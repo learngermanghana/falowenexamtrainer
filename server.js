@@ -32,17 +32,7 @@ app.get("/", (req, res) => {
   res.send("Falowen Exam Coach Backend is running ✅");
 });
 
-// --- 1. Transcribe audio (TEMP: dummy, replace with real STT later) ---
-async function transcribeAudio(filePath) {
-  // TEMPORARY: skip real transcription while testing locally
-  console.log("⚠️ Using dummy transcript instead of real transcription.");
-
-  // Change this text to test different answers
-  return "Hallo, ich heiße Felix. Ich komme aus Ghana und wohne in Accra. Ich spreche Englisch und ein bisschen Deutsch.";
-}
-
-/*
-// --- REAL version (for later, when you want real transcription) ---
+// --- 1. Transcribe audio ---
 async function transcribeAudio(filePath) {
   try {
     const fileStream = fs.createReadStream(filePath);
@@ -59,7 +49,6 @@ async function transcribeAudio(filePath) {
     throw new Error("Transcription failed");
   }
 }
-*/
 
 // --- 2. Analyze speaking with GPT (Goethe-style feedback) ---
 async function analyzeSpeaking(transcript, teil, level) {
