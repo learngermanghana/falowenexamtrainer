@@ -19,13 +19,75 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// --- Allowed options ---
+const ALLOWED_TEILE = [
+  "Teil 1 – Vorstellung",
+  "Teil 2 – Fragen",
+  "Teil 3 – Bitten / Planen",
+];
+
+const ALLOWED_LEVELS = ["A1", "A2", "B1", "B2"];
+
+// Ensure uploads directory exists before multer writes streamed chunks
+const uploadsDir = path.join(__dirname, "uploads");
+fs.mkdirSync(uploadsDir, { recursive: true });
+
 // --- Multer config for audio uploads ---
 const upload = multer({
-  dest: "uploads/",
+  dest: uploadsDir,
   limits: {
     fileSize: 25 * 1024 * 1024, // 25MB max
   },
+  fileFilter: (req, file, cb) => {
+    const isAudio = file.mimetype.startsWith("audio/");
+    if (!isAudio) {
+      return cb(new Error("Only audio files are allowed"));
+    }
+    cb(null, true);
+  },
 });
+
+function validateTeilAndLevel(teil, level) {
+  if (!ALLOWED_TEILE.includes(teil)) {
+    return {
+      valid: false,
+      message: "Invalid exam teil provided. Choose a supported option.",
+    };
+  }
+
+  if (!ALLOWED_LEVELS.includes(level)) {
+    return {
+      valid: false,
+      message: "Invalid level provided. Choose A1, A2, B1, or B2.",
+    };
+  }
+
+  return { valid: true };
+}
+
+// Clean up stale uploads (e.g., if process crashes before fs.unlink runs)
+async function cleanOldUploads(maxAgeMs = 60 * 60 * 1000) {
+  try {
+    const now = Date.now();
+    const files = await fs.promises.readdir(uploadsDir);
+
+    await Promise.all(
+      files.map(async (file) => {
+        const fullPath = path.join(uploadsDir, file);
+        const stats = await fs.promises.stat(fullPath);
+        if (now - stats.mtimeMs > maxAgeMs) {
+          await fs.promises.unlink(fullPath);
+        }
+      })
+    );
+  } catch (error) {
+    console.error("⚠️ Failed to clean uploads directory:", error);
+  }
+}
+
+// Initial cleanup plus periodic sweep for chunked/partial uploads that were never deleted
+cleanOldUploads().catch(() => {});
+setInterval(() => cleanOldUploads().catch(() => {}), 30 * 60 * 1000); // every 30 minutes
 
 // --- Test route ---
 app.get("/", (req, res) => {
@@ -53,6 +115,11 @@ async function transcribeAudio(filePath) {
 // --- 2. Analyze speaking with GPT (Goethe-style feedback) ---
 async function analyzeSpeaking(transcript, teil, level) {
   try {
+    const validation = validateTeilAndLevel(teil, level);
+    if (!validation.valid) {
+      throw new Error(validation.message);
+    }
+
     // Short description per Teil for the prompt
     let teilDescription = "";
     if (teil && teil.startsWith("Teil 1")) {
@@ -171,7 +238,12 @@ app.post(
   "/api/speaking/analyze",
   upload.single("audio"), // field name: "audio"
   async (req, res) => {
-    const { teil, level } = req.body;
+    const { teil = "Teil 1 – Vorstellung", level = "A1" } = req.body;
+    const validation = validateTeilAndLevel(teil, level);
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.message });
+    }
+
     const file = req.file;
 
     if (!file) {
@@ -187,7 +259,7 @@ app.post(
       const transcript = await transcribeAudio(filePath);
 
       // 2) Analyze
-      const analysis = await analyzeSpeaking(transcript, teil || "Teil 1", level || "A1");
+      const analysis = await analyzeSpeaking(transcript, teil, level);
 
       // 3) Cleanup temp file
       fs.unlink(filePath, (err) => {
@@ -205,7 +277,16 @@ app.post(
 // --- 3B. Text endpoint: send typed answer + get feedback ---
 app.post("/api/speaking/analyze-text", async (req, res) => {
   try {
-    const { text, teil, level } = req.body;
+    const {
+      text,
+      teil = "Teil 1 – Vorstellung",
+      level = "A1",
+    } = req.body;
+
+    const validation = validateTeilAndLevel(teil, level);
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.message });
+    }
 
     if (!text || !text.trim()) {
       return res.status(400).json({ error: "Text is required." });
@@ -219,6 +300,19 @@ app.post("/api/speaking/analyze-text", async (req, res) => {
     console.error("❌ Error in /api/speaking/analyze-text:", error);
     return res.status(500).json({ error: error.message || "Server error" });
   }
+});
+
+// --- Multer / upload error handler ---
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    return res.status(400).json({ error: err.message });
+  }
+
+  if (err?.message === "Only audio files are allowed") {
+    return res.status(400).json({ error: err.message });
+  }
+
+  next(err);
 });
 
 app.listen(PORT, () => {
