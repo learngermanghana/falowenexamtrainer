@@ -9,11 +9,13 @@ function App() {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
+  const [typedAnswer, setTypedAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const chunksRef = useRef([]);
 
-  const backendUrl = "http://localhost:5000";
+  const backendUrl =
+    process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
   const startRecording = async () => {
     setResult(null);
@@ -56,6 +58,37 @@ function App() {
     setAudioBlob(null);
     setAudioUrl(null);
     setResult(null);
+  };
+
+  const sendTypedAnswerForCorrection = async () => {
+    const trimmed = typedAnswer.trim();
+
+    if (!trimmed) {
+      alert("Please type your answer before sending.");
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const response = await axios.post(`${backendUrl}/api/speaking/analyze-text`, {
+        text: trimmed,
+        teil,
+        level,
+      });
+
+      setResult(response.data);
+    } catch (err) {
+      console.error("Falowen frontend error:", err);
+      const msg =
+        err?.response?.data?.error ||
+        err.message ||
+        "Falowen Exam Coach: Error sending text for analysis.";
+      alert("Falowen Exam Coach:\n" + msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const sendForCorrection = async () => {
@@ -179,6 +212,32 @@ function App() {
               disabled={!audioBlob || loading}
             >
               {loading ? "Analyzing..." : "Send to Falowen for Feedback"}
+            </button>
+          </div>
+        </section>
+
+        <section style={styles.card}>
+          <h2 style={styles.sectionTitle}>2b. Prefer typing?</h2>
+          <p style={styles.helperText}>
+            💬 Paste a practice answer here if you cannot record audio. We will
+            still analyze it like a spoken response.
+          </p>
+
+          <textarea
+            value={typedAnswer}
+            onChange={(e) => setTypedAnswer(e.target.value)}
+            placeholder="Schreibe hier deine Antwort auf Deutsch..."
+            style={styles.textArea}
+            rows={5}
+          />
+
+          <div style={{ marginTop: 12 }}>
+            <button
+              style={styles.primaryButton}
+              onClick={sendTypedAnswerForCorrection}
+              disabled={loading}
+            >
+              {loading ? "Analyzing..." : "Send Typed Answer"}
             </button>
           </div>
         </section>
@@ -319,6 +378,16 @@ const styles = {
     fontSize: 16,
     marginTop: 12,
     marginBottom: 4,
+  },
+  textArea: {
+    width: "100%",
+    padding: 12,
+    borderRadius: 12,
+    border: "1px solid #d1d5db",
+    fontSize: 14,
+    resize: "vertical",
+    minHeight: 120,
+    boxSizing: "border-box",
   },
   resultText: {
     fontSize: 14,
