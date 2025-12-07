@@ -3,6 +3,14 @@ import React, { useState, useRef } from "react";
 import axios from "axios";
 
 function App() {
+  const ALLOWED_TEILE = [
+    "Teil 1 – Vorstellung",
+    "Teil 2 – Fragen",
+    "Teil 3 – Bitten / Planen",
+  ];
+
+  const ALLOWED_LEVELS = ["A1", "A2", "B1", "B2"];
+
   const [activePage, setActivePage] = useState("sprechen");
   const [teil, setTeil] = useState("Teil 1 – Vorstellung");
   const [level, setLevel] = useState("A1");
@@ -13,12 +21,14 @@ function App() {
   const [typedAnswer, setTypedAnswer] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
   const chunksRef = useRef([]);
 
   const backendUrl =
     process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
   const startRecording = async () => {
+    setError("");
     setResult(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -56,9 +66,25 @@ function App() {
   };
 
   const resetAudio = () => {
+    setError("");
     setAudioBlob(null);
     setAudioUrl(null);
     setResult(null);
+  };
+
+  const validateSelections = () => {
+    if (!ALLOWED_TEILE.includes(teil)) {
+      setError("Bitte wähle einen gültigen Teil aus der Liste.");
+      return false;
+    }
+
+    if (!ALLOWED_LEVELS.includes(level)) {
+      setError("Bitte wähle ein gültiges Niveau (A1–B2).");
+      return false;
+    }
+
+    setError("");
+    return true;
   };
 
   const sendTypedAnswerForCorrection = async () => {
@@ -66,6 +92,10 @@ function App() {
 
     if (!trimmed) {
       alert("Please type your answer before sending.");
+      return;
+    }
+
+    if (!validateSelections()) {
       return;
     }
 
@@ -86,7 +116,7 @@ function App() {
         err?.response?.data?.error ||
         err.message ||
         "Falowen Exam Coach: Error sending text for analysis.";
-      alert("Falowen Exam Coach:\n" + msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -95,6 +125,10 @@ function App() {
   const sendForCorrection = async () => {
     if (!audioBlob) {
       alert("Please record your answer first.");
+      return;
+    }
+
+    if (!validateSelections()) {
       return;
     }
 
@@ -124,7 +158,7 @@ function App() {
         err?.response?.data?.error ||
         err.message ||
         "Falowen Exam Coach: Error sending audio for analysis.";
-      alert("Falowen Exam Coach:\n" + msg);
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -139,12 +173,15 @@ function App() {
             <label style={styles.label}>Teil</label>
             <select
               value={teil}
-              onChange={(e) => setTeil(e.target.value)}
+              onChange={(e) => {
+                setError("");
+                setTeil(e.target.value);
+              }}
               style={styles.select}
             >
-              <option>Teil 1 – Vorstellung</option>
-              <option>Teil 2 – Fragen</option>
-              <option>Teil 3 – Bitten / Planen</option>
+              {ALLOWED_TEILE.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
             </select>
           </div>
 
@@ -152,13 +189,15 @@ function App() {
             <label style={styles.label}>Niveau</label>
             <select
               value={level}
-              onChange={(e) => setLevel(e.target.value)}
+              onChange={(e) => {
+                setError("");
+                setLevel(e.target.value);
+              }}
               style={styles.select}
             >
-              <option>A1</option>
-              <option>A2</option>
-              <option>B1</option>
-              <option>B2</option>
+              {ALLOWED_LEVELS.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -206,6 +245,12 @@ function App() {
             {loading ? "Analyzing..." : "Send to Falowen for Feedback"}
           </button>
         </div>
+
+        {error && (
+          <div style={styles.errorBox}>
+            <strong>Hinweis:</strong> {error}
+          </div>
+        )}
       </section>
 
       {result && renderFeedback()}
@@ -225,12 +270,15 @@ function App() {
             <label style={styles.label}>Teil</label>
             <select
               value={teil}
-              onChange={(e) => setTeil(e.target.value)}
+              onChange={(e) => {
+                setError("");
+                setTeil(e.target.value);
+              }}
               style={styles.select}
             >
-              <option>Teil 1 – Vorstellung</option>
-              <option>Teil 2 – Fragen</option>
-              <option>Teil 3 – Bitten / Planen</option>
+              {ALLOWED_TEILE.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
             </select>
           </div>
 
@@ -238,20 +286,25 @@ function App() {
             <label style={styles.label}>Niveau</label>
             <select
               value={level}
-              onChange={(e) => setLevel(e.target.value)}
+              onChange={(e) => {
+                setError("");
+                setLevel(e.target.value);
+              }}
               style={styles.select}
             >
-              <option>A1</option>
-              <option>A2</option>
-              <option>B1</option>
-              <option>B2</option>
+              {ALLOWED_LEVELS.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
             </select>
           </div>
         </div>
 
         <textarea
           value={typedAnswer}
-          onChange={(e) => setTypedAnswer(e.target.value)}
+          onChange={(e) => {
+            setError("");
+            setTypedAnswer(e.target.value);
+          }}
           placeholder="Schreibe hier deine Antwort auf Deutsch..."
           style={styles.textArea}
           rows={7}
@@ -266,6 +319,12 @@ function App() {
             {loading ? "Analyzing..." : "Send Typed Answer"}
           </button>
         </div>
+
+        {error && (
+          <div style={styles.errorBox}>
+            <strong>Hinweis:</strong> {error}
+          </div>
+        )}
       </section>
 
       <section style={styles.card}>
@@ -380,6 +439,7 @@ function App() {
             style={activePage === "sprechen" ? styles.navButtonActive : styles.navButton}
             onClick={() => {
               setResult(null);
+              setError("");
               setActivePage("sprechen");
             }}
           >
@@ -389,6 +449,7 @@ function App() {
             style={activePage === "schreiben" ? styles.navButtonActive : styles.navButton}
             onClick={() => {
               setResult(null);
+              setError("");
               setActivePage("schreiben");
             }}
           >
@@ -398,6 +459,7 @@ function App() {
             style={activePage === "vocabs" ? styles.navButtonActive : styles.navButton}
             onClick={() => {
               setResult(null);
+              setError("");
               setActivePage("vocabs");
             }}
           >
@@ -595,6 +657,15 @@ const styles = {
     margin: 0,
     display: "grid",
     gap: 6,
+  },
+  errorBox: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 10,
+    background: "#fef3c7",
+    color: "#92400e",
+    border: "1px solid #f59e0b",
+    fontSize: 13,
   },
 };
 
