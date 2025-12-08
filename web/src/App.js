@@ -403,6 +403,139 @@ function App() {
     </>
   );
 
+  const storySeeds = [
+    {
+      title: "Verspäteter Zug",
+      hook:
+        "Du sitzt im Zug nach Berlin. Der Zug hat 50 Minuten Verspätung und du musst deine Freunde informieren.",
+      twist: "Plötzlich lernst du jemanden kennen, der dir einen Geheimtipp für Berlin gibt. Was ist er?",
+    },
+    {
+      title: "Wohnungssuche",
+      hook:
+        "Du besichtigst eine WG. Eine Mitbewohnerin kann am Tag des Einzugs nicht da sein.",
+      twist: "Du musst alles per Sprachnachricht klären und eine wichtige Frage stellen – welche?",
+    },
+    {
+      title: "Reise nach Zürich",
+      hook:
+        "Dein Gepäck ist noch in München. Du brauchst dringend Kleidung für ein Goethe-Prüfungstraining.",
+      twist: "Ein Ladenbesitzer bietet dir Hilfe an, aber nur wenn du einen kurzen Dialog auf Deutsch führst.",
+    },
+  ];
+
+  const examDayPlan = [
+    {
+      time: "Morgens",
+      steps: [
+        "10 Minuten Zungenbrecher laut lesen (z. B. 'Zwischen zwei Zwetschgenzweigen').",
+        "Atmung 4-4-6: 4 Sekunden einatmen, 4 halten, 6 ausatmen.",
+        "Ein kurzer Smalltalk im Kopf: Begrüßung, Name, Herkunft, Tagesziel.",
+      ],
+    },
+    {
+      time: "Kurz vor der Prüfung",
+      steps: [
+        "Eine Karte ziehen: Teil 1, 2 oder 3 simulieren und drei Sätze sprechen.",
+        "Checkliste: Pass, Stift, Wasser, Uhr. Dann Schultern lockern und lächeln.",
+        "Lieblingssatz bereit halten: 'Darf ich kurz nachfragen ...?'",
+      ],
+    },
+    {
+      time: "Nach der Prüfung",
+      steps: [
+        "Reflexion aufschreiben: 3 Sätze, was gut lief, 1 Satz, was du beim nächsten Mal anders machst.",
+        "Belohnungsidee: Kaffee, Spaziergang oder kurzer Call mit Freunden auf Deutsch.",
+      ],
+    },
+  ];
+
+  const challengeDeck = [
+    "Führe ein 6-Satz-Rollenspiel: Du bist Touristenführer:in für einen Park in deiner Stadt.",
+    "Erkläre einem Freund auf Deutsch, wie man dein Lieblingsrezept kocht – mindestens fünf Verben im Imperativ!",
+    "Erfinde eine Mini-Story mit den Wörtern: Prüfung, Regenschirm, Überraschung, Fahrkarte.",
+    "Beschreibe einen Gegenstand in deiner Nähe, ohne seinen Namen zu nennen. Lass jemanden raten.",
+    "Plane ein Wochenende in Hamburg mit drei Stationen, Preisen und Uhrzeiten.",
+  ];
+
+  const renderCreativePage = () => (
+    <>
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>Kreative Story-Seeds</h2>
+        <p style={styles.helperText}>
+          🌟 Nutze diese Situationen als spontane Prüfungs-Bühne. Setze dir einen Timer von 90 Sekunden
+          und erzähle die Szene laut. Kombiniere mindestens zwei Zeiten (Präsens & Perfekt).
+        </p>
+        <div style={styles.vocabGrid}>
+          {storySeeds.map((seed) => (
+            <div key={seed.title} style={styles.storyCard}>
+              <div style={styles.storyHeader}>{seed.title}</div>
+              <p style={styles.resultText}>{seed.hook}</p>
+              <p style={styles.twist}>Plot Twist: {seed.twist}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={styles.card}>
+        <h3 style={styles.sectionTitle}>Challenge-Deck</h3>
+        <p style={styles.helperText}>
+          🎲 Ziehe mental eine Karte und sprich oder schreibe deine Antwort. Nutze eine Stoppuhr, um
+          dein Timing wie in der Goethe-Prüfung zu trainieren.
+        </p>
+        <ul style={styles.challengeList}>
+          {challengeDeck.map((challenge) => (
+            <li key={challenge}>{challenge}</li>
+          ))}
+        </ul>
+      </section>
+    </>
+  );
+
+  const renderExamDayPage = () => (
+    <>
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>Prüfungstag-Plan</h2>
+        <p style={styles.helperText}>
+          📅 Mini-Rituale, damit du am Goethe-Prüfungstag fokussiert bleibst. Druck dir diese Liste aus und hake sie ab.
+        </p>
+        <div style={styles.timeline}>
+          {examDayPlan.map((block) => (
+            <div key={block.time} style={styles.timelineBlock}>
+              <div style={styles.timelineLabel}>{block.time}</div>
+              <ul style={styles.timelineList}>
+                {block.steps.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section style={styles.card}>
+        <h3 style={styles.sectionTitle}>Mini-Mantra & Körper</h3>
+        <p style={styles.helperText}>
+          🧘 Sag laut: "Ich kenne meine Strukturen. Ich kann fragen, reagieren und improvisieren." Dann 30 Sekunden Power-Pose, Schultern hoch, tief atmen.
+        </p>
+        <div style={styles.tipGrid}>
+          <div style={styles.tipCard}>
+            <h4 style={styles.tipTitle}>Stimm-Check</h4>
+            <p style={styles.resultText}>Sprich drei Mal laut: "Ich bringe Ruhe in den Raum." Danach Zungenbrecher + großes Lächeln.</p>
+          </div>
+          <div style={styles.tipCard}>
+            <h4 style={styles.tipTitle}>Plan B</h4>
+            <p style={styles.resultText}>Wenn du ein Wort vergisst: Umschreiben, Beispiele nennen, nachfragen. Dein Ziel ist Verständlichkeit, nicht Perfektion.</p>
+          </div>
+          <div style={styles.tipCard}>
+            <h4 style={styles.tipTitle}>Energie</h4>
+            <p style={styles.resultText}>Wasser, leichter Snack, ein kurzer Spaziergang. Keine neuen Grammatikregeln 60 Minuten vor der Prüfung.</p>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+
   const renderFeedback = () => (
     <section style={styles.resultCard}>
       <h2 style={styles.sectionTitle}>3. Feedback</h2>
@@ -465,6 +598,26 @@ function App() {
           >
             Vokabeln
           </button>
+          <button
+            style={activePage === "creative" ? styles.navButtonActive : styles.navButton}
+            onClick={() => {
+              setResult(null);
+              setError("");
+              setActivePage("creative");
+            }}
+          >
+            Kreativideen
+          </button>
+          <button
+            style={activePage === "examday" ? styles.navButtonActive : styles.navButton}
+            onClick={() => {
+              setResult(null);
+              setError("");
+              setActivePage("examday");
+            }}
+          >
+            Prüfungstag
+          </button>
         </div>
       </header>
 
@@ -472,6 +625,8 @@ function App() {
         {activePage === "sprechen" && renderSprechenPage()}
         {activePage === "schreiben" && renderSchreibenPage()}
         {activePage === "vocabs" && renderVocabsPage()}
+        {activePage === "creative" && renderCreativePage()}
+        {activePage === "examday" && renderExamDayPage()}
       </main>
     </div>
   );
@@ -657,6 +812,68 @@ const styles = {
     margin: 0,
     display: "grid",
     gap: 6,
+  },
+  storyCard: {
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    padding: 12,
+    background: "#ffffff",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
+  },
+  storyHeader: {
+    fontWeight: 700,
+    marginBottom: 6,
+    color: "#1f2937",
+  },
+  twist: {
+    color: "#2563eb",
+    fontWeight: 600,
+    marginTop: 6,
+    fontSize: 14,
+  },
+  challengeList: {
+    paddingLeft: 20,
+    display: "grid",
+    gap: 6,
+    margin: 0,
+    color: "#111827",
+  },
+  timeline: {
+    display: "grid",
+    gap: 12,
+  },
+  timelineBlock: {
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    padding: 12,
+    background: "#f9fafb",
+  },
+  timelineLabel: {
+    fontWeight: 700,
+    marginBottom: 8,
+  },
+  timelineList: {
+    paddingLeft: 18,
+    margin: 0,
+    display: "grid",
+    gap: 6,
+    color: "#111827",
+  },
+  tipGrid: {
+    display: "grid",
+    gap: 12,
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  },
+  tipCard: {
+    border: "1px solid #e5e7eb",
+    borderRadius: 12,
+    padding: 12,
+    background: "#ffffff",
+    boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
+  },
+  tipTitle: {
+    margin: "0 0 6px 0",
+    fontSize: 15,
   },
   errorBox: {
     marginTop: 12,
