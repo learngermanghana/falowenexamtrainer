@@ -1,8 +1,15 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
+import App from "./App";
 
-test('renders learn react link', () => {
+jest.mock("./services/coachService", () => ({
+  analyzeAudio: jest.fn(),
+  analyzeText: jest.fn(),
+}));
+
+test("renders navigation buttons", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByText(/Falowen Exam Coach/i)).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Sprechen/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Schreiben/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /Vokabeln/i })).toBeInTheDocument();
 });
