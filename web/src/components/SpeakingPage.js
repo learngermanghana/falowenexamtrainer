@@ -21,7 +21,15 @@ const SpeakingPage = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [waveform, setWaveform] = useState([]);
   const chunksRef = useRef([]);
+  const streamRef = useRef(null);
+  const timerRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const dataArrayRef = useRef(null);
+  const animationFrameRef = useRef(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questionError, setQuestionError] = useState("");
@@ -73,6 +81,8 @@ const SpeakingPage = () => {
     setAudioBlob(null);
     setAudioUrl(null);
     setResult(null);
+    setRecordingTime(0);
+    setWaveform([]);
   };
 
   const currentQuestion = questions[currentQuestionIndex] || null;
@@ -104,6 +114,48 @@ const SpeakingPage = () => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
 
+      streamRef.current = stream;
+
+      const audioContext = new AudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      source.connect(analyser);
+
+      audioContextRef.current = audioContext;
+      analyserRef.current = analyser;
+      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
+
+      const drawWaveform = () => {
+        if (!analyserRef.current || !dataArrayRef.current) return;
+
+        analyserRef.current.getByteTimeDomainData(dataArrayRef.current);
+
+        const chunkSize = Math.max(
+          1,
+          Math.floor(dataArrayRef.current.length / 24)
+        );
+
+        const bars = [];
+        for (let i = 0; i < dataArrayRef.current.length; i += chunkSize) {
+          const slice = dataArrayRef.current.slice(i, i + chunkSize);
+          const avg =
+            slice.reduce((sum, val) => sum + Math.abs(val - 128), 0) /
+            (slice.length * 128);
+          bars.push(Math.min(avg, 1));
+        }
+
+        setWaveform(bars);
+        animationFrameRef.current = requestAnimationFrame(drawWaveform);
+      };
+
+      drawWaveform();
+
+      setRecordingTime(0);
+      timerRef.current = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+
       chunksRef.current = [];
 
       recorder.ondataavailable = (e) => {
@@ -133,7 +185,54 @@ const SpeakingPage = () => {
       mediaRecorder.stop();
       setIsRecording(false);
     }
+
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+
+    analyserRef.current = null;
+    dataArrayRef.current = null;
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
   };
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+
+      if (mediaRecorder && mediaRecorder.state !== "inactive") {
+        mediaRecorder.stop();
+      }
+
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, [mediaRecorder]);
 
   const sendForCorrection = async () => {
     if (!audioBlob) {
@@ -230,6 +329,48 @@ const SpeakingPage = () => {
           >
             Clear Recording
           </button>
+        </div>
+
+        <div
+          style={{
+            marginTop: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ ...styles.helperText, margin: 0 }}>
+            ⏱️ Aufnahmezeit: {Math.floor(recordingTime / 60)
+              .toString()
+              .padStart(2, "0")}
+            :{(recordingTime % 60).toString().padStart(2, "0")}
+          </div>
+
+          {waveform.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "flex-end",
+                gap: 4,
+                height: 48,
+                flexGrow: 1,
+              }}
+            >
+              {waveform.map((value, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    width: 6,
+                    borderRadius: 4,
+                    background: "linear-gradient(180deg, #4ade80, #16a34a)",
+                    height: `${Math.max(8, value * 48)}px`,
+                    transition: "height 80ms ease-out",
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {audioUrl && (
