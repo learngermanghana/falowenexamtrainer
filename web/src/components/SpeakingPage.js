@@ -3,7 +3,7 @@ import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS, ALLOWED_TEILE } from "../context/ExamContext";
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
-import { analyzeAudio } from "../services/coachService";
+import { analyzeAudio, analyzeText } from "../services/coachService";
 
 const SpeakingPage = () => {
   const {
@@ -21,6 +21,7 @@ const SpeakingPage = () => {
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
+  const [typedAnswer, setTypedAnswer] = useState("");
   const chunksRef = useRef([]);
 
   const resetAudio = () => {
@@ -111,6 +112,36 @@ const SpeakingPage = () => {
     }
   };
 
+  const sendTypedAnswerForCorrection = async () => {
+    const trimmed = typedAnswer.trim();
+
+    if (!trimmed) {
+      alert("Please type your answer before sending.");
+      return;
+    }
+
+    if (!validateSelections()) {
+      return;
+    }
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      const data = await analyzeText(trimmed, teil, level);
+      setResult(data);
+    } catch (err) {
+      console.error("Falowen frontend error:", err);
+      const msg =
+        err?.response?.data?.error ||
+        err.message ||
+        "Falowen Exam Coach: Error sending text for analysis.";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <>
       <SettingsForm title="1. Choose Exam Settings" />
@@ -163,6 +194,35 @@ const SpeakingPage = () => {
             <strong>Hinweis:</strong> {error}
           </div>
         )}
+      </section>
+
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>Prefer typing instead?</h2>
+        <p style={styles.helperText}>
+          ✍️ No microphone? Paste or type what you would say. You’ll get the same speaking feedback as the
+          recording flow.
+        </p>
+
+        <textarea
+          value={typedAnswer}
+          onChange={(e) => {
+            setError("");
+            setTypedAnswer(e.target.value);
+          }}
+          placeholder="Schreibe hier deine Antwort auf Deutsch..."
+          style={styles.textArea}
+          rows={5}
+        />
+
+        <div style={{ marginTop: 12 }}>
+          <button
+            style={styles.secondaryButton}
+            onClick={sendTypedAnswerForCorrection}
+            disabled={loading}
+          >
+            {loading ? "Analyzing..." : "Send Typed Answer"}
+          </button>
+        </div>
       </section>
 
       <Feedback result={result} />
