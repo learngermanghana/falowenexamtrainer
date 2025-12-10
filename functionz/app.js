@@ -27,6 +27,17 @@ const ALLOWED_TEILE = [
 
 const ALLOWED_LEVELS = ["A1", "A2", "B1", "B2"];
 
+// --- Google Sheets config for practice questions ---
+const SHEET_ID = "1zaAT5NjRGKiITV7EpuSHvYMBHHENMs9Piw3pNcyQtho";
+const SHEET_GID = "1161508231"; // Exams_list tab
+const SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+const QUESTIONS_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+let cachedQuestions = {
+  fetchedAt: 0,
+  data: null,
+};
+
 // Ensure uploads directory exists before multer writes streamed chunks
 const uploadsDir = process.env.VERCEL
   ? path.join("/tmp", "uploads")
@@ -64,6 +75,103 @@ function validateTeilAndLevel(teil, level) {
   }
 
   return { valid: true };
+}
+
+function splitCsvLine(line) {
+  const cells = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    const next = line[i + 1];
+
+    if (char === '"' && next === '"' && inQuotes) {
+      current += '"';
+      i += 1; // skip escaped quote
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === "," && !inQuotes) {
+      cells.push(current.trim());
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  cells.push(current.trim());
+  return cells;
+}
+
+function parseCsv(csvText) {
+  const lines = csvText.split(/\r?\n/).filter((line) => line.trim().length > 0);
+  if (lines.length === 0) return [];
+
+  const headers = splitCsvLine(lines[0]);
+
+  return lines.slice(1).map((line) => {
+    const values = splitCsvLine(line);
+    const row = {};
+
+    headers.forEach((header, idx) => {
+      row[header] = values[idx] ?? "";
+    });
+
+    return row;
+  });
+}
+
+async function fetchSheetQuestions() {
+  const now = Date.now();
+  if (cachedQuestions.data && now - cachedQuestions.fetchedAt < QUESTIONS_CACHE_TTL_MS) {
+    return cachedQuestions.data;
+  }
+
+  if (typeof fetch !== "function") {
+    throw new Error("Fetch API is not available in this runtime.");
+  }
+
+  const response = await fetch(SHEET_EXPORT_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch sheet (status ${response.status})`);
+  }
+
+  const csvText = await response.text();
+  const rows = parseCsv(csvText);
+
+  const normalized = rows
+    .map((row) => {
+      const level = row.Level?.trim();
+      const teil = row.Teil?.trim();
+      const topic =
+        row["Topic/Prompt"]?.trim() || row["Topic / Prompt"]?.trim() || "";
+      const keyword =
+        row["Keyword/Subtopic"]?.trim() || row["Keyword / Subtopic"]?.trim() || "";
+
+      if (!level || !teil || !topic) return null;
+
+      return {
+        level,
+        teil,
+        topic,
+        keyword,
+      };
+    })
+    .filter(Boolean);
+
+  cachedQuestions = {
+    fetchedAt: now,
+    data: normalized,
+  };
+
+  return normalized;
 }
 
 // Clean up stale uploads (e.g., if process crashes before fs.unlink runs)
@@ -276,7 +384,39 @@ app.post(
   }
 );
 
-// --- 3B. Text endpoint: send typed answer + get feedback ---
+// --- 3B. Questions endpoint: fetch prompts from Google Sheets ---
+app.get("/api/speaking/questions", async (req, res) => {
+  const { level, teil } = req.query;
+
+  if (!level || !ALLOWED_LEVELS.includes(level)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid or missing level. Choose A1, A2, B1, or B2." });
+  }
+
+  if (teil && !ALLOWED_TEILE.includes(teil)) {
+    return res.status(400).json({ error: "Invalid exam teil provided." });
+  }
+
+  try {
+    const questions = await fetchSheetQuestions();
+
+    const filtered = questions.filter(
+      (q) =>
+        q.level?.toUpperCase() === level.toUpperCase() &&
+        (!teil || q.teil === teil)
+    );
+
+    return res.json({ questions: filtered });
+  } catch (error) {
+    console.error("❌ Failed to fetch speaking questions:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to load speaking questions. Please try again." });
+  }
+});
+
+// --- 3C. Text endpoint: send typed answer + get feedback ---
 app.post("/api/speaking/analyze-text", async (req, res) => {
   try {
     const {
