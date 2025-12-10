@@ -1,81 +1,98 @@
-import { initializeApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import {
-  getMessaging,
-  getToken,
-  isSupported,
-  onMessage,
-} from "firebase/messaging";
+const isBrowser = typeof window !== "undefined";
 
-const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+const STORAGE_KEY = "exam-coach-auth";
+
+const loadStoredUser = () => {
+  if (!isBrowser) return null;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    console.warn("Failed to read stored auth user", error);
+    return null;
+  }
 };
 
-const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const persistUser = (user) => {
+  if (!isBrowser) return;
+  try {
+    if (user) {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    } else {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+  } catch (error) {
+    console.warn("Failed to persist auth user", error);
+  }
+};
 
-export const auth = getAuth(app);
+const createToken = () => {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Math.random().toString(36).slice(2);
+};
 
-let messagingPromise = null;
+const auth = {
+  currentUser: loadStoredUser(),
+  listeners: new Set(),
+};
 
-const getMessagingInstance = async () => {
-  if (!messagingPromise) {
-    messagingPromise = isSupported().then((supported) =>
-      supported ? getMessaging(app) : null
-    );
+const notifyAuthListeners = () => {
+  auth.listeners.forEach((callback) => callback(auth.currentUser));
+};
+
+const wrapUser = (user) => ({
+  ...user,
+  getIdToken: async () => user.token,
+});
+
+const setCurrentUser = (user) => {
+  auth.currentUser = user ? wrapUser(user) : null;
+  persistUser(user ? auth.currentUser : null);
+  notifyAuthListeners();
+};
+
+export const onIdTokenChanged = (authInstance, callback) => {
+  callback(authInstance.currentUser);
+  authInstance.listeners.add(callback);
+  return () => authInstance.listeners.delete(callback);
+};
+
+export const createUserWithEmailAndPassword = async (_auth, email, password) => {
+  if (!email || !password) {
+    throw new Error("Email and password are required");
   }
 
-  return messagingPromise;
+  const user = {
+    uid: createToken(),
+    email,
+    password,
+    token: createToken(),
+  };
+
+  setCurrentUser(user);
+  return { user: auth.currentUser };
 };
 
-const ensureServiceWorker = async () => {
-  if (!("serviceWorker" in navigator)) return null;
+export const signInWithEmailAndPassword = async (_auth, email, password) => {
+  const stored = auth.currentUser;
+  if (!stored || stored.email !== email || stored.password !== password) {
+    throw new Error("Invalid credentials");
+  }
 
-  const registration = await navigator.serviceWorker.register(
-    "/firebase-messaging-sw.js"
-  );
+  setCurrentUser({ ...stored, token: createToken() });
+  return { user: auth.currentUser };
+};
 
-  registration?.active?.postMessage({
-    type: "INIT_FIREBASE",
-    payload: firebaseConfig,
-  });
-
-  return registration;
+export const signOut = async (_auth) => {
+  setCurrentUser(null);
 };
 
 export const requestMessagingToken = async () => {
-  const messaging = await getMessagingInstance();
-
-  if (!messaging) {
-    throw new Error("Push messaging is not supported in this browser.");
-  }
-
-  if (!("Notification" in window)) {
-    throw new Error("Notifications are not available in this environment.");
-  }
-
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") {
-    throw new Error("Notifications were not granted.");
-  }
-
-  const registration = await ensureServiceWorker();
-
-  const token = await getToken(messaging, {
-    vapidKey: process.env.REACT_APP_FIREBASE_VAPID_KEY,
-    serviceWorkerRegistration: registration || undefined,
-  });
-
-  return token;
+  throw new Error("Push notifications are unavailable without the Firebase SDK.");
 };
 
-export const listenForForegroundMessages = async (callback) => {
-  const messaging = await getMessagingInstance();
-  if (!messaging) return () => {};
+export const listenForForegroundMessages = async () => () => {};
 
-  return onMessage(messaging, callback);
-};
+export { auth };
