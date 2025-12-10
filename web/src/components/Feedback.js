@@ -60,24 +60,25 @@ const Feedback = ({ result }) => {
 
   if (!result) return null;
 
+  const feedback = result.feedback || result;
+  const transcript = result.transcript || feedback.transcript;
   const {
-    transcript,
     corrected_text,
     overall_level,
     overall_score,
-    scores,
+    scores = {},
     strengths = [],
     improvements = [],
     example_corrections = [],
     practice_phrases = [],
     next_task_hint,
-  } = result;
+  } = feedback;
 
   const hasScores = scores && Object.keys(scores).length > 0;
 
   return (
     <section style={styles.resultCard}>
-      <h2 style={styles.sectionTitle}>3. Feedback</h2>
+      <h2 style={styles.sectionTitle}>Feedback</h2>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
         <div style={{ flex: 1, minWidth: 180 }}>
@@ -176,7 +177,7 @@ const Feedback = ({ result }) => {
             style={styles.primaryButton}
             onClick={() => setShowPracticeTask(true)}
           >
-            Train this now
+            Train this skill again
           </button>
           {showPracticeTask && (
             <div
