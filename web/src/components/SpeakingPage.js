@@ -15,20 +15,28 @@ const SIMULATION_STEPS = [
       "Begrüße die Prüfer:innen, nenne deinen Namen, Herkunft und zwei kurze Fakten über dich (z. B. Beruf, Hobbys).",
   },
   {
-    teil: "Teil 2 – Fragen",
+    teil: "Teil 2 – Fragen stellen",
     thinkSeconds: 30,
     speakSeconds: 90,
     instructions:
-      "Reagiere auf 2–3 Alltagsfragen. Sprich ganze Sätze, gib kurze Begründungen und stelle selbst eine Rückfrage.",
+      "Stell deiner Mitprüferin/deinem Mitprüfer drei Fragen zu einem Thema (z. B. Freizeit, Wohnen, Arbeit).",
   },
   {
-    teil: "Teil 3 – Bitten / Planen",
-    thinkSeconds: 45,
+    teil: "Teil 3 – Etwas planen",
+    thinkSeconds: 30,
     speakSeconds: 120,
     instructions:
-      "Plane etwas mit einer anderen Person. Mache mindestens drei höfliche Bitten oder Vorschläge und reagiere flexibel, falls etwas nicht passt.",
+      "Plane zusammen mit deiner Mitprüferin/deinem Mitprüfer eine Aktivität. Mach Vorschläge, reagiere auf Vorschläge und trefft eine Entscheidung.",
   },
 ];
+
+const formatTime = (seconds) => {
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+};
 
 const SpeakingPage = () => {
   const {
@@ -51,20 +59,16 @@ const SpeakingPage = () => {
   const [audioUrl, setAudioUrl] = useState(null);
   const [recordingTime, setRecordingTime] = useState(0);
   const [waveform, setWaveform] = useState([]);
-  const chunksRef = useRef([]);
-  const streamRef = useRef(null);
-  const timerRef = useRef(null);
-  const audioContextRef = useRef(null);
-  const analyserRef = useRef(null);
-  const dataArrayRef = useRef(null);
-  const animationFrameRef = useRef(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [questionError, setQuestionError] = useState("");
   const [questionsLoading, setQuestionsLoading] = useState(false);
+  const [questionError, setQuestionError] = useState("");
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const animationRef = useRef(null);
   const [simulationMode, setSimulationMode] = useState(false);
-  const [simulationPhase, setSimulationPhase] = useState("idle");
-  const [simulationStepIndex, setSimulationStepIndex] = useState(0);
+  const [currentSimulationStepIndex, setCurrentSimulationStepIndex] =
+    useState(0);
   const [simulationCountdown, setSimulationCountdown] = useState(null);
   const [simulationScores, setSimulationScores] = useState([]);
   const [simulationSummary, setSimulationSummary] = useState(null);
@@ -82,24 +86,25 @@ const SpeakingPage = () => {
       setCurrentQuestionIndex(0);
 
       try {
-        const fetched = await fetchSpeakingQuestions(level, teil);
+        const data = await fetchSpeakingQuestions(level, teil);
         if (!isMounted) return;
 
-        setQuestions(fetched);
-
-        if (fetched.length === 0) {
+        if (!data || !Array.isArray(data.questions) || data.questions.length === 0) {
           setQuestionError(
-            "Keine passenden Prüfungsfragen für diese Auswahl gefunden."
+            "Keine Fragen verfügbar. Bitte wähle ein anderes Niveau oder einen anderen Teil."
           );
+          setQuestions([]);
+        } else {
+          setQuestions(data.questions);
         }
       } catch (err) {
-        if (!isMounted) return;
-        console.error("Falowen frontend error while loading questions:", err);
-        const msg =
-          err?.response?.data?.error ||
-          err.message ||
-          "Fragen konnten nicht geladen werden.";
-        setQuestionError(msg);
+        console.error(err);
+        if (isMounted) {
+          setQuestionError(
+            "Fehler beim Laden der Fragen. Bitte versuche es später erneut."
+          );
+          setQuestions([]);
+        }
       } finally {
         if (isMounted) {
           setQuestionsLoading(false);
@@ -130,576 +135,679 @@ const SpeakingPage = () => {
     setCurrentQuestionIndex((prev) => (prev + 1) % questions.length);
   };
 
-  const validateSelections = () => {
-    if (!ALLOWED_TEILE.includes(teil)) {
-      setError("Bitte wähle einen gültigen Teil aus der Liste.");
-      return false;
+  const cleanupAudioContext = () => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
     }
-
-    if (!ALLOWED_LEVELS.includes(level)) {
-      setError("Bitte wähle ein gültiges Niveau (A1–B2).");
-      return false;
-    }
-
-    setError("");
-    return true;
-  };
-
-  const startRecording = async () => {
-    setError("");
-    setResult(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-
-      streamRef.current = stream;
-
-      const audioContext = new AudioContext();
-      const source = audioContext.createMediaStreamSource(stream);
-      const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
-      source.connect(analyser);
-
-      audioContextRef.current = audioContext;
-      analyserRef.current = analyser;
-      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
-
-      const drawWaveform = () => {
-        if (!analyserRef.current || !dataArrayRef.current) return;
-
-        analyserRef.current.getByteTimeDomainData(dataArrayRef.current);
-
-        const chunkSize = Math.max(
-          1,
-          Math.floor(dataArrayRef.current.length / 24)
-        );
-
-        const bars = [];
-        for (let i = 0; i < dataArrayRef.current.length; i += chunkSize) {
-          const slice = dataArrayRef.current.slice(i, i + chunkSize);
-          const avg =
-            slice.reduce((sum, val) => sum + Math.abs(val - 128), 0) /
-            (slice.length * 128);
-          bars.push(Math.min(avg, 1));
-        }
-
-        setWaveform(bars);
-        animationFrameRef.current = requestAnimationFrame(drawWaveform);
-      };
-
-      drawWaveform();
-
-      setRecordingTime(0);
-      timerRef.current = setInterval(() => {
-        setRecordingTime((prev) => prev + 1);
-      }, 1000);
-
-      chunksRef.current = [];
-
-      recorder.ondataavailable = (e) => {
-        chunksRef.current.push(e.data);
-      };
-
-      recorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
-        const url = URL.createObjectURL(blob);
-        setAudioBlob(blob);
-        setAudioUrl(url);
-      };
-
-      recorder.start();
-      setMediaRecorder(recorder);
-      setIsRecording(true);
-      if (simulationMode && simulationPhase === "speaking") {
-        setHasStartedSpeaking(true);
-      }
-    } catch (err) {
-      console.error(err);
-      alert(
-        "Falowen Exam Coach: Microphone access failed. Please allow mic access in your browser."
-      );
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      setIsRecording(false);
-    }
-
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-
     if (audioContextRef.current) {
       audioContextRef.current.close();
       audioContextRef.current = null;
+      analyserRef.current = null;
     }
+  };
 
-    analyserRef.current = null;
-    dataArrayRef.current = null;
+  const startVisualization = (stream) => {
+    cleanupAudioContext();
 
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
-      }
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const analyser = audioContext.createAnalyser();
+
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+
+    analyser.fftSize = 256;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    const draw = () => {
+      analyser.getByteTimeDomainData(dataArray);
+      const normalizedData = Array.from(dataArray).map(
+        (v) => (v - 128) / 128
+      );
+      setWaveform(normalizedData);
+      animationRef.current = requestAnimationFrame(draw);
+    };
+
+    audioContextRef.current = audioContext;
+    analyserRef.current = analyser;
+    draw();
+  };
+
+  const stopVisualization = () => {
+    cleanupAudioContext();
+    setWaveform([]);
   };
 
   useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-      }
-
-      if (mediaRecorder && mediaRecorder.state !== "inactive") {
-        mediaRecorder.stop();
-      }
-
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-      }
-    };
-  }, [mediaRecorder]);
-
-  useEffect(() => {
-    if (!simulationMode || simulationCountdown === null) return undefined;
-
-    if (simulationCountdown <= 0) {
-      handleCountdownComplete();
-      return undefined;
+    let interval = null;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+    } else if (!isRecording && recordingTime !== 0) {
+      clearInterval(interval);
     }
 
-    countdownRef.current = setTimeout(() => {
-      setSimulationCountdown((prev) => (prev !== null ? prev - 1 : null));
-    }, 1000);
-
     return () => {
-      if (countdownRef.current) {
-        clearTimeout(countdownRef.current);
-        countdownRef.current = null;
-      }
+      if (interval) clearInterval(interval);
     };
-  }, [simulationCountdown, simulationMode, simulationPhase]);
+  }, [isRecording, recordingTime]);
 
-  useEffect(() => {
-    if (!simulationMode || simulationPhase !== "speaking") return;
-    if (!isRecording && hasStartedSpeaking) {
-      finishCurrentTeil("recording");
+  const validateLevel = () => {
+    if (!ALLOWED_LEVELS.includes(level)) {
+      setError("Bitte wähle ein gültiges Sprachniveau (A1, A2 oder B1).");
+      return false;
     }
-  }, [hasStartedSpeaking, isRecording, simulationMode, simulationPhase]);
+    return true;
+  };
 
-  const sendForCorrection = async () => {
+  const validateTeil = () => {
+    if (!ALLOWED_TEILE.includes(teil)) {
+      setError("Bitte wähle einen gültigen Prüfungsteil.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleAssessment = async () => {
     if (!audioBlob) {
-      alert("Please record your answer first.");
+      setError(
+        "Bitte nimm zuerst deine Antwort auf oder lade eine Audio-Datei hoch."
+      );
       return;
     }
 
-    if (!validateSelections()) {
-      return;
-    }
+    if (!validateLevel() || !validateTeil()) return;
 
     setLoading(true);
-    setResult(null);
+    setError("");
 
     try {
-      const data = await analyzeAudio(audioBlob, teil, level);
-      const feedback = data.feedback || data;
-      const enrichedResult = {
-        ...feedback,
-        transcript: data.transcript,
-        teil,
+      const analysis = await analyzeAudio({
+        audioBlob,
         level,
-        mode: "Speaking",
-      };
-      setResult(enrichedResult);
-      addResultToHistory(enrichedResult);
+        teil,
+        contextType: simulationMode ? "simulation" : "single",
+        question: currentQuestion?.text || "",
+      });
+
+      setResult(analysis);
+      addResultToHistory(analysis);
+
+      resetAudio();
+      stopVisualization();
     } catch (err) {
-      console.error("Falowen frontend error:", err);
-      const msg =
-        err?.response?.data?.error ||
-        err.message ||
-        "Falowen Exam Coach: Error sending audio for analysis.";
-      setError(msg);
+      console.error(err);
+      setError(
+        "Die Auswertung ist fehlgeschlagen. Bitte versuche es später erneut."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const formatCountdown = (seconds) => {
-    if (seconds === null || seconds < 0) return "--:--";
-    const mins = Math.floor(seconds / 60)
-      .toString()
-      .padStart(2, "0");
-    const secs = (seconds % 60).toString().padStart(2, "0");
-    return `${mins}:${secs}`;
-  };
-
-  const buildSummaryText = (score) => {
-    const levelHint =
-      score >= 85
-        ? `Du klingst wie ein starkes ${level}, teilweise schon Richtung ${level === "B2" ? "C1" : "B2"}.`
-        : score >= 70
-        ? `Du bist ein solides ${level} und wirkst oft flüssig. Mit etwas Feinschliff wird der nächste Schritt erreichbar.`
-        : `Du deckst die Basics auf ${level}-Niveau ab, wirkst aber noch zögerlich.`;
-
-    const grammarHint =
-      score >= 85
-        ? "Feinschliff: präzise Zeitformen und klarere Artikel helfen dir, noch natürlicher zu klingen."
-        : score >= 70
-        ? "Achte auf Vergangenheitsformen und Übergänge, damit deine Sätze sauber verbunden sind."
-        : "Trainiere feste Redemittel und sichere Grammatik in Präsens und Perfekt, bevor du schneller sprichst.";
-
-    return `${levelHint} ${grammarHint}`;
-  };
-
-  const startSpeakingPhase = (step) => {
-    setSimulationPhase("speaking");
-    setSimulationCountdown(step.speakSeconds);
-    stepAdvanceGuardRef.current = false;
-    setHasStartedSpeaking(false);
-    resetAudio();
-  };
-
-  const handleCountdownComplete = () => {
-    const currentStep = SIMULATION_STEPS[simulationStepIndex];
-    if (!currentStep) return;
-
-    if (simulationPhase === "thinking") {
-      startSpeakingPhase(currentStep);
+  const handleSimulationAssessment = async () => {
+    if (!audioBlob) {
+      setError(
+        "Bitte nimm zuerst deine Antwort auf oder lade eine Audio-Datei hoch."
+      );
       return;
     }
 
-    if (simulationPhase === "speaking") {
-      if (isRecording) {
-        stopRecording();
+    if (!validateLevel()) return;
+
+    const step = SIMULATION_STEPS[currentSimulationStepIndex];
+    if (!step) {
+      setError("Ungültiger Simulationsschritt.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const analysis = await analyzeAudio({
+        audioBlob,
+        level,
+        teil: step.teil,
+        contextType: "simulation",
+        question: step.instructions,
+      });
+
+      setSimulationScores((prev) => [
+        ...prev,
+        {
+          stepIndex: currentSimulationStepIndex,
+          teil: step.teil,
+          score: analysis?.totalScore || null,
+          feedback: analysis?.feedback || "",
+          summary: analysis?.summary || "",
+        },
+      ]);
+
+      setResult(analysis);
+      addResultToHistory(analysis);
+
+      resetAudio();
+      stopVisualization();
+
+      if (currentSimulationStepIndex < SIMULATION_STEPS.length - 1) {
+        const nextIndex = currentSimulationStepIndex + 1;
+        setCurrentSimulationStepIndex(nextIndex);
+        setSimulationCountdown({
+          type: "think",
+          secondsRemaining: SIMULATION_STEPS[nextIndex].thinkSeconds,
+        });
+        setHasStartedSpeaking(false);
+      } else {
+        const scores = simulationScores.concat({
+          stepIndex: currentSimulationStepIndex,
+          teil: step.teil,
+          score: analysis?.totalScore || null,
+          feedback: analysis?.feedback || "",
+          summary: analysis?.summary || "",
+        });
+
+        const validScores = scores
+          .map((s) => s.score)
+          .filter((s) => typeof s === "number");
+
+        const averageScore =
+          validScores.length > 0
+            ? Math.round(
+                (validScores.reduce((sum, s) => sum + s, 0) / validScores.length) *
+                  10
+              ) / 10
+            : null;
+
+        setSimulationSummary({
+          steps: scores,
+          averageScore,
+          level,
+          date: new Date().toISOString(),
+        });
+
+        setSimulationCountdown(null);
+        setSimulationMode(false);
       }
-      finishCurrentTeil("timer");
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Die Auswertung für diesen Schritt ist fehlgeschlagen. Bitte versuche es später erneut."
+      );
+    } finally {
+      setLoading(false);
+      stepAdvanceGuardRef.current = false;
     }
   };
 
-  const finalizeSummary = (scores) => {
-    const total = scores.reduce((sum, item) => sum + item.score, 0);
-    const maxScore = SIMULATION_STEPS.length * 25;
-    const overall = Math.round((total / maxScore) * 100);
+  const handleRecordClick = async () => {
+    if (isRecording) {
+      if (mediaRecorder) {
+        mediaRecorder.stop();
+      }
+      setIsRecording(false);
+      stopVisualization();
+      return;
+    }
 
-    setSimulationSummary({
-      overall,
-      details: scores,
-      text: buildSummaryText(overall),
-    });
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        stream.getTracks().forEach((track) => track.stop());
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        setAudioBlob(blob);
+
+        if (audioUrl) {
+          URL.revokeObjectURL(audioUrl);
+        }
+        const newUrl = URL.createObjectURL(blob);
+        setAudioUrl(newUrl);
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setRecordingTime(0);
+      setError("");
+
+      startVisualization(stream);
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Zugriff auf das Mikrofon verweigert oder nicht möglich. Bitte überprüfe deine Einstellungen."
+      );
+    }
   };
 
-  const finishCurrentTeil = (reason) => {
-    if (!simulationMode || simulationPhase !== "speaking") return;
-    if (stepAdvanceGuardRef.current) return;
+  const handleUploadClick = () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "audio/*";
+
+    fileInput.onchange = (event) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const blob = new Blob([file], { type: file.type });
+      setAudioBlob(blob);
+
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+      const newUrl = URL.createObjectURL(blob);
+      setAudioUrl(newUrl);
+      resetAudio();
+    };
+
+    fileInput.click();
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audioUrl) {
+        URL.revokeObjectURL(audioUrl);
+      }
+      stopVisualization();
+    };
+  }, [audioUrl]);
+
+  const handleSimulationStart = () => {
+    setSimulationMode(true);
+    setSimulationScores([]);
+    setSimulationSummary(null);
+    setCurrentSimulationStepIndex(0);
+    setSimulationCountdown({
+      type: "think",
+      secondsRemaining: SIMULATION_STEPS[0].thinkSeconds,
+    });
+    setHasStartedSpeaking(false);
+    stepAdvanceGuardRef.current = false;
+    setTeil(SIMULATION_STEPS[0].teil);
+  };
+
+  const handleSimulationStop = () => {
+    setSimulationMode(false);
+    setSimulationCountdown(null);
+    setCurrentSimulationStepIndex(0);
+    setSimulationScores([]);
+    setSimulationSummary(null);
+    stepAdvanceGuardRef.current = false;
+  };
+
+  useEffect(() => {
+    if (!simulationMode || !simulationCountdown) return;
+
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+    }
+
+    countdownRef.current = setInterval(() => {
+      setSimulationCountdown((prev) => {
+        if (!prev) return null;
+
+        if (prev.secondsRemaining <= 1) {
+          if (prev.type === "think") {
+            setHasStartedSpeaking(true);
+            return {
+              type: "speak",
+              secondsRemaining:
+                SIMULATION_STEPS[currentSimulationStepIndex].speakSeconds,
+            };
+          } else {
+            clearInterval(countdownRef.current);
+            countdownRef.current = null;
+            return {
+              ...prev,
+              secondsRemaining: 0,
+            };
+          }
+        }
+
+        return {
+          ...prev,
+          secondsRemaining: prev.secondsRemaining - 1,
+        };
+      });
+    }, 1000);
+
+    return () => {
+      if (countdownRef.current) {
+        clearInterval(countdownRef.current);
+        countdownRef.current = null;
+      }
+    };
+  }, [simulationMode, currentSimulationStepIndex, simulationCountdown]);
+
+  useEffect(() => {
+    if (
+      !simulationMode ||
+      !simulationCountdown ||
+      simulationCountdown.type !== "speak" ||
+      simulationCountdown.secondsRemaining > 0 ||
+      stepAdvanceGuardRef.current
+    ) {
+      return;
+    }
+
     stepAdvanceGuardRef.current = true;
 
-    const currentStep = SIMULATION_STEPS[simulationStepIndex];
-    if (!currentStep) return;
-
-    const baseScores = { A1: 72, A2: 78, B1: 84, B2: 90 };
-    const normalizedBase = baseScores[level] ?? 75;
-    const scaledTeilScore = Math.min(
-      25,
-      Math.max(12, Math.round((normalizedBase / 100) * 25 + simulationStepIndex))
-    );
-
-    setSimulationScores((prev) => {
-      const updated = [...prev, { teil: currentStep.teil, score: scaledTeilScore, reason }];
-
-      if (simulationStepIndex >= SIMULATION_STEPS.length - 1) {
-        finalizeSummary(updated);
-        setSimulationMode(false);
-        setSimulationPhase("summary");
-        setSimulationCountdown(null);
+    const doneTimeout = setTimeout(() => {
+      if (audioBlob) {
+        handleSimulationAssessment();
       } else {
-        const nextIndex = simulationStepIndex + 1;
-        const nextStep = SIMULATION_STEPS[nextIndex];
-        setSimulationStepIndex(nextIndex);
-        setTeil(nextStep.teil);
-        setSimulationPhase("thinking");
-        setSimulationCountdown(nextStep.thinkSeconds);
-        setHasStartedSpeaking(false);
+        setError(
+          "Die Sprechzeit ist vorbei, aber es wurde keine Aufnahme gefunden. Bitte wiederhole den Schritt."
+        );
+        stepAdvanceGuardRef.current = false;
       }
+    }, 1000);
 
-      return updated;
-    });
-
-    resetAudio();
-  };
+    return () => {
+      clearTimeout(doneTimeout);
+    };
+  }, [
+    simulationMode,
+    simulationCountdown,
+    audioBlob,
+    handleSimulationAssessment,
+  ]);
 
   const handleInputModeChange = (mode) => {
     if (mode === inputMode) return;
-    if (isRecording) {
-      stopRecording();
-    }
     setInputMode(mode);
     resetAudio();
+    stopVisualization();
   };
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setAudioBlob(file);
-    setAudioUrl(URL.createObjectURL(file));
-    setError("");
-  };
-
-  const startSimulation = () => {
-    setSimulationSummary(null);
-    setSimulationScores([]);
-    setSimulationStepIndex(0);
-    setSimulationMode(true);
-    setSimulationPhase("thinking");
-    setSimulationCountdown(SIMULATION_STEPS[0].thinkSeconds);
-    setTeil(SIMULATION_STEPS[0].teil);
-    setHasStartedSpeaking(false);
-    stepAdvanceGuardRef.current = false;
-    resetAudio();
-  };
-
-  const stopSimulation = () => {
-    setSimulationMode(false);
-    setSimulationPhase("idle");
-    setSimulationCountdown(null);
-    setSimulationSummary(null);
-    setSimulationScores([]);
-    setHasStartedSpeaking(false);
-    stepAdvanceGuardRef.current = false;
-    if (countdownRef.current) {
-      clearTimeout(countdownRef.current);
-      countdownRef.current = null;
-    }
-  };
-
-  const currentSimulationStep = SIMULATION_STEPS[simulationStepIndex] || null;
 
   return (
     <>
-      <SettingsForm title="1. Choose Exam Settings" />
+      <header style={styles.sectionHeader}>
+        <h2 style={styles.sectionTitle}>Sprechen</h2>
+        <p style={styles.sectionDescription}>
+          Übe das Sprechen für die Goethe-Prüfung. Du kannst Antworten aufnehmen
+          oder eine Audio-Datei hochladen. Die KI gibt dir ein Feedback mit
+          Punkten, Stärken und Tipps.
+        </p>
+      </header>
 
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>2. Guided exam simulation</h2>
-        <p style={styles.helperText}>
-          Wähle dein Niveau und starte die geführte Simulation. Du bekommst pro Teil
-          eine Vorbereitungszeit und eine feste Sprechzeit. Danach geht es
-          automatisch weiter.
-        </p>
+        <SettingsForm />
+      </section>
 
-        <div style={styles.row}>
-          <button
-            style={styles.primaryButton}
-            onClick={startSimulation}
-            disabled={simulationMode || questionsLoading}
-          >
-            {simulationMode ? "Simulation läuft" : "Simulate real exam"}
-          </button>
-
-          <button
-            style={styles.secondaryButton}
-            onClick={stopSimulation}
-            disabled={!simulationMode && simulationPhase !== "summary"}
-          >
-            {simulationPhase === "summary" ? "Reset simulation" : "Cancel"}
-          </button>
+      <section style={styles.card}>
+        <div style={styles.cardHeader}>
+          <h3 style={styles.cardTitle}>Fragen aus der Prüfung</h3>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+            <button
+              style={{
+                ...styles.buttonSecondary,
+                ...(inputMode === "record"
+                  ? styles.buttonSecondaryActive
+                  : null),
+              }}
+              onClick={() => handleInputModeChange("record")}
+            >
+              Aufnahme
+            </button>
+            <button
+              style={{
+                ...styles.buttonSecondary,
+                ...(inputMode === "upload"
+                  ? styles.buttonSecondaryActive
+                  : null),
+              }}
+              onClick={() => handleInputModeChange("upload")}
+            >
+              Datei hochladen
+            </button>
+          </div>
         </div>
 
-        {simulationMode && currentSimulationStep && (
-          <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
-            <div style={{ ...styles.helperText, margin: 0 }}>
-              <strong>Aktueller Abschnitt:</strong> {currentSimulationStep.teil} · Niveau {level}
+        {questionsLoading && <p>Lade Fragen...</p>}
+        {questionError && (
+          <p style={{ color: "var(--color-error)" }}>{questionError}</p>
+        )}
+
+        {!questionsLoading && !questionError && currentQuestion && (
+          <div style={styles.questionBox}>
+            <div style={styles.questionHeader}>
+              <span style={styles.questionLabel}>Frage</span>
+              <span style={styles.questionMeta}>
+                Frage {currentQuestionIndex + 1} von {questions.length}
+              </span>
             </div>
-            <div style={{ ...styles.helperText, margin: 0 }}>
-              <strong>Phase:</strong> {simulationPhase === "thinking" ? "Vorbereitungszeit" : "Sprechzeit"}
-              {simulationCountdown !== null &&
-                ` – Countdown: ${formatCountdown(simulationCountdown)}`}
-            </div>
-            <div style={styles.helperText}>{currentSimulationStep.instructions}</div>
-            {simulationPhase === "speaking" && (
-              <div style={{ ...styles.errorBox, background: "#ecfeff", borderColor: "#22d3ee", color: "#0f172a" }}>
-                Wenn du fertig bist, klicke auf <b>Stop Recording</b>. Der nächste Teil
-                startet automatisch, sobald die Zeit endet oder deine Aufnahme stoppt.
+            <p style={styles.questionText}>{currentQuestion.text}</p>
+            {currentQuestion.hint && (
+              <p style={styles.questionHint}>{currentQuestion.hint}</p>
+            )}
+            <button
+              style={styles.buttonGhost}
+              type="button"
+              onClick={showNextQuestion}
+            >
+              Nächste Frage
+            </button>
+          </div>
+        )}
+
+        <div style={styles.audioControls}>
+          <div style={styles.waveformContainer}>
+            {waveform.length > 0 ? (
+              <svg
+                viewBox="0 0 200 50"
+                preserveAspectRatio="none"
+                style={styles.waveformSvg}
+              >
+                {waveform.map((value, index) => {
+                  const x = (index / waveform.length) * 200;
+                  const y = 25;
+                  const height = Math.max(2, Math.abs(value) * 50);
+                  return (
+                    <rect
+                      key={index}
+                      x={x}
+                      y={y - height / 2}
+                      width={200 / waveform.length}
+                      height={height}
+                      rx="1"
+                    />
+                  );
+                })}
+              </svg>
+            ) : (
+              <div style={styles.waveformPlaceholder}>
+                <span>
+                  {isRecording
+                    ? "Sprich jetzt – deine Stimme wird aufgenommen..."
+                    : "Hier siehst du deine Sprachaufnahme als Wellenform."}
+                </span>
               </div>
             )}
           </div>
-        )}
 
-        {simulationSummary && (
-          <div style={{ ...styles.resultCard, marginTop: 16 }}>
-            <h3 style={styles.resultHeading}>Simulation summary</h3>
-            <p style={{ ...styles.resultText, fontWeight: 700, fontSize: 16 }}>
-              Overall score: {simulationSummary.overall}/100
-            </p>
-            <ul style={{ ...styles.promptList, marginTop: 8 }}>
-              {simulationSummary.details.map((item) => (
-                <li key={item.teil}>
-                  {item.teil}: {item.score}/25
-                </li>
-              ))}
-            </ul>
-            <p style={{ ...styles.helperText, marginTop: 8 }}>{simulationSummary.text}</p>
-          </div>
-        )}
-      </section>
-
-      <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>3. Practice question for your level</h2>
-        {questionsLoading ? (
-          <p style={styles.helperText}>Lade Fragen...</p>
-        ) : currentQuestion ? (
-          <>
-            <p style={styles.helperText}>
-              <strong>{currentQuestion.teil}</strong> · {currentQuestion.level}
-            </p>
-            <p style={styles.helperText}>{currentQuestion.topic}</p>
-            {currentQuestion.keyword && (
-              <p style={styles.helperText}>
-                Stichworte: <em>{currentQuestion.keyword}</em>
-              </p>
-            )}
-            <div style={{ marginTop: 12 }}>
+          <div style={styles.audioButtonRow}>
+            {inputMode === "record" ? (
+              <>
+                <button
+                  style={{
+                    ...styles.recordButton,
+                    ...(isRecording ? styles.recordButtonActive : null),
+                  }}
+                  type="button"
+                  onClick={handleRecordClick}
+                >
+                  {isRecording ? "Stoppen" : "Aufnahme starten"}
+                </button>
+                <span style={styles.recordingTime}>
+                  {formatTime(recordingTime)}
+                </span>
+              </>
+            ) : (
               <button
-                style={styles.secondaryButton}
-                onClick={showNextQuestion}
-                disabled={questions.length < 2}
+                style={styles.buttonPrimary}
+                type="button"
+                onClick={handleUploadClick}
               >
-                {questions.length < 2 ? "Nur eine Frage verfügbar" : "Nächste Frage"}
+                Audio-Datei wählen
               </button>
-            </div>
-          </>
-        ) : (
-          <p style={styles.helperText}>
-            Noch keine Frage gefunden. Bitte wähle ein anderes Niveau oder versuche es
-            erneut.
-          </p>
-        )}
+            )}
 
-        {questionError && (
-          <div style={{ ...styles.errorBox, marginTop: 12 }}>
-            <strong>Hinweis:</strong> {questionError}
-          </div>
-        )}
-      </section>
-
-      <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>4. Capture Your Answer</h2>
-        <div style={styles.segmentedControl}>
-          <button
-            style={inputMode === "record" ? styles.segmentedActive : styles.segmentedButton}
-            onClick={() => handleInputModeChange("record")}
-          >
-            Record now
-          </button>
-          <button
-            style={inputMode === "upload" ? styles.segmentedActive : styles.segmentedButton}
-            onClick={() => handleInputModeChange("upload")}
-          >
-            Upload audio
-          </button>
-        </div>
-
-        {inputMode === "record" ? (
-          <div style={styles.recordCard}>
-            <div style={styles.recordStatus}>{
-              isRecording ? "Recording… Tap to stop" : "Tap once to start your answer"
-            }</div>
-            <button
-              style={isRecording ? styles.recordButtonActive : styles.recordButton}
-              onClick={isRecording ? stopRecording : startRecording}
-              aria-label={isRecording ? "Stop recording" : "Start recording"}
-            >
-              {isRecording ? "Stop" : "Record"}
-            </button>
-
-            <div style={styles.recordMetaRow}>
-              <span style={styles.recordTimer}>
-                ⏱️ {Math.floor(recordingTime / 60)
-                  .toString()
-                  .padStart(2, "0")}
-                :{(recordingTime % 60).toString().padStart(2, "0")}
-              </span>
-              {waveform.length > 0 && (
-                <div style={styles.waveform}>
-                  {waveform.map((value, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        width: 6,
-                        borderRadius: 4,
-                        background: "linear-gradient(180deg, #22c55e, #16a34a)",
-                        height: `${Math.max(10, value * 52)}px`,
-                        transition: "height 80ms ease-out",
-                      }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div style={styles.uploadCard}>
-            <p style={{ ...styles.helperText, marginBottom: 6 }}>
-              Choose a clear audio file (webm, m4a, mp3, wav) from your phone.
-            </p>
-            <label style={styles.uploadLabel}>
-              <input
-                type="file"
-                accept="audio/*"
-                style={{ display: "none" }}
-                onChange={handleFileUpload}
-              />
-              <span>{audioBlob ? "Replace file" : "Upload from device"}</span>
-            </label>
-            {audioBlob && (
-              <p style={{ ...styles.helperText, marginTop: 8 }}>
-                Selected: {audioBlob.name || "Audio clip"}
-              </p>
+            {audioUrl && (
+              <audio
+                controls
+                src={audioUrl}
+                style={styles.audioPlayer}
+                controlsList="nodownload"
+              >
+                Dein Browser unterstützt das Audio-Element nicht.
+              </audio>
             )}
           </div>
-        )}
-
-        {audioUrl && (
-          <div style={{ marginTop: 12 }}>
-            <p style={{ ...styles.helperText, marginBottom: 6 }}>Preview</p>
-            <audio controls src={audioUrl} style={{ width: "100%" }} />
-          </div>
-        )}
-
-        <div style={styles.row}>
-          <button
-            style={styles.primaryButton}
-            onClick={sendForCorrection}
-            disabled={!audioBlob || loading}
-          >
-            {loading ? "Analyzing..." : "Send to Falowen for Feedback"}
-          </button>
 
           <button
-            style={styles.secondaryButton}
-            onClick={resetAudio}
-            disabled={!audioBlob}
+            style={styles.buttonPrimary}
+            type="button"
+            onClick={simulationMode ? handleSimulationAssessment : handleAssessment}
+            disabled={loading || !audioBlob}
           >
-            Clear audio
+            {loading
+              ? "Wird ausgewertet..."
+              : simulationMode
+              ? "Schritt auswerten"
+              : "Antwort auswerten"}
           </button>
         </div>
 
         {error && (
           <div style={styles.errorBox}>
             <strong>Hinweis:</strong> {error}
+          </div>
+        )}
+      </section>
+
+      <section style={styles.card}>
+        <div style={styles.cardHeader}>
+          <h3 style={styles.cardTitle}>Prüfungssimulation (Teil 1–3)</h3>
+          <p style={styles.cardSubtitle}>
+            Simuliere eine komplette Sprechprüfung mit Vorbereitungszeit und
+            Sprechzeit. Die KI bewertet jeden Teil und gibt dir eine Gesamtübersicht.
+          </p>
+        </div>
+
+        <div style={styles.simulationControls}>
+          <button
+            style={{
+              ...styles.buttonSecondary,
+              ...(simulationMode ? styles.buttonSecondaryActive : null),
+            }}
+            type="button"
+            onClick={simulationMode ? handleSimulationStop : handleSimulationStart}
+          >
+            {simulationMode
+              ? "Simulation beenden"
+              : "Prüfungssimulation starten"}
+          </button>
+        </div>
+
+        {simulationMode && (
+          <div style={styles.simulationBox}>
+            <div style={styles.simulationStepHeader}>
+              <span style={styles.simulationStepLabel}>
+                {SIMULATION_STEPS[currentSimulationStepIndex].teil}
+              </span>
+              <span style={styles.simulationStepMeta}>
+                Schritt {currentSimulationStepIndex + 1} von{" "}
+                {SIMULATION_STEPS.length}
+              </span>
+            </div>
+
+            <p style={styles.simulationInstructions}>
+              {SIMULATION_STEPS[currentSimulationStepIndex].instructions}
+            </p>
+
+            {simulationCountdown && (
+              <div style={styles.simulationCountdown}>
+                <span style={styles.simulationCountdownLabel}>
+                  {simulationCountdown.type === "think"
+                    ? "Vorbereitungszeit"
+                    : "Sprechzeit"}
+                </span>
+                <span style={styles.simulationCountdownTime}>
+                  {formatTime(simulationCountdown.secondsRemaining)}
+                </span>
+              </div>
+            )}
+
+            {!hasStartedSpeaking && simulationCountdown?.type === "think" && (
+              <p style={styles.simulationHint}>
+                Nutze die Vorbereitungszeit, um deine Antwort zu planen. Die
+                Sprechzeit beginnt automatisch.
+              </p>
+            )}
+
+            {hasStartedSpeaking && simulationCountdown?.type === "speak" && (
+              <p style={styles.simulationHint}>
+                Sprich jetzt frei und zusammenhängend. Die Aufnahme läuft, bis
+                die Zeit abgelaufen ist. Dann kannst du die Antwort auswerten
+                lassen.
+              </p>
+            )}
+          </div>
+        )}
+
+        {simulationSummary && (
+          <div style={styles.simulationSummaryBox}>
+            <h4 style={styles.simulationSummaryTitle}>
+              Zusammenfassung der Prüfungssimulation
+            </h4>
+            <p style={styles.simulationSummaryMeta}>
+              Niveau: {simulationSummary.level} · Datum:{" "}
+              {new Date(simulationSummary.date).toLocaleString("de-DE")}
+            </p>
+
+            {simulationSummary.averageScore !== null && (
+              <p style={styles.simulationSummaryScore}>
+                Durchschnittliche Punktzahl:{" "}
+                <strong>{simulationSummary.averageScore.toFixed(1)}</strong> / 100
+              </p>
+            )}
+
+            <ul style={styles.simulationSummaryList}>
+              {simulationSummary.steps.map((step) => (
+                <li key={step.stepIndex} style={styles.simulationSummaryItem}>
+                  <div style={styles.simulationSummaryItemHeader}>
+                    <span style={styles.simulationSummaryItemLabel}>
+                      {step.teil}
+                    </span>
+                    {typeof step.score === "number" && (
+                      <span style={styles.simulationSummaryItemScore}>
+                        {step.score} / 100
+                      </span>
+                    )}
+                  </div>
+                  {step.summary && (
+                    <p style={styles.simulationSummaryItemText}>
+                      {step.summary}
+                    </p>
+                  )}
+                  {step.feedback && (
+                    <p style={styles.simulationSummaryItemFeedback}>
+                      {step.feedback}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </section>
