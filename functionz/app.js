@@ -38,6 +38,61 @@ let cachedQuestions = {
   data: null,
 };
 
+// --- Simple user history persistence ---
+const historyFile = path.join(__dirname, "data", "userHistory.json");
+fs.mkdirSync(path.dirname(historyFile), { recursive: true });
+
+function loadHistory() {
+  try {
+    const raw = fs.readFileSync(historyFile, "utf-8");
+    return JSON.parse(raw);
+  } catch (error) {
+    return { users: {} };
+  }
+}
+
+function saveHistory(history) {
+  fs.writeFileSync(historyFile, JSON.stringify(history, null, 2));
+}
+
+function getUserHistory(userId) {
+  if (!userId) return null;
+  const history = loadHistory();
+  return history.users[userId] || { targetLevel: "A1", entries: [] };
+}
+
+function recordHistoryEntry(userId, entry) {
+  if (!userId) return;
+  const history = loadHistory();
+  if (!history.users[userId]) {
+    history.users[userId] = { targetLevel: entry.targetLevel || "A1", entries: [] };
+  }
+
+  const userHistory = history.users[userId];
+  userHistory.targetLevel = entry.targetLevel || userHistory.targetLevel;
+  userHistory.entries.unshift({ ...entry, timestamp: new Date().toISOString() });
+  userHistory.entries = userHistory.entries.slice(0, 25);
+  saveHistory(history);
+}
+
+function buildPromptContext(userId, taskType, targetLevel) {
+  const history = getUserHistory(userId);
+  const recentEntries = history?.entries?.slice(0, 5) || [];
+
+  const scoreSnapshot = recentEntries.map((item) => ({
+    taskType: item.taskType,
+    level: item.level,
+    overall_score: item.overall_score,
+    teil: item.teil,
+  }));
+
+  return {
+    targetLevel: targetLevel || history?.targetLevel || "A1",
+    taskType,
+    recentScores: scoreSnapshot,
+  };
+}
+
 // Ensure uploads directory exists before multer writes streamed chunks
 const uploadsDir = process.env.VERCEL
   ? path.join("/tmp", "uploads")
@@ -222,7 +277,7 @@ async function transcribeAudio(filePath) {
 }
 
 // --- 2. Analyze speaking with GPT (Goethe-style feedback) ---
-async function analyzeSpeaking(transcript, teil, level) {
+async function analyzeSpeaking(transcript, teil, level, userContext = {}) {
   try {
     const validation = validateTeilAndLevel(teil, level);
     if (!validation.valid) {
@@ -268,6 +323,12 @@ Check if the form is polite and fits the idea.
 `;
     }
 
+    const contextInfo = buildPromptContext(
+      userContext.userId,
+      userContext.taskType || teil,
+      userContext.targetLevel || level
+    );
+
     const systemPrompt = `
 You are an experienced German teacher preparing students for the Goethe ${level} Sprechen exam.
 You receive the TRANSCRIPT of the student's spoken answer (already transcribed from audio or typed by the student).
@@ -275,6 +336,11 @@ You receive the TRANSCRIPT of the student's spoken answer (already transcribed f
 Exam part: ${teil}
 
 ${teilDescription}
+
+Learner context (use this to tailor the feedback):
+- Target level: ${contextInfo.targetLevel}
+- Task type: ${contextInfo.taskType}
+- Recent scores (most recent first): ${JSON.stringify(contextInfo.recentScores)}
 
 Your task is to become a fully self-contained coach. Give the student everything they need to improve without another tutor.
 
@@ -336,28 +402,38 @@ ${transcript}
     }
 
     return {
-      transcript,
-      corrected_text: parsed.corrected_text || "",
-      overall_level: parsed.overall_level || level,
-      overall_score:
-        typeof parsed.overall_score === "number"
-          ? Math.min(Math.max(Math.round(parsed.overall_score), 0), 100)
-          : 0,
-      scores: {
-        task_fulfilment: parsed.scores?.task_fulfilment || 0,
-        fluency: parsed.scores?.fluency || 0,
-        grammar: parsed.scores?.grammar || 0,
-        vocabulary: parsed.scores?.vocabulary || 0,
+      meta: {
+        teil,
+        level,
+        targetLevel: contextInfo.targetLevel,
+        taskType: userContext.taskType || teil,
       },
-      strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
-      improvements: Array.isArray(parsed.improvements) ? parsed.improvements : [],
-      example_corrections: Array.isArray(parsed.example_corrections)
-        ? parsed.example_corrections
-        : [],
-      practice_phrases: Array.isArray(parsed.practice_phrases)
-        ? parsed.practice_phrases
-        : [],
-      next_task_hint: parsed.next_task_hint || "",
+      transcript,
+      feedback: {
+        corrected_text: parsed.corrected_text || "",
+        overall_level: parsed.overall_level || level,
+        overall_score:
+          typeof parsed.overall_score === "number"
+            ? Math.min(Math.max(Math.round(parsed.overall_score), 0), 100)
+            : 0,
+        scores: {
+          task_fulfilment: parsed.scores?.task_fulfilment || 0,
+          fluency: parsed.scores?.fluency || 0,
+          grammar: parsed.scores?.grammar || 0,
+          vocabulary: parsed.scores?.vocabulary || 0,
+        },
+        strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+        improvements: Array.isArray(parsed.improvements)
+          ? parsed.improvements
+          : [],
+        example_corrections: Array.isArray(parsed.example_corrections)
+          ? parsed.example_corrections
+          : [],
+        practice_phrases: Array.isArray(parsed.practice_phrases)
+          ? parsed.practice_phrases
+          : [],
+        next_task_hint: parsed.next_task_hint || "",
+      },
       // Legacy fields kept for backwards compatibility
       mistakes:
         parsed.mistakes ||
@@ -384,7 +460,7 @@ app.post(
   "/api/speaking/analyze",
   upload.single("audio"), // field name: "audio"
   async (req, res) => {
-    const { teil = "Teil 1 – Vorstellung", level = "A1" } = req.body;
+    const { teil = "Teil 1 – Vorstellung", level = "A1", userId, targetLevel } = req.body;
     const validation = validateTeilAndLevel(teil, level);
     if (!validation.valid) {
       return res.status(400).json({ error: validation.message });
@@ -405,7 +481,19 @@ app.post(
       const transcript = await transcribeAudio(filePath);
 
       // 2) Analyze
-      const analysis = await analyzeSpeaking(transcript, teil, level);
+      const analysis = await analyzeSpeaking(transcript, teil, level, {
+        userId,
+        targetLevel,
+        taskType: "speaking",
+      });
+
+      recordHistoryEntry(userId, {
+        taskType: "speaking",
+        teil,
+        level,
+        targetLevel: targetLevel || level,
+        overall_score: analysis.feedback?.overall_score,
+      });
 
       // 3) Cleanup temp file
       fs.unlink(filePath, (err) => {
@@ -455,11 +543,7 @@ app.get("/api/speaking/questions", async (req, res) => {
 // --- 3C. Text endpoint: send typed answer + get feedback ---
 app.post("/api/speaking/analyze-text", async (req, res) => {
   try {
-    const {
-      text,
-      teil = "Teil 1 – Vorstellung",
-      level = "A1",
-    } = req.body;
+    const { text, teil = "Teil 1 – Vorstellung", level = "A1", userId, targetLevel } = req.body;
 
     const validation = validateTeilAndLevel(teil, level);
     if (!validation.valid) {
@@ -471,12 +555,139 @@ app.post("/api/speaking/analyze-text", async (req, res) => {
     }
 
     const transcript = text.trim();
-    const analysis = await analyzeSpeaking(transcript, teil || "Teil 1", level || "A1");
+    const analysis = await analyzeSpeaking(transcript, teil || "Teil 1", level || "A1", {
+      userId,
+      targetLevel,
+      taskType: "speaking-text",
+    });
+
+    recordHistoryEntry(userId, {
+      taskType: "speaking-text",
+      teil,
+      level,
+      targetLevel: targetLevel || level,
+      overall_score: analysis.feedback?.overall_score,
+    });
 
     return res.json(analysis);
   } catch (error) {
     console.error("❌ Error in /api/speaking/analyze-text:", error);
     return res.status(500).json({ error: error.message || "Server error" });
+  }
+});
+
+// --- Tutor endpoints ---
+app.post("/api/tutor/placement", async (req, res) => {
+  const { userId = "guest", targetLevel = "A2", answers = [] } = req.body;
+
+  const contextInfo = buildPromptContext(userId, "placement", targetLevel);
+  const joinedAnswers = answers
+    .map((item) => `- (${item.taskType || "task"}) ${item.text || ""}`)
+    .join("\n");
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: `You are a placement bot that estimates a learner's CEFR level (A1-B2). Consider previous scores and tasks when available: ${JSON.stringify(
+            contextInfo
+          )}. Reply with JSON {"estimated_level": "A2", "confidence": 0.72, "rationale": "...", "next_task_hint": "..."}.`,
+        },
+        {
+          role: "user",
+          content: `Mini test answers:\n${joinedAnswers || "No answers provided"}`,
+        },
+      ],
+    });
+
+    const raw = completion.choices[0]?.message?.content || "{}";
+    const parsed = JSON.parse(raw);
+
+    recordHistoryEntry(userId, {
+      taskType: "placement",
+      level: parsed.estimated_level || targetLevel,
+      targetLevel: parsed.estimated_level || targetLevel,
+      overall_score: Math.round((parsed.confidence || 0) * 100),
+    });
+
+    return res.json({
+      meta: { targetLevel: parsed.estimated_level || targetLevel },
+      placement: parsed,
+    });
+  } catch (error) {
+    console.error("❌ Error in /api/tutor/placement:", error.response?.data || error);
+    return res.status(500).json({ error: "Placement failed" });
+  }
+});
+
+app.get("/api/tutor/next-task", async (req, res) => {
+  const userId = req.query.userId || "guest";
+  const history = getUserHistory(userId);
+  const targetLevel = history?.targetLevel || "A2";
+
+  const contextInfo = buildPromptContext(userId, "next-task", targetLevel);
+  const recentScores = contextInfo.recentScores || [];
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: `You are a concise German tutor. Given a learner profile (target level ${targetLevel}) and recent scores ${JSON.stringify(
+            recentScores
+          )}, return JSON {"title": "", "prompt": "", "skill": "speaking|writing|vocab", "tip": "short tip"}.`,
+        },
+        {
+          role: "user",
+          content: `Task type: ${contextInfo.taskType}. Target level ${targetLevel}. Recent scores: ${JSON.stringify(
+            recentScores
+          )}. Suggest the next micro-task in 1-2 sentences.`,
+        },
+      ],
+    });
+
+    const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
+    return res.json({
+      meta: { targetLevel },
+      nextTask: parsed,
+    });
+  } catch (error) {
+    console.error("❌ Error in /api/tutor/next-task:", error.response?.data || error);
+    return res.status(500).json({ error: "Could not generate next task" });
+  }
+});
+
+app.get("/api/tutor/weekly-summary", async (req, res) => {
+  const userId = req.query.userId || "guest";
+  const history = getUserHistory(userId);
+  const targetLevel = history?.targetLevel || "A2";
+  const recentEntries = history?.entries?.slice(0, 7) || [];
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You summarize weekly language training. Target level: ${targetLevel}. Use bullet points and keep it under 120 words.`,
+        },
+        {
+          role: "user",
+          content: `Recent attempts: ${JSON.stringify(recentEntries)}`,
+        },
+      ],
+    });
+
+    const summary = completion.choices[0]?.message?.content || "Summary unavailable.";
+    return res.json({ summary, targetLevel });
+  } catch (error) {
+    console.error("❌ Error in /api/tutor/weekly-summary:", error.response?.data || error);
+    return res.status(500).json({ error: "Could not create weekly summary" });
   }
 });
 

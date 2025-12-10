@@ -1,6 +1,6 @@
 export const styles = {
   container: {
-    maxWidth: 900,
+    maxWidth: 1180,
     margin: "0 auto",
     padding: "24px 16px 40px",
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",

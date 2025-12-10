@@ -316,8 +316,10 @@ const SpeakingPage = () => {
 
     try {
       const data = await analyzeAudio(audioBlob, teil, level);
+      const feedback = data.feedback || data;
       const enrichedResult = {
-        ...data,
+        ...feedback,
+        transcript: data.transcript,
         teil,
         level,
         mode: "Speaking",
