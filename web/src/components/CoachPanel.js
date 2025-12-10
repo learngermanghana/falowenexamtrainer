@@ -1,20 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
 import { fetchNextTask, fetchWeeklySummary } from "../services/coachService";
+import { useAuth } from "../context/AuthContext";
 
 const CoachPanel = () => {
   const [nextTask, setNextTask] = useState(null);
   const [summary, setSummary] = useState("");
+  const { user, idToken } = useAuth();
+  const userId = user?.uid;
 
   useEffect(() => {
-    fetchNextTask()
+    if (!userId) return;
+
+    fetchNextTask({ userId, idToken })
       .then((data) => setNextTask(data))
       .catch(() => setNextTask(null));
 
-    fetchWeeklySummary()
+    fetchWeeklySummary({ userId, idToken })
       .then((data) => setSummary(data?.summary || ""))
       .catch(() => setSummary(""));
-  }, []);
+  }, [userId, idToken]);
 
   return (
     <aside style={{ ...styles.card, position: "sticky", top: 16 }}>

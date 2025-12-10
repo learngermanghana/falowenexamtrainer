@@ -4,6 +4,7 @@ import { useExam, ALLOWED_LEVELS, ALLOWED_TEILE } from "../context/ExamContext";
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
 import ResultHistory from "./ResultHistory";
+import { useAuth } from "../context/AuthContext";
 import { analyzeAudio, fetchSpeakingQuestions } from "../services/coachService";
 
 const SIMULATION_STEPS = [
@@ -52,6 +53,8 @@ const SpeakingPage = () => {
     loading,
     setLoading,
   } = useExam();
+  const { user, idToken } = useAuth();
+  const userId = user?.uid;
 
   const [isRecording, setIsRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
@@ -86,16 +89,21 @@ const SpeakingPage = () => {
       setCurrentQuestionIndex(0);
 
       try {
-        const data = await fetchSpeakingQuestions(level, teil);
+        const data = await fetchSpeakingQuestions(level, teil, idToken);
         if (!isMounted) return;
 
-        if (!data || !Array.isArray(data.questions) || data.questions.length === 0) {
+        if (!data || data.length === 0) {
           setQuestionError(
             "Keine Fragen verfügbar. Bitte wähle ein anderes Niveau oder einen anderen Teil."
           );
           setQuestions([]);
         } else {
-          setQuestions(data.questions);
+          const normalized = data.map((entry) => ({
+            ...entry,
+            text: entry.text || entry.topic || entry.keyword || "Übe deine Vorstellung.",
+            hint: entry.hint || entry.keyword || "",
+          }));
+          setQuestions(normalized);
         }
       } catch (err) {
         console.error(err);
@@ -117,7 +125,7 @@ const SpeakingPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [level, teil]);
+  }, [level, teil, idToken]);
 
   const resetAudio = () => {
     setError("");
@@ -230,6 +238,8 @@ const SpeakingPage = () => {
         teil,
         contextType: simulationMode ? "simulation" : "single",
         question: currentQuestion?.text || "",
+        userId,
+        idToken,
       });
 
       setResult(analysis);
@@ -273,6 +283,8 @@ const SpeakingPage = () => {
         teil: step.teil,
         contextType: "simulation",
         question: step.instructions,
+        userId,
+        idToken,
       });
 
       setSimulationScores((prev) => [
