@@ -33,6 +33,7 @@ const SIMULATION_STEPS = [
 const SpeakingPage = () => {
   const {
     teil,
+    setTeil,
     level,
     result,
     setResult,
