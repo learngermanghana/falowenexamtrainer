@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { styles } from "../styles";
 import { startPlacement } from "../services/coachService";
+import { useAuth } from "../context/AuthContext";
 
 const PlacementCheck = () => {
   const [answers, setAnswers] = useState(["", ""]);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const { user, idToken } = useAuth();
+  const userId = user?.uid;
 
   const handleChange = (idx, value) => {
     setAnswers((prev) => prev.map((val, i) => (i === idx ? value : val)));
@@ -20,7 +23,11 @@ const PlacementCheck = () => {
       const payload = answers
         .filter((text) => text.trim())
         .map((text, idx) => ({ text, taskType: idx === 0 ? "intro" : "story" }));
-      const data = await startPlacement(payload);
+      const data = await startPlacement({
+        answers: payload,
+        userId,
+        idToken,
+      });
       setResult(data?.placement || null);
     } catch (e) {
       setError(e?.response?.data?.error || "Could not run placement.");

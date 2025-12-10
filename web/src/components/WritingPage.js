@@ -5,6 +5,7 @@ import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
 import ResultHistory from "./ResultHistory";
 import { analyzeText } from "../services/coachService";
+import { useAuth } from "../context/AuthContext";
 import { writingLetters } from "../data/writingLetters";
 
 const WritingPage = () => {
@@ -20,6 +21,8 @@ const WritingPage = () => {
     loading,
     setLoading,
   } = useExam();
+  const { user, idToken } = useAuth();
+  const userId = user?.uid;
 
   const [activeTab, setActiveTab] = useState("practice");
   const [typedAnswer, setTypedAnswer] = useState("");
@@ -113,7 +116,14 @@ const WritingPage = () => {
     setResult(null);
 
     try {
-      const data = await analyzeText(trimmed, teil, level);
+      const data = await analyzeText({
+        text: trimmed,
+        teil,
+        level,
+        targetLevel: level,
+        userId,
+        idToken,
+      });
       const enrichedResult = { ...data, teil, level, mode: "Writing" };
       setResult(enrichedResult);
       addResultToHistory(enrichedResult);
