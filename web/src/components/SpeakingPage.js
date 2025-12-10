@@ -68,6 +68,7 @@ const SpeakingPage = () => {
   const [simulationScores, setSimulationScores] = useState([]);
   const [simulationSummary, setSimulationSummary] = useState(null);
   const [hasStartedSpeaking, setHasStartedSpeaking] = useState(false);
+  const [inputMode, setInputMode] = useState("record");
   const countdownRef = useRef(null);
   const stepAdvanceGuardRef = useRef(false);
 
@@ -243,10 +244,10 @@ const SpeakingPage = () => {
     analyserRef.current = null;
     dataArrayRef.current = null;
 
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+        streamRef.current = null;
+      }
   };
 
   useEffect(() => {
@@ -438,6 +439,23 @@ const SpeakingPage = () => {
     resetAudio();
   };
 
+  const handleInputModeChange = (mode) => {
+    if (mode === inputMode) return;
+    if (isRecording) {
+      stopRecording();
+    }
+    setInputMode(mode);
+    resetAudio();
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setAudioBlob(file);
+    setAudioUrl(URL.createObjectURL(file));
+    setError("");
+  };
+
   const startSimulation = () => {
     setSimulationSummary(null);
     setSimulationScores([]);
@@ -575,87 +593,104 @@ const SpeakingPage = () => {
       </section>
 
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>4. Record Your Answer</h2>
-        <p style={styles.helperText}>
-          🎙️ Click <b>Start Recording</b>, speak your answer, then click <b>Stop</b>.
-        </p>
-
-        <div style={styles.row}>
-          {!isRecording ? (
-            <button style={styles.primaryButton} onClick={startRecording}>
-              Start Recording
-            </button>
-          ) : (
-            <button style={styles.dangerButton} onClick={stopRecording}>
-              Stop Recording
-            </button>
-          )}
-
+        <h2 style={styles.sectionTitle}>4. Capture Your Answer</h2>
+        <div style={styles.segmentedControl}>
           <button
-            style={styles.secondaryButton}
-            onClick={resetAudio}
-            disabled={!audioBlob}
+            style={inputMode === "record" ? styles.segmentedActive : styles.segmentedButton}
+            onClick={() => handleInputModeChange("record")}
           >
-            Clear Recording
+            Record now
+          </button>
+          <button
+            style={inputMode === "upload" ? styles.segmentedActive : styles.segmentedButton}
+            onClick={() => handleInputModeChange("upload")}
+          >
+            Upload audio
           </button>
         </div>
 
-        <div
-          style={{
-            marginTop: 12,
-            display: "flex",
-            alignItems: "center",
-            gap: 16,
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={{ ...styles.helperText, margin: 0 }}>
-            ⏱️ Aufnahmezeit: {Math.floor(recordingTime / 60)
-              .toString()
-              .padStart(2, "0")}
-            :{(recordingTime % 60).toString().padStart(2, "0")}
-          </div>
-
-          {waveform.length > 0 && (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "flex-end",
-                gap: 4,
-                height: 48,
-                flexGrow: 1,
-              }}
+        {inputMode === "record" ? (
+          <div style={styles.recordCard}>
+            <div style={styles.recordStatus}>{
+              isRecording ? "Recording… Tap to stop" : "Tap once to start your answer"
+            }</div>
+            <button
+              style={isRecording ? styles.recordButtonActive : styles.recordButton}
+              onClick={isRecording ? stopRecording : startRecording}
+              aria-label={isRecording ? "Stop recording" : "Start recording"}
             >
-              {waveform.map((value, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    width: 6,
-                    borderRadius: 4,
-                    background: "linear-gradient(180deg, #4ade80, #16a34a)",
-                    height: `${Math.max(8, value * 48)}px`,
-                    transition: "height 80ms ease-out",
-                  }}
-                />
-              ))}
+              {isRecording ? "Stop" : "Record"}
+            </button>
+
+            <div style={styles.recordMetaRow}>
+              <span style={styles.recordTimer}>
+                ⏱️ {Math.floor(recordingTime / 60)
+                  .toString()
+                  .padStart(2, "0")}
+                :{(recordingTime % 60).toString().padStart(2, "0")}
+              </span>
+              {waveform.length > 0 && (
+                <div style={styles.waveform}>
+                  {waveform.map((value, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        width: 6,
+                        borderRadius: 4,
+                        background: "linear-gradient(180deg, #22c55e, #16a34a)",
+                        height: `${Math.max(10, value * 52)}px`,
+                        transition: "height 80ms ease-out",
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div style={styles.uploadCard}>
+            <p style={{ ...styles.helperText, marginBottom: 6 }}>
+              Choose a clear audio file (webm, m4a, mp3, wav) from your phone.
+            </p>
+            <label style={styles.uploadLabel}>
+              <input
+                type="file"
+                accept="audio/*"
+                style={{ display: "none" }}
+                onChange={handleFileUpload}
+              />
+              <span>{audioBlob ? "Replace file" : "Upload from device"}</span>
+            </label>
+            {audioBlob && (
+              <p style={{ ...styles.helperText, marginTop: 8 }}>
+                Selected: {audioBlob.name || "Audio clip"}
+              </p>
+            )}
+          </div>
+        )}
 
         {audioUrl && (
-          <div style={{ marginTop: 16 }}>
-            <p style={styles.helperText}>▶️ Preview your recording:</p>
+          <div style={{ marginTop: 12 }}>
+            <p style={{ ...styles.helperText, marginBottom: 6 }}>Preview</p>
             <audio controls src={audioUrl} style={{ width: "100%" }} />
           </div>
         )}
 
-        <div style={{ marginTop: 16 }}>
+        <div style={styles.row}>
           <button
             style={styles.primaryButton}
             onClick={sendForCorrection}
             disabled={!audioBlob || loading}
           >
             {loading ? "Analyzing..." : "Send to Falowen for Feedback"}
+          </button>
+
+          <button
+            style={styles.secondaryButton}
+            onClick={resetAudio}
+            disabled={!audioBlob}
+          >
+            Clear audio
           </button>
         </div>
 
