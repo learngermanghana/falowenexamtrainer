@@ -276,33 +276,39 @@ Exam part: ${teil}
 
 ${teilDescription}
 
-Your task:
-1. Understand what the student wanted to say.
-2. Correct the German (same ideas, better ${level} level grammar and vocabulary).
-3. Explain the MOST IMPORTANT mistakes in simple English (short bullet points).
-4. Give a short comment about fluency/pronunciation based ONLY on the transcript quality (word choice, clarity), not the actual
-sound.
-5. Give a score from 0 to 10 for THIS Teil only.
-   - 0–3: very weak / incomplete
-   - 4–6: basic but understandable
-   - 7–8: good for this level, small mistakes
-   - 9–10: very good for this level
+Your task is to become a fully self-contained coach. Give the student everything they need to improve without another tutor.
 
-IMPORTANT:
-- Tailor expectations to the level: ${level}.
-- For A1 keep grammar simple (no complex structures).
-- Be friendly and encouraging.
-- Keep explanations short and focused on what helps the student next time.
+Do the following:
+1) Understand what the student wanted to say and produce a corrected German version at the same idea level.
+2) Score their performance by skill (task fulfilment, fluency, grammar, vocabulary) out of 25 each, plus an overall score out of 100.
+3) Decide an overall CEFR level label (A1–B2) for this answer only.
+4) List clear strengths and concrete improvements (short bullet sentences in English).
+5) Add at least one example correction mapping a student sentence to the fixed version.
+6) Provide 2–4 practice phrases they can reuse immediately.
+7) Suggest one focused next task hint that can be trained now (e.g., "Use 'weil' to give a reason").
+
+Keep the tone encouraging and specific to their errors. If information is missing, make reasonable, level-appropriate suggestions.
 
 You MUST answer in valid JSON with this exact shape:
-
 {
+  "overall_level": "A2",
+  "overall_score": 72,
   "corrected_text": "string - corrected German version",
-  "mistakes": "string - short English explanation of common mistakes (bullets allowed)",
-  "pronunciation": "string - short comment based on transcript quality only",
-  "score": 7,
-  "comment": "string - very short overall feedback in English"
+  "scores": {
+    "task_fulfilment": 18,
+    "fluency": 17,
+    "grammar": 19,
+    "vocabulary": 18
+  },
+  "strengths": ["..."],
+  "improvements": ["..."],
+  "example_corrections": [
+    {"student": "Ich habe 20 Jahre alt.", "corrected": "Ich bin 20 Jahre alt."}
+  ],
+  "practice_phrases": ["..."],
+  "next_task_hint": "Next time, focus on using 'weil' to give a reason in at least 2 sentences."
 }
+Do not include any additional keys.
     `.trim();
 
     const userPrompt = `
@@ -332,10 +338,40 @@ ${transcript}
     return {
       transcript,
       corrected_text: parsed.corrected_text || "",
-      mistakes: parsed.mistakes || "",
+      overall_level: parsed.overall_level || level,
+      overall_score:
+        typeof parsed.overall_score === "number"
+          ? Math.min(Math.max(Math.round(parsed.overall_score), 0), 100)
+          : 0,
+      scores: {
+        task_fulfilment: parsed.scores?.task_fulfilment || 0,
+        fluency: parsed.scores?.fluency || 0,
+        grammar: parsed.scores?.grammar || 0,
+        vocabulary: parsed.scores?.vocabulary || 0,
+      },
+      strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+      improvements: Array.isArray(parsed.improvements) ? parsed.improvements : [],
+      example_corrections: Array.isArray(parsed.example_corrections)
+        ? parsed.example_corrections
+        : [],
+      practice_phrases: Array.isArray(parsed.practice_phrases)
+        ? parsed.practice_phrases
+        : [],
+      next_task_hint: parsed.next_task_hint || "",
+      // Legacy fields kept for backwards compatibility
+      mistakes:
+        parsed.mistakes ||
+        (Array.isArray(parsed.improvements)
+          ? parsed.improvements.map((item) => `• ${item}`).join("\n")
+          : ""),
       pronunciation: parsed.pronunciation || "",
-      score: typeof parsed.score === "number" ? parsed.score : 0,
-      comment: parsed.comment || "",
+      score:
+        typeof parsed.score === "number"
+          ? parsed.score
+          : typeof parsed.overall_score === "number"
+          ? Math.round(parsed.overall_score / 10)
+          : 0,
+      comment: parsed.comment || parsed.next_task_hint || "",
     };
   } catch (error) {
     console.error("❌ Error during speaking analysis:", error.response?.data || error);
