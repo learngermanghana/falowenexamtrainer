@@ -24,3 +24,16 @@ export const analyzeText = async (text, teil, level) => {
 
   return response.data;
 };
+
+export const fetchSpeakingQuestions = async (level, teil) => {
+  const params = new URLSearchParams({ level });
+  if (teil) {
+    params.append("teil", teil);
+  }
+
+  const response = await axios.get(
+    `${backendUrl}/api/speaking/questions?${params.toString()}`
+  );
+
+  return response.data?.questions || [];
+};

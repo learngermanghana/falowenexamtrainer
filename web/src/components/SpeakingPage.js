@@ -1,9 +1,9 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS, ALLOWED_TEILE } from "../context/ExamContext";
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
-import { analyzeAudio } from "../services/coachService";
+import { analyzeAudio, fetchSpeakingQuestions } from "../services/coachService";
 
 const SpeakingPage = () => {
   const {
@@ -22,12 +22,64 @@ const SpeakingPage = () => {
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState(null);
   const chunksRef = useRef([]);
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [questionError, setQuestionError] = useState("");
+  const [questionsLoading, setQuestionsLoading] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadQuestions = async () => {
+      setQuestionsLoading(true);
+      setQuestionError("");
+      setCurrentQuestionIndex(0);
+
+      try {
+        const fetched = await fetchSpeakingQuestions(level, teil);
+        if (!isMounted) return;
+
+        setQuestions(fetched);
+
+        if (fetched.length === 0) {
+          setQuestionError(
+            "Keine passenden Prüfungsfragen für diese Auswahl gefunden."
+          );
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        console.error("Falowen frontend error while loading questions:", err);
+        const msg =
+          err?.response?.data?.error ||
+          err.message ||
+          "Fragen konnten nicht geladen werden.";
+        setQuestionError(msg);
+      } finally {
+        if (isMounted) {
+          setQuestionsLoading(false);
+        }
+      }
+    };
+
+    loadQuestions();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [level, teil]);
 
   const resetAudio = () => {
     setError("");
     setAudioBlob(null);
     setAudioUrl(null);
     setResult(null);
+  };
+
+  const currentQuestion = questions[currentQuestionIndex] || null;
+
+  const showNextQuestion = () => {
+    if (questions.length === 0) return;
+    setCurrentQuestionIndex((prev) => (prev + 1) % questions.length);
   };
 
   const validateSelections = () => {
@@ -116,7 +168,46 @@ const SpeakingPage = () => {
       <SettingsForm title="1. Choose Exam Settings" />
 
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>2. Record Your Answer</h2>
+        <h2 style={styles.sectionTitle}>2. Practice question for your level</h2>
+        {questionsLoading ? (
+          <p style={styles.helperText}>Lade Fragen...</p>
+        ) : currentQuestion ? (
+          <>
+            <p style={styles.helperText}>
+              <strong>{currentQuestion.teil}</strong> · {currentQuestion.level}
+            </p>
+            <p style={styles.helperText}>{currentQuestion.topic}</p>
+            {currentQuestion.keyword && (
+              <p style={styles.helperText}>
+                Stichworte: <em>{currentQuestion.keyword}</em>
+              </p>
+            )}
+            <div style={{ marginTop: 12 }}>
+              <button
+                style={styles.secondaryButton}
+                onClick={showNextQuestion}
+                disabled={questions.length < 2}
+              >
+                {questions.length < 2 ? "Nur eine Frage verfügbar" : "Nächste Frage"}
+              </button>
+            </div>
+          </>
+        ) : (
+          <p style={styles.helperText}>
+            Noch keine Frage gefunden. Bitte wähle ein anderes Niveau oder versuche es
+            erneut.
+          </p>
+        )}
+
+        {questionError && (
+          <div style={{ ...styles.errorBox, marginTop: 12 }}>
+            <strong>Hinweis:</strong> {questionError}
+          </div>
+        )}
+      </section>
+
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>3. Record Your Answer</h2>
         <p style={styles.helperText}>
           🎙️ Click <b>Start Recording</b>, speak your answer, then click <b>Stop</b>.
         </p>
