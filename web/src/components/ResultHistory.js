@@ -33,6 +33,21 @@ const ResultHistory = ({ results = [] }) => {
                 </>
               )}
 
+              {entry.overall_score !== undefined && (
+                <p style={{ ...styles.resultText, fontWeight: 600 }}>
+                  Overall: {entry.overall_score}/100 ({entry.overall_level || "-"})
+                </p>
+              )}
+
+              {entry.scores && (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8 }}>
+                  <div style={styles.helperText}>Task fulfilment: {entry.scores.task_fulfilment || 0}/25</div>
+                  <div style={styles.helperText}>Fluency: {entry.scores.fluency || 0}/25</div>
+                  <div style={styles.helperText}>Grammar: {entry.scores.grammar || 0}/25</div>
+                  <div style={styles.helperText}>Vocabulary: {entry.scores.vocabulary || 0}/25</div>
+                </div>
+              )}
+
               {entry.corrected_text && (
                 <>
                   <h4 style={styles.resultHeading}>Corrected German Version</h4>
@@ -40,31 +55,49 @@ const ResultHistory = ({ results = [] }) => {
                 </>
               )}
 
-              {entry.mistakes && (
+              {entry.strengths && entry.strengths.length > 0 && (
                 <>
-                  <h4 style={styles.resultHeading}>Mistakes & Explanations</h4>
-                  <pre style={styles.pre}>{entry.mistakes}</pre>
+                  <h4 style={styles.resultHeading}>Strengths</h4>
+                  <ul style={{ paddingLeft: 18, margin: 0, display: "grid", gap: 4 }}>
+                    {entry.strengths.map((item, idx) => (
+                      <li key={`strength-${entry.id}-${idx}`} style={styles.resultText}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </>
               )}
 
-              {entry.pronunciation && (
+              {entry.improvements && entry.improvements.length > 0 && (
                 <>
-                  <h4 style={styles.resultHeading}>Pronunciation / Fluency</h4>
-                  <p style={styles.resultText}>{entry.pronunciation}</p>
+                  <h4 style={styles.resultHeading}>Improvements</h4>
+                  <ul style={{ paddingLeft: 18, margin: 0, display: "grid", gap: 4 }}>
+                    {entry.improvements.map((item, idx) => (
+                      <li key={`improve-${entry.id}-${idx}`} style={styles.resultText}>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
                 </>
               )}
 
-              {entry.score !== undefined && entry.score !== null && (
+              {entry.practice_phrases && entry.practice_phrases.length > 0 && (
                 <>
-                  <h4 style={styles.resultHeading}>Score</h4>
-                  <p style={styles.score}>
-                    ⭐ <b>{entry.score} / 10</b>
-                  </p>
+                  <h4 style={styles.resultHeading}>Practice phrases</h4>
+                  <ul style={{ paddingLeft: 18, margin: 0, display: "grid", gap: 4 }}>
+                    {entry.practice_phrases.map((phrase, idx) => (
+                      <li key={`phrase-${entry.id}-${idx}`} style={styles.resultText}>
+                        {phrase}
+                      </li>
+                    ))}
+                  </ul>
                 </>
               )}
 
-              {entry.comment && (
-                <p style={{ ...styles.resultText, marginTop: 4 }}>{entry.comment}</p>
+              {entry.next_task_hint && (
+                <p style={{ ...styles.resultText, marginTop: 6 }}>
+                  <strong>Next task hint:</strong> {entry.next_task_hint}
+                </p>
               )}
             </article>
           );
