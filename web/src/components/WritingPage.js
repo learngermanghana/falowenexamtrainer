@@ -3,11 +3,22 @@ import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS, ALLOWED_TEILE } from "../context/ExamContext";
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
+import ResultHistory from "./ResultHistory";
 import { analyzeText } from "../services/coachService";
 
 const WritingPage = () => {
-  const { teil, level, result, setResult, error, setError, loading, setLoading } =
-    useExam();
+  const {
+    teil,
+    level,
+    result,
+    setResult,
+    resultHistory,
+    addResultToHistory,
+    error,
+    setError,
+    loading,
+    setLoading,
+  } = useExam();
   const [typedAnswer, setTypedAnswer] = useState("");
 
   const validateSelections = () => {
@@ -42,7 +53,9 @@ const WritingPage = () => {
 
     try {
       const data = await analyzeText(trimmed, teil, level);
-      setResult(data);
+      const enrichedResult = { ...data, teil, level, mode: "Writing" };
+      setResult(enrichedResult);
+      addResultToHistory(enrichedResult);
     } catch (err) {
       console.error("Falowen frontend error:", err);
       const msg =
@@ -101,6 +114,7 @@ const WritingPage = () => {
       </section>
 
       <Feedback result={result} />
+      <ResultHistory results={resultHistory} />
     </>
   );
 };

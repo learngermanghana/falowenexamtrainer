@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS, ALLOWED_TEILE } from "../context/ExamContext";
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
+import ResultHistory from "./ResultHistory";
 import { analyzeAudio, fetchSpeakingQuestions } from "../services/coachService";
 
 const SpeakingPage = () => {
@@ -11,6 +12,8 @@ const SpeakingPage = () => {
     level,
     result,
     setResult,
+    resultHistory,
+    addResultToHistory,
     error,
     setError,
     loading,
@@ -249,7 +252,14 @@ const SpeakingPage = () => {
 
     try {
       const data = await analyzeAudio(audioBlob, teil, level);
-      setResult(data);
+      const enrichedResult = {
+        ...data,
+        teil,
+        level,
+        mode: "Speaking",
+      };
+      setResult(enrichedResult);
+      addResultToHistory(enrichedResult);
     } catch (err) {
       console.error("Falowen frontend error:", err);
       const msg =
@@ -398,6 +408,7 @@ const SpeakingPage = () => {
       </section>
 
       <Feedback result={result} />
+      <ResultHistory results={resultHistory} />
     </>
   );
 };
