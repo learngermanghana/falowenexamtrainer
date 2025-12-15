@@ -56,7 +56,10 @@ let cachedQuestions = {
 };
 
 // --- Simple user history persistence ---
-const historyFile = path.join(__dirname, "data", "userHistory.json");
+const historyBaseDir = process.env.VERCEL
+  ? path.join("/tmp", "falowen-exam-coach")
+  : path.join(__dirname, "data");
+const historyFile = path.join(historyBaseDir, "userHistory.json");
 fs.mkdirSync(path.dirname(historyFile), { recursive: true });
 
 function loadHistory() {

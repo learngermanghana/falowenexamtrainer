@@ -67,3 +67,9 @@ The optimized static files are written to `web/build/`. You can serve that folde
 ## Troubleshooting
 - Ensure `OPENAI_API_KEY` is set before starting the backend; requests will fail without it.
 - Audio uploads are limited to 25 MB and stored under `functionz/uploads/` when running locally.
+
+## Deploying to Vercel
+- The repository includes a `vercel.json` that builds the React app from `web/` and deploys the Express API from `api/`.
+- When running on Vercel, the backend writes user history to `/tmp/falowen-exam-coach/` to comply with the platform's read-only filesystem.
+- The frontend calls the API on the same origin by default in production; set `REACT_APP_BACKEND_URL` only when pointing to a different API URL.
+- Make sure `OPENAI_API_KEY` is configured as a Vercel environment variable before deploying.
