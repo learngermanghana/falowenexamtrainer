@@ -1,9 +1,15 @@
 import React from "react";
 import { styles } from "../styles";
-import { useExam, ALLOWED_TEILE, ALLOWED_LEVELS } from "../context/ExamContext";
+import {
+  useExam,
+  ALLOWED_LEVELS,
+  getTasksForLevel,
+} from "../context/ExamContext";
 
 const SettingsForm = ({ title, helperText }) => {
   const { teil, setTeil, level, setLevel, setError } = useExam();
+
+  const teilOptions = getTasksForLevel(level);
 
   return (
     <section style={styles.card}>
@@ -21,8 +27,10 @@ const SettingsForm = ({ title, helperText }) => {
             }}
             style={styles.select}
           >
-            {ALLOWED_TEILE.map((option) => (
-              <option key={option}>{option}</option>
+            {teilOptions.map((option) => (
+              <option key={option.id} value={option.label}>
+                {option.label}
+              </option>
             ))}
           </select>
         </div>

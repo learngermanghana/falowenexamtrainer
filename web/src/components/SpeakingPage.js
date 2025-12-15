@@ -1,35 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
-import { useExam, ALLOWED_LEVELS, ALLOWED_TEILE } from "../context/ExamContext";
+import {
+  useExam,
+  ALLOWED_LEVELS,
+  getTasksForLevel,
+} from "../context/ExamContext";
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
 import ResultHistory from "./ResultHistory";
 import { useAuth } from "../context/AuthContext";
 import { analyzeAudio, fetchSpeakingQuestions } from "../services/coachService";
-
-const SIMULATION_STEPS = [
-  {
-    teil: "Teil 1 – Vorstellung",
-    thinkSeconds: 30,
-    speakSeconds: 90,
-    instructions:
-      "Begrüße die Prüfer:innen, nenne deinen Namen, Herkunft und zwei kurze Fakten über dich (z. B. Beruf, Hobbys).",
-  },
-  {
-    teil: "Teil 2 – Fragen stellen",
-    thinkSeconds: 30,
-    speakSeconds: 90,
-    instructions:
-      "Stell deiner Mitprüferin/deinem Mitprüfer drei Fragen zu einem Thema (z. B. Freizeit, Wohnen, Arbeit).",
-  },
-  {
-    teil: "Teil 3 – Etwas planen",
-    thinkSeconds: 30,
-    speakSeconds: 120,
-    instructions:
-      "Plane zusammen mit deiner Mitprüferin/deinem Mitprüfer eine Aktivität. Mach Vorschläge, reagiere auf Vorschläge und trefft eine Entscheidung.",
-  },
-];
 
 const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60)
@@ -79,6 +59,30 @@ const SpeakingPage = () => {
   const [inputMode, setInputMode] = useState("record");
   const countdownRef = useRef(null);
   const stepAdvanceGuardRef = useRef(false);
+
+  const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
+
+  const simulationSteps = useMemo(() => {
+    if (!teilOptions.length) return [];
+
+    return teilOptions.map((task) => ({
+      teil: task.label,
+      instructions:
+        task.instructions ||
+        "Sprich frei zu deinem Prüfungsthema und reagiere auf Rückfragen.",
+      thinkSeconds: task.timing?.prepSeconds ?? 30,
+      speakSeconds: task.timing?.speakSeconds ?? 120,
+    }));
+  }, [teilOptions]);
+
+  useEffect(() => {
+    setSimulationMode(false);
+    setSimulationCountdown(null);
+    setCurrentSimulationStepIndex(0);
+    setSimulationScores([]);
+    setSimulationSummary(null);
+    stepAdvanceGuardRef.current = false;
+  }, [simulationSteps]);
 
   useEffect(() => {
     let isMounted = true;
@@ -204,14 +208,16 @@ const SpeakingPage = () => {
 
   const validateLevel = () => {
     if (!ALLOWED_LEVELS.includes(level)) {
-      setError("Bitte wähle ein gültiges Sprachniveau (A1, A2 oder B1).");
+      setError("Bitte wähle ein gültiges Sprachniveau (A1–B2).");
       return false;
     }
     return true;
   };
 
   const validateTeil = () => {
-    if (!ALLOWED_TEILE.includes(teil)) {
+    const allowedTeile = teilOptions.map((option) => option.label);
+
+    if (!allowedTeile.includes(teil)) {
       setError("Bitte wähle einen gültigen Prüfungsteil.");
       return false;
     }
@@ -267,7 +273,7 @@ const SpeakingPage = () => {
 
     if (!validateLevel()) return;
 
-    const step = SIMULATION_STEPS[currentSimulationStepIndex];
+    const step = simulationSteps[currentSimulationStepIndex];
     if (!step) {
       setError("Ungültiger Simulationsschritt.");
       return;
@@ -304,12 +310,12 @@ const SpeakingPage = () => {
       resetAudio();
       stopVisualization();
 
-      if (currentSimulationStepIndex < SIMULATION_STEPS.length - 1) {
+      if (currentSimulationStepIndex < simulationSteps.length - 1) {
         const nextIndex = currentSimulationStepIndex + 1;
         setCurrentSimulationStepIndex(nextIndex);
         setSimulationCountdown({
           type: "think",
-          secondsRemaining: SIMULATION_STEPS[nextIndex].thinkSeconds,
+          secondsRemaining: simulationSteps[nextIndex].thinkSeconds,
         });
         setHasStartedSpeaking(false);
       } else {
@@ -434,17 +440,22 @@ const SpeakingPage = () => {
   }, [audioUrl]);
 
   const handleSimulationStart = () => {
+    if (!simulationSteps.length) {
+      setError("Für dieses Niveau sind aktuell keine Simulationsteile definiert.");
+      return;
+    }
+
     setSimulationMode(true);
     setSimulationScores([]);
     setSimulationSummary(null);
     setCurrentSimulationStepIndex(0);
     setSimulationCountdown({
       type: "think",
-      secondsRemaining: SIMULATION_STEPS[0].thinkSeconds,
+      secondsRemaining: simulationSteps[0].thinkSeconds,
     });
     setHasStartedSpeaking(false);
     stepAdvanceGuardRef.current = false;
-    setTeil(SIMULATION_STEPS[0].teil);
+    setTeil(simulationSteps[0].teil);
   };
 
   const handleSimulationStop = () => {
@@ -473,7 +484,7 @@ const SpeakingPage = () => {
             return {
               type: "speak",
               secondsRemaining:
-                SIMULATION_STEPS[currentSimulationStepIndex].speakSeconds,
+                simulationSteps[currentSimulationStepIndex]?.speakSeconds || 0,
             };
           } else {
             clearInterval(countdownRef.current);
@@ -498,7 +509,12 @@ const SpeakingPage = () => {
         countdownRef.current = null;
       }
     };
-  }, [simulationMode, currentSimulationStepIndex, simulationCountdown]);
+  }, [
+    simulationMode,
+    currentSimulationStepIndex,
+    simulationCountdown,
+    simulationSteps,
+  ]);
 
   useEffect(() => {
     if (
@@ -735,16 +751,16 @@ const SpeakingPage = () => {
           <div style={styles.simulationBox}>
             <div style={styles.simulationStepHeader}>
               <span style={styles.simulationStepLabel}>
-                {SIMULATION_STEPS[currentSimulationStepIndex].teil}
+                {simulationSteps[currentSimulationStepIndex]?.teil || ""}
               </span>
               <span style={styles.simulationStepMeta}>
                 Schritt {currentSimulationStepIndex + 1} von{" "}
-                {SIMULATION_STEPS.length}
+                {simulationSteps.length}
               </span>
             </div>
 
             <p style={styles.simulationInstructions}>
-              {SIMULATION_STEPS[currentSimulationStepIndex].instructions}
+              {simulationSteps[currentSimulationStepIndex]?.instructions || ""}
             </p>
 
             {simulationCountdown && (
