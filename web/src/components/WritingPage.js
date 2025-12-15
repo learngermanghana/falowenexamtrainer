@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
-import { useExam, ALLOWED_LEVELS, ALLOWED_TEILE } from "../context/ExamContext";
+import {
+  useExam,
+  ALLOWED_LEVELS,
+  getTasksForLevel,
+} from "../context/ExamContext";
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
 import ResultHistory from "./ResultHistory";
@@ -23,6 +27,8 @@ const WritingPage = () => {
   } = useExam();
   const { user, idToken } = useAuth();
   const userId = user?.uid;
+
+  const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
 
   const [activeTab, setActiveTab] = useState("practice");
   const [typedAnswer, setTypedAnswer] = useState("");
@@ -86,7 +92,7 @@ const WritingPage = () => {
   };
 
   const validateSelections = () => {
-    if (!ALLOWED_TEILE.includes(teil)) {
+    if (!teilOptions.some((option) => option.label === teil)) {
       setError("Bitte wähle einen gültigen Teil aus der Liste.");
       return false;
     }
