@@ -8,9 +8,9 @@ import {
 import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
 import ResultHistory from "./ResultHistory";
-import { analyzeText } from "../services/coachService";
+import { analyzeText, fetchWritingLetters } from "../services/coachService";
 import { useAuth } from "../context/AuthContext";
-import { writingLetters } from "../data/writingLetters";
+import { writingLetters as fallbackWritingLetters } from "../data/writingLetters";
 
 const WritingPage = () => {
   const {
@@ -31,6 +31,9 @@ const WritingPage = () => {
   const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
 
   const [activeTab, setActiveTab] = useState("practice");
+  const [writingTasks, setWritingTasks] = useState(fallbackWritingLetters);
+  const [writingTasksLoading, setWritingTasksLoading] = useState(true);
+  const [writingTasksError, setWritingTasksError] = useState("");
   const [typedAnswer, setTypedAnswer] = useState("");
   const [practiceDraft, setPracticeDraft] = useState("");
   const [question, setQuestion] = useState("");
@@ -41,16 +44,62 @@ const WritingPage = () => {
     },
   ]);
   const [selectedLetterId, setSelectedLetterId] = useState(
-    writingLetters[0]?.id || ""
+    fallbackWritingLetters[0]?.id || ""
   );
   const selectedLetter = useMemo(
-    () => writingLetters.find((item) => item.id === selectedLetterId),
-    [selectedLetterId]
+    () => writingTasks.find((item) => item.id === selectedLetterId),
+    [selectedLetterId, writingTasks]
   );
   const [remainingSeconds, setRemainingSeconds] = useState(
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadWritingTasks = async () => {
+      setWritingTasksLoading(true);
+      try {
+        const tasks = await fetchWritingLetters(undefined, idToken);
+
+        if (!isMounted) return;
+
+        if (tasks.length > 0) {
+          setWritingTasks(tasks);
+          setWritingTasksError("");
+        } else {
+          setWritingTasks(fallbackWritingLetters);
+          setWritingTasksError(
+            "Keine Schreibaufgaben aus dem Sheet gefunden – zeige Beispiele."
+          );
+        }
+      } catch (err) {
+        console.error("Failed to load writing tasks", err);
+        if (!isMounted) return;
+
+        setWritingTasks(fallbackWritingLetters);
+        setWritingTasksError(
+          "Konnte Schreibaufgaben nicht laden. Zeige lokale Beispieldaten."
+        );
+      } finally {
+        if (isMounted) setWritingTasksLoading(false);
+      }
+    };
+
+    loadWritingTasks();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [idToken]);
+
+  useEffect(() => {
+    if (!writingTasks.length) return;
+    if (!selectedLetterId || !writingTasks.some((item) => item.id === selectedLetterId)) {
+      setSelectedLetterId(writingTasks[0].id);
+    }
+  }, [selectedLetterId, writingTasks]);
 
   useEffect(() => {
     if (selectedLetter) {
@@ -245,45 +294,58 @@ const WritingPage = () => {
         <>
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Briefe aus der Übungsvorlage</h3>
-            <div style={styles.gridTwo}>
-              {writingLetters.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: 12,
-                    background:
-                      selectedLetterId === item.id ? "#eff6ff" : "#f9fafb",
-                    boxShadow:
-                      selectedLetterId === item.id
-                        ? "0 8px 18px rgba(37,99,235,0.15)"
-                        : "none",
-                  }}
-                >
-                  <div style={styles.metaRow}>
-                    <div style={{ fontWeight: 800 }}>{item.letter}</div>
-                    <span style={styles.levelPill}>Niveau {item.level}</span>
-                  </div>
-                  <p style={styles.helperText}>{item.situation}</p>
-                  <div style={styles.metaRow}>
-                    <span style={styles.badge}>
-                      ⏱️ {item.durationMinutes} Minuten
-                    </span>
-                    <button
-                      style={
+            {writingTasksError && (
+              <p style={{ ...styles.helperText, color: "#b91c1c" }}>
+                {writingTasksError}
+              </p>
+            )}
+            {writingTasksLoading ? (
+              <p style={styles.helperText}>Lade Schreibaufgaben aus dem Sheet ...</p>
+            ) : writingTasks.length === 0 ? (
+              <p style={styles.helperText}>
+                Keine Schreibaufgaben verfügbar. Bitte versuche es später erneut.
+              </p>
+            ) : (
+              <div style={styles.gridTwo}>
+                {writingTasks.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 12,
+                      padding: 12,
+                      background:
+                        selectedLetterId === item.id ? "#eff6ff" : "#f9fafb",
+                      boxShadow:
                         selectedLetterId === item.id
-                          ? styles.primaryButton
-                          : styles.secondaryButton
-                      }
-                      onClick={() => setSelectedLetterId(item.id)}
-                    >
-                      {selectedLetterId === item.id ? "Gewählt" : "Üben"}
-                    </button>
+                          ? "0 8px 18px rgba(37,99,235,0.15)"
+                          : "none",
+                    }}
+                  >
+                    <div style={styles.metaRow}>
+                      <div style={{ fontWeight: 800 }}>{item.letter}</div>
+                      <span style={styles.levelPill}>Niveau {item.level}</span>
+                    </div>
+                    <p style={styles.helperText}>{item.situation}</p>
+                    <div style={styles.metaRow}>
+                      <span style={styles.badge}>
+                        ⏱️ {item.durationMinutes} Minuten
+                      </span>
+                      <button
+                        style={
+                          selectedLetterId === item.id
+                            ? styles.primaryButton
+                            : styles.secondaryButton
+                        }
+                        onClick={() => setSelectedLetterId(item.id)}
+                      >
+                        {selectedLetterId === item.id ? "Gewählt" : "Üben"}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
 
           <section style={styles.card}>
@@ -295,7 +357,7 @@ const WritingPage = () => {
                 <p style={styles.helperText}>{selectedLetter.situation}</p>
                 <h4 style={styles.resultHeading}>Checkliste</h4>
                 <ul style={styles.checklist}>
-                  {selectedLetter.whatToInclude.map((item) => (
+                  {(selectedLetter.whatToInclude || []).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
