@@ -45,12 +45,23 @@ const SPEAKING_FORMATS = {
 const ALLOWED_LEVELS = Object.keys(SPEAKING_FORMATS);
 
 // --- Google Sheets config for practice questions ---
-const SHEET_ID = "1zaAT5NjRGKiITV7EpuSHvYMBHHENMs9Piw3pNcyQtho";
-const SHEET_GID = "1161508231"; // Exams_list tab
+const SHEET_ID = "1zaAT5NjRGKiITV7EpuSHvYMBHHENMs9Piw3pNcyQtho"; // Exams list
+const SHEET_GID = "1161508231"; // Exams list tab
 const SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
 const QUESTIONS_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
 
+// --- Google Sheets config for writing tasks ---
+const WRITING_SHEET_ID = "1RnZ_YHhbGNYxlwq0KN2a-31OpLygpOkkMGVmQSbGiVQ"; // Schreiben sheet
+const WRITING_SHEET_GID = "0"; // Schreiben tab
+const WRITING_SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${WRITING_SHEET_ID}/export?format=csv&gid=${WRITING_SHEET_GID}`;
+const WRITING_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
 let cachedQuestions = {
+  fetchedAt: 0,
+  data: null,
+};
+
+let cachedWritingTasks = {
   fetchedAt: 0,
   data: null,
 };
@@ -209,6 +220,42 @@ function parseCsv(csvText) {
   });
 }
 
+function slugifyId(text, fallback = "writing-task") {
+  const normalized = (text || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+  return normalized || fallback;
+}
+
+function parseDurationMinutes(value, fallback = 15) {
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return value;
+  }
+
+  const numericText = String(value || "")
+    .replace(/,/g, ".")
+    .match(/\d+(\.\d+)?/);
+  if (!numericText) return fallback;
+
+  const parsed = Number.parseFloat(numericText[0]);
+  if (Number.isNaN(parsed)) return fallback;
+
+  return Math.max(5, Math.round(parsed));
+}
+
+function extractChecklist(row) {
+  const checklistKeys = Object.keys(row || {}).filter((key) =>
+    /(bullet|include|item|point|tip|hint)/i.test(key)
+  );
+
+  const checklist = checklistKeys
+    .map((key) => row[key]?.trim())
+    .filter(Boolean);
+
+  return checklist;
+}
+
 async function fetchSheetQuestions() {
   const now = Date.now();
   if (cachedQuestions.data && now - cachedQuestions.fetchedAt < QUESTIONS_CACHE_TTL_MS) {
@@ -248,6 +295,68 @@ async function fetchSheetQuestions() {
     .filter(Boolean);
 
   cachedQuestions = {
+    fetchedAt: now,
+    data: normalized,
+  };
+
+  return normalized;
+}
+
+async function fetchSheetWritingTasks() {
+  const now = Date.now();
+  if (
+    cachedWritingTasks.data &&
+    now - cachedWritingTasks.fetchedAt < WRITING_CACHE_TTL_MS
+  ) {
+    return cachedWritingTasks.data;
+  }
+
+  if (typeof fetch !== "function") {
+    throw new Error("Fetch API is not available in this runtime.");
+  }
+
+  const response = await fetch(WRITING_SHEET_EXPORT_URL);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch writing sheet (status ${response.status})`);
+  }
+
+  const csvText = await response.text();
+  const rows = parseCsv(csvText);
+
+  const normalized = rows
+    .map((row) => {
+      const letter =
+        row.Letter?.trim() ||
+        row["Letter Title"]?.trim() ||
+        row["Letter/Prompt"]?.trim() ||
+        row["Prompt"]?.trim();
+      const level = row.Level?.trim();
+      const durationMinutes = parseDurationMinutes(
+        row.DurationMinutes || row.Duration || row["Duration (min)"] || row.Time
+      );
+      const situation =
+        row.Situation?.trim() ||
+        row["Topic/Prompt"]?.trim() ||
+        row.Topic?.trim() ||
+        row.Context?.trim() ||
+        "";
+
+      const whatToInclude = extractChecklist(row);
+
+      if (!letter || !level) return null;
+
+      return {
+        id: slugifyId(letter),
+        letter,
+        level,
+        durationMinutes,
+        situation,
+        whatToInclude,
+      };
+    })
+    .filter(Boolean);
+
+  cachedWritingTasks = {
     fetchedAt: now,
     data: normalized,
   };
@@ -688,7 +797,24 @@ app.get("/api/speaking/questions", async (req, res) => {
   }
 });
 
-// --- 3C. Text endpoint: send typed answer + get feedback ---
+// --- 3C. Writing tasks endpoint: fetch prompts from Google Sheets ---
+app.get("/api/writing/tasks", async (req, res) => {
+  const { level } = req.query;
+
+  try {
+    const tasks = await fetchSheetWritingTasks();
+    const filtered = level
+      ? tasks.filter((task) => task.level?.toUpperCase() === level.toUpperCase())
+      : tasks;
+
+    return res.json({ tasks: filtered });
+  } catch (error) {
+    console.error("❌ Failed to fetch writing tasks:", error);
+    return res.status(500).json({ error: "Failed to load writing tasks." });
+  }
+});
+
+// --- 3D. Text endpoint: send typed answer + get feedback ---
 app.post("/api/speaking/analyze-text", async (req, res) => {
   try {
     const { text, teil = "Teil 1 – Vorstellung", level = "A1", userId, targetLevel } = req.body;

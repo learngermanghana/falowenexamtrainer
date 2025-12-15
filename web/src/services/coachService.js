@@ -110,6 +110,20 @@ export const fetchSpeakingQuestions = async (level, teil, idToken) => {
   return response.data?.questions || [];
 };
 
+export const fetchWritingLetters = async (level, idToken) => {
+  const params = new URLSearchParams();
+  if (level) params.append("level", level);
+
+  const response = await axios.get(
+    `${backendUrl}/api/writing/tasks${params.toString() ? `?${params.toString()}` : ""}`,
+    {
+      headers: authHeaders(idToken),
+    }
+  );
+
+  return response.data?.tasks || [];
+};
+
 export const startPlacement = async ({ answers = [], userId, targetLevel, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/api/tutor/placement`,
