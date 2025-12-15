@@ -89,12 +89,33 @@ const Feedback = ({ result }) => {
         </div>
         {hasScores && (
           <div style={{ flex: 2, minWidth: 240 }}>
-            <h3 style={styles.resultHeading}>Skill breakdown</h3>
+            <h3 style={styles.resultHeading}>Goethe-style skill view</h3>
+            <p style={{ ...styles.helperText, marginBottom: 4 }}>
+              Interaction and pronunciation are scored separately in Goethe B1/B2;
+              both are mapped to your fluency score until we collect those
+              signals directly.
+            </p>
             <div style={scoreBarStyles.container}>
-              {renderScoreBar("Task fulfilment", scores.task_fulfilment || 0)}
-              {renderScoreBar("Fluency", scores.fluency || 0)}
-              {renderScoreBar("Grammar", scores.grammar || 0)}
-              {renderScoreBar("Vocabulary", scores.vocabulary || 0)}
+              {renderScoreBar(
+                "Aufgabenbewältigung (task fulfilment)",
+                scores.task_fulfilment || 0
+              )}
+              {renderScoreBar(
+                "Interaktion (mapped from fluency)",
+                scores.fluency || 0
+              )}
+              {renderScoreBar(
+                "Aussprache · Ausspracheklarheit (mapped from fluency)",
+                scores.fluency || 0
+              )}
+              {renderScoreBar(
+                "Sprachrichtigkeit (grammar accuracy)",
+                scores.grammar || 0
+              )}
+              {renderScoreBar(
+                "Wortschatz (vocabulary range)",
+                scores.vocabulary || 0
+              )}
             </div>
           </div>
         )}

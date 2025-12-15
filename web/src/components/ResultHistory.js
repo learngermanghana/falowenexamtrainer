@@ -40,11 +40,32 @@ const ResultHistory = ({ results = [] }) => {
               )}
 
               {entry.scores && (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8 }}>
-                  <div style={styles.helperText}>Task fulfilment: {entry.scores.task_fulfilment || 0}/25</div>
-                  <div style={styles.helperText}>Fluency: {entry.scores.fluency || 0}/25</div>
-                  <div style={styles.helperText}>Grammar: {entry.scores.grammar || 0}/25</div>
-                  <div style={styles.helperText}>Vocabulary: {entry.scores.vocabulary || 0}/25</div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                    gap: 8,
+                  }}
+                >
+                  <div style={styles.helperText}>
+                    Aufgabenbewältigung (task fulfilment):
+                    {" "}
+                    {entry.scores.task_fulfilment || 0}/25
+                  </div>
+                  <div style={styles.helperText}>
+                    Interaktion (mapped from fluency): {entry.scores.fluency || 0}/25
+                  </div>
+                  <div style={styles.helperText}>
+                    Aussprache · Ausspracheklarheit (mapped from fluency):
+                    {" "}
+                    {entry.scores.fluency || 0}/25
+                  </div>
+                  <div style={styles.helperText}>
+                    Sprachrichtigkeit (grammar accuracy): {entry.scores.grammar || 0}/25
+                  </div>
+                  <div style={styles.helperText}>
+                    Wortschatz (vocabulary range): {entry.scores.vocabulary || 0}/25
+                  </div>
                 </div>
               )}
 
