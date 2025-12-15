@@ -6,6 +6,10 @@ import VocabPage from "./components/VocabPage";
 import CoachPanel from "./components/CoachPanel";
 import HomeActions from "./components/HomeActions";
 import PlacementCheck from "./components/PlacementCheck";
+import PlanPage from "./components/PlanPage";
+import PracticeLab from "./components/PracticeLab";
+import ProgressPage from "./components/ProgressPage";
+import ResourcePage from "./components/ResourcePage";
 import AuthGate from "./components/AuthGate";
 import { useAuth } from "./context/AuthContext";
 import { styles } from "./styles";
@@ -13,7 +17,7 @@ import { styles } from "./styles";
 function App() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
     useAuth();
-  const [activePage, setActivePage] = useState("home");
+  const [activePage, setActivePage] = useState("plan");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
 
@@ -32,12 +36,17 @@ function App() {
   };
 
   const renderMain = () => {
+    if (activePage === "plan") return <PlanPage onSelect={setActivePage} />;
     if (activePage === "home") return <HomeActions onSelect={setActivePage} />;
+    if (activePage === "speaking") return <SpeakingPage />;
+    if (activePage === "writing") return <WritingPage />;
+    if (activePage === "vocab") return <VocabPage />;
+    if (activePage === "ueben") return <PracticeLab />;
+    if (activePage === "progress") return <ProgressPage />;
+    if (activePage === "resources") return <ResourcePage />;
     if (activePage === "level-check") return <PlacementCheck />;
     if (activePage === "daily") return <SpeakingPage mode="daily" />;
     if (activePage === "exam") return <SpeakingPage mode="exam" />;
-    if (activePage === "schreiben") return <WritingPage />;
-    if (activePage === "vocabs") return <VocabPage />;
     return <SpeakingPage />;
   };
 
@@ -98,6 +107,26 @@ function App() {
             )}
           </div>
         </header>
+
+        <nav style={{ ...styles.nav, marginBottom: 16 }}>
+          {[
+            { key: "plan", label: "Home · Plan" },
+            { key: "speaking", label: "Sprechen" },
+            { key: "writing", label: "Schreiben" },
+            { key: "vocab", label: "Vokabeln" },
+            { key: "ueben", label: "Üben" },
+            { key: "progress", label: "Fortschritt" },
+            { key: "resources", label: "Ressourcen" },
+          ].map((item) => (
+            <button
+              key={item.key}
+              style={activePage === item.key ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActivePage(item.key)}
+            >
+              {item.label}
+            </button>
+          ))}
+        </nav>
 
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
           <main style={{ minWidth: 0 }}>{renderMain()}</main>
