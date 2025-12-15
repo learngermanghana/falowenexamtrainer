@@ -15,6 +15,7 @@ export const analyzeAudio = async ({
   level,
   contextType,
   question,
+  interactionMode,
   userId,
   idToken,
 }) => {
@@ -26,6 +27,9 @@ export const analyzeAudio = async ({
 
   if (contextType) formData.append("contextType", contextType);
   if (question) formData.append("question", question);
+  if (typeof interactionMode !== "undefined") {
+    formData.append("interactionMode", interactionMode);
+  }
 
   const response = await axios.post(`${backendUrl}/api/speaking/analyze`, formData, {
     headers: {
@@ -33,6 +37,39 @@ export const analyzeAudio = async ({
       ...authHeaders(idToken),
     },
   });
+
+  return response.data;
+};
+
+export const scoreInteractionAudio = async ({
+  audioBlob,
+  initialTranscript,
+  followUpQuestion,
+  teil,
+  level,
+  userId,
+  targetLevel,
+  idToken,
+}) => {
+  const formData = new FormData();
+  formData.append("audio", audioBlob, "interaction-followup.webm");
+  formData.append("initialTranscript", initialTranscript);
+  formData.append("followUpQuestion", followUpQuestion);
+  formData.append("teil", teil);
+  formData.append("level", level);
+  if (userId) formData.append("userId", userId);
+  if (targetLevel) formData.append("targetLevel", targetLevel);
+
+  const response = await axios.post(
+    `${backendUrl}/api/speaking/interaction-score`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...authHeaders(idToken),
+      },
+    }
+  );
 
   return response.data;
 };

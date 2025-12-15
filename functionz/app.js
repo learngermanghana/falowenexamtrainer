@@ -300,7 +300,106 @@ async function transcribeAudio(filePath) {
 }
 
 // --- 2. Analyze speaking with GPT (Goethe-style feedback) ---
-async function analyzeSpeaking(transcript, teil, level, userContext = {}) {
+function shouldOfferInteraction(teil, level, explicitFlag = false) {
+  if (explicitFlag) return true;
+
+  const normalizedTeil = (teil || "").toLowerCase();
+  const normalizedLevel = (level || "").toUpperCase();
+
+  const isB1Interaction =
+    normalizedLevel === "B1" &&
+    (normalizedTeil.includes("präsentation") ||
+      normalizedTeil.includes("planung"));
+
+  const isB2OrHigherDiscussion =
+    ["B2", "C1", "C2"].includes(normalizedLevel) &&
+    normalizedTeil.includes("diskussion");
+
+  return isB1Interaction || isB2OrHigherDiscussion;
+}
+
+async function generateInteractionFollowups(transcript, teil, level) {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4.1-mini",
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: `You are the AI examiner/partner in a Goethe-style speaking interaction. Level ${level}. Exam part: ${teil}.
+Generate 2-3 natural, concise follow-up questions that keep the conversation moving. Mix brief reactions, clarifying questions and polite interruptions where relevant.
+Return JSON {"mode": "examiner|partner", "style_tip": "one sentence on tone", "follow_up_questions": [{"prompt": "", "focus": ""}, ...], "closing_prompt": "short wrap-up or summary request"}.`,
+      },
+      {
+        role: "user",
+        content: `Learner just said: ${transcript}`,
+      },
+    ],
+  });
+
+  const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
+  const questions = Array.isArray(parsed.follow_up_questions)
+    ? parsed.follow_up_questions
+    : [];
+
+  return {
+    mode: parsed.mode || "examiner",
+    style_tip: parsed.style_tip || "Höflich, knapp und fokussiert.",
+    closing_prompt:
+      parsed.closing_prompt ||
+      "Fasse deine Position in zwei Sätzen zusammen und reagiere kurz auf einen Einwand.",
+    followUpQuestions: questions
+      .map((q, idx) => ({
+        prompt: q.prompt || q.question || `Rückfrage ${idx + 1}?`,
+        focus: q.focus || "",
+      }))
+      .slice(0, 3),
+  };
+}
+
+async function scoreInteractionLoop({
+  initialTranscript,
+  followUpTranscript,
+  followUpQuestion,
+  teil,
+  level,
+}) {
+  const completion = await openai.chat.completions.create({
+    model: "gpt-4.1-mini",
+    response_format: { type: "json_object" },
+    messages: [
+      {
+        role: "system",
+        content: `You are an interaction examiner. Evaluate the learner's turn-taking, reactions, follow-up quality and politeness for Goethe level ${level}, part ${teil}. Return JSON with keys: overall_score (0-100), overall_level (A1-C2), summary, turn_taking, follow_up_quality, politeness, strengths [..], improvements [..], practice_phrases [..], next_task_hint.`,
+      },
+      {
+        role: "user",
+        content: `Initial contribution: ${initialTranscript}\nFollow-up question: ${followUpQuestion}\nLearner follow-up answer: ${followUpTranscript}`,
+      },
+    ],
+  });
+
+  const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
+
+  return {
+    overall_level: parsed.overall_level || level,
+    overall_score:
+      typeof parsed.overall_score === "number"
+        ? Math.min(Math.max(Math.round(parsed.overall_score), 0), 100)
+        : 0,
+    summary: parsed.summary || "",
+    turn_taking: parsed.turn_taking || "",
+    follow_up_quality: parsed.follow_up_quality || "",
+    politeness: parsed.politeness || "",
+    strengths: Array.isArray(parsed.strengths) ? parsed.strengths : [],
+    improvements: Array.isArray(parsed.improvements) ? parsed.improvements : [],
+    practice_phrases: Array.isArray(parsed.practice_phrases)
+      ? parsed.practice_phrases
+      : [],
+    next_task_hint: parsed.next_task_hint || "",
+  };
+}
+
+async function analyzeSpeaking(transcript, teil, level, userContext = {}, options = {}) {
   try {
     const validation = validateTeilAndLevel(teil, level);
     if (!validation.valid) {
@@ -424,7 +523,7 @@ ${transcript}
       throw new Error("Model returned invalid JSON");
     }
 
-    return {
+    const baseResult = {
       meta: {
         teil,
         level,
@@ -472,6 +571,16 @@ ${transcript}
           : 0,
       comment: parsed.comment || parsed.next_task_hint || "",
     };
+
+    if (shouldOfferInteraction(teil, level, options.interactionMode)) {
+      baseResult.interaction = await generateInteractionFollowups(
+        transcript,
+        teil,
+        level
+      );
+    }
+
+    return baseResult;
   } catch (error) {
     console.error("❌ Error during speaking analysis:", error.response?.data || error);
     throw new Error("Speaking analysis failed");
@@ -483,7 +592,13 @@ app.post(
   "/api/speaking/analyze",
   upload.single("audio"), // field name: "audio"
   async (req, res) => {
-    const { teil = "Teil 1 – Vorstellung", level = "A1", userId, targetLevel } = req.body;
+    const {
+      teil = "Teil 1 – Vorstellung",
+      level = "A1",
+      userId,
+      targetLevel,
+      interactionMode,
+    } = req.body;
     const validation = validateTeilAndLevel(teil, level);
     if (!validation.valid) {
       return res.status(400).json({ error: validation.message });
@@ -504,11 +619,17 @@ app.post(
       const transcript = await transcribeAudio(filePath);
 
       // 2) Analyze
-      const analysis = await analyzeSpeaking(transcript, teil, level, {
-        userId,
-        targetLevel,
-        taskType: "speaking",
-      });
+      const analysis = await analyzeSpeaking(
+        transcript,
+        teil,
+        level,
+        {
+          userId,
+          targetLevel,
+          taskType: "speaking",
+        },
+        { interactionMode: interactionMode === "true" || interactionMode === true }
+      );
 
       recordHistoryEntry(userId, {
         taskType: "speaking",
@@ -599,6 +720,111 @@ app.post("/api/speaking/analyze-text", async (req, res) => {
     return res.status(500).json({ error: error.message || "Server error" });
   }
 });
+
+app.post(
+  "/api/speaking/interaction-score",
+  upload.single("audio"),
+  async (req, res) => {
+    const {
+      initialTranscript,
+      followUpQuestion,
+      teil = "Teil 1 – Vorstellung",
+      level = "A1",
+      userId,
+      targetLevel,
+    } = req.body;
+
+    const validation = validateTeilAndLevel(teil, level);
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.message });
+    }
+
+    if (!initialTranscript || !initialTranscript.trim()) {
+      return res
+        .status(400)
+        .json({ error: "Initial transcript is required for interaction scoring." });
+    }
+
+    if (!followUpQuestion || !followUpQuestion.trim()) {
+      return res
+        .status(400)
+        .json({ error: "Please include the follow-up question that was answered." });
+    }
+
+    const file = req.file;
+    if (!file) {
+      return res.status(400).json({ error: "Audio file is required (field name: audio)" });
+    }
+
+    const filePath = file.path || path.join(uploadsDir, file.filename);
+
+    try {
+      const followUpTranscript = await transcribeAudio(filePath);
+
+      const interactionScore = await scoreInteractionLoop({
+        initialTranscript,
+        followUpTranscript,
+        followUpQuestion,
+        teil,
+        level,
+      });
+
+      const scoreForBars = interactionScore.overall_score || 0;
+      const balancedScore = Math.round(scoreForBars / 4);
+
+      const responsePayload = {
+        meta: {
+          teil,
+          level,
+          targetLevel: targetLevel || level,
+          taskType: "speaking-interaction",
+        },
+        transcript: followUpTranscript,
+        feedback: {
+          corrected_text: followUpTranscript,
+          overall_level: interactionScore.overall_level,
+          overall_score: interactionScore.overall_score,
+          scores: {
+            task_fulfilment: balancedScore,
+            fluency: balancedScore,
+            grammar: balancedScore,
+            vocabulary: balancedScore,
+          },
+          strengths: interactionScore.strengths,
+          improvements: interactionScore.improvements,
+          practice_phrases: interactionScore.practice_phrases,
+          next_task_hint: interactionScore.next_task_hint,
+        },
+        interaction: {
+          followUpQuestion,
+          initialTranscript,
+          followUpTranscript,
+          summary: interactionScore.summary,
+          turn_taking: interactionScore.turn_taking,
+          follow_up_quality: interactionScore.follow_up_quality,
+          politeness: interactionScore.politeness,
+        },
+      };
+
+      recordHistoryEntry(userId, {
+        taskType: "speaking-interaction",
+        teil,
+        level,
+        targetLevel: targetLevel || level,
+        overall_score: interactionScore.overall_score,
+      });
+
+      fs.unlink(filePath, (err) => {
+        if (err) console.error("⚠️ Failed to delete temp file:", err);
+      });
+
+      return res.json(responsePayload);
+    } catch (error) {
+      console.error("❌ Error in /api/speaking/interaction-score:", error);
+      return res.status(500).json({ error: error.message || "Interaction scoring failed" });
+    }
+  }
+);
 
 // --- Tutor endpoints ---
 app.post("/api/tutor/placement", async (req, res) => {

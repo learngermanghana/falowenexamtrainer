@@ -9,7 +9,11 @@ import SettingsForm from "./SettingsForm";
 import Feedback from "./Feedback";
 import ResultHistory from "./ResultHistory";
 import { useAuth } from "../context/AuthContext";
-import { analyzeAudio, fetchSpeakingQuestions } from "../services/coachService";
+import {
+  analyzeAudio,
+  fetchSpeakingQuestions,
+  scoreInteractionAudio,
+} from "../services/coachService";
 
 const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60)
@@ -57,6 +61,11 @@ const SpeakingPage = () => {
   const [simulationSummary, setSimulationSummary] = useState(null);
   const [hasStartedSpeaking, setHasStartedSpeaking] = useState(false);
   const [inputMode, setInputMode] = useState("record");
+  const [interactionMode, setInteractionMode] = useState(false);
+  const [interactionSession, setInteractionSession] = useState(null);
+  const [interactionResult, setInteractionResult] = useState(null);
+  const [selectedFollowUpIndex, setSelectedFollowUpIndex] = useState(0);
+  const hasManuallyToggledInteraction = useRef(false);
   const countdownRef = useRef(null);
   const stepAdvanceGuardRef = useRef(false);
 
@@ -74,6 +83,35 @@ const SpeakingPage = () => {
       speakSeconds: task.timing?.speakSeconds ?? 120,
     }));
   }, [teilOptions]);
+
+  const interactionAvailable = useMemo(() => {
+    const normalizedLevel = (level || "").toUpperCase();
+    const normalizedTeil = (teil || "").toLowerCase();
+
+    const isB1Task =
+      normalizedLevel === "B1" &&
+      (normalizedTeil.includes("präsentation") ||
+        normalizedTeil.includes("planung"));
+
+    const isB2OrHigherDiscussion =
+      ["B2", "C1", "C2"].includes(normalizedLevel) &&
+      normalizedTeil.includes("diskussion");
+
+    return isB1Task || isB2OrHigherDiscussion;
+  }, [level, teil]);
+
+  useEffect(() => {
+    if (!interactionAvailable) {
+      setInteractionMode(false);
+      setInteractionSession(null);
+      setInteractionResult(null);
+      return;
+    }
+
+    if (!hasManuallyToggledInteraction.current) {
+      setInteractionMode(true);
+    }
+  }, [interactionAvailable]);
 
   useEffect(() => {
     setSimulationMode(false);
@@ -131,11 +169,14 @@ const SpeakingPage = () => {
     };
   }, [level, teil, idToken]);
 
-  const resetAudio = () => {
+  const resetAudio = (options = {}) => {
     setError("");
     setAudioBlob(null);
     setAudioUrl(null);
-    setResult(null);
+    if (!options.keepResult) {
+      setResult(null);
+      setInteractionResult(null);
+    }
     setRecordingTime(0);
     setWaveform([]);
   };
@@ -244,19 +285,96 @@ const SpeakingPage = () => {
         teil,
         contextType: simulationMode ? "simulation" : "single",
         question: currentQuestion?.text || "",
+        interactionMode,
         userId,
         idToken,
       });
 
       setResult(analysis);
+      setInteractionResult(analysis?.interaction || null);
+
+      if (interactionMode && analysis?.interaction?.followUpQuestions?.length) {
+        setInteractionSession({
+          followUpQuestions: analysis.interaction.followUpQuestions,
+          initialTranscript: analysis.transcript,
+          teil,
+          level,
+          styleTip: analysis.interaction.style_tip,
+          closingPrompt: analysis.interaction.closing_prompt,
+        });
+        setSelectedFollowUpIndex(0);
+      } else {
+        setInteractionSession(null);
+      }
+
       addResultToHistory(analysis);
 
-      resetAudio();
+      resetAudio({ keepResult: true });
       stopVisualization();
     } catch (err) {
       console.error(err);
       setError(
         "Die Auswertung ist fehlgeschlagen. Bitte versuche es später erneut."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleInteractionToggle = () => {
+    hasManuallyToggledInteraction.current = true;
+    setInteractionMode((prev) => !prev);
+    setInteractionSession(null);
+    setInteractionResult(null);
+  };
+
+  const handleInteractionAssessment = async () => {
+    if (!interactionSession || !interactionSession.followUpQuestions?.length) {
+      setError(
+        "Starte zuerst eine Auswertung, um Folgefragen vom Prüfer/Partner zu erhalten."
+      );
+      return;
+    }
+
+    const selectedQuestion =
+      interactionSession.followUpQuestions[selectedFollowUpIndex] ||
+      interactionSession.followUpQuestions[0];
+
+    if (!selectedQuestion) {
+      setError("Keine Folgefrage ausgewählt.");
+      return;
+    }
+
+    if (!audioBlob) {
+      setError("Bitte nimm deine Antwort auf eine Folgefrage auf.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await scoreInteractionAudio({
+        audioBlob,
+        initialTranscript: interactionSession.initialTranscript,
+        followUpQuestion: selectedQuestion.prompt || selectedQuestion.text,
+        teil: interactionSession.teil || teil,
+        level,
+        userId,
+        targetLevel: level,
+        idToken,
+      });
+
+      setResult(response);
+      setInteractionResult(response?.interaction || null);
+      addResultToHistory(response);
+
+      resetAudio({ keepResult: true });
+      stopVisualization();
+    } catch (err) {
+      console.error(err);
+      setError(
+        "Die Bewertung des Gesprächsverlaufs ist fehlgeschlagen. Bitte versuche es später erneut."
       );
     } finally {
       setLoading(false);
@@ -307,7 +425,7 @@ const SpeakingPage = () => {
       setResult(analysis);
       addResultToHistory(analysis);
 
-      resetAudio();
+      resetAudio({ keepResult: true });
       stopVisualization();
 
       if (currentSimulationStepIndex < simulationSteps.length - 1) {
@@ -601,6 +719,46 @@ const SpeakingPage = () => {
           </div>
         </div>
 
+        {interactionAvailable && (
+          <div
+            style={{
+              marginTop: 8,
+              padding: 12,
+              borderRadius: 10,
+              border: "1px dashed #9ca3af",
+              background: "#f9fafb",
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+            }}
+          >
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <div style={{ flex: 1 }}>
+                <strong>AI-Prüfer/Partner Modus</strong>
+                <p style={{ ...styles.cardSubtitle, margin: "4px 0 0" }}>
+                  Für Interaktionsteile (B1 Teil 1 & 3, B2 Diskussion) stellt die KI
+                  2–3 Rückfragen und bewertet deinen Dialog.
+                </p>
+              </div>
+              <button
+                style={{
+                  ...styles.buttonSecondary,
+                  ...(interactionMode ? styles.buttonSecondaryActive : null),
+                }}
+                type="button"
+                onClick={handleInteractionToggle}
+              >
+                {interactionMode ? "Modus aktiviert" : "Modus aktivieren"}
+              </button>
+            </div>
+            {interactionMode && interactionSession?.styleTip && (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                Prüfer-Hinweis: {interactionSession.styleTip}
+              </p>
+            )}
+          </div>
+        )}
+
         {questionsLoading && <p>Lade Fragen...</p>}
         {questionError && (
           <p style={{ color: "var(--color-error)" }}>{questionError}</p>
@@ -719,6 +877,98 @@ const SpeakingPage = () => {
         {error && (
           <div style={styles.errorBox}>
             <strong>Hinweis:</strong> {error}
+          </div>
+        )}
+
+        {interactionMode && interactionSession?.followUpQuestions?.length > 0 && (
+          <div
+            style={{
+              marginTop: 16,
+              padding: 12,
+              borderRadius: 10,
+              border: "1px solid #e5e7eb",
+              background: "#f8fafc",
+              display: "grid",
+              gap: 10,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>
+                <h4 style={{ ...styles.cardTitle, marginBottom: 4 }}>
+                  Folgefragen des Prüfers/Partners
+                </h4>
+                <p style={styles.cardSubtitle}>
+                  Wähle eine Rückfrage, nimm deine Antwort auf und lasse den Dialog bewerten.
+                </p>
+              </div>
+              {interactionSession.closingPrompt && (
+                <span style={{ ...styles.helperText, maxWidth: 320 }}>
+                  Abschluss-Idee: {interactionSession.closingPrompt}
+                </span>
+              )}
+            </div>
+
+            <div style={{ display: "grid", gap: 8 }}>
+              {interactionSession.followUpQuestions.map((item, idx) => (
+                <label
+                  key={`followup-${idx}`}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    alignItems: "flex-start",
+                    padding: 10,
+                    borderRadius: 8,
+                    border:
+                      selectedFollowUpIndex === idx
+                        ? "2px solid #2563eb"
+                        : "1px solid #e5e7eb",
+                    background:
+                      selectedFollowUpIndex === idx ? "#eef2ff" : "#fff",
+                    cursor: "pointer",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    checked={selectedFollowUpIndex === idx}
+                    onChange={() => setSelectedFollowUpIndex(idx)}
+                    style={{ marginTop: 4 }}
+                  />
+                  <div>
+                    <div style={{ fontWeight: 600 }}>{item.prompt || item.text}</div>
+                    {item.focus && (
+                      <div style={{ ...styles.helperText, marginTop: 4 }}>
+                        Fokus: {item.focus}
+                      </div>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <button
+                style={styles.buttonPrimary}
+                type="button"
+                onClick={handleInteractionAssessment}
+                disabled={loading || !audioBlob}
+              >
+                Gesprächsbewertung senden
+              </button>
+              <span style={styles.helperText}>
+                Nutze die Aufnahme-Steuerung oben, um deine Folgeantwort einzusprechen.
+              </span>
+            </div>
+
+            {interactionResult && (
+              <div style={{ ...styles.helperText, background: "#ecfeff", padding: 12 }}>
+                <strong>Dialog-Zusammenfassung:</strong> {interactionResult.summary || ""}
+                <div style={{ marginTop: 6 }}>
+                  <div>Turn-Taking: {interactionResult.turn_taking || ""}</div>
+                  <div>Follow-ups: {interactionResult.follow_up_quality || ""}</div>
+                  <div>Höflichkeit: {interactionResult.politeness || ""}</div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </section>
