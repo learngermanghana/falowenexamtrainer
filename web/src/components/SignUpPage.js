@@ -18,17 +18,17 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setMessage("");
 
     if (password !== confirmPassword) {
-      setAuthError("Die Passwörter stimmen nicht überein.");
+      setAuthError("Passwords do not match.");
       return;
     }
 
     setLoading(true);
     try {
       await signup(email, password);
-      setMessage("Account erstellt! Wir haben dich direkt eingeloggt.");
+      setMessage("Account created! You are now signed in.");
     } catch (error) {
       console.error(error);
-      setAuthError(error?.message || "Registrierung fehlgeschlagen.");
+      setAuthError(error?.message || "Sign up failed.");
     } finally {
       setLoading(false);
     }
@@ -38,42 +38,40 @@ const SignUpPage = ({ onLogin, onBack }) => {
     <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
       <div style={{ ...styles.card, width: "100%", maxWidth: 520, position: "relative" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-          <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>Account erstellen</h2>
+          <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>Create account</h2>
           {onBack && (
             <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
-              Zur Übersicht
+              Back to overview
             </button>
           )}
         </div>
         <p style={styles.helperText}>
-          Sichere dir Zugriff auf den Daily Plan, Prüfungssimulationen und Push-Erinnerungen. Dein Fortschritt wird in der
-          Cloud gespeichert.
+          Get access to the Daily Plan, exam simulations, and push reminders. Your progress is saved in the cloud.
         </p>
 
         <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            Mit deiner Registrierung verknüpfen wir dein Profil mit Firebase (gehostet auf Vercel). Du kannst den gleichen
-            Login für Web und Mobile verwenden.
+            Signing up links your profile to Firebase (hosted on Vercel). You can use the same login for web and mobile.
           </p>
           <ul style={{ ...styles.checklist, margin: 0 }}>
-            <li>Push-Reminder und Wochenziele aktivierbar.</li>
-            <li>Speicherung deiner Level-Checks und Mock-Tests.</li>
-            <li>Direkter Zugriff auf Speaking & Writing Sessions.</li>
+            <li>Enable push reminders and weekly goals.</li>
+            <li>Store your level checks and mock tests.</li>
+            <li>Direct access to speaking and writing sessions.</li>
           </ul>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-          <label style={styles.label}>E-Mail</label>
+          <label style={styles.label}>Email</label>
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
-            placeholder="du@example.com"
+            placeholder="you@example.com"
           />
 
-          <label style={styles.label}>Passwort</label>
+          <label style={styles.label}>Password</label>
           <input
             type="password"
             required
@@ -81,10 +79,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
-            placeholder="Mindestens 6 Zeichen"
+            placeholder="At least 6 characters"
           />
 
-          <label style={styles.label}>Passwort bestätigen</label>
+          <label style={styles.label}>Confirm password</label>
           <input
             type="password"
             required
@@ -92,11 +90,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             style={inputStyle}
-            placeholder="Passwort erneut eingeben"
+            placeholder="Enter password again"
           />
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
-            {loading ? "Wird erstellt ..." : "Jetzt registrieren"}
+            {loading ? "Creating ..." : "Sign up now"}
           </button>
         </form>
 
@@ -108,13 +106,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
         )}
 
         <div style={{ marginTop: 10, fontSize: 13, color: "#4b5563" }}>
-          Bereits registriert?{" "}
+          Already registered?{" "}
           <button
             type="button"
             onClick={onLogin}
             style={{ ...styles.secondaryButton, padding: "6px 12px" }}
           >
-            Zum Login wechseln
+            Go to login
           </button>
         </div>
       </div>

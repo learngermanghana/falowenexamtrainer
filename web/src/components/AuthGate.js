@@ -20,15 +20,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     try {
       if (mode === "signup") {
         await signup(email, password);
-        setMessage("Account erstellt! Du bist jetzt eingeloggt.");
+        setMessage("Account created! You are now signed in.");
       } else {
         await login(email, password);
-        setMessage("Willkommen zurück!");
+        setMessage("Welcome back!");
       }
     } catch (error) {
       console.error(error);
       setAuthError(
-        error?.message || "Login fehlgeschlagen. Bitte probiere es erneut."
+        error?.message || "Login failed. Please try again."
       );
     } finally {
       setLoading(false);
@@ -46,21 +46,20 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       <div style={{ ...styles.card, maxWidth: 420, width: "100%", position: "relative" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
-            {mode === "login" ? "Login" : "Account erstellen"}
+            {mode === "login" ? "Login" : "Create account"}
           </h2>
           {onBack && (
             <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
-              Zur Übersicht
+              Back to overview
             </button>
           )}
         </div>
         <p style={styles.helperText}>
-          Verbinde dich mit deinem Account, um deine Prüfungsfortschritte zu
-          speichern.
+          Connect with your account so we can save your exam progress.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-          <label style={styles.label}>E-Mail</label>
+          <label style={styles.label}>Email</label>
           <input
             type="email"
             required
@@ -69,7 +68,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             style={inputStyle}
           />
 
-          <label style={styles.label}>Passwort</label>
+          <label style={styles.label}>Password</label>
           <input
             type="password"
             required
@@ -81,10 +80,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading
-              ? "Bitte warten ..."
+              ? "Please wait ..."
               : mode === "login"
-              ? "Einloggen"
-              : "Registrieren"}
+              ? "Log in"
+              : "Sign up"}
           </button>
         </form>
 
@@ -96,13 +95,13 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         )}
 
         <div style={{ marginTop: 10, fontSize: 13, color: "#4b5563" }}>
-          {mode === "login" ? "Neu hier?" : "Schon registriert?"}{" "}
+          {mode === "login" ? "New here?" : "Already registered?"}{" "}
           <button
             type="button"
             onClick={onSwitchToSignup ? onSwitchToSignup : toggleMode}
             style={{ ...styles.secondaryButton, padding: "6px 12px" }}
           >
-            {mode === "login" ? "Account anlegen" : "Zum Login"}
+            {mode === "login" ? "Create account" : "Go to login"}
           </button>
         </div>
       </div>
