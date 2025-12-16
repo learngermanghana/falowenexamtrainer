@@ -555,7 +555,7 @@ const SpeakingPage = () => {
       }
       stopVisualization();
     };
-  }, [audioUrl]);
+  }, [audioUrl, stopVisualization]);
 
   const handleSimulationStart = () => {
     if (!simulationSteps.length) {
@@ -661,12 +661,13 @@ const SpeakingPage = () => {
     return () => {
       clearTimeout(doneTimeout);
     };
-  }, [
-    simulationMode,
-    simulationCountdown,
-    audioBlob,
-    handleSimulationAssessment,
-  ]);
+    }, [
+      simulationMode,
+      simulationCountdown,
+      audioBlob,
+      handleSimulationAssessment,
+      setError,
+    ]);
 
   const handleInputModeChange = (mode) => {
     if (mode === inputMode) return;
