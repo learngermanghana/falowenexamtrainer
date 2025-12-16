@@ -13,6 +13,7 @@ import ResourcePage from "./components/ResourcePage";
 import AuthGate from "./components/AuthGate";
 import { useAuth } from "./context/AuthContext";
 import { styles } from "./styles";
+import AccountSettings from "./components/AccountSettings";
 
 function App() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
@@ -44,6 +45,7 @@ function App() {
     if (activePage === "ueben") return <PracticeLab />;
     if (activePage === "progress") return <ProgressPage />;
     if (activePage === "resources") return <ResourcePage />;
+    if (activePage === "account") return <AccountSettings />;
     if (activePage === "level-check") return <PlacementCheck />;
     if (activePage === "daily") return <SpeakingPage mode="daily" />;
     if (activePage === "exam") return <SpeakingPage mode="exam" />;
@@ -117,6 +119,7 @@ function App() {
             { key: "ueben", label: "Üben" },
             { key: "progress", label: "Fortschritt" },
             { key: "resources", label: "Ressourcen" },
+            { key: "account", label: "Konto" },
           ].map((item) => (
             <button
               key={item.key}
