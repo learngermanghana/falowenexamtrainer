@@ -1,8 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { courseOverview, sheetResults, chatPrompts } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
 import { writingLetters } from "../data/writingLetters";
+import { useAuth } from "../context/AuthContext";
+import {
+  isSubmissionLocked,
+  loadDraftForStudent,
+  loadStudentCodeForEmail,
+  rememberStudentCodeForEmail,
+  saveDraftForStudent,
+  submitFinalWork,
+} from "../services/submissionService";
 
 const tabs = [
   { key: "home", label: "Home" },
@@ -21,6 +30,7 @@ const StatCard = ({ label, value, helper }) => (
 );
 
 const CourseTab = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("home");
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([
@@ -31,11 +41,85 @@ const CourseTab = () => {
   ]);
   const [letterLevel, setLetterLevel] = useState("all");
   const [selectedCourseLevel, setSelectedCourseLevel] = useState("A1");
+  const [submissionLevel, setSubmissionLevel] = useState("A1");
+  const [studentCode, setStudentCode] = useState("");
+  const [workDraft, setWorkDraft] = useState("");
+  const [draftStatus, setDraftStatus] = useState("");
+  const [submissionStatus, setSubmissionStatus] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [locked, setLocked] = useState(false);
 
   const filteredLetters = useMemo(() => {
     if (letterLevel === "all") return writingLetters;
     return writingLetters.filter((letter) => letter.level === letterLevel);
   }, [letterLevel]);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    const storedCode = loadStudentCodeForEmail(user.email);
+    if (storedCode) {
+      setStudentCode(storedCode);
+    }
+  }, [user?.email]);
+
+  useEffect(() => {
+    setSubmissionLevel(selectedCourseLevel);
+  }, [selectedCourseLevel]);
+
+  useEffect(() => {
+    if (!user?.email || !studentCode) {
+      setWorkDraft("");
+      setDraftStatus("Add your student code to start saving drafts to /drafts_v2.");
+      setLocked(false);
+      return;
+    }
+
+    const draft = loadDraftForStudent({
+      email: user.email,
+      studentCode,
+      level: submissionLevel,
+    });
+    setWorkDraft(draft.content || "");
+    setDraftStatus(
+      draft.updatedAt
+        ? `Draft restored from /${draft.path}`
+        : `Ready to save drafts to /${draft.path}`
+    );
+
+    const lockState = isSubmissionLocked({ email: user.email, studentCode });
+    setLocked(lockState.locked);
+    if (lockState.locked) {
+      const lockedAt = lockState.lockedAt
+        ? ` at ${new Date(lockState.lockedAt).toLocaleString()}`
+        : "";
+      setSubmissionStatus(`Submission locked via /${lockState.lockPath}${lockedAt}`);
+    } else {
+      setSubmissionStatus("");
+    }
+  }, [studentCode, submissionLevel, user?.email]);
+
+  useEffect(() => {
+    if (!user?.email || !studentCode || locked) return;
+    const handle = setTimeout(() => {
+      const result = saveDraftForStudent({
+        email: user.email,
+        studentCode,
+        level: submissionLevel,
+        content: workDraft,
+      });
+      setDraftStatus(
+        `Draft saved to /${result.path} (${new Date(result.savedAt).toLocaleTimeString()})`
+      );
+    }, 800);
+
+    return () => clearTimeout(handle);
+  }, [user?.email, studentCode, submissionLevel, workDraft, locked]);
+
+  useEffect(() => {
+    if (user?.email && studentCode) {
+      rememberStudentCodeForEmail(user.email, studentCode);
+    }
+  }, [studentCode, user?.email]);
 
   const handleSend = (value) => {
     const content = value?.trim();
@@ -50,6 +134,56 @@ const CourseTab = () => {
       },
     ]);
     setChatInput("");
+  };
+
+  const handleSubmitWork = async () => {
+    setSubmissionStatus("");
+    if (!user?.email) {
+      setSubmissionStatus("Please sign in to submit your work.");
+      return;
+    }
+
+    if (!studentCode.trim()) {
+      setSubmissionStatus("Enter your student code to track the submission.");
+      return;
+    }
+
+    if (!workDraft.trim()) {
+      setSubmissionStatus("Add your coursework before submitting.");
+      return;
+    }
+
+    const existingLock = isSubmissionLocked({ email: user.email, studentCode });
+    if (existingLock.locked) {
+      setLocked(true);
+      setSubmissionStatus(`Submission already locked at /${existingLock.lockPath}.`);
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const result = submitFinalWork({
+        email: user.email,
+        studentCode,
+        level: submissionLevel,
+        content: workDraft,
+      });
+
+      setLocked(true);
+      if (result.locked) {
+        setSubmissionStatus(`Submission locked at /${result.lockPath}.`);
+        return;
+      }
+
+      setSubmissionStatus(
+        `Submitted to /${result.submissionPath} and locked at /${result.lockPath}.`
+      );
+    } catch (error) {
+      console.error("Failed to submit work", error);
+      setSubmissionStatus("Could not submit your work. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const renderHome = () => (
@@ -355,6 +489,111 @@ const CourseTab = () => {
     </div>
   );
 
+  const renderSubmission = () => (
+    <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: 10,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <h2 style={styles.sectionTitle}>Submit your coursework</h2>
+        <span style={styles.badge}>/drafts_v2 · /submissions/{submissionLevel}</span>
+      </div>
+      <p style={styles.helperText}>
+        Drafts are auto-saved in Firebase-style paths using your email + student code. Final submissions land in
+        /submissions/{submissionLevel} and are locked via /submission_locks once you submit.
+      </p>
+
+      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+        <div>
+          <label style={styles.label}>Student email</label>
+          <input
+            value={user?.email || ""}
+            readOnly
+            style={{ ...styles.textArea, minHeight: "auto", height: 44, background: "#f9fafb" }}
+          />
+          <p style={styles.helperText}>Used to key your draft and submission.</p>
+        </div>
+        <div>
+          <label style={styles.label}>Student code</label>
+          <input
+            value={studentCode}
+            onChange={(e) => setStudentCode(e.target.value)}
+            placeholder="Campus / student code"
+            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
+            disabled={locked}
+          />
+          <p style={styles.helperText}>Required alongside email to store drafts and submissions.</p>
+        </div>
+        <div>
+          <label style={styles.label}>Course level for this upload</label>
+          <select
+            style={styles.select}
+            value={submissionLevel}
+            onChange={(e) => setSubmissionLevel(e.target.value)}
+            disabled={locked}
+          >
+            {Object.keys(courseSchedules).map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+          <p style={styles.helperText}>Matches the /submissions/{submissionLevel} path.</p>
+        </div>
+      </div>
+
+      <div>
+        <label style={styles.label}>Your work</label>
+        <textarea
+          style={styles.textArea}
+          value={workDraft}
+          disabled={locked}
+          onChange={(e) => setWorkDraft(e.target.value)}
+          rows={6}
+          placeholder="Paste or type your course work. Drafts save to /drafts_v2 while you type."
+        />
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 8,
+          }}
+        >
+          <span style={{ ...styles.helperText, margin: 0 }}>{draftStatus}</span>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {locked && <span style={styles.lockPill}>Locked</span>}
+            <button
+              style={styles.primaryButton}
+              onClick={handleSubmitWork}
+              disabled={locked || submitting}
+            >
+              {locked ? "Submission locked" : submitting ? "Submitting..." : "Submit work"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {submissionStatus && (
+        <div
+          style={
+            submissionStatus.toLowerCase().includes("submitted to")
+              ? styles.successBox
+              : styles.errorBox
+          }
+        >
+          {submissionStatus}
+        </div>
+      )}
+    </section>
+  );
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={styles.tabList}>
@@ -374,6 +613,7 @@ const CourseTab = () => {
       {activeTab === "chat" && renderChat()}
       {activeTab === "results" && renderResults()}
       {activeTab === "letters" && renderLetters()}
+      {activeTab === "course" && renderSubmission()}
     </div>
   );
 };

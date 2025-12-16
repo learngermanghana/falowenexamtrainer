@@ -27,6 +27,25 @@ function App() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
 
+  const isFocusedView = activePage === "course" || activePage === "exam";
+  const generalNavItems = [
+    { key: "plan", label: "Home · Plan" },
+    { key: "course", label: "Course" },
+    { key: "speaking", label: "Speaking" },
+    { key: "writing", label: "Writing" },
+    { key: "vocab", label: "Vocabulary" },
+    { key: "ueben", label: "Practice" },
+    { key: "progress", label: "Progress" },
+    { key: "resources", label: "Resources" },
+    { key: "account", label: "Account" },
+    { key: "exam", label: "Exam" },
+  ];
+  const focusNavItems = [
+    { key: "course", label: "Campus Course" },
+    { key: "exam", label: "Exam Room" },
+    { key: "plan", label: "Back to dashboard" },
+  ];
+
   const handleEnableNotifications = async () => {
     setNotificationMessage("");
     setNotificationError("");
@@ -130,18 +149,8 @@ function App() {
           </div>
         </header>
 
-        <nav style={{ ...styles.nav, marginBottom: 16 }}>
-          {[
-            { key: "plan", label: "Home · Plan" },
-            { key: "course", label: "Course" },
-            { key: "speaking", label: "Speaking" },
-            { key: "writing", label: "Writing" },
-            { key: "vocab", label: "Vocabulary" },
-            { key: "ueben", label: "Practice" },
-            { key: "progress", label: "Progress" },
-            { key: "resources", label: "Resources" },
-            { key: "account", label: "Account" },
-          ].map((item) => (
+        <nav style={{ ...styles.nav, marginBottom: 8 }}>
+          {(isFocusedView ? focusNavItems : generalNavItems).map((item) => (
             <button
               key={item.key}
               style={activePage === item.key ? styles.navButtonActive : styles.navButton}
@@ -149,8 +158,15 @@ function App() {
             >
               {item.label}
             </button>
-            ))}
+          ))}
         </nav>
+
+        {isFocusedView ? (
+          <div style={styles.focusNotice}>
+            General tabs are hidden while you work in the campus course or exam rooms. Use this strip to move between
+            Course and Exam or jump back to the dashboard.
+          </div>
+        ) : null}
 
         <LevelOnboarding />
 
