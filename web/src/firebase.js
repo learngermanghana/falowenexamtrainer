@@ -59,7 +59,12 @@ export const onIdTokenChanged = (authInstance, callback) => {
   return () => authInstance.listeners.delete(callback);
 };
 
-export const createUserWithEmailAndPassword = async (_auth, email, password) => {
+export const createUserWithEmailAndPassword = async (
+  _auth,
+  email,
+  password,
+  profile = {}
+) => {
   if (!email || !password) {
     throw new Error("Email and password are required");
   }
@@ -69,6 +74,7 @@ export const createUserWithEmailAndPassword = async (_auth, email, password) => 
     email,
     password,
     token: createToken(),
+    profile,
   };
 
   setCurrentUser(user);

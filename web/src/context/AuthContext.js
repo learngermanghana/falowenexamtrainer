@@ -44,9 +44,14 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  const signup = async (email, password) => {
+  const signup = async (email, password, profile = {}) => {
     setAuthError("");
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    const credential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password,
+      profile
+    );
     const token = await credential.user.getIdToken();
     setIdToken(token);
     return credential.user;
