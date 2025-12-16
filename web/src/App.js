@@ -30,15 +30,8 @@ function App() {
   const isFocusedView = activePage === "course" || activePage === "exam";
   const generalNavItems = [
     { key: "plan", label: "Home · Plan" },
-    { key: "course", label: "Course" },
-    { key: "speaking", label: "Speaking" },
-    { key: "writing", label: "Writing" },
-    { key: "vocab", label: "Vocabulary" },
-    { key: "ueben", label: "Practice" },
-    { key: "progress", label: "Progress" },
-    { key: "resources", label: "Resources" },
-    { key: "account", label: "Account" },
-    { key: "exam", label: "Exam" },
+    { key: "course", label: "Kursbuch" },
+    { key: "exam", label: "Prüfungen" },
   ];
   const focusNavItems = [
     { key: "course", label: "Campus Course" },
@@ -118,9 +111,7 @@ function App() {
         >
           <div>
             <h1 style={styles.title}>Falowen Exam Coach</h1>
-            <p style={styles.subtitle}>
-              Choose your next step: Level Check, Daily Trainer, or a full simulation.
-            </p>
+            <p style={styles.subtitle}>Wähle aus, ob du heute ins Kursbuch oder direkt in die Prüfung gehst.</p>
           </div>
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
             <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
