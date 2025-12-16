@@ -1,16 +1,28 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { styles } from "../styles";
+import { useExam } from "../context/ExamContext";
+
+const LEVEL_BLURBS = {
+  A1: "Kurze Vorstellungsrunden, einfache Fragen und Bitten.",
+  A2: "Alltagssituationen sicher üben – Fragen, kurze Planungen, E-Mails.",
+  B1: "Kurzvorträge, Meinung sagen und Schreiben mit klarer Struktur.",
+  B2: "Argumentieren, diskutieren und längere Schreiben mit Belegen.",
+};
 
 const HomeActions = ({ onSelect }) => {
+  const { level, levelConfirmed } = useExam();
+  const levelBlurb = useMemo(
+    () => LEVEL_BLURBS[level] || "Wähle zuerst dein Niveau, damit wir die richtigen Aufgaben laden.",
+    [level]
+  );
+
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
         <h2 style={styles.sectionTitle}>Home / Plan</h2>
-        <span style={styles.levelPill}>A1–B2</span>
+        <span style={styles.levelPill}>{levelConfirmed ? `Level ${level}` : "Level wählen"}</span>
       </div>
-      <p style={styles.helperText}>
-        Choose your level, start the Level Check, and stay consistent with daily sessions and streaks.
-      </p>
+      <p style={styles.helperText}>{levelBlurb}</p>
       <div style={{ display: "grid", gap: 10 }}>
         <button
           style={{ ...styles.primaryButton, padding: "14px 16px", fontSize: 16 }}

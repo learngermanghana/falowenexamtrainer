@@ -6,9 +6,7 @@ import { useAuth } from "./context/AuthContext";
 import { styles } from "./styles";
 import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
-import AppHeader from "./components/AppHeader";
-import AppNavigation from "./components/AppNavigation";
-import PageRouter from "./components/PageRouter";
+import LevelOnboarding from "./components/LevelOnboarding";
 
 function App() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
@@ -70,7 +68,28 @@ function App() {
           onLogout={logout}
         />
 
-        <AppNavigation activePage={activePage} onSelectPage={setActivePage} />
+        <nav style={{ ...styles.nav, marginBottom: 16 }}>
+          {[
+            { key: "plan", label: "Home · Plan" },
+            { key: "speaking", label: "Speaking" },
+            { key: "writing", label: "Writing" },
+            { key: "vocab", label: "Vocabulary" },
+            { key: "ueben", label: "Practice" },
+            { key: "progress", label: "Progress" },
+            { key: "resources", label: "Resources" },
+            { key: "account", label: "Account" },
+          ].map((item) => (
+            <button
+              key={item.key}
+              style={activePage === item.key ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActivePage(item.key)}
+            >
+              {item.label}
+            </button>
+            ))}
+        </nav>
+
+        <LevelOnboarding />
 
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
           <main style={{ minWidth: 0 }}>

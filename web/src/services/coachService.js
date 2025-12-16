@@ -1,4 +1,6 @@
 import axios from "axios";
+import { speakingSheetQuestions } from "../data/speakingSheet";
+import { writingLetters as writingSheetLetters } from "../data/writingLetters";
 
 const backendUrl =
   process.env.REACT_APP_BACKEND_URL ||
@@ -95,33 +97,41 @@ export const analyzeText = async ({ text, teil, level, targetLevel, userId, idTo
 };
 
 export const fetchSpeakingQuestions = async (level, teil, idToken) => {
-  const params = new URLSearchParams({ level });
-  if (teil) {
-    params.append("teil", teil);
+  const normalizedLevel = (level || "").toUpperCase();
+  const normalizedTeil = (teil || "").toLowerCase();
+
+  const filtered = speakingSheetQuestions.filter((question) => {
+    const matchesLevel = normalizedLevel ? question.level === normalizedLevel : true;
+    const matchesTeil = normalizedTeil
+      ? question.teilLabel?.toLowerCase() === normalizedTeil || question.teilId?.toLowerCase() === normalizedTeil
+      : true;
+    return matchesLevel && matchesTeil;
+  });
+
+  if (filtered.length > 0) {
+    return filtered;
   }
 
-  const response = await axios.get(
-    `${backendUrl}/api/speaking/questions?${params.toString()}`,
-    {
-      headers: authHeaders(idToken),
-    }
-  );
+  // fallback: return all questions for the level or the full list
+  if (normalizedLevel) {
+    const levelOnly = speakingSheetQuestions.filter((question) => question.level === normalizedLevel);
+    if (levelOnly.length) return levelOnly;
+  }
 
-  return response.data?.questions || [];
+  return speakingSheetQuestions;
 };
 
 export const fetchWritingLetters = async (level, idToken) => {
-  const params = new URLSearchParams();
-  if (level) params.append("level", level);
-
-  const response = await axios.get(
-    `${backendUrl}/api/writing/tasks${params.toString() ? `?${params.toString()}` : ""}`,
-    {
-      headers: authHeaders(idToken),
-    }
+  const normalizedLevel = (level || "").toUpperCase();
+  const filtered = writingSheetLetters.filter((letter) =>
+    normalizedLevel ? letter.level === normalizedLevel : true
   );
 
-  return response.data?.tasks || [];
+  if (filtered.length > 0) {
+    return filtered;
+  }
+
+  return writingSheetLetters;
 };
 
 export const startPlacement = async ({ answers = [], userId, targetLevel, idToken }) => {

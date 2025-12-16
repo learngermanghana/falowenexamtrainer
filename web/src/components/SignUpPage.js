@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
+import { ALLOWED_LEVELS } from "../context/ExamContext";
+import { savePreferredLevel } from "../services/levelStorage";
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
@@ -9,6 +11,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState("B1");
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
@@ -25,6 +28,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setLoading(true);
     try {
       await signup(email, password);
+      savePreferredLevel(selectedLevel);
       setMessage("Account created! You are now signed in.");
     } catch (error) {
       console.error(error);
@@ -92,6 +96,23 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="Enter password again"
           />
+
+          <label style={styles.label}>Your current level</label>
+          <select
+            required
+            value={selectedLevel}
+            onChange={(event) => setSelectedLevel(event.target.value)}
+            style={styles.select}
+          >
+            {ALLOWED_LEVELS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <p style={{ ...styles.helperText, marginTop: -2 }}>
+            Wir laden Sprechen- und Schreiben-Aufgaben aus dem passenden Niveau-Sheet.
+          </p>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading ? "Creating ..." : "Sign up now"}
