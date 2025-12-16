@@ -14,11 +14,14 @@ import AuthGate from "./components/AuthGate";
 import { useAuth } from "./context/AuthContext";
 import { styles } from "./styles";
 import AccountSettings from "./components/AccountSettings";
+import LandingPage from "./components/LandingPage";
+import SignUpPage from "./components/SignUpPage";
 
 function App() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
     useAuth();
   const [activePage, setActivePage] = useState("plan");
+  const [authView, setAuthView] = useState("landing");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
 
@@ -61,7 +64,21 @@ function App() {
   }
 
   if (!user) {
-    return <AuthGate />;
+    if (authView === "signup") {
+      return <SignUpPage onLogin={() => setAuthView("login")} onBack={() => setAuthView("landing")} />;
+    }
+
+    if (authView === "login") {
+      return (
+        <AuthGate
+          initialMode="login"
+          onBack={() => setAuthView("landing")}
+          onSwitchToSignup={() => setAuthView("signup")}
+        />
+      );
+    }
+
+    return <LandingPage onSignUp={() => setAuthView("signup")} onLogin={() => setAuthView("login")} />;
   }
 
   return (
