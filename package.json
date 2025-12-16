@@ -4,7 +4,9 @@
   "main": "functionz/server.js",
   "scripts": {
     "start": "node functionz/server.js",
-    "test": "jest"
+    "test": "npm run test:backend",
+    "test:backend": "jest --config jest.config.js",
+    "test:ci": "npm run test:backend -- --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -21,8 +23,5 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "supertest": "^7.1.1"
-  },
-  "jest": {
-    "testEnvironment": "node"
   }
 }
