@@ -16,6 +16,7 @@ import { styles } from "./styles";
 import AccountSettings from "./components/AccountSettings";
 import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
+import LevelOnboarding from "./components/LevelOnboarding";
 
 function App() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
@@ -145,8 +146,10 @@ function App() {
             >
               {item.label}
             </button>
-          ))}
+            ))}
         </nav>
+
+        <LevelOnboarding />
 
         <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
           <main style={{ minWidth: 0 }}>{renderMain()}</main>
