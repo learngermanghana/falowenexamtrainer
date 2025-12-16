@@ -18,6 +18,7 @@ import AccountSettings from "./components/AccountSettings";
 import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
 import LevelOnboarding from "./components/LevelOnboarding";
+import ClassDiscussionPage from "./components/ClassDiscussionPage";
 
 function App() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
@@ -32,6 +33,7 @@ function App() {
     { key: "plan", label: "Home · Plan" },
     { key: "course", label: "Kursbuch" },
     { key: "exam", label: "Prüfungen" },
+    { key: "discussion", label: "Klassenforum" },
   ];
   const focusNavItems = [
     { key: "course", label: "Campus Course" },
@@ -64,6 +66,7 @@ function App() {
     if (activePage === "progress") return <ProgressPage />;
     if (activePage === "resources") return <ResourcePage />;
     if (activePage === "account") return <AccountSettings />;
+    if (activePage === "discussion") return <ClassDiscussionPage />;
     if (activePage === "level-check") return <PlacementCheck />;
     if (activePage === "daily") return <SpeakingPage mode="daily" />;
     if (activePage === "exam") return <SpeakingPage mode="exam" />;
