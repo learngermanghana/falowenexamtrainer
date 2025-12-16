@@ -35,8 +35,20 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         rememberStudentCodeForEmail(email, studentCode);
         setMessage(`Account created! Your student code is ${studentCode}.`);
       } else {
-        await login(email, password);
-        setMessage("Welcome back!");
+        const credential = await login(email, password);
+        const studentCode = credential?.user?.profile?.studentCode;
+        const level = credential?.user?.profile?.level;
+        if (studentCode) {
+          rememberStudentCodeForEmail(email, studentCode);
+        }
+        if (level) {
+          savePreferredLevel(level);
+        }
+        setMessage(
+          credential?.migratedFromLegacy
+            ? "We found your old account. Your new password is now saved."
+            : "Welcome back!"
+        );
       }
     } catch (error) {
       console.error(error);
@@ -70,6 +82,16 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         <p style={styles.helperText}>
           Connect with your account so we can save your exam progress.
         </p>
+        {mode === "login" && (
+          <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
+            <p style={{ ...styles.helperText, marginBottom: 4 }}>
+              Returning student from Firebase? Use your existing email and choose a new password. We'll import your profile automatically.
+            </p>
+            <p style={{ ...styles.helperText, marginBottom: 0 }}>
+              New student? Switch to "Create account" and sign up normally.
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
           {mode === "signup" && (

@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
     );
     const token = await credential.user.getIdToken();
     setIdToken(token);
-    return credential.user;
+    return credential;
   };
 
   const login = async (email, password) => {
@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
     const credential = await signInWithEmailAndPassword(auth, email, password);
     const token = await credential.user.getIdToken();
     setIdToken(token);
-    return credential.user;
+    return credential;
   };
 
   const logout = async () => {

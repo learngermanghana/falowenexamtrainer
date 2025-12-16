@@ -66,6 +66,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
             Signing up links your profile to Firebase (hosted on Vercel). You can use the same login for web and mobile.
           </p>
+          <p style={{ ...styles.helperText, marginBottom: 6 }}>
+            Already have an email in our old Firebase student list? Please go to Login and reuse that email to set a new password. We'll migrate your profile.
+          </p>
           <ul style={{ ...styles.checklist, margin: 0 }}>
             <li>Enable push reminders and weekly goals.</li>
             <li>Store your level checks and mock tests.</li>
