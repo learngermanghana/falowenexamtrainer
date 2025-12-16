@@ -40,6 +40,12 @@ const WRITING_SHEET_ID = "1RnZ_YHhbGNYxlwq0KN2a-31OpLygpOkkMGVmQSbGiVQ"; // Schr
 const WRITING_SHEET_GID = "0"; // Schreiben tab
 const WRITING_SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${WRITING_SHEET_ID}/export?format=csv&gid=${WRITING_SHEET_GID}`;
 const WRITING_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+// --- Google Sheets config for assignment tracking ---
+const ASSIGNMENT_SHEET_ID = "1BRb8p3Rq0VpFCLSwL4eS9tSgXBo9hSWzfW_J_7W36NQ";
+const ASSIGNMENT_SHEET_GID = "2121051612";
+const ASSIGNMENT_SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${ASSIGNMENT_SHEET_ID}/export?format=csv&gid=${ASSIGNMENT_SHEET_GID}`;
+const ASSIGNMENT_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const FETCH_TIMEOUT_MS = 8000;
 const FETCH_MAX_ATTEMPTS = 3;
 const FETCH_BACKOFF_MS = 500;
@@ -97,6 +103,7 @@ fs.mkdirSync(path.dirname(historyFile), { recursive: true });
 const sheetCacheDir = historyBaseDir;
 const questionsCacheFile = path.join(sheetCacheDir, "questionsCache.json");
 const writingTasksCacheFile = path.join(sheetCacheDir, "writingTasksCache.json");
+const assignmentsCacheFile = path.join(sheetCacheDir, "assignmentsCache.json");
 const resultsCacheFile = path.join(sheetCacheDir, "resultsCache.json");
 fs.mkdirSync(sheetCacheDir, { recursive: true });
 
@@ -414,6 +421,28 @@ function writeFallbackCache(cacheFile, data) {
   }
 }
 
+function readFallbackObject(cacheFile) {
+  try {
+    const raw = fs.readFileSync(cacheFile, "utf-8");
+    return JSON.parse(raw);
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeFallbackObject(cacheFile, data) {
+  if (process.env.VERCEL) return;
+
+  try {
+    fs.writeFileSync(cacheFile, JSON.stringify(data, null, 2));
+  } catch (error) {
+    logStructured("error", "Failed to persist fallback cache", {
+      cacheFile,
+      error: error.message,
+    });
+  }
+}
+
 function formatExternalError(error, fallbackMessage) {
   const payload = { error: fallbackMessage };
 
@@ -670,6 +699,110 @@ async function fetchSheetWritingTasks() {
   }
 }
 
+function normalizeScoreValue(value) {
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return value;
+  }
+
+  const text = (value || "").toString().trim();
+  if (!text) return 0;
+
+  const fraction = text.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (fraction) {
+    const top = Number.parseFloat(fraction[1]);
+    const bottom = Number.parseFloat(fraction[2]);
+    if (!Number.isNaN(top) && !Number.isNaN(bottom) && bottom > 0) {
+      return Math.round((top / bottom) * 100);
+    }
+  }
+
+  const numericMatch = text.match(/-?\d+(?:\.\d+)?/);
+  const numeric = numericMatch ? Number.parseFloat(numericMatch[0]) : NaN;
+  return Number.isNaN(numeric) ? 0 : numeric;
+}
+
+function parseSheetDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function normalizeAssignmentRow(row) {
+  const studentCode =
+    row.studentcode?.trim() ||
+    row.StudentCode?.trim() ||
+    row["Student Code"]?.trim() ||
+    row.Code?.trim() ||
+    "";
+  const assignment =
+    row.assignment?.trim() ||
+    row.Assignment?.trim() ||
+    row.Task?.trim() ||
+    row["Assignment Name"]?.trim() ||
+    "";
+  const name = row.name?.trim() || row.Name?.trim() || "";
+  const comments = row.comments?.trim() || row.Comments?.trim() || "";
+  const scoreRaw =
+    row.score ||
+    row.Score ||
+    row.Mark ||
+    row.mark ||
+    row.Result ||
+    row.result ||
+    "";
+  const dateValue = row.date || row.Date || row.timestamp || row.Timestamp;
+  const parsedDate = parseSheetDate(dateValue);
+  const level = (row.level || row.Level || "Unspecified").toString().trim() || "Unspecified";
+  const link = row.link || row.Link || row.URL || row.url || "";
+
+  if (!studentCode || !assignment || !parsedDate) return null;
+
+  return {
+    studentCode,
+    name: name || studentCode,
+    assignment,
+    score: normalizeScoreValue(scoreRaw),
+    scoreRaw: scoreRaw ? scoreRaw.toString().trim() : "",
+    comments,
+    date: parsedDate.toISOString(),
+    level,
+    link,
+  };
+}
+
+function dedupeAssignments(rows) {
+  const byStudentAndAssignment = new Map();
+
+  rows.forEach((entry) => {
+    const key = `${entry.studentCode.toLowerCase()}__${entry.assignment.toLowerCase()}`;
+    const existing = byStudentAndAssignment.get(key);
+
+    if (!existing) {
+      byStudentAndAssignment.set(key, { ...entry, attempts: 1 });
+      return;
+    }
+
+    const attempts = (existing.attempts || 1) + 1;
+    const entryDate = new Date(entry.date).getTime();
+    const existingDate = new Date(existing.date).getTime();
+    const shouldReplace = entry.score > existing.score || entryDate > existingDate;
+
+    byStudentAndAssignment.set(
+      key,
+      shouldReplace ? { ...entry, attempts } : { ...existing, attempts }
+    );
+  });
+
+  return Array.from(byStudentAndAssignment.values());
+}
+
+async function fetchAssignmentData() {
+  const now = Date.now();
+  if (
+    cachedAssignments.data &&
+    now - cachedAssignments.fetchedAt < ASSIGNMENT_CACHE_TTL_MS
+  ) {
+    return cachedAssignments.data;
 async function fetchSheetResults() {
   const now = Date.now();
   if (cachedResults.data && now - cachedResults.fetchedAt < RESULTS_CACHE_TTL_MS) {
@@ -692,6 +825,14 @@ async function fetchSheetResults() {
     });
 
     if (!response.ok) {
+      throw new ExternalFetchError(
+        `Failed to fetch assignment sheet (status ${response.status})`,
+        {
+          status: response.status,
+          code: "sheet_status_error",
+          retryable: response.status >= 500,
+        }
+      );
       throw new ExternalFetchError(`Failed to fetch results sheet (status ${response.status})`, {
         status: response.status,
         code: "sheet_status_error",
