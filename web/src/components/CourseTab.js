@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
-import { courseOverview, courseBook, sheetResults, chatPrompts } from "../data/courseData";
+import { courseOverview, sheetResults, chatPrompts } from "../data/courseData";
+import { courseSchedules } from "../data/courseSchedule";
 import { writingLetters } from "../data/writingLetters";
 
 const tabs = [
@@ -29,6 +30,7 @@ const CourseTab = () => {
     },
   ]);
   const [letterLevel, setLetterLevel] = useState("all");
+  const [selectedCourseLevel, setSelectedCourseLevel] = useState("A1");
 
   const filteredLetters = useMemo(() => {
     if (letterLevel === "all") return writingLetters;
@@ -92,27 +94,158 @@ const CourseTab = () => {
 
   const renderCourse = () => (
     <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
         <h2 style={styles.sectionTitle}>My Course</h2>
-        <span style={styles.badge}>{courseBook.instructor} · Kursleiterin</span>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <span style={styles.helperText}>Course level:</span>
+          <select
+            style={styles.select}
+            value={selectedCourseLevel}
+            onChange={(e) => setSelectedCourseLevel(e.target.value)}
+          >
+            {Object.keys(courseSchedules).map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-      <p style={styles.helperText}>{courseBook.title}</p>
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-        {courseBook.units.map((unit) => (
-          <div key={unit.id} style={{ ...styles.card, marginBottom: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-              <h3 style={{ margin: "0 0 4px 0" }}>{unit.name}</h3>
-              <span style={styles.levelPill}>{unit.status}</span>
+      <p style={styles.helperText}>
+        Pulling content from the course dictionary. Select a level to see its full day-by-day plan.
+      </p>
+
+      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+        {(courseSchedules[selectedCourseLevel] || []).map((entry) => {
+          const lesenHorenList = Array.isArray(entry.lesen_hören)
+            ? entry.lesen_hören
+            : entry.lesen_hören
+            ? [entry.lesen_hören]
+            : [];
+          const schreibenSprechenList = entry.schreiben_sprechen
+            ? Array.isArray(entry.schreiben_sprechen)
+              ? entry.schreiben_sprechen
+              : [entry.schreiben_sprechen]
+            : [];
+
+          return (
+            <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                <div>
+                  <span style={styles.levelPill}>Day {entry.day}</span>
+                  <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
+                  {entry.chapter ? (
+                    <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div>
+                  ) : null}
+                </div>
+                <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
+                  {entry.assignment !== undefined ? (
+                    <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
+                  ) : null}
+                  {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
+                </div>
+              </div>
+
+              {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
+              {entry.instruction ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p> : null}
+
+              {lesenHorenList.length > 0 ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  <h4 style={{ margin: 0 }}>Lesen &amp; Hören</h4>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {lesenHorenList.map((lesson, index) => (
+                      <div
+                        key={`${entry.day}-lesen-${lesson.chapter || index}`}
+                        style={{
+                          padding: 10,
+                          borderRadius: 10,
+                          border: "1px solid #e5e7eb",
+                          background: "#f9fafb",
+                          display: "grid",
+                          gap: 6,
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+                          <div style={{ fontWeight: 700 }}>
+                            {lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}
+                          </div>
+                          {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
+                        </div>
+                        <ul style={{ ...styles.checklist, margin: 0 }}>
+                          {lesson.video ? (
+                            <li>
+                              <a href={lesson.video} target="_blank" rel="noreferrer">
+                                Video ansehen
+                              </a>
+                            </li>
+                          ) : null}
+                          {lesson.grammarbook_link ? (
+                            <li>
+                              <a href={lesson.grammarbook_link} target="_blank" rel="noreferrer">
+                                Grammarbook
+                              </a>
+                            </li>
+                          ) : null}
+                          {lesson.workbook_link ? (
+                            <li>
+                              <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
+                                Workbook
+                              </a>
+                            </li>
+                          ) : null}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {schreibenSprechenList.length > 0 ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  <h4 style={{ margin: 0 }}>Schreiben &amp; Sprechen</h4>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {schreibenSprechenList.map((lesson, index) => (
+                      <div
+                        key={`${entry.day}-schreiben-${lesson.chapter || index}`}
+                        style={{
+                          padding: 10,
+                          borderRadius: 10,
+                          border: "1px solid #e5e7eb",
+                          background: "#f8fafc",
+                          display: "grid",
+                          gap: 6,
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+                          <div style={{ fontWeight: 700 }}>
+                            {lesson.chapter ? `Kapitel ${lesson.chapter}` : "Übung"}
+                          </div>
+                          {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
+                        </div>
+                        <ul style={{ ...styles.checklist, margin: 0 }}>
+                          {lesson.video ? (
+                            <li>
+                              <a href={lesson.video} target="_blank" rel="noreferrer">
+                                Video ansehen
+                              </a>
+                            </li>
+                          ) : null}
+                          {lesson.workbook_link ? (
+                            <li>
+                              <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
+                                Workbook
+                              </a>
+                            </li>
+                          ) : null}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
-            <div style={{ ...styles.helperText, marginBottom: 6 }}>{unit.pages}</div>
-            <p style={{ margin: "0 0 6px 0" }}>Aufgabe: {unit.assignment}</p>
-            <ul style={styles.checklist}>
-              {unit.keyPoints.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
