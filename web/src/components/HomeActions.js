@@ -9,32 +9,32 @@ const HomeActions = ({ onSelect }) => {
         <span style={styles.levelPill}>A1–B2</span>
       </div>
       <p style={styles.helperText}>
-        Wähle dein Niveau, starte den Level Check und bleibe mit Daily Sessions und Streaks dran.
+        Choose your level, start the Level Check, and stay consistent with daily sessions and streaks.
       </p>
       <div style={{ display: "grid", gap: 10 }}>
         <button
           style={{ ...styles.primaryButton, padding: "14px 16px", fontSize: 16 }}
           onClick={() => onSelect("level-check")}
         >
-          Level Check starten
+          Start Level Check
         </button>
         <button
           style={{ ...styles.secondaryButton, padding: "14px 16px", fontSize: 16 }}
           onClick={() => onSelect("daily")}
         >
-          Daily Plan öffnen
+          Open Daily Plan
         </button>
         <button
           style={{ ...styles.secondaryButton, padding: "14px 16px", fontSize: 16 }}
           onClick={() => onSelect("exam")}
         >
-          Nächste Session (Simulation)
+          Next session (simulation)
         </button>
       </div>
       <ul style={styles.checklist}>
-        <li>Automatische Tagesaufgaben basierend auf A1–B2 Level.</li>
-        <li>"Next Session" führt direkt zur passenden Sprechen- oder Schreiben-Übung.</li>
-        <li>Streak/Progress-Anzeige motiviert und verlinkt zum Fortschritt-Tab.</li>
+        <li>Automatic daily tasks based on A1–B2 level.</li>
+        <li>"Next Session" jumps straight to the right speaking or writing exercise.</li>
+        <li>Streak/progress display keeps you motivated and links to the progress tab.</li>
       </ul>
     </div>
   );

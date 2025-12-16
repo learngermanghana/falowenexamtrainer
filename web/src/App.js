@@ -31,10 +31,10 @@ function App() {
 
     try {
       await enableNotifications();
-      setNotificationMessage("Push-Benachrichtigungen wurden aktiviert.");
+      setNotificationMessage("Push notifications are active.");
     } catch (error) {
       setNotificationError(
-        error?.message || "Konnte Push-Benachrichtigungen nicht aktivieren."
+        error?.message || "Could not enable push notifications."
       );
     }
   };
@@ -58,7 +58,7 @@ function App() {
   if (authLoading) {
     return (
       <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
-        <div style={styles.card}>Authentifizierung wird geladen ...</div>
+        <div style={styles.card}>Loading authentication ...</div>
       </div>
     );
   }
@@ -97,11 +97,11 @@ function App() {
           <div>
             <h1 style={styles.title}>Falowen Exam Coach</h1>
             <p style={styles.subtitle}>
-              Wähle deinen nächsten Schritt: Level Check, Daily Trainer oder eine komplette Simulation.
+              Choose your next step: Level Check, Daily Trainer, or a full simulation.
             </p>
           </div>
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
-            <div style={{ fontSize: 13, color: "#374151" }}>Eingeloggt als {user.email}</div>
+            <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
               <button
                 style={styles.secondaryButton}
@@ -109,10 +109,10 @@ function App() {
                 disabled={notificationStatus === "pending" || notificationStatus === "granted"}
               >
                 {notificationStatus === "granted"
-                  ? "Push aktiv"
+                  ? "Push ready"
                   : notificationStatus === "pending"
-                  ? "Aktiviere ..."
-                  : "Push-Benachrichtigungen erlauben"}
+                  ? "Enabling ..."
+                  : "Allow push notifications"}
               </button>
               <button style={styles.dangerButton} onClick={logout}>
                 Logout
@@ -130,13 +130,13 @@ function App() {
         <nav style={{ ...styles.nav, marginBottom: 16 }}>
           {[
             { key: "plan", label: "Home · Plan" },
-            { key: "speaking", label: "Sprechen" },
-            { key: "writing", label: "Schreiben" },
-            { key: "vocab", label: "Vokabeln" },
-            { key: "ueben", label: "Üben" },
-            { key: "progress", label: "Fortschritt" },
-            { key: "resources", label: "Ressourcen" },
-            { key: "account", label: "Konto" },
+            { key: "speaking", label: "Speaking" },
+            { key: "writing", label: "Writing" },
+            { key: "vocab", label: "Vocabulary" },
+            { key: "ueben", label: "Practice" },
+            { key: "progress", label: "Progress" },
+            { key: "resources", label: "Resources" },
+            { key: "account", label: "Account" },
           ].map((item) => (
             <button
               key={item.key}

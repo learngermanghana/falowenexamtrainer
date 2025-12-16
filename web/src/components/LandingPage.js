@@ -18,41 +18,41 @@ const Highlight = ({ title, description }) => (
 const LandingPage = ({ onSignUp, onLogin }) => {
   const highlights = [
     {
-      title: "Über uns",
+      title: "About us",
       description:
-        "Wir sind ein kleines Team aus Sprachcoaches und Techies, das dich mit smarter Vorbereitung durch jede Prüfung begleitet.",
+        "We are a small team of language coaches and technologists helping you prepare smarter for every exam.",
     },
     {
-      title: "Unsere Mission",
+      title: "Our mission",
       description:
-        "Individuelle Lernpfade, echte Prüfungsnähe und kontinuierliches Feedback – damit du sicher und selbstbewusst in jede Prüfung gehst.",
+        "Personalized learning paths, exam-style practice, and continuous feedback to keep you confident and ready.",
     },
     {
-      title: "Was dich erwartet",
+      title: "What to expect",
       description:
-        "Geführte Speaking- und Writing-Sessions, Wortschatz-Drills und ein Fortschritts-Cockpit mit klaren nächsten Schritten.",
+        "Guided speaking and writing sessions, vocabulary drills, and a progress cockpit with clear next steps.",
     },
   ];
 
   const pillars = [
     {
-      title: "Fokus auf Ergebnisse",
-      copy: "Klare Zieldefinition, adaptive Aufgaben und realistische Mock-Tests beschleunigen deine Fortschritte.",
+      title: "Focus on outcomes",
+      copy: "Clear goals, adaptive tasks, and realistic mock tests accelerate your progress.",
     },
     {
-      title: "Coach im Loop",
-      copy: "Feedback in Echtzeit, personalisierte Tipps und Erinnerungen halten dich verlässlich im Flow.",
+      title: "Coach in the loop",
+      copy: "Real-time feedback, personalized tips, and reminders keep you in the flow.",
     },
     {
-      title: "Technologie + Didaktik",
-      copy: "Wir verbinden modernste Sprach-Tools mit erprobten Lernmethoden für nachhaltige Erfolge.",
+      title: "Tech + teaching",
+      copy: "We combine modern language tools with proven methods for sustainable results.",
     },
   ];
 
   const steps = [
-    "Level Check machen und dein Profil freischalten.",
-    "Daily Plan folgen und Speaking/Writing Sessions absolvieren.",
-    "Wöchentliche Auswertung mit klaren Next Steps und Streak-Sicherung.",
+    "Run the Level Check to unlock your profile.",
+    "Follow the Daily Plan and complete speaking/writing sessions.",
+    "Get a weekly review with clear next steps and streak support.",
   ];
 
   return (
@@ -84,23 +84,23 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               Falowen Exam Coach
             </p>
             <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-              Dein smarter Weg zu sicheren Prüfungsergebnissen.
+              Your guided path to confident exam results.
             </h1>
             <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 4 }}>
-              Alltagstaugliche Trainings, echte Prüfungssimulationen und ein Coach, der dich Schritt für Schritt begleitet.
+              Everyday-friendly training, realistic simulations, and a coach that guides you step by step.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button style={styles.primaryButton} onClick={onSignUp}>
-                Jetzt kostenlos registrieren
+                Sign up for free
               </button>
               <button style={styles.secondaryButton} onClick={onLogin}>
-                Ich habe bereits einen Account
+                I already have an account
               </button>
             </div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 6 }}>
               <span style={styles.badge}>A1–B2 Speaking & Writing</span>
-              <span style={styles.badge}>Adaptiver Daily Plan</span>
-              <span style={styles.badge}>Push-Erinnerungen</span>
+              <span style={styles.badge}>Adaptive Daily Plan</span>
+              <span style={styles.badge}>Push reminders</span>
             </div>
           </div>
         </section>
@@ -114,10 +114,10 @@ const LandingPage = ({ onSignUp, onLogin }) => {
         <section style={{ ...styles.card, background: "#111827", color: "#e5e7eb" }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
             <div style={{ flex: 2, minWidth: 260 }}>
-              <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>Mission & Ansatz</h2>
+              <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>Mission & approach</h2>
               <p style={{ ...styles.helperText, color: "#d1d5db" }}>
-                Wir glauben daran, dass Vorbereitung messbar, motivierend und machbar sein muss. Deshalb kombinieren wir
-                kurze Daily Sessions, klare Wochenziele und persönliche Rückmeldung zu jeder Übung.
+                Prep should be measurable, motivating, and manageable. That is why we pair short daily sessions, clear weekly
+                goals, and personal feedback on every exercise.
               </p>
             </div>
             <div style={{ display: "grid", gap: 10, flex: 1, minWidth: 240 }}>
@@ -134,8 +134,8 @@ const LandingPage = ({ onSignUp, onLogin }) => {
         <section style={{ ...styles.card }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 260 }}>
-              <h2 style={styles.sectionTitle}>So funktioniert's</h2>
-              <p style={styles.helperText}>In drei einfachen Schritten startklar:</p>
+              <h2 style={styles.sectionTitle}>How it works</h2>
+              <p style={styles.helperText}>Get ready in three simple steps:</p>
               <ul style={{ ...styles.checklist, margin: 0 }}>
                 {steps.map((step) => (
                   <li key={step}>{step}</li>
@@ -144,26 +144,25 @@ const LandingPage = ({ onSignUp, onLogin }) => {
             </div>
             <div style={{ flex: 1, minWidth: 260, display: "grid", gap: 10 }}>
               <div style={{ ...styles.resultCard, marginTop: 0 }}>
-                <h3 style={styles.sectionTitle}>Warum jetzt starten?</h3>
+                <h3 style={styles.sectionTitle}>Why start now?</h3>
                 <p style={styles.helperText}>
-                  Sichere dir einen frühen Vorsprung, erhalte einen klaren Plan und verfolge deinen Fortschritt mit jedem
-                  Login.
+                  Get an early lead, receive a clear plan, and track your progress with every login.
                 </p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button style={{ ...styles.primaryButton, padding: "10px 14px" }} onClick={onSignUp}>
-                    Account anlegen
+                    Create account
                   </button>
                   <button style={{ ...styles.secondaryButton, padding: "10px 14px" }} onClick={onLogin}>
-                    Zum Login
+                    Go to login
                   </button>
                 </div>
               </div>
               <div style={{ ...styles.uploadCard }}>
-                <h4 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Community-Facts</h4>
+                <h4 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Community facts</h4>
                 <ul style={{ ...styles.checklist, margin: 0 }}>
-                  <li>98% behalten ihren Streak in den ersten 14 Tagen.</li>
-                  <li>Weekly Review mit individuellen Schreib- und Sprech-Tipps.</li>
-                  <li>Push-Reminder und E-Mail-Summaries inklusive.</li>
+                  <li>98% keep their streaks in the first 14 days.</li>
+                  <li>Weekly review with individual writing and speaking tips.</li>
+                  <li>Push reminders and email summaries included.</li>
                 </ul>
               </div>
             </div>
