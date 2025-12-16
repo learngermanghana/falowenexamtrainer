@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
-import { courseOverview, sheetResults, chatPrompts } from "../data/courseData";
+import { courseOverview, chatPrompts } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
 import { writingLetters } from "../data/writingLetters";
 import { useAuth } from "../context/AuthContext";
@@ -15,6 +15,7 @@ import {
   saveDraftToSpecificPath,
   submitWorkToSpecificPath,
 } from "../services/submissionService";
+import { fetchResults } from "../services/resultsService";
 
 const tabs = [
   { key: "home", label: "Home" },
@@ -57,6 +58,15 @@ const CourseTab = () => {
   const [assignmentLoading, setAssignmentLoading] = useState(false);
   const [assignmentError, setAssignmentError] = useState("");
   const [leaderboardLevel, setLeaderboardLevel] = useState("A1");
+  const [results, setResults] = useState([]);
+  const [resultsSummary, setResultsSummary] = useState(null);
+  const [resultsLevelFilter, setResultsLevelFilter] = useState("all");
+  const [resultsStudentFilter, setResultsStudentFilter] = useState("");
+  const [resultsStatus, setResultsStatus] = useState({
+    loading: false,
+    error: "",
+    fetchedAt: null,
+  });
 
   const LESSON_ASSIGNMENT_NAME = "A1_day10_ch6";
   const LESSON_POST_ID = "0lYQbCPoL4nEux99kYZk";
@@ -82,6 +92,57 @@ const CourseTab = () => {
     if (letterLevel === "all") return writingLetters;
     return writingLetters.filter((letter) => letter.level === letterLevel);
   }, [letterLevel]);
+
+  const summarizeResults = (rows = []) => {
+    const perLevel = {};
+    const students = {};
+    const allStudents = new Set();
+    let retakes = 0;
+
+    rows.forEach((row) => {
+      const level = row.level || "Unknown";
+      perLevel[level] = (perLevel[level] || 0) + 1;
+
+      const code = (row.studentCode || "").toLowerCase();
+      if (code) {
+        if (!students[level]) students[level] = new Set();
+        students[level].add(code);
+        allStudents.add(code);
+      }
+
+      if (row.isRetake) retakes += 1;
+    });
+
+    const studentsPerLevel = Object.fromEntries(
+      Object.entries(students).map(([level, codes]) => [level, codes.size])
+    );
+
+    return {
+      total: rows.length,
+      perLevel,
+      studentsPerLevel,
+      uniqueStudents: allStudents.size,
+      retakes,
+    };
+  };
+
+  const filteredResults = useMemo(() => {
+    const level = resultsLevelFilter === "all" ? "" : resultsLevelFilter;
+    const codeFilter = resultsStudentFilter.trim().toLowerCase();
+
+    return results.filter((row) => {
+      const matchesLevel = level ? row.level === level : true;
+      const matchesCode = codeFilter
+        ? (row.studentCode || "").toLowerCase().includes(codeFilter)
+        : true;
+      return matchesLevel && matchesCode;
+    });
+  }, [results, resultsLevelFilter, resultsStudentFilter]);
+
+  const filteredSummary = useMemo(
+    () => summarizeResults(filteredResults),
+    [filteredResults]
+  );
 
   useEffect(() => {
     if (!user?.email) return;
@@ -138,6 +199,29 @@ const CourseTab = () => {
       setLeaderboardLevel(selectedCourseLevel);
     }
   }, [assignmentSummary?.leaderboard, selectedCourseLevel]);
+    if (activeTab !== "results") return;
+
+    const loadResults = async () => {
+      setResultsStatus((prev) => ({ ...prev, loading: true, error: "" }));
+      try {
+        const response = await fetchResults();
+        const payloadResults = response.results || [];
+        setResults(payloadResults);
+        setResultsSummary(response.summary || summarizeResults(payloadResults));
+        setResultsStatus({
+          loading: false,
+          error: "",
+          fetchedAt: response.fetchedAt || null,
+        });
+      } catch (error) {
+        const fallbackMessage =
+          error.response?.data?.error || "Konnte Ergebnisse nicht laden.";
+        setResultsStatus({ loading: false, error: fallbackMessage, fetchedAt: null });
+      }
+    };
+
+    loadResults();
+  }, [activeTab]);
 
   useEffect(() => {
     if (!user?.email || !studentCode) {
@@ -634,28 +718,135 @@ const CourseTab = () => {
     </div>
   );
 
-  const renderResults = () => (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-        <h2 style={styles.sectionTitle}>My Results</h2>
-        <span style={styles.badge}>Import: Google Sheet</span>
+  const renderResults = () => {
+    const levelSummary = resultsSummary || summarizeResults(results);
+
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 10,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <h2 style={styles.sectionTitle}>My Results</h2>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <span style={styles.badge}>Import: Google Sheet</span>
+            {resultsStatus.fetchedAt && (
+              <span style={{ ...styles.helperText, margin: 0 }}>
+                Sync: {new Date(resultsStatus.fetchedAt).toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
+        <p style={styles.helperText}>
+          Die Werte stammen aus dem letzten Google-Sheet-Sync. Doppelte Aufgaben bedeuten, dass der Schüler einen Retake gemacht
+          hat; jeder Versuch wird mit einer Versuchszahl angezeigt.
+        </p>
+
+      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+        {["A1", "A2", "B1", "B2"].map((level) => (
+          <StatCard
+            key={level}
+            label={`${level} Ergebnisse`}
+            value={levelSummary?.perLevel?.[level] || 0}
+            helper={`${levelSummary?.studentsPerLevel?.[level] || 0} eindeutige Schüler`}
+          />
+        ))}
+        <StatCard
+          label="Retakes"
+          value={levelSummary?.retakes || 0}
+          helper="Wiederholte Abgaben"
+        />
+        <StatCard label="Gesamt" value={levelSummary?.total || 0} helper="Alle Einträge" />
       </div>
-      <p style={styles.helperText}>Die Werte stammen aus dem letzten Google-Sheet-Sync und zeigen Score, Aufgabe und Kurzfeedback.</p>
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-        {sheetResults.map((row) => (
-          <div key={`${row.date}-${row.task}`} style={{ ...styles.card, marginBottom: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-              <h3 style={{ margin: "0 0 4px 0" }}>{row.skill}</h3>
-              <span style={styles.badge}>{row.date}</span>
+
+      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+        <div>
+          <label style={styles.label}>Level filtern</label>
+          <select
+            style={styles.select}
+            value={resultsLevelFilter}
+            onChange={(e) => setResultsLevelFilter(e.target.value)}
+          >
+            <option value="all">Alle</option>
+            <option value="A1">A1</option>
+            <option value="A2">A2</option>
+            <option value="B1">B1</option>
+            <option value="B2">B2</option>
+          </select>
+          <p style={styles.helperText}>Begrenzt die Liste auf ein Niveau.</p>
+        </div>
+        <div>
+          <label style={styles.label}>Student code</label>
+          <input
+            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
+            value={resultsStudentFilter}
+            onChange={(e) => setResultsStudentFilter(e.target.value)}
+            placeholder="z.B. sewornua2"
+          />
+          <p style={styles.helperText}>Filtert nach Studentcode oder Teilen davon.</p>
+        </div>
+        <div>
+          <label style={styles.label}>Gefilterte Übersicht</label>
+          <div style={styles.helperText}>
+            {filteredSummary.total} Ergebnisse · {filteredSummary.retakes} Retakes · {filteredSummary.uniqueStudents} eindeutige
+            Schüler
+          </div>
+        </div>
+      </div>
+
+      {resultsStatus.error && <div style={styles.errorBox}>{resultsStatus.error}</div>}
+      {resultsStatus.loading && <div style={styles.helperText}>Lade Ergebnisse ...</div>}
+
+      {!resultsStatus.loading && !filteredResults.length && (
+        <div style={styles.card}>
+          <p style={{ margin: 0 }}>Keine Ergebnisse gefunden. Passe Filter an oder versuche es später erneut.</p>
+        </div>
+      )}
+
+      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+        {filteredResults.map((row) => (
+          <div
+            key={`${row.studentCode}-${row.assignment}-${row.attempt}-${row.date}`}
+            style={{
+              ...styles.card,
+              marginBottom: 0,
+              border: row.isRetake ? "1px solid #f97316" : undefined,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", flexWrap: "wrap" }}>
+              <div>
+                <h3 style={{ margin: "0 0 4px 0" }}>{row.assignment}</h3>
+                <p style={{ ...styles.helperText, margin: 0 }}>
+                  {row.studentName || "Unbekannter Name"} · {row.studentCode || "kein Code"}
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                <span style={styles.badge}>{row.level || "?"}</span>
+                {row.date && <span style={styles.badge}>{row.date}</span>}
+                <span style={styles.badge}>
+                  Versuch {row.attempt || 1}
+                  {row.isRetake ? " · Retake" : ""}
+                </span>
+              </div>
             </div>
-            <p style={{ margin: "0 0 6px 0" }}>{row.task}</p>
-            <div style={{ fontWeight: 700, marginBottom: 4 }}>{row.score}</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>{row.feedback}</p>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Score: {row.score || "pending"}</div>
+            <p style={{ margin: "0 0 8px 0" }}>{row.comments || "Kein Feedback hinterlegt."}</p>
+            {row.link ? (
+              <a href={row.link} target="_blank" rel="noreferrer" style={{ fontWeight: 600 }}>
+                Link öffnen
+              </a>
+            ) : null}
           </div>
         ))}
       </div>
     </div>
-  );
+    );
+  };
 
   const renderLetters = () => (
     <div style={{ display: "grid", gap: 12 }}>

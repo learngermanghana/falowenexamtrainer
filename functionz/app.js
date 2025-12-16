@@ -50,6 +50,12 @@ const FETCH_TIMEOUT_MS = 8000;
 const FETCH_MAX_ATTEMPTS = 3;
 const FETCH_BACKOFF_MS = 500;
 
+// --- Google Sheets config for graded results ---
+const RESULTS_SHEET_ID = "1BRb8p3Rq0VpFCLSwL4eS9tSgXBo9hSWzfW_J_7W36NQ";
+const RESULTS_SHEET_GID = "2121051612";
+const RESULTS_SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${RESULTS_SHEET_ID}/export?format=csv&gid=${RESULTS_SHEET_GID}`;
+const RESULTS_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
 class ExternalFetchError extends Error {
   constructor(message, { status, code, retryable } = {}) {
     super(message);
@@ -70,7 +76,7 @@ let cachedWritingTasks = {
   data: null,
 };
 
-let cachedAssignments = {
+let cachedResults = {
   fetchedAt: 0,
   data: null,
 };
@@ -98,6 +104,7 @@ const sheetCacheDir = historyBaseDir;
 const questionsCacheFile = path.join(sheetCacheDir, "questionsCache.json");
 const writingTasksCacheFile = path.join(sheetCacheDir, "writingTasksCache.json");
 const assignmentsCacheFile = path.join(sheetCacheDir, "assignmentsCache.json");
+const resultsCacheFile = path.join(sheetCacheDir, "resultsCache.json");
 fs.mkdirSync(sheetCacheDir, { recursive: true });
 
 function loadHistory() {
@@ -221,6 +228,84 @@ function parseCsv(csvText) {
 
     return row;
   });
+}
+
+function normalizeRowKeys(row = {}) {
+  return Object.entries(row).reduce((acc, [key, value]) => {
+    if (!key) return acc;
+    const normalizedKey = key.toString().trim().toLowerCase();
+    acc[normalizedKey] = typeof value === "string" ? value.trim() : value;
+    return acc;
+  }, {});
+}
+
+function sortByDateOrIndex(a, b) {
+  const dateA = Date.parse(a.date);
+  const dateB = Date.parse(b.date);
+
+  const aHasDate = !Number.isNaN(dateA);
+  const bHasDate = !Number.isNaN(dateB);
+
+  if (aHasDate && bHasDate) return dateA - dateB;
+  if (aHasDate && !bHasDate) return -1;
+  if (!aHasDate && bHasDate) return 1;
+  return (a.rawIndex || 0) - (b.rawIndex || 0);
+}
+
+function computeResultAttempts(rows = []) {
+  const grouped = new Map();
+
+  rows.forEach((row) => {
+    const key = `${row.studentCode || ""}__${row.assignment || ""}`.toLowerCase();
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key).push(row);
+  });
+
+  grouped.forEach((entries) => {
+    entries.sort(sortByDateOrIndex);
+    entries.forEach((entry, index) => {
+      entry.attempt = index + 1;
+      entry.isRetake = index > 0;
+    });
+  });
+
+  return rows
+    .slice()
+    .sort((a, b) => sortByDateOrIndex(b, a))
+    .map(({ rawIndex, ...rest }) => rest);
+}
+
+function buildResultsSummary(rows = []) {
+  const perLevel = {};
+  const studentSets = {};
+  const allStudents = new Set();
+  let retakes = 0;
+
+  rows.forEach((row) => {
+    const level = row.level || "Unknown";
+    perLevel[level] = (perLevel[level] || 0) + 1;
+
+    if (!studentSets[level]) studentSets[level] = new Set();
+    if (row.studentCode) {
+      const normalizedCode = row.studentCode.toLowerCase();
+      studentSets[level].add(normalizedCode);
+      allStudents.add(normalizedCode);
+    }
+
+    if (row.isRetake) retakes += 1;
+  });
+
+  const studentsPerLevel = Object.fromEntries(
+    Object.entries(studentSets).map(([level, set]) => [level, set.size])
+  );
+
+  return {
+    total: rows.length,
+    perLevel,
+    studentsPerLevel,
+    uniqueStudents: allStudents.size,
+    retakes,
+  };
 }
 
 function slugifyId(text, fallback = "writing-task") {
@@ -608,8 +693,8 @@ async function fetchSheetWritingTasks() {
       {
         status: error.status,
         code: error.code || "fetch_failed",
-        retryable: error.retryable,
-      }
+      retryable: error.retryable,
+    }
     );
   }
 }
@@ -718,6 +803,10 @@ async function fetchAssignmentData() {
     now - cachedAssignments.fetchedAt < ASSIGNMENT_CACHE_TTL_MS
   ) {
     return cachedAssignments.data;
+async function fetchSheetResults() {
+  const now = Date.now();
+  if (cachedResults.data && now - cachedResults.fetchedAt < RESULTS_CACHE_TTL_MS) {
+    return cachedResults.data;
   }
 
   if (typeof fetch !== "function") {
@@ -727,13 +816,10 @@ async function fetchAssignmentData() {
   }
 
   const fetchCsv = async (attempt) => {
-    const response = await fetchWithTimeout(
-      ASSIGNMENT_SHEET_EXPORT_URL,
-      FETCH_TIMEOUT_MS
-    );
-    logStructured("info", "Fetched assignment sheet", {
+    const response = await fetchWithTimeout(RESULTS_SHEET_EXPORT_URL, FETCH_TIMEOUT_MS);
+    logStructured("info", "Fetched results sheet", {
       event: "sheet_fetch",
-      sheet: "assignments",
+      sheet: "results",
       attempt,
       status: response.status,
     });
@@ -747,6 +833,11 @@ async function fetchAssignmentData() {
           retryable: response.status >= 500,
         }
       );
+      throw new ExternalFetchError(`Failed to fetch results sheet (status ${response.status})`, {
+        status: response.status,
+        code: "sheet_status_error",
+        retryable: response.status >= 500,
+      });
     }
 
     return response.text();
@@ -757,9 +848,9 @@ async function fetchAssignmentData() {
       maxAttempts: FETCH_MAX_ATTEMPTS,
       baseDelayMs: FETCH_BACKOFF_MS,
       onRetry: (error, attempt) => {
-        logStructured("error", "Retrying assignment sheet fetch", {
+        logStructured("error", "Retrying results sheet fetch", {
           event: "sheet_fetch_retry",
-          sheet: "assignments",
+          sheet: "results",
           attempt,
           error: error.message,
           status: error.status,
@@ -768,134 +859,72 @@ async function fetchAssignmentData() {
       },
     });
 
-    const rows = parseCsv(csvText);
-    const validRows = rows.map(normalizeAssignmentRow).filter(Boolean);
-    const normalized = dedupeAssignments(validRows);
-    const payload = { rawEntries: validRows, entries: normalized };
+    const rows = parseCsv(csvText).map((row, index) => ({ ...normalizeRowKeys(row), rawIndex: index }));
 
-    cachedAssignments = { fetchedAt: now, data: payload };
-    writeFallbackObject(assignmentsCacheFile, payload);
+    const normalized = rows
+      .map((row) => {
+        const studentCode = row.studentcode || row["student code"] || row.code;
+        const assignment = row.assignment || row.task || row["assignment name"];
+        const studentName = row.name || row["student name"] || row.student;
+        const score = row.score || row.result;
+        const comments = row.comments || row.feedback;
+        const date = row.date || row["submitted at"];
+        const level = (row.level || "").toUpperCase();
+        const link = row.link || row.url;
 
-    return payload;
+        if (!studentCode || !assignment || !level) return null;
+
+        return {
+          studentCode,
+          studentName,
+          assignment,
+          score,
+          comments,
+          date,
+          level,
+          link,
+          rawIndex: row.rawIndex,
+        };
+      })
+      .filter(Boolean);
+
+    const resultsWithAttempts = computeResultAttempts(normalized);
+    const summary = buildResultsSummary(resultsWithAttempts);
+
+    cachedResults = {
+      fetchedAt: now,
+      data: { results: resultsWithAttempts, summary, fetchedAt: now },
+    };
+
+    writeFallbackCache(resultsCacheFile, cachedResults.data);
+
+    return cachedResults.data;
   } catch (error) {
-    logStructured("error", "Failed to refresh assignments", {
+    logStructured("error", "Failed to refresh results", {
       event: "sheet_fetch_failed",
-      sheet: "assignments",
+      sheet: "results",
       status: error.status,
       error: error.message,
       timeout: error.isTimeout,
     });
 
-    const fallback = readFallbackObject(assignmentsCacheFile);
+    const fallback = readFallbackCache(resultsCacheFile);
     if (fallback) {
-      cachedAssignments = { fetchedAt: now, data: fallback };
-      return fallback;
+      const patchedFallback = {
+        results: fallback.results || [],
+        summary: fallback.summary || buildResultsSummary(fallback.results || []),
+        fetchedAt: fallback.fetchedAt || now,
+      };
+      cachedResults = { fetchedAt: patchedFallback.fetchedAt, data: patchedFallback };
+      return patchedFallback;
     }
 
-    throw new ExternalFetchError("Unable to load assignments right now.", {
+    throw new ExternalFetchError("Unable to load results right now. Please try again soon.", {
       status: error.status,
       code: error.code || "fetch_failed",
       retryable: error.retryable,
     });
   }
-}
-
-function summarizeStudentWeek(data, studentCode) {
-  const safeCode = (studentCode || "").trim().toLowerCase();
-  if (!safeCode) return null;
-
-  const now = Date.now();
-  const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
-  const weekRaw = (data.rawEntries || []).filter(
-    (entry) =>
-      entry.studentCode?.toLowerCase() === safeCode &&
-      new Date(entry.date).getTime() >= weekAgo
-  );
-
-  if (weekRaw.length === 0) return null;
-
-  const uniqueMap = new Map();
-  weekRaw.forEach((entry) => {
-    const key = entry.assignment.toLowerCase();
-    const existing = uniqueMap.get(key);
-    const attempts = (existing?.attempts || 0) + 1;
-    const shouldReplace =
-      !existing ||
-      new Date(entry.date).getTime() > new Date(existing.date).getTime() ||
-      entry.score > (existing.score || 0);
-
-    const base = shouldReplace ? entry : existing;
-    uniqueMap.set(key, { ...base, attempts });
-  });
-
-  const unique = Array.from(uniqueMap.values());
-  const bestScore = unique.reduce(
-    (max, item) => Math.max(max, Number(item.score) || 0),
-    0
-  );
-  const latest = [...unique].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )[0];
-
-  return {
-    studentCode: weekRaw[0]?.studentCode || studentCode,
-    name: weekRaw[0]?.name || weekRaw[0]?.studentCode || studentCode,
-    level: latest?.level || "",
-    weekAssignments: unique.length,
-    weekAttempts: weekRaw.length,
-    retriesThisWeek: Math.max(0, weekRaw.length - unique.length),
-    bestScore,
-    lastAssignment: latest?.assignment || "",
-    lastDate: latest?.date || null,
-  };
-}
-
-function buildAssignmentLeaderboard(data) {
-  const leaderboardByLevel = {};
-
-  (data.entries || []).forEach((entry) => {
-    const levelKey = (entry.level || "Unspecified").toUpperCase();
-    if (!leaderboardByLevel[levelKey]) leaderboardByLevel[levelKey] = {};
-
-    const studentKey = entry.studentCode.toLowerCase();
-    const current = leaderboardByLevel[levelKey][studentKey] || {
-      studentCode: entry.studentCode,
-      name: entry.name,
-      assignmentCount: 0,
-      bestScore: 0,
-      lastDate: null,
-      level: levelKey,
-    };
-
-    const latestDate =
-      !current.lastDate || new Date(entry.date) > new Date(current.lastDate)
-        ? entry.date
-        : current.lastDate;
-
-    leaderboardByLevel[levelKey][studentKey] = {
-      ...current,
-      assignmentCount: current.assignmentCount + 1,
-      bestScore: Math.max(current.bestScore || 0, Number(entry.score) || 0),
-      lastDate: latestDate,
-    };
-  });
-
-  const leaderboard = {};
-  Object.entries(leaderboardByLevel).forEach(([level, students]) => {
-    const sorted = Object.values(students).sort((a, b) => {
-      if ((b.bestScore || 0) !== (a.bestScore || 0)) {
-        return (b.bestScore || 0) - (a.bestScore || 0);
-      }
-      if ((b.assignmentCount || 0) !== (a.assignmentCount || 0)) {
-        return (b.assignmentCount || 0) - (a.assignmentCount || 0);
-      }
-      return (a.name || a.studentCode).localeCompare(b.name || b.studentCode);
-    });
-
-    leaderboard[level] = sorted.slice(0, 5);
-  });
-
-  return leaderboard;
 }
 
 // Clean up stale uploads (e.g., if process crashes before fs.unlink runs)
@@ -1357,39 +1386,41 @@ app.get("/api/writing/tasks", async (req, res) => {
   }
 });
 
-// --- 3D. Assignment summary endpoint: streak + leaderboard from Google Sheets ---
-app.get("/api/assignments/summary", async (req, res) => {
-  const studentCode = (req.query.studentCode || "").trim();
+// --- 3D. Results endpoint: fetch graded attempts from Google Sheets ---
+app.get("/api/results", async (req, res) => {
+  const { level, studentCode } = req.query;
 
   try {
-    const data = await fetchAssignmentData();
-    const leaderboard = buildAssignmentLeaderboard(data);
-    const student = summarizeStudentWeek(data, studentCode);
+    const payload = await fetchSheetResults();
+    const normalizedLevel = (level || "").toUpperCase();
+    const codeFilter = (studentCode || "").toLowerCase();
+
+    const filteredResults = payload.results.filter((row) => {
+      const matchesLevel = normalizedLevel ? row.level === normalizedLevel : true;
+      const matchesCode = codeFilter
+        ? (row.studentCode || "").toLowerCase().includes(codeFilter)
+        : true;
+      return matchesLevel && matchesCode;
+    });
+
+    const summary = buildResultsSummary(filteredResults);
 
     return res.json({
-      student: student || null,
-      leaderboard,
-      totals: {
-        rows: data.rawEntries?.length || 0,
-        uniqueAssignments: data.entries?.length || 0,
-      },
-      lastUpdated: new Date().toISOString(),
+      results: filteredResults,
+      summary,
+      source: "google-sheet",
+      fetchedAt: payload.fetchedAt,
     });
   } catch (error) {
-    logStructured("error", "❌ Failed to load assignment summary", {
-      event: "assignments_endpoint_error",
+    logStructured("error", "❌ Failed to fetch results", {
+      event: "results_endpoint_error",
       error: error.message,
       status: error.status,
     });
 
     return res
       .status(500)
-      .json(
-        formatExternalError(
-          error,
-          "Failed to load assignment submissions. Please try again."
-        )
-      );
+      .json(formatExternalError(error, "Failed to load results."));
   }
 });
 
