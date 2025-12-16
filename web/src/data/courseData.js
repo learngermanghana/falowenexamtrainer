@@ -46,30 +46,6 @@ export const courseBook = {
   ],
 };
 
-export const sheetResults = [
-  {
-    date: "2025-02-28",
-    skill: "Schreiben",
-    task: "Bibliotheks-E-Mail",
-    score: "84 / 100",
-    feedback: "Gute Struktur, mehr Konnektoren einsetzen (außerdem, deshalb).",
-  },
-  {
-    date: "2025-02-26",
-    skill: "Sprechen",
-    task: "Rollenspiel: Termin verschieben",
-    score: "B1-, 78%",
-    feedback: "Satzklammer bei Modalverben prüfen, höfliche Bitten üben.",
-  },
-  {
-    date: "2025-02-21",
-    skill: "Vokabeln",
-    task: "Redemittel Kapitel 4",
-    score: "92%",
-    feedback: "Sehr sicher, Wiederholung nur alle 3 Tage nötig.",
-  },
-];
-
 export const chatPrompts = [
   "Wie kann ich mich auf die Beschwerde im Unterricht vorbereiten?",
   "Welche Redemittel brauche ich für Telefonnotizen?",
