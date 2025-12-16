@@ -10,6 +10,7 @@ import PlanPage from "./components/PlanPage";
 import PracticeLab from "./components/PracticeLab";
 import ProgressPage from "./components/ProgressPage";
 import ResourcePage from "./components/ResourcePage";
+import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
 import { useAuth } from "./context/AuthContext";
 import { styles } from "./styles";
@@ -42,6 +43,7 @@ function App() {
 
   const renderMain = () => {
     if (activePage === "plan") return <PlanPage onSelect={setActivePage} />;
+    if (activePage === "course") return <CourseTab />;
     if (activePage === "home") return <HomeActions onSelect={setActivePage} />;
     if (activePage === "speaking") return <SpeakingPage />;
     if (activePage === "writing") return <WritingPage />;
@@ -131,6 +133,7 @@ function App() {
         <nav style={{ ...styles.nav, marginBottom: 16 }}>
           {[
             { key: "plan", label: "Home · Plan" },
+            { key: "course", label: "Course" },
             { key: "speaking", label: "Speaking" },
             { key: "writing", label: "Writing" },
             { key: "vocab", label: "Vocabulary" },
