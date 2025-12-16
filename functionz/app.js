@@ -7,6 +7,17 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const OpenAI = require("openai");
+const {
+  SPEAKING_FORMATS,
+  ALLOWED_LEVELS,
+  getAllowedTeile,
+} = require("./speakingConfig");
+const {
+  validationErrorResponse,
+  validateSpeakingAnalyzeBody,
+  validateSpeakingAnalyzeTextBody,
+  validateInteractionScoreBody,
+} = require("./validators");
 
 // --- OpenAI client ---
 const openai = new OpenAI({
@@ -17,32 +28,6 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-// --- Allowed options ---
-const SPEAKING_FORMATS = {
-  A1: [
-    { id: "a1_vorstellung", label: "Teil 1 – Vorstellung" },
-    { id: "a1_fragen", label: "Teil 2 – Fragen" },
-    { id: "a1_planen", label: "Teil 3 – Bitten / Planen" },
-  ],
-  A2: [
-    { id: "a2_vorstellung", label: "Teil 1 – Vorstellung" },
-    { id: "a2_fragen", label: "Teil 2 – Fragen" },
-    { id: "a2_planen", label: "Teil 3 – Bitten / Planen" },
-  ],
-  B1: [
-    { id: "b1_praesentation", label: "Teil 1 – Präsentation" },
-    { id: "b1_diskussion", label: "Teil 2 – Diskussion / Fragen" },
-    { id: "b1_planung", label: "Teil 3 – Gemeinsame Planung" },
-  ],
-  B2: [
-    { id: "b2_praesentation", label: "Teil 1 – Präsentation mit Stellungnahme" },
-    { id: "b2_diskussion", label: "Teil 2 – Diskussion / Streitgespräch" },
-    { id: "b2_verhandlung", label: "Teil 3 – Verhandeln / Planung auf B2" },
-  ],
-};
-
-const ALLOWED_LEVELS = Object.keys(SPEAKING_FORMATS);
 
 // --- Google Sheets config for practice questions ---
 const SHEET_ID = "1zaAT5NjRGKiITV7EpuSHvYMBHHENMs9Piw3pNcyQtho"; // Exams list
@@ -65,6 +50,19 @@ let cachedWritingTasks = {
   fetchedAt: 0,
   data: null,
 };
+
+function assertValidTeilAndLevel(teil, level) {
+  if (!ALLOWED_LEVELS.includes(level)) {
+    throw new Error("Invalid level provided. Choose A1, A2, B1, or B2.");
+  }
+
+  const allowedTeile = getAllowedTeile(level);
+  if (teil && !allowedTeile.includes(teil)) {
+    throw new Error(
+      "Invalid exam teil provided for the selected level. Choose a supported option."
+    );
+  }
+}
 
 // --- Simple user history persistence ---
 const historyBaseDir = process.env.VERCEL
@@ -144,30 +142,6 @@ const upload = multer({
     cb(null, true);
   },
 });
-
-function getAllowedTeile(level) {
-  return (SPEAKING_FORMATS[level] || []).map((format) => format.label);
-}
-
-function validateTeilAndLevel(teil, level) {
-  if (!ALLOWED_LEVELS.includes(level)) {
-    return {
-      valid: false,
-      message: "Invalid level provided. Choose A1, A2, B1, or B2.",
-    };
-  }
-
-  const allowedTeile = getAllowedTeile(level);
-  if (teil && !allowedTeile.includes(teil)) {
-    return {
-      valid: false,
-      message:
-        "Invalid exam teil provided for the selected level. Choose a supported option.",
-    };
-  }
-
-  return { valid: true };
-}
 
 function splitCsvLine(line) {
   const cells = [];
@@ -513,10 +487,7 @@ async function scoreInteractionLoop({
 
 async function analyzeSpeaking(transcript, teil, level, userContext = {}, options = {}) {
   try {
-    const validation = validateTeilAndLevel(teil, level);
-    if (!validation.valid) {
-      throw new Error(validation.message);
-    }
+    assertValidTeilAndLevel(teil, level);
 
     // Short description per Teil for the prompt
     let teilDescription = "";
@@ -704,25 +675,20 @@ app.post(
   "/api/speaking/analyze",
   upload.single("audio"), // field name: "audio"
   async (req, res) => {
-    const {
-      teil = "Teil 1 – Vorstellung",
-      level = "A1",
-      userId,
-      targetLevel,
-      interactionMode,
-    } = req.body;
-    const validation = validateTeilAndLevel(teil, level);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.message });
+    const validation = validateSpeakingAnalyzeBody(req.body);
+    if (!validation.success) {
+      return validationErrorResponse(res, validation.errors);
     }
 
     const file = req.file;
 
     if (!file) {
-      return res
-        .status(400)
-        .json({ error: "Audio file is required (field name: audio)" });
+      return validationErrorResponse(res, [
+        { path: ["audio"], message: "Audio file is required (field name: audio)" },
+      ]);
     }
+
+    const { teil, level, userId, targetLevel, interactionMode } = validation.data;
 
     const filePath = file.path || path.join(uploadsDir, file.filename);
 
@@ -740,7 +706,7 @@ app.post(
           targetLevel,
           taskType: "speaking",
         },
-        { interactionMode: interactionMode === "true" || interactionMode === true }
+        { interactionMode }
       );
 
       recordHistoryEntry(userId, {
@@ -817,19 +783,14 @@ app.get("/api/writing/tasks", async (req, res) => {
 // --- 3D. Text endpoint: send typed answer + get feedback ---
 app.post("/api/speaking/analyze-text", async (req, res) => {
   try {
-    const { text, teil = "Teil 1 – Vorstellung", level = "A1", userId, targetLevel } = req.body;
-
-    const validation = validateTeilAndLevel(teil, level);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.message });
+    const validation = validateSpeakingAnalyzeTextBody(req.body);
+    if (!validation.success) {
+      return validationErrorResponse(res, validation.errors);
     }
 
-    if (!text || !text.trim()) {
-      return res.status(400).json({ error: "Text is required." });
-    }
+    const { text, teil, level, userId, targetLevel } = validation.data;
 
-    const transcript = text.trim();
-    const analysis = await analyzeSpeaking(transcript, teil || "Teil 1", level || "A1", {
+    const analysis = await analyzeSpeaking(text, teil || "Teil 1", level || "A1", {
       userId,
       targetLevel,
       taskType: "speaking-text",
@@ -854,35 +815,19 @@ app.post(
   "/api/speaking/interaction-score",
   upload.single("audio"),
   async (req, res) => {
-    const {
-      initialTranscript,
-      followUpQuestion,
-      teil = "Teil 1 – Vorstellung",
-      level = "A1",
-      userId,
-      targetLevel,
-    } = req.body;
-
-    const validation = validateTeilAndLevel(teil, level);
-    if (!validation.valid) {
-      return res.status(400).json({ error: validation.message });
+    const validation = validateInteractionScoreBody(req.body);
+    if (!validation.success) {
+      return validationErrorResponse(res, validation.errors);
     }
 
-    if (!initialTranscript || !initialTranscript.trim()) {
-      return res
-        .status(400)
-        .json({ error: "Initial transcript is required for interaction scoring." });
-    }
-
-    if (!followUpQuestion || !followUpQuestion.trim()) {
-      return res
-        .status(400)
-        .json({ error: "Please include the follow-up question that was answered." });
-    }
+    const { initialTranscript, followUpQuestion, teil, level, userId, targetLevel } =
+      validation.data;
 
     const file = req.file;
     if (!file) {
-      return res.status(400).json({ error: "Audio file is required (field name: audio)" });
+      return validationErrorResponse(res, [
+        { path: ["audio"], message: "Audio file is required (field name: audio)" },
+      ]);
     }
 
     const filePath = file.path || path.join(uploadsDir, file.filename);
