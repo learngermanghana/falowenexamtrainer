@@ -4,6 +4,7 @@ import { courseOverview, sheetResults, chatPrompts } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
 import { writingLetters } from "../data/writingLetters";
 import { useAuth } from "../context/AuthContext";
+import { fetchAssignmentSummary } from "../services/assignmentService";
 import {
   isSubmissionLocked,
   loadDraftForStudent,
@@ -52,6 +53,10 @@ const CourseTab = () => {
   const [manualSubmissionStatus, setManualSubmissionStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [locked, setLocked] = useState(false);
+  const [assignmentSummary, setAssignmentSummary] = useState(null);
+  const [assignmentLoading, setAssignmentLoading] = useState(false);
+  const [assignmentError, setAssignmentError] = useState("");
+  const [leaderboardLevel, setLeaderboardLevel] = useState("A1");
 
   const LESSON_ASSIGNMENT_NAME = "A1_day10_ch6";
   const LESSON_POST_ID = "0lYQbCPoL4nEux99kYZk";
@@ -89,6 +94,50 @@ const CourseTab = () => {
   useEffect(() => {
     setSubmissionLevel(selectedCourseLevel);
   }, [selectedCourseLevel]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAssignmentSummary = async () => {
+      setAssignmentLoading(true);
+      setAssignmentError("");
+
+      try {
+        const data = await fetchAssignmentSummary({ studentCode });
+        if (cancelled) return;
+
+        setAssignmentSummary(data);
+        const levels = Object.keys(data?.leaderboard || {});
+        if (levels.length) {
+          setLeaderboardLevel((prev) => (levels.includes(prev) ? prev : levels[0]));
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setAssignmentError(
+          error?.response?.data?.error ||
+            error?.message ||
+            "Konnte Assignment-Daten nicht laden."
+        );
+      } finally {
+        if (!cancelled) {
+          setAssignmentLoading(false);
+        }
+      }
+    };
+
+    loadAssignmentSummary();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [studentCode]);
+
+  useEffect(() => {
+    if (!assignmentSummary?.leaderboard) return;
+    if (assignmentSummary.leaderboard[selectedCourseLevel]) {
+      setLeaderboardLevel(selectedCourseLevel);
+    }
+  }, [assignmentSummary?.leaderboard, selectedCourseLevel]);
 
   useEffect(() => {
     if (!user?.email || !studentCode) {
@@ -146,6 +195,108 @@ const CourseTab = () => {
     }
   }, [studentCode, user?.email]);
 
+  const streakStats = assignmentSummary?.student;
+  const streakValue = assignmentLoading
+    ? "Lädt …"
+    : streakStats
+    ? `${streakStats.weekAssignments} diese Woche`
+    : `${courseOverview.assignmentStreak} Tage`;
+  const streakHelper = assignmentLoading
+    ? "Hole Abgaben aus dem Sheet …"
+    : streakStats
+    ? `${streakStats.weekAttempts} Abgaben · ${streakStats.retriesThisWeek} Wiederholungen${
+        streakStats.lastAssignment ? ` · Letzte: ${streakStats.lastAssignment}` : ""
+      }`
+    : "Halte die Serie – jede Aufgabe zählt.";
+
+  const renderAssignmentLeaderboard = () => {
+    const levels = Object.keys(assignmentSummary?.leaderboard || {});
+
+    if (!levels.length) {
+      return assignmentLoading ? (
+        <div style={{ ...styles.card, display: "grid", gap: 6 }}>
+          <h3 style={{ margin: 0 }}>Assignments Leaderboard</h3>
+          <p style={{ ...styles.helperText, margin: 0 }}>Sheet wird geladen …</p>
+        </div>
+      ) : null;
+    }
+
+    const activeLevel = levels.includes(leaderboardLevel)
+      ? leaderboardLevel
+      : levels[0];
+    const rows = assignmentSummary.leaderboard[activeLevel] || [];
+
+    return (
+      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          <h3 style={{ margin: 0 }}>Assignments Leaderboard</h3>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={styles.helperText}>Level</span>
+            <select
+              style={styles.select}
+              value={activeLevel}
+              onChange={(e) => setLeaderboardLevel(e.target.value)}
+            >
+              {levels.map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Ranking basiert auf höchster Note und der Anzahl eindeutiger Abgaben pro Level.
+        </p>
+        {assignmentError ? <div style={styles.errorBox}>{assignmentError}</div> : null}
+
+        <div style={{ display: "grid", gap: 10 }}>
+          {rows.length === 0 ? (
+            <div style={styles.helperText}>Keine Einträge für dieses Level.</div>
+          ) : (
+            rows.map((row, index) => (
+              <div
+                key={`${row.studentCode}-${row.lastDate || index}`}
+                style={{
+                  padding: 12,
+                  borderRadius: 12,
+                  border: "1px solid #e5e7eb",
+                  background: "#f9fafb",
+                  display: "grid",
+                  gap: 6,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                  <div style={{ fontWeight: 800, display: "flex", gap: 8, alignItems: "center" }}>
+                    <span style={{ color: "#6b7280" }}>{index + 1}.</span>
+                    <span>{row.name || row.studentCode}</span>
+                  </div>
+                  <span style={styles.badge}>{row.studentCode}</span>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 12, fontSize: 13, color: "#374151" }}>
+                  <span>Assignments: {row.assignmentCount}</span>
+                  <span>Beste Note: {Math.round(row.bestScore || 0)}%</span>
+                  {row.lastDate ? (
+                    <span>Letzte Abgabe: {new Date(row.lastDate).toLocaleDateString()}</span>
+                  ) : null}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  };
+
   const handleSend = (value) => {
     const content = value?.trim();
     if (!content) return;
@@ -155,7 +306,7 @@ const CourseTab = () => {
       { sender: "user", text: content },
       {
         sender: "coach",
-        text: `Notiert. Für ${courseOverview.nextAssignment.title} nutze bitte die Redemittel aus Kapitel 5. Denk an dein Ziel: ${courseOverview.assignmentStreak} Tage Streak und ${courseOverview.attendanceSummary}.`,
+        text: `Notiert. Für ${courseOverview.nextAssignment.title} nutze bitte die Redemittel aus Kapitel 5. Denk an dein Ziel: ${streakValue} und ${courseOverview.attendanceSummary}.`,
       },
     ]);
     setChatInput("");
@@ -250,8 +401,8 @@ const CourseTab = () => {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
         <StatCard
           label="Assignment Streak"
-          value={`${courseOverview.assignmentStreak} Tage`}
-          helper="Halte die Serie – jede Aufgabe zählt."
+          value={streakValue}
+          helper={assignmentError ? `Sheet-Fehler: ${assignmentError}` : streakHelper}
         />
         <StatCard
           label="Anwesenheit"
@@ -278,6 +429,8 @@ const CourseTab = () => {
           <span style={styles.badge}>80–100 Wörter</span>
         </div>
       </div>
+
+      {renderAssignmentLeaderboard()}
     </div>
   );
 

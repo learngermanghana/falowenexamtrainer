@@ -40,6 +40,12 @@ const WRITING_SHEET_ID = "1RnZ_YHhbGNYxlwq0KN2a-31OpLygpOkkMGVmQSbGiVQ"; // Schr
 const WRITING_SHEET_GID = "0"; // Schreiben tab
 const WRITING_SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${WRITING_SHEET_ID}/export?format=csv&gid=${WRITING_SHEET_GID}`;
 const WRITING_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+
+// --- Google Sheets config for assignment tracking ---
+const ASSIGNMENT_SHEET_ID = "1BRb8p3Rq0VpFCLSwL4eS9tSgXBo9hSWzfW_J_7W36NQ";
+const ASSIGNMENT_SHEET_GID = "2121051612";
+const ASSIGNMENT_SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${ASSIGNMENT_SHEET_ID}/export?format=csv&gid=${ASSIGNMENT_SHEET_GID}`;
+const ASSIGNMENT_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const FETCH_TIMEOUT_MS = 8000;
 const FETCH_MAX_ATTEMPTS = 3;
 const FETCH_BACKOFF_MS = 500;
@@ -60,6 +66,11 @@ let cachedQuestions = {
 };
 
 let cachedWritingTasks = {
+  fetchedAt: 0,
+  data: null,
+};
+
+let cachedAssignments = {
   fetchedAt: 0,
   data: null,
 };
@@ -86,6 +97,7 @@ fs.mkdirSync(path.dirname(historyFile), { recursive: true });
 const sheetCacheDir = historyBaseDir;
 const questionsCacheFile = path.join(sheetCacheDir, "questionsCache.json");
 const writingTasksCacheFile = path.join(sheetCacheDir, "writingTasksCache.json");
+const assignmentsCacheFile = path.join(sheetCacheDir, "assignmentsCache.json");
 fs.mkdirSync(sheetCacheDir, { recursive: true });
 
 function loadHistory() {
@@ -312,6 +324,28 @@ function readFallbackCache(cacheFile) {
 }
 
 function writeFallbackCache(cacheFile, data) {
+  if (process.env.VERCEL) return;
+
+  try {
+    fs.writeFileSync(cacheFile, JSON.stringify(data, null, 2));
+  } catch (error) {
+    logStructured("error", "Failed to persist fallback cache", {
+      cacheFile,
+      error: error.message,
+    });
+  }
+}
+
+function readFallbackObject(cacheFile) {
+  try {
+    const raw = fs.readFileSync(cacheFile, "utf-8");
+    return JSON.parse(raw);
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeFallbackObject(cacheFile, data) {
   if (process.env.VERCEL) return;
 
   try {
@@ -578,6 +612,290 @@ async function fetchSheetWritingTasks() {
       }
     );
   }
+}
+
+function normalizeScoreValue(value) {
+  if (typeof value === "number" && !Number.isNaN(value)) {
+    return value;
+  }
+
+  const text = (value || "").toString().trim();
+  if (!text) return 0;
+
+  const fraction = text.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (fraction) {
+    const top = Number.parseFloat(fraction[1]);
+    const bottom = Number.parseFloat(fraction[2]);
+    if (!Number.isNaN(top) && !Number.isNaN(bottom) && bottom > 0) {
+      return Math.round((top / bottom) * 100);
+    }
+  }
+
+  const numericMatch = text.match(/-?\d+(?:\.\d+)?/);
+  const numeric = numericMatch ? Number.parseFloat(numericMatch[0]) : NaN;
+  return Number.isNaN(numeric) ? 0 : numeric;
+}
+
+function parseSheetDate(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function normalizeAssignmentRow(row) {
+  const studentCode =
+    row.studentcode?.trim() ||
+    row.StudentCode?.trim() ||
+    row["Student Code"]?.trim() ||
+    row.Code?.trim() ||
+    "";
+  const assignment =
+    row.assignment?.trim() ||
+    row.Assignment?.trim() ||
+    row.Task?.trim() ||
+    row["Assignment Name"]?.trim() ||
+    "";
+  const name = row.name?.trim() || row.Name?.trim() || "";
+  const comments = row.comments?.trim() || row.Comments?.trim() || "";
+  const scoreRaw =
+    row.score ||
+    row.Score ||
+    row.Mark ||
+    row.mark ||
+    row.Result ||
+    row.result ||
+    "";
+  const dateValue = row.date || row.Date || row.timestamp || row.Timestamp;
+  const parsedDate = parseSheetDate(dateValue);
+  const level = (row.level || row.Level || "Unspecified").toString().trim() || "Unspecified";
+  const link = row.link || row.Link || row.URL || row.url || "";
+
+  if (!studentCode || !assignment || !parsedDate) return null;
+
+  return {
+    studentCode,
+    name: name || studentCode,
+    assignment,
+    score: normalizeScoreValue(scoreRaw),
+    scoreRaw: scoreRaw ? scoreRaw.toString().trim() : "",
+    comments,
+    date: parsedDate.toISOString(),
+    level,
+    link,
+  };
+}
+
+function dedupeAssignments(rows) {
+  const byStudentAndAssignment = new Map();
+
+  rows.forEach((entry) => {
+    const key = `${entry.studentCode.toLowerCase()}__${entry.assignment.toLowerCase()}`;
+    const existing = byStudentAndAssignment.get(key);
+
+    if (!existing) {
+      byStudentAndAssignment.set(key, { ...entry, attempts: 1 });
+      return;
+    }
+
+    const attempts = (existing.attempts || 1) + 1;
+    const entryDate = new Date(entry.date).getTime();
+    const existingDate = new Date(existing.date).getTime();
+    const shouldReplace = entry.score > existing.score || entryDate > existingDate;
+
+    byStudentAndAssignment.set(
+      key,
+      shouldReplace ? { ...entry, attempts } : { ...existing, attempts }
+    );
+  });
+
+  return Array.from(byStudentAndAssignment.values());
+}
+
+async function fetchAssignmentData() {
+  const now = Date.now();
+  if (
+    cachedAssignments.data &&
+    now - cachedAssignments.fetchedAt < ASSIGNMENT_CACHE_TTL_MS
+  ) {
+    return cachedAssignments.data;
+  }
+
+  if (typeof fetch !== "function") {
+    throw new ExternalFetchError("Fetch API is not available in this runtime.", {
+      code: "missing_fetch",
+    });
+  }
+
+  const fetchCsv = async (attempt) => {
+    const response = await fetchWithTimeout(
+      ASSIGNMENT_SHEET_EXPORT_URL,
+      FETCH_TIMEOUT_MS
+    );
+    logStructured("info", "Fetched assignment sheet", {
+      event: "sheet_fetch",
+      sheet: "assignments",
+      attempt,
+      status: response.status,
+    });
+
+    if (!response.ok) {
+      throw new ExternalFetchError(
+        `Failed to fetch assignment sheet (status ${response.status})`,
+        {
+          status: response.status,
+          code: "sheet_status_error",
+          retryable: response.status >= 500,
+        }
+      );
+    }
+
+    return response.text();
+  };
+
+  try {
+    const csvText = await withRetries(fetchCsv, {
+      maxAttempts: FETCH_MAX_ATTEMPTS,
+      baseDelayMs: FETCH_BACKOFF_MS,
+      onRetry: (error, attempt) => {
+        logStructured("error", "Retrying assignment sheet fetch", {
+          event: "sheet_fetch_retry",
+          sheet: "assignments",
+          attempt,
+          error: error.message,
+          status: error.status,
+          timeout: error.isTimeout,
+        });
+      },
+    });
+
+    const rows = parseCsv(csvText);
+    const validRows = rows.map(normalizeAssignmentRow).filter(Boolean);
+    const normalized = dedupeAssignments(validRows);
+    const payload = { rawEntries: validRows, entries: normalized };
+
+    cachedAssignments = { fetchedAt: now, data: payload };
+    writeFallbackObject(assignmentsCacheFile, payload);
+
+    return payload;
+  } catch (error) {
+    logStructured("error", "Failed to refresh assignments", {
+      event: "sheet_fetch_failed",
+      sheet: "assignments",
+      status: error.status,
+      error: error.message,
+      timeout: error.isTimeout,
+    });
+
+    const fallback = readFallbackObject(assignmentsCacheFile);
+    if (fallback) {
+      cachedAssignments = { fetchedAt: now, data: fallback };
+      return fallback;
+    }
+
+    throw new ExternalFetchError("Unable to load assignments right now.", {
+      status: error.status,
+      code: error.code || "fetch_failed",
+      retryable: error.retryable,
+    });
+  }
+}
+
+function summarizeStudentWeek(data, studentCode) {
+  const safeCode = (studentCode || "").trim().toLowerCase();
+  if (!safeCode) return null;
+
+  const now = Date.now();
+  const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const weekRaw = (data.rawEntries || []).filter(
+    (entry) =>
+      entry.studentCode?.toLowerCase() === safeCode &&
+      new Date(entry.date).getTime() >= weekAgo
+  );
+
+  if (weekRaw.length === 0) return null;
+
+  const uniqueMap = new Map();
+  weekRaw.forEach((entry) => {
+    const key = entry.assignment.toLowerCase();
+    const existing = uniqueMap.get(key);
+    const attempts = (existing?.attempts || 0) + 1;
+    const shouldReplace =
+      !existing ||
+      new Date(entry.date).getTime() > new Date(existing.date).getTime() ||
+      entry.score > (existing.score || 0);
+
+    const base = shouldReplace ? entry : existing;
+    uniqueMap.set(key, { ...base, attempts });
+  });
+
+  const unique = Array.from(uniqueMap.values());
+  const bestScore = unique.reduce(
+    (max, item) => Math.max(max, Number(item.score) || 0),
+    0
+  );
+  const latest = [...unique].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )[0];
+
+  return {
+    studentCode: weekRaw[0]?.studentCode || studentCode,
+    name: weekRaw[0]?.name || weekRaw[0]?.studentCode || studentCode,
+    level: latest?.level || "",
+    weekAssignments: unique.length,
+    weekAttempts: weekRaw.length,
+    retriesThisWeek: Math.max(0, weekRaw.length - unique.length),
+    bestScore,
+    lastAssignment: latest?.assignment || "",
+    lastDate: latest?.date || null,
+  };
+}
+
+function buildAssignmentLeaderboard(data) {
+  const leaderboardByLevel = {};
+
+  (data.entries || []).forEach((entry) => {
+    const levelKey = (entry.level || "Unspecified").toUpperCase();
+    if (!leaderboardByLevel[levelKey]) leaderboardByLevel[levelKey] = {};
+
+    const studentKey = entry.studentCode.toLowerCase();
+    const current = leaderboardByLevel[levelKey][studentKey] || {
+      studentCode: entry.studentCode,
+      name: entry.name,
+      assignmentCount: 0,
+      bestScore: 0,
+      lastDate: null,
+      level: levelKey,
+    };
+
+    const latestDate =
+      !current.lastDate || new Date(entry.date) > new Date(current.lastDate)
+        ? entry.date
+        : current.lastDate;
+
+    leaderboardByLevel[levelKey][studentKey] = {
+      ...current,
+      assignmentCount: current.assignmentCount + 1,
+      bestScore: Math.max(current.bestScore || 0, Number(entry.score) || 0),
+      lastDate: latestDate,
+    };
+  });
+
+  const leaderboard = {};
+  Object.entries(leaderboardByLevel).forEach(([level, students]) => {
+    const sorted = Object.values(students).sort((a, b) => {
+      if ((b.bestScore || 0) !== (a.bestScore || 0)) {
+        return (b.bestScore || 0) - (a.bestScore || 0);
+      }
+      if ((b.assignmentCount || 0) !== (a.assignmentCount || 0)) {
+        return (b.assignmentCount || 0) - (a.assignmentCount || 0);
+      }
+      return (a.name || a.studentCode).localeCompare(b.name || b.studentCode);
+    });
+
+    leaderboard[level] = sorted.slice(0, 5);
+  });
+
+  return leaderboard;
 }
 
 // Clean up stale uploads (e.g., if process crashes before fs.unlink runs)
@@ -1039,7 +1357,43 @@ app.get("/api/writing/tasks", async (req, res) => {
   }
 });
 
-// --- 3D. Text endpoint: send typed answer + get feedback ---
+// --- 3D. Assignment summary endpoint: streak + leaderboard from Google Sheets ---
+app.get("/api/assignments/summary", async (req, res) => {
+  const studentCode = (req.query.studentCode || "").trim();
+
+  try {
+    const data = await fetchAssignmentData();
+    const leaderboard = buildAssignmentLeaderboard(data);
+    const student = summarizeStudentWeek(data, studentCode);
+
+    return res.json({
+      student: student || null,
+      leaderboard,
+      totals: {
+        rows: data.rawEntries?.length || 0,
+        uniqueAssignments: data.entries?.length || 0,
+      },
+      lastUpdated: new Date().toISOString(),
+    });
+  } catch (error) {
+    logStructured("error", "❌ Failed to load assignment summary", {
+      event: "assignments_endpoint_error",
+      error: error.message,
+      status: error.status,
+    });
+
+    return res
+      .status(500)
+      .json(
+        formatExternalError(
+          error,
+          "Failed to load assignment submissions. Please try again."
+        )
+      );
+  }
+});
+
+// --- 3E. Text endpoint: send typed answer + get feedback ---
 app.post("/api/speaking/analyze-text", async (req, res) => {
   try {
     const validation = validateSpeakingAnalyzeTextBody(req.body);
