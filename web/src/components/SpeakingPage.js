@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import {
   useExam,
@@ -169,17 +169,28 @@ const SpeakingPage = () => {
     };
   }, [level, teil, idToken]);
 
-  const resetAudio = (options = {}) => {
-    setError("");
-    setAudioBlob(null);
-    setAudioUrl(null);
-    if (!options.keepResult) {
-      setResult(null);
-      setInteractionResult(null);
-    }
-    setRecordingTime(0);
-    setWaveform([]);
-  };
+  const resetAudio = useCallback(
+    (options = {}) => {
+      setError("");
+      setAudioBlob(null);
+      setAudioUrl(null);
+      if (!options.keepResult) {
+        setResult(null);
+        setInteractionResult(null);
+      }
+      setRecordingTime(0);
+      setWaveform([]);
+    },
+    [
+      setAudioBlob,
+      setAudioUrl,
+      setError,
+      setInteractionResult,
+      setRecordingTime,
+      setResult,
+      setWaveform,
+    ]
+  );
 
   const currentQuestion = questions[currentQuestionIndex] || null;
 
@@ -188,7 +199,7 @@ const SpeakingPage = () => {
     setCurrentQuestionIndex((prev) => (prev + 1) % questions.length);
   };
 
-  const cleanupAudioContext = () => {
+  const cleanupAudioContext = useCallback(() => {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
@@ -198,7 +209,7 @@ const SpeakingPage = () => {
       audioContextRef.current = null;
       analyserRef.current = null;
     }
-  };
+  }, []);
 
   const startVisualization = (stream) => {
     cleanupAudioContext();
@@ -227,10 +238,10 @@ const SpeakingPage = () => {
     draw();
   };
 
-  const stopVisualization = () => {
+  const stopVisualization = useCallback(() => {
     cleanupAudioContext();
     setWaveform([]);
-  };
+  }, [cleanupAudioContext]);
 
   useEffect(() => {
     let interval = null;
@@ -247,13 +258,13 @@ const SpeakingPage = () => {
     };
   }, [isRecording, recordingTime]);
 
-  const validateLevel = () => {
+  const validateLevel = useCallback(() => {
     if (!ALLOWED_LEVELS.includes(level)) {
       setError("Bitte wähle ein gültiges Sprachniveau (A1–B2).");
       return false;
     }
     return true;
-  };
+  }, [level, setError]);
 
   const validateTeil = () => {
     const allowedTeile = teilOptions.map((option) => option.label);
@@ -381,7 +392,7 @@ const SpeakingPage = () => {
     }
   };
 
-  const handleSimulationAssessment = async () => {
+  const handleSimulationAssessment = useCallback(async () => {
     if (!audioBlob) {
       setError(
         "Bitte nimm zuerst deine Antwort auf oder lade eine Audio-Datei hoch."
@@ -476,7 +487,22 @@ const SpeakingPage = () => {
       setLoading(false);
       stepAdvanceGuardRef.current = false;
     }
-  };
+  }, [
+    addResultToHistory,
+    audioBlob,
+    currentSimulationStepIndex,
+    idToken,
+    level,
+    resetAudio,
+    setError,
+    setLoading,
+    setResult,
+    simulationScores,
+    simulationSteps,
+    stopVisualization,
+    userId,
+    validateLevel,
+  ]);
 
   const handleRecordClick = async () => {
     if (isRecording) {
