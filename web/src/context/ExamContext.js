@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { loadPreferredLevel, savePreferredLevel } from "../services/levelStorage";
 
 export const SPEAKING_FORMATS = {
   A1: [
@@ -114,13 +115,33 @@ export const getTasksForLevel = (level) =>
 
 const ExamContext = createContext();
 
+const getInitialLevel = () => {
+  const stored = loadPreferredLevel();
+  if (stored && ALLOWED_LEVELS.includes(stored)) {
+    return stored;
+  }
+  return ALLOWED_LEVELS[0];
+};
+
+const initialLevel = getInitialLevel();
+
 export const ExamProvider = ({ children }) => {
-  const [level, setLevel] = useState(ALLOWED_LEVELS[0]);
-  const [teil, setTeil] = useState(getTasksForLevel(ALLOWED_LEVELS[0])[0].label);
+  const [level, setLevelState] = useState(initialLevel);
+  const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel()));
+  const [teil, setTeil] = useState(getTasksForLevel(initialLevel)[0].label);
   const [result, setResult] = useState(null);
   const [resultHistory, setResultHistory] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const setLevel = (newLevel) => {
+    const safeLevel = ALLOWED_LEVELS.includes(newLevel)
+      ? newLevel
+      : ALLOWED_LEVELS[0];
+    setLevelState(safeLevel);
+    setLevelConfirmed(true);
+    savePreferredLevel(safeLevel);
+  };
 
   useEffect(() => {
     const allowedTeile = getTasksForLevel(level).map((task) => task.label);
@@ -150,6 +171,8 @@ export const ExamProvider = ({ children }) => {
         setTeil,
         level,
         setLevel,
+        levelConfirmed,
+        setLevelConfirmed,
         result,
         setResult,
         resultHistory,
