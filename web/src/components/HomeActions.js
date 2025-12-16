@@ -25,6 +25,12 @@ const HomeActions = ({ onSelect }) => {
         >
           Zur Prüfungssimulation
         </button>
+        <button
+          style={{ ...styles.secondaryButton, padding: "14px 16px", fontSize: 16 }}
+          onClick={() => onSelect("discussion")}
+        >
+          Zur Klassendiskussion
+        </button>
       </div>
     </div>
   );
