@@ -19,6 +19,7 @@ import { fetchResults } from "../services/resultsService";
 const tabs = [
   { key: "home", label: "Home" },
   { key: "course", label: "My Course" },
+  { key: "submit", label: "Submit Work" },
   { key: "chat", label: "Class Chat" },
   { key: "results", label: "My Results" },
   { key: "letters", label: "Schreiben Trainer" },
@@ -389,6 +390,20 @@ const CourseTab = () => {
       <p style={styles.helperText}>
         Pulling content from the course dictionary. Select a level to see its full day-by-day plan.
       </p>
+
+      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
+          <div>
+            <h3 style={{ margin: "0 0 4px" }}>Ready to submit your coursework?</h3>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Jump straight to the submission tools without scrolling to the bottom of this page.
+            </p>
+          </div>
+          <button style={styles.primaryButton} onClick={() => setActiveTab("submit")}>
+            Open submit tab
+          </button>
+        </div>
+      </div>
 
       <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
         {(courseSchedules[selectedCourseLevel] || []).map((entry) => {
@@ -895,7 +910,7 @@ const CourseTab = () => {
       {activeTab === "chat" && renderChat()}
       {activeTab === "results" && renderResults()}
       {activeTab === "letters" && renderLetters()}
-      {activeTab === "course" && renderSubmission()}
+      {activeTab === "submit" && renderSubmission()}
     </div>
   );
 };
