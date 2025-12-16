@@ -3,10 +3,13 @@ import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { savePreferredLevel } from "../services/levelStorage";
+import { rememberStudentCodeForEmail } from "../services/submissionService";
+import { generateStudentCode } from "../services/studentCode";
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,9 +30,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     setLoading(true);
     try {
-      await signup(email, password);
+      const studentCode = generateStudentCode({ firstName, level: selectedLevel });
+      await signup(email, password, {
+        firstName,
+        level: selectedLevel,
+        studentCode,
+      });
       savePreferredLevel(selectedLevel);
-      setMessage("Account created! You are now signed in.");
+      rememberStudentCodeForEmail(email, studentCode);
+      setMessage(`Account created! Your student code is ${studentCode}.`);
     } catch (error) {
       console.error(error);
       setAuthError(error?.message || "Sign up failed.");
@@ -57,6 +66,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
             Signing up links your profile to Firebase (hosted on Vercel). You can use the same login for web and mobile.
           </p>
+          <p style={{ ...styles.helperText, marginBottom: 6 }}>
+            Already have an email in our old Firebase student list? Please go to Login and reuse that email to set a new password. We'll migrate your profile.
+          </p>
           <ul style={{ ...styles.checklist, margin: 0 }}>
             <li>Enable push reminders and weekly goals.</li>
             <li>Store your level checks and mock tests.</li>
@@ -65,6 +77,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
+          <label style={styles.label}>First name</label>
+          <input
+            type="text"
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            style={inputStyle}
+            placeholder="Abigail"
+          />
+
           <label style={styles.label}>Email</label>
           <input
             type="email"

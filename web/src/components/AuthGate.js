@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
+import { ALLOWED_LEVELS } from "../context/ExamContext";
+import { generateStudentCode } from "../services/studentCode";
+import { rememberStudentCodeForEmail } from "../services/submissionService";
+import { savePreferredLevel } from "../services/levelStorage";
 
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, authError, setAuthError } = useAuth();
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState("B1");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
@@ -19,11 +25,30 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
     try {
       if (mode === "signup") {
-        await signup(email, password);
-        setMessage("Account created! You are now signed in.");
+        const studentCode = generateStudentCode({ firstName, level: selectedLevel });
+        await signup(email, password, {
+          firstName,
+          level: selectedLevel,
+          studentCode,
+        });
+        savePreferredLevel(selectedLevel);
+        rememberStudentCodeForEmail(email, studentCode);
+        setMessage(`Account created! Your student code is ${studentCode}.`);
       } else {
-        await login(email, password);
-        setMessage("Welcome back!");
+        const credential = await login(email, password);
+        const studentCode = credential?.user?.profile?.studentCode;
+        const level = credential?.user?.profile?.level;
+        if (studentCode) {
+          rememberStudentCodeForEmail(email, studentCode);
+        }
+        if (level) {
+          savePreferredLevel(level);
+        }
+        setMessage(
+          credential?.migratedFromLegacy
+            ? "We found your old account. Your new password is now saved."
+            : "Welcome back!"
+        );
       }
     } catch (error) {
       console.error(error);
@@ -57,8 +82,31 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         <p style={styles.helperText}>
           Connect with your account so we can save your exam progress.
         </p>
+        {mode === "login" && (
+          <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
+            <p style={{ ...styles.helperText, marginBottom: 4 }}>
+              Returning student from Firebase? Use your existing email and choose a new password. We'll import your profile automatically.
+            </p>
+            <p style={{ ...styles.helperText, marginBottom: 0 }}>
+              New student? Switch to "Create account" and sign up normally.
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
+          {mode === "signup" && (
+            <>
+              <label style={styles.label}>First name</label>
+              <input
+                type="text"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                style={inputStyle}
+              />
+            </>
+          )}
+
           <label style={styles.label}>Email</label>
           <input
             type="email"
@@ -77,6 +125,24 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
           />
+
+          {mode === "signup" && (
+            <>
+              <label style={styles.label}>Your current level</label>
+              <select
+                required
+                value={selectedLevel}
+                onChange={(event) => setSelectedLevel(event.target.value)}
+                style={{ ...styles.select, height: 44 }}
+              >
+                {ALLOWED_LEVELS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading
