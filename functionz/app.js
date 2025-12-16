@@ -40,6 +40,19 @@ const WRITING_SHEET_ID = "1RnZ_YHhbGNYxlwq0KN2a-31OpLygpOkkMGVmQSbGiVQ"; // Schr
 const WRITING_SHEET_GID = "0"; // Schreiben tab
 const WRITING_SHEET_EXPORT_URL = `https://docs.google.com/spreadsheets/d/${WRITING_SHEET_ID}/export?format=csv&gid=${WRITING_SHEET_GID}`;
 const WRITING_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const FETCH_TIMEOUT_MS = 8000;
+const FETCH_MAX_ATTEMPTS = 3;
+const FETCH_BACKOFF_MS = 500;
+
+class ExternalFetchError extends Error {
+  constructor(message, { status, code, retryable } = {}) {
+    super(message);
+    this.name = "ExternalFetchError";
+    this.status = status;
+    this.code = code;
+    this.retryable = retryable;
+  }
+}
 
 let cachedQuestions = {
   fetchedAt: 0,
@@ -70,6 +83,10 @@ const historyBaseDir = process.env.VERCEL
   : path.join(__dirname, "data");
 const historyFile = path.join(historyBaseDir, "userHistory.json");
 fs.mkdirSync(path.dirname(historyFile), { recursive: true });
+const sheetCacheDir = historyBaseDir;
+const questionsCacheFile = path.join(sheetCacheDir, "questionsCache.json");
+const writingTasksCacheFile = path.join(sheetCacheDir, "writingTasksCache.json");
+fs.mkdirSync(sheetCacheDir, { recursive: true });
 
 function loadHistory() {
   try {
@@ -218,6 +235,109 @@ function parseDurationMinutes(value, fallback = 15) {
   return Math.max(5, Math.round(parsed));
 }
 
+function logStructured(level, message, metadata = {}) {
+  const payload = {
+    at: new Date().toISOString(),
+    level,
+    message,
+    ...metadata,
+  };
+
+  const serialized = JSON.stringify(payload);
+  if (level === "error") {
+    console.error(serialized);
+  } else {
+    console.info(serialized);
+  }
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function withRetries(fn, { maxAttempts, baseDelayMs, backoffFactor = 2, onRetry } = {}) {
+  let attempt = 0;
+  let lastError;
+
+  while (attempt < maxAttempts) {
+    try {
+      attempt += 1;
+      return await fn(attempt);
+    } catch (error) {
+      lastError = error;
+      if (attempt >= maxAttempts) break;
+
+      if (typeof onRetry === "function") {
+        onRetry(error, attempt);
+      }
+
+      const delay = baseDelayMs * backoffFactor ** (attempt - 1);
+      await sleep(delay);
+    }
+  }
+
+  throw lastError;
+}
+
+async function fetchWithTimeout(url, timeoutMs) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      const timeoutError = new ExternalFetchError(
+        `Request timed out after ${timeoutMs}ms`,
+        { code: "timeout", retryable: true }
+      );
+      timeoutError.isTimeout = true;
+      throw timeoutError;
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function readFallbackCache(cacheFile) {
+  try {
+    const raw = fs.readFileSync(cacheFile, "utf-8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function writeFallbackCache(cacheFile, data) {
+  if (process.env.VERCEL) return;
+
+  try {
+    fs.writeFileSync(cacheFile, JSON.stringify(data, null, 2));
+  } catch (error) {
+    logStructured("error", "Failed to persist fallback cache", {
+      cacheFile,
+      error: error.message,
+    });
+  }
+}
+
+function formatExternalError(error, fallbackMessage) {
+  const payload = { error: fallbackMessage };
+
+  if (error instanceof ExternalFetchError) {
+    payload.code = error.code || "fetch_failed";
+    if (error.status) payload.status = error.status;
+    if (typeof error.retryable === "boolean") payload.retryable = error.retryable;
+  } else {
+    payload.code = "internal_error";
+  }
+
+  return payload;
+}
+
 function extractChecklist(row) {
   const checklistKeys = Object.keys(row || {}).filter((key) =>
     /(bullet|include|item|point|tip|hint)/i.test(key)
@@ -237,43 +357,104 @@ async function fetchSheetQuestions() {
   }
 
   if (typeof fetch !== "function") {
-    throw new Error("Fetch API is not available in this runtime.");
+    throw new ExternalFetchError("Fetch API is not available in this runtime.", {
+      code: "missing_fetch",
+    });
   }
 
-  const response = await fetch(SHEET_EXPORT_URL);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch sheet (status ${response.status})`);
-  }
+  const fetchCsv = async (attempt) => {
+    const response = await fetchWithTimeout(SHEET_EXPORT_URL, FETCH_TIMEOUT_MS);
+    logStructured("info", "Fetched speaking sheet", {
+      event: "sheet_fetch",
+      sheet: "questions",
+      attempt,
+      status: response.status,
+    });
 
-  const csvText = await response.text();
-  const rows = parseCsv(csvText);
+    if (!response.ok) {
+      throw new ExternalFetchError(
+        `Failed to fetch sheet (status ${response.status})`,
+        {
+          status: response.status,
+          code: "sheet_status_error",
+          retryable: response.status >= 500,
+        }
+      );
+    }
 
-  const normalized = rows
-    .map((row) => {
-      const level = row.Level?.trim();
-      const teil = row.Teil?.trim();
-      const topic =
-        row["Topic/Prompt"]?.trim() || row["Topic / Prompt"]?.trim() || "";
-      const keyword =
-        row["Keyword/Subtopic"]?.trim() || row["Keyword / Subtopic"]?.trim() || "";
-
-      if (!level || !teil || !topic) return null;
-
-      return {
-        level,
-        teil,
-        topic,
-        keyword,
-      };
-    })
-    .filter(Boolean);
-
-  cachedQuestions = {
-    fetchedAt: now,
-    data: normalized,
+    return response.text();
   };
 
-  return normalized;
+  try {
+    const csvText = await withRetries(fetchCsv, {
+      maxAttempts: FETCH_MAX_ATTEMPTS,
+      baseDelayMs: FETCH_BACKOFF_MS,
+      onRetry: (error, attempt) => {
+        logStructured("error", "Retrying sheet fetch", {
+          event: "sheet_fetch_retry",
+          sheet: "questions",
+          attempt,
+          error: error.message,
+          status: error.status,
+          timeout: error.isTimeout,
+        });
+      },
+    });
+
+    const rows = parseCsv(csvText);
+
+    const normalized = rows
+      .map((row) => {
+        const level = row.Level?.trim();
+        const teil = row.Teil?.trim();
+        const topic =
+          row["Topic/Prompt"]?.trim() || row["Topic / Prompt"]?.trim() || "";
+        const keyword =
+          row["Keyword/Subtopic"]?.trim() || row["Keyword / Subtopic"]?.trim() || "";
+
+        if (!level || !teil || !topic) return null;
+
+        return {
+          level,
+          teil,
+          topic,
+          keyword,
+        };
+      })
+      .filter(Boolean);
+
+    cachedQuestions = {
+      fetchedAt: now,
+      data: normalized,
+    };
+
+    writeFallbackCache(questionsCacheFile, normalized);
+
+    return normalized;
+  } catch (error) {
+    logStructured("error", "Failed to refresh speaking questions", {
+      event: "sheet_fetch_failed",
+      sheet: "questions",
+      status: error.status,
+      error: error.message,
+      timeout: error.isTimeout,
+    });
+
+    const fallback = readFallbackCache(questionsCacheFile);
+    if (fallback) {
+      cachedQuestions = { fetchedAt: now, data: fallback };
+      return fallback;
+    }
+
+    throw new ExternalFetchError(
+      "Unable to load speaking questions right now. Please try again soon.",
+      {
+        status: error.status,
+        code: error.code || "fetch_failed",
+        retryable: error.retryable,
+      }
+    );
+  }
 }
 
 async function fetchSheetWritingTasks() {
@@ -286,56 +467,117 @@ async function fetchSheetWritingTasks() {
   }
 
   if (typeof fetch !== "function") {
-    throw new Error("Fetch API is not available in this runtime.");
+    throw new ExternalFetchError("Fetch API is not available in this runtime.", {
+      code: "missing_fetch",
+    });
   }
 
-  const response = await fetch(WRITING_SHEET_EXPORT_URL);
-  if (!response.ok) {
-    throw new Error(`Failed to fetch writing sheet (status ${response.status})`);
-  }
+  const fetchCsv = async (attempt) => {
+    const response = await fetchWithTimeout(WRITING_SHEET_EXPORT_URL, FETCH_TIMEOUT_MS);
+    logStructured("info", "Fetched writing sheet", {
+      event: "sheet_fetch",
+      sheet: "writing",
+      attempt,
+      status: response.status,
+    });
 
-  const csvText = await response.text();
-  const rows = parseCsv(csvText);
-
-  const normalized = rows
-    .map((row) => {
-      const letter =
-        row.Letter?.trim() ||
-        row["Letter Title"]?.trim() ||
-        row["Letter/Prompt"]?.trim() ||
-        row["Prompt"]?.trim();
-      const level = row.Level?.trim();
-      const durationMinutes = parseDurationMinutes(
-        row.DurationMinutes || row.Duration || row["Duration (min)"] || row.Time
+    if (!response.ok) {
+      throw new ExternalFetchError(
+        `Failed to fetch writing sheet (status ${response.status})`,
+        {
+          status: response.status,
+          code: "sheet_status_error",
+          retryable: response.status >= 500,
+        }
       );
-      const situation =
-        row.Situation?.trim() ||
-        row["Topic/Prompt"]?.trim() ||
-        row.Topic?.trim() ||
-        row.Context?.trim() ||
-        "";
+    }
 
-      const whatToInclude = extractChecklist(row);
-
-      if (!letter || !level) return null;
-
-      return {
-        id: slugifyId(letter),
-        letter,
-        level,
-        durationMinutes,
-        situation,
-        whatToInclude,
-      };
-    })
-    .filter(Boolean);
-
-  cachedWritingTasks = {
-    fetchedAt: now,
-    data: normalized,
+    return response.text();
   };
 
-  return normalized;
+  try {
+    const csvText = await withRetries(fetchCsv, {
+      maxAttempts: FETCH_MAX_ATTEMPTS,
+      baseDelayMs: FETCH_BACKOFF_MS,
+      onRetry: (error, attempt) => {
+        logStructured("error", "Retrying writing sheet fetch", {
+          event: "sheet_fetch_retry",
+          sheet: "writing",
+          attempt,
+          error: error.message,
+          status: error.status,
+          timeout: error.isTimeout,
+        });
+      },
+    });
+
+    const rows = parseCsv(csvText);
+
+    const normalized = rows
+      .map((row) => {
+        const letter =
+          row.Letter?.trim() ||
+          row["Letter Title"]?.trim() ||
+          row["Letter/Prompt"]?.trim() ||
+          row["Prompt"]?.trim();
+        const level = row.Level?.trim();
+        const durationMinutes = parseDurationMinutes(
+          row.DurationMinutes || row.Duration || row["Duration (min)"] || row.Time
+        );
+        const situation =
+          row.Situation?.trim() ||
+          row["Topic/Prompt"]?.trim() ||
+          row.Topic?.trim() ||
+          row.Context?.trim() ||
+          "";
+
+        const whatToInclude = extractChecklist(row);
+
+        if (!letter || !level) return null;
+
+        return {
+          id: slugifyId(letter),
+          letter,
+          level,
+          durationMinutes,
+          situation,
+          whatToInclude,
+        };
+      })
+      .filter(Boolean);
+
+    cachedWritingTasks = {
+      fetchedAt: now,
+      data: normalized,
+    };
+
+    writeFallbackCache(writingTasksCacheFile, normalized);
+
+    return normalized;
+  } catch (error) {
+    logStructured("error", "Failed to refresh writing tasks", {
+      event: "sheet_fetch_failed",
+      sheet: "writing",
+      status: error.status,
+      error: error.message,
+      timeout: error.isTimeout,
+    });
+
+    const fallback = readFallbackCache(writingTasksCacheFile);
+    if (fallback) {
+      cachedWritingTasks = { fetchedAt: now, data: fallback };
+      return fallback;
+    }
+
+    throw new ExternalFetchError(
+      "Unable to load writing tasks right now. Please try again soon.",
+      {
+        status: error.status,
+        code: error.code || "fetch_failed",
+        retryable: error.retryable,
+      }
+    );
+  }
 }
 
 // Clean up stale uploads (e.g., if process crashes before fs.unlink runs)
@@ -756,10 +998,20 @@ app.get("/api/speaking/questions", async (req, res) => {
 
     return res.json({ questions: filtered });
   } catch (error) {
-    console.error("❌ Failed to fetch speaking questions:", error);
+    logStructured("error", "❌ Failed to fetch speaking questions", {
+      event: "questions_endpoint_error",
+      error: error.message,
+      status: error.status,
+    });
+
     return res
       .status(500)
-      .json({ error: "Failed to load speaking questions. Please try again." });
+      .json(
+        formatExternalError(
+          error,
+          "Failed to load speaking questions. Please try again."
+        )
+      );
   }
 });
 
@@ -775,8 +1027,15 @@ app.get("/api/writing/tasks", async (req, res) => {
 
     return res.json({ tasks: filtered });
   } catch (error) {
-    console.error("❌ Failed to fetch writing tasks:", error);
-    return res.status(500).json({ error: "Failed to load writing tasks." });
+    logStructured("error", "❌ Failed to fetch writing tasks", {
+      event: "writing_endpoint_error",
+      error: error.message,
+      status: error.status,
+    });
+
+    return res
+      .status(500)
+      .json(formatExternalError(error, "Failed to load writing tasks."));
   }
 });
 
