@@ -3,13 +3,6 @@ import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
 import { downloadClassCalendar, formatScheduleSummary } from "../services/classCalendar";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
-import {
-  buildSessionSummary,
-  computeNextSession,
-  getCourseTitle,
-  getDaysUntilEnd,
-  getScheduleDetails,
-} from "../services/classScheduleTracker";
 
 const ClassCalendarCard = () => {
   const catalogEntries = useMemo(() => Object.keys(classCatalog), []);
@@ -18,12 +11,6 @@ const ClassCalendarCard = () => {
   );
 
   const classDetails = classCatalog[selectedClass];
-  const scheduleDetails = getScheduleDetails(selectedClass);
-  const nextSession = useMemo(
-    () => computeNextSession(selectedClass, new Date()),
-    [selectedClass]
-  );
-  const daysLeft = useMemo(() => getDaysUntilEnd(selectedClass, new Date()), [selectedClass]);
 
   const handleChange = (event) => {
     const value = event.target.value;
@@ -88,50 +75,6 @@ const ClassCalendarCard = () => {
           Adds every scheduled session to your device calendar with the Zoom link prefilled.
         </span>
       </div>
-
-      {scheduleDetails && (
-        <div
-          style={{
-            marginTop: 8,
-            padding: 12,
-            borderRadius: 8,
-            background: "#f0f9ff",
-            border: "1px solid #bae6fd",
-            display: "grid",
-            gap: 6,
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <div>
-              <div style={{ fontWeight: 700 }}>{getCourseTitle(selectedClass) || scheduleDetails.title}</div>
-              <div style={{ ...styles.helperText, margin: 0 }}>{scheduleDetails.className}</div>
-            </div>
-            <span style={{ ...styles.badge, background: "#0ea5e9", color: "white" }}>Next class</span>
-          </div>
-
-          {nextSession ? (
-            <>
-              <div style={{ fontWeight: 700 }}>
-                {nextSession.weekday}, {nextSession.humanDate} · {nextSession.startTime} ({scheduleDetails.timezone})
-              </div>
-              <div style={{ ...styles.helperText, margin: 0 }}>
-                Topics: {buildSessionSummary(nextSession.sessions)}
-              </div>
-              <div style={{ ...styles.helperText, margin: 0 }}>
-                {nextSession.minutesUntilStart} minutes left · {daysLeft ?? "?"} days until course end
-              </div>
-            </>
-          ) : (
-            <div style={{ ...styles.helperText, margin: 0 }}>
-              All scheduled sessions are complete for this class.
-            </div>
-          )}
-
-          {scheduleDetails.generatedNote && (
-            <div style={{ ...styles.helperText, margin: 0 }}>{scheduleDetails.generatedNote}</div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
