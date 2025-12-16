@@ -105,6 +105,34 @@ export const saveDraftForStudent = ({ email, studentCode, level, content }) => {
   };
 };
 
+const writeContentToPath = ({ path, content, timestampKey }) => {
+  const store = readStore();
+  const now = new Date().toISOString();
+  const safePath = (path || "").replace(/^\/+/, "");
+  const segments = safePath.split("/").filter(Boolean);
+
+  if (segments.length === 0) {
+    return { savedAt: now, path: safePath };
+  }
+
+  let node = store;
+  segments.forEach((segment, index) => {
+    if (index === segments.length - 1) {
+      node[segment] = { content, [timestampKey]: now };
+    } else {
+      if (!node[segment]) node[segment] = {};
+      node = node[segment];
+    }
+  });
+
+  writeStore(store);
+
+  return { savedAt: now, path: safePath };
+};
+
+export const saveDraftToSpecificPath = ({ path, content }) =>
+  writeContentToPath({ path, content, timestampKey: "updatedAt" });
+
 export const isSubmissionLocked = ({ email, studentCode }) => {
   const store = readStore();
   const studentKey = buildStudentKey(email, studentCode);
@@ -161,3 +189,6 @@ export const submitFinalWork = ({ email, studentCode, level, content }) => {
     lockPath: `submission_locks/${studentKey}`,
   };
 };
+
+export const submitWorkToSpecificPath = ({ path, content }) =>
+  writeContentToPath({ path, content, timestampKey: "submittedAt" });
