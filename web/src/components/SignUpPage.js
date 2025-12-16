@@ -5,6 +5,8 @@ import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { savePreferredLevel } from "../services/levelStorage";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { generateStudentCode } from "../services/studentCode";
+import { classCatalog } from "../data/classCatalog";
+import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
@@ -15,6 +17,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("B1");
+  const [selectedClass, setSelectedClass] = useState(
+    loadPreferredClass() || Object.keys(classCatalog)[0]
+  );
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
@@ -35,8 +40,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
         firstName,
         level: selectedLevel,
         studentCode,
+        className: selectedClass,
       });
       savePreferredLevel(selectedLevel);
+      savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(email, studentCode);
       setMessage(`Account created! Your student code is ${studentCode}.`);
     } catch (error) {
@@ -134,6 +141,23 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </select>
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             Wir laden Sprechen- und Schreiben-Aufgaben aus dem passenden Niveau-Sheet.
+          </p>
+
+          <label style={styles.label}>Which live class are you joining?</label>
+          <select
+            required
+            value={selectedClass}
+            onChange={(event) => setSelectedClass(event.target.value)}
+            style={styles.select}
+          >
+            {Object.keys(classCatalog).map((className) => (
+              <option key={className} value={className}>
+                {className}
+              </option>
+            ))}
+          </select>
+          <p style={{ ...styles.helperText, marginTop: -2 }}>
+            Wir hinterlegen deinen Kurs im Profil und erstellen den Kalender-Export mit Zoom-Link.
           </p>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
