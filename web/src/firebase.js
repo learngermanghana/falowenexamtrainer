@@ -1,8 +1,4 @@
-import {
-  initializeApp,
-  getApps,
-  getApp,
-} from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
 import {
   getAuth,
   onIdTokenChanged,
@@ -58,6 +54,59 @@ const app = isFirebaseConfigured ? getFirebaseApp() : null;
 const auth = app ? getAuth(app) : null;
 const db = app ? getFirestore(app) : null;
 
+let messagingServiceWorkerRegistrationPromise = null;
+
+const sendFirebaseConfigToServiceWorker = async (registration) => {
+  if (!registration) return null;
+  const serviceWorker = registration.active || registration.waiting;
+
+  if (serviceWorker) {
+    serviceWorker.postMessage({
+      type: "INIT_FIREBASE",
+      payload: firebaseConfig,
+    });
+    return registration;
+  }
+
+  const installingWorker = registration.installing;
+  if (installingWorker) {
+    return new Promise((resolve) => {
+      installingWorker.addEventListener("statechange", (event) => {
+        if (event.target.state === "activated" && registration.active) {
+          registration.active.postMessage({
+            type: "INIT_FIREBASE",
+            payload: firebaseConfig,
+          });
+          resolve(registration);
+        }
+      });
+    });
+  }
+
+  return registration;
+};
+
+const registerMessagingServiceWorker = async () => {
+  if (messagingServiceWorkerRegistrationPromise) {
+    return messagingServiceWorkerRegistrationPromise;
+  }
+
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+    return null;
+  }
+
+  messagingServiceWorkerRegistrationPromise = navigator.serviceWorker
+    .register("/firebase-messaging-sw.js")
+    .then(() => navigator.serviceWorker.ready)
+    .then(sendFirebaseConfigToServiceWorker)
+    .catch((error) => {
+      console.error("Failed to register messaging service worker", error);
+      return null;
+    });
+
+  return messagingServiceWorkerRegistrationPromise;
+};
+
 const assertFirebaseReady = () => {
   if (!isFirebaseConfigured || !app) {
     throw missingConfigError;
@@ -77,7 +126,12 @@ const requestMessagingToken = async () => {
     throw new Error("Missing REACT_APP_FIREBASE_VAPID_KEY for push notifications.");
   }
 
-  return getToken(messaging, { vapidKey });
+  const serviceWorkerRegistration = await registerMessagingServiceWorker();
+
+  return getToken(messaging, {
+    vapidKey,
+    serviceWorkerRegistration: serviceWorkerRegistration || undefined,
+  });
 };
 
 const listenForForegroundMessages = async (callback) => {
