@@ -14,6 +14,7 @@ import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
 import HealthIndicator from "./components/HealthIndicator";
 import { useAuth } from "./context/AuthContext";
+import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
 import AccountSettings from "./components/AccountSettings";
 import LandingPage from "./components/LandingPage";
@@ -23,8 +24,14 @@ import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import "./App.css";
 
 function App() {
-  const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
-    useAuth();
+  const {
+    user,
+    loading: authLoading,
+    logout,
+    enableNotifications,
+    notificationStatus,
+    authError,
+  } = useAuth();
   const [activePage, setActivePage] = useState("plan");
   const [authView, setAuthView] = useState("landing");
   const [notificationMessage, setNotificationMessage] = useState("");
@@ -56,6 +63,31 @@ function App() {
       );
     }
   };
+
+  if (!isFirebaseConfigured) {
+    return (
+      <div style={{ ...styles.container, display: "grid", gap: 12 }}>
+        <div style={styles.card}>
+          <h1 style={{ ...styles.title, marginBottom: 8 }}>Falowen Exam Coach</h1>
+          <p style={styles.subtitle}>
+            The app could not connect to Firebase. Please add your REACT_APP_FIREBASE_* credentials to a .env file
+            and restart the app.
+          </p>
+          <div style={{ ...styles.errorBox, marginTop: 12 }}>
+            {authError || "Firebase configuration missing: API key, auth domain, project ID, storage bucket, messaging sender ID, and app ID are required."}
+          </div>
+        </div>
+        <div style={{ ...styles.card, background: "#f9fafb" }}>
+          <h2 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Quick setup checklist</h2>
+          <ul style={{ margin: 0, paddingLeft: 20, color: "#1f2937" }}>
+            <li>Create a .env file in the web/ directory.</li>
+            <li>Add REACT_APP_FIREBASE_API_KEY, REACT_APP_FIREBASE_AUTH_DOMAIN, REACT_APP_FIREBASE_PROJECT_ID, REACT_APP_FIREBASE_STORAGE_BUCKET, REACT_APP_FIREBASE_MESSAGING_SENDER_ID, REACT_APP_FIREBASE_APP_ID, and REACT_APP_FIREBASE_VAPID_KEY.</li>
+            <li>Restart the development server after saving the file.</li>
+          </ul>
+        </div>
+      </div>
+    );
+  }
 
   const renderMain = () => {
     if (activePage === "plan") return <PlanPage onSelect={setActivePage} />;
