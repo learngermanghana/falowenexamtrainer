@@ -78,11 +78,18 @@ export const loadDraftForStudent = ({ email, studentCode, level }) => {
   return {
     content: draft.content || "",
     updatedAt: draft.updatedAt || null,
+    assignmentTitle: draft.assignmentTitle || "",
     path: `drafts_v2/${studentKey}/${levelKey}`,
   };
 };
 
-export const saveDraftForStudent = ({ email, studentCode, level, content }) => {
+export const saveDraftForStudent = ({
+  email,
+  studentCode,
+  level,
+  content,
+  assignmentTitle,
+}) => {
   const store = readStore();
   const studentKey = buildStudentKey(email, studentCode);
   const levelKey = normalizeLevel(level);
@@ -95,6 +102,7 @@ export const saveDraftForStudent = ({ email, studentCode, level, content }) => {
   store.drafts_v2[studentKey][levelKey] = {
     content,
     updatedAt: now,
+    assignmentTitle: assignmentTitle || "",
   };
 
   writeStore(store);
@@ -146,7 +154,13 @@ export const isSubmissionLocked = ({ email, studentCode }) => {
   };
 };
 
-export const submitFinalWork = ({ email, studentCode, level, content }) => {
+export const submitFinalWork = ({
+  email,
+  studentCode,
+  level,
+  content,
+  assignmentTitle,
+}) => {
   const store = readStore();
   const studentKey = buildStudentKey(email, studentCode);
   const levelKey = normalizeLevel(level);
@@ -172,6 +186,7 @@ export const submitFinalWork = ({ email, studentCode, level, content }) => {
     studentCode,
     content,
     submittedAt: now,
+    assignmentTitle: assignmentTitle || "",
   };
 
   store.submission_locks[studentKey] = {

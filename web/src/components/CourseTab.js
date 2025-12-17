@@ -16,6 +16,7 @@ import {
   submitWorkToSpecificPath,
 } from "../services/submissionService";
 import { fetchResults } from "../services/resultsService";
+import { deriveStudentProfile } from "../services/studentDirectory";
 
 const tabs = [
   { key: "home", label: "Home" },
@@ -48,6 +49,9 @@ const CourseTab = () => {
   const [selectedCourseLevel, setSelectedCourseLevel] = useState("A1");
   const [submissionLevel, setSubmissionLevel] = useState("A1");
   const [studentCode, setStudentCode] = useState("");
+  const [assignmentTitle, setAssignmentTitle] = useState(
+    courseOverview.nextAssignment.title
+  );
   const [workDraft, setWorkDraft] = useState("");
   const [draftStatus, setDraftStatus] = useState("");
   const [manualDraftStatus, setManualDraftStatus] = useState("");
@@ -147,11 +151,23 @@ const CourseTab = () => {
 
   useEffect(() => {
     if (!user?.email) return;
+    const profile = deriveStudentProfile(user);
     const storedCode = loadStudentCodeForEmail(user.email);
-    if (storedCode) {
-      setStudentCode(storedCode);
+    const resolvedStudentCode = profile.studentCode || storedCode;
+
+    if (resolvedStudentCode) {
+      setStudentCode((prev) => prev || resolvedStudentCode);
     }
-  }, [user?.email]);
+
+    if (profile.level) {
+      setSelectedCourseLevel((prev) => prev || profile.level);
+      setSubmissionLevel((prev) => prev || profile.level);
+    }
+
+    if (profile.assignmentTitle) {
+      setAssignmentTitle((prev) => prev || profile.assignmentTitle);
+    }
+  }, [user?.email, user?.profile]);
 
   useEffect(() => {
     setSubmissionLevel(selectedCourseLevel);
@@ -200,6 +216,7 @@ const CourseTab = () => {
       setLeaderboardLevel(selectedCourseLevel);
     }
   }, [assignmentSummary?.leaderboard, selectedCourseLevel]);
+  useEffect(() => {
     if (activeTab !== "results") return;
 
     const loadResults = async () => {
@@ -238,6 +255,9 @@ const CourseTab = () => {
       level: submissionLevel,
     });
     setWorkDraft(draft.content || "");
+    setAssignmentTitle(
+      (draft.assignmentTitle || assignmentTitle || courseOverview.nextAssignment.title).trim()
+    );
     setDraftStatus(
       draft.updatedAt
         ? `Draft restored from /${draft.path}`
@@ -264,6 +284,7 @@ const CourseTab = () => {
         studentCode,
         level: submissionLevel,
         content: workDraft,
+        assignmentTitle,
       });
       setDraftStatus(
         `Draft saved to /${result.path} (${new Date(result.savedAt).toLocaleTimeString()})`
@@ -272,7 +293,7 @@ const CourseTab = () => {
     }, 800);
 
     return () => clearTimeout(handle);
-  }, [user?.email, studentCode, submissionLevel, workDraft, locked]);
+  }, [user?.email, studentCode, submissionLevel, workDraft, assignmentTitle, locked]);
 
   useEffect(() => {
     if (user?.email && studentCode) {
@@ -410,6 +431,11 @@ const CourseTab = () => {
       return;
     }
 
+    if (!assignmentTitle.trim()) {
+      setSubmissionStatus("Add an assignment title so we know what you're submitting.");
+      return;
+    }
+
     if (!workDraft.trim()) {
       setSubmissionStatus("Add your coursework before submitting.");
       return;
@@ -429,6 +455,7 @@ const CourseTab = () => {
         studentCode,
         level: submissionLevel,
         content: workDraft,
+        assignmentTitle,
       });
 
       setLocked(true);
@@ -438,7 +465,7 @@ const CourseTab = () => {
       }
 
       setSubmissionStatus(
-        `Submitted to /${result.submissionPath} and locked at /${result.lockPath}.`
+        `Submitted "${assignmentTitle}" to /${result.submissionPath} and locked at /${result.lockPath}.`
       );
     } catch (error) {
       console.error("Failed to submit work", error);
@@ -964,6 +991,19 @@ const CourseTab = () => {
             ))}
           </select>
           <p style={styles.helperText}>Matches the /submissions/{submissionLevel} path.</p>
+        </div>
+        <div>
+          <label style={styles.label}>Assignment title</label>
+          <input
+            value={assignmentTitle}
+            onChange={(e) => setAssignmentTitle(e.target.value)}
+            placeholder="Auto-picked from your profile or course data"
+            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
+            disabled={locked}
+          />
+          <p style={styles.helperText}>
+            Pulled from your Firebase student record when available so we can tag this submission.
+          </p>
         </div>
       </div>
 
