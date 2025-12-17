@@ -10,9 +10,30 @@ import Feedback from "./Feedback";
 import ResultHistory from "./ResultHistory";
 import { analyzeText, fetchWritingLetters } from "../services/coachService";
 import { useAuth } from "../context/AuthContext";
-import { writingLetters as fallbackWritingLetters } from "../data/writingLetters";
+import { writingLetters as courseWritingLetters } from "../data/writingLetters";
+import { WRITING_PROMPTS } from "../data/writingExamPrompts";
 
-const WritingPage = () => {
+const DEFAULT_EXAM_TIMINGS = {
+  A1: 20,
+  A2: 25,
+  B1: 30,
+  B2: 35,
+  C1: 40,
+};
+
+const mapExamPromptsToLetters = (prompts) =>
+  Object.entries(prompts).flatMap(([level, entries]) =>
+    (entries || []).map((item, index) => ({
+      id: `${level.toLowerCase()}-${index + 1}`,
+      letter: `${level}: ${item.Thema}`,
+      level,
+      durationMinutes: DEFAULT_EXAM_TIMINGS[level] || 20,
+      situation: item.Thema,
+      whatToInclude: item.Punkte || [],
+    }))
+  );
+
+const WritingPage = ({ mode = "course" }) => {
   const {
     teil,
     level,
@@ -27,12 +48,20 @@ const WritingPage = () => {
   } = useExam();
   const { user, idToken } = useAuth();
   const userId = user?.uid;
+  const isExamMode = mode === "exam";
+
+  const examWritingLetters = useMemo(
+    () => mapExamPromptsToLetters(WRITING_PROMPTS),
+    []
+  );
 
   const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
 
   const [activeTab, setActiveTab] = useState("practice");
-  const [writingTasks, setWritingTasks] = useState(fallbackWritingLetters);
-  const [writingTasksLoading, setWritingTasksLoading] = useState(true);
+  const [writingTasks, setWritingTasks] = useState(
+    isExamMode ? examWritingLetters : courseWritingLetters
+  );
+  const [writingTasksLoading, setWritingTasksLoading] = useState(!isExamMode);
   const [writingTasksError, setWritingTasksError] = useState("");
   const [typedAnswer, setTypedAnswer] = useState("");
   const [practiceDraft, setPracticeDraft] = useState("");
@@ -44,7 +73,7 @@ const WritingPage = () => {
     },
   ]);
   const [selectedLetterId, setSelectedLetterId] = useState(
-    fallbackWritingLetters[0]?.id || ""
+    (isExamMode ? examWritingLetters : courseWritingLetters)[0]?.id || ""
   );
   const selectedLetter = useMemo(
     () => writingTasks.find((item) => item.id === selectedLetterId),
@@ -58,6 +87,15 @@ const WritingPage = () => {
   useEffect(() => {
     let isMounted = true;
 
+    if (isExamMode) {
+      setWritingTasks(examWritingLetters);
+      setWritingTasksError("");
+      setWritingTasksLoading(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+
     const loadWritingTasks = async () => {
       setWritingTasksLoading(true);
       try {
@@ -69,7 +107,7 @@ const WritingPage = () => {
           setWritingTasks(tasks);
           setWritingTasksError("");
         } else {
-          setWritingTasks(fallbackWritingLetters);
+          setWritingTasks(courseWritingLetters);
           setWritingTasksError(
             "Keine Schreibaufgaben aus dem Sheet gefunden – zeige Beispiele."
           );
@@ -78,7 +116,7 @@ const WritingPage = () => {
         console.error("Failed to load writing tasks", err);
         if (!isMounted) return;
 
-        setWritingTasks(fallbackWritingLetters);
+        setWritingTasks(courseWritingLetters);
         setWritingTasksError(
           "Konnte Schreibaufgaben nicht laden. Zeige lokale Beispieldaten."
         );
@@ -92,7 +130,7 @@ const WritingPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [idToken]);
+  }, [examWritingLetters, idToken, isExamMode]);
 
   useEffect(() => {
     if (!writingTasks.length) return;
