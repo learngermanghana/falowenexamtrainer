@@ -16,12 +16,12 @@ const express = require("express");
 const cors = require("cors");
 
 // OPTIONAL: if you want missed assignments, copy your schedules to functions/data (see section 3)
-// let courseSchedulesByName = null;
-// try {
-//   courseSchedulesByName = require("./data/courseSchedulesByName").courseSchedulesByName;
-// } catch (e) {
-//   courseSchedulesByName = null;
-// }
+let courseSchedulesByName = null;
+try {
+  courseSchedulesByName = require("./data/courseSchedulesByName").courseSchedulesByName;
+} catch (e) {
+  courseSchedulesByName = null;
+}
 
 setGlobalOptions({ maxInstances: 10 });
 
@@ -278,34 +278,34 @@ app.get("/api/metrics", async (req, res) => {
     let missed = [];
     let missedEnabled = false;
 
-    // if (courseSchedulesByName && className && courseSchedulesByName[className]) {
-    //   missedEnabled = true;
-    //   const schedule = courseSchedulesByName[className];
-    //   const scheduled = [];
-    //   for (const day of schedule.days || []) {
-    //     const ymd = safeStr(day.date);
-    //     for (const s of day.sessions || []) {
-    //       const chapter = safeStr(s.chapter) || parseAssignmentId(s.title || "");
-    //       const id = parseAssignmentId(chapter) || safeStr(chapter);
-    //       if (!id || !ymd) continue;
-    //       scheduled.push({ date: ymd, assignmentId: id, raw: s });
-    //     }
-    //   }
-    //   scheduled.sort((a, b) => ymdToInt(a.date) - ymdToInt(b.date));
-    //
-    //   const completedIds = new Set(best.map((b) => b.assignmentId).filter(Boolean));
-    //
-    //   // Find latest completed scheduled day
-    //   let latestCompletedDay = "";
-    //   for (const item of scheduled) {
-    //     if (completedIds.has(item.assignmentId)) latestCompletedDay = item.date;
-    //   }
-    //
-    //   // Missed = scheduled on/before latestCompletedDay but not completed
-    //   missed = scheduled
-    //     .filter((x) => latestCompletedDay && ymdToInt(x.date) <= ymdToInt(latestCompletedDay))
-    //     .filter((x) => !completedIds.has(x.assignmentId));
-    // }
+    if (courseSchedulesByName && className && courseSchedulesByName[className]) {
+      missedEnabled = true;
+      const schedule = courseSchedulesByName[className];
+      const scheduled = [];
+      for (const day of schedule.days || []) {
+        const ymd = safeStr(day.date);
+        for (const s of day.sessions || []) {
+          const chapter = safeStr(s.chapter) || parseAssignmentId(s.title || "");
+          const id = parseAssignmentId(chapter) || safeStr(chapter);
+          if (!id || !ymd) continue;
+          scheduled.push({ date: ymd, assignmentId: id, raw: s });
+        }
+      }
+      scheduled.sort((a, b) => ymdToInt(a.date) - ymdToInt(b.date));
+
+      const completedIds = new Set(best.map((b) => b.assignmentId).filter(Boolean));
+
+      // Find latest completed scheduled day
+      let latestCompletedDay = "";
+      for (const item of scheduled) {
+        if (completedIds.has(item.assignmentId)) latestCompletedDay = item.date;
+      }
+
+      // Missed = scheduled on/before latestCompletedDay but not completed
+      missed = scheduled
+        .filter((x) => latestCompletedDay && ymdToInt(x.date) <= ymdToInt(latestCompletedDay))
+        .filter((x) => !completedIds.has(x.assignmentId));
+    }
 
     res.json({
       studentCode,
