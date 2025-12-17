@@ -19,6 +19,7 @@ import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
 import LevelOnboarding from "./components/LevelOnboarding";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
+import "./App.css";
 
 function App() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
@@ -101,7 +102,7 @@ function App() {
 
   return (
     <ExamProvider>
-      <div style={styles.container}>
+      <div className="app-shell" style={styles.container}>
         <header
           style={{
             ...styles.header,
@@ -164,9 +165,11 @@ function App() {
 
         <LevelOnboarding />
 
-        <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 16 }}>
-          <main style={{ minWidth: 0 }}>{renderMain()}</main>
-          <CoachPanel />
+        <div className="layout-grid">
+          <main className="layout-main" style={{ minWidth: 0 }}>
+            {renderMain()}
+          </main>
+          <CoachPanel className="layout-aside" />
         </div>
       </div>
     </ExamProvider>
