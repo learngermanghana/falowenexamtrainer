@@ -40,6 +40,20 @@ const AccountSettings = () => {
     [profile.email, user?.email]
   );
 
+  const studentRecord = useMemo(
+    () => ({
+      studentId: "STU-48219",
+      cohort: "Sommer 2024",
+      track: "Intensiv Deutsch",
+      level: "B1 → B2",
+      agreement: "Learning Agreement · signiert",
+      contractVersion: "Vertrag v1.3 (gültig)",
+      signedAt: "12. März 2024",
+      lastSync: "Heute, 09:14",
+    }),
+    []
+  );
+
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({ ...prev, [field]: event.target.value }));
     setStatus("");
@@ -52,6 +66,56 @@ const AccountSettings = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <section style={styles.card}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <h2 style={styles.sectionTitle}>Kontoübersicht</h2>
+          <span style={styles.levelPill}>{studentRecord.track}</span>
+        </div>
+        <p style={styles.helperText}>
+          Hier findest du deine Stammdaten, Vertragsstatus und den letzten Datenabgleich zwischen Campus und
+          Prüfungscoach.
+        </p>
+
+        <div
+          style={{
+            display: "grid",
+            gap: 10,
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          }}
+        >
+          <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+            <div style={styles.metaRow}>
+              <span>Studenten-ID</span>
+              <span style={styles.badge}>{studentRecord.cohort}</span>
+            </div>
+            <strong style={{ fontSize: 20 }}>{studentRecord.studentId}</strong>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>Eindeutige Kennung für Support & Rechnungen.</p>
+          </div>
+
+          <div style={{ ...styles.card, margin: 0, background: "#fef3c7", border: "1px solid #f59e0b" }}>
+            <div style={styles.metaRow}>
+              <span>Stufe & Kurs</span>
+              <span style={styles.badge}>{studentRecord.level}</span>
+            </div>
+            <strong style={{ fontSize: 16 }}>{studentRecord.agreement}</strong>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              Vertrag seit {studentRecord.signedAt}. Änderungen an Vereinbarungen werden hier gespiegelt.
+            </p>
+          </div>
+
+          <div style={{ ...styles.card, margin: 0, background: "#ecfdf3", border: "1px solid #34d399" }}>
+            <div style={styles.metaRow}>
+              <span>Datenabgleich</span>
+              <span style={styles.badge}>aktuell</span>
+            </div>
+            <strong style={{ fontSize: 16 }}>{studentRecord.lastSync}</strong>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              Wir synchronisieren Profil, Verträge und Zahlungsstatus mit dem Campus-Backend.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <h2 style={styles.sectionTitle}>Kontoeinstellungen</h2>
@@ -207,6 +271,101 @@ const AccountSettings = () => {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section style={styles.card}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <h2 style={styles.sectionTitle}>Vertrag &amp; Zustimmung</h2>
+          <span style={styles.badge}>{studentRecord.contractVersion}</span>
+        </div>
+        <p style={styles.helperText}>
+          Prüfe, was du unterschrieben hast. Hier liegen die wichtigsten Vereinbarungen, Datenschutz-Hinweise und
+          Einverständnisse.
+        </p>
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+          <div style={{ ...styles.card, margin: 0, background: "#f0f9ff", border: "1px solid #bae6fd" }}>
+            <div style={styles.metaRow}>
+              <span>Status</span>
+              <span style={styles.levelPill}>gültig</span>
+            </div>
+            <strong style={{ fontSize: 16 }}>{studentRecord.agreement}</strong>
+            <ul style={{ ...styles.checklist, marginTop: 10 }}>
+              <li>Signiert am {studentRecord.signedAt}</li>
+              <li>Datenschutzerklärung bestätigt</li>
+              <li>Widerruf jederzeit per Support möglich</li>
+            </ul>
+            <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+              <button style={styles.secondaryButton} type="button">
+                Vertrag anzeigen
+              </button>
+              <button style={styles.secondaryButton} type="button">
+                PDF herunterladen
+              </button>
+            </div>
+          </div>
+
+          <div style={{ ...styles.card, margin: 0 }}>
+            <h3 style={{ margin: "0 0 8px 0" }}>Einverständnisse</h3>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={styles.metaRow}>
+                <span>Benachrichtigungen</span>
+                <strong>{profile.reminder === "none" ? "deaktiviert" : "aktiv"}</strong>
+              </div>
+              <div style={styles.metaRow}>
+                <span>Datenweitergabe an Coach</span>
+                <strong>erlaubt</strong>
+              </div>
+              <div style={styles.metaRow}>
+                <span>Eltern/Träger informiert</span>
+                <strong>per E-Mail bestätigt</strong>
+              </div>
+            </div>
+            <p style={{ ...styles.helperText, margin: "10px 0 0" }}>
+              Wenn sich etwas ändert, informiere uns bitte rechtzeitig – wir aktualisieren Vertrag, Rechnungen und
+              Erinnerungen automatisch.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section style={styles.card}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <h2 style={styles.sectionTitle}>Zahlungsdetails &amp; Belege</h2>
+          <span style={styles.levelPill}>sicher gespeichert</span>
+        </div>
+        <p style={styles.helperText}>
+          Überblick über dein Zahlungsmittel, die nächste Abbuchung und wo du Rechnungen findest.
+        </p>
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={styles.metaRow}>
+            <span>Nächste Zahlung</span>
+            <strong>{subscription.renewalDate}</strong>
+          </div>
+          <div style={styles.metaRow}>
+            <span>Zahlungsmittel</span>
+            <strong>{subscription.paymentMethod}</strong>
+          </div>
+          <div style={styles.metaRow}>
+            <span>Rechnungs-E-Mail</span>
+            <strong>{subscription.invoiceEmail || "(bitte ergänzen)"}</strong>
+          </div>
+          <div style={styles.metaRow}>
+            <span>Letzte Rechnung</span>
+            <strong>#INV-2093 · 02. Juni 2024</strong>
+          </div>
+          <div style={styles.metaRow}>
+            <span>SEPA / Kreditkartenmandat</span>
+            <strong>gültig – keine Aktion nötig</strong>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
+          <button style={styles.secondaryButton} type="button">
+            Rechnung per E-Mail schicken
+          </button>
+          <button style={styles.secondaryButton} type="button">
+            Zahlungsdaten aktualisieren
+          </button>
         </div>
       </section>
     </div>

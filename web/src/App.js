@@ -76,15 +76,16 @@ function App() {
 
   const isFocusedView = activePage === "course" || activePage === "exam";
   const generalNavItems = [
-    { key: "plan", label: "Home · Plan" },
-    { key: "course", label: "Kursbuch" },
-    { key: "exam", label: "Prüfungen" },
-    { key: "discussion", label: "Klassenforum" },
+    { key: "plan", label: "Home · Plan (Start / dashboard)" },
+    { key: "course", label: "Kursbuch (course book)" },
+    { key: "exam", label: "Prüfungen (exam room)" },
+    { key: "account", label: "Konto (account)" },
+    { key: "discussion", label: "Klassenforum (class forum)" },
   ];
   const focusNavItems = [
-    { key: "course", label: "Campus Course" },
-    { key: "exam", label: "Exam Room" },
-    { key: "plan", label: "Back to dashboard" },
+    { key: "course", label: "Campus Course · Kursbuch" },
+    { key: "exam", label: "Exam Room · Prüfungsraum" },
+    { key: "plan", label: "Back to dashboard · Zurück" },
   ];
 
   const handleEnableNotifications = async () => {
