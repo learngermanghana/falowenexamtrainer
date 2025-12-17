@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { courseOverview, chatPrompts } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
-import { writingLetters } from "../data/writingLetters";
 import { useAuth } from "../context/AuthContext";
 import { fetchAssignmentSummary } from "../services/assignmentService";
 import {
@@ -45,7 +44,17 @@ const CourseTab = () => {
       text: `Willkommen, ${courseOverview.studentName}! Wähle einen Prompt oder frag mich direkt, ich bereite dich auf ${courseOverview.upcomingSession.topic} vor.`,
     },
   ]);
-  const [letterLevel, setLetterLevel] = useState("all");
+  const [writingSubtab, setWritingSubtab] = useState("mark");
+  const [letterQuestion, setLetterQuestion] = useState("");
+  const [letterDraft, setLetterDraft] = useState("");
+  const [letterFeedback, setLetterFeedback] = useState("");
+  const [ideaMessages, setIdeaMessages] = useState([
+    {
+      sender: "coach",
+      text: "Füge deine Prüfungsfrage ein und lass uns Ideen brainstormen, bevor du schreibst.",
+    },
+  ]);
+  const [ideaInput, setIdeaInput] = useState("");
   const [selectedCourseLevel, setSelectedCourseLevel] = useState("A1");
   const [submissionLevel, setSubmissionLevel] = useState("A1");
   const [studentCode, setStudentCode] = useState("");
@@ -92,11 +101,6 @@ const CourseTab = () => {
     () => `/submissions/${submissionLevel}/posts/${LESSON_POST_ID}`,
     [submissionLevel]
   );
-
-  const filteredLetters = useMemo(() => {
-    if (letterLevel === "all") return writingLetters;
-    return writingLetters.filter((letter) => letter.level === letterLevel);
-  }, [letterLevel]);
 
   const summarizeResults = (rows = []) => {
     const perLevel = {};
@@ -890,45 +894,166 @@ const CourseTab = () => {
     );
   };
 
-  const renderLetters = () => (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-        <h2 style={styles.sectionTitle}>Schreiben Trainer</h2>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={styles.helperText}>Level filtern:</span>
-          <select
-            style={styles.select}
-            value={letterLevel}
-            onChange={(e) => setLetterLevel(e.target.value)}
-          >
-            <option value="all">Alle</option>
-            <option value="A1">A1</option>
-            <option value="A2">A2</option>
-            <option value="B1">B1</option>
-            <option value="B2">B2</option>
-          </select>
-        </div>
-      </div>
-      <p style={styles.helperText}>Wähle eine Vorlage und schreibe den Text in 10–20 Minuten. Nutze sie im Unterricht oder lade sie im Schreib-Tab hoch.</p>
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-        {filteredLetters.map((letter) => (
-          <div key={letter.id} style={{ ...styles.card, marginBottom: 0 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-              <h3 style={{ margin: "0 0 4px 0" }}>{letter.letter}</h3>
-              <span style={styles.badge}>{letter.level}</span>
-            </div>
-            <div style={{ ...styles.helperText, marginBottom: 6 }}>Dauer: {letter.durationMinutes} Minuten</div>
-            <p style={{ margin: "0 0 6px 0" }}>{letter.situation}</p>
-            <ul style={styles.checklist}>
-              {letter.whatToInclude.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+  const renderLetters = () => {
+    const handleReviewLetter = () => {
+      if (!letterDraft.trim()) {
+        setLetterFeedback("Füge deinen Brief ein, damit der Coach ihn prüfen kann.");
+        return;
+      }
+
+      const wordCount = letterDraft.trim().split(/\s+/).length;
+      const topicHint = letterQuestion.trim()
+        ? `Aufgabe: "${letterQuestion.trim()}"`
+        : "Keine Aufgabe angegeben";
+
+      const insights = [
+        `${topicHint}.`,
+        wordCount < 80
+          ? "Dein Text ist noch kurz – füge Details zu Ort, Zeit und Begründungen hinzu."
+          : "Gute Länge! Prüfe, ob jede Bullet-Point-Forderung direkt beantwortet ist.",
+        "Prüfe Satzanfänge (z.B. Zudem, Außerdem, Danach), um den roten Faden klar zu halten.",
+        "Schließe mit einer klaren Bitte oder einem nächsten Schritt (z.B. Rückmeldung, Termin).",
+      ];
+
+      setLetterFeedback(
+        `AI Coach (Demo): ${insights[0]}\n- ${insights.slice(1).join("\n- ")}`
+      );
+    };
+
+    const handleIdeaSend = (message) => {
+      const content = message.trim();
+      if (!content) return;
+
+      setIdeaMessages((prev) => [
+        ...prev,
+        { sender: "user", text: content },
+        {
+          sender: "coach",
+          text: `Hier sind drei Ansatzpunkte für ${
+            letterQuestion.trim() || "deine Aufgabe"
+          }:\n1) Situations-Check: Was ist der Anlass und welches Ziel hast du?\n2) Struktur: Einleitung (Dank/Bezug) · Hauptteil (2–3 Kernpunkte) · Abschluss (Bitte/Frist).\n3) Sprach-Booster: Nutze zwei Verbindungswörter (z.B. außerdem, dennoch) und eine klare Bitte im letzten Satz.`,
+        },
+      ]);
+      setIdeaInput("");
+    };
+
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 10,
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <h2 style={styles.sectionTitle}>Schreiben Trainer</h2>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              style={writingSubtab === "mark" ? styles.primaryButton : styles.secondaryButton}
+              onClick={() => setWritingSubtab("mark")}
+              type="button"
+            >
+              Mark my letter
+            </button>
+            <button
+              style={writingSubtab === "ideas" ? styles.primaryButton : styles.secondaryButton}
+              onClick={() => setWritingSubtab("ideas")}
+              type="button"
+            >
+              Ideas generator
+            </button>
           </div>
-        ))}
+        </div>
+
+        {writingSubtab === "mark" ? (
+          <div style={{ ...styles.card, display: "grid", gap: 12 }}>
+            <div style={{ display: "grid", gap: 4 }}>
+              <h3 style={{ margin: 0 }}>Mark my letter</h3>
+              <p style={styles.helperText}>
+                Füge die Prüfungsfrage oben ein und deinen Brief darunter. Der AI-Coach gibt dir Sofort-Feedback zu Länge,
+                Struktur und Redemitteln.
+              </p>
+            </div>
+            <div style={{ display: "grid", gap: 8 }}>
+              <label style={styles.label}>Letter question oder Aufgabenstellung</label>
+              <textarea
+                style={styles.textArea}
+                placeholder="Kopiere hier die genaue Frage / Situation aus der Prüfung"
+                value={letterQuestion}
+                onChange={(e) => setLetterQuestion(e.target.value)}
+              />
+            </div>
+            <div style={{ display: "grid", gap: 8 }}>
+              <label style={styles.label}>Dein Brief (zum Prüfen einfügen)</label>
+              <textarea
+                style={{ ...styles.textArea, minHeight: 180 }}
+                placeholder="Liebes Prüfungsamt, ..."
+                value={letterDraft}
+                onChange={(e) => setLetterDraft(e.target.value)}
+              />
+            </div>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button style={styles.primaryButton} type="button" onClick={handleReviewLetter}>
+                AI um Feedback bitten
+              </button>
+            </div>
+            {letterFeedback ? (
+              <div style={styles.card}>
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Feedback</div>
+                <pre style={{ ...styles.pre, background: "#0f172a", color: "#e2e8f0" }}>{letterFeedback}</pre>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {writingSubtab === "ideas" ? (
+          <div style={{ ...styles.card, display: "grid", gap: 12 }}>
+            <div style={{ display: "grid", gap: 4 }}>
+              <h3 style={{ margin: 0 }}>Ideas generator</h3>
+              <p style={styles.helperText}>
+                Klebe die Aufgabenstellung ein und chatte mit dem Coach. Er schlägt Ideen, Satzstarter und Formulierungen vor,
+                bevor du schreibst.
+              </p>
+            </div>
+            <div style={{ display: "grid", gap: 8 }}>
+              <label style={styles.label}>Letter question</label>
+              <textarea
+                style={styles.textArea}
+                placeholder="Beschweren Sie sich beim Vermieter über Heizung und Internet ..."
+                value={letterQuestion}
+                onChange={(e) => setLetterQuestion(e.target.value)}
+              />
+            </div>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={styles.chatLog}>
+                {ideaMessages.map((message, index) => (
+                  <div
+                    key={`${message.sender}-${index}`}
+                    style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
+                  >
+                    <strong>{message.sender === "coach" ? "Coach" : "Du"}:</strong> {message.text}
+                  </div>
+                ))}
+              </div>
+              <textarea
+                style={styles.textareaSmall}
+                placeholder="Beschreibe kurz, wobei du Hilfe brauchst – z.B. Ideen für Einleitung oder Schluss."
+                value={ideaInput}
+                onChange={(e) => setIdeaInput(e.target.value)}
+              />
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button style={styles.primaryButton} type="button" onClick={() => handleIdeaSend(ideaInput)}>
+                  Nachricht senden
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderSubmission = () => (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
