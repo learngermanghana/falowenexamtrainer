@@ -96,6 +96,30 @@ export const analyzeText = async ({ text, teil, level, targetLevel, userId, idTo
   return response.data;
 };
 
+export const markLetterWithAI = async ({ text, level, studentName, idToken }) => {
+  const response = await axios.post(
+    `${backendUrl}/api/writing/mark`,
+    {
+      text,
+      level,
+      studentName,
+    },
+    { headers: authHeaders(idToken) }
+  );
+
+  return response.data;
+};
+
+export const fetchIdeasFromCoach = async ({ messages, level, idToken }) => {
+  const response = await axios.post(
+    `${backendUrl}/api/writing/ideas`,
+    { messages, level },
+    { headers: authHeaders(idToken) }
+  );
+
+  return response.data;
+};
+
 export const fetchSpeakingQuestions = async (level, teil, idToken) => {
   const normalizedLevel = (level || "").toUpperCase();
   const normalizedTeil = (teil || "").toLowerCase();

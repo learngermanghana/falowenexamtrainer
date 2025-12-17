@@ -1,14 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
-import {
-  useExam,
-  ALLOWED_LEVELS,
-  getTasksForLevel,
-} from "../context/ExamContext";
-import SettingsForm from "./SettingsForm";
-import Feedback from "./Feedback";
+import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import ResultHistory from "./ResultHistory";
-import { analyzeText, fetchWritingLetters } from "../services/coachService";
+import { fetchIdeasFromCoach, fetchWritingLetters, markLetterWithAI } from "../services/coachService";
 import { useAuth } from "../context/AuthContext";
 import { writingLetters as courseWritingLetters } from "../data/writingLetters";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
@@ -19,6 +13,12 @@ const DEFAULT_EXAM_TIMINGS = {
   B1: 30,
   B2: 35,
   C1: 40,
+};
+
+const IDEA_COACH_INTRO = {
+  role: "assistant",
+  content:
+    "Paste your exam question or draft idea, and I'll guide you step by step with Herr Felix's coaching prompts.",
 };
 
 const mapExamPromptsToLetters = (prompts) =>
@@ -35,10 +35,8 @@ const mapExamPromptsToLetters = (prompts) =>
 
 const WritingPage = ({ mode = "course" }) => {
   const {
-    teil,
     level,
-    result,
-    setResult,
+    setLevel,
     resultHistory,
     addResultToHistory,
     error,
@@ -55,8 +53,6 @@ const WritingPage = ({ mode = "course" }) => {
     []
   );
 
-  const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
-
   const [activeTab, setActiveTab] = useState("practice");
   const [writingTasks, setWritingTasks] = useState(
     isExamMode ? examWritingLetters : courseWritingLetters
@@ -65,13 +61,11 @@ const WritingPage = ({ mode = "course" }) => {
   const [writingTasksError, setWritingTasksError] = useState("");
   const [typedAnswer, setTypedAnswer] = useState("");
   const [practiceDraft, setPracticeDraft] = useState("");
-  const [question, setQuestion] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    {
-      role: "coach",
-      text: "Frag mich nach Formulierungen, Struktur oder Beispielsätzen für deine Prüfung.",
-    },
-  ]);
+  const [ideaInput, setIdeaInput] = useState("");
+  const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
+  const [ideasLoading, setIdeasLoading] = useState(false);
+  const [ideaError, setIdeaError] = useState("");
+  const [markFeedback, setMarkFeedback] = useState("");
   const [selectedLetterId, setSelectedLetterId] = useState(
     (isExamMode ? examWritingLetters : courseWritingLetters)[0]?.id || ""
   );
@@ -174,16 +168,14 @@ const WritingPage = ({ mode = "course" }) => {
     setActiveTab(tabKey);
     setError("");
     if (tabKey !== "mark") {
-      setResult(null);
+      setMarkFeedback("");
+    }
+    if (tabKey !== "ideas") {
+      setIdeaError("");
     }
   };
 
   const validateSelections = () => {
-    if (!teilOptions.some((option) => option.label === teil)) {
-      setError("Bitte wähle einen gültigen Teil aus der Liste.");
-      return false;
-    }
-
     if (!ALLOWED_LEVELS.includes(level)) {
       setError("Bitte wähle ein gültiges Niveau (A1–B2).");
       return false;
@@ -206,19 +198,24 @@ const WritingPage = ({ mode = "course" }) => {
     }
 
     setLoading(true);
-    setResult(null);
+    setMarkFeedback("");
 
     try {
-      const data = await analyzeText({
+      const studentName = user?.displayName || user?.email || "Student";
+      const data = await markLetterWithAI({
         text: trimmed,
-        teil,
         level,
-        targetLevel: level,
-        userId,
+        studentName,
         idToken,
       });
-      const enrichedResult = { ...data, teil, level, mode: "Writing" };
-      setResult(enrichedResult);
+      const enrichedResult = {
+        id: Date.now(),
+        mode: "Mark my letter",
+        level,
+        comments: data.feedback,
+        createdAt: new Date().toISOString(),
+      };
+      setMarkFeedback(data.feedback);
       addResultToHistory(enrichedResult);
     } catch (err) {
       console.error("Falowen frontend error:", err);
@@ -232,37 +229,37 @@ const WritingPage = ({ mode = "course" }) => {
     }
   };
 
-  const addChatMessage = (role, text) => {
-    setChatMessages((prev) => [...prev, { role, text }]);
+  const addChatMessage = (role, content) => {
+    setChatMessages((prev) => [...prev, { role, content }]);
   };
 
-  const coachReply = (userQuestion) => {
-    const scaffolds = [
-      "Starte mit einem klaren Betreff und nenne den Grund im ersten Satz.",
-      "Schließe mit einer höflichen Bitte um Rückmeldung und deiner Signatur.",
-      "Verbinde deine Punkte mit Konnektoren wie 'außerdem', 'deshalb', 'daher'.",
-      "Nutze mindestens einen Nebensatz mit 'weil' oder 'dass', um dein Niveau zu zeigen.",
-      "Halte Absätze kurz: Situation beschreiben, Wunsch formulieren, Abschluss.",
-    ];
+  const handleAskCoach = async () => {
+    const trimmed = ideaInput.trim();
+    if (!trimmed || ideasLoading) return;
 
-    const levelHint = selectedLetter
-      ? `Passe deine Sprache an Niveau ${selectedLetter.level} an und bleibe beim Thema "${selectedLetter.letter}".`
-      : "Bleib beim Prüfungsthema und verwende höfliche Strukturen.";
+    setIdeaError("");
+    const updatedMessages = [...chatMessages, { role: "user", content: trimmed }];
+    setChatMessages(updatedMessages);
+    setIdeaInput("");
+    setIdeasLoading(true);
 
-    const tip = scaffolds[chatMessages.length % scaffolds.length];
-
-    return `${levelHint} ${tip} Meine Empfehlung: ${
-      userQuestion || "Schreibe klare Sätze und vermeide sehr lange Schachtelungen."
-    }`;
-  };
-
-  const handleAskCoach = () => {
-    const trimmed = question.trim();
-    if (!trimmed) return;
-    addChatMessage("user", trimmed);
-    const reply = coachReply(trimmed);
-    addChatMessage("coach", reply);
-    setQuestion("");
+    try {
+      const { reply } = await fetchIdeasFromCoach({
+        messages: updatedMessages,
+        level,
+        idToken,
+      });
+      addChatMessage("assistant", reply);
+    } catch (err) {
+      console.error("Ideas generator error:", err);
+      const msg =
+        err?.response?.data?.error ||
+        err.message ||
+        "Could not fetch ideas from Herr Felix.";
+      setIdeaError(msg);
+    } finally {
+      setIdeasLoading(false);
+    }
   };
 
   const practiceTimerControls = (
@@ -417,22 +414,38 @@ const WritingPage = ({ mode = "course" }) => {
 
       {activeTab === "mark" && (
         <>
-          <SettingsForm
-            title="Mark my letter"
-            helperText="Wähle Teil und Niveau, füge deinen Brief ein und erhalte sofort Feedback."
-          />
-
           <section style={styles.card}>
-            <label style={styles.label}>Dein Brief</label>
+            <h3 style={styles.sectionTitle}>Mark my letter</h3>
+            <p style={styles.helperText}>
+              Paste your finished letter in one box. Herr Felix will score it with the new rubric and highlight what to fix.
+            </p>
+
+            <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
+              <label style={styles.label}>Level for feedback</label>
+              <select
+                value={level}
+                onChange={(e) => {
+                  setLevel(e.target.value);
+                  setError("");
+                }}
+                style={styles.select}
+              >
+                {ALLOWED_LEVELS.map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+
+            <label style={styles.label}>Your letter (single box)</label>
             <textarea
               value={typedAnswer}
               onChange={(e) => {
                 setError("");
                 setTypedAnswer(e.target.value);
               }}
-              placeholder="Füge deinen Text hier ein oder schreibe direkt..."
+              placeholder="Paste your finished letter or essay here for marking..."
               style={styles.textArea}
-              rows={7}
+              rows={9}
             />
 
             <div style={{ marginTop: 12 }}>
@@ -441,7 +454,7 @@ const WritingPage = ({ mode = "course" }) => {
                 onClick={sendTypedAnswerForCorrection}
                 disabled={loading}
               >
-                {loading ? "Analyzing..." : "Jetzt bewerten"}
+                {loading ? "Getting feedback..." : "Get AI feedback"}
               </button>
             </div>
 
@@ -452,7 +465,13 @@ const WritingPage = ({ mode = "course" }) => {
             )}
           </section>
 
-          <Feedback result={result} />
+          {markFeedback && (
+            <section style={styles.card}>
+              <h3 style={styles.sectionTitle}>AI feedback</h3>
+              <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+            </section>
+          )}
+
           <ResultHistory results={resultHistory} />
         </>
       )}
@@ -461,47 +480,61 @@ const WritingPage = ({ mode = "course" }) => {
         <section style={styles.card}>
           <h3 style={styles.sectionTitle}>Ideen-Generator</h3>
           <p style={styles.helperText}>
-            Frag nach Beispielsätzen, Formulierungen oder Strukturen. Der Coach
-            antwortet mit kompakten Tipps, damit du den Brief bestehst.
+            Füge deine Aufgabenstellung ein und chatte nur in einem Feld. Herr
+            Felix antwortet Schritt für Schritt mit dem neuen Coaching-Prompt.
           </p>
           <div style={styles.chatLog}>
             {chatMessages.map((msg, idx) => (
               <div
                 key={`${msg.role}-${idx}`}
                 style={
-                  msg.role === "coach"
+                  msg.role === "assistant"
                     ? styles.chatBubbleCoach
                     : styles.chatBubbleUser
                 }
               >
                 <strong style={{ display: "block", marginBottom: 4 }}>
-                  {msg.role === "coach" ? "Coach" : "Du"}
+                  {msg.role === "assistant" ? "Coach" : "Du"}
                 </strong>
-                <span>{msg.text}</span>
+                <span>{msg.content}</span>
               </div>
             ))}
           </div>
           <div style={{ marginTop: 12 }}>
-            <label style={styles.label}>Deine Frage</label>
+            <label style={styles.label}>Deine Frage (ein Feld)</label>
             <textarea
               style={styles.textareaSmall}
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Z. B. Wie beginne ich höflich? Wie bitte ich um Rückerstattung?"
+              value={ideaInput}
+              onChange={(e) => setIdeaInput(e.target.value)}
+              placeholder="Paste your exam question or the part you need help with."
               rows={3}
             />
           </div>
-          <div style={{ marginTop: 10, display: "flex", gap: 8 }}>
-            <button style={styles.primaryButton} onClick={handleAskCoach}>
-              Frage stellen
+          <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button
+              style={styles.primaryButton}
+              onClick={handleAskCoach}
+              disabled={ideasLoading}
+            >
+              {ideasLoading ? "Coach is typing..." : "Send to AI coach"}
             </button>
             <button
               style={styles.secondaryButton}
-              onClick={() => setChatMessages(chatMessages.slice(0, 1))}
+              onClick={() => {
+                setChatMessages([IDEA_COACH_INTRO]);
+                setIdeaError("");
+                setIdeaInput("");
+              }}
             >
               Chat zurücksetzen
             </button>
           </div>
+
+          {ideaError && (
+            <div style={{ ...styles.errorBox, marginTop: 8 }}>
+              <strong>Hinweis:</strong> {ideaError}
+            </div>
+          )}
         </section>
       )}
     </>
