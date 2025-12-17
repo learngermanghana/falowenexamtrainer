@@ -36,7 +36,7 @@ const StatCard = ({ label, value, helper }) => (
 );
 
 const CourseTab = () => {
-  const { user } = useAuth();
+  const { user, studentProfile } = useAuth();
   const [activeTab, setActiveTab] = useState("home");
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([
@@ -151,7 +151,7 @@ const CourseTab = () => {
 
   useEffect(() => {
     if (!user?.email) return;
-    const profile = deriveStudentProfile(user);
+    const profile = deriveStudentProfile(user, studentProfile);
     const storedCode = loadStudentCodeForEmail(user.email);
     const resolvedStudentCode = profile.studentCode || storedCode;
 
