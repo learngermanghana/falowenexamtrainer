@@ -124,6 +124,13 @@ const OnboardingChecklist = ({
 
   const allFinished = progress.done === progress.total;
 
+  useEffect(() => {
+    if (!allFinished || state.completed) return;
+    setState((prev) => ({ ...prev, completed: true }));
+  }, [allFinished, state.completed]);
+
+  if (state.completed) return null;
+
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
