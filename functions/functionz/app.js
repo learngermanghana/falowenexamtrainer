@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 const fsPromises = require("fs/promises");
+const bcrypt = require("bcryptjs");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 
@@ -153,6 +154,58 @@ app.get("/student", async (req, res) => {
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Failed to fetch student" });
+  }
+});
+
+app.post("/legacy/login", async (req, res) => {
+  try {
+    const { email, password, studentCode } = req.body || {};
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const providedPassword = typeof password === "string" ? password : "";
+    const normalizedStudentCode = String(studentCode || "").trim();
+
+    if (!providedPassword || (!normalizedEmail && !normalizedStudentCode)) {
+      return res.status(400).json({ error: "email or studentCode with password is required" });
+    }
+
+    let snapshot;
+
+    if (normalizedStudentCode) {
+      snapshot = await admin.firestore().collection("students").doc(normalizedStudentCode).get();
+    }
+
+    if (!snapshot || !snapshot.exists) {
+      const query = await admin
+        .firestore()
+        .collection("students")
+        .where("email", "==", normalizedEmail)
+        .limit(1)
+        .get();
+      snapshot = query.docs[0];
+    }
+
+    if (!snapshot || !snapshot.exists) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    const student = snapshot.data() || {};
+    const hashedPassword = student.password;
+
+    if (!hashedPassword) {
+      return res.status(400).json({ error: "Account has no password; please contact support." });
+    }
+
+    const isValid = await bcrypt.compare(providedPassword, hashedPassword);
+    if (!isValid) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const { password: _hiddenPassword, ...studentSafe } = student;
+
+    return res.json({ id: snapshot.id, ...studentSafe });
+  } catch (e) {
+    console.error("/legacy/login error", e);
+    return res.status(500).json({ error: "Failed to authenticate student" });
   }
 });
 

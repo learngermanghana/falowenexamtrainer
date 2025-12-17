@@ -53,6 +53,33 @@ rows into the approval spreadsheet with the helper script at
 You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
 for near-real-time mirroring between Firebase and Google Sheets.
 
+## Legacy student login (pre-Firebase accounts)
+For historic student rows that only stored an email, student code, and a
+bcrypt-hashed password in Firestore, the backend exposes a `/legacy/login`
+endpoint. It validates the supplied password against the stored hash and
+returns the student record without the password.
+
+Example request (from the repository root while the backend is running):
+
+```
+curl -X POST http://localhost:5000/api/legacy/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"moxflex@live.com","password":"<plaintext password>"}'
+```
+
+You can also pass `studentCode` instead of `email` when the document ID is
+known:
+
+```
+{
+  "studentCode": "ABC123",
+  "password": "<plaintext password>"
+}
+```
+
+On success, the response includes the `id` (doc ID) and all student fields
+except `password`, allowing the React app to display the legacy profile data.
+
 ## Install dependencies
 From the repository root, install backend dependencies:
 
