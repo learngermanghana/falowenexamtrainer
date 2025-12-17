@@ -11,6 +11,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [location, setLocation] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emergencyContact, setEmergencyContact] = useState("");
   const [password, setPassword] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("B1");
   const [loading, setLoading] = useState(false);
@@ -30,6 +33,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           firstName,
           level: selectedLevel,
           studentCode,
+          location,
+          phoneNumber,
+          emergencyContact,
         });
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
@@ -104,6 +110,50 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 onChange={(e) => setFirstName(e.target.value)}
                 style={inputStyle}
               />
+
+              <label style={styles.label}>Location</label>
+              <input
+                type="text"
+                required
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                style={inputStyle}
+                placeholder="Accra, Ghana"
+              />
+
+              <label style={styles.label}>Phone number</label>
+              <input
+                type="tel"
+                required
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                style={inputStyle}
+                placeholder="+233 501 234 567"
+              />
+
+              <label style={styles.label}>Emergency contact (name & phone)</label>
+              <input
+                type="text"
+                required
+                value={emergencyContact}
+                onChange={(e) => setEmergencyContact(e.target.value)}
+                style={inputStyle}
+                placeholder="Amina Doe – +233 20 000 0000"
+              />
+
+              <label style={styles.label}>Your current level</label>
+              <select
+                required
+                value={selectedLevel}
+                onChange={(event) => setSelectedLevel(event.target.value)}
+                style={{ ...styles.select, height: 44 }}
+              >
+                {ALLOWED_LEVELS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
             </>
           )}
 
@@ -125,24 +175,6 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
           />
-
-          {mode === "signup" && (
-            <>
-              <label style={styles.label}>Your current level</label>
-              <select
-                required
-                value={selectedLevel}
-                onChange={(event) => setSelectedLevel(event.target.value)}
-                style={{ ...styles.select, height: 44 }}
-              >
-                {ALLOWED_LEVELS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </>
-          )}
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading

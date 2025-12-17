@@ -12,6 +12,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [location, setLocation] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [emergencyContact, setEmergencyContact] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,6 +44,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
         level: selectedLevel,
         studentCode,
         className: selectedClass,
+        location,
+        phoneNumber,
+        emergencyContact,
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
@@ -92,6 +98,36 @@ const SignUpPage = ({ onLogin, onBack }) => {
             onChange={(e) => setFirstName(e.target.value)}
             style={inputStyle}
             placeholder="Abigail"
+          />
+
+          <label style={styles.label}>Location</label>
+          <input
+            type="text"
+            required
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            style={inputStyle}
+            placeholder="Accra, Ghana"
+          />
+
+          <label style={styles.label}>Phone number</label>
+          <input
+            type="tel"
+            required
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            style={inputStyle}
+            placeholder="+233 501 234 567"
+          />
+
+          <label style={styles.label}>Emergency contact (name &amp; phone)</label>
+          <input
+            type="text"
+            required
+            value={emergencyContact}
+            onChange={(e) => setEmergencyContact(e.target.value)}
+            style={inputStyle}
+            placeholder="Amina Doe – +233 20 000 0000"
           />
 
           <label style={styles.label}>Email</label>

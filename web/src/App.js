@@ -20,15 +20,18 @@ import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
 import LevelOnboarding from "./components/LevelOnboarding";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
+import { AccessProvider, useAccess } from "./context/AccessContext";
 import "./App.css";
 
-function App() {
+function AppContent() {
   const { user, loading: authLoading, logout, enableNotifications, notificationStatus } =
     useAuth();
+  const { hasExamAccess, courseAccessLabel } = useAccess();
   const [activePage, setActivePage] = useState("plan");
   const [authView, setAuthView] = useState("landing");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
+  const [accessWarning, setAccessWarning] = useState("");
 
   const isFocusedView = activePage === "course" || activePage === "exam";
   const generalNavItems = [
@@ -57,10 +60,23 @@ function App() {
     }
   };
 
+  const handleSelect = (key) => {
+    if (key === "exam" && !hasExamAccess) {
+      setAccessWarning(
+        "Exam simulations unlock after full Paystack payment. Full-course students keep automatic access for 6 months."
+      );
+      setActivePage("plan");
+      return;
+    }
+
+    setAccessWarning("");
+    setActivePage(key);
+  };
+
   const renderMain = () => {
-    if (activePage === "plan") return <PlanPage onSelect={setActivePage} />;
+    if (activePage === "plan") return <PlanPage onSelect={handleSelect} />;
     if (activePage === "course") return <CourseTab />;
-    if (activePage === "home") return <HomeActions onSelect={setActivePage} />;
+    if (activePage === "home") return <HomeActions onSelect={handleSelect} />;
     if (activePage === "speaking") return <SpeakingPage />;
     if (activePage === "writing") return <WritingPage />;
     if (activePage === "vocab") return <VocabPage />;
@@ -71,7 +87,24 @@ function App() {
     if (activePage === "discussion") return <ClassDiscussionPage />;
     if (activePage === "level-check") return <PlacementCheck />;
     if (activePage === "daily") return <SpeakingPage mode="daily" />;
-    if (activePage === "exam") return <SpeakingPage mode="exam" />;
+    if (activePage === "exam") {
+      if (!hasExamAccess) {
+        return (
+          <div style={{ ...styles.card, background: "#fff7ed", borderColor: "#f97316" }}>
+            <h2 style={{ ...styles.sectionTitle, marginTop: 0 }}>Exam access locked</h2>
+            <p style={{ ...styles.helperText, marginBottom: 6 }}>
+              Complete a full Paystack payment to unlock fully automated exams for 6 months. Students who
+              already paid the full course fee see exams automatically.
+            </p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Current access: <strong>{courseAccessLabel}</strong>.
+            </p>
+          </div>
+        );
+      }
+
+      return <SpeakingPage mode="exam" />;
+    }
     return <SpeakingPage />;
   };
 
@@ -151,12 +184,18 @@ function App() {
             <button
               key={item.key}
               style={activePage === item.key ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActivePage(item.key)}
+              onClick={() => handleSelect(item.key)}
             >
               {item.label}
             </button>
           ))}
         </nav>
+
+        {accessWarning && (
+          <div style={{ ...styles.errorBox, background: "#fff7ed", color: "#9a3412", borderColor: "#fb923c" }}>
+            {accessWarning}
+          </div>
+        )}
 
         {isFocusedView ? (
           <div style={styles.focusNotice}>
@@ -175,6 +214,14 @@ function App() {
         </div>
       </div>
     </ExamProvider>
+  );
+}
+
+function App() {
+  return (
+    <AccessProvider>
+      <AppContent />
+    </AccessProvider>
   );
 }
 

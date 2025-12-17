@@ -1,6 +1,8 @@
 import React from "react";
 import { styles } from "../styles";
 import { ALLOWED_LEVELS, useExam } from "../context/ExamContext";
+import { classCatalog } from "../data/classCatalog";
+import { useAccess } from "../context/AccessContext";
 
 const LEVEL_DETAILS = {
   A1: {
@@ -23,6 +25,7 @@ const LEVEL_DETAILS = {
 
 const LevelOnboarding = () => {
   const { level, setLevel, levelConfirmed } = useExam();
+  const { state, setPreferredClass, setExamOnlyFocus } = useAccess();
 
   if (levelConfirmed) {
     return null;
@@ -62,6 +65,51 @@ const LevelOnboarding = () => {
             </button>
           );
         })}
+      </div>
+
+      <div style={{ marginTop: 10 }}>
+        <h3 style={{ margin: "0 0 6px 0" }}>Choose a live class or exam-only focus</h3>
+        <p style={{ ...styles.helperText, marginTop: 4 }}>
+          Courses are tutor-supported with live help. If you only want automated exam prep, pick the exam focus instead.
+        </p>
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {Object.entries(classCatalog).map(([className, meta]) => (
+            <button
+              key={className}
+              style={{
+                ...styles.uploadCard,
+                textAlign: "left",
+                cursor: "pointer",
+                borderColor: state?.preferredClass === className ? "#4f46e5" : "#e5e7eb",
+                background: state?.preferredClass === className ? "#eef2ff" : "#ffffff",
+              }}
+              onClick={() => setPreferredClass(className)}
+            >
+              <div style={{ fontWeight: 700, marginBottom: 4 }}>{className}</div>
+              <div style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
+                {meta.startDate} – {meta.endDate}
+              </div>
+              <div style={{ ...styles.helperText, margin: 0 }}>
+                {meta.schedule.map((slot) => `${slot.day} ${slot.startTime}-${slot.endTime}`).join(" · ")}
+              </div>
+            </button>
+          ))}
+          <button
+            style={{
+              ...styles.uploadCard,
+              textAlign: "left",
+              cursor: "pointer",
+              borderColor: state?.focus === "exam-only" ? "#4f46e5" : "#e5e7eb",
+              background: state?.focus === "exam-only" ? "#eef2ff" : "#ffffff",
+            }}
+            onClick={setExamOnlyFocus}
+          >
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Exam prep only</div>
+            <div style={{ ...styles.helperText, margin: 0 }}>
+              Skip live classes and focus on the automated speaking and writing exams.
+            </div>
+          </button>
+        </div>
       </div>
     </div>
   );
