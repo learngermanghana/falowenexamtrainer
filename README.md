@@ -26,6 +26,33 @@ Create a `.env` file inside `web/` for the frontend (optional when using the def
 REACT_APP_BACKEND_URL=http://localhost:5000
 ```
 
+## Automate Firebase signups to Google Sheets
+If your new signup flow writes student records to Firestore, you can mirror those
+rows into the approval spreadsheet with the helper script at
+`functionz/googleSheetsSync.js`:
+
+1. Create a Google Cloud service account with "Google Sheets API" access and a
+   Firebase Admin SDK key. Download the JSON key file and either point
+   `GOOGLE_SERVICE_ACCOUNT_FILE` to it or base64-encode it into
+   `GOOGLE_SERVICE_ACCOUNT_KEY`.
+2. Share the destination sheet (e.g., your approval sheet) with the service
+   account email. Set `GOOGLE_SHEETS_ID` to the sheet ID (the long string in the
+   sheet URL) and optionally `GOOGLE_SHEETS_RANGE` to change the tab/range
+   (default: `Signups!A:E`).
+3. Ensure each Firestore signup document contains `firstName`, `lastName`,
+   `email`, `level`, `createdAt`, and a boolean `syncedToSheets: false` field so
+   the script can find unsent entries. The script marks `syncedToSheets` true
+   and adds a `syncedAt` timestamp after a successful append.
+4. Run the sync from the repository root:
+   ```
+   GOOGLE_SHEETS_ID="<target_sheet_id>" \
+   GOOGLE_SERVICE_ACCOUNT_FILE=./service-account.json \
+   node functionz/googleSheetsSync.js
+   ```
+
+You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
+for near-real-time mirroring between Firebase and Google Sheets.
+
 ## Install dependencies
 From the repository root, install backend dependencies:
 
