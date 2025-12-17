@@ -14,6 +14,7 @@ import {
   setDoc,
   doc,
   serverTimestamp,
+  isFirebaseConfigured,
 } from "../firebase";
 
 const AuthContext = createContext();
@@ -38,6 +39,17 @@ export const AuthProvider = ({ children }) => {
   const [messagingToken, setMessagingToken] = useState(null);
 
   useEffect(() => {
+    if (!isFirebaseConfigured) {
+      setAuthError("Firebase ist nicht konfiguriert. Bitte REACT_APP_FIREBASE_* Variablen setzen.");
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isFirebaseConfigured || !auth) {
+      return undefined;
+    }
+
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       setStudentProfile(null);
@@ -67,6 +79,9 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signup = async (email, password, profile = {}) => {
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
+    }
     setAuthError("");
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     const token = await credential.user.getIdToken();
@@ -94,6 +109,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = async (email, password) => {
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
+    }
     setAuthError("");
     const credential = await signInWithEmailAndPassword(auth, email, password);
     const token = await credential.user.getIdToken();
@@ -104,12 +122,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    if (!isFirebaseConfigured || !auth) {
+      setUser(null);
+      setStudentProfile(null);
+      setIdToken(null);
+      return;
+    }
     await signOut(auth);
     setMessagingToken(null);
     setStudentProfile(null);
   };
 
   const enableNotifications = async () => {
+    if (!isFirebaseConfigured) {
+      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
+    }
     setNotificationStatus("pending");
     try {
       const token = await requestMessagingToken();

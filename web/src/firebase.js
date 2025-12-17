@@ -33,18 +33,31 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
+const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
+
+const missingConfigError = new Error(
+  "Firebase config is missing. Please set REACT_APP_FIREBASE_* env vars."
+);
+
 const getFirebaseApp = () => {
-  if (!firebaseConfig.apiKey) {
-    throw new Error("Firebase config is missing. Please set REACT_APP_FIREBASE_* env vars.");
+  if (!isFirebaseConfigured) {
+    throw missingConfigError;
   }
   return getApps().length ? getApp() : initializeApp(firebaseConfig);
 };
 
-const app = getFirebaseApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app = isFirebaseConfigured ? getFirebaseApp() : null;
+const auth = app ? getAuth(app) : null;
+const db = app ? getFirestore(app) : null;
+
+const assertFirebaseReady = () => {
+  if (!isFirebaseConfigured || !app) {
+    throw missingConfigError;
+  }
+};
 
 const requestMessagingToken = async () => {
+  assertFirebaseReady();
   const supported = await isSupported().catch(() => false);
   if (!supported) {
     throw new Error("Browser does not support Firebase Cloud Messaging.");
@@ -60,6 +73,7 @@ const requestMessagingToken = async () => {
 };
 
 const listenForForegroundMessages = async (callback) => {
+  if (!isFirebaseConfigured || !app) return () => {};
   const supported = await isSupported().catch(() => false);
   if (!supported) return () => {};
   const messaging = getMessaging(app);
@@ -70,6 +84,7 @@ export {
   app,
   auth,
   db,
+  isFirebaseConfigured,
   onIdTokenChanged,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
