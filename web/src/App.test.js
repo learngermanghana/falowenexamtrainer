@@ -7,6 +7,7 @@ jest.mock("./context/AuthContext", () => ({
     logout: jest.fn(),
     enableNotifications: jest.fn(),
     notificationStatus: "idle",
+    messagingToken: null,
   }),
 }));
 
