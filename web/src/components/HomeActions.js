@@ -17,19 +17,25 @@ const HomeActions = ({ onSelect }) => {
           style={{ ...styles.primaryButton, padding: "14px 16px", fontSize: 16 }}
           onClick={() => onSelect("course")}
         >
-          Kursbuch öffnen
+          Kursbuch öffnen (open course book)
         </button>
         <button
           style={{ ...styles.secondaryButton, padding: "14px 16px", fontSize: 16 }}
           onClick={() => onSelect("exam")}
         >
-          Zur Prüfungssimulation
+          Zur Prüfungssimulation (go to exam practice)
         </button>
         <button
           style={{ ...styles.secondaryButton, padding: "14px 16px", fontSize: 16 }}
           onClick={() => onSelect("discussion")}
         >
-          Zur Klassendiskussion
+          Zur Klassendiskussion (class discussion)
+        </button>
+        <button
+          style={{ ...styles.secondaryButton, padding: "14px 16px", fontSize: 16 }}
+          onClick={() => onSelect("account")}
+        >
+          Konto, Vertrag &amp; Zahlungen (account &amp; payments)
         </button>
       </div>
     </div>
