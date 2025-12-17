@@ -14,7 +14,7 @@
     }
   ],
   "env": {
-    "REACT_APP_BACKEND_URL": "https://europe-west1-language-academy-3e1de.cloudfunctions.net/api"
+    "REACT_APP_BACKEND_URL": "https://europe-west1-language-academy-3e1de.cloudfunctions.net"
   },
   "routes": [
     {
