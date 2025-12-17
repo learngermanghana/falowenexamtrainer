@@ -2,36 +2,20 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
 import { styles } from "../styles";
-
-const STORAGE_KEY = "class-discussion-threads";
-const isBrowser = typeof window !== "undefined";
-
-const createId = () =>
-  typeof crypto !== "undefined" && crypto.randomUUID
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2);
-
-const loadThreads = () => {
-  if (!isBrowser) return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    console.warn("Failed to load discussion threads", error);
-    return [];
-  }
-};
-
-const persistThreads = (threads) => {
-  if (!isBrowser) return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(threads));
-  } catch (error) {
-    console.warn("Failed to persist discussion threads", error);
-  }
-};
+import {
+  addDoc,
+  collection,
+  collectionGroup,
+  db,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  Timestamp,
+  updateDoc,
+} from "../firebase";
 
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "Kein Timer";
@@ -46,9 +30,13 @@ const formatTimeRemaining = (expiresAt, now) => {
 const ClassDiscussionPage = () => {
   const { user } = useAuth();
   const [threads, setThreads] = useState([]);
+  const [repliesByThread, setRepliesByThread] = useState({});
   const [now, setNow] = useState(Date.now());
   const [replyDrafts, setReplyDrafts] = useState({});
   const [editingReply, setEditingReply] = useState(null);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSavingThread, setIsSavingThread] = useState(false);
   const [form, setForm] = useState({
     lessonId: "",
     topic: "",
@@ -76,31 +64,85 @@ const ClassDiscussionPage = () => {
   }, []);
 
   useEffect(() => {
-    setThreads(loadThreads());
+    if (!db) {
+      setError("Firebase ist nicht konfiguriert. Bitte richte Firestore ein, um Diskussionen zu teilen.");
+      setIsLoading(false);
+      return;
+    }
+
+    const threadsQuery = query(collection(db, "discussionThreads"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(
+      threadsQuery,
+      (snapshot) => {
+        const nextThreads = snapshot.docs.map((docSnapshot) => {
+          const data = docSnapshot.data();
+          return {
+            id: docSnapshot.id,
+            lessonId: data.lessonId || "",
+            lessonLabel: data.lessonLabel || "",
+            topic: data.topic || "",
+            question: data.question || "",
+            extraLink: data.extraLink || "",
+            timerMinutes: data.timerMinutes || 0,
+            createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
+            createdBy: data.createdBy || "Tutor",
+            createdByUid: data.createdByUid || null,
+            expiresAt: data.expiresAt?.toMillis ? data.expiresAt.toMillis() : data.expiresAt || null,
+          };
+        });
+        setError("");
+        setThreads(nextThreads);
+        setIsLoading(false);
+      },
+      (err) => {
+        console.error("Failed to subscribe to discussion threads", err);
+        setError("Diskussionen konnten nicht geladen werden. Versuche es später erneut.");
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
-    const handleStorage = (event) => {
-      if (event.key === STORAGE_KEY) {
-        setThreads(loadThreads());
+    if (!db) return undefined;
+
+    const repliesQuery = query(collectionGroup(db, "replies"), orderBy("createdAt", "asc"));
+    const unsubscribe = onSnapshot(
+      repliesQuery,
+      (snapshot) => {
+        const grouped = {};
+        snapshot.forEach((docSnapshot) => {
+          const parentThread = docSnapshot.ref.parent.parent;
+          if (!parentThread) return;
+          const threadId = parentThread.id;
+          const data = docSnapshot.data();
+          const reply = {
+            id: docSnapshot.id,
+            author: data.author || "Student",
+            text: data.text || "",
+            createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
+            editedAt: data.editedAt?.toMillis ? data.editedAt.toMillis() : data.editedAt || null,
+          };
+          if (!grouped[threadId]) grouped[threadId] = [];
+          grouped[threadId].push(reply);
+        });
+        setError("");
+        setRepliesByThread(grouped);
+      },
+      (err) => {
+        console.error("Failed to subscribe to replies", err);
+        setError("Antworten konnten nicht geladen werden. Versuche es später erneut.");
       }
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
+    );
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
-
-  const updateThreads = (updater) => {
-    setThreads((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater;
-      persistThreads(next);
-      return next;
-    });
-  };
 
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
 
@@ -114,91 +156,106 @@ const ClassDiscussionPage = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleCreateThread = (event) => {
+  const handleCreateThread = async (event) => {
     event.preventDefault();
-    if (!form.question.trim()) return;
+    if (!form.question.trim() || !db) return;
 
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
-    const newThread = {
-      id: createId(),
-      lessonId: lesson?.id,
-      lessonLabel: lesson?.label,
-      topic: form.topic || lesson?.topic,
-      question: form.question,
-      extraLink: form.extraLink,
-      timerMinutes: Number(form.timerMinutes) || 0,
-      createdAt: Date.now(),
-      createdBy: user?.email || "Tutor",
-      expiresAt: form.timerMinutes ? Date.now() + Number(form.timerMinutes) * 60000 : null,
-      replies: [],
-    };
+    const timerMinutes = Number(form.timerMinutes) || 0;
+    const expiresAtMillis = timerMinutes ? Date.now() + timerMinutes * 60000 : null;
 
-    updateThreads((prev) => [newThread, ...prev]);
-    setForm({
-      lessonId: lesson?.id || "",
-      topic: lesson?.topic || "",
-      question: "",
-      extraLink: "",
-      timerMinutes: form.timerMinutes,
-    });
+    setIsSavingThread(true);
+    setError("");
+
+    try {
+      await addDoc(collection(db, "discussionThreads"), {
+        lessonId: lesson?.id,
+        lessonLabel: lesson?.label,
+        topic: form.topic || lesson?.topic,
+        question: form.question,
+        extraLink: form.extraLink,
+        timerMinutes,
+        createdAt: serverTimestamp(),
+        createdBy: user?.email || "Tutor",
+        createdByUid: user?.uid || null,
+        expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
+      });
+      setForm({
+        lessonId: lesson?.id || "",
+        topic: lesson?.topic || "",
+        question: "",
+        extraLink: "",
+        timerMinutes,
+      });
+    } catch (err) {
+      console.error("Failed to create discussion thread", err);
+      setError("Thread konnte nicht erstellt werden. Bitte versuche es erneut.");
+    } finally {
+      setIsSavingThread(false);
+    }
   };
 
-  const handleReply = (threadId) => {
+  const handleReply = async (threadId) => {
     const draft = replyDrafts[threadId] || "";
-    if (!draft.trim()) return;
+    if (!draft.trim() || !db) return;
 
-    const reply = {
-      id: createId(),
-      author: user?.email || "Student", 
-      text: draft,
-      createdAt: Date.now(),
-    };
+    setError("");
 
-    updateThreads((prev) =>
-      prev.map((thread) =>
-        thread.id === threadId
-          ? { ...thread, replies: [...thread.replies, reply] }
-          : thread
-      )
-    );
-    setReplyDrafts((prev) => ({ ...prev, [threadId]: "" }));
+    try {
+      const threadRef = doc(db, "discussionThreads", threadId);
+      await addDoc(collection(threadRef, "replies"), {
+        author: user?.email || "Student",
+        text: draft,
+        createdAt: serverTimestamp(),
+      });
+      setReplyDrafts((prev) => ({ ...prev, [threadId]: "" }));
+    } catch (err) {
+      console.error("Failed to post reply", err);
+      setError("Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.");
+    }
   };
 
-  const handleDeleteReply = (threadId, replyId) => {
-    updateThreads((prev) =>
-      prev.map((thread) =>
-        thread.id === threadId
-          ? { ...thread, replies: thread.replies.filter((reply) => reply.id !== replyId) }
-          : thread
-      )
-    );
-    if (editingReply?.replyId === replyId) {
-      setEditingReply(null);
+  const handleDeleteReply = async (threadId, reply) => {
+    if (!db) return;
+    if (reply.author && user?.email && reply.author !== user.email) return;
+
+    try {
+      await deleteDoc(doc(db, "discussionThreads", threadId, "replies", reply.id));
+      if (editingReply?.replyId === reply.id) {
+        setEditingReply(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete reply", err);
+      setError("Antwort konnte nicht gelöscht werden.");
     }
   };
 
   const handleStartEdit = (threadId, reply) => {
-    setEditingReply({ threadId, replyId: reply.id, text: reply.text });
+    setEditingReply({ threadId, replyId: reply.id, text: reply.text, author: reply.author });
   };
 
-  const handleSaveEdit = () => {
-    if (!editingReply || !editingReply.text.trim()) return;
-    updateThreads((prev) =>
-      prev.map((thread) =>
-        thread.id === editingReply.threadId
-          ? {
-              ...thread,
-              replies: thread.replies.map((reply) =>
-                reply.id === editingReply.replyId ? { ...reply, text: editingReply.text, editedAt: Date.now() } : reply
-              ),
-            }
-          : thread
-      )
-    );
-    setEditingReply(null);
+  const handleSaveEdit = async () => {
+    if (!editingReply || !editingReply.text.trim() || !db) return;
+    if (editingReply.author && user?.email && editingReply.author !== user.email) return;
+
+    try {
+      await updateDoc(doc(db, "discussionThreads", editingReply.threadId, "replies", editingReply.replyId), {
+        text: editingReply.text,
+        editedAt: serverTimestamp(),
+      });
+      setEditingReply(null);
+    } catch (err) {
+      console.error("Failed to edit reply", err);
+      setError("Antwort konnte nicht bearbeitet werden.");
+    }
   };
 
   const isReplyOwner = (reply) => reply.author && user?.email && reply.author === user.email;
+
+  const threadsWithReplies = useMemo(
+    () => threads.map((thread) => ({ ...thread, replies: repliesByThread[thread.id] || [] })),
+    [threads, repliesByThread]
+  );
 
   const renderThread = (thread) => (
     <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
@@ -240,7 +297,7 @@ const ClassDiscussionPage = () => {
                       </button>
                       <button
                         style={{ ...styles.dangerButton, padding: "6px 10px" }}
-                        onClick={() => handleDeleteReply(thread.id, reply.id)}
+                        onClick={() => handleDeleteReply(thread.id, reply)}
                       >
                         Löschen
                       </button>
@@ -372,7 +429,7 @@ const ClassDiscussionPage = () => {
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <button style={styles.primaryButton} type="submit">
+            <button style={styles.primaryButton} type="submit" disabled={isSavingThread}>
               Diskussion posten
             </button>
           </div>
@@ -380,7 +437,17 @@ const ClassDiscussionPage = () => {
       </div>
 
       <div style={{ display: "grid", gap: 12 }}>
-        {threads.length === 0 ? (
+        {error ? (
+          <div style={{ ...styles.card, borderColor: "#fca5a5", background: "#fef2f2" }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Fehler</div>
+            <p style={{ ...styles.helperText, margin: 0 }}>{error}</p>
+          </div>
+        ) : isLoading ? (
+          <div style={styles.card}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Lade Diskussionen ...</div>
+            <p style={{ ...styles.helperText, margin: 0 }}>Die neuesten Beiträge werden abgerufen.</p>
+          </div>
+        ) : threadsWithReplies.length === 0 ? (
           <div style={styles.card}>
             <div style={{ fontWeight: 700, marginBottom: 6 }}>Keine Diskussionen gestartet</div>
             <p style={{ ...styles.helperText, margin: 0 }}>
@@ -388,7 +455,7 @@ const ClassDiscussionPage = () => {
             </p>
           </div>
         ) : (
-          threads.map((thread) => renderThread(thread))
+          threadsWithReplies.map((thread) => renderThread(thread))
         )}
       </div>
     </div>
