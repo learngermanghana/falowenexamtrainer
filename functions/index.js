@@ -1,14 +1,36 @@
 const { setGlobalOptions } = require("firebase-functions/v2");
 const { onRequest } = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const admin = require("firebase-admin");
 
-const app = require("./functionz/server");
+admin.initializeApp();
 
-// optional: pick a region close to you; change if you want
-setGlobalOptions({ maxInstances: 10, region: "europe-west1" });
+setGlobalOptions({ maxInstances: 10 });
 
-// Deploy as: https://...cloudfunctions.net/api
-exports.api = onRequest({ cors: true }, (req, res) => {
-  logger.info("API request", { path: req.path, method: req.method });
-  return app(req, res);
-});
+const app = require("./functionz/app");
+const { appendStudentToStudentsSheetSafely } = require("./functionz/studentsSheet");
+
+exports.api = onRequest(
+  {
+    region: "europe-west1",
+    cors: true
+  },
+  app
+);
+
+// When a student doc is created in Firestore, append to Students sheet (safe header-mapped append)
+exports.onStudentCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "students/{studentCode}"
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+
+    const student = snap.data();
+    if (!student) return;
+
+    await appendStudentToStudentsSheetSafely(student);
+  }
+);
