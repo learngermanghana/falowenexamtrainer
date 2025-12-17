@@ -30,12 +30,48 @@ function App() {
     logout,
     enableNotifications,
     notificationStatus,
+    messagingToken,
     authError,
   } = useAuth();
   const [activePage, setActivePage] = useState("plan");
   const [authView, setAuthView] = useState("landing");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
+
+  const notificationLabel = () => {
+    switch (notificationStatus) {
+      case "granted":
+        return "Push ready";
+      case "pending":
+        return "Enabling ...";
+      case "stale":
+        return "Refresh push token";
+      case "blocked":
+        return "Push blocked";
+      case "error":
+        return "Retry push setup";
+      default:
+        return "Allow push notifications";
+    }
+  };
+
+  const notificationHelper = () => {
+    if (notificationStatus === "blocked") {
+      return "Browser blocked push notifications. Update site permissions and try again.";
+    }
+    if (notificationStatus === "stale") {
+      return "We found an old push token on your profile. Refresh to keep notifications working.";
+    }
+    if (notificationStatus === "error") {
+      return notificationError || "Could not enable push notifications.";
+    }
+    if (notificationMessage) return notificationMessage;
+    if (notificationError) return notificationError;
+    if (messagingToken) {
+      return `Push token synced (${messagingToken.slice(0, 8)}…)`;
+    }
+    return "";
+  };
 
   const isFocusedView = activePage === "course" || activePage === "exam";
   const generalNavItems = [
@@ -157,23 +193,26 @@ function App() {
               <button
                 style={styles.secondaryButton}
                 onClick={handleEnableNotifications}
-                disabled={notificationStatus === "pending" || notificationStatus === "granted"}
+                disabled={
+                  notificationStatus === "pending" || notificationStatus === "granted" || notificationStatus === "blocked"
+                }
               >
-                {notificationStatus === "granted"
-                  ? "Push ready"
-                  : notificationStatus === "pending"
-                  ? "Enabling ..."
-                  : "Allow push notifications"}
+                {notificationLabel()}
               </button>
               <button style={styles.dangerButton} onClick={logout}>
                 Logout
               </button>
             </div>
-            {notificationMessage && (
-              <div style={{ ...styles.helperText, margin: 0 }}>{notificationMessage}</div>
-            )}
-            {notificationError && (
-              <div style={{ ...styles.errorBox, marginTop: 4 }}>{notificationError}</div>
+            {notificationHelper() && (
+              <div
+                style={
+                  notificationStatus === "error"
+                    ? { ...styles.errorBox, marginTop: 4 }
+                    : { ...styles.helperText, margin: 0 }
+                }
+              >
+                {notificationHelper()}
+              </div>
             )}
           </div>
         </header>

@@ -13,8 +13,10 @@ import {
   getDocs,
   setDoc,
   doc,
+  updateDoc,
   serverTimestamp,
   isFirebaseConfigured,
+  deleteField,
 } from "../firebase";
 
 const AuthContext = createContext();
@@ -38,6 +40,33 @@ export const AuthProvider = ({ children }) => {
   const [notificationStatus, setNotificationStatus] = useState("idle");
   const [messagingToken, setMessagingToken] = useState(null);
 
+  const persistMessagingToken = async (token, studentId) => {
+    if (!studentId || !token) return;
+    const studentRef = doc(db, "students", studentId);
+    await setDoc(
+      studentRef,
+      { messagingToken: token, messagingTokenUpdatedAt: serverTimestamp() },
+      { merge: true }
+    );
+    setStudentProfile((prev) =>
+      prev?.id === studentId ? { ...prev, messagingToken: token } : prev
+    );
+  };
+
+  const revokeMessagingToken = async (studentId) => {
+    if (!studentId) return;
+    const studentRef = doc(db, "students", studentId);
+    await updateDoc(studentRef, {
+      messagingToken: deleteField(),
+      messagingTokenUpdatedAt: serverTimestamp(),
+    });
+    setStudentProfile((prev) =>
+      prev?.id === studentId
+        ? { ...prev, messagingToken: undefined }
+        : prev
+    );
+  };
+
   useEffect(() => {
     if (!isFirebaseConfigured) {
       setAuthError("Firebase ist nicht konfiguriert. Bitte REACT_APP_FIREBASE_* Variablen setzen.");
@@ -59,6 +88,7 @@ export const AuthProvider = ({ children }) => {
         setIdToken(null);
         setLoading(false);
         setMessagingToken(null);
+        setNotificationStatus("idle");
         return;
       }
 
@@ -67,6 +97,7 @@ export const AuthProvider = ({ children }) => {
         setIdToken(token);
         const profile = await fetchStudentProfileByEmail(firebaseUser.email);
         setStudentProfile(profile);
+        setMessagingToken(profile?.messagingToken || null);
       } catch (error) {
         console.error("Failed to fetch ID token or profile", error);
         setAuthError("Konnte Login-Token nicht laden.");
@@ -105,6 +136,7 @@ export const AuthProvider = ({ children }) => {
 
     await setDoc(studentsRef, payload, { merge: true });
     setStudentProfile({ id: studentsRef.id, ...payload });
+    setNotificationStatus("idle");
     return credential;
   };
 
@@ -118,6 +150,7 @@ export const AuthProvider = ({ children }) => {
     setIdToken(token);
     const profile = await fetchStudentProfileByEmail(email);
     setStudentProfile(profile);
+    setMessagingToken(profile?.messagingToken || null);
     return credential;
   };
 
@@ -128,8 +161,16 @@ export const AuthProvider = ({ children }) => {
       setIdToken(null);
       return;
     }
+    if (studentProfile?.id && studentProfile.messagingToken) {
+      try {
+        await revokeMessagingToken(studentProfile.id);
+      } catch (error) {
+        console.error("Failed to revoke messaging token", error);
+      }
+    }
     await signOut(auth);
     setMessagingToken(null);
+    setNotificationStatus("idle");
     setStudentProfile(null);
   };
 
@@ -141,6 +182,9 @@ export const AuthProvider = ({ children }) => {
     try {
       const token = await requestMessagingToken();
       setMessagingToken(token);
+      if (studentProfile?.id) {
+        await persistMessagingToken(token, studentProfile.id);
+      }
       setNotificationStatus("granted");
       return token;
     } catch (error) {
@@ -149,6 +193,45 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+
+  useEffect(() => {
+    const refreshMessagingToken = async () => {
+      if (!user || !studentProfile || !isFirebaseConfigured) return;
+
+      const storedToken = studentProfile.messagingToken || null;
+
+      if (typeof Notification !== "undefined") {
+        if (Notification.permission === "denied") {
+          setNotificationStatus("blocked");
+          return;
+        }
+
+        if (Notification.permission === "default") {
+          setNotificationStatus(storedToken ? "stale" : "idle");
+          return;
+        }
+      }
+
+      if (!storedToken) {
+        setNotificationStatus("pending");
+      }
+
+      try {
+        const token = await requestMessagingToken();
+        setMessagingToken(token);
+        if (studentProfile.messagingToken !== token) {
+          await persistMessagingToken(token, studentProfile.id);
+        }
+        setNotificationStatus("granted");
+      } catch (error) {
+        console.error("Failed to refresh messaging token on sign-in", error);
+        setNotificationStatus(storedToken ? "stale" : "error");
+      }
+    };
+
+    refreshMessagingToken();
+    // Only re-run when a new user or profile is loaded to avoid repeated token prompts.
+  }, [user?.uid, studentProfile?.id]);
 
   const value = useMemo(
     () => ({

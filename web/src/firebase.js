@@ -28,6 +28,7 @@ import {
   orderBy,
   Timestamp,
   collectionGroup,
+  deleteField,
 } from "firebase/firestore";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
@@ -114,4 +115,5 @@ export {
   orderBy,
   Timestamp,
   collectionGroup,
+  deleteField,
 };
