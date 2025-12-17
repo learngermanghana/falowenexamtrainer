@@ -26,3 +26,10 @@ To generate static assets for hosting from disk or any static server:
 npm run build
 ```
 The build output is written to `web/build/`.
+
+## Billing configuration (Paystack)
+
+Save Paystack plan codes, exam prep price, and course level pricing in `src/data/paystackPlans.js`. This keeps
+Paystack-specific values in one place so components like the plan page and access context can import them without
+hardcoding dashboard values in multiple files. Update the placeholder plan codes with the values generated in your
+Paystack dashboard (Subscriptions → Plans).

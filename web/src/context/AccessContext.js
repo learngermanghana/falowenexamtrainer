@@ -5,6 +5,7 @@ import {
   loadPreferredClass,
   savePreferredClass,
 } from "../services/classSelectionStorage";
+import { PAYMENT_PROVIDER } from "../data/paystackPlans";
 
 const isBrowser = typeof window !== "undefined";
 const ACCESS_STORAGE_KEY = "exam-coach-access";
@@ -191,7 +192,7 @@ export const AccessProvider = ({ children }) => {
       markFullPayment,
       setPreferredClass,
       setExamOnlyFocus,
-      paymentProvider: "Paystack",
+      paymentProvider: PAYMENT_PROVIDER,
     }),
     [derived, state]
   );

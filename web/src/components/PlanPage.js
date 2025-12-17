@@ -3,16 +3,19 @@ import HomeActions from "./HomeActions";
 import { styles } from "../styles";
 import ClassCalendarCard from "./ClassCalendarCard";
 import { useAccess } from "../context/AccessContext";
-
-const COURSE_PRICES = [
-  { level: "A1", price: "2,800" },
-  { level: "A2", price: "3,000" },
-  { level: "B1", price: "3,000" },
-  { level: "B2", price: "3,000" },
-];
+import {
+  COURSE_LEVEL_PRICES,
+  EXAM_PREP_PRICE,
+  PAYMENT_PROVIDER,
+} from "../data/paystackPlans";
 
 const formatDate = (date) =>
   date ? new Date(date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—";
+
+const formatPrice = (amount) =>
+  typeof amount === "number"
+    ? amount.toLocaleString(undefined, { minimumFractionDigits: 0 })
+    : amount;
 
 const PlanPage = ({ onSelect }) => {
   const {
@@ -20,10 +23,11 @@ const PlanPage = ({ onSelect }) => {
     trialEndsAt,
     courseAccessLabel,
     hasExamAccess,
-    paymentProvider,
     markPartialPayment,
     markFullPayment,
   } = useAccess();
+
+  const paymentProvider = PAYMENT_PROVIDER;
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -71,12 +75,12 @@ const PlanPage = ({ onSelect }) => {
           <div style={{ ...styles.card, margin: 0 }}>
             <h3 style={{ margin: "0 0 6px 0" }}>Course pricing (cedis)</h3>
             <ul style={{ ...styles.checklist, marginBottom: 0 }}>
-              {COURSE_PRICES.map((item) => (
+              {COURSE_LEVEL_PRICES.map((item) => (
                 <li key={item.level}>
-                  {item.level}: <strong>{item.price} GHS</strong>
+                  {item.level}: <strong>{formatPrice(item.price)} GHS</strong>
                 </li>
               ))}
-              <li>Exam prep add-on: <strong>700 GHS / month</strong></li>
+              <li>Exam prep add-on: <strong>{formatPrice(EXAM_PREP_PRICE)} GHS / month</strong></li>
             </ul>
           </div>
         </div>
