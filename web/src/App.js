@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ExamProvider } from "./context/ExamContext";
 import SpeakingPage from "./components/SpeakingPage";
 import WritingPage from "./components/WritingPage";
@@ -22,6 +22,7 @@ import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
 import LevelOnboarding from "./components/LevelOnboarding";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
+import OnboardingChecklist from "./components/OnboardingChecklist";
 import "./App.css";
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
   const [authView, setAuthView] = useState("landing");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
+  const levelOnboardingRef = useRef(null);
 
   const notificationLabel = () => {
     switch (notificationStatus) {
@@ -100,6 +102,16 @@ function App() {
         error?.message || "Could not enable push notifications."
       );
     }
+  };
+
+  const handleSelectLevel = () => {
+    if (levelOnboardingRef.current) {
+      levelOnboardingRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const handleConfirmClass = () => {
+    setActivePage("plan");
   };
 
   if (!isFirebaseConfigured) {
@@ -238,7 +250,15 @@ function App() {
           </div>
         ) : null}
 
-        <LevelOnboarding />
+        <OnboardingChecklist
+          notificationStatus={notificationStatus}
+          onEnableNotifications={handleEnableNotifications}
+          onSelectLevel={handleSelectLevel}
+          onConfirmClass={handleConfirmClass}
+        />
+        <div ref={levelOnboardingRef}>
+          <LevelOnboarding />
+        </div>
 
         <div className="layout-grid">
           <main className="layout-main" style={{ minWidth: 0 }}>

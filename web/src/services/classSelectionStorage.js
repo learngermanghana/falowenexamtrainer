@@ -16,6 +16,9 @@ export const savePreferredClass = (className) => {
   if (!isBrowser) return;
   try {
     window.localStorage.setItem(CLASS_STORAGE_KEY, className);
+    window.dispatchEvent(
+      new CustomEvent("class-selection-changed", { detail: { className } })
+    );
   } catch (error) {
     console.warn("Failed to store preferred class", error);
   }
