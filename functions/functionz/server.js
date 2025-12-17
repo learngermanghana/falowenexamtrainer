@@ -1,12 +1,12 @@
-const express = require("express");
-const cors = require("cors");
+const app = require("./app");
 
-const app = express();
+const port = process.env.PORT || 5000;
 
-app.use(cors({ origin: true }));
-app.use(express.json({ limit: "2mb" }));
-
-app.get("/", (req, res) => res.json({ ok: true, service: "falowen-functions-api" }));
-app.get("/health", (req, res) => res.json({ ok: true }));
+if (require.main === module) {
+  app.listen(port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Falowen functions API listening on http://localhost:${port}`);
+  });
+}
 
 module.exports = app;
