@@ -560,15 +560,16 @@ const SpeakingPage = () => {
       const file = event.target.files?.[0];
       if (!file) return;
 
-      const blob = new Blob([file], { type: file.type });
-      setAudioBlob(blob);
-
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl);
       }
+
+      resetAudio();
+
+      const blob = new Blob([file], { type: file.type });
+      setAudioBlob(blob);
       const newUrl = URL.createObjectURL(blob);
       setAudioUrl(newUrl);
-      resetAudio();
     };
 
     fileInput.click();
