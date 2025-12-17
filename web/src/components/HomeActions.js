@@ -5,12 +5,12 @@ const HomeActions = ({ onSelect }) => {
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <h2 style={styles.sectionTitle}>Was möchtest du heute machen?</h2>
-        <span style={styles.levelPill}>Schnellstart</span>
+        <h2 style={styles.sectionTitle}>What do you want to do today?</h2>
+        <span style={styles.levelPill}>Quick start</span>
       </div>
       <p style={styles.helperText}>
-        Wähle eine der beiden Hauptaufgaben für den Tag: arbeite im Kursbuch oder mache eine
-        Prüfungssimulation.
+        Choose one of the two main tasks for today: study in the course book or try an exam
+        simulation. Simple English helps everyone, especially A1 students.
       </p>
       <div style={{ display: "grid", gap: 10 }}>
         <button
