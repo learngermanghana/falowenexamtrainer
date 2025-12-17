@@ -1,12 +1,10 @@
 {
   "name": "falowen-exam-coach-backend",
   "version": "1.0.0",
-  "main": "functionz/server.js",
-  "engines": {
-    "node": "22"
-  },
+  "main": "index.js",
+  "engines": { "node": "22" },
   "scripts": {
-    "start": "node functionz/server.js",
+    "start": "node index.js",
     "test": "npm run test:backend",
     "test:backend": "jest --config jest.config.js",
     "test:ci": "npm run test:backend -- --runInBand"
@@ -20,6 +18,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "firebase-admin": "^12.7.0",
+    "firebase-functions": "^4.9.0",
     "googleapis": "^144.0.0",
     "multer": "^2.0.2",
     "openai": "^6.10.0",
