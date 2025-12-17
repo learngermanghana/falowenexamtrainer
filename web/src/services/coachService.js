@@ -3,8 +3,8 @@ import { speakingSheetQuestions } from "../data/speakingSheet";
 import { writingLetters as writingSheetLetters } from "../data/writingLetters";
 
 const backendUrl =
-  import.meta.env.VITE_BACKEND_URL ||
-  (import.meta.env.PROD ? "" : "http://localhost:5000");
+  process.env.REACT_APP_BACKEND_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
 
 const authHeaders = (idToken) =>
   idToken
