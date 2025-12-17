@@ -51,7 +51,7 @@ const Step = ({ title, description, actionLabel, onAction, complete, accent = "#
           whiteSpace: "nowrap",
         }}
       >
-        {complete ? "Erledigt" : "Offen"}
+        {complete ? "Done" : "Open"}
       </span>
     </div>
     {onAction ? (
@@ -61,7 +61,7 @@ const Step = ({ title, description, actionLabel, onAction, complete, accent = "#
           onClick={onAction}
           disabled={complete}
         >
-          {complete ? "Abgeschlossen" : actionLabel}
+          {complete ? "Completed" : actionLabel}
         </button>
       </div>
     ) : null}
@@ -137,19 +137,19 @@ const OnboardingChecklist = ({
         <div>
           <p style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>Onboarding</p>
           <h2 style={{ ...styles.sectionTitle, marginTop: 4, marginBottom: 4 }}>
-            Die ersten Schritte im Exam Coach
+            Start strong with Exam Coach
           </h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Kurzer Leitfaden für neue Lernende: Level wählen, Klasse bestätigen, Kalender speichern und Push-Benachrichtigungen aktivieren.
+            Quick guide for new learners: choose your level, confirm your class, save the calendar, and turn on push notifications.
           </p>
         </div>
         <div style={{ display: "grid", justifyItems: "end" }}>
           <span style={{ ...styles.helperText, fontWeight: 600 }}>
-            Fortschritt: {progress.done}/{progress.total}
+            Progress: {progress.done}/{progress.total}
           </span>
           {allFinished ? (
             <span style={{ ...styles.badge, background: "#d1fae5", color: "#065f46" }}>
-              Onboarding abgeschlossen
+              Onboarding complete
             </span>
           ) : null}
         </div>
@@ -157,33 +157,33 @@ const OnboardingChecklist = ({
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
         <Step
-          title="Level auswählen"
-          description="Leg dein GER-Niveau fest. Danach siehst du passende Sprechen- und Schreiben-Aufgaben."
-          actionLabel="Level setzen"
+          title="Choose your level"
+          description="Set your CEFR level to get speaking and writing tasks that fit your skills."
+          actionLabel="Set level"
           onAction={onSelectLevel}
           complete={levelConfirmed}
           accent="#e5e7eb"
         />
         <Step
-          title="Klasse bestätigen"
-          description="Wähle deine Kohorte für Zoom-Link, Kursdokumente und Kalender mit allen Terminen."
-          actionLabel="Kurs öffnen"
+          title="Confirm your class"
+          description="Pick your cohort to get the Zoom link, course documents, and the full schedule."
+          actionLabel="Open class"
           onAction={onConfirmClass}
           complete={classConfirmed}
           accent="#f3e8ff"
         />
         <Step
-          title="Kalender herunterladen"
-          description="Füge alle Sessions zu deinem Handy-Kalender hinzu – inkl. Zoom-Link."
-          actionLabel={currentClass ? `${currentClass} Kalender` : "Kalender holen"}
+          title="Download the calendar"
+          description="Add every session to your phone calendar, including the Zoom link."
+          actionLabel={currentClass ? `${currentClass} calendar` : "Get calendar"}
           onAction={handleDownloadCalendar}
           complete={calendarDownloaded}
           accent="#fef3c7"
         />
         <Step
-          title="Push-Benachrichtigungen aktivieren"
-          description="Aktiviere Browser-Push, um Lern-Reminders und neue Aufgaben zu erhalten."
-          actionLabel="Push erlauben"
+          title="Enable push notifications"
+          description="Turn on browser push to get study reminders and new tasks."
+          actionLabel="Allow push"
           onAction={handleEnableNotifications}
           complete={notificationsReady}
           accent="#e0f2fe"
