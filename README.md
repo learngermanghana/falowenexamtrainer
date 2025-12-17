@@ -3,9 +3,9 @@
 Falowen Exam Coach is a two-part application that helps learners practice spoken German exam tasks. The backend (Express + OpenAI) evaluates answers and stores lightweight history, while the frontend (React) guides users through placement and speaking practice.
 
 ## Repository structure
-- `functionz/` – Express backend with routes for speaking analysis, placement, and task scheduling.
+- `functions/functionz/` – Express backend with routes for speaking analysis, placement, and task scheduling.
 - `web/` – React frontend that records audio/text answers and calls the backend.
-- `api/`, `vercel.json` – Deployment helpers for serverless environments.
+- `api/`, `vercel.json` – Deployment helpers for serverless environments (the API entry re-exports the Express app from `functions/functionz/app.js`).
 
 ## Prerequisites
 - Node.js 18+ and npm
@@ -72,7 +72,7 @@ npm install
    ```
    npm start
    ```
-   The API listens on `http://localhost:5000` by default and stores user history under `functionz/data/`.
+   The API listens on `http://localhost:5000` by default and stores user history under `functions/functionz/data/`.
 
 2. **Start the frontend** (new terminal):
    ```

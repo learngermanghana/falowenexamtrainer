@@ -1,3 +1,3 @@
-const app = require("../functionz/app");
+const app = require("../functions/functionz/app");
 
 module.exports = app;

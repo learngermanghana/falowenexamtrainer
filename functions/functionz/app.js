@@ -3,6 +3,10 @@ const cors = require("cors");
 const admin = require("firebase-admin");
 let getScoresForStudent;
 
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
 function loadScoresModule() {
   if (getScoresForStudent) return getScoresForStudent;
 
