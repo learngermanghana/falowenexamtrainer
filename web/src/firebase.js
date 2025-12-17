@@ -21,6 +21,13 @@ import {
   setDoc,
   serverTimestamp,
   limit,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  orderBy,
+  Timestamp,
+  collectionGroup,
 } from "firebase/firestore";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
@@ -100,4 +107,11 @@ export {
   setDoc,
   serverTimestamp,
   limit,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  orderBy,
+  Timestamp,
+  collectionGroup,
 };
