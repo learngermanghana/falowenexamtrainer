@@ -11,6 +11,7 @@ import PracticeLab from "./components/PracticeLab";
 import ProgressPage from "./components/ProgressPage";
 import ResourcePage from "./components/ResourcePage";
 import CourseTab from "./components/CourseTab";
+import ExamRoom from "./components/ExamRoom";
 import AuthGate from "./components/AuthGate";
 import HealthIndicator from "./components/HealthIndicator";
 import { useAuth } from "./context/AuthContext";
@@ -139,7 +140,7 @@ function App() {
     if (activePage === "discussion") return <ClassDiscussionPage />;
     if (activePage === "level-check") return <PlacementCheck />;
     if (activePage === "daily") return <SpeakingPage mode="daily" />;
-    if (activePage === "exam") return <SpeakingPage mode="exam" />;
+    if (activePage === "exam") return <ExamRoom />;
     return <SpeakingPage />;
   };
 
