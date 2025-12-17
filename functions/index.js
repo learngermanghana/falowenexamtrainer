@@ -13,7 +13,8 @@ const { appendStudentToStudentsSheetSafely } = require("./functionz/studentsShee
 exports.api = onRequest(
   {
     region: "europe-west1",
-    cors: true
+    cors: true,
+    secrets: ["OPENAI_API_KEY"],
   },
   app
 );
@@ -22,7 +23,12 @@ exports.api = onRequest(
 exports.onStudentCreated = onDocumentCreated(
   {
     region: "europe-west1",
-    document: "students/{studentCode}"
+    document: "students/{studentCode}",
+    secrets: [
+      "GOOGLE_SERVICE_ACCOUNT_JSON_B64",
+      "STUDENTS_SHEET_ID",
+      "STUDENTS_SHEET_TAB",
+    ],
   },
   async (event) => {
     const snap = event.data;
