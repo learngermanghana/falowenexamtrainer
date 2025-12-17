@@ -1,6 +1,12 @@
 import React from "react";
 import { styles } from "../styles";
 
+const formatDate = (value) => {
+  if (!value) return "";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleString();
+};
+
 const ResultHistory = ({ results = [] }) => {
   if (!results.length) return null;
 
@@ -12,19 +18,41 @@ const ResultHistory = ({ results = [] }) => {
       </p>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {results.map((entry) => {
-          const created = entry.createdAt
-            ? new Date(entry.createdAt).toLocaleString()
-            : "";
+          const created =
+            formatDate(entry.createdAt || entry.date || entry.dateIso || entry.created_at) || "";
+
+          const assignmentLabel =
+            entry.assignmentText ||
+            entry.assignment ||
+            (entry.assignmentId ? `Assignment ${entry.assignmentId}` : "");
+          const heading = entry.mode || assignmentLabel || "Feedback";
+          const levelLabel = entry.level || entry.overall_level || "";
+          const scoreValue =
+            entry.overall_score !== undefined ? entry.overall_score : entry.score;
+          const hasScoreDetails = entry.scores && Object.keys(entry.scores || {}).length > 0;
+          const hasBasicSummary =
+            !hasScoreDetails &&
+            (scoreValue !== undefined || entry.comments || entry.link || assignmentLabel);
+
+          const metaParts = [heading, entry.teil, levelLabel, created].filter(Boolean);
 
           return (
-            <article
-              key={entry.id || created}
-              style={{ ...styles.resultCard, marginTop: 0 }}
-            >
+            <article key={entry.id || created} style={{ ...styles.resultCard, marginTop: 0 }}>
               <div style={{ ...styles.helperText, marginBottom: 8 }}>
-                <strong>{entry.mode || "Feedback"}</strong> · {entry.teil} · {entry.level}
-                {created ? ` · ${created}` : ""}
+                {metaParts.length ? metaParts.join(" · ") : ""}
               </div>
+
+              {assignmentLabel && heading !== assignmentLabel && (
+                <p style={{ ...styles.helperText, marginTop: 0 }}>
+                  Assignment: {assignmentLabel}
+                </p>
+              )}
+
+              {entry.assignmentId && !assignmentLabel && heading !== `Assignment ${entry.assignmentId}` && (
+                <p style={{ ...styles.helperText, marginTop: 0 }}>
+                  Assignment ID: {entry.assignmentId}
+                </p>
+              )}
 
               {entry.transcript && (
                 <>
@@ -33,13 +61,13 @@ const ResultHistory = ({ results = [] }) => {
                 </>
               )}
 
-              {entry.overall_score !== undefined && (
+              {scoreValue !== undefined && (
                 <p style={{ ...styles.resultText, fontWeight: 600 }}>
-                  Overall: {entry.overall_score}/100 ({entry.overall_level || "-"})
+                  Overall: {scoreValue}/100 ({entry.overall_level || levelLabel || "-"})
                 </p>
               )}
 
-              {entry.scores && (
+              {hasScoreDetails && (
                 <div
                   style={{
                     display: "grid",
@@ -48,16 +76,14 @@ const ResultHistory = ({ results = [] }) => {
                   }}
                 >
                   <div style={styles.helperText}>
-                    Aufgabenbewältigung (task fulfilment):
-                    {" "}
+                    Aufgabenbewältigung (task fulfilment): {" "}
                     {entry.scores.task_fulfilment || 0}/25
                   </div>
                   <div style={styles.helperText}>
                     Interaktion (mapped from fluency): {entry.scores.fluency || 0}/25
                   </div>
                   <div style={styles.helperText}>
-                    Aussprache · Ausspracheklarheit (mapped from fluency):
-                    {" "}
+                    Aussprache · Ausspracheklarheit (mapped from fluency): {" "}
                     {entry.scores.fluency || 0}/25
                   </div>
                   <div style={styles.helperText}>
@@ -66,6 +92,33 @@ const ResultHistory = ({ results = [] }) => {
                   <div style={styles.helperText}>
                     Wortschatz (vocabulary range): {entry.scores.vocabulary || 0}/25
                   </div>
+                </div>
+              )}
+
+              {hasBasicSummary && (
+                <div style={{ display: "grid", gap: 4 }}>
+                  {scoreValue !== undefined && (
+                    <p style={styles.resultText}>
+                      <strong>Score:</strong> {scoreValue}
+                    </p>
+                  )}
+
+                  {entry.comments && (
+                    <p style={styles.resultText}>
+                      <strong>Comments:</strong> {entry.comments}
+                    </p>
+                  )}
+
+                  {entry.link && (
+                    <a
+                      href={entry.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ ...styles.resultText, color: "#0070f3" }}
+                    >
+                      View submission
+                    </a>
+                  )}
                 </div>
               )}
 
