@@ -1,14 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
-import { collection, db, getDocs, limit, query } from "../firebase";
 
 export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
   const [status, setStatus] = useState("loading");
   const [lastChecked, setLastChecked] = useState(null);
 
   const refresh = useCallback(async () => {
+    const baseUrl = process.env.REACT_APP_API_BASE || "";
+    const url = `${baseUrl}/api/health`;
+
     try {
-      const pingRef = collection(db, "scores");
-      await getDocs(query(pingRef, limit(1)));
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Health check failed");
+      }
+
+      await response.json();
       setStatus("ok");
       setLastChecked(new Date().toISOString());
     } catch (error) {
