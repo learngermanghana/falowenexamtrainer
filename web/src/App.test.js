@@ -15,7 +15,6 @@ jest.mock("./services/coachService", () => ({
   analyzeAudio: jest.fn(),
   analyzeText: jest.fn(),
   fetchNextTask: jest.fn(() => Promise.resolve(null)),
-  fetchWeeklySummary: jest.fn(() => Promise.resolve({ summary: "" })),
 }));
 
 jest.mock("./services/assignmentService", () => ({

@@ -156,12 +156,3 @@ export const fetchNextTask = async ({ userId, idToken }) => {
 
   return response.data?.nextTask;
 };
-
-export const fetchWeeklySummary = async ({ userId, idToken }) => {
-  const response = await axios.get(
-    `${backendUrl}/api/tutor/weekly-summary?userId=${userId || "guest"}`,
-    { headers: authHeaders(idToken) }
-  );
-
-  return response.data;
-};

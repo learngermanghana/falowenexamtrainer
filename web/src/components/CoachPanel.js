@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
-import { fetchNextTask, fetchWeeklySummary } from "../services/coachService";
+import { fetchNextTask } from "../services/coachService";
 import { useAuth } from "../context/AuthContext";
 
-const CoachPanel = () => {
+const CoachPanel = ({ className = "" }) => {
   const [nextTask, setNextTask] = useState(null);
-  const [summary, setSummary] = useState("");
   const { user, idToken } = useAuth();
   const userId = user?.uid;
 
@@ -15,14 +14,10 @@ const CoachPanel = () => {
     fetchNextTask({ userId, idToken })
       .then((data) => setNextTask(data))
       .catch(() => setNextTask(null));
-
-    fetchWeeklySummary({ userId, idToken })
-      .then((data) => setSummary(data?.summary || ""))
-      .catch(() => setSummary(""));
   }, [userId, idToken]);
 
   return (
-    <aside style={{ ...styles.card, position: "sticky", top: 16 }}>
+    <aside className={`coach-panel ${className}`.trim()} style={{ ...styles.card }}>
       <h3 style={styles.sectionTitle}>Coach</h3>
       <p style={styles.helperText}>
         Hallo! I’m your AI coach. I’ll keep recommending the next focus based on
@@ -43,12 +38,6 @@ const CoachPanel = () => {
         <p style={styles.helperText}>Loading next task …</p>
       )}
 
-      <div style={{ borderTop: "1px solid #e5e7eb", paddingTop: 12 }}>
-        <div style={{ fontWeight: 600, marginBottom: 6 }}>Weekly snapshot</div>
-        <div style={{ whiteSpace: "pre-wrap", fontSize: 14, color: "#111827" }}>
-          {summary || "You haven’t trained this week. Start a quick attempt!"}
-        </div>
-      </div>
     </aside>
   );
 };
