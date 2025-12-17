@@ -1,7 +1,14 @@
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+const fsPromises = require("fs/promises");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
+const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
+
 let getScoresForStudent;
 
 if (!admin.apps.length) {
@@ -26,6 +33,8 @@ function loadScoresModule() {
   }
 }
 
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+
 const app = express();
 
 app.use(cors({ origin: true }));
@@ -34,38 +43,55 @@ app.use(express.json({ limit: "1mb" }));
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
-const callOpenAI = async (messages) => {
-  if (!process.env.OPENAI_API_KEY) {
-    throw new Error("OPENAI_API_KEY is not configured");
+const writeTempFile = async (file) => {
+  const fileName = file?.originalname || "audio.webm";
+  const tempPath = path.join(os.tmpdir(), `${Date.now()}-${fileName}`);
+  await fsPromises.writeFile(tempPath, file.buffer);
+  return tempPath;
+};
+
+const transcribeAudio = async (fileBuffer) => {
+  const client = getOpenAIClient();
+  const tempPath = await writeTempFile(fileBuffer);
+
+  try {
+    const transcription = await client.audio.transcriptions.create({
+      file: fs.createReadStream(tempPath),
+      model: "whisper-1",
+      language: "de",
+    });
+
+    return transcription?.text?.trim();
+  } finally {
+    await fsPromises.unlink(tempPath).catch(() => undefined);
   }
+};
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-    },
-    body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
-      temperature: 0.4,
-      max_tokens: 750,
-      messages,
-    }),
-  });
+const speakingPrompt = ({ teil, level, contextType, question, interactionMode }) => {
+  const teilLabel = teil ? `Teil ${teil}` : "your last speaking sample";
+  const context = contextType ? `Context: ${contextType}.` : "";
+  const interaction = typeof interactionMode === "undefined" ? "" : `Interaction mode: ${interactionMode}.`;
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`OpenAI request failed: ${response.status} ${errorBody}`);
-  }
+  return (
+    "You are a German speaking examiner and supportive coach. " +
+    "Score pronunciation, grammar, vocabulary, fluency, and task achievement. " +
+    "Give concise feedback in English, but include short German fragments to model corrections. " +
+    `Focus on ${teilLabel}. Level target: ${level || "A2"}. ${context} ${interaction} ` +
+    "If the student seems below target, explain the biggest gaps and suggest one focused drill. " +
+    (question ? `The prompt/question was: ${question}.` : "")
+  );
+};
 
-  const data = await response.json();
-  const reply = data?.choices?.[0]?.message?.content;
+const placementPrompt = ({ answers, targetLevel }) => {
+  const formattedAnswers = answers
+    .map((item, idx) => `Answer ${idx + 1} (${item.taskType || "custom"}): ${item.text}`)
+    .join("\n");
 
-  if (!reply) {
-    throw new Error("OpenAI response missing content");
-  }
-
-  return reply;
+  return (
+    "You are an expert German examiner. Estimate the CEFR level (A1–C1) from the answers provided. " +
+    `If a target level is given, comment on readiness for ${targetLevel || "their next"} exam. ` +
+    "Return a short rationale, confidence 0–1, and one next drill suggestion."
+  ).concat("\n\n", formattedAnswers);
 };
 
 app.post("/writing/ideas", async (req, res) => {
@@ -83,7 +109,7 @@ app.post("/writing/ideas", async (req, res) => {
         })),
     ];
 
-    const reply = await callOpenAI(chatMessages);
+    const reply = await createChatCompletion(chatMessages, { max_tokens: 750 });
 
     res.json({ reply });
   } catch (err) {
@@ -106,7 +132,7 @@ app.post("/writing/mark", async (req, res) => {
       { role: "user", content: String(text).trim() },
     ];
 
-    const feedback = await callOpenAI(messages);
+    const feedback = await createChatCompletion(messages, { max_tokens: 750 });
 
     res.json({ feedback });
   } catch (err) {
@@ -141,6 +167,180 @@ app.get("/scores", async (req, res) => {
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Failed to fetch scores" });
+  }
+});
+
+app.post("/speaking/analyze", upload.single("audio"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Audio file is required" });
+    }
+
+    const {
+      teil,
+      level = "A2",
+      contextType,
+      question,
+      interactionMode,
+      userId = "guest",
+    } = req.body || {};
+
+    const transcript = await transcribeAudio(req.file);
+
+    if (!transcript) {
+      return res.status(500).json({ error: "Could not transcribe audio" });
+    }
+
+    const messages = [
+      { role: "system", content: speakingPrompt({ teil, level, contextType, question, interactionMode }) },
+      {
+        role: "user",
+        content: `User ${userId} speaking sample transcript: ${transcript}`,
+      },
+    ];
+
+    const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 500 });
+
+    return res.json({ transcript, feedback });
+  } catch (err) {
+    console.error("/speaking/analyze error", err);
+    return res.status(500).json({ error: err.message || "Failed to analyze speaking" });
+  }
+});
+
+app.post("/speaking/analyze-text", async (req, res) => {
+  try {
+    const { text, teil, level = "A2", targetLevel, userId = "guest" } = req.body || {};
+
+    if (!text || !String(text).trim()) {
+      return res.status(400).json({ error: "Transcript text is required" });
+    }
+
+    const messages = [
+      { role: "system", content: speakingPrompt({ teil, level: targetLevel || level }) },
+      { role: "user", content: `User ${userId} transcript: ${String(text).trim()}` },
+    ];
+
+    const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 500 });
+
+    return res.json({ feedback });
+  } catch (err) {
+    console.error("/speaking/analyze-text error", err);
+    return res.status(500).json({ error: err.message || "Failed to analyze text" });
+  }
+});
+
+app.post("/speaking/interaction-score", upload.single("audio"), async (req, res) => {
+  try {
+    const {
+      initialTranscript,
+      followUpQuestion,
+      teil,
+      level = "A2",
+      targetLevel,
+      userId = "guest",
+    } = req.body || {};
+
+    let transcript = String(initialTranscript || "").trim();
+
+    if (!transcript && req.file) {
+      transcript = (await transcribeAudio(req.file)) || "";
+    }
+
+    if (!transcript) {
+      return res.status(400).json({ error: "A transcript or audio recording is required" });
+    }
+
+    const messages = [
+      {
+        role: "system",
+        content:
+          speakingPrompt({ teil, level: targetLevel || level }) +
+          " Return a 3-sentence breakdown and a score out of 10 for interaction quality.",
+      },
+      {
+        role: "user",
+        content: `User ${userId} follow-up answer to '${followUpQuestion || "prompt"}': ${transcript}`,
+      },
+    ];
+
+    const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 450 });
+
+    return res.json({ feedback, transcript });
+  } catch (err) {
+    console.error("/speaking/interaction-score error", err);
+    return res.status(500).json({ error: err.message || "Failed to score interaction" });
+  }
+});
+
+app.post("/tutor/placement", async (req, res) => {
+  try {
+    const { answers = [], targetLevel, userId = "guest" } = req.body || {};
+
+    if (!Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ error: "At least one answer is required" });
+    }
+
+    const messages = [
+      { role: "system", content: placementPrompt({ answers, targetLevel }) },
+      { role: "user", content: `Student id ${userId}. Provide JSON with estimated_level, confidence, rationale, next_task_hint.` },
+    ];
+
+    const reply = await createChatCompletion(messages, { temperature: 0.2, max_tokens: 400 });
+
+    let placement;
+
+    try {
+      placement = JSON.parse(reply);
+    } catch (_err) {
+      placement = {
+        estimated_level: targetLevel || "A2",
+        confidence: 0.5,
+        rationale: reply,
+        next_task_hint: "Try a short speaking drill about your weekend and upload it for feedback.",
+      };
+    }
+
+    return res.json({ placement });
+  } catch (err) {
+    console.error("/tutor/placement error", err);
+    return res.status(500).json({ error: err.message || "Failed to run placement" });
+  }
+});
+
+app.get("/tutor/next-task", async (req, res) => {
+  try {
+    const userId = String(req.query.userId || "guest");
+
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You are an AI tutor. Suggest the next micro-task for a German learner. " +
+          "Keep it short: title, prompt, skill, and one tip. Respond as JSON.",
+      },
+      { role: "user", content: `Student id ${userId}. Offer a next actionable task for speaking or writing.` },
+    ];
+
+    const reply = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 200 });
+
+    let nextTask;
+
+    try {
+      nextTask = JSON.parse(reply);
+    } catch (_err) {
+      nextTask = {
+        title: "Describe your last weekend",
+        prompt: reply,
+        skill: "Speaking",
+        tip: "Use past tense verbs and 3 time markers (e.g., gestern, am Samstag, danach).",
+      };
+    }
+
+    return res.json({ nextTask });
+  } catch (err) {
+    console.error("/tutor/next-task error", err);
+    return res.status(500).json({ error: err.message || "Failed to fetch next task" });
   }
 });
 
