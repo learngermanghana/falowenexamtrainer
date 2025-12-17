@@ -1,206 +1,88 @@
-import legacyStudents from "./data/legacyStudents";
+import {
+  initializeApp,
+  getApps,
+  getApp,
+} from "firebase/app";
+import {
+  getAuth,
+  onIdTokenChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  setDoc,
+  serverTimestamp,
+  limit,
+} from "firebase/firestore";
+import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
-const isBrowser = typeof window !== "undefined";
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+};
 
-const STORAGE_KEY = "exam-coach-auth";
-const USER_STORE_KEY = "exam-coach-users";
-
-const createToken = () => {
-  if (typeof crypto !== "undefined" && crypto.randomUUID) {
-    return crypto.randomUUID();
+const getFirebaseApp = () => {
+  if (!firebaseConfig.apiKey) {
+    throw new Error("Firebase config is missing. Please set REACT_APP_FIREBASE_* env vars.");
   }
-  return Math.random().toString(36).slice(2);
+  return getApps().length ? getApp() : initializeApp(firebaseConfig);
 };
 
-const loadUserStore = () => {
-  if (!isBrowser) return { users: {}, seededLegacy: false };
-  try {
-    const raw = window.localStorage.getItem(USER_STORE_KEY);
-    if (!raw) return { users: {}, seededLegacy: false };
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object"
-      ? { users: parsed.users || {}, seededLegacy: Boolean(parsed.seededLegacy) }
-      : { users: {}, seededLegacy: false };
-  } catch (error) {
-    console.warn("Failed to load user store", error);
-    return { users: {}, seededLegacy: false };
-  }
-};
+const app = getFirebaseApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const persistUserStore = (store) => {
-  if (!isBrowser) return;
-  try {
-    window.localStorage.setItem(USER_STORE_KEY, JSON.stringify(store));
-  } catch (error) {
-    console.warn("Failed to persist user store", error);
-  }
-};
-
-const userStore = loadUserStore();
-
-const wrapUser = (user) => ({
-  ...user,
-  getIdToken: async () => user.token,
-});
-
-const seedLegacyStudents = () => {
-  if (userStore.seededLegacy || !Array.isArray(legacyStudents)) return;
-
-  legacyStudents.forEach((student) => {
-    const emailKey = (student.email || "").toLowerCase();
-    if (!emailKey || userStore.users[emailKey]) return;
-
-    userStore.users[emailKey] = {
-      uid: createToken(),
-      email: student.email,
-      password: null,
-      token: null,
-      profile: {
-        firstName: student.firstName || "",
-        level: (student.level || "").toUpperCase(),
-        studentCode: student.studentCode || "",
-        legacy: true,
-      },
-    };
-  });
-
-  userStore.seededLegacy = true;
-  persistUserStore(userStore);
-};
-
-seedLegacyStudents();
-
-const findUserByEmail = (email) => {
-  if (!email) return null;
-  return userStore.users[email.toLowerCase()] || null;
-};
-
-const loadStoredUser = () => {
-  if (!isBrowser) return null;
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : null;
-    if (!parsed || !parsed.email) return null;
-
-    const stored = findUserByEmail(parsed.email) || parsed;
-    return wrapUser({ ...stored, token: stored.token || createToken() });
-  } catch (error) {
-    console.warn("Failed to read stored auth user", error);
-    return null;
-  }
-};
-
-const persistUser = (user) => {
-  if (!isBrowser) return;
-  try {
-    if (user) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
-  } catch (error) {
-    console.warn("Failed to persist auth user", error);
-  }
-};
-
-const auth = {
-  currentUser: null,
-  listeners: new Set(),
-};
-
-const notifyAuthListeners = () => {
-  auth.listeners.forEach((callback) => callback(auth.currentUser));
-};
-
-const setCurrentUser = (user) => {
-  auth.currentUser = user ? wrapUser(user) : null;
-  persistUser(user ? user : null);
-  notifyAuthListeners();
-};
-
-auth.currentUser = loadStoredUser();
-
-export const onIdTokenChanged = (authInstance, callback) => {
-  callback(authInstance.currentUser);
-  authInstance.listeners.add(callback);
-  return () => authInstance.listeners.delete(callback);
-};
-
-export const createUserWithEmailAndPassword = async (
-  _auth,
-  email,
-  password,
-  profile = {}
-) => {
-  if (!email || !password) {
-    throw new Error("Email and password are required");
+const requestMessagingToken = async () => {
+  const supported = await isSupported().catch(() => false);
+  if (!supported) {
+    throw new Error("Browser does not support Firebase Cloud Messaging.");
   }
 
-  const emailKey = email.toLowerCase();
-  if (userStore.users[emailKey]) {
-    throw new Error("An account with this email already exists.");
+  const messaging = getMessaging(app);
+  const vapidKey = process.env.REACT_APP_FIREBASE_VAPID_KEY;
+  if (!vapidKey) {
+    throw new Error("Missing REACT_APP_FIREBASE_VAPID_KEY for push notifications.");
   }
 
-  const user = {
-    uid: createToken(),
-    email,
-    password,
-    token: createToken(),
-    profile,
-  };
-
-  userStore.users[emailKey] = user;
-  persistUserStore(userStore);
-  setCurrentUser(user);
-  return { user: auth.currentUser };
+  return getToken(messaging, { vapidKey });
 };
 
-export const signInWithEmailAndPassword = async (_auth, email, password) => {
-  if (!email || !password) {
-    throw new Error("Email and password are required");
-  }
-
-  const stored = findUserByEmail(email);
-
-  if (!stored) {
-    throw new Error("No account found. Please sign up first.");
-  }
-
-  if (!stored.password) {
-    const activatedUser = {
-      ...stored,
-      password,
-      token: createToken(),
-      profile: {
-        ...stored.profile,
-        legacy: true,
-      },
-    };
-    userStore.users[email.toLowerCase()] = activatedUser;
-    persistUserStore(userStore);
-    setCurrentUser(activatedUser);
-    return { user: auth.currentUser, migratedFromLegacy: true };
-  }
-
-  if (stored.password !== password) {
-    throw new Error("Invalid credentials");
-  }
-
-  const refreshedUser = { ...stored, token: createToken() };
-  userStore.users[email.toLowerCase()] = refreshedUser;
-  persistUserStore(userStore);
-  setCurrentUser(refreshedUser);
-  return { user: auth.currentUser, migratedFromLegacy: false };
+const listenForForegroundMessages = async (callback) => {
+  const supported = await isSupported().catch(() => false);
+  if (!supported) return () => {};
+  const messaging = getMessaging(app);
+  return onMessage(messaging, callback);
 };
 
-export const signOut = async (_auth) => {
-  setCurrentUser(null);
+export {
+  app,
+  auth,
+  db,
+  onIdTokenChanged,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  requestMessagingToken,
+  listenForForegroundMessages,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  setDoc,
+  serverTimestamp,
+  limit,
 };
-
-export const requestMessagingToken = async () => {
-  throw new Error("Push notifications are unavailable without the Firebase SDK.");
-};
-
-export const listenForForegroundMessages = async () => () => {};
-
-export { auth };

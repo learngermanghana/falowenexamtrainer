@@ -1,24 +1,20 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { collection, db, getDocs, limit, query } from "../firebase";
 
 export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
-  const apiBase = useMemo(() => process.env.REACT_APP_API_BASE || "", []);
   const [status, setStatus] = useState("loading");
   const [lastChecked, setLastChecked] = useState(null);
 
   const refresh = useCallback(async () => {
     try {
-      const response = await fetch(`${apiBase}/api/health`);
-      if (!response.ok) {
-        throw new Error(`Healthcheck failed with status ${response.status}`);
-      }
-
-      const body = await response.json();
-      setStatus(body.status || "ok");
-      setLastChecked(body.timestamp || new Date().toISOString());
+      const pingRef = collection(db, "scores");
+      await getDocs(query(pingRef, limit(1)));
+      setStatus("ok");
+      setLastChecked(new Date().toISOString());
     } catch (error) {
       setStatus("offline");
     }
-  }, [apiBase]);
+  }, []);
 
   useEffect(() => {
     let timerId;

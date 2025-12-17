@@ -6,12 +6,31 @@ import {
   signInWithEmailAndPassword,
   signOut,
   requestMessagingToken,
+  db,
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc,
+  doc,
+  serverTimestamp,
 } from "../firebase";
 
 const AuthContext = createContext();
 
+const fetchStudentProfileByEmail = async (email) => {
+  if (!email) return null;
+  const studentsRef = collection(db, "students");
+  const q = query(studentsRef, where("email", "==", email.toLowerCase())) ;
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return null;
+  const hit = snapshot.docs[0];
+  return { id: hit.id, ...hit.data() };
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [studentProfile, setStudentProfile] = useState(null);
   const [idToken, setIdToken] = useState(null);
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState("");
@@ -21,6 +40,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
+      setStudentProfile(null);
       setAuthError("");
 
       if (!firebaseUser) {
@@ -33,8 +53,10 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = await firebaseUser.getIdToken();
         setIdToken(token);
+        const profile = await fetchStudentProfileByEmail(firebaseUser.email);
+        setStudentProfile(profile);
       } catch (error) {
-        console.error("Failed to fetch ID token", error);
+        console.error("Failed to fetch ID token or profile", error);
         setAuthError("Konnte Login-Token nicht laden.");
       } finally {
         setLoading(false);
@@ -46,14 +68,28 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (email, password, profile = {}) => {
     setAuthError("");
-    const credential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password,
-      profile
-    );
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
     const token = await credential.user.getIdToken();
     setIdToken(token);
+
+    const studentCode = profile.studentCode;
+    const studentsRef = doc(db, "students", studentCode || credential.user.uid);
+    const payload = {
+      name: profile.firstName || "",
+      email: email.toLowerCase(),
+      about: "",
+      level: (profile.level || "").toUpperCase(),
+      className: profile.className || "",
+      joined_at: new Date().toISOString(),
+      updated_at: serverTimestamp(),
+      syncedToSheets: false,
+    };
+    if (studentCode) {
+      payload.studentcode = studentCode;
+    }
+
+    await setDoc(studentsRef, payload, { merge: true });
+    setStudentProfile({ id: studentsRef.id, ...payload });
     return credential;
   };
 
@@ -62,12 +98,15 @@ export const AuthProvider = ({ children }) => {
     const credential = await signInWithEmailAndPassword(auth, email, password);
     const token = await credential.user.getIdToken();
     setIdToken(token);
+    const profile = await fetchStudentProfileByEmail(email);
+    setStudentProfile(profile);
     return credential;
   };
 
   const logout = async () => {
     await signOut(auth);
     setMessagingToken(null);
+    setStudentProfile(null);
   };
 
   const enableNotifications = async () => {
@@ -87,6 +126,7 @@ export const AuthProvider = ({ children }) => {
   const value = useMemo(
     () => ({
       user,
+      studentProfile,
       idToken,
       loading,
       authError,
@@ -100,6 +140,7 @@ export const AuthProvider = ({ children }) => {
     }),
     [
       user,
+      studentProfile,
       idToken,
       loading,
       authError,
