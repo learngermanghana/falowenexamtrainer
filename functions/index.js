@@ -1,32 +1,60 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+"use strict";
 
-const {setGlobalOptions} = require("firebase-functions");
-const {onRequest} = require("firebase-functions/https");
+const { setGlobalOptions } = require("firebase-functions/v2");
+const { onRequest } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
+const cors = require("cors");
 
-// For cost control, you can set the maximum number of containers that can be
-// running at the same time. This helps mitigate the impact of unexpected
-// traffic spikes by instead downgrading performance. This limit is a
-// per-function limit. You can override the limit for each function using the
-// `maxInstances` option in the function's options, e.g.
-// `onRequest({ maxInstances: 5 }, (req, res) => { ... })`.
-// NOTE: setGlobalOptions does not apply to functions using the v1 API. V1
-// functions should each use functions.runWith({ maxInstances: 10 }) instead.
-// In the v1 API, each function can only serve one request per container, so
-// this will be the maximum concurrent request count.
+const admin = require("firebase-admin");
+admin.initializeApp();
+const db = admin.firestore();
+
+const { computeStudentMetrics } = require("./functionz/lib/metrics");
+
+// Optional CORS (allow your Vercel domain(s))
+const corsHandler = cors({ origin: true });
+
 setGlobalOptions({ maxInstances: 10 });
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
+exports.studentMetrics = onRequest(async (req, res) => {
+  corsHandler(req, res, async () => {
+    try {
+      // Accept GET or POST
+      const studentcode = (req.query.studentcode || req.body?.studentcode || "").trim();
+      const level = (req.query.level || req.body?.level || "").trim();
+      const passMark = Number(req.query.passMark || req.body?.passMark || 60);
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+      // Optional: scheduleOrder array sent by frontend to compute missed/jumped
+      const scheduleOrder = Array.isArray(req.body?.scheduleOrder) ? req.body.scheduleOrder : null;
+
+      if (!studentcode || !level) {
+        return res.status(400).json({ error: "Missing studentcode or level" });
+      }
+
+      // Fetch attempts for this student+level.
+      // (No orderBy to avoid composite index issues; we sort in-memory if needed)
+      const snap = await db
+        .collection("scores")
+        .where("studentcode", "==", studentcode)
+        .where("level", "==", level)
+        .get();
+
+      const attempts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      const metrics = computeStudentMetrics({
+        attempts,
+        passMark,
+        scheduleOrder,
+      });
+
+      return res.json({
+        studentcode,
+        level,
+        ...metrics,
+      });
+    } catch (err) {
+      logger.error(err);
+      return res.status(500).json({ error: String(err?.message || err) });
+    }
+  });
+});
