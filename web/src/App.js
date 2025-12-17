@@ -12,6 +12,7 @@ import ProgressPage from "./components/ProgressPage";
 import ResourcePage from "./components/ResourcePage";
 import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
+import HealthIndicator from "./components/HealthIndicator";
 import { useAuth } from "./context/AuthContext";
 import { styles } from "./styles";
 import AccountSettings from "./components/AccountSettings";
@@ -117,6 +118,7 @@ function App() {
             <p style={styles.subtitle}>Wähle aus, ob du heute ins Kursbuch oder direkt in die Prüfung gehst.</p>
           </div>
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+            <HealthIndicator />
             <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
               <button

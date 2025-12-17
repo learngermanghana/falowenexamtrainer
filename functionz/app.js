@@ -29,6 +29,31 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// --- Healthcheck ---
+app.get("/api/health", (req, res) => {
+  const now = new Date().toISOString();
+
+  return res.json({
+    status: "ok",
+    timestamp: now,
+    uptime: process.uptime(),
+    cache: {
+      questions: {
+        entries: cachedQuestions.data?.length || 0,
+        fetchedAt: cachedQuestions.fetchedAt || null,
+      },
+      writingTasks: {
+        entries: cachedWritingTasks.data?.length || 0,
+        fetchedAt: cachedWritingTasks.fetchedAt || null,
+      },
+      results: {
+        entries: cachedResults.data?.results?.length || 0,
+        fetchedAt: cachedResults.fetchedAt || null,
+      },
+    },
+  });
+});
+
 // --- Google Sheets config for practice questions ---
 const SHEET_ID = "1zaAT5NjRGKiITV7EpuSHvYMBHHENMs9Piw3pNcyQtho"; // Exams list
 const SHEET_GID = "1161508231"; // Exams list tab
