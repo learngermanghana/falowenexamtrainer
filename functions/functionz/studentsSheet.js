@@ -1,11 +1,33 @@
-const { getSheetsClient } = require("./googleSheetsClient");
+// functions/functionz/studentsSheet.js
+"use strict";
+
+const { google } = require("googleapis");
+
+/**
+ * Header-aware upsert into your Students Google Sheet.
+ * - Reads row 1 for headers
+ * - Finds existing row by StudentCode (preferred), else by uid/email
+ * - Updates ONLY the matching cells (safe for Apps Script + formulas)
+ * - Appends a new row if not found
+ *
+ * ENV expected:
+ * - STUDENTS_SHEET_ID
+ * - STUDENTS_SHEET_TAB (default: "students")
+ * - GOOGLE_SERVICE_ACCOUNT_JSON (recommended, JSON string)
+ *    OR GOOGLE_SERVICE_ACCOUNT_JSON_B64 (base64 of JSON string)
+ */
 
 function normalizeHeader(h) {
-  return String(h || "").trim().toLowerCase();
+  return String(h || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[_-]+/g, " ");
 }
 
-function colToA1(colIndexZeroBased) {
-  let n = colIndexZeroBased + 1;
+function colToA1(colIdx0) {
+  // 0 => A, 25 => Z, 26 => AA
+  let n = colIdx0 + 1;
   let s = "";
   while (n > 0) {
     const r = (n - 1) % 26;
@@ -15,101 +37,186 @@ function colToA1(colIndexZeroBased) {
   return s;
 }
 
-async function readHeaderRow(sheets, sheetId, tab) {
-  const resp = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${tab}!1:1`
-  });
+function getServiceAccountFromEnv() {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (raw && raw.trim().startsWith("{")) {
+    return JSON.parse(raw);
+  }
 
-  const header = (resp.data.values && resp.data.values[0]) || [];
-  if (!header.length) throw new Error(`No header row found in ${tab}`);
-  return header;
+  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64;
+  if (b64) {
+    const decoded = Buffer.from(b64, "base64").toString("utf8");
+    return JSON.parse(decoded);
+  }
+
+  throw new Error(
+    "Missing GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_JSON_B64)."
+  );
 }
 
-async function readColumnValues(sheets, sheetId, tab, colIndex) {
-  const colLetter = colToA1(colIndex);
-  const resp = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${tab}!${colLetter}:${colLetter}`
+async function getSheetsClient() {
+  const sa = getServiceAccountFromEnv();
+  const auth = new google.auth.JWT({
+    email: sa.client_email,
+    key: sa.private_key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
   });
-  const values = resp.data.values || [];
-  // values includes header in row 1
+
+  const sheets = google.sheets({ version: "v4", auth });
+  return sheets;
+}
+
+async function loadHeaderMap(sheets, sheetId, tabName) {
+  const headerRes = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${tabName}!1:1`,
+  });
+
+  const headers = (headerRes.data.values && headerRes.data.values[0]) || [];
+  const headerMap = new Map(); // normalized header -> colIdx0
+
+  headers.forEach((h, idx) => {
+    const key = normalizeHeader(h);
+    if (key) headerMap.set(key, idx);
+  });
+
+  return { headers, headerMap };
+}
+
+function findCol(headerMap, ...candidates) {
+  for (const c of candidates) {
+    const idx = headerMap.get(normalizeHeader(c));
+    if (idx !== undefined) return idx;
+  }
+  return null;
+}
+
+async function getColumnValues(sheets, sheetId, tabName, colIdx0) {
+  const colA1 = colToA1(colIdx0);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${tabName}!${colA1}2:${colA1}`,
+  });
+
+  const values = res.data.values || [];
+  // values is [["x"],["y"]...]
   return values.map((r) => (r && r[0] ? String(r[0]).trim() : ""));
 }
 
-async function updateSingleCell(sheets, sheetId, tab, rowNumber1Based, colIndex0Based, value) {
-  const colLetter = colToA1(colIndex0Based);
-  const range = `${tab}!${colLetter}${rowNumber1Based}`;
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: sheetId,
-    range,
-    valueInputOption: "RAW",
-    requestBody: { values: [[value]] }
-  });
-}
+async function upsertStudentToSheet(student) {
+  const sheetId = process.env.STUDENTS_SHEET_ID;
+  const tabName = process.env.STUDENTS_SHEET_TAB || "students";
 
-async function appendRow(sheets, sheetId, tab, row) {
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: sheetId,
-    range: `${tab}!A1`,
-    valueInputOption: "RAW",
-    insertDataOption: "INSERT_ROWS",
-    requestBody: { values: [row] }
-  });
-}
-
-async function appendStudentToStudentsSheetSafely(student) {
-  const SHEET_ID = process.env.SHEETS_STUDENTS_ID; // your students sheet id
-  const TAB = process.env.SHEETS_STUDENTS_TAB || "students";
-
-  if (!SHEET_ID) throw new Error("Missing env SHEETS_STUDENTS_ID");
+  if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
 
   const sheets = await getSheetsClient();
-  const header = await readHeaderRow(sheets, SHEET_ID, TAB);
+  const { headerMap } = await loadHeaderMap(sheets, sheetId, tabName);
 
-  // Build lookup
-  const headerNorm = header.map(normalizeHeader);
-  const idxStudentCode = headerNorm.indexOf("studentcode");
-  const idxUid = headerNorm.indexOf("uid");
+  // Find important columns by header names (supports variations)
+  const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
+  const colUid = findCol(headerMap, "uid", "UID");
+  const colEmail = findCol(headerMap, "Email", "email");
+  const colName = findCol(headerMap, "Name", "name");
+  const colPhone = findCol(headerMap, "Phone", "phone");
+  const colLocation = findCol(headerMap, "Location", "location");
+  const colLevel = findCol(headerMap, "Level", "level");
+  const colClassName = findCol(headerMap, "ClassName", "Class Name", "classname");
+  const colStatus = findCol(headerMap, "Status", "status");
+  const colEnrollDate = findCol(headerMap, "EnrollDate", "Enroll Date", "enrolldate");
 
-  // Dedupe: if StudentCode exists, update UID only (if possible), else skip append
-  if (idxStudentCode !== -1) {
-    const colValues = await readColumnValues(sheets, SHEET_ID, TAB, idxStudentCode);
-    const existingRowIndex = colValues.findIndex(
-      (v, i) => i > 0 && v && v.toLowerCase() === String(student.studentCode || student.studentcode || "").toLowerCase()
-    );
-
-    if (existingRowIndex !== -1) {
-      // row number is index + 1
-      const rowNumber = existingRowIndex + 1;
-
-      // If uid column exists and we have uid, update it (safe)
-      if (idxUid !== -1 && student.uid) {
-        await updateSingleCell(sheets, SHEET_ID, TAB, rowNumber, idxUid, String(student.uid));
-      }
-      return;
-    }
+  if (colStudentCode === null) {
+    throw new Error("Students sheet is missing a StudentCode column header.");
   }
 
-  // Map fields based on header names ONLY (prevents extra columns)
-  const row = header.map((h) => {
-    const key = normalizeHeader(h);
+  // Build indexes to locate existing rows (only by columns that exist)
+  const studentCodes = await getColumnValues(sheets, sheetId, tabName, colStudentCode);
 
-    // match your sheet headers
-    if (key === "name") return student.name || "";
-    if (key === "phone") return student.phone || "";
-    if (key === "location") return student.location || "";
-    if (key === "level") return student.level || "";
-    if (key === "studentcode") return student.studentCode || student.studentcode || "";
-    if (key === "email") return student.email || "";
-    if (key === "classname") return student.className || student.classname || "";
-    if (key === "uid") return student.uid || "";
+  let uids = [];
+  if (colUid !== null) uids = await getColumnValues(sheets, sheetId, tabName, colUid);
 
-    // keep existing automation columns untouched
-    return "";
+  let emails = [];
+  if (colEmail !== null) emails = await getColumnValues(sheets, sheetId, tabName, colEmail);
+
+  // Row number in sheet (1-based; row 1 is header). Data rows start at row 2.
+  const targetStudentCode = String(student.studentCode || "").trim();
+  const targetUid = String(student.uid || "").trim();
+  const targetEmail = String(student.email || "").trim();
+
+  let rowIndex0 = -1; // data index in arrays (0 means sheet row 2)
+  if (targetStudentCode) {
+    rowIndex0 = studentCodes.findIndex((v) => v === targetStudentCode);
+  }
+  if (rowIndex0 === -1 && targetUid && uids.length) {
+    rowIndex0 = uids.findIndex((v) => v === targetUid);
+  }
+  if (rowIndex0 === -1 && targetEmail && emails.length) {
+    rowIndex0 = emails.findIndex((v) => v.toLowerCase() === targetEmail.toLowerCase());
+  }
+
+  const sheetRowNumber = rowIndex0 >= 0 ? rowIndex0 + 2 : null;
+
+  // Prepare cell updates (ONLY update columns that exist)
+  const updates = [];
+  function pushCell(colIdx0, value) {
+    if (colIdx0 === null || colIdx0 === undefined) return;
+    const colA1 = colToA1(colIdx0);
+    const a1 = `${tabName}!${colA1}${sheetRowNumber}`;
+    updates.push({ range: a1, values: [[value]] });
+  }
+
+  if (sheetRowNumber) {
+    // Update existing row safely
+    pushCell(colStudentCode, targetStudentCode || "");
+    pushCell(colUid, targetUid || "");
+    pushCell(colEmail, targetEmail || "");
+    pushCell(colName, student.name || "");
+    pushCell(colPhone, student.phone || "");
+    pushCell(colLocation, student.location || "");
+    pushCell(colLevel, student.level || "");
+    pushCell(colClassName, student.className || "");
+    pushCell(colStatus, student.status || "");
+    pushCell(colEnrollDate, student.enrollDate || "");
+
+    if (updates.length) {
+      await sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: {
+          valueInputOption: "USER_ENTERED",
+          data: updates,
+        },
+      });
+    }
+
+    return { action: "updated", row: sheetRowNumber };
+  }
+
+  // Append new row: create an array aligned to header length
+  // Note: we only fill known columns; everything else stays empty.
+  const maxCol = Math.max(...Array.from(headerMap.values()));
+  const row = Array(maxCol + 1).fill("");
+
+  row[colStudentCode] = targetStudentCode || "";
+  if (colUid !== null) row[colUid] = targetUid || "";
+  if (colEmail !== null) row[colEmail] = targetEmail || "";
+  if (colName !== null) row[colName] = student.name || "";
+  if (colPhone !== null) row[colPhone] = student.phone || "";
+  if (colLocation !== null) row[colLocation] = student.location || "";
+  if (colLevel !== null) row[colLevel] = student.level || "";
+  if (colClassName !== null) row[colClassName] = student.className || "";
+  if (colStatus !== null) row[colStatus] = student.status || "";
+  if (colEnrollDate !== null) row[colEnrollDate] = student.enrollDate || "";
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: `${tabName}!A:Z`,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [row] },
   });
 
-  await appendRow(sheets, SHEET_ID, TAB, row);
+  return { action: "appended" };
 }
 
-module.exports = { appendStudentToStudentsSheetSafely };
+module.exports = {
+  upsertStudentToSheet,
+};
