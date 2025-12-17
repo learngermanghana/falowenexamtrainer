@@ -2,7 +2,7 @@
   "name": "falowen-exam-coach-backend",
   "version": "1.0.0",
   "main": "index.js",
-  "engines": { "node": "22" },
+  "engines": { "node": "20" },
   "scripts": {
     "start": "node index.js",
     "test": "npm run test:backend",
@@ -18,7 +18,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "firebase-admin": "^12.7.0",
-    "firebase-functions": "^4.9.0",
+    "firebase-functions": "^6.0.0",
     "googleapis": "^144.0.0",
     "multer": "^2.0.2",
     "openai": "^6.10.0",
