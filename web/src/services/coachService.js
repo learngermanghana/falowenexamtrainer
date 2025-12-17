@@ -3,8 +3,8 @@ import { speakingSheetQuestions } from "../data/speakingSheet";
 import { writingLetters as writingSheetLetters } from "../data/writingLetters";
 
 const backendUrl =
-  process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+  import.meta.env.VITE_BACKEND_URL ||
+  (import.meta.env.PROD ? "" : "http://localhost:5000");
 
 const authHeaders = (idToken) =>
   idToken
@@ -132,6 +132,11 @@ export const fetchWritingLetters = async (level, idToken) => {
   }
 
   return writingSheetLetters;
+};
+
+export const fetchBackendHealth = async () => {
+  const response = await fetch(`${backendUrl}/health`);
+  return response.json();
 };
 
 export const startPlacement = async ({ answers = [], userId, targetLevel, idToken }) => {
