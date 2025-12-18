@@ -23,8 +23,6 @@ jest.mock("./services/assignmentService", () => ({
   fetchAssignmentSummary: jest.fn(() => Promise.resolve({ leaderboard: {}, student: null })),
 }));
 
-jest.mock("./components/CoachPanel", () => () => <div data-testid="coach-panel" />);
-
 import App from "./App";
 
 test("renders home actions for authenticated users", () => {
