@@ -98,7 +98,6 @@ const ProgressPage = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
   useEffect(() => {
     let cancelled = false;
 
@@ -106,7 +105,9 @@ const ProgressPage = () => {
       setLoading(true);
       setError("");
       try {
-        const response = await fetchResults({ studentCode: studentProfile?.studentcode });
+        const response = await fetchResults({
+          studentCode: studentProfile?.studentcode,
+        });
         if (cancelled) return;
         setResults(response.results || []);
       } catch (err) {

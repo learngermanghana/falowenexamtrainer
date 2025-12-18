@@ -1,9 +1,21 @@
 import { collection, db, getDocs, query, where } from "../firebase";
 import { courseSchedules } from "../data/courseSchedule";
 
+const backendUrl =
+  process.env.REACT_APP_BACKEND_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+
+const scoresApiBase =
+  process.env.REACT_APP_SCORES_API_URL ||
+  backendUrl ||
+  "https://falowenexamtrainer.vercel.app";
+
 const LEVEL_ASSIGNMENT_TARGET_OVERRIDES = {
   A1: 19,
 };
+
+const normalizeCode = (value) => (value || "").toString().trim().toLowerCase();
+const normalizeLevel = (value) => (value || "").toString().trim().toUpperCase();
 
 const average = (values = []) => {
   const numeric = values.map(Number).filter((value) => Number.isFinite(value));
@@ -92,7 +104,24 @@ const toDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const loadScores = async ({ level, studentCode } = {}) => {
+const fetchSheetScores = async ({ level, studentCode } = {}) => {
+  if (!studentCode) return [];
+
+  const params = new URLSearchParams();
+  params.set("studentCode", studentCode);
+  if (level && level !== "all") params.set("level", level.toUpperCase());
+
+  const response = await fetch(`${scoresApiBase}/api/scores?${params.toString()}`);
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || "Failed to load scores from sheet.");
+  }
+
+  const data = await response.json();
+  return Array.isArray(data?.rows) ? data.rows : [];
+};
+
+const loadFirestoreScores = async ({ level, studentCode } = {}) => {
   const scoresRef = collection(db, "scores");
   const constraints = [];
   if (level && level !== "all") {
@@ -103,6 +132,20 @@ const loadScores = async ({ level, studentCode } = {}) => {
   }
   const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+const loadScores = async ({ level, studentCode } = {}) => {
+  if (!studentCode) return [];
+
+  try {
+    const sheetScores = await fetchSheetScores({ level, studentCode });
+    return sheetScores;
+  } catch (error) {
+    console.error("Failed to fetch sheet scores", error);
+    if (!db) throw error;
+  }
+
+  return loadFirestoreScores({ level, studentCode });
 };
 
 const buildResults = (scores = []) => {
@@ -122,6 +165,7 @@ const buildResults = (scores = []) => {
       return {
         assignment: row.assignment || "Assignment",
         studentCode: row.studentcode || row.studentCode || "",
+        email: row.email || row.studentEmail || "",
         studentName: row.name || "",
         level: (row.level || "").toUpperCase(),
         date: row.date || row.created_at || "",
@@ -139,6 +183,22 @@ const buildResults = (scores = []) => {
     });
 
   return rows;
+};
+
+const filterResultsForStudent = (rows = [], { studentCode, level } = {}) => {
+  const targetCode = normalizeCode(studentCode);
+  const targetLevel = normalizeLevel(level);
+  const restrictLevel = targetLevel && targetLevel !== "ALL" ? targetLevel : null;
+
+  return rows.filter((row) => {
+    const rowCode = normalizeCode(row.studentCode);
+    if (targetCode && rowCode !== targetCode) return false;
+
+    const rowLevel = normalizeLevel(row.level);
+    if (restrictLevel && rowLevel !== restrictLevel) return false;
+
+    return true;
+  });
 };
 
 const summarizeResults = (rows = []) => {
@@ -175,8 +235,8 @@ const summarizeResults = (rows = []) => {
 };
 
 const buildStudentMetrics = ({ level, studentCode, results }) => {
-  const normalizedLevel = (level || "").toUpperCase();
-  const normalizedCode = (studentCode || "").toLowerCase();
+  const normalizedLevel = normalizeLevel(level);
+  const normalizedCode = normalizeCode(studentCode);
 
   const assignments = normalizedLevel ? collectAssignmentsFromSchedule(normalizedLevel) : [];
   const assignmentIndex = Object.fromEntries(
@@ -277,10 +337,10 @@ const buildStudentMetrics = ({ level, studentCode, results }) => {
 
 export const fetchResults = async ({ level, studentCode } = {}) => {
   const scores = await loadScores({ level, studentCode });
-  const results = buildResults(scores);
+  const results = filterResultsForStudent(buildResults(scores), { level, studentCode });
   const summary = summarizeResults(results);
   const metrics = buildStudentMetrics({ level, studentCode, results });
-  const assignments = collectAssignmentsFromSchedule((level || "").toUpperCase());
+  const assignments = collectAssignmentsFromSchedule(normalizeLevel(level));
 
   return {
     results,

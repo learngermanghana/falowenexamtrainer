@@ -356,7 +356,10 @@ const CourseTab = () => {
           return;
         }
 
-        const response = await fetchResults({ level: resultsLevel, studentCode });
+        const response = await fetchResults({
+          level: resultsLevel,
+          studentCode,
+        });
         const payloadResults = response.results || [];
         setResults(payloadResults);
         setResultsMetrics(response.metrics || null);
