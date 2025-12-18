@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
 
 const Highlight = ({ title, description }) => (
@@ -16,43 +16,117 @@ const Highlight = ({ title, description }) => (
 );
 
 const LandingPage = ({ onSignUp, onLogin }) => {
+  const [latestBlogs, setLatestBlogs] = useState([]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadFeed = async () => {
+      try {
+        const response = await fetch("https://blog.falowen.app/feed", {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) return;
+
+        const text = await response.text();
+        const parser = new window.DOMParser();
+        const xml = parser.parseFromString(text, "application/xml");
+        const items = Array.from(xml.querySelectorAll("item"))
+          .slice(0, 5)
+          .map((item) => ({
+            title: item.querySelector("title")?.textContent?.trim(),
+            href: item.querySelector("link")?.textContent?.trim(),
+          }))
+          .filter((item) => item.title && item.href);
+
+        setLatestBlogs(items);
+      } catch (error) {
+        // Silently ignore feed issues so the page still renders.
+      }
+    };
+
+    loadFeed();
+
+    return () => controller.abort();
+  }, []);
+
   const highlights = [
     {
-      title: "About us",
+      title: "Who we serve",
       description:
-        "We are a small team of language coaches and technologists helping you prepare smarter for every exam.",
+        "Falowen is a conversational mobile and web app built for students preparing for German certifications (A1–C1).",
     },
     {
-      title: "Our mission",
+      title: "Blended learning",
       description:
-        "Personalized learning paths, exam-style practice, and continuous feedback to keep you confident and ready.",
+        "Connect daily self-study with structured classroom coaching so every session moves you closer to Goethe exam day.",
     },
     {
-      title: "What to expect",
+      title: "Always exam-ready",
       description:
-        "Guided speaking and writing sessions, vocabulary drills, and a progress cockpit with clear next steps.",
+        "Practice introductions, polite requests, and live Q&A that mirror test conditions while tutors monitor in real time.",
     },
   ];
 
   const pillars = [
     {
-      title: "Focus on outcomes",
-      copy: "Clear goals, adaptive tasks, and realistic mock tests accelerate your progress.",
+      title: "Exam preparation that feels real",
+      copy: "Speaking and writing prompts are modeled after Goethe-style A1–C1 tasks so you rehearse exactly what you will face.",
     },
     {
-      title: "Coach in the loop",
-      copy: "Real-time feedback, personalized tips, and reminders keep you in the flow.",
+      title: "Coach-guided chat",
+      copy: "Join live-typed German chats during class while tutors keep the conversation flowing and give instant feedback.",
     },
     {
-      title: "Tech + teaching",
-      copy: "We combine modern language tools with proven methods for sustainable results.",
+      title: "Personal reminders",
+      copy: "Email and Telegram updates include countdowns to your registered exam date plus tailored coaching tips.",
     },
   ];
 
   const steps = [
-    "Run the Level Check to unlock your profile.",
-    "Follow the Daily Plan and complete speaking/writing sessions.",
-    "Get a weekly review with clear next steps and streak support.",
+    "Start with the Level Check to tailor your A1–C1 pathway.",
+    "Follow the Daily Plan with blended self-study and live class chat tasks.",
+    "Track progress, get reminders, and arrive at exam day confident and prepared.",
+  ];
+
+  const featureList = [
+    "Blended learning that links daily practice with structured classroom coaching.",
+    "Realistic German exam preparation with introductions, questions, and polite requests.",
+    "Live German chat participation with tutor monitoring and feedback.",
+    "Exam reminders, countdowns, and personalized coaching via email and Telegram.",
+  ];
+
+  const socialLinks = [
+    { label: "Instagram", href: "https://www.instagram.com/lleaghana/" },
+    { label: "Facebook", href: "https://web.facebook.com/lleaghana" },
+    { label: "YouTube", href: "https://www.youtube.com/@LLEAGhana" },
+  ];
+
+  const contactInfo = {
+    phone: {
+      label: "+233 205 706 589",
+      href: "tel:+233205706589",
+    },
+    email: {
+      label: "Learngermanghana@gmail.com",
+      href: "mailto:Learngermanghana@gmail.com",
+    },
+  };
+
+  const galleryImages = [
+    {
+      src: "https://raw.githubusercontent.com/learngermanghana/falowenexamtrainer/main/photos/pexels-akbissue-29558446.jpg",
+      alt: "Student practicing German speaking on a mobile phone",
+    },
+    {
+      src: "https://raw.githubusercontent.com/learngermanghana/falowenexamtrainer/main/photos/pexels-ilabappa-19376862.jpg",
+      alt: "Group German study session with notebooks",
+    },
+    {
+      src: "https://raw.githubusercontent.com/learngermanghana/falowenexamtrainer/main/photos/pexels-mikhail-nilov-6893950.jpg",
+      alt: "Tutor guiding a student through German exercises",
+    },
   ];
 
   return (
@@ -84,24 +158,60 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               Falowen Exam Coach
             </p>
             <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-              Your guided path to confident exam results.
+              Conversational prep for German exams (A1–C1).
             </h1>
             <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 4 }}>
-              Everyday-friendly training, realistic simulations, and a coach that guides you step by step.
+              Blended mobile and web learning that connects daily practice, classroom coaching, and live tutor feedback so you
+              arrive confident on exam day.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button style={styles.primaryButton} onClick={onSignUp}>
-                Sign up for free
-              </button>
+              <a
+                href="https://api.whatsapp.com/send/?phone=233205706589&text&type=phone_number&app_absent=0"
+                style={{ ...styles.primaryButton, textDecoration: "none", display: "inline-block" }}
+              >
+                Register via WhatsApp
+              </a>
               <button style={styles.secondaryButton} onClick={onLogin}>
                 I already have an account
               </button>
             </div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 6 }}>
-              <span style={styles.badge}>A1–B2 Speaking & Writing</span>
+              <span style={styles.badge}>A1–C1 Speaking & Writing</span>
               <span style={styles.badge}>Adaptive Daily Plan</span>
               <span style={styles.badge}>Push reminders</span>
             </div>
+          </div>
+        </section>
+
+        <section style={{ ...styles.card }}>
+          <h2 style={styles.sectionTitle}>Key features and functions</h2>
+          <p style={styles.helperText}>
+            Everything is designed around Goethe exam readiness with blended learning and coach support.
+          </p>
+          <ul style={{ ...styles.checklist, margin: 0 }}>
+            {featureList.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+            <a
+              href="https://api.whatsapp.com/send/?phone=233205706589&text&type=phone_number&app_absent=0"
+              style={{ ...styles.primaryButton, textDecoration: "none", display: "inline-block" }}
+            >
+              Register via WhatsApp
+            </a>
+            <a
+              href="https://register.falowen.app/privacy"
+              style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-block" }}
+            >
+              Privacy & terms (register.falowen.app)
+            </a>
+            <a
+              href="https://blog.falowen.app"
+              style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-block" }}
+            >
+              Read Falowen blog
+            </a>
           </div>
         </section>
 
@@ -116,8 +226,8 @@ const LandingPage = ({ onSignUp, onLogin }) => {
             <div style={{ flex: 2, minWidth: 260 }}>
               <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>Mission & approach</h2>
               <p style={{ ...styles.helperText, color: "#d1d5db" }}>
-                Prep should be measurable, motivating, and manageable. That is why we pair short daily sessions, clear weekly
-                goals, and personal feedback on every exercise.
+                Prep should be measurable, motivating, and manageable. We pair short daily sessions, clear weekly goals, and
+                personal feedback on every exercise.
               </p>
             </div>
             <div style={{ display: "grid", gap: 10, flex: 1, minWidth: 240 }}>
@@ -149,9 +259,12 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                   Get an early lead, receive a clear plan, and track your progress with every login.
                 </p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button style={{ ...styles.primaryButton, padding: "10px 14px" }} onClick={onSignUp}>
-                    Create account
-                  </button>
+                  <a
+                    href="https://api.whatsapp.com/send/?phone=233205706589&text&type=phone_number&app_absent=0"
+                    style={{ ...styles.primaryButton, padding: "10px 14px", textDecoration: "none", display: "inline-block" }}
+                  >
+                    Register via WhatsApp
+                  </a>
                   <button style={{ ...styles.secondaryButton, padding: "10px 14px" }} onClick={onLogin}>
                     Go to login
                   </button>
@@ -164,6 +277,97 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                   <li>Weekly review with individual writing and speaking tips.</li>
                   <li>Push reminders and email summaries included.</li>
                 </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section style={{ ...styles.card }}>
+          <h2 style={styles.sectionTitle}>Classroom & practice moments</h2>
+          <p style={styles.helperText}>
+            Real learners, real preparation: a glimpse of how Falowen keeps German exam coaching conversational and practical.
+          </p>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 12,
+            }}
+          >
+            {galleryImages.map((image) => (
+              <div key={image.src} style={{ ...styles.uploadCard, padding: 0, overflow: "hidden" }}>
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section style={{ ...styles.card }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
+            <div>
+              <h3 style={styles.sectionTitle}>Stay connected</h3>
+              <p style={styles.helperText}>Follow learning highlights and class moments.</p>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {socialLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-block" }}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+              <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
+                <h4 style={{ ...styles.helperText, margin: 0, fontWeight: 600, color: "#111827" }}>
+                  Talk to the team
+                </h4>
+                <a href={contactInfo.phone.href} style={{ color: "#1d4ed8", textDecoration: "none" }}>
+                  Call: {contactInfo.phone.label}
+                </a>
+                <a href={contactInfo.email.href} style={{ color: "#1d4ed8", textDecoration: "none" }}>
+                  Email: {contactInfo.email.label}
+                </a>
+              </div>
+            </div>
+            <div>
+              <h3 style={styles.sectionTitle}>Latest from the blog</h3>
+              <p style={styles.helperText}>Fresh tips and updates from blog.falowen.app.</p>
+              <ul style={{ ...styles.checklist, margin: 0 }}>
+                {(latestBlogs.length > 0 ? latestBlogs : [{ title: "Loading latest posts...", href: "#" }]).map(
+                  (post) => (
+                    <li key={`${post.title}-${post.href}`}>
+                      {post.href !== "#" ? (
+                        <a href={post.href} style={{ color: "#1d4ed8", textDecoration: "none" }}>
+                          {post.title}
+                        </a>
+                      ) : (
+                        <span>{post.title}</span>
+                      )}
+                    </li>
+                  ),
+                )}
+              </ul>
+            </div>
+            <div>
+              <h3 style={styles.sectionTitle}>Privacy & terms</h3>
+              <p style={styles.helperText}>
+                Review how we handle your data and the service terms before you register.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <a href="https://register.falowen.app/privacy" style={{ color: "#1d4ed8", textDecoration: "none" }}>
+                  Privacy policy
+                </a>
+                <a href="https://register.falowen.app/terms" style={{ color: "#1d4ed8", textDecoration: "none" }}>
+                  Terms of service
+                </a>
+                <a href="https://register.falowen.app" style={{ color: "#1d4ed8", textDecoration: "none" }}>
+                  Privacy & terms home (register.falowen.app)
+                </a>
               </div>
             </div>
           </div>
