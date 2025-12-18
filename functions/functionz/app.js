@@ -142,6 +142,35 @@ app.post("/writing/mark", async (req, res) => {
   }
 });
 
+app.post("/discussion/correct", async (req, res) => {
+  try {
+    const { text, level = "A2" } = req.body || {};
+    const input = String(text || "").trim();
+
+    if (!input) {
+      return res.status(400).json({ error: "Text is required for correction" });
+    }
+
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You are a concise German writing assistant for class discussions. " +
+          "Return only the corrected German text. Preserve meaning, keep it short, and focus on grammar and spelling. " +
+          `Target level: ${level}. If the input already looks correct, return it unchanged.`,
+      },
+      { role: "user", content: input },
+    ];
+
+    const corrected = await createChatCompletion(messages, { temperature: 0.2, max_tokens: 300 });
+
+    return res.json({ corrected });
+  } catch (err) {
+    console.error("/discussion/correct error", err);
+    return res.status(500).json({ error: err.message || "Failed to correct text" });
+  }
+});
+
 app.get("/student", async (req, res) => {
   try {
     const studentCode = String(req.query.studentCode || "").trim();

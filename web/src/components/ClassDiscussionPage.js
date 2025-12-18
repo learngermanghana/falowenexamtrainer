@@ -5,17 +5,17 @@ import { styles } from "../styles";
 import {
   addDoc,
   collection,
-  collectionGroup,
   db,
-  deleteDoc,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
   Timestamp,
-  updateDoc,
+  setDoc,
 } from "../firebase";
+import { correctDiscussionText } from "../services/discussionService";
 
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "Kein Timer";
@@ -28,11 +28,12 @@ const formatTimeRemaining = (expiresAt, now) => {
 };
 
 const ClassDiscussionPage = () => {
-  const { user } = useAuth();
+  const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
   const [repliesByThread, setRepliesByThread] = useState({});
   const [now, setNow] = useState(Date.now());
   const [replyDrafts, setReplyDrafts] = useState({});
+  const [isCorrectingDraft, setIsCorrectingDraft] = useState({});
   const [editingReply, setEditingReply] = useState(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -70,7 +71,16 @@ const ClassDiscussionPage = () => {
       return;
     }
 
-    const threadsQuery = query(collection(db, "discussionThreads"), orderBy("createdAt", "desc"));
+    if (!studentProfile?.level || !studentProfile?.className) {
+      setError("Es fehlen Kursangaben aus deinem Profil. Bitte Klasse und Niveau hinterlegen.");
+      setIsLoading(false);
+      return undefined;
+    }
+
+    const threadsQuery = query(
+      collection(db, "class_board", studentProfile.level, "classes", studentProfile.className, "posts"),
+      orderBy("createdAt", "desc")
+    );
     const unsubscribe = onSnapshot(
       threadsQuery,
       (snapshot) => {
@@ -102,30 +112,32 @@ const ClassDiscussionPage = () => {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [studentProfile?.level, studentProfile?.className]);
 
   useEffect(() => {
     if (!db) return undefined;
 
-    const repliesQuery = query(collectionGroup(db, "replies"), orderBy("createdAt", "asc"));
+    const repliesQuery = collection(db, "qa_posts");
     const unsubscribe = onSnapshot(
       repliesQuery,
       (snapshot) => {
         const grouped = {};
         snapshot.forEach((docSnapshot) => {
-          const parentThread = docSnapshot.ref.parent.parent;
-          if (!parentThread) return;
-          const threadId = parentThread.id;
           const data = docSnapshot.data();
-          const reply = {
-            id: docSnapshot.id,
-            author: data.author || "Student",
-            text: data.text || "",
-            createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
-            editedAt: data.editedAt?.toMillis ? data.editedAt.toMillis() : data.editedAt || null,
-          };
-          if (!grouped[threadId]) grouped[threadId] = [];
-          grouped[threadId].push(reply);
+          const responses = Array.isArray(data?.responses) ? data.responses : [];
+          const replies = responses
+            .map((response, index) => ({
+              id: response.id || `${docSnapshot.id}-${index}`,
+              author: response.responder || response.author || "Student",
+              responderCode: response.responderCode || response.studentCode || null,
+              text: response.text || "",
+              createdAt: response.createdAt?.toMillis
+                ? response.createdAt.toMillis()
+                : response.createdAt || Date.now(),
+              editedAt: response.editedAt?.toMillis ? response.editedAt.toMillis() : response.editedAt || null,
+            }))
+            .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+          grouped[docSnapshot.id] = replies;
         });
         setError("");
         setRepliesByThread(grouped);
@@ -159,6 +171,10 @@ const ClassDiscussionPage = () => {
   const handleCreateThread = async (event) => {
     event.preventDefault();
     if (!form.question.trim() || !db) return;
+    if (!studentProfile?.level || !studentProfile?.className) {
+      setError("Bitte trage dein Kurs-Level und den Klassennamen in den Account-Einstellungen nach.");
+      return;
+    }
 
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
     const timerMinutes = Number(form.timerMinutes) || 0;
@@ -168,18 +184,23 @@ const ClassDiscussionPage = () => {
     setError("");
 
     try {
-      await addDoc(collection(db, "discussionThreads"), {
-        lessonId: lesson?.id,
-        lessonLabel: lesson?.label,
-        topic: form.topic || lesson?.topic,
-        question: form.question,
-        extraLink: form.extraLink,
-        timerMinutes,
-        createdAt: serverTimestamp(),
-        createdBy: user?.email || "Tutor",
-        createdByUid: user?.uid || null,
-        expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
-      });
+      await addDoc(
+        collection(db, "class_board", studentProfile.level, "classes", studentProfile.className, "posts"),
+        {
+          level: studentProfile.level,
+          className: studentProfile.className,
+          lessonId: lesson?.id,
+          lessonLabel: lesson?.label,
+          topic: form.topic || lesson?.topic,
+          question: form.question,
+          extraLink: form.extraLink,
+          timerMinutes,
+          createdAt: serverTimestamp(),
+          createdBy: user?.email || "Tutor",
+          createdByUid: user?.uid || null,
+          expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
+        }
+      );
       setForm({
         lessonId: lesson?.id || "",
         topic: lesson?.topic || "",
@@ -195,6 +216,9 @@ const ClassDiscussionPage = () => {
     }
   };
 
+  const getResponderCode = () =>
+    studentProfile?.studentcode || studentProfile?.id || studentProfile?.className || user?.uid || "unknown";
+
   const handleReply = async (threadId) => {
     const draft = replyDrafts[threadId] || "";
     if (!draft.trim() || !db) return;
@@ -202,12 +226,27 @@ const ClassDiscussionPage = () => {
     setError("");
 
     try {
-      const threadRef = doc(db, "discussionThreads", threadId);
-      await addDoc(collection(threadRef, "replies"), {
-        author: user?.email || "Student",
+      const qaDocRef = doc(db, "qa_posts", threadId);
+      const existingSnap = await getDoc(qaDocRef);
+      const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
+
+      const replyId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+      const payload = {
+        id: replyId,
+        responder: user?.email || "Student",
+        responderCode: getResponderCode(),
         text: draft,
         createdAt: serverTimestamp(),
-      });
+      };
+
+      await setDoc(
+        qaDocRef,
+        {
+          responses: [...responses, payload],
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
       setReplyDrafts((prev) => ({ ...prev, [threadId]: "" }));
     } catch (err) {
       console.error("Failed to post reply", err);
@@ -220,7 +259,16 @@ const ClassDiscussionPage = () => {
     if (reply.author && user?.email && reply.author !== user.email) return;
 
     try {
-      await deleteDoc(doc(db, "discussionThreads", threadId, "replies", reply.id));
+      const qaDocRef = doc(db, "qa_posts", threadId);
+      const existingSnap = await getDoc(qaDocRef);
+      const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
+      const nextResponses = responses.filter((response) => response.id !== reply.id);
+
+      await setDoc(
+        qaDocRef,
+        { responses: nextResponses, updatedAt: serverTimestamp() },
+        { merge: true }
+      );
       if (editingReply?.replyId === reply.id) {
         setEditingReply(null);
       }
@@ -239,10 +287,20 @@ const ClassDiscussionPage = () => {
     if (editingReply.author && user?.email && editingReply.author !== user.email) return;
 
     try {
-      await updateDoc(doc(db, "discussionThreads", editingReply.threadId, "replies", editingReply.replyId), {
-        text: editingReply.text,
-        editedAt: serverTimestamp(),
-      });
+      const qaDocRef = doc(db, "qa_posts", editingReply.threadId);
+      const existingSnap = await getDoc(qaDocRef);
+      const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
+      const updatedResponses = responses.map((response) =>
+        response.id === editingReply.replyId
+          ? { ...response, text: editingReply.text, editedAt: serverTimestamp() }
+          : response
+      );
+
+      await setDoc(
+        qaDocRef,
+        { responses: updatedResponses, updatedAt: serverTimestamp() },
+        { merge: true }
+      );
       setEditingReply(null);
     } catch (err) {
       console.error("Failed to edit reply", err);
@@ -250,7 +308,40 @@ const ClassDiscussionPage = () => {
     }
   };
 
-  const isReplyOwner = (reply) => reply.author && user?.email && reply.author === user.email;
+  const isReplyOwner = (reply) => {
+    if (reply.author && user?.email && reply.author === user.email) return true;
+    if (reply.responderCode && studentProfile?.studentcode && reply.responderCode === studentProfile.studentcode)
+      return true;
+    return false;
+  };
+
+  const handleCorrectDraft = async (threadId) => {
+    const draft = replyDrafts[threadId] || "";
+    if (!draft.trim()) {
+      setError("Gib zuerst etwas ein – ohne Text kann die KI nichts korrigieren.");
+      return;
+    }
+
+    setIsCorrectingDraft((prev) => ({ ...prev, [threadId]: true }));
+    setError("");
+
+    try {
+      const { corrected } = await correctDiscussionText({
+        text: draft,
+        level: studentProfile?.level,
+        idToken,
+      });
+
+      if (corrected) {
+        setReplyDrafts((prev) => ({ ...prev, [threadId]: corrected }));
+      }
+    } catch (err) {
+      console.error("Failed to correct draft", err);
+      setError("Die KI-Korrektur ist fehlgeschlagen. Bitte versuche es später erneut.");
+    } finally {
+      setIsCorrectingDraft((prev) => ({ ...prev, [threadId]: false }));
+    }
+  };
 
   const threadsWithReplies = useMemo(
     () => threads.map((thread) => ({ ...thread, replies: repliesByThread[thread.id] || [] })),
@@ -340,11 +431,22 @@ const ClassDiscussionPage = () => {
             value={replyDrafts[thread.id] || ""}
             onChange={(e) => setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }))}
           />
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
+            <button
+              style={{ ...styles.secondaryButton, padding: "10px 12px" }}
+              type="button"
+              onClick={() => handleCorrectDraft(thread.id)}
+              disabled={isCorrectingDraft[thread.id]}
+            >
+              {isCorrectingDraft[thread.id] ? "KI korrigiert ..." : "Mit KI korrigieren"}
+            </button>
             <button style={styles.primaryButton} onClick={() => handleReply(thread.id)}>
               Antwort posten
             </button>
           </div>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            "Mit KI korrigieren" verbessert nur den Text, den du eingibst. Ohne Eingabe kann die KI dir nicht helfen.
+          </p>
         </div>
       </div>
     </div>
@@ -364,6 +466,22 @@ const ClassDiscussionPage = () => {
           <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
             Live aktualisiert
           </span>
+        </div>
+
+        <div style={{ ...styles.card, background: "#f8fafc", borderColor: "#e2e8f0", marginTop: 12 }}>
+          <div style={{ fontWeight: 700, marginBottom: 6 }}>Datenquellen</div>
+          <div style={{ display: "grid", gap: 6, color: "#0f172a" }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Klassennotizen und Diskussionsbeiträge werden aus <code>class_board/&lt;level&gt;/classes/&lt;class_name&gt;/posts</code>
+              geladen <strong>und</strong> direkt dort gespeichert. Level und Klassenname stammen aus der Sitzung der angemeldeten
+              Studierenden, und ihre Beiträge erscheinen als einzelne Dokumente in dieser <em>posts</em>-Unterkollektion.
+            </p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Antworten in Q&A-Threads sowie KI-Vorschläge landen in der Sammlung <code>qa_posts</code>. Jedes
+              <code>qa_posts/{{post_id}}</code>-Dokument bündelt die Antworten im Feld <code>responses</code> – inklusive Code der
+              antwortenden Person und Zeitstempeln.
+            </p>
+          </div>
         </div>
 
         <form onSubmit={handleCreateThread} style={{ display: "grid", gap: 10, marginTop: 12 }}>
