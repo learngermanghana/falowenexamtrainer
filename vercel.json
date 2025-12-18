@@ -1,6 +1,9 @@
 {
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://api-haqjyxn5wa-ew.a.run.app/$1" },
+    {
+      "source": "/api/(.*)",
+      "destination": "https://europe-west1-language-academy-3e1de.cloudfunctions.net/api/$1"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

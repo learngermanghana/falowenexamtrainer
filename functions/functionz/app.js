@@ -124,8 +124,12 @@ app.get("/exams", async (_req, res) => {
   }
 });
 
-app.get("/sheets/diagnose", async (_req, res) => {
+app.get("/sheets/diagnose", async (req, res) => {
   try {
+    if (process.env.DIAGNOSE_KEY && req.get("x-diagnose-key") !== process.env.DIAGNOSE_KEY) {
+      return res.status(403).json({ ok: false, error: "Forbidden" });
+    }
+
     const sheets = await getSheetsClient();
 
     const checks = [
@@ -461,7 +465,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
   }
 });
 
-app.post("/speaking/interaction-score", upload.single("audio"), async (req, res) => {
+app.post("/speaking/interaction-score", speakingUpload.single("audio"), async (req, res) => {
   try {
     const {
       initialTranscript,
@@ -573,6 +577,16 @@ app.get("/tutor/next-task", async (req, res) => {
     console.error("/tutor/next-task error", err);
     return res.status(500).json({ error: err.message || "Failed to fetch next task" });
   }
+});
+
+app.use((err, _req, res, next) => {
+  if (err && err.name === "MulterError") {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({ error: "Audio file too large" });
+    }
+    return res.status(400).json({ error: err.message });
+  }
+  return next(err);
 });
 
 module.exports = app;
