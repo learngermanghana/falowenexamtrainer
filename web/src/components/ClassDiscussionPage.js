@@ -17,6 +17,9 @@ import {
 } from "../firebase";
 import { correctDiscussionText } from "../services/discussionService";
 
+const postsCollectionRef = (level, className) =>
+  collection(db, "class_board", level, "classes", className, "posts");
+
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "Kein Timer";
   const diff = Math.max(0, expiresAt - now);
@@ -78,7 +81,7 @@ const ClassDiscussionPage = () => {
     }
 
     const threadsQuery = query(
-      collection(db, "class_board", studentProfile.level, "classes", studentProfile.className, "posts"),
+      postsCollectionRef(studentProfile.level, studentProfile.className),
       orderBy("createdAt", "desc")
     );
     const unsubscribe = onSnapshot(
@@ -184,23 +187,20 @@ const ClassDiscussionPage = () => {
     setError("");
 
     try {
-      await addDoc(
-        collection(db, "class_board", studentProfile.level, "classes", studentProfile.className, "posts"),
-        {
-          level: studentProfile.level,
-          className: studentProfile.className,
-          lessonId: lesson?.id,
-          lessonLabel: lesson?.label,
-          topic: form.topic || lesson?.topic,
-          question: form.question,
-          extraLink: form.extraLink,
-          timerMinutes,
-          createdAt: serverTimestamp(),
-          createdBy: user?.email || "Tutor",
-          createdByUid: user?.uid || null,
-          expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
-        }
-      );
+      await addDoc(postsCollectionRef(studentProfile.level, studentProfile.className), {
+        level: studentProfile.level,
+        className: studentProfile.className,
+        lessonId: lesson?.id,
+        lessonLabel: lesson?.label,
+        topic: form.topic || lesson?.topic,
+        question: form.question,
+        extraLink: form.extraLink,
+        timerMinutes,
+        createdAt: serverTimestamp(),
+        createdBy: user?.email || "Tutor",
+        createdByUid: user?.uid || null,
+        expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
+      });
       setForm({
         lessonId: lesson?.id || "",
         topic: lesson?.topic || "",
