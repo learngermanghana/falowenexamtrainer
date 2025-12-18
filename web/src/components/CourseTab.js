@@ -109,31 +109,76 @@ const CourseTab = () => {
   const falowenIntro = useMemo(
     () => ({
       sender: "coach",
-      text: `Hi ${studentFirstName}, ich bin Falowen A.I. – dein Grammatik-Helfer und Chat Buddy. Willst du eine Grammatikfrage stellen oder einfach sprechen? Ich passe mich an dein Niveau (${studentLevel}) an.`,
+      text: `Hi ${studentFirstName}, I’m Falowen A.I.—your German grammar coach and chat buddy. Ask a grammar question or just practice chatting; I’ll keep the guidance at your level (${studentLevel}).`,
       kind: "system",
       createdAt: new Date(),
     }),
     [studentFirstName, studentLevel]
   );
 
-  const buildFalowenReply = (content) => {
-    if (!content) {
-      return "Erzähl mir, ob du Grammatik üben oder eine kleine Konversation führen möchtest.";
+  const sendToOpenAI = async (content, history) => {
+    const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+    if (!apiKey) {
+      setChatStatus("Missing OpenAI API key. Add REACT_APP_OPENAI_API_KEY to your .env file.");
+      return;
     }
 
-    const lower = content.toLowerCase();
-    const grammarHints = ["grammatik", "satz", "artikel", "konjug", "zeitform"];
-    const isGrammar = grammarHints.some((hint) => lower.includes(hint));
+    const thread = history || chatMessages;
+    const chatPayload = [
+      {
+        role: "system",
+        content: `You are Falowen, a patient German grammar coach. Keep answers concise, switch between German and English when helpful, and adapt to level ${studentLevel}. Encourage speaking aloud and correct short errors clearly.`,
+      },
+      ...thread.map((message) => ({
+        role: message.sender === "coach" ? "assistant" : "user",
+        content: message.text,
+      })),
+      { role: "user", content },
+    ];
 
-    if (isGrammar) {
-      return "Hier ist eine schnelle Grammatik-Stütze: Achte auf Verbzweitstellung und pass die Artikel an. Schick mir einen Beispielsatz, dann korrigiere ich ihn.";
+    setChatLoading(true);
+    setChatStatus("Falowen is replying via OpenAI…");
+
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: chatPayload,
+          temperature: 0.4,
+          max_tokens: 320,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`OpenAI error: ${response.status} ${errorBody}`);
+      }
+
+      const data = await response.json();
+      const reply = data?.choices?.[0]?.message?.content?.trim();
+      const assistantMessage = {
+        sender: "coach",
+        text: reply || "I couldn’t send anything back. Please try again.",
+        kind: "text",
+        createdAt: new Date(),
+      };
+
+      setChatMessages((prev) => [...prev, assistantMessage]);
+      appendChatMessages(user?.uid, [assistantMessage]).catch((error) => {
+        console.error("Failed to persist assistant chat", error);
+      });
+      setChatStatus("Reply sent. Ask me anything about German grammar or pronunciation.");
+    } catch (error) {
+      console.error("OpenAI chat error", error);
+      setChatStatus("Could not reach OpenAI. Please check your API key and connection.");
+    } finally {
+      setChatLoading(false);
     }
-
-    if (lower.includes("presentation") || lower.includes("präsent")) {
-      return "Für A2-Präsentationen: Starte mit einer kurzen Einleitung (Thema + Grund), nutze 3–4 Stichpunkte und schließe mit einer Frage ans Publikum. Möchtest du das laut üben?";
-    }
-
-    return "Lass uns kurz plaudern! Nenn ein Alltagsthema oder stell eine Frage, und ich reagiere so, dass du neue Wörter nutzen kannst.";
   };
 
   const sanitizePathSegment = (value) =>
@@ -673,22 +718,20 @@ Thank you!`
     if (!content) return;
 
     if (!user?.uid) {
-      setChatStatus("Bitte einloggen, um den Chat zu nutzen.");
+      setChatStatus("Please log in to use the chat.");
       return;
     }
 
-    const reply = buildFalowenReply(content);
-    const newMessages = [
-      { sender: "user", text: content, kind: "text", createdAt: new Date() },
-      { sender: "coach", text: reply, kind: "text", createdAt: new Date() },
-    ];
+    const userMessage = { sender: "user", text: content, kind: "text", createdAt: new Date() };
+    const nextMessages = [...chatMessages, userMessage];
 
-    setChatMessages((prev) => [...prev, ...newMessages]);
-    appendChatMessages(user.uid, newMessages).catch((error) => {
+    setChatMessages(nextMessages);
+    appendChatMessages(user.uid, [userMessage]).catch((error) => {
       console.error("Failed to persist chat", error);
-      setChatStatus("Konnte Chat nicht speichern. Versuche es erneut.");
+      setChatStatus("Could not save chat. Please try again.");
     });
     setChatInput("");
+    sendToOpenAI(content, nextMessages);
   };
 
   const stopActiveRecorder = () => {
@@ -705,19 +748,19 @@ Thank you!`
     }
 
     if (!navigator.mediaDevices?.getUserMedia) {
-      setRecorderError("Aufnahme nicht unterstützt.");
+      setRecorderError("Recording not supported.");
       return;
     }
 
     if (typeof MediaRecorder === "undefined") {
-      setRecorderError("MediaRecorder wird nicht unterstützt.");
+      setRecorderError("MediaRecorder is not supported.");
       return;
     }
 
-    try {
-      setRecorderError("");
-      setChatStatus("Aufnahme läuft – tippe erneut zum Stop.");
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      try {
+        setRecorderError("");
+        setChatStatus("Recording… tap again to stop.");
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const chunks = [];
       const recorder = new MediaRecorder(stream);
 
@@ -727,38 +770,38 @@ Thank you!`
         }
       };
 
-      recorder.onstop = () => {
-        const audioBlob = new Blob(chunks, { type: "audio/webm" });
-        stopActiveRecorder();
-        setIsRecording(false);
-        const sizeKb = Math.max(Math.round(audioBlob.size / 1024), 1);
-        setRecordingDuration(sizeKb);
+        recorder.onstop = () => {
+          const audioBlob = new Blob(chunks, { type: "audio/webm" });
+          stopActiveRecorder();
+          setIsRecording(false);
+          const sizeKb = Math.max(Math.round(audioBlob.size / 1024), 1);
+          setRecordingDuration(sizeKb);
 
-        if (!user?.uid) {
-          setChatStatus("Bitte einloggen, um Sprachaufnahmen zu speichern.");
-          return;
-        }
+          if (!user?.uid) {
+            setChatStatus("Please log in to save voice notes.");
+            return;
+          }
 
-        const audioNote = {
-          sender: "user",
-          kind: "audio",
-          text: `Audio-Notiz aufgenommen (${sizeKb} KB). Whisper kann sie in Text umwandeln.`,
-          createdAt: new Date(),
+          const audioNote = {
+            sender: "user",
+            kind: "audio",
+            text: `Voice note captured (${sizeKb} KB). Whisper can turn it into text later.`,
+            createdAt: new Date(),
+          };
+
+          setChatMessages((prev) => [...prev, audioNote]);
+          appendChatMessages(user.uid, [audioNote]).catch((error) => {
+            console.error("Failed to save audio note", error);
+            setChatStatus("Could not save the audio note.");
+          });
         };
-
-        setChatMessages((prev) => [...prev, audioNote]);
-        appendChatMessages(user.uid, [audioNote]).catch((error) => {
-          console.error("Failed to save audio note", error);
-          setChatStatus("Audio-Notiz konnte nicht gespeichert werden.");
-        });
-      };
 
       recorderRef.current = recorder;
       recorder.start();
       setIsRecording(true);
     } catch (error) {
       console.error("Recorder error", error);
-      setRecorderError("Konnte nicht aufnehmen. Bitte Mikrofonrechte prüfen.");
+      setRecorderError("Could not record. Please check microphone permissions.");
       setIsRecording(false);
     }
   };
@@ -1139,68 +1182,93 @@ Thank you!`
 
   const renderChat = () => (
     <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-        <h2 style={styles.sectionTitle}>Falowen A.I. · Grammar &amp; Chat Buddy</h2>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <span style={styles.badge}>Level: {studentLevel}</span>
-          <span style={styles.badge}>Campus: Home · My Course · Vokabeln · Falowen A.I.</span>
-        </div>
-      </div>
-      <p style={styles.helperText}>
-        Wenn du den Campus auswählst, findest du hier die Untertabs (Home, My Course, Vokabeln, Falowen A.I., Submit Work), damit der Dashboard-Tab ausgeblendet werden kann.
-      </p>
-      <p style={styles.helperText}>
-        Falowen fragt nach: Hast du eine Grammatikfrage oder möchtest du chatten, zum Beispiel eine kurze A2-Präsentation üben? Wähle einen Prompt oder schreib frei.
-      </p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {chatPrompts.map((prompt) => (
-          <button
-            key={prompt}
-            style={styles.secondaryButton}
-            onClick={() => handleSend(prompt)}
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
-      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={styles.badge}>{chatLoading ? "Lädt ..." : "Chat bereit"}</span>
+      <div style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <div style={styles.chatHeaderRow}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <h2 style={styles.sectionTitle}>Falowen A.I. · Voice &amp; Grammar Chat</h2>
+            <p style={styles.helperText}>
+              WhatsApp-style layout: record or type at the bottom, see the thread above. Ask for grammar help, request feedback, or get quick exercises.
+            </p>
+            <p style={styles.helperText}>
+              OpenAI connects once you add <code>REACT_APP_OPENAI_API_KEY</code> to your .env file. We send your turns as chat context so answers stay matched to your level.
+            </p>
+          </div>
+          <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+            <span style={styles.badge}>Level: {studentLevel}</span>
+            <span style={styles.badge}>{chatLoading ? "Falowen is typing…" : "Chat ready"}</span>
             {recordingDuration ? (
-              <span style={styles.helperText}>Letzte Aufnahme: {recordingDuration} KB</span>
+              <span style={{ ...styles.helperText, margin: 0 }}>Last recording: {recordingDuration} KB</span>
             ) : null}
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              style={isRecording ? styles.dangerButton : styles.secondaryButton}
-              onClick={handleRecordingToggle}
-            >
-              {isRecording ? "Aufnahme stoppen" : "🎙️ Aufnahme (Whisper-ready)"}
-            </button>
-            <button style={styles.primaryButton} onClick={() => handleSend(chatInput)}>Nachricht senden</button>
-          </div>
         </div>
 
-        {chatStatus ? <div style={styles.helperText}>{chatStatus}</div> : null}
-        {recorderError ? <div style={styles.errorBox}>{recorderError}</div> : null}
-
-        <div style={styles.chatLog}>
-          {chatMessages.map((message, index) => (
-            <div
-              key={`${message.sender}-${index}-${message.createdAt || index}`}
-              style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
-            >
-              <strong>{message.sender === "coach" ? "Falowen" : "Du"}:</strong> {message.text}
-            </div>
+        <div style={styles.promptChips}>
+          {chatPrompts.map((prompt) => (
+            <button key={prompt} style={styles.promptChip} onClick={() => handleSend(prompt)}>
+              {prompt}
+            </button>
           ))}
         </div>
-        <textarea
-          style={styles.textareaSmall}
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          placeholder="Frag nach Grammatik, bitte um Feedback zu einer Präsentation oder starte Small Talk."
-        />
+
+        <div style={styles.chatShell}>
+          <div style={styles.chatLogWide}>
+            {chatMessages.length === 0 ? (
+              <div style={{ ...styles.helperText, textAlign: "center" }}>
+                No messages yet. Type a question or record a short voice note below.
+              </div>
+            ) : (
+              chatMessages.map((message, index) => (
+                <div
+                  key={`${message.sender}-${index}-${message.createdAt || index}`}
+                  style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                    <strong>{message.sender === "coach" ? "Falowen" : "You"}</strong>
+                    <span style={styles.chatTimestamp}>
+                      {message.createdAt ? new Date(message.createdAt).toLocaleTimeString() : "Just now"}
+                    </span>
+                  </div>
+                  <div>{message.text}</div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div style={styles.chatComposer}>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={styles.recorderRow}>
+                <button
+                  style={isRecording ? styles.recorderButtonActive : styles.recorderButton}
+                  onClick={handleRecordingToggle}
+                >
+                  {isRecording ? "■ Stop" : "🎙️ Voice note"}
+                </button>
+                <div style={styles.helperText}>
+                  Tap like WhatsApp: tap once to start, again to stop. We save it as a note for Whisper later.
+                </div>
+              </div>
+              <div style={styles.composerRow}>
+                <textarea
+                  style={styles.chatTextarea}
+                  rows={2}
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask a grammar question or write a short sentence to correct."
+                  disabled={chatLoading}
+                />
+                <button
+                  style={styles.sendButton}
+                  onClick={() => handleSend(chatInput)}
+                  disabled={chatLoading}
+                >
+                  {chatLoading ? "Sending…" : "Send"}
+                </button>
+              </div>
+            </div>
+            {chatStatus ? <div style={{ ...styles.helperText, marginTop: 6 }}>{chatStatus}</div> : null}
+            {recorderError ? <div style={styles.errorBox}>{recorderError}</div> : null}
+          </div>
+        </div>
       </div>
     </div>
   );
