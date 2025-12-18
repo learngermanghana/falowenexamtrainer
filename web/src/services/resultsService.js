@@ -1,9 +1,17 @@
 import { collection, db, getDocs, query, where } from "../firebase";
 import { courseSchedules } from "../data/courseSchedule";
 
+const backendUrl =
+  process.env.REACT_APP_BACKEND_URL ||
+  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+
 const LEVEL_ASSIGNMENT_TARGET_OVERRIDES = {
   A1: 19,
 };
+
+const normalizeCode = (value) => (value || "").toString().trim().toLowerCase();
+const normalizeEmail = (value) => (value || "").toString().trim().toLowerCase();
+const normalizeLevel = (value) => (value || "").toString().trim().toUpperCase();
 
 const average = (values = []) => {
   const numeric = values.map(Number).filter((value) => Number.isFinite(value));
@@ -92,7 +100,25 @@ const toDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-const loadScores = async ({ level, studentCode } = {}) => {
+const fetchSheetScores = async ({ level, studentCode, email } = {}) => {
+  if (!studentCode) return [];
+
+  const params = new URLSearchParams();
+  params.set("studentCode", studentCode);
+  if (email) params.set("email", email);
+  if (level && level !== "all") params.set("level", level.toUpperCase());
+
+  const response = await fetch(`${backendUrl}/api/scores?${params.toString()}`);
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(message || "Failed to load scores from sheet.");
+  }
+
+  const data = await response.json();
+  return Array.isArray(data?.rows) ? data.rows : [];
+};
+
+const loadFirestoreScores = async ({ level, studentCode } = {}) => {
   const scoresRef = collection(db, "scores");
   const constraints = [];
   if (level && level !== "all") {
@@ -103,6 +129,20 @@ const loadScores = async ({ level, studentCode } = {}) => {
   }
   const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+const loadScores = async ({ level, studentCode, email } = {}) => {
+  if (!studentCode) return [];
+
+  try {
+    const sheetScores = await fetchSheetScores({ level, studentCode, email });
+    return sheetScores;
+  } catch (error) {
+    console.error("Failed to fetch sheet scores", error);
+    if (!db) throw error;
+  }
+
+  return loadFirestoreScores({ level, studentCode });
 };
 
 const buildResults = (scores = []) => {
@@ -122,6 +162,7 @@ const buildResults = (scores = []) => {
       return {
         assignment: row.assignment || "Assignment",
         studentCode: row.studentcode || row.studentCode || "",
+        email: row.email || row.studentEmail || "",
         studentName: row.name || "",
         level: (row.level || "").toUpperCase(),
         date: row.date || row.created_at || "",
@@ -139,6 +180,26 @@ const buildResults = (scores = []) => {
     });
 
   return rows;
+};
+
+const filterResultsForStudent = (rows = [], { studentCode, email, level } = {}) => {
+  const targetCode = normalizeCode(studentCode);
+  const targetEmail = normalizeEmail(email);
+  const targetLevel = normalizeLevel(level);
+  const restrictLevel = targetLevel && targetLevel !== "ALL" ? targetLevel : null;
+
+  return rows.filter((row) => {
+    const rowCode = normalizeCode(row.studentCode);
+    if (targetCode && rowCode !== targetCode) return false;
+
+    const rowEmail = normalizeEmail(row.email);
+    if (targetEmail && (!rowEmail || rowEmail !== targetEmail)) return false;
+
+    const rowLevel = normalizeLevel(row.level);
+    if (restrictLevel && rowLevel !== restrictLevel) return false;
+
+    return true;
+  });
 };
 
 const summarizeResults = (rows = []) => {
@@ -174,9 +235,10 @@ const summarizeResults = (rows = []) => {
   };
 };
 
-const buildStudentMetrics = ({ level, studentCode, results }) => {
-  const normalizedLevel = (level || "").toUpperCase();
-  const normalizedCode = (studentCode || "").toLowerCase();
+const buildStudentMetrics = ({ level, studentCode, email, results }) => {
+  const normalizedLevel = normalizeLevel(level);
+  const normalizedCode = normalizeCode(studentCode);
+  const normalizedEmail = normalizeEmail(email);
 
   const assignments = normalizedLevel ? collectAssignmentsFromSchedule(normalizedLevel) : [];
   const assignmentIndex = Object.fromEntries(
@@ -190,7 +252,10 @@ const buildStudentMetrics = ({ level, studentCode, results }) => {
     const matchesCode = normalizedCode
       ? (row.studentCode || "").toLowerCase() === normalizedCode
       : true;
-    return matchesLevel && matchesCode;
+    const matchesEmail = normalizedEmail
+      ? normalizeEmail(row.email) === normalizedEmail
+      : true;
+    return matchesLevel && matchesCode && matchesEmail;
   });
 
   const bestPerIdentifier = {};
@@ -275,12 +340,12 @@ const buildStudentMetrics = ({ level, studentCode, results }) => {
   };
 };
 
-export const fetchResults = async ({ level, studentCode } = {}) => {
-  const scores = await loadScores({ level, studentCode });
-  const results = buildResults(scores);
+export const fetchResults = async ({ level, studentCode, email } = {}) => {
+  const scores = await loadScores({ level, studentCode, email });
+  const results = filterResultsForStudent(buildResults(scores), { level, studentCode, email });
   const summary = summarizeResults(results);
-  const metrics = buildStudentMetrics({ level, studentCode, results });
-  const assignments = collectAssignmentsFromSchedule((level || "").toUpperCase());
+  const metrics = buildStudentMetrics({ level, studentCode, email, results });
+  const assignments = collectAssignmentsFromSchedule(normalizeLevel(level));
 
   return {
     results,
