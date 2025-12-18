@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   Timestamp,
   setDoc,
+  where,
 } from "../firebase";
 import { correctDiscussionText } from "../services/discussionService";
 
@@ -119,8 +120,16 @@ const ClassDiscussionPage = () => {
 
   useEffect(() => {
     if (!db) return undefined;
+    if (!studentProfile?.level || !studentProfile?.className) {
+      setError("Es fehlen Kursangaben aus deinem Profil. Bitte Klasse und Niveau hinterlegen.");
+      return undefined;
+    }
 
-    const repliesQuery = collection(db, "qa_posts");
+    const repliesQuery = query(
+      collection(db, "qa_posts"),
+      where("level", "==", studentProfile.level),
+      where("className", "==", studentProfile.className)
+    );
     const unsubscribe = onSnapshot(
       repliesQuery,
       (snapshot) => {
@@ -152,7 +161,7 @@ const ClassDiscussionPage = () => {
     );
 
     return () => unsubscribe();
-  }, [db]);
+  }, [db, studentProfile?.level, studentProfile?.className]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -242,6 +251,8 @@ const ClassDiscussionPage = () => {
       await setDoc(
         qaDocRef,
         {
+          level: studentProfile.level,
+          className: studentProfile.className,
           responses: [...responses, payload],
           updatedAt: serverTimestamp(),
         },
