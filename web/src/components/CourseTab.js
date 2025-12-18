@@ -96,13 +96,8 @@ const CourseTab = () => {
   }, [assignmentId, studentCode]);
 
   const lessonSubmissionPath = useMemo(
-    () =>
-      assignmentId
-        ? `/submissions/${submissionLevel}/lessons/${sanitizePathSegment(
-            assignmentId
-          )}`
-        : "",
-    [assignmentId, submissionLevel]
+    () => `/submissions/${submissionLevel}/posts`,
+    [submissionLevel]
   );
 
   const assignmentOptions = useMemo(() => {
@@ -328,10 +323,18 @@ const CourseTab = () => {
       return;
     }
 
+    if (!assignmentId) {
+      setWorkDraft("");
+      setDraftStatus("Select an assignment to load drafts.");
+      setLocked(false);
+      return;
+    }
+
     const draft = loadDraftForStudent({
       email: user.email,
       studentCode,
       level: submissionLevel,
+      lessonKey: assignmentId,
     });
     setWorkDraft(draft.content || "");
     setAssignmentTitle(
@@ -353,15 +356,16 @@ const CourseTab = () => {
     } else {
       setSubmissionStatus("");
     }
-  }, [studentCode, submissionLevel, user?.email]);
+  }, [assignmentId, studentCode, submissionLevel, user?.email]);
 
   useEffect(() => {
-    if (!user?.email || !studentCode || locked) return;
+    if (!user?.email || !studentCode || !assignmentId || locked) return;
     const handle = setTimeout(() => {
       const result = saveDraftForStudent({
         email: user.email,
         studentCode,
         level: submissionLevel,
+        lessonKey: assignmentId,
         content: workDraft,
         assignmentTitle,
       });
@@ -372,7 +376,15 @@ const CourseTab = () => {
     }, 800);
 
     return () => clearTimeout(handle);
-  }, [user?.email, studentCode, submissionLevel, workDraft, assignmentTitle, locked]);
+  }, [
+    assignmentId,
+    user?.email,
+    studentCode,
+    submissionLevel,
+    workDraft,
+    assignmentTitle,
+    locked,
+  ]);
 
   useEffect(() => {
     if (user?.email && studentCode) {
@@ -541,10 +553,17 @@ const CourseTab = () => {
       const result = submitWorkToSpecificPath({
         path: lessonSubmissionPath,
         content: workDraft,
+        studentCode,
+        lessonKey: assignmentId,
+        level: submissionLevel,
       });
       setLocked(true);
       setSubmissionStatus(
-        `Submitted to ${lessonSubmissionPath} (${new Date(result.savedAt).toLocaleTimeString()})`
+        `Submitted to ${lessonSubmissionPath} (student_code=${sanitizePathSegment(
+          studentCode
+        )}, lesson_key=${sanitizePathSegment(assignmentId)}) at ${new Date(
+          result.savedAt
+        ).toLocaleTimeString()}`
       );
     } catch (error) {
       console.error("Failed to submit work", error);
@@ -1153,7 +1172,7 @@ const CourseTab = () => {
         <span style={styles.badge}>/drafts_v2 · /submissions/{submissionLevel}</span>
       </div>
       <p style={styles.helperText}>
-        Drafts are auto-saved in Firebase-style paths using your email + student code. We now auto-look up your student code
+        Drafts are auto-saved in Firebase-style paths rooted at your student code. We now auto-look up your student code
         from the students collection when you sign in, and you can pick the assignment number directly from the course
         dictionary to avoid mistakes.
       </p>
@@ -1161,7 +1180,8 @@ const CourseTab = () => {
         Need explicit lesson paths? Use the buttons to save drafts to
         {" "}
         {lessonDraftPath || "/drafts_v2/<student-code>/lessons/<assignment>"} and submit the final version to
-        {lessonSubmissionPath || `/submissions/${submissionLevel}/lessons/<assignment>`}.
+        {lessonSubmissionPath || `/submissions/${submissionLevel}/posts`} (filtered by
+        student_code + lesson_key).
       </p>
 
       <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>

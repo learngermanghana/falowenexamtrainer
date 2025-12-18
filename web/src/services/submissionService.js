@@ -5,6 +5,7 @@ const isBrowser = typeof window !== "undefined";
 
 const createEmptyStore = () => ({
   drafts_v2: {},
+  draft_answers: {},
   submissions: {},
   submission_locks: {},
 });
@@ -69,17 +70,38 @@ export const rememberStudentCodeForEmail = (email, studentCode) => {
   }
 };
 
-export const loadDraftForStudent = ({ email, studentCode, level }) => {
+export const loadDraftForStudent = ({ email, studentCode, level, lessonKey }) => {
   const store = readStore();
-  const studentKey = buildStudentKey(email, studentCode);
+  const studentKey = sanitizeKey(studentCode || "no-code");
+  const combinedKey = buildStudentKey(email, studentCode);
   const levelKey = normalizeLevel(level);
-  const draft = store.drafts_v2?.[studentKey]?.[levelKey] || {};
+  const safeLessonKey = sanitizeKey(lessonKey || "lesson");
+
+  const userRootDraft =
+    store.drafts_v2?.[studentKey]?.lessons?.[safeLessonKey] ||
+    store.drafts_v2?.[combinedKey]?.lessons?.[safeLessonKey] || {};
+  const legacyFlatDraft =
+    store.drafts_v2?.[studentKey]?.[levelKey] ||
+    store.drafts_v2?.[combinedKey]?.[levelKey] || {};
+  const levelRootDraft =
+    store.drafts_v2?.[levelKey]?.lessons?.[safeLessonKey]?.users?.[studentKey] || {};
+  const legacyDraft = store.draft_answers?.[safeLessonKey]?.[studentKey] || {};
+
+  const draft = userRootDraft.updatedAt
+    ? userRootDraft
+    : legacyFlatDraft.updatedAt
+      ? legacyFlatDraft
+    : levelRootDraft.updatedAt
+      ? levelRootDraft
+      : legacyDraft;
 
   return {
     content: draft.content || "",
-    updatedAt: draft.updatedAt || null,
+    updatedAt: draft.updatedAt || draft.updated_at || null,
     assignmentTitle: draft.assignmentTitle || "",
-    path: `drafts_v2/${studentKey}/${levelKey}`,
+    level: draft.level || levelKey,
+    lessonKey: draft.lessonKey || safeLessonKey,
+    path: `drafts_v2/${studentKey}/lessons/${safeLessonKey}`,
   };
 };
 
@@ -87,29 +109,36 @@ export const saveDraftForStudent = ({
   email,
   studentCode,
   level,
+  lessonKey,
   content,
   assignmentTitle,
 }) => {
   const store = readStore();
-  const studentKey = buildStudentKey(email, studentCode);
+  const studentKey = sanitizeKey(studentCode || "no-code");
   const levelKey = normalizeLevel(level);
+  const safeLessonKey = sanitizeKey(lessonKey || "lesson");
   const now = new Date().toISOString();
 
   if (!store.drafts_v2[studentKey]) {
-    store.drafts_v2[studentKey] = {};
+    store.drafts_v2[studentKey] = { lessons: {} };
+  }
+  if (!store.drafts_v2[studentKey].lessons) {
+    store.drafts_v2[studentKey].lessons = {};
   }
 
-  store.drafts_v2[studentKey][levelKey] = {
+  store.drafts_v2[studentKey].lessons[safeLessonKey] = {
     content,
     updatedAt: now,
     assignmentTitle: assignmentTitle || "",
+    level: levelKey,
+    lessonKey: safeLessonKey,
   };
 
   writeStore(store);
 
   return {
     savedAt: now,
-    path: `drafts_v2/${studentKey}/${levelKey}`,
+    path: `drafts_v2/${studentKey}/lessons/${safeLessonKey}`,
   };
 };
 
@@ -205,5 +234,35 @@ export const submitFinalWork = ({
   };
 };
 
-export const submitWorkToSpecificPath = ({ path, content }) =>
-  writeContentToPath({ path, content, timestampKey: "submittedAt" });
+export const submitWorkToSpecificPath = ({
+  path,
+  content,
+  studentCode,
+  lessonKey,
+  level,
+}) => {
+  const store = readStore();
+  const now = new Date().toISOString();
+  const levelKey = normalizeLevel(level);
+  const safeLessonKey = sanitizeKey(lessonKey || "lesson");
+  const safeStudentCode = sanitizeKey(studentCode || "no-code");
+
+  if (!store.submissions[levelKey]) {
+    store.submissions[levelKey] = { posts: [] };
+  }
+  if (!store.submissions[levelKey].posts) {
+    store.submissions[levelKey].posts = [];
+  }
+
+  store.submissions[levelKey].posts.push({
+    content,
+    submittedAt: now,
+    student_code: safeStudentCode,
+    lesson_key: safeLessonKey,
+    level: levelKey,
+  });
+
+  writeStore(store);
+
+  return { savedAt: now, path };
+};
