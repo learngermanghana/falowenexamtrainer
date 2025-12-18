@@ -3,7 +3,6 @@ import { ExamProvider } from "./context/ExamContext";
 import SpeakingPage from "./components/SpeakingPage";
 import WritingPage from "./components/WritingPage";
 import VocabPage from "./components/VocabPage";
-import CoachPanel from "./components/CoachPanel";
 import HomeActions from "./components/HomeActions";
 import PlacementCheck from "./components/PlacementCheck";
 import PlanPage from "./components/PlanPage";
@@ -22,7 +21,6 @@ import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
 import LevelOnboarding from "./components/LevelOnboarding";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
-import OnboardingChecklist from "./components/OnboardingChecklist";
 import "./App.css";
 
 function App() {
@@ -250,23 +248,17 @@ function App() {
           </div>
         ) : null}
 
-        <OnboardingChecklist
-          onConfirmClass={handleConfirmClass}
-        />
         <div>
           <LevelOnboarding />
         </div>
 
-        <div className="layout-grid">
-          <main className="layout-main" style={{ minWidth: 0 }}>
-            {activePage === "plan" ? (
-              <PlanPage onSelect={setActivePage} classCalendarRef={classCalendarRef} />
-            ) : (
-              renderMain()
-            )}
-          </main>
-          <CoachPanel className="layout-aside" />
-        </div>
+        <main className="layout-main" style={{ minWidth: 0 }}>
+          {activePage === "plan" ? (
+            <PlanPage onSelect={setActivePage} classCalendarRef={classCalendarRef} />
+          ) : (
+            renderMain()
+          )}
+        </main>
       </div>
     </ExamProvider>
   );
