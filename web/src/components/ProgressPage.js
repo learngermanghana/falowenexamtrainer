@@ -98,6 +98,10 @@ const ProgressPage = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const studentEmail = useMemo(
+    () => studentProfile?.email || "",
+    [studentProfile?.email]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -106,7 +110,10 @@ const ProgressPage = () => {
       setLoading(true);
       setError("");
       try {
-        const response = await fetchResults({ studentCode: studentProfile?.studentcode });
+        const response = await fetchResults({
+          studentCode: studentProfile?.studentcode,
+          email: studentEmail,
+        });
         if (cancelled) return;
         setResults(response.results || []);
       } catch (err) {
@@ -123,7 +130,7 @@ const ProgressPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [studentProfile?.studentcode]);
+  }, [studentProfile?.studentcode, studentEmail]);
 
   const sortedResults = useMemo(() => {
     return results

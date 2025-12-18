@@ -101,6 +101,11 @@ const CourseTab = () => {
     return fullName.split(" ")[0];
   }, [studentProfile?.name]);
 
+  const studentEmail = useMemo(
+    () => studentProfile?.email || user?.email || "",
+    [studentProfile?.email, user?.email]
+  );
+
   const falowenIntro = useMemo(
     () => ({
       sender: "coach",
@@ -356,7 +361,11 @@ const CourseTab = () => {
           return;
         }
 
-        const response = await fetchResults({ level: resultsLevel, studentCode });
+        const response = await fetchResults({
+          level: resultsLevel,
+          studentCode,
+          email: studentEmail,
+        });
         const payloadResults = response.results || [];
         setResults(payloadResults);
         setResultsMetrics(response.metrics || null);
@@ -374,7 +383,7 @@ const CourseTab = () => {
     };
 
     loadResults();
-  }, [activeTab, resultsLevel, studentCode]);
+  }, [activeTab, resultsLevel, studentCode, studentEmail]);
 
   useEffect(() => {
     if (!user?.email || !studentCode) {
