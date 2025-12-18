@@ -103,17 +103,6 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     { label: "YouTube", href: "https://www.youtube.com/@LLEAGhana" },
   ];
 
-  const contactInfo = {
-    phone: {
-      label: "+233 205 706 589",
-      href: "tel:+233205706589",
-    },
-    email: {
-      label: "Learngermanghana@gmail.com",
-      href: "mailto:Learngermanghana@gmail.com",
-    },
-  };
-
   const galleryImages = [
     {
       src: "https://raw.githubusercontent.com/learngermanghana/falowenexamtrainer/main/photos/pexels-akbissue-29558446.jpg",
@@ -321,17 +310,6 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                     {item.label}
                   </a>
                 ))}
-              </div>
-              <div style={{ marginTop: 12, display: "flex", flexDirection: "column", gap: 6 }}>
-                <h4 style={{ ...styles.helperText, margin: 0, fontWeight: 600, color: "#111827" }}>
-                  Talk to the team
-                </h4>
-                <a href={contactInfo.phone.href} style={{ color: "#1d4ed8", textDecoration: "none" }}>
-                  Call: {contactInfo.phone.label}
-                </a>
-                <a href={contactInfo.email.href} style={{ color: "#1d4ed8", textDecoration: "none" }}>
-                  Email: {contactInfo.email.label}
-                </a>
               </div>
             </div>
             <div>

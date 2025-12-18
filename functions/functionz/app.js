@@ -9,7 +9,7 @@ const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
-const { getSheetsClient } = require("./googleSheetsClient");
+const { getSheetsClient, getServiceAccountEmail } = require("./googleSheetsClient");
 
 let getScoresForStudent;
 
@@ -36,6 +36,10 @@ function loadScoresModule() {
 }
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+const speakingUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 10 },
+});
 
 const app = express();
 
@@ -44,6 +48,25 @@ app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
+
+const CACHE_TTL_MS = 60 * 1000;
+
+const cache = {
+  vocab: { data: null, expiresAt: 0 },
+  exams: { data: null, expiresAt: 0 },
+};
+
+const setCache = (key, data) => {
+  if (!cache[key]) return;
+  cache[key] = { data, expiresAt: Date.now() + CACHE_TTL_MS };
+};
+
+const getCache = (key) => {
+  const entry = cache[key];
+  if (!entry) return null;
+  if (entry.expiresAt > Date.now()) return entry.data;
+  return null;
+};
 
 app.get("/vocab", async (_req, res) => {
   try {
@@ -54,6 +77,9 @@ app.get("/vocab", async (_req, res) => {
       return res.status(500).json({ error: "Missing SHEETS_VOCAB_ID env" });
     }
 
+    const cached = getCache("vocab");
+    if (cached) return res.json(cached);
+
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -61,7 +87,9 @@ app.get("/vocab", async (_req, res) => {
     });
 
     const rows = mapSheetRows(response.data.values || []);
-    return res.json({ rows });
+    const payload = { rows };
+    setCache("vocab", payload);
+    return res.json(payload);
   } catch (err) {
     console.error("/vocab error", err);
     return res.status(500).json({ error: err.message || "Failed to load vocab" });
@@ -77,6 +105,9 @@ app.get("/exams", async (_req, res) => {
       return res.status(500).json({ error: "Missing SHEETS_EXAMS_ID env" });
     }
 
+    const cached = getCache("exams");
+    if (cached) return res.json(cached);
+
     const sheets = await getSheetsClient();
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
@@ -84,10 +115,49 @@ app.get("/exams", async (_req, res) => {
     });
 
     const rows = mapSheetRows(response.data.values || []);
-    return res.json({ rows });
+    const payload = { rows };
+    setCache("exams", payload);
+    return res.json(payload);
   } catch (err) {
     console.error("/exams error", err);
     return res.status(500).json({ error: err.message || "Failed to load exams" });
+  }
+});
+
+app.get("/sheets/diagnose", async (req, res) => {
+  try {
+    if (process.env.DIAGNOSE_KEY && req.get("x-diagnose-key") !== process.env.DIAGNOSE_KEY) {
+      return res.status(403).json({ ok: false, error: "Forbidden" });
+    }
+
+    const sheets = await getSheetsClient();
+
+    const checks = [
+      { name: "vocab", id: process.env.SHEETS_VOCAB_ID, tab: process.env.SHEETS_VOCAB_TAB || "Sheet1" },
+      { name: "exams", id: process.env.SHEETS_EXAMS_ID, tab: process.env.SHEETS_EXAMS_TAB || "Sheet1" },
+      { name: "students", id: process.env.STUDENTS_SHEET_ID, tab: process.env.STUDENTS_SHEET_TAB || "students" },
+    ];
+
+    const results = {};
+    for (const c of checks) {
+      if (!c.id || !c.tab) {
+        results[c.name] = { ok: false, error: "Missing sheet id/tab env" };
+        continue;
+      }
+      try {
+        const r = await sheets.spreadsheets.values.get({
+          spreadsheetId: c.id,
+          range: `${c.tab}!1:2`,
+        });
+        results[c.name] = { ok: true, rowsFetched: (r.data.values || []).length };
+      } catch (e) {
+        results[c.name] = { ok: false, error: e?.message || String(e) };
+      }
+    }
+
+    res.json({ ok: true, serviceAccountEmail: getServiceAccountEmail(), results });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
 
@@ -335,7 +405,7 @@ app.get("/scores", async (req, res) => {
   }
 });
 
-app.post("/speaking/analyze", upload.single("audio"), async (req, res) => {
+app.post("/speaking/analyze", speakingUpload.single("audio"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "Audio file is required" });
@@ -395,7 +465,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
   }
 });
 
-app.post("/speaking/interaction-score", upload.single("audio"), async (req, res) => {
+app.post("/speaking/interaction-score", speakingUpload.single("audio"), async (req, res) => {
   try {
     const {
       initialTranscript,
@@ -507,6 +577,16 @@ app.get("/tutor/next-task", async (req, res) => {
     console.error("/tutor/next-task error", err);
     return res.status(500).json({ error: err.message || "Failed to fetch next task" });
   }
+});
+
+app.use((err, _req, res, next) => {
+  if (err && err.name === "MulterError") {
+    if (err.code === "LIMIT_FILE_SIZE") {
+      return res.status(413).json({ error: "Audio file too large" });
+    }
+    return res.status(400).json({ error: err.message });
+  }
+  return next(err);
 });
 
 module.exports = app;
