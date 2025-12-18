@@ -10,7 +10,7 @@ const SUBSCRIPTION_FEATURES = [
 ];
 
 const AccountSettings = () => {
-  const { user } = useAuth();
+  const { user, studentProfile } = useAuth();
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -63,6 +63,24 @@ const AccountSettings = () => {
     event.preventDefault();
     setStatus("Änderungen gespeichert (lokal)");
   };
+
+  if (!studentProfile) {
+    return (
+      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <h2 style={styles.sectionTitle}>Account &amp; Billing</h2>
+          <span style={styles.badge}>No profile data</span>
+        </div>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          We couldn't find any account data for this login. Once your campus profile syncs, we'll show contracts,
+          payments, and billing details here.
+        </p>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Please contact your instructor or try again later.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
