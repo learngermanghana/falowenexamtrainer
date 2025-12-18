@@ -1,13 +1,9 @@
 import React from "react";
 import { styles } from "../styles";
-import {
-  useExam,
-  ALLOWED_LEVELS,
-  getTasksForLevel,
-} from "../context/ExamContext";
+import { useExam, getTasksForLevel } from "../context/ExamContext";
 
 const SettingsForm = ({ title, helperText }) => {
-  const { teil, setTeil, level, setLevel, setError } = useExam();
+  const { teil, setTeil, level, setError } = useExam();
 
   const teilOptions = getTasksForLevel(level);
 
@@ -37,18 +33,14 @@ const SettingsForm = ({ title, helperText }) => {
 
         <div style={styles.field}>
           <label style={styles.label}>Niveau</label>
-          <select
+          <input
             value={level}
-            onChange={(e) => {
-              setError("");
-              setLevel(e.target.value);
-            }}
-            style={styles.select}
-          >
-            {ALLOWED_LEVELS.map((option) => (
-              <option key={option}>{option}</option>
-            ))}
-          </select>
+            readOnly
+            style={{ ...styles.select, background: "#f3f4f6", cursor: "not-allowed" }}
+          />
+          <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+            Das Niveau wird nach der Anmeldung automatisch gesetzt.
+          </p>
         </div>
       </div>
     </section>

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
-import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { generateStudentCode } from "../services/studentCode";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { savePreferredLevel } from "../services/levelStorage";
@@ -12,10 +11,11 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("B1");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
+
+  const defaultSignupLevel = "B1";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -25,13 +25,13 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
     try {
       if (mode === "signup") {
-        const studentCode = generateStudentCode({ firstName, level: selectedLevel });
+        const studentCode = generateStudentCode({ firstName, level: defaultSignupLevel });
         await signup(email, password, {
           firstName,
-          level: selectedLevel,
+          level: defaultSignupLevel,
           studentCode,
         });
-        savePreferredLevel(selectedLevel);
+        savePreferredLevel(defaultSignupLevel);
         rememberStudentCodeForEmail(email, studentCode);
         setMessage(`Account created! Your student code is ${studentCode}.`);
       } else {
@@ -127,21 +127,11 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           />
 
           {mode === "signup" && (
-            <>
-              <label style={styles.label}>Your current level</label>
-              <select
-                required
-                value={selectedLevel}
-                onChange={(event) => setSelectedLevel(event.target.value)}
-                style={{ ...styles.select, height: 44 }}
-              >
-                {ALLOWED_LEVELS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </>
+            <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                We assign your starting level automatically. Your profile will begin at {defaultSignupLevel}.
+              </p>
+            </div>
           )}
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
