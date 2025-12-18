@@ -22,11 +22,7 @@ const normalizeString = (value, fallback = "") => {
 export const fetchVocabEntries = async () => {
   try {
     const data = await fetchJson("/vocab");
-    const rows = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.rows)
-        ? data.rows
-        : [];
+    const rows = Array.isArray(data?.rows) ? data.rows : [];
 
     const normalized = rows
       .map((row, index) => {
@@ -90,11 +86,7 @@ export const fetchVocabEntries = async () => {
 export const fetchExamPrompts = async () => {
   try {
     const data = await fetchJson("/exams");
-    const rows = Array.isArray(data)
-      ? data
-      : Array.isArray(data?.rows)
-        ? data.rows
-        : [];
+    const rows = Array.isArray(data?.rows) ? data.rows : [];
 
     return rows
       .map((row, index) => {

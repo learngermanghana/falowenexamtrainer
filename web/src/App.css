@@ -32,27 +32,7 @@
   padding: 24px 16px 40px;
 }
 
-.layout-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
-  align-items: start;
-}
-
-.coach-panel {
-  position: sticky;
-  top: 16px;
-}
-
 @media (max-width: 900px) {
-  .layout-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .coach-panel {
-    position: static;
-  }
 
   .app-shell {
     padding: 16px 12px 28px;
