@@ -8,6 +8,9 @@ import { generateStudentCode } from "../services/studentCode";
 import { classCatalog } from "../data/classCatalog";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 
+const formatSchedule = (schedule = []) =>
+  schedule.map(({ day, startTime, endTime }) => `${day} ${startTime}-${endTime}`).join(" · ");
+
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const [email, setEmail] = useState("");
@@ -140,7 +143,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             ))}
           </select>
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Wir laden Sprechen- und Schreiben-Aufgaben aus dem passenden Niveau-Sheet.
+            We load speaking and writing tasks from the matching level sheet.
           </p>
 
           <label style={styles.label}>Which live class are you joining?</label>
@@ -150,14 +153,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
             onChange={(event) => setSelectedClass(event.target.value)}
             style={styles.select}
           >
-            {Object.keys(classCatalog).map((className) => (
+            {Object.entries(classCatalog).map(([className, classDetails]) => (
               <option key={className} value={className}>
-                {className}
+                {className} — {formatSchedule(classDetails?.schedule)}
               </option>
             ))}
           </select>
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Wir hinterlegen deinen Kurs im Profil und erstellen den Kalender-Export mit Zoom-Link.
+            We save your course in your profile and generate the calendar export with the Zoom link.
           </p>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
