@@ -55,7 +55,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     {
       title: "Who we serve",
       description:
-        "Falowen is a conversational mobile and web app built for students preparing for German certifications (A1–C1).",
+        "Falowen is a conversational mobile and web app built for newcomers, professionals, and exam candidates learning German.",
     },
     {
       title: "Blended learning",
@@ -85,14 +85,16 @@ const LandingPage = ({ onSignUp, onLogin }) => {
   ];
 
   const steps = [
-    "Start with the Level Check to tailor your A1–C1 pathway.",
+    "Start with the Level Check to tailor your everyday, work, or A1–C1 exam pathway.",
     "Follow the Daily Plan with blended self-study and live class chat tasks.",
     "Track progress, get reminders, and arrive at exam day confident and prepared.",
   ];
 
   const featureList = [
     "Blended learning that links daily practice with structured classroom coaching.",
-    "Realistic German exam preparation with introductions, questions, and polite requests.",
+    "Everyday German for greetings, directions, shopping, and conversations with neighbors.",
+    "Work and business German for meetings, emails, and customer conversations.",
+    "Realistic exam preparation with A1–C1 style introductions, questions, and polite requests.",
     "Live German chat participation with tutor monitoring and feedback.",
     "Exam reminders, countdowns, and personalized coaching via email and Telegram.",
   ];
@@ -115,6 +117,21 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     {
       src: "https://raw.githubusercontent.com/learngermanghana/falowenexamtrainer/main/photos/pexels-mikhail-nilov-6893950.jpg",
       alt: "Tutor guiding a student through German exercises",
+    },
+  ];
+
+  const focusOptions = [
+    {
+      title: "Everyday German",
+      copy: "Learn practical phrases for greetings, markets, directions, appointments, and family life.",
+    },
+    {
+      title: "Work & business German",
+      copy: "Build confidence for meetings, emails, presentations, and serving customers in German-speaking workplaces.",
+    },
+    {
+      title: "Exam prep A1–C1",
+      copy: "Train for Goethe and ÖSD-style tasks with speaking, writing, and listening drills for every level.",
     },
   ];
 
@@ -147,11 +164,11 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               Falowen Exam Coach
             </p>
             <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-              Conversational prep for German exams (A1–C1).
+              Learn German for daily life, work, or A1–C1 exams.
             </h1>
             <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 4 }}>
-              Blended mobile and web learning that connects daily practice, classroom coaching, and live tutor feedback so you
-              arrive confident on exam day.
+              Blended mobile and web learning that lets you pick your focus—practical everyday German, workplace communication,
+              or dedicated exam prep—while classroom coaching and live tutor feedback keep you confident.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <a
@@ -165,10 +182,28 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               </button>
             </div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 6 }}>
-              <span style={styles.badge}>A1–C1 Speaking & Writing</span>
+              <span style={styles.badge}>Everyday German</span>
+              <span style={styles.badge}>Work & business</span>
+              <span style={styles.badge}>A1–C1 exam prep</span>
               <span style={styles.badge}>Adaptive Daily Plan</span>
               <span style={styles.badge}>Push reminders</span>
             </div>
+          </div>
+        </section>
+
+        <section style={{ ...styles.card }}>
+          <h2 style={styles.sectionTitle}>Choose your learning focus</h2>
+          <p style={styles.helperText}>
+            Switch between tracks anytime so your study time matches what you need next—daily life, workplace German, or exam
+            day preparation.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10 }}>
+            {focusOptions.map((option) => (
+              <div key={option.title} style={{ ...styles.uploadCard }}>
+                <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>{option.title}</h3>
+                <p style={{ ...styles.helperText, margin: 0 }}>{option.copy}</p>
+              </div>
+            ))}
           </div>
         </section>
 
