@@ -28,7 +28,12 @@ export const fetchVocabEntries = async () => {
       .map((row, index) => {
         const topic =
           normalizeString(
-            row.topic || row.theme || row.category || row.set || row.list,
+            row.topic ||
+              row.theme ||
+              row.category ||
+              row.set ||
+              row.list ||
+              row.level,
             "Allgemein"
           ) || "Allgemein";
         const phrase =
@@ -95,19 +100,16 @@ export const fetchExamPrompts = async () => {
           row.teil || row.section || row.task || row.teil_label || row.part,
           ""
         );
-        const topic =
-          normalizeString(row.topic || row.thema || row.title || row.category, "") ||
-          "Prüfungsthema";
-        const prompt =
-          normalizeString(
-            row.prompt ||
-              row.question ||
-              row.text ||
-              row.aufgabe ||
-              row.scenario ||
-              row.keyword,
-            ""
-          );
+        const topicPrompt = normalizeString(
+          row.topic_prompt || row.prompt || row.topic || row.thema || row.title,
+          ""
+        );
+        const keyword = normalizeString(
+          row.keyword_subtopic || row.keyword || row.category,
+          ""
+        );
+        const topic = topicPrompt || keyword || "Prüfungsthema";
+        const prompt = topicPrompt || keyword;
         const hint = normalizeString(
           row.hint || row.tip || row.translation || row.english,
           ""
