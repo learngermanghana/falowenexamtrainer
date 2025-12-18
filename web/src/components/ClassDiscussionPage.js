@@ -478,7 +478,7 @@ const ClassDiscussionPage = () => {
             </p>
             <p style={{ ...styles.helperText, margin: 0 }}>
               Antworten in Q&A-Threads sowie KI-Vorschläge landen in der Sammlung <code>qa_posts</code>. Jedes
-              <code>qa_posts/{{post_id}}</code>-Dokument bündelt die Antworten im Feld <code>responses</code> – inklusive Code der
+              <code>qa_posts/&lt;post_id&gt;</code>-Dokument bündelt die Antworten im Feld <code>responses</code> – inklusive Code der
               antwortenden Person und Zeitstempeln.
             </p>
           </div>
