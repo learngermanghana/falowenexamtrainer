@@ -157,34 +157,70 @@ const CourseTab = () => {
 
   const assignmentOptions = useMemo(() => {
     const schedule = courseSchedules[submissionLevel] || [];
-    const uniqueAssignments = new Set();
+    const seen = new Set();
+    const options = [];
 
-    const addChapter = (chapter) => {
+    const addChapter = ({ chapter, topic, day }) => {
       if (!chapter) return;
-      uniqueAssignments.add(chapter.toString());
+      const value = chapter.toString();
+      if (seen.has(value)) return;
+      seen.add(value);
+
+      const parts = [`${submissionLevel} · ${value}`];
+      if (topic) parts.push(`— ${topic}`);
+      if (typeof day !== "undefined") parts.push(`(Day ${day})`);
+
+      options.push({
+        value,
+        label: parts.join(" "),
+        title: topic || `Assignment ${value}`,
+      });
     };
 
-    const inspectLesson = (lesson) => {
+    const inspectLesson = (lesson, meta) => {
       if (!lesson) return;
       if (Array.isArray(lesson)) {
-        lesson.forEach(inspectLesson);
+        lesson.forEach((item) => inspectLesson(item, meta));
         return;
       }
       if (lesson.assignment) {
-        addChapter(lesson.chapter || lesson.topic);
+        addChapter({
+          chapter: lesson.chapter || lesson.topic,
+          topic: lesson.topic || meta?.topic,
+          day: meta?.day,
+        });
       }
     };
 
     schedule.forEach((day) => {
       if (day.assignment) {
-        addChapter(day.chapter || day.topic);
+        addChapter({ chapter: day.chapter || day.topic, topic: day.topic, day: day.day });
       }
-      inspectLesson(day.lesen_hören);
-      inspectLesson(day.schreiben_sprechen);
+      inspectLesson(day.lesen_hören, { topic: day.topic, day: day.day });
+      inspectLesson(day.schreiben_sprechen, { topic: day.topic, day: day.day });
     });
 
-    return Array.from(uniqueAssignments).sort((a, b) => a.localeCompare(b));
+    return options.sort((a, b) => a.value.localeCompare(b.value));
   }, [submissionLevel]);
+
+  const resubmitMailto = useMemo(() => {
+    const subject = encodeURIComponent(
+      `Request new attempt: ${submissionLevel} assignment ${assignmentId || "(choose chapter)"}`
+    );
+    const body = encodeURIComponent(
+      `Hi team,
+
+I'd like to request another submission slot for ${submissionLevel} assignment ${
+        assignmentId || "(add chapter)"
+      }.
+Student code: ${studentCode || "(add your student code)"}
+Receipt: ${receiptCode || "(optional)"}
+
+Thank you!`
+    );
+
+    return `mailto:learngermanghana@gmail.com?subject=${subject}&body=${body}`;
+  }, [assignmentId, receiptCode, studentCode, submissionLevel]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -287,13 +323,20 @@ const CourseTab = () => {
 
   useEffect(() => {
     if (!assignmentOptions.length || assignmentId) return;
-    setAssignmentId(assignmentOptions[0]);
+    setAssignmentId(assignmentOptions[0].value);
   }, [assignmentId, assignmentOptions]);
 
   useEffect(() => {
     if (!assignmentId) return;
-    setAssignmentTitle((prev) => prev || `Assignment ${assignmentId}`);
-  }, [assignmentId]);
+    const selectedAssignment = assignmentOptions.find((option) => option.value === assignmentId);
+    const preferredTitle = selectedAssignment?.title || `Assignment ${assignmentId}`;
+    setAssignmentTitle((prev) => {
+      if (!prev || prev.startsWith("Assignment ")) {
+        return preferredTitle;
+      }
+      return prev;
+    });
+  }, [assignmentId, assignmentOptions]);
 
   useEffect(() => {
     let cancelled = false;
@@ -1549,7 +1592,6 @@ const CourseTab = () => {
             onChange={(e) => setStudentCode(e.target.value)}
             placeholder="Campus / student code"
             style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-            disabled={locked}
           />
           <p style={styles.helperText}>Required alongside email to store drafts and submissions.</p>
         </div>
@@ -1569,12 +1611,12 @@ const CourseTab = () => {
             style={styles.select}
             value={assignmentId}
             onChange={(e) => setAssignmentId(e.target.value)}
-            disabled={locked || !assignmentOptions.length}
+            disabled={!assignmentOptions.length}
           >
             {!assignmentId && <option value="">Select from dictionary</option>}
             {assignmentOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
@@ -1589,7 +1631,6 @@ const CourseTab = () => {
             onChange={(e) => setAssignmentTitle(e.target.value)}
             placeholder="Auto-picked from your profile or course data"
             style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-            disabled={locked}
           />
           <p style={styles.helperText}>
             Pulled from your Firebase student record when available so we can tag this submission.
@@ -1662,6 +1703,20 @@ const CourseTab = () => {
           </div>
         </div>
         <div style={{ display: "grid", gap: 8 }}>
+          {locked && (
+            <a
+              href={resubmitMailto}
+              style={{
+                ...styles.secondaryButton,
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Request new attempt via email
+            </a>
+          )}
           {manualDraftStatus && (
             <div style={styles.successBox}>
               {manualDraftStatus} {lessonDraftPath ? `(path: ${lessonDraftPath})` : ""}
