@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { courseOverview, chatPrompts } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
+import VocabPage from "./VocabPage";
 import { useAuth } from "../context/AuthContext";
 import { fetchAssignmentSummary } from "../services/assignmentService";
 import {
@@ -20,6 +21,7 @@ import { deriveStudentProfile, findStudentByEmail } from "../services/studentDir
 const tabs = [
   { key: "home", label: "Home" },
   { key: "course", label: "My Course" },
+  { key: "vocab", label: "Vokabeln" },
   { key: "submit", label: "Submit Work" },
   { key: "chat", label: "Class Chat" },
   { key: "results", label: "My Results" },
@@ -931,6 +933,16 @@ const CourseTab = () => {
     </div>
   );
 
+  const renderVocab = () => (
+    <div style={{ display: "grid", gap: 12 }}>
+      <VocabPage
+        title="Vokabel-Training für Kurs & Prüfung"
+        subtitle="Die gleiche Liste aus dem Vocab Sheet wird hier und im Prüfungsraum verwendet. Markiere, was du geübt hast, oder starte neu."
+        contextLabel="Geteilte Vokabeln"
+      />
+    </div>
+  );
+
   const renderChat = () => (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
@@ -1538,6 +1550,7 @@ const CourseTab = () => {
 
       {activeTab === "home" && renderHome()}
       {activeTab === "course" && renderCourse()}
+      {activeTab === "vocab" && renderVocab()}
       {activeTab === "chat" && renderChat()}
       {activeTab === "results" && renderResults()}
       {activeTab === "letters" && renderLetters()}
