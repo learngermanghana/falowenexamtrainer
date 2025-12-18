@@ -130,6 +130,11 @@ export const downloadClassCalendar = (className) => {
   window.URL.revokeObjectURL(url);
 };
 
+export const downloadCalendarAfterHydration = (className) => {
+  if (!className) return;
+  downloadClassCalendar(className);
+};
+
 export const formatScheduleSummary = (schedule) =>
   schedule
     .map((item) => `${item.day}: ${item.startTime}–${item.endTime}`)

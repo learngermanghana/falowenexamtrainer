@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   auth,
   createUserWithEmailAndPassword,
@@ -47,6 +47,35 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState("");
   const [notificationStatus, setNotificationStatus] = useState("idle");
   const [messagingToken, setMessagingToken] = useState(null);
+
+  const persistStudentClassName = useCallback(async (className) => {
+    if (!isFirebaseConfigured || !db || !studentProfile?.id) {
+      return { ok: false, reason: "unavailable" };
+    }
+
+    const studentRef = doc(db, "students", studentProfile.id);
+
+    try {
+      await updateDoc(studentRef, { className, updated_at: serverTimestamp() });
+    } catch (error) {
+      if (error?.code === "permission-denied") {
+        console.warn("Missing Firestore permissions to persist className", error);
+        return { ok: false, reason: "permission-denied" };
+      }
+
+      if (error?.code === "not-found") {
+        await setDoc(studentRef, { className, updated_at: serverTimestamp() }, { merge: true });
+      } else if (error) {
+        throw error;
+      }
+    }
+
+    setStudentProfile((prev) =>
+      prev?.id === studentRef.id ? { ...prev, className } : prev
+    );
+
+    return { ok: true };
+  }, [studentProfile?.id]);
 
   const persistMessagingToken = async (token, studentId) => {
     if (!studentId || !token) return;
@@ -255,6 +284,7 @@ export const AuthProvider = ({ children }) => {
       enableNotifications,
       messagingToken,
       notificationStatus,
+      persistStudentClassName,
     }),
     [
       user,
@@ -264,6 +294,7 @@ export const AuthProvider = ({ children }) => {
       authError,
       messagingToken,
       notificationStatus,
+      persistStudentClassName,
     ]
   );
 
