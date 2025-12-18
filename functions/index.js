@@ -3,7 +3,9 @@ const { onRequest } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 
-admin.initializeApp();
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 
 setGlobalOptions({ maxInstances: 10 });
 
@@ -14,7 +16,7 @@ exports.api = onRequest(
   {
     region: "europe-west1",
     cors: true,
-    secrets: ["OPENAI_API_KEY"],
+    secrets: ["OPENAI_API_KEY", "GOOGLE_SERVICE_ACCOUNT_JSON_B64"],
   },
   app
 );
