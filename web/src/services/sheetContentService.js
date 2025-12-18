@@ -98,3 +98,18 @@ export const fetchExamPrompts = async () => {
     return [];
   }
 };
+
+export async function fetchExamEntries() {
+  const url = `${(process.env.REACT_APP_BACKEND_URL || "")}/api/exams`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to fetch exams");
+  const rows = await res.json();
+
+  return (Array.isArray(rows) ? rows : []).map((r, i) => ({
+    id: r.id || `${r.level || "exam"}-${i + 1}`,
+    level: r.level || "",
+    teil: r.teil || "",
+    prompt: r.topic_prompt || r.prompt || "",
+    keyword: r.keyword_subtopic || "",
+  }));
+}
