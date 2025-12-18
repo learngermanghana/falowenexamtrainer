@@ -47,7 +47,8 @@ export const courseBook = {
 };
 
 export const chatPrompts = [
-  "Wie kann ich mich auf die Beschwerde im Unterricht vorbereiten?",
+  "Kannst du meine Grammatik für eine kurze Präsentation checken?",
+  "Gib mir ein Gesprächsthema zu Service & Beschwerden, bitte.",
   "Welche Redemittel brauche ich für Telefonnotizen?",
   "Hast du eine Mini-Übung für Perfekt vs. Präteritum?",
 ];
