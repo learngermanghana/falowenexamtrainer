@@ -15,7 +15,9 @@ function loadServiceAccount() {
   }
 
   // Option C: env contains base64 JSON
-  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64;
+  const b64 =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 ||
+    process.env.GOOGLE_SERVICE_ACCOUNT_KEY_B64;
   if (b64) {
     const json = Buffer.from(b64, "base64").toString("utf8");
     return JSON.parse(json);
