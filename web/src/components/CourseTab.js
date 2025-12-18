@@ -7,6 +7,7 @@ import { fetchAssignmentSummary } from "../services/assignmentService";
 import {
   isSubmissionLocked,
   loadDraftForStudent,
+  loadSubmissionForStudent,
   loadStudentCodeForEmail,
   rememberStudentCodeForEmail,
   saveDraftForStudent,
@@ -65,8 +66,14 @@ const CourseTab = () => {
   const [draftStatus, setDraftStatus] = useState("");
   const [manualDraftStatus, setManualDraftStatus] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState("");
+  const [receiptCode, setReceiptCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [locked, setLocked] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const [lastSavedDraft, setLastSavedDraft] = useState("");
+  const [lastSavedAt, setLastSavedAt] = useState(null);
+  const [confirmComplete, setConfirmComplete] = useState(false);
+  const [confirmLock, setConfirmLock] = useState(false);
   const [assignmentSummary, setAssignmentSummary] = useState(null);
   const [assignmentLoading, setAssignmentLoading] = useState(false);
   const [assignmentError, setAssignmentError] = useState("");
@@ -238,6 +245,19 @@ const CourseTab = () => {
   }, [selectedCourseLevel]);
 
   useEffect(() => {
+    setHydrated(false);
+    setLocked(false);
+    setReceiptCode("");
+    setSubmissionStatus("");
+    setDraftStatus("");
+    setManualDraftStatus("");
+    setLastSavedDraft("");
+    setLastSavedAt(null);
+    setConfirmComplete(false);
+    setConfirmLock(false);
+  }, [assignmentId, studentCode, submissionLevel]);
+
+  useEffect(() => {
     if (!assignmentOptions.length || assignmentId) return;
     setAssignmentId(assignmentOptions[0]);
   }, [assignmentId, assignmentOptions]);
@@ -320,6 +340,7 @@ const CourseTab = () => {
       setWorkDraft("");
       setDraftStatus("Add your student code to start saving drafts to /drafts_v2.");
       setLocked(false);
+      setHydrated(false);
       return;
     }
 
@@ -327,6 +348,50 @@ const CourseTab = () => {
       setWorkDraft("");
       setDraftStatus("Select an assignment to load drafts.");
       setLocked(false);
+      setHydrated(false);
+      return;
+    }
+
+    if (hydrated) return;
+
+    const submission = loadSubmissionForStudent({
+      level: submissionLevel,
+      studentCode,
+      lessonKey: assignmentId,
+    });
+
+    if (submission) {
+      setWorkDraft(submission.content || "");
+      setLocked(true);
+      setReceiptCode(submission.receiptCode || "");
+      const submittedAt = submission.submittedAt
+        ? ` at ${new Date(submission.submittedAt).toLocaleString()}`
+        : "";
+      setSubmissionStatus(
+        `Submission loaded from /${submission.submissionPath}${submittedAt}${
+          submission.receiptCode ? ` · Receipt ${submission.receiptCode}` : ""
+        }`
+      );
+      setDraftStatus("Submitted attempt is locked.");
+      setLastSavedDraft(submission.content || "");
+      setLastSavedAt(submission.submittedAt || null);
+      setHydrated(true);
+      return;
+    }
+
+    const lockState = isSubmissionLocked({
+      email: user.email,
+      studentCode,
+      level: submissionLevel,
+      lessonKey: assignmentId,
+    });
+    if (lockState.locked) {
+      setLocked(true);
+      const lockedAt = lockState.lockedAt
+        ? ` at ${new Date(lockState.lockedAt).toLocaleString()}`
+        : "";
+      setSubmissionStatus(`Submission locked via /${lockState.lockPath}${lockedAt}`);
+      setHydrated(true);
       return;
     }
 
@@ -336,7 +401,8 @@ const CourseTab = () => {
       level: submissionLevel,
       lessonKey: assignmentId,
     });
-    setWorkDraft(draft.content || "");
+    const draftContent = draft.text || draft.content || "";
+    setWorkDraft(draftContent);
     setAssignmentTitle(
       (draft.assignmentTitle || assignmentTitle || courseOverview.nextAssignment.title).trim()
     );
@@ -345,21 +411,31 @@ const CourseTab = () => {
         ? `Draft restored from /${draft.path}`
         : `Ready to save drafts to /${draft.path}`
     );
-
-    const lockState = isSubmissionLocked({ email: user.email, studentCode });
-    setLocked(lockState.locked);
-    if (lockState.locked) {
-      const lockedAt = lockState.lockedAt
-        ? ` at ${new Date(lockState.lockedAt).toLocaleString()}`
-        : "";
-      setSubmissionStatus(`Submission locked via /${lockState.lockPath}${lockedAt}`);
-    } else {
-      setSubmissionStatus("");
-    }
-  }, [assignmentId, studentCode, submissionLevel, user?.email]);
+    setLastSavedDraft(draftContent);
+    setLastSavedAt(draft.updatedAt || draft.updated_at || null);
+    setLocked(false);
+    setSubmissionStatus("");
+    setHydrated(true);
+  }, [
+    assignmentId,
+    assignmentTitle,
+    hydrated,
+    studentCode,
+    submissionLevel,
+    user?.email,
+  ]);
 
   useEffect(() => {
-    if (!user?.email || !studentCode || !assignmentId || locked) return;
+    if (!user?.email || !studentCode || !assignmentId || locked || !hydrated) return;
+
+    const hasChanges = workDraft !== lastSavedDraft;
+    if (!hasChanges) return;
+
+    const lastSavedMs = lastSavedAt ? new Date(lastSavedAt).getTime() : 0;
+    const timeSinceLastSave = lastSavedMs ? Date.now() - lastSavedMs : Infinity;
+    const changeSize = Math.abs(workDraft.length - (lastSavedDraft || "").length);
+    const delay = changeSize >= 20 || timeSinceLastSave >= 15000 ? 800 : 1800;
+
     const handle = setTimeout(() => {
       const result = saveDraftForStudent({
         email: user.email,
@@ -373,17 +449,22 @@ const CourseTab = () => {
         `Draft saved to /${result.path} (${new Date(result.savedAt).toLocaleTimeString()})`
       );
       setManualDraftStatus("");
-    }, 800);
+      setLastSavedDraft(workDraft);
+      setLastSavedAt(result.savedAt);
+    }, delay);
 
     return () => clearTimeout(handle);
   }, [
     assignmentId,
-    user?.email,
+    assignmentTitle,
+    hydrated,
+    lastSavedAt,
+    lastSavedDraft,
+    locked,
     studentCode,
     submissionLevel,
+    user?.email,
     workDraft,
-    assignmentTitle,
-    locked,
   ]);
 
   useEffect(() => {
@@ -509,6 +590,32 @@ const CourseTab = () => {
     setChatInput("");
   };
 
+  const saveDraftImmediately = () => {
+    if (!user?.email || !studentCode || !assignmentId || locked) return null;
+    if (!workDraft.trim()) return null;
+
+    const result = saveDraftForStudent({
+      email: user.email,
+      studentCode,
+      level: submissionLevel,
+      lessonKey: assignmentId,
+      content: workDraft,
+      assignmentTitle,
+    });
+    setDraftStatus(
+      `Draft saved to /${result.path} (${new Date(result.savedAt).toLocaleTimeString()})`
+    );
+    setLastSavedDraft(workDraft);
+    setLastSavedAt(result.savedAt);
+    setManualDraftStatus("");
+    return result;
+  };
+
+  const handleBlurSave = () => {
+    if (!hydrated || locked) return;
+    saveDraftImmediately();
+  };
+
   const handleSubmitWork = async () => {
     setSubmissionStatus("");
     if (!user?.email) {
@@ -541,30 +648,57 @@ const CourseTab = () => {
       return;
     }
 
-    const existingLock = isSubmissionLocked({ email: user.email, studentCode });
+    if (!confirmComplete || !confirmLock) {
+      setSubmissionStatus("Tick both confirmation boxes before submitting.");
+      return;
+    }
+
+    const existingLock = isSubmissionLocked({
+      email: user.email,
+      studentCode,
+      level: submissionLevel,
+      lessonKey: assignmentId,
+    });
     if (existingLock.locked) {
       setLocked(true);
+      setReceiptCode(existingLock.submission?.receiptCode || "");
       setSubmissionStatus(`Submission already locked at /${existingLock.lockPath}.`);
       return;
     }
 
     setSubmitting(true);
     try {
+      saveDraftImmediately();
       const result = submitWorkToSpecificPath({
         path: lessonSubmissionPath,
         content: workDraft,
         studentCode,
         lessonKey: assignmentId,
         level: submissionLevel,
+        email: user.email,
+        assignmentTitle,
       });
+      if (result.locked) {
+        setLocked(true);
+        setReceiptCode(result.receiptCode || "");
+        const lockedAt = result.lockedAt
+          ? ` at ${new Date(result.lockedAt).toLocaleTimeString()}`
+          : "";
+        setSubmissionStatus(`Submission locked via /${result.lockPath}${lockedAt}`);
+        return;
+      }
       setLocked(true);
+      setReceiptCode(result.receiptCode || "");
       setSubmissionStatus(
         `Submitted to ${lessonSubmissionPath} (student_code=${sanitizePathSegment(
           studentCode
         )}, lesson_key=${sanitizePathSegment(assignmentId)}) at ${new Date(
           result.savedAt
-        ).toLocaleTimeString()}`
+        ).toLocaleTimeString()}${result.receiptCode ? ` · Receipt ${result.receiptCode}` : ""}`
       );
+      setDraftStatus("Submitted attempt is locked.");
+      setLastSavedDraft(workDraft);
+      setLastSavedAt(result.savedAt);
     } catch (error) {
       console.error("Failed to submit work", error);
       setSubmissionStatus("Could not submit your work. Please try again.");
@@ -584,10 +718,16 @@ const CourseTab = () => {
       return;
     }
 
+    const localResult = saveDraftImmediately();
     const result = saveDraftToSpecificPath({ path: lessonDraftPath, content: workDraft });
     setManualDraftStatus(
       `Draft saved to ${lessonDraftPath} (${new Date(result.savedAt).toLocaleTimeString()})`
     );
+    if (localResult?.savedAt) {
+      setDraftStatus(
+        `Draft saved to /${localResult.path} (${new Date(localResult.savedAt).toLocaleTimeString()})`
+      );
+    }
   };
 
   const renderHome = () => {
@@ -1262,9 +1402,34 @@ const CourseTab = () => {
           value={workDraft}
           disabled={locked}
           onChange={(e) => setWorkDraft(e.target.value)}
+          onBlur={handleBlurSave}
           rows={6}
           placeholder="Paste or type your course work. Drafts save to /drafts_v2 while you type."
         />
+        <div style={{ display: "grid", gap: 6 }}>
+          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input
+              type="checkbox"
+              checked={confirmComplete}
+              disabled={locked}
+              onChange={(e) => setConfirmComplete(e.target.checked)}
+            />
+            <span style={styles.helperText}>
+              I confirm this answer is complete for {submissionLevel} / assignment {assignmentId || "?"}.
+            </span>
+          </label>
+          <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <input
+              type="checkbox"
+              checked={confirmLock}
+              disabled={locked}
+              onChange={(e) => setConfirmLock(e.target.checked)}
+            />
+            <span style={styles.helperText}>
+              I understand this box locks after submission and I cannot edit until a new attempt is opened.
+            </span>
+          </label>
+        </div>
         <div
           style={{
             display: "flex",
@@ -1288,7 +1453,7 @@ const CourseTab = () => {
             <button
               style={styles.primaryButton}
               onClick={handleSubmitWork}
-              disabled={locked || submitting}
+              disabled={locked || submitting || !confirmComplete || !confirmLock}
             >
               {locked ? "Submission locked" : submitting ? "Submitting..." : "Submit now"}
             </button>
@@ -1306,12 +1471,14 @@ const CourseTab = () => {
       {submissionStatus && (
         <div
           style={
-            submissionStatus.toLowerCase().includes("submitted to")
+            submissionStatus.toLowerCase().includes("submit") ||
+            submissionStatus.toLowerCase().includes("locked")
               ? styles.successBox
               : styles.errorBox
           }
         >
           {submissionStatus}
+          {receiptCode ? ` · Receipt ${receiptCode}` : ""}
         </div>
       )}
     </section>

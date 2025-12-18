@@ -45,6 +45,11 @@ const buildStudentKey = (email, studentCode) => {
   return `${safeEmail}__${safeCode || "no-code"}`;
 };
 
+const buildLockId = ({ level, studentCode, lessonKey }) =>
+  `${normalizeLevel(level)}__${sanitizeKey(studentCode || "no-code")}__${sanitizeKey(
+    lessonKey || "lesson"
+  )}`;
+
 export const loadStudentCodeForEmail = (email) => {
   if (!isBrowser || !email) return "";
   try {
@@ -96,8 +101,10 @@ export const loadDraftForStudent = ({ email, studentCode, level, lessonKey }) =>
       : legacyDraft;
 
   return {
-    content: draft.content || "",
+    content: draft.content || draft.text || "",
+    text: draft.text || draft.content || "",
     updatedAt: draft.updatedAt || draft.updated_at || null,
+    updated_at: draft.updated_at || draft.updatedAt || null,
     assignmentTitle: draft.assignmentTitle || "",
     level: draft.level || levelKey,
     lessonKey: draft.lessonKey || safeLessonKey,
@@ -128,19 +135,28 @@ export const saveDraftForStudent = ({
 
   store.drafts_v2[studentKey].lessons[safeLessonKey] = {
     content,
+    text: content,
     updatedAt: now,
+    updated_at: now,
     assignmentTitle: assignmentTitle || "",
     level: levelKey,
     lessonKey: safeLessonKey,
+    email,
+    studentCode,
   };
 
   writeStore(store);
 
   return {
     savedAt: now,
+    updatedAt: now,
+    text: content,
+    content,
     path: `drafts_v2/${studentKey}/lessons/${safeLessonKey}`,
   };
 };
+
+export const loadDraftMetaFromDb = (params) => loadDraftForStudent(params);
 
 const writeContentToPath = ({ path, content, timestampKey }) => {
   const store = readStore();
@@ -155,7 +171,7 @@ const writeContentToPath = ({ path, content, timestampKey }) => {
   let node = store;
   segments.forEach((segment, index) => {
     if (index === segments.length - 1) {
-      node[segment] = { content, [timestampKey]: now };
+      node[segment] = { content, text: content, [timestampKey]: now };
     } else {
       if (!node[segment]) node[segment] = {};
       node = node[segment];
@@ -170,16 +186,50 @@ const writeContentToPath = ({ path, content, timestampKey }) => {
 export const saveDraftToSpecificPath = ({ path, content }) =>
   writeContentToPath({ path, content, timestampKey: "updatedAt" });
 
-export const isSubmissionLocked = ({ email, studentCode }) => {
+export const isSubmissionLocked = ({ email, studentCode, level, lessonKey }) => {
   const store = readStore();
-  const studentKey = buildStudentKey(email, studentCode);
-  const lock = store.submission_locks?.[studentKey];
+  const lockId = buildLockId({ level, studentCode, lessonKey });
+  const lock = store.submission_locks?.[lockId];
+  const levelKey = normalizeLevel(level);
+  const safeLessonKey = sanitizeKey(lessonKey || "lesson");
+  const safeStudentCode = sanitizeKey(studentCode || "no-code");
+
+  const submission = store.submissions?.[levelKey]?.posts?.find(
+    (post) =>
+      post.student_code === safeStudentCode &&
+      (post.lesson_key === safeLessonKey || post.lessonKey === safeLessonKey)
+  );
 
   return {
-    locked: Boolean(lock?.locked),
-    lockedAt: lock?.lockedAt || null,
-    lockPath: `submission_locks/${studentKey}`,
-    level: lock?.level,
+    locked: Boolean(lock?.locked || submission),
+    lockedAt: lock?.lockedAt || submission?.submittedAt || null,
+    lockPath: `submission_locks/${lockId}`,
+    level: lock?.level || submission?.level,
+    submission,
+  };
+};
+
+export const loadSubmissionForStudent = ({ level, studentCode, lessonKey }) => {
+  const store = readStore();
+  const levelKey = normalizeLevel(level);
+  const safeLessonKey = sanitizeKey(lessonKey || "lesson");
+  const safeStudentCode = sanitizeKey(studentCode || "no-code");
+
+  const submission = store.submissions?.[levelKey]?.posts?.find(
+    (post) =>
+      post.student_code === safeStudentCode &&
+      (post.lesson_key === safeLessonKey || post.lessonKey === safeLessonKey)
+  );
+
+  if (!submission) return null;
+
+  return {
+    ...submission,
+    content: submission.content || submission.text || submission.answer || "",
+    text: submission.content || submission.text || submission.answer || "",
+    receiptCode: submission.receiptCode,
+    submissionPath: `submissions/${levelKey}/posts`,
+    submittedAt: submission.submittedAt,
   };
 };
 
@@ -189,18 +239,19 @@ export const submitFinalWork = ({
   level,
   content,
   assignmentTitle,
+  lessonKey,
 }) => {
   const store = readStore();
-  const studentKey = buildStudentKey(email, studentCode);
   const levelKey = normalizeLevel(level);
-  const existingLock = store.submission_locks?.[studentKey];
+  const lockId = buildLockId({ level, studentCode, lessonKey });
+  const existingLock = store.submission_locks?.[lockId];
 
   if (existingLock?.locked) {
     return {
       locked: true,
       lockedAt: existingLock.lockedAt,
-      submissionPath: `submissions/${levelKey}/${studentKey}`,
-      lockPath: `submission_locks/${studentKey}`,
+      submissionPath: `submissions/${levelKey}/${lockId}`,
+      lockPath: `submission_locks/${lockId}`,
     };
   }
 
@@ -210,18 +261,26 @@ export const submitFinalWork = ({
     store.submissions[levelKey] = {};
   }
 
-  store.submissions[levelKey][studentKey] = {
+  const receiptCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  store.submissions[levelKey][lockId] = {
     email,
     studentCode,
+    lessonKey: sanitizeKey(lessonKey || "lesson"),
     content,
+    text: content,
     submittedAt: now,
     assignmentTitle: assignmentTitle || "",
+    status: "submitted",
+    receiptCode,
   };
 
-  store.submission_locks[studentKey] = {
+  store.submission_locks[lockId] = {
     locked: true,
     lockedAt: now,
     level: levelKey,
+    lessonKey: sanitizeKey(lessonKey || "lesson"),
+    studentCode,
   };
 
   writeStore(store);
@@ -229,8 +288,9 @@ export const submitFinalWork = ({
   return {
     locked: false,
     submittedAt: now,
-    submissionPath: `submissions/${levelKey}/${studentKey}`,
-    lockPath: `submission_locks/${studentKey}`,
+    submissionPath: `submissions/${levelKey}/${lockId}`,
+    lockPath: `submission_locks/${lockId}`,
+    receiptCode,
   };
 };
 
@@ -240,12 +300,33 @@ export const submitWorkToSpecificPath = ({
   studentCode,
   lessonKey,
   level,
+  email,
+  assignmentTitle,
 }) => {
   const store = readStore();
   const now = new Date().toISOString();
   const levelKey = normalizeLevel(level);
   const safeLessonKey = sanitizeKey(lessonKey || "lesson");
   const safeStudentCode = sanitizeKey(studentCode || "no-code");
+  const lockId = buildLockId({ level, studentCode, lessonKey });
+  const receiptCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+
+  const existingLock = store.submission_locks?.[lockId];
+  const existingSubmission = store.submissions?.[levelKey]?.posts?.find(
+    (post) =>
+      post.student_code === safeStudentCode &&
+      (post.lesson_key === safeLessonKey || post.lessonKey === safeLessonKey)
+  );
+
+  if (existingLock?.locked || existingSubmission) {
+    return {
+      locked: true,
+      lockedAt: existingLock?.lockedAt || existingSubmission?.submittedAt,
+      lockPath: `submission_locks/${lockId}`,
+      submissionPath: `submissions/${levelKey}/posts`,
+      receiptCode: existingSubmission?.receiptCode,
+    };
+  }
 
   if (!store.submissions[levelKey]) {
     store.submissions[levelKey] = { posts: [] };
@@ -254,15 +335,35 @@ export const submitWorkToSpecificPath = ({
     store.submissions[levelKey].posts = [];
   }
 
+  if (!store.submission_locks) {
+    store.submission_locks = {};
+  }
+  store.submission_locks[lockId] = {
+    locked: true,
+    lockedAt: now,
+    level: levelKey,
+    lessonKey: safeLessonKey,
+    studentCode: safeStudentCode,
+  };
+
   store.submissions[levelKey].posts.push({
     content,
+    text: content,
     submittedAt: now,
     student_code: safeStudentCode,
     lesson_key: safeLessonKey,
     level: levelKey,
+    email,
+    assignment_title: assignmentTitle || "",
+    status: "submitted",
+    receiptCode,
   });
+
+  if (store.drafts_v2?.[safeStudentCode]?.lessons?.[safeLessonKey]) {
+    store.drafts_v2[safeStudentCode].lessons[safeLessonKey].archivedAt = now;
+  }
 
   writeStore(store);
 
-  return { savedAt: now, path };
+  return { savedAt: now, path, receiptCode, lockPath: `submission_locks/${lockId}` };
 };
