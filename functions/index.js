@@ -23,6 +23,7 @@ exports.api = onRequest(
       "SHEETS_VOCAB_TAB",
       "SHEETS_EXAMS_ID",
       "SHEETS_EXAMS_TAB",
+      "DIAGNOSE_KEY",
     ],
   },
   app
