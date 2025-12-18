@@ -10,6 +10,8 @@ const WEEKDAY_MAP = {
   Saturday: 6,
 };
 
+const LINE_BREAK = "\r\n";
+
 const pad = (value) => value.toString().padStart(2, "0");
 
 const formatDateTime = (date) => {
@@ -75,15 +77,38 @@ const buildEvents = ({ className, startDate, endDate, schedule, description }) =
           `DTSTART;TZID=Europe/Berlin:${formatDateTime(sessionStart)}`,
           `DTEND;TZID=Europe/Berlin:${formatDateTime(sessionEnd)}`,
           "END:VEVENT",
-        ].join("\n")
+        ]
+          .filter(Boolean)
+          .join(LINE_BREAK)
       );
 
       occurrence.setDate(occurrence.getDate() + 7);
     }
   });
 
-  return events.join("\n");
+  return events.join(LINE_BREAK);
 };
+
+const timeZoneDefinition = [
+  "BEGIN:VTIMEZONE",
+  "TZID:Europe/Berlin",
+  "X-LIC-LOCATION:Europe/Berlin",
+  "BEGIN:DAYLIGHT",
+  "TZOFFSETFROM:+0100",
+  "TZOFFSETTO:+0200",
+  "TZNAME:CEST",
+  "DTSTART:19700329T020000",
+  "RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU",
+  "END:DAYLIGHT",
+  "BEGIN:STANDARD",
+  "TZOFFSETFROM:+0200",
+  "TZOFFSETTO:+0100",
+  "TZNAME:CET",
+  "DTSTART:19701025T030000",
+  "RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU",
+  "END:STANDARD",
+  "END:VTIMEZONE",
+].join(LINE_BREAK);
 
 export const generateClassCalendar = (className) => {
   const details = classCatalog[className];
@@ -112,21 +137,26 @@ export const generateClassCalendar = (className) => {
     "VERSION:2.0",
     "PRODID:-//Falowen Exam Coach//Class Calendar//EN",
     "CALSCALE:GREGORIAN",
+    timeZoneDefinition,
     eventsBlock,
     "END:VCALENDAR",
-  ].join("\n");
+    "",
+  ].join(LINE_BREAK);
 };
 
 export const downloadClassCalendar = (className) => {
   const calendar = generateClassCalendar(className);
   if (!calendar) return;
 
-  const blob = new Blob([calendar], { type: "text/calendar" });
+  const blob = new Blob([calendar], { type: "text/calendar;charset=utf-8" });
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${className.replace(/\\s+/g, "-")}-schedule.ics`;
+  link.download = `${className.replace(/\s+/g, "-")}-schedule.ics`;
+  link.style.display = "none";
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
   window.URL.revokeObjectURL(url);
 };
 
