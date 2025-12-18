@@ -53,7 +53,6 @@ const CourseTab = () => {
   const [recordingDuration, setRecordingDuration] = useState(0);
   const recorderRef = useRef(null);
   const [writingSubtab, setWritingSubtab] = useState("mark");
-  const [letterQuestion, setLetterQuestion] = useState("");
   const [letterDraft, setLetterDraft] = useState("");
   const [letterFeedback, setLetterFeedback] = useState("");
   const [ideaMessages, setIdeaMessages] = useState([
@@ -1373,9 +1372,8 @@ const CourseTab = () => {
       }
 
       const wordCount = letterDraft.trim().split(/\s+/).length;
-      const topicHint = letterQuestion.trim()
-        ? `Aufgabe: "${letterQuestion.trim()}"`
-        : "Keine Aufgabe angegeben";
+      const excerpt = letterDraft.trim().split(/\s+/).slice(0, 12).join(" ");
+      const topicHint = excerpt ? `Brief-Auszug: "${excerpt}..."` : "Brief geprüft";
 
       const insights = [
         `${topicHint}.`,
@@ -1395,14 +1393,14 @@ const CourseTab = () => {
       const content = message.trim();
       if (!content) return;
 
+      const topicLabel = content || "deine Aufgabe";
+
       setIdeaMessages((prev) => [
         ...prev,
         { sender: "user", text: content },
         {
           sender: "coach",
-          text: `Hier sind drei Ansatzpunkte für ${
-            letterQuestion.trim() || "deine Aufgabe"
-          }:\n1) Situations-Check: Was ist der Anlass und welches Ziel hast du?\n2) Struktur: Einleitung (Dank/Bezug) · Hauptteil (2–3 Kernpunkte) · Abschluss (Bitte/Frist).\n3) Sprach-Booster: Nutze zwei Verbindungswörter (z.B. außerdem, dennoch) und eine klare Bitte im letzten Satz.`,
+          text: `Hier sind drei Ansatzpunkte für ${topicLabel}:\n1) Situations-Check: Was ist der Anlass und welches Ziel hast du?\n2) Struktur: Einleitung (Dank/Bezug) · Hauptteil (2–3 Kernpunkte) · Abschluss (Bitte/Frist).\n3) Sprach-Booster: Nutze zwei Verbindungswörter (z.B. außerdem, dennoch) und eine klare Bitte im letzten Satz.`,
         },
       ]);
       setIdeaInput("");
@@ -1443,24 +1441,15 @@ const CourseTab = () => {
             <div style={{ display: "grid", gap: 4 }}>
               <h3 style={{ margin: 0 }}>Mark my letter</h3>
               <p style={styles.helperText}>
-                Füge die Prüfungsfrage oben ein und deinen Brief darunter. Der AI-Coach gibt dir Sofort-Feedback zu Länge,
+                Ein Feld reicht: Kopiere deinen gesamten Brief hier hinein. Der AI-Coach gibt dir Sofort-Feedback zu Länge,
                 Struktur und Redemitteln.
               </p>
             </div>
             <div style={{ display: "grid", gap: 8 }}>
-              <label style={styles.label}>Letter question oder Aufgabenstellung</label>
-              <textarea
-                style={styles.textArea}
-                placeholder="Kopiere hier die genaue Frage / Situation aus der Prüfung"
-                value={letterQuestion}
-                onChange={(e) => setLetterQuestion(e.target.value)}
-              />
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              <label style={styles.label}>Dein Brief (zum Prüfen einfügen)</label>
+              <label style={styles.label}>Dein Brief (ein Feld zum Einfügen)</label>
               <textarea
                 style={{ ...styles.textArea, minHeight: 180 }}
-                placeholder="Liebes Prüfungsamt, ..."
+                placeholder="Paste hier deine komplette Antwort – inklusive Aufgabenstellung, wenn du möchtest."
                 value={letterDraft}
                 onChange={(e) => setLetterDraft(e.target.value)}
               />
@@ -1484,18 +1473,9 @@ const CourseTab = () => {
             <div style={{ display: "grid", gap: 4 }}>
               <h3 style={{ margin: 0 }}>Ideas generator</h3>
               <p style={styles.helperText}>
-                Klebe die Aufgabenstellung ein und chatte mit dem Coach. Er schlägt Ideen, Satzstarter und Formulierungen vor,
-                bevor du schreibst.
+                Nur ein Feld: Klebe die Aufgabenstellung oder deinen Ansatz ein und chatte mit dem Coach. Er schlägt Ideen,
+                Satzstarter und Formulierungen vor, bevor du schreibst.
               </p>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              <label style={styles.label}>Letter question</label>
-              <textarea
-                style={styles.textArea}
-                placeholder="Beschweren Sie sich beim Vermieter über Heizung und Internet ..."
-                value={letterQuestion}
-                onChange={(e) => setLetterQuestion(e.target.value)}
-              />
             </div>
             <div style={{ display: "grid", gap: 8 }}>
               <div style={styles.chatLog}>
