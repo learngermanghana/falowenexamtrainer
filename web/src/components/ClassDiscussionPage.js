@@ -8,6 +8,7 @@ import {
   db,
   doc,
   getDoc,
+  arrayUnion,
   onSnapshot,
   orderBy,
   query,
@@ -236,8 +237,6 @@ const ClassDiscussionPage = () => {
 
     try {
       const qaDocRef = doc(db, "qa_posts", threadId);
-      const existingSnap = await getDoc(qaDocRef);
-      const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
 
       const replyId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
       const payload = {
@@ -253,7 +252,7 @@ const ClassDiscussionPage = () => {
         {
           level: studentProfile.level,
           className: studentProfile.className,
-          responses: [...responses, payload],
+          responses: arrayUnion(payload),
           updatedAt: serverTimestamp(),
         },
         { merge: true }
