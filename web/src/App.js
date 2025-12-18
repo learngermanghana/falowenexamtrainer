@@ -40,6 +40,7 @@ function App() {
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
   const levelOnboardingRef = useRef(null);
+  const classCalendarRef = useRef(null);
 
   const notificationLabel = () => {
     switch (notificationStatus) {
@@ -112,6 +113,12 @@ function App() {
 
   const handleConfirmClass = () => {
     setActivePage("plan");
+    window.requestAnimationFrame(() => {
+      if (classCalendarRef.current) {
+        classCalendarRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        classCalendarRef.current.focus?.();
+      }
+    });
   };
 
   if (!isFirebaseConfigured) {
@@ -139,8 +146,8 @@ function App() {
     );
   }
 
-  const renderMain = () => {
-    if (activePage === "plan") return <PlanPage onSelect={setActivePage} />;
+    const renderMain = () => {
+      if (activePage === "plan") return <PlanPage onSelect={setActivePage} classCalendarRef={classCalendarRef} />;
     if (activePage === "course") return <CourseTab />;
     if (activePage === "home") return <HomeActions onSelect={setActivePage} />;
     if (activePage === "speaking") return <SpeakingPage />;
@@ -262,7 +269,11 @@ function App() {
 
         <div className="layout-grid">
           <main className="layout-main" style={{ minWidth: 0 }}>
-            {renderMain()}
+            {activePage === "plan" ? (
+              <PlanPage onSelect={setActivePage} classCalendarRef={classCalendarRef} />
+            ) : (
+              renderMain()
+            )}
           </main>
           <CoachPanel className="layout-aside" />
         </div>

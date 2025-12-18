@@ -174,7 +174,7 @@ const OnboardingChecklist = ({
         />
         <Step
           title="Download the calendar"
-          description="Add every session to your phone calendar, including the Zoom link."
+          description="Save every session to your calendar with the Zoom link. Works on iPhone, Android, and desktop (ICS file for Google Calendar)."
           actionLabel={currentClass ? `${currentClass} calendar` : "Get calendar"}
           onAction={handleDownloadCalendar}
           complete={calendarDownloaded}

@@ -3,10 +3,12 @@ import HomeActions from "./HomeActions";
 import { styles } from "../styles";
 import ClassCalendarCard from "./ClassCalendarCard";
 
-const PlanPage = ({ onSelect }) => {
+const PlanPage = ({ onSelect, classCalendarRef }) => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <ClassCalendarCard />
+      <div ref={classCalendarRef}>
+        <ClassCalendarCard />
+      </div>
 
       <HomeActions onSelect={onSelect} />
 
