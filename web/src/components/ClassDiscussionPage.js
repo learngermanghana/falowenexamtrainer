@@ -112,7 +112,7 @@ const ClassDiscussionPage = () => {
     );
 
     return () => unsubscribe();
-  }, [studentProfile?.level, studentProfile?.className]);
+  }, [db, studentProfile?.level, studentProfile?.className]);
 
   useEffect(() => {
     if (!db) return undefined;
@@ -149,7 +149,7 @@ const ClassDiscussionPage = () => {
     );
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -162,7 +162,7 @@ const ClassDiscussionPage = () => {
     if (!form.lessonId && lessonOptions.length > 0) {
       setForm((prev) => ({ ...prev, lessonId: lessonOptions[0].id, topic: lessonOptions[0].topic }));
     }
-  }, [lessonOptions]);
+  }, [form.lessonId, lessonOptions]);
 
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
