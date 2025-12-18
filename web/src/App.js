@@ -39,7 +39,6 @@ function App() {
   const [authView, setAuthView] = useState("landing");
   const [notificationMessage, setNotificationMessage] = useState("");
   const [notificationError, setNotificationError] = useState("");
-  const levelOnboardingRef = useRef(null);
   const classCalendarRef = useRef(null);
 
   const notificationLabel = () => {
@@ -102,12 +101,6 @@ function App() {
       setNotificationError(
         error?.message || "Could not enable push notifications."
       );
-    }
-  };
-
-  const handleSelectLevel = () => {
-    if (levelOnboardingRef.current) {
-      levelOnboardingRef.current.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -258,12 +251,9 @@ function App() {
         ) : null}
 
         <OnboardingChecklist
-          notificationStatus={notificationStatus}
-          onEnableNotifications={handleEnableNotifications}
-          onSelectLevel={handleSelectLevel}
           onConfirmClass={handleConfirmClass}
         />
-        <div ref={levelOnboardingRef}>
+        <div>
           <LevelOnboarding />
         </div>
 
