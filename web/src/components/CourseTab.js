@@ -10,12 +10,11 @@ import {
   loadStudentCodeForEmail,
   rememberStudentCodeForEmail,
   saveDraftForStudent,
-  submitFinalWork,
   saveDraftToSpecificPath,
   submitWorkToSpecificPath,
 } from "../services/submissionService";
 import { fetchResults } from "../services/resultsService";
-import { deriveStudentProfile } from "../services/studentDirectory";
+import { deriveStudentProfile, findStudentByEmail } from "../services/studentDirectory";
 
 const tabs = [
   { key: "home", label: "Home" },
@@ -61,11 +60,11 @@ const CourseTab = () => {
   const [assignmentTitle, setAssignmentTitle] = useState(
     courseOverview.nextAssignment.title
   );
+  const [assignmentId, setAssignmentId] = useState("");
   const [workDraft, setWorkDraft] = useState("");
   const [draftStatus, setDraftStatus] = useState("");
   const [manualDraftStatus, setManualDraftStatus] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState("");
-  const [manualSubmissionStatus, setManualSubmissionStatus] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [locked, setLocked] = useState(false);
   const [assignmentSummary, setAssignmentSummary] = useState(null);
@@ -82,9 +81,6 @@ const CourseTab = () => {
     fetchedAt: null,
   });
 
-  const LESSON_ASSIGNMENT_NAME = "A1_day10_ch6";
-  const LESSON_POST_ID = "0lYQbCPoL4nEux99kYZk";
-
   const sanitizePathSegment = (value) =>
     (value || "")
       .toString()
@@ -93,14 +89,52 @@ const CourseTab = () => {
       .replace(/[^a-z0-9@._-]/gi, "-");
 
   const lessonDraftPath = useMemo(() => {
-    if (!studentCode) return "";
-    return `/drafts_v2/${sanitizePathSegment(studentCode)}/lessons/${LESSON_ASSIGNMENT_NAME}`;
-  }, [studentCode]);
+    if (!studentCode || !assignmentId) return "";
+    return `/drafts_v2/${sanitizePathSegment(
+      studentCode
+    )}/lessons/${sanitizePathSegment(assignmentId)}`;
+  }, [assignmentId, studentCode]);
 
   const lessonSubmissionPath = useMemo(
-    () => `/submissions/${submissionLevel}/posts/${LESSON_POST_ID}`,
-    [submissionLevel]
+    () =>
+      assignmentId
+        ? `/submissions/${submissionLevel}/lessons/${sanitizePathSegment(
+            assignmentId
+          )}`
+        : "",
+    [assignmentId, submissionLevel]
   );
+
+  const assignmentOptions = useMemo(() => {
+    const schedule = courseSchedules[submissionLevel] || [];
+    const uniqueAssignments = new Set();
+
+    const addChapter = (chapter) => {
+      if (!chapter) return;
+      uniqueAssignments.add(chapter.toString());
+    };
+
+    const inspectLesson = (lesson) => {
+      if (!lesson) return;
+      if (Array.isArray(lesson)) {
+        lesson.forEach(inspectLesson);
+        return;
+      }
+      if (lesson.assignment) {
+        addChapter(lesson.chapter || lesson.topic);
+      }
+    };
+
+    schedule.forEach((day) => {
+      if (day.assignment) {
+        addChapter(day.chapter || day.topic);
+      }
+      inspectLesson(day.lesen_hören);
+      inspectLesson(day.schreiben_sprechen);
+    });
+
+    return Array.from(uniqueAssignments).sort((a, b) => a.localeCompare(b));
+  }, [submissionLevel]);
 
   const summarizeResults = (rows = []) => {
     const perLevel = {};
@@ -174,8 +208,49 @@ const CourseTab = () => {
   }, [user?.email, user?.profile]);
 
   useEffect(() => {
+    let cancelled = false;
+    if (!user?.email || studentCode) return undefined;
+
+    const lookupStudent = async () => {
+      try {
+        const match = await findStudentByEmail(user.email);
+        if (!match || cancelled) return;
+        const detectedCode = match.studentcode || match.studentCode || match.id;
+        if (detectedCode) {
+          setStudentCode((prev) => prev || detectedCode);
+        }
+        if (match.assignmentTitle) {
+          setAssignmentTitle((prev) => prev || match.assignmentTitle);
+        }
+        if (match.level) {
+          const normalizedLevel = (match.level || "").toUpperCase();
+          setSelectedCourseLevel((prev) => prev || normalizedLevel);
+          setSubmissionLevel((prev) => prev || normalizedLevel);
+        }
+      } catch (error) {
+        console.error("Failed to fetch student by email", error);
+      }
+    };
+
+    lookupStudent();
+    return () => {
+      cancelled = true;
+    };
+  }, [studentCode, user?.email]);
+
+  useEffect(() => {
     setSubmissionLevel(selectedCourseLevel);
   }, [selectedCourseLevel]);
+
+  useEffect(() => {
+    if (!assignmentOptions.length || assignmentId) return;
+    setAssignmentId(assignmentOptions[0]);
+  }, [assignmentId, assignmentOptions]);
+
+  useEffect(() => {
+    if (!assignmentId) return;
+    setAssignmentTitle((prev) => prev || `Assignment ${assignmentId}`);
+  }, [assignmentId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -424,7 +499,6 @@ const CourseTab = () => {
 
   const handleSubmitWork = async () => {
     setSubmissionStatus("");
-    setManualSubmissionStatus("");
     if (!user?.email) {
       setSubmissionStatus("Please sign in to submit your work.");
       return;
@@ -432,6 +506,16 @@ const CourseTab = () => {
 
     if (!studentCode.trim()) {
       setSubmissionStatus("Enter your student code to track the submission.");
+      return;
+    }
+
+    if (!assignmentId) {
+      setSubmissionStatus("Pick the assignment number from the course dictionary.");
+      return;
+    }
+
+    if (!lessonSubmissionPath) {
+      setSubmissionStatus("Add an assignment number to generate the submission path.");
       return;
     }
 
@@ -454,22 +538,13 @@ const CourseTab = () => {
 
     setSubmitting(true);
     try {
-      const result = submitFinalWork({
-        email: user.email,
-        studentCode,
-        level: submissionLevel,
+      const result = submitWorkToSpecificPath({
+        path: lessonSubmissionPath,
         content: workDraft,
-        assignmentTitle,
       });
-
       setLocked(true);
-      if (result.locked) {
-        setSubmissionStatus(`Submission locked at /${result.lockPath}.`);
-        return;
-      }
-
       setSubmissionStatus(
-        `Submitted "${assignmentTitle}" to /${result.submissionPath} and locked at /${result.lockPath}.`
+        `Submitted to ${lessonSubmissionPath} (${new Date(result.savedAt).toLocaleTimeString()})`
       );
     } catch (error) {
       console.error("Failed to submit work", error);
@@ -486,25 +561,13 @@ const CourseTab = () => {
     }
 
     if (!lessonDraftPath) {
-      setManualDraftStatus("Enter your student code to save this lesson draft.");
+      setManualDraftStatus("Add student code and assignment number to save this draft.");
       return;
     }
 
     const result = saveDraftToSpecificPath({ path: lessonDraftPath, content: workDraft });
     setManualDraftStatus(
       `Draft saved to ${lessonDraftPath} (${new Date(result.savedAt).toLocaleTimeString()})`
-    );
-  };
-
-  const handleSubmitLessonWork = () => {
-    if (!workDraft.trim()) {
-      setManualSubmissionStatus("Add your coursework before submitting this lesson.");
-      return;
-    }
-
-    const result = submitWorkToSpecificPath({ path: lessonSubmissionPath, content: workDraft });
-    setManualSubmissionStatus(
-      `Submitted to ${lessonSubmissionPath} (${new Date(result.savedAt).toLocaleTimeString()})`
     );
   };
 
@@ -1090,14 +1153,15 @@ const CourseTab = () => {
         <span style={styles.badge}>/drafts_v2 · /submissions/{submissionLevel}</span>
       </div>
       <p style={styles.helperText}>
-        Drafts are auto-saved in Firebase-style paths using your email + student code. Final submissions land in
-        /submissions/{submissionLevel} and are locked via /submission_locks once you submit.
+        Drafts are auto-saved in Firebase-style paths using your email + student code. We now auto-look up your student code
+        from the students collection when you sign in, and you can pick the assignment number directly from the course
+        dictionary to avoid mistakes.
       </p>
       <p style={styles.helperText}>
-        Need explicit lesson paths? Use the new buttons to save drafts to
+        Need explicit lesson paths? Use the buttons to save drafts to
         {" "}
-        {lessonDraftPath || `/drafts_v2/<student-code>/lessons/${LESSON_ASSIGNMENT_NAME}`} and to submit the final version
-        to {lessonSubmissionPath}.
+        {lessonDraftPath || "/drafts_v2/<student-code>/lessons/<assignment>"} and submit the final version to
+        {lessonSubmissionPath || `/submissions/${submissionLevel}/lessons/<assignment>`}.
       </p>
 
       <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
@@ -1138,6 +1202,25 @@ const CourseTab = () => {
           <p style={styles.helperText}>Matches the /submissions/{submissionLevel} path.</p>
         </div>
         <div>
+          <label style={styles.label}>Assignment number</label>
+          <select
+            style={styles.select}
+            value={assignmentId}
+            onChange={(e) => setAssignmentId(e.target.value)}
+            disabled={locked || !assignmentOptions.length}
+          >
+            {!assignmentId && <option value="">Select from dictionary</option>}
+            {assignmentOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <p style={styles.helperText}>
+            Pulled from the course dictionary so you don’t have to type the assignment number manually.
+          </p>
+        </div>
+        <div>
           <label style={styles.label}>Assignment title</label>
           <input
             value={assignmentTitle}
@@ -1172,30 +1255,22 @@ const CourseTab = () => {
           }}
         >
           <span style={{ ...styles.helperText, margin: 0 }}>{draftStatus}</span>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              {locked && <span style={styles.lockPill}>Locked</span>}
-              <button
-                style={styles.secondaryButton}
-                type="button"
-                onClick={handleSaveLessonDraft}
-                disabled={locked}
-              >
-                Save draft to lessons path
-              </button>
-              <button
-                style={styles.secondaryButton}
-                type="button"
-                onClick={handleSubmitLessonWork}
-                disabled={locked}
-              >
-                Submit to lessons path
-              </button>
-              <button
-                style={styles.primaryButton}
-                onClick={handleSubmitWork}
-                disabled={locked || submitting}
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            {locked && <span style={styles.lockPill}>Locked</span>}
+            <button
+              style={styles.secondaryButton}
+              type="button"
+              onClick={handleSaveLessonDraft}
+              disabled={locked}
             >
-              {locked ? "Submission locked" : submitting ? "Submitting..." : "Submit work"}
+              Save draft
+            </button>
+            <button
+              style={styles.primaryButton}
+              onClick={handleSubmitWork}
+              disabled={locked || submitting}
+            >
+              {locked ? "Submission locked" : submitting ? "Submitting..." : "Submit now"}
             </button>
           </div>
         </div>
@@ -1203,11 +1278,6 @@ const CourseTab = () => {
           {manualDraftStatus && (
             <div style={styles.successBox}>
               {manualDraftStatus} {lessonDraftPath ? `(path: ${lessonDraftPath})` : ""}
-            </div>
-          )}
-          {manualSubmissionStatus && (
-            <div style={styles.successBox}>
-              {manualSubmissionStatus} (path: {lessonSubmissionPath})
             </div>
           )}
         </div>
