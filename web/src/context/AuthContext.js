@@ -25,10 +25,18 @@ const fetchStudentProfileByEmail = async (email) => {
   if (!email) return null;
   const studentsRef = collection(db, "students");
   const q = query(studentsRef, where("email", "==", email.toLowerCase())) ;
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
-  const hit = snapshot.docs[0];
-  return { id: hit.id, ...hit.data() };
+  try {
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const hit = snapshot.docs[0];
+    return { id: hit.id, ...hit.data() };
+  } catch (error) {
+    if (error?.code === "permission-denied") {
+      console.warn("Skipping profile lookup: missing Firestore permissions.");
+      return null;
+    }
+    throw error;
+  }
 };
 
 export const AuthProvider = ({ children }) => {

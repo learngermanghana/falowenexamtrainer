@@ -21,19 +21,28 @@ export const subscribeToChatMessages = (userId, callback) => {
   if (!isFirebaseConfigured || !chatRef) return () => {};
 
   const chatQuery = query(chatRef, orderBy("createdAt", "asc"));
-  return onSnapshot(chatQuery, (snapshot) => {
-    const rows = snapshot.docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        sender: data.sender,
-        text: data.text,
-        kind: data.kind || "text",
-        createdAt: data.createdAt?.toDate?.() || null,
-      };
-    });
-    callback(rows);
-  });
+  return onSnapshot(
+    chatQuery,
+    (snapshot) => {
+      const rows = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          sender: data.sender,
+          text: data.text,
+          kind: data.kind || "text",
+          createdAt: data.createdAt?.toDate?.() || null,
+        };
+      });
+      callback(rows);
+    },
+    (error) => {
+      console.error("Chat listener error", error);
+      if (error?.code === "permission-denied") {
+        callback([]);
+      }
+    }
+  );
 };
 
 export const appendChatMessages = async (userId, messages = []) => {

@@ -33,11 +33,19 @@ export const findStudentByEmail = async (email) => {
 
   const studentsRef = collection(db, "students");
   const lookup = query(studentsRef, where("email", "==", normalizedEmail));
-  const snapshot = await getDocs(lookup);
-  if (snapshot.empty) return null;
+  try {
+    const snapshot = await getDocs(lookup);
+    if (snapshot.empty) return null;
 
-  const hit = snapshot.docs[0];
-  return { id: hit.id, ...hit.data() };
+    const hit = snapshot.docs[0];
+    return { id: hit.id, ...hit.data() };
+  } catch (error) {
+    if (error?.code === "permission-denied") {
+      console.warn("Skipping student lookup: missing Firestore permissions.");
+      return null;
+    }
+    throw error;
+  }
 };
 
 export default deriveStudentProfile;
