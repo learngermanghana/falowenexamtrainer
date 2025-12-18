@@ -18,5 +18,9 @@
       "source": "/health",
       "destination": "https://api-haqjyxn5wa-ew.a.run.app/health"
     }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/web/index.html" }
   ]
 }
