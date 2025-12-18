@@ -219,4 +219,6 @@ async function upsertStudentToSheet(student) {
 
 module.exports = {
   upsertStudentToSheet,
+  // Kept for backwards compatibility with existing imports
+  appendStudentToStudentsSheetSafely: upsertStudentToSheet,
 };
