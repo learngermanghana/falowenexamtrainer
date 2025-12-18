@@ -1,8 +1,10 @@
-import { vocabLists } from "../data/vocabLists";
-
 const backendUrl =
   process.env.REACT_APP_BACKEND_URL ||
   (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+
+const API_BASE = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/$/, "");
+
+const toText = (v) => (v == null ? "" : String(v).trim());
 
 const fetchJson = async (path) => {
   const response = await fetch(`${backendUrl}/api${path}`);
@@ -19,74 +21,38 @@ const normalizeString = (value, fallback = "") => {
   return fallback;
 };
 
-export const fetchVocabEntries = async () => {
-  try {
-    const data = await fetchJson("/vocab");
-    const rows = Array.isArray(data?.rows) ? data.rows : [];
+export async function fetchVocabEntries() {
+  const url = `${API_BASE}/api/vocab`;
 
-    const normalized = rows
-      .map((row, index) => {
-        const topic =
-          normalizeString(
-            row.topic ||
-              row.theme ||
-              row.category ||
-              row.set ||
-              row.list ||
-              row.level,
-            "Allgemein"
-          ) || "Allgemein";
-        const phrase =
-          normalizeString(
-            row.phrase ||
-              row.term ||
-              row.vocab ||
-              row.german ||
-              row.de ||
-              row.text ||
-              row.prompt,
-            ""
-          ) || normalizeString(row.item, "");
-        const translation = normalizeString(
-          row.translation || row.english || row.en || row.meaning || row.hint,
-          ""
-        );
+  const res = await fetch(url, {
+    method: "GET",
+    headers: { Accept: "application/json" },
+  });
 
-        if (!phrase) return null;
-
-        return {
-          id: normalizeString(row.id, `vocab-${index}`),
-          topic,
-          phrase,
-          translation,
-        };
-      })
-      .filter(Boolean);
-
-    if (normalized.length === 0) {
-      return vocabLists.flatMap((block, idx) =>
-        block.items.map((item, itemIdx) => ({
-          id: `fallback-${idx}-${itemIdx}`,
-          topic: block.title,
-          phrase: item,
-          translation: "",
-        }))
-      );
-    }
-
-    return normalized;
-  } catch (error) {
-    console.error("Failed to fetch vocab entries", error);
-    return vocabLists.flatMap((block, idx) =>
-      block.items.map((item, itemIdx) => ({
-        id: `fallback-${idx}-${itemIdx}`,
-        topic: block.title,
-        phrase: item,
-        translation: "",
-      }))
-    );
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Failed to load vocab (${res.status}): ${body.slice(0, 200)}`);
   }
-};
+
+  const rows = await res.json();
+
+  return (Array.isArray(rows) ? rows : []).map((row, index) => {
+    const level = toText(row.level);
+    const german = toText(row.german);
+    const english = toText(row.english);
+
+    const id = toText(row.id) || `${level || "vocab"}-${index + 1}-${german}`;
+
+    return {
+      id,
+      topic: level || "Allgemein",
+      phrase: german,
+      translation: english,
+      audioNormal: toText(row.audio_normal),
+      audioSlow: toText(row.audio_slow),
+    };
+  });
+}
 
 export const fetchExamPrompts = async () => {
   try {
@@ -98,21 +64,21 @@ export const fetchExamPrompts = async () => {
         const level = normalizeString(row.level || row.niveau, "").toUpperCase();
         const teil = normalizeString(
           row.teil || row.section || row.task || row.teil_label || row.part,
-          ""
+          "",
         );
         const topicPrompt = normalizeString(
           row.topic_prompt || row.prompt || row.topic || row.thema || row.title,
-          ""
+          "",
         );
         const keyword = normalizeString(
           row.keyword_subtopic || row.keyword || row.category,
-          ""
+          "",
         );
         const topic = topicPrompt || keyword || "Prüfungsthema";
         const prompt = topicPrompt || keyword;
         const hint = normalizeString(
           row.hint || row.tip || row.translation || row.english,
-          ""
+          "",
         );
 
         if (!prompt && !topic) return null;
