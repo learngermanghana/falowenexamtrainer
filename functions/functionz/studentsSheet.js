@@ -1,7 +1,7 @@
 // functions/functionz/studentsSheet.js
 "use strict";
 
-const { google } = require("googleapis");
+const { getSheetsClient } = require("./googleSheetsClient");
 
 /**
  * Header-aware upsert into your Students Google Sheet.
@@ -35,35 +35,6 @@ function colToA1(colIdx0) {
     n = Math.floor((n - 1) / 26);
   }
   return s;
-}
-
-function getServiceAccountFromEnv() {
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  if (raw && raw.trim().startsWith("{")) {
-    return JSON.parse(raw);
-  }
-
-  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64;
-  if (b64) {
-    const decoded = Buffer.from(b64, "base64").toString("utf8");
-    return JSON.parse(decoded);
-  }
-
-  throw new Error(
-    "Missing GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_JSON_B64)."
-  );
-}
-
-async function getSheetsClient() {
-  const sa = getServiceAccountFromEnv();
-  const auth = new google.auth.JWT({
-    email: sa.client_email,
-    key: sa.private_key,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-  });
-
-  const sheets = google.sheets({ version: "v4", auth });
-  return sheets;
 }
 
 async function loadHeaderMap(sheets, sheetId, tabName) {
