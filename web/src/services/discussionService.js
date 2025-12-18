@@ -1,21 +1,13 @@
-import axios from "axios";
+export async function correctDiscussionText({ text, level, idToken }) {
+  const res = await fetch(`/api/discussion/correct`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
+    },
+    body: JSON.stringify({ text, level }),
+  });
 
-const backendUrl =
-  process.env.REACT_APP_BACKEND_URL || (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
-
-const authHeaders = (idToken) =>
-  idToken
-    ? {
-        Authorization: `Bearer ${idToken}`,
-      }
-    : {};
-
-export const correctDiscussionText = async ({ text, level, idToken }) => {
-  const response = await axios.post(
-    `${backendUrl}/api/discussion/correct`,
-    { text, level },
-    { headers: authHeaders(idToken) }
-  );
-
-  return response.data;
-};
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
