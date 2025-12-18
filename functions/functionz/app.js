@@ -9,6 +9,7 @@ const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
+const { getSheetsClient } = require("./googleSheetsClient");
 
 let getScoresForStudent;
 
@@ -44,6 +45,52 @@ app.use(express.json({ limit: "1mb" }));
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
+app.get("/vocab", async (_req, res) => {
+  try {
+    const spreadsheetId = process.env.SHEETS_VOCAB_ID;
+    const tab = process.env.SHEETS_VOCAB_TAB || "Sheet1";
+
+    if (!spreadsheetId) {
+      return res.status(500).json({ error: "Missing SHEETS_VOCAB_ID env" });
+    }
+
+    const sheets = await getSheetsClient();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${tab}!A:Z`,
+    });
+
+    const rows = mapSheetRows(response.data.values || []);
+    return res.json({ rows });
+  } catch (err) {
+    console.error("/vocab error", err);
+    return res.status(500).json({ error: err.message || "Failed to load vocab" });
+  }
+});
+
+app.get("/exams", async (_req, res) => {
+  try {
+    const spreadsheetId = process.env.SHEETS_EXAMS_ID;
+    const tab = process.env.SHEETS_EXAMS_TAB || "Exams list";
+
+    if (!spreadsheetId) {
+      return res.status(500).json({ error: "Missing SHEETS_EXAMS_ID env" });
+    }
+
+    const sheets = await getSheetsClient();
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `${tab}!A:Z`,
+    });
+
+    const rows = mapSheetRows(response.data.values || []);
+    return res.json({ rows });
+  } catch (err) {
+    console.error("/exams error", err);
+    return res.status(500).json({ error: err.message || "Failed to load exams" });
+  }
+});
+
 const writeTempFile = async (file) => {
   const fileName = file?.originalname || "audio.webm";
   const tempPath = path.join(os.tmpdir(), `${Date.now()}-${fileName}`);
@@ -66,6 +113,40 @@ const transcribeAudio = async (fileBuffer) => {
   } finally {
     await fsPromises.unlink(tempPath).catch(() => undefined);
   }
+};
+
+const normalizeHeaderKey = (header, index) => {
+  const normalized = String(header || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^a-z0-9_]/g, "");
+
+  if (normalized) return normalized;
+  return `col_${index}`;
+};
+
+const mapSheetRows = (values = []) => {
+  if (!values.length) return [];
+
+  const header = values[0].map(normalizeHeaderKey);
+  const rows = values.slice(1);
+
+  return rows
+    .map((row, rowIndex) => {
+      const entry = { _row: rowIndex + 2 };
+
+      header.forEach((key, idx) => {
+        entry[key] = typeof row[idx] !== "undefined" ? row[idx] : "";
+      });
+
+      if (!entry.id) {
+        entry.id = `${entry._row}-${Object.values(entry).join("-")}`;
+      }
+
+      return entry;
+    })
+    .filter((row) => Object.values(row).some((value) => String(value || "").trim()));
 };
 
 const speakingPrompt = ({ teil, level, contextType, question, interactionMode }) => {

@@ -16,7 +16,14 @@ exports.api = onRequest(
   {
     region: "europe-west1",
     cors: true,
-    secrets: ["OPENAI_API_KEY", "GOOGLE_SERVICE_ACCOUNT_JSON_B64"],
+    secrets: [
+      "OPENAI_API_KEY",
+      "GOOGLE_SERVICE_ACCOUNT_JSON_B64",
+      "SHEETS_VOCAB_ID",
+      "SHEETS_VOCAB_TAB",
+      "SHEETS_EXAMS_ID",
+      "SHEETS_EXAMS_TAB",
+    ],
   },
   app
 );
