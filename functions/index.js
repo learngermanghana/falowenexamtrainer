@@ -10,7 +10,7 @@ if (!admin.apps.length) {
 setGlobalOptions({ maxInstances: 10 });
 
 const app = require("./functionz/app");
-const { appendStudentToStudentsSheetSafely } = require("./functionz/studentsSheet");
+const { appendStudentToStudentsSheetSafely } = require("./functionz/studentsSheet.js");
 
 exports.api = onRequest(
   {
