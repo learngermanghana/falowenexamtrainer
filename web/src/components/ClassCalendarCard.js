@@ -1,21 +1,69 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
-import { downloadClassCalendar, formatScheduleSummary } from "../services/classCalendar";
+import {
+  downloadCalendarAfterHydration,
+  downloadClassCalendar,
+  formatScheduleSummary,
+} from "../services/classCalendar";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
+import { useAuth } from "../context/AuthContext";
 
 const ClassCalendarCard = () => {
+  const { studentProfile, persistStudentClassName } = useAuth();
   const catalogEntries = useMemo(() => Object.keys(classCatalog), []);
+  const fallbackClass = useMemo(() => catalogEntries[0], [catalogEntries]);
   const [selectedClass, setSelectedClass] = useState(
-    loadPreferredClass() || catalogEntries[0]
+    () => loadPreferredClass() || fallbackClass
   );
+  const [cloudSaveWarning, setCloudSaveWarning] = useState("");
+  const hydratedClassRef = useRef(null);
+
+  useEffect(() => {
+    if (studentProfile?.className) {
+      const normalizedClass = studentProfile.className;
+      setSelectedClass((current) =>
+        current === normalizedClass ? current : normalizedClass
+      );
+      savePreferredClass(normalizedClass);
+
+      if (hydratedClassRef.current !== normalizedClass) {
+        hydratedClassRef.current = normalizedClass;
+        downloadCalendarAfterHydration(normalizedClass);
+      }
+      return;
+    }
+
+    setSelectedClass((current) => current || loadPreferredClass() || fallbackClass);
+  }, [downloadCalendarAfterHydration, fallbackClass, studentProfile?.className]);
+
+  useEffect(() => {
+    if (!selectedClass) return;
+    if (classCatalog[selectedClass]) return;
+    setSelectedClass(fallbackClass);
+  }, [fallbackClass, selectedClass]);
 
   const classDetails = classCatalog[selectedClass];
 
-  const handleChange = (event) => {
+  const handleChange = async (event) => {
     const value = event.target.value;
+    setCloudSaveWarning("");
     setSelectedClass(value);
     savePreferredClass(value);
+
+    try {
+      const result = await persistStudentClassName(value);
+      if (result?.reason === "permission-denied") {
+        setCloudSaveWarning(
+          "We couldn't save your class to the cloud. We'll remember it on this device."
+        );
+      }
+    } catch (error) {
+      console.error("Failed to persist class selection", error);
+      setCloudSaveWarning(
+        "We couldn't sync your class selection right now. We'll keep it saved locally."
+      );
+    }
   };
 
   if (!classDetails) return null;
@@ -30,6 +78,20 @@ const ClassCalendarCard = () => {
         Choose your cohort to get the official Zoom link, docs, and a downloadable calendar. The ICS file works on
         iPhone, Android (import into Google Calendar), and desktop calendars.
       </p>
+      {cloudSaveWarning ? (
+        <div
+          style={{
+            ...styles.helperText,
+            margin: 0,
+            padding: "8px 12px",
+            background: "#fff7ed",
+            border: "1px solid #fdba74",
+            borderRadius: 10,
+          }}
+        >
+          {cloudSaveWarning}
+        </div>
+      ) : null}
 
       <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         <div style={{ ...styles.field, margin: 0 }}>
