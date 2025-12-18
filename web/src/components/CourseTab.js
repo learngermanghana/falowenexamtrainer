@@ -508,47 +508,67 @@ const CourseTab = () => {
     );
   };
 
-  const renderHome = () => (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-        <h2 style={styles.sectionTitle}>Course Home</h2>
-        <span style={styles.badge}>Live aus Kurs-Dictionary</span>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-        <StatCard
-          label="Assignment Streak"
-          value={streakValue}
-          helper={assignmentError ? `Sheet-Fehler: ${assignmentError}` : streakHelper}
-        />
-        <StatCard
-          label="Anwesenheit"
-          value={`${courseOverview.attendanceRate}%`}
-          helper={courseOverview.attendanceSummary}
-        />
-        <StatCard
-          label="Nächste Session"
-          value={courseOverview.upcomingSession.topic}
-          helper={`${courseOverview.upcomingSession.materials} · Fokus: ${courseOverview.upcomingSession.focus}`}
-        />
-      </div>
-
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-          <h3 style={{ margin: 0 }}>Nächste empfohlene Aufgabe</h3>
-          <span style={styles.levelPill}>Due: {courseOverview.nextAssignment.dueDate}</span>
+  const renderHome = () => {
+    if (!studentProfile) {
+      return (
+        <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+            <h2 style={styles.sectionTitle}>Course Home</h2>
+            <span style={styles.badge}>No course data</span>
+          </div>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            We haven’t received course data for your account yet. Once your profile is linked to the campus system,
+            your next assignment, attendance, and recommendations will show up here.
+          </p>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Please ask your instructor for an update or try again later.
+          </p>
         </div>
-        <p style={{ ...styles.helperText, margin: 0 }}>{courseOverview.nextAssignment.title}</p>
-        <p style={{ margin: 0 }}>{courseOverview.nextAssignment.description}</p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <span style={styles.badge}>Kapitel 5</span>
-          <span style={styles.badge}>Schreiben</span>
-          <span style={styles.badge}>80–100 Wörter</span>
-        </div>
-      </div>
+      );
+    }
 
-      {renderAssignmentLeaderboard()}
-    </div>
-  );
+    return (
+      <div style={{ display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+          <h2 style={styles.sectionTitle}>Course Home</h2>
+          <span style={styles.badge}>Live aus Kurs-Dictionary</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+          <StatCard
+            label="Assignment Streak"
+            value={streakValue}
+            helper={assignmentError ? `Sheet-Fehler: ${assignmentError}` : streakHelper}
+          />
+          <StatCard
+            label="Anwesenheit"
+            value={`${courseOverview.attendanceRate}%`}
+            helper={courseOverview.attendanceSummary}
+          />
+          <StatCard
+            label="Nächste Session"
+            value={courseOverview.upcomingSession.topic}
+            helper={`${courseOverview.upcomingSession.materials} · Fokus: ${courseOverview.upcomingSession.focus}`}
+          />
+        </div>
+
+        <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+            <h3 style={{ margin: 0 }}>Nächste empfohlene Aufgabe</h3>
+            <span style={styles.levelPill}>Due: {courseOverview.nextAssignment.dueDate}</span>
+          </div>
+          <p style={{ ...styles.helperText, margin: 0 }}>{courseOverview.nextAssignment.title}</p>
+          <p style={{ margin: 0 }}>{courseOverview.nextAssignment.description}</p>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <span style={styles.badge}>Kapitel 5</span>
+            <span style={styles.badge}>Schreiben</span>
+            <span style={styles.badge}>80–100 Wörter</span>
+          </div>
+        </div>
+
+        {renderAssignmentLeaderboard()}
+      </div>
+    );
+  };
 
   const renderCourse = () => (
     <div style={{ display: "grid", gap: 12 }}>
