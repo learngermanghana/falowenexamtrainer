@@ -123,12 +123,10 @@ const getInitialLevel = () => {
   return ALLOWED_LEVELS[0];
 };
 
-const initialLevel = getInitialLevel();
-
 export const ExamProvider = ({ children }) => {
-  const [level, setLevelState] = useState(initialLevel);
-  const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel()));
-  const [teil, setTeil] = useState(getTasksForLevel(initialLevel)[0].label);
+  const [level, setLevelState] = useState(() => getInitialLevel());
+  const [levelConfirmed, setLevelConfirmed] = useState(() => Boolean(loadPreferredLevel()));
+  const [teil, setTeil] = useState(() => getTasksForLevel(getInitialLevel())[0].label);
   const [result, setResult] = useState(null);
   const [resultHistory, setResultHistory] = useState([]);
   const [error, setError] = useState("");

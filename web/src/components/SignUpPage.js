@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -11,6 +11,14 @@ import { loadPreferredClass, savePreferredClass } from "../services/classSelecti
 const formatSchedule = (schedule = []) =>
   schedule.map(({ day, startTime, endTime }) => `${day} ${startTime}-${endTime}`).join(" · ");
 
+const DEFAULT_AUTO_LEVEL = ALLOWED_LEVELS.includes("B1") ? "B1" : ALLOWED_LEVELS[0];
+
+const inferLevelFromClassName = (className) => {
+  const normalized = (className || "").toUpperCase();
+  const matchedLevel = ALLOWED_LEVELS.find((option) => normalized.includes(option.toUpperCase()));
+  return matchedLevel || DEFAULT_AUTO_LEVEL;
+};
+
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const [email, setEmail] = useState("");
@@ -19,12 +27,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("B1");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
   );
+  const [derivedLevel, setDerivedLevel] = useState(() => inferLevelFromClassName(selectedClass));
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
+
+  useEffect(() => {
+    setDerivedLevel(inferLevelFromClassName(selectedClass));
+  }, [selectedClass]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -38,14 +50,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     setLoading(true);
     try {
-      const studentCode = generateStudentCode({ firstName, level: selectedLevel });
+      const studentCode = generateStudentCode({ firstName, level: derivedLevel });
       await signup(email, password, {
         firstName,
-        level: selectedLevel,
+        level: derivedLevel,
         studentCode,
         className: selectedClass,
       });
-      savePreferredLevel(selectedLevel);
+      savePreferredLevel(derivedLevel);
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(email, studentCode);
       setMessage(`Account created! Your student code is ${studentCode}.`);
@@ -129,23 +141,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder="Enter password again"
           />
 
-          <label style={styles.label}>Your current level</label>
-          <select
-            required
-            value={selectedLevel}
-            onChange={(event) => setSelectedLevel(event.target.value)}
-            style={styles.select}
-          >
-            {ALLOWED_LEVELS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <p style={{ ...styles.helperText, marginTop: -2 }}>
-            We load speaking and writing tasks from the matching level sheet.
-          </p>
-
           <label style={styles.label}>Which live class are you joining?</label>
           <select
             required
@@ -162,6 +157,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             We save your course in your profile and generate the calendar export with the Zoom link.
           </p>
+
+          <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              We automatically assign your level based on the class you pick. Your profile will start at
+              {" "}
+              <strong>{derivedLevel}</strong> for speaking and writing tasks.
+            </p>
+          </div>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading ? "Creating ..." : "Sign up now"}

@@ -928,21 +928,11 @@ const CourseTab = () => {
         <h2 style={styles.sectionTitle}>My Course</h2>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <span style={styles.helperText}>Course level:</span>
-          <select
-            style={styles.select}
-            value={selectedCourseLevel}
-            onChange={(e) => setSelectedCourseLevel(e.target.value)}
-          >
-            {Object.keys(courseSchedules).map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
-          </select>
+          <span style={styles.levelPill}>{studentLevel}</span>
         </div>
       </div>
       <p style={styles.helperText}>
-        Pulling content from the course dictionary. Select a level to see its full day-by-day plan.
+        Pulling content from the course dictionary. Your enrolled level controls the day-by-day plan.
       </p>
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -960,7 +950,7 @@ const CourseTab = () => {
       </div>
 
       <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-        {(courseSchedules[selectedCourseLevel] || []).map((entry) => {
+        {(courseSchedules[studentLevel] || []).map((entry) => {
           const lesenHorenList = Array.isArray(entry.lesen_hören)
             ? entry.lesen_hören
             : entry.lesen_hören
@@ -1565,18 +1555,12 @@ const CourseTab = () => {
         </div>
         <div>
           <label style={styles.label}>Course level for this upload</label>
-          <select
-            style={styles.select}
+          <input
+            style={{ ...styles.select, background: "#f3f4f6", cursor: "not-allowed" }}
             value={submissionLevel}
-            onChange={(e) => setSubmissionLevel(e.target.value)}
-            disabled={locked}
-          >
-            {Object.keys(courseSchedules).map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
-          </select>
+            readOnly
+            disabled
+          />
           <p style={styles.helperText}>Matches the /submissions/{submissionLevel} path.</p>
         </div>
         <div>
