@@ -27,8 +27,8 @@ const ClassCalendarCard = () => {
         <span style={styles.badge}>Zoom ready</span>
       </div>
       <p style={{ ...styles.helperText, marginBottom: 0 }}>
-        Choose your cohort to get the official Zoom link, docs, and a downloadable calendar you can add to your
-        phone (ICS for iPhone/Android).
+        Choose your cohort to get the official Zoom link, docs, and a downloadable calendar. The ICS file works on
+        iPhone, Android (import into Google Calendar), and desktop calendars.
       </p>
 
       <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
@@ -72,7 +72,8 @@ const ClassCalendarCard = () => {
           Download calendar (.ics)
         </button>
         <span style={{ ...styles.helperText, margin: 0 }}>
-          Adds every scheduled session to your device calendar with the Zoom link prefilled.
+          Adds every scheduled session to your calendar with the Zoom link prefilled. Android/desktop users can import the
+          ICS file into Google Calendar.
         </span>
       </div>
     </div>
