@@ -109,7 +109,7 @@ const CourseTab = () => {
   const falowenIntro = useMemo(
     () => ({
       sender: "coach",
-      text: `Hi ${studentFirstName}, ich bin Falowen A.I. – dein Grammatik-Helfer und Chat Buddy. Willst du eine Grammatikfrage stellen oder einfach sprechen? Ich passe mich an dein Niveau (${studentLevel}) an.`,
+      text: `Hi ${studentFirstName}, I’m Falowen A.I.—your German grammar coach and chat buddy. Ask a grammar question or just practice chatting; I’ll keep the guidance at your level (${studentLevel}).`,
       kind: "system",
       createdAt: new Date(),
     }),
@@ -119,7 +119,7 @@ const CourseTab = () => {
   const sendToOpenAI = async (content, history) => {
     const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
     if (!apiKey) {
-      setChatStatus("OpenAI API key fehlt. Bitte REACT_APP_OPENAI_API_KEY in der .env setzen.");
+      setChatStatus("Missing OpenAI API key. Add REACT_APP_OPENAI_API_KEY to your .env file.");
       return;
     }
 
@@ -137,7 +137,7 @@ const CourseTab = () => {
     ];
 
     setChatLoading(true);
-    setChatStatus("Falowen antwortet über OpenAI …");
+    setChatStatus("Falowen is replying via OpenAI…");
 
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -163,7 +163,7 @@ const CourseTab = () => {
       const reply = data?.choices?.[0]?.message?.content?.trim();
       const assistantMessage = {
         sender: "coach",
-        text: reply || "Ich konnte gerade nichts zurücksenden. Versuch es bitte erneut.",
+        text: reply || "I couldn’t send anything back. Please try again.",
         kind: "text",
         createdAt: new Date(),
       };
@@ -172,10 +172,10 @@ const CourseTab = () => {
       appendChatMessages(user?.uid, [assistantMessage]).catch((error) => {
         console.error("Failed to persist assistant chat", error);
       });
-      setChatStatus("Antwort gesendet. Frage mich alles zu Grammatik oder Aussprache.");
+      setChatStatus("Reply sent. Ask me anything about German grammar or pronunciation.");
     } catch (error) {
       console.error("OpenAI chat error", error);
-      setChatStatus("Konnte OpenAI nicht erreichen. Prüfe API-Key und Verbindung.");
+      setChatStatus("Could not reach OpenAI. Please check your API key and connection.");
     } finally {
       setChatLoading(false);
     }
@@ -718,7 +718,7 @@ Thank you!`
     if (!content) return;
 
     if (!user?.uid) {
-      setChatStatus("Bitte einloggen, um den Chat zu nutzen.");
+      setChatStatus("Please log in to use the chat.");
       return;
     }
 
@@ -728,7 +728,7 @@ Thank you!`
     setChatMessages(nextMessages);
     appendChatMessages(user.uid, [userMessage]).catch((error) => {
       console.error("Failed to persist chat", error);
-      setChatStatus("Konnte Chat nicht speichern. Versuche es erneut.");
+      setChatStatus("Could not save chat. Please try again.");
     });
     setChatInput("");
     sendToOpenAI(content, nextMessages);
@@ -748,19 +748,19 @@ Thank you!`
     }
 
     if (!navigator.mediaDevices?.getUserMedia) {
-      setRecorderError("Aufnahme nicht unterstützt.");
+      setRecorderError("Recording not supported.");
       return;
     }
 
     if (typeof MediaRecorder === "undefined") {
-      setRecorderError("MediaRecorder wird nicht unterstützt.");
+      setRecorderError("MediaRecorder is not supported.");
       return;
     }
 
-    try {
-      setRecorderError("");
-      setChatStatus("Aufnahme läuft – tippe erneut zum Stop.");
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      try {
+        setRecorderError("");
+        setChatStatus("Recording… tap again to stop.");
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const chunks = [];
       const recorder = new MediaRecorder(stream);
 
@@ -770,38 +770,38 @@ Thank you!`
         }
       };
 
-      recorder.onstop = () => {
-        const audioBlob = new Blob(chunks, { type: "audio/webm" });
-        stopActiveRecorder();
-        setIsRecording(false);
-        const sizeKb = Math.max(Math.round(audioBlob.size / 1024), 1);
-        setRecordingDuration(sizeKb);
+        recorder.onstop = () => {
+          const audioBlob = new Blob(chunks, { type: "audio/webm" });
+          stopActiveRecorder();
+          setIsRecording(false);
+          const sizeKb = Math.max(Math.round(audioBlob.size / 1024), 1);
+          setRecordingDuration(sizeKb);
 
-        if (!user?.uid) {
-          setChatStatus("Bitte einloggen, um Sprachaufnahmen zu speichern.");
-          return;
-        }
+          if (!user?.uid) {
+            setChatStatus("Please log in to save voice notes.");
+            return;
+          }
 
-        const audioNote = {
-          sender: "user",
-          kind: "audio",
-          text: `Audio-Notiz aufgenommen (${sizeKb} KB). Whisper kann sie in Text umwandeln.`,
-          createdAt: new Date(),
+          const audioNote = {
+            sender: "user",
+            kind: "audio",
+            text: `Voice note captured (${sizeKb} KB). Whisper can turn it into text later.`,
+            createdAt: new Date(),
+          };
+
+          setChatMessages((prev) => [...prev, audioNote]);
+          appendChatMessages(user.uid, [audioNote]).catch((error) => {
+            console.error("Failed to save audio note", error);
+            setChatStatus("Could not save the audio note.");
+          });
         };
-
-        setChatMessages((prev) => [...prev, audioNote]);
-        appendChatMessages(user.uid, [audioNote]).catch((error) => {
-          console.error("Failed to save audio note", error);
-          setChatStatus("Audio-Notiz konnte nicht gespeichert werden.");
-        });
-      };
 
       recorderRef.current = recorder;
       recorder.start();
       setIsRecording(true);
     } catch (error) {
       console.error("Recorder error", error);
-      setRecorderError("Konnte nicht aufnehmen. Bitte Mikrofonrechte prüfen.");
+      setRecorderError("Could not record. Please check microphone permissions.");
       setIsRecording(false);
     }
   };
@@ -1187,17 +1187,17 @@ Thank you!`
           <div style={{ display: "grid", gap: 6 }}>
             <h2 style={styles.sectionTitle}>Falowen A.I. · Voice &amp; Grammar Chat</h2>
             <p style={styles.helperText}>
-              Neues Chat-Layout wie bei WhatsApp: unten Aufnahme oder Nachricht tippen, oben siehst du den Verlauf. Frag nach Grammatik, bitte um Feedback oder lass dir kurze Übungen geben.
+              WhatsApp-style layout: record or type at the bottom, see the thread above. Ask for grammar help, request feedback, or get quick exercises.
             </p>
             <p style={styles.helperText}>
-              OpenAI ist verbunden, sobald du <code>REACT_APP_OPENAI_API_KEY</code> in der .env setzt. Wir schicken deine Texte als Chat-Kontext, damit Antworten zu deinem Level passen.
+              OpenAI connects once you add <code>REACT_APP_OPENAI_API_KEY</code> to your .env file. We send your turns as chat context so answers stay matched to your level.
             </p>
           </div>
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
             <span style={styles.badge}>Level: {studentLevel}</span>
-            <span style={styles.badge}>{chatLoading ? "Falowen tippt …" : "Chat bereit"}</span>
+            <span style={styles.badge}>{chatLoading ? "Falowen is typing…" : "Chat ready"}</span>
             {recordingDuration ? (
-              <span style={{ ...styles.helperText, margin: 0 }}>Letzte Aufnahme: {recordingDuration} KB</span>
+              <span style={{ ...styles.helperText, margin: 0 }}>Last recording: {recordingDuration} KB</span>
             ) : null}
           </div>
         </div>
@@ -1214,7 +1214,7 @@ Thank you!`
           <div style={styles.chatLogWide}>
             {chatMessages.length === 0 ? (
               <div style={{ ...styles.helperText, textAlign: "center" }}>
-                Noch keine Nachrichten. Tippe eine Frage oder nimm eine kurze Sprachnotiz unten auf.
+                No messages yet. Type a question or record a short voice note below.
               </div>
             ) : (
               chatMessages.map((message, index) => (
@@ -1223,9 +1223,9 @@ Thank you!`
                   style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-                    <strong>{message.sender === "coach" ? "Falowen" : "Du"}</strong>
+                    <strong>{message.sender === "coach" ? "Falowen" : "You"}</strong>
                     <span style={styles.chatTimestamp}>
-                      {message.createdAt ? new Date(message.createdAt).toLocaleTimeString() : "Gerade eben"}
+                      {message.createdAt ? new Date(message.createdAt).toLocaleTimeString() : "Just now"}
                     </span>
                   </div>
                   <div>{message.text}</div>
@@ -1241,10 +1241,10 @@ Thank you!`
                   style={isRecording ? styles.recorderButtonActive : styles.recorderButton}
                   onClick={handleRecordingToggle}
                 >
-                  {isRecording ? "■ Stop" : "🎙️ Sprachnotiz"}
+                  {isRecording ? "■ Stop" : "🎙️ Voice note"}
                 </button>
                 <div style={styles.helperText}>
-                  Halte den Button wie bei WhatsApp: einmal tippen zum Start, nochmal zum Stop. Wir speichern sie als Notiz für Whisper.
+                  Tap like WhatsApp: tap once to start, again to stop. We save it as a note for Whisper later.
                 </div>
               </div>
               <div style={styles.composerRow}>
@@ -1253,7 +1253,7 @@ Thank you!`
                   rows={2}
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Schreibe deine Frage oder formuliere einen kurzen Satz zum Korrigieren."
+                  placeholder="Ask a grammar question or write a short sentence to correct."
                   disabled={chatLoading}
                 />
                 <button
@@ -1261,7 +1261,7 @@ Thank you!`
                   onClick={() => handleSend(chatInput)}
                   disabled={chatLoading}
                 >
-                  {chatLoading ? "Senden …" : "Senden"}
+                  {chatLoading ? "Sending…" : "Send"}
                 </button>
               </div>
             </div>
