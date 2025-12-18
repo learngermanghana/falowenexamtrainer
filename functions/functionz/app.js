@@ -323,11 +323,12 @@ app.post("/legacy/login", async (req, res) => {
 app.get("/scores", async (req, res) => {
   try {
     const studentCode = String(req.query.studentCode || "").trim();
+    const email = String(req.query.email || "").trim();
     const level = String(req.query.level || "").trim();
     if (!studentCode) return res.status(400).json({ error: "studentCode is required" });
 
-    const rows = await loadScoresModule()({ studentCode, level });
-    return res.json({ studentCode, level, rows });
+    const rows = await loadScoresModule()({ studentCode, email, level });
+    return res.json({ studentCode, email, level, rows });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Failed to fetch scores" });

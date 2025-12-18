@@ -6,7 +6,7 @@ function normalizeHeader(h) {
 
 const normalizeValue = (value) => String(value || "").trim().toLowerCase();
 
-async function getScoresForStudent({ studentCode, level } = {}) {
+async function getScoresForStudent({ studentCode, email, level } = {}) {
   const SHEET_ID = process.env.SHEETS_SCORES_ID;
   const TAB = process.env.SHEETS_SCORES_TAB || "scores_backup";
   if (!SHEET_ID) throw new Error("Missing env SHEETS_SCORES_ID");
@@ -37,6 +37,7 @@ async function getScoresForStudent({ studentCode, level } = {}) {
   if (idxStudentCode === -1) throw new Error("Scores sheet missing 'studentcode' column");
 
   const targetCode = normalizeValue(studentCode);
+  const targetEmail = normalizeValue(email);
   const targetLevel = normalizeValue(level);
 
   const out = [];
@@ -44,6 +45,8 @@ async function getScoresForStudent({ studentCode, level } = {}) {
     const r = rows[i];
     const sc = normalizeValue(r[idxStudentCode]);
     if (targetCode && sc !== targetCode) continue;
+    const rowEmail = idxEmail !== -1 ? normalizeValue(r[idxEmail]) : "";
+    if (targetEmail && (!rowEmail || rowEmail !== targetEmail)) continue;
     const rowLevel = idxLevel !== -1 ? normalizeValue(r[idxLevel]) : "";
     if (targetLevel && targetLevel !== "all" && rowLevel !== targetLevel) continue;
 
