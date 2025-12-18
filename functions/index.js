@@ -33,6 +33,8 @@ exports.onStudentCreated = onDocumentCreated(
     ],
   },
   async (event) => {
+    console.log("✅ onStudentCreated fired", event.params);
+
     const snap = event.data;
     if (!snap) return;
 
