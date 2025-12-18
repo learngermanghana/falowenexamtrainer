@@ -5,7 +5,7 @@
       "src": "web/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "web/build"
+        "distDir": "build"
       }
     }
   ],
@@ -17,10 +17,10 @@
     {
       "source": "/health",
       "destination": "https://api-haqjyxn5wa-ew.a.run.app/health"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/web/index.html" }
   ]
 }
