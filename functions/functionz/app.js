@@ -9,6 +9,7 @@ const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
+const { getSheetContent } = require("./sheetContentService");
 
 let getScoresForStudent;
 
@@ -43,6 +44,40 @@ app.use(express.json({ limit: "1mb" }));
 
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
+
+app.get("/vocab", async (_req, res) => {
+  try {
+    const spreadsheetId = process.env.SHEETS_VOCAB_ID;
+    const tab = process.env.SHEETS_VOCAB_TAB || "Sheet1";
+
+    if (!spreadsheetId) {
+      return res.status(500).json({ error: "Missing SHEETS_VOCAB_ID env" });
+    }
+
+    const rows = await getSheetContent(spreadsheetId, tab);
+    return res.json(rows);
+  } catch (err) {
+    console.error("Failed to fetch vocab:", err);
+    return res.status(500).json({ error: "Failed to fetch vocab" });
+  }
+});
+
+app.get("/exams", async (_req, res) => {
+  try {
+    const spreadsheetId = process.env.SHEETS_EXAMS_ID;
+    const tab = process.env.SHEETS_EXAMS_TAB || "Exams list";
+
+    if (!spreadsheetId) {
+      return res.status(500).json({ error: "Missing SHEETS_EXAMS_ID env" });
+    }
+
+    const rows = await getSheetContent(spreadsheetId, tab);
+    return res.json(rows);
+  } catch (err) {
+    console.error("Failed to fetch exams:", err);
+    return res.status(500).json({ error: "Failed to fetch exams" });
+  }
+});
 
 const writeTempFile = async (file) => {
   const fileName = file?.originalname || "audio.webm";

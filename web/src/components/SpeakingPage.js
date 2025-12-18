@@ -14,6 +14,7 @@ import {
   fetchSpeakingQuestions,
   scoreInteractionAudio,
 } from "../services/coachService";
+import { fetchExamPrompts } from "../services/sheetContentService";
 
 const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60)
@@ -23,7 +24,7 @@ const formatTime = (seconds) => {
   return `${m}:${s}`;
 };
 
-const SpeakingPage = () => {
+const SpeakingPage = ({ mode = "course" }) => {
   const {
     teil,
     setTeil,
@@ -50,6 +51,10 @@ const SpeakingPage = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questionsLoading, setQuestionsLoading] = useState(false);
   const [questionError, setQuestionError] = useState("");
+  const [examPrompts, setExamPrompts] = useState([]);
+  const [examPromptsLoading, setExamPromptsLoading] = useState(false);
+  const [examPromptsError, setExamPromptsError] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState("all");
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
   const animationRef = useRef(null);
@@ -70,6 +75,19 @@ const SpeakingPage = () => {
   const stepAdvanceGuardRef = useRef(false);
 
   const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
+  const isExamMode = mode === "exam";
+
+  const examTopics = useMemo(() => {
+    if (!examPrompts.length) return [];
+    const normalizedLevel = (level || "").toUpperCase();
+    const topicsForLevel = examPrompts
+      .filter((prompt) =>
+        normalizedLevel ? !prompt.level || prompt.level === normalizedLevel : true
+      )
+      .map((prompt) => prompt.topic || "Prüfungsthema");
+
+    return Array.from(new Set(topicsForLevel)).sort();
+  }, [examPrompts, level]);
 
   const simulationSteps = useMemo(() => {
     if (!teilOptions.length) return [];
@@ -114,6 +132,46 @@ const SpeakingPage = () => {
   }, [interactionAvailable]);
 
   useEffect(() => {
+    if (!isExamMode) {
+      setExamPrompts([]);
+      setSelectedTopic("all");
+      return;
+    }
+
+    let isMounted = true;
+    setExamPromptsLoading(true);
+    setExamPromptsError("");
+
+    fetchExamPrompts()
+      .then((rows) => {
+        if (!isMounted) return;
+        setExamPrompts(rows || []);
+      })
+      .catch((err) => {
+        console.error(err);
+        if (isMounted) {
+          setExamPromptsError(
+            "Themen aus dem Exams Sheet konnten nicht geladen werden. Fallback aktiv."
+          );
+        }
+      })
+      .finally(() => {
+        if (isMounted) setExamPromptsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isExamMode]);
+
+  useEffect(() => {
+    if (!isExamMode) return;
+    if (selectedTopic !== "all" && !examTopics.includes(selectedTopic)) {
+      setSelectedTopic(examTopics[0] || "all");
+    }
+  }, [examTopics, isExamMode, selectedTopic]);
+
+  useEffect(() => {
     setSimulationMode(false);
     setSimulationCountdown(null);
     setCurrentSimulationStepIndex(0);
@@ -131,7 +189,15 @@ const SpeakingPage = () => {
       setCurrentQuestionIndex(0);
 
       try {
-        const data = await fetchSpeakingQuestions(level, teil, idToken);
+        if (isExamMode && examPromptsLoading) {
+          return;
+        }
+
+        const data = await fetchSpeakingQuestions(level, teil, idToken, {
+          preferExamSheet: isExamMode,
+          topic: selectedTopic !== "all" ? selectedTopic : undefined,
+          examPrompts: isExamMode ? examPrompts : undefined,
+        });
         if (!isMounted) return;
 
         if (!data || data.length === 0) {
@@ -167,7 +233,15 @@ const SpeakingPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [level, teil, idToken]);
+  }, [
+    examPrompts,
+    examPromptsLoading,
+    idToken,
+    isExamMode,
+    level,
+    selectedTopic,
+    teil,
+  ]);
 
   const resetAudio = useCallback(
     (options = {}) => {
@@ -747,6 +821,57 @@ const SpeakingPage = () => {
           </div>
         </div>
 
+        {isExamMode && (
+          <div
+            style={{
+              margin: "12px 0",
+              padding: 12,
+              borderRadius: 10,
+              border: "1px solid #e5e7eb",
+              background: "#f8fafc",
+              display: "grid",
+              gap: 8,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+              <div>
+                <strong>Goethe Sprechen – Exam Topics</strong>
+                <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+                  Datenquelle: Exams Google Sheet. Wähle dein Prüfungsthema, damit die Fragen zum Sprechen dazu passen.
+                </p>
+              </div>
+              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                <label style={{ fontSize: 13, color: "#374151" }}>
+                  Thema:
+                  <select
+                    value={selectedTopic}
+                    onChange={(e) => setSelectedTopic(e.target.value)}
+                    disabled={!examTopics.length}
+                    style={{ ...styles.input, marginLeft: 8, minWidth: 160 }}
+                  >
+                    <option value="all">Alle Themen</option>
+                    {examTopics.map((topic) => (
+                      <option key={topic} value={topic}>
+                        {topic}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <span style={styles.badge}>
+                  {examPromptsLoading
+                    ? "Lade Exams Sheet ..."
+                    : `${examTopics.length || "0"} Themen`}
+                </span>
+              </div>
+            </div>
+            {examPromptsError && (
+              <p style={{ ...styles.helperText, color: "#b91c1c", margin: 0 }}>
+                {examPromptsError}
+              </p>
+            )}
+          </div>
+        )}
+
         {interactionAvailable && (
           <div
             style={{
@@ -800,6 +925,11 @@ const SpeakingPage = () => {
                 Frage {currentQuestionIndex + 1} von {questions.length}
               </span>
             </div>
+            {isExamMode && currentQuestion.topic && (
+              <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
+                Thema: {currentQuestion.topic}
+              </p>
+            )}
             <p style={styles.questionText}>{currentQuestion.text}</p>
             {currentQuestion.hint && (
               <p style={styles.questionHint}>{currentQuestion.hint}</p>

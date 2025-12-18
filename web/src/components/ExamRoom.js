@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
+import VocabPage from "./VocabPage";
 import { useExam } from "../context/ExamContext";
 import { styles } from "../styles";
 
@@ -88,12 +89,23 @@ const ExamRoom = () => {
       );
     }
 
+    if (activeTab === "vocab") {
+      return (
+        <VocabPage
+          title="Vokabel-Booster für deine Prüfung"
+          subtitle="Gleiche Daten wie im Kursbuch. Übe die Goethe-Wortlisten und starte bei Bedarf neu."
+          contextLabel="Geteiltes Exams & Kursbuch Vokab"
+        />
+      );
+    }
+
     return <SpeakingPage mode="exam" />;
   };
 
   const tabs = [
     { key: "sprechen", label: "Sprechen" },
     { key: "schreiben", label: "Schreiben" },
+    { key: "vocab", label: "Vokabeln" },
     { key: "resources", label: "Ressourcen" },
   ];
 
