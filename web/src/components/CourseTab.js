@@ -116,24 +116,69 @@ const CourseTab = () => {
     [studentFirstName, studentLevel]
   );
 
-  const buildFalowenReply = (content) => {
-    if (!content) {
-      return "Erzähl mir, ob du Grammatik üben oder eine kleine Konversation führen möchtest.";
+  const sendToOpenAI = async (content, history) => {
+    const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
+    if (!apiKey) {
+      setChatStatus("OpenAI API key fehlt. Bitte REACT_APP_OPENAI_API_KEY in der .env setzen.");
+      return;
     }
 
-    const lower = content.toLowerCase();
-    const grammarHints = ["grammatik", "satz", "artikel", "konjug", "zeitform"];
-    const isGrammar = grammarHints.some((hint) => lower.includes(hint));
+    const thread = history || chatMessages;
+    const chatPayload = [
+      {
+        role: "system",
+        content: `You are Falowen, a patient German grammar coach. Keep answers concise, switch between German and English when helpful, and adapt to level ${studentLevel}. Encourage speaking aloud and correct short errors clearly.`,
+      },
+      ...thread.map((message) => ({
+        role: message.sender === "coach" ? "assistant" : "user",
+        content: message.text,
+      })),
+      { role: "user", content },
+    ];
 
-    if (isGrammar) {
-      return "Hier ist eine schnelle Grammatik-Stütze: Achte auf Verbzweitstellung und pass die Artikel an. Schick mir einen Beispielsatz, dann korrigiere ich ihn.";
+    setChatLoading(true);
+    setChatStatus("Falowen antwortet über OpenAI …");
+
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: chatPayload,
+          temperature: 0.4,
+          max_tokens: 320,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`OpenAI error: ${response.status} ${errorBody}`);
+      }
+
+      const data = await response.json();
+      const reply = data?.choices?.[0]?.message?.content?.trim();
+      const assistantMessage = {
+        sender: "coach",
+        text: reply || "Ich konnte gerade nichts zurücksenden. Versuch es bitte erneut.",
+        kind: "text",
+        createdAt: new Date(),
+      };
+
+      setChatMessages((prev) => [...prev, assistantMessage]);
+      appendChatMessages(user?.uid, [assistantMessage]).catch((error) => {
+        console.error("Failed to persist assistant chat", error);
+      });
+      setChatStatus("Antwort gesendet. Frage mich alles zu Grammatik oder Aussprache.");
+    } catch (error) {
+      console.error("OpenAI chat error", error);
+      setChatStatus("Konnte OpenAI nicht erreichen. Prüfe API-Key und Verbindung.");
+    } finally {
+      setChatLoading(false);
     }
-
-    if (lower.includes("presentation") || lower.includes("präsent")) {
-      return "Für A2-Präsentationen: Starte mit einer kurzen Einleitung (Thema + Grund), nutze 3–4 Stichpunkte und schließe mit einer Frage ans Publikum. Möchtest du das laut üben?";
-    }
-
-    return "Lass uns kurz plaudern! Nenn ein Alltagsthema oder stell eine Frage, und ich reagiere so, dass du neue Wörter nutzen kannst.";
   };
 
   const sanitizePathSegment = (value) =>
@@ -677,18 +722,16 @@ Thank you!`
       return;
     }
 
-    const reply = buildFalowenReply(content);
-    const newMessages = [
-      { sender: "user", text: content, kind: "text", createdAt: new Date() },
-      { sender: "coach", text: reply, kind: "text", createdAt: new Date() },
-    ];
+    const userMessage = { sender: "user", text: content, kind: "text", createdAt: new Date() };
+    const nextMessages = [...chatMessages, userMessage];
 
-    setChatMessages((prev) => [...prev, ...newMessages]);
-    appendChatMessages(user.uid, newMessages).catch((error) => {
+    setChatMessages(nextMessages);
+    appendChatMessages(user.uid, [userMessage]).catch((error) => {
       console.error("Failed to persist chat", error);
       setChatStatus("Konnte Chat nicht speichern. Versuche es erneut.");
     });
     setChatInput("");
+    sendToOpenAI(content, nextMessages);
   };
 
   const stopActiveRecorder = () => {
@@ -1139,68 +1182,93 @@ Thank you!`
 
   const renderChat = () => (
     <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-        <h2 style={styles.sectionTitle}>Falowen A.I. · Grammar &amp; Chat Buddy</h2>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <span style={styles.badge}>Level: {studentLevel}</span>
-          <span style={styles.badge}>Campus: Home · My Course · Vokabeln · Falowen A.I.</span>
-        </div>
-      </div>
-      <p style={styles.helperText}>
-        Wenn du den Campus auswählst, findest du hier die Untertabs (Home, My Course, Vokabeln, Falowen A.I., Submit Work), damit der Dashboard-Tab ausgeblendet werden kann.
-      </p>
-      <p style={styles.helperText}>
-        Falowen fragt nach: Hast du eine Grammatikfrage oder möchtest du chatten, zum Beispiel eine kurze A2-Präsentation üben? Wähle einen Prompt oder schreib frei.
-      </p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {chatPrompts.map((prompt) => (
-          <button
-            key={prompt}
-            style={styles.secondaryButton}
-            onClick={() => handleSend(prompt)}
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
-      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={styles.badge}>{chatLoading ? "Lädt ..." : "Chat bereit"}</span>
+      <div style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <div style={styles.chatHeaderRow}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <h2 style={styles.sectionTitle}>Falowen A.I. · Voice &amp; Grammar Chat</h2>
+            <p style={styles.helperText}>
+              Neues Chat-Layout wie bei WhatsApp: unten Aufnahme oder Nachricht tippen, oben siehst du den Verlauf. Frag nach Grammatik, bitte um Feedback oder lass dir kurze Übungen geben.
+            </p>
+            <p style={styles.helperText}>
+              OpenAI ist verbunden, sobald du <code>REACT_APP_OPENAI_API_KEY</code> in der .env setzt. Wir schicken deine Texte als Chat-Kontext, damit Antworten zu deinem Level passen.
+            </p>
+          </div>
+          <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+            <span style={styles.badge}>Level: {studentLevel}</span>
+            <span style={styles.badge}>{chatLoading ? "Falowen tippt …" : "Chat bereit"}</span>
             {recordingDuration ? (
-              <span style={styles.helperText}>Letzte Aufnahme: {recordingDuration} KB</span>
+              <span style={{ ...styles.helperText, margin: 0 }}>Letzte Aufnahme: {recordingDuration} KB</span>
             ) : null}
           </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              style={isRecording ? styles.dangerButton : styles.secondaryButton}
-              onClick={handleRecordingToggle}
-            >
-              {isRecording ? "Aufnahme stoppen" : "🎙️ Aufnahme (Whisper-ready)"}
-            </button>
-            <button style={styles.primaryButton} onClick={() => handleSend(chatInput)}>Nachricht senden</button>
-          </div>
         </div>
 
-        {chatStatus ? <div style={styles.helperText}>{chatStatus}</div> : null}
-        {recorderError ? <div style={styles.errorBox}>{recorderError}</div> : null}
-
-        <div style={styles.chatLog}>
-          {chatMessages.map((message, index) => (
-            <div
-              key={`${message.sender}-${index}-${message.createdAt || index}`}
-              style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
-            >
-              <strong>{message.sender === "coach" ? "Falowen" : "Du"}:</strong> {message.text}
-            </div>
+        <div style={styles.promptChips}>
+          {chatPrompts.map((prompt) => (
+            <button key={prompt} style={styles.promptChip} onClick={() => handleSend(prompt)}>
+              {prompt}
+            </button>
           ))}
         </div>
-        <textarea
-          style={styles.textareaSmall}
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          placeholder="Frag nach Grammatik, bitte um Feedback zu einer Präsentation oder starte Small Talk."
-        />
+
+        <div style={styles.chatShell}>
+          <div style={styles.chatLogWide}>
+            {chatMessages.length === 0 ? (
+              <div style={{ ...styles.helperText, textAlign: "center" }}>
+                Noch keine Nachrichten. Tippe eine Frage oder nimm eine kurze Sprachnotiz unten auf.
+              </div>
+            ) : (
+              chatMessages.map((message, index) => (
+                <div
+                  key={`${message.sender}-${index}-${message.createdAt || index}`}
+                  style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                    <strong>{message.sender === "coach" ? "Falowen" : "Du"}</strong>
+                    <span style={styles.chatTimestamp}>
+                      {message.createdAt ? new Date(message.createdAt).toLocaleTimeString() : "Gerade eben"}
+                    </span>
+                  </div>
+                  <div>{message.text}</div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div style={styles.chatComposer}>
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={styles.recorderRow}>
+                <button
+                  style={isRecording ? styles.recorderButtonActive : styles.recorderButton}
+                  onClick={handleRecordingToggle}
+                >
+                  {isRecording ? "■ Stop" : "🎙️ Sprachnotiz"}
+                </button>
+                <div style={styles.helperText}>
+                  Halte den Button wie bei WhatsApp: einmal tippen zum Start, nochmal zum Stop. Wir speichern sie als Notiz für Whisper.
+                </div>
+              </div>
+              <div style={styles.composerRow}>
+                <textarea
+                  style={styles.chatTextarea}
+                  rows={2}
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Schreibe deine Frage oder formuliere einen kurzen Satz zum Korrigieren."
+                  disabled={chatLoading}
+                />
+                <button
+                  style={styles.sendButton}
+                  onClick={() => handleSend(chatInput)}
+                  disabled={chatLoading}
+                >
+                  {chatLoading ? "Senden …" : "Senden"}
+                </button>
+              </div>
+            </div>
+            {chatStatus ? <div style={{ ...styles.helperText, marginTop: 6 }}>{chatStatus}</div> : null}
+            {recorderError ? <div style={styles.errorBox}>{recorderError}</div> : null}
+          </div>
+        </div>
       </div>
     </div>
   );
