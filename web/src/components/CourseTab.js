@@ -79,9 +79,9 @@ const CourseTab = () => {
   const [assignmentError, setAssignmentError] = useState("");
   const [leaderboardLevel, setLeaderboardLevel] = useState("A1");
   const [results, setResults] = useState([]);
-  const [resultsSummary, setResultsSummary] = useState(null);
-  const [resultsLevelFilter, setResultsLevelFilter] = useState("all");
-  const [resultsStudentFilter, setResultsStudentFilter] = useState("");
+  const [resultsMetrics, setResultsMetrics] = useState(null);
+  const [resultsAssignments, setResultsAssignments] = useState([]);
+  const [resultsLevel, setResultsLevel] = useState("A1");
   const [resultsStatus, setResultsStatus] = useState({
     loading: false,
     error: "",
@@ -137,57 +137,6 @@ const CourseTab = () => {
 
     return Array.from(uniqueAssignments).sort((a, b) => a.localeCompare(b));
   }, [submissionLevel]);
-
-  const summarizeResults = (rows = []) => {
-    const perLevel = {};
-    const students = {};
-    const allStudents = new Set();
-    let retakes = 0;
-
-    rows.forEach((row) => {
-      const level = row.level || "Unknown";
-      perLevel[level] = (perLevel[level] || 0) + 1;
-
-      const code = (row.studentCode || "").toLowerCase();
-      if (code) {
-        if (!students[level]) students[level] = new Set();
-        students[level].add(code);
-        allStudents.add(code);
-      }
-
-      if (row.isRetake) retakes += 1;
-    });
-
-    const studentsPerLevel = Object.fromEntries(
-      Object.entries(students).map(([level, codes]) => [level, codes.size])
-    );
-
-    return {
-      total: rows.length,
-      perLevel,
-      studentsPerLevel,
-      uniqueStudents: allStudents.size,
-      retakes,
-    };
-  };
-
-  const filteredResults = useMemo(() => {
-    const level = resultsLevelFilter === "all" ? "" : resultsLevelFilter;
-    const codeFilter = resultsStudentFilter.trim().toLowerCase();
-
-    return results.filter((row) => {
-      const matchesLevel = level ? row.level === level : true;
-      const matchesCode = codeFilter
-        ? (row.studentCode || "").toLowerCase().includes(codeFilter)
-        : true;
-      return matchesLevel && matchesCode;
-    });
-  }, [results, resultsLevelFilter, resultsStudentFilter]);
-
-  const filteredSummary = useMemo(
-    () => summarizeResults(filteredResults),
-    [filteredResults]
-  );
 
   useEffect(() => {
     if (!user?.email) return;
@@ -310,16 +259,34 @@ const CourseTab = () => {
       setLeaderboardLevel(selectedCourseLevel);
     }
   }, [assignmentSummary?.leaderboard, selectedCourseLevel]);
+
+  useEffect(() => {
+    if (!selectedCourseLevel) return;
+    setResultsLevel((prev) => (prev && prev !== "A1" ? prev : selectedCourseLevel));
+  }, [selectedCourseLevel]);
   useEffect(() => {
     if (activeTab !== "results") return;
 
     const loadResults = async () => {
       setResultsStatus((prev) => ({ ...prev, loading: true, error: "" }));
       try {
-        const response = await fetchResults();
+        if (!studentCode) {
+          setResults([]);
+          setResultsMetrics(null);
+          setResultsAssignments([]);
+          setResultsStatus({
+            loading: false,
+            error: "Bitte füge deinen Student code hinzu, um Ergebnisse zu sehen.",
+            fetchedAt: null,
+          });
+          return;
+        }
+
+        const response = await fetchResults({ level: resultsLevel, studentCode });
         const payloadResults = response.results || [];
         setResults(payloadResults);
-        setResultsSummary(response.summary || summarizeResults(payloadResults));
+        setResultsMetrics(response.metrics || null);
+        setResultsAssignments(response.assignments || []);
         setResultsStatus({
           loading: false,
           error: "",
@@ -333,7 +300,7 @@ const CourseTab = () => {
     };
 
     loadResults();
-  }, [activeTab]);
+  }, [activeTab, resultsLevel, studentCode]);
 
   useEffect(() => {
     if (!user?.email || !studentCode) {
@@ -1007,7 +974,36 @@ const CourseTab = () => {
   );
 
   const renderResults = () => {
-    const levelSummary = resultsSummary || summarizeResults(results);
+    const targetTotal = resultsMetrics?.targetTotal ?? resultsAssignments.length ?? 0;
+    const completedCount = resultsMetrics?.completedCount ?? 0;
+    const remaining = resultsMetrics?.remaining ?? Math.max(targetTotal - completedCount, 0);
+    const averageScore = resultsMetrics?.averageScore ?? null;
+    const bestScore = resultsMetrics?.bestScore ?? null;
+    const missed = resultsMetrics?.missed || [];
+    const failed = resultsMetrics?.failed || [];
+    const next = resultsMetrics?.next || null;
+    const targetHelper = resultsMetrics?.targetOverride
+      ? `Override aktiv (${resultsMetrics.targetOverride})`
+      : `${resultsMetrics?.scheduleCount || resultsAssignments.length || 0} laut Plan`;
+
+    const renderAssignmentPill = (assignment) => (
+      <span
+        key={assignment.identifier || assignment.label}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 10px",
+          borderRadius: 999,
+          background: "#f8fafc",
+          border: "1px solid #e5e7eb",
+          fontSize: 13,
+        }}
+      >
+        <span style={{ fontWeight: 700 }}>{assignment.identifier || "?"}</span>
+        <span style={{ color: "#4b5563" }}>{assignment.label || "Lesson"}</span>
+      </span>
+    );
 
     return (
       <div style={{ display: "grid", gap: 12 }}>
@@ -1020,119 +1016,161 @@ const CourseTab = () => {
             flexWrap: "wrap",
           }}
         >
-          <h2 style={styles.sectionTitle}>My Results</h2>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <span style={styles.badge}>Import: Google Sheet</span>
+            <h2 style={styles.sectionTitle}>My Results</h2>
+            <span style={styles.badge}>Level: {resultsLevel}</span>
             {resultsStatus.fetchedAt && (
               <span style={{ ...styles.helperText, margin: 0 }}>
                 Sync: {new Date(resultsStatus.fetchedAt).toLocaleString()}
               </span>
             )}
           </div>
+          <span style={styles.badge}>Targets nutzen Kursplan + Overrides</span>
         </div>
+
         <p style={styles.helperText}>
-          Die Werte stammen aus dem letzten Google-Sheet-Sync. Doppelte Aufgaben bedeuten, dass der Schüler einen Retake gemacht
-          hat; jeder Versuch wird mit einer Versuchszahl angezeigt.
+          Berechnet aus dem Kursplan (Assignments) und deinen besten Scores pro Kapitel. Ab 60% gilt ein Assignment als
+          abgeschlossen. Falls Scores unter 60% vorliegen, ist der nächste Vorschlag blockiert, bis du die Reworks erledigst.
         </p>
 
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-        {["A1", "A2", "B1", "B2"].map((level) => (
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          <div>
+            <label style={styles.label}>Level auswählen</label>
+            <select
+              style={styles.select}
+              value={resultsLevel}
+              onChange={(e) => setResultsLevel(e.target.value)}
+            >
+              <option value="A1">A1</option>
+              <option value="A2">A2</option>
+              <option value="B1">B1</option>
+              <option value="B2">B2</option>
+            </select>
+            <p style={styles.helperText}>Lädt Kursplan + Scores für dieses Level.</p>
+          </div>
+          <div>
+            <label style={styles.label}>Student code</label>
+            <input
+              style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
+              value={studentCode}
+              onChange={(e) => setStudentCode(e.target.value)}
+              placeholder="z.B. sewornua2"
+            />
+            <p style={styles.helperText}>Notwendig, um deine Versuche zu finden.</p>
+          </div>
+        </div>
+
+        {resultsStatus.error && <div style={styles.errorBox}>{resultsStatus.error}</div>}
+        {resultsStatus.loading && <div style={styles.helperText}>Lade Ergebnisse ...</div>}
+
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+          <StatCard label="Total assignments" value={targetTotal || 0} helper={targetHelper} />
+          <StatCard label="Completed assignments" value={completedCount || 0} helper={`Bleiben: ${remaining || 0}`} />
           <StatCard
-            key={level}
-            label={`${level} Ergebnisse`}
-            value={levelSummary?.perLevel?.[level] || 0}
-            helper={`${levelSummary?.studentsPerLevel?.[level] || 0} eindeutige Schüler`}
+            label="Average score"
+            value={averageScore !== null ? `${averageScore}%` : "–"}
+            helper="Bestwerte pro Assignment"
           />
-        ))}
-        <StatCard
-          label="Retakes"
-          value={levelSummary?.retakes || 0}
-          helper="Wiederholte Abgaben"
-        />
-        <StatCard label="Gesamt" value={levelSummary?.total || 0} helper="Alle Einträge" />
-      </div>
-
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <div>
-          <label style={styles.label}>Level filtern</label>
-          <select
-            style={styles.select}
-            value={resultsLevelFilter}
-            onChange={(e) => setResultsLevelFilter(e.target.value)}
-          >
-            <option value="all">Alle</option>
-            <option value="A1">A1</option>
-            <option value="A2">A2</option>
-            <option value="B1">B1</option>
-            <option value="B2">B2</option>
-          </select>
-          <p style={styles.helperText}>Begrenzt die Liste auf ein Niveau.</p>
-        </div>
-        <div>
-          <label style={styles.label}>Student code</label>
-          <input
-            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-            value={resultsStudentFilter}
-            onChange={(e) => setResultsStudentFilter(e.target.value)}
-            placeholder="z.B. sewornua2"
+          <StatCard
+            label="Best score"
+            value={bestScore !== null ? `${bestScore}%` : "–"}
+            helper={`Versuche: ${results.length}`}
           />
-          <p style={styles.helperText}>Filtert nach Studentcode oder Teilen davon.</p>
         </div>
-        <div>
-          <label style={styles.label}>Gefilterte Übersicht</label>
-          <div style={styles.helperText}>
-            {filteredSummary.total} Ergebnisse · {filteredSummary.retakes} Retakes · {filteredSummary.uniqueStudents} eindeutige
-            Schüler
-          </div>
-        </div>
-      </div>
 
-      {resultsStatus.error && <div style={styles.errorBox}>{resultsStatus.error}</div>}
-      {resultsStatus.loading && <div style={styles.helperText}>Lade Ergebnisse ...</div>}
-
-      {!resultsStatus.loading && !filteredResults.length && (
-        <div style={styles.card}>
-          <p style={{ margin: 0 }}>Keine Ergebnisse gefunden. Passe Filter an oder versuche es später erneut.</p>
-        </div>
-      )}
-
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-        {filteredResults.map((row) => (
-          <div
-            key={`${row.studentCode}-${row.assignment}-${row.attempt}-${row.date}`}
-            style={{
-              ...styles.card,
-              marginBottom: 0,
-              border: row.isRetake ? "1px solid #f97316" : undefined,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <div>
-                <h3 style={{ margin: "0 0 4px 0" }}>{row.assignment}</h3>
-                <p style={{ ...styles.helperText, margin: 0 }}>
-                  {row.studentName || "Unbekannter Name"} · {row.studentCode || "kein Code"}
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                <span style={styles.badge}>{row.level || "?"}</span>
-                {row.date && <span style={styles.badge}>{row.date}</span>}
-                <span style={styles.badge}>
-                  Versuch {row.attempt || 1}
-                  {row.isRetake ? " · Retake" : ""}
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+          <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+              <h3 style={{ margin: 0 }}>Jumped &amp; Next</h3>
+              {resultsMetrics?.isBlockedForRework ? (
+                <span style={{ ...styles.badge, background: "#fef2f2", color: "#b91c1c" }}>
+                  Rework nötig
                 </span>
-              </div>
+              ) : (
+                <span style={styles.badge}>Unblockiert</span>
+              )}
             </div>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Score: {row.score || "pending"}</div>
-            <p style={{ margin: "0 0 8px 0" }}>{row.comments || "Kein Feedback hinterlegt."}</p>
-            {row.link ? (
-              <a href={row.link} target="_blank" rel="noreferrer" style={{ fontWeight: 600 }}>
-                Link öffnen
-              </a>
-            ) : null}
+
+            {resultsMetrics?.isBlockedForRework ? (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                Mindestens ein Assignment hat &lt; 60%. Erledige diese Reworks, bevor du mit dem nächsten weitermachst.
+              </p>
+            ) : next ? (
+              <p style={{ margin: 0 }}>
+                Nächster Vorschlag: <strong>{next.label || `Kapitel ${next.identifier}`}</strong>
+                {next.identifier ? ` (${next.identifier})` : ""}. Noch {remaining || 0} übrig.
+              </p>
+            ) : (
+              <p style={{ margin: 0 }}>Keine Empfehlung verfügbar.</p>
+            )}
+
+            {!!missed.length && (
+              <div>
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Missed (übersprungen)</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {missed.map((assignment) => renderAssignmentPill(assignment))}
+                </div>
+              </div>
+            )}
+
+            {!!failed.length && (
+              <div>
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Failed (&lt;60%)</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {failed.map((assignment) => renderAssignmentPill(assignment))}
+                </div>
+              </div>
+            )}
           </div>
-        ))}
+
+          <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+              <h3 style={{ margin: 0 }}>Attempts</h3>
+              <span style={styles.badge}>Gesamt: {results.length}</span>
+            </div>
+
+            {!resultsStatus.loading && !results.length ? (
+              <p style={{ margin: 0 }}>Keine Ergebnisse gefunden.</p>
+            ) : (
+              <div style={{ display: "grid", gap: 10 }}>
+                {results.map((row) => (
+                  <div
+                    key={`${row.studentCode}-${row.assignment}-${row.attempt}-${row.date}`}
+                    style={{
+                      padding: 12,
+                      borderRadius: 12,
+                      border: row.isRetake ? "1px solid #f97316" : "1px solid #e5e7eb",
+                      background: "#fff",
+                      display: "grid",
+                      gap: 6,
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                      <div>
+                        <div style={{ fontWeight: 800 }}>{row.assignment}</div>
+                        <div style={{ ...styles.helperText, margin: 0 }}>
+                          {row.date || "Datum fehlt"} · Versuch {row.attempt || 1}
+                          {row.isRetake ? " · Retake" : ""}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
+                        <span style={styles.badge}>{row.level || "?"}</span>
+                        <span style={styles.badge}>{row.score !== null ? `${row.score}%` : "pending"}</span>
+                      </div>
+                    </div>
+                    <p style={{ margin: "0 0 4px 0" }}>{row.comments || "Kein Feedback hinterlegt."}</p>
+                    {row.link ? (
+                      <a href={row.link} target="_blank" rel="noreferrer" style={{ fontWeight: 600 }}>
+                        Link öffnen
+                      </a>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
     );
   };
 
