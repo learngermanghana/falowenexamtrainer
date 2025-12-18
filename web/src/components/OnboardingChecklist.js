@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
-import { useExam } from "../context/ExamContext";
 import { classCatalog } from "../data/classCatalog";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { loadPreferredClass } from "../services/classSelectionStorage";
@@ -68,13 +67,7 @@ const Step = ({ title, description, actionLabel, onAction, complete, accent = "#
   </div>
 );
 
-const OnboardingChecklist = ({
-  notificationStatus,
-  onEnableNotifications,
-  onSelectLevel,
-  onConfirmClass,
-}) => {
-  const { levelConfirmed } = useExam();
+const OnboardingChecklist = ({ onConfirmClass }) => {
   const [state, setState] = useState(loadState);
   const [selectedClass, setSelectedClass] = useState(loadPreferredClass);
 
@@ -99,22 +92,16 @@ const OnboardingChecklist = ({
     };
   }, []);
 
-  const notificationsReady = notificationStatus === "granted";
   const classConfirmed = Boolean(selectedClass);
   const calendarDownloaded = Boolean(state.calendarDownloaded);
   const fallbackClass = useMemo(() => Object.keys(classCatalog)?.[0], []);
   const currentClass = selectedClass || fallbackClass;
 
   const progress = useMemo(() => {
-    const steps = [levelConfirmed, classConfirmed, calendarDownloaded, notificationsReady];
+    const steps = [classConfirmed, calendarDownloaded];
     const done = steps.filter(Boolean).length;
     return { done, total: steps.length };
-  }, [calendarDownloaded, classConfirmed, levelConfirmed, notificationsReady]);
-
-  const handleEnableNotifications = async () => {
-    if (!onEnableNotifications) return;
-    await onEnableNotifications();
-  };
+  }, [calendarDownloaded, classConfirmed]);
 
   const handleDownloadCalendar = () => {
     if (!currentClass) return;
@@ -137,10 +124,10 @@ const OnboardingChecklist = ({
         <div>
           <p style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>Onboarding</p>
           <h2 style={{ ...styles.sectionTitle, marginTop: 4, marginBottom: 4 }}>
-            Start strong with Exam Coach
+            Welcome to Falowen Exam Coach
           </h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Quick guide for new learners: choose your level, confirm your class, save the calendar, and turn on push notifications.
+            Just two quick steps: confirm your class name and download your calendar. We’re glad you’re here!
           </p>
         </div>
         <div style={{ display: "grid", justifyItems: "end" }}>
@@ -157,14 +144,6 @@ const OnboardingChecklist = ({
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
         <Step
-          title="Choose your level"
-          description="Set your CEFR level to get speaking and writing tasks that fit your skills."
-          actionLabel="Set level"
-          onAction={onSelectLevel}
-          complete={levelConfirmed}
-          accent="#e5e7eb"
-        />
-        <Step
           title="Confirm your class"
           description="Pick your cohort to get the Zoom link, course documents, and the full schedule."
           actionLabel="Open class"
@@ -179,14 +158,6 @@ const OnboardingChecklist = ({
           onAction={handleDownloadCalendar}
           complete={calendarDownloaded}
           accent="#fef3c7"
-        />
-        <Step
-          title="Enable push notifications"
-          description="Turn on browser push to get study reminders and new tasks."
-          actionLabel="Allow push"
-          onAction={handleEnableNotifications}
-          complete={notificationsReady}
-          accent="#e0f2fe"
         />
       </div>
     </div>
