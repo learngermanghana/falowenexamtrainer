@@ -241,7 +241,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const refreshMessagingToken = async () => {
+    const refreshMessagingToken = () => {
       if (!user || !studentProfile || !isFirebaseConfigured) return;
 
       const storedToken = studentProfile.messagingToken || null;
@@ -258,21 +258,8 @@ export const AuthProvider = ({ children }) => {
         }
       }
 
-      if (!storedToken) {
-        setNotificationStatus("pending");
-      }
-
-      try {
-        const token = await requestMessagingToken();
-        setMessagingToken(token);
-        if (studentProfile.messagingToken !== token) {
-          await persistMessagingToken(token, studentProfile.id);
-        }
-        setNotificationStatus("granted");
-      } catch (error) {
-        console.error("Failed to refresh messaging token on sign-in", error);
-        setNotificationStatus(storedToken ? "stale" : "error");
-      }
+      setNotificationStatus(storedToken ? "granted" : "idle");
+      setMessagingToken(storedToken);
     };
 
     refreshMessagingToken();
