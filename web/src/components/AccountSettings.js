@@ -9,6 +9,17 @@ const SUBSCRIPTION_FEATURES = [
   "Push-Reminder für tägliche Drills",
 ];
 
+const formatDate = (value) => {
+  if (!value) return "–";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "–";
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 const AccountSettings = () => {
   const { user, studentProfile } = useAuth();
   const [profile, setProfile] = useState({
@@ -23,36 +34,28 @@ const AccountSettings = () => {
   useEffect(() => {
     setProfile((prev) => ({
       ...prev,
-      name: user?.displayName || "", // falls später aus Firebase geladen
-      email: user?.email || prev.email,
+      name: studentProfile?.name || user?.displayName || "",
+      email: studentProfile?.email || user?.email || prev.email,
+      goal: studentProfile?.goal || prev.goal,
     }));
-  }, [user]);
+  }, [studentProfile, user]);
 
   const subscription = useMemo(
     () => ({
-      plan: "Coach Plus (Monat)",
-      renewalDate: "02. Juli 2025",
-      status: "Aktiv",
+      plan: studentProfile?.paymentStatus === "paid" ? "6-Monatsvertrag" : "1-Monats-Starter",
+      renewalDate: formatDate(studentProfile?.contractEnd),
+      status: studentProfile?.paymentStatus === "paid" ? "Aktiv" : "Ausstehend",
       seats: 1,
-      paymentMethod: "Visa •••• 4242",
+      paymentMethod: studentProfile?.paystackLink ? "Paystack" : "Unbekannt",
       invoiceEmail: profile.email || user?.email || "",
     }),
-    [profile.email, user?.email]
+    [profile.email, studentProfile?.contractEnd, studentProfile?.paystackLink, studentProfile?.paymentStatus, user?.email]
   );
 
-  const studentRecord = useMemo(
-    () => ({
-      studentId: "STU-48219",
-      cohort: "Sommer 2024",
-      track: "Intensiv Deutsch",
-      level: "B1 → B2",
-      agreement: "Learning Agreement · signiert",
-      contractVersion: "Vertrag v1.3 (gültig)",
-      signedAt: "12. März 2024",
-      lastSync: "Heute, 09:14",
-    }),
-    []
-  );
+  const tuitionFee = studentProfile?.tuitionFee ?? null;
+  const balanceDue = studentProfile?.balanceDue ?? null;
+  const paidAmount =
+    tuitionFee === null || balanceDue === null ? null : Math.max(tuitionFee - balanceDue, 0);
 
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({ ...prev, [field]: event.target.value }));
@@ -87,7 +90,7 @@ const AccountSettings = () => {
       <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <h2 style={styles.sectionTitle}>Kontoübersicht</h2>
-          <span style={styles.levelPill}>{studentRecord.track}</span>
+          <span style={styles.levelPill}>{studentProfile.className || "Kein Kurs"}</span>
         </div>
         <p style={styles.helperText}>
           Hier findest du deine Stammdaten, Vertragsstatus und den letzten Datenabgleich zwischen Campus und
@@ -103,32 +106,34 @@ const AccountSettings = () => {
         >
           <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
             <div style={styles.metaRow}>
-              <span>Studenten-ID</span>
-              <span style={styles.badge}>{studentRecord.cohort}</span>
+              <span>Studenten-Code</span>
+              <span style={styles.badge}>{studentProfile.status || "–"}</span>
             </div>
-            <strong style={{ fontSize: 20 }}>{studentRecord.studentId}</strong>
+            <strong style={{ fontSize: 20 }}>{studentProfile.studentCode}</strong>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>Eindeutige Kennung für Support & Rechnungen.</p>
           </div>
 
           <div style={{ ...styles.card, margin: 0, background: "#fef3c7", border: "1px solid #f59e0b" }}>
             <div style={styles.metaRow}>
               <span>Stufe & Kurs</span>
-              <span style={styles.badge}>{studentRecord.level}</span>
+              <span style={styles.badge}>{studentProfile.level || "–"}</span>
             </div>
-            <strong style={{ fontSize: 16 }}>{studentRecord.agreement}</strong>
+            <strong style={{ fontSize: 16 }}>
+              Vertrag: {subscription.plan} · Start {formatDate(studentProfile.contractStart)}
+            </strong>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Vertrag seit {studentRecord.signedAt}. Änderungen an Vereinbarungen werden hier gespiegelt.
+              Läuft bis {formatDate(studentProfile.contractEnd)}. Änderungen an Vereinbarungen werden hier gespiegelt.
             </p>
           </div>
 
           <div style={{ ...styles.card, margin: 0, background: "#ecfdf3", border: "1px solid #34d399" }}>
             <div style={styles.metaRow}>
-              <span>Datenabgleich</span>
+              <span>Kontakt</span>
               <span style={styles.badge}>aktuell</span>
             </div>
-            <strong style={{ fontSize: 16 }}>{studentRecord.lastSync}</strong>
+            <strong style={{ fontSize: 16 }}>{studentProfile.phone || "(keine Nummer)"}</strong>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Wir synchronisieren Profil, Verträge und Zahlungsstatus mit dem Campus-Backend.
+              Standort: {studentProfile.location || "(unbekannt)"} · Notfallkontakt: {studentProfile.emergencyContactPhone || "–"}
             </p>
           </div>
         </div>
@@ -232,7 +237,11 @@ const AccountSettings = () => {
             </button>
           </div>
 
-          {status && <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#065f46", borderColor: "#34d399" }}>{status}</div>}
+          {status && (
+            <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#065f46", borderColor: "#34d399" }}>
+              {status}
+            </div>
+          )}
         </form>
       </section>
 
@@ -262,9 +271,12 @@ const AccountSettings = () => {
               <button style={styles.secondaryButton} type="button">
                 Tarif wechseln
               </button>
-              <button style={styles.secondaryButton} type="button">
-                Rechnungshistorie
-              </button>
+              <a
+                href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
+                style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}
+              >
+                Paystack öffnen
+              </a>
             </div>
           </div>
 
@@ -276,16 +288,20 @@ const AccountSettings = () => {
                 <strong>{subscription.renewalDate}</strong>
               </div>
               <div style={styles.metaRow}>
-                <span>Zahlungsmittel</span>
-                <strong>{subscription.paymentMethod}</strong>
+                <span>Zahlungsstatus</span>
+                <strong>{studentProfile.paymentStatus || "ausstehend"}</strong>
+              </div>
+              <div style={styles.metaRow}>
+                <span>Offener Betrag</span>
+                <strong>{balanceDue === null ? "–" : `₦${balanceDue}`}</strong>
+              </div>
+              <div style={styles.metaRow}>
+                <span>Bisher gezahlt</span>
+                <strong>{paidAmount === null ? "–" : `₦${paidAmount}`}</strong>
               </div>
               <div style={styles.metaRow}>
                 <span>Konto-E-Mail</span>
                 <strong>{subscription.invoiceEmail || "(bitte ergänzen)"}</strong>
-              </div>
-              <div style={styles.metaRow}>
-                <span>Kündigungsfrist</span>
-                <strong>jederzeit bis 24h vor Verlängerung</strong>
               </div>
             </div>
           </div>
@@ -295,7 +311,7 @@ const AccountSettings = () => {
       <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <h2 style={styles.sectionTitle}>Vertrag &amp; Zustimmung</h2>
-          <span style={styles.badge}>{studentRecord.contractVersion}</span>
+          <span style={styles.badge}>{studentProfile.contractTermMonths ? `${studentProfile.contractTermMonths} Monate` : "–"}</span>
         </div>
         <p style={styles.helperText}>
           Prüfe, was du unterschrieben hast. Hier liegen die wichtigsten Vereinbarungen, Datenschutz-Hinweise und
@@ -305,18 +321,23 @@ const AccountSettings = () => {
           <div style={{ ...styles.card, margin: 0, background: "#f0f9ff", border: "1px solid #bae6fd" }}>
             <div style={styles.metaRow}>
               <span>Status</span>
-              <span style={styles.levelPill}>gültig</span>
+              <span style={styles.levelPill}>{subscription.status}</span>
             </div>
-            <strong style={{ fontSize: 16 }}>{studentRecord.agreement}</strong>
+            <strong style={{ fontSize: 16 }}>
+              Vertrag {subscription.plan} · Start {formatDate(studentProfile.contractStart)}
+            </strong>
             <ul style={{ ...styles.checklist, marginTop: 10 }}>
-              <li>Signiert am {studentRecord.signedAt}</li>
+              <li>Endet am {formatDate(studentProfile.contractEnd)}</li>
               <li>Datenschutzerklärung bestätigt</li>
               <li>Widerruf jederzeit per Support möglich</li>
             </ul>
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
-              <button style={styles.secondaryButton} type="button">
-                Vertrag anzeigen
-              </button>
+              <a
+                href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
+                style={{ ...styles.secondaryButton, textDecoration: "none" }}
+              >
+                Paystack öffnen
+              </a>
               <button style={styles.secondaryButton} type="button">
                 PDF herunterladen
               </button>
@@ -344,46 +365,6 @@ const AccountSettings = () => {
               Erinnerungen automatisch.
             </p>
           </div>
-        </div>
-      </section>
-
-      <section style={styles.card}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Zahlungsdetails &amp; Belege</h2>
-          <span style={styles.levelPill}>sicher gespeichert</span>
-        </div>
-        <p style={styles.helperText}>
-          Überblick über dein Zahlungsmittel, die nächste Abbuchung und wo du Rechnungen findest.
-        </p>
-        <div style={{ display: "grid", gap: 8 }}>
-          <div style={styles.metaRow}>
-            <span>Nächste Zahlung</span>
-            <strong>{subscription.renewalDate}</strong>
-          </div>
-          <div style={styles.metaRow}>
-            <span>Zahlungsmittel</span>
-            <strong>{subscription.paymentMethod}</strong>
-          </div>
-          <div style={styles.metaRow}>
-            <span>Rechnungs-E-Mail</span>
-            <strong>{subscription.invoiceEmail || "(bitte ergänzen)"}</strong>
-          </div>
-          <div style={styles.metaRow}>
-            <span>Letzte Rechnung</span>
-            <strong>#INV-2093 · 02. Juni 2024</strong>
-          </div>
-          <div style={styles.metaRow}>
-            <span>SEPA / Kreditkartenmandat</span>
-            <strong>gültig – keine Aktion nötig</strong>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-          <button style={styles.secondaryButton} type="button">
-            Rechnung per E-Mail schicken
-          </button>
-          <button style={styles.secondaryButton} type="button">
-            Zahlungsdaten aktualisieren
-          </button>
         </div>
       </section>
     </div>

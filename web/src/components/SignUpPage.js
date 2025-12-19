@@ -21,11 +21,22 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [location, setLocation] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [status, setStatus] = useState("Active");
+  const [initialPaymentAmount, setInitialPaymentAmount] = useState("");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
   );
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
+
+  const LEVEL_FEES = {
+    A1: 2800,
+    A2: 3000,
+    B1: 3000,
+    B2: 3000,
+  };
+
+  const paystackLinkForLevel = (level) =>
+    `https://paystack.com/pay/falowen-${String(level || "").toLowerCase()}`;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -39,6 +50,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     setLoading(true);
     try {
+      const tuitionFee = LEVEL_FEES[selectedLevel] || 0;
+      const paidAmount = Number(initialPaymentAmount) || 0;
+      const contractStart = new Date();
+      const contractMonths = paidAmount >= tuitionFee ? 6 : 1;
+      const contractEnd = new Date(contractStart);
+      contractEnd.setMonth(contractEnd.getMonth() + contractMonths);
+      const balanceDue = Math.max(tuitionFee - paidAmount, 0);
+      const paymentStatus = paidAmount >= tuitionFee ? "paid" : "partial";
+      const paystackLink = paystackLinkForLevel(selectedLevel);
+
       const studentCode = generateStudentCode({ firstName });
       await signup(email, password, {
         firstName,
@@ -49,11 +70,24 @@ const SignUpPage = ({ onLogin, onBack }) => {
         location,
         emergencyContactPhone,
         status,
+        initialPaymentAmount: paidAmount,
+        tuitionFee,
+        balanceDue,
+        paymentStatus,
+        paystackLink,
+        contractStart: contractStart.toISOString(),
+        contractEnd: contractEnd.toISOString(),
+        contractTermMonths: contractMonths,
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(email, studentCode);
-      setMessage(`Account created! Your student code is ${studentCode}.`);
+      const contractLabel =
+        paymentStatus === "paid"
+          ? "6-month contract activated"
+          : "1-month starter contract set with reminder";
+      const balanceText = balanceDue > 0 ? ` Balance due: ₦${balanceDue}.` : "";
+      setMessage(`Account created! Your student code is ${studentCode}. ${contractLabel}. Pay via Paystack: ${paystackLink}.${balanceText}`);
     } catch (error) {
       console.error(error);
       setAuthError(error?.message || "Sign up failed.");
@@ -190,6 +224,20 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="Active"
           />
+
+          <label style={styles.label}>Initial payment amount (₦)</label>
+          <input
+            type="number"
+            min="0"
+            step="100"
+            value={initialPaymentAmount}
+            onChange={(e) => setInitialPaymentAmount(e.target.value)}
+            style={inputStyle}
+            placeholder="0"
+          />
+          <p style={{ ...styles.helperText, marginTop: -2 }}>
+            A1: ₦2800 · A2: ₦3000 · B1: ₦3000 · B2: ₦3000. Full payment activates a 6-month contract; partial payment sets a 1-month starter contract with reminders.
+          </p>
 
           <label style={styles.label}>Which live class are you joining?</label>
           <select
