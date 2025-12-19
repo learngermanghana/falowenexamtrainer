@@ -43,8 +43,6 @@ const AssignmentSubmissionPage = () => {
     [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
   );
   const assignmentOptions = useMemo(() => {
-    const levelKey = ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "A1";
-    const schedule = courseSchedules[levelKey] || [];
     const names = [];
     const addName = (value) => {
       if (!value) return;
@@ -54,38 +52,24 @@ const AssignmentSubmissionPage = () => {
       }
     };
 
-    schedule.forEach((entry) => {
-      const baseLabel = entry.chapter || entry.topic || `Day ${entry.day || names.length + 1}`;
-      if (entry.assignment) {
-        addName(baseLabel);
-      }
+    addName(studentProfile?.assignmentTitle);
+    if (Array.isArray(studentProfile?.assignments)) {
+      studentProfile.assignments.forEach(addName);
+    }
+    if (Array.isArray(studentProfile?.assignmentTitles)) {
+      studentProfile.assignmentTitles.forEach(addName);
+    }
+    if (studentProfile?.className) {
+      addName(`${studentProfile.className} Assignment`);
+    }
 
-      const lesenHorenItems = Array.isArray(entry.lesen_hören)
-        ? entry.lesen_hören
-        : entry.lesen_hören
-        ? [entry.lesen_hören]
-        : [];
-      const schreibenSprechenItems = Array.isArray(entry.schreiben_sprechen)
-        ? entry.schreiben_sprechen
-        : entry.schreiben_sprechen
-        ? [entry.schreiben_sprechen]
-        : [];
-
-      [...lesenHorenItems, ...schreibenSprechenItems].forEach((item) => {
-        if (item?.assignment) {
-          addName(item.chapter || item.topic || baseLabel);
-        }
-      });
-    });
-
-    return names.length ? names : ["General Assignment"];
-  }, [preferredLevel]);
+    return names.length ? names : ["Allgemeine Abgabe", "Standardaufgabe"];
+  }, [studentProfile?.assignmentTitle, studentProfile?.assignmentTitles, studentProfile?.assignments, studentProfile?.className]);
 
   const [form, setForm] = useState({
     assignmentTitle: assignmentOptions[0],
     submissionText: "",
-    confirmedAssignment: false,
-    acknowledgedLock: false,
+    confirmed: false,
   });
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
   const [recentSubmissions, setRecentSubmissions] = useState([]);
@@ -114,7 +98,7 @@ const AssignmentSubmissionPage = () => {
         if (entries.length > 0) {
           setConfirmationLocked(true);
           setHasSubmitted(true);
-          setForm((prev) => ({ ...prev, confirmedAssignment: true, acknowledgedLock: true }));
+          setForm((prev) => ({ ...prev, confirmed: true }));
         }
       } catch (error) {
         console.error("Failed to load submissions", error);
@@ -131,58 +115,47 @@ const AssignmentSubmissionPage = () => {
   }, [user]);
 
   const handleChange = (field) => (event) => {
-    const value = event.target.type === "checkbox" ? event.target.checked : event.target.value;
+    const value = field === "confirmed" ? event.target.checked : event.target.value;
     setForm((prev) => ({ ...prev, [field]: value }));
-    if (field === "confirmedAssignment" || field === "acknowledgedLock") {
+    if (field === "confirmed") {
       setStatus((prev) => ({ ...prev, error: "" }));
     }
-  };
-
-  const persistSubmission = async ({ statusLabel }) => {
-    if (!form.assignmentTitle || !form.submissionText.trim()) {
-      setStatus({ loading: false, error: "Please choose an assignment and add your text.", success: "" });
-      return false;
-    }
-
-    if (!form.confirmedAssignment || !form.acknowledgedLock) {
-      setStatus({
-        loading: false,
-        error: "Please confirm the assignment number and that the form will lock after submission.",
-        success: "",
-      });
-      return false;
-    }
-
-    await addDoc(collection(db, "submissions"), {
-      title: form.assignmentTitle,
-      assignmentTitle: form.assignmentTitle,
-      level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
-      chapter: null,
-      submissionLink: null,
-      submissionText: form.submissionText.trim(),
-      studentEmail: user?.email || "",
-      studentId: user?.uid || "",
-      studentCode,
-      studentName: studentProfile?.name || "",
-      className: studentProfile?.className || "",
-      status: statusLabel,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-
-    return true;
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ loading: true, error: "", success: "" });
 
-    try {
-      const saved = await persistSubmission({ statusLabel: "submitted" });
-      if (!saved) return;
+    if (!form.assignmentTitle || !form.submissionText.trim()) {
+      setStatus({ loading: false, error: "Bitte wähle eine Aufgabe und trage deinen Text ein.", success: "" });
+      return;
+    }
 
-      setStatus({ loading: false, error: "", success: "Thanks! Your assignment has been submitted." });
-      setForm((prev) => ({ ...prev, submissionText: "", confirmedAssignment: true, acknowledgedLock: true }));
+    if (!form.confirmed) {
+      setStatus({ loading: false, error: "Bitte bestätige, dass du die richtige Aufgabe abgibst.", success: "" });
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "submissions"), {
+        title: form.assignmentTitle,
+        assignmentTitle: form.assignmentTitle,
+        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+        chapter: null,
+        submissionLink: null,
+        submissionText: form.submissionText.trim(),
+        studentEmail: user?.email || "",
+        studentId: user?.uid || "",
+        studentCode,
+        studentName: studentProfile?.name || "",
+        className: studentProfile?.className || "",
+        status: "submitted",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      setStatus({ loading: false, error: "", success: "Danke! Deine Abgabe wurde gespeichert." });
+      setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
       setConfirmationLocked(true);
       setHasSubmitted(true);
 
@@ -224,8 +197,8 @@ const AssignmentSubmissionPage = () => {
         <div>
           <h2 style={styles.sectionTitle}>Submit Assignment</h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Share your answer as text. Course, level, student code, and email are filled in automatically so you cannot mistype
-            them.
+            Lade deine Lösung als Text hoch. Kurs, Level, Studenten-Code und E-Mail werden automatisch übernommen, damit keine
+            Tippfehler passieren.
           </p>
         </div>
 
@@ -239,7 +212,7 @@ const AssignmentSubmissionPage = () => {
             gap: 10,
           }}>
             <div style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Assignment</span>
+              <span style={styles.label}>Zuordnung</span>
               <select
                 value={form.assignmentTitle || assignmentOptions[0]}
                 onChange={handleChange("assignmentTitle")}
@@ -252,20 +225,20 @@ const AssignmentSubmissionPage = () => {
                 ))}
               </select>
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                Pick the assignment from your level dictionary — no typing needed.
+                Aufgabe aus deinem Verzeichnis auswählen – kein Tippen nötig.
               </p>
             </div>
             <div style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Your details</span>
+              <span style={styles.label}>Deine Daten</span>
               <div style={{ ...styles.metaRow, padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: 10 }}>
                 <div>
                   <div style={{ fontWeight: 700 }}>{user?.email || "–"}</div>
-                  <div style={styles.helperText}>Email • Level {preferredLevel}</div>
+                  <div style={styles.helperText}>Email • Stufe {preferredLevel}</div>
                 </div>
-                <span style={styles.badge}>{studentCode || "no code"}</span>
+                <span style={styles.badge}>{studentCode || "kein Code"}</span>
               </div>
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                Class: {studentProfile?.className || "–"}
+                Kurs: {studentProfile?.className || "–"}
               </p>
             </div>
           </div>
@@ -285,40 +258,20 @@ const AssignmentSubmissionPage = () => {
           <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
             <input
               type="checkbox"
-              checked={form.confirmedAssignment || confirmationLocked}
-              onChange={handleChange("confirmedAssignment")}
+              checked={form.confirmed || confirmationLocked}
+              onChange={handleChange("confirmed")}
               disabled={confirmationLocked || status.loading}
             />
             <span style={{ ...styles.label, margin: 0 }}>
-              I confirm I am submitting the selected assignment number.
-            </span>
-          </label>
-
-          <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
-            <input
-              type="checkbox"
-              checked={form.acknowledgedLock || confirmationLocked}
-              onChange={handleChange("acknowledgedLock")}
-              disabled={confirmationLocked || status.loading}
-            />
-            <span style={{ ...styles.label, margin: 0 }}>
-              I understand the form will be locked after I submit.
+              Ich bestätige, dass dies die richtige Aufgabe ist.
             </span>
           </label>
 
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <button
-              type="button"
-              style={styles.secondaryButton}
-              disabled={status.loading || confirmationLocked}
-              onClick={handleSaveDraft}
-            >
-              {status.loading ? "Saving ..." : "Save draft"}
-            </button>
             <button type="submit" style={styles.primaryButton} disabled={status.loading || confirmationLocked}>
-              {status.loading ? "Submitting ..." : confirmationLocked ? "Submission locked" : "Submit assignment"}
+              {status.loading ? "Wird gespeichert ..." : confirmationLocked ? "Abgabe gesperrt" : "Abgabe speichern"}
             </button>
-            <span style={styles.helperText}>Check both boxes before submitting. The form locks after your first submission.</span>
+            <span style={styles.helperText}>Nur Textfeld erforderlich. Bestätigung nach erster Abgabe gesperrt.</span>
           </div>
         </form>
       </div>
@@ -326,29 +279,29 @@ const AssignmentSubmissionPage = () => {
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h3 style={{ margin: 0 }}>Resubmission</h3>
-          <span style={styles.badge}>{hasSubmitted ? "Active" : "After first submission"}</span>
+          <span style={styles.badge}>{hasSubmitted ? "Aktiv" : "Nach erster Abgabe"}</span>
         </div>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          If you made a mistake, contact us by email. Resubmission is available after your first submission.
+          Falls du einen Fehler bemerkt hast, kontaktiere uns per E-Mail. Die Option wird nach deiner ersten Abgabe freigeschaltet.
         </p>
         {hasSubmitted ? (
           <a
             href={`mailto:learngermanghana@gmail.com?subject=${encodeURIComponent("Resubmission request")}&body=${encodeURIComponent(
-              `Hello team,
+              `Hallo Team,
 
-I would like to resubmit an assignment.
+ich möchte erneut einreichen.
 
-Assignment: ${form.assignmentTitle || assignmentOptions[0]}
-Student code: ${studentCode || "-"}
+Aufgabe: ${form.assignmentTitle || assignmentOptions[0]}
+Studenten-Code: ${studentCode || "-"}
 Email: ${user?.email || "-"}
 Level: ${preferredLevel}`
             )}`}
             style={styles.primaryButton}
           >
-            Request resubmission by email
+            Resubmit per E-Mail anfordern
           </a>
         ) : (
-          <span style={{ ...styles.helperText, margin: 0 }}>Resubmit is available after you submit once.</span>
+          <span style={{ ...styles.helperText, margin: 0 }}>Resubmit ist verfügbar, nachdem du einmal eingereicht hast.</span>
         )}
       </div>
 
@@ -374,11 +327,11 @@ Level: ${preferredLevel}`
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <strong>{entry.assignmentTitle || entry.title || "Submission"}</strong>
+                <strong>{entry.assignmentTitle || entry.title || "Abgabe"}</strong>
                 <span style={styles.levelPill}>{entry.level || preferredLevel}</span>
               </div>
               <div style={{ ...styles.helperText, margin: 0 }}>
-                Class: {entry.className || "–"}
+                Kurs: {entry.className || "–"}
               </div>
               <div style={{ ...styles.helperText, margin: 0 }}>
                 Saved: {formatDate(entry.createdAt)}
