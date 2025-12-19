@@ -6,7 +6,7 @@ import {
   query,
   where,
 } from "../firebase";
-import { firestoreCollections } from "../lib/firestorePaths";
+import { firestoreCollections, legacyStudentKey } from "../lib/firestorePaths";
 
 const normalizeEmail = (email) => (email || "").trim().toLowerCase();
 
@@ -15,12 +15,16 @@ export const deriveStudentProfile = (user, studentProfile = null) => {
   const profileFromAuth = user?.profile || {};
   const profileFromStore = studentProfile || {};
 
+  const studentKey =
+    legacyStudentKey(profileFromStore) ||
+    profileFromAuth.studentCode ||
+    profileFromStore.studentCode ||
+    profileFromStore.id ||
+    "";
+
   return {
     email: email || "",
-    studentCode:
-      profileFromAuth.studentCode ||
-      profileFromStore.studentcode ||
-      "",
+    studentCode: studentKey,
     level: (profileFromAuth.level || profileFromStore.level || "").toUpperCase(),
     assignmentTitle: profileFromAuth.assignmentTitle || profileFromStore.assignmentTitle || "",
     className: profileFromStore.className || "",
