@@ -90,8 +90,35 @@ const AssignmentSubmissionPage = () => {
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
   const [recentSubmissions, setRecentSubmissions] = useState([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [lockedChapters, setLockedChapters] = useState(new Set());
   const [confirmationLocked, setConfirmationLocked] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const buildChapterKey = (title) => {
+    if (!title) return null;
+
+    const entry = assignmentDictionary.find((item) => item.label === title);
+    if (typeof entry?.day !== "undefined") {
+      return `day-${entry.day}`;
+    }
+
+    const dayMatch = /^day\s*(\d+)/i.exec(title);
+    if (dayMatch?.[1]) {
+      return `day-${dayMatch[1]}`;
+    }
+
+    return title.toLowerCase();
+  };
+
+  const deriveChapterValue = (title) => {
+    const entry = assignmentDictionary.find((item) => item.label === title);
+    if (typeof entry?.day !== "undefined") {
+      return entry.day;
+    }
+
+    const dayMatch = /^day\s*(\d+)/i.exec(title || "");
+    return dayMatch?.[1] ? Number(dayMatch[1]) : null;
+  };
 
   useEffect(() => {
     setForm((prev) => ({ ...prev, assignmentTitle: assignmentOptions[0] }));
@@ -107,7 +134,7 @@ const AssignmentSubmissionPage = () => {
       title: form.assignmentTitle,
       assignmentTitle: form.assignmentTitle,
       level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
-      chapter: null,
+      chapter: deriveChapterValue(form.assignmentTitle),
       submissionLink: null,
       submissionText: trimmedText,
       studentEmail: user?.email || "",
@@ -133,7 +160,13 @@ const AssignmentSubmissionPage = () => {
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
         lockedAt: serverTimestamp(),
         assignmentTitle: form.assignmentTitle,
+        chapter: deriveChapterValue(form.assignmentTitle),
       });
+
+      const currentChapterKey = buildChapterKey(form.assignmentTitle);
+      if (currentChapterKey) {
+        setLockedChapters((prev) => new Set([...prev, currentChapterKey]));
+      }
     }
 
     return true;
@@ -154,19 +187,22 @@ const AssignmentSubmissionPage = () => {
         const entries = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
         setRecentSubmissions(entries);
         if (entries.length > 0) {
-          setConfirmationLocked(true);
           setHasSubmitted(true);
-          setForm((prev) => ({ ...prev, confirmed: true }));
         }
 
         const lockRef = collection(db, LOCK_COLLECTION);
-        const lockSnapshot = await getDocs(
-          query(lockRef, where("studentId", "==", user.uid), orderBy("lockedAt", "desc"), limit(1))
-        );
+        const lockSnapshot = await getDocs(query(lockRef, where("studentId", "==", user.uid)));
         if (!lockSnapshot.empty) {
-          setConfirmationLocked(true);
+          const locked = new Set();
+          lockSnapshot.docs.forEach((doc) => {
+            const data = doc.data();
+            const chapterKey = buildChapterKey(data.assignmentTitle) || (data.chapter ? `day-${data.chapter}` : null);
+            if (chapterKey) {
+              locked.add(chapterKey);
+            }
+          });
+          setLockedChapters(locked);
           setHasSubmitted(true);
-          setForm((prev) => ({ ...prev, confirmed: true }));
         }
 
         const draftsRef = collection(db, DRAFT_COLLECTION);
@@ -195,6 +231,14 @@ const AssignmentSubmissionPage = () => {
 
     loadDraftsAndSubmissions();
   }, [user]);
+
+  useEffect(() => {
+    const isLocked = lockedChapters.has(buildChapterKey(form.assignmentTitle));
+    setConfirmationLocked(isLocked);
+    if (isLocked) {
+      setForm((prev) => ({ ...prev, confirmed: true }));
+    }
+  }, [form.assignmentTitle, lockedChapters]);
 
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
