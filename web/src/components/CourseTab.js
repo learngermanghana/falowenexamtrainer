@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { courseOverview, chatPrompts } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
@@ -248,6 +248,16 @@ const CourseTab = () => {
     return options.sort((a, b) => a.value.localeCompare(b.value));
   }, [submissionLevel]);
 
+  const handleAssignmentChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      setAssignmentId(value);
+      const selectedAssignment = assignmentOptions.find((option) => option.value === value);
+      setAssignmentTitle(selectedAssignment?.title || `Assignment ${value}`);
+    },
+    [assignmentOptions]
+  );
+
   const resubmitMailto = useMemo(() => {
     const subject = encodeURIComponent(
       `Request new attempt: ${submissionLevel} assignment ${assignmentId || "(choose chapter)"}`
@@ -369,18 +379,14 @@ Thank you!`
   useEffect(() => {
     if (!assignmentOptions.length || assignmentId) return;
     setAssignmentId(assignmentOptions[0].value);
+    setAssignmentTitle(assignmentOptions[0].title || `Assignment ${assignmentOptions[0].value}`);
   }, [assignmentId, assignmentOptions]);
 
   useEffect(() => {
     if (!assignmentId) return;
     const selectedAssignment = assignmentOptions.find((option) => option.value === assignmentId);
     const preferredTitle = selectedAssignment?.title || `Assignment ${assignmentId}`;
-    setAssignmentTitle((prev) => {
-      if (!prev || prev.startsWith("Assignment ")) {
-        return preferredTitle;
-      }
-      return prev;
-    });
+    setAssignmentTitle(preferredTitle);
   }, [assignmentId, assignmentOptions]);
 
   useEffect(() => {
@@ -1674,11 +1680,11 @@ Thank you!`
           <p style={styles.helperText}>Matches the /submissions/{submissionLevel} path.</p>
         </div>
         <div>
-          <label style={styles.label}>Assignment number</label>
+          <label style={styles.label}>Assignment (number + title)</label>
           <select
             style={styles.select}
             value={assignmentId}
-            onChange={(e) => setAssignmentId(e.target.value)}
+            onChange={handleAssignmentChange}
             disabled={!assignmentOptions.length}
           >
             {!assignmentId && <option value="">Select from dictionary</option>}
@@ -1689,19 +1695,15 @@ Thank you!`
             ))}
           </select>
           <p style={styles.helperText}>
-            Pulled from the course dictionary so you don’t have to type the assignment number manually.
+            Pulled from the course dictionary so the assignment number and title stay in sync.
           </p>
         </div>
-        <div>
-          <label style={styles.label}>Assignment title</label>
-          <input
-            value={assignmentTitle}
-            onChange={(e) => setAssignmentTitle(e.target.value)}
-            placeholder="Auto-picked from your profile or course data"
-            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-          />
+        <div style={{ alignSelf: "flex-end" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Selected title: <strong>{assignmentTitle || "Choose an assignment"}</strong>
+          </p>
           <p style={styles.helperText}>
-            Pulled from your Firebase student record when available so we can tag this submission.
+            Auto-fills from the dictionary entry you pick above.
           </p>
         </div>
       </div>
