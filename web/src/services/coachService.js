@@ -2,10 +2,9 @@ import axios from "axios";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 import { writingLetters as writingSheetLetters } from "../data/writingLetters";
 import { fetchExamPrompts } from "./sheetContentService";
+import { getBackendBaseUrl } from "./backendConfig";
 
-const backendUrl =
-  process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+const backendUrl = getBackendBaseUrl();
 
 const authHeaders = (idToken) =>
   idToken
@@ -197,7 +196,7 @@ export const fetchWritingLetters = async (level, idToken) => {
 };
 
 export const fetchBackendHealth = async () => {
-  const response = await fetch(`${backendUrl}/health`);
+  const response = await fetch(`${backendUrl}/api/health`);
   return response.json();
 };
 

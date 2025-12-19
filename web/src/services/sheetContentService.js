@@ -1,8 +1,8 @@
-const backendUrl =
-  process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+import { getBackendBaseUrl } from "./backendConfig";
 
-const API_BASE = (process.env.REACT_APP_BACKEND_URL || "").replace(/\/$/, "");
+const backendUrl = getBackendBaseUrl();
+
+const API_BASE = backendUrl.replace(/\/$/, "");
 
 const toText = (v) => (v == null ? "" : String(v).trim());
 
@@ -100,7 +100,7 @@ export const fetchExamPrompts = async () => {
 };
 
 export async function fetchExamEntries() {
-  const url = `${(process.env.REACT_APP_BACKEND_URL || "")}/api/exams`;
+  const url = `${backendUrl}/api/exams`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch exams");
   const rows = await res.json();

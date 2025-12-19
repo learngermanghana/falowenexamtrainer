@@ -1,16 +1,16 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import HealthIndicator from "../components/HealthIndicator";
 
-const originalEnv = process.env.REACT_APP_API_BASE;
+const originalEnv = process.env.REACT_APP_BACKEND_URL;
 
 describe("HealthIndicator", () => {
   beforeEach(() => {
-    process.env.REACT_APP_API_BASE = "";
+    process.env.REACT_APP_BACKEND_URL = "http://localhost:5000";
     global.fetch = jest.fn();
   });
 
   afterEach(() => {
-    process.env.REACT_APP_API_BASE = originalEnv;
+    process.env.REACT_APP_BACKEND_URL = originalEnv;
     delete global.fetch;
   });
 
@@ -23,7 +23,7 @@ describe("HealthIndicator", () => {
     render(<HealthIndicator />);
 
     await waitFor(() => expect(screen.getByText(/API online/i)).toBeInTheDocument());
-    expect(global.fetch).toHaveBeenCalledWith("/api/health");
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:5000/api/health");
   });
 
   it("shows offline when the request fails", async () => {
