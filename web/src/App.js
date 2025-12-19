@@ -93,7 +93,7 @@ function App() {
               style={activeSection === "course" ? styles.navButtonActive : styles.navButton}
               onClick={() => setActiveSection("course")}
             >
-              Kursplan
+              Course Book
             </button>
           </div>
 

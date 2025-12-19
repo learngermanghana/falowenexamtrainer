@@ -16,6 +16,7 @@ export const courseSchedules = {
         youtube_link: DAY0_TUTORIAL_VIDEO_URL_A1,
         grammarbook_link: null,
         workbook_link: null,
+        assignment: false,
       },
     },
     {
@@ -31,6 +32,7 @@ export const courseSchedules = {
         youtube_link: "https://youtu.be/NmaHd9xsGvw",
         grammarbook_link: "https://drive.google.com/file/d/10UPl4n5FzukSDiTIlcM-WjmNuJGz9OgL/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
+        assignment: true,
       },
     },
     {
@@ -114,6 +116,7 @@ export const courseSchedules = {
         video: "https://youtu.be/LZ5AhNpkMrM",
         youtube_link: "https://youtu.be/LZ5AhNpkMrM",
         workbook_link: "https://drive.google.com/file/d/1-fDUBzfJ4n-fukM9ROPx-dSC7g9gamEb/view?usp=sharing",
+        assignment: false,
       },
     },
     {
@@ -127,6 +130,7 @@ export const courseSchedules = {
         video: "https://youtu.be/7hsWwLGcOn4",
         youtube_link: "https://youtu.be/7hsWwLGcOn4",
         workbook_link: "https://drive.google.com/file/d/1xellIzaxzoBTFOUdaCEHu_OiiuEnFeWT/view?usp=sharing",
+        assignment: false,
       },
     },
     {
@@ -159,6 +163,7 @@ export const courseSchedules = {
         youtube_link: "https://youtu.be/0HjCQKxMl5Q",
         grammarbook_link: "https://drive.google.com/file/d/1FaRD4UibeJwCM8Yggjn84cdiVS7n-Rv2/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1woXksV9sTZ_8huXa8yf6QUQ8aUXPxVug/view?usp=sharing",
+        assignment: true,
       },
     },
     {
@@ -174,6 +179,7 @@ export const courseSchedules = {
         youtube_link: "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
         grammarbook_link: "https://drive.google.com/file/d/17y5fGW8nAbfeVgolV7tEW4BLiLXZDoO6/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1zjAqvQqNb7iKknuhJ79bUclimEaTg-mt/view?usp=sharing",
+        assignment: true,
       },
     },
     {
@@ -211,6 +217,7 @@ export const courseSchedules = {
         youtube_link: "https://youtu.be/uyvXoCoqjiE",
         grammarbook_link: "https://drive.google.com/file/d/1pSaloRhfh8eTKK_r9mzwp6xkbfdkCVox/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
+        assignment: true,
       },
     },
     {
@@ -225,6 +232,7 @@ export const courseSchedules = {
         youtube_link: "https://youtu.be/hLpPFOthVkU",
         grammarbook_link: "https://drive.google.com/file/d/1fW2ChjnDKW_5SEr65ZgE1ylJy1To46_p/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1onzokN8kQualNO6MSsPndFXiRwsnsVM9/view?usp=sharing",
+        assignment: true,
       },
     },
     {
@@ -255,6 +263,7 @@ export const courseSchedules = {
         video: "https://youtu.be/G08nQJh1Trc",
         youtube_link: "https://youtu.be/G08nQJh1Trc",
         workbook_link: "https://drive.google.com/file/d/1oOT_b3S4MZIqZ10Kui-dR6qlM0AZfWZ4/view?usp=sharing",
+        assignment: false,
       },
     },
     {
@@ -270,6 +279,7 @@ export const courseSchedules = {
         video: "https://youtu.be/376paUpM2bI",
         youtube_link: "https://youtu.be/376paUpM2bI",
         workbook_link: "https://drive.google.com/file/d/1p1eI_lwAHj6I9BD-Nw3TAdnemEskUUAq/view?usp=sharing",
+        assignment: false,
       },
     },
     {
@@ -374,6 +384,7 @@ export const courseSchedules = {
         video: "https://youtu.be/2iJQFYGUqRE",
         youtube_link: "https://youtu.be/2iJQFYGUqRE",
         workbook_link: "https://drive.google.com/file/d/1SjaDH1bYR7O-BnIbM2N82XOEjeLCfPFb/view?usp=sharing",
+        assignment: true,
       },
     },
     {
@@ -435,6 +446,7 @@ export const courseSchedules = {
         video: "https://youtu.be/WVq9x69dCeE",
         youtube_link: "https://youtu.be/WVq9x69dCeE",
         workbook_link: "https://drive.google.com/file/d/1LE1b9ilkLLobE5Uw0TVLG0RIVpLK5k1t/view?usp=sharing",
+        assignment: false,
       },
     },
     {
