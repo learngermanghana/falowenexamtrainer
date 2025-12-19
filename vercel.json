@@ -5,11 +5,14 @@
       "src": "web/package.json",
       "use": "@vercel/static-build",
       "config": { "distDir": "build" }
+    },
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
     }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://api-haqjyxn5wa-ew.a.run.app/$1" },
-    { "source": "/health", "destination": "https://api-haqjyxn5wa-ew.a.run.app/health" },
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/((?!api).*)", "destination": "/index.html" }
   ]
 }
