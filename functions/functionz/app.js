@@ -171,6 +171,35 @@ app.post("/discussion/correct", async (req, res) => {
   }
 });
 
+app.post("/grammar/ask", async (req, res) => {
+  try {
+    const { question, level = "A2" } = req.body || {};
+    const trimmedQuestion = String(question || "").trim();
+
+    if (!trimmedQuestion) {
+      return res.status(400).json({ error: "A grammar question is required" });
+    }
+
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You are a concise German grammar coach for language learners. " +
+          "Answer clearly in English with 1-2 short German examples. " +
+          `Keep it practical for a ${level} learner and avoid long lists.`,
+      },
+      { role: "user", content: trimmedQuestion },
+    ];
+
+    const answer = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 450 });
+
+    return res.json({ answer });
+  } catch (err) {
+    console.error("/grammar/ask error", err);
+    return res.status(500).json({ error: err.message || "Failed to answer grammar question" });
+  }
+});
+
 app.get("/student", async (req, res) => {
   try {
     const studentCode = String(req.query.studentCode || "").trim();
