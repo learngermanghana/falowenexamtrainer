@@ -1,31 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
 import { fetchExamEntries } from "../services/sheetContentService";
+import { useApiRequest } from "../hooks/useApiRequest";
 
 const SpeakingPage = () => {
-  const [entries, setEntries] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [level, setLevel] = useState("all");
   const [teil, setTeil] = useState("all");
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const data = await fetchExamEntries();
-        if (mounted) setEntries(data);
-      } catch (e) {
-        console.error(e);
-        if (mounted) setError("Exams konnten nicht geladen werden.");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  const { data: entries = [], loading, error } = useApiRequest(fetchExamEntries, {
+    initialData: [],
+    immediate: true,
+    mapError: () => "Exams konnten nicht geladen werden.",
+  });
 
   const levels = useMemo(
     () => ["all", ...Array.from(new Set(entries.map(e => e.level).filter(Boolean))).sort()],
@@ -72,7 +58,7 @@ const SpeakingPage = () => {
         </div>
 
         {loading && <p>Exams werden geladen ...</p>}
-        {error && <p style={{ color: "var(--color-error)" }}>{error}</p>}
+        {error && <div style={{ ...styles.errorBox, marginTop: 8 }}>{error}</div>}
 
         {!loading && !error && filtered.length === 0 && (
           <p style={styles.helperText}>Keine Einträge gefunden.</p>

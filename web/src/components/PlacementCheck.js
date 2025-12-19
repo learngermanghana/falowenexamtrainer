@@ -1,38 +1,43 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
 import { startPlacement } from "../services/coachService";
 import { useAuth } from "../context/AuthContext";
+import { useApiRequest } from "../hooks/useApiRequest";
 
 const PlacementCheck = () => {
   const [answers, setAnswers] = useState(["", ""]);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const { user, idToken } = useAuth();
   const userId = user?.uid;
+
+  const { data: response, loading, error, execute, setData } = useApiRequest(
+    (payload) => startPlacement(payload),
+    {
+      initialData: null,
+      mapError: (err) =>
+        err?.response?.data?.error || err?.message || "Could not run placement.",
+    }
+  );
+
+  const placement = useMemo(() => response?.placement || null, [response]);
 
   const handleChange = (idx, value) => {
     setAnswers((prev) => prev.map((val, i) => (i === idx ? value : val)));
   };
 
   const handleSubmit = async () => {
-    setLoading(true);
-    setError("");
-    setResult(null);
+    setData(null);
+    const payload = answers
+      .filter((text) => text.trim())
+      .map((text, idx) => ({ text, taskType: idx === 0 ? "intro" : "story" }));
+
     try {
-      const payload = answers
-        .filter((text) => text.trim())
-        .map((text, idx) => ({ text, taskType: idx === 0 ? "intro" : "story" }));
-      const data = await startPlacement({
+      await execute({
         answers: payload,
         userId,
         idToken,
       });
-      setResult(data?.placement || null);
-    } catch (e) {
-      setError(e?.response?.data?.error || "Could not run placement.");
-    } finally {
-      setLoading(false);
+    } catch (err) {
+      // Error is handled through the hook state
     }
   };
 
@@ -68,15 +73,15 @@ const PlacementCheck = () => {
         {error && <div style={styles.errorBox}>{error}</div>}
       </div>
 
-      {result && (
+      {placement && (
         <div style={{ ...styles.resultCard, marginTop: 12 }}>
           <h3 style={styles.resultHeading}>Estimated level</h3>
           <p style={styles.resultText}>
-            {result.estimated_level} · Confidence {Math.round((result.confidence || 0) * 100)}%
+            {placement.estimated_level} · Confidence {Math.round((placement.confidence || 0) * 100)}%
           </p>
-          <p style={styles.resultText}>{result.rationale}</p>
+          <p style={styles.resultText}>{placement.rationale}</p>
           <div style={{ marginTop: 8 }}>
-            <strong>Next step:</strong> {result.next_task_hint}
+            <strong>Next step:</strong> {placement.next_task_hint}
           </div>
         </div>
       )}
