@@ -1,4 +1,5 @@
 import { collection, db, getDocs, isFirebaseConfigured } from "../firebase";
+import { firestoreCollections } from "../lib/firestorePaths";
 
 const toBoolean = (value) => {
   if (typeof value === "boolean") return value;
@@ -57,7 +58,7 @@ export const fetchAttendanceRecords = async ({ className, studentCode } = {}) =>
     return { records: [], sessions: 0, hours: 0 };
   }
 
-  const snap = await getDocs(collection(db, "attendance", className, "sessions"));
+  const snap = await getDocs(collection(db, ...firestoreCollections.attendanceSessions(className)));
   const records = [];
   let sessions = 0;
   let hours = 0;
@@ -80,7 +81,7 @@ export const fetchAttendanceSummary = async ({ className, studentCode } = {}) =>
     return { sessions: 0, hours: 0 };
   }
 
-  const snap = await getDocs(collection(db, "attendance", className, "sessions"));
+  const snap = await getDocs(collection(db, ...firestoreCollections.attendanceSessions(className)));
   let sessions = 0;
   let hours = 0;
 

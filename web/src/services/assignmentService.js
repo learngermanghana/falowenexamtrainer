@@ -1,5 +1,6 @@
 import { collection, db, getDoc, getDocs, doc, query, where } from "../firebase";
 import { courseSchedulesByName } from "../data/courseSchedules";
+import { firestoreCollections } from "../lib/firestorePaths";
 
 const parseAssignmentNumber = (assignment = "") => {
   const match = assignment.match(/(\d+(?:\.\d+)?)/);
@@ -14,7 +15,7 @@ const toDate = (value) => {
 const unique = (arr) => Array.from(new Set(arr));
 
 const loadScores = async ({ studentCode } = {}) => {
-  const scoresRef = collection(db, "scores");
+  const scoresRef = collection(db, ...firestoreCollections.scores());
   const constraints = [];
   if (studentCode) {
     constraints.push(where("studentcode", "==", studentCode));
@@ -25,7 +26,7 @@ const loadScores = async ({ studentCode } = {}) => {
 
 const loadStudent = async (studentCode) => {
   if (!studentCode) return null;
-  const ref = doc(db, "students", studentCode);
+  const ref = doc(db, ...firestoreCollections.students(), studentCode);
   const snap = await getDoc(ref);
   return snap.exists() ? { id: ref.id, ...snap.data() } : null;
 };

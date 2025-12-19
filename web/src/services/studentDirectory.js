@@ -6,6 +6,7 @@ import {
   query,
   where,
 } from "../firebase";
+import { firestoreCollections } from "../lib/firestorePaths";
 
 const normalizeEmail = (email) => (email || "").trim().toLowerCase();
 
@@ -30,7 +31,7 @@ export const findStudentByEmail = async (email) => {
   const normalizedEmail = normalizeEmail(email);
   if (!normalizedEmail || !isFirebaseConfigured || !db) return null;
 
-  const studentsRef = collection(db, "students");
+  const studentsRef = collection(db, ...firestoreCollections.students());
   const lookup = query(studentsRef, where("email", "==", normalizedEmail));
   try {
     const snapshot = await getDocs(lookup);
