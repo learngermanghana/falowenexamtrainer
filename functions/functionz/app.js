@@ -59,12 +59,7 @@ app.get("/vocab", async (_req, res) => {
     if (cached) return res.json(cached);
 
     const rows = mapVocabRows(VOCAB_ENTRIES);
-    const payload = {
-      rows,
-      source: "static-dictionary",
-      dictionaryPath: "functions/functionz/vocab.js",
-      count: rows.length,
-    };
+    const payload = { rows, source: "static-dictionary" };
     setCache("vocab", payload);
     return res.json(payload);
   } catch (err) {
@@ -97,12 +92,7 @@ app.get("/sheets/diagnose", async (req, res) => {
 
     const results = {
       exams: { ok: true, source: "static-dictionary", rows: EXAM_PROMPTS.length },
-      vocab: {
-        ok: true,
-        source: "static-dictionary",
-        rows: VOCAB_ENTRIES.length,
-        dictionaryPath: "functions/functionz/vocab.js",
-      },
+      vocab: { ok: true, source: "static-dictionary", rows: VOCAB_ENTRIES.length },
     };
     const checks = [
       { name: "students", id: process.env.STUDENTS_SHEET_ID, tab: process.env.STUDENTS_SHEET_TAB || "students" },

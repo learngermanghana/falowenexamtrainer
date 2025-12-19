@@ -21,6 +21,7 @@ import LandingPage from "./components/LandingPage";
 import SignUpPage from "./components/SignUpPage";
 import LevelOnboarding from "./components/LevelOnboarding";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
+import ResultsPage from "./components/ResultsPage";
 import "./App.css";
 
 function App() {
@@ -78,6 +79,7 @@ function App() {
   const generalNavItems = [
     { key: "plan", label: "Home · Plan (Start / dashboard)" },
     { key: "course", label: "Kursbuch (course book)" },
+    { key: "results", label: "Results (Ergebnisse)" },
     { key: "exam", label: "Prüfungen (exam room)" },
     { key: "account", label: "Konto (account)" },
     { key: "discussion", label: "Klassenforum (class forum)" },
@@ -152,6 +154,7 @@ function App() {
     if (activePage === "level-check") return <PlacementCheck />;
     if (activePage === "daily") return <SpeakingPage mode="daily" />;
     if (activePage === "exam") return <ExamRoom />;
+    if (activePage === "results") return <ResultsPage />;
     return <SpeakingPage />;
   };
 
