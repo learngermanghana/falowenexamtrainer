@@ -10,7 +10,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, authError, setAuthError } = useAuth();
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("B1");
   const [phone, setPhone] = useState("");
@@ -30,9 +30,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
     try {
       if (mode === "signup") {
-        const studentCode = generateStudentCode({ firstName });
+        const studentCode = generateStudentCode({ name });
         await signup(email, password, {
-          firstName,
+          name,
           level: selectedLevel,
           studentCode,
           phone,
@@ -106,12 +106,12 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
           {mode === "signup" && (
             <>
-              <label style={styles.label}>First name</label>
+              <label style={styles.label}>Name</label>
               <input
                 type="text"
                 required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 style={inputStyle}
               />
               <label style={styles.label}>Phone number</label>

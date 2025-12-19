@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
     const studentsRef = doc(db, "students", studentId);
     const payload = {
       uid: credential.user.uid,
-      name: profile.firstName || "",
+      name: profile.name || profile.firstName || "",
       email: email.toLowerCase(),
       role: "student",
       studentCode: studentId,
