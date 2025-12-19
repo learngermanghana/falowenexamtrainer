@@ -11,7 +11,7 @@ import { loadPreferredClass, savePreferredClass } from "../services/classSelecti
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,9 +60,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const paymentStatus = paidAmount >= tuitionFee ? "paid" : "partial";
       const paystackLink = paystackLinkForLevel(selectedLevel);
 
-      const studentCode = generateStudentCode({ firstName });
+      const studentCode = generateStudentCode({ name });
       await signup(email, password, {
-        firstName,
+        name,
         level: selectedLevel,
         studentCode,
         className: selectedClass,
@@ -126,12 +126,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-          <label style={styles.label}>First name</label>
+          <label style={styles.label}>Name</label>
           <input
             type="text"
             required
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             style={inputStyle}
             placeholder="Abigail"
           />
