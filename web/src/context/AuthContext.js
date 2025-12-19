@@ -196,8 +196,11 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setStudentProfile(null);
       setIdToken(null);
+      setMessagingToken(null);
+      setNotificationStatus("idle");
       return;
     }
+
     if (studentProfile?.id && studentProfile.messagingToken) {
       try {
         await revokeMessagingToken(studentProfile.id);
@@ -205,10 +208,16 @@ export const AuthProvider = ({ children }) => {
         console.error("Failed to revoke messaging token", error);
       }
     }
-    await signOut(auth);
-    setMessagingToken(null);
-    setNotificationStatus("idle");
-    setStudentProfile(null);
+
+    try {
+      await signOut(auth);
+    } finally {
+      setUser(null);
+      setIdToken(null);
+      setMessagingToken(null);
+      setNotificationStatus("idle");
+      setStudentProfile(null);
+    }
   };
 
   const enableNotifications = async () => {
