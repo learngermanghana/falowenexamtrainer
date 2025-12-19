@@ -37,21 +37,48 @@ const AssignmentSubmissionPage = () => {
     () => (studentProfile?.level || "A1").toUpperCase(),
     [studentProfile?.level]
   );
+  const studentCode = useMemo(
+    () => studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "",
+    [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
+  );
+  const assignmentOptions = useMemo(() => {
+    const names = [];
+    const addName = (value) => {
+      if (!value) return;
+      const label = value.toString();
+      if (!names.includes(label)) {
+        names.push(label);
+      }
+    };
+
+    addName(studentProfile?.assignmentTitle);
+    if (Array.isArray(studentProfile?.assignments)) {
+      studentProfile.assignments.forEach(addName);
+    }
+    if (Array.isArray(studentProfile?.assignmentTitles)) {
+      studentProfile.assignmentTitles.forEach(addName);
+    }
+    if (studentProfile?.className) {
+      addName(`${studentProfile.className} Assignment`);
+    }
+
+    return names.length ? names : ["Allgemeine Abgabe", "Standardaufgabe"];
+  }, [studentProfile?.assignmentTitle, studentProfile?.assignmentTitles, studentProfile?.assignments, studentProfile?.className]);
 
   const [form, setForm] = useState({
-    title: "",
-    level: preferredLevel,
-    chapter: "",
-    submissionLink: "",
+    assignmentTitle: assignmentOptions[0],
     submissionText: "",
+    confirmed: false,
   });
   const [status, setStatus] = useState({ loading: false, error: "", success: "" });
   const [recentSubmissions, setRecentSubmissions] = useState([]);
   const [submissionsLoading, setSubmissionsLoading] = useState(false);
+  const [confirmationLocked, setConfirmationLocked] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, level: preferredLevel }));
-  }, [preferredLevel]);
+    setForm((prev) => ({ ...prev, assignmentTitle: assignmentOptions[0] }));
+  }, [assignmentOptions]);
 
   useEffect(() => {
     const loadSubmissions = async () => {
@@ -65,7 +92,13 @@ const AssignmentSubmissionPage = () => {
           limit(10),
         ];
         const snapshot = await getDocs(query(submissionsRef, ...constraints));
-        setRecentSubmissions(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+        const entries = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        setRecentSubmissions(entries);
+        if (entries.length > 0) {
+          setConfirmationLocked(true);
+          setHasSubmitted(true);
+          setForm((prev) => ({ ...prev, confirmed: true }));
+        }
       } catch (error) {
         console.error("Failed to load submissions", error);
         setStatus((prev) => ({
@@ -81,28 +114,38 @@ const AssignmentSubmissionPage = () => {
   }, [user]);
 
   const handleChange = (field) => (event) => {
-    setForm((prev) => ({ ...prev, [field]: event.target.value }));
+    const value = field === "confirmed" ? event.target.checked : event.target.value;
+    setForm((prev) => ({ ...prev, [field]: value }));
+    if (field === "confirmed") {
+      setStatus((prev) => ({ ...prev, error: "" }));
+    }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ loading: true, error: "", success: "" });
 
-    if (!form.title.trim() || !form.submissionText.trim()) {
-      setStatus({ loading: false, error: "Titel und Text dürfen nicht leer sein.", success: "" });
+    if (!form.assignmentTitle || !form.submissionText.trim()) {
+      setStatus({ loading: false, error: "Bitte wähle eine Aufgabe und trage deinen Text ein.", success: "" });
+      return;
+    }
+
+    if (!form.confirmed) {
+      setStatus({ loading: false, error: "Bitte bestätige, dass du die richtige Aufgabe abgibst.", success: "" });
       return;
     }
 
     try {
       await addDoc(collection(db, "submissions"), {
-        title: form.title.trim(),
-        level: ALLOWED_LEVELS.includes(form.level) ? form.level : preferredLevel,
-        chapter: form.chapter.trim() || null,
-        submissionLink: form.submissionLink.trim() || null,
+        title: form.assignmentTitle,
+        assignmentTitle: form.assignmentTitle,
+        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+        chapter: null,
+        submissionLink: null,
         submissionText: form.submissionText.trim(),
         studentEmail: user?.email || "",
         studentId: user?.uid || "",
-        studentCode: studentProfile?.id || "",
+        studentCode,
         studentName: studentProfile?.name || "",
         className: studentProfile?.className || "",
         status: "submitted",
@@ -111,7 +154,9 @@ const AssignmentSubmissionPage = () => {
       });
 
       setStatus({ loading: false, error: "", success: "Danke! Deine Abgabe wurde gespeichert." });
-      setForm((prev) => ({ ...prev, title: "", chapter: "", submissionLink: "", submissionText: "" }));
+      setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
+      setConfirmationLocked(true);
+      setHasSubmitted(true);
 
       if (user) {
         const submissionsRef = collection(db, "submissions");
@@ -137,8 +182,8 @@ const AssignmentSubmissionPage = () => {
         <div>
           <h2 style={styles.sectionTitle}>Aufgabe einreichen</h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Lade deine Lösung als Text hoch. Optional kannst du einen Link zu Google Docs oder einem geteilten Dokument
-            hinzufügen.
+            Lade deine Lösung als Text hoch. Kurs, Level, Studenten-Code und E-Mail werden automatisch übernommen, damit keine
+            Tippfehler passieren.
           </p>
         </div>
 
@@ -146,50 +191,41 @@ const AssignmentSubmissionPage = () => {
         {status.success ? <div style={styles.successBox}>{status.success}</div> : null}
 
         <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
-          <div style={styles.row}>
-            <label style={styles.field}>
-              <span style={styles.label}>Titel der Aufgabe *</span>
-              <input
-                type="text"
-                value={form.title}
-                onChange={handleChange("title")}
-                placeholder="z.B. Modul 5 – Bibliothek E-Mail"
-                style={styles.textArea}
-              />
-            </label>
-            <label style={styles.field}>
-              <span style={styles.label}>Niveau</span>
-              <select value={form.level} onChange={handleChange("level")} style={styles.select}>
-                {ALLOWED_LEVELS.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 10,
+          }}>
+            <div style={{ ...styles.field, margin: 0 }}>
+              <span style={styles.label}>Zuordnung</span>
+              <select
+                value={form.assignmentTitle || assignmentOptions[0]}
+                onChange={handleChange("assignmentTitle")}
+                style={styles.select}
+              >
+                {assignmentOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
                   </option>
                 ))}
               </select>
-            </label>
-          </div>
-
-          <div style={styles.row}>
-            <label style={styles.field}>
-              <span style={styles.label}>Kapitel / Fokus</span>
-              <input
-                type="text"
-                value={form.chapter}
-                onChange={handleChange("chapter")}
-                placeholder="Kapitel 5 – Termine machen"
-                style={styles.textArea}
-              />
-            </label>
-            <label style={styles.field}>
-              <span style={styles.label}>Optionaler Link</span>
-              <input
-                type="url"
-                value={form.submissionLink}
-                onChange={handleChange("submissionLink")}
-                placeholder="https://..."
-                style={styles.textArea}
-              />
-            </label>
+              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                Aufgabe aus deinem Verzeichnis auswählen – kein Tippen nötig.
+              </p>
+            </div>
+            <div style={{ ...styles.field, margin: 0 }}>
+              <span style={styles.label}>Deine Daten</span>
+              <div style={{ ...styles.metaRow, padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: 10 }}>
+                <div>
+                  <div style={{ fontWeight: 700 }}>{user?.email || "–"}</div>
+                  <div style={styles.helperText}>Email • Stufe {preferredLevel}</div>
+                </div>
+                <span style={styles.badge}>{studentCode || "kein Code"}</span>
+              </div>
+              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                Kurs: {studentProfile?.className || "–"}
+              </p>
+            </div>
           </div>
 
           <div>
@@ -204,13 +240,54 @@ const AssignmentSubmissionPage = () => {
             </label>
           </div>
 
+          <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
+            <input
+              type="checkbox"
+              checked={form.confirmed || confirmationLocked}
+              onChange={handleChange("confirmed")}
+              disabled={confirmationLocked || status.loading}
+            />
+            <span style={{ ...styles.label, margin: 0 }}>
+              Ich bestätige, dass dies die richtige Aufgabe ist.
+            </span>
+          </label>
+
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <button type="submit" style={styles.primaryButton} disabled={status.loading}>
-              {status.loading ? "Wird gespeichert ..." : "Abgabe speichern"}
+            <button type="submit" style={styles.primaryButton} disabled={status.loading || confirmationLocked}>
+              {status.loading ? "Wird gespeichert ..." : confirmationLocked ? "Abgabe gesperrt" : "Abgabe speichern"}
             </button>
-            <span style={styles.helperText}>Titel und Text sind Pflichtfelder.</span>
+            <span style={styles.helperText}>Nur Textfeld erforderlich. Bestätigung nach erster Abgabe gesperrt.</span>
           </div>
         </form>
+      </div>
+
+      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+          <h3 style={{ margin: 0 }}>Resubmission</h3>
+          <span style={styles.badge}>{hasSubmitted ? "Aktiv" : "Nach erster Abgabe"}</span>
+        </div>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Falls du einen Fehler bemerkt hast, kontaktiere uns per E-Mail. Die Option wird nach deiner ersten Abgabe freigeschaltet.
+        </p>
+        {hasSubmitted ? (
+          <a
+            href={`mailto:learngermanghana@gmail.com?subject=${encodeURIComponent("Resubmission request")}&body=${encodeURIComponent(
+              `Hallo Team,
+
+ich möchte erneut einreichen.
+
+Aufgabe: ${form.assignmentTitle || assignmentOptions[0]}
+Studenten-Code: ${studentCode || "-"}
+Email: ${user?.email || "-"}
+Level: ${preferredLevel}`
+            )}`}
+            style={styles.primaryButton}
+          >
+            Resubmit per E-Mail anfordern
+          </a>
+        ) : (
+          <span style={{ ...styles.helperText, margin: 0 }}>Resubmit ist verfügbar, nachdem du einmal eingereicht hast.</span>
+        )}
       </div>
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -235,20 +312,15 @@ const AssignmentSubmissionPage = () => {
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <strong>{entry.title}</strong>
-                <span style={styles.levelPill}>{entry.level}</span>
+                <strong>{entry.assignmentTitle || entry.title || "Abgabe"}</strong>
+                <span style={styles.levelPill}>{entry.level || preferredLevel}</span>
               </div>
               <div style={{ ...styles.helperText, margin: 0 }}>
-                {entry.chapter ? `Kapitel: ${entry.chapter}` : "Ohne Kapitel"}
+                Kurs: {entry.className || "–"}
               </div>
               <div style={{ ...styles.helperText, margin: 0 }}>
                 Gespeichert: {formatDate(entry.createdAt)}
               </div>
-              {entry.submissionLink ? (
-                <a href={entry.submissionLink} target="_blank" rel="noreferrer">
-                  Link öffnen
-                </a>
-              ) : null}
             </div>
           ))}
         </div>
