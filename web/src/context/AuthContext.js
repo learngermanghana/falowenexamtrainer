@@ -18,6 +18,7 @@ import {
   isFirebaseConfigured,
   deleteField,
 } from "../firebase";
+import { generateStudentCode } from "../services/studentCode";
 
 const AuthContext = createContext();
 

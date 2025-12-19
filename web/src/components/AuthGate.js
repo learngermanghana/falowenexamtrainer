@@ -13,6 +13,11 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [firstName, setFirstName] = useState("");
   const [password, setPassword] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("B1");
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+  const [status, setStatus] = useState("Active");
+  const [className, setClassName] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
@@ -25,11 +30,16 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
     try {
       if (mode === "signup") {
-        const studentCode = generateStudentCode({ firstName, level: selectedLevel });
+        const studentCode = generateStudentCode({ firstName });
         await signup(email, password, {
           firstName,
           level: selectedLevel,
           studentCode,
+          phone,
+          location,
+          emergencyContactPhone,
+          status,
+          className,
         });
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
@@ -104,6 +114,22 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 onChange={(e) => setFirstName(e.target.value)}
                 style={inputStyle}
               />
+              <label style={styles.label}>Phone number</label>
+              <input
+                type="tel"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                style={inputStyle}
+              />
+              <label style={styles.label}>Location</label>
+              <input
+                type="text"
+                required
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                style={inputStyle}
+              />
             </>
           )}
 
@@ -141,6 +167,30 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                   </option>
                 ))}
               </select>
+              <label style={styles.label}>Emergency contact (phone)</label>
+              <input
+                type="tel"
+                required
+                value={emergencyContactPhone}
+                onChange={(e) => setEmergencyContactPhone(e.target.value)}
+                style={inputStyle}
+              />
+              <label style={styles.label}>Status</label>
+              <input
+                type="text"
+                required
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                style={inputStyle}
+              />
+              <label style={styles.label}>Class name</label>
+              <input
+                type="text"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+                style={inputStyle}
+                placeholder="A1 Morning"
+              />
             </>
           )}
 

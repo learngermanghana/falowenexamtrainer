@@ -1,5 +1,3 @@
-const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
 const sanitizeName = (name) => {
   const fallback = "student";
   if (!name) return fallback;
@@ -7,18 +5,16 @@ const sanitizeName = (name) => {
   return cleaned || fallback;
 };
 
-const generateRandomLetters = (length = 3) => {
+const generateRandomDigits = (length = 3) => {
   let output = "";
   for (let index = 0; index < length; index += 1) {
-    const randomIndex = Math.floor(Math.random() * LETTERS.length);
-    output += LETTERS[randomIndex];
+    output += Math.floor(Math.random() * 10).toString();
   }
   return output;
 };
 
-export const generateStudentCode = ({ firstName, level }) => {
+export const generateStudentCode = ({ firstName }) => {
   const safeName = sanitizeName(firstName);
-  const levelCode = (level || "").toString().trim().toUpperCase() || "LVL";
-  const suffix = generateRandomLetters(3);
-  return `${safeName}-${levelCode}-${suffix}`;
+  const suffix = generateRandomDigits(3);
+  return `${safeName}-${suffix}`;
 };

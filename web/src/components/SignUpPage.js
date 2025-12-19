@@ -17,6 +17,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("B1");
+  const [phone, setPhone] = useState("");
+  const [location, setLocation] = useState("");
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+  const [status, setStatus] = useState("Active");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
   );
@@ -35,12 +39,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     setLoading(true);
     try {
-      const studentCode = generateStudentCode({ firstName, level: selectedLevel });
+      const studentCode = generateStudentCode({ firstName });
       await signup(email, password, {
         firstName,
         level: selectedLevel,
         studentCode,
         className: selectedClass,
+        phone,
+        location,
+        emergencyContactPhone,
+        status,
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
@@ -142,6 +150,46 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             Wir laden Sprechen- und Schreiben-Aufgaben aus dem passenden Niveau-Sheet.
           </p>
+
+          <label style={styles.label}>Phone number</label>
+          <input
+            type="tel"
+            required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            style={inputStyle}
+            placeholder="0176 12345678"
+          />
+
+          <label style={styles.label}>Location</label>
+          <input
+            type="text"
+            required
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            style={inputStyle}
+            placeholder="Berlin"
+          />
+
+          <label style={styles.label}>Emergency contact (phone)</label>
+          <input
+            type="tel"
+            required
+            value={emergencyContactPhone}
+            onChange={(e) => setEmergencyContactPhone(e.target.value)}
+            style={inputStyle}
+            placeholder="0176 98765432"
+          />
+
+          <label style={styles.label}>Status</label>
+          <input
+            type="text"
+            required
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            style={inputStyle}
+            placeholder="Active"
+          />
 
           <label style={styles.label}>Which live class are you joining?</label>
           <select
