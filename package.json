@@ -1,0 +1,31 @@
+{
+  "name": "falowen-exam-coach-backend",
+  "version": "1.0.0",
+  "main": "functions/functionz/server.js",
+  "scripts": {
+    "start": "node functions/functionz/server.js",
+    "test": "npm run test:backend",
+    "test:backend": "jest --config jest.config.js",
+    "test:ci": "npm run test:backend -- --runInBand"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "firebase-functions": "^7.0.2",
+    "firebase-admin": "^12.7.0",
+    "googleapis": "^144.0.0",
+    "multer": "^2.0.2",
+    "openai": "^6.10.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.1.1"
+  }
+}
