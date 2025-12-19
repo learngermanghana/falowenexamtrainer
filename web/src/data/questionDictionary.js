@@ -1,52 +1,57 @@
 export const questionDictionary = [
   {
-    id: "writing-formal-email",
-    level: "A2",
-    title: "Formelle E-Mail zur Beschwerde",
+    id: "a1-day1-greetings",
+    level: "A1",
+    title: "Begrüßung und Vorstellung (Kapitel 0.1)",
     question:
-      "Du hast ein defektes Produkt erhalten. Schreibe eine formelle E-Mail an den Kundenservice und beschreibe das Problem.",
+      "Stell dich einer neuen Gruppe vor: Wie heißt du, woher kommst du und wie geht es dir? Nutze die Begrüßungsformeln aus dem Kursbuch Kapitel 0.1.",
     instructions:
-      "Nutze höfliche Einleitungen, beschreibe das Problem klar und bitte um eine Lösung. Schließe mit einem Dank und deiner Unterschrift.",
-    suggestedLink: "https://www.goethe.de/",
+      "Beginne mit einer formellen oder informellen Begrüßung, stelle dich mit Namen und Herkunft vor und frage höflich nach dem Befinden der anderen. Beziehe dich auf die Beispiele aus der Lektion 0.1.",
+    suggestedLink:
+      "https://drive.google.com/file/d/10UPl4n5FzukSDiTIlcM-WjmNuJGz9OgL/view?usp=sharing",
   },
   {
-    id: "job-interview-prep",
-    level: "B1",
-    title: "Vorbereitung auf das Vorstellungsgespräch",
+    id: "a1-day3-pronouns",
+    level: "A1",
+    title: "Pronomen im Kontext (Kapitel 1.1/1.2)",
     question:
-      "Welche Stärken bringst du in ein neues Team? Bereite dich auf ein kurzes Vorstellungsgespräch vor und beantworte die Frage.",
+      "Du übst die Personalpronomen aus den Kapiteln 1.1 und 1.2. Schreibe drei Sätze über dich und deine Familie und ersetze dabei Nomen durch passende Pronomen.",
     instructions:
-      "Nenne zwei bis drei konkrete Stärken, jeweils mit einem Beispiel. Halte die Antwort knapp (max. 5 Sätze).",
-    suggestedLink: "https://www.arbeitsagentur.de/",
+      "Nutze Beispiele aus dem Kursbuch: setze \"ich/du/er/sie/es/wir/ihr/sie/Sie\" korrekt ein und kontrolliere die Groß- und Kleinschreibung. Orientiere dich an den Selbstübungen in Schreiben & Sprechen 1.1.",
+    suggestedLink:
+      "https://drive.google.com/file/d/1OUJT9aSU1XABi3cdZlstUvfBIndyEOwb/view?usp=sharing",
   },
   {
-    id: "debate-remote-work",
-    level: "B2",
-    title: "Debatte: Homeoffice vs. Büro",
+    id: "a1-day7-price-dialogue",
+    level: "A1",
+    title: "Dialog: Nach dem Preis fragen (Kapitel 3)",
     question:
-      "Sollte dein Unternehmen dauerhaft Homeoffice erlauben? Formuliere ein Argument dafür oder dagegen.",
+      "Führe einen kurzen Dialog aus Kapitel 3 nach: Frage nach dem Preis eines Produkts und reagiere mit einer passenden Präferenz (gern/lieber/mögen).",
     instructions:
-      "Baue deine Antwort nach dem Schema These – Begründung – Beispiel – Schluss. Nutze verbindende Konnektoren.",
-    suggestedLink: "https://www.zeit.de/arbeitswelt",
+      "Schreibe mindestens vier Zeilen: Frage nach dem Preis, höre die Antwort, äußere deine Meinung mit 'gern/lieber/mögen' und schließe den Kauf ab. Nutze die Redemittel aus der Lektion und bleibe höflich.",
+    suggestedLink:
+      "https://drive.google.com/file/d/1W5GCdtp-NzSQWMz_ir7uQSKJc3F4LGPb/view?usp=sharing",
   },
   {
-    id: "cultural-tip",
-    level: "A2",
-    title: "Kultureller Tipp für neue Studierende",
+    id: "a1-day8-countries-languages",
+    level: "A1",
+    title: "Länder und Sprachen (Kapitel 4)",
     question:
-      "Welche Tradition aus deinem Heimatland sollten neue Kommiliton:innen unbedingt kennenlernen?",
+      "Beschreibe zwei Länder aus Kapitel 4: Welche Sprachen spricht man dort und wo warst du schon? Nutze 'schon mal' und 'noch nie'.",
     instructions:
-      "Beschreibe den Anlass, typische Aktivitäten und warum die Tradition wichtig ist. Maximal 8 Sätze.",
-    suggestedLink: "https://de.wikipedia.org/wiki/Kategorie:Kultur",
+      "Formuliere zwei bis drei Sätze pro Land. Verbinde die Aussagen mit einfachen Konnektoren und überprüfe die Verbposition, wie im Kursbuch gezeigt.",
+    suggestedLink:
+      "https://drive.google.com/file/d/1woXksV9sTZ_8huXa8yf6QUQ8aUXPxVug/view?usp=sharing",
   },
   {
-    id: "project-retro",
-    level: "B1",
-    title: "Projekt-Retrospektive",
+    id: "a1-day9-cases",
+    level: "A1",
+    title: "Artikel im Nominativ und Akkusativ (Kapitel 5)",
     question:
-      "Was lief in unserem letzten Kursprojekt gut und was sollten wir verbessern?",
+      "Übe die Fälle aus Kapitel 5: Schreibe drei Sätze mit bestimmten und unbestimmten Artikeln im Nominativ und Akkusativ.",
     instructions:
-      "Liste mindestens einen Erfolg und eine Sache, die wir besser machen können. Schließe mit einer konkreten nächsten Aktion.",
-    suggestedLink: "https://www.atlassian.com/retro",
+      "Nutze die Beispielsätze aus dem Kursbuch, markiere Nominativ- und Akkusativobjekte und kontrolliere die Endungen. Halte dich an die Wortschatzliste der Lektion.",
+    suggestedLink:
+      "https://drive.google.com/file/d/17y5fGW8nAbfeVgolV7tEW4BLiLXZDoO6/view?usp=sharing",
   },
 ];

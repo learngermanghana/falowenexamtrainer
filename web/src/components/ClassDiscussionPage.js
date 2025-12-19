@@ -34,6 +34,15 @@ const formatTimeRemaining = (expiresAt, now) => {
   return diff > 0 ? `${minutes}:${seconds}` : "Abgelaufen";
 };
 
+const formatDateTime = (value) => {
+  if (!value) return "Sofort";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sofort";
+  return date.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
+};
+
+const defaultStartTime = () => new Date().toISOString().slice(0, 16);
+
 const ClassDiscussionPage = () => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
@@ -54,6 +63,7 @@ const ClassDiscussionPage = () => {
     dictionaryId: "",
     extraLink: "",
     timerMinutes: 15,
+    startTime: defaultStartTime(),
   });
   const typingTimeouts = useRef({});
 
@@ -116,6 +126,9 @@ const ClassDiscussionPage = () => {
             instructions: data.instructions || "",
             extraLink: data.extraLink || "",
             timerMinutes: data.timerMinutes || 0,
+            availableAt: data.availableAt?.toMillis
+              ? data.availableAt.toMillis()
+              : data.availableAt || null,
             createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
             createdBy: data.createdBy || "Tutor",
             createdByUid: data.createdByUid || null,
@@ -266,6 +279,7 @@ const ClassDiscussionPage = () => {
     const dictionaryEntry = questionDictionary.find((item) => item.id === form.dictionaryId);
     const timerMinutes = Number(form.timerMinutes) || 0;
     const expiresAtMillis = timerMinutes ? Date.now() + timerMinutes * 60000 : null;
+    const availableAtMillis = Date.parse(form.startTime || "") || Date.now();
 
     setIsSavingThread(true);
     setError("");
@@ -283,6 +297,7 @@ const ClassDiscussionPage = () => {
         question: form.question,
         extraLink: form.extraLink,
         timerMinutes,
+        availableAt: Timestamp.fromMillis(availableAtMillis),
         createdAt: serverTimestamp(),
         createdBy: user?.email || "Tutor",
         createdByUid: user?.uid || null,
@@ -296,6 +311,7 @@ const ClassDiscussionPage = () => {
         instructions: dictionaryEntry?.instructions || "",
         extraLink: dictionaryEntry?.suggestedLink || "",
         timerMinutes,
+        startTime: defaultStartTime(),
       });
     } catch (err) {
       console.error("Failed to create discussion thread", err);
@@ -493,44 +509,60 @@ const ClassDiscussionPage = () => {
     [threads, repliesByThread]
   );
 
-  const renderThread = (thread) => (
-    <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
-        <div style={{ display: "grid", gap: 4 }}>
-          <div style={{ fontWeight: 800, fontSize: 16 }}>{thread.questionTitle || thread.topic}</div>
-          <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
-          {thread.extraLink ? (
-            <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
-              Externer Link öffnen
-            </a>
+  const renderThread = (thread) => {
+    const isActive = !thread.availableAt || now >= thread.availableAt;
+
+    return (
+      <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <div style={{ fontWeight: 800, fontSize: 16 }}>{thread.questionTitle || thread.topic}</div>
+            <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
+            {thread.extraLink ? (
+              <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
+                Externer Link öffnen
+              </a>
+            ) : null}
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <span style={styles.badge}>Frage von {thread.createdBy}</span>
+            <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>
+              Timer {formatTimeRemaining(thread.expiresAt, now)}
+            </span>
+            <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0e7490" }}>
+              Start: {formatDateTime(thread.availableAt)}
+            </span>
+            {!isActive && (
+              <span style={{ ...styles.badge, background: "#fffbeb", borderColor: "#fcd34d", color: "#92400e" }}>
+                Geplant · startet bald
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 6 }}>
+          <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
+            <strong>Frage:</strong> {thread.question}
+          </div>
+          {thread.availableAt && now < thread.availableAt ? (
+            <div style={{ ...styles.helperText, margin: 0, color: "#c2410c" }}>
+              Diese Diskussion startet am {formatDateTime(thread.availableAt)}. Antworten sind bis dahin deaktiviert.
+            </div>
+          ) : null}
+          {thread.instructions ? (
+            <div
+              style={{
+                ...styles.helperText,
+                margin: 0,
+                background: "#f8fafc",
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <strong>Anleitung:</strong> {thread.instructions}
+            </div>
           ) : null}
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={styles.badge}>Frage von {thread.createdBy}</span>
-          <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>
-            Timer {formatTimeRemaining(thread.expiresAt, now)}
-          </span>
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gap: 6 }}>
-        <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
-          <strong>Frage:</strong> {thread.question}
-        </div>
-        {thread.instructions ? (
-          <div
-            style={{
-              ...styles.helperText,
-              margin: 0,
-              background: "#f8fafc",
-              padding: 10,
-              borderRadius: 10,
-            }}
-          >
-            <strong>Anleitung:</strong> {thread.instructions}
-          </div>
-        ) : null}
-      </div>
 
       <div style={{ display: "grid", gap: 8 }}>
         <div style={{ fontWeight: 700, fontSize: 14 }}>Antworten ({thread.replies.length})</div>
@@ -593,9 +625,12 @@ const ClassDiscussionPage = () => {
             value={replyDrafts[thread.id] || ""}
             onChange={(e) => {
               setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
-              markTypingForThread(thread.id);
+              if (isActive) {
+                markTypingForThread(thread.id);
+              }
             }}
             onBlur={() => stopTypingIndicator(thread.id)}
+            disabled={!isActive}
           />
           {typingByThread[thread.id]?.length ? (
             <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
@@ -607,11 +642,11 @@ const ClassDiscussionPage = () => {
               style={{ ...styles.secondaryButton, padding: "10px 12px" }}
               type="button"
               onClick={() => handleCorrectDraft(thread.id)}
-              disabled={isCorrectingDraft[thread.id]}
+              disabled={isCorrectingDraft[thread.id] || !isActive}
             >
               {isCorrectingDraft[thread.id] ? "KI korrigiert ..." : "Mit KI korrigieren"}
             </button>
-            <button style={styles.primaryButton} onClick={() => handleReply(thread.id)}>
+            <button style={styles.primaryButton} onClick={() => handleReply(thread.id)} disabled={!isActive}>
               Antwort posten
             </button>
           </div>
@@ -622,6 +657,8 @@ const ClassDiscussionPage = () => {
       </div>
     </div>
   );
+
+  };
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -720,6 +757,19 @@ const ClassDiscussionPage = () => {
                 value={form.timerMinutes}
                 onChange={(e) => handleFormChange("timerMinutes", e.target.value)}
               />
+            </div>
+            <div style={styles.field}>
+              <label style={styles.label}>Startzeit</label>
+              <input
+                type="datetime-local"
+                style={styles.select}
+                value={form.startTime}
+                onChange={(e) => handleFormChange("startTime", e.target.value)}
+                min={defaultStartTime()}
+              />
+              <div style={{ ...styles.helperText, margin: 0 }}>
+                Wähle, wann die Frage sichtbar wird. Standard ist jetzt sofort.
+              </div>
             </div>
             <div style={styles.field}>
               <label style={styles.label}>Zusätzlicher Link (optional)</label>
