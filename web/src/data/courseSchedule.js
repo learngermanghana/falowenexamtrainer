@@ -20,7 +20,7 @@ export const courseSchedules = {
     },
     {
       day: 1,
-      topic: "Lesen & Hören 0.1",
+      topic: "Greetings",
       chapter: "0.1",
       goal: "You will learn to greet others in German, and ask about people's well-being.",
       instruction: "Watch the video, review grammar, do the workbook, submit assignment.",
@@ -35,7 +35,7 @@ export const courseSchedules = {
     },
     {
       day: 2,
-      topic: "Lesen & Hören 0.2 and 1.1 ",
+      topic: "Alphabets and Personal Pronouns ",
       chapter: "0.2_1.1",
       goal: "Understand the German alphabets, personal pronouns and verb conjugation in German.",
       instruction:
@@ -62,7 +62,7 @@ export const courseSchedules = {
     },
     {
       day: 3,
-      topic: "Schreiben & Sprechen 1.1 and Lesen & Hören 1.2",
+      topic: "Pronouns",
       chapter: "1.1_1.2",
       goal:
         "Recap what we have learned so far: be able to introduce yourself in German and know all the pronouns.",
@@ -89,7 +89,7 @@ export const courseSchedules = {
     },
     {
       day: 4,
-      topic: "Lesen & Hören 2",
+      topic: "Numbers",
       chapter: "2",
       goal: "Learn numbers from one to 10 thousand. Also know the difference between city and street",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
@@ -105,7 +105,7 @@ export const courseSchedules = {
     },
     {
       day: 5,
-      topic: "Schreiben & Sprechen 1.2 (Recap)",
+      topic: "Revision",
       chapter: "1.2",
       goal: "Consolidate your understanding of introductions.",
       instruction: "Use self-practice workbook and review answers for self-check.",
@@ -118,7 +118,7 @@ export const courseSchedules = {
     },
     {
       day: 6,
-      topic: "Schreiben & Sprechen 2.3",
+      topic: "Family and Hobbies",
       chapter: "2.3",
       goal: "Learn about family and expressing your hobby",
       assignment: false,
@@ -131,7 +131,7 @@ export const courseSchedules = {
     },
     {
       day: 7,
-      topic: "Lesen & Hören 3",
+      topic: "Asking About Prices",
       chapter: "3",
       goal: "Know how to ask for a price and also the use of mogen and gern to express your hobby",
       instruction:
@@ -148,7 +148,7 @@ export const courseSchedules = {
     },
     {
       day: 8,
-      topic: "Lesen & Hören 4",
+      topic: "Countries and Languages",
       chapter: "4",
       goal: "Learn about schon mal and noch nie, irregular verbs and all the personal pronouns",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
@@ -178,7 +178,7 @@ export const courseSchedules = {
     },
     {
       day: 10,
-      topic: "Lesen & Hören 6 and Schreiben & Sprechen 2.4",
+      topic: "Objects and Colors",
       chapter: "6",
       goal: "Understand Possessive Determiners and its usage in connection with nouns",
       instruction:
@@ -201,7 +201,7 @@ export const courseSchedules = {
     },
     {
       day: 11,
-      topic: "Lesen & Hören 7",
+      topic: "12 Hour Clock",
       chapter: "7",
       goal: "Understand the 12 hour clock system",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
@@ -215,7 +215,7 @@ export const courseSchedules = {
     },
     {
       day: 12,
-      topic: "Lesen & Hören 8",
+      topic: "24 Hour Clock",
       chapter: "8",
       goal: "Understand the 24 hour clock and date system in German",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
@@ -229,7 +229,7 @@ export const courseSchedules = {
     },
     {
       day: 13,
-      topic: "Schreiben & Sprechen 3.5",
+      topic: "Revision",
       chapter: "3.5",
       goal:
         "Recap from the lesen and horen. Understand numbers, time, asking of price and how to formulate statements in German",
@@ -244,7 +244,7 @@ export const courseSchedules = {
     },
     {
       day: 14,
-      topic: "Schreiben & Sprechen 3.6",
+      topic: "Modal Verbs",
       chapter: "3.6",
       goal: "Understand how to use modal verbs with main verbs and separable verbs",
       assignment: false,
@@ -259,7 +259,7 @@ export const courseSchedules = {
     },
     {
       day: 15,
-      topic: "Schreiben & Sprechen 4.7",
+      topic: "Introduction to Speaking Exams",
       chapter: "4.7",
       assignment: false,
       goal: "Understand imperative statements and learn how to use them in your Sprechen exams, especially in Teil 3.",
@@ -274,7 +274,7 @@ export const courseSchedules = {
     },
     {
       day: 16,
-      topic: "Lesen & Hören 9 and 10",
+      topic: "Food and Negation",
       chapter: "9_10",
       goal: "Understand how to negate statements using nicht,kein and nein",
       instruction:
@@ -301,7 +301,7 @@ export const courseSchedules = {
     },
     {
       day: 17,
-      topic: "Lesen & Hören 11",
+      topic: "Instructions",
       chapter: "11",
       goal: "Understand instructions and request in German using the Imperative rule",
       grammar_topic: "Direction",
@@ -316,7 +316,7 @@ export const courseSchedules = {
     },
     {
       day: 18,
-      topic: "Lesen & Hören 12.1 and 12.2",
+      topic: "Two Case Preposition",
       chapter: "12.1_12.2",
       goal: "Learn about German professions and how to use two-way prepositions",
       instruction:
@@ -350,7 +350,7 @@ export const courseSchedules = {
     },
     {
       day: 19,
-      topic: "Schreiben & Sprechen 5.9",
+      topic: "Verboten and Erlaubt",
       chapter: "5.9",
       goal: "Understand the difference between Erlaubt and Verboten and how to use it in the exams hall",
       instruction: "Review the workbook and do the practicals in it. Answers are attached",
@@ -378,7 +378,7 @@ export const courseSchedules = {
     },
     {
       day: 21,
-      topic: "Lesen & Hören 13",
+      topic: "Weather",
       chapter: "13",
       assignment: true,
       goal: "",
@@ -394,7 +394,7 @@ export const courseSchedules = {
     },
     {
       day: 22,
-      topic: "Lesen & Hören 14.1",
+      topic: "Health",
       chapter: "14.1",
       goal: "Understand health and talking about body parts in German",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
@@ -409,7 +409,7 @@ export const courseSchedules = {
     },
     {
       day: 23,
-      topic: "Lesen & Hören 14.2",
+      topic: "Dative Verbs and Adjective Declension",
       chapter: "14.2",
       goal: "Understand adjective declension and dative verbs",
       instruction: " This chapter has no assignment. Only grammar",
@@ -424,7 +424,7 @@ export const courseSchedules = {
     },
     {
       day: 24,
-      topic: "Schreiben & Sprechen 5.10",
+      topic: "Conjunctions",
       chapter: "5.10",
       goal: "Learn about conjunctions and how to apply them in your exams",
       instruction:
