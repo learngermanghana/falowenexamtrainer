@@ -34,6 +34,9 @@ const formatDate = (timestamp) => {
 
 const AssignmentSubmissionPage = () => {
   const { user, studentProfile } = useAuth();
+  const SUBMISSION_COLLECTION = "submissions";
+  const DRAFT_COLLECTION = "submissionDrafts";
+  const LOCK_COLLECTION = "submissionLocks";
   const preferredLevel = useMemo(
     () => (studentProfile?.level || "A1").toUpperCase(),
     [studentProfile?.level]
@@ -117,28 +120,67 @@ const AssignmentSubmissionPage = () => {
       updatedAt: serverTimestamp(),
     };
 
-    await addDoc(collection(db, "submissions"), submissionPayload);
+    const targetCollection =
+      statusLabel === "draft" ? DRAFT_COLLECTION : SUBMISSION_COLLECTION;
+
+    await addDoc(collection(db, targetCollection), submissionPayload);
+
+    if (statusLabel === "submitted") {
+      await addDoc(collection(db, LOCK_COLLECTION), {
+        studentId: user?.uid || "",
+        studentEmail: user?.email || "",
+        studentCode,
+        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+        lockedAt: serverTimestamp(),
+        assignmentTitle: form.assignmentTitle,
+      });
+    }
+
     return true;
   };
 
   useEffect(() => {
-    const loadSubmissions = async () => {
+    const loadDraftsAndSubmissions = async () => {
       if (!db || !user) return;
       setSubmissionsLoading(true);
       try {
-        const submissionsRef = collection(db, "submissions");
+        const submissionsRef = collection(db, SUBMISSION_COLLECTION);
         const constraints = [
           where("studentId", "==", user.uid),
           orderBy("createdAt", "desc"),
           limit(10),
         ];
-        const snapshot = await getDocs(query(submissionsRef, ...constraints));
-        const entries = snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const submissionSnapshot = await getDocs(query(submissionsRef, ...constraints));
+        const entries = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
         setRecentSubmissions(entries);
         if (entries.length > 0) {
           setConfirmationLocked(true);
           setHasSubmitted(true);
           setForm((prev) => ({ ...prev, confirmed: true }));
+        }
+
+        const lockRef = collection(db, LOCK_COLLECTION);
+        const lockSnapshot = await getDocs(
+          query(lockRef, where("studentId", "==", user.uid), orderBy("lockedAt", "desc"), limit(1))
+        );
+        if (!lockSnapshot.empty) {
+          setConfirmationLocked(true);
+          setHasSubmitted(true);
+          setForm((prev) => ({ ...prev, confirmed: true }));
+        }
+
+        const draftsRef = collection(db, DRAFT_COLLECTION);
+        const draftSnapshot = await getDocs(
+          query(draftsRef, where("studentId", "==", user.uid), orderBy("updatedAt", "desc"), limit(1))
+        );
+        if (!draftSnapshot.empty) {
+          const latestDraft = draftSnapshot.docs[0].data();
+          setForm((prev) => ({
+            ...prev,
+            assignmentTitle: latestDraft.assignmentTitle || prev.assignmentTitle,
+            submissionText: latestDraft.submissionText || "",
+            confirmed: false,
+          }));
         }
       } catch (error) {
         console.error("Failed to load submissions", error);
@@ -151,7 +193,7 @@ const AssignmentSubmissionPage = () => {
       }
     };
 
-    loadSubmissions();
+    loadDraftsAndSubmissions();
   }, [user]);
 
   const handleChange = (field) => (event) => {
@@ -185,7 +227,7 @@ const AssignmentSubmissionPage = () => {
       setHasSubmitted(true);
 
       if (user) {
-        const submissionsRef = collection(db, "submissions");
+        const submissionsRef = collection(db, SUBMISSION_COLLECTION);
         const snapshot = await getDocs(
           query(
             submissionsRef,
