@@ -1,21 +1,33 @@
 const { getSheetsClient } = require("./googleSheetsClient");
 
+// Make headers robust: "Student Code", "student_code", "StudentCode" -> "studentcode"
 function normalizeHeader(h) {
-  return String(h || "").trim().toLowerCase();
+  return String(h || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
 }
 
 const normalizeValue = (value) => String(value || "").trim().toLowerCase();
 
 async function getScoresForStudent({ studentCode, email, level } = {}) {
-  const SHEET_ID = process.env.SHEETS_SCORES_ID;
-  const TAB = process.env.SHEETS_SCORES_TAB || "scores_backup";
-  if (!SHEET_ID) throw new Error("Missing env SHEETS_SCORES_ID");
+  // ✅ support both naming styles
+  const SHEET_ID =
+    process.env.SCORES_SHEET_ID ||
+    process.env.SHEETS_SCORES_ID;
+
+  const TAB =
+    process.env.SCORES_SHEET_TAB ||
+    process.env.SHEETS_SCORES_TAB ||
+    "scores_backup";
+
+  if (!SHEET_ID) throw new Error("Missing env SCORES_SHEET_ID (or SHEETS_SCORES_ID)");
 
   const sheets = await getSheetsClient();
 
   const resp = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${TAB}!A:Z`
+    range: `${TAB}!A:Z`,
   });
 
   const values = resp.data.values || [];
@@ -34,19 +46,22 @@ async function getScoresForStudent({ studentCode, email, level } = {}) {
   const idxLink = header.indexOf("link");
   const idxEmail = header.indexOf("email");
 
-  if (idxStudentCode === -1) throw new Error("Scores sheet missing 'studentcode' column");
+  if (idxStudentCode === -1) {
+    throw new Error("Scores sheet missing a 'studentcode' column (try header StudentCode / Student Code / studentcode)");
+  }
 
   const targetCode = normalizeValue(studentCode);
   const targetEmail = normalizeValue(email);
   const targetLevel = normalizeValue(level);
 
   const out = [];
-  for (let i = 0; i < rows.length; i++) {
-    const r = rows[i];
+  for (const r of rows) {
     const sc = normalizeValue(r[idxStudentCode]);
     if (targetCode && sc !== targetCode) continue;
+
     const rowEmail = idxEmail !== -1 ? normalizeValue(r[idxEmail]) : "";
     if (targetEmail && (!rowEmail || rowEmail !== targetEmail)) continue;
+
     const rowLevel = idxLevel !== -1 ? normalizeValue(r[idxLevel]) : "";
     if (targetLevel && targetLevel !== "all" && rowLevel !== targetLevel) continue;
 
@@ -59,7 +74,7 @@ async function getScoresForStudent({ studentCode, email, level } = {}) {
       comments: idxComments !== -1 ? (r[idxComments] || "") : "",
       date: idxDate !== -1 ? (r[idxDate] || "") : "",
       level: idxLevel !== -1 ? (r[idxLevel] || "") : "",
-      link: idxLink !== -1 ? (r[idxLink] || "") : ""
+      link: idxLink !== -1 ? (r[idxLink] || "") : "",
     });
   }
 
