@@ -10,29 +10,11 @@ const bcrypt = require("bcryptjs");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { getSheetsClient, getServiceAccountEmail } = require("./googleSheetsClient");
-
-let getScoresForStudent;
+const { getScoresByStudentCode } = require("./scoresSheet");
+const { getStudentCodeByEmail } = require("./studentsLookup");
 
 if (!admin.apps.length) {
   admin.initializeApp();
-}
-
-function loadScoresModule() {
-  if (getScoresForStudent) return getScoresForStudent;
-
-  try {
-    // Lazily require so the function can still start if the file is missing in a build/deploy artefact.
-    const mod = require("./scoresSheet.js");
-    if (typeof mod.getScoresForStudent !== "function") {
-      throw new Error("scoresSheet.getScoresForStudent is not a function");
-    }
-
-    getScoresForStudent = mod.getScoresForStudent;
-    return getScoresForStudent;
-  } catch (err) {
-    console.error("Failed to load scoresSheet module", err);
-    throw err;
-  }
 }
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
@@ -394,14 +376,21 @@ app.get("/scores", async (req, res) => {
   try {
     const studentCode = String(req.query.studentCode || "").trim();
     const email = String(req.query.email || "").trim();
-    const level = String(req.query.level || "").trim();
-    if (!studentCode) return res.status(400).json({ error: "studentCode is required" });
 
-    const rows = await loadScoresModule()({ studentCode, email, level });
-    return res.json({ studentCode, email, level, rows });
+    let code = studentCode;
+    if (!code && email) {
+      code = await getStudentCodeByEmail(email);
+    }
+
+    if (!code) {
+      return res.status(400).json({ ok: false, error: "Provide studentCode or email" });
+    }
+
+    const rows = await getScoresByStudentCode(code);
+    return res.json({ ok: true, studentCode: code, rows });
   } catch (e) {
     console.error(e);
-    return res.status(500).json({ error: "Failed to fetch scores" });
+    return res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
 });
 
