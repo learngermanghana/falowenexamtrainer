@@ -3,10 +3,10 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 
 const SUBSCRIPTION_FEATURES = [
-  "Unbegrenzte Prüfungs-Simulationen für Sprechen & Schreiben",
-  "Feedback-Exports für Lehrkräfte",
-  "From-my-mistakes Vokabel-Decks",
-  "Push-Reminder für tägliche Drills",
+  "Unlimited exam simulations for speaking & writing",
+  "Feedback exports for instructors",
+  "From-my-mistakes vocabulary decks",
+  "Push reminders for daily drills",
 ];
 
 const formatDate = (value) => {
@@ -25,7 +25,7 @@ const AccountSettings = () => {
   const [profile, setProfile] = useState({
     name: "",
     email: "",
-    goal: "B2 bestehen",
+    goal: "Pass B2",
     timezone: "Europe/Berlin",
     reminder: "push+email",
   });
@@ -42,11 +42,11 @@ const AccountSettings = () => {
 
   const subscription = useMemo(
     () => ({
-      plan: studentProfile?.paymentStatus === "paid" ? "6-Monatsvertrag" : "1-Monats-Starter",
+      plan: studentProfile?.paymentStatus === "paid" ? "6-month contract" : "1-month starter",
       renewalDate: formatDate(studentProfile?.contractEnd),
-      status: studentProfile?.paymentStatus === "paid" ? "Aktiv" : "Ausstehend",
+      status: studentProfile?.paymentStatus === "paid" ? "Active" : "Pending",
       seats: 1,
-      paymentMethod: studentProfile?.paystackLink ? "Paystack" : "Unbekannt",
+      paymentMethod: studentProfile?.paystackLink ? "Paystack" : "Unknown",
       invoiceEmail: profile.email || user?.email || "",
     }),
     [profile.email, studentProfile?.contractEnd, studentProfile?.paystackLink, studentProfile?.paymentStatus, user?.email]
@@ -64,7 +64,7 @@ const AccountSettings = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setStatus("Änderungen gespeichert (lokal)");
+    setStatus("Changes saved (local only)");
   };
 
   if (!studentProfile) {
@@ -89,12 +89,11 @@ const AccountSettings = () => {
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Kontoübersicht</h2>
-          <span style={styles.levelPill}>{studentProfile.className || "Kein Kurs"}</span>
+          <h2 style={styles.sectionTitle}>Account overview</h2>
+          <span style={styles.levelPill}>{studentProfile.className || "No course"}</span>
         </div>
         <p style={styles.helperText}>
-          Hier findest du deine Stammdaten, Vertragsstatus und den letzten Datenabgleich zwischen Campus und
-          Prüfungscoach.
+          Here you can review your basic details, contract status, and the last sync between campus and Exam Coach.
         </p>
 
         <div
@@ -106,34 +105,34 @@ const AccountSettings = () => {
         >
           <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
             <div style={styles.metaRow}>
-              <span>Studenten-Code</span>
+              <span>Student code</span>
               <span style={styles.badge}>{studentProfile.status || "–"}</span>
             </div>
             <strong style={{ fontSize: 20 }}>{studentProfile.studentCode}</strong>
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>Eindeutige Kennung für Support & Rechnungen.</p>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>Unique identifier for support & invoices.</p>
           </div>
 
           <div style={{ ...styles.card, margin: 0, background: "#fef3c7", border: "1px solid #f59e0b" }}>
             <div style={styles.metaRow}>
-              <span>Stufe & Kurs</span>
+              <span>Level & course</span>
               <span style={styles.badge}>{studentProfile.level || "–"}</span>
             </div>
             <strong style={{ fontSize: 16 }}>
-              Vertrag: {subscription.plan} · Start {formatDate(studentProfile.contractStart)}
+              Plan: {subscription.plan} · Start {formatDate(studentProfile.contractStart)}
             </strong>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Läuft bis {formatDate(studentProfile.contractEnd)}. Änderungen an Vereinbarungen werden hier gespiegelt.
+              Runs until {formatDate(studentProfile.contractEnd)}. Agreement updates will be shown here.
             </p>
           </div>
 
           <div style={{ ...styles.card, margin: 0, background: "#ecfdf3", border: "1px solid #34d399" }}>
             <div style={styles.metaRow}>
-              <span>Kontakt</span>
-              <span style={styles.badge}>aktuell</span>
+              <span>Contact</span>
+              <span style={styles.badge}>current</span>
             </div>
-            <strong style={{ fontSize: 16 }}>{studentProfile.phone || "(keine Nummer)"}</strong>
+            <strong style={{ fontSize: 16 }}>{studentProfile.phone || "(no number)"}</strong>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Standort: {studentProfile.location || "(unbekannt)"} · Notfallkontakt: {studentProfile.emergencyContactPhone || "–"}
+              Location: {studentProfile.location || "(unknown)"} · Emergency contact: {studentProfile.emergencyContactPhone || "–"}
             </p>
           </div>
         </div>
@@ -141,19 +140,18 @@ const AccountSettings = () => {
 
       <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Kontoeinstellungen</h2>
-          <span style={styles.badge}>Profil &amp; Kommunikation</span>
+          <h2 style={styles.sectionTitle}>Account settings</h2>
+          <span style={styles.badge}>Profile &amp; communication</span>
         </div>
         <p style={styles.helperText}>
-          Aktualisiere deinen Anzeigenamen und deine Kontaktpräferenzen. Änderungen werden aktuell nur lokal
-          gespeichert.
+          Update your display name and contact preferences. Changes are currently saved locally only.
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 10 }}>
           <div style={styles.row}>
             <div style={styles.field}>
               <label style={styles.label} htmlFor="name">
-                Anzeigename
+                Display name
               </label>
               <input
                 id="name"
@@ -161,12 +159,12 @@ const AccountSettings = () => {
                 value={profile.name}
                 onChange={handleChange("name")}
                 style={{ ...styles.select, padding: "10px 12px" }}
-                placeholder="z. B. Alex Müller"
+                placeholder="e.g., Alex Miller"
               />
             </div>
             <div style={styles.field}>
               <label style={styles.label} htmlFor="email">
-                Login-E-Mail
+                Login email
               </label>
               <input
                 id="email"
@@ -174,7 +172,7 @@ const AccountSettings = () => {
                 value={profile.email}
                 onChange={handleChange("email")}
                 style={{ ...styles.select, padding: "10px 12px" }}
-                placeholder="name@email.de"
+                placeholder="name@email.com"
               />
             </div>
           </div>
@@ -182,7 +180,7 @@ const AccountSettings = () => {
           <div style={styles.row}>
             <div style={styles.field}>
               <label style={styles.label} htmlFor="goal">
-                Lernziel
+                Learning goal
               </label>
               <input
                 id="goal"
@@ -190,12 +188,12 @@ const AccountSettings = () => {
                 value={profile.goal}
                 onChange={handleChange("goal")}
                 style={{ ...styles.select, padding: "10px 12px" }}
-                placeholder="z. B. B1 bestehen"
+                placeholder="e.g., pass B1"
               />
             </div>
             <div style={styles.field}>
               <label style={styles.label} htmlFor="timezone">
-                Zeitzone für Erinnerungen
+                Time zone for reminders
               </label>
               <select
                 id="timezone"
@@ -213,7 +211,7 @@ const AccountSettings = () => {
 
           <div style={styles.field}>
             <label style={styles.label} htmlFor="reminder">
-              Benachrichtigungen
+              Notifications
             </label>
             <select
               id="reminder"
@@ -221,19 +219,19 @@ const AccountSettings = () => {
               onChange={handleChange("reminder")}
               style={styles.select}
             >
-              <option value="push+email">Push &amp; E-Mail</option>
-              <option value="push">Nur Push</option>
-              <option value="email">Nur E-Mail</option>
-              <option value="none">Keine Erinnerungen</option>
+              <option value="push+email">Push &amp; email</option>
+              <option value="push">Push only</option>
+              <option value="email">Email only</option>
+              <option value="none">No reminders</option>
             </select>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Push wird über die Schaltfläche oben rechts aktiviert. E-Mail-Erinnerungen folgen automatisch.
+              Enable push using the button in the top right. Email reminders follow automatically.
             </p>
           </div>
 
           <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
             <button type="submit" style={styles.primaryButton}>
-              Änderungen speichern
+              Save changes
             </button>
           </div>
 
@@ -247,13 +245,13 @@ const AccountSettings = () => {
 
       <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Abo &amp; Rechnungen</h2>
+          <h2 style={styles.sectionTitle}>Subscription &amp; billing</h2>
           <span style={styles.levelPill}>{subscription.status}</span>
         </div>
         <p style={styles.helperText}>
-          Deine aktuelle Stufe bleibt bis zur nächsten Verlängerung aktiv. Rechnungs-E-Mails gehen an
+          Your current level stays active until the next renewal. Invoice emails go to
           {" "}
-          <strong>{subscription.invoiceEmail || "deine Adresse"}</strong>.
+          <strong>{subscription.invoiceEmail || "your address"}</strong>.
         </p>
 
         <div style={styles.gridTwo}>
@@ -269,39 +267,39 @@ const AccountSettings = () => {
             </ul>
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
               <button style={styles.secondaryButton} type="button">
-                Tarif wechseln
+                Change plan
               </button>
               <a
                 href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
                 style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}
               >
-                Paystack öffnen
+                Open Paystack
               </a>
             </div>
           </div>
 
           <div style={{ ...styles.card, margin: 0 }}>
-            <h3 style={{ margin: "0 0 8px 0" }}>Zahlung &amp; Termine</h3>
+            <h3 style={{ margin: "0 0 8px 0" }}>Payments &amp; dates</h3>
             <div style={{ display: "grid", gap: 8 }}>
               <div style={styles.metaRow}>
-                <span>Nächste Verlängerung</span>
+                <span>Next renewal</span>
                 <strong>{subscription.renewalDate}</strong>
               </div>
               <div style={styles.metaRow}>
-                <span>Zahlungsstatus</span>
-                <strong>{studentProfile.paymentStatus || "ausstehend"}</strong>
+                <span>Payment status</span>
+                <strong>{studentProfile.paymentStatus || "pending"}</strong>
               </div>
               <div style={styles.metaRow}>
-                <span>Offener Betrag</span>
+                <span>Balance due</span>
                 <strong>{balanceDue === null ? "–" : `₦${balanceDue}`}</strong>
               </div>
               <div style={styles.metaRow}>
-                <span>Bisher gezahlt</span>
+                <span>Paid so far</span>
                 <strong>{paidAmount === null ? "–" : `₦${paidAmount}`}</strong>
               </div>
               <div style={styles.metaRow}>
-                <span>Konto-E-Mail</span>
-                <strong>{subscription.invoiceEmail || "(bitte ergänzen)"}</strong>
+                <span>Billing email</span>
+                <strong>{subscription.invoiceEmail || "(please add)"}</strong>
               </div>
             </div>
           </div>
@@ -310,12 +308,11 @@ const AccountSettings = () => {
 
       <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Vertrag &amp; Zustimmung</h2>
-          <span style={styles.badge}>{studentProfile.contractTermMonths ? `${studentProfile.contractTermMonths} Monate` : "–"}</span>
+          <h2 style={styles.sectionTitle}>Contract &amp; consent</h2>
+          <span style={styles.badge}>{studentProfile.contractTermMonths ? `${studentProfile.contractTermMonths} months` : "–"}</span>
         </div>
         <p style={styles.helperText}>
-          Prüfe, was du unterschrieben hast. Hier liegen die wichtigsten Vereinbarungen, Datenschutz-Hinweise und
-          Einverständnisse.
+          Review what you signed. Here you'll find key agreements, privacy notes, and consents.
         </p>
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
           <div style={{ ...styles.card, margin: 0, background: "#f0f9ff", border: "1px solid #bae6fd" }}>
@@ -324,45 +321,44 @@ const AccountSettings = () => {
               <span style={styles.levelPill}>{subscription.status}</span>
             </div>
             <strong style={{ fontSize: 16 }}>
-              Vertrag {subscription.plan} · Start {formatDate(studentProfile.contractStart)}
+              Contract {subscription.plan} · Start {formatDate(studentProfile.contractStart)}
             </strong>
             <ul style={{ ...styles.checklist, marginTop: 10 }}>
-              <li>Endet am {formatDate(studentProfile.contractEnd)}</li>
-              <li>Datenschutzerklärung bestätigt</li>
-              <li>Widerruf jederzeit per Support möglich</li>
+              <li>Ends on {formatDate(studentProfile.contractEnd)}</li>
+              <li>Privacy policy accepted</li>
+              <li>Cancellation possible anytime via support</li>
             </ul>
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
               <a
                 href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
                 style={{ ...styles.secondaryButton, textDecoration: "none" }}
               >
-                Paystack öffnen
+                Open Paystack
               </a>
               <button style={styles.secondaryButton} type="button">
-                PDF herunterladen
+                Download PDF
               </button>
             </div>
           </div>
 
           <div style={{ ...styles.card, margin: 0 }}>
-            <h3 style={{ margin: "0 0 8px 0" }}>Einverständnisse</h3>
+            <h3 style={{ margin: "0 0 8px 0" }}>Consents</h3>
             <div style={{ display: "grid", gap: 8 }}>
               <div style={styles.metaRow}>
-                <span>Benachrichtigungen</span>
-                <strong>{profile.reminder === "none" ? "deaktiviert" : "aktiv"}</strong>
+                <span>Notifications</span>
+                <strong>{profile.reminder === "none" ? "disabled" : "active"}</strong>
               </div>
               <div style={styles.metaRow}>
-                <span>Datenweitergabe an Coach</span>
-                <strong>erlaubt</strong>
+                <span>Data sharing with coach</span>
+                <strong>allowed</strong>
               </div>
               <div style={styles.metaRow}>
-                <span>Eltern/Träger informiert</span>
-                <strong>per E-Mail bestätigt</strong>
+                <span>Parents/sponsor informed</span>
+                <strong>confirmed via email</strong>
               </div>
             </div>
             <p style={{ ...styles.helperText, margin: "10px 0 0" }}>
-              Wenn sich etwas ändert, informiere uns bitte rechtzeitig – wir aktualisieren Vertrag, Rechnungen und
-              Erinnerungen automatisch.
+              If anything changes, please tell us promptly—we'll update contract, invoices, and reminders automatically.
             </p>
           </div>
         </div>
