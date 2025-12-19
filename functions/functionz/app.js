@@ -7,6 +7,7 @@ const path = require("path");
 const os = require("os");
 const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
+const { z } = require("zod");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { getSheetsClient, getServiceAccountEmail } = require("./googleSheetsClient");
@@ -51,6 +52,31 @@ const getCache = (key) => {
   if (!entry) return null;
   if (entry.expiresAt > Date.now()) return entry.data;
   return null;
+};
+
+const isProduction = process.env.NODE_ENV === "production";
+
+const createHttpError = (status, message) => {
+  const err = new Error(message);
+  err.status = status;
+  return err;
+};
+
+const formatZodIssues = (issues = []) =>
+  issues
+    .map((issue) => issue.message)
+    .filter(Boolean)
+    .join("; ") || "Invalid request body";
+
+const validateBody = (schema) => (req, _res, next) => {
+  const result = schema.safeParse(req.body);
+
+  if (!result.success) {
+    return next(createHttpError(400, formatZodIssues(result.error.issues)));
+  }
+
+  req.validatedBody = result.data;
+  return next();
 };
 
 app.get("/vocab", async (_req, res) => {
@@ -117,6 +143,31 @@ app.get("/sheets/diagnose", async (req, res) => {
   } catch (e) {
     res.status(500).json({ ok: false, error: e?.message || String(e) });
   }
+});
+
+const legacyLoginSchema = z
+  .object({
+    email: z.string().trim().email().optional(),
+    studentCode: z.string().trim().min(1, "studentCode is required when email is missing").optional(),
+    password: z.string().min(1, "password is required"),
+  })
+  .refine((data) => data.email || data.studentCode, {
+    message: "email or studentCode with password is required",
+    path: ["email"],
+  });
+
+const placementSchema = z.object({
+  answers: z.array(z.unknown()).nonempty("At least one answer is required"),
+  targetLevel: z.string().trim().optional(),
+  userId: z.string().trim().default("guest"),
+});
+
+const speakingTextSchema = z.object({
+  text: z.string().trim().min(1, "Transcript text is required"),
+  teil: z.string().optional(),
+  level: z.string().trim().default("A2"),
+  targetLevel: z.string().trim().optional(),
+  userId: z.string().trim().default("guest"),
 });
 
 const writeTempFile = async (file) => {
@@ -305,16 +356,11 @@ app.get("/student", async (req, res) => {
   }
 });
 
-app.post("/legacy/login", async (req, res) => {
+app.post("/legacy/login", validateBody(legacyLoginSchema), async (req, res, next) => {
   try {
-    const { email, password, studentCode } = req.body || {};
-    const normalizedEmail = String(email || "").trim().toLowerCase();
-    const providedPassword = typeof password === "string" ? password : "";
-    const normalizedStudentCode = String(studentCode || "").trim();
-
-    if (!providedPassword || (!normalizedEmail && !normalizedStudentCode)) {
-      return res.status(400).json({ error: "email or studentCode with password is required" });
-    }
+    const { email, password, studentCode } = req.validatedBody;
+    const normalizedEmail = (email || "").toLowerCase();
+    const normalizedStudentCode = studentCode || "";
 
     let snapshot;
 
@@ -333,19 +379,19 @@ app.post("/legacy/login", async (req, res) => {
     }
 
     if (!snapshot || !snapshot.exists) {
-      return res.status(404).json({ error: "Student not found" });
+      return next(createHttpError(404, "Student not found"));
     }
 
     const student = snapshot.data() || {};
     const hashedPassword = student.password;
 
     if (!hashedPassword) {
-      return res.status(400).json({ error: "Account has no password; please contact support." });
+      return next(createHttpError(400, "Account has no password; please contact support."));
     }
 
-    const isValid = await bcrypt.compare(providedPassword, hashedPassword);
+    const isValid = await bcrypt.compare(password, hashedPassword);
     if (!isValid) {
-      return res.status(401).json({ error: "Invalid credentials" });
+      return next(createHttpError(401, "Invalid credentials"));
     }
 
     const { password: _hiddenPassword, ...studentSafe } = student;
@@ -353,7 +399,7 @@ app.post("/legacy/login", async (req, res) => {
     return res.json({ id: snapshot.id, ...studentSafe });
   } catch (e) {
     console.error("/legacy/login error", e);
-    return res.status(500).json({ error: "Failed to authenticate student" });
+    return next(createHttpError(500, "Failed to authenticate student"));
   }
 });
 
@@ -418,17 +464,13 @@ app.post("/speaking/analyze", speakingUpload.single("audio"), async (req, res) =
   }
 });
 
-app.post("/speaking/analyze-text", async (req, res) => {
+app.post("/speaking/analyze-text", validateBody(speakingTextSchema), async (req, res, next) => {
   try {
-    const { text, teil, level = "A2", targetLevel, userId = "guest" } = req.body || {};
-
-    if (!text || !String(text).trim()) {
-      return res.status(400).json({ error: "Transcript text is required" });
-    }
+    const { text, teil, level, targetLevel, userId } = req.validatedBody;
 
     const messages = [
       { role: "system", content: speakingPrompt({ teil, level: targetLevel || level }) },
-      { role: "user", content: `User ${userId} transcript: ${String(text).trim()}` },
+      { role: "user", content: `User ${userId} transcript: ${text}` },
     ];
 
     const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 500 });
@@ -436,7 +478,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
     return res.json({ feedback });
   } catch (err) {
     console.error("/speaking/analyze-text error", err);
-    return res.status(500).json({ error: err.message || "Failed to analyze text" });
+    return next(createHttpError(500, err.message || "Failed to analyze text"));
   }
 });
 
@@ -483,13 +525,9 @@ app.post("/speaking/interaction-score", speakingUpload.single("audio"), async (r
   }
 });
 
-app.post("/tutor/placement", async (req, res) => {
+app.post("/tutor/placement", validateBody(placementSchema), async (req, res, next) => {
   try {
-    const { answers = [], targetLevel, userId = "guest" } = req.body || {};
-
-    if (!Array.isArray(answers) || answers.length === 0) {
-      return res.status(400).json({ error: "At least one answer is required" });
-    }
+    const { answers, targetLevel, userId } = req.validatedBody;
 
     const messages = [
       { role: "system", content: placementPrompt({ answers, targetLevel }) },
@@ -514,7 +552,7 @@ app.post("/tutor/placement", async (req, res) => {
     return res.json({ placement });
   } catch (err) {
     console.error("/tutor/placement error", err);
-    return res.status(500).json({ error: err.message || "Failed to run placement" });
+    return next(createHttpError(500, err.message || "Failed to run placement"));
   }
 });
 
@@ -557,11 +595,24 @@ app.get("/tutor/next-task", async (req, res) => {
 app.use((err, _req, res, next) => {
   if (err && err.name === "MulterError") {
     if (err.code === "LIMIT_FILE_SIZE") {
-      return res.status(413).json({ error: "Audio file too large" });
+      return res.status(413).json({ ok: false, error: "Audio file too large" });
     }
-    return res.status(400).json({ error: err.message });
+    return res.status(400).json({ ok: false, error: err.message });
   }
   return next(err);
+});
+
+app.use((err, _req, res, _next) => {
+  const status = err?.status || 500;
+  const message = err?.message || "Internal Server Error";
+
+  const payload = { ok: false, error: message };
+  if (!isProduction && err?.stack) {
+    payload.stack = err.stack;
+  }
+
+  if (res.headersSent) return;
+  return res.status(status).json(payload);
 });
 
 module.exports = app;
