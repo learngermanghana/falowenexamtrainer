@@ -7,6 +7,7 @@ import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
+import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
@@ -98,6 +99,12 @@ function App() {
               Course Book
             </button>
             <button
+              style={activeSection === "grammar" ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActiveSection("grammar")}
+            >
+              Ask Grammar Question
+            </button>
+            <button
               style={activeSection === "discussion" ? styles.navButtonActive : styles.navButton}
               onClick={() => setActiveSection("discussion")}
             >
@@ -112,6 +119,7 @@ function App() {
           </div>
 
           {activeSection === "course" ? <CourseTab /> : null}
+          {activeSection === "grammar" ? <GrammarQuestionTab /> : null}
           {activeSection === "submit" ? <AssignmentSubmissionPage /> : null}
           {activeSection === "discussion" ? <ClassDiscussionPage /> : null}
           {activeSection === "account" ? <AccountSettings /> : null}
