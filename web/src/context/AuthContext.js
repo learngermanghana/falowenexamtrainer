@@ -59,9 +59,20 @@ const fetchStudentProfileByUid = async (uid) => {
     return null;
   }
 
+  const canonicalClassName =
+    mappingData?.className ||
+    mappingData?.class_board ||
+    legacyData?.className ||
+    legacyData?.class_board ||
+    "";
+
+  const legacyClassBoard = mappingData?.class_board || legacyData?.class_board || null;
+
   return {
     ...(legacyData || {}),
     ...(mappingData || {}),
+    className: canonicalClassName,
+    class_board: legacyClassBoard || canonicalClassName || undefined,
     id: derivedStudentCode || mappingData?.id || null,
     mappingId: mappingData?.id || uid,
     studentcode: derivedStudentCode,
@@ -88,11 +99,13 @@ export const AuthProvider = ({ children }) => {
     );
 
     try {
-      await setDoc(
-        mappingRef,
-        { className, updated_at: serverTimestamp() },
-        { merge: true }
-      );
+      const payload = { className, class_board: className, updated_at: serverTimestamp() };
+      await setDoc(mappingRef, payload, { merge: true });
+
+      if (studentProfile?.studentcode) {
+        const legacyRef = doc(db, ...firestoreCollections.studentDoc(studentProfile.studentcode));
+        await setDoc(legacyRef, { class_board: className }, { merge: true });
+      }
     } catch (error) {
       if (error?.code === "permission-denied") {
         console.warn("Missing Firestore permissions to persist className", error);
@@ -103,7 +116,9 @@ export const AuthProvider = ({ children }) => {
     }
 
     setStudentProfile((prev) =>
-      prev?.mappingId === mappingRef.id ? { ...prev, className } : prev
+      prev?.mappingId === mappingRef.id
+        ? { ...prev, className, class_board: className }
+        : prev
     );
 
     return { ok: true };
@@ -189,10 +204,12 @@ export const AuthProvider = ({ children }) => {
 
     const legacyStudentCode = legacyStudentKey(profile) || profile.studentCode || "";
     const mappingRef = doc(db, ...firestoreCollections.studentMappingDoc(credential.user.uid));
+    const className = profile.className || "";
     const payload = {
       email: email.toLowerCase(),
       level: (profile.level || "").toUpperCase(),
-      className: profile.className || "",
+      className,
+      class_board: className,
       studentcode: legacyStudentCode,
       joined_at: serverTimestamp(),
       updated_at: serverTimestamp(),
