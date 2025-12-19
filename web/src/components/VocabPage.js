@@ -29,6 +29,7 @@ const VocabPage = ({
   contextLabel = "Gemeinsamer Trainer",
 }) => {
   const [entries, setEntries] = useState([]);
+  const [meta, setMeta] = useState({ source: "", count: 0, dictionaryPath: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("all");
@@ -41,9 +42,16 @@ const VocabPage = ({
       setError("");
 
       try {
-        const data = await fetchVocabEntries();
+        const response = await fetchVocabEntries();
         if (!isMounted) return;
-        setEntries(data);
+
+        if (Array.isArray(response)) {
+          setEntries(response);
+          setMeta((prev) => ({ ...prev, count: response.length }));
+        } else {
+          setEntries(response.entries || []);
+          setMeta(response.meta || { source: "", count: 0, dictionaryPath: "" });
+        }
       } catch (err) {
         console.error(err);
         if (isMounted) {
@@ -123,6 +131,11 @@ const VocabPage = ({
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
               <span style={styles.badge}>Geteilt mit Prüfungsraum</span>
+              {meta.count ? <span style={styles.badge}>{meta.count} Einträge</span> : null}
+              {meta.source ? <span style={styles.badge}>Quelle: {meta.source}</span> : null}
+              {meta.dictionaryPath ? (
+                <span style={{ ...styles.badge, whiteSpace: "nowrap" }}>Pfad: {meta.dictionaryPath}</span>
+              ) : null}
               <span style={styles.badge}>Fortschritt: {completionRate}%</span>
             </div>
           </div>

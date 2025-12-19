@@ -37,7 +37,7 @@ export async function fetchVocabEntries() {
   const payload = await res.json();
   const rows = Array.isArray(payload) ? payload : Array.isArray(payload?.rows) ? payload.rows : [];
 
-  return rows.map((row, index) => {
+  const entries = rows.map((row, index) => {
     const level = toText(row.level);
     const german = toText(row.german);
     const english = toText(row.english);
@@ -53,6 +53,15 @@ export async function fetchVocabEntries() {
       audioSlow: toText(row.audio_slow),
     };
   });
+
+  return {
+    entries,
+    meta: {
+      source: payload?.source || "",
+      count: typeof payload?.count === "number" ? payload.count : entries.length,
+      dictionaryPath: payload?.dictionaryPath || "",
+    },
+  };
 }
 
 export const fetchExamPrompts = async () => {

@@ -12,6 +12,7 @@ const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { getSheetsClient, getServiceAccountEmail } = require("./googleSheetsClient");
 const { getScoresByStudentCode } = require("./scoresSheet");
 const { getStudentCodeByEmail } = require("./studentsLookup");
+const { VOCAB_ENTRIES } = require("./vocab");
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -54,24 +55,16 @@ const getCache = (key) => {
 
 app.get("/vocab", async (_req, res) => {
   try {
-    const spreadsheetId = process.env.SHEETS_VOCAB_ID;
-    const tab = process.env.SHEETS_VOCAB_TAB || "Sheet1";
-
-    if (!spreadsheetId) {
-      return res.status(500).json({ error: "Missing SHEETS_VOCAB_ID env" });
-    }
-
     const cached = getCache("vocab");
     if (cached) return res.json(cached);
 
-    const sheets = await getSheetsClient();
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${tab}!A:Z`,
-    });
-
-    const rows = mapSheetRows(response.data.values || []);
-    const payload = { rows };
+    const rows = mapVocabRows(VOCAB_ENTRIES);
+    const payload = {
+      rows,
+      source: "static-dictionary",
+      dictionaryPath: "functions/functionz/vocab.js",
+      count: rows.length,
+    };
     setCache("vocab", payload);
     return res.json(payload);
   } catch (err) {
@@ -102,14 +95,18 @@ app.get("/sheets/diagnose", async (req, res) => {
 
     const sheets = await getSheetsClient();
 
-    const checks = [
-      { name: "vocab", id: process.env.SHEETS_VOCAB_ID, tab: process.env.SHEETS_VOCAB_TAB || "Sheet1" },
-      { name: "students", id: process.env.STUDENTS_SHEET_ID, tab: process.env.STUDENTS_SHEET_TAB || "students" },
-    ];
-
     const results = {
       exams: { ok: true, source: "static-dictionary", rows: EXAM_PROMPTS.length },
+      vocab: {
+        ok: true,
+        source: "static-dictionary",
+        rows: VOCAB_ENTRIES.length,
+        dictionaryPath: "functions/functionz/vocab.js",
+      },
     };
+    const checks = [
+      { name: "students", id: process.env.STUDENTS_SHEET_ID, tab: process.env.STUDENTS_SHEET_TAB || "students" },
+    ];
     for (const c of checks) {
       if (!c.id || !c.tab) {
         results[c.name] = { ok: false, error: "Missing sheet id/tab env" };
@@ -166,6 +163,16 @@ const normalizeHeaderKey = (header, index) => {
   if (normalized) return normalized;
   return `col_${index}`;
 };
+
+const mapVocabRows = (rows = []) =>
+  rows.map((row, index) => ({
+    id: row.id || `vocab-${index + 1}-${row.german || row.english || row.level || "entry"}`,
+    level: row.level || "",
+    german: row.german || "",
+    english: row.english || "",
+    audio_normal: row.audio_normal || "",
+    audio_slow: row.audio_slow || "",
+  }));
 
 const mapSheetRows = (values = []) => {
   if (!values.length) return [];
