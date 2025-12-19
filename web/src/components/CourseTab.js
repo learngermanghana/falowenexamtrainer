@@ -107,15 +107,16 @@ const CourseTab = () => {
     [studentProfile?.email, user?.email]
   );
 
-  const chatUserId = useMemo(
+  const submissionStudentCode = useMemo(
     () =>
       legacyStudentKey(studentProfile) ||
-      studentProfile?.id ||
       legacyStudentKey(user?.profile) ||
       studentCode ||
       "",
     [studentCode, studentProfile, user?.profile]
   );
+
+  const chatUserId = useMemo(() => submissionStudentCode, [submissionStudentCode]);
 
   const falowenIntro = useMemo(
     () => ({
@@ -201,11 +202,11 @@ const CourseTab = () => {
       .replace(/[^a-z0-9@._-]/gi, "-");
 
   const lessonDraftPath = useMemo(() => {
-    if (!studentCode || !assignmentId) return "";
+    if (!submissionStudentCode || !assignmentId) return "";
     return `/drafts_v2/${sanitizePathSegment(
-      studentCode
+      submissionStudentCode
     )}/lessons/${sanitizePathSegment(assignmentId)}`;
-  }, [assignmentId, studentCode]);
+  }, [assignmentId, submissionStudentCode]);
 
   const lessonSubmissionPath = useMemo(
     () => `/submissions/${submissionLevel}/posts`,
@@ -270,14 +271,14 @@ const CourseTab = () => {
 I'd like to request another submission slot for ${submissionLevel} assignment ${
         assignmentId || "(add chapter)"
       }.
-Student code: ${studentCode || "(add your student code)"}
+Student code: ${submissionStudentCode || "(add your student code)"}
 Receipt: ${receiptCode || "(optional)"}
 
 Thank you!`
     );
 
     return `mailto:learngermanghana@gmail.com?subject=${subject}&body=${body}`;
-  }, [assignmentId, receiptCode, studentCode, submissionLevel]);
+  }, [assignmentId, receiptCode, submissionLevel, submissionStudentCode]);
 
   useEffect(() => {
     if (!user?.email) return;
@@ -376,7 +377,7 @@ Thank you!`
     setLastSavedAt(null);
     setConfirmComplete(false);
     setConfirmLock(false);
-  }, [assignmentId, studentCode, submissionLevel]);
+  }, [assignmentId, submissionStudentCode, submissionLevel]);
 
   useEffect(() => {
     if (!assignmentOptions.length || assignmentId) return;
@@ -401,7 +402,7 @@ Thank you!`
       setAssignmentError("");
 
       try {
-        const data = await fetchAssignmentSummary({ studentCode });
+        const data = await fetchAssignmentSummary({ studentCode: submissionStudentCode });
         if (cancelled) return;
 
         setAssignmentSummary(data);
@@ -428,7 +429,7 @@ Thank you!`
     return () => {
       cancelled = true;
     };
-  }, [studentCode]);
+  }, [submissionStudentCode]);
 
   useEffect(() => {
     if (!assignmentSummary?.leaderboard) return;
@@ -447,7 +448,7 @@ Thank you!`
     const loadResults = async () => {
       setResultsStatus((prev) => ({ ...prev, loading: true, error: "" }));
       try {
-        if (!studentCode) {
+        if (!submissionStudentCode) {
           setResults([]);
           setResultsMetrics(null);
           setResultsAssignments([]);
@@ -461,7 +462,7 @@ Thank you!`
 
         const response = await fetchResults({
           level: resultsLevel,
-          studentCode,
+          studentCode: submissionStudentCode,
           email: studentEmail,
         });
         const payloadResults = response.results || [];
@@ -481,10 +482,10 @@ Thank you!`
     };
 
     loadResults();
-  }, [activeTab, resultsLevel, studentCode, studentEmail]);
+  }, [activeTab, resultsLevel, studentEmail, submissionStudentCode]);
 
   useEffect(() => {
-    if (!user?.email || !studentCode) {
+    if (!user?.email || !submissionStudentCode) {
       setWorkDraft("");
       setDraftStatus("Add your student code to start saving drafts to /drafts_v2.");
       setLocked(false);
@@ -504,7 +505,7 @@ Thank you!`
 
     const submission = loadSubmissionForStudent({
       level: submissionLevel,
-      studentCode,
+      studentCode: submissionStudentCode,
       lessonKey: assignmentId,
     });
 
@@ -529,7 +530,7 @@ Thank you!`
 
     const lockState = isSubmissionLocked({
       email: user.email,
-      studentCode,
+      studentCode: submissionStudentCode,
       level: submissionLevel,
       lessonKey: assignmentId,
     });
@@ -545,7 +546,7 @@ Thank you!`
 
     const draft = loadDraftForStudent({
       email: user.email,
-      studentCode,
+      studentCode: submissionStudentCode,
       level: submissionLevel,
       lessonKey: assignmentId,
     });
@@ -568,13 +569,20 @@ Thank you!`
     assignmentId,
     assignmentTitle,
     hydrated,
-    studentCode,
     submissionLevel,
+    submissionStudentCode,
     user?.email,
   ]);
 
   useEffect(() => {
-    if (!user?.email || !studentCode || !assignmentId || locked || !hydrated) return;
+    if (
+      !user?.email ||
+      !submissionStudentCode ||
+      !assignmentId ||
+      locked ||
+      !hydrated
+    )
+      return;
 
     const hasChanges = workDraft !== lastSavedDraft;
     if (!hasChanges) return;
@@ -587,7 +595,7 @@ Thank you!`
     const handle = setTimeout(() => {
       const result = saveDraftForStudent({
         email: user.email,
-        studentCode,
+        studentCode: submissionStudentCode,
         level: submissionLevel,
         lessonKey: assignmentId,
         content: workDraft,
@@ -609,17 +617,17 @@ Thank you!`
     lastSavedAt,
     lastSavedDraft,
     locked,
-    studentCode,
+    submissionStudentCode,
     submissionLevel,
     user?.email,
     workDraft,
   ]);
 
   useEffect(() => {
-    if (user?.email && studentCode) {
-      rememberStudentCodeForEmail(user.email, studentCode);
+    if (user?.email && submissionStudentCode) {
+      rememberStudentCodeForEmail(user.email, submissionStudentCode);
     }
-  }, [studentCode, user?.email]);
+  }, [submissionStudentCode, user?.email]);
 
   const streakStats = assignmentSummary?.student;
   const streakValue = assignmentLoading
@@ -817,12 +825,12 @@ Thank you!`
   };
 
   const saveDraftImmediately = () => {
-    if (!user?.email || !studentCode || !assignmentId || locked) return null;
+    if (!user?.email || !submissionStudentCode || !assignmentId || locked) return null;
     if (!workDraft.trim()) return null;
 
     const result = saveDraftForStudent({
       email: user.email,
-      studentCode,
+      studentCode: submissionStudentCode,
       level: submissionLevel,
       lessonKey: assignmentId,
       content: workDraft,
@@ -849,7 +857,7 @@ Thank you!`
       return;
     }
 
-    if (!studentCode.trim()) {
+    if (!submissionStudentCode.trim()) {
       setSubmissionStatus("Enter your student code to track the submission.");
       return;
     }
@@ -881,7 +889,7 @@ Thank you!`
 
     const existingLock = isSubmissionLocked({
       email: user.email,
-      studentCode,
+      studentCode: submissionStudentCode,
       level: submissionLevel,
       lessonKey: assignmentId,
     });
@@ -898,7 +906,7 @@ Thank you!`
       const result = submitWorkToSpecificPath({
         path: lessonSubmissionPath,
         content: workDraft,
-        studentCode,
+        studentCode: submissionStudentCode,
         lessonKey: assignmentId,
         level: submissionLevel,
         email: user.email,
@@ -917,7 +925,7 @@ Thank you!`
       setReceiptCode(result.receiptCode || "");
       setSubmissionStatus(
         `Submitted to ${lessonSubmissionPath} (student_code=${sanitizePathSegment(
-          studentCode
+          submissionStudentCode
         )}, lesson_key=${sanitizePathSegment(assignmentId)}) at ${new Date(
           result.savedAt
         ).toLocaleTimeString()}${result.receiptCode ? ` · Receipt ${result.receiptCode}` : ""}`
