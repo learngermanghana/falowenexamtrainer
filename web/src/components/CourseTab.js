@@ -22,6 +22,7 @@ import {
   ensureIntroMessage,
   subscribeToChatMessages,
 } from "../services/chatService";
+import { legacyStudentKey } from "../lib/firestorePaths";
 
 const tabs = [
   { key: "home", label: "Campus Home" },
@@ -106,6 +107,16 @@ const CourseTab = () => {
     [studentProfile?.email, user?.email]
   );
 
+  const chatUserId = useMemo(
+    () =>
+      legacyStudentKey(studentProfile) ||
+      studentProfile?.id ||
+      legacyStudentKey(user?.profile) ||
+      studentCode ||
+      "",
+    [studentCode, studentProfile, user?.profile]
+  );
+
   const falowenIntro = useMemo(
     () => ({
       sender: "coach",
@@ -170,7 +181,7 @@ const CourseTab = () => {
       };
 
       setChatMessages((prev) => [...prev, assistantMessage]);
-      appendChatMessages(user?.uid, [assistantMessage]).catch((error) => {
+      appendChatMessages(chatUserId, [assistantMessage]).catch((error) => {
         console.error("Failed to persist assistant chat", error);
       });
       setChatStatus("Reply sent. Ask me anything about German grammar or pronunciation.");
@@ -324,15 +335,15 @@ Thank you!`
   }, [selectedCourseLevel]);
 
   useEffect(() => {
-    if (!user?.uid) return undefined;
+    if (!chatUserId) return undefined;
 
     setChatLoading(true);
     setChatStatus("");
 
-    const unsubscribe = subscribeToChatMessages(user.uid, (messages) => {
+    const unsubscribe = subscribeToChatMessages(chatUserId, (messages) => {
       if (!messages.length) {
         setChatMessages([falowenIntro]);
-        ensureIntroMessage(user.uid, falowenIntro).catch((error) => {
+        ensureIntroMessage(chatUserId, falowenIntro).catch((error) => {
           console.error("Failed to seed intro message", error);
           setChatStatus("Chat konnte nicht initialisiert werden.");
         });
@@ -345,7 +356,7 @@ Thank you!`
     });
 
     return unsubscribe;
-  }, [falowenIntro, user?.uid]);
+  }, [chatUserId, falowenIntro]);
 
   useEffect(
     () => () => {
@@ -716,7 +727,7 @@ Thank you!`
     const content = value?.trim();
     if (!content) return;
 
-    if (!user?.uid) {
+    if (!chatUserId) {
       setChatStatus("Please log in to use the chat.");
       return;
     }
@@ -725,7 +736,7 @@ Thank you!`
     const nextMessages = [...chatMessages, userMessage];
 
     setChatMessages(nextMessages);
-    appendChatMessages(user.uid, [userMessage]).catch((error) => {
+    appendChatMessages(chatUserId, [userMessage]).catch((error) => {
       console.error("Failed to persist chat", error);
       setChatStatus("Could not save chat. Please try again.");
     });
@@ -776,7 +787,7 @@ Thank you!`
           const sizeKb = Math.max(Math.round(audioBlob.size / 1024), 1);
           setRecordingDuration(sizeKb);
 
-          if (!user?.uid) {
+          if (!chatUserId) {
             setChatStatus("Please log in to save voice notes.");
             return;
           }
@@ -789,7 +800,7 @@ Thank you!`
           };
 
           setChatMessages((prev) => [...prev, audioNote]);
-          appendChatMessages(user.uid, [audioNote]).catch((error) => {
+          appendChatMessages(chatUserId, [audioNote]).catch((error) => {
             console.error("Failed to save audio note", error);
             setChatStatus("Could not save the audio note.");
           });

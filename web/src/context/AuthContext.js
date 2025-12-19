@@ -15,23 +15,64 @@ import {
   deleteField,
   getDoc,
 } from "../firebase";
+import { firestoreCollections, legacyStudentKey } from "../lib/firestorePaths";
 
 const AuthContext = createContext();
 
 const fetchStudentProfileByUid = async (uid) => {
   if (!uid) return null;
-  const studentRef = doc(db, "students", uid);
-  try {
-    const snapshot = await getDoc(studentRef);
-    if (!snapshot.exists()) return null;
-    return { id: snapshot.id, ...snapshot.data() };
-  } catch (error) {
+
+  const mappingRef = doc(db, ...firestoreCollections.studentMappingDoc(uid));
+  const mappingSnapshot = await getDoc(mappingRef).catch((error) => {
     if (error?.code === "permission-denied") {
-      console.warn("Skipping profile lookup: missing Firestore permissions.");
+      console.warn("Skipping mapping lookup: missing Firestore permissions.");
       return null;
     }
     throw error;
+  });
+
+  const mappingData = mappingSnapshot?.exists()
+    ? { id: mappingSnapshot.id, ...mappingSnapshot.data() }
+    : null;
+
+  const studentCode = legacyStudentKey(mappingData);
+  if (!studentCode) {
+    const fallbackRef = doc(db, ...firestoreCollections.studentDoc(uid));
+    const fallbackSnapshot = await getDoc(fallbackRef).catch((error) => {
+      if (error?.code === "permission-denied") {
+        console.warn("Skipping fallback profile lookup: missing Firestore permissions.");
+        return null;
+      }
+      throw error;
+    });
+
+    if (fallbackSnapshot?.exists()) {
+      return { id: fallbackSnapshot.id, ...fallbackSnapshot.data() };
+    }
+
+    return mappingData;
   }
+
+  const studentRef = doc(db, ...firestoreCollections.studentDoc(studentCode));
+  const studentSnapshot = await getDoc(studentRef).catch((error) => {
+    if (error?.code === "permission-denied") {
+      console.warn("Skipping profile lookup: missing Firestore permissions.");
+      return mappingData ? { ...mappingData, id: studentCode } : null;
+    }
+    throw error;
+  });
+
+  if (!studentSnapshot?.exists()) {
+    return mappingData ? { ...mappingData, id: studentCode } : null;
+  }
+
+  const legacyData = { id: studentSnapshot.id, ...studentSnapshot.data() };
+  return {
+    ...legacyData,
+    ...mappingData,
+    id: legacyData.id,
+    studentcode: legacyStudentKey({ ...legacyData, ...mappingData }) || "",
+  };
 };
 
 export const AuthProvider = ({ children }) => {
@@ -48,7 +89,7 @@ export const AuthProvider = ({ children }) => {
       return { ok: false, reason: "unavailable" };
     }
 
-    const studentRef = doc(db, "students", studentProfile.id);
+    const studentRef = doc(db, ...firestoreCollections.studentDoc(studentProfile.id));
 
     try {
       await updateDoc(studentRef, { className, updated_at: serverTimestamp() });
@@ -74,7 +115,7 @@ export const AuthProvider = ({ children }) => {
 
   const persistMessagingToken = async (token, studentId) => {
     if (!studentId || !token) return;
-    const studentRef = doc(db, "students", studentId);
+    const studentRef = doc(db, ...firestoreCollections.studentDoc(studentId));
     await setDoc(
       studentRef,
       { messagingToken: token, messagingTokenUpdatedAt: serverTimestamp() },
@@ -87,7 +128,7 @@ export const AuthProvider = ({ children }) => {
 
   const revokeMessagingToken = async (studentId) => {
     if (!studentId) return;
-    const studentRef = doc(db, "students", studentId);
+    const studentRef = doc(db, ...firestoreCollections.studentDoc(studentId));
     await updateDoc(studentRef, {
       messagingToken: deleteField(),
       messagingTokenUpdatedAt: serverTimestamp(),
@@ -151,7 +192,11 @@ export const AuthProvider = ({ children }) => {
     setIdToken(token);
 
     const studentCode = profile.studentCode;
-    const studentsRef = doc(db, "students", credential.user.uid);
+    const legacyStudentCode = legacyStudentKey(profile) || profile.studentCode;
+    const studentsRef = legacyStudentCode
+      ? doc(db, ...firestoreCollections.studentDoc(legacyStudentCode))
+      : doc(db, ...firestoreCollections.studentDoc(credential.user.uid));
+    const mappingRef = doc(db, ...firestoreCollections.studentMappingDoc(credential.user.uid));
     const payload = {
       uid: credential.user.uid,
       name: profile.firstName || "",
@@ -159,13 +204,16 @@ export const AuthProvider = ({ children }) => {
       about: "",
       level: (profile.level || "").toUpperCase(),
       className: profile.className || "",
-      studentcode: studentCode || "",
+      studentcode: legacyStudentCode || "",
       joined_at: serverTimestamp(),
       updated_at: serverTimestamp(),
       syncedToSheets: false,
     };
 
-    await setDoc(studentsRef, payload, { merge: true });
+    await Promise.all([
+      setDoc(studentsRef, payload, { merge: true }),
+      setDoc(mappingRef, { ...payload, uid: credential.user.uid }, { merge: true }),
+    ]);
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
     return credential;
