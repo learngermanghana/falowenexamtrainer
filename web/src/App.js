@@ -5,6 +5,7 @@ import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
+import AccountSettings from "./components/AccountSettings";
 import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
@@ -95,9 +96,17 @@ function App() {
             >
               Course Book
             </button>
+            <button
+              style={activeSection === "account" ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActiveSection("account")}
+            >
+              Account
+            </button>
           </div>
 
-          {activeSection === "course" ? <CourseTab /> : <AssignmentSubmissionPage />}
+          {activeSection === "course" ? <CourseTab /> : null}
+          {activeSection === "submit" ? <AssignmentSubmissionPage /> : null}
+          {activeSection === "account" ? <AccountSettings /> : null}
         </main>
       </div>
     </ExamProvider>
