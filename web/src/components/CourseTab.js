@@ -1,15 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
-import { courseOverview } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
-
-const StatCard = ({ label, value, helper }) => (
-  <div style={{ ...styles.card, marginBottom: 0 }}>
-    <div style={{ fontSize: 13, color: "#4b5563" }}>{label}</div>
-    <div style={{ fontSize: 22, fontWeight: 800, marginTop: 4 }}>{value}</div>
-    {helper ? <div style={{ ...styles.helperText, margin: "6px 0 0" }}>{helper}</div> : null}
-  </div>
-);
 
 const LessonList = ({ title, lessons }) => {
   if (!lessons.length) return null;
@@ -74,44 +65,6 @@ const CourseTab = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "grid", gap: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Course Home</h2>
-          <span style={styles.badge}>Live aus Kurs-Dictionary</span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-          <StatCard
-            label="Assignment Streak"
-            value={`${courseOverview.assignmentStreak} Tage`}
-            helper="Halte die Serie – jede Aufgabe zählt."
-          />
-          <StatCard
-            label="Anwesenheit"
-            value={`${courseOverview.attendanceRate}%`}
-            helper={courseOverview.attendanceSummary}
-          />
-          <StatCard
-            label="Nächste Session"
-            value={courseOverview.upcomingSession.topic}
-            helper={`${courseOverview.upcomingSession.materials} · Fokus: ${courseOverview.upcomingSession.focus}`}
-          />
-        </div>
-
-        <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-            <h3 style={{ margin: 0 }}>Nächste empfohlene Aufgabe</h3>
-            <span style={styles.levelPill}>Due: {courseOverview.nextAssignment.dueDate}</span>
-          </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>{courseOverview.nextAssignment.title}</p>
-          <p style={{ margin: 0 }}>{courseOverview.nextAssignment.description}</p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <span style={styles.badge}>Kapitel 5</span>
-            <span style={styles.badge}>Schreiben</span>
-            <span style={styles.badge}>80–100 Wörter</span>
-          </div>
-        </div>
-      </div>
-
       <div style={{ display: "grid", gap: 12 }}>
         <div
           style={{
