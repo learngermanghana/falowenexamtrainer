@@ -34,9 +34,10 @@ export async function fetchVocabEntries() {
     throw new Error(`Failed to load vocab (${res.status}): ${body.slice(0, 200)}`);
   }
 
-  const rows = await res.json();
+  const payload = await res.json();
+  const rows = Array.isArray(payload) ? payload : Array.isArray(payload?.rows) ? payload.rows : [];
 
-  return (Array.isArray(rows) ? rows : []).map((row, index) => {
+  return rows.map((row, index) => {
     const level = toText(row.level);
     const german = toText(row.german);
     const english = toText(row.english);
@@ -57,7 +58,7 @@ export async function fetchVocabEntries() {
 export const fetchExamPrompts = async () => {
   try {
     const data = await fetchJson("/exams");
-    const rows = Array.isArray(data?.rows) ? data.rows : [];
+    const rows = Array.isArray(data?.rows) ? data.rows : Array.isArray(data) ? data : [];
 
     return rows
       .map((row, index) => {
@@ -103,9 +104,10 @@ export async function fetchExamEntries() {
   const url = `${backendUrl}/api/exams`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("Failed to fetch exams");
-  const rows = await res.json();
+  const payload = await res.json();
+  const rows = Array.isArray(payload) ? payload : Array.isArray(payload?.rows) ? payload.rows : [];
 
-  return (Array.isArray(rows) ? rows : []).map((r, i) => ({
+  return rows.map((r, i) => ({
     id: r.id || `${r.level || "exam"}-${i + 1}`,
     level: r.level || "",
     teil: r.teil || "",
