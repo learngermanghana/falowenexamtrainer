@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }) => {
     const token = await credential.user.getIdToken();
     setIdToken(token);
 
-    const studentCode = profile.studentCode || generateStudentCode({ firstName: profile.firstName });
+    const studentCode = profile.studentCode;
     const studentId = studentCode || credential.user.uid;
     const studentsRef = doc(db, "students", studentId);
     const payload = {
@@ -128,10 +128,6 @@ export const AuthProvider = ({ children }) => {
       email: email.toLowerCase(),
       role: "student",
       studentCode: studentId,
-      phone: profile.phone || "",
-      location: profile.location || "",
-      emergencyContactPhone: profile.emergencyContactPhone || "",
-      status: profile.status || "",
       about: "",
       level: (profile.level || "").toUpperCase(),
       className: profile.className || "",
