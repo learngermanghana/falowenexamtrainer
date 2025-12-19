@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
-import { questionDictionary } from "../data/questionDictionary";
 import { styles } from "../styles";
 import {
   addDoc,
@@ -34,15 +33,6 @@ const formatTimeRemaining = (expiresAt, now) => {
   return diff > 0 ? `${minutes}:${seconds}` : "Abgelaufen";
 };
 
-const formatDateTime = (value) => {
-  if (!value) return "Sofort";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Sofort";
-  return date.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
-};
-
-const defaultStartTime = () => new Date().toISOString().slice(0, 16);
-
 const ClassDiscussionPage = () => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
@@ -60,10 +50,8 @@ const ClassDiscussionPage = () => {
     topic: "",
     question: "",
     instructions: "",
-    dictionaryId: "",
     extraLink: "",
     timerMinutes: 15,
-    startTime: defaultStartTime(),
   });
   const typingTimeouts = useRef({});
 
@@ -84,14 +72,6 @@ const ClassDiscussionPage = () => {
     });
     return options;
   }, []);
-
-  const dictionaryOptions = useMemo(() => {
-    const level = (studentProfile?.level || "").toUpperCase();
-    const filtered = questionDictionary.filter(
-      (entry) => !level || entry.level.toUpperCase() === level
-    );
-    return filtered.length > 0 ? filtered : questionDictionary;
-  }, [studentProfile?.level]);
 
   useEffect(() => {
     if (!db) {
@@ -122,13 +102,9 @@ const ClassDiscussionPage = () => {
             topic: data.topic || "",
             question: data.question || "",
             questionTitle: data.questionTitle || data.topic || "",
-            dictionaryId: data.dictionaryId || "",
             instructions: data.instructions || "",
             extraLink: data.extraLink || "",
             timerMinutes: data.timerMinutes || 0,
-            availableAt: data.availableAt?.toMillis
-              ? data.availableAt.toMillis()
-              : data.availableAt || null,
             createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
             createdBy: data.createdBy || "Tutor",
             createdByUid: data.createdByUid || null,
@@ -228,8 +204,6 @@ const ClassDiscussionPage = () => {
   }, []);
 
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
-  const selectedDictionaryEntry =
-    dictionaryOptions.find((entry) => entry.id === form.dictionaryId) || dictionaryOptions[0];
 
   useEffect(() => {
     if (!form.lessonId && lessonOptions.length > 0) {
@@ -237,33 +211,7 @@ const ClassDiscussionPage = () => {
     }
   }, [form.lessonId, lessonOptions]);
 
-  useEffect(() => {
-    if (!form.dictionaryId && dictionaryOptions.length > 0) {
-      const entry = dictionaryOptions[0];
-      setForm((prev) => ({
-        ...prev,
-        dictionaryId: entry.id,
-        question: entry.question,
-        instructions: entry.instructions,
-        topic: prev.topic || entry.title,
-        extraLink: prev.extraLink || entry.suggestedLink,
-      }));
-    }
-  }, [dictionaryOptions, form.dictionaryId]);
-
   const handleFormChange = (field, value) => {
-    if (field === "dictionaryId") {
-      const entry = questionDictionary.find((item) => item.id === value);
-      setForm((prev) => ({
-        ...prev,
-        dictionaryId: value,
-        question: entry?.question || prev.question,
-        instructions: entry?.instructions || prev.instructions,
-        topic: entry?.title || prev.topic,
-        extraLink: entry?.suggestedLink || prev.extraLink,
-      }));
-      return;
-    }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -276,10 +224,8 @@ const ClassDiscussionPage = () => {
     }
 
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
-    const dictionaryEntry = questionDictionary.find((item) => item.id === form.dictionaryId);
     const timerMinutes = Number(form.timerMinutes) || 0;
     const expiresAtMillis = timerMinutes ? Date.now() + timerMinutes * 60000 : null;
-    const availableAtMillis = Date.parse(form.startTime || "") || Date.now();
 
     setIsSavingThread(true);
     setError("");
@@ -291,13 +237,11 @@ const ClassDiscussionPage = () => {
         lessonId: lesson?.id,
         lessonLabel: lesson?.label,
         topic: form.topic || lesson?.topic,
-        questionTitle: dictionaryEntry?.title || form.topic || lesson?.topic,
-        dictionaryId: dictionaryEntry?.id || form.dictionaryId || "",
-        instructions: form.instructions || dictionaryEntry?.instructions || "",
+        questionTitle: form.topic || lesson?.topic,
+        instructions: form.instructions || "",
         question: form.question,
         extraLink: form.extraLink,
         timerMinutes,
-        availableAt: Timestamp.fromMillis(availableAtMillis),
         createdAt: serverTimestamp(),
         createdBy: user?.email || "Tutor",
         createdByUid: user?.uid || null,
@@ -305,13 +249,11 @@ const ClassDiscussionPage = () => {
       });
       setForm({
         lessonId: lesson?.id || "",
-        topic: lesson?.topic || dictionaryEntry?.title || "",
-        dictionaryId: dictionaryEntry?.id || form.dictionaryId || "",
-        question: dictionaryEntry?.question || "",
-        instructions: dictionaryEntry?.instructions || "",
-        extraLink: dictionaryEntry?.suggestedLink || "",
+        topic: lesson?.topic || "",
+        question: "",
+        instructions: "",
+        extraLink: "",
         timerMinutes,
-        startTime: defaultStartTime(),
       });
     } catch (err) {
       console.error("Failed to create discussion thread", err);
@@ -417,7 +359,6 @@ const ClassDiscussionPage = () => {
 
   const handleDeleteReply = async (threadId, reply) => {
     if (!db) return;
-    if (reply.author && user?.email && reply.author !== user.email) return;
 
     try {
       const qaDocRef = doc(db, "qa_posts", threadId);
@@ -445,7 +386,6 @@ const ClassDiscussionPage = () => {
 
   const handleSaveEdit = async () => {
     if (!editingReply || !editingReply.text.trim() || !db) return;
-    if (editingReply.author && user?.email && editingReply.author !== user.email) return;
 
     try {
       const qaDocRef = doc(db, "qa_posts", editingReply.threadId);
@@ -467,13 +407,6 @@ const ClassDiscussionPage = () => {
       console.error("Failed to edit reply", err);
       setError("Antwort konnte nicht bearbeitet werden.");
     }
-  };
-
-  const isReplyOwner = (reply) => {
-    if (reply.author && user?.email && reply.author === user.email) return true;
-    if (reply.responderCode && studentProfile?.studentcode && reply.responderCode === studentProfile.studentcode)
-      return true;
-    return false;
   };
 
   const handleCorrectDraft = async (threadId) => {
@@ -510,8 +443,6 @@ const ClassDiscussionPage = () => {
   );
 
   const renderThread = (thread) => {
-    const isActive = !thread.availableAt || now >= thread.availableAt;
-
     return (
       <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
@@ -529,14 +460,6 @@ const ClassDiscussionPage = () => {
             <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>
               Timer {formatTimeRemaining(thread.expiresAt, now)}
             </span>
-            <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0e7490" }}>
-              Start: {formatDateTime(thread.availableAt)}
-            </span>
-            {!isActive && (
-              <span style={{ ...styles.badge, background: "#fffbeb", borderColor: "#fcd34d", color: "#92400e" }}>
-                Geplant · startet bald
-              </span>
-            )}
           </div>
         </div>
 
@@ -544,11 +467,6 @@ const ClassDiscussionPage = () => {
           <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
             <strong>Frage:</strong> {thread.question}
           </div>
-          {thread.availableAt && now < thread.availableAt ? (
-            <div style={{ ...styles.helperText, margin: 0, color: "#c2410c" }}>
-              Diese Diskussion startet am {formatDateTime(thread.availableAt)}. Antworten sind bis dahin deaktiviert.
-            </div>
-          ) : null}
           {thread.instructions ? (
             <div
               style={{
@@ -559,7 +477,7 @@ const ClassDiscussionPage = () => {
                 borderRadius: 10,
               }}
             >
-              <strong>Anleitung:</strong> {thread.instructions}
+              <strong>Instructions (English):</strong> {thread.instructions}
             </div>
           ) : null}
         </div>
@@ -572,22 +490,18 @@ const ClassDiscussionPage = () => {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{reply.author || "Student"}</div>
                 <div style={{ display: "flex", gap: 8 }}>
-                  {isReplyOwner(reply) && (
-                    <>
-                      <button
-                        style={{ ...styles.secondaryButton, padding: "6px 10px" }}
-                        onClick={() => handleStartEdit(thread.id, reply)}
-                      >
-                        Bearbeiten
-                      </button>
-                      <button
-                        style={{ ...styles.dangerButton, padding: "6px 10px" }}
-                        onClick={() => handleDeleteReply(thread.id, reply)}
-                      >
-                        Löschen
-                      </button>
-                    </>
-                  )}
+                  <button
+                    style={{ ...styles.secondaryButton, padding: "6px 10px" }}
+                    onClick={() => handleStartEdit(thread.id, reply)}
+                  >
+                    Bearbeiten
+                  </button>
+                  <button
+                    style={{ ...styles.dangerButton, padding: "6px 10px" }}
+                    onClick={() => handleDeleteReply(thread.id, reply)}
+                  >
+                    Löschen
+                  </button>
                 </div>
               </div>
               {editingReply && editingReply.replyId === reply.id ? (
@@ -625,12 +539,9 @@ const ClassDiscussionPage = () => {
             value={replyDrafts[thread.id] || ""}
             onChange={(e) => {
               setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
-              if (isActive) {
-                markTypingForThread(thread.id);
-              }
+              markTypingForThread(thread.id);
             }}
             onBlur={() => stopTypingIndicator(thread.id)}
-            disabled={!isActive}
           />
           {typingByThread[thread.id]?.length ? (
             <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
@@ -642,11 +553,11 @@ const ClassDiscussionPage = () => {
               style={{ ...styles.secondaryButton, padding: "10px 12px" }}
               type="button"
               onClick={() => handleCorrectDraft(thread.id)}
-              disabled={isCorrectingDraft[thread.id] || !isActive}
+              disabled={isCorrectingDraft[thread.id]}
             >
               {isCorrectingDraft[thread.id] ? "KI korrigiert ..." : "Mit KI korrigieren"}
             </button>
-            <button style={styles.primaryButton} onClick={() => handleReply(thread.id)} disabled={!isActive}>
+            <button style={styles.primaryButton} onClick={() => handleReply(thread.id)}>
               Antwort posten
             </button>
           </div>
@@ -683,22 +594,6 @@ const ClassDiscussionPage = () => {
           </span>
         </div>
 
-        <div style={{ ...styles.card, background: "#f8fafc", borderColor: "#e2e8f0", marginTop: 12 }}>
-          <div style={{ fontWeight: 700, marginBottom: 6 }}>Datenquellen</div>
-          <div style={{ display: "grid", gap: 6, color: "#0f172a" }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Klassennotizen und Diskussionsbeiträge werden aus <code>class_board/&lt;level&gt;/classes/&lt;class_name&gt;/posts</code>
-              geladen <strong>und</strong> direkt dort gespeichert. Level und Klassenname stammen aus der Sitzung der angemeldeten
-              Studierenden, und ihre Beiträge erscheinen als einzelne Dokumente in dieser <em>posts</em>-Unterkollektion.
-            </p>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Antworten in Q&A-Threads sowie KI-Vorschläge landen in der Sammlung <code>qa_posts</code>. Jedes
-              <code>qa_posts/&lt;post_id&gt;</code>-Dokument bündelt die Antworten im Feld <code>responses</code> – inklusive Code der
-              antwortenden Person und Zeitstempeln.
-            </p>
-          </div>
-        </div>
-
         <form onSubmit={handleCreateThread} style={{ display: "grid", gap: 10, marginTop: 12 }}>
           <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
             <div style={styles.field}>
@@ -716,25 +611,6 @@ const ClassDiscussionPage = () => {
               </select>
               {selectedLesson?.goal ? (
                 <div style={{ ...styles.helperText, margin: 0 }}>Ziel: {selectedLesson.goal}</div>
-              ) : null}
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label}>Frage aus dem Katalog</label>
-              <select
-                value={form.dictionaryId}
-                onChange={(e) => handleFormChange("dictionaryId", e.target.value)}
-                style={styles.select}
-              >
-                {dictionaryOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.level} · {option.title}
-                  </option>
-                ))}
-              </select>
-              {selectedDictionaryEntry?.question ? (
-                <div style={{ ...styles.helperText, margin: 0 }}>
-                  Vorgabe: {selectedDictionaryEntry.question}
-                </div>
               ) : null}
             </div>
             <div style={styles.field}>
@@ -759,19 +635,6 @@ const ClassDiscussionPage = () => {
               />
             </div>
             <div style={styles.field}>
-              <label style={styles.label}>Startzeit</label>
-              <input
-                type="datetime-local"
-                style={styles.select}
-                value={form.startTime}
-                onChange={(e) => handleFormChange("startTime", e.target.value)}
-                min={defaultStartTime()}
-              />
-              <div style={{ ...styles.helperText, margin: 0 }}>
-                Wähle, wann die Frage sichtbar wird. Standard ist jetzt sofort.
-              </div>
-            </div>
-            <div style={styles.field}>
               <label style={styles.label}>Zusätzlicher Link (optional)</label>
               <input
                 type="url"
@@ -784,12 +647,12 @@ const ClassDiscussionPage = () => {
           </div>
 
           <div style={styles.field}>
-            <label style={styles.label}>Anleitung für alle</label>
+            <label style={styles.label}>Instructions for everyone (English)</label>
             <textarea
               style={styles.textArea}
               value={form.instructions}
               onChange={(e) => handleFormChange("instructions", e.target.value)}
-              placeholder="Hinweise für Hausregeln, Materialien oder Format der Antworten"
+              placeholder="Share house rules, materials, or answer format in English so everyone can follow along."
             />
           </div>
 
