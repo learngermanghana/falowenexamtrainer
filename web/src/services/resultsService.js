@@ -1,6 +1,7 @@
-import { collection, db, getDocs, query, where } from "../firebase";
+import { collection, collectionGroup, db, getDocs, query, where } from "../firebase";
 import { courseSchedules } from "../data/courseSchedule";
 import { getBackendBaseUrl } from "./backendConfig";
+import { firestoreCollections } from "../lib/firestorePaths";
 
 const backendUrl = getBackendBaseUrl();
 
@@ -118,15 +119,17 @@ const fetchSheetScores = async ({ level, studentCode, email } = {}) => {
 };
 
 const loadFirestoreScores = async ({ level, studentCode } = {}) => {
-  const scoresRef = collection(db, "scores");
+  const hasLevel = level && level !== "all";
+  const ref = hasLevel
+    ? collection(db, ...firestoreCollections.submissions(level.toUpperCase()))
+    : collectionGroup(db, "posts");
+
   const constraints = [];
-  if (level && level !== "all") {
-    constraints.push(where("level", "==", level.toUpperCase()));
-  }
   if (studentCode) {
     constraints.push(where("studentcode", "==", studentCode));
   }
-  const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
+
+  const snapshot = await getDocs(constraints.length ? query(ref, ...constraints) : ref);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
