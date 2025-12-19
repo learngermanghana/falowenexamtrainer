@@ -7,29 +7,24 @@ import {
   signOut,
   requestMessagingToken,
   db,
-  collection,
-  query,
-  where,
-  getDocs,
   setDoc,
   doc,
   updateDoc,
   serverTimestamp,
   isFirebaseConfigured,
   deleteField,
+  getDoc,
 } from "../firebase";
 
 const AuthContext = createContext();
 
-const fetchStudentProfileByEmail = async (email) => {
-  if (!email) return null;
-  const studentsRef = collection(db, "students");
-  const q = query(studentsRef, where("email", "==", email.toLowerCase())) ;
+const fetchStudentProfileByUid = async (uid) => {
+  if (!uid) return null;
+  const studentRef = doc(db, "students", uid);
   try {
-    const snapshot = await getDocs(q);
-    if (snapshot.empty) return null;
-    const hit = snapshot.docs[0];
-    return { id: hit.id, ...hit.data() };
+    const snapshot = await getDoc(studentRef);
+    if (!snapshot.exists()) return null;
+    return { id: snapshot.id, ...snapshot.data() };
   } catch (error) {
     if (error?.code === "permission-denied") {
       console.warn("Skipping profile lookup: missing Firestore permissions.");
@@ -132,7 +127,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const token = await firebaseUser.getIdToken();
         setIdToken(token);
-        const profile = await fetchStudentProfileByEmail(firebaseUser.email);
+        const profile = await fetchStudentProfileByUid(firebaseUser.uid);
         setStudentProfile(profile);
         setMessagingToken(profile?.messagingToken || null);
       } catch (error) {
@@ -156,20 +151,19 @@ export const AuthProvider = ({ children }) => {
     setIdToken(token);
 
     const studentCode = profile.studentCode;
-    const studentsRef = doc(db, "students", studentCode || credential.user.uid);
+    const studentsRef = doc(db, "students", credential.user.uid);
     const payload = {
+      uid: credential.user.uid,
       name: profile.firstName || "",
       email: email.toLowerCase(),
       about: "",
       level: (profile.level || "").toUpperCase(),
       className: profile.className || "",
-      joined_at: new Date().toISOString(),
+      studentcode: studentCode || "",
+      joined_at: serverTimestamp(),
       updated_at: serverTimestamp(),
       syncedToSheets: false,
     };
-    if (studentCode) {
-      payload.studentcode = studentCode;
-    }
 
     await setDoc(studentsRef, payload, { merge: true });
     setStudentProfile({ id: studentsRef.id, ...payload });
@@ -185,7 +179,7 @@ export const AuthProvider = ({ children }) => {
     const credential = await signInWithEmailAndPassword(auth, email, password);
     const token = await credential.user.getIdToken();
     setIdToken(token);
-    const profile = await fetchStudentProfileByEmail(email);
+    const profile = await fetchStudentProfileByUid(credential.user.uid);
     setStudentProfile(profile);
     setMessagingToken(profile?.messagingToken || null);
     return credential;

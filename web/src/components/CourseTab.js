@@ -296,7 +296,7 @@ Thank you!`
       try {
         const match = await findStudentByEmail(user.email);
         if (!match || cancelled) return;
-        const detectedCode = match.studentcode || match.studentCode || match.id;
+        const detectedCode = match.studentcode || match.studentCode || "";
         if (detectedCode) {
           setStudentCode((prev) => prev || detectedCode);
         }

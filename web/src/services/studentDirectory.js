@@ -19,7 +19,6 @@ export const deriveStudentProfile = (user, studentProfile = null) => {
     studentCode:
       profileFromAuth.studentCode ||
       profileFromStore.studentcode ||
-      profileFromStore.id ||
       "",
     level: (profileFromAuth.level || profileFromStore.level || "").toUpperCase(),
     assignmentTitle: profileFromAuth.assignmentTitle || profileFromStore.assignmentTitle || "",
