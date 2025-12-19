@@ -120,6 +120,7 @@ const CourseTab = () => {
     const apiKey = process.env.REACT_APP_OPENAI_API_KEY;
     if (!apiKey) {
       setChatStatus("Missing OpenAI API key. Add REACT_APP_OPENAI_API_KEY to your .env file.");
+      setChatLoading(false);
       return;
     }
 

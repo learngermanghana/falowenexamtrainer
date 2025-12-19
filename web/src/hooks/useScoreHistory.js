@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { getBackendBaseUrl } from "../services/backendConfig";
 
 function normalizeScoreRow(r) {
   return {
@@ -38,7 +39,8 @@ export function useScoreHistory({ studentCode, email }) {
           return;
         }
 
-        const res = await fetch(`/api/scores?${qs}`, {
+        const backendUrl = getBackendBaseUrl();
+        const res = await fetch(`${backendUrl}/api/scores?${qs}`, {
           headers: { Accept: "application/json" },
         });
 
