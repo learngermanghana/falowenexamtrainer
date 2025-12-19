@@ -125,7 +125,9 @@ const loadFirestoreScores = async ({ level, studentCode } = {}) => {
     constraints.push(where("studentcode", "==", studentCode));
   }
 
-  const snapshot = await getDocs(constraints.length ? query(ref, ...constraints) : ref);
+  const snapshot = await getDocs(
+    constraints.length ? query(scoresRef, ...constraints) : scoresRef
+  );
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 };
 
