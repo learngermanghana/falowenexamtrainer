@@ -6,6 +6,7 @@ import { fetchIdeasFromCoach, fetchWritingLetters, markLetterWithAI } from "../s
 import { useAuth } from "../context/AuthContext";
 import { writingLetters as courseWritingLetters } from "../data/writingLetters";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
+import { useScoreHistory } from "../hooks/useScoreHistory";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 20,
@@ -44,7 +45,7 @@ const WritingPage = ({ mode = "course" }) => {
     loading,
     setLoading,
   } = useExam();
-  const { user, idToken } = useAuth();
+  const { user, idToken, studentProfile } = useAuth();
   const userId = user?.uid;
   const isExamMode = mode === "exam";
 
@@ -52,6 +53,11 @@ const WritingPage = ({ mode = "course" }) => {
     () => mapExamPromptsToLetters(WRITING_PROMPTS),
     []
   );
+
+  const { results: sheetResults, loadingScores, scoresError } = useScoreHistory({
+    studentCode: studentProfile?.studentcode || user?.studentCode,
+    email: user?.email,
+  });
 
   const [activeTab, setActiveTab] = useState("practice");
   const [writingTasks, setWritingTasks] = useState(
@@ -77,6 +83,13 @@ const WritingPage = ({ mode = "course" }) => {
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
+  const combinedResults = useMemo(() => {
+    const merged = [...(sheetResults || []), ...(resultHistory || [])];
+    const parseDate = (entry) =>
+      new Date(entry.createdAt || entry.date || entry.dateIso || entry.created_at || 0).getTime();
+
+    return merged.slice().sort((a, b) => parseDate(b) - parseDate(a));
+  }, [resultHistory, sheetResults]);
 
   useEffect(() => {
     let isMounted = true;
@@ -472,7 +485,12 @@ const WritingPage = ({ mode = "course" }) => {
             </section>
           )}
 
-          <ResultHistory results={resultHistory} />
+          {loadingScores ? <p style={styles.helperText}>Loading results…</p> : null}
+          {scoresError ? (
+            <p style={{ ...styles.helperText, color: "red" }}>{scoresError}</p>
+          ) : null}
+
+          <ResultHistory results={combinedResults} />
         </>
       )}
 
