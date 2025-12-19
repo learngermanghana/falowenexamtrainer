@@ -372,15 +372,13 @@ Thank you!`
   }, [assignmentId, assignmentOptions]);
 
   useEffect(() => {
-    if (!assignmentId) return;
+    if (!assignmentId) {
+      setAssignmentTitle("");
+      return;
+    }
     const selectedAssignment = assignmentOptions.find((option) => option.value === assignmentId);
     const preferredTitle = selectedAssignment?.title || `Assignment ${assignmentId}`;
-    setAssignmentTitle((prev) => {
-      if (!prev || prev.startsWith("Assignment ")) {
-        return preferredTitle;
-      }
-      return prev;
-    });
+    setAssignmentTitle(preferredTitle);
   }, [assignmentId, assignmentOptions]);
 
   useEffect(() => {
@@ -1674,7 +1672,7 @@ Thank you!`
           <p style={styles.helperText}>Matches the /submissions/{submissionLevel} path.</p>
         </div>
         <div>
-          <label style={styles.label}>Assignment number</label>
+          <label style={styles.label}>Assignment (number & title)</label>
           <select
             style={styles.select}
             value={assignmentId}
@@ -1684,24 +1682,12 @@ Thank you!`
             {!assignmentId && <option value="">Select from dictionary</option>}
             {assignmentOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {`${option.value} — ${option.title}`}
               </option>
             ))}
           </select>
           <p style={styles.helperText}>
-            Pulled from the course dictionary so you don’t have to type the assignment number manually.
-          </p>
-        </div>
-        <div>
-          <label style={styles.label}>Assignment title</label>
-          <input
-            value={assignmentTitle}
-            onChange={(e) => setAssignmentTitle(e.target.value)}
-            placeholder="Auto-picked from your profile or course data"
-            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-          />
-          <p style={styles.helperText}>
-            Pulled from your Firebase student record when available so we can tag this submission.
+            Choose one entry from the course dictionary so the assignment number and title stay in sync.
           </p>
         </div>
       </div>
