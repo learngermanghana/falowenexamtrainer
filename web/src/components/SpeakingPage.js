@@ -50,7 +50,7 @@ const SpeakingPage = () => {
           <div>
             <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Sprechen – Prüfungsaufgaben</h2>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Diese Liste wird direkt aus Google Sheets geladen (<code>/api/exams</code>).
+              Diese Liste kommt aus dem eingebauten Prüfungs-Wörterbuch (<code>/api/exams</code>, kein Google Sheet mehr).
             </p>
           </div>
 

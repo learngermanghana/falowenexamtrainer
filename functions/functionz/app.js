@@ -23,6 +23,8 @@ const speakingUpload = multer({
   limits: { fileSize: 10 * 1024 * 1024, files: 1, fields: 10 },
 });
 
+const { EXAM_PROMPTS } = require("./examPromptsDictionary");
+
 const app = express();
 
 app.use(cors({ origin: true }));
@@ -80,24 +82,10 @@ app.get("/vocab", async (_req, res) => {
 
 app.get("/exams", async (_req, res) => {
   try {
-    const spreadsheetId = process.env.SHEETS_EXAMS_ID;
-    const tab = process.env.SHEETS_EXAMS_TAB || "Exams list";
-
-    if (!spreadsheetId) {
-      return res.status(500).json({ error: "Missing SHEETS_EXAMS_ID env" });
-    }
-
     const cached = getCache("exams");
     if (cached) return res.json(cached);
 
-    const sheets = await getSheetsClient();
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `${tab}!A:Z`,
-    });
-
-    const rows = mapSheetRows(response.data.values || []);
-    const payload = { rows };
+    const payload = { rows: EXAM_PROMPTS };
     setCache("exams", payload);
     return res.json(payload);
   } catch (err) {
@@ -116,11 +104,12 @@ app.get("/sheets/diagnose", async (req, res) => {
 
     const checks = [
       { name: "vocab", id: process.env.SHEETS_VOCAB_ID, tab: process.env.SHEETS_VOCAB_TAB || "Sheet1" },
-      { name: "exams", id: process.env.SHEETS_EXAMS_ID, tab: process.env.SHEETS_EXAMS_TAB || "Sheet1" },
       { name: "students", id: process.env.STUDENTS_SHEET_ID, tab: process.env.STUDENTS_SHEET_TAB || "students" },
     ];
 
-    const results = {};
+    const results = {
+      exams: { ok: true, source: "static-dictionary", rows: EXAM_PROMPTS.length },
+    };
     for (const c of checks) {
       if (!c.id || !c.tab) {
         results[c.name] = { ok: false, error: "Missing sheet id/tab env" };
