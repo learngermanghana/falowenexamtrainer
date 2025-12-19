@@ -168,7 +168,7 @@ export const courseSchedules = {
     },
     {
       day: 9,
-      topic: "Lesen & Hören 5",
+      topic: "German Cases",
       chapter: "5",
       goal: "Learn about the German articles and cases",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
