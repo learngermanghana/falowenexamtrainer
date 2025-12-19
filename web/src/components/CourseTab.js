@@ -1,29 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
-import { courseOverview, chatPrompts } from "../data/courseData";
+import { courseOverview } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
-import { useAuth } from "../context/AuthContext";
-import { fetchAssignmentSummary } from "../services/assignmentService";
-import {
-  isSubmissionLocked,
-  loadDraftForStudent,
-  loadStudentCodeForEmail,
-  rememberStudentCodeForEmail,
-  saveDraftForStudent,
-  saveDraftToSpecificPath,
-  submitWorkToSpecificPath,
-} from "../services/submissionService";
-import { fetchResults } from "../services/resultsService";
-import { deriveStudentProfile, findStudentByEmail } from "../services/studentDirectory";
-
-const tabs = [
-  { key: "home", label: "Home" },
-  { key: "course", label: "My Course" },
-  { key: "submit", label: "Submit Work" },
-  { key: "chat", label: "Class Chat" },
-  { key: "results", label: "My Results" },
-  { key: "letters", label: "Schreiben Trainer" },
-];
 
 const StatCard = ({ label, value, helper }) => (
   <div style={{ ...styles.card, marginBottom: 0 }}>
@@ -33,583 +11,69 @@ const StatCard = ({ label, value, helper }) => (
   </div>
 );
 
-const CourseTab = () => {
-  const { user, studentProfile } = useAuth();
-  const [activeTab, setActiveTab] = useState("home");
-  const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    {
-      sender: "coach",
-      text: `Willkommen, ${courseOverview.studentName}! Wähle einen Prompt oder frag mich direkt, ich bereite dich auf ${courseOverview.upcomingSession.topic} vor.`,
-    },
-  ]);
-  const [writingSubtab, setWritingSubtab] = useState("mark");
-  const [letterQuestion, setLetterQuestion] = useState("");
-  const [letterDraft, setLetterDraft] = useState("");
-  const [letterFeedback, setLetterFeedback] = useState("");
-  const [ideaMessages, setIdeaMessages] = useState([
-    {
-      sender: "coach",
-      text: "Füge deine Prüfungsfrage ein und lass uns Ideen brainstormen, bevor du schreibst.",
-    },
-  ]);
-  const [ideaInput, setIdeaInput] = useState("");
-  const [selectedCourseLevel, setSelectedCourseLevel] = useState("A1");
-  const [submissionLevel, setSubmissionLevel] = useState("A1");
-  const [studentCode, setStudentCode] = useState("");
-  const [assignmentTitle, setAssignmentTitle] = useState(
-    courseOverview.nextAssignment.title
-  );
-  const [assignmentId, setAssignmentId] = useState("");
-  const [workDraft, setWorkDraft] = useState("");
-  const [draftStatus, setDraftStatus] = useState("");
-  const [manualDraftStatus, setManualDraftStatus] = useState("");
-  const [submissionStatus, setSubmissionStatus] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [locked, setLocked] = useState(false);
-  const [assignmentSummary, setAssignmentSummary] = useState(null);
-  const [assignmentLoading, setAssignmentLoading] = useState(false);
-  const [assignmentError, setAssignmentError] = useState("");
-  const [leaderboardLevel, setLeaderboardLevel] = useState("A1");
-  const [results, setResults] = useState([]);
-  const [resultsSummary, setResultsSummary] = useState(null);
-  const [resultsLevelFilter, setResultsLevelFilter] = useState("all");
-  const [resultsStudentFilter, setResultsStudentFilter] = useState("");
-  const [resultsStatus, setResultsStatus] = useState({
-    loading: false,
-    error: "",
-    fetchedAt: null,
-  });
+const LessonList = ({ title, lessons }) => {
+  if (!lessons.length) return null;
 
-  const sanitizePathSegment = (value) =>
-    (value || "")
-      .toString()
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9@._-]/gi, "-");
-
-  const lessonDraftPath = useMemo(() => {
-    if (!studentCode || !assignmentId) return "";
-    return `/drafts_v2/${sanitizePathSegment(
-      studentCode
-    )}/lessons/${sanitizePathSegment(assignmentId)}`;
-  }, [assignmentId, studentCode]);
-
-  const lessonSubmissionPath = useMemo(
-    () => `/submissions/${submissionLevel}/posts`,
-    [submissionLevel]
-  );
-
-  const assignmentOptions = useMemo(() => {
-    const schedule = courseSchedules[submissionLevel] || [];
-    const uniqueAssignments = new Set();
-
-    const addChapter = (chapter) => {
-      if (!chapter) return;
-      uniqueAssignments.add(chapter.toString());
-    };
-
-    const inspectLesson = (lesson) => {
-      if (!lesson) return;
-      if (Array.isArray(lesson)) {
-        lesson.forEach(inspectLesson);
-        return;
-      }
-      if (lesson.assignment) {
-        addChapter(lesson.chapter || lesson.topic);
-      }
-    };
-
-    schedule.forEach((day) => {
-      if (day.assignment) {
-        addChapter(day.chapter || day.topic);
-      }
-      inspectLesson(day.lesen_hören);
-      inspectLesson(day.schreiben_sprechen);
-    });
-
-    return Array.from(uniqueAssignments).sort((a, b) => a.localeCompare(b));
-  }, [submissionLevel]);
-
-  const summarizeResults = (rows = []) => {
-    const perLevel = {};
-    const students = {};
-    const allStudents = new Set();
-    let retakes = 0;
-
-    rows.forEach((row) => {
-      const level = row.level || "Unknown";
-      perLevel[level] = (perLevel[level] || 0) + 1;
-
-      const code = (row.studentCode || "").toLowerCase();
-      if (code) {
-        if (!students[level]) students[level] = new Set();
-        students[level].add(code);
-        allStudents.add(code);
-      }
-
-      if (row.isRetake) retakes += 1;
-    });
-
-    const studentsPerLevel = Object.fromEntries(
-      Object.entries(students).map(([level, codes]) => [level, codes.size])
-    );
-
-    return {
-      total: rows.length,
-      perLevel,
-      studentsPerLevel,
-      uniqueStudents: allStudents.size,
-      retakes,
-    };
-  };
-
-  const filteredResults = useMemo(() => {
-    const level = resultsLevelFilter === "all" ? "" : resultsLevelFilter;
-    const codeFilter = resultsStudentFilter.trim().toLowerCase();
-
-    return results.filter((row) => {
-      const matchesLevel = level ? row.level === level : true;
-      const matchesCode = codeFilter
-        ? (row.studentCode || "").toLowerCase().includes(codeFilter)
-        : true;
-      return matchesLevel && matchesCode;
-    });
-  }, [results, resultsLevelFilter, resultsStudentFilter]);
-
-  const filteredSummary = useMemo(
-    () => summarizeResults(filteredResults),
-    [filteredResults]
-  );
-
-  useEffect(() => {
-    if (!user?.email) return;
-    const profile = deriveStudentProfile(user, studentProfile);
-    const storedCode = loadStudentCodeForEmail(user.email);
-    const resolvedStudentCode = profile.studentCode || storedCode;
-
-    if (resolvedStudentCode) {
-      setStudentCode((prev) => prev || resolvedStudentCode);
-    }
-
-    if (profile.level) {
-      setSelectedCourseLevel((prev) => prev || profile.level);
-      setSubmissionLevel((prev) => prev || profile.level);
-    }
-
-    if (profile.assignmentTitle) {
-      setAssignmentTitle((prev) => prev || profile.assignmentTitle);
-    }
-  }, [user?.email, user?.profile]);
-
-  useEffect(() => {
-    let cancelled = false;
-    if (!user?.email || studentCode) return undefined;
-
-    const lookupStudent = async () => {
-      try {
-        const match = await findStudentByEmail(user.email);
-        if (!match || cancelled) return;
-        const detectedCode = match.studentcode || match.studentCode || match.id;
-        if (detectedCode) {
-          setStudentCode((prev) => prev || detectedCode);
-        }
-        if (match.assignmentTitle) {
-          setAssignmentTitle((prev) => prev || match.assignmentTitle);
-        }
-        if (match.level) {
-          const normalizedLevel = (match.level || "").toUpperCase();
-          setSelectedCourseLevel((prev) => prev || normalizedLevel);
-          setSubmissionLevel((prev) => prev || normalizedLevel);
-        }
-      } catch (error) {
-        console.error("Failed to fetch student by email", error);
-      }
-    };
-
-    lookupStudent();
-    return () => {
-      cancelled = true;
-    };
-  }, [studentCode, user?.email]);
-
-  useEffect(() => {
-    setSubmissionLevel(selectedCourseLevel);
-  }, [selectedCourseLevel]);
-
-  useEffect(() => {
-    if (!assignmentOptions.length || assignmentId) return;
-    setAssignmentId(assignmentOptions[0]);
-  }, [assignmentId, assignmentOptions]);
-
-  useEffect(() => {
-    if (!assignmentId) return;
-    setAssignmentTitle((prev) => prev || `Assignment ${assignmentId}`);
-  }, [assignmentId]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadAssignmentSummary = async () => {
-      setAssignmentLoading(true);
-      setAssignmentError("");
-
-      try {
-        const data = await fetchAssignmentSummary({ studentCode });
-        if (cancelled) return;
-
-        setAssignmentSummary(data);
-        const levels = Object.keys(data?.leaderboard || {});
-        if (levels.length) {
-          setLeaderboardLevel((prev) => (levels.includes(prev) ? prev : levels[0]));
-        }
-      } catch (error) {
-        if (cancelled) return;
-        setAssignmentError(
-          error?.response?.data?.error ||
-            error?.message ||
-            "Konnte Assignment-Daten nicht laden."
-        );
-      } finally {
-        if (!cancelled) {
-          setAssignmentLoading(false);
-        }
-      }
-    };
-
-    loadAssignmentSummary();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [studentCode]);
-
-  useEffect(() => {
-    if (!assignmentSummary?.leaderboard) return;
-    if (assignmentSummary.leaderboard[selectedCourseLevel]) {
-      setLeaderboardLevel(selectedCourseLevel);
-    }
-  }, [assignmentSummary?.leaderboard, selectedCourseLevel]);
-  useEffect(() => {
-    if (activeTab !== "results") return;
-
-    const loadResults = async () => {
-      setResultsStatus((prev) => ({ ...prev, loading: true, error: "" }));
-      try {
-        const response = await fetchResults();
-        const payloadResults = response.results || [];
-        setResults(payloadResults);
-        setResultsSummary(response.summary || summarizeResults(payloadResults));
-        setResultsStatus({
-          loading: false,
-          error: "",
-          fetchedAt: response.fetchedAt || null,
-        });
-      } catch (error) {
-        const fallbackMessage =
-          error.response?.data?.error || "Konnte Ergebnisse nicht laden.";
-        setResultsStatus({ loading: false, error: fallbackMessage, fetchedAt: null });
-      }
-    };
-
-    loadResults();
-  }, [activeTab]);
-
-  useEffect(() => {
-    if (!user?.email || !studentCode) {
-      setWorkDraft("");
-      setDraftStatus("Add your student code to start saving drafts to /drafts_v2.");
-      setLocked(false);
-      return;
-    }
-
-    if (!assignmentId) {
-      setWorkDraft("");
-      setDraftStatus("Select an assignment to load drafts.");
-      setLocked(false);
-      return;
-    }
-
-    const draft = loadDraftForStudent({
-      email: user.email,
-      studentCode,
-      level: submissionLevel,
-      lessonKey: assignmentId,
-    });
-    setWorkDraft(draft.content || "");
-    setAssignmentTitle(
-      (draft.assignmentTitle || assignmentTitle || courseOverview.nextAssignment.title).trim()
-    );
-    setDraftStatus(
-      draft.updatedAt
-        ? `Draft restored from /${draft.path}`
-        : `Ready to save drafts to /${draft.path}`
-    );
-
-    const lockState = isSubmissionLocked({ email: user.email, studentCode });
-    setLocked(lockState.locked);
-    if (lockState.locked) {
-      const lockedAt = lockState.lockedAt
-        ? ` at ${new Date(lockState.lockedAt).toLocaleString()}`
-        : "";
-      setSubmissionStatus(`Submission locked via /${lockState.lockPath}${lockedAt}`);
-    } else {
-      setSubmissionStatus("");
-    }
-  }, [assignmentId, studentCode, submissionLevel, user?.email]);
-
-  useEffect(() => {
-    if (!user?.email || !studentCode || !assignmentId || locked) return;
-    const handle = setTimeout(() => {
-      const result = saveDraftForStudent({
-        email: user.email,
-        studentCode,
-        level: submissionLevel,
-        lessonKey: assignmentId,
-        content: workDraft,
-        assignmentTitle,
-      });
-      setDraftStatus(
-        `Draft saved to /${result.path} (${new Date(result.savedAt).toLocaleTimeString()})`
-      );
-      setManualDraftStatus("");
-    }, 800);
-
-    return () => clearTimeout(handle);
-  }, [
-    assignmentId,
-    user?.email,
-    studentCode,
-    submissionLevel,
-    workDraft,
-    assignmentTitle,
-    locked,
-  ]);
-
-  useEffect(() => {
-    if (user?.email && studentCode) {
-      rememberStudentCodeForEmail(user.email, studentCode);
-    }
-  }, [studentCode, user?.email]);
-
-  const streakStats = assignmentSummary?.student;
-  const streakValue = assignmentLoading
-    ? "Lädt …"
-    : streakStats
-    ? `${streakStats.weekAssignments} diese Woche`
-    : `${courseOverview.assignmentStreak} Tage`;
-  const streakHelper = assignmentLoading
-    ? "Hole Abgaben aus dem Sheet …"
-    : streakStats
-    ? `${streakStats.weekAttempts} Abgaben · ${streakStats.retriesThisWeek} Wiederholungen${
-        streakStats.lastAssignment ? ` · Letzte: ${streakStats.lastAssignment}` : ""
-      }`
-    : "Halte die Serie – jede Aufgabe zählt.";
-
-  const renderAssignmentLeaderboard = () => {
-    const levels = Object.keys(assignmentSummary?.leaderboard || {});
-
-    if (!levels.length) {
-      return assignmentLoading ? (
-        <div style={{ ...styles.card, display: "grid", gap: 6 }}>
-          <h3 style={{ margin: 0 }}>Assignments Leaderboard</h3>
-          <p style={{ ...styles.helperText, margin: 0 }}>Sheet wird geladen …</p>
-        </div>
-      ) : null;
-    }
-
-    const activeLevel = levels.includes(leaderboardLevel)
-      ? leaderboardLevel
-      : levels[0];
-    const rows = assignmentSummary.leaderboard[activeLevel] || [];
-
-    return (
-      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 10,
-            flexWrap: "wrap",
-          }}
-        >
-          <h3 style={{ margin: 0 }}>Assignments Leaderboard</h3>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={styles.helperText}>Level</span>
-            <select
-              style={styles.select}
-              value={activeLevel}
-              onChange={(e) => setLeaderboardLevel(e.target.value)}
-            >
-              {levels.map((level) => (
-                <option key={level} value={level}>
-                  {level}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          Ranking basiert auf höchster Note und der Anzahl eindeutiger Abgaben pro Level.
-        </p>
-        {assignmentError ? <div style={styles.errorBox}>{assignmentError}</div> : null}
-
-        <div style={{ display: "grid", gap: 10 }}>
-          {rows.length === 0 ? (
-            <div style={styles.helperText}>Keine Einträge für dieses Level.</div>
-          ) : (
-            rows.map((row, index) => (
-              <div
-                key={`${row.studentCode}-${row.lastDate || index}`}
-                style={{
-                  padding: 12,
-                  borderRadius: 12,
-                  border: "1px solid #e5e7eb",
-                  background: "#f9fafb",
-                  display: "grid",
-                  gap: 6,
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                  <div style={{ fontWeight: 800, display: "flex", gap: 8, alignItems: "center" }}>
-                    <span style={{ color: "#6b7280" }}>{index + 1}.</span>
-                    <span>{row.name || row.studentCode}</span>
-                  </div>
-                  <span style={styles.badge}>{row.studentCode}</span>
-                </div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 12, fontSize: 13, color: "#374151" }}>
-                  <span>Assignments: {row.assignmentCount}</span>
-                  <span>Beste Note: {Math.round(row.bestScore || 0)}%</span>
-                  {row.lastDate ? (
-                    <span>Letzte Abgabe: {new Date(row.lastDate).toLocaleDateString()}</span>
-                  ) : null}
-                </div>
+  return (
+    <div style={{ display: "grid", gap: 8 }}>
+      <h4 style={{ margin: 0 }}>{title}</h4>
+      <div style={{ display: "grid", gap: 8 }}>
+        {lessons.map((lesson, index) => (
+          <div
+            key={`${lesson.chapter || title}-${index}`}
+            style={{
+              padding: 10,
+              borderRadius: 10,
+              border: "1px solid #e5e7eb",
+              background: "#f9fafb",
+              display: "grid",
+              gap: 6,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+              <div style={{ fontWeight: 700 }}>
+                {lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}
               </div>
-            ))
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const handleSend = (value) => {
-    const content = value?.trim();
-    if (!content) return;
-
-    setChatMessages((prev) => [
-      ...prev,
-      { sender: "user", text: content },
-      {
-        sender: "coach",
-        text: `Notiert. Für ${courseOverview.nextAssignment.title} nutze bitte die Redemittel aus Kapitel 5. Denk an dein Ziel: ${streakValue} und ${courseOverview.attendanceSummary}.`,
-      },
-    ]);
-    setChatInput("");
-  };
-
-  const handleSubmitWork = async () => {
-    setSubmissionStatus("");
-    if (!user?.email) {
-      setSubmissionStatus("Please sign in to submit your work.");
-      return;
-    }
-
-    if (!studentCode.trim()) {
-      setSubmissionStatus("Enter your student code to track the submission.");
-      return;
-    }
-
-    if (!assignmentId) {
-      setSubmissionStatus("Pick the assignment number from the course dictionary.");
-      return;
-    }
-
-    if (!lessonSubmissionPath) {
-      setSubmissionStatus("Add an assignment number to generate the submission path.");
-      return;
-    }
-
-    if (!assignmentTitle.trim()) {
-      setSubmissionStatus("Add an assignment title so we know what you're submitting.");
-      return;
-    }
-
-    if (!workDraft.trim()) {
-      setSubmissionStatus("Add your coursework before submitting.");
-      return;
-    }
-
-    const existingLock = isSubmissionLocked({ email: user.email, studentCode });
-    if (existingLock.locked) {
-      setLocked(true);
-      setSubmissionStatus(`Submission already locked at /${existingLock.lockPath}.`);
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const result = submitWorkToSpecificPath({
-        path: lessonSubmissionPath,
-        content: workDraft,
-        studentCode,
-        lessonKey: assignmentId,
-        level: submissionLevel,
-      });
-      setLocked(true);
-      setSubmissionStatus(
-        `Submitted to ${lessonSubmissionPath} (student_code=${sanitizePathSegment(
-          studentCode
-        )}, lesson_key=${sanitizePathSegment(assignmentId)}) at ${new Date(
-          result.savedAt
-        ).toLocaleTimeString()}`
-      );
-    } catch (error) {
-      console.error("Failed to submit work", error);
-      setSubmissionStatus("Could not submit your work. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleSaveLessonDraft = () => {
-    if (!workDraft.trim()) {
-      setManualDraftStatus("Add content before saving your lesson draft.");
-      return;
-    }
-
-    if (!lessonDraftPath) {
-      setManualDraftStatus("Add student code and assignment number to save this draft.");
-      return;
-    }
-
-    const result = saveDraftToSpecificPath({ path: lessonDraftPath, content: workDraft });
-    setManualDraftStatus(
-      `Draft saved to ${lessonDraftPath} (${new Date(result.savedAt).toLocaleTimeString()})`
-    );
-  };
-
-  const renderHome = () => {
-    if (!studentProfile) {
-      return (
-        <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-            <h2 style={styles.sectionTitle}>Course Home</h2>
-            <span style={styles.badge}>No course data</span>
+              {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
+            </div>
+            <ul style={{ ...styles.checklist, margin: 0 }}>
+              {lesson.video ? (
+                <li>
+                  <a href={lesson.video} target="_blank" rel="noreferrer">
+                    Video ansehen
+                  </a>
+                </li>
+              ) : null}
+              {lesson.grammarbook_link ? (
+                <li>
+                  <a href={lesson.grammarbook_link} target="_blank" rel="noreferrer">
+                    Grammarbook
+                  </a>
+                </li>
+              ) : null}
+              {lesson.workbook_link ? (
+                <li>
+                  <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
+                    Workbook
+                  </a>
+                </li>
+              ) : null}
+            </ul>
           </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            We haven’t received course data for your account yet. Once your profile is linked to the campus system,
-            your next assignment, attendance, and recommendations will show up here.
-          </p>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Please ask your instructor for an update or try again later.
-          </p>
-        </div>
-      );
-    }
+        ))}
+      </div>
+    </div>
+  );
+};
 
-    return (
+const CourseTab = () => {
+  const levels = Object.keys(courseSchedules);
+  const [selectedCourseLevel, setSelectedCourseLevel] = useState(levels[0] || "");
+
+  const schedule = useMemo(() => courseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
+
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
           <h2 style={styles.sectionTitle}>Course Home</h2>
@@ -618,8 +82,8 @@ const CourseTab = () => {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
           <StatCard
             label="Assignment Streak"
-            value={streakValue}
-            helper={assignmentError ? `Sheet-Fehler: ${assignmentError}` : streakHelper}
+            value={`${courseOverview.assignmentStreak} Tage`}
+            helper="Halte die Serie – jede Aufgabe zählt."
           />
           <StatCard
             label="Anwesenheit"
@@ -646,230 +110,8 @@ const CourseTab = () => {
             <span style={styles.badge}>80–100 Wörter</span>
           </div>
         </div>
-
-        {renderAssignmentLeaderboard()}
-      </div>
-    );
-  };
-
-  const renderCourse = () => (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-        <h2 style={styles.sectionTitle}>My Course</h2>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={styles.helperText}>Course level:</span>
-          <select
-            style={styles.select}
-            value={selectedCourseLevel}
-            onChange={(e) => setSelectedCourseLevel(e.target.value)}
-          >
-            {Object.keys(courseSchedules).map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-      <p style={styles.helperText}>
-        Pulling content from the course dictionary. Select a level to see its full day-by-day plan.
-      </p>
-
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <div style={{ display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
-          <div>
-            <h3 style={{ margin: "0 0 4px" }}>Ready to submit your coursework?</h3>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Jump straight to the submission tools without scrolling to the bottom of this page.
-            </p>
-          </div>
-          <button style={styles.primaryButton} onClick={() => setActiveTab("submit")}>
-            Open submit tab
-          </button>
-        </div>
       </div>
 
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-        {(courseSchedules[selectedCourseLevel] || []).map((entry) => {
-          const lesenHorenList = Array.isArray(entry.lesen_hören)
-            ? entry.lesen_hören
-            : entry.lesen_hören
-            ? [entry.lesen_hören]
-            : [];
-          const schreibenSprechenList = entry.schreiben_sprechen
-            ? Array.isArray(entry.schreiben_sprechen)
-              ? entry.schreiben_sprechen
-              : [entry.schreiben_sprechen]
-            : [];
-
-          return (
-            <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <div>
-                  <span style={styles.levelPill}>Day {entry.day}</span>
-                  <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
-                  {entry.chapter ? (
-                    <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div>
-                  ) : null}
-                </div>
-                <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                  {entry.assignment !== undefined ? (
-                    <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
-                  ) : null}
-                  {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
-                </div>
-              </div>
-
-              {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-              {entry.instruction ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p> : null}
-
-              {lesenHorenList.length > 0 ? (
-                <div style={{ display: "grid", gap: 8 }}>
-                  <h4 style={{ margin: 0 }}>Lesen &amp; Hören</h4>
-                  <div style={{ display: "grid", gap: 8 }}>
-                    {lesenHorenList.map((lesson, index) => (
-                      <div
-                        key={`${entry.day}-lesen-${lesson.chapter || index}`}
-                        style={{
-                          padding: 10,
-                          borderRadius: 10,
-                          border: "1px solid #e5e7eb",
-                          background: "#f9fafb",
-                          display: "grid",
-                          gap: 6,
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-                          <div style={{ fontWeight: 700 }}>
-                            {lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}
-                          </div>
-                          {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
-                        </div>
-                        <ul style={{ ...styles.checklist, margin: 0 }}>
-                          {lesson.video ? (
-                            <li>
-                              <a href={lesson.video} target="_blank" rel="noreferrer">
-                                Video ansehen
-                              </a>
-                            </li>
-                          ) : null}
-                          {lesson.grammarbook_link ? (
-                            <li>
-                              <a href={lesson.grammarbook_link} target="_blank" rel="noreferrer">
-                                Grammarbook
-                              </a>
-                            </li>
-                          ) : null}
-                          {lesson.workbook_link ? (
-                            <li>
-                              <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
-                                Workbook
-                              </a>
-                            </li>
-                          ) : null}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {schreibenSprechenList.length > 0 ? (
-                <div style={{ display: "grid", gap: 8 }}>
-                  <h4 style={{ margin: 0 }}>Schreiben &amp; Sprechen</h4>
-                  <div style={{ display: "grid", gap: 8 }}>
-                    {schreibenSprechenList.map((lesson, index) => (
-                      <div
-                        key={`${entry.day}-schreiben-${lesson.chapter || index}`}
-                        style={{
-                          padding: 10,
-                          borderRadius: 10,
-                          border: "1px solid #e5e7eb",
-                          background: "#f8fafc",
-                          display: "grid",
-                          gap: 6,
-                        }}
-                      >
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-                          <div style={{ fontWeight: 700 }}>
-                            {lesson.chapter ? `Kapitel ${lesson.chapter}` : "Übung"}
-                          </div>
-                          {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
-                        </div>
-                        <ul style={{ ...styles.checklist, margin: 0 }}>
-                          {lesson.video ? (
-                            <li>
-                              <a href={lesson.video} target="_blank" rel="noreferrer">
-                                Video ansehen
-                              </a>
-                            </li>
-                          ) : null}
-                          {lesson.workbook_link ? (
-                            <li>
-                              <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
-                                Workbook
-                              </a>
-                            </li>
-                          ) : null}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-
-  const renderChat = () => (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-        <h2 style={styles.sectionTitle}>Class Chat · AI Coach</h2>
-        <span style={styles.badge}>Vorbereitung auf den Unterricht</span>
-      </div>
-      <p style={styles.helperText}>Fragen für die nächste Stunde, Redemittel oder Mini-Übungen – die Antworten nutzen dein Kurs-Dictionary.</p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {chatPrompts.map((prompt) => (
-          <button
-            key={prompt}
-            style={styles.secondaryButton}
-            onClick={() => handleSend(prompt)}
-          >
-            {prompt}
-          </button>
-        ))}
-      </div>
-      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={styles.chatLog}>
-          {chatMessages.map((message, index) => (
-            <div
-              key={`${message.sender}-${index}`}
-              style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
-            >
-              <strong>{message.sender === "coach" ? "Coach" : "Du"}:</strong> {message.text}
-            </div>
-          ))}
-        </div>
-        <textarea
-          style={styles.textareaSmall}
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          placeholder="Frag den Coach nach Redemitteln oder lasse dir eine Mini-Übung geben"
-        />
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button style={styles.primaryButton} onClick={() => handleSend(chatInput)}>Nachricht senden</button>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderResults = () => {
-    const levelSummary = resultsSummary || summarizeResults(results);
-
-    return (
       <div style={{ display: "grid", gap: 12 }}>
         <div
           style={{
@@ -880,463 +122,84 @@ const CourseTab = () => {
             flexWrap: "wrap",
           }}
         >
-          <h2 style={styles.sectionTitle}>My Results</h2>
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-            <span style={styles.badge}>Import: Google Sheet</span>
-            {resultsStatus.fetchedAt && (
-              <span style={{ ...styles.helperText, margin: 0 }}>
-                Sync: {new Date(resultsStatus.fetchedAt).toLocaleString()}
-              </span>
-            )}
+          <h2 style={styles.sectionTitle}>Course Book</h2>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <span style={styles.helperText}>Course level:</span>
+            <select
+              style={styles.select}
+              value={selectedCourseLevel}
+              onChange={(e) => setSelectedCourseLevel(e.target.value)}
+            >
+              {levels.map((level) => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
         <p style={styles.helperText}>
-          Die Werte stammen aus dem letzten Google-Sheet-Sync. Doppelte Aufgaben bedeuten, dass der Schüler einen Retake gemacht
-          hat; jeder Versuch wird mit einer Versuchszahl angezeigt.
+          Pulling content from the course dictionary. Select a level to see its full day-by-day plan.
         </p>
 
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-        {["A1", "A2", "B1", "B2"].map((level) => (
-          <StatCard
-            key={level}
-            label={`${level} Ergebnisse`}
-            value={levelSummary?.perLevel?.[level] || 0}
-            helper={`${levelSummary?.studentsPerLevel?.[level] || 0} eindeutige Schüler`}
-          />
-        ))}
-        <StatCard
-          label="Retakes"
-          value={levelSummary?.retakes || 0}
-          helper="Wiederholte Abgaben"
-        />
-        <StatCard label="Gesamt" value={levelSummary?.total || 0} helper="Alle Einträge" />
-      </div>
+        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+          {schedule.map((entry) => {
+            const lesenHorenList = Array.isArray(entry.lesen_hören)
+              ? entry.lesen_hören
+              : entry.lesen_hören
+              ? [entry.lesen_hören]
+              : [];
+            const schreibenSprechenList = entry.schreiben_sprechen
+              ? Array.isArray(entry.schreiben_sprechen)
+                ? entry.schreiben_sprechen
+                : [entry.schreiben_sprechen]
+              : [];
 
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-        <div>
-          <label style={styles.label}>Level filtern</label>
-          <select
-            style={styles.select}
-            value={resultsLevelFilter}
-            onChange={(e) => setResultsLevelFilter(e.target.value)}
-          >
-            <option value="all">Alle</option>
-            <option value="A1">A1</option>
-            <option value="A2">A2</option>
-            <option value="B1">B1</option>
-            <option value="B2">B2</option>
-          </select>
-          <p style={styles.helperText}>Begrenzt die Liste auf ein Niveau.</p>
-        </div>
-        <div>
-          <label style={styles.label}>Student code</label>
-          <input
-            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-            value={resultsStudentFilter}
-            onChange={(e) => setResultsStudentFilter(e.target.value)}
-            placeholder="z.B. sewornua2"
-          />
-          <p style={styles.helperText}>Filtert nach Studentcode oder Teilen davon.</p>
-        </div>
-        <div>
-          <label style={styles.label}>Gefilterte Übersicht</label>
-          <div style={styles.helperText}>
-            {filteredSummary.total} Ergebnisse · {filteredSummary.retakes} Retakes · {filteredSummary.uniqueStudents} eindeutige
-            Schüler
-          </div>
-        </div>
-      </div>
-
-      {resultsStatus.error && <div style={styles.errorBox}>{resultsStatus.error}</div>}
-      {resultsStatus.loading && <div style={styles.helperText}>Lade Ergebnisse ...</div>}
-
-      {!resultsStatus.loading && !filteredResults.length && (
-        <div style={styles.card}>
-          <p style={{ margin: 0 }}>Keine Ergebnisse gefunden. Passe Filter an oder versuche es später erneut.</p>
-        </div>
-      )}
-
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-        {filteredResults.map((row) => (
-          <div
-            key={`${row.studentCode}-${row.assignment}-${row.attempt}-${row.date}`}
-            style={{
-              ...styles.card,
-              marginBottom: 0,
-              border: row.isRetake ? "1px solid #f97316" : undefined,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", flexWrap: "wrap" }}>
-              <div>
-                <h3 style={{ margin: "0 0 4px 0" }}>{row.assignment}</h3>
-                <p style={{ ...styles.helperText, margin: 0 }}>
-                  {row.studentName || "Unbekannter Name"} · {row.studentCode || "kein Code"}
-                </p>
-              </div>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "flex-end" }}>
-                <span style={styles.badge}>{row.level || "?"}</span>
-                {row.date && <span style={styles.badge}>{row.date}</span>}
-                <span style={styles.badge}>
-                  Versuch {row.attempt || 1}
-                  {row.isRetake ? " · Retake" : ""}
-                </span>
-              </div>
-            </div>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Score: {row.score || "pending"}</div>
-            <p style={{ margin: "0 0 8px 0" }}>{row.comments || "Kein Feedback hinterlegt."}</p>
-            {row.link ? (
-              <a href={row.link} target="_blank" rel="noreferrer" style={{ fontWeight: 600 }}>
-                Link öffnen
-              </a>
-            ) : null}
-          </div>
-        ))}
-      </div>
-    </div>
-    );
-  };
-
-  const renderLetters = () => {
-    const handleReviewLetter = () => {
-      if (!letterDraft.trim()) {
-        setLetterFeedback("Füge deinen Brief ein, damit der Coach ihn prüfen kann.");
-        return;
-      }
-
-      const wordCount = letterDraft.trim().split(/\s+/).length;
-      const topicHint = letterQuestion.trim()
-        ? `Aufgabe: "${letterQuestion.trim()}"`
-        : "Keine Aufgabe angegeben";
-
-      const insights = [
-        `${topicHint}.`,
-        wordCount < 80
-          ? "Dein Text ist noch kurz – füge Details zu Ort, Zeit und Begründungen hinzu."
-          : "Gute Länge! Prüfe, ob jede Bullet-Point-Forderung direkt beantwortet ist.",
-        "Prüfe Satzanfänge (z.B. Zudem, Außerdem, Danach), um den roten Faden klar zu halten.",
-        "Schließe mit einer klaren Bitte oder einem nächsten Schritt (z.B. Rückmeldung, Termin).",
-      ];
-
-      setLetterFeedback(
-        `AI Coach (Demo): ${insights[0]}\n- ${insights.slice(1).join("\n- ")}`
-      );
-    };
-
-    const handleIdeaSend = (message) => {
-      const content = message.trim();
-      if (!content) return;
-
-      setIdeaMessages((prev) => [
-        ...prev,
-        { sender: "user", text: content },
-        {
-          sender: "coach",
-          text: `Hier sind drei Ansatzpunkte für ${
-            letterQuestion.trim() || "deine Aufgabe"
-          }:\n1) Situations-Check: Was ist der Anlass und welches Ziel hast du?\n2) Struktur: Einleitung (Dank/Bezug) · Hauptteil (2–3 Kernpunkte) · Abschluss (Bitte/Frist).\n3) Sprach-Booster: Nutze zwei Verbindungswörter (z.B. außerdem, dennoch) und eine klare Bitte im letzten Satz.`,
-        },
-      ]);
-      setIdeaInput("");
-    };
-
-    return (
-      <div style={{ display: "grid", gap: 12 }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 10,
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <h2 style={styles.sectionTitle}>Schreiben Trainer</h2>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              style={writingSubtab === "mark" ? styles.primaryButton : styles.secondaryButton}
-              onClick={() => setWritingSubtab("mark")}
-              type="button"
-            >
-              Mark my letter
-            </button>
-            <button
-              style={writingSubtab === "ideas" ? styles.primaryButton : styles.secondaryButton}
-              onClick={() => setWritingSubtab("ideas")}
-              type="button"
-            >
-              Ideas generator
-            </button>
-          </div>
-        </div>
-
-        {writingSubtab === "mark" ? (
-          <div style={{ ...styles.card, display: "grid", gap: 12 }}>
-            <div style={{ display: "grid", gap: 4 }}>
-              <h3 style={{ margin: 0 }}>Mark my letter</h3>
-              <p style={styles.helperText}>
-                Füge die Prüfungsfrage oben ein und deinen Brief darunter. Der AI-Coach gibt dir Sofort-Feedback zu Länge,
-                Struktur und Redemitteln.
-              </p>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              <label style={styles.label}>Letter question oder Aufgabenstellung</label>
-              <textarea
-                style={styles.textArea}
-                placeholder="Kopiere hier die genaue Frage / Situation aus der Prüfung"
-                value={letterQuestion}
-                onChange={(e) => setLetterQuestion(e.target.value)}
-              />
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              <label style={styles.label}>Dein Brief (zum Prüfen einfügen)</label>
-              <textarea
-                style={{ ...styles.textArea, minHeight: 180 }}
-                placeholder="Liebes Prüfungsamt, ..."
-                value={letterDraft}
-                onChange={(e) => setLetterDraft(e.target.value)}
-              />
-            </div>
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <button style={styles.primaryButton} type="button" onClick={handleReviewLetter}>
-                AI um Feedback bitten
-              </button>
-            </div>
-            {letterFeedback ? (
-              <div style={styles.card}>
-                <div style={{ fontWeight: 700, marginBottom: 6 }}>Feedback</div>
-                <pre style={{ ...styles.pre, background: "#0f172a", color: "#e2e8f0" }}>{letterFeedback}</pre>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {writingSubtab === "ideas" ? (
-          <div style={{ ...styles.card, display: "grid", gap: 12 }}>
-            <div style={{ display: "grid", gap: 4 }}>
-              <h3 style={{ margin: 0 }}>Ideas generator</h3>
-              <p style={styles.helperText}>
-                Klebe die Aufgabenstellung ein und chatte mit dem Coach. Er schlägt Ideen, Satzstarter und Formulierungen vor,
-                bevor du schreibst.
-              </p>
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              <label style={styles.label}>Letter question</label>
-              <textarea
-                style={styles.textArea}
-                placeholder="Beschweren Sie sich beim Vermieter über Heizung und Internet ..."
-                value={letterQuestion}
-                onChange={(e) => setLetterQuestion(e.target.value)}
-              />
-            </div>
-            <div style={{ display: "grid", gap: 8 }}>
-              <div style={styles.chatLog}>
-                {ideaMessages.map((message, index) => (
-                  <div
-                    key={`${message.sender}-${index}`}
-                    style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
-                  >
-                    <strong>{message.sender === "coach" ? "Coach" : "Du"}:</strong> {message.text}
+            return (
+              <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                  <div>
+                    <span style={styles.levelPill}>Day {entry.day}</span>
+                    <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
+                    {entry.chapter ? <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div> : null}
                   </div>
-                ))}
+                  <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
+                    {entry.assignment !== undefined ? (
+                      <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
+                    ) : null}
+                    {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
+                  </div>
+                </div>
+
+                {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
+                {entry.instruction ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p> : null}
+
+                <LessonList title="Lesen & Hören" lessons={lesenHorenList} />
+                <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} />
+
+                {entry.schreiben ? (
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <h4 style={{ margin: 0 }}>Schreiben</h4>
+                    <p style={{ margin: 0 }}>{entry.schreiben}</p>
+                  </div>
+                ) : null}
+                {entry.sprechen ? (
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <h4 style={{ margin: 0 }}>Sprechen</h4>
+                    <p style={{ margin: 0 }}>{entry.sprechen}</p>
+                  </div>
+                ) : null}
+                {entry.zusatzmaterial ? (
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
+                    <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
+                  </div>
+                ) : null}
               </div>
-              <textarea
-                style={styles.textareaSmall}
-                placeholder="Beschreibe kurz, wobei du Hilfe brauchst – z.B. Ideen für Einleitung oder Schluss."
-                value={ideaInput}
-                onChange={(e) => setIdeaInput(e.target.value)}
-              />
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                <button style={styles.primaryButton} type="button" onClick={() => handleIdeaSend(ideaInput)}>
-                  Nachricht senden
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : null}
-      </div>
-    );
-  };
-
-  const renderSubmission = () => (
-    <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 10,
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        <h2 style={styles.sectionTitle}>Submit your coursework</h2>
-        <span style={styles.badge}>/drafts_v2 · /submissions/{submissionLevel}</span>
-      </div>
-      <p style={styles.helperText}>
-        Drafts are auto-saved in Firebase-style paths rooted at your student code. We now auto-look up your student code
-        from the students collection when you sign in, and you can pick the assignment number directly from the course
-        dictionary to avoid mistakes.
-      </p>
-      <p style={styles.helperText}>
-        Need explicit lesson paths? Use the buttons to save drafts to
-        {" "}
-        {lessonDraftPath || "/drafts_v2/<student-code>/lessons/<assignment>"} and submit the final version to
-        {lessonSubmissionPath || `/submissions/${submissionLevel}/posts`} (filtered by
-        student_code + lesson_key).
-      </p>
-
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-        <div>
-          <label style={styles.label}>Student email</label>
-          <input
-            value={user?.email || ""}
-            readOnly
-            style={{ ...styles.textArea, minHeight: "auto", height: 44, background: "#f9fafb" }}
-          />
-          <p style={styles.helperText}>Used to key your draft and submission.</p>
-        </div>
-        <div>
-          <label style={styles.label}>Student code</label>
-          <input
-            value={studentCode}
-            onChange={(e) => setStudentCode(e.target.value)}
-            placeholder="Campus / student code"
-            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-            disabled={locked}
-          />
-          <p style={styles.helperText}>Required alongside email to store drafts and submissions.</p>
-        </div>
-        <div>
-          <label style={styles.label}>Course level for this upload</label>
-          <select
-            style={styles.select}
-            value={submissionLevel}
-            onChange={(e) => setSubmissionLevel(e.target.value)}
-            disabled={locked}
-          >
-            {Object.keys(courseSchedules).map((level) => (
-              <option key={level} value={level}>
-                {level}
-              </option>
-            ))}
-          </select>
-          <p style={styles.helperText}>Matches the /submissions/{submissionLevel} path.</p>
-        </div>
-        <div>
-          <label style={styles.label}>Assignment number</label>
-          <select
-            style={styles.select}
-            value={assignmentId}
-            onChange={(e) => setAssignmentId(e.target.value)}
-            disabled={locked || !assignmentOptions.length}
-          >
-            {!assignmentId && <option value="">Select from dictionary</option>}
-            {assignmentOptions.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-          <p style={styles.helperText}>
-            Pulled from the course dictionary so you don’t have to type the assignment number manually.
-          </p>
-        </div>
-        <div>
-          <label style={styles.label}>Assignment title</label>
-          <input
-            value={assignmentTitle}
-            onChange={(e) => setAssignmentTitle(e.target.value)}
-            placeholder="Auto-picked from your profile or course data"
-            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-            disabled={locked}
-          />
-          <p style={styles.helperText}>
-            Pulled from your Firebase student record when available so we can tag this submission.
-          </p>
+            );
+          })}
         </div>
       </div>
-
-      <div>
-        <label style={styles.label}>Your work</label>
-        <textarea
-          style={styles.textArea}
-          value={workDraft}
-          disabled={locked}
-          onChange={(e) => setWorkDraft(e.target.value)}
-          rows={6}
-          placeholder="Paste or type your course work. Drafts save to /drafts_v2 while you type."
-        />
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 8,
-          }}
-        >
-          <span style={{ ...styles.helperText, margin: 0 }}>{draftStatus}</span>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            {locked && <span style={styles.lockPill}>Locked</span>}
-            <button
-              style={styles.secondaryButton}
-              type="button"
-              onClick={handleSaveLessonDraft}
-              disabled={locked}
-            >
-              Save draft
-            </button>
-            <button
-              style={styles.primaryButton}
-              onClick={handleSubmitWork}
-              disabled={locked || submitting}
-            >
-              {locked ? "Submission locked" : submitting ? "Submitting..." : "Submit now"}
-            </button>
-          </div>
-        </div>
-        <div style={{ display: "grid", gap: 8 }}>
-          {manualDraftStatus && (
-            <div style={styles.successBox}>
-              {manualDraftStatus} {lessonDraftPath ? `(path: ${lessonDraftPath})` : ""}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {submissionStatus && (
-        <div
-          style={
-            submissionStatus.toLowerCase().includes("submitted to")
-              ? styles.successBox
-              : styles.errorBox
-          }
-        >
-          {submissionStatus}
-        </div>
-      )}
-    </section>
-  );
-
-  return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={styles.tabList}>
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            style={activeTab === tab.key ? styles.tabButtonActive : styles.tabButton}
-            onClick={() => setActiveTab(tab.key)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === "home" && renderHome()}
-      {activeTab === "course" && renderCourse()}
-      {activeTab === "chat" && renderChat()}
-      {activeTab === "results" && renderResults()}
-      {activeTab === "letters" && renderLetters()}
-      {activeTab === "submit" && renderSubmission()}
     </div>
   );
 };
