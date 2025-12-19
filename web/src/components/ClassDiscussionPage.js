@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
+import { questionDictionary } from "../data/questionDictionary";
 import { styles } from "../styles";
 import {
   addDoc,
@@ -14,11 +15,14 @@ import {
   serverTimestamp,
   Timestamp,
   setDoc,
+  deleteField,
 } from "../firebase";
 import { correctDiscussionText } from "../services/discussionService";
 
 const postsCollectionRef = (level, className) =>
   collection(db, "class_board", level, "classes", className, "posts");
+const presenceCollectionRef = (level, className) =>
+  collection(db, "class_board", level, "classes", className, "presence");
 
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "Kein Timer";
@@ -30,10 +34,20 @@ const formatTimeRemaining = (expiresAt, now) => {
   return diff > 0 ? `${minutes}:${seconds}` : "Abgelaufen";
 };
 
+const formatDateTime = (value) => {
+  if (!value) return "Sofort";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Sofort";
+  return date.toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
+};
+
+const defaultStartTime = () => new Date().toISOString().slice(0, 16);
+
 const ClassDiscussionPage = () => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
   const [repliesByThread, setRepliesByThread] = useState({});
+  const [typingByThread, setTypingByThread] = useState({});
   const [now, setNow] = useState(Date.now());
   const [replyDrafts, setReplyDrafts] = useState({});
   const [isCorrectingDraft, setIsCorrectingDraft] = useState({});
@@ -45,9 +59,13 @@ const ClassDiscussionPage = () => {
     lessonId: "",
     topic: "",
     question: "",
+    instructions: "",
+    dictionaryId: "",
     extraLink: "",
     timerMinutes: 15,
+    startTime: defaultStartTime(),
   });
+  const typingTimeouts = useRef({});
 
   const lessonOptions = useMemo(() => {
     const options = [];
@@ -66,6 +84,14 @@ const ClassDiscussionPage = () => {
     });
     return options;
   }, []);
+
+  const dictionaryOptions = useMemo(() => {
+    const level = (studentProfile?.level || "").toUpperCase();
+    const filtered = questionDictionary.filter(
+      (entry) => !level || entry.level.toUpperCase() === level
+    );
+    return filtered.length > 0 ? filtered : questionDictionary;
+  }, [studentProfile?.level]);
 
   useEffect(() => {
     if (!db) {
@@ -95,8 +121,14 @@ const ClassDiscussionPage = () => {
             lessonLabel: data.lessonLabel || "",
             topic: data.topic || "",
             question: data.question || "",
+            questionTitle: data.questionTitle || data.topic || "",
+            dictionaryId: data.dictionaryId || "",
+            instructions: data.instructions || "",
             extraLink: data.extraLink || "",
             timerMinutes: data.timerMinutes || 0,
+            availableAt: data.availableAt?.toMillis
+              ? data.availableAt.toMillis()
+              : data.availableAt || null,
             createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
             createdBy: data.createdBy || "Tutor",
             createdByUid: data.createdByUid || null,
@@ -155,11 +187,49 @@ const ClassDiscussionPage = () => {
   }, [db]);
 
   useEffect(() => {
+    if (!db || !studentProfile?.level || !studentProfile?.className) return undefined;
+
+    const presenceRef = presenceCollectionRef(studentProfile.level, studentProfile.className);
+    const unsubscribe = onSnapshot(
+      presenceRef,
+      (snapshot) => {
+        const nowTs = Date.now();
+        const grouped = {};
+
+        snapshot.forEach((docSnapshot) => {
+          const data = docSnapshot.data();
+          const typingFor = data.typingFor;
+          const typedAt = data.typingAt?.toMillis ? data.typingAt.toMillis() : data.typingAt || 0;
+          if (!typingFor || !typedAt || nowTs - typedAt > 15000) return;
+
+          const name = data.displayName || data.responder || data.author || "Student";
+          const existing = new Set(grouped[typingFor] || []);
+          existing.add(name);
+          grouped[typingFor] = Array.from(existing);
+        });
+
+        setTypingByThread(grouped);
+      },
+      (err) => {
+        console.error("Failed to subscribe to typing indicators", err);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [db, studentProfile?.level, studentProfile?.className]);
+
+  useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => () => {
+    Object.values(typingTimeouts.current).forEach((timeoutId) => clearTimeout(timeoutId));
+  }, []);
+
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
+  const selectedDictionaryEntry =
+    dictionaryOptions.find((entry) => entry.id === form.dictionaryId) || dictionaryOptions[0];
 
   useEffect(() => {
     if (!form.lessonId && lessonOptions.length > 0) {
@@ -167,7 +237,33 @@ const ClassDiscussionPage = () => {
     }
   }, [form.lessonId, lessonOptions]);
 
+  useEffect(() => {
+    if (!form.dictionaryId && dictionaryOptions.length > 0) {
+      const entry = dictionaryOptions[0];
+      setForm((prev) => ({
+        ...prev,
+        dictionaryId: entry.id,
+        question: entry.question,
+        instructions: entry.instructions,
+        topic: prev.topic || entry.title,
+        extraLink: prev.extraLink || entry.suggestedLink,
+      }));
+    }
+  }, [dictionaryOptions, form.dictionaryId]);
+
   const handleFormChange = (field, value) => {
+    if (field === "dictionaryId") {
+      const entry = questionDictionary.find((item) => item.id === value);
+      setForm((prev) => ({
+        ...prev,
+        dictionaryId: value,
+        question: entry?.question || prev.question,
+        instructions: entry?.instructions || prev.instructions,
+        topic: entry?.title || prev.topic,
+        extraLink: entry?.suggestedLink || prev.extraLink,
+      }));
+      return;
+    }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -180,8 +276,10 @@ const ClassDiscussionPage = () => {
     }
 
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
+    const dictionaryEntry = questionDictionary.find((item) => item.id === form.dictionaryId);
     const timerMinutes = Number(form.timerMinutes) || 0;
     const expiresAtMillis = timerMinutes ? Date.now() + timerMinutes * 60000 : null;
+    const availableAtMillis = Date.parse(form.startTime || "") || Date.now();
 
     setIsSavingThread(true);
     setError("");
@@ -193,9 +291,13 @@ const ClassDiscussionPage = () => {
         lessonId: lesson?.id,
         lessonLabel: lesson?.label,
         topic: form.topic || lesson?.topic,
+        questionTitle: dictionaryEntry?.title || form.topic || lesson?.topic,
+        dictionaryId: dictionaryEntry?.id || form.dictionaryId || "",
+        instructions: form.instructions || dictionaryEntry?.instructions || "",
         question: form.question,
         extraLink: form.extraLink,
         timerMinutes,
+        availableAt: Timestamp.fromMillis(availableAtMillis),
         createdAt: serverTimestamp(),
         createdBy: user?.email || "Tutor",
         createdByUid: user?.uid || null,
@@ -203,10 +305,13 @@ const ClassDiscussionPage = () => {
       });
       setForm({
         lessonId: lesson?.id || "",
-        topic: lesson?.topic || "",
-        question: "",
-        extraLink: "",
+        topic: lesson?.topic || dictionaryEntry?.title || "",
+        dictionaryId: dictionaryEntry?.id || form.dictionaryId || "",
+        question: dictionaryEntry?.question || "",
+        instructions: dictionaryEntry?.instructions || "",
+        extraLink: dictionaryEntry?.suggestedLink || "",
         timerMinutes,
+        startTime: defaultStartTime(),
       });
     } catch (err) {
       console.error("Failed to create discussion thread", err);
@@ -218,6 +323,61 @@ const ClassDiscussionPage = () => {
 
   const getResponderCode = () =>
     studentProfile?.studentcode || studentProfile?.id || studentProfile?.className || user?.uid || "unknown";
+
+  const getPresenceDocRef = () => {
+    if (!db || !studentProfile?.level || !studentProfile?.className) return null;
+    return doc(
+      presenceCollectionRef(studentProfile.level, studentProfile.className),
+      user?.uid || studentProfile?.id || studentProfile?.studentcode || "anonymous"
+    );
+  };
+
+  const stopTypingIndicator = async (threadId) => {
+    const presenceDocRef = getPresenceDocRef();
+    if (!presenceDocRef) return;
+
+    if (typingTimeouts.current[threadId]) {
+      clearTimeout(typingTimeouts.current[threadId]);
+      delete typingTimeouts.current[threadId];
+    }
+
+    try {
+      await setDoc(
+        presenceDocRef,
+        { typingFor: deleteField(), typingAt: serverTimestamp() },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error("Failed to clear typing indicator", err);
+    }
+  };
+
+  const markTypingForThread = async (threadId) => {
+    const presenceDocRef = getPresenceDocRef();
+    if (!presenceDocRef) return;
+
+    if (typingTimeouts.current[threadId]) {
+      clearTimeout(typingTimeouts.current[threadId]);
+    }
+
+    try {
+      await setDoc(
+        presenceDocRef,
+        {
+          displayName: studentProfile?.name || user?.email || "Student",
+          typingFor: threadId,
+          typingAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+
+      typingTimeouts.current[threadId] = setTimeout(() => {
+        stopTypingIndicator(threadId);
+      }, 8000);
+    } catch (err) {
+      console.error("Failed to write typing indicator", err);
+    }
+  };
 
   const handleReply = async (threadId) => {
     const draft = replyDrafts[threadId] || "";
@@ -248,6 +408,7 @@ const ClassDiscussionPage = () => {
         { merge: true }
       );
       setReplyDrafts((prev) => ({ ...prev, [threadId]: "" }));
+      stopTypingIndicator(threadId);
     } catch (err) {
       console.error("Failed to post reply", err);
       setError("Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.");
@@ -348,27 +509,60 @@ const ClassDiscussionPage = () => {
     [threads, repliesByThread]
   );
 
-  const renderThread = (thread) => (
-    <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
-        <div style={{ display: "grid", gap: 4 }}>
-          <div style={{ fontWeight: 800, fontSize: 16 }}>{thread.topic}</div>
-          <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
-          {thread.extraLink ? (
-            <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
-              Externer Link öffnen
-            </a>
+  const renderThread = (thread) => {
+    const isActive = !thread.availableAt || now >= thread.availableAt;
+
+    return (
+      <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <div style={{ fontWeight: 800, fontSize: 16 }}>{thread.questionTitle || thread.topic}</div>
+            <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
+            {thread.extraLink ? (
+              <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
+                Externer Link öffnen
+              </a>
+            ) : null}
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <span style={styles.badge}>Frage von {thread.createdBy}</span>
+            <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>
+              Timer {formatTimeRemaining(thread.expiresAt, now)}
+            </span>
+            <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0e7490" }}>
+              Start: {formatDateTime(thread.availableAt)}
+            </span>
+            {!isActive && (
+              <span style={{ ...styles.badge, background: "#fffbeb", borderColor: "#fcd34d", color: "#92400e" }}>
+                Geplant · startet bald
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 6 }}>
+          <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
+            <strong>Frage:</strong> {thread.question}
+          </div>
+          {thread.availableAt && now < thread.availableAt ? (
+            <div style={{ ...styles.helperText, margin: 0, color: "#c2410c" }}>
+              Diese Diskussion startet am {formatDateTime(thread.availableAt)}. Antworten sind bis dahin deaktiviert.
+            </div>
+          ) : null}
+          {thread.instructions ? (
+            <div
+              style={{
+                ...styles.helperText,
+                margin: 0,
+                background: "#f8fafc",
+                padding: 10,
+                borderRadius: 10,
+              }}
+            >
+              <strong>Anleitung:</strong> {thread.instructions}
+            </div>
           ) : null}
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <span style={styles.badge}>Frage von {thread.createdBy}</span>
-          <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>
-            Timer {formatTimeRemaining(thread.expiresAt, now)}
-          </span>
-        </div>
-      </div>
-
-      <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>{thread.question}</div>
 
       <div style={{ display: "grid", gap: 8 }}>
         <div style={{ fontWeight: 700, fontSize: 14 }}>Antworten ({thread.replies.length})</div>
@@ -429,18 +623,30 @@ const ClassDiscussionPage = () => {
             style={styles.textareaSmall}
             placeholder="Teile deine Meinung oder gib Feedback ..."
             value={replyDrafts[thread.id] || ""}
-            onChange={(e) => setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }))}
+            onChange={(e) => {
+              setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
+              if (isActive) {
+                markTypingForThread(thread.id);
+              }
+            }}
+            onBlur={() => stopTypingIndicator(thread.id)}
+            disabled={!isActive}
           />
+          {typingByThread[thread.id]?.length ? (
+            <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
+              {typingByThread[thread.id].join(", ")} tippt gerade ...
+            </div>
+          ) : null}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
             <button
               style={{ ...styles.secondaryButton, padding: "10px 12px" }}
               type="button"
               onClick={() => handleCorrectDraft(thread.id)}
-              disabled={isCorrectingDraft[thread.id]}
+              disabled={isCorrectingDraft[thread.id] || !isActive}
             >
               {isCorrectingDraft[thread.id] ? "KI korrigiert ..." : "Mit KI korrigieren"}
             </button>
-            <button style={styles.primaryButton} onClick={() => handleReply(thread.id)}>
+            <button style={styles.primaryButton} onClick={() => handleReply(thread.id)} disabled={!isActive}>
               Antwort posten
             </button>
           </div>
@@ -452,6 +658,8 @@ const ClassDiscussionPage = () => {
     </div>
   );
 
+  };
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={styles.card}>
@@ -462,6 +670,13 @@ const ClassDiscussionPage = () => {
               Tutor:innen erstellen eine Frage mit Timer, Thema und Link. Studierende sehen neue Beiträge sofort und können ihre Antworten
               bearbeiten oder löschen.
             </p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+              <span style={styles.badge}>Level: {studentProfile?.level || "(fehlt)"}</span>
+              <span style={styles.badge}>Klasse: {studentProfile?.className || "(fehlt)"}</span>
+              <span style={{ ...styles.badge, background: "#f8fafc", borderColor: "#cbd5e1", color: "#0f172a" }}>
+                Nur Mitglieder deiner Klasse sehen und posten hier.
+              </span>
+            </div>
           </div>
           <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
             Live aktualisiert
@@ -504,6 +719,25 @@ const ClassDiscussionPage = () => {
               ) : null}
             </div>
             <div style={styles.field}>
+              <label style={styles.label}>Frage aus dem Katalog</label>
+              <select
+                value={form.dictionaryId}
+                onChange={(e) => handleFormChange("dictionaryId", e.target.value)}
+                style={styles.select}
+              >
+                {dictionaryOptions.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.level} · {option.title}
+                  </option>
+                ))}
+              </select>
+              {selectedDictionaryEntry?.question ? (
+                <div style={{ ...styles.helperText, margin: 0 }}>
+                  Vorgabe: {selectedDictionaryEntry.question}
+                </div>
+              ) : null}
+            </div>
+            <div style={styles.field}>
               <label style={styles.label}>Thema / Überschrift</label>
               <input
                 type="text"
@@ -525,6 +759,19 @@ const ClassDiscussionPage = () => {
               />
             </div>
             <div style={styles.field}>
+              <label style={styles.label}>Startzeit</label>
+              <input
+                type="datetime-local"
+                style={styles.select}
+                value={form.startTime}
+                onChange={(e) => handleFormChange("startTime", e.target.value)}
+                min={defaultStartTime()}
+              />
+              <div style={{ ...styles.helperText, margin: 0 }}>
+                Wähle, wann die Frage sichtbar wird. Standard ist jetzt sofort.
+              </div>
+            </div>
+            <div style={styles.field}>
               <label style={styles.label}>Zusätzlicher Link (optional)</label>
               <input
                 type="url"
@@ -534,6 +781,16 @@ const ClassDiscussionPage = () => {
                 placeholder="https://..."
               />
             </div>
+          </div>
+
+          <div style={styles.field}>
+            <label style={styles.label}>Anleitung für alle</label>
+            <textarea
+              style={styles.textArea}
+              value={form.instructions}
+              onChange={(e) => handleFormChange("instructions", e.target.value)}
+              placeholder="Hinweise für Hausregeln, Materialien oder Format der Antworten"
+            />
           </div>
 
           <div style={styles.field}>
