@@ -2,6 +2,8 @@ import { collection, collectionGroup, db, getDoc, getDocs, doc, query, where } f
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { firestoreCollections } from "../lib/firestorePaths";
 
+const normalizeLevel = (level) => (level || "general").toString();
+
 const parseAssignmentNumber = (assignment = "") => {
   const match = assignment.match(/(\d+(?:\.\d+)?)/);
   return match ? Number(match[1]) : null;
@@ -14,8 +16,7 @@ const toDate = (value) => {
 
 const unique = (arr) => Array.from(new Set(arr));
 
-const loadScores = async ({ studentCode } = {}) => {
-  const scoresRef = collection(db, ...firestoreCollections.scores());
+const buildSubmissionQuery = ({ level, studentCode } = {}) => {
   const constraints = [];
   const hasLevel = level && level !== "all";
   const ref = hasLevel
