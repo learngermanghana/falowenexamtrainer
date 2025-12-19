@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { getBackendBaseUrl } from "../services/backendConfig";
 
 export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
   const [status, setStatus] = useState("loading");
   const [lastChecked, setLastChecked] = useState(null);
 
   const refresh = useCallback(async () => {
-    const baseUrl = process.env.REACT_APP_API_BASE || "";
+    const baseUrl = getBackendBaseUrl();
     const url = `${baseUrl}/api/health`;
 
     try {

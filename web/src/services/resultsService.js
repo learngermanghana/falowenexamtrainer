@@ -1,9 +1,8 @@
 import { collection, db, getDocs, query, where } from "../firebase";
 import { courseSchedules } from "../data/courseSchedule";
+import { getBackendBaseUrl } from "./backendConfig";
 
-const backendUrl =
-  process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+const backendUrl = getBackendBaseUrl();
 
 const LEVEL_ASSIGNMENT_TARGET_OVERRIDES = {
   A1: 19,
