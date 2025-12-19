@@ -1,4 +1,4 @@
-import { collection, db, getDoc, getDocs, doc, query, where } from "../firebase";
+import { collection, collectionGroup, db, getDoc, getDocs, doc, query, where } from "../firebase";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { firestoreCollections } from "../lib/firestorePaths";
 
@@ -17,10 +17,20 @@ const unique = (arr) => Array.from(new Set(arr));
 const loadScores = async ({ studentCode } = {}) => {
   const scoresRef = collection(db, ...firestoreCollections.scores());
   const constraints = [];
+  const hasLevel = level && level !== "all";
+  const ref = hasLevel
+    ? collection(db, ...firestoreCollections.submissions(normalizeLevel(level)))
+    : collectionGroup(db, "posts");
+
   if (studentCode) {
     constraints.push(where("studentcode", "==", studentCode));
   }
-  const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
+
+  return constraints.length ? query(ref, ...constraints) : ref;
+};
+
+const loadScores = async ({ level, studentCode } = {}) => {
+  const snapshot = await getDocs(buildSubmissionQuery({ level, studentCode }));
   return snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
 };
 

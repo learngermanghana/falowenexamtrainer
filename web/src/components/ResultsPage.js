@@ -165,7 +165,7 @@ const ResultsPage = () => {
       <section style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h3 style={{ margin: 0 }}>Ergebnisse</h3>
-          <span style={styles.badge}>Quelle: /scores</span>
+          <span style={styles.badge}>Quelle: /submissions</span>
         </div>
 
         {!loading && !sortedResults.length ? (
