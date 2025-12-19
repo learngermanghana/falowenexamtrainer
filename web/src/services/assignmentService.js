@@ -14,9 +14,8 @@ const toDate = (value) => {
 
 const unique = (arr) => Array.from(new Set(arr));
 
-const normalizeLevel = (level) => (level || "general").toString().toUpperCase();
-
-const buildSubmissionQuery = ({ level, studentCode } = {}) => {
+const loadScores = async ({ studentCode } = {}) => {
+  const scoresRef = collection(db, ...firestoreCollections.scores());
   const constraints = [];
   const hasLevel = level && level !== "all";
   const ref = hasLevel

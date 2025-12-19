@@ -119,11 +119,7 @@ const fetchSheetScores = async ({ level, studentCode, email } = {}) => {
 };
 
 const loadFirestoreScores = async ({ level, studentCode } = {}) => {
-  const hasLevel = level && level !== "all";
-  const ref = hasLevel
-    ? collection(db, ...firestoreCollections.submissions(level.toUpperCase()))
-    : collectionGroup(db, "posts");
-
+  const scoresRef = collection(db, ...firestoreCollections.scores());
   const constraints = [];
   if (studentCode) {
     constraints.push(where("studentcode", "==", studentCode));

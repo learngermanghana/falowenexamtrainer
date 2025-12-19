@@ -8,7 +8,8 @@ This project reads from or writes to a handful of Firestore collections carried 
 
 ## Assignments and submissions
 - `drafts_v2/{student}/lessons/{lesson}` keeps per-student draft text while learners type; legacy `draft_answers` keys are still read for older saves.【F:web/src/services/submissionService.js†L1-L120】
-- `submissions/{level}/posts` is the per-level submission feed tracked in local storage alongside `submission_locks/{level__student__lesson}` to prevent duplicate sends and now fuels leaderboards and results queries in React.【F:web/src/services/submissionService.js†L120-L215】【F:web/src/services/assignmentService.js†L14-L44】【F:web/src/services/resultsService.js†L19-L43】
+- `submissions/{level}/posts` is the per-level submission feed tracked in local storage alongside `submission_locks/{level__student__lesson}` to prevent duplicate sends.【F:web/src/services/submissionService.js†L120-L215】
+- `scores` holds graded assignment rows pulled into the leaderboard and results screens.【F:web/src/services/assignmentService.js†L14-L25】【F:web/src/services/resultsService.js†L19-L40】
 
 ## Student profiles and auth
 - `students` stores student records used for legacy login lookups on the backend and profile enrichment on the frontend.【F:functions/functionz/app.js†L349-L378】【F:web/src/services/studentDirectory.js†L22-L44】
@@ -17,4 +18,4 @@ This project reads from or writes to a handful of Firestore collections carried 
 - `attendance/{className}/sessions` contains per-class attendance sessions that the attendance helper aggregates for each student.【F:web/src/services/attendanceService.js†L48-L88】
 
 ## Falowen chat/coaching
-- `falowen_chats/{userId}/messages` persists chat history for the coaching assistant shown in the course tab.【F:web/src/services/chatService.js†L12-L45】
+- `falowenChats/{userId}/messages` persists chat history for the coaching assistant shown in the course tab.【F:web/src/services/chatService.js†L12-L45】
