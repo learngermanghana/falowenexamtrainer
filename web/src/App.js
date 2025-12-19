@@ -4,6 +4,7 @@ import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import HealthIndicator from "./components/HealthIndicator";
+import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
@@ -12,6 +13,7 @@ import "./App.css";
 function App() {
   const { user, loading: authLoading, logout, authError } = useAuth();
   const [authMode, setAuthMode] = useState("login");
+  const [activeSection, setActiveSection] = useState("submit");
 
   if (!isFirebaseConfigured) {
     return (
@@ -80,7 +82,22 @@ function App() {
         </header>
 
         <main className="layout-main" style={{ minWidth: 0 }}>
-          <CourseTab />
+          <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
+            <button
+              style={activeSection === "submit" ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActiveSection("submit")}
+            >
+              Abgabe
+            </button>
+            <button
+              style={activeSection === "course" ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActiveSection("course")}
+            >
+              Kursplan
+            </button>
+          </div>
+
+          {activeSection === "course" ? <CourseTab /> : <AssignmentSubmissionPage />}
         </main>
       </div>
     </ExamProvider>
