@@ -81,6 +81,33 @@ const AssignmentSubmissionPage = () => {
     setForm((prev) => ({ ...prev, assignmentTitle: assignmentOptions[0] }));
   }, [assignmentOptions]);
 
+  const persistSubmission = async ({ statusLabel = "submitted" } = {}) => {
+    const trimmedText = form.submissionText.trim();
+    if (!form.assignmentTitle || !trimmedText) {
+      return false;
+    }
+
+    const submissionPayload = {
+      title: form.assignmentTitle,
+      assignmentTitle: form.assignmentTitle,
+      level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+      chapter: null,
+      submissionLink: null,
+      submissionText: trimmedText,
+      studentEmail: user?.email || "",
+      studentId: user?.uid || "",
+      studentCode,
+      studentName: studentProfile?.name || "",
+      className: studentProfile?.className || "",
+      status: statusLabel,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    };
+
+    await addDoc(collection(db, "submissions"), submissionPayload);
+    return true;
+  };
+
   useEffect(() => {
     const loadSubmissions = async () => {
       if (!db || !user) return;
@@ -137,22 +164,7 @@ const AssignmentSubmissionPage = () => {
     }
 
     try {
-      await addDoc(collection(db, "submissions"), {
-        title: form.assignmentTitle,
-        assignmentTitle: form.assignmentTitle,
-        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
-        chapter: null,
-        submissionLink: null,
-        submissionText: form.submissionText.trim(),
-        studentEmail: user?.email || "",
-        studentId: user?.uid || "",
-        studentCode,
-        studentName: studentProfile?.name || "",
-        className: studentProfile?.className || "",
-        status: "submitted",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      await persistSubmission({ statusLabel: "submitted" });
 
       setStatus({ loading: false, error: "", success: "Danke! Deine Abgabe wurde gespeichert." });
       setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
