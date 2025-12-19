@@ -18,9 +18,10 @@ import {
   where,
 } from "../firebase";
 import { correctDiscussionText } from "../services/discussionService";
+import { firestoreCollections } from "../lib/firestorePaths";
 
 const postsCollectionRef = (level, className) =>
-  collection(db, "class_board", level, "classes", className, "posts");
+  collection(db, ...firestoreCollections.classBoardPosts(level, className));
 
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "Kein Timer";
@@ -127,7 +128,7 @@ const ClassDiscussionPage = () => {
     }
 
     const repliesQuery = query(
-      collection(db, "qa_posts"),
+      collection(db, ...firestoreCollections.qaPosts()),
       where("level", "==", studentProfile.level),
       where("className", "==", studentProfile.className)
     );

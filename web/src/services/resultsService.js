@@ -1,6 +1,7 @@
 import { collection, db, getDocs, query, where } from "../firebase";
 import { courseSchedules } from "../data/courseSchedule";
 import { getBackendBaseUrl } from "./backendConfig";
+import { firestoreCollections } from "../lib/firestorePaths";
 
 const backendUrl = getBackendBaseUrl();
 
@@ -118,7 +119,7 @@ const fetchSheetScores = async ({ level, studentCode, email } = {}) => {
 };
 
 const loadFirestoreScores = async ({ level, studentCode } = {}) => {
-  const scoresRef = collection(db, "scores");
+  const scoresRef = collection(db, ...firestoreCollections.scores());
   const constraints = [];
   if (level && level !== "all") {
     constraints.push(where("level", "==", level.toUpperCase()));

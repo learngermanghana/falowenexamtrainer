@@ -10,10 +10,11 @@ import {
   query,
   serverTimestamp,
 } from "../firebase";
+import { firestoreCollections } from "../lib/firestorePaths";
 
 const getUserChatCollection = (userId) => {
   if (!userId) return null;
-  return collection(db, "falowenChats", userId, "messages");
+  return collection(db, ...firestoreCollections.falowenChatMessages(userId));
 };
 
 export const subscribeToChatMessages = (userId, callback) => {
