@@ -18,6 +18,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:ci": "CI=true react-scripts test --watch=false --passWithNoTests",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -37,5 +39,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "eslint": "^8.57.1"
   }
 }
