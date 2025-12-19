@@ -88,7 +88,7 @@ function App() {
               style={activeSection === "submit" ? styles.navButtonActive : styles.navButton}
               onClick={() => setActiveSection("submit")}
             >
-              Abgabe
+              Submit Assignment
             </button>
             <button
               style={activeSection === "course" ? styles.navButtonActive : styles.navButton}

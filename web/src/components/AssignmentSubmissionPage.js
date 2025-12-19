@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
+import { courseSchedules } from "../data/courseSchedule";
 import {
   addDoc,
   collection,
@@ -103,7 +104,7 @@ const AssignmentSubmissionPage = () => {
         console.error("Failed to load submissions", error);
         setStatus((prev) => ({
           ...prev,
-          error: "Konnte bisherige Abgaben nicht laden.",
+          error: "Could not load your previous submissions.",
         }));
       } finally {
         setSubmissionsLoading(false);
@@ -172,7 +173,21 @@ const AssignmentSubmissionPage = () => {
       }
     } catch (error) {
       console.error("Failed to save submission", error);
-      setStatus({ loading: false, error: "Konnte die Abgabe nicht speichern.", success: "" });
+      setStatus({ loading: false, error: "Could not save your submission.", success: "" });
+    }
+  };
+
+  const handleSaveDraft = async () => {
+    setStatus({ loading: true, error: "", success: "" });
+
+    try {
+      const saved = await persistSubmission({ statusLabel: "draft" });
+      if (!saved) return;
+
+      setStatus({ loading: false, error: "", success: "Draft saved. You can keep editing before submitting." });
+    } catch (error) {
+      console.error("Failed to save draft", error);
+      setStatus({ loading: false, error: "Could not save your draft.", success: "" });
     }
   };
 
@@ -180,7 +195,7 @@ const AssignmentSubmissionPage = () => {
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div>
-          <h2 style={styles.sectionTitle}>Aufgabe einreichen</h2>
+          <h2 style={styles.sectionTitle}>Submit Assignment</h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
             Lade deine Lösung als Text hoch. Kurs, Level, Studenten-Code und E-Mail werden automatisch übernommen, damit keine
             Tippfehler passieren.
@@ -230,12 +245,12 @@ const AssignmentSubmissionPage = () => {
 
           <div>
             <label style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Dein Text *</span>
+              <span style={styles.label}>Your text *</span>
               <textarea
                 value={form.submissionText}
                 onChange={handleChange("submissionText")}
                 style={{ ...styles.textArea, minHeight: 200 }}
-                placeholder="Schreibe hier deine Lösung oder füge sie ein."
+                placeholder="Type your answer here or paste it in."
               />
             </label>
           </div>
@@ -292,11 +307,11 @@ Level: ${preferredLevel}`
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-          <h3 style={{ margin: 0 }}>Letzte Abgaben</h3>
-          {submissionsLoading ? <span style={styles.helperText}>Lade ...</span> : null}
+          <h3 style={{ margin: 0 }}>Recent submissions</h3>
+          {submissionsLoading ? <span style={styles.helperText}>Loading ...</span> : null}
         </div>
         {recentSubmissions.length === 0 && !submissionsLoading ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>Noch keine Abgaben gespeichert.</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>No submissions saved yet.</p>
         ) : null}
         <div style={{ display: "grid", gap: 8 }}>
           {recentSubmissions.map((entry) => (
@@ -319,7 +334,7 @@ Level: ${preferredLevel}`
                 Kurs: {entry.className || "–"}
               </div>
               <div style={{ ...styles.helperText, margin: 0 }}>
-                Gespeichert: {formatDate(entry.createdAt)}
+                Saved: {formatDate(entry.createdAt)}
               </div>
             </div>
           ))}
