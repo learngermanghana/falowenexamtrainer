@@ -91,6 +91,8 @@ const GeneralHome = ({ onSelectArea, studentProfile }) => {
           </div>
         </section>
       </div>
+
+      <ClassVideoSpotlight studentProfile={studentProfile} />
     </div>
   );
 };
