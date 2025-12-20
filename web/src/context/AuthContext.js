@@ -170,7 +170,7 @@ export const AuthProvider = ({ children }) => {
     return credential;
   };
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     if (!isFirebaseConfigured || !auth) {
       setUser(null);
       setStudentProfile(null);
@@ -188,9 +188,9 @@ export const AuthProvider = ({ children }) => {
     setMessagingToken(null);
     setNotificationStatus("idle");
     setStudentProfile(null);
-  };
+  }, [auth, isFirebaseConfigured, revokeMessagingToken, studentProfile]);
 
-  const enableNotifications = async () => {
+  const enableNotifications = useCallback(async () => {
     if (!isFirebaseConfigured) {
       throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
     }
@@ -208,7 +208,7 @@ export const AuthProvider = ({ children }) => {
       setNotificationStatus("error");
       throw error;
     }
-  };
+  }, [isFirebaseConfigured, persistMessagingToken, requestMessagingToken, studentProfile?.id]);
 
   useEffect(() => {
     const refreshMessagingToken = async () => {
@@ -247,22 +247,25 @@ export const AuthProvider = ({ children }) => {
 
     refreshMessagingToken();
     // Only re-run when a new user or profile is loaded to avoid repeated token prompts.
-  }, [isFirebaseConfigured, persistMessagingToken, requestMessagingToken, studentProfile, user]);
+  }, [persistMessagingToken, studentProfile, user]);
 
-  const saveStudentProfile = async (updates) => {
-    if (!studentProfile?.id) {
-      throw new Error("No student profile found. Please re-login.");
-    }
+  const saveStudentProfile = useCallback(
+    async (updates) => {
+      if (!studentProfile?.id) {
+        throw new Error("No student profile found. Please re-login.");
+      }
 
-    if (!isFirebaseConfigured || !db) {
-      throw new Error("Firebase is not configured. Cannot save profile.");
-    }
+      if (!isFirebaseConfigured || !db) {
+        throw new Error("Firebase is not configured. Cannot save profile.");
+      }
 
-    const studentRef = doc(db, "students", studentProfile.id);
-    await setDoc(studentRef, { ...updates, updated_at: serverTimestamp() }, { merge: true });
-    setStudentProfile((prev) => (prev ? { ...prev, ...updates } : prev));
-    return { ...studentProfile, ...updates };
-  };
+      const studentRef = doc(db, "students", studentProfile.id);
+      await setDoc(studentRef, { ...updates, updated_at: serverTimestamp() }, { merge: true });
+      setStudentProfile((prev) => (prev ? { ...prev, ...updates } : prev));
+      return { ...studentProfile, ...updates };
+    },
+    [isFirebaseConfigured, studentProfile]
+  );
 
   const value = useMemo(
     () => ({
