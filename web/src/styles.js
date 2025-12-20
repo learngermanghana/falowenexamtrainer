@@ -109,6 +109,12 @@ export const styles = {
     border: "1px solid #d1d5db",
     fontSize: 14,
   },
+  input: {
+    padding: "6px 8px",
+    borderRadius: 8,
+    border: "1px solid #d1d5db",
+    fontSize: 14,
+  },
   primaryButton: {
     padding: "8px 16px",
     borderRadius: 999,
