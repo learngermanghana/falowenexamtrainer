@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ExamProvider } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
@@ -16,9 +16,47 @@ import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
 
 function App() {
-  const { user, loading: authLoading, logout, authError } = useAuth();
+  const { user, loading: authLoading, logout, authError, studentProfile } = useAuth();
   const [authMode, setAuthMode] = useState("login");
   const [activeSection, setActiveSection] = useState("submit");
+
+  const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
+  const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
+  const isEnrolled = isStaff || Boolean(studentProfile?.className || studentProfile?.level);
+
+  const allowedSections = useMemo(
+    () => ({
+      submit: true,
+      course: isEnrolled,
+      results: isEnrolled || isStaff,
+      grammar: true,
+      buddy: true,
+      discussion: isEnrolled || isStaff,
+      account: true,
+    }),
+    [isEnrolled, isStaff]
+  );
+
+  const tabStorageKey = user?.uid ? `falowen:last-tab:${user.uid}` : null;
+
+  useEffect(() => {
+    if (!tabStorageKey) return;
+    const saved = localStorage.getItem(tabStorageKey);
+    if (saved && allowedSections[saved]) {
+      setActiveSection(saved);
+    }
+  }, [tabStorageKey, allowedSections]);
+
+  useEffect(() => {
+    if (!tabStorageKey) return;
+    localStorage.setItem(tabStorageKey, activeSection);
+  }, [activeSection, tabStorageKey]);
+
+  useEffect(() => {
+    if (allowedSections[activeSection]) return;
+    const fallback = Object.keys(allowedSections).find((key) => allowedSections[key]) || "account";
+    setActiveSection(fallback);
+  }, [activeSection, allowedSections]);
 
   if (!isFirebaseConfigured) {
     return (
@@ -88,57 +126,71 @@ function App() {
 
         <main className="layout-main" style={{ minWidth: 0 }}>
           <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
-            <button
-              style={activeSection === "submit" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSection("submit")}
-            >
-              Submit Assignment
-            </button>
-            <button
-              style={activeSection === "course" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSection("course")}
-            >
-              Course Book
-            </button>
-            <button
-              style={activeSection === "results" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSection("results")}
-            >
-              Results
-            </button>
-            <button
-              style={activeSection === "grammar" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSection("grammar")}
-            >
-              Ask Grammar Question
-            </button>
-            <button
-              style={activeSection === "buddy" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSection("buddy")}
-            >
-              Chat Buddy
-            </button>
-            <button
-              style={activeSection === "discussion" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSection("discussion")}
-            >
-              Group Discussion
-            </button>
-            <button
-              style={activeSection === "account" ? styles.navButtonActive : styles.navButton}
-              onClick={() => setActiveSection("account")}
-            >
-              Account
-            </button>
+            {allowedSections.submit ? (
+              <button
+                style={activeSection === "submit" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("submit")}
+              >
+                Submit Assignment
+              </button>
+            ) : null}
+            {allowedSections.course ? (
+              <button
+                style={activeSection === "course" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("course")}
+              >
+                Course Book
+              </button>
+            ) : null}
+            {allowedSections.results ? (
+              <button
+                style={activeSection === "results" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("results")}
+              >
+                Results
+              </button>
+            ) : null}
+            {allowedSections.grammar ? (
+              <button
+                style={activeSection === "grammar" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("grammar")}
+              >
+                Ask Grammar Question
+              </button>
+            ) : null}
+            {allowedSections.buddy ? (
+              <button
+                style={activeSection === "buddy" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("buddy")}
+              >
+                Chat Buddy
+              </button>
+            ) : null}
+            {allowedSections.discussion ? (
+              <button
+                style={activeSection === "discussion" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("discussion")}
+              >
+                Group Discussion
+              </button>
+            ) : null}
+            {allowedSections.account ? (
+              <button
+                style={activeSection === "account" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("account")}
+              >
+                Account
+              </button>
+            ) : null}
           </div>
 
-          {activeSection === "course" ? <CourseTab /> : null}
-          {activeSection === "grammar" ? <GrammarQuestionTab /> : null}
-          {activeSection === "buddy" ? <ChatBuddyPage /> : null}
-          {activeSection === "submit" ? <AssignmentSubmissionPage /> : null}
-          {activeSection === "results" ? <StudentResultsPage /> : null}
-          {activeSection === "discussion" ? <ClassDiscussionPage /> : null}
-          {activeSection === "account" ? <AccountSettings /> : null}
+          {activeSection === "course" && allowedSections.course ? <CourseTab /> : null}
+          {activeSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
+          {activeSection === "buddy" && allowedSections.buddy ? <ChatBuddyPage /> : null}
+          {activeSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
+          {activeSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
+          {activeSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
+          {activeSection === "account" && allowedSections.account ? <AccountSettings /> : null}
         </main>
       </div>
     </ExamProvider>
