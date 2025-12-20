@@ -12,6 +12,7 @@ import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
 import "./App.css";
+import StudentResultsPage from "./components/StudentResultsPage";
 
 function App() {
   const { user, loading: authLoading, logout, authError } = useAuth();
@@ -99,6 +100,12 @@ function App() {
               Course Book
             </button>
             <button
+              style={activeSection === "results" ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActiveSection("results")}
+            >
+              Results
+            </button>
+            <button
               style={activeSection === "grammar" ? styles.navButtonActive : styles.navButton}
               onClick={() => setActiveSection("grammar")}
             >
@@ -121,6 +128,7 @@ function App() {
           {activeSection === "course" ? <CourseTab /> : null}
           {activeSection === "grammar" ? <GrammarQuestionTab /> : null}
           {activeSection === "submit" ? <AssignmentSubmissionPage /> : null}
+          {activeSection === "results" ? <StudentResultsPage /> : null}
           {activeSection === "discussion" ? <ClassDiscussionPage /> : null}
           {activeSection === "account" ? <AccountSettings /> : null}
         </main>
