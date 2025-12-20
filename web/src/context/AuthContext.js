@@ -190,7 +190,7 @@ export const AuthProvider = ({ children }) => {
       setNotificationStatus("idle");
       setStudentProfile(null);
     },
-    [revokeMessagingToken, studentProfile]
+    [revokeMessagingToken, studentProfile?.id, studentProfile?.messagingToken]
   );
 
   const enableNotifications = useCallback(
@@ -213,7 +213,7 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
     },
-    [persistMessagingToken, studentProfile?.id]
+    [persistMessagingToken, requestMessagingToken, studentProfile?.id]
   );
 
   useEffect(() => {
@@ -270,7 +270,7 @@ export const AuthProvider = ({ children }) => {
       setStudentProfile((prev) => (prev ? { ...prev, ...updates } : prev));
       return { ...studentProfile, ...updates };
     },
-    [studentProfile]
+    [studentProfile?.id]
   );
 
   const value = useMemo(
