@@ -340,7 +340,7 @@ const CampusArea = ({ allowedSections, availableTabs, defaultSection, onBack, ta
 
       {resolvedSection === "course" && allowedSections.course ? <CourseTab /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
-      {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage /> : null}
+      {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "buddy" && allowedSections.buddy ? <ChatBuddyPage /> : null}
       {resolvedSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
@@ -391,7 +391,7 @@ const ExamArea = ({ onBack }) => {
       </div>
 
       {examSection === "speaking" ? <SpeakingRoom /> : null}
-      {examSection === "writing" ? <LetterPracticePage /> : null}
+      {examSection === "writing" ? <LetterPracticePage mode="exams" /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
     </>
   );

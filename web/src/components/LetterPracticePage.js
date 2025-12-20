@@ -12,11 +12,29 @@ const IDEA_COACH_INTRO = {
     "Paste your exam prompt or describe the situation. I'll guide you step by step with Herr Felix's coaching prompts until your letter is ready.",
 };
 
-const LetterPracticePage = () => {
+const LetterPracticePage = ({ mode = "exams" }) => {
   const { level, setLevel, error, setError, loading, setLoading, resultHistory, addResultToHistory } = useExam();
   const { user, idToken } = useAuth();
 
-  const [activeTab, setActiveTab] = useState("practice");
+  const isExamMode = mode === "exams";
+
+  const availableTabs = useMemo(
+    () => {
+      const baseTabs = [
+        { key: "mark", label: "Mark my letter" },
+        { key: "ideas", label: "Ideas generator" },
+      ];
+
+      if (isExamMode) {
+        baseTabs.unshift({ key: "practice", label: "Practice letters" });
+      }
+
+      return baseTabs;
+    },
+    [isExamMode]
+  );
+
+  const [activeTab, setActiveTab] = useState(() => availableTabs[0].key);
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
@@ -37,6 +55,14 @@ const LetterPracticePage = () => {
     setActiveTab(tabKey);
     resetErrors();
   };
+
+  useEffect(() => {
+    if (!availableTabs.find((tab) => tab.key === activeTab)) {
+      setActiveTab(availableTabs[0].key);
+      setError("");
+      setIdeaError("");
+    }
+  }, [activeTab, availableTabs, setError, setIdeaError]);
 
   const selectedLetter = useMemo(() => writingLetters.find((item) => item.id === selectedLetterId), [selectedLetterId]);
 
@@ -155,17 +181,25 @@ const LetterPracticePage = () => {
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div>
             <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>Schreiben trainer</p>
-            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Timed letters + Herr Felix ideas</h2>
+            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>
+              {isExamMode ? "Timed letters + Herr Felix ideas" : "Mark my letter + Herr Felix ideas"}
+            </h2>
             <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-              Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator (prompts in
-              <code>functions/functionz/prompts.js</code>) to keep moving.
+              {isExamMode ? (
+                <>
+                  Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator
+                  (prompts in <code>functions/functionz/prompts.js</code>) to keep moving.
+                </>
+              ) : (
+                "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
+              )}
             </p>
           </div>
           <span style={styles.badge}>Exam writing lab</span>
         </div>
 
         <div style={styles.tabList}>
-          {[{ key: "practice", label: "Practice letters" }, { key: "ideas", label: "Ideas generator" }].map((tab) => (
+          {availableTabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
@@ -177,7 +211,7 @@ const LetterPracticePage = () => {
         </div>
       </section>
 
-      {activeTab === "practice" && (
+      {activeTab === "practice" && isExamMode && (
         <section style={styles.card}>
           <div style={{ display: "grid", gap: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
@@ -272,64 +306,72 @@ const LetterPracticePage = () => {
               </div>
             )}
 
-            <div style={{ display: "grid", gap: 12 }}>
-              <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Mark my letter</h3>
-              <div style={{ display: "grid", gap: 6 }}>
-                <label style={styles.label}>Level for feedback</label>
-                <select
-                  value={level}
-                  onChange={(e) => {
-                    setLevel(e.target.value);
-                    setError("");
-                  }}
-                  style={styles.select}
-                >
-                  {ALLOWED_LEVELS.map((option) => (
-                    <option key={option}>{option}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div style={{ display: "grid", gap: 6 }}>
-                <label style={styles.label}>Your letter</label>
-                <textarea
-                  style={styles.textArea}
-                  placeholder="Paste your finished letter or essay here for marking."
-                  value={letterText}
-                  onChange={(e) => setLetterText(e.target.value)}
-                  rows={10}
-                />
-              </div>
-
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading}>
-                  {loading ? "Marking your letter..." : "Get AI marking"}
-                </button>
-                <button
-                  style={styles.secondaryButton}
-                  onClick={() => {
-                    setLetterText("");
-                    setMarkFeedback("");
-                    resetErrors();
-                  }}
-                >
-                  Clear
-                </button>
-              </div>
-
-              {error && (
-                <div style={styles.errorBox}>
-                  <strong>Hinweis:</strong> {error}
-                </div>
-              )}
-
-              {markFeedback && (
-                <div>
-                  <h4 style={styles.sectionTitle}>AI feedback</h4>
-                  <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
-                </div>
-              )}
+            <div style={{ ...styles.helperText, marginTop: -4 }}>
+              After finishing a draft, switch to <strong>Mark my letter</strong> for feedback.
             </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === "mark" && (
+        <section style={styles.card}>
+          <div style={{ display: "grid", gap: 12 }}>
+            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Mark my letter</h3>
+            <div style={{ display: "grid", gap: 6 }}>
+              <label style={styles.label}>Level for feedback</label>
+              <select
+                value={level}
+                onChange={(e) => {
+                  setLevel(e.target.value);
+                  setError("");
+                }}
+                style={styles.select}
+              >
+                {ALLOWED_LEVELS.map((option) => (
+                  <option key={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: "grid", gap: 6 }}>
+              <label style={styles.label}>Your letter</label>
+              <textarea
+                style={styles.textArea}
+                placeholder="Paste your finished letter or essay here for marking."
+                value={letterText}
+                onChange={(e) => setLetterText(e.target.value)}
+                rows={10}
+              />
+            </div>
+
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading}>
+                {loading ? "Marking your letter..." : "Get AI marking"}
+              </button>
+              <button
+                style={styles.secondaryButton}
+                onClick={() => {
+                  setLetterText("");
+                  setMarkFeedback("");
+                  resetErrors();
+                }}
+              >
+                Clear
+              </button>
+            </div>
+
+            {error && (
+              <div style={styles.errorBox}>
+                <strong>Hinweis:</strong> {error}
+              </div>
+            )}
+
+            {markFeedback && (
+              <div>
+                <h4 style={styles.sectionTitle}>AI feedback</h4>
+                <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+              </div>
+            )}
           </div>
         </section>
       )}
