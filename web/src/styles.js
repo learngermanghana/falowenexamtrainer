@@ -9,7 +9,7 @@ export const styles = {
   },
   header: {
     marginBottom: 24,
-    textAlign: "center",
+    textAlign: "left",
   },
   title: {
     fontSize: 28,
@@ -25,6 +25,10 @@ export const styles = {
     justifyContent: "center",
     gap: 8,
     flexWrap: "wrap",
+    overflowX: "auto",
+    paddingBottom: 6,
+    width: "100%",
+    scrollbarWidth: "thin",
   },
   focusNotice: {
     marginBottom: 12,
@@ -43,6 +47,8 @@ export const styles = {
     backgroundColor: "#ffffff",
     cursor: "pointer",
     fontWeight: 600,
+    whiteSpace: "nowrap",
+    flexShrink: 0,
   },
   navButtonActive: {
     padding: "10px 16px",
@@ -52,6 +58,8 @@ export const styles = {
     color: "#ffffff",
     cursor: "pointer",
     fontWeight: 600,
+    whiteSpace: "nowrap",
+    flexShrink: 0,
   },
   card: {
     background: "#ffffff",

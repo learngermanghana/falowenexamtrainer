@@ -206,6 +206,7 @@ const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout
   return (
     <div className="app-shell" style={styles.container}>
       <header
+        className="app-header"
         style={{
           ...styles.header,
           display: "flex",
@@ -219,7 +220,7 @@ const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout
           <h1 style={styles.title}>Falowen Exam Coach</h1>
           <p style={styles.subtitle}>{subtitle}</p>
         </div>
-        <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+        <div className="app-header-meta" style={{ display: "grid", gap: 6, justifyItems: "end" }}>
           <HealthIndicator />
           <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
           <button style={styles.dangerButton} onClick={logout}>
@@ -300,7 +301,7 @@ const CampusArea = ({ allowedSections, availableTabs, defaultSection, onBack, ta
 
   return (
     <>
-      <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
+      <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
         <button style={styles.secondaryButton} onClick={onBack}>
           Back to general home
         </button>
@@ -319,7 +320,10 @@ const CampusArea = ({ allowedSections, availableTabs, defaultSection, onBack, ta
       </div>
 
       {activeMainTabConfig?.sections ? (
-        <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}>
+        <div
+          className="nav-row"
+          style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}
+        >
           {activeMainTabConfig.sections
             .filter((subTab) => allowedSections[subTab.key])
             .map((subTab) => (
@@ -371,7 +375,7 @@ const ExamArea = ({ onBack }) => {
 
   return (
     <>
-      <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
+      <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
         <button style={styles.secondaryButton} onClick={onBack}>
           Back to general home
         </button>
