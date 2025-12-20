@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -7,11 +7,13 @@ import {
   addDoc,
   collection,
   db,
+  doc,
   getDocs,
   limit,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   where,
 } from "../firebase";
 
@@ -93,6 +95,8 @@ const AssignmentSubmissionPage = () => {
   const [lockedChapters, setLockedChapters] = useState(new Set());
   const [confirmationLocked, setConfirmationLocked] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [draftsByAssignment, setDraftsByAssignment] = useState({});
+  const lastAssignmentRef = useRef(assignmentOptions[0]);
 
   const buildChapterKey = (title) => {
     if (!title) return null;
@@ -121,8 +125,32 @@ const AssignmentSubmissionPage = () => {
   };
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, assignmentTitle: assignmentOptions[0] }));
-  }, [assignmentOptions]);
+    const defaultAssignment = assignmentOptions[0];
+    const defaultDraft = draftsByAssignment[defaultAssignment];
+
+    setForm((prev) => ({
+      ...prev,
+      assignmentTitle: defaultAssignment,
+      submissionText: defaultDraft?.submissionText || prev.submissionText,
+    }));
+  }, [assignmentOptions, draftsByAssignment]);
+
+  const buildSubmissionPayload = (statusLabel) => ({
+    title: form.assignmentTitle,
+    assignmentTitle: form.assignmentTitle,
+    level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+    chapter: deriveChapterValue(form.assignmentTitle),
+    submissionLink: null,
+    submissionText: form.submissionText.trim(),
+    studentEmail: user?.email || "",
+    studentId: user?.uid || "",
+    studentCode,
+    studentName: studentProfile?.name || "",
+    className: studentProfile?.className || "",
+    status: statusLabel,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
 
   const persistSubmission = async ({ statusLabel = "submitted" } = {}) => {
     const trimmedText = form.submissionText.trim();
@@ -130,25 +158,33 @@ const AssignmentSubmissionPage = () => {
       return false;
     }
 
-    const submissionPayload = {
-      title: form.assignmentTitle,
-      assignmentTitle: form.assignmentTitle,
-      level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
-      chapter: deriveChapterValue(form.assignmentTitle),
-      submissionLink: null,
-      submissionText: trimmedText,
-      studentEmail: user?.email || "",
-      studentId: user?.uid || "",
-      studentCode,
-      studentName: studentProfile?.name || "",
-      className: studentProfile?.className || "",
-      status: statusLabel,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    };
+    const submissionPayload = buildSubmissionPayload(statusLabel);
+    const targetCollection = statusLabel === "draft" ? DRAFT_COLLECTION : SUBMISSION_COLLECTION;
 
-    const targetCollection =
-      statusLabel === "draft" ? DRAFT_COLLECTION : SUBMISSION_COLLECTION;
+    if (statusLabel === "draft") {
+      const existingDraft = draftsByAssignment[form.assignmentTitle];
+      const payloadWithTimestamps = {
+        ...submissionPayload,
+        createdAt: existingDraft?.createdAt || submissionPayload.createdAt,
+      };
+
+      if (existingDraft?.id) {
+        const draftRef = doc(db, targetCollection, existingDraft.id);
+        await setDoc(draftRef, payloadWithTimestamps, { merge: true });
+        setDraftsByAssignment((prev) => ({
+          ...prev,
+          [form.assignmentTitle]: { id: existingDraft.id, ...payloadWithTimestamps },
+        }));
+        return true;
+      }
+
+      const newDraftRef = await addDoc(collection(db, targetCollection), submissionPayload);
+      setDraftsByAssignment((prev) => ({
+        ...prev,
+        [form.assignmentTitle]: { id: newDraftRef.id, ...submissionPayload },
+      }));
+      return true;
+    }
 
     await addDoc(collection(db, targetCollection), submissionPayload);
 
@@ -205,19 +241,33 @@ const AssignmentSubmissionPage = () => {
           setHasSubmitted(true);
         }
 
-        const draftsRef = collection(db, DRAFT_COLLECTION);
-        const draftSnapshot = await getDocs(
-          query(draftsRef, where("studentId", "==", user.uid), orderBy("updatedAt", "desc"), limit(1))
-        );
-        if (!draftSnapshot.empty) {
-          const latestDraft = draftSnapshot.docs[0].data();
-          setForm((prev) => ({
-            ...prev,
-            assignmentTitle: latestDraft.assignmentTitle || prev.assignmentTitle,
-            submissionText: latestDraft.submissionText || "",
-            confirmed: false,
-          }));
-        }
+          const draftsRef = collection(db, DRAFT_COLLECTION);
+          const draftSnapshot = await getDocs(
+            query(draftsRef, where("studentId", "==", user.uid), orderBy("updatedAt", "desc"), limit(20))
+          );
+
+          if (!draftSnapshot.empty) {
+            const latestDrafts = {};
+            draftSnapshot.docs.forEach((docSnap) => {
+              const data = docSnap.data();
+              const assignmentKey = data.assignmentTitle || data.title || assignmentOptions[0];
+              if (!latestDrafts[assignmentKey]) {
+                latestDrafts[assignmentKey] = { id: docSnap.id, ...data };
+              }
+            });
+
+            setDraftsByAssignment(latestDrafts);
+
+            const selectedDraft = latestDrafts[form.assignmentTitle || assignmentOptions[0]];
+            if (selectedDraft) {
+              setForm((prev) => ({
+                ...prev,
+                assignmentTitle: selectedDraft.assignmentTitle || prev.assignmentTitle,
+                submissionText: selectedDraft.submissionText || "",
+                confirmed: false,
+              }));
+            }
+          }
       } catch (error) {
         console.error("Failed to load submissions", error);
         setStatus((prev) => ({
@@ -230,7 +280,7 @@ const AssignmentSubmissionPage = () => {
     };
 
     loadDraftsAndSubmissions();
-  }, [user]);
+  }, [assignmentOptions, user]);
 
   useEffect(() => {
     const isLocked = lockedChapters.has(buildChapterKey(form.assignmentTitle));
@@ -242,11 +292,46 @@ const AssignmentSubmissionPage = () => {
 
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
+    if (field === "assignmentTitle") {
+      const draft = draftsByAssignment[value];
+      lastAssignmentRef.current = value;
+      setForm((prev) => ({
+        ...prev,
+        assignmentTitle: value,
+        submissionText: draft?.submissionText || "",
+        confirmed: false,
+      }));
+      setStatus((prev) => ({ ...prev, error: "", success: "" }));
+      return;
+    }
+
     setForm((prev) => ({ ...prev, [field]: value }));
     if (field === "confirmed") {
       setStatus((prev) => ({ ...prev, error: "" }));
     }
   };
+
+  useEffect(() => {
+    const currentAssignment = form.assignmentTitle;
+    const draft = draftsByAssignment[currentAssignment];
+    const assignmentChanged = lastAssignmentRef.current !== currentAssignment;
+    lastAssignmentRef.current = currentAssignment;
+
+    if (assignmentChanged) {
+      setForm((prev) => ({
+        ...prev,
+        submissionText: draft?.submissionText || "",
+        confirmed: false,
+      }));
+      setStatus((prev) => ({ ...prev, error: "", success: "" }));
+    } else if (!form.submissionText && draft?.submissionText) {
+      setForm((prev) => ({
+        ...prev,
+        submissionText: draft.submissionText,
+        confirmed: false,
+      }));
+    }
+  }, [draftsByAssignment, form.assignmentTitle]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
