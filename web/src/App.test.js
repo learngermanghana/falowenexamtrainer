@@ -23,6 +23,11 @@ jest.mock("./services/assignmentService", () => ({
   fetchAssignmentSummary: jest.fn(() => Promise.resolve({ leaderboard: {}, student: null })),
 }));
 
+jest.mock("./services/attendanceService", () => ({
+  __esModule: true,
+  fetchAttendanceSummary: jest.fn(() => Promise.resolve({ sessions: 0, hours: 0 })),
+}));
+
 jest.mock("./components/CoachPanel", () => () => <div data-testid="coach-panel" />);
 
 import App from "./App";
