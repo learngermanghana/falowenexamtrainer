@@ -22,23 +22,31 @@ export async function callAI({ path, payload, idToken, timeoutMs = 20000 }) {
       signal: controller.signal,
     });
 
-    if (!response.ok) {
-      try {
-        const errorPayload = await response.json();
-        throw new Error(errorPayload?.error || "Failed to reach the AI coach");
-      } catch (parseErr) {
-        const fallbackMessage = await response.text();
-        const parseMessage = parseErr instanceof Error ? parseErr.message : null;
-        throw new Error(fallbackMessage || parseMessage || "Failed to reach the AI coach");
-      }
+    // Read body exactly once
+    const raw = await response.text();
+
+    // Try to parse JSON if present
+    let data = null;
+    try {
+      data = raw ? JSON.parse(raw) : null;
+    } catch {
+      data = null;
     }
 
-    return response.json();
+    if (!response.ok) {
+      const msg =
+        data?.error ||
+        data?.message ||
+        raw ||
+        `Failed to reach the AI coach (HTTP ${response.status})`;
+      throw new Error(msg);
+    }
+
+    return data ?? {};
   } catch (error) {
-    if (error.name === "AbortError") {
+    if (error?.name === "AbortError") {
       throw new Error("The AI service took too long to respond. Please try again.");
     }
-
     throw error;
   } finally {
     clearTimeout(timer);
