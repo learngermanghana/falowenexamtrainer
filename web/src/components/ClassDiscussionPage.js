@@ -24,13 +24,13 @@ const presenceCollectionRef = (level, className) =>
   collection(db, "class_board", level, "classes", className, "presence");
 
 const formatTimeRemaining = (expiresAt, now) => {
-  if (!expiresAt) return "Kein Timer";
+  if (!expiresAt) return "No timer";
   const diff = Math.max(0, expiresAt - now);
   const minutes = Math.floor(diff / 60000);
   const seconds = Math.floor((diff % 60000) / 1000)
     .toString()
     .padStart(2, "0");
-  return diff > 0 ? `${minutes}:${seconds}` : "Abgelaufen";
+  return diff > 0 ? `${minutes}:${seconds}` : "Expired";
 };
 
 const ClassDiscussionPage = () => {
@@ -75,13 +75,13 @@ const ClassDiscussionPage = () => {
 
   useEffect(() => {
     if (!db) {
-      setError("Firebase ist nicht konfiguriert. Bitte richte Firestore ein, um Diskussionen zu teilen.");
+      setError("Firebase is not configured. Please set up Firestore to share discussions.");
       setIsLoading(false);
       return;
     }
 
     if (!studentProfile?.level || !studentProfile?.className) {
-      setError("Es fehlen Kursangaben aus deinem Profil. Bitte Klasse und Niveau hinterlegen.");
+      setError("Missing course details in your profile. Please set your class and level.");
       setIsLoading(false);
       return undefined;
     }
@@ -117,7 +117,7 @@ const ClassDiscussionPage = () => {
       },
       (err) => {
         console.error("Failed to subscribe to discussion threads", err);
-        setError("Diskussionen konnten nicht geladen werden. Versuche es später erneut.");
+        setError("Discussions could not be loaded. Please try again later.");
         setIsLoading(false);
       }
     );
@@ -155,7 +155,7 @@ const ClassDiscussionPage = () => {
       },
       (err) => {
         console.error("Failed to subscribe to replies", err);
-        setError("Antworten konnten nicht geladen werden. Versuche es später erneut.");
+        setError("Responses could not be loaded. Please try again later.");
       }
     );
 
@@ -211,6 +211,9 @@ const ClassDiscussionPage = () => {
     }
   }, [form.lessonId, lessonOptions]);
 
+  const getDisplayName = () =>
+    studentProfile?.name || user?.displayName || user?.email || "Student";
+
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
@@ -219,7 +222,7 @@ const ClassDiscussionPage = () => {
     event.preventDefault();
     if (!form.question.trim() || !db) return;
     if (!studentProfile?.level || !studentProfile?.className) {
-      setError("Bitte trage dein Kurs-Level und den Klassennamen in den Account-Einstellungen nach.");
+      setError("Please add your course level and class name in your account settings.");
       return;
     }
 
@@ -243,7 +246,7 @@ const ClassDiscussionPage = () => {
         extraLink: form.extraLink,
         timerMinutes,
         createdAt: serverTimestamp(),
-        createdBy: user?.email || "Tutor",
+        createdBy: getDisplayName() || "Tutor",
         createdByUid: user?.uid || null,
         expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
       });
@@ -257,7 +260,7 @@ const ClassDiscussionPage = () => {
       });
     } catch (err) {
       console.error("Failed to create discussion thread", err);
-      setError("Thread konnte nicht erstellt werden. Bitte versuche es erneut.");
+      setError("Thread could not be created. Please try again.");
     } finally {
       setIsSavingThread(false);
     }
@@ -333,13 +336,13 @@ const ClassDiscussionPage = () => {
       const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
 
       const replyId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
-      const payload = {
-        id: replyId,
-        responder: user?.email || "Student",
-        responderCode: getResponderCode(),
-        text: draft,
-        createdAt: serverTimestamp(),
-      };
+        const payload = {
+          id: replyId,
+          responder: getDisplayName(),
+          responderCode: getResponderCode(),
+          text: draft,
+          createdAt: serverTimestamp(),
+        };
 
       await setDoc(
         qaDocRef,
@@ -353,7 +356,7 @@ const ClassDiscussionPage = () => {
       stopTypingIndicator(threadId);
     } catch (err) {
       console.error("Failed to post reply", err);
-      setError("Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.");
+      setError("Response could not be saved. Please try again.");
     }
   };
 
@@ -376,7 +379,7 @@ const ClassDiscussionPage = () => {
       }
     } catch (err) {
       console.error("Failed to delete reply", err);
-      setError("Antwort konnte nicht gelöscht werden.");
+      setError("Response could not be deleted.");
     }
   };
 
@@ -405,14 +408,14 @@ const ClassDiscussionPage = () => {
       setEditingReply(null);
     } catch (err) {
       console.error("Failed to edit reply", err);
-      setError("Antwort konnte nicht bearbeitet werden.");
+      setError("Response could not be edited.");
     }
   };
 
   const handleCorrectDraft = async (threadId) => {
     const draft = replyDrafts[threadId] || "";
     if (!draft.trim()) {
-      setError("Gib zuerst etwas ein – ohne Text kann die KI nichts korrigieren.");
+      setError("Enter text first — the AI needs content to correct.");
       return;
     }
 
@@ -431,7 +434,7 @@ const ClassDiscussionPage = () => {
       }
     } catch (err) {
       console.error("Failed to correct draft", err);
-      setError("Die KI-Korrektur ist fehlgeschlagen. Bitte versuche es später erneut.");
+      setError("The AI correction failed. Please try again later.");
     } finally {
       setIsCorrectingDraft((prev) => ({ ...prev, [threadId]: false }));
     }
@@ -451,12 +454,12 @@ const ClassDiscussionPage = () => {
             <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
             {thread.extraLink ? (
               <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
-                Externer Link öffnen
+                Open external link
               </a>
             ) : null}
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-            <span style={styles.badge}>Frage von {thread.createdBy}</span>
+            <span style={styles.badge}>Question by {thread.createdBy}</span>
             <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>
               Timer {formatTimeRemaining(thread.expiresAt, now)}
             </span>
@@ -465,7 +468,7 @@ const ClassDiscussionPage = () => {
 
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
-            <strong>Frage:</strong> {thread.question}
+            <strong>Question:</strong> {thread.question}
           </div>
           {thread.instructions ? (
             <div
@@ -477,13 +480,13 @@ const ClassDiscussionPage = () => {
                 borderRadius: 10,
               }}
             >
-              <strong>Instructions (English):</strong> {thread.instructions}
+              <strong>Instructions (English):</strong> {thread.instructions} — Refer to chapter "Tutorial" in the course book.
             </div>
           ) : null}
         </div>
 
       <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 700, fontSize: 14 }}>Antworten ({thread.replies.length})</div>
+        <div style={{ fontWeight: 700, fontSize: 14 }}>Responses ({thread.replies.length})</div>
         <div style={{ display: "grid", gap: 10 }}>
           {thread.replies.map((reply) => (
             <div key={reply.id} style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}>
@@ -494,13 +497,13 @@ const ClassDiscussionPage = () => {
                     style={{ ...styles.secondaryButton, padding: "6px 10px" }}
                     onClick={() => handleStartEdit(thread.id, reply)}
                   >
-                    Bearbeiten
+                    Edit
                   </button>
                   <button
                     style={{ ...styles.dangerButton, padding: "6px 10px" }}
                     onClick={() => handleDeleteReply(thread.id, reply)}
                   >
-                    Löschen
+                    Delete
                   </button>
                 </div>
               </div>
@@ -513,29 +516,29 @@ const ClassDiscussionPage = () => {
                   />
                   <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
                     <button style={{ ...styles.secondaryButton, padding: "6px 10px" }} onClick={() => setEditingReply(null)}>
-                      Abbrechen
+                      Cancel
                     </button>
                     <button style={{ ...styles.primaryButton, padding: "6px 10px" }} onClick={handleSaveEdit}>
-                      Speichern
+                      Save
                     </button>
                   </div>
                 </>
               ) : (
                 <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#111827" }}>
                   {reply.text}
-                  {reply.editedAt ? " · bearbeitet" : ""}
+                  {reply.editedAt ? " · edited" : ""}
                 </p>
               )}
             </div>
           ))}
           {thread.replies.length === 0 && (
-            <div style={{ ...styles.helperText, margin: 0 }}>Noch keine Antworten – starte die Diskussion!</div>
+            <div style={{ ...styles.helperText, margin: 0 }}>No responses yet — start the discussion!</div>
           )}
         </div>
         <div style={{ display: "grid", gap: 8 }}>
           <textarea
             style={styles.textareaSmall}
-            placeholder="Teile deine Meinung oder gib Feedback ..."
+            placeholder="Share your opinion or give feedback ..."
             value={replyDrafts[thread.id] || ""}
             onChange={(e) => {
               setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
@@ -545,7 +548,7 @@ const ClassDiscussionPage = () => {
           />
           {typingByThread[thread.id]?.length ? (
             <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
-              {typingByThread[thread.id].join(", ")} tippt gerade ...
+              {typingByThread[thread.id].join(", ")} is typing ...
             </div>
           ) : null}
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
@@ -555,14 +558,14 @@ const ClassDiscussionPage = () => {
               onClick={() => handleCorrectDraft(thread.id)}
               disabled={isCorrectingDraft[thread.id]}
             >
-              {isCorrectingDraft[thread.id] ? "KI korrigiert ..." : "Mit KI korrigieren"}
+              {isCorrectingDraft[thread.id] ? "AI is correcting ..." : "Correct with AI"}
             </button>
             <button style={styles.primaryButton} onClick={() => handleReply(thread.id)}>
-              Antwort posten
+              Post response
             </button>
           </div>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            "Mit KI korrigieren" verbessert nur den Text, den du eingibst. Ohne Eingabe kann die KI dir nicht helfen.
+            "Correct with AI" improves only what you type. Without text, the AI cannot help.
           </p>
         </div>
       </div>
@@ -576,28 +579,28 @@ const ClassDiscussionPage = () => {
       <div style={styles.card}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <div>
-            <h2 style={styles.sectionTitle}>Klassen-Diskussion</h2>
+            <h2 style={styles.sectionTitle}>Class discussion</h2>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              Tutor:innen erstellen eine Frage mit Timer, Thema und Link. Studierende sehen neue Beiträge sofort und können ihre Antworten
-              bearbeiten oder löschen.
+              Tutors create a timed question with a topic and link. Students see new posts instantly and can edit or delete their own
+              responses.
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
-              <span style={styles.badge}>Level: {studentProfile?.level || "(fehlt)"}</span>
-              <span style={styles.badge}>Klasse: {studentProfile?.className || "(fehlt)"}</span>
+              <span style={styles.badge}>Level: {studentProfile?.level || "(missing)"}</span>
+              <span style={styles.badge}>Class: {studentProfile?.className || "(missing)"}</span>
               <span style={{ ...styles.badge, background: "#f8fafc", borderColor: "#cbd5e1", color: "#0f172a" }}>
-                Nur Mitglieder deiner Klasse sehen und posten hier.
+                Only members of your class can view and post here.
               </span>
             </div>
           </div>
           <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
-            Live aktualisiert
+            Live updates
           </span>
         </div>
 
         <form onSubmit={handleCreateThread} style={{ display: "grid", gap: 10, marginTop: 12 }}>
           <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
             <div style={styles.field}>
-              <label style={styles.label}>Lektion auswählen</label>
+              <label style={styles.label}>Select lesson</label>
               <select
                 value={form.lessonId}
                 onChange={(e) => handleFormChange("lessonId", e.target.value)}
@@ -610,21 +613,21 @@ const ClassDiscussionPage = () => {
                 ))}
               </select>
               {selectedLesson?.goal ? (
-                <div style={{ ...styles.helperText, margin: 0 }}>Ziel: {selectedLesson.goal}</div>
+                <div style={{ ...styles.helperText, margin: 0 }}>Goal: {selectedLesson.goal}</div>
               ) : null}
             </div>
             <div style={styles.field}>
-              <label style={styles.label}>Thema / Überschrift</label>
+              <label style={styles.label}>Topic / headline</label>
               <input
                 type="text"
                 style={styles.select}
                 value={form.topic}
                 onChange={(e) => handleFormChange("topic", e.target.value)}
-                placeholder="z. B. Redemittel für Beschwerden"
+                placeholder="e.g. Phrases for complaints"
               />
             </div>
             <div style={styles.field}>
-              <label style={styles.label}>Timer (Minuten)</label>
+              <label style={styles.label}>Timer (minutes)</label>
               <input
                 type="number"
                 min="0"
@@ -635,7 +638,7 @@ const ClassDiscussionPage = () => {
               />
             </div>
             <div style={styles.field}>
-              <label style={styles.label}>Zusätzlicher Link (optional)</label>
+              <label style={styles.label}>Additional link (optional)</label>
               <input
                 type="url"
                 style={styles.select}
@@ -652,23 +655,23 @@ const ClassDiscussionPage = () => {
               style={styles.textArea}
               value={form.instructions}
               onChange={(e) => handleFormChange("instructions", e.target.value)}
-              placeholder="Share house rules, materials, or answer format in English so everyone can follow along."
+              placeholder="Share house rules, materials, or answer format in English so everyone can follow along. Refer to chapter 'Tutorial' in the course book."
             />
           </div>
 
           <div style={styles.field}>
-            <label style={styles.label}>Leitfrage für die Klasse</label>
+            <label style={styles.label}>Guiding question for the class</label>
             <textarea
               style={styles.textArea}
               value={form.question}
               onChange={(e) => handleFormChange("question", e.target.value)}
-              placeholder="Welche Frage sollen die Lernenden beantworten?"
+              placeholder="Which question should learners answer?"
             />
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
             <button style={styles.primaryButton} type="submit" disabled={isSavingThread}>
-              Diskussion posten
+              Post discussion
             </button>
           </div>
         </form>
@@ -677,20 +680,18 @@ const ClassDiscussionPage = () => {
       <div style={{ display: "grid", gap: 12 }}>
         {error ? (
           <div style={{ ...styles.card, borderColor: "#fca5a5", background: "#fef2f2" }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Fehler</div>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
             <p style={{ ...styles.helperText, margin: 0 }}>{error}</p>
           </div>
         ) : isLoading ? (
           <div style={styles.card}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Lade Diskussionen ...</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Die neuesten Beiträge werden abgerufen.</p>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Loading discussions ...</div>
+            <p style={{ ...styles.helperText, margin: 0 }}>Fetching the latest posts.</p>
           </div>
         ) : threadsWithReplies.length === 0 ? (
           <div style={styles.card}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Keine Diskussionen gestartet</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Erstelle die erste Frage, wähle die passende Lektion und gib deinen Studierenden einen Timer.
-            </p>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>No discussions started</div>
+            <p style={{ ...styles.helperText, margin: 0 }}>Create the first question, pick the right lesson, and set a timer for your students.</p>
           </div>
         ) : (
           threadsWithReplies.map((thread) => renderThread(thread))
