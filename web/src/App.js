@@ -4,6 +4,7 @@ import { ExamProvider } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
+import LandingPage from "./components/LandingPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
@@ -79,7 +80,7 @@ const getPreferredSection = (allowedSections, preferred) => {
 
 function App() {
   const { user, loading: authLoading, logout, authError, studentProfile } = useAuth();
-  const [authMode, setAuthMode] = useState("login");
+  const [authMode, setAuthMode] = useState("landing");
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
@@ -140,13 +141,17 @@ function App() {
 
   if (!user) {
     if (authMode === "signup") {
-      return <SignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("login")} />;
+      return <SignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
+    }
+
+    if (authMode === "landing") {
+      return <LandingPage onSignUp={() => setAuthMode("signup")} onLogin={() => setAuthMode("login")} />;
     }
 
     return (
       <AuthGate
         initialMode="login"
-        onBack={() => setAuthMode("login")}
+        onBack={() => setAuthMode("landing")}
         onSwitchToSignup={() => setAuthMode("signup")}
       />
     );
