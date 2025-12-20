@@ -213,6 +213,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder="0176 98765432"
           />
 
+          <label style={styles.label}>Status</label>
+          <input
+            type="text"
+            required
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            style={inputStyle}
+            placeholder="Active"
+          />
+
           <label style={styles.label}>Initial payment amount (GH₵)</label>
           <input
             type="number"
