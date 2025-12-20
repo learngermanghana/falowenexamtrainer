@@ -334,7 +334,13 @@ app.post("/grammar/ask", async (req, res) => {
 
     const answer = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 450 });
 
-    const db = admin.firestore();
+    let db;
+    try {
+      db = admin.firestore();
+    } catch (e) {
+      db = null;
+      console.warn("Firestore not available; skipping grammar log:", e?.message || e);
+    }
     const logEntry = {
       question: trimmedQuestion,
       level,
@@ -346,9 +352,11 @@ app.post("/grammar/ask", async (req, res) => {
     if (authedUser?.uid) logEntry.uid = authedUser.uid;
     if (authedUser?.email) logEntry.email = String(authedUser.email).toLowerCase();
 
-    db.collection("grammarQuestions")
-      .add(logEntry)
-      .catch((logErr) => console.warn("Failed to log grammar question", logErr));
+    if (db) {
+      db.collection("grammarQuestions")
+        .add(logEntry)
+        .catch((logErr) => console.warn("Failed to log grammar question", logErr));
+    }
 
     return res.json({ answer });
   } catch (err) {
