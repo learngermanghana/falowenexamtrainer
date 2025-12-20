@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -98,31 +98,37 @@ const AssignmentSubmissionPage = () => {
   const [draftsByAssignment, setDraftsByAssignment] = useState({});
   const lastAssignmentRef = useRef(assignmentOptions[0]);
 
-  const buildChapterKey = (title) => {
-    if (!title) return null;
+  const buildChapterKey = useCallback(
+    (title) => {
+      if (!title) return null;
 
-    const entry = assignmentDictionary.find((item) => item.label === title);
-    if (typeof entry?.day !== "undefined") {
-      return `day-${entry.day}`;
-    }
+      const entry = assignmentDictionary.find((item) => item.label === title);
+      if (typeof entry?.day !== "undefined") {
+        return `day-${entry.day}`;
+      }
 
-    const dayMatch = /^day\s*(\d+)/i.exec(title);
-    if (dayMatch?.[1]) {
-      return `day-${dayMatch[1]}`;
-    }
+      const dayMatch = /^day\s*(\d+)/i.exec(title);
+      if (dayMatch?.[1]) {
+        return `day-${dayMatch[1]}`;
+      }
 
-    return title.toLowerCase();
-  };
+      return title.toLowerCase();
+    },
+    [assignmentDictionary]
+  );
 
-  const deriveChapterValue = (title) => {
-    const entry = assignmentDictionary.find((item) => item.label === title);
-    if (typeof entry?.day !== "undefined") {
-      return entry.day;
-    }
+  const deriveChapterValue = useCallback(
+    (title) => {
+      const entry = assignmentDictionary.find((item) => item.label === title);
+      if (typeof entry?.day !== "undefined") {
+        return entry.day;
+      }
 
-    const dayMatch = /^day\s*(\d+)/i.exec(title || "");
-    return dayMatch?.[1] ? Number(dayMatch[1]) : null;
-  };
+      const dayMatch = /^day\s*(\d+)/i.exec(title || "");
+      return dayMatch?.[1] ? Number(dayMatch[1]) : null;
+    },
+    [assignmentDictionary]
+  );
 
   useEffect(() => {
     const defaultAssignment = assignmentOptions[0];
@@ -280,7 +286,7 @@ const AssignmentSubmissionPage = () => {
     };
 
     loadDraftsAndSubmissions();
-  }, [assignmentOptions, user]);
+  }, [assignmentOptions, buildChapterKey, form.assignmentTitle, user]);
 
   useEffect(() => {
     const isLocked = lockedChapters.has(buildChapterKey(form.assignmentTitle));
@@ -288,7 +294,7 @@ const AssignmentSubmissionPage = () => {
     if (isLocked) {
       setForm((prev) => ({ ...prev, confirmed: true }));
     }
-  }, [form.assignmentTitle, lockedChapters]);
+  }, [buildChapterKey, form.assignmentTitle, lockedChapters]);
 
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
@@ -331,7 +337,7 @@ const AssignmentSubmissionPage = () => {
         confirmed: false,
       }));
     }
-  }, [draftsByAssignment, form.assignmentTitle]);
+  }, [draftsByAssignment, form.assignmentTitle, form.submissionText]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
