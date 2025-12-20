@@ -4,7 +4,7 @@
     {
       "src": "web/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "config": { "distDir": "web/build" }
     },
     {
       "src": "api/index.js",
@@ -13,7 +13,13 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/static/(.*)", "dest": "/web/build/static/$1" },
+    { "src": "/asset-manifest\\.json", "dest": "/web/build/asset-manifest.json" },
+    { "src": "/favicon\\.ico", "dest": "/web/build/favicon.ico" },
+    { "src": "/manifest\\.json", "dest": "/web/build/manifest.json" },
+    { "src": "/logo192\\.png", "dest": "/web/build/logo192.png" },
+    { "src": "/logo512\\.png", "dest": "/web/build/logo512.png" },
+    { "src": "/robots\\.txt", "dest": "/web/build/robots.txt" },
+    { "src": "/(.*)", "dest": "/web/build/index.html" }
   ]
 }
