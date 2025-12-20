@@ -32,24 +32,9 @@ const ChatBuddyPage = () => {
     }
   }, [history]);
 
-  useEffect(() => () => {
-    // Clean up any active recording or object URLs when leaving the page
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
-      mediaRecorderRef.current.stop();
-    }
-
-    if (audioUrl) {
-      URL.revokeObjectURL(audioUrl);
-    }
-  }, [audioUrl]);
-
   const startRecording = async () => {
     setError("");
     try {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error("Your browser cannot access a microphone. Please try Chrome or Edge.");
-      }
-
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
       chunksRef.current = [];
@@ -207,11 +192,6 @@ const ChatBuddyPage = () => {
               ) : null}
             </div>
           ))}
-          {loading ? (
-            <div style={{ padding: 12, borderRadius: 12, border: "1px dashed #cbd5e1", color: "#475569" }}>
-              Buddy is formulating a reply ...
-            </div>
-          ) : null}
           <div ref={historyEndRef} />
         </div>
       </div>
