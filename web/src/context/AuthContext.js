@@ -170,45 +170,51 @@ export const AuthProvider = ({ children }) => {
     return credential;
   };
 
-  const logout = useCallback(async () => {
-    if (!isFirebaseConfigured || !auth) {
-      setUser(null);
+  const logout = useCallback(
+    async () => {
+      if (!isFirebaseConfigured || !auth) {
+        setUser(null);
+        setStudentProfile(null);
+        setIdToken(null);
+        return;
+      }
+      if (studentProfile?.id && studentProfile.messagingToken) {
+        try {
+          await revokeMessagingToken(studentProfile.id);
+        } catch (error) {
+          console.error("Failed to revoke messaging token", error);
+        }
+      }
+      await signOut(auth);
+      setMessagingToken(null);
+      setNotificationStatus("idle");
       setStudentProfile(null);
-      setIdToken(null);
-      return;
-    }
-    if (studentProfile?.id && studentProfile.messagingToken) {
-      try {
-        await revokeMessagingToken(studentProfile.id);
-      } catch (error) {
-        console.error("Failed to revoke messaging token", error);
-      }
-    }
-    await signOut(auth);
-    setMessagingToken(null);
-    setNotificationStatus("idle");
-    setStudentProfile(null);
-  }, [auth, isFirebaseConfigured, revokeMessagingToken, studentProfile]);
+    },
+    [revokeMessagingToken, studentProfile]
+  );
 
-  const enableNotifications = useCallback(async () => {
-    if (!isFirebaseConfigured) {
-      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
-    }
-    setNotificationStatus("pending");
-    try {
-      const token = await requestMessagingToken();
-      setMessagingToken(token);
-      if (studentProfile?.id) {
-        await persistMessagingToken(token, studentProfile.id);
+  const enableNotifications = useCallback(
+    async () => {
+      if (!isFirebaseConfigured) {
+        throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
       }
-      setNotificationStatus("granted");
-      return token;
-    } catch (error) {
-      console.error("Failed to enable notifications", error);
-      setNotificationStatus("error");
-      throw error;
-    }
-  }, [isFirebaseConfigured, persistMessagingToken, requestMessagingToken, studentProfile?.id]);
+      setNotificationStatus("pending");
+      try {
+        const token = await requestMessagingToken();
+        setMessagingToken(token);
+        if (studentProfile?.id) {
+          await persistMessagingToken(token, studentProfile.id);
+        }
+        setNotificationStatus("granted");
+        return token;
+      } catch (error) {
+        console.error("Failed to enable notifications", error);
+        setNotificationStatus("error");
+        throw error;
+      }
+    },
+    [persistMessagingToken, studentProfile?.id]
+  );
 
   useEffect(() => {
     const refreshMessagingToken = async () => {
@@ -264,7 +270,7 @@ export const AuthProvider = ({ children }) => {
       setStudentProfile((prev) => (prev ? { ...prev, ...updates } : prev));
       return { ...studentProfile, ...updates };
     },
-    [isFirebaseConfigured, studentProfile]
+    [studentProfile]
   );
 
   const value = useMemo(
