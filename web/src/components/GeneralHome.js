@@ -53,13 +53,21 @@ const GeneralHome = ({ onSelectArea, studentProfile }) => {
               <p style={{ ...styles.helperText, margin: 0 }}>Campus</p>
               <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Classes, course book, and AI helpers</h3>
             </div>
-            <span style={styles.badge}>Daily work</span>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <span style={{ ...styles.badge, background: "#d1fae5", color: "#065f46", borderColor: "#bbf7d0" }}>
+                Start here
+              </span>
+              <span style={styles.badge}>Daily work</span>
+            </div>
           </div>
           <ul style={{ ...styles.checklist, margin: 0 }}>
             <li>Course book access, assignment submission, and results.</li>
             <li>Grammar Q&amp;A, Chat Buddy, and the original writing coach.</li>
             <li>Group discussion and your account settings.</li>
           </ul>
+          <p style={{ ...styles.helperText, marginBottom: 6 }}>
+            Start in Campus for daily work; use Exams Room for mock exam practice.
+          </p>
           <div>
             <button style={styles.primaryButton} onClick={() => onSelectArea("campus")}>
               Enter Campus
@@ -80,6 +88,9 @@ const GeneralHome = ({ onSelectArea, studentProfile }) => {
             <li>Schreiben trainer with timed letters and idea generation.</li>
             <li>Goethe Lesen/Hören links and quick exam-day reminders.</li>
           </ul>
+          <p style={{ ...styles.helperText, marginBottom: 6 }}>
+            Start in Campus for daily work; use Exams Room for mock exam practice.
+          </p>
           <div>
             <button style={styles.secondaryButton} onClick={() => onSelectArea("exams")}>
               Go to Exams Room
