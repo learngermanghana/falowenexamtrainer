@@ -1,6 +1,6 @@
-const backendUrl =
-  process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+import { getBackendUrl } from "./backendUrl";
+
+const backendUrl = getBackendUrl();
 
 const buildApiUrl = (path) => {
   const normalized = path.startsWith("/") ? path : `/${path}`;
