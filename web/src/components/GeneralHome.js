@@ -1,9 +1,15 @@
 import React from "react";
 import { styles } from "../styles";
+import ClassCalendarCard from "./ClassCalendarCard";
+import ClassVideoSpotlight from "./ClassVideoSpotlight";
 
-const GeneralHome = ({ onSelectArea }) => {
+const GeneralHome = ({ onSelectArea, studentProfile }) => {
+  const preferredClass = studentProfile?.className;
+
   return (
     <div style={{ display: "grid", gap: 16 }}>
+      <ClassCalendarCard initialClassName={preferredClass} />
+
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>
         <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Choose your learning space</h2>
@@ -54,6 +60,8 @@ const GeneralHome = ({ onSelectArea }) => {
           </div>
         </section>
       </div>
+
+      <ClassVideoSpotlight studentProfile={studentProfile} />
     </div>
   );
 };

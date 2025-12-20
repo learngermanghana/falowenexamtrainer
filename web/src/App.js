@@ -164,6 +164,7 @@ function App() {
         availableTabs={availableTabs}
         defaultCampusSection={defaultCampusSection}
         logout={logout}
+        studentProfile={studentProfile}
         tabStorageKey={tabStorageKey}
         user={user}
       />
@@ -173,7 +174,7 @@ function App() {
 
 export default App;
 
-const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout, tabStorageKey, user }) => {
+const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout, studentProfile, tabStorageKey, user }) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -229,7 +230,10 @@ const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout
 
       <main className="layout-main" style={{ minWidth: 0 }}>
         <Routes>
-          <Route path="/" element={<GeneralHome onSelectArea={handleAreaSelect} />} />
+          <Route
+            path="/"
+            element={<GeneralHome onSelectArea={handleAreaSelect} studentProfile={studentProfile} />}
+          />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
           <Route
