@@ -5,7 +5,9 @@ export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
   const [lastChecked, setLastChecked] = useState(null);
 
   const refresh = useCallback(async () => {
-    const baseUrl = process.env.REACT_APP_API_BASE || "";
+    const baseUrl =
+      process.env.REACT_APP_BACKEND_URL ||
+      (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
     const url = `${baseUrl}/api/health`;
 
     try {
