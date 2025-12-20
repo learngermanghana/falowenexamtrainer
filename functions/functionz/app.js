@@ -105,6 +105,15 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
   );
 };
 
+const chatBuddyPrompt = ({ level }) =>
+  [
+    "You are Falowen Chat Buddy, a friendly German speaking partner helping a student practise.",
+    `Match the CEFR level ${level || "B1"} and keep answers short (max 4 sentences).`,
+    "Blend simple German with brief English guidance so the learner understands.",
+    "Always ask one follow-up question in German to keep the conversation going.",
+    "If you notice pronunciation or grammar issues, include one quick tip using a short German example.",
+  ].join(" ");
+
 const placementPrompt = ({ answers, targetLevel }) => {
   const formattedAnswers = answers
     .map((item, idx) => `Answer ${idx + 1} (${item.taskType || "custom"}): ${item.text}`)
@@ -546,6 +555,39 @@ app.post("/speaking/interaction-score", upload.single("audio"), async (req, res)
   } catch (err) {
     console.error("/speaking/interaction-score error", err);
     return res.status(500).json({ error: err.message || "Failed to score interaction" });
+  }
+});
+
+app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
+  try {
+    const { message, level = "B1" } = req.body || {};
+
+    if (!req.file && (!message || !String(message).trim())) {
+      return res.status(400).json({ error: "A message or audio recording is required" });
+    }
+
+    let transcript = "";
+
+    if (req.file) {
+      transcript = (await transcribeAudio(req.file)) || "";
+    }
+
+    const trimmedMessage = String(message || "").trim();
+    const combinedMessage = [trimmedMessage, transcript ? `Audio transcript: ${transcript}` : null]
+      .filter(Boolean)
+      .join("\n\n");
+
+    const chatMessages = [
+      { role: "system", content: chatBuddyPrompt({ level }) },
+      { role: "user", content: combinedMessage || transcript || "Student sent an empty message." },
+    ];
+
+    const reply = await createChatCompletion(chatMessages, { temperature: 0.55, max_tokens: 420 });
+
+    return res.json({ reply, transcript: transcript || null });
+  } catch (err) {
+    console.error("/chatbuddy/respond error", err);
+    return res.status(500).json({ error: err.message || "Failed to chat with buddy" });
   }
 });
 
