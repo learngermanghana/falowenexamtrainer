@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import ResultHistory from "./ResultHistory";
 import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService";
+import { writingLetters } from "../data/writingLetters";
 
 const IDEA_COACH_INTRO = {
   role: "assistant",
@@ -15,13 +16,17 @@ const LetterPracticePage = () => {
   const { level, setLevel, error, setError, loading, setLoading, resultHistory, addResultToHistory } = useExam();
   const { user, idToken } = useAuth();
 
-  const [activeTab, setActiveTab] = useState("mark");
+  const [activeTab, setActiveTab] = useState("practice");
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
+  const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
+  const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [practiceLevel, setPracticeLevel] = useState("All");
 
   const resetErrors = () => {
     setError("");
@@ -31,6 +36,40 @@ const LetterPracticePage = () => {
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
     resetErrors();
+  };
+
+  const selectedLetter = useMemo(() => writingLetters.find((item) => item.id === selectedLetterId), [selectedLetterId]);
+
+  useEffect(() => {
+    if (!selectedLetter) return;
+    setLevel(selectedLetter.level);
+    setTimerSeconds(selectedLetter.durationMinutes * 60);
+  }, [selectedLetter, setLevel]);
+
+  useEffect(() => {
+    if (!timerRunning) return;
+
+    const interval = setInterval(() => {
+      setTimerSeconds((prev) => {
+        if (prev <= 1) {
+          setTimerRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timerRunning]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, "0");
+    const secs = Math.floor(seconds % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${mins}:${secs}`;
   };
 
   const validateLevel = () => {
@@ -115,17 +154,18 @@ const LetterPracticePage = () => {
       <section style={styles.card}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div>
-            <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>Writing lab</p>
-            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Practice letter writing</h2>
+            <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>Schreiben trainer</p>
+            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Timed letters + Herr Felix ideas</h2>
             <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-              Two focused tools: paste a finished letter for instant marking, or chat with the ideas generator to build your letter step by step.
+              Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator (prompts in
+              <code>functions/functionz/prompts.js</code>) to keep moving.
             </p>
           </div>
-          <span style={styles.badge}>Herr Felix prompts</span>
+          <span style={styles.badge}>Exam writing lab</span>
         </div>
 
         <div style={styles.tabList}>
-          {[{ key: "mark", label: "Mark my letter" }, { key: "ideas", label: "Ideas generator" }].map((tab) => (
+          {[{ key: "practice", label: "Practice letters" }, { key: "ideas", label: "Ideas generator" }].map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
@@ -137,64 +177,159 @@ const LetterPracticePage = () => {
         </div>
       </section>
 
-      {activeTab === "mark" && (
+      {activeTab === "practice" && (
         <section style={styles.card}>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div style={{ display: "grid", gap: 6 }}>
-              <label style={styles.label}>Level for feedback</label>
-              <select
-                value={level}
-                onChange={(e) => {
-                  setLevel(e.target.value);
-                  setError("");
-                }}
-                style={styles.select}
-              >
-                {ALLOWED_LEVELS.map((option) => (
-                  <option key={option}>{option}</option>
-                ))}
-              </select>
-            </div>
-
-            <div style={{ display: "grid", gap: 6 }}>
-              <label style={styles.label}>Your letter</label>
-              <textarea
-                style={styles.textArea}
-                placeholder="Paste your finished letter or essay here for marking."
-                value={letterText}
-                onChange={(e) => setLetterText(e.target.value)}
-                rows={10}
-              />
-            </div>
-
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading}>
-                {loading ? "Marking your letter..." : "Get AI marking"}
-              </button>
-              <button
-                style={styles.secondaryButton}
-                onClick={() => {
-                  setLetterText("");
-                  setMarkFeedback("");
-                  resetErrors();
-                }}
-              >
-                Clear
-              </button>
-            </div>
-
-            {error && (
-              <div style={styles.errorBox}>
-                <strong>Hinweis:</strong> {error}
+          <div style={{ display: "grid", gap: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+              <div style={{ display: "grid", gap: 6 }}>
+                <label style={styles.label}>Choose a level to browse tasks</label>
+                <div style={styles.segmentedControl}>
+                  {["All", ...ALLOWED_LEVELS].map((lvl) => (
+                    <button
+                      key={lvl}
+                      style={practiceLevel === lvl ? styles.segmentedActive : styles.segmentedButton}
+                      onClick={() => setPracticeLevel(lvl)}
+                    >
+                      {lvl}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
-
-            {markFeedback && (
               <div>
-                <h3 style={styles.sectionTitle}>AI feedback</h3>
-                <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+                <div style={styles.timer}>{formatTime(timerSeconds)}</div>
+                <p style={{ ...styles.timerHelp, margin: 0 }}>
+                  Start the timer, write without stopping, then switch to "Mark my letter".
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ ...styles.promptList, paddingLeft: 0, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+                {writingLetters
+                  .filter((item) => (practiceLevel === "All" ? true : item.level === practiceLevel))
+                  .map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelectedLetterId(item.id)}
+                      style={
+                        selectedLetterId === item.id
+                          ? { ...styles.tabButtonActive, textAlign: "left" }
+                          : { ...styles.tabButton, textAlign: "left" }
+                      }
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                        <span>{item.letter}</span>
+                        <span style={styles.levelPill}>{item.level}</span>
+                      </div>
+                      <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
+                        {item.durationMinutes} min • {item.situation}
+                      </p>
+                    </button>
+                  ))}
+              </div>
+            </div>
+
+            {selectedLetter && (
+              <div style={{ ...styles.uploadCard, border: "1px dashed #cbd5e1", background: "#f8fafc" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                      <span style={styles.levelPill}>{selectedLetter.level}</span>
+                      <strong>{selectedLetter.letter}</strong>
+                      <span style={styles.badge}>{selectedLetter.durationMinutes} minute target</span>
+                    </div>
+                    <p style={{ ...styles.helperText, margin: 0 }}>{selectedLetter.situation}</p>
+                    <div>
+                      <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>Checklist</p>
+                      <ul style={styles.checklist}>
+                        {selectedLetter.whatToInclude.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gap: 8, alignItems: "flex-start" }}>
+                    <button
+                      style={timerRunning ? styles.secondaryButton : styles.primaryButton}
+                      onClick={() => {
+                        setTimerSeconds(selectedLetter.durationMinutes * 60);
+                        setTimerRunning(true);
+                      }}
+                    >
+                      {timerRunning ? "Restart timer" : "Start timer"}
+                    </button>
+                    <button
+                      style={styles.secondaryButton}
+                      onClick={() => {
+                        setTimerRunning(false);
+                        setTimerSeconds(selectedLetter.durationMinutes * 60);
+                      }}
+                    >
+                      Pause / Reset
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
+
+            <div style={{ display: "grid", gap: 12 }}>
+              <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Mark my letter</h3>
+              <div style={{ display: "grid", gap: 6 }}>
+                <label style={styles.label}>Level for feedback</label>
+                <select
+                  value={level}
+                  onChange={(e) => {
+                    setLevel(e.target.value);
+                    setError("");
+                  }}
+                  style={styles.select}
+                >
+                  {ALLOWED_LEVELS.map((option) => (
+                    <option key={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: "grid", gap: 6 }}>
+                <label style={styles.label}>Your letter</label>
+                <textarea
+                  style={styles.textArea}
+                  placeholder="Paste your finished letter or essay here for marking."
+                  value={letterText}
+                  onChange={(e) => setLetterText(e.target.value)}
+                  rows={10}
+                />
+              </div>
+
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading}>
+                  {loading ? "Marking your letter..." : "Get AI marking"}
+                </button>
+                <button
+                  style={styles.secondaryButton}
+                  onClick={() => {
+                    setLetterText("");
+                    setMarkFeedback("");
+                    resetErrors();
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+
+              {error && (
+                <div style={styles.errorBox}>
+                  <strong>Hinweis:</strong> {error}
+                </div>
+              )}
+
+              {markFeedback && (
+                <div>
+                  <h4 style={styles.sectionTitle}>AI feedback</h4>
+                  <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+                </div>
+              )}
+            </div>
           </div>
         </section>
       )}
