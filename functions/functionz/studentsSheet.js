@@ -123,6 +123,20 @@ async function upsertStudentToSheet(student) {
   const colClassName = findCol(headerMap, "ClassName", "Class Name", "classname");
   const colStatus = findCol(headerMap, "Status", "status");
   const colEnrollDate = findCol(headerMap, "EnrollDate", "Enroll Date", "enrolldate");
+  const colPaid = findCol(headerMap, "Paid", "InitialPayment", "Initial Payment");
+  const colBalance = findCol(headerMap, "Balance", "BalanceDue", "Balance Due");
+  const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
+  const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
+  const colEmergencyPhone = findCol(
+    headerMap,
+    "Emergency Contact (Phone Number)",
+    "Emergency Contact",
+    "Emergency Contact Phone"
+  );
+  const colDailyLimit = findCol(headerMap, "Daily_Limit", "Daily Limit", "DailyLimit");
+  const colUsesToday = findCol(headerMap, "Uses_Today", "Uses Today", "UsesToday");
+  const colLastDate = findCol(headerMap, "Last_Date", "Last Date", "LastDate");
+  const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
 
   if (colStudentCode === null) {
     throw new Error("Students sheet is missing a StudentCode column header.");
@@ -176,6 +190,15 @@ async function upsertStudentToSheet(student) {
     pushCell(colClassName, student.className || "");
     pushCell(colStatus, student.status || "");
     pushCell(colEnrollDate, student.enrollDate || "");
+    pushCell(colPaid, student.initialPaymentAmount ?? "");
+    pushCell(colBalance, student.balanceDue ?? "");
+    pushCell(colContractStart, student.contractStart || "");
+    pushCell(colContractEnd, student.contractEnd || "");
+    pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
+    pushCell(colDailyLimit, student.dailyLimit ?? "");
+    pushCell(colUsesToday, student.usesToday ?? "");
+    pushCell(colLastDate, student.lastDate || "");
+    pushCell(colReminderSent, student.reminderSent || "");
 
     if (updates.length) {
       await sheets.spreadsheets.values.batchUpdate({
@@ -205,6 +228,16 @@ async function upsertStudentToSheet(student) {
   if (colClassName !== null) row[colClassName] = student.className || "";
   if (colStatus !== null) row[colStatus] = student.status || "";
   if (colEnrollDate !== null) row[colEnrollDate] = student.enrollDate || "";
+  if (colPaid !== null) row[colPaid] = student.initialPaymentAmount ?? "";
+  if (colBalance !== null) row[colBalance] = student.balanceDue ?? "";
+  if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
+  if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
+  if (colEmergencyPhone !== null)
+    row[colEmergencyPhone] = student.emergencyContactPhone || "";
+  if (colDailyLimit !== null) row[colDailyLimit] = student.dailyLimit ?? "";
+  if (colUsesToday !== null) row[colUsesToday] = student.usesToday ?? "";
+  if (colLastDate !== null) row[colLastDate] = student.lastDate || "";
+  if (colReminderSent !== null) row[colReminderSent] = student.reminderSent || "";
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
