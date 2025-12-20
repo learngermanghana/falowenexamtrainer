@@ -278,6 +278,8 @@ async function findStudentByCodeOrEmail({ studentCode, email }) {
 }
 
 app.post("/paystack/webhook", async (req, res) => {
+  let dedupeRef;
+
   try {
     const secret = process.env.PAYSTACK_SECRET;
     if (!secret) {
@@ -303,22 +305,64 @@ app.post("/paystack/webhook", async (req, res) => {
       return res.json({ status: "ignored", event });
     }
 
+    const reference = data?.reference ? String(data.reference) : "";
+    if (!reference) {
+      return res.status(400).json({ error: "Missing Paystack reference" });
+    }
+
+    const payloadHash = crypto.createHash("sha256").update(raw).digest("hex");
+    const db = admin.firestore();
+
     const studentCode =
       data?.metadata?.studentCode ||
       data?.metadata?.student_code ||
       data?.metadata?.studentcode ||
       null;
     const email = data?.customer?.email ? String(data.customer.email).toLowerCase() : "";
+
+    const amountPaid = Number(data?.amount || 0) / 100;
+    dedupeRef = db.collection("paystackWebhookEvents").doc(reference);
+    let alreadyProcessed = false;
+
+    await db.runTransaction(async (tx) => {
+      const existing = await tx.get(dedupeRef);
+      if (existing.exists) {
+        alreadyProcessed = true;
+        return;
+      }
+
+      tx.set(dedupeRef, {
+        reference,
+        event,
+        signature,
+        payloadHash,
+        studentCode: studentCode || "",
+        email,
+        amount: amountPaid,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    if (alreadyProcessed) {
+      return res.json({ status: "duplicate", reference });
+    }
+
     const match = await findStudentByCodeOrEmail({ studentCode, email });
 
     if (!match) {
       console.warn("No matching student for Paystack callback", { studentCode, email });
+      await dedupeRef.set(
+        {
+          status: "no-match",
+          handledAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
       return res.status(202).json({ status: "no-match" });
     }
 
     const { ref, snap } = match;
     const studentData = snap.data() || {};
-    const amountPaid = Number(data?.amount || 0) / 100;
     const priorPaid = Number(studentData.initialPaymentAmount || 0);
     const tuitionFee = Number(studentData.tuitionFee || 0);
     const totalPaid = priorPaid + amountPaid;
@@ -338,9 +382,34 @@ app.post("/paystack/webhook", async (req, res) => {
     const mergedStudent = { ...studentData, ...updates };
     await appendStudentToStudentsSheetSafely(mergedStudent);
 
+    await dedupeRef.set(
+      {
+        status: "handled",
+        handledAt: admin.firestore.FieldValue.serverTimestamp(),
+        studentId: ref.id,
+        paymentStatus,
+        balanceDue,
+      },
+      { merge: true }
+    );
+
     return res.json({ status: "synced", paymentStatus, balanceDue });
   } catch (err) {
     console.error("/paystack/webhook error", err);
+    try {
+      if (dedupeRef) {
+        await dedupeRef.set(
+          {
+            status: "error",
+            errorMessage: err?.message || "unknown",
+            handledAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
+    } catch (dedupeErr) {
+      console.warn("Failed to update dedupe record", dedupeErr?.message || dedupeErr);
+    }
     return res.status(500).json({ error: "Failed to process webhook" });
   }
 });
