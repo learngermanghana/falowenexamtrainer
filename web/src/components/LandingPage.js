@@ -43,6 +43,24 @@ const LandingPage = ({ onSignUp, onLogin }) => {
       description:
         "Join a live German chat during class with real-time monitoring and feedback from a tutor while you type.",
     },
+  ];
+
+  const quickLinks = [
+    { label: "About us", href: "https://register.falowen.app/#about-us" },
+    { label: "Privacy policy", href: "https://register.falowen.app/#privacy-policy" },
+    { label: "Contact", href: "https://register.falowen.app/#contact" },
+    { label: "Terms of service", href: "https://register.falowen.app/#terms-of-service" },
+    { label: "FAQ", href: "https://register.falowen.app/#faq" },
+    { label: "Blog", href: "https://blog.falowen.app/feed" },
+  ];
+
+  const socialLinks = [
+    { label: "Instagram", href: "https://www.instagram.com/lleaghana" },
+    { label: "YouTube", href: "https://www.youtube.com/@LLEAGhana" },
+    { label: "Facebook", href: "https://web.facebook.com/lleaghana" },
+  ];
+
+  const photos = [
     {
       title: "Exam Preparation",
       description:
@@ -78,27 +96,6 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     {
       url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-mart-production-8473001.jpg?raw=1",
       caption: "Hands-on writing and speaking drills for every level.",
-    },
-  ];
-
-  const learnerVoices = [
-    {
-      name: "Priscilla · Accra, Ghana",
-      quote:
-        "Falowen helped me practice polite requests every night so my Goethe prep class could focus on conversation.",
-    },
-    {
-      name: "Sulaiman · Freetown, Sierra Leone",
-      quote: "I send my writing tasks on the app and my tutor reviews them in class—feedback is so much faster.",
-    },
-    {
-      name: "Chidinma · Lagos, Nigeria",
-      quote:
-        "The live chat during class keeps me speaking up. I joined from home and still felt part of the classroom.",
-    },
-    {
-      name: "Kofi · Kumasi, Ghana",
-      quote: "Vocabulary drills and the A.I. buddy mean I can study even when I travel for work.",
     },
   ];
 
@@ -170,51 +167,9 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                   style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                 />
               </div>
-            <p style={{ ...styles.helperText, margin: 0 }}>{photo.caption}</p>
-          </div>
+              <p style={{ ...styles.helperText, margin: 0 }}>{photo.caption}</p>
+            </div>
           ))}
-        </section>
-
-        <section
-          style={{
-            ...styles.card,
-            background: "linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%)",
-            borderColor: "#c7d2fe",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap", alignItems: "center" }}>
-            <div style={{ flex: 2, minWidth: 260 }}>
-              <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Trusted pivots: learner voices</h2>
-              <p style={{ ...styles.helperText, marginBottom: 0 }}>
-                Students across Ghana, Nigeria, Sierra Leone, and beyond use Falowen daily. Tutors point to these
-                testimonials as proof points during info sessions and parent meetings.
-              </p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <span style={styles.badge}>Campus pilots in Accra & Lagos</span>
-              <span style={styles.badge}>Evening cohorts for workers</span>
-              <span style={styles.badge}>Live chat during class</span>
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gap: 12, marginTop: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-            {learnerVoices.map((voice) => (
-              <div
-                key={voice.name}
-                style={{
-                  ...styles.card,
-                  marginBottom: 0,
-                  height: "100%",
-                  border: "1px solid #e0e7ff",
-                  background: "#ffffff",
-                  boxShadow: "0 10px 20px rgba(37, 99, 235, 0.08)",
-                }}
-              >
-                <p style={{ fontWeight: 700, fontSize: 14, color: "#1e3a8a", margin: "0 0 6px" }}>{voice.name}</p>
-                <p style={{ ...styles.helperText, margin: 0, color: "#111827" }}>“{voice.quote}”</p>
-              </div>
-            ))}
-          </div>
         </section>
 
         <section style={{ ...styles.card, background: "#111827", color: "#e5e7eb" }}>

@@ -236,6 +236,28 @@ const ClassDiscussionPage = () => {
     return () => clearInterval(id);
   }, []);
 
+  const resolveStatus = useCallback(
+    (thread) => {
+      if (!thread) return "open";
+      if (thread.status === "archived") return "archived";
+      if (thread.status === "expired") return "expired";
+      if (thread.expiresAt && thread.expiresAt <= now) return "expired";
+      return "open";
+    },
+    [now]
+  );
+
+  const getThreadDocRef = useCallback(
+    (thread) => {
+      if (!db || !thread?.id) return null;
+      const level = thread.level || studentProfile?.level;
+      const className = thread.className || studentProfile?.className;
+      if (!level || !className) return null;
+      return doc(postsCollectionRef(level, className), thread.id);
+    },
+    [studentProfile?.className, studentProfile?.level]
+  );
+
   useEffect(() => {
     const ensureStatuses = async () => {
       if (!db || threads.length === 0) return;
@@ -281,28 +303,6 @@ const ClassDiscussionPage = () => {
   }, []);
 
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
-
-  const resolveStatus = useCallback(
-    (thread) => {
-      if (!thread) return "open";
-      if (thread.status === "archived") return "archived";
-      if (thread.status === "expired") return "expired";
-      if (thread.expiresAt && thread.expiresAt <= now) return "expired";
-      return "open";
-    },
-    [now]
-  );
-
-  const getThreadDocRef = useCallback(
-    (thread) => {
-      if (!db || !thread?.id) return null;
-      const level = thread.level || studentProfile?.level;
-      const className = thread.className || studentProfile?.className;
-      if (!level || !className) return null;
-      return doc(postsCollectionRef(level, className), thread.id);
-    },
-    [studentProfile?.className, studentProfile?.level]
-  );
 
   useEffect(() => {
     if (!form.lessonId && lessonOptions.length > 0) {
