@@ -16,10 +16,45 @@ import { styles } from "./styles";
 import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
 
+const TAB_STRUCTURE = [
+  {
+    key: "myCourse",
+    label: "My Course",
+    sections: [
+      { key: "course", label: "Course Book" },
+      { key: "submit", label: "Submit Assignment" },
+    ],
+  },
+  {
+    key: "falowenAI",
+    label: "Falowen A.I",
+    sections: [
+      { key: "grammar", label: "Ask Grammar Question" },
+      { key: "writing", label: "Writing Practice" },
+      { key: "buddy", label: "Chat Buddy" },
+    ],
+  },
+  { key: "results", label: "Results", section: "results" },
+  { key: "discussion", label: "Group Discussion", section: "discussion" },
+  { key: "account", label: "Account", section: "account" },
+];
+
+const getMainTabForSection = (section) =>
+  TAB_STRUCTURE.find((tab) => tab.section === section || tab.sections?.some((entry) => entry.key === section));
+
+const isTabAvailable = (tab, allowedSections) => {
+  if (tab.section) {
+    return Boolean(allowedSections[tab.section]);
+  }
+
+  return tab.sections.some((entry) => allowedSections[entry.key]);
+};
+
 function App() {
   const { user, loading: authLoading, logout, authError, studentProfile } = useAuth();
   const [authMode, setAuthMode] = useState("login");
   const [activeSection, setActiveSection] = useState("submit");
+  const [activeMainTab, setActiveMainTab] = useState(null);
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
@@ -41,6 +76,13 @@ function App() {
 
   const tabStorageKey = user?.uid ? `falowen:last-tab:${user.uid}` : null;
 
+  const availableTabs = useMemo(
+    () => TAB_STRUCTURE.filter((tab) => isTabAvailable(tab, allowedSections)),
+    [allowedSections]
+  );
+
+  const activeMainTabConfig = useMemo(() => TAB_STRUCTURE.find((tab) => tab.key === activeMainTab), [activeMainTab]);
+
   useEffect(() => {
     if (!tabStorageKey) return;
     const saved = localStorage.getItem(tabStorageKey);
@@ -59,6 +101,58 @@ function App() {
     const fallback = Object.keys(allowedSections).find((key) => allowedSections[key]) || "account";
     setActiveSection(fallback);
   }, [activeSection, allowedSections]);
+
+  useEffect(() => {
+    const mainTabFromSection = getMainTabForSection(activeSection);
+    const fallbackMainTab = availableTabs[0];
+
+    if (mainTabFromSection && isTabAvailable(mainTabFromSection, allowedSections)) {
+      setActiveMainTab(mainTabFromSection.key);
+    } else if (fallbackMainTab) {
+      setActiveMainTab(fallbackMainTab.key);
+    }
+  }, [activeSection, allowedSections, availableTabs]);
+
+  useEffect(() => {
+    if (!activeMainTabConfig) return;
+
+    if (activeMainTabConfig.section && activeMainTabConfig.section !== activeSection) {
+      setActiveSection(activeMainTabConfig.section);
+      return;
+    }
+
+    if (!activeMainTabConfig.sections) return;
+
+    const hasAllowedActiveSection = activeMainTabConfig.sections.some(
+      (section) => section.key === activeSection && allowedSections[section.key]
+    );
+
+    if (!hasAllowedActiveSection) {
+      const firstAllowed = activeMainTabConfig.sections.find((section) => allowedSections[section.key]);
+      if (firstAllowed) {
+        setActiveSection(firstAllowed.key);
+      }
+    }
+  }, [activeMainTabConfig, activeSection, allowedSections]);
+
+  const handleMainTabClick = (tab) => {
+    setActiveMainTab(tab.key);
+
+    if (tab.section) {
+      setActiveSection(tab.section);
+      return;
+    }
+
+    const firstAllowed = tab.sections.find((section) => allowedSections[section.key]);
+    if (firstAllowed) {
+      setActiveSection(firstAllowed.key);
+    }
+  };
+
+  const handleSubTabClick = (sectionKey, parentKey) => {
+    setActiveMainTab(parentKey);
+    setActiveSection(sectionKey);
+  };
 
   if (!isFirebaseConfigured) {
     return (
@@ -127,72 +221,33 @@ function App() {
         </header>
 
         <main className="layout-main" style={{ minWidth: 0 }}>
-          <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
-            {allowedSections.submit ? (
+          <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
+            {availableTabs.map((tab) => (
               <button
-                style={activeSection === "submit" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("submit")}
+                key={tab.key}
+                style={activeMainTab === tab.key ? styles.navButtonActive : styles.navButton}
+                onClick={() => handleMainTabClick(tab)}
               >
-                Submit Assignment
+                {tab.label}
               </button>
-            ) : null}
-            {allowedSections.course ? (
-              <button
-                style={activeSection === "course" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("course")}
-              >
-                Course Book
-              </button>
-            ) : null}
-            {allowedSections.results ? (
-              <button
-                style={activeSection === "results" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("results")}
-              >
-                Results
-              </button>
-            ) : null}
-            {allowedSections.grammar ? (
-              <button
-                style={activeSection === "grammar" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("grammar")}
-              >
-                Ask Grammar Question
-              </button>
-            ) : null}
-            {allowedSections.writing ? (
-              <button
-                style={activeSection === "writing" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("writing")}
-              >
-                Writing Practice
-              </button>
-            ) : null}
-            {allowedSections.buddy ? (
-              <button
-                style={activeSection === "buddy" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("buddy")}
-              >
-                Chat Buddy
-              </button>
-            ) : null}
-            {allowedSections.discussion ? (
-              <button
-                style={activeSection === "discussion" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("discussion")}
-              >
-                Group Discussion
-              </button>
-            ) : null}
-            {allowedSections.account ? (
-              <button
-                style={activeSection === "account" ? styles.navButtonActive : styles.navButton}
-                onClick={() => setActiveSection("account")}
-              >
-                Account
-              </button>
-            ) : null}
+            ))}
           </div>
+
+          {activeMainTabConfig?.sections ? (
+            <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}>
+              {activeMainTabConfig.sections
+                .filter((section) => allowedSections[section.key])
+                .map((section) => (
+                  <button
+                    key={section.key}
+                    style={activeSection === section.key ? styles.navButtonActive : styles.navButton}
+                    onClick={() => handleSubTabClick(section.key, activeMainTabConfig.key)}
+                  >
+                    {section.label}
+                  </button>
+                ))}
+            </div>
+          ) : null}
 
           {activeSection === "course" && allowedSections.course ? <CourseTab /> : null}
           {activeSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
