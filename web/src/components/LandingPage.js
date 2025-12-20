@@ -1,7 +1,7 @@
 import React from "react";
 import { styles } from "../styles";
 
-const Highlight = ({ title, description }) => (
+const FeatureCard = ({ title, description }) => (
   <div
     style={{
       ...styles.card,
@@ -15,44 +15,70 @@ const Highlight = ({ title, description }) => (
   </div>
 );
 
+const ResourceLink = ({ label, href }) => (
+  <a
+    href={href}
+    style={{ color: "#1d4ed8", textDecoration: "none", fontWeight: 600, fontSize: 14 }}
+    target="_blank"
+    rel="noreferrer"
+  >
+    {label}
+  </a>
+);
+
 const LandingPage = ({ onSignUp, onLogin }) => {
-  const highlights = [
+  const features = [
     {
-      title: "About us",
+      title: "Blended Learning Model",
       description:
-        "We are a small team of language coaches and technologists helping you prepare smarter for every exam.",
+        "Connect daily mobile or laptop practice with structured face-to-face classroom sessions for steady progress.",
     },
     {
-      title: "Our mission",
+      title: "Tutor Integration",
       description:
-        "Personalized learning paths, exam-style practice, and continuous feedback to keep you confident and ready.",
+        "Speaking and writing tasks you complete independently are reviewed by human tutors during live classes.",
     },
     {
-      title: "What to expect",
+      title: "Live Interactive Chat",
       description:
-        "Guided speaking and writing sessions, vocabulary drills, and a progress cockpit with clear next steps.",
+        "Join a live German chat during class with real-time monitoring and feedback from a tutor while you type.",
+    },
+    {
+      title: "Exam Preparation",
+      description:
+        "Practice polite requests, questions, opinions, and full conversations with exam-style prompts tailored for Goethe and Telc formats.",
+    },
+    {
+      title: "24/7 Resource Access",
+      description:
+        "Vocabulary practice, live AI integration, and round-the-clock learning materials keep you on track whenever you study.",
     },
   ];
 
-  const pillars = [
-    {
-      title: "Focus on outcomes",
-      copy: "Clear goals, adaptive tasks, and realistic mock tests accelerate your progress.",
-    },
-    {
-      title: "Coach in the loop",
-      copy: "Real-time feedback, personalized tips, and reminders keep you in the flow.",
-    },
-    {
-      title: "Tech + teaching",
-      copy: "We combine modern language tools with proven methods for sustainable results.",
-    },
+  const quickLinks = [
+    { label: "About us", href: "https://register.falowen.app/#about-us" },
+    { label: "Privacy policy", href: "https://register.falowen.app/#privacy-policy" },
+    { label: "Contact", href: "https://register.falowen.app/#contact" },
+    { label: "Terms of service", href: "https://register.falowen.app/#terms-of-service" },
+    { label: "FAQ", href: "https://register.falowen.app/#faq" },
+    { label: "Blog", href: "https://blog.falowen.app/feed" },
   ];
 
-  const steps = [
-    "Run the Level Check to unlock your profile.",
-    "Follow the Daily Plan and complete speaking/writing sessions.",
-    "Get a weekly review with clear next steps and streak support.",
+  const socialLinks = [
+    { label: "Instagram", href: "https://www.instagram.com/lleaghana" },
+    { label: "YouTube", href: "https://www.youtube.com/@LLEAGhana" },
+    { label: "Facebook", href: "https://web.facebook.com/lleaghana" },
+  ];
+
+  const photos = [
+    {
+      url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-julia-m-cameron-4145153.jpg?raw=1",
+      caption: "Guided practice sessions with classmates and tutors.",
+    },
+    {
+      url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-mart-production-8473001.jpg?raw=1",
+      caption: "Hands-on writing and speaking drills for every level.",
+    },
   ];
 
   return (
@@ -62,14 +88,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
         background: "radial-gradient(circle at 10% 20%, #eef2ff 0, #f3f4f6 35%, #f3f4f6 100%)",
       }}
     >
-      <div
-        style={{
-          display: "grid",
-          gap: 16,
-          margin: "0 auto",
-          maxWidth: 1080,
-        }}
-      >
+      <div style={{ display: "grid", gap: 16, margin: "0 auto", maxWidth: 1100 }}>
         <section
           style={{
             ...styles.card,
@@ -81,13 +100,14 @@ const LandingPage = ({ onSignUp, onLogin }) => {
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ ...styles.badge, alignSelf: "flex-start", background: "#c7d2fe", color: "#1e3a8a" }}>
-              Falowen Exam Coach
+              Falowen · Launched 2025
             </p>
             <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-              Your guided path to confident exam results.
+              Conversation-focused German learning built in Ghana.
             </h1>
             <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 4 }}>
-              Everyday-friendly training, realistic simulations, and a coach that guides you step by step.
+              Falowen is a conversation-focused German language learning application launched in 2025 by Ghanaian educators.
+              It bridges the gap between classroom coaching and independent daily practice for students preparing for German certification exams.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button style={styles.primaryButton} onClick={onSignUp}>
@@ -98,55 +118,56 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               </button>
             </div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 6 }}>
-              <span style={styles.badge}>A1–B2 Speaking & Writing</span>
-              <span style={styles.badge}>Adaptive Daily Plan</span>
-              <span style={styles.badge}>Push reminders</span>
+              <span style={styles.badge}>Daily practice + live classes</span>
+              <span style={styles.badge}>Tutor-reviewed exercises</span>
+              <span style={styles.badge}>Exam-style simulations</span>
             </div>
           </div>
         </section>
 
-        <section style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-          {highlights.map((item) => (
-            <Highlight key={item.title} title={item.title} description={item.description} />
+        <section style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {features.map((item) => (
+            <FeatureCard key={item.title} title={item.title} description={item.description} />
+          ))}
+        </section>
+
+        <section style={{ ...styles.card, display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+          {photos.map((photo) => (
+            <div key={photo.url} style={{ display: "grid", gap: 8 }}>
+              <div
+                style={{
+                  position: "relative",
+                  overflow: "hidden",
+                  borderRadius: 12,
+                  boxShadow: "0 10px 24px rgba(0, 0, 0, 0.1)",
+                  border: "1px solid #e5e7eb",
+                }}
+              >
+                <img
+                  src={photo.url}
+                  alt={photo.caption}
+                  style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                />
+              </div>
+              <p style={{ ...styles.helperText, margin: 0 }}>{photo.caption}</p>
+            </div>
           ))}
         </section>
 
         <section style={{ ...styles.card, background: "#111827", color: "#e5e7eb" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div style={{ flex: 2, minWidth: 260 }}>
-              <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>Mission & approach</h2>
+              <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>How Falowen supports your exam goals</h2>
               <p style={{ ...styles.helperText, color: "#d1d5db" }}>
-                Prep should be measurable, motivating, and manageable. That is why we pair short daily sessions, clear weekly
-                goals, and personal feedback on every exercise.
+                The platform includes realistic examination tasks designed for polite requests, questions, and confident conversation building.
+                Daily mobile practice pairs with tutor-led classroom sessions so you get feedback exactly when you need it.
               </p>
             </div>
             <div style={{ display: "grid", gap: 10, flex: 1, minWidth: 240 }}>
-              {pillars.map((pillar) => (
-                <div key={pillar.title} style={{ ...styles.uploadCard, background: "#0f172a", borderColor: "#1f2937" }}>
-                  <h3 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 6 }}>{pillar.title}</h3>
-                  <p style={{ ...styles.helperText, color: "#d1d5db", margin: 0 }}>{pillar.copy}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section style={{ ...styles.card }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-            <div style={{ flex: 1, minWidth: 260 }}>
-              <h2 style={styles.sectionTitle}>How it works</h2>
-              <p style={styles.helperText}>Get ready in three simple steps:</p>
-              <ul style={{ ...styles.checklist, margin: 0 }}>
-                {steps.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ul>
-            </div>
-            <div style={{ flex: 1, minWidth: 260, display: "grid", gap: 10 }}>
-              <div style={{ ...styles.resultCard, marginTop: 0 }}>
-                <h3 style={styles.sectionTitle}>Why start now?</h3>
-                <p style={styles.helperText}>
-                  Get an early lead, receive a clear plan, and track your progress with every login.
+              <div style={{ ...styles.uploadCard, background: "#0f172a", borderColor: "#1f2937" }}>
+                <h3 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 6 }}>Ready to start?</h3>
+                <p style={{ ...styles.helperText, color: "#d1d5db", marginBottom: 10 }}>
+                  Create your profile to access the Daily Plan, join live chats, and unlock exam resources.
                 </p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button style={{ ...styles.primaryButton, padding: "10px 14px" }} onClick={onSignUp}>
@@ -157,15 +178,46 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                   </button>
                 </div>
               </div>
-              <div style={{ ...styles.uploadCard }}>
-                <h4 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Community facts</h4>
-                <ul style={{ ...styles.checklist, margin: 0 }}>
-                  <li>98% keep their streaks in the first 14 days.</li>
-                  <li>Weekly review with individual writing and speaking tips.</li>
-                  <li>Push reminders and email summaries included.</li>
+              <div style={{ ...styles.uploadCard, background: "#0f172a", borderColor: "#1f2937" }}>
+                <h4 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 8 }}>Stay connected</h4>
+                <ul style={{ ...styles.checklist, margin: 0, color: "#d1d5db" }}>
+                  <li>
+                    WhatsApp: <a style={{ color: "#a5b4fc" }} href="https://wa.me/233205706589">+233 20 570 6589</a>
+                  </li>
+                  <li>
+                    Email: <a style={{ color: "#a5b4fc" }} href="mailto:learngermanghana.com">learngermanghana.com</a>
+                  </li>
+                  <li>Live chat during classes with tutor monitoring and feedback.</li>
                 </ul>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section style={{ ...styles.card, display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          <div>
+            <h3 style={styles.sectionTitle}>Quick links</h3>
+            <div style={{ display: "grid", gap: 8 }}>
+              {quickLinks.map((link) => (
+                <ResourceLink key={link.label} label={link.label} href={link.href} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 style={styles.sectionTitle}>Follow Falowen</h3>
+            <div style={{ display: "grid", gap: 8 }}>
+              {socialLinks.map((link) => (
+                <ResourceLink key={link.label} label={link.label} href={link.href} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 style={styles.sectionTitle}>Why learners stay</h3>
+            <ul style={{ ...styles.checklist, margin: 0 }}>
+              <li>Blended learning keeps class time productive.</li>
+              <li>Coaches review every submitted speaking and writing task.</li>
+              <li>24/7 access to vocabulary practice and live AI partners.</li>
+            </ul>
           </div>
         </section>
       </div>
