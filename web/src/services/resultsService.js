@@ -14,10 +14,22 @@ const loadScores = async ({ level, studentCode } = {}) => {
   const scoresRef = collection(db, "scores");
   const constraints = [];
   if (level && level !== "all") {
-    constraints.push(where("level", "==", level.toUpperCase()));
+    const levelOptions = Array.from(
+      new Set(
+        [level, level?.toUpperCase(), level?.toLowerCase()]
+          .map((value) => value?.trim())
+          .filter(Boolean)
+      )
+    );
+
+    constraints.push(
+      levelOptions.length > 1
+        ? where("level", "in", levelOptions)
+        : where("level", "==", levelOptions[0])
+    );
   }
   if (studentCode) {
-    constraints.push(where("studentcode", "==", studentCode));
+    constraints.push(where("studentcode", "==", studentCode.trim()));
   }
   const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
