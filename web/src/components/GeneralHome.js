@@ -22,10 +22,9 @@ const WelcomeHero = ({ studentProfile }) => {
         {studentName}, your campus is ready.
       </h2>
       <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 12 }}>
-        Personalised tips, attendance, and assignments for {className}. Jump straight into the space you need today.
+        Personalised tips, attendance, and assignments for {className}—jump straight into the space you need today.
       </p>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <span style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}>Stay above 60 to pass</span>
         <span style={{ ...styles.badge, background: "#d1fae5", color: "#065f46" }}>Keep your streak alive</span>
       </div>
     </section>
@@ -38,9 +37,6 @@ const GeneralHome = ({ onSelectArea, studentProfile }) => {
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <WelcomeHero studentProfile={studentProfile} />
-      <HomeMetrics studentProfile={studentProfile} />
-      <ClassCalendarCard initialClassName={preferredClass} />
-
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>
         <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Choose your learning space</h2>
@@ -91,6 +87,16 @@ const GeneralHome = ({ onSelectArea, studentProfile }) => {
           </div>
         </section>
       </div>
+
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <details open style={{ ...styles.card, background: "#f8fafc" }}>
+          <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>More for you</summary>
+          <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+            <HomeMetrics studentProfile={studentProfile} />
+            <ClassCalendarCard initialClassName={preferredClass} />
+          </div>
+        </details>
+      </section>
     </div>
   );
 };
