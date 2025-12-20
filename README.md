@@ -53,6 +53,68 @@ rows into the approval spreadsheet with the helper script at
 You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
 for near-real-time mirroring between Firebase and Google Sheets.
 
+## Deploy the Firestore trigger that writes to the Students sheet
+The Cloud Function `onStudentCreated` (in `functions/index.js`) listens to
+`students/{studentCode}` and mirrors each new document to your Students Google
+Sheet. To deploy it:
+
+1. Install the Firebase CLI if needed: `npm install -g firebase-tools`.
+2. Authenticate and pick your project: `firebase login` then
+   `firebase use <your-project-id>`.
+3. From the repository root, enter the functions directory:
+   ```
+   cd functions
+   ```
+4. Set the required secrets so the function can reach your sheet.
+   The CLI will prompt you to paste each value (no quotes needed):
+   ```
+   firebase functions:secrets:set GOOGLE_SERVICE_ACCOUNT_JSON_B64   # paste the full base64 of your service-account JSON
+   firebase functions:secrets:set STUDENTS_SHEET_ID                 # paste the sheet ID from the URL
+   firebase functions:secrets:set STUDENTS_SHEET_TAB                # optional; defaults to "students"
+   ```
+   If you prefer not to base64-encode the key, you can set
+   `GOOGLE_SERVICE_ACCOUNT_JSON` directly with the raw JSON instead of
+   `GOOGLE_SERVICE_ACCOUNT_JSON_B64`.
+5. Deploy just the trigger (or include `api` if needed):
+   ```
+   firebase deploy --only functions:onStudentCreated
+   ```
+6. Confirm the deployment in the Firebase console or with
+   `firebase functions:list`, and watch logs with
+   `firebase functions:log --only onStudentCreated` when testing a signup.
+
+### Fixing "Not in a Firebase app directory" errors
+The Firebase CLI looks for a `firebase.json` file to know where your
+functions source lives. This repository now includes a minimal
+`firebase.json` at the root that points to the `functions/` folder. If you
+see `Error: Not in a Firebase app directory (could not locate
+firebase.json)`, make sure you run Firebase commands from the repository
+root (`/workspace/falowenexamtrainer`), or re-create the config with:
+
+```
+cat > firebase.json <<'EOF'
+{
+  "functions": {
+    "source": "functions"
+  }
+}
+EOF
+```
+
+After that, rerun `firebase use <project-id>` and the deploy command.
+
+### Using Vercel environment variables
+- Vercel environment variables only apply to the frontend/API deployed on
+  Vercel. The Firestore trigger runs in Google Cloud Functions and needs its
+  own secrets via `firebase functions:secrets:set` (above).
+- To keep values in sync, add the same entries in Vercel for reference:
+  ```
+  vercel env add GOOGLE_SERVICE_ACCOUNT_JSON_B64
+  vercel env add STUDENTS_SHEET_ID
+  vercel env add STUDENTS_SHEET_TAB   # optional
+  ```
+  Use the same base64-encoded key and sheet ID you supplied to Firebase.
+
 ## Legacy student login (pre-Firebase accounts)
 For historic student rows that only stored an email, student code, and a
 bcrypt-hashed password in Firestore, the backend exposes a `/legacy/login`
