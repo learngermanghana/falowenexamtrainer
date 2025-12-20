@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { fetchResults } from "../services/resultsService";
 import { styles } from "../styles";
+import { useAuth } from "../context/AuthContext";
 
 const PASS_MARK = 60;
 
@@ -106,25 +107,40 @@ const StatPill = ({ label, value, tone = "default" }) => {
 };
 
 const StudentResultsPage = () => {
-  const [form, setForm] = useState({ studentCode: "" });
+  const { studentProfile, user } = useAuth();
+  const [filters, setFilters] = useState({ assignmentQuery: "" });
   const [state, setState] = useState({ loading: false, error: null, data: [], summary: null, fetched: false });
 
   const assignments = useMemo(() => buildAssignmentSummaries(state.data), [state.data]);
   const studentName = state.data[0]?.studentName || state.data[0]?.name || "";
-  const level = state.data[0]?.level || "";
+  const level = state.data[0]?.level || studentProfile?.level || "";
+  const filteredAssignments = useMemo(() => {
+    const query = filters.assignmentQuery.trim().toLowerCase();
+    if (!query) return assignments;
+    return assignments.filter((entry) => entry.assignment.toLowerCase().includes(query));
+  }, [assignments, filters.assignmentQuery]);
 
-  const loadResults = (event) => {
-    event?.preventDefault();
-    const studentCode = form.studentCode.trim();
+  const loadResults = ({ showErrors = true } = {}) => {
+    const studentCode = (studentProfile?.studentcode || studentProfile?.studentCode || "").trim().toLowerCase();
+    const levelFromProfile = (studentProfile?.level || "").trim().toUpperCase();
+    const email = (user?.email || studentProfile?.email || "").trim().toLowerCase();
 
-    if (!studentCode) {
-      setState({ loading: false, error: "Enter a student code to view results.", data: [], summary: null, fetched: false });
+    if (!studentCode || !email || !levelFromProfile) {
+      if (showErrors) {
+        setState({
+          loading: false,
+          error: "Missing student data. Ensure your account has email, level, and student code saved in your profile.",
+          data: [],
+          summary: null,
+          fetched: false,
+        });
+      }
       return;
     }
 
     setState((prev) => ({ ...prev, loading: true, error: null, fetched: true }));
 
-    fetchResults({ studentCode: studentCode.toLowerCase() })
+    fetchResults({ studentCode, level: levelFromProfile })
       .then((payload) => {
         setState({
           loading: false,
@@ -139,34 +155,41 @@ const StudentResultsPage = () => {
       });
   };
 
+  useEffect(() => {
+    loadResults({ showErrors: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [studentProfile?.studentcode, studentProfile?.studentCode, studentProfile?.level, user?.email]);
+
   return (
     <div style={{ ...styles.card, display: "grid", gap: 16 }}>
       <header style={{ display: "grid", gap: 4 }}>
-        <p style={{ ...styles.helperText, margin: 0 }}>Enter any student code to see their attempts.</p>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Your results are loaded automatically when your email, level, and student code match the score sheet.
+        </p>
         <h2 style={{ margin: 0 }}>Results {studentName ? `for ${studentName}` : "viewer"}</h2>
         <p style={{ ...styles.helperText, marginTop: 0 }}>Pass mark: {PASS_MARK}</p>
       </header>
 
-      <form onSubmit={loadResults} style={{ display: "grid", gap: 8 }}>
+      <div style={{ display: "grid", gap: 8 }}>
         <div style={{ display: "grid", gap: 6, gridTemplateColumns: "minmax(240px, 1fr)", alignItems: "end" }}>
           <label style={{ display: "grid", gap: 4 }}>
-            <span style={styles.helperText}>Student code</span>
+            <span style={styles.helperText}>Filter by assignment title</span>
             <input
               type="text"
-              value={form.studentCode}
-              onChange={(event) => setForm((prev) => ({ ...prev, studentCode: event.target.value }))}
-              placeholder="e.g. sandrab1"
+              value={filters.assignmentQuery}
+              onChange={(event) => setFilters((prev) => ({ ...prev, assignmentQuery: event.target.value }))}
+              placeholder="Start typing an assignment title"
               style={styles.input}
             />
           </label>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-          <button type="submit" style={styles.primaryButton}>
-            Load results
+          <button type="button" style={styles.primaryButton} onClick={() => loadResults()}>
+            Reload results
           </button>
           {level ? <span style={styles.helperText}>Level detected from student data: {level}</span> : null}
         </div>
-      </form>
+      </div>
 
       <div style={{ display: "grid", gap: 8 }}>
         <div style={styles.helperText}>
@@ -189,9 +212,12 @@ const StudentResultsPage = () => {
       {!state.loading && !state.error && state.fetched && assignments.length === 0 ? (
         <div style={styles.helperText}>No results available yet for this student.</div>
       ) : null}
+      {!state.loading && !state.error && state.fetched && assignments.length > 0 && filteredAssignments.length === 0 ? (
+        <div style={styles.helperText}>No assignments match that title filter.</div>
+      ) : null}
 
       <div style={{ display: "grid", gap: 12 }}>
-        {assignments.map((entry) => (
+        {filteredAssignments.map((entry) => (
           <article key={entry.assignment} style={styles.resultCard}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <div>
