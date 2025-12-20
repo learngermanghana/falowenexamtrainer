@@ -1,16 +1,45 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
-import { downloadClassCalendar, formatScheduleSummary } from "../services/classCalendar";
+import {
+  downloadClassCalendar,
+  findNextClassSession,
+  formatScheduleSummary,
+} from "../services/classCalendar";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 
-const ClassCalendarCard = () => {
+const ClassCalendarCard = ({ initialClassName }) => {
   const catalogEntries = useMemo(() => Object.keys(classCatalog), []);
-  const [selectedClass, setSelectedClass] = useState(
-    loadPreferredClass() || catalogEntries[0]
-  );
+  const defaultClass = useMemo(() => {
+    if (initialClassName && catalogEntries.includes(initialClassName)) {
+      return initialClassName;
+    }
+    const stored = loadPreferredClass();
+    if (stored && catalogEntries.includes(stored)) return stored;
+    return catalogEntries[0];
+  }, [catalogEntries, initialClassName]);
+
+  const [selectedClass, setSelectedClass] = useState(defaultClass);
+  const [now, setNow] = useState(new Date());
 
   const classDetails = classCatalog[selectedClass];
+  const nextClass = useMemo(
+    () => findNextClassSession(selectedClass, now),
+    [now, selectedClass]
+  );
+  const minutesUntil = useMemo(() => {
+    if (!nextClass?.startDateTime) return null;
+    return Math.max(0, Math.round((nextClass.startDateTime - now) / 60000));
+  }, [nextClass?.startDateTime, now]);
+
+  useEffect(() => {
+    setSelectedClass(defaultClass);
+  }, [defaultClass]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   const handleChange = (event) => {
     const value = event.target.value;
@@ -66,6 +95,44 @@ const ClassCalendarCard = () => {
           </p>
         </div>
       </div>
+
+      {nextClass ? (
+        <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Next live class</h3>
+            {minutesUntil !== null ? (
+              <span style={styles.badge}>
+                {minutesUntil === 0 ? "Starting now" : `${minutesUntil} min left`}
+              </span>
+            ) : null}
+          </div>
+          <p style={{ ...styles.helperText, margin: "6px 0" }}>
+            {nextClass.weekday}, {nextClass.date} · {nextClass.startTime}–{nextClass.endTime}
+          </p>
+          <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
+            Chapters: {nextClass.titles?.join("; ")}
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <a
+              href={ZOOM_DETAILS.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center" }}
+            >
+              Join now
+            </a>
+            {minutesUntil !== null ? (
+              <span style={{ ...styles.helperText, margin: 0 }}>
+                Starts in {minutesUntil} minute{minutesUntil === 1 ? "" : "s"}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      ) : (
+        <div style={{ ...styles.helperText, margin: 0 }}>
+          No upcoming sessions found for this class. Choose a different class to refresh the schedule.
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button style={styles.primaryButton} type="button" onClick={() => downloadClassCalendar(selectedClass)}>
