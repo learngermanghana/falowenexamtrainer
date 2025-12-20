@@ -21,6 +21,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [location, setLocation] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [initialPaymentAmount, setInitialPaymentAmount] = useState("");
+  const [accountStatus, setAccountStatus] = useState("Active");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
   );
@@ -73,6 +74,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         balanceDue,
         paymentStatus,
         paystackLink,
+        status: accountStatus,
         contractStart: contractStart.toISOString(),
         contractEnd: contractEnd.toISOString(),
         contractTermMonths: contractMonths,
@@ -217,8 +219,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="text"
             required
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            value={accountStatus}
+            onChange={(e) => setAccountStatus(e.target.value)}
             style={inputStyle}
             placeholder="Active"
           />
