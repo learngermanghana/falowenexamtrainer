@@ -8,6 +8,7 @@ import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
+import ChatBuddyPage from "./components/ChatBuddyPage";
 import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
@@ -112,6 +113,12 @@ function App() {
               Ask Grammar Question
             </button>
             <button
+              style={activeSection === "buddy" ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActiveSection("buddy")}
+            >
+              Chat Buddy
+            </button>
+            <button
               style={activeSection === "discussion" ? styles.navButtonActive : styles.navButton}
               onClick={() => setActiveSection("discussion")}
             >
@@ -127,6 +134,7 @@ function App() {
 
           {activeSection === "course" ? <CourseTab /> : null}
           {activeSection === "grammar" ? <GrammarQuestionTab /> : null}
+          {activeSection === "buddy" ? <ChatBuddyPage /> : null}
           {activeSection === "submit" ? <AssignmentSubmissionPage /> : null}
           {activeSection === "results" ? <StudentResultsPage /> : null}
           {activeSection === "discussion" ? <ClassDiscussionPage /> : null}
