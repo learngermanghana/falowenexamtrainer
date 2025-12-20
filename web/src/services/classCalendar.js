@@ -1,4 +1,5 @@
 import { ZOOM_DETAILS, classCatalog } from "../data/classCatalog";
+import { courseSchedulesByName } from "../data/courseSchedules";
 
 const WEEKDAY_MAP = {
   Sunday: 0,
@@ -134,3 +135,41 @@ export const formatScheduleSummary = (schedule) =>
   schedule
     .map((item) => `${item.day}: ${item.startTime}–${item.endTime}`)
     .join(" • ");
+
+const findTimeSlot = (className, weekday) => {
+  const schedule = classCatalog[className]?.schedule || [];
+  return schedule.find((entry) => entry.day === weekday);
+};
+
+export const findNextClassSession = (className, referenceDate = new Date()) => {
+  const courseSchedule = courseSchedulesByName[className];
+  const sessionDays = courseSchedule?.days;
+  if (!sessionDays || sessionDays.length === 0) return null;
+
+  const sortedDays = [...sessionDays].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  for (const day of sortedDays) {
+    const timeSlot = findTimeSlot(className, day.weekday);
+    const startTime = timeSlot?.startTime || "00:00";
+    const endTime = timeSlot?.endTime || "00:00";
+
+    const startDateTime = new Date(`${day.date}T${startTime}:00`);
+    const endDateTime = endTime ? new Date(`${day.date}T${endTime}:00`) : null;
+
+    if (startDateTime >= referenceDate) {
+      return {
+        ...day,
+        startTime,
+        endTime,
+        startDateTime,
+        endDateTime,
+        titles: day.sessions?.map((session) => {
+          const base = [session.chapter, session.type].filter(Boolean).join(" – ");
+          return session.note ? `${base} (${session.note})` : base;
+        }),
+      };
+    }
+  }
+
+  return null;
+};
