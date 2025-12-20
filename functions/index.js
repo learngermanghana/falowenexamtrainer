@@ -8,9 +8,12 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 const { FieldValue, FieldPath } = require("firebase-admin/firestore");
 
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
+const getAdmin = () => {
+  if (!admin.apps.length) {
+    admin.initializeApp();
+  }
+  return admin;
+};
 
 setGlobalOptions({ maxInstances: 10 });
 
@@ -42,7 +45,7 @@ const safeTruncate = (text = "", maxLength = 140) => {
   return `${str.slice(0, Math.max(1, maxLength - 1))}…`;
 };
 
-const getFirestore = () => admin.firestore();
+const getFirestore = () => getAdmin().firestore();
 
 const fetchStudentMessagingToken = async (studentCode) => {
   if (!studentCode) return null;
@@ -90,7 +93,7 @@ const fetchClassMessagingTokens = async ({ level, className, excludeCodes = new 
 const sendNotifications = async ({ tokens = [], notification = {}, data = {} }) => {
   if (!tokens.length) return null;
 
-  const messaging = admin.messaging();
+  const messaging = getAdmin().messaging();
   const chunks = [];
 
   for (let i = 0; i < tokens.length; i += NOTIFICATION_BATCH_SIZE) {
@@ -175,8 +178,8 @@ exports.archiveOldThreads = onSchedule(
     timeZone: "Etc/UTC",
   },
   async () => {
-    const db = admin.firestore();
-    const cutoff = admin.firestore.Timestamp.fromMillis(Date.now() - THIRTY_DAYS_IN_MS);
+    const db = getFirestore();
+    const cutoff = getAdmin().firestore.Timestamp.fromMillis(Date.now() - THIRTY_DAYS_IN_MS);
     const snapshot = await db.collectionGroup("posts").where("createdAt", "<", cutoff).get();
 
     if (snapshot.empty) {
