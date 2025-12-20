@@ -20,7 +20,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [status, setStatus] = useState("Active");
   const [initialPaymentAmount, setInitialPaymentAmount] = useState("");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
@@ -69,7 +68,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
         phone,
         location,
         emergencyContactPhone,
-        status,
         initialPaymentAmount: paidAmount,
         tuitionFee,
         balanceDue,

@@ -16,7 +16,6 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [status, setStatus] = useState("Active");
   const [className, setClassName] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -38,7 +37,6 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           phone,
           location,
           emergencyContactPhone,
-          status,
           className,
         });
         savePreferredLevel(selectedLevel);
@@ -173,14 +171,6 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 required
                 value={emergencyContactPhone}
                 onChange={(e) => setEmergencyContactPhone(e.target.value)}
-                style={inputStyle}
-              />
-              <label style={styles.label}>Status</label>
-              <input
-                type="text"
-                required
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
                 style={inputStyle}
               />
               <label style={styles.label}>Class name</label>
