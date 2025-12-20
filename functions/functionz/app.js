@@ -11,8 +11,12 @@ const bcrypt = require("bcryptjs");
 const { LETTER_COACH_PROMPTS, grammarPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
+const { createLogger, logRequest } = require("./logger");
+const { incrementCounter, getMetricsSnapshot } = require("./metrics");
 
 let getScoresForStudent;
+
+const log = createLogger({ scope: "app" });
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -104,6 +108,8 @@ async function enforceUserQuota({ uid, category, limit }) {
       const current = Number(todayCounters[category] || 0);
 
       if (current >= limit) {
+        incrementCounter("quota_blocked", category);
+        log.warn("quota.limit.hit", { uid, category, limit, remaining: 0 });
         return { allowed: false, remaining: 0 };
       }
 
@@ -122,6 +128,8 @@ async function enforceUserQuota({ uid, category, limit }) {
   const currentEntry = memoryQuota.get(key) || 0;
 
   if (currentEntry >= limit) {
+    incrementCounter("quota_blocked", category);
+    log.warn("quota.limit.hit", { uid, category, limit, remaining: 0 });
     return { allowed: false, remaining: 0 };
   }
 
@@ -180,6 +188,7 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 
 const app = express();
 
 app.use(cors({ origin: true }));
+app.use(logRequest);
 app.use(
   express.json({
     limit: "1mb",
@@ -190,7 +199,19 @@ app.use(
 );
 
 app.get("/", (_req, res) => res.send("OK"));
-app.get("/health", (_req, res) => res.json({ ok: true }));
+app.get("/health", (_req, res) =>
+  res.json({ ok: true, timestamp: new Date().toISOString(), uptimeSeconds: process.uptime() })
+);
+app.get("/metrics", (_req, res) => {
+  const snapshot = getMetricsSnapshot();
+  res.json({
+    ok: true,
+    timestamp: new Date().toISOString(),
+    uptimeSeconds: process.uptime(),
+    metrics: snapshot,
+    memory: process.memoryUsage(),
+  });
+});
 
 const writeTempFile = async (file) => {
   const fileName = file?.originalname || "audio.webm";
@@ -279,22 +300,26 @@ async function findStudentByCodeOrEmail({ studentCode, email }) {
 
 app.post("/paystack/webhook", async (req, res) => {
   let dedupeRef;
+  const webhookLog = createLogger({ scope: "paystack_webhook", requestId: req.requestId });
 
   try {
     const secret = process.env.PAYSTACK_SECRET;
     if (!secret) {
-      console.error("PAYSTACK_SECRET not configured");
+      webhookLog.error("paystack.webhook.missing_secret");
+      incrementCounter("webhook_errors", "missing_secret");
       return res.status(500).json({ error: "PAYSTACK_SECRET is missing" });
     }
 
     const signature = req.headers["x-paystack-signature"];
     if (!signature) {
+      incrementCounter("webhook_errors", "missing_signature");
       return res.status(400).json({ error: "Missing Paystack signature" });
     }
 
     const raw = req.rawBody || Buffer.from(JSON.stringify(req.body || {}));
     const computed = crypto.createHmac("sha512", secret).update(raw).digest("hex");
     if (computed !== signature) {
+      incrementCounter("webhook_errors", "invalid_signature");
       return res.status(401).json({ error: "Invalid signature" });
     }
 
@@ -302,6 +327,7 @@ app.post("/paystack/webhook", async (req, res) => {
     const { event, data } = payload;
 
     if (event !== "charge.success") {
+      incrementCounter("webhook_ignored", event || "unknown");
       return res.json({ status: "ignored", event });
     }
 
@@ -344,13 +370,15 @@ app.post("/paystack/webhook", async (req, res) => {
     });
 
     if (alreadyProcessed) {
+      incrementCounter("webhook_duplicates", "paystack");
       return res.json({ status: "duplicate", reference });
     }
 
     const match = await findStudentByCodeOrEmail({ studentCode, email });
 
     if (!match) {
-      console.warn("No matching student for Paystack callback", { studentCode, email });
+      webhookLog.warn("paystack.webhook.no_match", { studentCode, email });
+      incrementCounter("webhook_no_match", "paystack");
       await dedupeRef.set(
         {
           status: "no-match",
@@ -393,9 +421,16 @@ app.post("/paystack/webhook", async (req, res) => {
       { merge: true }
     );
 
+    incrementCounter("webhook_handled", paymentStatus || "handled");
+    webhookLog.info("paystack.webhook.success", { reference, studentId: ref.id, paymentStatus, balanceDue });
+
     return res.json({ status: "synced", paymentStatus, balanceDue });
   } catch (err) {
-    console.error("/paystack/webhook error", err);
+    incrementCounter("webhook_errors", "processing_error");
+    webhookLog.error("paystack.webhook.error", {
+      errorMessage: err?.message || "unknown",
+      stack: err?.stack,
+    });
     try {
       if (dedupeRef) {
         await dedupeRef.set(
@@ -539,6 +574,7 @@ app.post("/grammar/ask", async (req, res) => {
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "grammar", limit: DAILY_LIMITS.grammar });
     if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/grammar/ask", uid: authedUser.uid, category: "grammar" });
       return res.status(429).json({ error: "Daily grammar question limit reached" });
     }
 
@@ -694,6 +730,7 @@ app.post("/speaking/analyze", upload.single("audio"), async (req, res) => {
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/speaking/analyze", uid: authedUser.uid, category: "speaking" });
       return res.status(429).json({ error: "Daily speaking analysis limit reached" });
     }
 
@@ -749,6 +786,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/speaking/analyze-text", uid: authedUser.uid, category: "speaking" });
       return res.status(429).json({ error: "Daily speaking analysis limit reached" });
     }
 
@@ -808,6 +846,7 @@ app.post("/speaking/interaction-score", upload.single("audio"), async (req, res)
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/speaking/interaction-score", uid: authedUser.uid, category: "speaking" });
       return res.status(429).json({ error: "Daily speaking analysis limit reached" });
     }
 
@@ -863,6 +902,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
     if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/chatbuddy/respond", uid: authedUser.uid, category: "chatbuddy" });
       return res.status(429).json({ error: "Daily chat buddy limit reached" });
     }
 
@@ -916,6 +956,7 @@ app.post("/tutor/placement", async (req, res) => {
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "placement", limit: DAILY_LIMITS.placement });
     if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/tutor/placement", uid: authedUser.uid, category: "placement" });
       return res.status(429).json({ error: "Daily placement attempts limit reached" });
     }
 
