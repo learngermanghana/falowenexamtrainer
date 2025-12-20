@@ -121,8 +121,8 @@ const StudentResultsPage = () => {
   }, [assignments, filters.assignmentQuery]);
 
   const loadResults = ({ showErrors = true } = {}) => {
-    const studentCode = (studentProfile?.studentcode || studentProfile?.studentCode || "").trim().toLowerCase();
-    const levelFromProfile = (studentProfile?.level || "").trim().toUpperCase();
+    const studentCode = (studentProfile?.studentcode || studentProfile?.studentCode || "").trim();
+    const levelFromProfile = (studentProfile?.level || "").trim();
     const email = (user?.email || studentProfile?.email || "").trim().toLowerCase();
 
     if (!studentCode || !email || !levelFromProfile) {
