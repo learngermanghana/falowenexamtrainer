@@ -24,14 +24,32 @@ const postsCollectionRef = (level, className) =>
 const presenceCollectionRef = (level, className) =>
   collection(db, "class_board", level, "classes", className, "presence");
 
+const UNIT_MULTIPLIERS = {
+  minutes: 1,
+  hours: 60,
+  days: 60 * 24,
+};
+
+const getUnitMultiplier = (unit) => UNIT_MULTIPLIERS[unit] || UNIT_MULTIPLIERS.minutes;
+
+const minutesFromValue = (value, unit) => (Number(value) || 0) * getUnitMultiplier(unit);
+
+const valueFromMinutes = (minutes, unit) =>
+  (Number(minutes) || 0) / Math.max(1, getUnitMultiplier(unit));
+
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "No timer";
   const diff = Math.max(0, expiresAt - now);
-  const minutes = Math.floor(diff / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000)
-    .toString()
-    .padStart(2, "0");
-  return diff > 0 ? `${minutes}:${seconds}` : "Expired";
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (diff <= 0) return "Expired";
+  if (days > 0) return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
 };
 
 const ClassDiscussionPage = () => {
@@ -43,6 +61,8 @@ const ClassDiscussionPage = () => {
   const [replyDrafts, setReplyDrafts] = useState({});
   const [isCorrectingDraft, setIsCorrectingDraft] = useState({});
   const [editingReply, setEditingReply] = useState(null);
+  const [extensionValues, setExtensionValues] = useState({});
+  const [extensionUnits, setExtensionUnits] = useState({});
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingThread, setIsSavingThread] = useState(false);
@@ -54,6 +74,7 @@ const ClassDiscussionPage = () => {
     instructions: "",
     extraLink: "",
     timerMinutes: 15,
+    timerUnit: "minutes",
   });
   const typingTimeouts = useRef({});
 
@@ -74,6 +95,11 @@ const ClassDiscussionPage = () => {
     });
     return options;
   }, []);
+
+  const isTutor = useMemo(() => {
+    const role = (studentProfile?.role || "").toLowerCase();
+    return role === "tutor" || role === "admin" || studentProfile?.isTutor === true;
+  }, [studentProfile?.role, studentProfile?.isTutor]);
 
   useEffect(() => {
     if (!db) {
@@ -99,6 +125,8 @@ const ClassDiscussionPage = () => {
           const data = docSnapshot.data();
           return {
             id: docSnapshot.id,
+            level: data.level || studentProfile?.level || "",
+            className: data.className || studentProfile?.className || "",
             lessonId: data.lessonId || "",
             lessonLabel: data.lessonLabel || "",
             topic: data.topic || "",
@@ -106,11 +134,18 @@ const ClassDiscussionPage = () => {
             questionTitle: data.questionTitle || data.topic || "",
             instructions: data.instructions || "",
             extraLink: data.extraLink || "",
+            timerUnit: data.timerUnit || "minutes",
             timerMinutes: data.timerMinutes || 0,
+            timerValue:
+              data.timerValue !== undefined
+                ? data.timerValue
+                : valueFromMinutes(data.timerMinutes || 0, data.timerUnit || "minutes"),
             createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
             createdBy: data.createdBy || "Tutor",
             createdByUid: data.createdByUid || null,
             expiresAt: data.expiresAt?.toMillis ? data.expiresAt.toMillis() : data.expiresAt || null,
+            status: data.status || "open",
+            expiredAt: data.expiredAt?.toMillis ? data.expiredAt.toMillis() : data.expiredAt || null,
           };
         });
         setError("");
@@ -201,11 +236,60 @@ const ClassDiscussionPage = () => {
     return () => clearInterval(id);
   }, []);
 
+  useEffect(() => {
+    const ensureStatuses = async () => {
+      if (!db || threads.length === 0) return;
+
+      const updates = threads.map(async (thread) => {
+        const status = resolveStatus(thread);
+        if (!thread.id || status === thread.status || status === "archived") return null;
+
+        const threadRef = getThreadDocRef(thread);
+        if (!threadRef) return null;
+
+        const payload = { status };
+        if (status === "expired" && !thread.expiredAt) {
+          payload.expiredAt = serverTimestamp();
+        }
+        if (status === "open") {
+          payload.expiredAt = deleteField();
+        }
+
+        try {
+          await setDoc(threadRef, payload, { merge: true });
+        } catch (err) {
+          console.error("Failed to update thread status", err);
+        }
+        return null;
+      });
+
+      await Promise.all(updates);
+    };
+
+    ensureStatuses();
+  }, [threads, now, db, studentProfile?.level, studentProfile?.className]);
+
   useEffect(() => () => {
     Object.values(typingTimeouts.current).forEach((timeoutId) => clearTimeout(timeoutId));
   }, []);
 
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
+
+  const resolveStatus = (thread) => {
+    if (!thread) return "open";
+    if (thread.status === "archived") return "archived";
+    if (thread.status === "expired") return "expired";
+    if (thread.expiresAt && thread.expiresAt <= now) return "expired";
+    return "open";
+  };
+
+  const getThreadDocRef = (thread) => {
+    if (!db || !thread?.id) return null;
+    const level = thread.level || studentProfile?.level;
+    const className = thread.className || studentProfile?.className;
+    if (!level || !className) return null;
+    return doc(postsCollectionRef(level, className), thread.id);
+  };
 
   useEffect(() => {
     if (!form.lessonId && lessonOptions.length > 0) {
@@ -229,7 +313,8 @@ const ClassDiscussionPage = () => {
     }
 
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
-    const timerMinutes = Number(form.timerMinutes) || 0;
+    const timerValue = Number(form.timerMinutes) || 0;
+    const timerMinutes = minutesFromValue(timerValue, form.timerUnit);
     const expiresAtMillis = timerMinutes ? Date.now() + timerMinutes * 60000 : null;
 
     setIsSavingThread(true);
@@ -247,10 +332,13 @@ const ClassDiscussionPage = () => {
         question: form.question,
         extraLink: form.extraLink,
         timerMinutes,
+        timerUnit: form.timerUnit,
+        timerValue,
         createdAt: serverTimestamp(),
         createdBy: getDisplayName() || "Tutor",
         createdByUid: user?.uid || null,
         expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
+        status: "open",
       });
       setForm({
         lessonId: lesson?.id || "",
@@ -258,7 +346,8 @@ const ClassDiscussionPage = () => {
         question: "",
         instructions: "",
         extraLink: "",
-        timerMinutes,
+        timerMinutes: timerValue,
+        timerUnit: form.timerUnit,
       });
     } catch (err) {
       console.error("Failed to create discussion thread", err);
@@ -327,6 +416,12 @@ const ClassDiscussionPage = () => {
   };
 
   const handleReply = async (threadId) => {
+    const thread = threads.find((item) => item.id === threadId);
+    if (thread && resolveStatus(thread) !== "open") {
+      setError("Replies are closed for this thread. Reopen the timer to post again.");
+      return;
+    }
+
     const draft = replyDrafts[threadId] || "";
     if (!draft.trim() || !db) return;
 
@@ -359,6 +454,40 @@ const ClassDiscussionPage = () => {
     } catch (err) {
       console.error("Failed to post reply", err);
       setError("Response could not be saved. Please try again.");
+    }
+  };
+
+  const handleExtendThread = async (threadId) => {
+    const thread = threads.find((item) => item.id === threadId);
+    if (!thread) return;
+
+    const unit = extensionUnits[threadId] || thread.timerUnit || "minutes";
+    const minutes = minutesFromValue(extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes, unit);
+    const threadRef = getThreadDocRef(thread);
+
+    if (!threadRef) {
+      setError("Missing class context. Please reload the page.");
+      return;
+    }
+
+    try {
+      const newExpiresAt = minutes > 0 ? Timestamp.fromMillis(Date.now() + minutes * 60000) : null;
+      await setDoc(
+        threadRef,
+        {
+          expiresAt: newExpiresAt,
+          timerMinutes: minutes,
+          timerUnit: unit,
+          timerValue: extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes,
+          status: "open",
+          expiredAt: deleteField(),
+        },
+        { merge: true }
+      );
+      setError("");
+    } catch (err) {
+      console.error("Failed to extend or reopen thread", err);
+      setError("Could not extend or reopen this thread. Try again.");
     }
   };
 
@@ -443,11 +572,45 @@ const ClassDiscussionPage = () => {
   };
 
   const threadsWithReplies = useMemo(
-    () => threads.map((thread) => ({ ...thread, replies: repliesByThread[thread.id] || [] })),
-    [threads, repliesByThread]
+    () =>
+      threads.map((thread) => ({
+        ...thread,
+        status: resolveStatus(thread),
+        replies: repliesByThread[thread.id] || [],
+      })),
+    [threads, repliesByThread, now]
   );
 
   const renderThread = (thread) => {
+    const status = thread.status || resolveStatus(thread);
+    const isThreadOpen = status === "open";
+    const timeRemainingLabel =
+      status === "archived"
+        ? "Archived"
+        : status === "expired"
+        ? "Expired"
+        : thread.expiresAt
+        ? `Time left ${formatTimeRemaining(thread.expiresAt, now)}`
+        : "No timer set";
+    const statusBadgeStyle = {
+      ...styles.badge,
+      background:
+        status === "archived"
+          ? "#fef3c7"
+          : status === "expired"
+          ? "#fee2e2"
+          : "#ecfeff",
+      borderColor:
+        status === "archived"
+          ? "#fcd34d"
+          : status === "expired"
+          ? "#fecaca"
+          : "#a5f3fc",
+      color: status === "archived" ? "#92400e" : status === "expired" ? "#991b1b" : "#0ea5e9",
+    };
+    const tutorUnit = extensionUnits[thread.id] || thread.timerUnit || "minutes";
+    const tutorMinutes = valueFromMinutes(thread.timerMinutes || 0, tutorUnit);
+    const tutorValue = extensionValues[thread.id] ?? tutorMinutes ?? 10;
     return (
       <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
@@ -462,11 +625,24 @@ const ClassDiscussionPage = () => {
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
             <span style={styles.badge}>Question by {thread.createdBy}</span>
-            <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe", color: "#3730a3" }}>
-              Timer {formatTimeRemaining(thread.expiresAt, now)}
-            </span>
+            <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
           </div>
         </div>
+
+        {!isThreadOpen ? (
+          <div
+            style={{
+              ...styles.helperText,
+              margin: 0,
+              background: "#f8fafc",
+              borderRadius: 10,
+              padding: 10,
+              color: "#0f172a",
+            }}
+          >
+            Replies are closed because this thread is {status}. Tutors can reopen it with the timer controls.
+          </div>
+        ) : null}
 
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
@@ -487,9 +663,41 @@ const ClassDiscussionPage = () => {
           ) : null}
         </div>
 
-      <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 700, fontSize: 14 }}>Responses ({thread.replies.length})</div>
-        <div style={{ display: "grid", gap: 10 }}>
+        {isTutor ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <label style={{ ...styles.helperText, margin: 0 }}>Extend or reopen timer</label>
+            <input
+              type="number"
+              min="0"
+              step="5"
+              style={{ ...styles.select, maxWidth: 120 }}
+              value={tutorValue}
+              onChange={(e) =>
+                setExtensionValues((prev) => ({ ...prev, [thread.id]: e.target.value }))
+              }
+            />
+            <select
+              value={tutorUnit}
+              onChange={(e) => setExtensionUnits((prev) => ({ ...prev, [thread.id]: e.target.value }))}
+              style={{ ...styles.select, maxWidth: 140 }}
+            >
+              <option value="minutes">Minutes</option>
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+            </select>
+            <button
+              style={{ ...styles.primaryButton, padding: "10px 12px" }}
+              type="button"
+              onClick={() => handleExtendThread(thread.id)}
+            >
+              Reopen / extend
+            </button>
+          </div>
+        ) : null}
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Responses ({thread.replies.length})</div>
+          <div style={{ display: "grid", gap: 10 }}>
           {thread.replies.map((reply) => (
             <div key={reply.id} style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -540,13 +748,20 @@ const ClassDiscussionPage = () => {
         <div style={{ display: "grid", gap: 8 }}>
           <textarea
             style={styles.textareaSmall}
-            placeholder="Share your opinion or give feedback ..."
+            placeholder={
+              isThreadOpen
+                ? "Share your opinion or give feedback ..."
+                : "Replies are disabled for this thread"
+            }
             value={replyDrafts[thread.id] || ""}
             onChange={(e) => {
               setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
-              markTypingForThread(thread.id);
+              if (isThreadOpen) {
+                markTypingForThread(thread.id);
+              }
             }}
             onBlur={() => stopTypingIndicator(thread.id)}
+            disabled={!isThreadOpen}
           />
           {typingByThread[thread.id]?.length ? (
             <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
@@ -558,14 +773,23 @@ const ClassDiscussionPage = () => {
               style={{ ...styles.secondaryButton, padding: "10px 12px" }}
               type="button"
               onClick={() => handleCorrectDraft(thread.id)}
-              disabled={isCorrectingDraft[thread.id]}
+              disabled={isCorrectingDraft[thread.id] || !isThreadOpen}
             >
               {isCorrectingDraft[thread.id] ? "AI is correcting ..." : "Correct with AI"}
             </button>
-            <button style={styles.primaryButton} onClick={() => handleReply(thread.id)}>
+            <button
+              style={styles.primaryButton}
+              onClick={() => handleReply(thread.id)}
+              disabled={!isThreadOpen}
+            >
               Post response
             </button>
           </div>
+          {!isThreadOpen ? (
+            <p style={{ ...styles.helperText, margin: 0, color: "#0f172a" }}>
+              Replies are disabled for this {status} thread.
+            </p>
+          ) : null}
           <p style={{ ...styles.helperText, margin: 0 }}>
             "Correct with AI" improves only what you type. Without text, the AI cannot help.
           </p>
@@ -653,15 +877,26 @@ const ClassDiscussionPage = () => {
                 />
               </div>
               <div style={styles.field}>
-                <label style={styles.label}>Timer (minutes)</label>
-                <input
-                  type="number"
-                  min="0"
-                  step="5"
-                  style={styles.select}
-                  value={form.timerMinutes}
-                  onChange={(e) => handleFormChange("timerMinutes", e.target.value)}
-                />
+                <label style={styles.label}>Timer</label>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    type="number"
+                    min="0"
+                    step="5"
+                    style={{ ...styles.select, flex: 1 }}
+                    value={form.timerMinutes}
+                    onChange={(e) => handleFormChange("timerMinutes", e.target.value)}
+                  />
+                  <select
+                    value={form.timerUnit}
+                    onChange={(e) => handleFormChange("timerUnit", e.target.value)}
+                    style={{ ...styles.select, width: 140 }}
+                  >
+                    <option value="minutes">Minutes</option>
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                  </select>
+                </div>
               </div>
               <div style={styles.field}>
                 <label style={styles.label}>Additional link (optional)</label>
