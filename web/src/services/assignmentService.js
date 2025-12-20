@@ -1,5 +1,6 @@
 import { collection, db, getDoc, getDocs, doc, query, where } from "../firebase";
 import { courseSchedulesByName } from "../data/courseSchedules";
+import { courseSchedules } from "../data/courseSchedule";
 
 const parseAssignmentNumber = (assignment = "") => {
   const match = assignment.match(/(\d+(?:\.\d+)?)/);
@@ -119,15 +120,74 @@ const computeStreak = (dates = []) => {
   return streak;
 };
 
+const normalizeAssignmentEntry = (session = {}, fallbackTitle = null) => {
+  if (session.assignment !== true) return null;
+
+  const chapter = session.chapter || session.assignmentId || session.id || null;
+  const number = parseAssignmentNumber(chapter);
+  const label =
+    session.assignmentTitle ||
+    session.title ||
+    session.keyAssignment ||
+    fallbackTitle ||
+    chapter ||
+    (number !== null ? `Assignment ${number}` : null);
+
+  return number !== null || label
+    ? {
+        label,
+        number,
+      }
+    : null;
+};
+
+const collectDaySessions = (day = {}) => {
+  const collected = [];
+  const pushEntry = (entry, fallbackTitle) => {
+    const normalized = normalizeAssignmentEntry(entry, fallbackTitle);
+    if (normalized) collected.push(normalized);
+  };
+
+  pushEntry({ ...day, chapter: day.chapter || day.topic }, day.topic);
+
+  const processGroup = (group, fallbackTitle) => {
+    if (Array.isArray(group)) {
+      group.forEach((item) => pushEntry(item, fallbackTitle));
+    } else if (group) {
+      pushEntry(group, fallbackTitle);
+    }
+  };
+
+  processGroup(day.sessions, day.topic);
+  processGroup(day.lesen_hören, day.topic);
+  processGroup(day.schreiben_sprechen, day.topic);
+
+  return collected;
+};
+
+const collectPlannedAssignments = ({ classSchedule, courseSchedule } = {}) => {
+  const scheduleDays = classSchedule?.days || courseSchedule || [];
+  return scheduleDays.flatMap((day) => collectDaySessions(day)).filter(Boolean);
+};
+
 const computeStudentStats = (scores = [], student) => {
   const studentCode = student?.id || "";
-  const classSchedule = student?.className
-    ? courseSchedulesByName[student.className]
-    : null;
+  const classSchedule = student?.className ? courseSchedulesByName[student.className] : null;
+  const courseSchedule = student?.level ? courseSchedules[(student.level || "").toUpperCase()] : null;
 
   const bestPerAssignment = {};
   const attemptsByAssignment = {};
   const submissionDates = [];
+
+  const plannedAssignments = collectPlannedAssignments({ classSchedule, courseSchedule });
+  const plannedAssignmentLabels = new Map();
+  plannedAssignments
+    .filter((entry) => typeof entry.number === "number")
+    .forEach((entry) => {
+      if (!plannedAssignmentLabels.has(entry.number) && entry.label) {
+        plannedAssignmentLabels.set(entry.number, entry.label);
+      }
+    });
 
   scores.forEach((row) => {
     const assignment = row.assignment || "";
@@ -148,25 +208,33 @@ const computeStudentStats = (scores = [], student) => {
     .map(parseAssignmentNumber)
     .filter((value) => typeof value === "number");
 
-  const completedAssignments = Object.entries(bestPerAssignment).map(([assignment, score]) => ({
-    assignment,
-    bestScore: score,
-    number: parseAssignmentNumber(assignment),
-    attempts: attemptsByAssignment[assignment] || 0,
-  }));
+  const completedAssignments = Object.entries(bestPerAssignment).map(([assignment, score]) => {
+    const number = parseAssignmentNumber(assignment);
+    return {
+      assignment,
+      bestScore: score,
+      number,
+      label: number !== null && plannedAssignmentLabels.has(number)
+        ? plannedAssignmentLabels.get(number)
+        : assignment,
+      attempts: attemptsByAssignment[assignment] || 0,
+    };
+  });
 
   let missedAssignments = [];
-  if (classSchedule) {
-    const plannedNumbers = classSchedule.days
-      .flatMap((day) => day.sessions || [])
-      .map((session) => parseAssignmentNumber(session.chapter))
+  if (plannedAssignments.length) {
+    const plannedNumbers = plannedAssignments
+      .map((session) => session.number)
       .filter((value) => typeof value === "number");
     const latestCompleted = completedNumbers.length ? Math.max(...completedNumbers) : null;
     if (latestCompleted !== null) {
       missedAssignments = plannedNumbers
         .filter((number) => number <= latestCompleted && !completedNumbers.includes(number))
         .sort((a, b) => a - b)
-        .map((num) => num.toString());
+        .map((num) => ({
+          number: num,
+          label: plannedAssignmentLabels.get(num) || `Assignment ${num}`,
+        }));
     }
   }
 

@@ -26,11 +26,20 @@ const findMissingNumbers = (numbers = []) => {
   return missing;
 };
 
+const formatAssignmentLabel = (entry) => {
+  if (!entry) return "";
+  if (typeof entry === "string") return entry;
+  if (entry.label) return entry.label;
+  if (typeof entry.number === "number") return `Assignment ${entry.number}`;
+  return "";
+};
+
 const formatList = (items = []) => {
-  if (!items.length) return "None yet";
-  if (items.length === 1) return items[0];
-  if (items.length === 2) return `${items[0]} and ${items[1]}`;
-  return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`;
+  const labels = items.map(formatAssignmentLabel).filter(Boolean);
+  if (!labels.length) return "None yet";
+  if (labels.length === 1) return labels[0];
+  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
 };
 
 const HomeMetrics = ({ studentProfile }) => {
@@ -82,7 +91,33 @@ const HomeMetrics = ({ studentProfile }) => {
 
   const missingNumbers = useMemo(() => findMissingNumbers(completedNumbers), [completedNumbers]);
 
+  const normalizedMissedAssignments = useMemo(() => {
+    if (assignmentStats?.missedAssignments?.length) {
+      return assignmentStats.missedAssignments
+        .map((entry) => {
+          if (!entry) return null;
+          if (typeof entry === "string") {
+            return { label: entry, number: parseAssignmentNumber(entry) };
+          }
+          return {
+            label: entry.label || entry.title || entry.assignment || entry.chapter || null,
+            number:
+              typeof entry.number === "number"
+                ? entry.number
+                : parseAssignmentNumber(entry.label || entry.title || entry.assignment || entry.chapter),
+          };
+        })
+        .filter(Boolean);
+    }
+
+    return missingNumbers.map((value) => ({ number: value, label: `Assignment ${value}` }));
+  }, [assignmentStats?.missedAssignments, missingNumbers]);
+
   const recommendedNext = useMemo(() => {
+    const queued = normalizedMissedAssignments[0];
+    const queuedLabel = formatAssignmentLabel(queued);
+    if (queuedLabel) return queuedLabel;
+
     const hasDecimals = completedNumbers.some((value) => Math.abs(value - Math.round(value)) > 0.0001);
     const step = hasDecimals ? 0.1 : 1;
     const nextNumber = missingNumbers[0] ?? (completedNumbers.length
@@ -102,14 +137,11 @@ const HomeMetrics = ({ studentProfile }) => {
     }
 
     return "Start with Assignment 1";
-  }, [assignmentStats?.lastAssignment, completedNumbers, missingNumbers]);
+  }, [assignmentStats?.lastAssignment, completedNumbers, missingNumbers, normalizedMissedAssignments]);
 
   const failedAssignments = useMemo(() => assignmentStats?.failedAssignments || [], [assignmentStats?.failedAssignments]);
 
-  const missedAssignments = useMemo(() => {
-    if (assignmentStats?.missedAssignments?.length) return assignmentStats.missedAssignments;
-    return missingNumbers.map((value) => value.toString());
-  }, [assignmentStats?.missedAssignments, missingNumbers]);
+  const missedAssignments = useMemo(() => normalizedMissedAssignments, [normalizedMissedAssignments]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -140,7 +172,7 @@ const HomeMetrics = ({ studentProfile }) => {
           <p style={{ ...styles.helperText, margin: 0 }}>Missed or skipped</p>
           <h4 style={{ margin: "4px 0" }}>{formatList(missedAssignments)}</h4>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            We flag jumps in numbering so you can close the loop.
+            We flag graded assignments only; self-practice items are ignored.
           </p>
         </div>
 
