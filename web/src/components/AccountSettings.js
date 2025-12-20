@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
+import { correctBiography } from "../services/profileService";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -14,15 +15,18 @@ const formatDate = (value) => {
 };
 
 const AccountSettings = () => {
-  const { user, studentProfile } = useAuth();
+  const { user, studentProfile, idToken, saveStudentProfile } = useAuth();
   const [profile, setProfile] = useState({
     name: "",
     email: "",
     goal: "Pass B2",
     timezone: "Europe/Berlin",
     reminder: "push+email",
+    biography: "",
   });
   const [status, setStatus] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [isCorrectingBio, setIsCorrectingBio] = useState(false);
 
   useEffect(() => {
     setProfile((prev) => ({
@@ -30,6 +34,7 @@ const AccountSettings = () => {
       name: studentProfile?.name || user?.displayName || "",
       email: studentProfile?.email || user?.email || prev.email,
       goal: studentProfile?.goal || prev.goal,
+      biography: studentProfile?.biography || "",
     }));
   }, [studentProfile, user]);
 
@@ -57,7 +62,52 @@ const AccountSettings = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setStatus("Changes saved (local only)");
+
+    const payload = {
+      name: profile.name.trim(),
+      email: profile.email.trim(),
+      reminder: profile.reminder,
+      biography: profile.biography.trim(),
+    };
+
+    setIsSaving(true);
+    setStatus("");
+
+    saveStudentProfile(payload)
+      .then(() => {
+        setStatus("Profile saved. Your classmates can now read your bio.");
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : "Could not save profile.";
+        setStatus(message);
+      })
+      .finally(() => {
+        setIsSaving(false);
+      });
+  };
+
+  const handleCorrectBiography = async () => {
+    const draft = profile.biography || "";
+    if (!draft.trim()) {
+      setStatus("Please add a short bio before asking the AI to correct it.");
+      return;
+    }
+
+    setIsCorrectingBio(true);
+    setStatus("");
+
+    try {
+      const { corrected } = await correctBiography({ text: draft, level: studentProfile?.level, idToken });
+      if (corrected) {
+        setProfile((prev) => ({ ...prev, biography: corrected }));
+        setStatus("AI suggestions applied to your bio.");
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not correct your biography.";
+      setStatus(message);
+    } finally {
+      setIsCorrectingBio(false);
+    }
   };
 
   if (!studentProfile) {
@@ -181,12 +231,34 @@ const AccountSettings = () => {
               </p>
             </div>
 
-            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
-              <button type="submit" style={styles.primaryButton}>
-                Save changes
-              </button>
+            <div style={styles.field}>
+              <label style={styles.label} htmlFor="biography">
+                Class biography
+              </label>
+              <textarea
+                id="biography"
+                style={styles.textArea}
+                value={profile.biography}
+                onChange={handleChange("biography")}
+                placeholder="Write 2-4 sentences about your work, goals, or hobbies. Classmates will see this on the member page."
+              />
+              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6, flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={handleCorrectBiography}
+                  disabled={isCorrectingBio}
+                >
+                  {isCorrectingBio ? "AI is polishing ..." : "Correct with AI"}
+                </button>
+                <button type="submit" style={styles.primaryButton} disabled={isSaving}>
+                  {isSaving ? "Saving ..." : "Save changes"}
+                </button>
+              </div>
+              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                Your bio is read-only on the member page. Edit it here anytime.
+              </p>
             </div>
-
             {status && (
               <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#065f46", borderColor: "#34d399" }}>
                 {status}

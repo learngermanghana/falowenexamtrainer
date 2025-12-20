@@ -17,6 +17,7 @@ import {
   deleteField,
 } from "../firebase";
 import { correctDiscussionText } from "../services/discussionService";
+import ClassMembersTab from "./ClassMembersTab";
 
 const postsCollectionRef = (level, className) =>
   collection(db, "class_board", level, "classes", className, "posts");
@@ -45,6 +46,7 @@ const ClassDiscussionPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingThread, setIsSavingThread] = useState(false);
+  const [activeTab, setActiveTab] = useState("discussion");
   const [form, setForm] = useState({
     lessonId: "",
     topic: "",
@@ -592,111 +594,144 @@ const ClassDiscussionPage = () => {
               </span>
             </div>
           </div>
-          <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
-            Live updates
-          </span>
+          {activeTab === "discussion" ? (
+            <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
+              Live updates
+            </span>
+          ) : (
+            <span style={{ ...styles.badge, background: "#f3f4f6", borderColor: "#cbd5e1", color: "#374151" }}>
+              Read-only class directory
+            </span>
+          )}
         </div>
 
-        <form onSubmit={handleCreateThread} style={{ display: "grid", gap: 10, marginTop: 12 }}>
-          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-            <div style={styles.field}>
-              <label style={styles.label}>Select lesson</label>
-              <select
-                value={form.lessonId}
-                onChange={(e) => handleFormChange("lessonId", e.target.value)}
-                style={styles.select}
-              >
-                {lessonOptions.map((option) => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              {selectedLesson?.goal ? (
-                <div style={{ ...styles.helperText, margin: 0 }}>Goal: {selectedLesson.goal}</div>
-              ) : null}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+          <button
+            style={activeTab === "discussion" ? styles.navButtonActive : styles.navButton}
+            onClick={() => setActiveTab("discussion")}
+            type="button"
+          >
+            Group discussion
+          </button>
+          <button
+            style={activeTab === "members" ? styles.navButtonActive : styles.navButton}
+            onClick={() => setActiveTab("members")}
+            type="button"
+          >
+            Class members
+          </button>
+        </div>
+
+        {activeTab === "discussion" ? (
+          <form onSubmit={handleCreateThread} style={{ display: "grid", gap: 10, marginTop: 12 }}>
+            <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+              <div style={styles.field}>
+                <label style={styles.label}>Select lesson</label>
+                <select
+                  value={form.lessonId}
+                  onChange={(e) => handleFormChange("lessonId", e.target.value)}
+                  style={styles.select}
+                >
+                  {lessonOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {selectedLesson?.goal ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>Goal: {selectedLesson.goal}</div>
+                ) : null}
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label}>Topic / headline</label>
+                <input
+                  type="text"
+                  style={styles.select}
+                  value={form.topic}
+                  onChange={(e) => handleFormChange("topic", e.target.value)}
+                  placeholder="e.g. Phrases for complaints"
+                />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label}>Timer (minutes)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="5"
+                  style={styles.select}
+                  value={form.timerMinutes}
+                  onChange={(e) => handleFormChange("timerMinutes", e.target.value)}
+                />
+              </div>
+              <div style={styles.field}>
+                <label style={styles.label}>Additional link (optional)</label>
+                <input
+                  type="url"
+                  style={styles.select}
+                  value={form.extraLink}
+                  onChange={(e) => handleFormChange("extraLink", e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
             </div>
+
             <div style={styles.field}>
-              <label style={styles.label}>Topic / headline</label>
-              <input
-                type="text"
-                style={styles.select}
-                value={form.topic}
-                onChange={(e) => handleFormChange("topic", e.target.value)}
-                placeholder="e.g. Phrases for complaints"
+              <label style={styles.label}>Instructions for everyone (English)</label>
+              <textarea
+                style={styles.textArea}
+                value={form.instructions}
+                onChange={(e) => handleFormChange("instructions", e.target.value)}
+                placeholder="Share house rules, materials, or answer format in English so everyone can follow along. Refer to chapter 'Tutorial' in the course book."
               />
             </div>
+
             <div style={styles.field}>
-              <label style={styles.label}>Timer (minutes)</label>
-              <input
-                type="number"
-                min="0"
-                step="5"
-                style={styles.select}
-                value={form.timerMinutes}
-                onChange={(e) => handleFormChange("timerMinutes", e.target.value)}
+              <label style={styles.label}>Guiding question for the class</label>
+              <textarea
+                style={styles.textArea}
+                value={form.question}
+                onChange={(e) => handleFormChange("question", e.target.value)}
+                placeholder="Which question should learners answer?"
               />
             </div>
-            <div style={styles.field}>
-              <label style={styles.label}>Additional link (optional)</label>
-              <input
-                type="url"
-                style={styles.select}
-                value={form.extraLink}
-                onChange={(e) => handleFormChange("extraLink", e.target.value)}
-                placeholder="https://..."
-              />
+
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button style={styles.primaryButton} type="submit" disabled={isSavingThread}>
+                Post discussion
+              </button>
             </div>
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Instructions for everyone (English)</label>
-            <textarea
-              style={styles.textArea}
-              value={form.instructions}
-              onChange={(e) => handleFormChange("instructions", e.target.value)}
-              placeholder="Share house rules, materials, or answer format in English so everyone can follow along. Refer to chapter 'Tutorial' in the course book."
-            />
-          </div>
-
-          <div style={styles.field}>
-            <label style={styles.label}>Guiding question for the class</label>
-            <textarea
-              style={styles.textArea}
-              value={form.question}
-              onChange={(e) => handleFormChange("question", e.target.value)}
-              placeholder="Which question should learners answer?"
-            />
-          </div>
-
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            <button style={styles.primaryButton} type="submit" disabled={isSavingThread}>
-              Post discussion
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div style={{ display: "grid", gap: 12 }}>
-        {error ? (
-          <div style={{ ...styles.card, borderColor: "#fca5a5", background: "#fef2f2" }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>{error}</p>
-          </div>
-        ) : isLoading ? (
-          <div style={styles.card}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Loading discussions ...</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Fetching the latest posts.</p>
-          </div>
-        ) : threadsWithReplies.length === 0 ? (
-          <div style={styles.card}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>No discussions started</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Create the first question, pick the right lesson, and set a timer for your students.</p>
-          </div>
+          </form>
         ) : (
-          threadsWithReplies.map((thread) => renderThread(thread))
+          <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              This read-only directory lists classmates in your level and class. They update their biographies from the account page.
+            </p>
+            <ClassMembersTab />
+          </div>
         )}
       </div>
+      {activeTab === "discussion" ? (
+        <div style={{ display: "grid", gap: 12 }}>
+          {error ? (
+            <div style={{ ...styles.card, borderColor: "#fca5a5", background: "#fef2f2" }}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
+              <p style={{ ...styles.helperText, margin: 0 }}>{error}</p>
+            </div>
+          ) : isLoading ? (
+            <div style={styles.card}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>Loading discussions ...</div>
+              <p style={{ ...styles.helperText, margin: 0 }}>Fetching the latest posts.</p>
+            </div>
+          ) : threadsWithReplies.length === 0 ? (
+            <div style={styles.card}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>No discussions started</div>
+              <p style={{ ...styles.helperText, margin: 0 }}>Create the first question, pick the right lesson, and set a timer for your students.</p>
+            </div>
+          ) : (
+            threadsWithReplies.map((thread) => renderThread(thread))
+          )}
+        </div>
+      ) : null}
     </div>
   );
 };
