@@ -20,7 +20,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [status, setStatus] = useState("Active");
   const [initialPaymentAmount, setInitialPaymentAmount] = useState("");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
@@ -69,7 +68,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
         phone,
         location,
         emergencyContactPhone,
-        status,
         initialPaymentAmount: paidAmount,
         tuitionFee,
         balanceDue,
@@ -86,7 +84,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         paymentStatus === "paid"
           ? "6-month contract activated"
           : "1-month starter contract set with reminder";
-      const balanceText = balanceDue > 0 ? ` Balance due: ₦${balanceDue}.` : "";
+      const balanceText = balanceDue > 0 ? ` Balance due: GH₵${balanceDue}.` : "";
       setMessage(`Account created! Your student code is ${studentCode}. ${contractLabel}. Pay via Paystack: ${paystackLink}.${balanceText}`);
     } catch (error) {
       console.error(error);
@@ -215,17 +213,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder="0176 98765432"
           />
 
-          <label style={styles.label}>Status</label>
-          <input
-            type="text"
-            required
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            style={inputStyle}
-            placeholder="Active"
-          />
-
-          <label style={styles.label}>Initial payment amount (₦)</label>
+          <label style={styles.label}>Initial payment amount (GH₵)</label>
           <input
             type="number"
             min="0"
@@ -236,7 +224,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder="0"
           />
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            A1: ₦2800 · A2: ₦3000 · B1: ₦3000 · B2: ₦3000. Full payment activates a 6-month contract; partial payment sets a 1-month starter contract with reminders.
+            A1: GH₵2800 · A2: GH₵3000 · B1: GH₵3000 · B2: GH₵3000. Full payment activates a 6-month contract; partial payment sets a 1-month starter contract with reminders.
           </p>
 
           <label style={styles.label}>Which live class are you joining?</label>

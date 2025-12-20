@@ -225,11 +225,11 @@ const AccountSettings = () => {
               <div style={{ display: "grid", gap: 8 }}>
                 <div style={styles.metaRow}>
                   <span>Due now</span>
-                  <strong>{balanceDue === null ? "–" : `₦${balanceDue}`}</strong>
+                  <strong>{balanceDue === null ? "–" : `GH₵${balanceDue}`}</strong>
                 </div>
                 <div style={styles.metaRow}>
                   <span>Paid</span>
-                  <strong>{paidAmount === null ? "–" : `₦${paidAmount}`}</strong>
+                  <strong>{paidAmount === null ? "–" : `GH₵${paidAmount}`}</strong>
                 </div>
                 <div style={styles.metaRow}>
                   <span>Billing email</span>
