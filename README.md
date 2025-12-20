@@ -53,6 +53,32 @@ rows into the approval spreadsheet with the helper script at
 You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
 for near-real-time mirroring between Firebase and Google Sheets.
 
+## Deploy the Firestore trigger that writes to the Students sheet
+The Cloud Function `onStudentCreated` (in `functions/index.js`) listens to
+`students/{studentCode}` and mirrors each new document to your Students Google
+Sheet. To deploy it:
+
+1. Install the Firebase CLI if needed: `npm install -g firebase-tools`.
+2. Authenticate and pick your project: `firebase login` then
+   `firebase use <your-project-id>`.
+3. From the repository root, enter the functions directory:
+   ```
+   cd functions
+   ```
+4. Set the required secrets so the function can reach your sheet:
+   ```
+   firebase functions:secrets:set GOOGLE_SERVICE_ACCOUNT_JSON_B64   # base64 of your service-account JSON
+   firebase functions:secrets:set STUDENTS_SHEET_ID                 # sheet ID from the URL
+   firebase functions:secrets:set STUDENTS_SHEET_TAB                # optional; defaults to "students"
+   ```
+5. Deploy just the trigger (or include `api` if needed):
+   ```
+   firebase deploy --only functions:onStudentCreated
+   ```
+6. Confirm the deployment in the Firebase console or with
+   `firebase functions:list`, and watch logs with
+   `firebase functions:log --only onStudentCreated` when testing a signup.
+
 ## Legacy student login (pre-Firebase accounts)
 For historic student rows that only stored an email, student code, and a
 bcrypt-hashed password in Firestore, the backend exposes a `/legacy/login`
