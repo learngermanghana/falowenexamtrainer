@@ -11,8 +11,24 @@ if (!admin.apps.length) {
 
 setGlobalOptions({ maxInstances: 10 });
 
-const app = require("./functionz/app");
-const { appendStudentToStudentsSheetSafely } = require("./functionz/studentsSheet");
+let appInstance;
+let appendStudentToStudentsSheetSafely;
+
+const getApp = () => {
+  if (!appInstance) {
+    // Lazy-load the Express app so deployment initialization stays fast.
+    appInstance = require("./functionz/app");
+  }
+  return appInstance;
+};
+
+const getStudentAppender = () => {
+  if (!appendStudentToStudentsSheetSafely) {
+    // Lazy-load the Sheets helper to avoid importing googleapis during cold start.
+    ({ appendStudentToStudentsSheetSafely } = require("./functionz/studentsSheet"));
+  }
+  return appendStudentToStudentsSheetSafely;
+};
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 
@@ -28,7 +44,7 @@ exports.api = onRequest(
       "STUDENTS_SHEET_TAB",
     ],
   },
-  app
+  (req, res) => getApp()(req, res)
 );
 
 // When a student doc is created in Firestore, append to Students sheet (safe header-mapped append)
@@ -49,7 +65,7 @@ exports.onStudentCreated = onDocumentCreated(
     const student = snap.data();
     if (!student) return;
 
-    await appendStudentToStudentsSheetSafely(student);
+    await getStudentAppender()(student);
   }
 );
 
