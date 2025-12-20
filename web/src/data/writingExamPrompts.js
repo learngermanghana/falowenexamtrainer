@@ -1,3 +1,4 @@
+// Utility module providing writing prompts by CEFR level.
 export const WRITING_PROMPTS = {
   A1: [
     {
@@ -436,3 +437,5 @@ export const WRITING_PROMPTS = {
     },
   ],
 };
+
+export const getPromptsForLevel = (level) => WRITING_PROMPTS[level?.toUpperCase()] || [];
