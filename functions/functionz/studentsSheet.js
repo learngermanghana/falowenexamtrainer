@@ -250,6 +250,16 @@ async function upsertStudentToSheet(student) {
   return { action: "appended" };
 }
 
+async function appendStudentToStudentsSheetSafely(student) {
+  try {
+    return await upsertStudentToSheet(student);
+  } catch (err) {
+    console.error("appendStudentToStudentsSheetSafely error", err);
+    return { error: err.message || "Failed to sync student to sheet" };
+  }
+}
+
 module.exports = {
   upsertStudentToSheet,
+  appendStudentToStudentsSheetSafely,
 };

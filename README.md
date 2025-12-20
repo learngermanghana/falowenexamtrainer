@@ -53,10 +53,15 @@ rows into the approval spreadsheet with the helper script at
 You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
 for near-real-time mirroring between Firebase and Google Sheets.
 
-## Deploy the Firestore trigger that writes to the Students sheet
-The Cloud Function `onStudentCreated` (in `functions/index.js`) listens to
-`students/{studentCode}` and mirrors each new document to your Students Google
-Sheet. To deploy it:
+## Deploy the Cloud Functions (Firestore trigger + Paystack webhook)
+The Firebase Functions bundle exposes two entry points:
+
+- `api`: an Express app that now includes the Paystack webhook at
+  `/paystack/webhook`
+- `onStudentCreated`: a Firestore trigger that mirrors new student docs to the
+  Students Google Sheet
+
+To deploy them:
 
 1. Install the Firebase CLI if needed: `npm install -g firebase-tools`.
 2. Authenticate and pick your project: `firebase login` then
@@ -65,19 +70,43 @@ Sheet. To deploy it:
    ```
    cd functions
    ```
-4. Set the required secrets so the function can reach your sheet:
+4. Set the required secrets (for both the API and the sheet sync):
    ```
    firebase functions:secrets:set GOOGLE_SERVICE_ACCOUNT_JSON_B64   # base64 of your service-account JSON
    firebase functions:secrets:set STUDENTS_SHEET_ID                 # sheet ID from the URL
    firebase functions:secrets:set STUDENTS_SHEET_TAB                # optional; defaults to "students"
+   firebase functions:secrets:set PAYSTACK_SECRET                   # your Paystack secret key for webhook verification
    ```
-5. Deploy just the trigger (or include `api` if needed):
+5. Deploy the functions (both the API + webhook and the Firestore trigger):
    ```
-   firebase deploy --only functions:onStudentCreated
+   firebase deploy --only functions:api,functions:onStudentCreated
    ```
 6. Confirm the deployment in the Firebase console or with
-   `firebase functions:list`, and watch logs with
-   `firebase functions:log --only onStudentCreated` when testing a signup.
+   `firebase functions:list`, and watch logs while testing:
+   ```
+   firebase functions:log --only onStudentCreated
+   firebase functions:log --only api
+   ```
+
+### Point Paystack to the webhook
+After deploying, configure the webhook URL in your Paystack dashboard to point
+to the HTTPS endpoint (replace `<project>` with your Firebase project ID):
+
+```
+https://europe-west1-<project>.cloudfunctions.net/api/paystack/webhook
+```
+
+Include the student code (preferred) or email in your Paystack transaction
+metadata (e.g., `studentCode: "ABC123"`). The webhook will verify the
+`PAYSTACK_SECRET`, add the new payment to the student's totals, update the
+Firestore document, and upsert the row in the Students sheet.
+
+### Configure level-specific tuition fees
+- Update `web/src/data/levelFees.js` to set the GH₵ tuition amount for each CEFR
+  level (A1, A2, B1, B2, etc.). The signup form reads these values to set each
+  student's `tuitionFee`, `balanceDue`, and `paymentStatus`.
+- Make sure your Paystack payment pages/links for each level charge the same
+  amounts so webhook callbacks reconcile correctly with the stored tuition.
 
 ## Legacy student login (pre-Firebase accounts)
 For historic student rows that only stored an email, student code, and a
