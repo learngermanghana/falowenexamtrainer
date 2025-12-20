@@ -4,27 +4,7 @@ import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import ResultHistory from "./ResultHistory";
 import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService";
-import { WRITING_PROMPTS } from "../data/writingExamPrompts";
-
-const DEFAULT_EXAM_TIMINGS = {
-  A1: 20,
-  A2: 25,
-  B1: 30,
-  B2: 35,
-  C1: 40,
-};
-
-const mapExamPromptsToLetters = (prompts) =>
-  Object.entries(prompts).flatMap(([levelKey, entries]) =>
-    (entries || []).map((item, index) => ({
-      id: `${levelKey.toLowerCase()}-${index + 1}`,
-      letter: `${levelKey}: ${item.Thema}`,
-      level: levelKey,
-      durationMinutes: DEFAULT_EXAM_TIMINGS[levelKey] || 20,
-      situation: item.Thema,
-      whatToInclude: item.Punkte || [],
-    }))
-  );
+import { writingLetters } from "../data/writingLetters";
 
 const IDEA_COACH_INTRO = {
   role: "assistant",
@@ -36,7 +16,6 @@ const LetterPracticePage = () => {
   const { level, setLevel, error, setError, loading, setLoading, resultHistory, addResultToHistory } = useExam();
   const { user, idToken } = useAuth();
 
-  const examLetters = useMemo(() => mapExamPromptsToLetters(WRITING_PROMPTS), []);
   const [activeTab, setActiveTab] = useState("practice");
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
@@ -44,16 +23,10 @@ const LetterPracticePage = () => {
   const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
-  const [practiceLevel, setPracticeLevel] = useState(level);
-  const [selectedLetterId, setSelectedLetterId] = useState(() => {
-    const initialLetter = examLetters.find((item) => item.level === level) || examLetters[0];
-    return initialLetter?.id || "";
-  });
-  const [timerSeconds, setTimerSeconds] = useState(() => {
-    const initialLetter = examLetters.find((item) => item.id === selectedLetterId) || examLetters[0];
-    return (initialLetter?.durationMinutes || 0) * 60;
-  });
+  const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
+  const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [practiceLevel, setPracticeLevel] = useState("All");
 
   const resetErrors = () => {
     setError("");
@@ -65,33 +38,12 @@ const LetterPracticePage = () => {
     resetErrors();
   };
 
-  const filteredLetters = useMemo(
-    () => examLetters.filter((item) => item.level === practiceLevel),
-    [examLetters, practiceLevel]
-  );
-
-  const selectedLetter = useMemo(
-    () => filteredLetters.find((item) => item.id === selectedLetterId),
-    [filteredLetters, selectedLetterId]
-  );
-
-  useEffect(() => {
-    const firstForLevel = filteredLetters[0];
-
-    if (firstForLevel && !filteredLetters.some((item) => item.id === selectedLetterId)) {
-      setSelectedLetterId(firstForLevel.id);
-    }
-  }, [filteredLetters, selectedLetterId]);
-
-  useEffect(() => {
-    setPracticeLevel(level);
-  }, [level]);
+  const selectedLetter = useMemo(() => writingLetters.find((item) => item.id === selectedLetterId), [selectedLetterId]);
 
   useEffect(() => {
     if (!selectedLetter) return;
     setLevel(selectedLetter.level);
     setTimerSeconds(selectedLetter.durationMinutes * 60);
-    setTimerRunning(false);
   }, [selectedLetter, setLevel]);
 
   useEffect(() => {
@@ -232,7 +184,7 @@ const LetterPracticePage = () => {
               <div style={{ display: "grid", gap: 6 }}>
                 <label style={styles.label}>Choose a level to browse tasks</label>
                 <div style={styles.segmentedControl}>
-                  {ALLOWED_LEVELS.map((lvl) => (
+                  {["All", ...ALLOWED_LEVELS].map((lvl) => (
                     <button
                       key={lvl}
                       style={practiceLevel === lvl ? styles.segmentedActive : styles.segmentedButton}
@@ -252,32 +204,28 @@ const LetterPracticePage = () => {
             </div>
 
             <div style={{ display: "grid", gap: 10 }}>
-              <div
-                style={{
-                  ...styles.promptList,
-                  paddingLeft: 0,
-                  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-                }}
-              >
-                {filteredLetters.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setSelectedLetterId(item.id)}
-                    style={
-                      selectedLetterId === item.id
-                        ? { ...styles.tabButtonActive, textAlign: "left" }
-                        : { ...styles.tabButton, textAlign: "left" }
-                    }
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                      <span>{item.letter}</span>
-                      <span style={styles.levelPill}>{item.level}</span>
-                    </div>
-                    <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-                      {item.durationMinutes} min • {item.situation}
-                    </p>
-                  </button>
-                ))}
+              <div style={{ ...styles.promptList, paddingLeft: 0, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+                {writingLetters
+                  .filter((item) => (practiceLevel === "All" ? true : item.level === practiceLevel))
+                  .map((item) => (
+                    <button
+                      key={item.id}
+                      onClick={() => setSelectedLetterId(item.id)}
+                      style={
+                        selectedLetterId === item.id
+                          ? { ...styles.tabButtonActive, textAlign: "left" }
+                          : { ...styles.tabButton, textAlign: "left" }
+                      }
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                        <span>{item.letter}</span>
+                        <span style={styles.levelPill}>{item.level}</span>
+                      </div>
+                      <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
+                        {item.durationMinutes} min • {item.situation}
+                      </p>
+                    </button>
+                  ))}
               </div>
             </div>
 
