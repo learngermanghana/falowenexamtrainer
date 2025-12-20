@@ -6,6 +6,7 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { generateStudentCode } from "../services/studentCode";
 import { classCatalog } from "../data/classCatalog";
+import { getTuitionFeeForLevel } from "../data/levelFees";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 
 const SignUpPage = ({ onLogin, onBack }) => {
@@ -27,13 +28,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
-  const LEVEL_FEES = {
-    A1: 2800,
-    A2: 3000,
-    B1: 3000,
-    B2: 3000,
-  };
-
   const paystackLinkForLevel = (level) =>
     `https://paystack.com/pay/falowen-${String(level || "").toLowerCase()}`;
 
@@ -49,7 +43,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     setLoading(true);
     try {
-      const tuitionFee = LEVEL_FEES[selectedLevel] || 0;
+      const tuitionFee = getTuitionFeeForLevel(selectedLevel);
       const paidAmount = Number(initialPaymentAmount) || 0;
       const contractStart = new Date();
       const contractMonths = paidAmount >= tuitionFee ? 6 : 1;

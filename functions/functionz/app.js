@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
@@ -9,6 +10,7 @@ const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
 const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
+const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 
 let getScoresForStudent;
 
@@ -39,7 +41,14 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 
 const app = express();
 
 app.use(cors({ origin: true }));
-app.use(express.json({ limit: "1mb" }));
+app.use(
+  express.json({
+    limit: "1mb",
+    verify: (req, _res, buf) => {
+      req.rawBody = buf;
+    },
+  })
+);
 
 app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
@@ -94,6 +103,99 @@ const placementPrompt = ({ answers, targetLevel }) => {
     "Return a short rationale, confidence 0–1, and one next drill suggestion."
   ).concat("\n\n", formattedAnswers);
 };
+
+async function findStudentByCodeOrEmail({ studentCode, email }) {
+  const db = admin.firestore();
+
+  if (studentCode) {
+    const docRef = db.collection("students").doc(studentCode);
+    const docSnap = await docRef.get();
+    if (docSnap.exists) return { ref: docRef, snap: docSnap };
+  }
+
+  if (email) {
+    const normalizedEmail = email.toLowerCase();
+    const querySnap = await db
+      .collection("students")
+      .where("email", "==", normalizedEmail)
+      .limit(1)
+      .get();
+    if (!querySnap.empty) {
+      const doc = querySnap.docs[0];
+      return { ref: doc.ref, snap: doc };
+    }
+  }
+
+  return null;
+}
+
+app.post("/paystack/webhook", async (req, res) => {
+  try {
+    const secret = process.env.PAYSTACK_SECRET;
+    if (!secret) {
+      console.error("PAYSTACK_SECRET not configured");
+      return res.status(500).json({ error: "PAYSTACK_SECRET is missing" });
+    }
+
+    const signature = req.headers["x-paystack-signature"];
+    if (!signature) {
+      return res.status(400).json({ error: "Missing Paystack signature" });
+    }
+
+    const raw = req.rawBody || Buffer.from(JSON.stringify(req.body || {}));
+    const computed = crypto.createHmac("sha512", secret).update(raw).digest("hex");
+    if (computed !== signature) {
+      return res.status(401).json({ error: "Invalid signature" });
+    }
+
+    const payload = req.body || {};
+    const { event, data } = payload;
+
+    if (event !== "charge.success") {
+      return res.json({ status: "ignored", event });
+    }
+
+    const studentCode =
+      data?.metadata?.studentCode ||
+      data?.metadata?.student_code ||
+      data?.metadata?.studentcode ||
+      null;
+    const email = data?.customer?.email ? String(data.customer.email).toLowerCase() : "";
+    const match = await findStudentByCodeOrEmail({ studentCode, email });
+
+    if (!match) {
+      console.warn("No matching student for Paystack callback", { studentCode, email });
+      return res.status(202).json({ status: "no-match" });
+    }
+
+    const { ref, snap } = match;
+    const studentData = snap.data() || {};
+    const amountPaid = Number(data?.amount || 0) / 100;
+    const priorPaid = Number(studentData.initialPaymentAmount || 0);
+    const tuitionFee = Number(studentData.tuitionFee || 0);
+    const totalPaid = priorPaid + amountPaid;
+    const balanceDue = tuitionFee ? Math.max(tuitionFee - totalPaid, 0) : null;
+    const paymentStatus = tuitionFee && totalPaid < tuitionFee ? "partial" : "paid";
+
+    const updates = {
+      initialPaymentAmount: totalPaid,
+      balanceDue,
+      paymentStatus,
+      paystackReference: data?.reference || studentData.paystackReference || "",
+      updated_at: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    await ref.set(updates, { merge: true });
+
+    const mergedStudent = { ...studentData, ...updates };
+    await appendStudentToStudentsSheetSafely(mergedStudent);
+
+    return res.json({ status: "synced", paymentStatus, balanceDue });
+  } catch (err) {
+    console.error("/paystack/webhook error", err);
+    return res.status(500).json({ error: "Failed to process webhook" });
+  }
+});
 
 app.post("/writing/ideas", async (req, res) => {
   try {
