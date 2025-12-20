@@ -1,13 +1,5 @@
-export async function correctDiscussionText({ text, level, idToken }) {
-  const res = await fetch(`/api/discussion/correct`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}),
-    },
-    body: JSON.stringify({ text, level }),
-  });
+import { callAI } from "./aiClient";
 
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
+export async function correctDiscussionText({ text, level, idToken, timeoutMs = 15000 }) {
+  return callAI({ path: "/discussion/correct", payload: { text, level }, idToken, timeoutMs });
 }
