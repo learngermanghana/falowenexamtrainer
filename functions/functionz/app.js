@@ -31,6 +31,132 @@ async function getAuthedUser(req) {
   }
 }
 
+function getFirestoreSafe() {
+  try {
+    return admin.firestore();
+  } catch (err) {
+    console.warn("Firestore not available", err?.message || err);
+    return null;
+  }
+}
+
+function validateString(value, { required = false, maxLength = 500, label = "field" } = {}) {
+  if (required && (typeof value !== "string" || !value.trim())) {
+    return `${label} is required`;
+  }
+
+  if (typeof value === "string" && value.length > maxLength) {
+    return `${label} must be at most ${maxLength} characters`;
+  }
+
+  return null;
+}
+
+function validateAnswersArray(value, { maxEntries = 10, maxTextLength = 600 } = {}) {
+  if (!Array.isArray(value) || value.length === 0) {
+    return "At least one answer is required";
+  }
+
+  if (value.length > maxEntries) {
+    return `A maximum of ${maxEntries} answers is allowed`;
+  }
+
+  for (const item of value) {
+    if (typeof item?.text !== "string" || !item.text.trim()) {
+      return "Each answer must include text";
+    }
+
+    if (item.text.length > maxTextLength) {
+      return `Answers must be under ${maxTextLength} characters`;
+    }
+  }
+
+  return null;
+}
+
+const DAILY_LIMITS = {
+  grammar: 20,
+  chatbuddy: 30,
+  placement: 5,
+  speaking: 25,
+};
+
+const memoryQuota = new Map();
+
+function pruneOldCounters(counters = {}) {
+  const today = new Date().toISOString().slice(0, 10);
+  return Object.fromEntries(Object.entries(counters).filter(([date]) => date === today));
+}
+
+async function enforceUserQuota({ uid, category, limit }) {
+  const db = getFirestoreSafe();
+  const today = new Date().toISOString().slice(0, 10);
+
+  if (db) {
+    const ref = db.collection("usageQuotas").doc(uid);
+    const now = admin.firestore.Timestamp.now();
+
+    return db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const data = snap.exists ? snap.data() || {} : {};
+      const counters = pruneOldCounters(data.counters || {});
+      const todayCounters = counters[today] || {};
+      const current = Number(todayCounters[category] || 0);
+
+      if (current >= limit) {
+        return { allowed: false, remaining: 0 };
+      }
+
+      const updatedCounters = {
+        ...counters,
+        [today]: { ...todayCounters, [category]: current + 1 },
+      };
+
+      tx.set(ref, { counters: updatedCounters, updatedAt: now }, { merge: true });
+
+      return { allowed: true, remaining: Math.max(limit - (current + 1), 0) };
+    });
+  }
+
+  const key = `${uid}:${today}:${category}`;
+  const currentEntry = memoryQuota.get(key) || 0;
+
+  if (currentEntry >= limit) {
+    return { allowed: false, remaining: 0 };
+  }
+
+  memoryQuota.set(key, currentEntry + 1);
+  return { allowed: true, remaining: Math.max(limit - (currentEntry + 1), 0) };
+}
+
+async function auditAIRequest({ route, uid, email, metadata = {}, success = true }) {
+  const db = getFirestoreSafe();
+  if (!db) return;
+
+  try {
+    await db.collection("aiAuditLogs").add({
+      route,
+      uid: uid || null,
+      email: email ? String(email).toLowerCase() : null,
+      success,
+      metadata,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (err) {
+    console.warn(`Failed to write audit for ${route}`, err?.message || err);
+  }
+}
+
+async function requireAuthenticatedUser(req, res) {
+  const authedUser = await getAuthedUser(req);
+  if (!authedUser?.uid) {
+    res.status(401).json({ error: "Authentication is required for this action" });
+    return null;
+  }
+
+  return authedUser;
+}
+
 function loadScoresModule() {
   if (getScoresForStudent) return getScoresForStudent;
 
@@ -325,16 +451,27 @@ app.post("/profile/biography/correct", async (req, res) => {
 });
 
 app.post("/grammar/ask", async (req, res) => {
+  let authedUser;
   try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
     const { question, level = "A2", studentId } = req.body || {};
     const trimmedQuestion = String(question || "").trim();
     const trimmedStudentId = typeof studentId === "string" ? studentId.trim() : "";
 
-    if (!trimmedQuestion) {
-      return res.status(400).json({ error: "A grammar question is required" });
+    const validationError =
+      validateString(trimmedQuestion, { required: true, maxLength: 400, label: "question" }) ||
+      validateString(level, { maxLength: 10, label: "level" });
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
     }
 
-    const authedUser = await getAuthedUser(req);
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "grammar", limit: DAILY_LIMITS.grammar });
+    if (!quota.allowed) {
+      return res.status(429).json({ error: "Daily grammar question limit reached" });
+    }
 
     const messages = [
       { role: "system", content: grammarPrompt({ level }) },
@@ -343,13 +480,7 @@ app.post("/grammar/ask", async (req, res) => {
 
     const answer = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 450 });
 
-    let db;
-    try {
-      db = admin.firestore();
-    } catch (e) {
-      db = null;
-      console.warn("Firestore not available; skipping grammar log:", e?.message || e);
-    }
+    const db = getFirestoreSafe();
     const logEntry = {
       question: trimmedQuestion,
       level,
@@ -367,9 +498,17 @@ app.post("/grammar/ask", async (req, res) => {
         .catch((logErr) => console.warn("Failed to log grammar question", logErr));
     }
 
-    return res.json({ answer });
+    auditAIRequest({
+      route: "/grammar/ask",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { level, studentId: trimmedStudentId, quotaRemaining: quota.remaining },
+    });
+
+    return res.json({ answer, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/grammar/ask error", err);
+    auditAIRequest({ route: "/grammar/ask", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to answer grammar question" });
   }
 });
@@ -456,7 +595,11 @@ app.get("/scores", async (req, res) => {
 });
 
 app.post("/speaking/analyze", upload.single("audio"), async (req, res) => {
+  let authedUser;
   try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
     if (!req.file) {
       return res.status(400).json({ error: "Audio file is required" });
     }
@@ -470,7 +613,22 @@ app.post("/speaking/analyze", upload.single("audio"), async (req, res) => {
       userId = "guest",
     } = req.body || {};
 
-    const transcript = await transcribeAudio(req.file);
+    const validationError =
+      validateString(teil, { maxLength: 20, label: "teil" }) ||
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(contextType, { maxLength: 60, label: "context" }) ||
+      validateString(question, { maxLength: 400, label: "question" });
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
+    if (!quota.allowed) {
+      return res.status(429).json({ error: "Daily speaking analysis limit reached" });
+    }
+
+    const transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1800);
 
     if (!transcript) {
       return res.status(500).json({ error: "Could not transcribe audio" });
@@ -480,43 +638,79 @@ app.post("/speaking/analyze", upload.single("audio"), async (req, res) => {
       { role: "system", content: speakingPrompt({ teil, level, contextType, question, interactionMode }) },
       {
         role: "user",
-        content: `User ${userId} speaking sample transcript: ${transcript}`,
+        content: `User ${authedUser.uid || userId} speaking sample transcript: ${transcript}`,
       },
     ];
 
     const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 500 });
 
-    return res.json({ transcript, feedback });
+    auditAIRequest({
+      route: "/speaking/analyze",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { teil, level, quotaRemaining: quota.remaining },
+    });
+
+    return res.json({ transcript, feedback, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/speaking/analyze error", err);
+    auditAIRequest({ route: "/speaking/analyze", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to analyze speaking" });
   }
 });
 
 app.post("/speaking/analyze-text", async (req, res) => {
+  let authedUser;
   try {
-    const { text, teil, level = "A2", targetLevel, userId = "guest" } = req.body || {};
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
 
-    if (!text || !String(text).trim()) {
-      return res.status(400).json({ error: "Transcript text is required" });
+    const { text, teil, level = "A2", targetLevel, userId = "guest" } = req.body || {};
+    const trimmed = String(text || "").trim();
+
+    const validationError =
+      validateString(trimmed, { required: true, maxLength: 2000, label: "transcript" }) ||
+      validateString(teil, { maxLength: 20, label: "teil" }) ||
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
+    if (!quota.allowed) {
+      return res.status(429).json({ error: "Daily speaking analysis limit reached" });
     }
 
     const messages = [
       { role: "system", content: speakingPrompt({ teil, level: targetLevel || level }) },
-      { role: "user", content: `User ${userId} transcript: ${String(text).trim()}` },
+      { role: "user", content: `User ${authedUser.uid || userId} transcript: ${trimmed}` },
     ];
 
     const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 500 });
 
-    return res.json({ feedback });
+    auditAIRequest({
+      route: "/speaking/analyze-text",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { teil, level, targetLevel, quotaRemaining: quota.remaining },
+    });
+
+    return res.json({ feedback, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/speaking/analyze-text error", err);
+    auditAIRequest({ route: "/speaking/analyze-text", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to analyze text" });
   }
 });
 
 app.post("/speaking/interaction-score", upload.single("audio"), async (req, res) => {
+  let authedUser;
   try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
     const {
       initialTranscript,
       followUpQuestion,
@@ -532,8 +726,20 @@ app.post("/speaking/interaction-score", upload.single("audio"), async (req, res)
       transcript = (await transcribeAudio(req.file)) || "";
     }
 
-    if (!transcript) {
-      return res.status(400).json({ error: "A transcript or audio recording is required" });
+    const validationError =
+      validateString(transcript, { required: true, maxLength: 1800, label: "transcript" }) ||
+      validateString(followUpQuestion, { maxLength: 400, label: "followUpQuestion" }) ||
+      validateString(teil, { maxLength: 20, label: "teil" }) ||
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
+    if (!quota.allowed) {
+      return res.status(429).json({ error: "Daily speaking analysis limit reached" });
     }
 
     const messages = [
@@ -545,31 +751,56 @@ app.post("/speaking/interaction-score", upload.single("audio"), async (req, res)
       },
       {
         role: "user",
-        content: `User ${userId} follow-up answer to '${followUpQuestion || "prompt"}': ${transcript}`,
+        content: `User ${authedUser.uid || userId} follow-up answer to '${followUpQuestion || "prompt"}': ${transcript}`,
       },
     ];
 
     const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 450 });
 
-    return res.json({ feedback, transcript });
+    auditAIRequest({
+      route: "/speaking/interaction-score",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { teil, level, targetLevel, quotaRemaining: quota.remaining },
+    });
+
+    return res.json({ feedback, transcript, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/speaking/interaction-score error", err);
+    auditAIRequest({ route: "/speaking/interaction-score", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to score interaction" });
   }
 });
 
 app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
+  let authedUser;
   try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
     const { message, level = "B1" } = req.body || {};
 
     if (!req.file && (!message || !String(message).trim())) {
       return res.status(400).json({ error: "A message or audio recording is required" });
     }
 
+    const validationError =
+      validateString(message, { maxLength: 800, label: "message" }) ||
+      validateString(level, { maxLength: 10, label: "level" });
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
+    if (!quota.allowed) {
+      return res.status(429).json({ error: "Daily chat buddy limit reached" });
+    }
+
     let transcript = "";
 
     if (req.file) {
-      transcript = (await transcribeAudio(req.file)) || "";
+      transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1200);
     }
 
     const trimmedMessage = String(message || "").trim();
@@ -584,24 +815,47 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
 
     const reply = await createChatCompletion(chatMessages, { temperature: 0.55, max_tokens: 420 });
 
-    return res.json({ reply, transcript: transcript || null });
+    auditAIRequest({
+      route: "/chatbuddy/respond",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { level, quotaRemaining: quota.remaining },
+    });
+
+    return res.json({ reply, transcript: transcript || null, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/chatbuddy/respond error", err);
+    auditAIRequest({ route: "/chatbuddy/respond", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to chat with buddy" });
   }
 });
 
 app.post("/tutor/placement", async (req, res) => {
+  let authedUser;
   try {
-    const { answers = [], targetLevel, userId = "guest" } = req.body || {};
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
 
-    if (!Array.isArray(answers) || answers.length === 0) {
-      return res.status(400).json({ error: "At least one answer is required" });
+    const { answers = [], targetLevel, userId = "guest" } = req.body || {};
+    const validationError =
+      validateAnswersArray(answers, { maxEntries: 8, maxTextLength: 700 }) ||
+      validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "placement", limit: DAILY_LIMITS.placement });
+    if (!quota.allowed) {
+      return res.status(429).json({ error: "Daily placement attempts limit reached" });
     }
 
     const messages = [
       { role: "system", content: placementPrompt({ answers, targetLevel }) },
-      { role: "user", content: `Student id ${userId}. Provide JSON with estimated_level, confidence, rationale, next_task_hint.` },
+      {
+        role: "user",
+        content: `Student id ${authedUser.uid || userId}. Provide JSON with estimated_level, confidence, rationale, next_task_hint.`,
+      },
     ];
 
     const reply = await createChatCompletion(messages, { temperature: 0.2, max_tokens: 400 });
@@ -619,9 +873,17 @@ app.post("/tutor/placement", async (req, res) => {
       };
     }
 
-    return res.json({ placement });
+    auditAIRequest({
+      route: "/tutor/placement",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { targetLevel, answersCount: answers.length, quotaRemaining: quota.remaining },
+    });
+
+    return res.json({ placement, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/tutor/placement error", err);
+    auditAIRequest({ route: "/tutor/placement", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to run placement" });
   }
 });
