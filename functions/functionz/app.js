@@ -171,6 +171,35 @@ app.post("/discussion/correct", async (req, res) => {
   }
 });
 
+app.post("/profile/biography/correct", async (req, res) => {
+  try {
+    const { text, level = "A2" } = req.body || {};
+    const input = String(text || "").trim();
+
+    if (!input) {
+      return res.status(400).json({ error: "Biography text is required" });
+    }
+
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You polish short first-person biographies for classmates. " +
+          "Keep the voice friendly, 3-4 sentences, and simple for German learners. " +
+          `Target level: ${level}. Return only the improved biography text.`,
+      },
+      { role: "user", content: input },
+    ];
+
+    const corrected = await createChatCompletion(messages, { temperature: 0.25, max_tokens: 220 });
+
+    return res.json({ corrected });
+  } catch (err) {
+    console.error("/profile/biography/correct error", err);
+    return res.status(500).json({ error: err.message || "Failed to polish biography" });
+  }
+});
+
 app.post("/grammar/ask", async (req, res) => {
   try {
     const { question, level = "A2" } = req.body || {};

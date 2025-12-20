@@ -250,6 +250,21 @@ export const AuthProvider = ({ children }) => {
     // Only re-run when a new user or profile is loaded to avoid repeated token prompts.
   }, [user?.uid, studentProfile?.id]);
 
+  const saveStudentProfile = async (updates) => {
+    if (!studentProfile?.id) {
+      throw new Error("No student profile found. Please re-login.");
+    }
+
+    if (!isFirebaseConfigured || !db) {
+      throw new Error("Firebase is not configured. Cannot save profile.");
+    }
+
+    const studentRef = doc(db, "students", studentProfile.id);
+    await setDoc(studentRef, { ...updates, updated_at: serverTimestamp() }, { merge: true });
+    setStudentProfile((prev) => (prev ? { ...prev, ...updates } : prev));
+    return { ...studentProfile, ...updates };
+  };
+
   const value = useMemo(
     () => ({
       user,
@@ -264,6 +279,7 @@ export const AuthProvider = ({ children }) => {
       enableNotifications,
       messagingToken,
       notificationStatus,
+      saveStudentProfile,
     }),
     [
       user,
@@ -273,6 +289,7 @@ export const AuthProvider = ({ children }) => {
       authError,
       messagingToken,
       notificationStatus,
+      saveStudentProfile,
     ]
   );
 
