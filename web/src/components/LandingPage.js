@@ -62,34 +62,6 @@ const LandingPage = ({ onSignUp, onLogin }) => {
 
   const photos = [
     {
-      title: "Exam Preparation",
-      description:
-        "Practice polite requests, questions, opinions, and full conversations with exam-style prompts tailored for Goethe and Telc formats.",
-    },
-    {
-      title: "24/7 Resource Access",
-      description:
-        "Vocabulary practice, live AI integration, and round-the-clock learning materials keep you on track whenever you study.",
-    },
-  ];
-
-  const quickLinks = [
-    { label: "About us", href: "https://register.falowen.app/#about-us" },
-    { label: "Privacy policy", href: "https://register.falowen.app/#privacy-policy" },
-    { label: "Contact", href: "https://register.falowen.app/#contact" },
-    { label: "Terms of service", href: "https://register.falowen.app/#terms-of-service" },
-    { label: "FAQ", href: "https://register.falowen.app/#faq" },
-    { label: "Blog", href: "https://blog.falowen.app/feed" },
-  ];
-
-  const socialLinks = [
-    { label: "Instagram", href: "https://www.instagram.com/lleaghana" },
-    { label: "YouTube", href: "https://www.youtube.com/@LLEAGhana" },
-    { label: "Facebook", href: "https://web.facebook.com/lleaghana" },
-  ];
-
-  const photos = [
-    {
       url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-julia-m-cameron-4145153.jpg?raw=1",
       caption: "Guided practice sessions with classmates and tutors.",
     },
