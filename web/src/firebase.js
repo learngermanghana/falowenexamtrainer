@@ -55,6 +55,7 @@ const auth = app ? getAuth(app) : null;
 const db = app ? getFirestore(app) : null;
 
 let messagingServiceWorkerRegistrationPromise = null;
+let unregisteringMessagingServiceWorkerPromise = null;
 
 const sendFirebaseConfigToServiceWorker = async (registration) => {
   if (!registration) return null;
@@ -107,13 +108,49 @@ const registerMessagingServiceWorker = async () => {
   return messagingServiceWorkerRegistrationPromise;
 };
 
+const unregisterMessagingServiceWorker = async () => {
+  if (unregisteringMessagingServiceWorkerPromise) {
+    return unregisteringMessagingServiceWorkerPromise;
+  }
+
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
+    return null;
+  }
+
+  unregisteringMessagingServiceWorkerPromise = navigator.serviceWorker
+    .getRegistrations()
+    .then((registrations) =>
+      Promise.all(
+        registrations
+          .filter((registration) =>
+            [registration.active, registration.waiting, registration.installing]
+              .filter(Boolean)
+              .some((worker) => worker.scriptURL.includes("firebase-messaging-sw.js"))
+          )
+          .map((registration) => registration.unregister())
+      )
+    )
+    .then(() => {
+      messagingServiceWorkerRegistrationPromise = null;
+      unregisteringMessagingServiceWorkerPromise = null;
+      return null;
+    })
+    .catch((error) => {
+      console.error("Failed to unregister messaging service worker", error);
+      unregisteringMessagingServiceWorkerPromise = null;
+      return null;
+    });
+
+  return unregisteringMessagingServiceWorkerPromise;
+};
+
 const assertFirebaseReady = () => {
   if (!isFirebaseConfigured || !app) {
     throw missingConfigError;
   }
 };
 
-const requestMessagingToken = async () => {
+const requestMessagingToken = async (shouldRetry = true) => {
   assertFirebaseReady();
   const supported = await isSupported().catch(() => false);
   if (!supported) {
@@ -128,10 +165,21 @@ const requestMessagingToken = async () => {
 
   const serviceWorkerRegistration = await registerMessagingServiceWorker();
 
-  return getToken(messaging, {
-    vapidKey,
-    serviceWorkerRegistration: serviceWorkerRegistration || undefined,
-  });
+  try {
+    return await getToken(messaging, {
+      vapidKey,
+      serviceWorkerRegistration: serviceWorkerRegistration || undefined,
+    });
+  } catch (error) {
+    const isSubscribeFailed = error?.code === "messaging/token-subscribe-failed";
+
+    if (shouldRetry && isSubscribeFailed) {
+      await unregisterMessagingServiceWorker();
+      return requestMessagingToken(false);
+    }
+
+    throw error;
+  }
 };
 
 const listenForForegroundMessages = async (callback) => {
