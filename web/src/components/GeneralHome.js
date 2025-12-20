@@ -1,7 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
 import ClassCalendarCard from "./ClassCalendarCard";
-import ClassVideoSpotlight from "./ClassVideoSpotlight";
 
 const GeneralHome = ({ onSelectArea, studentProfile }) => {
   const preferredClass = studentProfile?.className;
