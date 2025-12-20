@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { ExamProvider } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
@@ -53,13 +54,32 @@ const isTabAvailable = (tab, allowedSections) => {
   return tab.sections.some((entry) => allowedSections[entry.key]);
 };
 
+const findFirstAllowedSection = (allowedSections) => {
+  for (const tab of TAB_STRUCTURE) {
+    if (tab.section && allowedSections[tab.section]) {
+      return tab.section;
+    }
+
+    if (tab.sections) {
+      const allowedSection = tab.sections.find((entry) => allowedSections[entry.key]);
+      if (allowedSection) {
+        return allowedSection.key;
+      }
+    }
+  }
+
+  return "account";
+};
+
+const getPreferredSection = (allowedSections, preferred) => {
+  if (preferred && allowedSections[preferred]) return preferred;
+
+  return findFirstAllowedSection(allowedSections);
+};
+
 function App() {
   const { user, loading: authLoading, logout, authError, studentProfile } = useAuth();
   const [authMode, setAuthMode] = useState("login");
-  const [activeSection, setActiveSection] = useState("submit");
-  const [activeMainTab, setActiveMainTab] = useState(null);
-  const [activeArea, setActiveArea] = useState("home");
-  const [examSection, setExamSection] = useState("speaking");
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
@@ -80,100 +100,17 @@ function App() {
   );
 
   const tabStorageKey = user?.uid ? `falowen:last-tab:${user.uid}` : null;
+  const savedSection = useMemo(() => (tabStorageKey ? localStorage.getItem(tabStorageKey) : null), [tabStorageKey]);
 
   const availableTabs = useMemo(
     () => TAB_STRUCTURE.filter((tab) => isTabAvailable(tab, allowedSections)),
     [allowedSections]
   );
 
-  const activeMainTabConfig = useMemo(() => TAB_STRUCTURE.find((tab) => tab.key === activeMainTab), [activeMainTab]);
-
-  useEffect(() => {
-    if (!tabStorageKey) return;
-    const saved = localStorage.getItem(tabStorageKey);
-    if (saved && allowedSections[saved]) {
-      setActiveSection(saved);
-    }
-  }, [tabStorageKey, allowedSections]);
-
-  useEffect(() => {
-    if (!tabStorageKey) return;
-    localStorage.setItem(tabStorageKey, activeSection);
-  }, [activeSection, tabStorageKey]);
-
-  useEffect(() => {
-    if (allowedSections[activeSection]) return;
-    const fallback = Object.keys(allowedSections).find((key) => allowedSections[key]) || "account";
-    setActiveSection(fallback);
-  }, [activeSection, allowedSections]);
-
-  useEffect(() => {
-    const mainTabFromSection = getMainTabForSection(activeSection);
-    const fallbackMainTab = availableTabs[0];
-
-    if (mainTabFromSection && isTabAvailable(mainTabFromSection, allowedSections)) {
-      setActiveMainTab(mainTabFromSection.key);
-    } else if (fallbackMainTab) {
-      setActiveMainTab(fallbackMainTab.key);
-    }
-  }, [activeSection, allowedSections, availableTabs]);
-
-  useEffect(() => {
-    if (!activeMainTabConfig) return;
-
-    if (activeMainTabConfig.section && activeMainTabConfig.section !== activeSection) {
-      setActiveSection(activeMainTabConfig.section);
-      return;
-    }
-
-    if (!activeMainTabConfig.sections) return;
-
-    const hasAllowedActiveSection = activeMainTabConfig.sections.some(
-      (section) => section.key === activeSection && allowedSections[section.key]
-    );
-
-    if (!hasAllowedActiveSection) {
-      const firstAllowed = activeMainTabConfig.sections.find((section) => allowedSections[section.key]);
-      if (firstAllowed) {
-        setActiveSection(firstAllowed.key);
-      }
-    }
-  }, [activeMainTabConfig, activeSection, allowedSections]);
-
-  const handleMainTabClick = (tab) => {
-    setActiveMainTab(tab.key);
-
-    if (tab.section) {
-      setActiveSection(tab.section);
-      return;
-    }
-
-    const firstAllowed = tab.sections.find((section) => allowedSections[section.key]);
-    if (firstAllowed) {
-      setActiveSection(firstAllowed.key);
-    }
-  };
-
-  const handleSubTabClick = (sectionKey, parentKey) => {
-    setActiveMainTab(parentKey);
-    setActiveSection(sectionKey);
-  };
-
-  const resetToHome = (area) => {
-    setActiveArea(area);
-    if (area === "campus") {
-      const mainTabFromSection = getMainTabForSection(activeSection);
-      const fallbackMainTab = availableTabs[0];
-      if (mainTabFromSection && isTabAvailable(mainTabFromSection, allowedSections)) {
-        setActiveMainTab(mainTabFromSection.key);
-      } else if (fallbackMainTab) {
-        setActiveMainTab(fallbackMainTab.key);
-      }
-    }
-    if (area === "exams") {
-      setExamSection("speaking");
-    }
-  };
+  const defaultCampusSection = useMemo(
+    () => getPreferredSection(allowedSections, savedSection),
+    [allowedSections, savedSection]
+  );
 
   if (!isFirebaseConfigured) {
     return (
@@ -217,112 +154,232 @@ function App() {
 
   return (
     <ExamProvider>
-      <div className="app-shell" style={styles.container}>
-        <header
-          style={{
-            ...styles.header,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            <h1 style={styles.title}>Falowen Exam Coach</h1>
-            <p style={styles.subtitle}>
-              {activeArea === "home"
-                ? "Choose Campus or the Exams Room"
-                : activeArea === "campus"
-                  ? "Campus: course book, submissions, community"
-                  : "Exams Room: speaking, Schreiben trainer, resources"}
-            </p>
-          </div>
-          <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
-            <HealthIndicator />
-            <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
-            <button style={styles.dangerButton} onClick={logout}>
-              Logout
-            </button>
-          </div>
-        </header>
-
-        <main className="layout-main" style={{ minWidth: 0 }}>
-          {activeArea === "home" && <GeneralHome onSelectArea={resetToHome} />}
-
-          {activeArea === "campus" && (
-            <>
-              <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
-                <button
-                  style={styles.secondaryButton}
-                  onClick={() => resetToHome("home")}
-                >
-                  Back to general home
-                </button>
-                {availableTabs.map((tab) => (
-                  <button
-                    key={tab.key}
-                    style={activeMainTab === tab.key ? styles.navButtonActive : styles.navButton}
-                    onClick={() => handleMainTabClick(tab)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {activeMainTabConfig?.sections ? (
-                <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}>
-                  {activeMainTabConfig.sections
-                    .filter((section) => allowedSections[section.key])
-                    .map((section) => (
-                      <button
-                        key={section.key}
-                        style={activeSection === section.key ? styles.navButtonActive : styles.navButton}
-                        onClick={() => handleSubTabClick(section.key, activeMainTabConfig.key)}
-                      >
-                        {section.label}
-                      </button>
-                    ))}
-                </div>
-              ) : null}
-
-              {activeSection === "course" && allowedSections.course ? <CourseTab /> : null}
-              {activeSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
-              {activeSection === "writing" && allowedSections.writing ? <LetterPracticePage /> : null}
-              {activeSection === "buddy" && allowedSections.buddy ? <ChatBuddyPage /> : null}
-              {activeSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
-              {activeSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
-              {activeSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
-              {activeSection === "account" && allowedSections.account ? <AccountSettings /> : null}
-            </>
-          )}
-
-          {activeArea === "exams" && (
-            <>
-              <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
-                <button style={styles.secondaryButton} onClick={() => resetToHome("home")}>
-                  Back to general home
-                </button>
-                {[{ key: "speaking", label: "Speaking" }, { key: "writing", label: "Schreiben trainer" }, { key: "resources", label: "Resources" }].map((tab) => (
-                  <button
-                    key={tab.key}
-                    style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
-                    onClick={() => setExamSection(tab.key)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {examSection === "speaking" ? <SpeakingRoom /> : null}
-              {examSection === "writing" ? <LetterPracticePage /> : null}
-              {examSection === "resources" ? <ExamResources /> : null}
-            </>
-          )}
-        </main>
-      </div>
+      <AppShell
+        allowedSections={allowedSections}
+        availableTabs={availableTabs}
+        defaultCampusSection={defaultCampusSection}
+        logout={logout}
+        tabStorageKey={tabStorageKey}
+        user={user}
+      />
     </ExamProvider>
   );
 }
 
 export default App;
+
+const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout, tabStorageKey, user }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const subtitle = useMemo(() => {
+    if (location.pathname.startsWith("/campus")) {
+      return "Campus: course book, submissions, community";
+    }
+
+    if (location.pathname.startsWith("/exams")) {
+      return "Exams Room: speaking, Schreiben trainer, resources";
+    }
+
+    return "Choose Campus or the Exams Room";
+  }, [location.pathname]);
+
+  const goHome = () => navigate("/");
+
+  const handleAreaSelect = (area) => {
+    if (area === "campus") {
+      navigate(`/campus/${defaultCampusSection}`);
+      return;
+    }
+
+    if (area === "exams") {
+      navigate("/exams/speaking");
+    }
+  };
+
+  return (
+    <div className="app-shell" style={styles.container}>
+      <header
+        style={{
+          ...styles.header,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+          flexWrap: "wrap",
+        }}
+      >
+        <div>
+          <h1 style={styles.title}>Falowen Exam Coach</h1>
+          <p style={styles.subtitle}>{subtitle}</p>
+        </div>
+        <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+          <HealthIndicator />
+          <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
+          <button style={styles.dangerButton} onClick={logout}>
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <main className="layout-main" style={{ minWidth: 0 }}>
+        <Routes>
+          <Route path="/" element={<GeneralHome onSelectArea={handleAreaSelect} />} />
+
+          <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
+          <Route
+            path="/campus/:section"
+            element={
+              <CampusArea
+                allowedSections={allowedSections}
+                availableTabs={availableTabs}
+                defaultSection={defaultCampusSection}
+                onBack={goHome}
+                tabStorageKey={tabStorageKey}
+              />
+            }
+          />
+
+          <Route path="/exams" element={<Navigate to="/exams/speaking" replace />} />
+          <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+};
+
+const CampusArea = ({ allowedSections, availableTabs, defaultSection, onBack, tabStorageKey }) => {
+  const { section } = useParams();
+  const navigate = useNavigate();
+
+  const resolvedSection = useMemo(() => getPreferredSection(allowedSections, section || defaultSection), [
+    allowedSections,
+    defaultSection,
+    section,
+  ]);
+
+  const activeMainTabConfig = useMemo(() => getMainTabForSection(resolvedSection), [resolvedSection]);
+
+  useEffect(() => {
+    if (!section || section !== resolvedSection) {
+      navigate(`/campus/${resolvedSection}`, { replace: true });
+    }
+  }, [navigate, resolvedSection, section]);
+
+  useEffect(() => {
+    if (!tabStorageKey) return;
+    localStorage.setItem(tabStorageKey, resolvedSection);
+  }, [resolvedSection, tabStorageKey]);
+
+  const handleMainTabClick = (tab) => {
+    if (tab.section) {
+      navigate(`/campus/${tab.section}`);
+      return;
+    }
+
+    const firstAllowed = tab.sections.find((entry) => allowedSections[entry.key]);
+    if (firstAllowed) {
+      navigate(`/campus/${firstAllowed.key}`);
+    }
+  };
+
+  const handleSubTabClick = (sectionKey) => {
+    navigate(`/campus/${sectionKey}`);
+  };
+
+  return (
+    <>
+      <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
+        <button style={styles.secondaryButton} onClick={onBack}>
+          Back to general home
+        </button>
+        {availableTabs.map((tab) => {
+          const activeMainTab = activeMainTabConfig?.key;
+          return (
+            <button
+              key={tab.key}
+              style={activeMainTab === tab.key ? styles.navButtonActive : styles.navButton}
+              onClick={() => handleMainTabClick(tab)}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {activeMainTabConfig?.sections ? (
+        <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}>
+          {activeMainTabConfig.sections
+            .filter((subTab) => allowedSections[subTab.key])
+            .map((subTab) => (
+              <button
+                key={subTab.key}
+                style={resolvedSection === subTab.key ? styles.navButtonActive : styles.navButton}
+                onClick={() => handleSubTabClick(subTab.key)}
+              >
+                {subTab.label}
+              </button>
+            ))}
+        </div>
+      ) : null}
+
+      {resolvedSection === "course" && allowedSections.course ? <CourseTab /> : null}
+      {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
+      {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage /> : null}
+      {resolvedSection === "buddy" && allowedSections.buddy ? <ChatBuddyPage /> : null}
+      {resolvedSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
+      {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
+      {resolvedSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
+      {resolvedSection === "account" && allowedSections.account ? <AccountSettings /> : null}
+    </>
+  );
+};
+
+const ExamArea = ({ onBack }) => {
+  const { section } = useParams();
+  const navigate = useNavigate();
+
+  const examSection = useMemo(() => {
+    if (["speaking", "writing", "resources"].includes(section)) {
+      return section;
+    }
+    return "speaking";
+  }, [section]);
+
+  useEffect(() => {
+    if (section !== examSection) {
+      navigate(`/exams/${examSection}`, { replace: true });
+    }
+  }, [examSection, navigate, section]);
+
+  const tabs = [
+    { key: "speaking", label: "Speaking" },
+    { key: "writing", label: "Schreiben trainer" },
+    { key: "resources", label: "Resources" },
+  ];
+
+  return (
+    <>
+      <div style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
+        <button style={styles.secondaryButton} onClick={onBack}>
+          Back to general home
+        </button>
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
+            onClick={() => navigate(`/exams/${tab.key}`)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {examSection === "speaking" ? <SpeakingRoom /> : null}
+      {examSection === "writing" ? <LetterPracticePage /> : null}
+      {examSection === "resources" ? <ExamResources /> : null}
+    </>
+  );
+};
