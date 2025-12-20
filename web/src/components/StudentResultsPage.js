@@ -38,6 +38,7 @@ const buildAssignmentSummaries = (rows = []) => {
       date: row.date,
       comments: row.comments,
       link: row.link,
+      attemptNumber: row.attempt,
     });
 
     if (score !== null && score !== undefined) {
@@ -61,7 +62,7 @@ const buildAssignmentSummaries = (rows = []) => {
         .sort((a, b) => toTime(b.date) - toTime(a.date))
         .map((attempt, index) => ({
           ...attempt,
-          label: `Attempt ${index + 1}`,
+          label: `Attempt ${attempt.attemptNumber || index + 1}`,
           isBest: attempt.score === entry.bestScore,
         }));
 
@@ -260,9 +261,7 @@ const StudentResultsPage = () => {
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                    <div style={{ ...styles.helperText, margin: 0 }}>
-                      {attempt.label} · {formatDate(attempt.date) || "Date not set"}
-                    </div>
+                    <div style={{ ...styles.helperText, margin: 0 }}>{attempt.label} · {formatDate(attempt.date) || "Date not set"}</div>
                     {attempt.isBest ? (
                       <span
                         style={{
@@ -279,23 +278,21 @@ const StudentResultsPage = () => {
                     ) : null}
                   </div>
                   <p style={{ ...styles.resultText, margin: "4px 0" }}>
-                    Score: {attempt.score !== null && attempt.score !== undefined ? attempt.score : "Pending"}
+                    {attempt.isBest ? "Highest score:" : "Score:"} {attempt.score !== null && attempt.score !== undefined ? attempt.score : "Pending"}
                   </p>
-                  {attempt.comments ? (
-                    <p style={{ ...styles.resultText, margin: "4px 0" }}>
-                      Comments: {attempt.comments}
-                    </p>
-                  ) : null}
-                  {attempt.link ? (
-                    <a
-                      href={attempt.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ ...styles.resultText, color: "#2563eb" }}
-                    >
-                      View objectives
-                    </a>
-                  ) : null}
+                  <p style={{ ...styles.resultText, margin: "4px 0", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                    <span>Comments: {attempt.comments || "None"}</span>
+                    {attempt.link ? (
+                      <a
+                        href={attempt.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ ...styles.resultText, color: "#2563eb" }}
+                      >
+                        Objectives reference
+                      </a>
+                    ) : null}
+                  </p>
                 </div>
               ))}
             </div>
