@@ -38,6 +38,7 @@ const buildAssignmentSummaries = (rows = []) => {
       date: row.date,
       comments: row.comments,
       link: row.link,
+      attemptNumber: row.attempt,
     });
 
     if (score !== null && score !== undefined) {
@@ -61,7 +62,7 @@ const buildAssignmentSummaries = (rows = []) => {
         .sort((a, b) => toTime(b.date) - toTime(a.date))
         .map((attempt, index) => ({
           ...attempt,
-          label: `Attempt ${index + 1}`,
+          label: `Attempt ${attempt.attemptNumber || index + 1}`,
           isBest: attempt.score === entry.bestScore,
         }));
 
@@ -109,11 +110,14 @@ const StatPill = ({ label, value, tone = "default" }) => {
 const StudentResultsPage = () => {
   const { studentProfile, user } = useAuth();
   const [filters, setFilters] = useState({ assignmentQuery: "" });
-  const [state, setState] = useState({ loading: false, error: null, data: [], summary: null, fetched: false });
+  const [state, setState] = useState({ loading: false, error: null, data: [], summary: null, student: null, fetched: false });
 
   const assignments = useMemo(() => buildAssignmentSummaries(state.data), [state.data]);
-  const studentName = state.data[0]?.studentName || state.data[0]?.name || "";
-  const level = state.data[0]?.level || studentProfile?.level || "";
+  const studentName = state.student?.name || state.data[0]?.studentName || state.data[0]?.name || "";
+  const studentEmail = state.student?.email || user?.email || studentProfile?.email || "";
+  const studentCodeLabel =
+    state.student?.studentCode || state.student?.studentcode || state.data[0]?.studentCode || studentProfile?.studentcode || "";
+  const level = state.data[0]?.level || studentProfile?.level || state.student?.level || "";
   const filteredAssignments = useMemo(() => {
     const query = filters.assignmentQuery.trim().toLowerCase();
     if (!query) return assignments;
@@ -140,13 +144,14 @@ const StudentResultsPage = () => {
 
     setState((prev) => ({ ...prev, loading: true, error: null, fetched: true }));
 
-    fetchResults({ studentCode, level: levelFromProfile })
+    fetchResults({ studentCode, level: levelFromProfile, email })
       .then((payload) => {
         setState({
           loading: false,
           error: null,
           data: payload.results || [],
           summary: payload.summary || null,
+          student: payload.student || null,
           fetched: true,
         });
       })
@@ -167,6 +172,10 @@ const StudentResultsPage = () => {
           Your results are loaded automatically when your email, level, and student code match the score sheet.
         </p>
         <h2 style={{ margin: 0 }}>Results {studentName ? `for ${studentName}` : "viewer"}</h2>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+          {studentEmail ? <span style={styles.helperText}>Email: {studentEmail}</span> : null}
+          {studentCodeLabel ? <span style={styles.helperText}>Student code: {studentCodeLabel}</span> : null}
+        </div>
         <p style={{ ...styles.helperText, marginTop: 0 }}>Pass mark: {PASS_MARK}</p>
       </header>
 
@@ -252,9 +261,7 @@ const StudentResultsPage = () => {
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                    <div style={{ ...styles.helperText, margin: 0 }}>
-                      {attempt.label} · {formatDate(attempt.date) || "Date not set"}
-                    </div>
+                    <div style={{ ...styles.helperText, margin: 0 }}>{attempt.label} · {formatDate(attempt.date) || "Date not set"}</div>
                     {attempt.isBest ? (
                       <span
                         style={{
@@ -271,23 +278,21 @@ const StudentResultsPage = () => {
                     ) : null}
                   </div>
                   <p style={{ ...styles.resultText, margin: "4px 0" }}>
-                    Score: {attempt.score !== null && attempt.score !== undefined ? attempt.score : "Pending"}
+                    {attempt.isBest ? "Highest score:" : "Score:"} {attempt.score !== null && attempt.score !== undefined ? attempt.score : "Pending"}
                   </p>
-                  {attempt.comments ? (
-                    <p style={{ ...styles.resultText, margin: "4px 0" }}>
-                      Comments: {attempt.comments}
-                    </p>
-                  ) : null}
-                  {attempt.link ? (
-                    <a
-                      href={attempt.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ ...styles.resultText, color: "#2563eb" }}
-                    >
-                      View objectives
-                    </a>
-                  ) : null}
+                  <p style={{ ...styles.resultText, margin: "4px 0", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                    <span>Comments: {attempt.comments || "None"}</span>
+                    {attempt.link ? (
+                      <a
+                        href={attempt.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{ ...styles.resultText, color: "#2563eb" }}
+                      >
+                        Objectives reference
+                      </a>
+                    ) : null}
+                  </p>
                 </div>
               ))}
             </div>
