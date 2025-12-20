@@ -1,8 +1,7 @@
 import axios from "axios";
+import { getBackendUrl } from "./backendUrl";
 
-const backendUrl =
-  process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+const backendUrl = getBackendUrl();
 
 const authHeaders = (idToken) =>
   idToken
