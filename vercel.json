@@ -4,7 +4,7 @@
     {
       "src": "web/package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "config": { "distDir": "web/build" }
     },
     {
       "src": "api/index.js",
@@ -13,7 +13,6 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    { "src": "/(.*)", "dest": "/web/build/$1" }
   ]
 }
