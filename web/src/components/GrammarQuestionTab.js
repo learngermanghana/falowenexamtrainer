@@ -32,7 +32,12 @@ const GrammarQuestionTab = () => {
       setIsLoading(true);
       setError("");
       setAnswer("");
-      const { answer: reply } = await askGrammarQuestion({ question: trimmedQuestion, level, idToken });
+      const { answer: reply } = await askGrammarQuestion({
+        question: trimmedQuestion,
+        level,
+        idToken,
+        studentId: studentProfile?.id,
+      });
       setAnswer(reply);
     } catch (err) {
       setError(err.message || "Failed to reach the grammar coach.");
@@ -45,8 +50,8 @@ const GrammarQuestionTab = () => {
     <div style={{ ...styles.card, marginTop: 12 }}>
       <h2 style={styles.sectionTitle}>Ask a Grammar Question</h2>
       <p style={styles.helperText}>
-        Get a concise explanation with short German examples. Keep questions specific (e.g., "When do I use seit vs. für?" or
-        "How do I form the Perfekt with modal verbs?").
+        The grammar coach now gives a quick explanation plus 1–2 short German examples with English glosses. Keep questions
+        specific (e.g., "When do I use seit vs. für?" or "How do I form the Perfekt with modal verbs?").
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>

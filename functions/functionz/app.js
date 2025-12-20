@@ -8,7 +8,7 @@ const path = require("path");
 const os = require("os");
 const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
-const { LETTER_COACH_PROMPTS, markPrompt } = require("./prompts");
+const { LETTER_COACH_PROMPTS, grammarPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 
@@ -16,6 +16,19 @@ let getScoresForStudent;
 
 if (!admin.apps.length) {
   admin.initializeApp();
+}
+
+async function getAuthedUser(req) {
+  const authHeader = req.headers?.authorization || "";
+  const match = authHeader.match(/^Bearer (.+)$/i);
+  if (!match) return null;
+
+  try {
+    return await admin.auth().verifyIdToken(match[1]);
+  } catch (err) {
+    console.warn("Failed to verify ID token", err);
+    return null;
+  }
 }
 
 function loadScoresModule() {
@@ -304,25 +317,38 @@ app.post("/profile/biography/correct", async (req, res) => {
 
 app.post("/grammar/ask", async (req, res) => {
   try {
-    const { question, level = "A2" } = req.body || {};
+    const { question, level = "A2", studentId } = req.body || {};
     const trimmedQuestion = String(question || "").trim();
+    const trimmedStudentId = typeof studentId === "string" ? studentId.trim() : "";
 
     if (!trimmedQuestion) {
       return res.status(400).json({ error: "A grammar question is required" });
     }
 
+    const authedUser = await getAuthedUser(req);
+
     const messages = [
-      {
-        role: "system",
-        content:
-          "You are a concise German grammar coach for language learners. " +
-          "Answer clearly in English with 1-2 short German examples. " +
-          `Keep it practical for a ${level} learner and avoid long lists.`,
-      },
+      { role: "system", content: grammarPrompt({ level }) },
       { role: "user", content: trimmedQuestion },
     ];
 
     const answer = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 450 });
+
+    const db = admin.firestore();
+    const logEntry = {
+      question: trimmedQuestion,
+      level,
+      source: "grammar-tab",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    if (trimmedStudentId) logEntry.studentId = trimmedStudentId;
+    if (authedUser?.uid) logEntry.uid = authedUser.uid;
+    if (authedUser?.email) logEntry.email = String(authedUser.email).toLowerCase();
+
+    db.collection("grammarQuestions")
+      .add(logEntry)
+      .catch((logErr) => console.warn("Failed to log grammar question", logErr));
 
     return res.json({ answer });
   } catch (err) {

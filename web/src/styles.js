@@ -81,6 +81,7 @@ export const styles = {
   resultText: {
     fontSize: 14,
     color: "#111827",
+    whiteSpace: "pre-wrap",
   },
   score: {
     fontSize: 16,
