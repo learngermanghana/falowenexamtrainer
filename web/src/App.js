@@ -9,6 +9,7 @@ import AccountSettings from "./components/AccountSettings";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import ChatBuddyPage from "./components/ChatBuddyPage";
+import LetterPracticePage from "./components/LetterPracticePage";
 import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
@@ -30,6 +31,7 @@ function App() {
       course: isEnrolled,
       results: isEnrolled || isStaff,
       grammar: true,
+      writing: true,
       buddy: true,
       discussion: isEnrolled || isStaff,
       account: true,
@@ -158,6 +160,14 @@ function App() {
                 Ask Grammar Question
               </button>
             ) : null}
+            {allowedSections.writing ? (
+              <button
+                style={activeSection === "writing" ? styles.navButtonActive : styles.navButton}
+                onClick={() => setActiveSection("writing")}
+              >
+                Writing Practice
+              </button>
+            ) : null}
             {allowedSections.buddy ? (
               <button
                 style={activeSection === "buddy" ? styles.navButtonActive : styles.navButton}
@@ -186,6 +196,7 @@ function App() {
 
           {activeSection === "course" && allowedSections.course ? <CourseTab /> : null}
           {activeSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
+          {activeSection === "writing" && allowedSections.writing ? <LetterPracticePage /> : null}
           {activeSection === "buddy" && allowedSections.buddy ? <ChatBuddyPage /> : null}
           {activeSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
           {activeSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
