@@ -43,6 +43,24 @@ const LandingPage = ({ onSignUp, onLogin }) => {
       description:
         "Join a live German chat during class with real-time monitoring and feedback from a tutor while you type.",
     },
+  ];
+
+  const quickLinks = [
+    { label: "About us", href: "https://register.falowen.app/#about-us" },
+    { label: "Privacy policy", href: "https://register.falowen.app/#privacy-policy" },
+    { label: "Contact", href: "https://register.falowen.app/#contact" },
+    { label: "Terms of service", href: "https://register.falowen.app/#terms-of-service" },
+    { label: "FAQ", href: "https://register.falowen.app/#faq" },
+    { label: "Blog", href: "https://blog.falowen.app/feed" },
+  ];
+
+  const socialLinks = [
+    { label: "Instagram", href: "https://www.instagram.com/lleaghana" },
+    { label: "YouTube", href: "https://www.youtube.com/@LLEAGhana" },
+    { label: "Facebook", href: "https://web.facebook.com/lleaghana" },
+  ];
+
+  const photos = [
     {
       title: "Exam Preparation",
       description:
