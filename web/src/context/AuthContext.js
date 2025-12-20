@@ -213,7 +213,7 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
     },
-    [persistMessagingToken, requestMessagingToken, studentProfile?.id]
+    [persistMessagingToken, studentProfile?.id]
   );
 
   useEffect(() => {
@@ -270,7 +270,7 @@ export const AuthProvider = ({ children }) => {
       setStudentProfile((prev) => (prev ? { ...prev, ...updates } : prev));
       return { ...studentProfile, ...updates };
     },
-    [studentProfile?.id]
+    [studentProfile]
   );
 
   const value = useMemo(
