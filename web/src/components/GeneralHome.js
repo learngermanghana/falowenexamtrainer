@@ -1,12 +1,44 @@
 import React from "react";
 import { styles } from "../styles";
 import ClassCalendarCard from "./ClassCalendarCard";
+import HomeMetrics from "./HomeMetrics";
+
+const WelcomeHero = ({ studentProfile }) => {
+  const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
+  const className = studentProfile?.className || "your class";
+
+  return (
+    <section
+      style={{
+        ...styles.card,
+        background: "linear-gradient(135deg, #312e81, #2563eb)",
+        color: "#eef2ff",
+        border: "none",
+        boxShadow: "0 20px 45px rgba(37, 99, 235, 0.25)",
+      }}
+    >
+      <p style={{ ...styles.helperText, color: "#c7d2fe", margin: 0 }}>Welcome back</p>
+      <h2 style={{ margin: "4px 0 8px", fontSize: 26, letterSpacing: -0.3 }}>
+        {studentName}, your campus is ready.
+      </h2>
+      <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 12 }}>
+        Personalised tips, attendance, and assignments for {className}. Jump straight into the space you need today.
+      </p>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <span style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}>Stay above 60 to pass</span>
+        <span style={{ ...styles.badge, background: "#d1fae5", color: "#065f46" }}>Keep your streak alive</span>
+      </div>
+    </section>
+  );
+};
 
 const GeneralHome = ({ onSelectArea, studentProfile }) => {
   const preferredClass = studentProfile?.className;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
+      <WelcomeHero studentProfile={studentProfile} />
+      <HomeMetrics studentProfile={studentProfile} />
       <ClassCalendarCard initialClassName={preferredClass} />
 
       <section style={styles.card}>

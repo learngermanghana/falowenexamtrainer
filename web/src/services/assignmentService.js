@@ -148,6 +148,13 @@ const computeStudentStats = (scores = [], student) => {
     .map(parseAssignmentNumber)
     .filter((value) => typeof value === "number");
 
+  const completedAssignments = Object.entries(bestPerAssignment).map(([assignment, score]) => ({
+    assignment,
+    bestScore: score,
+    number: parseAssignmentNumber(assignment),
+    attempts: attemptsByAssignment[assignment] || 0,
+  }));
+
   let missedAssignments = [];
   if (classSchedule) {
     const plannedNumbers = classSchedule.days
@@ -194,6 +201,7 @@ const computeStudentStats = (scores = [], student) => {
     weekAttempts: weeklyAttempts.length,
     retriesThisWeek: weeklyRetryCount,
     lastAssignment: latest?.assignment || null,
+    completedAssignments,
   };
 };
 
