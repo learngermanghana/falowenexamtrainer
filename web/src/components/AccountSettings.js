@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { correctBiography } from "../services/profileService";
+import TuitionStatusCard from "./TuitionStatusCard";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -49,11 +50,6 @@ const AccountSettings = () => {
     }),
     [profile.email, studentProfile?.contractEnd, studentProfile?.paystackLink, studentProfile?.paymentStatus, user?.email]
   );
-
-  const tuitionFee = studentProfile?.tuitionFee ?? null;
-  const balanceDue = studentProfile?.balanceDue ?? null;
-  const paidAmount =
-    tuitionFee === null || balanceDue === null ? null : Math.max(tuitionFee - balanceDue, 0);
 
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({ ...prev, [field]: event.target.value }));
@@ -292,29 +288,15 @@ const AccountSettings = () => {
               </div>
             </div>
 
-            <div style={{ ...styles.card, margin: 0 }}>
-              <h3 style={{ margin: "0 0 8px 0" }}>Balance</h3>
-              <div style={{ display: "grid", gap: 8 }}>
-                <div style={styles.metaRow}>
-                  <span>Due now</span>
-                  <strong>{balanceDue === null ? "–" : `GH₵${balanceDue}`}</strong>
-                </div>
-                <div style={styles.metaRow}>
-                  <span>Paid</span>
-                  <strong>{paidAmount === null ? "–" : `GH₵${paidAmount}`}</strong>
-                </div>
-                <div style={styles.metaRow}>
-                  <span>Billing email</span>
-                  <strong>{subscription.invoiceEmail || "(please add)"}</strong>
-                </div>
-                <a
-                  href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
-                  style={{ ...styles.secondaryButton, textDecoration: "none", justifyContent: "center" }}
-                >
-                  Pay or update card
-                </a>
-              </div>
-            </div>
+            <TuitionStatusCard
+              level={studentProfile.level}
+              paidAmount={studentProfile.initialPaymentAmount}
+              balanceDue={studentProfile.balanceDue}
+              tuitionFee={studentProfile.tuitionFee}
+              paystackLink={studentProfile.paystackLink}
+              title="Balance & tuition"
+              description={`Billing email: ${subscription.invoiceEmail || "add an email"}`}
+            />
           </div>
         </section>
 

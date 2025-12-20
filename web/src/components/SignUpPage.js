@@ -6,8 +6,9 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { generateStudentCode } from "../services/studentCode";
 import { classCatalog } from "../data/classCatalog";
-import { getTuitionFeeForLevel } from "../data/levelFees";
+import { computeTuitionStatus } from "../data/levelFees";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
+import TuitionStatusCard from "./TuitionStatusCard";
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
@@ -29,8 +30,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
-  const paystackLinkForLevel = (level) =>
-    `https://paystack.com/pay/falowen-${String(level || "").toLowerCase()}`;
+  const tuitionSummary = computeTuitionStatus({
+    level: selectedLevel,
+    paidAmount: Number(initialPaymentAmount) || 0,
+  });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,15 +47,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     setLoading(true);
     try {
-      const tuitionFee = getTuitionFeeForLevel(selectedLevel);
-      const paidAmount = Number(initialPaymentAmount) || 0;
+      const tuitionFee = tuitionSummary.tuitionFee;
+      const paidAmount = tuitionSummary.paidAmount;
       const contractStart = new Date();
-      const contractMonths = paidAmount >= tuitionFee ? 6 : 1;
+      const contractMonths = tuitionSummary.statusLabel === "Paid" ? 6 : 1;
       const contractEnd = new Date(contractStart);
       contractEnd.setMonth(contractEnd.getMonth() + contractMonths);
-      const balanceDue = Math.max(tuitionFee - paidAmount, 0);
-      const paymentStatus = paidAmount >= tuitionFee ? "paid" : "partial";
-      const paystackLink = paystackLinkForLevel(selectedLevel);
+      const balanceDue = tuitionSummary.balanceDue;
+      const paymentStatus = tuitionSummary.statusLabel.toLowerCase();
+      const paystackLink = tuitionSummary.paystackLink;
 
       const studentCode = generateStudentCode({ name });
       await signup(email, password, {
@@ -81,7 +84,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
           ? "6-month contract activated"
           : "1-month starter contract set with reminder";
       const balanceText = balanceDue > 0 ? ` Balance due: GH₵${balanceDue}.` : "";
-      setMessage(`Account created! Your student code is ${studentCode}. ${contractLabel}. Pay via Paystack: ${paystackLink}.${balanceText}`);
+      setMessage(
+        `Account created! Your student code is ${studentCode}. ${contractLabel}. Pay via Paystack: ${paystackLink}.${balanceText}`
+      );
     } catch (error) {
       console.error(error);
       setAuthError(error?.message || "Sign up failed.");
@@ -232,6 +237,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             A1: GH₵2800 · A2: GH₵3000 · B1: GH₵3000 · B2: GH₵3000. Full payment activates a 6-month contract; partial payment sets a 1-month starter contract with reminders.
           </p>
+
+          <TuitionStatusCard
+            level={selectedLevel}
+            paidAmount={Number(initialPaymentAmount) || 0}
+            balanceDue={tuitionSummary.balanceDue}
+            tuitionFee={tuitionSummary.tuitionFee}
+            paystackLink={tuitionSummary.paystackLink}
+            title="Tuition summary"
+            description={`For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. We'll mark your account as ${tuitionSummary.statusLabel.toLowerCase()} until the full balance is received.`}
+          />
 
           <label style={styles.label}>Which live class are you joining?</label>
           <select
