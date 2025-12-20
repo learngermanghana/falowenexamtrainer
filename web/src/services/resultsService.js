@@ -1,4 +1,8 @@
-import { collection, db, getDocs, query, where } from "../firebase";
+import { collection, db, doc, getDoc, getDocs, query, where } from "../firebase";
+
+const normalizeString = (value) => value?.toString().trim();
+const normalizeStudentCode = (value) => normalizeString(value)?.toLowerCase();
+const normalizeEmail = (value) => normalizeString(value)?.toLowerCase();
 
 const toNumber = (value, fallback = 0) => {
   const num = Number(value);
@@ -17,7 +21,7 @@ const loadScores = async ({ level, studentCode } = {}) => {
     const levelOptions = Array.from(
       new Set(
         [level, level?.toUpperCase(), level?.toLowerCase()]
-          .map((value) => value?.trim())
+          .map(normalizeString)
           .filter(Boolean)
       )
     );
@@ -29,10 +33,61 @@ const loadScores = async ({ level, studentCode } = {}) => {
     );
   }
   if (studentCode) {
-    constraints.push(where("studentcode", "==", studentCode.trim()));
+    const normalizedCodes = Array.from(
+      new Set(
+        [studentCode, studentCode?.toLowerCase(), studentCode?.toUpperCase()]
+          .map(normalizeString)
+          .filter(Boolean)
+      )
+    );
+
+    constraints.push(
+      normalizedCodes.length > 1
+        ? where("studentcode", "in", normalizedCodes)
+        : where("studentcode", "==", normalizedCodes[0])
+    );
   }
   const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+};
+
+const loadStudentProfile = async ({ studentCode, email } = {}) => {
+  const normalizedCode = normalizeStudentCode(studentCode);
+  const normalizedEmail = normalizeEmail(email);
+
+  if (!normalizedCode && !normalizedEmail) return null;
+
+  if (normalizedCode) {
+    const directRef = doc(db, "students", normalizedCode);
+    const directSnap = await getDoc(directRef);
+    if (directSnap.exists()) {
+      return { id: directSnap.id, ...directSnap.data() };
+    }
+
+    const studentsRef = collection(db, "students");
+    const byCodeSnap = await getDocs(query(studentsRef, where("studentCode", "==", normalizedCode)));
+    if (!byCodeSnap.empty) {
+      const first = byCodeSnap.docs[0];
+      return { id: first.id, ...first.data() };
+    }
+
+    const byLegacyCodeSnap = await getDocs(query(studentsRef, where("studentcode", "==", normalizedCode)));
+    if (!byLegacyCodeSnap.empty) {
+      const first = byLegacyCodeSnap.docs[0];
+      return { id: first.id, ...first.data() };
+    }
+  }
+
+  if (normalizedEmail) {
+    const studentsRef = collection(db, "students");
+    const byEmailSnap = await getDocs(query(studentsRef, where("email", "==", normalizedEmail)));
+    if (!byEmailSnap.empty) {
+      const first = byEmailSnap.docs[0];
+      return { id: first.id, ...first.data() };
+    }
+  }
+
+  return null;
 };
 
 const buildResults = (scores = []) => {
@@ -46,18 +101,22 @@ const buildResults = (scores = []) => {
       return aDate - bDate;
     })
     .map((row) => {
-      const key = `${row.studentcode || row.studentCode}::${row.assignment}`;
+      const normalizedCode = normalizeStudentCode(
+        row.studentcode || row.studentCode
+      ) || "";
+      const normalizedAssignment = normalizeString(row.assignment) || "Assignment";
+      const key = `${normalizedCode}::${normalizedAssignment}`;
       attemptsTracker[key] = (attemptsTracker[key] || 0) + 1;
       const attemptNumber = attemptsTracker[key];
       return {
-        assignment: row.assignment || "Assignment",
-        studentCode: row.studentcode || row.studentCode || "",
-        studentName: row.name || "",
+        assignment: normalizedAssignment,
+        studentCode: normalizeString(row.studentcode || row.studentCode) || "",
+        studentName: normalizeString(row.name) || "",
         level: (row.level || "").toUpperCase(),
-        date: row.date || row.created_at || "",
+        date: normalizeString(row.date || row.created_at) || "",
         score: toNumber(row.score, null),
-        comments: row.comments || "",
-        link: row.link || "",
+        comments: normalizeString(row.comments) || "",
+        link: normalizeString(row.link) || "",
         attempt: attemptNumber,
         isRetake: attemptNumber > 1,
       };
@@ -81,7 +140,7 @@ const summarizeResults = (rows = []) => {
     const level = row.level || "Unknown";
     perLevel[level] = (perLevel[level] || 0) + 1;
 
-    const code = (row.studentCode || "").toLowerCase();
+    const code = normalizeStudentCode(row.studentCode);
     if (code) {
       if (!students[level]) students[level] = new Set();
       students[level].add(code);
@@ -104,13 +163,17 @@ const summarizeResults = (rows = []) => {
   };
 };
 
-export const fetchResults = async ({ level, studentCode } = {}) => {
-  const scores = await loadScores({ level, studentCode });
+export const fetchResults = async ({ level, studentCode, email } = {}) => {
+  const [scores, student] = await Promise.all([
+    loadScores({ level, studentCode }),
+    loadStudentProfile({ studentCode, email }),
+  ]);
   const results = buildResults(scores);
   const summary = summarizeResults(results);
   return {
     results,
     summary,
+    student,
     fetchedAt: new Date().toISOString(),
   };
 };
