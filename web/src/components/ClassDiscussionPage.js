@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
 import { styles } from "../styles";
@@ -160,7 +160,7 @@ const ClassDiscussionPage = () => {
     );
 
     return () => unsubscribe();
-  }, [db, studentProfile?.level, studentProfile?.className]);
+  }, [studentProfile?.level, studentProfile?.className]);
 
   useEffect(() => {
     if (!db) return undefined;
@@ -197,7 +197,7 @@ const ClassDiscussionPage = () => {
     );
 
     return () => unsubscribe();
-  }, [db]);
+  }, []);
 
   useEffect(() => {
     if (!db || !studentProfile?.level || !studentProfile?.className) return undefined;
@@ -229,7 +229,7 @@ const ClassDiscussionPage = () => {
     );
 
     return () => unsubscribe();
-  }, [db, studentProfile?.level, studentProfile?.className]);
+  }, [studentProfile?.level, studentProfile?.className]);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 1000);
@@ -267,7 +267,14 @@ const ClassDiscussionPage = () => {
     };
 
     ensureStatuses();
-  }, [threads, now, db, studentProfile?.level, studentProfile?.className]);
+  }, [
+    getThreadDocRef,
+    resolveStatus,
+    studentProfile?.className,
+    studentProfile?.level,
+    threads,
+    now,
+  ]);
 
   useEffect(() => () => {
     Object.values(typingTimeouts.current).forEach((timeoutId) => clearTimeout(timeoutId));
@@ -275,21 +282,27 @@ const ClassDiscussionPage = () => {
 
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
 
-  const resolveStatus = (thread) => {
-    if (!thread) return "open";
-    if (thread.status === "archived") return "archived";
-    if (thread.status === "expired") return "expired";
-    if (thread.expiresAt && thread.expiresAt <= now) return "expired";
-    return "open";
-  };
+  const resolveStatus = useCallback(
+    (thread) => {
+      if (!thread) return "open";
+      if (thread.status === "archived") return "archived";
+      if (thread.status === "expired") return "expired";
+      if (thread.expiresAt && thread.expiresAt <= now) return "expired";
+      return "open";
+    },
+    [now]
+  );
 
-  const getThreadDocRef = (thread) => {
-    if (!db || !thread?.id) return null;
-    const level = thread.level || studentProfile?.level;
-    const className = thread.className || studentProfile?.className;
-    if (!level || !className) return null;
-    return doc(postsCollectionRef(level, className), thread.id);
-  };
+  const getThreadDocRef = useCallback(
+    (thread) => {
+      if (!db || !thread?.id) return null;
+      const level = thread.level || studentProfile?.level;
+      const className = thread.className || studentProfile?.className;
+      if (!level || !className) return null;
+      return doc(postsCollectionRef(level, className), thread.id);
+    },
+    [studentProfile?.className, studentProfile?.level]
+  );
 
   useEffect(() => {
     if (!form.lessonId && lessonOptions.length > 0) {
@@ -578,7 +591,7 @@ const ClassDiscussionPage = () => {
         status: resolveStatus(thread),
         replies: repliesByThread[thread.id] || [],
       })),
-    [threads, repliesByThread, now]
+    [threads, repliesByThread, resolveStatus]
   );
 
   const renderThread = (thread) => {

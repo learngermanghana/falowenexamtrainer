@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import {
   auth,
   createUserWithEmailAndPassword,
@@ -18,7 +18,6 @@ import {
   isFirebaseConfigured,
   deleteField,
 } from "../firebase";
-import { generateStudentCode } from "../services/studentCode";
 
 const AuthContext = createContext();
 
@@ -41,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const [notificationStatus, setNotificationStatus] = useState("idle");
   const [messagingToken, setMessagingToken] = useState(null);
 
-  const persistMessagingToken = async (token, studentId) => {
+  const persistMessagingToken = useCallback(async (token, studentId) => {
     if (!studentId || !token) return;
     const studentRef = doc(db, "students", studentId);
     await setDoc(
@@ -52,9 +51,9 @@ export const AuthProvider = ({ children }) => {
     setStudentProfile((prev) =>
       prev?.id === studentId ? { ...prev, messagingToken: token } : prev
     );
-  };
+  }, []);
 
-  const revokeMessagingToken = async (studentId) => {
+  const revokeMessagingToken = useCallback(async (studentId) => {
     if (!studentId) return;
     const studentRef = doc(db, "students", studentId);
     await updateDoc(studentRef, {
@@ -66,7 +65,7 @@ export const AuthProvider = ({ children }) => {
         ? { ...prev, messagingToken: undefined }
         : prev
     );
-  };
+  }, []);
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
@@ -248,7 +247,7 @@ export const AuthProvider = ({ children }) => {
 
     refreshMessagingToken();
     // Only re-run when a new user or profile is loaded to avoid repeated token prompts.
-  }, [user?.uid, studentProfile?.id]);
+  }, [isFirebaseConfigured, persistMessagingToken, requestMessagingToken, studentProfile, user]);
 
   const saveStudentProfile = async (updates) => {
     if (!studentProfile?.id) {
@@ -290,6 +289,8 @@ export const AuthProvider = ({ children }) => {
       messagingToken,
       notificationStatus,
       saveStudentProfile,
+      enableNotifications,
+      logout,
     ]
   );
 
