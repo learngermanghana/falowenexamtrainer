@@ -157,22 +157,14 @@ const ensureNotificationPermission = async () => {
   }
 
   if (Notification.permission === "denied") {
-    throw new Error(
-      "Notifications are blocked for this site. Please enable them in your browser settings."
-    );
+    return "denied";
   }
 
   if (Notification.permission === "granted") {
     return "granted";
   }
 
-  const permission = await Notification.requestPermission();
-
-  if (permission !== "granted") {
-    throw new Error("Notification permission was not granted.");
-  }
-
-  return permission;
+  return Notification.requestPermission();
 };
 
 const requestMessagingToken = async (shouldRetry = true) => {
@@ -182,7 +174,10 @@ const requestMessagingToken = async (shouldRetry = true) => {
     throw new Error("Browser does not support Firebase Cloud Messaging.");
   }
 
-  await ensureNotificationPermission();
+  const permission = await ensureNotificationPermission();
+  if (permission !== "granted") {
+    return null;
+  }
 
   const messaging = getMessaging(app);
   const vapidKey = process.env.REACT_APP_FIREBASE_VAPID_KEY;
