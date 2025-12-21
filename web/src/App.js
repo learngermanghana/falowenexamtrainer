@@ -12,6 +12,7 @@ import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import ChatBuddyPage from "./components/ChatBuddyPage";
 import LetterPracticePage from "./components/LetterPracticePage";
+import WritingPage from "./components/WritingPage";
 import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
@@ -468,7 +469,7 @@ const ExamArea = ({ onBack }) => {
       </div>
 
       {examSection === "speaking" ? <SpeakingRoom /> : null}
-      {examSection === "writing" ? <LetterPracticePage mode="exams" /> : null}
+      {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
     </>
   );
