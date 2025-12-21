@@ -66,6 +66,8 @@ const CourseTab = ({ defaultLevel }) => {
     if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
     return levels[0] || "";
   });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [assignmentsOnly, setAssignmentsOnly] = useState(false);
 
   useEffect(() => {
     const normalizedDefault = normalizeLevel(defaultLevel);
@@ -80,40 +82,96 @@ const CourseTab = ({ defaultLevel }) => {
 
   const schedule = useMemo(() => courseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
 
+  const filteredSchedule = useMemo(() => {
+    const normalizedTerm = searchTerm.trim().toLowerCase();
+
+    const matchesSearch = (entry) => {
+      if (!normalizedTerm) return true;
+      const dayMatches = `${entry.day}`.includes(normalizedTerm);
+      const topicMatches = (entry.topic || "").toLowerCase().includes(normalizedTerm);
+      const chapterMatches = (entry.chapter || "").toLowerCase().includes(normalizedTerm);
+      const grammarMatches = (entry.grammar_topic || "").toLowerCase().includes(normalizedTerm);
+
+      return dayMatches || topicMatches || chapterMatches || grammarMatches;
+    };
+
+    const hasAssignment = (entry) => {
+      if (entry.assignment) return true;
+
+      const toArray = (value) =>
+        Array.isArray(value) ? value : value ? [value] : [];
+
+      return (
+        toArray(entry.lesen_hören).some((lesson) => lesson.assignment) ||
+        toArray(entry.schreiben_sprechen).some((lesson) => lesson.assignment)
+      );
+    };
+
+    return schedule.filter((entry) => matchesSearch(entry) && (!assignmentsOnly || hasAssignment(entry)));
+  }, [schedule, searchTerm, assignmentsOnly]);
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 12 }}>
         <div
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            gap: 10,
-            alignItems: "center",
-            flexWrap: "wrap",
+            display: "grid",
+            gap: 12,
           }}
         >
-          <h2 style={styles.sectionTitle}>Course Book</h2>
-          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <span style={styles.helperText}>Course level:</span>
-            <select
-              style={styles.select}
-              value={selectedCourseLevel}
-              onChange={(e) => setSelectedCourseLevel(e.target.value)}
-            >
-              {levels.map((level) => (
-                <option key={level} value={level}>
-                  {level}
-                </option>
-              ))}
-            </select>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              gap: 10,
+              alignItems: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            <h2 style={styles.sectionTitle}>Course Book</h2>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <span style={styles.helperText}>Course level:</span>
+              <select
+                style={styles.select}
+                value={selectedCourseLevel}
+                onChange={(e) => setSelectedCourseLevel(e.target.value)}
+              >
+                {levels.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            <label style={{ display: "grid", gap: 6 }}>
+              <span style={styles.helperText}>Search by day, topic, or grammar focus</span>
+              <input
+                style={{ ...styles.input, width: "100%" }}
+                placeholder="e.g., Day 4 or Pronouns"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="checkbox"
+                checked={assignmentsOnly}
+                onChange={(e) => setAssignmentsOnly(e.target.checked)}
+              />
+              <span style={styles.helperText}>Show only items with assignments</span>
+            </label>
           </div>
         </div>
         <p style={styles.helperText}>
-          Pulling content from the course dictionary. Select a level to see its full day-by-day plan.
+          Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the
+          assignment filter to jump straight to what you need.
         </p>
 
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-          {schedule.map((entry) => {
+          {filteredSchedule.map((entry) => {
             const lesenHorenList = Array.isArray(entry.lesen_hören)
               ? entry.lesen_hören
               : entry.lesen_hören
@@ -168,6 +226,11 @@ const CourseTab = ({ defaultLevel }) => {
               </div>
             );
           })}
+          {!filteredSchedule.length ? (
+            <div style={{ ...styles.card, marginBottom: 0 }}>
+              <p style={{ margin: 0 }}>No course days match your filters. Try another search term or turn off the assignment filter.</p>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>
