@@ -20,6 +20,7 @@ import StudentResultsPage from "./components/StudentResultsPage";
 import GeneralHome from "./components/GeneralHome";
 import SpeakingRoom from "./components/SpeakingRoom";
 import ExamResources from "./components/ExamResources";
+import NotificationBell from "./components/NotificationBell";
 
 const TAB_STRUCTURE = [
   {
@@ -255,6 +256,7 @@ const AppShell = ({
           <HealthIndicator />
           <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <NotificationBell notificationStatus={notificationStatus} />
             <button
               style={notificationStatus === "granted" ? styles.secondaryButton : styles.primaryButton}
               onClick={handleEnableNotifications}
@@ -277,6 +279,11 @@ const AppShell = ({
           ) : notificationStatus === "blocked" ? (
             <div style={{ fontSize: 12, color: "#b91c1c" }}>
               Notifications are blocked in your browser settings.
+            </div>
+          ) : notificationStatus !== "granted" ? (
+            <div style={{ fontSize: 12, color: "#1f2937" }}>
+              Tip: click “Enable push alerts” once per browser after signing in so new scores and attendance can reach this
+              device.
             </div>
           ) : null}
         </div>
