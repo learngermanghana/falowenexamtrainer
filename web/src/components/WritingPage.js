@@ -44,7 +44,7 @@ const WritingPage = ({ mode = "course" }) => {
     loading,
     setLoading,
   } = useExam();
-  const { user, idToken } = useAuth();
+  const { user, idToken, studentProfile } = useAuth();
   const userId = user?.uid;
   const isExamMode = mode === "exam";
 
@@ -77,6 +77,14 @@ const WritingPage = ({ mode = "course" }) => {
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
+  const profileLevel = (studentProfile?.level || "").toUpperCase();
+  const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+
+  useEffect(() => {
+    if (isLevelLocked && profileLevel !== level) {
+      setLevel(profileLevel);
+    }
+  }, [isLevelLocked, level, profileLevel, setLevel]);
 
   useEffect(() => {
     let isMounted = true;
@@ -421,7 +429,12 @@ const WritingPage = ({ mode = "course" }) => {
             </p>
 
             <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
-              <label style={styles.label}>Level for feedback</label>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <label style={styles.label}>Level for feedback</label>
+                {isLevelLocked && (
+                  <span style={styles.badge}>Aus Profil</span>
+                )}
+              </div>
               <select
                 value={level}
                 onChange={(e) => {
@@ -429,6 +442,7 @@ const WritingPage = ({ mode = "course" }) => {
                   setError("");
                 }}
                 style={styles.select}
+                disabled={isLevelLocked}
               >
                 {ALLOWED_LEVELS.map((option) => (
                   <option key={option}>{option}</option>
