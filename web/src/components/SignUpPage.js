@@ -31,6 +31,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
   );
+  const [hasConsented, setHasConsented] = useState(false);
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
@@ -48,6 +49,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const passwordError = "Passwords do not match.";
       setAuthError(passwordError);
       showToast(passwordError, "error");
+      return;
+    }
+
+    if (!hasConsented) {
+      const consentMessage = "Please agree to the terms and privacy policy to continue.";
+      setAuthError(consentMessage);
+      showToast(consentMessage, "error");
       return;
     }
 
@@ -209,6 +217,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder="0176 12345678"
           />
 
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            We keep your phone number on file to contact you directly when necessary. Your emergency contact is only
+            notified in urgent safety situations.
+          </p>
+
           <label style={styles.label}>Location</label>
           <input
             type="text"
@@ -279,6 +292,40 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             Wir hinterlegen deinen Kurs im Profil und erstellen den Kalender-Export mit Zoom-Link.
           </p>
+
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
+            <input
+              type="checkbox"
+              checked={hasConsented}
+              onChange={(event) => setHasConsented(event.target.checked)}
+              required
+              style={{ width: 18, height: 18 }}
+            />
+            <span>
+              I agree to the
+              {" "}
+              <a
+                href="https://register.falowen.app/#terms-of-service"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#1d4ed8", fontWeight: 600 }}
+              >
+                terms
+              </a>
+              {" "}
+              and
+              {" "}
+              <a
+                href="https://register.falowen.app/#privacy-policy"
+                target="_blank"
+                rel="noreferrer"
+                style={{ color: "#1d4ed8", fontWeight: 600 }}
+              >
+                privacy policy
+              </a>
+              .
+            </span>
+          </label>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading ? "Creating ..." : "Sign up now"}
