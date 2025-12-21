@@ -56,10 +56,26 @@ function getServiceAccountFromEnv() {
 
 async function getSheetsClient() {
   const sa = getServiceAccountFromEnv();
+  const projectId =
+    sa.project_id ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    process.env.GCLOUD_PROJECT ||
+    (process.env.FIREBASE_CONFIG
+      ? (() => {
+          try {
+            const cfg = JSON.parse(process.env.FIREBASE_CONFIG);
+            return cfg.projectId || null;
+          } catch (e) {
+            return null;
+          }
+        })()
+      : null);
+
   const auth = new google.auth.JWT({
     email: sa.client_email,
     key: sa.private_key,
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    projectId,
   });
 
   const sheets = google.sheets({ version: "v4", auth });
