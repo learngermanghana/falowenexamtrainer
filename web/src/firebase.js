@@ -3,6 +3,8 @@ import {
   getAuth,
   onIdTokenChanged,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
@@ -225,6 +227,8 @@ export {
   isFirebaseConfigured,
   onIdTokenChanged,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   requestMessagingToken,

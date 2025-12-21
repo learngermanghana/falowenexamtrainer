@@ -3,6 +3,8 @@ import {
   auth,
   createUserWithEmailAndPassword,
   onIdTokenChanged,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
   requestMessagingToken,
@@ -151,9 +153,11 @@ export const AuthProvider = ({ children }) => {
     }
 
     await setDoc(studentsRef, payload, { merge: true });
+    await sendEmailVerification(credential.user);
+    await signOut(auth);
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
-    return credential;
+    return { verificationRequired: true };
   };
 
   const login = async (email, password) => {
@@ -162,12 +166,32 @@ export const AuthProvider = ({ children }) => {
     }
     setAuthError("");
     const credential = await signInWithEmailAndPassword(auth, email, password);
+    if (!credential.user.emailVerified) {
+      await sendEmailVerification(credential.user);
+      await signOut(auth);
+      const error = new Error(
+        "Please verify your email address before logging in. We've re-sent the verification link."
+      );
+      error.code = "auth/email-not-verified";
+      error.email = credential.user.email;
+      throw error;
+    }
     const token = await credential.user.getIdToken();
     setIdToken(token);
     const profile = await fetchStudentProfileByEmail(email);
     setStudentProfile(profile);
     setMessagingToken(profile?.messagingToken || null);
     return credential;
+  };
+
+  const resetPassword = async (email) => {
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
+    }
+    if (!email) {
+      throw new Error("Please enter your email address to reset the password.");
+    }
+    await sendPasswordResetEmail(auth, email.toLowerCase());
   };
 
   const logout = useCallback(
@@ -295,6 +319,7 @@ export const AuthProvider = ({ children }) => {
       setAuthError,
       signup,
       login,
+      resetPassword,
       logout,
       enableNotifications,
       messagingToken,
@@ -307,6 +332,7 @@ export const AuthProvider = ({ children }) => {
       idToken,
       loading,
       authError,
+      resetPassword,
       messagingToken,
       notificationStatus,
       saveStudentProfile,
