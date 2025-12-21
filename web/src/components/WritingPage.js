@@ -54,7 +54,7 @@ const WritingPage = ({ mode = "course" }) => {
   );
 
   const [activeTab, setActiveTab] = useState("practice");
-  const [writingTasks, setWritingTasks] = useState(
+  const [writingTasks, setWritingTasks] = useState(() =>
     isExamMode ? examWritingLetters : courseWritingLetters
   );
   const [writingTasksLoading, setWritingTasksLoading] = useState(!isExamMode);
@@ -66,12 +66,22 @@ const WritingPage = ({ mode = "course" }) => {
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
-  const [selectedLetterId, setSelectedLetterId] = useState(
-    (isExamMode ? examWritingLetters : courseWritingLetters)[0]?.id || ""
-  );
+  const [selectedLetterId, setSelectedLetterId] = useState(() => {
+    const initialList = isExamMode
+      ? examWritingLetters.filter((task) => task.level === level)
+      : courseWritingLetters;
+    return initialList[0]?.id || "";
+  });
+  const visibleWritingTasks = useMemo(() => {
+    if (isExamMode) {
+      return writingTasks.filter((task) => task.level === level);
+    }
+
+    return writingTasks;
+  }, [isExamMode, level, writingTasks]);
   const selectedLetter = useMemo(
-    () => writingTasks.find((item) => item.id === selectedLetterId),
-    [selectedLetterId, writingTasks]
+    () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
+    [selectedLetterId, visibleWritingTasks]
   );
   const [remainingSeconds, setRemainingSeconds] = useState(
     (selectedLetter?.durationMinutes || 0) * 60
@@ -135,11 +145,14 @@ const WritingPage = ({ mode = "course" }) => {
   }, [examWritingLetters, idToken, isExamMode]);
 
   useEffect(() => {
-    if (!writingTasks.length) return;
-    if (!selectedLetterId || !writingTasks.some((item) => item.id === selectedLetterId)) {
-      setSelectedLetterId(writingTasks[0].id);
+    if (!visibleWritingTasks.length) return;
+    if (
+      !selectedLetterId ||
+      !visibleWritingTasks.some((item) => item.id === selectedLetterId)
+    ) {
+      setSelectedLetterId(visibleWritingTasks[0].id);
     }
-  }, [selectedLetterId, writingTasks]);
+  }, [selectedLetterId, visibleWritingTasks]);
 
   useEffect(() => {
     if (selectedLetter) {
@@ -344,13 +357,14 @@ const WritingPage = ({ mode = "course" }) => {
             )}
             {writingTasksLoading ? (
               <p style={styles.helperText}>Lade Schreibaufgaben aus dem Sheet ...</p>
-            ) : writingTasks.length === 0 ? (
+            ) : visibleWritingTasks.length === 0 ? (
               <p style={styles.helperText}>
-                Keine Schreibaufgaben verfügbar. Bitte versuche es später erneut.
+                Keine Schreibaufgaben für dieses Niveau verfügbar. Bitte passe dein
+                Level an oder versuche es später erneut.
               </p>
             ) : (
               <div style={styles.gridTwo}>
-                {writingTasks.map((item) => (
+                {visibleWritingTasks.map((item) => (
                   <div
                     key={item.id}
                     style={{
