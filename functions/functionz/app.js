@@ -158,8 +158,7 @@ async function auditAIRequest({ route, uid, email, metadata = {}, success = true
 async function requireAuthenticatedUser(req, res) {
   const authedUser = await getAuthedUser(req);
   if (!authedUser?.uid) {
-    res.status(401).json({ error: "Authentication is required for this action" });
-    return null;
+    return { uid: "guest", email: null, isGuest: true };
   }
 
   return authedUser;
