@@ -85,23 +85,64 @@ function hashAttemptKey(obj) {
   return crypto.createHash("sha1").update(base).digest("hex").slice(0, 12);
 }
 
-async function initFirestore(serviceAccountPath) {
-  const raw = fs.readFileSync(serviceAccountPath, "utf8");
-  const serviceAccount = JSON.parse(raw);
+function loadServiceAccount() {
+  const svcPath =
+    process.env.GOOGLE_SERVICE_ACCOUNT_FILE ||
+    process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+    "";
+
+  const b64 =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 ||
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
+
+  const raw =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+
+  let source = "";
+  let serviceAccount = null;
+  if (raw) {
+    serviceAccount = JSON.parse(raw);
+    source = "GOOGLE_SERVICE_ACCOUNT_JSON";
+  } else if (b64) {
+    serviceAccount = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
+    source = "GOOGLE_SERVICE_ACCOUNT_JSON_B64";
+  } else if (svcPath) {
+    const absKey = path.isAbsolute(svcPath) ? svcPath : path.resolve(process.cwd(), svcPath);
+    serviceAccount = JSON.parse(fs.readFileSync(absKey, "utf8"));
+    source = absKey;
+  }
+
+  if (!serviceAccount) {
+    throw new Error(
+      "Provide Firebase service account JSON via GOOGLE_SERVICE_ACCOUNT_JSON(_B64) or GOOGLE_SERVICE_ACCOUNT_FILE/GOOGLE_APPLICATION_CREDENTIALS."
+    );
+  }
+
+  if (serviceAccount?.private_key) {
+    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+  }
+
+  return { serviceAccount, source };
+}
+
+async function initFirestore(serviceAccount) {
+  const projectId =
+    process.env.FIREBASE_PROJECT_ID ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    process.env.GCLOUD_PROJECT ||
+    serviceAccount.project_id;
 
   if (!admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
+      projectId,
     });
   }
   const db = admin.firestore();
-  return { db, projectId: serviceAccount.project_id, clientEmail: serviceAccount.client_email };
+  return { db, projectId, clientEmail: serviceAccount.client_email };
 }
 
-async function initSheetsJwt(serviceAccountPath) {
-  const raw = fs.readFileSync(serviceAccountPath, "utf8");
-  const creds = JSON.parse(raw);
-
+async function initSheetsJwt(creds) {
   const jwt = new google.auth.JWT({
     email: creds.client_email,
     key: creds.private_key,
@@ -113,30 +154,19 @@ async function initSheetsJwt(serviceAccountPath) {
 }
 
 async function main() {
-  const serviceAccountFile =
-    process.env.GOOGLE_SERVICE_ACCOUNT_FILE ||
-    process.env.GOOGLE_APPLICATION_CREDENTIALS;
-
-  if (!serviceAccountFile) {
-    throw new Error(
-      "Set GOOGLE_SERVICE_ACCOUNT_FILE (or GOOGLE_APPLICATION_CREDENTIALS) to your Firebase service account JSON path."
-    );
-  }
+  const { serviceAccount, source } = loadServiceAccount();
 
   const sheetId = requireEnv("GOOGLE_SHEETS_ID");
   const range = requireEnv("GOOGLE_SHEETS_RANGE");
   const collectionName = process.env.FIRESTORE_COLLECTION || "scores";
   const scanLimit = Number(process.env.SCAN_LIMIT || "5000");
 
-  const absKey = path.isAbsolute(serviceAccountFile)
-    ? serviceAccountFile
-    : path.resolve(process.cwd(), serviceAccountFile);
-
-  const { db, projectId, clientEmail } = await initFirestore(absKey);
-  const sheets = await initSheetsJwt(absKey);
+  const { db, projectId, clientEmail } = await initFirestore(serviceAccount);
+  const sheets = await initSheetsJwt(serviceAccount);
 
   console.log("Firestore project:", projectId);
   console.log("Service account:", clientEmail);
+  console.log("Service account source:", source || "(unknown)");
   console.log("Firestore collection:", collectionName);
   console.log("Sheet ID:", sheetId);
   console.log("Sheet range:", range);
