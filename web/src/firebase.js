@@ -151,12 +151,38 @@ const assertFirebaseReady = () => {
   }
 };
 
+const ensureNotificationPermission = async () => {
+  if (typeof window === "undefined" || typeof Notification === "undefined") {
+    return "unsupported";
+  }
+
+  if (Notification.permission === "denied") {
+    throw new Error(
+      "Notifications are blocked for this site. Please enable them in your browser settings."
+    );
+  }
+
+  if (Notification.permission === "granted") {
+    return "granted";
+  }
+
+  const permission = await Notification.requestPermission();
+
+  if (permission !== "granted") {
+    throw new Error("Notification permission was not granted.");
+  }
+
+  return permission;
+};
+
 const requestMessagingToken = async (shouldRetry = true) => {
   assertFirebaseReady();
   const supported = await isSupported().catch(() => false);
   if (!supported) {
     throw new Error("Browser does not support Firebase Cloud Messaging.");
   }
+
+  await ensureNotificationPermission();
 
   const messaging = getMessaging(app);
   const vapidKey = process.env.REACT_APP_FIREBASE_VAPID_KEY;
@@ -165,6 +191,12 @@ const requestMessagingToken = async (shouldRetry = true) => {
   }
 
   const serviceWorkerRegistration = await registerMessagingServiceWorker();
+
+  if (!serviceWorkerRegistration) {
+    throw new Error(
+      "Push notifications require a registered service worker. Please use HTTPS or localhost."
+    );
+  }
 
   try {
     return await getToken(messaging, {
