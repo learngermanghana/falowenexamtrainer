@@ -1,6 +1,7 @@
 import React from "react";
 import { styles } from "../styles";
 import { computeTuitionStatus, paystackLinkForLevel } from "../data/levelFees";
+import { isPaymentsEnabled } from "../lib/featureFlags";
 
 const STATUS_TONES = {
   Paid: { background: "#ecfdf3", borderColor: "#22c55e", color: "#166534" },
@@ -26,6 +27,7 @@ const TuitionStatusCard = ({
     description ||
     `${summary.statusCopy}. ${summary.tuitionFee ? `Tuition for ${levelCopy} is GH₵${summary.tuitionFee}.` : "Tuition not set yet."}`;
   const checkoutLink = paystackLink || paystackLinkForLevel(level);
+  const paymentsEnabled = isPaymentsEnabled();
 
   return (
     <div style={{ ...styles.card, margin: 0 }} data-testid="tuition-status-card">
@@ -56,19 +58,35 @@ const TuitionStatusCard = ({
           <span>Balance remaining</span>
           <span style={metaValueStyle}>{summary.balanceDue ? `GH₵${summary.balanceDue}` : "GH₵0"}</span>
         </div>
-        <a
-          href={checkoutLink}
-          style={{
-            ...styles.primaryButton,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 10,
-            textDecoration: "none",
-          }}
-        >
-          Pay with Paystack
-        </a>
+        {paymentsEnabled ? (
+          <a
+            href={checkoutLink}
+            style={{
+              ...styles.primaryButton,
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              textDecoration: "none",
+            }}
+          >
+            Pay with Paystack
+          </a>
+        ) : (
+          <div
+            style={{
+              ...styles.errorBox,
+              background: "#f1f5f9",
+              borderColor: "#cbd5e1",
+              color: "#0f172a",
+            }}
+          >
+            <strong>Payments are only available on the web app.</strong>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+              Please sign in from the website to complete tuition payments via Paystack.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

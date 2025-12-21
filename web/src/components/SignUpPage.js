@@ -9,9 +9,11 @@ import { classCatalog } from "../data/classCatalog";
 import { computeTuitionStatus } from "../data/levelFees";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import TuitionStatusCard from "./TuitionStatusCard";
+import { isPaymentsEnabled } from "../lib/featureFlags";
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
+  const paymentsEnabled = isPaymentsEnabled();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -84,8 +86,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
           ? "6-month contract activated"
           : "1-month starter contract set with reminder";
       const balanceText = balanceDue > 0 ? ` Balance due: GH₵${balanceDue}.` : "";
+      const paymentInstruction = paymentsEnabled
+        ? ` Pay via Paystack: ${paystackLink}.`
+        : " Payments are handled on the web app only. Please sign in online to complete your tuition.";
       setMessage(
-        `Account created! Your student code is ${studentCode}. ${contractLabel}. Pay via Paystack: ${paystackLink}.${balanceText}`
+        `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${balanceText}`
       );
     } catch (error) {
       console.error(error);
