@@ -5,9 +5,11 @@ import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { generateStudentCode } from "../services/studentCode";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { savePreferredLevel } from "../services/levelStorage";
+import { useToast } from "../context/ToastContext";
 
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, authError, setAuthError, resetPassword } = useAuth();
+  const { showToast } = useToast();
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -42,8 +44,12 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         });
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
-        setMessage(
-          `Account created! Your student code is ${studentCode}. Please verify your email to log in.`
+        const successMessage =
+          `Account created! Your student code is ${studentCode}. Please verify your email to log in.`;
+        setMessage(successMessage);
+        showToast(
+          `${successMessage} Check your inbox for a verification link from Falowen.`,
+          "success"
         );
         if (result?.verificationRequired) {
           setMode("login");
@@ -58,11 +64,11 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         if (level) {
           savePreferredLevel(level);
         }
-        setMessage(
-          credential?.migratedFromLegacy
-            ? "We found your old account. Your new password is now saved."
-            : "Welcome back!"
-        );
+        const loginMessage = credential?.migratedFromLegacy
+          ? "We found your old account. Your new password is now saved."
+          : "Welcome back!";
+        setMessage(loginMessage);
+        showToast(loginMessage, "success");
       }
     } catch (error) {
       console.error(error);
@@ -71,14 +77,20 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         error?.code === "auth/email-verification-required"
       ) {
         setAuthError("");
-        setMessage(error.message || "Please verify your email address.");
+        const verificationMessage =
+          error.message || "Please verify your email address.";
+        setMessage(verificationMessage);
+        showToast(
+          `${verificationMessage} Check your inbox for the Falowen verification email.`,
+          "info"
+        );
         if (error?.code === "auth/email-verification-required") {
           setMode("login");
         }
       } else {
-        setAuthError(
-          error?.message || "Login failed. Please try again."
-        );
+        const errorMessage = error?.message || "Login failed. Please try again.";
+        setAuthError(errorMessage);
+        showToast(errorMessage, "error");
         setMessage("");
       }
     } finally {
@@ -92,10 +104,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     setAuthError("");
     try {
       await resetPassword(email);
-      setMessage("Password reset email sent. Please check your inbox.");
+      const resetMessage = "Password reset email sent. Please check your inbox.";
+      setMessage(resetMessage);
+      showToast(resetMessage, "info");
     } catch (error) {
       console.error(error);
-      setAuthError(error?.message || "Could not send password reset email.");
+      const errorMessage =
+        error?.message || "Could not send password reset email.";
+      setAuthError(errorMessage);
+      showToast(errorMessage, "error");
     } finally {
       setResetting(false);
     }
@@ -126,7 +143,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         {mode === "login" && (
           <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
             <p style={{ ...styles.helperText, marginBottom: 4 }}>
-              Returning student from Firebase? Use your existing email and choose a new password. We'll import your profile automatically.
+              Returning Falowen student? Use your existing email and choose a new password. We'll import your profile automatically.
             </p>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
               New student? Switch to "Create account" and sign up normally.
