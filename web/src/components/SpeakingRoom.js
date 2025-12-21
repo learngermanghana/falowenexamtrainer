@@ -7,97 +7,97 @@ const levels = ["A1", "A2", "B1", "B2", "C1"];
 const teilGuidance = {
   A1: {
     "Teil 1": {
-      title: "Kurzvorstellung (Name, Herkunft, Wohnort, Arbeit/Studium)",
+      title: "Short introduction (name, origin, city, work/study)",
       description:
-        "Stelle dich kurz vor. Wiederhole deinen Namen, wo du wohnst, was du machst und 1–2 Hobbys, damit die KI deine Aussprache und Klarheit bewerten kann.",
+        "Introduce yourself briefly. Repeat your name, where you live, what you do, and 1–2 hobbies so the AI can judge pronunciation and clarity.",
       steps: [
-        "Aufnahme starten, laut sprechen und ca. 30–45 Sekunden bleiben.",
-        "Nenne Name, Alter, Wohnort, Herkunft, Beruf/Studium und ein Hobby.",
-        "Beende die Aufnahme und höre sie dir noch einmal an. Wiederhole mit kleinen Variationen.",
+        "Start recording, speak clearly, and keep it to about 30–45 seconds.",
+        "Say your name, age, city, origin, job/studies, and one hobby.",
+        "Stop the clip, listen back, then repeat with small variations.",
       ],
     },
     "Teil 2": {
-      title: "Fragen stellen und beantworten (Thema + Stichwort)",
+      title: "Ask and answer questions (topic + keyword)",
       description:
-        "Wähle ein Thema und das Stichwort darunter. Stelle 2–3 einfache Fragen dazu, beantworte sie selbst laut und lass die KI mitmarken.",
+        "Choose a topic and its keyword. Ask 2–3 simple questions, answer them aloud yourself, and let the AI score you.",
       steps: [
-        "Klicke Aufnahme, stelle eine W-Frage und antworte kurz (z. B. Thema Uhr → Frage: Wann öffnet…?).",
-        "Baue einfache Ja/Nein-Fragen ein und beantworte sie ebenfalls.",
-        "Stoppen, anhören und erneut üben mit einer neuen Frage.",
+        "Click record, ask a WH-question, and answer briefly (e.g., topic: time → question: When does it open?).",
+        "Add simple yes/no questions and answer those too.",
+        "Stop, listen back, and practise again with a new question.",
       ],
     },
     "Teil 3": {
-      title: "Um etwas bitten oder eine Bitte ablehnen", 
+      title: "Make a request or politely decline",
       description:
-        "Formuliere höfliche Bitten oder kleine Planungen (z. B. um Hilfe bitten, um einen Termin fragen). Nutze Modalverben wie können/möchten und ein kurzes weil als Begründung.",
+        "Phrase polite requests or small plans (e.g., ask for help, ask for an appointment). Use modal verbs like can/would like and a short because to justify.",
       steps: [
-        "Starte Aufnahme, nenne kurz die Situation und formuliere deine Bitte.",
-        "Schlage eine Zeit/Option vor und reagiere mit Zustimmung oder höflicher Ablehnung.",
-        "Stoppen, anhören und dieselbe Bitte mit anderer Option wiederholen.",
+        "Start recording, briefly name the situation, and state your request.",
+        "Propose a time/option and respond with agreement or a polite no.",
+        "Stop, listen, and repeat the same request with a different option.",
       ],
     },
   },
   A2: {
     "Teil 1": {
-      title: "Thema wählen und über dich erzählen",
+      title: "Pick a topic and talk about yourself",
       description:
-        "Suche dir ein Thema (z. B. Reise, Alltag, Arbeit) und sprich 1–2 Minuten darüber. Fokus: du selbst, kurze Beispiele, ein Gefühl oder eine Meinung.",
+        "Choose a topic (e.g., travel, daily life, work) and speak for 1–2 minutes. Focus on yourself, short examples, a feeling, or an opinion.",
       steps: [
-        "Aufnahme starten und 3 Punkte nennen: kurze Einleitung, 2 Details, Abschluss.",
-        "Nutze weil/dass für einfache Begründungen.",
-        "Stoppen, anhören, ein neues Detail ergänzen und erneut aufnehmen.",
+        "Start recording and cover three points: short intro, two details, conclusion.",
+        "Use because/that for simple reasons.",
+        "Stop, listen back, add one new detail, and record again.",
       ],
     },
     "Teil 2": {
-      title: "Fragen beantworten und Rückfragen stellen",
+      title: "Answer a question and add a follow-up",
       description:
-        "Reagiere auf eine Frage zum Thema und stelle selbst eine passende Rückfrage. Halte die Sätze verbunden und klar.",
+        "Respond to a question about the topic and ask your own follow-up. Keep sentences connected and clear.",
       steps: [
-        "Starte Aufnahme, beantworte die Leitfrage mit 2–3 Sätzen.",
-        "Stelle danach eine eigene Rückfrage zum gleichen Thema und beantworte sie kurz.",
-        "Stoppen und prüfen, ob Frageformen und Verbposition stimmen.",
+        "Start recording and answer the main question in 2–3 sentences.",
+        "Then ask a related follow-up question and answer it briefly.",
+        "Stop and check if your question forms and verb positions are correct.",
       ],
     },
     "Teil 3": {
-      title: "Einen Termin/Plan mit jemandem abstimmen",
+      title: "Agree on a time/plan with someone",
       description:
-        "Plane etwas gemeinsam (Treffen, Essen, Sport). Mache Vorschläge, höre auf Konflikte und treffe eine Entscheidung.",
+        "Plan something together (meeting, meal, sport). Make suggestions, notice conflicts, and reach a decision.",
       steps: [
-        "Aufnahme starten, zwei Termine/Optionen vorschlagen.",
-        "Sage, welche Option besser passt und warum.",
-        "Stoppen, anhören und die Planung mit einer Bestätigung abschließen.",
+        "Start recording and propose two times/options.",
+        "State which option works better and why.",
+        "Stop, listen, and finish the plan with a clear confirmation.",
       ],
     },
   },
   B1: {
     "Teil 1": {
-      title: "Kurze Präsentation zu einem Alltagsthema",
+      title: "Short presentation on an everyday topic",
       description:
-        "Gib eine Mini-Präsentation (Einleitung, 2–3 Punkte, Meinung, Abschluss). Wähle ein Stichwort und nutze Beispiele.",
+        "Give a mini-presentation (intro, 2–3 points, opinion, ending). Choose a keyword and use examples.",
       steps: [
-        "Aufnahme starten, klar gliedern: Einstieg → Punkte → Meinung.",
-        "Nutze Verknüpfungen (erstens, außerdem, deshalb).",
-        "Stoppen, anhören und Schwachstellen (Aussprache, Wortwahl) notieren.",
+        "Start recording and structure clearly: opening → points → opinion.",
+        "Use connectors (firstly, also, therefore).",
+        "Stop, listen, and note weak spots (pronunciation, word choice).",
       ],
     },
     "Teil 2": {
-      title: "Fragen zur Präsentation beantworten",
+      title: "Answer questions about the presentation",
       description:
-        "Simuliere Rückfragen: fasse die Frage kurz zusammen, stimme zu oder lehne ab und begründe.",
+        "Simulate follow-up questions: briefly repeat the question, agree or disagree, and justify.",
       steps: [
-        "Aufnahme starten und eine mögliche Frage laut wiederholen.",
-        "Beantworte mit klarer Meinung + Begründung; füge ein Beispiel an.",
-        "Stoppen und prüfen, ob du verständlich reagierst und Verbposition hältst.",
+        "Start recording and say a possible question out loud.",
+        "Answer with a clear opinion and reason; add an example.",
+        "Stop and check you were clear and kept verb position.",
       ],
     },
     "Teil 3": {
-      title: "Gemeinsam planen und entscheiden",
+      title: "Plan together and make a decision",
       description:
-        "Plane eine Veranstaltung/Aktivität mit einer anderen Person. Vergleiche Optionen, handle einen Kompromiss aus und fasse zusammen.",
+        "Plan an activity with another person. Compare options, negotiate a compromise, and summarise.",
       steps: [
-        "Aufnahme starten, zwei Optionen vorstellen und Vor-/Nachteile nennen.",
-        "Formuliere Zustimmung oder Ablehnung höflich und schlage einen Kompromiss vor.",
-        "Stoppen, anhören und eine klare Entscheidung formulieren.",
+        "Start recording, present two options, and list pros/cons.",
+        "Agree or disagree politely and suggest a compromise.",
+        "Stop, listen, and state a clear decision.",
       ],
     },
   },
@@ -182,7 +182,7 @@ const SpeakingRoom = () => {
     setRecordingUrl(null);
 
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setRecordingError("Aufnahme nicht möglich: Kein Mikrofonzugriff im Browser.");
+      setRecordingError("Recording not possible: no microphone access in this browser.");
       return;
     }
 
@@ -209,7 +209,7 @@ const SpeakingRoom = () => {
       setIsRecording(true);
     } catch (err) {
       console.error("Recording failed", err);
-      setRecordingError("Bitte Mikrofon-Zugriff erlauben oder ein anderes Gerät testen.");
+      setRecordingError("Please allow microphone access or try another device.");
     }
   };
 
@@ -227,6 +227,17 @@ const SpeakingRoom = () => {
           </div>
           <span style={styles.badge}>Time-box: 10–12 minutes</span>
         </div>
+      </section>
+
+      <section style={{ ...styles.card, background: "#f8fafc" }}>
+        <h3 style={{ margin: "0 0 6px 0" }}>How to get the most out of speaking practice</h3>
+        <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
+          <li>🎧 Mic check: before recording, make sure you can hear yourself clearly. Move the device closer to your mouth.</li>
+          <li>⏱️ 60–90 seconds: Keep each attempt short. Repeat the same prompt twice to build fluency faster.
+          </li>
+          <li>🧭 Structure: at the start, say which part you are practising and name 2–3 points you will cover.</li>
+          <li>📝 After recording: jot down one improvement (e.g., push longer verbs to the end, speak more clearly) and record again right away.</li>
+        </ul>
       </section>
 
       <section style={styles.card}>
@@ -268,7 +279,7 @@ const SpeakingRoom = () => {
               your chosen level. Each Teil below explains exactly what to record so the keywords are no longer just a list.
             </p>
             <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
-              <li>📼 Quick start: Pick your level → choose Teil → pick a topic → hit "Aufnahme starten" → speak for 30–90 seconds.</li>
+              <li>📼 Quick start: Pick your level → choose Teil → pick a topic → hit "Start recording" → speak for 30–90 seconds.</li>
               <li>🧭 Stay focused: Cover the 2–3 steps listed for the Teil. That is what the AI will mark.</li>
               <li>🗣️ Speak first, then read: Glance at the keywords for ideas, then look away while you answer to practise fluency.</li>
             </ul>
@@ -364,9 +375,9 @@ const SpeakingRoom = () => {
                 Copy the details and start your AI chat for the chosen part.
               </p>
               <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
-                <li>👉 Lies die Stichwörter einmal laut vor, damit du weißt, was vorkommen soll.</li>
-                <li>👉 Starte danach die Aufnahme und sprich frei, ohne ständig auf den Text zu schauen.</li>
-                <li>👉 Speichere das Thema mit dem Button rechts, um es schnell in die KI zu kopieren.</li>
+                <li>👉 Read the keywords aloud once so you know what should appear.</li>
+                <li>👉 Then start recording and speak freely without staring at the text.</li>
+                <li>👉 Save the topic with the button on the right to copy it into the AI quickly.</li>
               </ul>
             </div>
             <button style={styles.primaryButton} disabled={!selectedPrompt} onClick={copyToClipboard}>

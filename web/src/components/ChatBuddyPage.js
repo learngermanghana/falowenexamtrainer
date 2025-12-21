@@ -5,18 +5,20 @@ import { useAuth } from "../context/AuthContext";
 
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
+const initialHistory = [
+  {
+    role: "assistant",
+    content:
+      "Hello! I’m your Falowen Chat Buddy. Type or speak to me and I’ll reply with short tips plus a follow-up question.",
+  },
+];
+
 const ChatBuddyPage = () => {
   const { idToken, studentProfile } = useAuth();
   const [level, setLevel] = useState("B1");
   const [inputMode, setInputMode] = useState("text");
   const [message, setMessage] = useState("");
-  const [history, setHistory] = useState([
-    {
-      role: "assistant",
-      content:
-        "Hallo! Ich bin dein Falowen Chat Buddy. Schreib oder sprich mit mir und ich antworte mit kurzen Tipps und einer Rückfrage.",
-    },
-  ]);
+  const [history, setHistory] = useState(initialHistory);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -86,6 +88,13 @@ const ChatBuddyPage = () => {
     chunksRef.current = [];
   };
 
+  const resetConversation = () => {
+    resetAudio();
+    setMessage("");
+    setError("");
+    setHistory(initialHistory);
+  };
+
   const handleSend = async () => {
     if (!message.trim() && !audioBlob) {
       setError("Please enter a message or record audio.");
@@ -106,7 +115,7 @@ const ChatBuddyPage = () => {
       const userEntry = {
         role: "user",
         content: message.trim() || "🎙️ Voice message",
-        transcript: response?.transcript || (audioBlob ? "(Transkription wird geladen...)" : null),
+        transcript: response?.transcript || (audioBlob ? "(Transcript loading...)" : null),
       };
 
       const assistantEntry = {
@@ -127,6 +136,19 @@ const ChatBuddyPage = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <div style={{ ...styles.card, background: "#f8fafc" }}>
+        <h2 style={{ margin: 0 }}>Chat Buddy: better exam practice</h2>
+        <p style={{ ...styles.helperText, margin: "6px 0 10px 0" }}>
+          Keep your messages short (2–4 sentences) and let the buddy reply with a follow-up question. It trains the back-and-forth
+          rhythm you need in the exam.
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13 }}>
+          <li>🎯 Start with your level. If your profile has a level, we’ll lock it here so you practise the right difficulty.</li>
+          <li>🎤 In record mode you can add a keyword note. It helps the AI understand your audio faster.</li>
+          <li>🔁 Send 3–4 messages back and forth, then click "Reset conversation" to start a new loop.</li>
+        </ul>
+      </div>
+
       <div style={styles.card}>
         <h2 style={styles.sectionTitle}>Chat Buddy</h2>
         <p style={styles.subtitle}>
@@ -264,6 +286,9 @@ const ChatBuddyPage = () => {
         {error ? <div style={{ ...styles.errorBox, marginTop: 10 }}>{error}</div> : null}
 
         <div style={{ display: "flex", gap: 8, marginTop: 12, justifyContent: "flex-end" }}>
+          <button type="button" style={styles.secondaryButton} onClick={resetConversation} disabled={loading}>
+            Reset conversation
+          </button>
           <button type="button" style={styles.secondaryButton} onClick={() => setMessage("")} disabled={loading}>
             Clear text
           </button>
