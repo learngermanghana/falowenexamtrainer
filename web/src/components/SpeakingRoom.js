@@ -1,13 +1,116 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 
 const levels = ["A1", "A2", "B1", "B2", "C1"];
 
+const teilGuidance = {
+  A1: {
+    "Teil 1": {
+      title: "Kurzvorstellung (Name, Herkunft, Wohnort, Arbeit/Studium)",
+      description:
+        "Stelle dich kurz vor. Wiederhole deinen Namen, wo du wohnst, was du machst und 1–2 Hobbys, damit die KI deine Aussprache und Klarheit bewerten kann.",
+      steps: [
+        "Aufnahme starten, laut sprechen und ca. 30–45 Sekunden bleiben.",
+        "Nenne Name, Alter, Wohnort, Herkunft, Beruf/Studium und ein Hobby.",
+        "Beende die Aufnahme und höre sie dir noch einmal an. Wiederhole mit kleinen Variationen.",
+      ],
+    },
+    "Teil 2": {
+      title: "Fragen stellen und beantworten (Thema + Stichwort)",
+      description:
+        "Wähle ein Thema und das Stichwort darunter. Stelle 2–3 einfache Fragen dazu, beantworte sie selbst laut und lass die KI mitmarken.",
+      steps: [
+        "Klicke Aufnahme, stelle eine W-Frage und antworte kurz (z. B. Thema Uhr → Frage: Wann öffnet…?).",
+        "Baue einfache Ja/Nein-Fragen ein und beantworte sie ebenfalls.",
+        "Stoppen, anhören und erneut üben mit einer neuen Frage.",
+      ],
+    },
+    "Teil 3": {
+      title: "Um etwas bitten oder eine Bitte ablehnen", 
+      description:
+        "Formuliere höfliche Bitten oder kleine Planungen (z. B. um Hilfe bitten, um einen Termin fragen). Nutze Modalverben wie können/möchten und ein kurzes weil als Begründung.",
+      steps: [
+        "Starte Aufnahme, nenne kurz die Situation und formuliere deine Bitte.",
+        "Schlage eine Zeit/Option vor und reagiere mit Zustimmung oder höflicher Ablehnung.",
+        "Stoppen, anhören und dieselbe Bitte mit anderer Option wiederholen.",
+      ],
+    },
+  },
+  A2: {
+    "Teil 1": {
+      title: "Thema wählen und über dich erzählen",
+      description:
+        "Suche dir ein Thema (z. B. Reise, Alltag, Arbeit) und sprich 1–2 Minuten darüber. Fokus: du selbst, kurze Beispiele, ein Gefühl oder eine Meinung.",
+      steps: [
+        "Aufnahme starten und 3 Punkte nennen: kurze Einleitung, 2 Details, Abschluss.",
+        "Nutze weil/dass für einfache Begründungen.",
+        "Stoppen, anhören, ein neues Detail ergänzen und erneut aufnehmen.",
+      ],
+    },
+    "Teil 2": {
+      title: "Fragen beantworten und Rückfragen stellen",
+      description:
+        "Reagiere auf eine Frage zum Thema und stelle selbst eine passende Rückfrage. Halte die Sätze verbunden und klar.",
+      steps: [
+        "Starte Aufnahme, beantworte die Leitfrage mit 2–3 Sätzen.",
+        "Stelle danach eine eigene Rückfrage zum gleichen Thema und beantworte sie kurz.",
+        "Stoppen und prüfen, ob Frageformen und Verbposition stimmen.",
+      ],
+    },
+    "Teil 3": {
+      title: "Einen Termin/Plan mit jemandem abstimmen",
+      description:
+        "Plane etwas gemeinsam (Treffen, Essen, Sport). Mache Vorschläge, höre auf Konflikte und treffe eine Entscheidung.",
+      steps: [
+        "Aufnahme starten, zwei Termine/Optionen vorschlagen.",
+        "Sage, welche Option besser passt und warum.",
+        "Stoppen, anhören und die Planung mit einer Bestätigung abschließen.",
+      ],
+    },
+  },
+  B1: {
+    "Teil 1": {
+      title: "Kurze Präsentation zu einem Alltagsthema",
+      description:
+        "Gib eine Mini-Präsentation (Einleitung, 2–3 Punkte, Meinung, Abschluss). Wähle ein Stichwort und nutze Beispiele.",
+      steps: [
+        "Aufnahme starten, klar gliedern: Einstieg → Punkte → Meinung.",
+        "Nutze Verknüpfungen (erstens, außerdem, deshalb).",
+        "Stoppen, anhören und Schwachstellen (Aussprache, Wortwahl) notieren.",
+      ],
+    },
+    "Teil 2": {
+      title: "Fragen zur Präsentation beantworten",
+      description:
+        "Simuliere Rückfragen: fasse die Frage kurz zusammen, stimme zu oder lehne ab und begründe.",
+      steps: [
+        "Aufnahme starten und eine mögliche Frage laut wiederholen.",
+        "Beantworte mit klarer Meinung + Begründung; füge ein Beispiel an.",
+        "Stoppen und prüfen, ob du verständlich reagierst und Verbposition hältst.",
+      ],
+    },
+    "Teil 3": {
+      title: "Gemeinsam planen und entscheiden",
+      description:
+        "Plane eine Veranstaltung/Aktivität mit einer anderen Person. Vergleiche Optionen, handle einen Kompromiss aus und fasse zusammen.",
+      steps: [
+        "Aufnahme starten, zwei Optionen vorstellen und Vor-/Nachteile nennen.",
+        "Formuliere Zustimmung oder Ablehnung höflich und schlage einen Kompromiss vor.",
+        "Stoppen, anhören und eine klare Entscheidung formulieren.",
+      ],
+    },
+  },
+};
+
 const SpeakingRoom = () => {
   const [levelFilter, setLevelFilter] = useState(levels[0]);
   const [teilFilter, setTeilFilter] = useState("Teil 1");
   const [selectedPrompt, setSelectedPrompt] = useState(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingError, setRecordingError] = useState("");
+  const [recordingUrl, setRecordingUrl] = useState(null);
+  const mediaRecorderRef = useRef(null);
 
   const promptsForLevel = useMemo(
     () => speakingSheetQuestions.filter((prompt) => prompt.level === levelFilter),
@@ -42,6 +145,11 @@ const SpeakingRoom = () => {
     setSelectedPrompt(filteredPrompts[0] || null);
   }, [filteredPrompts]);
 
+  const guidance = useMemo(() => {
+    const levelGuide = teilGuidance[levelFilter] || {};
+    return levelGuide[teilFilter] || null;
+  }, [levelFilter, teilFilter]);
+
   const aiPayload = useMemo(() => {
     if (!selectedPrompt) return "Wähle ein Thema, um es an die KI zu schicken.";
 
@@ -63,6 +171,48 @@ const SpeakingRoom = () => {
     }
   };
 
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
+  };
+
+  const startRecording = async () => {
+    setRecordingError("");
+    setRecordingUrl(null);
+
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      setRecordingError("Aufnahme nicht möglich: Kein Mikrofonzugriff im Browser.");
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        setRecordingUrl(URL.createObjectURL(blob));
+        stream.getTracks().forEach((track) => track.stop());
+        setIsRecording(false);
+      };
+
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setIsRecording(true);
+    } catch (err) {
+      console.error("Recording failed", err);
+      setRecordingError("Bitte Mikrofon-Zugriff erlauben oder ein anderes Gerät testen.");
+    }
+  };
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
@@ -72,7 +222,7 @@ const SpeakingRoom = () => {
             <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Warm-up prompts and responses</h2>
             <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
               Choose a level and practise answering out loud. Keep answers short, stay calm, and repeat each prompt a few times with
-              different ideas.
+              different ideas. Record your attempt so the AI can mark it.
             </p>
           </div>
           <span style={styles.badge}>Time-box: 10–12 minutes</span>
@@ -115,10 +265,60 @@ const SpeakingRoom = () => {
           <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>
               Select a topic to rehearse and pass straight to the AI coach. Use the Teil buttons to view Teil 1, 2, or 3 prompts for
-              your chosen level.
+              your chosen level. Each Teil below explains exactly what to record so the keywords are no longer just a list.
             </p>
+            <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
+              <li>📼 Quick start: Pick your level → choose Teil → pick a topic → hit "Aufnahme starten" → speak for 30–90 seconds.</li>
+              <li>🧭 Stay focused: Cover the 2–3 steps listed for the Teil. That is what the AI will mark.</li>
+              <li>🗣️ Speak first, then read: Glance at the keywords for ideas, then look away while you answer to practise fluency.</li>
+            </ul>
           </div>
         </div>
+
+        {guidance ? (
+          <div style={{ ...styles.card, background: "#f8fafc", marginTop: 12 }}>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "grid", gap: 6 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Was mache ich in diesem Teil?</p>
+                  <h3 style={{ margin: 0 }}>{guidance.title}</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{guidance.description}</p>
+                  <ul style={{ margin: "4px 0 0 16px", padding: 0, color: "#374151", fontSize: 13 }}>
+                    {guidance.steps.map((step, index) => (
+                      <li key={index} style={{ marginBottom: 4 }}>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={{ minWidth: 260, display: "grid", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Eigenes Audio aufnehmen</p>
+                  <button
+                    style={isRecording ? styles.dangerButton : styles.primaryButton}
+                    onClick={isRecording ? stopRecording : startRecording}
+                  >
+                    {isRecording ? "Aufnahme stoppen" : "Aufnahme starten"}
+                  </button>
+                  {isRecording ? (
+                    <span style={{ color: "#b91c1c", fontWeight: 600 }}>Recording … sprich jetzt laut</span>
+                  ) : null}
+                  {recordingError ? (
+                    <p style={{ ...styles.helperText, color: "#b91c1c", margin: 0 }}>{recordingError}</p>
+                  ) : null}
+                  {recordingUrl ? (
+              <div style={{ display: "grid", gap: 4 }}>
+                <span style={{ ...styles.helperText, margin: 0 }}>Probe-Aufnahme</span>
+                <audio controls src={recordingUrl} style={{ width: "100%" }} />
+                <span style={{ ...styles.helperText, margin: 0 }}>
+                  Tipp: Höre dir die Lautstärke an. Wenn es zu leise klingt, sprich näher am Mikro oder wiederhole die Probe.
+                </span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+            </div>
+          </div>
+        ) : null}
 
         <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
           {filteredPrompts.map((prompt) => (
@@ -163,6 +363,11 @@ const SpeakingRoom = () => {
               <p style={{ ...styles.helperText, margin: 0 }}>
                 Kopiere die Angaben und starte den KI-Dialog mit dem gewünschten Teil.
               </p>
+              <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
+                <li>👉 Lies die Stichwörter einmal laut vor, damit du weißt, was vorkommen soll.</li>
+                <li>👉 Starte danach die Aufnahme und sprich frei, ohne ständig auf den Text zu schauen.</li>
+                <li>👉 Speichere das Thema mit dem Button rechts, um es schnell in die KI zu kopieren.</li>
+              </ul>
             </div>
             <button style={styles.primaryButton} disabled={!selectedPrompt} onClick={copyToClipboard}>
               In die Zwischenablage kopieren
