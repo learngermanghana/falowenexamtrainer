@@ -271,17 +271,7 @@ const SpeakingRoom = () => {
               <li>📼 Quick start: Pick your level → choose Teil → pick a topic → hit "Aufnahme starten" → speak for 30–90 seconds.</li>
               <li>🧭 Stay focused: Cover the 2–3 steps listed for the Teil. That is what the AI will mark.</li>
               <li>🗣️ Speak first, then read: Glance at the keywords for ideas, then look away while you answer to practise fluency.</li>
-              <li>🧪 How the AI marks you: Aufgabenbezug (passt du zur Aufgabe?), Verständlichkeit/Aussprache, Grammatik/Verbposition, Wortschatz/Kohärenz.</li>
             </ul>
-            <div style={{ ...styles.card, padding: 12, margin: "10px 0 0 0", background: "#eef2ff" }}>
-              <strong style={{ display: "block", marginBottom: 4 }}>KI-Feedback bekommen</strong>
-              <ol style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
-                <li>Wähle Thema + Teil und klicke unten „In die Zwischenablage kopieren“.</li>
-                <li>Starte die Aufnahme und sprich 30–90 Sekunden. Speichere die Probe (oder notiere die wichtigsten Sätze).</li>
-                <li>Füge den kopierten Text im KI-Chat ein, lade die Audio-Datei hoch <em>(falls der Chat Audio erlaubt)</em> oder schreibe eine kurze Zusammenfassung deiner Antwort.</li>
-                <li>Bitte die KI um Bewertung nach den Kriterien oben und um 2–3 Verbesserungsvorschläge.</li>
-              </ol>
-            </div>
           </div>
         </div>
 
@@ -326,6 +316,48 @@ const SpeakingRoom = () => {
             ) : null}
           </div>
         </div>
+            </div>
+          </div>
+        ) : null}
+
+        {guidance ? (
+          <div style={{ ...styles.card, background: "#f8fafc", marginTop: 12 }}>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "grid", gap: 6 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Was mache ich in diesem Teil?</p>
+                  <h3 style={{ margin: 0 }}>{guidance.title}</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{guidance.description}</p>
+                  <ul style={{ margin: "4px 0 0 16px", padding: 0, color: "#374151", fontSize: 13 }}>
+                    {guidance.steps.map((step, index) => (
+                      <li key={index} style={{ marginBottom: 4 }}>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={{ minWidth: 260, display: "grid", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Eigenes Audio aufnehmen</p>
+                  <button
+                    style={isRecording ? styles.dangerButton : styles.primaryButton}
+                    onClick={isRecording ? stopRecording : startRecording}
+                  >
+                    {isRecording ? "Aufnahme stoppen" : "Aufnahme starten"}
+                  </button>
+                  {isRecording ? (
+                    <span style={{ color: "#b91c1c", fontWeight: 600 }}>Recording … sprich jetzt laut</span>
+                  ) : null}
+                  {recordingError ? (
+                    <p style={{ ...styles.helperText, color: "#b91c1c", margin: 0 }}>{recordingError}</p>
+                  ) : null}
+                  {recordingUrl ? (
+                    <div style={{ display: "grid", gap: 4 }}>
+                      <span style={{ ...styles.helperText, margin: 0 }}>Probe-Aufnahme</span>
+                      <audio controls src={recordingUrl} style={{ width: "100%" }} />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
             </div>
           </div>
         ) : null}
