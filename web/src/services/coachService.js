@@ -36,7 +36,6 @@ export const analyzeAudio = async ({
 
   const response = await axios.post(`${backendUrl}/api/speaking/analyze`, formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
       ...authHeaders(idToken),
     },
   });
@@ -68,7 +67,6 @@ export const scoreInteractionAudio = async ({
     formData,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
         ...authHeaders(idToken),
       },
     }
