@@ -398,7 +398,9 @@ const CampusArea = ({ allowedSections, availableTabs, defaultSection, onBack, ta
         </div>
       ) : null}
 
-      {resolvedSection === "course" && allowedSections.course ? <CourseTab /> : null}
+      {resolvedSection === "course" && allowedSections.course ? (
+        <CourseTab defaultLevel={studentProfile?.level} />
+      ) : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "buddy" && allowedSections.buddy ? <ChatBuddyPage /> : null}

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 
@@ -57,9 +57,26 @@ const LessonList = ({ title, lessons }) => {
   );
 };
 
-const CourseTab = () => {
-  const levels = Object.keys(courseSchedules);
-  const [selectedCourseLevel, setSelectedCourseLevel] = useState(levels[0] || "");
+const normalizeLevel = (level) => (level || "").toUpperCase();
+
+const CourseTab = ({ defaultLevel }) => {
+  const levels = useMemo(() => Object.keys(courseSchedules), []);
+  const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
+    const normalizedDefault = normalizeLevel(defaultLevel);
+    if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
+    return levels[0] || "";
+  });
+
+  useEffect(() => {
+    const normalizedDefault = normalizeLevel(defaultLevel);
+    if (
+      normalizedDefault &&
+      levels.includes(normalizedDefault) &&
+      normalizedDefault !== selectedCourseLevel
+    ) {
+      setSelectedCourseLevel(normalizedDefault);
+    }
+  }, [defaultLevel, levels, selectedCourseLevel]);
 
   const schedule = useMemo(() => courseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
 
