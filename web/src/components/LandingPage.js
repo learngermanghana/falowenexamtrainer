@@ -172,10 +172,16 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                 <h4 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 8 }}>Stay connected</h4>
                 <ul style={{ ...styles.checklist, margin: 0, color: "#d1d5db" }}>
                   <li>
-                    WhatsApp: <a style={{ color: "#a5b4fc" }} href="https://wa.me/233205706589">+233 20 570 6589</a>
+                    Call or WhatsApp:
+                    <a style={{ color: "#a5b4fc", marginLeft: 4 }} href="https://wa.me/233205706589">
+                      +233 20 570 6589
+                    </a>
                   </li>
                   <li>
-                    Email: <a style={{ color: "#a5b4fc" }} href="mailto:learngermanghana.com">learngermanghana.com</a>
+                    Email:
+                    <a style={{ color: "#a5b4fc", marginLeft: 4 }} href="mailto:sedifexbiz@gmail.com">
+                      sedifexbiz@gmail.com
+                    </a>
                   </li>
                   <li>Live chat during classes with tutor monitoring and feedback.</li>
                 </ul>
