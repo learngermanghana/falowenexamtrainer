@@ -39,6 +39,15 @@ const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnabl
   const classCalendarId = "class-calendar-card";
 
   const handleSelectLevel = () => navigate("/campus/account");
+  const handleConfirmClass = () => {
+    const calendarSection = document.getElementById(classCalendarId);
+    if (calendarSection) {
+      calendarSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    navigate("/");
+  };
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
