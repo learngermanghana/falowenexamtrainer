@@ -125,7 +125,7 @@ function App() {
     return (
       <div style={{ ...styles.container, display: "grid", gap: 12 }}>
         <div style={styles.card}>
-          <h1 style={{ ...styles.title, marginBottom: 8 }}>Falowen Exam Coach</h1>
+          <h1 style={{ ...styles.title, marginBottom: 8 }}>Falowen Learning Hub</h1>
           <p style={styles.subtitle}>
             The app could not connect to Firebase. Please add your REACT_APP_FIREBASE_* credentials to a .env file and restart
             the app.
@@ -248,7 +248,7 @@ const AppShell = ({
         }}
       >
         <div>
-          <h1 style={styles.title}>Falowen Exam Coach</h1>
+          <h1 style={styles.title}>Falowen Learning Hub</h1>
           <p style={styles.subtitle}>{subtitle}</p>
         </div>
         <div className="app-header-meta" style={{ display: "grid", gap: 6, justifyItems: "end" }}>

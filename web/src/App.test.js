@@ -34,6 +34,6 @@ import App from "./App";
 
 test("renders home actions for authenticated users", () => {
   render(<App />);
-  expect(screen.getByText(/Falowen Exam Coach/i)).toBeInTheDocument();
+  expect(screen.getByText(/Falowen Learning Hub/i)).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /Kursbuch öffnen/i })).toBeInTheDocument();
 });

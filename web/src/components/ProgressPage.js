@@ -81,7 +81,7 @@ const shareSummary = async (summaryText) => {
   if (!summaryText) return;
   if (navigator.share) {
     try {
-      await navigator.share({ title: "Falowen Exam Coach progress", text: summaryText });
+      await navigator.share({ title: "Falowen Learning Hub progress", text: summaryText });
       return;
     } catch (error) {
       // Swallow share cancellation and fallback to clipboard
@@ -237,7 +237,7 @@ const ProgressPage = () => {
     const latest = scoredAttempts[0];
     const latestScore = toScore(latest);
     return [
-      "Falowen Exam Coach Fortschritts-Update:",
+      "Falowen Learning Hub Fortschritts-Update:",
       `Aktueller Schnitt: ${skillAverages.overall || "-"}/100`,
       latestScore !== null ? `Letzter Versuch: ${latestScore}/100 (${formatDate(latest.date)})` : "",
       actionItems[0] ? `Nächster Schritt: ${actionItems[0]}` : "",
