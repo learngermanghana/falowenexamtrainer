@@ -1,7 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import ClassCalendarCard from "./ClassCalendarCard";
 import HomeMetrics from "./HomeMetrics";
+import OnboardingChecklist from "./OnboardingChecklist";
 
 const WelcomeHero = ({ studentProfile }) => {
   const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
@@ -31,12 +33,22 @@ const WelcomeHero = ({ studentProfile }) => {
   );
 };
 
-const GeneralHome = ({ onSelectArea, studentProfile }) => {
+const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnableNotifications }) => {
   const preferredClass = studentProfile?.className;
+  const navigate = useNavigate();
+
+  const handleSelectLevel = () => navigate("/campus/account");
+  const handleConfirmClass = () => navigate("/campus/course");
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <WelcomeHero studentProfile={studentProfile} />
+      <OnboardingChecklist
+        notificationStatus={notificationStatus}
+        onEnableNotifications={onEnableNotifications}
+        onSelectLevel={handleSelectLevel}
+        onConfirmClass={handleConfirmClass}
+      />
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>
         <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Choose your learning space</h2>
