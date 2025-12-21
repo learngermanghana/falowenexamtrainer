@@ -7,7 +7,7 @@ import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { savePreferredLevel } from "../services/levelStorage";
 
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
-  const { signup, login, authError, setAuthError } = useAuth();
+  const { signup, login, authError, setAuthError, resetPassword } = useAuth();
   const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -18,6 +18,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [className, setClassName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [message, setMessage] = useState("");
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
 
@@ -30,7 +31,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     try {
       if (mode === "signup") {
         const studentCode = generateStudentCode({ name });
-        await signup(email, password, {
+        const result = await signup(email, password, {
           name,
           level: selectedLevel,
           studentCode,
@@ -41,7 +42,12 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         });
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
-        setMessage(`Account created! Your student code is ${studentCode}.`);
+        setMessage(
+          `Account created! Your student code is ${studentCode}. Please verify your email to log in.`
+        );
+        if (result?.verificationRequired) {
+          setMode("login");
+        }
       } else {
         const credential = await login(email, password);
         const studentCode = credential?.user?.profile?.studentCode;
@@ -60,11 +66,38 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       }
     } catch (error) {
       console.error(error);
-      setAuthError(
-        error?.message || "Login failed. Please try again."
-      );
+      if (
+        error?.code === "auth/email-not-verified" ||
+        error?.code === "auth/email-verification-required"
+      ) {
+        setAuthError("");
+        setMessage(error.message || "Please verify your email address.");
+        if (error?.code === "auth/email-verification-required") {
+          setMode("login");
+        }
+      } else {
+        setAuthError(
+          error?.message || "Login failed. Please try again."
+        );
+        setMessage("");
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    setResetting(true);
+    setMessage("");
+    setAuthError("");
+    try {
+      await resetPassword(email);
+      setMessage("Password reset email sent. Please check your inbox.");
+    } catch (error) {
+      console.error(error);
+      setAuthError(error?.message || "Could not send password reset email.");
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -149,6 +182,24 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
           />
+
+          {mode === "login" && (
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={handlePasswordReset}
+                disabled={resetting || loading}
+                style={{
+                  ...styles.secondaryButton,
+                  padding: "6px 10px",
+                  fontSize: 13,
+                  marginTop: 2,
+                }}
+              >
+                {resetting ? "Sending reset email ..." : "Forgot password?"}
+              </button>
+            </div>
+          )}
 
           {mode === "signup" && (
             <>
