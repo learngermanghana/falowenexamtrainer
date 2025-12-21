@@ -56,7 +56,6 @@ const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnabl
         notificationStatus={notificationStatus}
         onEnableNotifications={onEnableNotifications}
         onSelectLevel={handleSelectLevel}
-        onConfirmClass={handleConfirmClass}
       />
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>

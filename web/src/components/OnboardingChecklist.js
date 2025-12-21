@@ -68,12 +68,7 @@ const Step = ({ title, description, actionLabel, onAction, complete, accent = "#
   </div>
 );
 
-const OnboardingChecklist = ({
-  notificationStatus,
-  onEnableNotifications,
-  onSelectLevel,
-  onConfirmClass,
-}) => {
+const OnboardingChecklist = ({ notificationStatus, onEnableNotifications, onSelectLevel }) => {
   const { levelConfirmed } = useExam();
   const [state, setState] = useState(() => ({
     congratulated: false,
@@ -103,16 +98,15 @@ const OnboardingChecklist = ({
   }, []);
 
   const notificationsReady = notificationStatus === "granted";
-  const classConfirmed = Boolean(selectedClass);
   const calendarDownloaded = Boolean(state.calendarDownloaded);
   const fallbackClass = useMemo(() => Object.keys(classCatalog)?.[0], []);
   const currentClass = selectedClass || fallbackClass;
 
   const progress = useMemo(() => {
-    const steps = [levelConfirmed, classConfirmed, calendarDownloaded, notificationsReady];
+    const steps = [levelConfirmed, calendarDownloaded, notificationsReady];
     const done = steps.filter(Boolean).length;
     return { done, total: steps.length };
-  }, [calendarDownloaded, classConfirmed, levelConfirmed, notificationsReady]);
+  }, [calendarDownloaded, levelConfirmed, notificationsReady]);
 
   const handleEnableNotifications = async () => {
     if (!onEnableNotifications) return;
@@ -173,7 +167,7 @@ const OnboardingChecklist = ({
             Start strong with Falowen
           </h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Quick guide for new learners: choose your level, confirm your class, save the calendar, and turn on push notifications.
+            Quick guide for new learners: choose your level, save the calendar, and turn on push notifications.
           </p>
         </div>
         <div style={{ display: "grid", justifyItems: "end" }}>
@@ -196,14 +190,6 @@ const OnboardingChecklist = ({
           onAction={onSelectLevel}
           complete={levelConfirmed}
           accent="#e5e7eb"
-        />
-        <Step
-          title="Confirm your class"
-          description="Pick your cohort to get the Zoom link, course documents, and the full schedule."
-          actionLabel="Open class"
-          onAction={onConfirmClass}
-          complete={classConfirmed}
-          accent="#f3e8ff"
         />
         <Step
           title="Download the calendar"
