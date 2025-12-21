@@ -336,6 +336,7 @@ const CampusArea = ({
   studentProfile,
   tabStorageKey,
 }) => {
+  const campusStudentProfile = studentProfile || {};
   const { section } = useParams();
   const navigate = useNavigate();
 
@@ -414,7 +415,7 @@ const CampusArea = ({
       ) : null}
 
       {resolvedSection === "course" && allowedSections.course ? (
-        <CourseTab defaultLevel={studentProfile?.level} />
+        <CourseTab defaultLevel={campusStudentProfile?.level} />
       ) : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
