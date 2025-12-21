@@ -188,7 +188,7 @@ const StudentResultsPage = () => {
   const downloadCsv = () => {
     if (!assignments.length) return;
 
-    const headers = ["Assignment", "Attempt", "Score", "Date", "Comments"];
+    const headers = ["Assignment", "Attempt", "Score", "Date", "Comments", "link"];
     const rows = assignments.flatMap((assignment) =>
       assignment.attempts.map((attempt) => [
         assignment.assignment,
@@ -196,6 +196,7 @@ const StudentResultsPage = () => {
         typeof attempt.score === "number" ? attempt.score : "",
         formatDate(attempt.date),
         (attempt.comments || "").replace(/\n/g, " ").replace(/"/g, "'"),
+        (attempt.link || "").replace(/\n/g, " ").replace(/"/g, "'"),
       ]),
     );
 
