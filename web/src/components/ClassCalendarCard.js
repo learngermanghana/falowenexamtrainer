@@ -8,7 +8,7 @@ import {
 } from "../services/classCalendar";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 
-const ClassCalendarCard = ({ initialClassName }) => {
+const ClassCalendarCard = ({ id, initialClassName }) => {
   const catalogEntries = useMemo(() => Object.keys(classCatalog), []);
   const defaultClass = useMemo(() => {
     if (initialClassName && catalogEntries.includes(initialClassName)) {
@@ -50,7 +50,7 @@ const ClassCalendarCard = ({ initialClassName }) => {
   if (!classDetails) return null;
 
   return (
-    <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+    <div id={id} style={{ ...styles.card, display: "grid", gap: 10 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
         <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Live class access</h2>
         <span style={styles.badge}>Zoom ready</span>
