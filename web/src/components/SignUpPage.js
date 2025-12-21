@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -26,36 +26,86 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [initialPaymentAmount, setInitialPaymentAmount] = useState("");
-  const [accountStatus, setAccountStatus] = useState("Active");
+  const [manualPaymentAmount, setManualPaymentAmount] = useState("");
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [accountStatus, setAccountStatus] = useState("Pending activation");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
   );
   const [hasConsented, setHasConsented] = useState(false);
+  const [geoStatus, setGeoStatus] = useState("");
+  const [locationLoading, setLocationLoading] = useState(false);
+
+  const formatPhoneNumber = (value) => {
+    const digits = value.replace(/\D/g, "");
+    if (!digits) return "";
+
+    const withoutZero = digits.startsWith("0") ? digits.slice(1) : digits;
+    const normalized = withoutZero.startsWith("49") ? withoutZero.slice(2) : withoutZero;
+    const parts = [];
+    if (normalized.length > 0) parts.push(normalized.slice(0, 3));
+    if (normalized.length > 3) parts.push(normalized.slice(3, 7));
+    if (normalized.length > 7) parts.push(normalized.slice(7, 11));
+
+    return `+49 ${parts.filter(Boolean).join(" ")}`.trim();
+  };
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
+  const inlineErrorStyle = { color: "#b91c1c", fontSize: 12, marginTop: -6 };
+
+  const handlePhoneInput = (value, setter) => {
+    const formatted = formatPhoneNumber(value);
+    setter(formatted);
+  };
+
+  const paidAmount = showPaymentDetails ? Number(manualPaymentAmount) || 0 : 0;
+
+  useEffect(() => {
+    if (!showPaymentDetails) {
+      setManualPaymentAmount("");
+      setAccountStatus("Pending activation");
+    }
+  }, [showPaymentDetails]);
 
   const tuitionSummary = computeTuitionStatus({
     level: selectedLevel,
-    paidAmount: Number(initialPaymentAmount) || 0,
+    paidAmount,
   });
+
+  const emailIsValid = /\S+@\S+\.\S+/.test(email);
+  const passwordIsValid = password.length >= 6;
+  const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
+  const cleanedPhone = phone.replace(/\D/g, "");
+  const phoneIsValid = cleanedPhone.length >= 10;
+  const locationIsValid = location.trim().length >= 3;
+  const nameIsValid = name.trim().length > 1;
+  const consentValid = hasConsented;
+
+  const emailError = email && !emailIsValid ? "Enter a valid email address." : "";
+  const passwordError = password && !passwordIsValid ? "Password must be at least 6 characters." : "";
+  const confirmError = confirmPassword && !passwordsMatch ? "Passwords must match." : "";
+  const phoneError = phone && !phoneIsValid ? "Enter a full phone number so we can reach you." : "";
+  const locationError = location && !locationIsValid ? "Add your city and neighbourhood for emergencies." : "";
+
+  const criticalValid =
+    nameIsValid &&
+    emailIsValid &&
+    passwordIsValid &&
+    passwordsMatch &&
+    phoneIsValid &&
+    locationIsValid &&
+    consentValid;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setAuthError("");
     setMessage("");
 
-    if (password !== confirmPassword) {
-      const passwordError = "Passwords do not match.";
-      setAuthError(passwordError);
-      showToast(passwordError, "error");
-      return;
-    }
-
-    if (!hasConsented) {
-      const consentMessage = "Please agree to the terms and privacy policy to continue.";
-      setAuthError(consentMessage);
-      showToast(consentMessage, "error");
+    if (!criticalValid) {
+      const errorMessage =
+        "Please fix the highlighted fields so we can reach you and keep your account secure.";
+      setAuthError(errorMessage);
+      showToast(errorMessage, "error");
       return;
     }
 
@@ -118,6 +168,29 @@ const SignUpPage = ({ onLogin, onBack }) => {
     }
   };
 
+  const handleUseCurrentLocation = () => {
+    setGeoStatus("");
+    if (!navigator.geolocation) {
+      setGeoStatus("Geolocation is blocked or unsupported. Please type your city manually.");
+      return;
+    }
+
+    setLocationLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const approx = `Lat ${coords.latitude.toFixed(4)}, Lng ${coords.longitude.toFixed(4)}`;
+        setLocation(approx);
+        setGeoStatus("We added your approximate location. Update it if you want a city name instead.");
+        setLocationLoading(false);
+      },
+      () => {
+        setGeoStatus("Unable to fetch your location. Please enter your city and nearest landmark.");
+        setLocationLoading(false);
+      },
+      { timeout: 7000 }
+    );
+  };
+
   return (
     <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
       <div style={{ ...styles.card, width: "100%", maxWidth: 520, position: "relative" }}>
@@ -157,6 +230,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="Abigail"
           />
+          {!nameIsValid && name && <div style={inlineErrorStyle}>Please enter your full name.</div>}
 
           <label style={styles.label}>Email</label>
           <input
@@ -167,6 +241,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="you@example.com"
           />
+          {emailError && <div style={inlineErrorStyle}>{emailError}</div>}
 
           <label style={styles.label}>Password</label>
           <input
@@ -178,6 +253,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="At least 6 characters"
           />
+          {passwordError && <div style={inlineErrorStyle}>{passwordError}</div>}
 
           <label style={styles.label}>Confirm password</label>
           <input
@@ -189,6 +265,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="Enter password again"
           />
+          {confirmError && <div style={inlineErrorStyle}>{confirmError}</div>}
 
           <label style={styles.label}>Your current level</label>
           <select
@@ -212,15 +289,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
             type="tel"
             required
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => handlePhoneInput(e.target.value, setPhone)}
             style={inputStyle}
             placeholder="0176 12345678"
           />
-
-          <p style={{ ...styles.helperText, marginTop: -4 }}>
-            We keep your phone number on file to contact you directly when necessary. Your emergency contact is only
-            notified in urgent safety situations.
-          </p>
+          <div style={{ ...styles.helperText, marginTop: -4 }}>
+            We'll format numbers for Germany automatically. Use a reachable personal number for lesson reminders.
+          </div>
+          {phoneError && <div style={inlineErrorStyle}>{phoneError}</div>}
 
           <label style={styles.label}>Location</label>
           <input
@@ -231,44 +307,80 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="Berlin"
           />
+          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <button
+              type="button"
+              onClick={handleUseCurrentLocation}
+              style={{ ...styles.secondaryButton, padding: "10px 12px" }}
+              disabled={locationLoading}
+            >
+              {locationLoading ? "Detecting..." : "Use my GPS location"}
+            </button>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              (Optional) We'll store a rough location to guide tutors if there's an emergency.
+            </p>
+          </div>
+          {geoStatus && <div style={{ ...styles.helperText, color: "#1d4ed8", marginTop: -6 }}>{geoStatus}</div>}
+          {locationError && <div style={inlineErrorStyle}>{locationError}</div>}
 
           <label style={styles.label}>Emergency contact (phone)</label>
           <input
             type="tel"
-            required
             value={emergencyContactPhone}
-            onChange={(e) => setEmergencyContactPhone(e.target.value)}
+            onChange={(e) => handlePhoneInput(e.target.value, setEmergencyContactPhone)}
             style={inputStyle}
-            placeholder="0176 98765432"
+            placeholder="Optional — 0176 98765432"
           />
-
-          <label style={styles.label}>Status</label>
-          <input
-            type="text"
-            required
-            value={accountStatus}
-            onChange={(e) => setAccountStatus(e.target.value)}
-            style={inputStyle}
-            placeholder="Active"
-          />
-
-          <label style={styles.label}>Initial payment amount (GH₵)</label>
-          <input
-            type="number"
-            min="0"
-            step="100"
-            value={initialPaymentAmount}
-            onChange={(e) => setInitialPaymentAmount(e.target.value)}
-            style={inputStyle}
-            placeholder="0"
-          />
-          <p style={{ ...styles.helperText, marginTop: -2 }}>
-            A1: GH₵2800 · A2: GH₵3000 · B1: GH₵3000 · B2: GH₵3000. Full payment activates a 6-month contract; partial payment sets a 1-month starter contract with reminders.
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            Optional but recommended. We'll only notify this person in urgent safety situations.
           </p>
+
+          <div style={{ ...styles.card, background: "#f8fafc", border: "1px solid #e2e8f0" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <label style={styles.label}>Payment setup (optional)</label>
+                <p style={{ ...styles.helperText, marginTop: -6 }}>
+                  Tuition is auto-calculated from your chosen level. You can add contract details later in Account Settings.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowPaymentDetails((prev) => !prev)}
+                style={{ ...styles.secondaryButton, padding: "8px 12px" }}
+              >
+                {showPaymentDetails ? "Hide now" : "Add details now"}
+              </button>
+            </div>
+
+            {showPaymentDetails ? (
+              <div style={{ display: "grid", gap: 10, marginTop: 8 }}>
+                <label style={styles.label}>Recorded payment amount (GH₵)</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={manualPaymentAmount}
+                  onChange={(e) => setManualPaymentAmount(e.target.value)}
+                  style={inputStyle}
+                  placeholder={String(tuitionSummary.tuitionFee)}
+                />
+                <label style={styles.label}>Account status</label>
+                <select
+                  value={accountStatus}
+                  onChange={(event) => setAccountStatus(event.target.value)}
+                  style={styles.select}
+                >
+                  <option value="Pending activation">Pending activation</option>
+                  <option value="Active">Active</option>
+                  <option value="On hold">On hold</option>
+                </select>
+              </div>
+            ) : null}
+          </div>
 
           <TuitionStatusCard
             level={selectedLevel}
-            paidAmount={Number(initialPaymentAmount) || 0}
+            paidAmount={tuitionSummary.paidAmount}
             balanceDue={tuitionSummary.balanceDue}
             tuitionFee={tuitionSummary.tuitionFee}
             paystackLink={tuitionSummary.paystackLink}
@@ -327,7 +439,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </span>
           </label>
 
-          <button style={styles.primaryButton} type="submit" disabled={loading}>
+          <button style={styles.primaryButton} type="submit" disabled={loading || !criticalValid}>
             {loading ? "Creating ..." : "Sign up now"}
           </button>
         </form>
