@@ -10,9 +10,11 @@ import { computeTuitionStatus } from "../data/levelFees";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
+import { useToast } from "../context/ToastContext";
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
+  const { showToast } = useToast();
   const paymentsEnabled = isPaymentsEnabled();
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -43,7 +45,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setMessage("");
 
     if (password !== confirmPassword) {
-      setAuthError("Passwords do not match.");
+      const passwordError = "Passwords do not match.";
+      setAuthError(passwordError);
+      showToast(passwordError, "error");
       return;
     }
 
@@ -89,12 +93,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const paymentInstruction = paymentsEnabled
         ? ` Pay via Paystack: ${paystackLink}.`
         : " Payments are handled on the web app only. Please sign in online to complete your tuition.";
-      setMessage(
-        `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${balanceText}`
+      const successMessage =
+        `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${balanceText}`;
+      setMessage(successMessage);
+      showToast(
+        `${successMessage} Check your email for a Falowen verification link before logging in.`,
+        "success"
       );
     } catch (error) {
       console.error(error);
-      setAuthError(error?.message || "Sign up failed.");
+      const errorMessage = error?.message || "Sign up failed.";
+      setAuthError(errorMessage);
+      showToast(errorMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -117,10 +127,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
         <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            Signing up links your profile to Firebase (hosted on Vercel). You can use the same login for web and mobile.
+            Signing up saves your profile to the Falowen cloud so you can use the same login for web and mobile.
           </p>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            Already have an email in our old Firebase student list? Please go to Login and reuse that email to set a new password. We'll migrate your profile.
+            Returning Falowen student from our old system? Go to Login and reuse that email to set a new password. We'll migrate your profile automatically.
           </p>
           <ul style={{ ...styles.checklist, margin: 0 }}>
             <li>Enable push reminders and weekly goals.</li>
