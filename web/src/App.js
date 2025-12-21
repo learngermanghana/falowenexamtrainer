@@ -171,7 +171,9 @@ function App() {
         allowedSections={allowedSections}
         availableTabs={availableTabs}
         defaultCampusSection={defaultCampusSection}
+        enableNotifications={enableNotifications}
         logout={logout}
+        notificationStatus={notificationStatus}
         studentProfile={studentProfile}
         tabStorageKey={tabStorageKey}
         user={user}
@@ -182,7 +184,17 @@ function App() {
 
 export default App;
 
-const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout, studentProfile, tabStorageKey, user }) => {
+const AppShell = ({
+  allowedSections,
+  availableTabs,
+  defaultCampusSection,
+  enableNotifications,
+  logout,
+  notificationStatus,
+  studentProfile,
+  tabStorageKey,
+  user,
+}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
