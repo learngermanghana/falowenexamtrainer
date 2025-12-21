@@ -85,13 +85,40 @@ function initFirestore() {
     process.env.GOOGLE_APPLICATION_CREDENTIALS ||
     "";
 
-  if (svcPath && fs.existsSync(svcPath)) {
-    const serviceAccount = require(path.resolve(svcPath));
+  const b64 =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 ||
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
+
+  const raw =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+
+  let serviceAccount = null;
+
+  if (raw) {
+    serviceAccount = JSON.parse(raw);
+  } else if (b64) {
+    serviceAccount = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
+  } else if (svcPath && fs.existsSync(svcPath)) {
+    serviceAccount = JSON.parse(fs.readFileSync(path.resolve(svcPath), "utf8"));
+  }
+
+  if (serviceAccount?.private_key) {
+    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+  }
+
+  const projectId =
+    process.env.FIREBASE_PROJECT_ID ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    process.env.GCLOUD_PROJECT ||
+    serviceAccount?.project_id;
+
+  if (serviceAccount?.client_email && serviceAccount?.private_key) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
+      projectId,
     });
   } else {
-    admin.initializeApp();
+    admin.initializeApp({ projectId });
   }
   return admin.firestore();
 }
@@ -103,10 +130,35 @@ function getSheetsAuth() {
     "";
 
   if (!svcPath || !fs.existsSync(svcPath)) {
-    // Cloud Functions case: uses ADC (make sure Sheets API enabled + SA has access to sheet)
-    return new google.auth.GoogleAuth({
+    const b64 =
+      process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 ||
+      process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
+
+    const raw =
+      process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+
+    if (!raw && !b64) {
+      // Cloud Functions case: uses ADC (make sure Sheets API enabled + SA has access to sheet)
+      return new google.auth.GoogleAuth({
+        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+      });
+    }
+
+    const serviceAccount = raw
+      ? JSON.parse(raw)
+      : JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
+
+    if (serviceAccount?.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+    }
+
+    const jwt = new google.auth.JWT({
+      email: serviceAccount.client_email,
+      key: serviceAccount.private_key,
       scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
+
+    return jwt;
   }
 
   const key = JSON.parse(fs.readFileSync(svcPath, "utf8"));

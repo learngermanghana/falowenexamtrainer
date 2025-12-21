@@ -18,9 +18,47 @@ let getScoresForStudent;
 
 const log = createLogger({ scope: "app" });
 
-if (!admin.apps.length) {
-  admin.initializeApp();
+function initFirebaseAdmin() {
+  if (admin.apps.length) return;
+
+  const b64 =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 ||
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
+
+  const raw =
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+
+  let serviceAccount = null;
+
+  if (raw) {
+    serviceAccount = JSON.parse(raw);
+  } else if (b64) {
+    serviceAccount = JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
+  }
+
+  if (serviceAccount?.private_key) {
+    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
+  }
+
+  const projectId =
+    process.env.FIREBASE_PROJECT_ID ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    process.env.GCLOUD_PROJECT ||
+    serviceAccount?.project_id;
+
+  if (serviceAccount?.client_email && serviceAccount?.private_key) {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      projectId,
+    });
+    return;
+  }
+
+  // fallback (not ideal on Vercel, but keeps it from crashing if projectId exists)
+  admin.initializeApp({ projectId });
 }
+
+initFirebaseAdmin();
 
 async function getAuthedUser(req) {
   const authHeader = req.headers?.authorization || "";
