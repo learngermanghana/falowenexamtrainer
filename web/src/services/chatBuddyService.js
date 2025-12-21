@@ -27,7 +27,6 @@ export const sendChatBuddyMessage = async ({ text, level, audioBlob, idToken }) 
 
   const response = await axios.post(`${backendUrl}/api/chatbuddy/respond`, formData, {
     headers: {
-      "Content-Type": "multipart/form-data",
       ...authHeaders(idToken),
     },
   });
