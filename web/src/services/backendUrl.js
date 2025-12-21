@@ -1,6 +1,10 @@
 const DEFAULT_BACKEND_URL =
   process.env.REACT_APP_BACKEND_URL ||
-  (process.env.NODE_ENV === "production" ? "" : "http://localhost:5000");
+  (process.env.NODE_ENV === "production"
+    ? // In production, fall back to the current origin so we still reach the deployed API
+      // even when REACT_APP_BACKEND_URL is not set.
+      (typeof window !== "undefined" ? window.location.origin : "")
+    : "http://localhost:5000");
 
 /**
  * Normalize the backend base URL so callers don't accidentally double-prefix
