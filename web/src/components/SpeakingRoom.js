@@ -151,13 +151,13 @@ const SpeakingRoom = () => {
   }, [levelFilter, teilFilter]);
 
   const aiPayload = useMemo(() => {
-    if (!selectedPrompt) return "Wähle ein Thema, um es an die KI zu schicken.";
+    if (!selectedPrompt) return "Choose a topic to send to the AI.";
 
     const keyword = selectedPrompt.keywordSubtopic
-      ? ` (Stichwort: ${selectedPrompt.keywordSubtopic})`
+      ? ` (Keyword: ${selectedPrompt.keywordSubtopic})`
       : "";
 
-    return `Niveau: ${selectedPrompt.level}\nTeil: ${selectedPrompt.teilLabel}\nThema: ${selectedPrompt.topicPrompt}${keyword}`;
+    return `Level: ${selectedPrompt.level}\nPart: ${selectedPrompt.teilLabel}\nTopic: ${selectedPrompt.topicPrompt}${keyword}`;
   }, [selectedPrompt]);
 
   const copyToClipboard = async () => {
@@ -165,7 +165,7 @@ const SpeakingRoom = () => {
 
     try {
       await navigator.clipboard.writeText(aiPayload);
-      alert("Thema kopiert. Füge es im KI-Chat ein.");
+      alert("Topic copied. Paste it into your AI chat.");
     } catch (error) {
       console.error("Clipboard copy failed", error);
     }
@@ -233,7 +233,7 @@ const SpeakingRoom = () => {
         <div style={{ display: "grid", gap: 10 }}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-              <label style={styles.label}>Niveau</label>
+              <label style={styles.label}>Level</label>
               <div style={styles.segmentedControl}>
                 {levels.map((lvl) => (
                   <button
@@ -247,7 +247,7 @@ const SpeakingRoom = () => {
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-              <label style={styles.label}>Teil</label>
+              <label style={styles.label}>Part (Teil)</label>
               <div style={styles.segmentedControl}>
                 {teilOptions.map((teil) => (
                   <button
@@ -362,6 +362,51 @@ const SpeakingRoom = () => {
           </div>
         ) : null}
 
+        {guidance ? (
+          <div style={{ ...styles.card, background: "#f8fafc", marginTop: 12 }}>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "grid", gap: 6 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>What do I do in this part?</p>
+                  <h3 style={{ margin: 0 }}>{guidance.title}</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{guidance.description}</p>
+                  <ul style={{ margin: "4px 0 0 16px", padding: 0, color: "#374151", fontSize: 13 }}>
+                    {guidance.steps.map((step, index) => (
+                      <li key={index} style={{ marginBottom: 4 }}>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={{ minWidth: 260, display: "grid", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Record your answer</p>
+                  <button
+                    style={isRecording ? styles.dangerButton : styles.primaryButton}
+                    onClick={isRecording ? stopRecording : startRecording}
+                  >
+                    {isRecording ? "Stop recording" : "Start recording"}
+                  </button>
+                  {isRecording ? (
+                    <span style={{ color: "#b91c1c", fontWeight: 600 }}>Recording … speak out loud now</span>
+                  ) : null}
+                  {recordingError ? (
+                    <p style={{ ...styles.helperText, color: "#b91c1c", margin: 0 }}>{recordingError}</p>
+                  ) : null}
+                  {recordingUrl ? (
+                    <div style={{ display: "grid", gap: 4 }}>
+                      <span style={{ ...styles.helperText, margin: 0 }}>Practice recording</span>
+                      <audio controls src={recordingUrl} style={{ width: "100%" }} />
+                      <span style={{ ...styles.helperText, margin: 0 }}>
+                        Tip: Check your volume. If it sounds too quiet, move closer to the mic or redo the clip.
+                      </span>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
           {filteredPrompts.map((prompt) => (
             <div
@@ -380,15 +425,15 @@ const SpeakingRoom = () => {
                   <span style={{ ...styles.helperText, fontWeight: 600 }}>{prompt.topicPrompt}</span>
                   {prompt.keywordSubtopic ? (
                     <span style={{ ...styles.helperText, color: "#4f46e5" }}>
-                      Stichwort: {prompt.keywordSubtopic}
+                      Keyword: {prompt.keywordSubtopic}
                     </span>
                   ) : null}
                 </div>
                 <div style={{ display: "grid", gap: 6, minWidth: 220 }}>
-                  <span style={{ ...styles.helperText, margin: 0 }}>KI-Anweisung</span>
+                  <span style={{ ...styles.helperText, margin: 0 }}>AI prompt</span>
                   <div style={{ ...styles.card, padding: 10, margin: 0 }}>
                     <p style={{ ...styles.helperText, margin: 0 }}>
-                      {`Level ${prompt.level}, ${prompt.teilLabel}. Thema: ${prompt.topicPrompt}${prompt.keywordSubtopic ? ` (${prompt.keywordSubtopic})` : ""}.`}
+                      {`Level ${prompt.level}, ${prompt.teilLabel}. Topic: ${prompt.topicPrompt}${prompt.keywordSubtopic ? ` (${prompt.keywordSubtopic})` : ""}.`}
                     </p>
                   </div>
                 </div>
@@ -400,10 +445,10 @@ const SpeakingRoom = () => {
         <div style={{ ...styles.card, marginTop: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             <div>
-              <p style={{ ...styles.helperText, margin: 0 }}>Ausgewähltes Thema</p>
-              <h3 style={{ margin: "4px 0" }}>{selectedPrompt?.topicPrompt || "Bitte ein Thema wählen"}</h3>
+              <p style={{ ...styles.helperText, margin: 0 }}>Selected topic</p>
+              <h3 style={{ margin: "4px 0" }}>{selectedPrompt?.topicPrompt || "Please choose a topic"}</h3>
               <p style={{ ...styles.helperText, margin: 0 }}>
-                Kopiere die Angaben und starte den KI-Dialog mit dem gewünschten Teil.
+                Copy the details and start your AI chat for the chosen part.
               </p>
               <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
                 <li>👉 Lies die Stichwörter einmal laut vor, damit du weißt, was vorkommen soll.</li>
@@ -412,7 +457,7 @@ const SpeakingRoom = () => {
               </ul>
             </div>
             <button style={styles.primaryButton} disabled={!selectedPrompt} onClick={copyToClipboard}>
-              In die Zwischenablage kopieren
+              Copy to clipboard
             </button>
           </div>
 
