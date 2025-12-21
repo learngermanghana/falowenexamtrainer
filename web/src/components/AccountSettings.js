@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { correctBiography } from "../services/profileService";
 import TuitionStatusCard from "./TuitionStatusCard";
+import { isPaymentsEnabled } from "../lib/featureFlags";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -17,6 +18,7 @@ const formatDate = (value) => {
 
 const AccountSettings = () => {
   const { user, studentProfile, idToken, saveStudentProfile } = useAuth();
+  const paymentsEnabled = isPaymentsEnabled();
   const [profile, setProfile] = useState({
     name: "",
     email: "",
@@ -45,10 +47,21 @@ const AccountSettings = () => {
       renewalDate: formatDate(studentProfile?.contractEnd),
       status: studentProfile?.paymentStatus === "paid" ? "Active" : "Pending",
       seats: 1,
-      paymentMethod: studentProfile?.paystackLink ? "Paystack" : "Unknown",
+      paymentMethod: paymentsEnabled
+        ? studentProfile?.paystackLink
+          ? "Paystack"
+          : "Unknown"
+        : "Web portal",
       invoiceEmail: profile.email || user?.email || "",
     }),
-    [profile.email, studentProfile?.contractEnd, studentProfile?.paystackLink, studentProfile?.paymentStatus, user?.email]
+    [
+      paymentsEnabled,
+      profile.email,
+      studentProfile?.contractEnd,
+      studentProfile?.paystackLink,
+      studentProfile?.paymentStatus,
+      user?.email,
+    ]
   );
 
   const handleChange = (field) => (event) => {
@@ -319,12 +332,29 @@ const AccountSettings = () => {
                 <li>Privacy accepted</li>
                 <li>Cancel via support anytime</li>
               </ul>
-              <a
-                href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
-                style={{ ...styles.secondaryButton, textDecoration: "none", marginTop: 10 }}
-              >
-                View payment link
-              </a>
+              {paymentsEnabled ? (
+                <a
+                  href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
+                  style={{ ...styles.secondaryButton, textDecoration: "none", marginTop: 10 }}
+                >
+                  View payment link
+                </a>
+              ) : (
+                <div
+                  style={{
+                    ...styles.errorBox,
+                    background: "#f1f5f9",
+                    borderColor: "#cbd5e1",
+                    color: "#0f172a",
+                    marginTop: 10,
+                  }}
+                >
+                  <strong>Payments are only available on the web app.</strong>
+                  <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+                    Use the website to view or pay your tuition via Paystack. Payments are hidden in the Android app.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div style={{ ...styles.card, margin: 0 }}>
