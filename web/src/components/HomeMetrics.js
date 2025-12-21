@@ -51,37 +51,71 @@ const HomeMetrics = ({ studentProfile }) => {
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
 
+  const isMountedRef = React.useRef(true);
+
   useEffect(() => {
-    let active = true;
-    const load = async () => {
-      if (!className && !studentCode) return;
-      setLoading(true);
-      try {
-        const [attendanceResponse, assignmentResponse] = await Promise.all([
-          fetchAttendanceSummary({ className, studentCode }),
-          fetchAssignmentSummary({ studentCode }),
-        ]);
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-        if (!active) return;
+  const refreshMetrics = React.useCallback(async () => {
+    if (!className && !studentCode) {
+      if (isMountedRef.current) {
+        setAttendance({ sessions: 0, hours: 0 });
+        setAssignmentStats(null);
+      }
+      return;
+    }
 
-        setAttendance(attendanceResponse || { sessions: 0, hours: 0 });
-        setAssignmentStats(assignmentResponse?.student || null);
-      } catch (error) {
-        if (active) {
-          setAttendance({ sessions: 0, hours: 0 });
-          setAssignmentStats(null);
-        }
-      } finally {
-        if (active) setLoading(false);
+    if (isMountedRef.current) setLoading(true);
+    try {
+      const [attendanceResponse, assignmentResponse] = await Promise.all([
+        fetchAttendanceSummary({ className, studentCode }),
+        fetchAssignmentSummary({ studentCode }),
+      ]);
+
+      if (!isMountedRef.current) return;
+
+      setAttendance(attendanceResponse || { sessions: 0, hours: 0 });
+      setAssignmentStats(assignmentResponse?.student || null);
+    } catch (error) {
+      if (!isMountedRef.current) return;
+
+      setAttendance({ sessions: 0, hours: 0 });
+      setAssignmentStats(null);
+    } finally {
+      if (isMountedRef.current) setLoading(false);
+    }
+  }, [className, studentCode]);
+
+  useEffect(() => {
+    const run = async () => {
+      await refreshMetrics();
+    };
+
+    run();
+  }, [refreshMetrics]);
+
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        refreshMetrics();
       }
     };
 
-    load();
+    const handleFocus = () => {
+      refreshMetrics();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleVisibility);
 
     return () => {
-      active = false;
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
-  }, [className, studentCode]);
+  }, [refreshMetrics]);
 
   const completedNumbers = useMemo(() => {
     return (assignmentStats?.completedAssignments || [])
@@ -150,7 +184,17 @@ const HomeMetrics = ({ studentProfile }) => {
           <p style={{ ...styles.helperText, margin: 0 }}>Your personalised metrics</p>
           <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Attendance and assignments snapshot</h3>
         </div>
-        {loading && <span style={styles.badge}>Refreshing…</span>}
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          {loading && <span style={styles.badge}>Refreshing…</span>}
+          <button
+            type="button"
+            onClick={refreshMetrics}
+            disabled={loading}
+            style={{ ...styles.secondaryButton, padding: "8px 12px" }}
+          >
+            Refresh now
+          </button>
+        </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
