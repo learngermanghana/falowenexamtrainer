@@ -126,7 +126,7 @@ async function upsertStudentToSheet(student) {
   if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
 
   const sheets = await getSheetsClient();
-  const { headerMap } = await loadHeaderMap(sheets, sheetId, tabName);
+  const { headers, headerMap } = await loadHeaderMap(sheets, sheetId, tabName);
 
   // Find important columns by header names (supports variations)
   const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
@@ -155,7 +155,10 @@ async function upsertStudentToSheet(student) {
   const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
 
   if (colStudentCode === null) {
-    throw new Error("Students sheet is missing a StudentCode column header.");
+    const headerNames = headers && headers.length ? headers.join(" | ") : "(none)";
+    throw new Error(
+      `Students sheet is missing a StudentCode column header. Found headers: ${headerNames}`
+    );
   }
 
   // Build indexes to locate existing rows (only by columns that exist)
@@ -231,7 +234,7 @@ async function upsertStudentToSheet(student) {
 
   // Append new row: create an array aligned to header length
   // Note: we only fill known columns; everything else stays empty.
-  const maxCol = Math.max(...Array.from(headerMap.values()));
+  const maxCol = headerMap.size ? Math.max(...Array.from(headerMap.values())) : 0;
   const row = Array(maxCol + 1).fill("");
 
   row[colStudentCode] = targetStudentCode || "";
@@ -255,9 +258,11 @@ async function upsertStudentToSheet(student) {
   if (colLastDate !== null) row[colLastDate] = student.lastDate || "";
   if (colReminderSent !== null) row[colReminderSent] = student.reminderSent || "";
 
+  const appendRange = `${tabName}!A:${colToA1(maxCol)}`;
+
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
-    range: `${tabName}!A:Z`,
+    range: appendRange,
     valueInputOption: "USER_ENTERED",
     insertDataOption: "INSERT_ROWS",
     requestBody: { values: [row] },
