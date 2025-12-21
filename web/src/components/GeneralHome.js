@@ -36,9 +36,9 @@ const WelcomeHero = ({ studentProfile }) => {
 const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnableNotifications }) => {
   const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
+  const classCalendarId = "class-calendar-card";
 
   const handleSelectLevel = () => navigate("/campus/account");
-  const handleConfirmClass = () => navigate("/campus/course");
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -47,7 +47,6 @@ const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnabl
         notificationStatus={notificationStatus}
         onEnableNotifications={onEnableNotifications}
         onSelectLevel={handleSelectLevel}
-        onConfirmClass={handleConfirmClass}
       />
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>
@@ -116,7 +115,7 @@ const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnabl
           <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>More for you</summary>
           <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
             <HomeMetrics studentProfile={studentProfile} />
-            <ClassCalendarCard initialClassName={preferredClass} />
+            <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} />
           </div>
         </details>
       </section>
