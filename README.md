@@ -26,6 +26,28 @@ Create a `.env` file inside `web/` for the frontend (optional when using the def
 REACT_APP_BACKEND_URL=http://localhost:5000
 ```
 
+## Configure Firebase for auth + Firestore
+The React app reads/writes student data from Firestore and relies on Firebase Authentication for login, email verification, and
+password resets. To set it up:
+
+1. In the Firebase Console, create a **Web App** and copy the config values into `web/.env` (see `web/README.md` for the full
+   list). Set `REACT_APP_AUTH_CONTINUE_URL` to the host you want verification/reset links to return to.
+2. Under **Authentication → Sign-in method**, enable **Email/Password**. (Optional) Customize the verification and reset email
+   templates to mention your app host.
+3. Under **Firestore Database**, create a database (production mode for real users). The app stores student profiles and
+   placement history here.
+4. (Optional) Under **Cloud Messaging**, create a Web Push certificate key and set `REACT_APP_FIREBASE_VAPID_KEY` to enable
+   browser notifications.
+5. For server-side features (Paystack webhook, Sheets sync), deploy the Cloud Functions as described below so they can access
+   the same project resources.
+
+### Check whether a student is verified
+- In the Firebase Console, open **Authentication → Users**. The **Email verified** column shows `true` for verified students
+  and `false` for accounts that have not clicked the verification link yet.
+- If someone signed up before you finished configuring verification emails, their account remains listed with `Email verified`
+  set to `false`; they can log in and request a new verification email (or you can click the triple-dot menu in the Users table
+  to **Send verification email** from the console). No data is lost—the flag flips to `true` as soon as they verify.
+
 ## Automate Firebase signups to Google Sheets
 If your new signup flow writes student records to Firestore, you can mirror those
 rows into the approval spreadsheet with the helper script at

@@ -40,6 +40,27 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
+const resolveActionCodeUrl = () => {
+  if (process.env.REACT_APP_AUTH_CONTINUE_URL) {
+    return process.env.REACT_APP_AUTH_CONTINUE_URL;
+  }
+
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return window.location.origin;
+  }
+
+  if (firebaseConfig.authDomain) {
+    return `https://${firebaseConfig.authDomain}`;
+  }
+
+  return "http://localhost";
+};
+
+const getActionCodeSettings = () => ({
+  url: resolveActionCodeUrl(),
+  handleCodeInApp: false,
+});
+
 const isFirebaseConfigured = Object.values(firebaseConfig).every(Boolean);
 
 const missingConfigError = new Error(
@@ -233,6 +254,7 @@ export {
   signOut,
   requestMessagingToken,
   listenForForegroundMessages,
+  getActionCodeSettings,
   collection,
   doc,
   getDoc,

@@ -19,6 +19,7 @@ import {
   serverTimestamp,
   isFirebaseConfigured,
   deleteField,
+  getActionCodeSettings,
 } from "../firebase";
 
 const AuthContext = createContext();
@@ -116,7 +117,12 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
     }
     setAuthError("");
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    const normalizedEmail = email.trim().toLowerCase();
+    const credential = await createUserWithEmailAndPassword(
+      auth,
+      normalizedEmail,
+      password
+    );
     const token = await credential.user.getIdToken();
     setIdToken(token);
 
@@ -126,7 +132,7 @@ export const AuthProvider = ({ children }) => {
     const payload = {
       uid: credential.user.uid,
       name: profile.name || profile.firstName || "",
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       role: "student",
       studentCode: studentId,
       about: "",
@@ -153,7 +159,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     await setDoc(studentsRef, payload, { merge: true });
-    await sendEmailVerification(credential.user);
+    await sendEmailVerification(credential.user, getActionCodeSettings());
     await signOut(auth);
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
@@ -165,9 +171,14 @@ export const AuthProvider = ({ children }) => {
       throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
     }
     setAuthError("");
-    const credential = await signInWithEmailAndPassword(auth, email, password);
+    const normalizedEmail = email.trim().toLowerCase();
+    const credential = await signInWithEmailAndPassword(
+      auth,
+      normalizedEmail,
+      password
+    );
     if (!credential.user.emailVerified) {
-      await sendEmailVerification(credential.user);
+      await sendEmailVerification(credential.user, getActionCodeSettings());
       await signOut(auth);
       const error = new Error(
         "Please verify your email address before logging in. We've re-sent the verification link."
@@ -178,7 +189,7 @@ export const AuthProvider = ({ children }) => {
     }
     const token = await credential.user.getIdToken();
     setIdToken(token);
-    const profile = await fetchStudentProfileByEmail(email);
+    const profile = await fetchStudentProfileByEmail(normalizedEmail);
     setStudentProfile(profile);
     setMessagingToken(profile?.messagingToken || null);
     return credential;
@@ -191,7 +202,8 @@ export const AuthProvider = ({ children }) => {
     if (!email) {
       throw new Error("Please enter your email address to reset the password.");
     }
-    await sendPasswordResetEmail(auth, email.toLowerCase());
+    const normalizedEmail = email.trim().toLowerCase();
+    await sendPasswordResetEmail(auth, normalizedEmail, getActionCodeSettings());
   };
 
   const logout = useCallback(
