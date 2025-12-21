@@ -6,7 +6,7 @@ import { useAuth } from "../context/AuthContext";
 const LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const ChatBuddyPage = () => {
-  const { idToken } = useAuth();
+  const { idToken, studentProfile } = useAuth();
   const [level, setLevel] = useState("B1");
   const [inputMode, setInputMode] = useState("text");
   const [message, setMessage] = useState("");
@@ -25,12 +25,20 @@ const ChatBuddyPage = () => {
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const historyEndRef = useRef(null);
+  const profileLevel = (studentProfile?.level || "").toUpperCase();
+  const isLevelLocked = LEVELS.includes(profileLevel);
 
   useEffect(() => {
     if (historyEndRef.current) {
       historyEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [history]);
+
+  useEffect(() => {
+    if (isLevelLocked && level !== profileLevel) {
+      setLevel(profileLevel);
+    }
+  }, [isLevelLocked, level, profileLevel]);
 
   const startRecording = async () => {
     setError("");
@@ -127,15 +135,18 @@ const ChatBuddyPage = () => {
         </p>
         <div style={styles.row}>
           <div style={styles.field}>
-            <label style={styles.label} htmlFor="level-select">
-              Target level
-            </label>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <label style={styles.label} htmlFor="level-select">
+                Target level
+              </label>
+              {isLevelLocked && <span style={styles.badge}>From profile</span>}
+            </div>
             <select
               id="level-select"
               style={styles.select}
               value={level}
               onChange={(e) => setLevel(e.target.value)}
-              disabled={loading}
+              disabled={loading || isLevelLocked}
             >
               {LEVELS.map((lvl) => (
                 <option key={lvl} value={lvl}>
