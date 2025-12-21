@@ -115,7 +115,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           setMode("login");
         }
       } else {
-        setAuthError(getAuthErrorMessage(error, mode));
+        setAuthError(
+          error?.message || "Login failed. Please try again."
+        );
         setMessage("");
       }
     } finally {
