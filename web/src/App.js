@@ -305,6 +305,7 @@ const AppShell = ({
                 availableTabs={availableTabs}
                 defaultSection={defaultCampusSection}
                 onBack={goHome}
+                studentProfile={studentProfile}
                 tabStorageKey={tabStorageKey}
               />
             }
@@ -320,7 +321,14 @@ const AppShell = ({
   );
 };
 
-const CampusArea = ({ allowedSections, availableTabs, defaultSection, onBack, tabStorageKey }) => {
+const CampusArea = ({
+  allowedSections,
+  availableTabs,
+  defaultSection,
+  onBack,
+  studentProfile,
+  tabStorageKey,
+}) => {
   const { section } = useParams();
   const navigate = useNavigate();
 
