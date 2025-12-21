@@ -1,4 +1,4 @@
-# Falowen Exam Coach – Frontend
+# Falowen Learning Hub – Frontend
 
 This React app guides learners through recording or typing answers for speaking practice and now connects directly to Firebase Firestore for student profiles and scores.
 

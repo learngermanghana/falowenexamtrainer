@@ -243,7 +243,7 @@ const WritingPage = ({ mode = "course" }) => {
       const msg =
         err?.response?.data?.error ||
         err.message ||
-        "Falowen Exam Coach: Error sending text for analysis.";
+        "Falowen Learning Hub: Error sending text for analysis.";
       setError(msg);
     } finally {
       setLoading(false);

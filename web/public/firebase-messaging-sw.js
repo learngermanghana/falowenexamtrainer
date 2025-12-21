@@ -17,7 +17,7 @@ function initializeMessaging(config) {
     if (!title) return;
 
     self.registration.showNotification(title, {
-      body: body || "Falowen Exam Coach update",
+      body: body || "Falowen Learning Hub update",
       icon: "/logo192.png",
     });
   });

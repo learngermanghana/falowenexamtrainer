@@ -137,7 +137,7 @@ const OnboardingChecklist = ({
         <div>
           <p style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>Onboarding</p>
           <h2 style={{ ...styles.sectionTitle, marginTop: 4, marginBottom: 4 }}>
-            Start strong with Exam Coach
+            Start strong with Falowen
           </h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
             Quick guide for new learners: choose your level, confirm your class, save the calendar, and turn on push notifications.

@@ -111,7 +111,7 @@ export const generateClassCalendar = (className) => {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Falowen Exam Coach//Class Calendar//EN",
+    "PRODID:-//Falowen Learning Hub//Class Calendar//EN",
     "CALSCALE:GREGORIAN",
     eventsBlock,
     "END:VCALENDAR",
