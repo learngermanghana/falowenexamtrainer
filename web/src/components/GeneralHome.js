@@ -36,9 +36,18 @@ const WelcomeHero = ({ studentProfile }) => {
 const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnableNotifications }) => {
   const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
+  const classCalendarId = "class-calendar-card";
 
   const handleSelectLevel = () => navigate("/campus/account");
-  const handleConfirmClass = () => navigate("/campus/course");
+  const handleConfirmClass = () => {
+    const calendarSection = document.getElementById(classCalendarId);
+    if (calendarSection) {
+      calendarSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    navigate("/");
+  };
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -116,7 +125,7 @@ const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnabl
           <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>More for you</summary>
           <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
             <HomeMetrics studentProfile={studentProfile} />
-            <ClassCalendarCard initialClassName={preferredClass} />
+            <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} />
           </div>
         </details>
       </section>
