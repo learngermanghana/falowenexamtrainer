@@ -320,6 +320,48 @@ const SpeakingRoom = () => {
           </div>
         ) : null}
 
+        {guidance ? (
+          <div style={{ ...styles.card, background: "#f8fafc", marginTop: 12 }}>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "grid", gap: 6 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Was mache ich in diesem Teil?</p>
+                  <h3 style={{ margin: 0 }}>{guidance.title}</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{guidance.description}</p>
+                  <ul style={{ margin: "4px 0 0 16px", padding: 0, color: "#374151", fontSize: 13 }}>
+                    {guidance.steps.map((step, index) => (
+                      <li key={index} style={{ marginBottom: 4 }}>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={{ minWidth: 260, display: "grid", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Eigenes Audio aufnehmen</p>
+                  <button
+                    style={isRecording ? styles.dangerButton : styles.primaryButton}
+                    onClick={isRecording ? stopRecording : startRecording}
+                  >
+                    {isRecording ? "Aufnahme stoppen" : "Aufnahme starten"}
+                  </button>
+                  {isRecording ? (
+                    <span style={{ color: "#b91c1c", fontWeight: 600 }}>Recording … sprich jetzt laut</span>
+                  ) : null}
+                  {recordingError ? (
+                    <p style={{ ...styles.helperText, color: "#b91c1c", margin: 0 }}>{recordingError}</p>
+                  ) : null}
+                  {recordingUrl ? (
+                    <div style={{ display: "grid", gap: 4 }}>
+                      <span style={{ ...styles.helperText, margin: 0 }}>Probe-Aufnahme</span>
+                      <audio controls src={recordingUrl} style={{ width: "100%" }} />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
           {filteredPrompts.map((prompt) => (
             <div
