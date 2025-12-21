@@ -959,16 +959,30 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
       { role: "user", content: combinedMessage || transcript || "Student sent an empty message." },
     ];
 
-    const reply = await createChatCompletion(chatMessages, { temperature: 0.55, max_tokens: 420 });
+    let fallbackUsed = false;
+    let reply;
+
+    try {
+      reply = await createChatCompletion(chatMessages, { temperature: 0.55, max_tokens: 420 });
+    } catch (err) {
+      log.error("chatbuddy.completion.failed", {
+        errorMessage: err?.message || "unknown",
+        uid: authedUser.uid,
+      });
+      fallbackUsed = true;
+      reply =
+        "Sorry, the chat buddy is unavailable right now. Please try again in a few moments or send a shorter message.";
+    }
 
     auditAIRequest({
       route: "/chatbuddy/respond",
       uid: authedUser.uid,
       email: authedUser.email,
       metadata: { level, quotaRemaining: quota.remaining },
+      success: !fallbackUsed,
     });
 
-    return res.json({ reply, transcript: transcript || null, quotaRemaining: quota.remaining });
+    return res.json({ reply, transcript: transcript || null, quotaRemaining: quota.remaining, degraded: fallbackUsed });
   } catch (err) {
     console.error("/chatbuddy/respond error", err);
     auditAIRequest({ route: "/chatbuddy/respond", uid: authedUser?.uid, email: authedUser?.email, success: false });

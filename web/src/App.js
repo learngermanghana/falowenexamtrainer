@@ -197,6 +197,7 @@ const AppShell = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [notificationError, setNotificationError] = useState("");
 
   const subtitle = useMemo(() => {
     if (location.pathname.startsWith("/campus")) {
@@ -211,6 +212,16 @@ const AppShell = ({
   }, [location.pathname]);
 
   const goHome = () => navigate("/");
+
+  const handleEnableNotifications = async () => {
+    setNotificationError("");
+    try {
+      await enableNotifications();
+    } catch (err) {
+      console.error("Failed to enable notifications", err);
+      setNotificationError("Could not enable push notifications. Please try again.");
+    }
+  };
 
   const handleAreaSelect = (area) => {
     if (area === "campus") {
@@ -243,9 +254,31 @@ const AppShell = ({
         <div className="app-header-meta" style={{ display: "grid", gap: 6, justifyItems: "end" }}>
           <HealthIndicator />
           <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
-          <button style={styles.dangerButton} onClick={logout}>
-            Logout
-          </button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+            <button
+              style={notificationStatus === "granted" ? styles.secondaryButton : styles.primaryButton}
+              onClick={handleEnableNotifications}
+              disabled={notificationStatus === "pending" || notificationStatus === "granted"}
+            >
+              {notificationStatus === "granted"
+                ? "Push enabled"
+                : notificationStatus === "pending"
+                ? "Enabling..."
+                : notificationStatus === "blocked"
+                ? "Unblock notifications"
+                : "Enable push alerts"}
+            </button>
+            <button style={styles.dangerButton} onClick={logout}>
+              Logout
+            </button>
+          </div>
+          {notificationError ? (
+            <div style={{ ...styles.errorBox, marginTop: 4 }}>{notificationError}</div>
+          ) : notificationStatus === "blocked" ? (
+            <div style={{ fontSize: 12, color: "#b91c1c" }}>
+              Notifications are blocked in your browser settings.
+            </div>
+          ) : null}
         </div>
       </header>
 
