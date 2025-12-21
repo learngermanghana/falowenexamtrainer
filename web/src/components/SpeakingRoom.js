@@ -7,97 +7,97 @@ const levels = ["A1", "A2", "B1", "B2", "C1"];
 const teilGuidance = {
   A1: {
     "Teil 1": {
-      title: "Short intro (name, origin, where you live, work/study)",
+      title: "Kurzvorstellung (Name, Herkunft, Wohnort, Arbeit/Studium)",
       description:
-        "Introduce yourself briefly in one go so the AI can rate clarity and pronunciation.",
+        "Stelle dich kurz vor. Wiederhole deinen Namen, wo du wohnst, was du machst und 1–2 Hobbys, damit die KI deine Aussprache und Klarheit bewerten kann.",
       steps: [
-        "Start one recording and cover everything in a single clip: name, age, where you live/are from, job/studies, and one hobby (30–45 seconds).",
-        "Speak clearly and smoothly, as if meeting someone new. Keep the points together, not in separate clips.",
-        "Stop the recording, listen once, then repeat with small variations.",
+        "Aufnahme starten, laut sprechen und ca. 30–45 Sekunden bleiben.",
+        "Nenne Name, Alter, Wohnort, Herkunft, Beruf/Studium und ein Hobby.",
+        "Beende die Aufnahme und höre sie dir noch einmal an. Wiederhole mit kleinen Variationen.",
       ],
     },
     "Teil 2": {
-      title: "Ask and answer questions (topic + keyword)",
+      title: "Fragen stellen und beantworten (Thema + Stichwort)",
       description:
-        "Pick a topic and keyword. Ask 2–3 simple questions about it, answer them yourself out loud, and let the AI score it.",
+        "Wähle ein Thema und das Stichwort darunter. Stelle 2–3 einfache Fragen dazu, beantworte sie selbst laut und lass die KI mitmarken.",
       steps: [
-        "Start recording, ask a WH-question, and answer briefly (e.g., topic: time → question: When does it open…?).",
-        "Add a simple yes/no question and answer it too.",
-        "Stop, listen back, and try again with a new question.",
+        "Klicke Aufnahme, stelle eine W-Frage und antworte kurz (z. B. Thema Uhr → Frage: Wann öffnet…?).",
+        "Baue einfache Ja/Nein-Fragen ein und beantworte sie ebenfalls.",
+        "Stoppen, anhören und erneut üben mit einer neuen Frage.",
       ],
     },
     "Teil 3": {
-      title: "Make or refuse a request",
+      title: "Um etwas bitten oder eine Bitte ablehnen", 
       description:
-        "Practise polite requests or small plans (asking for help or a time). Use modal verbs like can/would like and add a short because for context.",
+        "Formuliere höfliche Bitten oder kleine Planungen (z. B. um Hilfe bitten, um einen Termin fragen). Nutze Modalverben wie können/möchten und ein kurzes weil als Begründung.",
       steps: [
-        "Start recording, state the situation, and say your request.",
-        "Suggest a time/option and respond with agreement or a polite refusal.",
-        "Stop, listen, then repeat the same request with a different option.",
+        "Starte Aufnahme, nenne kurz die Situation und formuliere deine Bitte.",
+        "Schlage eine Zeit/Option vor und reagiere mit Zustimmung oder höflicher Ablehnung.",
+        "Stoppen, anhören und dieselbe Bitte mit anderer Option wiederholen.",
       ],
     },
   },
   A2: {
     "Teil 1": {
-      title: "Pick a topic and talk about yourself",
+      title: "Thema wählen und über dich erzählen",
       description:
-        "Choose a topic (e.g., travel, daily life, work) and speak for 1–2 minutes. Focus on yourself, short examples, and one feeling or opinion.",
+        "Suche dir ein Thema (z. B. Reise, Alltag, Arbeit) und sprich 1–2 Minuten darüber. Fokus: du selbst, kurze Beispiele, ein Gefühl oder eine Meinung.",
       steps: [
-        "Start recording and cover three parts: short intro, two details, closing line.",
-        "Use because/that for simple reasons.",
-        "Stop, listen, add one new detail, and record again.",
+        "Aufnahme starten und 3 Punkte nennen: kurze Einleitung, 2 Details, Abschluss.",
+        "Nutze weil/dass für einfache Begründungen.",
+        "Stoppen, anhören, ein neues Detail ergänzen und erneut aufnehmen.",
       ],
     },
     "Teil 2": {
-      title: "Answer and ask back",
+      title: "Fragen beantworten und Rückfragen stellen",
       description:
-        "Respond to a question about the topic and add your own follow-up question. Keep sentences connected and clear.",
+        "Reagiere auf eine Frage zum Thema und stelle selbst eine passende Rückfrage. Halte die Sätze verbunden und klar.",
       steps: [
-        "Start recording, answer the main question in 2–3 sentences.",
-        "Ask a related follow-up question and answer it briefly.",
-        "Stop and check if your question forms and verb order are correct.",
+        "Starte Aufnahme, beantworte die Leitfrage mit 2–3 Sätzen.",
+        "Stelle danach eine eigene Rückfrage zum gleichen Thema und beantworte sie kurz.",
+        "Stoppen und prüfen, ob Frageformen und Verbposition stimmen.",
       ],
     },
     "Teil 3": {
-      title: "Agree on a time or plan with someone",
+      title: "Einen Termin/Plan mit jemandem abstimmen",
       description:
-        "Plan something together (meeting, meal, sport). Make suggestions, note conflicts, and decide.",
+        "Plane etwas gemeinsam (Treffen, Essen, Sport). Mache Vorschläge, höre auf Konflikte und treffe eine Entscheidung.",
       steps: [
-        "Start recording and suggest two times/options.",
-        "Say which option fits better and why.",
-        "Stop, listen, and finish with a clear confirmation.",
+        "Aufnahme starten, zwei Termine/Optionen vorschlagen.",
+        "Sage, welche Option besser passt und warum.",
+        "Stoppen, anhören und die Planung mit einer Bestätigung abschließen.",
       ],
     },
   },
   B1: {
     "Teil 1": {
-      title: "Short presentation on an everyday topic",
+      title: "Kurze Präsentation zu einem Alltagsthema",
       description:
-        "Give a mini presentation (intro, 2–3 points, opinion, closing). Pick a keyword and use examples.",
+        "Gib eine Mini-Präsentation (Einleitung, 2–3 Punkte, Meinung, Abschluss). Wähle ein Stichwort und nutze Beispiele.",
       steps: [
-        "Start recording and structure clearly: opening → points → opinion.",
-        "Use connectors (first, also, therefore).",
-        "Stop, listen, and note weak spots (pronunciation, word choice).",
+        "Aufnahme starten, klar gliedern: Einstieg → Punkte → Meinung.",
+        "Nutze Verknüpfungen (erstens, außerdem, deshalb).",
+        "Stoppen, anhören und Schwachstellen (Aussprache, Wortwahl) notieren.",
       ],
     },
     "Teil 2": {
-      title: "Answer questions about the presentation",
+      title: "Fragen zur Präsentation beantworten",
       description:
-        "Simulate follow-up questions: restate the question briefly, agree or disagree, and give a reason.",
+        "Simuliere Rückfragen: fasse die Frage kurz zusammen, stimme zu oder lehne ab und begründe.",
       steps: [
-        "Start recording and repeat a likely question out loud.",
-        "Answer with a clear opinion + reason; add one example.",
-        "Stop and check if you respond clearly and keep verb order.",
+        "Aufnahme starten und eine mögliche Frage laut wiederholen.",
+        "Beantworte mit klarer Meinung + Begründung; füge ein Beispiel an.",
+        "Stoppen und prüfen, ob du verständlich reagierst und Verbposition hältst.",
       ],
     },
     "Teil 3": {
-      title: "Plan and decide together",
+      title: "Gemeinsam planen und entscheiden",
       description:
-        "Plan an event/activity with another person. Compare options, negotiate a compromise, and summarise.",
+        "Plane eine Veranstaltung/Aktivität mit einer anderen Person. Vergleiche Optionen, handle einen Kompromiss aus und fasse zusammen.",
       steps: [
-        "Start recording, present two options, and state pros/cons.",
-        "Agree or disagree politely and suggest a compromise.",
-        "Stop, listen, and give a clear decision.",
+        "Aufnahme starten, zwei Optionen vorstellen und Vor-/Nachteile nennen.",
+        "Formuliere Zustimmung oder Ablehnung höflich und schlage einen Kompromiss vor.",
+        "Stoppen, anhören und eine klare Entscheidung formulieren.",
       ],
     },
   },
@@ -182,7 +182,7 @@ const SpeakingRoom = () => {
     setRecordingUrl(null);
 
     if (!navigator?.mediaDevices?.getUserMedia) {
-      setRecordingError("Recording not possible: browser has no microphone access.");
+      setRecordingError("Aufnahme nicht möglich: Kein Mikrofonzugriff im Browser.");
       return;
     }
 
@@ -209,7 +209,7 @@ const SpeakingRoom = () => {
       setIsRecording(true);
     } catch (err) {
       console.error("Recording failed", err);
-      setRecordingError("Please allow microphone access or try a different device.");
+      setRecordingError("Bitte Mikrofon-Zugriff erlauben oder ein anderes Gerät testen.");
     }
   };
 
@@ -264,26 +264,103 @@ const SpeakingRoom = () => {
 
           <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Select a topic to rehearse and pass straight to the AI coach. Use the Part buttons to view Teil 1, 2, or 3 prompts for
+              Select a topic to rehearse and pass straight to the AI coach. Use the Teil buttons to view Teil 1, 2, or 3 prompts for
               your chosen level. Each Teil below explains exactly what to record so the keywords are no longer just a list.
             </p>
             <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
-              <li>📼 Quick start: Pick your level → choose the part (Teil) → pick a topic → hit "Start recording" → speak for 30–90 seconds.</li>
-              <li>🧭 Stay focused: Cover the 2–3 steps listed for the part. That is what the AI will mark.</li>
+              <li>📼 Quick start: Pick your level → choose Teil → pick a topic → hit "Aufnahme starten" → speak for 30–90 seconds.</li>
+              <li>🧭 Stay focused: Cover the 2–3 steps listed for the Teil. That is what the AI will mark.</li>
               <li>🗣️ Speak first, then read: Glance at the keywords for ideas, then look away while you answer to practise fluency.</li>
-              <li>🧪 How the AI marks you: task fit, clarity/pronunciation, grammar/verb order, vocabulary/coherence.</li>
             </ul>
-            <div style={{ ...styles.card, padding: 12, margin: "10px 0 0 0", background: "#eef2ff" }}>
-              <strong style={{ display: "block", marginBottom: 4 }}>Get AI feedback</strong>
-              <ol style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
-                <li>Pick your topic + part and click “Copy to clipboard” below.</li>
-                <li>Start recording and speak for 30–90 seconds. Save the practice clip (or jot down your main sentences).</li>
-                <li>Paste the copied text into the AI chat, upload the audio file <em>(if the chat allows)</em>, or write a short summary of your answer.</li>
-                <li>Ask the AI to score you on the criteria above and to give 2–3 improvement tips.</li>
-              </ol>
-            </div>
           </div>
         </div>
+
+        {guidance ? (
+          <div style={{ ...styles.card, background: "#f8fafc", marginTop: 12 }}>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "grid", gap: 6 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Was mache ich in diesem Teil?</p>
+                  <h3 style={{ margin: 0 }}>{guidance.title}</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{guidance.description}</p>
+                  <ul style={{ margin: "4px 0 0 16px", padding: 0, color: "#374151", fontSize: 13 }}>
+                    {guidance.steps.map((step, index) => (
+                      <li key={index} style={{ marginBottom: 4 }}>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={{ minWidth: 260, display: "grid", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Eigenes Audio aufnehmen</p>
+                  <button
+                    style={isRecording ? styles.dangerButton : styles.primaryButton}
+                    onClick={isRecording ? stopRecording : startRecording}
+                  >
+                    {isRecording ? "Aufnahme stoppen" : "Aufnahme starten"}
+                  </button>
+                  {isRecording ? (
+                    <span style={{ color: "#b91c1c", fontWeight: 600 }}>Recording … sprich jetzt laut</span>
+                  ) : null}
+                  {recordingError ? (
+                    <p style={{ ...styles.helperText, color: "#b91c1c", margin: 0 }}>{recordingError}</p>
+                  ) : null}
+                  {recordingUrl ? (
+              <div style={{ display: "grid", gap: 4 }}>
+                <span style={{ ...styles.helperText, margin: 0 }}>Probe-Aufnahme</span>
+                <audio controls src={recordingUrl} style={{ width: "100%" }} />
+                <span style={{ ...styles.helperText, margin: 0 }}>
+                  Tipp: Höre dir die Lautstärke an. Wenn es zu leise klingt, sprich näher am Mikro oder wiederhole die Probe.
+                </span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+            </div>
+          </div>
+        ) : null}
+
+        {guidance ? (
+          <div style={{ ...styles.card, background: "#f8fafc", marginTop: 12 }}>
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "grid", gap: 6 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Was mache ich in diesem Teil?</p>
+                  <h3 style={{ margin: 0 }}>{guidance.title}</h3>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{guidance.description}</p>
+                  <ul style={{ margin: "4px 0 0 16px", padding: 0, color: "#374151", fontSize: 13 }}>
+                    {guidance.steps.map((step, index) => (
+                      <li key={index} style={{ marginBottom: 4 }}>
+                        {step}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div style={{ minWidth: 260, display: "grid", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Eigenes Audio aufnehmen</p>
+                  <button
+                    style={isRecording ? styles.dangerButton : styles.primaryButton}
+                    onClick={isRecording ? stopRecording : startRecording}
+                  >
+                    {isRecording ? "Aufnahme stoppen" : "Aufnahme starten"}
+                  </button>
+                  {isRecording ? (
+                    <span style={{ color: "#b91c1c", fontWeight: 600 }}>Recording … sprich jetzt laut</span>
+                  ) : null}
+                  {recordingError ? (
+                    <p style={{ ...styles.helperText, color: "#b91c1c", margin: 0 }}>{recordingError}</p>
+                  ) : null}
+                  {recordingUrl ? (
+                    <div style={{ display: "grid", gap: 4 }}>
+                      <span style={{ ...styles.helperText, margin: 0 }}>Probe-Aufnahme</span>
+                      <audio controls src={recordingUrl} style={{ width: "100%" }} />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {guidance ? (
           <div style={{ ...styles.card, background: "#f8fafc", marginTop: 12 }}>
@@ -374,9 +451,9 @@ const SpeakingRoom = () => {
                 Copy the details and start your AI chat for the chosen part.
               </p>
               <ul style={{ margin: "8px 0 0 18px", color: "#4b5563", fontSize: 13, lineHeight: 1.4 }}>
-                <li>👉 Read the keywords out loud once so you know what should appear.</li>
-                <li>👉 Then start recording and speak freely without staring at the text.</li>
-                <li>👉 Save the topic with the button on the right to copy it quickly into the AI chat.</li>
+                <li>👉 Lies die Stichwörter einmal laut vor, damit du weißt, was vorkommen soll.</li>
+                <li>👉 Starte danach die Aufnahme und sprich frei, ohne ständig auf den Text zu schauen.</li>
+                <li>👉 Speichere das Thema mit dem Button rechts, um es schnell in die KI zu kopieren.</li>
               </ul>
             </div>
             <button style={styles.primaryButton} disabled={!selectedPrompt} onClick={copyToClipboard}>
