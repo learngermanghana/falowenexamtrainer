@@ -79,7 +79,15 @@ const getPreferredSection = (allowedSections, preferred) => {
 };
 
 function App() {
-  const { user, loading: authLoading, logout, authError, studentProfile } = useAuth();
+  const {
+    user,
+    loading: authLoading,
+    logout,
+    authError,
+    studentProfile,
+    enableNotifications,
+    notificationStatus,
+  } = useAuth();
   const [authMode, setAuthMode] = useState("landing");
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
@@ -233,7 +241,14 @@ const AppShell = ({ allowedSections, availableTabs, defaultCampusSection, logout
         <Routes>
           <Route
             path="/"
-            element={<GeneralHome onSelectArea={handleAreaSelect} studentProfile={studentProfile} />}
+            element={
+              <GeneralHome
+                onSelectArea={handleAreaSelect}
+                studentProfile={studentProfile}
+                notificationStatus={notificationStatus}
+                onEnableNotifications={enableNotifications}
+              />
+            }
           />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
