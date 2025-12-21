@@ -8,6 +8,11 @@ This React app guides learners through recording or typing answers for speaking 
    cd web
    npm install
    ```
+   If your environment injects an HTTP(S) proxy that blocks the npm registry, the included
+   [`.npmrc`](./.npmrc) pins the registry to `https://registry.npmjs.org/` so `npm install`
+   can bypass the proxy-specific override. If you still see 403 or network errors, temporarily
+   unset `HTTP_PROXY`/`HTTPS_PROXY` before installing so npm can reach the public registry
+   directly.
 2. Create a `.env` file in `web/` with your Firebase project settings:
    ```
    REACT_APP_FIREBASE_API_KEY=xxxx
