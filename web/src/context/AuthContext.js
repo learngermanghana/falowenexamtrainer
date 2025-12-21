@@ -201,6 +201,14 @@ export const AuthProvider = ({ children }) => {
       setNotificationStatus("pending");
       try {
         const token = await requestMessagingToken();
+        if (!token) {
+          setNotificationStatus(
+            typeof Notification !== "undefined" && Notification.permission === "denied"
+              ? "blocked"
+              : "idle"
+          );
+          return null;
+        }
         setMessagingToken(token);
         if (studentProfile?.id) {
           await persistMessagingToken(token, studentProfile.id);
@@ -240,6 +248,10 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const token = await requestMessagingToken();
+        if (!token) {
+          setNotificationStatus(storedToken ? "stale" : "blocked");
+          return;
+        }
         setMessagingToken(token);
         if (studentProfile.messagingToken !== token) {
           await persistMessagingToken(token, studentProfile.id);
