@@ -112,7 +112,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           : "1-month starter contract set with reminder";
       const balanceText = balanceDue > 0 ? ` Balance due: GH₵${balanceDue}.` : "";
       const paymentInstruction = paymentsEnabled
-        ? ` Pay via Paystack: ${paystackLink}.`
+        ? ` Pay online using your secure link: ${paystackLink}.`
         : " Payments are handled on the web app only. Please sign in online to complete your tuition.";
       const successMessage =
         `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${balanceText}`;

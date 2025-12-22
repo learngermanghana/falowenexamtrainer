@@ -70,7 +70,7 @@ const TuitionStatusCard = ({
               textDecoration: "none",
             }}
           >
-            Pay with Paystack
+            Pay tuition online
           </a>
         ) : (
           <div
@@ -83,7 +83,7 @@ const TuitionStatusCard = ({
           >
             <strong>Payments are only available on the web app.</strong>
             <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-              Please sign in from the website to complete tuition payments via Paystack.
+              Please sign in from the website to complete your tuition payment through our secure portal.
             </p>
           </div>
         )}
