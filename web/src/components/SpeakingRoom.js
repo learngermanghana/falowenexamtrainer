@@ -3,6 +3,8 @@ import { styles } from "../styles";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 
 const levels = ["A1", "A2", "B1", "B2", "C1"];
+const goethePracticeLink =
+  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
 
 const teilGuidance = {
   A1: {
@@ -226,6 +228,50 @@ const SpeakingRoom = () => {
             </p>
           </div>
           <span style={styles.badge}>Time-box: 10–12 minutes</span>
+        </div>
+      </section>
+
+      <section
+        style={{
+          ...styles.card,
+          background: "linear-gradient(135deg, #ecfeff 0%, #eef2ff 100%)",
+          borderColor: "#c7d2fe",
+          display: "grid",
+          gap: 10,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>Goethe exam booster</p>
+            <h3 style={{ margin: 0 }}>Open the dedicated speaking practice tool</h3>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Use the online practice link to rehearse Goethe speaking tasks. When it opens, enter your student code, choose your
+              level, and follow the on-page instructions so the AI can analyse your speaking and give feedback.
+            </p>
+            <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
+              <li>Open the tool and read the directions carefully before recording.</li>
+              <li>Add your student code to save progress and match feedback to you.</li>
+              <li>Select the right Goethe level and practise the suggested prompts.</li>
+            </ul>
+          </div>
+          <a
+            href={goethePracticeLink}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              ...styles.primaryButton,
+              textDecoration: "none",
+              height: "fit-content",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span role="img" aria-label="microphone">
+              🎤
+            </span>
+            Open Goethe speaking practice
+          </a>
         </div>
       </section>
 
