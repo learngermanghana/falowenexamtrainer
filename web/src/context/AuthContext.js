@@ -95,6 +95,23 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
+      if (!firebaseUser.emailVerified) {
+        try {
+          await sendEmailVerification(firebaseUser, getActionCodeSettings());
+        } catch (error) {
+          console.error("Failed to send verification email", error);
+        }
+        await signOut(auth);
+        setIdToken(null);
+        setMessagingToken(null);
+        setNotificationStatus("idle");
+        setAuthError(
+          "Please verify your email address before logging in. We've re-sent the verification link."
+        );
+        setLoading(false);
+        return;
+      }
+
       try {
         const token = await firebaseUser.getIdToken();
         setIdToken(token);
