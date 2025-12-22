@@ -43,6 +43,20 @@ export const AuthProvider = ({ children }) => {
   const [notificationStatus, setNotificationStatus] = useState("idle");
   const [messagingToken, setMessagingToken] = useState(null);
 
+  const resendVerificationEmail = useCallback(async (firebaseUser) => {
+    if (!firebaseUser) {
+      return { sent: false };
+    }
+
+    try {
+      await sendEmailVerification(firebaseUser, getActionCodeSettings());
+      return { sent: true };
+    } catch (error) {
+      console.error("Failed to send verification email", error);
+      return { sent: false, error };
+    }
+  }, []);
+
   const persistMessagingToken = useCallback(async (token, studentId) => {
     if (!studentId || !token) return;
     const studentRef = doc(db, "students", studentId);
@@ -96,18 +110,15 @@ export const AuthProvider = ({ children }) => {
       }
 
       if (!firebaseUser.emailVerified) {
-        try {
-          await sendEmailVerification(firebaseUser, getActionCodeSettings());
-        } catch (error) {
-          console.error("Failed to send verification email", error);
-        }
+        const { sent } = await resendVerificationEmail(firebaseUser);
         await signOut(auth);
         setIdToken(null);
         setMessagingToken(null);
         setNotificationStatus("idle");
-        setAuthError(
-          "Please verify your email address before logging in. We've re-sent the verification link."
-        );
+        const verificationMessage = sent
+          ? "Please verify your email address before logging in. We've re-sent the verification link."
+          : "Please verify your email address before logging in. We couldn't send the verification email, please try again or contact support.";
+        setAuthError(verificationMessage);
         setLoading(false);
         return;
       }
@@ -176,8 +187,19 @@ export const AuthProvider = ({ children }) => {
     }
 
     await setDoc(studentsRef, payload, { merge: true });
-    await sendEmailVerification(credential.user, getActionCodeSettings());
+    const { sent, error: verificationError } = await resendVerificationEmail(
+      credential.user
+    );
     await signOut(auth);
+    if (!sent) {
+      const error = new Error(
+        "Account created but we couldn't send the verification email. Please try again or contact support."
+      );
+      error.code = "auth/email-verification-send-failed";
+      error.email = normalizedEmail;
+      error.cause = verificationError;
+      throw error;
+    }
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
     return { verificationRequired: true };
@@ -195,13 +217,20 @@ export const AuthProvider = ({ children }) => {
       password
     );
     if (!credential.user.emailVerified) {
-      await sendEmailVerification(credential.user, getActionCodeSettings());
+      const { sent, error: verificationError } = await resendVerificationEmail(
+        credential.user
+      );
       await signOut(auth);
       const error = new Error(
-        "Please verify your email address before logging in. We've re-sent the verification link."
+        sent
+          ? "Please verify your email address before logging in. We've re-sent the verification link."
+          : "Please verify your email address before logging in. We couldn't send the verification email, please try again or contact support."
       );
-      error.code = "auth/email-not-verified";
+      error.code = sent
+        ? "auth/email-not-verified"
+        : "auth/email-verification-send-failed";
       error.email = credential.user.email;
+      error.cause = verificationError;
       throw error;
     }
     const token = await credential.user.getIdToken();

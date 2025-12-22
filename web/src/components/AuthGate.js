@@ -74,7 +74,8 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       console.error(error);
       if (
         error?.code === "auth/email-not-verified" ||
-        error?.code === "auth/email-verification-required"
+        error?.code === "auth/email-verification-required" ||
+        error?.code === "auth/email-verification-send-failed"
       ) {
         setAuthError("");
         const verificationMessage =
