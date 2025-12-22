@@ -141,6 +141,7 @@ async function upsertStudentToSheet(student) {
   const colEnrollDate = findCol(headerMap, "EnrollDate", "Enroll Date", "enrolldate");
   const colPaid = findCol(headerMap, "Paid", "InitialPayment", "Initial Payment");
   const colBalance = findCol(headerMap, "Balance", "BalanceDue", "Balance Due");
+  const colPaymentStatus = findCol(headerMap, "PaymentStatus", "Payment Status", "paymentStatus");
   const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
   const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
   const colEmergencyPhone = findCol(
@@ -209,8 +210,9 @@ async function upsertStudentToSheet(student) {
     pushCell(colClassName, student.className || "");
     pushCell(colStatus, student.status || "");
     pushCell(colEnrollDate, student.enrollDate || "");
-    pushCell(colPaid, student.initialPaymentAmount ?? "");
-    pushCell(colBalance, student.balanceDue ?? "");
+    pushCell(colPaid, student.initialPaymentAmount ?? student.paidAmount ?? "");
+    pushCell(colBalance, student.balanceDue ?? student.balance ?? "");
+    pushCell(colPaymentStatus, student.paymentStatus || "");
     pushCell(colContractStart, student.contractStart || "");
     pushCell(colContractEnd, student.contractEnd || "");
     pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
@@ -247,8 +249,9 @@ async function upsertStudentToSheet(student) {
   if (colClassName !== null) row[colClassName] = student.className || "";
   if (colStatus !== null) row[colStatus] = student.status || "";
   if (colEnrollDate !== null) row[colEnrollDate] = student.enrollDate || "";
-  if (colPaid !== null) row[colPaid] = student.initialPaymentAmount ?? "";
-  if (colBalance !== null) row[colBalance] = student.balanceDue ?? "";
+  if (colPaid !== null) row[colPaid] = student.initialPaymentAmount ?? student.paidAmount ?? "";
+  if (colBalance !== null) row[colBalance] = student.balanceDue ?? student.balance ?? "";
+  if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
   if (colEmergencyPhone !== null)

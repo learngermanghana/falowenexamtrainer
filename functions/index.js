@@ -5,6 +5,7 @@ const {
   onDocumentUpdated,
 } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const { FieldValue, FieldPath } = require("firebase-admin/firestore");
 
@@ -16,6 +17,10 @@ const getAdmin = () => {
 };
 
 setGlobalOptions({ maxInstances: 10 });
+
+const GOOGLE_SERVICE_ACCOUNT_JSON_B64 = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSON_B64");
+const STUDENTS_SHEET_ID = defineSecret("STUDENTS_SHEET_ID");
+const STUDENTS_SHEET_TAB = defineSecret("STUDENTS_SHEET_TAB");
 
 let appInstance;
 let appendStudentToStudentsSheetSafely;
@@ -140,10 +145,10 @@ exports.api = onRequest(
     cors: true,
     secrets: [
       "OPENAI_API_KEY",
-      "GOOGLE_SERVICE_ACCOUNT_JSON_B64",
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
       "PAYSTACK_SECRET",
-      "STUDENTS_SHEET_ID",
-      "STUDENTS_SHEET_TAB",
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
     ],
   },
   (req, res) => getApp()(req, res)
@@ -155,19 +160,32 @@ exports.onStudentCreated = onDocumentCreated(
     region: "europe-west1",
     document: "students/{studentCode}",
     secrets: [
-      "GOOGLE_SERVICE_ACCOUNT_JSON_B64",
-      "STUDENTS_SHEET_ID",
-      "STUDENTS_SHEET_TAB",
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
     ],
   },
   async (event) => {
+    console.log("onStudentCreated fired for", event.params.studentCode);
+
     const snap = event.data;
     if (!snap) return;
 
     const student = snap.data();
     if (!student) return;
 
-    await getStudentAppender()(student);
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
+    process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
+    process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
+
+    const studentCode = String(student.studentCode || event.params.studentCode || "").trim();
+
+    const result = await getStudentAppender()({
+      ...student,
+      studentCode,
+    });
+
+    console.log("onStudentCreated -> sheet sync result:", result);
   }
 );
 
