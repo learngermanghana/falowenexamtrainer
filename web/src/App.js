@@ -89,6 +89,7 @@ function App() {
     studentProfile,
     enableNotifications,
     notificationStatus,
+    saveStudentProfile,
   } = useAuth();
   const [authMode, setAuthMode] = useState("landing");
 
@@ -174,6 +175,7 @@ function App() {
         availableTabs={availableTabs}
         defaultCampusSection={defaultCampusSection}
         enableNotifications={enableNotifications}
+        saveStudentProfile={saveStudentProfile}
         logout={logout}
         notificationStatus={notificationStatus}
         studentProfile={studentProfile}
@@ -191,6 +193,7 @@ const AppShell = ({
   availableTabs,
   defaultCampusSection,
   enableNotifications,
+  saveStudentProfile,
   logout,
   notificationStatus,
   studentProfile,
@@ -300,6 +303,7 @@ const AppShell = ({
                 studentProfile={studentProfile}
                 notificationStatus={notificationStatus}
                 onEnableNotifications={enableNotifications}
+                onSaveOnboarding={() => saveStudentProfile({ onboardingCompleted: true })}
               />
             }
           />
