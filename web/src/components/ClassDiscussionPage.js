@@ -79,22 +79,18 @@ const ClassDiscussionPage = () => {
   const typingTimeouts = useRef({});
 
   const lessonOptions = useMemo(() => {
-    const options = [];
-    Object.entries(courseSchedules).forEach(([level, sessions]) => {
-      sessions.forEach((session) => {
-        const label = `${level} · Tag ${session.day}: ${session.topic}`;
-        options.push({
-          id: `${level}-${session.day}-${session.chapter || session.topic}`,
-          label,
-          level,
-          topic: session.topic,
-          goal: session.goal,
-          chapter: session.chapter,
-        });
-      });
-    });
-    return options;
-  }, []);
+    const level = (studentProfile?.level || "").toUpperCase();
+    const sessions = courseSchedules[level] || [];
+
+    return sessions.map((session) => ({
+      id: `${level}-${session.day}-${session.chapter || session.topic}`,
+      label: `${level} · Tag ${session.day}: ${session.topic}`,
+      level,
+      topic: session.topic,
+      goal: session.goal,
+      chapter: session.chapter,
+    }));
+  }, [studentProfile?.level]);
 
   const isTutor = useMemo(() => {
     const role = (studentProfile?.role || "").toLowerCase();
@@ -305,7 +301,11 @@ const ClassDiscussionPage = () => {
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
 
   useEffect(() => {
-    if (!form.lessonId && lessonOptions.length > 0) {
+    if (lessonOptions.length === 0) return;
+
+    const lessonExists = lessonOptions.some((option) => option.id === form.lessonId);
+
+    if (!lessonExists) {
       setForm((prev) => ({ ...prev, lessonId: lessonOptions[0].id, topic: lessonOptions[0].topic }));
     }
   }, [form.lessonId, lessonOptions]);
