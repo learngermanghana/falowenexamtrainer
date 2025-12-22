@@ -4,11 +4,8 @@
   "outputDirectory": "web/build",
   "routes": [
     { "handle": "filesystem" },
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/index",
-      "methods": ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-    },
+    { "src": "/api/sync-student", "dest": "/api/sync-student.js" },
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
