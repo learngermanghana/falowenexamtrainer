@@ -33,7 +33,13 @@ const WelcomeHero = ({ studentProfile }) => {
   );
 };
 
-const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnableNotifications }) => {
+const GeneralHome = ({
+  onSelectArea,
+  studentProfile,
+  notificationStatus,
+  onEnableNotifications,
+  onSaveOnboarding,
+}) => {
   const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
   const classCalendarId = "class-calendar-card";
@@ -57,6 +63,8 @@ const GeneralHome = ({ onSelectArea, studentProfile, notificationStatus, onEnabl
         onEnableNotifications={onEnableNotifications}
         onSelectLevel={handleSelectLevel}
         onConfirmClass={handleConfirmClass}
+        studentProfile={studentProfile}
+        onSaveOnboarding={onSaveOnboarding}
       />
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>
