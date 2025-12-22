@@ -198,11 +198,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           <span style={styles.badge}>Exam writing lab</span>
         </div>
 
-        <div style={styles.tabList}>
+        <div style={styles.tabList} className="tab-list">
           {availableTabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
+              className="tab-button"
               style={activeTab === tab.key ? styles.tabButtonActive : styles.tabButton}
             >
               {tab.label}

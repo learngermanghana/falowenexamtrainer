@@ -327,7 +327,7 @@ const WritingPage = ({ mode = "course" }) => {
           Wähle einen Brief, schreibe mit Timer, lass deinen Text bewerten oder
           frag den Ideen-Generator nach Formulierungen.
         </p>
-        <div style={styles.tabList}>
+        <div style={styles.tabList} className="tab-list">
           {[
             { key: "practice", label: "Übungsbriefe" },
             { key: "mark", label: "Mark my letter" },
@@ -336,6 +336,7 @@ const WritingPage = ({ mode = "course" }) => {
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
+              className="tab-button"
               style={
                 activeTab === tab.key ? styles.tabButtonActive : styles.tabButton
               }
