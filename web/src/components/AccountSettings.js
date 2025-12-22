@@ -298,7 +298,7 @@ const AccountSettings = () => {
                   href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
                   style={{ ...styles.secondaryButton, textDecoration: "none", marginTop: 10 }}
                 >
-                  View payment link
+                  Open tuition payment link
                 </a>
               ) : (
                 <div
@@ -312,7 +312,8 @@ const AccountSettings = () => {
                 >
                   <strong>Payments are only available on the web app.</strong>
                   <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-                    Use the website to view or pay your tuition via Paystack. Payments are hidden in the Android app.
+                    Use the website to view or pay your tuition through the secure payment portal. Payments are hidden in the
+                    Android app.
                   </p>
                 </div>
               )}
