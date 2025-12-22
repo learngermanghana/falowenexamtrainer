@@ -175,6 +175,7 @@ function App() {
         availableTabs={availableTabs}
         defaultCampusSection={defaultCampusSection}
         enableNotifications={enableNotifications}
+        saveStudentProfile={saveStudentProfile}
         logout={logout}
         notificationStatus={notificationStatus}
         studentProfile={studentProfile}
@@ -192,6 +193,7 @@ const AppShell = ({
   availableTabs,
   defaultCampusSection,
   enableNotifications,
+  saveStudentProfile,
   logout,
   notificationStatus,
   studentProfile,
