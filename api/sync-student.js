@@ -1,4 +1,4 @@
-import { google } from "googleapis";
+const { google } = require("googleapis");
 
 const SHEET_ID = process.env.STUDENTS_SHEET_ID;
 const TAB = process.env.STUDENTS_SHEET_TAB || "student";
@@ -34,13 +34,12 @@ async function getSheets() {
   return google.sheets({ version: "v4", auth });
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   try {
     if (req.method !== "POST") return res.status(405).json({ error: "POST only" });
     if (!SHEET_ID) return res.status(500).json({ error: "Missing STUDENTS_SHEET_ID" });
 
     const student = req.body || {};
-    // required identifiers
     const studentCode = String(student.studentCode || student.StudentCode || "").trim();
     const uid = String(student.uid || student.UID || "").trim();
     const email = String(student.email || student.Email || "").trim();
@@ -51,16 +50,15 @@ export default async function handler(req, res) {
 
     const sheets = await getSheets();
 
-    // Load headers from row 1
     const headerRes = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: `${TAB}!1:1`,
     });
+
     const headers = (headerRes.data.values && headerRes.data.values[0]) || [];
     const headerIndex = new Map();
     headers.forEach((h, i) => headerIndex.set(normalizeHeader(h), i));
 
-    // Your exact headings (must exist in sheet row 1)
     const H = {
       Name: "Name",
       Phone: "Phone",
@@ -88,7 +86,6 @@ export default async function handler(req, res) {
     const colUID = headerIndex.get(H.UID);
     const colEmail = headerIndex.get(H.Email);
 
-    // Read existing StudentCode column values to find row
     const codeColA1 = colToA1(colStudentCode);
     const codesRes = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
@@ -99,7 +96,6 @@ export default async function handler(req, res) {
     let rowIndex0 = -1;
     if (studentCode) rowIndex0 = codes.findIndex((v) => v === studentCode);
 
-    // Optional fallbacks
     if (rowIndex0 === -1 && colUID !== undefined && uid) {
       const uidA1 = colToA1(colUID);
       const uRes = await sheets.spreadsheets.values.get({
@@ -122,7 +118,7 @@ export default async function handler(req, res) {
 
     const rowNumber = rowIndex0 >= 0 ? rowIndex0 + 2 : null;
 
-    const get = (k, alt) => student[k] ?? student[alt] ?? "";
+    const get = (k, alt) => (student[k] ?? student[alt] ?? "");
     const updates = [];
 
     function setCell(headerName, value) {
@@ -135,7 +131,6 @@ export default async function handler(req, res) {
     }
 
     if (rowNumber) {
-      // update existing row
       setCell(H.StudentCode, studentCode);
       setCell(H.UID, uid);
       setCell(H.Email, email);
@@ -164,7 +159,6 @@ export default async function handler(req, res) {
       return res.json({ ok: true, action: "updated", row: rowNumber });
     }
 
-    // append new row
     const maxCol = Math.max(...Array.from(headerIndex.values()));
     const row = Array(maxCol + 1).fill("");
 
@@ -206,4 +200,4 @@ export default async function handler(req, res) {
   } catch (e) {
     return res.status(500).json({ error: e.message || String(e) });
   }
-}
+};
