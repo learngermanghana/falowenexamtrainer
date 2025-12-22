@@ -75,9 +75,6 @@ module.exports = async function handler(req, res) {
       EnrollDate: "EnrollDate",
       ClassName: "ClassName",
       Daily_Limit: "Daily_Limit",
-      Uses_Today: "Uses_Today",
-      Last_Date: "Last_Date",
-      ReminderSent: "ReminderSent",
       UID: "UID",
     };
 
@@ -147,9 +144,6 @@ module.exports = async function handler(req, res) {
       setCell(H.EnrollDate, get("enrollDate", "EnrollDate"));
       setCell(H.ClassName, get("className", "ClassName"));
       setCell(H.Daily_Limit, get("dailyLimit", "Daily_Limit"));
-      setCell(H.Uses_Today, get("usesToday", "Uses_Today"));
-      setCell(H.Last_Date, get("lastDate", "Last_Date"));
-      setCell(H.ReminderSent, get("reminderSent", "ReminderSent"));
 
       await sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: SHEET_ID,
@@ -184,9 +178,6 @@ module.exports = async function handler(req, res) {
     setRow(H.EnrollDate, get("enrollDate", "EnrollDate"));
     setRow(H.ClassName, get("className", "ClassName"));
     setRow(H.Daily_Limit, get("dailyLimit", "Daily_Limit"));
-    setRow(H.Uses_Today, get("usesToday", "Uses_Today"));
-    setRow(H.Last_Date, get("lastDate", "Last_Date"));
-    setRow(H.ReminderSent, get("reminderSent", "ReminderSent"));
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
