@@ -20,11 +20,6 @@ const AccountSettings = () => {
   const { user, studentProfile, idToken, saveStudentProfile } = useAuth();
   const paymentsEnabled = isPaymentsEnabled();
   const [profile, setProfile] = useState({
-    name: "",
-    email: "",
-    goal: "Pass B2",
-    timezone: "Europe/Berlin",
-    reminder: "push+email",
     biography: "",
   });
   const [status, setStatus] = useState("");
@@ -34,9 +29,6 @@ const AccountSettings = () => {
   useEffect(() => {
     setProfile((prev) => ({
       ...prev,
-      name: studentProfile?.name || user?.displayName || "",
-      email: studentProfile?.email || user?.email || prev.email,
-      goal: studentProfile?.goal || prev.goal,
       biography: studentProfile?.biography || "",
     }));
   }, [studentProfile, user]);
@@ -52,11 +44,10 @@ const AccountSettings = () => {
           ? "Paystack"
           : "Unknown"
         : "Web portal",
-      invoiceEmail: profile.email || user?.email || "",
+      invoiceEmail: studentProfile?.email || user?.email || "",
     }),
     [
       paymentsEnabled,
-      profile.email,
       studentProfile?.contractEnd,
       studentProfile?.paystackLink,
       studentProfile?.paymentStatus,
@@ -73,9 +64,6 @@ const AccountSettings = () => {
     event.preventDefault();
 
     const payload = {
-      name: profile.name.trim(),
-      email: profile.email.trim(),
-      reminder: profile.reminder,
       biography: profile.biography.trim(),
     };
 
@@ -189,55 +177,28 @@ const AccountSettings = () => {
             <h2 style={styles.sectionTitle}>Account settings</h2>
             <span style={styles.badge}>Profile &amp; communication</span>
           </div>
-          <p style={styles.helperText}>Keep your contact details up to date.</p>
+          <p style={styles.helperText}>
+            Your name and login email are managed by Falowen to keep linked apps in sync. Contact support to update them.
+          </p>
 
           <form onSubmit={handleSubmit} style={{ display: "grid", gap: 10 }}>
-            <div style={styles.row}>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="name">
-                  Display name
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  value={profile.name}
-                  onChange={handleChange("name")}
-                  style={{ ...styles.select, padding: "10px 12px" }}
-                  placeholder="e.g., Alex Miller"
-                />
+            <div style={{
+              ...styles.card,
+              margin: 0,
+              padding: 12,
+              background: "#f8fafc",
+              borderColor: "#e2e8f0",
+            }}>
+              <div style={styles.metaRow}>
+                <span>Display name</span>
+                <span style={styles.badge}>read-only</span>
               </div>
-              <div style={styles.field}>
-                <label style={styles.label} htmlFor="email">
-                  Login email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={profile.email}
-                  onChange={handleChange("email")}
-                  style={{ ...styles.select, padding: "10px 12px" }}
-                  placeholder="name@email.com"
-                />
+              <strong style={{ fontSize: 16 }}>{studentProfile?.name || user?.displayName || "Unknown"}</strong>
+              <div style={{ ...styles.metaRow, marginTop: 8 }}>
+                <span>Login email</span>
+                <span style={styles.badge}>managed by admin</span>
               </div>
-            </div>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="reminder">
-                Notifications
-              </label>
-              <select
-                id="reminder"
-                value={profile.reminder}
-                onChange={handleChange("reminder")}
-                style={styles.select}
-              >
-                <option value="push+email">Push &amp; email</option>
-                <option value="push">Push only</option>
-                <option value="email">Email only</option>
-                <option value="none">No reminders</option>
-              </select>
-              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                Enable push using the button in the top right. Email reminders follow automatically.
-              </p>
+              <strong style={{ fontSize: 16 }}>{studentProfile?.email || user?.email || "(no email)"}</strong>
             </div>
 
             <div style={styles.field}>
@@ -362,7 +323,7 @@ const AccountSettings = () => {
               <div style={{ display: "grid", gap: 8 }}>
                 <div style={styles.metaRow}>
                   <span>Notifications</span>
-                  <strong>{profile.reminder === "none" ? "off" : "on"}</strong>
+                  <strong>{(studentProfile?.reminder || "push+email") === "none" ? "off" : "on"}</strong>
                 </div>
                 <div style={styles.metaRow}>
                   <span>Data sharing</span>
