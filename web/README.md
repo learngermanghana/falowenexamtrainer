@@ -57,3 +57,9 @@ To generate static assets for hosting from disk or any static server:
 npm run build
 ```
 The build output is written to `web/build/`.
+
+## Offline experience
+- A service worker precaches the app shell, manifest, and offline fallback page in production builds. After first load, repeat
+  visits will continue to show the UI even if the network is temporarily unavailable.
+- Navigation requests fall back to `offline.html` when the network is unreachable, while previously fetched static assets are
+  served from the cache.
