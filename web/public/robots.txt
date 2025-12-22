@@ -1,0 +1,12 @@
+# Robots.txt for https://www.falowen.app/
+# Allow crawlers to index the public learning and exam resources while keeping
+# internal APIs out of search results.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /server-status
+
+# Sitemaps
+Sitemap: https://www.falowen.app/sitemap.xml

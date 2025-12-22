@@ -1,0 +1,111 @@
+import React from "react";
+import { styles } from "../styles";
+import { useAuth } from "../context/AuthContext";
+
+const practiceLink =
+  "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
+
+const SpeechTrainerPage = () => {
+  const { studentProfile } = useAuth();
+  const studentCode =
+    studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "";
+  const profileLevel = (studentProfile?.level || "").toUpperCase();
+
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      <div
+        style={{
+          ...styles.card,
+          background: "linear-gradient(135deg, #eef2ff 0%, #e0f2fe 100%)",
+          borderColor: "#c7d2fe",
+          display: "grid",
+          gap: 12,
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gap: 6 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>Speech Trainer</p>
+            <h2 style={{ margin: 0 }}>Practice with the new online coach</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Open the updated practice tool, enter your student code, pick your level, and let the AI listen to your
+              spoken answer. You will get an instant transcript, pronunciation notes, and level-targeted feedback.
+            </p>
+          </div>
+          {studentCode ? (
+            <div style={{ ...styles.badge, alignSelf: "start", background: "#fef3c7", color: "#92400e" }}>
+              Student code: {studentCode}
+            </div>
+          ) : null}
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gap: 8,
+            padding: 16,
+            borderRadius: 12,
+            background: "white",
+            border: "1px solid #e5e7eb",
+          }}
+        >
+          <h3 style={{ ...styles.sectionTitle, margin: 0 }}>How to use it</h3>
+          <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
+            <li>Click the button below to open the speech trainer.</li>
+            <li>Type your student code so the coach saves your progress.</li>
+            <li>Select your Goethe level {profileLevel ? `(profile level: ${profileLevel})` : "(A1–C2)"}.</li>
+            <li>Record your answer and follow the on-page tips for clearer Sprechen.</li>
+          </ul>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+            <a
+              href={practiceLink}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...styles.primaryButton,
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <span role="img" aria-label="sparkles">
+                ✨
+              </span>
+              Open Speech Trainer
+            </a>
+            <span style={{ ...styles.helperText, margin: 0 }}>
+              The practice page includes full instructions—read them carefully before you start.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>What you will see</h3>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          <div style={{ ...styles.resultCard, marginTop: 0 }}>
+            <p style={{ ...styles.label, margin: "0 0 4px 0" }}>Transcript</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              The coach writes what you said so you can catch missing endings and word order slips.
+            </p>
+          </div>
+          <div style={{ ...styles.resultCard, marginTop: 0 }}>
+            <p style={{ ...styles.label, margin: "0 0 4px 0" }}>Feedback</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Expect targeted Goethe-style notes on clarity, vocabulary range, and grammar priorities for your level.
+            </p>
+          </div>
+          <div style={{ ...styles.resultCard, marginTop: 0 }}>
+            <p style={{ ...styles.label, margin: "0 0 4px 0" }}>Next steps</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Use the suggestions on the practice page to repeat your answer and track improvements.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SpeechTrainerPage;
