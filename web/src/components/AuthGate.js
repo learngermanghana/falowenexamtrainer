@@ -45,15 +45,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
         const successMessage =
-          `Account created! Your student code is ${studentCode}. Please verify your email to log in.`;
+          `Account created! Your student code is ${studentCode}. You're now logged in.`;
         setMessage(successMessage);
-        showToast(
-          `${successMessage} Check your inbox for a verification link from Falowen.`,
-          "success"
-        );
-        if (result?.verificationRequired) {
-          setMode("login");
-        }
+        showToast(successMessage, "success");
       } else {
         const credential = await login(email, password);
         const studentCode = credential?.user?.profile?.studentCode;
@@ -72,28 +66,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       }
     } catch (error) {
       console.error(error);
-      if (
-        error?.code === "auth/email-not-verified" ||
-        error?.code === "auth/email-verification-required" ||
-        error?.code === "auth/email-verification-send-failed"
-      ) {
-        setAuthError("");
-        const verificationMessage =
-          error.message || "Please verify your email address.";
-        setMessage(verificationMessage);
-        showToast(
-          `${verificationMessage} Check your inbox for the Falowen verification email.`,
-          "info"
-        );
-        if (error?.code === "auth/email-verification-required") {
-          setMode("login");
-        }
-      } else {
-        const errorMessage = error?.message || "Login failed. Please try again.";
-        setAuthError(errorMessage);
-        showToast(errorMessage, "error");
-        setMessage("");
-      }
+      const errorMessage = error?.message || "Login failed. Please try again.";
+      setAuthError(errorMessage);
+      showToast(errorMessage, "error");
+      setMessage("");
     } finally {
       setLoading(false);
     }

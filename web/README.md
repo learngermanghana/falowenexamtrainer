@@ -22,27 +22,20 @@ This React app guides learners through recording or typing answers for speaking 
    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=xxxx
    REACT_APP_FIREBASE_APP_ID=xxxx
    REACT_APP_FIREBASE_VAPID_KEY=your-web-push-key
-   # Optional: override the URL used in password reset and email verification links
+   # Optional: override the URL used in password reset links
    REACT_APP_AUTH_CONTINUE_URL=https://your-app-url
    ```
    These values are provided in Vercel and are required for Firestore reads and writes.
 
 3. In the Firebase Console, create a **Web App** under your project and enable the features this UI needs:
-   - **Authentication → Sign-in method**: enable **Email/Password**. The email verification and password reset flows will use the
-     `REACT_APP_AUTH_CONTINUE_URL` if set; otherwise they default to the app origin.
+   - **Authentication → Sign-in method**: enable **Email/Password**. The password reset flow will use the
+     `REACT_APP_AUTH_CONTINUE_URL` if set; otherwise it defaults to the app origin.
    - **Firestore Database**: create a database (Start in production mode for real users). The app reads and writes student
      profiles and placements here.
    - **Cloud Messaging** (optional): generate a Web Push certificate key and paste it into
      `REACT_APP_FIREBASE_VAPID_KEY` to enable in-browser notifications.
-   - (Optional) **Authentication → Templates**: update the verification and reset email templates to include your app name and
+   - (Optional) **Authentication → Templates**: update the reset email template to include your app name and
      a link back to the host you set in `REACT_APP_AUTH_CONTINUE_URL`.
-
-### Checking who is verified
-- Go to **Authentication → Users** in the Firebase Console to see the **Email verified** column. It is `true` only after a
-  student clicks the verification link.
-- Accounts created before verification emails were configured will still be listed with `Email verified: false`. Have the
-  student log in and resend the verification email from the app, or use the console's user menu to **Send verification email**;
-  the flag will flip to `true` once they confirm.
 
 ## Development
 Start the dev server from inside `web/`:
