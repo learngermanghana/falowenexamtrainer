@@ -60,7 +60,16 @@ const LessonList = ({ title, lessons }) => {
 const normalizeLevel = (level) => (level || "").toUpperCase();
 
 const CourseTab = ({ defaultLevel }) => {
-  const levels = useMemo(() => Object.keys(courseSchedules), []);
+  const levels = useMemo(() => {
+    const baseLevels = Object.keys(courseSchedules);
+    const normalizedDefault = normalizeLevel(defaultLevel);
+
+    if (normalizedDefault && !baseLevels.includes(normalizedDefault)) {
+      return [...baseLevels, normalizedDefault];
+    }
+
+    return baseLevels;
+  }, [defaultLevel]);
   const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
     const normalizedDefault = normalizeLevel(defaultLevel);
     if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
