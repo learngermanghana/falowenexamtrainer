@@ -176,6 +176,21 @@ const placementPrompt = ({ answers, targetLevel }) => {
   ).concat("\n\n", formattedAnswers);
 };
 
+const falowenSystemPrompt = ({ level, studentName }) => {
+  const normalizedLevel = (level || "A2").toUpperCase();
+  const firstName = (studentName || "Student").split(" ")[0];
+
+  return (
+    "You are Falowen A.I., a supportive German tutor and chat buddy. " +
+    "Be concise, warm, and keep replies under 120 words. " +
+    "Always invite the student to choose: grammar help or conversation. " +
+    `Address the student by first name (${firstName}) and adapt difficulty to ${normalizedLevel}. ` +
+    "When asked about presentations (especially A2), propose a 3-part structure and one sample opener. " +
+    "If they ask grammar, give one correction and one follow-up question to practice. " +
+    "Switch between short German examples and brief English hints so the student can imitate you."
+  );
+};
+
 app.post("/writing/ideas", async (req, res) => {
   try {
     const { level = "A2", messages = [] } = req.body || {};
@@ -197,6 +212,30 @@ app.post("/writing/ideas", async (req, res) => {
   } catch (err) {
     console.error("/writing/ideas error", err);
     res.status(500).json({ error: err.message || "Failed to get ideas" });
+  }
+});
+
+app.post("/falowen/chat", async (req, res) => {
+  try {
+    const { level = "A2", studentName = "Student", messages = [] } = req.body || {};
+    const systemPrompt = falowenSystemPrompt({ level, studentName });
+
+    const chatMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages
+        .filter((msg) => msg && msg.content)
+        .slice(-10)
+        .map((msg) => ({
+          role: msg.role === "assistant" ? "assistant" : "user",
+          content: msg.content,
+        })),
+    ];
+
+    const reply = await createChatCompletion(chatMessages, { temperature: 0.45, max_tokens: 400 });
+    return res.json({ reply });
+  } catch (err) {
+    console.error("/falowen/chat error", err);
+    return res.status(500).json({ error: err.message || "Failed to chat with Falowen" });
   }
 });
 
