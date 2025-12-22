@@ -23,6 +23,23 @@ code {
   scroll-snap-align: start;
 }
 
+.onboarding-step-header {
+  flex-wrap: wrap;
+  row-gap: 6px;
+}
+
+.onboarding-grid {
+  width: 100%;
+}
+
+.onboarding-action-row {
+  width: 100%;
+}
+
+.onboarding-footer {
+  width: 100%;
+}
+
 @media (max-width: 640px) {
   .tab-list {
     display: flex;
@@ -38,5 +55,31 @@ code {
     min-width: 180px;
     flex: 0 0 auto;
     text-align: left;
+  }
+
+  .onboarding-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .onboarding-step-header {
+    align-items: flex-start;
+  }
+
+  .onboarding-action-row {
+    flex-direction: column;
+  }
+
+  .onboarding-action-row button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .onboarding-footer {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+
+  .onboarding-footer button {
+    width: 100%;
   }
 }

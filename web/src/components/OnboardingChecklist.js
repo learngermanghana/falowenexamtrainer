@@ -38,7 +38,10 @@ const Step = ({ title, description, actionLabel, onAction, complete, accent = "#
       background: complete ? "#ecfdf3" : "#ffffff",
     }}
   >
-    <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+    <div
+      className="onboarding-step-header"
+      style={{ display: "flex", justifyContent: "space-between", gap: 8 }}
+    >
       <div>
         <div style={{ fontWeight: 700, color: "#111827" }}>{title}</div>
         <p style={{ ...styles.helperText, margin: "4px 0 0 0" }}>{description}</p>
@@ -55,7 +58,7 @@ const Step = ({ title, description, actionLabel, onAction, complete, accent = "#
       </span>
     </div>
     {onAction ? (
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <div className="onboarding-action-row" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button
           style={complete ? styles.secondaryButton : styles.primaryButton}
           onClick={onAction}
@@ -178,7 +181,10 @@ const OnboardingChecklist = ({
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+      <div
+        className="onboarding-grid"
+        style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
+      >
         <Step
           title="Choose your level"
           description="Set your CEFR level to get speaking and writing tasks that fit your skills."
@@ -214,6 +220,7 @@ const OnboardingChecklist = ({
       </div>
 
       <div
+        className="onboarding-footer"
         style={{
           display: "flex",
           justifyContent: "space-between",
