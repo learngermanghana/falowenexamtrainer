@@ -3,7 +3,6 @@ const { onRequest } = require("firebase-functions/v2/https");
 const {
   onDocumentCreated,
   onDocumentUpdated,
-  onDocumentWritten,
 } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
@@ -140,7 +139,7 @@ const getThreadMetadata = async (threadId) => {
   };
 };
 
-const api = onRequest(
+exports.api = onRequest(
   {
     region: "europe-west1",
     cors: true,
@@ -155,8 +154,8 @@ const api = onRequest(
   (req, res) => getApp()(req, res)
 );
 
-// When a student doc is created or updated (and hasn't been synced yet), append to Students sheet
-const onStudentCreated = onDocumentWritten(
+// When a student doc is created in Firestore, append to Students sheet (safe header-mapped append)
+exports.onStudentCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "students/{studentCode}",
@@ -169,29 +168,17 @@ const onStudentCreated = onDocumentWritten(
   async (event) => {
     console.log("onStudentCreated fired for", event.params.studentCode);
 
-    const before = event.data?.before;
-    const after = event.data?.after || event.data;
-    if (!after?.exists) return;
+    const snap = event.data;
+    if (!snap) return;
 
-    const student = after.data();
+    const student = snap.data();
     if (!student) return;
-
-    // Avoid re-syncing documents already marked as synced unless explicitly reset to false.
-    const alreadySynced = student.syncedToSheets === true;
-    if (alreadySynced) return;
 
     process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
     process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
     process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
 
-    const studentCode = String(
-      student.studentCode || student.studentcode || event.params.studentCode || ""
-    ).trim();
-
-    if (!studentCode) {
-      console.warn("onStudentCreated missing studentCode; skipping sheet sync.");
-      return;
-    }
+    const studentCode = String(student.studentCode || event.params.studentCode || "").trim();
 
     const result = await getStudentAppender()({
       ...student,
@@ -199,24 +186,10 @@ const onStudentCreated = onDocumentWritten(
     });
 
     console.log("onStudentCreated -> sheet sync result:", result);
-
-    try {
-      const db = getFirestore();
-      const updates = result?.error
-        ? { syncedToSheets: false, syncedToSheetsError: result.error }
-        : { syncedToSheets: true, syncedToSheetsError: FieldValue.delete() };
-
-      await db
-        .collection("students")
-        .doc(event.params.studentCode)
-        .set(updates, { merge: true });
-    } catch (err) {
-      console.warn("Failed to update syncedToSheets flag", err);
-    }
   }
 );
 
-const archiveOldThreads = onSchedule(
+exports.archiveOldThreads = onSchedule(
   {
     region: "europe-west1",
     schedule: "every 24 hours",
@@ -374,7 +347,7 @@ const notifyAssignmentScore = async ({ attemptId, attempt }) => {
   return null;
 };
 
-const onClassBoardPostCreated = onDocumentCreated(
+exports.onClassBoardPostCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "class_board/{level}/classes/{className}/posts/{postId}",
@@ -414,7 +387,7 @@ const onClassBoardPostCreated = onDocumentCreated(
   }
 );
 
-const onQaPostCreated = onDocumentCreated(
+exports.onQaPostCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "qa_posts/{threadId}",
@@ -425,7 +398,7 @@ const onQaPostCreated = onDocumentCreated(
   }
 );
 
-const onQaPostUpdated = onDocumentUpdated(
+exports.onQaPostUpdated = onDocumentUpdated(
   {
     region: "europe-west1",
     document: "qa_posts/{threadId}",
@@ -438,7 +411,7 @@ const onQaPostUpdated = onDocumentUpdated(
   }
 );
 
-const onScoreCreated = onDocumentCreated(
+exports.onScoreCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "scores/{attemptId}",
@@ -451,13 +424,3 @@ const onScoreCreated = onDocumentCreated(
     await notifyAssignmentScore({ attemptId: event.params.attemptId, attempt });
   }
 );
-
-module.exports = {
-  api,
-  onStudentCreated,
-  archiveOldThreads,
-  onClassBoardPostCreated,
-  onQaPostCreated,
-  onQaPostUpdated,
-  onScoreCreated,
-};
