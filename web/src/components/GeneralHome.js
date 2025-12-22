@@ -91,7 +91,7 @@ const GeneralHome = ({
           </div>
           <ul style={{ ...styles.checklist, margin: 0 }}>
             <li>Course book access, assignment submission, and results.</li>
-            <li>Grammar Q&amp;A, Chat Buddy, and the original writing coach.</li>
+            <li>Grammar Q&amp;A, Speech Trainer, and the original writing coach.</li>
             <li>Group discussion and your account settings.</li>
           </ul>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
