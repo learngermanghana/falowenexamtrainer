@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { styles } from "../styles";
 import { sendChatBuddyMessage } from "../services/chatBuddyService";
 import { useAuth } from "../context/AuthContext";
@@ -14,7 +14,7 @@ const initialHistory = [
 ];
 
 const ChatBuddyPage = () => {
-  const { idToken, studentProfile } = useAuth();
+  const { idToken, studentProfile, user } = useAuth();
   const [level, setLevel] = useState("B1");
   const [inputMode, setInputMode] = useState("text");
   const [message, setMessage] = useState("");
@@ -95,6 +95,18 @@ const ChatBuddyPage = () => {
     setHistory(initialHistory);
   };
 
+  const getActiveIdToken = useCallback(async () => {
+    if (idToken) return idToken;
+    if (user?.getIdToken) {
+      try {
+        return await user.getIdToken();
+      } catch (tokenError) {
+        console.warn("Could not refresh ID token for chat buddy", tokenError);
+      }
+    }
+    return null;
+  }, [idToken, user]);
+
   const handleSend = async () => {
     if (!message.trim() && !audioBlob) {
       setError("Please enter a message or record audio.");
@@ -105,11 +117,12 @@ const ChatBuddyPage = () => {
     setLoading(true);
 
     try {
+      const activeToken = await getActiveIdToken();
       const response = await sendChatBuddyMessage({
         text: message.trim(),
         level,
         audioBlob,
-        idToken,
+        idToken: activeToken,
       });
 
       const userEntry = {

@@ -69,6 +69,18 @@ const SpeakingPage = () => {
   const countdownRef = useRef(null);
   const stepAdvanceGuardRef = useRef(false);
 
+  const getActiveIdToken = useCallback(async () => {
+    if (idToken) return idToken;
+    if (user?.getIdToken) {
+      try {
+        return await user.getIdToken();
+      } catch (tokenError) {
+        console.warn("Could not refresh ID token for speaking coach", tokenError);
+      }
+    }
+    return null;
+  }, [idToken, user]);
+
   const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
 
   const simulationSteps = useMemo(() => {
@@ -290,6 +302,7 @@ const SpeakingPage = () => {
     setError("");
 
     try {
+      const activeToken = await getActiveIdToken();
       const analysis = await analyzeAudio({
         audioBlob,
         level,
@@ -298,7 +311,7 @@ const SpeakingPage = () => {
         question: currentQuestion?.text || "",
         interactionMode,
         userId,
-        idToken,
+        idToken: activeToken,
       });
 
       setResult(analysis);
@@ -365,6 +378,7 @@ const SpeakingPage = () => {
     setError("");
 
     try {
+      const activeToken = await getActiveIdToken();
       const response = await scoreInteractionAudio({
         audioBlob,
         initialTranscript: interactionSession.initialTranscript,
@@ -373,7 +387,7 @@ const SpeakingPage = () => {
         level,
         userId,
         targetLevel: level,
-        idToken,
+        idToken: activeToken,
       });
 
       setResult(response);
@@ -412,6 +426,7 @@ const SpeakingPage = () => {
     setError("");
 
     try {
+      const activeToken = await getActiveIdToken();
       const analysis = await analyzeAudio({
         audioBlob,
         level,
@@ -419,7 +434,7 @@ const SpeakingPage = () => {
         contextType: "simulation",
         question: step.instructions,
         userId,
-        idToken,
+        idToken: activeToken,
       });
 
       setSimulationScores((prev) => [
