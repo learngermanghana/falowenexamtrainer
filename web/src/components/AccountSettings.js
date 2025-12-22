@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import { correctBiography } from "../services/profileService";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
+import { buildPaystackCheckoutLink } from "../lib/paystack";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -295,7 +296,13 @@ const AccountSettings = () => {
               </ul>
               {paymentsEnabled ? (
                 <a
-                  href={studentProfile.paystackLink || "https://paystack.com/pay/falowen"}
+                  href={buildPaystackCheckoutLink({
+                    baseLink: studentProfile.paystackLink || "https://paystack.com/pay/falowen",
+                    amount: studentProfile.balanceDue || studentProfile.tuitionFee,
+                    redirectUrl: `${window.location.origin}/payment-complete`,
+                  })}
+                  target="_blank"
+                  rel="noreferrer"
                   style={{ ...styles.secondaryButton, textDecoration: "none", marginTop: 10 }}
                 >
                   Open tuition payment link

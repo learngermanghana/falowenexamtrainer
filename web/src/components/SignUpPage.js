@@ -11,6 +11,7 @@ import { loadPreferredClass, savePreferredClass } from "../services/classSelecti
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
+import { buildPaystackCheckoutLink } from "../lib/paystack";
 
 const MIN_INITIAL_PAYMENT = 1000;
 
@@ -117,7 +118,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
       contractEnd.setMonth(contractEnd.getMonth() + contractMonths);
       const balanceDue = tuitionSummary.balanceDue;
       const paymentStatus = tuitionSummary.statusLabel.toLowerCase();
-      const paystackLink = tuitionSummary.paystackLink;
+      const paystackLink = buildPaystackCheckoutLink({
+        baseLink: tuitionSummary.paystackLink,
+        amount: numericInitialPayment,
+        redirectUrl: `${window.location.origin}/payment-complete`,
+      });
 
       const studentCode = generateStudentCode({ name });
       await signup(email, password, {
@@ -163,7 +168,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
       if (paystackLink) {
         setTimeout(() => {
-          window.location.assign(paystackLink);
+          window.open(paystackLink, "_blank", "noopener,noreferrer");
         }, 900);
       }
     } catch (error) {
