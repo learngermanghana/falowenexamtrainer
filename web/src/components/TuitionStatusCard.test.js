@@ -21,7 +21,7 @@ describe("TuitionStatusCard", () => {
 
     expect(screen.getByRole("link", { name: /pay tuition online/i })).toHaveAttribute(
       "href",
-      "https://paystack.com/pay/falowen"
+      "https://paystack.shop/pay/1navy7uihs"
     );
     const cardText = screen.getByTestId("tuition-status-card").textContent;
 

@@ -9,9 +9,20 @@ export const LEVEL_FEES = {
 
 export const getTuitionFeeForLevel = (level) => LEVEL_FEES[level] ?? 0;
 
-const DEFAULT_PAYSTACK_LINK = "https://paystack.com/pay/falowen";
+const DEFAULT_PAYSTACK_LINKS = {
+  A1: "https://paystack.shop/pay/yzz468-lbj",
+  A2: "https://paystack.shop/pay/1navy7uihs",
+  B1: "https://paystack.shop/pay/1navy7uihs",
+  B2: "https://paystack.shop/pay/1navy7uihs",
+  C1: "https://paystack.shop/pay/1navy7uihs",
+};
 
-export const paystackLinkForLevel = () => process.env.REACT_APP_PAYSTACK_LINK || DEFAULT_PAYSTACK_LINK;
+export const paystackLinkForLevel = (level) => {
+  if (process.env.REACT_APP_PAYSTACK_LINK) return process.env.REACT_APP_PAYSTACK_LINK;
+
+  const normalizedLevel = typeof level === "string" ? level.toUpperCase() : "";
+  return DEFAULT_PAYSTACK_LINKS[normalizedLevel] || DEFAULT_PAYSTACK_LINKS.A2;
+};
 
 export const computeTuitionStatus = ({ level, paidAmount = 0, tuitionFee, balanceDue }) => {
   const normalizedPaid = Math.max(Number(paidAmount) || 0, 0);
