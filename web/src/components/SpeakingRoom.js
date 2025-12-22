@@ -231,61 +231,6 @@ const SpeakingRoom = () => {
         </div>
       </section>
 
-      <section
-        style={{
-          ...styles.card,
-          background: "linear-gradient(135deg, #ecfeff 0%, #eef2ff 100%)",
-          borderColor: "#c7d2fe",
-          display: "grid",
-          gap: 10,
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-          <div style={{ display: "grid", gap: 6 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>Goethe exam booster</p>
-            <h3 style={{ margin: 0 }}>Open the dedicated speaking practice tool</h3>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Use the online practice link to rehearse Goethe speaking tasks. When it opens, enter your student code, choose your
-              level, and follow the on-page instructions so the AI can analyse your speaking and give feedback.
-            </p>
-            <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
-              <li>Open the tool and read the directions carefully before recording.</li>
-              <li>Add your student code to save progress and match feedback to you.</li>
-              <li>Select the right Goethe level and practise the suggested prompts.</li>
-            </ul>
-          </div>
-          <a
-            href={goethePracticeLink}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              ...styles.primaryButton,
-              textDecoration: "none",
-              height: "fit-content",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span role="img" aria-label="microphone">
-              🎤
-            </span>
-            Open Goethe speaking practice
-          </a>
-        </div>
-      </section>
-
-      <section style={{ ...styles.card, background: "#f8fafc" }}>
-        <h3 style={{ margin: "0 0 6px 0" }}>How to get the most out of speaking practice</h3>
-        <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
-          <li>🎧 Mic check: before recording, make sure you can hear yourself clearly. Move the device closer to your mouth.</li>
-          <li>⏱️ 60–90 seconds: Keep each attempt short. Repeat the same prompt twice to build fluency faster.
-          </li>
-          <li>🧭 Structure: at the start, say which part you are practising and name 2–3 points you will cover.</li>
-          <li>📝 After recording: jot down one improvement (e.g., push longer verbs to the end, speak more clearly) and record again right away.</li>
-        </ul>
-      </section>
-
       <section style={styles.card}>
         <div style={{ display: "grid", gap: 10 }}>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
