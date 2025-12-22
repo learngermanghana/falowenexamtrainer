@@ -10,7 +10,7 @@ import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
-import ChatBuddyPage from "./components/ChatBuddyPage";
+import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
 import WritingPage from "./components/WritingPage";
 import { useAuth } from "./context/AuthContext";
@@ -38,7 +38,7 @@ const TAB_STRUCTURE = [
     sections: [
       { key: "grammar", label: "Ask Grammar Question" },
       { key: "writing", label: "Writing Practice" },
-      { key: "buddy", label: "Chat Buddy" },
+      { key: "speech", label: "Speech Trainer" },
     ],
   },
   { key: "results", label: "Results", section: "results" },
@@ -104,7 +104,7 @@ function App() {
       results: isEnrolled || isStaff,
       grammar: true,
       writing: true,
-      buddy: true,
+      speech: true,
       discussion: isEnrolled || isStaff,
       account: true,
     }),
@@ -424,7 +424,7 @@ const CampusArea = ({
       ) : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
-      {resolvedSection === "buddy" && allowedSections.buddy ? <ChatBuddyPage /> : null}
+      {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
       {resolvedSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
       {resolvedSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
