@@ -28,6 +28,7 @@ const SpeakingPage = () => {
     teil,
     setTeil,
     level,
+    setLevel,
     result,
     setResult,
     resultHistory,
@@ -37,7 +38,7 @@ const SpeakingPage = () => {
     loading,
     setLoading,
   } = useExam();
-  const { user, idToken } = useAuth();
+  const { user, idToken, studentProfile } = useAuth();
   const userId = user?.uid;
 
   const [isRecording, setIsRecording] = useState(false);
@@ -68,6 +69,7 @@ const SpeakingPage = () => {
   const hasManuallyToggledInteraction = useRef(false);
   const countdownRef = useRef(null);
   const stepAdvanceGuardRef = useRef(false);
+  const appliedProfileLevelRef = useRef(null);
 
   const getActiveIdToken = useCallback(async () => {
     if (idToken) return idToken;
@@ -111,6 +113,16 @@ const SpeakingPage = () => {
 
     return isB1Task || isB2OrHigherDiscussion;
   }, [level, teil]);
+
+  useEffect(() => {
+    const profileLevel = (studentProfile?.level || "").toUpperCase();
+    if (!ALLOWED_LEVELS.includes(profileLevel)) return;
+
+    if (appliedProfileLevelRef.current === profileLevel) return;
+
+    setLevel(profileLevel);
+    appliedProfileLevelRef.current = profileLevel;
+  }, [setLevel, studentProfile?.level]);
 
   useEffect(() => {
     if (!interactionAvailable) {
