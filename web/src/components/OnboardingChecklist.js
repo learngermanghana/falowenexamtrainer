@@ -75,10 +75,15 @@ const OnboardingChecklist = ({
   onConfirmClass,
 }) => {
   const { levelConfirmed } = useExam();
-  const [state, setState] = useState(() => ({
-    congratulated: false,
-    ...loadState(),
-  }));
+  const [state, setState] = useState(() => {
+    const persisted = loadState();
+    const completed = Boolean(persisted.completed);
+
+    return {
+      congratulated: completed,
+      ...persisted,
+    };
+  });
   const [selectedClass, setSelectedClass] = useState(loadPreferredClass);
 
   useEffect(() => {
