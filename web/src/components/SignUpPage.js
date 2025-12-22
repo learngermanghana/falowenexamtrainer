@@ -12,6 +12,8 @@ import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 
+const MIN_INITIAL_PAYMENT = 1000;
+
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { showToast } = useToast();
@@ -26,7 +28,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [initialPaymentAmount, setInitialPaymentAmount] = useState("");
+  const [initialPaymentAmount, setInitialPaymentAmount] = useState(
+    `${MIN_INITIAL_PAYMENT}`
+  );
   const [accountStatus, setAccountStatus] = useState("Active");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
@@ -45,6 +49,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setAuthError("");
     setMessage("");
 
+    const numericInitialPayment = Number(initialPaymentAmount);
+
     if (password !== confirmPassword) {
       const passwordError = "Passwords do not match.";
       setAuthError(passwordError);
@@ -56,6 +62,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const consentMessage = "Please agree to the terms and privacy policy to continue.";
       setAuthError(consentMessage);
       showToast(consentMessage, "error");
+      return;
+    }
+
+    if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
+      const paymentError = `Initial payment amount must be at least GH₵${MIN_INITIAL_PAYMENT}.`;
+      setAuthError(paymentError);
+      showToast(paymentError, "error");
       return;
     }
 
@@ -255,12 +268,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <label style={styles.label}>Initial payment amount (GH₵)</label>
           <input
             type="number"
-            min="0"
+            min={MIN_INITIAL_PAYMENT}
             step="100"
             value={initialPaymentAmount}
             onChange={(e) => setInitialPaymentAmount(e.target.value)}
             style={inputStyle}
-            placeholder="0"
+            placeholder={`At least GH₵${MIN_INITIAL_PAYMENT}`}
           />
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             A1: GH₵2800 · A2: GH₵3000 · B1: GH₵3000 · B2: GH₵3000. Full payment activates a 6-month contract; partial payment sets a 1-month starter contract with reminders.
