@@ -140,7 +140,7 @@ const getThreadMetadata = async (threadId) => {
   };
 };
 
-exports.api = onRequest(
+const api = onRequest(
   {
     region: "europe-west1",
     cors: true,
@@ -156,7 +156,7 @@ exports.api = onRequest(
 );
 
 // When a student doc is created or updated (and hasn't been synced yet), append to Students sheet
-exports.onStudentCreated = onDocumentWritten(
+const onStudentCreated = onDocumentWritten(
   {
     region: "europe-west1",
     document: "students/{studentCode}",
@@ -216,7 +216,7 @@ exports.onStudentCreated = onDocumentWritten(
   }
 );
 
-exports.archiveOldThreads = onSchedule(
+const archiveOldThreads = onSchedule(
   {
     region: "europe-west1",
     schedule: "every 24 hours",
@@ -374,7 +374,7 @@ const notifyAssignmentScore = async ({ attemptId, attempt }) => {
   return null;
 };
 
-exports.onClassBoardPostCreated = onDocumentCreated(
+const onClassBoardPostCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "class_board/{level}/classes/{className}/posts/{postId}",
@@ -414,7 +414,7 @@ exports.onClassBoardPostCreated = onDocumentCreated(
   }
 );
 
-exports.onQaPostCreated = onDocumentCreated(
+const onQaPostCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "qa_posts/{threadId}",
@@ -425,7 +425,7 @@ exports.onQaPostCreated = onDocumentCreated(
   }
 );
 
-exports.onQaPostUpdated = onDocumentUpdated(
+const onQaPostUpdated = onDocumentUpdated(
   {
     region: "europe-west1",
     document: "qa_posts/{threadId}",
@@ -438,7 +438,7 @@ exports.onQaPostUpdated = onDocumentUpdated(
   }
 );
 
-exports.onScoreCreated = onDocumentCreated(
+const onScoreCreated = onDocumentCreated(
   {
     region: "europe-west1",
     document: "scores/{attemptId}",
@@ -451,3 +451,13 @@ exports.onScoreCreated = onDocumentCreated(
     await notifyAssignmentScore({ attemptId: event.params.attemptId, attempt });
   }
 );
+
+module.exports = {
+  api,
+  onStudentCreated,
+  archiveOldThreads,
+  onClassBoardPostCreated,
+  onQaPostCreated,
+  onQaPostUpdated,
+  onScoreCreated,
+};
