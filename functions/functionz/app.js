@@ -121,6 +121,7 @@ const DAILY_LIMITS = {
   chatbuddy: 30,
   placement: 5,
   speaking: 25,
+  speechTrainer: 25,
 };
 
 const memoryQuota = new Map();
@@ -297,6 +298,17 @@ const chatBuddyPrompt = ({ level }) =>
     "Always ask one follow-up question in German to keep the conversation going.",
     "If you notice pronunciation or grammar issues, include one quick tip using a short German example.",
   ].join(" ");
+
+const speechTrainerPrompt = ({ level, note }) =>
+  [
+    "You are an encouraging German pronunciation coach working from a Whisper transcript.",
+    `Aim feedback at CEFR level ${level || "B1"}. Keep the tone warm and concrete.`,
+    note ? `The student noted: ${note}.` : "",
+    "Return three compact bullets: (1) pronunciation + stress, (2) grammar + vocabulary, (3) one 20-second drill with a short German example.",
+    "Stay under 120 words total. If audio seems empty, give a microphone tip instead.",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
 const placementPrompt = ({ answers, targetLevel }) => {
   const formattedAnswers = answers
@@ -914,6 +926,59 @@ app.post("/speaking/interaction-score", upload.single("audio"), async (req, res)
     console.error("/speaking/interaction-score error", err);
     auditAIRequest({ route: "/speaking/interaction-score", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to score interaction" });
+  }
+});
+
+app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Audio recording is required" });
+    }
+
+    const { note = "", level = "B1", userId = "guest" } = req.body || {};
+
+    const validationError =
+      validateString(note, { maxLength: 300, label: "note" }) ||
+      validateString(level, { maxLength: 10, label: "level" });
+
+    if (validationError) {
+      return res.status(400).json({ error: validationError });
+    }
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speechTrainer", limit: DAILY_LIMITS.speechTrainer });
+    if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/speech-trainer/feedback", uid: authedUser.uid, category: "speechTrainer" });
+      return res.status(429).json({ error: "Daily speech trainer limit reached" });
+    }
+
+    const transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1500);
+
+    const messages = [
+      { role: "system", content: speechTrainerPrompt({ level, note: String(note || "").trim() }) },
+      {
+        role: "user",
+        content: transcript || "No words detected. Offer a one-line microphone troubleshooting tip in English.",
+      },
+    ];
+
+    const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 420 });
+
+    auditAIRequest({
+      route: "/speech-trainer/feedback",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { level, userId, quotaRemaining: quota.remaining, hasTranscript: Boolean(transcript) },
+    });
+
+    return res.json({ transcript: transcript || null, feedback, quotaRemaining: quota.remaining });
+  } catch (err) {
+    console.error("/speech-trainer/feedback error", err);
+    auditAIRequest({ route: "/speech-trainer/feedback", uid: authedUser?.uid, email: authedUser?.email, success: false });
+    return res.status(500).json({ error: err.message || "Failed to run speech trainer" });
   }
 });
 
