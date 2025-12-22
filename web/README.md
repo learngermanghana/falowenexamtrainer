@@ -1,6 +1,6 @@
 # Falowen Learning Hub – Frontend
 
-This React app guides learners through recording or typing answers for speaking practice and now connects directly to Firebase Firestore for student profiles and scores.
+This React app guides learner through recording or typing answers for speaking practice and now connects directly to Firebase Firestore for student profiles and scores.
 
 ## Setup
 1. Install dependencies (from the repo root):
