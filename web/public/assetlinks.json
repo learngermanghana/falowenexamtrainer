@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.falowen.app",
+      "sha256_cert_fingerprints": [
+        "4B:0E:91:5E:27:95:74:F1:5F:81:08:B8:9C:51:2A:5B:06:B9:2C:80:49:D9:2B:F8:C9:4D:E6:8F:E3:48:A8:10"
+      ]
+    }
+  }
+]
