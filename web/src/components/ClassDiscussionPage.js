@@ -446,13 +446,13 @@ const ClassDiscussionPage = () => {
       const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
 
       const replyId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
-        const payload = {
-          id: replyId,
-          responder: getDisplayName(),
-          responderCode: getResponderCode(),
-          text: draft,
-          createdAt: serverTimestamp(),
-        };
+      const payload = {
+        id: replyId,
+        responder: getDisplayName(),
+        responderCode: getResponderCode(),
+        text: draft,
+        createdAt: Timestamp.now(),
+      };
 
       await setDoc(
         qaDocRef,
@@ -540,7 +540,7 @@ const ClassDiscussionPage = () => {
       const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
       const updatedResponses = responses.map((response) =>
         response.id === editingReply.replyId
-          ? { ...response, text: editingReply.text, editedAt: serverTimestamp() }
+          ? { ...response, text: editingReply.text, editedAt: Timestamp.now() }
           : response
       );
 
