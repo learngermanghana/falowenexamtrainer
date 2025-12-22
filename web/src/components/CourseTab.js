@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { courseOverview, chatPrompts } from "../data/courseData";
 import { courseSchedules } from "../data/courseSchedule";
@@ -17,13 +17,19 @@ import {
 } from "../services/submissionService";
 import { fetchResults } from "../services/resultsService";
 import { deriveStudentProfile, findStudentByEmail } from "../services/studentDirectory";
+import {
+  appendChatMessages,
+  ensureIntroMessage,
+  requestFalowenReply,
+  subscribeToChatMessages,
+} from "../services/chatService";
 
 const tabs = [
-  { key: "home", label: "Home" },
+  { key: "home", label: "Campus Home" },
   { key: "course", label: "My Course" },
   { key: "vocab", label: "Vokabeln" },
   { key: "submit", label: "Submit Work" },
-  { key: "chat", label: "Class Chat" },
+  { key: "chat", label: "Falowen A.I." },
   { key: "results", label: "My Results" },
   { key: "letters", label: "Schreiben Trainer" },
 ];
@@ -40,12 +46,13 @@ const CourseTab = () => {
   const { user, studentProfile } = useAuth();
   const [activeTab, setActiveTab] = useState("home");
   const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([
-    {
-      sender: "coach",
-      text: `Willkommen, ${courseOverview.studentName}! Wähle einen Prompt oder frag mich direkt, ich bereite dich auf ${courseOverview.upcomingSession.topic} vor.`,
-    },
-  ]);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatStatus, setChatStatus] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [recorderError, setRecorderError] = useState("");
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const recorderRef = useRef(null);
   const [writingSubtab, setWritingSubtab] = useState("mark");
   const [letterQuestion, setLetterQuestion] = useState("");
   const [letterDraft, setLetterDraft] = useState("");
@@ -89,6 +96,42 @@ const CourseTab = () => {
     error: "",
     fetchedAt: null,
   });
+
+  const studentLevel = (studentProfile?.level || selectedCourseLevel || "A1").toUpperCase();
+  const studentFirstName = useMemo(() => {
+    const fullName = studentProfile?.name || courseOverview.studentName || "Student";
+    return fullName.split(" ")[0];
+  }, [studentProfile?.name]);
+
+  const falowenIntro = useMemo(
+    () => ({
+      sender: "coach",
+      text: `Hi ${studentFirstName}, ich bin Falowen A.I. – dein Grammatik-Helfer und Chat Buddy. Willst du eine Grammatikfrage stellen oder einfach sprechen? Ich passe mich an dein Niveau (${studentLevel}) an.`,
+      kind: "system",
+      createdAt: new Date(),
+    }),
+    [studentFirstName, studentLevel]
+  );
+
+  const buildFalowenReply = (content) => {
+    if (!content) {
+      return "Erzähl mir, ob du Grammatik üben oder eine kleine Konversation führen möchtest.";
+    }
+
+    const lower = content.toLowerCase();
+    const grammarHints = ["grammatik", "satz", "artikel", "konjug", "zeitform"];
+    const isGrammar = grammarHints.some((hint) => lower.includes(hint));
+
+    if (isGrammar) {
+      return "Hier ist eine schnelle Grammatik-Stütze: Achte auf Verbzweitstellung und pass die Artikel an. Schick mir einen Beispielsatz, dann korrigiere ich ihn.";
+    }
+
+    if (lower.includes("presentation") || lower.includes("präsent")) {
+      return "Für A2-Präsentationen: Starte mit einer kurzen Einleitung (Thema + Grund), nutze 3–4 Stichpunkte und schließe mit einer Frage ans Publikum. Möchtest du das laut üben?";
+    }
+
+    return "Lass uns kurz plaudern! Nenn ein Alltagsthema oder stell eine Frage, und ich reagiere so, dass du neue Wörter nutzen kannst.";
+  };
 
   const sanitizePathSegment = (value) =>
     (value || "")
@@ -194,6 +237,37 @@ const CourseTab = () => {
   useEffect(() => {
     setSubmissionLevel(selectedCourseLevel);
   }, [selectedCourseLevel]);
+
+  useEffect(() => {
+    if (!user?.uid) return undefined;
+
+    setChatLoading(true);
+    setChatStatus("");
+
+    const unsubscribe = subscribeToChatMessages(user.uid, (messages) => {
+      if (!messages.length) {
+        setChatMessages([falowenIntro]);
+        ensureIntroMessage(user.uid, falowenIntro).catch((error) => {
+          console.error("Failed to seed intro message", error);
+          setChatStatus("Chat konnte nicht initialisiert werden.");
+        });
+        setChatLoading(false);
+        return;
+      }
+
+      setChatMessages(messages);
+      setChatLoading(false);
+    });
+
+    return unsubscribe;
+  }, [falowenIntro, user?.uid]);
+
+  useEffect(
+    () => () => {
+      stopActiveRecorder();
+    },
+    []
+  );
 
   useEffect(() => {
     setHydrated(false);
@@ -544,19 +618,133 @@ const CourseTab = () => {
     );
   };
 
-  const handleSend = (value) => {
+  const handleSend = async (value) => {
     const content = value?.trim();
     if (!content) return;
 
-    setChatMessages((prev) => [
-      ...prev,
-      { sender: "user", text: content },
-      {
-        sender: "coach",
-        text: `Notiert. Für ${courseOverview.nextAssignment.title} nutze bitte die Redemittel aus Kapitel 5. Denk an dein Ziel: ${streakValue} und ${courseOverview.attendanceSummary}.`,
-      },
-    ]);
+    if (!user?.uid) {
+      setChatStatus("Bitte einloggen, um den Chat zu nutzen.");
+      return;
+    }
+
+    const userMessage = { sender: "user", text: content, kind: "text", createdAt: new Date() };
+    setChatMessages((prev) => [...prev, userMessage]);
     setChatInput("");
+
+    appendChatMessages(user.uid, [userMessage]).catch((error) => {
+      console.error("Failed to persist chat", error);
+      setChatStatus("Konnte Chat nicht speichern. Versuche es erneut.");
+    });
+
+    setChatLoading(true);
+    setChatStatus("Falowen A.I. denkt nach …");
+
+    const apiMessages = [...chatMessages, userMessage]
+      .filter((msg) => msg?.text)
+      .slice(-8)
+      .map((msg) => ({
+        role: msg.sender === "coach" ? "assistant" : "user",
+        content: msg.text,
+      }));
+
+    try {
+      const response = await requestFalowenReply({
+        messages: apiMessages,
+        level: studentLevel,
+        studentName: studentFirstName,
+      });
+
+      const replyText = response?.reply || buildFalowenReply(content);
+      const coachMessage = { sender: "coach", text: replyText, kind: "text", createdAt: new Date() };
+
+      setChatMessages((prev) => [...prev, coachMessage]);
+      appendChatMessages(user.uid, [coachMessage]).catch((error) => {
+        console.error("Failed to persist chat reply", error);
+        setChatStatus("Konnte Antwort nicht speichern.");
+      });
+      setChatStatus("Falowen hat geantwortet.");
+    } catch (error) {
+      console.error("Falowen API error", error);
+      const fallback = buildFalowenReply(content);
+      const coachMessage = { sender: "coach", text: fallback, kind: "text", createdAt: new Date() };
+      setChatMessages((prev) => [...prev, coachMessage]);
+      setChatStatus("Falowen A.I. antwortet im Offline-Modus.");
+      appendChatMessages(user.uid, [coachMessage]).catch(() => undefined);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const stopActiveRecorder = () => {
+    if (recorderRef.current?.state === "recording") {
+      recorderRef.current.stop();
+    }
+    recorderRef.current?.stream?.getTracks?.().forEach((track) => track.stop());
+  };
+
+  const handleRecordingToggle = async () => {
+    if (isRecording) {
+      stopActiveRecorder();
+      return;
+    }
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setRecorderError("Aufnahme nicht unterstützt.");
+      return;
+    }
+
+    if (typeof MediaRecorder === "undefined") {
+      setRecorderError("MediaRecorder wird nicht unterstützt.");
+      return;
+    }
+
+    try {
+      setRecorderError("");
+      setChatStatus("Aufnahme läuft – tippe erneut zum Stop.");
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const chunks = [];
+      const recorder = new MediaRecorder(stream);
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(chunks, { type: "audio/webm" });
+        stopActiveRecorder();
+        setIsRecording(false);
+        const sizeKb = Math.max(Math.round(audioBlob.size / 1024), 1);
+        setRecordingDuration(sizeKb);
+
+        if (!user?.uid) {
+          setChatStatus("Bitte einloggen, um Sprachaufnahmen zu speichern.");
+          return;
+        }
+
+        const audioNote = {
+          sender: "user",
+          kind: "audio",
+          text: `Audio-Notiz aufgenommen (${sizeKb} KB). Whisper kann sie in Text umwandeln.`,
+          createdAt: new Date(),
+        };
+
+        setChatMessages((prev) => [...prev, audioNote]);
+        appendChatMessages(user.uid, [audioNote]).catch((error) => {
+          console.error("Failed to save audio note", error);
+          setChatStatus("Audio-Notiz konnte nicht gespeichert werden.");
+        });
+      };
+
+      recorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Recorder error", error);
+      setRecorderError("Konnte nicht aufnehmen. Bitte Mikrofonrechte prüfen.");
+      setIsRecording(false);
+    }
   };
 
   const saveDraftImmediately = () => {
@@ -945,11 +1133,19 @@ const CourseTab = () => {
 
   const renderChat = () => (
     <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-        <h2 style={styles.sectionTitle}>Class Chat · AI Coach</h2>
-        <span style={styles.badge}>Vorbereitung auf den Unterricht</span>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <h2 style={styles.sectionTitle}>Falowen A.I. · Grammar &amp; Chat Buddy</h2>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <span style={styles.badge}>Level: {studentLevel}</span>
+          <span style={styles.badge}>Campus: Home · My Course · Vokabeln · Falowen A.I.</span>
+        </div>
       </div>
-      <p style={styles.helperText}>Fragen für die nächste Stunde, Redemittel oder Mini-Übungen – die Antworten nutzen dein Kurs-Dictionary.</p>
+      <p style={styles.helperText}>
+        Wenn du den Campus auswählst, findest du hier die Untertabs (Home, My Course, Vokabeln, Falowen A.I., Submit Work), damit der Dashboard-Tab ausgeblendet werden kann.
+      </p>
+      <p style={styles.helperText}>
+        Falowen fragt nach: Hast du eine Grammatikfrage oder möchtest du chatten, zum Beispiel eine kurze A2-Präsentation üben? Wähle einen Prompt oder schreib frei.
+      </p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {chatPrompts.map((prompt) => (
           <button
@@ -962,13 +1158,34 @@ const CourseTab = () => {
         ))}
       </div>
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <span style={styles.badge}>{chatLoading ? "Lädt ..." : "Chat bereit"}</span>
+            {recordingDuration ? (
+              <span style={styles.helperText}>Letzte Aufnahme: {recordingDuration} KB</span>
+            ) : null}
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              style={isRecording ? styles.dangerButton : styles.secondaryButton}
+              onClick={handleRecordingToggle}
+            >
+              {isRecording ? "Aufnahme stoppen" : "🎙️ Aufnahme (Whisper-ready)"}
+            </button>
+            <button style={styles.primaryButton} onClick={() => handleSend(chatInput)}>Nachricht senden</button>
+          </div>
+        </div>
+
+        {chatStatus ? <div style={styles.helperText}>{chatStatus}</div> : null}
+        {recorderError ? <div style={styles.errorBox}>{recorderError}</div> : null}
+
         <div style={styles.chatLog}>
           {chatMessages.map((message, index) => (
             <div
-              key={`${message.sender}-${index}`}
+              key={`${message.sender}-${index}-${message.createdAt || index}`}
               style={message.sender === "coach" ? styles.chatBubbleCoach : styles.chatBubbleUser}
             >
-              <strong>{message.sender === "coach" ? "Coach" : "Du"}:</strong> {message.text}
+              <strong>{message.sender === "coach" ? "Falowen" : "Du"}:</strong> {message.text}
             </div>
           ))}
         </div>
@@ -976,11 +1193,8 @@ const CourseTab = () => {
           style={styles.textareaSmall}
           value={chatInput}
           onChange={(e) => setChatInput(e.target.value)}
-          placeholder="Frag den Coach nach Redemitteln oder lasse dir eine Mini-Übung geben"
+          placeholder="Frag nach Grammatik, bitte um Feedback zu einer Präsentation oder starte Small Talk."
         />
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button style={styles.primaryButton} onClick={() => handleSend(chatInput)}>Nachricht senden</button>
-        </div>
       </div>
     </div>
   );
