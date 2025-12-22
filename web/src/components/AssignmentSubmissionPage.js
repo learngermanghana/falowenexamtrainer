@@ -97,6 +97,10 @@ const AssignmentSubmissionPage = () => {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [draftsByAssignment, setDraftsByAssignment] = useState({});
   const lastAssignmentRef = useRef(assignmentOptions[0]);
+  const localDraftStorageKey = useMemo(
+    () => (user?.uid ? `assignmentDrafts:${user.uid}` : null),
+    [user?.uid]
+  );
 
   const buildChapterKey = useCallback(
     (title) => {
@@ -130,16 +134,67 @@ const AssignmentSubmissionPage = () => {
     [assignmentDictionary]
   );
 
+  const getDraftKey = useCallback(
+    (title) => buildChapterKey(title) || (title ? title.toLowerCase() : "default"),
+    [buildChapterKey]
+  );
+
+  const readLocalDrafts = useCallback(() => {
+    if (!localDraftStorageKey) return {};
+    try {
+      const storedValue = localStorage.getItem(localDraftStorageKey);
+      return storedValue ? JSON.parse(storedValue) : {};
+    } catch (error) {
+      console.error("Failed to read drafts from storage", error);
+      return {};
+    }
+  }, [localDraftStorageKey]);
+
+  const writeLocalDrafts = useCallback(
+    (draftMap) => {
+      if (!localDraftStorageKey) return;
+      try {
+        localStorage.setItem(localDraftStorageKey, JSON.stringify(draftMap));
+      } catch (error) {
+        console.error("Failed to write drafts to storage", error);
+      }
+    },
+    [localDraftStorageKey]
+  );
+
   useEffect(() => {
     const defaultAssignment = assignmentOptions[0];
-    const defaultDraft = draftsByAssignment[defaultAssignment];
+    const currentAssignment = form.assignmentTitle;
+    const hasCurrentAssignment = currentAssignment && assignmentOptions.includes(currentAssignment);
 
+    if (hasCurrentAssignment || !defaultAssignment) return;
+
+    const defaultDraft = draftsByAssignment[getDraftKey(defaultAssignment)];
     setForm((prev) => ({
       ...prev,
       assignmentTitle: defaultAssignment,
       submissionText: defaultDraft?.submissionText || prev.submissionText,
     }));
-  }, [assignmentOptions, draftsByAssignment]);
+  }, [assignmentOptions, draftsByAssignment, form.assignmentTitle, getDraftKey]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const localDrafts = readLocalDrafts();
+    if (Object.keys(localDrafts).length) {
+      setDraftsByAssignment((prev) => ({ ...localDrafts, ...prev }));
+      const draftKey = getDraftKey(form.assignmentTitle || assignmentOptions[0]);
+      const localDraft = localDrafts[draftKey];
+      if (localDraft?.submissionText) {
+        setForm((prev) => ({
+          ...prev,
+          assignmentTitle: localDraft.assignmentTitle || prev.assignmentTitle,
+          submissionText: localDraft.submissionText,
+          confirmed: false,
+        }));
+      }
+    }
+  }, [assignmentOptions, form.assignmentTitle, getDraftKey, readLocalDrafts, user]);
 
   const buildSubmissionPayload = (statusLabel) => ({
     title: form.assignmentTitle,
@@ -168,27 +223,44 @@ const AssignmentSubmissionPage = () => {
     const targetCollection = statusLabel === "draft" ? DRAFT_COLLECTION : SUBMISSION_COLLECTION;
 
     if (statusLabel === "draft") {
-      const existingDraft = draftsByAssignment[form.assignmentTitle];
+      const draftKey = getDraftKey(form.assignmentTitle);
+      const existingDraft = draftsByAssignment[draftKey];
       const payloadWithTimestamps = {
         ...submissionPayload,
         createdAt: existingDraft?.createdAt || submissionPayload.createdAt,
+      };
+      const stateDraft = {
+        id: existingDraft?.id,
+        assignmentTitle: form.assignmentTitle,
+        submissionText: submissionPayload.submissionText,
+        chapter: deriveChapterValue(form.assignmentTitle),
+        updatedAtMillis: Date.now(),
       };
 
       if (existingDraft?.id) {
         const draftRef = doc(db, targetCollection, existingDraft.id);
         await setDoc(draftRef, payloadWithTimestamps, { merge: true });
-        setDraftsByAssignment((prev) => ({
-          ...prev,
-          [form.assignmentTitle]: { id: existingDraft.id, ...payloadWithTimestamps },
-        }));
+        setDraftsByAssignment((prev) => {
+          const updatedMap = {
+            ...prev,
+            [draftKey]: { ...stateDraft },
+          };
+          writeLocalDrafts(updatedMap);
+          return updatedMap;
+        });
         return true;
       }
 
       const newDraftRef = await addDoc(collection(db, targetCollection), submissionPayload);
-      setDraftsByAssignment((prev) => ({
-        ...prev,
-        [form.assignmentTitle]: { id: newDraftRef.id, ...submissionPayload },
-      }));
+      const newStateDraft = { ...stateDraft, id: newDraftRef.id };
+      setDraftsByAssignment((prev) => {
+        const updatedMap = {
+          ...prev,
+          [draftKey]: newStateDraft,
+        };
+        writeLocalDrafts(updatedMap);
+        return updatedMap;
+      });
       return true;
     }
 
@@ -247,33 +319,49 @@ const AssignmentSubmissionPage = () => {
           setHasSubmitted(true);
         }
 
-          const draftsRef = collection(db, DRAFT_COLLECTION);
-          const draftSnapshot = await getDocs(
-            query(draftsRef, where("studentId", "==", user.uid), orderBy("updatedAt", "desc"), limit(20))
-          );
+        const draftsRef = collection(db, DRAFT_COLLECTION);
+        const draftSnapshot = await getDocs(
+          query(draftsRef, where("studentId", "==", user.uid), orderBy("updatedAt", "desc"), limit(20))
+        );
 
-          if (!draftSnapshot.empty) {
-            const latestDrafts = {};
-            draftSnapshot.docs.forEach((docSnap) => {
-              const data = docSnap.data();
-              const assignmentKey = data.assignmentTitle || data.title || assignmentOptions[0];
-              if (!latestDrafts[assignmentKey]) {
-                latestDrafts[assignmentKey] = { id: docSnap.id, ...data };
-              }
-            });
+        if (!draftSnapshot.empty) {
+          const latestDrafts = {};
+          draftSnapshot.docs.forEach((docSnap) => {
+            const data = docSnap.data();
+            const draftKey = getDraftKey(data.assignmentTitle || data.title || assignmentOptions[0]);
+            const existingDraft = latestDrafts[draftKey];
+            const updatedAtMillis = data.updatedAt?.toMillis ? data.updatedAt.toMillis() : Date.now();
+            const existingUpdatedAt = existingDraft?.updatedAtMillis || 0;
 
-            setDraftsByAssignment(latestDrafts);
-
-            const selectedDraft = latestDrafts[form.assignmentTitle || assignmentOptions[0]];
-            if (selectedDraft) {
-              setForm((prev) => ({
-                ...prev,
-                assignmentTitle: selectedDraft.assignmentTitle || prev.assignmentTitle,
-                submissionText: selectedDraft.submissionText || "",
-                confirmed: false,
-              }));
+            if (!existingDraft || updatedAtMillis > existingUpdatedAt) {
+              latestDrafts[draftKey] = {
+                id: docSnap.id,
+                assignmentTitle: data.assignmentTitle || data.title || assignmentOptions[0],
+                submissionText: data.submissionText || "",
+                chapter: data.chapter ?? deriveChapterValue(data.assignmentTitle || data.title),
+                updatedAtMillis,
+              };
             }
+          });
+
+          setDraftsByAssignment((prev) => {
+            const merged = { ...prev, ...latestDrafts };
+            const stored = readLocalDrafts();
+            writeLocalDrafts({ ...stored, ...merged });
+            return merged;
+          });
+
+          const currentKey = getDraftKey(form.assignmentTitle || assignmentOptions[0]);
+          const selectedDraft = latestDrafts[currentKey];
+          if (selectedDraft) {
+            setForm((prev) => ({
+              ...prev,
+              assignmentTitle: selectedDraft.assignmentTitle || prev.assignmentTitle,
+              submissionText: selectedDraft.submissionText || "",
+              confirmed: false,
+            }));
           }
+        }
       } catch (error) {
         console.error("Failed to load submissions", error);
         setStatus((prev) => ({
@@ -286,7 +374,7 @@ const AssignmentSubmissionPage = () => {
     };
 
     loadDraftsAndSubmissions();
-  }, [assignmentOptions, buildChapterKey, form.assignmentTitle, user]);
+  }, [assignmentOptions, buildChapterKey, deriveChapterValue, form.assignmentTitle, getDraftKey, readLocalDrafts, user]);
 
   useEffect(() => {
     const isLocked = lockedChapters.has(buildChapterKey(form.assignmentTitle));
@@ -299,7 +387,8 @@ const AssignmentSubmissionPage = () => {
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
     if (field === "assignmentTitle") {
-      const draft = draftsByAssignment[value];
+      const draftKey = getDraftKey(value);
+      const draft = draftsByAssignment[draftKey];
       lastAssignmentRef.current = value;
       setForm((prev) => ({
         ...prev,
@@ -319,7 +408,8 @@ const AssignmentSubmissionPage = () => {
 
   useEffect(() => {
     const currentAssignment = form.assignmentTitle;
-    const draft = draftsByAssignment[currentAssignment];
+    const draftKey = getDraftKey(currentAssignment);
+    const draft = draftsByAssignment[draftKey];
     const assignmentChanged = lastAssignmentRef.current !== currentAssignment;
     lastAssignmentRef.current = currentAssignment;
 
@@ -337,7 +427,7 @@ const AssignmentSubmissionPage = () => {
         confirmed: false,
       }));
     }
-  }, [draftsByAssignment, form.assignmentTitle, form.submissionText]);
+  }, [draftsByAssignment, form.assignmentTitle, form.submissionText, getDraftKey]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
