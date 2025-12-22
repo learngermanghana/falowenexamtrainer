@@ -27,6 +27,32 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
     () => findNextClassSession(selectedClass, now),
     [now, selectedClass]
   );
+  const timeline = useMemo(() => {
+    if (!classDetails?.startDate || !classDetails?.endDate) return null;
+
+    const start = new Date(`${classDetails.startDate}T00:00:00`);
+    const end = new Date(`${classDetails.endDate}T23:59:59`);
+    const nowTime = now.getTime();
+    const dayMs = 24 * 60 * 60 * 1000;
+
+    const totalDuration = Math.max(end - start, dayMs);
+    const elapsed = Math.min(Math.max(nowTime - start, 0), totalDuration);
+
+    const percentComplete = Math.round((elapsed / totalDuration) * 100);
+    const daysUntilStart = Math.max(0, Math.ceil((start - nowTime) / dayMs));
+    const daysUntilEnd = Math.max(0, Math.ceil((end - nowTime) / dayMs));
+
+    let status;
+    if (nowTime < start) {
+      status = `Starts in ${daysUntilStart} day${daysUntilStart === 1 ? "" : "s"}`;
+    } else if (nowTime > end) {
+      status = "Course finished";
+    } else {
+      status = `${daysUntilEnd} day${daysUntilEnd === 1 ? "" : "s"} left`;
+    }
+
+    return { percentComplete, daysUntilStart, daysUntilEnd, status };
+  }, [classDetails?.endDate, classDetails?.startDate, now]);
   const minutesUntil = useMemo(() => {
     if (!nextClass?.startDateTime) return null;
     return Math.max(0, Math.round((nextClass.startDateTime - now) / 60000));
@@ -94,6 +120,37 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
             {classDetails.startDate} → {classDetails.endDate}
           </p>
         </div>
+
+        {timeline ? (
+          <div style={{ ...styles.field, margin: 0 }}>
+            <label style={styles.label}>Timeline</label>
+            <div style={{ ...styles.card, background: "#f3f4f6", margin: 0, gap: 6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontWeight: 700 }}>{timeline.status}</span>
+                <span style={styles.badge}>{timeline.percentComplete}% done</span>
+              </div>
+              <div style={{ position: "relative", height: 10, background: "#e5e7eb", borderRadius: 999 }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: `${timeline.percentComplete}%`,
+                    background: "linear-gradient(90deg, #2563eb, #7c3aed)",
+                    borderRadius: 999,
+                    transition: "width 0.3s ease",
+                  }}
+                />
+              </div>
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                {timeline.daysUntilStart > 0
+                  ? `${timeline.daysUntilStart} day${timeline.daysUntilStart === 1 ? "" : "s"} until kickoff`
+                  : timeline.daysUntilEnd > 0
+                  ? `${timeline.daysUntilEnd} day${timeline.daysUntilEnd === 1 ? "" : "s"} until graduation`
+                  : "This class has finished."}
+              </p>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {nextClass ? (
