@@ -132,14 +132,18 @@ const AssignmentSubmissionPage = () => {
 
   useEffect(() => {
     const defaultAssignment = assignmentOptions[0];
-    const defaultDraft = draftsByAssignment[defaultAssignment];
+    const currentAssignment = form.assignmentTitle;
+    const hasCurrentAssignment = currentAssignment && assignmentOptions.includes(currentAssignment);
 
+    if (hasCurrentAssignment || !defaultAssignment) return;
+
+    const defaultDraft = draftsByAssignment[defaultAssignment];
     setForm((prev) => ({
       ...prev,
       assignmentTitle: defaultAssignment,
       submissionText: defaultDraft?.submissionText || prev.submissionText,
     }));
-  }, [assignmentOptions, draftsByAssignment]);
+  }, [assignmentOptions, draftsByAssignment, form.assignmentTitle]);
 
   const buildSubmissionPayload = (statusLabel) => ({
     title: form.assignmentTitle,
