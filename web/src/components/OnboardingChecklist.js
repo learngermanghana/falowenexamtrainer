@@ -73,18 +73,21 @@ const OnboardingChecklist = ({
   onEnableNotifications,
   onSelectLevel,
   onConfirmClass,
+  studentProfile,
+  onSaveOnboarding,
 }) => {
   const { levelConfirmed } = useExam();
   const [state, setState] = useState(() => {
     const persisted = loadState();
-    const completed = Boolean(persisted.completed);
 
     return {
-      congratulated: completed,
-      ...persisted,
+      calendarDownloaded: Boolean(persisted.calendarDownloaded),
     };
   });
   const [selectedClass, setSelectedClass] = useState(loadPreferredClass);
+  const [savingOnboarding, setSavingOnboarding] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [localCompletion, setLocalCompletion] = useState(false);
 
   useEffect(() => {
     persistState(state);
@@ -112,6 +115,7 @@ const OnboardingChecklist = ({
   const calendarDownloaded = Boolean(state.calendarDownloaded);
   const fallbackClass = useMemo(() => Object.keys(classCatalog)?.[0], []);
   const currentClass = selectedClass || fallbackClass;
+  const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted) || localCompletion;
 
   const progress = useMemo(() => {
     const steps = [levelConfirmed, classConfirmed, calendarDownloaded, notificationsReady];
@@ -132,42 +136,23 @@ const OnboardingChecklist = ({
 
   const allFinished = progress.done === progress.total;
 
-  const handleSaveOnboarding = () => {
-    if (!allFinished) return;
-    setState((prev) => ({ ...prev, completed: true }));
+  const handleSaveOnboarding = async () => {
+    if (!allFinished || !onSaveOnboarding) return;
+    setSaveError("");
+    setSavingOnboarding(true);
+
+    try {
+      await onSaveOnboarding();
+      setLocalCompletion(true);
+    } catch (error) {
+      console.error("Failed to save onboarding", error);
+      setSaveError("Could not save onboarding status. Please try again.");
+    } finally {
+      setSavingOnboarding(false);
+    }
   };
 
-  useEffect(() => {
-    if (!state.completed || state.congratulated) return;
-    setState((prev) => ({ ...prev, congratulated: true }));
-  }, [state.completed, state.congratulated]);
-
-  if (state.completed && state.congratulated) return null;
-
-  if (state.completed && !state.congratulated) {
-    return (
-      <div style={{ ...styles.card, display: "grid", gap: 12, background: "#ecfdf3", borderColor: "#bbf7d0" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-          <div>
-            <p style={{ ...styles.badge, background: "#d1fae5", color: "#065f46", margin: 0 }}>Onboarding saved</p>
-            <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>You&apos;re ready to learn</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Great job completing the onboarding steps. Keep the momentum going—show up to class, ask questions, and use your study streaks.
-            </p>
-          </div>
-          <span style={{ fontSize: 32, color: "#10b981" }}>🎉</span>
-        </div>
-        <div>
-          <button
-            style={{ ...styles.primaryButton, background: "#065f46", borderColor: "#047857" }}
-            onClick={() => setState((prev) => ({ ...prev, congratulated: true }))}
-          >
-            Got it
-          </button>
-        </div>
-      </div>
-    );
-  }
+  if (onboardingCompleted) return null;
 
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -242,16 +227,19 @@ const OnboardingChecklist = ({
         <p style={{ ...styles.helperText, margin: 0 }}>
           Finish every step and tap save to mark onboarding as done. This keeps your streaks and reminders aligned with your cohort.
         </p>
+        {saveError ? (
+          <span style={{ ...styles.helperText, color: "#b91c1c" }}>{saveError}</span>
+        ) : null}
         <button
           style={{
             ...(allFinished ? styles.primaryButton : styles.secondaryButton),
             opacity: allFinished ? 1 : 0.6,
-            cursor: allFinished ? "pointer" : "not-allowed",
+            cursor: allFinished && !savingOnboarding ? "pointer" : "not-allowed",
           }}
-          disabled={!allFinished}
+          disabled={!allFinished || savingOnboarding}
           onClick={handleSaveOnboarding}
         >
-          Save onboarding
+          {savingOnboarding ? "Saving..." : "Save onboarding"}
         </button>
       </div>
     </div>
