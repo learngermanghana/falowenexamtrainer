@@ -3,6 +3,7 @@ import {
   auth,
   createUserWithEmailAndPassword,
   onIdTokenChanged,
+  sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
@@ -158,9 +159,11 @@ export const AuthProvider = ({ children }) => {
     }
 
     await setDoc(studentsRef, payload, { merge: true });
+    await sendEmailVerification(credential.user, getActionCodeSettings());
+    await signOut(auth);
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
-    return { verificationRequired: false };
+    return { verificationRequired: true };
   };
 
   const login = async (email, password) => {
@@ -174,6 +177,16 @@ export const AuthProvider = ({ children }) => {
       normalizedEmail,
       password
     );
+    if (!credential.user.emailVerified) {
+      await sendEmailVerification(credential.user, getActionCodeSettings());
+      await signOut(auth);
+      const error = new Error(
+        "Please verify your email address before logging in. We've re-sent the verification link."
+      );
+      error.code = "auth/email-not-verified";
+      error.email = credential.user.email;
+      throw error;
+    }
     const token = await credential.user.getIdToken();
     setIdToken(token);
     const profile = await fetchStudentProfileByEmail(normalizedEmail);

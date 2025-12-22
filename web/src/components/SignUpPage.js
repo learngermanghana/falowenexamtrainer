@@ -117,7 +117,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const successMessage =
         `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${balanceText}`;
       setMessage(successMessage);
-      showToast(successMessage, "success");
+      showToast(
+        `${successMessage} Check your email for a Falowen verification link before logging in.`,
+        "success"
+      );
     } catch (error) {
       console.error(error);
       const errorMessage = error?.message || "Sign up failed.";
