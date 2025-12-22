@@ -19,10 +19,13 @@ describe("TuitionStatusCard", () => {
   it("renders partial state snapshot with balance and link", () => {
     render(<TuitionStatusCard level="B1" paidAmount={500} tuitionFee={3000} balanceDue={2500} />);
 
-    expect(screen.getByRole("link", { name: /pay tuition online/i })).toHaveAttribute(
-      "href",
-      "https://paystack.shop/pay/1navy7uihs"
-    );
+    const checkoutLink = screen.getByRole("link", { name: /pay tuition online/i }).getAttribute("href");
+    expect(checkoutLink).toBeTruthy();
+
+    const parsedLink = new URL(checkoutLink || "");
+    expect(parsedLink.origin + parsedLink.pathname).toBe("https://paystack.shop/pay/1navy7uihs");
+    expect(parsedLink.searchParams.get("amount")).toBe("250000");
+    expect(parsedLink.searchParams.get("redirect_url")).toBe("http://localhost/payment-complete");
     const cardText = screen.getByTestId("tuition-status-card").textContent;
 
     expect(cardText).toContain("Tuition & payments");

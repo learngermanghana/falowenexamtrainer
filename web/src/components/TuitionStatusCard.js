@@ -2,6 +2,7 @@ import React from "react";
 import { styles } from "../styles";
 import { computeTuitionStatus, paystackLinkForLevel } from "../data/levelFees";
 import { isPaymentsEnabled } from "../lib/featureFlags";
+import { buildPaystackCheckoutLink } from "../lib/paystack";
 
 const STATUS_TONES = {
   Paid: { background: "#ecfdf3", borderColor: "#22c55e", color: "#166534" },
@@ -27,6 +28,13 @@ const TuitionStatusCard = ({
     description ||
     `${summary.statusCopy}. ${summary.tuitionFee ? `Tuition for ${levelCopy} is GH₵${summary.tuitionFee}.` : "Tuition not set yet."}`;
   const checkoutLink = paystackLink || paystackLinkForLevel(level);
+  const checkoutAmount = summary.balanceDue || summary.paidAmount || summary.tuitionFee;
+  const redirectUrl = `${window.location.origin}/payment-complete`;
+  const checkoutLinkWithParams = buildPaystackCheckoutLink({
+    baseLink: checkoutLink,
+    amount: checkoutAmount,
+    redirectUrl,
+  });
   const paymentsEnabled = isPaymentsEnabled();
 
   return (
@@ -60,7 +68,9 @@ const TuitionStatusCard = ({
         </div>
         {paymentsEnabled ? (
           <a
-            href={checkoutLink}
+            href={checkoutLinkWithParams}
+            target="_blank"
+            rel="noreferrer"
             style={{
               ...styles.primaryButton,
               display: "inline-flex",
