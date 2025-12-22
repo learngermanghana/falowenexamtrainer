@@ -1,6 +1,53 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
+import { courseSchedulesByName } from "../data/courseSchedules";
+
+const normalizeLevel = (level) => (level || "").toUpperCase();
+
+const buildLevelSchedules = () => {
+  const derivedSchedules = {};
+  const derivedLevels = new Set();
+
+  Object.values(courseSchedulesByName).forEach((schedule) => {
+    const level = normalizeLevel(schedule.course);
+
+    if (!level || courseSchedules[level] || derivedSchedules[level]) return;
+
+    derivedLevels.add(level);
+
+    derivedSchedules[level] = (schedule.days || []).map((day) => {
+      const sessions = day.sessions || [];
+      const primarySession = sessions[0] || {};
+
+      const lessonList = sessions.map((session, index) => ({
+        chapter: session.chapter || session.title || `Session ${index + 1}`,
+        title: session.title,
+        assignment: false,
+        note: session.note,
+        type: session.type,
+      }));
+
+      const notes = lessonList.map((lesson) => lesson.note).filter(Boolean);
+
+      return {
+        day: day.dayNumber,
+        topic: primarySession.title || primarySession.chapter || `Day ${day.dayNumber}`,
+        chapter: primarySession.chapter || primarySession.title || null,
+        instruction:
+          notes.length > 0
+            ? notes.join(" • ")
+            : schedule.generatedNote || `Class plan for ${schedule.className}`,
+        grammar_topic: primarySession.type || null,
+        lesen_hören: lessonList,
+      };
+    });
+  });
+
+  return { schedules: { ...courseSchedules, ...derivedSchedules }, derivedLevels };
+};
+
+const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules();
 
 const LessonList = ({ title, lessons }) => {
   if (!lessons.length) return null;
@@ -57,11 +104,9 @@ const LessonList = ({ title, lessons }) => {
   );
 };
 
-const normalizeLevel = (level) => (level || "").toUpperCase();
-
 const CourseTab = ({ defaultLevel }) => {
   const levels = useMemo(() => {
-    const baseLevels = Object.keys(courseSchedules);
+    const baseLevels = Object.keys(mergedCourseSchedules);
     const normalizedDefault = normalizeLevel(defaultLevel);
 
     if (normalizedDefault && !baseLevels.includes(normalizedDefault)) {
@@ -89,7 +134,12 @@ const CourseTab = ({ defaultLevel }) => {
     }
   }, [defaultLevel, levels, selectedCourseLevel]);
 
-  const schedule = useMemo(() => courseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
+  const schedule = useMemo(() => mergedCourseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
+
+  const isDerivedLevel = useMemo(
+    () => derivedLevels.has(selectedCourseLevel),
+    [selectedCourseLevel]
+  );
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
@@ -175,8 +225,9 @@ const CourseTab = ({ defaultLevel }) => {
           </div>
         </div>
         <p style={styles.helperText}>
-          Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the
-          assignment filter to jump straight to what you need.
+          {isDerivedLevel
+            ? "This level uses the class schedule because the course book dictionary does not yet include it."
+            : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
         </p>
 
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
@@ -203,6 +254,9 @@ const CourseTab = ({ defaultLevel }) => {
                   <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
                     {entry.assignment !== undefined ? (
                       <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
+                    ) : null}
+                    {isDerivedLevel ? (
+                      <span style={styles.levelPill}>From class schedule</span>
                     ) : null}
                     {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
                   </div>
