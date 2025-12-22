@@ -217,7 +217,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             ))}
           </select>
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Wir laden Sprechen- und Schreiben-Aufgaben aus dem passenden Niveau-Sheet.
+            We load speaking and writing tasks from the sheet that matches your level.
           </p>
 
           <label style={styles.label}>Phone number</label>
@@ -303,7 +303,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             ))}
           </select>
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Wir hinterlegen deinen Kurs im Profil und erstellen den Kalender-Export mit Zoom-Link.
+            We save your class to your profile and generate the calendar export with your Zoom link.
           </p>
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
