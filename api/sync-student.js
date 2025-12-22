@@ -9,8 +9,13 @@ function getServiceAccount() {
   return JSON.parse(Buffer.from(b64, "base64").toString("utf8"));
 }
 
+// ✅ Strong normalization: handles "Daily Limit", "Daily_Limit", "daily-limit", etc.
 function normalizeHeader(h) {
-  return String(h || "").trim();
+  return String(h || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "") // remove spaces/underscores/hyphens
+    .replace(/[()]/g, "");  // remove parentheses
 }
 
 function colToA1(colIdx0) {
@@ -50,40 +55,57 @@ module.exports = async function handler(req, res) {
 
     const sheets = await getSheets();
 
+    // Read header row
     const headerRes = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: `${TAB}!1:1`,
     });
 
     const headers = (headerRes.data.values && headerRes.data.values[0]) || [];
+
+    // Map normalizedHeader -> columnIndex
     const headerIndex = new Map();
     headers.forEach((h, i) => headerIndex.set(normalizeHeader(h), i));
 
-    const H = {
-      Name: "Name",
-      Phone: "Phone",
-      Location: "Location",
-      Level: "Level",
-      Paid: "Paid",
-      Balance: "Balance",
-      ContractStart: "ContractStart",
-      ContractEnd: "ContractEnd",
-      StudentCode: "StudentCode",
-      Email: "Email",
-      EmergencyPhone: "Emergency Contact (Phone Number)",
-      Status: "Status",
-      EnrollDate: "EnrollDate",
-      ClassName: "ClassName",
-      Daily_Limit: "Daily_Limit",
-      UID: "UID",
+    // Helper: find a column by trying multiple aliases
+    function findCol(...aliases) {
+      for (const a of aliases) {
+        const col = headerIndex.get(normalizeHeader(a));
+        if (col !== undefined) return col;
+      }
+      return undefined;
+    }
+
+    // ✅ Column resolution with aliases (backwards compatible)
+    const COL = {
+      StudentCode: findCol("StudentCode", "Student Code"),
+      UID: findCol("UID"),
+      Email: findCol("Email"),
+      Name: findCol("Name"),
+      Phone: findCol("Phone"),
+      Location: findCol("Location"),
+      Level: findCol("Level"),
+      Paid: findCol("Paid", "InitialPayment", "Initial Payment"),
+      Balance: findCol("Balance", "BalanceDue", "Balance Due"),
+      ContractStart: findCol("ContractStart", "Contract Start"),
+      ContractEnd: findCol("ContractEnd", "Contract End"),
+      EmergencyPhone: findCol(
+        "Emergency Contact (Phone Number)",
+        "Emergency Contact Phone",
+        "Emergency Contact"
+      ),
+      Status: findCol("Status"),
+      EnrollDate: findCol("EnrollDate", "Enroll Date"),
+      ClassName: findCol("ClassName", "Class Name"),
+      Daily_Limit: findCol("Daily_Limit", "Daily Limit", "DailyLimit"),
     };
 
-    const colStudentCode = headerIndex.get(H.StudentCode);
-    if (colStudentCode === undefined) throw new Error("Sheet missing StudentCode header");
-    const colUID = headerIndex.get(H.UID);
-    const colEmail = headerIndex.get(H.Email);
+    if (COL.StudentCode === undefined) {
+      throw new Error("Sheet missing StudentCode header (or Student Code) in row 1");
+    }
 
-    const codeColA1 = colToA1(colStudentCode);
+    // ----- Find existing row by StudentCode (primary), else UID, else Email -----
+    const codeColA1 = colToA1(COL.StudentCode);
     const codesRes = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: `${TAB}!${codeColA1}2:${codeColA1}`,
@@ -93,8 +115,8 @@ module.exports = async function handler(req, res) {
     let rowIndex0 = -1;
     if (studentCode) rowIndex0 = codes.findIndex((v) => v === studentCode);
 
-    if (rowIndex0 === -1 && colUID !== undefined && uid) {
-      const uidA1 = colToA1(colUID);
+    if (rowIndex0 === -1 && COL.UID !== undefined && uid) {
+      const uidA1 = colToA1(COL.UID);
       const uRes = await sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
         range: `${TAB}!${uidA1}2:${uidA1}`,
@@ -103,8 +125,8 @@ module.exports = async function handler(req, res) {
       rowIndex0 = uids.findIndex((v) => v === uid);
     }
 
-    if (rowIndex0 === -1 && colEmail !== undefined && email) {
-      const emailA1 = colToA1(colEmail);
+    if (rowIndex0 === -1 && COL.Email !== undefined && email) {
+      const emailA1 = colToA1(COL.Email);
       const eRes = await sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
         range: `${TAB}!${emailA1}2:${emailA1}`,
@@ -118,8 +140,8 @@ module.exports = async function handler(req, res) {
     const get = (k, alt) => (student[k] ?? student[alt] ?? "");
     const updates = [];
 
-    function setCell(headerName, value) {
-      const col = headerIndex.get(headerName);
+    // Update one cell in an existing row
+    function setCell(col, value) {
       if (col === undefined || !rowNumber) return;
       updates.push({
         range: `${TAB}!${colToA1(col)}${rowNumber}`,
@@ -127,23 +149,24 @@ module.exports = async function handler(req, res) {
       });
     }
 
+    // ✅ UPDATE existing row
     if (rowNumber) {
-      setCell(H.StudentCode, studentCode);
-      setCell(H.UID, uid);
-      setCell(H.Email, email);
-      setCell(H.Name, get("name", "Name"));
-      setCell(H.Phone, get("phone", "Phone"));
-      setCell(H.Location, get("location", "Location"));
-      setCell(H.Level, get("level", "Level"));
-      setCell(H.Paid, get("paid", "Paid"));
-      setCell(H.Balance, get("balance", "Balance"));
-      setCell(H.ContractStart, get("contractStart", "ContractStart"));
-      setCell(H.ContractEnd, get("contractEnd", "ContractEnd"));
-      setCell(H.EmergencyPhone, get("emergencyPhone", "Emergency Contact (Phone Number)"));
-      setCell(H.Status, get("status", "Status"));
-      setCell(H.EnrollDate, get("enrollDate", "EnrollDate"));
-      setCell(H.ClassName, get("className", "ClassName"));
-      setCell(H.Daily_Limit, get("dailyLimit", "Daily_Limit"));
+      setCell(COL.StudentCode, studentCode);
+      setCell(COL.UID, uid);
+      setCell(COL.Email, email);
+      setCell(COL.Name, get("name", "Name"));
+      setCell(COL.Phone, get("phone", "Phone"));
+      setCell(COL.Location, get("location", "Location"));
+      setCell(COL.Level, get("level", "Level"));
+      setCell(COL.Paid, get("paid", "Paid"));
+      setCell(COL.Balance, get("balance", "Balance"));
+      setCell(COL.ContractStart, get("contractStart", "ContractStart"));
+      setCell(COL.ContractEnd, get("contractEnd", "ContractEnd"));
+      setCell(COL.EmergencyPhone, get("emergencyPhone", "Emergency Contact (Phone Number)"));
+      setCell(COL.Status, get("status", "Status"));
+      setCell(COL.EnrollDate, get("enrollDate", "EnrollDate"));
+      setCell(COL.ClassName, get("className", "ClassName"));
+      setCell(COL.Daily_Limit, get("dailyLimit", "Daily_Limit"));
 
       await sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: SHEET_ID,
@@ -153,31 +176,30 @@ module.exports = async function handler(req, res) {
       return res.json({ ok: true, action: "updated", row: rowNumber });
     }
 
-    const maxCol = Math.max(...Array.from(headerIndex.values()));
-    const row = Array(maxCol + 1).fill("");
+    // ✅ APPEND new row (match sheet width)
+    const row = Array(headers.length).fill("");
 
-    function setRow(headerName, value) {
-      const col = headerIndex.get(headerName);
+    function setRow(col, value) {
       if (col === undefined) return;
       row[col] = value ?? "";
     }
 
-    setRow(H.StudentCode, studentCode);
-    setRow(H.UID, uid);
-    setRow(H.Email, email);
-    setRow(H.Name, get("name", "Name"));
-    setRow(H.Phone, get("phone", "Phone"));
-    setRow(H.Location, get("location", "Location"));
-    setRow(H.Level, get("level", "Level"));
-    setRow(H.Paid, get("paid", "Paid"));
-    setRow(H.Balance, get("balance", "Balance"));
-    setRow(H.ContractStart, get("contractStart", "ContractStart"));
-    setRow(H.ContractEnd, get("contractEnd", "ContractEnd"));
-    setRow(H.EmergencyPhone, get("emergencyPhone", "Emergency Contact (Phone Number)"));
-    setRow(H.Status, get("status", "Status"));
-    setRow(H.EnrollDate, get("enrollDate", "EnrollDate"));
-    setRow(H.ClassName, get("className", "ClassName"));
-    setRow(H.Daily_Limit, get("dailyLimit", "Daily_Limit"));
+    setRow(COL.StudentCode, studentCode);
+    setRow(COL.UID, uid);
+    setRow(COL.Email, email);
+    setRow(COL.Name, get("name", "Name"));
+    setRow(COL.Phone, get("phone", "Phone"));
+    setRow(COL.Location, get("location", "Location"));
+    setRow(COL.Level, get("level", "Level"));
+    setRow(COL.Paid, get("paid", "Paid"));
+    setRow(COL.Balance, get("balance", "Balance"));
+    setRow(COL.ContractStart, get("contractStart", "ContractStart"));
+    setRow(COL.ContractEnd, get("contractEnd", "ContractEnd"));
+    setRow(COL.EmergencyPhone, get("emergencyPhone", "Emergency Contact (Phone Number)"));
+    setRow(COL.Status, get("status", "Status"));
+    setRow(COL.EnrollDate, get("enrollDate", "EnrollDate"));
+    setRow(COL.ClassName, get("className", "ClassName"));
+    setRow(COL.Daily_Limit, get("dailyLimit", "Daily_Limit"));
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: SHEET_ID,
