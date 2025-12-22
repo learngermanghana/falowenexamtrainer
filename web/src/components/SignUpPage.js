@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -13,6 +13,33 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 
 const MIN_INITIAL_PAYMENT = 1000;
+
+const formatClassLabel = (className) => {
+  const details = classCatalog[className];
+  if (!details) return className;
+
+  const startLabel = details.startDate
+    ? new Date(details.startDate).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Schedule";
+
+  const timeLabel = Array.isArray(details.schedule)
+    ? details.schedule
+        .map(({ day, startTime, endTime }) =>
+          [day, startTime && ` ${startTime}`, endTime && `-${endTime}`]
+            .filter(Boolean)
+            .join("")
+        )
+        .join(" · ")
+    : "";
+
+  return timeLabel
+    ? `${className} — starts ${startLabel} — ${timeLabel}`
+    : `${className} — starts ${startLabel}`;
+};
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
@@ -31,11 +58,19 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [initialPaymentAmount, setInitialPaymentAmount] = useState(
     `${MIN_INITIAL_PAYMENT}`
   );
-  const [accountStatus, setAccountStatus] = useState("Active");
   const [selectedClass, setSelectedClass] = useState(
     loadPreferredClass() || Object.keys(classCatalog)[0]
   );
   const [hasConsented, setHasConsented] = useState(false);
+
+  const classOptions = useMemo(
+    () =>
+      Object.keys(classCatalog).map((className) => ({
+        value: className,
+        label: formatClassLabel(className),
+      })),
+    []
+  );
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
@@ -98,7 +133,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         balanceDue,
         paymentStatus,
         paystackLink,
-        status: accountStatus,
+        status: "Active",
         contractStart: contractStart.toISOString(),
         contractEnd: contractEnd.toISOString(),
         contractTermMonths: contractMonths,
@@ -114,13 +149,23 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const paymentInstruction = paymentsEnabled
         ? ` Pay online using your secure link: ${paystackLink}.`
         : " Payments are handled on the web app only. Please sign in online to complete your tuition.";
+      const paymentRedirectNote =
+        paystackLink && paymentsEnabled
+          ? " Complete your tuition before logging in—we'll open your checkout now."
+          : " Complete your tuition before logging in.";
       const successMessage =
-        `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${balanceText}`;
+        `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${paymentRedirectNote}${balanceText}`;
       setMessage(successMessage);
       showToast(
         `${successMessage} Check your email for a Falowen verification link before logging in.`,
         "success"
       );
+
+      if (paystackLink) {
+        setTimeout(() => {
+          window.location.assign(paystackLink);
+        }, 900);
+      }
     } catch (error) {
       console.error(error);
       const errorMessage = error?.message || "Sign up failed.";
@@ -255,16 +300,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder="0176 98765432"
           />
 
-          <label style={styles.label}>Status</label>
-          <input
-            type="text"
-            required
-            value={accountStatus}
-            onChange={(e) => setAccountStatus(e.target.value)}
-            style={inputStyle}
-            placeholder="Active"
-          />
-
           <label style={styles.label}>Initial payment amount (GH₵)</label>
           <input
             type="number"
@@ -296,9 +331,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             onChange={(event) => setSelectedClass(event.target.value)}
             style={styles.select}
           >
-            {Object.keys(classCatalog).map((className) => (
-              <option key={className} value={className}>
-                {className}
+            {classOptions.map((classOption) => (
+              <option key={classOption.value} value={classOption.value}>
+                {classOption.label}
               </option>
             ))}
           </select>
