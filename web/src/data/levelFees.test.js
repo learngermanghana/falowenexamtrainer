@@ -6,7 +6,11 @@ describe("computeTuitionStatus", () => {
 
     expect(summary.balanceDue).toBe(0);
     expect(summary.statusLabel).toBe("Paid");
-    expect(summary.paystackLink).toBe(paystackLinkForLevel("A1"));
+    const checkoutUrl = new URL(summary.paystackLink);
+
+    expect(checkoutUrl.origin + checkoutUrl.pathname).toBe(paystackLinkForLevel("A1"));
+    expect(checkoutUrl.searchParams.get("amount")).toBeNull();
+    expect(checkoutUrl.searchParams.get("redirect_url")).toBe("https://www.falowen.app/payment-complete");
   });
 
   it("returns partial when some amount is paid but balance remains", () => {
@@ -15,6 +19,9 @@ describe("computeTuitionStatus", () => {
     expect(summary.balanceDue).toBe(2000);
     expect(summary.statusLabel).toBe("Partial");
     expect(summary.statusCopy).toContain("Partial tuition received");
+
+    const checkoutUrl = new URL(summary.paystackLink);
+    expect(checkoutUrl.searchParams.get("amount")).toBe("200000");
   });
 
   it("defaults to pending with full balance when nothing is paid", () => {
@@ -23,5 +30,8 @@ describe("computeTuitionStatus", () => {
     expect(summary.balanceDue).toBe(3000);
     expect(summary.statusLabel).toBe("Pending");
     expect(summary.statusCopy).toBe("Awaiting payment");
+
+    const checkoutUrl = new URL(summary.paystackLink);
+    expect(checkoutUrl.searchParams.get("amount")).toBe("300000");
   });
 });
