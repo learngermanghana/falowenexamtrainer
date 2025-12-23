@@ -385,10 +385,10 @@ const SpeakingPage = () => {
       resetAudio({ keepResult: true });
       stopVisualization();
     } catch (err) {
-      console.error(err);
-      setError(
-        "Die Auswertung ist fehlgeschlagen. Bitte versuche es später erneut."
-      );
+      console.log("SPEAKING ERROR STATUS:", err?.response?.status);
+      console.log("SPEAKING ERROR DATA:", err?.response?.data);
+      console.log("SPEAKING ERROR HEADERS:", err?.response?.headers);
+      setError(err?.response?.data?.error || err.message);
     } finally {
       setLoading(false);
     }
@@ -543,10 +543,10 @@ const SpeakingPage = () => {
         setSimulationMode(false);
       }
     } catch (err) {
-      console.error(err);
-      setError(
-        "Die Auswertung für diesen Schritt ist fehlgeschlagen. Bitte versuche es später erneut."
-      );
+      console.log("SPEAKING ERROR STATUS:", err?.response?.status);
+      console.log("SPEAKING ERROR DATA:", err?.response?.data);
+      console.log("SPEAKING ERROR HEADERS:", err?.response?.headers);
+      setError(err?.response?.data?.error || err.message);
     } finally {
       setLoading(false);
       stepAdvanceGuardRef.current = false;
@@ -629,10 +629,8 @@ const SpeakingPage = () => {
       }
 
       resetAudio();
-
-      const blob = new Blob([file], { type: file.type });
-      setAudioBlob(blob);
-      const newUrl = URL.createObjectURL(blob);
+      setAudioBlob(file);
+      const newUrl = URL.createObjectURL(file);
       setAudioUrl(newUrl);
     };
 

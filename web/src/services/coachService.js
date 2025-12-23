@@ -24,7 +24,8 @@ export const analyzeAudio = async ({
   idToken,
 }) => {
   const formData = new FormData();
-  formData.append("audio", audioBlob, "recording.webm");
+  const filename = audioBlob?.name || "recording.webm";
+  formData.append("audio", audioBlob, filename);
   formData.append("teil", teil);
   formData.append("level", level);
   formData.append("userId", userId || "guest");
