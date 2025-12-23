@@ -59,9 +59,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [initialPaymentAmount, setInitialPaymentAmount] = useState(
     `${MIN_INITIAL_PAYMENT}`
   );
-  const [selectedClass, setSelectedClass] = useState(
-    loadPreferredClass() || Object.keys(classCatalog)[0]
-  );
+  const [selectedClass, setSelectedClass] = useState(loadPreferredClass() || "");
   const [hasConsented, setHasConsented] = useState(false);
 
   const classOptions = useMemo(
@@ -270,10 +268,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             We load speaking and writing tasks from the sheet that matches your level.
           </p>
 
-          <label style={styles.label}>Phone number</label>
+          <label style={styles.label}>Phone number (optional)</label>
           <input
             type="tel"
-            required
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             style={inputStyle}
@@ -285,20 +282,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
             notified in urgent safety situations.
           </p>
 
-          <label style={styles.label}>Location</label>
+          <label style={styles.label}>Location (optional)</label>
           <input
             type="text"
-            required
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             style={inputStyle}
             placeholder="Berlin"
           />
 
-          <label style={styles.label}>Emergency contact (phone)</label>
+          <label style={styles.label}>Emergency contact (phone, optional)</label>
           <input
             type="tel"
-            required
             value={emergencyContactPhone}
             onChange={(e) => setEmergencyContactPhone(e.target.value)}
             style={inputStyle}
@@ -329,13 +324,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
             description={`For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. We'll mark your account as ${tuitionSummary.statusLabel.toLowerCase()} until the full balance is received.`}
           />
 
-          <label style={styles.label}>Which live class are you joining?</label>
+          <label style={styles.label}>Which live class are you joining? (optional)</label>
           <select
-            required
             value={selectedClass}
             onChange={(event) => setSelectedClass(event.target.value)}
             style={styles.select}
           >
+            <option value="">Decide later (we'll ask again after signup)</option>
             {classOptions.map((classOption) => (
               <option key={classOption.value} value={classOption.value}>
                 {classOption.label}
@@ -343,7 +338,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             ))}
           </select>
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            We save your class to your profile and generate the calendar export with your Zoom link.
+            You can skip this for now and add your class after you log in.
           </p>
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
