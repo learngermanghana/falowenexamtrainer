@@ -223,6 +223,23 @@ function loadScoresModule() {
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
 
+const audioUpload = (req, res, next) => {
+  upload.single("audio")(req, res, (err) => {
+    if (!err) return next();
+
+    console.error("Multer upload error:", err);
+
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({
+        error: err.message,
+        code: err.code,
+      });
+    }
+
+    return res.status(400).json({ error: err?.message || "Upload failed" });
+  });
+};
+
 const app = express();
 
 app.use(cors({ origin: true }));
@@ -748,7 +765,7 @@ app.get("/scores", async (req, res) => {
   }
 });
 
-app.post("/speaking/analyze", upload.single("audio"), async (req, res) => {
+app.post("/speaking/analyze", audioUpload, async (req, res) => {
   let authedUser;
   try {
     authedUser = await requireAuthenticatedUser(req, res);
@@ -861,7 +878,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
   }
 });
 
-app.post("/speaking/interaction-score", upload.single("audio"), async (req, res) => {
+app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
   let authedUser;
   try {
     authedUser = await requireAuthenticatedUser(req, res);
@@ -1148,6 +1165,11 @@ app.get("/tutor/next-task", async (req, res) => {
     console.error("/tutor/next-task error", err);
     return res.status(500).json({ error: err.message || "Failed to fetch next task" });
   }
+});
+
+app.use((err, req, res, _next) => {
+  console.error("Unhandled error:", err);
+  res.status(500).json({ error: err?.message || "Internal server error" });
 });
 
 module.exports = app;
