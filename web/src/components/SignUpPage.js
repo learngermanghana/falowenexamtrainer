@@ -65,6 +65,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [accountIntent, setAccountIntent] = useState("pay-now");
   const [selectedContractTerm, setSelectedContractTerm] = useState("");
   const [showConsentDetails, setShowConsentDetails] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const consentHighlights = [
     "We collect your contact details to create and support your account, share class updates, and send payment reminders.",
@@ -119,7 +120,59 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
+  const clearFieldError = (field) => {
+    setFieldErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
+
+  const setFieldError = (field, message) => {
+    setFieldErrors((prev) => ({ ...prev, [field]: message }));
+  };
+
+  const interpretSignupError = (error) => {
+    const code = error?.code || "";
+    if (code.includes("email-already-in-use")) {
+      return {
+        field: "email",
+        message: "That email is already registered. Try logging in or use a different email address.",
+      };
+    }
+
+    if (code.includes("invalid-email")) {
+      return {
+        field: "email",
+        message: "This email looks invalid. Check for typos or try another address.",
+      };
+    }
+
+    if (code.includes("weak-password")) {
+      return {
+        field: "password",
+        message: "Password is too weak. Use at least 8 characters with a mix of letters and numbers.",
+      };
+    }
+
+    if (code.includes("network-request-failed") || error?.message?.toLowerCase().includes("network")) {
+      return {
+        field: null,
+        message: "We could not reach the signup service. Check your connection and try again.",
+      };
+    }
+
+    return {
+      field: null,
+      message:
+        "We couldn't create your account right now. Please try again in a moment or contact support@falowen.com for help.",
+    };
+  };
+
   const handleInitialPaymentChange = (event) => {
+    clearFieldError("initialPaymentAmount");
+    setAuthError("");
     const numericOnlyValue = event.target.value.replace(/[^0-9]/g, "");
     if (numericOnlyValue === "") {
       setInitialPaymentAmount("");
@@ -162,58 +215,51 @@ const SignUpPage = ({ onLogin, onBack }) => {
     event.preventDefault();
     setAuthError("");
     setMessage("");
+    setFieldErrors({});
 
     const numericInitialPayment = isPayNow ? Number(initialPaymentAmount) : 0;
 
+    const validationIssues = {};
+
     if (isPayNow && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
-      const paymentError = "Enter a numeric initial payment amount.";
-      setAuthError(paymentError);
-      showToast(paymentError, "error");
-      return;
+      validationIssues.initialPaymentAmount =
+        "Enter a number without commas or spaces. You need at least GH₵1000 to start a paid account.";
     }
 
     if (password !== confirmPassword) {
-      const passwordError = "Passwords do not match.";
-      setAuthError(passwordError);
-      showToast(passwordError, "error");
-      return;
+      validationIssues.confirmPassword = "Passwords do not match. Re-enter both fields to continue.";
     }
 
     if (!hasConsented) {
-      const consentMessage = "Please agree to the terms and privacy policy to continue.";
-      setAuthError(consentMessage);
-      showToast(consentMessage, "error");
-      return;
+      validationIssues.consent = "Agree to the terms and privacy policy to continue. You can open the summary above first.";
     }
 
     if (isPayNow) {
       if (numericInitialPayment < 0) {
-        const paymentError = "Initial payment amount cannot be negative.";
-        setAuthError(paymentError);
-        showToast(paymentError, "error");
-        return;
+        validationIssues.initialPaymentAmount = "Initial payment cannot be negative. Remove the minus sign and try again.";
       }
 
       if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
-        const paymentError = `Initial payment amount must be at least GH₵${MIN_INITIAL_PAYMENT}.`;
-        setAuthError(paymentError);
-        showToast(paymentError, "error");
-        return;
+        validationIssues.initialPaymentAmount = `Enter GH₵${MIN_INITIAL_PAYMENT} or more to reserve your class.`;
       }
 
       if (!selectedClass) {
-        const classError = "Please pick a class to reserve your seat.";
-        setAuthError(classError);
-        showToast(classError, "error");
-        return;
+        validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
       }
 
       if (!selectedContractTerm) {
-        const contractError = "Please choose a contract term to continue.";
-        setAuthError(contractError);
-        showToast(contractError, "error");
-        return;
+        validationIssues.selectedContractTerm =
+          "Choose a contract term to continue. You can change this later with support if needed.";
       }
+    }
+
+    const validationMessages = Object.values(validationIssues);
+    if (validationMessages.length) {
+      setFieldErrors(validationIssues);
+      const summaryMessage = `${validationMessages[0]} Fix the highlighted fields, then submit again.`;
+      setAuthError(summaryMessage);
+      showToast(summaryMessage, "error");
+      return;
     }
 
     setLoading(true);
@@ -288,9 +334,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
       );
     } catch (error) {
       console.error(error);
-      const errorMessage = error?.message || "Sign up failed.";
-      setAuthError(errorMessage);
-      showToast(errorMessage, "error");
+      const friendlyError = interpretSignupError(error);
+      if (friendlyError.field) {
+        setFieldError(friendlyError.field, friendlyError.message);
+      }
+
+      const errorMessage = friendlyError.message;
+      const nextStep = friendlyError.field
+        ? "Review the highlighted field and try again."
+        : "Try again shortly. If it keeps failing, contact support@falowen.com.";
+      const combinedMessage = `${errorMessage} ${nextStep}`;
+      setAuthError(combinedMessage);
+      showToast(combinedMessage, "error");
     } finally {
       setLoading(false);
     }
@@ -418,7 +473,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
             type="text"
             required
             value={name}
-            onChange={(e) => setName(e.target.value)}
+            onChange={(e) => {
+              setName(e.target.value);
+              clearFieldError("name");
+              setAuthError("");
+            }}
             style={inputStyle}
             placeholder="Abigail"
           />
@@ -428,10 +487,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
             type="email"
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              clearFieldError("email");
+              setAuthError("");
+            }}
             style={inputStyle}
             placeholder="you@example.com"
           />
+          {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
 
           <label style={styles.label}>Password</label>
           <input
@@ -439,10 +503,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
             required
             minLength={8}
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clearFieldError("password");
+              setAuthError("");
+            }}
             style={inputStyle}
             placeholder="At least 8 characters with letters and numbers"
           />
+          {fieldErrors.password ? <p style={styles.fieldError}>{fieldErrors.password}</p> : null}
 
           <PasswordGuidance password={password} />
 
@@ -452,10 +521,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
             required
             minLength={8}
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              clearFieldError("confirmPassword");
+              setAuthError("");
+            }}
             style={inputStyle}
             placeholder="Enter password again"
           />
+          {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
 
           <label style={styles.label}>Your current level</label>
           <select
@@ -520,6 +594,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder={`At least GH₵${MIN_INITIAL_PAYMENT}`}
             disabled={isTrial}
           />
+          {fieldErrors.initialPaymentAmount ? (
+            <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
+          ) : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             Enter between GH₵{MIN_INITIAL_PAYMENT} and GH₵{tuitionFeeForLevel} for {selectedLevel}. A1: GH₵2800 · A2:
             GH₵3000 · B1: GH₵3000 · B2: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start a paid account.
@@ -543,7 +620,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <label style={styles.label}>Which live class are you joining? {isPayNow ? "(required)" : "(optional)"}</label>
           <select
             value={selectedClass}
-            onChange={(event) => setSelectedClass(event.target.value)}
+            onChange={(event) => {
+              setSelectedClass(event.target.value);
+              clearFieldError("selectedClass");
+              setAuthError("");
+            }}
             style={styles.select}
             required={isPayNow}
           >
@@ -554,6 +635,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
               </option>
             ))}
           </select>
+          {fieldErrors.selectedClass ? <p style={styles.fieldError}>{fieldErrors.selectedClass}</p> : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             {isPayNow
               ? "Picking a class is required when you pay now so we can reserve your spot."
@@ -563,7 +645,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <label style={styles.label}>Contract term</label>
           <select
             value={selectedContractTerm}
-            onChange={(event) => setSelectedContractTerm(event.target.value)}
+            onChange={(event) => {
+              setSelectedContractTerm(event.target.value);
+              clearFieldError("selectedContractTerm");
+              setAuthError("");
+            }}
             style={styles.select}
             required={isPayNow}
           >
@@ -571,6 +657,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <option value="1">1-month starter (partial tuition)</option>
             <option value="6">6-month standard (full tuition)</option>
           </select>
+          {fieldErrors.selectedContractTerm ? (
+            <p style={styles.fieldError}>{fieldErrors.selectedContractTerm}</p>
+          ) : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             Contract selection is required when paying now. Trial accounts can pick a contract later inside Account & Billing.
           </p>
@@ -579,7 +668,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <input
               type="checkbox"
               checked={hasConsented}
-              onChange={(event) => setHasConsented(event.target.checked)}
+              onChange={(event) => {
+                setHasConsented(event.target.checked);
+                clearFieldError("consent");
+                setAuthError("");
+              }}
               required
               style={{ width: 18, height: 18 }}
             />
@@ -608,6 +701,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
               .
             </span>
           </label>
+          {fieldErrors.consent ? <p style={styles.fieldError}>{fieldErrors.consent}</p> : null}
           <div style={{ marginLeft: 26, marginTop: 6, color: "#4b5563", fontSize: 13 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <strong style={{ fontWeight: 600 }}>Key points:</strong>
