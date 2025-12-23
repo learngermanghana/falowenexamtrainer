@@ -1,7 +1,6 @@
 import React from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
-import InlineSpeechTrainer from "./speechTrainer/InlineSpeechTrainer";
 
 const practiceLink =
   "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
@@ -78,32 +77,6 @@ const SpeechTrainerPage = () => {
             <span style={{ ...styles.helperText, margin: 0 }}>
               The practice page includes full instructions—read them carefully before you start.
             </span>
-          </div>
-        </div>
-      </div>
-
-      <InlineSpeechTrainer profileLevel={profileLevel} />
-
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>What you will see</h3>
-        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-          <div style={{ ...styles.resultCard, marginTop: 0 }}>
-            <p style={{ ...styles.label, margin: "0 0 4px 0" }}>Transcript</p>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              The coach writes what you said so you can catch missing endings and word order slips.
-            </p>
-          </div>
-          <div style={{ ...styles.resultCard, marginTop: 0 }}>
-            <p style={{ ...styles.label, margin: "0 0 4px 0" }}>Feedback</p>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Expect targeted Goethe-style notes on clarity, vocabulary range, and grammar priorities for your level.
-            </p>
-          </div>
-          <div style={{ ...styles.resultCard, marginTop: 0 }}>
-            <p style={{ ...styles.label, margin: "0 0 4px 0" }}>Next steps</p>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Use the suggestions on the practice page to repeat your answer and track improvements.
-            </p>
           </div>
         </div>
       </div>
