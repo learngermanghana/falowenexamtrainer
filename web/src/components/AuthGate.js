@@ -46,17 +46,18 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
         const successMessage =
-          `Account created! Your student code is ${studentCode}. Please verify your email to log in.`;
+          `Account created! Your student code is ${studentCode}. Verify your email to unlock classes.`;
         setMessage(successMessage);
         showToast(
-          `${successMessage} Check your inbox for a verification link from Falowen.`,
+          `${successMessage} Check your inbox for a verification link from Falowen and finish setup inside the app.`,
           "success"
         );
         if (result?.verificationRequired) {
           setMode("login");
         }
       } else {
-        const credential = await login(email, password);
+        const loginResult = await login(email, password);
+        const credential = loginResult?.credential || loginResult;
         const studentCode = credential?.user?.profile?.studentCode;
         const level = credential?.user?.profile?.level;
         if (studentCode) {
@@ -67,9 +68,11 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         }
         const loginMessage = credential?.migratedFromLegacy
           ? "We found your old account. Your new password is now saved."
+          : loginResult?.emailVerificationRequired
+          ? "Signed in with limited access. Please verify your email to unlock classes."
           : "Welcome back!";
         setMessage(loginMessage);
-        showToast(loginMessage, "success");
+        showToast(loginMessage, loginResult?.emailVerificationRequired ? "info" : "success");
       }
     } catch (error) {
       console.error(error);

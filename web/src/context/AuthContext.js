@@ -20,6 +20,7 @@ import {
   isFirebaseConfigured,
   deleteField,
   getActionCodeSettings,
+  reload,
 } from "../firebase";
 
 const AuthContext = createContext();
@@ -160,10 +161,9 @@ export const AuthProvider = ({ children }) => {
 
     await setDoc(studentsRef, payload, { merge: true });
     await sendEmailVerification(credential.user, getActionCodeSettings());
-    await signOut(auth);
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
-    return { verificationRequired: true };
+    return { verificationRequired: true, studentCode, paystackLink: payload.paystackLink };
   };
 
   const login = async (email, password) => {
@@ -177,22 +177,31 @@ export const AuthProvider = ({ children }) => {
       normalizedEmail,
       password
     );
-    if (!credential.user.emailVerified) {
-      await sendEmailVerification(credential.user, getActionCodeSettings());
-      await signOut(auth);
-      const error = new Error(
-        "Please verify your email address before logging in. We've re-sent the verification link."
-      );
-      error.code = "auth/email-not-verified";
-      error.email = credential.user.email;
-      throw error;
-    }
     const token = await credential.user.getIdToken();
     setIdToken(token);
     const profile = await fetchStudentProfileByEmail(normalizedEmail);
     setStudentProfile(profile);
     setMessagingToken(profile?.messagingToken || null);
+    if (!credential.user.emailVerified) {
+      await sendEmailVerification(credential.user, getActionCodeSettings());
+      return { credential, emailVerificationRequired: true };
+    }
+
     return credential;
+  };
+
+  const refreshUser = async () => {
+    if (!auth?.currentUser) return null;
+    await reload(auth.currentUser);
+    return auth.currentUser;
+  };
+
+  const resendVerificationEmail = async () => {
+    if (!auth?.currentUser) {
+      throw new Error("No user is signed in.");
+    }
+
+    await sendEmailVerification(auth.currentUser, getActionCodeSettings());
   };
 
   const resetPassword = async (email) => {
@@ -337,6 +346,8 @@ export const AuthProvider = ({ children }) => {
       messagingToken,
       notificationStatus,
       saveStudentProfile,
+      refreshUser,
+      resendVerificationEmail,
     }),
     [
       user,
@@ -350,6 +361,8 @@ export const AuthProvider = ({ children }) => {
       saveStudentProfile,
       enableNotifications,
       logout,
+      refreshUser,
+      resendVerificationEmail,
     ]
   );
 
