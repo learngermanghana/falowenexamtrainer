@@ -14,7 +14,7 @@ const IDEA_COACH_INTRO = {
 
 const LetterPracticePage = ({ mode = "exams" }) => {
   const { level, setLevel, error, setError, loading, setLoading, resultHistory, addResultToHistory } = useExam();
-  const { user, idToken } = useAuth();
+  const { user, idToken, studentProfile } = useAuth();
 
   const isExamMode = mode === "exams";
 
@@ -46,6 +46,21 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [timerRunning, setTimerRunning] = useState(false);
   const [practiceLevel, setPracticeLevel] = useState("All");
 
+  const normalizeProfileLevel = (rawLevel) => {
+    const normalized = (rawLevel || "").trim().toUpperCase();
+
+    if (ALLOWED_LEVELS.includes(normalized)) {
+      return normalized;
+    }
+
+    const fuzzyMatch = ALLOWED_LEVELS.find((allowed) => normalized.startsWith(allowed));
+
+    return fuzzyMatch || "";
+  };
+
+  const profileLevel = normalizeProfileLevel(studentProfile?.level);
+  const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+
   const resetErrors = () => {
     setError("");
     setIdeaError("");
@@ -68,9 +83,25 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
   useEffect(() => {
     if (!selectedLetter) return;
-    setLevel(selectedLetter.level);
+
+    if (!isLevelLocked) {
+      setLevel(selectedLetter.level);
+    }
+
     setTimerSeconds(selectedLetter.durationMinutes * 60);
-  }, [selectedLetter, setLevel]);
+  }, [isLevelLocked, selectedLetter, setLevel]);
+
+  useEffect(() => {
+    if (isLevelLocked && profileLevel !== level) {
+      setLevel(profileLevel);
+    }
+  }, [isLevelLocked, level, profileLevel, setLevel]);
+
+  useEffect(() => {
+    if (isLevelLocked && practiceLevel !== profileLevel) {
+      setPracticeLevel(profileLevel);
+    }
+  }, [isLevelLocked, practiceLevel, profileLevel]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -319,7 +350,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           <div style={{ display: "grid", gap: 12 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Mark my letter</h3>
             <div style={{ display: "grid", gap: 6 }}>
-              <label style={styles.label}>Level for feedback</label>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <label style={styles.label}>Level for feedback</label>
+                {isLevelLocked && <span style={styles.badge}>From student profile</span>}
+              </div>
               <select
                 value={level}
                 onChange={(e) => {
@@ -327,6 +361,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                   setError("");
                 }}
                 style={styles.select}
+                disabled={isLevelLocked}
               >
                 {ALLOWED_LEVELS.map((option) => (
                   <option key={option}>{option}</option>
@@ -381,7 +416,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         <section style={styles.card}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 260 }}>
-              <label style={styles.label}>Level for coaching</label>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <label style={styles.label}>Level for coaching</label>
+                {isLevelLocked && <span style={styles.badge}>From student profile</span>}
+              </div>
               <select
                 value={level}
                 onChange={(e) => {
@@ -389,6 +427,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                   resetErrors();
                 }}
                 style={styles.select}
+                disabled={isLevelLocked}
               >
                 {ALLOWED_LEVELS.map((option) => (
                   <option key={option}>{option}</option>
