@@ -7,6 +7,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  reload,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -252,6 +253,7 @@ export {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  reload,
   requestMessagingToken,
   listenForForegroundMessages,
   getActionCodeSettings,

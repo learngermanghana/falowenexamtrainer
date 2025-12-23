@@ -274,26 +274,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const paymentInstruction = isTrial
         ? " We'll prompt you inside the app to finish your tuition and pick a class before live sessions start."
         : paymentsEnabled
-        ? ` Pay online using your secure link: ${paystackLink}.`
+        ? " Pay online using your secure link inside the app."
         : " Payments are handled on the web app only. Please sign in online to complete your tuition.";
       const paymentRedirectNote = isTrial
         ? " You can explore the app now—finish payment from Account & Billing when you're ready."
-        : paystackLink && paymentsEnabled
-        ? " Complete your tuition before logging in—we'll open your checkout now."
-        : " Complete your tuition before logging in. You can open your checkout link from the app when you're ready.";
+        : " Complete your tuition to unlock live classes. You can open your checkout link from the app whenever you're ready.";
       const successMessage =
         `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${paymentRedirectNote}${balanceText}`;
       setMessage(successMessage);
       showToast(
-        `${successMessage} Check your email for a Falowen verification link before logging in.`,
+        `${successMessage} Check your email for a Falowen verification link and finish setup inside the app.`,
         "success"
       );
-
-      if (paystackLink && paymentsEnabled && isPayNow) {
-        setTimeout(() => {
-          window.open(paystackLink, "_blank", "noopener,noreferrer");
-        }, 900);
-      }
     } catch (error) {
       console.error(error);
       const errorMessage = error?.message || "Sign up failed.";

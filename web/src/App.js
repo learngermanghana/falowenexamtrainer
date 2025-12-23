@@ -22,6 +22,7 @@ import GeneralHome from "./components/GeneralHome";
 import SpeakingRoom from "./components/SpeakingRoom";
 import ExamResources from "./components/ExamResources";
 import NotificationBell from "./components/NotificationBell";
+import SetupCheckpoint from "./components/SetupCheckpoint";
 
 const TAB_STRUCTURE = [
   {
@@ -124,6 +125,13 @@ function App() {
     [allowedSections, savedSection]
   );
 
+  const paymentStatus = useMemo(
+    () => (studentProfile?.paymentStatus || "pending").toLowerCase(),
+    [studentProfile?.paymentStatus]
+  );
+  const awaitingVerification = Boolean(user && !user.emailVerified);
+  const awaitingPayment = Boolean(studentProfile) && !isStaff && paymentStatus !== "paid";
+
   if (!isFirebaseConfigured) {
     return (
       <div style={{ ...styles.container, display: "grid", gap: 12 }}>
@@ -166,6 +174,10 @@ function App() {
         onSwitchToSignup={() => setAuthMode("signup")}
       />
     );
+  }
+
+  if (awaitingVerification || awaitingPayment) {
+    return <SetupCheckpoint />;
   }
 
   return (
