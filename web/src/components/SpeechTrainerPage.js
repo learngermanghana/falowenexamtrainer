@@ -1,6 +1,7 @@
 import React from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
+import InlineSpeechTrainer from "./speechTrainer/InlineSpeechTrainer";
 
 const practiceLink =
   "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
@@ -80,6 +81,8 @@ const SpeechTrainerPage = () => {
           </div>
         </div>
       </div>
+
+      <InlineSpeechTrainer profileLevel={profileLevel} />
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
         <h3 style={{ ...styles.sectionTitle, margin: 0 }}>What you will see</h3>
