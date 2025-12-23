@@ -130,7 +130,8 @@ function App() {
     [studentProfile?.paymentStatus]
   );
   const awaitingVerification = Boolean(user && !user.emailVerified);
-  const awaitingPayment = Boolean(studentProfile) && !isStaff && paymentStatus !== "paid";
+  const awaitingPayment =
+    Boolean(studentProfile) && !isStaff && !["paid", "partial"].includes(paymentStatus);
 
   if (!isFirebaseConfigured) {
     return (
