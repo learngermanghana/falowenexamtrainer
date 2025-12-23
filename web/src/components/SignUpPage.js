@@ -281,13 +281,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const paymentStatus = isTrial
         ? "trial"
         : tuitionSummary.statusLabel.toLowerCase();
-      const paystackLink = isPayNow
-        ? buildPaystackCheckoutLink({
-            baseLink: tuitionSummary.paystackLink,
-            amount: numericInitialPayment,
-            redirectUrl: `${window.location.origin}/payment-complete`,
-          })
-        : tuitionSummary.paystackLink;
+      const paystackCheckoutLink = buildPaystackCheckoutLink({
+        baseLink: tuitionSummary.paystackLink,
+        amount: balanceDue,
+        redirectUrl: `${window.location.origin}/payment-complete`,
+      });
+      const paystackLink = paystackCheckoutLink || tuitionSummary.paystackLink;
 
       const studentCode = generateStudentCode({ name });
       await signup(email, password, {

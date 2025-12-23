@@ -1,3 +1,5 @@
+import { buildPaystackCheckoutLink } from "../lib/paystack";
+
 export const LEVEL_FEES = {
   // Customize each CEFR level's tuition here.
   // These amounts are used at signup to set the student's tuitionFee and balance.
@@ -48,12 +50,20 @@ export const computeTuitionStatus = ({ level, paidAmount = 0, tuitionFee, balanc
       ? "Partial tuition received"
       : "Awaiting payment";
 
+  const basePaystackLink = paystackLinkForLevel(level);
+  const paystackLink = buildPaystackCheckoutLink({
+    baseLink: basePaystackLink,
+    amount: computedBalance,
+    redirectUrl: "https://www.falowen.app/payment-complete",
+    allowedRedirectOrigins: ["https://www.falowen.app"],
+  });
+
   return {
     tuitionFee: computedTuitionFee,
     paidAmount: normalizedPaid,
     balanceDue: computedBalance,
     statusLabel,
     statusCopy,
-    paystackLink: paystackLinkForLevel(level),
+    paystackLink,
   };
 };
