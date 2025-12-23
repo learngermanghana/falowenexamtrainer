@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import ClassCalendarCard from "./ClassCalendarCard";
 import HomeMetrics from "./HomeMetrics";
 import OnboardingChecklist from "./OnboardingChecklist";
+import NavigationGuide from "./NavigationGuide";
 
 const WelcomeHero = ({ studentProfile }) => {
   const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
@@ -65,6 +66,12 @@ const GeneralHome = ({
         onConfirmClass={handleConfirmClass}
         studentProfile={studentProfile}
         onSaveOnboarding={onSaveOnboarding}
+      />
+      <NavigationGuide
+        onOpenCourse={() => navigate("/campus/course")}
+        onSubmitAssignment={() => navigate("/campus/submit")}
+        onAskAI={() => navigate("/campus/grammar")}
+        onOpenExams={() => navigate("/exams/speaking")}
       />
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>
