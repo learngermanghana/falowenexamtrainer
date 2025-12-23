@@ -4,7 +4,7 @@ const backendUrl = getBackendUrl();
 
 const buildApiUrl = (path) => {
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  return `${backendUrl}/api${normalized}`;
+  return `${backendUrl}${normalized}`;
 };
 
 export async function callAI({ path, payload, idToken, timeoutMs = 20000 }) {

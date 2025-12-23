@@ -34,7 +34,7 @@ export const analyzeAudio = async ({
     formData.append("interactionMode", interactionMode);
   }
 
-  const response = await axios.post(`${backendUrl}/api/speaking/analyze`, formData, {
+  const response = await axios.post(`${backendUrl}/speaking/analyze`, formData, {
     headers: {
       ...authHeaders(idToken),
     },
@@ -63,7 +63,7 @@ export const scoreInteractionAudio = async ({
   if (targetLevel) formData.append("targetLevel", targetLevel);
 
   const response = await axios.post(
-    `${backendUrl}/api/speaking/interaction-score`,
+    `${backendUrl}/speaking/interaction-score`,
     formData,
     {
       headers: {
@@ -77,7 +77,7 @@ export const scoreInteractionAudio = async ({
 
 export const analyzeText = async ({ text, teil, level, targetLevel, userId, idToken }) => {
   const response = await axios.post(
-    `${backendUrl}/api/speaking/analyze-text`,
+    `${backendUrl}/speaking/analyze-text`,
     {
       text,
       teil,
@@ -95,7 +95,7 @@ export const analyzeText = async ({ text, teil, level, targetLevel, userId, idTo
 
 export const markLetterWithAI = async ({ text, level, studentName, idToken }) => {
   const response = await axios.post(
-    `${backendUrl}/api/writing/mark`,
+    `${backendUrl}/writing/mark`,
     {
       text,
       level,
@@ -109,7 +109,7 @@ export const markLetterWithAI = async ({ text, level, studentName, idToken }) =>
 
 export const fetchIdeasFromCoach = async ({ messages, level, idToken }) => {
   const response = await axios.post(
-    `${backendUrl}/api/writing/ideas`,
+    `${backendUrl}/writing/ideas`,
     { messages, level },
     { headers: authHeaders(idToken) }
   );
@@ -162,7 +162,7 @@ export const fetchBackendHealth = async () => {
 
 export const startPlacement = async ({ answers = [], userId, targetLevel, idToken }) => {
   const response = await axios.post(
-    `${backendUrl}/api/tutor/placement`,
+    `${backendUrl}/tutor/placement`,
     {
       userId: userId || "guest",
       targetLevel,
@@ -176,7 +176,7 @@ export const startPlacement = async ({ answers = [], userId, targetLevel, idToke
 
 export const fetchNextTask = async ({ userId, idToken }) => {
   const response = await axios.get(
-    `${backendUrl}/api/tutor/next-task?userId=${userId || "guest"}`,
+    `${backendUrl}/tutor/next-task?userId=${userId || "guest"}`,
     { headers: authHeaders(idToken) }
   );
 

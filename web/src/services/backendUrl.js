@@ -7,8 +7,8 @@ const DEFAULT_BACKEND_URL =
     : "http://localhost:5000");
 
 /**
- * Normalize the backend base URL so callers don't accidentally double-prefix
- * "/api" (e.g., when REACT_APP_BACKEND_URL already ends with /api).
+ * Normalize the backend base URL so callers don't accidentally include
+ * a trailing "/api" segment when routes are mounted at the root.
  */
 export function getBackendUrl() {
   const raw = DEFAULT_BACKEND_URL || "";
@@ -19,7 +19,7 @@ export function getBackendUrl() {
   let normalized = raw.replace(/\/+$/, "");
 
   // If someone sets the env var to the function root (".../api"),
-  // avoid building URLs like "/api/api/grammar/ask".
+  // avoid building URLs like "/api/grammar/ask" when routes live at "/grammar/ask".
   if (normalized.toLowerCase().endsWith("/api")) {
     normalized = normalized.slice(0, -4);
   }

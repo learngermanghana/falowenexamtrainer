@@ -25,7 +25,7 @@ export const sendSpeechTrainerAttempt = async ({ audioBlob, note, level, idToken
     formData.append("level", level);
   }
 
-  const response = await axios.post(`${backendUrl}/api/speech-trainer/feedback`, formData, {
+  const response = await axios.post(`${backendUrl}/speech-trainer/feedback`, formData, {
     headers: {
       ...authHeaders(idToken),
     },
