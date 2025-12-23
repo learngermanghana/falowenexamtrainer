@@ -157,7 +157,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const paymentRedirectNote =
         paystackLink && paymentsEnabled
           ? " Complete your tuition before logging in—we'll open your checkout now."
-          : " Complete your tuition before logging in.";
+          : " Complete your tuition before logging in. You can open your checkout link from the app when you're ready.";
       const successMessage =
         `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${paymentRedirectNote}${balanceText}`;
       setMessage(successMessage);
@@ -166,7 +166,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         "success"
       );
 
-      if (paystackLink) {
+      if (paystackLink && paymentsEnabled) {
         setTimeout(() => {
           window.open(paystackLink, "_blank", "noopener,noreferrer");
         }, 900);
