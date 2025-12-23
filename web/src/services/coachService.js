@@ -1,9 +1,10 @@
 import axios from "axios";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 import { writingLetters as writingSheetLetters } from "../data/writingLetters";
-import { getBackendUrl } from "./backendUrl";
+import { getBackendUrl, getSpeakingApiUrl } from "./backendUrl";
 
 const backendUrl = getBackendUrl();
+const speakingApiUrl = getSpeakingApiUrl();
 
 const authHeaders = (idToken) =>
   idToken
@@ -34,7 +35,7 @@ export const analyzeAudio = async ({
     formData.append("interactionMode", interactionMode);
   }
 
-  const response = await axios.post(`${backendUrl}/speaking/analyze`, formData, {
+  const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, formData, {
     headers: {
       ...authHeaders(idToken),
     },
@@ -63,7 +64,7 @@ export const scoreInteractionAudio = async ({
   if (targetLevel) formData.append("targetLevel", targetLevel);
 
   const response = await axios.post(
-    `${backendUrl}/speaking/interaction-score`,
+    `${speakingApiUrl}/speaking/interaction-score`,
     formData,
     {
       headers: {
@@ -77,7 +78,7 @@ export const scoreInteractionAudio = async ({
 
 export const analyzeText = async ({ text, teil, level, targetLevel, userId, idToken }) => {
   const response = await axios.post(
-    `${backendUrl}/speaking/analyze-text`,
+    `${speakingApiUrl}/speaking/analyze-text`,
     {
       text,
       teil,
