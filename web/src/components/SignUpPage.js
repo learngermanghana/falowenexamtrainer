@@ -64,6 +64,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [hasConsented, setHasConsented] = useState(false);
   const [accountIntent, setAccountIntent] = useState("pay-now");
   const [selectedContractTerm, setSelectedContractTerm] = useState("");
+  const [showConsentDetails, setShowConsentDetails] = useState(false);
+
+  const consentHighlights = [
+    "We collect your contact details to create and support your account, share class updates, and send payment reminders.",
+    "You can switch contract terms or cancel future renewals by contacting support before the next billing date.",
+    "Payments are processed securely; tuition balances must be cleared to keep full access to live classes and materials.",
+    "We never sell your data and only share it with partners that help us deliver the service (like payments and messaging).",
+  ];
 
   const isPayNow = accountIntent === "pay-now";
   const isTrial = accountIntent === "trial";
@@ -531,11 +539,113 @@ const SignUpPage = ({ onLogin, onBack }) => {
               .
             </span>
           </label>
+          <div style={{ marginLeft: 26, marginTop: 6, color: "#4b5563", fontSize: 13 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <strong style={{ fontWeight: 600 }}>Key points:</strong>
+              <button
+                type="button"
+                onClick={() => setShowConsentDetails(true)}
+                style={{
+                  ...styles.secondaryButton,
+                  padding: "4px 10px",
+                  fontSize: 12,
+                  height: "auto",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                View summary
+              </button>
+            </div>
+            <ul style={{ marginTop: 6, paddingLeft: 18, lineHeight: 1.5 }}>
+              {consentHighlights.slice(0, 2).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p style={{ marginTop: 4 }}>
+              Want the full details? Open the summary or the links above without leaving the form.
+            </p>
+          </div>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
             {loading ? "Creating ..." : "Sign up now"}
           </button>
         </form>
+
+        {showConsentDetails && (
+          <div
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.45)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 16,
+              zIndex: 20,
+            }}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Terms and privacy highlights"
+          >
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: 12,
+                maxWidth: 520,
+                width: "100%",
+                boxShadow: "0 10px 35px rgba(0,0,0,0.12)",
+                padding: 20,
+                color: "#111827",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Terms and privacy highlights</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowConsentDetails(false)}
+                  style={{ ...styles.secondaryButton, padding: "6px 12px", fontSize: 12 }}
+                >
+                  Close
+                </button>
+              </div>
+              <p style={{ marginTop: 12, marginBottom: 10 }}>
+                Here is a quick summary of what you are agreeing to when you continue.
+              </p>
+              <ul style={{ marginTop: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+                {consentHighlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p style={{ marginTop: 10, color: "#4b5563" }}>
+                Read the full
+                {" "}
+                <a
+                  href="https://register.falowen.app/#terms-of-service"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#1d4ed8", fontWeight: 600 }}
+                >
+                  terms
+                </a>
+                {" "}
+                and
+                {" "}
+                <a
+                  href="https://register.falowen.app/#privacy-policy"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#1d4ed8", fontWeight: 600 }}
+                >
+                  privacy policy
+                </a>
+                {" "}
+                at any time without losing your progress.
+              </p>
+            </div>
+          </div>
+        )}
 
         {authError && <div style={styles.errorBox}>{authError}</div>}
         {message && (
