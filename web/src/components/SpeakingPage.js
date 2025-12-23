@@ -85,6 +85,13 @@ const SpeakingPage = () => {
 
   const teilOptions = useMemo(() => getTasksForLevel(level), [level]);
 
+  const levelIsValid = useMemo(() => ALLOWED_LEVELS.includes(level), [level]);
+
+  const teilIsValid = useMemo(() => {
+    const allowedTeile = teilOptions.map((option) => option.label);
+    return allowedTeile.includes(teil);
+  }, [teil, teilOptions]);
+
   const simulationSteps = useMemo(() => {
     if (!teilOptions.length) return [];
 
@@ -113,6 +120,36 @@ const SpeakingPage = () => {
 
     return isB1Task || isB2OrHigherDiscussion;
   }, [level, teil]);
+
+  const progressSteps = useMemo(() => {
+    const step1Done = levelIsValid && teilIsValid;
+    const step2Done = isRecording || Boolean(audioBlob);
+    const step3Done = Boolean(audioBlob) && !isRecording;
+    const step4Done = Boolean(result);
+
+    const currentStep = !step1Done ? 0 : !step2Done ? 1 : !step3Done ? 2 : 3;
+
+    const statusText = step4Done
+      ? "Fertig! Scrolle nach unten, um dein Feedback zu lesen."
+      : !step1Done
+      ? "Schritt 1: Wähle zuerst dein Niveau und den Prüfungsteil."
+      : !step2Done
+      ? "Schritt 2: Klicke auf „Aufnahme starten“ und sprich deine Antwort."
+      : !step3Done
+      ? "Schritt 3: Klicke auf „Stoppen“, wenn du fertig bist."
+      : "Schritt 4: Klicke auf „Antwort auswerten“ für KI-Feedback.";
+
+    return {
+      statusText,
+      currentStep,
+      steps: [
+        { label: "Niveau & Teil wählen", done: step1Done },
+        { label: "Aufnahme starten", done: step2Done },
+        { label: "Stoppen (Aufnahme speichern)", done: step3Done },
+        { label: "KI-Feedback erhalten", done: step4Done },
+      ],
+    };
+  }, [audioBlob, isRecording, levelIsValid, teilIsValid, result]);
 
   useEffect(() => {
     const profileLevel = (studentProfile?.level || "").toUpperCase();
@@ -840,6 +877,36 @@ const SpeakingPage = () => {
             </button>
           </div>
         )}
+
+        <div style={styles.stepGuide}>
+          <div style={styles.stepStatus}>{progressSteps.statusText}</div>
+
+          <div style={styles.stepRow}>
+            {progressSteps.steps.map((step, idx) => {
+              const isCurrent = idx === progressSteps.currentStep && !step.done;
+
+              const dotStyle = step.done
+                ? styles.stepDotDone
+                : isCurrent
+                ? styles.stepDotCurrent
+                : styles.stepDot;
+
+              return (
+                <div key={step.label} style={styles.stepItem}>
+                  <span style={dotStyle} />
+                  <span>
+                    {idx + 1}. {step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Tipp: Wenn der Button „Antwort auswerten“ grau ist, stoppe zuerst die Aufnahme
+            oder lade eine Datei hoch, damit sie gespeichert wird.
+          </p>
+        </div>
 
         <div style={styles.audioControls}>
           <div style={styles.waveformContainer}>

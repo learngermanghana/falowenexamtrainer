@@ -19,7 +19,7 @@ import { styles } from "./styles";
 import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
 import GeneralHome from "./components/GeneralHome";
-import SpeakingRoom from "./components/SpeakingRoom";
+import SpeakingPage from "./components/SpeakingPage";
 import ExamResources from "./components/ExamResources";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
@@ -489,7 +489,7 @@ const ExamArea = ({ onBack }) => {
         ))}
       </div>
 
-      {examSection === "speaking" ? <SpeakingRoom /> : null}
+      {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
     </>
