@@ -6,17 +6,16 @@ importScripts(
 
 let messaging = null;
 
-const CACHE_NAME = "falowen-offline-v1";
+const CACHE_PREFIX = "apzla-offline";
+const CACHE_NAME = `${CACHE_PREFIX}-v6`;
 const OFFLINE_URL = "/offline.html";
 
 const STATIC_ASSETS = [
-  "/",
-  "/index.html",
   OFFLINE_URL,
   "/manifest.json",
   "/favicon.ico",
-  "/Logo-192x192.png",
-  "/Logo 512.png",
+  "/logo192.png",
+  "/logo512.png",
 ];
 
 function initializeMessaging(config) {
@@ -59,7 +58,7 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(
           keys
-            .filter((key) => key.startsWith("falowen-offline") && key !== CACHE_NAME)
+            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
             .map((key) => caches.delete(key))
         )
       )
