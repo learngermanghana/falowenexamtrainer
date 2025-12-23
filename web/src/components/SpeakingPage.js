@@ -66,6 +66,7 @@ const SpeakingPage = () => {
   const [interactionSession, setInteractionSession] = useState(null);
   const [interactionResult, setInteractionResult] = useState(null);
   const [selectedFollowUpIndex, setSelectedFollowUpIndex] = useState(0);
+  const [copyStatus, setCopyStatus] = useState("");
   const hasManuallyToggledInteraction = useRef(false);
   const countdownRef = useRef(null);
   const stepAdvanceGuardRef = useRef(false);
@@ -217,6 +218,27 @@ const SpeakingPage = () => {
   );
 
   const currentQuestion = questions[currentQuestionIndex] || null;
+
+  const copyCurrentQuestion = useCallback(async () => {
+    if (!currentQuestion) return;
+
+    const parts = [currentQuestion.text];
+    if (currentQuestion.hint) {
+      parts.push(`Hinweis: ${currentQuestion.hint}`);
+    }
+
+    try {
+      await navigator.clipboard.writeText(parts.join("\n"));
+      setCopyStatus("Thema kopiert!");
+    } catch (err) {
+      console.error("Copy question failed", err);
+      setCopyStatus("Kopieren nicht möglich");
+    }
+  }, [currentQuestion]);
+
+  useEffect(() => {
+    setCopyStatus("");
+  }, [currentQuestion]);
 
   const showNextQuestion = () => {
     if (questions.length === 0) return;
@@ -831,13 +853,25 @@ const SpeakingPage = () => {
             {currentQuestion.hint && (
               <p style={styles.questionHint}>{currentQuestion.hint}</p>
             )}
-            <button
-              style={styles.buttonGhost}
-              type="button"
-              onClick={showNextQuestion}
-            >
-              Nächste Frage
-            </button>
+            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <button
+                style={styles.buttonGhost}
+                type="button"
+                onClick={copyCurrentQuestion}
+              >
+                Thema kopieren
+              </button>
+              <button
+                style={styles.buttonGhost}
+                type="button"
+                onClick={showNextQuestion}
+              >
+                Nächste Frage
+              </button>
+              {copyStatus && (
+                <span style={styles.helperText}>{copyStatus}</span>
+              )}
+            </div>
           </div>
         )}
 
