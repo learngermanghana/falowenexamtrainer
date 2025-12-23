@@ -68,7 +68,10 @@ describe("SignUpPage", () => {
     await userEvent.click(screen.getByRole("button", { name: /skip payment for now/i }));
     await userEvent.type(screen.getByPlaceholderText("Abigail"), "Test User");
     await userEvent.type(screen.getByPlaceholderText("you@example.com"), "test@example.com");
-    await userEvent.type(screen.getByPlaceholderText("At least 6 characters"), "password123");
+    await userEvent.type(
+      screen.getByPlaceholderText("At least 8 characters with letters and numbers"),
+      "password123"
+    );
     await userEvent.type(screen.getByPlaceholderText("Enter password again"), "password123");
     await userEvent.type(screen.getByPlaceholderText("0176 12345678"), "0123456789");
     await userEvent.type(screen.getByPlaceholderText("Berlin"), "Berlin");
