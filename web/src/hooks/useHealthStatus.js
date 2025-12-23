@@ -6,7 +6,7 @@ export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
   const [lastChecked, setLastChecked] = useState(null);
 
   const refresh = useCallback(async () => {
-    const url = `${getBackendUrl()}/api/health`;
+    const url = `${getBackendUrl()}/health`;
 
     try {
       const response = await fetch(url);
@@ -15,9 +15,9 @@ export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
         throw new Error("Health check failed");
       }
 
-      await response.json();
+      const data = await response.json();
       setStatus("ok");
-      setLastChecked(new Date().toISOString());
+      setLastChecked(data?.timestamp || new Date().toISOString());
     } catch (error) {
       setStatus("offline");
     }
