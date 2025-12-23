@@ -77,7 +77,24 @@ const SignUpPage = ({ onLogin, onBack }) => {
     []
   );
 
+  const tuitionFeeForLevel = useMemo(
+    () => computeTuitionStatus({ level: selectedLevel, paidAmount: 0 }).tuitionFee,
+    [selectedLevel]
+  );
+
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
+
+  const handleInitialPaymentChange = (event) => {
+    const numericOnlyValue = event.target.value.replace(/[^0-9]/g, "");
+    if (numericOnlyValue === "") {
+      setInitialPaymentAmount("");
+      return;
+    }
+
+    const sanitizedValue = Math.max(Number(numericOnlyValue), 0);
+    const cappedValue = Math.min(sanitizedValue, tuitionFeeForLevel || sanitizedValue);
+    setInitialPaymentAmount(`${cappedValue}`);
+  };
 
   useEffect(() => {
     if (isTrial) {
@@ -88,6 +105,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
       setInitialPaymentAmount((prev) => (Number(prev) > 0 ? prev : `${MIN_INITIAL_PAYMENT}`));
     }
   }, [isTrial]);
+
+  useEffect(() => {
+    if (!isPayNow || initialPaymentAmount === "") return;
+
+    const numericAmount = Number(initialPaymentAmount);
+    if (Number.isNaN(numericAmount)) return;
+
+    const cappedAmount = Math.min(Math.max(numericAmount, 0), tuitionFeeForLevel || numericAmount);
+    if (`${cappedAmount}` !== `${initialPaymentAmount}`) {
+      setInitialPaymentAmount(`${cappedAmount}`);
+    }
+  }, [initialPaymentAmount, isPayNow, tuitionFeeForLevel]);
 
   const tuitionSummary = computeTuitionStatus({
     level: selectedLevel,
@@ -100,6 +129,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setMessage("");
 
     const numericInitialPayment = isPayNow ? Number(initialPaymentAmount) : 0;
+
+    if (isPayNow && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
+      const paymentError = "Enter a numeric initial payment amount.";
+      setAuthError(paymentError);
+      showToast(paymentError, "error");
+      return;
+    }
 
     if (password !== confirmPassword) {
       const passwordError = "Passwords do not match.";
@@ -116,6 +152,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
     }
 
     if (isPayNow) {
+      if (numericInitialPayment < 0) {
+        const paymentError = "Initial payment amount cannot be negative.";
+        setAuthError(paymentError);
+        showToast(paymentError, "error");
+        return;
+      }
+
       if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
         const paymentError = `Initial payment amount must be at least GH₵${MIN_INITIAL_PAYMENT}.`;
         setAuthError(paymentError);
@@ -390,16 +433,20 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="number"
             min={MIN_INITIAL_PAYMENT}
+            max={tuitionFeeForLevel}
             step="100"
+            pattern="[0-9]*"
+            inputMode="numeric"
             value={initialPaymentAmount}
-            onChange={(e) => setInitialPaymentAmount(e.target.value)}
+            onChange={handleInitialPaymentChange}
             style={{ ...inputStyle, background: isTrial ? "#f3f4f6" : inputStyle.background }}
             placeholder={`At least GH₵${MIN_INITIAL_PAYMENT}`}
             disabled={isTrial}
           />
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            A1: GH₵2800 · A2: GH₵3000 · B1: GH₵3000 · B2: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start a
-            paid account. Choose "Skip payment for now" to explore without paying yet.
+            Enter between GH₵{MIN_INITIAL_PAYMENT} and GH₵{tuitionFeeForLevel} for {selectedLevel}. A1: GH₵2800 · A2:
+            GH₵3000 · B1: GH₵3000 · B2: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start a paid account.
+            Choose "Skip payment for now" to explore without paying yet.
           </p>
 
           <TuitionStatusCard
