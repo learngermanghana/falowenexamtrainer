@@ -53,14 +53,36 @@ const buildLevelSchedules = () => {
 
 const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules();
 
+const getLessonKey = (lesson) => {
+  return [
+    lesson.chapter || lesson.title || "",
+    lesson.video || "",
+    lesson.youtube_link || "",
+    lesson.grammarbook_link || "",
+    lesson.workbook_link || "",
+    Boolean(lesson.assignment),
+  ].join("::");
+};
+
 const LessonList = ({ title, lessons }) => {
-  if (!lessons.length) return null;
+  const uniqueLessons = useMemo(() => {
+    const seen = new Set();
+
+    return lessons.filter((lesson) => {
+      const key = getLessonKey(lesson);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [lessons]);
+
+  if (!uniqueLessons.length) return null;
 
   return (
     <div style={{ display: "grid", gap: 8 }}>
       <h4 style={{ margin: 0 }}>{title}</h4>
       <div style={{ display: "grid", gap: 8 }}>
-        {lessons.map((lesson, index) => (
+        {uniqueLessons.map((lesson, index) => (
           <div
             key={`${lesson.chapter || title}-${index}`}
             style={{
