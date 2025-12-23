@@ -73,6 +73,33 @@ const SignUpPage = ({ onLogin, onBack }) => {
     "We never sell your data and only share it with partners that help us deliver the service (like payments and messaging).",
   ];
 
+  const overviewSections = [
+    {
+      title: "What you get",
+      items: [
+        "Daily Plan, mock exams, and speaking/writing rooms in one account.",
+        "Progress saved across web and mobile with reminders.",
+        "Tuition tracker with secure Paystack checkout when payments are enabled.",
+      ],
+    },
+    {
+      title: "What happens now",
+      items: [
+        "Choose to pay now to reserve your class or start with a trial.",
+        "Pick your level so we can match you to the right materials.",
+        "Create a password and confirm your consent to our terms and privacy policy.",
+      ],
+    },
+    {
+      title: "Finish later",
+      items: [
+        "For trials: complete tuition and pick a class inside Account & Billing when you're ready.",
+        "For pay-now: you can reopen your checkout link anytime if you close it accidentally.",
+        "Need help? Use the contact links in the terms to reach support.",
+      ],
+    },
+  ];
+
   const isPayNow = accountIntent === "pay-now";
   const isTrial = accountIntent === "trial";
 
@@ -279,7 +306,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   return (
     <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
-      <div style={{ ...styles.card, width: "100%", maxWidth: 520, position: "relative" }}>
+      <div
+        style={{
+          ...styles.card,
+          width: "100%",
+          maxWidth: 660,
+          position: "relative",
+          padding: 20,
+          gap: 8,
+        }}
+      >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>Create account</h2>
           {onBack && (
@@ -288,23 +324,64 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </button>
           )}
         </div>
-        <p style={styles.helperText}>
-          Get access to the Daily Plan, exam simulations, and push reminders. Your progress is saved in the cloud. Pay now or
-          start a trial, then finish tuition inside the app when you're ready.
-        </p>
-
-        <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
-          <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            Signing up saves your profile to the Falowen cloud so you can use the same login for web and mobile.
+        <div
+          style={{
+            ...styles.uploadCard,
+            background: "#f8fafc",
+            marginBottom: 12,
+            display: "grid",
+            gap: 12,
+          }}
+        >
+          <p style={{ ...styles.helperText, marginBottom: 2 }}>
+            Get oriented quickly—open the sections below to skim what matters.
           </p>
-          <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            Returning Falowen student from our old system? Go to Login and reuse that email to set a new password. We'll migrate your profile automatically.
-          </p>
-          <ul style={{ ...styles.checklist, margin: 0 }}>
-            <li>Enable push reminders and weekly goals.</li>
-            <li>Store your level checks and mock tests.</li>
-            <li>Direct access to speaking and writing sessions.</li>
-          </ul>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+              gap: 10,
+            }}
+          >
+            {overviewSections.map((section) => (
+              <div
+                key={section.title}
+                style={{
+                  background: "#fff",
+                  borderRadius: 10,
+                  padding: 12,
+                  border: "1px solid #e5e7eb",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+                }}
+              >
+                <strong style={{ display: "block", marginBottom: 6, color: "#0f172a" }}>{section.title}</strong>
+                <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 6 }}>
+                  {section.items.map((item) => (
+                    <li key={item} style={{ color: styles.helperText.color, fontSize: 13, lineHeight: 1.5 }}>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <details style={{ background: "#eef2ff", padding: 12, borderRadius: 10, border: "1px solid #c7d2fe" }}>
+            <summary style={{ cursor: "pointer", fontWeight: 700, color: "#312e81", marginBottom: 6 }}>
+              Need the full explanation?
+            </summary>
+            <div style={{ display: "grid", gap: 8, color: styles.helperText.color, fontSize: 13, lineHeight: 1.6 }}>
+              <p style={{ margin: 0 }}>
+                Signing up saves your profile to the Falowen cloud so you can reuse the same login on web and mobile.
+              </p>
+              <p style={{ margin: 0 }}>
+                Returning Falowen student from our old system? Go to Login and reuse that email to set a new password. We'll
+                migrate your profile automatically.
+              </p>
+              <p style={{ margin: 0 }}>
+                Want reminders? Enable push notifications after login to get weekly goals and practice nudges.
+              </p>
+            </div>
+          </details>
         </div>
 
         <div style={{ ...styles.uploadCard, background: "#eef2ff", marginBottom: 12 }}>
