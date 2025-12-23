@@ -4,7 +4,7 @@ import { writingLetters as writingSheetLetters } from "../data/writingLetters";
 import { getBackendUrl, getSpeakingApiUrl } from "./backendUrl";
 
 const backendUrl = getBackendUrl();
-const speakingApiUrl = getSpeakingApiUrl();
+const speakingApiUrl = getSpeakingApiUrl() || backendUrl;
 
 const authHeaders = (idToken) =>
   idToken

@@ -7,7 +7,7 @@ const DEFAULT_BACKEND_URL =
     : "http://localhost:5000");
 
 const DEFAULT_SPEAKING_API_URL =
-  process.env.REACT_APP_SPEAKING_API_URL || "https://api-awc2au65xa-ew.a.run.app";
+  process.env.REACT_APP_SPEAKING_API_URL || DEFAULT_BACKEND_URL;
 
 const normalizeBaseUrl = (rawUrl) => {
   const raw = rawUrl || "";
