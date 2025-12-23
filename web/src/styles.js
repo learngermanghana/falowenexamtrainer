@@ -212,6 +212,12 @@ export const styles = {
     border: "1px solid #f59e0b",
     fontSize: 13,
   },
+  fieldError: {
+    color: "#b91c1c",
+    margin: "4px 0 0 0",
+    fontSize: 13,
+    lineHeight: 1.4,
+  },
   successBox: {
     marginTop: 12,
     padding: 12,
