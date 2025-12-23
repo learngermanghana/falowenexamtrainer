@@ -6,6 +6,7 @@ import { generateStudentCode } from "../services/studentCode";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { savePreferredLevel } from "../services/levelStorage";
 import { useToast } from "../context/ToastContext";
+import PasswordGuidance from "./PasswordGuidance";
 
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, authError, setAuthError, resetPassword } = useAuth();
@@ -194,11 +195,18 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           <input
             type="password"
             required
-            minLength={6}
+            minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
+            placeholder={
+              mode === "signup"
+                ? "At least 8 characters with letters and numbers"
+                : undefined
+            }
           />
+
+          {mode === "signup" && <PasswordGuidance password={password} />}
 
           {mode === "login" && (
             <div style={{ display: "flex", justifyContent: "flex-end" }}>

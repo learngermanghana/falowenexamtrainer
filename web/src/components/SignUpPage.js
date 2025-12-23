@@ -12,6 +12,7 @@ import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 import { buildPaystackCheckoutLink } from "../lib/paystack";
+import PasswordGuidance from "./PasswordGuidance";
 
 const MIN_INITIAL_PAYMENT = 1000;
 
@@ -316,18 +317,20 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="password"
             required
-            minLength={6}
+            minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters with letters and numbers"
           />
+
+          <PasswordGuidance password={password} />
 
           <label style={styles.label}>Confirm password</label>
           <input
             type="password"
             required
-            minLength={6}
+            minLength={8}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             style={inputStyle}
