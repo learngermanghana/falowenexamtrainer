@@ -87,7 +87,20 @@ const WritingPage = ({ mode = "course" }) => {
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
-  const profileLevel = (studentProfile?.level || "").toUpperCase();
+  const normalizeProfileLevel = (rawLevel) => {
+    const normalized = (rawLevel || "").trim().toUpperCase();
+    if (ALLOWED_LEVELS.includes(normalized)) {
+      return normalized;
+    }
+
+    const fuzzyMatch = ALLOWED_LEVELS.find((allowed) =>
+      normalized.startsWith(allowed)
+    );
+
+    return fuzzyMatch || "";
+  };
+
+  const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
 
   useEffect(() => {
