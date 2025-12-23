@@ -1,6 +1,23 @@
 import React from "react";
 import { styles } from "../styles";
 
+const goetheLevelLinks = {
+  lesen: [
+    { level: "A1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd1/ueb.html" },
+    { level: "A2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd2/ueb.html" },
+    { level: "B1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb1/ueb.html" },
+    { level: "B2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb2/ue9.html" },
+    { level: "C1", url: "https://www.goethe.de/ins/be/en/spr/prf/gzc1/u24.html" },
+  ],
+  horen: [
+    { level: "A1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd1/ueb.html" },
+    { level: "A2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd2/ueb.html" },
+    { level: "B1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb1/ueb.html" },
+    { level: "B2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb2/ue9.html" },
+    { level: "C1", url: "https://www.goethe.de/ins/be/en/spr/prf/gzc1/u24.html" },
+  ],
+};
+
 const resources = [
   {
     title: "Goethe Lesen & Hören practice",
@@ -50,6 +67,45 @@ const ExamResources = () => {
         <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
           Bookmark these for last-minute checks. All tips stay in English so you can skim fast before your test.
         </p>
+      </section>
+
+      <section style={styles.card}>
+        <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>Level-aware Goethe links (Lesen & Hören)</h3>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 12,
+          }}
+        >
+          <div style={{ ...styles.card, margin: 0, boxShadow: "none" }}>
+            <h4 style={{ margin: "0 0 6px 0" }}>Lesen</h4>
+            <ul style={{ ...styles.checklist, margin: 0 }}>
+              {goetheLevelLinks.lesen.map((item) => (
+                <li key={`lesen-${item.level}`}>
+                  <strong>{item.level}:</strong>{" "}
+                  <a href={item.url} target="_blank" rel="noreferrer">
+                    Goethe Lesen practice
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div style={{ ...styles.card, margin: 0, boxShadow: "none" }}>
+            <h4 style={{ margin: "0 0 6px 0" }}>Hören</h4>
+            <ul style={{ ...styles.checklist, margin: 0 }}>
+              {goetheLevelLinks.horen.map((item) => (
+                <li key={`horen-${item.level}`}>
+                  <strong>{item.level}:</strong>{" "}
+                  <a href={item.url} target="_blank" rel="noreferrer">
+                    Goethe Hören practice
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </section>
 
       {resources.map((group) => (
