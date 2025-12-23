@@ -129,6 +129,15 @@ Firestore document, and upsert the row in the Students sheet.
 - Make sure your Paystack payment pages/links for each level charge the same
   amounts so webhook callbacks reconcile correctly with the stored tuition.
 
+### Configure Paystack checkout links
+- Set a default checkout link for all levels via `REACT_APP_PAYSTACK_LINK` in
+  your `.env` file (e.g., `REACT_APP_PAYSTACK_LINK=https://paystack.com/pay/your-link`).
+- Optionally override the link for specific levels using
+  `REACT_APP_PAYSTACK_LINK_<LEVEL>`, where `<LEVEL>` is the uppercase level name
+  (e.g., `REACT_APP_PAYSTACK_LINK_A1=https://paystack.com/pay/a1-link`).
+- If no overrides are provided, the app falls back to
+  `https://paystack.com/pay/falowen`.
+
 ## Legacy student login (pre-Firebase accounts)
 For historic student rows that only stored an email, student code, and a
 bcrypt-hashed password in Firestore, the backend exposes a `/legacy/login`
