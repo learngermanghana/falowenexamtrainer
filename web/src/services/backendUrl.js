@@ -6,12 +6,11 @@ const DEFAULT_BACKEND_URL =
       (typeof window !== "undefined" ? window.location.origin : "")
     : "http://localhost:5000");
 
-/**
- * Normalize the backend base URL so callers don't accidentally include
- * a trailing "/api" segment when routes are mounted at the root.
- */
-export function getBackendUrl() {
-  const raw = DEFAULT_BACKEND_URL || "";
+const DEFAULT_SPEAKING_API_URL =
+  process.env.REACT_APP_SPEAKING_API_URL || "https://api-awc2au65xa-ew.a.run.app";
+
+const normalizeBaseUrl = (rawUrl) => {
+  const raw = rawUrl || "";
 
   if (!raw) return "";
 
@@ -25,4 +24,16 @@ export function getBackendUrl() {
   }
 
   return normalized;
+};
+
+/**
+ * Normalize the backend base URL so callers don't accidentally include
+ * a trailing "/api" segment when routes are mounted at the root.
+ */
+export function getBackendUrl() {
+  return normalizeBaseUrl(DEFAULT_BACKEND_URL);
+}
+
+export function getSpeakingApiUrl() {
+  return normalizeBaseUrl(DEFAULT_SPEAKING_API_URL);
 }
