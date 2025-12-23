@@ -193,6 +193,7 @@ export const AuthProvider = ({ children }) => {
   const refreshUser = async () => {
     if (!auth?.currentUser) return null;
     await reload(auth.currentUser);
+    setUser(auth.currentUser);
     return auth.currentUser;
   };
 
