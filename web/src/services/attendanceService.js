@@ -8,6 +8,7 @@ const toBoolean = (value) => {
     return ["present", "p", "yes", "y", "true", "1", "attended"].includes(normalized);
   }
   if (value && typeof value === "object") {
+    if ("attended" in value) return toBoolean(value.attended);
     if ("present" in value) return toBoolean(value.present);
     if ("status" in value) return toBoolean(value.status);
   }
