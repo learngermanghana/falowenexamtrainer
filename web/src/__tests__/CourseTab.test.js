@@ -24,6 +24,13 @@ jest.mock("../data/courseSchedules", () => ({
               youtube_link: youtubeLink,
               workbook_link: workbookLink,
             },
+            {
+              chapter: "1.1",
+              type: "Lesen & Hören",
+              note: "Bring workbook.",
+              youtube_link: youtubeLink,
+              workbook_link: workbookLink,
+            },
           ],
         },
       ],
@@ -43,11 +50,12 @@ describe("CourseTab", () => {
       })
     ).toHaveAttribute("href", youtubeLink);
 
-    expect(
-      screen.getByRole("link", {
-        name: /Workbook/i,
-      })
-    ).toHaveAttribute("href", workbookLink);
+    const workbookLinks = screen.getAllByRole("link", {
+      name: /Workbook/i,
+    });
+
+    expect(workbookLinks).toHaveLength(1);
+    expect(workbookLinks[0]).toHaveAttribute("href", workbookLink);
   });
 });
 
