@@ -2,8 +2,19 @@ import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
+import { classCatalog } from "../data/classCatalog";
 
 const normalizeLevel = (level) => (level || "").toUpperCase();
+
+const LEVEL_FALLBACK_RESOURCES = {
+  A2: {
+    video: "https://youtu.be/a1-day0-tutorial",
+    grammarbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
+    workbook_link: classCatalog?.["A2 Bonn Klasse"]?.docUrl || null,
+    instructionNote:
+      "Course book links use the A2 class folder until the full A2 course book dictionary is loaded.",
+  },
+};
 
 const buildLevelSchedules = () => {
   const derivedSchedules = {};
@@ -15,24 +26,41 @@ const buildLevelSchedules = () => {
     if (!level || courseSchedules[level] || derivedSchedules[level]) return;
 
     derivedLevels.add(level);
+    const fallback = LEVEL_FALLBACK_RESOURCES[level] || {};
 
     derivedSchedules[level] = (schedule.days || []).map((day) => {
       const sessions = day.sessions || [];
       const primarySession = sessions[0] || {};
+      let usedFallbackResource = false;
 
-      const lessonList = sessions.map((session, index) => ({
-        chapter: session.chapter || session.title || `Session ${index + 1}`,
-        title: session.title,
-        assignment: false,
-        note: session.note,
-        type: session.type,
-        video: session.video || session.youtube_link || null,
-        youtube_link: session.youtube_link || session.video || null,
-        grammarbook_link: session.grammarbook_link || null,
-        workbook_link: session.workbook_link || null,
-      }));
+      const lessonList = sessions.map((session, index) => {
+        const video = session.video || session.youtube_link || fallback.video || null;
+        const grammarbook_link =
+          session.grammarbook_link ?? fallback.grammarbook_link ?? null;
+        const workbook_link = session.workbook_link ?? fallback.workbook_link ?? null;
+
+        usedFallbackResource =
+          usedFallbackResource ||
+          (!session.video && !session.youtube_link && Boolean(fallback.video)) ||
+          (!session.grammarbook_link && Boolean(fallback.grammarbook_link)) ||
+          (!session.workbook_link && Boolean(fallback.workbook_link));
+
+        return {
+          chapter: session.chapter || session.title || `Session ${index + 1}`,
+          title: session.title,
+          assignment: false,
+          note: session.note,
+          type: session.type,
+          video,
+          youtube_link: session.youtube_link || session.video || fallback.video || null,
+          grammarbook_link,
+          workbook_link,
+        };
+      });
 
       const notes = lessonList.map((lesson) => lesson.note).filter(Boolean);
+      const instructionNote =
+        usedFallbackResource && fallback.instructionNote ? ` ${fallback.instructionNote}` : "";
 
       return {
         day: day.dayNumber,
@@ -40,8 +68,8 @@ const buildLevelSchedules = () => {
         chapter: primarySession.chapter || primarySession.title || null,
         instruction:
           notes.length > 0
-            ? notes.join(" • ")
-            : schedule.generatedNote || `Class plan for ${schedule.className}`,
+            ? `${notes.join(" • ")}${instructionNote}`
+            : `${schedule.generatedNote || `Class plan for ${schedule.className}`}${instructionNote}`,
         grammar_topic: primarySession.type || null,
         lesen_hören: lessonList,
       };
