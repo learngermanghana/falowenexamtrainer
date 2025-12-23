@@ -170,6 +170,23 @@ cd web
 npm install
 ```
 
+## Firebase integration tests
+The repository includes Jest integration tests that run against the Firebase Emulator Suite for Authentication and Firestore.
+
+- Install dependencies from the repository root:
+
+```
+npm install
+```
+
+- Run the integration suite (requires the Firebase CLI; `npm i -g firebase-tools` if you don't already have it):
+
+```
+npm run test:integration
+```
+
+The suite provisions a test user via email/password, completes the email verification flow through the Auth emulator, and writes/reads a student profile document in Firestore.
+
 ## Run locally
 1. **Start the backend** (from the repository root):
    ```
