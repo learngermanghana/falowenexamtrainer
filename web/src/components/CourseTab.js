@@ -26,6 +26,10 @@ const buildLevelSchedules = () => {
         assignment: false,
         note: session.note,
         type: session.type,
+        video: session.video || session.youtube_link || null,
+        youtube_link: session.youtube_link || session.video || null,
+        grammarbook_link: session.grammarbook_link || null,
+        workbook_link: session.workbook_link || null,
       }));
 
       const notes = lessonList.map((lesson) => lesson.note).filter(Boolean);
@@ -75,9 +79,13 @@ const LessonList = ({ title, lessons }) => {
               {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
             </div>
             <ul style={{ ...styles.checklist, margin: 0 }}>
-              {lesson.video ? (
+              {lesson.video || lesson.youtube_link ? (
                 <li>
-                  <a href={lesson.video} target="_blank" rel="noreferrer">
+                  <a
+                    href={lesson.video || lesson.youtube_link}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Video ansehen
                   </a>
                 </li>
