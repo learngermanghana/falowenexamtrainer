@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "./AuthContext";
 import { loadPreferredLevel, savePreferredLevel } from "../services/levelStorage";
 
 export const SPEAKING_FORMATS = {
@@ -143,6 +144,7 @@ const getInitialLevel = () => {
 const initialLevel = getInitialLevel();
 
 export const ExamProvider = ({ children }) => {
+  const { studentProfile, saveStudentProfile } = useAuth();
   const [level, setLevelState] = useState(initialLevel);
   const [levelConfirmed, setLevelConfirmed] = useState(Boolean(loadPreferredLevel()));
   const [teil, setTeil] = useState(getTasksForLevel(initialLevel)[0].label);
@@ -158,7 +160,21 @@ export const ExamProvider = ({ children }) => {
     setLevelState(safeLevel);
     setLevelConfirmed(true);
     savePreferredLevel(safeLevel);
+
+    if (studentProfile?.id && (studentProfile.level || "").toUpperCase() !== safeLevel) {
+      saveStudentProfile({ level: safeLevel }).catch((error) => {
+        console.warn("Failed to sync level to student profile", error);
+      });
+    }
   };
+
+  useEffect(() => {
+    const profileLevel = (studentProfile?.level || "").toUpperCase();
+    if (!profileLevel || !ALLOWED_LEVELS.includes(profileLevel)) return;
+    if (profileLevel === level) return;
+
+    setLevel(profileLevel);
+  }, [level, studentProfile?.level]);
 
   useEffect(() => {
     const allowedTeile = getTasksForLevel(level).map((task) => task.label);
