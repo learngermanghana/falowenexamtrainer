@@ -432,7 +432,10 @@ const CampusArea = ({
       ) : null}
 
       {resolvedSection === "course" && allowedSections.course ? (
-        <CourseTab defaultLevel={campusStudentProfile?.level} />
+        <CourseTab
+          defaultLevel={campusStudentProfile?.level}
+          defaultClassName={campusStudentProfile?.className}
+        />
       ) : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
