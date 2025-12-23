@@ -65,6 +65,7 @@ describe("SignUpPage", () => {
   it("does not redirect to checkout when payments are disabled", async () => {
     render(<SignUpPage onLogin={jest.fn()} />);
 
+    await userEvent.click(screen.getByRole("button", { name: /skip payment for now/i }));
     await userEvent.type(screen.getByPlaceholderText("Abigail"), "Test User");
     await userEvent.type(screen.getByPlaceholderText("you@example.com"), "test@example.com");
     await userEvent.type(screen.getByPlaceholderText("At least 6 characters"), "password123");
