@@ -1,3 +1,12 @@
+/**
+ * app.js (FULL FILE) — Paystack installments + better contract handling
+ * Key fixes included:
+ * 1) DO NOT store authorization_url in students.paystackLink (it expires). Return it only to frontend.
+ * 2) Preserve contractStart if already active; extend/upgrade contractEnd instead of resetting each payment.
+ * 3) Enforce min installment GH₵1000 unless the payment clears the remaining balance.
+ * 4) Safer Paystack signature comparison (timing-safe).
+ */
+
 const express = require("express");
 const cors = require("cors");
 const admin = require("firebase-admin");
@@ -8,6 +17,7 @@ const path = require("path");
 const os = require("os");
 const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
+
 const { LETTER_COACH_PROMPTS, grammarPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
@@ -26,7 +36,8 @@ function initFirebaseAdmin() {
     process.env.FIREBASE_SERVICE_ACCOUNT_JSON_B64;
 
   const raw =
-    process.env.GOOGLE_SERVICE_ACCOUNT_JSON || process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON ||
+    process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 
   let serviceAccount = null;
 
@@ -82,7 +93,10 @@ function getFirestoreSafe() {
   }
 }
 
-function validateString(value, { required = false, maxLength = 500, label = "field" } = {}) {
+function validateString(
+  value,
+  { required = false, maxLength = 500, label = "field" } = {}
+) {
   if (required && (typeof value !== "string" || !value.trim())) {
     return `${label} is required`;
   }
@@ -136,6 +150,22 @@ function addMonths(date, months) {
   if (Number.isNaN(d.getTime())) return null;
   d.setMonth(d.getMonth() + Number(months || 0));
   return d;
+}
+
+/**
+ * Timing-safe compare for signature hex strings
+ */
+function safeEqualHex(a, b) {
+  if (!a || !b) return false;
+  const aStr = String(a);
+  const bStr = String(b);
+  if (aStr.length !== bStr.length) return false;
+
+  try {
+    return crypto.timingSafeEqual(Buffer.from(aStr, "utf8"), Buffer.from(bStr, "utf8"));
+  } catch (_e) {
+    return false;
+  }
 }
 
 const memoryQuota = new Map();
@@ -215,7 +245,6 @@ async function requireAuthenticatedUser(req, res, { allowGuest = true } = {}) {
       res.status(401).json({ error: "Authentication required" });
       return null;
     }
-
     return { uid: "guest", email: null, isGuest: true };
   }
 
@@ -226,7 +255,6 @@ function loadScoresModule() {
   if (getScoresForStudent) return getScoresForStudent;
 
   try {
-    // Lazily require so the function can still start if the file is missing in a build/deploy artefact.
     const mod = require("./scoresSheet.js");
     if (typeof mod.getScoresForStudent !== "function") {
       throw new Error("scoresSheet.getScoresForStudent is not a function");
@@ -240,7 +268,10 @@ function loadScoresModule() {
   }
 }
 
-const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 25 * 1024 * 1024 } });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 25 * 1024 * 1024 },
+});
 
 const audioUpload = (req, res, next) => {
   upload.single("audio")(req, res, (err) => {
@@ -276,6 +307,7 @@ app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) =>
   res.json({ ok: true, timestamp: new Date().toISOString(), uptimeSeconds: process.uptime() })
 );
+
 app.get("/metrics", (_req, res) => {
   const snapshot = getMetricsSnapshot();
   res.json({
@@ -314,7 +346,8 @@ const transcribeAudio = async (fileBuffer) => {
 const speakingPrompt = ({ teil, level, contextType, question, interactionMode }) => {
   const teilLabel = teil ? `Teil ${teil}` : "your last speaking sample";
   const context = contextType ? `Context: ${contextType}.` : "";
-  const interaction = typeof interactionMode === "undefined" ? "" : `Interaction mode: ${interactionMode}.`;
+  const interaction =
+    typeof interactionMode === "undefined" ? "" : `Interaction mode: ${interactionMode}.`;
 
   return (
     "You are a German speaking examiner and supportive coach. " +
@@ -383,16 +416,20 @@ async function findStudentByCodeOrEmail({ studentCode, email }) {
   return null;
 }
 
+/**
+ * =========================
+ * PAYSTACK: INITIALIZE
+ * =========================
+ */
 app.post("/paystack/initialize", async (req, res) => {
   const requestLog = createLogger({ scope: "paystack_initialize", requestId: req.requestId });
+
   try {
     const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
     if (!authedUser) return;
 
     const secret = process.env.PAYSTACK_SECRET;
-    if (!secret) {
-      return res.status(500).json({ error: "PAYSTACK_SECRET is missing" });
-    }
+    if (!secret) return res.status(500).json({ error: "PAYSTACK_SECRET is missing" });
 
     const db = getFirestoreSafe();
     if (!db) return res.status(500).json({ error: "Firestore not available" });
@@ -413,29 +450,32 @@ app.post("/paystack/initialize", async (req, res) => {
     const studentEmail = student?.email ? String(student.email).toLowerCase() : null;
     const authedEmail = authedUser?.email ? String(authedUser.email).toLowerCase() : null;
 
-    // Simple ownership check: the caller must be the student (by uid) or match the student's email.
+    // Ownership check: must be same uid OR same email
     if (student?.uid !== authedUser.uid && studentEmail && authedEmail !== studentEmail) {
       return res.status(403).json({ error: "Not authorized for this student" });
     }
 
     const tuitionFee = Math.max(Number(student.tuitionFee || 0), 0);
     const paidSoFar = Math.max(Number(student.initialPaymentAmount || 0), 0);
+
     const balanceDue = Number.isFinite(Number(student.balanceDue))
       ? Math.max(Number(student.balanceDue), 0)
       : Math.max(tuitionFee - paidSoFar, 0);
 
-    if (balanceDue <= 0) {
-      return res.status(400).json({ error: "No balance due" });
-    }
+    if (balanceDue <= 0) return res.status(400).json({ error: "No balance due" });
 
     if (amountGhs > balanceDue * (1 + PAYSTACK_OVERPAY_TOLERANCE_RATE)) {
       return res.status(400).json({ error: "Amount exceeds balance" });
     }
 
     const amountRounded = Math.round(amountGhs * 100) / 100;
+
+    // Minimum installment unless final balance
     const isFinalPayment = Math.abs(amountRounded - balanceDue) < 0.5;
     if (amountRounded < PAYSTACK_MIN_INSTALLMENT_GHS && !isFinalPayment) {
-      return res.status(400).json({ error: `Minimum payment is GH₵${PAYSTACK_MIN_INSTALLMENT_GHS} (or pay the remaining balance).` });
+      return res.status(400).json({
+        error: `Minimum payment is GH₵${PAYSTACK_MIN_INSTALLMENT_GHS} (or pay the remaining balance).`,
+      });
     }
 
     const payEmail = studentEmail || authedEmail;
@@ -465,7 +505,7 @@ app.post("/paystack/initialize", async (req, res) => {
 
     const initializePayload = {
       email: payEmail,
-      amount: Math.round(amountRounded * 100),
+      amount: Math.round(amountRounded * 100), // pesewas
       currency: String(student.tuitionCurrency || DEFAULT_TUITION_CURRENCY).toUpperCase(),
       callback_url: redirectUrl || undefined,
       metadata: { ...metadata, custom_fields },
@@ -486,23 +526,26 @@ app.post("/paystack/initialize", async (req, res) => {
         httpStatus: paystackRes.status,
         body: paystackJson,
       });
-      return res.status(502).json({ error: "Failed to initialize Paystack", details: paystackJson?.message });
+      return res.status(502).json({
+        error: "Failed to initialize Paystack",
+        details: paystackJson?.message,
+      });
     }
 
     const authorizationUrl = paystackJson?.data?.authorization_url || "";
     const reference = paystackJson?.data?.reference || "";
 
+    // IMPORTANT: Do NOT store authorization_url (single-use / expires).
     await studentRef.set(
       {
-        paystackLink: authorizationUrl,
         paymentIntentAmount: amountRounded,
         paystackReference: reference,
+        lastPaymentInitAt: admin.firestore.FieldValue.serverTimestamp(),
         updated_at: admin.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true }
     );
 
-    // Keep a lightweight audit trail for debugging.
     await db.collection("paystackInitRequests").doc(reference || crypto.randomUUID()).set(
       {
         studentCode,
@@ -516,6 +559,7 @@ app.post("/paystack/initialize", async (req, res) => {
       { merge: true }
     );
 
+    // Frontend will redirect to this
     return res.json({ ok: true, authorization_url: authorizationUrl, reference });
   } catch (err) {
     requestLog.error("paystack.initialize.error", { errorMessage: err?.message, stack: err?.stack });
@@ -523,6 +567,11 @@ app.post("/paystack/initialize", async (req, res) => {
   }
 });
 
+/**
+ * =========================
+ * PAYSTACK: WEBHOOK
+ * =========================
+ */
 app.post("/paystack/webhook", async (req, res) => {
   let dedupeRef;
   const webhookLog = createLogger({ scope: "paystack_webhook", requestId: req.requestId });
@@ -543,7 +592,9 @@ app.post("/paystack/webhook", async (req, res) => {
 
     const raw = req.rawBody || Buffer.from(JSON.stringify(req.body || {}));
     const computed = crypto.createHmac("sha512", secret).update(raw).digest("hex");
-    if (computed !== signature) {
+
+    // safer compare
+    if (!safeEqualHex(computed, signature)) {
       incrementCounter("webhook_errors", "invalid_signature");
       return res.status(401).json({ error: "Invalid signature" });
     }
@@ -557,9 +608,7 @@ app.post("/paystack/webhook", async (req, res) => {
     }
 
     const reference = data?.reference ? String(data.reference) : "";
-    if (!reference) {
-      return res.status(400).json({ error: "Missing Paystack reference" });
-    }
+    if (!reference) return res.status(400).json({ error: "Missing Paystack reference" });
 
     const payloadHash = crypto.createHash("sha256").update(raw).digest("hex");
     const db = admin.firestore();
@@ -569,9 +618,11 @@ app.post("/paystack/webhook", async (req, res) => {
       data?.metadata?.student_code ||
       data?.metadata?.studentcode ||
       null;
-    const email = data?.customer?.email ? String(data.customer.email).toLowerCase() : "";
 
+    const email = data?.customer?.email ? String(data.customer.email).toLowerCase() : "";
     const amountPaid = Number(data?.amount || 0) / 100;
+
+    // Dedup by reference
     dedupeRef = db.collection("paystackWebhookEvents").doc(reference);
     let alreadyProcessed = false;
 
@@ -602,6 +653,7 @@ app.post("/paystack/webhook", async (req, res) => {
     const markRejected = async (reason, extra = {}) => {
       incrementCounter("webhook_rejected", reason);
       webhookLog.warn("paystack.webhook.rejected", { reference, reason, ...extra });
+
       await dedupeRef.set(
         {
           status: "rejected",
@@ -611,6 +663,7 @@ app.post("/paystack/webhook", async (req, res) => {
         },
         { merge: true }
       );
+
       return res.status(202).json({ status: "rejected", reason });
     };
 
@@ -619,28 +672,37 @@ app.post("/paystack/webhook", async (req, res) => {
     if (!match) {
       webhookLog.warn("paystack.webhook.no_match", { studentCode, email });
       incrementCounter("webhook_no_match", "paystack");
+
       await dedupeRef.set(
-        {
-          status: "no-match",
-          handledAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
+        { status: "no-match", handledAt: admin.firestore.FieldValue.serverTimestamp() },
         { merge: true }
       );
+
       return res.status(202).json({ status: "no-match" });
     }
 
     const { ref, snap } = match;
     const studentData = snap.data() || {};
+
     const priorPaid = Number(studentData.initialPaymentAmount || 0);
     const tuitionFee = Number(studentData.tuitionFee || 0);
+
     const priorBalanceDue = Number.isFinite(Number(studentData.balanceDue))
       ? Math.max(Number(studentData.balanceDue), 0)
       : tuitionFee
-      ? Math.max(tuitionFee - Math.max(priorPaid, 0), 0)
-      : 0;
+        ? Math.max(tuitionFee - Math.max(priorPaid, 0), 0)
+        : 0;
+
     const expectedCurrency = String(studentData.tuitionCurrency || DEFAULT_TUITION_CURRENCY).toUpperCase();
     const payloadCurrency = String(data?.currency || "").toUpperCase();
-    const paidAtRaw = data?.paid_at || data?.paidAt || data?.transaction_date || data?.created_at || data?.createdAt;
+
+    const paidAtRaw =
+      data?.paid_at ||
+      data?.paidAt ||
+      data?.transaction_date ||
+      data?.created_at ||
+      data?.createdAt;
+
     const paidAtMs = paidAtRaw ? Date.parse(paidAtRaw) : NaN;
 
     if (!payloadCurrency || payloadCurrency !== expectedCurrency) {
@@ -651,7 +713,7 @@ app.post("/paystack/webhook", async (req, res) => {
       return markRejected("invalid_amount", { amountPaid });
     }
 
-    // Enforce our installment rule: minimum GH₵1000 unless this payment clears the remaining balance.
+    // Minimum installment unless final balance
     const isFinalPayment = priorBalanceDue > 0 && Math.abs(amountPaid - priorBalanceDue) < 0.5;
     if (amountPaid < PAYSTACK_MIN_INSTALLMENT_GHS && !isFinalPayment) {
       return markRejected("below_min_installment", { amountPaid, priorBalanceDue });
@@ -667,6 +729,7 @@ app.post("/paystack/webhook", async (req, res) => {
     }
 
     const projectedPaid = priorPaid + amountPaid;
+
     if (tuitionFee > 0) {
       const allowedCeiling = tuitionFee * (1 + PAYSTACK_OVERPAY_TOLERANCE_RATE);
       if (projectedPaid > allowedCeiling) {
@@ -682,21 +745,46 @@ app.post("/paystack/webhook", async (req, res) => {
     const balanceDue = tuitionFee ? Math.max(tuitionFee - totalPaid, 0) : null;
     const paymentStatus = tuitionFee && totalPaid < tuitionFee ? "partial" : "paid";
 
-    // Contract rule:
-    // - Any successful partial payment grants 1-month access.
-    // - Fully clearing tuition grants 6-month access.
+    /**
+     * Contract rule:
+     * - Any successful partial payment grants at least 1-month access.
+     * - Fully clearing tuition grants 6-month access.
+     *
+     * Important: Do NOT reset contractStart every time.
+     * - If existing contract is active (contractEnd > now), keep existing start.
+     * - If expired or missing, start from now.
+     * - If upgrading to 6-month, extend end date.
+     */
     const now = new Date();
-    const contractMonths = paymentStatus === "paid" ? 6 : 1;
-    const contractStart = now.toISOString();
-    const contractEndDate = addMonths(now, contractMonths);
+
+    const existingStart = studentData.contractStart ? new Date(studentData.contractStart) : null;
+    const existingEnd = studentData.contractEnd ? new Date(studentData.contractEnd) : null;
+
+    const startIsValid = existingStart && !Number.isNaN(existingStart.getTime());
+    const endIsValid = existingEnd && !Number.isNaN(existingEnd.getTime());
+
+    const contractWasActive = endIsValid && existingEnd > now;
+
+    const contractStartDate = contractWasActive && startIsValid ? existingStart : now;
+
+    const targetMonths = paymentStatus === "paid" ? 6 : 1;
+    const currentMonths = Number(studentData.contractTermMonths || 0);
+
+    // Keep the bigger access (never reduce)
+    const finalMonths = Math.max(currentMonths, targetMonths);
+
+    const proposedEnd = addMonths(contractStartDate, finalMonths);
+
+    // If they already had a later end date, preserve it
+    const contractEndDate = endIsValid && existingEnd > proposedEnd ? existingEnd : proposedEnd;
 
     const updates = {
       initialPaymentAmount: totalPaid,
       balanceDue,
       paymentStatus,
-      contractStart,
+      contractStart: contractStartDate.toISOString(),
       contractEnd: contractEndDate ? contractEndDate.toISOString() : "",
-      contractTermMonths: contractMonths,
+      contractTermMonths: finalMonths,
       status: "Active",
       paystackReference: data?.reference || studentData.paystackReference || "",
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
@@ -714,20 +802,28 @@ app.post("/paystack/webhook", async (req, res) => {
         studentId: ref.id,
         paymentStatus,
         balanceDue,
+        contractTermMonths: finalMonths,
       },
       { merge: true }
     );
 
     incrementCounter("webhook_handled", paymentStatus || "handled");
-    webhookLog.info("paystack.webhook.success", { reference, studentId: ref.id, paymentStatus, balanceDue });
+    webhookLog.info("paystack.webhook.success", {
+      reference,
+      studentId: ref.id,
+      paymentStatus,
+      balanceDue,
+      contractTermMonths: finalMonths,
+    });
 
-    return res.json({ status: "synced", paymentStatus, balanceDue });
+    return res.json({ status: "synced", paymentStatus, balanceDue, contractTermMonths: finalMonths });
   } catch (err) {
     incrementCounter("webhook_errors", "processing_error");
     webhookLog.error("paystack.webhook.error", {
       errorMessage: err?.message || "unknown",
       stack: err?.stack,
     });
+
     try {
       if (dedupeRef) {
         await dedupeRef.set(
@@ -742,10 +838,16 @@ app.post("/paystack/webhook", async (req, res) => {
     } catch (dedupeErr) {
       console.warn("Failed to update dedupe record", dedupeErr?.message || dedupeErr);
     }
+
     return res.status(500).json({ error: "Failed to process webhook" });
   }
 });
 
+/**
+ * =========================
+ * AI / WRITING ROUTES
+ * =========================
+ */
 app.post("/writing/ideas", async (req, res) => {
   try {
     const { level = "A2", messages = [] } = req.body || {};
@@ -762,7 +864,6 @@ app.post("/writing/ideas", async (req, res) => {
     ];
 
     const reply = await createChatCompletion(chatMessages, { max_tokens: 750 });
-
     res.json({ reply });
   } catch (err) {
     console.error("/writing/ideas error", err);
@@ -785,7 +886,6 @@ app.post("/writing/mark", async (req, res) => {
     ];
 
     const feedback = await createChatCompletion(messages, { max_tokens: 750 });
-
     res.json({ feedback });
   } catch (err) {
     console.error("/writing/mark error", err);
@@ -798,9 +898,7 @@ app.post("/discussion/correct", async (req, res) => {
     const { text, level = "A2" } = req.body || {};
     const input = String(text || "").trim();
 
-    if (!input) {
-      return res.status(400).json({ error: "Text is required for correction" });
-    }
+    if (!input) return res.status(400).json({ error: "Text is required for correction" });
 
     const messages = [
       {
@@ -814,7 +912,6 @@ app.post("/discussion/correct", async (req, res) => {
     ];
 
     const corrected = await createChatCompletion(messages, { temperature: 0.2, max_tokens: 300 });
-
     return res.json({ corrected });
   } catch (err) {
     console.error("/discussion/correct error", err);
@@ -827,9 +924,7 @@ app.post("/profile/biography/correct", async (req, res) => {
     const { text, level = "A2" } = req.body || {};
     const input = String(text || "").trim();
 
-    if (!input) {
-      return res.status(400).json({ error: "Biography text is required" });
-    }
+    if (!input) return res.status(400).json({ error: "Biography text is required" });
 
     const messages = [
       {
@@ -843,7 +938,6 @@ app.post("/profile/biography/correct", async (req, res) => {
     ];
 
     const corrected = await createChatCompletion(messages, { temperature: 0.25, max_tokens: 220 });
-
     return res.json({ corrected });
   } catch (err) {
     console.error("/profile/biography/correct error", err);
@@ -865,11 +959,14 @@ app.post("/grammar/ask", async (req, res) => {
       validateString(trimmedQuestion, { required: true, maxLength: 400, label: "question" }) ||
       validateString(level, { maxLength: 10, label: "level" });
 
-    if (validationError) {
-      return res.status(400).json({ error: validationError });
-    }
+    if (validationError) return res.status(400).json({ error: validationError });
 
-    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "grammar", limit: DAILY_LIMITS.grammar });
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "grammar",
+      limit: DAILY_LIMITS.grammar,
+    });
+
     if (!quota.allowed) {
       log.warn("quota.blocked", { route: "/grammar/ask", uid: authedUser.uid, category: "grammar" });
       return res.status(429).json({ error: "Daily grammar question limit reached" });
@@ -910,7 +1007,12 @@ app.post("/grammar/ask", async (req, res) => {
     return res.json({ answer, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/grammar/ask error", err);
-    auditAIRequest({ route: "/grammar/ask", uid: authedUser?.uid, email: authedUser?.email, success: false });
+    auditAIRequest({
+      route: "/grammar/ask",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
     return res.status(500).json({ error: err.message || "Failed to answer grammar question" });
   }
 });
@@ -963,9 +1065,7 @@ app.post("/legacy/login", async (req, res) => {
       snapshot = query.docs[0];
     }
 
-    if (!snapshot || !snapshot.exists) {
-      return res.status(404).json({ error: "Student not found" });
-    }
+    if (!snapshot || !snapshot.exists) return res.status(404).json({ error: "Student not found" });
 
     const student = snapshot.data() || {};
     const hashedPassword = student.password;
@@ -975,12 +1075,9 @@ app.post("/legacy/login", async (req, res) => {
     }
 
     const isValid = await bcrypt.compare(providedPassword, hashedPassword);
-    if (!isValid) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
+    if (!isValid) return res.status(401).json({ error: "Invalid credentials" });
 
     const { password: _hiddenPassword, ...studentSafe } = student;
-
     return res.json({ id: snapshot.id, ...studentSafe });
   } catch (e) {
     console.error("/legacy/login error", e);
@@ -988,7 +1085,6 @@ app.post("/legacy/login", async (req, res) => {
   }
 });
 
-// READ-ONLY scores from Google Sheet
 app.get("/scores", async (req, res) => {
   try {
     const studentCode = String(req.query.studentCode || "").trim();
@@ -1008,18 +1104,9 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    if (!req.file) {
-      return res.status(400).json({ error: "Audio file is required" });
-    }
+    if (!req.file) return res.status(400).json({ error: "Audio file is required" });
 
-    const {
-      teil,
-      level = "A2",
-      contextType,
-      question,
-      interactionMode,
-      userId = "guest",
-    } = req.body || {};
+    const { teil, level = "A2", contextType, question, interactionMode, userId = "guest" } = req.body || {};
 
     const validationError =
       validateString(teil, { maxLength: 20, label: "teil" }) ||
@@ -1027,9 +1114,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
       validateString(contextType, { maxLength: 60, label: "context" }) ||
       validateString(question, { maxLength: 400, label: "question" });
 
-    if (validationError) {
-      return res.status(400).json({ error: validationError });
-    }
+    if (validationError) return res.status(400).json({ error: validationError });
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
@@ -1038,17 +1123,11 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     }
 
     const transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1800);
-
-    if (!transcript) {
-      return res.status(500).json({ error: "Could not transcribe audio" });
-    }
+    if (!transcript) return res.status(500).json({ error: "Could not transcribe audio" });
 
     const messages = [
       { role: "system", content: speakingPrompt({ teil, level, contextType, question, interactionMode }) },
-      {
-        role: "user",
-        content: `User ${authedUser.uid || userId} speaking sample transcript: ${transcript}`,
-      },
+      { role: "user", content: `User ${authedUser.uid || userId} speaking sample transcript: ${transcript}` },
     ];
 
     const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 500 });
@@ -1083,9 +1162,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
       validateString(level, { maxLength: 10, label: "level" }) ||
       validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
 
-    if (validationError) {
-      return res.status(400).json({ error: validationError });
-    }
+    if (validationError) return res.status(400).json({ error: validationError });
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
@@ -1121,20 +1198,10 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const {
-      initialTranscript,
-      followUpQuestion,
-      teil,
-      level = "A2",
-      targetLevel,
-      userId = "guest",
-    } = req.body || {};
-
+    const { initialTranscript, followUpQuestion, teil, level = "A2", targetLevel, userId = "guest" } = req.body || {};
     let transcript = String(initialTranscript || "").trim();
 
-    if (!transcript && req.file) {
-      transcript = (await transcribeAudio(req.file)) || "";
-    }
+    if (!transcript && req.file) transcript = (await transcribeAudio(req.file)) || "";
 
     const validationError =
       validateString(transcript, { required: true, maxLength: 1800, label: "transcript" }) ||
@@ -1143,9 +1210,7 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
       validateString(level, { maxLength: 10, label: "level" }) ||
       validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
 
-    if (validationError) {
-      return res.status(400).json({ error: validationError });
-    }
+    if (validationError) return res.status(400).json({ error: validationError });
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
@@ -1162,7 +1227,9 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
       },
       {
         role: "user",
-        content: `User ${authedUser.uid || userId} follow-up answer to '${followUpQuestion || "prompt"}': ${transcript}`,
+        content: `User ${authedUser.uid || userId} follow-up answer to '${
+          followUpQuestion || "prompt"
+        }': ${transcript}`,
       },
     ];
 
@@ -1189,9 +1256,7 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    if (!req.file) {
-      return res.status(400).json({ error: "Audio recording is required" });
-    }
+    if (!req.file) return res.status(400).json({ error: "Audio recording is required" });
 
     const { note = "", level = "B1", userId = "guest" } = req.body || {};
 
@@ -1199,11 +1264,14 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
       validateString(note, { maxLength: 300, label: "note" }) ||
       validateString(level, { maxLength: 10, label: "level" });
 
-    if (validationError) {
-      return res.status(400).json({ error: validationError });
-    }
+    if (validationError) return res.status(400).json({ error: validationError });
 
-    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speechTrainer", limit: DAILY_LIMITS.speechTrainer });
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "speechTrainer",
+      limit: DAILY_LIMITS.speechTrainer,
+    });
+
     if (!quota.allowed) {
       log.warn("quota.blocked", { route: "/speech-trainer/feedback", uid: authedUser.uid, category: "speechTrainer" });
       return res.status(429).json({ error: "Daily speech trainer limit reached" });
@@ -1213,10 +1281,7 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
 
     const messages = [
       { role: "system", content: speechTrainerPrompt({ level, note: String(note || "").trim() }) },
-      {
-        role: "user",
-        content: transcript || "No words detected. Offer a one-line microphone troubleshooting tip in English.",
-      },
+      { role: "user", content: transcript || "No words detected. Offer a one-line microphone troubleshooting tip in English." },
     ];
 
     const feedback = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 420 });
@@ -1252,9 +1317,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
       validateString(message, { maxLength: 800, label: "message" }) ||
       validateString(level, { maxLength: 10, label: "level" });
 
-    if (validationError) {
-      return res.status(400).json({ error: validationError });
-    }
+    if (validationError) return res.status(400).json({ error: validationError });
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
     if (!quota.allowed) {
@@ -1263,10 +1326,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
     }
 
     let transcript = "";
-
-    if (req.file) {
-      transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1200);
-    }
+    if (req.file) transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1200);
 
     const trimmedMessage = String(message || "").trim();
     const combinedMessage = [trimmedMessage, transcript ? `Audio transcript: ${transcript}` : null]
@@ -1284,13 +1344,9 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
     try {
       reply = await createChatCompletion(chatMessages, { temperature: 0.55, max_tokens: 420 });
     } catch (err) {
-      log.error("chatbuddy.completion.failed", {
-        errorMessage: err?.message || "unknown",
-        uid: authedUser.uid,
-      });
+      log.error("chatbuddy.completion.failed", { errorMessage: err?.message || "unknown", uid: authedUser.uid });
       fallbackUsed = true;
-      reply =
-        "Sorry, the chat buddy is unavailable right now. Please try again in a few moments or send a shorter message.";
+      reply = "Sorry, the chat buddy is unavailable right now. Please try again in a few moments or send a shorter message.";
     }
 
     auditAIRequest({
@@ -1316,13 +1372,12 @@ app.post("/tutor/placement", async (req, res) => {
     if (!authedUser) return;
 
     const { answers = [], targetLevel, userId = "guest" } = req.body || {};
+
     const validationError =
       validateAnswersArray(answers, { maxEntries: 8, maxTextLength: 700 }) ||
       validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
 
-    if (validationError) {
-      return res.status(400).json({ error: validationError });
-    }
+    if (validationError) return res.status(400).json({ error: validationError });
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "placement", limit: DAILY_LIMITS.placement });
     if (!quota.allowed) {
@@ -1341,7 +1396,6 @@ app.post("/tutor/placement", async (req, res) => {
     const reply = await createChatCompletion(messages, { temperature: 0.2, max_tokens: 400 });
 
     let placement;
-
     try {
       placement = JSON.parse(reply);
     } catch (_err) {
@@ -1400,7 +1454,6 @@ app.get("/tutor/next-task", async (req, res) => {
     const reply = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 200 });
 
     let nextTask;
-
     try {
       nextTask = JSON.parse(reply);
     } catch (_err) {
@@ -1422,12 +1475,7 @@ app.get("/tutor/next-task", async (req, res) => {
     return res.json({ nextTask, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/tutor/next-task error", err);
-    auditAIRequest({
-      route: "/tutor/next-task",
-      uid: authedUser?.uid,
-      email: authedUser?.email,
-      success: false,
-    });
+    auditAIRequest({ route: "/tutor/next-task", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to fetch next task" });
   }
 });
