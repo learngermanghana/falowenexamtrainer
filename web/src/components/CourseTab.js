@@ -22,7 +22,6 @@ const buildLevelSchedules = () => {
 
   Object.values(courseSchedulesByName).forEach((schedule) => {
     const level = normalizeLevel(schedule.course);
-
     if (!level || courseSchedules[level] || derivedSchedules[level]) return;
 
     derivedLevels.add(level);
@@ -35,8 +34,7 @@ const buildLevelSchedules = () => {
 
       const lessonList = sessions.map((session, index) => {
         const video = session.video || session.youtube_link || fallback.video || null;
-        const grammarbook_link =
-          session.grammarbook_link ?? fallback.grammarbook_link ?? null;
+        const grammarbook_link = session.grammarbook_link ?? fallback.grammarbook_link ?? null;
         const workbook_link = session.workbook_link ?? fallback.workbook_link ?? null;
 
         usedFallbackResource =
@@ -48,7 +46,8 @@ const buildLevelSchedules = () => {
         return {
           chapter: session.chapter || session.title || `Session ${index + 1}`,
           title: session.title,
-          assignment: false,
+          // ✅ FIX: keep real assignment value if it exists
+          assignment: Boolean(session.assignment),
           note: session.note,
           type: session.type,
           video,
@@ -83,8 +82,8 @@ const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules(
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
-const getLessonKey = (lesson) => {
-  return [
+const getLessonKey = (lesson) =>
+  [
     lesson.chapter || lesson.title || "",
     lesson.video || "",
     lesson.youtube_link || "",
@@ -92,12 +91,10 @@ const getLessonKey = (lesson) => {
     lesson.workbook_link || "",
     Boolean(lesson.assignment),
   ].join("::");
-};
 
 const LessonList = ({ title, lessons }) => {
   const uniqueLessons = useMemo(() => {
     const seen = new Set();
-
     return lessons.filter((lesson) => {
       const key = getLessonKey(lesson);
       if (seen.has(key)) return false;
@@ -125,19 +122,14 @@ const LessonList = ({ title, lessons }) => {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-              <div style={{ fontWeight: 700 }}>
-                {lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}
-              </div>
+              <div style={{ fontWeight: 700 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}</div>
               {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
             </div>
+
             <ul style={{ ...styles.checklist, margin: 0 }}>
               {lesson.video || lesson.youtube_link ? (
                 <li>
-                  <a
-                    href={lesson.video || lesson.youtube_link}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                  <a href={lesson.video || lesson.youtube_link} target="_blank" rel="noreferrer">
                     Video ansehen
                   </a>
                 </li>
@@ -168,55 +160,45 @@ const CourseTab = ({ defaultLevel }) => {
   const levels = useMemo(() => {
     const baseLevels = Object.keys(mergedCourseSchedules);
     const normalizedDefault = normalizeLevel(defaultLevel);
-
-    if (normalizedDefault && !baseLevels.includes(normalizedDefault)) {
-      return [...baseLevels, normalizedDefault];
-    }
-
-    return baseLevels;
+    const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
+    // optional: stable order
+    return merged.sort((a, b) => a.localeCompare(b));
   }, [defaultLevel]);
+
   const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
     const normalizedDefault = normalizeLevel(defaultLevel);
     if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
     return levels[0] || "";
   });
+
   const [searchTerm, setSearchTerm] = useState("");
   const [assignmentsOnly, setAssignmentsOnly] = useState(false);
 
   useEffect(() => {
     const normalizedDefault = normalizeLevel(defaultLevel);
-    if (
-      normalizedDefault &&
-      levels.includes(normalizedDefault) &&
-      normalizedDefault !== selectedCourseLevel
-    ) {
+    if (normalizedDefault && levels.includes(normalizedDefault) && normalizedDefault !== selectedCourseLevel) {
       setSelectedCourseLevel(normalizedDefault);
     }
   }, [defaultLevel, levels, selectedCourseLevel]);
 
   const schedule = useMemo(() => mergedCourseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
-
-  const isDerivedLevel = useMemo(
-    () => derivedLevels.has(selectedCourseLevel),
-    [selectedCourseLevel]
-  );
+  const isDerivedLevel = useMemo(() => derivedLevels.has(selectedCourseLevel), [selectedCourseLevel]);
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
 
     const matchesSearch = (entry) => {
       if (!normalizedTerm) return true;
-      const dayMatches = `${entry.day}`.includes(normalizedTerm);
-      const topicMatches = (entry.topic || "").toLowerCase().includes(normalizedTerm);
-      const chapterMatches = (entry.chapter || "").toLowerCase().includes(normalizedTerm);
-      const grammarMatches = (entry.grammar_topic || "").toLowerCase().includes(normalizedTerm);
-
-      return dayMatches || topicMatches || chapterMatches || grammarMatches;
+      return (
+        `${entry.day}`.includes(normalizedTerm) ||
+        (entry.topic || "").toLowerCase().includes(normalizedTerm) ||
+        (entry.chapter || "").toLowerCase().includes(normalizedTerm) ||
+        (entry.grammar_topic || "").toLowerCase().includes(normalizedTerm)
+      );
     };
 
     const hasAssignment = (entry) => {
       if (entry.assignment) return true;
-
       return (
         toLessonArray(entry.lesen_hören).some((lesson) => lesson.assignment) ||
         toLessonArray(entry.schreiben_sprechen).some((lesson) => lesson.assignment)
@@ -230,11 +212,7 @@ const CourseTab = ({ defaultLevel }) => {
     const entry = filteredSchedule[0];
     if (!entry) return null;
 
-    const lessons = [
-      ...toLessonArray(entry.lesen_hören),
-      ...toLessonArray(entry.schreiben_sprechen),
-    ];
-
+    const lessons = [...toLessonArray(entry.lesen_hören), ...toLessonArray(entry.schreiben_sprechen)];
     const findLink = (key) => lessons.find((lesson) => lesson?.[key])?.[key] || null;
     const videoLesson = lessons.find((lesson) => lesson?.video || lesson?.youtube_link);
 
@@ -250,29 +228,12 @@ const CourseTab = ({ defaultLevel }) => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 12 }}>
-        <div
-          style={{
-            display: "grid",
-            gap: 12,
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 10,
-              alignItems: "center",
-              flexWrap: "wrap",
-            }}
-          >
+        <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <h2 style={styles.sectionTitle}>Course Book</h2>
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <span style={styles.helperText}>Course level:</span>
-              <select
-                style={styles.select}
-                value={selectedCourseLevel}
-                onChange={(e) => setSelectedCourseLevel(e.target.value)}
-              >
+              <select style={styles.select} value={selectedCourseLevel} onChange={(e) => setSelectedCourseLevel(e.target.value)}>
                 {levels.map((level) => (
                   <option key={level} value={level}>
                     {level}
@@ -292,21 +253,20 @@ const CourseTab = ({ defaultLevel }) => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </label>
+
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input
-                type="checkbox"
-                checked={assignmentsOnly}
-                onChange={(e) => setAssignmentsOnly(e.target.checked)}
-              />
+              <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
               <span style={styles.helperText}>Show only items with assignments</span>
             </label>
           </div>
         </div>
+
         <p style={styles.helperText}>
           {isDerivedLevel
             ? "This level uses the class schedule because the course book dictionary does not yet include it."
             : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
         </p>
+
         {quickActions && (quickActions.video || quickActions.grammarbook || quickActions.workbook) ? (
           <div style={{ ...styles.card, marginBottom: 0, padding: 12, display: "grid", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
@@ -354,15 +314,16 @@ const CourseTab = ({ defaultLevel }) => {
                   <div>
                     <span style={styles.levelPill}>Day {entry.day}</span>
                     <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
-                    {entry.chapter ? <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div> : null}
+                    {entry.chapter ? (
+                      <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div>
+                    ) : null}
                   </div>
+
                   <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
                     {entry.assignment !== undefined ? (
                       <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
                     ) : null}
-                    {isDerivedLevel ? (
-                      <span style={styles.levelPill}>From class schedule</span>
-                    ) : null}
+                    {isDerivedLevel ? <span style={styles.levelPill}>From class schedule</span> : null}
                     {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
                   </div>
                 </div>
@@ -394,9 +355,12 @@ const CourseTab = ({ defaultLevel }) => {
               </div>
             );
           })}
+
           {!filteredSchedule.length ? (
             <div style={{ ...styles.card, marginBottom: 0 }}>
-              <p style={{ margin: 0 }}>No course days match your filters. Try another search term or turn off the assignment filter.</p>
+              <p style={{ margin: 0 }}>
+                No course days match your filters. Try another search term or turn off the assignment filter.
+              </p>
             </div>
           ) : null}
         </div>
