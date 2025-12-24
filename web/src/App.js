@@ -23,6 +23,7 @@ import SpeakingPage from "./components/SpeakingPage";
 import ExamResources from "./components/ExamResources";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
+import PaymentComplete from "./components/PaymentComplete";
 
 const TAB_STRUCTURE = [
   {
@@ -93,6 +94,7 @@ function App() {
     saveStudentProfile,
   } = useAuth();
   const [authMode, setAuthMode] = useState("landing");
+  const location = useLocation();
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
@@ -129,7 +131,6 @@ function App() {
     () => (studentProfile?.paymentStatus || "pending").toLowerCase(),
     [studentProfile?.paymentStatus]
   );
-  const awaitingVerification = Boolean(user && !user.emailVerified);
   const awaitingPayment =
     Boolean(studentProfile) && !isStaff && !["paid", "partial"].includes(paymentStatus);
 
@@ -159,6 +160,10 @@ function App() {
     );
   }
 
+  if (location.pathname === "/payment-complete") {
+    return <PaymentComplete />;
+  }
+
   if (!user) {
     if (authMode === "signup") {
       return <SignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
@@ -177,7 +182,7 @@ function App() {
     );
   }
 
-  if (awaitingVerification || awaitingPayment) {
+  if (awaitingPayment) {
     return <SetupCheckpoint />;
   }
 

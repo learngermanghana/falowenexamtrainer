@@ -34,7 +34,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     try {
       if (mode === "signup") {
         const studentCode = generateStudentCode({ name });
-        const result = await signup(email, password, {
+        await signup(email, password, {
           name,
           level: selectedLevel,
           studentCode,
@@ -45,16 +45,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         });
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
-        const successMessage =
-          `Account created! Your student code is ${studentCode}. Verify your email to unlock classes.`;
+        const successMessage = `Account created! Your student code is ${studentCode}.`;
         setMessage(successMessage);
-        showToast(
-          `${successMessage} Check your inbox for a verification link from Falowen and finish setup inside the app.`,
-          "success"
-        );
-        if (result?.verificationRequired) {
-          setMode("login");
-        }
+        showToast(`${successMessage} Finish setup inside the app.`, "success");
       } else {
         const loginResult = await login(email, password);
         const credential = loginResult?.credential || loginResult;
@@ -68,35 +61,16 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         }
         const loginMessage = credential?.migratedFromLegacy
           ? "We found your old account. Your new password is now saved."
-          : loginResult?.emailVerificationRequired
-          ? "Signed in with limited access. Please verify your email to unlock classes."
           : "Welcome back!";
         setMessage(loginMessage);
-        showToast(loginMessage, loginResult?.emailVerificationRequired ? "info" : "success");
+        showToast(loginMessage, "success");
       }
     } catch (error) {
       console.error(error);
-      if (
-        error?.code === "auth/email-not-verified" ||
-        error?.code === "auth/email-verification-required"
-      ) {
-        setAuthError("");
-        const verificationMessage =
-          error.message || "Please verify your email address.";
-        setMessage(verificationMessage);
-        showToast(
-          `${verificationMessage} Check your inbox for the Falowen verification email.`,
-          "info"
-        );
-        if (error?.code === "auth/email-verification-required") {
-          setMode("login");
-        }
-      } else {
-        const errorMessage = error?.message || "Login failed. Please try again.";
-        setAuthError(errorMessage);
-        showToast(errorMessage, "error");
-        setMessage("");
-      }
+      const errorMessage = error?.message || "Login failed. Please try again.";
+      setAuthError(errorMessage);
+      showToast(errorMessage, "error");
+      setMessage("");
     } finally {
       setLoading(false);
     }
