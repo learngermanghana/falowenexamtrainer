@@ -330,7 +330,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${paymentRedirectNote}${balanceText}`;
       setMessage(successMessage);
       showToast(
-        `${successMessage} Check your email for a Falowen verification link and finish setup inside the app.`,
+        `${successMessage} Finish setup inside the app.`,
         "success"
       );
     } catch (error) {
@@ -611,6 +611,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             balanceDue={isTrial ? 0 : tuitionSummary.tuitionFee}
             tuitionFee={tuitionSummary.tuitionFee}
             paystackLink={tuitionSummary.paystackLink}
+            showPaymentAction={false}
             title="Tuition summary"
             description={
               isTrial

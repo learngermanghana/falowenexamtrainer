@@ -21,6 +21,7 @@ const TuitionStatusCard = ({
   checkoutAmountOverride,
   title = "Tuition & payments",
   description,
+  showPaymentAction = true,
 }) => {
   const summary = computeTuitionStatus({ level, paidAmount, tuitionFee, balanceDue });
   const tone = STATUS_TONES[summary.statusLabel] || STATUS_TONES.Pending;
@@ -71,37 +72,39 @@ const TuitionStatusCard = ({
           <span>Balance remaining</span>
           <span style={metaValueStyle}>{summary.balanceDue ? `GH₵${summary.balanceDue}` : "GH₵0"}</span>
         </div>
-        {paymentsEnabled ? (
-          <a
-            href={checkoutLinkWithParams}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              ...styles.primaryButton,
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 10,
-              textDecoration: "none",
-            }}
-          >
-            Pay tuition online
-          </a>
-        ) : (
-          <div
-            style={{
-              ...styles.errorBox,
-              background: "#f1f5f9",
-              borderColor: "#cbd5e1",
-              color: "#0f172a",
-            }}
-          >
-            <strong>Payments are only available on the web app.</strong>
-            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-              Please sign in from the website to complete your tuition payment through our secure portal.
-            </p>
-          </div>
-        )}
+        {showPaymentAction ? (
+          paymentsEnabled ? (
+            <a
+              href={checkoutLinkWithParams}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...styles.primaryButton,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                textDecoration: "none",
+              }}
+            >
+              Pay tuition online
+            </a>
+          ) : (
+            <div
+              style={{
+                ...styles.errorBox,
+                background: "#f1f5f9",
+                borderColor: "#cbd5e1",
+                color: "#0f172a",
+              }}
+            >
+              <strong>Payments are only available on the web app.</strong>
+              <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+                Please sign in from the website to complete your tuition payment through our secure portal.
+              </p>
+            </div>
+          )
+        ) : null}
       </div>
     </div>
   );

@@ -3,7 +3,6 @@ import {
   auth,
   createUserWithEmailAndPassword,
   onIdTokenChanged,
-  sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
@@ -46,61 +45,6 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState("");
   const [notificationStatus, setNotificationStatus] = useState("idle");
   const [messagingToken, setMessagingToken] = useState(null);
-
-  // Firebase applies rate limits to verification emails (auth/too-many-requests).
-  // We also add a client-side cooldown to avoid users hammering the button.
-  const VERIFICATION_EMAIL_COOLDOWN_MS = 60 * 1000; // 60s
-  const verificationKeyForUser = (uid) => (uid ? `falowen:verify-email:lastSent:${uid}` : null);
-  const setVerificationSentNow = (uid) => {
-    try {
-      const key = verificationKeyForUser(uid);
-      if (!key) return;
-      localStorage.setItem(key, String(Date.now()));
-    } catch {
-      // ignore storage failures
-    }
-  };
-  const getVerificationCooldownRemainingMs = (uid) => {
-    try {
-      const key = verificationKeyForUser(uid);
-      if (!key) return 0;
-      const raw = localStorage.getItem(key);
-      const last = raw ? Number(raw) : 0;
-      if (!Number.isFinite(last) || last <= 0) return 0;
-      const elapsed = Date.now() - last;
-      return Math.max(VERIFICATION_EMAIL_COOLDOWN_MS - elapsed, 0);
-    } catch {
-      return 0;
-    }
-  };
-
-  const sendVerificationEmailSafely = async (firebaseUser, { force = false } = {}) => {
-    if (!firebaseUser) throw new Error("No user is signed in.");
-
-    const remainingMs = force ? 0 : getVerificationCooldownRemainingMs(firebaseUser.uid);
-    if (remainingMs > 0) {
-      const seconds = Math.ceil(remainingMs / 1000);
-      const err = new Error(`Please wait ${seconds}s before requesting another verification email.`);
-      err.code = "verification/cooldown";
-      throw err;
-    }
-
-    try {
-      await sendEmailVerification(firebaseUser, getActionCodeSettings());
-      setVerificationSentNow(firebaseUser.uid);
-      return { sent: true };
-    } catch (error) {
-      // Surface friendlier copy for common Firebase auth errors.
-      if (error?.code === "auth/too-many-requests") {
-        const err = new Error(
-          "Too many verification emails were requested. Please wait a few minutes, then try again."
-        );
-        err.code = error.code;
-        throw err;
-      }
-      throw error;
-    }
-  };
 
   const persistMessagingToken = useCallback(async (token, studentId) => {
     if (!studentId || !token) return;
@@ -310,15 +254,9 @@ export const AuthProvider = ({ children }) => {
     }
 
     await setDoc(studentsRef, payload, { merge: true });
-    // Don't fail sign-up if Firebase is rate-limiting verification emails.
-    try {
-      await sendVerificationEmailSafely(credential.user, { force: true });
-    } catch (error) {
-      console.warn("Failed to send verification email during signup", error);
-    }
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
-    return { verificationRequired: true, studentCode, paystackLink: payload.paystackLink };
+    return { studentCode, paystackLink: payload.paystackLink };
   };
 
   const login = async (email, password) => {
@@ -337,16 +275,6 @@ export const AuthProvider = ({ children }) => {
 
       if (meta.migratedFromLegacy) {
         credential.migratedFromLegacy = true;
-      }
-
-      if (!credential.user.emailVerified) {
-        // Try to auto-send once per minute to avoid Firebase rate limiting.
-        try {
-          await sendVerificationEmailSafely(credential.user);
-        } catch (error) {
-          // ignore (UI lets the user resend manually)
-        }
-        return { credential, emailVerificationRequired: true, ...meta };
       }
 
       return { credential, ...meta };
@@ -411,14 +339,6 @@ export const AuthProvider = ({ children }) => {
     await reload(auth.currentUser);
     setUser(auth.currentUser);
     return auth.currentUser;
-  };
-
-  const resendVerificationEmail = async () => {
-    if (!auth?.currentUser) {
-      throw new Error("No user is signed in.");
-    }
-
-    await sendVerificationEmailSafely(auth.currentUser);
   };
 
   const resetPassword = async (email) => {
@@ -564,7 +484,6 @@ export const AuthProvider = ({ children }) => {
       notificationStatus,
       saveStudentProfile,
       refreshUser,
-      resendVerificationEmail,
     }),
     [
       user,
@@ -579,7 +498,6 @@ export const AuthProvider = ({ children }) => {
       enableNotifications,
       logout,
       refreshUser,
-      resendVerificationEmail,
     ]
   );
 
