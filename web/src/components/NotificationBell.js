@@ -34,6 +34,7 @@ const NotificationBell = ({ notificationStatus }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(false);
 
   const needsPushOptIn = useMemo(
     () => notificationStatus !== "granted" && notificationStatus !== "pending",
@@ -60,6 +61,17 @@ const NotificationBell = ({ notificationStatus }) => {
     // refresh when profile changes
   }, [studentProfile]);
 
+  useEffect(() => {
+    const updateDeviceSize = () => {
+      if (typeof window === "undefined") return;
+      setIsMobile(window.matchMedia("(max-width: 640px)").matches);
+    };
+
+    updateDeviceSize();
+    window?.addEventListener("resize", updateDeviceSize);
+    return () => window?.removeEventListener("resize", updateDeviceSize);
+  }, []);
+
   const statusLabel = useMemo(() => {
     if (notificationStatus === "granted") return "Push on";
     if (notificationStatus === "pending") return "Enabling push";
@@ -75,8 +87,32 @@ const NotificationBell = ({ notificationStatus }) => {
     setOpen((prev) => !prev);
   };
 
+  const drawerStyle = useMemo(
+    () => ({
+      position: "absolute",
+      top: "calc(100% + 8px)",
+      right: isMobile ? "auto" : 0,
+      left: isMobile ? 0 : "auto",
+      width: isMobile ? "calc(100vw - 32px)" : 360,
+      maxWidth: isMobile ? "calc(100vw - 16px)" : 420,
+      minWidth: isMobile ? "auto" : 320,
+      background: "#fff",
+      border: "1px solid #e5e7eb",
+      borderRadius: 12,
+      boxShadow: "0 12px 35px rgba(0,0,0,0.12)",
+      zIndex: 20,
+      padding: isMobile ? 14 : 12,
+      display: "grid",
+      gap: isMobile ? 10 : 8,
+      boxSizing: "border-box",
+      maxHeight: "70vh",
+      overflowY: "auto",
+    }),
+    [isMobile]
+  );
+
   return (
-    <div style={{ position: "relative" }}>
+    <div style={{ position: "relative", width: isMobile ? "100%" : "auto" }}>
       <button
         style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6 }}
         onClick={handleToggle}
@@ -88,22 +124,7 @@ const NotificationBell = ({ notificationStatus }) => {
         <NotificationBadge count={items.length} />
       </button>
       {open ? (
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            marginTop: 6,
-            background: "#fff",
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            boxShadow: "0 12px 35px rgba(0,0,0,0.12)",
-            minWidth: 320,
-            zIndex: 20,
-            padding: 12,
-            display: "grid",
-            gap: 8,
-          }}
-        >
+        <div style={drawerStyle}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
             <div>
               <div style={{ fontWeight: 700, color: "#111827" }}>Student notifications</div>
