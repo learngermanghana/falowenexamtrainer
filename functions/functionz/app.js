@@ -125,6 +125,11 @@ const DAILY_LIMITS = {
   nextTask: 30,
 };
 
+const DEFAULT_TUITION_CURRENCY = "GHS";
+const PAYSTACK_MAX_EVENT_AGE_MINUTES = 60 * 24 * 3; // 72 hours
+const PAYSTACK_MIN_PAYMENT_FLOOR = 10; // guard against tiny or missing amounts
+const PAYSTACK_OVERPAY_TOLERANCE_RATE = 0.02; // allow small rounding/fee differences
+
 const memoryQuota = new Map();
 
 function pruneOldCounters(counters = {}) {
@@ -446,6 +451,21 @@ app.post("/paystack/webhook", async (req, res) => {
       return res.json({ status: "duplicate", reference });
     }
 
+    const markRejected = async (reason, extra = {}) => {
+      incrementCounter("webhook_rejected", reason);
+      webhookLog.warn("paystack.webhook.rejected", { reference, reason, ...extra });
+      await dedupeRef.set(
+        {
+          status: "rejected",
+          reason,
+          handledAt: admin.firestore.FieldValue.serverTimestamp(),
+          ...extra,
+        },
+        { merge: true }
+      );
+      return res.status(202).json({ status: "rejected", reason });
+    };
+
     const match = await findStudentByCodeOrEmail({ studentCode, email });
 
     if (!match) {
@@ -465,7 +485,41 @@ app.post("/paystack/webhook", async (req, res) => {
     const studentData = snap.data() || {};
     const priorPaid = Number(studentData.initialPaymentAmount || 0);
     const tuitionFee = Number(studentData.tuitionFee || 0);
-    const totalPaid = priorPaid + amountPaid;
+    const expectedCurrency = String(studentData.tuitionCurrency || DEFAULT_TUITION_CURRENCY).toUpperCase();
+    const payloadCurrency = String(data?.currency || "").toUpperCase();
+    const paidAtRaw = data?.paid_at || data?.paidAt || data?.transaction_date || data?.created_at || data?.createdAt;
+    const paidAtMs = paidAtRaw ? Date.parse(paidAtRaw) : NaN;
+
+    if (!payloadCurrency || payloadCurrency !== expectedCurrency) {
+      return markRejected("currency_mismatch", { payloadCurrency, expectedCurrency });
+    }
+
+    if (!Number.isFinite(amountPaid) || amountPaid < PAYSTACK_MIN_PAYMENT_FLOOR) {
+      return markRejected("invalid_amount", { amountPaid });
+    }
+
+    if (!Number.isFinite(paidAtMs)) {
+      return markRejected("missing_timestamp", { paidAtRaw });
+    }
+
+    const ageMinutes = (Date.now() - paidAtMs) / (1000 * 60);
+    if (ageMinutes > PAYSTACK_MAX_EVENT_AGE_MINUTES) {
+      return markRejected("stale_event", { ageMinutes, paidAtRaw });
+    }
+
+    const projectedPaid = priorPaid + amountPaid;
+    if (tuitionFee > 0) {
+      const allowedCeiling = tuitionFee * (1 + PAYSTACK_OVERPAY_TOLERANCE_RATE);
+      if (projectedPaid > allowedCeiling) {
+        return markRejected("overpay_exceeds_tolerance", {
+          projectedPaid,
+          tuitionFee,
+          allowedCeiling,
+        });
+      }
+    }
+
+    const totalPaid = projectedPaid;
     const balanceDue = tuitionFee ? Math.max(tuitionFee - totalPaid, 0) : null;
     const paymentStatus = tuitionFee && totalPaid < tuitionFee ? "partial" : "paid";
 
