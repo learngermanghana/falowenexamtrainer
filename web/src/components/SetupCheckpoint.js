@@ -27,6 +27,15 @@ const SetupCheckpoint = () => {
     [studentProfile?.level, studentProfile?.paystackLink]
   );
 
+  const checkoutAmountOverride = useMemo(() => {
+    const intended = Number(studentProfile?.paymentIntentAmount);
+    const alreadyPaid = Number(studentProfile?.initialPaymentAmount || 0) > 0;
+    if (alreadyPaid) return undefined;
+    if (!Number.isFinite(intended) || intended <= 0) return undefined;
+    // If the student selected an amount during signup, charge that amount on first checkout.
+    return intended;
+  }, [studentProfile?.initialPaymentAmount, studentProfile?.paymentIntentAmount]);
+
   const handleResendVerification = async () => {
     setSendingVerification(true);
     setStatus("");
@@ -137,6 +146,7 @@ const SetupCheckpoint = () => {
             balanceDue={studentProfile?.balanceDue}
             tuitionFee={studentProfile?.tuitionFee}
             paystackLink={paystackLink}
+            checkoutAmountOverride={checkoutAmountOverride}
             title="Pay your tuition"
             description={
               paymentsEnabled
