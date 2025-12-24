@@ -12,8 +12,10 @@ import {
   collection,
   query,
   where,
+  getDoc,
   getDocs,
   setDoc,
+  onSnapshot,
   doc,
   updateDoc,
   serverTimestamp,
@@ -21,6 +23,7 @@ import {
   deleteField,
   getActionCodeSettings,
   reload,
+  limit,
 } from "../firebase";
 
 const AuthContext = createContext();
@@ -84,34 +87,125 @@ export const AuthProvider = ({ children }) => {
     }
 
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
+      setLoading(true);
       setUser(firebaseUser);
       setStudentProfile(null);
       setAuthError("");
 
       if (!firebaseUser) {
         setIdToken(null);
-        setLoading(false);
         setMessagingToken(null);
         setNotificationStatus("idle");
+        setLoading(false);
         return;
       }
 
       try {
         const token = await firebaseUser.getIdToken();
         setIdToken(token);
-        const profile = await fetchStudentProfileByEmail(firebaseUser.email);
-        setStudentProfile(profile);
-        setMessagingToken(profile?.messagingToken || null);
       } catch (error) {
         console.error("Failed to fetch ID token or profile", error);
         setAuthError("Konnte Login-Token nicht laden.");
-      } finally {
-        setLoading(false);
       }
     });
 
     return unsubscribe;
   }, []);
+
+  useEffect(() => {
+    if (!user?.uid || !isFirebaseConfigured || !db) {
+      return undefined;
+    }
+
+    let unsubscribe = null;
+    let cancelled = false;
+
+    const subscribeToProfile = async () => {
+      setLoading(true);
+      const studentsRef = collection(db, "students");
+
+      const connectToDoc = (docId) =>
+        onSnapshot(
+          doc(db, "students", docId),
+          (docSnapshot) => {
+            if (!docSnapshot.exists()) {
+              setStudentProfile(null);
+              setMessagingToken(null);
+              setLoading(false);
+              return;
+            }
+            const profile = { id: docSnapshot.id, ...docSnapshot.data() };
+            setStudentProfile(profile);
+            setMessagingToken(profile?.messagingToken || null);
+            setLoading(false);
+          },
+          (error) => {
+            console.error("Failed to subscribe to student profile", error);
+            setAuthError("Konnte Studentenprofil nicht laden.");
+            setLoading(false);
+          }
+        );
+
+      try {
+        const primaryDocRef = doc(db, "students", user.uid);
+        const primaryDoc = await getDoc(primaryDocRef);
+        if (cancelled) return;
+
+        if (primaryDoc.exists()) {
+          unsubscribe = connectToDoc(primaryDocRef.id);
+          return;
+        }
+
+        const studentCodeQuery = query(
+          studentsRef,
+          where("studentCode", "==", user.uid),
+          limit(1)
+        );
+        const studentCodeSnapshot = await getDocs(studentCodeQuery);
+        if (cancelled) return;
+
+        if (!studentCodeSnapshot.empty) {
+          unsubscribe = connectToDoc(studentCodeSnapshot.docs[0].id);
+          return;
+        }
+
+        if (user.email) {
+          const emailQuery = query(
+            studentsRef,
+            where("email", "==", user.email.toLowerCase()),
+            limit(1)
+          );
+          const emailSnapshot = await getDocs(emailQuery);
+          if (cancelled) return;
+
+          if (!emailSnapshot.empty) {
+            unsubscribe = connectToDoc(emailSnapshot.docs[0].id);
+            return;
+          }
+        }
+
+        setStudentProfile(null);
+        setMessagingToken(null);
+        setLoading(false);
+      } catch (error) {
+        if (cancelled) return;
+        console.error("Failed to resolve student profile subscription", error);
+        setAuthError("Konnte Studentenprofil nicht laden.");
+        setStudentProfile(null);
+        setMessagingToken(null);
+        setLoading(false);
+      }
+    };
+
+    subscribeToProfile();
+
+    return () => {
+      cancelled = true;
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [user?.email, user?.uid]);
 
   const signup = async (email, password, profile = {}) => {
     if (!isFirebaseConfigured || !auth) {
