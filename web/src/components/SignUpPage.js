@@ -62,8 +62,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
   );
   const [selectedClass, setSelectedClass] = useState(loadPreferredClass() || "");
   const [hasConsented, setHasConsented] = useState(false);
-  const [accountIntent, setAccountIntent] = useState("pay-now");
-  const [selectedContractTerm, setSelectedContractTerm] = useState("");
   const [showConsentDetails, setShowConsentDetails] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
@@ -86,7 +84,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
     {
       title: "What happens now",
       items: [
-        "Choose to pay now to reserve your class or start with a trial.",
+        "Pay now to reserve your class. Partial payment unlocks 1 month; full payment unlocks 6 months.",
         "Pick your level so we can match you to the right materials.",
         "Create a password and confirm your consent to our terms and privacy policy.",
       ],
@@ -94,15 +92,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
     {
       title: "Finish later",
       items: [
-        "For trials: complete tuition and pick a class inside Account & Billing when you're ready.",
-        "For pay-now: you can reopen your checkout link anytime if you close it accidentally.",
+        "You can reopen your checkout link anytime if you close it accidentally.",
         "Need help? Use the contact links in the terms to reach support.",
       ],
     },
   ];
-
-  const isPayNow = accountIntent === "pay-now";
-  const isTrial = accountIntent === "trial";
 
   const classOptions = useMemo(
     () =>
@@ -185,30 +179,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
   };
 
   useEffect(() => {
-    if (isTrial) {
-      setInitialPaymentAmount("0");
-      setSelectedContractTerm("");
-      setSelectedClass("");
-    } else {
-      setInitialPaymentAmount((prev) => (Number(prev) > 0 ? prev : `${MIN_INITIAL_PAYMENT}`));
-    }
-  }, [isTrial]);
-
-  useEffect(() => {
-    if (!isPayNow || initialPaymentAmount === "") return;
-
     const numericAmount = Number(initialPaymentAmount);
-    if (Number.isNaN(numericAmount)) return;
+    if (initialPaymentAmount === "" || Number.isNaN(numericAmount)) return;
 
     const cappedAmount = Math.min(Math.max(numericAmount, 0), tuitionFeeForLevel || numericAmount);
     if (`${cappedAmount}` !== `${initialPaymentAmount}`) {
       setInitialPaymentAmount(`${cappedAmount}`);
     }
-  }, [initialPaymentAmount, isPayNow, tuitionFeeForLevel]);
+  }, [initialPaymentAmount, tuitionFeeForLevel]);
 
   const tuitionSummary = computeTuitionStatus({
     level: selectedLevel,
-    paidAmount: isPayNow ? Number(initialPaymentAmount) || 0 : 0,
+    paidAmount: 0,
   });
 
   const handleSubmit = async (event) => {
@@ -217,13 +199,33 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setMessage("");
     setFieldErrors({});
 
-    const numericInitialPayment = isPayNow ? Number(initialPaymentAmount) : 0;
+    const numericInitialPayment = Number(initialPaymentAmount);
 
     const validationIssues = {};
 
-    if (isPayNow && (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment))) {
+    if (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment)) {
       validationIssues.initialPaymentAmount =
         "Enter a number without commas or spaces. You need at least GH₵1000 to start a paid account.";
+    }
+
+    if (numericInitialPayment < 0) {
+      validationIssues.initialPaymentAmount = "Initial payment cannot be negative. Remove the minus sign and try again.";
+    }
+
+    if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
+      validationIssues.initialPaymentAmount = `Enter GH₵${MIN_INITIAL_PAYMENT} or more to reserve your class.`;
+    }
+
+    if (!selectedClass) {
+      validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
+    }
+
+    if (!phone.trim()) {
+      validationIssues.phone = "Enter a contact phone number so we can reach you.";
+    }
+
+    if (!emergencyContactPhone.trim()) {
+      validationIssues.emergencyContactPhone = "Add an emergency contact phone number. This is required for safety.";
     }
 
     if (password !== confirmPassword) {
@@ -232,25 +234,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     if (!hasConsented) {
       validationIssues.consent = "Agree to the terms and privacy policy to continue. You can open the summary above first.";
-    }
-
-    if (isPayNow) {
-      if (numericInitialPayment < 0) {
-        validationIssues.initialPaymentAmount = "Initial payment cannot be negative. Remove the minus sign and try again.";
-      }
-
-      if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
-        validationIssues.initialPaymentAmount = `Enter GH₵${MIN_INITIAL_PAYMENT} or more to reserve your class.`;
-      }
-
-      if (!selectedClass) {
-        validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
-      }
-
-      if (!selectedContractTerm) {
-        validationIssues.selectedContractTerm =
-          "Choose a contract term to continue. You can change this later with support if needed.";
-      }
     }
 
     const validationMessages = Object.values(validationIssues);
@@ -266,30 +249,35 @@ const SignUpPage = ({ onLogin, onBack }) => {
     try {
       const tuitionFee = tuitionSummary.tuitionFee;
       // IMPORTANT: don't mark money as paid until the Paystack webhook confirms it.
-      const intendedPaymentAmount = isPayNow ? Math.max(Number(numericInitialPayment) || 0, 0) : 0;
+      const intendedPaymentAmount = Math.max(Number(numericInitialPayment) || 0, 0);
       const paidAmount = 0;
       const contractStart = new Date();
-      const contractMonths = isPayNow
-        ? Number(selectedContractTerm) || (tuitionSummary.statusLabel === "Paid" ? 6 : 1)
-        : 0;
-      const contractEnd = contractMonths
-        ? (() => {
-            const endDate = new Date(contractStart);
-            endDate.setMonth(endDate.getMonth() + contractMonths);
-            return endDate;
-          })()
-        : null;
-      const balanceDue = isTrial ? 0 : Math.max(Number(tuitionFee) || 0, 0);
-      const paymentStatus = isTrial ? "trial" : "pending";
+      const contractMonths = intendedPaymentAmount >= tuitionSummary.tuitionFee ? 6 : 1;
+      const contractEnd = (() => {
+        const endDate = new Date(contractStart);
+        endDate.setMonth(endDate.getMonth() + contractMonths);
+        return endDate;
+      })();
+      const balanceDue = Math.max(Number(tuitionFee) || 0, 0);
+      const paymentStatus = "pending";
+      const studentCode = generateStudentCode({ name });
       const paystackCheckoutLink = buildPaystackCheckoutLink({
         baseLink: paystackLinkForLevel(selectedLevel),
         // Charge the amount the student intends to pay now (min deposit), not the remaining balance.
         amount: intendedPaymentAmount || balanceDue,
+        metadata: {
+          studentCode: studentCode || undefined,
+          student_code: studentCode || undefined,
+          level: selectedLevel,
+          email,
+          name,
+          phone,
+          emergencyContactPhone,
+        },
         redirectUrl: `${window.location.origin}/payment-complete`,
       });
       const paystackLink = paystackCheckoutLink || paystackLinkForLevel(selectedLevel);
 
-      const studentCode = generateStudentCode({ name });
       await signup(email, password, {
         name,
         level: selectedLevel,
@@ -304,7 +292,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         paymentStatus,
         paystackLink,
         paymentIntentAmount: intendedPaymentAmount || null,
-        status: isTrial ? "Trial" : "Active",
+        status: "Active",
         contractStart: contractStart.toISOString(),
         contractEnd: contractEnd ? contractEnd.toISOString() : "",
         contractTermMonths: contractMonths || null,
@@ -312,27 +300,18 @@ const SignUpPage = ({ onLogin, onBack }) => {
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(email, studentCode);
-      const contractLabel = isTrial
-        ? "Trial access started"
-        : paymentStatus === "paid"
-        ? `${contractMonths}-month contract activated`
-        : `${contractMonths}-month starter contract set with reminder`;
       const balanceText = balanceDue > 0 ? ` Balance due: GH₵${balanceDue}.` : "";
-      const paymentInstruction = isTrial
-        ? " We'll prompt you inside the app to finish your tuition and pick a class before live sessions start."
-        : paymentsEnabled
-        ? " Pay online using your secure link inside the app."
-        : " Payments are handled on the web app only. Please sign in online to complete your tuition.";
-      const paymentRedirectNote = isTrial
-        ? " You can explore the app now—finish payment from Account & Billing when you're ready."
-        : " Complete your tuition to unlock live classes. You can open your checkout link from the app whenever you're ready.";
-      const successMessage =
-        `Account created! Your student code is ${studentCode}. ${contractLabel}.${paymentInstruction}${paymentRedirectNote}${balanceText}`;
+      const accessCopy =
+        contractMonths === 6
+          ? "6-month access activated because you covered full tuition."
+          : "1-month starter access activated until the remaining tuition is paid.";
+      const paymentInstruction = paymentsEnabled
+        ? "Pay online using your secure link inside the app."
+        : "Payments are handled on the web app only. Please sign in online to complete your tuition.";
+      const paymentRedirectNote = "Complete your tuition to unlock full access. You can open your checkout link from the app whenever you're ready.";
+      const successMessage = `Account created! Your student code is ${studentCode}. ${accessCopy} ${paymentInstruction} ${paymentRedirectNote}${balanceText}`;
       setMessage(successMessage);
-      showToast(
-        `${successMessage} Finish setup inside the app.`,
-        "success"
-      );
+      showToast(`${successMessage} Finish setup inside the app.`, "success");
     } catch (error) {
       console.error(error);
       const friendlyError = interpretSignupError(error);
@@ -432,42 +411,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </details>
         </div>
 
-        <div style={{ ...styles.uploadCard, background: "#eef2ff", marginBottom: 12 }}>
-          <label style={{ ...styles.label, marginBottom: 8 }}>How do you want to start?</label>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <button
-              type="button"
-              onClick={() => setAccountIntent("pay-now")}
-              style={{
-                ...styles.secondaryButton,
-                padding: "10px 12px",
-                borderColor: isPayNow ? "#4f46e5" : styles.secondaryButton.borderColor,
-                color: isPayNow ? "#111827" : styles.secondaryButton.color,
-                background: isPayNow ? "#e0e7ff" : styles.secondaryButton.background,
-              }}
-            >
-              Pay tuition now
-            </button>
-            <button
-              type="button"
-              onClick={() => setAccountIntent("trial")}
-              style={{
-                ...styles.secondaryButton,
-                padding: "10px 12px",
-                borderColor: isTrial ? "#4f46e5" : styles.secondaryButton.borderColor,
-                color: isTrial ? "#111827" : styles.secondaryButton.color,
-                background: isTrial ? "#e0e7ff" : styles.secondaryButton.background,
-              }}
-            >
-              Skip payment for now
-            </button>
-          </div>
-          <p style={{ ...styles.helperText, marginTop: 8, marginBottom: 0 }}>
-            Paying now reserves your class and activates your contract. Skipping payment gives you a trial account so you can
-            explore the app before committing to a schedule—we'll keep reminding you inside the app to finish tuition.
-          </p>
-        </div>
-
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
           <label style={styles.label}>Name</label>
           <input
@@ -549,14 +492,20 @@ const SignUpPage = ({ onLogin, onBack }) => {
             We load speaking and writing tasks from the sheet that matches your level.
           </p>
 
-          <label style={styles.label}>Phone number (optional)</label>
+          <label style={styles.label}>Phone number</label>
           <input
             type="tel"
+            required
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              setPhone(e.target.value);
+              clearFieldError("phone");
+              setAuthError("");
+            }}
             style={inputStyle}
             placeholder="0176 12345678"
           />
+          {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
 
           <p style={{ ...styles.helperText, marginTop: -4 }}>
             We keep your phone number on file to contact you directly when necessary. Your emergency contact is only
@@ -572,17 +521,26 @@ const SignUpPage = ({ onLogin, onBack }) => {
             placeholder="Berlin"
           />
 
-          <label style={styles.label}>Emergency contact (phone, optional)</label>
+          <label style={styles.label}>Emergency contact phone</label>
           <input
             type="tel"
+            required
             value={emergencyContactPhone}
-            onChange={(e) => setEmergencyContactPhone(e.target.value)}
+            onChange={(e) => {
+              setEmergencyContactPhone(e.target.value);
+              clearFieldError("emergencyContactPhone");
+              setAuthError("");
+            }}
             style={inputStyle}
             placeholder="0176 98765432"
           />
+          {fieldErrors.emergencyContactPhone ? (
+            <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
+          ) : null}
 
-          <label style={styles.label}>Initial payment amount (GH₵)</label>
+          <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GH₵)</label>
           <input
+            id="initial-payment-amount"
             type="number"
             min={MIN_INITIAL_PAYMENT}
             max={tuitionFeeForLevel}
@@ -591,37 +549,33 @@ const SignUpPage = ({ onLogin, onBack }) => {
             inputMode="numeric"
             value={initialPaymentAmount}
             onChange={handleInitialPaymentChange}
-            style={{ ...inputStyle, background: isTrial ? "#f3f4f6" : inputStyle.background }}
+            style={inputStyle}
             placeholder={`At least GH₵${MIN_INITIAL_PAYMENT}`}
-            disabled={isTrial}
           />
           {fieldErrors.initialPaymentAmount ? (
             <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
           ) : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             Enter between GH₵{MIN_INITIAL_PAYMENT} and GH₵{tuitionFeeForLevel} for {selectedLevel}. A1: GH₵2800 · A2:
-            GH₵3000 · B1: GH₵3000 · B2: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start a paid account.
-            Choose "Skip payment for now" to explore without paying yet.
+            GH₵3000 · B1: GH₵3000 · B2: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start your account. We
+            confirm Paystack payments before marking you as paid.
           </p>
 
           <TuitionStatusCard
             level={selectedLevel}
             // This card is a preview only... actual payment is confirmed via Paystack webhook.
             paidAmount={0}
-            balanceDue={isTrial ? 0 : tuitionSummary.tuitionFee}
+            balanceDue={tuitionSummary.tuitionFee}
             tuitionFee={tuitionSummary.tuitionFee}
             paystackLink={tuitionSummary.paystackLink}
             showPaymentAction={false}
             title="Tuition summary"
-            description={
-              isTrial
-                ? `For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. Your account will stay in trial mode until you complete tuition in the app.`
-                : `For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`
-            }
+            description={`For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
           />
 
-          <label style={styles.label}>Which live class are you joining? {isPayNow ? "(required)" : "(optional)"}</label>
+          <label style={styles.label} htmlFor="class-selection">Which live class are you joining? (required)</label>
           <select
+            id="class-selection"
             value={selectedClass}
             onChange={(event) => {
               setSelectedClass(event.target.value);
@@ -629,7 +583,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
               setAuthError("");
             }}
             style={styles.select}
-            required={isPayNow}
+            required
           >
             <option value="">Decide later (we'll ask again after signup)</option>
             {classOptions.map((classOption) => (
@@ -640,31 +594,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           </select>
           {fieldErrors.selectedClass ? <p style={styles.fieldError}>{fieldErrors.selectedClass}</p> : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            {isPayNow
-              ? "Picking a class is required when you pay now so we can reserve your spot."
-              : "You can skip this for now and add your class after you log in."}
-          </p>
-
-          <label style={styles.label}>Contract term</label>
-          <select
-            value={selectedContractTerm}
-            onChange={(event) => {
-              setSelectedContractTerm(event.target.value);
-              clearFieldError("selectedContractTerm");
-              setAuthError("");
-            }}
-            style={styles.select}
-            required={isPayNow}
-          >
-            <option value="">Select a contract term</option>
-            <option value="1">1-month starter (partial tuition)</option>
-            <option value="6">6-month standard (full tuition)</option>
-          </select>
-          {fieldErrors.selectedContractTerm ? (
-            <p style={styles.fieldError}>{fieldErrors.selectedContractTerm}</p>
-          ) : null}
-          <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Contract selection is required when paying now. Trial accounts can pick a contract later inside Account & Billing.
+            Picking a class is required so we can reserve your spot. If unsure, choose the closest option for now.
           </p>
 
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
