@@ -266,22 +266,78 @@ export const AuthProvider = ({ children }) => {
     }
     setAuthError("");
     const normalizedEmail = email.trim().toLowerCase();
-    const credential = await signInWithEmailAndPassword(
-      auth,
-      normalizedEmail,
-      password
-    );
-    const token = await credential.user.getIdToken();
-    setIdToken(token);
-    const profile = await fetchStudentProfileByEmail(normalizedEmail);
-    setStudentProfile(profile);
-    setMessagingToken(profile?.messagingToken || null);
-    if (!credential.user.emailVerified) {
-      await sendEmailVerification(credential.user, getActionCodeSettings());
-      return { credential, emailVerificationRequired: true };
-    }
 
-    return credential;
+    const finalizeLogin = async (credential, profileOverride = null, meta = {}) => {
+      const token = await credential.user.getIdToken();
+      setIdToken(token);
+      const profile = profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
+      setStudentProfile(profile);
+      setMessagingToken(profile?.messagingToken || null);
+
+      if (meta.migratedFromLegacy) {
+        credential.migratedFromLegacy = true;
+      }
+
+      if (!credential.user.emailVerified) {
+        await sendEmailVerification(credential.user, getActionCodeSettings());
+        return { credential, emailVerificationRequired: true, ...meta };
+      }
+
+      return { credential, ...meta };
+    };
+
+    try {
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        normalizedEmail,
+        password
+      );
+      return await finalizeLogin(credential);
+    } catch (error) {
+      if (error?.code === "auth/user-not-found") {
+        const existingProfile = await fetchStudentProfileByEmail(normalizedEmail);
+
+        if (existingProfile) {
+          const migratedCredential = await createUserWithEmailAndPassword(
+            auth,
+            normalizedEmail,
+            password
+          );
+
+          const mergedStudentCode =
+            existingProfile.studentCode ||
+            existingProfile.studentcode ||
+            existingProfile.id ||
+            migratedCredential.user.uid;
+
+          const studentRef = doc(db, "students", existingProfile.id);
+          const mergedProfile = {
+            ...existingProfile,
+            uid: migratedCredential.user.uid,
+            studentCode: mergedStudentCode,
+            studentcode: mergedStudentCode,
+            email: normalizedEmail,
+          };
+
+          await setDoc(
+            studentRef,
+            {
+              uid: migratedCredential.user.uid,
+              studentCode: mergedStudentCode,
+              studentcode: mergedStudentCode,
+              email: normalizedEmail,
+              role: existingProfile.role || "student",
+              updated_at: serverTimestamp(),
+            },
+            { merge: true }
+          );
+
+          return await finalizeLogin(migratedCredential, mergedProfile, { migratedFromLegacy: true });
+        }
+      }
+
+      throw error;
+    }
   };
 
   const refreshUser = async () => {
