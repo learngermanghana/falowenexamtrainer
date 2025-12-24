@@ -122,6 +122,7 @@ const DAILY_LIMITS = {
   placement: 5,
   speaking: 25,
   speechTrainer: 25,
+  nextTask: 30,
 };
 
 const memoryQuota = new Map();
@@ -194,9 +195,14 @@ async function auditAIRequest({ route, uid, email, metadata = {}, success = true
   }
 }
 
-async function requireAuthenticatedUser(req, res) {
+async function requireAuthenticatedUser(req, res, { allowGuest = true } = {}) {
   const authedUser = await getAuthedUser(req);
   if (!authedUser?.uid) {
+    if (!allowGuest) {
+      res.status(401).json({ error: "Authentication required" });
+      return null;
+    }
+
     return { uid: "guest", email: null, isGuest: true };
   }
 
@@ -686,13 +692,19 @@ app.post("/grammar/ask", async (req, res) => {
 
 app.get("/student", async (req, res) => {
   try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
     const studentCode = String(req.query.studentCode || "").trim();
     if (!studentCode) return res.status(400).json({ error: "studentCode is required" });
 
     const doc = await admin.firestore().collection("students").doc(studentCode).get();
     if (!doc.exists) return res.status(404).json({ error: "Student not found" });
 
-    return res.json({ id: doc.id, ...doc.data() });
+    const student = doc.data() || {};
+    const { password: _hiddenPassword, ...safeStudent } = student;
+
+    return res.json({ id: doc.id, ...safeStudent });
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "Failed to fetch student" });
@@ -1132,8 +1144,23 @@ app.post("/tutor/placement", async (req, res) => {
 });
 
 app.get("/tutor/next-task", async (req, res) => {
+  let authedUser;
   try {
-    const userId = String(req.query.userId || "guest");
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const userId = String(req.query.userId || authedUser.uid || "guest");
+
+    const quota = await enforceUserQuota({
+      uid: authedUser.uid,
+      category: "nextTask",
+      limit: DAILY_LIMITS.nextTask,
+    });
+
+    if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/tutor/next-task", uid: authedUser.uid, category: "nextTask" });
+      return res.status(429).json({ error: "Daily next-task limit reached" });
+    }
 
     const messages = [
       {
@@ -1160,9 +1187,22 @@ app.get("/tutor/next-task", async (req, res) => {
       };
     }
 
-    return res.json({ nextTask });
+    auditAIRequest({
+      route: "/tutor/next-task",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { userId, quotaRemaining: quota.remaining },
+    });
+
+    return res.json({ nextTask, quotaRemaining: quota.remaining });
   } catch (err) {
     console.error("/tutor/next-task error", err);
+    auditAIRequest({
+      route: "/tutor/next-task",
+      uid: authedUser?.uid,
+      email: authedUser?.email,
+      success: false,
+    });
     return res.status(500).json({ error: err.message || "Failed to fetch next task" });
   }
 });
