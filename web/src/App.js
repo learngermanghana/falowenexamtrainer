@@ -131,8 +131,15 @@ function App() {
     () => (studentProfile?.paymentStatus || "pending").toLowerCase(),
     [studentProfile?.paymentStatus]
   );
-  const awaitingPayment =
-    Boolean(studentProfile) && !isStaff && !["paid", "partial"].includes(paymentStatus);
+  const contractEndMs = useMemo(() => {
+    if (!studentProfile?.contractEnd) return NaN;
+    const parsed = Date.parse(studentProfile.contractEnd);
+    return Number.isFinite(parsed) ? parsed : NaN;
+  }, [studentProfile?.contractEnd]);
+
+  const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > Date.now();
+  const canAccessLegacy = !Number.isFinite(contractEndMs) && ["paid", "partial"].includes(paymentStatus);
+  const awaitingPayment = Boolean(studentProfile) && !isStaff && !(hasActiveContract || canAccessLegacy);
 
   if (!isFirebaseConfigured) {
     return (

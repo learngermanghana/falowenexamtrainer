@@ -11,7 +11,6 @@ import { loadPreferredClass, savePreferredClass } from "../services/classSelecti
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
-import { buildPaystackCheckoutLink } from "../lib/paystack";
 import PasswordGuidance from "./PasswordGuidance";
 
 const MIN_INITIAL_PAYMENT = 1000;
@@ -251,32 +250,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
       // IMPORTANT: don't mark money as paid until the Paystack webhook confirms it.
       const intendedPaymentAmount = Math.max(Number(numericInitialPayment) || 0, 0);
       const paidAmount = 0;
-      const contractStart = new Date();
-      const contractMonths = intendedPaymentAmount >= tuitionSummary.tuitionFee ? 6 : 1;
-      const contractEnd = (() => {
-        const endDate = new Date(contractStart);
-        endDate.setMonth(endDate.getMonth() + contractMonths);
-        return endDate;
-      })();
       const balanceDue = Math.max(Number(tuitionFee) || 0, 0);
       const paymentStatus = "pending";
       const studentCode = generateStudentCode({ name });
-      const paystackCheckoutLink = buildPaystackCheckoutLink({
-        baseLink: paystackLinkForLevel(selectedLevel),
-        // Charge the amount the student intends to pay now (min deposit), not the remaining balance.
-        amount: intendedPaymentAmount || balanceDue,
-        metadata: {
-          studentCode: studentCode || undefined,
-          student_code: studentCode || undefined,
-          level: selectedLevel,
-          email,
-          name,
-          phone,
-          emergencyContactPhone,
-        },
-        redirectUrl: `${window.location.origin}/payment-complete`,
-      });
-      const paystackLink = paystackCheckoutLink || paystackLinkForLevel(selectedLevel);
+      // Store the base Paystack link, but create the actual checkout URL on-demand
+      // via the backend so we can validate amounts and attach clear metadata.
+      const paystackLink = paystackLinkForLevel(selectedLevel);
 
       await signup(email, password, {
         name,
@@ -293,23 +272,24 @@ const SignUpPage = ({ onLogin, onBack }) => {
         paystackLink,
         paymentIntentAmount: intendedPaymentAmount || null,
         status: "Active",
-        contractStart: contractStart.toISOString(),
-        contractEnd: contractEnd ? contractEnd.toISOString() : "",
-        contractTermMonths: contractMonths || null,
+        contractStart: "",
+        contractEnd: "",
+        contractTermMonths: null,
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(email, studentCode);
       const balanceText = balanceDue > 0 ? ` Balance due: GH₵${balanceDue}.` : "";
+      const amountCopy = intendedPaymentAmount
+        ? `You chose to pay GH₵${intendedPaymentAmount} now.`
+        : "Choose how much to pay now inside the app.";
       const accessCopy =
-        contractMonths === 6
-          ? "6-month access activated because you covered full tuition."
-          : "1-month starter access activated until the remaining tuition is paid.";
+        "Pay at least GH₵1000 to unlock 1-month access, or clear the full balance to unlock 6 months.";
       const paymentInstruction = paymentsEnabled
-        ? "Pay online using your secure link inside the app."
+        ? "Open the tuition card in the app to start Paystack checkout."
         : "Payments are handled on the web app only. Please sign in online to complete your tuition.";
-      const paymentRedirectNote = "Complete your tuition to unlock full access. You can open your checkout link from the app whenever you're ready.";
-      const successMessage = `Account created! Your student code is ${studentCode}. ${accessCopy} ${paymentInstruction} ${paymentRedirectNote}${balanceText}`;
+      const paymentRedirectNote = "You'll always see your student code and tuition status under Account & Billing.";
+      const successMessage = `Account created! Your student code is ${studentCode}. ${amountCopy} ${accessCopy} ${paymentInstruction} ${paymentRedirectNote}${balanceText}`;
       setMessage(successMessage);
       showToast(`${successMessage} Finish setup inside the app.`, "success");
     } catch (error) {

@@ -2,7 +2,6 @@ import React, { useMemo, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
-import { paystackLinkForLevel } from "../data/levelFees";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 
 const SetupCheckpoint = () => {
@@ -18,11 +17,6 @@ const SetupCheckpoint = () => {
       paymentReady: paymentStatus === "paid",
     };
   }, [studentProfile?.paymentStatus]);
-
-  const paystackLink = useMemo(
-    () => studentProfile?.paystackLink || paystackLinkForLevel(studentProfile?.level),
-    [studentProfile?.level, studentProfile?.paystackLink]
-  );
 
   const checkoutAmountOverride = useMemo(() => {
     const intended = Number(studentProfile?.paymentIntentAmount);
@@ -54,8 +48,8 @@ const SetupCheckpoint = () => {
           <div>
             <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Finish setting up your account</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              You're signed in with limited access until your tuition payment is confirmed. Your student code and payment
-              link are always available here.
+              You're signed in with limited access until your tuition payment is confirmed.
+              Pay at least GH₵1000 to unlock 1-month access, or clear the full balance to unlock 6 months.
             </p>
           </div>
           <button style={styles.secondaryButton} onClick={logout}>
@@ -95,13 +89,12 @@ const SetupCheckpoint = () => {
             paidAmount={studentProfile?.initialPaymentAmount}
             balanceDue={studentProfile?.balanceDue}
             tuitionFee={studentProfile?.tuitionFee}
-            paystackLink={paystackLink}
             checkoutAmountOverride={checkoutAmountOverride}
             title="Pay your tuition"
             description={
               paymentsEnabled
-                ? "Finish your secure checkout to unlock full access. You can return to this link anytime."
-                : "Payments are available on the web app. Use the link below when you're ready."
+                ? "Choose how much to pay now. We'll show Paystack your paid-so-far and remaining balance for clarity."
+                : "Payments are available on the web app. Sign in on the website to complete your tuition."
             }
           />
         </div>
