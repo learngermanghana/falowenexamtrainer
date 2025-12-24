@@ -269,6 +269,11 @@ const AccountSettings = () => {
               balanceDue={studentProfile.balanceDue}
               tuitionFee={studentProfile.tuitionFee}
               paystackLink={studentProfile.paystackLink}
+              checkoutAmountOverride={
+                Number(studentProfile?.initialPaymentAmount || 0) > 0
+                  ? undefined
+                  : studentProfile?.paymentIntentAmount
+              }
               title="Balance & tuition"
               description={`Billing email: ${subscription.invoiceEmail || "add an email"}`}
             />
@@ -298,7 +303,12 @@ const AccountSettings = () => {
                 <a
                   href={buildPaystackCheckoutLink({
                     baseLink: studentProfile.paystackLink || "https://paystack.com/pay/falowen",
-                    amount: studentProfile.balanceDue || studentProfile.tuitionFee,
+                    amount:
+                      (Number(studentProfile?.initialPaymentAmount || 0) > 0
+                        ? undefined
+                        : studentProfile?.paymentIntentAmount) ||
+                      studentProfile.balanceDue ||
+                      studentProfile.tuitionFee,
                     redirectUrl: `${window.location.origin}/payment-complete`,
                   })}
                   target="_blank"
