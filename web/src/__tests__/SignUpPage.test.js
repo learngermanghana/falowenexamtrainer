@@ -65,7 +65,6 @@ describe("SignUpPage", () => {
   it("does not redirect to checkout when payments are disabled", async () => {
     render(<SignUpPage onLogin={jest.fn()} />);
 
-    await userEvent.click(screen.getByRole("button", { name: /skip payment for now/i }));
     await userEvent.type(screen.getByPlaceholderText("Abigail"), "Test User");
     await userEvent.type(screen.getByPlaceholderText("you@example.com"), "test@example.com");
     await userEvent.type(
@@ -76,6 +75,9 @@ describe("SignUpPage", () => {
     await userEvent.type(screen.getByPlaceholderText("0176 12345678"), "0123456789");
     await userEvent.type(screen.getByPlaceholderText("Berlin"), "Berlin");
     await userEvent.type(screen.getByPlaceholderText("0176 98765432"), "0987654321");
+    await userEvent.clear(screen.getByLabelText(/Initial payment amount/i));
+    await userEvent.type(screen.getByLabelText(/Initial payment amount/i), "1500");
+    await userEvent.selectOptions(screen.getByLabelText(/Which live class are you joining/i), "Evening A1");
     await userEvent.click(screen.getByRole("checkbox"));
     await userEvent.click(screen.getByRole("button", { name: /sign up now/i }));
 

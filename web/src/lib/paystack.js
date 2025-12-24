@@ -7,6 +7,15 @@ const normalizeAmount = (amount) => {
   return Math.round(numeric * PESWAS_PER_CEDI);
 };
 
+const normalizeMetadata = (metadata) => {
+  if (!metadata || typeof metadata !== "object") return null;
+
+  const entries = Object.entries(metadata).filter(([, value]) => value !== undefined && typeof value !== "function");
+  if (!entries.length) return null;
+
+  return Object.fromEntries(entries);
+};
+
 const DEFAULT_PAYSTACK_HOSTS = ["paystack.com", "paystack.shop"];
 
 const defaultRedirectOrigins = (() => {
@@ -50,6 +59,7 @@ const isAllowedRedirect = (redirectUrl, allowedOrigins = defaultRedirectOrigins)
  * @param {string} options.baseLink - The base Paystack payment link.
  * @param {number|string} [options.amount] - Amount in Ghana cedis the user intends to pay.
  * @param {string} [options.redirectUrl] - URL to return to after payment.
+ * @param {object} [options.metadata] - Additional metadata to forward to Paystack (e.g., studentCode).
  * @param {string[]} [options.allowedBaseHosts] - Allowed Paystack hostnames.
  * @param {string[]} [options.allowedRedirectOrigins] - Allowed origins for redirect URLs.
  * @returns {string} A URL string with optional query params, or an empty string when invalid.
@@ -58,6 +68,7 @@ export const buildPaystackCheckoutLink = ({
   baseLink,
   amount,
   redirectUrl,
+  metadata,
   allowedBaseHosts,
   allowedRedirectOrigins,
 } = {}) => {
@@ -80,6 +91,11 @@ export const buildPaystackCheckoutLink = ({
 
     if (isAllowedRedirect(redirectUrl, redirectOriginAllowlist)) {
       url.searchParams.set("redirect_url", redirectUrl);
+    }
+
+    const metadataPayload = normalizeMetadata(metadata);
+    if (metadataPayload) {
+      url.searchParams.set("metadata", JSON.stringify(metadataPayload));
     }
 
     return url.toString();
