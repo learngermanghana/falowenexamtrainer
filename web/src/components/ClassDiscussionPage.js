@@ -1,3 +1,4 @@
+// web/src/components/ClassDiscussionPage.js
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
@@ -52,6 +53,10 @@ const formatTimeRemaining = (expiresAt, now) => {
   return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
 };
 
+const makeUUID = () =>
+  (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
+  `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
 const ClassDiscussionPage = () => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
@@ -61,6 +66,9 @@ const ClassDiscussionPage = () => {
   const [replyDrafts, setReplyDrafts] = useState({});
   const [isCorrectingDraft, setIsCorrectingDraft] = useState({});
   const [editingReply, setEditingReply] = useState(null);
+  const [editingThread, setEditingThread] = useState(null); // { threadId, topic, question, instructions, extraLink }
+  const [isSavingThreadEdit, setIsSavingThreadEdit] = useState(false);
+
   const [extensionValues, setExtensionValues] = useState({});
   const [extensionUnits, setExtensionUnits] = useState({});
   const [error, setError] = useState("");
@@ -114,6 +122,7 @@ const ClassDiscussionPage = () => {
       postsCollectionRef(studentProfile.level, studentProfile.className),
       orderBy("createdAt", "desc")
     );
+
     const unsubscribe = onSnapshot(
       threadsQuery,
       (snapshot) => {
@@ -137,8 +146,10 @@ const ClassDiscussionPage = () => {
                 ? data.timerValue
                 : valueFromMinutes(data.timerMinutes || 0, data.timerUnit || "minutes"),
             createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
-            createdBy: data.createdBy || "Tutor",
+            createdBy: data.createdBy || "Student",
             createdByUid: data.createdByUid || null,
+            editedAt: data.editedAt?.toMillis ? data.editedAt.toMillis() : data.editedAt || null,
+            editedByUid: data.editedByUid || null,
             expiresAt: data.expiresAt?.toMillis ? data.expiresAt.toMillis() : data.expiresAt || null,
             status: data.status || "open",
             expiredAt: data.expiredAt?.toMillis ? data.expiredAt.toMillis() : data.expiredAt || null,
@@ -174,6 +185,7 @@ const ClassDiscussionPage = () => {
               id: response.id || `${docSnapshot.id}-${index}`,
               author: response.responder || response.author || "Student",
               responderCode: response.responderCode || response.studentCode || null,
+              responderUid: response.responderUid || null,
               text: response.text || "",
               createdAt: response.createdAt?.toMillis
                 ? response.createdAt.toMillis()
@@ -285,14 +297,7 @@ const ClassDiscussionPage = () => {
     };
 
     ensureStatuses();
-  }, [
-    getThreadDocRef,
-    resolveStatus,
-    studentProfile?.className,
-    studentProfile?.level,
-    threads,
-    now,
-  ]);
+  }, [getThreadDocRef, resolveStatus, threads, now]);
 
   useEffect(() => () => {
     Object.values(typingTimeouts.current).forEach((timeoutId) => clearTimeout(timeoutId));
@@ -310,13 +315,13 @@ const ClassDiscussionPage = () => {
     }
   }, [form.lessonId, lessonOptions]);
 
-  const getDisplayName = () =>
-    studentProfile?.name || user?.displayName || user?.email || "Student";
+  const getDisplayName = () => studentProfile?.name || user?.displayName || user?.email || "Student";
 
   const handleFormChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Everyone can create threads (students + tutors)
   const handleCreateThread = async (event) => {
     event.preventDefault();
     if (!form.question.trim() || !db) return;
@@ -348,11 +353,12 @@ const ClassDiscussionPage = () => {
         timerUnit: form.timerUnit,
         timerValue,
         createdAt: serverTimestamp(),
-        createdBy: getDisplayName() || "Tutor",
+        createdBy: getDisplayName(),
         createdByUid: user?.uid || null,
         expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
         status: "open",
       });
+
       setForm({
         lessonId: lesson?.id || "",
         topic: lesson?.topic || "",
@@ -371,7 +377,94 @@ const ClassDiscussionPage = () => {
   };
 
   const getResponderCode = () =>
-    studentProfile?.studentcode || studentProfile?.id || studentProfile?.className || user?.uid || "unknown";
+    studentProfile?.studentcode ||
+    studentProfile?.studentCode ||
+    studentProfile?.id ||
+    user?.uid ||
+    "unknown";
+
+  const canEditThread = useCallback(
+    (thread) => {
+      if (!thread) return false;
+      if (isTutor) return true;
+      return Boolean(user?.uid) && thread.createdByUid === user.uid;
+    },
+    [isTutor, user?.uid]
+  );
+
+  const startEditThread = (thread) => {
+    if (!canEditThread(thread)) {
+      setError("You can only edit a post you created.");
+      return;
+    }
+    setError("");
+    setEditingThread({
+      threadId: thread.id,
+      topic: thread.topic || "",
+      question: thread.question || "",
+      instructions: thread.instructions || "",
+      extraLink: thread.extraLink || "",
+    });
+  };
+
+  const saveThreadEdit = async () => {
+    if (!editingThread?.threadId || !db) return;
+
+    const thread = threads.find((t) => t.id === editingThread.threadId);
+    if (!thread || !canEditThread(thread)) {
+      setError("You can only edit a post you created.");
+      return;
+    }
+
+    const threadRef = getThreadDocRef(thread);
+    if (!threadRef) {
+      setError("Missing class context. Please reload the page.");
+      return;
+    }
+
+    setIsSavingThreadEdit(true);
+    setError("");
+
+    try {
+      await setDoc(
+        threadRef,
+        {
+          topic: editingThread.topic,
+          questionTitle: editingThread.topic,
+          question: editingThread.question,
+          instructions: editingThread.instructions,
+          extraLink: editingThread.extraLink,
+          editedAt: serverTimestamp(),
+          editedByUid: user?.uid || null,
+        },
+        { merge: true }
+      );
+      setEditingThread(null);
+    } catch (err) {
+      console.error("Failed to edit thread", err);
+      setError("Thread could not be edited. Please try again.");
+    } finally {
+      setIsSavingThreadEdit(false);
+    }
+  };
+
+  const canEditReply = useCallback(
+    (reply) => {
+      if (!reply) return false;
+      if (isTutor) return true;
+
+      const myCode = String(getResponderCode() || "").toLowerCase();
+      const replyCode = String(reply.responderCode || "").toLowerCase();
+      if (myCode && replyCode && myCode === replyCode) return true;
+
+      // Optional UID matching if you store it
+      if (reply.responderUid && user?.uid && reply.responderUid === user.uid) return true;
+
+      return false;
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isTutor, user?.uid, studentProfile?.studentcode, studentProfile?.studentCode, studentProfile?.id]
+  );
 
   const getPresenceDocRef = () => {
     if (!db || !studentProfile?.level || !studentProfile?.className) return null;
@@ -431,7 +524,7 @@ const ClassDiscussionPage = () => {
   const handleReply = async (threadId) => {
     const thread = threads.find((item) => item.id === threadId);
     if (thread && resolveStatus(thread) !== "open") {
-      setError("Replies are closed for this thread. Reopen the timer to post again.");
+      setError("Replies are closed for this thread. A tutor can reopen it with the timer controls.");
       return;
     }
 
@@ -445,11 +538,12 @@ const ClassDiscussionPage = () => {
       const existingSnap = await getDoc(qaDocRef);
       const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
 
-      const replyId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
+      const replyId = makeUUID();
       const payload = {
         id: replyId,
         responder: getDisplayName(),
         responderCode: getResponderCode(),
+        responderUid: user?.uid || null, // helpful for permissions
         text: draft,
         createdAt: Timestamp.now(),
       };
@@ -462,6 +556,7 @@ const ClassDiscussionPage = () => {
         },
         { merge: true }
       );
+
       setReplyDrafts((prev) => ({ ...prev, [threadId]: "" }));
       stopTypingIndicator(threadId);
     } catch (err) {
@@ -506,6 +601,10 @@ const ClassDiscussionPage = () => {
 
   const handleDeleteReply = async (threadId, reply) => {
     if (!db) return;
+    if (!canEditReply(reply)) {
+      setError("You can only delete your own response.");
+      return;
+    }
 
     try {
       const qaDocRef = doc(db, "qa_posts", threadId);
@@ -518,6 +617,7 @@ const ClassDiscussionPage = () => {
         { responses: nextResponses, updatedAt: serverTimestamp() },
         { merge: true }
       );
+
       if (editingReply?.replyId === reply.id) {
         setEditingReply(null);
       }
@@ -527,17 +627,30 @@ const ClassDiscussionPage = () => {
     }
   };
 
-  const handleStartEdit = (threadId, reply) => {
+  const handleStartEditReply = (threadId, reply) => {
+    if (!canEditReply(reply)) {
+      setError("You can only edit your own response.");
+      return;
+    }
+    setError("");
     setEditingReply({ threadId, replyId: reply.id, text: reply.text, author: reply.author });
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEditReply = async () => {
     if (!editingReply || !editingReply.text.trim() || !db) return;
+
+    const threadReplies = repliesByThread[editingReply.threadId] || [];
+    const currentReply = threadReplies.find((r) => r.id === editingReply.replyId);
+    if (!canEditReply(currentReply)) {
+      setError("You can only edit your own response.");
+      return;
+    }
 
     try {
       const qaDocRef = doc(db, "qa_posts", editingReply.threadId);
       const existingSnap = await getDoc(qaDocRef);
       const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
+
       const updatedResponses = responses.map((response) =>
         response.id === editingReply.replyId
           ? { ...response, text: editingReply.text, editedAt: Timestamp.now() }
@@ -549,6 +662,7 @@ const ClassDiscussionPage = () => {
         { responses: updatedResponses, updatedAt: serverTimestamp() },
         { merge: true }
       );
+
       setEditingReply(null);
     } catch (err) {
       console.error("Failed to edit reply", err);
@@ -597,6 +711,7 @@ const ClassDiscussionPage = () => {
   const renderThread = (thread) => {
     const status = thread.status || resolveStatus(thread);
     const isThreadOpen = status === "open";
+
     const timeRemainingLabel =
       status === "archived"
         ? "Archived"
@@ -605,6 +720,7 @@ const ClassDiscussionPage = () => {
         : thread.expiresAt
         ? `Time left ${formatTimeRemaining(thread.expiresAt, now)}`
         : "No timer set";
+
     const statusBadgeStyle = {
       ...styles.badge,
       background:
@@ -621,14 +737,31 @@ const ClassDiscussionPage = () => {
           : "#a5f3fc",
       color: status === "archived" ? "#92400e" : status === "expired" ? "#991b1b" : "#0ea5e9",
     };
+
     const tutorUnit = extensionUnits[thread.id] || thread.timerUnit || "minutes";
     const tutorMinutes = valueFromMinutes(thread.timerMinutes || 0, tutorUnit);
     const tutorValue = extensionValues[thread.id] ?? tutorMinutes ?? 10;
+
+    const isEditingThisThread = editingThread?.threadId === thread.id;
+
     return (
       <div key={thread.id} style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "space-between", flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+          }}
+        >
           <div style={{ display: "grid", gap: 4 }}>
-            <div style={{ fontWeight: 800, fontSize: 16 }}>{thread.questionTitle || thread.topic}</div>
+            <div style={{ fontWeight: 800, fontSize: 16 }}>
+              {thread.questionTitle || thread.topic}
+              {thread.editedAt ? (
+                <span style={{ ...styles.helperText, marginLeft: 8 }}>· edited</span>
+              ) : null}
+            </div>
             <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
             {thread.extraLink ? (
               <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
@@ -636,45 +769,118 @@ const ClassDiscussionPage = () => {
               </a>
             ) : null}
           </div>
+
           <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-            <span style={styles.badge}>Question by {thread.createdBy}</span>
+            <span style={styles.badge}>Posted by {thread.createdBy}</span>
             <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
+
+            {canEditThread(thread) ? (
+              <button
+                style={{ ...styles.secondaryButton, padding: "8px 10px" }}
+                type="button"
+                onClick={() => startEditThread(thread)}
+              >
+                Edit post
+              </button>
+            ) : null}
           </div>
         </div>
 
-        {!isThreadOpen ? (
-          <div
-            style={{
-              ...styles.helperText,
-              margin: 0,
-              background: "#f8fafc",
-              borderRadius: 10,
-              padding: 10,
-              color: "#0f172a",
-            }}
-          >
-            Replies are closed because this thread is {status}. Tutors can reopen it with the timer controls.
-          </div>
-        ) : null}
-
-        <div style={{ display: "grid", gap: 6 }}>
-          <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
-            <strong>Question:</strong> {thread.question}
-          </div>
-          {thread.instructions ? (
-            <div
-              style={{
-                ...styles.helperText,
-                margin: 0,
-                background: "#f8fafc",
-                padding: 10,
-                borderRadius: 10,
-              }}
-            >
-              <strong>Instructions (English):</strong> {thread.instructions} — Refer to chapter "Tutorial" in the course book.
+        {isEditingThisThread ? (
+          <div style={{ display: "grid", gap: 10, background: "#f8fafc", padding: 12, borderRadius: 12 }}>
+            <div style={styles.field}>
+              <label style={styles.label}>Topic / headline</label>
+              <input
+                type="text"
+                style={styles.select}
+                value={editingThread.topic}
+                onChange={(e) => setEditingThread((p) => ({ ...p, topic: e.target.value }))}
+              />
             </div>
-          ) : null}
-        </div>
+
+            <div style={styles.field}>
+              <label style={styles.label}>Instructions (English)</label>
+              <textarea
+                style={styles.textArea}
+                value={editingThread.instructions}
+                onChange={(e) => setEditingThread((p) => ({ ...p, instructions: e.target.value }))}
+              />
+            </div>
+
+            <div style={styles.field}>
+              <label style={styles.label}>Guiding question</label>
+              <textarea
+                style={styles.textArea}
+                value={editingThread.question}
+                onChange={(e) => setEditingThread((p) => ({ ...p, question: e.target.value }))}
+              />
+            </div>
+
+            <div style={styles.field}>
+              <label style={styles.label}>Additional link (optional)</label>
+              <input
+                type="url"
+                style={styles.select}
+                value={editingThread.extraLink}
+                onChange={(e) => setEditingThread((p) => ({ ...p, extraLink: e.target.value }))}
+              />
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
+              <button
+                style={{ ...styles.secondaryButton, padding: "10px 12px" }}
+                type="button"
+                onClick={() => setEditingThread(null)}
+              >
+                Cancel
+              </button>
+              <button
+                style={{ ...styles.primaryButton, padding: "10px 12px" }}
+                type="button"
+                onClick={saveThreadEdit}
+                disabled={isSavingThreadEdit}
+              >
+                {isSavingThreadEdit ? "Saving..." : "Save changes"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {!isThreadOpen ? (
+              <div
+                style={{
+                  ...styles.helperText,
+                  margin: 0,
+                  background: "#f8fafc",
+                  borderRadius: 10,
+                  padding: 10,
+                  color: "#0f172a",
+                }}
+              >
+                Replies are closed because this thread is {status}. Tutors can reopen it with the timer controls.
+              </div>
+            ) : null}
+
+            <div style={{ display: "grid", gap: 6 }}>
+              <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
+                <strong>Question:</strong> {thread.question}
+              </div>
+              {thread.instructions ? (
+                <div
+                  style={{
+                    ...styles.helperText,
+                    margin: 0,
+                    background: "#f8fafc",
+                    padding: 10,
+                    borderRadius: 10,
+                  }}
+                >
+                  <strong>Instructions (English):</strong> {thread.instructions} — Refer to chapter "Tutorial" in the course book.
+                </div>
+              ) : null}
+            </div>
+          </>
+        )}
 
         {isTutor ? (
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
@@ -685,9 +891,7 @@ const ClassDiscussionPage = () => {
               step="5"
               style={{ ...styles.select, maxWidth: 120 }}
               value={tutorValue}
-              onChange={(e) =>
-                setExtensionValues((prev) => ({ ...prev, [thread.id]: e.target.value }))
-              }
+              onChange={(e) => setExtensionValues((prev) => ({ ...prev, [thread.id]: e.target.value }))}
             />
             <select
               value={tutorUnit}
@@ -710,107 +914,133 @@ const ClassDiscussionPage = () => {
 
         <div style={{ display: "grid", gap: 8 }}>
           <div style={{ fontWeight: 700, fontSize: 14 }}>Responses ({thread.replies.length})</div>
+
           <div style={{ display: "grid", gap: 10 }}>
-          {thread.replies.map((reply) => (
-            <div key={reply.id} style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                <div style={{ fontWeight: 700, fontSize: 14 }}>{reply.author || "Student"}</div>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button
-                    style={{ ...styles.secondaryButton, padding: "6px 10px" }}
-                    onClick={() => handleStartEdit(thread.id, reply)}
+            {thread.replies.map((reply) => {
+              const canManage = canEditReply(reply);
+              return (
+                <div key={reply.id} style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 8,
+                      flexWrap: "wrap",
+                    }}
                   >
-                    Edit
-                  </button>
-                  <button
-                    style={{ ...styles.dangerButton, padding: "6px 10px" }}
-                    onClick={() => handleDeleteReply(thread.id, reply)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-              {editingReply && editingReply.replyId === reply.id ? (
-                <>
-                  <textarea
-                    style={{ ...styles.textareaSmall, marginTop: 8 }}
-                    value={editingReply.text}
-                    onChange={(e) => setEditingReply((prev) => ({ ...prev, text: e.target.value }))}
-                  />
-                  <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
-                    <button style={{ ...styles.secondaryButton, padding: "6px 10px" }} onClick={() => setEditingReply(null)}>
-                      Cancel
-                    </button>
-                    <button style={{ ...styles.primaryButton, padding: "6px 10px" }} onClick={handleSaveEdit}>
-                      Save
-                    </button>
+                    <div style={{ fontWeight: 700, fontSize: 14 }}>{reply.author || "Student"}</div>
+
+                    {canManage ? (
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          style={{ ...styles.secondaryButton, padding: "6px 10px" }}
+                          onClick={() => handleStartEditReply(thread.id, reply)}
+                          type="button"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          style={{ ...styles.dangerButton, padding: "6px 10px" }}
+                          onClick={() => handleDeleteReply(thread.id, reply)}
+                          type="button"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    ) : null}
                   </div>
-                </>
-              ) : (
-                <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#111827" }}>
-                  {reply.text}
-                  {reply.editedAt ? " · edited" : ""}
-                </p>
-              )}
-            </div>
-          ))}
-          {thread.replies.length === 0 && (
-            <div style={{ ...styles.helperText, margin: 0 }}>No responses yet — start the discussion!</div>
-          )}
-        </div>
-        <div style={{ display: "grid", gap: 8 }}>
-          <textarea
-            style={styles.textareaSmall}
-            placeholder={
-              isThreadOpen
-                ? "Share your opinion or give feedback ..."
-                : "Replies are disabled for this thread"
-            }
-            value={replyDrafts[thread.id] || ""}
-            onChange={(e) => {
-              setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
-              if (isThreadOpen) {
-                markTypingForThread(thread.id);
-              }
-            }}
-            onBlur={() => stopTypingIndicator(thread.id)}
-            disabled={!isThreadOpen}
-          />
-          {typingByThread[thread.id]?.length ? (
-            <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
-              {typingByThread[thread.id].join(", ")} is typing ...
-            </div>
-          ) : null}
-          <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
-            <button
-              style={{ ...styles.secondaryButton, padding: "10px 12px" }}
-              type="button"
-              onClick={() => handleCorrectDraft(thread.id)}
-              disabled={isCorrectingDraft[thread.id] || !isThreadOpen}
-            >
-              {isCorrectingDraft[thread.id] ? "AI is correcting ..." : "Correct with AI"}
-            </button>
-            <button
-              style={styles.primaryButton}
-              onClick={() => handleReply(thread.id)}
-              disabled={!isThreadOpen}
-            >
-              Post response
-            </button>
+
+                  {editingReply && editingReply.replyId === reply.id ? (
+                    <>
+                      <textarea
+                        style={{ ...styles.textareaSmall, marginTop: 8 }}
+                        value={editingReply.text}
+                        onChange={(e) => setEditingReply((prev) => ({ ...prev, text: e.target.value }))}
+                      />
+                      <div style={{ display: "flex", gap: 8, marginTop: 8, justifyContent: "flex-end" }}>
+                        <button
+                          style={{ ...styles.secondaryButton, padding: "6px 10px" }}
+                          onClick={() => setEditingReply(null)}
+                          type="button"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          style={{ ...styles.primaryButton, padding: "6px 10px" }}
+                          onClick={handleSaveEditReply}
+                          type="button"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#111827" }}>
+                      {reply.text}
+                      {reply.editedAt ? " · edited" : ""}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+
+            {thread.replies.length === 0 && (
+              <div style={{ ...styles.helperText, margin: 0 }}>No responses yet — start the discussion!</div>
+            )}
           </div>
-          {!isThreadOpen ? (
-            <p style={{ ...styles.helperText, margin: 0, color: "#0f172a" }}>
-              Replies are disabled for this {status} thread.
+
+          <div style={{ display: "grid", gap: 8 }}>
+            <textarea
+              style={styles.textareaSmall}
+              placeholder={isThreadOpen ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"}
+              value={replyDrafts[thread.id] || ""}
+              onChange={(e) => {
+                setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
+                if (isThreadOpen) markTypingForThread(thread.id);
+              }}
+              onBlur={() => stopTypingIndicator(thread.id)}
+              disabled={!isThreadOpen}
+            />
+
+            {typingByThread[thread.id]?.length ? (
+              <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
+                {typingByThread[thread.id].join(", ")} is typing ...
+              </div>
+            ) : null}
+
+            <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, flexWrap: "wrap" }}>
+              <button
+                style={{ ...styles.secondaryButton, padding: "10px 12px" }}
+                type="button"
+                onClick={() => handleCorrectDraft(thread.id)}
+                disabled={isCorrectingDraft[thread.id] || !isThreadOpen}
+              >
+                {isCorrectingDraft[thread.id] ? "AI is correcting ..." : "Correct with AI"}
+              </button>
+              <button
+                style={styles.primaryButton}
+                onClick={() => handleReply(thread.id)}
+                disabled={!isThreadOpen}
+                type="button"
+              >
+                Post response
+              </button>
+            </div>
+
+            {!isThreadOpen ? (
+              <p style={{ ...styles.helperText, margin: 0, color: "#0f172a" }}>
+                Replies are disabled for this {status} thread.
+              </p>
+            ) : null}
+
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              "Correct with AI" improves only what you type. Without text, the AI cannot help.
             </p>
-          ) : null}
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            "Correct with AI" improves only what you type. Without text, the AI cannot help.
-          </p>
+          </div>
         </div>
       </div>
-    </div>
-  );
-
+    );
   };
 
   return (
@@ -820,8 +1050,8 @@ const ClassDiscussionPage = () => {
           <div>
             <h2 style={styles.sectionTitle}>Class discussion</h2>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              Tutors create a timed question with a topic and link. Students see new posts instantly and can edit or delete their own
-              responses.
+              Anyone in your class (students + tutors) can create a timed discussion post. Replies update live, and you can edit your own
+              posts if you make mistakes.
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
               <span style={styles.badge}>Level: {studentProfile?.level || "(missing)"}</span>
@@ -875,10 +1105,9 @@ const ClassDiscussionPage = () => {
                     </option>
                   ))}
                 </select>
-                {selectedLesson?.goal ? (
-                  <div style={{ ...styles.helperText, margin: 0 }}>Goal: {selectedLesson.goal}</div>
-                ) : null}
+                {selectedLesson?.goal ? <div style={{ ...styles.helperText, margin: 0 }}>Goal: {selectedLesson.goal}</div> : null}
               </div>
+
               <div style={styles.field}>
                 <label style={styles.label}>Topic / headline</label>
                 <input
@@ -889,6 +1118,7 @@ const ClassDiscussionPage = () => {
                   placeholder="e.g. Phrases for complaints"
                 />
               </div>
+
               <div style={styles.field}>
                 <label style={styles.label}>Timer</label>
                 <div style={{ display: "flex", gap: 8 }}>
@@ -911,6 +1141,7 @@ const ClassDiscussionPage = () => {
                   </select>
                 </div>
               </div>
+
               <div style={styles.field}>
                 <label style={styles.label}>Additional link (optional)</label>
                 <input
@@ -945,7 +1176,7 @@ const ClassDiscussionPage = () => {
 
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <button style={styles.primaryButton} type="submit" disabled={isSavingThread}>
-                Post discussion
+                {isSavingThread ? "Posting..." : "Post discussion"}
               </button>
             </div>
           </form>
@@ -958,6 +1189,7 @@ const ClassDiscussionPage = () => {
           </div>
         )}
       </div>
+
       {activeTab === "discussion" ? (
         <div style={{ display: "grid", gap: 12 }}>
           {error ? (
@@ -973,7 +1205,9 @@ const ClassDiscussionPage = () => {
           ) : threadsWithReplies.length === 0 ? (
             <div style={styles.card}>
               <div style={{ fontWeight: 700, marginBottom: 6 }}>No discussions started</div>
-              <p style={{ ...styles.helperText, margin: 0 }}>Create the first question, pick the right lesson, and set a timer for your students.</p>
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                Create the first post, pick the right lesson, and set a timer for your class.
+              </p>
             </div>
           ) : (
             threadsWithReplies.map((thread) => renderThread(thread))
