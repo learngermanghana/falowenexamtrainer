@@ -5,14 +5,15 @@ import { sendSpeechTrainerAttempt } from "../../services/speechTrainerService";
 
 const InlineSpeechTrainer = ({ profileLevel }) => {
   const { idToken } = useAuth();
+  const displayLevel = profileLevel || "A2";
 
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState("Hallo");
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioUrl, setAudioUrl] = useState(null);
   const [audioBlob, setAudioBlob] = useState(null);
   const [status, setStatus] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState("Could not reach the coach right now. Please try again in a moment.");
   const [feedback, setFeedback] = useState(null);
 
   const mediaRecorderRef = useRef(null);
@@ -115,7 +116,7 @@ const InlineSpeechTrainer = ({ profileLevel }) => {
       const response = await sendSpeechTrainerAttempt({
         audioBlob,
         note: note.trim(),
-        level: profileLevel,
+        level: displayLevel,
         idToken,
       });
 
@@ -153,7 +154,7 @@ const InlineSpeechTrainer = ({ profileLevel }) => {
       <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Practice inside the app</h3>
       <p style={{ ...styles.helperText, margin: 0 }}>
         Type a short answer or record yourself here. When you submit, the coach will listen and send focused notes for
-        your level {profileLevel ? `(${profileLevel})` : ""}.
+        your level ({displayLevel}).
       </p>
 
       <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
@@ -162,7 +163,7 @@ const InlineSpeechTrainer = ({ profileLevel }) => {
           <textarea
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Give a 2–3 sentence answer or key points before you record."
+            placeholder="Type your answer"
             rows={4}
             style={{
               ...styles.input,

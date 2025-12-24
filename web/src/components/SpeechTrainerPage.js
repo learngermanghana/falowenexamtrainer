@@ -9,7 +9,8 @@ const SpeechTrainerPage = () => {
   const { studentProfile } = useAuth();
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "";
-  const profileLevel = (studentProfile?.level || "").toUpperCase();
+  const displayStudentCode = studentCode || "FelixAsadu579";
+  const profileLevel = (studentProfile?.level || "A2").toUpperCase();
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -31,11 +32,9 @@ const SpeechTrainerPage = () => {
               spoken answer. You will get an instant transcript, pronunciation notes, and level-targeted feedback.
             </p>
           </div>
-          {studentCode ? (
-            <div style={{ ...styles.badge, alignSelf: "start", background: "#fef3c7", color: "#92400e" }}>
-              Student code: {studentCode}
-            </div>
-          ) : null}
+          <div style={{ ...styles.badge, alignSelf: "start", background: "#fef3c7", color: "#92400e" }}>
+            Student code: {displayStudentCode}
+          </div>
         </div>
 
         <div
@@ -52,7 +51,7 @@ const SpeechTrainerPage = () => {
           <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
             <li>Click the button below to open the speech trainer.</li>
             <li>Type your student code so the coach saves your progress.</li>
-            <li>Select your Goethe level {profileLevel ? `(profile level: ${profileLevel})` : "(A1–C2)"}.</li>
+            <li>Select your Goethe level (profile level: {profileLevel}).</li>
             <li>Record your answer and follow the on-page tips for clearer Sprechen.</li>
           </ul>
 
@@ -74,9 +73,6 @@ const SpeechTrainerPage = () => {
               </span>
               Open Speech Trainer
             </a>
-            <span style={{ ...styles.helperText, margin: 0 }}>
-              The practice page includes full instructions—read them carefully before you start.
-            </span>
           </div>
         </div>
       </div>
