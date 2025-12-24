@@ -6,7 +6,7 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { generateStudentCode } from "../services/studentCode";
 import { classCatalog } from "../data/classCatalog";
-import { computeTuitionStatus } from "../data/levelFees";
+import { computeTuitionStatus, paystackLinkForLevel } from "../data/levelFees";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
@@ -265,7 +265,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setLoading(true);
     try {
       const tuitionFee = tuitionSummary.tuitionFee;
-      const paidAmount = tuitionSummary.paidAmount;
+      // IMPORTANT: don't mark money as paid until the Paystack webhook confirms it.
+      const intendedPaymentAmount = isPayNow ? Math.max(Number(numericInitialPayment) || 0, 0) : 0;
+      const paidAmount = 0;
       const contractStart = new Date();
       const contractMonths = isPayNow
         ? Number(selectedContractTerm) || (tuitionSummary.statusLabel === "Paid" ? 6 : 1)
@@ -277,16 +279,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
             return endDate;
           })()
         : null;
-      const balanceDue = tuitionSummary.balanceDue;
-      const paymentStatus = isTrial
-        ? "trial"
-        : tuitionSummary.statusLabel.toLowerCase();
+      const balanceDue = isTrial ? 0 : Math.max(Number(tuitionFee) || 0, 0);
+      const paymentStatus = isTrial ? "trial" : "pending";
       const paystackCheckoutLink = buildPaystackCheckoutLink({
-        baseLink: tuitionSummary.paystackLink,
-        amount: balanceDue,
+        baseLink: paystackLinkForLevel(selectedLevel),
+        // Charge the amount the student intends to pay now (min deposit), not the remaining balance.
+        amount: intendedPaymentAmount || balanceDue,
         redirectUrl: `${window.location.origin}/payment-complete`,
       });
-      const paystackLink = paystackCheckoutLink || tuitionSummary.paystackLink;
+      const paystackLink = paystackCheckoutLink || paystackLinkForLevel(selectedLevel);
 
       const studentCode = generateStudentCode({ name });
       await signup(email, password, {
@@ -302,6 +303,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         balanceDue,
         paymentStatus,
         paystackLink,
+        paymentIntentAmount: intendedPaymentAmount || null,
         status: isTrial ? "Trial" : "Active",
         contractStart: contractStart.toISOString(),
         contractEnd: contractEnd ? contractEnd.toISOString() : "",
@@ -604,15 +606,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
           <TuitionStatusCard
             level={selectedLevel}
-            paidAmount={Number(initialPaymentAmount) || 0}
-            balanceDue={tuitionSummary.balanceDue}
+            // This card is a preview only... actual payment is confirmed via Paystack webhook.
+            paidAmount={0}
+            balanceDue={isTrial ? 0 : tuitionSummary.tuitionFee}
             tuitionFee={tuitionSummary.tuitionFee}
             paystackLink={tuitionSummary.paystackLink}
             title="Tuition summary"
             description={
               isTrial
                 ? `For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. Your account will stay in trial mode until you complete tuition in the app.`
-                : `For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. We'll mark your account as ${tuitionSummary.statusLabel.toLowerCase()} until the full balance is received.`
+                : `For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`
             }
           />
 
