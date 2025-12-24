@@ -18,6 +18,7 @@ const TuitionStatusCard = ({
   balanceDue,
   tuitionFee,
   paystackLink,
+  checkoutAmountOverride,
   title = "Tuition & payments",
   description,
 }) => {
@@ -28,7 +29,11 @@ const TuitionStatusCard = ({
     description ||
     `${summary.statusCopy}. ${summary.tuitionFee ? `Tuition for ${levelCopy} is GH₵${summary.tuitionFee}.` : "Tuition not set yet."}`;
   const checkoutLink = paystackLink || paystackLinkForLevel(level);
-  const checkoutAmount = summary.balanceDue || summary.paidAmount || summary.tuitionFee;
+  const normalizedOverride = Number(checkoutAmountOverride);
+  const checkoutAmount =
+    Number.isFinite(normalizedOverride) && normalizedOverride > 0
+      ? normalizedOverride
+      : summary.balanceDue || summary.paidAmount || summary.tuitionFee;
   const redirectUrl = `${window.location.origin}/payment-complete`;
   const checkoutLinkWithParams = buildPaystackCheckoutLink({
     baseLink: checkoutLink,
