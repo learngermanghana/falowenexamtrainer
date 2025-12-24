@@ -81,6 +81,8 @@ const buildLevelSchedules = () => {
 
 const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules();
 
+const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
 const getLessonKey = (lesson) => {
   return [
     lesson.chapter || lesson.title || "",
@@ -215,17 +217,35 @@ const CourseTab = ({ defaultLevel }) => {
     const hasAssignment = (entry) => {
       if (entry.assignment) return true;
 
-      const toArray = (value) =>
-        Array.isArray(value) ? value : value ? [value] : [];
-
       return (
-        toArray(entry.lesen_hören).some((lesson) => lesson.assignment) ||
-        toArray(entry.schreiben_sprechen).some((lesson) => lesson.assignment)
+        toLessonArray(entry.lesen_hören).some((lesson) => lesson.assignment) ||
+        toLessonArray(entry.schreiben_sprechen).some((lesson) => lesson.assignment)
       );
     };
 
     return schedule.filter((entry) => matchesSearch(entry) && (!assignmentsOnly || hasAssignment(entry)));
   }, [schedule, searchTerm, assignmentsOnly]);
+
+  const quickActions = useMemo(() => {
+    const entry = filteredSchedule[0];
+    if (!entry) return null;
+
+    const lessons = [
+      ...toLessonArray(entry.lesen_hören),
+      ...toLessonArray(entry.schreiben_sprechen),
+    ];
+
+    const findLink = (key) => lessons.find((lesson) => lesson?.[key])?.[key] || null;
+    const videoLesson = lessons.find((lesson) => lesson?.video || lesson?.youtube_link);
+
+    return {
+      day: entry.day,
+      topic: entry.topic,
+      video: videoLesson?.video || videoLesson?.youtube_link || null,
+      grammarbook: findLink("grammarbook_link"),
+      workbook: findLink("workbook_link"),
+    };
+  }, [filteredSchedule]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -287,6 +307,33 @@ const CourseTab = ({ defaultLevel }) => {
             ? "This level uses the class schedule because the course book dictionary does not yet include it."
             : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
         </p>
+        {quickActions && (quickActions.video || quickActions.grammarbook || quickActions.workbook) ? (
+          <div style={{ ...styles.card, marginBottom: 0, padding: 12, display: "grid", gap: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <div style={{ fontWeight: 700 }}>Quick actions</div>
+              <div style={styles.helperText}>
+                From Day {quickActions.day}: {quickActions.topic}
+              </div>
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+              {quickActions.video ? (
+                <a href={quickActions.video} target="_blank" rel="noreferrer">
+                  ▶️ Video
+                </a>
+              ) : null}
+              {quickActions.grammarbook ? (
+                <a href={quickActions.grammarbook} target="_blank" rel="noreferrer">
+                  📘 Grammar book
+                </a>
+              ) : null}
+              {quickActions.workbook ? (
+                <a href={quickActions.workbook} target="_blank" rel="noreferrer">
+                  📗 Workbook
+                </a>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
 
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
           {filteredSchedule.map((entry) => {
