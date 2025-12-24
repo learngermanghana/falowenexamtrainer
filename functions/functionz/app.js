@@ -353,10 +353,29 @@ const placementPrompt = ({ answers, targetLevel }) => {
 async function findStudentByCodeOrEmail({ studentCode, email }) {
   const db = admin.firestore();
 
-  if (studentCode) {
-    const docRef = db.collection("students").doc(studentCode);
-    const docSnap = await docRef.get();
-    if (docSnap.exists) return { ref: docRef, snap: docSnap };
+  const normalizedStudentCode = studentCode ? String(studentCode).trim() : "";
+
+  if (normalizedStudentCode) {
+    const candidateCodes = Array.from(
+      new Set([normalizedStudentCode, normalizedStudentCode.toLowerCase(), normalizedStudentCode.toUpperCase()])
+    );
+
+    for (const code of candidateCodes) {
+      const docRef = db.collection("students").doc(code);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) return { ref: docRef, snap: docSnap };
+    }
+
+    const codeFields = ["studentCode", "studentcode"];
+    for (const field of codeFields) {
+      for (const code of candidateCodes) {
+        const querySnap = await db.collection("students").where(field, "==", code).limit(1).get();
+        if (!querySnap.empty) {
+          const doc = querySnap.docs[0];
+          return { ref: doc.ref, snap: doc };
+        }
+      }
+    }
   }
 
   if (email) {
