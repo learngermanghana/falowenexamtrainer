@@ -51,6 +51,10 @@ const TuitionStatusCard = ({
   );
 
   const maxPayable = Math.max(Number(summary.balanceDue) || 0, 0);
+
+  // If remaining balance is below the minimum installment, it's a final top-up (pay exact balance).
+  const isFinalTopUp = maxPayable > 0 && maxPayable < MIN_INSTALLMENT_GHS;
+
   const defaultAmount =
     checkoutAmountOverride !== undefined && checkoutAmountOverride !== null
       ? clampNumber(checkoutAmountOverride, { min: 0, max: maxPayable })
@@ -61,10 +65,15 @@ const TuitionStatusCard = ({
   const [paymentError, setPaymentError] = useState("");
 
   useEffect(() => {
-    // Keep the input in sync when the profile updates (e.g., after webhook).
+    // If we are in final-topup mode, force the exact remaining balance.
+    if (isFinalTopUp) {
+      setAmountText(String(maxPayable));
+      return;
+    }
+    // Otherwise keep input synced to suggested default.
     const nextDefault = defaultAmount ? String(defaultAmount) : "";
     setAmountText(nextDefault);
-  }, [defaultAmount]);
+  }, [defaultAmount, isFinalTopUp, maxPayable]);
 
   const amountNow = useMemo(() => {
     if (!amountText) return 0;
@@ -72,26 +81,45 @@ const TuitionStatusCard = ({
     return clampNumber(numericOnly, { min: 0, max: maxPayable });
   }, [amountText, maxPayable]);
 
+  // In final-topup mode, always charge the exact remaining balance.
+  const amountToPay = isFinalTopUp ? maxPayable : amountNow;
+
   const paidSoFar = Math.max(Number(summary.paidAmount) || 0, 0);
   const tuitionTotal = Math.max(Number(summary.tuitionFee) || 0, 0);
-  const projectedTotalPaid = paidSoFar + amountNow;
+  const projectedTotalPaid = paidSoFar + amountToPay;
 
-  const isFinalPayment = maxPayable > 0 && Math.abs(amountNow - maxPayable) < 0.5;
-  const meetsMinimum = amountNow >= MIN_INSTALLMENT_GHS || isFinalPayment;
+  const isFinalPayment = maxPayable > 0 && Math.abs(amountToPay - maxPayable) < 0.5;
+  const meetsMinimum = amountToPay >= MIN_INSTALLMENT_GHS || isFinalPayment;
+
   const willClearTuition = tuitionTotal > 0 && projectedTotalPaid >= tuitionTotal;
   const accessAfterPayment = willClearTuition ? "6 months" : "1 month";
 
   const amountHelper = useMemo(() => {
     if (maxPayable <= 0) return "No balance due.";
-    if (!amountNow) return `Enter an amount (min GH₵${MIN_INSTALLMENT_GHS}, or pay the remaining balance).`;
+
+    if (isFinalTopUp) {
+      return `Final top-up: paying ${formatMoney(maxPayable)} completes your tuition and gives access for ${accessAfterPayment}.`;
+    }
+
+    if (!amountToPay) {
+      return `Enter an amount (min GH₵${MIN_INSTALLMENT_GHS}, or pay the remaining balance).`;
+    }
+
     if (!meetsMinimum) {
       return `Minimum is GH₵${MIN_INSTALLMENT_GHS} unless you're paying the remaining ${formatMoney(maxPayable)}.`;
     }
-    const remaining = Math.max(maxPayable - amountNow, 0);
-    return `After this payment: access for ${accessAfterPayment}. Remaining balance: ${formatMoney(remaining)}.`;
-  }, [accessAfterPayment, amountNow, maxPayable, meetsMinimum]);
 
-  const canPay = paymentsEnabled && maxPayable > 0 && amountNow > 0 && meetsMinimum && Boolean(idToken);
+    const remaining = Math.max(maxPayable - amountToPay, 0);
+    return `After this payment: access for ${accessAfterPayment}. Remaining balance: ${formatMoney(remaining)}.`;
+  }, [accessAfterPayment, amountToPay, isFinalTopUp, maxPayable, meetsMinimum]);
+
+  const canPay =
+    paymentsEnabled &&
+    showPaymentAction &&
+    maxPayable > 0 &&
+    amountToPay > 0 &&
+    meetsMinimum &&
+    Boolean(idToken);
 
   const startPayment = async () => {
     setPaymentError("");
@@ -123,7 +151,7 @@ const TuitionStatusCard = ({
         },
         body: JSON.stringify({
           studentCode,
-          amount: amountNow,
+          amount: amountToPay,
           redirectUrl: `${window.location.origin}/payment-complete`,
         }),
       });
@@ -173,32 +201,57 @@ const TuitionStatusCard = ({
 
       {paymentsEnabled && showPaymentAction ? (
         <div style={{ marginTop: 12 }}>
-          <label style={{ ...styles.label, marginBottom: 6 }}>Amount to pay now</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            value={amountText}
-            onChange={(e) => {
-              setPaymentError("");
-              setAmountText(e.target.value);
-            }}
-            style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-            placeholder={`Min GH₵${MIN_INSTALLMENT_GHS} (or pay remaining)`}
-          />
-          <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
+          {maxPayable <= 0 ? null : isFinalTopUp ? (
+            <>
+              <div style={{ ...styles.card, margin: 0, background: "#f8fafc", borderColor: "#e2e8f0" }}>
+                <div style={styles.metaRow}>
+                  <span>Final payment</span>
+                  <strong>{formatMoney(maxPayable)}</strong>
+                </div>
+                <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                  Your remaining balance is below the GH₵{MIN_INSTALLMENT_GHS} installment minimum, so you can pay the exact balance to finish.
+                </p>
+              </div>
 
-          <button
-            type="button"
-            style={{ ...styles.primaryButton, marginTop: 10 }}
-            onClick={startPayment}
-            disabled={!canPay || isStartingPayment}
-          >
-            {isStartingPayment ? "Opening Paystack ..." : "Pay tuition online"}
-          </button>
+              <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{amountHelper}</p>
 
-          {paymentError ? (
-            <div style={{ ...styles.errorBox, marginTop: 10 }}>{paymentError}</div>
-          ) : null}
+              <button
+                type="button"
+                style={{ ...styles.primaryButton, marginTop: 10 }}
+                onClick={startPayment}
+                disabled={!canPay || isStartingPayment}
+              >
+                {isStartingPayment ? "Opening Paystack ..." : `Pay ${formatMoney(maxPayable)} to finish`}
+              </button>
+            </>
+          ) : (
+            <>
+              <label style={{ ...styles.label, marginBottom: 6 }}>Amount to pay now</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={amountText}
+                onChange={(e) => {
+                  setPaymentError("");
+                  setAmountText(e.target.value);
+                }}
+                style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
+                placeholder={`Min GH₵${MIN_INSTALLMENT_GHS} (or pay remaining)`}
+              />
+              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
+
+              <button
+                type="button"
+                style={{ ...styles.primaryButton, marginTop: 10 }}
+                onClick={startPayment}
+                disabled={!canPay || isStartingPayment}
+              >
+                {isStartingPayment ? "Opening Paystack ..." : "Pay tuition online"}
+              </button>
+            </>
+          )}
+
+          {paymentError ? <div style={{ ...styles.errorBox, marginTop: 10 }}>{paymentError}</div> : null}
         </div>
       ) : (
         <div
