@@ -3,8 +3,8 @@ import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useExam } from "../context/ExamContext";
 import { fetchAttendanceSummary } from "../services/attendanceService";
-import { fetchAssignmentSummary } from "../services/assignmentService";
-import { fetchResults } from "../services/resultsService";
+import { fetchScoreSummary } from "../services/scoreSummaryService";
+import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { isFirebaseConfigured } from "../firebase";
 
@@ -26,15 +26,12 @@ const downloadTextFile = (filename, content) => {
 
 const computeReadiness = ({ attendanceSessions, completedAssignments }) => {
   const completedCount = completedAssignments.length;
-  const scoredAssignments = completedAssignments.filter((entry) => typeof entry.bestScore === "number");
+  const scored = completedAssignments.filter((entry) => typeof entry.score === "number");
   const averageScore =
-    scoredAssignments.length > 0
-      ? Math.round(
-          scoredAssignments.reduce((sum, entry) => sum + entry.bestScore, 0) / scoredAssignments.length,
-        )
-      : null;
-  const passCount = scoredAssignments.filter((entry) => entry.bestScore >= 70).length;
-  const passRate = scoredAssignments.length ? Math.round((passCount / scoredAssignments.length) * 100) : null;
+    scored.length > 0 ? Math.round(scored.reduce((sum, entry) => sum + entry.score, 0) / scored.length) : null;
+
+  const passCount = scored.filter((entry) => entry.score >= 70).length;
+  const passRate = scored.length ? Math.round((passCount / scored.length) * 100) : null;
 
   if (completedCount >= 5 && averageScore !== null && averageScore >= 75 && attendanceSessions >= 5) {
     return {
@@ -50,8 +47,7 @@ const computeReadiness = ({ attendanceSessions, completedAssignments }) => {
       icon: "⚠️",
       tone: "#fef3c7",
       text: "Build a stronger buffer",
-      detail:
-        "Keep aiming for 75+/100 on recent work and finish at least 5 marked assignments for a green check.",
+      detail: "Keep aiming for 75+/100 on recent work and finish at least 5 marked identifiers for a green check.",
     };
   }
 
@@ -64,28 +60,35 @@ const computeReadiness = ({ attendanceSessions, completedAssignments }) => {
 };
 
 const MyExamFilePage = () => {
-  const { studentProfile, user } = useAuth();
+  const { studentProfile, user, idToken } = useAuth();
   const { level, levelConfirmed } = useExam();
 
   const [attendanceState, setAttendanceState] = useState({ sessions: 0, hours: 0, loading: false, error: "" });
+
   const [assignmentState, setAssignmentState] = useState({
     loading: false,
     completed: [],
-    failed: [],
+    failedLessons: [],
+    missedLessons: [],
+    nextRecommendation: null,
+    blocked: false,
     lastAssignment: null,
     retriesThisWeek: 0,
     error: "",
   });
+
   const [feedbackState, setFeedbackState] = useState({ loading: false, items: [], error: "" });
 
   const studentCode = useMemo(
     () => studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "",
-    [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode],
+    [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
   );
+
   const className = useMemo(() => studentProfile?.className || "", [studentProfile?.className]);
+
   const detectedLevel = useMemo(
     () => (levelConfirmed ? level : (studentProfile?.level || level || "").toString().toUpperCase()),
-    [level, levelConfirmed, studentProfile?.level],
+    [level, levelConfirmed, studentProfile?.level]
   );
 
   const loadAttendance = useCallback(async () => {
@@ -123,12 +126,16 @@ const MyExamFilePage = () => {
     }
   }, [className, studentCode]);
 
+  // ✅ sheet-backed summary (scores + schedule logic)
   const loadAssignments = useCallback(async () => {
     if (!studentCode) {
       setAssignmentState({
         loading: false,
         completed: [],
-        failed: [],
+        failedLessons: [],
+        missedLessons: [],
+        nextRecommendation: null,
+        blocked: false,
         lastAssignment: null,
         retriesThisWeek: 0,
         error: "Add your student code to see submitted assignments.",
@@ -136,26 +143,26 @@ const MyExamFilePage = () => {
       return;
     }
 
-    if (!isFirebaseConfigured) {
-      setAssignmentState({
+    if (!idToken) {
+      setAssignmentState((prev) => ({
+        ...prev,
         loading: false,
-        completed: [],
-        failed: [],
-        lastAssignment: null,
-        retriesThisWeek: 0,
-        error: "Connect Firebase to load assignment history.",
-      });
+        error: "Sign in again to load your score summary.",
+      }));
       return;
     }
 
     setAssignmentState((prev) => ({ ...prev, loading: true, error: "" }));
     try {
-      const response = await fetchAssignmentSummary({ studentCode });
+      const response = await fetchScoreSummary({ idToken, studentCode });
       const student = response.student || {};
       setAssignmentState({
         loading: false,
         completed: student.completedAssignments || [],
-        failed: student.failedAssignments || [],
+        failedLessons: student.failedAssignments || [],
+        missedLessons: student.missedAssignments || [],
+        nextRecommendation: student.nextRecommendation || null,
+        blocked: Boolean(student.recommendationBlocked),
         lastAssignment: student.lastAssignment || null,
         retriesThisWeek: student.retriesThisWeek || 0,
         error: "",
@@ -164,36 +171,45 @@ const MyExamFilePage = () => {
       setAssignmentState({
         loading: false,
         completed: [],
-        failed: [],
+        failedLessons: [],
+        missedLessons: [],
+        nextRecommendation: null,
+        blocked: false,
         lastAssignment: null,
         retriesThisWeek: 0,
-        error: "Could not load submitted assignments.",
+        error: "Could not load score summary.",
       });
     }
-  }, [studentCode]);
+  }, [idToken, studentCode]);
 
+  // ✅ sheet-backed feedback history (scores + tutor comments)
   const loadFeedback = useCallback(async () => {
-    if (!studentCode && !user?.email) {
-      setFeedbackState({ loading: false, items: [], error: "Add student code or email to see feedback history." });
+    if (!studentCode) {
+      setFeedbackState({ loading: false, items: [], error: "Add your student code to see feedback history." });
       return;
     }
 
-    if (!isFirebaseConfigured) {
-      setFeedbackState({ loading: false, items: [], error: "Connect Firebase to load teacher feedback." });
+    if (!idToken) {
+      setFeedbackState({ loading: false, items: [], error: "Sign in again to load feedback history." });
       return;
     }
 
     setFeedbackState({ loading: true, items: [], error: "" });
     try {
-      const payload = await fetchResults({ studentCode, email: user?.email, level: detectedLevel || "all" });
-      const items = (payload.results || [])
+      const rows = await fetchStudentResultsHistory({ idToken, studentCode });
+
+      // newest first
+      const items = (rows || [])
+        .slice()
+        .sort((a, b) => new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0))
         .filter((row) => row.comments || typeof row.score === "number")
         .slice(0, 12);
+
       setFeedbackState({ loading: false, items, error: "" });
     } catch (error) {
       setFeedbackState({ loading: false, items: [], error: "Could not load teacher feedback right now." });
     }
-  }, [detectedLevel, studentCode, user?.email]);
+  }, [idToken, studentCode]);
 
   useEffect(() => {
     loadAttendance();
@@ -213,7 +229,7 @@ const MyExamFilePage = () => {
         attendanceSessions: attendanceState.sessions,
         completedAssignments: assignmentState.completed,
       }),
-    [assignmentState.completed, attendanceState.sessions],
+    [assignmentState.completed, attendanceState.sessions]
   );
 
   const downloadContract = () => {
@@ -242,29 +258,9 @@ const MyExamFilePage = () => {
     downloadTextFile("receipt-log.txt", receipt);
   };
 
-  const attendanceList = (
-    <div style={{ display: "grid", gap: 8 }}>
-      <div style={{ display: "grid", gap: 6, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-        <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
-          <div style={{ ...styles.helperText, margin: 0 }}>Sessions credited</div>
-          <div style={{ fontSize: 20, fontWeight: 800 }}>{attendanceState.sessions}</div>
-        </div>
-        <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
-          <div style={{ ...styles.helperText, margin: 0 }}>Hours credited</div>
-          <div style={{ fontSize: 20, fontWeight: 800 }}>{attendanceState.hours}</div>
-        </div>
-      </div>
-      {attendanceState.error ? <div style={styles.errorBox}>{attendanceState.error}</div> : null}
-      {attendanceState.loading ? <div style={styles.helperText}>Loading attendance ...</div> : null}
-    </div>
-  );
-
   const lockedAssignments = assignmentState.completed
     .slice()
-    .sort((a, b) => {
-      if (typeof a.number === "number" && typeof b.number === "number") return a.number - b.number;
-      return (a.label || a.assignment || "").localeCompare(b.label || b.assignment || "");
-    })
+    .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
     .slice(0, 8);
 
   const feedbackItems = feedbackState.items.slice(0, 6);
@@ -277,7 +273,7 @@ const MyExamFilePage = () => {
             <p style={{ ...styles.helperText, margin: 0 }}>Exam dossier</p>
             <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>My Exam File</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Level + class confirmation, attendance, assignments, teacher feedback, and quick downloads in one place.
+              Level + class confirmation, attendance, score sheet progress, tutor feedback, and quick downloads in one place.
             </p>
           </div>
           <div style={{ display: "grid", gap: 6 }}>
@@ -285,6 +281,7 @@ const MyExamFilePage = () => {
             {className ? <span style={styles.badge}>Class: {className}</span> : null}
           </div>
         </div>
+
         <div
           style={{
             borderRadius: 12,
@@ -304,27 +301,6 @@ const MyExamFilePage = () => {
       </section>
 
       <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-          <div style={{ ...styles.lockPill, background: "#ecfdf3", color: "#065f46", borderColor: "#bbf7d0" }}>
-            ✅ Level confirmed
-          </div>
-          <div style={{ ...styles.lockPill, background: "#eef2ff", color: "#312e81", borderColor: "#c7d2fe" }}>
-            {className ? "Class linked" : "Class not set"}
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <span style={styles.levelPill}>Level: {detectedLevel || "Select your level"}</span>
-          <span style={styles.badge}>Class: {className || "Add your class"}</span>
-          {assignmentState.lastAssignment ? (
-            <span style={styles.badge}>Last submission: {assignmentState.lastAssignment}</span>
-          ) : null}
-        </div>
-        <div style={{ ...styles.helperText, margin: 0 }}>
-          Confirmed settings keep your attendance, submissions, and scores synced to the right classroom.
-        </div>
-      </section>
-
-      <section style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
           <div>
             <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Attendance summary</h3>
@@ -334,7 +310,21 @@ const MyExamFilePage = () => {
             Refresh
           </button>
         </div>
-        {attendanceList}
+
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ display: "grid", gap: 6, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+            <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
+              <div style={{ ...styles.helperText, margin: 0 }}>Sessions credited</div>
+              <div style={{ fontSize: 20, fontWeight: 800 }}>{attendanceState.sessions}</div>
+            </div>
+            <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
+              <div style={{ ...styles.helperText, margin: 0 }}>Hours credited</div>
+              <div style={{ fontSize: 20, fontWeight: 800 }}>{attendanceState.hours}</div>
+            </div>
+          </div>
+          {attendanceState.error ? <div style={styles.errorBox}>{attendanceState.error}</div> : null}
+          {attendanceState.loading ? <div style={styles.helperText}>Loading attendance ...</div> : null}
+        </div>
       </section>
 
       <section style={{ ...styles.card, display: "grid", gap: 10 }}>
@@ -342,29 +332,38 @@ const MyExamFilePage = () => {
           <div>
             <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Submitted assignments (locked)</h3>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              View-only list of graded work. Contact your tutor if you need a resubmission unlocked.
+              This list comes from the published score sheet (best passed identifiers).
             </p>
           </div>
           <div style={styles.lockPill}>🔒 View only</div>
         </div>
+
         {assignmentState.error ? <div style={styles.errorBox}>{assignmentState.error}</div> : null}
-        {assignmentState.loading ? <div style={styles.helperText}>Loading submitted assignments ...</div> : null}
-        {!assignmentState.loading && !assignmentState.error && lockedAssignments.length === 0 ? (
-          <div style={styles.helperText}>No submissions detected yet.</div>
+        {assignmentState.loading ? <div style={styles.helperText}>Loading score summary ...</div> : null}
+
+        {!assignmentState.loading && !assignmentState.error && assignmentState.blocked ? (
+          <div style={{ ...styles.errorBox, background: "#fff7ed" }}>
+            Your next recommendation is blocked until you pass the failed identifiers.
+          </div>
         ) : null}
+
+        {!assignmentState.loading && !assignmentState.error && lockedAssignments.length === 0 ? (
+          <div style={styles.helperText}>No passed identifiers detected yet.</div>
+        ) : null}
+
         <div style={{ display: "grid", gap: 8 }}>
           {lockedAssignments.map((entry, index) => (
             <div
-              key={`${entry.assignment || entry.label || index}-locked`}
+              key={`${entry.identifier || index}-locked`}
               style={{ ...styles.uploadCard, display: "grid", gap: 4, background: "#f9fafb" }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <div style={{ fontWeight: 700 }}>{entry.label || entry.assignment || `Assignment ${index + 1}`}</div>
+                <div style={{ fontWeight: 700 }}>{entry.label || `Identifier ${entry.identifier}`}</div>
                 <span style={styles.lockPill}>🔒 Locked</span>
               </div>
               <p style={{ ...styles.helperText, margin: 0 }}>
-                Best score: {typeof entry.bestScore === "number" ? `${entry.bestScore}/100` : "Pending"} · Attempts:{" "}
-                {entry.attempts || 1}
+                Identifier: <b>{entry.identifier || "—"}</b> · Score:{" "}
+                {typeof entry.score === "number" ? `${entry.score}/100` : "Pending"} · Date: {formatDate(entry.date) || "—"}
               </p>
             </div>
           ))}
@@ -376,18 +375,20 @@ const MyExamFilePage = () => {
           <div>
             <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Teacher feedback history</h3>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Most recent scores and tutor comments from your submissions.
+              Scores + tutor comments are loaded from the published Google Sheet.
             </p>
           </div>
           <button type="button" style={styles.secondaryButton} onClick={loadFeedback} disabled={feedbackState.loading}>
             Reload feedback
           </button>
         </div>
+
         {feedbackState.error ? <div style={styles.errorBox}>{feedbackState.error}</div> : null}
         {feedbackState.loading ? <div style={styles.helperText}>Loading feedback ...</div> : null}
         {!feedbackState.loading && !feedbackState.error && feedbackItems.length === 0 ? (
           <div style={styles.helperText}>No feedback recorded yet.</div>
         ) : null}
+
         <div style={{ display: "grid", gap: 8 }}>
           {feedbackItems.map((entry, index) => (
             <div
@@ -399,6 +400,7 @@ const MyExamFilePage = () => {
                   <div style={{ fontWeight: 800 }}>{entry.assignment}</div>
                   <p style={{ ...styles.helperText, margin: 0 }}>Date: {formatDate(entry.date) || "Not set"}</p>
                 </div>
+
                 {typeof entry.score === "number" ? (
                   <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe" }}>
                     Score: {entry.score}/100
@@ -407,28 +409,29 @@ const MyExamFilePage = () => {
                   <span style={styles.badge}>Not scored</span>
                 )}
               </div>
+
               <p style={{ ...styles.resultText, margin: "6px 0 0" }}>{entry.comments || "No comments supplied."}</p>
+
+              {entry.link ? (
+                <div style={{ marginTop: 8 }}>
+                  <a href={entry.link} target="_blank" rel="noreferrer">
+                    Open marked file
+                  </a>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
       </section>
 
       <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div>
-            <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Downloadables</h3>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Calendar, contract snapshot, and receipt log in case you need to share proof quickly.
-            </p>
-          </div>
-        </div>
+        <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Downloadables</h3>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Calendar, contract snapshot, and receipt log in case you need to share proof quickly.
+        </p>
+
         <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-          <button
-            type="button"
-            style={styles.buttonSecondary}
-            onClick={() => downloadClassCalendar(className)}
-            disabled={!className}
-          >
+          <button type="button" style={styles.buttonSecondary} onClick={() => downloadClassCalendar(className)} disabled={!className}>
             Download class calendar (.ics)
           </button>
           <button type="button" style={styles.buttonSecondary} onClick={downloadContract}>
@@ -438,6 +441,7 @@ const MyExamFilePage = () => {
             Download receipt log
           </button>
         </div>
+
         <p style={{ ...styles.helperText, margin: 0 }}>
           Calendar downloads need your class name. Receipt and contract summaries use the profile details shown above.
         </p>
