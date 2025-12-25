@@ -154,6 +154,7 @@ async function upsertStudentToSheet(student) {
   const colLastDate = findCol(headerMap, "Last_Date", "Last Date", "LastDate");
   const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
   const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
+  const colAddress = findCol(headerMap, "Address", "Home Address", "address", "homeaddress");
 
   if (colStudentCode === null) {
     const headerNames = headers && headers.length ? headers.join(" | ") : "(none)";
@@ -216,6 +217,7 @@ async function upsertStudentToSheet(student) {
     pushCell(colContractStart, student.contractStart || "");
     pushCell(colContractEnd, student.contractEnd || "");
     pushCell(colLearningMode, student.learningMode || "");
+    pushCell(colAddress, student.address || "");
     pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
     pushCell(colDailyLimit, student.dailyLimit ?? "");
     pushCell(colUsesToday, student.usesToday ?? "");
@@ -256,6 +258,7 @@ async function upsertStudentToSheet(student) {
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
   if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
+  if (colAddress !== null) row[colAddress] = student.address || "";
   if (colEmergencyPhone !== null)
     row[colEmergencyPhone] = student.emergencyContactPhone || "";
   if (colDailyLimit !== null) row[colDailyLimit] = student.dailyLimit ?? "";
