@@ -137,7 +137,7 @@ const WritingPage = ({ mode = "course" }) => {
         } else {
           setWritingTasks(courseWritingLetters);
           setWritingTasksError(
-            "Keine Schreibaufgaben aus dem Sheet gefunden – zeige Beispiele."
+            "No writing tasks found in the sheet – showing sample prompts instead."
           );
         }
       } catch (err) {
@@ -146,7 +146,7 @@ const WritingPage = ({ mode = "course" }) => {
 
         setWritingTasks(courseWritingLetters);
         setWritingTasksError(
-          "Konnte Schreibaufgaben nicht laden. Zeige lokale Beispieldaten."
+          "Could not load writing tasks. Showing local example data."
         );
       } finally {
         if (isMounted) setWritingTasksLoading(false);
@@ -215,7 +215,7 @@ const WritingPage = ({ mode = "course" }) => {
 
   const validateSelections = () => {
     if (!ALLOWED_LEVELS.includes(level)) {
-      setError("Bitte wähle ein gültiges Niveau (A1–B2).");
+      setError("Please choose a valid level (A1–B2).");
       return false;
     }
 
@@ -306,7 +306,7 @@ const WritingPage = ({ mode = "course" }) => {
 
     if (!combinedDraft) {
       setIdeaError(
-        "Wähle mindestens einen Entwurf oder schreibe etwas in die Vorschau, bevor du es zum Markieren schickst."
+        "Select at least one draft or type something in the live preview before sending it for marking."
       );
       setIdeaSuccess("");
       return;
@@ -319,7 +319,7 @@ const WritingPage = ({ mode = "course" }) => {
     });
     setError("");
     setMarkFeedback("");
-    setIdeaSuccess("Deine ausgewählten Sätze sind im Tab „Mark my letter“ eingefügt.");
+    setIdeaSuccess("Your selected lines are now pasted into the “Mark my letter” tab.");
     setIdeaError("");
     setSelectedDraftIds([]);
     setActiveTab("mark");
@@ -365,7 +365,7 @@ const WritingPage = ({ mode = "course" }) => {
       <div>
         <div style={styles.timer}>{formatTime(remainingSeconds)}</div>
         <div style={styles.timerHelp}>
-          Zeit für diese Aufgabe: {selectedLetter?.durationMinutes || 0} Minuten
+          Time for this task: {selectedLetter?.durationMinutes || 0} minutes
         </div>
       </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -399,16 +399,15 @@ const WritingPage = ({ mode = "course" }) => {
   return (
     <>
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>Schreiben – Prüfungsbriefe trainieren</h2>
+        <h2 style={styles.sectionTitle}>Writing – Practice exam letters</h2>
         <p style={styles.helperText}>
-          Wähle einen Brief, schreibe mit Timer, lass deinen Text bewerten oder
-          frag den Ideen-Generator nach Formulierungen.
+          Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help.
         </p>
         <div style={styles.tabList} className="tab-list">
           {[
-            { key: "practice", label: "Übungsbriefe" },
+            { key: "practice", label: "Practice letters" },
             { key: "mark", label: "Mark my letter" },
-            { key: "ideas", label: "Ideen-Generator" },
+            { key: "ideas", label: "Idea generator" },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -427,18 +426,17 @@ const WritingPage = ({ mode = "course" }) => {
       {activeTab === "practice" && (
         <>
           <section style={styles.card}>
-            <h3 style={styles.sectionTitle}>Briefe aus der Übungsvorlage</h3>
+            <h3 style={styles.sectionTitle}>Letters from the practice set</h3>
             {writingTasksError && (
               <p style={{ ...styles.helperText, color: "#b91c1c" }}>
                 {writingTasksError}
               </p>
             )}
             {writingTasksLoading ? (
-              <p style={styles.helperText}>Lade Schreibaufgaben aus dem Sheet ...</p>
+              <p style={styles.helperText}>Loading writing tasks from the sheet ...</p>
             ) : visibleWritingTasks.length === 0 ? (
               <p style={styles.helperText}>
-                Keine Schreibaufgaben für dieses Niveau verfügbar. Bitte passe dein
-                Level an oder versuche es später erneut.
+                No writing tasks are available for this level. Please adjust your level or try again later.
               </p>
             ) : (
               <div style={styles.gridTwo}>
@@ -459,12 +457,12 @@ const WritingPage = ({ mode = "course" }) => {
                   >
                     <div style={styles.metaRow}>
                       <div style={{ fontWeight: 800 }}>{item.letter}</div>
-                      <span style={styles.levelPill}>Niveau {item.level}</span>
+                      <span style={styles.levelPill}>Level {item.level}</span>
                     </div>
                     <p style={styles.helperText}>{item.situation}</p>
                     <div style={styles.metaRow}>
                       <span style={styles.badge}>
-                        ⏱️ {item.durationMinutes} Minuten
+                        ⏱️ {item.durationMinutes} minutes
                       </span>
                       <button
                         style={
@@ -474,7 +472,7 @@ const WritingPage = ({ mode = "course" }) => {
                         }
                         onClick={() => setSelectedLetterId(item.id)}
                       >
-                        {selectedLetterId === item.id ? "Gewählt" : "Üben"}
+                        {selectedLetterId === item.id ? "Selected" : "Practice"}
                       </button>
                     </div>
                   </div>
@@ -484,13 +482,13 @@ const WritingPage = ({ mode = "course" }) => {
           </section>
 
           <section style={styles.card}>
-            <h3 style={styles.sectionTitle}>Dein Simulationsraum</h3>
+            <h3 style={styles.sectionTitle}>Your simulation room</h3>
             {practiceTimerControls}
             {selectedLetter && (
               <>
-                <div style={styles.badge}>Thema: {selectedLetter.letter}</div>
+                <div style={styles.badge}>Topic: {selectedLetter.letter}</div>
                 <p style={styles.helperText}>{selectedLetter.situation}</p>
-                <h4 style={styles.resultHeading}>Checkliste</h4>
+                <h4 style={styles.resultHeading}>Checklist</h4>
                 <ul style={styles.checklist}>
                   {(selectedLetter.whatToInclude || []).map((item) => (
                     <li key={item}>{item}</li>
@@ -499,10 +497,10 @@ const WritingPage = ({ mode = "course" }) => {
               </>
             )}
             <div style={{ marginTop: 12 }}>
-              <label style={styles.label}>Dein Entwurf</label>
+              <label style={styles.label}>Your draft</label>
               <textarea
                 style={styles.textArea}
-                placeholder="Schreibe deinen Brief hier, während der Timer läuft..."
+                placeholder="Write your letter here while the timer is running..."
                 value={practiceDraft}
                 onChange={(e) => setPracticeDraft(e.target.value)}
                 rows={7}
@@ -524,7 +522,7 @@ const WritingPage = ({ mode = "course" }) => {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <label style={styles.label}>Level for feedback</label>
                 {isLevelLocked && (
-                  <span style={styles.badge}>Aus Profil</span>
+                  <span style={styles.badge}>From profile</span>
                 )}
               </div>
               <select
@@ -566,7 +564,7 @@ const WritingPage = ({ mode = "course" }) => {
 
             {error && (
               <div style={styles.errorBox}>
-                <strong>Hinweis:</strong> {error}
+                <strong>Note:</strong> {error}
               </div>
             )}
           </section>
@@ -584,10 +582,9 @@ const WritingPage = ({ mode = "course" }) => {
 
       {activeTab === "ideas" && (
         <section style={styles.card}>
-          <h3 style={styles.sectionTitle}>Ideen-Generator</h3>
+          <h3 style={styles.sectionTitle}>Idea generator</h3>
           <p style={styles.helperText}>
-            Füge deine Aufgabenstellung ein und chatte nur in einem Feld. Herr
-            Felix antwortet Schritt für Schritt mit dem neuen Coaching-Prompt.
+            Paste your task and chat in a single field. Herr Felix replies step by step with the updated coaching prompt.
           </p>
           <div style={styles.chatLog}>
             {chatMessages.map((msg, idx) => (
@@ -600,14 +597,14 @@ const WritingPage = ({ mode = "course" }) => {
                 }
               >
                 <strong style={{ display: "block", marginBottom: 4 }}>
-                  {msg.role === "assistant" ? "Coach" : "Du"}
+                  {msg.role === "assistant" ? "Coach" : "You"}
                 </strong>
                 <span>{msg.content}</span>
               </div>
             ))}
           </div>
           <div style={{ marginTop: 12 }}>
-            <label style={styles.label}>Deine Frage (ein Feld)</label>
+            <label style={styles.label}>Your prompt (single box)</label>
             <textarea
               style={styles.textareaSmall}
               value={ideaInput}
@@ -636,30 +633,30 @@ const WritingPage = ({ mode = "course" }) => {
                 setIdeaInput("");
               }}
             >
-              Chat zurücksetzen
+              Reset chat
             </button>
           </div>
 
           {ideaError && (
             <div style={{ ...styles.errorBox, marginTop: 8 }}>
-              <strong>Hinweis:</strong> {ideaError}
+              <strong>Note:</strong> {ideaError}
             </div>
           )}
 
           <div style={{ marginTop: 16 }}>
-            <h4 style={styles.resultHeading}>Vorschau & schnell kopieren</h4>
+            <h4 style={styles.resultHeading}>Preview & quick copy</h4>
             <p style={styles.helperText}>
-              Wähle Teile aus deinen Chat-Nachrichten oder nutze die Live-Vorschau unten.
-              Wir fügen sie für dich im Tab „Mark my letter“ ein, damit du sie einfach bewerten lassen kannst.
+              Choose parts from your chat messages or use the live preview below.
+              We will place them in the “Mark my letter” tab so you can get them graded quickly.
             </p>
             <div style={styles.gridTwo}>
               <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
                 <div style={styles.metaRow}>
-                  <div style={{ fontWeight: 800 }}>Live-Vorschau</div>
-                  <span style={styles.badge}>Nur du siehst das</span>
+                  <div style={{ fontWeight: 800 }}>Live preview</div>
+                  <span style={styles.badge}>Visible only to you</span>
                 </div>
                 <p style={styles.helperText}>
-                  Hier siehst du, was du gerade tippst, bevor du es abschickst.
+                  See what you're typing before you send it.
                 </p>
                 <div
                   style={{
@@ -671,18 +668,18 @@ const WritingPage = ({ mode = "course" }) => {
                     whiteSpace: "pre-wrap",
                   }}
                 >
-                  {ideaInput.trim() || "Noch nichts getippt."}
+                  {ideaInput.trim() || "No draft typed yet."}
                 </div>
               </div>
 
               <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
                 <div style={styles.metaRow}>
-                  <div style={{ fontWeight: 800 }}>Aus dem Chat auswählen</div>
-                  <span style={styles.badge}>{userMessages.length} Entwürfe</span>
+                  <div style={{ fontWeight: 800 }}>Pick from your chat</div>
+                  <span style={styles.badge}>{userMessages.length} drafts</span>
                 </div>
                 {userMessages.length === 0 ? (
                   <p style={styles.helperText}>
-                    Sende eine Frage im Chat, dann kannst du hier deine eigenen Texte auswählen.
+                    Send a question in the chat, then you can select your own messages here.
                   </p>
                 ) : (
                   <div style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }}>
@@ -707,9 +704,7 @@ const WritingPage = ({ mode = "course" }) => {
                           style={{ marginTop: 4 }}
                         />
                         <div>
-                          <div style={{ fontWeight: 700, fontSize: 13, color: "#1f2937" }}>
-                            Dein Chat-Beitrag
-                          </div>
+                          <div style={{ fontWeight: 700, fontSize: 13, color: "#1f2937" }}>Your chat entry</div>
                           <p style={{ ...styles.helperText, marginBottom: 0, whiteSpace: "pre-wrap" }}>
                             {msg.content}
                           </p>
@@ -722,7 +717,7 @@ const WritingPage = ({ mode = "course" }) => {
                   style={{ ...styles.primaryButton, marginTop: 10 }}
                   onClick={sendDraftsToMarkTab}
                 >
-                  Zu „Mark my letter“ schicken
+                  Send to “Mark my letter”
                 </button>
                 {ideaSuccess && (
                   <div style={{ ...styles.successBox, marginTop: 8 }}>
