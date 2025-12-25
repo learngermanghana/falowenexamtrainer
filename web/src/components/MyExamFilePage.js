@@ -431,7 +431,12 @@ const MyExamFilePage = () => {
         </p>
 
         <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-          <button type="button" style={styles.buttonSecondary} onClick={() => downloadClassCalendar(className)} disabled={!className}>
+          <button
+            type="button"
+            style={styles.buttonSecondary}
+            onClick={() => downloadClassCalendar(className)}
+            disabled={!className}
+          >
             Download class calendar (.ics)
           </button>
           <button type="button" style={styles.buttonSecondary} onClick={downloadContract}>
