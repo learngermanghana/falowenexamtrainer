@@ -71,6 +71,8 @@ function initFirebaseAdmin() {
 
 initFirebaseAdmin();
 
+const { scoresSummaryHandler } = require("./routes/scoresSummary");
+
 async function getAuthedUser(req) {
   const authHeader = req.headers?.authorization || "";
   const match = authHeader.match(/^Bearer (.+)$/i);
@@ -318,6 +320,8 @@ app.get("/metrics", (_req, res) => {
     memory: process.memoryUsage(),
   });
 });
+
+app.get("/scores/summary", scoresSummaryHandler);
 
 const writeTempFile = async (file) => {
   const fileName = file?.originalname || "audio.webm";
