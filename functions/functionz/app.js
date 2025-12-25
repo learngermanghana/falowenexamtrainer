@@ -1098,6 +1098,166 @@ app.get("/scores", async (req, res) => {
   }
 });
 
+// --- Results history from published sheet (filtered per student) ---
+const normalizeHeaderKey = (header = "") =>
+  String(header || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "")
+    .replace(/[()]/g, "");
+
+const parseCsv = (text) => {
+  const rows = [];
+  let currentCell = "";
+  let currentRow = [];
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === "\"") {
+      if (inQuotes && next === "\"") {
+        currentCell += "\"";
+        i += 1;
+        continue;
+      }
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (char === "," && !inQuotes) {
+      currentRow.push(currentCell);
+      currentCell = "";
+      continue;
+    }
+
+    if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && next === "\n") i += 1;
+      currentRow.push(currentCell);
+      rows.push(currentRow);
+      currentRow = [];
+      currentCell = "";
+      continue;
+    }
+
+    currentCell += char;
+  }
+
+  if (currentCell.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentCell);
+    rows.push(currentRow);
+  }
+
+  return rows
+    .map((row) => row.map((cell) => String(cell || "").trim()))
+    .filter((row) => row.some((cell) => cell.length > 0));
+};
+
+const findIndexByHeader = (headers, candidates) => {
+  const normalizedHeaders = headers.map(normalizeHeaderKey);
+  const normalizedCandidates = candidates.map(normalizeHeaderKey);
+  return normalizedHeaders.findIndex((h) => normalizedCandidates.includes(h));
+};
+
+const safeLower = (v) => String(v || "").trim().toLowerCase();
+
+app.get("/results/history", async (req, res) => {
+  const requestLog = createLogger({ scope: "results_history", requestId: req.requestId });
+
+  try {
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const publishedCsvUrl = process.env.RESULTS_SHEET_PUBLISHED_CSV_URL;
+    if (!publishedCsvUrl) {
+      return res.status(500).json({ error: "RESULTS_SHEET_PUBLISHED_CSV_URL is missing" });
+    }
+
+    const requestedStudentCode = String(req.query.studentCode || "").trim();
+    if (!requestedStudentCode) {
+      return res.status(400).json({ error: "studentCode is required" });
+    }
+
+    // Ownership check: caller must match student by uid or email
+    const db = getFirestoreSafe();
+    if (!db) return res.status(500).json({ error: "Firestore not available" });
+
+    const studentRef = db.collection("students").doc(requestedStudentCode);
+    const snap = await studentRef.get();
+    if (!snap.exists) return res.status(404).json({ error: "Student not found" });
+
+    const student = snap.data() || {};
+    const studentEmail = student?.email ? String(student.email).toLowerCase() : null;
+    const authedEmail = authedUser?.email ? String(authedUser.email).toLowerCase() : null;
+
+    if (student?.uid !== authedUser.uid && studentEmail && authedEmail !== studentEmail) {
+      return res.status(403).json({ error: "Not authorized for this student" });
+    }
+
+    // Fetch the published CSV server-side (students will not see the URL)
+    const csvRes = await fetch(publishedCsvUrl, { method: "GET" });
+    if (!csvRes.ok) {
+      requestLog.error("results.sheet.fetch_failed", { status: csvRes.status });
+      return res.status(502).json({ error: "Failed to fetch results sheet" });
+    }
+
+    const csvText = await csvRes.text();
+    const rows = parseCsv(csvText);
+    if (!rows.length) return res.json({ studentCode: requestedStudentCode, rows: [] });
+
+    const headerRow = rows[0];
+
+    const idx = {
+      assignment: findIndexByHeader(headerRow, ["assignment", "task", "title"]),
+      level: findIndexByHeader(headerRow, ["level", "cefr", "lvl"]),
+      name: findIndexByHeader(headerRow, ["name"]),
+      studentcode: findIndexByHeader(headerRow, ["studentcode", "student code"]),
+      uid: findIndexByHeader(headerRow, ["uid"]),
+      email: findIndexByHeader(headerRow, ["email"]),
+      score: findIndexByHeader(headerRow, ["score", "mark", "marks"]),
+      comments: findIndexByHeader(headerRow, ["comments", "feedback", "comment"]),
+      link: findIndexByHeader(headerRow, ["link", "url"]),
+      date: findIndexByHeader(headerRow, ["date", "createdat", "created_at", "timestamp", "time"]),
+    };
+
+    const get = (row, i) => (i >= 0 && i < row.length ? String(row[i] || "").trim() : "");
+
+    const targetCode = requestedStudentCode;
+    const targetUid = String(student?.uid || "").trim();
+    const targetEmail = String(student?.email || "").trim();
+
+    const filtered = rows.slice(1).filter((row) => {
+      const rowCode = get(row, idx.studentcode);
+      const rowUid = get(row, idx.uid);
+      const rowEmail = get(row, idx.email);
+
+      if (rowCode && rowCode.trim() === targetCode) return true;
+      if (rowUid && targetUid && rowUid.trim() === targetUid) return true;
+      if (rowEmail && targetEmail && safeLower(rowEmail) === safeLower(targetEmail)) return true;
+
+      return false;
+    });
+
+    const mapped = filtered.map((row, n) => ({
+      id: `${targetCode}-${n + 1}`,
+      assignment: get(row, idx.assignment) || "Feedback",
+      level: get(row, idx.level) || "",
+      name: get(row, idx.name) || "",
+      studentcode: get(row, idx.studentcode) || targetCode,
+      score: get(row, idx.score) || "",
+      comments: get(row, idx.comments) || "",
+      link: get(row, idx.link) || "",
+      date: get(row, idx.date) || "",
+    }));
+
+    return res.json({ studentCode: requestedStudentCode, rows: mapped });
+  } catch (err) {
+    requestLog.error("results.history.error", { errorMessage: err?.message, stack: err?.stack });
+    return res.status(500).json({ error: "Failed to load results history" });
+  }
+});
+
 app.post("/speaking/analyze", audioUpload, async (req, res) => {
   let authedUser;
   try {
