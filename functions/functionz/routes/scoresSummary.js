@@ -1,10 +1,13 @@
 "use strict";
 
 const admin = require("firebase-admin");
+const { courseSchedulesByName } = require("../../data/courseSchedulesByName");
 
 if (!admin.apps.length) {
   admin.initializeApp();
 }
+
+const PASS_MARK = 60;
 
 const normalizeHeaderKey = (header = "") =>
   String(header || "")
@@ -67,57 +70,51 @@ const findIndexByHeader = (headers, candidates) => {
   return normalizedHeaders.findIndex((h) => normalizedCandidates.includes(h));
 };
 
-const parseAssignmentNumber = (assignment = "") => {
-  const text = String(assignment || "");
-
-  const dayMatch = text.match(/\bday\s*(\d+(?:\.\d+)?)\b/i);
-  if (dayMatch?.[1]) return Number(dayMatch[1]);
-
-  const match = text.match(/(\d+(?:\.\d+)?)/);
-  return match ? Number(match[1]) : null;
+// ---- Identifier parsing (STRING-based, preserves 4.10 etc) ----
+const extractNumsWithPos = (text = "") => {
+  const s = String(text || "");
+  const regex = /(\d+(?:\.\d+)?)/g;
+  const out = [];
+  let m;
+  while ((m = regex.exec(s)) !== null) {
+    out.push({ raw: m[1], index: m.index });
+  }
+  return out;
 };
 
-const uniqSorted = (numbers = []) => {
-  const clean = numbers.filter((n) => Number.isFinite(n));
-  return Array.from(new Set(clean)).sort((a, b) => a - b);
+const normalizeIdentifier = (raw = "") => {
+  const s = String(raw || "").trim();
+  if (!s) return null;
+  if (!/^\d+(\.\d+)?$/.test(s)) return null;
+
+  const [majorRaw, minorRaw] = s.split(".");
+  // Remove leading zeros in major part only
+  const major = String(Number(majorRaw));
+  if (minorRaw === undefined) return major;
+  // Keep minor as-is (preserves 10 in 4.10)
+  return `${major}.${minorRaw}`;
 };
 
-const inferStep = (numbers = []) => {
-  const sorted = uniqSorted(numbers);
-  if (sorted.length < 2) {
-    const hasDecimal = sorted.some((n) => Math.abs(n - Math.round(n)) > 1e-6);
-    return hasDecimal ? 0.5 : 1;
+const pickIdentifierFromText = (assignmentText, plannedSet) => {
+  const matches = extractNumsWithPos(assignmentText)
+    .map((m) => ({
+      ...m,
+      id: normalizeIdentifier(m.raw),
+    }))
+    .filter((m) => m.id);
+
+  if (!matches.length) return null;
+
+  // Prefer an identifier that exists in the schedule (plannedSet),
+  // and prefer the one closest to the end of the string.
+  const plannedMatches = matches.filter((m) => plannedSet.has(m.id));
+  if (plannedMatches.length) {
+    plannedMatches.sort((a, b) => b.index - a.index);
+    return plannedMatches[0].id;
   }
 
-  let minDiff = Infinity;
-  for (let i = 1; i < sorted.length; i += 1) {
-    const diff = sorted[i] - sorted[i - 1];
-    if (diff > 1e-6 && diff < minDiff) minDiff = diff;
-  }
-
-  if (!Number.isFinite(minDiff) || minDiff <= 1e-6) return 1;
-  if (minDiff <= 0.1 + 1e-6) return 0.1;
-  if (minDiff <= 0.25 + 1e-6) return 0.25;
-  if (minDiff <= 0.5 + 1e-6) return 0.5;
-  return 1;
-};
-
-const findMissingNumbers = (numbers = []) => {
-  const sorted = uniqSorted(numbers);
-  if (!sorted.length) return [];
-
-  const step = inferStep(sorted);
-  const start = sorted[0] > step ? step : sorted[0];
-  const end = sorted[sorted.length - 1];
-
-  const missing = [];
-  const round = (v) => Number(v.toFixed(2));
-
-  for (let current = start; current < end - 1e-6; current = round(current + step)) {
-    const exists = sorted.some((x) => Math.abs(x - current) < 1e-6);
-    if (!exists) missing.push(current);
-  }
-  return missing;
+  // Fallback: first number found
+  return matches[0].id;
 };
 
 const parseDateMs = (value) => {
@@ -148,6 +145,47 @@ const buildStreakDays = (attemptDatesMs = []) => {
   return streak;
 };
 
+// ---- Schedule scanning ----
+const buildPlannedLessons = (student) => {
+  const className =
+    student?.className || student?.classname || student?.class || "";
+
+  const schedule = className ? courseSchedulesByName[className] : null;
+  if (!schedule?.days?.length) {
+    return { lessons: [], plannedSet: new Set(), course: "", className: className || "" };
+  }
+
+  const lessons = [];
+  for (const day of schedule.days) {
+    const sessions = Array.isArray(day.sessions) ? day.sessions : [];
+    for (const session of sessions) {
+      const refText = session.chapter || session.title || "";
+      const ids = extractNumsWithPos(refText)
+        .map((m) => normalizeIdentifier(m.raw))
+        .filter(Boolean);
+
+      // skip things like "Exam tips"
+      if (!ids.length) continue;
+
+      const label = session.title
+        ? `Day ${day.dayNumber}: ${session.title}`
+        : `Day ${day.dayNumber}: Chapter ${session.chapter} – ${session.type || "Session"}${
+            session.note ? ` (${session.note})` : ""
+          }`;
+
+      lessons.push({
+        dayNumber: Number(day.dayNumber) || 0,
+        date: day.date || "",
+        label,
+        identifiers: ids,
+      });
+    }
+  }
+
+  const plannedSet = new Set(lessons.flatMap((l) => l.identifiers));
+  return { lessons, plannedSet, course: schedule.course || "", className: schedule.className || className };
+};
+
 const requireAuth = async (req) => {
   const authHeader = req.headers.authorization || "";
   const match = authHeader.match(/^Bearer\s+(.+)$/i);
@@ -171,6 +209,12 @@ const scoresSummaryHandler = async (req, res) => {
     if (student.uid && student.uid !== decoded.uid) {
       return res.status(403).json({ error: "Not authorized" });
     }
+
+    const { lessons, plannedSet, course: scheduleCourse } = buildPlannedLessons(student);
+
+    const expectedLevel = String(
+      scheduleCourse || student.level || student.course || ""
+    ).trim().toUpperCase();
 
     const CSV_URL =
       process.env.SCORES_SHEET_PUBLISHED_CSV_URL ||
@@ -217,22 +261,29 @@ const scoresSummaryHandler = async (req, res) => {
       .filter((r) => get(r, idx.studentCode) === studentCode)
       .map((r) => {
         const assignment = get(r, idx.assignment);
-        const num = parseAssignmentNumber(assignment);
         const scoreRaw = get(r, idx.score);
         const scoreNum = Number(scoreRaw);
         const dateRaw = get(r, idx.date);
         const dateMs = parseDateMs(dateRaw);
+        const rowLevel = get(r, idx.level) || "";
+
+        const identifier = pickIdentifierFromText(assignment, plannedSet);
 
         return {
           assignment: assignment || "",
-          number: Number.isFinite(num) ? num : null,
+          identifier, // string
           score: Number.isFinite(scoreNum) ? scoreNum : null,
           dateRaw,
           dateMs,
-          level: get(r, idx.level) || "",
+          level: rowLevel,
           comments: get(r, idx.comments) || "",
           link: get(r, idx.link) || "",
         };
+      })
+      .filter((row) => {
+        if (!expectedLevel) return true;
+        const lv = String(row.level || "").trim().toUpperCase();
+        return !lv || lv === expectedLevel;
       });
 
     if (!mine.length) {
@@ -241,6 +292,9 @@ const scoresSummaryHandler = async (req, res) => {
           completedAssignments: [],
           missedAssignments: [],
           failedAssignments: [],
+          failedIdentifiers: [],
+          nextRecommendation: null,
+          recommendationBlocked: false,
           lastAssignment: "",
           weekAssignments: 0,
           weekAttempts: 0,
@@ -250,11 +304,13 @@ const scoresSummaryHandler = async (req, res) => {
       });
     }
 
-    const bestByKey = new Map();
-    mine.forEach((row) => {
-      const key = row.number !== null ? `N:${row.number}` : `A:${row.assignment}`;
-      const prev = bestByKey.get(key);
+    // Best attempt per identifier (highest score, tie -> latest)
+    const bestById = new Map();
+    for (const row of mine) {
+      if (!row.identifier) continue;
+      if (!Number.isFinite(row.score)) continue;
 
+      const prev = bestById.get(row.identifier);
       const prevScore = prev?.score ?? -Infinity;
       const currScore = row.score ?? -Infinity;
 
@@ -262,40 +318,89 @@ const scoresSummaryHandler = async (req, res) => {
         currScore > prevScore ||
         (currScore === prevScore && (row.dateMs || 0) > (prev?.dateMs || 0));
 
-      if (!prev || shouldReplace) bestByKey.set(key, row);
+      if (!prev || shouldReplace) bestById.set(row.identifier, row);
+    }
+
+    const passSet = new Set();
+    const failedIdSet = new Set();
+
+    for (const [id, best] of bestById.entries()) {
+      if (!plannedSet.size || plannedSet.has(id)) {
+        if ((best.score ?? -Infinity) >= PASS_MARK) passSet.add(id);
+        else failedIdSet.add(id);
+      }
+    }
+
+    // Lesson status against schedule
+    const lessonStatus = lessons.map((l) => {
+      const isCompleted = l.identifiers.every((id) => passSet.has(id));
+      const hasFailed = l.identifiers.some((id) => failedIdSet.has(id));
+      return { ...l, isCompleted, hasFailed };
     });
 
-    const bestList = Array.from(bestByKey.values());
+    const failedLessons = lessonStatus
+      .filter((l) => l.hasFailed)
+      .map((l) => ({
+        label: l.label,
+        identifiers: l.identifiers,
+      }));
 
-    const completedAssignments = bestList
-      .map((r) => ({
-        number: r.number,
-        label: r.assignment || (r.number !== null ? `Assignment ${r.number}` : "Assignment"),
-        score: r.score,
-        date: r.dateRaw,
-        level: r.level,
-        comments: r.comments,
-        link: r.link,
-      }))
-      .sort((a, b) => (Number(b.number ?? -1) - Number(a.number ?? -1)));
+    // Highest day fully done
+    const byDay = new Map();
+    for (const l of lessonStatus) {
+      if (!byDay.has(l.dayNumber)) byDay.set(l.dayNumber, []);
+      byDay.get(l.dayNumber).push(l);
+    }
 
-    const completedNumbers = bestList
-      .map((r) => r.number)
-      .filter((n) => Number.isFinite(n));
+    let maxDayFullyDone = 0;
+    for (const [dayNum, dayLessons] of byDay.entries()) {
+      if (dayLessons.every((x) => x.isCompleted)) {
+        if (dayNum > maxDayFullyDone) maxDayFullyDone = dayNum;
+      }
+    }
 
-    const missingNumbers = findMissingNumbers(completedNumbers);
-    const missedAssignments = missingNumbers.map((n) => ({ number: n, label: `Assignment ${n}` }));
+    const missedLessons = lessonStatus
+      .filter((l) => l.dayNumber <= maxDayFullyDone && !l.isCompleted && !l.hasFailed)
+      .map((l) => ({
+        label: l.label,
+        identifiers: l.identifiers,
+      }));
 
-    const failedAssignments = bestList
-      .filter((r) => Number.isFinite(r.score) && Number(r.score) < 60)
-      .map((r) => ({
-        number: r.number,
-        label: r.assignment || (r.number !== null ? `Assignment ${r.number}` : "Assignment"),
-        score: r.score,
-      }))
-      .sort((a, b) => (Number(a.number ?? 99999) - Number(b.number ?? 99999)));
+    const recommendationBlocked = failedLessons.length > 0;
 
-    const lastAttempt = mine.reduce((acc, cur) => ((cur.dateMs || 0) > (acc?.dateMs || 0) ? cur : acc), null);
+    let nextRecommendation = null;
+    if (!recommendationBlocked) {
+      const firstIncomplete = lessonStatus.find((l) => !l.isCompleted);
+      if (firstIncomplete) {
+        nextRecommendation = {
+          label: firstIncomplete.label,
+          identifiers: firstIncomplete.identifiers,
+          dayNumber: firstIncomplete.dayNumber,
+          date: firstIncomplete.date,
+        };
+      }
+    }
+
+    // Completed assignments = passed identifiers (best attempt)
+    const completedAssignments = Array.from(passSet)
+      .map((id) => {
+        const best = bestById.get(id);
+        return {
+          identifier: id,
+          label: best?.assignment || `Assignment ${id}`,
+          score: best?.score ?? null,
+          date: best?.dateRaw || "",
+          level: best?.level || "",
+          comments: best?.comments || "",
+          link: best?.link || "",
+        };
+      });
+
+    // Weekly stats and streak are still based on ALL attempts
+    const lastAttempt = mine.reduce(
+      (acc, cur) => ((cur.dateMs || 0) > (acc?.dateMs || 0) ? cur : acc),
+      null
+    );
     const lastAssignment = lastAttempt?.assignment || "";
 
     const now = Date.now();
@@ -305,19 +410,21 @@ const scoresSummaryHandler = async (req, res) => {
 
     const weekAssignments = new Set(
       weekRows
-        .map((r) => (r.number !== null ? `N:${r.number}` : `A:${r.assignment}`))
+        .map((r) => r.identifier || r.assignment)
         .filter(Boolean)
     ).size;
 
     const retriesThisWeek = Math.max(0, weekAttempts - weekAssignments);
-
     const streakDays = buildStreakDays(mine.map((r) => r.dateMs));
 
     return res.json({
       student: {
         completedAssignments,
-        missedAssignments,
-        failedAssignments,
+        missedAssignments: missedLessons,
+        failedAssignments: failedLessons,
+        failedIdentifiers: Array.from(failedIdSet),
+        nextRecommendation,
+        recommendationBlocked,
         lastAssignment,
         weekAssignments,
         weekAttempts,
