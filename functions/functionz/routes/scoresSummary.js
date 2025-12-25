@@ -1,13 +1,23 @@
 "use strict";
 
 const admin = require("firebase-admin");
-const { courseSchedulesByName } = require("../../data/courseSchedulesByName");
+
+// If you're on Node 18+ in Firebase Functions, global fetch exists.
+// If not, uncomment the next line and install node-fetch@2.
+// const fetch = require("node-fetch");
+
+const PASS_MARK = 60;
+
+// IMPORTANT:
+// Create: functions/data/courseSchedule.js
+// and export `courseSchedules` from web/src/data/courseSchedule.js (copy-paste the object).
+const { courseSchedules } = require("../../data/courseSchedule");
 
 if (!admin.apps.length) {
   admin.initializeApp();
 }
 
-const PASS_MARK = 60;
+/* ----------------------------- CSV parsing ----------------------------- */
 
 const normalizeHeaderKey = (header = "") =>
   String(header || "")
@@ -26,9 +36,9 @@ const parseCsv = (text) => {
     const char = text[i];
     const next = text[i + 1];
 
-    if (char === "\"") {
-      if (inQuotes && next === "\"") {
-        currentCell += "\"";
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        currentCell += '"';
         i += 1;
         continue;
       }
@@ -70,58 +80,126 @@ const findIndexByHeader = (headers, candidates) => {
   return normalizedHeaders.findIndex((h) => normalizedCandidates.includes(h));
 };
 
-// ---- Identifier parsing (STRING-based, preserves 4.10 etc) ----
-const extractNumsWithPos = (text = "") => {
-  const s = String(text || "");
-  const regex = /(\d+(?:\.\d+)?)/g;
-  const out = [];
-  let m;
-  while ((m = regex.exec(s)) !== null) {
-    out.push({ raw: m[1], index: m.index });
-  }
-  return out;
-};
-
-const normalizeIdentifier = (raw = "") => {
-  const s = String(raw || "").trim();
-  if (!s) return null;
-  if (!/^\d+(\.\d+)?$/.test(s)) return null;
-
-  const [majorRaw, minorRaw] = s.split(".");
-  // Remove leading zeros in major part only
-  const major = String(Number(majorRaw));
-  if (minorRaw === undefined) return major;
-  // Keep minor as-is (preserves 10 in 4.10)
-  return `${major}.${minorRaw}`;
-};
-
-const pickIdentifierFromText = (assignmentText, plannedSet) => {
-  const matches = extractNumsWithPos(assignmentText)
-    .map((m) => ({
-      ...m,
-      id: normalizeIdentifier(m.raw),
-    }))
-    .filter((m) => m.id);
-
-  if (!matches.length) return null;
-
-  // Prefer an identifier that exists in the schedule (plannedSet),
-  // and prefer the one closest to the end of the string.
-  const plannedMatches = matches.filter((m) => plannedSet.has(m.id));
-  if (plannedMatches.length) {
-    plannedMatches.sort((a, b) => b.index - a.index);
-    return plannedMatches[0].id;
-  }
-
-  // Fallback: first number found
-  return matches[0].id;
-};
-
 const parseDateMs = (value) => {
   if (!value) return 0;
   const ms = Date.parse(String(value));
   return Number.isFinite(ms) ? ms : 0;
 };
+
+/* ------------------------ Identifier parsing (strings) ------------------------ */
+
+// Extract numbers like 0.2, 1.1, 4.10 from a string.
+// Also handles combined strings like "0.2_1.1" -> ["0.2","1.1"].
+const _extractAllNums = (value = "") => {
+  const text = String(value || "");
+  const matches = text.match(/\d+(?:\.\d+)?/g) || [];
+  return matches;
+};
+
+// Normalize major part only, preserve minor digits exactly (so 4.10 stays "4.10").
+const normalizeIdentifier = (raw = "") => {
+  const s = String(raw || "").trim();
+  if (!s) return null;
+  if (!/^\d+(?:\.\d+)?$/.test(s)) return null;
+
+  const parts = s.split(".");
+  const major = String(Number(parts[0]));
+  if (parts.length === 1) return major;
+
+  const minor = parts[1]; // keep as typed
+  return `${major}.${minor}`;
+};
+
+const extractIdentifiers = (value = "") => {
+  const nums = _extractAllNums(value);
+  const ids = nums.map(normalizeIdentifier).filter(Boolean);
+  return Array.from(new Set(ids));
+};
+
+// Prefer identifiers that exist in the planned schedule; prefer the LAST planned match in the string.
+const pickIdentifierFromText = (assignmentText, plannedSet) => {
+  const found = extractIdentifiers(assignmentText);
+  if (!found.length) return null;
+
+  // last-to-first so we favor the later number in titles like "12 Hour Clock 7"
+  for (let i = found.length - 1; i >= 0; i -= 1) {
+    if (plannedSet.has(found[i])) return found[i];
+  }
+  // fallback: first number
+  return found[0];
+};
+
+/* ------------------------ Schedule scanning (web schedule) ------------------------ */
+
+const isRealAssignment = (obj) => obj && obj.assignment === true;
+
+const scheduleTopicIsIgnored = (topic = "") =>
+  String(topic || "").toLowerCase().includes("goethe");
+
+// Build a linear list of lessons in schedule order with the identifiers that must be passed.
+const getAssignmentSummary = (level = "A1") => {
+  const schedule = courseSchedules?.[String(level || "A1").toUpperCase()] || [];
+  const lessons = [];
+
+  for (const lesson of schedule) {
+    const dayNumber = Number(lesson.day || lesson.dayNumber || 0);
+    const topic = String(lesson.topic || "");
+    const goal = String(lesson.goal || "");
+
+    if (!dayNumber || scheduleTopicIsIgnored(topic)) continue;
+
+    const identifiers = [];
+
+    // top-level chapter (only if it's marked assignment:true)
+    if (lesson.assignment === true && lesson.chapter) {
+      identifiers.push(...extractIdentifiers(lesson.chapter));
+    }
+
+    // nested lesen_hören
+    if (Array.isArray(lesson.lesen_hören)) {
+      for (const block of lesson.lesen_hören) {
+        if (isRealAssignment(block) && block.chapter) {
+          identifiers.push(...extractIdentifiers(block.chapter));
+        }
+      }
+    } else if (isRealAssignment(lesson.lesen_hören)) {
+      // sometimes lesen_hören is an object
+      const ch = lesson.lesen_hören.chapter || lesson.chapter;
+      if (ch) identifiers.push(...extractIdentifiers(ch));
+    }
+
+    // nested schreiben_sprechen
+    if (Array.isArray(lesson.schreiben_sprechen)) {
+      for (const block of lesson.schreiben_sprechen) {
+        if (isRealAssignment(block) && block.chapter) {
+          identifiers.push(...extractIdentifiers(block.chapter));
+        }
+      }
+    } else if (isRealAssignment(lesson.schreiben_sprechen)) {
+      const ch = lesson.schreiben_sprechen.chapter || lesson.chapter;
+      if (ch) identifiers.push(...extractIdentifiers(ch));
+    }
+
+    const clean = Array.from(new Set(identifiers)).filter(Boolean);
+
+    // Skip practice-only lessons (no real assignment identifiers)
+    if (!clean.length) continue;
+
+    const label = `Day ${dayNumber}: Chapter ${lesson.chapter || clean.join(", ")} – ${topic}`.trim();
+
+    lessons.push({
+      dayNumber,
+      label,
+      goal,
+      identifiers: clean, // array of string identifiers
+    });
+  }
+
+  const plannedSet = new Set(lessons.flatMap((l) => l.identifiers));
+  return { lessons, plannedSet };
+};
+
+/* ------------------------ Streak + auth helpers ------------------------ */
 
 const buildStreakDays = (attemptDatesMs = []) => {
   const daySet = new Set(
@@ -145,47 +223,6 @@ const buildStreakDays = (attemptDatesMs = []) => {
   return streak;
 };
 
-// ---- Schedule scanning ----
-const buildPlannedLessons = (student) => {
-  const className =
-    student?.className || student?.classname || student?.class || "";
-
-  const schedule = className ? courseSchedulesByName[className] : null;
-  if (!schedule?.days?.length) {
-    return { lessons: [], plannedSet: new Set(), course: "", className: className || "" };
-  }
-
-  const lessons = [];
-  for (const day of schedule.days) {
-    const sessions = Array.isArray(day.sessions) ? day.sessions : [];
-    for (const session of sessions) {
-      const refText = session.chapter || session.title || "";
-      const ids = extractNumsWithPos(refText)
-        .map((m) => normalizeIdentifier(m.raw))
-        .filter(Boolean);
-
-      // skip things like "Exam tips"
-      if (!ids.length) continue;
-
-      const label = session.title
-        ? `Day ${day.dayNumber}: ${session.title}`
-        : `Day ${day.dayNumber}: Chapter ${session.chapter} – ${session.type || "Session"}${
-            session.note ? ` (${session.note})` : ""
-          }`;
-
-      lessons.push({
-        dayNumber: Number(day.dayNumber) || 0,
-        date: day.date || "",
-        label,
-        identifiers: ids,
-      });
-    }
-  }
-
-  const plannedSet = new Set(lessons.flatMap((l) => l.identifiers));
-  return { lessons, plannedSet, course: schedule.course || "", className: schedule.className || className };
-};
-
 const requireAuth = async (req) => {
   const authHeader = req.headers.authorization || "";
   const match = authHeader.match(/^Bearer\s+(.+)$/i);
@@ -193,6 +230,8 @@ const requireAuth = async (req) => {
   const decoded = await admin.auth().verifyIdToken(match[1]);
   return decoded;
 };
+
+/* ----------------------------- Main handler ----------------------------- */
 
 const scoresSummaryHandler = async (req, res) => {
   try {
@@ -210,14 +249,14 @@ const scoresSummaryHandler = async (req, res) => {
       return res.status(403).json({ error: "Not authorized" });
     }
 
-    const { lessons, plannedSet, course: scheduleCourse } = buildPlannedLessons(student);
+    const level = String(student.level || student.course || "A1").trim().toUpperCase();
 
-    const expectedLevel = String(
-      scheduleCourse || student.level || student.course || ""
-    ).trim().toUpperCase();
+    // Build schedule targets
+    const { lessons: plannedLessons, plannedSet } = getAssignmentSummary(level);
 
     const CSV_URL =
       process.env.SCORES_SHEET_PUBLISHED_CSV_URL ||
+      process.env.RESULTS_SHEET_PUBLISHED_CSV_URL ||
       "PASTE_YOUR_PUBLISHED_CSV_URL_HERE";
 
     if (!CSV_URL || CSV_URL.includes("PASTE_YOUR")) {
@@ -229,10 +268,11 @@ const scoresSummaryHandler = async (req, res) => {
 
     const csvText = await csvRes.text();
     const rows = parseCsv(csvText);
-    if (!rows.length) return res.json({ student: null });
+    if (!rows.length) {
+      return res.json({ student: null });
+    }
 
     const header = rows[0];
-
     const idx = {
       studentCode: findIndexByHeader(header, [
         "studentno",
@@ -256,13 +296,13 @@ const scoresSummaryHandler = async (req, res) => {
 
     const get = (row, i) => (i >= 0 && i < row.length ? String(row[i] || "").trim() : "");
 
+    // Pull attempts for this student + (optional) level match
     const mine = rows
       .slice(1)
       .filter((r) => get(r, idx.studentCode) === studentCode)
       .map((r) => {
         const assignment = get(r, idx.assignment);
-        const scoreRaw = get(r, idx.score);
-        const scoreNum = Number(scoreRaw);
+        const scoreNum = Number(get(r, idx.score));
         const dateRaw = get(r, idx.date);
         const dateMs = parseDateMs(dateRaw);
         const rowLevel = get(r, idx.level) || "";
@@ -281,11 +321,13 @@ const scoresSummaryHandler = async (req, res) => {
         };
       })
       .filter((row) => {
-        if (!expectedLevel) return true;
-        const lv = String(row.level || "").trim().toUpperCase();
-        return !lv || lv === expectedLevel;
+        const rowLevel = String(row.level || "").trim().toUpperCase();
+        // If row has no level, accept it
+        if (!rowLevel) return true;
+        return rowLevel === level;
       });
 
+    // If no attempts, return empty stats
     if (!mine.length) {
       return res.json({
         student: {
@@ -304,10 +346,11 @@ const scoresSummaryHandler = async (req, res) => {
       });
     }
 
-    // Best attempt per identifier (highest score, tie -> latest)
+    // Best attempt per identifier
     const bestById = new Map();
     for (const row of mine) {
       if (!row.identifier) continue;
+      if (!plannedSet.has(row.identifier)) continue;
       if (!Number.isFinite(row.score)) continue;
 
       const prev = bestById.get(row.identifier);
@@ -321,53 +364,60 @@ const scoresSummaryHandler = async (req, res) => {
       if (!prev || shouldReplace) bestById.set(row.identifier, row);
     }
 
-    const passSet = new Set();
-    const failedIdSet = new Set();
+    const passed = new Set();
+    const failed = new Set();
 
     for (const [id, best] of bestById.entries()) {
-      if (!plannedSet.size || plannedSet.has(id)) {
-        if ((best.score ?? -Infinity) >= PASS_MARK) passSet.add(id);
-        else failedIdSet.add(id);
-      }
+      if ((best.score ?? -Infinity) >= PASS_MARK) passed.add(id);
+      else failed.add(id);
     }
 
-    // Lesson status against schedule
-    const lessonStatus = lessons.map((l) => {
-      const isCompleted = l.identifiers.every((id) => passSet.has(id));
-      const hasFailed = l.identifiers.some((id) => failedIdSet.has(id));
+    // Evaluate schedule lessons
+    const lessonStatus = plannedLessons.map((l) => {
+      const isCompleted = l.identifiers.every((id) => passed.has(id));
+      const hasFailed = l.identifiers.some((id) => failed.has(id));
       return { ...l, isCompleted, hasFailed };
     });
 
-    const failedLessons = lessonStatus
-      .filter((l) => l.hasFailed)
-      .map((l) => ({
-        label: l.label,
-        identifiers: l.identifiers,
-      }));
-
-    // Highest day fully done
-    const byDay = new Map();
+    // Determine highest day that is FULLY done
+    const dayMap = new Map();
     for (const l of lessonStatus) {
-      if (!byDay.has(l.dayNumber)) byDay.set(l.dayNumber, []);
-      byDay.get(l.dayNumber).push(l);
+      if (!dayMap.has(l.dayNumber)) dayMap.set(l.dayNumber, []);
+      dayMap.get(l.dayNumber).push(l);
     }
 
     let maxDayFullyDone = 0;
-    for (const [dayNum, dayLessons] of byDay.entries()) {
-      if (dayLessons.every((x) => x.isCompleted)) {
-        if (dayNum > maxDayFullyDone) maxDayFullyDone = dayNum;
+    const sortedDays = Array.from(dayMap.keys()).sort((a, b) => a - b);
+    for (const d of sortedDays) {
+      const dayLessons = dayMap.get(d) || [];
+      if (dayLessons.length && dayLessons.every((x) => x.isCompleted)) {
+        maxDayFullyDone = d;
       }
     }
 
-    const missedLessons = lessonStatus
+    // Missed: <= maxDayFullyDone but incomplete and not failed
+    const missedAssignments = lessonStatus
       .filter((l) => l.dayNumber <= maxDayFullyDone && !l.isCompleted && !l.hasFailed)
       .map((l) => ({
         label: l.label,
         identifiers: l.identifiers,
+        dayNumber: l.dayNumber,
+        goal: l.goal,
       }));
 
-    const recommendationBlocked = failedLessons.length > 0;
+    // Failed lessons
+    const failedAssignments = lessonStatus
+      .filter((l) => l.hasFailed)
+      .map((l) => ({
+        label: l.label,
+        identifiers: l.identifiers,
+        dayNumber: l.dayNumber,
+        goal: l.goal,
+      }));
 
+    const recommendationBlocked = failedAssignments.length > 0;
+
+    // Next: first incomplete lesson in schedule order (blocked if failures exist)
     let nextRecommendation = null;
     if (!recommendationBlocked) {
       const firstIncomplete = lessonStatus.find((l) => !l.isCompleted);
@@ -376,27 +426,26 @@ const scoresSummaryHandler = async (req, res) => {
           label: firstIncomplete.label,
           identifiers: firstIncomplete.identifiers,
           dayNumber: firstIncomplete.dayNumber,
-          date: firstIncomplete.date,
+          goal: firstIncomplete.goal,
         };
       }
     }
 
-    // Completed assignments = passed identifiers (best attempt)
-    const completedAssignments = Array.from(passSet)
-      .map((id) => {
-        const best = bestById.get(id);
-        return {
-          identifier: id,
-          label: best?.assignment || `Assignment ${id}`,
-          score: best?.score ?? null,
-          date: best?.dateRaw || "",
-          level: best?.level || "",
-          comments: best?.comments || "",
-          link: best?.link || "",
-        };
-      });
+    // Completed list for UI (by identifier)
+    const completedAssignments = Array.from(passed).map((id) => {
+      const best = bestById.get(id);
+      return {
+        identifier: id,
+        label: best?.assignment || `Assignment ${id}`,
+        score: best?.score ?? null,
+        date: best?.dateRaw || "",
+        level: best?.level || "",
+        comments: best?.comments || "",
+        link: best?.link || "",
+      };
+    });
 
-    // Weekly stats and streak are still based on ALL attempts
+    // Weekly stats + streak
     const lastAttempt = mine.reduce(
       (acc, cur) => ((cur.dateMs || 0) > (acc?.dateMs || 0) ? cur : acc),
       null
@@ -406,23 +455,19 @@ const scoresSummaryHandler = async (req, res) => {
     const now = Date.now();
     const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
     const weekRows = mine.filter((r) => r.dateMs && now - r.dateMs <= sevenDaysMs);
+
     const weekAttempts = weekRows.length;
-
-    const weekAssignments = new Set(
-      weekRows
-        .map((r) => r.identifier || r.assignment)
-        .filter(Boolean)
-    ).size;
-
+    const weekAssignments = new Set(weekRows.map((r) => r.identifier || r.assignment).filter(Boolean)).size;
     const retriesThisWeek = Math.max(0, weekAttempts - weekAssignments);
+
     const streakDays = buildStreakDays(mine.map((r) => r.dateMs));
 
     return res.json({
       student: {
         completedAssignments,
-        missedAssignments: missedLessons,
-        failedAssignments: failedLessons,
-        failedIdentifiers: Array.from(failedIdSet),
+        missedAssignments,
+        failedAssignments,
+        failedIdentifiers: Array.from(failed),
         nextRecommendation,
         recommendationBlocked,
         lastAssignment,
