@@ -1,162 +1,276 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { styles } from "../styles";
-import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
-import { useAuth } from "../context/AuthContext";
-import { fetchVocabularyFromSheet, VOCAB_SOURCE_URL } from "../services/vocabService";
+"use strict";
 
-const normalizeProfileLevel = (rawLevel) => {
-  const normalized = (rawLevel || "").trim().toUpperCase();
-  if (ALLOWED_LEVELS.includes(normalized)) return normalized;
-  const fuzzyMatch = ALLOWED_LEVELS.find((allowed) => normalized.startsWith(allowed));
-  return fuzzyMatch || "";
-};
+const { google } = require("googleapis");
 
-const VocabExamPage = () => {
-  const { level, setLevel, setError } = useExam();
-  const { studentProfile } = useAuth();
-  const profileLevel = normalizeProfileLevel(studentProfile?.level);
-  const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+/**
+ * Header-aware upsert into your Students Google Sheet.
+ * - Reads row 1 for headers
+ * - Finds existing row by StudentCode (preferred), else by uid/email
+ * - Updates ONLY the matching cells (safe for Apps Script + formulas)
+ * - Appends a new row if not found
+ *
+ * ENV expected:
+ * - STUDENTS_SHEET_ID
+ * - STUDENTS_SHEET_TAB (default: "students")
+ * - GOOGLE_SERVICE_ACCOUNT_JSON (recommended, JSON string)
+ *    OR GOOGLE_SERVICE_ACCOUNT_JSON_B64 (base64 of JSON string)
+ */
 
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setLocalError] = useState("");
+function normalizeHeader(h) {
+  return String(h || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+}
 
-  useEffect(() => {
-    if (isLevelLocked && level !== profileLevel) {
-      setLevel(profileLevel);
-    }
-  }, [isLevelLocked, level, profileLevel, setLevel]);
+function colToA1(colIdx0) {
+  // 0 => A, 25 => Z, 26 => AA
+  let n = colIdx0 + 1;
+  let s = "";
+  while (n > 0) {
+    const r = (n - 1) % 26;
+    s = String.fromCharCode(65 + r) + s;
+    n = Math.floor((n - 1) / 26);
+  }
+  return s;
+}
 
-  useEffect(() => {
-    let isMounted = true;
+function getServiceAccountFromEnv() {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (raw && raw.trim().startsWith("{")) {
+    return JSON.parse(raw);
+  }
 
-    const load = async () => {
-      setLoading(true);
-      setLocalError("");
-      try {
-        const vocab = await fetchVocabularyFromSheet();
-        if (!isMounted) return;
-        setItems(vocab);
-      } catch (err) {
-        console.error("Failed to load vocab sheet", err);
-        if (!isMounted) return;
-        setLocalError(err?.message || "Konnte Vokabeln nicht laden.");
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
+  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64;
+  if (b64) {
+    const decoded = Buffer.from(b64, "base64").toString("utf8");
+    return JSON.parse(decoded);
+  }
 
-    load();
+  throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_JSON_B64).");
+}
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+async function getSheetsClient() {
+  const sa = getServiceAccountFromEnv();
+  const projectId =
+    sa.project_id ||
+    process.env.GOOGLE_CLOUD_PROJECT ||
+    process.env.GCLOUD_PROJECT ||
+    (process.env.FIREBASE_CONFIG
+      ? (() => {
+          try {
+            const cfg = JSON.parse(process.env.FIREBASE_CONFIG);
+            return cfg.projectId || null;
+          } catch (e) {
+            return null;
+          }
+        })()
+      : null);
 
-  const levelItems = useMemo(
-    () => items.filter((item) => item.level === level),
-    [items, level]
+  const auth = new google.auth.JWT({
+    email: sa.client_email,
+    key: sa.private_key,
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    projectId,
+  });
+
+  return google.sheets({ version: "v4", auth });
+}
+
+async function loadHeaderMap(sheets, sheetId, tabName) {
+  const headerRes = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${tabName}!1:1`,
+  });
+
+  const headers = (headerRes.data.values && headerRes.data.values[0]) || [];
+  const headerMap = new Map(); // normalized header -> colIdx0
+
+  headers.forEach((h, idx) => {
+    const key = normalizeHeader(h);
+    if (key) headerMap.set(key, idx);
+  });
+
+  return { headers, headerMap };
+}
+
+function findCol(headerMap, ...candidates) {
+  for (const c of candidates) {
+    const idx = headerMap.get(normalizeHeader(c));
+    if (idx !== undefined) return idx;
+  }
+  return null;
+}
+
+async function getColumnValues(sheets, sheetId, tabName, colIdx0) {
+  const colA1 = colToA1(colIdx0);
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range: `${tabName}!${colA1}2:${colA1}`,
+  });
+
+  const values = res.data.values || [];
+  return values.map((r) => (r && r[0] ? String(r[0]).trim() : ""));
+}
+
+async function upsertStudentToSheet(student) {
+  const sheetId = process.env.STUDENTS_SHEET_ID;
+  const tabName = process.env.STUDENTS_SHEET_TAB || "students";
+
+  if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
+
+  const sheets = await getSheetsClient();
+  const { headers, headerMap } = await loadHeaderMap(sheets, sheetId, tabName);
+
+  const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
+  const colUid = findCol(headerMap, "uid", "UID");
+  const colEmail = findCol(headerMap, "Email", "email");
+  const colName = findCol(headerMap, "Name", "name");
+  const colPhone = findCol(headerMap, "Phone", "phone");
+  const colLocation = findCol(headerMap, "Location", "location");
+  const colLevel = findCol(headerMap, "Level", "level");
+  const colClassName = findCol(headerMap, "ClassName", "Class Name", "classname");
+  const colStatus = findCol(headerMap, "Status", "status");
+  const colEnrollDate = findCol(headerMap, "EnrollDate", "Enroll Date", "enrolldate");
+  const colPaid = findCol(headerMap, "Paid", "InitialPayment", "Initial Payment");
+  const colBalance = findCol(headerMap, "Balance", "BalanceDue", "Balance Due");
+  const colPaymentStatus = findCol(headerMap, "PaymentStatus", "Payment Status", "paymentStatus");
+  const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
+  const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
+  const colEmergencyPhone = findCol(
+    headerMap,
+    "Emergency Contact (Phone Number)",
+    "Emergency Contact",
+    "Emergency Contact Phone"
   );
+  const colDailyLimit = findCol(headerMap, "Daily_Limit", "Daily Limit", "DailyLimit");
+  const colUsesToday = findCol(headerMap, "Uses_Today", "Uses Today", "UsesToday");
+  const colLastDate = findCol(headerMap, "Last_Date", "Last Date", "LastDate");
+  const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
+  const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
+  const colAddress = findCol(headerMap, "Address", "address", "Home Address", "Residential Address");
 
-  const hasAudio = (entry) => entry.audioNormal || entry.audioSlow;
-
-  const renderAudio = (entry) => {
-    if (!hasAudio(entry)) return null;
-
-    return (
-      <div style={{ display: "grid", gap: 6, marginTop: 8 }}>
-        {entry.audioNormal ? (
-          <audio controls style={styles.audioPlayer} src={entry.audioNormal}>
-            Your browser does not support the audio element.
-          </audio>
-        ) : null}
-        {entry.audioSlow ? (
-          <audio controls style={styles.audioPlayer} src={entry.audioSlow}>
-            Your browser does not support the audio element.
-          </audio>
-        ) : null}
-      </div>
+  if (colStudentCode === null) {
+    const headerNames = headers && headers.length ? headers.join(" | ") : "(none)";
+    throw new Error(
+      `Students sheet is missing a StudentCode column header. Found headers: ${headerNames}`
     );
-  };
+  }
 
-  return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <section style={styles.card}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Exam Room</p>
-            <h2 style={{ ...styles.sectionTitle, margin: "4px 0 2px" }}>Vokabeln aus dem Sheet</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Gefiltert nach deinem Niveau. Quelle: Sheet1 (Google Sheet).
-            </p>
-          </div>
-          <div style={{ display: "grid", gap: 6 }}>
-            <label style={{ ...styles.label, margin: 0 }}>
-              Level auswählen {isLevelLocked ? "(aus Profil)" : ""}
-            </label>
-            <select
-              value={level}
-              onChange={(e) => {
-                setLevel(e.target.value);
-                setError("");
-              }}
-              style={styles.select}
-              disabled={isLevelLocked}
-            >
-              {ALLOWED_LEVELS.map((option) => (
-                <option key={option}>{option}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </section>
+  const studentCodes = await getColumnValues(sheets, sheetId, tabName, colStudentCode);
 
-      {loading ? (
-        <section style={styles.card}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Lade Vokabeln aus dem Sheet ...</p>
-        </section>
-      ) : error ? (
-        <section style={styles.card}>
-          <div style={styles.errorBox}>
-            <strong>Hinweis:</strong> {error}
-          </div>
-        </section>
-      ) : levelItems.length === 0 ? (
-        <section style={styles.card}>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Keine Vokabeln für Niveau {level} gefunden. Bitte prüfe das Sheet oder wähle ein anderes Niveau.
-          </p>
-        </section>
-      ) : (
-        <section style={styles.card}>
-          <div style={{ ...styles.metaRow, marginTop: 0, marginBottom: 12 }}>
-            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Vokabel-Liste (Niveau {level})</h3>
-            <a href={VOCAB_SOURCE_URL} target="_blank" rel="noreferrer" style={styles.secondaryButton}>
-              Sheet öffnen
-            </a>
-          </div>
-          <div style={{ ...styles.vocabGrid, marginTop: 0 }}>
-            {levelItems.map((entry) => (
-              <div key={entry.id} style={{ ...styles.vocabCard, background: "#fff" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
-                  <div style={{ fontWeight: 800, fontSize: 15 }}>{entry.german || "—"}</div>
-                  <span style={styles.levelPill}>{entry.level}</span>
-                </div>
-                <p style={{ ...styles.helperText, margin: "4px 0 6px" }}>{entry.english || "No English translation"}</p>
-                {hasAudio(entry) ? (
-                  <div style={{ display: "grid", gap: 4 }}>
-                    {entry.audioNormal ? <span style={styles.badge}>Audio (normal)</span> : null}
-                    {entry.audioSlow ? <span style={styles.badge}>Audio (slow)</span> : null}
-                  </div>
-                ) : null}
-                {renderAudio(entry)}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
+  let uids = [];
+  if (colUid !== null) uids = await getColumnValues(sheets, sheetId, tabName, colUid);
+
+  let emails = [];
+  if (colEmail !== null) emails = await getColumnValues(sheets, sheetId, tabName, colEmail);
+
+  const targetStudentCode = String(student.studentCode || "").trim();
+  const targetUid = String(student.uid || "").trim();
+  const targetEmail = String(student.email || "").trim();
+
+  let rowIndex0 = -1;
+  if (targetStudentCode) rowIndex0 = studentCodes.findIndex((v) => v === targetStudentCode);
+  if (rowIndex0 === -1 && targetUid && uids.length) rowIndex0 = uids.findIndex((v) => v === targetUid);
+  if (rowIndex0 === -1 && targetEmail && emails.length)
+    rowIndex0 = emails.findIndex((v) => v.toLowerCase() === targetEmail.toLowerCase());
+
+  const sheetRowNumber = rowIndex0 >= 0 ? rowIndex0 + 2 : null;
+
+  const updates = [];
+  function pushCell(colIdx0, value) {
+    if (colIdx0 === null || colIdx0 === undefined) return;
+    const colA1 = colToA1(colIdx0);
+    const a1 = `${tabName}!${colA1}${sheetRowNumber}`;
+    updates.push({ range: a1, values: [[value]] });
+  }
+
+  if (sheetRowNumber) {
+    pushCell(colStudentCode, targetStudentCode || "");
+    pushCell(colUid, targetUid || "");
+    pushCell(colEmail, targetEmail || "");
+    pushCell(colName, student.name || "");
+    pushCell(colPhone, student.phone || "");
+    pushCell(colLocation, student.location || "");
+    pushCell(colLevel, student.level || "");
+    pushCell(colClassName, student.className || "");
+    pushCell(colStatus, student.status || "");
+    pushCell(colEnrollDate, student.enrollDate || "");
+    pushCell(colPaid, student.initialPaymentAmount ?? student.paidAmount ?? "");
+    pushCell(colBalance, student.balanceDue ?? student.balance ?? "");
+    pushCell(colPaymentStatus, student.paymentStatus || "");
+    pushCell(colContractStart, student.contractStart || "");
+    pushCell(colContractEnd, student.contractEnd || "");
+    pushCell(colLearningMode, student.learningMode || "");
+    pushCell(colAddress, student.address || "");
+    pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
+    pushCell(colDailyLimit, student.dailyLimit ?? "");
+    pushCell(colUsesToday, student.usesToday ?? "");
+    pushCell(colLastDate, student.lastDate || "");
+    pushCell(colReminderSent, student.reminderSent || "");
+
+    if (updates.length) {
+      await sheets.spreadsheets.values.batchUpdate({
+        spreadsheetId: sheetId,
+        requestBody: {
+          valueInputOption: "USER_ENTERED",
+          data: updates,
+        },
+      });
+    }
+
+    return { action: "updated", row: sheetRowNumber };
+  }
+
+  const maxCol = headerMap.size ? Math.max(...Array.from(headerMap.values())) : 0;
+  const row = Array(maxCol + 1).fill("");
+
+  row[colStudentCode] = targetStudentCode || "";
+  if (colUid !== null) row[colUid] = targetUid || "";
+  if (colEmail !== null) row[colEmail] = targetEmail || "";
+  if (colName !== null) row[colName] = student.name || "";
+  if (colPhone !== null) row[colPhone] = student.phone || "";
+  if (colLocation !== null) row[colLocation] = student.location || "";
+  if (colLevel !== null) row[colLevel] = student.level || "";
+  if (colClassName !== null) row[colClassName] = student.className || "";
+  if (colStatus !== null) row[colStatus] = student.status || "";
+  if (colEnrollDate !== null) row[colEnrollDate] = student.enrollDate || "";
+  if (colPaid !== null) row[colPaid] = student.initialPaymentAmount ?? student.paidAmount ?? "";
+  if (colBalance !== null) row[colBalance] = student.balanceDue ?? student.balance ?? "";
+  if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
+  if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
+  if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
+  if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
+  if (colAddress !== null) row[colAddress] = student.address || "";
+  if (colEmergencyPhone !== null) row[colEmergencyPhone] = student.emergencyContactPhone || "";
+  if (colDailyLimit !== null) row[colDailyLimit] = student.dailyLimit ?? "";
+  if (colUsesToday !== null) row[colUsesToday] = student.usesToday ?? "";
+  if (colLastDate !== null) row[colLastDate] = student.lastDate || "";
+  if (colReminderSent !== null) row[colReminderSent] = student.reminderSent || "";
+
+  const appendRange = `${tabName}!A:${colToA1(maxCol)}`;
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: appendRange,
+    valueInputOption: "USER_ENTERED",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [row] },
+  });
+
+  return { action: "appended" };
+}
+
+async function appendStudentToStudentsSheetSafely(student) {
+  try {
+    return await upsertStudentToSheet(student);
+  } catch (err) {
+    console.error("appendStudentToStudentsSheetSafely error", err);
+    return { error: err.message || "Failed to sync student to sheet" };
+  }
+}
+
+module.exports = {
+  upsertStudentToSheet,
+  appendStudentToStudentsSheetSafely,
 };
-
-export default VocabExamPage;
