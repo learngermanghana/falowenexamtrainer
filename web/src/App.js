@@ -13,6 +13,7 @@ import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
 import WritingPage from "./components/WritingPage";
+import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
 import { isFirebaseConfigured } from "./firebase";
 import { styles } from "./styles";
@@ -473,7 +474,7 @@ const ExamArea = ({ onBack }) => {
   const navigate = useNavigate();
 
   const examSection = useMemo(() => {
-    if (["speaking", "writing", "resources", "file"].includes(section)) {
+    if (["speaking", "writing", "resources", "file", "vocab"].includes(section)) {
       return section;
     }
     return "speaking";
@@ -488,6 +489,7 @@ const ExamArea = ({ onBack }) => {
   const tabs = [
     { key: "speaking", label: "Speaking" },
     { key: "writing", label: "Schreiben trainer" },
+    { key: "vocab", label: "Vocab" },
     { key: "resources", label: "Resources" },
     { key: "file", label: "My Exam File" },
   ];
@@ -511,6 +513,7 @@ const ExamArea = ({ onBack }) => {
 
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
+      {examSection === "vocab" ? <VocabExamPage /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
     </>
