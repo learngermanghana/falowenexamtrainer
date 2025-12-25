@@ -440,12 +440,31 @@ const AssignmentSubmissionPage = () => {
     if (field === "confirmed") setStatus((prev) => ({ ...prev, error: "" }));
   };
 
+  const selectedDayNumber = useMemo(
+    () => deriveChapterValue(form.assignmentTitle),
+    [deriveChapterValue, form.assignmentTitle]
+  );
+  const isOrientationDay = selectedDayNumber === 0;
+  const assignmentInfo = useMemo(() => {
+    const base = form.assignmentTitle || assignmentOptions[0] || "Assignment";
+    return selectedDayNumber ? `${base} (Day ${selectedDayNumber})` : base;
+  }, [assignmentOptions, form.assignmentTitle, selectedDayNumber]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ loading: true, error: "", success: "" });
 
     if (!form.assignmentTitle || !form.submissionText.trim()) {
       setStatus({ loading: false, error: "Please select an assignment and enter your text.", success: "" });
+      return;
+    }
+
+    if (isOrientationDay) {
+      setStatus({
+        loading: false,
+        error: "Day 0 is orientation only. Please select another day to submit an assignment.",
+        success: "",
+      });
       return;
     }
 
@@ -534,12 +553,6 @@ const AssignmentSubmissionPage = () => {
   };
 
   // ✅ Resubmission mailto (per selected assignment)
-  const selectedDayNumber = useMemo(() => deriveChapterValue(form.assignmentTitle), [deriveChapterValue, form.assignmentTitle]);
-  const assignmentInfo = useMemo(() => {
-    const base = form.assignmentTitle || assignmentOptions[0] || "Assignment";
-    return selectedDayNumber ? `${base} (Day ${selectedDayNumber})` : base;
-  }, [assignmentOptions, form.assignmentTitle, selectedDayNumber]);
-
   const resubmissionMailto = useMemo(() => {
     const subject = `Resubmission request - ${assignmentInfo} - ${studentCode || "no-code"}`;
 
@@ -616,6 +629,11 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
                   Choose the assignment using the Day/Topic list from the course schedule – no typing needed.
                 </p>
               )}
+              {isOrientationDay ? (
+                <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#b45309" }}>
+                  Day 0 is orientation only, so submissions are disabled for this selection.
+                </p>
+              ) : null}
             </div>
 
             <div style={{ ...styles.field, margin: 0 }}>
@@ -653,7 +671,7 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
               type="checkbox"
               checked={form.confirmed || confirmationLocked}
               onChange={handleChange("confirmed")}
-              disabled={confirmationLocked || status.loading || isSelectedLocked}
+              disabled={confirmationLocked || status.loading || isSelectedLocked || isOrientationDay}
             />
             <span style={{ ...styles.label, margin: 0 }}>I confirm this is the correct assignment.</span>
           </label>
@@ -671,7 +689,7 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
             <button
               type="submit"
               style={styles.primaryButton}
-              disabled={status.loading || confirmationLocked || isSelectedLocked}
+              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay}
             >
               {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>
