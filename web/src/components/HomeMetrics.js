@@ -4,102 +4,22 @@ import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 
-const PASS_MARK = 60;
-
-/** -------------------------
- * Fallback helpers (old logic)
- * ------------------------- */
-const parseAssignmentNumber = (assignment = "") => {
-  const text = String(assignment || "");
-  const dayMatch = text.match(/\bday\s*(\d+(?:\.\d+)?)\b/i);
-  if (dayMatch?.[1]) return Number(dayMatch[1]);
-  const match = text.match(/(\d+(?:\.\d+)?)/);
-  return match ? Number(match[1]) : null;
-};
-
-const uniqSorted = (numbers = []) => {
-  const clean = numbers.filter((n) => Number.isFinite(n));
-  return Array.from(new Set(clean)).sort((a, b) => a - b);
-};
-
-const inferStep = (numbers = []) => {
-  const sorted = uniqSorted(numbers);
-  if (sorted.length < 2) {
-    const hasDecimal = sorted.some((n) => Math.abs(n - Math.round(n)) > 1e-6);
-    return hasDecimal ? 0.5 : 1;
-  }
-
-  let minDiff = Infinity;
-  for (let i = 1; i < sorted.length; i += 1) {
-    const diff = sorted[i] - sorted[i - 1];
-    if (diff > 1e-6 && diff < minDiff) minDiff = diff;
-  }
-
-  if (!Number.isFinite(minDiff) || minDiff <= 1e-6) return 1;
-  if (minDiff <= 0.1 + 1e-6) return 0.1;
-  if (minDiff <= 0.25 + 1e-6) return 0.25;
-  if (minDiff <= 0.5 + 1e-6) return 0.5;
-  return 1;
-};
-
-const findMissingNumbers = (numbers = []) => {
-  const sorted = uniqSorted(numbers);
-  if (!sorted.length) return [];
-
-  const step = inferStep(sorted);
-  const start = sorted[0] > step ? step : sorted[0];
-  const end = sorted[sorted.length - 1];
-
-  const missing = [];
-  const round = (value) => Number(value.toFixed(2));
-
-  for (let current = start; current < end - 1e-6; current = round(current + step)) {
-    const exists = sorted.some((v) => Math.abs(v - current) < 1e-6);
-    if (!exists) missing.push(current);
-  }
-
-  return missing;
-};
-
-/** -------------------------
- * Display helpers (new logic)
- * ------------------------- */
-const asArray = (v) => (Array.isArray(v) ? v : []);
-
-const formatLessonLabel = (entry) => {
+const labelOf = (entry) => {
   if (!entry) return "";
   if (typeof entry === "string") return entry;
-  if (typeof entry === "number") return `Assignment ${entry}`;
-
-  // new schedule-aware payload uses .label
-  if (entry.label) return String(entry.label);
-
-  // fallback older payload
-  if (entry.assignment) return String(entry.assignment);
-  if (typeof entry.number === "number") return `Assignment ${entry.number}`;
-
-  return "";
+  return String(entry.label || entry.assignment || "").trim();
 };
 
 const formatList = (items = [], maxItems = 3) => {
-  const labels = asArray(items).map(formatLessonLabel).filter(Boolean);
+  const labels = (items || []).map(labelOf).filter(Boolean);
   if (!labels.length) return "None yet";
-
   if (labels.length <= maxItems) {
     if (labels.length === 1) return labels[0];
     if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
     return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
   }
-
   const shown = labels.slice(0, maxItems);
   return `${shown.join(", ")} (+${labels.length - maxItems} more)`;
-};
-
-const joinIdentifiers = (ids = []) => {
-  const clean = asArray(ids).map((x) => String(x || "").trim()).filter(Boolean);
-  if (!clean.length) return "";
-  if (clean.length <= 3) return clean.join(", ");
-  return `${clean.slice(0, 3).join(", ")} (+${clean.length - 3})`;
 };
 
 const HomeMetrics = ({ studentProfile }) => {
@@ -155,8 +75,7 @@ const HomeMetrics = ({ studentProfile }) => {
       setRefreshError("");
     } catch (error) {
       if (!isMountedRef.current) return;
-      // show real error if present (helps debugging)
-      setRefreshError(error?.message || "Could not refresh right now. Showing your last saved metrics.");
+      setRefreshError("Could not refresh right now. Showing your last saved metrics.");
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
@@ -181,84 +100,31 @@ const HomeMetrics = ({ studentProfile }) => {
     };
   }, [refreshMetrics]);
 
-  /** -------------------------
-   * New payload fields (preferred)
-   * ------------------------- */
-  const missedLessons = useMemo(
-    () => asArray(assignmentStats?.missedAssignments),
-    [assignmentStats?.missedAssignments]
-  );
+  const missedAssignments = useMemo(() => assignmentStats?.missedAssignments || [], [assignmentStats]);
+  const failedAssignments = useMemo(() => assignmentStats?.failedAssignments || [], [assignmentStats]);
+  const blocked = Boolean(assignmentStats?.recommendationBlocked);
+  const nextObj = assignmentStats?.nextRecommendation || null;
 
-  const failedLessons = useMemo(
-    () => asArray(assignmentStats?.failedAssignments),
-    [assignmentStats?.failedAssignments]
-  );
-
-  const failedIdentifiers = useMemo(
-    () => asArray(assignmentStats?.failedIdentifiers),
-    [assignmentStats?.failedIdentifiers]
-  );
-
-  const nextRecommendation = assignmentStats?.nextRecommendation || null;
-  const recommendationBlocked = Boolean(assignmentStats?.recommendationBlocked);
-
-  const hasFailures = useMemo(
-    () => recommendationBlocked || failedLessons.length > 0 || failedIdentifiers.length > 0,
-    [failedIdentifiers.length, failedLessons.length, recommendationBlocked]
-  );
-
-  /** -------------------------
-   * Fallback (old payload)
-   * ------------------------- */
-  const completedAssignmentsFallback = useMemo(
-    () => asArray(assignmentStats?.completedAssignments),
-    [assignmentStats?.completedAssignments]
-  );
-
-  const completedNumbersFallback = useMemo(() => {
-    return completedAssignmentsFallback
-      .map((e) =>
-        typeof e?.number === "number" ? e.number : parseAssignmentNumber(e?.label || e?.assignment)
-      )
-      .filter((n) => Number.isFinite(n));
-  }, [completedAssignmentsFallback]);
-
-  const computedMissingNumbersFallback = useMemo(
-    () => findMissingNumbers(completedNumbersFallback),
-    [completedNumbersFallback]
-  );
-
-  const missedFallback = useMemo(() => {
-    if (missedLessons.length) return missedLessons;
-    // if backend doesn't return missedLessons (older deployment), fall back to gap guessing
-    return computedMissingNumbersFallback.map((n) => ({ number: n, label: `Assignment ${n}` }));
-  }, [computedMissingNumbersFallback, missedLessons]);
-
-  /** -------------------------
-   * UI text for Next / Missed / Failed
-   * ------------------------- */
-  const nextText = useMemo(() => {
-    if (hasFailures) {
-      const firstFail = failedLessons[0];
-      return firstFail?.label
-        ? `Fix failed attempt: ${firstFail.label}`
-        : "Fix failed assignments before new lessons";
+  const recommendedNext = useMemo(() => {
+    if (blocked) {
+      const firstFail = failedAssignments[0];
+      return firstFail ? `Redo first: ${labelOf(firstFail)}` : "Redo failed work first";
     }
-    if (nextRecommendation?.label) return nextRecommendation.label;
-    if (missedFallback.length) return formatLessonLabel(missedFallback[0]);
-    return "All caught up 🎉";
-  }, [failedLessons, hasFailures, missedFallback, nextRecommendation?.label]);
 
-  const nextSubtext = useMemo(() => {
-    if (hasFailures) {
-      const ids = joinIdentifiers(failedIdentifiers);
-      if (ids) return `Scores under ${PASS_MARK}. Pass these first: ${ids}`;
-      return `Scores under ${PASS_MARK} need a retry before the next assignment unlocks.`;
-    }
-    const ids = joinIdentifiers(nextRecommendation?.identifiers || []);
-    if (ids) return `Targets: ${ids}`;
-    return "Based on your schedule + score submissions.";
-  }, [failedIdentifiers, hasFailures, nextRecommendation?.identifiers]);
+    if (nextObj?.label) return nextObj.label;
+
+    if (missedAssignments.length) return labelOf(missedAssignments[0]);
+
+    // If we have any stats at all and nothing is pending, you're caught up.
+    if (assignmentStats) return "All caught up 🎉";
+
+    return "Start with Day 1";
+  }, [assignmentStats, blocked, failedAssignments, missedAssignments, nextObj]);
+
+  const failedIdentifiersText = useMemo(() => {
+    const ids = assignmentStats?.failedIdentifiers || [];
+    return ids.length ? ids.join(", ") : "";
+  }, [assignmentStats]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -270,14 +136,7 @@ const HomeMetrics = ({ studentProfile }) => {
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           {loading ? <span style={styles.badge}>Refreshing…</span> : null}
           {refreshError ? (
-            <span
-              style={{
-                ...styles.badge,
-                background: "#fff7ed",
-                borderColor: "#fdba74",
-                color: "#9a3412",
-              }}
-            >
+            <span style={{ ...styles.badge, background: "#fff7ed", borderColor: "#fdba74", color: "#9a3412" }}>
               {refreshError}
             </span>
           ) : null}
@@ -301,35 +160,40 @@ const HomeMetrics = ({ studentProfile }) => {
 
         <div style={{ ...styles.vocabCard, background: "#fef9c3", borderColor: "#fcd34d" }}>
           <p style={{ ...styles.helperText, margin: 0 }}>Next recommendation</p>
-          <h4 style={{ margin: "4px 0" }}>{nextText}</h4>
-          <p style={{ ...styles.helperText, margin: 0 }}>{nextSubtext}</p>
+          <h4 style={{ margin: "4px 0" }}>{recommendedNext}</h4>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            {blocked
+              ? failedIdentifiersText
+                ? `Blocked until you pass: ${failedIdentifiersText}`
+                : "Blocked until failed work is passed."
+              : nextObj?.goal
+              ? `Goal: ${nextObj.goal}`
+              : "Based on your score sheet submissions and schedule targets."}
+          </p>
         </div>
 
         <div style={{ ...styles.vocabCard, background: "#eef2ff", borderColor: "#c7d2fe" }}>
           <p style={{ ...styles.helperText, margin: 0 }}>Missed or skipped</p>
-          <h4 style={{ margin: "4px 0" }}>{formatList(missedFallback)}</h4>
+          <h4 style={{ margin: "4px 0" }}>{formatList(missedAssignments)}</h4>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Based on your class schedule order (not just number gaps).
+            Missed = incomplete items up to your last fully completed day.
           </p>
         </div>
 
         <div style={{ ...styles.vocabCard, background: "#ffe4e6", borderColor: "#fda4af" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Needs rework (below {PASS_MARK})</p>
-          <h4 style={{ margin: "4px 0" }}>{formatList(failedLessons)}</h4>
+          <p style={{ ...styles.helperText, margin: 0 }}>Below pass mark (60)</p>
+          <h4 style={{ margin: "4px 0" }}>{formatList(failedAssignments)}</h4>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            {failedIdentifiers.length
-              ? `Identifiers to redo: ${joinIdentifiers(failedIdentifiers)}`
-              : `Retake these to clear the ${PASS_MARK} pass mark.`}
+            Retake these to unlock next recommendations.
           </p>
         </div>
       </div>
 
       {assignmentStats ? (
         <div style={{ ...styles.helperText, margin: 0 }}>
-          This week: {assignmentStats.weekAssignments || 0} assignments across{" "}
-          {assignmentStats.weekAttempts || 0} attempts · Streak: {assignmentStats.streakDays || 0}{" "}
-          day(s) · Last upload: {assignmentStats.lastAssignment || "–"} · Retries this week:{" "}
-          {assignmentStats.retriesThisWeek || 0}
+          This week: {assignmentStats.weekAssignments || 0} assignments across {assignmentStats.weekAttempts || 0} attempts ·
+          Streak: {assignmentStats.streakDays || 0} day(s) · Last upload: {assignmentStats.lastAssignment || "–"} ·
+          Retries this week: {assignmentStats.retriesThisWeek || 0}
         </div>
       ) : null}
     </section>

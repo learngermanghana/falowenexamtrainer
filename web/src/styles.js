@@ -68,6 +68,7 @@ export const styles = {
     boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
     marginBottom: 16,
     border: "1px solid #e5e7eb",
+    boxSizing: "border-box",
   },
   resultCard: {
     background: "#ffffff",
@@ -76,6 +77,7 @@ export const styles = {
     boxShadow: "0 8px 16px rgba(0, 0, 0, 0.08)",
     marginTop: 16,
     border: "1px solid #d1d5db",
+    boxSizing: "border-box",
   },
   sectionTitle: {
     margin: "0 0 12px 0",
