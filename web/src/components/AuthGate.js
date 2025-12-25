@@ -1,3 +1,4 @@
+// AuthGate.js
 import React, { useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
@@ -11,19 +12,27 @@ import PasswordGuidance from "./PasswordGuidance";
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, authError, setAuthError, resetPassword } = useAuth();
   const { showToast } = useToast();
+
   const [mode, setMode] = useState(initialMode);
+
+  // shared
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+
+  // signup-only fields
+  const [name, setName] = useState("");
   const [selectedLevel, setSelectedLevel] = useState("B1");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
-  const [learningMode, setLearningMode] = useState("Online");
+  const [address, setAddress] = useState(""); // ✅ NEW
+  const [learningMode, setLearningMode] = useState("Online"); // Online | In-person | Hybrid
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [className, setClassName] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [message, setMessage] = useState("");
+
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
 
   const handleSubmit = async (event) => {
@@ -35,35 +44,39 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     try {
       if (mode === "signup") {
         const studentCode = generateStudentCode({ name });
+
         await signup(email, password, {
           name,
           level: selectedLevel,
           studentCode,
           phone,
           location,
+          address, // ✅ NEW
           learningMode,
           emergencyContactPhone,
           className,
         });
+
         savePreferredLevel(selectedLevel);
         rememberStudentCodeForEmail(email, studentCode);
+
         const successMessage = `Account created! Your student code is ${studentCode}.`;
         setMessage(successMessage);
         showToast(`${successMessage} Finish setup inside the app.`, "success");
       } else {
         const loginResult = await login(email, password);
         const credential = loginResult?.credential || loginResult;
+
         const studentCode = credential?.user?.profile?.studentCode;
         const level = credential?.user?.profile?.level;
-        if (studentCode) {
-          rememberStudentCodeForEmail(email, studentCode);
-        }
-        if (level) {
-          savePreferredLevel(level);
-        }
+
+        if (studentCode) rememberStudentCodeForEmail(email, studentCode);
+        if (level) savePreferredLevel(level);
+
         const loginMessage = credential?.migratedFromLegacy
           ? "We found your old account. Your new password is now saved."
           : "Welcome back!";
+
         setMessage(loginMessage);
         showToast(loginMessage, "success");
       }
@@ -82,6 +95,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     setResetting(true);
     setMessage("");
     setAuthError("");
+
     try {
       await resetPassword(email);
       const resetMessage = "Password reset email sent. Please check your inbox.";
@@ -89,8 +103,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       showToast(resetMessage, "info");
     } catch (error) {
       console.error(error);
-      const errorMessage =
-        error?.message || "Could not send password reset email.";
+      const errorMessage = error?.message || "Could not send password reset email.";
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
     } finally {
@@ -111,15 +124,18 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
             {mode === "login" ? "Login" : "Create account"}
           </h2>
+
           {onBack && (
             <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
               Back to overview
             </button>
           )}
         </div>
+
         <p style={styles.helperText}>
           Connect with your account so we can save your exam progress.
         </p>
+
         {mode === "login" && (
           <div style={{ ...styles.uploadCard, background: "#f8fafc", marginBottom: 12 }}>
             <p style={{ ...styles.helperText, marginBottom: 4 }}>
@@ -135,29 +151,24 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           {mode === "signup" && (
             <>
               <label style={styles.label}>Name</label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                style={inputStyle}
-              />
+              <input type="text" required value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
+
               <label style={styles.label}>Phone number</label>
-              <input
-                type="tel"
-                required
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                style={inputStyle}
-              />
+              <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} />
+
               <label style={styles.label}>Location</label>
+              <input type="text" required value={location} onChange={(e) => setLocation(e.target.value)} style={inputStyle} />
+
+              <label style={styles.label}>Address</label>
               <input
                 type="text"
                 required
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
                 style={inputStyle}
+                placeholder="e.g. Madina, Accra (street/area)"
               />
+
               <label style={styles.label}>Learning mode</label>
               <select
                 required
@@ -173,13 +184,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           )}
 
           <label style={styles.label}>Email</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={inputStyle}
-          />
+          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
 
           <label style={styles.label}>Password</label>
           <input
@@ -189,11 +194,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             style={inputStyle}
-            placeholder={
-              mode === "signup"
-                ? "At least 8 characters with letters and numbers"
-                : undefined
-            }
+            placeholder={mode === "signup" ? "At least 8 characters with letters and numbers" : undefined}
           />
 
           {mode === "signup" && <PasswordGuidance password={password} />}
@@ -204,12 +205,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 type="button"
                 onClick={handlePasswordReset}
                 disabled={resetting || loading}
-                style={{
-                  ...styles.secondaryButton,
-                  padding: "6px 10px",
-                  fontSize: 13,
-                  marginTop: 2,
-                }}
+                style={{ ...styles.secondaryButton, padding: "6px 10px", fontSize: 13, marginTop: 2 }}
               >
                 {resetting ? "Sending reset email ..." : "Forgot password?"}
               </button>
@@ -231,6 +227,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                   </option>
                 ))}
               </select>
+
               <label style={styles.label}>Emergency contact (phone)</label>
               <input
                 type="tel"
@@ -239,6 +236,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 onChange={(e) => setEmergencyContactPhone(e.target.value)}
                 style={inputStyle}
               />
+
               <label style={styles.label}>Class name</label>
               <input
                 type="text"
@@ -251,17 +249,21 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           )}
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
-            {loading
-              ? "Please wait ..."
-              : mode === "login"
-              ? "Log in"
-              : "Sign up"}
+            {loading ? "Please wait ..." : mode === "login" ? "Log in" : "Sign up"}
           </button>
         </form>
 
         {authError && <div style={styles.errorBox}>{authError}</div>}
+
         {message && (
-          <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#166534", borderColor: "#22c55e" }}>
+          <div
+            style={{
+              ...styles.errorBox,
+              background: "#ecfdf3",
+              color: "#166534",
+              borderColor: "#22c55e",
+            }}
+          >
             {message}
           </div>
         )}
