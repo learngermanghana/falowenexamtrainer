@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
+import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 
 const formatDate = (value) => {
   if (!value) return "";
-  const parsed = new Date(value); // supports "2025-12-21" and ISO
+  const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toLocaleString();
 };
 
@@ -34,13 +35,49 @@ const TextBlock = ({ title, text, maxChars = 650 }) => {
   );
 };
 
-const ResultHistory = ({ results = [] }) => {
+/**
+ * If you pass `sheetCsvUrl`, this component will fetch results from that published sheet.
+ * Otherwise, it will use the `results` prop (old behaviour).
+ */
+const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
+  const [sheetResults, setSheetResults] = useState([]);
+  const [sheetLoading, setSheetLoading] = useState(false);
+  const [sheetError, setSheetError] = useState("");
+
   const [search, setSearch] = useState("");
   const [levelFilter, setLevelFilter] = useState("ALL");
   const [minScore, setMinScore] = useState("");
 
+  useEffect(() => {
+    if (!sheetCsvUrl) return;
+
+    let mounted = true;
+    const run = async () => {
+      setSheetLoading(true);
+      setSheetError("");
+      try {
+        const data = await fetchResultsFromPublishedSheet(sheetCsvUrl);
+        if (!mounted) return;
+        setSheetResults(data);
+      } catch (e) {
+        if (!mounted) return;
+        setSheetError(e?.message || "Failed to load results sheet.");
+        setSheetResults([]);
+      } finally {
+        if (mounted) setSheetLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      mounted = false;
+    };
+  }, [sheetCsvUrl]);
+
+  const activeResults = sheetCsvUrl ? sheetResults : results;
+
   const normalized = useMemo(() => {
-    const list = (Array.isArray(results) ? results : []).map((entry, idx) => {
+    const list = (Array.isArray(activeResults) ? activeResults : []).map((entry, idx) => {
       const dateRaw = entry.date || entry.createdAt || entry.created_at || entry.dateIso || "";
       const createdMs = dateRaw ? Date.parse(dateRaw) : NaN;
 
@@ -61,9 +98,8 @@ const ResultHistory = ({ results = [] }) => {
       };
     });
 
-    // newest first
     return list.sort((a, b) => (b.createdMs || 0) - (a.createdMs || 0));
-  }, [results]);
+  }, [activeResults]);
 
   const availableLevels = useMemo(() => {
     const set = new Set();
@@ -88,21 +124,40 @@ const ResultHistory = ({ results = [] }) => {
         safeLower(r.studentcode).includes(q);
 
       const matchesScore =
-        min === null || !Number.isFinite(min)
-          ? true
-          : Number(r.score || 0) >= min;
+        min === null || !Number.isFinite(min) ? true : Number(r.score || 0) >= min;
 
       return matchesLevel && matchesSearch && matchesScore;
     });
   }, [levelFilter, minScore, normalized, search]);
-
-  if (!normalized.length) return null;
 
   const resetFilters = () => {
     setSearch("");
     setLevelFilter("ALL");
     setMinScore("");
   };
+
+  // Loading/error states for sheet source
+  if (sheetCsvUrl && sheetLoading) {
+    return (
+      <section style={{ ...styles.card, marginTop: 16 }}>
+        <h2 style={styles.sectionTitle}>Past feedback</h2>
+        <p style={styles.helperText}>Loading your feedback history…</p>
+      </section>
+    );
+  }
+
+  if (sheetCsvUrl && sheetError) {
+    return (
+      <section style={{ ...styles.card, marginTop: 16 }}>
+        <h2 style={styles.sectionTitle}>Past feedback</h2>
+        <div style={styles.errorBox}>
+          <strong>Could not load sheet:</strong> {sheetError}
+        </div>
+      </section>
+    );
+  }
+
+  if (!normalized.length) return null;
 
   return (
     <section style={{ ...styles.card, marginTop: 16 }}>
