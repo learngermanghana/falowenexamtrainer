@@ -55,6 +55,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [selectedLevel, setSelectedLevel] = useState("B1");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [address, setAddress] = useState("");
+  const [learningMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [initialPaymentAmount, setInitialPaymentAmount] = useState(
     `${MIN_INITIAL_PAYMENT}`
@@ -223,8 +225,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
       validationIssues.phone = "Enter a contact phone number so we can reach you.";
     }
 
+    if (!address.trim()) {
+      validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
+    }
+
     if (!emergencyContactPhone.trim()) {
       validationIssues.emergencyContactPhone = "Add an emergency contact phone number. This is required for safety.";
+    }
+
+    if (!learningMode) {
+      validationIssues.learningMode = "Choose how you plan to learn so we can match you to the right experience.";
     }
 
     if (password !== confirmPassword) {
@@ -264,6 +274,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
         className: selectedClass,
         phone,
         location,
+        address,
+        learningMode,
         emergencyContactPhone,
         initialPaymentAmount: paidAmount,
         tuitionFee,
@@ -492,6 +504,20 @@ const SignUpPage = ({ onLogin, onBack }) => {
             notified in urgent safety situations.
           </p>
 
+          <label style={styles.label}>Address</label>
+          <textarea
+            required
+            value={address}
+            onChange={(event) => {
+              setAddress(event.target.value);
+              clearFieldError("address");
+              setAuthError("");
+            }}
+            style={{ ...styles.textArea, minHeight: 80 }}
+            placeholder="House number, street, city, region"
+          />
+          {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
+
           <label style={styles.label}>Location (optional)</label>
           <input
             type="text"
@@ -500,6 +526,24 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={inputStyle}
             placeholder="Berlin"
           />
+
+          <label style={styles.label}>Preferred learning mode</label>
+          <select
+            required
+            value={learningMode}
+            onChange={(event) => {
+              setLearningMode(event.target.value);
+              clearFieldError("learningMode");
+              setAuthError("");
+            }}
+            style={styles.select}
+          >
+            <option value="">Choose one</option>
+            <option value="In-person">In-person</option>
+            <option value="Online">Online</option>
+            <option value="Hybrid">Hybrid</option>
+          </select>
+          {fieldErrors.learningMode ? <p style={styles.fieldError}>{fieldErrors.learningMode}</p> : null}
 
           <label style={styles.label}>Emergency contact phone</label>
           <input
