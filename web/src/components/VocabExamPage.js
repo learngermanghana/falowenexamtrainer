@@ -1,276 +1,421 @@
-"use strict";
+// web/src/pages/VocabExamPage.jsx
+import React, { useEffect, useMemo, useState } from "react";
+import { styles } from "../styles";
+import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
+import { useAuth } from "../context/AuthContext";
+import { fetchVocabularyFromSheet } from "../services/vocabService";
 
-const { google } = require("googleapis");
+const PAGE_SIZE = 40;
 
-/**
- * Header-aware upsert into your Students Google Sheet.
- * - Reads row 1 for headers
- * - Finds existing row by StudentCode (preferred), else by uid/email
- * - Updates ONLY the matching cells (safe for Apps Script + formulas)
- * - Appends a new row if not found
- *
- * ENV expected:
- * - STUDENTS_SHEET_ID
- * - STUDENTS_SHEET_TAB (default: "students")
- * - GOOGLE_SERVICE_ACCOUNT_JSON (recommended, JSON string)
- *    OR GOOGLE_SERVICE_ACCOUNT_JSON_B64 (base64 of JSON string)
- */
-
-function normalizeHeader(h) {
-  return String(h || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[\s_-]+/g, "");
-}
-
-function colToA1(colIdx0) {
-  // 0 => A, 25 => Z, 26 => AA
-  let n = colIdx0 + 1;
-  let s = "";
-  while (n > 0) {
-    const r = (n - 1) % 26;
-    s = String.fromCharCode(65 + r) + s;
-    n = Math.floor((n - 1) / 26);
-  }
-  return s;
-}
-
-function getServiceAccountFromEnv() {
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
-  if (raw && raw.trim().startsWith("{")) {
-    return JSON.parse(raw);
-  }
-
-  const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64;
-  if (b64) {
-    const decoded = Buffer.from(b64, "base64").toString("utf8");
-    return JSON.parse(decoded);
-  }
-
-  throw new Error("Missing GOOGLE_SERVICE_ACCOUNT_JSON (or GOOGLE_SERVICE_ACCOUNT_JSON_B64).");
-}
-
-async function getSheetsClient() {
-  const sa = getServiceAccountFromEnv();
-  const projectId =
-    sa.project_id ||
-    process.env.GOOGLE_CLOUD_PROJECT ||
-    process.env.GCLOUD_PROJECT ||
-    (process.env.FIREBASE_CONFIG
-      ? (() => {
-          try {
-            const cfg = JSON.parse(process.env.FIREBASE_CONFIG);
-            return cfg.projectId || null;
-          } catch (e) {
-            return null;
-          }
-        })()
-      : null);
-
-  const auth = new google.auth.JWT({
-    email: sa.client_email,
-    key: sa.private_key,
-    scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    projectId,
-  });
-
-  return google.sheets({ version: "v4", auth });
-}
-
-async function loadHeaderMap(sheets, sheetId, tabName) {
-  const headerRes = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${tabName}!1:1`,
-  });
-
-  const headers = (headerRes.data.values && headerRes.data.values[0]) || [];
-  const headerMap = new Map(); // normalized header -> colIdx0
-
-  headers.forEach((h, idx) => {
-    const key = normalizeHeader(h);
-    if (key) headerMap.set(key, idx);
-  });
-
-  return { headers, headerMap };
-}
-
-function findCol(headerMap, ...candidates) {
-  for (const c of candidates) {
-    const idx = headerMap.get(normalizeHeader(c));
-    if (idx !== undefined) return idx;
-  }
-  return null;
-}
-
-async function getColumnValues(sheets, sheetId, tabName, colIdx0) {
-  const colA1 = colToA1(colIdx0);
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range: `${tabName}!${colA1}2:${colA1}`,
-  });
-
-  const values = res.data.values || [];
-  return values.map((r) => (r && r[0] ? String(r[0]).trim() : ""));
-}
-
-async function upsertStudentToSheet(student) {
-  const sheetId = process.env.STUDENTS_SHEET_ID;
-  const tabName = process.env.STUDENTS_SHEET_TAB || "students";
-
-  if (!sheetId) throw new Error("Missing STUDENTS_SHEET_ID env var.");
-
-  const sheets = await getSheetsClient();
-  const { headers, headerMap } = await loadHeaderMap(sheets, sheetId, tabName);
-
-  const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
-  const colUid = findCol(headerMap, "uid", "UID");
-  const colEmail = findCol(headerMap, "Email", "email");
-  const colName = findCol(headerMap, "Name", "name");
-  const colPhone = findCol(headerMap, "Phone", "phone");
-  const colLocation = findCol(headerMap, "Location", "location");
-  const colLevel = findCol(headerMap, "Level", "level");
-  const colClassName = findCol(headerMap, "ClassName", "Class Name", "classname");
-  const colStatus = findCol(headerMap, "Status", "status");
-  const colEnrollDate = findCol(headerMap, "EnrollDate", "Enroll Date", "enrolldate");
-  const colPaid = findCol(headerMap, "Paid", "InitialPayment", "Initial Payment");
-  const colBalance = findCol(headerMap, "Balance", "BalanceDue", "Balance Due");
-  const colPaymentStatus = findCol(headerMap, "PaymentStatus", "Payment Status", "paymentStatus");
-  const colContractStart = findCol(headerMap, "ContractStart", "Contract Start");
-  const colContractEnd = findCol(headerMap, "ContractEnd", "Contract End");
-  const colEmergencyPhone = findCol(
-    headerMap,
-    "Emergency Contact (Phone Number)",
-    "Emergency Contact",
-    "Emergency Contact Phone"
-  );
-  const colDailyLimit = findCol(headerMap, "Daily_Limit", "Daily Limit", "DailyLimit");
-  const colUsesToday = findCol(headerMap, "Uses_Today", "Uses Today", "UsesToday");
-  const colLastDate = findCol(headerMap, "Last_Date", "Last Date", "LastDate");
-  const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
-  const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
-  const colAddress = findCol(headerMap, "Address", "address", "Home Address", "Residential Address");
-
-  if (colStudentCode === null) {
-    const headerNames = headers && headers.length ? headers.join(" | ") : "(none)";
-    throw new Error(
-      `Students sheet is missing a StudentCode column header. Found headers: ${headerNames}`
-    );
-  }
-
-  const studentCodes = await getColumnValues(sheets, sheetId, tabName, colStudentCode);
-
-  let uids = [];
-  if (colUid !== null) uids = await getColumnValues(sheets, sheetId, tabName, colUid);
-
-  let emails = [];
-  if (colEmail !== null) emails = await getColumnValues(sheets, sheetId, tabName, colEmail);
-
-  const targetStudentCode = String(student.studentCode || "").trim();
-  const targetUid = String(student.uid || "").trim();
-  const targetEmail = String(student.email || "").trim();
-
-  let rowIndex0 = -1;
-  if (targetStudentCode) rowIndex0 = studentCodes.findIndex((v) => v === targetStudentCode);
-  if (rowIndex0 === -1 && targetUid && uids.length) rowIndex0 = uids.findIndex((v) => v === targetUid);
-  if (rowIndex0 === -1 && targetEmail && emails.length)
-    rowIndex0 = emails.findIndex((v) => v.toLowerCase() === targetEmail.toLowerCase());
-
-  const sheetRowNumber = rowIndex0 >= 0 ? rowIndex0 + 2 : null;
-
-  const updates = [];
-  function pushCell(colIdx0, value) {
-    if (colIdx0 === null || colIdx0 === undefined) return;
-    const colA1 = colToA1(colIdx0);
-    const a1 = `${tabName}!${colA1}${sheetRowNumber}`;
-    updates.push({ range: a1, values: [[value]] });
-  }
-
-  if (sheetRowNumber) {
-    pushCell(colStudentCode, targetStudentCode || "");
-    pushCell(colUid, targetUid || "");
-    pushCell(colEmail, targetEmail || "");
-    pushCell(colName, student.name || "");
-    pushCell(colPhone, student.phone || "");
-    pushCell(colLocation, student.location || "");
-    pushCell(colLevel, student.level || "");
-    pushCell(colClassName, student.className || "");
-    pushCell(colStatus, student.status || "");
-    pushCell(colEnrollDate, student.enrollDate || "");
-    pushCell(colPaid, student.initialPaymentAmount ?? student.paidAmount ?? "");
-    pushCell(colBalance, student.balanceDue ?? student.balance ?? "");
-    pushCell(colPaymentStatus, student.paymentStatus || "");
-    pushCell(colContractStart, student.contractStart || "");
-    pushCell(colContractEnd, student.contractEnd || "");
-    pushCell(colLearningMode, student.learningMode || "");
-    pushCell(colAddress, student.address || "");
-    pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
-    pushCell(colDailyLimit, student.dailyLimit ?? "");
-    pushCell(colUsesToday, student.usesToday ?? "");
-    pushCell(colLastDate, student.lastDate || "");
-    pushCell(colReminderSent, student.reminderSent || "");
-
-    if (updates.length) {
-      await sheets.spreadsheets.values.batchUpdate({
-        spreadsheetId: sheetId,
-        requestBody: {
-          valueInputOption: "USER_ENTERED",
-          data: updates,
-        },
-      });
-    }
-
-    return { action: "updated", row: sheetRowNumber };
-  }
-
-  const maxCol = headerMap.size ? Math.max(...Array.from(headerMap.values())) : 0;
-  const row = Array(maxCol + 1).fill("");
-
-  row[colStudentCode] = targetStudentCode || "";
-  if (colUid !== null) row[colUid] = targetUid || "";
-  if (colEmail !== null) row[colEmail] = targetEmail || "";
-  if (colName !== null) row[colName] = student.name || "";
-  if (colPhone !== null) row[colPhone] = student.phone || "";
-  if (colLocation !== null) row[colLocation] = student.location || "";
-  if (colLevel !== null) row[colLevel] = student.level || "";
-  if (colClassName !== null) row[colClassName] = student.className || "";
-  if (colStatus !== null) row[colStatus] = student.status || "";
-  if (colEnrollDate !== null) row[colEnrollDate] = student.enrollDate || "";
-  if (colPaid !== null) row[colPaid] = student.initialPaymentAmount ?? student.paidAmount ?? "";
-  if (colBalance !== null) row[colBalance] = student.balanceDue ?? student.balance ?? "";
-  if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
-  if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
-  if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
-  if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
-  if (colAddress !== null) row[colAddress] = student.address || "";
-  if (colEmergencyPhone !== null) row[colEmergencyPhone] = student.emergencyContactPhone || "";
-  if (colDailyLimit !== null) row[colDailyLimit] = student.dailyLimit ?? "";
-  if (colUsesToday !== null) row[colUsesToday] = student.usesToday ?? "";
-  if (colLastDate !== null) row[colLastDate] = student.lastDate || "";
-  if (colReminderSent !== null) row[colReminderSent] = student.reminderSent || "";
-
-  const appendRange = `${tabName}!A:${colToA1(maxCol)}`;
-
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: sheetId,
-    range: appendRange,
-    valueInputOption: "USER_ENTERED",
-    insertDataOption: "INSERT_ROWS",
-    requestBody: { values: [row] },
-  });
-
-  return { action: "appended" };
-}
-
-async function appendStudentToStudentsSheetSafely(student) {
-  try {
-    return await upsertStudentToSheet(student);
-  } catch (err) {
-    console.error("appendStudentToStudentsSheetSafely error", err);
-    return { error: err.message || "Failed to sync student to sheet" };
-  }
-}
-
-module.exports = {
-  upsertStudentToSheet,
-  appendStudentToStudentsSheetSafely,
+const normalizeProfileLevel = (rawLevel) => {
+  const normalized = (rawLevel || "").trim().toUpperCase();
+  if (ALLOWED_LEVELS.includes(normalized)) return normalized;
+  const fuzzyMatch = ALLOWED_LEVELS.find((allowed) => normalized.startsWith(allowed));
+  return fuzzyMatch || "";
 };
+
+const shuffle = (arr) => {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
+
+const pickRandom = (arr, count) => shuffle(arr).slice(0, count);
+
+const VocabExamPage = () => {
+  const { level, setLevel, setError } = useExam();
+  const { studentProfile } = useAuth();
+
+  const profileLevel = normalizeProfileLevel(studentProfile?.level);
+  const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setLocalError] = useState("");
+
+  // UI controls
+  const [mode, setMode] = useState("cards"); // "cards" | "quiz" | "browse"
+  const [queryText, setQueryText] = useState("");
+  const [page, setPage] = useState(1);
+  const [cardIndex, setCardIndex] = useState(0);
+
+  // quiz state
+  const [quizIndex, setQuizIndex] = useState(0);
+  const [quizScore, setQuizScore] = useState({ correct: 0, total: 0 });
+  const [quizFeedback, setQuizFeedback] = useState("");
+  const [quizOptions, setQuizOptions] = useState([]);
+
+  useEffect(() => {
+    if (isLevelLocked && level !== profileLevel) {
+      setLevel(profileLevel);
+    }
+  }, [isLevelLocked, level, profileLevel, setLevel]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const load = async () => {
+      setLoading(true);
+      setLocalError("");
+      try {
+        const vocab = await fetchVocabularyFromSheet();
+        if (!isMounted) return;
+        setItems(vocab);
+      } catch (err) {
+        console.error("Failed to load vocab sheet", err);
+        if (!isMounted) return;
+        setLocalError(err?.message || "Konnte Vokabeln nicht laden.");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const levelItems = useMemo(
+    () => items.filter((item) => item.level === level || item.level === "ALL"),
+    [items, level]
+  );
+
+  const filtered = useMemo(() => {
+    const q = queryText.trim().toLowerCase();
+    if (!q) return levelItems;
+    return levelItems.filter((x) => `${x.german} ${x.english}`.toLowerCase().includes(q));
+  }, [levelItems, queryText]);
+
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)), [filtered.length]);
+
+  useEffect(() => {
+    setPage(1);
+    setCardIndex(0);
+    setQuizIndex(0);
+    setQuizScore({ correct: 0, total: 0 });
+    setQuizFeedback("");
+  }, [level, queryText, mode]);
+
+  const pageItems = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return filtered.slice(start, start + PAGE_SIZE);
+  }, [filtered, page]);
+
+  const currentCard = pageItems[cardIndex] || null;
+
+  const hasAudio = (entry) => Boolean(entry?.audioNormal || entry?.audioSlow);
+
+  // Build quiz question from filtered pool (not only current page)
+  const quizPool = filtered;
+
+  const currentQuizItem = quizPool[quizIndex] || null;
+
+  useEffect(() => {
+    if (!currentQuizItem) {
+      setQuizOptions([]);
+      return;
+    }
+    // Build 4 choices: 1 correct + 3 wrong
+    const wrong = pickRandom(
+      quizPool.filter((x) => x.id !== currentQuizItem.id && x.english),
+      3
+    ).map((x) => x.english);
+
+    const options = shuffle([currentQuizItem.english, ...wrong]).filter(Boolean);
+    setQuizOptions(options);
+    setQuizFeedback("");
+  }, [quizIndex, currentQuizItem, quizPool]);
+
+  const playModeLabel =
+    mode === "cards" ? "Flashcards" : mode === "quiz" ? "Quiz" : "Browse";
+
+  return (
+    <div style={{ display: "grid", gap: 12 }}>
+      <section style={styles.card}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <div>
+            <p style={{ ...styles.helperText, margin: 0 }}>Exam Room</p>
+            <h2 style={{ ...styles.sectionTitle, margin: "4px 0 2px" }}>Vocabulary Practice</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Mode: <strong>{playModeLabel}</strong> • Filtered by your level.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gap: 8, minWidth: 220 }}>
+            <label style={{ ...styles.label, margin: 0 }}>
+              Level {isLevelLocked ? "(from profile)" : ""}
+            </label>
+            <select
+              value={level}
+              onChange={(e) => {
+                setLevel(e.target.value);
+                setError("");
+              }}
+              style={styles.select}
+              disabled={isLevelLocked}
+            >
+              {ALLOWED_LEVELS.map((option) => (
+                <option key={option}>{option}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </section>
+
+      {/* Controls */}
+      <section style={styles.card}>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <input
+            style={{ ...styles.textArea, minHeight: "auto", height: 44, flex: 1 }}
+            placeholder="Search German or English..."
+            value={queryText}
+            onChange={(e) => setQueryText(e.target.value)}
+          />
+
+          <select
+            value={mode}
+            onChange={(e) => setMode(e.target.value)}
+            style={{ ...styles.select, height: 44, minWidth: 180 }}
+          >
+            <option value="cards">Flashcards</option>
+            <option value="quiz">Quiz (MCQ)</option>
+            <option value="browse">Browse / Scan list</option>
+          </select>
+
+          {/* Pagination only for browse + cards (page based) */}
+          {(mode === "browse" || mode === "cards") && (
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+              >
+                Prev page
+              </button>
+
+              <span style={{ fontSize: 13, color: "#4b5563" }}>
+                Page {page}/{totalPages} • {filtered.length} words
+              </span>
+
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+              >
+                Next page
+              </button>
+            </div>
+          )}
+
+          {/* Quiz progress */}
+          {mode === "quiz" && (
+            <span style={{ fontSize: 13, color: "#4b5563" }}>
+              Progress: {quizIndex + 1}/{quizPool.length || 0} • Score: {quizScore.correct}/{quizScore.total}
+            </span>
+          )}
+        </div>
+      </section>
+
+      {loading ? (
+        <section style={styles.card}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Loading vocabulary ...</p>
+        </section>
+      ) : error ? (
+        <section style={styles.card}>
+          <div style={styles.errorBox}>
+            <strong>Note:</strong> {error}
+          </div>
+        </section>
+      ) : filtered.length === 0 ? (
+        <section style={styles.card}>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            No vocabulary found for level <strong>{level}</strong>. Try removing the search text.
+          </p>
+        </section>
+      ) : mode === "cards" ? (
+        // Flashcards
+        <section style={styles.card}>
+          {!currentCard ? (
+            <p style={{ ...styles.helperText, margin: 0 }}>No items on this page.</p>
+          ) : (
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
+                <div>
+                  <div style={{ fontWeight: 900, fontSize: 20 }}>{currentCard.german}</div>
+                  <div style={{ ...styles.helperText, marginTop: 4 }}>{currentCard.english}</div>
+                </div>
+                <span style={styles.levelPill}>{currentCard.level}</span>
+              </div>
+
+              {hasAudio(currentCard) ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  {currentCard.audioNormal ? (
+                    <audio controls preload="none" style={styles.audioPlayer} src={currentCard.audioNormal} />
+                  ) : null}
+                  {currentCard.audioSlow ? (
+                    <audio controls preload="none" style={styles.audioPlayer} src={currentCard.audioSlow} />
+                  ) : null}
+                </div>
+              ) : (
+                <p style={{ ...styles.helperText, margin: 0 }}>No audio for this word.</p>
+              )}
+
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => setCardIndex((i) => Math.max(0, i - 1))}
+                  disabled={cardIndex <= 0}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  style={styles.primaryButton}
+                  onClick={() => setCardIndex((i) => Math.min(pageItems.length - 1, i + 1))}
+                  disabled={cardIndex >= pageItems.length - 1}
+                >
+                  Next card
+                </button>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => setCardIndex(Math.floor(Math.random() * pageItems.length))}
+                >
+                  Random
+                </button>
+              </div>
+
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                Card {cardIndex + 1}/{pageItems.length} on this page
+              </p>
+            </div>
+          )}
+        </section>
+      ) : mode === "quiz" ? (
+        // Quiz (MCQ)
+        <section style={styles.card}>
+          {!currentQuizItem ? (
+            <p style={{ ...styles.helperText, margin: 0 }}>No quiz items available.</p>
+          ) : (
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                <div>
+                  <p style={{ ...styles.helperText, margin: 0 }}>Choose the correct English meaning:</p>
+                  <div style={{ fontWeight: 900, fontSize: 20, marginTop: 6 }}>{currentQuizItem.german}</div>
+                </div>
+                <span style={styles.levelPill}>{currentQuizItem.level}</span>
+              </div>
+
+              {hasAudio(currentQuizItem) ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  {currentQuizItem.audioNormal ? (
+                    <audio controls preload="none" style={styles.audioPlayer} src={currentQuizItem.audioNormal} />
+                  ) : null}
+                  {currentQuizItem.audioSlow ? (
+                    <audio controls preload="none" style={styles.audioPlayer} src={currentQuizItem.audioSlow} />
+                  ) : null}
+                </div>
+              ) : null}
+
+              <div style={{ display: "grid", gap: 8 }}>
+                {quizOptions.map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={() => {
+                      const isCorrect = opt === currentQuizItem.english;
+                      setQuizScore((s) => ({
+                        correct: s.correct + (isCorrect ? 1 : 0),
+                        total: s.total + 1,
+                      }));
+                      setQuizFeedback(
+                        isCorrect ? "✅ Correct!" : `❌ Not quite. Correct answer: ${currentQuizItem.english}`
+                      );
+
+                      // move next after short delay
+                      setTimeout(() => {
+                        setQuizIndex((i) => Math.min(quizPool.length - 1, i + 1));
+                      }, 600);
+                    }}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+
+              {quizFeedback ? (
+                <div style={{ ...styles.errorBox, background: "#f8fafc", borderColor: "#e5e7eb", color: "#111827" }}>
+                  {quizFeedback}
+                </div>
+              ) : null}
+
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => setQuizIndex((i) => Math.max(0, i - 1))}
+                  disabled={quizIndex <= 0}
+                >
+                  Previous
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.primaryButton}
+                  onClick={() => setQuizIndex((i) => Math.min(quizPool.length - 1, i + 1))}
+                  disabled={quizIndex >= quizPool.length - 1}
+                >
+                  Skip / Next
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => {
+                    setQuizIndex(0);
+                    setQuizScore({ correct: 0, total: 0 });
+                    setQuizFeedback("");
+                  }}
+                >
+                  Restart quiz
+                </button>
+              </div>
+            </div>
+          )}
+        </section>
+      ) : (
+        // Browse / Scan list
+        <section style={styles.card}>
+          <div style={{ ...styles.vocabGrid, marginTop: 0 }}>
+            {pageItems.map((entry) => (
+              <div key={entry.id} style={{ ...styles.vocabCard, background: "#fff" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
+                  <div style={{ fontWeight: 800, fontSize: 15 }}>{entry.german || "—"}</div>
+                  <span style={styles.levelPill}>{entry.level}</span>
+                </div>
+                <p style={{ ...styles.helperText, margin: "4px 0 8px" }}>{entry.english || "—"}</p>
+
+                {entry.audioNormal ? (
+                  <audio controls preload="none" style={styles.audioPlayer} src={entry.audioNormal} />
+                ) : null}
+                {entry.audioSlow ? (
+                  <audio controls preload="none" style={styles.audioPlayer} src={entry.audioSlow} />
+                ) : null}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+};
+
+export default VocabExamPage;
