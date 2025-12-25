@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchAttendanceSummary } from "../services/attendanceService";
-import { fetchAssignmentSummary } from "../services/assignmentService";
+import { fetchScoreSummary } from "../services/scoreSummaryService";
+import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 
 const parseAssignmentNumber = (assignment = "") => {
   const text = String(assignment || "");
-
-  // Matches "Day 3", "Assignment 2", "Assignment 2.5", "2.5", etc
   const dayMatch = text.match(/\bday\s*(\d+(?:\.\d+)?)\b/i);
   if (dayMatch?.[1]) return Number(dayMatch[1]);
-
   const match = text.match(/(\d+(?:\.\d+)?)/);
   return match ? Number(match[1]) : null;
 };
@@ -19,11 +17,9 @@ const uniqSorted = (numbers = []) => {
   return Array.from(new Set(clean)).sort((a, b) => a - b);
 };
 
-// ✅ Detect step from your real assignment numbers (supports 1, 0.5, 0.1 etc)
 const inferStep = (numbers = []) => {
   const sorted = uniqSorted(numbers);
   if (sorted.length < 2) {
-    // fallback: if any decimal exists, default 0.5 (common for 2.5 style)
     const hasDecimal = sorted.some((n) => Math.abs(n - Math.round(n)) > 1e-6);
     return hasDecimal ? 0.5 : 1;
   }
@@ -35,8 +31,6 @@ const inferStep = (numbers = []) => {
   }
 
   if (!Number.isFinite(minDiff) || minDiff <= 1e-6) return 1;
-
-  // Clamp to a sensible set
   if (minDiff <= 0.1 + 1e-6) return 0.1;
   if (minDiff <= 0.25 + 1e-6) return 0.25;
   if (minDiff <= 0.5 + 1e-6) return 0.5;
@@ -85,6 +79,8 @@ const formatList = (items = [], maxItems = 3) => {
 };
 
 const HomeMetrics = ({ studentProfile }) => {
+  const { idToken } = useAuth();
+
   const [attendance, setAttendance] = useState({ sessions: 0, hours: 0 });
   const [assignmentStats, setAssignmentStats] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -105,7 +101,6 @@ const HomeMetrics = ({ studentProfile }) => {
 
   const refreshMetrics = useCallback(async () => {
     const now = Date.now();
-    // ✅ prevent focus + visibility double refresh spam
     if (now - lastRefreshAtRef.current < 2000) return;
     lastRefreshAtRef.current = now;
 
@@ -124,24 +119,23 @@ const HomeMetrics = ({ studentProfile }) => {
     }
 
     try {
-      const [attendanceResponse, assignmentResponse] = await Promise.all([
+      const [attendanceResponse, scoreResponse] = await Promise.all([
         fetchAttendanceSummary({ className, studentCode }),
-        fetchAssignmentSummary({ studentCode }),
+        fetchScoreSummary({ idToken, studentCode }),
       ]);
 
       if (!isMountedRef.current) return;
 
       setAttendance(attendanceResponse || { sessions: 0, hours: 0 });
-      setAssignmentStats(assignmentResponse?.student || null);
+      setAssignmentStats(scoreResponse?.student || null);
       setRefreshError("");
     } catch (error) {
       if (!isMountedRef.current) return;
-      // ✅ keep last values, just show warning
       setRefreshError("Could not refresh right now. Showing your last saved metrics.");
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
-  }, [className, studentCode]);
+  }, [className, studentCode, idToken]);
 
   useEffect(() => {
     refreshMetrics();
@@ -162,7 +156,6 @@ const HomeMetrics = ({ studentProfile }) => {
     };
   }, [refreshMetrics]);
 
-  // ✅ From your real API shape
   const completedAssignments = useMemo(
     () => assignmentStats?.completedAssignments || [],
     [assignmentStats?.completedAssignments]
@@ -180,12 +173,18 @@ const HomeMetrics = ({ studentProfile }) => {
 
   const completedNumbers = useMemo(() => {
     return completedAssignments
-      .map((e) => (typeof e?.number === "number" ? e.number : parseAssignmentNumber(e?.label || e?.assignment)))
+      .map((e) =>
+        typeof e?.number === "number"
+          ? e.number
+          : parseAssignmentNumber(e?.label || e?.assignment)
+      )
       .filter((n) => Number.isFinite(n));
   }, [completedAssignments]);
 
-  // Use missedAssignments if present; otherwise compute missing gaps from completed numbers
-  const computedMissingNumbers = useMemo(() => findMissingNumbers(completedNumbers), [completedNumbers]);
+  const computedMissingNumbers = useMemo(
+    () => findMissingNumbers(completedNumbers),
+    [completedNumbers]
+  );
 
   const normalizedMissed = useMemo(() => {
     if (missedAssignments.length) return missedAssignments;
@@ -193,10 +192,8 @@ const HomeMetrics = ({ studentProfile }) => {
   }, [computedMissingNumbers, missedAssignments]);
 
   const recommendedNext = useMemo(() => {
-    // Priority: first missed item (since backend already knows “missed” meaning)
     if (normalizedMissed.length) return formatAssignmentLabel(normalizedMissed[0]);
 
-    // Otherwise: next step after highest completed
     const step = inferStep(completedNumbers);
     if (completedNumbers.length) {
       const max = Math.max(...completedNumbers);
@@ -204,7 +201,6 @@ const HomeMetrics = ({ studentProfile }) => {
       return `Assignment ${next}`;
     }
 
-    // Otherwise: use lastAssignment if present
     if (assignmentStats?.lastAssignment) {
       const parsed = parseAssignmentNumber(assignmentStats.lastAssignment);
       if (parsed !== null) return `Assignment ${Number((parsed + 1).toFixed(2))}`;
@@ -250,7 +246,7 @@ const HomeMetrics = ({ studentProfile }) => {
           <p style={{ ...styles.helperText, margin: 0 }}>Next recommendation</p>
           <h4 style={{ margin: "4px 0" }}>{recommendedNext}</h4>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Based on your submissions and any gaps we detected.
+            Based on your score sheet submissions and any gaps we detected.
           </p>
         </div>
 
@@ -258,7 +254,7 @@ const HomeMetrics = ({ studentProfile }) => {
           <p style={{ ...styles.helperText, margin: 0 }}>Missed or skipped</p>
           <h4 style={{ margin: "4px 0" }}>{formatList(normalizedMissed)}</h4>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            We flag graded assignments only; self-practice items are ignored.
+            We use scored submissions only.
           </p>
         </div>
 
