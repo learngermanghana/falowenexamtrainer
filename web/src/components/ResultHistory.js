@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 
+const PASS_MARK = 60;
+
 const formatDate = (value) => {
   if (!value) return "";
   const parsed = new Date(value);
@@ -9,6 +11,20 @@ const formatDate = (value) => {
 };
 
 const safeLower = (value) => String(value || "").toLowerCase();
+
+const toNumericScore = (value) => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === "string") {
+    const cleaned = value.replace(/[^\d.+-]+/g, "");
+    const parsed = Number(cleaned);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const getAssignmentKey = (assignment, fallback) => safeLower(assignment) || fallback;
 
 const TextBlock = ({ title, text, maxChars = 650 }) => {
   const [expanded, setExpanded] = useState(false);
@@ -80,25 +96,86 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     const list = (Array.isArray(activeResults) ? activeResults : []).map((entry, idx) => {
       const dateRaw = entry.date || entry.createdAt || entry.created_at || entry.dateIso || "";
       const createdMs = dateRaw ? Date.parse(dateRaw) : NaN;
+      const numericScore = toNumericScore(entry.score);
+      const key =
+        entry.id ||
+        `${entry.studentcode || "student"}-${entry.assignment || "assignment"}-${dateRaw || idx}`;
 
       return {
-        key:
-          entry.id ||
-          `${entry.studentcode || "student"}-${entry.assignment || "assignment"}-${dateRaw || idx}`,
+        key,
         assignment: entry.assignment || "Feedback",
         level: (entry.level || "").toUpperCase(),
         name: entry.name || "",
         studentcode: entry.studentcode || "",
         score: entry.score,
+        numericScore,
         comments: entry.comments || "",
         link: entry.link || "",
         dateRaw,
         createdLabel: formatDate(dateRaw),
         createdMs: Number.isNaN(createdMs) ? 0 : createdMs,
+        position: idx,
       };
     });
 
-    return list.sort((a, b) => (b.createdMs || 0) - (a.createdMs || 0));
+    const chronological = list
+      .slice()
+      .sort((a, b) => (a.createdMs || 0) - (b.createdMs || 0) || a.position - b.position);
+
+    const attemptsByAssignment = new Map();
+    const attemptNumbers = new Map();
+
+    chronological.forEach((entry) => {
+      const assignmentKey = getAssignmentKey(entry.assignment, entry.key);
+      const aggregate = attemptsByAssignment.get(assignmentKey) || { total: 0, scores: [] };
+      aggregate.total += 1;
+      aggregate.scores.push(entry.numericScore);
+      attemptsByAssignment.set(assignmentKey, aggregate);
+      attemptNumbers.set(entry.key, aggregate.total);
+    });
+
+    const attemptSummaries = new Map();
+    attemptsByAssignment.forEach((value, assignmentKey) => {
+      const bestScore = value.scores.reduce((best, score) => {
+        if (typeof score !== "number" || Number.isNaN(score)) return best;
+        return Math.max(best, score);
+      }, -Infinity);
+      const cleanBest = Number.isFinite(bestScore) ? bestScore : null;
+      attemptSummaries.set(assignmentKey, {
+        totalAttempts: value.total,
+        bestScore: cleanBest,
+        passedOverall: typeof cleanBest === "number" ? cleanBest >= PASS_MARK : null,
+      });
+    });
+
+    const annotated = list.map((entry) => {
+      const assignmentKey = getAssignmentKey(entry.assignment, entry.key);
+      const summary = attemptSummaries.get(assignmentKey) || {
+        totalAttempts: 1,
+        bestScore: entry.numericScore,
+        passedOverall: typeof entry.numericScore === "number" ? entry.numericScore >= PASS_MARK : null,
+      };
+      const attempt = attemptNumbers.get(entry.key) || 1;
+      const attemptStatus =
+        typeof entry.numericScore === "number"
+          ? entry.numericScore >= PASS_MARK
+            ? "passed"
+            : "failed"
+          : null;
+
+      return {
+        ...entry,
+        attempt,
+        totalAttempts: summary.totalAttempts,
+        bestScore: summary.bestScore,
+        passedOverall: summary.passedOverall,
+        attemptStatus,
+      };
+    });
+
+    return annotated.sort(
+      (a, b) => (b.createdMs || 0) - (a.createdMs || 0) || b.position - a.position
+    );
   }, [activeResults]);
 
   const availableLevels = useMemo(() => {
@@ -124,7 +201,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         safeLower(r.studentcode).includes(q);
 
       const matchesScore =
-        min === null || !Number.isFinite(min) ? true : Number(r.score || 0) >= min;
+        min === null || !Number.isFinite(min) ? true : Number(r.numericScore || 0) >= min;
 
       return matchesLevel && matchesSearch && matchesScore;
     });
@@ -236,6 +313,33 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.map((item) => {
           const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
+          const statusVariant =
+            item.attemptStatus === "failed" || item.passedOverall === false
+              ? "fail"
+              : item.attemptStatus === "passed"
+              ? "pass"
+              : "neutral";
+          const statusStyles =
+            statusVariant === "pass"
+              ? { background: "#ecfdf3", borderColor: "#bbf7d0", color: "#166534" }
+              : statusVariant === "fail"
+              ? { background: "#fef2f2", borderColor: "#fecdd3", color: "#b91c1c" }
+              : { background: "#e0f2fe", borderColor: "#bae6fd", color: "#0ea5e9" };
+
+          const attemptLabel =
+            item.totalAttempts > 1
+              ? `Try ${item.attempt} of ${item.totalAttempts}`
+              : "Try 1";
+          const bestScoreText =
+            item.totalAttempts > 1 && typeof item.bestScore === "number"
+              ? item.passedOverall
+                ? `Best: ${item.bestScore} (meets ${PASS_MARK})`
+                : `Best so far: ${item.bestScore} of ${PASS_MARK} needed`
+              : null;
+          const scoreDisplay =
+            typeof item.numericScore === "number"
+              ? item.numericScore
+              : item.score || item.numericScore || "–";
 
           return (
             <article key={item.key} style={{ ...styles.resultCard, marginTop: 0 }}>
@@ -252,10 +356,32 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                   ) : null}
                 </div>
 
-                {item.score !== undefined && item.score !== null ? (
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>Score</div>
-                    <div style={{ fontWeight: 800, fontSize: 18, marginTop: 6 }}>{item.score}</div>
+                {scoreDisplay !== undefined && scoreDisplay !== null ? (
+                  <div style={{ textAlign: "right", display: "grid", gap: 4, justifyItems: "end" }}>
+                    <div style={{ ...styles.badge, ...statusStyles, borderColor: statusStyles.borderColor }}>
+                      {statusVariant === "fail"
+                        ? `Failed (pass mark ${PASS_MARK})`
+                        : statusVariant === "pass"
+                        ? "Passed"
+                        : "Score"}
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: 18 }}>{scoreDisplay}</div>
+                    <div style={{ ...styles.helperText, textAlign: "right" }}>{attemptLabel}</div>
+                    {bestScoreText ? (
+                      <div
+                        style={{
+                          ...styles.helperText,
+                          textAlign: "right",
+                          color: statusVariant === "fail" ? "#b91c1c" : "#065f46",
+                        }}
+                      >
+                        {bestScoreText}
+                      </div>
+                    ) : statusVariant === "fail" ? (
+                      <div style={{ ...styles.helperText, textAlign: "right", color: "#b91c1c" }}>
+                        Below the {PASS_MARK} pass mark—retry recommended.
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
