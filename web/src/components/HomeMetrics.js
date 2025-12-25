@@ -121,7 +121,7 @@ const HomeMetrics = ({ studentProfile }) => {
     try {
       const [attendanceResponse, scoreResponse] = await Promise.all([
         fetchAttendanceSummary({ className, studentCode }),
-        fetchScoreSummary({ idToken, studentCode }),
+        idToken && studentCode ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
       if (!isMountedRef.current) return;
