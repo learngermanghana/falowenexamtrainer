@@ -8,7 +8,7 @@ export const fetchStudentResultsHistory = async ({ idToken, studentCode }) => {
   if (!idToken) throw new Error("Not authenticated.");
   if (!studentCode) throw new Error("Missing student code.");
 
-  const url = `${API_BASE.replace(/\\/$/, "")}/results/history?studentCode=${encodeURIComponent(studentCode)}`;
+  const url = `${API_BASE.replace(/\/$/, "")}/results/history?studentCode=${encodeURIComponent(studentCode)}`;
 
   const res = await fetch(url, {
     headers: {
