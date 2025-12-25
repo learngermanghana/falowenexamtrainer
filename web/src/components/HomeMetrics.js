@@ -1,26 +1,62 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchAssignmentSummary } from "../services/assignmentService";
 import { styles } from "../styles";
 
 const parseAssignmentNumber = (assignment = "") => {
-  const match = assignment.match(/(\d+(?:\.\d+)?)/);
+  const text = String(assignment || "");
+
+  // Matches "Day 3", "Assignment 2", "Assignment 2.5", "2.5", etc
+  const dayMatch = text.match(/\bday\s*(\d+(?:\.\d+)?)\b/i);
+  if (dayMatch?.[1]) return Number(dayMatch[1]);
+
+  const match = text.match(/(\d+(?:\.\d+)?)/);
   return match ? Number(match[1]) : null;
 };
 
+const uniqSorted = (numbers = []) => {
+  const clean = numbers.filter((n) => Number.isFinite(n));
+  return Array.from(new Set(clean)).sort((a, b) => a - b);
+};
+
+// ✅ Detect step from your real assignment numbers (supports 1, 0.5, 0.1 etc)
+const inferStep = (numbers = []) => {
+  const sorted = uniqSorted(numbers);
+  if (sorted.length < 2) {
+    // fallback: if any decimal exists, default 0.5 (common for 2.5 style)
+    const hasDecimal = sorted.some((n) => Math.abs(n - Math.round(n)) > 1e-6);
+    return hasDecimal ? 0.5 : 1;
+  }
+
+  let minDiff = Infinity;
+  for (let i = 1; i < sorted.length; i += 1) {
+    const diff = sorted[i] - sorted[i - 1];
+    if (diff > 1e-6 && diff < minDiff) minDiff = diff;
+  }
+
+  if (!Number.isFinite(minDiff) || minDiff <= 1e-6) return 1;
+
+  // Clamp to a sensible set
+  if (minDiff <= 0.1 + 1e-6) return 0.1;
+  if (minDiff <= 0.25 + 1e-6) return 0.25;
+  if (minDiff <= 0.5 + 1e-6) return 0.5;
+  return 1;
+};
+
 const findMissingNumbers = (numbers = []) => {
-  const sorted = Array.from(new Set(numbers)).sort((a, b) => a - b);
+  const sorted = uniqSorted(numbers);
   if (!sorted.length) return [];
 
-  const hasDecimals = sorted.some((value) => Math.abs(value - Math.round(value)) > 0.0001);
-  const step = hasDecimals ? 0.1 : 1;
-  const end = sorted[sorted.length - 1];
+  const step = inferStep(sorted);
   const start = sorted[0] > step ? step : sorted[0];
-  const missing = [];
+  const end = sorted[sorted.length - 1];
 
-  for (let current = start; current < end - 1e-6; current = Number((current + step).toFixed(1))) {
-    const exists = sorted.some((value) => Math.abs(value - current) < 1e-6);
-    if (!exists) missing.push(Number(current.toFixed(1)));
+  const missing = [];
+  const round = (value) => Number(value.toFixed(2));
+
+  for (let current = start; current < end - 1e-6; current = round(current + step)) {
+    const exists = sorted.some((v) => Math.abs(v - current) < 1e-6);
+    if (!exists) missing.push(current);
   }
 
   return missing;
@@ -29,29 +65,37 @@ const findMissingNumbers = (numbers = []) => {
 const formatAssignmentLabel = (entry) => {
   if (!entry) return "";
   if (typeof entry === "string") return entry;
+  if (typeof entry === "number") return `Assignment ${entry}`;
   if (entry.label) return entry.label;
+  if (entry.assignment) return entry.assignment;
   if (typeof entry.number === "number") return `Assignment ${entry.number}`;
   return "";
 };
 
-const formatList = (items = []) => {
+const formatList = (items = [], maxItems = 3) => {
   const labels = items.map(formatAssignmentLabel).filter(Boolean);
   if (!labels.length) return "None yet";
-  if (labels.length === 1) return labels[0];
-  if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
-  return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+  if (labels.length <= maxItems) {
+    if (labels.length === 1) return labels[0];
+    if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
+    return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+  }
+  const shown = labels.slice(0, maxItems);
+  return `${shown.join(", ")} (+${labels.length - maxItems} more)`;
 };
 
 const HomeMetrics = ({ studentProfile }) => {
   const [attendance, setAttendance] = useState({ sessions: 0, hours: 0 });
   const [assignmentStats, setAssignmentStats] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [refreshError, setRefreshError] = useState("");
 
   const className = studentProfile?.className || "";
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
 
-  const isMountedRef = React.useRef(true);
+  const isMountedRef = useRef(true);
+  const lastRefreshAtRef = useRef(0);
 
   useEffect(() => {
     return () => {
@@ -59,16 +103,26 @@ const HomeMetrics = ({ studentProfile }) => {
     };
   }, []);
 
-  const refreshMetrics = React.useCallback(async () => {
+  const refreshMetrics = useCallback(async () => {
+    const now = Date.now();
+    // ✅ prevent focus + visibility double refresh spam
+    if (now - lastRefreshAtRef.current < 2000) return;
+    lastRefreshAtRef.current = now;
+
     if (!className && !studentCode) {
       if (isMountedRef.current) {
         setAttendance({ sessions: 0, hours: 0 });
         setAssignmentStats(null);
+        setRefreshError("");
       }
       return;
     }
 
-    if (isMountedRef.current) setLoading(true);
+    if (isMountedRef.current) {
+      setLoading(true);
+      setRefreshError("");
+    }
+
     try {
       const [attendanceResponse, assignmentResponse] = await Promise.all([
         fetchAttendanceSummary({ className, studentCode }),
@@ -79,34 +133,25 @@ const HomeMetrics = ({ studentProfile }) => {
 
       setAttendance(attendanceResponse || { sessions: 0, hours: 0 });
       setAssignmentStats(assignmentResponse?.student || null);
+      setRefreshError("");
     } catch (error) {
       if (!isMountedRef.current) return;
-
-      setAttendance({ sessions: 0, hours: 0 });
-      setAssignmentStats(null);
+      // ✅ keep last values, just show warning
+      setRefreshError("Could not refresh right now. Showing your last saved metrics.");
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
   }, [className, studentCode]);
 
   useEffect(() => {
-    const run = async () => {
-      await refreshMetrics();
-    };
-
-    run();
+    refreshMetrics();
   }, [refreshMetrics]);
 
   useEffect(() => {
     const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
-        refreshMetrics();
-      }
+      if (document.visibilityState === "visible") refreshMetrics();
     };
-
-    const handleFocus = () => {
-      refreshMetrics();
-    };
+    const handleFocus = () => refreshMetrics();
 
     window.addEventListener("focus", handleFocus);
     document.addEventListener("visibilitychange", handleVisibility);
@@ -117,65 +162,57 @@ const HomeMetrics = ({ studentProfile }) => {
     };
   }, [refreshMetrics]);
 
+  // ✅ From your real API shape
+  const completedAssignments = useMemo(
+    () => assignmentStats?.completedAssignments || [],
+    [assignmentStats?.completedAssignments]
+  );
+
+  const missedAssignments = useMemo(
+    () => assignmentStats?.missedAssignments || [],
+    [assignmentStats?.missedAssignments]
+  );
+
+  const failedAssignments = useMemo(
+    () => assignmentStats?.failedAssignments || [],
+    [assignmentStats?.failedAssignments]
+  );
+
   const completedNumbers = useMemo(() => {
-    return (assignmentStats?.completedAssignments || [])
-      .map((entry) => entry.number)
-      .filter((value) => typeof value === "number");
-  }, [assignmentStats?.completedAssignments]);
+    return completedAssignments
+      .map((e) => (typeof e?.number === "number" ? e.number : parseAssignmentNumber(e?.label || e?.assignment)))
+      .filter((n) => Number.isFinite(n));
+  }, [completedAssignments]);
 
-  const missingNumbers = useMemo(() => findMissingNumbers(completedNumbers), [completedNumbers]);
+  // Use missedAssignments if present; otherwise compute missing gaps from completed numbers
+  const computedMissingNumbers = useMemo(() => findMissingNumbers(completedNumbers), [completedNumbers]);
 
-  const normalizedMissedAssignments = useMemo(() => {
-    if (assignmentStats?.missedAssignments?.length) {
-      return assignmentStats.missedAssignments
-        .map((entry) => {
-          if (!entry) return null;
-          if (typeof entry === "string") {
-            return { label: entry, number: parseAssignmentNumber(entry) };
-          }
-          return {
-            label: entry.label || entry.title || entry.assignment || entry.chapter || null,
-            number:
-              typeof entry.number === "number"
-                ? entry.number
-                : parseAssignmentNumber(entry.label || entry.title || entry.assignment || entry.chapter),
-          };
-        })
-        .filter(Boolean);
-    }
-
-    return missingNumbers.map((value) => ({ number: value, label: `Assignment ${value}` }));
-  }, [assignmentStats?.missedAssignments, missingNumbers]);
+  const normalizedMissed = useMemo(() => {
+    if (missedAssignments.length) return missedAssignments;
+    return computedMissingNumbers.map((n) => ({ number: n, label: `Assignment ${n}` }));
+  }, [computedMissingNumbers, missedAssignments]);
 
   const recommendedNext = useMemo(() => {
-    const queued = normalizedMissedAssignments[0];
-    const queuedLabel = formatAssignmentLabel(queued);
-    if (queuedLabel) return queuedLabel;
+    // Priority: first missed item (since backend already knows “missed” meaning)
+    if (normalizedMissed.length) return formatAssignmentLabel(normalizedMissed[0]);
 
-    const hasDecimals = completedNumbers.some((value) => Math.abs(value - Math.round(value)) > 0.0001);
-    const step = hasDecimals ? 0.1 : 1;
-    const nextNumber = missingNumbers[0] ?? (completedNumbers.length
-      ? Number((Math.max(...completedNumbers) + step).toFixed(1))
-      : null);
-
-    if (nextNumber !== null && Number.isFinite(nextNumber)) {
-      return `Assignment ${nextNumber}`;
+    // Otherwise: next step after highest completed
+    const step = inferStep(completedNumbers);
+    if (completedNumbers.length) {
+      const max = Math.max(...completedNumbers);
+      const next = Number((max + step).toFixed(2));
+      return `Assignment ${next}`;
     }
 
+    // Otherwise: use lastAssignment if present
     if (assignmentStats?.lastAssignment) {
       const parsed = parseAssignmentNumber(assignmentStats.lastAssignment);
-      if (parsed !== null) {
-        return `Assignment ${(parsed + step).toFixed(1)}`;
-      }
+      if (parsed !== null) return `Assignment ${Number((parsed + 1).toFixed(2))}`;
       return `Repeat ${assignmentStats.lastAssignment}`;
     }
 
     return "Start with Assignment 1";
-  }, [assignmentStats?.lastAssignment, completedNumbers, missingNumbers, normalizedMissedAssignments]);
-
-  const failedAssignments = useMemo(() => assignmentStats?.failedAssignments || [], [assignmentStats?.failedAssignments]);
-
-  const missedAssignments = useMemo(() => normalizedMissedAssignments, [normalizedMissedAssignments]);
+  }, [assignmentStats?.lastAssignment, completedNumbers, normalizedMissed]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -185,7 +222,12 @@ const HomeMetrics = ({ studentProfile }) => {
           <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Attendance and assignments snapshot</h3>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {loading && <span style={styles.badge}>Refreshing…</span>}
+          {loading ? <span style={styles.badge}>Refreshing…</span> : null}
+          {refreshError ? (
+            <span style={{ ...styles.badge, background: "#fff7ed", borderColor: "#fdba74", color: "#9a3412" }}>
+              {refreshError}
+            </span>
+          ) : null}
           <button
             type="button"
             onClick={refreshMetrics}
@@ -214,7 +256,7 @@ const HomeMetrics = ({ studentProfile }) => {
 
         <div style={{ ...styles.vocabCard, background: "#eef2ff", borderColor: "#c7d2fe" }}>
           <p style={{ ...styles.helperText, margin: 0 }}>Missed or skipped</p>
-          <h4 style={{ margin: "4px 0" }}>{formatList(missedAssignments)}</h4>
+          <h4 style={{ margin: "4px 0" }}>{formatList(normalizedMissed)}</h4>
           <p style={{ ...styles.helperText, margin: 0 }}>
             We flag graded assignments only; self-practice items are ignored.
           </p>
@@ -229,12 +271,13 @@ const HomeMetrics = ({ studentProfile }) => {
         </div>
       </div>
 
-      {assignmentStats && (
+      {assignmentStats ? (
         <div style={{ ...styles.helperText, margin: 0 }}>
           This week: {assignmentStats.weekAssignments || 0} assignments across {assignmentStats.weekAttempts || 0} attempts ·
-          Streak: {assignmentStats.streakDays || 0} day(s) · Last upload: {assignmentStats.lastAssignment || "–"}
+          Streak: {assignmentStats.streakDays || 0} day(s) · Last upload: {assignmentStats.lastAssignment || "–"} ·
+          Retries this week: {assignmentStats.retriesThisWeek || 0}
         </div>
-      )}
+      ) : null}
     </section>
   );
 };
