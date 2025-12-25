@@ -2,8 +2,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
-import { courseSchedules } from "../data/courseSchedule";
-import { courseSchedulesByName } from "../data/courseSchedules";
 import { styles } from "../styles";
 
 const parseAssignmentNumber = (assignment = "") => {
@@ -56,69 +54,6 @@ const findMissingNumbers = (numbers = []) => {
   }
 
   return missing;
-};
-
-const normalizeAssignmentEntry = (session = {}, fallbackTitle = null) => {
-  if (session.assignment !== true) return null;
-
-  const chapter = session.chapter || session.assignmentId || session.id || session.assignment || fallbackTitle || null;
-  const number = parseAssignmentNumber(chapter);
-  const label =
-    session.assignmentTitle ||
-    session.title ||
-    session.keyAssignment ||
-    fallbackTitle ||
-    chapter ||
-    (Number.isFinite(number) ? `Assignment ${number}` : null);
-
-  if (!label && !Number.isFinite(number)) return null;
-
-  return {
-    label: label || "",
-    number: Number.isFinite(number) ? number : null,
-  };
-};
-
-const collectDayAssignments = (day = {}) => {
-  const collected = [];
-
-  const pushEntry = (entry, fallbackTitle) => {
-    const normalized = normalizeAssignmentEntry(entry, fallbackTitle);
-    if (normalized) collected.push(normalized);
-  };
-
-  const fallbackTitle = day.topic || day.title || null;
-  pushEntry({ ...day, chapter: day.chapter || day.topic }, fallbackTitle);
-
-  const processGroup = (group, fallback) => {
-    if (Array.isArray(group)) {
-      group.forEach((item) => pushEntry(item, fallback));
-    } else if (group) {
-      pushEntry(group, fallback);
-    }
-  };
-
-  processGroup(day.sessions, fallbackTitle);
-  processGroup(day.lesen_hören, fallbackTitle);
-  processGroup(day.schreiben_sprechen, fallbackTitle);
-
-  return collected;
-};
-
-const collectPlannedAssignments = ({ level, className } = {}) => {
-  const levelKey = String(level || "").toUpperCase();
-  const scheduleDays = courseSchedules[levelKey] || courseSchedulesByName[className]?.days || [];
-  const seen = new Set();
-
-  return scheduleDays
-    .flatMap((day) => collectDayAssignments(day))
-    .filter(Boolean)
-    .filter((entry) => {
-      const key = Number.isFinite(entry.number) ? `N:${entry.number}` : `L:${entry.label}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
 };
 
 const formatAssignmentLabel = (entry) => {
@@ -226,23 +161,6 @@ const HomeMetrics = ({ studentProfile }) => {
     [assignmentStats?.completedAssignments]
   );
 
-  const plannedAssignments = useMemo(() => {
-    return collectPlannedAssignments({
-      level: studentProfile?.level,
-      className: studentProfile?.className,
-    });
-  }, [studentProfile?.className, studentProfile?.level]);
-
-  const plannedNumberToLabel = useMemo(() => {
-    const map = new Map();
-    plannedAssignments.forEach((entry) => {
-      if (Number.isFinite(entry.number) && entry.label && !map.has(entry.number)) {
-        map.set(entry.number, entry.label);
-      }
-    });
-    return map;
-  }, [plannedAssignments]);
-
   const missedAssignments = useMemo(
     () => assignmentStats?.missedAssignments || [],
     [assignmentStats?.missedAssignments]
@@ -268,34 +186,13 @@ const HomeMetrics = ({ studentProfile }) => {
     [completedNumbers]
   );
 
-  const plannedMissing = useMemo(() => {
-    if (!plannedAssignments.length) return [];
-    const latestCompleted = completedNumbers.length ? Math.max(...completedNumbers) : null;
-    const plannedNumbers = plannedAssignments
-      .map((entry) => entry.number)
-      .filter((num) => Number.isFinite(num))
-      .sort((a, b) => a - b);
-
-    return plannedNumbers
-      .filter((num) => !completedNumbers.includes(num) && (latestCompleted === null || num <= latestCompleted))
-      .map((num) => ({ number: num, label: plannedNumberToLabel.get(num) || `Assignment ${num}` }));
-  }, [completedNumbers, plannedAssignments, plannedNumberToLabel]);
-
   const normalizedMissed = useMemo(() => {
     if (missedAssignments.length) return missedAssignments;
-    if (plannedMissing.length) return plannedMissing;
     return computedMissingNumbers.map((n) => ({ number: n, label: `Assignment ${n}` }));
-  }, [computedMissingNumbers, missedAssignments, plannedMissing]);
+  }, [computedMissingNumbers, missedAssignments]);
 
   const recommendedNext = useMemo(() => {
     if (normalizedMissed.length) return formatAssignmentLabel(normalizedMissed[0]);
-
-    if (plannedAssignments.length) {
-      const pendingPlanned = plannedAssignments
-        .filter((entry) => Number.isFinite(entry.number) && !completedNumbers.includes(entry.number))
-        .sort((a, b) => Number(a.number ?? 0) - Number(b.number ?? 0));
-      if (pendingPlanned.length) return formatAssignmentLabel(pendingPlanned[0]);
-    }
 
     const step = inferStep(completedNumbers);
     if (completedNumbers.length) {
@@ -311,7 +208,7 @@ const HomeMetrics = ({ studentProfile }) => {
     }
 
     return "Start with Assignment 1";
-  }, [assignmentStats?.lastAssignment, completedNumbers, normalizedMissed, plannedAssignments]);
+  }, [assignmentStats?.lastAssignment, completedNumbers, normalizedMissed]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
