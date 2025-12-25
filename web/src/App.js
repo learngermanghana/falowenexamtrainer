@@ -44,6 +44,7 @@ const TAB_STRUCTURE = [
       { key: "grammar", label: "Ask Grammar Question" },
       { key: "writing", label: "Writing Practice" },
       { key: "speech", label: "Speech Trainer" },
+      { key: "vocab", label: "Vocab Practice" },
     ],
   },
   { key: "results", label: "Results", section: "results" },
@@ -112,6 +113,7 @@ function App() {
       grammar: true,
       writing: true,
       speech: true,
+      vocab: true,
       discussion: isEnrolled || isStaff,
       account: true,
     }),
@@ -461,6 +463,7 @@ const CampusArea = ({
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
+      {resolvedSection === "vocab" && allowedSections.vocab ? <VocabExamPage /> : null}
       {resolvedSection === "submit" && allowedSections.submit ? <AssignmentSubmissionPage /> : null}
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
       {resolvedSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
