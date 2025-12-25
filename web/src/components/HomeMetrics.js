@@ -4,6 +4,8 @@ import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 
+const PASS_MARK = 60;
+
 /** -------------------------
  * Fallback helpers (old logic)
  * ------------------------- */
@@ -200,6 +202,11 @@ const HomeMetrics = ({ studentProfile }) => {
   const nextRecommendation = assignmentStats?.nextRecommendation || null;
   const recommendationBlocked = Boolean(assignmentStats?.recommendationBlocked);
 
+  const hasFailures = useMemo(
+    () => recommendationBlocked || failedLessons.length > 0 || failedIdentifiers.length > 0,
+    [failedIdentifiers.length, failedLessons.length, recommendationBlocked]
+  );
+
   /** -------------------------
    * Fallback (old payload)
    * ------------------------- */
@@ -231,24 +238,27 @@ const HomeMetrics = ({ studentProfile }) => {
    * UI text for Next / Missed / Failed
    * ------------------------- */
   const nextText = useMemo(() => {
-    if (recommendationBlocked) {
+    if (hasFailures) {
       const firstFail = failedLessons[0];
-      return firstFail?.label ? `Redo first: ${firstFail.label}` : "Redo failed assignments first";
+      return firstFail?.label
+        ? `Fix failed attempt: ${firstFail.label}`
+        : "Fix failed assignments before new lessons";
     }
     if (nextRecommendation?.label) return nextRecommendation.label;
     if (missedFallback.length) return formatLessonLabel(missedFallback[0]);
     return "All caught up 🎉";
-  }, [failedLessons, missedFallback, nextRecommendation?.label, recommendationBlocked]);
+  }, [failedLessons, hasFailures, missedFallback, nextRecommendation?.label]);
 
   const nextSubtext = useMemo(() => {
-    if (recommendationBlocked) {
+    if (hasFailures) {
       const ids = joinIdentifiers(failedIdentifiers);
-      return ids ? `Pass these first: ${ids}` : "Pass failed items to unlock the next lesson.";
+      if (ids) return `Scores under ${PASS_MARK}. Pass these first: ${ids}`;
+      return `Scores under ${PASS_MARK} need a retry before the next assignment unlocks.`;
     }
     const ids = joinIdentifiers(nextRecommendation?.identifiers || []);
     if (ids) return `Targets: ${ids}`;
     return "Based on your schedule + score submissions.";
-  }, [failedIdentifiers, nextRecommendation?.identifiers, recommendationBlocked]);
+  }, [failedIdentifiers, hasFailures, nextRecommendation?.identifiers]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -304,12 +314,12 @@ const HomeMetrics = ({ studentProfile }) => {
         </div>
 
         <div style={{ ...styles.vocabCard, background: "#ffe4e6", borderColor: "#fda4af" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Needs rework (below 60)</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>Needs rework (below {PASS_MARK})</p>
           <h4 style={{ margin: "4px 0" }}>{formatList(failedLessons)}</h4>
           <p style={{ ...styles.helperText, margin: 0 }}>
             {failedIdentifiers.length
               ? `Identifiers to redo: ${joinIdentifiers(failedIdentifiers)}`
-              : "Retake these to push them over the line."}
+              : `Retake these to clear the ${PASS_MARK} pass mark.`}
           </p>
         </div>
       </div>
