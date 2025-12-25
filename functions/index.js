@@ -155,6 +155,7 @@ exports.api = onRequest(
   },
   (req, res) => {
     process.env.RESULTS_SHEET_PUBLISHED_CSV_URL = RESULTS_SHEET_PUBLISHED_CSV_URL.value();
+    process.env.SCORES_SHEET_PUBLISHED_CSV_URL = RESULTS_SHEET_PUBLISHED_CSV_URL.value();
     return getApp()(req, res);
   }
 );
