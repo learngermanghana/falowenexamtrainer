@@ -55,6 +55,25 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
 
   const rootRef = useRef(null);
 
+  // ✅ Responsive: on small phones, popover becomes a fixed drawer
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return undefined;
+
+    const mq = window.matchMedia("(max-width: 420px)");
+    const apply = () => setIsMobile(Boolean(mq.matches));
+    apply();
+
+    // Safari fallback
+    if (mq.addEventListener) {
+      mq.addEventListener("change", apply);
+      return () => mq.removeEventListener("change", apply);
+    }
+    mq.addListener(apply);
+    return () => mq.removeListener(apply);
+  }, []);
+
   const normalizedStatus = useMemo(
     () => normalizeStatus(notificationStatus),
     [notificationStatus]
@@ -131,7 +150,6 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     if (!open) {
       await loadNotifications();
       // When opening, consider everything currently loaded as "seen"
-      // (you can change this to only mark when user scrolls, if you want).
       const newest = (items?.[0]?.timestamp ? Number(items[0].timestamp) : Date.now()) || Date.now();
       writeSeenAt(newest);
     }
@@ -171,40 +189,68 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     };
   }, [open]);
 
+  const popoverStyle = useMemo(() => {
+    if (isMobile) {
+      return {
+        position: "fixed",
+        left: 12,
+        right: 12,
+        top: 84, // below header area
+        marginTop: 0,
+        background: "#fff",
+        border: "1px solid #e5e7eb",
+        borderRadius: 12,
+        boxShadow: "0 12px 35px rgba(0,0,0,0.12)",
+        zIndex: 999,
+        padding: 12,
+        display: "grid",
+        gap: 10,
+        maxHeight: "calc(100vh - 110px)",
+        overflow: "hidden",
+      };
+    }
+
+    return {
+      position: "absolute",
+      right: 0,
+      marginTop: 6,
+      background: "#fff",
+      border: "1px solid #e5e7eb",
+      borderRadius: 12,
+      boxShadow: "0 12px 35px rgba(0,0,0,0.12)",
+      minWidth: 340,
+      maxWidth: 420,
+      zIndex: 50,
+      padding: 12,
+      display: "grid",
+      gap: 10,
+    };
+  }, [isMobile]);
+
   return (
-    <div ref={rootRef} style={{ position: "relative" }}>
+    <div ref={rootRef} style={{ position: "relative", maxWidth: "100%" }}>
       <button
         type="button"
-        style={{ ...styles.secondaryButton, display: "inline-flex", alignItems: "center", gap: 6 }}
+        style={{
+          ...styles.secondaryButton,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          maxWidth: "100%",
+        }}
         onClick={handleToggle}
       >
         <span role="img" aria-label="Notifications">
           🔔
         </span>
-        <span>Notifications</span>
+        <span style={{ whiteSpace: "nowrap" }}>Notifications</span>
         <NotificationBadge count={unreadCount} />
       </button>
 
       {open ? (
-        <div
-          style={{
-            position: "absolute",
-            right: 0,
-            marginTop: 6,
-            background: "#fff",
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            boxShadow: "0 12px 35px rgba(0,0,0,0.12)",
-            minWidth: 340,
-            maxWidth: 420,
-            zIndex: 50,
-            padding: 12,
-            display: "grid",
-            gap: 10,
-          }}
-        >
+        <div style={popoverStyle}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
-            <div>
+            <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: 800, color: "#111827" }}>Student notifications</div>
               <div style={{ fontSize: 12, color: "#6b7280" }}>Scores, attendance, and class updates</div>
             </div>
@@ -264,7 +310,8 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
             </div>
           ) : null}
 
-          <div style={{ display: "grid", gap: 8, maxHeight: 380, overflow: "auto", paddingRight: 2 }}>
+          {/* ✅ Scroll area (important for mobile drawer) */}
+          <div style={{ display: "grid", gap: 8, maxHeight: isMobile ? "calc(100vh - 300px)" : 380, overflow: "auto", paddingRight: 2 }}>
             {items.map((item) => {
               const isUnread = Number(item?.timestamp || 0) > readSeenAt();
               return (
@@ -298,7 +345,7 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
           </div>
 
           <div style={{ ...styles.helperText, margin: 0 }}>
-            Tip: open this drawer to “read” notifications (badge resets automatically).
+            Tip: opening this drawer marks notifications as “read” (badge resets automatically).
           </div>
         </div>
       ) : null}
