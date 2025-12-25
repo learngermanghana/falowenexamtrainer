@@ -22,6 +22,7 @@ const GOOGLE_SERVICE_ACCOUNT_JSON_B64 = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSO
 const STUDENTS_SHEET_ID = defineSecret("STUDENTS_SHEET_ID");
 const STUDENTS_SHEET_TAB = defineSecret("STUDENTS_SHEET_TAB");
 const RESULTS_SHEET_PUBLISHED_CSV_URL = defineSecret("RESULTS_SHEET_PUBLISHED_CSV_URL");
+const SCORES_SHEET_PUBLISHED_CSV_URL = defineSecret("SCORES_SHEET_PUBLISHED_CSV_URL");
 
 let appInstance;
 let appendStudentToStudentsSheetSafely;
@@ -151,10 +152,12 @@ exports.api = onRequest(
       STUDENTS_SHEET_ID,
       STUDENTS_SHEET_TAB,
       RESULTS_SHEET_PUBLISHED_CSV_URL,
+      SCORES_SHEET_PUBLISHED_CSV_URL,
     ],
   },
   (req, res) => {
     process.env.RESULTS_SHEET_PUBLISHED_CSV_URL = RESULTS_SHEET_PUBLISHED_CSV_URL.value();
+    process.env.SCORES_SHEET_PUBLISHED_CSV_URL = SCORES_SHEET_PUBLISHED_CSV_URL.value();
     return getApp()(req, res);
   }
 );
