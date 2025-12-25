@@ -285,7 +285,10 @@ const AppShell = ({
           <HealthIndicator />
           <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
-            <NotificationBell notificationStatus={notificationStatus} />
+            <NotificationBell
+              notificationStatus={notificationStatus}
+              onEnablePush={handleEnableNotifications}
+            />
             <button
               style={notificationStatus === "granted" ? styles.secondaryButton : styles.primaryButton}
               onClick={handleEnableNotifications}
