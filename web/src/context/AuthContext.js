@@ -30,7 +30,7 @@ const AuthContext = createContext();
 const fetchStudentProfileByEmail = async (email) => {
   if (!email) return null;
   const studentsRef = collection(db, "students");
-  const q = query(studentsRef, where("email", "==", email.toLowerCase())) ;
+  const q = query(studentsRef, where("email", "==", email.toLowerCase()));
   const snapshot = await getDocs(q);
   if (snapshot.empty) return null;
   const hit = snapshot.docs[0];
@@ -206,23 +206,27 @@ export const AuthProvider = ({ children }) => {
     };
   }, [user?.email, user?.uid]);
 
+  // ✅ UPDATED signup: now includes address
   const signup = async (email, password, profile = {}) => {
     if (!isFirebaseConfigured || !auth) {
       throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
     }
     setAuthError("");
+
     const normalizedEmail = email.trim().toLowerCase();
     const credential = await createUserWithEmailAndPassword(
       auth,
       normalizedEmail,
       password
     );
+
     const token = await credential.user.getIdToken();
     setIdToken(token);
 
     const studentCode = profile.studentCode;
     const studentId = studentCode || credential.user.uid;
     const studentsRef = doc(db, "students", studentId);
+
     const payload = {
       uid: credential.user.uid,
       name: profile.name || profile.firstName || "",
@@ -234,7 +238,10 @@ export const AuthProvider = ({ children }) => {
       className: profile.className || "",
       phone: profile.phone || "",
       location: profile.location || "",
-      learningMode: profile.learningMode || "",
+
+      learningMode: profile.learningMode || "", // already there ✅
+      address: profile.address || "",            // ✅ NEW FIELD
+
       emergencyContactPhone: profile.emergencyContactPhone || "",
       status: profile.status || "Active",
       initialPaymentAmount: profile.initialPaymentAmount ?? 0,
@@ -250,6 +257,7 @@ export const AuthProvider = ({ children }) => {
       updated_at: serverTimestamp(),
       syncedToSheets: false,
     };
+
     if (studentCode) {
       payload.studentcode = studentCode;
     }
@@ -447,7 +455,6 @@ export const AuthProvider = ({ children }) => {
     };
 
     refreshMessagingToken();
-    // Only re-run when a new user or profile is loaded to avoid repeated token prompts.
   }, [persistMessagingToken, studentProfile, user]);
 
   const saveStudentProfile = useCallback(
