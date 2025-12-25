@@ -21,6 +21,7 @@ setGlobalOptions({ maxInstances: 10 });
 const GOOGLE_SERVICE_ACCOUNT_JSON_B64 = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSON_B64");
 const STUDENTS_SHEET_ID = defineSecret("STUDENTS_SHEET_ID");
 const STUDENTS_SHEET_TAB = defineSecret("STUDENTS_SHEET_TAB");
+const RESULTS_SHEET_PUBLISHED_CSV_URL = defineSecret("RESULTS_SHEET_PUBLISHED_CSV_URL");
 
 let appInstance;
 let appendStudentToStudentsSheetSafely;
@@ -149,9 +150,13 @@ exports.api = onRequest(
       "PAYSTACK_SECRET",
       STUDENTS_SHEET_ID,
       STUDENTS_SHEET_TAB,
+      RESULTS_SHEET_PUBLISHED_CSV_URL,
     ],
   },
-  (req, res) => getApp()(req, res)
+  (req, res) => {
+    process.env.RESULTS_SHEET_PUBLISHED_CSV_URL = RESULTS_SHEET_PUBLISHED_CSV_URL.value();
+    return getApp()(req, res);
+  }
 );
 
 // When a student doc is created in Firestore, append to Students sheet (safe header-mapped append)
