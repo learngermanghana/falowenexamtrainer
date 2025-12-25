@@ -107,8 +107,6 @@ const VocabExamPage = () => {
 
   const currentCard = pageItems[cardIndex] || null;
 
-  const hasAudio = (entry) => Boolean(entry?.audioNormal || entry?.audioSlow);
-
   // Build quiz question from filtered pool (not only current page)
   const quizPool = filtered;
 
@@ -253,19 +251,6 @@ const VocabExamPage = () => {
                 <span style={styles.levelPill}>{currentCard.level}</span>
               </div>
 
-              {hasAudio(currentCard) ? (
-                <div style={{ display: "grid", gap: 8 }}>
-                  {currentCard.audioNormal ? (
-                    <audio controls preload="none" style={styles.audioPlayer} src={currentCard.audioNormal} />
-                  ) : null}
-                  {currentCard.audioSlow ? (
-                    <audio controls preload="none" style={styles.audioPlayer} src={currentCard.audioSlow} />
-                  ) : null}
-                </div>
-              ) : (
-                <p style={{ ...styles.helperText, margin: 0 }}>No audio for this word.</p>
-              )}
-
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button
                   type="button"
@@ -312,17 +297,6 @@ const VocabExamPage = () => {
                 </div>
                 <span style={styles.levelPill}>{currentQuizItem.level}</span>
               </div>
-
-              {hasAudio(currentQuizItem) ? (
-                <div style={{ display: "grid", gap: 8 }}>
-                  {currentQuizItem.audioNormal ? (
-                    <audio controls preload="none" style={styles.audioPlayer} src={currentQuizItem.audioNormal} />
-                  ) : null}
-                  {currentQuizItem.audioSlow ? (
-                    <audio controls preload="none" style={styles.audioPlayer} src={currentQuizItem.audioSlow} />
-                  ) : null}
-                </div>
-              ) : null}
 
               <div style={{ display: "grid", gap: 8 }}>
                 {quizOptions.map((opt) => (
@@ -402,13 +376,6 @@ const VocabExamPage = () => {
                   <span style={styles.levelPill}>{entry.level}</span>
                 </div>
                 <p style={{ ...styles.helperText, margin: "4px 0 8px" }}>{entry.english || "—"}</p>
-
-                {entry.audioNormal ? (
-                  <audio controls preload="none" style={styles.audioPlayer} src={entry.audioNormal} />
-                ) : null}
-                {entry.audioSlow ? (
-                  <audio controls preload="none" style={styles.audioPlayer} src={entry.audioSlow} />
-                ) : null}
               </div>
             ))}
           </div>
