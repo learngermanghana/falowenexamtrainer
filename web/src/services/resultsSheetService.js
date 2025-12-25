@@ -87,6 +87,7 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     level: findIndexByHeader(headerRow, ["level", "cefr", "lvl"]),
     name: findIndexByHeader(headerRow, ["name", "student", "student name"]),
     studentcode: findIndexByHeader(headerRow, ["studentcode", "student code", "code"]),
+    email: findIndexByHeader(headerRow, ["email", "student email"]),
     score: findIndexByHeader(headerRow, ["score", "mark", "marks"]),
     comments: findIndexByHeader(headerRow, ["comments", "feedback", "comment"]),
     link: findIndexByHeader(headerRow, ["link", "url"]),
@@ -101,7 +102,12 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     level: (getValue(row, indices.level) || "").toUpperCase(),
     name: getValue(row, indices.name),
     studentcode: getValue(row, indices.studentcode),
-    score: getValue(row, indices.score),
+    email: getValue(row, indices.email),
+    score: (() => {
+      const raw = getValue(row, indices.score);
+      const asNumber = Number(raw);
+      return Number.isFinite(asNumber) ? asNumber : raw;
+    })(),
     comments: getValue(row, indices.comments),
     link: getValue(row, indices.link),
     date: getValue(row, indices.date),

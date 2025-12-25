@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 
+const PASS_MARK = 60;
+
 const formatDate = (value) => {
   if (!value) return "";
   const parsed = new Date(value);
@@ -9,6 +11,10 @@ const formatDate = (value) => {
 };
 
 const safeLower = (value) => String(value || "").toLowerCase();
+const toScoreValue = (value) => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+};
 
 const TextBlock = ({ title, text, maxChars = 650 }) => {
   const [expanded, setExpanded] = useState(false);
@@ -76,20 +82,24 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
   const activeResults = sheetCsvUrl ? sheetResults : results;
 
-  const normalized = useMemo(() => {
+  const normalizedResults = useMemo(() => {
     const list = (Array.isArray(activeResults) ? activeResults : []).map((entry, idx) => {
       const dateRaw = entry.date || entry.createdAt || entry.created_at || entry.dateIso || "";
       const createdMs = dateRaw ? Date.parse(dateRaw) : NaN;
+      const numericScore = toScoreValue(entry.score);
+
+      const studentCode = entry.studentcode || entry.studentCode || "";
 
       return {
         key:
-          entry.id ||
-          `${entry.studentcode || "student"}-${entry.assignment || "assignment"}-${dateRaw || idx}`,
+          entry.id || `${studentCode || "student"}-${entry.assignment || "assignment"}-${dateRaw || idx}`,
         assignment: entry.assignment || "Feedback",
         level: (entry.level || "").toUpperCase(),
         name: entry.name || "",
-        studentcode: entry.studentcode || "",
-        score: entry.score,
+        studentcode: studentCode,
+        email: entry.email || "",
+        score: Number.isFinite(numericScore) ? numericScore : entry.score,
+        scoreValue: numericScore,
         comments: entry.comments || "",
         link: entry.link || "",
         dateRaw,
@@ -103,17 +113,43 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
   const availableLevels = useMemo(() => {
     const set = new Set();
-    normalized.forEach((r) => {
+    normalizedResults.forEach((r) => {
       if (r.level) set.add(r.level);
     });
     return ["ALL", ...Array.from(set).sort((a, b) => a.localeCompare(b))];
-  }, [normalized]);
+  }, [normalizedResults]);
+
+  const bestResults = useMemo(() => {
+    const bestMap = new Map();
+
+    normalizedResults.forEach((row) => {
+      const scoreValue = toScoreValue(row.scoreValue ?? row.score);
+      const studentKey = safeLower(row.studentcode) || safeLower(row.email) || safeLower(row.name) || "unknown";
+      const assignmentKey = `${studentKey}::${safeLower(row.assignment)}`;
+      const existing = bestMap.get(assignmentKey);
+      const attempts = (existing?.attempts || 0) + 1;
+      const currentScore = existing?.scoreValue;
+      const hasCurrentScore = Number.isFinite(currentScore);
+      const hasNewScore = Number.isFinite(scoreValue);
+      const isBetterScore = hasNewScore && (!hasCurrentScore || scoreValue > currentScore);
+      const isNewerWhenMissingScore =
+        !hasNewScore && !hasCurrentScore && (row.createdMs || 0) > (existing?.createdMs || 0);
+
+      if (!existing || isBetterScore || isNewerWhenMissingScore) {
+        bestMap.set(assignmentKey, { ...row, scoreValue, attempts });
+      } else {
+        bestMap.set(assignmentKey, { ...existing, attempts });
+      }
+    });
+
+    return Array.from(bestMap.values()).sort((a, b) => (b.createdMs || 0) - (a.createdMs || 0));
+  }, [normalizedResults]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     const min = minScore === "" ? null : Number(minScore);
 
-    return normalized.filter((r) => {
+    return bestResults.filter((r) => {
       const matchesLevel = levelFilter === "ALL" ? true : r.level === levelFilter;
 
       const matchesSearch =
@@ -121,14 +157,15 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         safeLower(r.assignment).includes(q) ||
         safeLower(r.comments).includes(q) ||
         safeLower(r.name).includes(q) ||
+        safeLower(r.email).includes(q) ||
         safeLower(r.studentcode).includes(q);
 
-      const matchesScore =
-        min === null || !Number.isFinite(min) ? true : Number(r.score || 0) >= min;
+      const scoreForFilter = toScoreValue(r.scoreValue ?? r.score);
+      const matchesScore = min === null || !Number.isFinite(min) ? true : Number(scoreForFilter || 0) >= min;
 
       return matchesLevel && matchesSearch && matchesScore;
     });
-  }, [levelFilter, minScore, normalized, search]);
+  }, [bestResults, levelFilter, minScore, search]);
 
   const resetFilters = () => {
     setSearch("");
@@ -157,12 +194,15 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     );
   }
 
-  if (!normalized.length) return null;
+  if (!bestResults.length) return null;
 
   return (
     <section style={{ ...styles.card, marginTop: 16 }}>
       <h2 style={styles.sectionTitle}>Past feedback</h2>
-      <p style={styles.helperText}>Review your previous feedback to track your progress.</p>
+      <p style={styles.helperText}>
+        Review your previous feedback to track your progress. Showing the best score per assignment
+        (pass mark {PASS_MARK}).
+      </p>
 
       {/* Filters */}
       <div
@@ -226,7 +266,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
               Reset
             </button>
             <span style={{ ...styles.badge, background: "#f8fafc", borderColor: "#cbd5e1", color: "#0f172a" }}>
-              Showing {filtered.length}/{normalized.length}
+              Showing {filtered.length}/{bestResults.length}
             </span>
           </div>
         </div>
@@ -235,6 +275,14 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       {/* Results */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.map((item) => {
+          const scoreValue = toScoreValue(item.scoreValue ?? item.score);
+          const hasNumericScore = Number.isFinite(scoreValue);
+          const isPass = hasNumericScore ? scoreValue >= PASS_MARK : null;
+          const badgeStyle = isPass === null
+            ? { background: "#e0f2fe", color: "#075985" }
+            : isPass
+              ? { background: "#dcfce7", color: "#166534" }
+              : { background: "#fee2e2", color: "#b91c1c" };
           const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
 
           return (
@@ -254,8 +302,15 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
                 {item.score !== undefined && item.score !== null ? (
                   <div style={{ textAlign: "right" }}>
-                    <div style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>Score</div>
-                    <div style={{ fontWeight: 800, fontSize: 18, marginTop: 6 }}>{item.score}</div>
+                    <div style={{ ...styles.badge, ...badgeStyle }}>
+                      {isPass === null ? "Score" : isPass ? "Best score (pass)" : "Best score (needs 60+)"}
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: 18, marginTop: 6 }}>
+                      {hasNumericScore ? scoreValue : item.score}
+                    </div>
+                    {item.attempts > 1 ? (
+                      <div style={{ ...styles.helperText, marginTop: 4 }}>Best of {item.attempts} attempts</div>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
