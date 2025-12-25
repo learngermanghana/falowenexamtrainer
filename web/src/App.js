@@ -33,6 +33,7 @@ const TAB_STRUCTURE = [
     sections: [
       { key: "course", label: "Course Book" },
       { key: "submit", label: "Submit Assignment" },
+      { key: "examFile", label: "My Exam File" },
     ],
   },
   {
@@ -105,6 +106,7 @@ function App() {
     () => ({
       submit: true,
       course: isEnrolled,
+      examFile: isEnrolled || isStaff,
       results: isEnrolled || isStaff,
       grammar: true,
       writing: true,
@@ -454,6 +456,7 @@ const CampusArea = ({
           defaultClassName={campusStudentProfile?.className}
         />
       ) : null}
+      {resolvedSection === "examFile" && allowedSections.examFile ? <MyExamFilePage /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
