@@ -26,9 +26,11 @@ const formatDate = (timestamp) => {
   if (!timestamp) return "–";
 
   const date =
-    typeof timestamp.toDate === "function"
+    typeof timestamp?.toDate === "function"
       ? timestamp.toDate()
-      : new Date(timestamp.seconds ? timestamp.seconds * 1000 : timestamp);
+      : new Date(timestamp?.seconds ? timestamp.seconds * 1000 : timestamp);
+
+  if (!date || Number.isNaN(date.getTime())) return "–";
 
   return date.toLocaleString(undefined, {
     year: "numeric",
@@ -107,8 +109,6 @@ const AssignmentSubmissionPage = () => {
   const [lockInfoByChapterKey, setLockInfoByChapterKey] = useState({}); // { [chapterKey]: { lockedAt, assignmentTitle } }
 
   const [confirmationLocked, setConfirmationLocked] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-
   const [draftsByAssignment, setDraftsByAssignment] = useState({});
 
   const [preview, setPreview] = useState(null); // { assignmentTitle, submissionText, createdAt }
@@ -258,7 +258,7 @@ const AssignmentSubmissionPage = () => {
       }));
     }
 
-    // Preview (use local time immediately; Firestore serverTimestamp will come later)
+    // Preview (use local time immediately)
     setPreview({
       assignmentTitle: form.assignmentTitle,
       submissionText: trimmedText,
@@ -292,17 +292,11 @@ const AssignmentSubmissionPage = () => {
         // Recent submissions
         const submissionsRef = collection(db, SUBMISSION_COLLECTION);
         const submissionSnapshot = await getDocs(
-          query(
-            submissionsRef,
-            where("studentId", "==", user.uid),
-            orderBy("createdAt", "desc"),
-            limit(25)
-          )
+          query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
         );
 
         const entries = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
         setRecentSubmissions(entries);
-        if (entries.length > 0) setHasSubmitted(true);
 
         // Locks
         const lockRef = collection(db, LOCK_COLLECTION);
@@ -330,7 +324,6 @@ const AssignmentSubmissionPage = () => {
 
           setLockedChapters(locked);
           setLockInfoByChapterKey(lockMeta);
-          setHasSubmitted(true);
         }
 
         // Drafts
@@ -394,15 +387,14 @@ const AssignmentSubmissionPage = () => {
     [lockInfoByChapterKey, selectedChapterKey]
   );
 
+  const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
+
   useEffect(() => {
-    const isLocked = selectedChapterKey ? lockedChapters.has(selectedChapterKey) : false;
-    setConfirmationLocked(isLocked);
-    if (isLocked) setForm((prev) => ({ ...prev, confirmed: true }));
-  }, [lockedChapters, selectedChapterKey]);
+    setConfirmationLocked(isSelectedLocked);
+    if (isSelectedLocked) setForm((prev) => ({ ...prev, confirmed: true }));
+  }, [isSelectedLocked]);
 
   // Preview for selected assignment:
-  // 1) if we just submitted it now -> use preview state
-  // 2) else find latest matching submission in recentSubmissions
   const selectedPreview = useMemo(() => {
     if (preview && safeLower(preview.assignmentTitle) === safeLower(form.assignmentTitle)) return preview;
 
@@ -418,8 +410,6 @@ const AssignmentSubmissionPage = () => {
       createdAt: match.createdAt || match.updatedAt || null,
     };
   }, [form.assignmentTitle, preview, recentSubmissions]);
-
-  const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
 
   const decoratedAssignmentOptions = useMemo(() => {
     return assignmentOptions.map((opt) => {
@@ -470,11 +460,9 @@ const AssignmentSubmissionPage = () => {
       if (!saved.ok && saved.reason === "locked") {
         setStatus({
           loading: false,
-          error: "This assignment is already submitted (locked). If you need changes, request resubmission via email.",
+          error: "This assignment is already submitted (locked). If you need changes, use the resubmission request for THIS assignment.",
           success: "",
         });
-        setConfirmationLocked(true);
-        setHasSubmitted(true);
         return;
       }
 
@@ -484,10 +472,9 @@ const AssignmentSubmissionPage = () => {
       }
 
       setStatus({ loading: false, error: "", success: "Thanks! Your submission has been saved." });
+
       // Clear editor after submission (preview remains available below)
       setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
-      setConfirmationLocked(true);
-      setHasSubmitted(true);
 
       // Refresh list
       if (user?.uid) {
@@ -528,7 +515,6 @@ const AssignmentSubmissionPage = () => {
       if (navigator?.clipboard?.writeText) {
         await navigator.clipboard.writeText(text);
       } else {
-        // Fallback
         const textarea = document.createElement("textarea");
         textarea.value = text;
         textarea.style.position = "fixed";
@@ -546,6 +532,35 @@ const AssignmentSubmissionPage = () => {
       setTimeout(() => setCopyStatus(""), 2000);
     }
   };
+
+  // ✅ Resubmission mailto (per selected assignment)
+  const selectedDayNumber = useMemo(() => deriveChapterValue(form.assignmentTitle), [deriveChapterValue, form.assignmentTitle]);
+  const assignmentInfo = useMemo(() => {
+    const base = form.assignmentTitle || assignmentOptions[0] || "Assignment";
+    return selectedDayNumber ? `${base} (Day ${selectedDayNumber})` : base;
+  }, [assignmentOptions, form.assignmentTitle, selectedDayNumber]);
+
+  const resubmissionMailto = useMemo(() => {
+    const subject = `Resubmission request - ${assignmentInfo} - ${studentCode || "no-code"}`;
+
+    const body = `Hello team,
+
+I would like to resubmit.
+
+IMPORTANT (please keep these details):
+- Assignment name + day number: ${assignmentInfo}
+- Student code: ${studentCode || "-"}
+- Email: ${user?.email || "-" }
+- Level: ${preferredLevel}
+- Class: ${studentProfile?.className || "-"}
+
+Please paste your corrected letter/text below (do NOT attach screenshots):
+
+--- PASTE YOUR CORRECTED TEXT HERE ---
+`;
+
+    return `mailto:learngermanghana@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }, [assignmentInfo, preferredLevel, studentCode, studentProfile?.className, user?.email]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -583,19 +598,18 @@ const AssignmentSubmissionPage = () => {
               </select>
 
               {isSelectedLocked ? (
-                <div
-                  style={{
-                    marginTop: 8,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <span style={{ ...styles.badge, background: "#ecfdf5", borderColor: "#bbf7d0", color: "#065f46" }}>
+                <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <span
+                    style={{
+                      ...styles.badge,
+                      background: "#ecfdf5",
+                      borderColor: "#bbf7d0",
+                      color: "#065f46",
+                    }}
+                  >
                     Locked ✅ submitted on {formatDate(selectedLockInfo?.lockedAt || selectedPreview?.createdAt)}
                   </span>
-                  <span style={styles.helperText}>This assignment is locked. Use “Resubmission” if you need changes.</span>
+                  <span style={styles.helperText}>This assignment is locked. Resubmission is available for THIS assignment only.</span>
                 </div>
               ) : (
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
@@ -606,14 +620,7 @@ const AssignmentSubmissionPage = () => {
 
             <div style={{ ...styles.field, margin: 0 }}>
               <span style={styles.label}>Your details</span>
-              <div
-                style={{
-                  ...styles.metaRow,
-                  padding: "10px 12px",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 10,
-                }}
-              >
+              <div style={{ ...styles.metaRow, padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: 10 }}>
                 <div>
                   <div style={{ fontWeight: 700 }}>{user?.email || "–"}</div>
                   <div style={styles.helperText}>Email • Level {preferredLevel}</div>
@@ -631,7 +638,11 @@ const AssignmentSubmissionPage = () => {
                 value={form.submissionText}
                 onChange={handleChange("submissionText")}
                 style={{ ...styles.textArea, minHeight: 200 }}
-                placeholder={isSelectedLocked ? "This assignment is locked. Your previous submission is shown below." : "Type your answer here or paste it in."}
+                placeholder={
+                  isSelectedLocked
+                    ? "This assignment is locked. Your previous submission is shown below."
+                    : "Type your answer here or paste it in."
+                }
                 disabled={isSelectedLocked}
               />
             </label>
@@ -657,17 +668,19 @@ const AssignmentSubmissionPage = () => {
               {status.loading ? "Saving ..." : "Save draft"}
             </button>
 
-            <button type="submit" style={styles.primaryButton} disabled={status.loading || confirmationLocked || isSelectedLocked}>
+            <button
+              type="submit"
+              style={styles.primaryButton}
+              disabled={status.loading || confirmationLocked || isSelectedLocked}
+            >
               {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>
 
-            <span style={styles.helperText}>
-              Drafts can be saved anytime. Submission is locked after the first confirmed send.
-            </span>
+            <span style={styles.helperText}>Drafts can be saved anytime. Submission is locked after the first confirmed send.</span>
           </div>
         </form>
 
-        {/* ✅ UX: Read-only preview + copy button */}
+        {/* ✅ UX: Read-only preview + copy */}
         {selectedPreview ? (
           <div style={{ marginTop: 6, borderTop: "1px solid #e5e7eb", paddingTop: 12, display: "grid", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -678,10 +691,18 @@ const AssignmentSubmissionPage = () => {
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <button type="button" style={{ ...styles.secondaryButton, padding: "10px 12px" }} onClick={handleCopyPreview}>
+                <button
+                  type="button"
+                  style={{ ...styles.secondaryButton, padding: "10px 12px" }}
+                  onClick={handleCopyPreview}
+                >
                   Copy submission text
                 </button>
-                {copyStatus ? <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>{copyStatus}</span> : null}
+                {copyStatus ? (
+                  <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
+                    {copyStatus}
+                  </span>
+                ) : null}
               </div>
             </div>
 
@@ -690,42 +711,36 @@ const AssignmentSubmissionPage = () => {
               value={selectedPreview.submissionText}
               style={{ ...styles.textArea, minHeight: 160, background: "#f9fafb" }}
             />
-
-            <div style={styles.helperText}>
-              Tip: If you spot a mistake after submission, use the resubmission request below.
-            </div>
           </div>
         ) : null}
       </div>
 
+      {/* ✅ Resubmission (PER ASSIGNMENT) */}
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h3 style={{ margin: 0 }}>Resubmission</h3>
-          <span style={styles.badge}>{hasSubmitted ? "Active" : "After first submission"}</span>
+          <span style={styles.badge}>{isSelectedLocked ? "Available" : "Not available"}</span>
         </div>
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          If you need to correct something, contact us via email. This option unlocks after your first submission.
-        </p>
-        {hasSubmitted ? (
-          <a
-            href={`mailto:learngermanghana@gmail.com?subject=${encodeURIComponent(
-              "Resubmission request"
-            )}&body=${encodeURIComponent(
-              `Hello team,
 
-I would like to resubmit.
+        {isSelectedLocked ? (
+          <>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              You can request resubmission for <strong>{assignmentInfo}</strong>. Please paste your corrected text in the email.
+            </p>
 
-Assignment: ${form.assignmentTitle || assignmentOptions[0]}
-Student code: ${studentCode || "-"}
-Email: ${user?.email || "-"}
-Level: ${preferredLevel}`
-            )}`}
-            style={styles.primaryButton}
-          >
-            Request resubmission via email
-          </a>
+            <a href={resubmissionMailto} style={styles.primaryButton}>
+              Request resubmission for this assignment
+            </a>
+
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Tip: Do not send screenshots. Paste the corrected letter/text so we can review quickly.
+            </p>
+          </>
         ) : (
-          <span style={{ ...styles.helperText, margin: 0 }}>Resubmission is available after you submit once.</span>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Resubmission is only available after you submit <strong>this selected assignment</strong>.  
+            If you haven’t submitted it yet, submit first — then the resubmission button will appear here.
+          </p>
         )}
       </div>
 
