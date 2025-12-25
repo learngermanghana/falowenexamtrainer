@@ -18,6 +18,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [selectedLevel, setSelectedLevel] = useState("B1");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
+  const [learningMode, setLearningMode] = useState("Online");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
   const [className, setClassName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -40,6 +41,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           studentCode,
           phone,
           location,
+          learningMode,
           emergencyContactPhone,
           className,
         });
@@ -156,6 +158,17 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
                 onChange={(e) => setLocation(e.target.value)}
                 style={inputStyle}
               />
+              <label style={styles.label}>Learning mode</label>
+              <select
+                required
+                value={learningMode}
+                onChange={(e) => setLearningMode(e.target.value)}
+                style={{ ...styles.select, height: 44 }}
+              >
+                <option value="Online">Online</option>
+                <option value="In-person">In-person</option>
+                <option value="Hybrid">Hybrid</option>
+              </select>
             </>
           )}
 

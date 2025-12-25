@@ -21,8 +21,7 @@ function normalizeHeader(h) {
   return String(h || "")
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, " ")
-    .replace(/[_-]+/g, " ");
+    .replace(/[\s_-]+/g, "");
 }
 
 function colToA1(colIdx0) {
@@ -154,6 +153,7 @@ async function upsertStudentToSheet(student) {
   const colUsesToday = findCol(headerMap, "Uses_Today", "Uses Today", "UsesToday");
   const colLastDate = findCol(headerMap, "Last_Date", "Last Date", "LastDate");
   const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
+  const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
 
   if (colStudentCode === null) {
     const headerNames = headers && headers.length ? headers.join(" | ") : "(none)";
@@ -215,6 +215,7 @@ async function upsertStudentToSheet(student) {
     pushCell(colPaymentStatus, student.paymentStatus || "");
     pushCell(colContractStart, student.contractStart || "");
     pushCell(colContractEnd, student.contractEnd || "");
+    pushCell(colLearningMode, student.learningMode || "");
     pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
     pushCell(colDailyLimit, student.dailyLimit ?? "");
     pushCell(colUsesToday, student.usesToday ?? "");
@@ -254,6 +255,7 @@ async function upsertStudentToSheet(student) {
   if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
+  if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
   if (colEmergencyPhone !== null)
     row[colEmergencyPhone] = student.emergencyContactPhone || "";
   if (colDailyLimit !== null) row[colDailyLimit] = student.dailyLimit ?? "";

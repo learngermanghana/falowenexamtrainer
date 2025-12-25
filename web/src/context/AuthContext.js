@@ -234,6 +234,7 @@ export const AuthProvider = ({ children }) => {
       className: profile.className || "",
       phone: profile.phone || "",
       location: profile.location || "",
+      learningMode: profile.learningMode || "",
       emergencyContactPhone: profile.emergencyContactPhone || "",
       status: profile.status || "Active",
       initialPaymentAmount: profile.initialPaymentAmount ?? 0,
