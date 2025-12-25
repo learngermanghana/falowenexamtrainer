@@ -24,6 +24,7 @@ import ExamResources from "./components/ExamResources";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
+import MyExamFilePage from "./components/MyExamFilePage";
 
 const TAB_STRUCTURE = [
   {
@@ -32,6 +33,7 @@ const TAB_STRUCTURE = [
     sections: [
       { key: "course", label: "Course Book" },
       { key: "submit", label: "Submit Assignment" },
+      { key: "examFile", label: "My Exam File" },
     ],
   },
   {
@@ -104,6 +106,7 @@ function App() {
     () => ({
       submit: true,
       course: isEnrolled,
+      examFile: isEnrolled || isStaff,
       results: isEnrolled || isStaff,
       grammar: true,
       writing: true,
@@ -453,6 +456,7 @@ const CampusArea = ({
           defaultClassName={campusStudentProfile?.className}
         />
       ) : null}
+      {resolvedSection === "examFile" && allowedSections.examFile ? <MyExamFilePage /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
@@ -469,7 +473,7 @@ const ExamArea = ({ onBack }) => {
   const navigate = useNavigate();
 
   const examSection = useMemo(() => {
-    if (["speaking", "writing", "resources"].includes(section)) {
+    if (["speaking", "writing", "resources", "file"].includes(section)) {
       return section;
     }
     return "speaking";
@@ -485,6 +489,7 @@ const ExamArea = ({ onBack }) => {
     { key: "speaking", label: "Speaking" },
     { key: "writing", label: "Schreiben trainer" },
     { key: "resources", label: "Resources" },
+    { key: "file", label: "My Exam File" },
   ];
 
   return (
@@ -507,6 +512,7 @@ const ExamArea = ({ onBack }) => {
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
+      {examSection === "file" ? <MyExamFilePage /> : null}
     </>
   );
 };
