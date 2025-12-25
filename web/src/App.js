@@ -24,6 +24,7 @@ import ExamResources from "./components/ExamResources";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
+import MyExamFilePage from "./components/MyExamFilePage";
 
 const TAB_STRUCTURE = [
   {
@@ -469,7 +470,7 @@ const ExamArea = ({ onBack }) => {
   const navigate = useNavigate();
 
   const examSection = useMemo(() => {
-    if (["speaking", "writing", "resources"].includes(section)) {
+    if (["speaking", "writing", "resources", "file"].includes(section)) {
       return section;
     }
     return "speaking";
@@ -485,6 +486,7 @@ const ExamArea = ({ onBack }) => {
     { key: "speaking", label: "Speaking" },
     { key: "writing", label: "Schreiben trainer" },
     { key: "resources", label: "Resources" },
+    { key: "file", label: "My Exam File" },
   ];
 
   return (
@@ -507,6 +509,7 @@ const ExamArea = ({ onBack }) => {
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
+      {examSection === "file" ? <MyExamFilePage /> : null}
     </>
   );
 };
