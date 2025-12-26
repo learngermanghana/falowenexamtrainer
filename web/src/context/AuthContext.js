@@ -24,6 +24,7 @@ import {
   getActionCodeSettings,
   reload,
   limit,
+  addDoc,
   GoogleAuthProvider,
 } from "../firebase";
 
@@ -59,6 +60,32 @@ export const AuthProvider = ({ children }) => {
     setStudentProfile((prev) =>
       prev?.id === studentId ? { ...prev, messagingToken: token } : prev
     );
+  }, []);
+
+  const logLoginSession = useCallback(async ({ uid, email, studentId, studentCode, provider, meta = {} }) => {
+    if (!isFirebaseConfigured || !db || !uid) return;
+    try {
+      const sessionPayload = {
+        uid,
+        email: email || null,
+        studentId: studentId || null,
+        studentCode: studentCode || null,
+        provider: provider || "unknown",
+        loggedInAt: serverTimestamp(),
+        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+        language: typeof navigator !== "undefined" ? navigator.language : null,
+        timeZone:
+          typeof Intl !== "undefined"
+            ? Intl.DateTimeFormat().resolvedOptions().timeZone
+            : null,
+        origin: typeof window !== "undefined" ? window.location.origin : null,
+        ...meta,
+      };
+
+      await addDoc(collection(db, "loginSessions"), sessionPayload);
+    } catch (error) {
+      console.error("Failed to log login session", error);
+    }
   }, []);
 
   const revokeMessagingToken = useCallback(async (studentId) => {
@@ -267,6 +294,14 @@ export const AuthProvider = ({ children }) => {
     await setDoc(studentsRef, payload, { merge: true });
     setStudentProfile({ id: studentsRef.id, ...payload });
     setNotificationStatus("idle");
+    await logLoginSession({
+      uid: credential.user.uid,
+      email: normalizedEmail,
+      studentId: studentsRef.id,
+      studentCode: studentId,
+      provider: "password",
+      meta: { isSignup: true },
+    });
     return { studentCode, paystackLink: payload.paystackLink };
   };
 
@@ -283,6 +318,16 @@ export const AuthProvider = ({ children }) => {
       const profile = profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
       setStudentProfile(profile);
       setMessagingToken(profile?.messagingToken || null);
+      const studentId = profile?.id || credential.user.uid;
+      const studentCode = profile?.studentCode || profile?.studentcode || credential.user.uid;
+      await logLoginSession({
+        uid: credential.user.uid,
+        email: normalizedEmail,
+        studentId,
+        studentCode,
+        provider: "password",
+        meta,
+      });
 
       if (meta.migratedFromLegacy) {
         credential.migratedFromLegacy = true;
@@ -390,6 +435,13 @@ export const AuthProvider = ({ children }) => {
     const mergedProfile = { ...existingProfile, uid: credential.user.uid, email };
     setStudentProfile(mergedProfile);
     setMessagingToken(mergedProfile?.messagingToken || null);
+    await logLoginSession({
+      uid: credential.user.uid,
+      email,
+      studentId: mergedProfile?.id || credential.user.uid,
+      studentCode: mergedProfile?.studentCode || mergedProfile?.studentcode || credential.user.uid,
+      provider: "google",
+    });
     return { credential, profile: mergedProfile };
   }, []);
 
