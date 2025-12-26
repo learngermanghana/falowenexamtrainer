@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchStudentNotifications } from "../services/notificationService";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
@@ -53,6 +53,7 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPrevious, setShowPrevious] = useState(false);
+  const [markedSeenThisSession, setMarkedSeenThisSession] = useState(false);
 
   const rootRef = useRef(null);
 
@@ -122,7 +123,7 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     };
   }, [items]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     if (!studentProfile) return;
     setLoading(true);
     setError("");
@@ -135,13 +136,12 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [studentProfile]);
 
   // Load on profile change (initial + when class/level updates)
   useEffect(() => {
     loadNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [studentProfile?.studentCode, studentProfile?.studentcode, studentProfile?.email, studentProfile?.className]);
+  }, [loadNotifications]);
 
   const unreadCount = useMemo(() => {
     const seenAt = readSeenAt();
@@ -155,20 +155,26 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     setItems((prev) => [...prev]);
   };
 
-  const handleToggle = async () => {
-    if (!open) {
-      await loadNotifications();
-      // When opening, consider everything currently loaded as "seen"
-      const newest = (items?.[0]?.timestamp ? Number(items[0].timestamp) : Date.now()) || Date.now();
-      writeSeenAt(newest);
-    }
+  const handleToggle = () => {
     setOpen((prev) => !prev);
   };
 
-  // Reset expanded state when closing
   useEffect(() => {
-    if (!open) setShowPrevious(false);
-  }, [open]);
+    if (!open) {
+      setShowPrevious(false);
+      setMarkedSeenThisSession(false);
+      return;
+    }
+    setError("");
+    loadNotifications();
+  }, [loadNotifications, open]);
+
+  useEffect(() => {
+    if (!open || markedSeenThisSession) return;
+    const newest = (items?.[0]?.timestamp ? Number(items[0].timestamp) : Date.now()) || Date.now();
+    writeSeenAt(newest);
+    setMarkedSeenThisSession(true);
+  }, [open, items, markedSeenThisSession]);
 
   const renderNotification = (item) => {
     const isUnread = Number(item?.timestamp || 0) > readSeenAt();
