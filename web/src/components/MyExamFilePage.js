@@ -8,8 +8,9 @@ import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
-import { jsPDF } from "jspdf"; // npm i jspdf
+import { jsPDF } from "jspdf";
 
+// ---------- helpers ----------
 const formatDate = (value) => {
   if (!value) return "";
   const parsed = new Date(value);
@@ -22,7 +23,11 @@ const toTime = (row) => {
   return Number.isNaN(t) ? 0 : t;
 };
 
+<<<<<<< HEAD
 // Google Sheets/CSV can return score as "85" (string) or "85/100"
+=======
+// Sheets/CSV often returns "85" or "85/100" as string
+>>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
 const parseScore = (value) => {
   if (value === null || value === undefined || value === "") return null;
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -51,7 +56,11 @@ const initialAssignmentState = {
 
 const initialFeedbackState = { loading: false, items: [], error: "" };
 
+<<<<<<< HEAD
 // ---------- Small UI helpers ----------
+=======
+// ---------- UI bits ----------
+>>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
 const StatCard = ({ label, value, sub, icon }) => (
   <div
     style={{
@@ -162,6 +171,7 @@ const downloadSimplePdf = ({ filename, title, subtitle, pairs, footer }) => {
   doc.save(filename);
 };
 
+// ---------- component ----------
 const MyExamFilePage = () => {
   const { studentProfile, user, idToken } = useAuth();
   const { level, levelConfirmed } = useExam();
@@ -187,6 +197,8 @@ const MyExamFilePage = () => {
       return;
     }
 
+    // NOTE: some setups export isFirebaseConfigured as boolean, others as function.
+    // If yours is a function, change this to: if (!isFirebaseConfigured())
     if (!isFirebaseConfigured) {
       setAttendanceState({ ...initialAttendanceState, error: "Connect Firebase to load attendance." });
       return;
@@ -290,6 +302,11 @@ const MyExamFilePage = () => {
       .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
       .slice(0, 8);
   }, [assignmentState.completed]);
+<<<<<<< HEAD
+=======
+
+  const feedbackItems = useMemo(() => (feedbackState.items || []).slice(0, 6), [feedbackState.items]);
+>>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
 
   const feedbackItems = useMemo(() => (feedbackState.items || []).slice(0, 6), [feedbackState.items]);
   const lastFeedbackDate = useMemo(() => {
@@ -346,7 +363,11 @@ const MyExamFilePage = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+<<<<<<< HEAD
       {/* Report Header + Summary row */}
+=======
+      {/* Report header */}
+>>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
           <div>
@@ -363,7 +384,9 @@ const MyExamFilePage = () => {
           </div>
         </div>
 
+        {/* Top summary row */}
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+<<<<<<< HEAD
           <StatCard icon="🎓" label="Level" value={detectedLevel || "Not set"} sub={className ? `Class: ${className}` : "Add class name in your profile"} />
           <StatCard
             icon={readiness.icon || "📌"}
@@ -377,6 +400,16 @@ const MyExamFilePage = () => {
             value={`${attendanceState.sessions} sessions`}
             sub={`${attendanceState.hours} hours`}
           />
+=======
+          <StatCard
+            icon="🎓"
+            label="Level"
+            value={detectedLevel || "Not set"}
+            sub={className ? `Class: ${className}` : "Add class name in your profile"}
+          />
+          <StatCard icon={readiness.icon || "📌"} label="Readiness" value={readiness.text} sub={readiness.detail} />
+          <StatCard icon="🧾" label="Attendance" value={`${attendanceState.sessions} sessions`} sub={`${attendanceState.hours} hours`} />
+>>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
           <StatCard
             icon="🗓️"
             label="Last feedback"
@@ -410,7 +443,7 @@ const MyExamFilePage = () => {
         </div>
       </section>
 
-      {/* Collapsible: Attendance */}
+      {/* Attendance (collapsible) */}
       <CollapsibleCard
         title="Attendance summary"
         subtitle="Sessions and hours credited to your class."
@@ -446,7 +479,7 @@ const MyExamFilePage = () => {
         </div>
       </CollapsibleCard>
 
-      {/* Collapsible: Assignments */}
+      {/* Assignments (collapsible) */}
       <CollapsibleCard
         title="Submitted assignments (locked)"
         subtitle="Passed identifiers from the published score sheet."
@@ -494,7 +527,7 @@ const MyExamFilePage = () => {
         </div>
       </CollapsibleCard>
 
-      {/* Collapsible: Feedback */}
+      {/* Feedback (collapsible) */}
       <CollapsibleCard
         title="Teacher feedback history"
         subtitle="Scores + tutor comments loaded from the published Google Sheet."
@@ -576,7 +609,7 @@ const MyExamFilePage = () => {
         </div>
       </CollapsibleCard>
 
-      {/* Collapsible: Downloadables */}
+      {/* Downloadables (collapsible) */}
       <CollapsibleCard
         title="Downloadables"
         subtitle="Calendar + professional PDFs for contract and receipt."
