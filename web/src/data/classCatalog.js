@@ -5,16 +5,6 @@ export const ZOOM_DETAILS = {
 };
 
 export const classCatalog = {
-  "A1 Frankfurt Klasse": {
-    startDate: "2025-10-23",
-    endDate: "2025-12-18",
-    schedule: [
-      { day: "Thursday", startTime: "18:00", endTime: "19:00" },
-      { day: "Friday", startTime: "18:00", endTime: "19:00" },
-      { day: "Saturday", startTime: "08:00", endTime: "09:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/1BFPE0gvTb7DWPRqdfWhLzbvgwhLbGvRv/view?usp=sharing",
-  },
   "A1 Bonn Klasse": {
     startDate: "2025-11-10",
     endDate: "2026-01-13",
@@ -34,6 +24,16 @@ export const classCatalog = {
       { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
     docUrl: "https://drive.google.com/file/d/1YaML32aP8L0Uk_-fu2HEW1b0Qo4CceDg/view?usp=sharing",
+  },
+  "A1 Stuttgart Klasse": {
+    startDate: "2026-01-08",
+    endDate: "2026-03-06",
+    schedule: [
+      { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
+      { day: "Thursday", startTime: "11:00", endTime: "12:00" },
+      { day: "Friday", startTime: "11:00", endTime: "12:00" },
+    ],
+    docUrl: "https://drive.google.com/file/d/1Bzb1-cHO10m_KsrTHfbhaZAfQcmbssFt/view?usp=sharing",
   },
   "A2 Bonn Klasse": {
     startDate: "2025-11-25",
