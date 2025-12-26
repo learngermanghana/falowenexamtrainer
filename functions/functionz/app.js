@@ -342,6 +342,7 @@ app.post("/admin/purge-expired-students", async (req, res) => {
     let deletedStudents = 0;
     let authDeleted = 0;
     let authMissing = 0;
+    let firestoreFailed = 0;
 
     while (true) {
       const snap = await db
@@ -349,6 +350,7 @@ app.post("/admin/purge-expired-students", async (req, res) => {
         .where("role", "==", "student")
         .where("contractEnd", ">", "")
         .where("contractEnd", "<", nowIso)
+        .where("purgeStatus", "!=", "failed") // ✅ skip docs that failed before
         .limit(25)
         .get();
 
@@ -358,6 +360,7 @@ app.post("/admin/purge-expired-students", async (req, res) => {
         const data = docSnap.data() || {};
         const uid = data.uid;
 
+        // Delete Auth user (best effort)
         if (uid) {
           try {
             await admin.auth().deleteUser(uid);
@@ -368,15 +371,27 @@ app.post("/admin/purge-expired-students", async (req, res) => {
           }
         }
 
+        // Delete Firestore doc
         try {
           if (typeof db.recursiveDelete === "function") {
             await db.recursiveDelete(docSnap.ref);
           } else {
-            await docSnap.ref.delete();
+            await docSnap.ref.delete(); // NOTE: doesn't delete subcollections
           }
           deletedStudents += 1;
         } catch (err) {
+          firestoreFailed += 1;
           console.warn("Firestore delete failed", docSnap.id, err?.message || err);
+
+          // ✅ mark so we don't loop forever
+          await docSnap.ref.set(
+            {
+              purgeStatus: "failed",
+              purgeError: String(err?.message || "unknown"),
+              purgeFailedAt: admin.firestore.FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
         }
       }
     }
@@ -386,12 +401,14 @@ app.post("/admin/purge-expired-students", async (req, res) => {
       deletedStudents,
       authDeleted,
       authMissing,
+      firestoreFailed,
       nowIso,
     });
   } catch (err) {
     return res.status(500).json({ error: err?.message || "Unknown error" });
   }
 });
+
 
 app.get("/scores/summary", scoresSummaryHandler);
 
