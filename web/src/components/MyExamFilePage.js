@@ -16,14 +16,14 @@ const formatDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleDateString();
 };
 
-const getRowTime = (row) => {
-  const raw = row?.date || row?.created_at || row?.createdAt || 0;
+const toTime = (row) => {
+  const raw = row?.date ?? row?.created_at ?? row?.createdAt ?? 0;
   const t = new Date(raw).getTime();
   return Number.isNaN(t) ? 0 : t;
 };
 
-// More robust than Number(value). Supports "85", "85/100", "Score: 85"
-const parseScoreValue = (value) => {
+// Google Sheets/CSV can return score as "85" (string) or "85/100"
+const parseScore = (value) => {
   if (value === null || value === undefined || value === "") return null;
   if (typeof value === "number" && Number.isFinite(value)) return value;
 
@@ -35,8 +35,24 @@ const parseScoreValue = (value) => {
   return Number.isFinite(num) ? num : null;
 };
 
-// ---------- Simple UI blocks ----------
-const StatCard = ({ icon, label, value, sub }) => (
+const initialAttendanceState = { sessions: 0, hours: 0, loading: false, error: "" };
+
+const initialAssignmentState = {
+  loading: false,
+  completed: [],
+  failedLessons: [],
+  missedLessons: [],
+  nextRecommendation: null,
+  blocked: false,
+  lastAssignment: null,
+  retriesThisWeek: 0,
+  error: "",
+};
+
+const initialFeedbackState = { loading: false, items: [], error: "" };
+
+// ---------- Small UI helpers ----------
+const StatCard = ({ label, value, sub, icon }) => (
   <div
     style={{
       border: "1px solid #e5e7eb",
@@ -89,7 +105,9 @@ const CollapsibleCard = ({ title, subtitle, right, defaultOpen, children }) => (
         </div>
         {subtitle ? <div style={{ marginLeft: 22, fontSize: 12, color: "#6B7280" }}>{subtitle}</div> : null}
       </div>
-      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>{right}</div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        {right}
+      </div>
     </summary>
 
     <div style={{ padding: 12 }}>{children}</div>
@@ -99,19 +117,16 @@ const CollapsibleCard = ({ title, subtitle, right, defaultOpen, children }) => (
 // ---------- PDF helpers ----------
 const pdfKeyValueBlock = (doc, startY, pairs) => {
   let y = startY;
-
   pairs.forEach(([k, v]) => {
     doc.setFont("helvetica", "bold");
     doc.text(`${k}:`, 14, y);
-
     doc.setFont("helvetica", "normal");
+
     const text = String(v ?? "—");
     const lines = doc.splitTextToSize(text, 130);
     doc.text(lines, 60, y);
-
     y += 8 * Math.max(1, lines.length);
   });
-
   return y;
 };
 
@@ -151,91 +166,54 @@ const MyExamFilePage = () => {
   const { studentProfile, user, idToken } = useAuth();
   const { level, levelConfirmed } = useExam();
 
-  const [attendanceState, setAttendanceState] = useState({ sessions: 0, hours: 0, loading: false, error: "" });
+  const [attendanceState, setAttendanceState] = useState(initialAttendanceState);
+  const [assignmentState, setAssignmentState] = useState(initialAssignmentState);
+  const [feedbackState, setFeedbackState] = useState(initialFeedbackState);
 
-  const [assignmentState, setAssignmentState] = useState({
-    loading: false,
-    completed: [],
-    failedLessons: [],
-    missedLessons: [],
-    nextRecommendation: null,
-    blocked: false,
-    lastAssignment: null,
-    retriesThisWeek: 0,
-    error: "",
-  });
+  const studentCode = useMemo(() => {
+    return studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
+  }, [studentProfile]);
 
-  const [feedbackState, setFeedbackState] = useState({ loading: false, items: [], error: "" });
+  const className = useMemo(() => studentProfile?.className || "", [studentProfile]);
 
-  const studentCode = useMemo(
-    () => studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "",
-    [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
-  );
-
-  const className = useMemo(() => studentProfile?.className || "", [studentProfile?.className]);
-
-  const detectedLevel = useMemo(
-    () => (levelConfirmed ? level : (studentProfile?.level || level || "").toString().toUpperCase()),
-    [level, levelConfirmed, studentProfile?.level]
-  );
+  const detectedLevel = useMemo(() => {
+    const raw = levelConfirmed ? level : studentProfile?.level || level || "";
+    return String(raw || "").toUpperCase();
+  }, [level, levelConfirmed, studentProfile]);
 
   const loadAttendance = useCallback(async () => {
     if (!className || !studentCode) {
-      setAttendanceState({
-        sessions: 0,
-        hours: 0,
-        loading: false,
-        error: "Add your class and student code to view attendance.",
-      });
+      setAttendanceState({ ...initialAttendanceState, error: "Add your class and student code to view attendance." });
       return;
     }
 
     if (!isFirebaseConfigured) {
-      setAttendanceState({
-        sessions: 0,
-        hours: 0,
-        loading: false,
-        error: "Connect Firebase to load attendance.",
-      });
+      setAttendanceState({ ...initialAttendanceState, error: "Connect Firebase to load attendance." });
       return;
     }
 
     setAttendanceState((prev) => ({ ...prev, loading: true, error: "" }));
     try {
       const summary = await fetchAttendanceSummary({ className, studentCode });
-      setAttendanceState({ sessions: summary.sessions || 0, hours: summary.hours || 0, loading: false, error: "" });
-    } catch (error) {
       setAttendanceState({
-        sessions: 0,
-        hours: 0,
+        sessions: summary.sessions || 0,
+        hours: summary.hours || 0,
         loading: false,
-        error: "Could not load attendance right now.",
+        error: "",
       });
+    } catch (error) {
+      setAttendanceState({ ...initialAttendanceState, error: "Could not load attendance right now." });
     }
   }, [className, studentCode]);
 
   const loadAssignments = useCallback(async () => {
     if (!studentCode) {
-      setAssignmentState({
-        loading: false,
-        completed: [],
-        failedLessons: [],
-        missedLessons: [],
-        nextRecommendation: null,
-        blocked: false,
-        lastAssignment: null,
-        retriesThisWeek: 0,
-        error: "Add your student code to see submitted assignments.",
-      });
+      setAssignmentState({ ...initialAssignmentState, error: "Add your student code to see submitted assignments." });
       return;
     }
 
     if (!idToken) {
-      setAssignmentState((prev) => ({
-        ...prev,
-        loading: false,
-        error: "Sign in again to load your score summary.",
-      }));
+      setAssignmentState({ ...initialAssignmentState, error: "Sign in again to load your score summary." });
       return;
     }
 
@@ -255,28 +233,18 @@ const MyExamFilePage = () => {
         error: "",
       });
     } catch (error) {
-      setAssignmentState({
-        loading: false,
-        completed: [],
-        failedLessons: [],
-        missedLessons: [],
-        nextRecommendation: null,
-        blocked: false,
-        lastAssignment: null,
-        retriesThisWeek: 0,
-        error: "Could not load score summary.",
-      });
+      setAssignmentState({ ...initialAssignmentState, error: "Could not load score summary." });
     }
   }, [idToken, studentCode]);
 
   const loadFeedback = useCallback(async () => {
     if (!studentCode) {
-      setFeedbackState({ loading: false, items: [], error: "Add your student code to see feedback history." });
+      setFeedbackState({ ...initialFeedbackState, error: "Add your student code to see feedback history." });
       return;
     }
 
     if (!idToken) {
-      setFeedbackState({ loading: false, items: [], error: "Sign in again to load feedback history." });
+      setFeedbackState({ ...initialFeedbackState, error: "Sign in again to load feedback history." });
       return;
     }
 
@@ -285,9 +253,9 @@ const MyExamFilePage = () => {
       const rows = await fetchStudentResultsHistory({ idToken, studentCode });
 
       const items = (rows || [])
-        .map((row) => ({ ...row, score: parseScoreValue(row.score) }))
+        .map((row) => ({ ...row, score: parseScore(row.score) }))
         .slice()
-        .sort((a, b) => getRowTime(b) - getRowTime(a))
+        .sort((a, b) => toTime(b) - toTime(a))
         .filter((row) => row.comments || row.score !== null)
         .slice(0, 12);
 
@@ -309,42 +277,33 @@ const MyExamFilePage = () => {
     loadFeedback();
   }, [loadFeedback]);
 
-  const readiness = useMemo(
-    () =>
-      computeExamReadiness({
-        attendanceSessions: attendanceState.sessions,
-        completedAssignments: assignmentState.completed,
-      }),
-    [assignmentState.completed, attendanceState.sessions]
-  );
+  const readiness = useMemo(() => {
+    return computeExamReadiness({
+      attendanceSessions: attendanceState.sessions,
+      completedAssignments: assignmentState.completed,
+    });
+  }, [assignmentState.completed, attendanceState.sessions]);
 
-  const lockedAssignments = useMemo(
-    () =>
-      assignmentState.completed
-        .slice()
-        .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
-        .slice(0, 8),
-    [assignmentState.completed]
-  );
+  const lockedAssignments = useMemo(() => {
+    return (assignmentState.completed || [])
+      .slice()
+      .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
+      .slice(0, 8);
+  }, [assignmentState.completed]);
 
-  const feedbackItems = useMemo(() => feedbackState.items.slice(0, 6), [feedbackState.items]);
-
+  const feedbackItems = useMemo(() => (feedbackState.items || []).slice(0, 6), [feedbackState.items]);
   const lastFeedbackDate = useMemo(() => {
     const latest = feedbackState.items?.[0];
     return latest?.date || latest?.created_at || latest?.createdAt || "";
   }, [feedbackState.items]);
 
-  const nextRecommendationText = useMemo(() => {
+  const nextRecLabel = useMemo(() => {
     if (assignmentState.loading) return "Loading…";
     if (assignmentState.error) return "Unavailable";
     if (assignmentState.blocked) return "Blocked (fix failed tasks)";
     if (!assignmentState.nextRecommendation) return "Not set yet";
     return assignmentState.nextRecommendation.label || assignmentState.nextRecommendation.identifier || "Next task";
   }, [assignmentState.blocked, assignmentState.error, assignmentState.loading, assignmentState.nextRecommendation]);
-
-  const refreshAll = async () => {
-    await Promise.allSettled([loadAttendance(), loadAssignments(), loadFeedback()]);
-  };
 
   const downloadContract = () => {
     const studentName = studentProfile?.name || user?.email || "Unknown";
@@ -359,8 +318,8 @@ const MyExamFilePage = () => {
         ["Class", className || "Not set"],
         ["Payment status", studentProfile?.paymentStatus || "pending"],
         ["Contract term", `${studentProfile?.contractTermMonths || "n/a"} months`],
-        ["Start", studentProfile?.contractStart || "n/a"],
-        ["End", studentProfile?.contractEnd || "n/a"],
+        ["Start date", formatDate(studentProfile?.contractStart) || "n/a"],
+        ["End date", formatDate(studentProfile?.contractEnd) || "n/a"],
       ],
       footer: "This is a generated summary for quick reference. Contact support for an official contract copy.",
     });
@@ -379,7 +338,7 @@ const MyExamFilePage = () => {
         ["Email", user?.email || "—"],
         ["Level", detectedLevel || "—"],
         ["Class", className || "—"],
-        ["Payment status", studentProfile?.paymentStatus || "pending"],
+        ["Payment status", (studentProfile?.paymentStatus || "pending").toString()],
       ],
       footer: "This is a placeholder receipt log. Contact support for official invoices/receipts.",
     });
@@ -387,7 +346,7 @@ const MyExamFilePage = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      {/* Report header + summary row */}
+      {/* Report Header + Summary row */}
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
           <div>
@@ -401,33 +360,41 @@ const MyExamFilePage = () => {
           <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
             <span style={styles.badge}>Student code: {studentCode || "not set"}</span>
             {className ? <span style={styles.badge}>Class: {className}</span> : null}
-            <button type="button" style={styles.secondaryButton} onClick={refreshAll}>
-              Refresh all
-            </button>
           </div>
         </div>
 
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
-          <StatCard icon="🎓" label="Level" value={detectedLevel || "Not set"} sub={className ? `Class: ${className}` : "Add your class name"} />
-          <StatCard icon={readiness.icon || "📌"} label="Readiness" value={readiness.text} sub={readiness.detail} />
-          <StatCard icon="🧾" label="Attendance" value={`${attendanceState.sessions} sessions`} sub={`${attendanceState.hours} hours`} />
+          <StatCard icon="🎓" label="Level" value={detectedLevel || "Not set"} sub={className ? `Class: ${className}` : "Add class name in your profile"} />
+          <StatCard
+            icon={readiness.icon || "📌"}
+            label="Readiness"
+            value={readiness.text}
+            sub={readiness.detail}
+          />
+          <StatCard
+            icon="🧾"
+            label="Attendance"
+            value={`${attendanceState.sessions} sessions`}
+            sub={`${attendanceState.hours} hours`}
+          />
           <StatCard
             icon="🗓️"
             label="Last feedback"
-            value={lastFeedbackDate ? formatDate(lastFeedbackDate) : feedbackState.loading ? "Loading…" : "No feedback yet"}
+            value={lastFeedbackDate ? formatDate(lastFeedbackDate) : (feedbackState.loading ? "Loading…" : "No feedback yet")}
             sub="Latest marked task date"
           />
           <StatCard
             icon={assignmentState.blocked ? "⛔" : "➡️"}
             label="Next recommendation"
-            value={nextRecommendationText}
+            value={nextRecLabel}
             sub={assignmentState.blocked ? "Pass failed identifiers to unlock" : "Based on your score sheet"}
           />
         </div>
 
+        {/* Readiness banner */}
         <div
           style={{
-            borderRadius: 12,
+            borderRadius: 14,
             padding: 12,
             background: readiness.tone,
             border: "1px solid #e5e7eb",
@@ -463,7 +430,20 @@ const MyExamFilePage = () => {
           </button>
         }
       >
-        {attendanceState.error ? <div style={styles.errorBox}>{attendanceState.error}</div> : null}
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+              <div style={{ ...styles.helperText, margin: 0 }}>✅ Sessions credited</div>
+              <div style={{ fontSize: 22, fontWeight: 900 }}>{attendanceState.sessions}</div>
+            </div>
+            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
+              <div style={{ ...styles.helperText, margin: 0 }}>⏱️ Hours credited</div>
+              <div style={{ fontSize: 22, fontWeight: 900 }}>{attendanceState.hours}</div>
+            </div>
+          </div>
+
+          {attendanceState.error ? <div style={styles.errorBox}>{attendanceState.error}</div> : null}
+        </div>
       </CollapsibleCard>
 
       {/* Collapsible: Assignments */}
@@ -487,33 +467,30 @@ const MyExamFilePage = () => {
         ) : null}
 
         <div style={{ display: "grid", gap: 10 }}>
-          {lockedAssignments.map((entry, index) => {
-            const scoreValue = parseScoreValue(entry.score);
-            return (
-              <div
-                key={`${entry.identifier || index}-locked`}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 14,
-                  padding: 12,
-                  background: "#ffffff",
-                  display: "grid",
-                  gap: 6,
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-                }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                  <div style={{ fontWeight: 850, color: "#111827" }}>{entry.label || `Identifier ${entry.identifier}`}</div>
-                  <span style={styles.lockPill}>🔒 Locked</span>
-                </div>
-                <div style={{ fontSize: 13, color: "#6B7280" }}>
-                  Identifier: <b style={{ color: "#111827" }}>{entry.identifier || "—"}</b> · Score:{" "}
-                  <b style={{ color: "#111827" }}>{scoreValue !== null ? `${scoreValue}/100` : "Pending"}</b> · Date:{" "}
-                  <b style={{ color: "#111827" }}>{formatDate(entry.date) || "—"}</b>
-                </div>
+          {lockedAssignments.map((entry, index) => (
+            <div
+              key={`${entry.identifier || index}-locked`}
+              style={{
+                border: "1px solid #e5e7eb",
+                borderRadius: 14,
+                padding: 12,
+                background: "#ffffff",
+                display: "grid",
+                gap: 6,
+                boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                <div style={{ fontWeight: 850, color: "#111827" }}>{entry.label || `Identifier ${entry.identifier}`}</div>
+                <span style={styles.lockPill}>🔒 Locked</span>
               </div>
-            );
-          })}
+              <div style={{ fontSize: 13, color: "#6B7280" }}>
+                Identifier: <b style={{ color: "#111827" }}>{entry.identifier || "—"}</b> · Score:{" "}
+                <b style={{ color: "#111827" }}>{typeof entry.score === "number" ? `${entry.score}/100` : "Pending"}</b> · Date:{" "}
+                <b style={{ color: "#111827" }}>{formatDate(entry.date) || "—"}</b>
+              </div>
+            </div>
+          ))}
         </div>
       </CollapsibleCard>
 
@@ -545,8 +522,7 @@ const MyExamFilePage = () => {
 
         <div style={{ display: "grid", gap: 10 }}>
           {feedbackItems.map((entry, index) => {
-            const scoreValue = parseScoreValue(entry.score);
-            const hasScore = scoreValue !== null;
+            const hasScore = entry.score !== null;
 
             return (
               <div
@@ -581,7 +557,7 @@ const MyExamFilePage = () => {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {hasScore ? `Score: ${scoreValue}/100` : "Not scored"}
+                    {hasScore ? `Score: ${entry.score}/100` : "Not scored"}
                   </span>
                 </div>
 
@@ -603,7 +579,7 @@ const MyExamFilePage = () => {
       {/* Collapsible: Downloadables */}
       <CollapsibleCard
         title="Downloadables"
-        subtitle="Calendar + PDF downloads for contract and receipt."
+        subtitle="Calendar + professional PDFs for contract and receipt."
         defaultOpen={false}
         right={null}
       >
