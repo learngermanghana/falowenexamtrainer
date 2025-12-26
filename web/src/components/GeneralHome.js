@@ -1,10 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import { ZOOM_DETAILS } from "../data/classCatalog";
 import ClassCalendarCard from "./ClassCalendarCard";
 import HomeMetrics from "./HomeMetrics";
 import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
+import ExamReadinessBadge from "./ExamReadinessBadge";
 
 const WelcomeHero = ({ studentProfile }) => {
   const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
@@ -29,6 +31,13 @@ const WelcomeHero = ({ studentProfile }) => {
       </p>
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
         <span style={{ ...styles.badge, background: "#d1fae5", color: "#065f46" }}>Keep your streak alive</span>
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
+          onClick={() => window.open(ZOOM_DETAILS.url, "_blank", "noreferrer")}
+        >
+          Join on Zoom
+        </button>
       </div>
     </section>
   );
@@ -59,6 +68,10 @@ const GeneralHome = ({
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <WelcomeHero studentProfile={studentProfile} />
+      <ExamReadinessBadge
+        studentProfile={studentProfile}
+        onOpenExamFile={() => navigate("/campus/examFile")}
+      />
       <OnboardingChecklist
         notificationStatus={notificationStatus}
         onEnableNotifications={onEnableNotifications}
