@@ -10,7 +10,7 @@ import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
-  const { signup, login, authError, setAuthError, resetPassword } = useAuth();
+  const { signup, login, loginWithGoogle, authError, setAuthError, resetPassword } = useAuth();
   const { showToast } = useToast();
 
   const [mode, setMode] = useState(initialMode);
@@ -31,6 +31,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
   const [loading, setLoading] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
@@ -108,6 +109,33 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       showToast(errorMessage, "error");
     } finally {
       setResetting(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setMessage("");
+    setAuthError("");
+
+    try {
+      const result = await loginWithGoogle();
+      const profile = result?.profile;
+      if (profile?.studentCode) {
+        rememberStudentCodeForEmail(profile.email, profile.studentCode);
+      }
+      if (profile?.level) {
+        savePreferredLevel(profile.level);
+      }
+      const successMessage = "Welcome back! Your student profile is ready.";
+      setMessage(successMessage);
+      showToast(successMessage, "success");
+    } catch (error) {
+      console.error(error);
+      const errorMessage = error?.message || "Google sign-in failed. Please try again.";
+      setAuthError(errorMessage);
+      showToast(errorMessage, "error");
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -248,10 +276,35 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             </>
           )}
 
-          <button style={styles.primaryButton} type="submit" disabled={loading}>
+          <button style={styles.primaryButton} type="submit" disabled={loading || googleLoading}>
             {loading ? "Please wait ..." : mode === "login" ? "Log in" : "Sign up"}
           </button>
         </form>
+
+        {mode === "login" && (
+          <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
+            <div style={{ display: "grid", placeItems: "center", color: "#6b7280", fontSize: 12 }}>
+              or
+            </div>
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={googleLoading || loading}
+              style={{
+                ...styles.secondaryButton,
+                width: "100%",
+                justifyContent: "center",
+                padding: "10px 12px",
+                fontWeight: 600,
+              }}
+            >
+              {googleLoading ? "Connecting to Google ..." : "Sign in with Google"}
+            </button>
+            <p style={{ margin: 0, fontSize: 12, color: "#6b7280", textAlign: "center" }}>
+              Google sign-in is available only for students already listed in our records.
+            </p>
+          </div>
+        )}
 
         {authError && <div style={styles.errorBox}>{authError}</div>}
 
