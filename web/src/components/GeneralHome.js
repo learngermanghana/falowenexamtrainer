@@ -9,7 +9,7 @@ import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 
-const WelcomeHero = ({ studentProfile }) => {
+const WelcomeHero = ({ studentProfile, onOpenExamFile }) => {
   const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
   const className = studentProfile?.className || "your class";
 
@@ -30,8 +30,10 @@ const WelcomeHero = ({ studentProfile }) => {
       <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 12 }}>
         Personalised tips, attendance, and assignments for {className}—jump straight into the space you need today.
       </p>
+
       <PrimaryActionBar align="start">
         <PillBadge tone="success">Keep your streak alive</PillBadge>
+
         <button
           type="button"
           style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
@@ -39,6 +41,13 @@ const WelcomeHero = ({ studentProfile }) => {
         >
           Join on Zoom
         </button>
+
+        {/* ✅ Compact: sits beside Zoom */}
+        <ExamReadinessBadge
+          variant="button"
+          studentProfile={studentProfile}
+          onOpenExamFile={onOpenExamFile}
+        />
       </PrimaryActionBar>
     </section>
   );
@@ -68,11 +77,19 @@ const GeneralHome = ({
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
-      <WelcomeHero studentProfile={studentProfile} />
+      <WelcomeHero
+        studentProfile={studentProfile}
+        onOpenExamFile={() => navigate("/campus/examFile")}
+      />
+
+      {/* ❌ Remove the big readiness card from the home page */}
+      {/* 
       <ExamReadinessBadge
         studentProfile={studentProfile}
         onOpenExamFile={() => navigate("/campus/examFile")}
       />
+      */}
+
       <OnboardingChecklist
         notificationStatus={notificationStatus}
         onEnableNotifications={onEnableNotifications}
@@ -81,12 +98,14 @@ const GeneralHome = ({
         studentProfile={studentProfile}
         onSaveOnboarding={onSaveOnboarding}
       />
+
       <NavigationGuide
         onOpenCourse={() => navigate("/campus/course")}
         onSubmitAssignment={() => navigate("/campus/submit")}
         onAskAI={() => navigate("/campus/grammar")}
         onOpenExams={() => navigate("/exams/speaking")}
       />
+
       <section style={styles.card}>
         <SectionHeader
           eyebrow="Welcome back"
