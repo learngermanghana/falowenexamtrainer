@@ -18,6 +18,11 @@ const StudentResultsPage = () => {
     studentProfile?.id ||
     "";
 
+  const TOTAL_ASSIGNMENTS = {
+    A1: 19,
+    A2_B2: 28,
+  };
+
   // Put your published CSV URL here via env:
   // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
   const SHEET_CSV_URL = process.env.REACT_APP_RESULTS_SHEET_CSV_URL || "";
@@ -97,6 +102,25 @@ const StudentResultsPage = () => {
     return { count: results.length, avg };
   }, [results]);
 
+  const assignmentProgress = useMemo(() => {
+    const normalizeAssignment = (value) => String(value || "").trim().toLowerCase();
+    const uniqueAssignments = (levels) => {
+      const set = new Set();
+      results.forEach((entry) => {
+        const level = String(entry.level || "").toUpperCase();
+        if (!levels.includes(level)) return;
+        const assignmentKey = normalizeAssignment(entry.assignment);
+        if (assignmentKey) set.add(assignmentKey);
+      });
+      return set.size;
+    };
+
+    return {
+      a1Completed: uniqueAssignments(["A1"]),
+      a2b2Completed: uniqueAssignments(["A2", "B1", "B2"]),
+    };
+  }, [results]);
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
@@ -113,6 +137,13 @@ const StudentResultsPage = () => {
                 summary.avg !== null ? ` · Avg score: ${summary.avg}` : ""
               }`}
         </p>
+
+        {!loading && !error ? (
+          <p style={{ ...styles.helperText, marginTop: 6 }}>
+            Assignments completed · A1 {assignmentProgress.a1Completed}/{TOTAL_ASSIGNMENTS.A1} · A2-B2{" "}
+            {assignmentProgress.a2b2Completed}/{TOTAL_ASSIGNMENTS.A2_B2}
+          </p>
+        ) : null}
 
         {error ? <div style={styles.errorBox}>{error}</div> : null}
       </section>
