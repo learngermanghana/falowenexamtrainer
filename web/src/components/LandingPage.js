@@ -71,6 +71,29 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     },
   ];
 
+  const signupSteps = [
+    {
+      title: "Go to the sign-up page",
+      description: "Click “Sign up for free” to open the registration form and start your application.",
+    },
+    {
+      title: "Fill in your details",
+      description: "Share your name, contact details, and learning goals so we can match you to the right cohort.",
+    },
+    {
+      title: "Select your class",
+      description: "Choose the class or level you’re interested in to reserve a seat with your preferred schedule.",
+    },
+    {
+      title: "Make your payment",
+      description: "Complete payment on the checkout page to unlock full access to the course and daily practice tools.",
+    },
+    {
+      title: "Get guided next steps",
+      description: "Our team will contact you after payment with onboarding details, class links, and next steps.",
+    },
+  ];
+
   return (
     <div
       style={{
@@ -112,6 +135,66 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               <span style={styles.badge}>Tutor-reviewed exercises</span>
               <span style={styles.badge}>Exam-style simulations</span>
             </div>
+          </div>
+        </section>
+
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 16,
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            alignItems: "start",
+          }}
+        >
+          <div style={{ display: "grid", gap: 8 }}>
+            <h2 style={styles.sectionTitle}>How to sign up and start learning</h2>
+            <p style={{ ...styles.helperText, marginBottom: 0 }}>
+              Head to the sign up page, complete the short form, pick the class you want, and finalize payment. You’ll get
+              immediate access to the course, and our team will follow up with your welcome checklist.
+            </p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button style={styles.primaryButton} onClick={onSignUp}>
+                Start sign up
+              </button>
+              <button style={styles.secondaryButton} onClick={onLogin}>
+                Continue a saved account
+              </button>
+            </div>
+          </div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {signupSteps.map((step, index) => (
+              <div
+                key={step.title}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 12,
+                  padding: 12,
+                  background: "#f9fafb",
+                  display: "grid",
+                  gap: 6,
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div
+                    style={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: 10,
+                      background: "#dbeafe",
+                      color: "#1e40af",
+                      display: "grid",
+                      placeItems: "center",
+                      fontWeight: 800,
+                    }}
+                  >
+                    {index + 1}
+                  </div>
+                  <h4 style={{ margin: 0, fontSize: 15 }}>{step.title}</h4>
+                </div>
+                <p style={{ ...styles.helperText, margin: 0 }}>{step.description}</p>
+              </div>
+            ))}
           </div>
         </section>
 
