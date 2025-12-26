@@ -260,7 +260,10 @@ const scoresSummaryHandler = async (req, res) => {
       "PASTE_YOUR_PUBLISHED_CSV_URL_HERE";
 
     if (!CSV_URL || CSV_URL.includes("PASTE_YOUR")) {
-      return res.status(500).json({ error: "SCORES_SHEET_PUBLISHED_CSV_URL is missing" });
+      return res.status(503).json({
+        error: "Score sheet URL is not configured",
+        missingEnv: "SCORES_SHEET_PUBLISHED_CSV_URL or RESULTS_SHEET_PUBLISHED_CSV_URL",
+      });
     }
 
     const csvRes = await fetch(CSV_URL);

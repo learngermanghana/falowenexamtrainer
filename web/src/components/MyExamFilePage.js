@@ -8,6 +8,7 @@ import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
+import { jsPDF } from "jspdf"; // npm i jspdf
 
 const formatDate = (value) => {
   if (!value) return "";
@@ -15,14 +16,135 @@ const formatDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleDateString();
 };
 
-const downloadTextFile = (filename, content) => {
-  const blob = new Blob([content], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  link.click();
-  URL.revokeObjectURL(url);
+const getRowTime = (row) => {
+  const raw = row?.date || row?.created_at || row?.createdAt || 0;
+  const t = new Date(raw).getTime();
+  return Number.isNaN(t) ? 0 : t;
+};
+
+// More robust than Number(value). Supports "85", "85/100", "Score: 85"
+const parseScoreValue = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+
+  const cleaned = String(value).trim().replace(",", ".");
+  const match = cleaned.match(/(\d+(\.\d+)?)/);
+  if (!match) return null;
+
+  const num = Number(match[1]);
+  return Number.isFinite(num) ? num : null;
+};
+
+// ---------- Simple UI blocks ----------
+const StatCard = ({ icon, label, value, sub }) => (
+  <div
+    style={{
+      border: "1px solid #e5e7eb",
+      borderRadius: 14,
+      padding: 12,
+      background: "#ffffff",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+      display: "grid",
+      gap: 6,
+      minWidth: 0,
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "center", gap: 8, color: "#6B7280", fontSize: 12, fontWeight: 800 }}>
+      <span aria-hidden style={{ fontSize: 14 }}>{icon}</span>
+      {label}
+    </div>
+    <div style={{ fontSize: 16, fontWeight: 900, color: "#111827", overflow: "hidden", textOverflow: "ellipsis" }}>
+      {value}
+    </div>
+    {sub ? <div style={{ fontSize: 12, color: "#6B7280", lineHeight: 1.4 }}>{sub}</div> : null}
+  </div>
+);
+
+const CollapsibleCard = ({ title, subtitle, right, defaultOpen, children }) => (
+  <details
+    open={defaultOpen}
+    style={{
+      ...styles.card,
+      padding: 0,
+      overflow: "hidden",
+    }}
+  >
+    <summary
+      style={{
+        listStyle: "none",
+        cursor: "pointer",
+        padding: 12,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 10,
+        borderBottom: "1px solid #e5e7eb",
+        userSelect: "none",
+      }}
+    >
+      <div style={{ minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span aria-hidden style={{ color: "#6B7280" }}>▾</span>
+          <div style={{ fontWeight: 900, color: "#111827" }}>{title}</div>
+        </div>
+        {subtitle ? <div style={{ marginLeft: 22, fontSize: 12, color: "#6B7280" }}>{subtitle}</div> : null}
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>{right}</div>
+    </summary>
+
+    <div style={{ padding: 12 }}>{children}</div>
+  </details>
+);
+
+// ---------- PDF helpers ----------
+const pdfKeyValueBlock = (doc, startY, pairs) => {
+  let y = startY;
+
+  pairs.forEach(([k, v]) => {
+    doc.setFont("helvetica", "bold");
+    doc.text(`${k}:`, 14, y);
+
+    doc.setFont("helvetica", "normal");
+    const text = String(v ?? "—");
+    const lines = doc.splitTextToSize(text, 130);
+    doc.text(lines, 60, y);
+
+    y += 8 * Math.max(1, lines.length);
+  });
+
+  return y;
+};
+
+const downloadSimplePdf = ({ filename, title, subtitle, pairs, footer }) => {
+  const doc = new jsPDF();
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text(title, 14, 18);
+
+  if (subtitle) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(subtitle, 14, 26);
+  }
+
+  doc.setDrawColor(220);
+  doc.line(14, 30, 196, 30);
+
+  doc.setFontSize(12);
+  const endY = pdfKeyValueBlock(doc, 40, pairs);
+
+  doc.setDrawColor(220);
+  doc.line(14, endY + 4, 196, endY + 4);
+
+  if (footer) {
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    const footerLines = doc.splitTextToSize(String(footer), 180);
+    doc.text(footerLines, 14, endY + 14);
+  }
+
+  doc.save(filename);
 };
 
 const MyExamFilePage = () => {
@@ -92,7 +214,6 @@ const MyExamFilePage = () => {
     }
   }, [className, studentCode]);
 
-  // ✅ sheet-backed summary (scores + schedule logic)
   const loadAssignments = useCallback(async () => {
     if (!studentCode) {
       setAssignmentState({
@@ -148,7 +269,6 @@ const MyExamFilePage = () => {
     }
   }, [idToken, studentCode]);
 
-  // ✅ sheet-backed feedback history (scores + tutor comments)
   const loadFeedback = useCallback(async () => {
     if (!studentCode) {
       setFeedbackState({ loading: false, items: [], error: "Add your student code to see feedback history." });
@@ -164,11 +284,11 @@ const MyExamFilePage = () => {
     try {
       const rows = await fetchStudentResultsHistory({ idToken, studentCode });
 
-      // newest first
       const items = (rows || [])
+        .map((row) => ({ ...row, score: parseScoreValue(row.score) }))
         .slice()
-        .sort((a, b) => new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0))
-        .filter((row) => row.comments || typeof row.score === "number")
+        .sort((a, b) => getRowTime(b) - getRowTime(a))
+        .filter((row) => row.comments || row.score !== null)
         .slice(0, 12);
 
       setFeedbackState({ loading: false, items, error: "" });
@@ -198,54 +318,111 @@ const MyExamFilePage = () => {
     [assignmentState.completed, attendanceState.sessions]
   );
 
+  const lockedAssignments = useMemo(
+    () =>
+      assignmentState.completed
+        .slice()
+        .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
+        .slice(0, 8),
+    [assignmentState.completed]
+  );
+
+  const feedbackItems = useMemo(() => feedbackState.items.slice(0, 6), [feedbackState.items]);
+
+  const lastFeedbackDate = useMemo(() => {
+    const latest = feedbackState.items?.[0];
+    return latest?.date || latest?.created_at || latest?.createdAt || "";
+  }, [feedbackState.items]);
+
+  const nextRecommendationText = useMemo(() => {
+    if (assignmentState.loading) return "Loading…";
+    if (assignmentState.error) return "Unavailable";
+    if (assignmentState.blocked) return "Blocked (fix failed tasks)";
+    if (!assignmentState.nextRecommendation) return "Not set yet";
+    return assignmentState.nextRecommendation.label || assignmentState.nextRecommendation.identifier || "Next task";
+  }, [assignmentState.blocked, assignmentState.error, assignmentState.loading, assignmentState.nextRecommendation]);
+
+  const refreshAll = async () => {
+    await Promise.allSettled([loadAttendance(), loadAssignments(), loadFeedback()]);
+  };
+
   const downloadContract = () => {
-    const summary = [
-      `Student: ${studentProfile?.name || user?.email || "Unknown"}`,
-      `Level: ${detectedLevel || "Not set"}`,
-      `Class: ${className || "Not set"}`,
-      `Payment status: ${studentProfile?.paymentStatus || "pending"}`,
-      `Contract term: ${studentProfile?.contractTermMonths || "n/a"} months`,
-      `Start: ${studentProfile?.contractStart || "n/a"}`,
-      `End: ${studentProfile?.contractEnd || "n/a"}`,
-    ].join("\n");
-    downloadTextFile("contract-summary.txt", summary);
+    const studentName = studentProfile?.name || user?.email || "Unknown";
+    downloadSimplePdf({
+      filename: "contract-summary.pdf",
+      title: "Falowen Learning Hub",
+      subtitle: "Contract Summary (Unofficial)",
+      pairs: [
+        ["Student", studentName],
+        ["Student code", studentCode || "—"],
+        ["Level", detectedLevel || "Not set"],
+        ["Class", className || "Not set"],
+        ["Payment status", studentProfile?.paymentStatus || "pending"],
+        ["Contract term", `${studentProfile?.contractTermMonths || "n/a"} months`],
+        ["Start", studentProfile?.contractStart || "n/a"],
+        ["End", studentProfile?.contractEnd || "n/a"],
+      ],
+      footer: "This is a generated summary for quick reference. Contact support for an official contract copy.",
+    });
   };
 
   const downloadReceipt = () => {
-    const now = new Date().toISOString();
-    const receipt = [
-      "Falowen Learning Hub – Receipt",
-      `Generated: ${now}`,
-      `Student code: ${studentCode || "n/a"}`,
-      `Email: ${user?.email || "n/a"}`,
-      `Payment status: ${studentProfile?.paymentStatus || "pending"}`,
-      "This placeholder receipt records your current status. Contact support for official invoices.",
-    ].join("\n");
-    downloadTextFile("receipt-log.txt", receipt);
+    const generated = new Date().toLocaleString();
+    downloadSimplePdf({
+      filename: "receipt-log.pdf",
+      title: "Falowen Learning Hub",
+      subtitle: "Receipt Log (Unofficial)",
+      pairs: [
+        ["Generated", generated],
+        ["Student", studentProfile?.name || "—"],
+        ["Student code", studentCode || "—"],
+        ["Email", user?.email || "—"],
+        ["Level", detectedLevel || "—"],
+        ["Class", className || "—"],
+        ["Payment status", studentProfile?.paymentStatus || "pending"],
+      ],
+      footer: "This is a placeholder receipt log. Contact support for official invoices/receipts.",
+    });
   };
-
-  const lockedAssignments = assignmentState.completed
-    .slice()
-    .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
-    .slice(0, 8);
-
-  const feedbackItems = feedbackState.items.slice(0, 6);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <section style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+      {/* Report header + summary row */}
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
           <div>
             <p style={{ ...styles.helperText, margin: 0 }}>Exam dossier</p>
             <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>My Exam File</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Level + class confirmation, attendance, score sheet progress, tutor feedback, and quick downloads in one place.
+              A quick report of your level, readiness, attendance, scores, and tutor feedback.
             </p>
           </div>
-          <div style={{ display: "grid", gap: 6 }}>
+
+          <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
             <span style={styles.badge}>Student code: {studentCode || "not set"}</span>
             {className ? <span style={styles.badge}>Class: {className}</span> : null}
+            <button type="button" style={styles.secondaryButton} onClick={refreshAll}>
+              Refresh all
+            </button>
           </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
+          <StatCard icon="🎓" label="Level" value={detectedLevel || "Not set"} sub={className ? `Class: ${className}` : "Add your class name"} />
+          <StatCard icon={readiness.icon || "📌"} label="Readiness" value={readiness.text} sub={readiness.detail} />
+          <StatCard icon="🧾" label="Attendance" value={`${attendanceState.sessions} sessions`} sub={`${attendanceState.hours} hours`} />
+          <StatCard
+            icon="🗓️"
+            label="Last feedback"
+            value={lastFeedbackDate ? formatDate(lastFeedbackDate) : feedbackState.loading ? "Loading…" : "No feedback yet"}
+            sub="Latest marked task date"
+          />
+          <StatCard
+            icon={assignmentState.blocked ? "⛔" : "➡️"}
+            label="Next recommendation"
+            value={nextRecommendationText}
+            sub={assignmentState.blocked ? "Pass failed identifiers to unlock" : "Based on your score sheet"}
+          />
         </div>
 
         <div
@@ -255,10 +432,10 @@ const MyExamFilePage = () => {
             background: readiness.tone,
             border: "1px solid #e5e7eb",
             display: "grid",
-            gap: 4,
+            gap: 6,
           }}
         >
-          <div style={{ fontWeight: 800, display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ fontWeight: 900, display: "flex", alignItems: "center", gap: 8 }}>
             <span aria-hidden>{readiness.icon}</span>
             Exam readiness: {readiness.text}
           </div>
@@ -266,44 +443,36 @@ const MyExamFilePage = () => {
         </div>
       </section>
 
-      <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div>
-            <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Attendance summary</h3>
-            <p style={{ ...styles.helperText, margin: 0 }}>Sessions and hours credited to your class.</p>
-          </div>
-          <button type="button" style={styles.secondaryButton} onClick={loadAttendance} disabled={attendanceState.loading}>
-            Refresh
+      {/* Collapsible: Attendance */}
+      <CollapsibleCard
+        title="Attendance summary"
+        subtitle="Sessions and hours credited to your class."
+        defaultOpen
+        right={
+          <button
+            type="button"
+            style={styles.secondaryButton}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              loadAttendance();
+            }}
+            disabled={attendanceState.loading}
+          >
+            {attendanceState.loading ? "Refreshing..." : "Refresh"}
           </button>
-        </div>
+        }
+      >
+        {attendanceState.error ? <div style={styles.errorBox}>{attendanceState.error}</div> : null}
+      </CollapsibleCard>
 
-        <div style={{ display: "grid", gap: 8 }}>
-          <div style={{ display: "grid", gap: 6, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-            <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>Sessions credited</div>
-              <div style={{ fontSize: 20, fontWeight: 800 }}>{attendanceState.sessions}</div>
-            </div>
-            <div style={{ ...styles.uploadCard, background: "#f8fafc" }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>Hours credited</div>
-              <div style={{ fontSize: 20, fontWeight: 800 }}>{attendanceState.hours}</div>
-            </div>
-          </div>
-          {attendanceState.error ? <div style={styles.errorBox}>{attendanceState.error}</div> : null}
-          {attendanceState.loading ? <div style={styles.helperText}>Loading attendance ...</div> : null}
-        </div>
-      </section>
-
-      <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div>
-            <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Submitted assignments (locked)</h3>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              This list comes from the published score sheet (best passed identifiers).
-            </p>
-          </div>
-          <div style={styles.lockPill}>🔒 View only</div>
-        </div>
-
+      {/* Collapsible: Assignments */}
+      <CollapsibleCard
+        title="Submitted assignments (locked)"
+        subtitle="Passed identifiers from the published score sheet."
+        defaultOpen={false}
+        right={<div style={styles.lockPill}>🔒 View only</div>}
+      >
         {assignmentState.error ? <div style={styles.errorBox}>{assignmentState.error}</div> : null}
         {assignmentState.loading ? <div style={styles.helperText}>Loading score summary ...</div> : null}
 
@@ -317,106 +486,153 @@ const MyExamFilePage = () => {
           <div style={styles.helperText}>No passed identifiers detected yet.</div>
         ) : null}
 
-        <div style={{ display: "grid", gap: 8 }}>
-          {lockedAssignments.map((entry, index) => (
-            <div
-              key={`${entry.identifier || index}-locked`}
-              style={{ ...styles.uploadCard, display: "grid", gap: 4, background: "#f9fafb" }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <div style={{ fontWeight: 700 }}>{entry.label || `Identifier ${entry.identifier}`}</div>
-                <span style={styles.lockPill}>🔒 Locked</span>
+        <div style={{ display: "grid", gap: 10 }}>
+          {lockedAssignments.map((entry, index) => {
+            const scoreValue = parseScoreValue(entry.score);
+            return (
+              <div
+                key={`${entry.identifier || index}-locked`}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 14,
+                  padding: 12,
+                  background: "#ffffff",
+                  display: "grid",
+                  gap: 6,
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                  <div style={{ fontWeight: 850, color: "#111827" }}>{entry.label || `Identifier ${entry.identifier}`}</div>
+                  <span style={styles.lockPill}>🔒 Locked</span>
+                </div>
+                <div style={{ fontSize: 13, color: "#6B7280" }}>
+                  Identifier: <b style={{ color: "#111827" }}>{entry.identifier || "—"}</b> · Score:{" "}
+                  <b style={{ color: "#111827" }}>{scoreValue !== null ? `${scoreValue}/100` : "Pending"}</b> · Date:{" "}
+                  <b style={{ color: "#111827" }}>{formatDate(entry.date) || "—"}</b>
+                </div>
               </div>
-              <p style={{ ...styles.helperText, margin: 0 }}>
-                Identifier: <b>{entry.identifier || "—"}</b> · Score:{" "}
-                {typeof entry.score === "number" ? `${entry.score}/100` : "Pending"} · Date: {formatDate(entry.date) || "—"}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
-      </section>
+      </CollapsibleCard>
 
-      <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-          <div>
-            <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Teacher feedback history</h3>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Scores + tutor comments are loaded from the published Google Sheet.
-            </p>
-          </div>
-          <button type="button" style={styles.secondaryButton} onClick={loadFeedback} disabled={feedbackState.loading}>
-            Reload feedback
+      {/* Collapsible: Feedback */}
+      <CollapsibleCard
+        title="Teacher feedback history"
+        subtitle="Scores + tutor comments loaded from the published Google Sheet."
+        defaultOpen={false}
+        right={
+          <button
+            type="button"
+            style={styles.secondaryButton}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              loadFeedback();
+            }}
+            disabled={feedbackState.loading}
+          >
+            {feedbackState.loading ? "Reloading..." : "Reload"}
           </button>
-        </div>
-
+        }
+      >
         {feedbackState.error ? <div style={styles.errorBox}>{feedbackState.error}</div> : null}
         {feedbackState.loading ? <div style={styles.helperText}>Loading feedback ...</div> : null}
         {!feedbackState.loading && !feedbackState.error && feedbackItems.length === 0 ? (
           <div style={styles.helperText}>No feedback recorded yet.</div>
         ) : null}
 
-        <div style={{ display: "grid", gap: 8 }}>
-          {feedbackItems.map((entry, index) => (
-            <div
-              key={`${entry.assignment || "assignment"}-${index}`}
-              style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f8fafc" }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <div>
-                  <div style={{ fontWeight: 800 }}>{entry.assignment}</div>
-                  <p style={{ ...styles.helperText, margin: 0 }}>Date: {formatDate(entry.date) || "Not set"}</p>
-                </div>
+        <div style={{ display: "grid", gap: 10 }}>
+          {feedbackItems.map((entry, index) => {
+            const scoreValue = parseScoreValue(entry.score);
+            const hasScore = scoreValue !== null;
 
-                {typeof entry.score === "number" ? (
-                  <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe" }}>
-                    Score: {entry.score}/100
+            return (
+              <div
+                key={`${entry.assignment || "assignment"}-${index}`}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 14,
+                  padding: 12,
+                  background: "#ffffff",
+                  display: "grid",
+                  gap: 8,
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 }}>
+                  <div>
+                    <div style={{ fontWeight: 900, fontSize: 15, color: "#111827" }}>
+                      {entry.assignment || "Marked task"}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#6B7280" }}>📅 {formatDate(entry.date) || "Not set"}</div>
+                  </div>
+
+                  <span
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 999,
+                      border: "1px solid #e5e7eb",
+                      background: hasScore ? "#EEF2FF" : "#F9FAFB",
+                      fontSize: 12,
+                      fontWeight: 900,
+                      color: "#111827",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {hasScore ? `Score: ${scoreValue}/100` : "Not scored"}
                   </span>
-                ) : (
-                  <span style={styles.badge}>Not scored</span>
-                )}
-              </div>
-
-              <p style={{ ...styles.resultText, margin: "6px 0 0" }}>{entry.comments || "No comments supplied."}</p>
-
-              {entry.link ? (
-                <div style={{ marginTop: 8 }}>
-                  <a href={entry.link} target="_blank" rel="noreferrer">
-                    Open marked file
-                  </a>
                 </div>
-              ) : null}
-            </div>
-          ))}
+
+                <div style={{ fontSize: 14, lineHeight: 1.55, color: "#111827" }}>
+                  {entry.comments ? entry.comments : hasScore ? "No tutor comments for this task." : "No comments supplied."}
+                </div>
+
+                {entry.link ? (
+                  <a href={entry.link} target="_blank" rel="noreferrer" style={{ fontWeight: 800 }}>
+                    Open marked file →
+                  </a>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
-      </section>
+      </CollapsibleCard>
 
-      <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <h3 style={{ ...styles.sectionTitle, margin: "0 0 4px 0" }}>Downloadables</h3>
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          Calendar, contract snapshot, and receipt log in case you need to share proof quickly.
-        </p>
+      {/* Collapsible: Downloadables */}
+      <CollapsibleCard
+        title="Downloadables"
+        subtitle="Calendar + PDF downloads for contract and receipt."
+        defaultOpen={false}
+        right={null}
+      >
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            <button
+              type="button"
+              style={styles.buttonSecondary}
+              onClick={() => downloadClassCalendar(className)}
+              disabled={!className}
+              title={!className ? "Add your class name to download calendar" : ""}
+            >
+              📅 Download class calendar (.ics)
+            </button>
 
-        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
-          <button
-            type="button"
-            style={styles.buttonSecondary}
-            onClick={() => downloadClassCalendar(className)}
-            disabled={!className}
-          >
-            Download class calendar (.ics)
-          </button>
-          <button type="button" style={styles.buttonSecondary} onClick={downloadContract}>
-            Download contract summary
-          </button>
-          <button type="button" style={styles.buttonSecondary} onClick={downloadReceipt}>
-            Download receipt log
-          </button>
+            <button type="button" style={styles.buttonSecondary} onClick={downloadContract}>
+              📄 Download contract summary (PDF)
+            </button>
+
+            <button type="button" style={styles.buttonSecondary} onClick={downloadReceipt}>
+              🧾 Download receipt log (PDF)
+            </button>
+          </div>
+
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Calendar downloads need your class name. Contract and receipt PDFs use the profile details shown above.
+          </p>
         </div>
-
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          Calendar downloads need your class name. Receipt and contract summaries use the profile details shown above.
-        </p>
-      </section>
+      </CollapsibleCard>
     </div>
   );
 };

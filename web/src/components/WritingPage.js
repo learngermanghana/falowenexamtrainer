@@ -8,10 +8,10 @@ import { writingLetters as courseWritingLetters } from "../data/writingLetters";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
 
 const DEFAULT_EXAM_TIMINGS = {
-  A1: 20,
-  A2: 25,
-  B1: 30,
-  B2: 35,
+  A1: 15,
+  A2: 20,
+  B1: 20,
+  B2: 20,
   C1: 40,
 };
 
@@ -426,6 +426,33 @@ const WritingPage = ({ mode = "course" }) => {
       {activeTab === "practice" && (
         <>
           <section style={styles.card}>
+            <h3 style={styles.sectionTitle}>Your simulation room</h3>
+            {practiceTimerControls}
+            {selectedLetter && (
+              <>
+                <div style={styles.badge}>Topic: {selectedLetter.letter}</div>
+                <p style={styles.helperText}>{selectedLetter.situation}</p>
+                <h4 style={styles.resultHeading}>Checklist</h4>
+                <ul style={styles.checklist}>
+                  {(selectedLetter.whatToInclude || []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </>
+            )}
+            <div style={{ marginTop: 12 }}>
+              <label style={styles.label}>Your draft</label>
+              <textarea
+                style={styles.textArea}
+                placeholder="Write your letter here while the timer is running..."
+                value={practiceDraft}
+                onChange={(e) => setPracticeDraft(e.target.value)}
+                rows={7}
+              />
+            </div>
+          </section>
+
+          <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Letters from the practice set</h3>
             {writingTasksError && (
               <p style={{ ...styles.helperText, color: "#b91c1c" }}>
@@ -479,33 +506,6 @@ const WritingPage = ({ mode = "course" }) => {
                 ))}
               </div>
             )}
-          </section>
-
-          <section style={styles.card}>
-            <h3 style={styles.sectionTitle}>Your simulation room</h3>
-            {practiceTimerControls}
-            {selectedLetter && (
-              <>
-                <div style={styles.badge}>Topic: {selectedLetter.letter}</div>
-                <p style={styles.helperText}>{selectedLetter.situation}</p>
-                <h4 style={styles.resultHeading}>Checklist</h4>
-                <ul style={styles.checklist}>
-                  {(selectedLetter.whatToInclude || []).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </>
-            )}
-            <div style={{ marginTop: 12 }}>
-              <label style={styles.label}>Your draft</label>
-              <textarea
-                style={styles.textArea}
-                placeholder="Write your letter here while the timer is running..."
-                value={practiceDraft}
-                onChange={(e) => setPracticeDraft(e.target.value)}
-                rows={7}
-              />
-            </div>
           </section>
         </>
       )}

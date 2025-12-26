@@ -4,8 +4,8 @@ import { useAuth } from "../context/AuthContext";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { computeExamReadiness } from "../lib/examReadiness";
-import { isFirebaseConfigured } from "../firebase";
 import { styles } from "../styles";
+import { isFirebaseConfigured } from "../firebase";
 
 const ExamReadinessBadge = ({ studentProfile, onOpenExamFile }) => {
   const navigate = useNavigate();
@@ -87,37 +87,32 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile }) => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 10,
-        flexWrap: "wrap",
-        background: "#f8fafc",
-        border: "1px solid #e5e7eb",
-        padding: "8px 12px",
-        borderRadius: 12,
-      }}
-    >
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 700 }}>
-        <span aria-hidden>{readiness.icon}</span>
-        <span>Exam readiness: {readiness.text}</span>
-      </span>
-      <span style={{ ...styles.helperText, margin: 0 }}>
-        {state.error || readiness.detail}{" "}
-        <button
-          type="button"
-          style={{ ...styles.linkButton, padding: 0, marginLeft: 8 }}
-          onClick={loadReadiness}
-          disabled={state.loading}
-        >
-          {state.loading ? "Checking..." : "Refresh"}
-        </button>
-      </span>
-      <button type="button" style={styles.secondaryButton} onClick={handleOpenExamFile}>
-        Open My Exam File
-      </button>
-    </div>
+    <section style={{ ...styles.card, display: "grid", gap: 10, background: readiness.tone }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+        <div>
+          <p style={{ ...styles.helperText, margin: 0 }}>Exam readiness</p>
+          <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>
+            {readiness.icon} {readiness.text}
+          </h3>
+          <p style={{ ...styles.helperText, margin: 0 }}>{readiness.detail}</p>
+        </div>
+        <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+          <button type="button" style={styles.secondaryButton} onClick={loadReadiness} disabled={state.loading}>
+            {state.loading ? "Checking..." : "Refresh"}
+          </button>
+          <button type="button" style={styles.primaryButton} onClick={handleOpenExamFile}>
+            Open My Exam File
+          </button>
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+        <span style={styles.badge}>Attendance: {state.attendanceSessions} sessions</span>
+        <span style={styles.badge}>Marked identifiers: {state.completedAssignments.length}</span>
+        {state.error ? (
+          <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span>
+        ) : null}
+      </div>
+    </section>
   );
 };
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
+import { EmptyState, InfoBox, PillBadge, SectionHeader, SkeletonRow } from "./ui";
 
 const PASS_MARK = 60;
 
@@ -217,8 +218,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
   if (sheetCsvUrl && sheetLoading) {
     return (
       <section style={{ ...styles.card, marginTop: 16 }}>
-        <h2 style={styles.sectionTitle}>Past feedback</h2>
-        <p style={styles.helperText}>Loading your feedback history…</p>
+        <SectionHeader title="Past feedback" subtitle="Loading your feedback history…" />
+        <SkeletonRow widths={["60%", "85%", "70%"]} />
       </section>
     );
   }
@@ -226,10 +227,10 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
   if (sheetCsvUrl && sheetError) {
     return (
       <section style={{ ...styles.card, marginTop: 16 }}>
-        <h2 style={styles.sectionTitle}>Past feedback</h2>
-        <div style={styles.errorBox}>
-          <strong>Could not load sheet:</strong> {sheetError}
-        </div>
+        <SectionHeader title="Past feedback" />
+        <InfoBox tone="error" title="Could not load sheet">
+          {sheetError}
+        </InfoBox>
       </section>
     );
   }
@@ -238,8 +239,10 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
   return (
     <section style={{ ...styles.card, marginTop: 16 }}>
-      <h2 style={styles.sectionTitle}>Past feedback</h2>
-      <p style={styles.helperText}>Review your previous feedback to track your progress.</p>
+      <SectionHeader
+        title="Past feedback"
+        subtitle="Review your previous feedback to track your progress."
+      />
 
       {/* Filters */}
       <div
@@ -302,9 +305,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
             <button type="button" style={styles.secondaryButton} onClick={resetFilters}>
               Reset
             </button>
-            <span style={{ ...styles.badge, background: "#f8fafc", borderColor: "#cbd5e1", color: "#0f172a" }}>
-              Showing {filtered.length}/{normalized.length}
-            </span>
+            <PillBadge tone="info">Showing {filtered.length}/{normalized.length}</PillBadge>
           </div>
         </div>
       </div>
@@ -321,10 +322,10 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
               : "neutral";
           const statusStyles =
             statusVariant === "pass"
-              ? { background: "#ecfdf3", borderColor: "#bbf7d0", color: "#166534" }
+              ? { tone: "success", label: "Passed" }
               : statusVariant === "fail"
-              ? { background: "#fef2f2", borderColor: "#fecdd3", color: "#b91c1c" }
-              : { background: "#e0f2fe", borderColor: "#bae6fd", color: "#0ea5e9" };
+              ? { tone: "error", label: `Failed (pass mark ${PASS_MARK})` }
+              : { tone: "info", label: "Score" };
 
           const attemptLabel =
             item.totalAttempts > 1
@@ -358,13 +359,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
                 {scoreDisplay !== undefined && scoreDisplay !== null ? (
                   <div style={{ textAlign: "right", display: "grid", gap: 4, justifyItems: "end" }}>
-                    <div style={{ ...styles.badge, ...statusStyles, borderColor: statusStyles.borderColor }}>
-                      {statusVariant === "fail"
-                        ? `Failed (pass mark ${PASS_MARK})`
-                        : statusVariant === "pass"
-                        ? "Passed"
-                        : "Score"}
-                    </div>
+                    <PillBadge tone={statusStyles.tone}>{statusStyles.label}</PillBadge>
                     <div style={{ fontWeight: 800, fontSize: 18 }}>{scoreDisplay}</div>
                     <div style={{ ...styles.helperText, textAlign: "right" }}>{attemptLabel}</div>
                     {bestScoreText ? (
@@ -407,9 +402,15 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         })}
 
         {!filtered.length ? (
-          <div style={{ ...styles.card, marginBottom: 0 }}>
-            <p style={{ margin: 0 }}>No results match your filters. Try resetting or changing the search.</p>
-          </div>
+          <EmptyState
+            title="No results match your filters"
+            description="Try resetting or adjusting the search to see your past feedback."
+            action={
+              <button type="button" style={styles.secondaryButton} onClick={resetFilters}>
+                Reset filters
+              </button>
+            }
+          />
         ) : null}
       </div>
     </section>
