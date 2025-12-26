@@ -3,6 +3,7 @@ import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
+import { PillBadge, PrimaryActionBar, SectionHeader, StatCard } from "./ui";
 
 const labelOf = (entry) => {
   if (!entry) return "";
@@ -128,65 +129,58 @@ const HomeMetrics = ({ studentProfile }) => {
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-        <div>
-          <p style={{ ...styles.helperText, margin: 0 }}>Your personalised metrics</p>
-          <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Attendance and assignments snapshot</h3>
-        </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          {loading ? <span style={styles.badge}>Refreshing…</span> : null}
-          {refreshError ? (
-            <span style={{ ...styles.badge, background: "#fff7ed", borderColor: "#fdba74", color: "#9a3412" }}>
-              {refreshError}
-            </span>
-          ) : null}
-          <button
-            type="button"
-            onClick={refreshMetrics}
-            disabled={loading}
-            style={{ ...styles.secondaryButton, padding: "8px 12px" }}
-          >
-            Refresh now
-          </button>
-        </div>
-      </div>
+      <SectionHeader
+        eyebrow="Your personalised metrics"
+        title="Attendance and assignments snapshot"
+        actions={
+          <PrimaryActionBar align="flex-end" wrap>
+            {loading ? <PillBadge tone="info">Refreshing…</PillBadge> : null}
+            {refreshError ? <PillBadge tone="warning">{refreshError}</PillBadge> : null}
+            <button
+              type="button"
+              onClick={refreshMetrics}
+              disabled={loading}
+              style={{ ...styles.secondaryButton, padding: "8px 12px" }}
+            >
+              Refresh now
+            </button>
+          </PrimaryActionBar>
+        }
+      />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-        <div style={{ ...styles.vocabCard, background: "#ecfeff", borderColor: "#67e8f9" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Attendance</p>
-          <h4 style={{ margin: "4px 0" }}>{attendance.sessions} sessions credited</h4>
-          <p style={{ ...styles.helperText, margin: 0 }}>{attendance.hours} total hours</p>
-        </div>
-
-        <div style={{ ...styles.vocabCard, background: "#fef9c3", borderColor: "#fcd34d" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Next recommendation</p>
-          <h4 style={{ margin: "4px 0" }}>{recommendedNext}</h4>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {blocked
+        <StatCard
+          label="Attendance"
+          value={`${attendance.sessions} sessions credited`}
+          helper={`${attendance.hours} total hours`}
+          tone="info"
+        />
+        <StatCard
+          label="Next recommendation"
+          value={recommendedNext}
+          helper={
+            blocked
               ? failedIdentifiersText
                 ? `Blocked until you pass: ${failedIdentifiersText}`
                 : "Blocked until failed work is passed."
               : nextObj?.goal
               ? `Goal: ${nextObj.goal}`
-              : "Based on your score sheet submissions and schedule targets."}
-          </p>
-        </div>
-
-        <div style={{ ...styles.vocabCard, background: "#eef2ff", borderColor: "#c7d2fe" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Missed or skipped</p>
-          <h4 style={{ margin: "4px 0" }}>{formatList(missedAssignments)}</h4>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Missed = incomplete items up to your last fully completed day.
-          </p>
-        </div>
-
-        <div style={{ ...styles.vocabCard, background: "#ffe4e6", borderColor: "#fda4af" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Below pass mark (60)</p>
-          <h4 style={{ margin: "4px 0" }}>{formatList(failedAssignments)}</h4>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Retake these to unlock next recommendations.
-          </p>
-        </div>
+              : "Based on your score sheet submissions and schedule targets."
+          }
+          tone="warning"
+        />
+        <StatCard
+          label="Missed or skipped"
+          value={formatList(missedAssignments)}
+          helper="Missed = incomplete items up to your last fully completed day."
+          tone="neutral"
+        />
+        <StatCard
+          label="Below pass mark (60)"
+          value={formatList(failedAssignments)}
+          helper="Retake these to unlock next recommendations."
+          tone="error"
+        />
       </div>
 
       {assignmentStats ? (
