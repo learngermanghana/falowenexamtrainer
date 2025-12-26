@@ -327,6 +327,72 @@ app.get("/metrics", (_req, res) => {
   });
 });
 
+app.post("/admin/purge-expired-students", async (req, res) => {
+  try {
+    const secret = req.headers["x-cron-secret"];
+    if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(500).json({ error: "Firestore not available" });
+
+    const nowIso = new Date().toISOString();
+
+    let deletedStudents = 0;
+    let authDeleted = 0;
+    let authMissing = 0;
+
+    while (true) {
+      const snap = await db
+        .collection("students")
+        .where("role", "==", "student")
+        .where("contractEnd", ">", "")
+        .where("contractEnd", "<", nowIso)
+        .limit(25)
+        .get();
+
+      if (snap.empty) break;
+
+      for (const docSnap of snap.docs) {
+        const data = docSnap.data() || {};
+        const uid = data.uid;
+
+        if (uid) {
+          try {
+            await admin.auth().deleteUser(uid);
+            authDeleted += 1;
+          } catch (err) {
+            if (err?.code === "auth/user-not-found") authMissing += 1;
+            else console.warn("Auth delete failed", docSnap.id, err?.message || err);
+          }
+        }
+
+        try {
+          if (typeof db.recursiveDelete === "function") {
+            await db.recursiveDelete(docSnap.ref);
+          } else {
+            await docSnap.ref.delete();
+          }
+          deletedStudents += 1;
+        } catch (err) {
+          console.warn("Firestore delete failed", docSnap.id, err?.message || err);
+        }
+      }
+    }
+
+    return res.json({
+      ok: true,
+      deletedStudents,
+      authDeleted,
+      authMissing,
+      nowIso,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err?.message || "Unknown error" });
+  }
+});
+
 app.get("/scores/summary", scoresSummaryHandler);
 
 const writeTempFile = async (file) => {
