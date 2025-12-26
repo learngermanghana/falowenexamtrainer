@@ -16,6 +16,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     error: "",
     attendanceSessions: 0,
     completedAssignments: [],
+    totalAssignments: null,
   });
 
   const className = studentProfile?.className || "";
@@ -33,6 +34,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         error: "Add your class and student code to unlock readiness tracking.",
         attendanceSessions: 0,
         completedAssignments: [],
+        totalAssignments: null,
       });
       return;
     }
@@ -43,6 +45,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         error: "Connect Firebase to load exam readiness.",
         attendanceSessions: 0,
         completedAssignments: [],
+        totalAssignments: null,
       });
       return;
     }
@@ -56,12 +59,14 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
       ]);
 
       const completedAssignments = score?.student?.completedAssignments || [];
+      const totalAssignments = score?.student?.totalAssignments ?? null;
 
       setState({
         loading: false,
         error: "",
         attendanceSessions: attendance?.sessions || 0,
         completedAssignments,
+        totalAssignments,
       });
     } catch (e) {
       setState({
@@ -69,6 +74,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         error: "Could not load readiness right now.",
         attendanceSessions: 0,
         completedAssignments: [],
+        totalAssignments: null,
       });
     }
   }, [className, idToken, studentCode]);
@@ -82,13 +88,17 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
       computeExamReadiness({
         attendanceSessions: state.attendanceSessions,
         completedAssignments: state.completedAssignments,
+        totalAssignments: state.totalAssignments,
       }),
-    [state.attendanceSessions, state.completedAssignments]
+    [state.attendanceSessions, state.completedAssignments, state.totalAssignments]
   );
 
   // ✅ Compact button (for hero row)
   if (variant === "button") {
-    const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${state.completedAssignments.length}`;
+    const assignmentsLabel = state.totalAssignments
+      ? `${state.completedAssignments.length}/${state.totalAssignments}`
+      : `${state.completedAssignments.length}`;
+    const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${assignmentsLabel}`;
 
     return (
       <button
@@ -134,7 +144,10 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <span style={styles.badge}>Attendance: {state.attendanceSessions} sessions</span>
-        <span style={styles.badge}>Marked identifiers: {state.completedAssignments.length}</span>
+        <span style={styles.badge}>
+          Marked identifiers: {state.completedAssignments.length}
+          {state.totalAssignments ? `/${state.totalAssignments}` : ""}
+        </span>
         {state.error ? <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span> : null}
       </div>
     </section>
