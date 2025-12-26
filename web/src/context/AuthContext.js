@@ -5,6 +5,7 @@ import {
   onIdTokenChanged,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   requestMessagingToken,
   db,
@@ -23,6 +24,7 @@ import {
   getActionCodeSettings,
   reload,
   limit,
+  GoogleAuthProvider,
 } from "../firebase";
 
 const AuthContext = createContext();
@@ -343,6 +345,54 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = useCallback(async () => {
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
+    }
+    setAuthError("");
+
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+
+    const credential = await signInWithPopup(auth, provider);
+    const email = credential.user?.email?.toLowerCase();
+
+    if (!email) {
+      await signOut(auth);
+      throw new Error("Google sign-in did not return an email address. Please try another account.");
+    }
+
+    const existingProfile = await fetchStudentProfileByEmail(email);
+    if (!existingProfile) {
+      await signOut(auth);
+      throw new Error("Only existing students in our records can use Google sign-in. Please contact support.");
+    }
+
+    if (existingProfile.role && `${existingProfile.role}`.toLowerCase() !== "student") {
+      await signOut(auth);
+      throw new Error("Google sign-in is limited to student accounts. Please contact support for access.");
+    }
+
+    const studentRef = doc(db, "students", existingProfile.id);
+    await setDoc(
+      studentRef,
+      {
+        uid: credential.user.uid,
+        email,
+        role: existingProfile.role || "student",
+        updated_at: serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    const token = await credential.user.getIdToken();
+    setIdToken(token);
+    const mergedProfile = { ...existingProfile, uid: credential.user.uid, email };
+    setStudentProfile(mergedProfile);
+    setMessagingToken(mergedProfile?.messagingToken || null);
+    return { credential, profile: mergedProfile };
+  }, []);
+
   const refreshUser = async () => {
     if (!auth?.currentUser) return null;
     await reload(auth.currentUser);
@@ -485,6 +535,7 @@ export const AuthProvider = ({ children }) => {
       setAuthError,
       signup,
       login,
+      loginWithGoogle,
       resetPassword,
       logout,
       enableNotifications,
@@ -500,6 +551,7 @@ export const AuthProvider = ({ children }) => {
       loading,
       authError,
       resetPassword,
+      loginWithGoogle,
       messagingToken,
       notificationStatus,
       saveStudentProfile,

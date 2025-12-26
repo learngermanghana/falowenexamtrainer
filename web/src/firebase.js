@@ -6,8 +6,10 @@ import {
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   reload,
+  GoogleAuthProvider,
 } from "firebase/auth";
 import {
   getFirestore,
@@ -252,8 +254,10 @@ export {
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   reload,
+  GoogleAuthProvider,
   requestMessagingToken,
   listenForForegroundMessages,
   getActionCodeSettings,
