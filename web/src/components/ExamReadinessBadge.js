@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
-import { computeExamReadiness } from "../lib/examReadiness";
-import { styles } from "../styles";
 import { isFirebaseConfigured } from "../firebase";
+import { computeExamReadiness } from "../lib/examReadiness";
 
-const ExamReadinessBadge = ({ studentProfile, onOpenExamFile }) => {
+const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }) => {
   const navigate = useNavigate();
   const { idToken } = useAuth();
+
   const [state, setState] = useState({
     loading: false,
     error: "",
@@ -19,6 +20,11 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile }) => {
 
   const className = studentProfile?.className || "";
   const studentCode = studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
+
+  const handleOpenExamFile = () => {
+    if (typeof onOpenExamFile === "function") return onOpenExamFile();
+    navigate("/campus/examFile");
+  };
 
   const loadReadiness = useCallback(async () => {
     if (!className || !studentCode) {
@@ -42,20 +48,22 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile }) => {
     }
 
     setState((prev) => ({ ...prev, loading: true, error: "" }));
+
     try {
-      const [attendanceResponse, scoreResponse] = await Promise.all([
+      const [attendance, score] = await Promise.all([
         fetchAttendanceSummary({ className, studentCode }),
         idToken ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
-      const completedAssignments = scoreResponse?.student?.completedAssignments || [];
+      const completedAssignments = score?.student?.completedAssignments || [];
+
       setState({
         loading: false,
         error: "",
-        attendanceSessions: attendanceResponse?.sessions || 0,
+        attendanceSessions: attendance?.sessions || 0,
         completedAssignments,
       });
-    } catch (error) {
+    } catch (e) {
       setState({
         loading: false,
         error: "Could not load readiness right now.",
@@ -78,17 +86,33 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile }) => {
     [state.attendanceSessions, state.completedAssignments]
   );
 
-  const handleOpenExamFile = () => {
-    if (onOpenExamFile) {
-      onOpenExamFile();
-      return;
-    }
-    navigate("/campus/examFile");
-  };
+  // ✅ Compact button (for hero row)
+  if (variant === "button") {
+    const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${state.completedAssignments.length}`;
 
+    return (
+      <button
+        type="button"
+        title={title}
+        onClick={handleOpenExamFile}
+        disabled={state.loading}
+        style={{
+          ...styles.primaryButton,
+          background: "#f8fafc",
+          color: "#111827",
+          borderColor: "#e5e7eb",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {state.loading ? "Checking..." : `${readiness.icon} My Exam File`}
+      </button>
+    );
+  }
+
+  // ✅ Original card mode (keep for other screens if needed)
   return (
     <section style={{ ...styles.card, display: "grid", gap: 10, background: readiness.tone }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
         <div>
           <p style={{ ...styles.helperText, margin: 0 }}>Exam readiness</p>
           <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>
@@ -96,21 +120,22 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile }) => {
           </h3>
           <p style={{ ...styles.helperText, margin: 0 }}>{readiness.detail}</p>
         </div>
+
         <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
           <button type="button" style={styles.secondaryButton} onClick={loadReadiness} disabled={state.loading}>
             {state.loading ? "Checking..." : "Refresh"}
           </button>
+
           <button type="button" style={styles.primaryButton} onClick={handleOpenExamFile}>
             Open My Exam File
           </button>
         </div>
       </div>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <span style={styles.badge}>Attendance: {state.attendanceSessions} sessions</span>
         <span style={styles.badge}>Marked identifiers: {state.completedAssignments.length}</span>
-        {state.error ? (
-          <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span>
-        ) : null}
+        {state.error ? <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span> : null}
       </div>
     </section>
   );
