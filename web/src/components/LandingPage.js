@@ -240,6 +240,14 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               <button type="button" style={styles.secondaryButton} onClick={onLogin}>
                 Log in
               </button>
+              <a
+                href="https://play.google.com/store/apps/details?id=com.falowen.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ ...styles.secondaryButton, textDecoration: "none" }}
+              >
+                Get the app
+              </a>
 
               <a
                 href="#how-it-works"
