@@ -27,6 +27,12 @@ const { incrementCounter, getMetricsSnapshot } = require("./metrics");
 let getScoresForStudent;
 
 const log = createLogger({ scope: "app" });
+const isOpenAIConfigured = () => Boolean(process.env.OPENAI_API_KEY);
+const ensureOpenAIConfigured = (res) => {
+  if (isOpenAIConfigured()) return true;
+  res.status(503).json({ error: "OpenAI API key is not configured" });
+  return false;
+};
 
 function initFirebaseAdmin() {
   if (admin.apps.length) return;
@@ -854,6 +860,8 @@ app.post("/paystack/webhook", async (req, res) => {
  */
 app.post("/writing/ideas", async (req, res) => {
   try {
+    if (!ensureOpenAIConfigured(res)) return;
+
     const { level = "A2", messages = [] } = req.body || {};
     const systemPrompt = LETTER_COACH_PROMPTS[level] || LETTER_COACH_PROMPTS.A2;
 
@@ -883,6 +891,8 @@ app.post("/writing/mark", async (req, res) => {
       return res.status(400).json({ error: "Letter text is required" });
     }
 
+    if (!ensureOpenAIConfigured(res)) return;
+
     const systemPrompt = markPrompt({ schreibenLevel: level, studentName });
     const messages = [
       { role: "system", content: systemPrompt },
@@ -903,6 +913,8 @@ app.post("/discussion/correct", async (req, res) => {
     const input = String(text || "").trim();
 
     if (!input) return res.status(400).json({ error: "Text is required for correction" });
+
+    if (!ensureOpenAIConfigured(res)) return;
 
     const messages = [
       {
@@ -929,6 +941,8 @@ app.post("/profile/biography/correct", async (req, res) => {
     const input = String(text || "").trim();
 
     if (!input) return res.status(400).json({ error: "Biography text is required" });
+
+    if (!ensureOpenAIConfigured(res)) return;
 
     const messages = [
       {
@@ -964,6 +978,7 @@ app.post("/grammar/ask", async (req, res) => {
       validateString(level, { maxLength: 10, label: "level" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({
       uid: authedUser.uid,
@@ -1279,6 +1294,7 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
       validateString(question, { maxLength: 400, label: "question" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
@@ -1327,6 +1343,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
       validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
@@ -1375,6 +1392,7 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
       validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
     if (!quota.allowed) {
@@ -1429,6 +1447,7 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
       validateString(level, { maxLength: 10, label: "level" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({
       uid: authedUser.uid,
@@ -1482,6 +1501,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
       validateString(level, { maxLength: 10, label: "level" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
     if (!quota.allowed) {
@@ -1542,6 +1562,7 @@ app.post("/tutor/placement", async (req, res) => {
       validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
 
     if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "placement", limit: DAILY_LIMITS.placement });
     if (!quota.allowed) {
@@ -1593,6 +1614,8 @@ app.get("/tutor/next-task", async (req, res) => {
     if (!authedUser) return;
 
     const userId = String(req.query.userId || authedUser.uid || "guest");
+
+    if (!ensureOpenAIConfigured(res)) return;
 
     const quota = await enforceUserQuota({
       uid: authedUser.uid,
