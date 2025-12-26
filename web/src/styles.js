@@ -113,18 +113,28 @@ export const styles = {
     fontSize: 13,
     color: "#374151",
   },
+
+  // ✅ UPDATED (fix overflow)
   select: {
     padding: "6px 8px",
     borderRadius: 8,
     border: "1px solid #d1d5db",
     fontSize: 14,
+    width: "100%",
+    boxSizing: "border-box",
+    display: "block",
   },
+  // ✅ UPDATED (fix overflow)
   input: {
     padding: "6px 8px",
     borderRadius: 8,
     border: "1px solid #d1d5db",
     fontSize: 14,
+    width: "100%",
+    boxSizing: "border-box",
+    display: "block",
   },
+
   primaryButton: {
     padding: "8px 16px",
     borderRadius: 999,
