@@ -389,7 +389,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
             <div>
               <h2 style={styles.sectionTitle}>What our students say about lessons</h2>
               <p style={{ ...styles.helperText, margin: 0 }}>
-                Sample feedback from learners across Africa. Replace with real testimonials as you collect them.
+                Feedback from learners.
               </p>
             </div>
           </div>
