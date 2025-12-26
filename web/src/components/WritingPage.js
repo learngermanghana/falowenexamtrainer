@@ -6,6 +6,7 @@ import { fetchIdeasFromCoach, fetchWritingLetters, markLetterWithAI } from "../s
 import { useAuth } from "../context/AuthContext";
 import { writingLetters as courseWritingLetters } from "../data/writingLetters";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
+import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -69,6 +70,7 @@ const WritingPage = ({ mode = "course" }) => {
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [progressLoaded, setProgressLoaded] = useState(false);
   const [selectedLetterId, setSelectedLetterId] = useState(() => {
     const initialList = isExamMode
       ? examWritingLetters.filter((task) => task.level === level)
@@ -105,6 +107,7 @@ const WritingPage = ({ mode = "course" }) => {
 
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+  const progressMode = isExamMode ? "exam" : "course";
 
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
@@ -192,6 +195,92 @@ const WritingPage = ({ mode = "course" }) => {
 
     return () => clearInterval(interval);
   }, [timerRunning]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const resetProgressState = () => {
+      setTypedAnswer("");
+      setMarkFeedback("");
+      setIdeaInput("");
+      setChatMessages([IDEA_COACH_INTRO]);
+      setSelectedDraftIds([]);
+    };
+
+    const loadProgress = async () => {
+      if (!userId) {
+        resetProgressState();
+        setProgressLoaded(true);
+        return;
+      }
+
+      setProgressLoaded(false);
+      try {
+        const saved = await loadWritingProgress({ userId, mode: progressMode });
+        if (!isMounted) return;
+
+        if (!saved) {
+          resetProgressState();
+          return;
+        }
+
+        if (typeof saved.typedAnswer === "string") setTypedAnswer(saved.typedAnswer);
+        if (typeof saved.markFeedback === "string") setMarkFeedback(saved.markFeedback);
+        if (typeof saved.ideaInput === "string") setIdeaInput(saved.ideaInput);
+        if (Array.isArray(saved.chatMessages) && saved.chatMessages.length > 0) {
+          setChatMessages(saved.chatMessages);
+        } else {
+          setChatMessages([IDEA_COACH_INTRO]);
+        }
+        if (Array.isArray(saved.selectedDraftIds)) {
+          setSelectedDraftIds(saved.selectedDraftIds);
+        } else {
+          setSelectedDraftIds([]);
+        }
+      } catch (err) {
+        console.error("Failed to load writing progress", err);
+      } finally {
+        if (isMounted) setProgressLoaded(true);
+      }
+    };
+
+    loadProgress();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [progressMode, userId]);
+
+  useEffect(() => {
+    if (!progressLoaded || !userId) return;
+
+    const timeout = setTimeout(() => {
+      saveWritingProgress({
+        userId,
+        mode: progressMode,
+        data: {
+          typedAnswer,
+          markFeedback,
+          ideaInput,
+          chatMessages,
+          selectedDraftIds,
+        },
+      }).catch((err) => {
+        console.error("Failed to save writing progress", err);
+      });
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [
+    chatMessages,
+    ideaInput,
+    markFeedback,
+    progressLoaded,
+    progressMode,
+    selectedDraftIds,
+    typedAnswer,
+    userId,
+  ]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
