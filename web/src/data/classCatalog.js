@@ -5,62 +5,14 @@ export const ZOOM_DETAILS = {
 };
 
 export const classCatalog = {
-  "A1 Frankfurt Klasse": {
-    startDate: "2025-10-23",
-    endDate: "2025-12-18",
+  "A1 Stuttgart Klasse": {
+    startDate: "2026-01-08",
+    endDate: "2026-03-06",
     schedule: [
-      { day: "Thursday", startTime: "18:00", endTime: "19:00" },
-      { day: "Friday", startTime: "18:00", endTime: "19:00" },
-      { day: "Saturday", startTime: "08:00", endTime: "09:00" },
+      { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
+      { day: "Thursday", startTime: "11:00", endTime: "12:00" },
+      { day: "Friday", startTime: "11:00", endTime: "12:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1BFPE0gvTb7DWPRqdfWhLzbvgwhLbGvRv/view?usp=sharing",
-  },
-  "A1 Bonn Klasse": {
-    startDate: "2025-11-10",
-    endDate: "2026-01-13",
-    schedule: [
-      { day: "Monday", startTime: "11:00", endTime: "12:00" },
-      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
-      { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/13X4LxOTE4yfe4dw_k_ILLdzrbTm54ZEI/view?usp=sharing",
-  },
-  "A1 Munich Klasse": {
-    startDate: "2025-12-03",
-    endDate: "2026-02-09",
-    schedule: [
-      { day: "Monday", startTime: "18:00", endTime: "19:00" },
-      { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
-      { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/1YaML32aP8L0Uk_-fu2HEW1b0Qo4CceDg/view?usp=sharing",
-  },
-  "A2 Bonn Klasse": {
-    startDate: "2025-11-25",
-    endDate: "2026-02-04",
-    schedule: [
-      { day: "Tuesday", startTime: "19:30", endTime: "21:00" },
-      { day: "Wednesday", startTime: "19:30", endTime: "21:00" },
-      { day: "Thursday", startTime: "19:30", endTime: "21:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/1dE9cEXY9CC25lAXZuWNvQCFWis6nx0hW/view?usp=sharing",
-  },
-  "B1 Koln Klasse": {
-    startDate: "2025-11-20",
-    endDate: "2026-02-27",
-    schedule: [
-      { day: "Thursday", startTime: "19:30", endTime: "21:00" },
-      { day: "Friday", startTime: "19:30", endTime: "21:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/1sQ1ePNRapuVcih7BnhNNBQrO3SkM9K-O/view?usp=sharing",
-  },
-  "B2 Munich Klasse": {
-    startDate: "2025-08-08",
-    endDate: "2025-10-08",
-    schedule: [
-      { day: "Friday", startTime: "14:00", endTime: "15:30" },
-      { day: "Saturday", startTime: "09:30", endTime: "10:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/1gn6vYBbRyHSvKgqvpj5rr8OfUOYRL09W/view?usp=sharing",
+    docUrl: "https://drive.google.com/file/d/1Bzb1-cHO10m_KsrTHfbhaZAfQcmbssFt/view?usp=sharing",
   },
 };
