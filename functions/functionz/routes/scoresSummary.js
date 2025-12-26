@@ -253,6 +253,7 @@ const scoresSummaryHandler = async (req, res) => {
 
     // Build schedule targets
     const { lessons: plannedLessons, plannedSet } = getAssignmentSummary(level);
+    const totalAssignments = plannedSet.size;
 
     const CSV_URL =
       process.env.SCORES_SHEET_PUBLISHED_CSV_URL ||
@@ -345,6 +346,7 @@ const scoresSummaryHandler = async (req, res) => {
           weekAttempts: 0,
           streakDays: 0,
           retriesThisWeek: 0,
+          totalAssignments,
         },
       });
     }
@@ -478,6 +480,7 @@ const scoresSummaryHandler = async (req, res) => {
         weekAttempts,
         streakDays,
         retriesThisWeek,
+        totalAssignments,
       },
     });
   } catch (err) {

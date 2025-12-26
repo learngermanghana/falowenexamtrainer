@@ -47,6 +47,7 @@ const initialAssignmentState = {
   blocked: false,
   lastAssignment: null,
   retriesThisWeek: 0,
+  totalAssignments: null,
   error: "",
 };
 
@@ -234,6 +235,7 @@ const MyExamFilePage = () => {
         blocked: Boolean(student.recommendationBlocked),
         lastAssignment: student.lastAssignment || null,
         retriesThisWeek: student.retriesThisWeek || 0,
+        totalAssignments: student.totalAssignments ?? null,
         error: "",
       });
     } catch (error) {
@@ -285,8 +287,9 @@ const MyExamFilePage = () => {
     return computeExamReadiness({
       attendanceSessions: attendanceState.sessions,
       completedAssignments: assignmentState.completed,
+      totalAssignments: assignmentState.totalAssignments,
     });
-  }, [assignmentState.completed, attendanceState.sessions]);
+  }, [assignmentState.completed, assignmentState.totalAssignments, attendanceState.sessions]);
 
   const lockedAssignments = useMemo(() => {
     return (assignmentState.completed || [])
