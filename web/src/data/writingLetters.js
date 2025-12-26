@@ -3,7 +3,7 @@ export const writingLetters = [
     id: "a1-apartment-note",
     letter: "A1: Notiz an die Mitbewohnerin",
     level: "A1",
-    durationMinutes: 10,
+    durationMinutes: 15,
     situation: "Du musst früher zur Arbeit und hinterlässt eine kurze Nachricht für deine Mitbewohnerin.",
     whatToInclude: [
       "Grund der Nachricht (früher weg, Termin)",
@@ -16,7 +16,7 @@ export const writingLetters = [
     id: "a2-library-email",
     letter: "A2: E-Mail an die Bibliothek",
     level: "A2",
-    durationMinutes: 15,
+    durationMinutes: 20,
     situation: "Du möchtest ein deutsches Buch verlängern und fragst nach Kursmaterialien.",
     whatToInclude: [
       "Buchtitel und Datum der Ausleihe",
@@ -29,7 +29,7 @@ export const writingLetters = [
     id: "a2-course-feedback",
     letter: "A2: Rückmeldung zum Sprachkurs",
     level: "A2",
-    durationMinutes: 15,
+    durationMinutes: 20,
     situation: "Du schreibst deiner Sprachschule, was dir hilft und was dir noch schwer fällt.",
     whatToInclude: [
       "Welche Übungen gefallen dir? (z. B. Dialoge, Hörtexte)",
@@ -55,7 +55,7 @@ export const writingLetters = [
     id: "b1-complaint-delivery",
     letter: "B1: Beschwerde an einen Lieferdienst",
     level: "B1",
-    durationMinutes: 18,
+    durationMinutes: 20,
     situation: "Die letzte Lieferung kam zu spät und war unvollständig.",
     whatToInclude: [
       "Bestellnummer, Datum und was gefehlt hat",
@@ -68,7 +68,7 @@ export const writingLetters = [
     id: "b2-opinion-digital",
     letter: "B2: Meinung zum digitalen Lernen",
     level: "B2",
-    durationMinutes: 22,
+    durationMinutes: 20,
     situation: "Ein Magazin bittet dich um einen kurzen Artikel über digitales Lernen.",
     whatToInclude: [
       "Deine Erfahrung mit Onlinekursen",
