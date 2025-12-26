@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchStudentNotifications } from "../services/notificationService";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
@@ -52,6 +52,8 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPrevious, setShowPrevious] = useState(false);
+  const [markedSeenThisSession, setMarkedSeenThisSession] = useState(false);
 
   const rootRef = useRef(null);
 
@@ -113,7 +115,15 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
   const sortItems = (list) =>
     [...(list || [])].sort((a, b) => (b?.timestamp || 0) - (a?.timestamp || 0));
 
-  const loadNotifications = async () => {
+  const { recentItems, previousItems } = useMemo(() => {
+    const sorted = sortItems(items);
+    return {
+      recentItems: sorted.slice(0, 7),
+      previousItems: sorted.slice(7),
+    };
+  }, [items]);
+
+  const loadNotifications = useCallback(async () => {
     if (!studentProfile) return;
     setLoading(true);
     setError("");
@@ -126,13 +136,12 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [studentProfile]);
 
   // Load on profile change (initial + when class/level updates)
   useEffect(() => {
     loadNotifications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [studentProfile?.studentCode, studentProfile?.studentcode, studentProfile?.email, studentProfile?.className]);
+  }, [loadNotifications]);
 
   const unreadCount = useMemo(() => {
     const seenAt = readSeenAt();
@@ -146,14 +155,52 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     setItems((prev) => [...prev]);
   };
 
-  const handleToggle = async () => {
-    if (!open) {
-      await loadNotifications();
-      // When opening, consider everything currently loaded as "seen"
-      const newest = (items?.[0]?.timestamp ? Number(items[0].timestamp) : Date.now()) || Date.now();
-      writeSeenAt(newest);
-    }
+  const handleToggle = () => {
     setOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!open) {
+      setShowPrevious(false);
+      setMarkedSeenThisSession(false);
+      return;
+    }
+    setError("");
+    loadNotifications();
+  }, [loadNotifications, open]);
+
+  useEffect(() => {
+    if (!open || markedSeenThisSession) return;
+    const newest = (items?.[0]?.timestamp ? Number(items[0].timestamp) : Date.now()) || Date.now();
+    writeSeenAt(newest);
+    setMarkedSeenThisSession(true);
+  }, [open, items, markedSeenThisSession]);
+
+  const renderNotification = (item) => {
+    const isUnread = Number(item?.timestamp || 0) > readSeenAt();
+    return (
+      <article
+        key={`${item.id}-${item.timestamp}`}
+        style={{
+          border: "1px solid #e5e7eb",
+          borderRadius: 10,
+          padding: 10,
+          display: "grid",
+          gap: 4,
+          background: isUnread ? "#ecfeff" : "#f9fafb",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
+          <span style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>{item.type}</span>
+          <span style={{ fontSize: 12, color: "#6b7280" }}>{formatTime(item.timestamp)}</span>
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+          <div style={{ fontWeight: 800, color: "#111827" }}>{item.title}</div>
+          {isUnread ? <span style={{ ...styles.badge, background: "#bae6fd", color: "#0f172a" }}>New</span> : null}
+        </div>
+        <div style={{ color: "#374151", fontSize: 14 }}>{item.body}</div>
+      </article>
+    );
   };
 
   const handleEnablePush = async () => {
@@ -312,36 +359,29 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
 
           {/* ✅ Scroll area (important for mobile drawer) */}
           <div style={{ display: "grid", gap: 8, maxHeight: isMobile ? "calc(100vh - 300px)" : 380, overflow: "auto", paddingRight: 2 }}>
-            {items.map((item) => {
-              const isUnread = Number(item?.timestamp || 0) > readSeenAt();
-              return (
-                <article
-                  key={`${item.id}-${item.timestamp}`}
+            {recentItems.map(renderNotification)}
+
+            {previousItems.length ? (
+              <div style={{ display: "grid", gap: 8 }}>
+                <button
+                  type="button"
                   style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 10,
-                    padding: 10,
-                    display: "grid",
-                    gap: 4,
-                    background: isUnread ? "#ecfeff" : "#f9fafb",
+                    ...styles.secondaryButton,
+                    width: "100%",
+                    justifyContent: "center",
+                    background: "#f3f4f6",
+                    color: "#111827",
+                    fontWeight: 700,
                   }}
+                  onClick={() => setShowPrevious((prev) => !prev)}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 6 }}>
-                    <span style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>
-                      {item.type}
-                    </span>
-                    <span style={{ fontSize: 12, color: "#6b7280" }}>{formatTime(item.timestamp)}</span>
-                  </div>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-                    <div style={{ fontWeight: 800, color: "#111827" }}>{item.title}</div>
-                    {isUnread ? (
-                      <span style={{ ...styles.badge, background: "#bae6fd", color: "#0f172a" }}>New</span>
-                    ) : null}
-                  </div>
-                  <div style={{ color: "#374151", fontSize: 14 }}>{item.body}</div>
-                </article>
-              );
-            })}
+                  {showPrevious
+                    ? "Hide previous activity"
+                    : `See previous activity (${previousItems.length})`}
+                </button>
+                {showPrevious ? previousItems.map(renderNotification) : null}
+              </div>
+            ) : null}
           </div>
 
           <div style={{ ...styles.helperText, margin: 0 }}>
