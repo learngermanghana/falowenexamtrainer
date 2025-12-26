@@ -7,6 +7,7 @@ import HomeMetrics from "./HomeMetrics";
 import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
+import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 
 const WelcomeHero = ({ studentProfile }) => {
   const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
@@ -29,8 +30,8 @@ const WelcomeHero = ({ studentProfile }) => {
       <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 12 }}>
         Personalised tips, attendance, and assignments for {className}—jump straight into the space you need today.
       </p>
-      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-        <span style={{ ...styles.badge, background: "#d1fae5", color: "#065f46" }}>Keep your streak alive</span>
+      <PrimaryActionBar align="start">
+        <PillBadge tone="success">Keep your streak alive</PillBadge>
         <button
           type="button"
           style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
@@ -38,7 +39,7 @@ const WelcomeHero = ({ studentProfile }) => {
         >
           Join on Zoom
         </button>
-      </div>
+      </PrimaryActionBar>
     </section>
   );
 };
@@ -87,28 +88,25 @@ const GeneralHome = ({
         onOpenExams={() => navigate("/exams/speaking")}
       />
       <section style={styles.card}>
-        <p style={{ ...styles.helperText, margin: 0 }}>Welcome back</p>
-        <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Choose your learning space</h2>
-        <p style={styles.helperText}>
-          Pick the area that matches your focus today. All instructions stay in English so you can navigate quickly and spend
-          more time practising.
-        </p>
+        <SectionHeader
+          eyebrow="Welcome back"
+          title="Choose your learning space"
+          subtitle="Pick the area that matches your focus today. All instructions stay in English so you can navigate quickly and spend more time practising."
+        />
       </section>
 
       <div style={styles.gridTwo}>
         <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <p style={{ ...styles.helperText, margin: 0 }}>Campus</p>
-              <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Classes, course book, and AI helpers</h3>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <span style={{ ...styles.badge, background: "#d1fae5", color: "#065f46", borderColor: "#bbf7d0" }}>
-                Start here
-              </span>
-              <span style={styles.badge}>Daily work</span>
-            </div>
-          </div>
+          <SectionHeader
+            eyebrow="Campus"
+            title="Classes, course book, and AI helpers"
+            actions={
+              <PrimaryActionBar align="flex-end">
+                <PillBadge tone="success">Start here</PillBadge>
+                <PillBadge>Daily work</PillBadge>
+              </PrimaryActionBar>
+            }
+          />
           <ul style={{ ...styles.checklist, margin: 0 }}>
             <li>Course book access, assignment submission, and results.</li>
             <li>Grammar Q&amp;A, Speech Trainer, and the original writing coach.</li>
@@ -117,21 +115,23 @@ const GeneralHome = ({
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
             Start in Campus for daily work; use Exams Room for mock exam practice.
           </p>
-          <div>
+          <PrimaryActionBar align="start">
             <button style={styles.primaryButton} onClick={() => onSelectArea("campus")}>
               Enter Campus
             </button>
-          </div>
+          </PrimaryActionBar>
         </section>
 
         <section style={{ ...styles.card, display: "grid", gap: 10 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <div>
-              <p style={{ ...styles.helperText, margin: 0 }}>Exams Room</p>
-              <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Speaking, Schreiben trainer, resources</h3>
-            </div>
-            <span style={styles.badge}>Exam mode</span>
-          </div>
+          <SectionHeader
+            eyebrow="Exams Room"
+            title="Speaking, Schreiben trainer, resources"
+            actions={
+              <PrimaryActionBar align="flex-end">
+                <PillBadge tone="info">Exam mode</PillBadge>
+              </PrimaryActionBar>
+            }
+          />
           <ul style={{ ...styles.checklist, margin: 0 }}>
             <li>Speaking practice prompts organised by level.</li>
             <li>Schreiben trainer with timed letters and idea generation.</li>
@@ -140,11 +140,11 @@ const GeneralHome = ({
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
             Start in Campus for daily work; use Exams Room for mock exam practice.
           </p>
-          <div>
+          <PrimaryActionBar align="start">
             <button style={styles.secondaryButton} onClick={() => onSelectArea("exams")}>
               Go to Exams Room
             </button>
-          </div>
+          </PrimaryActionBar>
         </section>
       </div>
 

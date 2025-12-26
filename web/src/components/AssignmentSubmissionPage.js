@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
+import { InfoBox } from "./ui";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
@@ -585,8 +586,8 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
           </p>
         </div>
 
-        {status.error ? <div style={styles.errorBox}>{status.error}</div> : null}
-        {status.success ? <div style={styles.successBox}>{status.success}</div> : null}
+        {status.error ? <InfoBox tone="error">{status.error}</InfoBox> : null}
+        {status.success ? <InfoBox tone="success">{status.success}</InfoBox> : null}
 
         <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
           <div
