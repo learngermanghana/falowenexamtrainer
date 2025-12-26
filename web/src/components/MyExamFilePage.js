@@ -25,6 +25,11 @@ const downloadTextFile = (filename, content) => {
   URL.revokeObjectURL(url);
 };
 
+const parseScoreValue = (value) => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+};
+
 const MyExamFilePage = () => {
   const { studentProfile, user, idToken } = useAuth();
   const { level, levelConfirmed } = useExam();
@@ -168,7 +173,7 @@ const MyExamFilePage = () => {
       const items = (rows || [])
         .slice()
         .sort((a, b) => new Date(b.date || b.created_at || 0) - new Date(a.date || a.created_at || 0))
-        .filter((row) => row.comments || typeof row.score === "number")
+        .filter((row) => row.comments || Number.isFinite(parseScoreValue(row.score)))
         .slice(0, 12);
 
       setFeedbackState({ loading: false, items, error: "" });
@@ -318,21 +323,24 @@ const MyExamFilePage = () => {
         ) : null}
 
         <div style={{ display: "grid", gap: 8 }}>
-          {lockedAssignments.map((entry, index) => (
-            <div
-              key={`${entry.identifier || index}-locked`}
-              style={{ ...styles.uploadCard, display: "grid", gap: 4, background: "#f9fafb" }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <div style={{ fontWeight: 700 }}>{entry.label || `Identifier ${entry.identifier}`}</div>
-                <span style={styles.lockPill}>🔒 Locked</span>
+          {lockedAssignments.map((entry, index) => {
+            const scoreValue = parseScoreValue(entry.score);
+            return (
+              <div
+                key={`${entry.identifier || index}-locked`}
+                style={{ ...styles.uploadCard, display: "grid", gap: 4, background: "#f9fafb" }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                  <div style={{ fontWeight: 700 }}>{entry.label || `Identifier ${entry.identifier}`}</div>
+                  <span style={styles.lockPill}>🔒 Locked</span>
+                </div>
+                <p style={{ ...styles.helperText, margin: 0 }}>
+                  Identifier: <b>{entry.identifier || "—"}</b> · Score:{" "}
+                  {scoreValue !== null ? `${scoreValue}/100` : "Pending"} · Date: {formatDate(entry.date) || "—"}
+                </p>
               </div>
-              <p style={{ ...styles.helperText, margin: 0 }}>
-                Identifier: <b>{entry.identifier || "—"}</b> · Score:{" "}
-                {typeof entry.score === "number" ? `${entry.score}/100` : "Pending"} · Date: {formatDate(entry.date) || "—"}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -356,37 +364,40 @@ const MyExamFilePage = () => {
         ) : null}
 
         <div style={{ display: "grid", gap: 8 }}>
-          {feedbackItems.map((entry, index) => (
-            <div
-              key={`${entry.assignment || "assignment"}-${index}`}
-              style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f8fafc" }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <div>
-                  <div style={{ fontWeight: 800 }}>{entry.assignment}</div>
-                  <p style={{ ...styles.helperText, margin: 0 }}>Date: {formatDate(entry.date) || "Not set"}</p>
+          {feedbackItems.map((entry, index) => {
+            const scoreValue = parseScoreValue(entry.score);
+            return (
+              <div
+                key={`${entry.assignment || "assignment"}-${index}`}
+                style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f8fafc" }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                  <div>
+                    <div style={{ fontWeight: 800 }}>{entry.assignment}</div>
+                    <p style={{ ...styles.helperText, margin: 0 }}>Date: {formatDate(entry.date) || "Not set"}</p>
+                  </div>
+
+                  {scoreValue !== null ? (
+                    <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe" }}>
+                      Score: {scoreValue}/100
+                    </span>
+                  ) : (
+                    <span style={styles.badge}>Not scored</span>
+                  )}
                 </div>
 
-                {typeof entry.score === "number" ? (
-                  <span style={{ ...styles.badge, background: "#eef2ff", borderColor: "#c7d2fe" }}>
-                    Score: {entry.score}/100
-                  </span>
-                ) : (
-                  <span style={styles.badge}>Not scored</span>
-                )}
+                <p style={{ ...styles.resultText, margin: "6px 0 0" }}>{entry.comments || "No comments supplied."}</p>
+
+                {entry.link ? (
+                  <div style={{ marginTop: 8 }}>
+                    <a href={entry.link} target="_blank" rel="noreferrer">
+                      Open marked file
+                    </a>
+                  </div>
+                ) : null}
               </div>
-
-              <p style={{ ...styles.resultText, margin: "6px 0 0" }}>{entry.comments || "No comments supplied."}</p>
-
-              {entry.link ? (
-                <div style={{ marginTop: 8 }}>
-                  <a href={entry.link} target="_blank" rel="noreferrer">
-                    Open marked file
-                  </a>
-                </div>
-              ) : null}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

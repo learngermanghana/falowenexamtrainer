@@ -26,6 +26,11 @@ const parseTimestamp = (value) => {
   return null;
 };
 
+const parseScoreValue = (value) => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+};
+
 // -------------------------------------------
 // Student code resolver
 // -------------------------------------------
@@ -56,8 +61,8 @@ const buildScoreNotification = (resultsPayload) => {
 
   const timestamp = parseTimestamp(latestScore.date) || Date.now();
   const headline = latestScore.assignment || "Assignment";
-  const scoreText =
-    typeof latestScore.score === "number" ? `${latestScore.score}/100` : "Awaiting score";
+  const scoreValue = parseScoreValue(latestScore.score);
+  const scoreText = scoreValue !== null ? `${scoreValue}/100` : "Awaiting score";
   const detail = latestScore.comments
     ? `${scoreText} · ${latestScore.comments}`
     : scoreText;

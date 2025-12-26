@@ -17,8 +17,12 @@ const average = (numbers = []) => {
 };
 
 const toScore = (entry) => {
-  if (typeof entry?.overall_score === "number") return entry.overall_score;
-  if (typeof entry?.score === "number") return entry.score;
+  const overall = Number(entry?.overall_score);
+  if (Number.isFinite(overall)) return overall;
+
+  const score = Number(entry?.score);
+  if (Number.isFinite(score)) return score;
+
   return null;
 };
 
