@@ -23,11 +23,7 @@ const toTime = (row) => {
   return Number.isNaN(t) ? 0 : t;
 };
 
-<<<<<<< HEAD
-// Google Sheets/CSV can return score as "85" (string) or "85/100"
-=======
 // Sheets/CSV often returns "85" or "85/100" as string
->>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
 const parseScore = (value) => {
   if (value === null || value === undefined || value === "") return null;
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -56,11 +52,7 @@ const initialAssignmentState = {
 
 const initialFeedbackState = { loading: false, items: [], error: "" };
 
-<<<<<<< HEAD
-// ---------- Small UI helpers ----------
-=======
 // ---------- UI bits ----------
->>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
 const StatCard = ({ label, value, sub, icon }) => (
   <div
     style={{
@@ -302,11 +294,6 @@ const MyExamFilePage = () => {
       .sort((a, b) => String(a.identifier || "").localeCompare(String(b.identifier || "")))
       .slice(0, 8);
   }, [assignmentState.completed]);
-<<<<<<< HEAD
-=======
-
-  const feedbackItems = useMemo(() => (feedbackState.items || []).slice(0, 6), [feedbackState.items]);
->>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
 
   const feedbackItems = useMemo(() => (feedbackState.items || []).slice(0, 6), [feedbackState.items]);
   const lastFeedbackDate = useMemo(() => {
@@ -363,11 +350,7 @@ const MyExamFilePage = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-<<<<<<< HEAD
-      {/* Report Header + Summary row */}
-=======
       {/* Report header */}
->>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
           <div>
@@ -386,21 +369,6 @@ const MyExamFilePage = () => {
 
         {/* Top summary row */}
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }}>
-<<<<<<< HEAD
-          <StatCard icon="🎓" label="Level" value={detectedLevel || "Not set"} sub={className ? `Class: ${className}` : "Add class name in your profile"} />
-          <StatCard
-            icon={readiness.icon || "📌"}
-            label="Readiness"
-            value={readiness.text}
-            sub={readiness.detail}
-          />
-          <StatCard
-            icon="🧾"
-            label="Attendance"
-            value={`${attendanceState.sessions} sessions`}
-            sub={`${attendanceState.hours} hours`}
-          />
-=======
           <StatCard
             icon="🎓"
             label="Level"
@@ -409,7 +377,6 @@ const MyExamFilePage = () => {
           />
           <StatCard icon={readiness.icon || "📌"} label="Readiness" value={readiness.text} sub={readiness.detail} />
           <StatCard icon="🧾" label="Attendance" value={`${attendanceState.sessions} sessions`} sub={`${attendanceState.hours} hours`} />
->>>>>>> c20efd9 (Make My Exam File report-like + PDF downloads)
           <StatCard
             icon="🗓️"
             label="Last feedback"
