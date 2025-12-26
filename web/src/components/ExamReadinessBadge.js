@@ -39,6 +39,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
       return;
     }
 
+    // NOTE: if isFirebaseConfigured is a function in your project, change to:
+    // if (!isFirebaseConfigured()) { ... }
     if (!isFirebaseConfigured) {
       setState({
         loading: false,
@@ -68,7 +70,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         completedAssignments,
         totalAssignments,
       });
-    } catch (e) {
+    } catch (_e) {
       setState({
         loading: false,
         error: "Could not load readiness right now.",
@@ -93,13 +95,14 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     [state.attendanceSessions, state.completedAssignments, state.totalAssignments]
   );
 
+  const assignmentsLabel = state.totalAssignments
+    ? `${state.completedAssignments.length}/${state.totalAssignments}`
+    : `${state.completedAssignments.length}`;
+
+  const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${assignmentsLabel}`;
+
   // ✅ Compact button (for hero row)
   if (variant === "button") {
-    const assignmentsLabel = state.totalAssignments
-      ? `${state.completedAssignments.length}/${state.totalAssignments}`
-      : `${state.completedAssignments.length}`;
-    const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${assignmentsLabel}`;
-
     return (
       <button
         type="button"
@@ -112,23 +115,77 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
           color: "#111827",
           borderColor: "#e5e7eb",
           whiteSpace: "nowrap",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 10,
         }}
       >
-        {state.loading ? "Checking..." : `${readiness.icon} My Exam File`}
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <span aria-hidden>{state.loading ? "⏳" : readiness.icon}</span>
+          <span style={{ fontWeight: 800 }}>{state.loading ? "Checking..." : "My Exam File"}</span>
+        </span>
+
+        {/* status pill */}
+        {!state.loading ? (
+          <span
+            style={{
+              padding: "6px 10px",
+              borderRadius: 999,
+              border: `1px solid ${readiness.statusPillBorder || "#e5e7eb"}`,
+              background: readiness.statusPillBg || "#f3f4f6",
+              color: readiness.statusPillText || "#111827",
+              fontSize: 12,
+              fontWeight: 800,
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {readiness.statusLabel || "Status"}
+          </span>
+        ) : null}
       </button>
     );
   }
 
-  // ✅ Original card mode (keep for other screens if needed)
+  // ✅ Card mode
   return (
     <section style={{ ...styles.card, display: "grid", gap: 10, background: readiness.tone }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-        <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 10,
+          flexWrap: "wrap",
+        }}
+      >
+        <div style={{ minWidth: 240 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>Exam readiness</p>
-          <h3 style={{ ...styles.sectionTitle, margin: "4px 0" }}>
-            {readiness.icon} {readiness.text}
-          </h3>
-          <p style={{ ...styles.helperText, margin: 0 }}>{readiness.detail}</p>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
+            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>
+              {readiness.icon} {readiness.text}
+            </h3>
+
+            {/* status pill */}
+            <span
+              style={{
+                padding: "6px 10px",
+                borderRadius: 999,
+                border: `1px solid ${readiness.statusPillBorder || "#e5e7eb"}`,
+                background: readiness.statusPillBg || "#f3f4f6",
+                color: readiness.statusPillText || "#111827",
+                fontSize: 12,
+                fontWeight: 900,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {readiness.statusLabel || "Status"}
+            </span>
+          </div>
+
+          <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{readiness.detail}</p>
         </div>
 
         <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
@@ -144,11 +201,11 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
         <span style={styles.badge}>Attendance: {state.attendanceSessions} sessions</span>
-        <span style={styles.badge}>
-          Marked identifiers: {state.completedAssignments.length}
-          {state.totalAssignments ? `/${state.totalAssignments}` : ""}
-        </span>
-        {state.error ? <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span> : null}
+        <span style={styles.badge}>Marked identifiers: {assignmentsLabel}</span>
+
+        {state.error ? (
+          <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span>
+        ) : null}
       </div>
     </section>
   );
