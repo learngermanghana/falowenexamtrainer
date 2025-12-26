@@ -23,6 +23,18 @@ const formatList = (items = [], maxItems = 3) => {
   return `${shown.join(", ")} (+${labels.length - maxItems} more)`;
 };
 
+const extractIdentifiers = (value = "") => {
+  const matches = String(value || "").match(/\d+(?:\.\d+)?/g) || [];
+  return matches.map((item) => item.trim()).filter(Boolean);
+};
+
+const completionIdentifiersByLevel = {
+  A1: "14.1",
+  A2: "10.28",
+  B1: "10.28",
+  B2: "10.28",
+};
+
 const HomeMetrics = ({ studentProfile }) => {
   const { idToken } = useAuth();
 
@@ -106,6 +118,13 @@ const HomeMetrics = ({ studentProfile }) => {
   const blocked = Boolean(assignmentStats?.recommendationBlocked);
   const nextObj = assignmentStats?.nextRecommendation || null;
 
+  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
+  const isCourseCompleter = useMemo(() => {
+    const targetIdentifier = completionIdentifiersByLevel[levelKey];
+    if (!targetIdentifier || !assignmentStats?.lastAssignment) return false;
+    return extractIdentifiers(assignmentStats.lastAssignment).includes(targetIdentifier);
+  }, [assignmentStats?.lastAssignment, levelKey]);
+
   const recommendedNext = useMemo(() => {
     if (blocked) {
       const firstFail = failedAssignments[0];
@@ -134,6 +153,7 @@ const HomeMetrics = ({ studentProfile }) => {
         title="Attendance and assignments snapshot"
         actions={
           <PrimaryActionBar align="flex-end" wrap>
+            {isCourseCompleter ? <PillBadge tone="success">Course completer</PillBadge> : null}
             {loading ? <PillBadge tone="info">Refreshing…</PillBadge> : null}
             {refreshError ? <PillBadge tone="warning">{refreshError}</PillBadge> : null}
             <button
