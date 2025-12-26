@@ -34,7 +34,7 @@ const TAB_STRUCTURE = [
     sections: [
       { key: "course", label: "Course Book" },
       { key: "submit", label: "Submit Assignment" },
-      { key: "examFile", label: "My Exam File" },
+      { key: "examFile", label: "Exam Readiness" },
     ],
   },
   {
@@ -494,7 +494,7 @@ const ExamArea = ({ onBack }) => {
     { key: "writing", label: "Schreiben trainer" },
     { key: "vocab", label: "Vocab" },
     { key: "resources", label: "Resources" },
-    { key: "file", label: "My Exam File" },
+    { key: "file", label: "Exam Readiness" },
   ];
 
   return (
