@@ -58,6 +58,30 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
     return Math.max(0, Math.round((nextClass.startDateTime - now) / 60000));
   }, [nextClass?.startDateTime, now]);
 
+  const timeUntilDisplay = useMemo(() => {
+    if (minutesUntil === null) return null;
+
+    const minutesInDay = 24 * 60;
+    if (minutesUntil === 0) {
+      return { badge: "Starting now", detail: "Starting now" };
+    }
+
+    if (minutesUntil >= minutesInDay) {
+      const daysUntil = Math.ceil(minutesUntil / minutesInDay);
+      const suffix = daysUntil === 1 ? "" : "s";
+      return {
+        badge: `${daysUntil} day${suffix} left`,
+        detail: `Starts in ${daysUntil} day${suffix}`,
+      };
+    }
+
+    const suffix = minutesUntil === 1 ? "" : "s";
+    return {
+      badge: `${minutesUntil} min left`,
+      detail: `Starts in ${minutesUntil} minute${suffix}`,
+    };
+  }, [minutesUntil]);
+
   useEffect(() => {
     setSelectedClass(defaultClass);
   }, [defaultClass]);
@@ -157,11 +181,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
         <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Next live class</h3>
-            {minutesUntil !== null ? (
-              <span style={styles.badge}>
-                {minutesUntil === 0 ? "Starting now" : `${minutesUntil} min left`}
-              </span>
-            ) : null}
+            {timeUntilDisplay?.badge ? <span style={styles.badge}>{timeUntilDisplay.badge}</span> : null}
           </div>
           <p style={{ ...styles.helperText, margin: "6px 0" }}>
             {nextClass.weekday}, {nextClass.date} · {nextClass.startTime}–{nextClass.endTime}
@@ -178,10 +198,8 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
             >
               Join now
             </a>
-            {minutesUntil !== null ? (
-              <span style={{ ...styles.helperText, margin: 0 }}>
-                Starts in {minutesUntil} minute{minutesUntil === 1 ? "" : "s"}
-              </span>
+            {timeUntilDisplay?.detail ? (
+              <span style={{ ...styles.helperText, margin: 0 }}>{timeUntilDisplay.detail}</span>
             ) : null}
           </div>
         </div>
