@@ -93,6 +93,42 @@ const PhotoCard = ({ url, caption }) => (
   </div>
 );
 
+const shuffleArray = (items) => {
+  const copy = items.slice();
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+};
+
+const ReviewCard = ({ stars = 5, name, country, level, text }) => (
+  <div
+    style={{
+      border: "1px solid #e5e7eb",
+      borderRadius: 14,
+      padding: 12,
+      background: "#ffffff",
+      display: "grid",
+      gap: 8,
+      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+    }}
+  >
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+      <div style={{ fontWeight: 900, color: "#111827" }}>{name}</div>
+      <div style={{ fontSize: 13, color: "#111827", opacity: 0.85 }}>
+        {country} · {level}
+      </div>
+    </div>
+
+    <div aria-label={`${stars} star rating`} style={{ letterSpacing: 1 }}>
+      {"★★★★★☆☆☆☆☆".slice(5 - stars, 10 - stars)}
+    </div>
+
+    <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{text}</p>
+  </div>
+);
+
 const LandingPage = ({ onSignUp, onLogin }) => {
   const features = [
     {
@@ -127,8 +163,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     { label: "Facebook", href: "https://web.facebook.com/lleaghana" },
   ];
 
-  // Tip: for best performance, consider moving these images to web/public/photos
-  // and using "/photos/..." instead of GitHub raw URLs.
+  // Tip: for best performance, move these to web/public/photos and use "/photos/..."
   const photos = [
     {
       url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-julia-m-cameron-4145153.jpg?raw=1",
@@ -141,27 +176,30 @@ const LandingPage = ({ onSignUp, onLogin }) => {
   ];
 
   const signupSteps = [
-    {
-      title: "Open the sign-up form",
-      description: "Click “Join a cohort” to start your application.",
-    },
-    {
-      title: "Fill in your details",
-      description: "Share your name, contact info, and learning goals so we place you correctly.",
-    },
-    {
-      title: "Choose your level/class",
-      description: "Select the cohort you want (e.g., A1/A2/B1) based on schedule and availability.",
-    },
-    {
-      title: "Complete payment to unlock access",
-      description: "After selecting your cohort, complete payment to unlock full access to the course tools.",
-    },
-    {
-      title: "Get onboarding support",
-      description: "We follow up with your welcome checklist, class links, and next steps.",
-    },
+    { title: "Open the sign-up form", description: "Click “Join a cohort” to start your application." },
+    { title: "Fill in your details", description: "Share your name, contact info, and learning goals so we place you correctly." },
+    { title: "Choose your level/class", description: "Select the cohort you want (e.g., A1/A2/B1) based on schedule and availability." },
+    { title: "Complete payment to unlock access", description: "After selecting your cohort, complete payment to unlock full access to the course tools." },
+    { title: "Get onboarding support", description: "We follow up with your welcome checklist, class links, and next steps." },
   ];
+
+  // ✅ Placeholder reviews (clearly labeled as sample)
+  const studentReviews = [
+    { name: "Ama", country: "Ghana", level: "A1", stars: 5, text: "The speaking practice is clear and easy to follow. I finally got confident asking questions." },
+    { name: "Samuel", country: "Nigeria", level: "A2", stars: 5, text: "I like the tutor feedback. It shows exactly what to improve in my writing." },
+    { name: "Amina", country: "Kenya", level: "A1", stars: 4, text: "The lessons are structured. Daily practice keeps me consistent even when I’m busy." },
+    { name: "Fatou", country: "Senegal", level: "A2", stars: 5, text: "The exam-style tasks feel real. I now understand Teil 1, 2, and 3 for speaking." },
+    { name: "Youssef", country: "Morocco", level: "B1", stars: 5, text: "The writing steps help me organize ideas. My letters look more professional now." },
+    { name: "Lerato", country: "South Africa", level: "A1", stars: 4, text: "Simple instructions and helpful corrections. The platform is easy to use." },
+    { name: "Kofi", country: "Ghana", level: "A2", stars: 5, text: "I improved my pronunciation by recording and checking feedback regularly." },
+    { name: "Mariam", country: "Tanzania", level: "A1", stars: 5, text: "The class schedule and daily tasks make learning predictable and less stressful." },
+    { name: "Ibrahim", country: "Egypt", level: "B1", stars: 4, text: "Good practice materials. I like that it focuses on real exam conversation." },
+    { name: "Chiamaka", country: "Nigeria", level: "A1", stars: 5, text: "I used to fear speaking. Now I can introduce myself and ask polite requests." },
+    { name: "Hawa", country: "Mali", level: "A2", stars: 4, text: "The tutor reviews are strong. I understand my mistakes much faster." },
+    { name: "Patrick", country: "Uganda", level: "A1", stars: 5, text: "Short daily practice works. Even 10 minutes helps me stay active." },
+  ];
+
+  const featuredReviews = React.useMemo(() => shuffleArray(studentReviews).slice(0, 6), []);
 
   return (
     <main
@@ -191,10 +229,10 @@ const LandingPage = ({ onSignUp, onLogin }) => {
             </h1>
 
             <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0, lineHeight: 1.6 }}>
-              Falowen helps students prepare for German certification exams with daily practice, tutor feedback, and
-              structured live classes.
+              Falowen helps students prepare for German certification exams with daily practice, tutor feedback, and structured live classes.
             </p>
 
+            {/* ✅ Keep main CTAs only here */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button type="button" style={styles.primaryButton} onClick={onSignUp}>
                 Join a cohort
@@ -205,12 +243,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
 
               <a
                 href="#how-it-works"
-                style={{
-                  color: "#e0e7ff",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                  alignSelf: "center",
-                }}
+                style={{ color: "#e0e7ff", fontWeight: 700, textDecoration: "none", alignSelf: "center" }}
               >
                 See how it works ↓
               </a>
@@ -255,8 +288,8 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           >
             <div style={{ fontWeight: 900, color: "#111827" }}>I’m new to German</div>
             <p style={{ ...styles.helperText, margin: 0 }}>Join the next cohort and start from the right level (A1+).</p>
-            <button type="button" style={styles.primaryButton} onClick={onSignUp}>
-              Join a cohort
+            <button type="button" style={{ ...styles.primaryButton, padding: "10px 12px" }} onClick={onSignUp}>
+              Join a cohort →
             </button>
           </div>
 
@@ -273,8 +306,8 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           >
             <div style={{ fontWeight: 900, color: "#111827" }}>I’m preparing for exams</div>
             <p style={{ ...styles.helperText, margin: 0 }}>Log in to practice speaking and writing with exam tasks.</p>
-            <button type="button" style={styles.secondaryButton} onClick={onLogin}>
-              Log in
+            <button type="button" style={{ ...styles.secondaryButton, padding: "10px 12px" }} onClick={onLogin}>
+              Log in →
             </button>
           </div>
         </section>
@@ -293,27 +326,25 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           <div style={{ display: "grid", gap: 8 }}>
             <h2 style={styles.sectionTitle}>How to sign up and start learning</h2>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              Complete your application, pick a cohort, then unlock access with payment. After that, you’ll get your
-              onboarding checklist and class links.
+              Complete your application, pick a cohort, then unlock access with payment. After that, you’ll get your onboarding checklist and class links.
             </p>
 
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="button" style={styles.primaryButton} onClick={onSignUp}>
-                Join a cohort
-              </button>
-              <button type="button" style={styles.secondaryButton} onClick={onLogin}>
-                Log in
-              </button>
+            {/* ✅ No repeated login/signup buttons here */}
+            <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
+              <div style={{ ...styles.helperText, margin: 0 }}>✅ You’ll get: daily practice tools, tutor feedback, and live class support.</div>
+              <div style={{ ...styles.helperText, margin: 0 }}>✅ Best for: students preparing for Goethe-style speaking and writing tasks.</div>
             </div>
 
-            <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>
-                ✅ You’ll get: daily practice tools, tutor feedback, and live class support.
-              </div>
-              <div style={{ ...styles.helperText, margin: 0 }}>
-                ✅ Best for: students preparing for Goethe-style speaking and writing tasks.
-              </div>
-            </div>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                onSignUp();
+              }}
+              style={{ color: "#1d4ed8", fontWeight: 900, textDecoration: "none", marginTop: 8 }}
+            >
+              Ready? Join a cohort →
+            </a>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
@@ -344,14 +375,39 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           ))}
         </section>
 
+        {/* Student Reviews */}
+        <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: 12, flexWrap: "wrap" }}>
+            <div>
+              <h2 style={styles.sectionTitle}>What our students say about lessons</h2>
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                Sample feedback from learners across Africa. Replace with real testimonials as you collect them.
+              </p>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+            {featuredReviews.map((r) => (
+              <ReviewCard
+                key={`${r.name}-${r.country}-${r.level}`}
+                name={r.name}
+                country={r.country}
+                level={r.level}
+                stars={r.stars}
+                text={r.text}
+              />
+            ))}
+          </div>
+        </section>
+
         {/* Dark CTA */}
         <section style={{ ...styles.card, background: "#111827", color: "#e5e7eb" }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div style={{ flex: 2, minWidth: 260 }}>
               <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>How Falowen supports your exam goals</h2>
               <p style={{ ...styles.helperText, color: "#d1d5db", lineHeight: 1.65 }}>
-                Falowen trains the exact skills you need for exam success: polite requests, correct questions, and confident
-                conversation. Practice daily, then get tutor feedback during live classes.
+                Falowen trains the exact skills you need for exam success: polite requests, correct questions, and confident conversation.
+                Practice daily, then get tutor feedback during live classes.
               </p>
             </div>
 
@@ -361,13 +417,23 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                 <p style={{ ...styles.helperText, color: "#d1d5db", marginBottom: 10 }}>
                   Create your profile to access practice tools, class schedules, and tutor feedback.
                 </p>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+
+                {/* ✅ Keep one strong CTA here */}
+                <div style={{ display: "grid", gap: 8 }}>
                   <button type="button" style={{ ...styles.primaryButton, padding: "10px 14px" }} onClick={onSignUp}>
                     Join a cohort
                   </button>
-                  <button type="button" style={{ ...styles.secondaryButton, padding: "10px 14px" }} onClick={onLogin}>
-                    Log in
-                  </button>
+
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onLogin();
+                    }}
+                    style={{ color: "#a5b4fc", fontWeight: 900, textDecoration: "none" }}
+                  >
+                    Already a student? Log in →
+                  </a>
                 </div>
               </div>
 
