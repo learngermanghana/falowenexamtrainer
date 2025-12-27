@@ -40,6 +40,48 @@ const fetchStudentProfileByEmail = async (email) => {
   return { id: hit.id, ...hit.data() };
 };
 
+const fetchStudentProfileByStudentCode = async (studentCode) => {
+  if (!studentCode) return null;
+  const cleanedCode = studentCode.trim();
+  if (!cleanedCode) return null;
+
+  const studentsRef = collection(db, "students");
+  const directDoc = await getDoc(doc(db, "students", cleanedCode));
+  if (directDoc.exists()) {
+    return { id: directDoc.id, ...directDoc.data() };
+  }
+
+  const candidateCodes = Array.from(
+    new Set([cleanedCode, cleanedCode.toUpperCase(), cleanedCode.toLowerCase()])
+  );
+
+  for (const code of candidateCodes) {
+    const codeQuery = query(
+      studentsRef,
+      where("studentCode", "==", code),
+      limit(1)
+    );
+    const codeSnapshot = await getDocs(codeQuery);
+    if (!codeSnapshot.empty) {
+      const hit = codeSnapshot.docs[0];
+      return { id: hit.id, ...hit.data() };
+    }
+
+    const legacyCodeQuery = query(
+      studentsRef,
+      where("studentcode", "==", code),
+      limit(1)
+    );
+    const legacySnapshot = await getDocs(legacyCodeQuery);
+    if (!legacySnapshot.empty) {
+      const hit = legacySnapshot.docs[0];
+      return { id: hit.id, ...hit.data() };
+    }
+  }
+
+  return null;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [studentProfile, setStudentProfile] = useState(null);
@@ -305,17 +347,32 @@ export const AuthProvider = ({ children }) => {
     return { studentCode, paystackLink: payload.paystackLink };
   };
 
-  const login = async (email, password) => {
+  const login = async (identifier, password) => {
     if (!isFirebaseConfigured || !auth) {
       throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
     }
     setAuthError("");
-    const normalizedEmail = email.trim().toLowerCase();
+    const cleanedIdentifier = identifier.trim();
+    const isEmailLogin = cleanedIdentifier.includes("@");
+    let normalizedEmail = isEmailLogin ? cleanedIdentifier.toLowerCase() : "";
+    let profileFromCode = null;
+
+    if (!isEmailLogin) {
+      profileFromCode = await fetchStudentProfileByStudentCode(cleanedIdentifier);
+      if (!profileFromCode) {
+        throw new Error("Student code not found. Please check and try again.");
+      }
+      if (!profileFromCode.email) {
+        throw new Error("We couldn't find an email for this student code. Please contact support.");
+      }
+      normalizedEmail = profileFromCode.email.trim().toLowerCase();
+    }
 
     const finalizeLogin = async (credential, profileOverride = null, meta = {}) => {
       const token = await credential.user.getIdToken();
       setIdToken(token);
-      const profile = profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
+      const profile =
+        profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
       setStudentProfile(profile);
       setMessagingToken(profile?.messagingToken || null);
       const studentId = profile?.id || credential.user.uid;
@@ -345,7 +402,8 @@ export const AuthProvider = ({ children }) => {
       return await finalizeLogin(credential);
     } catch (error) {
       if (error?.code === "auth/user-not-found") {
-        const existingProfile = await fetchStudentProfileByEmail(normalizedEmail);
+        const existingProfile =
+          profileFromCode || (await fetchStudentProfileByEmail(normalizedEmail));
 
         if (existingProfile) {
           const migratedCredential = await createUserWithEmailAndPassword(
@@ -382,7 +440,9 @@ export const AuthProvider = ({ children }) => {
             { merge: true }
           );
 
-          return await finalizeLogin(migratedCredential, mergedProfile, { migratedFromLegacy: true });
+          return await finalizeLogin(migratedCredential, mergedProfile, {
+            migratedFromLegacy: true,
+          });
         }
       }
 

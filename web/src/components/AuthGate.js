@@ -93,6 +93,12 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   };
 
   const handlePasswordReset = async () => {
+    if (!email.includes("@")) {
+      const resetMessage = "Enter your email address to reset your password.";
+      setAuthError(resetMessage);
+      showToast(resetMessage, "error");
+      return;
+    }
     setResetting(true);
     setMessage("");
     setAuthError("");
@@ -211,8 +217,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             </>
           )}
 
-          <label style={styles.label}>Email</label>
-          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} style={inputStyle} />
+          <label style={styles.label}>{mode === "login" ? "Email or student code" : "Email"}</label>
+          <input
+            type={mode === "login" ? "text" : "email"}
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+            placeholder={mode === "login" ? "you@email.com or STU12345" : undefined}
+          />
 
           <label style={styles.label}>Password</label>
           <input
