@@ -122,7 +122,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
       >
         <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
           <span aria-hidden>{state.loading ? "⏳" : readiness.icon}</span>
-          <span style={{ fontWeight: 800 }}>{state.loading ? "Checking..." : "My Exam File"}</span>
+          <span style={{ fontWeight: 800 }}>{state.loading ? "Checking..." : "Exam Readiness"}</span>
         </span>
 
         {/* status pill */}
@@ -194,7 +194,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
           </button>
 
           <button type="button" style={styles.primaryButton} onClick={handleOpenExamFile}>
-            Open My Exam File
+            Open Exam Readiness
           </button>
         </div>
       </div>
