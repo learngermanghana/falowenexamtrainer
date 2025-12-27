@@ -48,6 +48,8 @@ const WritingPage = ({ mode = "course" }) => {
   } = useExam();
   const { user, idToken, studentProfile } = useAuth();
   const userId = user?.uid;
+  const studentCode =
+    studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "";
   const isExamMode = mode === "exam";
 
   const examWritingLetters = useMemo(
@@ -216,7 +218,7 @@ const WritingPage = ({ mode = "course" }) => {
 
       setProgressLoaded(false);
       try {
-        const saved = await loadWritingProgress({ userId, mode: progressMode });
+        const saved = await loadWritingProgress({ userId, studentCode, mode: progressMode });
         if (!isMounted) return;
 
         if (!saved) {
@@ -252,11 +254,12 @@ const WritingPage = ({ mode = "course" }) => {
   }, [progressMode, userId]);
 
   useEffect(() => {
-    if (!progressLoaded || !userId) return;
+    if (!progressLoaded || (!userId && !studentCode)) return;
 
     const timeout = setTimeout(() => {
       saveWritingProgress({
         userId,
+        studentCode,
         mode: progressMode,
         data: {
           typedAnswer,
@@ -280,6 +283,7 @@ const WritingPage = ({ mode = "course" }) => {
     selectedDraftIds,
     typedAnswer,
     userId,
+    studentCode,
   ]);
 
   const formatTime = (seconds) => {
