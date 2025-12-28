@@ -265,7 +265,7 @@ const TuitionStatusCard = ({
         >
           <strong>Payments are only available on the web app.</strong>
           <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-            Use the website to view or pay your tuition through the secure payment portal. Payments are hidden in the Android app.
+            To pay or renew your contract, please visit the web app. Payments are hidden in the Android app to meet Play Store rules.
           </p>
         </div>
       )}
