@@ -49,7 +49,7 @@ const SetupCheckpoint = () => {
             <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Finish setting up your account</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
               You're signed in with limited access until your tuition payment is confirmed.
-              Pay at least GH₵1000 to unlock 1-month access, or clear the full balance to unlock 6 months.
+              Pay at least GH₵2000 to unlock 1-month access, or clear the full balance to unlock 6 months.
             </p>
           </div>
           <button style={styles.secondaryButton} onClick={logout}>

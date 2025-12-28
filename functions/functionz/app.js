@@ -3,7 +3,7 @@
  * Key fixes included:
  * 1) DO NOT store authorization_url in students.paystackLink (it expires). Return it only to frontend.
  * 2) Preserve contractStart if already active; extend/upgrade contractEnd instead of resetting each payment.
- * 3) Enforce min installment GH₵1000 unless the payment clears the remaining balance.
+ * 3) Enforce min installment GH₵2000 unless the payment clears the remaining balance.
  * 4) Safer Paystack signature comparison (timing-safe).
  */
 
@@ -151,7 +151,7 @@ const DEFAULT_TUITION_CURRENCY = "GHS";
 const PAYSTACK_MAX_EVENT_AGE_MINUTES = 60 * 24 * 3; // 72 hours
 const PAYSTACK_MIN_PAYMENT_FLOOR = 10; // guard against tiny or missing amounts
 const PAYSTACK_OVERPAY_TOLERANCE_RATE = 0.02; // allow small rounding/fee differences
-const PAYSTACK_MIN_INSTALLMENT_GHS = 1000;
+const PAYSTACK_MIN_INSTALLMENT_GHS = 2000;
 
 function addMonths(date, months) {
   const d = new Date(date);

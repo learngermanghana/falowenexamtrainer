@@ -5,7 +5,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
 
-const MIN_INSTALLMENT_GHS = 1000;
+const MIN_INSTALLMENT_GHS = 2000;
 
 const formatMoney = (value) => {
   const numeric = Number(value);
@@ -23,7 +23,7 @@ const clampNumber = (value, { min = 0, max = Number.POSITIVE_INFINITY } = {}) =>
  * TuitionStatusCard
  * - shows tuition fee, paid so far, balance.
  * - lets students choose how much to pay now.
- * - enforces: minimum GH₵1000 unless they're paying the final remaining balance.
+ * - enforces: minimum GH₵2000 unless they're paying the final remaining balance.
  * - calls backend /paystack/initialize so Paystack receives clear metadata (paid so far, balance, plan).
  */
 const TuitionStatusCard = ({

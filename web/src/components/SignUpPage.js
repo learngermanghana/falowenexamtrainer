@@ -13,7 +13,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 
-const MIN_INITIAL_PAYMENT = 1000;
+const MIN_INITIAL_PAYMENT = 2000;
 
 const formatClassLabel = (className) => {
   const details = classCatalog[className];
@@ -206,7 +206,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
     if (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment)) {
       validationIssues.initialPaymentAmount =
-        "Enter a number without commas or spaces. You need at least GH₵1000 to start a paid account.";
+        "Enter a number without commas or spaces. You need at least GH₵2000 to start a paid account.";
     }
 
     if (numericInitialPayment < 0) {
@@ -296,7 +296,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         ? `You chose to pay GH₵${intendedPaymentAmount} now.`
         : "Choose how much to pay now inside the app.";
       const accessCopy =
-        "Pay at least GH₵1000 to unlock 1-month access, or clear the full balance to unlock 6 months.";
+        "Pay at least GH₵2000 to unlock 1-month access, or clear the full balance to unlock 6 months.";
       const paymentInstruction = paymentsEnabled
         ? "Open the tuition card in the app to start Paystack checkout."
         : "Payments are handled on the web app only. Please sign in online to complete your tuition.";
