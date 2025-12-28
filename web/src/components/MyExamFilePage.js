@@ -358,7 +358,7 @@ const MyExamFilePage = () => {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, flexWrap: "wrap" }}>
           <div>
             <p style={{ ...styles.helperText, margin: 0 }}>Exam dossier</p>
-            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>My Exam File</h2>
+            <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Exam Readiness</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
               A quick report of your level, readiness, attendance, scores, and tutor feedback.
             </p>
