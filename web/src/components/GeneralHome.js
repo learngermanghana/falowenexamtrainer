@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { ZOOM_DETAILS } from "../data/classCatalog";
@@ -63,6 +63,29 @@ const GeneralHome = ({
   const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
   const classCalendarId = "class-calendar-card";
+  const paymentAlert = useMemo(() => {
+    const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
+    if (balanceDue <= 0) return null;
+    if (!studentProfile?.contractEnd) return null;
+    const contractEndMs = Date.parse(studentProfile.contractEnd);
+    if (!Number.isFinite(contractEndMs)) return null;
+    const dayMs = 1000 * 60 * 60 * 24;
+    const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
+    if (daysLeft < 0 || daysLeft > 15) return null;
+
+    const amount = `GH₵${balanceDue.toLocaleString(undefined, {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })}`;
+
+    return {
+      daysLeft,
+      message:
+        daysLeft === 0
+          ? `Your access ends today and you still owe ${amount}. Please make a payment to keep access.`
+          : `You still owe ${amount} and have ${daysLeft} day${daysLeft === 1 ? "" : "s"} left. Please make a payment to keep access.`,
+    };
+  }, [studentProfile?.balanceDue, studentProfile?.contractEnd]);
 
   const handleSelectLevel = () => navigate("/campus/account");
   const handleConfirmClass = () => {
@@ -81,6 +104,26 @@ const GeneralHome = ({
         studentProfile={studentProfile}
         onOpenExamFile={() => navigate("/campus/examFile")}
       />
+
+      {paymentAlert ? (
+        <section
+          style={{
+            ...styles.card,
+            background: "#fffbeb",
+            border: "1px solid #f59e0b",
+            display: "grid",
+            gap: 8,
+          }}
+        >
+          <span style={{ ...styles.badge, background: "#f59e0b", color: "#fff" }}>Payment reminder</span>
+          <strong style={{ fontSize: 16 }}>{paymentAlert.message}</strong>
+          <PrimaryActionBar align="start">
+            <button style={styles.primaryButton} onClick={() => navigate("/campus/account")}>
+              Review payments
+            </button>
+          </PrimaryActionBar>
+        </section>
+      ) : null}
 
       {/* ❌ Remove the big readiness card from the home page */}
       {/* 
