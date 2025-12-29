@@ -16,6 +16,11 @@ const formatDate = (value) => {
   });
 };
 
+const formatMoney = (value) => {
+  const amount = Number(value) || 0;
+  return `GH₵${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+};
+
 const AccountSettings = () => {
   const { user, studentProfile, idToken, saveStudentProfile } = useAuth();
   const paymentsEnabled = isPaymentsEnabled();
@@ -59,6 +64,26 @@ const AccountSettings = () => {
       invoiceEmail: studentProfile?.email || user?.email || "",
     };
   }, [paymentsEnabled, studentProfile?.contractEnd, studentProfile?.contractTermMonths, studentProfile?.paymentStatus, studentProfile?.email, user?.email]);
+
+  const paymentAlert = useMemo(() => {
+    const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
+    if (balanceDue <= 0) return null;
+    if (!studentProfile?.contractEnd) return null;
+    const contractEndMs = Date.parse(studentProfile.contractEnd);
+    if (!Number.isFinite(contractEndMs)) return null;
+    const dayMs = 1000 * 60 * 60 * 24;
+    const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
+    if (daysLeft < 0 || daysLeft > 15) return null;
+
+    return {
+      balanceDue,
+      daysLeft,
+      message:
+        daysLeft === 0
+          ? `Your access ends today and you still owe ${formatMoney(balanceDue)}. Please make a payment to keep access.`
+          : `You still owe ${formatMoney(balanceDue)} and have ${daysLeft} day${daysLeft === 1 ? "" : "s"} left. Please make a payment to keep access.`,
+    };
+  }, [studentProfile?.balanceDue, studentProfile?.contractEnd]);
 
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({ ...prev, [field]: event.target.value }));
@@ -132,7 +157,7 @@ const AccountSettings = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-        <section style={styles.card}>
+      <section style={styles.card}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
           <h2 style={styles.sectionTitle}>Account overview</h2>
           <span style={styles.levelPill}>{studentProfile.className || "No course"}</span>
@@ -178,111 +203,112 @@ const AccountSettings = () => {
         </div>
       </section>
 
-        <section style={styles.card}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-            <h2 style={styles.sectionTitle}>Account settings</h2>
-            <span style={styles.badge}>Profile &amp; communication</span>
+      <section style={styles.card}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <h2 style={styles.sectionTitle}>Account settings</h2>
+          <span style={styles.badge}>Profile &amp; communication</span>
+        </div>
+        <p style={styles.helperText}>
+          Your name and login email are managed by Falowen to keep linked apps in sync. Contact support to update them.
+        </p>
+
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 10 }}>
+          <div style={{
+            ...styles.card,
+            margin: 0,
+            padding: 12,
+            background: "#f8fafc",
+            borderColor: "#e2e8f0",
+          }}>
+            <div style={styles.metaRow}>
+              <span>Display name</span>
+              <span style={styles.badge}>read-only</span>
+            </div>
+            <strong style={{ fontSize: 16 }}>{studentProfile?.name || user?.displayName || "Unknown"}</strong>
+            <div style={{ ...styles.metaRow, marginTop: 8 }}>
+              <span>Login email</span>
+              <span style={styles.badge}>managed by admin</span>
+            </div>
+            <strong style={{ fontSize: 16 }}>{studentProfile?.email || user?.email || "(no email)"}</strong>
           </div>
-          <p style={styles.helperText}>
-            Your name and login email are managed by Falowen to keep linked apps in sync. Contact support to update them.
-          </p>
 
-          <form onSubmit={handleSubmit} style={{ display: "grid", gap: 10 }}>
-            <div style={{
-              ...styles.card,
-              margin: 0,
-              padding: 12,
-              background: "#f8fafc",
-              borderColor: "#e2e8f0",
-            }}>
-              <div style={styles.metaRow}>
-                <span>Display name</span>
-                <span style={styles.badge}>read-only</span>
-              </div>
-              <strong style={{ fontSize: 16 }}>{studentProfile?.name || user?.displayName || "Unknown"}</strong>
-              <div style={{ ...styles.metaRow, marginTop: 8 }}>
-                <span>Login email</span>
-                <span style={styles.badge}>managed by admin</span>
-              </div>
-              <strong style={{ fontSize: 16 }}>{studentProfile?.email || user?.email || "(no email)"}</strong>
-            </div>
-
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="biography">
-                Class biography
-              </label>
-              <textarea
-                id="biography"
-                style={styles.textArea}
-                value={profile.biography}
-                onChange={handleChange("biography")}
-                placeholder="Write 2-4 sentences about your work, goals, or hobbies. Classmates will see this on the member page."
-              />
-              <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6, flexWrap: "wrap" }}>
-                <button
-                  type="button"
-                  style={styles.secondaryButton}
-                  onClick={handleCorrectBiography}
-                  disabled={isCorrectingBio}
-                >
-                  {isCorrectingBio ? "AI is polishing ..." : "Correct with AI"}
-                </button>
-                <button type="submit" style={styles.primaryButton} disabled={isSaving}>
-                  {isSaving ? "Saving ..." : "Save changes"}
-                </button>
-              </div>
-              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                Your bio is read-only on the member page. Edit it here anytime.
-              </p>
-            </div>
-            {status && (
-              <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#065f46", borderColor: "#34d399" }}>
-                {status}
-              </div>
-            )}
-          </form>
-        </section>
-
-        <section style={styles.card}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-            <h2 style={styles.sectionTitle}>Subscription &amp; billing</h2>
-            <span style={styles.levelPill}>{subscription.status}</span>
-          </div>
-          <p style={styles.helperText}>Essential billing info at a glance.</p>
-
-          <div style={{ ...styles.gridTwo, gap: 10 }}>
-            <div style={{ ...styles.card, margin: 0 }}>
-              <div style={styles.metaRow}>
-                <h3 style={{ margin: 0 }}>{subscription.plan}</h3>
-                <span style={styles.badge}>Seat: {subscription.seats}</span>
-              </div>
-              <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                <div style={styles.metaRow}>
-                  <span>Next renewal</span>
-                  <strong>{subscription.renewalDate}</strong>
-                </div>
-                <div style={styles.metaRow}>
-                  <span>Payment</span>
-                  <strong>{studentProfile.paymentStatus || "pending"}</strong>
-                </div>
-              </div>
-            </div>
-
-            <TuitionStatusCard
-              level={studentProfile.level}
-              paidAmount={studentProfile.initialPaymentAmount}
-              balanceDue={studentProfile.balanceDue}
-              tuitionFee={studentProfile.tuitionFee}
-              checkoutAmountOverride={
-                Number(studentProfile?.initialPaymentAmount || 0) > 0
-                  ? undefined
-                  : studentProfile?.paymentIntentAmount
-              }
-              title="Balance & tuition"
-              description={`Billing email: ${subscription.invoiceEmail || "add an email"}`}
+          <div style={styles.field}>
+            <label style={styles.label} htmlFor="biography">
+              Class biography
+            </label>
+            <textarea
+              id="biography"
+              style={styles.textArea}
+              value={profile.biography}
+              onChange={handleChange("biography")}
+              placeholder="Write 2-4 sentences about your work, goals, or hobbies. Classmates will see this on the member page."
             />
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={handleCorrectBiography}
+                disabled={isCorrectingBio}
+              >
+                {isCorrectingBio ? "AI is polishing ..." : "Correct with AI"}
+              </button>
+              <button type="submit" style={styles.primaryButton} disabled={isSaving}>
+                {isSaving ? "Saving ..." : "Save changes"}
+              </button>
+            </div>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              Your bio is read-only on the member page. Edit it here anytime.
+            </p>
           </div>
-        </section>
+          {status && (
+            <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#065f46", borderColor: "#34d399" }}>
+              {status}
+            </div>
+          )}
+        </form>
+      </section>
+
+      <section style={styles.card}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+          <h2 style={styles.sectionTitle}>Subscription &amp; billing</h2>
+          <span style={styles.levelPill}>{subscription.status}</span>
+        </div>
+        <p style={styles.helperText}>Essential billing info at a glance.</p>
+        {paymentAlert ? <div style={styles.errorBox}>{paymentAlert.message}</div> : null}
+
+        <div style={{ ...styles.gridTwo, gap: 10 }}>
+          <div style={{ ...styles.card, margin: 0 }}>
+            <div style={styles.metaRow}>
+              <h3 style={{ margin: 0 }}>{subscription.plan}</h3>
+              <span style={styles.badge}>Seat: {subscription.seats}</span>
+            </div>
+            <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+              <div style={styles.metaRow}>
+                <span>Next renewal</span>
+                <strong>{subscription.renewalDate}</strong>
+              </div>
+              <div style={styles.metaRow}>
+                <span>Payment</span>
+                <strong>{studentProfile.paymentStatus || "pending"}</strong>
+              </div>
+            </div>
+          </div>
+
+          <TuitionStatusCard
+            level={studentProfile.level}
+            paidAmount={studentProfile.initialPaymentAmount}
+            balanceDue={studentProfile.balanceDue}
+            tuitionFee={studentProfile.tuitionFee}
+            checkoutAmountOverride={
+              Number(studentProfile?.initialPaymentAmount || 0) > 0
+                ? undefined
+                : studentProfile?.paymentIntentAmount
+            }
+            title="Balance & tuition"
+            description={`Billing email: ${subscription.invoiceEmail || "add an email"}`}
+          />
+        </div>
+      </section>
     </div>
   );
 };
