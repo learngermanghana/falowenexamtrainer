@@ -12,9 +12,19 @@ export const classCatalog = {
       { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
       { day: "Thursday", startTime: "11:00", endTime: "12:00" },
       { day: "Friday", startTime: "11:00", endTime: "12:00" },
-    ],
+    
     docUrl: "https://drive.google.com/file/d/1Bzb1-cHO10m_KsrTHfbhaZAfQcmbssFt/view?usp=sharing",
   },
+  "A1 Hamburg Klasse": {
+    startDate: "2026-01-23",
+    endDate: "2026-03-21",
+    schedule: [
+      { day: "Thursday", startTime: "18:00", endTime: "19:00" },
+      { day: "Friday", startTime: "18:00", endTime: "19:00" },
+      { day: "Saturday", startTime: "8:00", endTime: "9:00" },
+
+    docUrl: "https://drive.google.com/file/d/1R7b3PqPvOVMKVOTbYVTDzmbw0N_UA7wQ/view?usp=sharing",
+  ],          
   "A1 Bonn Klasse": {
     startDate: "2025-11-10",
     endDate: "2026-01-13",
