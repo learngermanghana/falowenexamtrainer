@@ -53,7 +53,7 @@ export const classCatalog = {
       { day: "Wednesday", startTime: "19:30", endTime: "21:00" },
       { day: "Thursday", startTime: "19:30", endTime: "21:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1dE9cEXY9CC25lAXZuWNvQCFWis6nx0hW/view?usp=sharing",
+    docUrl: "https://drive.google.com/file/d/1GmRCIhn1S5zC55LvQstF4c5bXjeVFdS2/view?usp=sharing",
   },
   "B1 Koln Klasse": {
     startDate: "2025-11-20",
