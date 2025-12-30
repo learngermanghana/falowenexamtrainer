@@ -62,7 +62,7 @@ export const classCatalog = {
       { day: "Thursday", startTime: "19:30", endTime: "21:00" },
       { day: "Friday", startTime: "19:30", endTime: "21:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1sQ1ePNRapuVcih7BnhNNBQrO3SkM9K-O/view?usp=sharing",
+    docUrl: "https://drive.google.com/file/d/1ttjnOj10xo-baddfUHthHJ9dKYwqByk2/view?usp=sharing",
   },
   "B2 Munich Klasse": {
     startDate: "2025-08-08",
