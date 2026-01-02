@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { B2_SELF_LEARNING_PLAN } from "../data/b2SelfLearningPlan";
 import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/selfLearningProgressService";
+import { fetchVocabularyFromSheet } from "../services/vocabService";
 import { styles } from "../styles";
 
 const SCORE_THRESHOLD = 80;
+const SKIMMING_CHUNK_SIZE = 8;
 
 const buildEmptyDayState = () => ({
   grammarCheckComplete: false,
@@ -30,11 +32,45 @@ const B2SelfLearningCourse = () => {
 
   const [progressByDay, setProgressByDay] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
+  const [sheetVocabWords, setSheetVocabWords] = useState([]);
+  const [sheetVocabLoaded, setSheetVocabLoaded] = useState(false);
+  const [sheetVocabError, setSheetVocabError] = useState("");
 
   const dayKeys = useMemo(
     () => B2_SELF_LEARNING_PLAN.map((entry) => `day-${entry.day}`),
     []
   );
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadSheetVocab = async () => {
+      setSheetVocabLoaded(false);
+      setSheetVocabError("");
+      try {
+        const vocab = await fetchVocabularyFromSheet();
+        if (!isMounted) return;
+        const words = vocab
+          .filter((entry) => ["B2", "ALL"].includes(entry.level))
+          .map((entry) => entry.german)
+          .filter(Boolean);
+        setSheetVocabWords(Array.from(new Set(words)));
+      } catch (err) {
+        console.error("Failed to load B2 vocab sheet", err);
+        if (!isMounted) return;
+        setSheetVocabWords([]);
+        setSheetVocabError(err?.message || "Failed to load B2 vocabulary from the sheet.");
+      } finally {
+        if (isMounted) setSheetVocabLoaded(true);
+      }
+    };
+
+    loadSheetVocab();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -96,6 +132,31 @@ const B2SelfLearningCourse = () => {
     });
   };
 
+  const skimmingWordsByDay = useMemo(() => {
+    if (!sheetVocabWords.length) return {};
+    return B2_SELF_LEARNING_PLAN.reduce((acc, entry, index) => {
+      const start = index * SKIMMING_CHUNK_SIZE;
+      const chunk = sheetVocabWords.slice(start, start + SKIMMING_CHUNK_SIZE);
+      acc[`day-${entry.day}`] = chunk;
+      return acc;
+    }, {});
+  }, [sheetVocabWords]);
+
+  const getSkimmingWords = (entry, index) => {
+    const fallbackWords = entry.skimmingWords || [];
+    if (!sheetVocabWords.length) return fallbackWords;
+
+    const dayKey = `day-${entry.day}`;
+    const chunk =
+      skimmingWordsByDay[dayKey] || sheetVocabWords.slice(index * SKIMMING_CHUNK_SIZE, (index + 1) * SKIMMING_CHUNK_SIZE);
+
+    if (!chunk.length) return fallbackWords;
+    if (chunk.length >= SKIMMING_CHUNK_SIZE) return chunk;
+
+    const merged = [...chunk, ...fallbackWords.filter((word) => !chunk.includes(word))];
+    return merged.slice(0, SKIMMING_CHUNK_SIZE);
+  };
+
   const renderScoreField = ({ dayKey, label, value, onChange }) => (
     <label style={{ ...styles.field, maxWidth: 200 }}>
       <span style={styles.label}>{label}</span>
@@ -121,6 +182,15 @@ const B2SelfLearningCourse = () => {
           follow Goethe-B2 formats (Meinungsaufsatz or formeller Brief) and mirror the speaking topic and grammar
           focus. Use the brain map to collect quick ideas before you start.
         </p>
+        <p style={{ ...styles.helperText, marginTop: 0 }}>
+          Skimming words are loaded from the vocab Google Sheet when available; otherwise the built-in list is
+          shown.
+        </p>
+        {sheetVocabError ? (
+          <p style={{ ...styles.helperText, marginTop: 0, color: "#b91c1c" }}>
+            Vocabulary sheet unavailable: {sheetVocabError}
+          </p>
+        ) : null}
         {!userId && !studentCode ? (
           <p style={{ ...styles.helperText, color: "#b45309", marginBottom: 0 }}>
             Sign in to save your progress across devices.
@@ -128,7 +198,7 @@ const B2SelfLearningCourse = () => {
         ) : null}
       </div>
 
-      {B2_SELF_LEARNING_PLAN.map((entry) => {
+      {B2_SELF_LEARNING_PLAN.map((entry, index) => {
         const dayKey = `day-${entry.day}`;
         const dayState = progressByDay[dayKey] || buildEmptyDayState();
         const speakingScoreValue = dayState.speakingScore;
@@ -138,6 +208,7 @@ const B2SelfLearningCourse = () => {
         const canCompleteSpeaking = speakingScore !== null && speakingScore >= SCORE_THRESHOLD;
         const canCompleteWriting = writingScore !== null && writingScore >= SCORE_THRESHOLD;
         const canCompleteDay = dayState.speakingComplete && dayState.writingComplete && dayState.skimmingComplete;
+        const skimmingWords = getSkimmingWords(entry, index);
 
         return (
           <div key={dayKey} style={{ ...styles.card, display: "grid", gap: 16 }}>
@@ -311,8 +382,11 @@ const B2SelfLearningCourse = () => {
                 <p style={{ ...styles.helperText, margin: 0 }}>
                   Read the list quickly, then say each word in a short B2 sentence.
                 </p>
+                {!sheetVocabLoaded ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>Loading vocabulary from the sheet...</p>
+                ) : null}
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {entry.skimmingWords.map((word) => (
+                  {skimmingWords.map((word) => (
                     <span key={word} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>
                       {word}
                     </span>
