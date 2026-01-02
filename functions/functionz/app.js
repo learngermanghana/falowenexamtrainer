@@ -23,6 +23,7 @@ const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
+const { courseSchedulesByName } = require("../data/courseSchedulesByName");
 
 let getScoresForStudent;
 
@@ -152,6 +153,7 @@ const PAYSTACK_MAX_EVENT_AGE_MINUTES = 60 * 24 * 3; // 72 hours
 const PAYSTACK_MIN_PAYMENT_FLOOR = 10; // guard against tiny or missing amounts
 const PAYSTACK_OVERPAY_TOLERANCE_RATE = 0.02; // allow small rounding/fee differences
 const PAYSTACK_MIN_INSTALLMENT_GHS = 2000;
+const ZOOM_SIGNATURE_TOLERANCE_MS = 5 * 60 * 1000;
 
 function addMonths(date, months) {
   const d = new Date(date);
@@ -175,6 +177,76 @@ function safeEqualHex(a, b) {
     return false;
   }
 }
+
+const pad2 = (value) => String(value).padStart(2, "0");
+
+const formatDateInTimeZone = (date, timeZone) => {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  const parts = formatter.formatToParts(date);
+  const lookup = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${lookup.year}-${lookup.month}-${lookup.day}`;
+};
+
+const buildScheduleSummary = (sessions = []) =>
+  sessions
+    .map((session) => {
+      const base = [session.chapter, session.type].filter(Boolean).join(" – ");
+      return session.note ? `${base} (${session.note})` : base;
+    })
+    .join(" • ");
+
+const getScheduleSessionForDate = ({ className, referenceDate }) => {
+  const schedule = courseSchedulesByName[className];
+  if (!schedule?.days?.length) return null;
+
+  const timeZone = schedule.timezone || "UTC";
+  const date = formatDateInTimeZone(referenceDate, timeZone);
+  const day = schedule.days.find((entry) => entry.date === date);
+
+  if (!day) {
+    return { date, summary: null, sessions: [] };
+  }
+
+  return {
+    date,
+    sessions: day.sessions || [],
+    summary: buildScheduleSummary(day.sessions || []),
+  };
+};
+
+const verifyZoomSignature = (req, secret) => {
+  const signature = req.headers["x-zm-signature"];
+  const timestamp = req.headers["x-zm-request-timestamp"];
+
+  if (!signature || !timestamp) {
+    return { ok: false, error: "Missing Zoom signature headers" };
+  }
+
+  const parsedTimestamp = Number(timestamp);
+  if (!Number.isFinite(parsedTimestamp)) {
+    return { ok: false, error: "Invalid Zoom signature timestamp" };
+  }
+
+  const ageMs = Math.abs(Date.now() - parsedTimestamp * 1000);
+  if (ageMs > ZOOM_SIGNATURE_TOLERANCE_MS) {
+    return { ok: false, error: "Zoom signature timestamp expired" };
+  }
+
+  const rawBody = req.rawBody ? req.rawBody.toString("utf8") : JSON.stringify(req.body || {});
+  const message = `v0:${timestamp}:${rawBody}`;
+  const expected = `v0=${crypto.createHmac("sha256", secret).update(message).digest("hex")}`;
+
+  if (!safeEqualHex(expected, signature)) {
+    return { ok: false, error: "Zoom signature mismatch" };
+  }
+
+  return { ok: true };
+};
 
 const memoryQuota = new Map();
 
@@ -325,6 +397,135 @@ app.get("/metrics", (_req, res) => {
     metrics: snapshot,
     memory: process.memoryUsage(),
   });
+});
+
+app.post("/webhooks/zoom", async (req, res) => {
+  const requestLog = createLogger({ scope: "zoom_webhook", requestId: req.requestId });
+  const secret = process.env.ZOOM_WEBHOOK_SECRET;
+
+  if (!secret) {
+    requestLog.warn("zoom.webhook.missing_secret");
+    return res.status(503).json({ error: "Zoom webhook secret not configured" });
+  }
+
+  const eventType = req.body?.event;
+  if (eventType === "endpoint.url_validation") {
+    const plainToken = req.body?.payload?.plainToken;
+    if (!plainToken) {
+      return res.status(400).json({ error: "Missing Zoom plainToken" });
+    }
+
+    const encryptedToken = crypto
+      .createHmac("sha256", secret)
+      .update(plainToken)
+      .digest("hex");
+
+    return res.json({ plainToken, encryptedToken });
+  }
+
+  const verification = verifyZoomSignature(req, secret);
+  if (!verification.ok) {
+    requestLog.warn("zoom.webhook.signature_failed", { error: verification.error });
+    return res.status(401).json({ error: verification.error });
+  }
+
+  if (eventType !== "meeting.participant_joined") {
+    return res.json({ ok: true, ignored: true });
+  }
+
+  try {
+    const payload = req.body?.payload?.object || {};
+    const participant = payload.participant || {};
+    const displayName = participant.user_name || participant.name || "";
+    const emailFromPayload = participant.user_email || participant.email || "";
+    const emailFromName =
+      !emailFromPayload && displayName.includes("@") ? displayName.trim() : "";
+    const email = emailFromPayload || emailFromName;
+    const codeFromName =
+      !emailFromPayload && displayName && !displayName.includes("@")
+        ? displayName.trim()
+        : "";
+
+    if (!email) {
+      requestLog.warn("zoom.webhook.missing_email", { participant, displayName });
+    }
+
+    const studentResult =
+      (await findStudentByCodeOrEmail({ email, studentCode: codeFromName })) ||
+      (await findStudentByName(displayName));
+    if (!studentResult) {
+      requestLog.warn("zoom.webhook.student_not_found", { email, displayName });
+      return res.status(202).json({ ok: true, skipped: "student_not_found" });
+    }
+
+    const studentData = studentResult.snap.data() || {};
+    const className = studentData.className;
+    if (!className) {
+      requestLog.warn("zoom.webhook.missing_class", { email, studentId: studentResult.snap.id });
+      return res.status(202).json({ ok: true, skipped: "missing_class" });
+    }
+
+    const studentCode =
+      studentData.studentCode ||
+      studentData.studentcode ||
+      studentResult.snap.id ||
+      email.toLowerCase();
+
+    const joinTimeRaw =
+      participant.join_time || payload.start_time || payload.created_at || new Date().toISOString();
+    const joinTime = new Date(joinTimeRaw);
+    const referenceDate = Number.isNaN(joinTime.getTime()) ? new Date() : joinTime;
+
+    const scheduleInfo = getScheduleSessionForDate({ className, referenceDate });
+    const sessionDate =
+      scheduleInfo?.date || formatDateInTimeZone(referenceDate, "UTC");
+
+    const summary =
+      scheduleInfo?.summary || payload.topic || payload.topic_name || "Session";
+
+    const db = getFirestoreSafe();
+    if (!db) {
+      return res.status(500).json({ error: "Firestore not available" });
+    }
+
+    const sessionRef = db
+      .collection("attendance")
+      .doc(className)
+      .collection("sessions")
+      .doc(sessionDate);
+
+    const attendanceField = `attendance.${studentCode}`;
+    const sessionPayload = {
+      date: sessionDate,
+      topic: summary,
+      sessions: scheduleInfo?.sessions || [],
+      meetingId: payload.id || payload.uuid || null,
+      meetingTopic: payload.topic || null,
+      lastZoomJoinAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      source: "zoom",
+    };
+
+    await sessionRef.set(
+      {
+        ...sessionPayload,
+        [attendanceField]: true,
+      },
+      { merge: true }
+    );
+
+    requestLog.info("zoom.webhook.attendance_marked", {
+      studentCode,
+      className,
+      sessionDate,
+      meetingId: payload.id || payload.uuid || null,
+    });
+
+    return res.json({ ok: true, marked: studentCode, className, sessionDate });
+  } catch (err) {
+    requestLog.error("zoom.webhook.error", { error: err?.message || err });
+    return res.status(500).json({ error: err?.message || "Unknown error" });
+  }
 });
 
 app.post("/admin/purge-expired-students", async (req, res) => {
@@ -507,6 +708,21 @@ async function findStudentByCodeOrEmail({ studentCode, email }) {
   }
 
   return null;
+}
+
+async function findStudentByName(name) {
+  if (!name) return null;
+
+  const db = admin.firestore();
+  const snap = await db
+    .collection("students")
+    .where("name", "==", name)
+    .limit(1)
+    .get();
+
+  if (snap.empty) return null;
+  const doc = snap.docs[0];
+  return { ref: doc.ref, snap: doc };
 }
 
 /**

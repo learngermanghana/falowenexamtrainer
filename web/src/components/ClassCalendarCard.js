@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
 import {
   downloadClassCalendar,
+  findTodayClassSession,
   findNextClassSession,
   formatScheduleSummary,
 } from "../services/classCalendar";
@@ -25,6 +26,10 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
   const classDetails = classCatalog[selectedClass];
   const nextClass = useMemo(
     () => findNextClassSession(selectedClass, now),
+    [now, selectedClass]
+  );
+  const todayClass = useMemo(
+    () => findTodayClassSession(selectedClass, now),
     [now, selectedClass]
   );
   const timeline = useMemo(() => {
@@ -176,6 +181,32 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
           </div>
         ) : null}
       </div>
+
+      {todayClass ? (
+        <div style={{ ...styles.card, background: "#f8fafc", margin: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Today&apos;s lesson</h3>
+            <span style={styles.badge}>Today</span>
+          </div>
+          <p style={{ ...styles.helperText, margin: "6px 0" }}>
+            {todayClass.weekday}, {todayClass.date} · {todayClass.startTime}–{todayClass.endTime}
+          </p>
+          <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
+            Chapters: {todayClass.titles?.join("; ")}
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <a
+              href={ZOOM_DETAILS.url}
+              target="_blank"
+              rel="noreferrer"
+              style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center" }}
+            >
+              Join now
+            </a>
+            <span style={{ ...styles.helperText, margin: 0 }}>Session in progress today.</span>
+          </div>
+        </div>
+      ) : null}
 
       {nextClass ? (
         <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
