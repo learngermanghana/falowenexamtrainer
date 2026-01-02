@@ -21,6 +21,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 1,
     title: "Welcome + Self-learning kickoff",
     topic: "Introduce yourself and explain why you are learning German at B2.",
+    brainMap: [
+      "Ich heiße ... und komme aus ...",
+      "Ich lerne Deutsch, weil ...",
+      "Mein Ziel ist das Goethe-B2-Zertifikat.",
+      "Zuerst ..., danach ..., schließlich ...",
+    ],
     speaking: {
       concept:
         "Introduce yourself with context. Share who you are, your learning history, and what B2 means for your goals.",
@@ -33,13 +39,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you organize your intro and justify your B2 goals clearly.",
       prompt:
-        "Record a 60–90 second introduction. Mention your background, your goal for B2, and one challenge you face.",
+        "Sprich 60–90 Sekunden (Goethe-B2-Stil): Stelle dich vor, nenne dein Ziel für B2 und beschreibe eine Lernherausforderung.",
       askGrammarPrompt:
-        "Not sure about sentence order, connectors, or modal verbs? Ask a quick grammar question before you record.",
+        "Unsicher bei Satzstellung, Konnektoren oder Modalverben? Stelle zuerst eine kurze Grammatikfrage.",
     },
     writing: {
       prompt:
-        "Write a formal email to your course administrator requesting a change to your class schedule. Include the reason and a polite closing.",
+        "Schreibe im Goethe-B2-Stil einen formellen Brief/E-Mail an die Kursleitung: Stell dich vor, erkläre dein B2-Ziel (weil/damit) und nenne eine Lernschwierigkeit.",
     },
     skimmingWords: [
       "außerdem",
@@ -56,6 +62,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 2,
     title: "Kultur: explain the concept + give examples",
     topic: "Kultur: what it means, why it matters, and examples from your experience.",
+    brainMap: [
+      "In Deutschland ist Kultur sehr bekannt.",
+      "Viele Menschen haben ihre eigene Kultur.",
+      "Kultur zeigt sich in Sprache, Essen und Festen.",
+      "Menschen vergleichen Kulturen und lernen voneinander.",
+    ],
     speaking: {
       concept:
         "Define Kultur in your own words (values, traditions, daily habits). Give 2–3 concrete examples and compare cultures.",
@@ -68,13 +80,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Supports clear definitions and comparisons in your cultural examples.",
       prompt:
-        "Speak for 90 seconds. Explain what Kultur means, describe two examples, and compare your culture with another.",
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Erkläre, was Kultur bedeutet, gib zwei Beispiele und vergleiche zwei Kulturen.",
       askGrammarPrompt:
-        "If you need help defining or comparing ideas, ask the grammar coach first.",
+        "Wenn du Hilfe beim Definieren oder Vergleichen brauchst, frag zuerst den Grammar-Coach.",
     },
     writing: {
       prompt:
-        "Write a short opinion paragraph about why culture matters in a community. Include one example.",
+        "Schreibe im Goethe-B2-Stil einen kurzen Meinungsaufsatz über die Bedeutung von Kultur in einer Gemeinschaft. Nutze mindestens eine Relativsatz-Definition und Vergleichsformen.",
     },
     skimmingWords: [
       "Kulturerbe",
@@ -91,6 +103,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 15,
     title: "Bildung: definition to conclusion",
     topic: "Bildung and lifelong learning in modern society.",
+    brainMap: [
+      "Bildung = Wissen + Kompetenzen.",
+      "Lebenslanges Lernen = immer weiterlernen.",
+      "Vorteile: Chancen, Karriere.",
+      "Nachteile/Probleme: Zeit, Kosten.",
+    ],
     speaking: {
       concept:
         "Explain what Bildung means today and how learning shapes personal and social opportunities.",
@@ -103,13 +121,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you define Bildung, explain goals, and weigh pros/cons.",
       prompt:
-        "Speak for 2 minutes. Start with a definition of Bildung, give two examples, compare school learning and self-learning, share your opinion, list pros/cons, make a recommendation for adults, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Bildung, gib zwei Beispiele, vergleiche Schule und Selbstlernen, nenne Vor-/Nachteile, gib eine Empfehlung und schließe ab.",
       askGrammarPrompt:
-        "If you need help with nominalizations or purpose clauses, ask before you record.",
+        "Wenn du Hilfe mit Nominalisierungen oder Zweckangaben brauchst, frag vor der Aufnahme.",
     },
     writing: {
       prompt:
-        "Write a short report about one change that could improve adult education in your city.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über lebenslanges Lernen. Verwende damit/um ... zu und ein obwohl/trotzdem, um Vor- und Nachteile abzuwägen.",
     },
     skimmingWords: [
       "Weiterbildung",
@@ -126,6 +144,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 16,
     title: "Technologie: definition to conclusion",
     topic: "Technologie in Alltag, Schule, und Beruf.",
+    brainMap: [
+      "Technologie im Alltag: Smartphone, Apps.",
+      "Vorteile: schneller, effizient.",
+      "Nachteile: Ablenkung, Abhängigkeit.",
+      "Vergleich: früher vs. heute.",
+    ],
     speaking: {
       concept:
         "Define technology broadly and describe its impact on daily routines and communication.",
@@ -138,13 +162,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Lets you describe tech processes and compare impacts clearly.",
       prompt:
-        "Speak for 2 minutes. Define Technologie, give two everyday examples, compare life before/after smartphones, share your opinion, list pros/cons, make a recommendation for responsible use, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Technologie, gib Beispiele, vergleiche früher/heute, nenne Vor-/Nachteile, gib eine Empfehlung und schließe ab.",
       askGrammarPrompt:
-        "Need help with passive voice or cause-and-effect connectors? Ask first.",
+        "Brauchst du Hilfe mit Passiv oder Ursache-Wirkung-Konnektoren? Frag zuerst.",
     },
     writing: {
       prompt:
-        "Write an opinion paragraph about whether schools should allow smartphones in class.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz (Vorteile/Nachteile) über Smartphones im Unterricht. Nutze Vergleiche und Ursache-Wirkung-Konnektoren (deshalb, dadurch).",
     },
     skimmingWords: [
       "digital",
@@ -161,6 +185,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 17,
     title: "Umwelt: definition to conclusion",
     topic: "Umweltschutz and sustainable habits.",
+    brainMap: [
+      "Umweltschutz: Müll trennen, Energie sparen.",
+      "Individuelle Verantwortung vs. Politik.",
+      "Wenn/falls ... dann ...",
+      "Empfehlung: soll/muss.",
+    ],
     speaking: {
       concept:
         "Describe what environmental protection includes and why individual actions matter.",
@@ -173,13 +203,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you propose actions and responsibilities for sustainability.",
       prompt:
-        "Speak for 2 minutes. Define Umweltschutz, give examples of sustainable habits, compare city vs countryside challenges, share your opinion, list pros/cons of strict rules, recommend one action, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Umweltschutz, gib Beispiele, vergleiche Stadt/Land, nenne Vor-/Nachteile strenger Regeln, empfehle eine Maßnahme.",
       askGrammarPrompt:
-        "If conditionals or modal verbs are tricky, ask before you record.",
+        "Wenn Konditionalsätze oder Modalverben schwierig sind, frag vor der Aufnahme.",
     },
     writing: {
       prompt:
-        "Write a short email to your apartment building suggesting a recycling improvement.",
+        "Schreibe im Goethe-B2-Stil einen formellen Brief an die Hausverwaltung mit einem Vorschlag zum Recycling. Nutze wenn/falls und sollen/müssen.",
     },
     skimmingWords: [
       "nachhaltig",
@@ -196,6 +226,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 18,
     title: "Gesellschaft: definition to conclusion",
     topic: "Gesellschaft and social cohesion.",
+    brainMap: [
+      "Gesellschaft = Menschen + Regeln + Werte.",
+      "Zusammenhalt durch Projekte/Initiativen.",
+      "Kontrast: Individualismus vs. Gemeinschaft.",
+      "Außerdem/hingegen als Verknüpfung.",
+    ],
     speaking: {
       concept:
         "Explain society as a network of people, rules, and shared responsibilities.",
@@ -208,13 +244,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Supports precise definitions and balanced viewpoints about society.",
       prompt:
-        "Speak for 2 minutes. Define Gesellschaft, give examples of social rules, compare individualism and community, share your opinion, list pros/cons of social media for cohesion, recommend one initiative, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Gesellschaft, gib Beispiele, vergleiche Individualismus/Gemeinschaft, nenne Vor-/Nachteile sozialer Medien, empfehle eine Initiative.",
       askGrammarPrompt:
-        "Ask if you need help with relative clauses or conjunctive adverbs.",
+        "Frag, wenn du Hilfe mit Relativsätzen oder Konjunktivadverbien brauchst.",
     },
     writing: {
       prompt:
-        "Write a short article about one local project that strengthens community.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über ein lokales Projekt für Zusammenhalt. Nutze einen Relativsatz und ein Konjunktivadverb (hingegen/jedoch).",
     },
     skimmingWords: [
       "Zusammenhalt",
@@ -231,6 +267,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 19,
     title: "Arbeit: definition to conclusion",
     topic: "Work culture, jobs, and future skills.",
+    brainMap: [
+      "Arbeitswelt heute: flexibel, digital.",
+      "Zukunft: neue Berufe, neue Kompetenzen.",
+      "Vergleich: Büro vs. Homeoffice.",
+      "Aus meiner Sicht ...",
+    ],
     speaking: {
       concept:
         "Describe what Arbeit means today and how expectations have changed.",
@@ -243,13 +285,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you describe work contexts and future expectations politely.",
       prompt:
-        "Speak for 2 minutes. Define Arbeit, give examples of modern jobs, compare office work and remote work, share your opinion, list pros/cons of flexible hours, recommend one skill to learn, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Arbeit, gib Beispiele moderner Jobs, vergleiche Büro/Homeoffice, nenne Vor-/Nachteile flexibler Zeiten, empfehle eine Kompetenz.",
       askGrammarPrompt:
-        "If prepositions or future tense are confusing, ask first.",
+        "Wenn Präpositionen oder Futurformen verwirrend sind, frag zuerst.",
     },
     writing: {
       prompt:
-        "Write a short LinkedIn-style post about your ideal work environment.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über Zukunftskompetenzen im Beruf. Verwende Futur und eine formelle Meinungsformel.",
     },
     skimmingWords: [
       "Arbeitsplatz",
@@ -266,6 +308,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 20,
     title: "Gesundheit: definition to conclusion",
     topic: "Health, prevention, and lifestyle choices.",
+    brainMap: [
+      "Gesundheit: körperlich, mental, sozial.",
+      "Gewohnheiten: Schlaf, Bewegung, Ernährung.",
+      "Stressquellen: Arbeit vs. Schule.",
+      "Kontrast: während/hingegen.",
+    ],
     speaking: {
       concept:
         "Explain health as physical, mental, and social well-being.",
@@ -278,13 +326,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you define health and compare habits and stressors.",
       prompt:
-        "Speak for 2 minutes. Define Gesundheit, give examples of healthy habits, compare stress at work vs school, share your opinion, list pros/cons of fitness apps, recommend one daily routine, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Gesundheit, gib Beispiele, vergleiche Stressquellen, nenne Vor-/Nachteile von Fitness-Apps, empfehle eine Routine.",
       askGrammarPrompt:
-        "Need help with genitive or reflexive verbs? Ask before recording.",
+        "Brauchst du Hilfe mit Genitiv oder reflexiven Verben? Frag vor der Aufnahme.",
     },
     writing: {
       prompt:
-        "Write a short advice text to a friend about improving sleep habits.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über digitale Fitness-Apps. Nutze ein reflexives Verb und einen Kontrast (hingegen/während).",
     },
     skimmingWords: [
       "Wohlbefinden",
@@ -301,6 +349,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 21,
     title: "Migration: definition to conclusion",
     topic: "Migration, reasons, and integration.",
+    brainMap: [
+      "Gründe: Arbeit, Sicherheit, Familie.",
+      "Push/Pull-Faktoren erklären.",
+      "Integration: Sprache, Arbeit, Schule.",
+      "Zuerst/dann als Reihenfolge.",
+    ],
     speaking: {
       concept:
         "Define migration and describe common push and pull factors.",
@@ -313,13 +367,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Supports clear explanations of causes and integration steps.",
       prompt:
-        "Speak for 2 minutes. Define Migration, give examples of reasons, compare voluntary and forced migration, share your opinion, list pros/cons for host societies, recommend one integration measure, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Migration, nenne Gründe, vergleiche freiwillig/erzwungen, nenne Vor-/Nachteile, empfehle eine Integrationsmaßnahme.",
       askGrammarPrompt:
-        "If reason clauses or passive forms are hard, ask first.",
+        "Wenn Begründungssätze oder Passivformen schwer sind, frag zuerst.",
     },
     writing: {
       prompt:
-        "Write a short summary about a local integration program and its impact.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über Integrationsprogramme. Verwende weil/da, eine passive Form und eine zeitliche Reihenfolge.",
     },
     skimmingWords: [
       "Zuwanderung",
@@ -336,6 +390,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 22,
     title: "Medien: definition to conclusion",
     topic: "Media literacy and information quality.",
+    brainMap: [
+      "Medienkompetenz = kritisch prüfen.",
+      "Quellen: Zeitung, Social Media.",
+      "Gefahr: Fake News.",
+      "Jedoch/trotzdem als Kontrast.",
+    ],
     speaking: {
       concept:
         "Explain what media literacy is and why it matters for informed decisions.",
@@ -348,13 +408,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you report sources and evaluate media critically.",
       prompt:
-        "Speak for 2 minutes. Define Medienkompetenz, give examples of reliable sources, compare social media and newspapers, share your opinion, list pros/cons of fast news, recommend one verification step, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Medienkompetenz, nenne zuverlässige Quellen, vergleiche Social Media/Zeitung, nenne Vor-/Nachteile, empfehle eine Prüfstrategie.",
       askGrammarPrompt:
-        "If indirect speech or adjective endings are tricky, ask first.",
+        "Wenn indirekte Rede oder Adjektivendungen schwierig sind, frag zuerst.",
     },
     writing: {
       prompt:
-        "Write a short guide with three tips for checking online information.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über den Umgang mit Online-Informationen. Nutze eine indirekte Rede und einen Kontrastkonnektor.",
     },
     skimmingWords: [
       "Glaubwürdigkeit",
@@ -371,6 +431,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 23,
     title: "Politik: definition to conclusion",
     topic: "Civic participation and democratic processes.",
+    brainMap: [
+      "Politik = Entscheidungen für alle.",
+      "Beteiligung: wählen, mitreden.",
+      "Lokal vs. national.",
+      "Konjunktiv II: wäre/könnte.",
+    ],
     speaking: {
       concept:
         "Define politics as decision-making in a community and describe citizen roles.",
@@ -383,13 +449,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Lets you explain participation and propose policies diplomatically.",
       prompt:
-        "Speak for 2 minutes. Define Politik, give examples of participation, compare local vs national decisions, share your opinion, list pros/cons of mandatory voting, recommend one way to engage, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Politik, nenne Beteiligungsformen, vergleiche lokal/national, nenne Vor-/Nachteile der Wahlpflicht, empfehle eine Beteiligung.",
       askGrammarPrompt:
-        "Ask if you need help with Konjunktiv II or relative pronouns.",
+        "Frag, wenn du Hilfe mit Konjunktiv II oder Relativpronomen brauchst.",
     },
     writing: {
       prompt:
-        "Write a short opinion piece about voting at age 16.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über das Wahlrecht ab 16. Verwende Konjunktiv II und einen Relativsatz.",
     },
     skimmingWords: [
       "Beteiligung",
@@ -406,6 +472,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 24,
     title: "Freizeit: definition to conclusion",
     topic: "Leisure activities and work-life balance.",
+    brainMap: [
+      "Freizeit = Erholung + Hobbys.",
+      "Aktiv vs. passiv.",
+      "Wenn/sobald ...",
+      "regelmäßig/selten.",
+    ],
     speaking: {
       concept:
         "Describe leisure as time for recovery and personal interests.",
@@ -418,13 +490,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you explain leisure routines and balance strategies.",
       prompt:
-        "Speak for 2 minutes. Define Freizeit, give examples of activities, compare active and passive hobbies, share your opinion, list pros/cons of constant availability, recommend one balance strategy, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Freizeit, gib Beispiele, vergleiche aktive/passive Hobbys, nenne Vor-/Nachteile ständiger Erreichbarkeit, empfehle eine Strategie.",
       askGrammarPrompt:
-        "If separable verbs or time clauses are confusing, ask before recording.",
+        "Wenn trennbare Verben oder Temporalsätze verwirrend sind, frag vor der Aufnahme.",
     },
     writing: {
       prompt:
-        "Write a short paragraph about a hobby that helps you relax.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über Freizeit und Work-Life-Balance. Nutze ein trennbares Verb, einen Temporalsatz und eine Häufigkeitsangabe.",
     },
     skimmingWords: [
       "Ausgleich",
@@ -441,6 +513,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 25,
     title: "Wohnen: definition to conclusion",
     topic: "Housing, affordability, and living styles.",
+    brainMap: [
+      "Wohnen: Stadt vs. Land.",
+      "Wohnformen: WG, eigene Wohnung.",
+      "Je ... desto ... als Vergleich.",
+      "Sollte/könnte für Empfehlungen.",
+    ],
     speaking: {
       concept:
         "Explain housing needs and how people choose where to live.",
@@ -453,13 +531,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Supports clear comparisons and recommendations about housing.",
       prompt:
-        "Speak for 2 minutes. Define Wohnen, give examples of housing types, compare city and rural living, share your opinion, list pros/cons of shared apartments, recommend one housing policy, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Wohnen, gib Beispiele, vergleiche Stadt/Land, nenne Vor-/Nachteile von WGs, empfehle eine Wohnpolitik.",
       askGrammarPrompt:
-        "Ask if you need help with prepositions or comparative structures.",
+        "Frag, wenn du Hilfe mit Präpositionen oder Vergleichsstrukturen brauchst.",
     },
     writing: {
       prompt:
-        "Write a short email asking a landlord about a rental offer.",
+        "Schreibe im Goethe-B2-Stil einen formellen Brief an einen Vermieter mit Fragen zu einer Wohnung. Nutze je ... desto ... und eine Empfehlung mit sollte/könnte.",
     },
     skimmingWords: [
       "Miete",
@@ -476,6 +554,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 26,
     title: "Mobilität: definition to conclusion",
     topic: "Transport, infrastructure, and sustainable travel.",
+    brainMap: [
+      "Mobilität: ÖPNV, Fahrrad, Auto.",
+      "Nachhaltigkeit: weniger Emissionen.",
+      "Passiv: es wird gebaut.",
+      "Deswegen/daher als Ursache.",
+    ],
     speaking: {
       concept:
         "Describe mobility as the ability to move efficiently and safely.",
@@ -488,13 +572,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you explain transport options and policy effects.",
       prompt:
-        "Speak for 2 minutes. Define Mobilität, give examples of transport options, compare car use and public transport, share your opinion, list pros/cons of e-scooters, recommend one change, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Mobilität, gib Beispiele, vergleiche Auto/ÖPNV, nenne Vor-/Nachteile von E-Scootern, empfehle eine Änderung.",
       askGrammarPrompt:
-        "If passive voice or transport prepositions are tricky, ask first.",
+        "Wenn Passiv oder Verkehrs-Präpositionen schwierig sind, frag zuerst.",
     },
     writing: {
       prompt:
-        "Write a short proposal to your city about improving bike lanes.",
+        "Schreibe im Goethe-B2-Stil einen formellen Brief an die Stadt über bessere Radwege. Verwende Passiv und einen Kausalkonnektor (daher/deswegen).",
     },
     skimmingWords: [
       "Verkehr",
@@ -511,6 +595,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 27,
     title: "Wissenschaft: definition to conclusion",
     topic: "Science, research, and trust.",
+    brainMap: [
+      "Wissenschaft = Forschung + Methode.",
+      "Vertrauen durch Studien/Belege.",
+      "Weil/obwohl als Begründung.",
+      "Passiv: es wird untersucht.",
+    ],
     speaking: {
       concept:
         "Explain science as a method for testing ideas and expanding knowledge.",
@@ -523,13 +613,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you explain research methods and compare fields.",
       prompt:
-        "Speak for 2 minutes. Define Wissenschaft, give examples of research fields, compare basic and applied research, share your opinion, list pros/cons of public funding, recommend one communication practice, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Wissenschaft, nenne Beispiele, vergleiche Grundlagenforschung/angewandte Forschung, nenne Vor-/Nachteile öffentlicher Förderung, empfehle eine Kommunikationspraxis.",
       askGrammarPrompt:
-        "Ask if subordinate clauses or passive voice are confusing.",
+        "Frag, wenn Nebensätze oder Passivformen verwirrend sind.",
     },
     writing: {
       prompt:
-        "Write a short summary of a scientific discovery that interests you.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über die Bedeutung von Forschung. Verwende weil/obwohl und mindestens eine passive Konstruktion.",
     },
     skimmingWords: [
       "Forschung",
@@ -546,6 +636,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 28,
     title: "Konsum: definition to conclusion",
     topic: "Consumer habits and ethical choices.",
+    brainMap: [
+      "Konsum: Preise, Qualität, Nachhaltigkeit.",
+      "Online vs. lokal einkaufen.",
+      "Genitiv: die Qualität des Produkts.",
+      "Vor allem/besonders als Betonung.",
+    ],
     speaking: {
       concept:
         "Describe consumption patterns and how choices affect people and planet.",
@@ -558,13 +654,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Lets you compare consumption choices and highlight impacts.",
       prompt:
-        "Speak for 2 minutes. Define Konsum, give examples of daily purchases, compare online and local shopping, share your opinion, list pros/cons of fast fashion, recommend one change, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Konsum, gib Beispiele, vergleiche online/lokal, nenne Vor-/Nachteile von Fast Fashion, empfehle eine Veränderung.",
       askGrammarPrompt:
-        "If genitive or comparisons are tricky, ask before recording.",
+        "Wenn Genitiv oder Vergleiche schwierig sind, frag vor der Aufnahme.",
     },
     writing: {
       prompt:
-        "Write a short review comparing two shopping experiences.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über nachhaltigen Konsum. Nutze den Genitiv und einen Vergleichssatz.",
     },
     skimmingWords: [
       "Verbrauch",
@@ -581,6 +677,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 29,
     title: "Digitalisierung: definition to conclusion",
     topic: "Digitalization in services and daily life.",
+    brainMap: [
+      "Digitalisierung: Onlinebanking, E-Services.",
+      "Vorteile: schnell, effizient.",
+      "Risiken: Datenschutz, Zugang.",
+      "Dadurch/sodass als Folge.",
+    ],
     speaking: {
       concept:
         "Explain digitalization as shifting processes to digital tools and systems.",
@@ -593,13 +695,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you describe digital services and predict impacts.",
       prompt:
-        "Speak for 2 minutes. Define Digitalisierung, give examples in services, compare analog and digital processes, share your opinion, list pros/cons of e-government, recommend one improvement, and conclude.",
+        "Sprich 2 Minuten (Goethe-B2-Stil): Definiere Digitalisierung, nenne Beispiele, vergleiche analog/digital, nenne Vor-/Nachteile von E-Government, empfehle eine Verbesserung.",
       askGrammarPrompt:
-        "Ask if noun compounds or future tense are confusing.",
+        "Frag, wenn Nominalkomposita oder Futurformen verwirrend sind.",
     },
     writing: {
       prompt:
-        "Write a short message explaining how an app made your life easier.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über digitale Dienstleistungen. Verwende Futur und einen Ursache-Wirkung-Konnektor.",
     },
     skimmingWords: [
       "Online",
@@ -616,6 +718,12 @@ export const B2_SELF_LEARNING_PLAN = [
     day: 30,
     title: "Zusammenfassung: definition to conclusion",
     topic: "Review and connect B2 themes in one coherent talk.",
+    brainMap: [
+      "Rückblick auf mehrere Themen.",
+      "Hauptpunkt nennen + Beispiele.",
+      "Einerseits/andererseits als Kontrast.",
+      "Zusammenfassend als Abschluss.",
+    ],
     speaking: {
       concept:
         "Connect education, technology, environment, society, work, health, and migration into one narrative.",
@@ -628,13 +736,13 @@ export const B2_SELF_LEARNING_PLAN = [
       ],
       grammarPurpose: "Helps you tie themes together and end with a strong summary.",
       prompt:
-        "Speak for 2–3 minutes. Define a key theme, give examples across topics, compare two areas, share your opinion, list pros/cons, recommend one priority, and conclude with a summary.",
+        "Sprich 2–3 Minuten (Goethe-B2-Stil): Nenne ein Kernthema, gib Beispiele aus mehreren Bereichen, vergleiche zwei Felder, nenne Vor-/Nachteile, gib eine Empfehlung und fasse zusammen.",
       askGrammarPrompt:
-        "If you need help connecting ideas or summarizing, ask before recording.",
+        "Wenn du Hilfe beim Verbinden von Ideen oder Zusammenfassen brauchst, frag vor der Aufnahme.",
     },
     writing: {
       prompt:
-        "Write a reflective paragraph about the theme you found most challenging.",
+        "Schreibe im Goethe-B2-Stil einen Meinungsaufsatz über das Thema, das dir am schwersten fällt. Nutze Zusammenfassungen und einen Kontrast (einerseits/andererseits).",
     },
     skimmingWords: [
       "insgesamt",
