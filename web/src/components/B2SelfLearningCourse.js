@@ -150,6 +150,31 @@ const B2SelfLearningCourse = () => {
             <div style={{ display: "grid", gap: 12 }}>
               <div style={{ display: "grid", gap: 6 }}>
                 <strong>1) Speaking recorder</strong>
+                {entry.speaking.concept ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.speaking.concept}</p>
+                ) : null}
+                {entry.speaking.grammarNotes?.length ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Grammar focus</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.speaking.grammarNotes.map((note) => (
+                        <li key={note}>{note}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {entry.speaking.askGrammarPrompt ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    {entry.speaking.askGrammarPrompt}{" "}
+                    <button
+                      type="button"
+                      style={styles.linkButton}
+                      onClick={() => navigate("/campus/grammar")}
+                    >
+                      Ask the grammar coach
+                    </button>
+                  </p>
+                ) : null}
                 <p style={{ ...styles.helperText, margin: 0 }}>{entry.speaking.prompt}</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
                   <button
