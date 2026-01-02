@@ -22,6 +22,7 @@ const GOOGLE_SERVICE_ACCOUNT_JSON_B64 = defineSecret("GOOGLE_SERVICE_ACCOUNT_JSO
 const STUDENTS_SHEET_ID = defineSecret("STUDENTS_SHEET_ID");
 const STUDENTS_SHEET_TAB = defineSecret("STUDENTS_SHEET_TAB");
 const RESULTS_SHEET_PUBLISHED_CSV_URL = defineSecret("RESULTS_SHEET_PUBLISHED_CSV_URL");
+const ZOOM_WEBHOOK_SECRET = defineSecret("ZOOM_WEBHOOK_SECRET");
 
 let appInstance;
 let appendStudentToStudentsSheetSafely;
@@ -151,6 +152,7 @@ exports.api = onRequest(
       STUDENTS_SHEET_ID,
       STUDENTS_SHEET_TAB,
       RESULTS_SHEET_PUBLISHED_CSV_URL,
+      ZOOM_WEBHOOK_SECRET,
     ],
   },
   (req, res) => {
