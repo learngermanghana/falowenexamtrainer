@@ -6,7 +6,7 @@ import SignUpPage from "../components/SignUpPage";
 const mockSignup = jest.fn();
 
 jest.mock("../context/ExamContext", () => ({
-  ALLOWED_LEVELS: ["A1", "A2", "B1", "B2"],
+  ALLOWED_LEVELS: ["A1", "A2", "B1", "B2", "C1"],
 }));
 
 jest.mock("../context/AuthContext", () => ({

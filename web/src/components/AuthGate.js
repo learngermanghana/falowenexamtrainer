@@ -72,6 +72,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           learningMode,
           emergencyContactPhone,
           className,
+          contractTermMonths: 6,
         });
 
         savePreferredLevel(selectedLevel);
