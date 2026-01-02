@@ -4,6 +4,7 @@ import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
+import C1SelfLearningCourse from "./C1SelfLearningCourse";
 
 const normalizeLevel = (level) => (level || "").toUpperCase();
 const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -206,6 +207,7 @@ const CourseTab = ({ defaultLevel }) => {
   const schedule = useMemo(() => mergedCourseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
   const isDerivedLevel = useMemo(() => derivedLevels.has(selectedCourseLevel), [selectedCourseLevel]);
   const isB2SelfLearning = selectedCourseLevel === "B2";
+  const isC1SelfLearning = selectedCourseLevel === "C1";
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
@@ -249,7 +251,7 @@ const CourseTab = ({ defaultLevel }) => {
             </div>
           </div>
 
-          {isB2SelfLearning ? null : (
+          {isB2SelfLearning || isC1SelfLearning ? null : (
             <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
               <label style={{ display: "grid", gap: 6 }}>
                 <span style={styles.helperText}>Search by day, topic, or grammar focus</span>
@@ -269,8 +271,8 @@ const CourseTab = ({ defaultLevel }) => {
           )}
         </div>
 
-        {isB2SelfLearning ? (
-          <B2SelfLearningCourse />
+        {isB2SelfLearning || isC1SelfLearning ? (
+          isB2SelfLearning ? <B2SelfLearningCourse /> : <C1SelfLearningCourse />
         ) : (
           <>
             <p style={styles.helperText}>
