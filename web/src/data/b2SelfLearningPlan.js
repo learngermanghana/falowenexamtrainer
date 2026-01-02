@@ -7,10 +7,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Introduce yourself with context. Share who you are, your learning history, and what B2 means for your goals.",
       grammarNotes: [
-        "Sequencing connectors (zuerst, danach, schließlich)",
-        "Reasons and goals (weil, damit, um ... zu)",
-        "Modal verbs for intentions (möchte, will, kann)",
+        "Use sequencing connectors to structure your introduction (zuerst, danach, schließlich).",
+        "Use reason/goal clauses to explain your motivation (weil, damit, um ... zu).",
+        "Use modal verbs to state intentions and abilities (möchte, will, kann).",
       ],
+      grammarPurpose: "Helps you organize your intro and justify your B2 goals clearly.",
       prompt:
         "Record a 60–90 second introduction. Mention your background, your goal for B2, and one challenge you face.",
       askGrammarPrompt:
@@ -39,10 +40,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Define Kultur in your own words (values, traditions, daily habits). Give 2–3 concrete examples and compare cultures.",
       grammarNotes: [
-        "Noun phrases and compound nouns (Kulturerbe, Alltagskultur)",
-        "Comparisons (im Vergleich zu, genauso wie, anders als)",
-        "Relative clauses to define ideas (die Kultur, die ...)",
+        "Use compound nouns to label cultural concepts (Kulturerbe, Alltagskultur).",
+        "Use comparison phrases to contrast cultures (im Vergleich zu, genauso wie, anders als).",
+        "Use relative clauses to define Kultur precisely (die Kultur, die ...).",
       ],
+      grammarPurpose: "Supports clear definitions and comparisons in your cultural examples.",
       prompt:
         "Speak for 90 seconds. Explain what Kultur means, describe two examples, and compare your culture with another.",
       askGrammarPrompt:
@@ -71,10 +73,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Explain what Bildung means today and how learning shapes personal and social opportunities.",
       grammarNotes: [
-        "Nominalisierung (Bildung, Weiterbildung, Qualifikation)",
-        "Purpose clauses (damit, um ... zu)",
-        "Concession (obwohl, trotzdem)",
+        "Use nominalizations to sound formal when defining Bildung (Bildung, Weiterbildung, Qualifikation).",
+        "Use purpose clauses to explain learning goals (damit, um ... zu).",
+        "Use concession to balance pros/cons (obwohl, trotzdem).",
       ],
+      grammarPurpose: "Helps you define Bildung, explain goals, and weigh pros/cons.",
       prompt:
         "Speak for 2 minutes. Start with a definition of Bildung, give two examples, compare school learning and self-learning, share your opinion, list pros/cons, make a recommendation for adults, and conclude.",
       askGrammarPrompt:
@@ -103,10 +106,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Define technology broadly and describe its impact on daily routines and communication.",
       grammarNotes: [
-        "Passive voice (wird genutzt, wurde entwickelt)",
-        "Cause and effect (deshalb, dadurch, infolgedessen)",
-        "Comparatives and superlatives",
+        "Use passive voice to describe how tech is used (wird genutzt, wurde entwickelt).",
+        "Use cause-effect connectors to link tech and consequences (deshalb, dadurch, infolgedessen).",
+        "Use comparatives/superlatives to compare life before/after smartphones.",
       ],
+      grammarPurpose: "Lets you describe tech processes and compare impacts clearly.",
       prompt:
         "Speak for 2 minutes. Define Technologie, give two everyday examples, compare life before/after smartphones, share your opinion, list pros/cons, make a recommendation for responsible use, and conclude.",
       askGrammarPrompt:
@@ -135,10 +139,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Describe what environmental protection includes and why individual actions matter.",
       grammarNotes: [
-        "Verb-preposition pairs (sich kümmern um, beitragen zu)",
-        "Conditional sentences (wenn, falls)",
-        "Modal verbs for obligation (müssen, sollen)",
+        "Use verb-preposition pairs to name actions (sich kümmern um, beitragen zu).",
+        "Use conditionals to propose scenarios and solutions (wenn, falls).",
+        "Use modal verbs to express obligation in recommendations (müssen, sollen).",
       ],
+      grammarPurpose: "Helps you propose actions and responsibilities for sustainability.",
       prompt:
         "Speak for 2 minutes. Define Umweltschutz, give examples of sustainable habits, compare city vs countryside challenges, share your opinion, list pros/cons of strict rules, recommend one action, and conclude.",
       askGrammarPrompt:
@@ -167,10 +172,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Explain society as a network of people, rules, and shared responsibilities.",
       grammarNotes: [
-        "Relative clauses to define groups (die Menschen, die ...)",
-        "Noun clauses (dass, ob)",
-        "Conjunctive adverbs (außerdem, hingegen)",
+        "Use relative clauses to define social groups (die Menschen, die ...).",
+        "Use noun clauses to explain social rules and beliefs (dass, ob).",
+        "Use conjunctive adverbs to add or contrast ideas (außerdem, hingegen).",
       ],
+      grammarPurpose: "Supports precise definitions and balanced viewpoints about society.",
       prompt:
         "Speak for 2 minutes. Define Gesellschaft, give examples of social rules, compare individualism and community, share your opinion, list pros/cons of social media for cohesion, recommend one initiative, and conclude.",
       askGrammarPrompt:
@@ -199,10 +205,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Describe what Arbeit means today and how expectations have changed.",
       grammarNotes: [
-        "Two-way prepositions (in der Firma, auf der Arbeit)",
-        "Future with werden",
-        "Formal expressions (aus meiner Sicht, meiner Meinung nach)",
+        "Use two-way prepositions to place work settings accurately (in der Firma, auf der Arbeit).",
+        "Use future tense to predict job trends (werden).",
+        "Use formal opinion phrases to present your view (aus meiner Sicht, meiner Meinung nach).",
       ],
+      grammarPurpose: "Helps you describe work contexts and future expectations politely.",
       prompt:
         "Speak for 2 minutes. Define Arbeit, give examples of modern jobs, compare office work and remote work, share your opinion, list pros/cons of flexible hours, recommend one skill to learn, and conclude.",
       askGrammarPrompt:
@@ -231,10 +238,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Explain health as physical, mental, and social well-being.",
       grammarNotes: [
-        "Genitive with abstract nouns (die Bedeutung der Gesundheit)",
-        "Reflexive verbs (sich ernähren, sich bewegen)",
-        "Contrast (während, hingegen)",
+        "Use genitive with abstract nouns to define health (die Bedeutung der Gesundheit).",
+        "Use reflexive verbs to describe daily habits (sich ernähren, sich bewegen).",
+        "Use contrast connectors to compare stress sources (während, hingegen).",
       ],
+      grammarPurpose: "Helps you define health and compare habits and stressors.",
       prompt:
         "Speak for 2 minutes. Define Gesundheit, give examples of healthy habits, compare stress at work vs school, share your opinion, list pros/cons of fitness apps, recommend one daily routine, and conclude.",
       askGrammarPrompt:
@@ -263,10 +271,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Define migration and describe common push and pull factors.",
       grammarNotes: [
-        "Reason clauses (weil, da)",
-        "Passive voice for processes (es wird integriert)",
-        "Word order with time/place (zuerst, dann)",
+        "Use reason clauses to explain migration factors (weil, da).",
+        "Use passive voice to describe integration processes (es wird integriert).",
+        "Use time/place order to structure the sequence (zuerst, dann).",
       ],
+      grammarPurpose: "Supports clear explanations of causes and integration steps.",
       prompt:
         "Speak for 2 minutes. Define Migration, give examples of reasons, compare voluntary and forced migration, share your opinion, list pros/cons for host societies, recommend one integration measure, and conclude.",
       askGrammarPrompt:
@@ -295,10 +304,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Explain what media literacy is and why it matters for informed decisions.",
       grammarNotes: [
-        "Indirect speech (er sagt, dass ...)",
-        "Adjective endings after articles",
-        "Contrastive connectors (jedoch, trotzdem)",
+        "Use indirect speech to report sources (er sagt, dass ...).",
+        "Use adjective endings to describe sources precisely (zuverlässige Nachricht).",
+        "Use contrastive connectors to weigh pros/cons (jedoch, trotzdem).",
       ],
+      grammarPurpose: "Helps you report sources and evaluate media critically.",
       prompt:
         "Speak for 2 minutes. Define Medienkompetenz, give examples of reliable sources, compare social media and newspapers, share your opinion, list pros/cons of fast news, recommend one verification step, and conclude.",
       askGrammarPrompt:
@@ -327,10 +337,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Define politics as decision-making in a community and describe citizen roles.",
       grammarNotes: [
-        "Noun-verb phrases (eine Entscheidung treffen)",
-        "Relative pronouns (der/die/das)",
-        "Formal register with Konjunktiv II (wäre, könnte)",
+        "Use noun-verb phrases to describe participation (eine Entscheidung treffen).",
+        "Use relative pronouns to specify actors and rules (der/die/das).",
+        "Use Konjunktiv II to propose hypothetical solutions (wäre, könnte).",
       ],
+      grammarPurpose: "Lets you explain participation and propose policies diplomatically.",
       prompt:
         "Speak for 2 minutes. Define Politik, give examples of participation, compare local vs national decisions, share your opinion, list pros/cons of mandatory voting, recommend one way to engage, and conclude.",
       askGrammarPrompt:
@@ -359,10 +370,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Describe leisure as time for recovery and personal interests.",
       grammarNotes: [
-        "Separable verbs (abschalten, ausruhen)",
-        "Temporal clauses (wenn, sobald)",
-        "Expressions of frequency (regelmäßig, selten)",
+        "Use separable verbs to describe leisure actions (abschalten, ausruhen).",
+        "Use temporal clauses to sequence routines (wenn, sobald).",
+        "Use frequency expressions to describe habits (regelmäßig, selten).",
       ],
+      grammarPurpose: "Helps you explain leisure routines and balance strategies.",
       prompt:
         "Speak for 2 minutes. Define Freizeit, give examples of activities, compare active and passive hobbies, share your opinion, list pros/cons of constant availability, recommend one balance strategy, and conclude.",
       askGrammarPrompt:
@@ -391,10 +403,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Explain housing needs and how people choose where to live.",
       grammarNotes: [
-        "Prepositions with dative/accusative (in die Stadt, auf dem Land)",
-        "Comparative structures (je ..., desto ...)",
-        "Modal verbs for advice (sollte, könnte)",
+        "Use dative/accusative prepositions to describe location choices (in die Stadt, auf dem Land).",
+        "Use comparative structures to weigh options (je ..., desto ...).",
+        "Use modal verbs to give housing advice (sollte, könnte).",
       ],
+      grammarPurpose: "Supports clear comparisons and recommendations about housing.",
       prompt:
         "Speak for 2 minutes. Define Wohnen, give examples of housing types, compare city and rural living, share your opinion, list pros/cons of shared apartments, recommend one housing policy, and conclude.",
       askGrammarPrompt:
@@ -423,10 +436,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Describe mobility as the ability to move efficiently and safely.",
       grammarNotes: [
-        "Passive voice in infrastructure (es wird gebaut)",
-        "Prepositions with transport (mit dem Bus, per Fahrrad)",
-        "Causal connectors (deswegen, daher)",
+        "Use passive voice to describe infrastructure changes (es wird gebaut).",
+        "Use transport prepositions to name travel modes (mit dem Bus, per Fahrrad).",
+        "Use causal connectors to explain effects of policies (deswegen, daher).",
       ],
+      grammarPurpose: "Helps you explain transport options and policy effects.",
       prompt:
         "Speak for 2 minutes. Define Mobilität, give examples of transport options, compare car use and public transport, share your opinion, list pros/cons of e-scooters, recommend one change, and conclude.",
       askGrammarPrompt:
@@ -455,10 +469,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Explain science as a method for testing ideas and expanding knowledge.",
       grammarNotes: [
-        "Subordinate clauses (weil, obwohl, während)",
-        "Passive for research (es wird untersucht)",
-        "Linking phrases (zum einen ... zum anderen)",
+        "Use subordinate clauses to explain reasons and limits (weil, obwohl, während).",
+        "Use passive voice to describe research processes (es wird untersucht).",
+        "Use linking phrases to compare research types (zum einen ... zum anderen).",
       ],
+      grammarPurpose: "Helps you explain research methods and compare fields.",
       prompt:
         "Speak for 2 minutes. Define Wissenschaft, give examples of research fields, compare basic and applied research, share your opinion, list pros/cons of public funding, recommend one communication practice, and conclude.",
       askGrammarPrompt:
@@ -487,10 +502,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Describe consumption patterns and how choices affect people and planet.",
       grammarNotes: [
-        "Genitive with products (die Qualität des Produkts)",
-        "Comparatives with als/als ob",
-        "Adverbs for emphasis (besonders, vor allem)",
+        "Use genitive to describe product qualities (die Qualität des Produkts).",
+        "Use comparatives to contrast shopping options (als, als ob).",
+        "Use emphasis adverbs to stress priorities (besonders, vor allem).",
       ],
+      grammarPurpose: "Lets you compare consumption choices and highlight impacts.",
       prompt:
         "Speak for 2 minutes. Define Konsum, give examples of daily purchases, compare online and local shopping, share your opinion, list pros/cons of fast fashion, recommend one change, and conclude.",
       askGrammarPrompt:
@@ -519,10 +535,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Explain digitalization as shifting processes to digital tools and systems.",
       grammarNotes: [
-        "Noun compounds (Onlinebanking, Datensicherheit)",
-        "Future tense with werden",
-        "Cause-effect connectors (dadurch, sodass)",
+        "Use noun compounds to name digital services (Onlinebanking, Datensicherheit).",
+        "Use future tense to predict changes (werden).",
+        "Use cause-effect connectors to explain outcomes (dadurch, sodass).",
       ],
+      grammarPurpose: "Helps you describe digital services and predict impacts.",
       prompt:
         "Speak for 2 minutes. Define Digitalisierung, give examples in services, compare analog and digital processes, share your opinion, list pros/cons of e-government, recommend one improvement, and conclude.",
       askGrammarPrompt:
@@ -551,10 +568,11 @@ export const B2_SELF_LEARNING_PLAN = [
       concept:
         "Connect education, technology, environment, society, work, health, and migration into one narrative.",
       grammarNotes: [
-        "Summary phrases (insgesamt, zusammenfassend)",
-        "Concession and contrast (einerseits, andererseits)",
-        "Linking multiple clauses clearly",
+        "Use summary phrases to close your talk (insgesamt, zusammenfassend).",
+        "Use concession/contrast to balance topics (einerseits, andererseits).",
+        "Use clear clause linking to connect themes smoothly.",
       ],
+      grammarPurpose: "Helps you tie themes together and end with a strong summary.",
       prompt:
         "Speak for 2–3 minutes. Define a key theme, give examples across topics, compare two areas, share your opinion, list pros/cons, recommend one priority, and conclude with a summary.",
       askGrammarPrompt:
