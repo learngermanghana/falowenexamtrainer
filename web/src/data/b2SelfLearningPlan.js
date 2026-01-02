@@ -1,3 +1,21 @@
+const SPEAKING_OUTLINE = [
+  "Begrüßung + Thema nennen",
+  "Begriff kurz erklären oder definieren",
+  "Zwei konkrete Beispiele nennen",
+  "Vergleich oder Kontrast herstellen",
+  "Eigene Meinung + Begründung geben",
+  "Kurz zusammenfassen und abschließen",
+];
+
+const SPEAKING_STARTERS = [
+  "Meiner Meinung nach …",
+  "Ein Beispiel dafür ist …",
+  "Zum einen …",
+  "Zum anderen …",
+  "Außerdem …",
+  "Zusammenfassend …",
+];
+
 export const B2_SELF_LEARNING_PLAN = [
   {
     day: 1,
@@ -6,6 +24,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Introduce yourself with context. Share who you are, your learning history, and what B2 means for your goals.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use sequencing connectors to structure your introduction (zuerst, danach, schließlich).",
         "Use reason/goal clauses to explain your motivation (weil, damit, um ... zu).",
@@ -39,6 +59,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Define Kultur in your own words (values, traditions, daily habits). Give 2–3 concrete examples and compare cultures.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use compound nouns to label cultural concepts (Kulturerbe, Alltagskultur).",
         "Use comparison phrases to contrast cultures (im Vergleich zu, genauso wie, anders als).",
@@ -72,6 +94,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Explain what Bildung means today and how learning shapes personal and social opportunities.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use nominalizations to sound formal when defining Bildung (Bildung, Weiterbildung, Qualifikation).",
         "Use purpose clauses to explain learning goals (damit, um ... zu).",
@@ -105,6 +129,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Define technology broadly and describe its impact on daily routines and communication.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use passive voice to describe how tech is used (wird genutzt, wurde entwickelt).",
         "Use cause-effect connectors to link tech and consequences (deshalb, dadurch, infolgedessen).",
@@ -138,6 +164,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Describe what environmental protection includes and why individual actions matter.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use verb-preposition pairs to name actions (sich kümmern um, beitragen zu).",
         "Use conditionals to propose scenarios and solutions (wenn, falls).",
@@ -171,6 +199,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Explain society as a network of people, rules, and shared responsibilities.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use relative clauses to define social groups (die Menschen, die ...).",
         "Use noun clauses to explain social rules and beliefs (dass, ob).",
@@ -204,6 +234,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Describe what Arbeit means today and how expectations have changed.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use two-way prepositions to place work settings accurately (in der Firma, auf der Arbeit).",
         "Use future tense to predict job trends (werden).",
@@ -237,6 +269,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Explain health as physical, mental, and social well-being.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use genitive with abstract nouns to define health (die Bedeutung der Gesundheit).",
         "Use reflexive verbs to describe daily habits (sich ernähren, sich bewegen).",
@@ -270,6 +304,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Define migration and describe common push and pull factors.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use reason clauses to explain migration factors (weil, da).",
         "Use passive voice to describe integration processes (es wird integriert).",
@@ -303,6 +339,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Explain what media literacy is and why it matters for informed decisions.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use indirect speech to report sources (er sagt, dass ...).",
         "Use adjective endings to describe sources precisely (zuverlässige Nachricht).",
@@ -336,6 +374,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Define politics as decision-making in a community and describe citizen roles.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use noun-verb phrases to describe participation (eine Entscheidung treffen).",
         "Use relative pronouns to specify actors and rules (der/die/das).",
@@ -369,6 +409,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Describe leisure as time for recovery and personal interests.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use separable verbs to describe leisure actions (abschalten, ausruhen).",
         "Use temporal clauses to sequence routines (wenn, sobald).",
@@ -402,6 +444,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Explain housing needs and how people choose where to live.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use dative/accusative prepositions to describe location choices (in die Stadt, auf dem Land).",
         "Use comparative structures to weigh options (je ..., desto ...).",
@@ -435,6 +479,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Describe mobility as the ability to move efficiently and safely.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use passive voice to describe infrastructure changes (es wird gebaut).",
         "Use transport prepositions to name travel modes (mit dem Bus, per Fahrrad).",
@@ -468,6 +514,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Explain science as a method for testing ideas and expanding knowledge.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use subordinate clauses to explain reasons and limits (weil, obwohl, während).",
         "Use passive voice to describe research processes (es wird untersucht).",
@@ -501,6 +549,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Describe consumption patterns and how choices affect people and planet.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use genitive to describe product qualities (die Qualität des Produkts).",
         "Use comparatives to contrast shopping options (als, als ob).",
@@ -534,6 +584,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Explain digitalization as shifting processes to digital tools and systems.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use noun compounds to name digital services (Onlinebanking, Datensicherheit).",
         "Use future tense to predict changes (werden).",
@@ -567,6 +619,8 @@ export const B2_SELF_LEARNING_PLAN = [
     speaking: {
       concept:
         "Connect education, technology, environment, society, work, health, and migration into one narrative.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
       grammarNotes: [
         "Use summary phrases to close your talk (insgesamt, zusammenfassend).",
         "Use concession/contrast to balance topics (einerseits, andererseits).",
