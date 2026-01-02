@@ -463,9 +463,9 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                     Email:
                     <a
                       style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }}
-                      href="mailto:sedifexbiz@gmail.com"
+                      href="mailto:learngermanghana@gmail.com"
                     >
-                      sedifexbiz@gmail.com
+                      learngermanghana@gmail.com
                     </a>
                   </li>
                   <li>Live chat during classes with tutor monitoring and feedback.</li>
