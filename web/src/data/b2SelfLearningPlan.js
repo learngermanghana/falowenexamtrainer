@@ -65,25 +65,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 15,
-    title: "Bildung: vom Begriff bis zum Schluss",
-    topic: "Bildung und lebenslanges Lernen in der heutigen Gesellschaft.",
+    title: "Bildung: definition to conclusion",
+    topic: "Bildung and lifelong learning in modern society.",
     speaking: {
       concept:
-        "Beschreibe Bildung als mehr als Schule: Werte, Fähigkeiten und persönliche Entwicklung. Erkläre, warum lebenslanges Lernen (lifelong learning) wichtig ist und wie es Chancen eröffnet.",
+        "Explain what Bildung means today and how learning shapes personal and social opportunities.",
       grammarNotes: [
-        "Nominalisierungen (Bildung, Weiterbildung, Qualifikation)",
-        "Zweckangaben mit damit/um ... zu",
-        "Gegensatz und Einräumung (obwohl, trotzdem)",
-        "Reihenfolge im Satz: zuerst/danach/abschließend",
+        "Nominalisierung (Bildung, Weiterbildung, Qualifikation)",
+        "Purpose clauses (damit, um ... zu)",
+        "Concession (obwohl, trotzdem)",
       ],
       prompt:
-        "Sprich 2 Minuten: Gib eine Definition von Bildung, nenne zwei Beispiele, vergleiche Schule und Selbstlernen, sage deine Meinung, nenne Vor- und Nachteile, gib eine Empfehlung für Erwachsene und schließe mit einem kurzen Fazit.",
+        "Speak for 2 minutes. Start with a definition of Bildung, give two examples, compare school learning and self-learning, share your opinion, list pros/cons, make a recommendation for adults, and conclude.",
       askGrammarPrompt:
-        "Wenn du Fragen zu Nominalisierungen oder Zweckangaben hast, frag vor der Aufnahme.",
+        "If you need help with nominalizations or purpose clauses, ask before you record.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Bericht über eine Maßnahme, die die Erwachsenenbildung in deiner Stadt verbessern könnte.",
+        "Write a short report about one change that could improve adult education in your city.",
     },
     skimmingWords: [
       "Weiterbildung",
@@ -98,25 +97,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 16,
-    title: "Technologie: vom Begriff bis zum Schluss",
-    topic: "Technologie im Alltag, in der Schule und im Beruf.",
+    title: "Technologie: definition to conclusion",
+    topic: "Technologie in Alltag, Schule, und Beruf.",
     speaking: {
       concept:
-        "Erkläre Technologie als Werkzeuge und Systeme, die Probleme lösen. Zeige, wie sie Kommunikation, Lernen und Arbeit verändert.",
+        "Define technology broadly and describe its impact on daily routines and communication.",
       grammarNotes: [
-        "Passivformen (wird genutzt, wurde entwickelt)",
-        "Ursache und Wirkung (deshalb, dadurch, infolgedessen)",
-        "Steigerung (schneller, am effizientesten)",
-        "Zeitangaben mit damals/heute",
+        "Passive voice (wird genutzt, wurde entwickelt)",
+        "Cause and effect (deshalb, dadurch, infolgedessen)",
+        "Comparatives and superlatives",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Technologie, gib zwei Alltagsbeispiele, vergleiche Leben vor/nach Smartphones, äußere deine Meinung, nenne Vor- und Nachteile, gib eine Empfehlung für verantwortliche Nutzung und schließe ab.",
+        "Speak for 2 minutes. Define Technologie, give two everyday examples, compare life before/after smartphones, share your opinion, list pros/cons, make a recommendation for responsible use, and conclude.",
       askGrammarPrompt:
-        "Bei Problemen mit Passiv oder Ursache-Wirkung frag zuerst.",
+        "Need help with passive voice or cause-and-effect connectors? Ask first.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Meinungsabschnitt: Sollten Smartphones in der Schule erlaubt sein?",
+        "Write an opinion paragraph about whether schools should allow smartphones in class.",
     },
     skimmingWords: [
       "digital",
@@ -131,25 +129,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 17,
-    title: "Umwelt: vom Begriff bis zum Schluss",
-    topic: "Umweltschutz und nachhaltige Gewohnheiten.",
+    title: "Umwelt: definition to conclusion",
+    topic: "Umweltschutz and sustainable habits.",
     speaking: {
       concept:
-        "Beschreibe Umweltschutz als Schutz von Klima, Natur und Ressourcen. Erkläre, warum individuelles Handeln Wirkung hat.",
+        "Describe what environmental protection includes and why individual actions matter.",
       grammarNotes: [
-        "Verben mit Präpositionen (sich kümmern um, beitragen zu)",
-        "Bedingungssätze (wenn, falls)",
-        "Modalverben für Pflicht (müssen, sollen)",
-        "Wortschatz für Konsequenzen (Folge, Auswirkung)",
+        "Verb-preposition pairs (sich kümmern um, beitragen zu)",
+        "Conditional sentences (wenn, falls)",
+        "Modal verbs for obligation (müssen, sollen)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Umweltschutz, nenne Beispiele nachhaltiger Gewohnheiten, vergleiche Stadt und Land, sage deine Meinung, nenne Vor- und Nachteile strenger Regeln, gib eine Empfehlung und schließe mit einem Fazit.",
+        "Speak for 2 minutes. Define Umweltschutz, give examples of sustainable habits, compare city vs countryside challenges, share your opinion, list pros/cons of strict rules, recommend one action, and conclude.",
       askGrammarPrompt:
-        "Wenn Bedingungssätze oder Modalverben schwierig sind, frag vorher.",
+        "If conditionals or modal verbs are tricky, ask before you record.",
     },
     writing: {
       prompt:
-        "Schreibe eine kurze E-Mail an deine Hausverwaltung mit einem Vorschlag zur besseren Mülltrennung.",
+        "Write a short email to your apartment building suggesting a recycling improvement.",
     },
     skimmingWords: [
       "nachhaltig",
@@ -164,25 +161,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 18,
-    title: "Gesellschaft: vom Begriff bis zum Schluss",
-    topic: "Gesellschaft und sozialer Zusammenhalt.",
+    title: "Gesellschaft: definition to conclusion",
+    topic: "Gesellschaft and social cohesion.",
     speaking: {
       concept:
-        "Erkläre Gesellschaft als Netzwerk von Menschen, Regeln und gemeinsamen Aufgaben. Zeige, wie Zusammenhalt entsteht.",
+        "Explain society as a network of people, rules, and shared responsibilities.",
       grammarNotes: [
-        "Relativsätze (die Menschen, die ...)",
-        "Nomenklauseln mit dass/ob",
-        "Satzverknüpfungen (außerdem, hingegen, daher)",
-        "Wortschatz für Konflikte und Lösungen",
+        "Relative clauses to define groups (die Menschen, die ...)",
+        "Noun clauses (dass, ob)",
+        "Conjunctive adverbs (außerdem, hingegen)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Gesellschaft, nenne Beispiele sozialer Regeln, vergleiche Individualismus und Gemeinschaft, äußere deine Meinung, nenne Vor- und Nachteile von Social Media, gib eine Empfehlung und schließe ab.",
+        "Speak for 2 minutes. Define Gesellschaft, give examples of social rules, compare individualism and community, share your opinion, list pros/cons of social media for cohesion, recommend one initiative, and conclude.",
       askGrammarPrompt:
-        "Frag, wenn du Hilfe bei Relativsätzen oder Verknüpfungen brauchst.",
+        "Ask if you need help with relative clauses or conjunctive adverbs.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Artikel über ein lokales Projekt, das den Zusammenhalt stärkt.",
+        "Write a short article about one local project that strengthens community.",
     },
     skimmingWords: [
       "Zusammenhalt",
@@ -197,25 +193,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 19,
-    title: "Arbeit: vom Begriff bis zum Schluss",
-    topic: "Arbeitskultur, Berufe und Zukunftskompetenzen.",
+    title: "Arbeit: definition to conclusion",
+    topic: "Work culture, jobs, and future skills.",
     speaking: {
       concept:
-        "Beschreibe Arbeit als Tätigkeit mit Sinn, Einkommen und sozialer Rolle. Erkläre, wie sich Erwartungen verändert haben.",
+        "Describe what Arbeit means today and how expectations have changed.",
       grammarNotes: [
-        "Wechselpräpositionen (in der Firma, auf der Arbeit)",
-        "Futur mit werden",
-        "Formelle Ausdrücke (aus meiner Sicht, meiner Meinung nach)",
-        "Vergleichssätze (als, wie)",
+        "Two-way prepositions (in der Firma, auf der Arbeit)",
+        "Future with werden",
+        "Formal expressions (aus meiner Sicht, meiner Meinung nach)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Arbeit, gib Beispiele moderner Jobs, vergleiche Büroarbeit und Homeoffice, sage deine Meinung, nenne Vor- und Nachteile flexibler Zeiten, gib eine Empfehlung für eine Zukunftskompetenz und schließe ab.",
+        "Speak for 2 minutes. Define Arbeit, give examples of modern jobs, compare office work and remote work, share your opinion, list pros/cons of flexible hours, recommend one skill to learn, and conclude.",
       askGrammarPrompt:
-        "Bei Fragen zu Präpositionen oder Futur gern vorher fragen.",
+        "If prepositions or future tense are confusing, ask first.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen LinkedIn-Text über deine ideale Arbeitsumgebung.",
+        "Write a short LinkedIn-style post about your ideal work environment.",
     },
     skimmingWords: [
       "Arbeitsplatz",
@@ -230,25 +225,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 20,
-    title: "Gesundheit: vom Begriff bis zum Schluss",
-    topic: "Gesundheit, Prävention und Lebensstil.",
+    title: "Gesundheit: definition to conclusion",
+    topic: "Health, prevention, and lifestyle choices.",
     speaking: {
       concept:
-        "Erkläre Gesundheit als körperliches, psychisches und soziales Wohlbefinden. Zeige, warum Prävention wichtig ist.",
+        "Explain health as physical, mental, and social well-being.",
       grammarNotes: [
-        "Genitiv bei abstrakten Nomen (die Bedeutung der Gesundheit)",
-        "Reflexive Verben (sich ernähren, sich bewegen)",
-        "Gegensatz (während, hingegen)",
-        "Ausdrücke für Häufigkeit (regelmäßig, selten)",
+        "Genitive with abstract nouns (die Bedeutung der Gesundheit)",
+        "Reflexive verbs (sich ernähren, sich bewegen)",
+        "Contrast (während, hingegen)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Gesundheit, nenne Beispiele gesunder Gewohnheiten, vergleiche Stress in Arbeit und Schule, äußere deine Meinung, nenne Vor- und Nachteile von Fitness-Apps, gib eine Empfehlung für eine tägliche Routine und schließe ab.",
+        "Speak for 2 minutes. Define Gesundheit, give examples of healthy habits, compare stress at work vs school, share your opinion, list pros/cons of fitness apps, recommend one daily routine, and conclude.",
       askGrammarPrompt:
-        "Bei Genitiv oder Reflexivverben kannst du vorher fragen.",
+        "Need help with genitive or reflexive verbs? Ask before recording.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Ratgebertext für bessere Schlafgewohnheiten.",
+        "Write a short advice text to a friend about improving sleep habits.",
     },
     skimmingWords: [
       "Wohlbefinden",
@@ -263,25 +257,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 21,
-    title: "Migration: vom Begriff bis zum Schluss",
-    topic: "Migration, Gründe und Integration.",
+    title: "Migration: definition to conclusion",
+    topic: "Migration, reasons, and integration.",
     speaking: {
       concept:
-        "Definiere Migration als Ortswechsel aus verschiedenen Gründen. Erkläre Push- und Pull-Faktoren (push/pull factors) in einfachen Worten.",
+        "Define migration and describe common push and pull factors.",
       grammarNotes: [
-        "Begründungen mit weil/da",
-        "Passiv für Prozesse (es wird integriert)",
-        "Zeitangaben im Satz (zuerst, dann, später)",
-        "Wortschatz für Perspektiven (Herkunft, Aufnahmegesellschaft)",
+        "Reason clauses (weil, da)",
+        "Passive voice for processes (es wird integriert)",
+        "Word order with time/place (zuerst, dann)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Migration, nenne Beispiele für Gründe, vergleiche freiwillige und erzwungene Migration, äußere deine Meinung, nenne Vor- und Nachteile für die Aufnahmegesellschaft, gib eine Integrations-Empfehlung und schließe ab.",
+        "Speak for 2 minutes. Define Migration, give examples of reasons, compare voluntary and forced migration, share your opinion, list pros/cons for host societies, recommend one integration measure, and conclude.",
       askGrammarPrompt:
-        "Wenn Begründungen oder Passiv schwer sind, frag vorher.",
+        "If reason clauses or passive forms are hard, ask first.",
     },
     writing: {
       prompt:
-        "Schreibe eine kurze Zusammenfassung über ein lokales Integrationsprojekt und seine Wirkung.",
+        "Write a short summary about a local integration program and its impact.",
     },
     skimmingWords: [
       "Zuwanderung",
@@ -296,25 +289,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 22,
-    title: "Medien: vom Begriff bis zum Schluss",
-    topic: "Medienkompetenz und Informationsqualität.",
+    title: "Medien: definition to conclusion",
+    topic: "Media literacy and information quality.",
     speaking: {
       concept:
-        "Erkläre Medienkompetenz als Fähigkeit, Informationen zu prüfen und bewusst zu nutzen. Zeige, warum das für Entscheidungen wichtig ist.",
+        "Explain what media literacy is and why it matters for informed decisions.",
       grammarNotes: [
-        "Indirekte Rede (er sagt, dass ...)",
-        "Adjektivendungen nach Artikeln",
-        "Kontrast (jedoch, trotzdem)",
-        "Wortschatz für Quellen und Glaubwürdigkeit",
+        "Indirect speech (er sagt, dass ...)",
+        "Adjective endings after articles",
+        "Contrastive connectors (jedoch, trotzdem)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Medienkompetenz, nenne Beispiele für verlässliche Quellen, vergleiche soziale Medien und Zeitungen, sage deine Meinung, nenne Vor- und Nachteile schneller Nachrichten, gib eine Empfehlung zur Prüfung von Infos und schließe ab.",
+        "Speak for 2 minutes. Define Medienkompetenz, give examples of reliable sources, compare social media and newspapers, share your opinion, list pros/cons of fast news, recommend one verification step, and conclude.",
       askGrammarPrompt:
-        "Bei indirekter Rede oder Adjektivendungen gern vorher fragen.",
+        "If indirect speech or adjective endings are tricky, ask first.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Leitfaden mit drei Tipps zum Prüfen von Online-Informationen.",
+        "Write a short guide with three tips for checking online information.",
     },
     skimmingWords: [
       "Glaubwürdigkeit",
@@ -329,25 +321,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 23,
-    title: "Politik: vom Begriff bis zum Schluss",
-    topic: "Bürgerbeteiligung und demokratische Prozesse.",
+    title: "Politik: definition to conclusion",
+    topic: "Civic participation and democratic processes.",
     speaking: {
       concept:
-        "Definiere Politik als gemeinsames Entscheiden in einer Gesellschaft. Erkläre, wie Bürgerinnen und Bürger mitwirken können.",
+        "Define politics as decision-making in a community and describe citizen roles.",
       grammarNotes: [
-        "Nomen-Verb-Verbindungen (eine Entscheidung treffen)",
-        "Relativpronomen (der/die/das)",
-        "Konjunktiv II für Vorschläge (wäre, könnte)",
-        "Formeller Stil (meiner Ansicht nach)",
+        "Noun-verb phrases (eine Entscheidung treffen)",
+        "Relative pronouns (der/die/das)",
+        "Formal register with Konjunktiv II (wäre, könnte)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Politik, nenne Beispiele für Beteiligung, vergleiche lokale und nationale Entscheidungen, äußere deine Meinung, nenne Vor- und Nachteile der Wahlpflicht (mandatory voting), gib eine Empfehlung zur Beteiligung und schließe ab.",
+        "Speak for 2 minutes. Define Politik, give examples of participation, compare local vs national decisions, share your opinion, list pros/cons of mandatory voting, recommend one way to engage, and conclude.",
       askGrammarPrompt:
-        "Frag bei Konjunktiv II oder Relativpronomen gern vorher.",
+        "Ask if you need help with Konjunktiv II or relative pronouns.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Meinungstext: Wahlrecht ab 16 – ja oder nein?",
+        "Write a short opinion piece about voting at age 16.",
     },
     skimmingWords: [
       "Beteiligung",
@@ -362,25 +353,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 24,
-    title: "Freizeit: vom Begriff bis zum Schluss",
-    topic: "Freizeit, Erholung und Work-Life-Balance.",
+    title: "Freizeit: definition to conclusion",
+    topic: "Leisure activities and work-life balance.",
     speaking: {
       concept:
-        "Erkläre Freizeit als Zeit für Erholung und persönliche Interessen. Zeige, wie sie die Leistungsfähigkeit unterstützt.",
+        "Describe leisure as time for recovery and personal interests.",
       grammarNotes: [
-        "Trennbare Verben (abschalten, ausruhen)",
-        "Temporalsätze (wenn, sobald)",
-        "Häufigkeit (regelmäßig, selten)",
-        "Wortschatz für Balance und Erholung",
+        "Separable verbs (abschalten, ausruhen)",
+        "Temporal clauses (wenn, sobald)",
+        "Expressions of frequency (regelmäßig, selten)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Freizeit, nenne Beispiele für Aktivitäten, vergleiche aktive und passive Hobbys, äußere deine Meinung, nenne Vor- und Nachteile ständiger Erreichbarkeit, gib eine Empfehlung für Balance und schließe ab.",
+        "Speak for 2 minutes. Define Freizeit, give examples of activities, compare active and passive hobbies, share your opinion, list pros/cons of constant availability, recommend one balance strategy, and conclude.",
       askGrammarPrompt:
-        "Wenn trennbare Verben oder Temporalsätze schwierig sind, frag vorher.",
+        "If separable verbs or time clauses are confusing, ask before recording.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Absatz über ein Hobby, das dich entspannt.",
+        "Write a short paragraph about a hobby that helps you relax.",
     },
     skimmingWords: [
       "Ausgleich",
@@ -395,25 +385,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 25,
-    title: "Wohnen: vom Begriff bis zum Schluss",
-    topic: "Wohnformen, Bezahlbarkeit und Lebensqualität.",
+    title: "Wohnen: definition to conclusion",
+    topic: "Housing, affordability, and living styles.",
     speaking: {
       concept:
-        "Beschreibe Wohnen als Grundbedürfnis und Lebensraum. Erkläre, wie Lage, Preis und Gemeinschaft Entscheidungen beeinflussen.",
+        "Explain housing needs and how people choose where to live.",
       grammarNotes: [
-        "Präpositionen mit Dativ/Akkusativ (in die Stadt, auf dem Land)",
-        "Vergleichsstrukturen (je ..., desto ...)",
-        "Modalverben für Rat (sollte, könnte)",
-        "Wortschatz für Wohnformen (WG, Mietwohnung)",
+        "Prepositions with dative/accusative (in die Stadt, auf dem Land)",
+        "Comparative structures (je ..., desto ...)",
+        "Modal verbs for advice (sollte, könnte)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Wohnen, nenne Wohnformen, vergleiche Stadt- und Landleben, äußere deine Meinung, nenne Vor- und Nachteile von WGs, gib eine Empfehlung für Wohnpolitik und schließe ab.",
+        "Speak for 2 minutes. Define Wohnen, give examples of housing types, compare city and rural living, share your opinion, list pros/cons of shared apartments, recommend one housing policy, and conclude.",
       askGrammarPrompt:
-        "Bei Präpositionen oder Vergleichsstrukturen kannst du vorher fragen.",
+        "Ask if you need help with prepositions or comparative structures.",
     },
     writing: {
       prompt:
-        "Schreibe eine kurze E-Mail an eine Vermieterin mit Fragen zu einer Wohnung.",
+        "Write a short email asking a landlord about a rental offer.",
     },
     skimmingWords: [
       "Miete",
@@ -428,25 +417,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 26,
-    title: "Mobilität: vom Begriff bis zum Schluss",
-    topic: "Verkehr, Infrastruktur und nachhaltiges Reisen.",
+    title: "Mobilität: definition to conclusion",
+    topic: "Transport, infrastructure, and sustainable travel.",
     speaking: {
       concept:
-        "Erkläre Mobilität als Fähigkeit, sicher und effizient von A nach B zu kommen. Betone Umwelt und Komfort.",
+        "Describe mobility as the ability to move efficiently and safely.",
       grammarNotes: [
-        "Passiv in Berichten (es wird gebaut)",
-        "Präpositionen mit Verkehrsmitteln (mit dem Bus, per Fahrrad)",
-        "Kausale Verknüpfungen (deswegen, daher)",
-        "Wortschatz für Infrastruktur (Ausbau, Sicherheit)",
+        "Passive voice in infrastructure (es wird gebaut)",
+        "Prepositions with transport (mit dem Bus, per Fahrrad)",
+        "Causal connectors (deswegen, daher)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Mobilität, nenne Transportoptionen, vergleiche Auto und ÖPNV, sage deine Meinung, nenne Vor- und Nachteile von E-Scootern, gib eine Empfehlung für die Stadt und schließe ab.",
+        "Speak for 2 minutes. Define Mobilität, give examples of transport options, compare car use and public transport, share your opinion, list pros/cons of e-scooters, recommend one change, and conclude.",
       askGrammarPrompt:
-        "Bei Passiv oder Präpositionen kannst du vorher fragen.",
+        "If passive voice or transport prepositions are tricky, ask first.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Vorschlag an die Stadt zum Ausbau von Radwegen.",
+        "Write a short proposal to your city about improving bike lanes.",
     },
     skimmingWords: [
       "Verkehr",
@@ -461,25 +449,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 27,
-    title: "Wissenschaft: vom Begriff bis zum Schluss",
-    topic: "Wissenschaft, Forschung und Vertrauen.",
+    title: "Wissenschaft: definition to conclusion",
+    topic: "Science, research, and trust.",
     speaking: {
       concept:
-        "Erkläre Wissenschaft als Methode, um Fragen zu prüfen und Wissen zu erweitern. Zeige, warum Transparenz Vertrauen schafft.",
+        "Explain science as a method for testing ideas and expanding knowledge.",
       grammarNotes: [
-        "Nebensätze (weil, obwohl, während)",
-        "Passiv in Forschungstexten (es wird untersucht)",
-        "Verknüpfungen (zum einen ... zum anderen)",
-        "Wortschatz für Belege (Daten, Beweis)",
+        "Subordinate clauses (weil, obwohl, während)",
+        "Passive for research (es wird untersucht)",
+        "Linking phrases (zum einen ... zum anderen)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Wissenschaft, nenne Forschungsbereiche, vergleiche Grundlagen- und angewandte Forschung, äußere deine Meinung, nenne Vor- und Nachteile öffentlicher Finanzierung, gib eine Empfehlung für Wissenschaftskommunikation und schließe ab.",
+        "Speak for 2 minutes. Define Wissenschaft, give examples of research fields, compare basic and applied research, share your opinion, list pros/cons of public funding, recommend one communication practice, and conclude.",
       askGrammarPrompt:
-        "Wenn Nebensätze oder Passiv schwierig sind, frag vorher.",
+        "Ask if subordinate clauses or passive voice are confusing.",
     },
     writing: {
       prompt:
-        "Schreibe eine kurze Zusammenfassung einer wissenschaftlichen Entdeckung, die dich interessiert.",
+        "Write a short summary of a scientific discovery that interests you.",
     },
     skimmingWords: [
       "Forschung",
@@ -494,25 +481,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 28,
-    title: "Konsum: vom Begriff bis zum Schluss",
-    topic: "Konsumverhalten und ethische Entscheidungen.",
+    title: "Konsum: definition to conclusion",
+    topic: "Consumer habits and ethical choices.",
     speaking: {
       concept:
-        "Beschreibe Konsum als tägliche Auswahl von Produkten und Diensten. Erkläre, wie Entscheidungen Umwelt und Arbeitsbedingungen beeinflussen.",
+        "Describe consumption patterns and how choices affect people and planet.",
       grammarNotes: [
-        "Genitiv bei Produkten (die Qualität des Produkts)",
-        "Vergleiche mit als/als ob",
-        "Adverbien zur Betonung (besonders, vor allem)",
-        "Wortschatz für Nachhaltigkeit (bewusst, fair)",
+        "Genitive with products (die Qualität des Produkts)",
+        "Comparatives with als/als ob",
+        "Adverbs for emphasis (besonders, vor allem)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Konsum, nenne Beispiele für Käufe, vergleiche Online- und Lokalkauf, äußere deine Meinung, nenne Vor- und Nachteile von Fast Fashion, gib eine Empfehlung für bewussten Konsum und schließe ab.",
+        "Speak for 2 minutes. Define Konsum, give examples of daily purchases, compare online and local shopping, share your opinion, list pros/cons of fast fashion, recommend one change, and conclude.",
       askGrammarPrompt:
-        "Wenn Genitiv oder Vergleiche schwer sind, frag vorher.",
+        "If genitive or comparisons are tricky, ask before recording.",
     },
     writing: {
       prompt:
-        "Schreibe eine kurze Rezension, in der du zwei Einkaufserlebnisse vergleichst.",
+        "Write a short review comparing two shopping experiences.",
     },
     skimmingWords: [
       "Verbrauch",
@@ -527,30 +513,29 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 29,
-    title: "Digitalisierung: vom Begriff bis zum Schluss",
-    topic: "Digitalisierung in Dienstleistungen und Alltag.",
+    title: "Digitalisierung: definition to conclusion",
+    topic: "Digitalization in services and daily life.",
     speaking: {
       concept:
-        "Erkläre Digitalisierung als Umstellung von analogen auf digitale Prozesse. Zeige Vorteile und Risiken (risk) klar auf.",
+        "Explain digitalization as shifting processes to digital tools and systems.",
       grammarNotes: [
-        "Komposita (Onlinebanking, Datensicherheit)",
-        "Futur mit werden",
-        "Folgen ausdrücken (dadurch, sodass)",
-        "Wortschatz für Systeme (Plattform, Zugang)",
+        "Noun compounds (Onlinebanking, Datensicherheit)",
+        "Future tense with werden",
+        "Cause-effect connectors (dadurch, sodass)",
       ],
       prompt:
-        "Sprich 2 Minuten: Definiere Digitalisierung, nenne Beispiele aus Services, vergleiche analog und digital, äußere deine Meinung, nenne Vor- und Nachteile von E-Government, gib eine Empfehlung für bessere Nutzerfreundlichkeit (user-friendly) und schließe ab.",
+        "Speak for 2 minutes. Define Digitalisierung, give examples in services, compare analog and digital processes, share your opinion, list pros/cons of e-government, recommend one improvement, and conclude.",
       askGrammarPrompt:
-        "Bei Komposita oder Futur kannst du vorher fragen.",
+        "Ask if noun compounds or future tense are confusing.",
     },
     writing: {
       prompt:
-        "Schreibe eine kurze Nachricht darüber, wie eine App dir den Alltag erleichtert hat.",
+        "Write a short message explaining how an app made your life easier.",
     },
     skimmingWords: [
       "Online",
       "Datensicherheit",
-      "benutzerfreundlich",
+      "Benutzerfreundlich",
       "Automatisierung",
       "Zugang",
       "Service",
@@ -560,25 +545,24 @@ export const B2_SELF_LEARNING_PLAN = [
   },
   {
     day: 30,
-    title: "Zusammenfassung: vom Begriff bis zum Schluss",
-    topic: "B2-Themen verbinden und reflektieren.",
+    title: "Zusammenfassung: definition to conclusion",
+    topic: "Review and connect B2 themes in one coherent talk.",
     speaking: {
       concept:
-        "Verbinde Bildung, Technologie, Umwelt, Gesellschaft, Arbeit, Gesundheit und Migration in einer klaren Gesamtperspektive. Zeige, wie Themen zusammenhängen.",
+        "Connect education, technology, environment, society, work, health, and migration into one narrative.",
       grammarNotes: [
-        "Zusammenfassungssprache (insgesamt, zusammenfassend)",
-        "Gegensatzpaare (einerseits, andererseits)",
-        "Logische Reihenfolge mit klaren Verknüpfungen",
-        "Wortschatz für Schlussfolgerungen (Fazit, Priorität)",
+        "Summary phrases (insgesamt, zusammenfassend)",
+        "Concession and contrast (einerseits, andererseits)",
+        "Linking multiple clauses clearly",
       ],
       prompt:
-        "Sprich 2–3 Minuten: Definiere ein Kernthema, nenne Beispiele aus mehreren Bereichen, vergleiche zwei Themen, gib deine Meinung, nenne Vor- und Nachteile, gib eine Empfehlung für eine Priorität und schließe mit einer kurzen Zusammenfassung.",
+        "Speak for 2–3 minutes. Define a key theme, give examples across topics, compare two areas, share your opinion, list pros/cons, recommend one priority, and conclude with a summary.",
       askGrammarPrompt:
-        "Wenn du Hilfe beim Verbinden oder Zusammenfassen brauchst, frag vorher.",
+        "If you need help connecting ideas or summarizing, ask before recording.",
     },
     writing: {
       prompt:
-        "Schreibe einen kurzen Reflexionsabsatz darüber, welches Thema dir am schwersten fiel und warum.",
+        "Write a reflective paragraph about the theme you found most challenging.",
     },
     skimmingWords: [
       "insgesamt",
