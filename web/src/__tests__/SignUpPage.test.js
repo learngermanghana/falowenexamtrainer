@@ -65,7 +65,7 @@ describe("SignUpPage", () => {
   it("does not redirect to checkout when payments are disabled", async () => {
     render(<SignUpPage onLogin={jest.fn()} />);
 
-    await userEvent.type(screen.getByPlaceholderText("Abigail"), "Test User");
+    await userEvent.type(screen.getByPlaceholderText("Abigail Mensah"), "Test User");
     await userEvent.type(screen.getByPlaceholderText("you@example.com"), "test@example.com");
     await userEvent.type(
       screen.getByPlaceholderText("At least 8 characters with letters and numbers"),
@@ -73,7 +73,9 @@ describe("SignUpPage", () => {
     );
     await userEvent.type(screen.getByPlaceholderText("Enter password again"), "password123");
     await userEvent.type(screen.getByPlaceholderText("0176 12345678"), "0123456789");
+    await userEvent.type(screen.getByPlaceholderText("House number, street, city, region"), "1 Test St, Accra");
     await userEvent.type(screen.getByPlaceholderText("Berlin"), "Berlin");
+    await userEvent.selectOptions(screen.getByLabelText(/Preferred learning mode/i), "Online");
     await userEvent.type(screen.getByPlaceholderText("0176 98765432"), "0987654321");
     await userEvent.clear(screen.getByLabelText(/Initial payment amount/i));
     await userEvent.type(screen.getByLabelText(/Initial payment amount/i), "1500");
