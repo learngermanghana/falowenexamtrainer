@@ -14,6 +14,12 @@ import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 
 const MIN_INITIAL_PAYMENT = 2000;
+const isFullName = (value) => {
+  const cleaned = String(value || "").trim();
+  if (!cleaned) return false;
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  return parts.length >= 2 && parts.every((part) => part.length >= 2);
+};
 
 const formatClassLabel = (className) => {
   const details = classCatalog[className];
@@ -217,6 +223,11 @@ const SignUpPage = ({ onLogin, onBack }) => {
       validationIssues.initialPaymentAmount = `Enter GH₵${MIN_INITIAL_PAYMENT} or more to reserve your class.`;
     }
 
+    if (!isFullName(name)) {
+      validationIssues.name =
+        "Use your full name (first and last). This will appear on certificates and transcripts.";
+    }
+
     if (!selectedClass) {
       validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
     }
@@ -415,8 +426,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
               setAuthError("");
             }}
             style={inputStyle}
-            placeholder="Abigail"
+            placeholder="Abigail Mensah"
           />
+          {fieldErrors.name ? <p style={styles.fieldError}>{fieldErrors.name}</p> : null}
+          <p style={{ ...styles.helperText, marginTop: -4 }}>
+            Please enter your full name (first and last). We use it to print certificates and transcripts.
+          </p>
 
           <label style={styles.label}>Email</label>
           <input

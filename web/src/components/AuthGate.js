@@ -9,6 +9,13 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 
+const isFullName = (value) => {
+  const cleaned = String(value || "").trim();
+  if (!cleaned) return false;
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  return parts.length >= 2 && parts.every((part) => part.length >= 2);
+};
+
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, loginWithGoogle, authError, setAuthError, resetPassword } = useAuth();
   const { showToast } = useToast();
@@ -44,6 +51,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
     try {
       if (mode === "signup") {
+        if (!isFullName(name)) {
+          const errorMessage =
+            "Please enter your full name (first and last). It will be used on certificates and transcripts.";
+          setAuthError(errorMessage);
+          showToast(errorMessage, "error");
+          setLoading(false);
+          return;
+        }
+
         const studentCode = generateStudentCode({ name });
 
         await signup(email, password, {
@@ -186,6 +202,9 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             <>
               <label style={styles.label}>Name</label>
               <input type="text" required value={name} onChange={(e) => setName(e.target.value)} style={inputStyle} />
+              <p style={{ ...styles.helperText, marginTop: -4 }}>
+                Use your full name (first and last). This is printed on certificates and transcripts.
+              </p>
 
               <label style={styles.label}>Phone number</label>
               <input type="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} style={inputStyle} />
