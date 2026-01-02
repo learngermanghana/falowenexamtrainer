@@ -401,6 +401,7 @@ app.get("/metrics", (_req, res) => {
 
 app.post("/webhooks/zoom", async (req, res) => {
   const requestLog = createLogger({ scope: "zoom_webhook", requestId: req.requestId });
+  console.log("ZOOM_WEBHOOK_EVENT:", req.body?.event);
   const secret = process.env.ZOOM_WEBHOOK_SECRET;
 
   if (!secret) {
@@ -468,6 +469,9 @@ app.post("/webhooks/zoom", async (req, res) => {
     const referenceDate = Number.isNaN(joinTime.getTime()) ? new Date() : joinTime;
 
     const scheduleInfo = getScheduleSessionForDate({ className, referenceDate });
+    if (!scheduleInfo?.sessions?.length) {
+      return res.status(202).json({ ok: true, skipped: "no_class_today" });
+    }
     const sessionDate =
       scheduleInfo?.date || formatDateInTimeZone(referenceDate, "UTC");
 
