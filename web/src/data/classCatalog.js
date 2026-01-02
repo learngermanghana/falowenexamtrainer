@@ -65,6 +65,8 @@ export const classCatalog = {
     docUrl: "https://drive.google.com/file/d/1ttjnOj10xo-baddfUHthHJ9dKYwqByk2/view?usp=sharing",
   },
   "B2 Munich Klasse": {
+    isSelfLearning: true,
+    availability: "always",
     startDate: "2025-08-08",
     endDate: "2025-10-08",
     schedule: [
@@ -72,5 +74,13 @@ export const classCatalog = {
       { day: "Saturday", startTime: "09:30", endTime: "10:00" },
     ],
     docUrl: "https://drive.google.com/file/d/1gn6vYBbRyHSvKgqvpj5rr8OfUOYRL09W/view?usp=sharing",
+  },
+  "C1 Self-learning": {
+    isSelfLearning: true,
+    availability: "always",
+    startDate: "",
+    endDate: "",
+    schedule: [],
+    docUrl: "",
   },
 };
