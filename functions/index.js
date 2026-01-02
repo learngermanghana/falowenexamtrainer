@@ -59,14 +59,33 @@ const fetchStudentMessagingToken = async (studentCode) => {
 
   const db = getFirestore();
   const normalized = String(studentCode).trim();
-  const candidates = Array.from(new Set([normalized, normalized.toLowerCase()]));
+  const candidates = Array.from(
+    new Set([normalized, normalized.toLowerCase(), normalized.toUpperCase()])
+  ).filter(Boolean);
 
   for (const id of candidates) {
-    if (!id) continue;
     const snap = await db.collection("students").doc(id).get();
     if (!snap.exists) continue;
 
     const data = snap.data() || {};
+    if (!data.messagingToken) continue;
+
+    return { token: data.messagingToken, data };
+  }
+
+  const lookupFields = ["studentCode", "studentcode", "uid"];
+
+  for (const field of lookupFields) {
+    const snapshot = await db
+      .collection("students")
+      .where(field, "in", candidates)
+      .limit(1)
+      .get();
+
+    if (snapshot.empty) continue;
+
+    const docSnap = snapshot.docs[0];
+    const data = docSnap.data() || {};
     if (!data.messagingToken) continue;
 
     return { token: data.messagingToken, data };
