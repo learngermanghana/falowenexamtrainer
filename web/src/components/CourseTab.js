@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
+import B2SelfLearningCourse from "./B2SelfLearningCourse";
 
 const normalizeLevel = (level) => (level || "").toUpperCase();
 const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
@@ -204,6 +205,7 @@ const CourseTab = ({ defaultLevel }) => {
 
   const schedule = useMemo(() => mergedCourseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
   const isDerivedLevel = useMemo(() => derivedLevels.has(selectedCourseLevel), [selectedCourseLevel]);
+  const isB2SelfLearning = selectedCourseLevel === "B2";
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
@@ -247,99 +249,107 @@ const CourseTab = ({ defaultLevel }) => {
             </div>
           </div>
 
-          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-            <label style={{ display: "grid", gap: 6 }}>
-              <span style={styles.helperText}>Search by day, topic, or grammar focus</span>
-              <input
-                style={{ ...styles.input, width: "100%" }}
-                placeholder="e.g., Day 4 or Pronouns"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </label>
+          {isB2SelfLearning ? null : (
+            <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+              <label style={{ display: "grid", gap: 6 }}>
+                <span style={styles.helperText}>Search by day, topic, or grammar focus</span>
+                <input
+                  style={{ ...styles.input, width: "100%" }}
+                  placeholder="e.g., Day 4 or Pronouns"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </label>
 
-            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
-              <span style={styles.helperText}>Show only items with assignments</span>
-            </label>
-          </div>
-        </div>
-
-        <p style={styles.helperText}>
-          {isDerivedLevel
-            ? "This level uses the class schedule because the course book dictionary does not yet include it."
-            : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
-        </p>
-
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-          {filteredSchedule.map((entry) => {
-            const lesenHorenList = Array.isArray(entry.lesen_hören)
-              ? entry.lesen_hören
-              : entry.lesen_hören
-              ? [entry.lesen_hören]
-              : [];
-            const schreibenSprechenList = entry.schreiben_sprechen
-              ? Array.isArray(entry.schreiben_sprechen)
-                ? entry.schreiben_sprechen
-                : [entry.schreiben_sprechen]
-              : [];
-
-            return (
-              <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                  <div>
-                    <span style={styles.levelPill}>Day {entry.day}</span>
-                    <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
-                    {entry.chapter ? (
-                      <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div>
-                    ) : null}
-                  </div>
-
-                  <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                    {entry.assignment !== undefined ? (
-                      <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
-                    ) : null}
-                    {isDerivedLevel ? <span style={styles.levelPill}>From class schedule</span> : null}
-                    {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
-                  </div>
-                </div>
-
-                {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-                {entry.instruction ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p> : null}
-
-                <LessonList title="Lesen & Hören" lessons={lesenHorenList} />
-                <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} />
-
-                {entry.schreiben ? (
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <h4 style={{ margin: 0 }}>Schreiben</h4>
-                    <p style={{ margin: 0 }}>{entry.schreiben}</p>
-                  </div>
-                ) : null}
-                {entry.sprechen ? (
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <h4 style={{ margin: 0 }}>Sprechen</h4>
-                    <p style={{ margin: 0 }}>{entry.sprechen}</p>
-                  </div>
-                ) : null}
-                {entry.zusatzmaterial ? (
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
-                    <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-
-          {!filteredSchedule.length ? (
-            <div style={{ ...styles.card, marginBottom: 0 }}>
-              <p style={{ margin: 0 }}>
-                No course days match your filters. Try another search term or turn off the assignment filter.
-              </p>
+              <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
+                <span style={styles.helperText}>Show only items with assignments</span>
+              </label>
             </div>
-          ) : null}
+          )}
         </div>
+
+        {isB2SelfLearning ? (
+          <B2SelfLearningCourse />
+        ) : (
+          <>
+            <p style={styles.helperText}>
+              {isDerivedLevel
+                ? "This level uses the class schedule because the course book dictionary does not yet include it."
+                : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
+            </p>
+
+            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+              {filteredSchedule.map((entry) => {
+                const lesenHorenList = Array.isArray(entry.lesen_hören)
+                  ? entry.lesen_hören
+                  : entry.lesen_hören
+                  ? [entry.lesen_hören]
+                  : [];
+                const schreibenSprechenList = entry.schreiben_sprechen
+                  ? Array.isArray(entry.schreiben_sprechen)
+                    ? entry.schreiben_sprechen
+                    : [entry.schreiben_sprechen]
+                  : [];
+
+                return (
+                  <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                      <div>
+                        <span style={styles.levelPill}>Day {entry.day}</span>
+                        <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
+                        {entry.chapter ? (
+                          <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div>
+                        ) : null}
+                      </div>
+
+                      <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
+                        {entry.assignment !== undefined ? (
+                          <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
+                        ) : null}
+                        {isDerivedLevel ? <span style={styles.levelPill}>From class schedule</span> : null}
+                        {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
+                      </div>
+                    </div>
+
+                    {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
+                    {entry.instruction ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p> : null}
+
+                    <LessonList title="Lesen & Hören" lessons={lesenHorenList} />
+                    <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} />
+
+                    {entry.schreiben ? (
+                      <div style={{ display: "grid", gap: 6 }}>
+                        <h4 style={{ margin: 0 }}>Schreiben</h4>
+                        <p style={{ margin: 0 }}>{entry.schreiben}</p>
+                      </div>
+                    ) : null}
+                    {entry.sprechen ? (
+                      <div style={{ display: "grid", gap: 6 }}>
+                        <h4 style={{ margin: 0 }}>Sprechen</h4>
+                        <p style={{ margin: 0 }}>{entry.sprechen}</p>
+                      </div>
+                    ) : null}
+                    {entry.zusatzmaterial ? (
+                      <div style={{ display: "grid", gap: 6 }}>
+                        <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
+                        <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+
+              {!filteredSchedule.length ? (
+                <div style={{ ...styles.card, marginBottom: 0 }}>
+                  <p style={{ margin: 0 }}>
+                    No course days match your filters. Try another search term or turn off the assignment filter.
+                  </p>
+                </div>
+              ) : null}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
