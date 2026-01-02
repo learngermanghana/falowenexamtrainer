@@ -24,6 +24,9 @@ const isFullName = (value) => {
 const formatClassLabel = (className) => {
   const details = classCatalog[className];
   if (!details) return className;
+  if (details.isSelfLearning || details.availability === "always") {
+    return `${className} — self-learning (always available)`;
+  }
 
   const startLabel = details.startDate
     ? new Date(details.startDate).toLocaleDateString(undefined, {
@@ -52,6 +55,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { showToast } = useToast();
   const paymentsEnabled = isPaymentsEnabled();
+  const now = useMemo(() => new Date(), []);
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -105,14 +109,29 @@ const SignUpPage = ({ onLogin, onBack }) => {
     },
   ];
 
-  const classOptions = useMemo(
-    () =>
-      Object.keys(classCatalog).map((className) => ({
+  const classOptions = useMemo(() => {
+    return Object.keys(classCatalog)
+      .filter((className) => {
+        const details = classCatalog[className];
+        if (!details) return false;
+        if (details.isSelfLearning || details.availability === "always") return true;
+        if (!details.startDate) return false;
+        const startDate = new Date(`${details.startDate}T00:00:00`);
+        return startDate > now;
+      })
+      .map((className) => ({
         value: className,
         label: formatClassLabel(className),
-      })),
-    []
-  );
+      }));
+  }, [now]);
+
+  useEffect(() => {
+    if (!selectedClass) return;
+    const availableValues = new Set(classOptions.map((option) => option.value));
+    if (!availableValues.has(selectedClass)) {
+      setSelectedClass("");
+    }
+  }, [classOptions, selectedClass]);
 
   const tuitionFeeForLevel = useMemo(
     () => computeTuitionStatus({ level: selectedLevel, paidAmount: 0 }).tuitionFee,

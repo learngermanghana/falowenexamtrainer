@@ -48,7 +48,7 @@ jest.mock("../services/studentCode", () => ({
 
 jest.mock("../data/classCatalog", () => ({
   classCatalog: {
-    "Evening A1": { startDate: "2024-01-01", schedule: [] },
+    "Evening A1": { startDate: "2099-01-01", schedule: [] },
   },
 }));
 
