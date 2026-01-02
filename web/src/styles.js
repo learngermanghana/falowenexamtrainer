@@ -210,6 +210,16 @@ export const styles = {
     color: "#4b5563",
     marginBottom: 8,
   },
+  linkButton: {
+    border: "none",
+    background: "none",
+    color: "#2563eb",
+    cursor: "pointer",
+    fontSize: 13,
+    fontWeight: 600,
+    padding: 0,
+    textDecoration: "underline",
+  },
   textArea: {
     width: "100%",
     padding: 12,
