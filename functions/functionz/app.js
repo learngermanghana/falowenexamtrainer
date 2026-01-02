@@ -695,6 +695,21 @@ async function findStudentByCodeOrEmail({ studentCode, email }) {
   return null;
 }
 
+async function findStudentByName(name) {
+  if (!name) return null;
+
+  const db = admin.firestore();
+  const snap = await db
+    .collection("students")
+    .where("name", "==", name)
+    .limit(1)
+    .get();
+
+  if (snap.empty) return null;
+  const doc = snap.docs[0];
+  return { ref: doc.ref, snap: doc };
+}
+
 /**
  * =========================
  * PAYSTACK: INITIALIZE
