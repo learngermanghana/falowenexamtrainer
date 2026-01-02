@@ -100,6 +100,498 @@ export const B2_SELF_LEARNING_PLAN = [
     ],
   },
   {
+    day: 3,
+    title: "Medien: Informationen bewerten",
+    topic: "Mediennutzung und Informationsquellen im Alltag.",
+    brainMap: [
+      "Ich informiere mich über ...",
+      "Soziale Medien haben Vorteile und Risiken.",
+      "Fakten prüfen ist wichtig.",
+      "Man sollte Quellen vergleichen.",
+    ],
+    speaking: {
+      concept:
+        "Beschreibe deine Mediennutzung, nenne Chancen und Risiken und erkläre, wie du Informationen überprüfst.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Relativsätze, um Quellen zu beschreiben (die Seite, die ...).",
+        "Verwende Konnektoren für Begründungen (denn, deshalb, trotzdem).",
+        "Setze indirekte Fragen ein (Ich frage mich, ob ...).",
+      ],
+      grammarPurpose: "Hilft dir, Quellen zu erläutern und deine Meinung zu begründen.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Erkläre, wie du Informationen findest, nenne Vorteile/Nachteile sozialer Medien und gib einen Tipp zur Quellenprüfung.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Relativsätzen oder Konnektoren brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen kurzen Meinungsaufsatz über Informationsquellen. Nenne zwei Vorteile, zwei Risiken und eine Empfehlung.",
+    },
+    skimmingWords: [
+      "Quelle",
+      "Nachricht",
+      "glaubwürdig",
+      "Faktencheck",
+      "verifizieren",
+      "Filterblase",
+      "manipulieren",
+      "verlässlich",
+    ],
+  },
+  {
+    day: 4,
+    title: "Freundschaft und Beziehungen",
+    topic: "Was macht gute Beziehungen aus?",
+    brainMap: [
+      "Vertrauen und Respekt sind wichtig.",
+      "Kommunikation löst Konflikte.",
+      "Freundschaften verändern sich.",
+      "Gemeinsame Interessen verbinden.",
+    ],
+    speaking: {
+      concept:
+        "Erkläre, was eine gute Freundschaft ausmacht, und nenne Beispiele aus deinem Alltag.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze weil/da, um Gründe zu nennen (weil, da).",
+        "Verwende zu-Infinitiv-Konstruktionen (um zu, ohne zu).",
+        "Setze Adjektivdeklination für Beschreibungen ein.",
+      ],
+      grammarPurpose: "Hilft dir, Beziehungen zu beschreiben und Gründe klar zu benennen.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Beschreibe eine gute Freundschaft, nenne zwei Beispiele und gib einen Ratschlag.",
+      askGrammarPrompt:
+        "Brauchst du Hilfe bei Begründungen oder zu-Infinitiv? Frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil eine E-Mail an einen Freund: Erkläre, was dir in Freundschaften wichtig ist und schlage eine gemeinsame Aktivität vor.",
+    },
+    skimmingWords: [
+      "Vertrauen",
+      "Respekt",
+      "Konflikt",
+      "Unterstützung",
+      "ehrlich",
+      "gemeinsam",
+      "Ratschlag",
+      "verständnisvoll",
+    ],
+  },
+  {
+    day: 5,
+    title: "Arbeit und Beruf",
+    topic: "Berufliche Ziele, Chancen und Herausforderungen.",
+    brainMap: [
+      "Mein Berufsziel ist ...",
+      "Wichtige Fähigkeiten sind ...",
+      "Work-Life-Balance ist wichtig.",
+      "Ich wünsche mir ...",
+    ],
+    speaking: {
+      concept:
+        "Beschreibe deinen Berufswunsch, wichtige Fähigkeiten und Herausforderungen im Arbeitsleben.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Konjunktiv II für Wünsche (ich würde, ich könnte).",
+        "Verwende Modalverben für Anforderungen (müssen, sollen).",
+        "Nutze wenn/falls für Bedingungen.",
+      ],
+      grammarPurpose: "Hilft dir, Ziele und Bedingungen im Berufsleben klar zu formulieren.",
+      prompt:
+        "Sprich 2 Minuten (Goethe-B2-Stil): Beschreibe deinen Berufswunsch, nenne zwei Anforderungen und vergleiche zwei Arbeitsmodelle.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Konjunktiv II oder Bedingungen brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen formellen Brief an ein Unternehmen: Stelle dich vor, nenne deine Stärken und erkläre, warum du dort arbeiten möchtest.",
+    },
+    skimmingWords: [
+      "Bewerbung",
+      "Qualifikation",
+      "Erfahrung",
+      "Arbeitsmodell",
+      "Flexibilität",
+      "Herausforderung",
+      "Karriere",
+      "Ziel",
+    ],
+  },
+  {
+    day: 6,
+    title: "Gesundheit und Lebensstil",
+    topic: "Gesund bleiben im Alltag.",
+    brainMap: [
+      "Sport und Bewegung helfen.",
+      "Gesunde Ernährung ist wichtig.",
+      "Stress vermeiden ist nötig.",
+      "Ich empfehle ...",
+    ],
+    speaking: {
+      concept:
+        "Erkläre, wie man gesund bleibt, und gib konkrete Empfehlungen.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Imperativ für Ratschläge (Iss, Schlaf, Beweg dich).",
+        "Verwende deshalb/daher für Folgen.",
+        "Setze reflexive Verben ein (sich erholen, sich bewegen).",
+      ],
+      grammarPurpose: "Hilft dir, Empfehlungen und Auswirkungen klar auszudrücken.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Beschreibe drei Gesundheitsgewohnheiten, erkläre warum sie wichtig sind und gib einen Tipp.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Imperativ oder Reflexivverben brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen kurzen Ratgeber-Text über gesunden Lebensstil. Gib mindestens drei konkrete Tipps.",
+    },
+    skimmingWords: [
+      "Bewegung",
+      "Ernährung",
+      "Stress",
+      "Routine",
+      "ausgewogen",
+      "Schlaf",
+      "Gesundheit",
+      "Gewohnheit",
+    ],
+  },
+  {
+    day: 7,
+    title: "Reisen und Mobilität",
+    topic: "Reiseerfahrungen und Transportmittel vergleichen.",
+    brainMap: [
+      "Ich reise gern nach ...",
+      "Öffentliche Verkehrsmittel sind ...",
+      "Fliegen ist schnell, aber ...",
+      "Umweltfreundlich reisen ist wichtig.",
+    ],
+    speaking: {
+      concept:
+        "Erzähle von einer Reise, vergleiche Verkehrsmittel und nenne einen nachhaltigen Tipp.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Perfekt/Präteritum für Erfahrungen.",
+        "Verwende um ... zu für Ziele.",
+        "Setze Vergleichsformen ein (schneller, günstiger).",
+      ],
+      grammarPurpose: "Hilft dir, Erfahrungen und Vergleiche strukturiert zu erzählen.",
+      prompt:
+        "Sprich 2 Minuten (Goethe-B2-Stil): Berichte von einer Reise, vergleiche zwei Verkehrsmittel und gib einen Tipp fürs nachhaltige Reisen.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Zeiten oder Vergleichen brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen kurzen Bericht über eine Reise. Beschreibe Transport, Unterkunft und eine Herausforderung.",
+    },
+    skimmingWords: [
+      "Reiseerlebnis",
+      "Verkehrsmittel",
+      "nachhaltig",
+      "umweltfreundlich",
+      "Preis-Leistung",
+      "Anreise",
+      "Unterkunft",
+      "Erfahrung",
+    ],
+  },
+  {
+    day: 8,
+    title: "Wohnen und Nachbarschaft",
+    topic: "Wohnformen und Zusammenleben.",
+    brainMap: [
+      "Eine Wohnung muss ...",
+      "Nachbarn können helfen oder stören.",
+      "Gemeinschaftsräume sind praktisch.",
+      "Regeln sind wichtig.",
+    ],
+    speaking: {
+      concept:
+        "Beschreibe deine Wohnsituation, nenne Vor- und Nachteile und gib eine Empfehlung.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Präpositionen mit Dativ/Akkusativ (in, an, neben).",
+        "Verwende Relativsätze zur Beschreibung.",
+        "Setze Passiv, um Regeln zu nennen (Es wird erwartet, dass ...).",
+      ],
+      grammarPurpose: "Hilft dir, Wohnsituation und Regeln klar zu beschreiben.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Beschreibe deine Wohnform, nenne zwei Vorteile und einen Nachteil, gib eine Empfehlung.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Präpositionen oder Passiv brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil eine Beschwerde-E-Mail an die Hausverwaltung über Lärm. Nenne das Problem und schlage eine Lösung vor.",
+    },
+    skimmingWords: [
+      "Miete",
+      "Nachbarschaft",
+      "Hausordnung",
+      "Lärm",
+      "gemeinschaftlich",
+      "ruhig",
+      "Regel",
+      "Beschwerde",
+    ],
+  },
+  {
+    day: 9,
+    title: "Konsum und Werbung",
+    topic: "Kaufverhalten, Werbung und bewusster Konsum.",
+    brainMap: [
+      "Werbung beeinflusst Entscheidungen.",
+      "Online-Shopping ist bequem.",
+      "Impulse vermeiden ist wichtig.",
+      "Preis und Qualität vergleichen.",
+    ],
+    speaking: {
+      concept:
+        "Erkläre, wie Werbung dich beeinflusst, und nenne Strategien für bewussten Konsum.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Vergleichsformen (besser, günstiger).",
+        "Verwende Konjunktiv II für Kritik (man würde denken).",
+        "Setze Genitiv oder von-Konstruktionen ein.",
+      ],
+      grammarPurpose: "Hilft dir, Bewertungen und Kritik differenziert auszudrücken.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Erkläre den Einfluss von Werbung, nenne Vor-/Nachteile von Online-Shopping und gib einen Spartipp.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Vergleichen oder Konjunktiv II brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen kurzen Kommentar über nachhaltigen Konsum. Nenne zwei konkrete Maßnahmen.",
+    },
+    skimmingWords: [
+      "Konsum",
+      "Werbung",
+      "Nachhaltigkeit",
+      "Impuls",
+      "Preisvergleich",
+      "Kaufverhalten",
+      "Rückgabe",
+      "Qualität",
+    ],
+  },
+  {
+    day: 10,
+    title: "Migration und Integration",
+    topic: "Ankommen, Teilhabe und Herausforderungen.",
+    brainMap: [
+      "Integration braucht Sprache.",
+      "Kulturelle Vielfalt bereichert.",
+      "Herausforderungen sind ...",
+      "Unterstützung hilft.",
+    ],
+    speaking: {
+      concept:
+        "Erkläre, was Integration bedeutet, nenne Herausforderungen und mögliche Lösungen.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze obwohl/trotzdem für Kontraste.",
+        "Verwende Nominalisierungen (Integration, Teilhabe).",
+        "Setze Partizipien für Beschreibungen ein.",
+      ],
+      grammarPurpose: "Hilft dir, komplexe Themen sachlich zu strukturieren.",
+      prompt:
+        "Sprich 2 Minuten (Goethe-B2-Stil): Erkläre Integration, nenne zwei Herausforderungen, gib zwei Lösungen und schließe ab.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Kontrasten oder Nominalisierung brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen kurzen Meinungsaufsatz über Integration in der Schule oder am Arbeitsplatz.",
+    },
+    skimmingWords: [
+      "Integration",
+      "Teilhabe",
+      "Sprache",
+      "Unterstützung",
+      "Vielfalt",
+      "Herausforderung",
+      "Ankommen",
+      "Chancengleichheit",
+    ],
+  },
+  {
+    day: 11,
+    title: "Politik und Engagement",
+    topic: "Mitbestimmung und Verantwortung in der Gesellschaft.",
+    brainMap: [
+      "Wählen ist wichtig.",
+      "Engagement beginnt im Alltag.",
+      "Information ist notwendig.",
+      "Verantwortung tragen.",
+    ],
+    speaking: {
+      concept:
+        "Erkläre, warum Engagement wichtig ist, und nenne Beispiele für Mitbestimmung.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Passiv für Prozesse (es wird gewählt).",
+        "Verwende damit/um ... zu für Ziele.",
+        "Setze Konnektoren für Struktur (außerdem, dennoch).",
+      ],
+      grammarPurpose: "Hilft dir, gesellschaftliche Prozesse klar zu erläutern.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Erkläre, warum Engagement wichtig ist, nenne zwei Beispiele und gib eine Empfehlung.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Passiv oder Zweckangaben brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil eine kurze Stellungnahme über freiwilliges Engagement. Begründe deine Meinung.",
+    },
+    skimmingWords: [
+      "Engagement",
+      "Mitbestimmung",
+      "Verantwortung",
+      "Wahl",
+      "Beteiligung",
+      "Gemeinschaft",
+      "Demokratie",
+      "ehrenamtlich",
+    ],
+  },
+  {
+    day: 12,
+    title: "Freizeit und Kultur",
+    topic: "Hobbys, Veranstaltungen und Ausgleich.",
+    brainMap: [
+      "In meiner Freizeit mache ich ...",
+      "Kulturveranstaltungen sind ...",
+      "Ausgleich ist wichtig.",
+      "Man lernt neue Leute kennen.",
+    ],
+    speaking: {
+      concept:
+        "Beschreibe deine Hobbys, erkläre ihren Nutzen und vergleiche zwei Freizeitformen.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Nebensätze mit während/als.",
+        "Verwende Adjektive für Bewertungen.",
+        "Setze sowohl ... als auch für Aufzählungen ein.",
+      ],
+      grammarPurpose: "Hilft dir, Freizeitaktivitäten strukturiert zu vergleichen.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Beschreibe ein Hobby, vergleiche zwei Freizeitformen und nenne einen Vorteil für die Gesundheit.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Nebensätzen brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil eine Einladung zu einer kulturellen Veranstaltung. Nenne Ort, Zeit und Programm.",
+    },
+    skimmingWords: [
+      "Freizeit",
+      "Hobby",
+      "Kulturveranstaltung",
+      "Ausgleich",
+      "entspannen",
+      "aktiv",
+      "Programm",
+      "teilnehmen",
+    ],
+  },
+  {
+    day: 13,
+    title: "Sprache und Kommunikation",
+    topic: "Sprachenlernen und Kommunikation im Beruf.",
+    brainMap: [
+      "Sprachen öffnen Türen.",
+      "Kommunikation braucht Klarheit.",
+      "Missverständnisse passieren.",
+      "Übung verbessert.",
+    ],
+    speaking: {
+      concept:
+        "Erkläre, warum Sprachenlernen wichtig ist, und nenne Strategien für bessere Kommunikation.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze indirekte Rede (Er sagte, dass ...).",
+        "Verwende Konnektoren für Struktur (dennoch, außerdem).",
+        "Setze Präpositionen mit Genitiv ein (trotz, während).",
+      ],
+      grammarPurpose: "Hilft dir, Aussagen anderer korrekt wiederzugeben.",
+      prompt:
+        "Sprich 90 Sekunden (Goethe-B2-Stil): Erkläre die Bedeutung von Sprachen, nenne zwei Lernstrategien und gib einen Tipp für Missverständnisse.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit indirekter Rede brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen kurzen Erfahrungsbericht über eine Kommunikationssituation im Kurs oder Beruf.",
+    },
+    skimmingWords: [
+      "Kommunikation",
+      "Missverständnis",
+      "Ausdruck",
+      "Formulierung",
+      "Feedback",
+      "klar",
+      "Tonfall",
+      "Strategie",
+    ],
+  },
+  {
+    day: 14,
+    title: "Wissenschaft und Zukunft",
+    topic: "Innovationen und ihre Auswirkungen auf den Alltag.",
+    brainMap: [
+      "Forschung bringt Fortschritt.",
+      "Neue Technologien verändern Berufe.",
+      "Chancen und Risiken abwägen.",
+      "Zukunft planen.",
+    ],
+    speaking: {
+      concept:
+        "Beschreibe eine Innovation, erkläre Chancen und Risiken und gib eine Prognose.",
+      outline: SPEAKING_OUTLINE,
+      starters: SPEAKING_STARTERS,
+      grammarNotes: [
+        "Nutze Futur I/II für Prognosen.",
+        "Verwende wenn/falls für Szenarien.",
+        "Setze zu-Infinitiv für Ziele ein.",
+      ],
+      grammarPurpose: "Hilft dir, Zukunftsaussagen strukturiert zu formulieren.",
+      prompt:
+        "Sprich 2 Minuten (Goethe-B2-Stil): Beschreibe eine Innovation, nenne Chancen/Risiken und gib eine Prognose für die Zukunft.",
+      askGrammarPrompt:
+        "Wenn du Hilfe mit Futur brauchst, frag zuerst.",
+    },
+    writing: {
+      prompt:
+        "Schreibe im Goethe-B2-Stil einen kurzen Meinungsaufsatz über technologische Innovationen und ihre Auswirkungen.",
+    },
+    skimmingWords: [
+      "Innovation",
+      "Forschung",
+      "Fortschritt",
+      "Risiko",
+      "Prognose",
+      "Zukunft",
+      "entwickeln",
+      "Auswirkung",
+    ],
+  },
+  {
     day: 15,
     title: "Bildung: definition to conclusion",
     topic: "Bildung and lifelong learning in modern society.",
