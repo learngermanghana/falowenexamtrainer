@@ -26,6 +26,7 @@ import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import MyExamFilePage from "./components/MyExamFilePage";
+import SeoLandingPage from "./components/SeoLandingPage";
 
 const TAB_STRUCTURE = [
   {
@@ -175,6 +176,10 @@ function App() {
 
   if (location.pathname === "/payment-complete") {
     return <PaymentComplete />;
+  }
+
+  if (location.pathname === "/learn-german-ghana") {
+    return <SeoLandingPage onSignUp={() => setAuthMode("signup")} onLogin={() => setAuthMode("login")} />;
   }
 
   if (!user) {
