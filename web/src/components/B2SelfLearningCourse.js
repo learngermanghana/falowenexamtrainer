@@ -117,7 +117,9 @@ const B2SelfLearningCourse = () => {
         <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>B2 self-learning flow (no tutor)</h3>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
           Each day has three steps: speaking recording, writing practice, and skimming words. Save your
-          scores and only mark a step complete when the AI score is at least {SCORE_THRESHOLD}.
+          scores and only mark a step complete when the AI score is at least {SCORE_THRESHOLD}. Writing prompts
+          follow Goethe-B2 formats (Meinungsaufsatz or formeller Brief) and mirror the speaking topic and grammar
+          focus. Use the brain map to collect quick ideas before you start.
         </p>
         {!userId && !studentCode ? (
           <p style={{ ...styles.helperText, color: "#b45309", marginBottom: 0 }}>
@@ -144,6 +146,16 @@ const B2SelfLearningCourse = () => {
                 <span style={styles.levelPill}>Day {entry.day}</span>
                 <h3 style={{ margin: "6px 0" }}>{entry.title}</h3>
                 <p style={{ ...styles.helperText, margin: 0 }}>Topic: {entry.topic}</p>
+                {entry.brainMap?.length ? (
+                  <div style={{ ...styles.helperText, marginTop: 8 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Brain map (Ideen)</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.brainMap.map((idea) => (
+                        <li key={idea}>{idea}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </div>
               {dayState.dayComplete ? <span style={styles.badge}>Day complete</span> : null}
             </div>
