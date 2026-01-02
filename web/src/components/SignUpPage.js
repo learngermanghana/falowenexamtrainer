@@ -297,7 +297,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         status: "Active",
         contractStart: "",
         contractEnd: "",
-        contractTermMonths: null,
+        contractTermMonths: 6,
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
@@ -596,8 +596,8 @@ const SignUpPage = ({ onLogin, onBack }) => {
           ) : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
             Enter between GH₵{MIN_INITIAL_PAYMENT} and GH₵{tuitionFeeForLevel} for {selectedLevel}. A1: GH₵2800 · A2:
-            GH₵3000 · B1: GH₵3000 · B2: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start your account. We
-            confirm Paystack payments before marking you as paid.
+            GH₵3000 · B1: GH₵3000 · B2: GH₵3000 · C1: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start
+            your account. We confirm Paystack payments before marking you as paid.
           </p>
 
           <TuitionStatusCard

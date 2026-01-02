@@ -7,6 +7,7 @@ export const LEVEL_FEES = {
   A2: 3000,
   B1: 3000,
   B2: 3000,
+  C1: 3000,
 };
 
 export const getTuitionFeeForLevel = (level) => LEVEL_FEES[level] ?? 0;
