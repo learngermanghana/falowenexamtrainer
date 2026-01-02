@@ -436,25 +436,16 @@ app.post("/webhooks/zoom", async (req, res) => {
   try {
     const payload = req.body?.payload?.object || {};
     const participant = payload.participant || {};
-    const displayName = participant.user_name || participant.name || "";
-    const emailFromPayload = participant.user_email || participant.email || "";
-    const emailFromName =
-      !emailFromPayload && displayName.includes("@") ? displayName.trim() : "";
-    const email = emailFromPayload || emailFromName;
-    const codeFromName =
-      !emailFromPayload && displayName && !displayName.includes("@")
-        ? displayName.trim()
-        : "";
+    const email = participant.user_email || participant.email || "";
 
     if (!email) {
-      requestLog.warn("zoom.webhook.missing_email", { participant, displayName });
+      requestLog.warn("zoom.webhook.missing_email", { participant });
+      return res.status(202).json({ ok: true, skipped: "missing_email" });
     }
 
-    const studentResult =
-      (await findStudentByCodeOrEmail({ email, studentCode: codeFromName })) ||
-      (await findStudentByName(displayName));
+    const studentResult = await findStudentByCodeOrEmail({ email });
     if (!studentResult) {
-      requestLog.warn("zoom.webhook.student_not_found", { email, displayName });
+      requestLog.warn("zoom.webhook.student_not_found", { email });
       return res.status(202).json({ ok: true, skipped: "student_not_found" });
     }
 
@@ -494,32 +485,22 @@ app.post("/webhooks/zoom", async (req, res) => {
       .collection("sessions")
       .doc(sessionDate);
 
-    const attendanceField = `attendance.${studentCode}`;
-    const sessionPayload = {
-      date: sessionDate,
-      topic: summary,
-      sessions: scheduleInfo?.sessions || [],
-      meetingId: payload.id || payload.uuid || null,
-      meetingTopic: payload.topic || null,
-      lastZoomJoinAt: admin.firestore.FieldValue.serverTimestamp(),
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      source: "zoom",
-    };
-
     await sessionRef.set(
       {
-        ...sessionPayload,
-        [attendanceField]: true,
+        date: sessionDate,
+        topic: summary,
+        sessions: scheduleInfo?.sessions || [],
+        meetingId: payload.id || payload.uuid || null,
+        meetingTopic: payload.topic || null,
+        lastZoomJoinAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        source: "zoom",
+        attendance: {
+          [studentCode]: true,
+        },
       },
       { merge: true }
     );
-
-    requestLog.info("zoom.webhook.attendance_marked", {
-      studentCode,
-      className,
-      sessionDate,
-      meetingId: payload.id || payload.uuid || null,
-    });
 
     return res.json({ ok: true, marked: studentCode, className, sessionDate });
   } catch (err) {
