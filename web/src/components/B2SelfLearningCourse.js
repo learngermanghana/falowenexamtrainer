@@ -159,6 +159,31 @@ const B2SelfLearningCourse = () => {
                 {entry.speaking.concept ? (
                   <p style={{ ...styles.helperText, margin: 0 }}>{entry.speaking.concept}</p>
                 ) : null}
+                {entry.speaking.outline?.length ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Outline</div>
+                    <ol style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.speaking.outline.map((step) => (
+                        <li key={step}>{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
+                {entry.speaking.starters?.length ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Starter phrases</div>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {entry.speaking.starters.map((starter) => (
+                        <span
+                          key={starter}
+                          style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}
+                        >
+                          {starter}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
                 {entry.speaking.grammarNotes?.length ? (
                   <div style={{ ...styles.helperText, margin: 0 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Grammar focus</div>
