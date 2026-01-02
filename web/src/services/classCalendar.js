@@ -141,6 +141,40 @@ const findTimeSlot = (className, weekday) => {
   return schedule.find((entry) => entry.day === weekday);
 };
 
+const toLocalDateString = (date) => {
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  return `${year}-${month}-${day}`;
+};
+
+const buildSessionTitles = (sessions = []) =>
+  sessions.map((session) => {
+    const base = [session.chapter, session.type].filter(Boolean).join(" – ");
+    return session.note ? `${base} (${session.note})` : base;
+  });
+
+export const findTodayClassSession = (className, referenceDate = new Date()) => {
+  const courseSchedule = courseSchedulesByName[className];
+  const sessionDays = courseSchedule?.days;
+  if (!sessionDays || sessionDays.length === 0) return null;
+
+  const today = toLocalDateString(referenceDate);
+  const day = sessionDays.find((entry) => entry.date === today);
+  if (!day) return null;
+
+  const timeSlot = findTimeSlot(className, day.weekday);
+  const startTime = timeSlot?.startTime || "00:00";
+  const endTime = timeSlot?.endTime || "00:00";
+
+  return {
+    ...day,
+    startTime,
+    endTime,
+    titles: buildSessionTitles(day.sessions || []),
+  };
+};
+
 export const findNextClassSession = (className, referenceDate = new Date()) => {
   const courseSchedule = courseSchedulesByName[className];
   const sessionDays = courseSchedule?.days;
@@ -163,10 +197,7 @@ export const findNextClassSession = (className, referenceDate = new Date()) => {
         endTime,
         startDateTime,
         endDateTime,
-        titles: day.sessions?.map((session) => {
-          const base = [session.chapter, session.type].filter(Boolean).join(" – ");
-          return session.note ? `${base} (${session.note})` : base;
-        }),
+        titles: buildSessionTitles(day.sessions || []),
       };
     }
   }
