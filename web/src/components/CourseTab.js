@@ -5,6 +5,7 @@ import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
 
 const normalizeLevel = (level) => (level || "").toUpperCase();
+const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const LEVEL_FALLBACK_RESOURCES = {
   A2: {
@@ -156,13 +157,29 @@ const LessonList = ({ title, lessons }) => {
   );
 };
 
+const getAllowedCourseLevels = (levels, defaultLevel) => {
+  const normalizedDefault = normalizeLevel(defaultLevel);
+  const maxIndex = LEVEL_ORDER.indexOf(normalizedDefault);
+  if (!normalizedDefault || maxIndex === -1) return levels;
+
+  const allowed = new Set(LEVEL_ORDER.slice(0, maxIndex + 1));
+  return levels.filter((level) => allowed.has(level));
+};
+
 const CourseTab = ({ defaultLevel }) => {
   const levels = useMemo(() => {
     const baseLevels = Object.keys(mergedCourseSchedules);
     const normalizedDefault = normalizeLevel(defaultLevel);
     const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
-    // optional: stable order
-    return merged.sort((a, b) => a.localeCompare(b));
+    const allowedLevels = getAllowedCourseLevels(merged, normalizedDefault);
+    return allowedLevels.sort((a, b) => {
+      const aIndex = LEVEL_ORDER.indexOf(a);
+      const bIndex = LEVEL_ORDER.indexOf(b);
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return a.localeCompare(b);
+    });
   }, [defaultLevel]);
 
   const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
@@ -178,6 +195,10 @@ const CourseTab = ({ defaultLevel }) => {
     const normalizedDefault = normalizeLevel(defaultLevel);
     if (normalizedDefault && levels.includes(normalizedDefault) && normalizedDefault !== selectedCourseLevel) {
       setSelectedCourseLevel(normalizedDefault);
+      return;
+    }
+    if (!levels.includes(selectedCourseLevel)) {
+      setSelectedCourseLevel(levels[0] || "");
     }
   }, [defaultLevel, levels, selectedCourseLevel]);
 
