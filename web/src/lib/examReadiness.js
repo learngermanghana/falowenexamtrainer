@@ -17,13 +17,22 @@ export const computeExamReadiness = ({ attendanceSessions, completedAssignments,
 
   const completionRate = plannedTotal ? Math.round((completedCount / plannedTotal) * 100) : null;
   const readyTarget = plannedTotal ? Math.ceil(plannedTotal * 0.7) : 5;
-  const almostTarget = plannedTotal ? Math.max(2, Math.ceil(plannedTotal * 0.35)) : 2;
+  const almostTarget = plannedTotal ? Math.max(3, Math.ceil(plannedTotal * 0.5)) : 3;
+  const evidenceTarget = plannedTotal ? Math.max(3, Math.ceil(plannedTotal * 0.3)) : 3;
   const completionDetail = plannedTotal
     ? `${completedCount}/${plannedTotal} assignments (${completionRate ?? 0}%)`
     : `${completedCount} assignments`;
 
   // ✅ READY (green)
-  if (completedCount >= readyTarget && averageScore !== null && averageScore >= 75 && attendanceSessions >= 5) {
+  if (
+    completedCount >= readyTarget &&
+    normalizedScores.length >= readyTarget &&
+    averageScore !== null &&
+    averageScore >= 75 &&
+    passRate !== null &&
+    passRate >= 70 &&
+    attendanceSessions >= 5
+  ) {
     return {
       icon: "✅",
       tone: "#dcfce7",
@@ -37,7 +46,15 @@ export const computeExamReadiness = ({ attendanceSessions, completedAssignments,
   }
 
   // ⚠️ ALMOST (yellow)
-  if (completedCount >= almostTarget && averageScore !== null && averageScore >= 50) {
+  if (
+    completedCount >= almostTarget &&
+    normalizedScores.length >= evidenceTarget &&
+    averageScore !== null &&
+    averageScore >= 60 &&
+    passRate !== null &&
+    passRate >= 50 &&
+    attendanceSessions >= 3
+  ) {
     return {
       icon: "⚠️",
       tone: "#fef3c7",
@@ -58,7 +75,7 @@ export const computeExamReadiness = ({ attendanceSessions, completedAssignments,
     tone: "#fee2e2",
     text: "Not ready yet",
     detail: plannedTotal
-      ? `Complete at least ${almostTarget}/${plannedTotal} assignments with scores to unlock readiness tracking.`
+      ? `Complete at least ${almostTarget}/${plannedTotal} assignments with scores and ${evidenceTarget} scored items to unlock readiness tracking.`
       : "Submit more assignments with scores to unlock readiness tracking.",
     statusLabel: "Not ready",
     statusPillBg: "#fee2e2",
