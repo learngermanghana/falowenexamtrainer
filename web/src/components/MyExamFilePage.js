@@ -214,6 +214,22 @@ const MyExamFilePage = () => {
     const raw = levelConfirmed ? level : studentProfile?.level || level || "";
     return String(raw || "").toUpperCase();
   }, [level, levelConfirmed, studentProfile]);
+  const [showAllLevels, setShowAllLevels] = useState(!detectedLevel);
+
+  useEffect(() => {
+    if (!detectedLevel) {
+      setShowAllLevels(true);
+    }
+  }, [detectedLevel]);
+
+  const visibleExamLevels = useMemo(() => {
+    if (!detectedLevel || showAllLevels) {
+      return goetheExamLevels;
+    }
+
+    const matchedLevels = goetheExamLevels.filter((levelInfo) => levelInfo.level === detectedLevel);
+    return matchedLevels.length > 0 ? matchedLevels : goetheExamLevels;
+  }, [detectedLevel, showAllLevels]);
 
   const loadAttendance = useCallback(async () => {
     if (!className || !studentCode) {
@@ -482,16 +498,38 @@ const MyExamFilePage = () => {
         title="Goethe exam countdowns (Accra)"
         subtitle="Monitor upcoming exam dates and keep registration windows handy."
         defaultOpen
+        right={
+          detectedLevel ? (
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, padding: "6px 10px", fontSize: 12 }}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                setShowAllLevels((prev) => !prev);
+              }}
+            >
+              {showAllLevels ? "Show my level only" : "Show all levels"}
+            </button>
+          ) : null
+        }
       >
         <div style={{ display: "grid", gap: 14 }}>
-          {goetheExamLevels.map((levelInfo) => (
+          {!detectedLevel ? (
+            <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>
+              No level set yet — showing all exam levels so you can browse upcoming dates.
+            </div>
+          ) : null}
+          {visibleExamLevels.map((levelInfo) => {
+            const isDetectedLevel = levelInfo.level === detectedLevel;
+            return (
             <div
               key={levelInfo.level}
               style={{
-                border: "1px solid #e5e7eb",
+                border: isDetectedLevel ? "2px solid #2563eb" : "1px solid #e5e7eb",
                 borderRadius: 16,
                 padding: 14,
-                background: "#ffffff",
+                background: isDetectedLevel ? "#eff6ff" : "#ffffff",
                 display: "grid",
                 gap: 10,
                 boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
@@ -591,7 +629,7 @@ const MyExamFilePage = () => {
                 })}
               </div>
             </div>
-          ))}
+          )})}
         </div>
       </CollapsibleCard>
 
