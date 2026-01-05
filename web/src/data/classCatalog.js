@@ -73,6 +73,15 @@ export const classCatalog = {
       { day: "Friday", startTime: "19:30", endTime: "21:00" },
     ],
     docUrl: "https://drive.google.com/file/d/1ttjnOj10xo-baddfUHthHJ9dKYwqByk2/view?usp=sharing",
+    },
+  "B1 Stuttgart Klasse": {
+    startDate: "2026-03-12",
+    endDate: "2026-06-12",
+    schedule: [
+      { day: "Thursday", startTime: "19:30", endTime: "21:00" },
+      { day: "Friday", startTime: "19:30", endTime: "21:00" },
+    ],
+    docUrl: "https://drive.google.com/file/d/1QcKorNLQtveE-NYbZajDlAijrWhgknwp/view?usp=sharing",
   },
   "B2 Munich Klasse": {
     isSelfLearning: true,
