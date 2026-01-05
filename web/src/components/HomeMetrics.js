@@ -41,6 +41,7 @@ const HomeMetrics = ({ studentProfile }) => {
   const [attendance, setAttendance] = useState({ sessions: 0, hours: 0 });
   const [assignmentStats, setAssignmentStats] = useState(null);
   const [leaderboard, setLeaderboard] = useState(null);
+  const [leaderboardGeneratedAt, setLeaderboardGeneratedAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [refreshError, setRefreshError] = useState("");
 
@@ -67,6 +68,8 @@ const HomeMetrics = ({ studentProfile }) => {
         setAttendance({ sessions: 0, hours: 0 });
         setAssignmentStats(null);
         setRefreshError("");
+        setLeaderboard(null);
+        setLeaderboardGeneratedAt("");
       }
       return;
     }
@@ -87,6 +90,7 @@ const HomeMetrics = ({ studentProfile }) => {
       setAttendance(attendanceResponse || { sessions: 0, hours: 0 });
       setAssignmentStats(scoreResponse?.student || null);
       setLeaderboard(scoreResponse?.leaderboard || null);
+      setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");
       setRefreshError("");
     } catch (error) {
       if (!isMountedRef.current) return;
@@ -151,6 +155,12 @@ const HomeMetrics = ({ studentProfile }) => {
   const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
   const qualificationMinimum = leaderboard?.qualificationMinimum ?? 3;
   const topLeaderboardRows = useMemo(() => leaderboardRows.slice(0, 10), [leaderboardRows]);
+  const leaderboardUpdatedLabel = useMemo(() => {
+    if (!leaderboardGeneratedAt) return "";
+    const parsed = new Date(leaderboardGeneratedAt);
+    if (Number.isNaN(parsed.getTime())) return "";
+    return `Last updated ${parsed.toLocaleString()}`;
+  }, [leaderboardGeneratedAt]);
   const myLeaderboardEntry = useMemo(() => {
     const normalizedCode = String(studentCode || "").toLowerCase();
     return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
@@ -227,6 +237,7 @@ const HomeMetrics = ({ studentProfile }) => {
           <div style={{ ...styles.helperText, margin: 0 }}>
             Level leaderboard ({leaderboard.level || levelKey || "your level"}) · Only scores 60+ count ·
             Qualify after {qualificationMinimum} passed assignments.
+            {leaderboardUpdatedLabel ? ` · ${leaderboardUpdatedLabel}` : ""}
           </div>
 
           {assignmentStats && assignmentStats.completedCount < qualificationMinimum ? (

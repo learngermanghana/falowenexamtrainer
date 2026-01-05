@@ -529,6 +529,7 @@ const scoresSummaryHandler = async (req, res) => {
     const streakDays = buildStreakDays(mine.map((r) => r.dateMs));
 
     return res.json({
+      generatedAt: new Date().toISOString(),
       student: {
         completedAssignments,
         missedAssignments,
