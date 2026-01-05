@@ -29,6 +29,19 @@ const toTime = (row) => {
   return Number.isNaN(t) ? 0 : t;
 };
 
+const getCountdownLabel = (targetDate, now) => {
+  if (!targetDate) return "Date not set";
+  const diffMs = targetDate.getTime() - now.getTime();
+  if (Number.isNaN(diffMs)) return "Date not set";
+  if (diffMs <= 0) return "Exam day is here";
+
+  const totalMinutes = Math.floor(diffMs / 1000 / 60);
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+  return `${days}d ${hours}h ${minutes}m left`;
+};
+
 // Sheets/CSV often returns "85" or "85/100" as string
 const parseScore = (value) => {
   if (value === null || value === undefined || value === "") return null;
@@ -63,6 +76,65 @@ const initialAssignmentState = {
 };
 
 const initialFeedbackState = { loading: false, items: [], error: "" };
+
+const goetheExamLevels = [
+  {
+    level: "A1",
+    title: "Goethe-Zertifikat A1: Start Deutsch 1",
+    description:
+      "A German exam for adults. It certifies that candidates have acquired very basic language skills and corresponds to the first level (A1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    price: "3,000 GHS",
+    location: "Goethe-Institut Accra",
+    exams: [
+      { date: "2026-02-14", registrationStart: "2026-01-26", registrationEnd: "2026-01-26" },
+      { date: "2026-03-04", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-05", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-07", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-09", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-10", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-11", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-06-03", registrationStart: "2026-05-04", registrationEnd: "2026-05-04" },
+      { date: "2026-06-04", registrationStart: "2026-05-04", registrationEnd: "2026-05-04" },
+      { date: "2026-06-05", registrationStart: "2026-05-04", registrationEnd: "2026-05-04" },
+    ],
+  },
+  {
+    level: "A2",
+    title: "Goethe-Zertifikat A2",
+    description: "A German exam for adults. It certifies basic language skills at the A2 level of the CEFR.",
+    price: "2,550 GHS",
+    location: "Goethe-Institut Accra",
+    exams: [
+      { date: "2026-03-12", registrationStart: "2026-02-03", registrationEnd: "2026-02-03" },
+      { date: "2026-03-13", registrationStart: "2026-02-03", registrationEnd: "2026-02-03" },
+      { date: "2026-06-10", registrationStart: "2026-05-05", registrationEnd: "2026-05-05" },
+      { date: "2026-06-11", registrationStart: "2026-05-05", registrationEnd: "2026-05-05" },
+      { date: "2026-09-07", registrationStart: "2026-08-04", registrationEnd: "2026-08-04" },
+      { date: "2026-09-08", registrationStart: "2026-08-04", registrationEnd: "2026-08-04" },
+      { date: "2026-11-30", registrationStart: "2026-10-27", registrationEnd: "2026-10-27" },
+      { date: "2026-12-01", registrationStart: "2026-10-27", registrationEnd: "2026-10-27" },
+    ],
+  },
+  {
+    level: "B1",
+    title: "Goethe-Zertifikat B1",
+    description:
+      "A German exam for young people and adults. It certifies that candidates are independent users of the German language and corresponds to the third level (B1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    price: "2,900 GHS",
+    modulePrice: "950 GHS per module",
+    location: "Goethe-Institut Accra",
+    exams: [
+      { date: "2026-03-16", registrationStart: "2026-02-04", registrationEnd: "2026-02-04" },
+      { date: "2026-03-17", registrationStart: "2026-02-04", registrationEnd: "2026-02-04" },
+      { date: "2026-06-12", registrationStart: "2026-05-06", registrationEnd: "2026-05-06" },
+      { date: "2026-06-15", registrationStart: "2026-05-06", registrationEnd: "2026-05-06" },
+      { date: "2026-09-09", registrationStart: "2026-08-05", registrationEnd: "2026-08-05" },
+      { date: "2026-09-10", registrationStart: "2026-08-05", registrationEnd: "2026-08-05" },
+      { date: "2026-12-02", registrationStart: "2026-10-28", registrationEnd: "2026-10-28" },
+      { date: "2026-12-03", registrationStart: "2026-10-28", registrationEnd: "2026-10-28" },
+    ],
+  },
+];
 
 // ---------- UI bits ----------
 const StatCard = ({ label, value, sub, icon }) => (
@@ -183,6 +255,12 @@ const MyExamFilePage = () => {
   const [attendanceState, setAttendanceState] = useState(initialAttendanceState);
   const [assignmentState, setAssignmentState] = useState(initialAssignmentState);
   const [feedbackState, setFeedbackState] = useState(initialFeedbackState);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 60 * 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const studentCode = useMemo(() => {
     return studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
@@ -457,6 +535,75 @@ const MyExamFilePage = () => {
           <p style={{ ...styles.helperText, margin: 0 }}>{readiness.detail}</p>
         </div>
       </section>
+
+      <CollapsibleCard
+        title="Goethe exam countdowns (Accra)"
+        subtitle="Monitor upcoming exam dates and keep registration windows handy."
+        defaultOpen
+      >
+        <div style={{ display: "grid", gap: 14 }}>
+          {goetheExamLevels.map((levelInfo) => (
+            <div
+              key={levelInfo.level}
+              style={{
+                border: "1px solid #e5e7eb",
+                borderRadius: 16,
+                padding: 14,
+                background: "#ffffff",
+                display: "grid",
+                gap: 10,
+                boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                <div>
+                  <div style={{ fontWeight: 900, fontSize: 16, color: "#111827" }}>
+                    {levelInfo.level} · {levelInfo.title}
+                  </div>
+                  <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{levelInfo.description}</p>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <div style={{ fontWeight: 900, fontSize: 15, color: "#111827" }}>{levelInfo.price}</div>
+                  {levelInfo.modulePrice ? (
+                    <div style={{ fontSize: 12, color: "#6B7280" }}>{levelInfo.modulePrice}</div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gap: 8 }}>
+                {levelInfo.exams.map((exam, index) => {
+                  const examDate = new Date(exam.date);
+                  return (
+                    <div
+                      key={`${levelInfo.level}-${exam.date}-${index}`}
+                      style={{
+                        border: "1px solid #f3f4f6",
+                        borderRadius: 12,
+                        padding: 10,
+                        display: "grid",
+                        gap: 6,
+                        background: "#f9fafb",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                        <div style={{ fontWeight: 800, color: "#111827" }}>
+                          📅 {formatDate(exam.date)} · {levelInfo.location}
+                        </div>
+                        <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
+                          {getCountdownLabel(examDate, now)}
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 13, color: "#6B7280" }}>
+                        Registration window: {formatDate(exam.registrationStart)} - {formatDate(exam.registrationEnd)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CollapsibleCard>
 
       {/* Attendance (collapsible) */}
       <CollapsibleCard
