@@ -113,6 +113,8 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
 
     return { ghanaRange, localRange };
   }, [nextClass?.date, nextClass?.endTime, nextClass?.startTime]);
+  const isNextClassToday = Boolean(todayClass && nextClass && todayClass.date === nextClass.date);
+  const shouldShowNextClass = Boolean(nextClass && !isNextClassToday);
 
   useEffect(() => {
     setSelectedClass(defaultClass);
@@ -235,7 +237,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
         </div>
       ) : null}
 
-      {nextClass ? (
+      {shouldShowNextClass ? (
         <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Next live class</h3>
@@ -276,11 +278,13 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
             ) : null}
           </div>
         </div>
-      ) : (
+      ) : null}
+
+      {!nextClass ? (
         <div style={{ ...styles.helperText, margin: 0 }}>
           No upcoming sessions found for this class. Choose a different class to refresh the schedule.
         </div>
-      )}
+      ) : null}
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button style={styles.primaryButton} type="button" onClick={() => downloadClassCalendar(selectedClass)}>
