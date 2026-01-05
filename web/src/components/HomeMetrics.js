@@ -40,6 +40,7 @@ const HomeMetrics = ({ studentProfile }) => {
 
   const [attendance, setAttendance] = useState({ sessions: 0, hours: 0 });
   const [assignmentStats, setAssignmentStats] = useState(null);
+  const [leaderboard, setLeaderboard] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshError, setRefreshError] = useState("");
 
@@ -85,6 +86,7 @@ const HomeMetrics = ({ studentProfile }) => {
 
       setAttendance(attendanceResponse || { sessions: 0, hours: 0 });
       setAssignmentStats(scoreResponse?.student || null);
+      setLeaderboard(scoreResponse?.leaderboard || null);
       setRefreshError("");
     } catch (error) {
       if (!isMountedRef.current) return;
@@ -145,6 +147,13 @@ const HomeMetrics = ({ studentProfile }) => {
     const ids = assignmentStats?.failedIdentifiers || [];
     return ids.length ? ids.join(", ") : "";
   }, [assignmentStats]);
+
+  const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
+  const qualificationMinimum = leaderboard?.qualificationMinimum ?? 3;
+  const myLeaderboardEntry = useMemo(() => {
+    const normalizedCode = String(studentCode || "").toLowerCase();
+    return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
+  }, [leaderboardRows, studentCode]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -208,6 +217,55 @@ const HomeMetrics = ({ studentProfile }) => {
           This week: {assignmentStats.weekAssignments || 0} assignments across {assignmentStats.weekAttempts || 0} attempts ·
           Streak: {assignmentStats.streakDays || 0} day(s) · Last upload: {assignmentStats.lastAssignment || "–"} ·
           Retries this week: {assignmentStats.retriesThisWeek || 0}
+        </div>
+      ) : null}
+
+      {leaderboard ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ ...styles.helperText, margin: 0 }}>
+            Level leaderboard ({leaderboard.level || levelKey || "your level"}) · Only scores 60+ count ·
+            Qualify after {qualificationMinimum} passed assignments.
+          </div>
+
+          {assignmentStats && assignmentStats.completedCount < qualificationMinimum ? (
+            <div style={{ ...styles.helperText, margin: 0, fontStyle: "italic" }}>
+              You&apos;ll join once you pass {qualificationMinimum} assignments. Keep it steady — no rush.
+            </div>
+          ) : null}
+
+          {leaderboardRows.length === 0 ? (
+            <div style={{ ...styles.helperText, margin: 0 }}>No qualified rankings yet for this level.</div>
+          ) : (
+            <div style={{ display: "grid", gap: 6 }}>
+              {myLeaderboardEntry ? (
+                <div style={{ ...styles.helperText, margin: 0 }}>
+                  Your standing: #{myLeaderboardEntry.rank} · {myLeaderboardEntry.completedCount} assignments ·{" "}
+                  {myLeaderboardEntry.totalScore} points
+                </div>
+              ) : null}
+
+              {leaderboardRows.slice(0, 3).map((row) => (
+                <div
+                  key={`${row.studentCode}-${row.rank}`}
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 12,
+                    padding: "8px 10px",
+                    background: "#ffffff",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
+                  <div style={{ fontWeight: 700, color: "#111827" }}>
+                    #{row.rank} · {row.name || "Student"}
+                  </div>
+                  <span style={styles.badge}>{row.completedCount} passes</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : null}
     </section>

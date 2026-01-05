@@ -48,6 +48,10 @@ const initialAssignmentState = {
   lastAssignment: null,
   retriesThisWeek: 0,
   totalAssignments: null,
+  completedCount: 0,
+  pointsEarned: null,
+  expectedPoints: null,
+  leaderboard: null,
   error: "",
 };
 
@@ -236,6 +240,10 @@ const MyExamFilePage = () => {
         lastAssignment: student.lastAssignment || null,
         retriesThisWeek: student.retriesThisWeek || 0,
         totalAssignments: student.totalAssignments ?? null,
+        completedCount: student.completedCount ?? (student.completedAssignments || []).length,
+        pointsEarned: student.pointsEarned ?? null,
+        expectedPoints: student.expectedPoints ?? null,
+        leaderboard: response.leaderboard || null,
         error: "",
       });
     } catch (error) {
@@ -303,6 +311,23 @@ const MyExamFilePage = () => {
     const latest = feedbackState.items?.[0];
     return latest?.date || latest?.created_at || latest?.createdAt || "";
   }, [feedbackState.items]);
+
+  const pointsSummary = useMemo(() => {
+    if (assignmentState.pointsEarned === null || assignmentState.expectedPoints === null) return "Not yet";
+    return `${assignmentState.pointsEarned}/${assignmentState.expectedPoints} pts`;
+  }, [assignmentState.expectedPoints, assignmentState.pointsEarned]);
+
+  const assignmentProgress = useMemo(() => {
+    if (assignmentState.totalAssignments === null) return "Assignments passed: —";
+    return `Assignments passed: ${assignmentState.completedCount}/${assignmentState.totalAssignments}`;
+  }, [assignmentState.completedCount, assignmentState.totalAssignments]);
+
+  const leaderboardRows = useMemo(() => assignmentState.leaderboard?.rows || [], [assignmentState.leaderboard]);
+  const qualificationMinimum = assignmentState.leaderboard?.qualificationMinimum ?? 3;
+  const myLeaderboardEntry = useMemo(() => {
+    const normalizedCode = String(studentCode || "").toLowerCase();
+    return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
+  }, [leaderboardRows, studentCode]);
 
   const nextRecLabel = useMemo(() => {
     if (assignmentState.loading) return "Loading…";
@@ -391,6 +416,12 @@ const MyExamFilePage = () => {
             label="Next recommendation"
             value={nextRecLabel}
             sub={assignmentState.blocked ? "Pass failed identifiers to unlock" : "Based on your score sheet"}
+          />
+          <StatCard
+            icon="🏅"
+            label="Score progress"
+            value={pointsSummary}
+            sub={`${assignmentProgress} · Passes counted from 60+`}
           />
         </div>
 
@@ -495,6 +526,77 @@ const MyExamFilePage = () => {
             </div>
           ))}
         </div>
+      </CollapsibleCard>
+
+      <CollapsibleCard
+        title={`Level leaderboard (${assignmentState.leaderboard?.level || detectedLevel || "Level"})`}
+        subtitle="Friendly ranking for your level — only scores 60+ count, qualify after 3 passed assignments."
+        defaultOpen={false}
+      >
+        {assignmentState.loading ? <div style={styles.helperText}>Loading leaderboard ...</div> : null}
+        {!assignmentState.loading && assignmentState.error ? (
+          <div style={styles.errorBox}>{assignmentState.error}</div>
+        ) : null}
+
+        {!assignmentState.loading && !assignmentState.error && assignmentState.completedCount < qualificationMinimum ? (
+          <div style={{ ...styles.helperText, fontStyle: "italic" }}>
+            You&apos;ll join the leaderboard after {qualificationMinimum} passed assignments. Keep it steady — no rush!
+          </div>
+        ) : null}
+
+        {!assignmentState.loading && !assignmentState.error && leaderboardRows.length === 0 ? (
+          <div style={styles.helperText}>No qualified rankings yet for this level.</div>
+        ) : null}
+
+        {!assignmentState.loading && !assignmentState.error && leaderboardRows.length > 0 ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            {myLeaderboardEntry ? (
+              <div
+                style={{
+                  border: "1px solid #dbeafe",
+                  background: "#eff6ff",
+                  borderRadius: 14,
+                  padding: 12,
+                  display: "grid",
+                  gap: 4,
+                }}
+              >
+                <div style={{ fontWeight: 900 }}>Your standing</div>
+                <div style={{ fontSize: 13, color: "#1f2937" }}>
+                  Rank #{myLeaderboardEntry.rank} · {myLeaderboardEntry.completedCount} assignments passed ·{" "}
+                  {myLeaderboardEntry.totalScore} points
+                </div>
+              </div>
+            ) : null}
+
+            <div style={{ display: "grid", gap: 8 }}>
+              {leaderboardRows.slice(0, 8).map((row) => (
+                <div
+                  key={`${row.studentCode}-${row.rank}`}
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 14,
+                    padding: 12,
+                    background: "#ffffff",
+                    display: "grid",
+                    gap: 6,
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                    <div style={{ fontWeight: 900, color: "#111827" }}>
+                      #{row.rank} · {row.name || "Student"}
+                    </div>
+                    <span style={styles.badge}>{row.completedCount} assignments</span>
+                  </div>
+                  <div style={{ fontSize: 13, color: "#6B7280" }}>
+                    {row.totalScore}/{row.expectedPoints} points · Scores counted 60+
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </CollapsibleCard>
 
       {/* Feedback (collapsible) */}
