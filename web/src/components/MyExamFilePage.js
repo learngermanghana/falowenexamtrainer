@@ -581,7 +581,9 @@ const MyExamFilePage = () => {
                 <div style={{ fontWeight: 900 }}>Your standing</div>
                 <div style={{ fontSize: 13, color: "#1f2937" }}>
                   You are #{myLeaderboardEntry.rank} out of {leaderboardRows.length} students with{" "}
-                  {myLeaderboardEntry.totalScore} points and {myLeaderboardEntry.completedCount} completed assignments.
+                  {myLeaderboardEntry.completedCount} / {Math.round((myLeaderboardEntry.expectedPoints || 0) / 100)}{" "}
+                  passed, {myLeaderboardEntry.failedCount || 0} failed, {myLeaderboardEntry.totalScore} points, and{" "}
+                  {myLeaderboardEntry.expectedPoints || 0} expected points.
                 </div>
               </div>
             ) : (
@@ -595,8 +597,10 @@ const MyExamFilePage = () => {
                   <tr style={{ textAlign: "left", color: "#6B7280" }}>
                     <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Rank</th>
                     <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Name</th>
-                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Completed</th>
+                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Passed</th>
+                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Failed</th>
                     <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Total score</th>
+                    <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Expected points</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -615,8 +619,16 @@ const MyExamFilePage = () => {
                         <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
                           {row.name || "Student"}
                         </td>
-                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>{row.completedCount}</td>
+                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                          {row.completedCount} / {Math.round((row.expectedPoints || 0) / 100)}
+                        </td>
+                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                          {row.failedCount || 0}
+                        </td>
                         <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>{row.totalScore}</td>
+                        <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                          {row.expectedPoints || 0}
+                        </td>
                       </tr>
                     );
                   })}
