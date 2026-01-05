@@ -2,6 +2,8 @@ import { collection, db, getDoc, getDocs, doc, query, where } from "../firebase"
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { courseSchedules } from "../data/courseSchedule";
 
+const PASS_MARK = 60;
+
 const parseAssignmentNumber = (assignment = "") => {
   const match = assignment.match(/(\d+(?:\.\d+)?)/);
   return match ? Number(match[1]) : null;
@@ -63,12 +65,11 @@ const computeLeaderboard = (scores = []) => {
   Object.entries(perLevel).forEach(([level, students]) => {
     const rows = Object.values(students)
       .map((entry) => {
-        const assignments = Object.keys(entry.bestScores);
-        const completions = assignments.length;
-        const totalScore = assignments.reduce(
-          (sum, assignment) => sum + (entry.bestScores[assignment] || 0),
-          0
+        const passedAssignments = Object.entries(entry.bestScores).filter(
+          ([, score]) => Number(score) >= PASS_MARK
         );
+        const completions = passedAssignments.length;
+        const totalScore = passedAssignments.reduce((sum, [, score]) => sum + (Number(score) || 0), 0);
         return {
           ...entry,
           completions,
@@ -201,14 +202,19 @@ const computeStudentStats = (scores = [], student) => {
   });
 
   const failedAssignments = Object.entries(bestPerAssignment)
-    .filter(([, score]) => score < 60)
+    .filter(([, score]) => score < PASS_MARK)
     .map(([assignment]) => assignment);
 
-  const completedNumbers = Object.keys(bestPerAssignment)
+  const passedAssignments = Object.entries(bestPerAssignment).filter(
+    ([, score]) => score >= PASS_MARK
+  );
+
+  const completedNumbers = passedAssignments
+    .map(([assignment]) => assignment)
     .map(parseAssignmentNumber)
     .filter((value) => typeof value === "number");
 
-  const completedAssignments = Object.entries(bestPerAssignment).map(([assignment, score]) => {
+  const completedAssignments = passedAssignments.map(([assignment, score]) => {
     const number = parseAssignmentNumber(assignment);
     return {
       assignment,
