@@ -239,31 +239,14 @@ const HomeMetrics = ({ studentProfile }) => {
             <div style={{ display: "grid", gap: 6 }}>
               {myLeaderboardEntry ? (
                 <div style={{ ...styles.helperText, margin: 0 }}>
-                  Your standing: #{myLeaderboardEntry.rank} · {myLeaderboardEntry.completedCount} assignments ·{" "}
-                  {myLeaderboardEntry.totalScore} points
+                  You are #{myLeaderboardEntry.rank} out of {leaderboardRows.length} students with{" "}
+                  {myLeaderboardEntry.totalScore} points and {myLeaderboardEntry.completedCount} completed assignments.
                 </div>
-              ) : null}
-
-              {leaderboardRows.slice(0, 3).map((row) => (
-                <div
-                  key={`${row.studentCode}-${row.rank}`}
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 12,
-                    padding: "8px 10px",
-                    background: "#ffffff",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
-                  <div style={{ fontWeight: 700, color: "#111827" }}>
-                    #{row.rank} · {row.name || "Student"}
-                  </div>
-                  <span style={styles.badge}>{row.completedCount} passes</span>
+              ) : (
+                <div style={{ ...styles.helperText, margin: 0 }}>
+                  {leaderboardRows.length} students have qualified for this level.
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
