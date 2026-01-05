@@ -88,6 +88,32 @@ export const C1_SELF_LEARNING_PLAN = [
       prompt:
         "Schreibe im Goethe-C1-Stil einen kurzen Meinungsaufsatz über die Bedeutung von Kultur in einer Gemeinschaft. Nutze mindestens eine Relativsatz-Definition und Vergleichsformen.",
     },
+    reading: {
+      title: "Lesetext (gemeinfrei): Adolf Loos, Kultur (1908)",
+      text:
+        "Es mag für den deutschen nicht sehr angenehm sein, zu hören, er solle seine eigene kultur aufgeben und die englische annehmen. Aber das hört der bulgare auch nicht gern und der chinese noch weniger. Mit sentimentalitäten ist dieser frage nicht heizukommen.",
+      optional: true,
+      tasks: [
+        "Markiere drei rhetorische Mittel oder Wertungen im Text.",
+        "Fasse die Argumentation in 3–4 Sätzen zusammen.",
+        "Schreibe eine Gegenposition in zwei Sätzen.",
+      ],
+      source:
+        "Adolf Loos (1908), „Kultur“. Gemeinfrei. Quelle: de.wikisource.org/wiki/Kultur_(Loos).",
+    },
+    listening: {
+      title: "Hörverstehen (eigene Aufnahme)",
+      prompt:
+        "Lies den Lesetext laut, nimm dich auf und höre die Aufnahme zweimal an.",
+      optional: true,
+      tasks: [
+        "Notiere die Kernaussage in einem Satz.",
+        "Hebe zwei Schlüsselbegriffe hervor, die die Position stützen.",
+        "Erstelle eine 45-Sekunden-Reaktion mit Kontrast (hingegen/jedoch).",
+      ],
+      source:
+        "Eigene Aufnahme eines gemeinfreien Textes (Adolf Loos, 1908).",
+    },
     skimmingWords: [
       "Kulturerbe",
       "Bräuche",
