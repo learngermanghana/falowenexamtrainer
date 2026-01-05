@@ -515,6 +515,27 @@ const MyExamFilePage = () => {
               <div style={{ display: "grid", gap: 8 }}>
                 {levelInfo.exams.map((exam, index) => {
                   const examDate = new Date(exam.date);
+                  const registrationStart = new Date(exam.registrationStart);
+                  const registrationEnd = new Date(exam.registrationEnd);
+                  const registrationStatus =
+                    now < registrationStart ? "Upcoming" : now > registrationEnd ? "Closed" : "Open";
+                  const registrationBadgeStyles = {
+                    Open: {
+                      background: "#dcfce7",
+                      color: "#166534",
+                      borderColor: "#86efac",
+                    },
+                    Closed: {
+                      background: "#f3f4f6",
+                      color: "#6b7280",
+                      borderColor: "#e5e7eb",
+                    },
+                    Upcoming: {
+                      background: "#dbeafe",
+                      color: "#1d4ed8",
+                      borderColor: "#bfdbfe",
+                    },
+                  };
                   return (
                     <div
                       key={`${levelInfo.level}-${exam.date}-${index}`}
@@ -535,8 +556,35 @@ const MyExamFilePage = () => {
                           {getCountdownLabel(examDate, now)}
                         </div>
                       </div>
-                      <div style={{ fontSize: 13, color: "#6B7280" }}>
-                        Registration window: {formatDate(exam.registrationStart)} - {formatDate(exam.registrationEnd)}
+                      <div
+                        style={{
+                          fontSize: 13,
+                          color: "#6B7280",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span>
+                          Registration window: {formatDate(registrationStart)} - {formatDate(registrationEnd)}
+                        </span>
+                        <span
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            padding: "2px 8px",
+                            borderRadius: 999,
+                            fontSize: 11,
+                            fontWeight: 800,
+                            border: "1px solid",
+                            letterSpacing: "0.02em",
+                            textTransform: "uppercase",
+                            ...registrationBadgeStyles[registrationStatus],
+                          }}
+                        >
+                          {registrationStatus}
+                        </span>
                       </div>
                     </div>
                   );
