@@ -236,7 +236,7 @@ const HomeMetrics = ({ studentProfile }) => {
         <div style={{ display: "grid", gap: 8 }}>
           <div style={{ ...styles.helperText, margin: 0 }}>
             Level leaderboard ({leaderboard.level || levelKey || "your level"}) · Only scores 60+ count ·
-            Qualify after {qualificationMinimum} passed assignments.
+            Qualify after {qualificationMinimum} passed assignments. Ties break by total score, then passed count, then name.
             {leaderboardUpdatedLabel ? ` · ${leaderboardUpdatedLabel}` : ""}
           </div>
 

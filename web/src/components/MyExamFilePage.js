@@ -544,7 +544,7 @@ const MyExamFilePage = () => {
 
       <CollapsibleCard
         title={`Level leaderboard (${assignmentState.leaderboard?.level || detectedLevel || "Level"})`}
-        subtitle="Friendly ranking for your level — only scores 60+ count, qualify after 3 passed assignments."
+        subtitle="Friendly ranking for your level — only scores 60+ count, qualify after 3 passed assignments. Ties break by total score, then passed count, then name."
         defaultOpen={false}
       >
         {assignmentState.loading ? <div style={styles.helperText}>Loading leaderboard ...</div> : null}
