@@ -47,13 +47,13 @@ export const classCatalog = {
   },
   "A2 Bonn Klasse": {
     startDate: "2025-11-25",
-    endDate: "2026-02-04",
+    endDate: "2026-02-11",
     schedule: [
       { day: "Tuesday", startTime: "19:30", endTime: "21:00" },
       { day: "Wednesday", startTime: "19:30", endTime: "21:00" },
       { day: "Thursday", startTime: "19:30", endTime: "21:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1GmRCIhn1S5zC55LvQstF4c5bXjeVFdS2/view?usp=sharing",
+    docUrl: "https://drive.google.com/file/d/11YeRxocz9P5WUQHM3ojWaZ3wB6p1_8sE/view?usp=drive_link",
   },
   "B1 Koln Klasse": {
     startDate: "2025-11-20",
