@@ -1,0 +1,58 @@
+export const goetheExamLevels = [
+  {
+    level: "A1",
+    title: "Goethe-Zertifikat A1: Start Deutsch 1",
+    description:
+      "A German exam for adults. It certifies that candidates have acquired very basic language skills and corresponds to the first level (A1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    price: "3,000 GHS",
+    location: "Goethe-Institut Accra",
+    exams: [
+      { date: "2026-02-14", registrationStart: "2026-01-26", registrationEnd: "2026-01-26" },
+      { date: "2026-03-04", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-05", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-07", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-09", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-10", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-03-11", registrationStart: "2026-02-02", registrationEnd: "2026-02-02" },
+      { date: "2026-06-03", registrationStart: "2026-05-04", registrationEnd: "2026-05-04" },
+      { date: "2026-06-04", registrationStart: "2026-05-04", registrationEnd: "2026-05-04" },
+      { date: "2026-06-05", registrationStart: "2026-05-04", registrationEnd: "2026-05-04" },
+    ],
+  },
+  {
+    level: "A2",
+    title: "Goethe-Zertifikat A2",
+    description: "A German exam for adults. It certifies basic language skills at the A2 level of the CEFR.",
+    price: "2,550 GHS",
+    location: "Goethe-Institut Accra",
+    exams: [
+      { date: "2026-03-12", registrationStart: "2026-02-03", registrationEnd: "2026-02-03" },
+      { date: "2026-03-13", registrationStart: "2026-02-03", registrationEnd: "2026-02-03" },
+      { date: "2026-06-10", registrationStart: "2026-05-05", registrationEnd: "2026-05-05" },
+      { date: "2026-06-11", registrationStart: "2026-05-05", registrationEnd: "2026-05-05" },
+      { date: "2026-09-07", registrationStart: "2026-08-04", registrationEnd: "2026-08-04" },
+      { date: "2026-09-08", registrationStart: "2026-08-04", registrationEnd: "2026-08-04" },
+      { date: "2026-11-30", registrationStart: "2026-10-27", registrationEnd: "2026-10-27" },
+      { date: "2026-12-01", registrationStart: "2026-10-27", registrationEnd: "2026-10-27" },
+    ],
+  },
+  {
+    level: "B1",
+    title: "Goethe-Zertifikat B1",
+    description:
+      "A German exam for young people and adults. It certifies that candidates are independent users of the German language and corresponds to the third level (B1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    price: "2,900 GHS",
+    modulePrice: "950 GHS per module",
+    location: "Goethe-Institut Accra",
+    exams: [
+      { date: "2026-03-16", registrationStart: "2026-02-04", registrationEnd: "2026-02-04" },
+      { date: "2026-03-17", registrationStart: "2026-02-04", registrationEnd: "2026-02-04" },
+      { date: "2026-06-12", registrationStart: "2026-05-06", registrationEnd: "2026-05-06" },
+      { date: "2026-06-15", registrationStart: "2026-05-06", registrationEnd: "2026-05-06" },
+      { date: "2026-09-09", registrationStart: "2026-08-05", registrationEnd: "2026-08-05" },
+      { date: "2026-09-10", registrationStart: "2026-08-05", registrationEnd: "2026-08-05" },
+      { date: "2026-12-02", registrationStart: "2026-10-28", registrationEnd: "2026-10-28" },
+      { date: "2026-12-03", registrationStart: "2026-10-28", registrationEnd: "2026-10-28" },
+    ],
+  },
+];
