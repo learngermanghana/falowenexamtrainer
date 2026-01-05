@@ -563,38 +563,15 @@ const MyExamFilePage = () => {
               >
                 <div style={{ fontWeight: 900 }}>Your standing</div>
                 <div style={{ fontSize: 13, color: "#1f2937" }}>
-                  Rank #{myLeaderboardEntry.rank} · {myLeaderboardEntry.completedCount} assignments passed ·{" "}
-                  {myLeaderboardEntry.totalScore} points
+                  You are #{myLeaderboardEntry.rank} out of {leaderboardRows.length} students with{" "}
+                  {myLeaderboardEntry.totalScore} points and {myLeaderboardEntry.completedCount} completed assignments.
                 </div>
               </div>
-            ) : null}
-
-            <div style={{ display: "grid", gap: 8 }}>
-              {leaderboardRows.slice(0, 8).map((row) => (
-                <div
-                  key={`${row.studentCode}-${row.rank}`}
-                  style={{
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 14,
-                    padding: 12,
-                    background: "#ffffff",
-                    display: "grid",
-                    gap: 6,
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                    <div style={{ fontWeight: 900, color: "#111827" }}>
-                      #{row.rank} · {row.name || "Student"}
-                    </div>
-                    <span style={styles.badge}>{row.completedCount} assignments</span>
-                  </div>
-                  <div style={{ fontSize: 13, color: "#6B7280" }}>
-                    {row.totalScore}/{row.expectedPoints} points · Scores counted 60+
-                  </div>
-                </div>
-              ))}
-            </div>
+            ) : (
+              <div style={{ ...styles.helperText, margin: 0 }}>
+                {leaderboardRows.length} students have qualified for this level.
+              </div>
+            )}
           </div>
         ) : null}
       </CollapsibleCard>
