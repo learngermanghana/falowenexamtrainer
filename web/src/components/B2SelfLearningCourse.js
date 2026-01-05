@@ -177,10 +177,11 @@ const B2SelfLearningCourse = () => {
       <div style={styles.card}>
         <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>B2 self-learning flow (no tutor)</h3>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
-          Each day has three steps: speaking recording, writing practice, and skimming words. Save your
-          scores and only mark a step complete when the AI score is at least {SCORE_THRESHOLD}. Writing prompts
-          follow Goethe-B2 formats (Meinungsaufsatz or formeller Brief) and mirror the speaking topic and grammar
-          focus. Use the brain map to collect quick ideas before you start.
+          Each day has core steps: speaking recording, writing practice, and skimming words. Some days also add
+          reading and listening tasks as optional add-ons. Save your scores and only mark a step complete when
+          the AI score is at least {SCORE_THRESHOLD}. Writing prompts follow Goethe-B2 formats (Meinungsaufsatz
+          or formeller Brief) and mirror the speaking topic and grammar focus. Use the brain map to collect quick
+          ideas before you start.
         </p>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
           Skimming words are loaded from the vocab Google Sheet when available; otherwise the built-in list is
@@ -376,6 +377,64 @@ const B2SelfLearningCourse = () => {
                   ) : null}
                 </div>
               </div>
+
+              {entry.reading ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <strong>Reading task</strong>
+                    {entry.reading.optional ? (
+                      <span style={{ ...styles.badge, background: "#ecfeff", color: "#0e7490" }}>
+                        Optional
+                      </span>
+                    ) : null}
+                  </div>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.reading.title}</p>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.reading.text}</p>
+                  {entry.reading.tasks?.length ? (
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.reading.tasks.map((task) => (
+                        <li key={task} style={styles.helperText}>
+                          {task}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {entry.reading.source ? (
+                    <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
+                      Source: {entry.reading.source}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {entry.listening ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <strong>Listening task</strong>
+                    {entry.listening.optional ? (
+                      <span style={{ ...styles.badge, background: "#ecfeff", color: "#0e7490" }}>
+                        Optional
+                      </span>
+                    ) : null}
+                  </div>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.listening.title}</p>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.listening.prompt}</p>
+                  {entry.listening.tasks?.length ? (
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.listening.tasks.map((task) => (
+                        <li key={task} style={styles.helperText}>
+                          {task}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {entry.listening.source ? (
+                    <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
+                      Source: {entry.listening.source}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
 
               <div style={{ display: "grid", gap: 6 }}>
                 <strong>3) Skimming words</strong>

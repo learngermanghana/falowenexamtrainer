@@ -177,10 +177,11 @@ const C1SelfLearningCourse = () => {
       <div style={styles.card}>
         <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>C1 Selbstlernplan (ohne Tutor)</h3>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
-          Jeder Tag hat drei Schritte: Sprechaufnahme, Schreibtraining und Wortschatzüberblick. Speichere deine
-          Punktzahlen und markiere einen Schritt erst, wenn die KI-Punktzahl mindestens {SCORE_THRESHOLD} beträgt.
-          Die Schreibaufgaben folgen den Goethe-C1-Formaten (Meinungsaufsatz oder formeller Brief) und spiegeln
-          das Sprechthema samt Grammatikfokus. Nutze die Gedankenkarte, um schnelle Ideen zu sammeln.
+          Jeder Tag hat Kernschritte: Sprechaufnahme, Schreibtraining und Wortschatzüberblick. An manchen Tagen
+          kommen Lese- und Hörverstehensaufgaben als optionale Ergänzung dazu. Speichere deine Punktzahlen und
+          markiere einen Schritt erst, wenn die KI-Punktzahl mindestens {SCORE_THRESHOLD} beträgt. Die Schreibaufgaben
+          folgen den Goethe-C1-Formaten (Meinungsaufsatz oder formeller Brief) und spiegeln das Sprechthema samt
+          Grammatikfokus. Nutze die Gedankenkarte, um schnelle Ideen zu sammeln.
         </p>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
           Die Wortschatzliste wird aus dem Vokabel-Google-Sheet geladen; falls es nicht verfügbar ist, wird
@@ -374,6 +375,64 @@ const C1SelfLearningCourse = () => {
                   ) : null}
                 </div>
               </div>
+
+              {entry.reading ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <strong>Leseaufgabe</strong>
+                    {entry.reading.optional ? (
+                      <span style={{ ...styles.badge, background: "#ecfeff", color: "#0e7490" }}>
+                        Optional
+                      </span>
+                    ) : null}
+                  </div>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.reading.title}</p>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.reading.text}</p>
+                  {entry.reading.tasks?.length ? (
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.reading.tasks.map((task) => (
+                        <li key={task} style={styles.helperText}>
+                          {task}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {entry.reading.source ? (
+                    <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
+                      Quelle: {entry.reading.source}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {entry.listening ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <strong>Hörverstehen</strong>
+                    {entry.listening.optional ? (
+                      <span style={{ ...styles.badge, background: "#ecfeff", color: "#0e7490" }}>
+                        Optional
+                      </span>
+                    ) : null}
+                  </div>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.listening.title}</p>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.listening.prompt}</p>
+                  {entry.listening.tasks?.length ? (
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.listening.tasks.map((task) => (
+                        <li key={task} style={styles.helperText}>
+                          {task}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  {entry.listening.source ? (
+                    <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
+                      Quelle: {entry.listening.source}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
 
               <div style={{ display: "grid", gap: 6 }}>
                 <strong>3) Wortschatzüberblick</strong>
