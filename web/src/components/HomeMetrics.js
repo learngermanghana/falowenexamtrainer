@@ -150,10 +150,12 @@ const HomeMetrics = ({ studentProfile }) => {
 
   const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
   const qualificationMinimum = leaderboard?.qualificationMinimum ?? 3;
+  const topLeaderboardRows = useMemo(() => leaderboardRows.slice(0, 10), [leaderboardRows]);
   const myLeaderboardEntry = useMemo(() => {
     const normalizedCode = String(studentCode || "").toLowerCase();
     return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
   }, [leaderboardRows, studentCode]);
+  const normalizedStudentCode = String(studentCode || "").toLowerCase();
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -247,6 +249,42 @@ const HomeMetrics = ({ studentProfile }) => {
                   {leaderboardRows.length} students have qualified for this level.
                 </div>
               )}
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                  <thead>
+                    <tr style={{ textAlign: "left", color: "#6B7280" }}>
+                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Rank</th>
+                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Name</th>
+                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Completed</th>
+                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Total score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topLeaderboardRows.map((row) => {
+                      const isCurrentUser =
+                        normalizedStudentCode && String(row.studentCode || "").toLowerCase() === normalizedStudentCode;
+                      return (
+                        <tr
+                          key={`${row.studentCode || row.name}-${row.rank}`}
+                          style={{
+                            background: isCurrentUser ? "#eef2ff" : "transparent",
+                            fontWeight: isCurrentUser ? 700 : 500,
+                          }}
+                        >
+                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>#{row.rank}</td>
+                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                            {row.name || "Student"}
+                          </td>
+                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                            {row.completedCount}
+                          </td>
+                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>{row.totalScore}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>
