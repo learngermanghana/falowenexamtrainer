@@ -3,6 +3,8 @@ import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
 import {
   downloadClassCalendar,
+  buildGhanaDateTime,
+  GHANA_TIMEZONE,
   findTodayClassSession,
   findNextClassSession,
   formatScheduleSummary,
@@ -86,6 +88,28 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
       detail: `Starts in ${minutesUntil} minute${suffix}`,
     };
   }, [minutesUntil]);
+
+  const nextClassTimes = useMemo(() => {
+    if (!nextClass?.date || !nextClass?.startTime) return null;
+    const start = buildGhanaDateTime(nextClass.date, nextClass.startTime);
+    const end = nextClass.endTime ? buildGhanaDateTime(nextClass.date, nextClass.endTime) : null;
+    if (!start) return null;
+
+    const ghanaFormatter = new Intl.DateTimeFormat("en-GB", {
+      timeZone: GHANA_TIMEZONE,
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const localFormatter = new Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const ghanaRange = `${ghanaFormatter.format(start)}${end ? `–${ghanaFormatter.format(end)}` : ""}`;
+    const localRange = `${localFormatter.format(start)}${end ? `–${localFormatter.format(end)}` : ""}`;
+
+    return { ghanaRange, localRange };
+  }, [nextClass?.date, nextClass?.endTime, nextClass?.startTime]);
 
   useEffect(() => {
     setSelectedClass(defaultClass);
@@ -215,8 +239,12 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
             {timeUntilDisplay?.badge ? <span style={styles.badge}>{timeUntilDisplay.badge}</span> : null}
           </div>
           <p style={{ ...styles.helperText, margin: "6px 0" }}>
-            {nextClass.weekday}, {nextClass.date} · {nextClass.startTime}–{nextClass.endTime}
+            {nextClass.weekday}, {nextClass.date} · {nextClassTimes?.ghanaRange || `${nextClass.startTime}–${nextClass.endTime}`}{" "}
+            (GMT, Ghana)
           </p>
+          {nextClassTimes?.localRange ? (
+            <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>Your local time: {nextClassTimes.localRange}</p>
+          ) : null}
           <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
             Chapters: {nextClass.titles?.join("; ")}
           </p>

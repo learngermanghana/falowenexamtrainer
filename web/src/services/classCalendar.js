@@ -13,6 +13,8 @@ const WEEKDAY_MAP = {
 
 const pad = (value) => value.toString().padStart(2, "0");
 
+export const GHANA_TIMEZONE = "Africa/Accra";
+
 const formatDateTime = (date) => {
   return (
     date.getFullYear().toString() +
@@ -32,6 +34,13 @@ const withTime = (date, timeString) => {
   const withHours = new Date(date);
   withHours.setHours(hours, minutes, 0, 0);
   return withHours;
+};
+
+export const buildGhanaDateTime = (dateString, timeString) => {
+  if (!dateString || !timeString) return null;
+  const [year, month, day] = dateString.split("-").map((value) => parseInt(value, 10));
+  const [hours, minutes] = timeString.split(":").map((value) => parseInt(value, 10));
+  return new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
 };
 
 const findFirstSessionDate = (startDate, targetDay) => {
@@ -187,10 +196,10 @@ export const findNextClassSession = (className, referenceDate = new Date()) => {
     const startTime = timeSlot?.startTime || "00:00";
     const endTime = timeSlot?.endTime || "00:00";
 
-    const startDateTime = new Date(`${day.date}T${startTime}:00`);
-    const endDateTime = endTime ? new Date(`${day.date}T${endTime}:00`) : null;
+    const startDateTime = buildGhanaDateTime(day.date, startTime);
+    const endDateTime = endTime ? buildGhanaDateTime(day.date, endTime) : null;
 
-    if (startDateTime >= referenceDate) {
+    if (startDateTime && startDateTime >= referenceDate) {
       return {
         ...day,
         startTime,
