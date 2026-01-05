@@ -64,6 +64,9 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
     if (!nextClass?.startDateTime) return null;
     return Math.max(0, Math.round((nextClass.startDateTime - now) / 60000));
   }, [nextClass?.startDateTime, now]);
+  const joinWindowMinutes = 15;
+  const canJoinNextClass = minutesUntil !== null && minutesUntil <= joinWindowMinutes;
+  const showCalendarCta = minutesUntil !== null && minutesUntil > joinWindowMinutes;
 
   const timeUntilDisplay = useMemo(() => {
     if (minutesUntil === null) return null;
@@ -249,14 +252,25 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
             Chapters: {nextClass.titles?.join("; ")}
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            <a
-              href={ZOOM_DETAILS.url}
-              target="_blank"
-              rel="noreferrer"
-              style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center" }}
-            >
-              Join now
-            </a>
+            {canJoinNextClass ? (
+              <a
+                href={ZOOM_DETAILS.url}
+                target="_blank"
+                rel="noreferrer"
+                style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center" }}
+              >
+                Join now
+              </a>
+            ) : null}
+            {showCalendarCta ? (
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={() => downloadClassCalendar(selectedClass)}
+              >
+                Add to calendar
+              </button>
+            ) : null}
             {timeUntilDisplay?.detail ? (
               <span style={{ ...styles.helperText, margin: 0 }}>{timeUntilDisplay.detail}</span>
             ) : null}
