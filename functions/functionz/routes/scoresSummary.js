@@ -286,6 +286,7 @@ const scoresSummaryHandler = async (req, res) => {
         "student code",
         "code",
       ]),
+      name: findIndexByHeader(header, ["name", "studentname", "student name"]),
       assignment: findIndexByHeader(header, ["assignment", "task", "topic", "day", "title"]),
       score: findIndexByHeader(header, ["score", "mark", "marks", "result"]),
       date: findIndexByHeader(header, ["date", "timestamp", "createdat", "created_at", "time"]),
@@ -299,6 +300,61 @@ const scoresSummaryHandler = async (req, res) => {
     }
 
     const get = (row, i) => (i >= 0 && i < row.length ? String(row[i] || "").trim() : "");
+
+    const leaderboardEntries = new Map();
+    rows.slice(1).forEach((row) => {
+      const rowStudentCode = get(row, idx.studentCode);
+      if (!rowStudentCode) return;
+      const rowLevel = String(get(row, idx.level) || "").trim().toUpperCase();
+      if (rowLevel && rowLevel !== level) return;
+
+      const assignment = get(row, idx.assignment);
+      const identifier = pickIdentifierFromText(assignment, plannedSet);
+      if (!identifier) return;
+
+      const scoreNum = Number(get(row, idx.score));
+      if (!Number.isFinite(scoreNum)) return;
+
+      const key = rowStudentCode.toLowerCase();
+      const current = leaderboardEntries.get(key) || {
+        studentCode: rowStudentCode,
+        name: get(row, idx.name) || "Student",
+        bestScores: new Map(),
+      };
+
+      if (!current.name && get(row, idx.name)) current.name = get(row, idx.name);
+
+      const previousScore = current.bestScores.get(identifier);
+      if (!Number.isFinite(previousScore) || scoreNum > previousScore) {
+        current.bestScores.set(identifier, scoreNum);
+      }
+
+      leaderboardEntries.set(key, current);
+    });
+
+    const leaderboard = Array.from(leaderboardEntries.values())
+      .map((entry) => {
+        const scores = Array.from(entry.bestScores.values());
+        const passedScores = scores.filter((value) => value >= PASS_MARK);
+        const failedScores = scores.filter((value) => value < PASS_MARK);
+        const completedCount = passedScores.length;
+        const totalScore = passedScores.reduce((sum, value) => sum + value, 0);
+        return {
+          studentCode: entry.studentCode,
+          name: entry.name || "Student",
+          completedCount,
+          failedCount: failedScores.length,
+          totalScore,
+          expectedPoints: totalAssignments * 100,
+        };
+      })
+      .filter((entry) => entry.completedCount >= 3)
+      .sort((a, b) => {
+        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+        if (b.completedCount !== a.completedCount) return b.completedCount - a.completedCount;
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      })
+      .map((entry, index) => ({ ...entry, rank: index + 1 }));
 
     // Pull attempts for this student + (optional) level match
     const mine = rows
@@ -450,6 +506,11 @@ const scoresSummaryHandler = async (req, res) => {
       };
     });
 
+    const pointsEarned = Array.from(passed).reduce((sum, id) => {
+      const best = bestById.get(id);
+      return sum + (best?.score ?? 0);
+    }, 0);
+
     // Weekly stats + streak
     const lastAttempt = mine.reduce(
       (acc, cur) => ((cur.dateMs || 0) > (acc?.dateMs || 0) ? cur : acc),
@@ -481,6 +542,14 @@ const scoresSummaryHandler = async (req, res) => {
         streakDays,
         retriesThisWeek,
         totalAssignments,
+        completedCount: completedAssignments.length,
+        pointsEarned,
+        expectedPoints: totalAssignments * 100,
+      },
+      leaderboard: {
+        level,
+        rows: leaderboard,
+        qualificationMinimum: 3,
       },
     });
   } catch (err) {
