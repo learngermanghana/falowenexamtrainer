@@ -86,6 +86,25 @@ const parseDateMs = (value) => {
   return Number.isFinite(ms) ? ms : 0;
 };
 
+const anonymizeDisplayName = (name, studentCode) => {
+  const trimmedName = String(name || "").trim();
+  if (trimmedName) {
+    const parts = trimmedName.split(/\s+/);
+    if (parts.length === 1) return parts[0];
+    const first = parts[0];
+    const last = parts[parts.length - 1];
+    const lastInitial = last ? `${last[0].toUpperCase()}.` : "";
+    return `${first} ${lastInitial}`.trim();
+  }
+
+  const code = String(studentCode || "").trim();
+  if (code) {
+    return `Student ${code.slice(-4)}`;
+  }
+
+  return "Student";
+};
+
 /* ------------------------ Identifier parsing (strings) ------------------------ */
 
 // Extract numbers like 0.2, 1.1, 4.10 from a string.
@@ -318,7 +337,7 @@ const scoresSummaryHandler = async (req, res) => {
       const key = rowStudentCode.toLowerCase();
       const current = leaderboardEntries.get(key) || {
         studentCode: rowStudentCode,
-        name: get(row, idx.name) || "Student",
+        name: get(row, idx.name) || "",
         bestScores: new Map(),
       };
 
@@ -341,7 +360,7 @@ const scoresSummaryHandler = async (req, res) => {
         const totalScore = passedScores.reduce((sum, value) => sum + value, 0);
         return {
           studentCode: entry.studentCode,
-          name: entry.name || "Student",
+          name: anonymizeDisplayName(entry.name, entry.studentCode),
           completedCount,
           failedCount: failedScores.length,
           totalScore,
