@@ -17,6 +17,12 @@ const formatDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleDateString();
 };
 
+const formatDateTime = (value) => {
+  if (!value) return "";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleString();
+};
+
 const toTime = (row) => {
   const raw = row?.date ?? row?.created_at ?? row?.createdAt ?? 0;
   const t = new Date(raw).getTime();
@@ -52,6 +58,7 @@ const initialAssignmentState = {
   pointsEarned: null,
   expectedPoints: null,
   leaderboard: null,
+  leaderboardGeneratedAt: "",
   error: "",
 };
 
@@ -244,6 +251,7 @@ const MyExamFilePage = () => {
         pointsEarned: student.pointsEarned ?? null,
         expectedPoints: student.expectedPoints ?? null,
         leaderboard: response.leaderboard || null,
+        leaderboardGeneratedAt: response.generatedAt || "",
         error: "",
       });
     } catch (error) {
@@ -325,6 +333,10 @@ const MyExamFilePage = () => {
   const leaderboardRows = useMemo(() => assignmentState.leaderboard?.rows || [], [assignmentState.leaderboard]);
   const qualificationMinimum = assignmentState.leaderboard?.qualificationMinimum ?? 3;
   const topLeaderboardRows = useMemo(() => leaderboardRows.slice(0, 10), [leaderboardRows]);
+  const leaderboardUpdatedLabel = useMemo(() => {
+    const formatted = formatDateTime(assignmentState.leaderboardGeneratedAt);
+    return formatted ? `Last updated ${formatted}` : "";
+  }, [assignmentState.leaderboardGeneratedAt]);
   const myLeaderboardEntry = useMemo(() => {
     const normalizedCode = String(studentCode || "").toLowerCase();
     return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
@@ -538,6 +550,9 @@ const MyExamFilePage = () => {
         {assignmentState.loading ? <div style={styles.helperText}>Loading leaderboard ...</div> : null}
         {!assignmentState.loading && assignmentState.error ? (
           <div style={styles.errorBox}>{assignmentState.error}</div>
+        ) : null}
+        {!assignmentState.loading && !assignmentState.error && leaderboardUpdatedLabel ? (
+          <div style={{ ...styles.helperText, margin: "0 0 10px" }}>{leaderboardUpdatedLabel}</div>
         ) : null}
 
         {!assignmentState.loading && !assignmentState.error && assignmentState.completedCount < qualificationMinimum ? (
