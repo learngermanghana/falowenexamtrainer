@@ -288,7 +288,7 @@ const OnboardingChecklist = ({
 
         <Step
           title="Download the calendar"
-          description="Save every session to your calendar with the Zoom link (ICS file)."
+          description="Save scheduled sessions to your calendar with the Zoom link (ICS file). Breaks or cancellations may not be reflected."
           actionLabel={currentClass ? `${currentClass} calendar` : "Get calendar"}
           onAction={handleDownloadCalendar}
           complete={calendarDownloadedForThisClass}

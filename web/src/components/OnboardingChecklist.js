@@ -404,7 +404,7 @@ const OnboardingChecklist = ({
         <Step
           stepRef={calendarRef}
           title="Download the calendar"
-          description="Save every session to your calendar (ICS file)."
+          description="Save scheduled sessions to your calendar (ICS file). Breaks or cancellations may not be reflected."
           actionLabel={currentClass ? `${currentClass} calendar` : "Get calendar"}
           onAction={handleDownloadCalendar}
           complete={calendarDownloaded}

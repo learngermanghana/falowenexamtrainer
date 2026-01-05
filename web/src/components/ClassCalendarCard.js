@@ -291,8 +291,8 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
           Download calendar (.ics)
         </button>
         <span style={{ ...styles.helperText, margin: 0 }}>
-          Adds every scheduled session to your calendar with the Zoom link prefilled. Android/desktop users can import the
-          ICS file into Google Calendar.
+          Adds sessions from the published class schedule to your calendar with the Zoom link prefilled. Holiday breaks
+          or cancellations may not be reflected. Android/desktop users can import the ICS file into Google Calendar.
         </span>
       </div>
     </div>
