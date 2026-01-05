@@ -59,9 +59,9 @@ export const classCatalog = {
     startDate: "2026-02-23",
     endDate: "2026-04-27",
     schedule: [
+      { day: "Monday", startTime: "19:30", endTime: "21:00" },
       { day: "Tuesday", startTime: "19:30", endTime: "21:00" },
       { day: "Wednesday", startTime: "19:30", endTime: "21:00" },
-      { day: "Thursday", startTime: "19:30", endTime: "21:00" },
     ],
     docUrl: "https://drive.google.com/file/d/17gL8bIw_AyOovZ3AXR9S4zkmyq0MT1Ew/view?usp=sharing",
   },
