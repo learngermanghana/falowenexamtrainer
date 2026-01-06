@@ -165,15 +165,12 @@ const GeneralHome = ({
             actions={
               <PrimaryActionBar align="flex-end">
                 <PillBadge tone="success">Start here</PillBadge>
-                <PillBadge>Daily work</PillBadge>
               </PrimaryActionBar>
             }
           />
-          <ul style={{ ...styles.checklist, margin: 0 }}>
-            <li>Course book access, assignment submission, and results.</li>
-            <li>Grammar Q&amp;A, Speech Trainer, and the original writing coach.</li>
-            <li>Group discussion and your account settings.</li>
-          </ul>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Course work, assignments, AI helpers, discussion, and your account settings in one hub.
+          </p>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
             Start in Campus for daily work; use Exams Room for mock exam practice.
           </p>
@@ -194,11 +191,9 @@ const GeneralHome = ({
               </PrimaryActionBar>
             }
           />
-          <ul style={{ ...styles.checklist, margin: 0 }}>
-            <li>Speaking practice prompts organised by level.</li>
-            <li>Schreiben trainer with timed letters and idea generation.</li>
-            <li>Goethe Lesen/Hören links and quick exam-day reminders.</li>
-          </ul>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Speaking prompts, Schreiben trainer, and Goethe exam resources in one place.
+          </p>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
             Start in Campus for daily work; use Exams Room for mock exam practice.
           </p>
