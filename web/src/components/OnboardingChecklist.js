@@ -449,21 +449,10 @@ const OnboardingChecklist = ({
         }}
       >
         <p style={{ ...styles.helperText, margin: 0 }}>
-          When all steps are done, tap “Save onboarding” to lock in reminders and class setup.
+          {allFinished
+            ? "All set! Use “Save onboarding” above to lock in reminders and class setup."
+            : "Complete each step to unlock “Save onboarding” above."}
         </p>
-
-        <button
-          style={{
-            ...(allFinished ? styles.primaryButton : styles.secondaryButton),
-            opacity: allFinished ? 1 : 0.6,
-            cursor: allFinished && !savingOnboarding ? "pointer" : "not-allowed",
-          }}
-          disabled={!allFinished || savingOnboarding}
-          onClick={handleSaveOnboarding}
-          type="button"
-        >
-          {savingOnboarding ? "Saving..." : "Save onboarding"}
-        </button>
       </div>
     </div>
   );
