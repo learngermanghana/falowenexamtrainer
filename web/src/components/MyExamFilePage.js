@@ -573,6 +573,10 @@ const MyExamFilePage = () => {
                   const registrationEnd = new Date(exam.registrationEnd);
                   const registrationStatus =
                     now < registrationStart ? "Upcoming" : now > registrationEnd ? "Closed" : "Open";
+                  const isSingleDayRegistration = registrationStart.toDateString() === registrationEnd.toDateString();
+                  const registrationLabel = isSingleDayRegistration
+                    ? `Registration day: ${formatDate(registrationStart)}`
+                    : `Registration window: ${formatDate(registrationStart)} - ${formatDate(registrationEnd)}`;
                   const registrationBadgeStyles = {
                     Open: {
                       background: "#dcfce7",
@@ -604,7 +608,7 @@ const MyExamFilePage = () => {
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
                         <div style={{ fontWeight: 800, color: "#111827" }}>
-                          📅 {formatDate(exam.date)} · {levelInfo.location}
+                          📅 Exam date: {formatDate(exam.date)} · {levelInfo.location}
                         </div>
                         <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
                           {getCountdownLabel(examDate, now)}
@@ -620,9 +624,7 @@ const MyExamFilePage = () => {
                           flexWrap: "wrap",
                         }}
                       >
-                        <span>
-                          Registration window: {formatDate(registrationStart)} - {formatDate(registrationEnd)}
-                        </span>
+                        <span>{registrationLabel}</span>
                         <span
                           style={{
                             display: "inline-flex",
