@@ -44,6 +44,7 @@ const HomeMetrics = ({ studentProfile }) => {
   const [leaderboardGeneratedAt, setLeaderboardGeneratedAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [refreshError, setRefreshError] = useState("");
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const className = studentProfile?.className || "";
   const studentCode =
@@ -234,78 +235,96 @@ const HomeMetrics = ({ studentProfile }) => {
 
       {leaderboard ? (
         <div style={{ display: "grid", gap: 8 }}>
-          <div style={{ ...styles.helperText, margin: 0 }}>
-            Level leaderboard ({leaderboard.level || levelKey || "your level"}) · Only scores 60+ count ·
-            Qualify after {qualificationMinimum} passed assignments. Ties break by total score, then passed count, then name.
-            {leaderboardUpdatedLabel ? ` · ${leaderboardUpdatedLabel}` : ""}
+          <div style={{ display: "flex", justifyContent: "flex-start" }}>
+            <button
+              type="button"
+              onClick={() => setShowLeaderboard((prev) => !prev)}
+              style={{ ...styles.secondaryButton, padding: "8px 12px" }}
+              aria-expanded={showLeaderboard}
+            >
+              {showLeaderboard ? "Hide leaderboard" : "View leaderboard"}
+            </button>
           </div>
 
-          {assignmentStats && assignmentStats.completedCount < qualificationMinimum ? (
-            <div style={{ ...styles.helperText, margin: 0, fontStyle: "italic" }}>
-              You&apos;ll join once you pass {qualificationMinimum} assignments. Keep it steady — no rush.
-            </div>
-          ) : null}
+          {showLeaderboard ? (
+            <>
+              <div style={{ ...styles.helperText, margin: 0 }}>
+                Level leaderboard ({leaderboard.level || levelKey || "your level"}) · Only scores 60+ count ·
+                Qualify after {qualificationMinimum} passed assignments. Ties break by total score, then passed count, then
+                name.
+                {leaderboardUpdatedLabel ? ` · ${leaderboardUpdatedLabel}` : ""}
+              </div>
 
-          {leaderboardRows.length === 0 ? (
-            <div style={{ ...styles.helperText, margin: 0 }}>No qualified rankings yet for this level.</div>
-          ) : (
-            <div style={{ display: "grid", gap: 6 }}>
-              {myLeaderboardEntry ? (
-                <div style={{ ...styles.helperText, margin: 0 }}>
-                  You are #{myLeaderboardEntry.rank} out of {leaderboardRows.length} students with{" "}
-                  {myLeaderboardEntry.completedCount} / {Math.round((myLeaderboardEntry.expectedPoints || 0) / 100)} passed, {" "}
-                  {myLeaderboardEntry.failedCount || 0} failed, {myLeaderboardEntry.totalScore} points, and{" "}
-                  {myLeaderboardEntry.expectedPoints || 0} expected points.
+              {assignmentStats && assignmentStats.completedCount < qualificationMinimum ? (
+                <div style={{ ...styles.helperText, margin: 0, fontStyle: "italic" }}>
+                  You&apos;ll join once you pass {qualificationMinimum} assignments. Keep it steady — no rush.
                 </div>
+              ) : null}
+
+              {leaderboardRows.length === 0 ? (
+                <div style={{ ...styles.helperText, margin: 0 }}>No qualified rankings yet for this level.</div>
               ) : (
-                <div style={{ ...styles.helperText, margin: 0 }}>
-                  {leaderboardRows.length} students have qualified for this level.
+                <div style={{ display: "grid", gap: 6 }}>
+                  {myLeaderboardEntry ? (
+                    <div style={{ ...styles.helperText, margin: 0 }}>
+                      You are #{myLeaderboardEntry.rank} out of {leaderboardRows.length} students with{" "}
+                      {myLeaderboardEntry.completedCount} / {Math.round((myLeaderboardEntry.expectedPoints || 0) / 100)}{" "}
+                      passed, {myLeaderboardEntry.failedCount || 0} failed, {myLeaderboardEntry.totalScore} points, and{" "}
+                      {myLeaderboardEntry.expectedPoints || 0} expected points.
+                    </div>
+                  ) : (
+                    <div style={{ ...styles.helperText, margin: 0 }}>
+                      {leaderboardRows.length} students have qualified for this level.
+                    </div>
+                  )}
+                  <div style={{ overflowX: "auto" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ textAlign: "left", color: "#6B7280" }}>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Rank</th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Name</th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Passed</th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Failed</th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Total score</th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Expected points</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {topLeaderboardRows.map((row) => {
+                          const isCurrentUser =
+                            normalizedStudentCode && String(row.studentCode || "").toLowerCase() === normalizedStudentCode;
+                          return (
+                            <tr
+                              key={`${row.studentCode || row.name}-${row.rank}`}
+                              style={{
+                                background: isCurrentUser ? "#eef2ff" : "transparent",
+                                fontWeight: isCurrentUser ? 700 : 500,
+                              }}
+                            >
+                              <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>#{row.rank}</td>
+                              <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                                {row.name || "Student"}
+                              </td>
+                              <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                                {row.completedCount} / {Math.round((row.expectedPoints || 0) / 100)}
+                              </td>
+                              <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                                {row.failedCount || 0}
+                              </td>
+                              <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>{row.totalScore}</td>
+                              <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
+                                {row.expectedPoints || 0}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-                  <thead>
-                    <tr style={{ textAlign: "left", color: "#6B7280" }}>
-                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Rank</th>
-                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Name</th>
-                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Passed</th>
-                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Failed</th>
-                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Total score</th>
-                      <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Expected points</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {topLeaderboardRows.map((row) => {
-                      const isCurrentUser =
-                        normalizedStudentCode && String(row.studentCode || "").toLowerCase() === normalizedStudentCode;
-                      return (
-                        <tr
-                          key={`${row.studentCode || row.name}-${row.rank}`}
-                          style={{
-                            background: isCurrentUser ? "#eef2ff" : "transparent",
-                            fontWeight: isCurrentUser ? 700 : 500,
-                          }}
-                        >
-                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>#{row.rank}</td>
-                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                            {row.name || "Student"}
-                          </td>
-                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                            {row.completedCount} / {Math.round((row.expectedPoints || 0) / 100)}
-                          </td>
-                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>{row.failedCount || 0}</td>
-                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>{row.totalScore}</td>
-                          <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                            {row.expectedPoints || 0}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
+            </>
+          ) : null}
         </div>
       ) : null}
     </section>
