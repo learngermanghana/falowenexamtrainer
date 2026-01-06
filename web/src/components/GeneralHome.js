@@ -211,7 +211,7 @@ const GeneralHome = ({
       </div>
 
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <details open style={{ ...styles.card, background: "#f8fafc" }}>
+        <details style={{ ...styles.card, background: "#f8fafc" }}>
           <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>More for you</summary>
           <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
             <HomeMetrics studentProfile={studentProfile} />
