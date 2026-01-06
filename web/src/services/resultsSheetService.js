@@ -5,6 +5,47 @@ const normalizeHeaderKey = (header = "") =>
     .replace(/[\s_-]+/g, "")
     .replace(/[()]/g, "");
 
+const extractGid = (url) => {
+  const gidFromQuery = url.searchParams.get("gid");
+  if (gidFromQuery) return gidFromQuery;
+  const hashMatch = url.hash?.match(/gid=(\d+)/i);
+  return hashMatch ? hashMatch[1] : "";
+};
+
+const normalizeSheetCsvUrl = (sheetUrl = "") => {
+  const trimmed = String(sheetUrl || "").trim();
+  if (!trimmed) return "";
+
+  if (trimmed.includes("output=csv") || trimmed.includes("format=csv")) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    const publishedMatch = parsed.pathname.match(/\/spreadsheets\/d\/e\/([^/]+)/);
+    if (publishedMatch) {
+      const gid = extractGid(parsed);
+      const params = new URLSearchParams();
+      params.set("output", "csv");
+      if (gid) params.set("gid", gid);
+      return `https://docs.google.com/spreadsheets/d/e/${publishedMatch[1]}/pub?${params.toString()}`;
+    }
+
+    const sheetMatch = parsed.pathname.match(/\/spreadsheets\/d\/([^/]+)/);
+    if (sheetMatch) {
+      const gid = extractGid(parsed);
+      const params = new URLSearchParams();
+      params.set("format", "csv");
+      if (gid) params.set("gid", gid);
+      return `https://docs.google.com/spreadsheets/d/${sheetMatch[1]}/export?${params.toString()}`;
+    }
+  } catch (error) {
+    return trimmed;
+  }
+
+  return trimmed;
+};
+
 const parseCsv = (text) => {
   const rows = [];
   let currentCell = "";
@@ -75,9 +116,10 @@ const fetchCsv = async (url) => {
  * The sheet should include columns like: assignment, level, name, studentcode, score, comments, link, date.
  */
 export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
-  if (!sheetCsvUrl) throw new Error("Results sheet CSV URL is required.");
+  const normalizedUrl = normalizeSheetCsvUrl(sheetCsvUrl);
+  if (!normalizedUrl) throw new Error("Results sheet CSV URL is required.");
 
-  const csvText = await fetchCsv(sheetCsvUrl);
+  const csvText = await fetchCsv(normalizedUrl);
   const rows = parseCsv(csvText);
   if (!rows.length) return [];
 

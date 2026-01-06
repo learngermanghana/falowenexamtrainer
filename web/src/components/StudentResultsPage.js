@@ -23,8 +23,9 @@ const StudentResultsPage = () => {
     A2_B2: 28,
   };
 
-  // Put your published CSV URL here via env:
+  // Put your sheet URL here via env (CSV or edit URL):
   // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
+  // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/<sheetId>/edit
   const SHEET_CSV_URL = process.env.REACT_APP_RESULTS_SHEET_CSV_URL || "";
 
   const norm = (v) => String(v || "").trim().toLowerCase();
