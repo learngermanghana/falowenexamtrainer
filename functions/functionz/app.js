@@ -438,15 +438,19 @@ app.post("/webhooks/zoom", async (req, res) => {
     const payload = req.body?.payload?.object || {};
     const participant = payload.participant || {};
     const email = participant.user_email || participant.email || "";
+    const displayName = participant.user_name || participant.name || participant.display_name || "";
 
-    if (!email) {
+    if (!email && !displayName) {
       requestLog.warn("zoom.webhook.missing_email", { participant });
       return res.status(202).json({ ok: true, skipped: "missing_email" });
     }
 
-    const studentResult = await findStudentByCodeOrEmail({ email });
+    const studentResult = await findStudentByCodeOrEmail({
+      email: email || null,
+      studentCode: displayName || null,
+    });
     if (!studentResult) {
-      requestLog.warn("zoom.webhook.student_not_found", { email });
+      requestLog.warn("zoom.webhook.student_not_found", { email, displayName });
       return res.status(202).json({ ok: true, skipped: "student_not_found" });
     }
 
@@ -674,18 +678,32 @@ async function findStudentByCodeOrEmail({ studentCode, email }) {
   const db = admin.firestore();
 
   if (studentCode) {
-    const docRef = db.collection("students").doc(studentCode);
-    const docSnap = await docRef.get();
-    if (docSnap.exists) return { ref: docRef, snap: docSnap };
+    const normalizedCode = String(studentCode || "").trim();
+    const candidates = Array.from(
+      new Set([normalizedCode, normalizedCode.toLowerCase(), normalizedCode.toUpperCase()])
+    ).filter(Boolean);
+
+    for (const code of candidates) {
+      const docRef = db.collection("students").doc(code);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) return { ref: docRef, snap: docSnap };
+    }
+
+    const lookupFields = ["studentCode", "studentcode", "uid"];
+    for (const field of lookupFields) {
+      const querySnap = await db.collection("students").where(field, "in", candidates).limit(1).get();
+      if (!querySnap.empty) {
+        const doc = querySnap.docs[0];
+        return { ref: doc.ref, snap: doc };
+      }
+    }
   }
 
   if (email) {
-    const normalizedEmail = email.toLowerCase();
-    const querySnap = await db
-      .collection("students")
-      .where("email", "==", normalizedEmail)
-      .limit(1)
-      .get();
+    const rawEmail = String(email || "").trim();
+    const normalizedEmail = rawEmail.toLowerCase();
+    const candidates = Array.from(new Set([normalizedEmail, rawEmail])).filter(Boolean);
+    const querySnap = await db.collection("students").where("email", "in", candidates).limit(1).get();
     if (!querySnap.empty) {
       const doc = querySnap.docs[0];
       return { ref: doc.ref, snap: doc };
