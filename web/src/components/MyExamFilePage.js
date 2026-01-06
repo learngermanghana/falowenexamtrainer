@@ -542,10 +542,26 @@ const MyExamFilePage = () => {
                   </div>
                   <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{levelInfo.description}</p>
                 </div>
-                <div style={{ textAlign: "right" }}>
+                <div style={{ textAlign: "right", display: "grid", gap: 6, justifyItems: "end" }}>
                   <div style={{ fontWeight: 900, fontSize: 15, color: "#111827" }}>{levelInfo.price}</div>
                   {levelInfo.modulePrice ? (
                     <div style={{ fontSize: 12, color: "#6B7280" }}>{levelInfo.modulePrice}</div>
+                  ) : null}
+                  {levelInfo.registrationUrl ? (
+                    <a
+                      href={levelInfo.registrationUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        ...styles.secondaryButton,
+                        padding: "6px 10px",
+                        fontSize: 12,
+                        textDecoration: "none",
+                        color: "#111827",
+                      }}
+                    >
+                      Register →
+                    </a>
                   ) : null}
                 </div>
               </div>

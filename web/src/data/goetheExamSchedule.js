@@ -4,6 +4,7 @@ export const goetheExamLevels = [
     title: "Goethe-Zertifikat A1: Start Deutsch 1",
     description:
       "A German exam for adults. It certifies that candidates have acquired very basic language skills and corresponds to the first level (A1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    registrationUrl: "https://www.goethe.de/en/spr/kup/prf/prf/gzsd1.html",
     price: "3,000 GHS",
     location: "Goethe-Institut Accra",
     exams: [
@@ -23,6 +24,7 @@ export const goetheExamLevels = [
     level: "A2",
     title: "Goethe-Zertifikat A2",
     description: "A German exam for adults. It certifies basic language skills at the A2 level of the CEFR.",
+    registrationUrl: "https://www.goethe.de/en/spr/kup/prf/prf/gzsd2.html",
     price: "2,550 GHS",
     location: "Goethe-Institut Accra",
     exams: [
@@ -41,6 +43,7 @@ export const goetheExamLevels = [
     title: "Goethe-Zertifikat B1",
     description:
       "A German exam for young people and adults. It certifies that candidates are independent users of the German language and corresponds to the third level (B1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
+    registrationUrl: "https://www.goethe.de/en/spr/kup/prf/prf/gzb1.html",
     price: "2,900 GHS",
     modulePrice: "950 GHS per module",
     location: "Goethe-Institut Accra",
