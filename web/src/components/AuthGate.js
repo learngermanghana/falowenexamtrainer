@@ -43,6 +43,45 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
 
+  const getAuthErrorMessage = (error, intent) => {
+    const code = error?.code || "";
+
+    if (code === "auth/email-not-verified" || code === "auth/email-verification-required") {
+      return "Please verify your email address before logging in.";
+    }
+
+    if (intent === "login") {
+      switch (code) {
+        case "auth/user-not-found":
+        case "auth/invalid-credential":
+          return "No account found for this email and password.";
+        case "auth/wrong-password":
+          return "The password you entered is incorrect.";
+        case "auth/invalid-email":
+          return "That email address doesn't look right. Please check and try again.";
+        case "auth/too-many-requests":
+          return "Too many failed attempts. Please wait a moment and try again.";
+        case "auth/network-request-failed":
+          return "Network error. Check your connection and try again.";
+        default:
+          break;
+      }
+    }
+
+    if (intent === "signup") {
+      switch (code) {
+        case "auth/email-already-in-use":
+          return "An account with this email already exists. Try logging in instead.";
+        case "auth/invalid-email":
+          return "That email address doesn't look right. Please check and try again.";
+        default:
+          break;
+      }
+    }
+
+    return error?.message || "Login failed. Please try again.";
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
