@@ -102,7 +102,6 @@ function App() {
   } = useAuth();
   const [authMode, setAuthMode] = useState("landing");
   const location = useLocation();
-  const { showToast } = useToast();
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
@@ -241,7 +240,7 @@ const AppShell = ({
 }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [notificationError, setNotificationError] = useState("");
+  const { showToast } = useToast();
 
   const subtitle = useMemo(() => {
     if (location.pathname.startsWith("/campus")) {
@@ -256,16 +255,6 @@ const AppShell = ({
   }, [location.pathname]);
 
   const goHome = () => navigate("/");
-
-  const handleEnableNotifications = async () => {
-    setNotificationError("");
-    try {
-      await enableNotifications();
-    } catch (err) {
-      console.error("Failed to enable notifications", err);
-      setNotificationError("Could not enable push notifications. Please try again.");
-    }
-  };
 
   const handleAreaSelect = (area) => {
     if (area === "campus") {
@@ -343,37 +332,12 @@ const AppShell = ({
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
             <NotificationBell
               notificationStatus={notificationStatus}
-              onEnablePush={handleEnableNotifications}
+              onEnablePush={enableNotifications}
             />
-            <button
-              style={notificationStatus === "granted" ? styles.secondaryButton : styles.primaryButton}
-              onClick={handleEnableNotifications}
-              disabled={notificationStatus === "pending" || notificationStatus === "granted"}
-            >
-              {notificationStatus === "granted"
-                ? "Push enabled"
-                : notificationStatus === "pending"
-                ? "Enabling..."
-                : notificationStatus === "blocked"
-                ? "Unblock notifications"
-                : "Enable push alerts"}
-            </button>
             <button style={styles.dangerButton} onClick={logout}>
               Logout
             </button>
           </div>
-          {notificationError ? (
-            <div style={{ ...styles.errorBox, marginTop: 4 }}>{notificationError}</div>
-          ) : notificationStatus === "blocked" ? (
-            <div style={{ fontSize: 12, color: "#b91c1c" }}>
-              Notifications are blocked in your browser settings.
-            </div>
-          ) : notificationStatus !== "granted" ? (
-            <div style={{ fontSize: 12, color: "#1f2937" }}>
-              Tip: click “Enable push alerts” once per browser after signing in so new scores and attendance can reach this
-              device.
-            </div>
-          ) : null}
         </div>
       </header>
 
