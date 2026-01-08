@@ -39,7 +39,7 @@ const NotificationBadge = ({ count }) => {
 };
 
 const NotificationBell = ({ notificationStatus, onEnablePush }) => {
-  const { studentProfile, user } = useAuth();
+  const { studentProfile, user, saveStudentProfile } = useAuth();
 
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState([]);
@@ -100,8 +100,9 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     }
   }, [normalizedStatus]);
 
-  const readSeenAt = () => {
+  const readLocalSeenAt = useCallback(() => {
     try {
+      if (typeof window === "undefined") return 0;
       const key = seenKeyForUser(user?.uid);
       const raw = localStorage.getItem(key);
       const n = raw ? Number(raw) : 0;
@@ -109,14 +110,54 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     } catch (_e) {
       return 0;
     }
-  };
+  }, [user?.uid]);
 
-  const writeSeenAt = (value) => {
+  const [localSeenAt, setLocalSeenAt] = useState(0);
+  const lastSeenWriteRef = useRef(0);
+
+  useEffect(() => {
+    setLocalSeenAt(readLocalSeenAt());
+  }, [readLocalSeenAt]);
+
+  const writeLocalSeenAt = useCallback((value) => {
     try {
       const key = seenKeyForUser(user?.uid);
-      localStorage.setItem(key, String(value || Date.now()));
+      const nextValue = Number(value || Date.now());
+      localStorage.setItem(key, String(nextValue));
+      setLocalSeenAt(nextValue);
     } catch (_e) {}
-  };
+  }, [user?.uid]);
+
+  const persistSeenAt = useCallback(
+    async (value) => {
+      const nextValue = Number(value || Date.now());
+      writeLocalSeenAt(nextValue);
+      if (!studentProfile?.id || !saveStudentProfile) return;
+      const profileSeenAt = Number(studentProfile?.notificationsLastSeenAt || 0);
+      if (nextValue <= profileSeenAt || nextValue === lastSeenWriteRef.current) return;
+      lastSeenWriteRef.current = nextValue;
+      try {
+        await saveStudentProfile({ notificationsLastSeenAt: nextValue });
+      } catch (err) {
+        console.error("Failed to persist notification seen timestamp", err);
+      }
+    },
+    [saveStudentProfile, studentProfile?.id, studentProfile?.notificationsLastSeenAt, writeLocalSeenAt]
+  );
+
+  const profileSeenAt = Number(studentProfile?.notificationsLastSeenAt || 0);
+  const seenAt = useMemo(() => Math.max(profileSeenAt, localSeenAt), [profileSeenAt, localSeenAt]);
+
+  useEffect(() => {
+    if (!studentProfile?.id) return;
+    if (localSeenAt > profileSeenAt) {
+      persistSeenAt(localSeenAt);
+      return;
+    }
+    if (profileSeenAt > localSeenAt) {
+      writeLocalSeenAt(profileSeenAt);
+    }
+  }, [localSeenAt, persistSeenAt, profileSeenAt, studentProfile?.id, writeLocalSeenAt]);
 
   const sortItems = (list) =>
     [...(list || [])].sort((a, b) => (b?.timestamp || 0) - (a?.timestamp || 0));
@@ -150,14 +191,13 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
   }, [loadNotifications]);
 
   const unreadCount = useMemo(() => {
-    const seenAt = readSeenAt();
     return (items || []).filter((it) => Number(it?.timestamp || 0) > seenAt).length;
-  }, [items]);
+  }, [items, seenAt]);
 
   const markAllRead = () => {
     const newest = (items?.[0]?.timestamp ? Number(items[0].timestamp) : Date.now()) || Date.now();
-    writeSeenAt(newest);
-    // Force a state update to refresh badge (no server write)
+    persistSeenAt(newest);
+    // Force a state update to refresh badge
     setItems((prev) => [...prev]);
   };
 
@@ -189,12 +229,12 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
   useEffect(() => {
     if (!open || markedSeenThisSession) return;
     const newest = (items?.[0]?.timestamp ? Number(items[0].timestamp) : Date.now()) || Date.now();
-    writeSeenAt(newest);
+    persistSeenAt(newest);
     setMarkedSeenThisSession(true);
-  }, [open, items, markedSeenThisSession]);
+  }, [open, items, markedSeenThisSession, persistSeenAt]);
 
   const renderNotification = (item) => {
-    const isUnread = Number(item?.timestamp || 0) > readSeenAt();
+    const isUnread = Number(item?.timestamp || 0) > seenAt;
     return (
       <article
         key={`${item.id}-${item.timestamp}`}
