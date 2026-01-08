@@ -15,7 +15,8 @@ import LetterPracticePage from "./components/LetterPracticePage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
-import { isFirebaseConfigured } from "./firebase";
+import { useToast } from "./context/ToastContext";
+import { isFirebaseConfigured, listenForForegroundMessages } from "./firebase";
 import { styles } from "./styles";
 import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
@@ -27,6 +28,7 @@ import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
+import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 
 const TAB_STRUCTURE = [
   {
@@ -100,6 +102,7 @@ function App() {
   } = useAuth();
   const [authMode, setAuthMode] = useState("landing");
   const location = useLocation();
+  const { showToast } = useToast();
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
@@ -274,6 +277,48 @@ const AppShell = ({
       navigate("/exams/speaking");
     }
   };
+
+  useEffect(() => {
+    if (!user || !studentProfile) return undefined;
+    let unsubscribe = () => {};
+    let isMounted = true;
+
+    listenForForegroundMessages(async (payload) => {
+      if (!isMounted || !payload) return;
+      const normalized = buildPushNotification(payload);
+      if (!normalized) return;
+      if (normalized.title || normalized.body) {
+        showToast(`${normalized.title}${normalized.body ? ` — ${normalized.body}` : ""}`, "info");
+      }
+
+      try {
+        await persistPushNotification({ studentId: studentProfile.id, payload, notification: normalized });
+      } catch (error) {
+        console.error("Failed to persist push notification", error);
+      }
+
+      try {
+        window.dispatchEvent(
+          new CustomEvent("falowen:push-notification", { detail: { notification: normalized } })
+        );
+      } catch (error) {
+        console.error("Failed to dispatch push notification event", error);
+      }
+    }).then((off) => {
+      if (typeof off === "function") {
+        unsubscribe = off;
+      }
+    }).catch((error) => {
+      console.error("Failed to listen for foreground messages", error);
+    });
+
+    return () => {
+      isMounted = false;
+      if (typeof unsubscribe === "function") {
+        unsubscribe();
+      }
+    };
+  }, [showToast, studentProfile, user]);
 
   return (
     <div className="app-shell" style={styles.container}>
