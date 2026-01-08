@@ -155,6 +155,17 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     setItems((prev) => [...prev]);
   };
 
+  useEffect(() => {
+    const handlePush = (event) => {
+      const notification = event?.detail?.notification;
+      if (!notification) return;
+      setItems((prev) => sortItems([notification, ...(prev || [])]));
+    };
+
+    window.addEventListener("falowen:push-notification", handlePush);
+    return () => window.removeEventListener("falowen:push-notification", handlePush);
+  }, []);
+
   const handleToggle = () => {
     setOpen((prev) => !prev);
   };
