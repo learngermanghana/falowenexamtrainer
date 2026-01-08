@@ -2,6 +2,11 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { fetchStudentNotifications } from "../services/notificationService";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
+import {
+  getNotificationStatusLabel,
+  normalizeNotificationStatus,
+  shouldPromptForPush,
+} from "../utils/notificationStatus";
 
 const formatTime = (timestamp) => {
   if (!timestamp) return "";
@@ -31,18 +36,6 @@ const NotificationBadge = ({ count }) => {
       {count > 99 ? "99+" : count}
     </span>
   );
-};
-
-const normalizeStatus = (status) => {
-  const s = String(status || "").toLowerCase().trim();
-  if (!s) return "off";
-  if (s === "granted") return "granted";
-  if (s === "pending") return "pending";
-  if (s === "stale") return "stale";
-  if (s === "blocked") return "blocked";
-  if (s === "denied") return "blocked";
-  if (s === "default") return "off";
-  return s;
 };
 
 const NotificationBell = ({ notificationStatus, onEnablePush }) => {
@@ -77,21 +70,34 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
   }, []);
 
   const normalizedStatus = useMemo(
-    () => normalizeStatus(notificationStatus),
+    () => normalizeNotificationStatus(notificationStatus),
     [notificationStatus]
   );
 
   const needsPushOptIn = useMemo(() => {
-    // We treat anything other than granted/pending as needing opt-in.
-    return normalizedStatus !== "granted" && normalizedStatus !== "pending";
+    return shouldPromptForPush(normalizedStatus);
   }, [normalizedStatus]);
 
-  const statusLabel = useMemo(() => {
-    if (normalizedStatus === "granted") return "Push on";
-    if (normalizedStatus === "pending") return "Enabling push";
-    if (normalizedStatus === "blocked") return "Push blocked";
-    if (normalizedStatus === "stale") return "Push ready";
-    return "Push off";
+  const statusLabel = useMemo(
+    () => getNotificationStatusLabel(normalizedStatus),
+    [normalizedStatus]
+  );
+
+  const statusDescription = useMemo(() => {
+    switch (normalizedStatus) {
+      case "granted":
+        return "Push is active on this device. We also keep recent history here.";
+      case "pending":
+        return "Enabling push notifications. Keep this tab open.";
+      case "blocked":
+        return "Push is blocked by your browser settings.";
+      case "stale":
+        return "Push needs a refresh on this device. Re-enable to reconnect.";
+      case "error":
+        return "Push hit an error on this device. Try enabling again.";
+      default:
+        return "Push is off on this device. You can still view updates here.";
+    }
   }, [normalizedStatus]);
 
   const readSeenAt = () => {
@@ -224,6 +230,11 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
     }
   };
 
+  const handleOpenSettings = () => {
+    const settingsUrl = "https://support.google.com/chrome/answer/3220216";
+    window.open(settingsUrl, "_blank", "noopener,noreferrer");
+  };
+
   // Click outside to close + ESC
   useEffect(() => {
     if (!open) return;
@@ -325,22 +336,24 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
             </div>
           </div>
 
-          <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.5 }}>
-            {needsPushOptIn
-              ? "Push is off on this device. You can still view updates here."
-              : "Push is active on this device. We also keep recent history here."}
-          </div>
+          <div style={{ fontSize: 12, color: "#4b5563", lineHeight: 1.5 }}>{statusDescription}</div>
 
           {needsPushOptIn && onEnablePush ? (
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button type="button" style={styles.primaryButton} onClick={handleEnablePush}>
-                Enable push alerts
-              </button>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
               {normalizedStatus === "blocked" ? (
-                <span style={{ ...styles.helperText, margin: 0 }}>
-                  Your browser blocked notifications. Enable them in browser settings (site permissions).
-                </span>
-              ) : null}
+                <>
+                  <button type="button" style={styles.primaryButton} onClick={handleOpenSettings}>
+                    Open browser settings
+                  </button>
+                  <span style={{ ...styles.helperText, margin: 0 }}>
+                    Notifications are blocked. Enable them in browser settings, then retry here.
+                  </span>
+                </>
+              ) : (
+                <button type="button" style={styles.primaryButton} onClick={handleEnablePush}>
+                  Enable push alerts
+                </button>
+              )}
             </div>
           ) : null}
 

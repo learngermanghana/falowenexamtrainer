@@ -4,6 +4,7 @@ import { useExam } from "../context/ExamContext";
 import { classCatalog } from "../data/classCatalog";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { loadPreferredClass } from "../services/classSelectionStorage";
+import { normalizeNotificationStatus } from "../utils/notificationStatus";
 
 const STORAGE_KEY = "falowen_onboarding_v3";
 const DISMISS_HOURS = 24;
@@ -171,9 +172,13 @@ const OnboardingChecklist = ({
     };
   }, []);
 
-  const notificationsGranted = notificationStatus === "granted";
-  const notificationsDenied = notificationStatus === "denied";
-  const notificationsUnknown = !notificationStatus || notificationStatus === "default";
+  const normalizedNotificationStatus = useMemo(
+    () => normalizeNotificationStatus(notificationStatus),
+    [notificationStatus]
+  );
+  const notificationsGranted = normalizedNotificationStatus === "granted";
+  const notificationsDenied = normalizedNotificationStatus === "blocked";
+  const notificationsUnknown = normalizedNotificationStatus === "idle";
 
   // ✅ Auto-detect level/class and mark done instantly.
   const levelStepComplete = Boolean(levelConfirmed || profileLevel);
