@@ -9,6 +9,8 @@ let messaging = null;
 const CACHE_PREFIX = "apzla-offline";
 const CACHE_NAME = `${CACHE_PREFIX}-v6`;
 const OFFLINE_URL = "/offline.html";
+const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
+const DEFAULT_ROUTE = "/";
 
 const STATIC_ASSETS = [
   OFFLINE_URL,
@@ -17,6 +19,47 @@ const STATIC_ASSETS = [
   "/logo192.png",
   "/logo512.png",
 ];
+
+const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
+  const params = new URLSearchParams();
+  if (level) params.set("level", level);
+  if (className) params.set("className", className);
+  if (postId) params.set("postId", postId);
+  const query = params.toString();
+  return `/campus/discussion${query ? `?${query}` : ""}`;
+};
+
+const resolveNotificationRoute = (data = {}) => {
+  if (data.route) return data.route;
+  const type = String(data.type || "").toLowerCase();
+  if (data.postId || type.includes("discussion") || type.includes("class")) {
+    return buildDiscussionRoute(data);
+  }
+  if (type.includes("score") || type.includes("assignment")) {
+    return "/campus/results";
+  }
+  if (type.includes("exam")) {
+    return "/exams/speaking";
+  }
+  return DEFAULT_ROUTE;
+};
+
+const normalizeRoute = (route) => {
+  if (!route) return DEFAULT_ROUTE;
+  try {
+    const url = new URL(route, self.location.origin);
+    if (url.origin !== self.location.origin) return DEFAULT_ROUTE;
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch (error) {
+    return DEFAULT_ROUTE;
+  }
+};
+
+const buildNotificationData = (payload = {}) => {
+  const data = { ...(payload.data || {}) };
+  data.route = resolveNotificationRoute(data);
+  return data;
+};
 
 function initializeMessaging(config) {
   if (!config || messaging || !config.apiKey) return;
@@ -29,11 +72,40 @@ function initializeMessaging(config) {
     if (!title) return;
 
     self.registration.showNotification(title, {
-      body: body || "Falowen Learning Hub update",
+      body: body || DEFAULT_NOTIFICATION_BODY,
       icon: "/logo192.png",
+      data: buildNotificationData(payload),
     });
   });
 }
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  event.waitUntil(
+    (async () => {
+      const data = event.notification?.data || {};
+      const route = normalizeRoute(resolveNotificationRoute(data));
+      const targetUrl = new URL(route, self.location.origin).toString();
+      const clientList = await self.clients.matchAll({
+        type: "window",
+        includeUncontrolled: true,
+      });
+
+      for (const client of clientList) {
+        if ("navigate" in client) {
+          await client.navigate(targetUrl);
+          await client.focus();
+          return;
+        }
+      }
+
+      if (self.clients.openWindow) {
+        await self.clients.openWindow(targetUrl);
+      }
+    })()
+  );
+});
 
 self.addEventListener("message", (event) => {
   if (event?.data?.type === "INIT_FIREBASE") {

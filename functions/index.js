@@ -52,6 +52,27 @@ const safeTruncate = (text = "", maxLength = 140) => {
   return `${str.slice(0, Math.max(1, maxLength - 1))}…`;
 };
 
+const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
+  const params = new URLSearchParams();
+  if (level) params.set("level", level);
+  if (className) params.set("className", className);
+  if (postId) params.set("postId", postId);
+  const query = params.toString();
+  return `/campus/discussion${query ? `?${query}` : ""}`;
+};
+
+const resolveNotificationRoute = (data = {}) => {
+  if (data.route) return data.route;
+  const type = String(data.type || "").toLowerCase();
+  if (data.postId || type.includes("discussion") || type.includes("class")) {
+    return buildDiscussionRoute(data);
+  }
+  if (type.includes("score") || type.includes("assignment")) {
+    return "/campus/results";
+  }
+  return "/";
+};
+
 const getFirestore = () => getAdmin().firestore();
 
 const getTokensFromStudentData = (data = {}) => {
@@ -417,6 +438,7 @@ const notifyNewReply = async ({ threadId, beforeData = {}, afterData = {} }) => 
     postId: threadId,
     responseId: String(latest.id || latest.responderCode || latest.responder || ""),
   };
+  data.route = resolveNotificationRoute(data);
 
   await sendNotifications({ tokens, notification, data, tokenOwners });
   return null;
@@ -452,6 +474,7 @@ const notifyAssignmentScore = async ({ attemptId, attempt }) => {
     attemptId: attemptId || "",
     level: attempt.level || "",
   };
+  data.route = resolveNotificationRoute(data);
 
   const tokenOwners = tokenInfo.docId
     ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
@@ -499,6 +522,7 @@ exports.onClassBoardPostCreated = onDocumentCreated(
       className: className || "",
       postId: postId || "",
     };
+    payload.route = resolveNotificationRoute(payload);
 
     await sendNotifications({ tokens, notification, data: payload, tokenOwners });
     return null;
