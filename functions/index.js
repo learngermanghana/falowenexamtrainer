@@ -54,6 +54,21 @@ const safeTruncate = (text = "", maxLength = 140) => {
 
 const getFirestore = () => getAdmin().firestore();
 
+const getTokensFromStudentData = (data = {}) => {
+  const tokens = new Set();
+  if (data.messagingToken) {
+    tokens.add(data.messagingToken);
+  }
+  if (Array.isArray(data.messagingTokens)) {
+    data.messagingTokens.forEach((entry) => {
+      if (entry?.token) {
+        tokens.add(entry.token);
+      }
+    });
+  }
+  return Array.from(tokens);
+};
+
 const fetchStudentMessagingToken = async (studentCode) => {
   if (!studentCode) return null;
 
@@ -68,9 +83,10 @@ const fetchStudentMessagingToken = async (studentCode) => {
     if (!snap.exists) continue;
 
     const data = snap.data() || {};
-    if (!data.messagingToken) continue;
+    const tokens = getTokensFromStudentData(data);
+    if (!tokens.length) continue;
 
-    return { token: data.messagingToken, data };
+    return { tokens, data, docId: snap.id };
   }
 
   const lookupFields = ["studentCode", "studentcode", "uid"];
@@ -86,9 +102,10 @@ const fetchStudentMessagingToken = async (studentCode) => {
 
     const docSnap = snapshot.docs[0];
     const data = docSnap.data() || {};
-    if (!data.messagingToken) continue;
+    const tokens = getTokensFromStudentData(data);
+    if (!tokens.length) continue;
 
-    return { token: data.messagingToken, data };
+    return { tokens, data, docId: docSnap.id };
   }
 
   return null;
@@ -103,35 +120,101 @@ const fetchClassMessagingTokens = async ({ level, className, excludeCodes = new 
     .get();
 
   const tokens = new Set();
+  const tokenOwners = new Map();
 
   snapshot.forEach((docSnap) => {
     const data = docSnap.data() || {};
-    const token = data.messagingToken;
     const studentCode = String(data.studentcode || docSnap.id || "").toLowerCase();
 
-    if (!token || excludeCodes.has(studentCode)) return;
-    tokens.add(token);
+    if (excludeCodes.has(studentCode)) return;
+
+    const docTokens = getTokensFromStudentData(data);
+    docTokens.forEach((token) => {
+      if (!token) return;
+      tokens.add(token);
+      tokenOwners.set(token, docSnap.id);
+    });
   });
 
-  return Array.from(tokens);
+  return { tokens: Array.from(tokens), tokenOwners };
 };
 
-const sendNotifications = async ({ tokens = [], notification = {}, data = {} }) => {
+const getInvalidTokenReason = (code = "") => {
+  return [
+    "messaging/invalid-registration-token",
+    "messaging/registration-token-not-registered",
+  ].includes(code)
+    ? code
+    : null;
+};
+
+const cleanupInvalidTokens = async (tokenOwners, invalidTokens) => {
+  if (!invalidTokens.length) return null;
+  const db = getFirestore();
+  const updates = new Map();
+
+  invalidTokens.forEach((token) => {
+    const docId = tokenOwners.get(token);
+    if (!docId) return;
+    if (!updates.has(docId)) {
+      updates.set(docId, new Set());
+    }
+    updates.get(docId).add(token);
+  });
+
+  if (!updates.size) return null;
+
+  await Promise.all(
+    Array.from(updates.entries()).map(async ([docId, tokensToRemove]) => {
+      const docRef = db.collection("students").doc(docId);
+      const snap = await docRef.get();
+      if (!snap.exists) return;
+      const data = snap.data() || {};
+      const existing = Array.isArray(data.messagingTokens) ? data.messagingTokens : [];
+      const filtered = existing.filter((entry) => !tokensToRemove.has(entry?.token));
+      const updatesPayload = { messagingTokens: filtered };
+      if (data.messagingToken && tokensToRemove.has(data.messagingToken)) {
+        updatesPayload.messagingToken = FieldValue.delete();
+      }
+      await docRef.set(updatesPayload, { merge: true });
+    })
+  );
+
+  return null;
+};
+
+const sendNotifications = async ({
+  tokens = [],
+  notification = {},
+  data = {},
+  tokenOwners = new Map(),
+}) => {
   if (!tokens.length) return null;
 
   const messaging = getAdmin().messaging();
   const chunks = [];
+  const invalidTokens = new Set();
 
   for (let i = 0; i < tokens.length; i += NOTIFICATION_BATCH_SIZE) {
     chunks.push(tokens.slice(i, i + NOTIFICATION_BATCH_SIZE));
   }
 
   for (const chunk of chunks) {
-    await messaging.sendEachForMulticast({
+    const response = await messaging.sendEachForMulticast({
       tokens: chunk,
       notification,
       data,
     });
+    response.responses.forEach((result, index) => {
+      if (result.success) return;
+      const reason = getInvalidTokenReason(result.error?.code);
+      if (!reason) return;
+      invalidTokens.add(chunk[index]);
+    });
+  }
+
+  if (invalidTokens.size) {
+    await cleanupInvalidTokens(tokenOwners, Array.from(invalidTokens));
   }
 
   return null;
@@ -310,7 +393,7 @@ const notifyNewReply = async ({ threadId, beforeData = {}, afterData = {} }) => 
     excludeCodes.add(String(latest.responderCode).toLowerCase());
   }
 
-  const tokens = await fetchClassMessagingTokens({
+  const { tokens, tokenOwners } = await fetchClassMessagingTokens({
     level: thread.level,
     className: thread.className,
     excludeCodes,
@@ -335,7 +418,7 @@ const notifyNewReply = async ({ threadId, beforeData = {}, afterData = {} }) => 
     responseId: String(latest.id || latest.responderCode || latest.responder || ""),
   };
 
-  await sendNotifications({ tokens, notification, data });
+  await sendNotifications({ tokens, notification, data, tokenOwners });
   return null;
 };
 
@@ -344,7 +427,7 @@ const notifyAssignmentScore = async ({ attemptId, attempt }) => {
     attempt.studentCode || attempt.studentcode || attempt.student_code || attempt.student || "";
 
   const tokenInfo = await fetchStudentMessagingToken(studentCode);
-  if (!tokenInfo?.token) {
+  if (!tokenInfo?.tokens?.length) {
     console.log(`notifyAssignmentScore: no messaging token for ${studentCode}`);
     return null;
   }
@@ -370,7 +453,15 @@ const notifyAssignmentScore = async ({ attemptId, attempt }) => {
     level: attempt.level || "",
   };
 
-  await sendNotifications({ tokens: [tokenInfo.token], notification, data });
+  const tokenOwners = tokenInfo.docId
+    ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+    : new Map();
+  await sendNotifications({
+    tokens: tokenInfo.tokens,
+    notification,
+    data,
+    tokenOwners,
+  });
   return null;
 };
 
@@ -388,7 +479,7 @@ exports.onClassBoardPostCreated = onDocumentCreated(
 
     if (!data || !level || !className) return null;
 
-    const tokens = await fetchClassMessagingTokens({ level, className });
+    const { tokens, tokenOwners } = await fetchClassMessagingTokens({ level, className });
 
     if (!tokens.length) {
       console.log(`onClassBoardPostCreated: no tokens for ${level}/${className}`);
@@ -409,7 +500,7 @@ exports.onClassBoardPostCreated = onDocumentCreated(
       postId: postId || "",
     };
 
-    await sendNotifications({ tokens, notification, data: payload });
+    await sendNotifications({ tokens, notification, data: payload, tokenOwners });
     return null;
   }
 );

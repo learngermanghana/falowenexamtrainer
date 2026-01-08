@@ -30,6 +30,34 @@ import {
 
 const AuthContext = createContext();
 
+const DEVICE_ID_STORAGE_KEY = "falowenMessagingDeviceId";
+
+const getDeviceId = () => {
+  if (typeof window === "undefined") return "unknown";
+  let storedId = window.localStorage?.getItem(DEVICE_ID_STORAGE_KEY);
+  if (!storedId) {
+    storedId =
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    window.localStorage?.setItem(DEVICE_ID_STORAGE_KEY, storedId);
+  }
+  return storedId;
+};
+
+const getDevicePlatform = () => {
+  if (typeof navigator === "undefined") return "web";
+  return navigator.platform || navigator.userAgent || "web";
+};
+
+const getMessagingTokenFromProfile = (profile, deviceId) => {
+  if (!profile) return null;
+  const tokens = Array.isArray(profile.messagingTokens) ? profile.messagingTokens : [];
+  const match = tokens.find((entry) => entry?.deviceId && entry.deviceId === deviceId);
+  if (match?.token) return match.token;
+  return profile.messagingToken || null;
+};
+
 const fetchStudentProfileByEmail = async (email) => {
   if (!email) return null;
   const studentsRef = collection(db, "students");
@@ -90,19 +118,55 @@ export const AuthProvider = ({ children }) => {
   const [authError, setAuthError] = useState("");
   const [notificationStatus, setNotificationStatus] = useState("idle");
   const [messagingToken, setMessagingToken] = useState(null);
+  const deviceId = useMemo(() => getDeviceId(), []);
+  const devicePlatform = useMemo(() => getDevicePlatform(), []);
 
   const persistMessagingToken = useCallback(async (token, studentId) => {
-    if (!studentId || !token) return;
+    if (!studentId || !token || !deviceId) return;
     const studentRef = doc(db, "students", studentId);
+    const existingTokens = Array.isArray(studentProfile?.messagingTokens)
+      ? studentProfile.messagingTokens
+      : [];
+    const filteredTokens = existingTokens.filter(
+      (entry) => entry?.deviceId && entry.deviceId !== deviceId && entry.token
+    );
+    const firestoreTokens = [
+      ...filteredTokens,
+      {
+        token,
+        deviceId,
+        platform: devicePlatform,
+        lastSeen: serverTimestamp(),
+      },
+    ];
+    const localTokens = [
+      ...filteredTokens,
+      {
+        token,
+        deviceId,
+        platform: devicePlatform,
+        lastSeen: new Date().toISOString(),
+      },
+    ];
     await setDoc(
       studentRef,
-      { messagingToken: token, messagingTokenUpdatedAt: serverTimestamp() },
+      {
+        messagingToken: token,
+        messagingTokenUpdatedAt: serverTimestamp(),
+        messagingTokens: firestoreTokens,
+      },
       { merge: true }
     );
     setStudentProfile((prev) =>
-      prev?.id === studentId ? { ...prev, messagingToken: token } : prev
+      prev?.id === studentId
+        ? {
+            ...prev,
+            messagingToken: token,
+            messagingTokens: localTokens,
+          }
+        : prev
     );
-  }, []);
+  }, [deviceId, devicePlatform, studentProfile?.messagingTokens]);
 
   const logLoginSession = useCallback(async ({ uid, email, studentId, studentCode, provider, meta = {} }) => {
     if (!isFirebaseConfigured || !db || !uid) return;
@@ -130,19 +194,33 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const revokeMessagingToken = useCallback(async (studentId) => {
-    if (!studentId) return;
+  const revokeMessagingToken = useCallback(async (studentId, token) => {
+    if (!studentId || !deviceId) return;
     const studentRef = doc(db, "students", studentId);
-    await updateDoc(studentRef, {
-      messagingToken: deleteField(),
+    const existingTokens = Array.isArray(studentProfile?.messagingTokens)
+      ? studentProfile.messagingTokens
+      : [];
+    const filteredTokens = existingTokens.filter(
+      (entry) => entry?.deviceId && entry.deviceId !== deviceId && entry.token !== token
+    );
+    const updatePayload = {
+      messagingTokens: filteredTokens,
       messagingTokenUpdatedAt: serverTimestamp(),
-    });
+    };
+    if (studentProfile?.messagingToken && studentProfile.messagingToken === token) {
+      updatePayload.messagingToken = deleteField();
+    }
+    await updateDoc(studentRef, updatePayload);
     setStudentProfile((prev) =>
       prev?.id === studentId
-        ? { ...prev, messagingToken: undefined }
+        ? {
+            ...prev,
+            messagingToken: prev.messagingToken === token ? undefined : prev.messagingToken,
+            messagingTokens: filteredTokens,
+          }
         : prev
     );
-  }, []);
+  }, [deviceId, studentProfile?.messagingToken, studentProfile?.messagingTokens]);
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
@@ -206,7 +284,7 @@ export const AuthProvider = ({ children }) => {
             }
             const profile = { id: docSnapshot.id, ...docSnapshot.data() };
             setStudentProfile(profile);
-            setMessagingToken(profile?.messagingToken || null);
+            setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
             setLoading(false);
           },
           (error) => {
@@ -374,7 +452,7 @@ export const AuthProvider = ({ children }) => {
       const profile =
         profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
       setStudentProfile(profile);
-      setMessagingToken(profile?.messagingToken || null);
+      setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
       const studentId = profile?.id || credential.user.uid;
       const studentCode = profile?.studentCode || profile?.studentcode || credential.user.uid;
       await logLoginSession({
@@ -494,7 +572,7 @@ export const AuthProvider = ({ children }) => {
     setIdToken(token);
     const mergedProfile = { ...existingProfile, uid: credential.user.uid, email };
     setStudentProfile(mergedProfile);
-    setMessagingToken(mergedProfile?.messagingToken || null);
+    setMessagingToken(getMessagingTokenFromProfile(mergedProfile, deviceId));
     await logLoginSession({
       uid: credential.user.uid,
       email,
@@ -531,9 +609,9 @@ export const AuthProvider = ({ children }) => {
         setIdToken(null);
         return;
       }
-      if (studentProfile?.id && studentProfile.messagingToken) {
+      if (studentProfile?.id && messagingToken) {
         try {
-          await revokeMessagingToken(studentProfile.id);
+          await revokeMessagingToken(studentProfile.id, messagingToken);
         } catch (error) {
           console.error("Failed to revoke messaging token", error);
         }
@@ -543,7 +621,7 @@ export const AuthProvider = ({ children }) => {
       setNotificationStatus("idle");
       setStudentProfile(null);
     },
-    [revokeMessagingToken, studentProfile?.id, studentProfile?.messagingToken]
+    [messagingToken, revokeMessagingToken, studentProfile?.id]
   );
 
   const enableNotifications = useCallback(
@@ -581,7 +659,7 @@ export const AuthProvider = ({ children }) => {
     const refreshMessagingToken = async () => {
       if (!user || !studentProfile || !isFirebaseConfigured) return;
 
-      const storedToken = studentProfile.messagingToken || null;
+      const storedToken = getMessagingTokenFromProfile(studentProfile, deviceId);
 
       if (typeof Notification !== "undefined") {
         if (Notification.permission === "denied") {
@@ -606,7 +684,7 @@ export const AuthProvider = ({ children }) => {
           return;
         }
         setMessagingToken(token);
-        if (studentProfile.messagingToken !== token) {
+        if (storedToken !== token) {
           await persistMessagingToken(token, studentProfile.id);
         }
         setNotificationStatus("granted");
