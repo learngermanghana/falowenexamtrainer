@@ -4,7 +4,7 @@ export const goetheExamLevels = [
     title: "Goethe-Zertifikat A1: Start Deutsch 1",
     description:
       "A German exam for adults. It certifies that candidates have acquired very basic language skills and corresponds to the first level (A1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
-    registrationUrl: "https://www.goethe.de/en/spr/kup/prf/prf/gzsd1.html",
+    registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzsd1.cfm",
     price: "3,000 GHS",
     location: "Goethe-Institut Accra",
     exams: [
@@ -24,7 +24,7 @@ export const goetheExamLevels = [
     level: "A2",
     title: "Goethe-Zertifikat A2",
     description: "A German exam for adults. It certifies basic language skills at the A2 level of the CEFR.",
-    registrationUrl: "https://www.goethe.de/en/spr/kup/prf/prf/gzsd2.html",
+    registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzsd2.cfm",
     price: "2,550 GHS",
     location: "Goethe-Institut Accra",
     exams: [
@@ -43,7 +43,7 @@ export const goetheExamLevels = [
     title: "Goethe-Zertifikat B1",
     description:
       "A German exam for young people and adults. It certifies that candidates are independent users of the German language and corresponds to the third level (B1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
-    registrationUrl: "https://www.goethe.de/en/spr/kup/prf/prf/gzb1.html",
+    registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzb1.cfm",
     price: "2,900 GHS",
     modulePrice: "950 GHS per module",
     location: "Goethe-Institut Accra",
@@ -57,5 +57,25 @@ export const goetheExamLevels = [
       { date: "2026-12-02", registrationStart: "2026-10-28", registrationEnd: "2026-10-28" },
       { date: "2026-12-03", registrationStart: "2026-10-28", registrationEnd: "2026-10-28" },
     ],
+  },
+  {
+    level: "B2",
+    title: "Goethe-Zertifikat B2",
+    description:
+      "A German exam for young people and adults. It certifies advanced language skills at the B2 level of the CEFR.",
+    registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzb2.cfm",
+    price: "Contact Goethe-Institut Accra",
+    location: "Goethe-Institut Accra",
+    exams: [],
+  },
+  {
+    level: "C1",
+    title: "Goethe-Zertifikat C1",
+    description:
+      "A German exam for adults. It certifies proficient language skills at the C1 level of the CEFR.",
+    registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzc1.cfm",
+    price: "Contact Goethe-Institut Accra",
+    location: "Goethe-Institut Accra",
+    exams: [],
   },
 ];
