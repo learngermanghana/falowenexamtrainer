@@ -215,6 +215,17 @@ const sendNotifications = async ({
   const messaging = getAdmin().messaging();
   const chunks = [];
   const invalidTokens = new Set();
+  const webpushOptions = {
+    headers: {
+      TTL: "86400",
+      Urgency: "high",
+    },
+    notification: {
+      actions: [{ action: "open", title: "Open" }],
+      data: { ...data },
+    },
+    fcmOptions: data?.route ? { link: data.route } : undefined,
+  };
 
   for (let i = 0; i < tokens.length; i += NOTIFICATION_BATCH_SIZE) {
     chunks.push(tokens.slice(i, i + NOTIFICATION_BATCH_SIZE));
@@ -225,6 +236,7 @@ const sendNotifications = async ({
       tokens: chunk,
       notification,
       data,
+      webpush: webpushOptions,
     });
     response.responses.forEach((result, index) => {
       if (result.success) return;
