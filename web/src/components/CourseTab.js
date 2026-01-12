@@ -6,7 +6,13 @@ import { classCatalog } from "../data/classCatalog";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
 
-const normalizeLevel = (level) => (level || "").toUpperCase();
+const extractLevelToken = (value) => {
+  if (!value) return "";
+  const match = String(value).toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
+  return match ? match[1] : "";
+};
+
+const normalizeLevel = (level) => extractLevelToken(level);
 const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const LEVEL_FALLBACK_RESOURCES = {
@@ -168,10 +174,11 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
   return levels.filter((level) => allowed.has(level));
 };
 
-const CourseTab = ({ defaultLevel }) => {
+const CourseTab = ({ defaultLevel, defaultClassName }) => {
+  const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const levels = useMemo(() => {
     const baseLevels = Object.keys(mergedCourseSchedules);
-    const normalizedDefault = normalizeLevel(defaultLevel);
+    const normalizedDefault = resolvedDefaultLevel;
     const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
     const allowedLevels = getAllowedCourseLevels(merged, normalizedDefault);
     return allowedLevels.sort((a, b) => {
@@ -182,10 +189,10 @@ const CourseTab = ({ defaultLevel }) => {
       if (bIndex !== -1) return 1;
       return a.localeCompare(b);
     });
-  }, [defaultLevel]);
+  }, [resolvedDefaultLevel]);
 
   const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
-    const normalizedDefault = normalizeLevel(defaultLevel);
+    const normalizedDefault = resolvedDefaultLevel;
     if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
     return levels[0] || "";
   });
@@ -194,7 +201,7 @@ const CourseTab = ({ defaultLevel }) => {
   const [assignmentsOnly, setAssignmentsOnly] = useState(false);
 
   useEffect(() => {
-    const normalizedDefault = normalizeLevel(defaultLevel);
+    const normalizedDefault = resolvedDefaultLevel;
     if (normalizedDefault && levels.includes(normalizedDefault) && normalizedDefault !== selectedCourseLevel) {
       setSelectedCourseLevel(normalizedDefault);
       return;
@@ -202,7 +209,7 @@ const CourseTab = ({ defaultLevel }) => {
     if (!levels.includes(selectedCourseLevel)) {
       setSelectedCourseLevel(levels[0] || "");
     }
-  }, [defaultLevel, levels, selectedCourseLevel]);
+  }, [levels, resolvedDefaultLevel, selectedCourseLevel]);
 
   const schedule = useMemo(() => mergedCourseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
   const isDerivedLevel = useMemo(() => derivedLevels.has(selectedCourseLevel), [selectedCourseLevel]);
