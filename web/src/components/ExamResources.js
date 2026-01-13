@@ -1,5 +1,7 @@
 import React from "react";
 import { styles } from "../styles";
+import { goetheExamLevels } from "../data/goetheExamSchedule";
+import { downloadExamReminder } from "../services/examCalendar";
 
 const goetheLevelLinks = {
   lesen: [
@@ -58,7 +60,15 @@ const resources = [
   },
 ];
 
+const formatDate = (value) => {
+  if (!value) return "";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleDateString();
+};
+
 const ExamResources = () => {
+  const hasExamDates = goetheExamLevels.some((level) => (level.exams || []).length > 0);
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
@@ -67,6 +77,70 @@ const ExamResources = () => {
         <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
           Bookmark these for last-minute checks. All tips stay in English so you can skim fast before your test.
         </p>
+      </section>
+
+      <section style={styles.card}>
+        <p style={{ ...styles.helperText, margin: 0 }}>Exam calendar</p>
+        <h3 style={{ ...styles.sectionTitle, margin: "6px 0" }}>Add Goethe exam reminders to your phone</h3>
+        <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>
+          Tap an exam date to download a calendar reminder so you can plan your practice before the exam starts.
+        </p>
+        {!hasExamDates ? (
+          <div style={styles.helperText}>Exam dates are not published yet.</div>
+        ) : (
+          <div style={{ display: "grid", gap: 12 }}>
+            {goetheExamLevels.map((levelInfo) => (
+              <div
+                key={`exam-reminder-${levelInfo.level}`}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 12,
+                  padding: 12,
+                  background: "#ffffff",
+                  display: "grid",
+                  gap: 8,
+                }}
+              >
+                <div style={{ fontWeight: 900, color: "#111827" }}>
+                  {levelInfo.level} · {levelInfo.title}
+                </div>
+                {levelInfo.exams.length === 0 ? (
+                  <div style={styles.helperText}>No exam dates listed yet.</div>
+                ) : (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {levelInfo.exams.map((exam, index) => (
+                      <div
+                        key={`${levelInfo.level}-reminder-${exam.date}-${index}`}
+                        style={{
+                          display: "flex",
+                          flexWrap: "wrap",
+                          gap: 8,
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          background: "#f9fafb",
+                          borderRadius: 10,
+                          padding: "8px 10px",
+                          border: "1px solid #f3f4f6",
+                        }}
+                      >
+                        <div style={{ fontSize: 13, color: "#374151" }}>
+                          📅 {formatDate(exam.date)} · {levelInfo.location}
+                        </div>
+                        <button
+                          type="button"
+                          style={{ ...styles.secondaryButton, padding: "4px 8px", fontSize: 12 }}
+                          onClick={() => downloadExamReminder({ levelInfo, exam })}
+                        >
+                          Add reminder (.ics)
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section style={styles.card}>
