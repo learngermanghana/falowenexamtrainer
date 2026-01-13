@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import {
   auth,
   createUserWithEmailAndPassword,
@@ -121,6 +121,7 @@ export const AuthProvider = ({ children }) => {
   const deviceId = useMemo(() => getDeviceId(), []);
   const devicePlatform = useMemo(() => getDevicePlatform(), []);
   const hasVapidKey = Boolean(process.env.REACT_APP_FIREBASE_VAPID_KEY);
+  const previousUserId = useRef(null);
 
   const persistMessagingToken = useCallback(async (token, studentId) => {
     if (!studentId || !token || !deviceId) return;
@@ -236,10 +237,16 @@ export const AuthProvider = ({ children }) => {
     }
 
     const unsubscribe = onIdTokenChanged(auth, async (firebaseUser) => {
-      setLoading(true);
+      const nextUserId = firebaseUser?.uid ?? null;
+      const userChanged = previousUserId.current !== nextUserId;
+      if (userChanged) {
+        setLoading(true);
+        setStudentProfile(null);
+      }
+
       setUser(firebaseUser);
-      setStudentProfile(null);
       setAuthError("");
+      previousUserId.current = nextUserId;
 
       if (!firebaseUser) {
         setIdToken(null);
@@ -255,6 +262,9 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         console.error("Failed to fetch ID token or profile", error);
         setAuthError("Konnte Login-Token nicht laden.");
+        if (userChanged) {
+          setLoading(false);
+        }
       }
     });
 
