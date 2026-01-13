@@ -976,7 +976,7 @@ const ClassDiscussionPage = () => {
                       </div>
                     </>
                   ) : (
-                    <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#111827" }}>
+                    <p style={styles.discussionMessage}>
                       {reply.text}
                       {reply.editedAt ? " · edited" : ""}
                     </p>
