@@ -6,7 +6,7 @@ export const ZOOM_DETAILS = {
 
 export const classCatalog = {
   "A1 Stuttgart Klasse": {
-    startDate: "2026-01-08",
+    startDate: "2026-01-14",
     endDate: "2026-03-26",
     schedule: [
       { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
