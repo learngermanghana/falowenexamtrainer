@@ -210,14 +210,12 @@ export const styles = {
     color: "#4b5563",
     marginBottom: 8,
   },
-  discussionFormatted: {
-    whiteSpace: "pre-wrap",
-    wordBreak: "break-word",
-  },
   discussionMessage: {
     fontSize: 13,
     color: "#111827",
     margin: "6px 0 0",
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
   },
   linkButton: {
     border: "none",
