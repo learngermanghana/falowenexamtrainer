@@ -669,8 +669,8 @@ export const courseSchedules = {
         "This is a practical exercise. All the answers are included in the document except for the last paragraph. You can send a screenshot of that to your tutor",
       grammar_topic: "Modal Verbs",
       schreiben_sprechen: {
-        video: "https://youtu.be/G08nQJh1Trc",
-        youtube_link: "https://youtu.be/G08nQJh1Trc",
+        video: "https://youtu.be/vMfOb_nPRNc",
+        youtube_link: "https://youtu.be/vMfOb_nPRNc",
         workbook_link: "https://drive.google.com/file/d/1oOT_b3S4MZIqZ10Kui-dR6qlM0AZfWZ4/view?usp=sharing",
         assignment: false,
       },
