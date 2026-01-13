@@ -6,6 +6,7 @@ import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { downloadClassCalendar } from "../services/classCalendar";
+import { downloadExamReminder } from "../services/examCalendar";
 import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
@@ -641,6 +642,13 @@ const MyExamFilePage = () => {
                         >
                           {registrationStatus}
                         </span>
+                        <button
+                          type="button"
+                          style={{ ...styles.secondaryButton, padding: "4px 8px", fontSize: 12 }}
+                          onClick={() => downloadExamReminder({ levelInfo, exam })}
+                        >
+                          Add reminder (.ics)
+                        </button>
                       </div>
                     </div>
                   );
