@@ -862,13 +862,14 @@ const ClassDiscussionPage = () => {
             ) : null}
 
             <div style={{ display: "grid", gap: 6 }}>
-              <div style={{ ...styles.helperText, margin: 0, fontSize: 14 }}>
+              <div style={{ ...styles.helperText, ...styles.discussionFormatted, margin: 0, fontSize: 14 }}>
                 <strong>Question:</strong> {thread.question}
               </div>
               {thread.instructions ? (
                 <div
                   style={{
                     ...styles.helperText,
+                    ...styles.discussionFormatted,
                     margin: 0,
                     background: "#f8fafc",
                     padding: 10,
@@ -976,7 +977,7 @@ const ClassDiscussionPage = () => {
                       </div>
                     </>
                   ) : (
-                    <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#111827" }}>
+                    <p style={{ ...styles.discussionMessage, ...styles.discussionFormatted }}>
                       {reply.text}
                       {reply.editedAt ? " · edited" : ""}
                     </p>
