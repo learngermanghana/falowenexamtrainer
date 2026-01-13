@@ -216,6 +216,14 @@ export const styles = {
     margin: "6px 0 0",
     whiteSpace: "pre-wrap",
     wordBreak: "break-word",
+    lineHeight: 1.55,
+  },
+  discussionLongText: {
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+    overflowWrap: "anywhere",
+    lineHeight: 1.6,
+    fontVariantNumeric: "tabular-nums",
   },
   linkButton: {
     border: "none",
