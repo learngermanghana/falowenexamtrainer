@@ -653,8 +653,8 @@ export const courseSchedules = {
       instruction:
         "Use the statement rule to talk about your weekly routine using the activities listed. Go to the classnotes page, search for the assignment number and add your contribution",
       schreiben_sprechen: {
-        video: "https://youtu.be/vVEZq_ipYzI",
-        youtube_link: "https://youtu.be/vVEZq_ipYzI",
+        video: "https://youtu.be/VLRCia5TENI",
+        youtube_link: "https://youtu.be/VLRCia5TENI",
         assignment: false,
         workbook_link: "https://drive.google.com/file/d/12oFKrKrHBwSpSnzxLX_e-cjPSiYtCFVs/view?usp=sharing",
       },
