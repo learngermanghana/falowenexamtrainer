@@ -120,6 +120,7 @@ export const AuthProvider = ({ children }) => {
   const [messagingToken, setMessagingToken] = useState(null);
   const deviceId = useMemo(() => getDeviceId(), []);
   const devicePlatform = useMemo(() => getDevicePlatform(), []);
+  const hasVapidKey = Boolean(process.env.REACT_APP_FIREBASE_VAPID_KEY);
 
   const persistMessagingToken = useCallback(async (token, studentId) => {
     if (!studentId || !token || !deviceId) return;
@@ -629,6 +630,11 @@ export const AuthProvider = ({ children }) => {
       if (!isFirebaseConfigured) {
         throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
       }
+      if (!hasVapidKey) {
+        console.warn("Push notifications disabled: missing REACT_APP_FIREBASE_VAPID_KEY.");
+        setNotificationStatus("idle");
+        return null;
+      }
       setNotificationStatus("pending");
       try {
         const token = await requestMessagingToken();
@@ -652,7 +658,7 @@ export const AuthProvider = ({ children }) => {
         throw error;
       }
     },
-    [persistMessagingToken, studentProfile?.id]
+    [hasVapidKey, persistMessagingToken, studentProfile?.id]
   );
 
   useEffect(() => {
@@ -660,6 +666,10 @@ export const AuthProvider = ({ children }) => {
       if (!user || !studentProfile || !isFirebaseConfigured) return;
 
       const storedToken = getMessagingTokenFromProfile(studentProfile, deviceId);
+      if (!hasVapidKey) {
+        setNotificationStatus("idle");
+        return;
+      }
 
       if (typeof Notification !== "undefined") {
         if (Notification.permission === "denied") {
@@ -695,7 +705,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     refreshMessagingToken();
-  }, [persistMessagingToken, studentProfile, user]);
+  }, [deviceId, hasVapidKey, persistMessagingToken, studentProfile, user]);
 
   const saveStudentProfile = useCallback(
     async (updates) => {
