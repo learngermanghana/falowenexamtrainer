@@ -163,15 +163,18 @@ const handleNavigationRequest = async (request) => {
   }
 };
 
-const handleStaticRequest = (request) =>
-  caches.match(request).then(
-    (cached) =>
-      cached ||
-      fetch(request)
-        .then((response) => cacheNetworkResponse(request, response))
-        .catch(() => caches.match(OFFLINE_URL)),
-    () => caches.match(OFFLINE_URL)
-  );
+const handleStaticRequest = async (request) => {
+  try {
+    const response = await fetch(request);
+    return await cacheNetworkResponse(request, response);
+  } catch (error) {
+    const cached = await caches.match(request);
+    if (cached) {
+      return cached;
+    }
+    return caches.match(OFFLINE_URL);
+  }
+};
 
 self.addEventListener("fetch", (event) => {
   const { request } = event;
