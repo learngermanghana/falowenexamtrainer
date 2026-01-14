@@ -6,6 +6,14 @@ const formatDateOnly = (value) => {
   return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}`;
 };
 
+const formatDateTimeLocal = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}T${pad(
+    date.getHours()
+  )}${pad(date.getMinutes())}${pad(date.getSeconds())}`;
+};
+
 const escapeText = (value) =>
   String(value || "")
     .replace(/\\n/g, "\\n")
@@ -73,6 +81,130 @@ export const downloadExamReminder = ({ levelInfo, exam }) => {
   link.href = url;
   const safeLevel = String(levelInfo.level || "exam").replace(/\s+/g, "-");
   link.download = `${safeLevel}-${exam.date}-reminder.ics`;
+  link.click();
+  window.URL.revokeObjectURL(url);
+};
+
+const normalizeDateOnly = (value) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+};
+
+const buildStudyEvents = ({
+  level,
+  startDate,
+  endDate,
+  daysOfWeek,
+  timeOfDay,
+  durationMinutes,
+  reminderMinutes,
+}) => {
+  const start = normalizeDateOnly(startDate);
+  const end = normalizeDateOnly(endDate);
+  if (!start || !end || start > end) return [];
+
+  const [hours, minutes] = timeOfDay.split(":").map((value) => Number.parseInt(value, 10));
+  const totalMinutes = Number.isNaN(durationMinutes) ? 60 : durationMinutes;
+  const reminderOffset = Number.isNaN(reminderMinutes) ? null : reminderMinutes;
+
+  const events = [];
+  for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
+    if (!daysOfWeek.includes(cursor.getDay())) continue;
+    const startTime = new Date(cursor);
+    startTime.setHours(Number.isNaN(hours) ? 18 : hours);
+    startTime.setMinutes(Number.isNaN(minutes) ? 0 : minutes);
+    startTime.setSeconds(0, 0);
+    const endTime = new Date(startTime.getTime() + totalMinutes * 60 * 1000);
+
+    const uid = `study-${level}-${formatDateTimeLocal(startTime)}@falowen`;
+    const descriptionLines = [
+      `Goethe ${level} study session`,
+      `Duration: ${totalMinutes} minutes`,
+      "Focus: practice tasks or review notes.",
+    ];
+
+    const eventLines = [
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${formatDateTimeLocal(new Date())}`,
+      `SUMMARY:${escapeText(`Goethe ${level} Study Session`)}`,
+      `DESCRIPTION:${escapeText(descriptionLines.join("\\n"))}`,
+      `DTSTART:${formatDateTimeLocal(startTime)}`,
+      `DTEND:${formatDateTimeLocal(endTime)}`,
+    ];
+
+    if (reminderOffset && reminderOffset > 0) {
+      eventLines.push(
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        `DESCRIPTION:${escapeText("Study session reminder")}`,
+        `TRIGGER:-PT${reminderOffset}M`,
+        "END:VALARM"
+      );
+    }
+
+    eventLines.push("END:VEVENT");
+    events.push(eventLines.join("\n"));
+  }
+  return events;
+};
+
+export const generateStudyCalendar = ({
+  level,
+  startDate,
+  endDate,
+  daysOfWeek,
+  timeOfDay,
+  durationMinutes,
+  reminderMinutes,
+}) => {
+  const eventBlocks = buildStudyEvents({
+    level,
+    startDate,
+    endDate,
+    daysOfWeek,
+    timeOfDay,
+    durationMinutes,
+    reminderMinutes,
+  });
+  if (eventBlocks.length === 0) return null;
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Falowen Learning Hub//Study Calendar//EN",
+    "CALSCALE:GREGORIAN",
+    ...eventBlocks,
+    "END:VCALENDAR",
+  ].join("\n");
+};
+
+export const downloadStudyCalendar = ({
+  level,
+  startDate,
+  endDate,
+  daysOfWeek,
+  timeOfDay,
+  durationMinutes,
+  reminderMinutes,
+}) => {
+  const calendar = generateStudyCalendar({
+    level,
+    startDate,
+    endDate,
+    daysOfWeek,
+    timeOfDay,
+    durationMinutes,
+    reminderMinutes,
+  });
+  if (!calendar) return;
+
+  const blob = new Blob([calendar], { type: "text/calendar" });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  const safeLevel = String(level || "study-plan").replace(/\s+/g, "-");
+  link.download = `${safeLevel}-study-calendar.ics`;
   link.click();
   window.URL.revokeObjectURL(url);
 };
