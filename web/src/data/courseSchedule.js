@@ -852,8 +852,8 @@ export const courseSchedules = {
       grammar_topic: "German Conjunctions",
       assignment: false,
       schreiben_sprechen: {
-        video: "https://youtu.be/WVq9x69dCeE",
-        youtube_link: "https://youtu.be/WVq9x69dCeE",
+        video: "https://youtu.be/ztFf2WJhj_Q",
+        youtube_link: "https://youtu.be/ztFf2WJhj_Q",
         workbook_link: "https://drive.google.com/file/d/1LE1b9ilkLLobE5Uw0TVLG0RIVpLK5k1t/view?usp=sharing",
         assignment: false,
       },
