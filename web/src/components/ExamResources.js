@@ -73,10 +73,6 @@ const ExamResources = () => {
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Exam calendar</p>
-        <h3 style={{ ...styles.sectionTitle, margin: "6px 0" }}>Add Goethe exam reminders to your phone</h3>
-        <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>
-          Tap an exam date to download a calendar reminder so you can plan your practice before the exam starts.
-        </p>
         {!hasExamDates ? (
           <div style={styles.helperText}>Exam dates are not published yet.</div>
         ) : (
