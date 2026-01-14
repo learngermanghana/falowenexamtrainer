@@ -72,14 +72,6 @@ const ExamResources = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
-        <p style={{ ...styles.helperText, margin: 0 }}>Resources hub</p>
-        <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Goethe links and quick tips</h2>
-        <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-          Bookmark these for last-minute checks. All tips stay in English so you can skim fast before your test.
-        </p>
-      </section>
-
-      <section style={styles.card}>
         <p style={{ ...styles.helperText, margin: 0 }}>Exam calendar</p>
         <h3 style={{ ...styles.sectionTitle, margin: "6px 0" }}>Add Goethe exam reminders to your phone</h3>
         <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>
