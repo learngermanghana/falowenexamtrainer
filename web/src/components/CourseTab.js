@@ -196,20 +196,27 @@ const CourseTab = ({ defaultLevel, defaultClassName }) => {
     if (normalizedDefault && levels.includes(normalizedDefault)) return normalizedDefault;
     return levels[0] || "";
   });
+  const [hasManualSelection, setHasManualSelection] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [assignmentsOnly, setAssignmentsOnly] = useState(false);
 
   useEffect(() => {
     const normalizedDefault = resolvedDefaultLevel;
-    if (normalizedDefault && levels.includes(normalizedDefault) && normalizedDefault !== selectedCourseLevel) {
+    if (
+      !hasManualSelection &&
+      normalizedDefault &&
+      levels.includes(normalizedDefault) &&
+      normalizedDefault !== selectedCourseLevel
+    ) {
       setSelectedCourseLevel(normalizedDefault);
       return;
     }
     if (!levels.includes(selectedCourseLevel)) {
       setSelectedCourseLevel(levels[0] || "");
+      setHasManualSelection(false);
     }
-  }, [levels, resolvedDefaultLevel, selectedCourseLevel]);
+  }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
 
   const schedule = useMemo(() => mergedCourseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
   const isDerivedLevel = useMemo(() => derivedLevels.has(selectedCourseLevel), [selectedCourseLevel]);
@@ -248,7 +255,14 @@ const CourseTab = ({ defaultLevel, defaultClassName }) => {
             <h2 style={styles.sectionTitle}>Course Book</h2>
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <span style={styles.helperText}>Course level:</span>
-              <select style={styles.select} value={selectedCourseLevel} onChange={(e) => setSelectedCourseLevel(e.target.value)}>
+              <select
+                style={styles.select}
+                value={selectedCourseLevel}
+                onChange={(e) => {
+                  setSelectedCourseLevel(e.target.value);
+                  setHasManualSelection(true);
+                }}
+              >
                 {levels.map((level) => (
                   <option key={level} value={level}>
                     {level}
