@@ -992,6 +992,9 @@ const ClassDiscussionPage = () => {
           </div>
 
           <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
+            </div>
             <textarea
               style={styles.textareaSmall}
               placeholder={isThreadOpen ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"}
