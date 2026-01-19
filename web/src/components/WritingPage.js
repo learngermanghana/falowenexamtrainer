@@ -20,7 +20,7 @@ const IDEA_COACH_INTRO = {
   id: "intro",
   role: "assistant",
   content:
-    "Paste your exam question or draft idea, and I'll guide you step by step with Herr Felix's coaching prompts.",
+    "This is a chat between you and the ideas generator. Paste your exam question or draft idea, and I'll guide you step by step with Herr Felix's coaching prompts.",
 };
 
 const mapExamPromptsToLetters = (prompts) =>
