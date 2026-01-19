@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
+import { useToast } from "../context/ToastContext";
 import { classCatalog } from "../data/classCatalog";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { loadPreferredClass } from "../services/classSelectionStorage";
@@ -121,6 +122,7 @@ const OnboardingChecklist = ({
   onSaveOnboarding,
 }) => {
   const { levelConfirmed } = useExam();
+  const { showToast } = useToast();
 
   const [state, setState] = useState(() => {
     const persisted = loadState();
@@ -145,6 +147,13 @@ const OnboardingChecklist = ({
   const classRef = useRef(null);
   const calendarRef = useRef(null);
   const notifRef = useRef(null);
+  const completionRef = useRef({
+    level: levelConfirmed,
+    class: false,
+    calendar: false,
+    notifications: false,
+  });
+  const hasMountedRef = useRef(false);
 
   useEffect(() => persistState(state), [state]);
 
@@ -212,6 +221,48 @@ const OnboardingChecklist = ({
     return "save";
   }, [calendarDownloaded, classStepComplete, levelStepComplete, notificationsStepComplete]);
 
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      completionRef.current = {
+        level: levelStepComplete,
+        class: classStepComplete,
+        calendar: calendarDownloaded,
+        notifications: notificationsStepComplete,
+      };
+      hasMountedRef.current = true;
+      return;
+    }
+
+    const previous = completionRef.current;
+
+    if (!previous.level && levelStepComplete) {
+      showToast("Level saved.", "success");
+    }
+    if (!previous.class && classStepComplete) {
+      showToast("Class confirmed.", "success");
+    }
+    if (!previous.calendar && calendarDownloaded) {
+      showToast("Calendar downloaded.", "success");
+    }
+    if (!previous.notifications && notificationsStepComplete) {
+      showToast(state.notificationsSkipped ? "Notifications skipped for now." : "Notifications enabled.", "success");
+    }
+
+    completionRef.current = {
+      level: levelStepComplete,
+      class: classStepComplete,
+      calendar: calendarDownloaded,
+      notifications: notificationsStepComplete,
+    };
+  }, [
+    calendarDownloaded,
+    classStepComplete,
+    levelStepComplete,
+    notificationsStepComplete,
+    showToast,
+    state.notificationsSkipped,
+  ]);
+
   // Auto-scroll to next step in guided mode
   useEffect(() => {
     if (!state.guidedMode) return;
@@ -262,6 +313,7 @@ const OnboardingChecklist = ({
     setSavingOnboarding(true);
     try {
       await onSaveOnboarding();
+      showToast("Onboarding saved. You're all set!", "success");
       setLocalCompletion(true);
     } catch (error) {
       console.error("Failed to save onboarding", error);
