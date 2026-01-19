@@ -196,7 +196,7 @@ export const AuthProvider = ({ children }) => {
         console.error("Failed to log login session", error);
       }
     },
-    [db, isFirebaseConfigured]
+    []
   );
 
   const revokeMessagingToken = useCallback(async (studentId, token) => {
@@ -232,7 +232,7 @@ export const AuthProvider = ({ children }) => {
       setAuthError("Firebase ist nicht konfiguriert. Bitte REACT_APP_FIREBASE_* Variablen setzen.");
       setLoading(false);
     }
-  }, [isFirebaseConfigured]);
+  }, []);
 
   useEffect(() => {
     if (!isFirebaseConfigured || !auth) {
@@ -272,7 +272,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  }, [auth, isFirebaseConfigured]);
+  }, []);
 
   useEffect(() => {
     if (!user?.uid || !isFirebaseConfigured || !db) {
@@ -367,180 +367,186 @@ export const AuthProvider = ({ children }) => {
         unsubscribe();
       }
     };
-  }, [db, deviceId, isFirebaseConfigured, user?.email, user?.uid]);
+  }, [deviceId, user?.email, user?.uid]);
 
   // ✅ UPDATED signup: now includes address
-  const signup = async (email, password, profile = {}) => {
-    if (!isFirebaseConfigured || !auth) {
-      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
-    }
-    setAuthError("");
-
-    const normalizedEmail = email.trim().toLowerCase();
-    const credential = await createUserWithEmailAndPassword(
-      auth,
-      normalizedEmail,
-      password
-    );
-
-    const token = await credential.user.getIdToken();
-    setIdToken(token);
-
-    const studentCode = profile.studentCode;
-    const studentId = studentCode || credential.user.uid;
-    const studentsRef = doc(db, "students", studentId);
-
-    const payload = {
-      uid: credential.user.uid,
-      name: profile.name || profile.firstName || "",
-      email: normalizedEmail,
-      role: "student",
-      studentCode: studentId,
-      about: "",
-      level: (profile.level || "").toUpperCase(),
-      className: profile.className || "",
-      phone: profile.phone || "",
-      location: profile.location || "",
-
-      learningMode: profile.learningMode || "", // already there ✅
-      address: profile.address || "",            // ✅ NEW FIELD
-
-      emergencyContactPhone: profile.emergencyContactPhone || "",
-      status: profile.status || "Active",
-      initialPaymentAmount: profile.initialPaymentAmount ?? 0,
-      tuitionFee: profile.tuitionFee ?? null,
-      balanceDue: profile.balanceDue ?? null,
-      paymentStatus: profile.paymentStatus || "pending",
-      paystackLink: profile.paystackLink || "",
-      paymentIntentAmount: profile.paymentIntentAmount ?? null,
-      contractStart: profile.contractStart || "",
-      contractEnd: profile.contractEnd || "",
-      contractTermMonths: profile.contractTermMonths ?? null,
-      joined_at: new Date().toISOString(),
-      updated_at: serverTimestamp(),
-      syncedToSheets: false,
-    };
-
-    if (studentCode) {
-      payload.studentcode = studentCode;
-    }
-
-    await setDoc(studentsRef, payload, { merge: true });
-    setStudentProfile({ id: studentsRef.id, ...payload });
-    setNotificationStatus("idle");
-    await logLoginSession({
-      uid: credential.user.uid,
-      email: normalizedEmail,
-      studentId: studentsRef.id,
-      studentCode: studentId,
-      provider: "password",
-      meta: { isSignup: true },
-    });
-    return { studentCode, paystackLink: payload.paystackLink };
-  };
-
-  const login = async (identifier, password) => {
-    if (!isFirebaseConfigured || !auth) {
-      throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
-    }
-    setAuthError("");
-    const cleanedIdentifier = identifier.trim();
-    const isEmailLogin = cleanedIdentifier.includes("@");
-    let normalizedEmail = isEmailLogin ? cleanedIdentifier.toLowerCase() : "";
-    let profileFromCode = null;
-
-    if (!isEmailLogin) {
-      profileFromCode = await fetchStudentProfileByStudentCode(cleanedIdentifier);
-      if (!profileFromCode) {
-        throw new Error("Student code not found. Please check and try again.");
+  const signup = useCallback(
+    async (email, password, profile = {}) => {
+      if (!isFirebaseConfigured || !auth) {
+        throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
       }
-      if (!profileFromCode.email) {
-        throw new Error("We couldn't find an email for this student code. Please contact support.");
-      }
-      normalizedEmail = profileFromCode.email.trim().toLowerCase();
-    }
+      setAuthError("");
 
-    const finalizeLogin = async (credential, profileOverride = null, meta = {}) => {
-      const token = await credential.user.getIdToken();
-      setIdToken(token);
-      const profile =
-        profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
-      setStudentProfile(profile);
-      setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
-      const studentId = profile?.id || credential.user.uid;
-      const studentCode = profile?.studentCode || profile?.studentcode || credential.user.uid;
-      await logLoginSession({
-        uid: credential.user.uid,
-        email: normalizedEmail,
-        studentId,
-        studentCode,
-        provider: "password",
-        meta,
-      });
-
-      if (meta.migratedFromLegacy) {
-        credential.migratedFromLegacy = true;
-      }
-
-      return { credential, ...meta };
-    };
-
-    try {
-      const credential = await signInWithEmailAndPassword(
+      const normalizedEmail = email.trim().toLowerCase();
+      const credential = await createUserWithEmailAndPassword(
         auth,
         normalizedEmail,
         password
       );
-      return await finalizeLogin(credential);
-    } catch (error) {
-      if (error?.code === "auth/user-not-found") {
-        const existingProfile =
-          profileFromCode || (await fetchStudentProfileByEmail(normalizedEmail));
 
-        if (existingProfile) {
-          const migratedCredential = await createUserWithEmailAndPassword(
-            auth,
-            normalizedEmail,
-            password
-          );
+      const token = await credential.user.getIdToken();
+      setIdToken(token);
 
-          const mergedStudentCode =
-            existingProfile.studentCode ||
-            existingProfile.studentcode ||
-            existingProfile.id ||
-            migratedCredential.user.uid;
+      const studentCode = profile.studentCode;
+      const studentId = studentCode || credential.user.uid;
+      const studentsRef = doc(db, "students", studentId);
 
-          const studentRef = doc(db, "students", existingProfile.id);
-          const mergedProfile = {
-            ...existingProfile,
-            uid: migratedCredential.user.uid,
-            studentCode: mergedStudentCode,
-            studentcode: mergedStudentCode,
-            email: normalizedEmail,
-          };
+      const payload = {
+        uid: credential.user.uid,
+        name: profile.name || profile.firstName || "",
+        email: normalizedEmail,
+        role: "student",
+        studentCode: studentId,
+        about: "",
+        level: (profile.level || "").toUpperCase(),
+        className: profile.className || "",
+        phone: profile.phone || "",
+        location: profile.location || "",
 
-          await setDoc(
-            studentRef,
-            {
+        learningMode: profile.learningMode || "", // already there ✅
+        address: profile.address || "",            // ✅ NEW FIELD
+
+        emergencyContactPhone: profile.emergencyContactPhone || "",
+        status: profile.status || "Active",
+        initialPaymentAmount: profile.initialPaymentAmount ?? 0,
+        tuitionFee: profile.tuitionFee ?? null,
+        balanceDue: profile.balanceDue ?? null,
+        paymentStatus: profile.paymentStatus || "pending",
+        paystackLink: profile.paystackLink || "",
+        paymentIntentAmount: profile.paymentIntentAmount ?? null,
+        contractStart: profile.contractStart || "",
+        contractEnd: profile.contractEnd || "",
+        contractTermMonths: profile.contractTermMonths ?? null,
+        joined_at: new Date().toISOString(),
+        updated_at: serverTimestamp(),
+        syncedToSheets: false,
+      };
+
+      if (studentCode) {
+        payload.studentcode = studentCode;
+      }
+
+      await setDoc(studentsRef, payload, { merge: true });
+      setStudentProfile({ id: studentsRef.id, ...payload });
+      setNotificationStatus("idle");
+      await logLoginSession({
+        uid: credential.user.uid,
+        email: normalizedEmail,
+        studentId: studentsRef.id,
+        studentCode: studentId,
+        provider: "password",
+        meta: { isSignup: true },
+      });
+      return { studentCode, paystackLink: payload.paystackLink };
+    },
+    [logLoginSession]
+  );
+
+  const login = useCallback(
+    async (identifier, password) => {
+      if (!isFirebaseConfigured || !auth) {
+        throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
+      }
+      setAuthError("");
+      const cleanedIdentifier = identifier.trim();
+      const isEmailLogin = cleanedIdentifier.includes("@");
+      let normalizedEmail = isEmailLogin ? cleanedIdentifier.toLowerCase() : "";
+      let profileFromCode = null;
+
+      if (!isEmailLogin) {
+        profileFromCode = await fetchStudentProfileByStudentCode(cleanedIdentifier);
+        if (!profileFromCode) {
+          throw new Error("Student code not found. Please check and try again.");
+        }
+        if (!profileFromCode.email) {
+          throw new Error("We couldn't find an email for this student code. Please contact support.");
+        }
+        normalizedEmail = profileFromCode.email.trim().toLowerCase();
+      }
+
+      const finalizeLogin = async (credential, profileOverride = null, meta = {}) => {
+        const token = await credential.user.getIdToken();
+        setIdToken(token);
+        const profile =
+          profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
+        setStudentProfile(profile);
+        setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
+        const studentId = profile?.id || credential.user.uid;
+        const studentCode = profile?.studentCode || profile?.studentcode || credential.user.uid;
+        await logLoginSession({
+          uid: credential.user.uid,
+          email: normalizedEmail,
+          studentId,
+          studentCode,
+          provider: "password",
+          meta,
+        });
+
+        if (meta.migratedFromLegacy) {
+          credential.migratedFromLegacy = true;
+        }
+
+        return { credential, ...meta };
+      };
+
+      try {
+        const credential = await signInWithEmailAndPassword(
+          auth,
+          normalizedEmail,
+          password
+        );
+        return await finalizeLogin(credential);
+      } catch (error) {
+        if (error?.code === "auth/user-not-found") {
+          const existingProfile =
+            profileFromCode || (await fetchStudentProfileByEmail(normalizedEmail));
+
+          if (existingProfile) {
+            const migratedCredential = await createUserWithEmailAndPassword(
+              auth,
+              normalizedEmail,
+              password
+            );
+
+            const mergedStudentCode =
+              existingProfile.studentCode ||
+              existingProfile.studentcode ||
+              existingProfile.id ||
+              migratedCredential.user.uid;
+
+            const studentRef = doc(db, "students", existingProfile.id);
+            const mergedProfile = {
+              ...existingProfile,
               uid: migratedCredential.user.uid,
               studentCode: mergedStudentCode,
               studentcode: mergedStudentCode,
               email: normalizedEmail,
-              role: existingProfile.role || "student",
-              updated_at: serverTimestamp(),
-            },
-            { merge: true }
-          );
+            };
 
-          return await finalizeLogin(migratedCredential, mergedProfile, {
-            migratedFromLegacy: true,
-          });
+            await setDoc(
+              studentRef,
+              {
+                uid: migratedCredential.user.uid,
+                studentCode: mergedStudentCode,
+                studentcode: mergedStudentCode,
+                email: normalizedEmail,
+                role: existingProfile.role || "student",
+                updated_at: serverTimestamp(),
+              },
+              { merge: true }
+            );
+
+            return await finalizeLogin(migratedCredential, mergedProfile, {
+              migratedFromLegacy: true,
+            });
+          }
         }
-      }
 
-      throw error;
-    }
-  };
+        throw error;
+      }
+    },
+    [deviceId, logLoginSession]
+  );
 
   const loginWithGoogle = useCallback(async () => {
     if (!isFirebaseConfigured || !auth) {
@@ -595,16 +601,16 @@ export const AuthProvider = ({ children }) => {
       provider: "google",
     });
     return { credential, profile: mergedProfile };
-  }, [auth, db, deviceId, isFirebaseConfigured, logLoginSession]);
+  }, [deviceId, logLoginSession]);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     if (!auth?.currentUser) return null;
     await reload(auth.currentUser);
     setUser(auth.currentUser);
     return auth.currentUser;
-  };
+  }, []);
 
-  const resetPassword = async (email) => {
+  const resetPassword = useCallback(async (email) => {
     if (!isFirebaseConfigured || !auth) {
       throw new Error("Firebase-Konfiguration fehlt. Bitte .env Variablen setzen.");
     }
@@ -613,7 +619,7 @@ export const AuthProvider = ({ children }) => {
     }
     const normalizedEmail = email.trim().toLowerCase();
     await sendPasswordResetEmail(auth, normalizedEmail, getActionCodeSettings());
-  };
+  }, []);
 
   const logout = useCallback(
     async () => {
