@@ -25,16 +25,6 @@ export const classCatalog = {
     ],
     docUrl: "https://drive.google.com/file/d/1R7b3PqPvOVMKVOTbYVTDzmbw0N_UA7wQ/view?usp=sharing",
   },
-  "A1 Bonn Klasse": {
-    startDate: "2025-11-10",
-    endDate: "2026-01-13",
-    schedule: [
-      { day: "Monday", startTime: "11:00", endTime: "12:00" },
-      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
-      { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/13X4LxOTE4yfe4dw_k_ILLdzrbTm54ZEI/view?usp=sharing",
-  },
   "A1 Munich Klasse": {
     startDate: "2025-12-03",
     endDate: "2026-02-09",
