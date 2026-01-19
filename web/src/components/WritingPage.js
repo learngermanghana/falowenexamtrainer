@@ -251,7 +251,7 @@ const WritingPage = ({ mode = "course" }) => {
     return () => {
       isMounted = false;
     };
-  }, [progressMode, userId]);
+  }, [progressMode, studentCode, userId]);
 
   useEffect(() => {
     if (!progressLoaded || (!userId && !studentCode)) return;
