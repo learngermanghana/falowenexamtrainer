@@ -102,6 +102,22 @@ const shuffleArray = (items) => {
   return copy;
 };
 
+// ✅ Placeholder reviews (clearly labeled as sample)
+const studentReviews = [
+  { name: "Ama", country: "Ghana", level: "A1", stars: 5, text: "The speaking practice is clear and easy to follow. I finally got confident asking questions." },
+  { name: "Samuel", country: "Nigeria", level: "A2", stars: 5, text: "I like the tutor feedback. It shows exactly what to improve in my writing." },
+  { name: "Amina", country: "Kenya", level: "A1", stars: 4, text: "The lessons are structured. Daily practice keeps me consistent even when I’m busy." },
+  { name: "Fatou", country: "Senegal", level: "A2", stars: 5, text: "The exam-style tasks feel real. I now understand Teil 1, 2, and 3 for speaking." },
+  { name: "Youssef", country: "Morocco", level: "B1", stars: 5, text: "The writing steps help me organize ideas. My letters look more professional now." },
+  { name: "Lerato", country: "South Africa", level: "A1", stars: 4, text: "Simple instructions and helpful corrections. The platform is easy to use." },
+  { name: "Kofi", country: "Ghana", level: "A2", stars: 5, text: "I improved my pronunciation by recording and checking feedback regularly." },
+  { name: "Mariam", country: "Tanzania", level: "A1", stars: 5, text: "The class schedule and daily tasks make learning predictable and less stressful." },
+  { name: "Ibrahim", country: "Egypt", level: "B1", stars: 4, text: "Good practice materials. I like that it focuses on real exam conversation." },
+  { name: "Chiamaka", country: "Nigeria", level: "A1", stars: 5, text: "I used to fear speaking. Now I can introduce myself and ask polite requests." },
+  { name: "Hawa", country: "Mali", level: "A2", stars: 4, text: "The tutor reviews are strong. I understand my mistakes much faster." },
+  { name: "Patrick", country: "Uganda", level: "A1", stars: 5, text: "Short daily practice works. Even 10 minutes helps me stay active." },
+];
+
 const ReviewCard = ({ stars = 5, name, country, level, text }) => (
   <div
     style={{
@@ -181,22 +197,6 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     { title: "Choose your level/class", description: "Select the cohort you want (e.g., A1/A2/B1) based on schedule and availability." },
     { title: "Complete payment to unlock access", description: "After selecting your cohort, complete payment to unlock full access to the course tools." },
     { title: "Get onboarding support", description: "We follow up with your welcome checklist, class links, and next steps." },
-  ];
-
-  // ✅ Placeholder reviews (clearly labeled as sample)
-  const studentReviews = [
-    { name: "Ama", country: "Ghana", level: "A1", stars: 5, text: "The speaking practice is clear and easy to follow. I finally got confident asking questions." },
-    { name: "Samuel", country: "Nigeria", level: "A2", stars: 5, text: "I like the tutor feedback. It shows exactly what to improve in my writing." },
-    { name: "Amina", country: "Kenya", level: "A1", stars: 4, text: "The lessons are structured. Daily practice keeps me consistent even when I’m busy." },
-    { name: "Fatou", country: "Senegal", level: "A2", stars: 5, text: "The exam-style tasks feel real. I now understand Teil 1, 2, and 3 for speaking." },
-    { name: "Youssef", country: "Morocco", level: "B1", stars: 5, text: "The writing steps help me organize ideas. My letters look more professional now." },
-    { name: "Lerato", country: "South Africa", level: "A1", stars: 4, text: "Simple instructions and helpful corrections. The platform is easy to use." },
-    { name: "Kofi", country: "Ghana", level: "A2", stars: 5, text: "I improved my pronunciation by recording and checking feedback regularly." },
-    { name: "Mariam", country: "Tanzania", level: "A1", stars: 5, text: "The class schedule and daily tasks make learning predictable and less stressful." },
-    { name: "Ibrahim", country: "Egypt", level: "B1", stars: 4, text: "Good practice materials. I like that it focuses on real exam conversation." },
-    { name: "Chiamaka", country: "Nigeria", level: "A1", stars: 5, text: "I used to fear speaking. Now I can introduce myself and ask polite requests." },
-    { name: "Hawa", country: "Mali", level: "A2", stars: 4, text: "The tutor reviews are strong. I understand my mistakes much faster." },
-    { name: "Patrick", country: "Uganda", level: "A1", stars: 5, text: "Short daily practice works. Even 10 minutes helps me stay active." },
   ];
 
   const featuredReviews = React.useMemo(() => shuffleArray(studentReviews).slice(0, 6), []);
@@ -343,16 +343,23 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               <div style={{ ...styles.helperText, margin: 0 }}>✅ Best for: students preparing for Goethe-style speaking and writing tasks.</div>
             </div>
 
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                onSignUp();
+            <button
+              type="button"
+              onClick={onSignUp}
+              style={{
+                color: "#1d4ed8",
+                fontWeight: 900,
+                textDecoration: "none",
+                marginTop: 8,
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+                textAlign: "left",
               }}
-              style={{ color: "#1d4ed8", fontWeight: 900, textDecoration: "none", marginTop: 8 }}
             >
               Ready? Join a cohort →
-            </a>
+            </button>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
@@ -432,16 +439,22 @@ const LandingPage = ({ onSignUp, onLogin }) => {
                     Join a cohort
                   </button>
 
-                  <a
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onLogin();
+                  <button
+                    type="button"
+                    onClick={onLogin}
+                    style={{
+                      color: "#a5b4fc",
+                      fontWeight: 900,
+                      textDecoration: "none",
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      cursor: "pointer",
+                      textAlign: "left",
                     }}
-                    style={{ color: "#a5b4fc", fontWeight: 900, textDecoration: "none" }}
                   >
                     Already a student? Log in →
-                  </a>
+                  </button>
                 </div>
               </div>
 
