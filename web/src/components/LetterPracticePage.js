@@ -7,6 +7,7 @@ import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService"
 import { writingLetters } from "../data/writingLetters";
 
 const IDEA_COACH_INTRO = {
+  id: "intro",
   role: "assistant",
   content:
     "This is a chat between you and the ideas generator. Paste your exam prompt or describe the situation, and I'll guide you step by step with Herr Felix's coaching prompts until your letter is ready.",
@@ -41,6 +42,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
+  const [ideaSuccess, setIdeaSuccess] = useState("");
+  const [selectedDraftIds, setSelectedDraftIds] = useState([]);
   const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
   const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -64,6 +67,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const resetErrors = () => {
     setError("");
     setIdeaError("");
+    setIdeaSuccess("");
   };
 
   const handleTabChange = (tabKey) => {
@@ -76,6 +80,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       setActiveTab(availableTabs[0].key);
       setError("");
       setIdeaError("");
+      setIdeaSuccess("");
     }
   }, [activeTab, availableTabs, setError, setIdeaError]);
 
@@ -176,8 +181,61 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     }
   };
 
+  const makeChatMessage = (role, content) => ({
+    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+    role,
+    content,
+  });
+
   const addChatMessage = (role, content) => {
-    setChatMessages((prev) => [...prev, { role, content }]);
+    setChatMessages((prev) => [...prev, makeChatMessage(role, content)]);
+  };
+
+  const userMessages = useMemo(
+    () => chatMessages.filter((msg) => msg.role === "user"),
+    [chatMessages]
+  );
+
+  const toggleDraftSelection = (id) => {
+    setIdeaSuccess("");
+    setIdeaError("");
+    setSelectedDraftIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const selectedDraftText = useMemo(() => {
+    return userMessages
+      .filter((msg) => selectedDraftIds.includes(msg.id))
+      .map((msg) => msg.content.trim())
+      .filter(Boolean)
+      .join("\n\n");
+  }, [selectedDraftIds, userMessages]);
+
+  const sendDraftsToMarkTab = () => {
+    const livePreview = ideaInput.trim();
+    const combinedDraft = [selectedDraftText, livePreview]
+      .filter(Boolean)
+      .join("\n\n");
+
+    if (!combinedDraft) {
+      setIdeaError(
+        "Select at least one draft or type something in the live preview before sending it for marking."
+      );
+      setIdeaSuccess("");
+      return;
+    }
+
+    setLetterText((prev) => {
+      const existing = prev.trim();
+      const parts = [existing, combinedDraft].filter(Boolean);
+      return parts.join("\n\n");
+    });
+    setMarkFeedback("");
+    setIdeaSuccess("Your selected lines are now pasted into the “Mark my letter” tab.");
+    setIdeaError("");
+    setSelectedDraftIds([]);
+    setActiveTab("mark");
   };
 
   const handleAskForIdeas = async () => {
@@ -186,7 +244,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
     resetErrors();
 
-    const updatedMessages = [...chatMessages, { role: "user", content: trimmed }];
+    const updatedMessages = [...chatMessages, makeChatMessage("user", trimmed)];
     setChatMessages(updatedMessages);
     setIdeaInput("");
     setIdeasLoading(true);
@@ -439,7 +497,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
           <div style={{ ...styles.chatLog, marginTop: 12 }}>
             {chatMessages.map((msg, idx) => (
-              <div key={`${msg.role}-${idx}`} style={msg.role === "assistant" ? styles.chatBubbleCoach : styles.chatBubbleUser}>
+              <div
+                key={msg.id || `${msg.role}-${idx}`}
+                style={msg.role === "assistant" ? styles.chatBubbleCoach : styles.chatBubbleUser}
+              >
                 <strong style={{ display: "block", marginBottom: 4 }}>{msg.role === "assistant" ? "Coach" : "You"}</strong>
                 <span>{msg.content}</span>
               </div>
@@ -467,6 +528,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                 setChatMessages([IDEA_COACH_INTRO]);
                 setIdeaInput("");
                 resetErrors();
+                setSelectedDraftIds([]);
               }}
             >
               Reset chat
@@ -478,6 +540,91 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               <strong>Hinweis:</strong> {ideaError}
             </div>
           )}
+
+          <div style={{ marginTop: 16 }}>
+            <h4 style={styles.resultHeading}>Preview & quick copy</h4>
+            <p style={styles.helperText}>
+              Choose parts from your chat messages or use the live preview below.
+              We will place them in the “Mark my letter” tab so you can get them graded quickly.
+            </p>
+            <div style={styles.gridTwo}>
+              <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+                <div style={styles.metaRow}>
+                  <div style={{ fontWeight: 800 }}>Live preview</div>
+                  <span style={styles.badge}>Visible only to you</span>
+                </div>
+                <p style={styles.helperText}>
+                  See what you're typing before you send it.
+                </p>
+                <div
+                  style={{
+                    border: "1px dashed #d1d5db",
+                    borderRadius: 10,
+                    padding: 10,
+                    minHeight: 80,
+                    background: "#f8fafc",
+                    whiteSpace: "pre-wrap",
+                  }}
+                >
+                  {ideaInput.trim() || "No draft typed yet."}
+                </div>
+              </div>
+
+              <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+                <div style={styles.metaRow}>
+                  <div style={{ fontWeight: 800 }}>Pick from your chat</div>
+                  <span style={styles.badge}>{userMessages.length} drafts</span>
+                </div>
+                {userMessages.length === 0 ? (
+                  <p style={styles.helperText}>
+                    Send a question in the chat, then you can select your own messages here.
+                  </p>
+                ) : (
+                  <div style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }}>
+                    {userMessages.map((msg) => (
+                      <label
+                        key={msg.id}
+                        style={{
+                          display: "flex",
+                          gap: 10,
+                          alignItems: "flex-start",
+                          border: "1px solid #e5e7eb",
+                          borderRadius: 10,
+                          padding: 10,
+                          background: selectedDraftIds.includes(msg.id) ? "#eef2ff" : "#f9fafb",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedDraftIds.includes(msg.id)}
+                          onChange={() => toggleDraftSelection(msg.id)}
+                          style={{ marginTop: 4 }}
+                        />
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 13, color: "#1f2937" }}>Your chat entry</div>
+                          <p style={{ ...styles.helperText, marginBottom: 0, whiteSpace: "pre-wrap" }}>
+                            {msg.content}
+                          </p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                )}
+                <button
+                  style={{ ...styles.primaryButton, marginTop: 10 }}
+                  onClick={sendDraftsToMarkTab}
+                >
+                  Send to “Mark my letter”
+                </button>
+                {ideaSuccess && (
+                  <div style={{ ...styles.successBox, marginTop: 8 }}>
+                    {ideaSuccess}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </section>
       )}
 
