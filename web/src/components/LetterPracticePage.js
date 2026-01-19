@@ -9,7 +9,7 @@ import { writingLetters } from "../data/writingLetters";
 const IDEA_COACH_INTRO = {
   role: "assistant",
   content:
-    "Paste your exam prompt or describe the situation. I'll guide you step by step with Herr Felix's coaching prompts until your letter is ready.",
+    "This is a chat between you and the ideas generator. Paste your exam prompt or describe the situation, and I'll guide you step by step with Herr Felix's coaching prompts until your letter is ready.",
 };
 
 const LetterPracticePage = ({ mode = "exams" }) => {
