@@ -170,31 +170,34 @@ export const AuthProvider = ({ children }) => {
     );
   }, [deviceId, devicePlatform, studentProfile?.messagingTokens]);
 
-  const logLoginSession = useCallback(async ({ uid, email, studentId, studentCode, provider, meta = {} }) => {
-    if (!isFirebaseConfigured || !db || !uid) return;
-    try {
-      const sessionPayload = {
-        uid,
-        email: email || null,
-        studentId: studentId || null,
-        studentCode: studentCode || null,
-        provider: provider || "unknown",
-        loggedInAt: serverTimestamp(),
-        userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
-        language: typeof navigator !== "undefined" ? navigator.language : null,
-        timeZone:
-          typeof Intl !== "undefined"
-            ? Intl.DateTimeFormat().resolvedOptions().timeZone
-            : null,
-        origin: typeof window !== "undefined" ? window.location.origin : null,
-        ...meta,
-      };
+  const logLoginSession = useCallback(
+    async ({ uid, email, studentId, studentCode, provider, meta = {} }) => {
+      if (!isFirebaseConfigured || !db || !uid) return;
+      try {
+        const sessionPayload = {
+          uid,
+          email: email || null,
+          studentId: studentId || null,
+          studentCode: studentCode || null,
+          provider: provider || "unknown",
+          loggedInAt: serverTimestamp(),
+          userAgent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+          language: typeof navigator !== "undefined" ? navigator.language : null,
+          timeZone:
+            typeof Intl !== "undefined"
+              ? Intl.DateTimeFormat().resolvedOptions().timeZone
+              : null,
+          origin: typeof window !== "undefined" ? window.location.origin : null,
+          ...meta,
+        };
 
-      await addDoc(collection(db, "loginSessions"), sessionPayload);
-    } catch (error) {
-      console.error("Failed to log login session", error);
-    }
-  }, []);
+        await addDoc(collection(db, "loginSessions"), sessionPayload);
+      } catch (error) {
+        console.error("Failed to log login session", error);
+      }
+    },
+    [db, isFirebaseConfigured]
+  );
 
   const revokeMessagingToken = useCallback(async (studentId, token) => {
     if (!studentId || !deviceId) return;
@@ -229,7 +232,7 @@ export const AuthProvider = ({ children }) => {
       setAuthError("Firebase ist nicht konfiguriert. Bitte REACT_APP_FIREBASE_* Variablen setzen.");
       setLoading(false);
     }
-  }, []);
+  }, [isFirebaseConfigured]);
 
   useEffect(() => {
     if (!isFirebaseConfigured || !auth) {
@@ -269,7 +272,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  }, []);
+  }, [auth, isFirebaseConfigured]);
 
   useEffect(() => {
     if (!user?.uid || !isFirebaseConfigured || !db) {
@@ -364,7 +367,7 @@ export const AuthProvider = ({ children }) => {
         unsubscribe();
       }
     };
-  }, [user?.email, user?.uid]);
+  }, [db, deviceId, isFirebaseConfigured, user?.email, user?.uid]);
 
   // ✅ UPDATED signup: now includes address
   const signup = async (email, password, profile = {}) => {
@@ -592,7 +595,7 @@ export const AuthProvider = ({ children }) => {
       provider: "google",
     });
     return { credential, profile: mergedProfile };
-  }, []);
+  }, [auth, db, deviceId, isFirebaseConfigured, logLoginSession]);
 
   const refreshUser = async () => {
     if (!auth?.currentUser) return null;
@@ -760,6 +763,8 @@ export const AuthProvider = ({ children }) => {
       idToken,
       loading,
       authError,
+      signup,
+      login,
       resetPassword,
       loginWithGoogle,
       messagingToken,

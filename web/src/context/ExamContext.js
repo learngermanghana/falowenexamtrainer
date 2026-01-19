@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { loadPreferredLevel, savePreferredLevel } from "../services/levelStorage";
 
@@ -153,20 +153,23 @@ export const ExamProvider = ({ children }) => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const setLevel = (newLevel) => {
-    const safeLevel = ALLOWED_LEVELS.includes(newLevel)
-      ? newLevel
-      : ALLOWED_LEVELS[0];
-    setLevelState(safeLevel);
-    setLevelConfirmed(true);
-    savePreferredLevel(safeLevel);
+  const setLevel = useCallback(
+    (newLevel) => {
+      const safeLevel = ALLOWED_LEVELS.includes(newLevel)
+        ? newLevel
+        : ALLOWED_LEVELS[0];
+      setLevelState(safeLevel);
+      setLevelConfirmed(true);
+      savePreferredLevel(safeLevel);
 
-    if (studentProfile?.id && (studentProfile.level || "").toUpperCase() !== safeLevel) {
-      saveStudentProfile({ level: safeLevel }).catch((error) => {
-        console.warn("Failed to sync level to student profile", error);
-      });
-    }
-  };
+      if (studentProfile?.id && (studentProfile.level || "").toUpperCase() !== safeLevel) {
+        saveStudentProfile({ level: safeLevel }).catch((error) => {
+          console.warn("Failed to sync level to student profile", error);
+        });
+      }
+    },
+    [saveStudentProfile, studentProfile?.id, studentProfile?.level]
+  );
 
   useEffect(() => {
     const profileLevel = (studentProfile?.level || "").toUpperCase();
@@ -174,7 +177,7 @@ export const ExamProvider = ({ children }) => {
     if (profileLevel === level) return;
 
     setLevel(profileLevel);
-  }, [level, studentProfile?.level]);
+  }, [level, setLevel, studentProfile?.level]);
 
   useEffect(() => {
     const allowedTeile = getTasksForLevel(level).map((task) => task.label);
