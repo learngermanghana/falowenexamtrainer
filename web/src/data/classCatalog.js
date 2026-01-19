@@ -15,6 +15,16 @@ export const classCatalog = {
     ],
     docUrl: "https://drive.google.com/file/d/1Bzb1-cHO10m_KsrTHfbhaZAfQcmbssFt/view?usp=sharing",
   },
+  "A1 Berlin Klasse": {
+    startDate: "2026-02-17",
+    endDate: "2026-04-14",
+    schedule: [
+      { day: "Monday", startTime: "11:00", endTime: "12:00" },
+      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
+      { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
+    ],
+    docUrl: "https://drive.google.com/file/d/183tr6FGJ6wMkwhG0GOEzLBUGRqUdoAGW/view?usp=sharing",
+  },
   "A1 Hamburg Klasse": {
     startDate: "2026-01-23",
     endDate: "2026-03-21",
