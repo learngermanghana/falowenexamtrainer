@@ -23,6 +23,7 @@ import StudentResultsPage from "./components/StudentResultsPage";
 import GeneralHome from "./components/GeneralHome";
 import SpeakingPage from "./components/SpeakingPage";
 import ExamResources from "./components/ExamResources";
+import HorenPage from "./components/HorenPage";
 import StudyCalendarPage from "./components/StudyCalendarPage";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
@@ -492,7 +493,7 @@ const ExamArea = ({ onBack }) => {
   const navigate = useNavigate();
 
   const examSection = useMemo(() => {
-    if (["speaking", "writing", "resources", "study", "file", "vocab"].includes(section)) {
+    if (["speaking", "writing", "resources", "study", "file", "vocab", "horen"].includes(section)) {
       return section;
     }
     return "speaking";
@@ -508,6 +509,7 @@ const ExamArea = ({ onBack }) => {
     { key: "speaking", label: "Speaking" },
     { key: "writing", label: "Schreiben trainer" },
     { key: "vocab", label: "Vocab" },
+    { key: "horen", label: "Hören" },
     { key: "resources", label: "Resources" },
     { key: "study", label: "Study calendar" },
     { key: "file", label: "My Exam File" },
@@ -533,6 +535,7 @@ const ExamArea = ({ onBack }) => {
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
+      {examSection === "horen" ? <HorenPage /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
       {examSection === "study" ? <StudyCalendarPage /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
