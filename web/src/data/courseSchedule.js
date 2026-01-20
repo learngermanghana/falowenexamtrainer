@@ -719,15 +719,16 @@ export const courseSchedules = {
       ],
     },
     {
-      day: 17,
-      topic: "Instructions",
-      chapter: "11",
-      goal: "Understand instructions and request in German using the Imperative rule",
-      grammar_topic: "Direction",
-      instruction: "",
-      lesen_hören: {
-        video: "https://youtu.be/k2ZC3rXPe1k",
-        youtube_link: "https://youtu.be/k2ZC3rXPe1k",
+    day: 17,
+    topic: "Instructions",
+    chapter: "11",
+    goal: "Understand instructions and request in German using the Imperative rule",
+    grammar_topic: "Direction",
+    instruction:
+      "Complete Lesen & Hören; your tutor will mark it. Open the speaking exams practice link and try it for self-practice only.\n\nRead the exam guide: https://blog.falowen.app/blog/a1-speaking-exam-guide/\nPractice speaking exams: https://www.falowen.app/exams/speaking",
+    lesen_hören: {
+      video: "https://youtu.be/k2ZC3rXPe1k",
+      youtube_link: "https://youtu.be/k2ZC3rXPe1k",
         assignment: true,
         grammarbook_link: "https://drive.google.com/file/d/1lMzZrM4aAItO8bBmehODvT6gG7dz8I9s/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A/view?usp=sharing",
