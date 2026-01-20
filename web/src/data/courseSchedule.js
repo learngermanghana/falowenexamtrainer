@@ -243,11 +243,12 @@ const A2_SCHEDULE = [
   {
     day: 17,
     topic: "In die Apotheke gehen 6.17",
-    chapter: "6.17",
-    goal: "Learn phrases for the pharmacy.",
+    chapter: "11",
+    goal: "Understand instructions and requests in German using the Imperative rule.",
     assignment: true,
-    instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Notes on German Indefinite Pronouns",
+    instruction:
+      "Complete Lesen & Hören; your tutor will mark it. Open the speaking exams practice link and try it for self-practice only. Read the exam guide: https://blog.falowen.app/blog/a1-speaking-exam-guide/. Practice speaking exams: https://www.falowen.app/exams.",
+    grammar_topic: "Imperative (instructions and requests)",
     video: "https://youtu.be/Xjp2A1hU1ag",
     youtube_link: "https://youtu.be/Xjp2A1hU1ag",
     grammarbook_link: "https://drive.google.com/file/d/1O040UoSuBdy4llTK7MbGIsib63uNNcrV/view?usp=sharing",
