@@ -153,6 +153,23 @@ async function upsertStudentToSheet(student) {
   const colUsesToday = findCol(headerMap, "Uses_Today", "Uses Today", "UsesToday");
   const colLastDate = findCol(headerMap, "Last_Date", "Last Date", "LastDate");
   const colReminderSent = findCol(headerMap, "ReminderSent", "Reminder Sent");
+  const colEnrollmentSent = findCol(headerMap, "EnrollmentSent", "Enrollment Sent");
+  const colLastPaidRecorded = findCol(headerMap, "LastPaidRecorded", "Last Paid Recorded");
+  const colBalanceGraceNoticeSent = findCol(
+    headerMap,
+    "BalanceGraceNoticeSent",
+    "Balance Grace Notice Sent"
+  );
+  const colPaymentReminderLastSent = findCol(
+    headerMap,
+    "PaymentReminderLastSent",
+    "Payment Reminder Last Sent"
+  );
+  const colPaymentReminderCount = findCol(
+    headerMap,
+    "PaymentReminderCount",
+    "Payment Reminder Count"
+  );
   const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
   const colAddress = findCol(headerMap, "Address", "Home Address", "address", "homeaddress");
 
@@ -173,9 +190,10 @@ async function upsertStudentToSheet(student) {
   if (colEmail !== null) emails = await getColumnValues(sheets, sheetId, tabName, colEmail);
 
   // Row number in sheet (1-based; row 1 is header). Data rows start at row 2.
-  const targetStudentCode = String(student.studentCode || "").trim();
+  const targetStudentCode = String(student.studentCode || student.studentcode || "").trim();
   const targetUid = String(student.uid || "").trim();
   const targetEmail = String(student.email || "").trim();
+  const enrollDateValue = student.enrollDate || student.joined_at || "";
 
   let rowIndex0 = -1; // data index in arrays (0 means sheet row 2)
   if (targetStudentCode) {
@@ -210,7 +228,7 @@ async function upsertStudentToSheet(student) {
     pushCell(colLevel, student.level || "");
     pushCell(colClassName, student.className || "");
     pushCell(colStatus, student.status || "");
-    pushCell(colEnrollDate, student.enrollDate || "");
+    pushCell(colEnrollDate, enrollDateValue);
     pushCell(colPaid, student.initialPaymentAmount ?? student.paidAmount ?? "");
     pushCell(colBalance, student.balanceDue ?? student.balance ?? "");
     pushCell(colPaymentStatus, student.paymentStatus || "");
@@ -223,6 +241,11 @@ async function upsertStudentToSheet(student) {
     pushCell(colUsesToday, student.usesToday ?? "");
     pushCell(colLastDate, student.lastDate || "");
     pushCell(colReminderSent, student.reminderSent || "");
+    pushCell(colEnrollmentSent, student.enrollmentSent || "");
+    pushCell(colLastPaidRecorded, student.lastPaidRecorded || "");
+    pushCell(colBalanceGraceNoticeSent, student.balanceGraceNoticeSent || "");
+    pushCell(colPaymentReminderLastSent, student.paymentReminderLastSent || "");
+    pushCell(colPaymentReminderCount, student.paymentReminderCount ?? "");
 
     if (updates.length) {
       await sheets.spreadsheets.values.batchUpdate({
@@ -251,7 +274,7 @@ async function upsertStudentToSheet(student) {
   if (colLevel !== null) row[colLevel] = student.level || "";
   if (colClassName !== null) row[colClassName] = student.className || "";
   if (colStatus !== null) row[colStatus] = student.status || "";
-  if (colEnrollDate !== null) row[colEnrollDate] = student.enrollDate || "";
+  if (colEnrollDate !== null) row[colEnrollDate] = enrollDateValue;
   if (colPaid !== null) row[colPaid] = student.initialPaymentAmount ?? student.paidAmount ?? "";
   if (colBalance !== null) row[colBalance] = student.balanceDue ?? student.balance ?? "";
   if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
@@ -265,6 +288,14 @@ async function upsertStudentToSheet(student) {
   if (colUsesToday !== null) row[colUsesToday] = student.usesToday ?? "";
   if (colLastDate !== null) row[colLastDate] = student.lastDate || "";
   if (colReminderSent !== null) row[colReminderSent] = student.reminderSent || "";
+  if (colEnrollmentSent !== null) row[colEnrollmentSent] = student.enrollmentSent || "";
+  if (colLastPaidRecorded !== null) row[colLastPaidRecorded] = student.lastPaidRecorded || "";
+  if (colBalanceGraceNoticeSent !== null)
+    row[colBalanceGraceNoticeSent] = student.balanceGraceNoticeSent || "";
+  if (colPaymentReminderLastSent !== null)
+    row[colPaymentReminderLastSent] = student.paymentReminderLastSent || "";
+  if (colPaymentReminderCount !== null)
+    row[colPaymentReminderCount] = student.paymentReminderCount ?? "";
 
   const appendRange = `${tabName}!A:${colToA1(maxCol)}`;
 
