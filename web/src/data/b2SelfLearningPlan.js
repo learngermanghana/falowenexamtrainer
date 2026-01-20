@@ -16,7 +16,7 @@ const SPEAKING_STARTERS = [
   "Zusammenfassend …",
 ];
 
-export const B2_SELF_LEARNING_PLAN = [
+const BASE_B2_SELF_LEARNING_PLAN = [
   {
     day: 1,
     title: "Welcome + Self-learning kickoff",
@@ -1274,3 +1274,674 @@ export const B2_SELF_LEARNING_PLAN = [
     ],
   },
 ];
+
+const B2_PLAN_ENHANCEMENTS = {
+  1: {
+    learningObjectives: [
+      "Set personal B2 goals and describe your learning journey.",
+      "Use sequencing connectors to structure an introduction.",
+    ],
+    grammarFocus: {
+      group: "Week 1 foundations",
+      items: ["Sequencing connectors (zuerst, danach, schließlich)", "Reason and purpose clauses (weil, damit, um ... zu)"],
+    },
+    activities: {
+      quiz: [
+        "Wähle den passenden Konnektor: Ich lerne Deutsch, ___ ich in Deutschland arbeiten möchte.",
+        "Formuliere einen Satz mit „damit“ über dein Lernziel.",
+      ],
+      discussionPrompt: "Welche Lernstrategie hat dir bisher am meisten geholfen?",
+    },
+  },
+  2: {
+    learningObjectives: [
+      "Define Kultur and compare two cultural examples.",
+      "Practice relative clauses to add detail.",
+    ],
+    grammarFocus: {
+      group: "Week 1 foundations",
+      items: ["Relative clauses (die Kultur, die ...)", "Comparison phrases (im Vergleich zu, genauso wie)"],
+    },
+    activities: {
+      quiz: [
+        "Ergänze: Kultur ist etwas, ___ Menschen im Alltag verbindet.",
+        "Nenne zwei Vergleichsformen für Kulturen.",
+      ],
+      discussionPrompt: "Welche Tradition aus deinem Land würdest du gern erklären?",
+    },
+    reading: {
+      resourceId: "b2-kultur-article",
+      tasks: [
+        "Markiere fünf Wörter, die kulturelle Werte beschreiben.",
+        "Fasse den Text in 3–4 Sätzen zusammen.",
+        "Schreibe eine eigene Meinung mit „dennoch“.",
+      ],
+    },
+    listening: {
+      resourceId: "b2-kultur-audio",
+      prompt: "Höre den Beitrag zweimal und notiere Schlüsselwörter.",
+      tasks: [
+        "Notiere 5 Stichwörter zum Hauptthema.",
+        "Erkläre, welche Idee dich überrascht hat.",
+        "Formuliere eine kurze Zusammenfassung (4–5 Sätze).",
+      ],
+    },
+  },
+  3: {
+    learningObjectives: [
+      "Describe media habits and evaluate information sources.",
+      "Ask indirect questions about credibility.",
+    ],
+    grammarFocus: {
+      group: "Week 1 foundations",
+      items: ["Indirect questions (Ich frage mich, ob ...)", "Causal connectors (denn, deshalb)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe eine indirekte Frage zu einer Nachricht.",
+        "Nenne zwei Kriterien für glaubwürdige Quellen.",
+      ],
+      discussionPrompt: "Welche Quellen nutzt du täglich und warum?",
+    },
+  },
+  4: {
+    learningObjectives: [
+      "Explain relationship values with supporting reasons.",
+      "Use zu-Infinitiv clauses for recommendations.",
+    ],
+    grammarFocus: {
+      group: "Week 1 foundations",
+      items: ["weil/da clauses", "zu-Infinitiv with um/ohne"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere einen Satz mit „um ... zu“ über Freundschaft.",
+        "Ergänze: Vertrauen ist wichtig, ___ man ehrlich bleibt.",
+      ],
+      discussionPrompt: "Welche Regeln helfen, Konflikte fair zu lösen?",
+    },
+  },
+  5: {
+    learningObjectives: [
+      "Describe professional goals using Konjunktiv II.",
+      "Compare two work models.",
+    ],
+    grammarFocus: {
+      group: "Week 1 foundations",
+      items: ["Konjunktiv II for wishes", "Conditional clauses (wenn/falls)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Wunsch im Konjunktiv II.",
+        "Vergleiche Homeoffice und Büro in einem Satz.",
+      ],
+      discussionPrompt: "Welche Kompetenzen sind in deinem Beruf besonders wichtig?",
+    },
+    reading: {
+      resourceId: "b2-arbeitswelt-article",
+      tasks: [
+        "Notiere drei Veränderungen in der Arbeitswelt.",
+        "Welche Vorteile nennt der Text?",
+        "Schreibe eine Empfehlung mit „sollte“.",
+      ],
+    },
+    listening: {
+      resourceId: "b2-arbeitswelt-audio",
+      prompt: "Höre den Abschnitt und fasse ihn mündlich in 60 Sekunden zusammen.",
+      tasks: [
+        "Notiere zwei Anforderungen an moderne Berufe.",
+        "Formuliere eine Frage an die Sprecherin/den Sprecher.",
+      ],
+    },
+  },
+  6: {
+    learningObjectives: [
+      "Give health recommendations with imperatives.",
+      "Explain cause and effect for habits.",
+    ],
+    grammarFocus: {
+      group: "Week 1 foundations",
+      items: ["Imperative forms", "Deshalb/daher for consequences"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere einen Imperativ-Satz zur Ernährung.",
+        "Verbinde zwei Sätze mit „deshalb“.",
+      ],
+      discussionPrompt: "Welche Routine möchtest du diese Woche verbessern?",
+    },
+  },
+  7: {
+    title: "Week 1 review + Reisen und Mobilität",
+    topic: "Reiseerfahrungen reflektieren und die Woche zusammenfassen.",
+    learningObjectives: [
+      "Reflect on week 1 topics and reuse key vocabulary.",
+      "Identify personal strengths and gaps.",
+    ],
+    grammarFocus: {
+      group: "Week 1 review",
+      items: ["Connector recap", "Mini review of Konjunktiv II and relative clauses"],
+    },
+    activities: {
+      quiz: [
+        "Verbinde zwei Themen aus Woche 1 in einem Satz.",
+        "Schreibe zwei Sätze mit Relativsätzen.",
+      ],
+      reflectionPrompt: "Welche Grammatikstruktur war am schwierigsten?",
+      discussionPrompt: "Welche Woche-1-Themen kannst du zusammenfassen?",
+    },
+    weeklyReview: {
+      summary: "Review week 1 topics: Kultur, Medien, Beziehungen, Arbeit, Gesundheit.",
+      reflectionQuestions: [
+        "Welche Struktur hast du sicher genutzt?",
+        "Welche Aufgabe möchtest du wiederholen?",
+        "Welche Wörter brauchst du noch einmal?",
+      ],
+      practicePrompt: "Nimm eine 2-Minuten-Zusammenfassung der Woche auf.",
+    },
+  },
+  8: {
+    learningObjectives: [
+      "Describe housing situations and community rules.",
+      "Use passive voice to mention expectations.",
+    ],
+    grammarFocus: {
+      group: "Week 2 routines",
+      items: ["Two-way prepositions", "Passive voice basics"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz im Passiv über Hausregeln.",
+        "Nenne zwei Präpositionen mit Dativ/Akkusativ.",
+      ],
+      discussionPrompt: "Wie kann Nachbarschaft besser funktionieren?",
+    },
+  },
+  9: {
+    learningObjectives: [
+      "Analyze advertising influences and consumer habits.",
+      "Use comparative structures to discuss choices.",
+    ],
+    grammarFocus: {
+      group: "Week 2 routines",
+      items: ["Comparatives and superlatives", "Konjunktiv II for critique"],
+    },
+    activities: {
+      quiz: [
+        "Vergleiche zwei Marken mit einem Komparativ.",
+        "Formuliere eine Kritik mit „man würde denken“.",
+      ],
+      discussionPrompt: "Welche Werbung wirkt auf dich besonders stark?",
+    },
+    reading: {
+      resourceId: "b2-medien-article",
+      tasks: [
+        "Finde zwei Beispiele für Manipulation im Text.",
+        "Formuliere eine eigene Gegenposition.",
+        "Notiere drei neue Wörter.",
+      ],
+    },
+    listening: {
+      resourceId: "b2-medien-audio",
+      prompt: "Höre den Beitrag und notiere die Kernaussage.",
+      tasks: [
+        "Welche Tipps für Faktenchecks werden genannt?",
+        "Erkläre einen Tipp mit eigenen Worten.",
+      ],
+    },
+  },
+  10: {
+    learningObjectives: [
+      "Explain integration challenges with contrast connectors.",
+      "Use nominalizations to sound formal.",
+    ],
+    grammarFocus: {
+      group: "Week 2 routines",
+      items: ["Obwohl/trotzdem for contrasts", "Nominalizations"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere einen Satz mit „obwohl“.",
+        "Nenne zwei Nominalisierungen zu „integrieren“.",
+      ],
+      discussionPrompt: "Welche Unterstützung hilft beim Ankommen?",
+    },
+  },
+  11: {
+    learningObjectives: [
+      "Discuss civic engagement using passive voice.",
+      "Express goals with damit/um zu.",
+    ],
+    grammarFocus: {
+      group: "Week 2 routines",
+      items: ["Passive voice for processes", "Purpose clauses"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Passivsatz über Wahlen.",
+        "Ergänze einen Satz mit „damit“.",
+      ],
+      discussionPrompt: "Wie kann man sich lokal engagieren?",
+    },
+    reading: {
+      resourceId: "b2-mobilitaet-article",
+      tasks: [
+        "Notiere drei Vorteile nachhaltiger Mobilität.",
+        "Welche Lösung würdest du übernehmen?",
+      ],
+    },
+    listening: {
+      resourceId: "b2-umwelt-audio",
+      prompt: "Höre den Beitrag und notiere Ursachen und Folgen.",
+      tasks: [
+        "Nenne zwei Alltagstipps aus dem Audio.",
+        "Schreibe eine Empfehlung mit „sollte“.",
+      ],
+    },
+  },
+  12: {
+    learningObjectives: [
+      "Compare leisure activities using contrast connectors.",
+      "Use sowohl ... als auch for listings.",
+    ],
+    grammarFocus: {
+      group: "Week 2 routines",
+      items: ["Während/als clauses", "sowohl ... als auch"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere einen Satz mit „sowohl ... als auch“.",
+        "Vergleiche zwei Hobbys mit „während“.",
+      ],
+      discussionPrompt: "Welche Aktivität gibt dir den besten Ausgleich?",
+    },
+  },
+  13: {
+    learningObjectives: [
+      "Explain language learning strategies.",
+      "Use reported speech to share advice.",
+    ],
+    grammarFocus: {
+      group: "Week 2 routines",
+      items: ["Indirect speech (er sagte, dass ...)", "Genitive prepositions (trotz, während)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz in indirekter Rede.",
+        "Nenne zwei Strategien gegen Missverständnisse.",
+      ],
+      discussionPrompt: "Wie gibst du Feedback in Gesprächen?",
+    },
+  },
+  14: {
+    title: "Week 2 review + Wissenschaft und Zukunft",
+    topic: "Innovationen erklären und Woche 2 reflektieren.",
+    learningObjectives: [
+      "Summarize week 2 topics in a coherent narrative.",
+      "Identify grammar progress across multiple days.",
+    ],
+    grammarFocus: {
+      group: "Week 2 review",
+      items: ["Passive voice review", "Contrast connectors (während/hingegen)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe zwei Sätze mit Passiv und Kontrast.",
+        "Verbinde Wohnen und Freizeit in einem Satz.",
+      ],
+      reflectionPrompt: "Welche Aufgaben waren am anspruchsvollsten?",
+      discussionPrompt: "Welches Thema würdest du noch einmal üben?",
+    },
+    weeklyReview: {
+      summary: "Review week 2 topics: Wohnen, Konsum, Integration, Engagement, Freizeit, Sprache.",
+      reflectionQuestions: [
+        "Welche Texte oder Audios waren am hilfreichsten?",
+        "Welche Grammatik hast du bewusst eingesetzt?",
+        "Was möchtest du in Woche 3 verbessern?",
+      ],
+      practicePrompt: "Schreibe eine 5-Satz-Reflexion zur Woche.",
+    },
+  },
+  15: {
+    learningObjectives: [
+      "Define Bildung and compare learning formats.",
+      "Use nominalizations and purpose clauses.",
+    ],
+    grammarFocus: {
+      group: "Week 3 expansion",
+      items: ["Nominalizations (Bildung, Weiterbildung)", "Purpose clauses (damit/um ... zu)"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere zwei Nominalisierungen zum Lernen.",
+        "Schreibe einen Satz mit „um ... zu“.",
+      ],
+      discussionPrompt: "Wie organisierst du lebenslanges Lernen?",
+    },
+    reading: {
+      resourceId: "b2-gesundheit-article",
+      tasks: [
+        "Markiere zwei Tipps zur Prävention.",
+        "Schreibe eine kurze Empfehlung an eine Freundin/einen Freund.",
+      ],
+    },
+    listening: {
+      resourceId: "b2-gesundheit-audio",
+      prompt: "Höre das Audio und halte die Hauptaussage fest.",
+      tasks: [
+        "Notiere drei Schlüsselwörter.",
+        "Fasse das Audio in 3 Sätzen zusammen.",
+      ],
+    },
+  },
+  16: {
+    learningObjectives: [
+      "Describe technology impacts with cause-effect connectors.",
+      "Use passive voice to explain processes.",
+    ],
+    grammarFocus: {
+      group: "Week 3 expansion",
+      items: ["Passive voice practice", "Cause-effect connectors (deshalb, dadurch)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz im Passiv über Apps.",
+        "Verbinde zwei Sätze mit „dadurch“.",
+      ],
+      discussionPrompt: "Welche Technologie möchtest du bewusster nutzen?",
+    },
+  },
+  17: {
+    learningObjectives: [
+      "Discuss environmental actions using conditionals.",
+      "Express obligations with modal verbs.",
+    ],
+    grammarFocus: {
+      group: "Week 3 expansion",
+      items: ["Conditional clauses (wenn/falls)", "Modal verbs for obligations"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere einen Wenn-Satz mit einer Umweltmaßnahme.",
+        "Schreibe einen Satz mit „müssen“.",
+      ],
+      discussionPrompt: "Welche Umweltschutzmaßnahme würdest du sofort umsetzen?",
+    },
+  },
+  18: {
+    learningObjectives: [
+      "Explain society using relative clauses and noun clauses.",
+      "Balance viewpoints with conjunctive adverbs.",
+    ],
+    grammarFocus: {
+      group: "Week 3 expansion",
+      items: ["Relative clauses", "Conjunctive adverbs (hingegen, außerdem)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz mit „hingegen“.",
+        "Nutze einen Relativsatz über Gemeinschaft.",
+      ],
+      discussionPrompt: "Wie kann sozialer Zusammenhalt gestärkt werden?",
+    },
+  },
+  19: {
+    learningObjectives: [
+      "Describe work culture and future skills.",
+      "Use future tense to predict trends.",
+    ],
+    grammarFocus: {
+      group: "Week 3 expansion",
+      items: ["Future tense (werden)", "Formal opinion phrases"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz im Futur über Jobs.",
+        "Nutze „aus meiner Sicht“ in einem Satz.",
+      ],
+      discussionPrompt: "Welche Kompetenz wird in Zukunft wichtiger?",
+    },
+  },
+  20: {
+    learningObjectives: [
+      "Define health broadly and compare stress sources.",
+      "Use reflexive verbs in daily routines.",
+    ],
+    grammarFocus: {
+      group: "Week 3 expansion",
+      items: ["Genitive with abstract nouns", "Reflexive verbs"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz mit Genitiv zu Gesundheit.",
+        "Formuliere eine Routine mit einem reflexiven Verb.",
+      ],
+      discussionPrompt: "Wie gehst du mit Stress um?",
+    },
+  },
+  21: {
+    title: "Week 3 review + Migration",
+    topic: "Migrationsthema wiederholen und Wochenschwerpunkte verbinden.",
+    learningObjectives: [
+      "Review week 3 topics and connect them in a summary.",
+      "Identify grammar patterns you can reuse.",
+    ],
+    grammarFocus: {
+      group: "Week 3 review",
+      items: ["Conditionals and modal verbs", "Future tense recap"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe zwei Sätze: einen Konditionalsatz, einen Futursatz.",
+        "Verwende ein Konjunktivadverb.",
+      ],
+      reflectionPrompt: "Welche Themen konntest du frei erklären?",
+      discussionPrompt: "Welches Thema solltest du wiederholen?",
+    },
+    weeklyReview: {
+      summary: "Review week 3 topics: Bildung, Technologie, Umwelt, Gesellschaft, Arbeit, Gesundheit.",
+      reflectionQuestions: [
+        "Welche Konnektoren nutzt du sicher?",
+        "Welche Aufgaben liefen am flüssigsten?",
+        "Was brauchst du für Woche 4?",
+      ],
+      practicePrompt: "Halte eine 2-Minuten-Audio-Reflexion fest.",
+    },
+  },
+  22: {
+    learningObjectives: [
+      "Explain media literacy with contrast connectors.",
+      "Use indirect speech for reporting sources.",
+    ],
+    grammarFocus: {
+      group: "Week 4 consolidation",
+      items: ["Indirect speech", "Contrast connectors (jedoch, trotzdem)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz mit „trotzdem“.",
+        "Formuliere eine indirekte Rede zu einer Quelle.",
+      ],
+      discussionPrompt: "Welche Faktencheck-Strategie nutzt du zuerst?",
+    },
+    reading: {
+      resourceId: "b2-zukunft-article",
+      tasks: [
+        "Notiere zwei Innovationen aus dem Text.",
+        "Schreibe ein Fazit mit „zusammenfassend“.",
+      ],
+    },
+    listening: {
+      resourceId: "b2-zukunft-audio",
+      prompt: "Höre das Interview und fasse die Positionen zusammen.",
+      tasks: [
+        "Nenne zwei Chancen und ein Risiko.",
+        "Formuliere eine eigene Prognose.",
+      ],
+    },
+  },
+  23: {
+    learningObjectives: [
+      "Describe democratic participation using Konjunktiv II.",
+      "Balance pros and cons in civic topics.",
+    ],
+    grammarFocus: {
+      group: "Week 4 consolidation",
+      items: ["Konjunktiv II for proposals", "Relative pronouns"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Konjunktiv-II-Satz zu Politik.",
+        "Bilde einen Relativsatz über Bürger.",
+      ],
+      discussionPrompt: "Wie könnte man junge Menschen politisch motivieren?",
+    },
+  },
+  24: {
+    learningObjectives: [
+      "Describe leisure balance and habits.",
+      "Use temporal clauses to structure routines.",
+    ],
+    grammarFocus: {
+      group: "Week 4 consolidation",
+      items: ["Temporal clauses (wenn, sobald)", "Frequency expressions"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz mit „sobald“.",
+        "Nutze eine Häufigkeitsangabe in einem Satz.",
+      ],
+      discussionPrompt: "Wie schützt du deine Erholungszeit?",
+    },
+  },
+  25: {
+    learningObjectives: [
+      "Compare housing options using je ... desto.",
+      "Give recommendations with modal verbs.",
+    ],
+    grammarFocus: {
+      group: "Week 4 consolidation",
+      items: ["Je ... desto comparisons", "Modal verbs (sollte, könnte)"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere einen Satz mit „je ... desto“.",
+        "Schreibe eine Empfehlung mit „könnte“.",
+      ],
+      discussionPrompt: "Welche Wohnform passt zu deinem Alltag?",
+    },
+  },
+  26: {
+    learningObjectives: [
+      "Explain mobility policies using passive voice.",
+      "Use causal connectors to describe effects.",
+    ],
+    grammarFocus: {
+      group: "Week 4 consolidation",
+      items: ["Passive voice", "Causal connectors (deswegen, daher)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Passivsatz über Infrastruktur.",
+        "Verbinde zwei Sätze mit „daher“.",
+      ],
+      discussionPrompt: "Wie könnte deine Stadt Mobilität verbessern?",
+    },
+  },
+  27: {
+    learningObjectives: [
+      "Explain research processes clearly.",
+      "Use subordinate clauses to show reasons.",
+    ],
+    grammarFocus: {
+      group: "Week 4 consolidation",
+      items: ["weil/obwohl clauses", "Passive voice for research"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz mit „obwohl“.",
+        "Formuliere einen Passivsatz über Forschung.",
+      ],
+      discussionPrompt: "Welche Wissenschaftsthemen interessieren dich besonders?",
+    },
+  },
+  28: {
+    title: "Week 4 review + Konsum",
+    topic: "Konsumthema nutzen, um Woche 4 zusammenzufassen.",
+    learningObjectives: [
+      "Review week 4 topics and connect them with transitions.",
+      "Identify vocabulary to revise before final review.",
+    ],
+    grammarFocus: {
+      group: "Week 4 review",
+      items: ["Summary phrases (insgesamt, zusammenfassend)", "Contrast connectors recap"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe zwei Sätze mit Zusammenfassungen.",
+        "Verbinde zwei Themen mit „einerseits/andererseits“.",
+      ],
+      reflectionPrompt: "Welche Aufgaben hast du noch nicht wiederholt?",
+      discussionPrompt: "Welche Themen willst du im Abschluss wiederholen?",
+    },
+    weeklyReview: {
+      summary: "Review week 4 topics: Medien, Politik, Freizeit, Wohnen, Mobilität, Wissenschaft.",
+      reflectionQuestions: [
+        "Welche Themen liefen besonders flüssig?",
+        "Welche Grammatik brauchst du für den Abschluss?",
+        "Welche Wörter fehlen noch?",
+      ],
+      practicePrompt: "Schreibe eine Abschlussliste mit 10 wichtigen Wörtern.",
+    },
+  },
+  29: {
+    learningObjectives: [
+      "Explain digital services and their effects.",
+      "Use cause-effect connectors to show outcomes.",
+    ],
+    grammarFocus: {
+      group: "Week 4 consolidation",
+      items: ["Nominal compounds", "Cause-effect connectors (dadurch, sodass)"],
+    },
+    activities: {
+      quiz: [
+        "Schreibe einen Satz mit „sodass“.",
+        "Nenne zwei digitale Dienste im Kompositum.",
+      ],
+      discussionPrompt: "Welche digitalen Services sind unverzichtbar?",
+    },
+  },
+  30: {
+    title: "Final review + Zusammenfassung",
+    topic: "Abschlussreflexion und themenübergreifende Zusammenfassung.",
+    learningObjectives: [
+      "Deliver a full-topic summary with structured transitions.",
+      "Reflect on progress and next steps.",
+    ],
+    grammarFocus: {
+      group: "Final synthesis",
+      items: ["Summary connectors", "Balanced contrasts (einerseits/andererseits)"],
+    },
+    activities: {
+      quiz: [
+        "Formuliere ein Fazit mit „insgesamt“.",
+        "Verbinde zwei Themen mit einem Kontrast.",
+      ],
+      reflectionPrompt: "Welche Fortschritte sind am deutlichsten?",
+    },
+    weeklyReview: {
+      summary: "Final review: connect themes across the entire B2 plan.",
+      reflectionQuestions: [
+        "Welche Themen fühlst du dich bereit zu präsentieren?",
+        "Welche Aufgaben nutzt du als Wiederholung?",
+        "Welche Strategien nimmst du mit?",
+      ],
+      practicePrompt: "Erstelle eine 3-Minuten-Abschlussaufnahme mit 3 Themen.",
+    },
+  },
+};
+
+export const B2_SELF_LEARNING_PLAN = BASE_B2_SELF_LEARNING_PLAN.map((entry) => ({
+  ...entry,
+  ...(B2_PLAN_ENHANCEMENTS[entry.day] || {}),
+}));

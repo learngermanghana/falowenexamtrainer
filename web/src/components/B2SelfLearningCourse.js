@@ -2,12 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { B2_SELF_LEARNING_PLAN } from "../data/b2SelfLearningPlan";
+import { fetchSelfLearningResources } from "../services/selfLearningResourcesService";
 import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/selfLearningProgressService";
 import { fetchVocabularyFromSheet } from "../services/vocabService";
 import { styles } from "../styles";
 
-const SCORE_THRESHOLD = 80;
-const SKIMMING_CHUNK_SIZE = 8;
+const DEFAULT_SCORE_THRESHOLD = 80;
+const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
 
 const buildEmptyDayState = () => ({
   grammarCheckComplete: false,
@@ -35,6 +36,13 @@ const B2SelfLearningCourse = () => {
   const [sheetVocabWords, setSheetVocabWords] = useState([]);
   const [sheetVocabLoaded, setSheetVocabLoaded] = useState(false);
   const [sheetVocabError, setSheetVocabError] = useState("");
+  const [scoreThreshold, setScoreThreshold] = useState(DEFAULT_SCORE_THRESHOLD);
+  const [requireScoreThreshold, setRequireScoreThreshold] = useState(true);
+  const [vocabChunkSize, setVocabChunkSize] = useState(DEFAULT_SKIMMING_CHUNK_SIZE);
+  const [resources, setResources] = useState(null);
+  const [resourcesLoaded, setResourcesLoaded] = useState(false);
+  const [resourcesError, setResourcesError] = useState("");
+  const [flashcardIndexByDay, setFlashcardIndexByDay] = useState({});
 
   const dayKeys = useMemo(
     () => B2_SELF_LEARNING_PLAN.map((entry) => `day-${entry.day}`),
@@ -66,6 +74,33 @@ const B2SelfLearningCourse = () => {
     };
 
     loadSheetVocab();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadResources = async () => {
+      setResourcesLoaded(false);
+      setResourcesError("");
+      try {
+        const data = await fetchSelfLearningResources("B2");
+        if (!isMounted) return;
+        setResources(data);
+      } catch (err) {
+        console.error("Failed to load B2 resources", err);
+        if (!isMounted) return;
+        setResources(null);
+        setResourcesError(err?.message || "Failed to load B2 resources.");
+      } finally {
+        if (isMounted) setResourcesLoaded(true);
+      }
+    };
+
+    loadResources();
 
     return () => {
       isMounted = false;
@@ -134,27 +169,47 @@ const B2SelfLearningCourse = () => {
 
   const skimmingWordsByDay = useMemo(() => {
     if (!sheetVocabWords.length) return {};
+    const chunkSize = Math.max(1, vocabChunkSize);
     return B2_SELF_LEARNING_PLAN.reduce((acc, entry, index) => {
-      const start = index * SKIMMING_CHUNK_SIZE;
-      const chunk = sheetVocabWords.slice(start, start + SKIMMING_CHUNK_SIZE);
+      const start = index * chunkSize;
+      const chunk = sheetVocabWords.slice(start, start + chunkSize);
       acc[`day-${entry.day}`] = chunk;
       return acc;
     }, {});
-  }, [sheetVocabWords]);
+  }, [sheetVocabWords, vocabChunkSize]);
 
   const getSkimmingWords = (entry, index) => {
     const fallbackWords = entry.skimmingWords || [];
     if (!sheetVocabWords.length) return fallbackWords;
 
     const dayKey = `day-${entry.day}`;
+    const chunkSize = Math.max(1, vocabChunkSize);
     const chunk =
-      skimmingWordsByDay[dayKey] || sheetVocabWords.slice(index * SKIMMING_CHUNK_SIZE, (index + 1) * SKIMMING_CHUNK_SIZE);
+      skimmingWordsByDay[dayKey] || sheetVocabWords.slice(index * chunkSize, (index + 1) * chunkSize);
 
     if (!chunk.length) return fallbackWords;
-    if (chunk.length >= SKIMMING_CHUNK_SIZE) return chunk;
+    if (chunk.length >= chunkSize) return chunk;
 
     const merged = [...chunk, ...fallbackWords.filter((word) => !chunk.includes(word))];
-    return merged.slice(0, SKIMMING_CHUNK_SIZE);
+    return merged.slice(0, chunkSize);
+  };
+
+  const getResourceEntry = (collection, resourceId) => {
+    if (!resourceId || !resources?.[collection]) return null;
+    return resources[collection][resourceId] || null;
+  };
+
+  const getFlashcardIndex = (dayKey, length) => {
+    if (!length) return 0;
+    const current = flashcardIndexByDay[dayKey] ?? 0;
+    return current % length;
+  };
+
+  const updateFlashcardIndex = (dayKey, updater) => {
+    setFlashcardIndexByDay((prev) => {
+      const current = prev[dayKey] ?? 0;
+      return { ...prev, [dayKey]: updater(current) };
+    });
   };
 
   const renderScoreField = ({ dayKey, label, value, onChange }) => (
@@ -177,16 +232,128 @@ const B2SelfLearningCourse = () => {
       <div style={styles.card}>
         <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>B2 self-learning flow (no tutor)</h3>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
-          Each day has core steps: speaking recording, writing practice, and skimming words. Some days also add
-          reading and listening tasks as optional add-ons. Save your scores and only mark a step complete when
-          the AI score is at least {SCORE_THRESHOLD}. Writing prompts follow Goethe-B2 formats (Meinungsaufsatz
-          or formeller Brief) and mirror the speaking topic and grammar focus. Use the brain map to collect quick
-          ideas before you start.
+          Each day has core steps: speaking recording, writing practice, and skimming words. Curated reading and
+          listening tasks add authentic sources with comprehension tasks. Save your scores and only mark a step
+          complete when the AI score is at least {scoreThreshold}. Writing prompts follow Goethe-B2 formats
+          (Meinungsaufsatz or formeller Brief) and mirror the speaking topic and grammar focus. Use the brain map
+          to collect quick ideas before you start.
         </p>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
           Skimming words are loaded from the vocab Google Sheet when available; otherwise the built-in list is
           shown.
         </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+          <label style={{ ...styles.field, maxWidth: 220 }}>
+            <span style={styles.label}>Vocabulary chunk size</span>
+            <select
+              value={vocabChunkSize}
+              onChange={(event) => setVocabChunkSize(Number(event.target.value))}
+              style={styles.input}
+            >
+              {[6, 8, 10, 12].map((size) => (
+                <option key={size} value={size}>
+                  {size} words
+                </option>
+              ))}
+            </select>
+          </label>
+          <label style={{ ...styles.field, maxWidth: 220 }}>
+            <span style={styles.label}>Score threshold</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={scoreThreshold}
+              onChange={(event) => setScoreThreshold(Number(event.target.value) || 0)}
+              style={styles.input}
+              placeholder="0-100"
+            />
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={requireScoreThreshold}
+              onChange={(event) => setRequireScoreThreshold(event.target.checked)}
+            />
+            <span style={styles.label}>Require threshold to mark steps complete</span>
+          </label>
+        </div>
+        {!resourcesLoaded ? (
+          <p style={{ ...styles.helperText, marginTop: 8 }}>Loading curated resources...</p>
+        ) : null}
+        {resourcesError ? (
+          <p style={{ ...styles.helperText, marginTop: 8, color: "#b91c1c" }}>
+            Curated resources unavailable: {resourcesError}
+          </p>
+        ) : null}
+        {resources ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
+            {resources.sampleAnswers?.speaking ? (
+              <details style={{ ...styles.card, padding: 12 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+                  {resources.sampleAnswers.speaking.title}
+                </summary>
+                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                  {resources.sampleAnswers.speaking.text}
+                </p>
+              </details>
+            ) : null}
+            {resources.sampleAnswers?.writing ? (
+              <details style={{ ...styles.card, padding: 12 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+                  {resources.sampleAnswers.writing.title}
+                </summary>
+                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                  {resources.sampleAnswers.writing.text}
+                </p>
+              </details>
+            ) : null}
+            {resources.sampleRecordings?.length ? (
+              <div style={{ ...styles.card, padding: 12 }}>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Sample recordings</div>
+                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                  {resources.sampleRecordings.map((recording) => (
+                    <li key={recording.url} style={styles.helperText}>
+                      <a href={recording.url} target="_blank" rel="noreferrer">
+                        {recording.title}
+                      </a>{" "}
+                      <span style={{ color: "#6b7280" }}>({recording.source})</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {(resources.rubrics?.speaking || resources.rubrics?.writing) ? (
+              <div style={{ ...styles.card, padding: 12 }}>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Self-assessment rubrics</div>
+                {resources.rubrics?.speaking ? (
+                  <>
+                    <div style={{ ...styles.helperText, fontWeight: 600, margin: "6px 0" }}>Speaking</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {resources.rubrics.speaking.map((item) => (
+                        <li key={item} style={styles.helperText}>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+                {resources.rubrics?.writing ? (
+                  <>
+                    <div style={{ ...styles.helperText, fontWeight: 600, margin: "6px 0" }}>Writing</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {resources.rubrics.writing.map((item) => (
+                        <li key={item} style={styles.helperText}>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {sheetVocabError ? (
           <p style={{ ...styles.helperText, marginTop: 0, color: "#b91c1c" }}>
             Vocabulary sheet unavailable: {sheetVocabError}
@@ -206,10 +373,13 @@ const B2SelfLearningCourse = () => {
         const writingScoreValue = dayState.writingScore;
         const speakingScore = normalizeScore(speakingScoreValue);
         const writingScore = normalizeScore(writingScoreValue);
-        const canCompleteSpeaking = speakingScore !== null && speakingScore >= SCORE_THRESHOLD;
-        const canCompleteWriting = writingScore !== null && writingScore >= SCORE_THRESHOLD;
+        const canCompleteSpeaking = !requireScoreThreshold || (speakingScore !== null && speakingScore >= scoreThreshold);
+        const canCompleteWriting = !requireScoreThreshold || (writingScore !== null && writingScore >= scoreThreshold);
         const canCompleteDay = dayState.speakingComplete && dayState.writingComplete && dayState.skimmingComplete;
         const skimmingWords = getSkimmingWords(entry, index);
+        const readingResource = getResourceEntry("reading", entry.reading?.resourceId);
+        const listeningResource = getResourceEntry("listening", entry.listening?.resourceId);
+        const flashcardIndex = getFlashcardIndex(dayKey, skimmingWords.length);
 
         return (
           <div key={dayKey} style={{ ...styles.card, display: "grid", gap: 16 }}>
@@ -218,6 +388,28 @@ const B2SelfLearningCourse = () => {
                 <span style={styles.levelPill}>Day {entry.day}</span>
                 <h3 style={{ margin: "6px 0" }}>{entry.title}</h3>
                 <p style={{ ...styles.helperText, margin: 0 }}>Topic: {entry.topic}</p>
+                {entry.learningObjectives?.length ? (
+                  <div style={{ ...styles.helperText, marginTop: 8 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Learning objectives</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.learningObjectives.map((objective) => (
+                        <li key={objective}>{objective}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {entry.grammarFocus?.items?.length ? (
+                  <div style={{ ...styles.helperText, marginTop: 8 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                      Grammar focus {entry.grammarFocus.group ? `(${entry.grammarFocus.group})` : ""}
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.grammarFocus.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
                 {entry.brainMap?.length ? (
                   <div style={{ ...styles.helperText, marginTop: 8 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Brain map (Ideen)</div>
@@ -334,7 +526,7 @@ const B2SelfLearningCourse = () => {
                   </button>
                   {!canCompleteSpeaking ? (
                     <span style={{ ...styles.helperText, margin: 0 }}>
-                      Score must be {SCORE_THRESHOLD}+ to finish.
+                      Score must be {scoreThreshold}+ to finish.
                     </span>
                   ) : null}
                 </div>
@@ -372,11 +564,39 @@ const B2SelfLearningCourse = () => {
                   </button>
                   {!canCompleteWriting ? (
                     <span style={{ ...styles.helperText, margin: 0 }}>
-                      Score must be {SCORE_THRESHOLD}+ to finish.
+                      Score must be {scoreThreshold}+ to finish.
                     </span>
                   ) : null}
                 </div>
               </div>
+
+              {entry.activities ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <strong>2.5) Varied activities</strong>
+                  {entry.activities.quiz?.length ? (
+                    <>
+                      <div style={{ ...styles.helperText, fontWeight: 600 }}>Mini-quiz</div>
+                      <ul style={{ margin: 0, paddingLeft: 18 }}>
+                        {entry.activities.quiz.map((question) => (
+                          <li key={question} style={styles.helperText}>
+                            {question}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : null}
+                  {entry.activities.discussionPrompt ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      <strong>Discussion prompt:</strong> {entry.activities.discussionPrompt}
+                    </p>
+                  ) : null}
+                  {entry.activities.reflectionPrompt ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      <strong>Reflection:</strong> {entry.activities.reflectionPrompt}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
 
               {entry.reading ? (
                 <div style={{ display: "grid", gap: 6 }}>
@@ -388,8 +608,18 @@ const B2SelfLearningCourse = () => {
                       </span>
                     ) : null}
                   </div>
-                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.reading.title}</p>
-                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.reading.text}</p>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
+                    {readingResource?.title || entry.reading.title}
+                  </p>
+                  {readingResource?.description ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>{readingResource.description}</p>
+                  ) : null}
+                  {entry.reading.text ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.reading.text}</p> : null}
+                  {readingResource?.url ? (
+                    <a href={readingResource.url} target="_blank" rel="noreferrer" style={styles.linkButton}>
+                      Open reading source
+                    </a>
+                  ) : null}
                   {entry.reading.tasks?.length ? (
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
                       {entry.reading.tasks.map((task) => (
@@ -399,9 +629,9 @@ const B2SelfLearningCourse = () => {
                       ))}
                     </ul>
                   ) : null}
-                  {entry.reading.source ? (
+                  {readingResource?.source || entry.reading.source ? (
                     <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
-                      Source: {entry.reading.source}
+                      Source: {readingResource?.source || entry.reading.source}
                     </p>
                   ) : null}
                 </div>
@@ -417,8 +647,20 @@ const B2SelfLearningCourse = () => {
                       </span>
                     ) : null}
                   </div>
-                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.listening.title}</p>
-                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.listening.prompt}</p>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
+                    {listeningResource?.title || entry.listening.title}
+                  </p>
+                  {listeningResource?.description ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>{listeningResource.description}</p>
+                  ) : null}
+                  {entry.listening.prompt ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>{entry.listening.prompt}</p>
+                  ) : null}
+                  {listeningResource?.url ? (
+                    <a href={listeningResource.url} target="_blank" rel="noreferrer" style={styles.linkButton}>
+                      Open listening source
+                    </a>
+                  ) : null}
                   {entry.listening.tasks?.length ? (
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
                       {entry.listening.tasks.map((task) => (
@@ -428,9 +670,9 @@ const B2SelfLearningCourse = () => {
                       ))}
                     </ul>
                   ) : null}
-                  {entry.listening.source ? (
+                  {listeningResource?.source || entry.listening.source ? (
                     <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
-                      Source: {entry.listening.source}
+                      Source: {listeningResource?.source || entry.listening.source}
                     </p>
                   ) : null}
                 </div>
@@ -451,6 +693,48 @@ const B2SelfLearningCourse = () => {
                     </span>
                   ))}
                 </div>
+                {skimmingWords.length ? (
+                  <div style={{ ...styles.card, padding: 12 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 6 }}>Flashcard practice</div>
+                    <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>
+                      {skimmingWords[flashcardIndex]}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={() =>
+                          updateFlashcardIndex(dayKey, (current) =>
+                            current === 0 ? skimmingWords.length - 1 : current - 1
+                          )
+                        }
+                      >
+                        Previous
+                      </button>
+                      <button
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={() =>
+                          updateFlashcardIndex(dayKey, (current) => (current + 1) % skimmingWords.length)
+                        }
+                      >
+                        Next
+                      </button>
+                      <button
+                        type="button"
+                        style={styles.linkButton}
+                        onClick={() =>
+                          updateFlashcardIndex(dayKey, () => Math.floor(Math.random() * skimmingWords.length))
+                        }
+                      >
+                        Random card
+                      </button>
+                    </div>
+                    <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                      Say a sentence with the word, then add a synonym or antonym.
+                    </p>
+                  </div>
+                ) : null}
                 <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input
                     type="checkbox"
@@ -466,6 +750,29 @@ const B2SelfLearningCourse = () => {
                 </label>
               </div>
             </div>
+
+            {entry.weeklyReview ? (
+              <div style={{ display: "grid", gap: 6 }}>
+                <strong>Weekly review & reflection</strong>
+                {entry.weeklyReview.summary ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.weeklyReview.summary}</p>
+                ) : null}
+                {entry.weeklyReview.reflectionQuestions?.length ? (
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {entry.weeklyReview.reflectionQuestions.map((question) => (
+                      <li key={question} style={styles.helperText}>
+                        {question}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {entry.weeklyReview.practicePrompt ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    <strong>Practice prompt:</strong> {entry.weeklyReview.practicePrompt}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <span style={{ ...styles.helperText, margin: 0 }}>
