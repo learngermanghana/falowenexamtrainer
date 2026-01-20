@@ -250,6 +250,12 @@ const requireAuth = async (req) => {
   return decoded;
 };
 
+const normalizeLevelKey = (value = "") => {
+  const text = String(value || "").toUpperCase();
+  const match = text.match(/\b(A1|A2|B1|B2|C1|C2)\b/);
+  return (match ? match[1] : text).trim();
+};
+
 /* ----------------------------- Main handler ----------------------------- */
 
 const scoresSummaryHandler = async (req, res) => {
@@ -268,7 +274,7 @@ const scoresSummaryHandler = async (req, res) => {
       return res.status(403).json({ error: "Not authorized" });
     }
 
-    const level = String(student.level || student.course || "A1").trim().toUpperCase();
+    const level = normalizeLevelKey(student.level || student.course || "A1") || "A1";
 
     // Build schedule targets
     const { lessons: plannedLessons, plannedSet } = getAssignmentSummary(level);
@@ -324,7 +330,7 @@ const scoresSummaryHandler = async (req, res) => {
     rows.slice(1).forEach((row) => {
       const rowStudentCode = get(row, idx.studentCode);
       if (!rowStudentCode) return;
-      const rowLevel = String(get(row, idx.level) || "").trim().toUpperCase();
+      const rowLevel = normalizeLevelKey(get(row, idx.level) || "");
       if (rowLevel && rowLevel !== level) return;
 
       const assignment = get(row, idx.assignment);
@@ -400,7 +406,7 @@ const scoresSummaryHandler = async (req, res) => {
         };
       })
       .filter((row) => {
-        const rowLevel = String(row.level || "").trim().toUpperCase();
+        const rowLevel = normalizeLevelKey(row.level || "");
         // If row has no level, accept it
         if (!rowLevel) return true;
         return rowLevel === level;

@@ -167,6 +167,15 @@ const HomeMetrics = ({ studentProfile }) => {
     return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
   }, [leaderboardRows, studentCode]);
   const normalizedStudentCode = String(studentCode || "").toLowerCase();
+  const leaderboardQuickSummary = useMemo(() => {
+    if (!leaderboardRows.length) return "No qualified rankings yet for this level.";
+    if (myLeaderboardEntry) {
+      return `You are #${myLeaderboardEntry.rank} out of ${leaderboardRows.length} students with ${myLeaderboardEntry.completedCount} / ${Math.round(
+        (myLeaderboardEntry.expectedPoints || 0) / 100
+      )} passed and ${myLeaderboardEntry.totalScore} points.`;
+    }
+    return `${leaderboardRows.length} students have qualified for this level.`;
+  }, [leaderboardRows, myLeaderboardEntry]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -245,6 +254,13 @@ const HomeMetrics = ({ studentProfile }) => {
               {showLeaderboard ? "Hide leaderboard" : "View leaderboard"}
             </button>
           </div>
+
+          {!showLeaderboard ? (
+            <div style={{ ...styles.helperText, margin: 0 }}>
+              {leaderboardQuickSummary}
+              {leaderboardUpdatedLabel ? ` ${leaderboardUpdatedLabel}` : ""}
+            </div>
+          ) : null}
 
           {showLeaderboard ? (
             <>
