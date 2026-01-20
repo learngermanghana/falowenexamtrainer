@@ -7,12 +7,13 @@ importScripts(
 let messaging = null;
 
 const CACHE_PREFIX = "apzla-offline";
-const CACHE_NAME = `${CACHE_PREFIX}-v6`;
+const CACHE_NAME = `${CACHE_PREFIX}-v7`;
 const OFFLINE_URL = "/offline.html";
 const DEFAULT_NOTIFICATION_BODY = "Falowen Learning Hub update";
 const DEFAULT_ROUTE = "/";
 
 const STATIC_ASSETS = [
+  "/",
   OFFLINE_URL,
   "/manifest.json",
   "/favicon.ico",

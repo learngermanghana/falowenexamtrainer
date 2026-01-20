@@ -30,6 +30,7 @@ import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
 import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
+import OfflineBanner from "./components/OfflineBanner";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 
 const TAB_STRUCTURE = [
@@ -342,6 +343,7 @@ const AppShell = ({
           </div>
         </div>
       </header>
+      <OfflineBanner />
 
       <main className="layout-main" style={{ minWidth: 0 }}>
         <Routes>

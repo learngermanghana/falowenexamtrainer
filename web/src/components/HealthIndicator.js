@@ -1,5 +1,6 @@
 import React from "react";
 import { useHealthStatus } from "../hooks/useHealthStatus";
+import { useOfflineStatus } from "../hooks/useOfflineStatus";
 import { styles } from "../styles";
 
 const statusCopy = {
@@ -16,8 +17,9 @@ const statusColor = {
 
 function HealthIndicator() {
   const { status } = useHealthStatus({ pollIntervalMs: 60000 });
-  const label = statusCopy[status] || "API status";
-  const color = statusColor[status] || statusColor.loading;
+  const { isOffline } = useOfflineStatus();
+  const label = isOffline ? "Offline mode" : statusCopy[status] || "API status";
+  const color = isOffline ? "#f59e0b" : statusColor[status] || statusColor.loading;
 
   return (
     <div style={{ display: "flex", gap: 8, alignItems: "center" }} aria-live="polite">

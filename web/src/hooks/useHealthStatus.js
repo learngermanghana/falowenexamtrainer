@@ -6,6 +6,11 @@ export function useHealthStatus({ pollIntervalMs = 30000 } = {}) {
   const [lastChecked, setLastChecked] = useState(null);
 
   const refresh = useCallback(async () => {
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      setStatus("offline");
+      return;
+    }
+
     const url = `${getBackendUrl()}/health`;
 
     try {
