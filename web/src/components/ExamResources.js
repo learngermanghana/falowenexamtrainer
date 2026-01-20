@@ -3,7 +3,11 @@ import { styles } from "../styles";
 
 const goetheLevelLinks = {
   lesen: [
-    { level: "A1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd1/ueb.html" },
+    {
+      level: "A1",
+      url: "https://drive.google.com/file/d/1fCqzyTSkzaJIg7MBDhDtW_WOn6SWIV4r/view?usp=sharing",
+      label: "A1 Lesen sample",
+    },
     { level: "A2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd2/ueb.html" },
     { level: "B1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb1/ueb.html" },
     { level: "B2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb2/ue9.html" },
@@ -77,7 +81,7 @@ const ExamResources = () => {
                 <li key={`lesen-${item.level}`}>
                   <strong>{item.level}:</strong>{" "}
                   <a href={item.url} target="_blank" rel="noreferrer">
-                    Goethe Lesen practice
+                    {item.label ?? "Goethe Lesen practice"}
                   </a>
                 </li>
               ))}
