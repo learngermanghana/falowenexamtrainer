@@ -622,8 +622,8 @@ export const courseSchedules = {
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/uyvXoCoqjiE",
-        youtube_link: "https://youtu.be/uyvXoCoqjiE",
+        video: "https://youtu.be/DklpySXqAmg",
+        youtube_link: "https://youtu.be/DklpySXqAmg",
         grammarbook_link: "https://drive.google.com/file/d/1pSaloRhfh8eTKK_r9mzwp6xkbfdkCVox/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
         assignment: true,
