@@ -4,6 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import ResultHistory from "./ResultHistory";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
+import { fetchResults } from "../services/resultsService";
 
 const StudentResultsPage = () => {
   const { idToken, studentProfile } = useAuth();
@@ -17,6 +18,11 @@ const StudentResultsPage = () => {
     studentProfile?.studentcode ||
     studentProfile?.id ||
     "";
+  const studentLevel = String(studentProfile?.level || studentProfile?.course || "")
+    .trim()
+    .toUpperCase();
+  const useSheetResults = ["A1", "A2", "B1"].includes(studentLevel);
+  const useFirestoreResults = ["B2", "C1"].includes(studentLevel);
 
   const TOTAL_ASSIGNMENTS = {
     A1: 19,
@@ -47,6 +53,16 @@ const StudentResultsPage = () => {
       return Array.isArray(rows) ? rows : [];
     };
 
+    const loadFromResultsStore = async () => {
+      const response = await fetchResults({ studentCode, email: studentProfile?.email });
+      if (!Array.isArray(response?.results)) return [];
+      return response.results.map((entry) => ({
+        ...entry,
+        studentcode: entry.studentcode || entry.studentCode || "",
+        name: entry.name || entry.studentName || "",
+      }));
+    };
+
     const load = async () => {
       setLoading(true);
       setError("");
@@ -58,8 +74,15 @@ const StudentResultsPage = () => {
           return;
         }
 
-        // Prefer sheet if configured
-        if (SHEET_CSV_URL) {
+        if (useFirestoreResults) {
+          const rows = await loadFromResultsStore();
+          if (!mounted) return;
+          setResults(rows);
+          return;
+        }
+
+        // Prefer sheet for A1/A2/B1 if configured
+        if (useSheetResults && SHEET_CSV_URL) {
           const rows = await loadFromSheet();
           if (!mounted) return;
           setResults(rows);
@@ -90,7 +113,15 @@ const StudentResultsPage = () => {
     return () => {
       mounted = false;
     };
-  }, [idToken, studentCode, SHEET_CSV_URL]);
+  }, [
+    idToken,
+    studentCode,
+    studentLevel,
+    useFirestoreResults,
+    useSheetResults,
+    SHEET_CSV_URL,
+    studentProfile?.email,
+  ]);
 
   const summary = useMemo(() => {
     const scores = results
