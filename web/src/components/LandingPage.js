@@ -369,6 +369,46 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           </div>
         </section>
 
+        {/* B2/C1 self-learning ad */}
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 16,
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            alignItems: "center",
+            background: "linear-gradient(135deg, #ffffff, #eef2ff)",
+            border: "1px solid #e0e7ff",
+          }}
+        >
+          <div style={{ display: "grid", gap: 10 }}>
+            <h2 style={styles.sectionTitle}>B2 &amp; C1 self-learning (no tutor)</h2>
+            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+              Prefer independent study? Our B2 and C1 self-learning flows guide you through Goethe-style speaking,
+              writing, reading, and listening tasks with AI scoring and curated resources.
+            </p>
+            <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={onLogin}>
+              Log in to start →
+            </button>
+          </div>
+          <div
+            style={{
+              borderRadius: 16,
+              overflow: "hidden",
+              border: "1px solid #e5e7eb",
+              boxShadow: "0 16px 32px rgba(15, 23, 42, 0.15)",
+              background: "#fff",
+            }}
+          >
+            <img
+              src="https://github.com/learngermanghana/falowen-blog/blob/main/photos/b2c1_ad_final.jpg?raw=1"
+              alt="B2 and C1 self-learning advertisement"
+              loading="lazy"
+              style={{ width: "100%", display: "block" }}
+            />
+          </div>
+        </section>
+
         {/* Features */}
         <section style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {features.map((item) => (
