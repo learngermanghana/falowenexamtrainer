@@ -388,7 +388,7 @@ const A2_SCHEDULE = [
     chapter: null,
     goal: "🎯 Goal: Celebrate your achievement and plan your next steps.",
     instruction: `📝 Instruction: Congratulations on finishing your A2 course. 
-You worked hard and made excellent progress. The school will confirm your results and send your completion certificate to your email. 
+You worked hard and made excellent progress. Finishing the course is one step—now it's time to prepare for your exams. Visit the [Exams page](https://www.falowen.app/exams). The school will confirm your results and send your completion certificate to your email. 
 
 Kindly communicate with us what you would like to do next by emailing **learngermanghana@gmail.com**. 
 You can prepare for the A2 exams or progress to B1. We wish you continued success in your journey. 
@@ -865,7 +865,7 @@ export const courseSchedules = {
       chapter: null,
       goal: "🎯 Goal: Celebrate your achievement and plan your next steps.",
       instruction:
-        "📝 Instruction: Congratulations on finishing your A1 course. \nYou worked hard and made great progress. The school will confirm your results and send your completion certificate to your email. \n\nKindly communicate with us what you would like to do next by emailing **learngermanghana@gmail.com**. \nYou can prepare for the A1 exams or progress to A2. We wish you continued success in your journey.",
+        "📝 Instruction: Congratulations on finishing your A1 course. \nYou worked hard and made great progress. Finishing the course is one step—now it's time to prepare for your exams. Visit the [Exams page](https://www.falowen.app/exams). The school will confirm your results and send your completion certificate to your email. \n\nKindly communicate with us what you would like to do next by emailing **learngermanghana@gmail.com**. \nYou can prepare for the A1 exams or progress to A2. We wish you continued success in your journey.",
     },
   ],
   A2: A2_SCHEDULE,
