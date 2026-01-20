@@ -2,12 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { C1_SELF_LEARNING_PLAN } from "../data/c1SelfLearningPlan";
+import { fetchSelfLearningResources } from "../services/selfLearningResourcesService";
 import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/selfLearningProgressService";
 import { fetchVocabularyFromSheet } from "../services/vocabService";
 import { styles } from "../styles";
 
-const SCORE_THRESHOLD = 80;
-const SKIMMING_CHUNK_SIZE = 8;
+const DEFAULT_SCORE_THRESHOLD = 80;
+const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
 
 const buildEmptyDayState = () => ({
   grammarCheckComplete: false,
@@ -35,6 +36,13 @@ const C1SelfLearningCourse = () => {
   const [sheetVocabWords, setSheetVocabWords] = useState([]);
   const [sheetVocabLoaded, setSheetVocabLoaded] = useState(false);
   const [sheetVocabError, setSheetVocabError] = useState("");
+  const [scoreThreshold, setScoreThreshold] = useState(DEFAULT_SCORE_THRESHOLD);
+  const [requireScoreThreshold, setRequireScoreThreshold] = useState(true);
+  const [vocabChunkSize, setVocabChunkSize] = useState(DEFAULT_SKIMMING_CHUNK_SIZE);
+  const [resources, setResources] = useState(null);
+  const [resourcesLoaded, setResourcesLoaded] = useState(false);
+  const [resourcesError, setResourcesError] = useState("");
+  const [flashcardIndexByDay, setFlashcardIndexByDay] = useState({});
 
   const dayKeys = useMemo(
     () => C1_SELF_LEARNING_PLAN.map((entry) => `day-${entry.day}`),
@@ -66,6 +74,33 @@ const C1SelfLearningCourse = () => {
     };
 
     loadSheetVocab();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadResources = async () => {
+      setResourcesLoaded(false);
+      setResourcesError("");
+      try {
+        const data = await fetchSelfLearningResources("C1");
+        if (!isMounted) return;
+        setResources(data);
+      } catch (err) {
+        console.error("Failed to load C1 resources", err);
+        if (!isMounted) return;
+        setResources(null);
+        setResourcesError(err?.message || "C1-Ressourcen konnten nicht geladen werden.");
+      } finally {
+        if (isMounted) setResourcesLoaded(true);
+      }
+    };
+
+    loadResources();
 
     return () => {
       isMounted = false;
@@ -134,27 +169,47 @@ const C1SelfLearningCourse = () => {
 
   const skimmingWordsByDay = useMemo(() => {
     if (!sheetVocabWords.length) return {};
+    const chunkSize = Math.max(1, vocabChunkSize);
     return C1_SELF_LEARNING_PLAN.reduce((acc, entry, index) => {
-      const start = index * SKIMMING_CHUNK_SIZE;
-      const chunk = sheetVocabWords.slice(start, start + SKIMMING_CHUNK_SIZE);
+      const start = index * chunkSize;
+      const chunk = sheetVocabWords.slice(start, start + chunkSize);
       acc[`day-${entry.day}`] = chunk;
       return acc;
     }, {});
-  }, [sheetVocabWords]);
+  }, [sheetVocabWords, vocabChunkSize]);
 
   const getSkimmingWords = (entry, index) => {
     const fallbackWords = entry.skimmingWords || [];
     if (!sheetVocabWords.length) return fallbackWords;
 
     const dayKey = `day-${entry.day}`;
+    const chunkSize = Math.max(1, vocabChunkSize);
     const chunk =
-      skimmingWordsByDay[dayKey] || sheetVocabWords.slice(index * SKIMMING_CHUNK_SIZE, (index + 1) * SKIMMING_CHUNK_SIZE);
+      skimmingWordsByDay[dayKey] || sheetVocabWords.slice(index * chunkSize, (index + 1) * chunkSize);
 
     if (!chunk.length) return fallbackWords;
-    if (chunk.length >= SKIMMING_CHUNK_SIZE) return chunk;
+    if (chunk.length >= chunkSize) return chunk;
 
     const merged = [...chunk, ...fallbackWords.filter((word) => !chunk.includes(word))];
-    return merged.slice(0, SKIMMING_CHUNK_SIZE);
+    return merged.slice(0, chunkSize);
+  };
+
+  const getResourceEntry = (collection, resourceId) => {
+    if (!resourceId || !resources?.[collection]) return null;
+    return resources[collection][resourceId] || null;
+  };
+
+  const getFlashcardIndex = (dayKey, length) => {
+    if (!length) return 0;
+    const current = flashcardIndexByDay[dayKey] ?? 0;
+    return current % length;
+  };
+
+  const updateFlashcardIndex = (dayKey, updater) => {
+    setFlashcardIndexByDay((prev) => {
+      const current = prev[dayKey] ?? 0;
+      return { ...prev, [dayKey]: updater(current) };
+    });
   };
 
   const renderScoreField = ({ label, value, onChange }) => (
@@ -177,16 +232,128 @@ const C1SelfLearningCourse = () => {
       <div style={styles.card}>
         <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>C1 Selbstlernplan (ohne Tutor)</h3>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
-          Jeder Tag hat Kernschritte: Sprechaufnahme, Schreibtraining und Wortschatzüberblick. An manchen Tagen
-          kommen Lese- und Hörverstehensaufgaben als optionale Ergänzung dazu. Speichere deine Punktzahlen und
-          markiere einen Schritt erst, wenn die KI-Punktzahl mindestens {SCORE_THRESHOLD} beträgt. Die Schreibaufgaben
-          folgen den Goethe-C1-Formaten (Meinungsaufsatz oder formeller Brief) und spiegeln das Sprechthema samt
+          Jeder Tag hat Kernschritte: Sprechaufnahme, Schreibtraining und Wortschatzüberblick. Zusätzlich gibt es
+          kuratierte Lese- und Hörverstehensaufgaben mit Verständnisfragen. Speichere deine Punktzahlen und markiere
+          einen Schritt erst, wenn die KI-Punktzahl mindestens {scoreThreshold} beträgt. Die Schreibaufgaben folgen
+          den Goethe-C1-Formaten (Meinungsaufsatz oder formeller Brief) und spiegeln das Sprechthema samt
           Grammatikfokus. Nutze die Gedankenkarte, um schnelle Ideen zu sammeln.
         </p>
         <p style={{ ...styles.helperText, marginTop: 0 }}>
           Die Wortschatzliste wird aus dem Vokabel-Google-Sheet geladen; falls es nicht verfügbar ist, wird
           die interne Liste angezeigt.
         </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+          <label style={{ ...styles.field, maxWidth: 220 }}>
+            <span style={styles.label}>Wortschatz-Chunkgröße</span>
+            <select
+              value={vocabChunkSize}
+              onChange={(event) => setVocabChunkSize(Number(event.target.value))}
+              style={styles.input}
+            >
+              {[6, 8, 10, 12].map((size) => (
+                <option key={size} value={size}>
+                  {size} Wörter
+                </option>
+              ))}
+            </select>
+          </label>
+          <label style={{ ...styles.field, maxWidth: 220 }}>
+            <span style={styles.label}>Punkteschwelle</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={scoreThreshold}
+              onChange={(event) => setScoreThreshold(Number(event.target.value) || 0)}
+              style={styles.input}
+              placeholder="0-100"
+            />
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <input
+              type="checkbox"
+              checked={requireScoreThreshold}
+              onChange={(event) => setRequireScoreThreshold(event.target.checked)}
+            />
+            <span style={styles.label}>Schwelle für Abschluss erforderlich</span>
+          </label>
+        </div>
+        {!resourcesLoaded ? (
+          <p style={{ ...styles.helperText, marginTop: 8 }}>Lade kuratierte Ressourcen...</p>
+        ) : null}
+        {resourcesError ? (
+          <p style={{ ...styles.helperText, marginTop: 8, color: "#b91c1c" }}>
+            Kuratierte Ressourcen nicht verfügbar: {resourcesError}
+          </p>
+        ) : null}
+        {resources ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
+            {resources.sampleAnswers?.speaking ? (
+              <details style={{ ...styles.card, padding: 12 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+                  {resources.sampleAnswers.speaking.title}
+                </summary>
+                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                  {resources.sampleAnswers.speaking.text}
+                </p>
+              </details>
+            ) : null}
+            {resources.sampleAnswers?.writing ? (
+              <details style={{ ...styles.card, padding: 12 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
+                  {resources.sampleAnswers.writing.title}
+                </summary>
+                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                  {resources.sampleAnswers.writing.text}
+                </p>
+              </details>
+            ) : null}
+            {resources.sampleRecordings?.length ? (
+              <div style={{ ...styles.card, padding: 12 }}>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Musteraufnahmen</div>
+                <ul style={{ margin: 0, paddingLeft: 18 }}>
+                  {resources.sampleRecordings.map((recording) => (
+                    <li key={recording.url} style={styles.helperText}>
+                      <a href={recording.url} target="_blank" rel="noreferrer">
+                        {recording.title}
+                      </a>{" "}
+                      <span style={{ color: "#6b7280" }}>({recording.source})</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            {(resources.rubrics?.speaking || resources.rubrics?.writing) ? (
+              <div style={{ ...styles.card, padding: 12 }}>
+                <div style={{ fontWeight: 600, marginBottom: 6 }}>Selbsteinschätzungsraster</div>
+                {resources.rubrics?.speaking ? (
+                  <>
+                    <div style={{ ...styles.helperText, fontWeight: 600, margin: "6px 0" }}>Sprechen</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {resources.rubrics.speaking.map((item) => (
+                        <li key={item} style={styles.helperText}>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+                {resources.rubrics?.writing ? (
+                  <>
+                    <div style={{ ...styles.helperText, fontWeight: 600, margin: "6px 0" }}>Schreiben</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {resources.rubrics.writing.map((item) => (
+                        <li key={item} style={styles.helperText}>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         {sheetVocabError ? (
           <p style={{ ...styles.helperText, marginTop: 0, color: "#b91c1c" }}>
             Wortschatzliste nicht verfügbar: {sheetVocabError}
@@ -206,10 +373,13 @@ const C1SelfLearningCourse = () => {
         const writingScoreValue = dayState.writingScore;
         const speakingScore = normalizeScore(speakingScoreValue);
         const writingScore = normalizeScore(writingScoreValue);
-        const canCompleteSpeaking = speakingScore !== null && speakingScore >= SCORE_THRESHOLD;
-        const canCompleteWriting = writingScore !== null && writingScore >= SCORE_THRESHOLD;
+        const canCompleteSpeaking = !requireScoreThreshold || (speakingScore !== null && speakingScore >= scoreThreshold);
+        const canCompleteWriting = !requireScoreThreshold || (writingScore !== null && writingScore >= scoreThreshold);
         const canCompleteDay = dayState.speakingComplete && dayState.writingComplete && dayState.skimmingComplete;
         const skimmingWords = getSkimmingWords(entry, index);
+        const readingResource = getResourceEntry("reading", entry.reading?.resourceId);
+        const listeningResource = getResourceEntry("listening", entry.listening?.resourceId);
+        const flashcardIndex = getFlashcardIndex(dayKey, skimmingWords.length);
 
         return (
           <div key={dayKey} style={{ ...styles.card, display: "grid", gap: 16 }}>
@@ -218,6 +388,28 @@ const C1SelfLearningCourse = () => {
                 <span style={styles.levelPill}>Tag {entry.day}</span>
                 <h3 style={{ margin: "6px 0" }}>{entry.title}</h3>
                 <p style={{ ...styles.helperText, margin: 0 }}>Thema: {entry.topic}</p>
+                {entry.learningObjectives?.length ? (
+                  <div style={{ ...styles.helperText, marginTop: 8 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Lernziele</div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.learningObjectives.map((objective) => (
+                        <li key={objective}>{objective}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {entry.grammarFocus?.items?.length ? (
+                  <div style={{ ...styles.helperText, marginTop: 8 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                      Grammatikfokus {entry.grammarFocus.group ? `(${entry.grammarFocus.group})` : ""}
+                    </div>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {entry.grammarFocus.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
                 {entry.brainMap?.length ? (
                   <div style={{ ...styles.helperText, marginTop: 8 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Gedankenkarte (Ideen)</div>
@@ -333,7 +525,7 @@ const C1SelfLearningCourse = () => {
                   </button>
                   {!canCompleteSpeaking ? (
                     <span style={{ ...styles.helperText, margin: 0 }}>
-                      Punktzahl muss {SCORE_THRESHOLD}+ sein.
+                      Punktzahl muss {scoreThreshold}+ sein.
                     </span>
                   ) : null}
                 </div>
@@ -370,11 +562,39 @@ const C1SelfLearningCourse = () => {
                   </button>
                   {!canCompleteWriting ? (
                     <span style={{ ...styles.helperText, margin: 0 }}>
-                      Punktzahl muss {SCORE_THRESHOLD}+ sein.
+                      Punktzahl muss {scoreThreshold}+ sein.
                     </span>
                   ) : null}
                 </div>
               </div>
+
+              {entry.activities ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <strong>2.5) Abwechslung & Aktivitäten</strong>
+                  {entry.activities.quiz?.length ? (
+                    <>
+                      <div style={{ ...styles.helperText, fontWeight: 600 }}>Mini-Quiz</div>
+                      <ul style={{ margin: 0, paddingLeft: 18 }}>
+                        {entry.activities.quiz.map((question) => (
+                          <li key={question} style={styles.helperText}>
+                            {question}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : null}
+                  {entry.activities.discussionPrompt ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      <strong>Diskussionsimpuls:</strong> {entry.activities.discussionPrompt}
+                    </p>
+                  ) : null}
+                  {entry.activities.reflectionPrompt ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      <strong>Reflexion:</strong> {entry.activities.reflectionPrompt}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
 
               {entry.reading ? (
                 <div style={{ display: "grid", gap: 6 }}>
@@ -386,8 +606,18 @@ const C1SelfLearningCourse = () => {
                       </span>
                     ) : null}
                   </div>
-                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.reading.title}</p>
-                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.reading.text}</p>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
+                    {readingResource?.title || entry.reading.title}
+                  </p>
+                  {readingResource?.description ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>{readingResource.description}</p>
+                  ) : null}
+                  {entry.reading.text ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.reading.text}</p> : null}
+                  {readingResource?.url ? (
+                    <a href={readingResource.url} target="_blank" rel="noreferrer" style={styles.linkButton}>
+                      Quelle öffnen
+                    </a>
+                  ) : null}
                   {entry.reading.tasks?.length ? (
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
                       {entry.reading.tasks.map((task) => (
@@ -397,9 +627,9 @@ const C1SelfLearningCourse = () => {
                       ))}
                     </ul>
                   ) : null}
-                  {entry.reading.source ? (
+                  {readingResource?.source || entry.reading.source ? (
                     <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
-                      Quelle: {entry.reading.source}
+                      Quelle: {readingResource?.source || entry.reading.source}
                     </p>
                   ) : null}
                 </div>
@@ -415,8 +645,20 @@ const C1SelfLearningCourse = () => {
                       </span>
                     ) : null}
                   </div>
-                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>{entry.listening.title}</p>
-                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.listening.prompt}</p>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
+                    {listeningResource?.title || entry.listening.title}
+                  </p>
+                  {listeningResource?.description ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>{listeningResource.description}</p>
+                  ) : null}
+                  {entry.listening.prompt ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>{entry.listening.prompt}</p>
+                  ) : null}
+                  {listeningResource?.url ? (
+                    <a href={listeningResource.url} target="_blank" rel="noreferrer" style={styles.linkButton}>
+                      Quelle öffnen
+                    </a>
+                  ) : null}
                   {entry.listening.tasks?.length ? (
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
                       {entry.listening.tasks.map((task) => (
@@ -426,9 +668,9 @@ const C1SelfLearningCourse = () => {
                       ))}
                     </ul>
                   ) : null}
-                  {entry.listening.source ? (
+                  {listeningResource?.source || entry.listening.source ? (
                     <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
-                      Quelle: {entry.listening.source}
+                      Quelle: {listeningResource?.source || entry.listening.source}
                     </p>
                   ) : null}
                 </div>
@@ -449,6 +691,48 @@ const C1SelfLearningCourse = () => {
                     </span>
                   ))}
                 </div>
+                {skimmingWords.length ? (
+                  <div style={{ ...styles.card, padding: 12 }}>
+                    <div style={{ fontWeight: 600, marginBottom: 6 }}>Flashcard-Übung</div>
+                    <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>
+                      {skimmingWords[flashcardIndex]}
+                    </div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={() =>
+                          updateFlashcardIndex(dayKey, (current) =>
+                            current === 0 ? skimmingWords.length - 1 : current - 1
+                          )
+                        }
+                      >
+                        Zurück
+                      </button>
+                      <button
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={() =>
+                          updateFlashcardIndex(dayKey, (current) => (current + 1) % skimmingWords.length)
+                        }
+                      >
+                        Weiter
+                      </button>
+                      <button
+                        type="button"
+                        style={styles.linkButton}
+                        onClick={() =>
+                          updateFlashcardIndex(dayKey, () => Math.floor(Math.random() * skimmingWords.length))
+                        }
+                      >
+                        Zufallskarte
+                      </button>
+                    </div>
+                    <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                      Formuliere einen Satz mit dem Wort und erweitere ihn um ein Beispiel.
+                    </p>
+                  </div>
+                ) : null}
                 <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input
                     type="checkbox"
@@ -464,6 +748,29 @@ const C1SelfLearningCourse = () => {
                 </label>
               </div>
             </div>
+
+            {entry.weeklyReview ? (
+              <div style={{ display: "grid", gap: 6 }}>
+                <strong>Wöchentliche Wiederholung & Reflexion</strong>
+                {entry.weeklyReview.summary ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.weeklyReview.summary}</p>
+                ) : null}
+                {entry.weeklyReview.reflectionQuestions?.length ? (
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {entry.weeklyReview.reflectionQuestions.map((question) => (
+                      <li key={question} style={styles.helperText}>
+                        {question}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {entry.weeklyReview.practicePrompt ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    <strong>Übung:</strong> {entry.weeklyReview.practicePrompt}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <span style={{ ...styles.helperText, margin: 0 }}>
