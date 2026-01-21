@@ -508,8 +508,8 @@ export const courseSchedules = {
       grammar_topic: "German Numbers",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/BzI2n4A8Oak",
-        youtube_link: "https://youtu.be/BzI2n4A8Oak",
+        video: "https://youtu.be/lN7xxSbkPZ4",
+        youtube_link: "https://youtu.be/lN7xxSbkPZ4",
         grammarbook_link: "https://drive.google.com/file/d/12jHQvlNK-2JV0G6vY1UMho_UvzlcIrB8/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1C4VZDUj7VT27Qrn9vS5MNc3QfRqpmDGE/view?usp=sharing",
         assignment: true,
