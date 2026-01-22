@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
 import { downloadStudyCalendar } from "../services/examCalendar";
@@ -28,7 +29,10 @@ const shiftDate = (value, days) => {
   return formatInputDate(date);
 };
 
+const DOWNLOAD_STORAGE_KEY = "falowen_study_calendar_downloaded";
+
 const StudyCalendarPage = () => {
+  const location = useLocation();
   const [selectedLevel, setSelectedLevel] = useState(goetheExamLevels[0]?.level || "B1");
   const [examDate, setExamDate] = useState("");
   const [startDate, setStartDate] = useState(formatInputDate(new Date()));
@@ -37,11 +41,25 @@ const StudyCalendarPage = () => {
   const [durationMinutes, setDurationMinutes] = useState(60);
   const [reminderMinutes, setReminderMinutes] = useState(1440);
   const [activeDays, setActiveDays] = useState([1, 2, 3, 4, 5]);
+  const [hasDownloaded, setHasDownloaded] = useState(() => {
+    try {
+      return localStorage.getItem(DOWNLOAD_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+  const autoDownloadTriggered = useRef(false);
 
   const levelInfo = useMemo(
     () => goetheExamLevels.find((level) => level.level === selectedLevel) || goetheExamLevels[0],
     [selectedLevel]
   );
+
+  const forceDownload = useMemo(() => {
+    if (location.state?.forceDownload) return true;
+    const params = new URLSearchParams(location.search);
+    return params.get("force") === "1";
+  }, [location.search, location.state]);
 
   const examDates = useMemo(() => levelInfo?.exams || [], [levelInfo]);
 
@@ -69,8 +87,8 @@ const StudyCalendarPage = () => {
 
   const isFormReady = Boolean(selectedLevel && startDate && endDate && activeDays.length > 0);
 
-  const handleDownload = () => {
-    if (!isFormReady) return;
+  const handleDownload = useCallback(() => {
+    if (!isFormReady) return false;
     downloadStudyCalendar({
       level: selectedLevel,
       startDate,
@@ -80,7 +98,29 @@ const StudyCalendarPage = () => {
       durationMinutes: Number(durationMinutes),
       reminderMinutes: Number(reminderMinutes),
     });
-  };
+    try {
+      localStorage.setItem(DOWNLOAD_STORAGE_KEY, "true");
+    } catch {
+      // ignore storage failures
+    }
+    setHasDownloaded(true);
+    return true;
+  }, [
+    activeDays,
+    durationMinutes,
+    endDate,
+    isFormReady,
+    reminderMinutes,
+    selectedLevel,
+    startDate,
+    timeOfDay,
+  ]);
+
+  useEffect(() => {
+    if (!forceDownload || !isFormReady || hasDownloaded || autoDownloadTriggered.current) return;
+    autoDownloadTriggered.current = true;
+    handleDownload();
+  }, [forceDownload, handleDownload, hasDownloaded, isFormReady]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -92,6 +132,16 @@ const StudyCalendarPage = () => {
           to your phone.
         </p>
       </section>
+
+      {forceDownload ? (
+        <section style={{ ...styles.card, border: "1px solid #fdba74", background: "#fff7ed" }}>
+          <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>Required: lock in your reminders</h3>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Your course is complete, so we automatically download a study calendar to keep you on track for your
+            next exam. You can adjust the dates below and download again if you want.
+          </p>
+        </section>
+      ) : null}
 
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "grid", gap: 8 }}>
@@ -214,7 +264,7 @@ const StudyCalendarPage = () => {
         </div>
 
         <button type="button" style={styles.primaryButton} onClick={handleDownload} disabled={!isFormReady}>
-          Download study calendar (.ics)
+          {forceDownload ? "Download study calendar (required)" : "Download study calendar (.ics)"}
         </button>
         {!isFormReady ? (
           <p style={{ ...styles.helperText, margin: 0 }}>

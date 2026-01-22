@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
@@ -35,8 +36,11 @@ const completionIdentifiersByLevel = {
   B2: "10.28",
 };
 
+const COURSE_COMPLETION_CALENDAR_KEY = "falowen_course_completion_calendar_download";
+
 const HomeMetrics = ({ studentProfile }) => {
   const { idToken } = useAuth();
+  const navigate = useNavigate();
 
   const [attendance, setAttendance] = useState({ sessions: 0, hours: 0 });
   const [assignmentStats, setAssignmentStats] = useState(null);
@@ -132,6 +136,40 @@ const HomeMetrics = ({ studentProfile }) => {
     return extractIdentifiers(assignmentStats.lastAssignment).includes(targetIdentifier);
   }, [assignmentStats?.lastAssignment, levelKey]);
 
+  const completionStorageKey = useMemo(() => {
+    const codeKey = String(studentCode || "guest").toLowerCase();
+    const level = levelKey || "level";
+    return `${COURSE_COMPLETION_CALENDAR_KEY}:${codeKey}:${level}`;
+  }, [levelKey, studentCode]);
+
+  const [hasPromptedCompletion, setHasPromptedCompletion] = useState(() => {
+    try {
+      return localStorage.getItem(completionStorageKey) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    if (!completionStorageKey) return;
+    try {
+      setHasPromptedCompletion(localStorage.getItem(completionStorageKey) === "true");
+    } catch {
+      setHasPromptedCompletion(false);
+    }
+  }, [completionStorageKey]);
+
+  useEffect(() => {
+    if (!isCourseCompleter || hasPromptedCompletion) return;
+    try {
+      localStorage.setItem(completionStorageKey, "true");
+    } catch {
+      // ignore storage failures
+    }
+    setHasPromptedCompletion(true);
+    navigate("/exams/study?force=1", { state: { forceDownload: true, source: "course-complete" } });
+  }, [completionStorageKey, hasPromptedCompletion, isCourseCompleter, navigate]);
+
   const recommendedNext = useMemo(() => {
     if (blocked) {
       const firstFail = failedAssignments[0];
@@ -179,6 +217,29 @@ const HomeMetrics = ({ studentProfile }) => {
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+      {isCourseCompleter ? (
+        <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #fdba74", background: "#fff7ed" }}>
+          <SectionHeader
+            eyebrow="Course complete"
+            title="Download your study calendar"
+            actions={
+              <PrimaryActionBar align="flex-end">
+                <button
+                  type="button"
+                  onClick={() => navigate("/exams/study?force=1", { state: { forceDownload: true } })}
+                  style={styles.primaryButton}
+                >
+                  Download now
+                </button>
+              </PrimaryActionBar>
+            }
+          />
+          <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
+            We detected that you finished your course work. Download the study calendar so your phone keeps reminding
+            you to practice before the next exam window.
+          </p>
+        </div>
+      ) : null}
       <SectionHeader
         eyebrow="Your personalised metrics"
         title="Attendance and assignments snapshot"
