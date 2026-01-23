@@ -523,8 +523,8 @@ export const courseSchedules = {
       instruction: "Use self-practice workbook and review answers for self-check.",
       assignment: false,
       schreiben_sprechen: {
-        video: "https://youtu.be/LZ5AhNpkMrM",
-        youtube_link: "https://youtu.be/LZ5AhNpkMrM",
+        video: "https://youtu.be/aQNXQlTJMBA",
+        youtube_link: "https://youtu.be/aQNXQlTJMBA",
         workbook_link: "https://drive.google.com/file/d/1-fDUBzfJ4n-fukM9ROPx-dSC7g9gamEb/view?usp=sharing",
         assignment: false,
       },
@@ -537,8 +537,8 @@ export const courseSchedules = {
       assignment: false,
       instruction: "Use self-practice workbook and review answers for self-check.",
       schreiben_sprechen: {
-        video: "https://youtu.be/7hsWwLGcOn4",
-        youtube_link: "https://youtu.be/7hsWwLGcOn4",
+        video: "https://youtu.be/_WdlEcKXuVg",
+        youtube_link: "https://youtu.be/_WdlEcKXuVg",
         workbook_link: "https://drive.google.com/file/d/1xellIzaxzoBTFOUdaCEHu_OiiuEnFeWT/view?usp=sharing",
         assignment: false,
       },
