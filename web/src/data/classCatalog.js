@@ -26,8 +26,8 @@ export const classCatalog = {
     docUrl: "https://drive.google.com/file/d/183tr6FGJ6wMkwhG0GOEzLBUGRqUdoAGW/view?usp=sharing",
   },
   "A1 Hamburg Klasse": {
-    startDate: "2026-01-23",
-    endDate: "2026-03-21",
+    startDate: "2026-01-30",
+    endDate: "2026-03-27",
     schedule: [
       { day: "Thursday", startTime: "18:00", endTime: "19:00" },
       { day: "Friday", startTime: "18:00", endTime: "19:00" },
