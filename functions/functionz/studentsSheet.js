@@ -21,7 +21,8 @@ function normalizeHeader(h) {
   return String(h || "")
     .trim()
     .toLowerCase()
-    .replace(/[\s_-]+/g, "");
+    .replace(/[\s_-]+/g, "")
+    .replace(/[()]/g, "");
 }
 
 function colToA1(colIdx0) {
@@ -129,9 +130,9 @@ async function upsertStudentToSheet(student) {
 
   // Find important columns by header names (supports variations)
   const colStudentCode = findCol(headerMap, "StudentCode", "Student Code", "studentcode");
-  const colUid = findCol(headerMap, "uid", "UID");
+  const colUid = findCol(headerMap, "uid", "UID", "User Id", "UserID", "User ID");
   const colEmail = findCol(headerMap, "Email", "email");
-  const colName = findCol(headerMap, "Name", "name");
+  const colName = findCol(headerMap, "Name", "name", "Full Name", "Student Name", "StudentName");
   const colPhone = findCol(headerMap, "Phone", "phone");
   const colLocation = findCol(headerMap, "Location", "location");
   const colLevel = findCol(headerMap, "Level", "level");
