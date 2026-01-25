@@ -1,7 +1,7 @@
 const { google } = require("googleapis");
 
 const SHEET_ID = process.env.STUDENTS_SHEET_ID;
-const TAB = process.env.STUDENTS_SHEET_TAB || "student";
+const TAB = process.env.STUDENTS_SHEET_TAB || "students";
 
 function getServiceAccount() {
   const b64 = process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64;
@@ -79,9 +79,9 @@ module.exports = async function handler(req, res) {
     // ✅ Column resolution with aliases (backwards compatible)
     const COL = {
       StudentCode: findCol("StudentCode", "Student Code"),
-      UID: findCol("UID"),
+      UID: findCol("UID", "User Id", "UserID", "User ID"),
       Email: findCol("Email"),
-      Name: findCol("Name"),
+      Name: findCol("Name", "Full Name", "Student Name", "StudentName"),
       Phone: findCol("Phone"),
       Location: findCol("Location"),
       Level: findCol("Level"),
