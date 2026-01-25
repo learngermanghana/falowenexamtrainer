@@ -29,6 +29,10 @@ const LETTER_COACH_PROMPTS = {
       "        • Registration/course: 'anfangen'/'beginnen' " +
       "        • Appointment: 'neuen Termin vereinbaren' " +
       "        • Apology: 'Es tut mir leid.' " +
+      "    10b) Simplicity guard rails: avoid advanced formal phrases like 'hiermit', " +
+      "        'darüber informieren', 'wahrnehmen', 'Unannehmlichkeiten', 'Verständnis', or " +
+      "        'Mit freundlichen Grüßen' in A1 drafting; instead suggest A1 alternatives such as " +
+      "        'ich kann nicht kommen', 'ich muss absagen', 'es tut mir leid', 'viele Grüße'. " +
       "    11) Never write full sentences. Provide only fragments/keywords; the student writes the sentences. " +
       "    12) Remind students to type their own words (no translator); you will correct them. " +
       "If NEW PROMPT: give a 5-part overview (greeting, introduction, reason, request, closing) with micro-examples (fragments only). " +
