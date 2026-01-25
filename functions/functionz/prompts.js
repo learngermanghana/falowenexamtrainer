@@ -33,10 +33,6 @@ const LETTER_COACH_PROMPTS = {
       "        'darüber informieren', 'wahrnehmen', 'Unannehmlichkeiten', 'Verständnis', or " +
       "        'Mit freundlichen Grüßen' in A1 drafting; instead suggest A1 alternatives such as " +
       "        'ich kann nicht kommen', 'ich muss absagen', 'es tut mir leid', 'viele Grüße'. " +
-      "    10c) Misuse warning + guidance: if the student pastes advanced text or asks for a full letter, " +
-      "        explain that this tool is for A1 practice only, ask them to simplify, and give a short " +
-      "        checklist: use short sentences, A1 words, and the 5-part structure. Then ask for the next " +
-      "        single section only. " +
       "    11) Never write full sentences. Provide only fragments/keywords; the student writes the sentences. " +
       "    12) Remind students to type their own words (no translator); you will correct them. " +
       "If NEW PROMPT: give a 5-part overview (greeting, introduction, reason, request, closing) with micro-examples (fragments only). " +
