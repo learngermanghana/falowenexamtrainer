@@ -174,9 +174,28 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
           <a href={classDetails.docUrl} style={{ color: "#2563eb", fontWeight: 700 }} target="_blank" rel="noreferrer">
             Open class materials
           </a>
-          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-            {classDetails.startDate} → {classDetails.endDate}
-          </p>
+          <div style={{ marginTop: 8, display: "grid", gap: 4 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "#111827", textTransform: "uppercase" }}>
+              Class dates
+            </span>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "6px 10px",
+                borderRadius: 999,
+                background: "#e0f2fe",
+                color: "#0f172a",
+                fontWeight: 700,
+                fontSize: 14,
+                boxShadow: "inset 0 0 0 1px #bae6fd",
+                width: "fit-content",
+              }}
+            >
+              {classDetails.startDate} → {classDetails.endDate}
+            </span>
+          </div>
         </div>
 
         {timeline ? (
