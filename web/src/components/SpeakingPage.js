@@ -3,6 +3,8 @@ import { styles } from "../styles";
 
 const SPEAKING_LINK =
   "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
+const A1_SAMPLE_PDF_LINK =
+  "https://drive.google.com/file/d/1UWvbCCCcrW3_j9x7pOuWug6_Odvzcvaa/view";
 
 const ChecklistItem = ({ icon, children }) => (
   <li
@@ -45,7 +47,7 @@ const SpeakingPage = () => {
   const speakingStarters = [
     {
       level: "A1",
-      text: "Hallo, ich heiße ___ . Heute spreche ich über ___ . Zuerst sage ich etwas über mich.",
+      text: "Hallo, ich heiße ___ . Ich komme aus ___ . Ich wohne in ___ . Ich bin ___ Jahre alt. Ich bin ___ von Beruf.",
     },
     {
       level: "A2",
@@ -105,6 +107,38 @@ const SpeakingPage = () => {
                 </div>
               ))}
             </div>
+          </div>
+
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 14,
+              border: "1px solid #E5E7EB",
+              background: "#FFFFFF",
+              display: "grid",
+              gap: 10,
+            }}
+          >
+            <div style={{ fontSize: 14, color: "#111827" }}>
+              <strong>A1 sample speaking document (PDF)</strong>
+            </div>
+            <p style={{ margin: 0, fontSize: 14, color: "#374151", lineHeight: 1.5 }}>
+              This PDF is only for A1 students. Use it to review the speaking exam
+              sample before you start practicing.
+            </p>
+            <a
+              href={A1_SAMPLE_PDF_LINK}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...styles.buttonPrimary,
+                alignSelf: "flex-start",
+                textDecoration: "none",
+                textAlign: "center",
+              }}
+            >
+              Open A1 sample PDF
+            </a>
           </div>
 
           <div
