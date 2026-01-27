@@ -59,6 +59,55 @@ const getMessagingTokenFromProfile = (profile, deviceId) => {
   return profile.messagingToken || null;
 };
 
+const isServerTimestampValue = (value) =>
+  Boolean(value && typeof value === "object" && value._methodName === "serverTimestamp");
+
+const toTimestamp = (value) => {
+  if (!value) return Timestamp.now();
+  if (value instanceof Timestamp) return value;
+  if (value instanceof Date) return Timestamp.fromDate(value);
+  if (typeof value === "string" || typeof value === "number") {
+    const date = new Date(value);
+    if (!Number.isNaN(date.valueOf())) {
+      return Timestamp.fromDate(date);
+    }
+  }
+  if (isServerTimestampValue(value)) return Timestamp.now();
+  return Timestamp.now();
+};
+
+const toIsoString = (value) => {
+  if (!value) return null;
+  if (value instanceof Timestamp) return value.toDate().toISOString();
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "string") return value;
+  if (typeof value === "number") {
+    const date = new Date(value);
+    if (!Number.isNaN(date.valueOf())) return date.toISOString();
+  }
+  return null;
+};
+
+const normalizeMessagingTokensForFirestore = (tokens = []) =>
+  tokens
+    .filter((entry) => entry?.token && entry?.deviceId)
+    .map((entry) => ({
+      token: entry.token,
+      deviceId: entry.deviceId,
+      platform: entry.platform || "web",
+      lastSeen: toTimestamp(entry.lastSeen),
+    }));
+
+const normalizeMessagingTokensForState = (tokens = []) =>
+  tokens
+    .filter((entry) => entry?.token && entry?.deviceId)
+    .map((entry) => ({
+      token: entry.token,
+      deviceId: entry.deviceId,
+      platform: entry.platform || "web",
+      lastSeen: toIsoString(entry.lastSeen),
+    }));
+
 const fetchStudentProfileByEmail = async (email) => {
   if (!email) return null;
   const studentsRef = collection(db, "students");
@@ -133,7 +182,7 @@ export const AuthProvider = ({ children }) => {
     const filteredTokens = existingTokens.filter(
       (entry) => entry?.deviceId && entry.deviceId !== deviceId && entry.token
     );
-    const firestoreTokens = [
+    const firestoreTokens = normalizeMessagingTokensForFirestore([
       ...filteredTokens,
       {
         token,
@@ -141,8 +190,8 @@ export const AuthProvider = ({ children }) => {
         platform: devicePlatform,
         lastSeen: Timestamp.now(),
       },
-    ];
-    const localTokens = [
+    ]);
+    const localTokens = normalizeMessagingTokensForState([
       ...filteredTokens,
       {
         token,
@@ -150,7 +199,7 @@ export const AuthProvider = ({ children }) => {
         platform: devicePlatform,
         lastSeen: new Date().toISOString(),
       },
-    ];
+    ]);
     await setDoc(
       studentRef,
       {
@@ -210,7 +259,7 @@ export const AuthProvider = ({ children }) => {
       (entry) => entry?.deviceId && entry.deviceId !== deviceId && entry.token !== token
     );
     const updatePayload = {
-      messagingTokens: filteredTokens,
+      messagingTokens: normalizeMessagingTokensForFirestore(filteredTokens),
       messagingTokenUpdatedAt: serverTimestamp(),
     };
     if (studentProfile?.messagingToken && studentProfile.messagingToken === token) {
@@ -222,7 +271,7 @@ export const AuthProvider = ({ children }) => {
         ? {
             ...prev,
             messagingToken: prev.messagingToken === token ? undefined : prev.messagingToken,
-            messagingTokens: filteredTokens,
+            messagingTokens: normalizeMessagingTokensForState(filteredTokens),
           }
         : prev
     );
