@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import { toDateMs } from "../lib/dateUtils";
 import { ZOOM_DETAILS } from "../data/classCatalog";
 import ClassCalendarCard from "./ClassCalendarCard";
 import HomeMetrics from "./HomeMetrics";
@@ -67,7 +68,7 @@ const GeneralHome = ({
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
     if (!studentProfile?.contractEnd) return null;
-    const contractEndMs = Date.parse(studentProfile.contractEnd);
+    const contractEndMs = toDateMs(studentProfile.contractEnd);
     if (!Number.isFinite(contractEndMs)) return null;
     const dayMs = 1000 * 60 * 60 * 24;
     const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
