@@ -356,7 +356,9 @@ const AppShell = ({
                 studentProfile={studentProfile}
                 notificationStatus={notificationStatus}
                 onEnableNotifications={enableNotifications}
-                onSaveOnboarding={() => saveStudentProfile({ onboardingCompleted: true })}
+                onSaveOnboarding={
+                  studentProfile?.id ? () => saveStudentProfile({ onboardingCompleted: true }) : null
+                }
               />
             }
           />
