@@ -12,18 +12,32 @@ const DEFAULT_HEADERS = [
   "level",
   "paid",
   "balance",
+  "balanceDue",
   "contractStart",
   "contractEnd",
+  "contractTermMonths",
   "studentCode",
+  "studentcode",
   "email",
   "emergency",
+  "emergencyContactPhone",
   "status",
+  "role",
   "enrollDate",
+  "joined_at",
   "className",
+  "learningMode",
   "dailyLimit",
   "uid",
   "mode",
   "address",
+  "initialPaymentAmount",
+  "paymentIntentAmount",
+  "paymentStatus",
+  "paystackLink",
+  "tuitionFee",
+  "syncedToSheets",
+  "updated_at",
   "enrollSent",
   "lastPaidRec",
   "balanceGrace",
@@ -31,26 +45,39 @@ const DEFAULT_HEADERS = [
   "remindCount",
 ];
 
-const IMPORTANT_FIELDS = new Set([
-  "name",
-  "phone",
-  "location",
-  "level",
-  "paid",
-  "balance",
-  "contractStart",
-  "contractEnd",
-  "studentCode",
-  "email",
-  "emergency",
-  "status",
-  "enrollDate",
-  "className",
-  "dailyLimit",
-  "uid",
-  "mode",
-  "address",
-]);
+const FIELD_DEFS = [
+  { key: "name", output: "name" },
+  { key: "phone", output: "phone" },
+  { key: "location", output: "location" },
+  { key: "level", output: "level" },
+  { key: "paid", output: "paid", type: "number" },
+  { key: "balance", output: "balance", type: "number" },
+  { key: "balancedue", output: "balanceDue", type: "number" },
+  { key: "contractstart", output: "contractStart" },
+  { key: "contractend", output: "contractEnd" },
+  { key: "contracttermmonths", output: "contractTermMonths", type: "number" },
+  { key: "studentcode", output: ["studentCode", "studentcode"] },
+  { key: "email", output: "email" },
+  { key: "emergency", output: "emergency" },
+  { key: "emergencycontactphone", output: "emergencyContactPhone" },
+  { key: "status", output: "status" },
+  { key: "role", output: "role" },
+  { key: "enrolldate", output: "enrollDate" },
+  { key: "joinedat", output: "joined_at" },
+  { key: "classname", output: "className" },
+  { key: "learningmode", output: "learningMode" },
+  { key: "dailylimit", output: "dailyLimit", type: "number" },
+  { key: "uid", output: "uid" },
+  { key: "mode", output: "mode" },
+  { key: "address", output: "address" },
+  { key: "initialpaymentamount", output: "initialPaymentAmount", type: "number" },
+  { key: "paymentintentamount", output: "paymentIntentAmount", type: "number" },
+  { key: "paymentstatus", output: "paymentStatus" },
+  { key: "paystacklink", output: "paystackLink" },
+  { key: "tuitionfee", output: "tuitionFee", type: "number" },
+  { key: "syncedtosheets", output: "syncedToSheets", type: "boolean" },
+  { key: "updatedat", output: "updated_at" },
+];
 
 function normalizeHeader(value) {
   return String(value || "")
@@ -65,6 +92,14 @@ function parseNumber(value) {
   const raw = String(value).replace(/[^0-9.-]/g, "");
   const num = parseFloat(raw);
   return Number.isFinite(num) ? num : 0;
+}
+
+function parseBoolean(value) {
+  if (value === null || value === undefined) return false;
+  const normalized = String(value).trim().toLowerCase();
+  if (["true", "yes", "y", "1"].includes(normalized)) return true;
+  if (["false", "no", "n", "0"].includes(normalized)) return false;
+  return Boolean(normalized);
 }
 
 function getServiceAccount() {
@@ -173,15 +208,23 @@ function buildRowObject(row, headerMap, headersFallback) {
 
 function mapStudentFields(raw) {
   const student = {};
-  for (const field of IMPORTANT_FIELDS) {
-    if (!(field in raw)) continue;
-    const value = raw[field];
+  for (const field of FIELD_DEFS) {
+    if (!(field.key in raw)) continue;
+    const value = raw[field.key];
+    let parsedValue = value;
 
-    if (["paid", "balance", "dailyLimit"].includes(field)) {
-      student[field] = parseNumber(value);
-    } else {
-      student[field] = value;
+    if (field.type === "number") {
+      parsedValue = parseNumber(value);
     }
+
+    if (field.type === "boolean") {
+      parsedValue = parseBoolean(value);
+    }
+
+    const outputs = Array.isArray(field.output) ? field.output : [field.output];
+    outputs.forEach((output) => {
+      student[output] = parsedValue;
+    });
   }
   return student;
 }
@@ -223,7 +266,7 @@ async function restoreStudents() {
 
     const raw = buildRowObject(row, headerMap, DEFAULT_HEADERS);
     const mapped = mapStudentFields(raw);
-    const studentCode = String(mapped.studentCode || "").trim();
+    const studentCode = String(mapped.studentCode || mapped.studentcode || "").trim();
 
     if (!studentCode) {
       skipped += 1;
