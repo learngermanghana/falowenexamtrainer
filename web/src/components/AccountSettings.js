@@ -67,7 +67,15 @@ const AccountSettings = () => {
       paymentMethod: paymentsEnabled ? "Paystack" : "Web portal",
       invoiceEmail: studentProfile?.email || user?.email || "",
     };
-  }, [paymentsEnabled, studentProfile?.contractEnd, studentProfile?.contractTermMonths, studentProfile?.paymentStatus, studentProfile?.email, user?.email]);
+  }, [
+    paymentsEnabled,
+    studentProfile?.contractEnd,
+    studentProfile?.contractTermMonths,
+    studentProfile?.paymentStatus,
+    studentProfile?.balanceDue,
+    studentProfile?.email,
+    user?.email,
+  ]);
 
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
