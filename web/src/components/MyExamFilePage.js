@@ -10,24 +10,25 @@ import { downloadExamReminder } from "../services/examCalendar";
 import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
+import { toDate, toDateMs } from "../lib/dateUtils";
 import { jsPDF } from "jspdf";
 
 // ---------- helpers ----------
 const formatDate = (value) => {
   if (!value) return "";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleDateString();
+  const parsed = toDate(value);
+  return parsed ? parsed.toLocaleDateString() : "";
 };
 
 const formatDateTime = (value) => {
   if (!value) return "";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? "" : parsed.toLocaleString();
+  const parsed = toDate(value);
+  return parsed ? parsed.toLocaleString() : "";
 };
 
 const toTime = (row) => {
   const raw = row?.date ?? row?.created_at ?? row?.createdAt ?? 0;
-  const t = new Date(raw).getTime();
+  const t = toDateMs(raw);
   return Number.isNaN(t) ? 0 : t;
 };
 

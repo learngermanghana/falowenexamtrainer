@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
+import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 
 const SetupCheckpoint = () => {
   const { studentProfile, refreshUser, logout } = useAuth();
@@ -11,12 +12,13 @@ const SetupCheckpoint = () => {
   const paymentsEnabled = isPaymentsEnabled();
 
   const checkpoints = useMemo(() => {
-    const paymentStatus = (studentProfile?.paymentStatus || "pending").toLowerCase();
+    const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
+    const balanceCleared = hasClearedBalance(studentProfile?.balanceDue);
     return {
       paymentStatus,
-      paymentReady: paymentStatus === "paid",
+      paymentReady: paymentStatus === "paid" || balanceCleared,
     };
-  }, [studentProfile?.paymentStatus]);
+  }, [studentProfile?.balanceDue, studentProfile?.paymentStatus]);
 
   const checkoutAmountOverride = useMemo(() => {
     const intended = Number(studentProfile?.paymentIntentAmount);

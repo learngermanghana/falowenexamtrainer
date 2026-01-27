@@ -4,11 +4,13 @@ import { styles } from "../styles";
 import { correctBiography } from "../services/profileService";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
+import { toDate, toDateMs } from "../lib/dateUtils";
+import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 
 const formatDate = (value) => {
   if (!value) return "–";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "–";
+  const date = toDate(value);
+  if (!date) return "–";
   return date.toLocaleDateString(undefined, {
     year: "numeric",
     month: "short",
@@ -39,17 +41,19 @@ const AccountSettings = () => {
   }, [studentProfile, user]);
 
   const subscription = useMemo(() => {
-    const contractEnd = studentProfile?.contractEnd ? new Date(studentProfile.contractEnd) : null;
+    const contractEnd = studentProfile?.contractEnd ? toDate(studentProfile.contractEnd) : null;
     const isActive = contractEnd && !Number.isNaN(contractEnd.getTime()) && contractEnd.getTime() > Date.now();
     const contractMonths = Number(studentProfile?.contractTermMonths) || null;
-    const paymentStatus = (studentProfile?.paymentStatus || "pending").toLowerCase();
+    const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
+    const balanceCleared = hasClearedBalance(studentProfile?.balanceDue);
+    const hasPaid = paymentStatus === "paid" || balanceCleared;
 
     const plan =
       contractMonths === 6
         ? "6-month contract"
         : contractMonths === 1
         ? "1-month access"
-        : paymentStatus === "paid"
+        : hasPaid
         ? "6-month contract"
         : paymentStatus === "partial"
         ? "1-month access"
@@ -69,7 +73,7 @@ const AccountSettings = () => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
     if (!studentProfile?.contractEnd) return null;
-    const contractEndMs = Date.parse(studentProfile.contractEnd);
+    const contractEndMs = toDateMs(studentProfile.contractEnd);
     if (!Number.isFinite(contractEndMs)) return null;
     const dayMs = 1000 * 60 * 60 * 24;
     const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);

@@ -33,6 +33,8 @@ import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import OfflineBanner from "./components/OfflineBanner";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
+import { toDateMs } from "./lib/dateUtils";
+import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
 
 const TAB_STRUCTURE = [
   {
@@ -141,18 +143,24 @@ function App() {
   );
 
   const paymentStatus = useMemo(
-    () => (studentProfile?.paymentStatus || "pending").toLowerCase(),
+    () => normalizePaymentStatus(studentProfile?.paymentStatus),
     [studentProfile?.paymentStatus]
   );
   const contractEndMs = useMemo(() => {
     if (!studentProfile?.contractEnd) return NaN;
-    const parsed = Date.parse(studentProfile.contractEnd);
+    const parsed = toDateMs(studentProfile.contractEnd);
     return Number.isFinite(parsed) ? parsed : NaN;
   }, [studentProfile?.contractEnd]);
+  const balanceCleared = useMemo(
+    () => hasClearedBalance(studentProfile?.balanceDue),
+    [studentProfile?.balanceDue]
+  );
 
   const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > Date.now();
-  const canAccessLegacy = !Number.isFinite(contractEndMs) && ["paid", "partial"].includes(paymentStatus);
-  const awaitingPayment = Boolean(studentProfile) && !isStaff && !(hasActiveContract || canAccessLegacy);
+  const canAccessLegacy =
+    !Number.isFinite(contractEndMs) && (["paid", "partial"].includes(paymentStatus) || balanceCleared);
+  const awaitingPayment =
+    Boolean(studentProfile) && !isStaff && !(hasActiveContract || canAccessLegacy || balanceCleared);
 
   if (!isFirebaseConfigured) {
     return (
