@@ -19,6 +19,7 @@ import {
   doc,
   updateDoc,
   serverTimestamp,
+  Timestamp,
   isFirebaseConfigured,
   deleteField,
   getActionCodeSettings,
@@ -138,7 +139,7 @@ export const AuthProvider = ({ children }) => {
         token,
         deviceId,
         platform: devicePlatform,
-        lastSeen: serverTimestamp(),
+        lastSeen: Timestamp.now(),
       },
     ];
     const localTokens = [
