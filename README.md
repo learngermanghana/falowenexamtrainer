@@ -74,6 +74,22 @@ rows into the approval spreadsheet with the helper script at
 You can schedule this script (e.g., with cron) or wrap it in a Cloud Function
 for near-real-time mirroring between Firebase and Google Sheets.
 
+## Restore students from Google Sheets
+If the `students` collection was deleted and you have a backup in Google Sheets,
+you can restore the most important fields with the helper script at
+`functions/functionz/restoreStudentsFromSheet.js`:
+
+```
+STUDENTS_SHEET_ID="<sheet_id>" \
+STUDENTS_SHEET_TAB="students" \
+GOOGLE_SERVICE_ACCOUNT_FILE=./service-account.json \
+node functions/functionz/restoreStudentsFromSheet.js
+```
+
+The script only restores the key student fields (name, studentCode, email,
+level, paid, balance, etc.), upserts by `studentCode`, and adds a `restoredAt`
+timestamp to each document.
+
 ## Deploy the Cloud Functions (Firestore trigger + Paystack webhook)
 The Firebase Functions bundle exposes two entry points:
 
