@@ -86,11 +86,9 @@ GOOGLE_SERVICE_ACCOUNT_FILE=./service-account.json \
 node functions/functionz/restoreStudentsFromSheet.js
 ```
 
-The script restores the key student fields (name, studentCode, email, level,
-paid, balance, etc.) and maps them to the current Firestore schema (for example
-`paid` → `initialPaymentAmount`, `balance` → `balanceDue`, `enrollDate` →
-`joined_at`, `mode` → `learningMode`). It upserts by `studentCode` and adds a
-`restoredAt` timestamp to each document.
+The script only restores the key student fields (name, studentCode, email,
+level, paid, balance, etc.), upserts by `studentCode`, and adds a `restoredAt`
+timestamp to each document.
 
 ## Deploy the Cloud Functions (Firestore trigger + Paystack webhook)
 The Firebase Functions bundle exposes two entry points:
