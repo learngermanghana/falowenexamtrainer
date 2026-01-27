@@ -52,27 +52,6 @@ const IMPORTANT_FIELDS = new Set([
   "address",
 ]);
 
-const HEADER_ALIASES = {
-  name: ["name", "fullname", "studentname"],
-  phone: ["phone", "phonenumber", "mobile"],
-  location: ["location", "city", "town"],
-  level: ["level", "cefr", "classlevel"],
-  paid: ["paid", "amountpaid", "paidsofar"],
-  balance: ["balance", "balancedue", "balanceowed"],
-  contractStart: ["contractstart", "contractstartdate"],
-  contractEnd: ["contractend", "contractenddate"],
-  studentCode: ["studentcode", "student_code", "code"],
-  email: ["email", "emailaddress"],
-  emergency: ["emergency", "emergencycontact", "emergencyphone"],
-  status: ["status"],
-  enrollDate: ["enrolldate", "enroldate", "joinedat", "joindate"],
-  className: ["classname", "class"],
-  dailyLimit: ["dailylimit", "daily_limit"],
-  uid: ["uid", "userid", "user_id"],
-  mode: ["mode", "learningmode"],
-  address: ["address", "homeaddress"],
-};
-
 function normalizeHeader(value) {
   return String(value || "")
     .trim()
@@ -161,15 +140,6 @@ function buildHeaderMap(headers) {
   return map;
 }
 
-function findHeaderIndex(headerMap, aliases) {
-  for (const alias of aliases) {
-    const key = normalizeHeader(alias);
-    const idx = headerMap.get(key);
-    if (idx !== undefined) return idx;
-  }
-  return null;
-}
-
 function detectHeaders(row) {
   const normalized = row.map((cell) => normalizeHeader(cell));
   const hasKey = (key) => normalized.includes(normalizeHeader(key));
@@ -180,21 +150,21 @@ function detectHeaders(row) {
 }
 
 function buildRowObject(row, headerMap, headersFallback) {
+  const headers = headerMap ? null : headersFallback;
   const data = {};
 
   if (headerMap) {
-    for (const [field, aliases] of Object.entries(HEADER_ALIASES)) {
-      const idx = findHeaderIndex(headerMap, aliases);
-      if (idx !== null && idx < row.length) {
-        data[field] = String(row[idx] ?? "").trim();
+    for (const [key, idx] of headerMap.entries()) {
+      if (idx >= 0 && idx < row.length) {
+        data[key] = String(row[idx] ?? "").trim();
       }
     }
     return data;
   }
 
-  headersFallback.forEach((header, idx) => {
+  headers.forEach((header, idx) => {
     if (idx < row.length) {
-      data[header] = String(row[idx] ?? "").trim();
+      data[normalizeHeader(header)] = String(row[idx] ?? "").trim();
     }
   });
 
