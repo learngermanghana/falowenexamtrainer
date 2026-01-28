@@ -95,6 +95,47 @@
   }
 }
 
+@media (max-width: 640px) {
+  .idea-generator-card {
+    padding: 12px;
+  }
+
+  .idea-generator-chat {
+    max-height: 240px;
+    gap: 8px;
+  }
+
+  .idea-generator-bubble {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .idea-generator-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .idea-generator-actions button {
+    width: 100%;
+  }
+
+  .idea-generator-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .idea-generator-panel {
+    padding: 10px;
+  }
+
+  .idea-generator-preview {
+    font-size: 13px;
+  }
+
+  .idea-generator-drafts {
+    max-height: 160px;
+  }
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

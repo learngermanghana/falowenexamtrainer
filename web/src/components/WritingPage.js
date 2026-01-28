@@ -723,12 +723,12 @@ const WritingPage = ({ mode = "course" }) => {
       )}
 
       {activeTab === "ideas" && (
-        <section style={styles.card}>
+        <section style={styles.card} className="idea-generator-card">
           <h3 style={styles.sectionTitle}>Idea generator</h3>
           <p style={styles.helperText}>
             Paste your task and chat in a single field. Herr Felix replies step by step with the updated coaching prompt.
           </p>
-          <div style={styles.chatLog}>
+          <div style={styles.chatLog} className="idea-generator-chat">
             {chatMessages.map((msg, idx) => (
               <div
                 key={msg.id || `${msg.role}-${idx}`}
@@ -737,6 +737,7 @@ const WritingPage = ({ mode = "course" }) => {
                     ? styles.chatBubbleCoach
                     : styles.chatBubbleUser
                 }
+                className={`idea-generator-bubble ${msg.role === "assistant" ? "idea-generator-bubble--coach" : "idea-generator-bubble--user"}`}
               >
                 <strong style={{ display: "block", marginBottom: 4 }}>
                   {msg.role === "assistant" ? "Coach" : "You"}
@@ -759,7 +760,10 @@ const WritingPage = ({ mode = "course" }) => {
               rows={3}
             />
           </div>
-          <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div
+            style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}
+            className="idea-generator-actions"
+          >
             <button
               style={styles.primaryButton}
               onClick={handleAskCoach}
@@ -791,8 +795,11 @@ const WritingPage = ({ mode = "course" }) => {
               Choose parts from your chat messages or use the live preview below.
               We will place them in the “Mark my letter” tab so you can get them graded quickly.
             </p>
-            <div style={styles.gridTwo}>
-              <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+            <div style={styles.gridTwo} className="idea-generator-grid">
+              <div
+                style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+                className="idea-generator-panel"
+              >
                 <div style={styles.metaRow}>
                   <div style={{ fontWeight: 800 }}>Live preview</div>
                   <span style={styles.badge}>Visible only to you</span>
@@ -809,12 +816,16 @@ const WritingPage = ({ mode = "course" }) => {
                     background: "#f8fafc",
                     whiteSpace: "pre-wrap",
                   }}
+                  className="idea-generator-preview"
                 >
                   {ideaInput.trim() || "No draft typed yet."}
                 </div>
               </div>
 
-              <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+              <div
+                style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+                className="idea-generator-panel"
+              >
                 <div style={styles.metaRow}>
                   <div style={{ fontWeight: 800 }}>Pick from your chat</div>
                   <span style={styles.badge}>{userMessages.length} drafts</span>
@@ -824,7 +835,10 @@ const WritingPage = ({ mode = "course" }) => {
                     Send a question in the chat, then you can select your own messages here.
                   </p>
                 ) : (
-                  <div style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }}>
+                  <div
+                    style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }}
+                    className="idea-generator-drafts"
+                  >
                     {userMessages.map((msg) => (
                       <label
                         key={msg.id}

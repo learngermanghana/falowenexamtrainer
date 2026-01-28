@@ -471,7 +471,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       )}
 
       {activeTab === "ideas" && (
-        <section style={styles.card}>
+        <section style={styles.card} className="idea-generator-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 260 }}>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -495,11 +495,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             <span style={styles.levelPill}>Prompt bank in /functions/functionz/prompts.js</span>
           </div>
 
-          <div style={{ ...styles.chatLog, marginTop: 12 }}>
+          <div style={{ ...styles.chatLog, marginTop: 12 }} className="idea-generator-chat">
             {chatMessages.map((msg, idx) => (
               <div
                 key={msg.id || `${msg.role}-${idx}`}
                 style={msg.role === "assistant" ? styles.chatBubbleCoach : styles.chatBubbleUser}
+                className={`idea-generator-bubble ${msg.role === "assistant" ? "idea-generator-bubble--coach" : "idea-generator-bubble--user"}`}
               >
                 <strong style={{ display: "block", marginBottom: 4 }}>{msg.role === "assistant" ? "Coach" : "You"}</strong>
                 <span>{msg.content}</span>
@@ -518,7 +519,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             />
           </div>
 
-          <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div
+            style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}
+            className="idea-generator-actions"
+          >
             <button style={styles.primaryButton} onClick={handleAskForIdeas} disabled={ideasLoading}>
               {ideasLoading ? "Coach is typing..." : "Send to ideas coach"}
             </button>
@@ -547,8 +551,11 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               Choose parts from your chat messages or use the live preview below.
               We will place them in the “Mark my letter” tab so you can get them graded quickly.
             </p>
-            <div style={styles.gridTwo}>
-              <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+            <div style={styles.gridTwo} className="idea-generator-grid">
+              <div
+                style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+                className="idea-generator-panel"
+              >
                 <div style={styles.metaRow}>
                   <div style={{ fontWeight: 800 }}>Live preview</div>
                   <span style={styles.badge}>Visible only to you</span>
@@ -565,12 +572,16 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     background: "#f8fafc",
                     whiteSpace: "pre-wrap",
                   }}
+                  className="idea-generator-preview"
                 >
                   {ideaInput.trim() || "No draft typed yet."}
                 </div>
               </div>
 
-              <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+              <div
+                style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+                className="idea-generator-panel"
+              >
                 <div style={styles.metaRow}>
                   <div style={{ fontWeight: 800 }}>Pick from your chat</div>
                   <span style={styles.badge}>{userMessages.length} drafts</span>
@@ -580,7 +591,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     Send a question in the chat, then you can select your own messages here.
                   </p>
                 ) : (
-                  <div style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }}>
+                  <div
+                    style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }}
+                    className="idea-generator-drafts"
+                  >
                     {userMessages.map((msg) => (
                       <label
                         key={msg.id}
