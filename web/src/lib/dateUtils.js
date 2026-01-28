@@ -1,3 +1,19 @@
+const parseSlashDate = (raw) => {
+  if (!raw) return null;
+  const match = String(raw).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!match) return null;
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = Number(match[3]);
+  if (!day || !month || !year) return null;
+  const parsed = new Date(year, month - 1, day);
+  if (Number.isNaN(parsed.getTime())) return null;
+  if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) {
+    return null;
+  }
+  return parsed;
+};
+
 export const toDate = (value) => {
   if (!value) return null;
   if (value instanceof Date) return value;
@@ -8,6 +24,8 @@ export const toDate = (value) => {
     }
   }
   if (typeof value === "string" || typeof value === "number") {
+    const slashDate = parseSlashDate(value);
+    if (slashDate) return slashDate;
     const parsed = new Date(value);
     if (!Number.isNaN(parsed.getTime())) return parsed;
   }

@@ -40,12 +40,23 @@ const AccountSettings = () => {
     }));
   }, [studentProfile, user]);
 
+  const paidAmount = useMemo(() => {
+    const paid = studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0;
+    return Math.max(Number(paid) || 0, 0);
+  }, [studentProfile?.initialPaymentAmount, studentProfile?.paid]);
+
+  const balanceDue = useMemo(() => {
+    const balance = studentProfile?.balanceDue ?? studentProfile?.balance;
+    if (balance === null || balance === undefined) return undefined;
+    return Math.max(Number(balance) || 0, 0);
+  }, [studentProfile?.balance, studentProfile?.balanceDue]);
+
   const subscription = useMemo(() => {
     const contractEnd = studentProfile?.contractEnd ? toDate(studentProfile.contractEnd) : null;
     const isActive = contractEnd && !Number.isNaN(contractEnd.getTime()) && contractEnd.getTime() > Date.now();
     const contractMonths = Number(studentProfile?.contractTermMonths) || null;
     const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
-    const balanceCleared = hasClearedBalance(studentProfile?.balanceDue);
+    const balanceCleared = hasClearedBalance(balanceDue);
     const hasPaid = paymentStatus === "paid" || balanceCleared;
 
     const plan =
@@ -72,14 +83,13 @@ const AccountSettings = () => {
     studentProfile?.contractEnd,
     studentProfile?.contractTermMonths,
     studentProfile?.paymentStatus,
-    studentProfile?.balanceDue,
+    balanceDue,
     studentProfile?.email,
     user?.email,
   ]);
 
   const paymentAlert = useMemo(() => {
-    const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
-    if (balanceDue <= 0) return null;
+    if (!balanceDue || balanceDue <= 0) return null;
     if (!studentProfile?.contractEnd) return null;
     const contractEndMs = toDateMs(studentProfile.contractEnd);
     if (!Number.isFinite(contractEndMs)) return null;
@@ -95,7 +105,7 @@ const AccountSettings = () => {
           ? `Your access ends today and you still owe ${formatMoney(balanceDue)}. Please make a payment to keep access.`
           : `You still owe ${formatMoney(balanceDue)} and have ${daysLeft} day${daysLeft === 1 ? "" : "s"} left. Please make a payment to keep access.`,
     };
-  }, [studentProfile?.balanceDue, studentProfile?.contractEnd]);
+  }, [balanceDue, studentProfile?.contractEnd]);
 
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({ ...prev, [field]: event.target.value }));
@@ -308,11 +318,11 @@ const AccountSettings = () => {
 
           <TuitionStatusCard
             level={studentProfile.level}
-            paidAmount={studentProfile.initialPaymentAmount}
-            balanceDue={studentProfile.balanceDue}
+            paidAmount={paidAmount}
+            balanceDue={balanceDue}
             tuitionFee={studentProfile.tuitionFee}
             checkoutAmountOverride={
-              Number(studentProfile?.initialPaymentAmount || 0) > 0
+              paidAmount > 0
                 ? undefined
                 : studentProfile?.paymentIntentAmount
             }
