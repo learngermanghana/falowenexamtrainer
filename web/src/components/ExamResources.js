@@ -24,26 +24,6 @@ const goetheLevelLinks = {
 
 const resources = [
   {
-    title: "Goethe Lesen & Hören practice",
-    items: [
-      {
-        label: "Goethe practice portal",
-        url: "https://www.goethe.de/prf/deindex.html",
-        note: "Official sample tests and model answers by level.",
-      },
-      {
-        label: "Goethe audio samples",
-        url: "https://www.goethe.de/prf/ueb/enindex.htm",
-        note: "Play the Hören tracks and take notes like exam day.",
-      },
-      {
-        label: "Lesen strategies",
-        url: "https://www.goethe.de/prf/ueb/lv/enindex.htm",
-        note: "Scan for keywords first, then read for detail in round two.",
-      },
-    ],
-  },
-  {
     title: "Before the exam",
     items: [
       { label: "Pack your passport and pencils the night before.", url: null },
