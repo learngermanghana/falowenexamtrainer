@@ -11,23 +11,34 @@ const SetupCheckpoint = () => {
   const [refreshing, setRefreshing] = useState(false);
   const paymentsEnabled = isPaymentsEnabled();
 
+  const paidAmount = useMemo(() => {
+    const paid = studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0;
+    return Math.max(Number(paid) || 0, 0);
+  }, [studentProfile?.initialPaymentAmount, studentProfile?.paid]);
+
+  const balanceDue = useMemo(() => {
+    const balance = studentProfile?.balanceDue ?? studentProfile?.balance;
+    if (balance === null || balance === undefined) return undefined;
+    return Math.max(Number(balance) || 0, 0);
+  }, [studentProfile?.balance, studentProfile?.balanceDue]);
+
   const checkpoints = useMemo(() => {
     const paymentStatus = normalizePaymentStatus(studentProfile?.paymentStatus);
-    const balanceCleared = hasClearedBalance(studentProfile?.balanceDue);
+    const balanceCleared = hasClearedBalance(balanceDue);
     return {
       paymentStatus,
       paymentReady: paymentStatus === "paid" || balanceCleared,
     };
-  }, [studentProfile?.balanceDue, studentProfile?.paymentStatus]);
+  }, [balanceDue, studentProfile?.paymentStatus]);
 
   const checkoutAmountOverride = useMemo(() => {
     const intended = Number(studentProfile?.paymentIntentAmount);
-    const alreadyPaid = Number(studentProfile?.initialPaymentAmount || 0) > 0;
+    const alreadyPaid = paidAmount > 0;
     if (alreadyPaid) return undefined;
     if (!Number.isFinite(intended) || intended <= 0) return undefined;
     // If the student selected an amount during signup, charge that amount on first checkout.
     return intended;
-  }, [studentProfile?.initialPaymentAmount, studentProfile?.paymentIntentAmount]);
+  }, [paidAmount, studentProfile?.paymentIntentAmount]);
 
   const handleRefreshStatus = async () => {
     setRefreshing(true);
@@ -88,8 +99,8 @@ const SetupCheckpoint = () => {
         >
           <TuitionStatusCard
             level={studentProfile?.level}
-            paidAmount={studentProfile?.initialPaymentAmount}
-            balanceDue={studentProfile?.balanceDue}
+            paidAmount={paidAmount}
+            balanceDue={balanceDue}
             tuitionFee={studentProfile?.tuitionFee}
             checkoutAmountOverride={checkoutAmountOverride}
             title="Pay your tuition"
