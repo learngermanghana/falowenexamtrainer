@@ -171,7 +171,7 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
               and daily practice. Build speaking confidence, improve writing, and prepare for German certification exams.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="button" style={styles.primaryButton} onClick={onSignUp}>
+              <button type="button" style={styles.primaryButton} onClick={() => onSignUp("german")}>
                 Join a cohort
               </button>
               <button type="button" style={styles.secondaryButton} onClick={onLogin}>
@@ -250,7 +250,7 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
               next available class.
             </p>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="button" style={styles.primaryButton} onClick={onSignUp}>
+              <button type="button" style={styles.primaryButton} onClick={() => onSignUp("german")}>
                 Join a cohort
               </button>
               <a

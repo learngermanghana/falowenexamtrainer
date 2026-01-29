@@ -307,6 +307,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         address,
         learningMode,
         emergencyContactPhone,
+        program: "german",
         initialPaymentAmount: paidAmount,
         tuitionFee,
         balanceDue,
