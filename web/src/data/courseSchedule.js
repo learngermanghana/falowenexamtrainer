@@ -1,3 +1,5 @@
+import { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule";
+
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
 const buildA2Lesson = (lesson) => {
@@ -1757,4 +1759,5 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
       },
     },
   ],
+  FRENCH_A1: FRENCH_A1_SCHEDULE,
 };
