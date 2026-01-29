@@ -568,8 +568,8 @@ const courseSchedules = {
       grammar_topic: "schon mal, noch nie; irregular verbs; personal pronouns",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/0HjCQKxMl5Q",
-        youtube_link: "https://youtu.be/0HjCQKxMl5Q",
+        video: "https://youtu.be/Y0N1xLBBh1g",
+        youtube_link: "https://youtu.be/Y0N1xLBBh1g",
         grammarbook_link: "https://drive.google.com/file/d/1FaRD4UibeJwCM8Yggjn84cdiVS7n-Rv2/view?usp=sharing",
         workbook_link: "https://drive.google.com/file/d/1woXksV9sTZ_8huXa8yf6QUQ8aUXPxVug/view?usp=sharing",
         assignment: true,
