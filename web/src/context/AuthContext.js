@@ -452,6 +452,7 @@ export const AuthProvider = ({ children }) => {
         className: profile.className || "",
         phone: profile.phone || "",
         location: profile.location || "",
+        program: profile.program || "german",
 
         learningMode: profile.learningMode || "", // already there ✅
         address: profile.address || "",            // ✅ NEW FIELD

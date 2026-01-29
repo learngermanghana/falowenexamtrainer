@@ -5,6 +5,7 @@ import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import LandingPage from "./components/LandingPage";
+import FrenchSignUpPage from "./components/FrenchSignUpPage";
 import HealthIndicator from "./components/HealthIndicator";
 import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
@@ -107,6 +108,7 @@ function App() {
     saveStudentProfile,
   } = useAuth();
   const [authMode, setAuthMode] = useState("landing");
+  const [signupProgram, setSignupProgram] = useState("german");
   const location = useLocation();
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
@@ -193,16 +195,36 @@ function App() {
   }
 
   if (location.pathname === "/learn-german-ghana") {
-    return <SeoLandingPage onSignUp={() => setAuthMode("signup")} onLogin={() => setAuthMode("login")} />;
+    return (
+      <SeoLandingPage
+        onSignUp={() => {
+          setSignupProgram("german");
+          setAuthMode("signup");
+        }}
+        onLogin={() => setAuthMode("login")}
+      />
+    );
   }
 
   if (!user) {
     if (authMode === "signup") {
+      if (signupProgram === "french") {
+        return <FrenchSignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
+      }
+
       return <SignUpPage onLogin={() => setAuthMode("login")} onBack={() => setAuthMode("landing")} />;
     }
 
     if (authMode === "landing") {
-      return <LandingPage onSignUp={() => setAuthMode("signup")} onLogin={() => setAuthMode("login")} />;
+      return (
+        <LandingPage
+          onSignUp={(program) => {
+            setSignupProgram(program || "german");
+            setAuthMode("signup");
+          }}
+          onLogin={() => setAuthMode("login")}
+        />
+      );
     }
 
     return (
