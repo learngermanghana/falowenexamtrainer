@@ -47,7 +47,7 @@ const SpeakingPage = () => {
   const speakingStarters = [
     {
       level: "A1",
-      text: "Hallo, ich heiße ___ . Heute spreche ich über ___ . Zuerst sage ich etwas über mich.",
+      text: "Hallo, ich heiße ___ . Ich komme aus ___ . Ich wohne in ___ . Ich bin ___ Jahre alt. Ich bin ___ von Beruf.",
     },
     {
       level: "A2",
