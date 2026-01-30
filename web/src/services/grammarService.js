@@ -52,11 +52,18 @@ export const fetchGrammarHistory = async ({ studentId, pageSize = 10, cursor, id
   return { entries, nextCursor };
 };
 
-export async function askGrammarQuestion({ question, level, studentId, idToken, timeoutMs = 20000 }) {
+export async function askGrammarQuestion({
+  question,
+  level,
+  studentId,
+  program,
+  idToken,
+  timeoutMs = 20000,
+}) {
   try {
     const response = await callAI({
       path: "/grammar/ask",
-      payload: { question, level, studentId },
+      payload: { question, level, studentId, program },
       idToken,
       timeoutMs,
     });

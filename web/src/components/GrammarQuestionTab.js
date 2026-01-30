@@ -20,6 +20,11 @@ const GrammarQuestionTab = () => {
   const [sortOrder, setSortOrder] = useState("newest");
   const [levelFilter, setLevelFilter] = useState("all");
   const [keywordFilter, setKeywordFilter] = useState("");
+  const isFrenchProgram = studentProfile?.program === "french";
+  const languageLabel = isFrenchProgram ? "French" : "German";
+  const examplePrompt = isFrenchProgram
+    ? 'e.g., "Quand est-ce que vs. quand" or "How do I use ne…pas?"'
+    : 'e.g., "When do I use seit vs. für?" or "How do I form the Perfekt with modal verbs?"';
 
   useEffect(() => {
     if (studentProfile?.level) {
@@ -111,6 +116,7 @@ const GrammarQuestionTab = () => {
         level: levelValue,
         idToken,
         studentId: studentProfile?.id,
+        program: studentProfile?.program,
       });
       setAnswer(reply);
       setHistory((prev) => [
@@ -143,10 +149,10 @@ const GrammarQuestionTab = () => {
 
   return (
     <div style={{ ...styles.card, marginTop: 12 }}>
-      <h2 style={styles.sectionTitle}>Ask a Grammar Question</h2>
+      <h2 style={styles.sectionTitle}>Ask a {languageLabel} Grammar Question</h2>
       <p style={styles.helperText}>
-        The grammar coach now gives a quick explanation plus 1–2 short German examples with English glosses. Keep questions
-        specific (e.g., "When do I use seit vs. für?" or "How do I form the Perfekt with modal verbs?").
+        The grammar coach now gives a quick explanation plus 1–2 short {languageLabel} examples with English glosses. Keep
+        questions specific ({examplePrompt}).
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
@@ -171,7 +177,7 @@ const GrammarQuestionTab = () => {
           <span style={styles.label}>Your question</span>
           <textarea
             style={styles.textArea}
-            placeholder="Ask about word order, cases, tenses, or other grammar points..."
+            placeholder={`Ask about word order, tenses, or other ${languageLabel.toLowerCase()} grammar points...`}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />

@@ -360,6 +360,7 @@ const WritingPage = ({ mode = "course" }) => {
         level,
         studentName,
         idToken,
+        program: studentProfile?.program,
       });
       const enrichedResult = {
         id: Date.now(),
@@ -461,6 +462,7 @@ const WritingPage = ({ mode = "course" }) => {
         messages: payloadMessages,
         level,
         idToken,
+        program: studentProfile?.program,
       });
       addChatMessage("assistant", reply);
     } catch (err) {

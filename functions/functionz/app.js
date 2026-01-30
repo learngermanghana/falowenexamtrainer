@@ -18,7 +18,7 @@ const os = require("os");
 const fsPromises = require("fs/promises");
 const bcrypt = require("bcryptjs");
 
-const { LETTER_COACH_PROMPTS, grammarPrompt, markPrompt } = require("./prompts");
+const { grammarPrompt, getWritingIdeasPrompt, markPrompt } = require("./prompts");
 const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
@@ -1149,8 +1149,8 @@ app.post("/writing/ideas", async (req, res) => {
   try {
     if (!ensureOpenAIConfigured(res)) return;
 
-    const { level = "A2", messages = [] } = req.body || {};
-    const systemPrompt = LETTER_COACH_PROMPTS[level] || LETTER_COACH_PROMPTS.A2;
+    const { level = "A2", messages = [], program } = req.body || {};
+    const systemPrompt = getWritingIdeasPrompt({ level, program });
 
     const chatMessages = [
       { role: "system", content: systemPrompt },
@@ -1172,7 +1172,7 @@ app.post("/writing/ideas", async (req, res) => {
 
 app.post("/writing/mark", async (req, res) => {
   try {
-    const { text, level = "A2", studentName = "Student" } = req.body || {};
+    const { text, level = "A2", studentName = "Student", program } = req.body || {};
 
     if (!text || !String(text).trim()) {
       return res.status(400).json({ error: "Letter text is required" });
@@ -1180,7 +1180,7 @@ app.post("/writing/mark", async (req, res) => {
 
     if (!ensureOpenAIConfigured(res)) return;
 
-    const systemPrompt = markPrompt({ schreibenLevel: level, studentName });
+    const systemPrompt = markPrompt({ schreibenLevel: level, studentName, program });
     const messages = [
       { role: "system", content: systemPrompt },
       { role: "user", content: String(text).trim() },
@@ -1256,7 +1256,7 @@ app.post("/grammar/ask", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const { question, level = "A2", studentId } = req.body || {};
+    const { question, level = "A2", studentId, program } = req.body || {};
     const trimmedQuestion = String(question || "").trim();
     const trimmedStudentId = typeof studentId === "string" ? studentId.trim() : "";
 
@@ -1279,7 +1279,7 @@ app.post("/grammar/ask", async (req, res) => {
     }
 
     const messages = [
-      { role: "system", content: grammarPrompt({ level }) },
+      { role: "system", content: grammarPrompt({ level, program }) },
       { role: "user", content: trimmedQuestion },
     ];
 

@@ -10,6 +10,7 @@ const SpeechTrainerPage = () => {
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "";
   const profileLevel = (studentProfile?.level || "").toUpperCase();
+  const isFrenchProgram = studentProfile?.program === "french";
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -21,11 +22,15 @@ const SpeechTrainerPage = () => {
           display: "grid",
           gap: 12,
         }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "grid", gap: 6 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>Speech Trainer</p>
-            <h2 style={{ margin: 0 }}>Practice with the new online coach</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              {isFrenchProgram ? "French speech trainer" : "Speech Trainer"}
+            </p>
+            <h2 style={{ margin: 0 }}>
+              {isFrenchProgram ? "Practice French with the online coach" : "Practice with the new online coach"}
+            </h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
               Open the updated practice tool, enter your student code, pick your level, and let the AI listen to your
               spoken answer. You will get an instant transcript, pronunciation notes, and level-targeted feedback.
@@ -52,8 +57,14 @@ const SpeechTrainerPage = () => {
           <ul style={{ margin: 0, paddingLeft: 18, color: "#374151", fontSize: 13, lineHeight: 1.5 }}>
             <li>Click the button below to open the speech trainer.</li>
             <li>Type your student code so the coach saves your progress.</li>
-            <li>Select your Goethe level {profileLevel ? `(profile level: ${profileLevel})` : "(A1–C2)"}.</li>
-            <li>Record your answer and follow the on-page tips for clearer Sprechen.</li>
+            <li>
+              Select your {isFrenchProgram ? "CEFR" : "Goethe"} level{" "}
+              {profileLevel ? `(profile level: ${profileLevel})` : "(A1–C2)"}.
+            </li>
+            <li>
+              Record your answer and follow the on-page tips for clearer{" "}
+              {isFrenchProgram ? "French pronunciation" : "Sprechen"}.
+            </li>
           </ul>
 
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>

@@ -37,33 +37,42 @@ import { buildPushNotification, persistPushNotification } from "./services/notif
 import { toDateMs } from "./lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
 
-const TAB_STRUCTURE = [
-  {
-    key: "myCourse",
-    label: "My Course",
-    sections: [
-      { key: "course", label: "Course Book" },
-      { key: "submit", label: "Submit Assignment" },
-      { key: "examFile", label: "My Exam File" },
-    ],
-  },
-  {
-    key: "falowenAI",
-    label: "Falowen A.I",
-    sections: [
-      { key: "grammar", label: "Ask Grammar Question" },
-      { key: "writing", label: "Writing Practice" },
-      { key: "speech", label: "Speech Trainer" },
-      { key: "vocab", label: "Vocab Practice" },
-    ],
-  },
-  { key: "results", label: "Results", section: "results" },
-  { key: "discussion", label: "Group Discussion", section: "discussion" },
-  { key: "account", label: "Account", section: "account" },
-];
+const getTabStructure = (program) => {
+  const isFrenchProgram = program === "french";
+  const aiLabel = isFrenchProgram ? "Falowen A.I (French)" : "Falowen A.I";
+  const grammarLabel = isFrenchProgram ? "French Grammar Help" : "Ask Grammar Question";
+  const writingLabel = isFrenchProgram ? "French Writing Practice" : "Writing Practice";
+  const speechLabel = isFrenchProgram ? "French Speech Trainer" : "Speech Trainer";
+  const vocabLabel = isFrenchProgram ? "French Vocab Practice" : "Vocab Practice";
 
-const getMainTabForSection = (section) =>
-  TAB_STRUCTURE.find((tab) => tab.section === section || tab.sections?.some((entry) => entry.key === section));
+  return [
+    {
+      key: "myCourse",
+      label: "My Course",
+      sections: [
+        { key: "course", label: "Course Book" },
+        { key: "submit", label: "Submit Assignment" },
+        { key: "examFile", label: "My Exam File" },
+      ],
+    },
+    {
+      key: "falowenAI",
+      label: aiLabel,
+      sections: [
+        { key: "grammar", label: grammarLabel },
+        { key: "writing", label: writingLabel },
+        { key: "speech", label: speechLabel },
+        { key: "vocab", label: vocabLabel },
+      ],
+    },
+    { key: "results", label: "Results", section: "results" },
+    { key: "discussion", label: "Group Discussion", section: "discussion" },
+    { key: "account", label: "Account", section: "account" },
+  ];
+};
+
+const getMainTabForSection = (section, tabStructure) =>
+  tabStructure.find((tab) => tab.section === section || tab.sections?.some((entry) => entry.key === section));
 
 const isTabAvailable = (tab, allowedSections) => {
   if (tab.section) {
@@ -73,8 +82,8 @@ const isTabAvailable = (tab, allowedSections) => {
   return tab.sections.some((entry) => allowedSections[entry.key]);
 };
 
-const findFirstAllowedSection = (allowedSections) => {
-  for (const tab of TAB_STRUCTURE) {
+const findFirstAllowedSection = (allowedSections, tabStructure) => {
+  for (const tab of tabStructure) {
     if (tab.section && allowedSections[tab.section]) {
       return tab.section;
     }
@@ -90,10 +99,10 @@ const findFirstAllowedSection = (allowedSections) => {
   return "account";
 };
 
-const getPreferredSection = (allowedSections, preferred) => {
+const getPreferredSection = (allowedSections, preferred, tabStructure) => {
   if (preferred && allowedSections[preferred]) return preferred;
 
-  return findFirstAllowedSection(allowedSections);
+  return findFirstAllowedSection(allowedSections, tabStructure);
 };
 
 function App() {
@@ -114,6 +123,7 @@ function App() {
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
   const isEnrolled = isStaff || Boolean(studentProfile?.className || studentProfile?.level);
+  const tabStructure = useMemo(() => getTabStructure(studentProfile?.program), [studentProfile?.program]);
 
   const allowedSections = useMemo(
     () => ({
@@ -135,13 +145,13 @@ function App() {
   const savedSection = useMemo(() => (tabStorageKey ? localStorage.getItem(tabStorageKey) : null), [tabStorageKey]);
 
   const availableTabs = useMemo(
-    () => TAB_STRUCTURE.filter((tab) => isTabAvailable(tab, allowedSections)),
-    [allowedSections]
+    () => tabStructure.filter((tab) => isTabAvailable(tab, allowedSections)),
+    [allowedSections, tabStructure]
   );
 
   const defaultCampusSection = useMemo(
-    () => getPreferredSection(allowedSections, savedSection),
-    [allowedSections, savedSection]
+    () => getPreferredSection(allowedSections, savedSection, tabStructure),
+    [allowedSections, savedSection, tabStructure]
   );
 
   const paymentStatus = useMemo(
@@ -251,6 +261,7 @@ function App() {
         logout={logout}
         notificationStatus={notificationStatus}
         studentProfile={studentProfile}
+        tabStructure={tabStructure}
         tabStorageKey={tabStorageKey}
         user={user}
       />
@@ -269,6 +280,7 @@ const AppShell = ({
   logout,
   notificationStatus,
   studentProfile,
+  tabStructure,
   tabStorageKey,
   user,
 }) => {
@@ -401,6 +413,7 @@ const AppShell = ({
                 defaultSection={defaultCampusSection}
                 onBack={goHome}
                 studentProfile={studentProfile}
+                tabStructure={tabStructure}
                 tabStorageKey={tabStorageKey}
               />
             }
@@ -422,6 +435,7 @@ const CampusArea = ({
   defaultSection,
   onBack,
   studentProfile,
+  tabStructure,
   tabStorageKey,
 }) => {
   const campusStudentProfile = studentProfile || {};
@@ -434,7 +448,10 @@ const CampusArea = ({
     section,
   ]);
 
-  const activeMainTabConfig = useMemo(() => getMainTabForSection(resolvedSection), [resolvedSection]);
+  const activeMainTabConfig = useMemo(
+    () => getMainTabForSection(resolvedSection, tabStructure),
+    [resolvedSection, tabStructure]
+  );
 
   useEffect(() => {
     if (!section || section !== resolvedSection) {
