@@ -6,18 +6,21 @@ import ResultHistory from "./ResultHistory";
 import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService";
 import { writingLetters } from "../data/writingLetters";
 
-const IDEA_COACH_INTRO = {
-  id: "intro",
-  role: "assistant",
-  content:
-    "This is a chat between you and the ideas generator. Paste your exam prompt or describe the situation, and I'll guide you step by step with Herr Felix's coaching prompts until your letter is ready.",
-};
-
 const LetterPracticePage = ({ mode = "exams" }) => {
   const { level, setLevel, error, setError, loading, setLoading, resultHistory, addResultToHistory } = useExam();
   const { user, idToken, studentProfile } = useAuth();
 
   const isExamMode = mode === "exams";
+  const isFrenchProgram = studentProfile?.program === "french";
+  const coachDisplayName = isFrenchProgram ? "the French coach" : "Herr Felix";
+  const ideaCoachIntro = useMemo(
+    () => ({
+      id: "intro",
+      role: "assistant",
+      content: `This is a chat between you and the ideas generator. Paste your exam prompt or describe the situation, and I'll guide you step by step with ${coachDisplayName}'s coaching prompts until your letter is ready.`,
+    }),
+    [coachDisplayName]
+  );
 
   const availableTabs = useMemo(
     () => {
@@ -26,20 +29,20 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         { key: "ideas", label: "Ideas generator" },
       ];
 
-      if (isExamMode) {
+      if (isExamMode && !isFrenchProgram) {
         baseTabs.unshift({ key: "practice", label: "Practice letters" });
       }
 
       return baseTabs;
     },
-    [isExamMode]
+    [isExamMode, isFrenchProgram]
   );
 
   const [activeTab, setActiveTab] = useState(() => availableTabs[0].key);
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
+  const [chatMessages, setChatMessages] = useState([ideaCoachIntro]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
@@ -83,6 +86,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       setIdeaSuccess("");
     }
   }, [activeTab, availableTabs, setError, setIdeaError]);
+
+  useEffect(() => {
+    setChatMessages([ideaCoachIntro]);
+  }, [ideaCoachIntro]);
 
   const selectedLetter = useMemo(() => writingLetters.find((item) => item.id === selectedLetterId), [selectedLetterId]);
 
@@ -136,7 +143,11 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
   const validateLevel = () => {
     if (!ALLOWED_LEVELS.includes(level)) {
-      setError("Bitte wähle ein gültiges Niveau (A1–B2) für das Feedback.");
+      setError(
+        isFrenchProgram
+          ? "Please choose a valid level (A1–B2) for French feedback."
+          : "Bitte wähle ein gültiges Niveau (A1–B2) für das Feedback."
+      );
       return false;
     }
 
@@ -146,7 +157,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const handleMarkSubmit = async () => {
     const trimmed = letterText.trim();
     if (!trimmed) {
-      setError("Please paste your letter so Herr Felix can mark it.");
+      setError(`Please paste your letter so ${coachDisplayName} can mark it.`);
       return;
     }
 
@@ -162,6 +173,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         level,
         studentName,
         idToken,
+        program: studentProfile?.program,
       });
 
       setMarkFeedback(data.feedback);
@@ -254,10 +266,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         messages: updatedMessages,
         level,
         idToken,
+        program: studentProfile?.program,
       });
       addChatMessage("assistant", reply);
     } catch (err) {
-      const message = err?.response?.data?.error || err.message || "Could not fetch ideas from Herr Felix.";
+      const message =
+        err?.response?.data?.error || err.message || `Could not fetch ideas from ${coachDisplayName}.`;
       setIdeaError(message);
     } finally {
       setIdeasLoading(false);
@@ -269,18 +283,31 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       <section style={styles.card}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
           <div>
-            <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>Schreiben trainer</p>
+            <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>
+              {isFrenchProgram ? "French writing coach" : "Schreiben trainer"}
+            </p>
             <h2 style={{ ...styles.sectionTitle, margin: 0 }}>
-              {isExamMode ? "Timed letters + Herr Felix ideas" : "Mark my letter + Herr Felix ideas"}
+              {isExamMode
+                ? isFrenchProgram
+                  ? "French writing help + ideas"
+                  : "Timed letters + Herr Felix ideas"
+                : isFrenchProgram
+                  ? "Mark my letter + French ideas"
+                  : "Mark my letter + Herr Felix ideas"}
             </h2>
             <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
               {isExamMode ? (
                 <>
-                  Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator
-                  (prompts in <code>functions/functionz/prompts.js</code>) to keep moving.
+                  {isFrenchProgram
+                    ? "Start with a draft in French, then paste it into “Mark my letter”. Use the ideas generator to stay organized."
+                    : 'Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator (prompts in '}
+                  {isFrenchProgram ? null : <code>functions/functionz/prompts.js</code>}
+                  {isFrenchProgram ? null : ") to keep moving."}
                 </>
               ) : (
-                "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
+                isFrenchProgram
+                  ? "Timed practice lives in the Exams Room. Here you can paste French drafts for marking and use the ideas generator to build your letter."
+                  : "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
               )}
             </p>
           </div>
@@ -301,7 +328,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         </div>
       </section>
 
-      {activeTab === "practice" && isExamMode && (
+      {activeTab === "practice" && isExamMode && !isFrenchProgram && (
         <section style={styles.card}>
           <div style={{ display: "grid", gap: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
@@ -456,7 +483,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
             {error && (
               <div style={styles.errorBox}>
-                <strong>Hinweis:</strong> {error}
+                <strong>{isFrenchProgram ? "Note" : "Hinweis"}:</strong> {error}
               </div>
             )}
 
@@ -529,7 +556,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             <button
               style={styles.secondaryButton}
               onClick={() => {
-                setChatMessages([IDEA_COACH_INTRO]);
+                setChatMessages([ideaCoachIntro]);
                 setIdeaInput("");
                 resetErrors();
                 setSelectedDraftIds([]);
@@ -541,7 +568,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
           {ideaError && (
             <div style={{ ...styles.errorBox, marginTop: 8 }}>
-              <strong>Hinweis:</strong> {ideaError}
+              <strong>{isFrenchProgram ? "Note" : "Hinweis"}:</strong> {ideaError}
             </div>
           )}
 

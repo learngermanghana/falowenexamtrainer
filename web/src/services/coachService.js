@@ -95,13 +95,14 @@ export const analyzeText = async ({ text, teil, level, targetLevel, userId, idTo
   return response.data;
 };
 
-export const markLetterWithAI = async ({ text, level, studentName, idToken }) => {
+export const markLetterWithAI = async ({ text, level, studentName, program, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/writing/mark`,
     {
       text,
       level,
       studentName,
+      program,
     },
     { headers: authHeaders(idToken) }
   );
@@ -109,10 +110,10 @@ export const markLetterWithAI = async ({ text, level, studentName, idToken }) =>
   return response.data;
 };
 
-export const fetchIdeasFromCoach = async ({ messages, level, idToken }) => {
+export const fetchIdeasFromCoach = async ({ messages, level, program, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/writing/ideas`,
-    { messages, level },
+    { messages, level, program },
     { headers: authHeaders(idToken) }
   );
 
