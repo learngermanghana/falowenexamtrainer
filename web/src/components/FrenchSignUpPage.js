@@ -155,6 +155,10 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
       validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
     }
 
+    if (!location.trim()) {
+      validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
+    }
+
     if (!learningMode) {
       validationIssues.learningMode = "Choose how you plan to learn so we can match you to the right experience.";
     }
@@ -429,15 +433,20 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
             {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
 
             <label htmlFor="french-location" style={styles.label}>
-              Location (optional)
+              Location
             </label>
             <input
               id="french-location"
               value={location}
-              onChange={(event) => setLocation(event.target.value)}
+              onChange={(event) => {
+                clearFieldError("location");
+                setLocation(event.target.value);
+              }}
               style={inputStyle}
               placeholder="Accra"
+              required
             />
+            {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
 
             <label style={styles.label}>Preferred learning mode</label>
             <select
