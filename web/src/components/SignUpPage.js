@@ -259,6 +259,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
       validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
     }
 
+    if (!location.trim()) {
+      validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
+    }
+
     if (!emergencyContactPhone.trim()) {
       validationIssues.emergencyContactPhone = "Add an emergency contact phone number. This is required for safety.";
     }
@@ -553,14 +557,19 @@ const SignUpPage = ({ onLogin, onBack }) => {
           />
           {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
 
-          <label style={styles.label}>Location (optional)</label>
+          <label style={styles.label}>Location</label>
           <input
             type="text"
+            required
             value={location}
-            onChange={(e) => setLocation(e.target.value)}
+            onChange={(e) => {
+              setLocation(e.target.value);
+              clearFieldError("location");
+            }}
             style={inputStyle}
             placeholder="Berlin"
           />
+          {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
 
           <label style={styles.label}>Preferred learning mode</label>
           <select
