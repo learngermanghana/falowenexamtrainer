@@ -33,7 +33,7 @@ export const classCatalog = {
       { day: "Friday", startTime: "18:00", endTime: "19:00" },
       { day: "Saturday", startTime: "8:00", endTime: "9:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1R7b3PqPvOVMKVOTbYVTDzmbw0N_UA7wQ/view?usp=sharing",
+    docUrl: "https://drive.google.com/file/d/1eYBFqrJdlTtCdV9ZPg2gc-a0zZxCiXJS/view?usp=sharing",
   },
   "A1 Munich Klasse": {
     startDate: "2025-12-03",
