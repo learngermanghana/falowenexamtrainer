@@ -145,6 +145,39 @@ const ReviewCard = ({ stars = 5, name, country, level, text }) => (
   </div>
 );
 
+const UpdateCard = ({ title, description, tag }) => (
+  <div
+    style={{
+      border: "1px solid #e5e7eb",
+      borderRadius: 14,
+      padding: 14,
+      background: "#ffffff",
+      display: "grid",
+      gap: 8,
+      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+    }}
+  >
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+      <h3 style={{ margin: 0, fontSize: 16, color: "#111827" }}>{title}</h3>
+      <span
+        style={{
+          fontSize: 11,
+          fontWeight: 700,
+          textTransform: "uppercase",
+          letterSpacing: 0.6,
+          padding: "4px 8px",
+          borderRadius: 999,
+          background: "#e0e7ff",
+          color: "#1e3a8a",
+        }}
+      >
+        {tag}
+      </span>
+    </div>
+    <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{description}</p>
+  </div>
+);
+
 const LandingPage = ({ onSignUp, onLogin }) => {
   const features = [
     {
@@ -197,6 +230,29 @@ const LandingPage = ({ onSignUp, onLogin }) => {
     { title: "Choose your level/class", description: "Select the cohort you want (e.g., A1/A2/B1) based on schedule and availability." },
     { title: "Complete payment to unlock access", description: "After selecting your cohort, complete payment to unlock full access to the course tools." },
     { title: "Get onboarding support", description: "We follow up with your welcome checklist, class links, and next steps." },
+  ];
+
+  const updates = [
+    {
+      title: "Study calendar routines",
+      description: "Plan weekly tasks with a guided study calendar that keeps your speaking, writing, and vocab work consistent.",
+      tag: "New",
+    },
+    {
+      title: "My Exam File tracker",
+      description: "Collect key exam prompts, personal notes, and tutor feedback in one place so revision is faster.",
+      tag: "Updated",
+    },
+    {
+      title: "Speech + writing practice",
+      description: "Train with exam-style prompts and get structured feedback you can replay before class.",
+      tag: "Improved",
+    },
+    {
+      title: "Assignment submissions",
+      description: "Submit homework, track feedback, and stay aligned with the cohort’s weekly goals.",
+      tag: "Live",
+    },
   ];
 
   const featuredReviews = React.useMemo(() => shuffleArray(studentReviews).slice(0, 6), []);
@@ -472,6 +528,21 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           {features.map((item) => (
             <FeatureCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
           ))}
+        </section>
+
+        {/* Updates */}
+        <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+          <div>
+            <h2 style={styles.sectionTitle}>Latest updates you can try</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Fresh additions to keep your exam prep structured and personalized.
+            </p>
+          </div>
+          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+            {updates.map((item) => (
+              <UpdateCard key={item.title} title={item.title} description={item.description} tag={item.tag} />
+            ))}
+          </div>
         </section>
 
         {/* Photos */}
