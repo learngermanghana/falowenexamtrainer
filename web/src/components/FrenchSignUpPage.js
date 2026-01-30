@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
+import { frenchClassCatalog } from "../data/french/classCatalog";
 
 const isFullName = (value) => {
   const cleaned = String(value || "").trim();
@@ -11,15 +12,52 @@ const isFullName = (value) => {
   return parts.length >= 2 && parts.every((part) => part.length >= 2);
 };
 
+const formatClassLabel = (className) => {
+  const details = frenchClassCatalog[className];
+  if (!details) return className;
+
+  const startLabel = details.startDate
+    ? new Date(details.startDate).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "Schedule";
+
+  const timeLabel = Array.isArray(details.schedule)
+    ? details.schedule
+        .map(({ day, startTime, endTime }) =>
+          [day, startTime && ` ${startTime}`, endTime && `-${endTime}`]
+            .filter(Boolean)
+            .join("")
+        )
+        .join(" · ")
+    : "";
+
+  return timeLabel
+    ? `${className} — starts ${startLabel} — ${timeLabel}`
+    : `${className} — starts ${startLabel}`;
+};
+
 const FrenchSignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
   const { showToast } = useToast();
+  const classOptions = useMemo(
+    () =>
+      Object.keys(frenchClassCatalog)
+        .map((className) => ({
+          value: className,
+          label: formatClassLabel(className),
+        })),
+    []
+  );
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [selectedClass, setSelectedClass] = useState(() => classOptions[0]?.value || "");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [hasConsented, setHasConsented] = useState(false);
@@ -58,6 +96,10 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
       validationIssues.phone = "Add a contact phone number so we can reach you.";
     }
 
+    if (!selectedClass) {
+      validationIssues.class = "Choose the French class you want to join.";
+    }
+
     if (!password || password.length < 8) {
       validationIssues.password = "Create a password with at least 8 characters.";
     }
@@ -84,7 +126,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
       await signup(email, password, {
         name,
         level: "A1",
-        className: "French A1 Cohort",
+        className: selectedClass,
         phone,
         location,
         learningMode: "Live classes",
@@ -102,7 +144,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
       });
 
       const successMessage =
-        "Welcome to French A1! Your account is ready. We will send your cohort start date and class links by email.";
+        "Welcome to French A1! Your account is ready. We will send your class start date and live links by email.";
       setMessage(successMessage);
       showToast(successMessage, "success");
     } catch (error) {
@@ -210,6 +252,28 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
                 placeholder="+233 20 123 4567"
               />
               {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
+            </div>
+
+            <div>
+              <label htmlFor="french-class" style={styles.formLabel}>
+                Choose your class
+              </label>
+              <select
+                id="french-class"
+                value={selectedClass}
+                onChange={(event) => {
+                  clearFieldError("class");
+                  setSelectedClass(event.target.value);
+                }}
+                style={styles.select}
+              >
+                {classOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {fieldErrors.class ? <p style={styles.fieldError}>{fieldErrors.class}</p> : null}
             </div>
 
             <div>
