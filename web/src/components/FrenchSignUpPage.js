@@ -1,9 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import { frenchClassCatalog } from "../data/french/classCatalog";
+import { computeTuitionStatus } from "../data/levelFees";
+import { rememberStudentCodeForEmail } from "../services/submissionService";
+import { generateStudentCode } from "../services/studentCode";
+import PasswordGuidance from "./PasswordGuidance";
+import TuitionStatusCard from "./TuitionStatusCard";
+
+const MIN_INITIAL_PAYMENT = 2000;
+const FRENCH_LEVELS = ["A1"];
 
 const isFullName = (value) => {
   const cleaned = String(value || "").trim();
@@ -57,13 +65,30 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
   const [location, setLocation] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedClass, setSelectedClass] = useState(() => classOptions[0]?.value || "");
+  const [selectedClass, setSelectedClass] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [hasConsented, setHasConsented] = useState(false);
+  const [showConsentDetails, setShowConsentDetails] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [selectedLevel, setSelectedLevel] = useState(FRENCH_LEVELS[0]);
+  const [address, setAddress] = useState("");
+  const [learningMode, setLearningMode] = useState("");
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
+  const [initialPaymentAmount, setInitialPaymentAmount] = useState(`${MIN_INITIAL_PAYMENT}`);
 
   const scheduleHighlights = useMemo(() => FRENCH_A1_SCHEDULE.slice(0, 6), []);
+  const tuitionSummary = useMemo(
+    () => computeTuitionStatus({ level: selectedLevel, paidAmount: 0 }),
+    [selectedLevel]
+  );
+
+  const consentHighlights = [
+    "We collect your contact details to create and support your account, share class updates, and send payment reminders.",
+    "You can switch contract terms or cancel future renewals by contacting support before the next billing date.",
+    "Payments are processed securely; tuition balances must be cleared to keep full access to live classes and materials.",
+    "We never sell your data and only share it with partners that help us deliver the service (like payments and messaging).",
+  ];
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 46 };
 
@@ -76,12 +101,42 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
     });
   };
 
+  const handleInitialPaymentChange = (event) => {
+    const rawValue = event.target.value;
+    setInitialPaymentAmount(rawValue);
+    clearFieldError("initialPaymentAmount");
+
+    const numericOnlyValue = rawValue.replace(/[^\d.]/g, "");
+    if (!numericOnlyValue) return;
+
+    const numericValue = Number(numericOnlyValue);
+    if (Number.isNaN(numericValue)) return;
+
+    const sanitizedValue = Math.max(numericValue, 0);
+    const cappedValue = Math.min(sanitizedValue, tuitionSummary.tuitionFee || sanitizedValue);
+    setInitialPaymentAmount(`${cappedValue}`);
+  };
+
+  useEffect(() => {
+    const numericAmount = Number(initialPaymentAmount);
+    if (initialPaymentAmount === "" || Number.isNaN(numericAmount)) return;
+
+    const cappedAmount = Math.min(
+      Math.max(numericAmount, 0),
+      tuitionSummary.tuitionFee || numericAmount
+    );
+    if (`${cappedAmount}` !== `${initialPaymentAmount}`) {
+      setInitialPaymentAmount(`${cappedAmount}`);
+    }
+  }, [initialPaymentAmount, tuitionSummary.tuitionFee]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setAuthError("");
     setMessage("");
     setFieldErrors({});
 
+    const numericInitialPayment = Number(initialPaymentAmount);
     const validationIssues = {};
 
     if (!isFullName(name)) {
@@ -96,6 +151,18 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
       validationIssues.phone = "Add a contact phone number so we can reach you.";
     }
 
+    if (!address.trim()) {
+      validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
+    }
+
+    if (!learningMode) {
+      validationIssues.learningMode = "Choose how you plan to learn so we can match you to the right experience.";
+    }
+
+    if (!emergencyContactPhone.trim()) {
+      validationIssues.emergencyContactPhone = "Add an emergency contact phone number. This is required for safety.";
+    }
+
     if (!selectedClass) {
       validationIssues.class = "Choose the French class you want to join.";
     }
@@ -106,6 +173,23 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
 
     if (password !== confirmPassword) {
       validationIssues.confirmPassword = "Passwords do not match. Re-enter both fields to continue.";
+    }
+
+    if (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment)) {
+      validationIssues.initialPaymentAmount =
+        "Enter a number without commas or spaces. You need at least GH₵2000 to start a paid account.";
+    }
+
+    if (numericInitialPayment < 0) {
+      validationIssues.initialPaymentAmount = "Initial payment cannot be negative. Remove the minus sign and try again.";
+    }
+
+    if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
+      validationIssues.initialPaymentAmount = `Enter GH₵${MIN_INITIAL_PAYMENT} or more to reserve your class.`;
+    }
+
+    if (numericInitialPayment > tuitionSummary.tuitionFee) {
+      validationIssues.initialPaymentAmount = "Initial payment cannot exceed the tuition fee for A1.";
     }
 
     if (!hasConsented) {
@@ -123,28 +207,40 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
 
     setLoading(true);
     try {
+      const level = selectedLevel;
+      const tuitionFee = tuitionSummary.tuitionFee;
+      const studentCode = generateStudentCode({ name });
+      const paystackLink = tuitionSummary.paystackLink;
+      const intendedPaymentAmount = Math.max(Number(numericInitialPayment) || 0, 0);
+
       await signup(email, password, {
         name,
-        level: "A1",
+        level,
+        studentCode,
         className: selectedClass,
         phone,
         location,
-        learningMode: "Live classes",
+        learningMode,
+        address,
+        emergencyContactPhone,
         program: "french",
         initialPaymentAmount: 0,
-        tuitionFee: 0,
-        balanceDue: 0,
-        paymentStatus: "paid",
-        paystackLink: "",
-        paymentIntentAmount: null,
+        tuitionFee,
+        balanceDue: tuitionFee,
+        paymentStatus: "pending",
+        paystackLink,
+        paymentIntentAmount: intendedPaymentAmount || null,
         status: "Active",
         contractStart: "",
         contractEnd: "",
         contractTermMonths: 6,
       });
 
+      rememberStudentCodeForEmail(email, studentCode);
       const successMessage =
-        "Welcome to French A1! Your account is ready. We will send your class start date and live links by email.";
+        `Welcome to French A1! Your student code is ${studentCode}. ` +
+        "We will send your class start date and live links by email. " +
+        "Open the tuition card in the app to complete your Paystack payment.";
       setMessage(successMessage);
       showToast(successMessage, "success");
     } catch (error) {
@@ -202,143 +298,303 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               background: "#ffffff",
             }}
           >
-            <div>
-              <label htmlFor="french-name" style={styles.formLabel}>
-                Full name
-              </label>
-              <input
-                id="french-name"
-                value={name}
-                onChange={(event) => {
-                  clearFieldError("name");
-                  setName(event.target.value);
-                }}
-                style={inputStyle}
-                placeholder="Ama Owusu"
-              />
-              {fieldErrors.name ? <p style={styles.fieldError}>{fieldErrors.name}</p> : null}
-            </div>
+            <label htmlFor="french-name" style={styles.label}>
+              Name
+            </label>
+            <input
+              id="french-name"
+              value={name}
+              onChange={(event) => {
+                clearFieldError("name");
+                setName(event.target.value);
+              }}
+              style={inputStyle}
+              placeholder="Ama Owusu"
+              required
+            />
+            {fieldErrors.name ? <p style={styles.fieldError}>{fieldErrors.name}</p> : null}
+            <p style={{ ...styles.helperText, marginTop: -4 }}>
+              Please enter your full name (first and last). We use it to print certificates and transcripts.
+            </p>
 
-            <div>
-              <label htmlFor="french-email" style={styles.formLabel}>
-                Email address
-              </label>
-              <input
-                id="french-email"
-                type="email"
-                value={email}
-                onChange={(event) => {
-                  clearFieldError("email");
-                  setEmail(event.target.value);
-                }}
-                style={inputStyle}
-                placeholder="ama@example.com"
-              />
-              {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
-            </div>
+            <label htmlFor="french-email" style={styles.label}>
+              Email
+            </label>
+            <input
+              id="french-email"
+              type="email"
+              value={email}
+              onChange={(event) => {
+                clearFieldError("email");
+                setEmail(event.target.value);
+              }}
+              style={inputStyle}
+              placeholder="ama@example.com"
+              required
+            />
+            {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
 
-            <div>
-              <label htmlFor="french-phone" style={styles.formLabel}>
-                Phone number
-              </label>
-              <input
-                id="french-phone"
-                value={phone}
-                onChange={(event) => {
-                  clearFieldError("phone");
-                  setPhone(event.target.value);
-                }}
-                style={inputStyle}
-                placeholder="+233 20 123 4567"
-              />
-              {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
-            </div>
+            <label htmlFor="french-password" style={styles.label}>
+              Password
+            </label>
+            <input
+              id="french-password"
+              type="password"
+              minLength={8}
+              value={password}
+              onChange={(event) => {
+                clearFieldError("password");
+                setPassword(event.target.value);
+              }}
+              style={inputStyle}
+              placeholder="At least 8 characters with letters and numbers"
+              required
+            />
+            {fieldErrors.password ? <p style={styles.fieldError}>{fieldErrors.password}</p> : null}
+            <PasswordGuidance password={password} />
 
-            <div>
-              <label htmlFor="french-class" style={styles.formLabel}>
-                Choose your class
-              </label>
-              <select
-                id="french-class"
-                value={selectedClass}
-                onChange={(event) => {
-                  clearFieldError("class");
-                  setSelectedClass(event.target.value);
-                }}
-                style={styles.select}
-              >
-                {classOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              {fieldErrors.class ? <p style={styles.fieldError}>{fieldErrors.class}</p> : null}
-            </div>
+            <label htmlFor="french-confirm" style={styles.label}>
+              Confirm password
+            </label>
+            <input
+              id="french-confirm"
+              type="password"
+              minLength={8}
+              value={confirmPassword}
+              onChange={(event) => {
+                clearFieldError("confirmPassword");
+                setConfirmPassword(event.target.value);
+              }}
+              style={inputStyle}
+              placeholder="Enter password again"
+              required
+            />
+            {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
 
-            <div>
-              <label htmlFor="french-location" style={styles.formLabel}>
-                City / Location (optional)
-              </label>
-              <input
-                id="french-location"
-                value={location}
-                onChange={(event) => setLocation(event.target.value)}
-                style={inputStyle}
-                placeholder="Accra"
-              />
-            </div>
+            <label htmlFor="french-level" style={styles.label}>
+              Your current level
+            </label>
+            <select
+              id="french-level"
+              value={selectedLevel}
+              onChange={(event) => setSelectedLevel(event.target.value)}
+              style={styles.select}
+              required
+            >
+              {FRENCH_LEVELS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+            <p style={{ ...styles.helperText, marginTop: -2 }}>
+              We load speaking and writing tasks from the sheet that matches your level.
+            </p>
 
-            <div>
-              <label htmlFor="french-password" style={styles.formLabel}>
-                Create password
-              </label>
-              <input
-                id="french-password"
-                type="password"
-                value={password}
-                onChange={(event) => {
-                  clearFieldError("password");
-                  setPassword(event.target.value);
-                }}
-                style={inputStyle}
-                placeholder="Minimum 8 characters"
-              />
-              {fieldErrors.password ? <p style={styles.fieldError}>{fieldErrors.password}</p> : null}
-            </div>
+            <label htmlFor="french-phone" style={styles.label}>
+              Phone number
+            </label>
+            <input
+              id="french-phone"
+              type="tel"
+              value={phone}
+              onChange={(event) => {
+                clearFieldError("phone");
+                setPhone(event.target.value);
+              }}
+              style={inputStyle}
+              placeholder="+233 20 123 4567"
+              required
+            />
+            {fieldErrors.phone ? <p style={styles.fieldError}>{fieldErrors.phone}</p> : null}
+            <p style={{ ...styles.helperText, marginTop: -4 }}>
+              We keep your phone number on file to contact you directly when necessary. Your emergency contact is only
+              notified in urgent safety situations.
+            </p>
 
-            <div>
-              <label htmlFor="french-confirm" style={styles.formLabel}>
-                Confirm password
-              </label>
-              <input
-                id="french-confirm"
-                type="password"
-                value={confirmPassword}
-                onChange={(event) => {
-                  clearFieldError("confirmPassword");
-                  setConfirmPassword(event.target.value);
-                }}
-                style={inputStyle}
-                placeholder="Repeat password"
-              />
-              {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
-            </div>
+            <label htmlFor="french-address" style={styles.label}>
+              Address
+            </label>
+            <input
+              id="french-address"
+              value={address}
+              onChange={(event) => {
+                clearFieldError("address");
+                setAddress(event.target.value);
+              }}
+              style={inputStyle}
+              placeholder="East Legon, Accra"
+              required
+            />
+            {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
 
-            <label style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "#374151" }}>
+            <label htmlFor="french-location" style={styles.label}>
+              Location (optional)
+            </label>
+            <input
+              id="french-location"
+              value={location}
+              onChange={(event) => setLocation(event.target.value)}
+              style={inputStyle}
+              placeholder="Accra"
+            />
+
+            <label style={styles.label}>Preferred learning mode</label>
+            <select
+              required
+              value={learningMode}
+              onChange={(event) => {
+                setLearningMode(event.target.value);
+                clearFieldError("learningMode");
+                setAuthError("");
+              }}
+              style={styles.select}
+            >
+              <option value="">Choose one</option>
+              <option value="In-person">In-person</option>
+              <option value="Online">Online</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
+            {fieldErrors.learningMode ? <p style={styles.fieldError}>{fieldErrors.learningMode}</p> : null}
+
+            <label style={styles.label}>Emergency contact phone</label>
+            <input
+              type="tel"
+              required
+              value={emergencyContactPhone}
+              onChange={(event) => {
+                setEmergencyContactPhone(event.target.value);
+                clearFieldError("emergencyContactPhone");
+                setAuthError("");
+              }}
+              style={inputStyle}
+              placeholder="+233 24 987 6543"
+            />
+            {fieldErrors.emergencyContactPhone ? (
+              <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
+            ) : null}
+
+            <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GH₵)</label>
+            <input
+              id="initial-payment-amount"
+              type="number"
+              min={MIN_INITIAL_PAYMENT}
+              max={tuitionSummary.tuitionFee}
+              step="100"
+              pattern="[0-9]*"
+              inputMode="numeric"
+              value={initialPaymentAmount}
+              onChange={handleInitialPaymentChange}
+              style={inputStyle}
+              placeholder={`At least GH₵${MIN_INITIAL_PAYMENT}`}
+              required
+            />
+            {fieldErrors.initialPaymentAmount ? (
+              <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
+            ) : null}
+            <p style={{ ...styles.helperText, marginTop: -2 }}>
+              Enter between GH₵{MIN_INITIAL_PAYMENT} and GH₵{tuitionSummary.tuitionFee} for {selectedLevel}. A1: GH₵2800
+              · A2: GH₵3000 · B1: GH₵3000 · B2: GH₵3000 · C1: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to
+              start your account. We confirm Paystack payments before marking you as paid.
+            </p>
+
+            <TuitionStatusCard
+              level={selectedLevel}
+              paidAmount={0}
+              balanceDue={tuitionSummary.tuitionFee}
+              tuitionFee={tuitionSummary.tuitionFee}
+              paystackLink={tuitionSummary.paystackLink}
+              showPaymentAction={false}
+              title="Tuition summary"
+              description={`For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
+            />
+
+            <label style={styles.label} htmlFor="french-class">Which live class are you joining? (required)</label>
+            <select
+              id="french-class"
+              value={selectedClass}
+              onChange={(event) => {
+                clearFieldError("class");
+                setSelectedClass(event.target.value);
+              }}
+              style={styles.select}
+              required
+            >
+              <option value="">Decide later (we'll ask again after signup)</option>
+              {classOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {fieldErrors.class ? <p style={styles.fieldError}>{fieldErrors.class}</p> : null}
+            <p style={{ ...styles.helperText, marginTop: -2 }}>
+              Picking a class is required so we can reserve your spot. If unsure, choose the closest option for now.
+            </p>
+
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#111827" }}>
               <input
                 type="checkbox"
                 checked={hasConsented}
                 onChange={(event) => {
                   clearFieldError("consent");
                   setHasConsented(event.target.checked);
+                  setAuthError("");
                 }}
+                required
+                style={{ width: 18, height: 18 }}
               />
               <span>
-                I agree to the Falowen terms and privacy policy for communication about my French cohort.
+                I agree to the{" "}
+                <a
+                  href="https://register.falowen.app/#terms-of-service"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#1d4ed8", fontWeight: 600 }}
+                >
+                  terms
+                </a>{" "}
+                and{" "}
+                <a
+                  href="https://register.falowen.app/#privacy-policy"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#1d4ed8", fontWeight: 600 }}
+                >
+                  privacy policy
+                </a>
+                .
               </span>
             </label>
             {fieldErrors.consent ? <p style={styles.fieldError}>{fieldErrors.consent}</p> : null}
+            <div style={{ marginLeft: 26, marginTop: 6, color: "#4b5563", fontSize: 13 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                <strong style={{ fontWeight: 600 }}>Key points:</strong>
+                <button
+                  type="button"
+                  onClick={() => setShowConsentDetails(true)}
+                  style={{
+                    ...styles.secondaryButton,
+                    padding: "4px 10px",
+                    fontSize: 12,
+                    height: "auto",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                  }}
+                >
+                  View summary
+                </button>
+              </div>
+              <ul style={{ marginTop: 6, paddingLeft: 18, lineHeight: 1.5 }}>
+                {consentHighlights.slice(0, 2).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+              <p style={{ marginTop: 4 }}>
+                Want the full details? Open the summary or the links above without leaving the form.
+              </p>
+            </div>
 
             {authError ? <div style={styles.errorBox}>{authError}</div> : null}
             {message ? <div style={styles.successBox}>{message}</div> : null}
@@ -347,6 +603,76 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               {loading ? "Creating account..." : "Join French A1"}
             </button>
           </form>
+
+          {showConsentDetails && (
+            <div
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(0,0,0,0.45)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 16,
+                zIndex: 20,
+              }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="Terms and privacy highlights"
+            >
+              <div
+                style={{
+                  background: "#fff",
+                  borderRadius: 12,
+                  maxWidth: 520,
+                  width: "100%",
+                  boxShadow: "0 10px 35px rgba(0,0,0,0.12)",
+                  padding: 20,
+                  color: "#111827",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Terms and privacy highlights</h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowConsentDetails(false)}
+                    style={{ ...styles.secondaryButton, padding: "6px 12px", fontSize: 12 }}
+                  >
+                    Close
+                  </button>
+                </div>
+                <p style={{ marginTop: 12, marginBottom: 10 }}>
+                  Here is a quick summary of what you are agreeing to when you continue.
+                </p>
+                <ul style={{ marginTop: 0, paddingLeft: 18, lineHeight: 1.6 }}>
+                  {consentHighlights.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+                <p style={{ marginTop: 10, color: "#4b5563" }}>
+                  Read the full{" "}
+                  <a
+                    href="https://register.falowen.app/#terms-of-service"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#1d4ed8", fontWeight: 600 }}
+                  >
+                    terms
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    href="https://register.falowen.app/#privacy-policy"
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#1d4ed8", fontWeight: 600 }}
+                  >
+                    privacy policy
+                  </a>{" "}
+                  at any time without losing your progress.
+                </p>
+              </div>
+            </div>
+          )}
 
           <div style={{ display: "grid", gap: 12 }}>
             <div style={{ ...styles.card, border: "1px solid #fde68a", background: "#fffbeb" }}>
