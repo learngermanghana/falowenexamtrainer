@@ -281,11 +281,12 @@ const LandingPage = ({ onSignUp, onLogin }) => {
             </p>
 
             <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-              Conversation-focused German learning built in Ghana.
+              German &amp; French exam coaching built in Ghana.
             </h1>
 
             <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0, lineHeight: 1.6 }}>
-              Falowen helps students prepare for German certification exams with daily practice, tutor feedback, and structured live classes.
+              Falowen prepares students for German and French certification exams with daily practice, tutor feedback,
+              and structured live classes tailored to A1–C1 goals.
             </p>
 
             {/* ✅ Keep main CTAs only here */}
@@ -318,6 +319,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               <span style={styles.badge}>Tutor feedback</span>
               <span style={styles.badge}>Live classes</span>
               <span style={styles.badge}>Exam simulations</span>
+              <span style={styles.badge}>German + French cohorts</span>
             </div>
           </div>
         </header>
@@ -483,7 +485,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           </div>
         </section>
 
-        {/* B2/C1 self-learning ad */}
+        {/* Self-learning ad */}
         <section
           style={{
             ...styles.card,
@@ -496,10 +498,11 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           }}
         >
           <div style={{ display: "grid", gap: 10 }}>
-            <h2 style={styles.sectionTitle}>B2 &amp; C1 self-learning (no tutor)</h2>
+            <h2 style={styles.sectionTitle}>Self-learning tracks for German &amp; French</h2>
             <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
-              Prefer independent study? Our B2 and C1 self-learning flows guide you through Goethe-style speaking,
-              writing, reading, and listening tasks with AI scoring and curated resources.
+              Prefer independent study? German learners get B2/C1 self-learning flows with Goethe-style speaking,
+              writing, reading, and listening tasks plus AI scoring. French learners get A1 survival routines with
+              daily practice prompts and guided vocabulary checklists.
             </p>
             <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={onLogin}>
               Log in to start →
@@ -516,7 +519,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           >
             <img
               src="https://github.com/learngermanghana/falowen-blog/blob/main/photos/b2c1_ad_final.jpg?raw=1"
-              alt="B2 and C1 self-learning advertisement"
+              alt="German B2/C1 and French A1 self-learning advertisement"
               loading="lazy"
               style={{ width: "100%", display: "block" }}
             />
