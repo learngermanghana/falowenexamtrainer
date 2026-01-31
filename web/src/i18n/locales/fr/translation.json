@@ -74,14 +74,19 @@
     },
     "actions": {
       "collapse": "Masquer",
-      "expand": "Afficher"
+      "expand": "Afficher",
+      "dismiss": "Masquer la barre",
+      "reopen": "Study Buddy",
+      "reopenAria": "Rouvrir la barre Study Buddy",
+      "contrastOn": "Contraste élevé",
+      "contrastOff": "Contraste standard"
     },
     "metrics": {
       "latestResult": "Dernier résultat",
       "attendance": "Présence",
       "nextAssignment": "Prochaine tâche",
       "latestHelper": "Suis tes progrès après chaque correction.",
-      "attendanceHelper": "La régularité t’aide à progresser plus vite.",
+      "attendanceHelper": "Reste régulier pour progresser plus vite.",
       "assignmentHelper": "Basé sur tes derniers devoirs.",
       "awaitingAssignment": "Recommandation en attente",
       "scoreValue": "{{score}}/100",
@@ -94,6 +99,7 @@
       "title": "Suggestions",
       "lowScore": "Reprends le dernier devoir corrigé et refais les corrections avant une nouvelle tâche.",
       "lowAttendance": "Essaie d’assister aux deux prochains cours pour garder le rythme.",
+      "paymentReminder": "Rappel paiement : {{amount}} à régler dans {{time}}. Vérifie ton compte pour rester inscrit.",
       "assignmentPlan": "Planifie deux courtes sessions cette semaine pour terminer {{assignment}}.",
       "default": "Dis-moi ton objectif actuel et je prépare un mini plan de semaine."
     },
@@ -103,6 +109,14 @@
       "send": "Envoyer"
     },
     "quickReply": {
+      "keywords": {
+        "attendance": ["présence", "presence", "absent", "absence", "assiduité"],
+        "results": ["résultat", "resultat", "note", "score"],
+        "assignment": ["devoir", "exercice", "travail", "tâche", "tache"],
+        "grammar": ["grammaire"],
+        "vocab": ["vocabulaire", "mot", "mots"],
+        "exam": ["examen", "test", "épreuve", "epreuve"]
+      },
       "attendance": {
         "synced": "Tu es actuellement à {{attendance}}. Vise la prochaine session pour garder l’élan.",
         "notSynced": "Tes données de présence ne sont pas encore synchronisées. Demande à ton tuteur de confirmer."
