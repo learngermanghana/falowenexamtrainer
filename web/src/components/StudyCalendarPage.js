@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
 import { downloadStudyCalendar } from "../services/examCalendar";
@@ -32,6 +33,7 @@ const shiftDate = (value, days) => {
 const DOWNLOAD_STORAGE_KEY = "falowen_study_calendar_downloaded";
 
 const StudyCalendarPage = () => {
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const [selectedLevel, setSelectedLevel] = useState(goetheExamLevels[0]?.level || "B1");
   const [examDate, setExamDate] = useState("");
@@ -49,6 +51,16 @@ const StudyCalendarPage = () => {
     }
   });
   const autoDownloadTriggered = useRef(false);
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(i18n.language, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    [i18n.language]
+  );
 
   const levelInfo = useMemo(
     () => goetheExamLevels.find((level) => level.level === selectedLevel) || goetheExamLevels[0],
@@ -84,6 +96,15 @@ const StudyCalendarPage = () => {
       prev.includes(value) ? prev.filter((day) => day !== value) : [...prev, value]
     );
   };
+
+  const formatDisplayDate = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return dateFormatter.format(date);
+  };
+
+  const formatTimeUnit = (unit, count) =>
+    t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) });
 
   const isFormReady = Boolean(selectedLevel && startDate && endDate && activeDays.length > 0);
 
@@ -169,7 +190,7 @@ const StudyCalendarPage = () => {
             >
               {examDates.map((exam) => (
                 <option key={`${selectedLevel}-${exam.date}`} value={exam.date}>
-                  {formatInputDate(exam.date)} · {levelInfo.location}
+                  {formatDisplayDate(exam.date)} · {levelInfo.location}
                 </option>
               ))}
             </select>
@@ -242,7 +263,7 @@ const StudyCalendarPage = () => {
             >
               {[30, 45, 60, 90].map((value) => (
                 <option key={value} value={value}>
-                  {value} minutes
+                  {formatTimeUnit("minute", value)}
                 </option>
               ))}
             </select>
@@ -254,11 +275,19 @@ const StudyCalendarPage = () => {
               onChange={(event) => setReminderMinutes(event.target.value)}
               style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
             >
-              <option value={0}>No reminder</option>
-              <option value={60}>1 hour before</option>
-              <option value={180}>3 hours before</option>
-              <option value={720}>12 hours before</option>
-              <option value={1440}>1 day before</option>
+              <option value={0}>{t("studyCalendar.reminder.none")}</option>
+              <option value={60}>
+                {t("studyCalendar.reminder.before", { time: formatTimeUnit("hour", 1) })}
+              </option>
+              <option value={180}>
+                {t("studyCalendar.reminder.before", { time: formatTimeUnit("hour", 3) })}
+              </option>
+              <option value={720}>
+                {t("studyCalendar.reminder.before", { time: formatTimeUnit("hour", 12) })}
+              </option>
+              <option value={1440}>
+                {t("studyCalendar.reminder.before", { time: formatTimeUnit("day", 1) })}
+              </option>
             </select>
           </div>
         </div>

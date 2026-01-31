@@ -1,6 +1,12 @@
 {
   "common": {
-    "open": "Ouvrir"
+    "open": "Ouvrir",
+    "minute_one": "{{formattedCount}} minute",
+    "minute_other": "{{formattedCount}} minutes",
+    "hour_one": "{{formattedCount}} heure",
+    "hour_other": "{{formattedCount}} heures",
+    "day_one": "{{formattedCount}} jour",
+    "day_other": "{{formattedCount}} jours"
   },
   "homeActions": {
     "title": "Que veux-tu faire aujourd’hui ?",
@@ -106,9 +112,13 @@
     ]
   },
   "landing": {
+    "meta": {
+      "title": "Falowen Exam Coach · Coaching allemand & français",
+      "description": "Falowen accompagne les apprenants au Ghana avec des cours en direct, une pratique quotidienne et des retours des tuteurs."
+    },
     "badge": "Falowen · Exam Coach",
     "heroTitle": "Coaching d’examens d’allemand et de français depuis le Ghana.",
-    "heroSubtitle": "Falowen se concentre d’abord sur la préparation aux examens allemands : pratique quotidienne, feedback des tuteurs et classes live structurées. Le français est disponible comme module A1 complémentaire.",
+    "heroSubtitle": "Falowen se concentre d’abord sur la préparation aux examens d’allemand : pratique quotidienne, retours des tuteurs et cours en direct structurés. Le français est disponible comme module A1 complémentaire.",
     "cta": {
       "join": "Rejoindre une cohorte",
       "login": "Se connecter",
@@ -117,26 +127,28 @@
     },
     "heroBadges": [
       "Pratique quotidienne",
-      "Feedback tuteur",
-      "Classes live",
+      "Retours des tuteurs",
+      "Cours en direct",
       "Simulations d’examen",
-      "Cohortes allemand + français"
+      "Cohortes allemandes + françaises"
     ],
     "languageChooser": {
       "title": "Choisis ta langue d’apprentissage",
       "subtitle": "Choisis la langue que tu veux apprendre. Tu peux changer à tout moment, et nous mémorisons ton choix.",
-      "current": "Sélection actuelle : {{language}}"
+      "current": "Sélection actuelle : {{language}}",
+      "ariaLabel": "Sélecteur de langue pour le programme d’apprentissage",
+      "optionAria": "Sélectionner le programme {{language}}"
     },
     "programs": {
       "german": {
         "label": "Deutsch (DE)",
         "shortLabel": "Allemand",
-        "description": "Préparation structurée à l’examen avec pratique quotidienne et feedback tuteur.",
+        "description": "Préparation structurée avec pratique quotidienne et retours des tuteurs.",
         "focus": "Programme principal pour la préparation Goethe.",
         "details": [
           "Exercices quotidiens avec formats d’examen clairs.",
-          "Feedback tuteur en classes live et devoirs.",
-          "Focus sur parler, écrire, lire et écouter pour A1–B1."
+          "Retours des tuteurs en cours en direct et sur les devoirs.",
+          "Accent sur parler, écrire, lire et écouter pour A1–B1."
         ]
       },
       "french": {
@@ -185,8 +197,8 @@
       "title": "Comment s’inscrire et démarrer",
       "subtitle": "Complète ta candidature, choisis une cohorte, puis débloque l’accès avec le paiement. Ensuite, tu reçois ta checklist d’onboarding et les liens de classe.",
       "benefits": [
-        "✅ Tu obtiens : outils de pratique quotidienne, feedback tuteur et support en classe live.",
-        "✅ Idéal pour : apprenants visant les tâches de parole et d’écriture style Goethe."
+        "✅ Tu obtiens : outils de pratique quotidienne, retours des tuteurs et support en cours en direct.",
+        "✅ Idéal pour : apprenants qui préparent des tâches d’expression orale et écrite type Goethe."
       ],
       "cta": "Prêt ? Rejoindre une cohorte →",
       "steps": [
@@ -214,19 +226,19 @@
     },
     "selfLearning": {
       "title": "Parcours en autonomie pour allemand & français",
-      "description": "Tu préfères apprendre en autonomie ? Les apprenants d’allemand ont des parcours B2/C1 avec tâches type Goethe et scoring IA. Les apprenants de français reçoivent des routines A1 avec prompts quotidiens et checklists de vocabulaire guidées.",
+      "description": "Tu préfères apprendre en autonomie ? Les apprenants d’allemand ont des parcours B2/C1 avec tâches type Goethe et évaluation IA. Les apprenants de français reçoivent des routines A1 avec consignes quotidiennes et checklists de vocabulaire guidées.",
       "cta": "Se connecter pour commencer →",
       "imageAlt": "Annonce self-learning allemand B2/C1 et français A1"
     },
     "features": [
       {
         "icon": "📱",
-        "title": "Pratique quotidienne + classes live",
-        "description": "Pratique chaque jour sur téléphone ou laptop, puis applique en classe avec tuteur."
+        "title": "Pratique quotidienne + cours en direct",
+        "description": "Pratique chaque jour sur téléphone ou ordinateur, puis mets en pratique en cours avec un tuteur."
       },
       {
         "icon": "👩🏽‍🏫",
-        "title": "Retours tutorés",
+        "title": "Retours des tuteurs",
         "description": "Tes tâches d’oral et d’écrit sont évaluées et discutées en cours."
       },
       {
@@ -246,11 +258,11 @@
         },
         {
           "title": "Suivi My Exam File",
-          "description": "Regroupe les prompts d’examen, notes personnelles et feedback tuteur au même endroit.",
+          "description": "Regroupe les prompts d’examen, notes personnelles et retours des tuteurs au même endroit.",
           "tag": "Mis à jour"
         },
         {
-          "title": "Pratique oral + écrit",
+          "title": "Pratique de l’oral + de l’écrit",
           "description": "Entraîne-toi avec des prompts type examen et revois le feedback avant le cours.",
           "tag": "Amélioré"
         },
@@ -272,6 +284,8 @@
     "reviews": {
       "title": "Ce que disent nos apprenants",
       "subtitle": "Retours d’apprenants.",
+      "starRating_one": "{{count}} étoile",
+      "starRating_other": "{{count}} étoiles",
       "items": [
         {
           "name": "Ama",
@@ -361,15 +375,15 @@
     },
     "darkCta": {
       "title": "Comment Falowen soutient tes objectifs d’examen",
-      "subtitle": "Falowen entraîne exactement les compétences nécessaires à la réussite : demandes polies, questions correctes, conversation fluide. Pratique chaque jour et reçois le feedback tuteur en classe live.",
+      "subtitle": "Falowen entraîne exactement les compétences nécessaires à la réussite : demandes polies, questions correctes, conversation fluide. Pratique chaque jour et reçois les retours des tuteurs en cours en direct.",
       "ctaTitle": "Prêt à commencer ?",
-      "ctaSubtitle": "Crée ton profil pour accéder aux outils de pratique, aux horaires et au feedback tuteur.",
+      "ctaSubtitle": "Crée ton profil pour accéder aux outils de pratique, aux horaires et aux retours des tuteurs.",
       "ctaJoin": "Rejoindre une cohorte",
       "ctaLogin": "Déjà inscrit ? Se connecter →",
       "contactTitle": "Rester connecté",
       "contactPhone": "Appel ou WhatsApp :",
       "contactEmail": "E-mail :",
-      "contactChat": "Chat en direct pendant les cours avec suivi des tuteurs et feedback."
+      "contactChat": "Chat en direct pendant les cours avec suivi des tuteurs et retours."
     },
     "footer": {
       "quickLinksTitle": "Liens rapides",
@@ -394,5 +408,11 @@
       { "label": "YouTube", "href": "https://www.youtube.com/@LLEAGhana" },
       { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
     ]
+  },
+  "studyCalendar": {
+    "reminder": {
+      "none": "Aucun rappel",
+      "before": "{{time}} avant"
+    }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { persistLanguage } from "../i18n";
@@ -104,7 +104,7 @@ const shuffleArray = (items) => {
   return copy;
 };
 
-const ReviewCard = ({ stars = 5, name, country, level, text }) => (
+const ReviewCard = ({ stars = 5, name, country, level, text, starLabel }) => (
   <div
     style={{
       border: "1px solid #e5e7eb",
@@ -123,7 +123,7 @@ const ReviewCard = ({ stars = 5, name, country, level, text }) => (
       </div>
     </div>
 
-    <div aria-label={`${stars} star rating`} style={{ letterSpacing: 1 }}>
+    <div aria-label={starLabel} style={{ letterSpacing: 1 }}>
       {"★★★★★☆☆☆☆☆".slice(5 - stars, 10 - stars)}
     </div>
 
@@ -187,6 +187,29 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   const programComparisonGermanPoints = t("landing.programComparison.germanPoints", { returnObjects: true });
   const programComparisonFrenchPoints = t("landing.programComparison.frenchPoints", { returnObjects: true });
   const whyStayPoints = t("landing.footer.stayPoints", { returnObjects: true });
+
+  useEffect(() => {
+    const title = t("landing.meta.title");
+    const description = t("landing.meta.description");
+
+    document.title = title;
+    document.documentElement.lang = i18n.language;
+
+    const descriptionTag = document.querySelector('meta[name="description"]');
+    if (descriptionTag) {
+      descriptionTag.setAttribute("content", description);
+    }
+
+    const ogTitleTag = document.querySelector('meta[property="og:title"]');
+    if (ogTitleTag) {
+      ogTitleTag.setAttribute("content", title);
+    }
+
+    const ogDescriptionTag = document.querySelector('meta[property="og:description"]');
+    if (ogDescriptionTag) {
+      ogDescriptionTag.setAttribute("content", description);
+    }
+  }, [i18n.language, t]);
 
   // Tip: for best performance, move these to web/public/photos and use "/photos/..."
   const photos = [
@@ -288,11 +311,12 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }} role="group" aria-label={t("landing.languageChooser.ariaLabel")}>
               <button
                 type="button"
                 onClick={() => handleProgramSelect("german")}
                 aria-pressed={resolvedProgram === "german"}
+                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.german.label })}
                 style={{
                   ...(resolvedProgram === "german" ? styles.primaryButton : styles.secondaryButton),
                   padding: "10px 14px",
@@ -304,6 +328,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 type="button"
                 onClick={() => handleProgramSelect("french")}
                 aria-pressed={resolvedProgram === "french"}
+                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.french.label })}
                 style={{
                   ...(resolvedProgram === "french" ? styles.primaryButton : styles.secondaryButton),
                   padding: "10px 14px",
@@ -326,13 +351,19 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
             alignItems: "stretch",
           }}
+          aria-labelledby="program-comparison-title"
         >
           <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={styles.sectionTitle}>{t("landing.programComparison.title")}</h2>
+            <h2 id="program-comparison-title" style={styles.sectionTitle}>
+              {t("landing.programComparison.title")}
+            </h2>
             <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.programComparison.subtitle")}</p>
           </div>
 
-          <div style={{ ...styles.card, marginBottom: 0, background: "#f8fafc" }}>
+          <div
+            style={{ ...styles.card, marginBottom: 0, background: "#f8fafc" }}
+            aria-label={t("landing.programComparison.germanTitle")}
+          >
             <h3 style={{ margin: "0 0 6px 0" }}>{t("landing.programComparison.germanTitle")}</h3>
             <p style={{ ...styles.helperText, marginBottom: 10 }}>{programOptions.german.focus}</p>
             <ul style={styles.checklist}>
@@ -342,7 +373,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             </ul>
           </div>
 
-          <div style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}>
+          <div
+            style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}
+            aria-label={t("landing.programComparison.frenchTitle")}
+          >
             <h3 style={{ margin: "0 0 6px 0" }}>{t("landing.programComparison.frenchTitle")}</h3>
             <p style={{ ...styles.helperText, marginBottom: 10 }}>{programOptions.french.focus}</p>
             <ul style={styles.checklist}>
@@ -550,6 +584,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 level={r.level}
                 stars={r.stars}
                 text={r.text}
+                starLabel={t("landing.reviews.starRating", { count: r.stars })}
               />
             ))}
           </div>

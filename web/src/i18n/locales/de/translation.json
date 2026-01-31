@@ -1,6 +1,12 @@
 {
   "common": {
-    "open": "Öffnen"
+    "open": "Öffnen",
+    "minute_one": "{{formattedCount}} Minute",
+    "minute_other": "{{formattedCount}} Minuten",
+    "hour_one": "{{formattedCount}} Stunde",
+    "hour_other": "{{formattedCount}} Stunden",
+    "day_one": "{{formattedCount}} Tag",
+    "day_other": "{{formattedCount}} Tage"
   },
   "homeActions": {
     "title": "Was möchtest du heute machen?",
@@ -106,6 +112,10 @@
     ]
   },
   "landing": {
+    "meta": {
+      "title": "Falowen Exam Coach · Deutsch- & Französischtraining",
+      "description": "Falowen unterstützt dich beim Deutsch- und Französischlernen in Ghana mit Live-Klassen, täglicher Praxis und Tutor-Feedback."
+    },
     "badge": "Falowen · Exam Coach",
     "heroTitle": "Deutsch- und Französisch-Prüfungstraining aus Ghana.",
     "heroSubtitle": "Falowen begleitet dich vor allem auf dem Weg zur deutschen Prüfung: mit täglicher Praxis, Tutor-Feedback und strukturierten Live-Klassen. Französisch ist als ergänzendes A1-Modul verfügbar.",
@@ -125,7 +135,9 @@
     "languageChooser": {
       "title": "Wähle deine Lernsprache",
       "subtitle": "Wähle die Sprache, die du lernen möchtest. Du kannst jederzeit wechseln und wir merken uns deine Auswahl.",
-      "current": "Aktuelle Auswahl: {{language}}"
+      "current": "Aktuelle Auswahl: {{language}}",
+      "ariaLabel": "Sprachauswahl für das Lernprogramm",
+      "optionAria": "{{language}}-Programm auswählen"
     },
     "programs": {
       "german": {
@@ -272,6 +284,8 @@
     "reviews": {
       "title": "Was unsere Lernenden sagen",
       "subtitle": "Feedback von Lernenden.",
+      "starRating_one": "{{count}}-Sterne-Bewertung",
+      "starRating_other": "{{count}}-Sterne-Bewertung",
       "items": [
         {
           "name": "Ama",
@@ -394,5 +408,11 @@
       { "label": "YouTube", "href": "https://www.youtube.com/@LLEAGhana" },
       { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
     ]
+  },
+  "studyCalendar": {
+    "reminder": {
+      "none": "Keine Erinnerung",
+      "before": "{{time}} vorher"
+    }
   }
 }
