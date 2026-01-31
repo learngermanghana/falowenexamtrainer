@@ -74,14 +74,19 @@
     },
     "actions": {
       "collapse": "Ausblenden",
-      "expand": "Einblenden"
+      "expand": "Einblenden",
+      "dismiss": "Leiste ausblenden",
+      "reopen": "Study Buddy",
+      "reopenAria": "Study Buddy-Leiste wieder öffnen",
+      "contrastOn": "Hoher Kontrast",
+      "contrastOff": "Standardkontrast"
     },
     "metrics": {
       "latestResult": "Letztes Ergebnis",
       "attendance": "Anwesenheit",
       "nextAssignment": "Nächste Aufgabe",
       "latestHelper": "Behalte deinen Fortschritt nach jeder Korrektur im Blick.",
-      "attendanceHelper": "Regelmäßigkeit hilft dir schneller voranzukommen.",
+      "attendanceHelper": "Bleib regelmäßig dran, so machst du schneller Fortschritte.",
       "assignmentHelper": "Basierend auf deinen letzten Abgaben.",
       "awaitingAssignment": "Empfehlung ausstehend",
       "scoreValue": "{{score}}/100",
@@ -94,6 +99,7 @@
       "title": "Vorschläge",
       "lowScore": "Konzentriere dich auf die letzte Aufgabe und korrigiere sie, bevor du etwas Neues startest.",
       "lowAttendance": "Versuche, die nächsten zwei Termine zu besuchen, um stabil zu bleiben.",
+      "paymentReminder": "Zahlungserinnerung: {{amount}} fällig in {{time}}. Öffne dein Konto, um eingeschrieben zu bleiben.",
       "assignmentPlan": "Plane diese Woche zwei kurze Lernblöcke, um {{assignment}} zu schaffen.",
       "default": "Sag mir dein aktuelles Ziel, dann erstelle ich einen kurzen Wochenplan."
     },
@@ -103,6 +109,14 @@
       "send": "Senden"
     },
     "quickReply": {
+      "keywords": {
+        "attendance": ["anwesenheit", "fehlend", "abwesend", "abwesenheit"],
+        "results": ["ergebnis", "ergebnisse", "punkte", "note", "bewertung"],
+        "assignment": ["aufgabe", "hausaufgabe", "arbeitsauftrag"],
+        "grammar": ["grammatik"],
+        "vocab": ["wortschatz", "vokabel", "vokabeln"],
+        "exam": ["prüfung", "test", "klausur", "examen"]
+      },
       "attendance": {
         "synced": "Du liegst aktuell bei {{attendance}}. Nimm die nächste Stunde mit, um dranzubleiben.",
         "notSynced": "Deine Anwesenheit ist noch nicht synchronisiert. Bitte deine Lehrkraft um Bestätigung."
