@@ -608,6 +608,7 @@ export const styles = {
     gap: 8,
     paddingLeft: 18,
     margin: "8px 0 0",
+    lineHeight: 1.6,
   },
   chatLog: {
     display: "grid",
