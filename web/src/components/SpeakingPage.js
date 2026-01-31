@@ -44,29 +44,6 @@ const ChecklistItem = ({ icon, children }) => (
 );
 
 const SpeakingPage = () => {
-  const speakingStarters = [
-    {
-      level: "A1",
-      text: "Hallo, ich heiße ___ . Heute spreche ich über ___ . Zuerst sage ich etwas über mich.",
-    },
-    {
-      level: "A2",
-      text: "Guten Tag, ich möchte kurz über ___ sprechen. Ich finde das Thema wichtig, weil ___ .",
-    },
-    {
-      level: "B1",
-      text: "Ich präsentiere heute das Thema ___ . Zuerst erkläre ich ___, danach spreche ich über ___ .",
-    },
-    {
-      level: "B2",
-      text: "In meinem Vortrag geht es um ___ . Zunächst skizziere ich ___, anschließend nenne ich ___ .",
-    },
-    {
-      level: "C1",
-      text: "Das Thema meines Beitrags lautet ___ . Im Folgenden stelle ich die Situation dar und diskutiere ___ .",
-    },
-  ];
-
   return (
     <div style={styles.container}>
       <div style={styles.card}>
@@ -78,37 +55,6 @@ const SpeakingPage = () => {
         </div>
 
         <div style={{ display: "grid", gap: 14 }}>
-          <div
-            style={{
-              padding: 12,
-              borderRadius: 14,
-              border: "1px solid #E5E7EB",
-              background: "#FFFFFF",
-            }}
-          >
-            <div style={{ fontSize: 14, color: "#111827", marginBottom: 8 }}>
-              <strong>Beispielantwort (Sprechen): How to start by level</strong>
-            </div>
-            <div style={{ display: "grid", gap: 10 }}>
-              {speakingStarters.map((starter) => (
-                <div
-                  key={starter.level}
-                  style={{
-                    border: "1px solid #E5E7EB",
-                    borderRadius: 10,
-                    padding: "10px 12px",
-                    background: "#F9FAFB",
-                  }}
-                >
-                  <div style={{ fontWeight: 700, marginBottom: 6 }}>{starter.level}</div>
-                  <div style={{ fontSize: 14, color: "#111827", lineHeight: 1.5 }}>
-                    {starter.text}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
           <div
             style={{
               padding: 12,
