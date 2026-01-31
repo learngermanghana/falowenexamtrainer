@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
@@ -9,6 +10,7 @@ import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { generateStudentCode } from "../services/studentCode";
 import PasswordGuidance from "./PasswordGuidance";
 import TuitionStatusCard from "./TuitionStatusCard";
+import { formatCurrency } from "../lib/formatters";
 
 const MIN_INITIAL_PAYMENT = 2000;
 const FRENCH_LEVELS = ["A1"];
@@ -49,6 +51,12 @@ const formatClassLabel = (className) => {
 
 const FrenchSignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
+  const formatMoney = useMemo(
+    () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
+    [locale]
+  );
   const { showToast } = useToast();
   const classOptions = useMemo(
     () =>
@@ -180,8 +188,9 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
     }
 
     if (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment)) {
-      validationIssues.initialPaymentAmount =
-        "Enter a number without commas or spaces. You need at least GH₵2000 to start a paid account.";
+      validationIssues.initialPaymentAmount = `Enter a number without commas or spaces. You need at least ${formatMoney(
+        MIN_INITIAL_PAYMENT
+      )} to start a paid account.`;
     }
 
     if (numericInitialPayment < 0) {
@@ -189,7 +198,9 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
     }
 
     if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
-      validationIssues.initialPaymentAmount = `Enter GH₵${MIN_INITIAL_PAYMENT} or more to reserve your class.`;
+      validationIssues.initialPaymentAmount = `Enter ${formatMoney(
+        MIN_INITIAL_PAYMENT
+      )} or more to reserve your class.`;
     }
 
     if (numericInitialPayment > tuitionSummary.tuitionFee) {
@@ -483,7 +494,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
             ) : null}
 
-            <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GH₵)</label>
+            <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GHS)</label>
             <input
               id="initial-payment-amount"
               type="number"
@@ -495,16 +506,16 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               value={initialPaymentAmount}
               onChange={handleInitialPaymentChange}
               style={inputStyle}
-              placeholder={`At least GH₵${MIN_INITIAL_PAYMENT}`}
+              placeholder={`At least ${formatMoney(MIN_INITIAL_PAYMENT)}`}
               required
             />
             {fieldErrors.initialPaymentAmount ? (
               <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
             ) : null}
             <p style={{ ...styles.helperText, marginTop: -2 }}>
-              Enter between GH₵{MIN_INITIAL_PAYMENT} and GH₵{tuitionSummary.tuitionFee} for {selectedLevel}. A1: GH₵2800
-              · A2: GH₵3000 · B1: GH₵3000 · B2: GH₵3000 · C1: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to
-              start your account. We confirm Paystack payments before marking you as paid.
+              Enter between {formatMoney(MIN_INITIAL_PAYMENT)} and {formatMoney(tuitionSummary.tuitionFee)} for {selectedLevel}. A1: {formatMoney(2800)}
+              · A2: {formatMoney(3000)} · B1: {formatMoney(3000)} · B2: {formatMoney(3000)} · C1: {formatMoney(3000)}. You must pay at least{" "}
+              {formatMoney(MIN_INITIAL_PAYMENT)} to start your account. We confirm Paystack payments before marking you as paid.
             </p>
 
             <TuitionStatusCard
@@ -515,7 +526,9 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               paystackLink={tuitionSummary.paystackLink}
               showPaymentAction={false}
               title="Tuition summary"
-              description={`For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
+              description={`For ${selectedLevel} we charge ${formatMoney(
+                tuitionSummary.tuitionFee
+              )}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
             />
 
             <label style={styles.label} htmlFor="french-class">Which live class are you joining? (required)</label>

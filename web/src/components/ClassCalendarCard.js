@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
 import {
@@ -10,9 +11,27 @@ import {
   formatScheduleSummary,
 } from "../services/classCalendar";
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
+import { formatPercent } from "../lib/formatters";
 
 const ClassCalendarCard = ({ id, initialClassName }) => {
+  const { i18n, t } = useTranslation();
+  const locale = i18n.language;
   const catalogEntries = useMemo(() => Object.keys(classCatalog), []);
+  const selectId = useMemo(() => (id ? `${id}-class-select` : "class-calendar-select"), [id]);
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const dateFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat(locale, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }),
+    [locale]
+  );
+  const formatTimeUnit = useCallback(
+    (unit, count) => t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) }),
+    [numberFormatter, t]
+  );
   const defaultClass = useMemo(() => {
     if (initialClassName && catalogEntries.includes(initialClassName)) {
       return initialClassName;
@@ -51,15 +70,15 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
 
     let status;
     if (nowTime < start) {
-      status = `Starts in ${daysUntilStart} day${daysUntilStart === 1 ? "" : "s"}`;
+      status = t("classCalendar.status.startsIn", { time: formatTimeUnit("day", daysUntilStart) });
     } else if (nowTime > end) {
-      status = "Course finished";
+      status = t("classCalendar.status.courseFinished");
     } else {
-      status = `${daysUntilEnd} day${daysUntilEnd === 1 ? "" : "s"} left`;
+      status = t("classCalendar.status.timeLeft", { time: formatTimeUnit("day", daysUntilEnd) });
     }
 
     return { percentComplete, daysUntilStart, daysUntilEnd, status };
-  }, [classDetails?.endDate, classDetails?.startDate, now]);
+  }, [classDetails?.endDate, classDetails?.startDate, formatTimeUnit, now, t]);
   const minutesUntil = useMemo(() => {
     if (!nextClass?.startDateTime) return null;
     return Math.max(0, Math.round((nextClass.startDateTime - now) / 60000));
@@ -73,24 +92,24 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
 
     const minutesInDay = 24 * 60;
     if (minutesUntil === 0) {
-      return { badge: "Starting now", detail: "Starting now" };
+      return { badge: t("classCalendar.badge.startingNow"), detail: t("classCalendar.detail.startingNow") };
     }
 
     if (minutesUntil >= minutesInDay) {
       const daysUntil = Math.ceil(minutesUntil / minutesInDay);
-      const suffix = daysUntil === 1 ? "" : "s";
+      const timeLabel = formatTimeUnit("day", daysUntil);
       return {
-        badge: `${daysUntil} day${suffix} left`,
-        detail: `Starts in ${daysUntil} day${suffix}`,
+        badge: t("classCalendar.badge.timeLeft", { time: timeLabel }),
+        detail: t("classCalendar.detail.startsIn", { time: timeLabel }),
       };
     }
 
-    const suffix = minutesUntil === 1 ? "" : "s";
+    const timeLabel = formatTimeUnit("minute", minutesUntil);
     return {
-      badge: `${minutesUntil} min left`,
-      detail: `Starts in ${minutesUntil} minute${suffix}`,
+      badge: t("classCalendar.badge.timeLeft", { time: timeLabel }),
+      detail: t("classCalendar.detail.startsIn", { time: timeLabel }),
     };
-  }, [minutesUntil]);
+  }, [formatTimeUnit, minutesUntil, t]);
 
   const nextClassTimes = useMemo(() => {
     if (!nextClass?.date || !nextClass?.startTime) return null;
@@ -103,7 +122,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
       hour: "2-digit",
       minute: "2-digit",
     });
-    const localFormatter = new Intl.DateTimeFormat(undefined, {
+    const localFormatter = new Intl.DateTimeFormat(locale, {
       hour: "2-digit",
       minute: "2-digit",
     });
@@ -112,7 +131,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
     const localRange = `${localFormatter.format(start)}${end ? `–${localFormatter.format(end)}` : ""}`;
 
     return { ghanaRange, localRange };
-  }, [nextClass?.date, nextClass?.endTime, nextClass?.startTime]);
+  }, [locale, nextClass?.date, nextClass?.endTime, nextClass?.startTime]);
   const isNextClassToday = Boolean(todayClass && nextClass && todayClass.date === nextClass.date);
   const shouldShowNextClass = Boolean(nextClass && !isNextClassToday);
 
@@ -133,6 +152,11 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
 
   if (!classDetails) return null;
 
+  const formatDateLabel = (value) => {
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? value : dateFormatter.format(parsed);
+  };
+
   return (
     <div id={id} style={{ ...styles.card, display: "grid", gap: 10 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
@@ -146,8 +170,10 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
 
       <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         <div style={{ ...styles.field, margin: 0 }}>
-          <label style={styles.label}>Your class</label>
-          <select style={styles.select} value={selectedClass} onChange={handleChange}>
+          <label style={styles.label} htmlFor={selectId}>
+            Your class
+          </label>
+          <select id={selectId} style={styles.select} value={selectedClass} onChange={handleChange}>
             {catalogEntries.map((entry) => (
               <option key={entry} value={entry}>
                 {entry}
@@ -160,7 +186,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
         </div>
 
         <div style={{ ...styles.field, margin: 0 }}>
-          <label style={styles.label}>Zoom meeting</label>
+          <span style={styles.label}>Zoom meeting</span>
           <a href={ZOOM_DETAILS.url} style={{ color: "#2563eb", fontWeight: 700 }} target="_blank" rel="noreferrer">
             Join Zoom Meeting
           </a>
@@ -170,7 +196,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
         </div>
 
         <div style={{ ...styles.field, margin: 0 }}>
-          <label style={styles.label}>Course docs</label>
+          <span style={styles.label}>Course docs</span>
           <a href={classDetails.docUrl} style={{ color: "#2563eb", fontWeight: 700 }} target="_blank" rel="noreferrer">
             Open class materials
           </a>
@@ -193,18 +219,22 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
                 width: "fit-content",
               }}
             >
-              {classDetails.startDate} → {classDetails.endDate}
+              {formatDateLabel(classDetails.startDate)} → {formatDateLabel(classDetails.endDate)}
             </span>
           </div>
         </div>
 
         {timeline ? (
           <div style={{ ...styles.field, margin: 0 }}>
-            <label style={styles.label}>Timeline</label>
+            <span style={styles.label}>Timeline</span>
             <div style={{ ...styles.card, background: "#f3f4f6", margin: 0, gap: 6 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontWeight: 700 }}>{timeline.status}</span>
-                <span style={styles.badge}>{timeline.percentComplete}% done</span>
+                <span style={styles.badge}>
+                  {t("classCalendar.percentDone", {
+                    percent: formatPercent(timeline.percentComplete / 100, { locale }),
+                  })}
+                </span>
               </div>
               <div style={{ position: "relative", height: 10, background: "#e5e7eb", borderRadius: 999 }}>
                 <div
@@ -220,10 +250,14 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
               </div>
               <p style={{ ...styles.helperText, margin: 0 }}>
                 {timeline.daysUntilStart > 0
-                  ? `${timeline.daysUntilStart} day${timeline.daysUntilStart === 1 ? "" : "s"} until kickoff`
+                  ? t("classCalendar.timeline.untilKickoff", {
+                      time: formatTimeUnit("day", timeline.daysUntilStart),
+                    })
                   : timeline.daysUntilEnd > 0
-                  ? `${timeline.daysUntilEnd} day${timeline.daysUntilEnd === 1 ? "" : "s"} until graduation`
-                  : "This class has finished."}
+                  ? t("classCalendar.timeline.untilGraduation", {
+                      time: formatTimeUnit("day", timeline.daysUntilEnd),
+                    })
+                  : t("classCalendar.timeline.finished")}
               </p>
             </div>
           </div>
@@ -237,7 +271,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
             <span style={styles.badge}>Today</span>
           </div>
           <p style={{ ...styles.helperText, margin: "6px 0" }}>
-            {todayClass.weekday}, {todayClass.date} · {todayClass.startTime}–{todayClass.endTime}
+            {todayClass.weekday}, {formatDateLabel(todayClass.date)} · {todayClass.startTime}–{todayClass.endTime}
           </p>
           <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
             Chapters: {todayClass.titles?.join("; ")}
@@ -263,7 +297,8 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
             {timeUntilDisplay?.badge ? <span style={styles.badge}>{timeUntilDisplay.badge}</span> : null}
           </div>
           <p style={{ ...styles.helperText, margin: "6px 0" }}>
-            {nextClass.weekday}, {nextClass.date} · {nextClassTimes?.ghanaRange || `${nextClass.startTime}–${nextClass.endTime}`}{" "}
+            {nextClass.weekday}, {formatDateLabel(nextClass.date)} ·{" "}
+            {nextClassTimes?.ghanaRange || `${nextClass.startTime}–${nextClass.endTime}`}{" "}
             (GMT, Ghana)
           </p>
           {nextClassTimes?.localRange ? (

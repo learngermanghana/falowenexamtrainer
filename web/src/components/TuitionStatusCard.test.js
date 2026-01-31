@@ -1,4 +1,6 @@
 import { render, screen } from "@testing-library/react";
+import i18n from "../i18n";
+import { formatCurrency } from "../lib/formatters";
 import TuitionStatusCard from "./TuitionStatusCard";
 
 jest.mock("../context/AuthContext", () => ({
@@ -11,6 +13,8 @@ jest.mock("../context/AuthContext", () => ({
 
 describe("TuitionStatusCard", () => {
   const originalPaymentsFlag = process.env.REACT_APP_ENABLE_PAYMENTS;
+  const locale = i18n.language;
+  const formatMoney = (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 });
 
   afterEach(() => {
     process.env.REACT_APP_ENABLE_PAYMENTS = originalPaymentsFlag;
@@ -20,8 +24,8 @@ describe("TuitionStatusCard", () => {
     render(<TuitionStatusCard level="A1" paidAmount={2800} tuitionFee={2800} />);
 
     expect(screen.getByText("Paid")).toBeInTheDocument();
-    expect(screen.getAllByText("GH₵2800")).toHaveLength(2);
-    expect(screen.getByText("GH₵0")).toBeInTheDocument();
+    expect(screen.getAllByText(formatMoney(2800))).toHaveLength(2);
+    expect(screen.getByText(formatMoney(0))).toBeInTheDocument();
   });
 
   it("renders partial state snapshot with balance and payment controls", () => {
@@ -34,9 +38,9 @@ describe("TuitionStatusCard", () => {
 
     expect(cardText).toContain("Balance & tuition");
     expect(cardText).toContain("Partial");
-    expect(cardText).toContain("GH₵3000");
-    expect(cardText).toContain("GH₵500");
-    expect(cardText).toContain("GH₵2500");
+    expect(cardText).toContain(formatMoney(3000));
+    expect(cardText).toContain(formatMoney(500));
+    expect(cardText).toContain(formatMoney(2500));
     expect(cardText).toContain("Pay tuition online");
   });
 

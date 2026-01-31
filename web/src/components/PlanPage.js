@@ -1,13 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import HomeActions from "./HomeActions";
 import { styles } from "../styles";
 import ClassCalendarCard from "./ClassCalendarCard";
+import { updatePageMeta } from "../lib/pageMeta";
 
 const PlanPage = ({ onSelect, classCalendarRef }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const coursePoints = t("planPage.courseCard.points", { returnObjects: true });
   const examPoints = t("planPage.examCard.points", { returnObjects: true });
+
+  useEffect(() => {
+    updatePageMeta({
+      title: t("planPage.meta.title"),
+      description: t("planPage.meta.description"),
+      lang: i18n.language,
+    });
+  }, [i18n.language, t]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>

@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -12,6 +13,7 @@ import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
+import { formatCurrency } from "../lib/formatters";
 
 const MIN_INITIAL_PAYMENT = 2000;
 const isFullName = (value) => {
@@ -53,6 +55,12 @@ const formatClassLabel = (className) => {
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
+  const formatMoney = useMemo(
+    () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
+    [locale]
+  );
   const { showToast } = useToast();
   const paymentsEnabled = isPaymentsEnabled();
   const now = useMemo(() => new Date(), []);
@@ -230,8 +238,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
     const validationIssues = {};
 
     if (initialPaymentAmount === "" || Number.isNaN(numericInitialPayment)) {
-      validationIssues.initialPaymentAmount =
-        "Enter a number without commas or spaces. You need at least GH₵2000 to start a paid account.";
+      validationIssues.initialPaymentAmount = `Enter a number without commas or spaces. You need at least ${formatMoney(
+        MIN_INITIAL_PAYMENT
+      )} to start a paid account.`;
     }
 
     if (numericInitialPayment < 0) {
@@ -239,7 +248,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
     }
 
     if (!numericInitialPayment || numericInitialPayment < MIN_INITIAL_PAYMENT) {
-      validationIssues.initialPaymentAmount = `Enter GH₵${MIN_INITIAL_PAYMENT} or more to reserve your class.`;
+      validationIssues.initialPaymentAmount = `Enter ${formatMoney(
+        MIN_INITIAL_PAYMENT
+      )} or more to reserve your class.`;
     }
 
     if (!isFullName(name)) {
@@ -326,12 +337,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
       rememberStudentCodeForEmail(email, studentCode);
-      const balanceText = balanceDue > 0 ? ` Balance due: GH₵${balanceDue}.` : "";
+      const balanceText = balanceDue > 0 ? ` Balance due: ${formatMoney(balanceDue)}.` : "";
       const amountCopy = intendedPaymentAmount
-        ? `You chose to pay GH₵${intendedPaymentAmount} now.`
+        ? `You chose to pay ${formatMoney(intendedPaymentAmount)} now.`
         : "Choose how much to pay now inside the app.";
-      const accessCopy =
-        "Pay at least GH₵2000 to unlock 1-month access, or clear the full balance to unlock 6 months.";
+      const accessCopy = `Pay at least ${formatMoney(
+        MIN_INITIAL_PAYMENT
+      )} to unlock 1-month access, or clear the full balance to unlock 6 months.`;
       const paymentInstruction = paymentsEnabled
         ? "Open the tuition card in the app to start Paystack checkout."
         : "Payments are handled on the web app only. Please sign in online to complete your tuition.";
@@ -606,7 +618,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
           ) : null}
 
-          <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GH₵)</label>
+          <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GHS)</label>
           <input
             id="initial-payment-amount"
             type="number"
@@ -618,15 +630,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
             value={initialPaymentAmount}
             onChange={handleInitialPaymentChange}
             style={inputStyle}
-            placeholder={`At least GH₵${MIN_INITIAL_PAYMENT}`}
+            placeholder={`At least ${formatMoney(MIN_INITIAL_PAYMENT)}`}
           />
           {fieldErrors.initialPaymentAmount ? (
             <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
           ) : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Enter between GH₵{MIN_INITIAL_PAYMENT} and GH₵{tuitionFeeForLevel} for {selectedLevel}. A1: GH₵2800 · A2:
-            GH₵3000 · B1: GH₵3000 · B2: GH₵3000 · C1: GH₵3000. You must pay at least GH₵{MIN_INITIAL_PAYMENT} to start
-            your account. We confirm Paystack payments before marking you as paid.
+            Enter between {formatMoney(MIN_INITIAL_PAYMENT)} and {formatMoney(tuitionFeeForLevel)} for {selectedLevel}. A1: {formatMoney(2800)} ·
+            A2: {formatMoney(3000)} · B1: {formatMoney(3000)} · B2: {formatMoney(3000)} · C1: {formatMoney(3000)}. You must pay at least{" "}
+            {formatMoney(MIN_INITIAL_PAYMENT)} to start your account. We confirm Paystack payments before marking you as paid.
           </p>
 
           <TuitionStatusCard
@@ -638,7 +650,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             paystackLink={tuitionSummary.paystackLink}
             showPaymentAction={false}
             title="Tuition summary"
-            description={`For ${selectedLevel} we charge GH₵${tuitionSummary.tuitionFee}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
+            description={`For ${selectedLevel} we charge ${formatMoney(
+              tuitionSummary.tuitionFee
+            )}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
           />
 
           <label style={styles.label} htmlFor="class-selection">Which live class are you joining? (required)</label>

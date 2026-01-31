@@ -6,6 +6,7 @@ export const goetheExamLevels = [
       "A German exam for adults. It certifies that candidates have acquired very basic language skills and corresponds to the first level (A1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
     registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzsd1.cfm",
     price: "3,000 GHS",
+    priceValue: 3000,
     location: "Goethe-Institut Accra",
     exams: [
       { date: "2026-02-14", registrationStart: "2026-01-26", registrationEnd: "2026-01-26" },
@@ -26,6 +27,7 @@ export const goetheExamLevels = [
     description: "A German exam for adults. It certifies basic language skills at the A2 level of the CEFR.",
     registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzsd2.cfm",
     price: "2,550 GHS",
+    priceValue: 2550,
     location: "Goethe-Institut Accra",
     exams: [
       { date: "2026-03-12", registrationStart: "2026-02-03", registrationEnd: "2026-02-03" },
@@ -45,7 +47,9 @@ export const goetheExamLevels = [
       "A German exam for young people and adults. It certifies that candidates are independent users of the German language and corresponds to the third level (B1) on the six-level scale of competence laid down in the Common European Framework of Reference for Languages (CEFR).",
     registrationUrl: "https://www.goethe.de/ins/gh/en/spr/prf/gzb1.cfm",
     price: "2,900 GHS",
+    priceValue: 2900,
     modulePrice: "950 GHS per module",
+    modulePriceValue: 950,
     location: "Goethe-Institut Accra",
     exams: [
       { date: "2026-03-16", registrationStart: "2026-02-04", registrationEnd: "2026-02-04" },

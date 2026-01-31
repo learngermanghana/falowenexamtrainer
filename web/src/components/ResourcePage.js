@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
+import { updatePageMeta } from "../lib/pageMeta";
 
 const ResourcePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sections = t("resourcePage.sections", { returnObjects: true });
+
+  useEffect(() => {
+    updatePageMeta({
+      title: t("resourcePage.meta.title"),
+      description: t("resourcePage.meta.description"),
+      lang: i18n.language,
+    });
+  }, [i18n.language, t]);
 
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>

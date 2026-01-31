@@ -20,6 +20,10 @@
     }
   },
   "planPage": {
+    "meta": {
+      "title": "Ton plan · Falowen Exam Coach",
+      "description": "Choisis entre le cours et la simulation d’examen pour démarrer ta prochaine session."
+    },
     "title": "Deux options pour aujourd’hui",
     "badge": "Connexion requise",
     "intro": "Garde la page d’accueil simple : choisis entre le cours et la simulation d’examen. Tu accéderas au reste depuis ces espaces.",
@@ -70,6 +74,10 @@
     }
   },
   "resourcePage": {
+    "meta": {
+      "title": "Ressources · Falowen Exam Coach",
+      "description": "Stratégies et liens fiables pour la lecture, l’écoute et la préparation aux examens."
+    },
     "title": "Ressources",
     "subtitle": "Collection sûre avec stratégies claires et liens plutôt que des épreuves copiées.",
     "badge": "Lecture/écoute incluses",
@@ -409,8 +417,86 @@
       { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
     ]
   },
+  "examResources": {
+    "meta": {
+      "title": "Ressources d’examen · Falowen Exam Coach",
+      "description": "Liens Goethe et stratégies rapides pour la lecture et l’écoute."
+    }
+  },
+  "classCalendar": {
+    "status": {
+      "startsIn": "Démarre dans {{time}}",
+      "timeLeft": "{{time}} restantes",
+      "courseFinished": "Cours terminé"
+    },
+    "badge": {
+      "startingNow": "Ça commence",
+      "timeLeft": "{{time}} restantes"
+    },
+    "detail": {
+      "startingNow": "Ça commence",
+      "startsIn": "Démarre dans {{time}}"
+    },
+    "timeline": {
+      "untilKickoff": "{{time}} avant le démarrage",
+      "untilGraduation": "{{time}} avant la fin",
+      "finished": "Ce cours est terminé."
+    },
+    "percentDone": "Progression : {{percent}}"
+  },
+  "letterPractice": {
+    "minuteTarget": "Objectif : {{time}}"
+  },
+  "examFile": {
+    "modulePrice": "{{price}} par module"
+  },
   "studyCalendar": {
+    "meta": {
+      "title": "Calendrier d’étude · Falowen Exam Coach",
+      "description": "Planifie ton calendrier d’étude Goethe et télécharge un fichier calendrier."
+    },
+    "hero": {
+      "kicker": "Générateur de calendrier d’étude",
+      "title": "Crée ton calendrier d’étude Goethe",
+      "subtitle": "Choisis ta date d’examen, définis ton rythme et télécharge un fichier calendrier pour ton téléphone."
+    },
+    "required": {
+      "title": "Obligatoire : verrouille tes rappels",
+      "subtitle": "Ton cours est terminé, donc nous téléchargeons automatiquement un calendrier d’étude pour te garder sur la bonne voie. Tu peux ajuster les dates et télécharger à nouveau si tu veux."
+    },
+    "form": {
+      "examLevel": "Niveau d’examen",
+      "examDate": "Date d’examen",
+      "examDateHelp": "Tu ne vois pas ta date ? Saisis-la manuellement pour construire ton plan.",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "studyDays": "Jours d’étude",
+      "studyDayLabel": "Jour d’étude {{day}}",
+      "studyTime": "Heure",
+      "sessionLength": "Durée de la session",
+      "reminder": "Rappel",
+      "incomplete": "Choisis des dates et au moins un jour d’étude pour générer ton calendrier."
+    },
+    "days": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam",
+      "sun": "Dim"
+    },
+    "cta": {
+      "required": "Télécharger le calendrier d’étude (obligatoire)",
+      "standard": "Télécharger le calendrier d’étude (.ics)"
+    },
     "reminder": {
+      "title": "Comment fonctionnent les rappels",
+      "items": [
+        "Ajoute le fichier téléchargé à Google Calendar, iOS Calendar ou Outlook.",
+        "Chaque session d’étude reçoit un rappel selon le délai choisi.",
+        "Tu peux modifier ou supprimer les sessions plus tard dans ton calendrier."
+      ],
       "none": "Aucun rappel",
       "before": "{{time}} avant"
     }

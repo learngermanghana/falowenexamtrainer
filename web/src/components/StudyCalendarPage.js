@@ -4,15 +4,16 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
 import { downloadStudyCalendar } from "../services/examCalendar";
+import { updatePageMeta } from "../lib/pageMeta";
 
 const DAYS_OF_WEEK = [
-  { label: "Mon", value: 1 },
-  { label: "Tue", value: 2 },
-  { label: "Wed", value: 3 },
-  { label: "Thu", value: 4 },
-  { label: "Fri", value: 5 },
-  { label: "Sat", value: 6 },
-  { label: "Sun", value: 0 },
+  { key: "mon", value: 1 },
+  { key: "tue", value: 2 },
+  { key: "wed", value: 3 },
+  { key: "thu", value: 4 },
+  { key: "fri", value: 5 },
+  { key: "sat", value: 6 },
+  { key: "sun", value: 0 },
 ];
 
 const formatInputDate = (value) => {
@@ -74,6 +75,14 @@ const StudyCalendarPage = () => {
   }, [location.search, location.state]);
 
   const examDates = useMemo(() => levelInfo?.exams || [], [levelInfo]);
+
+  useEffect(() => {
+    updatePageMeta({
+      title: t("studyCalendar.meta.title"),
+      description: t("studyCalendar.meta.description"),
+      lang: i18n.language,
+    });
+  }, [i18n.language, t]);
 
   useEffect(() => {
     if (examDates.length > 0) {
@@ -146,28 +155,25 @@ const StudyCalendarPage = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
-        <p style={{ ...styles.helperText, margin: 0 }}>Study calendar builder</p>
-        <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>Create a Goethe study calendar</h2>
-        <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-          Pick your exam date, set how often you want to study, and download a calendar file to add
-          to your phone.
-        </p>
+        <p style={{ ...styles.helperText, margin: 0 }}>{t("studyCalendar.hero.kicker")}</p>
+        <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>{t("studyCalendar.hero.title")}</h2>
+        <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>{t("studyCalendar.hero.subtitle")}</p>
       </section>
 
       {forceDownload ? (
         <section style={{ ...styles.card, border: "1px solid #fdba74", background: "#fff7ed" }}>
-          <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>Required: lock in your reminders</h3>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            Your course is complete, so we automatically download a study calendar to keep you on track for your
-            next exam. You can adjust the dates below and download again if you want.
-          </p>
+          <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>{t("studyCalendar.required.title")}</h3>
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("studyCalendar.required.subtitle")}</p>
         </section>
       ) : null}
 
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "grid", gap: 8 }}>
-          <label style={styles.helperText}>Exam level</label>
+          <label style={styles.helperText} htmlFor="study-calendar-exam-level">
+            {t("studyCalendar.form.examLevel")}
+          </label>
           <select
+            id="study-calendar-exam-level"
             value={selectedLevel}
             onChange={(event) => setSelectedLevel(event.target.value)}
             style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
@@ -181,9 +187,12 @@ const StudyCalendarPage = () => {
         </div>
 
         <div style={{ display: "grid", gap: 8 }}>
-          <label style={styles.helperText}>Exam date</label>
+          <label style={styles.helperText} htmlFor="study-calendar-exam-date">
+            {t("studyCalendar.form.examDate")}
+          </label>
           {examDates.length > 0 ? (
             <select
+              id="study-calendar-exam-date"
               value={examDate}
               onChange={(event) => setExamDate(event.target.value)}
               style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
@@ -196,6 +205,7 @@ const StudyCalendarPage = () => {
             </select>
           ) : (
             <input
+              id="study-calendar-exam-date"
               type="date"
               value={examDate}
               onChange={(event) => setExamDate(event.target.value)}
@@ -203,14 +213,17 @@ const StudyCalendarPage = () => {
             />
           )}
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Don’t see a listed exam date? Enter one manually to build your plan.
+            {t("studyCalendar.form.examDateHelp")}
           </p>
         </div>
 
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
           <div style={{ display: "grid", gap: 8 }}>
-            <label style={styles.helperText}>Study start date</label>
+            <label style={styles.helperText} htmlFor="study-calendar-start-date">
+              {t("studyCalendar.form.startDate")}
+            </label>
             <input
+              id="study-calendar-start-date"
               type="date"
               value={startDate}
               onChange={(event) => setStartDate(event.target.value)}
@@ -218,8 +231,11 @@ const StudyCalendarPage = () => {
             />
           </div>
           <div style={{ display: "grid", gap: 8 }}>
-            <label style={styles.helperText}>Study end date</label>
+            <label style={styles.helperText} htmlFor="study-calendar-end-date">
+              {t("studyCalendar.form.endDate")}
+            </label>
             <input
+              id="study-calendar-end-date"
               type="date"
               value={endDate}
               onChange={(event) => setEndDate(event.target.value)}
@@ -229,16 +245,18 @@ const StudyCalendarPage = () => {
         </div>
 
         <div style={{ display: "grid", gap: 8 }}>
-          <label style={styles.helperText}>Study days</label>
+          <label style={styles.helperText}>{t("studyCalendar.form.studyDays")}</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {DAYS_OF_WEEK.map((day) => (
               <button
-                key={day.label}
+                key={day.key}
                 type="button"
                 onClick={() => toggleDay(day.value)}
+                aria-pressed={activeDays.includes(day.value)}
+                aria-label={t("studyCalendar.form.studyDayLabel", { day: t(`studyCalendar.days.${day.key}`) })}
                 style={activeDays.includes(day.value) ? styles.navButtonActive : styles.navButton}
               >
-                {day.label}
+                {t(`studyCalendar.days.${day.key}`)}
               </button>
             ))}
           </div>
@@ -246,8 +264,11 @@ const StudyCalendarPage = () => {
 
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
           <div style={{ display: "grid", gap: 8 }}>
-            <label style={styles.helperText}>Study time</label>
+            <label style={styles.helperText} htmlFor="study-calendar-time">
+              {t("studyCalendar.form.studyTime")}
+            </label>
             <input
+              id="study-calendar-time"
               type="time"
               value={timeOfDay}
               onChange={(event) => setTimeOfDay(event.target.value)}
@@ -255,8 +276,11 @@ const StudyCalendarPage = () => {
             />
           </div>
           <div style={{ display: "grid", gap: 8 }}>
-            <label style={styles.helperText}>Session length</label>
+            <label style={styles.helperText} htmlFor="study-calendar-duration">
+              {t("studyCalendar.form.sessionLength")}
+            </label>
             <select
+              id="study-calendar-duration"
               value={durationMinutes}
               onChange={(event) => setDurationMinutes(event.target.value)}
               style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
@@ -269,8 +293,11 @@ const StudyCalendarPage = () => {
             </select>
           </div>
           <div style={{ display: "grid", gap: 8 }}>
-            <label style={styles.helperText}>Reminder</label>
+            <label style={styles.helperText} htmlFor="study-calendar-reminder">
+              {t("studyCalendar.form.reminder")}
+            </label>
             <select
+              id="study-calendar-reminder"
               value={reminderMinutes}
               onChange={(event) => setReminderMinutes(event.target.value)}
               style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
@@ -293,21 +320,23 @@ const StudyCalendarPage = () => {
         </div>
 
         <button type="button" style={styles.primaryButton} onClick={handleDownload} disabled={!isFormReady}>
-          {forceDownload ? "Download study calendar (required)" : "Download study calendar (.ics)"}
+          {forceDownload
+            ? t("studyCalendar.cta.required")
+            : t("studyCalendar.cta.standard")}
         </button>
         {!isFormReady ? (
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Select dates and at least one study day to generate your calendar.
+            {t("studyCalendar.form.incomplete")}
           </p>
         ) : null}
       </section>
 
       <section style={styles.card}>
-        <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>How reminders work</h3>
+        <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>{t("studyCalendar.reminder.title")}</h3>
         <ul style={{ ...styles.checklist, margin: 0 }}>
-          <li>Add the downloaded file to Google Calendar, iOS Calendar, or Outlook.</li>
-          <li>Each study session gets its own reminder based on your selected lead time.</li>
-          <li>You can edit or delete sessions later in your calendar app.</li>
+          {t("studyCalendar.reminder.items", { returnObjects: true }).map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
       </section>
     </div>

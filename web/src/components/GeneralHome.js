@@ -1,4 +1,5 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { toDateMs } from "../lib/dateUtils";
@@ -9,6 +10,7 @@ import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
+import { formatCurrency } from "../lib/formatters";
 
 const WelcomeHero = ({ studentProfile, onOpenExamFile }) => {
   const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
@@ -61,6 +63,13 @@ const GeneralHome = ({
   onEnableNotifications,
   onSaveOnboarding,
 }) => {
+  const { i18n, t } = useTranslation();
+  const locale = i18n.language;
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const formatTimeUnit = useCallback(
+    (unit, count) => t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) }),
+    [numberFormatter, t]
+  );
   const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
   const classCalendarId = "class-calendar-card";
@@ -74,19 +83,17 @@ const GeneralHome = ({
     const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
     if (daysLeft < 0 || daysLeft > 15) return null;
 
-    const amount = `GH₵${balanceDue.toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    })}`;
+    const amount = formatCurrency(balanceDue, { locale, maximumFractionDigits: 2 });
+    const daysLabel = formatTimeUnit("day", daysLeft);
 
     return {
       daysLeft,
       message:
         daysLeft === 0
           ? `Your access ends today and you still owe ${amount}. Please make a payment to keep access.`
-          : `You still owe ${amount} and have ${daysLeft} day${daysLeft === 1 ? "" : "s"} left. Please make a payment to keep access.`,
+          : `You still owe ${amount} and have ${daysLabel} left. Please make a payment to keep access.`,
     };
-  }, [studentProfile?.balanceDue, studentProfile?.contractEnd]);
+  }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd]);
 
   const handleSelectLevel = () => navigate("/campus/account");
   const handleConfirmClass = () => {
