@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
@@ -176,6 +177,7 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
 };
 
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
+  const { t } = useTranslation();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
@@ -348,7 +350,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     </div>
 
                     {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-                    {entry.instruction ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p> : null}
+                    {entry.instruction ? (
+                      <div style={{ display: "grid", gap: 6 }}>
+                        <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
+                        <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p>
+                      </div>
+                    ) : null}
 
                     <LessonList title="Lesen & Hören" lessons={lesenHorenList} />
                     <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} />

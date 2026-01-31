@@ -80,6 +80,9 @@
       "account": "Account, contract & payments"
     }
   },
+  "courseTab": {
+    "instructionLabel": "Instruction"
+  },
   "planPage": {
     "meta": {
       "title": "Your plan · Falowen Exam Coach",

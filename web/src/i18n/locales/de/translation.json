@@ -80,6 +80,9 @@
       "account": "Konto, Vertrag & Zahlungen"
     }
   },
+  "courseTab": {
+    "instructionLabel": "Anleitung"
+  },
   "planPage": {
     "meta": {
       "title": "Dein Plan · Falowen Exam Coach",
