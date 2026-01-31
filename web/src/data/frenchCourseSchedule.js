@@ -6,13 +6,13 @@ export const FRENCH_A1_SCHEDULE = [
     goal: "Cover the alphabet, pronunciation, greetings, and the tu/vous distinction.",
     instruction: "Speaking focus: micro-dialogues for greetings and introductions.",
     grammar_topic: "Alphabet, pronunciation, greetings, tu/vous",
-    assignment: false,
+    assignment: true,
     lesen_hören: {
       video: null,
       youtube_link: null,
-      grammarbook_link: null,
-      workbook_link: null,
-      assignment: false,
+      grammarbook_link: "https://drive.google.com/file/d/1CkT5-A_3m6XgvS6HNyvoY4zDe-l7ke2n/view?usp=sharing",
+      workbook_link: "https://drive.google.com/file/d/1z0dbnthHGXk5hagWJ6ucH3UgL8S6jS-D/view?usp=sharing",
+      assignment: true,
     },
   },
   {
