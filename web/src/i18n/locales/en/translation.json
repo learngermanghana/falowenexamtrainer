@@ -74,14 +74,19 @@
     },
     "actions": {
       "collapse": "Hide",
-      "expand": "Show"
+      "expand": "Show",
+      "dismiss": "Hide bar",
+      "reopen": "Study Buddy",
+      "reopenAria": "Reopen Study Buddy bar",
+      "contrastOn": "High contrast",
+      "contrastOff": "Standard contrast"
     },
     "metrics": {
       "latestResult": "Latest result",
       "attendance": "Attendance",
       "nextAssignment": "Next assignment",
       "latestHelper": "Track progress after each marked task.",
-      "attendanceHelper": "Stay consistent to improve faster.",
+      "attendanceHelper": "Keep a steady routine to improve faster.",
       "assignmentHelper": "Based on your latest submissions.",
       "awaitingAssignment": "Awaiting recommendation",
       "scoreValue": "{{score}}/100",
@@ -94,6 +99,7 @@
       "title": "Suggestions",
       "lowScore": "Focus on the last marked task and redo corrections before starting a new assignment.",
       "lowAttendance": "Aim to attend the next two classes to keep your progress steady.",
+      "paymentReminder": "Payment reminder: {{amount}} due in {{time}}. Review your account to stay enrolled.",
       "assignmentPlan": "Plan 2 short study blocks this week to finish {{assignment}}.",
       "default": "Share your current goal, and I'll build a quick weekly plan for you."
     },
@@ -103,6 +109,14 @@
       "send": "Send"
     },
     "quickReply": {
+      "keywords": {
+        "attendance": ["attendance", "presence", "absent", "absence"],
+        "results": ["result", "results", "score", "grade"],
+        "assignment": ["assignment", "homework", "task"],
+        "grammar": ["grammar"],
+        "vocab": ["vocab", "vocabulary", "words"],
+        "exam": ["exam", "test", "mock"]
+      },
       "attendance": {
         "synced": "You're currently at {{attendance}}. Aim for the next session to keep momentum.",
         "notSynced": "Your attendance data isn't synced yet. Ask your tutor to confirm your sessions, and I'll track it here."

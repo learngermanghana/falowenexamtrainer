@@ -40,6 +40,18 @@ password resets. To set it up:
 5. For server-side features (Paystack webhook, Sheets sync), deploy the Cloud Functions as described below so they can access
    the same project resources.
 
+### Firestore data used by the app
+Client-side data access currently centers around these collections and subcollections:
+
+- `students` documents store the core student profile plus billing/contract fields created during signup (name, class, level,
+  studentCode, tuitionFee, balanceDue, paymentStatus, contract dates, etc.).【F:web/src/components/SignUpPage.js†L301-L346】
+- `students/{studentId}/notifications` stores per-student notifications read and acknowledged inside the notification drawer.【F:web/src/services/notificationService.js†L199-L277】
+- `loginSessions` captures login events with user agent, locale, and provider metadata to support audits.【F:web/src/context/AuthContext.js†L216-L251】
+- `writingProgress` holds ongoing writing drafts and syncs with local storage as a fallback cache.【F:web/src/services/writingProgressService.js†L1-L77】
+- `scores` provides result history and summaries used for assignments and score views.【F:web/src/services/resultsService.js†L36-L175】
+- `attendance/{className}/sessions` stores attendance session data used to build student attendance summaries.【F:web/src/services/attendanceService.js†L116-L141】
+- `class_board/{level}/classes/{className}/posts` and `class_board/.../presence` hold class discussion posts and presence data.【F:web/src/components/ClassDiscussionPage.js†L22-L27】
+
 ### Check whether a student is verified
 - In the Firebase Console, open **Authentication → Users**. The **Email verified** column shows `true` for verified students
   and `false` for accounts that have not clicked the verification link yet.
