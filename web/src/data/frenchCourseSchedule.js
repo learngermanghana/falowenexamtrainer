@@ -26,7 +26,7 @@ export const FRENCH_A1_SCHEDULE = [
     lesen_hören: {
       video: null,
       youtube_link: null,
-      grammarbook_link: null,
+      grammarbook_link: "https://drive.google.com/file/d/14sfFfDUmh7BBEBKFzRITzZ9yQ3yKtmqy/view?usp=sharing",
       workbook_link: null,
       assignment: false,
     },
@@ -38,13 +38,13 @@ export const FRENCH_A1_SCHEDULE = [
     goal: "Introduce yourself with name, nationality, and city; use être correctly.",
     instruction: "Speaking focus: self-introduction dialogues.",
     grammar_topic: "Être (present) + identity statements",
-    assignment: false,
+    assignment: true,
     lesen_hören: {
       video: null,
       youtube_link: null,
-      grammarbook_link: null,
-      workbook_link: null,
-      assignment: false,
+      grammarbook_link: "https://drive.google.com/file/d/1ZVGp4y7LLYHwnhkw7DlaGdQ5upb0JNbJ/view?usp=sharing",
+      workbook_link: "https://drive.google.com/file/d/1oYNN5WFifjHfNmsgpYT1QFD0Wyy3rYqJ/view?usp=sharing",
+      assignment: true,
     },
   },
   {
