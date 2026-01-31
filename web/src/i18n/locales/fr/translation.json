@@ -80,6 +80,9 @@
       "account": "Compte, contrat & paiements"
     }
   },
+  "courseTab": {
+    "instructionLabel": "Instruction"
+  },
   "planPage": {
     "meta": {
       "title": "Ton plan · Falowen Exam Coach",
