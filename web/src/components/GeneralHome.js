@@ -223,7 +223,11 @@ const GeneralHome = ({
           <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>More for you</summary>
           <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
             <HomeMetrics studentProfile={studentProfile} />
-            <ClassCalendarCard id={classCalendarId} initialClassName={preferredClass} />
+            <ClassCalendarCard
+              id={classCalendarId}
+              initialClassName={preferredClass}
+              program={studentProfile?.program}
+            />
           </div>
         </details>
       </section>

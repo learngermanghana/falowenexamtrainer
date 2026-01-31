@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
+import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
 
@@ -174,10 +175,18 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
   return levels.filter((level) => allowed.has(level));
 };
 
-const CourseTab = ({ defaultLevel, defaultClassName }) => {
+const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
+  const isFrenchProgram = program === "french";
+  const { schedules, resolvedDerivedLevels } = useMemo(() => {
+    if (isFrenchProgram) {
+      return { schedules: { A1: FRENCH_A1_SCHEDULE }, resolvedDerivedLevels: new Set() };
+    }
+
+    return { schedules: mergedCourseSchedules, resolvedDerivedLevels: derivedLevels };
+  }, [isFrenchProgram]);
   const levels = useMemo(() => {
-    const baseLevels = Object.keys(mergedCourseSchedules);
+    const baseLevels = Object.keys(schedules);
     const normalizedDefault = resolvedDefaultLevel;
     const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
     const allowedLevels = getAllowedCourseLevels(merged, normalizedDefault);
@@ -189,7 +198,7 @@ const CourseTab = ({ defaultLevel, defaultClassName }) => {
       if (bIndex !== -1) return 1;
       return a.localeCompare(b);
     });
-  }, [resolvedDefaultLevel]);
+  }, [resolvedDefaultLevel, schedules]);
 
   const [selectedCourseLevel, setSelectedCourseLevel] = useState(() => {
     const normalizedDefault = resolvedDefaultLevel;
@@ -218,8 +227,11 @@ const CourseTab = ({ defaultLevel, defaultClassName }) => {
     }
   }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
 
-  const schedule = useMemo(() => mergedCourseSchedules[selectedCourseLevel] || [], [selectedCourseLevel]);
-  const isDerivedLevel = useMemo(() => derivedLevels.has(selectedCourseLevel), [selectedCourseLevel]);
+  const schedule = useMemo(() => schedules[selectedCourseLevel] || [], [schedules, selectedCourseLevel]);
+  const isDerivedLevel = useMemo(
+    () => resolvedDerivedLevels.has(selectedCourseLevel),
+    [resolvedDerivedLevels, selectedCourseLevel]
+  );
   const isB2SelfLearning = selectedCourseLevel === "B2";
   const isC1SelfLearning = selectedCourseLevel === "C1";
 

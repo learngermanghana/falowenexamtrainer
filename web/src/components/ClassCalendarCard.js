@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { classCatalog, ZOOM_DETAILS } from "../data/classCatalog";
+import { frenchClassCatalog } from "../data/french/classCatalog";
 import {
   downloadClassCalendar,
   buildGhanaDateTime,
@@ -13,10 +14,14 @@ import {
 import { loadPreferredClass, savePreferredClass } from "../services/classSelectionStorage";
 import { formatPercent } from "../lib/formatters";
 
-const ClassCalendarCard = ({ id, initialClassName }) => {
+const ClassCalendarCard = ({ id, initialClassName, program }) => {
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
-  const catalogEntries = useMemo(() => Object.keys(classCatalog), []);
+  const resolvedCatalog = useMemo(
+    () => (program === "french" ? frenchClassCatalog : classCatalog),
+    [program]
+  );
+  const catalogEntries = useMemo(() => Object.keys(resolvedCatalog), [resolvedCatalog]);
   const selectId = useMemo(() => (id ? `${id}-class-select` : "class-calendar-select"), [id]);
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const dateFormatter = useMemo(
@@ -44,7 +49,7 @@ const ClassCalendarCard = ({ id, initialClassName }) => {
   const [selectedClass, setSelectedClass] = useState(defaultClass);
   const [now, setNow] = useState(new Date());
 
-  const classDetails = classCatalog[selectedClass];
+  const classDetails = resolvedCatalog[selectedClass];
   const nextClass = useMemo(
     () => findNextClassSession(selectedClass, now),
     [now, selectedClass]

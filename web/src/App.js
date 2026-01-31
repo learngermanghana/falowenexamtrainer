@@ -573,6 +573,7 @@ const CampusArea = ({
         <CourseTab
           defaultLevel={campusStudentProfile?.level}
           defaultClassName={campusStudentProfile?.className}
+          program={campusStudentProfile?.program}
         />
       ) : null}
       {resolvedSection === "examFile" && allowedSections.examFile ? <MyExamFilePage /> : null}
