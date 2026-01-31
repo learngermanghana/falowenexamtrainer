@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
-import { useAuth } from "../context/AuthContext";
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -74,9 +73,7 @@ const getQuickReply = (question, context, t, keywordSets) => {
 
 const StudyBuddyBar = ({ studentProfile }) => {
   const { i18n, t } = useTranslation();
-  const { saveStudentProfile, studentProfile: authProfile } = useAuth();
   const locale = i18n.language;
-  const preferenceProfile = authProfile || studentProfile;
   const [question, setQuestion] = useState("");
   const [lastAnswer, setLastAnswer] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -94,7 +91,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
       return false;
     }
   });
-  const lastSavedPreferences = useRef(null);
   const contentId = "study-buddy-content";
 
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -233,54 +229,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
       // Ignore storage errors (privacy mode, etc.)
     }
   }, [isHighContrast]);
-
-  useEffect(() => {
-    const preferences = preferenceProfile?.studyBuddyPreferences;
-    if (!preferences) return;
-    if (typeof preferences.dismissed === "boolean") {
-      setIsDismissed(preferences.dismissed);
-    }
-    if (typeof preferences.highContrast === "boolean") {
-      setIsHighContrast(preferences.highContrast);
-    }
-  }, [preferenceProfile?.studyBuddyPreferences]);
-
-  useEffect(() => {
-    if (!saveStudentProfile || !preferenceProfile?.id) return;
-    const existing = preferenceProfile?.studyBuddyPreferences || {};
-    const next = {
-      dismissed: Boolean(isDismissed),
-      highContrast: Boolean(isHighContrast),
-    };
-    const normalizedExisting = {
-      dismissed: Boolean(existing.dismissed),
-      highContrast: Boolean(existing.highContrast),
-    };
-    if (
-      normalizedExisting.dismissed === next.dismissed &&
-      normalizedExisting.highContrast === next.highContrast
-    ) {
-      lastSavedPreferences.current = normalizedExisting;
-      return;
-    }
-    if (
-      lastSavedPreferences.current &&
-      lastSavedPreferences.current.dismissed === next.dismissed &&
-      lastSavedPreferences.current.highContrast === next.highContrast
-    ) {
-      return;
-    }
-    saveStudentProfile({ studyBuddyPreferences: next }).catch((error) => {
-      console.error("Failed to save Study Buddy preferences", error);
-    });
-    lastSavedPreferences.current = next;
-  }, [
-    isDismissed,
-    isHighContrast,
-    saveStudentProfile,
-    preferenceProfile?.id,
-    preferenceProfile?.studyBuddyPreferences,
-  ]);
 
   if (isDismissed) {
     return (
