@@ -189,7 +189,7 @@
     "heroTitle": "German and French exam training from Ghana.",
     "heroSubtitle": "Falowen guides you toward German exams with daily practice, tutor feedback, and structured live classes. French is available as an optional A1 module.",
     "cta": {
-      "join": "Join a cohort",
+      "join": "Join the {{language}} cohort",
       "login": "Log in",
       "getApp": "Download the app",
       "seeHow": "See how it works ↓"
@@ -256,8 +256,8 @@
       "subtitle": "New to learning or exam-focused? Pick the option that matches your next step.",
       "newLearner": {
         "title": "I'm new to {{language}}",
-        "description": "Join the next cohort and start at the right level (A1+).",
-        "cta": "Join a cohort →"
+        "description": "Join the next {{language}} cohort and start at the right level (A1+).",
+        "cta": "Join the {{language}} cohort →"
       },
       "examReady": {
         "title": "I'm preparing for exams",
@@ -272,11 +272,11 @@
         "✅ You get: daily practice tools, tutor feedback, and live class support.",
         "✅ Ideal for: learners preparing for Goethe-style speaking and writing tasks."
       ],
-      "cta": "Ready? Join a cohort →",
+      "cta": "Ready? Join the {{language}} cohort →",
       "steps": [
         {
           "title": "Open the application",
-          "description": "Click “Join a cohort” to start your application."
+          "description": "Click “Join the {{language}} cohort” to start your application."
         },
         {
           "title": "Fill in your details",
@@ -450,7 +450,7 @@
       "subtitle": "Falowen trains the exact skills you need for exam success: polite requests, accurate questions, and confident conversation. Practise daily and get tutor feedback in live classes.",
       "ctaTitle": "Ready to start?",
       "ctaSubtitle": "Create your profile to access practice tools, schedules, and tutor feedback.",
-      "ctaJoin": "Join a cohort",
+      "ctaJoin": "Join the {{language}} cohort",
       "ctaLogin": "Already enrolled? Log in →",
       "contactTitle": "Stay connected",
       "contactPhone": "Call or WhatsApp:",

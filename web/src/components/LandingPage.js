@@ -188,7 +188,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   const features = t("landing.features", { returnObjects: true });
   const quickLinks = t("landing.quickLinks", { returnObjects: true });
   const socialLinks = t("landing.socialLinks", { returnObjects: true });
-  const signupSteps = t("landing.howItWorks.steps", { returnObjects: true });
+  const signupSteps = t("landing.howItWorks.steps", {
+    returnObjects: true,
+    language: selectedProgram.shortLabel,
+  });
   const updates = t("landing.updates.items", { returnObjects: true });
   const reviewItems = t("landing.reviews.items", { returnObjects: true });
   const featuredReviews = useMemo(() => shuffleArray(reviewItems).slice(0, 6), [reviewItems]);
@@ -260,7 +263,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             {/* ✅ Keep main CTAs only here */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
-                {t("landing.cta.join")}
+                {t("landing.cta.join", { language: selectedProgram.shortLabel })}
               </button>
               <button type="button" style={styles.secondaryButton} onClick={onLogin}>
                 {t("landing.cta.login")}
@@ -443,13 +446,15 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             <div style={{ fontWeight: 900, color: "#111827" }}>
               {t("landing.path.newLearner.title", { language: selectedProgram.shortLabel })}
             </div>
-            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.path.newLearner.description")}</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              {t("landing.path.newLearner.description", { language: selectedProgram.shortLabel })}
+            </p>
             <button
               type="button"
               style={{ ...styles.primaryButton, padding: "10px 12px" }}
               onClick={() => onSignUp(resolvedProgram)}
             >
-              {t("landing.path.newLearner.cta")}
+              {t("landing.path.newLearner.cta", { language: selectedProgram.shortLabel })}
             </button>
           </div>
 
@@ -511,7 +516,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 textAlign: "left",
               }}
             >
-              {t("landing.howItWorks.cta")}
+              {t("landing.howItWorks.cta", { language: selectedProgram.shortLabel })}
             </button>
           </div>
 
@@ -641,7 +646,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                     style={{ ...styles.primaryButton, padding: "10px 14px" }}
                     onClick={() => onSignUp(resolvedProgram)}
                   >
-                    {t("landing.darkCta.ctaJoin")}
+                    {t("landing.darkCta.ctaJoin", { language: selectedProgram.shortLabel })}
                   </button>
 
                   <button
