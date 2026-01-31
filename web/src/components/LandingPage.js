@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { persistLanguage } from "../i18n";
+import { updatePageMeta } from "../lib/pageMeta";
 
 const FeatureCard = ({ icon, title, description }) => (
   <div
@@ -192,23 +193,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     const title = t("landing.meta.title");
     const description = t("landing.meta.description");
 
-    document.title = title;
-    document.documentElement.lang = i18n.language;
-
-    const descriptionTag = document.querySelector('meta[name="description"]');
-    if (descriptionTag) {
-      descriptionTag.setAttribute("content", description);
-    }
-
-    const ogTitleTag = document.querySelector('meta[property="og:title"]');
-    if (ogTitleTag) {
-      ogTitleTag.setAttribute("content", title);
-    }
-
-    const ogDescriptionTag = document.querySelector('meta[property="og:description"]');
-    if (ogDescriptionTag) {
-      ogDescriptionTag.setAttribute("content", description);
-    }
+    updatePageMeta({ title, description, lang: i18n.language });
   }, [i18n.language, t]);
 
   // Tip: for best performance, move these to web/public/photos and use "/photos/..."

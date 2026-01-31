@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
@@ -7,6 +8,10 @@ import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService"
 import { writingLetters } from "../data/writingLetters";
 
 const LetterPracticePage = ({ mode = "exams" }) => {
+  const { i18n, t } = useTranslation();
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
+  const formatTimeUnit = (unit, count) =>
+    t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) });
   const { level, setLevel, error, setError, loading, setLoading, resultHistory, addResultToHistory } = useExam();
   const { user, idToken, studentProfile } = useAuth();
 
@@ -373,7 +378,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                         <span style={styles.levelPill}>{item.level}</span>
                       </div>
                       <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-                        {item.durationMinutes} min • {item.situation}
+                        {formatTimeUnit("minute", item.durationMinutes)} • {item.situation}
                       </p>
                     </button>
                   ))}
@@ -387,7 +392,11 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                       <span style={styles.levelPill}>{selectedLetter.level}</span>
                       <strong>{selectedLetter.letter}</strong>
-                      <span style={styles.badge}>{selectedLetter.durationMinutes} minute target</span>
+                      <span style={styles.badge}>
+                        {t("letterPractice.minuteTarget", {
+                          time: formatTimeUnit("minute", selectedLetter.durationMinutes),
+                        })}
+                      </span>
                     </div>
                     <p style={{ ...styles.helperText, margin: 0 }}>{selectedLetter.situation}</p>
                     <div>

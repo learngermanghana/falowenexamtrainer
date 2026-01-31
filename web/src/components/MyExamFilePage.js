@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useExam } from "../context/ExamContext";
@@ -11,6 +12,7 @@ import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
 import { toDate, toDateMs } from "../lib/dateUtils";
+import { formatCurrency } from "../lib/formatters";
 import { jsPDF } from "jspdf";
 
 // ---------- helpers ----------
@@ -195,6 +197,9 @@ const downloadSimplePdf = ({ filename, title, subtitle, pairs, footer }) => {
 const MyExamFilePage = () => {
   const { studentProfile, user, idToken } = useAuth();
   const { level, levelConfirmed } = useExam();
+  const { i18n, t } = useTranslation();
+  const locale = i18n.language;
+  const formatMoney = useCallback((value) => formatCurrency(value, { locale }), [locale]);
 
   const [attendanceState, setAttendanceState] = useState(initialAttendanceState);
   const [assignmentState, setAssignmentState] = useState(initialAssignmentState);
@@ -524,6 +529,12 @@ const MyExamFilePage = () => {
           ) : null}
           {visibleExamLevels.map((levelInfo) => {
             const isDetectedLevel = levelInfo.level === detectedLevel;
+            const formattedPrice =
+              typeof levelInfo.priceValue === "number" ? formatMoney(levelInfo.priceValue) : levelInfo.price;
+            const formattedModulePrice =
+              typeof levelInfo.modulePriceValue === "number"
+                ? t("examFile.modulePrice", { price: formatMoney(levelInfo.modulePriceValue) })
+                : levelInfo.modulePrice;
             return (
             <div
               key={levelInfo.level}
@@ -545,9 +556,9 @@ const MyExamFilePage = () => {
                   <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{levelInfo.description}</p>
                 </div>
                 <div style={{ textAlign: "right", display: "grid", gap: 6, justifyItems: "end" }}>
-                  <div style={{ fontWeight: 900, fontSize: 15, color: "#111827" }}>{levelInfo.price}</div>
-                  {levelInfo.modulePrice ? (
-                    <div style={{ fontSize: 12, color: "#6B7280" }}>{levelInfo.modulePrice}</div>
+                  <div style={{ fontWeight: 900, fontSize: 15, color: "#111827" }}>{formattedPrice}</div>
+                  {formattedModulePrice ? (
+                    <div style={{ fontSize: 12, color: "#6B7280" }}>{formattedModulePrice}</div>
                   ) : null}
                   {levelInfo.registrationUrl ? (
                     <a

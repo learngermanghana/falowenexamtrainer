@@ -1,12 +1,16 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
+import { formatCurrency } from "../lib/formatters";
 
 const SetupCheckpoint = () => {
   const { studentProfile, refreshUser, logout } = useAuth();
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
   const [status, setStatus] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const paymentsEnabled = isPaymentsEnabled();
@@ -62,7 +66,7 @@ const SetupCheckpoint = () => {
             <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Finish setting up your account</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
               You're signed in with limited access until your tuition payment is confirmed.
-              Pay at least GH₵2000 to unlock 1-month access, or clear the full balance to unlock 6 months.
+              Pay at least {formatCurrency(2000, { locale })} to unlock 1-month access, or clear the full balance to unlock 6 months.
             </p>
           </div>
           <button style={styles.secondaryButton} onClick={logout}>

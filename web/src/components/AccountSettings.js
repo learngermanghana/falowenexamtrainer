@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { correctBiography } from "../services/profileService";
@@ -6,6 +7,7 @@ import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
+import { formatCurrency } from "../lib/formatters";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -18,13 +20,15 @@ const formatDate = (value) => {
   });
 };
 
-const formatMoney = (value) => {
-  const amount = Number(value) || 0;
-  return `GH₵${amount.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
-};
-
 const AccountSettings = () => {
   const { user, studentProfile, idToken, saveStudentProfile } = useAuth();
+  const { i18n, t } = useTranslation();
+  const locale = i18n.language;
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const formatMoney = useCallback(
+    (value) => formatCurrency(value, { locale, maximumFractionDigits: 2 }),
+    [locale]
+  );
   const paymentsEnabled = isPaymentsEnabled();
   const [profile, setProfile] = useState({
     biography: "",
@@ -96,6 +100,7 @@ const AccountSettings = () => {
     const dayMs = 1000 * 60 * 60 * 24;
     const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
     if (daysLeft < 0 || daysLeft > 15) return null;
+    const daysLabel = t("common.day", { count: daysLeft, formattedCount: numberFormatter.format(daysLeft) });
 
     return {
       balanceDue,
@@ -103,9 +108,9 @@ const AccountSettings = () => {
       message:
         daysLeft === 0
           ? `Your access ends today and you still owe ${formatMoney(balanceDue)}. Please make a payment to keep access.`
-          : `You still owe ${formatMoney(balanceDue)} and have ${daysLeft} day${daysLeft === 1 ? "" : "s"} left. Please make a payment to keep access.`,
+          : `You still owe ${formatMoney(balanceDue)} and have ${daysLabel} left. Please make a payment to keep access.`,
     };
-  }, [balanceDue, studentProfile?.contractEnd]);
+  }, [balanceDue, formatMoney, numberFormatter, studentProfile?.contractEnd, t]);
 
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({ ...prev, [field]: event.target.value }));

@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
+import { updatePageMeta } from "../lib/pageMeta";
 
 const goetheLevelLinks = {
   lesen: [
@@ -43,6 +45,16 @@ const resources = [
 ];
 
 const ExamResources = () => {
+  const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    updatePageMeta({
+      title: t("examResources.meta.title"),
+      description: t("examResources.meta.description"),
+      lang: i18n.language,
+    });
+  }, [i18n.language, t]);
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>

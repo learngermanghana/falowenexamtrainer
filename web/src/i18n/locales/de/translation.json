@@ -20,6 +20,10 @@
     }
   },
   "planPage": {
+    "meta": {
+      "title": "Dein Plan · Falowen Exam Coach",
+      "description": "Wähle zwischen Kursbuch und Prüfungssimulation, um deine nächste Session zu starten."
+    },
     "title": "Zwei Wege für heute",
     "badge": "Login nötig",
     "intro": "Halte die Startseite schlank: Entscheide dich zwischen Kursbuch und Prüfungssimulation. Alle weiteren Inhalte erreichst du später innerhalb dieser Bereiche.",
@@ -70,6 +74,10 @@
     }
   },
   "resourcePage": {
+    "meta": {
+      "title": "Ressourcen · Falowen Exam Coach",
+      "description": "Strategien und geprüfte Links für Lesen, Hören und Prüfungsvorbereitung."
+    },
     "title": "Ressourcen",
     "subtitle": "Sichere Materialsammlung mit klaren Strategien und Links statt kopierter Prüfungsaufgaben.",
     "badge": "Lesen/Hören inklusive",
@@ -409,8 +417,86 @@
       { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
     ]
   },
+  "examResources": {
+    "meta": {
+      "title": "Prüfungsressourcen · Falowen Exam Coach",
+      "description": "Goethe-Links und kurze Strategien für Lesen und Hören."
+    }
+  },
+  "classCalendar": {
+    "status": {
+      "startsIn": "Start in {{time}}",
+      "timeLeft": "{{time}} übrig",
+      "courseFinished": "Kurs beendet"
+    },
+    "badge": {
+      "startingNow": "Startet jetzt",
+      "timeLeft": "{{time}} übrig"
+    },
+    "detail": {
+      "startingNow": "Startet jetzt",
+      "startsIn": "Start in {{time}}"
+    },
+    "timeline": {
+      "untilKickoff": "{{time}} bis zum Start",
+      "untilGraduation": "{{time}} bis zum Abschluss",
+      "finished": "Dieser Kurs ist beendet."
+    },
+    "percentDone": "{{percent}} erledigt"
+  },
+  "letterPractice": {
+    "minuteTarget": "Zielzeit: {{time}}"
+  },
+  "examFile": {
+    "modulePrice": "{{price}} pro Modul"
+  },
   "studyCalendar": {
+    "meta": {
+      "title": "Lernkalender · Falowen Exam Coach",
+      "description": "Plane deinen Goethe-Lernkalender und lade die Termine als Kalenderdatei herunter."
+    },
+    "hero": {
+      "kicker": "Lernkalender-Generator",
+      "title": "Erstelle deinen Goethe-Lernkalender",
+      "subtitle": "Wähle dein Prüfungsdatum, lege deine Lernfrequenz fest und lade eine Kalenderdatei für dein Handy herunter."
+    },
+    "required": {
+      "title": "Pflicht: Erinnerungen festlegen",
+      "subtitle": "Dein Kurs ist abgeschlossen, deshalb laden wir automatisch einen Lernkalender herunter. Passe die Termine unten an und lade ihn erneut, wenn du möchtest."
+    },
+    "form": {
+      "examLevel": "Prüfungsniveau",
+      "examDate": "Prüfungsdatum",
+      "examDateHelp": "Kein Datum dabei? Trage dein Wunschdatum manuell ein.",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "studyDays": "Lerntage",
+      "studyDayLabel": "Lerntag {{day}}",
+      "studyTime": "Uhrzeit",
+      "sessionLength": "Sitzungslänge",
+      "reminder": "Erinnerung",
+      "incomplete": "Wähle Daten und mindestens einen Lerntag, um deinen Kalender zu erzeugen."
+    },
+    "days": {
+      "mon": "Mo",
+      "tue": "Di",
+      "wed": "Mi",
+      "thu": "Do",
+      "fri": "Fr",
+      "sat": "Sa",
+      "sun": "So"
+    },
+    "cta": {
+      "required": "Lernkalender herunterladen (Pflicht)",
+      "standard": "Lernkalender herunterladen (.ics)"
+    },
     "reminder": {
+      "title": "So funktionieren Erinnerungen",
+      "items": [
+        "Füge die heruntergeladene Datei zu Google Kalender, iOS Kalender oder Outlook hinzu.",
+        "Jede Lernsitzung erhält eine Erinnerung basierend auf deiner Vorlaufzeit.",
+        "Du kannst Termine später in deiner Kalender-App bearbeiten oder löschen."
+      ],
       "none": "Keine Erinnerung",
       "before": "{{time}} vorher"
     }

@@ -1,17 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { computeTuitionStatus } from "../data/levelFees";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
+import { formatCurrency } from "../lib/formatters";
 
 const MIN_INSTALLMENT_GHS = 2000;
-
-const formatMoney = (value) => {
-  const numeric = Number(value);
-  if (!Number.isFinite(numeric)) return "–";
-  return `GH₵${numeric.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
-};
 
 const clampNumber = (value, { min = 0, max = Number.POSITIVE_INFINITY } = {}) => {
   const numeric = Number(value);
@@ -36,6 +32,12 @@ const TuitionStatusCard = ({
   description,
   checkoutAmountOverride,
 }) => {
+  const { i18n } = useTranslation();
+  const locale = i18n.language;
+  const formatMoney = useMemo(
+    () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
+    [locale]
+  );
   const paymentsEnabled = isPaymentsEnabled();
   const { idToken, studentProfile, user } = useAuth();
 
@@ -102,16 +104,16 @@ const TuitionStatusCard = ({
     }
 
     if (!amountToPay) {
-      return `Enter an amount (min GH₵${MIN_INSTALLMENT_GHS}, or pay the remaining balance).`;
+      return `Enter an amount (min ${formatMoney(MIN_INSTALLMENT_GHS)}, or pay the remaining balance).`;
     }
 
     if (!meetsMinimum) {
-      return `Minimum is GH₵${MIN_INSTALLMENT_GHS} unless you're paying the remaining ${formatMoney(maxPayable)}.`;
+      return `Minimum is ${formatMoney(MIN_INSTALLMENT_GHS)} unless you're paying the remaining ${formatMoney(maxPayable)}.`;
     }
 
     const remaining = Math.max(maxPayable - amountToPay, 0);
     return `After this payment: access for ${accessAfterPayment}. Remaining balance: ${formatMoney(remaining)}.`;
-  }, [accessAfterPayment, amountToPay, isFinalTopUp, maxPayable, meetsMinimum]);
+  }, [accessAfterPayment, amountToPay, formatMoney, isFinalTopUp, maxPayable, meetsMinimum]);
 
   const canPay =
     paymentsEnabled &&
@@ -209,7 +211,7 @@ const TuitionStatusCard = ({
                   <strong>{formatMoney(maxPayable)}</strong>
                 </div>
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                  Your remaining balance is below the GH₵{MIN_INSTALLMENT_GHS} installment minimum, so you can pay the exact balance to finish.
+                  Your remaining balance is below the {formatMoney(MIN_INSTALLMENT_GHS)} installment minimum, so you can pay the exact balance to finish.
                 </p>
               </div>
 
@@ -236,7 +238,7 @@ const TuitionStatusCard = ({
                   setAmountText(e.target.value);
                 }}
                 style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-                placeholder={`Min GH₵${MIN_INSTALLMENT_GHS} (or pay remaining)`}
+                placeholder={`Min ${formatMoney(MIN_INSTALLMENT_GHS)} (or pay remaining)`}
               />
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
 
