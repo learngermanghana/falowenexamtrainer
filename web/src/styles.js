@@ -648,9 +648,3 @@ export const styles = {
     gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
   },
 };
-
-export const vocabPrompts = [
-  "Beschreibe dich selbst mit 5–6 Sätzen (Name, Herkunft, Beruf, Hobbys).",
-  "Stelle drei Fragen zu einem Thema deiner Wahl (z. B. Urlaub, Arbeit, Familie).",
-  "Mache höfliche Bitten für ein Gruppenprojekt (Treffpunkt, Aufgaben, Zeitplan).",
-];

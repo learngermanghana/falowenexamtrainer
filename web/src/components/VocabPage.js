@@ -1,14 +1,17 @@
 import React from "react";
-import { styles, vocabPrompts } from "../styles";
+import { useTranslation } from "react-i18next";
+import { styles } from "../styles";
 import { vocabLists } from "../data/vocabLists";
 
-const VocabPage = () => (
-  <>
-    <section style={styles.card}>
-      <h2 style={styles.sectionTitle}>Vokabel-Booster</h2>
-      <p style={styles.helperText}>
-        🧠 Nutze diese Mini-Listen als Schnellhilfe für deine Antworten. Lies sie laut vor und bau sie in deine Beispiele ein.
-      </p>
+const VocabPage = () => {
+  const { t } = useTranslation();
+  const prompts = t("vocabPage.prompts", { returnObjects: true });
+
+  return (
+    <>
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>{t("vocabPage.title")}</h2>
+        <p style={styles.helperText}>{t("vocabPage.intro")}</p>
       <div style={styles.vocabGrid}>
         {vocabLists.map((block) => (
           <div key={block.title} style={styles.vocabCard}>
@@ -23,18 +26,17 @@ const VocabPage = () => (
       </div>
     </section>
 
-    <section style={styles.card}>
-      <h3 style={styles.sectionTitle}>Mini-Übung</h3>
-      <p style={styles.helperText}>
-        Wähle zwei Ausdrücke aus den Listen oben und schreibe oder spreche einen kurzen Dialog. Kombiniere mindestens eine Frage und eine Bitte.
-      </p>
-      <ul style={styles.promptList}>
-        {vocabPrompts.map((prompt) => (
-          <li key={prompt}>{prompt}</li>
-        ))}
-      </ul>
-    </section>
-  </>
-);
+      <section style={styles.card}>
+        <h3 style={styles.sectionTitle}>{t("vocabPage.exerciseTitle")}</h3>
+        <p style={styles.helperText}>{t("vocabPage.exerciseIntro")}</p>
+        <ul style={styles.promptList}>
+          {prompts.map((prompt) => (
+            <li key={prompt}>{prompt}</li>
+          ))}
+        </ul>
+      </section>
+    </>
+  );
+};
 
 export default VocabPage;

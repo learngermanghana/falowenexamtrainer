@@ -1,0 +1,398 @@
+{
+  "common": {
+    "open": "Öffnen"
+  },
+  "homeActions": {
+    "title": "Was möchtest du heute machen?",
+    "badge": "Schnellstart",
+    "description": "Wähle eine der beiden Hauptaufgaben für heute: im Kursbuch lernen oder eine Prüfungssimulation starten. Einfaches Deutsch hilft allen, besonders A1-Lernenden.",
+    "buttons": {
+      "course": "Kursbuch öffnen",
+      "exam": "Zur Prüfungssimulation",
+      "discussion": "Zur Klassendiskussion",
+      "account": "Konto, Vertrag & Zahlungen"
+    }
+  },
+  "planPage": {
+    "title": "Zwei Wege für heute",
+    "badge": "Login nötig",
+    "intro": "Halte die Startseite schlank: Entscheide dich zwischen Kursbuch und Prüfungssimulation. Alle weiteren Inhalte erreichst du später innerhalb dieser Bereiche.",
+    "courseCard": {
+      "title": "Kursbuch",
+      "description": "Öffne dein Kursmaterial und arbeite die Lektionen oder Hausaufgaben durch.",
+      "points": [
+        "Alle PDFs, Videos und Worksheets an einem Ort.",
+        "Roter Faden über die nächsten Aufgaben im Kurs.",
+        "Nach dem Login direkt in das aktuelle Modul springen."
+      ],
+      "cta": "Zum Kursbuch"
+    },
+    "examCard": {
+      "title": "Prüfungen",
+      "description": "Starte eine Prüfungssimulation mit klaren Aufgaben und Timer.",
+      "points": [
+        "Direkt in die nächste Speaking- oder Writing-Session springen.",
+        "Fragen und Prompts erscheinen erst nach Login.",
+        "Feedback und Score werden nach jeder Runde gespeichert."
+      ],
+      "cta": "Zur Prüfung"
+    }
+  },
+  "examRoom": {
+    "headingLabel": "Prüfungsraum",
+    "title": "Wähle dein Prüfungsformat",
+    "levelBadge": "Level: {{level}}",
+    "tabs": {
+      "speaking": "Sprechen",
+      "writing": "Schreiben",
+      "resources": "Ressourcen"
+    },
+    "resources": {
+      "title": "Ressourcen für Lesen & Hören",
+      "subtitle": "Offizielle Goethe-Beispiele ({{level}}) – übe mit Originalmaterial.",
+      "badge": "Externe Links",
+      "links": {
+        "reading": {
+          "label": "Lesen (Goethe Übungssätze)",
+          "description": "Öffnet die offiziellen Goethe-Leseverstehen-Übungen in einem neuen Tab."
+        },
+        "listening": {
+          "label": "Hören (Goethe Hörverstehen)",
+          "description": "Original-Audioaufgaben mit Lösungen direkt von der Goethe-Webseite."
+        }
+      }
+    }
+  },
+  "resourcePage": {
+    "title": "Ressourcen",
+    "subtitle": "Sichere Materialsammlung mit klaren Strategien und Links statt kopierter Prüfungsaufgaben.",
+    "badge": "Lesen/Hören inklusive",
+    "sections": [
+      {
+        "title": "Lesen & Hören als Skill Lab",
+        "points": [
+          "Strategie-Only Drills (Skimming, Scanning, Keyword-Spotting, Notizen).",
+          "User-Provided Content: Text einkopieren oder Audio-Link einfügen → Verständnisfragen & Feedback.",
+          "Keine gehosteten Prüfungsaufgaben; stattdessen Links zu verlässlichen Quellen (DW, Goethe, telc/ÖSD Beispiele)."
+        ]
+      },
+      {
+        "title": "Checklisten & Strategien",
+        "points": [
+          "'Teil 2 meistern' – Schritt-für-Schritt-Checklisten für Sprechen/Schreiben.",
+          "Konnektoren- und Redemittel-Layer pro Niveau (A1–B2).",
+          "Aussprache-Kurzlisten: häufige Stolpersteine + Beispielaudio (eigene Assets)."
+        ]
+      },
+      {
+        "title": "Offizielle Materialien verlinken",
+        "points": [
+          "Direkte Links zu Übungssätzen von Goethe, telc, ÖSD und Deutsche Welle.",
+          "Hinweis, dass Originalaufgaben nicht kopiert werden – Nutzer:innen üben direkt auf den offiziellen Seiten.",
+          "Kurze Begleittexte: Worauf achten? Welche Teile sind relevant für A1/A2/B1/B2?"
+        ]
+      }
+    ]
+  },
+  "vocabPage": {
+    "title": "Vokabel-Booster",
+    "intro": "🧠 Nutze diese Mini-Listen als Schnellhilfe für deine Antworten. Lies sie laut vor und bau sie in deine Beispiele ein.",
+    "exerciseTitle": "Mini-Übung",
+    "exerciseIntro": "Wähle zwei Ausdrücke aus den Listen oben und schreibe oder spreche einen kurzen Dialog. Kombiniere mindestens eine Frage und eine Bitte.",
+    "prompts": [
+      "Beschreibe dich selbst mit 5–6 Sätzen (Name, Herkunft, Beruf, Hobbys).",
+      "Stelle drei Fragen zu einem Thema deiner Wahl (z. B. Urlaub, Arbeit, Familie).",
+      "Mache höfliche Bitten für ein Gruppenprojekt (Treffpunkt, Aufgaben, Zeitplan)."
+    ]
+  },
+  "landing": {
+    "badge": "Falowen · Exam Coach",
+    "heroTitle": "Deutsch- und Französisch-Prüfungstraining aus Ghana.",
+    "heroSubtitle": "Falowen begleitet dich vor allem auf dem Weg zur deutschen Prüfung: mit täglicher Praxis, Tutor-Feedback und strukturierten Live-Klassen. Französisch ist als ergänzendes A1-Modul verfügbar.",
+    "cta": {
+      "join": "Einer Kohorte beitreten",
+      "login": "Einloggen",
+      "getApp": "App herunterladen",
+      "seeHow": "So funktioniert es ↓"
+    },
+    "heroBadges": [
+      "Tägliche Praxis",
+      "Tutor-Feedback",
+      "Live-Klassen",
+      "Prüfungssimulationen",
+      "Deutsch- & Französischkohorten"
+    ],
+    "languageChooser": {
+      "title": "Wähle deine Lernsprache",
+      "subtitle": "Wähle die Sprache, die du lernen möchtest. Du kannst jederzeit wechseln und wir merken uns deine Auswahl.",
+      "current": "Aktuelle Auswahl: {{language}}"
+    },
+    "programs": {
+      "german": {
+        "label": "Deutsch (DE)",
+        "shortLabel": "Deutsch",
+        "description": "Strukturiertes Prüfungstraining mit täglichen Aufgaben und Tutor-Feedback.",
+        "focus": "Kernprogramm für Goethe-orientierte Prüfungsvorbereitung.",
+        "details": [
+          "Tägliche Übungen mit klaren Prüfungsformaten.",
+          "Tutor-Feedback in Live-Klassen und Aufgabenrunden.",
+          "Fokus auf Sprechen, Schreiben, Lesen und Hören für A1–B1."
+        ]
+      },
+      "french": {
+        "label": "Français (FR)",
+        "shortLabel": "Français",
+        "description": "Französisch A1-Routinen mit wöchentlicher Struktur und Begleitmaterial.",
+        "focus": "Optionales Modul für grundlegende A1-Kommunikation.",
+        "details": [
+          "Wöchentliche Struktur mit kurzen täglichen Routinen.",
+          "Geführte Wortschatz- und Satzbaustein-Listen.",
+          "Ergänzt das deutsche Kernprogramm, ersetzt es nicht."
+        ]
+      }
+    },
+    "programComparison": {
+      "title": "Programme im Vergleich",
+      "subtitle": "Deutsch bleibt der Fokus. Französisch ist ein optionales A1-Modul für zusätzliche Routine.",
+      "germanTitle": "Deutsches Prüfungsprogramm (Kernangebot)",
+      "frenchTitle": "Französisches A1-Modul (optional)",
+      "germanPoints": [
+        "Strukturierte Prüfungsvorbereitung mit täglichen Aufgaben.",
+        "Tutor-Feedback und Live-Klassen für klare Fortschritte.",
+        "Ausgerichtet auf Goethe-orientierte Prüfungsformate."
+      ],
+      "frenchPoints": [
+        "A1-Routinen mit wöchentlicher Struktur.",
+        "Kurze Übungen für Alltagssituationen.",
+        "Ergänzung für Lernende, die zusätzlich Französisch brauchen."
+      ]
+    },
+    "path": {
+      "title": "Wähle deinen Weg",
+      "subtitle": "Neu beim Lernen oder prüfungsorientiert? Wähle die Option, die zu deinem nächsten Schritt passt.",
+      "newLearner": {
+        "title": "Ich bin neu in {{language}}",
+        "description": "Tritt der nächsten Kohorte bei und starte im passenden Level (A1+).",
+        "cta": "Einer Kohorte beitreten →"
+      },
+      "examReady": {
+        "title": "Ich bereite mich auf Prüfungen vor",
+        "description": "Melde dich an, um Sprechen und Schreiben mit Prüfungsaufgaben zu üben.",
+        "cta": "Einloggen →"
+      }
+    },
+    "howItWorks": {
+      "title": "So meldest du dich an und startest",
+      "subtitle": "Schließe deine Bewerbung ab, wähle eine Kohorte und schalte den Zugang per Zahlung frei. Danach erhältst du deine Onboarding-Checkliste und Klassenlinks.",
+      "benefits": [
+        "✅ Du bekommst: tägliche Übungstools, Tutor-Feedback und Live-Klassensupport.",
+        "✅ Ideal für: Lernende, die sich auf Goethe-orientierte Sprech- und Schreibaufgaben vorbereiten."
+      ],
+      "cta": "Bereit? Einer Kohorte beitreten →",
+      "steps": [
+        {
+          "title": "Anmeldeformular öffnen",
+          "description": "Klicke auf „Einer Kohorte beitreten“, um deine Bewerbung zu starten."
+        },
+        {
+          "title": "Daten ausfüllen",
+          "description": "Teile deinen Namen, Kontaktinfos und Lernziele, damit wir dich richtig einordnen."
+        },
+        {
+          "title": "Level/Klasse wählen",
+          "description": "Wähle die Kohorte (z. B. A1/A2/B1) nach Zeitplan und Verfügbarkeit."
+        },
+        {
+          "title": "Zahlung abschließen",
+          "description": "Nach der Auswahl der Kohorte schließt du die Zahlung ab, um vollen Zugriff zu erhalten."
+        },
+        {
+          "title": "Onboarding erhalten",
+          "description": "Wir senden dir Checkliste, Klassenlinks und die nächsten Schritte."
+        }
+      ]
+    },
+    "selfLearning": {
+      "title": "Self-Learning-Tracks für Deutsch & Französisch",
+      "description": "Du lernst lieber unabhängig? Deutsch-Lernende erhalten B2/C1-Self-Learning-Flows mit Goethe-orientierten Aufgaben und KI-Scoring. Französisch-Lernende erhalten A1-Routinen mit täglichen Prompts und geführten Vokabel-Checklisten.",
+      "cta": "Zum Start einloggen →",
+      "imageAlt": "Werbeanzeige für Deutsch B2/C1 und Französisch A1 Self-Learning"
+    },
+    "features": [
+      {
+        "icon": "📱",
+        "title": "Tägliche Praxis + Live-Klassen",
+        "description": "Übe täglich am Handy oder Laptop und wende das Gelernte in tutorierten Klassen an."
+      },
+      {
+        "icon": "👩🏽‍🏫",
+        "title": "Tutoriertes Feedback",
+        "description": "Deine Sprech- und Schreibaufgaben werden überprüft und im Unterricht besprochen."
+      },
+      {
+        "icon": "🗣️",
+        "title": "Prüfungsnahe Übungen",
+        "description": "Arbeite mit realistischen Aufgaben, die dich sicher auf A1–B1-Prüfungen vorbereiten."
+      }
+    ],
+    "updates": {
+      "title": "Aktuelle Updates",
+      "subtitle": "Neue Funktionen, damit dein Prüfungstraining strukturiert und persönlich bleibt.",
+      "items": [
+        {
+          "title": "Lernkalender-Routinen",
+          "description": "Plane wöchentliche Aufgaben mit einem Lernkalender, der Sprechen, Schreiben und Wortschatz stabil hält.",
+          "tag": "Neu"
+        },
+        {
+          "title": "My-Exam-File-Tracker",
+          "description": "Sammle Prüfungs-Prompts, persönliche Notizen und Tutor-Feedback an einem Ort.",
+          "tag": "Aktualisiert"
+        },
+        {
+          "title": "Sprechen + Schreiben",
+          "description": "Trainiere mit prüfungsnahen Prompts und erhalte Feedback, das du vor dem Unterricht wiederholen kannst.",
+          "tag": "Verbessert"
+        },
+        {
+          "title": "Aufgaben-Abgaben",
+          "description": "Reiche Hausaufgaben ein, verfolge Feedback und bleibe an den Wochenzielen dran.",
+          "tag": "Live"
+        }
+      ]
+    },
+    "photos": [
+      {
+        "caption": "Geführte Übungseinheiten mit Lernenden und Tutor:innen."
+      },
+      {
+        "caption": "Praxisnahes Schreib- und Sprechtraining für jedes Level."
+      }
+    ],
+    "reviews": {
+      "title": "Was unsere Lernenden sagen",
+      "subtitle": "Feedback von Lernenden.",
+      "items": [
+        {
+          "name": "Ama",
+          "country": "Ghana",
+          "level": "A1",
+          "stars": 5,
+          "text": "Die Sprechübungen sind klar und leicht nachzuvollziehen. Ich frage jetzt viel sicherer."
+        },
+        {
+          "name": "Samuel",
+          "country": "Nigeria",
+          "level": "A2",
+          "stars": 5,
+          "text": "Ich mag das Tutor-Feedback. Es zeigt genau, was ich im Schreiben verbessern muss."
+        },
+        {
+          "name": "Amina",
+          "country": "Kenia",
+          "level": "A1",
+          "stars": 4,
+          "text": "Der Unterricht ist strukturiert. Die tägliche Praxis hält mich dran, auch wenn ich viel zu tun habe."
+        },
+        {
+          "name": "Fatou",
+          "country": "Senegal",
+          "level": "A2",
+          "stars": 5,
+          "text": "Die Aufgaben wirken wie echte Prüfungen. Ich verstehe jetzt Teil 1, 2 und 3 fürs Sprechen."
+        },
+        {
+          "name": "Youssef",
+          "country": "Marokko",
+          "level": "B1",
+          "stars": 5,
+          "text": "Die Schreibschritte helfen mir, Ideen zu ordnen. Meine Briefe sind jetzt viel professioneller."
+        },
+        {
+          "name": "Lerato",
+          "country": "Südafrika",
+          "level": "A1",
+          "stars": 4,
+          "text": "Einfache Anweisungen und hilfreiche Korrekturen. Die Plattform ist leicht zu nutzen."
+        },
+        {
+          "name": "Kofi",
+          "country": "Ghana",
+          "level": "A2",
+          "stars": 5,
+          "text": "Ich habe meine Aussprache verbessert, weil ich regelmäßig aufnehme und Feedback bekomme."
+        },
+        {
+          "name": "Mariam",
+          "country": "Tansania",
+          "level": "A1",
+          "stars": 5,
+          "text": "Der Stundenplan und die täglichen Aufgaben machen das Lernen planbar und weniger stressig."
+        },
+        {
+          "name": "Ibrahim",
+          "country": "Ägypten",
+          "level": "B1",
+          "stars": 4,
+          "text": "Gute Übungsmaterialien. Mir gefällt, dass der Fokus auf echten Prüfungsgesprächen liegt."
+        },
+        {
+          "name": "Chiamaka",
+          "country": "Nigeria",
+          "level": "A1",
+          "stars": 5,
+          "text": "Ich hatte Angst vor dem Sprechen. Jetzt kann ich mich vorstellen und höflich bitten."
+        },
+        {
+          "name": "Hawa",
+          "country": "Mali",
+          "level": "A2",
+          "stars": 4,
+          "text": "Die Tutor-Reviews sind stark. Ich verstehe meine Fehler viel schneller."
+        },
+        {
+          "name": "Patrick",
+          "country": "Uganda",
+          "level": "A1",
+          "stars": 5,
+          "text": "Kurze tägliche Praxis funktioniert. Schon 10 Minuten halten mich aktiv."
+        }
+      ]
+    },
+    "darkCta": {
+      "title": "So unterstützt Falowen deine Prüfungsziele",
+      "subtitle": "Falowen trainiert genau die Fähigkeiten, die du für den Prüfungserfolg brauchst: höfliche Bitten, korrekte Fragen und sicheres Gespräch. Übe täglich und erhalte Tutor-Feedback in Live-Klassen.",
+      "ctaTitle": "Bereit zum Start?",
+      "ctaSubtitle": "Erstelle dein Profil, um Übungstools, Stundenpläne und Tutor-Feedback zu nutzen.",
+      "ctaJoin": "Einer Kohorte beitreten",
+      "ctaLogin": "Schon dabei? Einloggen →",
+      "contactTitle": "Bleib verbunden",
+      "contactPhone": "Anruf oder WhatsApp:",
+      "contactEmail": "E-Mail:",
+      "contactChat": "Live-Chat während der Klassen mit Tutor-Monitoring und Feedback."
+    },
+    "footer": {
+      "quickLinksTitle": "Quick Links",
+      "followTitle": "Folge Falowen",
+      "stayTitle": "Warum Lernende bleiben",
+      "stayPoints": [
+        "Blended Learning macht die Klassenzeit produktiv.",
+        "Tutor:innen begleiten deine Sprech- und Schreibpraxis.",
+        "Prüfungsnahe Aufgaben bauen schnell Vertrauen auf."
+      ]
+    },
+    "quickLinks": [
+      { "label": "Über uns", "href": "https://register.falowen.app/#about-us" },
+      { "label": "Datenschutz", "href": "https://register.falowen.app/#privacy-policy" },
+      { "label": "Kontakt", "href": "https://register.falowen.app/#contact" },
+      { "label": "AGB", "href": "https://register.falowen.app/#terms-of-service" },
+      { "label": "FAQ", "href": "https://register.falowen.app/#faq" },
+      { "label": "Blog", "href": "https://blog.falowen.app/feed" }
+    ],
+    "socialLinks": [
+      { "label": "Instagram", "href": "https://www.instagram.com/lleaghana" },
+      { "label": "YouTube", "href": "https://www.youtube.com/@LLEAGhana" },
+      { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
+    ]
+  }
+}

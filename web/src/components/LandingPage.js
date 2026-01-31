@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
+import { persistLanguage } from "../i18n";
 
 const FeatureCard = ({ icon, title, description }) => (
   <div
@@ -102,22 +104,6 @@ const shuffleArray = (items) => {
   return copy;
 };
 
-// ✅ Placeholder reviews (clearly labeled as sample)
-const studentReviews = [
-  { name: "Ama", country: "Ghana", level: "A1", stars: 5, text: "The speaking practice is clear and easy to follow. I finally got confident asking questions." },
-  { name: "Samuel", country: "Nigeria", level: "A2", stars: 5, text: "I like the tutor feedback. It shows exactly what to improve in my writing." },
-  { name: "Amina", country: "Kenya", level: "A1", stars: 4, text: "The lessons are structured. Daily practice keeps me consistent even when I’m busy." },
-  { name: "Fatou", country: "Senegal", level: "A2", stars: 5, text: "The exam-style tasks feel real. I now understand Teil 1, 2, and 3 for speaking." },
-  { name: "Youssef", country: "Morocco", level: "B1", stars: 5, text: "The writing steps help me organize ideas. My letters look more professional now." },
-  { name: "Lerato", country: "South Africa", level: "A1", stars: 4, text: "Simple instructions and helpful corrections. The platform is easy to use." },
-  { name: "Kofi", country: "Ghana", level: "A2", stars: 5, text: "I improved my pronunciation by recording and checking feedback regularly." },
-  { name: "Mariam", country: "Tanzania", level: "A1", stars: 5, text: "The class schedule and daily tasks make learning predictable and less stressful." },
-  { name: "Ibrahim", country: "Egypt", level: "B1", stars: 4, text: "Good practice materials. I like that it focuses on real exam conversation." },
-  { name: "Chiamaka", country: "Nigeria", level: "A1", stars: 5, text: "I used to fear speaking. Now I can introduce myself and ask polite requests." },
-  { name: "Hawa", country: "Mali", level: "A2", stars: 4, text: "The tutor reviews are strong. I understand my mistakes much faster." },
-  { name: "Patrick", country: "Uganda", level: "A1", stars: 5, text: "Short daily practice works. Even 10 minutes helps me stay active." },
-];
-
 const ReviewCard = ({ stars = 5, name, country, level, text }) => (
   <div
     style={{
@@ -178,99 +164,48 @@ const UpdateCard = ({ title, description, tag }) => (
   </div>
 );
 
-const programOptions = {
-  german: {
-    label: "Deutsch (DE)",
-    shortLabel: "Deutsch",
-    description: "German certification coaching with daily practice and tutor feedback.",
-  },
-  french: {
-    label: "Français (FR)",
-    shortLabel: "Français",
-    description: "French A1 routines with guided practice and weekly structure.",
-  },
-};
-
 const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
+  const { t, i18n } = useTranslation();
+  const programOptions = useMemo(
+    () => ({
+      german: t("landing.programs.german", { returnObjects: true }),
+      french: t("landing.programs.french", { returnObjects: true }),
+    }),
+    [t]
+  );
   const resolvedProgram = programOptions[program] ? program : "german";
   const selectedProgram = programOptions[resolvedProgram];
-  const features = [
-    {
-      icon: "📱",
-      title: "Daily practice + live classes",
-      description: "Practice on your phone or laptop daily, then apply it in tutor-led classroom sessions.",
-    },
-    {
-      icon: "👩🏽‍🏫",
-      title: "Tutor-reviewed submissions",
-      description: "Your speaking and writing tasks are reviewed and discussed during live classes.",
-    },
-    {
-      icon: "🗣️",
-      title: "Exam-style training",
-      description: "Work with realistic exam tasks that build confidence for A1–B1 certification.",
-    },
-  ];
-
-  const quickLinks = [
-    { label: "About us", href: "https://register.falowen.app/#about-us" },
-    { label: "Privacy policy", href: "https://register.falowen.app/#privacy-policy" },
-    { label: "Contact", href: "https://register.falowen.app/#contact" },
-    { label: "Terms of service", href: "https://register.falowen.app/#terms-of-service" },
-    { label: "FAQ", href: "https://register.falowen.app/#faq" },
-    { label: "Blog", href: "https://blog.falowen.app/feed" },
-  ];
-
-  const socialLinks = [
-    { label: "Instagram", href: "https://www.instagram.com/lleaghana" },
-    { label: "YouTube", href: "https://www.youtube.com/@LLEAGhana" },
-    { label: "Facebook", href: "https://web.facebook.com/lleaghana" },
-  ];
+  const features = t("landing.features", { returnObjects: true });
+  const quickLinks = t("landing.quickLinks", { returnObjects: true });
+  const socialLinks = t("landing.socialLinks", { returnObjects: true });
+  const signupSteps = t("landing.howItWorks.steps", { returnObjects: true });
+  const updates = t("landing.updates.items", { returnObjects: true });
+  const reviewItems = t("landing.reviews.items", { returnObjects: true });
+  const featuredReviews = useMemo(() => shuffleArray(reviewItems).slice(0, 6), [reviewItems]);
+  const heroBadges = t("landing.heroBadges", { returnObjects: true });
+  const howItWorksBenefits = t("landing.howItWorks.benefits", { returnObjects: true });
+  const programComparisonGermanPoints = t("landing.programComparison.germanPoints", { returnObjects: true });
+  const programComparisonFrenchPoints = t("landing.programComparison.frenchPoints", { returnObjects: true });
+  const whyStayPoints = t("landing.footer.stayPoints", { returnObjects: true });
 
   // Tip: for best performance, move these to web/public/photos and use "/photos/..."
   const photos = [
     {
       url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-julia-m-cameron-4145153.jpg?raw=1",
-      caption: "Guided practice sessions with classmates and tutors.",
+      caption: t("landing.photos.0.caption"),
     },
     {
       url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-mart-production-8473001.jpg?raw=1",
-      caption: "Hands-on writing and speaking drills for every level.",
+      caption: t("landing.photos.1.caption"),
     },
   ];
 
-  const signupSteps = [
-    { title: "Open the sign-up form", description: "Click “Join a cohort” to start your application." },
-    { title: "Fill in your details", description: "Share your name, contact info, and learning goals so we place you correctly." },
-    { title: "Choose your level/class", description: "Select the cohort you want (e.g., A1/A2/B1) based on schedule and availability." },
-    { title: "Complete payment to unlock access", description: "After selecting your cohort, complete payment to unlock full access to the course tools." },
-    { title: "Get onboarding support", description: "We follow up with your welcome checklist, class links, and next steps." },
-  ];
-
-  const updates = [
-    {
-      title: "Study calendar routines",
-      description: "Plan weekly tasks with a guided study calendar that keeps your speaking, writing, and vocab work consistent.",
-      tag: "New",
-    },
-    {
-      title: "My Exam File tracker",
-      description: "Collect key exam prompts, personal notes, and tutor feedback in one place so revision is faster.",
-      tag: "Updated",
-    },
-    {
-      title: "Speech + writing practice",
-      description: "Train with exam-style prompts and get structured feedback you can replay before class.",
-      tag: "Improved",
-    },
-    {
-      title: "Assignment submissions",
-      description: "Submit homework, track feedback, and stay aligned with the cohort’s weekly goals.",
-      tag: "Live",
-    },
-  ];
-
-  const featuredReviews = React.useMemo(() => shuffleArray(studentReviews).slice(0, 6), []);
+  const handleProgramSelect = (nextProgram) => {
+    onProgramSelect?.(nextProgram);
+    const language = nextProgram === "french" ? "fr" : "de";
+    i18n.changeLanguage(language);
+    persistLanguage(language);
+  };
 
   return (
     <main
@@ -292,25 +227,24 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <p style={{ ...styles.badge, alignSelf: "flex-start", background: "#c7d2fe", color: "#1e3a8a" }}>
-              Falowen · Exam Coach
+              {t("landing.badge")}
             </p>
 
             <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-              German &amp; French exam coaching built in Ghana.
+              {t("landing.heroTitle")}
             </h1>
 
             <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0, lineHeight: 1.6 }}>
-              Falowen prepares students for German and French certification exams with daily practice, tutor feedback,
-              and structured live classes tailored to A1–C1 goals.
+              {t("landing.heroSubtitle")}
             </p>
 
             {/* ✅ Keep main CTAs only here */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
-                Join a cohort
+                {t("landing.cta.join")}
               </button>
               <button type="button" style={styles.secondaryButton} onClick={onLogin}>
-                Log in
+                {t("landing.cta.login")}
               </button>
               <a
                 href="https://play.google.com/store/apps/details?id=com.falowen.app"
@@ -318,23 +252,23 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 rel="noopener noreferrer"
                 style={{ ...styles.secondaryButton, textDecoration: "none" }}
               >
-                Get the app
+                {t("landing.cta.getApp")}
               </a>
 
               <a
                 href="#how-it-works"
                 style={{ color: "#e0e7ff", fontWeight: 700, textDecoration: "none", alignSelf: "center" }}
               >
-                See how it works ↓
+                {t("landing.cta.seeHow")}
               </a>
             </div>
 
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 4 }}>
-              <span style={styles.badge}>Daily practice</span>
-              <span style={styles.badge}>Tutor feedback</span>
-              <span style={styles.badge}>Live classes</span>
-              <span style={styles.badge}>Exam simulations</span>
-              <span style={styles.badge}>German + French cohorts</span>
+              {heroBadges.map((badge) => (
+                <span key={badge} style={styles.badge}>
+                  {badge}
+                </span>
+              ))}
             </div>
           </div>
         </header>
@@ -349,17 +283,15 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           }}
         >
           <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={styles.sectionTitle}>Choose your learning language</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Pick the language you want to study. You can switch anytime, and we’ll remember your choice.
-            </p>
+            <h2 style={styles.sectionTitle}>{t("landing.languageChooser.title")}</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.languageChooser.subtitle")}</p>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button
                 type="button"
-                onClick={() => onProgramSelect?.("german")}
+                onClick={() => handleProgramSelect("german")}
                 aria-pressed={resolvedProgram === "german"}
                 style={{
                   ...(resolvedProgram === "german" ? styles.primaryButton : styles.secondaryButton),
@@ -370,7 +302,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               </button>
               <button
                 type="button"
-                onClick={() => onProgramSelect?.("french")}
+                onClick={() => handleProgramSelect("french")}
                 aria-pressed={resolvedProgram === "french"}
                 style={{
                   ...(resolvedProgram === "french" ? styles.primaryButton : styles.secondaryButton),
@@ -381,8 +313,43 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               </button>
             </div>
             <div style={{ ...styles.helperText, margin: 0 }}>
-              Current selection: <strong style={{ color: "#111827" }}>{selectedProgram.label}</strong>
+              {t("landing.languageChooser.current", { language: selectedProgram.label })}
             </div>
+          </div>
+        </section>
+
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 12,
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            alignItems: "stretch",
+          }}
+        >
+          <div style={{ display: "grid", gap: 8 }}>
+            <h2 style={styles.sectionTitle}>{t("landing.programComparison.title")}</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.programComparison.subtitle")}</p>
+          </div>
+
+          <div style={{ ...styles.card, marginBottom: 0, background: "#f8fafc" }}>
+            <h3 style={{ margin: "0 0 6px 0" }}>{t("landing.programComparison.germanTitle")}</h3>
+            <p style={{ ...styles.helperText, marginBottom: 10 }}>{programOptions.german.focus}</p>
+            <ul style={styles.checklist}>
+              {programComparisonGermanPoints.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+          </div>
+
+          <div style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}>
+            <h3 style={{ margin: "0 0 6px 0" }}>{t("landing.programComparison.frenchTitle")}</h3>
+            <p style={{ ...styles.helperText, marginBottom: 10 }}>{programOptions.french.focus}</p>
+            <ul style={styles.checklist}>
+              {programComparisonFrenchPoints.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
           </div>
         </section>
 
@@ -397,10 +364,8 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           }}
         >
           <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={styles.sectionTitle}>Choose your path</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              New learner or exam-focused? Pick the option that matches your next step.
-            </p>
+            <h2 style={styles.sectionTitle}>{t("landing.path.title")}</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.path.subtitle")}</p>
           </div>
 
           <div
@@ -414,14 +379,16 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
             }}
           >
-            <div style={{ fontWeight: 900, color: "#111827" }}>I’m new to {selectedProgram.shortLabel}</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Join the next cohort and start from the right level (A1+).</p>
+            <div style={{ fontWeight: 900, color: "#111827" }}>
+              {t("landing.path.newLearner.title", { language: selectedProgram.shortLabel })}
+            </div>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.path.newLearner.description")}</p>
             <button
               type="button"
               style={{ ...styles.primaryButton, padding: "10px 12px" }}
               onClick={() => onSignUp(resolvedProgram)}
             >
-              Join a cohort →
+              {t("landing.path.newLearner.cta")}
             </button>
           </div>
 
@@ -436,10 +403,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
             }}
           >
-            <div style={{ fontWeight: 900, color: "#111827" }}>I’m preparing for exams</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>Log in to practice speaking and writing with exam tasks.</p>
+            <div style={{ fontWeight: 900, color: "#111827" }}>{t("landing.path.examReady.title")}</div>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.path.examReady.description")}</p>
             <button type="button" style={{ ...styles.secondaryButton, padding: "10px 12px" }} onClick={onLogin}>
-              Log in →
+              {t("landing.path.examReady.cta")}
             </button>
           </div>
         </section>
@@ -456,15 +423,16 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           }}
         >
           <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={styles.sectionTitle}>How to sign up and start learning</h2>
-            <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              Complete your application, pick a cohort, then unlock access with payment. After that, you’ll get your onboarding checklist and class links.
-            </p>
+            <h2 style={styles.sectionTitle}>{t("landing.howItWorks.title")}</h2>
+            <p style={{ ...styles.helperText, marginBottom: 0 }}>{t("landing.howItWorks.subtitle")}</p>
 
             {/* ✅ No repeated login/signup buttons here */}
             <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>✅ You’ll get: daily practice tools, tutor feedback, and live class support.</div>
-              <div style={{ ...styles.helperText, margin: 0 }}>✅ Best for: students preparing for Goethe-style speaking and writing tasks.</div>
+              {howItWorksBenefits.map((benefit) => (
+                <div key={benefit} style={{ ...styles.helperText, margin: 0 }}>
+                  {benefit}
+                </div>
+              ))}
             </div>
 
             <button
@@ -482,7 +450,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 textAlign: "left",
               }}
             >
-              Ready? Join a cohort →
+              {t("landing.howItWorks.cta")}
             </button>
           </div>
 
@@ -506,14 +474,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           }}
         >
           <div style={{ display: "grid", gap: 10 }}>
-            <h2 style={styles.sectionTitle}>Self-learning tracks for German &amp; French</h2>
-            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
-              Prefer independent study? German learners get B2/C1 self-learning flows with Goethe-style speaking,
-              writing, reading, and listening tasks plus AI scoring. French learners get A1 survival routines with
-              daily practice prompts and guided vocabulary checklists.
-            </p>
+            <h2 style={styles.sectionTitle}>{t("landing.selfLearning.title")}</h2>
+            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{t("landing.selfLearning.description")}</p>
             <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={onLogin}>
-              Log in to start →
+              {t("landing.selfLearning.cta")}
             </button>
           </div>
           <div
@@ -527,7 +491,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           >
             <img
               src="https://github.com/learngermanghana/falowen-blog/blob/main/photos/b2c1_ad_final.jpg?raw=1"
-              alt="German B2/C1 and French A1 self-learning advertisement"
+              alt={t("landing.selfLearning.imageAlt")}
               loading="lazy"
               style={{ width: "100%", display: "block" }}
             />
@@ -544,10 +508,8 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
         {/* Updates */}
         <section style={{ ...styles.card, display: "grid", gap: 12 }}>
           <div>
-            <h2 style={styles.sectionTitle}>Latest updates you can try</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Fresh additions to keep your exam prep structured and personalized.
-            </p>
+            <h2 style={styles.sectionTitle}>{t("landing.updates.title")}</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.updates.subtitle")}</p>
           </div>
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
             {updates.map((item) => (
@@ -574,10 +536,8 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
         <section style={{ ...styles.card, display: "grid", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: 12, flexWrap: "wrap" }}>
             <div>
-              <h2 style={styles.sectionTitle}>What our students say about lessons</h2>
-              <p style={{ ...styles.helperText, margin: 0 }}>
-                Feedback from learners.
-              </p>
+              <h2 style={styles.sectionTitle}>{t("landing.reviews.title")}</h2>
+              <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.reviews.subtitle")}</p>
             </div>
           </div>
 
@@ -599,18 +559,17 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
         <section style={{ ...styles.card, background: "#111827", color: "#e5e7eb" }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div style={{ flex: 2, minWidth: 260 }}>
-              <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>How Falowen supports your exam goals</h2>
+              <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>{t("landing.darkCta.title")}</h2>
               <p style={{ ...styles.helperText, color: "#d1d5db", lineHeight: 1.65 }}>
-                Falowen trains the exact skills you need for exam success: polite requests, correct questions, and confident conversation.
-                Practice daily, then get tutor feedback during live classes.
+                {t("landing.darkCta.subtitle")}
               </p>
             </div>
 
             <div style={{ display: "grid", gap: 10, flex: 1, minWidth: 240 }}>
               <div style={{ ...styles.uploadCard, background: "#0f172a", borderColor: "#1f2937" }}>
-                <h3 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 6 }}>Ready to start?</h3>
+                <h3 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 6 }}>{t("landing.darkCta.ctaTitle")}</h3>
                 <p style={{ ...styles.helperText, color: "#d1d5db", marginBottom: 10 }}>
-                  Create your profile to access practice tools, class schedules, and tutor feedback.
+                  {t("landing.darkCta.ctaSubtitle")}
                 </p>
 
                 {/* ✅ Keep one strong CTA here */}
@@ -620,7 +579,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                     style={{ ...styles.primaryButton, padding: "10px 14px" }}
                     onClick={() => onSignUp(resolvedProgram)}
                   >
-                    Join a cohort
+                    {t("landing.darkCta.ctaJoin")}
                   </button>
 
                   <button
@@ -637,16 +596,16 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                       textAlign: "left",
                     }}
                   >
-                    Already a student? Log in →
+                    {t("landing.darkCta.ctaLogin")}
                   </button>
                 </div>
               </div>
 
               <div style={{ ...styles.uploadCard, background: "#0f172a", borderColor: "#1f2937" }}>
-                <h4 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 8 }}>Stay connected</h4>
+                <h4 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 8 }}>{t("landing.darkCta.contactTitle")}</h4>
                 <ul style={{ ...styles.checklist, margin: 0, color: "#d1d5db", lineHeight: 1.6 }}>
                   <li>
-                    Call or WhatsApp:
+                    {t("landing.darkCta.contactPhone")}
                     <a
                       style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }}
                       href="https://wa.me/233205706589"
@@ -657,7 +616,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                     </a>
                   </li>
                   <li>
-                    Email:
+                    {t("landing.darkCta.contactEmail")}
                     <a
                       style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }}
                       href="mailto:learngermanghana@gmail.com"
@@ -665,7 +624,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                       learngermanghana@gmail.com
                     </a>
                   </li>
-                  <li>Live chat during classes with tutor monitoring and feedback.</li>
+                  <li>{t("landing.darkCta.contactChat")}</li>
                 </ul>
               </div>
             </div>
@@ -682,7 +641,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           }}
         >
           <div>
-            <h3 style={styles.sectionTitle}>Quick links</h3>
+            <h3 style={styles.sectionTitle}>{t("landing.footer.quickLinksTitle")}</h3>
             <div style={{ display: "grid", gap: 8 }}>
               {quickLinks.map((l) => (
                 <ResourceLink key={l.label} label={l.label} href={l.href} />
@@ -691,7 +650,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
 
           <div>
-            <h3 style={styles.sectionTitle}>Follow Falowen</h3>
+            <h3 style={styles.sectionTitle}>{t("landing.footer.followTitle")}</h3>
             <div style={{ display: "grid", gap: 8 }}>
               {socialLinks.map((l) => (
                 <ResourceLink key={l.label} label={l.label} href={l.href} />
@@ -700,11 +659,11 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
 
           <div>
-            <h3 style={styles.sectionTitle}>Why learners stay</h3>
+            <h3 style={styles.sectionTitle}>{t("landing.footer.stayTitle")}</h3>
             <ul style={{ ...styles.checklist, margin: 0, lineHeight: 1.6 }}>
-              <li>Blended learning keeps class time productive.</li>
-              <li>Tutors review and guide your speaking + writing practice.</li>
-              <li>Exam-style tasks help you build confidence quickly.</li>
+              {whyStayPoints.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
             </ul>
           </div>
         </footer>

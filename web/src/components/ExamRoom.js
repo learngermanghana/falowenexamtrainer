@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
 import { useExam } from "../context/ExamContext";
@@ -16,24 +17,25 @@ const GOETHE_PRACTICE_BASE = {
   B2: "https://www.goethe.de/de/spr/kup/prf/prf/gzb2/ueb.html",
 };
 
-const buildResourceLinks = (level) => {
+const buildResourceLinks = (level, t) => {
   const base = GOETHE_PRACTICE_BASE[level] || GOETHE_PRACTICE_BASE.B1;
 
   return [
     {
-      label: "Lesen (Goethe Übungssätze)",
-      description: "Öffnet die offiziellen Goethe-Leseverstehen-Übungen in einem neuen Tab.",
+      label: t("examRoom.resources.links.reading.label"),
+      description: t("examRoom.resources.links.reading.description"),
       url: base,
     },
     {
-      label: "Hören (Goethe Hörverstehen)",
-      description: "Original-Audioaufgaben mit Lösungen direkt von der Goethe-Webseite.",
+      label: t("examRoom.resources.links.listening.label"),
+      description: t("examRoom.resources.links.listening.description"),
       url: `${base}#section-3`,
     },
   ];
 };
 
 const ExamRoom = () => {
+  const { t } = useTranslation();
   const { setResult, setError } = useExam();
   const { studentProfile } = useAuth();
 
@@ -47,7 +49,7 @@ const ExamRoom = () => {
     }
   });
 
-  const RESOURCE_LINKS = useMemo(() => buildResourceLinks(studentLevel), [studentLevel]);
+  const RESOURCE_LINKS = useMemo(() => buildResourceLinks(studentLevel, t), [studentLevel, t]);
 
   useEffect(() => {
     try {
@@ -79,12 +81,10 @@ const ExamRoom = () => {
             }}
           >
             <div>
-              <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Ressourcen für Lesen & Hören</h2>
-              <p style={styles.helperText}>
-                Offizielle Goethe-Beispiele ({studentLevel}) – übe mit Originalmaterial.
-              </p>
+              <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>{t("examRoom.resources.title")}</h2>
+              <p style={styles.helperText}>{t("examRoom.resources.subtitle", { level: studentLevel })}</p>
             </div>
-            <span style={styles.badge}>Externe Links</span>
+            <span style={styles.badge}>{t("examRoom.resources.badge")}</span>
           </div>
 
           <div style={{ display: "grid", gap: 12 }}>
@@ -109,7 +109,7 @@ const ExamRoom = () => {
                     rel="noreferrer noopener"
                     style={{ ...styles.primaryButton, textDecoration: "none" }}
                   >
-                    Öffnen
+                    {t("common.open")}
                   </a>
                 </div>
               </div>
@@ -123,9 +123,9 @@ const ExamRoom = () => {
   };
 
   const tabs = [
-    { key: "sprechen", label: "Sprechen" },
-    { key: "schreiben", label: "Schreiben" },
-    { key: "resources", label: "Ressourcen" },
+    { key: "sprechen", label: t("examRoom.tabs.speaking") },
+    { key: "schreiben", label: t("examRoom.tabs.writing") },
+    { key: "resources", label: t("examRoom.tabs.resources") },
   ];
 
   return (
@@ -133,10 +133,10 @@ const ExamRoom = () => {
       <div style={{ ...styles.card, background: "#f9fafb" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
           <div>
-            <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>Prüfungsraum</p>
-            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Wähle dein Prüfungsformat</h2>
+            <p style={{ ...styles.helperText, margin: "0 0 4px 0" }}>{t("examRoom.headingLabel")}</p>
+            <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("examRoom.title")}</h2>
             <div style={{ marginTop: 6 }}>
-              <span style={styles.badge}>Level: {studentLevel}</span>
+              <span style={styles.badge}>{t("examRoom.levelBadge", { level: studentLevel })}</span>
             </div>
           </div>
 
