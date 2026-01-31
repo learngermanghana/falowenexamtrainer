@@ -8,6 +8,67 @@
     "day_one": "{{formattedCount}} jour",
     "day_other": "{{formattedCount}} jours"
   },
+  "interfaceLanguages": {
+    "en": "English (EN)",
+    "de": "Deutsch (DE)",
+    "fr": "Français (FR)"
+  },
+  "interfaceLanguage": {
+    "label": "Changer la langue de l’interface",
+    "shortLabel": "Langue de l’interface",
+    "helper": "Les menus et les consignes restent dans la langue choisie, indépendamment de la langue étudiée.",
+    "ariaLabel": "Changer la langue de l’interface",
+    "optionAria": "Passer l’interface en {{language}}"
+  },
+  "appNav": {
+    "title": "Falowen Learning Hub",
+    "signedInAs": "Connecté en tant que {{email}}",
+    "logout": "Se déconnecter",
+    "backHome": "Retour à l’accueil",
+    "subtitle": {
+      "campus": "Campus : cours, devoirs, communauté",
+      "exams": "Salle d’examens : oral, écrit, ressources",
+      "default": "Choisissez le Campus ou la salle d’examens"
+    },
+    "tabs": {
+      "course": "Mon cours",
+      "ai": "Falowen A.I",
+      "aiFrench": "Falowen A.I (Français)",
+      "results": "Résultats",
+      "discussion": "Discussion de classe",
+      "account": "Compte"
+    },
+    "sections": {
+      "courseBook": "Livre de cours",
+      "submit": "Soumettre un devoir",
+      "examFile": "Mon dossier d’examen",
+      "grammar": "Poser une question de grammaire",
+      "grammarFrench": "Aide en grammaire française",
+      "writing": "Entraînement à l’écriture",
+      "writingFrench": "Entraînement à l’écriture française",
+      "speech": "Entraînement à l’oral",
+      "speechFrench": "Entraînement à l’oral français",
+      "vocab": "Entraînement au vocabulaire",
+      "vocabFrench": "Vocabulaire français"
+    },
+    "examTabs": {
+      "speaking": "Oral",
+      "writing": "Écriture",
+      "vocab": "Vocabulaire",
+      "horen": "Écoute",
+      "lesen": "Lecture",
+      "resources": "Ressources",
+      "study": "Calendrier d’étude",
+      "file": "Mon dossier d’examen"
+    }
+  },
+  "signup": {
+    "interfaceNote": "Ce programme enseigne le {{program}}. L’interface est disponible en anglais.",
+    "programs": {
+      "german": "allemand",
+      "french": "français"
+    }
+  },
   "homeActions": {
     "title": "Que veux-tu faire aujourd’hui ?",
     "badge": "Démarrage rapide",
@@ -142,7 +203,10 @@
     ],
     "languageChooser": {
       "title": "Choisis ta langue d’apprentissage",
-      "subtitle": "Choisis la langue que tu veux apprendre. Tu peux changer à tout moment, et nous mémorisons ton choix.",
+      "subtitle": "Choisis si tu veux étudier l’allemand ou le français. La langue de l’interface se règle séparément.",
+      "interfaceNote": "Les programmes enseignent l’allemand ou le français — l’interface est disponible en anglais par défaut.",
+      "studyGerman": "Étudier l’allemand",
+      "studyFrench": "Étudier le français",
       "current": "Sélection actuelle : {{language}}",
       "ariaLabel": "Sélecteur de langue pour le programme d’apprentissage",
       "optionAria": "Sélectionner le programme {{language}}"

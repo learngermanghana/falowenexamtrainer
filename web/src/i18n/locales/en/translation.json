@@ -1,0 +1,568 @@
+{
+  "common": {
+    "open": "Open",
+    "minute_one": "{{formattedCount}} minute",
+    "minute_other": "{{formattedCount}} minutes",
+    "hour_one": "{{formattedCount}} hour",
+    "hour_other": "{{formattedCount}} hours",
+    "day_one": "{{formattedCount}} day",
+    "day_other": "{{formattedCount}} days"
+  },
+  "interfaceLanguages": {
+    "en": "English (EN)",
+    "de": "Deutsch (DE)",
+    "fr": "Français (FR)"
+  },
+  "interfaceLanguage": {
+    "label": "Change interface language",
+    "shortLabel": "Interface language",
+    "helper": "Menus and instructions stay in the interface language, separate from what you study.",
+    "ariaLabel": "Change interface language",
+    "optionAria": "Change interface language to {{language}}"
+  },
+  "appNav": {
+    "title": "Falowen Learning Hub",
+    "signedInAs": "Signed in as {{email}}",
+    "logout": "Log out",
+    "backHome": "Back to general home",
+    "subtitle": {
+      "campus": "Campus: course book, submissions, community",
+      "exams": "Exams Room: speaking, writing, resources",
+      "default": "Choose Campus or the Exams Room"
+    },
+    "tabs": {
+      "course": "My Course",
+      "ai": "Falowen A.I",
+      "aiFrench": "Falowen A.I (French)",
+      "results": "Results",
+      "discussion": "Group Discussion",
+      "account": "Account"
+    },
+    "sections": {
+      "courseBook": "Course Book",
+      "submit": "Submit Assignment",
+      "examFile": "My Exam File",
+      "grammar": "Ask Grammar Question",
+      "grammarFrench": "French Grammar Help",
+      "writing": "Writing Practice",
+      "writingFrench": "French Writing Practice",
+      "speech": "Speech Trainer",
+      "speechFrench": "French Speech Trainer",
+      "vocab": "Vocab Practice",
+      "vocabFrench": "French Vocab Practice"
+    },
+    "examTabs": {
+      "speaking": "Speaking",
+      "writing": "Writing",
+      "vocab": "Vocab",
+      "horen": "Listening",
+      "lesen": "Reading",
+      "resources": "Resources",
+      "study": "Study calendar",
+      "file": "My Exam File"
+    }
+  },
+  "signup": {
+    "interfaceNote": "This programme teaches {{program}}. The interface is available in English.",
+    "programs": {
+      "german": "German",
+      "french": "French"
+    }
+  },
+  "homeActions": {
+    "title": "What would you like to do today?",
+    "badge": "Quick start",
+    "description": "Choose one of the two main tasks for today: study in the course book or start a mock exam. Simple English supports everyone, especially A1 learners.",
+    "buttons": {
+      "course": "Open course book",
+      "exam": "Go to mock exams",
+      "discussion": "Go to class discussion",
+      "account": "Account, contract & payments"
+    }
+  },
+  "planPage": {
+    "meta": {
+      "title": "Your plan · Falowen Exam Coach",
+      "description": "Choose between the course book and mock exams to begin your next session."
+    },
+    "title": "Two options for today",
+    "badge": "Login required",
+    "intro": "Keep the home page focused: decide between the course book and mock exams. You can reach everything else inside those areas after login.",
+    "courseCard": {
+      "title": "Course book",
+      "description": "Open your course materials and work through lessons or homework.",
+      "points": [
+        "All PDFs, videos, and worksheets in one place.",
+        "A clear path for upcoming tasks in the course.",
+        "Jump directly into the current module after login."
+      ],
+      "cta": "Go to course book"
+    },
+    "examCard": {
+      "title": "Exams",
+      "description": "Start a mock exam with clear tasks and timers.",
+      "points": [
+        "Jump straight into the next speaking or writing session.",
+        "Questions and prompts appear after login.",
+        "Feedback and scores are saved after each round."
+      ],
+      "cta": "Go to exams"
+    }
+  },
+  "examRoom": {
+    "headingLabel": "Exam room",
+    "title": "Choose your exam format",
+    "levelBadge": "Level: {{level}}",
+    "tabs": {
+      "speaking": "Speaking",
+      "writing": "Writing",
+      "resources": "Resources"
+    },
+    "resources": {
+      "title": "Resources for reading & listening",
+      "subtitle": "Official Goethe samples ({{level}}) — practise with real material.",
+      "badge": "External links",
+      "links": {
+        "reading": {
+          "label": "Reading (Goethe practice sets)",
+          "description": "Opens the official Goethe reading comprehension exercises in a new tab."
+        },
+        "listening": {
+          "label": "Listening (Goethe audio)",
+          "description": "Original audio tasks with solutions directly from the Goethe website."
+        }
+      }
+    }
+  },
+  "resourcePage": {
+    "meta": {
+      "title": "Resources · Falowen Exam Coach",
+      "description": "Strategies and vetted links for reading, listening, and exam preparation."
+    },
+    "title": "Resources",
+    "subtitle": "A curated library with clear strategies and trusted links instead of copied exam questions.",
+    "badge": "Reading/Listening included",
+    "sections": [
+      {
+        "title": "Reading & listening as a skill lab",
+        "points": [
+          "Strategy-only drills (skimming, scanning, keyword spotting, note-taking).",
+          "User-provided content: paste text or audio links → comprehension questions and feedback.",
+          "No hosted exam tasks; instead, links to reliable sources (DW, Goethe, telc/ÖSD samples)."
+        ]
+      },
+      {
+        "title": "Checklists & strategies",
+        "points": [
+          "'Master part 2' step-by-step checklists for speaking/writing.",
+          "Connector and phrase banks per level (A1–B2).",
+          "Pronunciation shortlists: common pitfalls + example audio (our own assets)."
+        ]
+      },
+      {
+        "title": "Link official materials",
+        "points": [
+          "Direct links to practice sets from Goethe, telc, ÖSD, and Deutsche Welle.",
+          "Note that original tasks are not copied — learners practise on official sites.",
+          "Short guidance: what to focus on? which parts matter for A1/A2/B1/B2?"
+        ]
+      }
+    ]
+  },
+  "vocabPage": {
+    "title": "Vocab booster",
+    "intro": "🧠 Use these mini lists as quick help for your answers. Read them out loud and work them into your examples.",
+    "exerciseTitle": "Mini exercise",
+    "exerciseIntro": "Choose two expressions from the lists above and write or speak a short dialogue. Combine at least one question and one request.",
+    "prompts": [
+      "Describe yourself in 5–6 sentences (name, origin, job, hobbies).",
+      "Ask three questions about a topic of your choice (e.g. holidays, work, family).",
+      "Make polite requests for a group project (meeting point, tasks, schedule)."
+    ]
+  },
+  "landing": {
+    "meta": {
+      "title": "Falowen Exam Coach · German & French training",
+      "description": "Falowen supports German and French learners in Ghana with live classes, daily practice, and tutor feedback."
+    },
+    "badge": "Falowen · Exam Coach",
+    "heroTitle": "German and French exam training from Ghana.",
+    "heroSubtitle": "Falowen guides you toward German exams with daily practice, tutor feedback, and structured live classes. French is available as an optional A1 module.",
+    "cta": {
+      "join": "Join a cohort",
+      "login": "Log in",
+      "getApp": "Download the app",
+      "seeHow": "See how it works ↓"
+    },
+    "heroBadges": [
+      "Daily practice",
+      "Tutor feedback",
+      "Live classes",
+      "Mock exams",
+      "German & French cohorts"
+    ],
+    "languageChooser": {
+      "title": "Choose your study language",
+      "subtitle": "Choose whether to study German or French. Set your interface language separately.",
+      "interfaceNote": "The programmes teach German or French — the interface is available in English by default.",
+      "studyGerman": "Study German",
+      "studyFrench": "Study French",
+      "current": "Current selection: {{language}}",
+      "ariaLabel": "Study programme language selection",
+      "optionAria": "Select the {{language}} programme"
+    },
+    "programs": {
+      "german": {
+        "label": "Deutsch (DE)",
+        "shortLabel": "German",
+        "description": "Structured exam prep with daily tasks and tutor feedback.",
+        "focus": "Core programme for Goethe-aligned exam preparation.",
+        "details": [
+          "Daily exercises with clear exam formats.",
+          "Tutor feedback in live classes and homework rounds.",
+          "Focus on speaking, writing, reading, and listening for A1–B1."
+        ]
+      },
+      "french": {
+        "label": "Français (FR)",
+        "shortLabel": "French",
+        "description": "French A1 routines with weekly structure and guided materials.",
+        "focus": "Optional module for basic A1 communication.",
+        "details": [
+          "Weekly structure with short daily routines.",
+          "Guided vocab and sentence building lists.",
+          "Complements the German core programme, does not replace it."
+        ]
+      }
+    },
+    "programComparison": {
+      "title": "Compare programmes",
+      "subtitle": "German remains the focus. French is an optional A1 module for extra routine.",
+      "germanTitle": "German exam programme (core offering)",
+      "frenchTitle": "French A1 module (optional)",
+      "germanPoints": [
+        "Structured exam preparation with daily tasks.",
+        "Tutor feedback and live classes for clear progress.",
+        "Aligned with Goethe-style exam formats."
+      ],
+      "frenchPoints": [
+        "A1 routines with weekly structure.",
+        "Short exercises for everyday situations.",
+        "Supplement for learners who also need French."
+      ]
+    },
+    "path": {
+      "title": "Choose your path",
+      "subtitle": "New to learning or exam-focused? Pick the option that matches your next step.",
+      "newLearner": {
+        "title": "I'm new to {{language}}",
+        "description": "Join the next cohort and start at the right level (A1+).",
+        "cta": "Join a cohort →"
+      },
+      "examReady": {
+        "title": "I'm preparing for exams",
+        "description": "Log in to practise speaking and writing with exam tasks.",
+        "cta": "Log in →"
+      }
+    },
+    "howItWorks": {
+      "title": "How to sign up and start",
+      "subtitle": "Complete your application, choose a cohort, and unlock access with payment. After that you receive your onboarding checklist and class links.",
+      "benefits": [
+        "✅ You get: daily practice tools, tutor feedback, and live class support.",
+        "✅ Ideal for: learners preparing for Goethe-style speaking and writing tasks."
+      ],
+      "cta": "Ready? Join a cohort →",
+      "steps": [
+        {
+          "title": "Open the application",
+          "description": "Click “Join a cohort” to start your application."
+        },
+        {
+          "title": "Fill in your details",
+          "description": "Share your name, contact info, and learning goals so we can place you correctly."
+        },
+        {
+          "title": "Choose level/class",
+          "description": "Select the cohort (e.g. A1/A2/B1) based on schedule and availability."
+        },
+        {
+          "title": "Complete payment",
+          "description": "After choosing your cohort, complete payment to unlock full access."
+        },
+        {
+          "title": "Get onboarding",
+          "description": "We send you the checklist, class links, and next steps."
+        }
+      ]
+    },
+    "selfLearning": {
+      "title": "Self-learning tracks for German & French",
+      "description": "Prefer learning independently? German learners get B2/C1 self-learning flows with Goethe-style tasks and AI scoring. French learners get A1 routines with daily prompts and guided vocab checklists.",
+      "cta": "Log in to start →",
+      "imageAlt": "Ad for German B2/C1 and French A1 self-learning"
+    },
+    "features": [
+      {
+        "icon": "📱",
+        "title": "Daily practice + live classes",
+        "description": "Practise daily on mobile or laptop and apply what you learn in tutor-led classes."
+      },
+      {
+        "icon": "👩🏽‍🏫",
+        "title": "Tutor feedback",
+        "description": "Your speaking and writing tasks are reviewed and discussed in class."
+      },
+      {
+        "icon": "🗣️",
+        "title": "Exam-style practice",
+        "description": "Work with realistic tasks that prepare you for A1–B1 exams."
+      }
+    ],
+    "updates": {
+      "title": "Latest updates",
+      "subtitle": "New features keep your exam training structured and personal.",
+      "items": [
+        {
+          "title": "Study calendar routines",
+          "description": "Plan weekly tasks with a study calendar that keeps speaking, writing, and vocab consistent.",
+          "tag": "New"
+        },
+        {
+          "title": "My-Exam-File tracker",
+          "description": "Collect exam prompts, personal notes, and tutor feedback in one place.",
+          "tag": "Updated"
+        },
+        {
+          "title": "Speaking + writing",
+          "description": "Train with exam-style prompts and get feedback you can review before class.",
+          "tag": "Improved"
+        },
+        {
+          "title": "Assignment submissions",
+          "description": "Submit homework, track feedback, and stay on top of weekly goals.",
+          "tag": "Live"
+        }
+      ]
+    },
+    "photos": [
+      {
+        "caption": "Guided practice sessions with learners and tutors."
+      },
+      {
+        "caption": "Practical writing and speaking practice for every level."
+      }
+    ],
+    "reviews": {
+      "title": "What learners say",
+      "subtitle": "Feedback from learners.",
+      "starRating_one": "{{count}}-star rating",
+      "starRating_other": "{{count}}-star rating",
+      "items": [
+        {
+          "name": "Ama",
+          "country": "Ghana",
+          "level": "A1",
+          "stars": 5,
+          "text": "The speaking exercises are clear and easy to follow. I ask questions more confidently now."
+        },
+        {
+          "name": "Samuel",
+          "country": "Nigeria",
+          "level": "A2",
+          "stars": 5,
+          "text": "I like the tutor feedback. It shows exactly what I need to improve in writing."
+        },
+        {
+          "name": "Amina",
+          "country": "Kenya",
+          "level": "A1",
+          "stars": 4,
+          "text": "The classes are structured. Daily practice keeps me going even when I am busy."
+        },
+        {
+          "name": "Fatou",
+          "country": "Senegal",
+          "level": "A2",
+          "stars": 5,
+          "text": "The tasks feel like real exams. I finally understand part 1, 2, and 3 for speaking."
+        },
+        {
+          "name": "Youssef",
+          "country": "Morocco",
+          "level": "B1",
+          "stars": 5,
+          "text": "The writing steps help me organise my ideas. My letters are much more professional now."
+        },
+        {
+          "name": "Lerato",
+          "country": "South Africa",
+          "level": "A1",
+          "stars": 4,
+          "text": "Simple instructions and helpful corrections. The platform is easy to use."
+        },
+        {
+          "name": "Kofi",
+          "country": "Ghana",
+          "level": "A2",
+          "stars": 5,
+          "text": "My pronunciation improved because I record regularly and get feedback."
+        },
+        {
+          "name": "Mariam",
+          "country": "Tanzania",
+          "level": "A1",
+          "stars": 5,
+          "text": "The timetable and daily tasks make learning planned and less stressful."
+        },
+        {
+          "name": "Ibrahim",
+          "country": "Egypt",
+          "level": "B1",
+          "stars": 4,
+          "text": "Good practice materials. I like that the focus is on real exam conversations."
+        },
+        {
+          "name": "Chiamaka",
+          "country": "Nigeria",
+          "level": "A1",
+          "stars": 5,
+          "text": "I was afraid of speaking. Now I can introduce myself and make polite requests."
+        },
+        {
+          "name": "Hawa",
+          "country": "Mali",
+          "level": "A2",
+          "stars": 4,
+          "text": "The tutor reviews are strong. I understand my mistakes much faster."
+        },
+        {
+          "name": "Patrick",
+          "country": "Uganda",
+          "level": "A1",
+          "stars": 5,
+          "text": "Short daily practice works. Even 10 minutes keeps me active."
+        }
+      ]
+    },
+    "darkCta": {
+      "title": "How Falowen supports your exam goals",
+      "subtitle": "Falowen trains the exact skills you need for exam success: polite requests, accurate questions, and confident conversation. Practise daily and get tutor feedback in live classes.",
+      "ctaTitle": "Ready to start?",
+      "ctaSubtitle": "Create your profile to access practice tools, schedules, and tutor feedback.",
+      "ctaJoin": "Join a cohort",
+      "ctaLogin": "Already enrolled? Log in →",
+      "contactTitle": "Stay connected",
+      "contactPhone": "Call or WhatsApp:",
+      "contactEmail": "Email:",
+      "contactChat": "Live chat during classes with tutor monitoring and feedback."
+    },
+    "footer": {
+      "quickLinksTitle": "Quick links",
+      "followTitle": "Follow Falowen",
+      "stayTitle": "Why learners stay",
+      "stayPoints": [
+        "Blended learning makes class time productive.",
+        "Tutors guide your speaking and writing practice.",
+        "Exam-style tasks build confidence quickly."
+      ]
+    },
+    "quickLinks": [
+      { "label": "About us", "href": "https://register.falowen.app/#about-us" },
+      { "label": "Privacy", "href": "https://register.falowen.app/#privacy-policy" },
+      { "label": "Contact", "href": "https://register.falowen.app/#contact" },
+      { "label": "Terms", "href": "https://register.falowen.app/#terms-of-service" },
+      { "label": "FAQ", "href": "https://register.falowen.app/#faq" },
+      { "label": "Blog", "href": "https://blog.falowen.app/feed" }
+    ],
+    "socialLinks": [
+      { "label": "Instagram", "href": "https://www.instagram.com/lleaghana" },
+      { "label": "YouTube", "href": "https://www.youtube.com/@LLEAGhana" },
+      { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
+    ]
+  },
+  "examResources": {
+    "meta": {
+      "title": "Exam resources · Falowen Exam Coach",
+      "description": "Goethe links and short strategies for reading and listening."
+    }
+  },
+  "classCalendar": {
+    "status": {
+      "startsIn": "Starts in {{time}}",
+      "timeLeft": "{{time}} left",
+      "courseFinished": "Course finished"
+    },
+    "badge": {
+      "startingNow": "Starting now",
+      "timeLeft": "{{time}} left"
+    },
+    "detail": {
+      "startingNow": "Starting now",
+      "startsIn": "Starts in {{time}}"
+    },
+    "timeline": {
+      "untilKickoff": "{{time}} until kickoff",
+      "untilGraduation": "{{time}} until graduation",
+      "finished": "This course is finished."
+    },
+    "percentDone": "{{percent}} done"
+  },
+  "letterPractice": {
+    "minuteTarget": "Target time: {{time}}"
+  },
+  "examFile": {
+    "modulePrice": "{{price}} per module"
+  },
+  "studyCalendar": {
+    "meta": {
+      "title": "Study calendar · Falowen Exam Coach",
+      "description": "Plan your Goethe study calendar and download the dates as a calendar file."
+    },
+    "hero": {
+      "kicker": "Study calendar generator",
+      "title": "Create your Goethe study calendar",
+      "subtitle": "Choose your exam date, set your study frequency, and download a calendar file for your phone."
+    },
+    "required": {
+      "title": "Required: set reminders",
+      "subtitle": "Your course has ended, so we automatically download a study calendar. Adjust the dates below and download again if needed."
+    },
+    "form": {
+      "examLevel": "Exam level",
+      "examDate": "Exam date",
+      "examDateHelp": "No date? Enter your target date manually.",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "studyDays": "Study days",
+      "studyDayLabel": "Study day {{day}}",
+      "studyTime": "Time",
+      "sessionLength": "Session length",
+      "reminder": "Reminder",
+      "incomplete": "Choose dates and at least one study day to generate your calendar."
+    },
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    },
+    "cta": {
+      "required": "Download study calendar (required)",
+      "standard": "Download study calendar (.ics)"
+    },
+    "reminder": {
+      "title": "How reminders work",
+      "items": [
+        "Add the downloaded file to Google Calendar, iOS Calendar, or Outlook.",
+        "Each study session gets a reminder based on your lead time.",
+        "You can edit or delete dates later in your calendar app."
+      ],
+      "none": "No reminder",
+      "before": "{{time}} before"
+    }
+  }
+}

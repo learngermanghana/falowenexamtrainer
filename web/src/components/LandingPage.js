@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
-import { persistLanguage } from "../i18n";
+import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 
 const FeatureCard = ({ icon, title, description }) => (
@@ -174,6 +174,15 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     }),
     [t]
   );
+  const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
+  const interfaceLanguageOptions = useMemo(
+    () => [
+      { value: "en", label: t("interfaceLanguages.en") },
+      { value: "de", label: t("interfaceLanguages.de") },
+      { value: "fr", label: t("interfaceLanguages.fr") },
+    ],
+    [t]
+  );
   const resolvedProgram = programOptions[program] ? program : "german";
   const selectedProgram = programOptions[resolvedProgram];
   const features = t("landing.features", { returnObjects: true });
@@ -210,9 +219,11 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
 
   const handleProgramSelect = (nextProgram) => {
     onProgramSelect?.(nextProgram);
-    const language = nextProgram === "french" ? "fr" : "de";
+  };
+
+  const handleInterfaceLanguageChange = (language) => {
     i18n.changeLanguage(language);
-    persistLanguage(language);
+    persistInterfaceLanguage(language);
   };
 
   return (
@@ -293,37 +304,68 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           <div style={{ display: "grid", gap: 8 }}>
             <h2 style={styles.sectionTitle}>{t("landing.languageChooser.title")}</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.languageChooser.subtitle")}</p>
+            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.languageChooser.interfaceNote")}</p>
           </div>
 
           <div style={{ display: "grid", gap: 10 }}>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }} role="group" aria-label={t("landing.languageChooser.ariaLabel")}>
+            <div
+              style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
+              role="group"
+              aria-label={t("landing.languageChooser.ariaLabel")}
+            >
               <button
                 type="button"
                 onClick={() => handleProgramSelect("german")}
                 aria-pressed={resolvedProgram === "german"}
-                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.german.label })}
+                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.german.shortLabel })}
                 style={{
                   ...(resolvedProgram === "german" ? styles.primaryButton : styles.secondaryButton),
                   padding: "10px 14px",
                 }}
               >
-                {programOptions.german.label}
+                {t("landing.languageChooser.studyGerman")}
               </button>
               <button
                 type="button"
                 onClick={() => handleProgramSelect("french")}
                 aria-pressed={resolvedProgram === "french"}
-                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.french.label })}
+                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.french.shortLabel })}
                 style={{
                   ...(resolvedProgram === "french" ? styles.primaryButton : styles.secondaryButton),
                   padding: "10px 14px",
                 }}
               >
-                {programOptions.french.label}
+                {t("landing.languageChooser.studyFrench")}
               </button>
             </div>
             <div style={{ ...styles.helperText, margin: 0 }}>
-              {t("landing.languageChooser.current", { language: selectedProgram.label })}
+              {t("landing.languageChooser.current", { language: selectedProgram.shortLabel })}
+            </div>
+
+            <div style={{ display: "grid", gap: 6 }}>
+              <div style={{ fontWeight: 700 }}>{t("interfaceLanguage.label")}</div>
+              <div
+                style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+                role="group"
+                aria-label={t("interfaceLanguage.ariaLabel")}
+              >
+                {interfaceLanguageOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleInterfaceLanguageChange(option.value)}
+                    aria-pressed={resolvedInterfaceLanguage === option.value}
+                    aria-label={t("interfaceLanguage.optionAria", { language: option.label })}
+                    style={{
+                      ...(resolvedInterfaceLanguage === option.value ? styles.primaryButton : styles.secondaryButton),
+                      padding: "8px 12px",
+                    }}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              <div style={{ ...styles.helperText, margin: 0 }}>{t("interfaceLanguage.helper")}</div>
             </div>
           </div>
         </section>

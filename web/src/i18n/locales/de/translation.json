@@ -8,6 +8,67 @@
     "day_one": "{{formattedCount}} Tag",
     "day_other": "{{formattedCount}} Tage"
   },
+  "interfaceLanguages": {
+    "en": "English (EN)",
+    "de": "Deutsch (DE)",
+    "fr": "Français (FR)"
+  },
+  "interfaceLanguage": {
+    "label": "Interface-Sprache ändern",
+    "shortLabel": "Interface-Sprache",
+    "helper": "Menüs und Anleitungen bleiben in der gewählten Sprache, unabhängig von deiner Lernsprache.",
+    "ariaLabel": "Interface-Sprache ändern",
+    "optionAria": "Interface-Sprache auf {{language}} umstellen"
+  },
+  "appNav": {
+    "title": "Falowen Learning Hub",
+    "signedInAs": "Angemeldet als {{email}}",
+    "logout": "Abmelden",
+    "backHome": "Zurück zur Startseite",
+    "subtitle": {
+      "campus": "Campus: Kursbuch, Abgaben, Community",
+      "exams": "Prüfungsraum: Sprechen, Schreiben, Ressourcen",
+      "default": "Wähle Campus oder den Prüfungsraum"
+    },
+    "tabs": {
+      "course": "Mein Kurs",
+      "ai": "Falowen A.I",
+      "aiFrench": "Falowen A.I (Französisch)",
+      "results": "Ergebnisse",
+      "discussion": "Klassendiskussion",
+      "account": "Konto"
+    },
+    "sections": {
+      "courseBook": "Kursbuch",
+      "submit": "Hausaufgabe einreichen",
+      "examFile": "Meine Prüfungsmappe",
+      "grammar": "Grammatikfrage stellen",
+      "grammarFrench": "Französische Grammatikhilfe",
+      "writing": "Schreibtraining",
+      "writingFrench": "Französisches Schreibtraining",
+      "speech": "Sprechtraining",
+      "speechFrench": "Französisches Sprechtraining",
+      "vocab": "Vokabeltraining",
+      "vocabFrench": "Französisches Vokabeltraining"
+    },
+    "examTabs": {
+      "speaking": "Sprechen",
+      "writing": "Schreiben",
+      "vocab": "Vokabeln",
+      "horen": "Hören",
+      "lesen": "Lesen",
+      "resources": "Ressourcen",
+      "study": "Lernkalender",
+      "file": "Meine Prüfungsmappe"
+    }
+  },
+  "signup": {
+    "interfaceNote": "Dieses Programm unterrichtet {{program}}. Die Benutzeroberfläche ist auf Englisch verfügbar.",
+    "programs": {
+      "german": "Deutsch",
+      "french": "Französisch"
+    }
+  },
   "homeActions": {
     "title": "Was möchtest du heute machen?",
     "badge": "Schnellstart",
@@ -142,7 +203,10 @@
     ],
     "languageChooser": {
       "title": "Wähle deine Lernsprache",
-      "subtitle": "Wähle die Sprache, die du lernen möchtest. Du kannst jederzeit wechseln und wir merken uns deine Auswahl.",
+      "subtitle": "Wähle, ob du Deutsch oder Französisch lernen möchtest. Deine Interface-Sprache stellst du separat ein.",
+      "interfaceNote": "Die Programme unterrichten Deutsch oder Französisch – die Oberfläche ist standardmäßig auf Englisch verfügbar.",
+      "studyGerman": "Deutsch lernen",
+      "studyFrench": "Französisch lernen",
       "current": "Aktuelle Auswahl: {{language}}",
       "ariaLabel": "Sprachauswahl für das Lernprogramm",
       "optionAria": "{{language}}-Programm auswählen"

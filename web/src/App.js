@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { ExamProvider } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
@@ -36,23 +37,24 @@ import OfflineBanner from "./components/OfflineBanner";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
+import { persistInterfaceLanguage } from "./i18n";
 
-const getTabStructure = (program) => {
+const getTabStructure = (program, t) => {
   const isFrenchProgram = program === "french";
-  const aiLabel = isFrenchProgram ? "Falowen A.I (French)" : "Falowen A.I";
-  const grammarLabel = isFrenchProgram ? "French Grammar Help" : "Ask Grammar Question";
-  const writingLabel = isFrenchProgram ? "French Writing Practice" : "Writing Practice";
-  const speechLabel = isFrenchProgram ? "French Speech Trainer" : "Speech Trainer";
-  const vocabLabel = isFrenchProgram ? "French Vocab Practice" : "Vocab Practice";
+  const aiLabel = isFrenchProgram ? t("appNav.tabs.aiFrench") : t("appNav.tabs.ai");
+  const grammarLabel = isFrenchProgram ? t("appNav.sections.grammarFrench") : t("appNav.sections.grammar");
+  const writingLabel = isFrenchProgram ? t("appNav.sections.writingFrench") : t("appNav.sections.writing");
+  const speechLabel = isFrenchProgram ? t("appNav.sections.speechFrench") : t("appNav.sections.speech");
+  const vocabLabel = isFrenchProgram ? t("appNav.sections.vocabFrench") : t("appNav.sections.vocab");
 
   return [
     {
       key: "myCourse",
-      label: "My Course",
+      label: t("appNav.tabs.course"),
       sections: [
-        { key: "course", label: "Course Book" },
-        { key: "submit", label: "Submit Assignment" },
-        { key: "examFile", label: "My Exam File" },
+        { key: "course", label: t("appNav.sections.courseBook") },
+        { key: "submit", label: t("appNav.sections.submit") },
+        { key: "examFile", label: t("appNav.sections.examFile") },
       ],
     },
     {
@@ -65,9 +67,9 @@ const getTabStructure = (program) => {
         { key: "vocab", label: vocabLabel },
       ],
     },
-    { key: "results", label: "Results", section: "results" },
-    { key: "discussion", label: "Group Discussion", section: "discussion" },
-    { key: "account", label: "Account", section: "account" },
+    { key: "results", label: t("appNav.tabs.results"), section: "results" },
+    { key: "discussion", label: t("appNav.tabs.discussion"), section: "discussion" },
+    { key: "account", label: t("appNav.tabs.account"), section: "account" },
   ];
 };
 
@@ -106,6 +108,7 @@ const getPreferredSection = (allowedSections, preferred, tabStructure) => {
 };
 
 function App() {
+  const { t } = useTranslation();
   const {
     user,
     loading: authLoading,
@@ -127,7 +130,10 @@ function App() {
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
   const isEnrolled = isStaff || Boolean(studentProfile?.className || studentProfile?.level);
-  const tabStructure = useMemo(() => getTabStructure(studentProfile?.program), [studentProfile?.program]);
+  const tabStructure = useMemo(
+    () => getTabStructure(studentProfile?.program, t),
+    [studentProfile?.program, t]
+  );
 
   const allowedSections = useMemo(
     () => ({
@@ -297,18 +303,28 @@ const AppShell = ({
   const location = useLocation();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { i18n, t } = useTranslation();
+  const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
+  const interfaceLanguageOptions = useMemo(
+    () => [
+      { value: "en", label: t("interfaceLanguages.en") },
+      { value: "de", label: t("interfaceLanguages.de") },
+      { value: "fr", label: t("interfaceLanguages.fr") },
+    ],
+    [t]
+  );
 
   const subtitle = useMemo(() => {
     if (location.pathname.startsWith("/campus")) {
-      return "Campus: course book, submissions, community";
+      return t("appNav.subtitle.campus");
     }
 
     if (location.pathname.startsWith("/exams")) {
-      return "Exams Room: speaking, Schreiben trainer, resources";
+      return t("appNav.subtitle.exams");
     }
 
-    return "Choose Campus or the Exams Room";
-  }, [location.pathname]);
+    return t("appNav.subtitle.default");
+  }, [location.pathname, t]);
 
   const goHome = () => navigate("/");
 
@@ -321,6 +337,12 @@ const AppShell = ({
     if (area === "exams") {
       navigate("/exams/speaking");
     }
+  };
+
+  const handleInterfaceLanguageChange = (event) => {
+    const nextLanguage = event.target.value;
+    i18n.changeLanguage(nextLanguage);
+    persistInterfaceLanguage(nextLanguage);
   };
 
   useEffect(() => {
@@ -379,19 +401,36 @@ const AppShell = ({
         }}
       >
         <div>
-          <h1 style={styles.title}>Falowen Learning Hub</h1>
+          <h1 style={styles.title}>{t("appNav.title")}</h1>
           <p style={styles.subtitle}>{subtitle}</p>
         </div>
         <div className="app-header-meta" style={{ display: "grid", gap: 6, justifyItems: "end" }}>
           <HealthIndicator />
-          <div style={{ fontSize: 13, color: "#374151" }}>Signed in as {user.email}</div>
+          <div style={{ fontSize: 13, color: "#374151" }}>
+            {t("appNav.signedInAs", { email: user.email })}
+          </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
             <NotificationBell
               notificationStatus={notificationStatus}
               onEnablePush={enableNotifications}
             />
+            <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
+              {t("interfaceLanguage.shortLabel")}
+              <select
+                value={resolvedInterfaceLanguage}
+                onChange={handleInterfaceLanguageChange}
+                aria-label={t("interfaceLanguage.ariaLabel")}
+                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #d1d5db", fontSize: 12 }}
+              >
+                {interfaceLanguageOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button style={styles.dangerButton} onClick={logout}>
-              Logout
+              {t("appNav.logout")}
             </button>
           </div>
         </div>
@@ -449,6 +488,7 @@ const CampusArea = ({
   tabStorageKey,
 }) => {
   const campusStudentProfile = studentProfile || {};
+  const { t } = useTranslation();
   const { section } = useParams();
   const navigate = useNavigate();
 
@@ -494,7 +534,7 @@ const CampusArea = ({
     <>
       <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
         <button style={styles.secondaryButton} onClick={onBack}>
-          Back to general home
+          {t("appNav.backHome")}
         </button>
         {availableTabs.map((tab) => {
           const activeMainTab = activeMainTabConfig?.key;
@@ -549,6 +589,7 @@ const CampusArea = ({
 };
 
 const ExamArea = ({ onBack }) => {
+  const { t } = useTranslation();
   const { section } = useParams();
   const navigate = useNavigate();
 
@@ -566,21 +607,21 @@ const ExamArea = ({ onBack }) => {
   }, [examSection, navigate, section]);
 
   const tabs = [
-    { key: "speaking", label: "Speaking" },
-    { key: "writing", label: "Schreiben trainer" },
-    { key: "vocab", label: "Vocab" },
-    { key: "horen", label: "Hören" },
-    { key: "lesen", label: "Lesen" },
-    { key: "resources", label: "Resources" },
-    { key: "study", label: "Study calendar" },
-    { key: "file", label: "My Exam File" },
+    { key: "speaking", label: t("appNav.examTabs.speaking") },
+    { key: "writing", label: t("appNav.examTabs.writing") },
+    { key: "vocab", label: t("appNav.examTabs.vocab") },
+    { key: "horen", label: t("appNav.examTabs.horen") },
+    { key: "lesen", label: t("appNav.examTabs.lesen") },
+    { key: "resources", label: t("appNav.examTabs.resources") },
+    { key: "study", label: t("appNav.examTabs.study") },
+    { key: "file", label: t("appNav.examTabs.file") },
   ];
 
   return (
     <>
       <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
         <button style={styles.secondaryButton} onClick={onBack}>
-          Back to general home
+          {t("appNav.backHome")}
         </button>
         {tabs.map((tab) => (
           <button

@@ -51,7 +51,7 @@ const formatClassLabel = (className) => {
 
 const FrenchSignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const locale = i18n.language;
   const formatMoney = useMemo(
     () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
@@ -289,6 +289,9 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
             <h1 style={{ ...styles.title, marginBottom: 8 }}>Sign up for French A1 in Ghana</h1>
             <p style={{ ...styles.helperText, margin: 0, maxWidth: 520 }}>
               Start with survival French, daily speaking practice, and guided routines tailored for beginners.
+            </p>
+            <p style={{ ...styles.helperText, margin: "6px 0 0", maxWidth: 520 }}>
+              {t("signup.interfaceNote", { program: t("signup.programs.french") })}
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>

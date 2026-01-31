@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import de from "../i18n/locales/de/translation.json";
 import fr from "../i18n/locales/fr/translation.json";
+import en from "../i18n/locales/en/translation.json";
 
 const COMPONENTS_DIR = path.resolve(__dirname, "../components");
 const TRANSLATION_KEY_REGEX = /\bt\(\s*["'`]([^"'`]+)["'`]/g;
@@ -136,6 +137,9 @@ describe("i18n translation keys", () => {
       if (!hasTranslationKey(fr, key)) {
         missingKeys.push(`fr:${key}`);
       }
+      if (!hasTranslationKey(en, key)) {
+        missingKeys.push(`en:${key}`);
+      }
     });
 
     expect(missingKeys).toEqual([]);
@@ -144,9 +148,11 @@ describe("i18n translation keys", () => {
   it("warns on unused keys and enforces placeholder/plural consistency", () => {
     const flatDe = flattenTranslations(de);
     const flatFr = flattenTranslations(fr);
+    const flatEn = flattenTranslations(en);
     const deKeys = Object.keys(flatDe);
     const frKeys = Object.keys(flatFr);
-    const allKeys = new Set([...deKeys, ...frKeys]);
+    const enKeys = Object.keys(flatEn);
+    const allKeys = new Set([...deKeys, ...frKeys, ...enKeys]);
 
     const componentFiles = getComponentFiles(COMPONENTS_DIR);
     const usedKeys = new Set();
@@ -164,12 +170,16 @@ describe("i18n translation keys", () => {
     allKeys.forEach((key) => {
       const dePlaceholders = extractPlaceholders(flatDe[key]);
       const frPlaceholders = extractPlaceholders(flatFr[key]);
+      const enPlaceholders = extractPlaceholders(flatEn[key]);
       if (dePlaceholders.join("|") !== frPlaceholders.join("|")) {
         placeholderMismatches.push(`${key} (de: ${dePlaceholders.join(", ")}, fr: ${frPlaceholders.join(", ")})`);
       }
+      if (dePlaceholders.join("|") !== enPlaceholders.join("|")) {
+        placeholderMismatches.push(`${key} (de: ${dePlaceholders.join(", ")}, en: ${enPlaceholders.join(", ")})`);
+      }
     });
 
-    const pluralIssues = [...checkPluralForms(deKeys), ...checkPluralForms(frKeys)];
+    const pluralIssues = [...checkPluralForms(deKeys), ...checkPluralForms(frKeys), ...checkPluralForms(enKeys)];
 
     expect(placeholderMismatches).toEqual([]);
     expect(pluralIssues).toEqual([]);
