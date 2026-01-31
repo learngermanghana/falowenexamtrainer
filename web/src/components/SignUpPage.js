@@ -55,7 +55,7 @@ const formatClassLabel = (className) => {
 
 const SignUpPage = ({ onLogin, onBack }) => {
   const { signup, authError, setAuthError } = useAuth();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const locale = i18n.language;
   const formatMoney = useMemo(
     () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
@@ -390,6 +390,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             </button>
           )}
         </div>
+        <p style={{ ...styles.helperText, marginTop: -2 }}>
+          {t("signup.interfaceNote", { program: t("signup.programs.german") })}
+        </p>
         <div
           style={{
             ...styles.uploadCard,
