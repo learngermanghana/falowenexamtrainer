@@ -178,7 +178,22 @@ const UpdateCard = ({ title, description, tag }) => (
   </div>
 );
 
-const LandingPage = ({ onSignUp, onLogin }) => {
+const programOptions = {
+  german: {
+    label: "Deutsch (DE)",
+    shortLabel: "Deutsch",
+    description: "German certification coaching with daily practice and tutor feedback.",
+  },
+  french: {
+    label: "Français (FR)",
+    shortLabel: "Français",
+    description: "French A1 routines with guided practice and weekly structure.",
+  },
+};
+
+const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
+  const resolvedProgram = programOptions[program] ? program : "german";
+  const selectedProgram = programOptions[resolvedProgram];
   const features = [
     {
       icon: "📱",
@@ -291,7 +306,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
 
             {/* ✅ Keep main CTAs only here */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="button" style={styles.primaryButton} onClick={() => onSignUp("german")}>
+              <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
                 Join a cohort
               </button>
               <button type="button" style={styles.secondaryButton} onClick={onLogin}>
@@ -324,6 +339,53 @@ const LandingPage = ({ onSignUp, onLogin }) => {
           </div>
         </header>
 
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 16,
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ display: "grid", gap: 8 }}>
+            <h2 style={styles.sectionTitle}>Choose your learning language</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Pick the language you want to study. You can switch anytime, and we’ll remember your choice.
+            </p>
+          </div>
+
+          <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={() => onProgramSelect?.("german")}
+                aria-pressed={resolvedProgram === "german"}
+                style={{
+                  ...(resolvedProgram === "german" ? styles.primaryButton : styles.secondaryButton),
+                  padding: "10px 14px",
+                }}
+              >
+                {programOptions.german.label}
+              </button>
+              <button
+                type="button"
+                onClick={() => onProgramSelect?.("french")}
+                aria-pressed={resolvedProgram === "french"}
+                style={{
+                  ...(resolvedProgram === "french" ? styles.primaryButton : styles.secondaryButton),
+                  padding: "10px 14px",
+                }}
+              >
+                {programOptions.french.label}
+              </button>
+            </div>
+            <div style={{ ...styles.helperText, margin: 0 }}>
+              Current selection: <strong style={{ color: "#111827" }}>{selectedProgram.label}</strong>
+            </div>
+          </div>
+        </section>
+
         {/* Choose your path */}
         <section
           style={{
@@ -352,9 +414,13 @@ const LandingPage = ({ onSignUp, onLogin }) => {
               boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
             }}
           >
-            <div style={{ fontWeight: 900, color: "#111827" }}>I’m new to German</div>
+            <div style={{ fontWeight: 900, color: "#111827" }}>I’m new to {selectedProgram.shortLabel}</div>
             <p style={{ ...styles.helperText, margin: 0 }}>Join the next cohort and start from the right level (A1+).</p>
-            <button type="button" style={{ ...styles.primaryButton, padding: "10px 12px" }} onClick={() => onSignUp("german")}>
+            <button
+              type="button"
+              style={{ ...styles.primaryButton, padding: "10px 12px" }}
+              onClick={() => onSignUp(resolvedProgram)}
+            >
               Join a cohort →
             </button>
           </div>
@@ -374,64 +440,6 @@ const LandingPage = ({ onSignUp, onLogin }) => {
             <p style={{ ...styles.helperText, margin: 0 }}>Log in to practice speaking and writing with exam tasks.</p>
             <button type="button" style={{ ...styles.secondaryButton, padding: "10px 12px" }} onClick={onLogin}>
               Log in →
-            </button>
-          </div>
-        </section>
-
-        {/* Language choice */}
-        <section
-          style={{
-            ...styles.card,
-            display: "grid",
-            gap: 12,
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            alignItems: "stretch",
-          }}
-        >
-          <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={styles.sectionTitle}>Pick your language</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Choose the program you want so we can show the right sign-up flow and schedule.
-            </p>
-          </div>
-
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 14,
-              padding: 12,
-              background: "#ffffff",
-              display: "grid",
-              gap: 10,
-              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            }}
-          >
-            <div style={{ fontWeight: 900, color: "#111827" }}>German cohorts</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Structured A1–B1 exam prep with tutor feedback and daily practice.
-            </p>
-            <button type="button" style={{ ...styles.primaryButton, padding: "10px 12px" }} onClick={() => onSignUp("german")}>
-              Join German cohort →
-            </button>
-          </div>
-
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 14,
-              padding: 12,
-              background: "#ffffff",
-              display: "grid",
-              gap: 10,
-              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            }}
-          >
-            <div style={{ fontWeight: 900, color: "#111827" }}>French cohorts</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Start with French A1 survival basics and a clear weekly routine.
-            </p>
-            <button type="button" style={{ ...styles.secondaryButton, padding: "10px 12px" }} onClick={() => onSignUp("french")}>
-              Join French cohort →
             </button>
           </div>
         </section>
@@ -461,7 +469,7 @@ const LandingPage = ({ onSignUp, onLogin }) => {
 
             <button
               type="button"
-              onClick={() => onSignUp("german")}
+              onClick={() => onSignUp(resolvedProgram)}
               style={{
                 color: "#1d4ed8",
                 fontWeight: 900,
@@ -607,7 +615,11 @@ const LandingPage = ({ onSignUp, onLogin }) => {
 
                 {/* ✅ Keep one strong CTA here */}
                 <div style={{ display: "grid", gap: 8 }}>
-                  <button type="button" style={{ ...styles.primaryButton, padding: "10px 14px" }} onClick={() => onSignUp("german")}>
+                  <button
+                    type="button"
+                    style={{ ...styles.primaryButton, padding: "10px 14px" }}
+                    onClick={() => onSignUp(resolvedProgram)}
+                  >
                     Join a cohort
                   </button>
 

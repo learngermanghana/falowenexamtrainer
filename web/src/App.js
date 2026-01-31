@@ -117,7 +117,11 @@ function App() {
     saveStudentProfile,
   } = useAuth();
   const [authMode, setAuthMode] = useState("landing");
-  const [signupProgram, setSignupProgram] = useState("german");
+  const programStorageKey = "falowen:signup-program";
+  const [signupProgram, setSignupProgram] = useState(() => {
+    if (typeof window === "undefined") return "german";
+    return localStorage.getItem(programStorageKey) || "german";
+  });
   const location = useLocation();
 
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
@@ -143,6 +147,10 @@ function App() {
 
   const tabStorageKey = user?.uid ? `falowen:last-tab:${user.uid}` : null;
   const savedSection = useMemo(() => (tabStorageKey ? localStorage.getItem(tabStorageKey) : null), [tabStorageKey]);
+
+  useEffect(() => {
+    localStorage.setItem(programStorageKey, signupProgram);
+  }, [programStorageKey, signupProgram]);
 
   const availableTabs = useMemo(
     () => tabStructure.filter((tab) => isTabAvailable(tab, allowedSections)),
@@ -228,6 +236,8 @@ function App() {
     if (authMode === "landing") {
       return (
         <LandingPage
+          program={signupProgram}
+          onProgramSelect={setSignupProgram}
           onSignUp={(program) => {
             setSignupProgram(program || "german");
             setAuthMode("signup");
