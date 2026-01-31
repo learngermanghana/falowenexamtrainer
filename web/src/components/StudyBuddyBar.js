@@ -146,7 +146,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
       : t("studyBuddy.metrics.notSynced");
   const hasAssignment = assignmentLabel !== t("studyBuddy.metrics.awaitingAssignment");
   const hasResults = latestScore !== null;
-  const keywordSets = useMemo(() => buildQuickReplyKeywords(t), [t, locale]);
+  const keywordSets = useMemo(() => buildQuickReplyKeywords(t), [t]);
 
   const paymentReminder = useMemo(() => {
     const balanceDue = Number(studentProfile?.balanceDue);
