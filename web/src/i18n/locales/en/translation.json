@@ -115,7 +115,8 @@
         "assignment": ["assignment", "homework", "task"],
         "grammar": ["grammar"],
         "vocab": ["vocab", "vocabulary", "words"],
-        "exam": ["exam", "test", "mock"]
+        "exam": ["exam", "test", "mock"],
+        "greeting": ["hi", "hello", "hey", "hallo"]
       },
       "attendance": {
         "synced": "You're currently at {{attendance}}. Aim for the next session to keep momentum.",
@@ -132,6 +133,7 @@
       "grammar": "For grammar, pick one rule and create 3 mini sentences with it. I can check them next.",
       "vocab": "Try 5 new words in short sentences today. I can quiz you on them if you'd like.",
       "examTips": "Exam tip: time your practice and review one mistake after each task to build confidence.",
+      "greeting": "Hi! Tell me what you'd like help with—results, attendance, assignments, grammar, vocab, or exam prep.",
       "default": "Got it! Share what you're working on, and I'll suggest the best next step."
     }
   },

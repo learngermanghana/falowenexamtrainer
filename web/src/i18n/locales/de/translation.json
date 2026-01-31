@@ -115,7 +115,8 @@
         "assignment": ["aufgabe", "hausaufgabe", "arbeitsauftrag"],
         "grammar": ["grammatik"],
         "vocab": ["wortschatz", "vokabel", "vokabeln"],
-        "exam": ["prüfung", "test", "klausur", "examen"]
+        "exam": ["prüfung", "test", "klausur", "examen"],
+        "greeting": ["hallo", "hi", "hey", "guten tag", "servus"]
       },
       "attendance": {
         "synced": "Du liegst aktuell bei {{attendance}}. Nimm die nächste Stunde mit, um dranzubleiben.",
@@ -132,6 +133,7 @@
       "grammar": "Für Grammatik: Wähle eine Regel und schreibe 3 kurze Sätze dazu.",
       "vocab": "Baue heute 5 neue Wörter in kurze Sätze ein. Ich kann dich abfragen.",
       "examTips": "Prüfungstipp: Übe mit Timer und notiere einen Fehler pro Aufgabe.",
+      "greeting": "Hallo! Sag mir, wobei du Hilfe brauchst: Ergebnisse, Anwesenheit, Aufgaben, Grammatik, Wortschatz oder Prüfungen.",
       "default": "Alles klar! Sag mir, woran du gerade arbeitest."
     }
   },
