@@ -34,6 +34,7 @@ import PaymentComplete from "./components/PaymentComplete";
 import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import OfflineBanner from "./components/OfflineBanner";
+import StudyBuddyBar from "./components/StudyBuddyBar";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
@@ -474,6 +475,7 @@ const AppShell = ({
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <StudyBuddyBar studentProfile={studentProfile} />
     </div>
   );
 };
