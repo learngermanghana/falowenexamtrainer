@@ -115,7 +115,8 @@
         "assignment": ["devoir", "exercice", "travail", "tâche", "tache"],
         "grammar": ["grammaire"],
         "vocab": ["vocabulaire", "mot", "mots"],
-        "exam": ["examen", "test", "épreuve", "epreuve"]
+        "exam": ["examen", "test", "épreuve", "epreuve"],
+        "greeting": ["salut", "bonjour", "coucou", "hallo", "hello"]
       },
       "attendance": {
         "synced": "Tu es actuellement à {{attendance}}. Vise la prochaine session pour garder l’élan.",
@@ -132,6 +133,7 @@
       "grammar": "Pour la grammaire : choisis une règle et écris 3 phrases courtes.",
       "vocab": "Utilise 5 nouveaux mots dans de petites phrases aujourd’hui. Je peux te quizzer.",
       "examTips": "Conseil examen : entraîne-toi avec un timer et note une erreur après chaque tâche.",
+      "greeting": "Salut ! Dis-moi ce dont tu as besoin : résultats, présence, devoirs, grammaire, vocabulaire ou examens.",
       "default": "D’accord ! Dis-moi sur quoi tu travailles et je propose la prochaine étape."
     }
   },

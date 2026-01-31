@@ -26,6 +26,7 @@ const buildQuickReplyKeywords = (t) => ({
   grammar: buildKeywordList(t, "studyBuddy.quickReply.keywords.grammar"),
   vocab: buildKeywordList(t, "studyBuddy.quickReply.keywords.vocab"),
   exam: buildKeywordList(t, "studyBuddy.quickReply.keywords.exam"),
+  greeting: buildKeywordList(t, "studyBuddy.quickReply.keywords.greeting"),
 });
 
 const matchesKeyword = (normalized, keywords) =>
@@ -66,6 +67,10 @@ const getQuickReply = (question, context, t, keywordSets) => {
 
   if (matchesKeyword(normalized, keywordSets.exam)) {
     return t("studyBuddy.quickReply.examTips");
+  }
+
+  if (matchesKeyword(normalized, keywordSets.greeting)) {
+    return t("studyBuddy.quickReply.greeting");
   }
 
   return t("studyBuddy.quickReply.default");
