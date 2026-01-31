@@ -34,10 +34,65 @@ const getStudentAttendance = (data = {}, studentCode = "") => {
   return data[studentCode] ?? data[normalizedCode] ?? data[studentCode.toUpperCase()];
 };
 
+const parseDurationToHours = (value) => {
+  if (value === null || value === undefined) return 0;
+  if (typeof value === "number" && !Number.isNaN(value)) return value;
+  if (typeof value !== "string") return 0;
+
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return 0;
+
+  const numericOnly = normalized.replace(/[^0-9.]/g, "");
+  const hasHourToken = /h|hr|hour/.test(normalized);
+  const hasMinuteToken = /m|min|minute/.test(normalized);
+
+  if (normalized.includes(":")) {
+    const [hoursPart, minutesPart] = normalized.split(":");
+    const hours = Number.parseFloat(hoursPart);
+    const minutes = Number.parseFloat(minutesPart);
+    if (!Number.isNaN(hours)) {
+      return hours + (!Number.isNaN(minutes) ? minutes / 60 : 0);
+    }
+  }
+
+  if (hasHourToken || hasMinuteToken) {
+    const hoursMatch = normalized.match(/(\d+(?:\.\d+)?)\s*(?:h|hr|hour)/);
+    const minutesMatch = normalized.match(/(\d+(?:\.\d+)?)\s*(?:m|min|minute)/);
+    const hours = hoursMatch ? Number.parseFloat(hoursMatch[1]) : 0;
+    const minutes = minutesMatch ? Number.parseFloat(minutesMatch[1]) : 0;
+    if (!Number.isNaN(hours) || !Number.isNaN(minutes)) {
+      return (Number.isNaN(hours) ? 0 : hours) + (Number.isNaN(minutes) ? 0 : minutes / 60);
+    }
+  }
+
+  const spacedParts = normalized.split(/\s+/).filter(Boolean);
+  if (spacedParts.length === 2) {
+    const [hoursPart, minutesPart] = spacedParts;
+    const hours = Number.parseFloat(hoursPart);
+    const minutes = Number.parseFloat(minutesPart);
+    if (!Number.isNaN(hours) && !Number.isNaN(minutes)) {
+      return hours + minutes / 60;
+    }
+  }
+
+  if (numericOnly) {
+    const numericValue = Number.parseFloat(numericOnly);
+    if (!Number.isNaN(numericValue)) {
+      if (hasMinuteToken && !hasHourToken) {
+        return numericValue / 60;
+      }
+      return numericValue;
+    }
+  }
+
+  return 0;
+};
+
 export const formatAttendanceRecord = (id, data = {}, studentCode = "") => {
   const studentEntry = getStudentAttendance(data, studentCode);
   const present = toBoolean(studentEntry);
-  const sessionHours = Number(data.hours ?? data.durationHours ?? data.duration ?? data.length) || 0;
+  const rawDuration = data.hours ?? data.durationHours ?? data.duration ?? data.length;
+  const sessionHours = parseDurationToHours(rawDuration);
 
   const record = {
     id,
