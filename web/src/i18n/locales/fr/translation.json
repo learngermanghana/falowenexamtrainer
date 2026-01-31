@@ -62,6 +62,65 @@
       "file": "Mon dossier d’examen"
     }
   },
+  "studyBuddy": {
+    "ariaLabel": "Study buddy",
+    "title": "Study Buddy",
+    "subtitle": "Un accompagnement continu avec tes résultats, ta présence et la prochaine tâche.",
+    "tags": {
+      "results": "Résultats",
+      "attendance": "Présence",
+      "assignments": "Devoirs",
+      "quickQa": "Questions rapides"
+    },
+    "actions": {
+      "collapse": "Masquer",
+      "expand": "Afficher"
+    },
+    "metrics": {
+      "latestResult": "Dernier résultat",
+      "attendance": "Présence",
+      "nextAssignment": "Prochaine tâche",
+      "latestHelper": "Suis tes progrès après chaque correction.",
+      "attendanceHelper": "La régularité t’aide à progresser plus vite.",
+      "assignmentHelper": "Basé sur tes derniers devoirs.",
+      "awaitingAssignment": "Recommandation en attente",
+      "scoreValue": "{{score}}/100",
+      "noResults": "Pas encore de résultats",
+      "attendancePercent": "{{percent}} %",
+      "attendanceSessions": "{{count}} sessions",
+      "notSynced": "Non synchronisé"
+    },
+    "suggestions": {
+      "title": "Suggestions",
+      "lowScore": "Reprends le dernier devoir corrigé et refais les corrections avant une nouvelle tâche.",
+      "lowAttendance": "Essaie d’assister aux deux prochains cours pour garder le rythme.",
+      "assignmentPlan": "Planifie deux courtes sessions cette semaine pour terminer {{assignment}}.",
+      "default": "Dis-moi ton objectif actuel et je prépare un mini plan de semaine."
+    },
+    "qa": {
+      "title": "Poser une question rapide",
+      "placeholder": "Ex. Que dois-je réviser pour le prochain cours ?",
+      "send": "Envoyer"
+    },
+    "quickReply": {
+      "attendance": {
+        "synced": "Tu es actuellement à {{attendance}}. Vise la prochaine session pour garder l’élan.",
+        "notSynced": "Tes données de présence ne sont pas encore synchronisées. Demande à ton tuteur de confirmer."
+      },
+      "results": {
+        "synced": "Ton dernier résultat est {{results}}. Tu veux un plan d’entraînement basé dessus ?",
+        "noResults": "Dès que la première tâche est notée, je résume la tendance."
+      },
+      "assignment": {
+        "recommended": "Prochaine étape : {{assignment}}. Je peux t’aider à organiser le travail.",
+        "awaiting": "Pas encore de recommandation. Dis-moi sur quel chapitre tu es."
+      },
+      "grammar": "Pour la grammaire : choisis une règle et écris 3 phrases courtes.",
+      "vocab": "Utilise 5 nouveaux mots dans de petites phrases aujourd’hui. Je peux te quizzer.",
+      "examTips": "Conseil examen : entraîne-toi avec un timer et note une erreur après chaque tâche.",
+      "default": "D’accord ! Dis-moi sur quoi tu travailles et je propose la prochaine étape."
+    }
+  },
   "signup": {
     "interfaceNote": "Ce programme enseigne le {{program}}. L’interface est disponible en anglais.",
     "programs": {

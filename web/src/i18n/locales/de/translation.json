@@ -62,6 +62,65 @@
       "file": "Meine Prüfungsmappe"
     }
   },
+  "studyBuddy": {
+    "ariaLabel": "Study Buddy",
+    "title": "Study Buddy",
+    "subtitle": "Immer griffbereite Hinweise zu Ergebnissen, Anwesenheit und der nächsten Aufgabe.",
+    "tags": {
+      "results": "Ergebnisse",
+      "attendance": "Anwesenheit",
+      "assignments": "Aufgaben",
+      "quickQa": "Kurzfragen"
+    },
+    "actions": {
+      "collapse": "Ausblenden",
+      "expand": "Einblenden"
+    },
+    "metrics": {
+      "latestResult": "Letztes Ergebnis",
+      "attendance": "Anwesenheit",
+      "nextAssignment": "Nächste Aufgabe",
+      "latestHelper": "Behalte deinen Fortschritt nach jeder Korrektur im Blick.",
+      "attendanceHelper": "Regelmäßigkeit hilft dir schneller voranzukommen.",
+      "assignmentHelper": "Basierend auf deinen letzten Abgaben.",
+      "awaitingAssignment": "Empfehlung ausstehend",
+      "scoreValue": "{{score}}/100",
+      "noResults": "Noch keine Ergebnisse",
+      "attendancePercent": "{{percent}}%",
+      "attendanceSessions": "{{count}} Termine",
+      "notSynced": "Nicht synchronisiert"
+    },
+    "suggestions": {
+      "title": "Vorschläge",
+      "lowScore": "Konzentriere dich auf die letzte Aufgabe und korrigiere sie, bevor du etwas Neues startest.",
+      "lowAttendance": "Versuche, die nächsten zwei Termine zu besuchen, um stabil zu bleiben.",
+      "assignmentPlan": "Plane diese Woche zwei kurze Lernblöcke, um {{assignment}} zu schaffen.",
+      "default": "Sag mir dein aktuelles Ziel, dann erstelle ich einen kurzen Wochenplan."
+    },
+    "qa": {
+      "title": "Kurze Frage stellen",
+      "placeholder": "z. B. Was soll ich für die nächste Stunde wiederholen?",
+      "send": "Senden"
+    },
+    "quickReply": {
+      "attendance": {
+        "synced": "Du liegst aktuell bei {{attendance}}. Nimm die nächste Stunde mit, um dranzubleiben.",
+        "notSynced": "Deine Anwesenheit ist noch nicht synchronisiert. Bitte deine Lehrkraft um Bestätigung."
+      },
+      "results": {
+        "synced": "Dein letztes Ergebnis ist {{results}}. Soll ich daraus einen Übungsplan ableiten?",
+        "noResults": "Sobald die erste Aufgabe korrigiert ist, fasse ich den Trend zusammen."
+      },
+      "assignment": {
+        "recommended": "Als Nächstes: {{assignment}}. Ich helfe dir gern beim Planen.",
+        "awaiting": "Noch keine Empfehlung. Sag mir, in welchem Kapitel du bist."
+      },
+      "grammar": "Für Grammatik: Wähle eine Regel und schreibe 3 kurze Sätze dazu.",
+      "vocab": "Baue heute 5 neue Wörter in kurze Sätze ein. Ich kann dich abfragen.",
+      "examTips": "Prüfungstipp: Übe mit Timer und notiere einen Fehler pro Aufgabe.",
+      "default": "Alles klar! Sag mir, woran du gerade arbeitest."
+    }
+  },
   "signup": {
     "interfaceNote": "Dieses Programm unterrichtet {{program}}. Die Benutzeroberfläche ist auf Englisch verfügbar.",
     "programs": {
