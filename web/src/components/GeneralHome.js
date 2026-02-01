@@ -201,53 +201,38 @@ const GeneralHome = ({
             No announcements yet. Check back later for new updates.
           </p>
         ) : null}
-        <div style={{ display: "grid", gap: 12 }}>
-          {announcements.map((announcement) => {
-            const labels = [];
-            if (announcement.className) {
-              labels.push(`Class ${announcement.className}`);
-            }
-            if (announcement.language && announcement.language !== "all") {
-              labels.push(`Language: ${announcement.language}`);
-            }
-
-            return (
-              <article
-                key={announcement.id}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 12,
-                  background: "#f8fafc",
-                  display: "grid",
-                  gap: 8,
-                }}
-              >
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {labels.map((label) => (
-                    <PillBadge key={label}>{label}</PillBadge>
-                  ))}
-                </div>
-                <div style={{ fontWeight: 700, fontSize: 16 }}>{announcement.title}</div>
-                {announcement.body ? (
-                  <p style={{ ...styles.helperText, margin: 0 }}>{announcement.body}</p>
-                ) : null}
-                {announcement.linkUrl ? (
-                  <PrimaryActionBar align="start">
-                    <a
-                      href={announcement.linkUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ ...styles.secondaryButton, textDecoration: "none" }}
-                    >
-                      {announcement.linkLabel || "Read more"}
-                    </a>
-                  </PrimaryActionBar>
-                ) : null}
-              </article>
-            );
-          })}
-        </div>
+        {announcementStatus === "success" && announcements.length > 0 ? (
+          <div className="announcement-ticker" aria-label="Latest announcements">
+            <div className="announcement-ticker-track">
+              {(announcements.length > 1 ? [...announcements, ...announcements] : announcements).map(
+                (announcement, index) => {
+                  const bodyText = announcement.body ? ` — ${announcement.body}` : "";
+                  return (
+                    <span className="announcement-ticker-item" key={`${announcement.id}-${index}`}>
+                      <span className="announcement-ticker-title">
+                        {announcement.title}
+                        {bodyText}
+                      </span>
+                      {announcement.linkUrl ? (
+                        <a
+                          href={announcement.linkUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="announcement-ticker-link"
+                        >
+                          {announcement.linkLabel || "Read more"}
+                        </a>
+                      ) : null}
+                      <span className="announcement-ticker-divider" aria-hidden="true">
+                        •
+                      </span>
+                    </span>
+                  );
+                }
+              )}
+            </div>
+          </div>
+        ) : null}
       </section>
 
       <section style={styles.card}>
