@@ -4,6 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
+import { fetchAttendanceSummary } from "../services/attendanceService";
+import { fetchResults } from "../services/resultsService";
+import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { requestStudyBuddyReply } from "../services/studyBuddyService";
 
 const toNumber = (value) => {
@@ -32,6 +35,13 @@ const StudyBuddyBar = ({ studentProfile }) => {
     }
   });
   const contentId = "study-buddy-content";
+  const studentCode =
+    studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
+  const studentEmail = studentProfile?.email || "";
+  const className = studentProfile?.className || "";
+  const [latestResult, setLatestResult] = useState(null);
+  const [scoreSummary, setScoreSummary] = useState(null);
+  const [attendanceSummary, setAttendanceSummary] = useState(null);
 
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const formatTimeUnit = useCallback(
@@ -45,12 +55,13 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const latestScore = useMemo(
     () =>
       toNumber(
-        studentProfile?.latestScore ??
+        latestResult?.score ??
+          studentProfile?.latestScore ??
           studentProfile?.latestResultScore ??
           studentProfile?.score ??
           studentProfile?.lastScore
       ),
-    [studentProfile]
+    [latestResult?.score, studentProfile]
   );
   const attendanceRate = useMemo(
     () =>
@@ -61,8 +72,13 @@ const StudyBuddyBar = ({ studentProfile }) => {
       ),
     [studentProfile]
   );
-  const attendanceSessions = studentProfile?.attendanceSessions ?? studentProfile?.attendance?.sessions ?? null;
+  const attendanceSessions =
+    attendanceSummary?.sessions ??
+    studentProfile?.attendanceSessions ??
+    studentProfile?.attendance?.sessions ??
+    null;
   const assignmentLabel =
+    scoreSummary?.student?.nextRecommendation?.label ||
     studentProfile?.nextAssignment ||
     studentProfile?.assignmentRecommendation ||
     studentProfile?.assignmentTitle ||
@@ -104,6 +120,76 @@ const StudyBuddyBar = ({ studentProfile }) => {
       time: formatTimeUnit("day", Math.max(daysLeft, 0)),
     };
   }, [formatMoney, formatTimeUnit, studentProfile?.balanceDue, studentProfile?.contractEnd]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadMetrics = async () => {
+      const tasks = [];
+
+      if (studentCode || studentEmail) {
+        tasks.push(
+          fetchResults({ studentCode, email: studentEmail })
+            .then((response) => {
+              if (!isMounted) return;
+              const results = response?.results || [];
+              if (!results.length) {
+                setLatestResult(null);
+                return;
+              }
+              const latest = results.reduce((acc, entry) => {
+                const entryDate = new Date(entry.date || entry.created_at || 0);
+                const accDate = acc ? new Date(acc.date || acc.created_at || 0) : new Date(0);
+                if (Number.isNaN(entryDate.getTime())) return acc;
+                if (Number.isNaN(accDate.getTime()) || entryDate > accDate) return entry;
+                return acc;
+              }, null);
+              setLatestResult(latest || null);
+            })
+            .catch(() => {
+              if (isMounted) setLatestResult(null);
+            })
+        );
+      }
+
+      if (className && studentCode) {
+        tasks.push(
+          fetchAttendanceSummary({ className, studentCode })
+            .then((response) => {
+              if (isMounted) setAttendanceSummary(response || null);
+            })
+            .catch(() => {
+              if (isMounted) setAttendanceSummary(null);
+            })
+        );
+      } else {
+        setAttendanceSummary(null);
+      }
+
+      if (idToken && studentCode) {
+        tasks.push(
+          fetchScoreSummary({ idToken, studentCode })
+            .then((response) => {
+              if (isMounted) setScoreSummary(response || null);
+            })
+            .catch(() => {
+              if (isMounted) setScoreSummary(null);
+            })
+        );
+      } else {
+        setScoreSummary(null);
+      }
+
+      if (tasks.length) {
+        await Promise.all(tasks);
+      }
+    };
+
+    loadMetrics();
+    return () => {
+      isMounted = false;
+    };
+  }, [className, idToken, studentCode, studentEmail]);
 
   const suggestions = useMemo(() => {
     const tips = [];

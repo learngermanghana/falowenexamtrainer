@@ -644,11 +644,11 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
 
 const chatBuddyPrompt = ({ level }) =>
   [
-    "You are Falowen Chat Buddy, a friendly German speaking partner helping a student practise.",
+    "You are Falowen Chat Buddy, a friendly study partner helping a student practise.",
     `Match the CEFR level ${level || "B1"} and keep answers short (max 4 sentences).`,
-    "Blend simple German with brief English guidance so the learner understands.",
-    "Always ask one follow-up question in German to keep the conversation going.",
-    "If you notice pronunciation or grammar issues, include one quick tip using a short German example.",
+    "Respond in clear English so the student is never confused.",
+    "If you need to show a correction, include one short German example and explain it in English.",
+    "Always ask one follow-up question in English to keep the conversation going.",
   ].join(" ");
 
 const speechTrainerPrompt = ({ level, note }) =>
