@@ -14,6 +14,7 @@ import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
+import LetterWritingIntroPage from "./components/LetterWritingIntroPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -468,6 +469,7 @@ const AppShell = ({
               />
             }
           />
+          <Route path="/campus/course/letter-writing-12-3" element={<LetterWritingIntroPage />} />
 
           <Route path="/exams" element={<Navigate to="/exams/speaking" replace />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
