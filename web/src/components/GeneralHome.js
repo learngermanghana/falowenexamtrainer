@@ -150,12 +150,7 @@ const GeneralHome = ({
         onSaveOnboarding={onSaveOnboarding}
       />
 
-      <NavigationGuide
-        onOpenCourse={() => navigate("/campus/course")}
-        onSubmitAssignment={() => navigate("/campus/submit")}
-        onAskAI={() => navigate("/campus/grammar")}
-        onOpenExams={() => navigate("/exams/speaking")}
-      />
+      <NavigationGuide />
 
       <section style={styles.card}>
         <SectionHeader
