@@ -13,6 +13,10 @@
     "de": "Deutsch (DE)",
     "fr": "Français (FR)"
   },
+  "programLanguages": {
+    "german": "Deutsch",
+    "french": "Französisch"
+  },
   "interfaceLanguage": {
     "label": "Interface-Sprache ändern",
     "shortLabel": "Interface-Sprache",
@@ -608,6 +612,111 @@
   },
   "letterPractice": {
     "minuteTarget": "Zielzeit: {{time}}"
+  },
+  "grammarQuestionTab": {
+    "title": "Stelle eine {{language}}-Grammatikfrage",
+    "description": "Der Grammatik-Coach gibt jetzt eine kurze Erklärung plus 1–2 kurze {{language}}-Beispiele mit englischen Glossen. Stelle konkrete Fragen ({{examplePrompt}}).",
+    "examplePrompt": {
+      "german": "z. B. „Wann benutze ich seit vs. für?“ oder „Wie bilde ich das Perfekt mit Modalverben?“",
+      "french": "z. B. „Quand est-ce que vs. quand“ oder „Wie benutze ich ne…pas?“"
+    },
+    "levelLabel": "Stufe (optional)",
+    "questionLabel": "Deine Frage",
+    "questionPlaceholder": "Frage nach Wortstellung, Zeiten oder anderen {{language}}-Grammatikthemen...",
+    "submit": "Coach fragen",
+    "submitLoading": "Frage läuft...",
+    "waiting": "Warte auf KI-Antwort...",
+    "answerHeading": "Antwort des Coaches",
+    "previousHeading": "Vorherige Fragen",
+    "filterLevelLabel": "Nach Stufe filtern",
+    "filterLevelAll": "Alle Stufen",
+    "searchLabel": "Suche",
+    "searchPlaceholder": "Stichwort in Frage oder Antwort",
+    "sortLabel": "Sortieren",
+    "sortNewest": "Neueste zuerst",
+    "sortOldest": "Älteste zuerst",
+    "entryLevel": "Stufe: {{level}}",
+    "entryQuestion": "F: {{question}}",
+    "entryAnswerPrefix": "A",
+    "reask": "Erneut fragen",
+    "pendingResponse": "(Antwort ausstehend)",
+    "askedAt": "Gefragt am {{date}}",
+    "loadMore": "Mehr laden",
+    "loadingMore": "Lädt...",
+    "noHistory": "Noch keine Fragen vorhanden.",
+    "fetchingHistory": "Verlauf wird geladen...",
+    "notAvailable": "k. A.",
+    "time": {
+      "justNow": "Gerade eben"
+    },
+    "errors": {
+      "missingQuestion": "Bitte gib eine Grammatikfrage ein, die du dem Coach stellen möchtest.",
+      "askFailed": "Der Grammatik-Coach konnte nicht erreicht werden.",
+      "signInToViewHistory": "Bitte melde dich an, um deine bisherigen Grammatikfragen zu sehen.",
+      "historyLoad": "Deine bisherigen Grammatikfragen konnten nicht geladen werden."
+    }
+  },
+  "letterWritingIntro": {
+    "backToCourse": "Zurück zum Kurs",
+    "title": "Einführung in das Briefeschreiben 12.3",
+    "subtitle": "Nutze diese Anleitung, um formelle und informelle Briefe zu strukturieren, bevor du deine Aufgabe abgibst.",
+    "formalTitle": "Aufbau eines formellen Briefes",
+    "formal": {
+      "salutations": [
+        "Sehr geehrte Frau + Name – für eine Frau.",
+        "Sehr geehrter Herr + Name – für einen Mann.",
+        "Sehr geehrte Damen und Herren – wenn der Empfänger unbekannt ist (z. B. Schule oder Reisebüro)."
+      ],
+      "openingLine": "<strong>Einleitung:</strong> Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [Grund]. Wenn du <em>weil</em> verwendest, steht das Verb oder Modalverb am Ende.",
+      "openingExamples": [
+        "Beispiel 1: Ich kann nicht kommen... Ich schreibe Ihnen, weil ich nicht kommen kann.",
+        "Beispiel 2: Ich komme nicht... Ich schreibe Ihnen, weil ich nicht komme.",
+        "Tipp: Beginne mit „Ich“ und ende mit „möchte“ wegen „weil“. Beispiel: Ich schreibe Ihnen, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Hauptteil:</strong> Verwende die Konjunktionen <em>Ich möchte wissen, ob</em>, <em>deshalb</em> und <em>weil</em>. Halte die Sätze klar und gut strukturiert.",
+      "conclusion": "<strong>Schluss:</strong> Ich freue mich im Voraus auf Ihre Antwort. (Nicht ändern.) Mit freundlichen Grüßen, <strong>[Dein vollständiger Name]</strong>."
+    },
+    "informalTitle": "Aufbau eines informellen Briefes",
+    "informal": {
+      "salutations": [
+        "Hallo [für männlich und weiblich],",
+        "Liebe (weiblich) / Lieber (männlich) [Vorname des Empfängers],"
+      ],
+      "openingLine": "<strong>Einleitung:</strong> Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [Grund]. Wenn du <em>weil</em> verwendest, steht das Verb oder Modalverb am Ende.",
+      "openingExamples": [
+        "Beispiel 1: Ich kann nicht kommen... Ich schreibe dir, weil ich nicht kommen kann.",
+        "Beispiel 2: Ich komme nicht... Ich schreibe dir, weil ich nicht komme.",
+        "Tipp: Beginne mit „Ich“ und ende mit „möchte“ wegen „weil“. Beispiel: Ich schreibe dir, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Hauptteil:</strong> Verwende die Konjunktionen <em>Ich möchte wissen, ob</em>, <em>deshalb</em> und <em>weil</em>. Halte die Sätze klar und gut strukturiert.",
+      "conclusion": "<strong>Schluss:</strong> Ich freue mich im Voraus auf deine Antwort. (Nicht ändern.) Liebe Grüße oder Viele Grüße. <strong>[Dein Vorname]</strong>."
+    },
+    "informalAssignmentTitle": "Aufgabe: informeller Brief (Geburtstagsbrief-Fragenbuch)",
+    "informalAssignment": {
+      "intro": "Schreibe einen Brief an deine Freundin oder deinen Freund, der/die Geburtstag hat. Folge diesen Schritten:",
+      "steps": [
+        "Beginne mit einer informellen Begrüßung.",
+        "Erkläre, warum du schreibst.",
+        "Wünsche alles Gute zum Geburtstag.",
+        "Frage, ob eine Feier geplant ist.",
+        "Schließe den Brief höflich ab."
+      ],
+      "sampleQuestion": "<strong>Beispielfrage:</strong> Ihr Freund hat Geburtstag. Schreiben Sie an Ihren Freund: • Warum schreiben Sie? • Gratulieren Sie ihm. • Fragen Sie, ob er eine Feier plant?",
+      "afterWriting": "Nach dem Schreiben: Gehe zum Schreiben-Trainer, füge die Frage in den Ideen-Generator ein und folge dem Prompt, um den Brief zu schreiben. Reiche ihn wie gewohnt ein."
+    },
+    "formalAssignmentTitle": "Aufgabe: formeller Brief (Formeller-Brief-Fragenbuch)",
+    "formalAssignment": {
+      "intro": "Schreibe einen formellen Brief an eine Sprachschule, weil du einen Deutschkurs besuchen möchtest. Folge diesen Schritten:",
+      "steps": [
+        "Beginne mit einer formellen Begrüßung.",
+        "Erkläre, warum du schreibst.",
+        "Bitte um Informationen über die Kurse.",
+        "Frage nach Kursterminen, Preisen und Zahlungsoptionen.",
+        "Schließe den Brief höflich ab."
+      ],
+      "sampleQuestion": "<strong>Beispielfrage:</strong> Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule: • Warum schreiben Sie? • Bitten Sie um Informationen über Kurse. • Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
+      "afterWriting": "Nach dem Schreiben: Nutze dasselbe Vorgehen (Schreiben-Trainer → Ideen-Generator → wie gewohnt einreichen)."
+    }
   },
   "examFile": {
     "modulePrice": "{{price}} pro Modul"

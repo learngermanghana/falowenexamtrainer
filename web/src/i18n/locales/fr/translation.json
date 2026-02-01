@@ -13,6 +13,10 @@
     "de": "Deutsch (DE)",
     "fr": "Français (FR)"
   },
+  "programLanguages": {
+    "german": "Allemand",
+    "french": "Français"
+  },
   "interfaceLanguage": {
     "label": "Changer la langue de l’interface",
     "shortLabel": "Langue de l’interface",
@@ -608,6 +612,111 @@
   },
   "letterPractice": {
     "minuteTarget": "Objectif : {{time}}"
+  },
+  "grammarQuestionTab": {
+    "title": "Poser une question de grammaire en {{language}}",
+    "description": "Le coach de grammaire donne maintenant une explication rapide plus 1–2 courts exemples en {{language}} avec des gloses anglaises. Pose des questions précises ({{examplePrompt}}).",
+    "examplePrompt": {
+      "german": "p. ex. « Quand utiliser seit vs. für ? » ou « Comment former le Perfekt avec les verbes modaux ? »",
+      "french": "p. ex. « Quand est-ce que vs. quand » ou « Comment utiliser ne…pas ? »"
+    },
+    "levelLabel": "Niveau (optionnel)",
+    "questionLabel": "Ta question",
+    "questionPlaceholder": "Demande l’ordre des mots, les temps ou d’autres points de grammaire {{language}}...",
+    "submit": "Poser la question au coach",
+    "submitLoading": "Envoi...",
+    "waiting": "En attente de la réponse de l’IA...",
+    "answerHeading": "Réponse du coach",
+    "previousHeading": "Questions précédentes",
+    "filterLevelLabel": "Filtrer par niveau",
+    "filterLevelAll": "Tous les niveaux",
+    "searchLabel": "Recherche",
+    "searchPlaceholder": "Mot-clé dans la question ou la réponse",
+    "sortLabel": "Trier",
+    "sortNewest": "Les plus récentes",
+    "sortOldest": "Les plus anciennes",
+    "entryLevel": "Niveau : {{level}}",
+    "entryQuestion": "Q : {{question}}",
+    "entryAnswerPrefix": "R",
+    "reask": "Reposer",
+    "pendingResponse": "(Réponse en attente)",
+    "askedAt": "Posée le {{date}}",
+    "loadMore": "Charger plus",
+    "loadingMore": "Chargement...",
+    "noHistory": "Aucune question précédente pour l’instant.",
+    "fetchingHistory": "Chargement de l’historique...",
+    "notAvailable": "N/D",
+    "time": {
+      "justNow": "À l’instant"
+    },
+    "errors": {
+      "missingQuestion": "Veuillez saisir une question de grammaire à poser au coach.",
+      "askFailed": "Impossible de joindre le coach de grammaire.",
+      "signInToViewHistory": "Veuillez vous connecter pour voir vos questions de grammaire précédentes.",
+      "historyLoad": "Impossible de charger vos questions de grammaire précédentes."
+    }
+  },
+  "letterWritingIntro": {
+    "backToCourse": "Retour au cours",
+    "title": "Introduction à la rédaction de lettres 12.3",
+    "subtitle": "Utilisez ce guide pour structurer vos lettres formelles et informelles avant de remettre votre devoir.",
+    "formalTitle": "Structure de la lettre formelle",
+    "formal": {
+      "salutations": [
+        "Sehr geehrte Frau + Name – à utiliser pour une femme.",
+        "Sehr geehrter Herr + Name – à utiliser pour un homme.",
+        "Sehr geehrte Damen und Herren – à utiliser lorsque le destinataire est inconnu (par ex. école ou agence de voyage)."
+      ],
+      "openingLine": "<strong>Ligne d’ouverture :</strong> Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [raison]. Lorsque vous utilisez <em>weil</em>, placez le verbe ou le verbe modal à la fin.",
+      "openingExamples": [
+        "Exemple 1 : Ich kann nicht kommen... Ich schreibe Ihnen, weil ich nicht kommen kann.",
+        "Exemple 2 : Ich komme nicht... Ich schreibe Ihnen, weil ich nicht komme.",
+        "Conseil : commencez par « Ich » et terminez par « möchte » à cause de « weil ». Exemple : Ich schreibe Ihnen, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Corps de la lettre :</strong> Utilisez les conjonctions <em>Ich möchte wissen, ob</em>, <em>deshalb</em> et <em>weil</em>. Gardez les phrases claires et bien structurées.",
+      "conclusion": "<strong>Conclusion :</strong> Ich freue mich im Voraus auf Ihre Antwort. (Ne pas modifier.) Mit freundlichen Grüßen, <strong>[Votre nom complet]</strong>."
+    },
+    "informalTitle": "Structure de la lettre informelle",
+    "informal": {
+      "salutations": [
+        "Hallo [pour homme et femme],",
+        "Liebe (femme) / Lieber (homme) [Prénom du destinataire],"
+      ],
+      "openingLine": "<strong>Ligne d’ouverture :</strong> Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [raison]. Lorsque vous utilisez <em>weil</em>, placez le verbe ou le verbe modal à la fin.",
+      "openingExamples": [
+        "Exemple 1 : Ich kann nicht kommen... Ich schreibe dir, weil ich nicht kommen kann.",
+        "Exemple 2 : Ich komme nicht... Ich schreibe dir, weil ich nicht komme.",
+        "Conseil : commencez par « Ich » et terminez par « möchte » à cause de « weil ». Exemple : Ich schreibe dir, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Corps de la lettre :</strong> Utilisez les conjonctions <em>Ich möchte wissen, ob</em>, <em>deshalb</em> et <em>weil</em>. Gardez les phrases claires et bien structurées.",
+      "conclusion": "<strong>Conclusion :</strong> Ich freue mich im Voraus auf deine Antwort. (Ne pas modifier.) Liebe Grüße ou Viele Grüße. <strong>[Votre prénom]</strong>."
+    },
+    "informalAssignmentTitle": "Devoir : lettre informelle (recueil de questions pour lettre d’anniversaire)",
+    "informalAssignment": {
+      "intro": "Écris une lettre à ton ami(e) qui a un anniversaire. Suis ces étapes :",
+      "steps": [
+        "Commence par une salutation informelle.",
+        "Explique pourquoi tu écris.",
+        "Souhaite-lui un joyeux anniversaire.",
+        "Demande s’il/si elle prévoit une célébration.",
+        "Conclus la lettre poliment."
+      ],
+      "sampleQuestion": "<strong>Question exemple :</strong> Ihr Freund hat Geburtstag. Schreiben Sie an Ihren Freund: • Warum schreiben Sie? • Gratulieren Sie ihm. • Fragen Sie, ob er eine Feier plant?",
+      "afterWriting": "Après avoir écrit : va dans le Schreiben Trainer, colle la question dans l’Ideas Generator et suis l’invite pour rédiger la lettre. Soumets-la comme d’habitude."
+    },
+    "formalAssignmentTitle": "Devoir : lettre formelle (recueil de questions pour lettre formelle)",
+    "formalAssignment": {
+      "intro": "Écris une lettre formelle à une école de langues parce que tu veux suivre un cours d’allemand. Suis ces étapes :",
+      "steps": [
+        "Commence par une salutation formelle.",
+        "Explique pourquoi tu écris.",
+        "Demande des informations sur les cours.",
+        "Pose des questions sur les dates, les prix et les modes de paiement.",
+        "Conclus la lettre poliment."
+      ],
+      "sampleQuestion": "<strong>Question exemple :</strong> Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule: • Warum schreiben Sie? • Bitten Sie um Informationen über Kurse. • Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
+      "afterWriting": "Après avoir écrit : utilise la même procédure (Schreiben Trainer → Ideas Generator → soumettre comme d’habitude)."
+    }
   },
   "examFile": {
     "modulePrice": "{{price}} par module"

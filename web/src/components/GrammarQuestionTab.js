@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { askGrammarQuestion, fetchGrammarHistory } from "../services/grammarService";
 import { styles } from "../styles";
@@ -6,6 +7,7 @@ import { styles } from "../styles";
 const levelOptions = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 const GrammarQuestionTab = () => {
+  const { t } = useTranslation();
   const { studentProfile, idToken } = useAuth();
   const [question, setQuestion] = useState("");
   const [level, setLevel] = useState(studentProfile?.level || "A2");
@@ -21,10 +23,10 @@ const GrammarQuestionTab = () => {
   const [levelFilter, setLevelFilter] = useState("all");
   const [keywordFilter, setKeywordFilter] = useState("");
   const isFrenchProgram = studentProfile?.program === "french";
-  const languageLabel = isFrenchProgram ? "French" : "German";
+  const languageLabel = isFrenchProgram ? t("programLanguages.french") : t("programLanguages.german");
   const examplePrompt = isFrenchProgram
-    ? 'e.g., "Quand est-ce que vs. quand" or "How do I use ne…pas?"'
-    : 'e.g., "When do I use seit vs. für?" or "How do I form the Perfekt with modal verbs?"';
+    ? t("grammarQuestionTab.examplePrompt.french")
+    : t("grammarQuestionTab.examplePrompt.german");
 
   useEffect(() => {
     if (studentProfile?.level) {
@@ -33,7 +35,7 @@ const GrammarQuestionTab = () => {
   }, [studentProfile?.level]);
 
   const formatDate = (value) => {
-    if (!value) return "Just now";
+    if (!value) return t("grammarQuestionTab.time.justNow");
     const asNumber = value?.toMillis ? value.toMillis() : Number(value);
     return Number.isNaN(asNumber) ? "" : new Date(asNumber).toLocaleString();
   };
@@ -41,7 +43,7 @@ const GrammarQuestionTab = () => {
   const loadHistoryPage = useCallback(
     async (cursor = null) => {
       if (!studentProfile?.id || !idToken) {
-        setHistoryError("Please sign in to view your previous grammar questions.");
+        setHistoryError(t("grammarQuestionTab.errors.signInToViewHistory"));
         return;
       }
 
@@ -59,12 +61,12 @@ const GrammarQuestionTab = () => {
         setHistoryError("");
       } catch (err) {
         console.error("Failed to load grammar history", err);
-        setHistoryError("Could not load your previous grammar questions.");
+        setHistoryError(t("grammarQuestionTab.errors.historyLoad"));
       } finally {
         setHistoryLoading(false);
       }
     },
-    [idToken, studentProfile?.id]
+    [idToken, studentProfile?.id, t]
   );
 
   useEffect(() => {
@@ -103,7 +105,7 @@ const GrammarQuestionTab = () => {
   const submitQuestion = async ({ questionText, levelValue }) => {
     const trimmedQuestion = questionText.trim();
     if (!trimmedQuestion) {
-      setError("Please enter a grammar question to ask the coach.");
+      setError(t("grammarQuestionTab.errors.missingQuestion"));
       return;
     }
 
@@ -130,7 +132,7 @@ const GrammarQuestionTab = () => {
         ...prev,
       ]);
     } catch (err) {
-      setError(err.message || "Failed to reach the grammar coach.");
+      setError(err.message || t("grammarQuestionTab.errors.askFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -149,16 +151,15 @@ const GrammarQuestionTab = () => {
 
   return (
     <div style={{ ...styles.card, marginTop: 12 }}>
-      <h2 style={styles.sectionTitle}>Ask a {languageLabel} Grammar Question</h2>
+      <h2 style={styles.sectionTitle}>{t("grammarQuestionTab.title", { language: languageLabel })}</h2>
       <p style={styles.helperText}>
-        The grammar coach now gives a quick explanation plus 1–2 short {languageLabel} examples with English glosses. Keep
-        questions specific ({examplePrompt}).
+        {t("grammarQuestionTab.description", { language: languageLabel, examplePrompt })}
       </p>
 
       <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
         <div style={styles.row}>
           <label style={styles.field}>
-            <span style={styles.label}>Level (optional)</span>
+            <span style={styles.label}>{t("grammarQuestionTab.levelLabel")}</span>
             <select
               value={level}
               onChange={(e) => setLevel(e.target.value)}
@@ -174,10 +175,10 @@ const GrammarQuestionTab = () => {
         </div>
 
         <div style={styles.field}>
-          <span style={styles.label}>Your question</span>
+          <span style={styles.label}>{t("grammarQuestionTab.questionLabel")}</span>
           <textarea
             style={styles.textArea}
-            placeholder={`Ask about word order, tenses, or other ${languageLabel.toLowerCase()} grammar points...`}
+            placeholder={t("grammarQuestionTab.questionPlaceholder", { language: languageLabel.toLowerCase() })}
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
           />
@@ -185,9 +186,11 @@ const GrammarQuestionTab = () => {
 
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button type="submit" style={styles.primaryButton} disabled={isLoading}>
-            {isLoading ? "Asking..." : "Ask the coach"}
+            {isLoading ? t("grammarQuestionTab.submitLoading") : t("grammarQuestionTab.submit")}
           </button>
-          {isLoading ? <span style={{ fontSize: 13, color: "#4b5563" }}>Waiting for AI reply...</span> : null}
+          {isLoading ? (
+            <span style={{ fontSize: 13, color: "#4b5563" }}>{t("grammarQuestionTab.waiting")}</span>
+          ) : null}
         </div>
       </form>
 
@@ -195,22 +198,22 @@ const GrammarQuestionTab = () => {
 
       {answer ? (
         <div style={styles.resultCard}>
-          <h3 style={styles.resultHeading}>Coach answer</h3>
+          <h3 style={styles.resultHeading}>{t("grammarQuestionTab.answerHeading")}</h3>
           <p style={styles.resultText}>{answer}</p>
         </div>
       ) : null}
 
       <div style={{ marginTop: 16 }}>
-        <h3 style={styles.sectionTitle}>Previous questions</h3>
+        <h3 style={styles.sectionTitle}>{t("grammarQuestionTab.previousHeading")}</h3>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 8 }}>
           <label style={{ ...styles.field, flex: "1 1 180px" }}>
-            <span style={styles.label}>Filter by level</span>
+            <span style={styles.label}>{t("grammarQuestionTab.filterLevelLabel")}</span>
             <select
               value={levelFilter}
               onChange={(e) => setLevelFilter(e.target.value)}
               style={{ ...styles.select, width: "100%" }}
             >
-              <option value="all">All levels</option>
+              <option value="all">{t("grammarQuestionTab.filterLevelAll")}</option>
               {levelOptions.map((option) => (
                 <option key={option} value={option}>
                   {option}
@@ -220,24 +223,24 @@ const GrammarQuestionTab = () => {
           </label>
 
           <label style={{ ...styles.field, flex: "1 1 220px" }}>
-            <span style={styles.label}>Search</span>
+            <span style={styles.label}>{t("grammarQuestionTab.searchLabel")}</span>
             <input
               value={keywordFilter}
               onChange={(e) => setKeywordFilter(e.target.value)}
-              placeholder="Keyword in question or answer"
+              placeholder={t("grammarQuestionTab.searchPlaceholder")}
               style={{ ...styles.input, width: "100%" }}
             />
           </label>
 
           <label style={{ ...styles.field, flex: "1 1 160px" }}>
-            <span style={styles.label}>Sort</span>
+            <span style={styles.label}>{t("grammarQuestionTab.sortLabel")}</span>
             <select
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
               style={{ ...styles.select, width: "100%" }}
             >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
+              <option value="newest">{t("grammarQuestionTab.sortNewest")}</option>
+              <option value="oldest">{t("grammarQuestionTab.sortOldest")}</option>
             </select>
           </label>
         </div>
@@ -250,9 +253,13 @@ const GrammarQuestionTab = () => {
               <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
                 <div>
                   <p style={{ ...styles.label, marginBottom: 4 }}>
-                    Level: {(entry.level || "").toUpperCase() || "N/A"}
+                    {t("grammarQuestionTab.entryLevel", {
+                      level: (entry.level || "").toUpperCase() || t("grammarQuestionTab.notAvailable"),
+                    })}
                   </p>
-                  <p style={{ fontWeight: 600, margin: 0 }}>Q: {entry.question}</p>
+                  <p style={{ fontWeight: 600, margin: 0 }}>
+                    {t("grammarQuestionTab.entryQuestion", { question: entry.question })}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -260,13 +267,16 @@ const GrammarQuestionTab = () => {
                   onClick={() => handleReask(entry)}
                   disabled={isLoading}
                 >
-                  Re-ask
+                  {t("grammarQuestionTab.reask")}
                 </button>
               </div>
               <p style={{ ...styles.resultText, marginTop: 8 }}>
-                <strong>A:</strong> {entry.answer || "(Pending response)"}
+                <strong>{t("grammarQuestionTab.entryAnswerPrefix")}:</strong>{" "}
+                {entry.answer || t("grammarQuestionTab.pendingResponse")}
               </p>
-              <p style={{ ...styles.helperText, marginTop: 6 }}>Asked {formatDate(entry.createdAt)}</p>
+              <p style={{ ...styles.helperText, marginTop: 6 }}>
+                {t("grammarQuestionTab.askedAt", { date: formatDate(entry.createdAt) })}
+              </p>
             </div>
           ))}
         </div>
@@ -279,14 +289,14 @@ const GrammarQuestionTab = () => {
               onClick={() => loadHistoryPage(historyCursor)}
               disabled={historyLoading}
             >
-              {historyLoading ? "Loading..." : "Load more"}
+              {historyLoading ? t("grammarQuestionTab.loadingMore") : t("grammarQuestionTab.loadMore")}
             </button>
           ) : null}
           {!historyLoading && !filteredHistory.length ? (
-            <span style={styles.helperText}>No previous questions yet.</span>
+            <span style={styles.helperText}>{t("grammarQuestionTab.noHistory")}</span>
           ) : null}
           {historyLoading ? (
-            <span style={styles.helperText}>Fetching your history...</span>
+            <span style={styles.helperText}>{t("grammarQuestionTab.fetchingHistory")}</span>
           ) : null}
         </div>
       </div>
