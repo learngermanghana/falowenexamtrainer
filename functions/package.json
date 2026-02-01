@@ -9,7 +9,8 @@
     "lint": "echo \"(optional)\"",
     "serve": "firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "seed:announcements": "node scripts/seedAnnouncements.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
