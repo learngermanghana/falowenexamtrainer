@@ -37,7 +37,7 @@ const VocabExamPage = () => {
   const [error, setLocalError] = useState("");
 
   // UI controls
-  const [mode, setMode] = useState("cards"); // "cards" | "quiz" | "browse"
+  const [mode, setMode] = useState("browse"); // "cards" | "quiz" | "browse"
   const [queryText, setQueryText] = useState("");
   const [page, setPage] = useState(1);
   const [cardIndex, setCardIndex] = useState(0);
@@ -179,9 +179,9 @@ const VocabExamPage = () => {
             onChange={(e) => setMode(e.target.value)}
             style={{ ...styles.select, height: 44, minWidth: 180 }}
           >
+            <option value="browse">Browse / Scan list</option>
             <option value="cards">Flashcards</option>
             <option value="quiz">Quiz (MCQ)</option>
-            <option value="browse">Browse / Scan list</option>
           </select>
 
           {/* Pagination only for browse + cards (page based) */}

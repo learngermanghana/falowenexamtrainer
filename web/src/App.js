@@ -15,7 +15,6 @@ import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
 import LetterWritingIntroPage from "./components/LetterWritingIntroPage";
-import ConjunctionsNotesPage from "./components/ConjunctionsNotesPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -471,7 +470,6 @@ const AppShell = ({
             }
           />
           <Route path="/campus/course/letter-writing-12-3" element={<LetterWritingIntroPage />} />
-          <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionsNotesPage />} />
 
           <Route path="/exams" element={<Navigate to="/exams/speaking" replace />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
@@ -614,11 +612,11 @@ const ExamArea = ({ onBack }) => {
   }, [examSection, navigate, section]);
 
   const tabs = [
+    { key: "lesen", label: t("appNav.examTabs.lesen") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "vocab", label: t("appNav.examTabs.vocab") },
     { key: "horen", label: t("appNav.examTabs.horen") },
-    { key: "lesen", label: t("appNav.examTabs.lesen") },
     { key: "resources", label: t("appNav.examTabs.resources") },
     { key: "study", label: t("appNav.examTabs.study") },
     { key: "file", label: t("appNav.examTabs.file") },
