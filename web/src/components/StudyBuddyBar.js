@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
+import { requestStudyBuddyReply } from "../services/studyBuddyService";
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -12,6 +14,7 @@ const toNumber = (value) => {
 const StudyBuddyBar = ({ studentProfile }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
+  const { idToken } = useAuth();
   const locale = i18n.language;
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDismissed, setIsDismissed] = useState(() => {
@@ -82,6 +85,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
         })
       : t("studyBuddy.metrics.notSynced");
   const hasAssignment = assignmentLabel !== t("studyBuddy.metrics.awaitingAssignment");
+  const [questionInput, setQuestionInput] = useState("");
+  const [quickReply, setQuickReply] = useState("");
+  const [quickReplyError, setQuickReplyError] = useState("");
+  const [isReplyLoading, setIsReplyLoading] = useState(false);
 
   const paymentReminder = useMemo(() => {
     const balanceDue = Number(studentProfile?.balanceDue);
@@ -134,6 +141,32 @@ const StudyBuddyBar = ({ studentProfile }) => {
   }, [attendanceRate, assignmentLabel, hasAssignment, latestScore, paymentReminder, t]);
 
   const primarySuggestion = suggestions[0];
+  const submitQuickQuestion = useCallback(
+    async (question) => {
+      const trimmed = question.trim();
+      if (!trimmed) return;
+      setIsReplyLoading(true);
+      setQuickReply("");
+      setQuickReplyError("");
+      try {
+        const response = await requestStudyBuddyReply({
+          message: trimmed,
+          level: studentProfile?.level || "B1",
+          idToken,
+        });
+        setQuickReply(response?.reply || "");
+        if (!response?.reply) {
+          setQuickReplyError(t("studyBuddy.qa.error"));
+        }
+      } catch (error) {
+        console.error("Study Buddy quick question failed", error);
+        setQuickReplyError(error?.message || t("studyBuddy.qa.error"));
+      } finally {
+        setIsReplyLoading(false);
+      }
+    },
+    [idToken, studentProfile?.level, t]
+  );
 
   const quickLinks = useMemo(
     () => [
@@ -270,6 +303,36 @@ const StudyBuddyBar = ({ studentProfile }) => {
           <div className="study-buddy-source">
             <p className="study-buddy-source-title">{t("studyBuddy.data.title")}</p>
             <p className="study-buddy-source-text">{t("studyBuddy.data.description")}</p>
+          </div>
+
+          <div className="study-buddy-qa">
+            <p className="study-buddy-qa-title">{t("studyBuddy.qa.title")}</p>
+            <form
+              className="study-buddy-qa-form"
+              onSubmit={(event) => {
+                event.preventDefault();
+                submitQuickQuestion(questionInput);
+              }}
+            >
+              <input
+                className="study-buddy-qa-input"
+                type="text"
+                value={questionInput}
+                placeholder={t("studyBuddy.qa.placeholder")}
+                onChange={(event) => setQuestionInput(event.target.value)}
+                disabled={isReplyLoading}
+              />
+              <button className="study-buddy-qa-button" type="submit" disabled={isReplyLoading}>
+                {t("studyBuddy.qa.send")}
+              </button>
+            </form>
+            {isReplyLoading ? (
+              <p className="study-buddy-qa-response">{t("studyBuddy.qa.loading")}</p>
+            ) : quickReply ? (
+              <p className="study-buddy-qa-response">{quickReply}</p>
+            ) : quickReplyError ? (
+              <p className="study-buddy-qa-response">{quickReplyError}</p>
+            ) : null}
           </div>
         </div>
       </div>

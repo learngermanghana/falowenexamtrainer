@@ -124,7 +124,9 @@
     "qa": {
       "title": "Kurze Frage stellen",
       "placeholder": "z. B. Was soll ich für die nächste Stunde wiederholen?",
-      "send": "Senden"
+      "send": "Senden",
+      "loading": "Antwort wird geladen ...",
+      "error": "Sorry, Study Buddy kann gerade nicht antworten. Bitte versuche es erneut."
     },
     "quickReply": {
       "keywords": {
