@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -9,6 +9,7 @@ import HomeMetrics from "./HomeMetrics";
 import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
+import { fetchAnnouncements } from "../services/announcementService";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 
@@ -73,6 +74,8 @@ const GeneralHome = ({
   const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
   const classCalendarId = "class-calendar-card";
+  const [announcements, setAnnouncements] = useState([]);
+  const [announcementStatus, setAnnouncementStatus] = useState("idle");
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
@@ -105,6 +108,33 @@ const GeneralHome = ({
 
     navigate("/");
   };
+
+  useEffect(() => {
+    let mounted = true;
+    const loadAnnouncements = async () => {
+      setAnnouncementStatus("loading");
+      try {
+        const items = await fetchAnnouncements({
+          className: studentProfile?.className,
+          program: studentProfile?.program,
+          locale,
+        });
+        if (!mounted) return;
+        setAnnouncements(items);
+        setAnnouncementStatus("success");
+      } catch (error) {
+        console.error("Failed to load announcements", error);
+        if (!mounted) return;
+        setAnnouncements([]);
+        setAnnouncementStatus("error");
+      }
+    };
+
+    loadAnnouncements();
+    return () => {
+      mounted = false;
+    };
+  }, [locale, studentProfile?.className, studentProfile?.program]);
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -151,6 +181,74 @@ const GeneralHome = ({
       />
 
       <NavigationGuide />
+
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <SectionHeader
+          eyebrow="Updates"
+          title="Announcements"
+          subtitle="Latest school and class notices, including language-specific updates."
+        />
+        {announcementStatus === "loading" ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>Loading announcements…</p>
+        ) : null}
+        {announcementStatus === "error" ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            We could not load announcements right now. Please refresh soon.
+          </p>
+        ) : null}
+        {announcementStatus === "success" && announcements.length === 0 ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            No announcements yet. Check back later for new updates.
+          </p>
+        ) : null}
+        <div style={{ display: "grid", gap: 12 }}>
+          {announcements.map((announcement) => {
+            const labels = [];
+            if (announcement.className) {
+              labels.push(`Class ${announcement.className}`);
+            }
+            if (announcement.language && announcement.language !== "all") {
+              labels.push(`Language: ${announcement.language}`);
+            }
+
+            return (
+              <article
+                key={announcement.id}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 12,
+                  padding: 12,
+                  background: "#f8fafc",
+                  display: "grid",
+                  gap: 8,
+                }}
+              >
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {labels.map((label) => (
+                    <PillBadge key={label}>{label}</PillBadge>
+                  ))}
+                </div>
+                <div style={{ fontWeight: 700, fontSize: 16 }}>{announcement.title}</div>
+                {announcement.body ? (
+                  <p style={{ ...styles.helperText, margin: 0 }}>{announcement.body}</p>
+                ) : null}
+                {announcement.linkUrl ? (
+                  <PrimaryActionBar align="start">
+                    <a
+                      href={announcement.linkUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ ...styles.secondaryButton, textDecoration: "none" }}
+                    >
+                      {announcement.linkLabel || "Read more"}
+                    </a>
+                  </PrimaryActionBar>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      </section>
 
       <section style={styles.card}>
         <SectionHeader

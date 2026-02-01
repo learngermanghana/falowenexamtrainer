@@ -52,6 +52,8 @@ const safeTruncate = (text = "", maxLength = 140) => {
   return `${str.slice(0, Math.max(1, maxLength - 1))}…`;
 };
 
+const normalizeValue = (value) => String(value || "").trim().toLowerCase();
+
 const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
   const params = new URLSearchParams();
   if (level) params.set("level", level);
@@ -158,6 +160,45 @@ const fetchClassMessagingTokens = async ({ level, className, excludeCodes = new 
   });
 
   return { tokens: Array.from(tokens), tokenOwners };
+};
+
+const fetchAnnouncementTokens = async ({ className, program } = {}) => {
+  const db = getFirestore();
+  let queryRef = db.collection("students");
+
+  if (className) {
+    queryRef = queryRef.where("className", "==", className);
+  }
+
+  if (program) {
+    queryRef = queryRef.where("program", "==", program);
+  }
+
+  const snapshot = await queryRef.get();
+  const tokens = new Set();
+  const tokenOwners = new Map();
+
+  snapshot.forEach((docSnap) => {
+    const data = docSnap.data() || {};
+    const docTokens = getTokensFromStudentData(data);
+    docTokens.forEach((token) => {
+      if (!token) return;
+      tokens.add(token);
+      tokenOwners.set(token, docSnap.id);
+    });
+  });
+
+  return { tokens: Array.from(tokens), tokenOwners };
+};
+
+const mergeTokenResults = (current, next) => {
+  next.tokens.forEach((token) => {
+    current.tokens.add(token);
+    if (next.tokenOwners.has(token) && !current.tokenOwners.has(token)) {
+      current.tokenOwners.set(token, next.tokenOwners.get(token));
+    }
+  });
+  return current;
 };
 
 const getInvalidTokenReason = (code = "") => {
@@ -537,6 +578,90 @@ exports.onClassBoardPostCreated = onDocumentCreated(
     payload.route = resolveNotificationRoute(payload);
 
     await sendNotifications({ tokens, notification, data: payload, tokenOwners });
+    return null;
+  }
+);
+
+exports.onAnnouncementCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "announcements/{announcementId}",
+  },
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return null;
+
+    const data = snap.data() || {};
+    const announcementId = event.params.announcementId;
+
+    const audience = normalizeValue(data.audience || data.scope || data.target || "");
+    const className =
+      data.className || data.class || data.classname || "";
+    const language = normalizeValue(data.language || data.program || data.lang || "");
+    const languages = Array.isArray(data.languages)
+      ? data.languages.map(normalizeValue).filter(Boolean)
+      : [];
+
+    const requestedLanguages = [];
+    if (language && language !== "all") {
+      requestedLanguages.push(language);
+    } else if (languages.length) {
+      requestedLanguages.push(...languages.filter((value) => value !== "all"));
+    }
+
+    const targetClassName = className && audience !== "all" ? className : className || "";
+
+    const tokenResult = { tokens: new Set(), tokenOwners: new Map() };
+
+    if (requestedLanguages.length) {
+      for (const program of requestedLanguages) {
+        const result = await fetchAnnouncementTokens({
+          className: targetClassName,
+          program,
+        });
+        mergeTokenResults(tokenResult, result);
+      }
+    } else {
+      const result = await fetchAnnouncementTokens({
+        className: targetClassName,
+        program: "",
+      });
+      mergeTokenResults(tokenResult, result);
+    }
+
+    const tokens = Array.from(tokenResult.tokens);
+    if (!tokens.length) {
+      console.log("onAnnouncementCreated: no messaging tokens found");
+      return null;
+    }
+
+    const notification = {
+      title: data.title || data.headline || "New announcement",
+      body:
+        safeTruncate(data.message, 140) ||
+        safeTruncate(data.body, 140) ||
+        safeTruncate(data.description, 140) ||
+        "A new announcement is available.",
+    };
+
+    const linkUrl = data.linkUrl || data.link || data.url || "";
+
+    const payload = {
+      type: "announcement",
+      announcementId,
+      className: className || "",
+      language: language || "",
+    };
+    if (linkUrl) {
+      payload.route = linkUrl;
+    }
+
+    await sendNotifications({
+      tokens,
+      notification,
+      data: payload,
+      tokenOwners: tokenResult.tokenOwners,
+    });
     return null;
   }
 );
