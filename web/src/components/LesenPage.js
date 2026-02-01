@@ -34,8 +34,6 @@ const lesenLevels = [
 ];
 
 const a1Reading = {
-  title: "A1 Lesen: Übung im App",
-  subtitle: "Alle Texte sind neu geschrieben, damit du copyrightfrei trainieren kannst.",
   sections: [
     {
       id: "teil-1",
@@ -477,8 +475,10 @@ const LesenPage = () => {
       {normalizedLevel === "A1" ? (
         <div style={{ ...styles.card, margin: 0, display: "grid", gap: 16 }}>
           <div>
-            <h3 style={{ margin: 0 }}>{a1Reading.title}</h3>
-            <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{a1Reading.subtitle}</p>
+            {a1Reading.title ? <h3 style={{ margin: 0 }}>{a1Reading.title}</h3> : null}
+            {a1Reading.subtitle ? (
+              <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{a1Reading.subtitle}</p>
+            ) : null}
           </div>
           <div
             style={{
