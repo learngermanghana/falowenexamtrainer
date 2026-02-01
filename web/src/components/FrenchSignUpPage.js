@@ -12,7 +12,7 @@ import PasswordGuidance from "./PasswordGuidance";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { formatCurrency } from "../lib/formatters";
 
-const MIN_INITIAL_PAYMENT = 2000;
+const MIN_INITIAL_PAYMENT = 200;
 const FRENCH_LEVELS = ["A1"];
 
 const isFullName = (value) => {
@@ -86,10 +86,17 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
   const [initialPaymentAmount, setInitialPaymentAmount] = useState(`${MIN_INITIAL_PAYMENT}`);
 
   const scheduleHighlights = useMemo(() => FRENCH_A1_SCHEDULE.slice(0, 6), []);
-  const tuitionSummary = useMemo(
-    () => computeTuitionStatus({ level: selectedLevel, paidAmount: 0 }),
-    [selectedLevel]
-  );
+  const defaultFrenchClass = useMemo(() => Object.keys(frenchClassCatalog)[0], []);
+  const tuitionSummary = useMemo(() => {
+    const resolvedClass = selectedClass || defaultFrenchClass;
+    const tuitionFee = frenchClassCatalog[resolvedClass]?.tuitionFee;
+    return computeTuitionStatus({ level: selectedLevel, paidAmount: 0, tuitionFee });
+  }, [defaultFrenchClass, selectedClass, selectedLevel]);
+  const resolvedClassDetails = useMemo(() => {
+    const resolvedClass = selectedClass || defaultFrenchClass;
+    return resolvedClass ? frenchClassCatalog[resolvedClass] : null;
+  }, [defaultFrenchClass, selectedClass]);
+  const examFee = resolvedClassDetails?.examFee;
 
   const consentHighlights = [
     "We collect your contact details to create and support your account, share class updates, and send payment reminders.",
@@ -516,10 +523,15 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
             ) : null}
             <p style={{ ...styles.helperText, marginTop: -2 }}>
-              Enter between {formatMoney(MIN_INITIAL_PAYMENT)} and {formatMoney(tuitionSummary.tuitionFee)} for {selectedLevel}. A1: {formatMoney(2800)}
+              Enter between {formatMoney(MIN_INITIAL_PAYMENT)} and {formatMoney(tuitionSummary.tuitionFee)} for {selectedLevel}. A1: {formatMoney(tuitionSummary.tuitionFee)}
               · A2: {formatMoney(3000)} · B1: {formatMoney(3000)} · B2: {formatMoney(3000)} · C1: {formatMoney(3000)}. You must pay at least{" "}
               {formatMoney(MIN_INITIAL_PAYMENT)} to start your account. We confirm Paystack payments before marking you as paid.
             </p>
+            {examFee ? (
+              <p style={{ ...styles.helperText, marginTop: -2 }}>
+                A1 Paris Class exam fee: {formatMoney(examFee)}.
+              </p>
+            ) : null}
 
             <TuitionStatusCard
               level={selectedLevel}
