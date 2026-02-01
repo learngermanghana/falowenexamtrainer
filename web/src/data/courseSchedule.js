@@ -800,7 +800,7 @@ export const courseSchedules = {
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
         youtube_link: "https://youtu.be/2iJQFYGUqRE",
-        workbook_link: "https://drive.google.com/file/d/1SjaDH1bYR7O-BnIbM2N82XOEjeLCfPFb/view?usp=sharing",
+        workbook_link: "",
         assignment: true,
       },
     },
