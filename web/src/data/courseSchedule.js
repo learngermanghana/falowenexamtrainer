@@ -791,7 +791,11 @@ export const courseSchedules = {
       chapter: "12.3",
       goal: "Practice how to write both formal and informal letters",
       assignment: true,
-      instruction: "Write all the two letters in this document and send to your tutor for corrections",
+      instruction: "Open the Letter Writing guide to follow the full structure, examples, and assignment steps.",
+      instructionLink: {
+        label: "Open the Letter Writing 12.3 guide",
+        to: "/campus/course/letter-writing-12-3",
+      },
       grammar_topic: "Formal and Informal Letter",
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
