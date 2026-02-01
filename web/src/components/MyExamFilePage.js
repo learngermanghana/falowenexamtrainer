@@ -527,6 +527,9 @@ const MyExamFilePage = () => {
               No level set yet — showing all exam levels so you can browse upcoming dates.
             </div>
           ) : null}
+          <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>
+            Date format: day / month / year (DD/MM/YYYY). Example: 05/03/2025 = 5 March 2025.
+          </div>
           {visibleExamLevels.map((levelInfo) => {
             const isDetectedLevel = levelInfo.level === detectedLevel;
             const formattedPrice =
