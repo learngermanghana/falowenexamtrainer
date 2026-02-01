@@ -22,9 +22,13 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDismissed, setIsDismissed] = useState(() => {
     try {
-      return localStorage.getItem("studyBuddyDismissed") === "true";
+      const storedValue = localStorage.getItem("studyBuddyDismissed");
+      if (storedValue !== null) {
+        return storedValue === "true";
+      }
+      return true;
     } catch (error) {
-      return false;
+      return true;
     }
   });
   const [isHighContrast, setIsHighContrast] = useState(() => {
