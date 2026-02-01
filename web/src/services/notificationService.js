@@ -48,6 +48,9 @@ const resolvePushType = (payload = {}) => {
   if (normalized.includes("class") || normalized.includes("discussion") || normalized.includes("board")) {
     return "Class board";
   }
+  if (normalized.includes("announcement") || normalized.includes("notice") || normalized.includes("bulletin")) {
+    return "Announcement";
+  }
   return "Update";
 };
 
