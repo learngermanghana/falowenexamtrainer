@@ -855,14 +855,17 @@ export const courseSchedules = {
       topic: "Conjunctions",
       chapter: "5.10",
       goal: "Learn about conjunctions and how to apply them in your exams",
-      instruction:
-        "This chapter has no assignments. It gives you ideas to progress for A2 and how to use conjunctions",
+      instruction: "Open the conjunctions notes to learn how to use them in A1 German letters.",
+      instructionLink: {
+        label: "Open the conjunctions notes",
+        to: "/campus/course/conjunctions-5-10",
+      },
       grammar_topic: "German Conjunctions",
       assignment: false,
       schreiben_sprechen: {
         video: "https://youtu.be/ztFf2WJhj_Q",
         youtube_link: "https://youtu.be/ztFf2WJhj_Q",
-        workbook_link: "https://drive.google.com/file/d/1LE1b9ilkLLobE5Uw0TVLG0RIVpLK5k1t/view?usp=sharing",
+        workbook_link: "",
         assignment: false,
       },
     },
