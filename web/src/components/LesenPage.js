@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
+import { useAuth } from "../context/AuthContext";
 
 const lesenLevels = [
   {
@@ -334,8 +335,12 @@ const flattenQuestions = (sections) =>
 
 const LesenPage = () => {
   const { level } = useExam();
+  const { studentProfile, user } = useAuth();
   const normalizedLevel = String(level || "A1").toUpperCase();
   const [answers, setAnswers] = useState({});
+  const A1_EXAM_SECONDS = 25 * 60;
+  const [remainingSeconds, setRemainingSeconds] = useState(A1_EXAM_SECONDS);
+  const [timerRunning, setTimerRunning] = useState(false);
 
   const visibleLevels = useMemo(() => {
     const match = lesenLevels.find((item) => item.level === normalizedLevel);
@@ -346,6 +351,53 @@ const LesenPage = () => {
   const answeredCount = Object.keys(answers).length;
   const isComplete = answeredCount === allQuestions.length && allQuestions.length > 0;
   const score = allQuestions.filter((question) => answers[question.id] === question.correct).length;
+  const studentName = studentProfile?.name || studentProfile?.displayName || user?.displayName || "Student";
+
+  useEffect(() => {
+    if (!timerRunning) return;
+    if (remainingSeconds <= 0) {
+      setTimerRunning(false);
+      return;
+    }
+
+    const timerId = window.setInterval(() => {
+      setRemainingSeconds((prev) => {
+        if (prev <= 1) {
+          setTimerRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, [timerRunning, remainingSeconds]);
+
+  useEffect(() => {
+    if (normalizedLevel !== "A1") return;
+    setRemainingSeconds(A1_EXAM_SECONDS);
+    setTimerRunning(false);
+  }, [normalizedLevel, A1_EXAM_SECONDS]);
+
+  const handleTimerToggle = () => {
+    if (remainingSeconds <= 0) {
+      setRemainingSeconds(A1_EXAM_SECONDS);
+      setTimerRunning(true);
+      return;
+    }
+    setTimerRunning((prev) => !prev);
+  };
+
+  const handleTimerReset = () => {
+    setRemainingSeconds(A1_EXAM_SECONDS);
+    setTimerRunning(false);
+  };
+
+  const formatCountdown = (totalSeconds) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  };
 
   const handleAnswer = (questionId, option) => {
     setAnswers((prev) => ({ ...prev, [questionId]: option }));
@@ -427,6 +479,46 @@ const LesenPage = () => {
           <div>
             <h3 style={{ margin: 0 }}>{a1Reading.title}</h3>
             <p style={{ margin: "6px 0 0", color: "#4b5563" }}>{a1Reading.subtitle}</p>
+          </div>
+          <div
+            style={{
+              ...styles.card,
+              margin: 0,
+              borderColor: timerRunning ? "#2563eb" : "#e2e8f0",
+              background: "#f8fafc",
+              display: "grid",
+              gap: 10,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+              <div>
+                <div style={{ fontWeight: 700 }}>A1 Lesen Exam Timer</div>
+                <div style={{ fontSize: 13, color: "#475569" }}>
+                  Student: <strong>{studentName}</strong> · Target time: 25 minutes
+                </div>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: remainingSeconds === 0 ? "#b91c1c" : "#0f172a" }}>
+                {formatCountdown(remainingSeconds)}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button
+                type="button"
+                onClick={handleTimerToggle}
+                style={{
+                  ...styles.primaryButton,
+                  background: timerRunning ? "#f97316" : styles.primaryButton?.background || "#2563eb",
+                }}
+              >
+                {timerRunning ? "Pause timer" : remainingSeconds === A1_EXAM_SECONDS ? "Start timer" : "Resume timer"}
+              </button>
+              <button type="button" onClick={handleTimerReset} style={styles.buttonSecondary}>
+                Reset to 25:00
+              </button>
+            </div>
+            <div style={{ fontSize: 13, color: "#64748b" }}>
+              Keep the pace steady and aim to finish all questions before time runs out.
+            </div>
           </div>
           <div style={{ display: "grid", gap: 12 }}>
             {a1Reading.sections.map((section) => (

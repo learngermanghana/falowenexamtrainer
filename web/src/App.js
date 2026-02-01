@@ -610,11 +610,11 @@ const ExamArea = ({ onBack }) => {
   }, [examSection, navigate, section]);
 
   const tabs = [
+    { key: "lesen", label: t("appNav.examTabs.lesen") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "vocab", label: t("appNav.examTabs.vocab") },
     { key: "horen", label: t("appNav.examTabs.horen") },
-    { key: "lesen", label: t("appNav.examTabs.lesen") },
     { key: "resources", label: t("appNav.examTabs.resources") },
     { key: "study", label: t("appNav.examTabs.study") },
     { key: "file", label: t("appNav.examTabs.file") },
