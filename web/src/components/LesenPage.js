@@ -6,7 +6,8 @@ import { useAuth } from "../context/AuthContext";
 const lesenLevels = [
   {
     level: "A1",
-    description: "In-app A1 reading practice is available below.",
+    description:
+      "This is a sample Goethe A1 reading text. Use it to practice and get the feel of a real exam simulation.",
     url: null,
   },
   {
