@@ -13,13 +13,13 @@ describe("StudyBuddyBar", () => {
     const user = userEvent.setup();
     render(<StudyBuddyBar studentProfile={{}} />);
 
-    const toggle = screen.getByRole("button", { name: /^Hide$/i });
-    expect(toggle).toHaveAttribute("aria-expanded", "true");
-
-    await user.click(toggle);
+    const toggle = screen.getByRole("button", { name: /show details/i });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
   });
 });
