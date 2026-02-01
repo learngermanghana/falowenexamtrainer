@@ -65,21 +65,39 @@
   "studyBuddy": {
     "ariaLabel": "Study buddy",
     "title": "Study Buddy",
-    "subtitle": "Always-on guidance with your results, attendance, and next assignment.",
+    "subtitle": "Quick shortcuts to the Falowen A.I page, calendar, and daily work.",
     "tags": {
       "results": "Results",
       "attendance": "Attendance",
       "assignments": "Assignments",
       "quickQa": "Quick Q&A"
     },
+    "shortcuts": {
+      "ariaLabel": "Study Buddy shortcuts",
+      "course": "Course book",
+      "submit": "Submit work",
+      "ai": "Falowen A.I",
+      "study": "Study calendar",
+      "exams": "Exams room"
+    },
     "actions": {
-      "collapse": "Hide",
-      "expand": "Show",
+      "collapse": "Hide details",
+      "expand": "Show details",
       "dismiss": "Hide bar",
       "reopen": "Study Buddy",
       "reopenAria": "Reopen Study Buddy bar",
       "contrastOn": "High contrast",
       "contrastOff": "Standard contrast"
+    },
+    "insights": {
+      "nextUp": "Next up",
+      "results": "Latest result",
+      "attendance": "Attendance",
+      "assignment": "Next assignment"
+    },
+    "data": {
+      "title": "Data sources",
+      "description": "Suggestions are based on your Falowen profile data. To use GitHub calendars or class schedules, we sync those files into the app or API first."
     },
     "metrics": {
       "latestResult": "Latest result",

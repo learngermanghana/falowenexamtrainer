@@ -65,21 +65,39 @@
   "studyBuddy": {
     "ariaLabel": "Study buddy",
     "title": "Study Buddy",
-    "subtitle": "Un accompagnement continu avec tes résultats, ta présence et la prochaine tâche.",
+    "subtitle": "Des raccourcis vers Falowen A.I, le calendrier et le travail du jour.",
     "tags": {
       "results": "Résultats",
       "attendance": "Présence",
       "assignments": "Devoirs",
       "quickQa": "Questions rapides"
     },
+    "shortcuts": {
+      "ariaLabel": "Raccourcis Study Buddy",
+      "course": "Cours",
+      "submit": "Envoyer un devoir",
+      "ai": "Falowen A.I",
+      "study": "Calendrier d’étude",
+      "exams": "Salle d’examens"
+    },
     "actions": {
-      "collapse": "Masquer",
-      "expand": "Afficher",
+      "collapse": "Masquer les détails",
+      "expand": "Afficher les détails",
       "dismiss": "Masquer la barre",
       "reopen": "Study Buddy",
       "reopenAria": "Rouvrir la barre Study Buddy",
       "contrastOn": "Contraste élevé",
       "contrastOff": "Contraste standard"
+    },
+    "insights": {
+      "nextUp": "Prochaine étape",
+      "results": "Dernier résultat",
+      "attendance": "Présence",
+      "assignment": "Prochaine tâche"
+    },
+    "data": {
+      "title": "Sources de données",
+      "description": "Les suggestions utilisent tes données de profil Falowen. Les calendriers ou horaires GitHub doivent d’abord être synchronisés dans l’app ou l’API."
     },
     "metrics": {
       "latestResult": "Dernier résultat",

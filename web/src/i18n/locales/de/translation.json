@@ -65,21 +65,39 @@
   "studyBuddy": {
     "ariaLabel": "Study Buddy",
     "title": "Study Buddy",
-    "subtitle": "Immer griffbereite Hinweise zu Ergebnissen, Anwesenheit und der nächsten Aufgabe.",
+    "subtitle": "Schnellzugriff auf Falowen A.I, Kalender und tägliche Aufgaben.",
     "tags": {
       "results": "Ergebnisse",
       "attendance": "Anwesenheit",
       "assignments": "Aufgaben",
       "quickQa": "Kurzfragen"
     },
+    "shortcuts": {
+      "ariaLabel": "Study Buddy Schnellzugriffe",
+      "course": "Kursbuch",
+      "submit": "Aufgabe senden",
+      "ai": "Falowen A.I",
+      "study": "Lernkalender",
+      "exams": "Prüfungsraum"
+    },
     "actions": {
-      "collapse": "Ausblenden",
-      "expand": "Einblenden",
+      "collapse": "Details ausblenden",
+      "expand": "Details anzeigen",
       "dismiss": "Leiste ausblenden",
       "reopen": "Study Buddy",
       "reopenAria": "Study Buddy-Leiste wieder öffnen",
       "contrastOn": "Hoher Kontrast",
       "contrastOff": "Standardkontrast"
+    },
+    "insights": {
+      "nextUp": "Als Nächstes",
+      "results": "Letztes Ergebnis",
+      "attendance": "Anwesenheit",
+      "assignment": "Nächste Aufgabe"
+    },
+    "data": {
+      "title": "Datenquellen",
+      "description": "Die Vorschläge basieren auf deinen Falowen-Profildaten. GitHub-Kalender oder Stundenpläne werden zuerst in die App oder API synchronisiert."
     },
     "metrics": {
       "latestResult": "Letztes Ergebnis",
