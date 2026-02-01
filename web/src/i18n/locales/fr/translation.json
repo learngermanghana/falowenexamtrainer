@@ -124,7 +124,9 @@
     "qa": {
       "title": "Poser une question rapide",
       "placeholder": "Ex. Que dois-je réviser pour le prochain cours ?",
-      "send": "Envoyer"
+      "send": "Envoyer",
+      "loading": "Réponse en cours...",
+      "error": "Désolé, Study Buddy ne peut pas répondre pour le moment. Réessaie plus tard."
     },
     "quickReply": {
       "keywords": {

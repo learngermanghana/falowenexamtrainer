@@ -124,7 +124,9 @@
     "qa": {
       "title": "Ask a quick question",
       "placeholder": "e.g. What should I revise for the next class?",
-      "send": "Send"
+      "send": "Send",
+      "loading": "Getting a reply...",
+      "error": "Sorry, the study buddy couldn't answer that right now. Please try again."
     },
     "quickReply": {
       "keywords": {
