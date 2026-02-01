@@ -517,6 +517,44 @@ app.post("/webhooks/zoom", async (req, res) => {
   }
 });
 
+const purgeStudentAccount = async (docSnap, db, counters) => {
+  const data = docSnap.data() || {};
+  const uid = data.uid;
+
+  if (uid) {
+    try {
+      await admin.auth().deleteUser(uid);
+      counters.authDeleted += 1;
+    } catch (err) {
+      if (err?.code === "auth/user-not-found") counters.authMissing += 1;
+      else console.warn("Auth delete failed", docSnap.id, err?.message || err);
+    }
+  }
+
+  try {
+    if (typeof db.recursiveDelete === "function") {
+      await db.recursiveDelete(docSnap.ref);
+    } else {
+      await docSnap.ref.delete(); // NOTE: doesn't delete subcollections
+    }
+    counters.deletedStudents += 1;
+    return true;
+  } catch (err) {
+    counters.firestoreFailed += 1;
+    console.warn("Firestore delete failed", docSnap.id, err?.message || err);
+
+    await docSnap.ref.set(
+      {
+        purgeStatus: "failed",
+        purgeError: String(err?.message || "unknown"),
+        purgeFailedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
+    return false;
+  }
+};
+
 app.post("/admin/purge-expired-students", async (req, res) => {
   try {
     const secret = req.headers["x-cron-secret"];
@@ -527,19 +565,28 @@ app.post("/admin/purge-expired-students", async (req, res) => {
     const db = getFirestoreSafe();
     if (!db) return res.status(500).json({ error: "Firestore not available" });
 
-    const nowIso = new Date().toISOString();
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const expiredCutoffIso = new Date(now.getTime() - 30 * MS_PER_DAY).toISOString();
+    const unpaidCutoffIso = new Date(now.getTime() - 7 * MS_PER_DAY).toISOString();
 
-    let deletedStudents = 0;
-    let authDeleted = 0;
-    let authMissing = 0;
-    let firestoreFailed = 0;
+    let deletedExpired = 0;
+    let deletedUnpaid = 0;
+
+    const counters = {
+      deletedStudents: 0,
+      authDeleted: 0,
+      authMissing: 0,
+      firestoreFailed: 0,
+    };
 
     while (true) {
       const snap = await db
         .collection("students")
         .where("role", "==", "student")
         .where("contractEnd", ">", "")
-        .where("contractEnd", "<", nowIso)
+        .where("contractEnd", "<", expiredCutoffIso)
         .where("purgeStatus", "!=", "failed") // ✅ skip docs that failed before
         .limit(25)
         .get();
@@ -547,52 +594,41 @@ app.post("/admin/purge-expired-students", async (req, res) => {
       if (snap.empty) break;
 
       for (const docSnap of snap.docs) {
-        const data = docSnap.data() || {};
-        const uid = data.uid;
+        const deleted = await purgeStudentAccount(docSnap, db, counters);
+        if (deleted) deletedExpired += 1;
+      }
+    }
 
-        // Delete Auth user (best effort)
-        if (uid) {
-          try {
-            await admin.auth().deleteUser(uid);
-            authDeleted += 1;
-          } catch (err) {
-            if (err?.code === "auth/user-not-found") authMissing += 1;
-            else console.warn("Auth delete failed", docSnap.id, err?.message || err);
-          }
-        }
+    while (true) {
+      const snap = await db
+        .collection("students")
+        .where("role", "==", "student")
+        .where("paymentStatus", "==", "pending")
+        .where("joined_at", ">", "")
+        .where("joined_at", "<", unpaidCutoffIso)
+        .where("purgeStatus", "!=", "failed")
+        .limit(25)
+        .get();
 
-        // Delete Firestore doc
-        try {
-          if (typeof db.recursiveDelete === "function") {
-            await db.recursiveDelete(docSnap.ref);
-          } else {
-            await docSnap.ref.delete(); // NOTE: doesn't delete subcollections
-          }
-          deletedStudents += 1;
-        } catch (err) {
-          firestoreFailed += 1;
-          console.warn("Firestore delete failed", docSnap.id, err?.message || err);
+      if (snap.empty) break;
 
-          // ✅ mark so we don't loop forever
-          await docSnap.ref.set(
-            {
-              purgeStatus: "failed",
-              purgeError: String(err?.message || "unknown"),
-              purgeFailedAt: admin.firestore.FieldValue.serverTimestamp(),
-            },
-            { merge: true }
-          );
-        }
+      for (const docSnap of snap.docs) {
+        const deleted = await purgeStudentAccount(docSnap, db, counters);
+        if (deleted) deletedUnpaid += 1;
       }
     }
 
     return res.json({
       ok: true,
-      deletedStudents,
-      authDeleted,
-      authMissing,
-      firestoreFailed,
+      deletedStudents: counters.deletedStudents,
+      deletedExpired,
+      deletedUnpaid,
+      authDeleted: counters.authDeleted,
+      authMissing: counters.authMissing,
+      firestoreFailed: counters.firestoreFailed,
       nowIso,
+      expiredCutoffIso,
+      unpaidCutoffIso,
     });
   } catch (err) {
     return res.status(500).json({ error: err?.message || "Unknown error" });
