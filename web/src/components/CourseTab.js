@@ -353,7 +353,17 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     {entry.instruction ? (
                       <div style={{ display: "grid", gap: 6 }}>
                         <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
-                        <p style={{ ...styles.helperText, margin: 0 }}>{entry.instruction}</p>
+                        <p style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-line" }}>
+                          {entry.instruction}
+                        </p>
+                        {entry.instructionLink ? (
+                          <a
+                            href={entry.instructionLink.to}
+                            style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
+                          >
+                            {entry.instructionLink.label}
+                          </a>
+                        ) : null}
                       </div>
                     ) : null}
 
