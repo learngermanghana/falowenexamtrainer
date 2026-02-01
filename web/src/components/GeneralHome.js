@@ -76,6 +76,7 @@ const GeneralHome = ({
   const classCalendarId = "class-calendar-card";
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
@@ -135,6 +136,19 @@ const GeneralHome = ({
       mounted = false;
     };
   }, [locale, studentProfile?.className, studentProfile?.program]);
+
+  useEffect(() => {
+    if (announcements.length <= 1) {
+      setAnnouncementIndex(0);
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      setAnnouncementIndex((current) => (current + 1) % announcements.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [announcements]);
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -202,35 +216,30 @@ const GeneralHome = ({
           </p>
         ) : null}
         {announcementStatus === "success" && announcements.length > 0 ? (
-          <div className="announcement-ticker" aria-label="Latest announcements">
-            <div className="announcement-ticker-track">
-              {(announcements.length > 1 ? [...announcements, ...announcements] : announcements).map(
-                (announcement, index) => {
-                  const bodyText = announcement.body ? ` — ${announcement.body}` : "";
-                  return (
-                    <span className="announcement-ticker-item" key={`${announcement.id}-${index}`}>
-                      <span className="announcement-ticker-title">
-                        {announcement.title}
-                        {bodyText}
-                      </span>
-                      {announcement.linkUrl ? (
-                        <a
-                          href={announcement.linkUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="announcement-ticker-link"
-                        >
-                          {announcement.linkLabel || "Read more"}
-                        </a>
-                      ) : null}
-                      <span className="announcement-ticker-divider" aria-hidden="true">
-                        •
-                      </span>
-                    </span>
-                  );
-                }
-              )}
+          <div className="announcement-slider" aria-label="Latest announcements" aria-live="polite">
+            <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
+              <span className="announcement-ticker-title">
+                {announcements[announcementIndex]?.title}
+                {announcements[announcementIndex]?.body
+                  ? ` — ${announcements[announcementIndex].body}`
+                  : ""}
+              </span>
+              {announcements[announcementIndex]?.linkUrl ? (
+                <a
+                  href={announcements[announcementIndex].linkUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="announcement-ticker-link"
+                >
+                  {announcements[announcementIndex].linkLabel || "Read more"}
+                </a>
+              ) : null}
             </div>
+            {announcements.length > 1 ? (
+              <div className="announcement-slide-count" aria-hidden="true">
+                {announcementIndex + 1} / {announcements.length}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </section>
