@@ -10,6 +10,7 @@ const StudentResultsPage = () => {
   const { idToken, studentProfile } = useAuth();
 
   const [results, setResults] = useState([]);
+  const [leaderboard, setLeaderboard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -36,6 +37,51 @@ const StudentResultsPage = () => {
 
   const norm = (v) => String(v || "").trim().toLowerCase();
 
+  const buildLeaderboard = (rows = []) => {
+    if (!rows.length || !studentCode) return null;
+
+    const levelFilter = studentLevel ? studentLevel : "";
+    const relevantRows = levelFilter
+      ? rows.filter(
+          (row) => String(row.level || "").trim().toUpperCase() === levelFilter
+        )
+      : rows;
+    const scoresByStudent = new Map();
+
+    relevantRows.forEach((row) => {
+      const code = norm(row.studentcode || row.studentCode);
+      const score = Number(row.score);
+      if (!code || !Number.isFinite(score)) return;
+      if (!scoresByStudent.has(code)) scoresByStudent.set(code, []);
+      scoresByStudent.get(code).push(score);
+    });
+
+    if (!scoresByStudent.size) return null;
+
+    const averages = Array.from(scoresByStudent.entries()).map(([code, scores]) => {
+      const avg =
+        Math.round((scores.reduce((sum, value) => sum + value, 0) / scores.length) * 10) /
+        10;
+      return { code, avg };
+    });
+
+    const studentEntry = averages.find((entry) => entry.code === norm(studentCode));
+    const totalStudents = averages.length;
+
+    if (!studentEntry) {
+      return { totalStudents, rank: null, average: null, level: levelFilter || "All levels" };
+    }
+
+    const higherCount = averages.filter((entry) => entry.avg > studentEntry.avg).length;
+
+    return {
+      totalStudents,
+      rank: higherCount + 1,
+      average: studentEntry.avg,
+      level: levelFilter || "All levels",
+    };
+  };
+
   useEffect(() => {
     let mounted = true;
 
@@ -45,7 +91,7 @@ const StudentResultsPage = () => {
       // Filter ONLY this student’s rows (privacy + correctness)
       const mine = all.filter((r) => norm(r.studentcode) === norm(studentCode));
 
-      return mine;
+      return { mine, all };
     };
 
     const loadFromApi = async () => {
@@ -63,6 +109,12 @@ const StudentResultsPage = () => {
       }));
     };
 
+    const loadLeaderboardFromResultsStore = async () => {
+      const response = await fetchResults({ level: studentLevel });
+      if (!Array.isArray(response?.results)) return [];
+      return response.results;
+    };
+
     const load = async () => {
       setLoading(true);
       setError("");
@@ -71,21 +123,27 @@ const StudentResultsPage = () => {
         if (!studentCode) {
           if (!mounted) return;
           setResults([]);
+          setLeaderboard(null);
           return;
         }
 
         if (useFirestoreResults) {
-          const rows = await loadFromResultsStore();
+          const [rows, leaderboardRows] = await Promise.all([
+            loadFromResultsStore(),
+            loadLeaderboardFromResultsStore(),
+          ]);
           if (!mounted) return;
           setResults(rows);
+          setLeaderboard(buildLeaderboard(leaderboardRows));
           return;
         }
 
         // Prefer sheet for A1/A2/B1 if configured
         if (useSheetResults && SHEET_CSV_URL) {
-          const rows = await loadFromSheet();
+          const { mine, all } = await loadFromSheet();
           if (!mounted) return;
-          setResults(rows);
+          setResults(mine);
+          setLeaderboard(buildLeaderboard(all));
           return;
         }
 
@@ -94,16 +152,19 @@ const StudentResultsPage = () => {
           const rows = await loadFromApi();
           if (!mounted) return;
           setResults(rows);
+          setLeaderboard(null);
           return;
         }
 
         // Not enough info to load
         if (!mounted) return;
         setResults([]);
+        setLeaderboard(null);
       } catch (e) {
         if (!mounted) return;
         setError(e?.message || "Failed to load results.");
         setResults([]);
+        setLeaderboard(null);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -175,6 +236,26 @@ const StudentResultsPage = () => {
             Assignments completed · A1 {assignmentProgress.a1Completed}/{TOTAL_ASSIGNMENTS.A1} · A2-B2{" "}
             {assignmentProgress.a2b2Completed}/{TOTAL_ASSIGNMENTS.A2_B2}
           </p>
+        ) : null}
+
+        {!loading && !error ? (
+          <>
+            <p style={{ ...styles.helperText, marginTop: 12 }}>
+              <strong>Leaderboard position:</strong>{" "}
+              {leaderboard?.rank
+                ? `${leaderboard.rank} of ${leaderboard.totalStudents} (${leaderboard.level})`
+                : leaderboard
+                ? `Not ranked yet (${leaderboard.level})`
+                : "Not available yet"}
+            </p>
+            <p style={{ ...styles.helperText, marginTop: 4 }}>
+              {leaderboard
+                ? `This compares your average score${
+                    leaderboard.average !== null ? ` (${leaderboard.average})` : ""
+                  } with ${leaderboard.totalStudents} students. We average all recorded scores per student, then order from highest to lowest. Students with the same average share a rank.`
+                : "We’ll show your leaderboard position once we have enough class scores to compare."}
+            </p>
+          </>
         ) : null}
 
         {error ? <div style={styles.errorBox}>{error}</div> : null}
