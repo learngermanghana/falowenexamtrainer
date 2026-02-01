@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import ResultHistory from "./ResultHistory";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { fetchResults } from "../services/resultsService";
+
+const norm = (v) => String(v || "").trim().toLowerCase();
 
 const StudentResultsPage = () => {
   const { idToken, studentProfile } = useAuth();
@@ -35,9 +37,7 @@ const StudentResultsPage = () => {
   // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/<sheetId>/edit
   const SHEET_CSV_URL = process.env.REACT_APP_RESULTS_SHEET_CSV_URL || "";
 
-  const norm = (v) => String(v || "").trim().toLowerCase();
-
-  const buildLeaderboard = (rows = []) => {
+  const buildLeaderboard = useCallback((rows = []) => {
     if (!rows.length || !studentCode) return null;
 
     const levelFilter = studentLevel ? studentLevel : "";
@@ -80,7 +80,7 @@ const StudentResultsPage = () => {
       average: studentEntry.avg,
       level: levelFilter || "All levels",
     };
-  };
+  }, [studentCode, studentLevel]);
 
   useEffect(() => {
     let mounted = true;
@@ -182,6 +182,7 @@ const StudentResultsPage = () => {
     useSheetResults,
     SHEET_CSV_URL,
     studentProfile?.email,
+    buildLeaderboard,
   ]);
 
   const summary = useMemo(() => {
