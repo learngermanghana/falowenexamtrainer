@@ -164,27 +164,33 @@ const fetchClassMessagingTokens = async ({ level, className, excludeCodes = new 
 
 const fetchAnnouncementTokens = async ({ className, program } = {}) => {
   const db = getFirestore();
-  let queryRef = db.collection("students");
+  const baseRef = db.collection("students");
+  const programFields = program ? ["program", "language", "lang"] : [null];
+  const snapshots = await Promise.all(
+    programFields.map((field) => {
+      let queryRef = baseRef;
+      if (className) {
+        queryRef = queryRef.where("className", "==", className);
+      }
+      if (program && field) {
+        queryRef = queryRef.where(field, "==", program);
+      }
+      return queryRef.get();
+    })
+  );
 
-  if (className) {
-    queryRef = queryRef.where("className", "==", className);
-  }
-
-  if (program) {
-    queryRef = queryRef.where("program", "==", program);
-  }
-
-  const snapshot = await queryRef.get();
   const tokens = new Set();
   const tokenOwners = new Map();
 
-  snapshot.forEach((docSnap) => {
-    const data = docSnap.data() || {};
-    const docTokens = getTokensFromStudentData(data);
-    docTokens.forEach((token) => {
-      if (!token) return;
-      tokens.add(token);
-      tokenOwners.set(token, docSnap.id);
+  snapshots.forEach((snapshot) => {
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data() || {};
+      const docTokens = getTokensFromStudentData(data);
+      docTokens.forEach((token) => {
+        if (!token) return;
+        tokens.add(token);
+        tokenOwners.set(token, docSnap.id);
+      });
     });
   });
 
