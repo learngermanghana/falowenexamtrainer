@@ -574,6 +574,23 @@ export const styles = {
     fontSize: 12,
     border: "1px solid #c7d2fe",
   },
+  tagRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  tagPill: {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "4px 10px",
+    borderRadius: 999,
+    border: "1px solid #e2e8f0",
+    background: "#f8fafc",
+    fontSize: 11,
+    fontWeight: 700,
+    color: "#475569",
+    textTransform: "capitalize",
+  },
   metaRow: {
     display: "flex",
     alignItems: "center",

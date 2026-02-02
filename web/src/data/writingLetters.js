@@ -3,6 +3,7 @@ export const writingLetters = [
     id: "a1-apartment-note",
     letter: "A1: Notiz an die Mitbewohnerin",
     level: "A1",
+    tags: ["note", "household"],
     durationMinutes: 15,
     situation: "Du musst früher zur Arbeit und hinterlässt eine kurze Nachricht für deine Mitbewohnerin.",
     whatToInclude: [
@@ -13,9 +14,24 @@ export const writingLetters = [
     ],
   },
   {
+    id: "a1-birthday-invite",
+    letter: "A1: Einladung zum Geburtstag",
+    level: "A1",
+    tags: ["birthday", "invitation"],
+    durationMinutes: 15,
+    situation: "Du lädst eine Freundin oder einen Freund zu deinem Geburtstag ein.",
+    whatToInclude: [
+      "Wann und wo die Feier ist",
+      "Was ihr machen wollt",
+      "Bitte um Antwort",
+      "Freundlicher Abschluss",
+    ],
+  },
+  {
     id: "a2-library-email",
     letter: "A2: E-Mail an die Bibliothek",
     level: "A2",
+    tags: ["reservation", "request"],
     durationMinutes: 20,
     situation: "Du möchtest ein deutsches Buch verlängern und fragst nach Kursmaterialien.",
     whatToInclude: [
@@ -29,6 +45,7 @@ export const writingLetters = [
     id: "a2-course-feedback",
     letter: "A2: Rückmeldung zum Sprachkurs",
     level: "A2",
+    tags: ["feedback", "course"],
     durationMinutes: 20,
     situation: "Du schreibst deiner Sprachschule, was dir hilft und was dir noch schwer fällt.",
     whatToInclude: [
@@ -42,6 +59,7 @@ export const writingLetters = [
     id: "b1-job-application",
     letter: "B1: Bewerbung auf einen Minijob",
     level: "B1",
+    tags: ["application", "job"],
     durationMinutes: 20,
     situation: "Du bewirbst dich für einen Minijob im Café deiner Stadt.",
     whatToInclude: [
@@ -55,6 +73,7 @@ export const writingLetters = [
     id: "b1-complaint-delivery",
     letter: "B1: Beschwerde an einen Lieferdienst",
     level: "B1",
+    tags: ["complaint", "service"],
     durationMinutes: 20,
     situation: "Die letzte Lieferung kam zu spät und war unvollständig.",
     whatToInclude: [
@@ -68,6 +87,7 @@ export const writingLetters = [
     id: "b2-opinion-digital",
     letter: "B2: Meinung zum digitalen Lernen",
     level: "B2",
+    tags: ["opinion", "article"],
     durationMinutes: 20,
     situation: "Ein Magazin bittet dich um einen kurzen Artikel über digitales Lernen.",
     whatToInclude: [
@@ -81,6 +101,7 @@ export const writingLetters = [
     id: "b2-formal-request",
     letter: "B2: Anfrage an das Rathaus",
     level: "B2",
+    tags: ["appointment", "formal request"],
     durationMinutes: 20,
     situation: "Du planst ein Nachbarschaftsprojekt und bittest die Stadt um Unterstützung.",
     whatToInclude: [
