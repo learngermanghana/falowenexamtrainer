@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
@@ -14,6 +15,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) });
   const { level, setLevel, error, setError, loading, setLoading, resultHistory, addResultToHistory } = useExam();
   const { user, idToken, studentProfile } = useAuth();
+  const location = useLocation();
 
   const isExamMode = mode === "exams";
   const isFrenchProgram = studentProfile?.program === "french";
@@ -43,7 +45,13 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     [isExamMode, isFrenchProgram]
   );
 
-  const [activeTab, setActiveTab] = useState(() => availableTabs[0].key);
+  const requestedTab = useMemo(() => new URLSearchParams(location.search).get("tab"), [location.search]);
+  const [activeTab, setActiveTab] = useState(() => {
+    if (requestedTab && availableTabs.some((tab) => tab.key === requestedTab)) {
+      return requestedTab;
+    }
+    return availableTabs[0].key;
+  });
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
@@ -91,6 +99,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       setIdeaSuccess("");
     }
   }, [activeTab, availableTabs, setError, setIdeaError]);
+
+  useEffect(() => {
+    if (requestedTab && availableTabs.some((tab) => tab.key === requestedTab)) {
+      setActiveTab(requestedTab);
+    }
+  }, [availableTabs, requestedTab]);
 
   useEffect(() => {
     setChatMessages([ideaCoachIntro]);

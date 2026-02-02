@@ -660,6 +660,14 @@
     "backToCourse": "Retour au cours",
     "title": "Introduction à la rédaction de lettres 12.3",
     "subtitle": "Utilisez ce guide pour structurer vos lettres formelles et informelles avant de remettre votre devoir.",
+    "languageNote": "Les exemples sont en allemand ; les consignes sont en anglais.",
+    "toc": {
+      "label": "Aller à :",
+      "formal": "Structure formelle",
+      "informal": "Structure informelle",
+      "informalAssignment": "Devoir informel",
+      "formalAssignment": "Devoir formel"
+    },
     "formalTitle": "Structure de la lettre formelle",
     "formal": {
       "salutations": [
@@ -691,6 +699,27 @@
       "mainBody": "<strong>Corps de la lettre :</strong> Utilisez les conjonctions <em>Ich möchte wissen, ob</em>, <em>deshalb</em> et <em>weil</em>. Gardez les phrases claires et bien structurées.",
       "conclusion": "<strong>Conclusion :</strong> Ich freue mich im Voraus auf deine Antwort. (Ne pas modifier.) Liebe Grüße ou Viele Grüße. <strong>[Votre prénom]</strong>."
     },
+    "annotatedSamplesTitle": "Lettres exemples annotées",
+    "annotatedSamples": {
+      "formal": {
+        "title": "Exemple formel",
+        "items": [
+          { "label": "Salutation", "text": "Sehr geehrte Frau Müller," },
+          { "label": "Raison", "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte." },
+          { "label": "Demande", "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?" },
+          { "label": "Conclusion", "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber" }
+        ]
+      },
+      "informal": {
+        "title": "Exemple informel",
+        "items": [
+          { "label": "Salutation", "text": "Hallo Tom," },
+          { "label": "Raison", "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte." },
+          { "label": "Détails", "text": "Die Feier ist am Samstag um 18 Uhr bei mir." },
+          { "label": "Conclusion", "text": "Liebe Grüße, Sara" }
+        ]
+      }
+    },
     "informalAssignmentTitle": "Devoir : lettre informelle (recueil de questions pour lettre d’anniversaire)",
     "informalAssignment": {
       "intro": "Écris une lettre à ton ami(e) qui a un anniversaire. Suis ces étapes :",
@@ -716,6 +745,10 @@
       ],
       "sampleQuestion": "<strong>Question exemple :</strong> Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule: • Warum schreiben Sie? • Bitten Sie um Informationen über Kurse. • Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
       "afterWriting": "Après avoir écrit : utilise la même procédure (Schreiben Trainer → Ideas Generator → soumettre comme d’habitude)."
+    },
+    "cta": {
+      "startWriting": "Commencer à écrire",
+      "openIdeas": "Ouvrir l’Ideas Generator"
     }
   },
   "examFile": {

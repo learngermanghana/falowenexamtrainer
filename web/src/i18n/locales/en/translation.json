@@ -660,6 +660,14 @@
     "backToCourse": "Back to course",
     "title": "Introduction to letter writing 12.3",
     "subtitle": "Use this guide to structure your formal and informal letters before submitting your assignment.",
+    "languageNote": "Examples are in German; instructions are in English.",
+    "toc": {
+      "label": "Jump to:",
+      "formal": "Formal structure",
+      "informal": "Informal structure",
+      "informalAssignment": "Informal assignment",
+      "formalAssignment": "Formal assignment"
+    },
     "formalTitle": "Formal letter structure",
     "formal": {
       "salutations": [
@@ -691,6 +699,27 @@
       "mainBody": "<strong>Main body:</strong> Use the conjunctions <em>Ich möchte wissen, ob</em>, <em>deshalb</em>, and <em>weil</em>. Keep sentences clear and well-structured.",
       "conclusion": "<strong>Conclusion:</strong> Ich freue mich im Voraus auf deine Antwort. (Do not change.) Liebe Grüße or Viele Grüße. <strong>[Your First Name]</strong>."
     },
+    "annotatedSamplesTitle": "Annotated sample letters",
+    "annotatedSamples": {
+      "formal": {
+        "title": "Formal sample letter",
+        "items": [
+          { "label": "Greeting", "text": "Sehr geehrte Frau Müller," },
+          { "label": "Reason", "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte." },
+          { "label": "Request", "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?" },
+          { "label": "Closing", "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber" }
+        ]
+      },
+      "informal": {
+        "title": "Informal sample letter",
+        "items": [
+          { "label": "Greeting", "text": "Hallo Tom," },
+          { "label": "Reason", "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte." },
+          { "label": "Details", "text": "Die Feier ist am Samstag um 18 Uhr bei mir." },
+          { "label": "Closing", "text": "Liebe Grüße, Sara" }
+        ]
+      }
+    },
     "informalAssignmentTitle": "Assignment: informal letter (birthday letter question book)",
     "informalAssignment": {
       "intro": "Write a letter to your friend who has a birthday. Follow these steps:",
@@ -716,6 +745,10 @@
       ],
       "sampleQuestion": "<strong>Sample question:</strong> Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule: • Warum schreiben Sie? • Bitten Sie um Informationen über Kurse. • Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
       "afterWriting": "After writing: Use the same procedure (Schreiben Trainer → Ideas Generator → submit as usual)."
+    },
+    "cta": {
+      "startWriting": "Start Writing",
+      "openIdeas": "Open Ideas Generator"
     }
   },
   "examFile": {
