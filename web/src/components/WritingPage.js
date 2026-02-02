@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import ResultHistory from "./ResultHistory";
@@ -21,6 +21,14 @@ const IDEA_COACH_INTRO = {
   role: "assistant",
   content:
     "This is a chat between you and the ideas generator. Paste your exam question or draft idea, and I'll guide you step by step with Herr Felix's coaching prompts.",
+};
+
+const WORD_TARGETS = {
+  A1: "30–50 words",
+  A2: "50–80 words",
+  B1: "80–120 words",
+  B2: "120–180 words",
+  C1: "180–220 words",
 };
 
 const mapExamPromptsToLetters = (prompts) =>
@@ -110,6 +118,8 @@ const WritingPage = ({ mode = "course" }) => {
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
   const progressMode = isExamMode ? "exam" : "course";
+  const activeTargetLevel = selectedLetter?.level || level;
+  const wordTarget = WORD_TARGETS[activeTargetLevel];
 
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
@@ -117,53 +127,42 @@ const WritingPage = ({ mode = "course" }) => {
     }
   }, [isLevelLocked, level, profileLevel, setLevel]);
 
-  useEffect(() => {
-    let isMounted = true;
+  const loadWritingTasks = useCallback(async () => {
+    setWritingTasksLoading(true);
+    setWritingTasksError("");
+    try {
+      const tasks = await fetchWritingLetters(undefined, idToken);
 
+      if (tasks.length > 0) {
+        setWritingTasks(tasks);
+        setWritingTasksError("");
+      } else {
+        setWritingTasks(courseWritingLetters);
+        setWritingTasksError(
+          "No writing tasks found in the sheet – showing sample prompts instead."
+        );
+      }
+    } catch (err) {
+      console.error("Failed to load writing tasks", err);
+      setWritingTasks(courseWritingLetters);
+      setWritingTasksError(
+        "Could not load writing tasks. Showing local example data."
+      );
+    } finally {
+      setWritingTasksLoading(false);
+    }
+  }, [idToken]);
+
+  useEffect(() => {
     if (isExamMode) {
       setWritingTasks(examWritingLetters);
       setWritingTasksError("");
       setWritingTasksLoading(false);
-      return () => {
-        isMounted = false;
-      };
+      return;
     }
 
-    const loadWritingTasks = async () => {
-      setWritingTasksLoading(true);
-      try {
-        const tasks = await fetchWritingLetters(undefined, idToken);
-
-        if (!isMounted) return;
-
-        if (tasks.length > 0) {
-          setWritingTasks(tasks);
-          setWritingTasksError("");
-        } else {
-          setWritingTasks(courseWritingLetters);
-          setWritingTasksError(
-            "No writing tasks found in the sheet – showing sample prompts instead."
-          );
-        }
-      } catch (err) {
-        console.error("Failed to load writing tasks", err);
-        if (!isMounted) return;
-
-        setWritingTasks(courseWritingLetters);
-        setWritingTasksError(
-          "Could not load writing tasks. Showing local example data."
-        );
-      } finally {
-        if (isMounted) setWritingTasksLoading(false);
-      }
-    };
-
     loadWritingTasks();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [examWritingLetters, idToken, isExamMode]);
+  }, [examWritingLetters, isExamMode, loadWritingTasks]);
 
   useEffect(() => {
     if (!visibleWritingTasks.length) return;
@@ -203,10 +202,14 @@ const WritingPage = ({ mode = "course" }) => {
 
     const resetProgressState = () => {
       setTypedAnswer("");
+      setPracticeDraft("");
       setMarkFeedback("");
       setIdeaInput("");
       setChatMessages([IDEA_COACH_INTRO]);
       setSelectedDraftIds([]);
+      setIdeaSuccess("");
+      setRemainingSeconds((selectedLetter?.durationMinutes || 0) * 60);
+      setTimerRunning(false);
     };
 
     const loadProgress = async () => {
@@ -227,6 +230,7 @@ const WritingPage = ({ mode = "course" }) => {
         }
 
         if (typeof saved.typedAnswer === "string") setTypedAnswer(saved.typedAnswer);
+        if (typeof saved.practiceDraft === "string") setPracticeDraft(saved.practiceDraft);
         if (typeof saved.markFeedback === "string") setMarkFeedback(saved.markFeedback);
         if (typeof saved.ideaInput === "string") setIdeaInput(saved.ideaInput);
         if (Array.isArray(saved.chatMessages) && saved.chatMessages.length > 0) {
@@ -238,6 +242,12 @@ const WritingPage = ({ mode = "course" }) => {
           setSelectedDraftIds(saved.selectedDraftIds);
         } else {
           setSelectedDraftIds([]);
+        }
+        if (typeof saved.remainingSeconds === "number") {
+          setRemainingSeconds(saved.remainingSeconds);
+        }
+        if (typeof saved.timerRunning === "boolean") {
+          setTimerRunning(saved.timerRunning);
         }
       } catch (err) {
         console.error("Failed to load writing progress", err);
@@ -263,10 +273,13 @@ const WritingPage = ({ mode = "course" }) => {
         mode: progressMode,
         data: {
           typedAnswer,
+          practiceDraft,
           markFeedback,
           ideaInput,
           chatMessages,
           selectedDraftIds,
+          remainingSeconds,
+          timerRunning,
         },
       }).catch((err) => {
         console.error("Failed to save writing progress", err);
@@ -278,13 +291,22 @@ const WritingPage = ({ mode = "course" }) => {
     chatMessages,
     ideaInput,
     markFeedback,
+    practiceDraft,
     progressLoaded,
     progressMode,
+    remainingSeconds,
     selectedDraftIds,
+    timerRunning,
     typedAnswer,
     userId,
     studentCode,
   ]);
+
+  const countWords = (value) => {
+    const trimmed = value.trim();
+    if (!trimmed) return 0;
+    return trimmed.split(/\s+/).length;
+  };
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
@@ -419,6 +441,24 @@ const WritingPage = ({ mode = "course" }) => {
     setActiveTab("mark");
   };
 
+  const sendPracticeDraftToMarkTab = () => {
+    const trimmed = practiceDraft.trim();
+
+    if (!trimmed) {
+      alert("Please write your practice draft before sending it to be marked.");
+      return;
+    }
+
+    setTypedAnswer((prev) => {
+      const existing = prev.trim();
+      const parts = [existing, trimmed].filter(Boolean);
+      return parts.join("\n\n");
+    });
+    setError("");
+    setMarkFeedback("");
+    setActiveTab("mark");
+  };
+
   const handleAskCoach = async () => {
     const trimmed = ideaInput.trim();
     if (!trimmed || ideasLoading) return;
@@ -498,7 +538,7 @@ const WritingPage = ({ mode = "course" }) => {
         <p style={styles.helperText}>
           Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help.
         </p>
-        <div style={styles.tabList} className="tab-list">
+        <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
           {[
             { key: "practice", label: "Practice letters" },
             { key: "mark", label: "Mark my letter" },
@@ -508,6 +548,8 @@ const WritingPage = ({ mode = "course" }) => {
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
               className="tab-button"
+              role="tab"
+              aria-selected={activeTab === tab.key}
               style={
                 activeTab === tab.key ? styles.tabButtonActive : styles.tabButton
               }
@@ -544,15 +586,35 @@ const WritingPage = ({ mode = "course" }) => {
                 onChange={(e) => setPracticeDraft(e.target.value)}
                 rows={7}
               />
+              <p style={styles.helperText}>
+                Words: {countWords(practiceDraft)} · Characters: {practiceDraft.length}
+                {wordTarget ? ` · Target: ${wordTarget}` : ""}
+              </p>
+              <div style={{ marginTop: 10 }}>
+                <button
+                  style={styles.secondaryButton}
+                  onClick={sendPracticeDraftToMarkTab}
+                  disabled={!practiceDraft.trim()}
+                >
+                  Send practice draft to “Mark my letter”
+                </button>
+              </div>
             </div>
           </section>
 
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Letters from the practice set</h3>
             {writingTasksError && (
-              <p style={{ ...styles.helperText, color: "#b91c1c" }}>
-                {writingTasksError}
-              </p>
+              <div style={{ ...styles.helperText, color: "#b91c1c" }}>
+                <p style={{ marginBottom: 8 }}>{writingTasksError}</p>
+                <button
+                  style={styles.secondaryButton}
+                  onClick={loadWritingTasks}
+                  disabled={writingTasksLoading}
+                >
+                  {writingTasksLoading ? "Retrying..." : "Retry load"}
+                </button>
+              </div>
             )}
             {writingTasksLoading ? (
               <p style={styles.helperText}>Loading writing tasks from the sheet ...</p>
@@ -646,6 +708,10 @@ const WritingPage = ({ mode = "course" }) => {
               style={styles.textArea}
               rows={9}
             />
+            <p style={styles.helperText}>
+              Words: {countWords(typedAnswer)} · Characters: {typedAnswer.length}
+              {WORD_TARGETS[level] ? ` · Target: ${WORD_TARGETS[level]}` : ""}
+            </p>
 
             <div style={{ marginTop: 12 }}>
               <button
@@ -730,6 +796,8 @@ const WritingPage = ({ mode = "course" }) => {
                 setChatMessages([IDEA_COACH_INTRO]);
                 setIdeaError("");
                 setIdeaInput("");
+                setSelectedDraftIds([]);
+                setIdeaSuccess("");
               }}
             >
               Reset chat
