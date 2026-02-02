@@ -792,7 +792,7 @@ export const courseSchedules = {
       goal: "Practice how to write both formal and informal letters",
       assignment: true,
       instruction:
-        "Video ansehen. Open the Letter Writing guide to follow the full structure, examples, and assignment steps.",
+        "Before writing, go to campus, Falowen A.I-Writng practice, ideas generator https://www.falowen.app/campus/writing. Open the Letter Writing guide to follow the full structure, examples, and assignment steps.",
       instructionLink: {
         label: "Assignment link: Open the Letter Writing 12.3 guide",
         to: "/campus/course/letter-writing-12-3",
