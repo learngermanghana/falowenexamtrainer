@@ -18,7 +18,6 @@ export const logStudyBuddyUsage = async ({
   className,
   userId,
   questionLength,
-  question,
 }) => {
   if (!event || !isFirebaseConfigured || !db) return null;
 
@@ -29,7 +28,6 @@ export const logStudyBuddyUsage = async ({
     className: className || null,
     userId: userId || null,
     questionLength: Number.isFinite(questionLength) ? questionLength : null,
-    question: question || null,
     createdAt: serverTimestamp(),
   };
 

@@ -76,6 +76,8 @@ const GeneralHome = ({
   const classCalendarId = "class-calendar-card";
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [expandedAnnouncements, setExpandedAnnouncements] = useState(() => new Set());
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
@@ -135,6 +137,31 @@ const GeneralHome = ({
       mounted = false;
     };
   }, [locale, studentProfile?.className, studentProfile?.program]);
+
+  useEffect(() => {
+    if (announcements.length <= 1) {
+      setAnnouncementIndex(0);
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      setAnnouncementIndex((current) => (current + 1) % announcements.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [announcements]);
+
+  const toggleAnnouncementExpansion = useCallback((announcementId) => {
+    setExpandedAnnouncements((prev) => {
+      const next = new Set(prev);
+      if (next.has(announcementId)) {
+        next.delete(announcementId);
+      } else {
+        next.add(announcementId);
+      }
+      return next;
+    });
+  }, []);
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -201,53 +228,55 @@ const GeneralHome = ({
             No announcements yet. Check back later for new updates.
           </p>
         ) : null}
-        <div style={{ display: "grid", gap: 12 }}>
-          {announcements.map((announcement) => {
-            const labels = [];
-            if (announcement.className) {
-              labels.push(`Class ${announcement.className}`);
-            }
-            if (announcement.language && announcement.language !== "all") {
-              labels.push(`Language: ${announcement.language}`);
-            }
+        {announcementStatus === "success" && announcements.length > 0 ? (
+          <div className="announcement-slider" aria-label="Latest announcements" aria-live="polite">
+            <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
+              {(() => {
+                const announcement = announcements[announcementIndex] || {};
+                const announcementId = announcement.id || `announcement-${announcementIndex}`;
+                const body = (announcement.body || "").trim();
+                const maxPreviewLength = 140;
+                const isLong = body.length > maxPreviewLength;
+                const isExpanded = expandedAnnouncements.has(announcementId);
+                const visibleBody =
+                  isExpanded || !isLong ? body : `${body.slice(0, maxPreviewLength).trim()}…`;
 
-            return (
-              <article
-                key={announcement.id}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 12,
-                  background: "#f8fafc",
-                  display: "grid",
-                  gap: 8,
-                }}
-              >
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {labels.map((label) => (
-                    <PillBadge key={label}>{label}</PillBadge>
-                  ))}
-                </div>
-                <div style={{ fontWeight: 700, fontSize: 16 }}>{announcement.title}</div>
-                {announcement.body ? (
-                  <p style={{ ...styles.helperText, margin: 0 }}>{announcement.body}</p>
-                ) : null}
-                {announcement.linkUrl ? (
-                  <PrimaryActionBar align="start">
-                    <a
-                      href={announcement.linkUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{ ...styles.secondaryButton, textDecoration: "none" }}
-                    >
-                      {announcement.linkLabel || "Read more"}
-                    </a>
-                  </PrimaryActionBar>
-                ) : null}
-              </article>
-            );
-          })}
-        </div>
+                return (
+                  <>
+                    <div className="announcement-message">
+                      <span className="announcement-ticker-title">{announcement.title}</span>
+                      {body ? <span className="announcement-ticker-body">— {visibleBody}</span> : null}
+                      {isLong ? (
+                        <button
+                          type="button"
+                          className="announcement-read-more"
+                          onClick={() => toggleAnnouncementExpansion(announcementId)}
+                        >
+                          {isExpanded ? "Show less" : "Read more"}
+                        </button>
+                      ) : null}
+                    </div>
+                    {announcement.linkUrl ? (
+                      <a
+                        href={announcement.linkUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="announcement-ticker-link"
+                      >
+                        {announcement.linkLabel || "Open update"}
+                      </a>
+                    ) : null}
+                  </>
+                );
+              })()}
+            </div>
+            {announcements.length > 1 ? (
+              <div className="announcement-slide-count" aria-hidden="true">
+                {announcementIndex + 1} / {announcements.length}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       <section style={styles.card}>

@@ -246,7 +246,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
           className,
           userId: user?.uid || null,
           questionLength: trimmed.length,
-          question: trimmed,
         });
         const response = await requestStudyBuddyReply({
           message: trimmed,
