@@ -313,19 +313,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
     }
   }, [isHighContrast]);
 
-  useEffect(() => {
-    if (isDismissed) return;
-    logStudyBuddyUsage({
-      event: "opened",
-      studentCode,
-      studentEmail,
-      className,
-      userId: user?.uid || null,
-    }).catch((error) => {
-      console.warn("Failed to log Study Buddy open", error);
-    });
-  }, [className, isDismissed, studentCode, studentEmail, user?.uid]);
-
   if (isDismissed) {
     return (
       <button
