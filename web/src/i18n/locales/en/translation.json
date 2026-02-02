@@ -666,7 +666,8 @@
       "formal": "Formal structure",
       "informal": "Informal structure",
       "informalAssignment": "Informal assignment",
-      "formalAssignment": "Formal assignment"
+      "formalAssignment": "Formal assignment",
+      "additionalTips": "Additional tips"
     },
     "formalTitle": "Formal letter structure",
     "formal": {
@@ -700,6 +701,54 @@
       "conclusion": "<strong>Conclusion:</strong> Ich freue mich im Voraus auf deine Antwort. (Do not change.) Liebe Grüße or Viele Grüße. <strong>[Your First Name]</strong>."
     },
     "annotatedSamplesTitle": "Annotated sample letters",
+    "additionalTipsTitle": "Additional tips for future letters",
+    "additionalTips": {
+      "items": [
+        {
+          "title": "Cancel appointment intro",
+          "lines": [
+            "Ich schreibe Ihnen, weil",
+            "ich den Termin absagen möchte."
+          ]
+        },
+        {
+          "title": "Enquiry letter intro",
+          "lines": [
+            "Ich schreibe Ihnen, weil",
+            "ich eine Anfrage stellen möchte."
+          ]
+        },
+        {
+          "title": "Ask about price in body",
+          "lines": [
+            "Wie viel kostet das?",
+            "Wie soll ich bezahlen?",
+            "Mit Kreditkarte oder bar?"
+          ]
+        },
+        {
+          "title": "Ask for more information",
+          "lines": [
+            "Könnten Sie mir bitte",
+            "Informationen über [Thema] geben?"
+          ]
+        },
+        {
+          "title": "Give a reason to cancel",
+          "lines": [
+            "Ich bin krank.",
+            "Es regnet.",
+            "Ich habe Fieber."
+          ]
+        },
+        {
+          "title": "Line length reminder",
+          "lines": [
+            "Max 6 words per line."
+          ]
+        }
+      ]
+    },
     "annotatedSamples": {
       "formal": {
         "title": "Formal sample letter",

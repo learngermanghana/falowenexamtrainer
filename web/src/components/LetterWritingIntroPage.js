@@ -87,6 +87,7 @@ const LetterWritingIntroPage = () => {
   const formalSteps = t("letterWritingIntro.formalAssignment.steps", { returnObjects: true });
   const formalSample = t("letterWritingIntro.annotatedSamples.formal.items", { returnObjects: true });
   const informalSample = t("letterWritingIntro.annotatedSamples.informal.items", { returnObjects: true });
+  const additionalTips = t("letterWritingIntro.additionalTips.items", { returnObjects: true });
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -112,6 +113,9 @@ const LetterWritingIntroPage = () => {
           </a>
           <a href="#formal-assignment" style={{ fontSize: 13, color: "#2563eb", fontWeight: 600 }}>
             {t("letterWritingIntro.toc.formalAssignment")}
+          </a>
+          <a href="#additional-tips" style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600 }}>
+            {t("letterWritingIntro.toc.additionalTips")}
           </a>
         </nav>
       </div>
@@ -172,6 +176,26 @@ const LetterWritingIntroPage = () => {
           accentColor="#6ee7b7"
           accentBackground="#ecfdf3"
         />
+      </Section>
+
+      <Section
+        id="additional-tips"
+        title={t("letterWritingIntro.additionalTipsTitle")}
+        accentColor="#7c3aed"
+        accentBackground="#f5f3ff"
+      >
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 12 }}>
+          {additionalTips.map((tip) => (
+            <li key={tip.title} style={{ display: "grid", gap: 6 }}>
+              <strong>{tip.title}</strong>
+              <div style={{ display: "grid", gap: 4 }}>
+                {tip.lines.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </div>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section
