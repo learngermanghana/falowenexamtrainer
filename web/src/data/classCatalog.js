@@ -45,6 +45,16 @@ export const classCatalog = {
     ],
     docUrl: "https://drive.google.com/file/d/1YaML32aP8L0Uk_-fu2HEW1b0Qo4CceDg/view?usp=sharing",
   },
+  "A1 Dortmund Klasse": {
+    startDate: "2026-03-02",
+    endDate: "2026-04-27",
+    schedule: [
+      { day: "Monday", startTime: "18:00", endTime: "19:00" },
+      { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
+      { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
+    ],
+    docUrl: "https://drive.google.com/file/d/18m_ljkX6Z1uu0jY-ZxZE_w_-kkcB_v-Y/view?usp=sharing",
+  },
   "A2 Bonn Klasse": {
     startDate: "2025-11-25",
     endDate: "2026-02-11",
