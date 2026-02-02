@@ -670,7 +670,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={styles.select}
             required
           >
-            <option value="">Decide later (we'll ask again after signup)</option>
             {classOptions.map((classOption) => (
               <option key={classOption.value} value={classOption.value}>
                 {classOption.label}
