@@ -29,11 +29,10 @@ const BulletList = ({ items }) => (
 
 const Checklist = ({ items }) => {
   const [checkedItems, setCheckedItems] = useState(() => items.map(() => false));
-  const itemsKey = items.join("|");
 
   useEffect(() => {
     setCheckedItems(items.map(() => false));
-  }, [itemsKey]);
+  }, [items]);
 
   return (
     <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
