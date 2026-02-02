@@ -77,6 +77,7 @@ const GeneralHome = ({
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
   const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const [expandedAnnouncements, setExpandedAnnouncements] = useState(() => new Set());
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
@@ -150,6 +151,18 @@ const GeneralHome = ({
     return () => clearInterval(interval);
   }, [announcements]);
 
+  const toggleAnnouncementExpansion = useCallback((announcementId) => {
+    setExpandedAnnouncements((prev) => {
+      const next = new Set(prev);
+      if (next.has(announcementId)) {
+        next.delete(announcementId);
+      } else {
+        next.add(announcementId);
+      }
+      return next;
+    });
+  }, []);
+
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <WelcomeHero
@@ -218,22 +231,44 @@ const GeneralHome = ({
         {announcementStatus === "success" && announcements.length > 0 ? (
           <div className="announcement-slider" aria-label="Latest announcements" aria-live="polite">
             <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
-              <span className="announcement-ticker-title">
-                {announcements[announcementIndex]?.title}
-                {announcements[announcementIndex]?.body
-                  ? ` — ${announcements[announcementIndex].body}`
-                  : ""}
-              </span>
-              {announcements[announcementIndex]?.linkUrl ? (
-                <a
-                  href={announcements[announcementIndex].linkUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="announcement-ticker-link"
-                >
-                  {announcements[announcementIndex].linkLabel || "Read more"}
-                </a>
-              ) : null}
+              {(() => {
+                const announcement = announcements[announcementIndex] || {};
+                const announcementId = announcement.id || `announcement-${announcementIndex}`;
+                const body = (announcement.body || "").trim();
+                const maxPreviewLength = 140;
+                const isLong = body.length > maxPreviewLength;
+                const isExpanded = expandedAnnouncements.has(announcementId);
+                const visibleBody =
+                  isExpanded || !isLong ? body : `${body.slice(0, maxPreviewLength).trim()}…`;
+
+                return (
+                  <>
+                    <div className="announcement-message">
+                      <span className="announcement-ticker-title">{announcement.title}</span>
+                      {body ? <span className="announcement-ticker-body">— {visibleBody}</span> : null}
+                      {isLong ? (
+                        <button
+                          type="button"
+                          className="announcement-read-more"
+                          onClick={() => toggleAnnouncementExpansion(announcementId)}
+                        >
+                          {isExpanded ? "Show less" : "Read more"}
+                        </button>
+                      ) : null}
+                    </div>
+                    {announcement.linkUrl ? (
+                      <a
+                        href={announcement.linkUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="announcement-ticker-link"
+                      >
+                        {announcement.linkLabel || "Open update"}
+                      </a>
+                    ) : null}
+                  </>
+                );
+              })()}
             </div>
             {announcements.length > 1 ? (
               <div className="announcement-slide-count" aria-hidden="true">
