@@ -1,3 +1,4 @@
+import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 
 export const requestStudyBuddyReply = async ({ message, level, idToken }) =>
@@ -9,3 +10,28 @@ export const requestStudyBuddyReply = async ({ message, level, idToken }) =>
     },
     idToken,
   });
+
+export const logStudyBuddyUsage = async ({
+  event,
+  studentCode,
+  studentEmail,
+  className,
+  userId,
+  questionLength,
+  question,
+}) => {
+  if (!event || !isFirebaseConfigured || !db) return null;
+
+  const payload = {
+    event,
+    studentCode: studentCode || null,
+    studentEmail: studentEmail || null,
+    className: className || null,
+    userId: userId || null,
+    questionLength: Number.isFinite(questionLength) ? questionLength : null,
+    question: question || null,
+    createdAt: serverTimestamp(),
+  };
+
+  return addDoc(collection(db, "studyBuddyUsage"), payload);
+};

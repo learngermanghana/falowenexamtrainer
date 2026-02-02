@@ -7,7 +7,7 @@ import { toDateMs } from "../lib/dateUtils";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchResults } from "../services/resultsService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
-import { requestStudyBuddyReply } from "../services/studyBuddyService";
+import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -17,7 +17,7 @@ const toNumber = (value) => {
 const StudyBuddyBar = ({ studentProfile }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
-  const { idToken } = useAuth();
+  const { idToken, user } = useAuth();
   const locale = i18n.language;
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDismissed, setIsDismissed] = useState(() => {
@@ -239,6 +239,15 @@ const StudyBuddyBar = ({ studentProfile }) => {
       setQuickReply("");
       setQuickReplyError("");
       try {
+        await logStudyBuddyUsage({
+          event: "quick_question",
+          studentCode,
+          studentEmail,
+          className,
+          userId: user?.uid || null,
+          questionLength: trimmed.length,
+          question: trimmed,
+        });
         const response = await requestStudyBuddyReply({
           message: trimmed,
           level: studentProfile?.level || "B1",
@@ -255,7 +264,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         setIsReplyLoading(false);
       }
     },
-    [idToken, studentProfile?.level, t]
+    [className, idToken, studentCode, studentEmail, studentProfile?.level, t, user?.uid]
   );
 
   const quickLinks = useMemo(
@@ -304,6 +313,19 @@ const StudyBuddyBar = ({ studentProfile }) => {
       // Ignore storage errors (privacy mode, etc.)
     }
   }, [isHighContrast]);
+
+  useEffect(() => {
+    if (isDismissed) return;
+    logStudyBuddyUsage({
+      event: "opened",
+      studentCode,
+      studentEmail,
+      className,
+      userId: user?.uid || null,
+    }).catch((error) => {
+      console.warn("Failed to log Study Buddy open", error);
+    });
+  }, [className, isDismissed, studentCode, studentEmail, user?.uid]);
 
   if (isDismissed) {
     return (
