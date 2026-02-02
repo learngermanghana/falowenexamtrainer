@@ -787,7 +787,8 @@ const courseSchedules = {
       chapter: "12.3",
       goal: "Practice how to write both formal and informal letters",
       assignment: true,
-      instruction: "Write all the two letters in this document and send to your tutor for corrections",
+      instruction:
+        "Before writing, go to campus, Falowen A.I-Writng practice, ideas generator https://www.falowen.app/campus/writing. Open the Letter Writing guide to follow the full structure, examples, and assignment steps.",
       grammar_topic: "Formal and Informal Letter",
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
