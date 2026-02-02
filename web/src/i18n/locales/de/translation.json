@@ -660,6 +660,14 @@
     "backToCourse": "Zurück zum Kurs",
     "title": "Einführung in das Briefeschreiben 12.3",
     "subtitle": "Nutze diese Anleitung, um formelle und informelle Briefe zu strukturieren, bevor du deine Aufgabe abgibst.",
+    "languageNote": "Beispiele sind auf Deutsch; die Anleitung ist auf Englisch.",
+    "toc": {
+      "label": "Direkt zu:",
+      "formal": "Formeller Aufbau",
+      "informal": "Informeller Aufbau",
+      "informalAssignment": "Informelle Aufgabe",
+      "formalAssignment": "Formelle Aufgabe"
+    },
     "formalTitle": "Aufbau eines formellen Briefes",
     "formal": {
       "salutations": [
@@ -691,6 +699,27 @@
       "mainBody": "<strong>Hauptteil:</strong> Verwende die Konjunktionen <em>Ich möchte wissen, ob</em>, <em>deshalb</em> und <em>weil</em>. Halte die Sätze klar und gut strukturiert.",
       "conclusion": "<strong>Schluss:</strong> Ich freue mich im Voraus auf deine Antwort. (Nicht ändern.) Liebe Grüße oder Viele Grüße. <strong>[Dein Vorname]</strong>."
     },
+    "annotatedSamplesTitle": "Kommentierte Beispielbriefe",
+    "annotatedSamples": {
+      "formal": {
+        "title": "Formelles Beispiel",
+        "items": [
+          { "label": "Anrede", "text": "Sehr geehrte Frau Müller," },
+          { "label": "Grund", "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte." },
+          { "label": "Bitte", "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?" },
+          { "label": "Schluss", "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber" }
+        ]
+      },
+      "informal": {
+        "title": "Informelles Beispiel",
+        "items": [
+          { "label": "Begrüßung", "text": "Hallo Tom," },
+          { "label": "Grund", "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte." },
+          { "label": "Details", "text": "Die Feier ist am Samstag um 18 Uhr bei mir." },
+          { "label": "Schluss", "text": "Liebe Grüße, Sara" }
+        ]
+      }
+    },
     "informalAssignmentTitle": "Aufgabe: informeller Brief (Geburtstagsbrief-Fragenbuch)",
     "informalAssignment": {
       "intro": "Schreibe einen Brief an deine Freundin oder deinen Freund, der/die Geburtstag hat. Folge diesen Schritten:",
@@ -716,6 +745,10 @@
       ],
       "sampleQuestion": "<strong>Beispielfrage:</strong> Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule: • Warum schreiben Sie? • Bitten Sie um Informationen über Kurse. • Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
       "afterWriting": "Nach dem Schreiben: Nutze dasselbe Vorgehen (Schreiben-Trainer → Ideen-Generator → wie gewohnt einreichen)."
+    },
+    "cta": {
+      "startWriting": "Jetzt schreiben",
+      "openIdeas": "Ideen-Generator öffnen"
     }
   },
   "examFile": {
