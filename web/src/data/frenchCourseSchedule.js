@@ -27,7 +27,7 @@ export const FRENCH_A1_SCHEDULE = [
       video: null,
       youtube_link: null,
       grammarbook_link: "https://drive.google.com/file/d/14sfFfDUmh7BBEBKFzRITzZ9yQ3yKtmqy/view?usp=sharing",
-      workbook_link: null,
+      workbook_link: "https://drive.google.com/file/d/1ypw3gS2UTOlzV-UZT3b0VXK40_AA8kDw/view?usp=sharing",
       assignment: false,
     },
   },
