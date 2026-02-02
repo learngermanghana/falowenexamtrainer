@@ -86,6 +86,39 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     setIdeaSuccess("");
   };
 
+  const formatLetterPrompt = (letter) => {
+    if (!letter) return "";
+    const tagLine = letter.tags?.length ? `Tags: ${letter.tags.join(", ")}` : "";
+    const checklist = letter.whatToInclude.map((item) => `- ${item}`).join("\n");
+
+    return [
+      `Prompt: ${letter.letter}`,
+      tagLine,
+      `Situation: ${letter.situation}`,
+      "Checklist:",
+      checklist,
+    ]
+      .filter(Boolean)
+      .join("\n");
+  };
+
+  const sendLetterToMarkTab = () => {
+    if (!selectedLetter) return;
+    const prompt = formatLetterPrompt(selectedLetter);
+    setLetterText((prev) => (prev.trim() ? prev : `${prompt}\n\n`));
+    setMarkFeedback("");
+    setActiveTab("mark");
+  };
+
+  const sendLetterToIdeasTab = () => {
+    if (!selectedLetter) return;
+    const prompt = formatLetterPrompt(selectedLetter);
+    setIdeaInput(prompt);
+    setIdeaSuccess("");
+    setIdeaError("");
+    setActiveTab("ideas");
+  };
+
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
     resetErrors();
@@ -394,6 +427,15 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                       <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
                         {formatTimeUnit("minute", item.durationMinutes)} • {item.situation}
                       </p>
+                      {item.tags?.length ? (
+                        <div style={styles.tagRow}>
+                          {item.tags.map((tag) => (
+                            <span key={`${item.id}-${tag}`} style={styles.tagPill}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </button>
                   ))}
               </div>
@@ -411,6 +453,15 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                           time: formatTimeUnit("minute", selectedLetter.durationMinutes),
                         })}
                       </span>
+                      {selectedLetter.tags?.length ? (
+                        <div style={styles.tagRow}>
+                          {selectedLetter.tags.map((tag) => (
+                            <span key={`${selectedLetter.id}-${tag}`} style={styles.tagPill}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      ) : null}
                     </div>
                     <p style={{ ...styles.helperText, margin: 0 }}>{selectedLetter.situation}</p>
                     <div>
@@ -423,6 +474,18 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     </div>
                   </div>
                   <div style={{ display: "grid", gap: 8, alignItems: "flex-start" }}>
+                    <button
+                      style={styles.primaryButton}
+                      onClick={sendLetterToIdeasTab}
+                    >
+                      Send prompt to ideas
+                    </button>
+                    <button
+                      style={styles.secondaryButton}
+                      onClick={sendLetterToMarkTab}
+                    >
+                      Send prompt to marking
+                    </button>
                     <button
                       style={timerRunning ? styles.secondaryButton : styles.primaryButton}
                       onClick={() => {
