@@ -94,28 +94,6 @@ const WritingPage = ({ mode = "course" }) => {
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
-  const writingStarters = [
-    {
-      level: "A1",
-      text: "Hallo ___, wie geht es dir? Ich schreibe dir, weil ___ .",
-    },
-    {
-      level: "A2",
-      text: "Liebe/Lieber ___, vielen Dank für deine Nachricht. Ich möchte dir erzählen, dass ___ .",
-    },
-    {
-      level: "B1",
-      text: "Sehr geehrte Damen und Herren, ich schreibe Ihnen, weil ___ .",
-    },
-    {
-      level: "B2",
-      text: "Sehr geehrte/r ___, ich beziehe mich auf ___ und möchte Ihnen mitteilen, dass ___ .",
-    },
-    {
-      level: "C1",
-      text: "Sehr geehrte Damen und Herren, im Folgenden nehme ich Stellung zu ___ und erläutere ___ .",
-    },
-  ];
   const normalizeProfileLevel = (rawLevel) => {
     const normalized = (rawLevel || "").trim().toUpperCase();
     if (ALLOWED_LEVELS.includes(normalized)) {
@@ -515,33 +493,6 @@ const WritingPage = ({ mode = "course" }) => {
 
   return (
     <>
-      {isExamMode ? (
-        <section style={styles.card}>
-          <h2 style={styles.sectionTitle}>Beispielantwort (Schreiben): How to start by level</h2>
-          <p style={styles.helperText}>
-            Use these starter lines as a quick guide when you begin an exam letter.
-          </p>
-          <div style={{ display: "grid", gap: 10 }}>
-            {writingStarters.map((starter) => (
-              <div
-                key={starter.level}
-                style={{
-                  border: "1px solid #E5E7EB",
-                  borderRadius: 10,
-                  padding: "10px 12px",
-                  background: "#F9FAFB",
-                }}
-              >
-                <div style={{ fontWeight: 700, marginBottom: 6 }}>{starter.level}</div>
-                <div style={{ fontSize: 14, color: "#111827", lineHeight: 1.5 }}>
-                  {starter.text}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>Writing – Practice exam letters</h2>
         <p style={styles.helperText}>
