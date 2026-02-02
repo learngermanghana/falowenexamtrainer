@@ -207,9 +207,10 @@
 }
 
 .announcement-slide {
-  display: inline-flex;
-  align-items: center;
-  gap: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
   min-height: 32px;
 }
 
@@ -229,6 +230,32 @@
 
 .announcement-ticker-title {
   font-weight: 600;
+}
+
+.announcement-message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.announcement-ticker-body {
+  font-weight: 400;
+}
+
+.announcement-read-more {
+  border: none;
+  background: none;
+  color: #2563eb;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.announcement-read-more:hover {
+  text-decoration: underline;
 }
 
 .announcement-ticker-link {
