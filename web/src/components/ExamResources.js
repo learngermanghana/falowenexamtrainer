@@ -7,20 +7,20 @@ const goetheLevelLinks = {
   lesen: [
     {
       level: "A1",
-      url: "https://drive.google.com/file/d/1fCqzyTSkzaJIg7MBDhDtW_WOn6SWIV4r/view?usp=sharing",
-      label: "A1 Lesen sample",
+      url: "https://bfu.goethe.de/a1_sd1/lesen.php",
+      label: "A1 Lesen practice",
     },
-    { level: "A2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd2/ueb.html" },
-    { level: "B1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb1/ueb.html" },
-    { level: "B2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb2/ue9.html" },
-    { level: "C1", url: "https://www.goethe.de/ins/be/en/spr/prf/gzc1/u24.html" },
+    { level: "A2", url: "https://bfu.goethe.de/a2_mod_2MX5/lesen.php" },
+    { level: "B1", url: "https://bfu.goethe.de/b1_mod/lesen.php" },
+    { level: "B2", url: "https://bfu.goethe.de/b2_mod_2MX6/lesen.php" },
+    { level: "C1", url: "https://bfu.goethe.de/c1mod/#lesen" },
   ],
   horen: [
-    { level: "A1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd1/ueb.html" },
-    { level: "A2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzsd2/ueb.html" },
-    { level: "B1", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb1/ueb.html" },
-    { level: "B2", url: "https://www.goethe.de/ins/mm/en/spr/prf/gzb2/ue9.html" },
-    { level: "C1", url: "https://www.goethe.de/ins/be/en/spr/prf/gzc1/u24.html" },
+    { level: "A1", url: "https://bfu.goethe.de/a1_sd1/hoeren.php" },
+    { level: "A2", url: "https://bfu.goethe.de/a2_mod_2MX5/hoeren.php" },
+    { level: "B1", url: "https://bfu.goethe.de/b1_mod/hoeren.php" },
+    { level: "B2", url: "https://bfu.goethe.de/b2_mod_2MX6/hoeren.php" },
+    { level: "C1", url: "https://bfu.goethe.de/c1mod/#hoeren" },
   ],
 };
 
