@@ -174,12 +174,14 @@ const WritingPage = ({ mode = "course" }) => {
     }
   }, [selectedLetterId, visibleWritingTasks]);
 
+  const selectedDurationMinutes = selectedLetter?.durationMinutes;
+
   useEffect(() => {
-    if (selectedLetter) {
-      setRemainingSeconds(selectedLetter.durationMinutes * 60);
+    if (typeof selectedDurationMinutes === "number") {
+      setRemainingSeconds(selectedDurationMinutes * 60);
       setTimerRunning(false);
     }
-  }, [selectedLetter]);
+  }, [selectedDurationMinutes]);
 
   useEffect(() => {
     if (!timerRunning) return;
