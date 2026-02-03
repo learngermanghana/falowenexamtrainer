@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
 import { downloadStudyCalendar } from "../services/examCalendar";
 import { updatePageMeta } from "../lib/pageMeta";
+import { useExam } from "../context/ExamContext";
 
 const DAYS_OF_WEEK = [
   { key: "mon", value: 1 },
@@ -32,11 +33,13 @@ const shiftDate = (value, days) => {
 };
 
 const DOWNLOAD_STORAGE_KEY = "falowen_study_calendar_downloaded";
+const DOWNLOAD_COUNT_STORAGE_KEY = "falowen_study_calendar_download_count";
 
 const StudyCalendarPage = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const location = useLocation();
-  const [selectedLevel, setSelectedLevel] = useState(goetheExamLevels[0]?.level || "B1");
+  const { level: selectedLevel, setLevel: setSelectedLevel } = useExam();
   const [examDate, setExamDate] = useState("");
   const [startDate, setStartDate] = useState(formatInputDate(new Date()));
   const [endDate, setEndDate] = useState("");
@@ -116,6 +119,13 @@ const StudyCalendarPage = () => {
     t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) });
 
   const isFormReady = Boolean(selectedLevel && startDate && endDate && activeDays.length > 0);
+  const sessionsPerWeek = activeDays.length;
+  const recommendedTab = useMemo(() => {
+    if (sessionsPerWeek >= 4 || durationMinutes >= 60) {
+      return { key: "writing", label: "Writing practice" };
+    }
+    return { key: "speaking", label: "Speaking warm-up" };
+  }, [durationMinutes, sessionsPerWeek]);
 
   const handleDownload = useCallback(() => {
     if (!isFormReady) return false;
@@ -130,6 +140,9 @@ const StudyCalendarPage = () => {
     });
     try {
       localStorage.setItem(DOWNLOAD_STORAGE_KEY, "true");
+      const count = Number(localStorage.getItem(DOWNLOAD_COUNT_STORAGE_KEY) || 0);
+      const nextCount = Number.isNaN(count) ? 1 : count + 1;
+      localStorage.setItem(DOWNLOAD_COUNT_STORAGE_KEY, String(nextCount));
     } catch {
       // ignore storage failures
     }
@@ -319,6 +332,37 @@ const StudyCalendarPage = () => {
           </div>
         </div>
 
+        <div
+          style={{
+            border: "1px solid #e5e7eb",
+            borderRadius: 12,
+            padding: 12,
+            background: "#f9fafb",
+            display: "grid",
+            gap: 6,
+          }}
+        >
+          <h4 style={{ margin: 0 }}>Preview schedule</h4>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            {sessionsPerWeek} sessions per week · {formatTimeUnit("minute", Number(durationMinutes))} each ·{" "}
+            {timeOfDay}
+          </p>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Dates: {formatDisplayDate(startDate)} → {formatDisplayDate(endDate || examDate)}
+          </p>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Exam level: {selectedLevel} · Reminder:{" "}
+            {reminderMinutes === 0
+              ? t("studyCalendar.reminder.none")
+              : t("studyCalendar.reminder.before", {
+                  time:
+                    reminderMinutes >= 1440
+                      ? formatTimeUnit("day", reminderMinutes / 1440)
+                      : formatTimeUnit("hour", reminderMinutes / 60),
+                })}
+          </p>
+        </div>
+
         <button type="button" style={styles.primaryButton} onClick={handleDownload} disabled={!isFormReady}>
           {forceDownload
             ? t("studyCalendar.cta.required")
@@ -330,6 +374,22 @@ const StudyCalendarPage = () => {
           </p>
         ) : null}
       </section>
+
+      {hasDownloaded ? (
+        <section style={styles.card}>
+          <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>Next steps</h3>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Your calendar is ready. Jump into a recommended practice tab based on your schedule.
+          </p>
+          <button
+            type="button"
+            style={{ ...styles.primaryButton, marginTop: 10 }}
+            onClick={() => navigate(`/exams/${recommendedTab.key}`)}
+          >
+            Go to {recommendedTab.label}
+          </button>
+        </section>
+      ) : null}
 
       <section style={styles.card}>
         <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>{t("studyCalendar.reminder.title")}</h3>

@@ -40,7 +40,7 @@ const resolveNotificationRoute = (data = {}) => {
     return "/campus/results";
   }
   if (type.includes("exam")) {
-    return "/exams/speaking";
+    return "/exams/overview";
   }
   return DEFAULT_ROUTE;
 };

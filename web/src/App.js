@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ExamProvider } from "./context/ExamContext";
+import { ALLOWED_LEVELS, ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
@@ -28,6 +28,7 @@ import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
 import GeneralHome from "./components/GeneralHome";
 import SpeakingPage from "./components/SpeakingPage";
+import ExamsOverviewPage from "./components/ExamsOverviewPage";
 import ExamResources from "./components/ExamResources";
 import HorenPage from "./components/HorenPage";
 import LesenPage from "./components/LesenPage";
@@ -340,7 +341,7 @@ const AppShell = ({
     }
 
     if (area === "exams") {
-      navigate("/exams/speaking");
+      navigate("/exams/overview");
     }
   };
 
@@ -480,7 +481,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
 
-          <Route path="/exams" element={<Navigate to="/exams/speaking" replace />} />
+          <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -606,12 +607,28 @@ const ExamArea = ({ onBack }) => {
   const { t } = useTranslation();
   const { section } = useParams();
   const navigate = useNavigate();
+  const { level, setLevel } = useExam();
+
+  const lastVisitStorageKey = "falowen_exam_last_visit";
+  const lastSectionStorageKey = "falowen_exam_last_section";
 
   const examSection = useMemo(() => {
-    if (["speaking", "writing", "resources", "study", "file", "vocab", "horen", "lesen"].includes(section)) {
+    if (
+      [
+        "overview",
+        "speaking",
+        "writing",
+        "resources",
+        "study",
+        "file",
+        "vocab",
+        "horen",
+        "lesen",
+      ].includes(section)
+    ) {
       return section;
     }
-    return "speaking";
+    return "overview";
   }, [section]);
 
   useEffect(() => {
@@ -620,7 +637,23 @@ const ExamArea = ({ onBack }) => {
     }
   }, [examSection, navigate, section]);
 
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(lastVisitStorageKey);
+      const parsed = stored ? JSON.parse(stored) : {};
+      const next = {
+        ...parsed,
+        [examSection]: new Date().toISOString(),
+      };
+      localStorage.setItem(lastVisitStorageKey, JSON.stringify(next));
+      localStorage.setItem(lastSectionStorageKey, examSection);
+    } catch (error) {
+      console.warn("Failed to store exam last visit metadata", error);
+    }
+  }, [examSection, lastSectionStorageKey, lastVisitStorageKey]);
+
   const tabs = [
+    { key: "overview", label: t("appNav.examTabs.overview") },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "writing", label: t("appNav.examTabs.writing") },
@@ -633,21 +666,56 @@ const ExamArea = ({ onBack }) => {
 
   return (
     <>
-      <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12 }}>
-        <button style={styles.secondaryButton} onClick={onBack}>
-          {t("appNav.backHome")}
-        </button>
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
-            onClick={() => navigate(`/exams/${tab.key}`)}
-          >
-            {tab.label}
+      <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+        <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 0 }}>
+          <button style={styles.secondaryButton} onClick={onBack}>
+            {t("appNav.backHome")}
           </button>
-        ))}
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              style={examSection === tab.key ? styles.navButtonActive : styles.navButton}
+              onClick={() => navigate(`/exams/${tab.key}`)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <div
+          style={{
+            ...styles.card,
+            margin: 0,
+            display: "flex",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
+          }}
+        >
+          <div style={{ minWidth: 160 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>Exam level</p>
+            <strong style={{ fontSize: 16 }}>{level}</strong>
+          </div>
+          <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
+            <label htmlFor="exam-level-selector" style={styles.helperText}>
+              Switch level for all tabs
+            </label>
+            <select
+              id="exam-level-selector"
+              value={level}
+              onChange={(event) => setLevel(event.target.value)}
+              style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
+            >
+              {ALLOWED_LEVELS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
+      {examSection === "overview" ? <ExamsOverviewPage /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
