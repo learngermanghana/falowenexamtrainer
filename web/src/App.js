@@ -18,6 +18,7 @@ import LetterWritingIntroPage from "./components/LetterWritingIntroPage";
 import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensionPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
+import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -479,6 +480,7 @@ const AppShell = ({
             path="/campus/course/dative-verbs-adjective-declension-14-2"
             element={<DativeAdjectiveDeclensionPage />}
           />
+          <Route path="/campus/course/verboten-erlaubt-5-9" element={<VerbotenErlaubtPage />} />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
