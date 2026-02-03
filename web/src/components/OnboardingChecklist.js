@@ -445,8 +445,8 @@ const OnboardingChecklist = ({
 
         <Step
           stepRef={classRef}
-          title="Confirm your class"
-          description="Pick your cohort to get the right Zoom link and documents."
+          title="Your class"
+          description="This is your class. Scroll down to download the calendar, then click Continue."
           actionLabel="Open class"
           onAction={onConfirmClass}
           complete={classStepComplete}
@@ -472,8 +472,8 @@ const OnboardingChecklist = ({
 
         <Step
           stepRef={notifRef}
-          title="Enable push notifications"
-          description="Get reminders for study sessions and new tasks."
+          title="Push notifications (optional)"
+          description="Enable reminders for study sessions and new tasks whenever you want."
           actionLabel={notificationsDenied ? "Notifications blocked" : "Allow push"}
           onAction={notificationsDenied ? null : onEnableNotifications}
           complete={notificationsStepComplete}
