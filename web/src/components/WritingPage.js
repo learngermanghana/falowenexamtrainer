@@ -210,7 +210,7 @@ const WritingPage = ({ mode = "course" }) => {
       setChatMessages([IDEA_COACH_INTRO]);
       setSelectedDraftIds([]);
       setIdeaSuccess("");
-      setRemainingSeconds((selectedLetter?.durationMinutes || 0) * 60);
+      setRemainingSeconds((selectedDurationMinutes || 0) * 60);
       setTimerRunning(false);
     };
 
@@ -263,7 +263,7 @@ const WritingPage = ({ mode = "course" }) => {
     return () => {
       isMounted = false;
     };
-  }, [progressMode, studentCode, userId]);
+  }, [progressMode, selectedDurationMinutes, studentCode, userId]);
 
   useEffect(() => {
     if (!progressLoaded || (!userId && !studentCode)) return;
