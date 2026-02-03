@@ -776,13 +776,18 @@ export const courseSchedules = {
       topic: "Verboten and Erlaubt",
       chapter: "5.9",
       goal: "Understand the difference between Erlaubt and Verboten and how to use it in the exams hall",
-      instruction: "Review the workbook and do the practicals in it. Answers are attached",
+      instruction:
+        "This chapter has no assignment. Use the grammar guide for workbook notes and Goethe A1 speaking practice tips.",
+      instructionLink: {
+        label: "Open the Verboten & Erlaubt guide (A1 workbook notes)",
+        to: "/campus/course/verboten-erlaubt-5-9",
+      },
       grammar_topic: "Erlaubt and Verboten",
       schreiben_sprechen: {
         video: "https://youtu.be/K5mzR9nY3vM",
         youtube_link: "https://youtu.be/K5mzR9nY3vM",
         assignment: false,
-        workbook_link: "https://drive.google.com/file/d/1CkoYa_qeqsGju0kTS6ElurCAlEW6pVFL/view?usp=sharing",
+        workbook_link: "",
       },
     },
     {
@@ -841,13 +846,17 @@ export const courseSchedules = {
       topic: "Dative Verbs and Adjective Declension",
       chapter: "14.2",
       goal: "Understand adjective declension and dative verbs",
-      instruction: " This chapter has no assignment. Only grammar",
+      instruction: "This chapter has no assignment. Use the grammar guide for the lesson notes.",
+      instructionLink: {
+        label: "Open the Day 23 guide: Dative verbs and adjective declension",
+        to: "/campus/course/dative-verbs-adjective-declension-14-2",
+      },
       grammar_topic: "Adjective Declension and Dative Verbs",
       lesen_hören: {
         video: "https://youtu.be/sAd8rWu9O0Q",
         youtube_link: "https://youtu.be/sAd8rWu9O0Q",
         assignment: false,
-        grammarbook_link: "https://drive.google.com/file/d/16h-yS0gkB2_FL1zxCC4MaqRBbKne7GI1/view?usp=sharing",
+        grammarbook_link: "",
         workbook_link: "",
       },
     },
