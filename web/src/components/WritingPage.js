@@ -31,6 +31,14 @@ const WORD_TARGETS = {
   C1: "180–220 words",
 };
 
+const WORD_TARGET_RANGES = {
+  A1: { min: 30, max: 50 },
+  A2: { min: 50, max: 80 },
+  B1: { min: 80, max: 120 },
+  B2: { min: 120, max: 180 },
+  C1: { min: 180, max: 220 },
+};
+
 const mapExamPromptsToLetters = (prompts) =>
   Object.entries(prompts).flatMap(([level, entries]) =>
     (entries || []).map((item, index) => ({
@@ -42,6 +50,43 @@ const mapExamPromptsToLetters = (prompts) =>
       whatToInclude: item.Punkte || [],
     }))
   );
+
+const WordCountMeter = ({ count, range }) => {
+  if (!range) return null;
+  const progress = Math.min((count / range.max) * 100, 100);
+  const isBelow = count < range.min;
+  const isAbove = count > range.max;
+  const status = isBelow
+    ? `Add ${range.min - count} words to reach ${range.min}.`
+    : isAbove
+      ? `Above target by ${count - range.max} words.`
+      : "On target for your level.";
+
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div
+        style={{
+          height: 10,
+          borderRadius: 999,
+          background: "#e5e7eb",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${progress}%`,
+            background: isAbove ? "#f97316" : "#2563eb",
+            transition: "width 0.2s ease",
+          }}
+        />
+      </div>
+      <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
+        Target: {range.min}–{range.max} words. {status}
+      </p>
+    </div>
+  );
+};
 
 const WritingPage = ({ mode = "course" }) => {
   const {
@@ -80,6 +125,12 @@ const WritingPage = ({ mode = "course" }) => {
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [mockExamMode, setMockExamMode] = useState(false);
+  const [rubricChecklist, setRubricChecklist] = useState({
+    task: false,
+    coherence: false,
+    grammar: false,
+  });
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [selectedLetterId, setSelectedLetterId] = useState(() => {
     const initialList = isExamMode
@@ -120,6 +171,8 @@ const WritingPage = ({ mode = "course" }) => {
   const progressMode = isExamMode ? "exam" : "course";
   const activeTargetLevel = selectedLetter?.level || level;
   const wordTarget = WORD_TARGETS[activeTargetLevel];
+  const wordRange = WORD_TARGET_RANGES[activeTargetLevel];
+  const mockHintsLocked = mockExamMode && remainingSeconds > 0;
 
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
@@ -310,6 +363,39 @@ const WritingPage = ({ mode = "course" }) => {
     return trimmed.split(/\s+/).length;
   };
 
+  const handleExportDraft = () => {
+    const trimmed = typedAnswer.trim();
+    if (!trimmed) {
+      alert("Please add your final draft before exporting.");
+      return;
+    }
+    const exportWindow = window.open("", "_blank");
+    if (!exportWindow) {
+      alert("Pop-up blocked. Please allow pop-ups to export your draft.");
+      return;
+    }
+    const title = `Writing Draft – ${level}`;
+    exportWindow.document.write(`
+      <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body { font-family: system-ui, sans-serif; padding: 24px; line-height: 1.6; color: #111827; }
+            h1 { font-size: 20px; margin-bottom: 12px; }
+            pre { white-space: pre-wrap; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          <pre>${trimmed.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</pre>
+        </body>
+      </html>
+    `);
+    exportWindow.document.close();
+    exportWindow.focus();
+    exportWindow.print();
+  };
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
       .toString()
@@ -461,6 +547,10 @@ const WritingPage = ({ mode = "course" }) => {
     setActiveTab("mark");
   };
 
+  const practiceWordCount = countWords(practiceDraft);
+  const typedWordCount = countWords(typedAnswer);
+  const typedWordRange = WORD_TARGET_RANGES[level];
+
   const handleAskCoach = async () => {
     const trimmed = ideaInput.trim();
     if (!trimmed || ideasLoading) return;
@@ -567,16 +657,39 @@ const WritingPage = ({ mode = "course" }) => {
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Your simulation room</h3>
             {practiceTimerControls}
+            <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+              <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14 }}>
+                <input
+                  type="checkbox"
+                  checked={mockExamMode}
+                  onChange={(event) => setMockExamMode(event.target.checked)}
+                />
+                Mock exam mode (hide hints until timer ends)
+              </label>
+              {mockExamMode ? (
+                <span style={{ ...styles.badge, background: "#fee2e2", color: "#991b1b" }}>
+                  Hints locked while timer is running
+                </span>
+              ) : null}
+            </div>
             {selectedLetter && (
               <>
                 <div style={styles.badge}>Topic: {selectedLetter.letter}</div>
                 <p style={styles.helperText}>{selectedLetter.situation}</p>
-                <h4 style={styles.resultHeading}>Checklist</h4>
-                <ul style={styles.checklist}>
-                  {(selectedLetter.whatToInclude || []).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+                {mockHintsLocked ? (
+                  <p style={{ ...styles.helperText, marginTop: 6 }}>
+                    Checklist and hints unlock once the timer reaches 00:00.
+                  </p>
+                ) : (
+                  <>
+                    <h4 style={styles.resultHeading}>Checklist</h4>
+                    <ul style={styles.checklist}>
+                      {(selectedLetter.whatToInclude || []).map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
               </>
             )}
             <div style={{ marginTop: 12 }}>
@@ -589,9 +702,10 @@ const WritingPage = ({ mode = "course" }) => {
                 rows={7}
               />
               <p style={styles.helperText}>
-                Words: {countWords(practiceDraft)} · Characters: {practiceDraft.length}
-                {wordTarget ? ` · Target: ${wordTarget}` : ""}
+                Words: {practiceWordCount} · Characters: {practiceDraft.length}
+                {!mockHintsLocked && wordTarget ? ` · Target: ${wordTarget}` : ""}
               </p>
+              {!mockHintsLocked ? <WordCountMeter count={practiceWordCount} range={wordRange} /> : null}
               <div style={{ marginTop: 10 }}>
                 <button
                   style={styles.secondaryButton}
@@ -711,18 +825,46 @@ const WritingPage = ({ mode = "course" }) => {
               rows={9}
             />
             <p style={styles.helperText}>
-              Words: {countWords(typedAnswer)} · Characters: {typedAnswer.length}
+              Words: {typedWordCount} · Characters: {typedAnswer.length}
               {WORD_TARGETS[level] ? ` · Target: ${WORD_TARGETS[level]}` : ""}
             </p>
+            <WordCountMeter count={typedWordCount} range={typedWordRange} />
 
             <div style={{ marginTop: 12 }}>
-              <button
-                style={styles.primaryButton}
-                onClick={sendTypedAnswerForCorrection}
-                disabled={loading}
-              >
-                {loading ? "Getting feedback..." : "Get AI feedback"}
-              </button>
+              <h4 style={styles.resultHeading}>Final draft rubric checklist</h4>
+              <div style={{ display: "grid", gap: 8 }}>
+                {[
+                  { key: "task", label: "Task completion: all bullet points answered" },
+                  { key: "coherence", label: "Coherence: logical order + connectors" },
+                  { key: "grammar", label: "Grammar & spelling: quick proofread done" },
+                ].map((item) => (
+                  <label key={item.key} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <input
+                      type="checkbox"
+                      checked={rubricChecklist[item.key]}
+                      onChange={() =>
+                        setRubricChecklist((prev) => ({ ...prev, [item.key]: !prev[item.key] }))
+                      }
+                    />
+                    <span>{item.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <button
+                  style={styles.primaryButton}
+                  onClick={sendTypedAnswerForCorrection}
+                  disabled={loading}
+                >
+                  {loading ? "Getting feedback..." : "Get AI feedback"}
+                </button>
+                <button style={styles.secondaryButton} type="button" onClick={handleExportDraft}>
+                  Export final draft (PDF/print)
+                </button>
+              </div>
             </div>
 
             {error && (

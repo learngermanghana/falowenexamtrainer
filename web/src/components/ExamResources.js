@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
+import { useExam } from "../context/ExamContext";
 
 const goetheLevelLinks = {
   lesen: [
@@ -46,6 +47,15 @@ const resources = [
 
 const ExamResources = () => {
   const { t, i18n } = useTranslation();
+  const { level } = useExam();
+
+  const levelLinks = useMemo(
+    () => ({
+      lesen: goetheLevelLinks.lesen.find((item) => item.level === level),
+      horen: goetheLevelLinks.horen.find((item) => item.level === level),
+    }),
+    [level]
+  );
 
   useEffect(() => {
     updatePageMeta({
@@ -58,7 +68,12 @@ const ExamResources = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
-        <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>Level-aware Goethe links (Lesen & Hören)</h3>
+        <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>
+          Level-aware Goethe links (Lesen & Hören)
+        </h3>
+        <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>
+          Showing links for level <strong>{level}</strong>. Switch levels in the Exams Room header.
+        </p>
         <div
           style={{
             display: "grid",
@@ -68,30 +83,38 @@ const ExamResources = () => {
         >
           <div style={{ ...styles.card, margin: 0, boxShadow: "none" }}>
             <h4 style={{ margin: "0 0 6px 0" }}>Lesen</h4>
-            <ul style={{ ...styles.checklist, margin: 0 }}>
-              {goetheLevelLinks.lesen.map((item) => (
-                <li key={`lesen-${item.level}`}>
-                  <strong>{item.level}:</strong>{" "}
-                  <a href={item.url} target="_blank" rel="noreferrer">
-                    {item.label ?? "Goethe Lesen practice"}
+            {levelLinks.lesen ? (
+              <ul style={{ ...styles.checklist, margin: 0 }}>
+                <li>
+                  <strong>{levelLinks.lesen.level}:</strong>{" "}
+                  <a href={levelLinks.lesen.url} target="_blank" rel="noreferrer">
+                    {levelLinks.lesen.label ?? "Goethe Lesen practice"}
                   </a>
                 </li>
-              ))}
-            </ul>
+              </ul>
+            ) : (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                No reading link is available for this level yet.
+              </p>
+            )}
           </div>
 
           <div style={{ ...styles.card, margin: 0, boxShadow: "none" }}>
             <h4 style={{ margin: "0 0 6px 0" }}>Hören</h4>
-            <ul style={{ ...styles.checklist, margin: 0 }}>
-              {goetheLevelLinks.horen.map((item) => (
-                <li key={`horen-${item.level}`}>
-                  <strong>{item.level}:</strong>{" "}
-                  <a href={item.url} target="_blank" rel="noreferrer">
+            {levelLinks.horen ? (
+              <ul style={{ ...styles.checklist, margin: 0 }}>
+                <li>
+                  <strong>{levelLinks.horen.level}:</strong>{" "}
+                  <a href={levelLinks.horen.url} target="_blank" rel="noreferrer">
                     Goethe Hören practice
                   </a>
                 </li>
-              ))}
-            </ul>
+              </ul>
+            ) : (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                No listening link is available for this level yet.
+              </p>
+            )}
           </div>
         </div>
       </section>

@@ -291,7 +291,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
       {
         key: "exams",
         label: t("studyBuddy.shortcuts.exams"),
-        action: () => navigate("/exams/speaking"),
+        action: () => navigate("/exams/overview"),
       },
     ],
     [navigate, t]
