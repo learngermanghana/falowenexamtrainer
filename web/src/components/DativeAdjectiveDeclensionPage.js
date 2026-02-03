@@ -68,6 +68,22 @@ const Callout = ({ children }) => (
   </div>
 );
 
+const WarningCallout = ({ children }) => (
+  <div
+    style={{
+      background: "#fff1f2",
+      borderLeft: "4px solid #fb7185",
+      borderRadius: 10,
+      padding: "10px 12px",
+      fontSize: 14,
+      display: "grid",
+      gap: 6,
+    }}
+  >
+    {children}
+  </div>
+);
+
 const ExampleCard = ({ title, items }) => (
   <div
     style={{
@@ -109,6 +125,16 @@ const DativeAdjectiveDeclensionPage = () => {
           This guide focuses on describing people and things clearly, then applying dative verbs in polite letter
           writing.
         </p>
+        <Callout>
+          <strong>TL;DR: Key rules</strong>
+          <BulletList
+            items={[
+              "Check the article first; it tells you the adjective ending.",
+              "Masculine accusative takes -en (einen kleinen Hund).",
+              "Neuter uses -es with ein (ein kleines Auto).",
+            ]}
+          />
+        </Callout>
       </Section>
 
       <Section title="Step 1: Review the Articles">
@@ -138,6 +164,18 @@ const DativeAdjectiveDeclensionPage = () => {
         <Callout>
           <strong>Very simple trick:</strong> Look at the article (der/die/das/den) → that tells you the ending.
         </Callout>
+        <div
+          style={{
+            border: "1px dashed #fdba74",
+            borderRadius: 10,
+            padding: "8px 12px",
+            background: "#fff7ed",
+            fontWeight: 600,
+            color: "#9a3412",
+          }}
+        >
+          der → -er • die → -e • das → -es • den → -en • plural (die/keine) → -en
+        </div>
         <Table
           headers={["If you see", "Use this ending"]}
           rows={[
@@ -154,6 +192,15 @@ const DativeAdjectiveDeclensionPage = () => {
         <p style={{ margin: 0 }}>
           We use simple adjectives: <strong>groß, klein, rot, blau, grün, schön, neu, alt</strong>.
         </p>
+        <WarningCallout>
+          <strong>Mistakes to avoid</strong>
+          <BulletList
+            items={[
+              'Neuter uses "ein + -es": ein kleines Auto (not "ein + -e").',
+              'Masculine accusative uses "einen + -en": einen kleinen Hund.',
+            ]}
+          />
+        </WarningCallout>
         <h3 style={{ margin: "12px 0 0" }}>Nominative Case – The Subject</h3>
         <Table
           headers={["Gender", "Article", "Ending", "Example"]}
@@ -208,18 +255,21 @@ const DativeAdjectiveDeclensionPage = () => {
           <li>Ich sehe eine ___ Blume. (rot)</li>
           <li>Er ist ein ___ Mann. (groß)</li>
         </ol>
-        <Callout>
-          <strong>✅ Answers</strong>
-          <BulletList
-            items={[
-              "einen kleinen Hund",
-              "ein neues Auto",
-              "eine schöne Frau",
-              "eine rote Blume",
-              "ein großer Mann",
-            ]}
-          />
-        </Callout>
+        <details style={{ borderRadius: 10, border: "1px solid #e6e8ef", padding: "8px 12px" }}>
+          <summary style={{ cursor: "pointer", fontWeight: 600, color: "#1f2937" }}>Check your answers</summary>
+          <div style={{ marginTop: 8, background: "#f8fafc", borderRadius: 8, padding: "8px 10px" }}>
+            <strong>✅ Answers</strong>
+            <BulletList
+              items={[
+                "einen kleinen Hund",
+                "ein neues Auto",
+                "eine schöne Frau",
+                "eine rote Blume",
+                "ein großer Mann",
+              ]}
+            />
+          </div>
+        </details>
       </Section>
 
       <Section title="Using the Dative Case in Letters">

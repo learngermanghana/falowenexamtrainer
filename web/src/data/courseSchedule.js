@@ -685,7 +685,11 @@ export const courseSchedules = {
       assignment: false,
       goal: "Understand imperative statements and learn how to use them in your Sprechen exams, especially in Teil 3.",
       instruction:
-        "After completing this chapter, open Chat • Grammar • Exams, pick A1 as your level, and ask for Teil 3-style prompts to practice.",
+        "Use the Day 15 guide to learn the polite request structures, then open Chat • Grammar • Exams, pick A1, and ask for Teil 3-style prompts to practice.",
+      instructionLink: {
+        label: "Open the Day 15 guide: Introduction to Speaking Exams",
+        to: "/campus/course/speaking-exams-intro-4-7",
+      },
       grammar_topic: "Imperative",
       schreiben_sprechen: {
         video: "https://youtu.be/376paUpM2bI",
