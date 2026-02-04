@@ -354,6 +354,7 @@ const getPlacementLevel = (score, total) => {
 const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   const { t, i18n } = useTranslation();
   const [placementAnswers, setPlacementAnswers] = useState({});
+  const [placementOpen, setPlacementOpen] = useState(false);
   const programOptions = useMemo(
     () => ({
       german: t("landing.programs.german", { returnObjects: true }),
@@ -429,6 +430,12 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
 
   const handlePlacementAnswer = (questionId, option) => {
     setPlacementAnswers((prev) => ({ ...prev, [questionId]: option }));
+  };
+
+  const handlePlacementOpen = (event) => {
+    event.preventDefault();
+    setPlacementOpen(true);
+    document.getElementById("placement-test")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const renderPlacementOptionButton = (question, option) => {
