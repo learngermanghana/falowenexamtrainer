@@ -627,12 +627,16 @@ export const courseSchedules = {
       chapter: "7",
       goal: "Understand the 12 hour clock system",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
+      instructionLink: {
+        label: "Open the Day 11 in-app assignment: 12 Hour Clock (Chapter 7)",
+        to: "/campus/course/a1-day-11-12-hour-clock",
+      },
       assignment: true,
       lesen_hören: {
         video: "https://youtu.be/DklpySXqAmg",
         youtube_link: "https://youtu.be/DklpySXqAmg",
         grammarbook_link: "https://drive.google.com/file/d/1pSaloRhfh8eTKK_r9mzwp6xkbfdkCVox/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-11-12-hour-clock",
         assignment: true,
       },
     },
