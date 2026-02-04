@@ -627,8 +627,8 @@ export const courseSchedules = {
       lesen_hören: {
         video: "https://youtu.be/DklpySXqAmg",
         youtube_link: "https://youtu.be/DklpySXqAmg",
-        grammarbook_link: "https://drive.google.com/file/d/1pSaloRhfh8eTKK_r9mzwp6xkbfdkCVox/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
+        grammar_link: "/campus/course/day-11-12-hour-clock-grammar",
+        assignment_link: "/campus/course/day-11-12-hour-clock-assignment",
         assignment: true,
       },
     },
