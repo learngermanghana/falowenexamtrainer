@@ -607,7 +607,7 @@ export const courseSchedules = {
         youtube_link: "https://youtu.be/sDL5z3lsITk",
         grammarbook_link: "https://drive.google.com/file/d/1Fy4bKhaHHb4ahS2xIumrLtuqdQ0YAFB4/view?usp=sharing",
         assignment: true,
-        workbook_link: "https://drive.google.com/file/d/1Da1iw54oAqoaY-UIw6oyIn8tsDmIi1YR/view?usp=sharing",
+        workbook_link: "https://drive.google.com/file/d/1bgKJrYJ0iZi675bD3MfJOXMXdKq4_vxr/view?usp=sharing",
       },
       schreiben_sprechen: {
         chapter: "2.4",
