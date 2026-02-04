@@ -442,8 +442,8 @@ export const courseSchedules = {
       lesen_hören: {
         video: "https://youtu.be/NmaHd9xsGvw",
         youtube_link: "https://youtu.be/NmaHd9xsGvw",
-        grammarbook_link: "https://drive.google.com/file/d/10UPl4n5FzukSDiTIlcM-WjmNuJGz9OgL/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
+        grammar_link: "/campus/course/day-1-greetings-grammar",
+        assignment_link: "/campus/course/day-1-greetings-assignment",
         assignment: true,
       },
     },
