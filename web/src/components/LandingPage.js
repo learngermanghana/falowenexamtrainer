@@ -354,7 +354,6 @@ const getPlacementLevel = (score, total) => {
 const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   const { t, i18n } = useTranslation();
   const [placementAnswers, setPlacementAnswers] = useState({});
-  const [placementOpen, setPlacementOpen] = useState(false);
   const programOptions = useMemo(
     () => ({
       german: t("landing.programs.german", { returnObjects: true }),
@@ -430,14 +429,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
 
   const handlePlacementAnswer = (questionId, option) => {
     setPlacementAnswers((prev) => ({ ...prev, [questionId]: option }));
-  };
-
-  const handlePlacementOpen = (event) => {
-    event.preventDefault();
-    setPlacementOpen(true);
-    window.setTimeout(() => {
-      document.getElementById("placement-test")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 0);
   };
 
   const renderPlacementOptionButton = (question, option) => {
@@ -540,6 +531,67 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             </div>
           </div>
         </header>
+
+        <section style={{ ...styles.card, display: "grid", gap: 16 }}>
+          <div>
+            <p style={{ ...styles.helperText, margin: 0 }}>New here?</p>
+            <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>{placementTest.title}</h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>{placementTest.subtitle}</p>
+          </div>
+          <div style={{ display: "grid", gap: 16 }}>
+            {placementTest.sections.map((section) => (
+              <div key={section.id} style={{ display: "grid", gap: 12 }}>
+                <h3 style={{ margin: 0, fontSize: 18 }}>{section.title}</h3>
+                <div style={{ display: "grid", gap: 6, color: "#374151", fontSize: 14 }}>
+                  {section.passage.map((line, idx) => (
+                    <p key={`${section.id}-line-${idx}`} style={{ margin: 0 }}>
+                      {line}
+                    </p>
+                  ))}
+                </div>
+                <div style={{ display: "grid", gap: 12 }}>
+                  {section.questions.map((question) => (
+                    <div key={question.id} style={{ display: "grid", gap: 8 }}>
+                      <div style={{ fontWeight: 600 }}>
+                        {question.number}. {question.text}
+                      </div>
+                      <div style={{ display: "grid", gap: 8 }}>
+                        {question.options.map((option) => renderPlacementOptionButton(question, option))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            <div style={{ fontSize: 14, color: "#4b5563" }}>
+              Answered {placementAnsweredCount} / {placementQuestions.length}
+            </div>
+            {placementComplete ? (
+              <div style={{ display: "grid", gap: 10 }}>
+                <div style={{ ...styles.focusNotice, margin: 0 }}>
+                  Score: <strong>{placementScore}</strong> / {placementQuestions.length} · Suggested level:{" "}
+                  <strong>{placementLevel}</strong>
+                </div>
+                <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+                  <h4 style={{ marginTop: 0 }}>Answer key</h4>
+                  <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+                    {placementQuestions.map((question) => (
+                      <li key={`key-${question.id}`}>
+                        <strong>{question.number}.</strong> {question.correct}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              </div>
+            ) : (
+              <div style={{ color: "#6b7280", fontSize: 14 }}>
+                Finish all questions to see your suggested level and the answer key.
+              </div>
+            )}
+          </div>
+        </section>
 
         <section
           style={{
