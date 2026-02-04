@@ -715,6 +715,126 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </section>
 
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 16,
+            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+            alignItems: "center",
+            background: "linear-gradient(135deg, #ffffff, #f1f5f9)",
+            border: "1px solid #e2e8f0",
+          }}
+        >
+          <div style={{ display: "grid", gap: 8 }}>
+            <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
+              If you don&apos;t know your level, take this placement test.
+            </h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              It only takes a few minutes and gives you a suggested CEFR level before you sign up.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <a
+              href="#placement-test"
+              onClick={handlePlacementOpen}
+              style={{ ...styles.primaryButton, textDecoration: "none" }}
+            >
+              Open placement test
+            </a>
+            <a href="#how-it-works" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+              See how it works
+            </a>
+          </div>
+        </section>
+
+        <section id="placement-test" style={{ ...styles.card, display: "grid", gap: 16 }}>
+          <details
+            open={placementOpen}
+            onToggle={(event) => setPlacementOpen(event.currentTarget.open)}
+            style={{ display: "grid", gap: 16 }}
+          >
+            <summary style={{ cursor: "pointer", listStyle: "none" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span
+                  aria-hidden
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: 12,
+                    background: "#e0e7ff",
+                    color: "#1d4ed8",
+                    display: "grid",
+                    placeItems: "center",
+                    fontWeight: 800,
+                  }}
+                >
+                  ✓
+                </span>
+                <div>
+                  <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{placementTest.title}</h2>
+                  <p style={{ ...styles.helperText, margin: 0 }}>{placementTest.subtitle}</p>
+                </div>
+              </div>
+            </summary>
+
+            <div style={{ display: "grid", gap: 16 }}>
+              {placementTest.sections.map((section) => (
+                <div key={section.id} style={{ display: "grid", gap: 12 }}>
+                  <h3 style={{ margin: 0, fontSize: 18 }}>{section.title}</h3>
+                  <div style={{ display: "grid", gap: 6, color: "#374151", fontSize: 14 }}>
+                    {section.passage.map((line, idx) => (
+                      <p key={`${section.id}-line-${idx}`} style={{ margin: 0 }}>
+                        {line}
+                      </p>
+                    ))}
+                  </div>
+                  <div style={{ display: "grid", gap: 12 }}>
+                    {section.questions.map((question) => (
+                      <div key={question.id} style={{ display: "grid", gap: 8 }}>
+                        <div style={{ fontWeight: 600 }}>
+                          {question.number}. {question.text}
+                        </div>
+                        <div style={{ display: "grid", gap: 8 }}>
+                          {question.options.map((option) => renderPlacementOptionButton(question, option))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "grid", gap: 8 }}>
+              <div style={{ fontSize: 14, color: "#4b5563" }}>
+                Answered {placementAnsweredCount} / {placementQuestions.length}
+              </div>
+              {placementComplete ? (
+                <div style={{ display: "grid", gap: 10 }}>
+                  <div style={{ ...styles.focusNotice, margin: 0 }}>
+                    Score: <strong>{placementScore}</strong> / {placementQuestions.length} · Suggested level:{" "}
+                    <strong>{placementLevel}</strong>
+                  </div>
+                  <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+                    <h4 style={{ marginTop: 0 }}>Answer key</h4>
+                    <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+                      {placementQuestions.map((question) => (
+                        <li key={`key-${question.id}`}>
+                          <strong>{question.number}.</strong> {question.correct}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </div>
+              ) : (
+                <div style={{ color: "#6b7280", fontSize: 14 }}>
+                  Finish all questions to see your suggested level and the answer key.
+                </div>
+              )}
+            </div>
+          </details>
+        </section>
+
         {/* Choose your path */}
         <section
           style={{
