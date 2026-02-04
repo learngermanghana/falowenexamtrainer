@@ -1,0 +1,809 @@
+{
+  "common": {
+    "open": "Ouvrir",
+    "minute_one": "{{formattedCount}} minute",
+    "minute_other": "{{formattedCount}} minutes",
+    "hour_one": "{{formattedCount}} heure",
+    "hour_other": "{{formattedCount}} heures",
+    "day_one": "{{formattedCount}} jour",
+    "day_other": "{{formattedCount}} jours"
+  },
+  "interfaceLanguages": {
+    "en": "English (EN)",
+    "de": "Deutsch (DE)",
+    "fr": "Français (FR)"
+  },
+  "programLanguages": {
+    "german": "Allemand",
+    "french": "Français"
+  },
+  "interfaceLanguage": {
+    "label": "Changer la langue de l’interface",
+    "shortLabel": "Langue de l’interface",
+    "helper": "Les menus et les consignes restent dans la langue choisie, indépendamment de la langue étudiée.",
+    "ariaLabel": "Changer la langue de l’interface",
+    "optionAria": "Passer l’interface en {{language}}"
+  },
+  "appNav": {
+    "title": "Falowen Learning Hub",
+    "signedInAs": "Connecté en tant que {{email}}",
+    "logout": "Se déconnecter",
+    "backHome": "Retour à l’accueil",
+    "subtitle": {
+      "campus": "Campus : cours, devoirs, communauté",
+      "exams": "Salle d’examens : oral, écrit, ressources",
+      "default": "Choisissez le Campus ou la salle d’examens"
+    },
+    "tabs": {
+      "course": "Mon cours",
+      "ai": "Falowen A.I",
+      "aiFrench": "Falowen A.I (Français)",
+      "results": "Résultats",
+      "discussion": "Discussion de classe",
+      "account": "Compte"
+    },
+    "sections": {
+      "courseBook": "Livre de cours",
+      "submit": "Soumettre un devoir",
+      "examFile": "Mon dossier d’examen",
+      "grammar": "Poser une question de grammaire",
+      "grammarFrench": "Aide en grammaire française",
+      "writing": "Entraînement à l’écriture",
+      "writingFrench": "Entraînement à l’écriture française",
+      "speech": "Entraînement à l’oral",
+      "speechFrench": "Entraînement à l’oral français",
+      "vocab": "Entraînement au vocabulaire",
+      "vocabFrench": "Vocabulaire français"
+    },
+    "examTabs": {
+      "overview": "Aperçu",
+      "speaking": "Oral",
+      "writing": "Écriture",
+      "vocab": "Vocabulaire",
+      "horen": "Écoute",
+      "lesen": "Lecture",
+      "resources": "Ressources",
+      "study": "Calendrier d’étude",
+      "file": "Mon dossier d’examen"
+    }
+  },
+  "studyBuddy": {
+    "ariaLabel": "Study buddy",
+    "title": "Study Buddy",
+    "subtitle": "Des raccourcis vers Falowen A.I, le calendrier et le travail du jour.",
+    "tags": {
+      "results": "Résultats",
+      "attendance": "Présence",
+      "assignments": "Devoirs",
+      "quickQa": "Questions rapides"
+    },
+    "shortcuts": {
+      "ariaLabel": "Raccourcis Study Buddy",
+      "course": "Cours",
+      "submit": "Envoyer un devoir",
+      "ai": "Falowen A.I",
+      "study": "Calendrier d’étude",
+      "exams": "Salle d’examens"
+    },
+    "actions": {
+      "collapse": "Masquer les détails",
+      "expand": "Afficher les détails",
+      "dismiss": "Masquer la barre",
+      "reopen": "Study Buddy",
+      "reopenAria": "Rouvrir la barre Study Buddy",
+      "contrastOn": "Contraste élevé",
+      "contrastOff": "Contraste standard"
+    },
+    "insights": {
+      "nextUp": "Prochaine étape",
+      "results": "Dernier résultat",
+      "attendance": "Présence",
+      "assignment": "Prochaine tâche"
+    },
+    "data": {
+      "title": "Sources de données",
+      "description": "Les suggestions utilisent tes données de profil Falowen. Les calendriers ou horaires GitHub doivent d’abord être synchronisés dans l’app ou l’API."
+    },
+    "metrics": {
+      "latestResult": "Dernier résultat",
+      "attendance": "Présence",
+      "nextAssignment": "Prochaine tâche",
+      "latestHelper": "Suis tes progrès après chaque correction.",
+      "attendanceHelper": "Reste régulier pour progresser plus vite.",
+      "assignmentHelper": "Basé sur tes derniers devoirs.",
+      "awaitingAssignment": "Recommandation en attente",
+      "scoreValue": "{{score}}/100",
+      "noResults": "Pas encore de résultats",
+      "attendancePercent": "{{percent}} %",
+      "attendanceSessions": "{{count}} sessions",
+      "notSynced": "Non synchronisé"
+    },
+    "suggestions": {
+      "title": "Suggestions",
+      "lowScore": "Reprends le dernier devoir corrigé et refais les corrections avant une nouvelle tâche.",
+      "lowAttendance": "Essaie d’assister aux deux prochains cours pour garder le rythme.",
+      "paymentReminder": "Rappel paiement : {{amount}} à régler dans {{time}}. Vérifie ton compte pour rester inscrit.",
+      "assignmentPlan": "Planifie deux courtes sessions cette semaine pour terminer {{assignment}}.",
+      "default": "Dis-moi ton objectif actuel et je prépare un mini plan de semaine."
+    },
+    "qa": {
+      "title": "Poser une question rapide",
+      "placeholder": "Ex. Que dois-je réviser pour le prochain cours ?",
+      "send": "Envoyer",
+      "loading": "Réponse en cours...",
+      "error": "Désolé, Study Buddy ne peut pas répondre pour le moment. Réessaie plus tard."
+    },
+    "quickReply": {
+      "keywords": {
+        "attendance": ["présence", "presence", "absent", "absence", "assiduité"],
+        "results": ["résultat", "resultat", "note", "score"],
+        "assignment": ["devoir", "exercice", "travail", "tâche", "tache"],
+        "grammar": ["grammaire"],
+        "vocab": ["vocabulaire", "mot", "mots"],
+        "exam": ["examen", "test", "épreuve", "epreuve"],
+        "greeting": ["salut", "bonjour", "coucou", "hallo", "hello"]
+      },
+      "attendance": {
+        "synced": "Tu es actuellement à {{attendance}}. Vise la prochaine session pour garder l’élan.",
+        "notSynced": "Tes données de présence ne sont pas encore synchronisées. Demande à ton tuteur de confirmer."
+      },
+      "results": {
+        "synced": "Ton dernier résultat est {{results}}. Tu veux un plan d’entraînement basé dessus ?",
+        "noResults": "Dès que la première tâche est notée, je résume la tendance."
+      },
+      "assignment": {
+        "recommended": "Prochaine étape : {{assignment}}. Je peux t’aider à organiser le travail.",
+        "awaiting": "Pas encore de recommandation. Dis-moi sur quel chapitre tu es."
+      },
+      "grammar": "Pour la grammaire : choisis une règle et écris 3 phrases courtes.",
+      "vocab": "Utilise 5 nouveaux mots dans de petites phrases aujourd’hui. Je peux te quizzer.",
+      "examTips": "Conseil examen : entraîne-toi avec un timer et note une erreur après chaque tâche.",
+      "greeting": "Salut ! Dis-moi ce dont tu as besoin : résultats, présence, devoirs, grammaire, vocabulaire ou examens.",
+      "default": "D’accord ! Dis-moi sur quoi tu travailles et je propose la prochaine étape."
+    }
+  },
+  "signup": {
+    "interfaceNote": "Ce programme enseigne le {{program}}. L’interface est disponible en anglais.",
+    "programs": {
+      "german": "allemand",
+      "french": "français"
+    }
+  },
+  "homeActions": {
+    "title": "Que veux-tu faire aujourd’hui ?",
+    "badge": "Démarrage rapide",
+    "description": "Choisis l’une des deux tâches principales : travailler dans le cours ou lancer une simulation d’examen. Un français simple aide tout le monde, surtout les apprenants A1.",
+    "buttons": {
+      "course": "Ouvrir le cours",
+      "exam": "Aller à la simulation d’examen",
+      "discussion": "Aller à la discussion de classe",
+      "account": "Compte, contrat & paiements"
+    }
+  },
+  "courseTab": {
+    "instructionLabel": "Instruction"
+  },
+  "planPage": {
+    "meta": {
+      "title": "Ton plan · Falowen Exam Coach",
+      "description": "Choisis entre le cours et la simulation d’examen pour démarrer ta prochaine session."
+    },
+    "title": "Deux options pour aujourd’hui",
+    "badge": "Connexion requise",
+    "intro": "Garde la page d’accueil simple : choisis entre le cours et la simulation d’examen. Tu accéderas au reste depuis ces espaces.",
+    "courseCard": {
+      "title": "Cours",
+      "description": "Ouvre tes supports et avance dans les leçons ou devoirs.",
+      "points": [
+        "Tous les PDFs, vidéos et worksheets au même endroit.",
+        "Fil conducteur clair pour les prochaines tâches.",
+        "Accès direct au module actuel après connexion."
+      ],
+      "cta": "Aller au cours"
+    },
+    "examCard": {
+      "title": "Examens",
+      "description": "Lance une simulation d’examen avec tâches claires et minuterie.",
+      "points": [
+        "Accès direct aux sessions de speaking ou writing.",
+        "Les questions et prompts s’affichent après connexion.",
+        "Feedback et score enregistrés après chaque session."
+      ],
+      "cta": "Aller à l’examen"
+    }
+  },
+  "examRoom": {
+    "headingLabel": "Salle d’examen",
+    "title": "Choisis ton format d’examen",
+    "levelBadge": "Niveau : {{level}}",
+    "tabs": {
+      "speaking": "Expression orale",
+      "writing": "Expression écrite",
+      "resources": "Ressources"
+    },
+    "resources": {
+      "title": "Ressources pour lecture & écoute",
+      "subtitle": "Exemples officiels Goethe ({{level}}) – entraîne-toi avec du matériel authentique.",
+      "badge": "Liens externes",
+      "links": {
+        "reading": {
+          "label": "Lecture (exercices Goethe)",
+          "description": "Ouvre les exercices officiels de compréhension écrite Goethe dans un nouvel onglet."
+        },
+        "listening": {
+          "label": "Écoute (compréhension orale Goethe)",
+          "description": "Exercices audio originaux avec solutions directement depuis le site Goethe."
+        }
+      }
+    }
+  },
+  "resourcePage": {
+    "meta": {
+      "title": "Ressources · Falowen Exam Coach",
+      "description": "Stratégies et liens fiables pour la lecture, l’écoute et la préparation aux examens."
+    },
+    "title": "Ressources",
+    "subtitle": "Collection sûre avec stratégies claires et liens plutôt que des épreuves copiées.",
+    "badge": "Lecture/écoute incluses",
+    "sections": [
+      {
+        "title": "Lecture & écoute comme Skill Lab",
+        "points": [
+          "Exercices de stratégie (skimming, scanning, repérage de mots-clés, prise de notes).",
+          "Contenu fourni par l’utilisateur : coller un texte ou un lien audio → questions de compréhension & feedback.",
+          "Pas d’épreuves hébergées ; liens vers des sources fiables (DW, Goethe, exemples telc/ÖSD)."
+        ]
+      },
+      {
+        "title": "Checklists & stratégies",
+        "points": [
+          "« Réussir la partie 2 » – checklists pas à pas pour parler/écrire.",
+          "Connecteurs et expressions par niveau (A1–B2).",
+          "Listes de prononciation : pièges fréquents + audio d’exemple (assets internes)."
+        ]
+      },
+      {
+        "title": "Liens vers les ressources officielles",
+        "points": [
+          "Liens directs vers les exercices Goethe, telc, ÖSD et Deutsche Welle.",
+          "Mention que les sujets originaux ne sont pas copiés – les apprenants s’entraînent sur les sites officiels.",
+          "Courts conseils : sur quoi se concentrer ? quelles parties sont clés pour A1/A2/B1/B2 ?"
+        ]
+      }
+    ]
+  },
+  "vocabPage": {
+    "title": "Booster de vocabulaire",
+    "intro": "🧠 Utilise ces mini-listes comme aide rapide pour tes réponses. Lis-les à voix haute et intègre-les dans tes exemples.",
+    "exerciseTitle": "Mini-exercice",
+    "exerciseIntro": "Choisis deux expressions dans les listes ci-dessus et écris ou dis un court dialogue. Combine au moins une question et une demande polie.",
+    "prompts": [
+      "Décris-toi en 5–6 phrases (nom, origine, profession, loisirs).",
+      "Pose trois questions sur un thème de ton choix (ex. vacances, travail, famille).",
+      "Formule des demandes polies pour un projet de groupe (lieu, tâches, planning)."
+    ]
+  },
+  "landing": {
+    "meta": {
+      "title": "Falowen Exam Coach · Coaching allemand & français",
+      "description": "Falowen accompagne les apprenants au Ghana avec des cours en direct, une pratique quotidienne et des retours des tuteurs."
+    },
+    "badge": "Falowen · Exam Coach",
+    "heroTitle": "Coaching d’examens d’allemand et de français depuis le Ghana.",
+    "heroSubtitle": "Falowen se concentre d’abord sur la préparation aux examens d’allemand : pratique quotidienne, retours des tuteurs et cours en direct structurés. Le français est disponible comme module A1 complémentaire.",
+    "cta": {
+      "join": "Rejoindre une cohorte",
+      "login": "Se connecter",
+      "getApp": "Télécharger l’app",
+      "seeHow": "Voir comment ça marche ↓"
+    },
+    "heroBadges": [
+      "Pratique quotidienne",
+      "Retours des tuteurs",
+      "Cours en direct",
+      "Simulations d’examen",
+      "Cohortes allemandes + françaises"
+    ],
+    "languageChooser": {
+      "title": "Choisis ta langue d’apprentissage",
+      "subtitle": "Choisis si tu veux étudier l’allemand ou le français. La langue de l’interface se règle séparément.",
+      "interfaceNote": "Les programmes enseignent l’allemand ou le français — l’interface est disponible en anglais par défaut.",
+      "studyGerman": "Étudier l’allemand",
+      "studyFrench": "Étudier le français",
+      "current": "Sélection actuelle : {{language}}",
+      "ariaLabel": "Sélecteur de langue pour le programme d’apprentissage",
+      "optionAria": "Sélectionner le programme {{language}}"
+    },
+    "programs": {
+      "german": {
+        "label": "Deutsch (DE)",
+        "shortLabel": "Allemand",
+        "description": "Préparation structurée avec pratique quotidienne et retours des tuteurs.",
+        "focus": "Programme principal pour la préparation Goethe.",
+        "details": [
+          "Exercices quotidiens avec formats d’examen clairs.",
+          "Retours des tuteurs en cours en direct et sur les devoirs.",
+          "Accent sur parler, écrire, lire et écouter pour A1–B1."
+        ]
+      },
+      "french": {
+        "label": "Français (FR)",
+        "shortLabel": "Français",
+        "description": "Routines A1 avec structure hebdomadaire et supports guidés.",
+        "focus": "Module optionnel pour la communication de base A1.",
+        "details": [
+          "Structure hebdomadaire avec routines quotidiennes courtes.",
+          "Listes guidées de vocabulaire et d’expressions.",
+          "Complément du programme allemand, pas un remplacement."
+        ]
+      }
+    },
+    "programComparison": {
+      "title": "Comparaison des programmes",
+      "subtitle": "L’allemand reste le cœur. Le français est un module A1 optionnel.",
+      "germanTitle": "Programme d’examen allemand (principal)",
+      "frenchTitle": "Module A1 français (optionnel)",
+      "germanPoints": [
+        "Préparation structurée avec tâches quotidiennes.",
+        "Feedback tuteur et classes live pour des progrès clairs.",
+        "Aligné sur les formats d’examen Goethe."
+      ],
+      "frenchPoints": [
+        "Routines A1 avec structure hebdomadaire.",
+        "Courts exercices pour la vie quotidienne.",
+        "Complément pour les apprenants qui veulent aussi le français."
+      ]
+    },
+    "path": {
+      "title": "Choisis ton parcours",
+      "subtitle": "Nouvel apprenant ou axé examen ? Choisis l’option qui correspond à ta prochaine étape.",
+      "newLearner": {
+        "title": "Je débute en {{language}}",
+        "description": "Rejoins la prochaine cohorte et démarre au bon niveau (A1+).",
+        "cta": "Rejoindre une cohorte →"
+      },
+      "examReady": {
+        "title": "Je prépare des examens",
+        "description": "Connecte-toi pour pratiquer l’oral et l’écrit avec des tâches d’examen.",
+        "cta": "Se connecter →"
+      }
+    },
+    "howItWorks": {
+      "title": "Comment s’inscrire et démarrer",
+      "subtitle": "Complète ta candidature, choisis une cohorte, puis débloque l’accès avec le paiement. Ensuite, tu reçois ta checklist d’onboarding et les liens de classe.",
+      "benefits": [
+        "✅ Tu obtiens : outils de pratique quotidienne, retours des tuteurs et support en cours en direct.",
+        "✅ Idéal pour : apprenants qui préparent des tâches d’expression orale et écrite type Goethe."
+      ],
+      "cta": "Prêt ? Rejoindre une cohorte →",
+      "steps": [
+        {
+          "title": "Ouvrir le formulaire d’inscription",
+          "description": "Clique sur « Rejoindre une cohorte » pour commencer ta candidature."
+        },
+        {
+          "title": "Remplir tes informations",
+          "description": "Partage ton nom, tes contacts et tes objectifs pour bien te placer."
+        },
+        {
+          "title": "Choisir ton niveau/classe",
+          "description": "Sélectionne la cohorte (ex. A1/A2/B1) selon l’horaire et la disponibilité."
+        },
+        {
+          "title": "Finaliser le paiement",
+          "description": "Après avoir choisi la cohorte, finalise le paiement pour accéder aux outils."
+        },
+        {
+          "title": "Recevoir l’onboarding",
+          "description": "Nous t’envoyons la checklist, les liens de classe et les prochaines étapes."
+        }
+      ]
+    },
+    "selfLearning": {
+      "title": "Parcours en autonomie pour allemand & français",
+      "description": "Tu préfères apprendre en autonomie ? Les apprenants d’allemand ont des parcours B2/C1 avec tâches type Goethe et évaluation IA. Les apprenants de français reçoivent des routines A1 avec consignes quotidiennes et checklists de vocabulaire guidées.",
+      "cta": "Se connecter pour commencer →",
+      "imageAlt": "Annonce self-learning allemand B2/C1 et français A1"
+    },
+    "features": [
+      {
+        "icon": "📱",
+        "title": "Pratique quotidienne + cours en direct",
+        "description": "Pratique chaque jour sur téléphone ou ordinateur, puis mets en pratique en cours avec un tuteur."
+      },
+      {
+        "icon": "👩🏽‍🏫",
+        "title": "Retours des tuteurs",
+        "description": "Tes tâches d’oral et d’écrit sont évaluées et discutées en cours."
+      },
+      {
+        "icon": "🗣️",
+        "title": "Entraînement type examen",
+        "description": "Travaille des tâches réalistes pour gagner confiance pour A1–B1."
+      }
+    ],
+    "updates": {
+      "title": "Dernières nouveautés",
+      "subtitle": "De nouvelles fonctions pour un entraînement structuré et personnalisé.",
+      "items": [
+        {
+          "title": "Routines du calendrier d’étude",
+          "description": "Planifie tes tâches hebdomadaires avec un calendrier guidé pour l’oral, l’écrit et le vocabulaire.",
+          "tag": "Nouveau"
+        },
+        {
+          "title": "Suivi My Exam File",
+          "description": "Regroupe les prompts d’examen, notes personnelles et retours des tuteurs au même endroit.",
+          "tag": "Mis à jour"
+        },
+        {
+          "title": "Pratique de l’oral + de l’écrit",
+          "description": "Entraîne-toi avec des prompts type examen et revois le feedback avant le cours.",
+          "tag": "Amélioré"
+        },
+        {
+          "title": "Soumission des devoirs",
+          "description": "Soumets tes devoirs, suis le feedback et reste aligné avec les objectifs hebdomadaires.",
+          "tag": "En ligne"
+        }
+      ]
+    },
+    "photos": [
+      {
+        "caption": "Séances guidées avec camarades et tuteurs."
+      },
+      {
+        "caption": "Exercices pratiques d’écriture et d’oral pour chaque niveau."
+      }
+    ],
+    "reviews": {
+      "title": "Ce que disent nos apprenants",
+      "subtitle": "Retours d’apprenants.",
+      "starRating_one": "{{count}} étoile",
+      "starRating_other": "{{count}} étoiles",
+      "items": [
+        {
+          "name": "Ama",
+          "country": "Ghana",
+          "level": "A1",
+          "stars": 5,
+          "text": "Les exercices d’oral sont clairs et faciles à suivre. Je pose enfin des questions avec confiance."
+        },
+        {
+          "name": "Samuel",
+          "country": "Nigeria",
+          "level": "A2",
+          "stars": 5,
+          "text": "J’aime le feedback tuteur. Je vois exactement quoi améliorer à l’écrit."
+        },
+        {
+          "name": "Amina",
+          "country": "Kenya",
+          "level": "A1",
+          "stars": 4,
+          "text": "Les cours sont structurés. La pratique quotidienne me garde régulière même quand je suis occupée."
+        },
+        {
+          "name": "Fatou",
+          "country": "Sénégal",
+          "level": "A2",
+          "stars": 5,
+          "text": "Les tâches ressemblent aux examens. Je comprends maintenant les parties 1, 2 et 3 pour l’oral."
+        },
+        {
+          "name": "Youssef",
+          "country": "Maroc",
+          "level": "B1",
+          "stars": 5,
+          "text": "Les étapes d’écriture m’aident à organiser mes idées. Mes lettres sont plus professionnelles."
+        },
+        {
+          "name": "Lerato",
+          "country": "Afrique du Sud",
+          "level": "A1",
+          "stars": 4,
+          "text": "Instructions simples et corrections utiles. La plateforme est facile à utiliser."
+        },
+        {
+          "name": "Kofi",
+          "country": "Ghana",
+          "level": "A2",
+          "stars": 5,
+          "text": "J’ai amélioré ma prononciation en enregistrant et en vérifiant le feedback régulièrement."
+        },
+        {
+          "name": "Mariam",
+          "country": "Tanzanie",
+          "level": "A1",
+          "stars": 5,
+          "text": "Le planning et les tâches quotidiennes rendent l’apprentissage prévisible et moins stressant."
+        },
+        {
+          "name": "Ibrahim",
+          "country": "Égypte",
+          "level": "B1",
+          "stars": 4,
+          "text": "Bon matériel de pratique. J’aime que cela se concentre sur les conversations d’examen."
+        },
+        {
+          "name": "Chiamaka",
+          "country": "Nigeria",
+          "level": "A1",
+          "stars": 5,
+          "text": "Je craignais de parler. Maintenant je peux me présenter et faire des demandes polies."
+        },
+        {
+          "name": "Hawa",
+          "country": "Mali",
+          "level": "A2",
+          "stars": 4,
+          "text": "Les retours des tuteurs sont solides. Je comprends mes erreurs plus vite."
+        },
+        {
+          "name": "Patrick",
+          "country": "Ouganda",
+          "level": "A1",
+          "stars": 5,
+          "text": "La pratique quotidienne courte fonctionne. Même 10 minutes m’aident à rester actif."
+        }
+      ]
+    },
+    "darkCta": {
+      "title": "Comment Falowen soutient tes objectifs d’examen",
+      "subtitle": "Falowen entraîne exactement les compétences nécessaires à la réussite : demandes polies, questions correctes, conversation fluide. Pratique chaque jour et reçois les retours des tuteurs en cours en direct.",
+      "ctaTitle": "Prêt à commencer ?",
+      "ctaSubtitle": "Crée ton profil pour accéder aux outils de pratique, aux horaires et aux retours des tuteurs.",
+      "ctaJoin": "Rejoindre une cohorte",
+      "ctaLogin": "Déjà inscrit ? Se connecter →",
+      "contactTitle": "Rester connecté",
+      "contactPhone": "Appel ou WhatsApp :",
+      "contactEmail": "E-mail :",
+      "contactChat": "Chat en direct pendant les cours avec suivi des tuteurs et retours."
+    },
+    "footer": {
+      "quickLinksTitle": "Liens rapides",
+      "followTitle": "Suivre Falowen",
+      "stayTitle": "Pourquoi les apprenants restent",
+      "stayPoints": [
+        "L’apprentissage hybride rend le temps de classe productif.",
+        "Les tuteurs guident ta pratique orale et écrite.",
+        "Les tâches type examen renforcent la confiance rapidement."
+      ]
+    },
+    "quickLinks": [
+      { "label": "À propos", "href": "https://register.falowen.app/#about-us" },
+      { "label": "Politique de confidentialité", "href": "https://register.falowen.app/#privacy-policy" },
+      { "label": "Contact", "href": "https://register.falowen.app/#contact" },
+      { "label": "Conditions d’utilisation", "href": "https://register.falowen.app/#terms-of-service" },
+      { "label": "FAQ", "href": "https://register.falowen.app/#faq" },
+      { "label": "Blog", "href": "https://blog.falowen.app/feed" }
+    ],
+    "socialLinks": [
+      { "label": "Instagram", "href": "https://www.instagram.com/lleaghana" },
+      { "label": "YouTube", "href": "https://www.youtube.com/@LLEAGhana" },
+      { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
+    ]
+  },
+  "examResources": {
+    "meta": {
+      "title": "Ressources d’examen · Falowen Exam Coach",
+      "description": "Liens Goethe et stratégies rapides pour la lecture et l’écoute."
+    }
+  },
+  "classCalendar": {
+    "status": {
+      "startsIn": "Démarre dans {{time}}",
+      "timeLeft": "{{time}} restantes",
+      "courseFinished": "Cours terminé"
+    },
+    "badge": {
+      "startingNow": "Ça commence",
+      "timeLeft": "{{time}} restantes"
+    },
+    "detail": {
+      "startingNow": "Ça commence",
+      "startsIn": "Démarre dans {{time}}"
+    },
+    "timeline": {
+      "untilKickoff": "{{time}} avant le démarrage",
+      "untilGraduation": "{{time}} avant la fin",
+      "finished": "Ce cours est terminé."
+    },
+    "percentDone": "Progression : {{percent}}"
+  },
+  "letterPractice": {
+    "minuteTarget": "Objectif : {{time}}"
+  },
+  "grammarQuestionTab": {
+    "title": "Poser une question de grammaire en {{language}}",
+    "description": "Le coach de grammaire donne maintenant une explication rapide plus 1–2 courts exemples en {{language}} avec des gloses anglaises. Pose des questions précises ({{examplePrompt}}).",
+    "examplePrompt": {
+      "german": "p. ex. « Quand utiliser seit vs. für ? » ou « Comment former le Perfekt avec les verbes modaux ? »",
+      "french": "p. ex. « Quand est-ce que vs. quand » ou « Comment utiliser ne…pas ? »"
+    },
+    "levelLabel": "Niveau (optionnel)",
+    "questionLabel": "Ta question",
+    "questionPlaceholder": "Demande l’ordre des mots, les temps ou d’autres points de grammaire {{language}}...",
+    "submit": "Poser la question au coach",
+    "submitLoading": "Envoi...",
+    "waiting": "En attente de la réponse de l’IA...",
+    "answerHeading": "Réponse du coach",
+    "previousHeading": "Questions précédentes",
+    "filterLevelLabel": "Filtrer par niveau",
+    "filterLevelAll": "Tous les niveaux",
+    "searchLabel": "Recherche",
+    "searchPlaceholder": "Mot-clé dans la question ou la réponse",
+    "sortLabel": "Trier",
+    "sortNewest": "Les plus récentes",
+    "sortOldest": "Les plus anciennes",
+    "entryLevel": "Niveau : {{level}}",
+    "entryQuestion": "Q : {{question}}",
+    "entryAnswerPrefix": "R",
+    "reask": "Reposer",
+    "pendingResponse": "(Réponse en attente)",
+    "askedAt": "Posée le {{date}}",
+    "loadMore": "Charger plus",
+    "loadingMore": "Chargement...",
+    "noHistory": "Aucune question précédente pour l’instant.",
+    "fetchingHistory": "Chargement de l’historique...",
+    "notAvailable": "N/D",
+    "time": {
+      "justNow": "À l’instant"
+    },
+    "errors": {
+      "missingQuestion": "Veuillez saisir une question de grammaire à poser au coach.",
+      "askFailed": "Impossible de joindre le coach de grammaire.",
+      "signInToViewHistory": "Veuillez vous connecter pour voir vos questions de grammaire précédentes.",
+      "historyLoad": "Impossible de charger vos questions de grammaire précédentes."
+    }
+  },
+  "letterWritingIntro": {
+    "backToCourse": "Retour au cours",
+    "title": "Introduction à la rédaction de lettres 12.3",
+    "subtitle": "Utilisez ce guide pour structurer vos lettres formelles et informelles avant de remettre votre devoir.",
+    "languageNote": "Les exemples sont en allemand ; les consignes sont en anglais.",
+    "toc": {
+      "label": "Aller à :",
+      "formal": "Structure formelle",
+      "informal": "Structure informelle",
+      "informalAssignment": "Devoir informel",
+      "formalAssignment": "Devoir formel"
+    },
+    "formalTitle": "Structure de la lettre formelle",
+    "formal": {
+      "salutations": [
+        "Sehr geehrte Frau + Name – à utiliser pour une femme.",
+        "Sehr geehrter Herr + Name – à utiliser pour un homme.",
+        "Sehr geehrte Damen und Herren – à utiliser lorsque le destinataire est inconnu (par ex. école ou agence de voyage)."
+      ],
+      "openingLine": "<strong>Ligne d’ouverture :</strong> Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [raison]. Lorsque vous utilisez <em>weil</em>, placez le verbe ou le verbe modal à la fin.",
+      "openingExamples": [
+        "Exemple 1 : Ich kann nicht kommen... Ich schreibe Ihnen, weil ich nicht kommen kann.",
+        "Exemple 2 : Ich komme nicht... Ich schreibe Ihnen, weil ich nicht komme.",
+        "Conseil : commencez par « Ich » et terminez par « möchte » à cause de « weil ». Exemple : Ich schreibe Ihnen, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Corps de la lettre :</strong> Utilisez les conjonctions <em>Ich möchte wissen, ob</em>, <em>deshalb</em> et <em>weil</em>. Gardez les phrases claires et bien structurées.",
+      "conclusion": "<strong>Conclusion :</strong> Ich freue mich im Voraus auf Ihre Antwort. (Ne pas modifier.) Mit freundlichen Grüßen, <strong>[Votre nom complet]</strong>."
+    },
+    "informalTitle": "Structure de la lettre informelle",
+    "informal": {
+      "salutations": [
+        "Hallo [pour homme et femme],",
+        "Liebe (femme) / Lieber (homme) [Prénom du destinataire],"
+      ],
+      "openingLine": "<strong>Ligne d’ouverture :</strong> Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [raison]. Lorsque vous utilisez <em>weil</em>, placez le verbe ou le verbe modal à la fin.",
+      "openingExamples": [
+        "Exemple 1 : Ich kann nicht kommen... Ich schreibe dir, weil ich nicht kommen kann.",
+        "Exemple 2 : Ich komme nicht... Ich schreibe dir, weil ich nicht komme.",
+        "Conseil : commencez par « Ich » et terminez par « möchte » à cause de « weil ». Exemple : Ich schreibe dir, weil ich den Termin absagen möchte."
+      ],
+      "mainBody": "<strong>Corps de la lettre :</strong> Utilisez les conjonctions <em>Ich möchte wissen, ob</em>, <em>deshalb</em> et <em>weil</em>. Gardez les phrases claires et bien structurées.",
+      "conclusion": "<strong>Conclusion :</strong> Ich freue mich im Voraus auf deine Antwort. (Ne pas modifier.) Liebe Grüße ou Viele Grüße. <strong>[Votre prénom]</strong>."
+    },
+    "annotatedSamplesTitle": "Lettres exemples annotées",
+    "annotatedSamples": {
+      "formal": {
+        "title": "Exemple formel",
+        "items": [
+          { "label": "Salutation", "text": "Sehr geehrte Frau Müller," },
+          { "label": "Raison", "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte." },
+          { "label": "Demande", "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?" },
+          { "label": "Conclusion", "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber" }
+        ]
+      },
+      "informal": {
+        "title": "Exemple informel",
+        "items": [
+          { "label": "Salutation", "text": "Hallo Tom," },
+          { "label": "Raison", "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte." },
+          { "label": "Détails", "text": "Die Feier ist am Samstag um 18 Uhr bei mir." },
+          { "label": "Conclusion", "text": "Liebe Grüße, Sara" }
+        ]
+      }
+    },
+    "informalAssignmentTitle": "Devoir : lettre informelle (recueil de questions pour lettre d’anniversaire)",
+    "informalAssignment": {
+      "intro": "Écris une lettre à ton ami(e) qui a un anniversaire. Suis ces étapes :",
+      "steps": [
+        "Commence par une salutation informelle.",
+        "Explique pourquoi tu écris.",
+        "Souhaite-lui un joyeux anniversaire.",
+        "Demande s’il/si elle prévoit une célébration.",
+        "Conclus la lettre poliment."
+      ],
+      "sampleQuestion": "<strong>Question exemple :</strong> Ihr Freund hat Geburtstag. Schreiben Sie an Ihren Freund: • Warum schreiben Sie? • Gratulieren Sie ihm. • Fragen Sie, ob er eine Feier plant?",
+      "afterWriting": "Après avoir écrit : va dans le Schreiben Trainer, colle la question dans l’Ideas Generator et suis l’invite pour rédiger la lettre. Soumets-la comme d’habitude."
+    },
+    "formalAssignmentTitle": "Devoir : lettre formelle (recueil de questions pour lettre formelle)",
+    "formalAssignment": {
+      "intro": "Écris une lettre formelle à une école de langues parce que tu veux suivre un cours d’allemand. Suis ces étapes :",
+      "steps": [
+        "Commence par une salutation formelle.",
+        "Explique pourquoi tu écris.",
+        "Demande des informations sur les cours.",
+        "Pose des questions sur les dates, les prix et les modes de paiement.",
+        "Conclus la lettre poliment."
+      ],
+      "sampleQuestion": "<strong>Question exemple :</strong> Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule: • Warum schreiben Sie? • Bitten Sie um Informationen über Kurse. • Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
+      "afterWriting": "Après avoir écrit : utilise la même procédure (Schreiben Trainer → Ideas Generator → soumettre comme d’habitude)."
+    },
+    "cta": {
+      "startWriting": "Commencer à écrire",
+      "openIdeas": "Ouvrir l’Ideas Generator"
+    }
+  },
+  "examFile": {
+    "modulePrice": "{{price}} par module"
+  },
+  "studyCalendar": {
+    "meta": {
+      "title": "Calendrier d’étude · Falowen Exam Coach",
+      "description": "Planifie ton calendrier d’étude Goethe et télécharge un fichier calendrier."
+    },
+    "hero": {
+      "kicker": "Générateur de calendrier d’étude",
+      "title": "Crée ton calendrier d’étude Goethe",
+      "subtitle": "Choisis ta date d’examen, définis ton rythme et télécharge un fichier calendrier pour ton téléphone."
+    },
+    "required": {
+      "title": "Obligatoire : verrouille tes rappels",
+      "subtitle": "Ton cours est terminé, donc nous téléchargeons automatiquement un calendrier d’étude pour te garder sur la bonne voie. Tu peux ajuster les dates et télécharger à nouveau si tu veux."
+    },
+    "form": {
+      "examLevel": "Niveau d’examen",
+      "examDate": "Date d’examen",
+      "examDateHelp": "Tu ne vois pas ta date ? Saisis-la manuellement pour construire ton plan.",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "studyDays": "Jours d’étude",
+      "studyDayLabel": "Jour d’étude {{day}}",
+      "studyTime": "Heure",
+      "sessionLength": "Durée de la session",
+      "reminder": "Rappel",
+      "incomplete": "Choisis des dates et au moins un jour d’étude pour générer ton calendrier."
+    },
+    "days": {
+      "mon": "Lun",
+      "tue": "Mar",
+      "wed": "Mer",
+      "thu": "Jeu",
+      "fri": "Ven",
+      "sat": "Sam",
+      "sun": "Dim"
+    },
+    "cta": {
+      "required": "Télécharger le calendrier d’étude (obligatoire)",
+      "standard": "Télécharger le calendrier d’étude (.ics)"
+    },
+    "reminder": {
+      "title": "Comment fonctionnent les rappels",
+      "items": [
+        "Ajoute le fichier téléchargé à Google Calendar, iOS Calendar ou Outlook.",
+        "Chaque session d’étude reçoit un rappel selon le délai choisi.",
+        "Tu peux modifier ou supprimer les sessions plus tard dans ton calendrier."
+      ],
+      "none": "Aucun rappel",
+      "before": "{{time}} avant"
+    }
+  }
+}

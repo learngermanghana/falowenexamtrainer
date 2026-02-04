@@ -1,0 +1,123 @@
+{
+  "reading": {
+    "c1-kultur-essay": {
+      "title": "Goethe Magazin: Kultur und Identität",
+      "description": "Ein Essay über kulturelle Identität und gesellschaftlichen Wandel.",
+      "url": "https://www.goethe.de/prj/ger/de/index.html",
+      "source": "Goethe-Institut Magazin",
+      "type": "Essay"
+    },
+    "c1-arbeitswelt-essay": {
+      "title": "Zeit Online: Zukunft der Arbeit",
+      "description": "Ein Hintergrundartikel über Arbeitsmodelle und Kompetenzen.",
+      "url": "https://www.zeit.de/arbeit",
+      "source": "ZEIT Online",
+      "type": "Article"
+    },
+    "c1-gesellschaft-essay": {
+      "title": "bpb: Gesellschaftlicher Zusammenhalt",
+      "description": "Ein Dossier über soziale Kohäsion und Engagement.",
+      "url": "https://www.bpb.de/",
+      "source": "Bundeszentrale für politische Bildung",
+      "type": "Dossier"
+    },
+    "c1-medien-essay": {
+      "title": "Deutschlandfunk: Medien und Demokratie",
+      "description": "Ein Artikel über Medienvertrauen und öffentliche Debatten.",
+      "url": "https://www.deutschlandfunk.de/",
+      "source": "Deutschlandfunk",
+      "type": "Article"
+    },
+    "c1-gesundheit-essay": {
+      "title": "Wissenschaft im Dialog: Gesundheitssystem",
+      "description": "Ein Sachtext zu Prävention und Verantwortung im Gesundheitssystem.",
+      "url": "https://www.wissenschaft-im-dialog.de/",
+      "source": "Wissenschaft im Dialog",
+      "type": "Article"
+    },
+    "c1-zukunft-essay": {
+      "title": "Handelsblatt: Innovation und Ethik",
+      "description": "Ein Kommentar über Innovationen und ethische Folgen.",
+      "url": "https://www.handelsblatt.com/",
+      "source": "Handelsblatt",
+      "type": "Commentary"
+    }
+  },
+  "listening": {
+    "c1-nachrichten-audio": {
+      "title": "Tagesschau in 100 Sekunden",
+      "description": "Kompakte Nachrichten mit hohem Informationsgehalt.",
+      "url": "https://www.tagesschau.de/100sekunden",
+      "source": "Tagesschau",
+      "type": "News"
+    },
+    "c1-wirtschaft-audio": {
+      "title": "Podcast: Wirtschaft kompakt",
+      "description": "Ein Audioformat über Wirtschaft und Arbeitswelt.",
+      "url": "https://www.br.de/mediathek/podcast",
+      "source": "BR Podcast",
+      "type": "Podcast"
+    },
+    "c1-medien-audio": {
+      "title": "Podcast: Medien und Meinung",
+      "description": "Ein Gespräch über Medienkritik und öffentliche Debatten.",
+      "url": "https://www.deutschlandfunk.de/",
+      "source": "Deutschlandfunk",
+      "type": "Podcast"
+    },
+    "c1-gesellschaft-audio": {
+      "title": "Podcast: Gesellschaft im Wandel",
+      "description": "Ein Interviewformat zu gesellschaftlichen Trends.",
+      "url": "https://www.zeit.de/serie/zeit-wissen",
+      "source": "ZEIT Wissen",
+      "type": "Podcast"
+    },
+    "c1-gesundheit-audio": {
+      "title": "Podcast: Gesundheitspolitik",
+      "description": "Eine Episode über Prävention und Versorgung.",
+      "url": "https://www.ndr.de/ratgeber/gesundheit/index.html",
+      "source": "NDR Ratgeber",
+      "type": "Podcast"
+    },
+    "c1-innovation-audio": {
+      "title": "Podcast: Zukunft & Innovation",
+      "description": "Ein Gespräch über neue Technologien und ethische Fragen.",
+      "url": "https://www.dw.com/de/podcasts/s-9012",
+      "source": "Deutsche Welle",
+      "type": "Podcast"
+    }
+  },
+  "sampleAnswers": {
+    "speaking": {
+      "title": "C1 Beispielantwort (Sprechen)",
+      "text": "Meines Erachtens zeigt sich Kultur im Alltag an kleinen Routinen, etwa im Umgang mit Zeit oder Konflikten. Einerseits verbindet sie Menschen, andererseits kann sie zu Missverständnissen führen. Wenn man Kulturen vergleicht, sollte man sowohl Werte als auch Geschichte berücksichtigen. Insgesamt ist Kultur ein dynamischer Prozess, der sich durch Austausch stetig verändert."
+    },
+    "writing": {
+      "title": "C1 Beispielantwort (Schreiben)",
+      "text": "Sehr geehrte Damen und Herren,\n\nmit großem Interesse habe ich Ihr Programm zur beruflichen Weiterbildung gelesen. Ich möchte meine Kompetenzen vertiefen, damit ich in internationalen Projekten sicherer kommunizieren kann. Besonders wichtig ist mir eine klare Struktur der Lernziele sowie regelmäßiges Feedback. Über weitere Informationen zu Prüfungsformaten würde ich mich freuen.\n\nMit freundlichen Grüßen"
+    }
+  },
+  "sampleRecordings": [
+    {
+      "title": "C1 Musteraufnahme: Argumentation",
+      "url": "https://learngerman.dw.com/de/sprechen/s-57018685",
+      "source": "Deutsche Welle"
+    }
+  ],
+  "rubrics": {
+    "speaking": [
+      "Argumentation ist logisch aufgebaut und differenziert.",
+      "Wortschatz ist präzise, idiomatisch und thematisch passend.",
+      "Grammatik ist weitgehend fehlerfrei bei komplexen Strukturen.",
+      "Register passt zum formellen Prüfungsformat.",
+      "Zeitmanagement: 90–150 Sekunden mit klarer Struktur."
+    ],
+    "writing": [
+      "Aufgabenstellung wird vollständig abgedeckt.",
+      "Text ist kohärent und nutzt geeignete Konnektoren.",
+      "Register ist formal und angemessen für C1.",
+      "Grammatik und Orthografie sind nahezu fehlerfrei.",
+      "Umfang ist passend (ca. 220–250 Wörter)."
+    ]
+  }
+}
