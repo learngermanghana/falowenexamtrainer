@@ -20,6 +20,7 @@ import Day11TwelveHourClockPage from "./components/Day11TwelveHourClockPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
+import Day10ApartmentAssignmentPage from "./components/Day10ApartmentAssignmentPage";
 import Day10ObjectsAndColorsPage from "./components/Day10ObjectsAndColorsPage";
 import GreetingsGrammarPage from "./components/GreetingsGrammarPage";
 import GreetingsAssignmentPage from "./components/GreetingsAssignmentPage";
@@ -488,6 +489,7 @@ const AppShell = ({
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/day-1-greetings-grammar" element={<GreetingsGrammarPage />} />
           <Route path="/campus/course/day-1-greetings-assignment" element={<GreetingsAssignmentPage />} />
+          <Route path="/campus/course/day-10-apartment-assignment" element={<Day10ApartmentAssignmentPage />} />
           <Route path="/campus/course/day-10-objects-and-colors" element={<Day10ObjectsAndColorsPage />} />
           <Route path="/campus/course/day-11-12-hour-clock" element={<Day11TwelveHourClockPage />} />
 
