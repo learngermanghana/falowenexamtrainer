@@ -21,8 +21,6 @@ import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import GreetingsGrammarPage from "./components/GreetingsGrammarPage";
 import GreetingsAssignmentPage from "./components/GreetingsAssignmentPage";
-import ObjectsColorsGrammarPage from "./components/ObjectsColorsGrammarPage";
-import ObjectsColorsAssignmentPage from "./components/ObjectsColorsAssignmentPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -488,8 +486,6 @@ const AppShell = ({
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/day-1-greetings-grammar" element={<GreetingsGrammarPage />} />
           <Route path="/campus/course/day-1-greetings-assignment" element={<GreetingsAssignmentPage />} />
-          <Route path="/campus/course/day-10-objects-grammar" element={<ObjectsColorsGrammarPage />} />
-          <Route path="/campus/course/day-10-objects-assignment" element={<ObjectsColorsAssignmentPage />} />
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
