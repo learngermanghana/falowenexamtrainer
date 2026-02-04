@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import AssignmentForm from "./AssignmentForm";
+import WorkbookSection from "./WorkbookSection";
 
 const Section = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -114,26 +115,30 @@ const Day11TwelveHourClockAssignmentPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>Lesen &amp; Hören — Complete the workbook in the form below.</p>
       </div>
 
-      <Section title="Workbook text (read first)">
-        <h3 style={{ margin: "6px 0 0" }}>Text 1: 12-Hour Clock</h3>
-        <p style={{ margin: 0 }}>
-          Es ist sieben Uhr morgens. Maria steht um sieben Uhr auf und macht sich fertig für den Tag. Sie frühstückt um
-          acht Uhr mit ihrer Familie. Danach geht sie zur Arbeit. Am Abend um sechs Uhr kommt sie nach Hause und isst
-          zu Abend. Um zehn Uhr geht sie ins Bett.
-        </p>
-        <h3 style={{ margin: "12px 0 0" }}>Text 2: Prepositions of Time</h3>
-        <p style={{ margin: 0 }}>
-          Paul hat jeden Morgen um neun Uhr Deutschunterricht. Nach dem Unterricht geht er in die Bibliothek und lernt
-          dort bis zwei Uhr nachmittags. Nachmittags um drei Uhr geht er nach Hause und macht seine Hausaufgaben. Abends
-          um sieben Uhr isst er zu Abend und entspannt sich.
-        </p>
-        <h3 style={{ margin: "12px 0 0" }}>Text 3: Days of the Week</h3>
-        <p style={{ margin: 0 }}>
-          Heute ist Montag. Peter hat am Dienstag und Donnerstag Fußballtraining. Am Freitag geht er mit seinen
-          Freunden ins Kino. Am Wochenende besucht er seine Großeltern. Am Samstag spielt er oft im Park und am Sonntag
-          ruht er sich aus.
-        </p>
-      </Section>
+      <WorkbookSection
+        title="Workbook text (read first)"
+        intro="Read each text below. Use the copy buttons if you want to paste them into your notes."
+        entries={[
+          {
+            id: "day11-text-1",
+            label: "Text 1: 12-Hour Clock",
+            text: "Es ist sieben Uhr morgens. Maria steht um sieben Uhr auf und macht sich fertig für den Tag. Sie frühstückt um acht Uhr mit ihrer Familie. Danach geht sie zur Arbeit. Am Abend um sechs Uhr kommt sie nach Hause und isst zu Abend. Um zehn Uhr geht sie ins Bett.",
+            rows: 4,
+          },
+          {
+            id: "day11-text-2",
+            label: "Text 2: Prepositions of Time",
+            text: "Paul hat jeden Morgen um neun Uhr Deutschunterricht. Nach dem Unterricht geht er in die Bibliothek und lernt dort bis zwei Uhr nachmittags. Nachmittags um drei Uhr geht er nach Hause und macht seine Hausaufgaben. Abends um sieben Uhr isst er zu Abend und entspannt sich.",
+            rows: 4,
+          },
+          {
+            id: "day11-text-3",
+            label: "Text 3: Days of the Week",
+            text: "Heute ist Montag. Peter hat am Dienstag und Donnerstag Fußballtraining. Am Freitag geht er mit seinen Freunden ins Kino. Am Wochenende besucht er seine Großeltern. Am Samstag spielt er oft im Park und am Sonntag ruht er sich aus.",
+            rows: 4,
+          },
+        ]}
+      />
 
       <Section title="Listening audio links">
         <p style={{ margin: 0 }}>

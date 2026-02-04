@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import AssignmentForm from "./AssignmentForm";
+import WorkbookSection from "./WorkbookSection";
 
 const Section = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -86,16 +87,19 @@ const GreetingsAssignmentPage = () => {
         </p>
       </div>
 
-      <Section title="Workbook text (read first)">
-        <p style={{ margin: 0 }}>
-          Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein bisschen müde.
-          Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!
-        </p>
-        <p style={{ margin: "8px 0 0", color: "#4b5563" }}>
-          Translation: Good morning! How are you? I am good, thank you. Good day! How are you? I am a bit tired. Good
-          evening! I am happy to see you. Good night! Sleep well! Goodbye! Bye!
-        </p>
-      </Section>
+      <WorkbookSection
+        title="Workbook text (read first)"
+        intro="Read the text below. Use the copy buttons if you want to paste it into your notes."
+        entries={[
+          {
+            id: "day1-greetings-text",
+            text: "Guten Morgen! Wie geht es dir? Mir geht es gut, danke. Guten Tag! Wie geht es Ihnen? Ich bin ein bisschen müde. Guten Abend! Ich bin glücklich, dich zu sehen. Gute Nacht! Schlaf gut! Auf Wiedersehen! Tschüss!",
+            translation:
+              "Good morning! How are you? I am good, thank you. Good day! How are you? I am a bit tired. Good evening! I am happy to see you. Good night! Sleep well! Goodbye! Bye!",
+            rows: 5,
+          },
+        ]}
+      />
 
       <AssignmentForm
         title="Assignment Form"
