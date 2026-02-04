@@ -114,6 +114,7 @@ const AssignmentSubmissionPage = () => {
 
   const [preview, setPreview] = useState(null); // { assignmentTitle, submissionText, createdAt }
   const [copyStatus, setCopyStatus] = useState("");
+  const [pasteStatus, setPasteStatus] = useState("");
 
   const lastAssignmentRef = useRef(assignmentOptions[0]);
 
@@ -553,6 +554,30 @@ const AssignmentSubmissionPage = () => {
     }
   };
 
+  const handlePasteFromClipboard = async () => {
+    setPasteStatus("");
+    try {
+      if (navigator?.clipboard?.readText) {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          setForm((prev) => ({ ...prev, submissionText: text }));
+          setPasteStatus("Pasted ✅");
+          setTimeout(() => setPasteStatus(""), 1500);
+        } else {
+          setPasteStatus("Clipboard is empty");
+          setTimeout(() => setPasteStatus(""), 2000);
+        }
+      } else {
+        setPasteStatus("Paste is not supported in this browser");
+        setTimeout(() => setPasteStatus(""), 2000);
+      }
+    } catch (error) {
+      console.error("Paste failed", error);
+      setPasteStatus("Paste failed");
+      setTimeout(() => setPasteStatus(""), 2000);
+    }
+  };
+
   // ✅ Resubmission mailto (per selected assignment)
   const resubmissionMailto = useMemo(() => {
     const subject = `Resubmission request - ${assignmentInfo} - ${studentCode || "no-code"}`;
@@ -653,6 +678,17 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
           <div>
             <label style={{ ...styles.field, margin: 0 }}>
               <span style={styles.label}>Your text *</span>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={handlePasteFromClipboard}
+                  disabled={isSelectedLocked}
+                >
+                  Paste answers from clipboard
+                </button>
+                {pasteStatus ? <span style={{ fontSize: 13, color: "#059669" }}>{pasteStatus}</span> : null}
+              </div>
               <textarea
                 value={form.submissionText}
                 onChange={handleChange("submissionText")}

@@ -100,6 +100,8 @@ const getLessonKey = (lesson) =>
     lesson.youtube_link || "",
     lesson.grammarbook_link || "",
     lesson.workbook_link || "",
+    lesson.grammar_link || "",
+    lesson.assignment_link || "",
     Boolean(lesson.assignment),
   ].join("::");
 
@@ -115,6 +117,18 @@ const LessonList = ({ title, lessons }) => {
   }, [lessons]);
 
   if (!uniqueLessons.length) return null;
+
+  const renderResourceLink = (href, label) => {
+    if (!href) return null;
+    const isInternal = href.startsWith("/");
+    return (
+      <li>
+        <a href={href} target={isInternal ? undefined : "_blank"} rel={isInternal ? undefined : "noreferrer"}>
+          {label}
+        </a>
+      </li>
+    );
+  };
 
   return (
     <div style={{ display: "grid", gap: 8 }}>
@@ -138,27 +152,11 @@ const LessonList = ({ title, lessons }) => {
             </div>
 
             <ul style={{ ...styles.checklist, margin: 0 }}>
-              {lesson.video || lesson.youtube_link ? (
-                <li>
-                  <a href={lesson.video || lesson.youtube_link} target="_blank" rel="noreferrer">
-                    Video ansehen
-                  </a>
-                </li>
-              ) : null}
-              {lesson.grammarbook_link ? (
-                <li>
-                  <a href={lesson.grammarbook_link} target="_blank" rel="noreferrer">
-                    Grammarbook
-                  </a>
-                </li>
-              ) : null}
-              {lesson.workbook_link ? (
-                <li>
-                  <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
-                    Workbook
-                  </a>
-                </li>
-              ) : null}
+              {renderResourceLink(lesson.video || lesson.youtube_link, "Video ansehen")}
+              {renderResourceLink(lesson.grammarbook_link, "Grammarbook")}
+              {renderResourceLink(lesson.workbook_link, "Workbook")}
+              {renderResourceLink(lesson.grammar_link, "Grammar")}
+              {renderResourceLink(lesson.assignment_link, "Assignment")}
             </ul>
           </div>
         ))}
