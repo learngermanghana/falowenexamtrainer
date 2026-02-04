@@ -27,6 +27,7 @@ const OrderedOptions = ({ items }) => (
 const A1Day10ObjectsColorsPage = () => {
   const navigate = useNavigate();
   const [submission, setSubmission] = useState("");
+  const [submittedAt, setSubmittedAt] = useState("");
 
   const vocabulary = useMemo(
     () => [
@@ -208,6 +209,13 @@ const A1Day10ObjectsColorsPage = () => {
     []
   );
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (!submission.trim()) return;
+    const timestamp = new Date().toLocaleString();
+    setSubmittedAt(timestamp);
+  };
+
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -242,19 +250,8 @@ const A1Day10ObjectsColorsPage = () => {
             ))}
           </ol>
           <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }} type="a">
-            {[
-              "the hallway",
-              "the bedroom",
-              "the balcony",
-              "the living room",
-              "the wardrobe",
-              "the kitchen",
-              "the chair",
-              "the bathroom",
-              "the table",
-              "the bed",
-            ].map((item) => (
-              <li key={item}>{item}</li>
+            {vocabulary.map((item) => (
+              <li key={item.english}>{item.english}</li>
             ))}
           </ol>
         </div>
@@ -337,22 +334,22 @@ const A1Day10ObjectsColorsPage = () => {
         <p style={{ margin: 0 }}>
           Paste or type your answers below. When you are done, click <strong>Submit assignment</strong>.
         </p>
-        <form
-          action="https://www.falowen.app/campus/submit"
-          method="GET"
-          style={{ display: "grid", gap: 12 }}
-        >
+        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
           <textarea
             style={{ ...styles.input, minHeight: 160, resize: "vertical", paddingTop: 12 }}
             placeholder="Type your answers here..."
             value={submission}
-            name="assignment"
             onChange={(event) => setSubmission(event.target.value)}
           />
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-            <button style={styles.primaryButton} type="submit" disabled={!submission.trim()}>
+            <button style={styles.primaryButton} type="submit">
               Submit assignment
             </button>
+            {submittedAt ? (
+              <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>
+                Submitted {submittedAt}
+              </span>
+            ) : null}
           </div>
         </form>
       </Section>
