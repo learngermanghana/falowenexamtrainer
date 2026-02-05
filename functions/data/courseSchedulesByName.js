@@ -594,21 +594,16 @@ exports.courseSchedulesByName = {
       },
       {
         dayNumber: 3,
-        date: "2026-02-05",
-        weekday: "Thursday",
+        date: "2026-02-06",
+        weekday: "Friday",
         sessions: [
           { chapter: "1.1", type: "Schreiben & Sprechen" },
           { chapter: "1.2", type: "Lesen & Hören" },
+          { chapter: "2", type: "Lesen & Hören" },
         ],
       },
       {
         dayNumber: 4,
-        date: "2026-02-06",
-        weekday: "Friday",
-        sessions: [{ chapter: "2", type: "Lesen & Hören" }],
-      },
-      {
-        dayNumber: 5,
         date: "2026-02-07",
         weekday: "Saturday",
         sessions: [
@@ -616,31 +611,31 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 6,
+        dayNumber: 5,
         date: "2026-02-12",
         weekday: "Thursday",
         sessions: [{ chapter: "2.3", type: "Schreiben & Sprechen" }],
       },
       {
-        dayNumber: 7,
+        dayNumber: 6,
         date: "2026-02-13",
         weekday: "Friday",
         sessions: [{ chapter: "3", type: "Lesen & Hören" }],
       },
       {
-        dayNumber: 8,
+        dayNumber: 7,
         date: "2026-02-14",
         weekday: "Saturday",
         sessions: [{ chapter: "4", type: "Lesen & Hören" }],
       },
       {
-        dayNumber: 9,
+        dayNumber: 8,
         date: "2026-02-19",
         weekday: "Thursday",
         sessions: [{ chapter: "5", type: "Lesen & Hören" }],
       },
       {
-        dayNumber: 10,
+        dayNumber: 9,
         date: "2026-02-20",
         weekday: "Friday",
         sessions: [
@@ -649,37 +644,37 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 11,
+        dayNumber: 10,
         date: "2026-02-21",
         weekday: "Saturday",
         sessions: [{ chapter: "7", type: "Lesen & Hören" }],
       },
       {
-        dayNumber: 12,
+        dayNumber: 11,
         date: "2026-02-26",
         weekday: "Thursday",
         sessions: [{ chapter: "8", type: "Lesen & Hören" }],
       },
       {
-        dayNumber: 13,
+        dayNumber: 12,
         date: "2026-02-27",
         weekday: "Friday",
         sessions: [{ chapter: "3.5", type: "Schreiben & Sprechen" }],
       },
       {
-        dayNumber: 14,
+        dayNumber: 13,
         date: "2026-02-28",
         weekday: "Saturday",
         sessions: [{ chapter: "3.6", type: "Schreiben & Sprechen" }],
       },
       {
-        dayNumber: 15,
+        dayNumber: 14,
         date: "2026-03-05",
         weekday: "Thursday",
         sessions: [{ chapter: "4.7", type: "Schreiben & Sprechen" }],
       },
       {
-        dayNumber: 16,
+        dayNumber: 15,
         date: "2026-03-06",
         weekday: "Friday",
         sessions: [
@@ -688,13 +683,13 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 17,
+        dayNumber: 16,
         date: "2026-03-07",
         weekday: "Saturday",
         sessions: [{ chapter: "11", type: "Lesen & Hören" }],
       },
       {
-        dayNumber: 18,
+        dayNumber: 17,
         date: "2026-03-12",
         weekday: "Thursday",
         sessions: [
@@ -703,13 +698,13 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 19,
+        dayNumber: 18,
         date: "2026-03-13",
         weekday: "Friday",
         sessions: [{ chapter: "5.9", type: "Schreiben & Sprechen" }],
       },
       {
-        dayNumber: 20,
+        dayNumber: 19,
         date: "2026-03-14",
         weekday: "Saturday",
         sessions: [
@@ -717,7 +712,7 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 21,
+        dayNumber: 20,
         date: "2026-03-19",
         weekday: "Thursday",
         sessions: [
@@ -726,7 +721,7 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 22,
+        dayNumber: 21,
         date: "2026-03-20",
         weekday: "Friday",
         sessions: [
@@ -735,7 +730,7 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 23,
+        dayNumber: 22,
         date: "2026-03-21",
         weekday: "Saturday",
         sessions: [
@@ -744,13 +739,13 @@ exports.courseSchedulesByName = {
         ],
       },
       {
-        dayNumber: 24,
+        dayNumber: 23,
         date: "2026-03-26",
         weekday: "Thursday",
         sessions: [{ chapter: "8.13", type: "Schreiben & Sprechen" }],
       },
       {
-        dayNumber: 25,
+        dayNumber: 24,
         date: "2026-03-27",
         weekday: "Friday",
         sessions: [
