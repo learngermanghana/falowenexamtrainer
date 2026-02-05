@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
@@ -178,6 +179,7 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
 
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
@@ -266,7 +268,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       <div style={{ display: "grid", gap: 12 }}>
         <div style={{ display: "grid", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <h2 style={styles.sectionTitle}>Course Book</h2>
+            <div style={{ display: "grid", gap: 4 }}>
+              <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Course Book</h2>
+              <span style={styles.helperText}>
+                Review the updated course book plan below, then submit your assignment when you are ready.
+              </span>
+            </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <span style={styles.helperText}>Course level:</span>
               <select
@@ -283,6 +290,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   </option>
                 ))}
               </select>
+              <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/submit")}>
+                Submit assignment
+              </button>
             </div>
           </div>
 
