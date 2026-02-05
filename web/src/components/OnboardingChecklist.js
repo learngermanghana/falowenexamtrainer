@@ -62,7 +62,10 @@ const Step = ({
         boxShadow: highlight ? "0 0 0 3px rgba(14,165,233,0.12)" : "none",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+      <div
+        className="onboarding-step-header"
+        style={{ display: "flex", justifyContent: "space-between", gap: 8 }}
+      >
         <div>
           <div style={{ fontWeight: 800, color: "#111827" }}>{title}</div>
           <p style={{ ...styles.helperText, margin: "4px 0 0 0" }}>{description}</p>
@@ -85,7 +88,7 @@ const Step = ({
       </div>
 
       {(onAction || onSecondaryAction) ? (
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+        <div className="onboarding-action-row" style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
           {onAction ? (
             <button
               style={complete ? styles.secondaryButton : styles.primaryButton}
@@ -382,7 +385,10 @@ const OnboardingChecklist = ({
 
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+      <div
+        className="onboarding-step-header"
+        style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}
+      >
         <div>
           <p style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>Onboarding</p>
           <h2 style={{ ...styles.sectionTitle, marginTop: 6, marginBottom: 4 }}>Finish setup in 60 seconds</h2>
@@ -414,7 +420,10 @@ const OnboardingChecklist = ({
             />
           </div>
 
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <div
+            className="onboarding-action-row"
+            style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}
+          >
             <button type="button" style={styles.secondaryButton} onClick={handleRemindLater}>
               Remind me later
             </button>
@@ -427,7 +436,10 @@ const OnboardingChecklist = ({
         </div>
       </div>
 
-      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+      <div
+        className="onboarding-grid"
+        style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
+      >
         <Step
           stepRef={levelRef}
           title="Choose your level"
@@ -495,6 +507,7 @@ const OnboardingChecklist = ({
       </div>
 
       <div
+        className="onboarding-footer"
         style={{
           display: "flex",
           justifyContent: "space-between",
