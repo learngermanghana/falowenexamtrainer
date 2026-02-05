@@ -185,10 +185,17 @@ const placementTest = {
   ],
 };
 
-const flattenPlacementQuestions = (sections) =>
-  sections.flatMap((section) =>
-    section.questions.map((question) => ({ ...question, sectionId: section.id, weight: section.weight || 1 }))
+const flattenPlacementQuestions = (sections) => {
+  let runningNumber = 1;
+  return sections.flatMap((section) =>
+    section.questions.map((question) => ({
+      ...question,
+      number: runningNumber++,
+      sectionId: section.id,
+      weight: section.weight || 1,
+    }))
   );
+};
 
 const getPlacementLevel = (weightedRatio) => {
   if (weightedRatio >= 0.9) return "C1";
