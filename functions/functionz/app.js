@@ -162,6 +162,55 @@ function addMonths(date, months) {
   return d;
 }
 
+function parseSlashDate(raw) {
+  if (!raw) return null;
+  const match = String(raw).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!match) return null;
+  const first = Number(match[1]);
+  const second = Number(match[2]);
+  const year = Number(match[3]);
+  if (!first || !second || !year) return null;
+
+  let month = first;
+  let day = second;
+  if (first > 12 && second <= 12) {
+    day = first;
+    month = second;
+  } else if (second > 12 && first <= 12) {
+    month = first;
+    day = second;
+  }
+
+  const parsed = new Date(year, month - 1, day);
+  if (Number.isNaN(parsed.getTime())) return null;
+  if (parsed.getFullYear() !== year || parsed.getMonth() !== month - 1 || parsed.getDate() !== day) {
+    return null;
+  }
+  return parsed;
+}
+
+function parseContractEnd(value) {
+  if (!value) return null;
+  if (value instanceof Date) return value;
+  if (typeof value === "object" && typeof value.toDate === "function") {
+    const fromTimestamp = value.toDate();
+    if (fromTimestamp instanceof Date && !Number.isNaN(fromTimestamp.getTime())) {
+      return fromTimestamp;
+    }
+  }
+  if (typeof value === "string") {
+    const slashDate = parseSlashDate(value);
+    if (slashDate) return slashDate;
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  if (typeof value === "number") {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return null;
+}
+
 /**
  * Timing-safe compare for signature hex strings
  */
@@ -527,28 +576,63 @@ app.post("/admin/purge-expired-students", async (req, res) => {
     const db = getFirestoreSafe();
     if (!db) return res.status(500).json({ error: "Firestore not available" });
 
-    const nowIso = new Date().toISOString();
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const nowMs = now.getTime();
 
     let deletedStudents = 0;
     let authDeleted = 0;
     let authMissing = 0;
     let firestoreFailed = 0;
+    let scanned = 0;
+    let skippedActive = 0;
+    let skippedInvalid = 0;
+    let skippedNonStudent = 0;
+    let skippedFailed = 0;
 
+    let lastDoc = null;
     while (true) {
-      const snap = await db
+      let query = db
         .collection("students")
-        .where("role", "==", "student")
         .where("contractEnd", ">", "")
-        .where("contractEnd", "<", nowIso)
-        .where("purgeStatus", "!=", "failed") // ✅ skip docs that failed before
-        .limit(25)
-        .get();
+        .orderBy("contractEnd")
+        .limit(25);
+
+      if (lastDoc) {
+        query = query.startAfter(lastDoc);
+      }
+
+      const snap = await query.get();
 
       if (snap.empty) break;
 
+      lastDoc = snap.docs[snap.docs.length - 1];
+
       for (const docSnap of snap.docs) {
+        scanned += 1;
         const data = docSnap.data() || {};
         const uid = data.uid;
+        const contractEndDate = parseContractEnd(data.contractEnd);
+
+        if (data.purgeStatus === "failed") {
+          skippedFailed += 1;
+          continue;
+        }
+
+        if (data.role && data.role !== "student") {
+          skippedNonStudent += 1;
+          continue;
+        }
+
+        if (!contractEndDate) {
+          skippedInvalid += 1;
+          continue;
+        }
+
+        if (contractEndDate.getTime() >= nowMs) {
+          skippedActive += 1;
+          continue;
+        }
 
         // Delete Auth user (best effort)
         if (uid) {
@@ -592,6 +676,11 @@ app.post("/admin/purge-expired-students", async (req, res) => {
       authDeleted,
       authMissing,
       firestoreFailed,
+      scanned,
+      skippedActive,
+      skippedInvalid,
+      skippedNonStudent,
+      skippedFailed,
       nowIso,
     });
   } catch (err) {
