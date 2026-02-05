@@ -90,7 +90,20 @@ const parseDurationToHours = (value) => {
 
 export const formatAttendanceRecord = (id, data = {}, studentCode = "") => {
   const studentEntry = getStudentAttendance(data, studentCode);
-  const present = toBoolean(studentEntry);
+  const hasMark = studentEntry !== undefined && studentEntry !== null && studentEntry !== "";
+  const rawStatus =
+    typeof studentEntry === "object" && studentEntry !== null
+      ? studentEntry.status ?? studentEntry.attendance ?? studentEntry.state
+      : studentEntry;
+  const normalizedStatus = typeof rawStatus === "string" ? rawStatus.trim().toLowerCase() : "";
+  const isPending =
+    !hasMark ||
+    normalizedStatus.includes("pending") ||
+    normalizedStatus.includes("await") ||
+    normalizedStatus.includes("unconfirmed");
+  const isLate = normalizedStatus.includes("late") || normalizedStatus.includes("tardy");
+  const present = isPending ? null : isLate ? true : toBoolean(studentEntry);
+  const status = isPending ? "Pending" : isLate ? "Late" : present ? "Present" : "Absent";
   const rawDuration = data.hours ?? data.durationHours ?? data.duration ?? data.length;
   const sessionHours = parseDurationToHours(rawDuration);
 
@@ -99,7 +112,8 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "") => {
     date: data.date || data.sessionDate || id,
     title: data.topic || data.chapter || data.title || "Session",
     present,
-    status: present ? "Present" : "Absent",
+    status,
+    marked: !isPending,
     hours: sessionHours,
     creditedHours: present ? sessionHours : 0,
     note: (studentEntry && typeof studentEntry === "object" && studentEntry.note) || data.note || "",
