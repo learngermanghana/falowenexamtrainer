@@ -806,4 +806,30 @@
       "before": "{{time}} avant"
     }
   }
+  ,
+  "placementPage": {
+    "meta": {
+      "title": "Test de niveau allemand · Falowen",
+      "description": "Fais un test de niveau allemand rapide et reçois une recommandation CECR avec la prochaine étape d’étude."
+    },
+    "badge": "Nouveau ici ?",
+    "title": "Vérification du niveau (tâches de type examen paraphrasées)",
+    "subtitle": "Tu n’es pas sûr de ton niveau ? Réponds aux questions ci-dessous. Tu verras d’abord le niveau suggéré, puis la révision complète.",
+    "backHome": "Retour à l’accueil",
+    "answeredStatus": "Répondu {{answered}} / {{total}}",
+    "resultSummary": "Score pondéré : {{score}} / {{total}} · Niveau suggéré : {{level}}",
+    "finishPrompt": "Termine toutes les questions pour voir ton niveau suggéré.",
+    "answerKeyTitle": "Révision des réponses",
+    "answerReviewLocked": "La révision des réponses est verrouillée pour préserver l’intégrité du test de niveau. Utilise d’abord les conseils de niveau.",
+    "unlockAnswerReview": "Déverrouiller la révision",
+    "levelCta": "Voir la prochaine étape {{level}}",
+    "feedback": {
+      "A1": "Commence par les bases : salutations, grammaire élémentaire et vocabulaire fréquent.",
+      "A2": "Tu gères les bases du quotidien. Renforce-toi avec de l’expression guidée et de courtes productions écrites.",
+      "B1": "Tu es prêt pour la communication intermédiaire et des exercices structurés de type examen.",
+      "B2": "Tu peux travailler des textes plus complexes et des nuances. Concentre-toi sur les stratégies d’examen avancées.",
+      "C1": "Très bon niveau détecté. Passe au perfectionnement, aux simulations d’examen et au feedback de précision."
+    }
+  }
+
 }

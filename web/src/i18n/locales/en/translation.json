@@ -855,4 +855,30 @@
       "before": "{{time}} before"
     }
   }
+  ,
+  "placementPage": {
+    "meta": {
+      "title": "German placement test · Falowen",
+      "description": "Take a quick German placement test and receive a suggested CEFR level with your next study step."
+    },
+    "badge": "New here?",
+    "title": "Placement check (paraphrased exam-style tasks)",
+    "subtitle": "Not sure about your level yet? Answer the questions below. You will receive a suggested level first, then unlock full review.",
+    "backHome": "Back to homepage",
+    "answeredStatus": "Answered {{answered}} / {{total}}",
+    "resultSummary": "Weighted score: {{score}} / {{total}} · Suggested level: {{level}}",
+    "finishPrompt": "Finish all questions to see your suggested level.",
+    "answerKeyTitle": "Answer review",
+    "answerReviewLocked": "Answer review is locked for placement integrity. Use your suggested level feedback first.",
+    "unlockAnswerReview": "Unlock study review",
+    "levelCta": "See your {{level}} next step",
+    "feedback": {
+      "A1": "Start with foundational classes: greetings, basic grammar, and high-frequency vocabulary.",
+      "A2": "You can handle daily basics. Build confidence with guided speaking and short writing tasks.",
+      "B1": "You are ready for intermediate communication practice and structured exam-style exercises.",
+      "B2": "You can work with complex texts and nuanced communication. Focus on advanced exam strategies.",
+      "C1": "Strong command detected. Move to advanced refinement, exam simulation, and precision feedback."
+    }
+  }
+
 }

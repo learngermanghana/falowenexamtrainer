@@ -25,6 +25,24 @@ export const updatePageMeta = ({ title, description, lang } = {}) => {
     if (ogDescriptionTag) ogDescriptionTag.setAttribute("content", description);
   }
 
+  const canonicalHref = typeof window !== "undefined" ? window.location.href : null;
+  if (canonicalHref) {
+    let canonicalTag = document.querySelector('link[rel="canonical"]');
+    if (!canonicalTag) {
+      canonicalTag = document.createElement("link");
+      canonicalTag.setAttribute("rel", "canonical");
+      document.head.appendChild(canonicalTag);
+    }
+    canonicalTag.setAttribute("href", canonicalHref);
+
+    const ogUrlTag = ensureMetaTag("property", "og:url");
+    if (ogUrlTag) ogUrlTag.setAttribute("content", canonicalHref);
+  }
+
+  const defaultOgImage = "https://www.falowen.app/falo.png";
+  const ogImageTag = ensureMetaTag("property", "og:image");
+  if (ogImageTag) ogImageTag.setAttribute("content", defaultOgImage);
+
   if (lang) {
     document.documentElement.lang = lang;
   }
