@@ -1,7 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
+
+const PLACEMENT_STORAGE_KEY = "falowen.placementTest.progress.v1";
+const ANSWER_REVIEW_DELAY_MS = 30 * 60 * 1000;
 
 const placementTest = {
   title: "Placement check (paraphrased exam-style tasks)",
@@ -11,6 +14,7 @@ const placementTest = {
     {
       id: "ticket",
       title: "Kurztext: 29-Euro-Ticket",
+      weight: 1,
       passage: [
         "Mit dem neuen 29-Euro-Ticket können Fahrgäste mit Bussen, Straßenbahnen und Regionalzügen in ganz Deutschland fahren.",
         "Das Ticket gilt von Anfang Oktober bis Ende Dezember. Es ist für beliebig viele Fahrten im Nahverkehr gültig.",
@@ -46,6 +50,7 @@ const placementTest = {
     {
       id: "store",
       title: "Kaufhaus-Übersicht",
+      weight: 1,
       passage: [
         "3. Stock: Smartphones, TV, Computer, Drucker, Spiele, Sport- und Arbeitskleidung.",
         "2. Stock: Herrenmode, Wäsche, Möbel für Wohnzimmer/Bad/Küche, Teppiche, Lampen, Deko.",
@@ -73,6 +78,7 @@ const placementTest = {
     {
       id: "ads",
       title: "Welche Anzeige passt?",
+      weight: 1.2,
       passage: [
         "A: Schweizer Autoren – leicht gelesen. Vereinfachte Literaturtexte für Deutschlernende.",
         "B: Deutsch-Training online. Zehn kostenlose Lektionen, Grammatik-Erklärungen, alle Übungen im Internet.",
@@ -92,6 +98,7 @@ const placementTest = {
     {
       id: "phones",
       title: "Meinungen zu Handyverboten in der Schule",
+      weight: 1.2,
       passage: [
         "Corinne (37): Handys sind oft nur zum Angeben. In der Schule sollten Kinder sich auf den Unterricht konzentrieren.",
         "Rüdiger (47): Ich musste lange auf meine Tochter warten, weil sie ihr Handy nicht einschalten durfte. Das geht so nicht.",
@@ -124,6 +131,7 @@ const placementTest = {
     {
       id: "murten",
       title: "Zeitreise per Velo",
+      weight: 1.4,
       passage: [
         "Mit der Radtour „Zeitreise per Velo“ entdecken Besucherinnen und Besucher Murten aktiv.",
         "Treffpunkt ist der Bahnhof. Wer möchte, bringt das eigene Fahrrad mit oder leiht eines dort aus.",
@@ -142,6 +150,7 @@ const placementTest = {
     {
       id: "digital",
       title: "Digitales Lernen",
+      weight: 1.8,
       passage: [
         "DIGITALES LERNEN – UNABHÄNGIG VON ZEIT UND ORT",
         "Alles online: Internetfähige Geräte werden beim E-Learning eingesetzt. In der Praxis (21) das,",
@@ -177,54 +186,149 @@ const placementTest = {
 };
 
 const flattenPlacementQuestions = (sections) =>
-  sections.flatMap((section) => section.questions.map((question) => ({ ...question, sectionId: section.id })));
+  sections.flatMap((section) =>
+    section.questions.map((question) => ({ ...question, sectionId: section.id, weight: section.weight || 1 }))
+  );
 
-const getPlacementLevel = (score, total) => {
-  if (total === 0) return "A1";
-  const ratio = score / total;
-  if (ratio >= 0.92) return "C1";
-  if (ratio >= 0.8) return "B2";
-  if (ratio >= 0.65) return "B1";
-  if (ratio >= 0.45) return "A2";
+const getPlacementLevel = (weightedRatio) => {
+  if (weightedRatio >= 0.9) return "C1";
+  if (weightedRatio >= 0.76) return "B2";
+  if (weightedRatio >= 0.6) return "B1";
+  if (weightedRatio >= 0.42) return "A2";
   return "A1";
 };
 
+const getPlacementRecommendationRoute = (level) => {
+  if (["B2", "C1"].includes(level)) return "/exams/overview";
+  if (level === "B1") return "/campus/course";
+  return "/signup";
+};
+
+const getPlacementProgress = () => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(PLACEMENT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch (error) {
+    return null;
+  }
+};
+
+const savePlacementProgress = (progress) => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PLACEMENT_STORAGE_KEY, JSON.stringify(progress));
+  } catch (error) {
+    // no-op
+  }
+};
+
+const trackPlacementEvent = (event, payload = {}) => {
+  if (typeof window === "undefined") return;
+  if (Array.isArray(window.dataLayer)) {
+    window.dataLayer.push({ event: "placement_test", action: event, ...payload });
+  }
+};
+
 const PlacementTestPage = () => {
-  const { i18n } = useTranslation();
-  const [placementAnswers, setPlacementAnswers] = useState({});
-  const placementQuestions = useMemo(
-    () => flattenPlacementQuestions(placementTest.sections),
+  const { t, i18n } = useTranslation();
+  const placementQuestions = useMemo(() => flattenPlacementQuestions(placementTest.sections), []);
+  const initialProgress = useMemo(
+    () =>
+      getPlacementProgress() || {
+        answers: {},
+        startedAt: null,
+        completedAt: null,
+        reviewUnlocked: false,
+      },
     []
   );
+  const [placementAnswers, setPlacementAnswers] = useState(initialProgress.answers || {});
+  const [startedAt, setStartedAt] = useState(initialProgress.startedAt || null);
+  const [completedAt, setCompletedAt] = useState(initialProgress.completedAt || null);
+  const [reviewUnlocked, setReviewUnlocked] = useState(Boolean(initialProgress.reviewUnlocked));
+  const startTrackedRef = useRef(Boolean(initialProgress.startedAt));
+  const completionTrackedRef = useRef(Boolean(initialProgress.completedAt));
+
   const placementAnsweredCount = Object.keys(placementAnswers).length;
   const placementComplete =
     placementAnsweredCount === placementQuestions.length && placementQuestions.length > 0;
-  const placementScore = placementQuestions.filter(
-    (question) => placementAnswers[question.id] === question.correct
-  ).length;
-  const placementLevel = getPlacementLevel(placementScore, placementQuestions.length);
+  const weightedTotal = placementQuestions.reduce((sum, question) => sum + question.weight, 0);
+  const weightedScore = placementQuestions.reduce(
+    (sum, question) =>
+      placementAnswers[question.id] === question.correct ? sum + question.weight : sum,
+    0
+  );
+  const weightedRatio = weightedTotal > 0 ? weightedScore / weightedTotal : 0;
+  const placementLevel = getPlacementLevel(weightedRatio);
+  const canRevealAnswerKey = reviewUnlocked || (completedAt && Date.now() - completedAt >= ANSWER_REVIEW_DELAY_MS);
+  const placementRecommendationRoute = getPlacementRecommendationRoute(placementLevel);
 
-  React.useEffect(() => {
+  useEffect(() => {
     updatePageMeta({
-      title: placementTest.title,
-      description: placementTest.subtitle,
+      title: t("placementPage.meta.title", { defaultValue: placementTest.title }),
+      description: t("placementPage.meta.description", { defaultValue: placementTest.subtitle }),
       lang: i18n.language,
     });
-  }, [i18n.language]);
+  }, [i18n.language, t]);
+
+  useEffect(() => {
+    savePlacementProgress({
+      answers: placementAnswers,
+      startedAt,
+      completedAt,
+      reviewUnlocked,
+    });
+  }, [placementAnswers, startedAt, completedAt, reviewUnlocked]);
+
+  useEffect(() => {
+    if (placementAnsweredCount > 0 && !startTrackedRef.current) {
+      const now = Date.now();
+      setStartedAt(now);
+      startTrackedRef.current = true;
+      trackPlacementEvent("start", { questionCount: placementQuestions.length });
+    }
+  }, [placementAnsweredCount, placementQuestions.length]);
+
+  useEffect(() => {
+    if (placementComplete && !completionTrackedRef.current) {
+      const completionTime = Date.now();
+      completionTrackedRef.current = true;
+      setCompletedAt(completionTime);
+      trackPlacementEvent("complete", {
+        score: Number(weightedScore.toFixed(2)),
+        totalWeight: Number(weightedTotal.toFixed(2)),
+        ratio: Number(weightedRatio.toFixed(4)),
+      });
+      trackPlacementEvent("level_assigned", { level: placementLevel });
+    }
+  }, [placementComplete, placementLevel, weightedRatio, weightedScore, weightedTotal]);
 
   const handlePlacementAnswer = (questionId, option) => {
     setPlacementAnswers((prev) => ({ ...prev, [questionId]: option }));
+    trackPlacementEvent("answer", { questionId, selectedOption: option });
   };
+
+  const handleUnlockAnswerReview = () => {
+    setReviewUnlocked(true);
+    trackPlacementEvent("review_unlock", {});
+  };
+
+  const getLevelFeedback = (level) => t(`placementPage.feedback.${level}`, { defaultValue: "" });
 
   const renderPlacementOptionButton = (question, option) => {
     const selected = placementAnswers[question.id] === option;
-    const isCorrect = placementComplete && option === question.correct;
-    const isIncorrect = placementComplete && selected && option !== question.correct;
+    const isCorrect = canRevealAnswerKey && option === question.correct;
+    const isIncorrect = canRevealAnswerKey && selected && option !== question.correct;
 
     return (
       <button
         key={option}
         type="button"
+        role="radio"
+        aria-checked={selected}
         onClick={() => handlePlacementAnswer(question.id, option)}
         style={{
           ...styles.buttonSecondary,
@@ -244,6 +348,7 @@ const PlacementTestPage = () => {
               }
             : {}),
           textAlign: "left",
+          outlineOffset: 2,
         }}
       >
         {option}
@@ -255,13 +360,13 @@ const PlacementTestPage = () => {
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "grid", gap: 6 }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>New here?</p>
-          <h1 style={{ ...styles.sectionTitle, margin: 0 }}>{placementTest.title}</h1>
-          <p style={{ ...styles.helperText, margin: 0 }}>{placementTest.subtitle}</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("placementPage.badge")}</p>
+          <h1 style={{ ...styles.sectionTitle, margin: 0 }}>{t("placementPage.title", { defaultValue: placementTest.title })}</h1>
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("placementPage.subtitle", { defaultValue: placementTest.subtitle })}</p>
         </div>
         <div>
           <a href="/" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-            Back to homepage
+            {t("placementPage.backHome")}
           </a>
         </div>
       </section>
@@ -280,14 +385,14 @@ const PlacementTestPage = () => {
               </div>
               <div style={{ display: "grid", gap: 12 }}>
                 {section.questions.map((question) => (
-                  <div key={question.id} style={{ display: "grid", gap: 8 }}>
-                    <div style={{ fontWeight: 600 }}>
+                  <fieldset key={question.id} style={{ display: "grid", gap: 8, border: "none", margin: 0, padding: 0 }}>
+                    <legend style={{ fontWeight: 600, padding: 0 }}>
                       {question.number}. {question.text}
-                    </div>
-                    <div style={{ display: "grid", gap: 8 }}>
+                    </legend>
+                    <div role="radiogroup" aria-label={`${question.number}. ${question.text}`} style={{ display: "grid", gap: 8 }}>
                       {question.options.map((option) => renderPlacementOptionButton(question, option))}
                     </div>
-                  </div>
+                  </fieldset>
                 ))}
               </div>
             </div>
@@ -295,29 +400,48 @@ const PlacementTestPage = () => {
         </div>
         <div style={{ display: "grid", gap: 8 }}>
           <div style={{ fontSize: 14, color: "#4b5563" }}>
-            Answered {placementAnsweredCount} / {placementQuestions.length}
+            {t("placementPage.answeredStatus", {
+              answered: placementAnsweredCount,
+              total: placementQuestions.length,
+            })}
           </div>
           {placementComplete ? (
             <div style={{ display: "grid", gap: 10 }}>
               <div style={{ ...styles.focusNotice, margin: 0 }}>
-                Score: <strong>{placementScore}</strong> / {placementQuestions.length} · Suggested level:{" "}
-                <strong>{placementLevel}</strong>
+                {t("placementPage.resultSummary", {
+                  score: weightedScore.toFixed(1),
+                  total: weightedTotal.toFixed(1),
+                  level: placementLevel,
+                })}
               </div>
-              <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
-                <h4 style={{ marginTop: 0 }}>Answer key</h4>
-                <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
-                  {placementQuestions.map((question) => (
-                    <li key={`key-${question.id}`}>
-                      <strong>{question.number}.</strong> {question.correct}
-                    </li>
-                  ))}
-                </ol>
+              <div style={{ color: "#374151", fontSize: 14 }}>{getLevelFeedback(placementLevel)}</div>
+              <div>
+                <a href={placementRecommendationRoute} style={{ ...styles.buttonPrimary, textDecoration: "none", display: "inline-block" }}>
+                  {t("placementPage.levelCta", { level: placementLevel })}
+                </a>
               </div>
+              {canRevealAnswerKey ? (
+                <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+                  <h4 style={{ marginTop: 0 }}>{t("placementPage.answerKeyTitle")}</h4>
+                  <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+                    {placementQuestions.map((question) => (
+                      <li key={`key-${question.id}`}>
+                        <strong>{question.number}.</strong> {question.correct}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ) : (
+                <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 10 }}>
+                  <div style={{ color: "#4b5563", fontSize: 14 }}>{t("placementPage.answerReviewLocked")}</div>
+                  <button type="button" style={styles.buttonSecondary} onClick={handleUnlockAnswerReview}>
+                    {t("placementPage.unlockAnswerReview")}
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
-            <div style={{ color: "#6b7280", fontSize: 14 }}>
-              Finish all questions to see your suggested level and the answer key.
-            </div>
+            <div style={{ color: "#6b7280", fontSize: 14 }}>{t("placementPage.finishPrompt")}</div>
           )}
         </div>
       </section>

@@ -806,4 +806,30 @@
       "before": "{{time}} vorher"
     }
   }
+  ,
+  "placementPage": {
+    "meta": {
+      "title": "Deutsch-Einstufungstest · Falowen",
+      "description": "Mache einen kurzen Deutsch-Einstufungstest und erhalte eine CEFR-Level-Empfehlung mit nächstem Lernschritt."
+    },
+    "badge": "Neu hier?",
+    "title": "Einstufungstest (paraphrasierte prüfungsnahe Aufgaben)",
+    "subtitle": "Noch unsicher beim Niveau? Beantworte die Fragen unten. Du bekommst zuerst eine Level-Empfehlung und danach die vollständige Auswertung.",
+    "backHome": "Zurück zur Startseite",
+    "answeredStatus": "Beantwortet {{answered}} / {{total}}",
+    "resultSummary": "Gewichtete Punktzahl: {{score}} / {{total}} · Empfohlenes Niveau: {{level}}",
+    "finishPrompt": "Beantworte alle Fragen, um deine Level-Empfehlung zu sehen.",
+    "answerKeyTitle": "Lösungsübersicht",
+    "answerReviewLocked": "Die Lösungsübersicht ist zur Sicherung der Einstufung zunächst gesperrt. Nutze zuerst dein Level-Feedback.",
+    "unlockAnswerReview": "Lernauswertung freischalten",
+    "levelCta": "Nächsten Schritt für {{level}} anzeigen",
+    "feedback": {
+      "A1": "Starte mit Grundlagenkursen: Begrüßungen, Basisgrammatik und häufige Wörter.",
+      "A2": "Du beherrschst Alltagssituationen. Baue Sicherheit mit angeleitetem Sprechen und kurzen Schreibaufgaben aus.",
+      "B1": "Du bist bereit für kommunikatives Mittelstufentraining und strukturierte prüfungsnahe Übungen.",
+      "B2": "Du kommst mit komplexeren Texten und nuancierter Kommunikation zurecht. Fokus auf fortgeschrittene Prüfungsstrategien.",
+      "C1": "Sehr gutes Niveau erkannt. Weiter mit Feinschliff, Prüfungssimulation und präzisem Feedback."
+    }
+  }
+
 }
