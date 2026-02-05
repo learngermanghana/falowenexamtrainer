@@ -436,6 +436,19 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               It only takes a few minutes and gives you a suggested CEFR level before you sign up.
             </p>
           </div>
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <img
+              src="https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-lagosfoodbank-9090820.jpg?raw=1"
+              alt="Student reviewing a placement test"
+              style={{
+                width: "100%",
+                maxWidth: 360,
+                borderRadius: 16,
+                boxShadow: "0 12px 24px rgba(15, 23, 42, 0.15)",
+                objectFit: "cover",
+              }}
+            />
+          </div>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <a
               href="/placement-test"
