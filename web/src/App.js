@@ -17,6 +17,7 @@ import LetterPracticePage from "./components/LetterPracticePage";
 import LetterWritingIntroPage from "./components/LetterWritingIntroPage";
 import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensionPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
+import CourseStructurePage from "./components/CourseStructurePage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import WritingPage from "./components/WritingPage";
@@ -488,6 +489,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/verboten-erlaubt-5-9" element={<VerbotenErlaubtPage />} />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
+          <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
