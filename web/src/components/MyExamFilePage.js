@@ -628,7 +628,7 @@ const MyExamFilePage = () => {
     const escapeCsv = (value) => {
       const text = String(value ?? "");
       if (text.includes(",") || text.includes("\"") || text.includes("\n")) {
-        return `"${text.replace(/\"/g, "\"\"")}"`;
+        return `"${text.replace(/"/g, "\"\"")}"`;
       }
       return text;
     };
