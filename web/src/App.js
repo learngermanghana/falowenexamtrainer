@@ -41,6 +41,7 @@ import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import OfflineBanner from "./components/OfflineBanner";
 import StudyBuddyBar from "./components/StudyBuddyBar";
+import PlacementTestPage from "./components/PlacementTestPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
@@ -235,6 +236,10 @@ function App() {
         onLogin={() => setAuthMode("login")}
       />
     );
+  }
+
+  if (location.pathname === "/placement-test") {
+    return <PlacementTestPage />;
   }
 
   if (!user) {
@@ -458,6 +463,7 @@ const AppShell = ({
               />
             }
           />
+          <Route path="/placement-test" element={<PlacementTestPage />} />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
           <Route
