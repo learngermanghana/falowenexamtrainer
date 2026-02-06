@@ -242,22 +242,30 @@ const trackPlacementEvent = (event, payload = {}) => {
 const PlacementTestPage = () => {
   const { t, i18n } = useTranslation();
   const placementQuestions = useMemo(() => flattenPlacementQuestions(placementTest.sections), []);
-  const initialProgress = useMemo(
-    () =>
-      getPlacementProgress() || {
-        answers: {},
-        startedAt: null,
-        completedAt: null,
-        reviewUnlocked: false,
+  const initialProgress = useMemo(() => {
+    const saved = getPlacementProgress();
+    return {
+      answers: saved?.answers || {},
+      startedAt: saved?.startedAt || null,
+      completedAt: saved?.completedAt || null,
+      reviewUnlocked: Boolean(saved?.reviewUnlocked),
+      contact: {
+        name: saved?.contact?.name || "",
+        email: saved?.contact?.email || "",
+        submittedAt: saved?.contact?.submittedAt || null,
       },
-    []
-  );
-  const [placementAnswers, setPlacementAnswers] = useState(initialProgress.answers || {});
-  const [startedAt, setStartedAt] = useState(initialProgress.startedAt || null);
-  const [completedAt, setCompletedAt] = useState(initialProgress.completedAt || null);
-  const [reviewUnlocked, setReviewUnlocked] = useState(Boolean(initialProgress.reviewUnlocked));
+    };
+  }, []);
+  const [placementAnswers, setPlacementAnswers] = useState(initialProgress.answers);
+  const [startedAt, setStartedAt] = useState(initialProgress.startedAt);
+  const [completedAt, setCompletedAt] = useState(initialProgress.completedAt);
+  const [reviewUnlocked, setReviewUnlocked] = useState(initialProgress.reviewUnlocked);
+  const [contactName, setContactName] = useState(initialProgress.contact.name);
+  const [contactEmail, setContactEmail] = useState(initialProgress.contact.email);
+  const [contactSubmittedAt, setContactSubmittedAt] = useState(initialProgress.contact.submittedAt);
   const startTrackedRef = useRef(Boolean(initialProgress.startedAt));
   const completionTrackedRef = useRef(Boolean(initialProgress.completedAt));
+  const contactTrackedRef = useRef(Boolean(initialProgress.contact.submittedAt));
 
   const placementAnsweredCount = Object.keys(placementAnswers).length;
   const placementComplete =
@@ -287,8 +295,13 @@ const PlacementTestPage = () => {
       startedAt,
       completedAt,
       reviewUnlocked,
+      contact: {
+        name: contactName,
+        email: contactEmail,
+        submittedAt: contactSubmittedAt,
+      },
     });
-  }, [placementAnswers, startedAt, completedAt, reviewUnlocked]);
+  }, [placementAnswers, startedAt, completedAt, reviewUnlocked, contactName, contactEmail, contactSubmittedAt]);
 
   useEffect(() => {
     if (placementAnsweredCount > 0 && !startTrackedRef.current) {
@@ -316,6 +329,29 @@ const PlacementTestPage = () => {
   const handlePlacementAnswer = (questionId, option) => {
     setPlacementAnswers((prev) => ({ ...prev, [questionId]: option }));
     trackPlacementEvent("answer", { questionId, selectedOption: option });
+  };
+
+  const handleContactSubmit = (event) => {
+    event.preventDefault();
+    const trimmedName = contactName.trim();
+    const trimmedEmail = contactEmail.trim();
+
+    if (!trimmedName || !trimmedEmail) {
+      return;
+    }
+
+    const submittedAt = Date.now();
+    setContactName(trimmedName);
+    setContactEmail(trimmedEmail);
+    setContactSubmittedAt(submittedAt);
+    if (!contactTrackedRef.current) {
+      contactTrackedRef.current = true;
+    }
+    trackPlacementEvent("lead_capture", {
+      name: trimmedName,
+      email: trimmedEmail,
+      submittedAt,
+    });
   };
 
   const handleUnlockAnswerReview = () => {
@@ -380,6 +416,48 @@ const PlacementTestPage = () => {
 
       <section style={{ ...styles.card, display: "grid", gap: 16 }}>
         <div style={{ display: "grid", gap: 16 }}>
+          <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 12 }}>
+            <div>
+              <h3 style={{ margin: 0 }}>{t("placementPage.leadHeading", { defaultValue: "Tell us about you" })}</h3>
+              <p style={{ margin: "6px 0 0", color: "#4b5563", fontSize: 14 }}>
+                {t("placementPage.leadSubtitle", { defaultValue: "Share your name and email so we can follow up with resources for your level." })}
+              </p>
+            </div>
+            <form onSubmit={handleContactSubmit} style={{ display: "grid", gap: 10 }}>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                <span>{t("placementPage.leadNameLabel", { defaultValue: "Full name" })}</span>
+                <input
+                  type="text"
+                  value={contactName}
+                  onChange={(event) => setContactName(event.target.value)}
+                  placeholder={t("placementPage.leadNamePlaceholder", { defaultValue: "e.g. Alex Schmidt" })}
+                  autoComplete="name"
+                  style={{ ...styles.input, borderColor: "#d1d5db" }}
+                />
+              </label>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                <span>{t("placementPage.leadEmailLabel", { defaultValue: "Email address" })}</span>
+                <input
+                  type="email"
+                  value={contactEmail}
+                  onChange={(event) => setContactEmail(event.target.value)}
+                  placeholder={t("placementPage.leadEmailPlaceholder", { defaultValue: "you@example.com" })}
+                  autoComplete="email"
+                  style={{ ...styles.input, borderColor: "#d1d5db" }}
+                />
+              </label>
+              <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                <button type="submit" style={styles.buttonPrimary}>
+                  {t("placementPage.leadSubmit", { defaultValue: "Save info" })}
+                </button>
+                {contactSubmittedAt ? (
+                  <span style={{ fontSize: 13, color: "#16a34a" }}>
+                    {t("placementPage.leadSaved", { defaultValue: "Saved — thanks!" })}
+                  </span>
+                ) : null}
+              </div>
+            </form>
+          </div>
           {placementTest.sections.map((section) => (
             <div key={section.id} style={{ display: "grid", gap: 12 }}>
               <h3 style={{ margin: 0, fontSize: 18 }}>{section.title}</h3>
