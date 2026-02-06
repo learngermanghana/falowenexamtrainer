@@ -57,6 +57,24 @@ const makeUUID = () =>
   (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
   `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+const normalizeTimestamp = (value) => {
+  if (!value) return null;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value < 1e12 ? value * 1000 : value;
+  }
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return Number.isNaN(parsed) ? null : parsed;
+  }
+  if (typeof value?.toMillis === "function") {
+    return value.toMillis();
+  }
+  if (typeof value?.seconds === "number") {
+    return value.seconds * 1000;
+  }
+  return null;
+};
+
 const ClassDiscussionPage = () => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
@@ -128,6 +146,12 @@ const ClassDiscussionPage = () => {
       (snapshot) => {
         const nextThreads = snapshot.docs.map((docSnapshot) => {
           const data = docSnapshot.data();
+          const createdAt = normalizeTimestamp(data.createdAt) || Date.now();
+          const timerMinutes = Number(data.timerMinutes) || 0;
+          let expiresAt = normalizeTimestamp(data.expiresAt);
+          if ((!expiresAt || (createdAt && expiresAt < createdAt)) && timerMinutes > 0) {
+            expiresAt = createdAt + timerMinutes * 60000;
+          }
           return {
             id: docSnapshot.id,
             level: data.level || studentProfile?.level || "",
@@ -140,19 +164,19 @@ const ClassDiscussionPage = () => {
             instructions: data.instructions || "",
             extraLink: data.extraLink || "",
             timerUnit: data.timerUnit || "minutes",
-            timerMinutes: data.timerMinutes || 0,
+            timerMinutes,
             timerValue:
               data.timerValue !== undefined
                 ? data.timerValue
-                : valueFromMinutes(data.timerMinutes || 0, data.timerUnit || "minutes"),
-            createdAt: data.createdAt?.toMillis ? data.createdAt.toMillis() : data.createdAt || Date.now(),
+                : valueFromMinutes(timerMinutes, data.timerUnit || "minutes"),
+            createdAt,
             createdBy: data.createdBy || "Student",
             createdByUid: data.createdByUid || null,
-            editedAt: data.editedAt?.toMillis ? data.editedAt.toMillis() : data.editedAt || null,
+            editedAt: normalizeTimestamp(data.editedAt),
             editedByUid: data.editedByUid || null,
-            expiresAt: data.expiresAt?.toMillis ? data.expiresAt.toMillis() : data.expiresAt || null,
+            expiresAt,
             status: data.status || "open",
-            expiredAt: data.expiredAt?.toMillis ? data.expiredAt.toMillis() : data.expiredAt || null,
+            expiredAt: normalizeTimestamp(data.expiredAt),
           };
         });
         setError("");
