@@ -196,83 +196,100 @@ const AssignmentSubmissionPage = () => {
     ]
   );
 
-  const persistSubmission = async ({ statusLabel = "submitted" } = {}) => {
-    const trimmedText = form.submissionText.trim();
-    if (!form.assignmentTitle || !trimmedText || !db || !user?.uid) return { ok: false, reason: "missing" };
+  const persistSubmission = useCallback(
+    async ({ statusLabel = "submitted" } = {}) => {
+      const trimmedText = form.submissionText.trim();
+      if (!form.assignmentTitle || !trimmedText || !db || !user?.uid) return { ok: false, reason: "missing" };
 
-    const submissionPayload = buildSubmissionPayload(statusLabel);
+      const submissionPayload = buildSubmissionPayload(statusLabel);
 
-    // Drafts: deterministic doc ID -> no duplicates
-    if (statusLabel === "draft") {
-      const draftId = getDraftDocId(form.assignmentTitle);
-      const draftRef = doc(db, DRAFT_COLLECTION, draftId);
+      // Drafts: deterministic doc ID -> no duplicates
+      if (statusLabel === "draft") {
+        const draftId = getDraftDocId(form.assignmentTitle);
+        const draftRef = doc(db, DRAFT_COLLECTION, draftId);
 
-      const existingDraft = draftsByAssignment[form.assignmentTitle];
-      const payloadWithTimestamps = {
-        ...submissionPayload,
-        createdAt: existingDraft?.createdAt || submissionPayload.createdAt,
-      };
+        const existingDraft = draftsByAssignment[form.assignmentTitle];
+        const payloadWithTimestamps = {
+          ...submissionPayload,
+          createdAt: existingDraft?.createdAt || submissionPayload.createdAt,
+        };
 
-      await setDoc(draftRef, payloadWithTimestamps, { merge: true });
+        await setDoc(draftRef, payloadWithTimestamps, { merge: true });
 
-      setDraftsByAssignment((prev) => ({
-        ...prev,
-        [form.assignmentTitle]: { id: draftId, ...payloadWithTimestamps },
-      }));
+        setDraftsByAssignment((prev) => ({
+          ...prev,
+          [form.assignmentTitle]: { id: draftId, ...payloadWithTimestamps },
+        }));
+
+        return { ok: true };
+      }
+
+      // Submitted: check lock first
+      const lockId = getLockDocId(form.assignmentTitle);
+      const lockRef = doc(db, LOCK_COLLECTION, lockId);
+
+      const lockSnap = await getDoc(lockRef);
+      if (lockSnap.exists()) {
+        const chapterKey = buildChapterKey(form.assignmentTitle);
+        if (chapterKey) setLockedChapters((prev) => new Set([...prev, chapterKey]));
+        setConfirmationLocked(true);
+        return { ok: false, reason: "locked" };
+      }
+
+      // Add submission history
+      await addDoc(collection(db, SUBMISSION_COLLECTION), submissionPayload);
+
+      // Create lock deterministically
+      const nowLocal = new Date();
+      await setDoc(
+        lockRef,
+        {
+          studentId: user?.uid || "",
+          studentEmail: user?.email || "",
+          studentCode,
+          level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+          lockedAt: serverTimestamp(),
+          assignmentTitle: form.assignmentTitle,
+          chapter: deriveChapterValue(form.assignmentTitle),
+          chapterKey: buildChapterKey(form.assignmentTitle),
+        },
+        { merge: true }
+      );
+
+      const currentChapterKey = buildChapterKey(form.assignmentTitle);
+      if (currentChapterKey) {
+        setLockedChapters((prev) => new Set([...prev, currentChapterKey]));
+        setLockInfoByChapterKey((prev) => ({
+          ...prev,
+          [currentChapterKey]: { lockedAt: nowLocal, assignmentTitle: form.assignmentTitle },
+        }));
+      }
+
+      // Preview (use local time immediately)
+      setPreview({
+        assignmentTitle: form.assignmentTitle,
+        submissionText: trimmedText,
+        createdAt: nowLocal,
+      });
 
       return { ok: true };
-    }
-
-    // Submitted: check lock first
-    const lockId = getLockDocId(form.assignmentTitle);
-    const lockRef = doc(db, LOCK_COLLECTION, lockId);
-
-    const lockSnap = await getDoc(lockRef);
-    if (lockSnap.exists()) {
-      const chapterKey = buildChapterKey(form.assignmentTitle);
-      if (chapterKey) setLockedChapters((prev) => new Set([...prev, chapterKey]));
-      setConfirmationLocked(true);
-      return { ok: false, reason: "locked" };
-    }
-
-    // Add submission history
-    await addDoc(collection(db, SUBMISSION_COLLECTION), submissionPayload);
-
-    // Create lock deterministically
-    const nowLocal = new Date();
-    await setDoc(
-      lockRef,
-      {
-        studentId: user?.uid || "",
-        studentEmail: user?.email || "",
-        studentCode,
-        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
-        lockedAt: serverTimestamp(),
-        assignmentTitle: form.assignmentTitle,
-        chapter: deriveChapterValue(form.assignmentTitle),
-        chapterKey: buildChapterKey(form.assignmentTitle),
-      },
-      { merge: true }
-    );
-
-    const currentChapterKey = buildChapterKey(form.assignmentTitle);
-    if (currentChapterKey) {
-      setLockedChapters((prev) => new Set([...prev, currentChapterKey]));
-      setLockInfoByChapterKey((prev) => ({
-        ...prev,
-        [currentChapterKey]: { lockedAt: nowLocal, assignmentTitle: form.assignmentTitle },
-      }));
-    }
-
-    // Preview (use local time immediately)
-    setPreview({
-      assignmentTitle: form.assignmentTitle,
-      submissionText: trimmedText,
-      createdAt: nowLocal,
-    });
-
-    return { ok: true };
-  };
+    },
+    [
+      buildChapterKey,
+      buildSubmissionPayload,
+      db,
+      deriveChapterValue,
+      draftsByAssignment,
+      form.assignmentTitle,
+      form.submissionText,
+      getDraftDocId,
+      getLockDocId,
+      preferredLevel,
+      studentCode,
+      user?.email,
+      user?.uid,
+    ]
+  );
 
   useEffect(() => {
     const defaultAssignment = assignmentOptions[0];
@@ -442,7 +459,7 @@ const AssignmentSubmissionPage = () => {
     return () => {
       if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
     };
-  }, [form.assignmentTitle, form.submissionText, isSelectedLocked, status.loading]);
+  }, [form.assignmentTitle, form.submissionText, isSelectedLocked, persistSubmission, status.loading]);
 
   // Preview for selected assignment:
   const selectedPreview = useMemo(() => {
