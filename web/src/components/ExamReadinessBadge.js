@@ -21,6 +21,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
 
   const className = studentProfile?.className || "";
   const studentCode = studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
+  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
 
   const handleOpenExamFile = () => {
     if (typeof onOpenExamFile === "function") return onOpenExamFile();
@@ -56,7 +57,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
 
     try {
       const [attendance, score] = await Promise.all([
-        fetchAttendanceSummary({ className, studentCode }),
+        fetchAttendanceSummary({ className, studentCode, level: levelKey }),
         idToken ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
@@ -79,7 +80,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         totalAssignments: null,
       });
     }
-  }, [className, idToken, studentCode]);
+  }, [className, idToken, levelKey, studentCode]);
 
   useEffect(() => {
     loadReadiness();

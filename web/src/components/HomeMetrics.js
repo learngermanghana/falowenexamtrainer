@@ -53,6 +53,7 @@ const HomeMetrics = ({ studentProfile }) => {
   const className = studentProfile?.className || "";
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
+  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
 
   const isMountedRef = useRef(true);
   const lastRefreshAtRef = useRef(0);
@@ -86,7 +87,7 @@ const HomeMetrics = ({ studentProfile }) => {
 
     try {
       const [attendanceResponse, scoreResponse] = await Promise.all([
-        fetchAttendanceSummary({ className, studentCode }),
+        fetchAttendanceSummary({ className, studentCode, level: levelKey }),
         idToken && studentCode ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
@@ -103,7 +104,7 @@ const HomeMetrics = ({ studentProfile }) => {
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
-  }, [className, studentCode, idToken]);
+  }, [className, idToken, levelKey, studentCode]);
 
   useEffect(() => {
     refreshMetrics();
@@ -129,7 +130,6 @@ const HomeMetrics = ({ studentProfile }) => {
   const blocked = Boolean(assignmentStats?.recommendationBlocked);
   const nextObj = assignmentStats?.nextRecommendation || null;
 
-  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
   const isCourseCompleter = useMemo(() => {
     const targetIdentifier = completionIdentifiersByLevel[levelKey];
     if (!targetIdentifier || !assignmentStats?.lastAssignment) return false;
