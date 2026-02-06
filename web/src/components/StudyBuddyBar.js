@@ -43,6 +43,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const studentEmail = studentProfile?.email || "";
   const className = studentProfile?.className || "";
+  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
   const [latestResult, setLatestResult] = useState(null);
   const [scoreSummary, setScoreSummary] = useState(null);
   const [attendanceSummary, setAttendanceSummary] = useState(null);
@@ -158,7 +159,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
 
       if (className && studentCode) {
         tasks.push(
-          fetchAttendanceSummary({ className, studentCode })
+          fetchAttendanceSummary({ className, studentCode, level: levelKey })
             .then((response) => {
               if (isMounted) setAttendanceSummary(response || null);
             })
@@ -193,7 +194,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     return () => {
       isMounted = false;
     };
-  }, [className, idToken, studentCode, studentEmail]);
+  }, [className, idToken, levelKey, studentCode, studentEmail]);
 
   const suggestions = useMemo(() => {
     const tips = [];

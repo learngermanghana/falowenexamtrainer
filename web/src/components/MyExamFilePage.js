@@ -258,7 +258,7 @@ const MyExamFilePage = () => {
 
     setAttendanceState((prev) => ({ ...prev, loading: true, error: "" }));
     try {
-      const summary = await fetchAttendanceRecords({ className, studentCode });
+      const summary = await fetchAttendanceRecords({ className, studentCode, level: detectedLevel });
       setAttendanceState({
         sessions: summary.sessions || 0,
         hours: summary.hours || 0,
@@ -269,7 +269,7 @@ const MyExamFilePage = () => {
     } catch (error) {
       setAttendanceState({ ...initialAttendanceState, error: "Could not load attendance right now." });
     }
-  }, [className, studentCode]);
+  }, [className, detectedLevel, studentCode]);
 
   const loadAssignments = useCallback(async () => {
     if (!studentCode) {

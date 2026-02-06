@@ -88,7 +88,15 @@ const parseDurationToHours = (value) => {
   return 0;
 };
 
-export const formatAttendanceRecord = (id, data = {}, studentCode = "") => {
+const getDefaultSessionHours = (level = "") => {
+  const normalized = String(level || "").trim().toUpperCase();
+  if (normalized === "A1") return 1;
+  if (normalized === "A2" || normalized === "B1") return 1.5;
+  return 0;
+};
+
+export const formatAttendanceRecord = (id, data = {}, studentCode = "", options = {}) => {
+  const { level } = options;
   const studentEntry = getStudentAttendance(data, studentCode);
   const hasMark = studentEntry !== undefined && studentEntry !== null && studentEntry !== "";
   const rawStatus =
@@ -101,11 +109,15 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "") => {
     normalizedStatus.includes("pending") ||
     normalizedStatus.includes("await") ||
     normalizedStatus.includes("unconfirmed");
-  const isLate = normalizedStatus.includes("late") || normalizedStatus.includes("tardy");
+  const hasLateFlag =
+    (studentEntry && typeof studentEntry === "object" && studentEntry.late === true) || data.late === true;
+  const isLate = hasLateFlag || /\b(late|tardy)\b/.test(normalizedStatus);
   const present = isPending ? null : isLate ? true : toBoolean(studentEntry);
   const status = isPending ? "Pending" : isLate ? "Late" : present ? "Present" : "Absent";
   const rawDuration = data.hours ?? data.durationHours ?? data.duration ?? data.length;
   const sessionHours = parseDurationToHours(rawDuration);
+  const defaultHours = sessionHours ? 0 : getDefaultSessionHours(level);
+  const resolvedHours = sessionHours || defaultHours;
 
   const record = {
     id,
@@ -114,15 +126,15 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "") => {
     present,
     status,
     marked: !isPending,
-    hours: sessionHours,
-    creditedHours: present ? sessionHours : 0,
+    hours: resolvedHours,
+    creditedHours: present ? resolvedHours : 0,
     note: (studentEntry && typeof studentEntry === "object" && studentEntry.note) || data.note || "",
   };
 
-  return { record, sessionHours, present, hours: sessionHours };
+  return { record, sessionHours: resolvedHours, present, hours: resolvedHours };
 };
 
-export const fetchAttendanceRecords = async ({ className, studentCode } = {}) => {
+export const fetchAttendanceRecords = async ({ className, studentCode, level } = {}) => {
   if (!className || !studentCode || !isFirebaseConfigured || !db) {
     return { records: [], sessions: 0, hours: 0 };
   }
@@ -134,7 +146,7 @@ export const fetchAttendanceRecords = async ({ className, studentCode } = {}) =>
 
   snap.forEach((doc) => {
     const data = doc.data() || {};
-    const { record, sessionHours } = formatAttendanceRecord(doc.id, data, studentCode);
+    const { record, sessionHours } = formatAttendanceRecord(doc.id, data, studentCode, { level });
     records.push(record);
     if (record.present) {
       sessions += 1;
@@ -145,7 +157,7 @@ export const fetchAttendanceRecords = async ({ className, studentCode } = {}) =>
   return { records, sessions, hours };
 };
 
-export const fetchAttendanceSummary = async ({ className, studentCode } = {}) => {
+export const fetchAttendanceSummary = async ({ className, studentCode, level } = {}) => {
   if (!className || !studentCode || !isFirebaseConfigured || !db) {
     return { sessions: 0, hours: 0 };
   }
@@ -155,7 +167,7 @@ export const fetchAttendanceSummary = async ({ className, studentCode } = {}) =>
   let hours = 0;
 
   snap.forEach((doc) => {
-    const { present, hours: h } = formatAttendanceRecord(doc.id, doc.data() || {}, studentCode);
+    const { present, hours: h } = formatAttendanceRecord(doc.id, doc.data() || {}, studentCode, { level });
     if (present) {
       sessions += 1;
       hours += h || 0;
