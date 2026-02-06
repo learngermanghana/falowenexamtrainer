@@ -114,8 +114,13 @@ const AssignmentSubmissionPage = () => {
 
   const [preview, setPreview] = useState(null); // { assignmentTitle, submissionText, createdAt }
   const [copyStatus, setCopyStatus] = useState("");
+  const [autosaveStatus, setAutosaveStatus] = useState({ state: "idle", savedAt: null });
+  const [resubmissionText, setResubmissionText] = useState("");
+  const [resubmissionCopyStatus, setResubmissionCopyStatus] = useState("");
 
   const lastAssignmentRef = useRef(assignmentOptions[0]);
+  const autosaveTimerRef = useRef(null);
+  const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
 
   const buildChapterKey = useCallback(
     (title) => {
@@ -368,6 +373,9 @@ const AssignmentSubmissionPage = () => {
       }));
       setStatus((prev) => ({ ...prev, error: "", success: "" }));
       setCopyStatus("");
+      setAutosaveStatus((prev) => ({ ...prev, state: "idle" }));
+      setResubmissionText("");
+      setResubmissionCopyStatus("");
     } else if (!form.submissionText && draft?.submissionText) {
       setForm((prev) => ({
         ...prev,
@@ -395,6 +403,47 @@ const AssignmentSubmissionPage = () => {
     if (isSelectedLocked) setForm((prev) => ({ ...prev, confirmed: true }));
   }, [isSelectedLocked]);
 
+  useEffect(() => {
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+      autosaveTimerRef.current = null;
+    }
+
+    if (isSelectedLocked || status.loading) return;
+
+    const trimmedText = form.submissionText.trim();
+    if (!trimmedText) return;
+
+    const lastAutosaved = lastAutosavedRef.current;
+    if (
+      lastAutosaved.assignmentTitle === form.assignmentTitle &&
+      lastAutosaved.submissionText === trimmedText
+    ) {
+      return;
+    }
+
+    setAutosaveStatus((prev) => ({ ...prev, state: "saving" }));
+    autosaveTimerRef.current = setTimeout(async () => {
+      try {
+        const saved = await persistSubmission({ statusLabel: "draft" });
+        if (saved.ok) {
+          const nowLocal = new Date();
+          lastAutosavedRef.current = { assignmentTitle: form.assignmentTitle, submissionText: trimmedText };
+          setAutosaveStatus({ state: "saved", savedAt: nowLocal });
+        } else {
+          setAutosaveStatus((prev) => ({ ...prev, state: "idle" }));
+        }
+      } catch (error) {
+        console.error("Autosave failed", error);
+        setAutosaveStatus((prev) => ({ ...prev, state: "idle" }));
+      }
+    }, 900);
+
+    return () => {
+      if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+    };
+  }, [form.assignmentTitle, form.submissionText, isSelectedLocked, status.loading]);
+
   // Preview for selected assignment:
   const selectedPreview = useMemo(() => {
     if (preview && safeLower(preview.assignmentTitle) === safeLower(form.assignmentTitle)) return preview;
@@ -419,6 +468,9 @@ const AssignmentSubmissionPage = () => {
       return { label: locked ? `${opt}  ✅ locked` : opt, value: opt, locked };
     });
   }, [assignmentOptions, buildChapterKey, lockedChapters]);
+
+  const selectedDraft = useMemo(() => draftsByAssignment[form.assignmentTitle], [draftsByAssignment, form.assignmentTitle]);
+  const hasDraftForSelection = Boolean(selectedDraft?.submissionText);
 
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
@@ -554,7 +606,7 @@ const AssignmentSubmissionPage = () => {
   };
 
   // ✅ Resubmission mailto (per selected assignment)
-  const resubmissionMailto = useMemo(() => {
+  const resubmissionRequestBody = useMemo(() => {
     const subject = `Resubmission request - ${assignmentInfo} - ${studentCode || "no-code"}`;
 
     const body = `Hello team,
@@ -573,8 +625,47 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
 --- PASTE YOUR CORRECTED TEXT HERE ---
 `;
 
-    return `mailto:learngermanghana@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    return { subject, body };
   }, [assignmentInfo, preferredLevel, studentCode, studentProfile?.className, user?.email]);
+
+  const resubmissionMailto = useMemo(() => {
+    const mergedBody = `${resubmissionRequestBody.body.replace(
+      "--- PASTE YOUR CORRECTED TEXT HERE ---",
+      resubmissionText || "--- PASTE YOUR CORRECTED TEXT HERE ---"
+    )}`;
+    return `mailto:learngermanghana@gmail.com?subject=${encodeURIComponent(
+      resubmissionRequestBody.subject
+    )}&body=${encodeURIComponent(mergedBody)}`;
+  }, [resubmissionRequestBody.body, resubmissionRequestBody.subject, resubmissionText]);
+
+  const handleCopyResubmission = async () => {
+    setResubmissionCopyStatus("");
+    const mergedBody = `${resubmissionRequestBody.body.replace(
+      "--- PASTE YOUR CORRECTED TEXT HERE ---",
+      resubmissionText || "--- PASTE YOUR CORRECTED TEXT HERE ---"
+    )}`;
+
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(mergedBody);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = mergedBody;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+      setResubmissionCopyStatus("Copied ✅");
+      setTimeout(() => setResubmissionCopyStatus(""), 1500);
+    } catch (err) {
+      console.error("Copy failed", err);
+      setResubmissionCopyStatus("Copy failed");
+      setTimeout(() => setResubmissionCopyStatus(""), 2000);
+    }
+  };
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -652,7 +743,14 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
 
           <div>
             <label style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>Your text *</span>
+              <span style={{ ...styles.label, display: "flex", alignItems: "center", gap: 8 }}>
+                Your text *
+                {hasDraftForSelection ? (
+                  <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
+                    Draft loaded
+                  </span>
+                ) : null}
+              </span>
               <textarea
                 value={form.submissionText}
                 onChange={handleChange("submissionText")}
@@ -665,6 +763,18 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
                 disabled={isSelectedLocked}
               />
             </label>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <span style={styles.helperText}>
+                {hasDraftForSelection && selectedDraft?.updatedAt
+                  ? `Draft updated ${formatDate(selectedDraft.updatedAt)}`
+                  : "Drafts save automatically while you type."}
+              </span>
+              {autosaveStatus.state === "saving" ? (
+                <span style={styles.helperText}>Autosaving ...</span>
+              ) : autosaveStatus.state === "saved" ? (
+                <span style={styles.helperText}>Autosaved {formatDate(autosaveStatus.savedAt)}</span>
+              ) : null}
+            </div>
           </div>
 
           <label style={{ ...styles.field, flexDirection: "row", alignItems: "center", gap: 8, margin: 0 }}>
@@ -696,6 +806,16 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
             </button>
 
             <span style={styles.helperText}>Drafts can be saved anytime. Submission is locked after the first confirmed send.</span>
+            {isSelectedLocked ? (
+              <span style={{ ...styles.helperText, color: "#b45309" }}>
+                Locked: you already submitted this assignment.
+              </span>
+            ) : null}
+            {isOrientationDay ? (
+              <span style={{ ...styles.helperText, color: "#b45309" }}>
+                Orientation Day (Day 0) cannot be submitted.
+              </span>
+            ) : null}
           </div>
         </form>
 
@@ -744,12 +864,36 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
         {isSelectedLocked ? (
           <>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              You can request resubmission for <strong>{assignmentInfo}</strong>. Please paste your corrected text in the email.
+              You can request resubmission for <strong>{assignmentInfo}</strong>. Paste your corrected text below so it is ready to send.
             </p>
 
-            <a href={resubmissionMailto} style={styles.primaryButton}>
-              Request resubmission for this assignment
-            </a>
+            <label style={{ ...styles.field, margin: 0 }}>
+              <span style={styles.label}>Corrected text</span>
+              <textarea
+                value={resubmissionText}
+                onChange={(event) => setResubmissionText(event.target.value)}
+                style={{ ...styles.textArea, minHeight: 160 }}
+                placeholder="Paste your corrected letter/text here."
+              />
+            </label>
+
+            <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={handleCopyResubmission}
+              >
+                Copy resubmission request
+              </button>
+              <a href={resubmissionMailto} style={styles.primaryButton}>
+                Open email with resubmission details
+              </a>
+              {resubmissionCopyStatus ? (
+                <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
+                  {resubmissionCopyStatus}
+                </span>
+              ) : null}
+            </div>
 
             <p style={{ ...styles.helperText, margin: 0 }}>
               Tip: Do not send screenshots. Paste the corrected letter/text so we can review quickly.
