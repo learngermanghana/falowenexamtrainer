@@ -277,7 +277,6 @@ const AssignmentSubmissionPage = () => {
     [
       buildChapterKey,
       buildSubmissionPayload,
-      db,
       deriveChapterValue,
       draftsByAssignment,
       form.assignmentTitle,
