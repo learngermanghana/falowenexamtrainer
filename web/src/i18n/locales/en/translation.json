@@ -129,6 +129,8 @@
     "qa": {
       "title": "Ask a quick question",
       "placeholder": "e.g. What should I revise for the next class?",
+      "helper": "Keep it short and focused for a faster tip.",
+      "charCount": "{{count}}/{{max}} characters",
       "send": "Send",
       "loading": "Getting a reply...",
       "error": "Sorry, the study buddy couldn't answer that right now. Please try again."

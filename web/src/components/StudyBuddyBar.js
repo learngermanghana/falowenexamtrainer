@@ -110,6 +110,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [quickReply, setQuickReply] = useState("");
   const [quickReplyError, setQuickReplyError] = useState("");
   const [isReplyLoading, setIsReplyLoading] = useState(false);
+  const maxQuestionLength = 160;
+  const trimmedQuestion = questionInput.trim();
+  const isQuestionTooLong = questionInput.length > maxQuestionLength;
+  const isSendDisabled = !trimmedQuestion || isReplyLoading || isQuestionTooLong;
 
   const paymentReminder = useMemo(() => {
     const balanceDue = Number(studentProfile?.balanceDue);
@@ -236,6 +240,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     async (question) => {
       const trimmed = question.trim();
       if (!trimmed) return;
+      setQuestionInput("");
       setIsReplyLoading(true);
       setQuickReply("");
       setQuickReplyError("");
@@ -417,20 +422,36 @@ const StudyBuddyBar = ({ studentProfile }) => {
                 className="study-buddy-qa-input"
                 type="text"
                 value={questionInput}
+                maxLength={maxQuestionLength}
                 placeholder={t("studyBuddy.qa.placeholder")}
                 onChange={(event) => setQuestionInput(event.target.value)}
                 disabled={isReplyLoading}
               />
-              <button className="study-buddy-qa-button" type="submit" disabled={isReplyLoading}>
+              <button className="study-buddy-qa-button" type="submit" disabled={isSendDisabled}>
                 {t("studyBuddy.qa.send")}
               </button>
             </form>
+            <div className="study-buddy-qa-meta">
+              <p className="study-buddy-qa-helper">{t("studyBuddy.qa.helper")}</p>
+              <p className={`study-buddy-qa-count${isQuestionTooLong ? " is-warning" : ""}`}>
+                {t("studyBuddy.qa.charCount", {
+                  count: questionInput.length,
+                  max: maxQuestionLength,
+                })}
+              </p>
+            </div>
             {isReplyLoading ? (
-              <p className="study-buddy-qa-response">{t("studyBuddy.qa.loading")}</p>
+              <p className="study-buddy-qa-response" aria-live="polite">
+                {t("studyBuddy.qa.loading")}
+              </p>
             ) : quickReply ? (
-              <p className="study-buddy-qa-response">{quickReply}</p>
+              <p className="study-buddy-qa-response" aria-live="polite">
+                {quickReply}
+              </p>
             ) : quickReplyError ? (
-              <p className="study-buddy-qa-response">{quickReplyError}</p>
+              <p className="study-buddy-qa-response" aria-live="polite">
+                {quickReplyError}
+              </p>
             ) : null}
           </div>
         </div>
