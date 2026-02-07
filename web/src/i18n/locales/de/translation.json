@@ -180,6 +180,69 @@
       "account": "Konto, Vertrag & Zahlungen"
     }
   },
+  "generalHome": {
+    "welcome": {
+      "studentFallback": "Teilnehmer",
+      "classFallback": "deinem Kurs",
+      "eyebrow": "Willkommen zurück",
+      "title": "{{studentName}}, dein Campus ist bereit.",
+      "subtitle": "Personalisierte Tipps, Anwesenheit und Aufgaben für {{className}} – spring direkt in den Bereich, den du heute brauchst.",
+      "streakBadge": "Halte deine Serie am Leben",
+      "joinZoom": "Auf Zoom beitreten"
+    },
+    "paymentAlert": {
+      "badge": "Zahlungserinnerung",
+      "endsToday": "Dein Zugang endet heute und du schuldest noch {{amount}}. Bitte bezahle, um den Zugang zu behalten.",
+      "endsSoon": "Du schuldest noch {{amount}} und hast {{time}} Zeit. Bitte bezahle, um den Zugang zu behalten.",
+      "cta": "Zahlungen prüfen"
+    },
+    "announcements": {
+      "eyebrow": "Updates",
+      "title": "Ankündigungen",
+      "subtitle": "Neueste Schul- und Klassenhinweise, inklusive sprachspezifischer Updates.",
+      "loading": "Ankündigungen werden geladen…",
+      "error": "Ankündigungen können gerade nicht geladen werden. Bitte aktualisiere bald.",
+      "empty": "Noch keine Ankündigungen. Schau später für neue Updates vorbei.",
+      "ariaLabel": "Neueste Ankündigungen",
+      "readMore": "Mehr lesen",
+      "showLess": "Weniger anzeigen",
+      "openUpdate": "Update öffnen"
+    },
+    "learningSpace": {
+      "eyebrow": "Willkommen zurück",
+      "title": "Wähle deinen Lernbereich",
+      "subtitle": "Wähle den Bereich, der zu deinem Fokus heute passt. Alle Anweisungen bleiben auf Englisch, damit du schnell navigieren und mehr Zeit zum Üben hast."
+    },
+    "campus": {
+      "eyebrow": "Campus",
+      "title": "Kurse, Kursbuch und KI-Helfer",
+      "badgePrimary": "Hier starten",
+      "badgeSecondary": "Tägliche Arbeit",
+      "points": [
+        "Zugriff auf Kursbuch, Aufgabenabgabe und Ergebnisse.",
+        "Grammatik-Q&A, Sprechtraining und der ursprüngliche Schreibcoach.",
+        "Klassendiskussion und deine Kontoeinstellungen."
+      ],
+      "helper": "Starte im Campus für tägliche Arbeit; nutze den Prüfungsraum für Prüfungssimulationen.",
+      "cta": "Campus betreten"
+    },
+    "exams": {
+      "eyebrow": "Prüfungsraum",
+      "title": "Sprechen, Schreiben-Trainer, Ressourcen",
+      "badge": "Prüfungsmodus",
+      "points": [
+        "Sprechübungen nach Level sortiert.",
+        "Schreiben-Trainer mit Zeitlimit und Ideengenerator.",
+        "Goethe Lesen/Hören-Links und kurze Prüfungstipps."
+      ],
+      "helper": "Starte im Campus für tägliche Arbeit; nutze den Prüfungsraum für Prüfungssimulationen.",
+      "cta": "Zum Prüfungsraum"
+    },
+    "more": {
+      "summary": "Mehr für dich",
+      "helper": "Behalte deine Anwesenheitsserie im Blick, sieh dir kommende Kurstermine an und prüfe den Kalender, damit du keine Stunde verpasst."
+    }
+  },
   "courseTab": {
     "instructionLabel": "Anleitung"
   },
