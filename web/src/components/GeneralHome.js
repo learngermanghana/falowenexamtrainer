@@ -100,7 +100,7 @@ const GeneralHome = ({
           ? t("generalHome.paymentAlert.endsToday", { amount })
           : t("generalHome.paymentAlert.endsSoon", { amount, time: daysLabel }),
     };
-  }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd]);
+  }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd, t]);
 
   const handleSelectLevel = () => navigate("/campus/account");
   const handleConfirmClass = () => {
