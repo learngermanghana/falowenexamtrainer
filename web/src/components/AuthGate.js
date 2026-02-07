@@ -1,5 +1,6 @@
 // AuthGate.js
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
@@ -8,6 +9,7 @@ import { rememberStudentCodeForEmail } from "../services/submissionService";
 import { savePreferredLevel } from "../services/levelStorage";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
+import { persistInterfaceLanguage } from "../i18n";
 
 const isFullName = (value) => {
   const cleaned = String(value || "").trim();
@@ -19,6 +21,7 @@ const isFullName = (value) => {
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, loginWithGoogle, authError, setAuthError, resetPassword } = useAuth();
   const { showToast } = useToast();
+  const { i18n, t } = useTranslation();
 
   const [mode, setMode] = useState(initialMode);
 
@@ -42,6 +45,21 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const [message, setMessage] = useState("");
 
   const inputStyle = { ...styles.textArea, minHeight: "auto", height: 44 };
+  const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
+  const interfaceLanguageOptions = useMemo(
+    () => [
+      { value: "en", label: t("interfaceLanguages.en") },
+      { value: "de", label: t("interfaceLanguages.de") },
+      { value: "fr", label: t("interfaceLanguages.fr") },
+    ],
+    [t]
+  );
+
+  const handleInterfaceLanguageChange = (event) => {
+    const nextLanguage = event.target.value;
+    i18n.changeLanguage(nextLanguage);
+    persistInterfaceLanguage(nextLanguage);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -171,16 +189,33 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   return (
     <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
       <div style={{ ...styles.card, maxWidth: 420, width: "100%", position: "relative" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
           <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
             {mode === "login" ? "Login" : "Create account"}
           </h2>
 
-          {onBack && (
-            <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
-              Back to overview
-            </button>
-          )}
+          <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+            <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#374151" }}>
+              {t("interfaceLanguage.shortLabel")}
+              <select
+                value={resolvedInterfaceLanguage}
+                onChange={handleInterfaceLanguageChange}
+                aria-label={t("interfaceLanguage.ariaLabel")}
+                style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid #d1d5db", fontSize: 12 }}
+              >
+                {interfaceLanguageOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {onBack && (
+              <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
+                Back to overview
+              </button>
+            )}
+          </div>
         </div>
 
         <p style={styles.helperText}>
