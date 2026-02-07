@@ -458,6 +458,15 @@
   background: #fde047;
 }
 
+.study-buddy-bar.is-high-contrast .study-buddy-qa-helper,
+.study-buddy-bar.is-high-contrast .study-buddy-qa-count {
+  color: rgba(248, 250, 252, 0.85);
+}
+
+.study-buddy-bar.is-high-contrast .study-buddy-qa-count.is-warning {
+  color: #facc15;
+}
+
 .study-buddy-reopen.is-high-contrast {
   background: #facc15;
   color: #111827;
@@ -555,6 +564,28 @@
 
 .study-buddy-qa-button:hover {
   background: #3b82f6;
+}
+
+.study-buddy-qa-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  font-size: 11px;
+  color: #cbd5f5;
+}
+
+.study-buddy-qa-helper,
+.study-buddy-qa-count {
+  margin: 0;
+}
+
+.study-buddy-qa-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.study-buddy-qa-count.is-warning {
+  color: #f87171;
 }
 
 .study-buddy-qa-response {
