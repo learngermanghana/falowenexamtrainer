@@ -341,21 +341,19 @@ const GeneralHome = ({
       </div>
 
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <details style={{ ...styles.card, background: "#f8fafc" }}>
-          <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>More for you</summary>
-          <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              Track your attendance streaks, keep an eye on upcoming class dates, and review the calendar so you
-              never miss a lesson.
-            </p>
-            <HomeMetrics studentProfile={studentProfile} />
-            <ClassCalendarCard
-              id={classCalendarId}
-              initialClassName={preferredClass}
-              program={studentProfile?.program}
-            />
-          </div>
-        </details>
+        <div style={{ ...styles.card, background: "#f8fafc", display: "grid", gap: 12 }}>
+          <h3 style={{ ...styles.sectionTitle, margin: 0 }}>More for you</h3>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Track your attendance streaks, keep an eye on upcoming class dates, and review the calendar so you
+            never miss a lesson.
+          </p>
+          <HomeMetrics studentProfile={studentProfile} />
+          <ClassCalendarCard
+            id={classCalendarId}
+            initialClassName={preferredClass}
+            program={studentProfile?.program}
+          />
+        </div>
       </section>
     </div>
   );
