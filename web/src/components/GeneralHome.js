@@ -14,8 +14,10 @@ import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 
 const WelcomeHero = ({ studentProfile, onOpenExamFile }) => {
-  const studentName = studentProfile?.name || studentProfile?.displayName || "Student";
-  const className = studentProfile?.className || "your class";
+  const { t } = useTranslation();
+  const studentName =
+    studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
+  const className = studentProfile?.className || t("generalHome.welcome.classFallback");
 
   return (
     <section
@@ -27,23 +29,23 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile }) => {
         boxShadow: "0 20px 45px rgba(37, 99, 235, 0.25)",
       }}
     >
-      <p style={{ ...styles.helperText, color: "#c7d2fe", margin: 0 }}>Welcome back</p>
+      <p style={{ ...styles.helperText, color: "#c7d2fe", margin: 0 }}>{t("generalHome.welcome.eyebrow")}</p>
       <h2 style={{ margin: "4px 0 8px", fontSize: 26, letterSpacing: -0.3 }}>
-        {studentName}, your campus is ready.
+        {t("generalHome.welcome.title", { studentName })}
       </h2>
       <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 12 }}>
-        Personalised tips, attendance, and assignments for {className}—jump straight into the space you need today.
+        {t("generalHome.welcome.subtitle", { className })}
       </p>
 
       <PrimaryActionBar align="start">
-        <PillBadge tone="success">Keep your streak alive</PillBadge>
+        <PillBadge tone="success">{t("generalHome.welcome.streakBadge")}</PillBadge>
 
         <button
           type="button"
           style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
           onClick={() => window.open(ZOOM_DETAILS.url, "_blank", "noreferrer")}
         >
-          Join on Zoom
+          {t("generalHome.welcome.joinZoom")}
         </button>
 
         {/* ✅ Compact: sits beside Zoom */}
@@ -95,8 +97,8 @@ const GeneralHome = ({
       daysLeft,
       message:
         daysLeft === 0
-          ? `Your access ends today and you still owe ${amount}. Please make a payment to keep access.`
-          : `You still owe ${amount} and have ${daysLabel} left. Please make a payment to keep access.`,
+          ? t("generalHome.paymentAlert.endsToday", { amount })
+          : t("generalHome.paymentAlert.endsSoon", { amount, time: daysLabel }),
     };
   }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd]);
 
@@ -180,11 +182,13 @@ const GeneralHome = ({
             gap: 8,
           }}
         >
-          <span style={{ ...styles.badge, background: "#f59e0b", color: "#fff" }}>Payment reminder</span>
+          <span style={{ ...styles.badge, background: "#f59e0b", color: "#fff" }}>
+            {t("generalHome.paymentAlert.badge")}
+          </span>
           <strong style={{ fontSize: 16 }}>{paymentAlert.message}</strong>
           <PrimaryActionBar align="start">
             <button style={styles.primaryButton} onClick={() => navigate("/campus/account")}>
-              Review payments
+              {t("generalHome.paymentAlert.cta")}
             </button>
           </PrimaryActionBar>
         </section>
@@ -211,25 +215,29 @@ const GeneralHome = ({
 
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <SectionHeader
-          eyebrow="Updates"
-          title="Announcements"
-          subtitle="Latest school and class notices, including language-specific updates."
+          eyebrow={t("generalHome.announcements.eyebrow")}
+          title={t("generalHome.announcements.title")}
+          subtitle={t("generalHome.announcements.subtitle")}
         />
         {announcementStatus === "loading" ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>Loading announcements…</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.loading")}</p>
         ) : null}
         {announcementStatus === "error" ? (
           <p style={{ ...styles.helperText, margin: 0 }}>
-            We could not load announcements right now. Please refresh soon.
+            {t("generalHome.announcements.error")}
           </p>
         ) : null}
         {announcementStatus === "success" && announcements.length === 0 ? (
           <p style={{ ...styles.helperText, margin: 0 }}>
-            No announcements yet. Check back later for new updates.
+            {t("generalHome.announcements.empty")}
           </p>
         ) : null}
         {announcementStatus === "success" && announcements.length > 0 ? (
-          <div className="announcement-slider" aria-label="Latest announcements" aria-live="polite">
+          <div
+            className="announcement-slider"
+            aria-label={t("generalHome.announcements.ariaLabel")}
+            aria-live="polite"
+          >
             <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
               {(() => {
                 const announcement = announcements[announcementIndex] || {};
@@ -252,7 +260,9 @@ const GeneralHome = ({
                           className="announcement-read-more"
                           onClick={() => toggleAnnouncementExpansion(announcementId)}
                         >
-                          {isExpanded ? "Show less" : "Read more"}
+                          {isExpanded
+                            ? t("generalHome.announcements.showLess")
+                            : t("generalHome.announcements.readMore")}
                         </button>
                       ) : null}
                     </div>
@@ -263,7 +273,7 @@ const GeneralHome = ({
                         rel="noreferrer"
                         className="announcement-ticker-link"
                       >
-                        {announcement.linkLabel || "Open update"}
+                        {announcement.linkLabel || t("generalHome.announcements.openUpdate")}
                       </a>
                     ) : null}
                   </>
@@ -281,60 +291,60 @@ const GeneralHome = ({
 
       <section style={styles.card}>
         <SectionHeader
-          eyebrow="Welcome back"
-          title="Choose your learning space"
-          subtitle="Pick the area that matches your focus today. All instructions stay in English so you can navigate quickly and spend more time practising."
+          eyebrow={t("generalHome.learningSpace.eyebrow")}
+          title={t("generalHome.learningSpace.title")}
+          subtitle={t("generalHome.learningSpace.subtitle")}
         />
       </section>
 
       <div style={styles.gridTwo}>
         <section style={{ ...styles.card, display: "grid", gap: 10 }}>
           <SectionHeader
-            eyebrow="Campus"
-            title="Classes, course book, and AI helpers"
+            eyebrow={t("generalHome.campus.eyebrow")}
+            title={t("generalHome.campus.title")}
             actions={
               <PrimaryActionBar align="flex-end">
-                <PillBadge tone="success">Start here</PillBadge>
-                <PillBadge>Daily work</PillBadge>
+                <PillBadge tone="success">{t("generalHome.campus.badgePrimary")}</PillBadge>
+                <PillBadge>{t("generalHome.campus.badgeSecondary")}</PillBadge>
               </PrimaryActionBar>
             }
           />
           <ul style={{ ...styles.checklist, margin: 0 }}>
-            <li>Course book access, assignment submission, and results.</li>
-            <li>Grammar Q&amp;A, Speech Trainer, and the original writing coach.</li>
-            <li>Group discussion and your account settings.</li>
+            <li>{t("generalHome.campus.points.0")}</li>
+            <li>{t("generalHome.campus.points.1")}</li>
+            <li>{t("generalHome.campus.points.2")}</li>
           </ul>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            Start in Campus for daily work; use Exams Room for mock exam practice.
+            {t("generalHome.campus.helper")}
           </p>
           <PrimaryActionBar align="start">
             <button style={styles.primaryButton} onClick={() => onSelectArea("campus")}>
-              Enter Campus
+              {t("generalHome.campus.cta")}
             </button>
           </PrimaryActionBar>
         </section>
 
         <section style={{ ...styles.card, display: "grid", gap: 10 }}>
           <SectionHeader
-            eyebrow="Exams Room"
-            title="Speaking, Schreiben trainer, resources"
+            eyebrow={t("generalHome.exams.eyebrow")}
+            title={t("generalHome.exams.title")}
             actions={
               <PrimaryActionBar align="flex-end">
-                <PillBadge tone="info">Exam mode</PillBadge>
+                <PillBadge tone="info">{t("generalHome.exams.badge")}</PillBadge>
               </PrimaryActionBar>
             }
           />
           <ul style={{ ...styles.checklist, margin: 0 }}>
-            <li>Speaking practice prompts organised by level.</li>
-            <li>Schreiben trainer with timed letters and idea generation.</li>
-            <li>Goethe Lesen/Hören links and quick exam-day reminders.</li>
+            <li>{t("generalHome.exams.points.0")}</li>
+            <li>{t("generalHome.exams.points.1")}</li>
+            <li>{t("generalHome.exams.points.2")}</li>
           </ul>
           <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            Start in Campus for daily work; use Exams Room for mock exam practice.
+            {t("generalHome.exams.helper")}
           </p>
           <PrimaryActionBar align="start">
             <button style={styles.secondaryButton} onClick={() => onSelectArea("exams")}>
-              Go to Exams Room
+              {t("generalHome.exams.cta")}
             </button>
           </PrimaryActionBar>
         </section>
@@ -342,11 +352,12 @@ const GeneralHome = ({
 
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <details style={{ ...styles.card, background: "#f8fafc" }}>
-          <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>More for you</summary>
+          <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>
+            {t("generalHome.more.summary")}
+          </summary>
           <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Track your attendance streaks, keep an eye on upcoming class dates, and review the calendar so you
-              never miss a lesson.
+              {t("generalHome.more.helper")}
             </p>
             <HomeMetrics studentProfile={studentProfile} />
             <ClassCalendarCard

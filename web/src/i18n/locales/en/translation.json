@@ -180,6 +180,69 @@
       "account": "Account, contract & payments"
     }
   },
+  "generalHome": {
+    "welcome": {
+      "studentFallback": "Student",
+      "classFallback": "your class",
+      "eyebrow": "Welcome back",
+      "title": "{{studentName}}, your campus is ready.",
+      "subtitle": "Personalised tips, attendance, and assignments for {{className}}—jump straight into the space you need today.",
+      "streakBadge": "Keep your streak alive",
+      "joinZoom": "Join on Zoom"
+    },
+    "paymentAlert": {
+      "badge": "Payment reminder",
+      "endsToday": "Your access ends today and you still owe {{amount}}. Please make a payment to keep access.",
+      "endsSoon": "You still owe {{amount}} and have {{time}} left. Please make a payment to keep access.",
+      "cta": "Review payments"
+    },
+    "announcements": {
+      "eyebrow": "Updates",
+      "title": "Announcements",
+      "subtitle": "Latest school and class notices, including language-specific updates.",
+      "loading": "Loading announcements…",
+      "error": "We could not load announcements right now. Please refresh soon.",
+      "empty": "No announcements yet. Check back later for new updates.",
+      "ariaLabel": "Latest announcements",
+      "readMore": "Read more",
+      "showLess": "Show less",
+      "openUpdate": "Open update"
+    },
+    "learningSpace": {
+      "eyebrow": "Welcome back",
+      "title": "Choose your learning space",
+      "subtitle": "Pick the area that matches your focus today. All instructions stay in English so you can navigate quickly and spend more time practising."
+    },
+    "campus": {
+      "eyebrow": "Campus",
+      "title": "Classes, course book, and AI helpers",
+      "badgePrimary": "Start here",
+      "badgeSecondary": "Daily work",
+      "points": [
+        "Course book access, assignment submission, and results.",
+        "Grammar Q&A, Speech Trainer, and the original writing coach.",
+        "Group discussion and your account settings."
+      ],
+      "helper": "Start in Campus for daily work; use Exams Room for mock exam practice.",
+      "cta": "Enter Campus"
+    },
+    "exams": {
+      "eyebrow": "Exams Room",
+      "title": "Speaking, Schreiben trainer, resources",
+      "badge": "Exam mode",
+      "points": [
+        "Speaking practice prompts organised by level.",
+        "Schreiben trainer with timed letters and idea generation.",
+        "Goethe Lesen/Hören links and quick exam-day reminders."
+      ],
+      "helper": "Start in Campus for daily work; use Exams Room for mock exam practice.",
+      "cta": "Go to Exams Room"
+    },
+    "more": {
+      "summary": "More for you",
+      "helper": "Track your attendance streaks, keep an eye on upcoming class dates, and review the calendar so you never miss a lesson."
+    }
+  },
   "courseTab": {
     "instructionLabel": "Instruction"
   },

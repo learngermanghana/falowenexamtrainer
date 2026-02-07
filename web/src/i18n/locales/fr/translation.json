@@ -180,6 +180,69 @@
       "account": "Compte, contrat & paiements"
     }
   },
+  "generalHome": {
+    "welcome": {
+      "studentFallback": "Étudiant",
+      "classFallback": "ta classe",
+      "eyebrow": "Bon retour",
+      "title": "{{studentName}}, ton campus est prêt.",
+      "subtitle": "Conseils personnalisés, présence et devoirs pour {{className}} — va directement à l’espace dont tu as besoin aujourd’hui.",
+      "streakBadge": "Garde ta série",
+      "joinZoom": "Rejoindre sur Zoom"
+    },
+    "paymentAlert": {
+      "badge": "Rappel de paiement",
+      "endsToday": "Ton accès se termine aujourd’hui et tu dois encore {{amount}}. Merci d’effectuer un paiement pour garder l’accès.",
+      "endsSoon": "Tu dois encore {{amount}} et il te reste {{time}}. Merci d’effectuer un paiement pour garder l’accès.",
+      "cta": "Vérifier les paiements"
+    },
+    "announcements": {
+      "eyebrow": "Nouveautés",
+      "title": "Annonces",
+      "subtitle": "Dernières informations de l’école et de la classe, y compris les mises à jour par langue.",
+      "loading": "Chargement des annonces…",
+      "error": "Impossible de charger les annonces pour le moment. Merci d’actualiser bientôt.",
+      "empty": "Pas encore d’annonces. Reviens plus tard pour les nouveautés.",
+      "ariaLabel": "Dernières annonces",
+      "readMore": "Lire la suite",
+      "showLess": "Réduire",
+      "openUpdate": "Ouvrir la mise à jour"
+    },
+    "learningSpace": {
+      "eyebrow": "Bon retour",
+      "title": "Choisis ton espace d’apprentissage",
+      "subtitle": "Choisis l’espace qui correspond à ton objectif du jour. Les consignes restent en anglais pour naviguer rapidement et consacrer plus de temps à la pratique."
+    },
+    "campus": {
+      "eyebrow": "Campus",
+      "title": "Cours, livre de cours et assistants IA",
+      "badgePrimary": "Commencer ici",
+      "badgeSecondary": "Travail quotidien",
+      "points": [
+        "Accès au livre de cours, dépôt des devoirs et résultats.",
+        "Questions de grammaire, Speech Trainer et coach d’écriture original.",
+        "Discussion de groupe et paramètres de compte."
+      ],
+      "helper": "Commence dans Campus pour le travail quotidien ; utilise la salle d’examens pour les simulations.",
+      "cta": "Entrer dans Campus"
+    },
+    "exams": {
+      "eyebrow": "Salle d’examens",
+      "title": "Expression orale, Schreiben trainer, ressources",
+      "badge": "Mode examen",
+      "points": [
+        "Prompts d’oral classés par niveau.",
+        "Schreiben trainer avec lettres chronométrées et génération d’idées.",
+        "Liens Goethe Lesen/Hören et rappels rapides pour le jour d’examen."
+      ],
+      "helper": "Commence dans Campus pour le travail quotidien ; utilise la salle d’examens pour les simulations.",
+      "cta": "Aller à la salle d’examens"
+    },
+    "more": {
+      "summary": "Plus pour toi",
+      "helper": "Suis ta série de présence, surveille les prochaines dates de cours et consulte le calendrier pour ne rien manquer."
+    }
+  },
   "courseTab": {
     "instructionLabel": "Instruction"
   },
