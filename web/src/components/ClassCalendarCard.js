@@ -165,18 +165,17 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
   return (
     <div id={id} style={{ ...styles.card, display: "grid", gap: 10 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-        <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Live class access</h2>
-        <span style={styles.badge}>Zoom ready</span>
+        <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("classCalendar.heading")}</h2>
+        <span style={styles.badge}>{t("classCalendar.zoomReady")}</span>
       </div>
       <p style={{ ...styles.helperText, marginBottom: 0 }}>
-        Choose your cohort to get the official Zoom link, docs, and a downloadable calendar. The ICS file works on
-        iPhone, Android (import into Google Calendar), and desktop calendars.
+        {t("classCalendar.helper")}
       </p>
 
       <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
         <div style={{ ...styles.field, margin: 0 }}>
           <label style={styles.label} htmlFor={selectId}>
-            Your class
+            {t("classCalendar.labels.class")}
           </label>
           <select id={selectId} style={styles.select} value={selectedClass} onChange={handleChange}>
             {catalogEntries.map((entry) => (
@@ -191,23 +190,26 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
         </div>
 
         <div style={{ ...styles.field, margin: 0 }}>
-          <span style={styles.label}>Zoom meeting</span>
+          <span style={styles.label}>{t("classCalendar.labels.zoomMeeting")}</span>
           <a href={ZOOM_DETAILS.url} style={{ color: "#2563eb", fontWeight: 700 }} target="_blank" rel="noreferrer">
-            Join Zoom Meeting
+            {t("classCalendar.actions.joinZoom")}
           </a>
           <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-            Meeting ID: {ZOOM_DETAILS.meetingId} · Passcode: {ZOOM_DETAILS.passcode}
+            {t("classCalendar.zoomDetails", {
+              meetingId: ZOOM_DETAILS.meetingId,
+              passcode: ZOOM_DETAILS.passcode,
+            })}
           </p>
         </div>
 
         <div style={{ ...styles.field, margin: 0 }}>
-          <span style={styles.label}>Course docs</span>
+          <span style={styles.label}>{t("classCalendar.labels.courseDocs")}</span>
           <a href={classDetails.docUrl} style={{ color: "#2563eb", fontWeight: 700 }} target="_blank" rel="noreferrer">
-            Open class materials
+            {t("classCalendar.actions.openMaterials")}
           </a>
           <div style={{ marginTop: 8, display: "grid", gap: 4 }}>
             <span style={{ fontSize: 12, fontWeight: 700, color: "#111827", textTransform: "uppercase" }}>
-              Class dates
+              {t("classCalendar.labels.classDates")}
             </span>
             <span
               style={{
@@ -231,7 +233,7 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
 
         {timeline ? (
           <div style={{ ...styles.field, margin: 0 }}>
-            <span style={styles.label}>Timeline</span>
+            <span style={styles.label}>{t("classCalendar.labels.timeline")}</span>
             <div style={{ ...styles.card, background: "#f3f4f6", margin: 0, gap: 6 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ fontWeight: 700 }}>{timeline.status}</span>
@@ -272,14 +274,14 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
       {todayClass ? (
         <div style={{ ...styles.card, background: "#f8fafc", margin: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Today&apos;s lesson</h3>
-            <span style={styles.badge}>Today</span>
+            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{t("classCalendar.today.title")}</h3>
+            <span style={styles.badge}>{t("classCalendar.today.badge")}</span>
           </div>
           <p style={{ ...styles.helperText, margin: "6px 0" }}>
             {todayClass.weekday}, {formatDateLabel(todayClass.date)} · {todayClass.startTime}–{todayClass.endTime}
           </p>
           <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
-            Chapters: {todayClass.titles?.join("; ")}
+            {t("classCalendar.today.chapters", { chapters: todayClass.titles?.join("; ") })}
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
             <a
@@ -288,9 +290,9 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
               rel="noreferrer"
               style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center" }}
             >
-              Join now
+              {t("classCalendar.actions.joinNow")}
             </a>
-            <span style={{ ...styles.helperText, margin: 0 }}>Session in progress today.</span>
+            <span style={{ ...styles.helperText, margin: 0 }}>{t("classCalendar.today.sessionActive")}</span>
           </div>
         </div>
       ) : null}
@@ -298,19 +300,21 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
       {shouldShowNextClass ? (
         <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Next live class</h3>
+            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{t("classCalendar.next.title")}</h3>
             {timeUntilDisplay?.badge ? <span style={styles.badge}>{timeUntilDisplay.badge}</span> : null}
           </div>
           <p style={{ ...styles.helperText, margin: "6px 0" }}>
             {nextClass.weekday}, {formatDateLabel(nextClass.date)} ·{" "}
             {nextClassTimes?.ghanaRange || `${nextClass.startTime}–${nextClass.endTime}`}{" "}
-            (GMT, Ghana)
+            {t("classCalendar.next.timezone")}
           </p>
           {nextClassTimes?.localRange ? (
-            <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>Your local time: {nextClassTimes.localRange}</p>
+            <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
+              {t("classCalendar.next.localTime", { time: nextClassTimes.localRange })}
+            </p>
           ) : null}
           <p style={{ ...styles.helperText, margin: "0 0 6px 0" }}>
-            Chapters: {nextClass.titles?.join("; ")}
+            {t("classCalendar.next.chapters", { chapters: nextClass.titles?.join("; ") })}
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
             {canJoinNextClass ? (
@@ -320,7 +324,7 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
                 rel="noreferrer"
                 style={{ ...styles.primaryButton, textDecoration: "none", textAlign: "center" }}
               >
-                Join now
+                {t("classCalendar.actions.joinNow")}
               </a>
             ) : null}
             {showCalendarCta ? (
@@ -329,7 +333,7 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
                 style={styles.secondaryButton}
                 onClick={() => downloadClassCalendar(selectedClass)}
               >
-                Add to calendar
+                {t("classCalendar.actions.addToCalendar")}
               </button>
             ) : null}
             {timeUntilDisplay?.detail ? (
@@ -341,17 +345,16 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
 
       {!nextClass ? (
         <div style={{ ...styles.helperText, margin: 0 }}>
-          No upcoming sessions found for this class. Choose a different class to refresh the schedule.
+          {t("classCalendar.empty")}
         </div>
       ) : null}
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         <button style={styles.primaryButton} type="button" onClick={() => downloadClassCalendar(selectedClass)}>
-          Download calendar (.ics)
+          {t("classCalendar.actions.downloadCalendar")}
         </button>
         <span style={{ ...styles.helperText, margin: 0 }}>
-          Adds sessions from the published class schedule to your calendar with the Zoom link prefilled. Holiday breaks
-          or cancellations may not be reflected. Android/desktop users can import the ICS file into Google Calendar.
+          {t("classCalendar.downloadHelper")}
         </span>
       </div>
     </div>

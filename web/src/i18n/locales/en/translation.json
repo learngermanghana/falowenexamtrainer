@@ -180,6 +180,199 @@
       "account": "Account, contract & payments"
     }
   },
+  "navigationGuide": {
+    "message": "For your course book, results, and assignment submission, click Campus below. For exam preparation, click Exams Room below. To chat with your study buddy (student support), click the Study button below."
+  },
+  "generalHome": {
+    "welcome": {
+      "studentFallback": "Student",
+      "classFallback": "your class",
+      "eyebrow": "Welcome back",
+      "title": "{{studentName}}, your campus is ready.",
+      "subtitle": "Personalised tips, attendance, and assignments for {{className}}—jump straight into the space you need today.",
+      "streakBadge": "Keep your streak alive",
+      "joinZoom": "Join on Zoom"
+    },
+    "paymentAlert": {
+      "badge": "Payment reminder",
+      "endsToday": "Your access ends today and you still owe {{amount}}. Please make a payment to keep access.",
+      "endsSoon": "You still owe {{amount}} and have {{time}} left. Please make a payment to keep access.",
+      "cta": "Review payments"
+    },
+    "announcements": {
+      "eyebrow": "Updates",
+      "title": "Announcements",
+      "subtitle": "Latest school and class notices, including language-specific updates.",
+      "loading": "Loading announcements…",
+      "error": "We could not load announcements right now. Please refresh soon.",
+      "empty": "No announcements yet. Check back later for new updates.",
+      "ariaLabel": "Latest announcements",
+      "readMore": "Read more",
+      "showLess": "Show less",
+      "openUpdate": "Open update"
+    },
+    "learningSpace": {
+      "eyebrow": "Welcome back",
+      "title": "Choose your learning space",
+      "subtitle": "Pick the area that matches your focus today. All instructions stay in English so you can navigate quickly and spend more time practising."
+    },
+    "campus": {
+      "eyebrow": "Campus",
+      "title": "Classes, course book, and AI helpers",
+      "badgePrimary": "Start here",
+      "badgeSecondary": "Daily work",
+      "points": [
+        "Course book access, assignment submission, and results.",
+        "Grammar Q&A, Speech Trainer, and the original writing coach.",
+        "Group discussion and your account settings."
+      ],
+      "helper": "Start in Campus for daily work; use Exams Room for mock exam practice.",
+      "cta": "Enter Campus"
+    },
+    "exams": {
+      "eyebrow": "Exams Room",
+      "title": "Speaking, Schreiben trainer, resources",
+      "badge": "Exam mode",
+      "points": [
+        "Speaking practice prompts organised by level.",
+        "Schreiben trainer with timed letters and idea generation.",
+        "Goethe Lesen/Hören links and quick exam-day reminders."
+      ],
+      "helper": "Start in Campus for daily work; use Exams Room for mock exam practice.",
+      "cta": "Go to Exams Room"
+    },
+    "more": {
+      "summary": "More for you",
+      "helper": "Track your attendance streaks, keep an eye on upcoming class dates, and review the calendar so you never miss a lesson."
+    }
+  },
+  "homeMetrics": {
+    "list": {
+      "none": "None yet",
+      "two": "{{first}} and {{second}}",
+      "many": "{{items}}, and {{last}}",
+      "more": "{{items}} (+{{count}} more)"
+    },
+    "refreshError": "Could not refresh right now. Showing your last saved metrics.",
+    "courseComplete": {
+      "eyebrow": "Course complete",
+      "title": "Download your study calendar",
+      "cta": "Download now",
+      "helper": "We detected that you finished your course work. Download the study calendar so your phone keeps reminding you to practice before the next exam window."
+    },
+    "section": {
+      "eyebrow": "Your personalised metrics",
+      "title": "Attendance and assignments snapshot",
+      "courseCompleter": "Course completer",
+      "refreshing": "Refreshing…",
+      "refreshCta": "Refresh now"
+    },
+    "attendance": {
+      "label": "Attendance",
+      "sessions_one": "{{count}} session credited",
+      "sessions_other": "{{count}} sessions credited",
+      "hours_one": "{{count}} total hour",
+      "hours_other": "{{count}} total hours"
+    },
+    "nextRecommendation": {
+      "label": "Next recommendation",
+      "redoFirst": "Redo first: {{item}}",
+      "redoFailed": "Redo failed work first",
+      "allCaughtUp": "All caught up 🎉",
+      "startDayOne": "Start with Day 1",
+      "blockedWithIds": "Blocked until you pass: {{items}}",
+      "blocked": "Blocked until failed work is passed.",
+      "goal": "Goal: {{goal}}",
+      "defaultHelper": "Based on your score sheet submissions and schedule targets."
+    },
+    "missed": {
+      "label": "Missed or skipped",
+      "helper": "Missed = incomplete items up to your last fully completed day."
+    },
+    "failed": {
+      "label": "Below pass mark (60)",
+      "helper": "Retake these to unlock next recommendations."
+    },
+    "weeklySummary": "This week: {{assignments}} assignments across {{attempts}} attempts · Streak: {{streak}} day(s) · Last upload: {{last}} · Retries this week: {{retries}}",
+    "leaderboard": {
+      "view": "View leaderboard",
+      "hide": "Hide leaderboard",
+      "updated": "Last updated {{date}}",
+      "none": "No qualified rankings yet for this level.",
+      "summarySelf": "You are #{{rank}} out of {{total}} students with {{passed}} / {{expected}} passed and {{points}} points.",
+      "summaryOther": "{{total}} students have qualified for this level.",
+      "details": "Level leaderboard ({{level}}) · Only scores 60+ count · Qualify after {{minimum}} passed assignments. Ties break by total score, then passed count, then name.",
+      "levelFallback": "your level",
+      "joinSoon": "You'll join once you pass {{minimum}} assignments. Keep it steady — no rush.",
+      "detailSelf": "You are #{{rank}} out of {{total}} students with {{passed}} / {{expected}} passed, {{failed}} failed, {{points}} points, and {{expectedPoints}} expected points.",
+      "qualifiedCount": "{{total}} students have qualified for this level.",
+      "studentFallback": "Student",
+      "headers": {
+        "rank": "Rank",
+        "name": "Name",
+        "passed": "Passed",
+        "failed": "Failed",
+        "totalScore": "Total score",
+        "expectedPoints": "Expected points"
+      }
+    }
+  },
+  "horenPage": {
+    "title": "Hören samples",
+    "subtitle": "Use the resources below for Hören practice in the exam room.",
+    "actions": {
+      "openSamples": "Open Hören samples",
+      "playlist": "Hören example playlist (YouTube)"
+    }
+  },
+  "resultHistory": {
+    "title": "Past feedback",
+    "subtitle": "Review your previous feedback to track your progress.",
+    "loading": "Loading your feedback history…",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "assignmentFallback": "Feedback",
+    "assignmentKeyFallback": "assignment",
+    "studentFallback": "student",
+    "errors": {
+      "load": "Failed to load results sheet.",
+      "title": "Could not load sheet"
+    },
+    "filters": {
+      "searchLabel": "Search (assignment, feedback, name, code)",
+      "searchPlaceholder": "e.g., Pronouns or Prince",
+      "levelLabel": "Level",
+      "allLevels": "All levels",
+      "minScoreLabel": "Min score",
+      "minScorePlaceholder": "e.g., 70",
+      "reset": "Reset",
+      "showing": "Showing {{filtered}}/{{total}}"
+    },
+    "status": {
+      "passed": "Passed",
+      "failed": "Failed (pass mark {{mark}})",
+      "score": "Score"
+    },
+    "attempt": "Try {{attempt}} of {{total}}",
+    "attemptSingle": "Try 1",
+    "bestScoreMet": "Best: {{score}} (meets {{mark}})",
+    "bestScoreNeeded": "Best so far: {{score}} of {{mark}} needed",
+    "belowPassMark": "Below the {{mark}} pass mark—retry recommended.",
+    "openObjective": "Open objective link",
+    "feedbackTitle": "Feedback",
+    "empty": {
+      "title": "No results match your filters",
+      "description": "Try resetting or adjusting the search to see your past feedback.",
+      "reset": "Reset filters"
+    }
+  },
+  "appStatus": {
+    "firebase": {
+      "subtitle": "The app could not connect to Firebase. Please add your REACT_APP_FIREBASE_* credentials to a .env file and restart the app.",
+      "error": "Firebase configuration missing: API key, auth domain, project ID, storage bucket, messaging sender ID, and app ID are required."
+    },
+    "authLoading": "Loading authentication ..."
+  },
   "courseTab": {
     "instructionLabel": "Instruction"
   },
@@ -591,6 +784,24 @@
     }
   },
   "classCalendar": {
+    "heading": "Live class access",
+    "zoomReady": "Zoom ready",
+    "helper": "Choose your cohort to get the official Zoom link, docs, and a downloadable calendar. The ICS file works on iPhone, Android (import into Google Calendar), and desktop calendars.",
+    "labels": {
+      "class": "Your class",
+      "zoomMeeting": "Zoom meeting",
+      "courseDocs": "Course docs",
+      "classDates": "Class dates",
+      "timeline": "Timeline"
+    },
+    "actions": {
+      "joinZoom": "Join Zoom Meeting",
+      "openMaterials": "Open class materials",
+      "joinNow": "Join now",
+      "addToCalendar": "Add to calendar",
+      "downloadCalendar": "Download calendar (.ics)"
+    },
+    "zoomDetails": "Meeting ID: {{meetingId}} · Passcode: {{passcode}}",
     "status": {
       "startsIn": "Starts in {{time}}",
       "timeLeft": "{{time}} left",
@@ -609,7 +820,21 @@
       "untilGraduation": "{{time}} until graduation",
       "finished": "This course is finished."
     },
-    "percentDone": "{{percent}} done"
+    "percentDone": "{{percent}} done",
+    "today": {
+      "title": "Today's lesson",
+      "badge": "Today",
+      "chapters": "Chapters: {{chapters}}",
+      "sessionActive": "Session in progress today."
+    },
+    "next": {
+      "title": "Next live class",
+      "timezone": "(GMT, Ghana)",
+      "localTime": "Your local time: {{time}}",
+      "chapters": "Chapters: {{chapters}}"
+    },
+    "empty": "No upcoming sessions found for this class. Choose a different class to refresh the schedule.",
+    "downloadHelper": "Adds sessions from the published class schedule to your calendar with the Zoom link prefilled. Holiday breaks or cancellations may not be reflected. Android/desktop users can import the ICS file into Google Calendar."
   },
   "letterPractice": {
     "minuteTarget": "Target time: {{time}}"

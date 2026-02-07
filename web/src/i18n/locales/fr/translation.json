@@ -180,6 +180,199 @@
       "account": "Compte, contrat & paiements"
     }
   },
+  "navigationGuide": {
+    "message": "Pour ton livre de cours, les résultats et le dépôt des devoirs, clique sur Campus ci-dessous. Pour la préparation d’examen, clique sur la salle d’examens ci-dessous. Pour discuter avec ton Study Buddy (support étudiant), clique sur le bouton Study ci-dessous."
+  },
+  "generalHome": {
+    "welcome": {
+      "studentFallback": "Étudiant",
+      "classFallback": "ta classe",
+      "eyebrow": "Bon retour",
+      "title": "{{studentName}}, ton campus est prêt.",
+      "subtitle": "Conseils personnalisés, présence et devoirs pour {{className}} — va directement à l’espace dont tu as besoin aujourd’hui.",
+      "streakBadge": "Garde ta série",
+      "joinZoom": "Rejoindre sur Zoom"
+    },
+    "paymentAlert": {
+      "badge": "Rappel de paiement",
+      "endsToday": "Ton accès se termine aujourd’hui et tu dois encore {{amount}}. Merci d’effectuer un paiement pour garder l’accès.",
+      "endsSoon": "Tu dois encore {{amount}} et il te reste {{time}}. Merci d’effectuer un paiement pour garder l’accès.",
+      "cta": "Vérifier les paiements"
+    },
+    "announcements": {
+      "eyebrow": "Nouveautés",
+      "title": "Annonces",
+      "subtitle": "Dernières informations de l’école et de la classe, y compris les mises à jour par langue.",
+      "loading": "Chargement des annonces…",
+      "error": "Impossible de charger les annonces pour le moment. Merci d’actualiser bientôt.",
+      "empty": "Pas encore d’annonces. Reviens plus tard pour les nouveautés.",
+      "ariaLabel": "Dernières annonces",
+      "readMore": "Lire la suite",
+      "showLess": "Réduire",
+      "openUpdate": "Ouvrir la mise à jour"
+    },
+    "learningSpace": {
+      "eyebrow": "Bon retour",
+      "title": "Choisis ton espace d’apprentissage",
+      "subtitle": "Choisis l’espace qui correspond à ton objectif du jour. Les consignes restent en anglais pour naviguer rapidement et consacrer plus de temps à la pratique."
+    },
+    "campus": {
+      "eyebrow": "Campus",
+      "title": "Cours, livre de cours et assistants IA",
+      "badgePrimary": "Commencer ici",
+      "badgeSecondary": "Travail quotidien",
+      "points": [
+        "Accès au livre de cours, dépôt des devoirs et résultats.",
+        "Questions de grammaire, Speech Trainer et coach d’écriture original.",
+        "Discussion de groupe et paramètres de compte."
+      ],
+      "helper": "Commence dans Campus pour le travail quotidien ; utilise la salle d’examens pour les simulations.",
+      "cta": "Entrer dans Campus"
+    },
+    "exams": {
+      "eyebrow": "Salle d’examens",
+      "title": "Expression orale, Schreiben trainer, ressources",
+      "badge": "Mode examen",
+      "points": [
+        "Prompts d’oral classés par niveau.",
+        "Schreiben trainer avec lettres chronométrées et génération d’idées.",
+        "Liens Goethe Lesen/Hören et rappels rapides pour le jour d’examen."
+      ],
+      "helper": "Commence dans Campus pour le travail quotidien ; utilise la salle d’examens pour les simulations.",
+      "cta": "Aller à la salle d’examens"
+    },
+    "more": {
+      "summary": "Plus pour toi",
+      "helper": "Suis ta série de présence, surveille les prochaines dates de cours et consulte le calendrier pour ne rien manquer."
+    }
+  },
+  "homeMetrics": {
+    "list": {
+      "none": "Pas encore",
+      "two": "{{first}} et {{second}}",
+      "many": "{{items}} et {{last}}",
+      "more": "{{items}} (+{{count}} de plus)"
+    },
+    "refreshError": "Impossible d’actualiser pour le moment. Affichage des dernières données enregistrées.",
+    "courseComplete": {
+      "eyebrow": "Cours terminé",
+      "title": "Télécharge ton calendrier d’étude",
+      "cta": "Télécharger maintenant",
+      "helper": "Nous avons détecté que tu as terminé ton cours. Télécharge le calendrier d’étude pour que ton téléphone te rappelle de pratiquer avant la prochaine session d’examen."
+    },
+    "section": {
+      "eyebrow": "Tes indicateurs personnalisés",
+      "title": "Aperçu présence et devoirs",
+      "courseCompleter": "Cours terminé",
+      "refreshing": "Actualisation…",
+      "refreshCta": "Actualiser"
+    },
+    "attendance": {
+      "label": "Présence",
+      "sessions_one": "{{count}} session créditée",
+      "sessions_other": "{{count}} sessions créditées",
+      "hours_one": "{{count}} heure au total",
+      "hours_other": "{{count}} heures au total"
+    },
+    "nextRecommendation": {
+      "label": "Prochaine recommandation",
+      "redoFirst": "À refaire d’abord : {{item}}",
+      "redoFailed": "Refais d’abord les devoirs échoués",
+      "allCaughtUp": "Tout est à jour 🎉",
+      "startDayOne": "Commence par le jour 1",
+      "blockedWithIds": "Bloqué tant que tu n’as pas réussi : {{items}}",
+      "blocked": "Bloqué tant que les devoirs échoués ne sont pas validés.",
+      "goal": "Objectif : {{goal}}",
+      "defaultHelper": "Basé sur tes soumissions et ton planning."
+    },
+    "missed": {
+      "label": "Manqués ou sautés",
+      "helper": "Manqué = éléments incomplets jusqu’à ton dernier jour entièrement validé."
+    },
+    "failed": {
+      "label": "Sous la note de passage (60)",
+      "helper": "Refais-les pour débloquer les prochaines recommandations."
+    },
+    "weeklySummary": "Cette semaine : {{assignments}} devoirs sur {{attempts}} tentatives · Série : {{streak}} jour(s) · Dernier upload : {{last}} · Reprises cette semaine : {{retries}}",
+    "leaderboard": {
+      "view": "Voir le classement",
+      "hide": "Masquer le classement",
+      "updated": "Dernière mise à jour {{date}}",
+      "none": "Pas encore de classement qualifié pour ce niveau.",
+      "summarySelf": "Tu es #{{rank}} sur {{total}} apprenants avec {{passed}} / {{expected}} réussis et {{points}} points.",
+      "summaryOther": "{{total}} apprenants se sont qualifiés pour ce niveau.",
+      "details": "Classement du niveau ({{level}}) · Seuls les scores ≥ 60 comptent · Qualification après {{minimum}} devoirs réussis. En cas d’égalité : score total, puis réussites, puis nom.",
+      "levelFallback": "ton niveau",
+      "joinSoon": "Tu apparaîtras après avoir réussi {{minimum}} devoirs. Reste régulier — pas de stress.",
+      "detailSelf": "Tu es #{{rank}} sur {{total}} apprenants avec {{passed}} / {{expected}} réussis, {{failed}} échoués, {{points}} points et {{expectedPoints}} points attendus.",
+      "qualifiedCount": "{{total}} apprenants se sont qualifiés pour ce niveau.",
+      "studentFallback": "Étudiant",
+      "headers": {
+        "rank": "Rang",
+        "name": "Nom",
+        "passed": "Réussis",
+        "failed": "Échoués",
+        "totalScore": "Score total",
+        "expectedPoints": "Points attendus"
+      }
+    }
+  },
+  "horenPage": {
+    "title": "Exemples de Hören",
+    "subtitle": "Utilise les ressources ci-dessous pour t’entraîner à l’écoute dans la salle d’examens.",
+    "actions": {
+      "openSamples": "Ouvrir les exemples de Hören",
+      "playlist": "Playlist d’exemples Hören (YouTube)"
+    }
+  },
+  "resultHistory": {
+    "title": "Feedback passé",
+    "subtitle": "Revois tes feedbacks précédents pour suivre tes progrès.",
+    "loading": "Chargement de l’historique des feedbacks…",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins",
+    "assignmentFallback": "Feedback",
+    "assignmentKeyFallback": "devoir",
+    "studentFallback": "étudiant",
+    "errors": {
+      "load": "Impossible de charger la feuille de résultats.",
+      "title": "Impossible de charger la feuille"
+    },
+    "filters": {
+      "searchLabel": "Recherche (devoir, feedback, nom, code)",
+      "searchPlaceholder": "ex. Pronoms ou Prince",
+      "levelLabel": "Niveau",
+      "allLevels": "Tous les niveaux",
+      "minScoreLabel": "Score min",
+      "minScorePlaceholder": "ex. 70",
+      "reset": "Réinitialiser",
+      "showing": "Affichage {{filtered}}/{{total}}"
+    },
+    "status": {
+      "passed": "Réussi",
+      "failed": "Échoué (note de passage {{mark}})",
+      "score": "Score"
+    },
+    "attempt": "Essai {{attempt}} sur {{total}}",
+    "attemptSingle": "Essai 1",
+    "bestScoreMet": "Meilleur : {{score}} (atteint {{mark}})",
+    "bestScoreNeeded": "Meilleur pour l’instant : {{score}} sur {{mark}} requis",
+    "belowPassMark": "Sous la note de passage {{mark}} — reprise recommandée.",
+    "openObjective": "Ouvrir le lien objectif",
+    "feedbackTitle": "Feedback",
+    "empty": {
+      "title": "Aucun résultat ne correspond à tes filtres",
+      "description": "Réinitialise ou ajuste la recherche pour voir tes feedbacks passés.",
+      "reset": "Réinitialiser les filtres"
+    }
+  },
+  "appStatus": {
+    "firebase": {
+      "subtitle": "L’application n’a pas pu se connecter à Firebase. Ajoute tes identifiants REACT_APP_FIREBASE_* dans un fichier .env puis redémarre l’application.",
+      "error": "Configuration Firebase manquante : clé API, domaine d’auth, ID projet, bucket de stockage, ID expéditeur et ID d’app sont requis."
+    },
+    "authLoading": "Chargement de l’authentification ..."
+  },
   "courseTab": {
     "instructionLabel": "Instruction"
   },
@@ -591,6 +784,24 @@
     }
   },
   "classCalendar": {
+    "heading": "Accès aux cours en direct",
+    "zoomReady": "Zoom prêt",
+    "helper": "Choisis ta cohorte pour obtenir le lien Zoom officiel, les documents et un calendrier téléchargeable. Le fichier ICS fonctionne sur iPhone, Android (import dans Google Calendar) et sur ordinateur.",
+    "labels": {
+      "class": "Ta classe",
+      "zoomMeeting": "Réunion Zoom",
+      "courseDocs": "Documents de cours",
+      "classDates": "Dates de cours",
+      "timeline": "Chronologie"
+    },
+    "actions": {
+      "joinZoom": "Rejoindre la réunion Zoom",
+      "openMaterials": "Ouvrir les supports de cours",
+      "joinNow": "Rejoindre maintenant",
+      "addToCalendar": "Ajouter au calendrier",
+      "downloadCalendar": "Télécharger le calendrier (.ics)"
+    },
+    "zoomDetails": "ID de réunion : {{meetingId}} · Code : {{passcode}}",
     "status": {
       "startsIn": "Démarre dans {{time}}",
       "timeLeft": "{{time}} restantes",
@@ -609,7 +820,21 @@
       "untilGraduation": "{{time}} avant la fin",
       "finished": "Ce cours est terminé."
     },
-    "percentDone": "Progression : {{percent}}"
+    "percentDone": "Progression : {{percent}}",
+    "today": {
+      "title": "Cours du jour",
+      "badge": "Aujourd’hui",
+      "chapters": "Chapitres : {{chapters}}",
+      "sessionActive": "Session en cours aujourd’hui."
+    },
+    "next": {
+      "title": "Prochain cours en direct",
+      "timezone": "(GMT, Ghana)",
+      "localTime": "Ton heure locale : {{time}}",
+      "chapters": "Chapitres : {{chapters}}"
+    },
+    "empty": "Aucune session à venir pour cette classe. Choisis une autre classe pour actualiser le planning.",
+    "downloadHelper": "Ajoute les sessions du planning officiel à ton calendrier avec le lien Zoom prérempli. Les vacances ou annulations peuvent ne pas apparaître. Les utilisateurs Android/desktop peuvent importer le fichier ICS dans Google Calendar."
   },
   "letterPractice": {
     "minuteTarget": "Objectif : {{time}}"

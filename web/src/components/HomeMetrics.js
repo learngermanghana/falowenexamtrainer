@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
@@ -12,16 +13,16 @@ const labelOf = (entry) => {
   return String(entry.label || entry.assignment || "").trim();
 };
 
-const formatList = (items = [], maxItems = 3) => {
+const formatList = (items = [], maxItems = 3, t) => {
   const labels = (items || []).map(labelOf).filter(Boolean);
-  if (!labels.length) return "None yet";
+  if (!labels.length) return t("homeMetrics.list.none");
   if (labels.length <= maxItems) {
     if (labels.length === 1) return labels[0];
-    if (labels.length === 2) return `${labels[0]} and ${labels[1]}`;
-    return `${labels.slice(0, -1).join(", ")}, and ${labels[labels.length - 1]}`;
+    if (labels.length === 2) return t("homeMetrics.list.two", { first: labels[0], second: labels[1] });
+    return t("homeMetrics.list.many", { items: labels.slice(0, -1).join(", "), last: labels[labels.length - 1] });
   }
   const shown = labels.slice(0, maxItems);
-  return `${shown.join(", ")} (+${labels.length - maxItems} more)`;
+  return t("homeMetrics.list.more", { items: shown.join(", "), count: labels.length - maxItems });
 };
 
 const extractIdentifiers = (value = "") => {
@@ -39,6 +40,7 @@ const completionIdentifiersByLevel = {
 const COURSE_COMPLETION_CALENDAR_KEY = "falowen_course_completion_calendar_download";
 
 const HomeMetrics = ({ studentProfile }) => {
+  const { t } = useTranslation();
   const { idToken } = useAuth();
   const navigate = useNavigate();
 
@@ -100,11 +102,11 @@ const HomeMetrics = ({ studentProfile }) => {
       setRefreshError("");
     } catch (error) {
       if (!isMountedRef.current) return;
-      setRefreshError("Could not refresh right now. Showing your last saved metrics.");
+      setRefreshError(t("homeMetrics.refreshError"));
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
-  }, [className, idToken, levelKey, studentCode]);
+  }, [className, idToken, levelKey, studentCode, t]);
 
   useEffect(() => {
     refreshMetrics();
@@ -173,7 +175,9 @@ const HomeMetrics = ({ studentProfile }) => {
   const recommendedNext = useMemo(() => {
     if (blocked) {
       const firstFail = failedAssignments[0];
-      return firstFail ? `Redo first: ${labelOf(firstFail)}` : "Redo failed work first";
+      return firstFail
+        ? t("homeMetrics.nextRecommendation.redoFirst", { item: labelOf(firstFail) })
+        : t("homeMetrics.nextRecommendation.redoFailed");
     }
 
     if (nextObj?.label) return nextObj.label;
@@ -181,10 +185,10 @@ const HomeMetrics = ({ studentProfile }) => {
     if (missedAssignments.length) return labelOf(missedAssignments[0]);
 
     // If we have any stats at all and nothing is pending, you're caught up.
-    if (assignmentStats) return "All caught up 🎉";
+    if (assignmentStats) return t("homeMetrics.nextRecommendation.allCaughtUp");
 
-    return "Start with Day 1";
-  }, [assignmentStats, blocked, failedAssignments, missedAssignments, nextObj]);
+    return t("homeMetrics.nextRecommendation.startDayOne");
+  }, [assignmentStats, blocked, failedAssignments, missedAssignments, nextObj, t]);
 
   const failedIdentifiersText = useMemo(() => {
     const ids = assignmentStats?.failedIdentifiers || [];
@@ -198,30 +202,34 @@ const HomeMetrics = ({ studentProfile }) => {
     if (!leaderboardGeneratedAt) return "";
     const parsed = new Date(leaderboardGeneratedAt);
     if (Number.isNaN(parsed.getTime())) return "";
-    return `Last updated ${parsed.toLocaleString()}`;
-  }, [leaderboardGeneratedAt]);
+    return t("homeMetrics.leaderboard.updated", { date: parsed.toLocaleString() });
+  }, [leaderboardGeneratedAt, t]);
   const myLeaderboardEntry = useMemo(() => {
     const normalizedCode = String(studentCode || "").toLowerCase();
     return leaderboardRows.find((row) => String(row.studentCode || "").toLowerCase() === normalizedCode) || null;
   }, [leaderboardRows, studentCode]);
   const normalizedStudentCode = String(studentCode || "").toLowerCase();
   const leaderboardQuickSummary = useMemo(() => {
-    if (!leaderboardRows.length) return "No qualified rankings yet for this level.";
+    if (!leaderboardRows.length) return t("homeMetrics.leaderboard.none");
     if (myLeaderboardEntry) {
-      return `You are #${myLeaderboardEntry.rank} out of ${leaderboardRows.length} students with ${myLeaderboardEntry.completedCount} / ${Math.round(
-        (myLeaderboardEntry.expectedPoints || 0) / 100
-      )} passed and ${myLeaderboardEntry.totalScore} points.`;
+      return t("homeMetrics.leaderboard.summarySelf", {
+        rank: myLeaderboardEntry.rank,
+        total: leaderboardRows.length,
+        passed: myLeaderboardEntry.completedCount,
+        expected: Math.round((myLeaderboardEntry.expectedPoints || 0) / 100),
+        points: myLeaderboardEntry.totalScore,
+      });
     }
-    return `${leaderboardRows.length} students have qualified for this level.`;
-  }, [leaderboardRows, myLeaderboardEntry]);
+    return t("homeMetrics.leaderboard.summaryOther", { total: leaderboardRows.length });
+  }, [leaderboardRows, myLeaderboardEntry, t]);
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
       {isCourseCompleter ? (
         <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #fdba74", background: "#fff7ed" }}>
           <SectionHeader
-            eyebrow="Course complete"
-            title="Download your study calendar"
+            eyebrow={t("homeMetrics.courseComplete.eyebrow")}
+            title={t("homeMetrics.courseComplete.title")}
             actions={
               <PrimaryActionBar align="flex-end">
                 <button
@@ -229,24 +237,25 @@ const HomeMetrics = ({ studentProfile }) => {
                   onClick={() => navigate("/exams/study?force=1", { state: { forceDownload: true } })}
                   style={styles.primaryButton}
                 >
-                  Download now
+                  {t("homeMetrics.courseComplete.cta")}
                 </button>
               </PrimaryActionBar>
             }
           />
           <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-            We detected that you finished your course work. Download the study calendar so your phone keeps reminding
-            you to practice before the next exam window.
+            {t("homeMetrics.courseComplete.helper")}
           </p>
         </div>
       ) : null}
       <SectionHeader
-        eyebrow="Your personalised metrics"
-        title="Attendance and assignments snapshot"
+        eyebrow={t("homeMetrics.section.eyebrow")}
+        title={t("homeMetrics.section.title")}
         actions={
           <PrimaryActionBar align="flex-end" wrap>
-            {isCourseCompleter ? <PillBadge tone="success">Course completer</PillBadge> : null}
-            {loading ? <PillBadge tone="info">Refreshing…</PillBadge> : null}
+            {isCourseCompleter ? (
+              <PillBadge tone="success">{t("homeMetrics.section.courseCompleter")}</PillBadge>
+            ) : null}
+            {loading ? <PillBadge tone="info">{t("homeMetrics.section.refreshing")}</PillBadge> : null}
             {refreshError ? <PillBadge tone="warning">{refreshError}</PillBadge> : null}
             <button
               type="button"
@@ -254,7 +263,7 @@ const HomeMetrics = ({ studentProfile }) => {
               disabled={loading}
               style={{ ...styles.secondaryButton, padding: "8px 12px" }}
             >
-              Refresh now
+              {t("homeMetrics.section.refreshCta")}
             </button>
           </PrimaryActionBar>
         }
@@ -262,44 +271,48 @@ const HomeMetrics = ({ studentProfile }) => {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
         <StatCard
-          label="Attendance"
-          value={`${attendance.sessions} sessions credited`}
-          helper={`${attendance.hours} total hours`}
+          label={t("homeMetrics.attendance.label")}
+          value={t("homeMetrics.attendance.sessions", { count: attendance.sessions })}
+          helper={t("homeMetrics.attendance.hours", { count: attendance.hours })}
           tone="info"
         />
         <StatCard
-          label="Next recommendation"
+          label={t("homeMetrics.nextRecommendation.label")}
           value={recommendedNext}
           helper={
             blocked
               ? failedIdentifiersText
-                ? `Blocked until you pass: ${failedIdentifiersText}`
-                : "Blocked until failed work is passed."
+                ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
+                : t("homeMetrics.nextRecommendation.blocked")
               : nextObj?.goal
-              ? `Goal: ${nextObj.goal}`
-              : "Based on your score sheet submissions and schedule targets."
+              ? t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal })
+              : t("homeMetrics.nextRecommendation.defaultHelper")
           }
           tone="warning"
         />
         <StatCard
-          label="Missed or skipped"
-          value={formatList(missedAssignments)}
-          helper="Missed = incomplete items up to your last fully completed day."
+          label={t("homeMetrics.missed.label")}
+          value={formatList(missedAssignments, 3, t)}
+          helper={t("homeMetrics.missed.helper")}
           tone="neutral"
         />
         <StatCard
-          label="Below pass mark (60)"
-          value={formatList(failedAssignments)}
-          helper="Retake these to unlock next recommendations."
+          label={t("homeMetrics.failed.label")}
+          value={formatList(failedAssignments, 3, t)}
+          helper={t("homeMetrics.failed.helper")}
           tone="error"
         />
       </div>
 
       {assignmentStats ? (
         <div style={{ ...styles.helperText, margin: 0 }}>
-          This week: {assignmentStats.weekAssignments || 0} assignments across {assignmentStats.weekAttempts || 0} attempts ·
-          Streak: {assignmentStats.streakDays || 0} day(s) · Last upload: {assignmentStats.lastAssignment || "–"} ·
-          Retries this week: {assignmentStats.retriesThisWeek || 0}
+          {t("homeMetrics.weeklySummary", {
+            assignments: assignmentStats.weekAssignments || 0,
+            attempts: assignmentStats.weekAttempts || 0,
+            streak: assignmentStats.streakDays || 0,
+            last: assignmentStats.lastAssignment || "–",
+            retries: assignmentStats.retriesThisWeek || 0,
+          })}
         </div>
       ) : null}
 
@@ -312,7 +325,7 @@ const HomeMetrics = ({ studentProfile }) => {
               style={{ ...styles.secondaryButton, padding: "8px 12px" }}
               aria-expanded={showLeaderboard}
             >
-              {showLeaderboard ? "Hide leaderboard" : "View leaderboard"}
+              {showLeaderboard ? t("homeMetrics.leaderboard.hide") : t("homeMetrics.leaderboard.view")}
             </button>
           </div>
 
@@ -326,44 +339,62 @@ const HomeMetrics = ({ studentProfile }) => {
           {showLeaderboard ? (
             <>
               <div style={{ ...styles.helperText, margin: 0 }}>
-                Level leaderboard ({leaderboard.level || levelKey || "your level"}) · Only scores 60+ count ·
-                Qualify after {qualificationMinimum} passed assignments. Ties break by total score, then passed count, then
-                name.
+                {t("homeMetrics.leaderboard.details", {
+                  level: leaderboard.level || levelKey || t("homeMetrics.leaderboard.levelFallback"),
+                  minimum: qualificationMinimum,
+                })}
                 {leaderboardUpdatedLabel ? ` · ${leaderboardUpdatedLabel}` : ""}
               </div>
 
               {assignmentStats && assignmentStats.completedCount < qualificationMinimum ? (
                 <div style={{ ...styles.helperText, margin: 0, fontStyle: "italic" }}>
-                  You&apos;ll join once you pass {qualificationMinimum} assignments. Keep it steady — no rush.
+                  {t("homeMetrics.leaderboard.joinSoon", { minimum: qualificationMinimum })}
                 </div>
               ) : null}
 
               {leaderboardRows.length === 0 ? (
-                <div style={{ ...styles.helperText, margin: 0 }}>No qualified rankings yet for this level.</div>
+                <div style={{ ...styles.helperText, margin: 0 }}>{t("homeMetrics.leaderboard.none")}</div>
               ) : (
                 <div style={{ display: "grid", gap: 6 }}>
                   {myLeaderboardEntry ? (
                     <div style={{ ...styles.helperText, margin: 0 }}>
-                      You are #{myLeaderboardEntry.rank} out of {leaderboardRows.length} students with{" "}
-                      {myLeaderboardEntry.completedCount} / {Math.round((myLeaderboardEntry.expectedPoints || 0) / 100)}{" "}
-                      passed, {myLeaderboardEntry.failedCount || 0} failed, {myLeaderboardEntry.totalScore} points, and{" "}
-                      {myLeaderboardEntry.expectedPoints || 0} expected points.
+                      {t("homeMetrics.leaderboard.detailSelf", {
+                        rank: myLeaderboardEntry.rank,
+                        total: leaderboardRows.length,
+                        passed: myLeaderboardEntry.completedCount,
+                        expected: Math.round((myLeaderboardEntry.expectedPoints || 0) / 100),
+                        failed: myLeaderboardEntry.failedCount || 0,
+                        points: myLeaderboardEntry.totalScore,
+                        expectedPoints: myLeaderboardEntry.expectedPoints || 0,
+                      })}
                     </div>
                   ) : (
                     <div style={{ ...styles.helperText, margin: 0 }}>
-                      {leaderboardRows.length} students have qualified for this level.
+                      {t("homeMetrics.leaderboard.qualifiedCount", { total: leaderboardRows.length })}
                     </div>
                   )}
                   <div style={{ overflowX: "auto" }}>
                     <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
                       <thead>
                         <tr style={{ textAlign: "left", color: "#6B7280" }}>
-                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Rank</th>
-                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Name</th>
-                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Passed</th>
-                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Failed</th>
-                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Total score</th>
-                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>Expected points</th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>
+                            {t("homeMetrics.leaderboard.headers.rank")}
+                          </th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>
+                            {t("homeMetrics.leaderboard.headers.name")}
+                          </th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>
+                            {t("homeMetrics.leaderboard.headers.passed")}
+                          </th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>
+                            {t("homeMetrics.leaderboard.headers.failed")}
+                          </th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>
+                            {t("homeMetrics.leaderboard.headers.totalScore")}
+                          </th>
+                          <th style={{ padding: "6px 8px", borderBottom: "1px solid #e5e7eb" }}>
+                            {t("homeMetrics.leaderboard.headers.expectedPoints")}
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -380,7 +411,7 @@ const HomeMetrics = ({ studentProfile }) => {
                             >
                               <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>#{row.rank}</td>
                               <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
-                                {row.name || "Student"}
+                                {row.name || t("homeMetrics.leaderboard.studentFallback")}
                               </td>
                               <td style={{ padding: "6px 8px", borderBottom: "1px solid #f3f4f6" }}>
                                 {row.completedCount} / {Math.round((row.expectedPoints || 0) / 100)}

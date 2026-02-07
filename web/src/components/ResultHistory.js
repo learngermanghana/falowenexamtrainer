@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { EmptyState, InfoBox, PillBadge, SectionHeader, SkeletonRow } from "./ui";
@@ -28,6 +29,7 @@ const toNumericScore = (value) => {
 const getAssignmentKey = (assignment, fallback) => safeLower(assignment) || fallback;
 
 const TextBlock = ({ title, text, maxChars = 650 }) => {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const safeText = String(text || "").trim();
   if (!safeText) return null;
@@ -45,7 +47,7 @@ const TextBlock = ({ title, text, maxChars = 650 }) => {
           style={{ ...styles.secondaryButton, padding: "8px 10px", width: "fit-content" }}
           onClick={() => setExpanded((p) => !p)}
         >
-          {expanded ? "Show less" : "Show more"}
+          {expanded ? t("resultHistory.showLess") : t("resultHistory.showMore")}
         </button>
       ) : null}
     </div>
@@ -57,6 +59,7 @@ const TextBlock = ({ title, text, maxChars = 650 }) => {
  * Otherwise, it will use the `results` prop (old behaviour).
  */
 const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
+  const { t } = useTranslation();
   const [sheetResults, setSheetResults] = useState([]);
   const [sheetLoading, setSheetLoading] = useState(false);
   const [sheetError, setSheetError] = useState("");
@@ -78,7 +81,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         setSheetResults(data);
       } catch (e) {
         if (!mounted) return;
-        setSheetError(e?.message || "Failed to load results sheet.");
+        setSheetError(e?.message || t("resultHistory.errors.load"));
         setSheetResults([]);
       } finally {
         if (mounted) setSheetLoading(false);
@@ -89,7 +92,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     return () => {
       mounted = false;
     };
-  }, [sheetCsvUrl]);
+  }, [sheetCsvUrl, t]);
 
   const activeResults = sheetCsvUrl ? sheetResults : results;
 
@@ -100,11 +103,11 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       const numericScore = toNumericScore(entry.score);
       const key =
         entry.id ||
-        `${entry.studentcode || "student"}-${entry.assignment || "assignment"}-${dateRaw || idx}`;
+        `${entry.studentcode || t("resultHistory.studentFallback")}-${entry.assignment || t("resultHistory.assignmentKeyFallback")}-${dateRaw || idx}`;
 
       return {
         key,
-        assignment: entry.assignment || "Feedback",
+        assignment: entry.assignment || t("resultHistory.assignmentFallback"),
         level: (entry.level || "").toUpperCase(),
         name: entry.name || "",
         studentcode: entry.studentcode || "",
@@ -177,7 +180,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     return annotated.sort(
       (a, b) => (b.createdMs || 0) - (a.createdMs || 0) || b.position - a.position
     );
-  }, [activeResults]);
+  }, [activeResults, t]);
 
   const availableLevels = useMemo(() => {
     const set = new Set();
@@ -218,7 +221,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
   if (sheetCsvUrl && sheetLoading) {
     return (
       <section style={{ ...styles.card, marginTop: 16 }}>
-        <SectionHeader title="Past feedback" subtitle="Loading your feedback history…" />
+        <SectionHeader title={t("resultHistory.title")} subtitle={t("resultHistory.loading")} />
         <SkeletonRow widths={["60%", "85%", "70%"]} />
       </section>
     );
@@ -227,8 +230,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
   if (sheetCsvUrl && sheetError) {
     return (
       <section style={{ ...styles.card, marginTop: 16 }}>
-        <SectionHeader title="Past feedback" />
-        <InfoBox tone="error" title="Could not load sheet">
+        <SectionHeader title={t("resultHistory.title")} />
+        <InfoBox tone="error" title={t("resultHistory.errors.title")}>
           {sheetError}
         </InfoBox>
       </section>
@@ -240,8 +243,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
   return (
     <section style={{ ...styles.card, marginTop: 16 }}>
       <SectionHeader
-        title="Past feedback"
-        subtitle="Review your previous feedback to track your progress."
+        title={t("resultHistory.title")}
+        subtitle={t("resultHistory.subtitle")}
       />
 
       {/* Filters */}
@@ -264,17 +267,17 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
           }}
         >
           <label style={{ display: "grid", gap: 6 }}>
-            <span style={styles.helperText}>Search (assignment, feedback, name, code)</span>
+            <span style={styles.helperText}>{t("resultHistory.filters.searchLabel")}</span>
             <input
               style={{ ...styles.input, width: "100%" }}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="e.g., Pronouns or Prince"
+              placeholder={t("resultHistory.filters.searchPlaceholder")}
             />
           </label>
 
           <label style={{ display: "grid", gap: 6 }}>
-            <span style={styles.helperText}>Level</span>
+            <span style={styles.helperText}>{t("resultHistory.filters.levelLabel")}</span>
             <select
               style={styles.select}
               value={levelFilter}
@@ -282,20 +285,20 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
             >
               {availableLevels.map((lvl) => (
                 <option key={lvl} value={lvl}>
-                  {lvl}
+                  {lvl === "ALL" ? t("resultHistory.filters.allLevels") : lvl}
                 </option>
               ))}
             </select>
           </label>
 
           <label style={{ display: "grid", gap: 6 }}>
-            <span style={styles.helperText}>Min score</span>
+            <span style={styles.helperText}>{t("resultHistory.filters.minScoreLabel")}</span>
             <input
               type="number"
               style={{ ...styles.input, width: "100%" }}
               value={minScore}
               onChange={(e) => setMinScore(e.target.value)}
-              placeholder="e.g., 70"
+              placeholder={t("resultHistory.filters.minScorePlaceholder")}
               min="0"
               max="100"
             />
@@ -303,9 +306,14 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
             <button type="button" style={styles.secondaryButton} onClick={resetFilters}>
-              Reset
+              {t("resultHistory.filters.reset")}
             </button>
-            <PillBadge tone="info">Showing {filtered.length}/{normalized.length}</PillBadge>
+            <PillBadge tone="info">
+              {t("resultHistory.filters.showing", {
+                filtered: filtered.length,
+                total: normalized.length,
+              })}
+            </PillBadge>
           </div>
         </div>
       </div>
@@ -322,20 +330,20 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
               : "neutral";
           const statusStyles =
             statusVariant === "pass"
-              ? { tone: "success", label: "Passed" }
+              ? { tone: "success", label: t("resultHistory.status.passed") }
               : statusVariant === "fail"
-              ? { tone: "error", label: `Failed (pass mark ${PASS_MARK})` }
-              : { tone: "info", label: "Score" };
+              ? { tone: "error", label: t("resultHistory.status.failed", { mark: PASS_MARK }) }
+              : { tone: "info", label: t("resultHistory.status.score") };
 
           const attemptLabel =
             item.totalAttempts > 1
-              ? `Try ${item.attempt} of ${item.totalAttempts}`
-              : "Try 1";
+              ? t("resultHistory.attempt", { attempt: item.attempt, total: item.totalAttempts })
+              : t("resultHistory.attemptSingle");
           const bestScoreText =
             item.totalAttempts > 1 && typeof item.bestScore === "number"
               ? item.passedOverall
-                ? `Best: ${item.bestScore} (meets ${PASS_MARK})`
-                : `Best so far: ${item.bestScore} of ${PASS_MARK} needed`
+                ? t("resultHistory.bestScoreMet", { score: item.bestScore, mark: PASS_MARK })
+                : t("resultHistory.bestScoreNeeded", { score: item.bestScore, mark: PASS_MARK })
               : null;
           const scoreDisplay =
             typeof item.numericScore === "number"
@@ -374,7 +382,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                       </div>
                     ) : statusVariant === "fail" ? (
                       <div style={{ ...styles.helperText, textAlign: "right", color: "#b91c1c" }}>
-                        Below the {PASS_MARK} pass mark—retry recommended.
+                        {t("resultHistory.belowPassMark", { mark: PASS_MARK })}
                       </div>
                     ) : null}
                   </div>
@@ -389,13 +397,13 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                     rel="noreferrer"
                     style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
                   >
-                    Open objective link
+                    {t("resultHistory.openObjective")}
                   </a>
                 </div>
               ) : null}
 
               <div style={{ marginTop: 12 }}>
-                <TextBlock title="Feedback" text={item.comments} />
+                <TextBlock title={t("resultHistory.feedbackTitle")} text={item.comments} />
               </div>
             </article>
           );
@@ -403,11 +411,11 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
         {!filtered.length ? (
           <EmptyState
-            title="No results match your filters"
-            description="Try resetting or adjusting the search to see your past feedback."
+            title={t("resultHistory.empty.title")}
+            description={t("resultHistory.empty.description")}
             action={
               <button type="button" style={styles.secondaryButton} onClick={resetFilters}>
-                Reset filters
+                {t("resultHistory.empty.reset")}
               </button>
             }
           />

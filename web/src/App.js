@@ -203,12 +203,11 @@ function App() {
         <div style={styles.card}>
           <h1 style={{ ...styles.title, marginBottom: 8 }}>Falowen Learning Hub</h1>
           <p style={styles.subtitle}>
-            The app could not connect to Firebase. Please add your REACT_APP_FIREBASE_* credentials to a .env file and restart
-            the app.
+            {t("appStatus.firebase.subtitle")}
           </p>
           <div style={{ ...styles.errorBox, marginTop: 12 }}>
             {authError ||
-              "Firebase configuration missing: API key, auth domain, project ID, storage bucket, messaging sender ID, and app ID are required."}
+              t("appStatus.firebase.error")}
           </div>
         </div>
       </div>
@@ -218,7 +217,7 @@ function App() {
   if (authLoading) {
     return (
       <div style={{ ...styles.container, display: "grid", placeItems: "center" }}>
-        <div style={styles.card}>Loading authentication ...</div>
+        <div style={styles.card}>{t("appStatus.authLoading")}</div>
       </div>
     );
   }
