@@ -223,6 +223,20 @@ const HomeMetrics = ({ studentProfile }) => {
     return t("homeMetrics.leaderboard.summaryOther", { total: leaderboardRows.length });
   }, [leaderboardRows, myLeaderboardEntry, t]);
 
+  const formatCountedList = useCallback(
+    (items = []) => {
+      const list = formatList(items, 3, t);
+      if (!items.length) return list;
+      return `${items.length} · ${list}`;
+    },
+    [t]
+  );
+
+  const missedHelperText = useMemo(() => {
+    const base = t("homeMetrics.missed.helper");
+    return `${base} Missed items are only those before your last fully completed day.`;
+  }, [t]);
+
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
       {isCourseCompleter ? (
@@ -292,13 +306,13 @@ const HomeMetrics = ({ studentProfile }) => {
         />
         <StatCard
           label={t("homeMetrics.missed.label")}
-          value={formatList(missedAssignments, 3, t)}
-          helper={t("homeMetrics.missed.helper")}
+          value={formatCountedList(missedAssignments)}
+          helper={missedHelperText}
           tone="neutral"
         />
         <StatCard
           label={t("homeMetrics.failed.label")}
-          value={formatList(failedAssignments, 3, t)}
+          value={formatCountedList(failedAssignments)}
           helper={t("homeMetrics.failed.helper")}
           tone="error"
         />
