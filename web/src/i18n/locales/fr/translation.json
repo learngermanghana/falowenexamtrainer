@@ -654,6 +654,24 @@
     }
   },
   "classCalendar": {
+    "heading": "Accès aux cours en direct",
+    "zoomReady": "Zoom prêt",
+    "helper": "Choisis ta cohorte pour obtenir le lien Zoom officiel, les documents et un calendrier téléchargeable. Le fichier ICS fonctionne sur iPhone, Android (import dans Google Calendar) et sur ordinateur.",
+    "labels": {
+      "class": "Ta classe",
+      "zoomMeeting": "Réunion Zoom",
+      "courseDocs": "Documents de cours",
+      "classDates": "Dates de cours",
+      "timeline": "Chronologie"
+    },
+    "actions": {
+      "joinZoom": "Rejoindre la réunion Zoom",
+      "openMaterials": "Ouvrir les supports de cours",
+      "joinNow": "Rejoindre maintenant",
+      "addToCalendar": "Ajouter au calendrier",
+      "downloadCalendar": "Télécharger le calendrier (.ics)"
+    },
+    "zoomDetails": "ID de réunion : {{meetingId}} · Code : {{passcode}}",
     "status": {
       "startsIn": "Démarre dans {{time}}",
       "timeLeft": "{{time}} restantes",
@@ -672,7 +690,21 @@
       "untilGraduation": "{{time}} avant la fin",
       "finished": "Ce cours est terminé."
     },
-    "percentDone": "Progression : {{percent}}"
+    "percentDone": "Progression : {{percent}}",
+    "today": {
+      "title": "Cours du jour",
+      "badge": "Aujourd’hui",
+      "chapters": "Chapitres : {{chapters}}",
+      "sessionActive": "Session en cours aujourd’hui."
+    },
+    "next": {
+      "title": "Prochain cours en direct",
+      "timezone": "(GMT, Ghana)",
+      "localTime": "Ton heure locale : {{time}}",
+      "chapters": "Chapitres : {{chapters}}"
+    },
+    "empty": "Aucune session à venir pour cette classe. Choisis une autre classe pour actualiser le planning.",
+    "downloadHelper": "Ajoute les sessions du planning officiel à ton calendrier avec le lien Zoom prérempli. Les vacances ou annulations peuvent ne pas apparaître. Les utilisateurs Android/desktop peuvent importer le fichier ICS dans Google Calendar."
   },
   "letterPractice": {
     "minuteTarget": "Objectif : {{time}}"

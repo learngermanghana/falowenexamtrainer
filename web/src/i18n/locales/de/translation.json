@@ -654,6 +654,24 @@
     }
   },
   "classCalendar": {
+    "heading": "Live-Kurszugang",
+    "zoomReady": "Zoom bereit",
+    "helper": "Wähle deine Kohorte, um den offiziellen Zoom-Link, Unterlagen und einen downloadbaren Kalender zu erhalten. Die ICS-Datei funktioniert auf iPhone, Android (Import in Google Calendar) und Desktop-Kalendern.",
+    "labels": {
+      "class": "Deine Klasse",
+      "zoomMeeting": "Zoom-Meeting",
+      "courseDocs": "Kursunterlagen",
+      "classDates": "Kurstermine",
+      "timeline": "Zeitplan"
+    },
+    "actions": {
+      "joinZoom": "Zoom-Meeting beitreten",
+      "openMaterials": "Kursmaterial öffnen",
+      "joinNow": "Jetzt beitreten",
+      "addToCalendar": "Zum Kalender hinzufügen",
+      "downloadCalendar": "Kalender herunterladen (.ics)"
+    },
+    "zoomDetails": "Meeting-ID: {{meetingId}} · Passwort: {{passcode}}",
     "status": {
       "startsIn": "Start in {{time}}",
       "timeLeft": "{{time}} übrig",
@@ -672,7 +690,21 @@
       "untilGraduation": "{{time}} bis zum Abschluss",
       "finished": "Dieser Kurs ist beendet."
     },
-    "percentDone": "{{percent}} erledigt"
+    "percentDone": "{{percent}} erledigt",
+    "today": {
+      "title": "Heutige Stunde",
+      "badge": "Heute",
+      "chapters": "Kapitel: {{chapters}}",
+      "sessionActive": "Sitzung läuft heute."
+    },
+    "next": {
+      "title": "Nächster Live-Kurs",
+      "timezone": "(GMT, Ghana)",
+      "localTime": "Deine lokale Zeit: {{time}}",
+      "chapters": "Kapitel: {{chapters}}"
+    },
+    "empty": "Keine kommenden Termine für diese Klasse gefunden. Wähle eine andere Klasse, um den Zeitplan zu aktualisieren.",
+    "downloadHelper": "Fügt Termine aus dem veröffentlichten Stundenplan mit dem Zoom-Link in deinen Kalender ein. Feiertage oder Ausfälle sind ggf. nicht berücksichtigt. Android/Desktop-Nutzer können die ICS-Datei in Google Calendar importieren."
   },
   "letterPractice": {
     "minuteTarget": "Zielzeit: {{time}}"

@@ -654,6 +654,24 @@
     }
   },
   "classCalendar": {
+    "heading": "Live class access",
+    "zoomReady": "Zoom ready",
+    "helper": "Choose your cohort to get the official Zoom link, docs, and a downloadable calendar. The ICS file works on iPhone, Android (import into Google Calendar), and desktop calendars.",
+    "labels": {
+      "class": "Your class",
+      "zoomMeeting": "Zoom meeting",
+      "courseDocs": "Course docs",
+      "classDates": "Class dates",
+      "timeline": "Timeline"
+    },
+    "actions": {
+      "joinZoom": "Join Zoom Meeting",
+      "openMaterials": "Open class materials",
+      "joinNow": "Join now",
+      "addToCalendar": "Add to calendar",
+      "downloadCalendar": "Download calendar (.ics)"
+    },
+    "zoomDetails": "Meeting ID: {{meetingId}} · Passcode: {{passcode}}",
     "status": {
       "startsIn": "Starts in {{time}}",
       "timeLeft": "{{time}} left",
@@ -672,7 +690,21 @@
       "untilGraduation": "{{time}} until graduation",
       "finished": "This course is finished."
     },
-    "percentDone": "{{percent}} done"
+    "percentDone": "{{percent}} done",
+    "today": {
+      "title": "Today's lesson",
+      "badge": "Today",
+      "chapters": "Chapters: {{chapters}}",
+      "sessionActive": "Session in progress today."
+    },
+    "next": {
+      "title": "Next live class",
+      "timezone": "(GMT, Ghana)",
+      "localTime": "Your local time: {{time}}",
+      "chapters": "Chapters: {{chapters}}"
+    },
+    "empty": "No upcoming sessions found for this class. Choose a different class to refresh the schedule.",
+    "downloadHelper": "Adds sessions from the published class schedule to your calendar with the Zoom link prefilled. Holiday breaks or cancellations may not be reflected. Android/desktop users can import the ICS file into Google Calendar."
   },
   "letterPractice": {
     "minuteTarget": "Target time: {{time}}"
