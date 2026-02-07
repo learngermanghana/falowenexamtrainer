@@ -73,6 +73,7 @@ const GeneralHome = ({
     (unit, count) => t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) }),
     [numberFormatter, t]
   );
+  const translate = useCallback((key, values) => t(key, values), [t]);
   const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
   const classCalendarId = "class-calendar-card";
@@ -97,10 +98,10 @@ const GeneralHome = ({
       daysLeft,
       message:
         daysLeft === 0
-          ? t("generalHome.paymentAlert.endsToday", { amount })
-          : t("generalHome.paymentAlert.endsSoon", { amount, time: daysLabel }),
+          ? translate("generalHome.paymentAlert.endsToday", { amount })
+          : translate("generalHome.paymentAlert.endsSoon", { amount, time: daysLabel }),
     };
-  }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd, t]);
+  }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd, translate]);
 
   const handleSelectLevel = () => navigate("/campus/account");
   const handleConfirmClass = () => {
