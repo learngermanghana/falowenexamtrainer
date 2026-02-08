@@ -24,6 +24,9 @@
     "ariaLabel": "Interface-Sprache ändern",
     "optionAria": "Interface-Sprache auf {{language}} umstellen"
   },
+  "appStatus": {
+    "authLoading": "Die App wird geladen…"
+  },
   "appNav": {
     "title": "Falowen Learning Hub",
     "signedInAs": "Angemeldet als {{email}}",

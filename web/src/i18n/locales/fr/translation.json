@@ -24,6 +24,9 @@
     "ariaLabel": "Changer la langue de l’interface",
     "optionAria": "Passer l’interface en {{language}}"
   },
+  "appStatus": {
+    "authLoading": "L’application se charge…"
+  },
   "appNav": {
     "title": "Falowen Learning Hub",
     "signedInAs": "Connecté en tant que {{email}}",
