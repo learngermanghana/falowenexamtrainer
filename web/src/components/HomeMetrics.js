@@ -31,6 +31,36 @@ const extractIdentifiers = (value = "") => {
   return matches.map((item) => item.trim()).filter(Boolean);
 };
 
+const PASS_MARK = 60;
+
+const getScoreFromGoal = (goal = "") => {
+  const text = String(goal);
+  const fractionMatch = text.match(/(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/);
+  if (fractionMatch) {
+    const score = Number(fractionMatch[1]);
+    const total = Number(fractionMatch[2]);
+    if (Number.isFinite(score) && Number.isFinite(total) && total > 0) {
+      return { score, total, percent: (score / total) * 100 };
+    }
+  }
+  const percentMatch = text.match(/(\d+(?:\.\d+)?)\s*%/);
+  if (percentMatch) {
+    const percent = Number(percentMatch[1]);
+    if (Number.isFinite(percent)) {
+      return { percent };
+    }
+  }
+  return null;
+};
+
+const isPassingScoreGoal = (goal = "") => {
+  const scoreInfo = getScoreFromGoal(goal);
+  if (!scoreInfo) return false;
+  if (Number.isFinite(scoreInfo.percent)) return scoreInfo.percent >= PASS_MARK;
+  if (Number.isFinite(scoreInfo.score)) return scoreInfo.score >= PASS_MARK;
+  return false;
+};
+
 const completionIdentifiersByLevel = {
   A1: "14.1",
   A2: "10.28",
@@ -191,7 +221,12 @@ const HomeMetrics = ({ studentProfile }) => {
         : t("homeMetrics.nextRecommendation.redoFailed");
     }
 
-    if (nextObj?.label) return nextObj.label;
+    if (nextObj?.label) {
+      if (isPassingScoreGoal(nextObj.goal)) {
+        return t("homeMetrics.nextRecommendation.allCaughtUp");
+      }
+      return nextObj.label;
+    }
 
     if (missedAssignments.length) return labelOf(missedAssignments[0]);
 
@@ -309,7 +344,7 @@ const HomeMetrics = ({ studentProfile }) => {
               ? failedIdentifiersText
                 ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
                 : t("homeMetrics.nextRecommendation.blocked")
-              : nextObj?.goal
+              : nextObj?.goal && !isPassingScoreGoal(nextObj.goal)
               ? t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal })
               : t("homeMetrics.nextRecommendation.defaultHelper")
           }
