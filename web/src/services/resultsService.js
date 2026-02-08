@@ -14,15 +14,31 @@ const toDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
+const normalizeLevels = (level) => {
+  if (!level) return [];
+  const rawLevels = Array.isArray(level) ? level : [level];
+  return rawLevels
+    .flatMap((entry) =>
+      String(entry || "")
+        .split(/[,\s/|]+/)
+        .map((item) => item.trim())
+        .filter(Boolean)
+    )
+    .map((entry) => entry.toUpperCase());
+};
+
 const loadScores = async ({ level, studentCode } = {}) => {
   const scoresRef = collection(db, "scores");
   const constraints = [];
-  if (level && level !== "all") {
+  const normalizedLevels = normalizeLevels(level);
+  if (normalizedLevels.length && !normalizedLevels.includes("ALL")) {
     const levelOptions = Array.from(
       new Set(
-        [level, level?.toUpperCase(), level?.toLowerCase()]
-          .map(normalizeString)
-          .filter(Boolean)
+        normalizedLevels.flatMap((entry) => [
+          entry,
+          entry.toLowerCase(),
+          entry.toUpperCase(),
+        ])
       )
     );
 

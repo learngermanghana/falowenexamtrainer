@@ -20,17 +20,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const { idToken, user } = useAuth();
   const locale = i18n.language;
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [isDismissed, setIsDismissed] = useState(() => {
-    try {
-      const storedValue = localStorage.getItem("studyBuddyDismissed");
-      if (storedValue !== null) {
-        return storedValue === "true";
-      }
-      return true;
-    } catch (error) {
-      return true;
-    }
-  });
+  const [isDismissed, setIsDismissed] = useState(true);
   const [isHighContrast, setIsHighContrast] = useState(() => {
     try {
       return localStorage.getItem("studyBuddyHighContrast") === "true";
@@ -43,7 +33,15 @@ const StudyBuddyBar = ({ studentProfile }) => {
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const studentEmail = studentProfile?.email || "";
   const className = studentProfile?.className || "";
-  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
+  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim();
+  const resolvedLevel = useMemo(() => {
+    if (!levelKey) return "";
+    const normalized = levelKey
+      .split(/[,\s/|]+/)
+      .map((entry) => entry.trim())
+      .find(Boolean);
+    return (normalized || "").toUpperCase();
+  }, [levelKey]);
   const [latestResult, setLatestResult] = useState(null);
   const [scoreSummary, setScoreSummary] = useState(null);
   const [attendanceSummary, setAttendanceSummary] = useState(null);
@@ -163,7 +161,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
 
       if (className && studentCode) {
         tasks.push(
-          fetchAttendanceSummary({ className, studentCode, level: levelKey })
+          fetchAttendanceSummary({ className, studentCode, level: resolvedLevel })
             .then((response) => {
               if (isMounted) setAttendanceSummary(response || null);
             })
@@ -198,7 +196,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     return () => {
       isMounted = false;
     };
-  }, [className, idToken, levelKey, studentCode, studentEmail]);
+  }, [className, idToken, resolvedLevel, studentCode, studentEmail]);
 
   const suggestions = useMemo(() => {
     const tips = [];
@@ -255,7 +253,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         });
         const response = await requestStudyBuddyReply({
           message: trimmed,
-          level: studentProfile?.level || "B1",
+          level: resolvedLevel || "B1",
           idToken,
         });
         setQuickReply(response?.reply || "");
@@ -269,7 +267,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         setIsReplyLoading(false);
       }
     },
-    [className, idToken, studentCode, studentEmail, studentProfile?.level, t, user?.uid]
+    [className, idToken, resolvedLevel, studentCode, studentEmail, t, user?.uid]
   );
 
   const quickLinks = useMemo(
@@ -302,14 +300,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
     ],
     [navigate, t]
   );
-
-  useEffect(() => {
-    try {
-      localStorage.setItem("studyBuddyDismissed", String(isDismissed));
-    } catch (error) {
-      // Ignore storage errors (privacy mode, etc.)
-    }
-  }, [isDismissed]);
 
   useEffect(() => {
     try {
