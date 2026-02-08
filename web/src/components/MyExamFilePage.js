@@ -793,91 +793,99 @@ const MyExamFilePage = () => {
               </div>
 
               <div style={{ display: "grid", gap: 8 }}>
-                {levelInfo.exams.map((exam, index) => {
-                  const examDate = new Date(exam.date);
-                  const registrationStart = new Date(exam.registrationStart);
-                  const registrationEnd = new Date(exam.registrationEnd);
-                  const registrationStatus =
-                    now < registrationStart ? "Upcoming" : now > registrationEnd ? "Closed" : "Open";
-                  const isSingleDayRegistration = registrationStart.toDateString() === registrationEnd.toDateString();
-                  const registrationLabel = isSingleDayRegistration
-                    ? `Registration day: ${formatDate(registrationStart)}`
-                    : `Registration window: ${formatDate(registrationStart)} - ${formatDate(registrationEnd)}`;
-                  const registrationBadgeStyles = {
-                    Open: {
-                      background: "#dcfce7",
-                      color: "#166534",
-                      borderColor: "#86efac",
-                    },
-                    Closed: {
-                      background: "#f3f4f6",
-                      color: "#6b7280",
-                      borderColor: "#e5e7eb",
-                    },
-                    Upcoming: {
-                      background: "#dbeafe",
-                      color: "#1d4ed8",
-                      borderColor: "#bfdbfe",
-                    },
-                  };
-                  return (
-                    <div
-                      key={`${levelInfo.level}-${exam.date}-${index}`}
-                      style={{
-                        border: "1px solid #f3f4f6",
-                        borderRadius: 12,
-                        padding: 10,
-                        display: "grid",
-                        gap: 6,
-                        background: "#f9fafb",
-                      }}
-                    >
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                        <div style={{ fontWeight: 800, color: "#111827" }}>
-                          📅 Exam date: {formatDate(exam.date)} · {levelInfo.location}
-                        </div>
-                        <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
-                          {getCountdownLabel(examDate, now)}
-                        </div>
-                      </div>
+                {levelInfo.exams
+                  .filter((exam) => {
+                    const registrationEnd = new Date(exam.registrationEnd);
+                    return now <= registrationEnd;
+                  })
+                  .map((exam, index) => {
+                    const examDate = new Date(exam.date);
+                    const registrationStart = new Date(exam.registrationStart);
+                    const registrationEnd = new Date(exam.registrationEnd);
+                    const registrationStatus =
+                      now < registrationStart ? "Upcoming" : now > registrationEnd ? "Closed" : "Open";
+                    const isSingleDayRegistration =
+                      registrationStart.toDateString() === registrationEnd.toDateString();
+                    const registrationLabel = isSingleDayRegistration
+                      ? `Registration day: ${formatDate(registrationStart)}`
+                      : `Registration window: ${formatDate(registrationStart)} - ${formatDate(
+                          registrationEnd
+                        )}`;
+                    const registrationBadgeStyles = {
+                      Open: {
+                        background: "#dcfce7",
+                        color: "#166534",
+                        borderColor: "#86efac",
+                      },
+                      Closed: {
+                        background: "#f3f4f6",
+                        color: "#6b7280",
+                        borderColor: "#e5e7eb",
+                      },
+                      Upcoming: {
+                        background: "#dbeafe",
+                        color: "#1d4ed8",
+                        borderColor: "#bfdbfe",
+                      },
+                    };
+                    return (
                       <div
+                        key={`${levelInfo.level}-${exam.date}-${index}`}
                         style={{
-                          fontSize: 13,
-                          color: "#6B7280",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                          flexWrap: "wrap",
+                          border: "1px solid #f3f4f6",
+                          borderRadius: 12,
+                          padding: 10,
+                          display: "grid",
+                          gap: 6,
+                          background: "#f9fafb",
                         }}
                       >
-                        <span>{registrationLabel}</span>
-                        <span
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                          <div style={{ fontWeight: 800, color: "#111827" }}>
+                            📅 Exam date: {formatDate(exam.date)} · {levelInfo.location}
+                          </div>
+                          <div style={{ fontSize: 12, fontWeight: 800, color: "#2563eb" }}>
+                            {getCountdownLabel(examDate, now)}
+                          </div>
+                        </div>
+                        <div
                           style={{
-                            display: "inline-flex",
+                            fontSize: 13,
+                            color: "#6B7280",
+                            display: "flex",
                             alignItems: "center",
-                            padding: "2px 8px",
-                            borderRadius: 999,
-                            fontSize: 11,
-                            fontWeight: 800,
-                            border: "1px solid",
-                            letterSpacing: "0.02em",
-                            textTransform: "uppercase",
-                            ...registrationBadgeStyles[registrationStatus],
+                            gap: 8,
+                            flexWrap: "wrap",
                           }}
                         >
-                          {registrationStatus}
-                        </span>
-                        <button
-                          type="button"
-                          style={{ ...styles.secondaryButton, padding: "4px 8px", fontSize: 12 }}
-                          onClick={() => downloadExamReminder({ levelInfo, exam })}
-                        >
-                          Add reminder (.ics)
-                        </button>
+                          <span>{registrationLabel}</span>
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              padding: "2px 8px",
+                              borderRadius: 999,
+                              fontSize: 11,
+                              fontWeight: 800,
+                              border: "1px solid",
+                              letterSpacing: "0.02em",
+                              textTransform: "uppercase",
+                              ...registrationBadgeStyles[registrationStatus],
+                            }}
+                          >
+                            {registrationStatus}
+                          </span>
+                          <button
+                            type="button"
+                            style={{ ...styles.secondaryButton, padding: "4px 8px", fontSize: 12 }}
+                            onClick={() => downloadExamReminder({ levelInfo, exam })}
+                          >
+                            Add reminder (.ics)
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             </div>
           )})}
