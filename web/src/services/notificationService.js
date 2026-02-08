@@ -85,6 +85,16 @@ const resolvePushId = (payload = {}) =>
 const studentCodeFromProfile = (profile = {}) =>
   profile.studentCode || profile.studentcode || profile.id || "";
 
+const normalizeLevelTokens = (level) =>
+  Array.from(
+    new Set(
+      String(level || "")
+        .split(/[,\s/|]+/)
+        .map((entry) => entry.trim().toUpperCase())
+        .filter(Boolean)
+    )
+  );
+
 // -------------------------------------------
 // Helper: Normalize attendance status
 // -------------------------------------------
@@ -164,29 +174,40 @@ const buildAttendanceNotification = (attendancePayload) => {
 const fetchClassBoardAnnouncements = async ({ level, className } = {}) => {
   if (!level || !className || !isFirebaseConfigured || !db) return [];
 
-  const ref = collection(db, "class_board", level, "classes", className, "posts");
-  const snapshot = await getDocs(
-    query(ref, orderBy("createdAt", "desc"), limit(5))
+  const levels = normalizeLevelTokens(level);
+  const targetLevels = levels.length ? levels : [level];
+  const snapshots = await Promise.all(
+    targetLevels.map((levelToken) =>
+      getDocs(
+        query(
+          collection(db, "class_board", levelToken, "classes", className, "posts"),
+          orderBy("createdAt", "desc"),
+          limit(5)
+        )
+      )
+    )
   );
 
-  return snapshot.docs.map((docSnapshot) => {
-    const data = docSnapshot.data() || {};
-    const timestamp = parseTimestamp(data.createdAt) || Date.now();
-    return {
-      id: docSnapshot.id,
-      type: "Class board",
-      title:
-        data.topic ||
-        data.questionTitle ||
-        data.lessonLabel ||
-        "New class post",
-      body:
-        data.question ||
-        data.instructions ||
-        "Your tutor posted a new discussion.",
-      timestamp,
-    };
-  });
+  return snapshots.flatMap((snapshot) =>
+    snapshot.docs.map((docSnapshot) => {
+      const data = docSnapshot.data() || {};
+      const timestamp = parseTimestamp(data.createdAt) || Date.now();
+      return {
+        id: docSnapshot.id,
+        type: "Class board",
+        title:
+          data.topic ||
+          data.questionTitle ||
+          data.lessonLabel ||
+          "New class post",
+        body:
+          data.question ||
+          data.instructions ||
+          "Your tutor posted a new discussion.",
+        timestamp,
+      };
+    })
+  );
 };
 
 // -------------------------------------------
@@ -215,8 +236,9 @@ export const fetchStudentNotifications = async (profile) => {
     });
   };
 
+  const levelTokens = normalizeLevelTokens(profile.level);
   const [resultsPayload, attendancePayload, classBoard, storedNotifications] = await Promise.all([
-    fetchResults({ level: profile.level, studentCode, email: profile.email }),
+    fetchResults({ level: levelTokens.length ? levelTokens : profile.level, studentCode, email: profile.email }),
     fetchAttendanceRecords({ className: profile.className, studentCode }),
     fetchClassBoardAnnouncements({ level: profile.level, className: profile.className }),
     fetchStoredNotifications(),
