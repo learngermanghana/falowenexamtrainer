@@ -900,8 +900,76 @@
       "none": "Keine Erinnerung",
       "before": "{{time}} vorher"
     }
-  }
-  ,
+  },
+  "homeMetrics": {
+    "section": {
+      "eyebrow": "Progress snapshot",
+      "title": "Home metrics",
+      "refreshCta": "Refresh data",
+      "courseCompleter": "Course complete",
+      "refreshing": "Refreshing"
+    },
+    "refreshError": "Unable to refresh right now.",
+    "attendance": {
+      "label": "Attendance",
+      "sessions": "{{count}} sessions",
+      "hours": "{{count}} hours"
+    },
+    "nextRecommendation": {
+      "label": "Next recommendation",
+      "redoFirst": "Redo {{item}}",
+      "redoFailed": "Redo a failed task",
+      "allCaughtUp": "You're all caught up",
+      "startDayOne": "Start day 1",
+      "blocked": "Complete failed tasks to unlock the next recommendation.",
+      "blockedWithIds": "Complete failed tasks ({{items}}) to unlock the next recommendation.",
+      "goal": "{{goal}}",
+      "defaultHelper": "Keep going with your next recommended task."
+    },
+    "missed": {
+      "label": "Missed items",
+      "helper": "Missed items are only those before your last fully completed day."
+    },
+    "failed": {
+      "label": "Failed items",
+      "helper": "Revisit failed tasks to keep momentum."
+    },
+    "list": {
+      "none": "None",
+      "two": "{{first}} and {{second}}",
+      "many": "{{items}}, and {{last}}",
+      "more": "{{items}}, and {{count}} more"
+    },
+    "weeklySummary": "This week: {{assignments}} assignments, {{attempts}} attempts, {{retries}} retries, {{streak}}-day streak. Last completed: {{last}}.",
+    "courseComplete": {
+      "eyebrow": "Course completed",
+      "title": "You're ready for the exam study plan",
+      "helper": "Download your study calendar to keep momentum toward your exam date.",
+      "cta": "Download study calendar"
+    },
+    "leaderboard": {
+      "view": "View leaderboard",
+      "hide": "Hide leaderboard",
+      "updated": "Updated {{date}}",
+      "none": "No leaderboard data yet.",
+      "summarySelf": "You are #{{rank}} of {{total}} · {{passed}} passed / {{expected}} expected · {{points}} points",
+      "summaryOther": "{{total}} learners qualified this week.",
+      "details": "Level {{level}} · minimum {{minimum}} completed tasks to qualify.",
+      "levelFallback": "your level",
+      "joinSoon": "Complete {{minimum}} tasks to join the leaderboard.",
+      "detailSelf": "You are #{{rank}} of {{total}} · {{passed}} passed / {{expected}} expected · {{failed}} failed · {{points}} points ({{expectedPoints}} expected).",
+      "qualifiedCount": "{{total}} learners qualified this week.",
+      "studentFallback": "Student",
+      "headers": {
+        "rank": "Rank",
+        "name": "Name",
+        "passed": "Passed",
+        "failed": "Failed",
+        "totalScore": "Total score",
+        "expectedPoints": "Expected points"
+      }
+    }
+  },
   "personalization": {
     "eyebrow": "Personalisierter Lernpfad",
     "title": "Deine nächsten drei empfohlenen Aufgaben",

@@ -243,10 +243,7 @@ const HomeMetrics = ({ studentProfile }) => {
     [t]
   );
 
-  const missedHelperText = useMemo(() => {
-    const base = t("homeMetrics.missed.helper");
-    return `${base} Missed items are only those before your last fully completed day.`;
-  }, [t]);
+  const missedHelperText = useMemo(() => t("homeMetrics.missed.helper"), [t]);
 
   const personalizationRecommendations = personalization?.recommendations || [];
   const personalizationHighlights = personalization?.highlights || [];
