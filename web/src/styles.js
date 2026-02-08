@@ -306,6 +306,15 @@ export const styles = {
     border: "1px solid #22c55e",
     fontSize: 13,
   },
+  infoBox: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 10,
+    background: "#eff6ff",
+    color: "#1e3a8a",
+    border: "1px solid #bfdbfe",
+    fontSize: 13,
+  },
   lockPill: {
     display: "inline-flex",
     alignItems: "center",
