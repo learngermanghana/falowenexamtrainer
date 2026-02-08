@@ -902,6 +902,15 @@
     }
   }
   ,
+  "personalization": {
+    "eyebrow": "Personalisierter Lernpfad",
+    "title": "Deine nächsten drei empfohlenen Aufgaben",
+    "subtitle": "Basierend auf deinen Ergebnissen, Schreibfortschritt, Anwesenheit und Profildaten.",
+    "feedbackLabel": "Adaptives Feedback",
+    "highlightsLabel": "Heute im Fokus",
+    "fallback": "Füge mehr Ergebnisse oder Schreibübungen hinzu, um Empfehlungen freizuschalten."
+  }
+  ,
   "placementPage": {
     "meta": {
       "title": "Deutsch-Einstufungstest · Falowen",
