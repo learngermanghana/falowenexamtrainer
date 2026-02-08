@@ -322,6 +322,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.map((item) => {
           const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
+          const studentMeta = [item.name, item.studentcode].filter(Boolean).join(" · ");
           const statusVariant =
             item.attemptStatus === "failed" || item.passedOverall === false
               ? "fail"
@@ -352,28 +353,34 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
           return (
             <article key={item.key} style={{ ...styles.resultCard, marginTop: 0 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-                <div>
+              <div
+                style={{
+                  display: "grid",
+                  gap: 12,
+                  gridTemplateColumns: "minmax(0, 1fr) auto",
+                  alignItems: "start",
+                }}
+              >
+                <div style={{ display: "grid", gap: 6 }}>
                   <div style={{ fontWeight: 800, fontSize: 15 }}>{item.assignment}</div>
-                  <div style={{ ...styles.helperText, marginTop: 4 }}>{meta}</div>
-                  {item.name || item.studentcode ? (
-                    <div style={{ ...styles.helperText, marginTop: 4 }}>
-                      {item.name ? item.name : null}
-                      {item.name && item.studentcode ? " · " : null}
-                      {item.studentcode ? item.studentcode : null}
-                    </div>
+                  {meta ? (
+                    <div style={{ ...styles.helperText, margin: 0 }}>{meta}</div>
+                  ) : null}
+                  {studentMeta ? (
+                    <div style={{ ...styles.helperText, margin: 0 }}>{studentMeta}</div>
                   ) : null}
                 </div>
 
                 {scoreDisplay !== undefined && scoreDisplay !== null ? (
-                  <div style={{ textAlign: "right", display: "grid", gap: 4, justifyItems: "end" }}>
+                  <div style={{ textAlign: "right", display: "grid", gap: 6, justifyItems: "end" }}>
                     <PillBadge tone={statusStyles.tone}>{statusStyles.label}</PillBadge>
-                    <div style={{ fontWeight: 800, fontSize: 18 }}>{scoreDisplay}</div>
-                    <div style={{ ...styles.helperText, textAlign: "right" }}>{attemptLabel}</div>
+                    <div style={{ fontWeight: 800, fontSize: 20 }}>{scoreDisplay}</div>
+                    <div style={{ ...styles.helperText, margin: 0, textAlign: "right" }}>{attemptLabel}</div>
                     {bestScoreText ? (
                       <div
                         style={{
                           ...styles.helperText,
+                          margin: 0,
                           textAlign: "right",
                           color: statusVariant === "fail" ? "#b91c1c" : "#065f46",
                         }}
@@ -381,7 +388,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                         {bestScoreText}
                       </div>
                     ) : statusVariant === "fail" ? (
-                      <div style={{ ...styles.helperText, textAlign: "right", color: "#b91c1c" }}>
+                      <div style={{ ...styles.helperText, margin: 0, textAlign: "right", color: "#b91c1c" }}>
                         {t("resultHistory.belowPassMark", { mark: PASS_MARK })}
                       </div>
                     ) : null}
@@ -390,7 +397,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
               </div>
 
               {item.link ? (
-                <div style={{ marginTop: 10 }}>
+                <div style={{ marginTop: 12 }}>
                   <a
                     href={item.link}
                     target="_blank"

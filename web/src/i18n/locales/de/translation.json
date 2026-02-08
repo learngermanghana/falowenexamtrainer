@@ -977,8 +977,48 @@
     "feedbackLabel": "Adaptives Feedback",
     "highlightsLabel": "Heute im Fokus",
     "fallback": "Füge mehr Ergebnisse oder Schreibübungen hinzu, um Empfehlungen freizuschalten."
-  }
-  ,
+  },
+  "resultHistory": {
+    "title": "Ergebnisverlauf",
+    "subtitle": "Vergangene Versuche, Feedback und Ergebnisse prüfen.",
+    "loading": "Ergebnisse werden geladen…",
+    "showMore": "Mehr anzeigen",
+    "showLess": "Weniger anzeigen",
+    "errors": {
+      "title": "Ergebnisse nicht verfügbar",
+      "load": "Die Ergebnisse konnten nicht geladen werden. Bitte versuche es erneut."
+    },
+    "studentFallback": "Lernende",
+    "assignmentKeyFallback": "Aufgabe",
+    "assignmentFallback": "Unbenannte Aufgabe",
+    "filters": {
+      "searchLabel": "Suche",
+      "searchPlaceholder": "Name, Aufgabe, Feedback oder Code",
+      "levelLabel": "Niveau",
+      "allLevels": "Alle Niveaus",
+      "minScoreLabel": "Mindestpunktzahl",
+      "minScorePlaceholder": "z. B. 60",
+      "reset": "Filter zurücksetzen",
+      "showing": "Zeige {{filtered}} von {{total}}"
+    },
+    "status": {
+      "passed": "Bestanden",
+      "failed": "Unter der Bestehensgrenze ({{mark}})",
+      "score": "Punktzahl"
+    },
+    "attempt": "Versuch {{attempt}} von {{total}}",
+    "attemptSingle": "Erster Versuch",
+    "bestScoreMet": "Beste Punktzahl {{score}} (≥ {{mark}})",
+    "bestScoreNeeded": "Beste Punktzahl {{score}} (< {{mark}})",
+    "belowPassMark": "Unter der Bestehensgrenze ({{mark}})",
+    "openObjective": "Ziel öffnen",
+    "feedbackTitle": "Feedback",
+    "empty": {
+      "title": "Noch keine Ergebnisse",
+      "description": "Versuche eine andere Suche oder schließe eine Prüfung ab, um Ergebnisse zu sehen.",
+      "reset": "Filter zurücksetzen"
+    }
+  },
   "placementPage": {
     "meta": {
       "title": "Deutsch-Einstufungstest · Falowen",

@@ -1028,8 +1028,48 @@
     "feedbackLabel": "Adaptive feedback",
     "highlightsLabel": "Focus today",
     "fallback": "Add more results or writing practice to unlock recommendations."
-  }
-  ,
+  },
+  "resultHistory": {
+    "title": "Results history",
+    "subtitle": "Review past attempts, feedback, and outcomes.",
+    "loading": "Loading results…",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "errors": {
+      "title": "Results unavailable",
+      "load": "We could not load the results. Please try again."
+    },
+    "studentFallback": "student",
+    "assignmentKeyFallback": "assignment",
+    "assignmentFallback": "Untitled assignment",
+    "filters": {
+      "searchLabel": "Search",
+      "searchPlaceholder": "Name, assignment, feedback, or student code",
+      "levelLabel": "Level",
+      "allLevels": "All levels",
+      "minScoreLabel": "Minimum score",
+      "minScorePlaceholder": "e.g. 60",
+      "reset": "Reset filters",
+      "showing": "Showing {{filtered}} of {{total}}"
+    },
+    "status": {
+      "passed": "Passed",
+      "failed": "Below pass mark ({{mark}})",
+      "score": "Score"
+    },
+    "attempt": "Attempt {{attempt}} of {{total}}",
+    "attemptSingle": "First attempt",
+    "bestScoreMet": "Best score {{score}} (≥ {{mark}})",
+    "bestScoreNeeded": "Best score {{score}} (< {{mark}})",
+    "belowPassMark": "Below pass mark ({{mark}})",
+    "openObjective": "Open objective",
+    "feedbackTitle": "Feedback",
+    "empty": {
+      "title": "No results yet",
+      "description": "Try another search or complete an exam to see results here.",
+      "reset": "Reset filters"
+    }
+  },
   "placementPage": {
     "meta": {
       "title": "German placement test · Falowen",
