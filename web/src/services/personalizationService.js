@@ -10,6 +10,7 @@ const WORD_TARGET_RANGES = {
   B2: { min: 120, max: 180 },
   C1: { min: 180, max: 220 },
 };
+const PASS_MARK = 60;
 
 const ISSUE_PATTERNS = [
   { label: "verb placement", regex: /\bverb (placement|position|order)\b/i },
@@ -132,7 +133,7 @@ export const fetchPersonalizedPlan = async ({
   const topIssue = Array.from(issueCounts.values()).sort((a, b) => b.count - a.count)[0] || null;
 
   const lowScoreAssignments = scores
-    .filter((entry) => Number.isFinite(entry.score))
+    .filter((entry) => Number.isFinite(entry.score) && entry.score < PASS_MARK)
     .sort((a, b) => a.score - b.score);
   const lowestScore = lowScoreAssignments[0] || null;
 
