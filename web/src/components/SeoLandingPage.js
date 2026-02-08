@@ -141,6 +141,17 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
     },
   ];
 
+  const faqBotQuestions = [
+    "How do I enroll and get access to Falowen?",
+    "Do online, in-person, self-learning, or recorded lectures cost the same?",
+    "How can I pay for a class?",
+    "What is the class duration and contract access period?",
+    "Where can I download receipts, results, and attendance?",
+    "How will I receive my assignment results?",
+    "Do I get weekly progress summaries?",
+    "What if I have payment or access issues?",
+  ];
+
   return (
     <main
       style={{
@@ -237,6 +248,65 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
                 <p style={{ margin: "6px 0 0", fontSize: 13, color: "#4b5563", lineHeight: 1.6 }}>{item.answer}</p>
               </div>
             ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard style={{ background: "#f8fafc" }}>
+          <div style={{ display: "grid", gap: 12 }}>
+            <div>
+              <h2 style={{ ...styles.sectionTitle, marginBottom: 6 }}>Falowen FAQ bot</h2>
+              <p style={{ margin: 0, fontSize: 13, color: "#4b5563", lineHeight: 1.7 }}>
+                New here? Ask the FAQ bot quick questions about enrollment, payments, certificates, or support. You can
+                also chat with our team on WhatsApp for immediate help.
+              </p>
+            </div>
+            <div style={{ display: "grid", gap: 10 }}>
+              <label htmlFor="faq-bot-input" style={{ fontSize: 12, fontWeight: 600, color: "#111827" }}>
+                Ask a quick question
+              </label>
+              <input
+                id="faq-bot-input"
+                type="text"
+                placeholder="Type a question like “How do I enroll?”"
+                style={{
+                  borderRadius: 12,
+                  border: "1px solid #e5e7eb",
+                  padding: "12px 14px",
+                  fontSize: 13,
+                  outline: "none",
+                }}
+              />
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {faqBotQuestions.map((question) => (
+                <span
+                  key={question}
+                  style={{
+                    padding: "6px 12px",
+                    borderRadius: 999,
+                    background: "#ffffff",
+                    border: "1px solid #e5e7eb",
+                    fontSize: 12,
+                    color: "#1f2937",
+                  }}
+                >
+                  {question}
+                </span>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button type="button" style={styles.primaryButton} onClick={() => onSignUp("german")}>
+                Enroll now
+              </button>
+              <a
+                href="https://wa.me/233205706589"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ ...styles.secondaryButton, textDecoration: "none" }}
+              >
+                Chat on WhatsApp
+              </a>
+            </div>
           </div>
         </SectionCard>
 
