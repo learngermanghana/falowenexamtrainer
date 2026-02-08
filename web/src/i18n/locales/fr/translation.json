@@ -979,8 +979,48 @@
     "feedbackLabel": "Retour adaptatif",
     "highlightsLabel": "Focus du jour",
     "fallback": "Ajoutez plus de résultats ou d'entraînement à l'écriture pour débloquer les recommandations."
-  }
-  ,
+  },
+  "resultHistory": {
+    "title": "Historique des résultats",
+    "subtitle": "Consultez les tentatives, retours et résultats passés.",
+    "loading": "Chargement des résultats…",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins",
+    "errors": {
+      "title": "Résultats indisponibles",
+      "load": "Impossible de charger les résultats. Veuillez réessayer."
+    },
+    "studentFallback": "apprenant",
+    "assignmentKeyFallback": "devoir",
+    "assignmentFallback": "Devoir sans titre",
+    "filters": {
+      "searchLabel": "Recherche",
+      "searchPlaceholder": "Nom, devoir, feedback ou code étudiant",
+      "levelLabel": "Niveau",
+      "allLevels": "Tous les niveaux",
+      "minScoreLabel": "Score minimum",
+      "minScorePlaceholder": "ex. 60",
+      "reset": "Réinitialiser les filtres",
+      "showing": "Affichage {{filtered}} sur {{total}}"
+    },
+    "status": {
+      "passed": "Réussi",
+      "failed": "Sous le seuil de réussite ({{mark}})",
+      "score": "Score"
+    },
+    "attempt": "Tentative {{attempt}} sur {{total}}",
+    "attemptSingle": "Première tentative",
+    "bestScoreMet": "Meilleur score {{score}} (≥ {{mark}})",
+    "bestScoreNeeded": "Meilleur score {{score}} (< {{mark}})",
+    "belowPassMark": "Sous le seuil de réussite ({{mark}})",
+    "openObjective": "Ouvrir l'objectif",
+    "feedbackTitle": "Feedback",
+    "empty": {
+      "title": "Pas encore de résultats",
+      "description": "Essayez une autre recherche ou terminez un examen pour voir des résultats ici.",
+      "reset": "Réinitialiser les filtres"
+    }
+  },
   "placementPage": {
     "meta": {
       "title": "Test de niveau allemand · Falowen",
