@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
+import { fetchPersonalizedPlan } from "../services/personalizationService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { PillBadge, PrimaryActionBar, SectionHeader, StatCard } from "./ui";
@@ -41,13 +42,14 @@ const COURSE_COMPLETION_CALENDAR_KEY = "falowen_course_completion_calendar_downl
 
 const HomeMetrics = ({ studentProfile }) => {
   const { t } = useTranslation();
-  const { idToken } = useAuth();
+  const { idToken, user } = useAuth();
   const navigate = useNavigate();
 
   const [attendance, setAttendance] = useState({ sessions: 0, hours: 0 });
   const [assignmentStats, setAssignmentStats] = useState(null);
   const [leaderboard, setLeaderboard] = useState(null);
   const [leaderboardGeneratedAt, setLeaderboardGeneratedAt] = useState("");
+  const [personalization, setPersonalization] = useState(null);
   const [loading, setLoading] = useState(false);
   const [refreshError, setRefreshError] = useState("");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -78,6 +80,7 @@ const HomeMetrics = ({ studentProfile }) => {
         setRefreshError("");
         setLeaderboard(null);
         setLeaderboardGeneratedAt("");
+        setPersonalization(null);
       }
       return;
     }
@@ -88,9 +91,16 @@ const HomeMetrics = ({ studentProfile }) => {
     }
 
     try {
-      const [attendanceResponse, scoreResponse] = await Promise.all([
+      const [attendanceResponse, scoreResponse, personalizationResponse] = await Promise.all([
         fetchAttendanceSummary({ className, studentCode, level: levelKey }),
         idToken && studentCode ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
+        fetchPersonalizedPlan({
+          className,
+          studentCode,
+          level: levelKey,
+          email: studentProfile?.email,
+          userId: user?.uid,
+        }),
       ]);
 
       if (!isMountedRef.current) return;
@@ -99,6 +109,7 @@ const HomeMetrics = ({ studentProfile }) => {
       setAssignmentStats(scoreResponse?.student || null);
       setLeaderboard(scoreResponse?.leaderboard || null);
       setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");
+      setPersonalization(personalizationResponse || null);
       setRefreshError("");
     } catch (error) {
       if (!isMountedRef.current) return;
@@ -106,7 +117,7 @@ const HomeMetrics = ({ studentProfile }) => {
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
-  }, [className, idToken, levelKey, studentCode, t]);
+  }, [className, idToken, levelKey, studentCode, studentProfile?.email, t, user?.uid]);
 
   useEffect(() => {
     refreshMetrics();
@@ -237,6 +248,9 @@ const HomeMetrics = ({ studentProfile }) => {
     return `${base} Missed items are only those before your last fully completed day.`;
   }, [t]);
 
+  const personalizationRecommendations = personalization?.recommendations || [];
+  const personalizationHighlights = personalization?.highlights || [];
+
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
       {isCourseCompleter ? (
@@ -316,6 +330,58 @@ const HomeMetrics = ({ studentProfile }) => {
           helper={t("homeMetrics.failed.helper")}
           tone="error"
         />
+      </div>
+
+      <div style={{ ...styles.card, margin: 0, border: "1px solid #dbeafe", background: "#eff6ff" }}>
+        <SectionHeader
+          eyebrow={t("personalization.eyebrow")}
+          title={t("personalization.title")}
+          subtitle={t("personalization.subtitle")}
+        />
+        {personalizationRecommendations.length ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+              {personalizationRecommendations.map((item) => (
+                <li key={item.title}>
+                  <strong>{item.title}.</strong>{" "}
+                  <span style={{ color: "#4b5563" }}>{item.detail}</span>
+                </li>
+              ))}
+            </ol>
+            <div>
+              <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
+                {t("personalization.feedbackLabel")}
+              </div>
+              <div style={{ ...styles.helperText, margin: 0 }}>{personalization?.feedback}</div>
+            </div>
+            {personalizationHighlights.length ? (
+              <div>
+                <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
+                  {t("personalization.highlightsLabel")}
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {personalizationHighlights.map((item) => (
+                    <span
+                      key={`${item.label}-${item.value}`}
+                      style={{
+                        padding: "6px 10px",
+                        background: "#fff",
+                        borderRadius: 999,
+                        border: "1px solid #bfdbfe",
+                        fontSize: 12,
+                        color: "#1f2937",
+                      }}
+                    >
+                      <strong>{item.label}:</strong> {item.value}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("personalization.fallback")}</p>
+        )}
       </div>
 
       {assignmentStats ? (

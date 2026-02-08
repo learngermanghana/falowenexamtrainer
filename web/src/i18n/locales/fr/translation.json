@@ -904,6 +904,15 @@
     }
   }
   ,
+  "personalization": {
+    "eyebrow": "Parcours personnalisé",
+    "title": "Vos trois prochaines tâches recommandées",
+    "subtitle": "Basé sur vos scores, progrès d'écriture, présence et données de profil.",
+    "feedbackLabel": "Retour adaptatif",
+    "highlightsLabel": "Focus du jour",
+    "fallback": "Ajoutez plus de résultats ou d'entraînement à l'écriture pour débloquer les recommandations."
+  }
+  ,
   "placementPage": {
     "meta": {
       "title": "Test de niveau allemand · Falowen",

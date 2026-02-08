@@ -953,6 +953,15 @@
     }
   }
   ,
+  "personalization": {
+    "eyebrow": "Personalized path",
+    "title": "Your next three recommended tasks",
+    "subtitle": "Based on your scores, writing progress, attendance, and profile data.",
+    "feedbackLabel": "Adaptive feedback",
+    "highlightsLabel": "Focus today",
+    "fallback": "Add more results or writing practice to unlock recommendations."
+  }
+  ,
   "placementPage": {
     "meta": {
       "title": "German placement test · Falowen",

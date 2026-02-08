@@ -5,6 +5,7 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { loadWritingProgress } from "../services/writingProgressService";
+import { fetchPersonalizedPlan } from "../services/personalizationService";
 
 const LAST_VISIT_STORAGE_KEY = "falowen_exam_last_visit";
 const LAST_SECTION_STORAGE_KEY = "falowen_exam_last_section";
@@ -19,13 +20,14 @@ const formatDate = (value, formatter) => {
 
 const ExamsOverviewPage = () => {
   const navigate = useNavigate();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { level, resultHistory } = useExam();
   const { user, studentProfile } = useAuth();
   const [lastVisits, setLastVisits] = useState({});
   const [lastSection, setLastSection] = useState("speaking");
   const [writingUpdatedAt, setWritingUpdatedAt] = useState("");
   const [downloadCount, setDownloadCount] = useState(0);
+  const [personalization, setPersonalization] = useState(null);
 
   const dateFormatter = useMemo(
     () =>
@@ -67,12 +69,39 @@ const ExamsOverviewPage = () => {
       setWritingUpdatedAt(progress?.updatedAt || "");
     };
 
+    const fetchPersonalization = async () => {
+      const userId = user?.uid;
+      const studentCode =
+        studentProfile?.studentCode || studentProfile?.studentcode || userId || "";
+      const response = await fetchPersonalizedPlan({
+        studentCode,
+        email: studentProfile?.email,
+        className: studentProfile?.className,
+        level,
+        userId,
+        writingMode: "exam",
+      });
+      if (!isMounted) return;
+      setPersonalization(response || null);
+    };
+
     fetchWritingProgress();
+    fetchPersonalization();
 
     return () => {
       isMounted = false;
     };
-  }, [studentProfile?.studentCode, studentProfile?.studentcode, user?.uid]);
+  }, [
+    level,
+    studentProfile?.className,
+    studentProfile?.email,
+    studentProfile?.studentCode,
+    studentProfile?.studentcode,
+    user?.uid,
+  ]);
+
+  const personalizationRecommendations = personalization?.recommendations || [];
+  const personalizationHighlights = personalization?.highlights || [];
 
   const latestResult = resultHistory[0];
   const resumeSection = lastSection || "speaking";
@@ -170,6 +199,55 @@ const ExamsOverviewPage = () => {
             </div>
           ))}
         </div>
+      </section>
+
+      <section style={{ ...styles.card, border: "1px solid #dbeafe", background: "#eff6ff" }}>
+        <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>{t("personalization.title")}</h3>
+        <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>{t("personalization.subtitle")}</p>
+        {personalizationRecommendations.length ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+              {personalizationRecommendations.map((item) => (
+                <li key={item.title}>
+                  <strong>{item.title}.</strong>{" "}
+                  <span style={{ color: "#4b5563" }}>{item.detail}</span>
+                </li>
+              ))}
+            </ol>
+            <div>
+              <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
+                {t("personalization.feedbackLabel")}
+              </div>
+              <div style={{ ...styles.helperText, margin: 0 }}>{personalization?.feedback}</div>
+            </div>
+            {personalizationHighlights.length ? (
+              <div>
+                <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
+                  {t("personalization.highlightsLabel")}
+                </div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {personalizationHighlights.map((item) => (
+                    <span
+                      key={`${item.label}-${item.value}`}
+                      style={{
+                        padding: "6px 10px",
+                        background: "#fff",
+                        borderRadius: 999,
+                        border: "1px solid #bfdbfe",
+                        fontSize: 12,
+                        color: "#1f2937",
+                      }}
+                    >
+                      <strong>{item.label}:</strong> {item.value}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        ) : (
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("personalization.fallback")}</p>
+        )}
       </section>
 
       <section style={styles.card}>
