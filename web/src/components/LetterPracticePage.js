@@ -8,6 +8,19 @@ import ResultHistory from "./ResultHistory";
 import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService";
 import { writingLetters } from "../data/writingLetters";
 
+const LEARNING_LOOP_STEPS = [
+  "Underline 2–3 sentences you are unsure about.",
+  "Ask the coach to explain the grammar or word order in simple words.",
+  "Rewrite the corrected sentence without looking.",
+  "Compare and note one new phrase to reuse next time.",
+];
+
+const IDEAS_COACHING_PROMPTS = [
+  "Start with the task and ask: What is unclear to me?",
+  "Request a short explanation and one example sentence.",
+  "End by summarizing the idea in your own words.",
+];
+
 const LetterPracticePage = ({ mode = "exams" }) => {
   const { i18n, t } = useTranslation();
   const numberFormatter = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
@@ -520,6 +533,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         <section style={styles.card}>
           <div style={{ display: "grid", gap: 12 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Mark my letter</h3>
+            <div style={styles.infoBox}>
+              <strong>Learning loop (don’t just copy):</strong>
+              <ul style={styles.promptList}>
+                {LEARNING_LOOP_STEPS.map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ul>
+            </div>
             <div style={{ display: "grid", gap: 6 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <label style={styles.label}>Level for feedback</label>
@@ -606,6 +627,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               </select>
             </div>
             <span style={styles.levelPill}>Prompt bank in /functions/functionz/prompts.js</span>
+          </div>
+          <div style={styles.infoBox}>
+            <strong>Use the coach to learn from your ideas:</strong>
+            <ul style={styles.promptList}>
+              {IDEAS_COACHING_PROMPTS.map((prompt) => (
+                <li key={prompt}>{prompt}</li>
+              ))}
+            </ul>
           </div>
 
           <div style={{ ...styles.chatLog, marginTop: 12 }} className="idea-generator-chat">
