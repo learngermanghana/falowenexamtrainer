@@ -394,11 +394,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
             </div>
           </div>
 
-          <div className="study-buddy-source">
-            <p className="study-buddy-source-title">{t("studyBuddy.data.title")}</p>
-            <p className="study-buddy-source-text">{t("studyBuddy.data.description")}</p>
-          </div>
-
           <div className="study-buddy-qa">
             <p className="study-buddy-qa-title">{t("studyBuddy.qa.title")}</p>
             <form

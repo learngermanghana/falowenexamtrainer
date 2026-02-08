@@ -103,10 +103,6 @@
       "attendance": "Attendance",
       "assignment": "Next assignment"
     },
-    "data": {
-      "title": "Data sources",
-      "description": "Suggestions are based on your Falowen profile data. To use GitHub calendars or class schedules, we sync those files into the app or API first."
-    },
     "metrics": {
       "latestResult": "Latest result",
       "attendance": "Attendance",
