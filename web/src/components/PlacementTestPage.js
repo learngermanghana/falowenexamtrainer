@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
+import { leadLevelOptions, leadModeOptions, leadStartOptions } from "../lib/leadCapture";
+import { captureLead, shareLeadOnWhatsApp } from "../services/leadCaptureService";
 
 const PLACEMENT_STORAGE_KEY = "falowen.placementTest.progress.v1";
 const ANSWER_REVIEW_DELAY_MS = 30 * 60 * 1000;
@@ -251,7 +253,11 @@ const PlacementTestPage = () => {
       reviewUnlocked: Boolean(saved?.reviewUnlocked),
       contact: {
         name: saved?.contact?.name || "",
+        phone: saved?.contact?.phone || "",
         email: saved?.contact?.email || "",
+        levelInterest: saved?.contact?.levelInterest || "",
+        preferredMode: saved?.contact?.preferredMode || "",
+        startTimeline: saved?.contact?.startTimeline || "",
         submittedAt: saved?.contact?.submittedAt || null,
       },
     };
@@ -261,7 +267,11 @@ const PlacementTestPage = () => {
   const [completedAt, setCompletedAt] = useState(initialProgress.completedAt);
   const [reviewUnlocked, setReviewUnlocked] = useState(initialProgress.reviewUnlocked);
   const [contactName, setContactName] = useState(initialProgress.contact.name);
+  const [contactPhone, setContactPhone] = useState(initialProgress.contact.phone);
   const [contactEmail, setContactEmail] = useState(initialProgress.contact.email);
+  const [contactLevelInterest, setContactLevelInterest] = useState(initialProgress.contact.levelInterest);
+  const [contactPreferredMode, setContactPreferredMode] = useState(initialProgress.contact.preferredMode);
+  const [contactStartTimeline, setContactStartTimeline] = useState(initialProgress.contact.startTimeline);
   const [contactSubmittedAt, setContactSubmittedAt] = useState(initialProgress.contact.submittedAt);
   const startTrackedRef = useRef(Boolean(initialProgress.startedAt));
   const completionTrackedRef = useRef(Boolean(initialProgress.completedAt));
@@ -297,11 +307,27 @@ const PlacementTestPage = () => {
       reviewUnlocked,
       contact: {
         name: contactName,
+        phone: contactPhone,
         email: contactEmail,
+        levelInterest: contactLevelInterest,
+        preferredMode: contactPreferredMode,
+        startTimeline: contactStartTimeline,
         submittedAt: contactSubmittedAt,
       },
     });
-  }, [placementAnswers, startedAt, completedAt, reviewUnlocked, contactName, contactEmail, contactSubmittedAt]);
+  }, [
+    placementAnswers,
+    startedAt,
+    completedAt,
+    reviewUnlocked,
+    contactName,
+    contactPhone,
+    contactEmail,
+    contactLevelInterest,
+    contactPreferredMode,
+    contactStartTimeline,
+    contactSubmittedAt,
+  ]);
 
   useEffect(() => {
     if (placementAnsweredCount > 0 && !startTrackedRef.current) {
@@ -334,22 +360,46 @@ const PlacementTestPage = () => {
   const handleContactSubmit = (event) => {
     event.preventDefault();
     const trimmedName = contactName.trim();
+    const trimmedPhone = contactPhone.trim();
     const trimmedEmail = contactEmail.trim();
 
-    if (!trimmedName || !trimmedEmail) {
+    if (
+      !trimmedName ||
+      !trimmedPhone ||
+      !trimmedEmail ||
+      !contactLevelInterest ||
+      !contactPreferredMode ||
+      !contactStartTimeline
+    ) {
       return;
     }
 
     const submittedAt = Date.now();
     setContactName(trimmedName);
+    setContactPhone(trimmedPhone);
     setContactEmail(trimmedEmail);
     setContactSubmittedAt(submittedAt);
     if (!contactTrackedRef.current) {
       contactTrackedRef.current = true;
     }
+    const entry = captureLead({
+      name: trimmedName,
+      phone: trimmedPhone,
+      email: trimmedEmail,
+      levelInterest: contactLevelInterest,
+      preferredMode: contactPreferredMode,
+      startTimeline: contactStartTimeline,
+      source: "placement_test",
+      cta: "Placement test form",
+    });
+    shareLeadOnWhatsApp(entry);
     trackPlacementEvent("lead_capture", {
       name: trimmedName,
+      phone: trimmedPhone,
       email: trimmedEmail,
+      levelInterest: contactLevelInterest,
+      preferredMode: contactPreferredMode,
+      startTimeline: contactStartTimeline,
       submittedAt,
     });
   };
@@ -420,7 +470,7 @@ const PlacementTestPage = () => {
             <div>
               <h3 style={{ margin: 0 }}>{t("placementPage.leadHeading", { defaultValue: "Tell us about you" })}</h3>
               <p style={{ margin: "6px 0 0", color: "#4b5563", fontSize: 14 }}>
-                {t("placementPage.leadSubtitle", { defaultValue: "Share your name and email so we can follow up with resources for your level." })}
+                {t("placementPage.leadSubtitle", { defaultValue: "Share your details so we can follow up with the right next step." })}
               </p>
             </div>
             <form onSubmit={handleContactSubmit} style={{ display: "grid", gap: 10 }}>
@@ -432,6 +482,19 @@ const PlacementTestPage = () => {
                   onChange={(event) => setContactName(event.target.value)}
                   placeholder={t("placementPage.leadNamePlaceholder", { defaultValue: "e.g. Alex Schmidt" })}
                   autoComplete="name"
+                  required
+                  style={{ ...styles.input, borderColor: "#d1d5db" }}
+                />
+              </label>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                <span>{t("placementPage.leadPhoneLabel", { defaultValue: "Phone number" })}</span>
+                <input
+                  type="tel"
+                  value={contactPhone}
+                  onChange={(event) => setContactPhone(event.target.value)}
+                  placeholder={t("placementPage.leadPhonePlaceholder", { defaultValue: "+233 20 123 4567" })}
+                  autoComplete="tel"
+                  required
                   style={{ ...styles.input, borderColor: "#d1d5db" }}
                 />
               </label>
@@ -443,8 +506,59 @@ const PlacementTestPage = () => {
                   onChange={(event) => setContactEmail(event.target.value)}
                   placeholder={t("placementPage.leadEmailPlaceholder", { defaultValue: "you@example.com" })}
                   autoComplete="email"
+                  required
                   style={{ ...styles.input, borderColor: "#d1d5db" }}
                 />
+              </label>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                <span>{t("placementPage.leadLevelLabel", { defaultValue: "Level of interest" })}</span>
+                <select
+                  value={contactLevelInterest}
+                  onChange={(event) => setContactLevelInterest(event.target.value)}
+                  required
+                  style={{ ...styles.input, borderColor: "#d1d5db" }}
+                >
+                  <option value="">{t("placementPage.leadLevelPlaceholder", { defaultValue: "Select a level" })}</option>
+                  {leadLevelOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                <span>{t("placementPage.leadModeLabel", { defaultValue: "Preferred mode" })}</span>
+                <select
+                  value={contactPreferredMode}
+                  onChange={(event) => setContactPreferredMode(event.target.value)}
+                  required
+                  style={{ ...styles.input, borderColor: "#d1d5db" }}
+                >
+                  <option value="">{t("placementPage.leadModePlaceholder", { defaultValue: "Select a mode" })}</option>
+                  {leadModeOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
+                <span>{t("placementPage.leadStartLabel", { defaultValue: "Preferred start" })}</span>
+                <select
+                  value={contactStartTimeline}
+                  onChange={(event) => setContactStartTimeline(event.target.value)}
+                  required
+                  style={{ ...styles.input, borderColor: "#d1d5db" }}
+                >
+                  <option value="">
+                    {t("placementPage.leadStartPlaceholder", { defaultValue: "Select a timeframe" })}
+                  </option>
+                  {leadStartOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </label>
               <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                 <button type="submit" style={styles.buttonPrimary}>
