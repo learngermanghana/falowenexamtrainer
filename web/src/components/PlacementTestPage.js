@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 import { leadLevelOptions, leadModeOptions, leadStartOptions } from "../lib/leadCapture";
-import { captureLead, shareLeadOnWhatsApp } from "../services/leadCaptureService";
+import { captureLead } from "../services/leadCaptureService";
 
 const PLACEMENT_STORAGE_KEY = "falowen.placementTest.progress.v1";
 const ANSWER_REVIEW_DELAY_MS = 30 * 60 * 1000;
@@ -382,7 +382,7 @@ const PlacementTestPage = () => {
     if (!contactTrackedRef.current) {
       contactTrackedRef.current = true;
     }
-    const entry = captureLead({
+    captureLead({
       name: trimmedName,
       phone: trimmedPhone,
       email: trimmedEmail,
@@ -392,7 +392,6 @@ const PlacementTestPage = () => {
       source: "placement_test",
       cta: "Placement test form",
     });
-    shareLeadOnWhatsApp(entry);
     trackPlacementEvent("lead_capture", {
       name: trimmedName,
       phone: trimmedPhone,

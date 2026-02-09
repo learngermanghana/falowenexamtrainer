@@ -15,7 +15,7 @@ import { toDate, toDateMs } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
 import { jsPDF } from "jspdf";
 import LeadCaptureModal from "./LeadCaptureModal";
-import { captureLead, shareLeadOnWhatsApp } from "../services/leadCaptureService";
+import { captureLead } from "../services/leadCaptureService";
 
 // ---------- helpers ----------
 const formatDate = (value) => {
@@ -250,14 +250,13 @@ const MyExamFilePage = () => {
   };
 
   const handleLeadSubmit = (payload) => {
-    const entry = captureLead({
+    captureLead({
       ...payload,
       source: "exam_registration",
       cta: "Register",
       level: leadCaptureConfig.level,
       registrationUrl: leadCaptureConfig.registrationUrl,
     });
-    shareLeadOnWhatsApp(entry);
     if (leadCaptureConfig.registrationUrl) {
       window.open(leadCaptureConfig.registrationUrl, "_blank", "noopener,noreferrer");
     }

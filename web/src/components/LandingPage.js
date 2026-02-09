@@ -4,7 +4,7 @@ import { styles } from "../styles";
 import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 import LeadCaptureModal from "./LeadCaptureModal";
-import { captureLead, shareLeadOnWhatsApp } from "../services/leadCaptureService";
+import { captureLead } from "../services/leadCaptureService";
 
 const FeatureCard = ({ icon, title, description }) => (
   <div
@@ -256,12 +256,11 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   };
 
   const handleLeadSubmit = (payload) => {
-    const entry = captureLead({
+    captureLead({
       ...payload,
       source: "landing_page",
       cta: leadCaptureConfig.cta,
     });
-    shareLeadOnWhatsApp(entry);
     if (leadCaptureConfig.nextUrl) {
       window.location.href = leadCaptureConfig.nextUrl;
     }

@@ -1,5 +1,4 @@
 const LEAD_STORAGE_KEY = "falowen_lead_captures";
-const DEFAULT_WHATSAPP_NUMBER = "233205706589";
 
 const readStoredLeads = () => {
   if (typeof window === "undefined") return [];
@@ -33,30 +32,4 @@ export const captureLead = (payload) => {
   }
 
   return entry;
-};
-
-const formatLeadMessage = (entry) => {
-  const lines = [
-    "New lead capture",
-    "",
-    `Name: ${entry?.name || "-"}`,
-    `Phone: ${entry?.phone || "-"}`,
-    `Email: ${entry?.email || "-"}`,
-    `Level interest: ${entry?.levelInterest || "-"}`,
-    `Preferred mode: ${entry?.preferredMode || "-"}`,
-    `Preferred start: ${entry?.startTimeline || "-"}`,
-    entry?.cta ? `CTA: ${entry.cta}` : null,
-    entry?.source ? `Source: ${entry.source}` : null,
-  ].filter(Boolean);
-
-  return lines.join("\n");
-};
-
-export const shareLeadOnWhatsApp = (entry, whatsappNumber = DEFAULT_WHATSAPP_NUMBER) => {
-  if (typeof window === "undefined") return;
-  const message = formatLeadMessage(entry);
-  const encodedMessage = encodeURIComponent(message);
-  const sanitizedNumber = String(whatsappNumber || DEFAULT_WHATSAPP_NUMBER).replace(/\D/g, "");
-  const url = `https://wa.me/${sanitizedNumber}?text=${encodedMessage}`;
-  window.open(url, "_blank", "noopener,noreferrer");
 };

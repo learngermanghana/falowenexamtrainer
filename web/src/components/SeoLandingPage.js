@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
 import LeadCaptureModal from "./LeadCaptureModal";
-import { captureLead, shareLeadOnWhatsApp } from "../services/leadCaptureService";
+import { captureLead } from "../services/leadCaptureService";
 
 const SectionCard = ({ children, style }) => (
   <section
@@ -55,8 +55,7 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
   const [leadCaptureOpen, setLeadCaptureOpen] = useState(false);
 
   const handleLeadSubmit = (payload) => {
-    const entry = captureLead({ ...payload, source: "seo_landing", cta: "Talk to us" });
-    shareLeadOnWhatsApp(entry);
+    captureLead({ ...payload, source: "seo_landing", cta: "Talk to us" });
   };
 
   useEffect(() => {
