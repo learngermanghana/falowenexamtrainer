@@ -1,5 +1,7 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
+import LeadCaptureModal from "./LeadCaptureModal";
+import { captureLead } from "../services/leadCaptureService";
 
 const SectionCard = ({ children, style }) => (
   <section
@@ -50,6 +52,12 @@ const HighlightCard = ({ title, description }) => (
 );
 
 const SeoLandingPage = ({ onSignUp, onLogin }) => {
+  const [leadCaptureOpen, setLeadCaptureOpen] = useState(false);
+
+  const handleLeadSubmit = (payload) => {
+    captureLead({ ...payload, source: "seo_landing", cta: "Talk to us" });
+  };
+
   useEffect(() => {
     const previousTitle = document.title;
     document.title = "Learn German in Ghana & Nigeria | Falowen";
@@ -298,15 +306,22 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
               <button type="button" style={styles.primaryButton} onClick={() => onSignUp("german")}>
                 Enroll now
               </button>
-              <a
-                href="https://wa.me/233205706589"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ ...styles.secondaryButton, textDecoration: "none" }}
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={() => setLeadCaptureOpen(true)}
               >
-                Chat on WhatsApp
-              </a>
+                Talk to us
+              </button>
             </div>
+            <a
+              href="https://wa.me/233205706589"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: 12, color: "#1f2937", textDecoration: "none", fontWeight: 600 }}
+            >
+              Prefer WhatsApp? +233 20 570 6589
+            </a>
           </div>
         </SectionCard>
 
@@ -323,24 +338,30 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
               <button type="button" style={styles.primaryButton} onClick={() => onSignUp("german")}>
                 Join a cohort
               </button>
-              <a
-                href="https://wa.me/233205706589"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                type="button"
+                onClick={() => setLeadCaptureOpen(true)}
                 style={{
                   ...styles.secondaryButton,
-                  textDecoration: "none",
                   color: "#e5e7eb",
                   borderColor: "#94a3b8",
                   background: "transparent",
                 }}
               >
-                WhatsApp us
-              </a>
+                Talk to us
+              </button>
             </div>
           </div>
         </SectionCard>
       </div>
+      <LeadCaptureModal
+        isOpen={leadCaptureOpen}
+        onClose={() => setLeadCaptureOpen(false)}
+        onSubmit={handleLeadSubmit}
+        title="Talk to us"
+        subtitle="Share a few details and our team will follow up with the best next step."
+        submitLabel="Send details"
+      />
     </main>
   );
 };
