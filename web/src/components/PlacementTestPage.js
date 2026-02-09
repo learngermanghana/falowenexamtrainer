@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
 import { leadLevelOptions, leadModeOptions, leadStartOptions } from "../lib/leadCapture";
-import { captureLead } from "../services/leadCaptureService";
+import { captureLead, getLatestLead } from "../services/leadCaptureService";
 
 const PLACEMENT_STORAGE_KEY = "falowen.placementTest.progress.v1";
 const ANSWER_REVIEW_DELAY_MS = 30 * 60 * 1000;
@@ -246,19 +246,31 @@ const PlacementTestPage = () => {
   const placementQuestions = useMemo(() => flattenPlacementQuestions(placementTest.sections), []);
   const initialProgress = useMemo(() => {
     const saved = getPlacementProgress();
+    const latestLead = getLatestLead();
+    const leadContact = latestLead
+      ? {
+          name: latestLead.name || "",
+          phone: latestLead.phone || "",
+          email: latestLead.email || "",
+          levelInterest: latestLead.levelInterest || "",
+          preferredMode: latestLead.preferredMode || "",
+          startTimeline: latestLead.startTimeline || "",
+          submittedAt: latestLead.capturedAt || null,
+        }
+      : null;
     return {
       answers: saved?.answers || {},
       startedAt: saved?.startedAt || null,
       completedAt: saved?.completedAt || null,
       reviewUnlocked: Boolean(saved?.reviewUnlocked),
       contact: {
-        name: saved?.contact?.name || "",
-        phone: saved?.contact?.phone || "",
-        email: saved?.contact?.email || "",
-        levelInterest: saved?.contact?.levelInterest || "",
-        preferredMode: saved?.contact?.preferredMode || "",
-        startTimeline: saved?.contact?.startTimeline || "",
-        submittedAt: saved?.contact?.submittedAt || null,
+        name: saved?.contact?.name || leadContact?.name || "",
+        phone: saved?.contact?.phone || leadContact?.phone || "",
+        email: saved?.contact?.email || leadContact?.email || "",
+        levelInterest: saved?.contact?.levelInterest || leadContact?.levelInterest || "",
+        preferredMode: saved?.contact?.preferredMode || leadContact?.preferredMode || "",
+        startTimeline: saved?.contact?.startTimeline || leadContact?.startTimeline || "",
+        submittedAt: saved?.contact?.submittedAt || leadContact?.submittedAt || null,
       },
     };
   }, []);
@@ -374,15 +386,10 @@ const PlacementTestPage = () => {
       return;
     }
 
-    const submittedAt = Date.now();
     setContactName(trimmedName);
     setContactPhone(trimmedPhone);
     setContactEmail(trimmedEmail);
-    setContactSubmittedAt(submittedAt);
-    if (!contactTrackedRef.current) {
-      contactTrackedRef.current = true;
-    }
-    captureLead({
+    const leadEntry = captureLead({
       name: trimmedName,
       phone: trimmedPhone,
       email: trimmedEmail,
@@ -392,6 +399,11 @@ const PlacementTestPage = () => {
       source: "placement_test",
       cta: "Placement test form",
     });
+    const submittedAt = leadEntry?.capturedAt || Date.now();
+    setContactSubmittedAt(submittedAt);
+    if (!contactTrackedRef.current) {
+      contactTrackedRef.current = true;
+    }
     trackPlacementEvent("lead_capture", {
       name: trimmedName,
       phone: trimmedPhone,

@@ -1,31 +1,43 @@
-const LEAD_STORAGE_KEY = "falowen_lead_captures";
+import { addDoc, collection, db, doc, isFirebaseConfigured, serverTimestamp, setDoc } from "../firebase";
 
-const readStoredLeads = () => {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(LEAD_STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    return [];
-  }
+let latestLead = null;
+
+const normalizeValue = (value) => (value || "").trim().toLowerCase();
+
+const buildLeadKey = (payload) => {
+  const payloadEmail = normalizeValue(payload.email);
+  if (payloadEmail) return `email:${encodeURIComponent(payloadEmail)}`;
+  const payloadPhone = normalizeValue(payload.phone);
+  if (payloadPhone) return `phone:${encodeURIComponent(payloadPhone)}`;
+  return null;
 };
 
-const writeStoredLeads = (leads) => {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(leads));
-  } catch (error) {
-    // no-op
+export const getLatestLead = () => {
+  return latestLead;
+};
+
+const persistLeadToFirestore = async (entry) => {
+  if (!isFirebaseConfigured || !db) return null;
+  const leadKey = buildLeadKey(entry);
+  const payload = {
+    ...entry,
+    updatedAt: serverTimestamp(),
+  };
+  if (!leadKey) {
+    return addDoc(collection(db, "leadCaptures"), {
+      ...payload,
+      createdAt: serverTimestamp(),
+    });
   }
+  return setDoc(doc(collection(db, "leadCaptures"), leadKey), payload, { merge: true });
 };
 
 export const captureLead = (payload) => {
   if (!payload) return null;
   const capturedAt = Date.now();
   const entry = { ...payload, capturedAt };
-  const leads = readStoredLeads();
-  writeStoredLeads([entry, ...leads].slice(0, 200));
+  latestLead = entry;
+  persistLeadToFirestore(entry);
 
   if (typeof window !== "undefined" && Array.isArray(window.dataLayer)) {
     window.dataLayer.push({ event: "lead_capture", ...entry });
