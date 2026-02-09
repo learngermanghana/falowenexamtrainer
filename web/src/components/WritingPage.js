@@ -52,6 +52,69 @@ const IDEAS_COACHING_PROMPTS = [
   "End by summarizing the idea in your own words.",
 ];
 
+const RUBRIC_CRITERIA = [
+  {
+    key: "task",
+    label: "Task completion",
+    keywords: ["task", "bullet", "question", "answer", "content", "point"],
+  },
+  {
+    key: "coherence",
+    label: "Coherence",
+    keywords: ["coherence", "structure", "flow", "connector", "paragraph", "order"],
+  },
+  {
+    key: "grammar",
+    label: "Grammar & accuracy",
+    keywords: ["grammar", "spelling", "case", "verb", "tense", "word order", "article"],
+  },
+];
+
+const RUBRIC_EXAMPLES = {
+  A1: {
+    good: "Short note with clear purpose, 2-3 details, polite closing.",
+    excellent: "All points covered + simple connectors (und, aber), no major grammar slips.",
+  },
+  A2: {
+    good: "Clear email with context, request, and polite closing.",
+    excellent: "Includes reasons, polite modal verbs, and 1–2 supporting details.",
+  },
+  B1: {
+    good: "Organized letter with paragraphs and clear request/complaint.",
+    excellent: "Adds justification, cohesive connectors, and accurate tenses.",
+  },
+  B2: {
+    good: "Structured opinion with examples and a clear conclusion.",
+    excellent: "Balances pros/cons, varied connectors, and precise grammar.",
+  },
+  C1: {
+    good: "Formal, coherent response with clear stance and examples.",
+    excellent: "Sophisticated structure, nuanced argument, and near-native accuracy.",
+  },
+};
+
+const CONNECTORS_BY_LEVEL = {
+  A1: ["und", "aber", "dann", "weil"],
+  A2: ["zuerst", "außerdem", "deshalb", "trotzdem"],
+  B1: ["zum Beispiel", "deswegen", "daher", "jedoch"],
+  B2: ["dennoch", "hingegen", "folglich", "darüber hinaus"],
+  C1: ["hingegen", "nichtsdestotrotz", "folglich", "dementsprechend"],
+};
+
+const TEMPLATE_SNIPPETS = {
+  formal:
+    "Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ...\n\nMit freundlichen Grüßen\n[Name]",
+  informal:
+    "Hallo [Name],\n\nich wollte dir kurz schreiben, weil ...\n\nLiebe Grüße\n[Name]",
+};
+
+const DEFAULT_OUTLINE = [
+  { title: "Greeting + context", hint: "Greet and name the situation." },
+  { title: "Purpose", hint: "State why you are writing." },
+  { title: "Bullet points", hint: "Answer the task points with details." },
+  { title: "Closing", hint: "Polite closing line." },
+];
+
 const mapExamPromptsToLetters = (prompts) =>
   Object.entries(prompts).flatMap(([level, entries]) =>
     (entries || []).map((item, index) => ({
@@ -63,6 +126,151 @@ const mapExamPromptsToLetters = (prompts) =>
       whatToInclude: item.Punkte || [],
     }))
   );
+
+const splitSentences = (text = "") => {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  if (!normalized) return [];
+  const matches = normalized.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
+  return matches ? matches.map((sentence) => sentence.trim()) : [];
+};
+
+const scoreFromFeedback = (feedback) => {
+  if (!feedback) return 0;
+  const positive = [
+    "excellent",
+    "strong",
+    "clear",
+    "good",
+    "well",
+    "effective",
+    "solid",
+    "accurate",
+  ];
+  const negative = [
+    "missing",
+    "unclear",
+    "weak",
+    "needs",
+    "incorrect",
+    "errors",
+    "poor",
+    "limited",
+    "confusing",
+    "lack",
+    "problem",
+  ];
+  const lower = feedback.toLowerCase();
+  const posHits = positive.reduce((count, word) => count + (lower.includes(word) ? 1 : 0), 0);
+  const negHits = negative.reduce((count, word) => count + (lower.includes(word) ? 1 : 0), 0);
+  const base = 3 + posHits - negHits;
+  return Math.min(5, Math.max(1, base));
+};
+
+const buildRubricBreakdown = (feedback) => {
+  if (!feedback) {
+    return RUBRIC_CRITERIA.map((item) => ({
+      ...item,
+      score: 0,
+      explanation: "Awaiting AI feedback.",
+    }));
+  }
+
+  const sentences = splitSentences(feedback);
+  return RUBRIC_CRITERIA.map((item) => {
+    const match =
+      sentences.find((sentence) =>
+        item.keywords.some((keyword) => sentence.toLowerCase().includes(keyword))
+      ) || feedback;
+    return {
+      ...item,
+      score: scoreFromFeedback(match),
+      explanation: match,
+    };
+  });
+};
+
+const derivePromptMeta = (task) => {
+  const tags = (task.tags || []).map((tag) => tag.toLowerCase());
+  const label = (task.letter || "").toLowerCase();
+  const situation = (task.situation || "").toLowerCase();
+  let type = "letter";
+  if (label.includes("e-mail") || label.includes("email") || tags.includes("email")) {
+    type = "email";
+  } else if (label.includes("meinung") || label.includes("opinion") || tags.includes("article")) {
+    type = "argument";
+  } else if (tags.includes("note")) {
+    type = "note";
+  }
+
+  let formality = "neutral";
+  if (tags.some((tag) => tag.includes("formal")) || situation.includes("rathaus")) {
+    formality = "formal";
+  } else if (tags.some((tag) => ["birthday", "invitation", "note"].includes(tag))) {
+    formality = "informal";
+  }
+
+  const theme = tags[0] || "general";
+  return { type, formality, theme };
+};
+
+const buildPlanOutline = ({ selectedLetter, ideaInput }) => {
+  if (selectedLetter?.whatToInclude?.length) {
+    return selectedLetter.whatToInclude.map((point, index) => ({
+      title: `Bullet point ${index + 1}`,
+      hint: point,
+      draft: "",
+    }));
+  }
+
+  if (ideaInput?.trim()) {
+    return DEFAULT_OUTLINE.map((step) => ({
+      ...step,
+      draft: "",
+      hint: `${step.hint} (${ideaInput.slice(0, 60)}...)`,
+    }));
+  }
+
+  return DEFAULT_OUTLINE.map((step) => ({ ...step, draft: "" }));
+};
+
+const extractErrorBank = (feedback) => {
+  if (!feedback) return [];
+  const sentences = splitSentences(feedback);
+  const keywords = ["error", "incorrect", "wrong", "fix", "grammar", "spelling", "case", "word order"];
+  return sentences.filter((sentence) =>
+    keywords.some((keyword) => sentence.toLowerCase().includes(keyword))
+  );
+};
+
+const buildRevisionTasks = (errors) => {
+  if (!errors.length) return [];
+  return [
+    "Rewrite 3 sentences using weil + correct word order.",
+    "Underline articles and check case endings.",
+    "Swap 3 connectors with higher-level alternatives.",
+  ];
+};
+
+const calculateStreak = (logEntries) => {
+  if (!logEntries.length) return 0;
+  const dates = [...logEntries]
+    .map((entry) => new Date(entry.completedAt).toDateString())
+    .filter(Boolean);
+  const uniqueDates = Array.from(new Set(dates)).sort((a, b) => new Date(b) - new Date(a));
+  let streak = 1;
+  let current = new Date(uniqueDates[0]);
+  for (let index = 1; index < uniqueDates.length; index += 1) {
+    const date = new Date(uniqueDates[index]);
+    const diffDays = Math.round((current - date) / (1000 * 60 * 60 * 24));
+    if (diffDays === 1) {
+      streak += 1;
+      current = date;
+    } else {
+      break;
+    }
+  }
+  return streak;
+};
 
 const WordCountMeter = ({ count, range }) => {
   if (!range) return null;
@@ -139,11 +347,26 @@ const WritingPage = ({ mode = "course" }) => {
   const [ideaSuccess, setIdeaSuccess] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
   const [mockExamMode, setMockExamMode] = useState(false);
+  const [showOutlineHelper, setShowOutlineHelper] = useState(true);
+  const [examFocusMode, setExamFocusMode] = useState(false);
+  const [pendingExamStart, setPendingExamStart] = useState(false);
+  const [promptFilters, setPromptFilters] = useState({
+    theme: "all",
+    type: "all",
+    formality: "all",
+  });
   const [rubricChecklist, setRubricChecklist] = useState({
     task: false,
     coherence: false,
     grammar: false,
   });
+  const [rubricBreakdown, setRubricBreakdown] = useState(() =>
+    buildRubricBreakdown("")
+  );
+  const [draftHistory, setDraftHistory] = useState([]);
+  const [completionLog, setCompletionLog] = useState([]);
+  const [errorBank, setErrorBank] = useState([]);
+  const [planOutline, setPlanOutline] = useState([]);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [selectedLetterId, setSelectedLetterId] = useState(() => {
     const initialList = isExamMode
@@ -158,9 +381,35 @@ const WritingPage = ({ mode = "course" }) => {
 
     return writingTasks;
   }, [isExamMode, level, writingTasks]);
+  const taskFilterOptions = useMemo(() => {
+    const themes = new Set();
+    const types = new Set();
+    const formalities = new Set();
+    visibleWritingTasks.forEach((task) => {
+      const meta = derivePromptMeta(task);
+      themes.add(meta.theme);
+      types.add(meta.type);
+      formalities.add(meta.formality);
+    });
+    return {
+      themes: Array.from(themes).sort(),
+      types: Array.from(types).sort(),
+      formalities: Array.from(formalities).sort(),
+    };
+  }, [visibleWritingTasks]);
+  const filteredWritingTasks = useMemo(() => {
+    return visibleWritingTasks.filter((task) => {
+      const meta = derivePromptMeta(task);
+      const themeMatch = promptFilters.theme === "all" || meta.theme === promptFilters.theme;
+      const typeMatch = promptFilters.type === "all" || meta.type === promptFilters.type;
+      const formalityMatch =
+        promptFilters.formality === "all" || meta.formality === promptFilters.formality;
+      return themeMatch && typeMatch && formalityMatch;
+    });
+  }, [promptFilters, visibleWritingTasks]);
   const selectedLetter = useMemo(
-    () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
-    [selectedLetterId, visibleWritingTasks]
+    () => filteredWritingTasks.find((item) => item.id === selectedLetterId),
+    [selectedLetterId, filteredWritingTasks]
   );
   const [remainingSeconds, setRemainingSeconds] = useState(
     (selectedLetter?.durationMinutes || 0) * 60
@@ -231,14 +480,14 @@ const WritingPage = ({ mode = "course" }) => {
   }, [examWritingLetters, isExamMode, loadWritingTasks]);
 
   useEffect(() => {
-    if (!visibleWritingTasks.length) return;
+    if (!filteredWritingTasks.length) return;
     if (
       !selectedLetterId ||
-      !visibleWritingTasks.some((item) => item.id === selectedLetterId)
+      !filteredWritingTasks.some((item) => item.id === selectedLetterId)
     ) {
-      setSelectedLetterId(visibleWritingTasks[0].id);
+      setSelectedLetterId(filteredWritingTasks[0].id);
     }
-  }, [selectedLetterId, visibleWritingTasks]);
+  }, [filteredWritingTasks, selectedLetterId]);
 
   const selectedDurationMinutes = selectedLetter?.durationMinutes;
 
@@ -246,8 +495,12 @@ const WritingPage = ({ mode = "course" }) => {
     if (typeof selectedDurationMinutes === "number") {
       setRemainingSeconds(selectedDurationMinutes * 60);
       setTimerRunning(false);
+      if (pendingExamStart) {
+        setTimerRunning(true);
+        setPendingExamStart(false);
+      }
     }
-  }, [selectedDurationMinutes]);
+  }, [pendingExamStart, selectedDurationMinutes]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -256,6 +509,7 @@ const WritingPage = ({ mode = "course" }) => {
       setRemainingSeconds((prev) => {
         if (prev <= 1) {
           setTimerRunning(false);
+          setExamFocusMode(false);
           return 0;
         }
         return prev - 1;
@@ -278,6 +532,15 @@ const WritingPage = ({ mode = "course" }) => {
       setIdeaSuccess("");
       setRemainingSeconds((selectedDurationMinutes || 0) * 60);
       setTimerRunning(false);
+      setRubricBreakdown(buildRubricBreakdown(""));
+      setDraftHistory([]);
+      setCompletionLog([]);
+      setErrorBank([]);
+      setPlanOutline([]);
+      setShowOutlineHelper(true);
+      setExamFocusMode(false);
+      setPendingExamStart(false);
+      setPromptFilters({ theme: "all", type: "all", formality: "all" });
     };
 
     const loadProgress = async () => {
@@ -317,6 +580,31 @@ const WritingPage = ({ mode = "course" }) => {
         if (typeof saved.timerRunning === "boolean") {
           setTimerRunning(saved.timerRunning);
         }
+        if (Array.isArray(saved.rubricBreakdown) && saved.rubricBreakdown.length) {
+          setRubricBreakdown(saved.rubricBreakdown);
+        }
+        if (Array.isArray(saved.draftHistory)) {
+          setDraftHistory(saved.draftHistory);
+        }
+        if (Array.isArray(saved.completionLog)) {
+          setCompletionLog(saved.completionLog);
+        }
+        if (Array.isArray(saved.errorBank)) {
+          setErrorBank(saved.errorBank);
+        }
+        if (Array.isArray(saved.planOutline)) {
+          setPlanOutline(saved.planOutline);
+        }
+        if (typeof saved.showOutlineHelper === "boolean") {
+          setShowOutlineHelper(saved.showOutlineHelper);
+        }
+        if (saved.promptFilters) {
+          setPromptFilters({
+            theme: saved.promptFilters.theme || "all",
+            type: saved.promptFilters.type || "all",
+            formality: saved.promptFilters.formality || "all",
+          });
+        }
       } catch (err) {
         console.error("Failed to load writing progress", err);
       } finally {
@@ -348,6 +636,13 @@ const WritingPage = ({ mode = "course" }) => {
           selectedDraftIds,
           remainingSeconds,
           timerRunning,
+          rubricBreakdown,
+          draftHistory,
+          completionLog,
+          errorBank,
+          planOutline,
+          showOutlineHelper,
+          promptFilters,
         },
       }).catch((err) => {
         console.error("Failed to save writing progress", err);
@@ -357,13 +652,20 @@ const WritingPage = ({ mode = "course" }) => {
     return () => clearTimeout(timeout);
   }, [
     chatMessages,
+    completionLog,
+    draftHistory,
+    errorBank,
     ideaInput,
     markFeedback,
+    planOutline,
+    promptFilters,
     practiceDraft,
     progressLoaded,
     progressMode,
     remainingSeconds,
+    rubricBreakdown,
     selectedDraftIds,
+    showOutlineHelper,
     timerRunning,
     typedAnswer,
     userId,
@@ -374,6 +676,29 @@ const WritingPage = ({ mode = "course" }) => {
     const trimmed = value.trim();
     if (!trimmed) return 0;
     return trimmed.split(/\s+/).length;
+  };
+
+  const handleInsertSnippet = (snippet) => {
+    setPracticeDraft((prev) => {
+      const spacer = prev.trim() ? "\n\n" : "";
+      return `${prev}${spacer}${snippet}`;
+    });
+  };
+
+  const handleRandomPrompt = () => {
+    if (!filteredWritingTasks.length) return;
+    const random = filteredWritingTasks[Math.floor(Math.random() * filteredWritingTasks.length)];
+    setSelectedLetterId(random.id);
+  };
+
+  const handleStartExamPreset = () => {
+    if (!filteredWritingTasks.length) return;
+    const random = filteredWritingTasks[Math.floor(Math.random() * filteredWritingTasks.length)];
+    setSelectedLetterId(random.id);
+    setMockExamMode(true);
+    setPendingExamStart(true);
+    setRemainingSeconds((random.durationMinutes || 0) * 60);
+    setExamFocusMode(true);
   };
 
   const handleExportDraft = () => {
@@ -463,6 +788,8 @@ const WritingPage = ({ mode = "course" }) => {
         idToken,
         program: studentProfile?.program,
       });
+      const breakdown = buildRubricBreakdown(data.feedback);
+      const overallScore = breakdown.reduce((sum, item) => sum + (item.score || 0), 0);
       const enrichedResult = {
         id: Date.now(),
         mode: "Mark my letter",
@@ -471,6 +798,32 @@ const WritingPage = ({ mode = "course" }) => {
         createdAt: new Date().toISOString(),
       };
       setMarkFeedback(data.feedback);
+      setRubricBreakdown(breakdown);
+      setErrorBank(extractErrorBank(data.feedback));
+      setDraftHistory((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          createdAt: new Date().toISOString(),
+          promptId: selectedLetterId || "custom",
+          promptTitle: selectedLetter?.letter || "Custom prompt",
+          draft: trimmed,
+          feedback: data.feedback,
+          breakdown,
+          score: overallScore,
+        },
+      ]);
+      setCompletionLog((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          completedAt: new Date().toISOString(),
+          promptId: selectedLetterId || "custom",
+          promptTitle: selectedLetter?.letter || "Custom prompt",
+          score: overallScore,
+          level,
+        },
+      ]);
       addResultToHistory(enrichedResult);
     } catch (err) {
       console.error("Falowen frontend error:", err);
@@ -492,6 +845,10 @@ const WritingPage = ({ mode = "course" }) => {
 
   const addChatMessage = (role, content) => {
     setChatMessages((prev) => [...prev, makeChatMessage(role, content)]);
+  };
+
+  const insertConnector = (connector) => {
+    setIdeaInput((prev) => `${prev}${prev.trim() ? " " : ""}${connector}`);
   };
 
   const userMessages = useMemo(
@@ -563,6 +920,21 @@ const WritingPage = ({ mode = "course" }) => {
   const practiceWordCount = countWords(practiceDraft);
   const typedWordCount = countWords(typedAnswer);
   const typedWordRange = WORD_TARGET_RANGES[level];
+  const completionStats = useMemo(() => {
+    const lastEntry = completionLog[completionLog.length - 1];
+    const bestScore = completionLog.reduce((best, entry) => Math.max(best, entry.score || 0), 0);
+    return {
+      streak: calculateStreak(completionLog),
+      lastCompleted: lastEntry?.completedAt || null,
+      bestScore,
+    };
+  }, [completionLog]);
+  const revisionTasks = useMemo(() => buildRevisionTasks(errorBank), [errorBank]);
+  const latestImprovementNotes = useMemo(() => {
+    if (!draftHistory.length) return [];
+    const latest = draftHistory[draftHistory.length - 1];
+    return extractErrorBank(latest.feedback).slice(0, 3);
+  }, [draftHistory]);
 
   const handleAskCoach = async () => {
     const trimmed = ideaInput.trim();
@@ -632,12 +1004,40 @@ const WritingPage = ({ mode = "course" }) => {
         >
           Reset
         </button>
+        <button
+          style={styles.secondaryButton}
+          onClick={handleRandomPrompt}
+          disabled={!filteredWritingTasks.length}
+        >
+          Random prompt
+        </button>
+        <button
+          style={styles.primaryButton}
+          onClick={handleStartExamPreset}
+          disabled={!filteredWritingTasks.length}
+        >
+          Start exam preset
+        </button>
       </div>
     </div>
   );
 
   return (
     <>
+      {examFocusMode && (
+        <div style={styles.focusOverlay}>
+          <div style={styles.focusTimer}>{formatTime(remainingSeconds)}</div>
+          <p style={{ margin: "0 0 16px", maxWidth: 520 }}>
+            Focus mode is on. Keep writing until the timer ends. Hints stay locked during the exam preset.
+          </p>
+          <button
+            style={styles.focusButton}
+            onClick={() => setExamFocusMode(false)}
+          >
+            Exit focus mode
+          </button>
+        </div>
+      )}
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>Writing – Practice exam letters</h2>
         <p style={styles.helperText}>
@@ -670,6 +1070,24 @@ const WritingPage = ({ mode = "course" }) => {
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Your simulation room</h3>
             {practiceTimerControls}
+            <div style={{ ...styles.helperCard, marginTop: 12 }}>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>Progress snapshot</div>
+              <div style={{ display: "grid", gap: 6 }}>
+                <div>
+                  <strong>Streak:</strong> {completionStats.streak} day
+                  {completionStats.streak === 1 ? "" : "s"}
+                </div>
+                <div>
+                  <strong>Last completed:</strong>{" "}
+                  {completionStats.lastCompleted
+                    ? new Date(completionStats.lastCompleted).toLocaleDateString()
+                    : "No submissions yet"}
+                </div>
+                <div>
+                  <strong>Best feedback score:</strong> {completionStats.bestScore || "—"}
+                </div>
+              </div>
+            </div>
             <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
               <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14 }}>
                 <input
@@ -706,6 +1124,22 @@ const WritingPage = ({ mode = "course" }) => {
               </>
             )}
             <div style={{ marginTop: 12 }}>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14 }}>
+                  <input
+                    type="checkbox"
+                    checked={showOutlineHelper}
+                    onChange={(event) => setShowOutlineHelper(event.target.checked)}
+                    disabled={mockHintsLocked}
+                  />
+                  Show outline helper
+                </label>
+                {mockHintsLocked ? (
+                  <span style={{ ...styles.badge, background: "#fee2e2", color: "#991b1b" }}>
+                    Outline hidden during mock exam timer
+                  </span>
+                ) : null}
+              </div>
               <label style={styles.label}>Your draft</label>
               <textarea
                 style={styles.textArea}
@@ -714,11 +1148,46 @@ const WritingPage = ({ mode = "course" }) => {
                 onChange={(e) => setPracticeDraft(e.target.value)}
                 rows={7}
               />
+              {!mockHintsLocked && showOutlineHelper ? (
+                <div style={{ ...styles.helperCard, marginTop: 10 }}>
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Outline helper</div>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {(selectedLetter?.whatToInclude?.length
+                      ? selectedLetter.whatToInclude.map((point) => ({
+                          title: "Bullet point",
+                          hint: point,
+                        }))
+                      : DEFAULT_OUTLINE
+                    ).map((step, index) => (
+                      <div key={`${step.title}-${index}`} style={styles.outlineStep}>
+                        <div style={{ fontWeight: 700 }}>{step.title}</div>
+                        <div style={styles.helperText}>{step.hint}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <p style={styles.helperText}>
                 Words: {practiceWordCount} · Characters: {practiceDraft.length}
                 {!mockHintsLocked && wordTarget ? ` · Target: ${wordTarget}` : ""}
               </p>
               {!mockHintsLocked ? <WordCountMeter count={practiceWordCount} range={wordRange} /> : null}
+              <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button
+                  style={styles.secondaryButton}
+                  onClick={() => handleInsertSnippet(TEMPLATE_SNIPPETS.formal)}
+                  disabled={mockHintsLocked}
+                >
+                  Insert formal snippet
+                </button>
+                <button
+                  style={styles.secondaryButton}
+                  onClick={() => handleInsertSnippet(TEMPLATE_SNIPPETS.informal)}
+                  disabled={mockHintsLocked}
+                >
+                  Insert informal snippet
+                </button>
+              </div>
               <div style={{ marginTop: 10 }}>
                 <button
                   style={styles.secondaryButton}
@@ -733,6 +1202,73 @@ const WritingPage = ({ mode = "course" }) => {
 
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Letters from the practice set</h3>
+            <div style={styles.filterPanel}>
+              <div style={{ fontWeight: 700 }}>Prompt filters</div>
+              <div style={styles.filterRow}>
+                <label style={styles.label}>
+                  Topic/theme
+                  <select
+                    style={styles.select}
+                    value={promptFilters.theme}
+                    onChange={(event) =>
+                      setPromptFilters((prev) => ({ ...prev, theme: event.target.value }))
+                    }
+                  >
+                    <option value="all">All themes</option>
+                    {taskFilterOptions.themes.map((theme) => (
+                      <option key={theme} value={theme}>
+                        {theme}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label style={styles.label}>
+                  Type
+                  <select
+                    style={styles.select}
+                    value={promptFilters.type}
+                    onChange={(event) =>
+                      setPromptFilters((prev) => ({ ...prev, type: event.target.value }))
+                    }
+                  >
+                    <option value="all">All types</option>
+                    {taskFilterOptions.types.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label style={styles.label}>
+                  Formality
+                  <select
+                    style={styles.select}
+                    value={promptFilters.formality}
+                    onChange={(event) =>
+                      setPromptFilters((prev) => ({ ...prev, formality: event.target.value }))
+                    }
+                  >
+                    <option value="all">All formalities</option>
+                    {taskFilterOptions.formalities.map((formality) => (
+                      <option key={formality} value={formality}>
+                        {formality}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button
+                  style={styles.secondaryButton}
+                  onClick={() => setPromptFilters({ theme: "all", type: "all", formality: "all" })}
+                >
+                  Clear filters
+                </button>
+                <span style={styles.helperText}>
+                  Showing {filteredWritingTasks.length} prompts
+                </span>
+              </div>
+            </div>
             {writingTasksError && (
               <div style={{ ...styles.helperText, color: "#b91c1c" }}>
                 <p style={{ marginBottom: 8 }}>{writingTasksError}</p>
@@ -751,9 +1287,15 @@ const WritingPage = ({ mode = "course" }) => {
               <p style={styles.helperText}>
                 No writing tasks are available for this level. Please adjust your level or try again later.
               </p>
+            ) : filteredWritingTasks.length === 0 ? (
+              <p style={styles.helperText}>
+                No prompts match the selected filters. Try clearing one filter.
+              </p>
             ) : (
               <div style={styles.gridTwo}>
-                {visibleWritingTasks.map((item) => (
+                {filteredWritingTasks.map((item) => {
+                  const meta = derivePromptMeta(item);
+                  return (
                   <div
                     key={item.id}
                     style={{
@@ -773,6 +1315,11 @@ const WritingPage = ({ mode = "course" }) => {
                       <span style={styles.levelPill}>Level {item.level}</span>
                     </div>
                     <p style={styles.helperText}>{item.situation}</p>
+                    <div style={styles.tagRow}>
+                      <span style={styles.tagPill}>{meta.theme}</span>
+                      <span style={styles.tagPill}>{meta.type}</span>
+                      <span style={styles.tagPill}>{meta.formality}</span>
+                    </div>
                     <div style={styles.metaRow}>
                       <span style={styles.badge}>
                         ⏱️ {item.durationMinutes} minutes
@@ -789,7 +1336,8 @@ const WritingPage = ({ mode = "course" }) => {
                       </button>
                     </div>
                   </div>
-                ))}
+                );
+                })}
               </div>
             )}
           </section>
@@ -871,6 +1419,19 @@ const WritingPage = ({ mode = "course" }) => {
                   </label>
                 ))}
               </div>
+              <details style={{ marginTop: 10 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>
+                  See rubric examples for {level}
+                </summary>
+                <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+                  <div style={styles.outlineStep}>
+                    <strong>Good:</strong> {RUBRIC_EXAMPLES[level]?.good}
+                  </div>
+                  <div style={styles.outlineStep}>
+                    <strong>Excellent:</strong> {RUBRIC_EXAMPLES[level]?.excellent}
+                  </div>
+                </div>
+              </details>
             </div>
 
             <div style={{ marginTop: 12 }}>
@@ -896,9 +1457,84 @@ const WritingPage = ({ mode = "course" }) => {
           </section>
 
           {markFeedback && (
+            <>
+              <section style={styles.card}>
+                <h3 style={styles.sectionTitle}>Rubric scoring breakdown</h3>
+                <div style={{ display: "grid", gap: 10 }}>
+                  {rubricBreakdown.map((item) => (
+                    <div key={item.key} style={styles.scoreCard}>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                        <strong>{item.label}</strong>
+                        <span style={styles.scoreBadge}>
+                          {item.score ? `${item.score}/5` : "—"}
+                        </span>
+                      </div>
+                      <div style={styles.helperText}>{item.explanation}</div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+              <section style={styles.card}>
+                <h3 style={styles.sectionTitle}>AI feedback</h3>
+                <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+              </section>
+            </>
+          )}
+
+          {draftHistory.length >= 2 && (
             <section style={styles.card}>
-              <h3 style={styles.sectionTitle}>AI feedback</h3>
-              <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+              <h3 style={styles.sectionTitle}>Compare drafts</h3>
+              <p style={styles.helperText}>
+                Review the last two submissions to see improvements before your next attempt.
+              </p>
+              <div style={styles.gridTwo}>
+                {draftHistory.slice(-2).map((entry, index) => (
+                  <div key={entry.id} style={styles.helperCard}>
+                    <div style={{ fontWeight: 700, marginBottom: 6 }}>
+                      {index === 0 ? "Previous draft" : "Latest draft"}
+                    </div>
+                    <div style={styles.helperText}>
+                      {entry.promptTitle} · {new Date(entry.createdAt).toLocaleString()}
+                    </div>
+                    <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{entry.draft}</pre>
+                  </div>
+                ))}
+              </div>
+              {latestImprovementNotes.length > 0 ? (
+                <>
+                  <div style={{ fontWeight: 700, marginTop: 10 }}>Improvement notes</div>
+                  <ul style={styles.checklist}>
+                    {latestImprovementNotes.map((note) => (
+                      <li key={note}>{note}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
+            </section>
+          )}
+
+          {(errorBank.length > 0 || revisionTasks.length > 0) && (
+            <section style={styles.card}>
+              <h3 style={styles.sectionTitle}>Error bank & quick fixes</h3>
+              {errorBank.length > 0 ? (
+                <ul style={styles.checklist}>
+                  {errorBank.map((item, index) => (
+                    <li key={`${item}-${index}`}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p style={styles.helperText}>No recurring errors flagged yet.</p>
+              )}
+              {revisionTasks.length > 0 ? (
+                <>
+                  <div style={{ fontWeight: 700, marginTop: 10 }}>Quick revision tasks</div>
+                  <ul style={styles.checklist}>
+                    {revisionTasks.map((task) => (
+                      <li key={task}>{task}</li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
             </section>
           )}
 
@@ -919,6 +1555,63 @@ const WritingPage = ({ mode = "course" }) => {
                 <li key={prompt}>{prompt}</li>
               ))}
             </ul>
+          </div>
+          <div style={{ ...styles.helperCard, marginTop: 12 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Plan before you write</div>
+            <p style={styles.helperText}>
+              Generate a quick outline from the prompt, then expand each bullet before sending to the coach.
+            </p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button
+                style={styles.secondaryButton}
+                onClick={() =>
+                  setPlanOutline(buildPlanOutline({ selectedLetter, ideaInput }))
+                }
+              >
+                Generate outline
+              </button>
+              <button
+                style={styles.secondaryButton}
+                onClick={() => setPlanOutline([])}
+                disabled={!planOutline.length}
+              >
+                Clear outline
+              </button>
+            </div>
+            {planOutline.length > 0 && (
+              <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
+                {planOutline.map((step, index) => (
+                  <div key={`${step.title}-${index}`} style={styles.outlineStep}>
+                    <div style={{ fontWeight: 700 }}>{step.title}</div>
+                    <div style={styles.helperText}>{step.hint}</div>
+                    <textarea
+                      style={{ ...styles.textareaSmall, marginTop: 6 }}
+                      rows={2}
+                      placeholder="Expand this bullet with your own sentence."
+                      value={step.draft || ""}
+                      onChange={(event) =>
+                        setPlanOutline((prev) =>
+                          prev.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, draft: event.target.value } : item
+                          )
+                        )
+                      }
+                    />
+                  </div>
+                ))}
+                <button
+                  style={styles.primaryButton}
+                  onClick={() => {
+                    const compiled = planOutline
+                      .map((step) => `- ${step.draft || step.hint}`)
+                      .join("\n");
+                    setIdeaInput((prev) => `${prev}${prev.trim() ? "\n\n" : ""}${compiled}`);
+                  }}
+                >
+                  Add outline to prompt
+                </button>
+              </div>
+            )}
           </div>
           <div style={styles.chatLog} className="idea-generator-chat">
             {chatMessages.map((msg, idx) => (
@@ -951,6 +1644,21 @@ const WritingPage = ({ mode = "course" }) => {
               placeholder="Paste your exam question or the part you need help with."
               rows={3}
             />
+          </div>
+          <div style={{ marginTop: 10 }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>Useful connectors</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {(CONNECTORS_BY_LEVEL[level] || CONNECTORS_BY_LEVEL.B1).map((connector) => (
+                <button
+                  key={connector}
+                  style={styles.chipButton}
+                  onClick={() => insertConnector(connector)}
+                  type="button"
+                >
+                  {connector}
+                </button>
+              ))}
+            </div>
           </div>
           <div
             style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}
