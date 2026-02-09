@@ -490,10 +490,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             <a
               href="/placement-test"
               style={{ ...styles.primaryButton, textDecoration: "none" }}
-              onClick={(event) => {
-                event.preventDefault();
-                openLeadCapture("Placement test", "/placement-test");
-              }}
             >
               Open placement test
             </a>
