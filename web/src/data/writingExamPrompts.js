@@ -177,11 +177,11 @@ export const WRITING_PROMPTS = {
       ],
     },
     {
-      "Thema": "Schreiben Sie eine Nachricht an Ihren Kollegen, das Meeting ist verschoben.",
+      "Thema": "Sie möchten in Ihrer Freizeit ein wenig arbeiten. Die Familie Weber braucht Hilfe zu Hause. Schreiben Sie einen Brief an Jonathan Weber, den Vater der Familie.",
       "Punkte": [
         "Warum schreiben Sie?",
-        "Auf wann ist das Meeting verschoben?",
-        "Wo findet es statt?",
+        "Wie können Sie der Familie helfen?",
+        "Wann können Sie anfangen?",
       ],
     },
   ],
