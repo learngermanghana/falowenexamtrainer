@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
+import LeadCaptureModal from "./LeadCaptureModal";
+import { captureLead } from "../services/leadCaptureService";
 
 const FeatureCard = ({ icon, title, description }) => (
   <div
@@ -167,6 +169,26 @@ const UpdateCard = ({ title, description, tag }) => (
 
 const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   const { t, i18n } = useTranslation();
+  const [leadCaptureConfig, setLeadCaptureConfig] = useState({
+    open: false,
+    cta: "",
+    nextUrl: "",
+  });
+  const leadCaptureTitle = useMemo(() => {
+    if (leadCaptureConfig.cta === "Placement test") {
+      return "Before you start the placement test";
+    }
+    if (leadCaptureConfig.cta === "Talk to us") {
+      return "Talk to us";
+    }
+    return "Get started";
+  }, [leadCaptureConfig.cta]);
+  const leadCaptureSubtitle = useMemo(() => {
+    if (leadCaptureConfig.cta === "Placement test") {
+      return "Share your details so we can guide you after your results.";
+    }
+    return "Share a few details and our team will follow up with the best next step.";
+  }, [leadCaptureConfig.cta]);
   const programOptions = useMemo(
     () => ({
       german: t("landing.programs.german", { returnObjects: true }),
@@ -227,6 +249,21 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   const handleInterfaceLanguageChange = (language) => {
     i18n.changeLanguage(language);
     persistInterfaceLanguage(language);
+  };
+
+  const openLeadCapture = (cta, nextUrl = "") => {
+    setLeadCaptureConfig({ open: true, cta, nextUrl });
+  };
+
+  const handleLeadSubmit = (payload) => {
+    captureLead({
+      ...payload,
+      source: "landing_page",
+      cta: leadCaptureConfig.cta,
+    });
+    if (leadCaptureConfig.nextUrl) {
+      window.location.href = leadCaptureConfig.nextUrl;
+    }
   };
 
   return (
@@ -453,6 +490,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             <a
               href="/placement-test"
               style={{ ...styles.primaryButton, textDecoration: "none" }}
+              onClick={(event) => {
+                event.preventDefault();
+                openLeadCapture("Placement test", "/placement-test");
+              }}
             >
               Open placement test
             </a>
@@ -717,6 +758,22 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 <h4 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 8 }}>{t("landing.darkCta.contactTitle")}</h4>
                 <ul style={{ ...styles.checklist, margin: 0, color: "#d1d5db", lineHeight: 1.6 }}>
                   <li>
+                    <button
+                      type="button"
+                      onClick={() => openLeadCapture("Talk to us")}
+                      style={{
+                        ...styles.secondaryButton,
+                        padding: "6px 10px",
+                        fontSize: 12,
+                        color: "#e2e8f0",
+                        borderColor: "#64748b",
+                        background: "transparent",
+                      }}
+                    >
+                      Talk to us
+                    </button>
+                  </li>
+                  <li>
                     {t("landing.darkCta.contactPhone")}
                     <a
                       style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }}
@@ -780,6 +837,15 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </footer>
       </div>
+      <LeadCaptureModal
+        isOpen={leadCaptureConfig.open}
+        onClose={() => setLeadCaptureConfig({ open: false, cta: "", nextUrl: "" })}
+        onSubmit={handleLeadSubmit}
+        title={leadCaptureTitle}
+        subtitle={leadCaptureSubtitle}
+        submitLabel={leadCaptureConfig.cta === "Placement test" ? "Continue to test" : "Send details"}
+        closeOnSubmit={Boolean(leadCaptureConfig.nextUrl)}
+      />
     </main>
   );
 };
