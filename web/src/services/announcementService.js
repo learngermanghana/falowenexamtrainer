@@ -1,5 +1,8 @@
 import { collection, db, getDocs, isFirebaseConfigured, limit, orderBy, query } from "../firebase";
 
+const BLOG_FEED_URL = "https://blog.falowen.app/feed.xml";
+const FALLBACK_ANNOUNCEMENT_LIMIT = 18;
+
 const parseTimestamp = (value) => {
   if (!value) return null;
   if (typeof value === "number") return value;
@@ -56,15 +59,50 @@ const matchesClass = (announcement = {}, className) => {
   return ["all", "global", "everyone"].includes(audience);
 };
 
-export const fetchAnnouncements = async ({
-  className,
-  program,
-  locale,
-  limitCount = 18,
-} = {}) => {
+const parseBlogFeed = (xmlText = "") => {
+  if (!xmlText || typeof DOMParser === "undefined") return [];
+
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+  if (xmlDoc.querySelector("parsererror")) return [];
+
+  return Array.from(xmlDoc.querySelectorAll("item")).map((item, index) => {
+    const title = item.querySelector("title")?.textContent?.trim() || "Blog update";
+    const body = item.querySelector("description")?.textContent?.trim() || "";
+    const linkUrl = item.querySelector("link")?.textContent?.trim() || "";
+    const pubDate = item.querySelector("pubDate")?.textContent?.trim();
+    const guid = item.querySelector("guid")?.textContent?.trim();
+
+    return {
+      id: `blog-${guid || linkUrl || index}`,
+      title,
+      body,
+      linkUrl,
+      linkLabel: "Read on blog",
+      className: "",
+      language: "",
+      audience: "all",
+      timestamp: parseTimestamp(pubDate) || Date.now(),
+      source: "blog",
+    };
+  });
+};
+
+const fetchBlogAnnouncements = async () => {
+  try {
+    const response = await fetch(BLOG_FEED_URL);
+    if (!response.ok) return [];
+    const xmlText = await response.text();
+    return parseBlogFeed(xmlText);
+  } catch (error) {
+    console.warn("Failed to load blog announcements", error);
+    return [];
+  }
+};
+
+const fetchFirestoreAnnouncements = async ({ className, studentLanguage, limitCount }) => {
   if (!isFirebaseConfigured || !db) return [];
 
-  const studentLanguage = resolveStudentLanguage({ program, locale });
   const ref = collection(db, "announcements");
   const snapshot = await getDocs(query(ref, orderBy("createdAt", "desc"), limit(limitCount)));
 
@@ -81,9 +119,28 @@ export const fetchAnnouncements = async ({
         language: data.language || data.program || "",
         audience: data.audience || data.scope || "",
         timestamp: parseTimestamp(data.createdAt) || Date.now(),
+        source: "firestore",
       };
     })
     .filter((announcement) =>
       matchesLanguage(announcement, studentLanguage) && matchesClass(announcement, className)
     );
+};
+
+export const fetchAnnouncements = async ({
+  className,
+  program,
+  locale,
+  limitCount = FALLBACK_ANNOUNCEMENT_LIMIT,
+} = {}) => {
+  const studentLanguage = resolveStudentLanguage({ program, locale });
+
+  const [firestoreAnnouncements, blogAnnouncements] = await Promise.all([
+    fetchFirestoreAnnouncements({ className, studentLanguage, limitCount }),
+    fetchBlogAnnouncements(),
+  ]);
+
+  return [...firestoreAnnouncements, ...blogAnnouncements]
+    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+    .slice(0, limitCount);
 };
