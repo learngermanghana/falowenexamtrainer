@@ -2,7 +2,6 @@ import { collection, db, getDocs, isFirebaseConfigured, limit, orderBy, query } 
 
 const BLOG_FEED_URL = "https://blog.falowen.app/feed.xml";
 const FALLBACK_ANNOUNCEMENT_LIMIT = 18;
-const BLOG_FETCH_TIMEOUT_MS = 6000;
 
 const parseTimestamp = (value) => {
   if (!value) return null;
@@ -90,21 +89,14 @@ const parseBlogFeed = (xmlText = "") => {
 };
 
 const fetchBlogAnnouncements = async () => {
-  const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
-  const timeoutId = controller
-    ? setTimeout(() => controller.abort(), BLOG_FETCH_TIMEOUT_MS)
-    : null;
-
   try {
-    const response = await fetch(BLOG_FEED_URL, controller ? { signal: controller.signal } : undefined);
+    const response = await fetch(BLOG_FEED_URL);
     if (!response.ok) return [];
     const xmlText = await response.text();
     return parseBlogFeed(xmlText);
   } catch (error) {
     console.warn("Failed to load blog announcements", error);
     return [];
-  } finally {
-    if (timeoutId) clearTimeout(timeoutId);
   }
 };
 
@@ -143,13 +135,10 @@ export const fetchAnnouncements = async ({
 } = {}) => {
   const studentLanguage = resolveStudentLanguage({ program, locale });
 
-  const [firestoreResult, blogResult] = await Promise.allSettled([
+  const [firestoreAnnouncements, blogAnnouncements] = await Promise.all([
     fetchFirestoreAnnouncements({ className, studentLanguage, limitCount }),
     fetchBlogAnnouncements(),
   ]);
-
-  const firestoreAnnouncements = firestoreResult.status === "fulfilled" ? firestoreResult.value : [];
-  const blogAnnouncements = blogResult.status === "fulfilled" ? blogResult.value : [];
 
   return [...firestoreAnnouncements, ...blogAnnouncements]
     .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
