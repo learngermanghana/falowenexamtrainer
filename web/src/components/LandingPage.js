@@ -70,34 +70,6 @@ const StepCard = ({ index, title, description }) => (
   </div>
 );
 
-const PhotoCard = ({ url, caption }) => (
-  <div style={{ display: "grid", gap: 8 }}>
-    <div
-      style={{
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: 14,
-        boxShadow: "0 10px 24px rgba(0, 0, 0, 0.10)",
-        border: "1px solid #e5e7eb",
-        background: "#fff",
-      }}
-    >
-      <img
-        src={url}
-        alt={caption}
-        loading="lazy"
-        style={{
-          width: "100%",
-          aspectRatio: "16 / 10",
-          objectFit: "cover",
-          display: "block",
-        }}
-      />
-    </div>
-    <p style={{ ...styles.helperText, margin: 0 }}>{caption}</p>
-  </div>
-);
-
 const shuffleArray = (items) => {
   const copy = items.slice();
   for (let i = copy.length - 1; i > 0; i -= 1) {
@@ -131,39 +103,6 @@ const ReviewCard = ({ stars = 5, name, country, level, text, starLabel }) => (
     </div>
 
     <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{text}</p>
-  </div>
-);
-
-const UpdateCard = ({ title, description, tag }) => (
-  <div
-    style={{
-      border: "1px solid #e5e7eb",
-      borderRadius: 14,
-      padding: 14,
-      background: "#ffffff",
-      display: "grid",
-      gap: 8,
-      boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-    }}
-  >
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-      <h3 style={{ margin: 0, fontSize: 16, color: "#111827" }}>{title}</h3>
-      <span
-        style={{
-          fontSize: 11,
-          fontWeight: 700,
-          textTransform: "uppercase",
-          letterSpacing: 0.6,
-          padding: "4px 8px",
-          borderRadius: 999,
-          background: "#e0e7ff",
-          color: "#1e3a8a",
-        }}
-      >
-        {tag}
-      </span>
-    </div>
-    <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{description}</p>
   </div>
 );
 
@@ -214,13 +153,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     returnObjects: true,
     language: selectedProgram.shortLabel,
   });
-  const updates = t("landing.updates.items", { returnObjects: true });
   const reviewItems = t("landing.reviews.items", { returnObjects: true });
   const featuredReviews = useMemo(() => shuffleArray(reviewItems).slice(0, 6), [reviewItems]);
   const heroBadges = t("landing.heroBadges", { returnObjects: true });
   const howItWorksBenefits = t("landing.howItWorks.benefits", { returnObjects: true });
-  const programComparisonGermanPoints = t("landing.programComparison.germanPoints", { returnObjects: true });
-  const programComparisonFrenchPoints = t("landing.programComparison.frenchPoints", { returnObjects: true });
   const whyStayPoints = t("landing.footer.stayPoints", { returnObjects: true });
 
   useEffect(() => {
@@ -229,18 +165,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
 
     updatePageMeta({ title, description, lang: i18n.language });
   }, [i18n.language, t]);
-
-  // Tip: for best performance, move these to web/public/photos and use "/photos/..."
-  const photos = [
-    {
-      url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-julia-m-cameron-4145153.jpg?raw=1",
-      caption: t("landing.photos.0.caption"),
-    },
-    {
-      url: "https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-mart-production-8473001.jpg?raw=1",
-      caption: t("landing.photos.1.caption"),
-    },
-  ];
 
   const handleProgramSelect = (nextProgram) => {
     onProgramSelect?.(nextProgram);
@@ -410,155 +334,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </section>
 
-        <section
-          style={{
-            ...styles.card,
-            display: "grid",
-            gap: 12,
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            alignItems: "stretch",
-          }}
-          aria-labelledby="program-comparison-title"
-        >
-          <div style={{ display: "grid", gap: 8 }}>
-            <h2 id="program-comparison-title" style={styles.sectionTitle}>
-              {t("landing.programComparison.title")}
-            </h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.programComparison.subtitle")}</p>
-          </div>
-
-          <div
-            style={{ ...styles.card, marginBottom: 0, background: "#f8fafc" }}
-            aria-label={t("landing.programComparison.germanTitle")}
-          >
-            <h3 style={{ margin: "0 0 6px 0" }}>{t("landing.programComparison.germanTitle")}</h3>
-            <p style={{ ...styles.helperText, marginBottom: 10 }}>{programOptions.german.focus}</p>
-            <ul style={styles.checklist}>
-              {programComparisonGermanPoints.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div
-            style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}
-            aria-label={t("landing.programComparison.frenchTitle")}
-          >
-            <h3 style={{ margin: "0 0 6px 0" }}>{t("landing.programComparison.frenchTitle")}</h3>
-            <p style={{ ...styles.helperText, marginBottom: 10 }}>{programOptions.french.focus}</p>
-            <ul style={styles.checklist}>
-              {programComparisonFrenchPoints.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        <section
-          style={{
-            ...styles.card,
-            display: "grid",
-            gap: 16,
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            alignItems: "center",
-            background: "linear-gradient(135deg, #ffffff, #f1f5f9)",
-            border: "1px solid #e2e8f0",
-          }}
-        >
-          <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>
-              If you don&apos;t know your level, take this placement test.
-            </h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              It only takes a few minutes and gives you a suggested CEFR level before you sign up.
-            </p>
-          </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <img
-              src="https://github.com/learngermanghana/falowenexamtrainer/blob/main/photos/pexels-lagosfoodbank-9090820.jpg?raw=1"
-              alt="Student reviewing a placement test"
-              style={{
-                width: "100%",
-                maxWidth: 360,
-                borderRadius: 16,
-                boxShadow: "0 12px 24px rgba(15, 23, 42, 0.15)",
-                objectFit: "cover",
-              }}
-            />
-          </div>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <a
-              href="/placement-test"
-              style={{ ...styles.primaryButton, textDecoration: "none" }}
-            >
-              Open placement test
-            </a>
-            <a href="#how-it-works" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-              See how it works
-            </a>
-          </div>
-        </section>
-
-        {/* Choose your path */}
-        <section
-          style={{
-            ...styles.card,
-            display: "grid",
-            gap: 12,
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            alignItems: "stretch",
-          }}
-        >
-          <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={styles.sectionTitle}>{t("landing.path.title")}</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.path.subtitle")}</p>
-          </div>
-
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 14,
-              padding: 12,
-              background: "#ffffff",
-              display: "grid",
-              gap: 10,
-              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            }}
-          >
-            <div style={{ fontWeight: 900, color: "#111827" }}>
-              {t("landing.path.newLearner.title", { language: selectedProgram.shortLabel })}
-            </div>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              {t("landing.path.newLearner.description", { language: selectedProgram.shortLabel })}
-            </p>
-            <button
-              type="button"
-              style={{ ...styles.primaryButton, padding: "10px 12px" }}
-              onClick={() => onSignUp(resolvedProgram)}
-            >
-              {t("landing.path.newLearner.cta", { language: selectedProgram.shortLabel })}
-            </button>
-          </div>
-
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 14,
-              padding: 12,
-              background: "#ffffff",
-              display: "grid",
-              gap: 10,
-              boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
-            }}
-          >
-            <div style={{ fontWeight: 900, color: "#111827" }}>{t("landing.path.examReady.title")}</div>
-            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.path.examReady.description")}</p>
-            <button type="button" style={{ ...styles.secondaryButton, padding: "10px 12px" }} onClick={onLogin}>
-              {t("landing.path.examReady.cta")}
-            </button>
-          </div>
-        </section>
-
         {/* How it works */}
         <section
           id="how-it-works"
@@ -609,74 +384,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </section>
 
-        {/* Self-learning ad */}
-        <section
-          style={{
-            ...styles.card,
-            display: "grid",
-            gap: 16,
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-            alignItems: "center",
-            background: "linear-gradient(135deg, #ffffff, #eef2ff)",
-            border: "1px solid #e0e7ff",
-          }}
-        >
-          <div style={{ display: "grid", gap: 10 }}>
-            <h2 style={styles.sectionTitle}>{t("landing.selfLearning.title")}</h2>
-            <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{t("landing.selfLearning.description")}</p>
-            <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={onLogin}>
-              {t("landing.selfLearning.cta")}
-            </button>
-          </div>
-          <div
-            style={{
-              borderRadius: 16,
-              overflow: "hidden",
-              border: "1px solid #e5e7eb",
-              boxShadow: "0 16px 32px rgba(15, 23, 42, 0.15)",
-              background: "#fff",
-            }}
-          >
-            <img
-              src="https://github.com/learngermanghana/falowen-blog/blob/main/photos/b2c1_ad_final.jpg?raw=1"
-              alt={t("landing.selfLearning.imageAlt")}
-              loading="lazy"
-              style={{ width: "100%", display: "block" }}
-            />
-          </div>
-        </section>
-
         {/* Features */}
         <section style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {features.map((item) => (
             <FeatureCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
-          ))}
-        </section>
-
-        {/* Updates */}
-        <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-          <div>
-            <h2 style={styles.sectionTitle}>{t("landing.updates.title")}</h2>
-            <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.updates.subtitle")}</p>
-          </div>
-          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-            {updates.map((item) => (
-              <UpdateCard key={item.title} title={item.title} description={item.description} tag={item.tag} />
-            ))}
-          </div>
-        </section>
-
-        {/* Photos */}
-        <section
-          style={{
-            ...styles.card,
-            display: "grid",
-            gap: 12,
-            gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          }}
-        >
-          {photos.map((p) => (
-            <PhotoCard key={p.url} url={p.url} caption={p.caption} />
           ))}
         </section>
 
