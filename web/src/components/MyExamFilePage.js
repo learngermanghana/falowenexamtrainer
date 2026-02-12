@@ -11,6 +11,7 @@ import { downloadExamReminder } from "../services/examCalendar";
 import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
+import { courseSchedulesByName } from "../data/courseSchedules";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
 import { jsPDF } from "jspdf";
@@ -444,6 +445,22 @@ const MyExamFilePage = () => {
     });
   }, [selectedMonth, sortedAttendanceRecords]);
 
+  const scheduledSessions = useMemo(() => {
+    const scheduleDays = courseSchedulesByName[className]?.days || [];
+    if (!scheduleDays.length) return 0;
+
+    const now = new Date();
+    now.setHours(23, 59, 59, 999);
+
+    return scheduleDays.filter((day) => {
+      const dayDate = toDate(day.date);
+      if (!dayDate || dayDate > now) return false;
+      if (selectedMonth === "all") return true;
+      const key = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, "0")}`;
+      return key === selectedMonth;
+    }).length;
+  }, [className, selectedMonth]);
+
   const attendanceStats = useMemo(() => {
     return filteredAttendanceRecords.reduce(
       (acc, record) => {
@@ -476,11 +493,11 @@ const MyExamFilePage = () => {
   }, [filteredAttendanceRecords]);
 
   const attendanceRate = useMemo(() => {
-    if (!attendanceStats.total) return null;
-    return Math.round((attendanceStats.attended / attendanceStats.total) * 100);
-  }, [attendanceStats.attended, attendanceStats.total]);
+    if (!scheduledSessions) return null;
+    return Math.round((attendanceStats.attended / scheduledSessions) * 100);
+  }, [attendanceStats.attended, scheduledSessions]);
 
-  const monthlyGoal = 8;
+  const monthlyGoal = scheduledSessions || attendanceStats.total || 0;
   const attendanceGoalProgress = useMemo(() => {
     if (!monthlyGoal) return 0;
     return Math.min((attendanceStats.attended / monthlyGoal) * 100, 100);
@@ -627,7 +644,7 @@ const MyExamFilePage = () => {
         ["Class", className || "—"],
         ["Period", attendancePeriodLabel],
         ["Attendance rate", attendanceRate !== null ? `${attendanceRate}%` : "—"],
-        ["Sessions attended", `${attendanceStats.attended}/${attendanceStats.total}`],
+        ["Sessions attended", `${attendanceStats.attended}/${scheduledSessions}`],
         ["Hours credited", formatHours(attendanceStats.hours)],
         ["Present", attendanceStats.present],
         ["Late", attendanceStats.late],
@@ -977,7 +994,7 @@ const MyExamFilePage = () => {
             <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
               <div style={{ ...styles.helperText, margin: 0 }}>✅ Sessions attended ({attendancePeriodLabel})</div>
               <div style={{ fontSize: 22, fontWeight: 900 }}>
-                {attendanceStats.attended} / {attendanceStats.total}
+                {attendanceStats.attended} / {scheduledSessions}
               </div>
             </div>
             <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
