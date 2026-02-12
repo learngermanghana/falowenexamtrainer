@@ -501,7 +501,7 @@ const MyExamFilePage = () => {
   const attendanceGoalProgress = useMemo(() => {
     if (!monthlyGoal) return 0;
     return Math.min((attendanceStats.attended / monthlyGoal) * 100, 100);
-  }, [attendanceStats.attended]);
+  }, [attendanceStats.attended, monthlyGoal]);
 
   const attendanceAlerts = useMemo(() => {
     const alerts = [];
