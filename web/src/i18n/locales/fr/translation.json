@@ -140,13 +140,47 @@
     },
     "quickReply": {
       "keywords": {
-        "attendance": ["présence", "presence", "absent", "absence", "assiduité"],
-        "results": ["résultat", "resultat", "note", "score"],
-        "assignment": ["devoir", "exercice", "travail", "tâche", "tache"],
-        "grammar": ["grammaire"],
-        "vocab": ["vocabulaire", "mot", "mots"],
-        "exam": ["examen", "test", "épreuve", "epreuve"],
-        "greeting": ["salut", "bonjour", "coucou", "hallo", "hello"]
+        "attendance": [
+          "présence",
+          "presence",
+          "absent",
+          "absence",
+          "assiduité"
+        ],
+        "results": [
+          "résultat",
+          "resultat",
+          "note",
+          "score"
+        ],
+        "assignment": [
+          "devoir",
+          "exercice",
+          "travail",
+          "tâche",
+          "tache"
+        ],
+        "grammar": [
+          "grammaire"
+        ],
+        "vocab": [
+          "vocabulaire",
+          "mot",
+          "mots"
+        ],
+        "exam": [
+          "examen",
+          "test",
+          "épreuve",
+          "epreuve"
+        ],
+        "greeting": [
+          "salut",
+          "bonjour",
+          "coucou",
+          "hallo",
+          "hello"
+        ]
       },
       "attendance": {
         "synced": "Tu es actuellement à {{attendance}}. Vise la prochaine session pour garder l’élan.",
@@ -165,6 +199,32 @@
       "examTips": "Conseil examen : entraîne-toi avec un timer et note une erreur après chaque tâche.",
       "greeting": "Salut ! Dis-moi ce dont tu as besoin : résultats, présence, devoirs, grammaire, vocabulaire ou examens.",
       "default": "D’accord ! Dis-moi sur quoi tu travailles et je propose la prochaine étape."
+    },
+    "weeklyPlan": {
+      "title": "Plan hebdomadaire",
+      "description": "Généré automatiquement selon tes faiblesses et la date d’examen. Coche chaque tâche terminée.",
+      "progress": "{{done}}/{{total}} terminées",
+      "items": {
+        "grammarRepair": "Faire 1 sprint de correction grammaticale (15 min)",
+        "attendanceReset": "Planifier et assister au prochain cours en direct",
+        "redoFailed": "Refaire {{assignment}} et corriger les points faibles",
+        "writingPractice": "Rédiger une production écrite chronométrée",
+        "examSimulation": "Faire une mini simulation d’examen",
+        "vocabRecall": "Réviser un set ciblé de vocabulaire"
+      },
+      "helpers": {
+        "grammarRepair": "Utilise l’onglet grammaire Falowen A.I avec une phrase réelle du cours.",
+        "attendanceReset": "La régularité améliore la confiance et la préparation à l’examen.",
+        "redoFailed": "Vise une structure plus claire et moins d’erreurs de grammaire.",
+        "writingPractice": "Respecte le temps d’examen et relis avant envoi.",
+        "examSimulation": "Examen dans {{days}} jours — simule la pression une fois cette semaine.",
+        "vocabRecall": "Choisis un thème et teste ton rappel à voix haute."
+      },
+      "nudges": {
+        "allDone": "Excellent — plan hebdomadaire terminé. Garde le rythme la semaine prochaine.",
+        "oneLeft": "Une seule tâche restante cette semaine. Tu y es presque.",
+        "pending": "Il reste {{count}} tâches cette semaine. Commence par une maintenant."
+      }
     }
   },
   "signup": {
@@ -639,17 +699,44 @@
       ]
     },
     "quickLinks": [
-      { "label": "À propos", "href": "https://register.falowen.app/#about-us" },
-      { "label": "Politique de confidentialité", "href": "https://register.falowen.app/#privacy-policy" },
-      { "label": "Contact", "href": "https://register.falowen.app/#contact" },
-      { "label": "Conditions d’utilisation", "href": "https://register.falowen.app/#terms-of-service" },
-      { "label": "FAQ", "href": "https://register.falowen.app/#faq" },
-      { "label": "Blog", "href": "https://blog.falowen.app/feed" }
+      {
+        "label": "À propos",
+        "href": "https://register.falowen.app/#about-us"
+      },
+      {
+        "label": "Politique de confidentialité",
+        "href": "https://register.falowen.app/#privacy-policy"
+      },
+      {
+        "label": "Contact",
+        "href": "https://register.falowen.app/#contact"
+      },
+      {
+        "label": "Conditions d’utilisation",
+        "href": "https://register.falowen.app/#terms-of-service"
+      },
+      {
+        "label": "FAQ",
+        "href": "https://register.falowen.app/#faq"
+      },
+      {
+        "label": "Blog",
+        "href": "https://blog.falowen.app/feed"
+      }
     ],
     "socialLinks": [
-      { "label": "Instagram", "href": "https://www.instagram.com/lleaghana" },
-      { "label": "YouTube", "href": "https://www.youtube.com/@LLEAGhana" },
-      { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
+      {
+        "label": "Instagram",
+        "href": "https://www.instagram.com/lleaghana"
+      },
+      {
+        "label": "YouTube",
+        "href": "https://www.youtube.com/@LLEAGhana"
+      },
+      {
+        "label": "Facebook",
+        "href": "https://web.facebook.com/lleaghana"
+      }
     ]
   },
   "examResources": {
@@ -805,19 +892,43 @@
       "formal": {
         "title": "Exemple formel",
         "items": [
-          { "label": "Salutation", "text": "Sehr geehrte Frau Müller," },
-          { "label": "Raison", "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte." },
-          { "label": "Demande", "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?" },
-          { "label": "Conclusion", "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber" }
+          {
+            "label": "Salutation",
+            "text": "Sehr geehrte Frau Müller,"
+          },
+          {
+            "label": "Raison",
+            "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte."
+          },
+          {
+            "label": "Demande",
+            "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?"
+          },
+          {
+            "label": "Conclusion",
+            "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber"
+          }
         ]
       },
       "informal": {
         "title": "Exemple informel",
         "items": [
-          { "label": "Salutation", "text": "Hallo Tom," },
-          { "label": "Raison", "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte." },
-          { "label": "Détails", "text": "Die Feier ist am Samstag um 18 Uhr bei mir." },
-          { "label": "Conclusion", "text": "Liebe Grüße, Sara" }
+          {
+            "label": "Salutation",
+            "text": "Hallo Tom,"
+          },
+          {
+            "label": "Raison",
+            "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte."
+          },
+          {
+            "label": "Détails",
+            "text": "Die Feier ist am Samstag um 18 Uhr bei mir."
+          },
+          {
+            "label": "Conclusion",
+            "text": "Liebe Grüße, Sara"
+          }
         ]
       }
     },
@@ -1048,5 +1159,4 @@
       "C1": "Très bon niveau détecté. Passe au perfectionnement, aux simulations d’examen et au feedback de précision."
     }
   }
-
 }

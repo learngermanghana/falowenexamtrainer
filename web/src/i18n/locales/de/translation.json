@@ -138,13 +138,45 @@
     },
     "quickReply": {
       "keywords": {
-        "attendance": ["anwesenheit", "fehlend", "abwesend", "abwesenheit"],
-        "results": ["ergebnis", "ergebnisse", "punkte", "note", "bewertung"],
-        "assignment": ["aufgabe", "hausaufgabe", "arbeitsauftrag"],
-        "grammar": ["grammatik"],
-        "vocab": ["wortschatz", "vokabel", "vokabeln"],
-        "exam": ["prüfung", "test", "klausur", "examen"],
-        "greeting": ["hallo", "hi", "hey", "guten tag", "servus"]
+        "attendance": [
+          "anwesenheit",
+          "fehlend",
+          "abwesend",
+          "abwesenheit"
+        ],
+        "results": [
+          "ergebnis",
+          "ergebnisse",
+          "punkte",
+          "note",
+          "bewertung"
+        ],
+        "assignment": [
+          "aufgabe",
+          "hausaufgabe",
+          "arbeitsauftrag"
+        ],
+        "grammar": [
+          "grammatik"
+        ],
+        "vocab": [
+          "wortschatz",
+          "vokabel",
+          "vokabeln"
+        ],
+        "exam": [
+          "prüfung",
+          "test",
+          "klausur",
+          "examen"
+        ],
+        "greeting": [
+          "hallo",
+          "hi",
+          "hey",
+          "guten tag",
+          "servus"
+        ]
       },
       "attendance": {
         "synced": "Du liegst aktuell bei {{attendance}}. Nimm die nächste Stunde mit, um dranzubleiben.",
@@ -163,6 +195,32 @@
       "examTips": "Prüfungstipp: Übe mit Timer und notiere einen Fehler pro Aufgabe.",
       "greeting": "Hallo! Sag mir, wobei du Hilfe brauchst: Ergebnisse, Anwesenheit, Aufgaben, Grammatik, Wortschatz oder Prüfungen.",
       "default": "Alles klar! Sag mir, woran du gerade arbeitest."
+    },
+    "weeklyPlan": {
+      "title": "Wochenplan",
+      "description": "Automatisch aus deinen Schwächen und dem Prüfungsdatum erstellt. Hake Aufgaben nach Abschluss ab.",
+      "progress": "{{done}}/{{total}} erledigt",
+      "items": {
+        "grammarRepair": "1 Grammatik-Repair-Sprint (15 Min.)",
+        "attendanceReset": "Nächste Live-Klasse planen und teilnehmen",
+        "redoFailed": "{{assignment}} wiederholen und Schwachstellen verbessern",
+        "writingPractice": "Eine Schreibaufgabe unter Zeitvorgabe schreiben",
+        "examSimulation": "Eine Mini-Prüfungssimulation durchführen",
+        "vocabRecall": "Gezieltes Wortschatz-Set wiederholen"
+      },
+      "helpers": {
+        "grammarRepair": "Nutze die Falowen-A.I-Grammatikseite mit einem echten Satz aus dem Unterricht.",
+        "attendanceReset": "Regelmäßigkeit verbessert Sicherheit und Prüfungsreife.",
+        "redoFailed": "Achte auf klarere Struktur und weniger Grammatikfehler.",
+        "writingPractice": "Mit Prüfungszeit üben und vor dem Abgeben Korrektur lesen.",
+        "examSimulation": "Prüfung in {{days}} Tagen – diese Woche einmal unter Druck üben.",
+        "vocabRecall": "Wähle ein Thema und teste deinen Abruf laut."
+      },
+      "nudges": {
+        "allDone": "Stark — Wochenplan geschafft. Nächste Woche dranbleiben.",
+        "oneLeft": "Nur noch eine Aufgabe diese Woche. Du bist fast durch.",
+        "pending": "Diese Woche sind noch {{count}} Aufgaben offen. Starte jetzt mit einer."
+      }
     }
   },
   "signup": {
@@ -637,17 +695,44 @@
       ]
     },
     "quickLinks": [
-      { "label": "Über uns", "href": "https://register.falowen.app/#about-us" },
-      { "label": "Datenschutz", "href": "https://register.falowen.app/#privacy-policy" },
-      { "label": "Kontakt", "href": "https://register.falowen.app/#contact" },
-      { "label": "AGB", "href": "https://register.falowen.app/#terms-of-service" },
-      { "label": "FAQ", "href": "https://register.falowen.app/#faq" },
-      { "label": "Blog", "href": "https://blog.falowen.app/feed" }
+      {
+        "label": "Über uns",
+        "href": "https://register.falowen.app/#about-us"
+      },
+      {
+        "label": "Datenschutz",
+        "href": "https://register.falowen.app/#privacy-policy"
+      },
+      {
+        "label": "Kontakt",
+        "href": "https://register.falowen.app/#contact"
+      },
+      {
+        "label": "AGB",
+        "href": "https://register.falowen.app/#terms-of-service"
+      },
+      {
+        "label": "FAQ",
+        "href": "https://register.falowen.app/#faq"
+      },
+      {
+        "label": "Blog",
+        "href": "https://blog.falowen.app/feed"
+      }
     ],
     "socialLinks": [
-      { "label": "Instagram", "href": "https://www.instagram.com/lleaghana" },
-      { "label": "YouTube", "href": "https://www.youtube.com/@LLEAGhana" },
-      { "label": "Facebook", "href": "https://web.facebook.com/lleaghana" }
+      {
+        "label": "Instagram",
+        "href": "https://www.instagram.com/lleaghana"
+      },
+      {
+        "label": "YouTube",
+        "href": "https://www.youtube.com/@LLEAGhana"
+      },
+      {
+        "label": "Facebook",
+        "href": "https://web.facebook.com/lleaghana"
+      }
     ]
   },
   "examResources": {
@@ -803,19 +888,43 @@
       "formal": {
         "title": "Formelles Beispiel",
         "items": [
-          { "label": "Anrede", "text": "Sehr geehrte Frau Müller," },
-          { "label": "Grund", "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte." },
-          { "label": "Bitte", "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?" },
-          { "label": "Schluss", "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber" }
+          {
+            "label": "Anrede",
+            "text": "Sehr geehrte Frau Müller,"
+          },
+          {
+            "label": "Grund",
+            "text": "ich schreibe Ihnen, weil ich mich für Ihren Deutschkurs anmelden möchte."
+          },
+          {
+            "label": "Bitte",
+            "text": "Könnten Sie mir bitte Informationen zu Terminen, Preisen und Zahlungsmöglichkeiten schicken?"
+          },
+          {
+            "label": "Schluss",
+            "text": "Vielen Dank im Voraus. Mit freundlichen Grüßen, Anna Weber"
+          }
         ]
       },
       "informal": {
         "title": "Informelles Beispiel",
         "items": [
-          { "label": "Begrüßung", "text": "Hallo Tom," },
-          { "label": "Grund", "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte." },
-          { "label": "Details", "text": "Die Feier ist am Samstag um 18 Uhr bei mir." },
-          { "label": "Schluss", "text": "Liebe Grüße, Sara" }
+          {
+            "label": "Begrüßung",
+            "text": "Hallo Tom,"
+          },
+          {
+            "label": "Grund",
+            "text": "ich schreibe dir, weil ich dich zu meiner Geburtstagsfeier einladen möchte."
+          },
+          {
+            "label": "Details",
+            "text": "Die Feier ist am Samstag um 18 Uhr bei mir."
+          },
+          {
+            "label": "Schluss",
+            "text": "Liebe Grüße, Sara"
+          }
         ]
       }
     },
@@ -1046,5 +1155,4 @@
       "C1": "Sehr gutes Niveau erkannt. Weiter mit Feinschliff, Prüfungssimulation und präzisem Feedback."
     }
   }
-
 }
