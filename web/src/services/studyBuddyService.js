@@ -18,6 +18,9 @@ export const logStudyBuddyUsage = async ({
   className,
   userId,
   questionLength,
+  itemId,
+  completed,
+  weekStart,
 }) => {
   if (!event || !isFirebaseConfigured || !db) return null;
 
@@ -28,6 +31,9 @@ export const logStudyBuddyUsage = async ({
     className: className || null,
     userId: userId || null,
     questionLength: Number.isFinite(questionLength) ? questionLength : null,
+    itemId: itemId || null,
+    completed: typeof completed === "boolean" ? completed : null,
+    weekStart: weekStart || null,
     createdAt: serverTimestamp(),
   };
 
