@@ -38,6 +38,8 @@ const minutesFromValue = (value, unit) => (Number(value) || 0) * getUnitMultipli
 const valueFromMinutes = (minutes, unit) =>
   (Number(minutes) || 0) / Math.max(1, getUnitMultiplier(unit));
 
+const TIMER_SKEW_TOLERANCE_MS = 5 * 60 * 1000;
+
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "No timer";
   const diff = Math.max(0, expiresAt - now);
@@ -148,9 +150,21 @@ const ClassDiscussionPage = () => {
           const data = docSnapshot.data();
           const createdAt = normalizeTimestamp(data.createdAt) || Date.now();
           const timerMinutes = Number(data.timerMinutes) || 0;
+          const timerStartedAt = normalizeTimestamp(data.timerStartedAt) || createdAt;
           let expiresAt = normalizeTimestamp(data.expiresAt);
+
+          const expectedExpiresAt = timerMinutes > 0 && timerStartedAt ? timerStartedAt + timerMinutes * 60000 : null;
+
+          if (
+            expiresAt &&
+            expectedExpiresAt &&
+            Math.abs(expiresAt - expectedExpiresAt) > TIMER_SKEW_TOLERANCE_MS
+          ) {
+            expiresAt = expectedExpiresAt;
+          }
+
           if ((!expiresAt || (createdAt && expiresAt < createdAt)) && timerMinutes > 0) {
-            expiresAt = createdAt + timerMinutes * 60000;
+            expiresAt = expectedExpiresAt;
           }
           return {
             id: docSnapshot.id,
@@ -170,6 +184,7 @@ const ClassDiscussionPage = () => {
                 ? data.timerValue
                 : valueFromMinutes(timerMinutes, data.timerUnit || "minutes"),
             createdAt,
+            timerStartedAt,
             createdBy: data.createdBy || "Student",
             createdByUid: data.createdByUid || null,
             editedAt: normalizeTimestamp(data.editedAt),
@@ -376,6 +391,7 @@ const ClassDiscussionPage = () => {
         timerMinutes,
         timerUnit: form.timerUnit,
         timerValue,
+        timerStartedAt: serverTimestamp(),
         createdAt: serverTimestamp(),
         createdBy: getDisplayName(),
         createdByUid: user?.uid || null,
@@ -611,6 +627,7 @@ const ClassDiscussionPage = () => {
           timerMinutes: minutes,
           timerUnit: unit,
           timerValue: extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes,
+          timerStartedAt: serverTimestamp(),
           status: "open",
           expiredAt: deleteField(),
         },
@@ -913,7 +930,7 @@ const ClassDiscussionPage = () => {
             <input
               type="number"
               min="0"
-              step="5"
+              step="1"
               style={{ ...styles.select, maxWidth: 120 }}
               value={tutorValue}
               onChange={(e) => setExtensionValues((prev) => ({ ...prev, [thread.id]: e.target.value }))}
@@ -1153,7 +1170,7 @@ const ClassDiscussionPage = () => {
                   <input
                     type="number"
                     min="0"
-                    step="5"
+                    step="1"
                     style={{ ...styles.select, flex: 1 }}
                     value={form.timerMinutes}
                     onChange={(e) => handleFormChange("timerMinutes", e.target.value)}
