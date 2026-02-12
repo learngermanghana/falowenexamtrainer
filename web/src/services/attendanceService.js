@@ -126,6 +126,13 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
     present,
     status,
     marked: !isPending,
+    markedAt:
+      (studentEntry && typeof studentEntry === "object" &&
+        (studentEntry.markedAt || studentEntry.updatedAt || studentEntry.timestamp)) ||
+      data.markedAt ||
+      data.updatedAt ||
+      data.timestamp ||
+      null,
     hours: resolvedHours,
     creditedHours: present ? resolvedHours : 0,
     note: (studentEntry && typeof studentEntry === "object" && studentEntry.note) || data.note || "",
