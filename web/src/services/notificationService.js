@@ -147,11 +147,15 @@ const buildAttendanceNotification = (attendancePayload) => {
 
   const latest = markedRecords
     .slice()
-    .sort(
-      (a, b) => (parseTimestamp(b.date) || 0) - (parseTimestamp(a.date) || 0)
-    )[0];
+    .sort((a, b) => {
+      const aMarkedAt = parseTimestamp(a?.markedAt) || 0;
+      const bMarkedAt = parseTimestamp(b?.markedAt) || 0;
+      if (bMarkedAt !== aMarkedAt) return bMarkedAt - aMarkedAt;
+      return (parseTimestamp(b?.date) || 0) - (parseTimestamp(a?.date) || 0);
+    })[0];
 
-  const timestamp = parseTimestamp(latest.date) || Date.now();
+  const timestamp =
+    parseTimestamp(latest.markedAt) || parseTimestamp(latest.date) || Date.now();
   const status = normalizeAttendanceStatus(latest) || "present";
   const label = latest.title || "Class session";
 
@@ -161,9 +165,7 @@ const buildAttendanceNotification = (attendancePayload) => {
     id: `attendance-${latest.id || label}-${timestamp}`,
     type: "Attendance",
     title: isPresent ? "Marked present ✅" : "Marked absent ❌",
-    body: isPresent
-      ? `${label} • Present`
-      : `${label} • Absent`,
+    body: isPresent ? `${label} • Present` : `${label} • Absent`,
     timestamp,
   };
 };
