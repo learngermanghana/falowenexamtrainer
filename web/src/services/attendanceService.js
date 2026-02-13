@@ -1,5 +1,20 @@
 import { collection, db, getDocs, isFirebaseConfigured } from "../firebase";
 
+const normalizeValue = (value = "") => String(value || "").trim();
+
+const isFirebaseReady = () => {
+  const configured =
+    typeof isFirebaseConfigured === "function"
+      ? isFirebaseConfigured()
+      : isFirebaseConfigured;
+  return Boolean(configured && db);
+};
+
+const getCodeAliases = (studentCode = "") => {
+  const trimmed = normalizeValue(studentCode);
+  return [trimmed, trimmed.toLowerCase(), trimmed.toUpperCase()].filter(Boolean);
+};
+
 const toBoolean = (value) => {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return value > 0;
@@ -16,22 +31,24 @@ const toBoolean = (value) => {
 };
 
 const getStudentAttendance = (data = {}, studentCode = "") => {
-  if (!studentCode) return data.present ?? data.attended ?? data.status;
+  const aliases = getCodeAliases(studentCode);
+  if (!aliases.length) return data.present ?? data.attended ?? data.status;
 
-  const normalizedCode = studentCode.toLowerCase();
   const maps = [data.attendance, data.students, data.participants];
 
   for (const map of maps) {
     if (map && typeof map === "object") {
-      const match =
-        map[studentCode] ??
-        map[normalizedCode] ??
-        map[studentCode.toUpperCase()];
-      if (match !== undefined) return match;
+      for (const alias of aliases) {
+        if (map[alias] !== undefined) return map[alias];
+      }
     }
   }
 
-  return data[studentCode] ?? data[normalizedCode] ?? data[studentCode.toUpperCase()];
+  for (const alias of aliases) {
+    if (data[alias] !== undefined) return data[alias];
+  }
+
+  return undefined;
 };
 
 const parseDurationToHours = (value) => {
@@ -159,44 +176,42 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
 };
 
 export const fetchAttendanceRecords = async ({ className, studentCode, level } = {}) => {
-  if (!className || !studentCode || !isFirebaseConfigured || !db) {
+  const normalizedClassName = normalizeValue(className);
+  const normalizedStudentCode = normalizeValue(studentCode);
+
+  if (!normalizedClassName || !normalizedStudentCode || !isFirebaseReady()) {
     return { records: [], sessions: 0, hours: 0 };
   }
 
-  const snap = await getDocs(collection(db, "attendance", className, "sessions"));
-  const records = [];
-  let sessions = 0;
-  let hours = 0;
+  try {
+    const snap = await getDocs(collection(db, "attendance", normalizedClassName, "sessions"));
+    const records = [];
+    let sessions = 0;
+    let hours = 0;
 
-  snap.forEach((doc) => {
-    const data = doc.data() || {};
-    const { record, sessionHours } = formatAttendanceRecord(doc.id, data, studentCode, { level });
-    records.push(record);
-    if (record.present) {
-      sessions += 1;
-      hours += sessionHours || 0;
-    }
-  });
+    snap.forEach((doc) => {
+      const data = doc.data() || {};
+      const { record, sessionHours } = formatAttendanceRecord(
+        doc.id,
+        data,
+        normalizedStudentCode,
+        { level }
+      );
+      records.push(record);
+      if (record.present) {
+        sessions += 1;
+        hours += sessionHours || 0;
+      }
+    });
 
-  return { records, sessions, hours };
+    return { records, sessions, hours };
+  } catch (error) {
+    console.error("Failed to fetch attendance records", error);
+    return { records: [], sessions: 0, hours: 0 };
+  }
 };
 
 export const fetchAttendanceSummary = async ({ className, studentCode, level } = {}) => {
-  if (!className || !studentCode || !isFirebaseConfigured || !db) {
-    return { sessions: 0, hours: 0 };
-  }
-
-  const snap = await getDocs(collection(db, "attendance", className, "sessions"));
-  let sessions = 0;
-  let hours = 0;
-
-  snap.forEach((doc) => {
-    const { present, hours: h } = formatAttendanceRecord(doc.id, doc.data() || {}, studentCode, { level });
-    if (present) {
-      sessions += 1;
-      hours += h || 0;
-    }
-  });
-
+  const { sessions, hours } = await fetchAttendanceRecords({ className, studentCode, level });
   return { sessions, hours };
 };
