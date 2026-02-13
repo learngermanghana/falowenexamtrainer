@@ -62,6 +62,36 @@ const buildNotificationData = (payload = {}) => {
   return data;
 };
 
+const resolveNotificationContent = (payload = {}) => {
+  const data = payload.data || {};
+  const type = String(data.type || "").toLowerCase();
+  const status = String(data.status || data.attendanceStatus || "").toLowerCase();
+  const presentFlag = String(data.present || "").toLowerCase();
+
+  const title =
+    payload.notification?.title ||
+    data.title ||
+    data.subject ||
+    data.headline ||
+    (type.includes("attendance")
+      ? status.includes("present") || presentFlag === "true"
+        ? "Marked present ✅"
+        : status.includes("absent") || presentFlag === "false"
+        ? "Marked absent ❌"
+        : "Attendance update"
+      : "") ||
+    "New update";
+
+  const body =
+    payload.notification?.body ||
+    data.body ||
+    data.message ||
+    data.detail ||
+    DEFAULT_NOTIFICATION_BODY;
+
+  return { title, body };
+};
+
 function initializeMessaging(config) {
   if (!config || messaging || !config.apiKey) return;
 
@@ -69,11 +99,10 @@ function initializeMessaging(config) {
   messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
-    const { title, body } = payload.notification || {};
-    if (!title) return;
+    const { title, body } = resolveNotificationContent(payload);
 
     self.registration.showNotification(title, {
-      body: body || DEFAULT_NOTIFICATION_BODY,
+      body,
       icon: "/logo192.png",
       data: buildNotificationData(payload),
     });
