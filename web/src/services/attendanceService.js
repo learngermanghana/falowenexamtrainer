@@ -98,21 +98,38 @@ const getDefaultSessionHours = (level = "") => {
 export const formatAttendanceRecord = (id, data = {}, studentCode = "", options = {}) => {
   const { level } = options;
   const studentEntry = getStudentAttendance(data, studentCode);
-  const hasMark = studentEntry !== undefined && studentEntry !== null && studentEntry !== "";
+  const entryIsObject = typeof studentEntry === "object" && studentEntry !== null;
   const rawStatus =
-    typeof studentEntry === "object" && studentEntry !== null
+    entryIsObject
       ? studentEntry.status ?? studentEntry.attendance ?? studentEntry.state
       : studentEntry;
   const normalizedStatus = typeof rawStatus === "string" ? rawStatus.trim().toLowerCase() : "";
+  const hasExplicitStatus =
+    normalizedStatus.length > 0 ||
+    (entryIsObject &&
+      ("present" in studentEntry || "attended" in studentEntry || "status" in studentEntry));
+  const hasMark = entryIsObject
+    ? hasExplicitStatus
+    : studentEntry !== undefined && studentEntry !== null && studentEntry !== "";
   const isPending =
     !hasMark ||
     normalizedStatus.includes("pending") ||
     normalizedStatus.includes("await") ||
     normalizedStatus.includes("unconfirmed");
   const hasLateFlag =
-    (studentEntry && typeof studentEntry === "object" && studentEntry.late === true) || data.late === true;
+    (entryIsObject && studentEntry.late === true) || data.late === true;
   const isLate = hasLateFlag || /\b(late|tardy)\b/.test(normalizedStatus);
-  const present = isPending ? null : isLate ? true : toBoolean(studentEntry);
+  const statusImpliesPresent = normalizedStatus.includes("present") || normalizedStatus.includes("attended");
+  const statusImpliesAbsent = normalizedStatus.includes("absent") || normalizedStatus.includes("missed");
+  const present = isPending
+    ? null
+    : isLate
+    ? true
+    : statusImpliesPresent
+    ? true
+    : statusImpliesAbsent
+    ? false
+    : toBoolean(studentEntry);
   const status = isPending ? "Pending" : isLate ? "Late" : present ? "Present" : "Absent";
   const rawDuration = data.hours ?? data.durationHours ?? data.duration ?? data.length;
   const sessionHours = parseDurationToHours(rawDuration);
@@ -127,7 +144,7 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
     status,
     marked: !isPending,
     markedAt:
-      (studentEntry && typeof studentEntry === "object" &&
+      (entryIsObject &&
         (studentEntry.markedAt || studentEntry.updatedAt || studentEntry.timestamp)) ||
       data.markedAt ||
       data.updatedAt ||
