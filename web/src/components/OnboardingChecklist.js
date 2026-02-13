@@ -302,6 +302,26 @@ const OnboardingChecklist = ({
 
   const handleSkipNotifications = () => setState((prev) => ({ ...prev, notificationsSkipped: true }));
 
+  const handleEnableNotifications = async () => {
+    try {
+      const token = await onEnableNotifications?.();
+      if (token) {
+        setState((prev) => ({ ...prev, notificationsSkipped: false }));
+        return;
+      }
+
+      const permission = typeof Notification !== "undefined" ? Notification.permission : "default";
+      if (permission !== "granted") {
+        setState((prev) => ({ ...prev, notificationsSkipped: true }));
+        showToast("Push could not be enabled right now. Skipped for now — you can enable it later.", "info");
+      }
+    } catch (error) {
+      console.error("Failed to enable notifications from onboarding", error);
+      setState((prev) => ({ ...prev, notificationsSkipped: true }));
+      showToast("Push setup failed on this device. Skipped for now.", "warning");
+    }
+  };
+
   const handleRemindLater = () => {
     const dismissedUntil = Date.now() + DISMISS_HOURS * 60 * 60 * 1000;
     setState((prev) => ({ ...prev, dismissedUntil }));
@@ -346,7 +366,7 @@ const OnboardingChecklist = ({
           handleSkipNotifications();
           return;
         }
-        await onEnableNotifications?.();
+        await handleEnableNotifications();
         return;
       }
       if (nextStepKey === "save") {
@@ -487,7 +507,7 @@ const OnboardingChecklist = ({
           title="Push notifications (optional)"
           description="Enable reminders for study sessions and new tasks whenever you want."
           actionLabel={notificationsDenied ? "Notifications blocked" : "Allow push"}
-          onAction={notificationsDenied ? null : onEnableNotifications}
+          onAction={notificationsDenied ? null : handleEnableNotifications}
           complete={notificationsStepComplete}
           accent="#e0f2fe"
           highlight={nextStepKey === "notifications" && state.guidedMode}
