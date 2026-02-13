@@ -685,9 +685,9 @@ const courseSchedules = {
         "After completing this chapter, open Chat • Grammar • Exams, pick A1 as your level, and ask for Teil 3-style prompts to practice.",
       grammar_topic: "Imperative",
       schreiben_sprechen: {
-        video: "https://youtu.be/376paUpM2bI",
-        youtube_link: "https://youtu.be/376paUpM2bI",
-        workbook_link: "https://drive.google.com/file/d/1p1eI_lwAHj6I9BD-Nw3TAdnemEskUUAq/view?usp=sharing",
+        video: "https://youtu.be/o6Ve1NSg0A4",
+        youtube_link: "https://youtu.be/o6Ve1NSg0A4",
+        workbook_link: "https://www.falowen.app/campus/course/speaking-exams-intro-4-7",
         assignment: false,
       },
     },
