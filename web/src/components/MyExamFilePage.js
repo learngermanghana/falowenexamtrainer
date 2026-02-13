@@ -403,9 +403,34 @@ const MyExamFilePage = () => {
     () => attendanceRecords.slice().sort((a, b) => toTime(b) - toTime(a)),
     [attendanceRecords]
   );
+
+  const normalizedAttendanceRecords = useMemo(() => {
+    const scheduleDays = courseSchedulesByName[className]?.days || [];
+    const scheduleDates = scheduleDays.map((day) => toDate(day.date)).filter(Boolean);
+
+    let minYear = null;
+    let maxYear = null;
+
+    if (scheduleDates.length) {
+      minYear = Math.min(...scheduleDates.map((date) => date.getFullYear())) - 1;
+      maxYear = Math.max(...scheduleDates.map((date) => date.getFullYear())) + 1;
+    } else {
+      const currentYear = new Date().getFullYear();
+      minYear = currentYear - 2;
+      maxYear = currentYear + 2;
+    }
+
+    return sortedAttendanceRecords.filter((record) => {
+      const date = toDate(record.date);
+      if (!date) return false;
+      const year = date.getFullYear();
+      return year >= minYear && year <= maxYear;
+    });
+  }, [className, sortedAttendanceRecords]);
+
   const monthOptions = useMemo(() => {
     const months = new Map();
-    sortedAttendanceRecords.forEach((record) => {
+    normalizedAttendanceRecords.forEach((record) => {
       const date = toDate(record.date);
       if (!date) return;
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -422,11 +447,12 @@ const MyExamFilePage = () => {
     return Array.from(months.entries())
       .sort((a, b) => b[0].localeCompare(a[0]))
       .map(([key, label]) => ({ key, label }));
-  }, [locale, sortedAttendanceRecords]);
+  }, [locale, normalizedAttendanceRecords]);
 
   useEffect(() => {
+    if (selectedMonth === "all") return;
     if (!monthOptions.length) return;
-    if (selectedMonth !== "all" && monthOptions.some((option) => option.key === selectedMonth)) return;
+    if (monthOptions.some((option) => option.key === selectedMonth)) return;
     setSelectedMonth(monthOptions[0]?.key || currentMonthKey);
   }, [currentMonthKey, monthOptions, selectedMonth]);
 
@@ -436,14 +462,14 @@ const MyExamFilePage = () => {
   }, [monthOptions, selectedMonth]);
 
   const filteredAttendanceRecords = useMemo(() => {
-    if (selectedMonth === "all") return sortedAttendanceRecords;
-    return sortedAttendanceRecords.filter((record) => {
+    if (selectedMonth === "all") return normalizedAttendanceRecords;
+    return normalizedAttendanceRecords.filter((record) => {
       const date = toDate(record.date);
       if (!date) return false;
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
       return key === selectedMonth;
     });
-  }, [selectedMonth, sortedAttendanceRecords]);
+  }, [normalizedAttendanceRecords, selectedMonth]);
 
   const scheduledSessions = useMemo(() => {
     const scheduleDays = courseSchedulesByName[className]?.days || [];
@@ -454,8 +480,8 @@ const MyExamFilePage = () => {
 
     return scheduleDays.filter((day) => {
       const dayDate = toDate(day.date);
-      if (!dayDate || dayDate > now) return false;
-      if (selectedMonth === "all") return true;
+      if (!dayDate) return false;
+      if (selectedMonth === "all") return dayDate <= now;
       const key = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, "0")}`;
       return key === selectedMonth;
     }).length;
