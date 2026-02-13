@@ -454,8 +454,8 @@ const MyExamFilePage = () => {
 
     return scheduleDays.filter((day) => {
       const dayDate = toDate(day.date);
-      if (!dayDate || dayDate > now) return false;
-      if (selectedMonth === "all") return true;
+      if (!dayDate) return false;
+      if (selectedMonth === "all") return dayDate <= now;
       const key = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, "0")}`;
       return key === selectedMonth;
     }).length;
