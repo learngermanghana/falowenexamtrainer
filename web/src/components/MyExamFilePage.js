@@ -471,22 +471,6 @@ const MyExamFilePage = () => {
     });
   }, [normalizedAttendanceRecords, selectedMonth]);
 
-  const scheduledSessions = useMemo(() => {
-    const scheduleDays = courseSchedulesByName[className]?.days || [];
-    if (!scheduleDays.length) return 0;
-
-    const now = new Date();
-    now.setHours(23, 59, 59, 999);
-
-    return scheduleDays.filter((day) => {
-      const dayDate = toDate(day.date);
-      if (!dayDate) return false;
-      if (selectedMonth === "all") return dayDate <= now;
-      const key = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, "0")}`;
-      return key === selectedMonth;
-    }).length;
-  }, [className, selectedMonth]);
-
   const attendanceStats = useMemo(() => {
     return filteredAttendanceRecords.reduce(
       (acc, record) => {
@@ -517,6 +501,33 @@ const MyExamFilePage = () => {
       }
     );
   }, [filteredAttendanceRecords]);
+
+  const scheduledSessions = useMemo(() => {
+    const scheduleDays = courseSchedulesByName[className]?.days || [];
+
+    if (!scheduleDays.length) {
+      return selectedMonth === "all" ? attendanceStats.total : filteredAttendanceRecords.length;
+    }
+
+    let monthStart = null;
+    let monthEnd = null;
+    if (selectedMonth !== "all") {
+      const [year, month] = selectedMonth.split("-");
+      monthStart = new Date(Number(year), Number(month) - 1, 1);
+      monthEnd = new Date(Number(year), Number(month), 0);
+    }
+
+    return scheduleDays.reduce((count, day) => {
+      const dayDate = toDate(day.date);
+      if (!dayDate) return count;
+
+      if (selectedMonth !== "all" && (dayDate < monthStart || dayDate > monthEnd)) {
+        return count;
+      }
+
+      return count + (day.sessions?.length || 0);
+    }, 0);
+  }, [attendanceStats.total, className, filteredAttendanceRecords.length, selectedMonth]);
 
   const attendanceRate = useMemo(() => {
     if (!scheduledSessions) return null;
