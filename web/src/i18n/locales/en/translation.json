@@ -669,11 +669,11 @@
     },
     "darkCta": {
       "title": "How Falowen supports your exam goals",
-      "subtitle": "Falowen trains the exact skills you need for exam success: polite requests, accurate questions, and confident conversation. Practise daily and get tutor feedback in live classes.",
+      "subtitle": "The platform includes realistic examination tasks designed for polite requests, questions, and confident conversation building. Daily mobile practice pairs with tutor-led classroom sessions so you get feedback exactly when you need it.",
       "ctaTitle": "Ready to start?",
-      "ctaSubtitle": "Create your profile to access practice tools, schedules, and tutor feedback.",
-      "ctaJoin": "Join the {{language}} cohort",
-      "ctaLogin": "Already enrolled? Log in →",
+      "ctaSubtitle": "Create your profile to access the Daily Plan, join live chats, and unlock exam resources.",
+      "ctaJoin": "Create account",
+      "ctaLogin": "Go to login",
       "contactTitle": "Stay connected",
       "contactPhone": "Call or WhatsApp:",
       "contactEmail": "Email:",
@@ -684,9 +684,9 @@
       "followTitle": "Follow Falowen",
       "stayTitle": "Why learners stay",
       "stayPoints": [
-        "Blended learning makes class time productive.",
-        "Tutors guide your speaking and writing practice.",
-        "Exam-style tasks build confidence quickly."
+        "Blended learning keeps class time productive.",
+        "Coaches review every submitted speaking and writing task.",
+        "24/7 access to vocabulary practice and live AI partners."
       ]
     },
     "quickLinks": [
