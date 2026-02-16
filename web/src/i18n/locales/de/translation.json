@@ -1154,5 +1154,64 @@
       "B2": "Du kommst mit komplexeren Texten und nuancierter Kommunikation zurecht. Fokus auf fortgeschrittene Prüfungsstrategien.",
       "C1": "Sehr gutes Niveau erkannt. Weiter mit Feinschliff, Prüfungssimulation und präzisem Feedback."
     }
+  },
+  "signupPage": {
+    "title": "Konto erstellen",
+    "backToOverview": "Zurück zur Übersicht",
+    "orientation": "Verschaffe dir schnell einen Überblick – öffne die Abschnitte unten und lies das Wichtigste.",
+    "fields": {
+      "name": "Name",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "currentLevel": "Dein aktuelles Niveau",
+      "phone": "Telefonnummer",
+      "address": "Adresse",
+      "location": "Standort",
+      "learningMode": "Bevorzugter Lernmodus",
+      "emergencyContactPhone": "Notfallkontakt (Telefon)",
+      "initialPayment": "Erste Zahlung (GHS)",
+      "classSelection": "Welchem Live-Kurs trittst du bei? (erforderlich)"
+    },
+    "options": {
+      "chooseOne": "Bitte wählen",
+      "inPerson": "Vor Ort",
+      "online": "Online",
+      "hybrid": "Hybrid",
+      "chooseClass": "Kurs auswählen"
+    },
+    "consent": {
+      "agreePrefix": "Ich stimme den",
+      "and": "und der",
+      "period": ".",
+      "keyPoints": "Wichtige Punkte:",
+      "viewSummary": "Zusammenfassung ansehen",
+      "fullDetails": "Du willst alle Details? Öffne die Zusammenfassung oder die Links oben, ohne das Formular zu verlassen.",
+      "dialogAria": "Highlights zu AGB und Datenschutz",
+      "dialogTitle": "Highlights zu AGB und Datenschutz",
+      "dialogIntro": "Hier ist eine kurze Zusammenfassung dessen, was du bei der Fortsetzung akzeptierst.",
+      "readFull": "Lies die vollständigen",
+      "withoutLosingProgress": "jederzeit, ohne deinen Fortschritt zu verlieren.",
+      "highlights": [
+        "Wir erfassen deine Kontaktdaten, um dein Konto zu erstellen und zu betreuen, Kursupdates zu teilen und Zahlungserinnerungen zu senden.",
+        "Du kannst Vertragsbedingungen wechseln oder künftige Verlängerungen kündigen, indem du den Support vor dem nächsten Abbuchungsdatum kontaktierst.",
+        "Zahlungen werden sicher verarbeitet; offene Gebühren müssen beglichen werden, damit du vollen Zugriff auf Live-Kurse und Materialien behältst.",
+        "Wir verkaufen deine Daten nie und teilen sie nur mit Partnern, die bei der Bereitstellung des Dienstes helfen (z. B. Zahlungen und Nachrichten)."
+      ]
+    },
+    "actions": {
+      "creating": "Wird erstellt ...",
+      "signUp": "Jetzt registrieren",
+      "close": "Schließen",
+      "goToLogin": "Zum Login"
+    },
+    "alreadyRegistered": "Bereits registriert?"
+  },
+  "payments": {
+    "notice": {
+      "nonRefundable": "Zahlungen sind nicht erstattungsfähig. Lies unseren Vertrag hier",
+      "contractLink": "Vertragsdetails",
+      "emailReminder": "Bitte prüfe direkt nach der Zahlung deine E-Mail auf Beleg, Einschreibebestätigung und weitere wichtige Informationen."
+    }
   }
 }
