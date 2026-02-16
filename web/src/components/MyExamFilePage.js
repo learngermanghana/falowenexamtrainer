@@ -15,8 +15,6 @@ import { courseSchedulesByName } from "../data/courseSchedules";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
 import { jsPDF } from "jspdf";
-import LeadCaptureModal from "./LeadCaptureModal";
-import { captureLead } from "../services/leadCaptureService";
 
 // ---------- helpers ----------
 const formatDate = (value) => {
@@ -213,12 +211,6 @@ const MyExamFilePage = () => {
     return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}`;
   }, []);
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
-  const [leadCaptureConfig, setLeadCaptureConfig] = useState({
-    open: false,
-    registrationUrl: "",
-    level: "",
-  });
-
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60 * 1000);
     return () => clearInterval(timer);
@@ -241,27 +233,6 @@ const MyExamFilePage = () => {
       setShowAllLevels(true);
     }
   }, [detectedLevel]);
-
-  const openRegistrationLeadCapture = (registrationUrl, levelLabel) => {
-    setLeadCaptureConfig({
-      open: true,
-      registrationUrl: registrationUrl || "",
-      level: levelLabel || "",
-    });
-  };
-
-  const handleLeadSubmit = (payload) => {
-    captureLead({
-      ...payload,
-      source: "exam_registration",
-      cta: "Register",
-      level: leadCaptureConfig.level,
-      registrationUrl: leadCaptureConfig.registrationUrl,
-    });
-    if (leadCaptureConfig.registrationUrl) {
-      window.open(leadCaptureConfig.registrationUrl, "_blank", "noopener,noreferrer");
-    }
-  };
 
   const visibleExamLevels = useMemo(() => {
     if (!detectedLevel || showAllLevels) {
@@ -858,7 +829,7 @@ const MyExamFilePage = () => {
                   {levelInfo.registrationUrl ? (
                     <button
                       type="button"
-                      onClick={() => openRegistrationLeadCapture(levelInfo.registrationUrl, levelInfo.level)}
+                      onClick={() => window.location.assign(levelInfo.registrationUrl)}
                       style={{
                         ...styles.secondaryButton,
                         padding: "6px 10px",
@@ -1423,15 +1394,6 @@ const MyExamFilePage = () => {
           </p>
         </div>
       </CollapsibleCard>
-      <LeadCaptureModal
-        isOpen={leadCaptureConfig.open}
-        onClose={() => setLeadCaptureConfig({ open: false, registrationUrl: "", level: "" })}
-        onSubmit={handleLeadSubmit}
-        title="Register for this exam"
-        subtitle="Share your details so we can confirm registration steps."
-        submitLabel="Continue to registration"
-        closeOnSubmit
-      />
     </div>
   );
 };
