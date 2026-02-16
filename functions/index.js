@@ -45,6 +45,8 @@ const getStudentAppender = () => {
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 const NOTIFICATION_BATCH_SIZE = 500;
+const UNPAID_SIGNUP_GRACE_DAYS = 7;
+const UNPAID_SIGNUP_GRACE_MS = UNPAID_SIGNUP_GRACE_DAYS * 24 * 60 * 60 * 1000;
 
 const safeTruncate = (text = "", maxLength = 140) => {
   const str = String(text || "").trim();
@@ -53,6 +55,35 @@ const safeTruncate = (text = "", maxLength = 140) => {
 };
 
 const normalizeValue = (value) => String(value || "").trim().toLowerCase();
+
+const getMillisFromTimestampLike = (value) => {
+  if (!value) return Number.NaN;
+  if (typeof value?.toMillis === "function") {
+    return value.toMillis();
+  }
+  if (typeof value === "string" || value instanceof Date || typeof value === "number") {
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  }
+  return Number.NaN;
+};
+
+const hasStudentMadePayment = (student = {}) => {
+  const paymentStatus = normalizeValue(student.paymentStatus);
+  if (["paid", "partial"].includes(paymentStatus)) return true;
+
+  const paidFields = [student.paid, student.paidAmount, student.initialPaymentAmount];
+  return paidFields.some((value) => Number(value) > 0);
+};
+
+const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
+  if (!student || hasStudentMadePayment(student)) return false;
+
+  const joinedAtMs = getMillisFromTimestampLike(student.joined_at);
+  if (!Number.isFinite(joinedAtMs)) return false;
+
+  return joinedAtMs < cutoffMs;
+};
 
 const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
   const params = new URLSearchParams();
@@ -438,6 +469,77 @@ exports.archiveOldThreads = onSchedule(
 
     await Promise.all(batches);
     console.log(`archiveOldThreads: archived ${snapshot.size} threads`);
+
+    return null;
+  }
+);
+
+exports.cleanupStaleUnpaidSignups = onSchedule(
+  {
+    region: "europe-west1",
+    schedule: "every day 02:30",
+    timeZone: "Etc/UTC",
+  },
+  async () => {
+    const db = getFirestore();
+    const auth = getAdmin().auth();
+    const cutoffMs = Date.now() - UNPAID_SIGNUP_GRACE_MS;
+
+    const pendingSnapshot = await db
+      .collection("students")
+      .where("paymentStatus", "==", "pending")
+      .get();
+
+    if (pendingSnapshot.empty) {
+      console.log("cleanupStaleUnpaidSignups: no pending signup records found");
+      return null;
+    }
+
+    const staleDocs = pendingSnapshot.docs.filter((docSnap) =>
+      isStaleUnpaidSignup(docSnap.data() || {}, cutoffMs)
+    );
+
+    if (!staleDocs.length) {
+      console.log("cleanupStaleUnpaidSignups: no stale unpaid signups eligible for deletion");
+      return null;
+    }
+
+    let deletedDocs = 0;
+    let deletedAuthUsers = 0;
+
+    for (const docSnap of staleDocs) {
+      const student = docSnap.data() || {};
+      const studentCode = String(student.studentCode || student.studentcode || docSnap.id || "");
+      const uid = String(student.uid || "").trim();
+
+      if (uid) {
+        try {
+          await auth.deleteUser(uid);
+          deletedAuthUsers += 1;
+        } catch (error) {
+          if (error?.code !== "auth/user-not-found") {
+            console.error("cleanupStaleUnpaidSignups: failed to delete auth user", {
+              studentCode,
+              uid,
+              errorMessage: error?.message,
+              code: error?.code,
+            });
+            continue;
+          }
+        }
+      }
+
+      await docSnap.ref.delete();
+      deletedDocs += 1;
+    }
+
+    console.log("cleanupStaleUnpaidSignups: completed", {
+      scannedPending: pendingSnapshot.size,
+      staleCandidates: staleDocs.length,
+      deletedDocs,
+      deletedAuthUsers,
+      graceDays: UNPAID_SIGNUP_GRACE_DAYS,
+    });
 
     return null;
   }
