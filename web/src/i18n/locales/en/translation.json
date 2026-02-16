@@ -1206,5 +1206,64 @@
       "B2": "You can work with complex texts and nuanced communication. Focus on advanced exam strategies.",
       "C1": "Strong command detected. Move to advanced refinement, exam simulation, and precision feedback."
     }
+  },
+  "signupPage": {
+    "title": "Create account",
+    "backToOverview": "Back to overview",
+    "orientation": "Get oriented quickly—open the sections below to skim what matters.",
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "currentLevel": "Your current level",
+      "phone": "Phone number",
+      "address": "Address",
+      "location": "Location",
+      "learningMode": "Preferred learning mode",
+      "emergencyContactPhone": "Emergency contact phone",
+      "initialPayment": "Initial payment amount (GHS)",
+      "classSelection": "Which live class are you joining? (required)"
+    },
+    "options": {
+      "chooseOne": "Choose one",
+      "inPerson": "In-person",
+      "online": "Online",
+      "hybrid": "Hybrid",
+      "chooseClass": "Choose a class"
+    },
+    "consent": {
+      "agreePrefix": "I agree to the",
+      "and": "and",
+      "period": ".",
+      "keyPoints": "Key points:",
+      "viewSummary": "View summary",
+      "fullDetails": "Want the full details? Open the summary or the links above without leaving the form.",
+      "dialogAria": "Terms and privacy highlights",
+      "dialogTitle": "Terms and privacy highlights",
+      "dialogIntro": "Here is a quick summary of what you are agreeing to when you continue.",
+      "readFull": "Read the full",
+      "withoutLosingProgress": "at any time without losing your progress.",
+      "highlights": [
+        "We collect your contact details to create and support your account, share class updates, and send payment reminders.",
+        "You can switch contract terms or cancel future renewals by contacting support before the next billing date.",
+        "Payments are processed securely; tuition balances must be cleared to keep full access to live classes and materials.",
+        "We never sell your data and only share it with partners that help us deliver the service (like payments and messaging)."
+      ]
+    },
+    "actions": {
+      "creating": "Creating ...",
+      "signUp": "Sign up now",
+      "close": "Close",
+      "goToLogin": "Go to login"
+    },
+    "alreadyRegistered": "Already registered?"
+  },
+  "payments": {
+    "notice": {
+      "nonRefundable": "Payments are non-refundable. Read our contract here",
+      "contractLink": "contract details",
+      "emailReminder": "After payment, please check your email right away for your receipt, letter of enrollment, and other important details."
+    }
   }
 }

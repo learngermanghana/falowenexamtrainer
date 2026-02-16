@@ -1158,5 +1158,64 @@
       "B2": "Tu peux travailler des textes plus complexes et des nuances. Concentre-toi sur les stratégies d’examen avancées.",
       "C1": "Très bon niveau détecté. Passe au perfectionnement, aux simulations d’examen et au feedback de précision."
     }
+  },
+  "signupPage": {
+    "title": "Créer un compte",
+    "backToOverview": "Retour à l’aperçu",
+    "orientation": "Prends rapidement tes repères — ouvre les sections ci-dessous pour lire l’essentiel.",
+    "fields": {
+      "name": "Nom",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "currentLevel": "Ton niveau actuel",
+      "phone": "Numéro de téléphone",
+      "address": "Adresse",
+      "location": "Localisation",
+      "learningMode": "Mode d’apprentissage préféré",
+      "emergencyContactPhone": "Téléphone du contact d’urgence",
+      "initialPayment": "Montant du paiement initial (GHS)",
+      "classSelection": "Quel cours en direct rejoins-tu ? (obligatoire)"
+    },
+    "options": {
+      "chooseOne": "Choisir",
+      "inPerson": "En présentiel",
+      "online": "En ligne",
+      "hybrid": "Hybride",
+      "chooseClass": "Choisir une classe"
+    },
+    "consent": {
+      "agreePrefix": "J’accepte les",
+      "and": "et la",
+      "period": ".",
+      "keyPoints": "Points clés :",
+      "viewSummary": "Voir le résumé",
+      "fullDetails": "Tu veux tous les détails ? Ouvre le résumé ou les liens ci-dessus sans quitter le formulaire.",
+      "dialogAria": "Points clés des conditions et de la confidentialité",
+      "dialogTitle": "Points clés des conditions et de la confidentialité",
+      "dialogIntro": "Voici un résumé rapide de ce que tu acceptes en continuant.",
+      "readFull": "Lis les",
+      "withoutLosingProgress": "à tout moment sans perdre ta progression.",
+      "highlights": [
+        "Nous collectons tes coordonnées pour créer et gérer ton compte, partager les mises à jour de cours et envoyer des rappels de paiement.",
+        "Tu peux modifier les conditions du contrat ou annuler les renouvellements futurs en contactant le support avant la prochaine échéance.",
+        "Les paiements sont traités de manière sécurisée ; les frais doivent être réglés pour conserver l’accès complet aux cours en direct et aux ressources.",
+        "Nous ne vendons jamais tes données et les partageons uniquement avec des partenaires qui nous aident à fournir le service (comme les paiements et la messagerie)."
+      ]
+    },
+    "actions": {
+      "creating": "Création ...",
+      "signUp": "S’inscrire maintenant",
+      "close": "Fermer",
+      "goToLogin": "Aller à la connexion"
+    },
+    "alreadyRegistered": "Déjà inscrit(e) ?"
+  },
+  "payments": {
+    "notice": {
+      "nonRefundable": "Les paiements ne sont pas remboursables. Lis notre contrat ici",
+      "contractLink": "détails du contrat",
+      "emailReminder": "Après le paiement, vérifie immédiatement ton e-mail pour le reçu, la lettre d’inscription et les autres informations importantes."
+    }
   }
 }

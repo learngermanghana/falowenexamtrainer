@@ -84,12 +84,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [showConsentDetails, setShowConsentDetails] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
-  const consentHighlights = [
-    "We collect your contact details to create and support your account, share class updates, and send payment reminders.",
-    "You can switch contract terms or cancel future renewals by contacting support before the next billing date.",
-    "Payments are processed securely; tuition balances must be cleared to keep full access to live classes and materials.",
-    "We never sell your data and only share it with partners that help us deliver the service (like payments and messaging).",
-  ];
+  const consentHighlights = t("signupPage.consent.highlights", { returnObjects: true });
 
   const overviewSections = [
     {
@@ -383,10 +378,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-          <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>Create account</h2>
+          <h2 style={{ ...styles.sectionTitle, marginBottom: 4 }}>{t("signupPage.title")}</h2>
           {onBack && (
             <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
-              Back to overview
+              {t("signupPage.backToOverview")}
             </button>
           )}
         </div>
@@ -403,7 +398,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           }}
         >
           <p style={{ ...styles.helperText, marginBottom: 2 }}>
-            Get oriented quickly—open the sections below to skim what matters.
+            {t("signupPage.orientation")}
           </p>
           <div
             style={{
@@ -454,7 +449,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-          <label style={styles.label}>Name</label>
+          <label style={styles.label}>{t("signupPage.fields.name")}</label>
           <input
             type="text"
             required
@@ -472,7 +467,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             Please enter your full name (first and last). We use it to print certificates and transcripts.
           </p>
 
-          <label style={styles.label}>Email</label>
+          <label style={styles.label}>{t("signupPage.fields.email")}</label>
           <input
             type="email"
             required
@@ -487,7 +482,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           />
           {fieldErrors.email ? <p style={styles.fieldError}>{fieldErrors.email}</p> : null}
 
-          <label style={styles.label}>Password</label>
+          <label style={styles.label}>{t("signupPage.fields.password")}</label>
           <input
             type="password"
             required
@@ -505,7 +500,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
           <PasswordGuidance password={password} />
 
-          <label style={styles.label}>Confirm password</label>
+          <label style={styles.label}>{t("signupPage.fields.confirmPassword")}</label>
           <input
             type="password"
             required
@@ -521,7 +516,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           />
           {fieldErrors.confirmPassword ? <p style={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
 
-          <label style={styles.label}>Your current level</label>
+          <label style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
           <select
             required
             value={selectedLevel}
@@ -538,7 +533,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             We load speaking and writing tasks from the sheet that matches your level.
           </p>
 
-          <label style={styles.label}>Phone number</label>
+          <label style={styles.label}>{t("signupPage.fields.phone")}</label>
           <input
             type="tel"
             required
@@ -558,7 +553,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             notified in urgent safety situations.
           </p>
 
-          <label style={styles.label}>Address</label>
+          <label style={styles.label}>{t("signupPage.fields.address")}</label>
           <textarea
             required
             value={address}
@@ -572,7 +567,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           />
           {fieldErrors.address ? <p style={styles.fieldError}>{fieldErrors.address}</p> : null}
 
-          <label style={styles.label}>Location</label>
+          <label style={styles.label}>{t("signupPage.fields.location")}</label>
           <input
             type="text"
             required
@@ -586,7 +581,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
           />
           {fieldErrors.location ? <p style={styles.fieldError}>{fieldErrors.location}</p> : null}
 
-          <label style={styles.label}>Preferred learning mode</label>
+          <label style={styles.label}>{t("signupPage.fields.learningMode")}</label>
           <select
             required
             value={learningMode}
@@ -597,14 +592,14 @@ const SignUpPage = ({ onLogin, onBack }) => {
             }}
             style={styles.select}
           >
-            <option value="">Choose one</option>
-            <option value="In-person">In-person</option>
-            <option value="Online">Online</option>
-            <option value="Hybrid">Hybrid</option>
+            <option value="">{t("signupPage.options.chooseOne")}</option>
+            <option value="In-person">{t("signupPage.options.inPerson")}</option>
+            <option value="Online">{t("signupPage.options.online")}</option>
+            <option value="Hybrid">{t("signupPage.options.hybrid")}</option>
           </select>
           {fieldErrors.learningMode ? <p style={styles.fieldError}>{fieldErrors.learningMode}</p> : null}
 
-          <label style={styles.label}>Emergency contact phone</label>
+          <label style={styles.label}>{t("signupPage.fields.emergencyContactPhone")}</label>
           <input
             type="tel"
             required
@@ -621,7 +616,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
           ) : null}
 
-          <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GHS)</label>
+          <label style={styles.label} htmlFor="initial-payment-amount">{t("signupPage.fields.initialPayment")}</label>
           <input
             id="initial-payment-amount"
             type="number"
@@ -658,7 +653,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             )}. You'll pay via Paystack after signup (we confirm payment before marking your account as paid).`}
           />
 
-          <label style={styles.label} htmlFor="class-selection">Which live class are you joining? (required)</label>
+          <label style={styles.label} htmlFor="class-selection">{t("signupPage.fields.classSelection")}</label>
           <select
             id="class-selection"
             value={selectedClass}
@@ -670,7 +665,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             style={styles.select}
             required
           >
-            <option value="">Choose a class</option>
+            <option value="">{t("signupPage.options.chooseClass")}</option>
             {classOptions.map((classOption) => (
               <option key={classOption.value} value={classOption.value}>
                 {classOption.label}
@@ -695,7 +690,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
               style={{ width: 18, height: 18 }}
             />
             <span>
-              I agree to the
+              {t("signupPage.consent.agreePrefix")}
               {" "}
               <a
                 href="https://register.falowen.app/#terms-of-service"
@@ -706,7 +701,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
                 terms
               </a>
               {" "}
-              and
+              {t("signupPage.consent.and")}
               {" "}
               <a
                 href="https://register.falowen.app/#privacy-policy"
@@ -716,13 +711,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
               >
                 privacy policy
               </a>
-              .
+              {t("signupPage.consent.period")}
             </span>
           </label>
           {fieldErrors.consent ? <p style={styles.fieldError}>{fieldErrors.consent}</p> : null}
           <div style={{ marginLeft: 26, marginTop: 6, color: "#4b5563", fontSize: 13 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <strong style={{ fontWeight: 600 }}>Key points:</strong>
+              <strong style={{ fontWeight: 600 }}>{t("signupPage.consent.keyPoints")}</strong>
               <button
                 type="button"
                 onClick={() => setShowConsentDetails(true)}
@@ -736,7 +731,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
                   gap: 6,
                 }}
               >
-                View summary
+                {t("signupPage.consent.viewSummary")}
               </button>
             </div>
             <ul style={{ marginTop: 6, paddingLeft: 18, lineHeight: 1.5 }}>
@@ -745,12 +740,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
               ))}
             </ul>
             <p style={{ marginTop: 4 }}>
-              Want the full details? Open the summary or the links above without leaving the form.
+              {t("signupPage.consent.fullDetails")}
             </p>
           </div>
 
           <button style={styles.primaryButton} type="submit" disabled={loading}>
-            {loading ? "Creating ..." : "Sign up now"}
+            {loading ? t("signupPage.actions.creating") : t("signupPage.actions.signUp")}
           </button>
         </form>
 
@@ -768,7 +763,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
             }}
             role="dialog"
             aria-modal="true"
-            aria-label="Terms and privacy highlights"
+            aria-label={t("signupPage.consent.dialogAria")}
           >
             <div
               style={{
@@ -782,17 +777,17 @@ const SignUpPage = ({ onLogin, onBack }) => {
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>Terms and privacy highlights</h3>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700 }}>{t("signupPage.consent.dialogTitle")}</h3>
                 <button
                   type="button"
                   onClick={() => setShowConsentDetails(false)}
                   style={{ ...styles.secondaryButton, padding: "6px 12px", fontSize: 12 }}
                 >
-                  Close
+                  {t("signupPage.actions.close")}
                 </button>
               </div>
               <p style={{ marginTop: 12, marginBottom: 10 }}>
-                Here is a quick summary of what you are agreeing to when you continue.
+                {t("signupPage.consent.dialogIntro")}
               </p>
               <ul style={{ marginTop: 0, paddingLeft: 18, lineHeight: 1.6 }}>
                 {consentHighlights.map((item) => (
@@ -800,7 +795,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
                 ))}
               </ul>
               <p style={{ marginTop: 10, color: "#4b5563" }}>
-                Read the full
+                {t("signupPage.consent.readFull")}
                 {" "}
                 <a
                   href="https://register.falowen.app/#terms-of-service"
@@ -811,7 +806,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
                   terms
                 </a>
                 {" "}
-                and
+                {t("signupPage.consent.and")}
                 {" "}
                 <a
                   href="https://register.falowen.app/#privacy-policy"
@@ -822,7 +817,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
                   privacy policy
                 </a>
                 {" "}
-                at any time without losing your progress.
+                {t("signupPage.consent.withoutLosingProgress")}
               </p>
             </div>
           </div>
@@ -836,13 +831,13 @@ const SignUpPage = ({ onLogin, onBack }) => {
         )}
 
         <div style={{ marginTop: 10, fontSize: 13, color: "#4b5563" }}>
-          Already registered?{" "}
+          {t("signupPage.alreadyRegistered")} {" "}
           <button
             type="button"
             onClick={onLogin}
             style={{ ...styles.secondaryButton, padding: "6px 12px" }}
           >
-            Go to login
+            {t("signupPage.actions.goToLogin")}
           </button>
         </div>
       </div>

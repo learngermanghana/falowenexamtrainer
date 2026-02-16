@@ -32,7 +32,7 @@ const TuitionStatusCard = ({
   description,
   checkoutAmountOverride,
 }) => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const locale = i18n.language;
   const formatMoney = useMemo(
     () => (value) => formatCurrency(value, { locale, maximumFractionDigits: 0 }),
@@ -203,6 +203,14 @@ const TuitionStatusCard = ({
 
       {paymentsEnabled && showPaymentAction ? (
         <div style={{ marginTop: 12 }}>
+          <p style={{ ...styles.helperText, margin: "0 0 8px", color: "#334155" }}>
+            {t("payments.notice.nonRefundable")}
+            {" "}
+            <a href="https://register.falowen.app/" target="_blank" rel="noreferrer" style={{ color: "#1d4ed8", fontWeight: 600 }}>
+              {t("payments.notice.contractLink")}
+            </a>
+            . {t("payments.notice.emailReminder")}
+          </p>
           {maxPayable <= 0 ? null : isFinalTopUp ? (
             <>
               <div style={{ ...styles.card, margin: 0, background: "#f8fafc", borderColor: "#e2e8f0" }}>
