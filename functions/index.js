@@ -47,8 +47,6 @@ const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 const NOTIFICATION_BATCH_SIZE = 500;
 const UNPAID_SIGNUP_GRACE_DAYS = 7;
 const UNPAID_SIGNUP_GRACE_MS = UNPAID_SIGNUP_GRACE_DAYS * 24 * 60 * 60 * 1000;
-const ENDED_CONTRACT_GRACE_DAYS = 30;
-const ENDED_CONTRACT_GRACE_MS = ENDED_CONTRACT_GRACE_DAYS * 24 * 60 * 60 * 1000;
 
 const safeTruncate = (text = "", maxLength = 140) => {
   const str = String(text || "").trim();
@@ -85,227 +83,6 @@ const isStaleUnpaidSignup = (student = {}, cutoffMs) => {
   if (!Number.isFinite(joinedAtMs)) return false;
 
   return joinedAtMs < cutoffMs;
-};
-
-const isEndedContract = (student = {}, cutoffMs) => {
-  const contractEndMs = getMillisFromTimestampLike(
-    student.contractEnd || student.contract_end || student.contractend
-  );
-  if (!Number.isFinite(contractEndMs)) return false;
-
-  return contractEndMs < cutoffMs;
-};
-
-const normalizeUniqueValues = (values = []) =>
-  Array.from(
-    new Set(
-      values
-        .map((value) => String(value || "").trim())
-        .filter(Boolean)
-    )
-  );
-
-const expandWithCaseVariants = (values = []) => {
-  const expanded = [];
-  values.forEach((value) => {
-    expanded.push(value, value.toLowerCase(), value.toUpperCase());
-  });
-  return normalizeUniqueValues(expanded);
-};
-
-const deleteByFieldValues = async ({ db, collectionName, field, values = [] }) => {
-  const normalizedValues = normalizeUniqueValues(values);
-  if (!normalizedValues.length) return 0;
-
-  let deletedCount = 0;
-  for (let index = 0; index < normalizedValues.length; index += 10) {
-    const chunk = normalizedValues.slice(index, index + 10);
-    const snapshot = await db.collection(collectionName).where(field, "in", chunk).get();
-    if (snapshot.empty) continue;
-
-    await Promise.all(snapshot.docs.map((docSnap) => docSnap.ref.delete()));
-    deletedCount += snapshot.size;
-  }
-
-  return deletedCount;
-};
-
-const deleteStudentRelatedData = async ({ db, docSnap, scope }) => {
-  const student = docSnap.data() || {};
-  const docId = String(docSnap.id || "").trim();
-  const uid = String(student.uid || "").trim();
-  const email = String(student.email || "").trim().toLowerCase();
-  const studentCode = String(student.studentCode || student.studentcode || docId || "").trim();
-  const codeCandidates = expandWithCaseVariants([studentCode, docId]);
-
-  const purgeStats = {
-    loginSessions: 0,
-    writingProgress: 0,
-    scores: 0,
-    qaPostsByCode: 0,
-    qaPostsByUid: 0,
-    paystackInitRequestsByCode: 0,
-    paystackInitRequestsByEmail: 0,
-    aiAuditLogsByUid: 0,
-    aiAuditLogsByEmail: 0,
-    classBoardPosts: 0,
-    usageQuotasDeleted: false,
-  };
-
-  purgeStats.loginSessions += await deleteByFieldValues({
-    db,
-    collectionName: "loginSessions",
-    field: "studentCode",
-    values: codeCandidates,
-  });
-  purgeStats.loginSessions += await deleteByFieldValues({
-    db,
-    collectionName: "loginSessions",
-    field: "studentId",
-    values: [docId],
-  });
-  if (uid) {
-    purgeStats.loginSessions += await deleteByFieldValues({
-      db,
-      collectionName: "loginSessions",
-      field: "uid",
-      values: [uid],
-    });
-  }
-  if (email) {
-    purgeStats.loginSessions += await deleteByFieldValues({
-      db,
-      collectionName: "loginSessions",
-      field: "email",
-      values: [email],
-    });
-  }
-
-  purgeStats.writingProgress += await deleteByFieldValues({
-    db,
-    collectionName: "writingProgress",
-    field: "studentCode",
-    values: codeCandidates,
-  });
-  if (uid) {
-    purgeStats.writingProgress += await deleteByFieldValues({
-      db,
-      collectionName: "writingProgress",
-      field: "userId",
-      values: [uid],
-    });
-  }
-
-  purgeStats.scores += await deleteByFieldValues({
-    db,
-    collectionName: "scores",
-    field: "studentcode",
-    values: codeCandidates,
-  });
-
-  purgeStats.qaPostsByCode += await deleteByFieldValues({
-    db,
-    collectionName: "qa_posts",
-    field: "responderCode",
-    values: codeCandidates,
-  });
-  if (uid) {
-    purgeStats.qaPostsByUid += await deleteByFieldValues({
-      db,
-      collectionName: "qa_posts",
-      field: "responderUid",
-      values: [uid],
-    });
-  }
-
-  purgeStats.paystackInitRequestsByCode += await deleteByFieldValues({
-    db,
-    collectionName: "paystackInitRequests",
-    field: "studentCode",
-    values: codeCandidates,
-  });
-  if (email) {
-    purgeStats.paystackInitRequestsByEmail += await deleteByFieldValues({
-      db,
-      collectionName: "paystackInitRequests",
-      field: "email",
-      values: [email],
-    });
-  }
-
-  if (uid) {
-    purgeStats.aiAuditLogsByUid += await deleteByFieldValues({
-      db,
-      collectionName: "aiAuditLogs",
-      field: "uid",
-      values: [uid],
-    });
-
-    const usageRef = db.collection("usageQuotas").doc(uid);
-    const usageSnap = await usageRef.get();
-    if (usageSnap.exists) {
-      await usageRef.delete();
-      purgeStats.usageQuotasDeleted = true;
-    }
-
-    const classBoardPosts = await db.collectionGroup("posts").where("createdByUid", "==", uid).get();
-    if (!classBoardPosts.empty) {
-      await Promise.all(classBoardPosts.docs.map((postSnap) => postSnap.ref.delete()));
-      purgeStats.classBoardPosts += classBoardPosts.size;
-    }
-  }
-
-  if (email) {
-    purgeStats.aiAuditLogsByEmail += await deleteByFieldValues({
-      db,
-      collectionName: "aiAuditLogs",
-      field: "email",
-      values: [email],
-    });
-  }
-
-  console.log(`${scope}: deleted related data`, {
-    studentCode,
-    docId,
-    ...purgeStats,
-  });
-
-  return purgeStats;
-};
-
-const deleteStudentAuthAndProfile = async ({ db, docSnap, auth, scope }) => {
-  const student = docSnap.data() || {};
-  const studentCode = String(student.studentCode || student.studentcode || docSnap.id || "");
-  const uid = String(student.uid || "").trim();
-
-  let deletedAuthUser = false;
-
-  if (uid) {
-    try {
-      await auth.deleteUser(uid);
-      deletedAuthUser = true;
-    } catch (error) {
-      if (error?.code !== "auth/user-not-found") {
-        console.error(`${scope}: failed to delete auth user`, {
-          studentCode,
-          uid,
-          errorMessage: error?.message,
-          code: error?.code,
-        });
-        return { deleted: false, deletedAuthUser: false };
-      }
-    }
-  }
-
-  await deleteStudentRelatedData({ db, docSnap, scope });
-
-  if (typeof db.recursiveDelete === "function") {
-    await db.recursiveDelete(docSnap.ref);
-  } else {
-    await docSnap.ref.delete();
-  }
-
-  return { deleted: true, deletedAuthUser };
 };
 
 const buildDiscussionRoute = ({ level = "", className = "", postId = "" } = {}) => {
@@ -731,20 +508,29 @@ exports.cleanupStaleUnpaidSignups = onSchedule(
     let deletedAuthUsers = 0;
 
     for (const docSnap of staleDocs) {
-      const result = await deleteStudentAuthAndProfile({
-        db,
-        docSnap,
-        auth,
-        scope: "cleanupStaleUnpaidSignups",
-      });
-      if (!result.deleted) {
-        continue;
+      const student = docSnap.data() || {};
+      const studentCode = String(student.studentCode || student.studentcode || docSnap.id || "");
+      const uid = String(student.uid || "").trim();
+
+      if (uid) {
+        try {
+          await auth.deleteUser(uid);
+          deletedAuthUsers += 1;
+        } catch (error) {
+          if (error?.code !== "auth/user-not-found") {
+            console.error("cleanupStaleUnpaidSignups: failed to delete auth user", {
+              studentCode,
+              uid,
+              errorMessage: error?.message,
+              code: error?.code,
+            });
+            continue;
+          }
+        }
       }
 
+      await docSnap.ref.delete();
       deletedDocs += 1;
-      if (result.deletedAuthUser) {
-        deletedAuthUsers += 1;
-      }
     }
 
     console.log("cleanupStaleUnpaidSignups: completed", {
@@ -753,65 +539,6 @@ exports.cleanupStaleUnpaidSignups = onSchedule(
       deletedDocs,
       deletedAuthUsers,
       graceDays: UNPAID_SIGNUP_GRACE_DAYS,
-    });
-
-    return null;
-  }
-);
-
-exports.cleanupEndedContracts = onSchedule(
-  {
-    region: "europe-west1",
-    schedule: "every day 03:00",
-    timeZone: "Etc/UTC",
-  },
-  async () => {
-    const db = getFirestore();
-    const auth = getAdmin().auth();
-    const cutoffMs = Date.now() - ENDED_CONTRACT_GRACE_MS;
-
-    const studentsSnapshot = await db.collection("students").get();
-
-    if (studentsSnapshot.empty) {
-      console.log("cleanupEndedContracts: no student records found");
-      return null;
-    }
-
-    const endedDocs = studentsSnapshot.docs.filter((docSnap) =>
-      isEndedContract(docSnap.data() || {}, cutoffMs)
-    );
-
-    if (!endedDocs.length) {
-      console.log("cleanupEndedContracts: no ended contracts eligible for deletion");
-      return null;
-    }
-
-    let deletedDocs = 0;
-    let deletedAuthUsers = 0;
-
-    for (const docSnap of endedDocs) {
-      const result = await deleteStudentAuthAndProfile({
-        db,
-        docSnap,
-        auth,
-        scope: "cleanupEndedContracts",
-      });
-      if (!result.deleted) {
-        continue;
-      }
-
-      deletedDocs += 1;
-      if (result.deletedAuthUser) {
-        deletedAuthUsers += 1;
-      }
-    }
-
-    console.log("cleanupEndedContracts: completed", {
-      scannedStudents: studentsSnapshot.size,
-      endedCandidates: endedDocs.length,
-      deletedDocs,
-      deletedAuthUsers,
-      graceDays: ENDED_CONTRACT_GRACE_DAYS,
     });
 
     return null;
