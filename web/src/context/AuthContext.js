@@ -110,12 +110,22 @@ const normalizeMessagingTokensForState = (tokens = []) =>
 
 const fetchStudentProfileByEmail = async (email) => {
   if (!email) return null;
+  const cleanedEmail = email.trim();
+  if (!cleanedEmail) return null;
+  const normalizedEmail = cleanedEmail.toLowerCase();
   const studentsRef = collection(db, "students");
-  const q = query(studentsRef, where("email", "==", email.toLowerCase()));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) return null;
-  const hit = snapshot.docs[0];
-  return { id: hit.id, ...hit.data() };
+  const candidateEmails = Array.from(new Set([normalizedEmail, cleanedEmail]));
+
+  for (const candidate of candidateEmails) {
+    const q = query(studentsRef, where("email", "==", candidate), limit(1));
+    const snapshot = await getDocs(q);
+    if (!snapshot.empty) {
+      const hit = snapshot.docs[0];
+      return { id: hit.id, ...hit.data() };
+    }
+  }
+
+  return null;
 };
 
 const fetchStudentProfileByStudentCode = async (studentCode) => {
@@ -548,11 +558,13 @@ export const AuthProvider = ({ children }) => {
         );
         return await finalizeLogin(credential);
       } catch (error) {
-        if (error?.code === "auth/user-not-found") {
+        const canAttemptLegacyMigration = ["auth/user-not-found", "auth/invalid-credential"].includes(error?.code);
+        if (canAttemptLegacyMigration) {
           const existingProfile =
             profileFromCode || (await fetchStudentProfileByEmail(normalizedEmail));
 
-          if (existingProfile) {
+          const hasLinkedUid = Boolean(existingProfile?.uid);
+          if (existingProfile && !hasLinkedUid) {
             const migratedCredential = await createUserWithEmailAndPassword(
               auth,
               normalizedEmail,
