@@ -73,6 +73,53 @@ const getPrimaryText = (value) => {
   return String(value);
 };
 
+const getDateMs = (value) => {
+  if (!value) return 0;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+};
+
+const buildAssignmentSnapshots = (scores = []) => {
+  const snapshots = new Map();
+
+  scores.forEach((entry, index) => {
+    const assignment = String(entry?.assignment || "").trim();
+    const score = Number(entry?.score);
+    if (!assignment || !Number.isFinite(score)) return;
+
+    const key = assignment.toLowerCase();
+    const entryDateMs = getDateMs(entry?.date || entry?.created_at || entry?.createdAt);
+    const snapshot = snapshots.get(key) || {
+      assignment,
+      bestScore: -Infinity,
+      latestScore: null,
+      latestDateMs: -1,
+      latestIndex: -1,
+    };
+
+    if (score > snapshot.bestScore) {
+      snapshot.bestScore = score;
+    }
+
+    const isNewer =
+      entryDateMs > snapshot.latestDateMs ||
+      (entryDateMs === snapshot.latestDateMs && index > snapshot.latestIndex);
+    if (isNewer) {
+      snapshot.latestScore = score;
+      snapshot.latestDateMs = entryDateMs;
+      snapshot.latestIndex = index;
+    }
+
+    snapshots.set(key, snapshot);
+  });
+
+  return Array.from(snapshots.values()).map((snapshot) => ({
+    assignment: snapshot.assignment,
+    bestScore: Number.isFinite(snapshot.bestScore) ? snapshot.bestScore : null,
+    latestScore: snapshot.latestScore,
+  }));
+};
+
 export const fetchPersonalizedPlan = async ({
   studentCode,
   email,
@@ -132,9 +179,10 @@ export const fetchPersonalizedPlan = async ({
 
   const topIssue = Array.from(issueCounts.values()).sort((a, b) => b.count - a.count)[0] || null;
 
-  const lowScoreAssignments = scores
-    .filter((entry) => Number.isFinite(entry.score) && entry.score < PASS_MARK)
-    .sort((a, b) => a.score - b.score);
+  const assignmentSnapshots = buildAssignmentSnapshots(scores);
+  const lowScoreAssignments = assignmentSnapshots
+    .filter((entry) => Number.isFinite(entry.bestScore) && entry.bestScore < PASS_MARK)
+    .sort((a, b) => a.bestScore - b.bestScore);
   const lowestScore = lowScoreAssignments[0] || null;
 
   const latestScore = scores[0] || null;
@@ -162,7 +210,7 @@ export const fetchPersonalizedPlan = async ({
   if (lowestScore?.assignment) {
     recommendations.push({
       title: `Redo ${lowestScore.assignment}`,
-      detail: `Last score: ${lowestScore.score ?? "–"}/100`,
+      detail: `Best score so far: ${lowestScore.bestScore ?? "–"}/100`,
       source: "scores",
     });
   }
@@ -194,7 +242,7 @@ export const fetchPersonalizedPlan = async ({
   const feedback = topIssue
     ? `You keep missing ${topIssue.level ? `${topIssue.level} ` : ""}${topIssue.label} → next practice focuses there.`
     : lowestScore?.assignment
-      ? `Your lowest score was ${lowestScore.assignment}. Focus your next practice there.`
+      ? `You have not passed ${lowestScore.assignment} yet. Focus your next practice there.`
       : "Keep building consistency — the next step is to follow your latest feedback notes.";
 
   const highlights = [];
