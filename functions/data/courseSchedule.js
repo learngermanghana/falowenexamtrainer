@@ -724,12 +724,17 @@ const courseSchedules = {
       chapter: "11",
       goal: "Understand instructions and request in German using the Imperative rule",
       grammar_topic: "Direction",
-      instruction: "",
+      instruction:
+        "Complete Lesen & Hören; your tutor will mark it. Open the in-app grammar guide for Chapter 11 notes and imperative examples for directions.",
+      instructionLink: {
+        label: "Open Chapter 11 guide: Directions + Imperative",
+        to: "/campus/course/directions-imperative-11",
+      },
       lesen_hören: {
         video: "https://youtu.be/k2ZC3rXPe1k",
         youtube_link: "https://youtu.be/k2ZC3rXPe1k",
         assignment: true,
-        grammarbook_link: "https://drive.google.com/file/d/1lMzZrM4aAItO8bBmehODvT6gG7dz8I9s/view?usp=sharing",
+        grammarbook_link: "https://www.falowen.app/campus/course/directions-imperative-11",
         workbook_link: "https://drive.google.com/file/d/17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A/view?usp=sharing",
       },
     },
