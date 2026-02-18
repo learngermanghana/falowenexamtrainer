@@ -66,9 +66,28 @@ const AssignmentSubmissionPage = () => {
 
   const assignmentDictionary = useMemo(() => {
     const levelSchedule = courseSchedules[preferredLevel] || [];
+    const duplicateCountByDay = levelSchedule.reduce((acc, entry) => {
+      if (typeof entry.day === "undefined" || !entry.topic) return acc;
+      const key = String(entry.day);
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
+
+    const seenByDay = {};
+
     return levelSchedule
       .filter((entry) => typeof entry.day !== "undefined" && entry.topic)
-      .map((entry) => ({ day: entry.day, topic: entry.topic, label: `Day ${entry.day}: ${entry.topic}` }));
+      .map((entry) => {
+        const dayKey = String(entry.day);
+        seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
+        const occurrence = seenByDay[dayKey];
+        const chapter = entry.chapter || entry?.lesen_hören?.chapter || "";
+        const chapterSuffix = chapter ? ` • Chapter ${chapter}` : "";
+        const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
+        const label = `Day ${entry.day}${duplicateSuffix}: ${entry.topic}${chapterSuffix}`;
+
+        return { day: entry.day, topic: entry.topic, chapter, occurrence, label };
+      });
   }, [preferredLevel]);
 
   const assignmentOptions = useMemo(() => {
@@ -127,7 +146,17 @@ const AssignmentSubmissionPage = () => {
       if (!title) return null;
 
       const entry = assignmentDictionary.find((item) => item.label === title);
-      if (typeof entry?.day !== "undefined") return `day-${entry.day}`;
+      if (entry?.chapter) return `chapter-${normalizeIdPart(entry.chapter)}`;
+      if (typeof entry?.day !== "undefined") {
+        if (entry.occurrence && entry.occurrence > 1) return `day-${entry.day}-task-${entry.occurrence}`;
+        return `day-${entry.day}`;
+      }
+
+      const chapterMatch = /chapter\s*([a-z0-9._-]+)/i.exec(title);
+      if (chapterMatch?.[1]) return `chapter-${normalizeIdPart(chapterMatch[1])}`;
+
+      const dayTaskMatch = /^day\s*(\d+)\s*[•\-|:]?\s*task\s*(\d+)/i.exec(title);
+      if (dayTaskMatch?.[1] && dayTaskMatch?.[2]) return `day-${dayTaskMatch[1]}-task-${dayTaskMatch[2]}`;
 
       const dayMatch = /^day\s*(\d+)/i.exec(title);
       if (dayMatch?.[1]) return `day-${dayMatch[1]}`;
@@ -734,7 +763,7 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
                 </div>
               ) : (
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                  Choose the assignment using the Day/Topic list from the course schedule – no typing needed.
+                  Choose the assignment using Day/Task/Chapter details so similar workbook tasks stay clearly separated.
                 </p>
               )}
               {isOrientationDay ? (
