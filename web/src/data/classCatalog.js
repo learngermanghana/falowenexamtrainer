@@ -16,14 +16,14 @@ export const classCatalog = {
     docUrl: "https://drive.google.com/file/d/1Bzb1-cHO10m_KsrTHfbhaZAfQcmbssFt/view?usp=sharing",
   },
   "A1 Berlin Klasse": {
-    startDate: "2026-02-17",
+    startDate: "2026-02-18",
     endDate: "2026-04-14",
     schedule: [
       { day: "Monday", startTime: "11:00", endTime: "12:00" },
       { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
       { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/183tr6FGJ6wMkwhG0GOEzLBUGRqUdoAGW/view?usp=sharing",
+    docUrl: "https://drive.google.com/file/d/1H87C3y6Xj09PY-giD1N73Mv8qbzCb8zk/view?usp=sharing",
   },
   "A1 Hamburg Klasse": {
     startDate: "2026-01-30",
@@ -46,14 +46,14 @@ export const classCatalog = {
     docUrl: "https://drive.google.com/file/d/1YaML32aP8L0Uk_-fu2HEW1b0Qo4CceDg/view?usp=sharing",
   },
   "A1 Dortmund Klasse": {
-    startDate: "2026-03-02",
-    endDate: "2026-04-27",
+    startDate: "2026-03-04",
+    endDate: "2026-04-28",
     schedule: [
       { day: "Monday", startTime: "18:00", endTime: "19:00" },
       { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
       { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/18m_ljkX6Z1uu0jY-ZxZE_w_-kkcB_v-Y/view?usp=sharing",
+    docUrl: "https://drive.google.com/file/d/1qhXA0dw6ULuo1_IlUtnPTgMAwhVNiLRl/view?usp=sharing",
   },
   "A2 Bonn Klasse": {
     startDate: "2025-11-25",
