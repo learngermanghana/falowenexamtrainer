@@ -3,6 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
 const sectionStyle = { ...styles.card, display: "grid", gap: 10 };
+const chipStyle = {
+  display: "inline-block",
+  padding: "4px 8px",
+  borderRadius: 999,
+  background: "#eef2ff",
+  border: "1px solid #c7d2fe",
+  fontSize: 13,
+  fontWeight: 600,
+};
 
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
@@ -51,11 +60,15 @@ const FormingBasicStatementsPage = () => {
 
       <div style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Past Tense for haben and sein</h2>
-        <p style={{ margin: 0 }}>Main tenses (names only): Präsens, Perfekt, Präteritum, Plusquamperfekt, Futur I, Futur II.</p>
-        <p style={{ margin: 0 }}>
-          How they connect: Präsens = now, Perfekt/Präteritum = past, Plusquamperfekt = earlier past,
-          Futur I/Futur II = future.
-        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          <span style={chipStyle}>Präsens</span>
+          <span style={chipStyle}>Perfekt</span>
+          <span style={chipStyle}>Präteritum</span>
+          <span style={chipStyle}>Plusquamperfekt</span>
+          <span style={chipStyle}>Futur I</span>
+          <span style={chipStyle}>Futur II</span>
+        </div>
+        <p style={{ margin: 0 }}>Quick map: Präsens = now, Perfekt/Präteritum = past, Plusquamperfekt = earlier past, Futur I/Futur II = future.</p>
         <p style={{ margin: 0 }}>Today we focus only on Präteritum forms of <em>haben</em> and <em>sein</em>.</p>
         <ul style={{ margin: 0, paddingLeft: 20 }}>
           <li><strong>haben</strong>: ich hatte, du hattest, er/sie/es hatte, wir hatten, ihr hattet, sie/Sie hatten.</li>
@@ -82,6 +95,19 @@ const FormingBasicStatementsPage = () => {
           <li>Bist du schon mal in Accra gewesen? – Ja, ich bin schon mal in Accra gewesen.</li>
           <li>Warst du schon mal in Wien? – Nein, ich war noch nie in Wien.</li>
         </ul>
+        <table style={{ borderCollapse: "collapse", width: "100%" }}>
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Warst du schon mal in ...?</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ja, ich war schon mal in ... .</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Nein, ich war noch nie in ... .</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div style={sectionStyle}>
@@ -114,16 +140,20 @@ const FormingBasicStatementsPage = () => {
         <p style={{ margin: 0 }}>
           Country tip: <em>nach</em> Deutschland, nach Ghana, nach Frankreich (no article);
           but <em>in</em> die Schweiz (feminine), in die Türkei (feminine), in den Irak (masculine),
-          in den Sudan (masculine), in das Iran (neuter, usually: in den Iran in modern usage), in die USA (plural).
+          in den Sudan (masculine), in den Iran (masculine), in die USA (plural).
         </p>
-        <p style={{ margin: 0 }}>
-          How to know country gender: learn each country with its article from a dictionary/list. Many are neuter with no article,
-          but some are fixed with article. We will practise adjective declension with these forms later.
-        </p>
+        <div style={{ display: "grid", gap: 6 }}>
+          <p style={{ margin: 0 }}><strong>Must memorize now (A1):</strong></p>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            <li>Use <em>nach</em> + city/country with no article: nach Berlin, nach Ghana.</li>
+            <li>Core exceptions with article: in die Schweiz, in die USA.</li>
+          </ul>
+          <p style={{ margin: 0 }}><strong>Later:</strong> full country article-gender patterns and adjective declension with these forms.</p>
+        </div>
         <ul style={{ margin: 0, paddingLeft: 20 }}>
           <li>Wo wohnst du? – Ich wohne in Kumasi.</li>
           <li>Woher kommt er? – Er kommt aus der Schweiz.</li>
-          <li>Wohin fahrt ihr morgen? – Wir fahren in die USA.</li>
+          <li>Wohin fährst du morgen? – Ich fahre in die USA.</li>
         </ul>
       </div>
 
@@ -173,7 +203,7 @@ const FormingBasicStatementsPage = () => {
             <strong>Check:</strong> In Berlin spricht man Deutsch. / Der Mann kommt aus Österreich.
           </li>
           <li>
-            Complete with Präteritum of <em>sein</em>: „___ du schon mal in Wien?“
+            Multiple choice: „___ du schon mal in Wien?“ (Warst / War / Waren)
             <br />
             <strong>Check:</strong> Warst.
           </li>
@@ -183,7 +213,7 @@ const FormingBasicStatementsPage = () => {
             <strong>Check:</strong> Osten.
           </li>
           <li>
-            Choose article + preposition: „Wir fliegen ___ Schweiz.“
+            Multiple choice: „Wir fliegen ___ Schweiz.“ (nach / in die / in den)
             <br />
             <strong>Check:</strong> in die Schweiz.
           </li>
