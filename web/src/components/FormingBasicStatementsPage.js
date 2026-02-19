@@ -15,8 +15,6 @@ const chipStyle = {
 
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
-  const grammarbookResourceViewerUrl = "/campus/course/resource-viewer?label=Grammarbook&url=https%3A%2F%2Fwww.falowen.app%2Fcampus%2Fcourse%2Fforming-basic-statements-german-a1-day-8";
-
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -37,25 +35,6 @@ const FormingBasicStatementsPage = () => {
         <p style={{ margin: 0 }}>
           Goal: form short statements and questions about experience, location, and movement with clear word order.
         </p>
-      </div>
-
-      <div style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Open the Grammarbook in-app</h2>
-        <p style={{ margin: 0 }}>
-          Use the in-app viewer for zoom controls when text looks too small.
-        </p>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button
-            type="button"
-            style={{ ...styles.secondaryButton, width: "fit-content" }}
-            onClick={() => navigate(grammarbookResourceViewerUrl)}
-          >
-            Open Grammarbook viewer
-          </button>
-          <a href="https://www.falowen.app/campus/course/resource-viewer?label=Grammarbook&url=https%3A%2F%2Fwww.falowen.app%2Fcampus%2Fcourse%2Fforming-basic-statements-german-a1-day-8" target="_blank" rel="noreferrer">
-            Open direct URL
-          </a>
-        </div>
       </div>
 
       <div style={sectionStyle}>
