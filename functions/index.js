@@ -56,6 +56,50 @@ const safeTruncate = (text = "", maxLength = 140) => {
 
 const normalizeValue = (value) => String(value || "").trim().toLowerCase();
 
+const normalizeStudentCode = (value) => String(value || "").trim().toLowerCase();
+
+const toBooleanLike = (value) => {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") return value > 0;
+  if (typeof value === "string") {
+    const normalized = normalizeValue(value);
+    if (["present", "p", "yes", "y", "true", "1", "attended", "late"].includes(normalized)) {
+      return true;
+    }
+    if (["absent", "a", "no", "n", "false", "0", "missed"].includes(normalized)) {
+      return false;
+    }
+  }
+  if (value && typeof value === "object") {
+    if ("present" in value) return toBooleanLike(value.present);
+    if ("attended" in value) return toBooleanLike(value.attended);
+    if ("status" in value) return toBooleanLike(value.status);
+  }
+  return false;
+};
+
+const extractAttendanceMap = (sessionData = {}) => {
+  const map = sessionData.attendance || sessionData.students || sessionData.participants;
+  if (!map || typeof map !== "object") return {};
+  return map;
+};
+
+const getPresentCodesFromAttendanceSession = (sessionData = {}) => {
+  const map = extractAttendanceMap(sessionData);
+  return new Set(
+    Object.entries(map)
+      .filter(([, value]) => toBooleanLike(value))
+      .map(([studentCode]) => normalizeStudentCode(studentCode))
+      .filter(Boolean)
+  );
+};
+
+const getNewlyPresentCodes = ({ before = {}, after = {} } = {}) => {
+  const beforeSet = getPresentCodesFromAttendanceSession(before);
+  const afterSet = getPresentCodesFromAttendanceSession(after);
+  return Array.from(afterSet).filter((code) => !beforeSet.has(code));
+};
+
 const getMillisFromTimestampLike = (value) => {
   if (!value) return Number.NaN;
   if (typeof value?.toMillis === "function") {
@@ -809,5 +853,67 @@ exports.onScoreCreated = onDocumentCreated(
 
     const attempt = snap.data() || {};
     await notifyAssignmentScore({ attemptId: event.params.attemptId, attempt });
+  }
+);
+
+exports.onAttendanceSessionUpdated = onDocumentUpdated(
+  {
+    region: "europe-west1",
+    document: "attendance/{className}/sessions/{sessionId}",
+  },
+  async (event) => {
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+    const newlyPresentCodes = getNewlyPresentCodes({ before: beforeData, after: afterData });
+
+    if (!newlyPresentCodes.length) return null;
+
+    const { className = "", sessionId = "" } = event.params;
+    const level = afterData.level || beforeData.level || "";
+    const topic =
+      afterData.topic ||
+      afterData.title ||
+      afterData.chapter ||
+      beforeData.topic ||
+      beforeData.title ||
+      beforeData.chapter ||
+      "Class session";
+
+    await Promise.all(
+      newlyPresentCodes.map(async (studentCode) => {
+        const tokenInfo = await fetchStudentMessagingToken(studentCode);
+        if (!tokenInfo?.tokens?.length) return null;
+
+        const notification = {
+          title: "Attendance updated",
+          body: safeTruncate(`You were marked present for ${topic}.`, 140),
+        };
+
+        const data = {
+          type: "attendance_update",
+          status: "present",
+          studentCode,
+          className,
+          level,
+          sessionId,
+          topic,
+          route: "/campus",
+        };
+
+        const tokenOwners = tokenInfo.docId
+          ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+          : new Map();
+
+        await sendNotifications({
+          tokens: tokenInfo.tokens,
+          notification,
+          data,
+          tokenOwners,
+        });
+        return null;
+      })
+    );
+
+    return null;
   }
 );
