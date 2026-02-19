@@ -3,8 +3,8 @@ import React from "react";
 export const RESOURCE_ACTION_LABELS = {
   video: "Video ansehen",
   openInApp: "View in app",
-  openExternal: "Open external",
-  guideOpenInApp: "Guide · Open in app",
+  openExternal: "View externally",
+  guideOpenInApp: "Guide · View in app",
 };
 
 const buildViewerHref = (label, url) =>
@@ -34,16 +34,20 @@ const ResourceLinkRow = ({ label, url }) => {
   if (isInAppLink(url)) {
     return (
       <li>
-        <a href={url}>{label}</a>
+        <a href={url} aria-label={`${label} (${RESOURCE_ACTION_LABELS.openInApp})`}>
+          {label}
+        </a>
       </li>
     );
   }
 
   return (
     <li>
-      <a href={buildViewerHref(label, url)}>{label}</a>{" "}
+      <a href={buildViewerHref(label, url)} aria-label={`${label} (${RESOURCE_ACTION_LABELS.openInApp})`}>
+        {label}
+      </a>{" "}
       ·{" "}
-      <a href={url} target="_blank" rel="noreferrer">
+      <a href={url} target="_blank" rel="noreferrer" aria-label={`${label} (${RESOURCE_ACTION_LABELS.openExternal})`}>
         {RESOURCE_ACTION_LABELS.openExternal}
       </a>
     </li>
