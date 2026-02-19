@@ -11,7 +11,7 @@ describe("ResourceLinkRow", () => {
     );
 
     expect(screen.getByRole("link", { name: "Workbook" })).toHaveAttribute("href", "/campus/workbook/day-1");
-    expect(screen.queryByRole("link", { name: /Open in app/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Open external/i })).not.toBeInTheDocument();
   });
 
   it("shows only one link for absolute falowen in-app campus URLs", () => {
@@ -28,6 +28,6 @@ describe("ResourceLinkRow", () => {
       "href",
       "https://www.falowen.app/campus/course/directions-imperative-11"
     );
-    expect(screen.queryByRole("link", { name: /Open in app/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Open external/i })).not.toBeInTheDocument();
   });
 });

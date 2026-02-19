@@ -44,7 +44,7 @@ jest.mock("../data/courseSchedules", () => ({
 import CourseTab from "../components/CourseTab";
 
 describe("CourseTab", () => {
-  it("renders deduplicated resource links with optional in-app viewer links", () => {
+  it("renders deduplicated resource links with direct in-app and external options", () => {
     render(<CourseTab defaultLevel="Z1" />);
 
     expect(
@@ -53,26 +53,20 @@ describe("CourseTab", () => {
       })
     ).toHaveAttribute("href", youtubeLink);
 
-    const workbookLinks = screen.getAllByRole("link", {
-      name: /Workbook/i,
-    });
-
-    expect(workbookLinks).toHaveLength(1);
-    expect(workbookLinks[0]).toHaveAttribute("href", workbookLink);
-
-    expect(screen.getByRole("link", { name: "Grammarbook" })).toHaveAttribute("href", grammarbookLink);
-
-    const openInAppLinks = screen.getAllByRole("link", { name: /Open in app/i });
-    expect(openInAppLinks).toHaveLength(2);
-
-    expect(openInAppLinks[0]).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Grammarbook" })).toHaveAttribute(
       "href",
       `/campus/course/resource-viewer?label=${encodeURIComponent("Grammarbook")}&url=${encodeURIComponent(grammarbookLink)}`
     );
 
-    expect(openInAppLinks[1]).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Workbook" })).toHaveAttribute(
       "href",
       `/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(workbookLink)}`
     );
+
+    const openExternalLinks = screen.getAllByRole("link", { name: /Open external/i });
+    expect(openExternalLinks).toHaveLength(2);
+
+    expect(openExternalLinks[0]).toHaveAttribute("href", grammarbookLink);
+    expect(openExternalLinks[1]).toHaveAttribute("href", workbookLink);
   });
 });
