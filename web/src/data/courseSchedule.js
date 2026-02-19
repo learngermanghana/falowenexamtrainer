@@ -744,11 +744,7 @@ export const courseSchedules = {
     goal: "Understand instructions and request in German using the Imperative rule",
     grammar_topic: "Direction",
     instruction:
-      "Complete Lesen & Hören; your tutor will mark it. Open the in-app grammar guide for Chapter 11 notes and imperative examples for directions.",
-    instructionLink: {
-      label: "Open Chapter 11 guide: Directions + Imperative",
-      to: "/campus/course/directions-imperative-11",
-    },
+      "Complete Lesen & Hören; your tutor will mark it.",
     lesen_hören: {
       video: "https://youtu.be/k2ZC3rXPe1k",
       youtube_link: "https://youtu.be/k2ZC3rXPe1k",
