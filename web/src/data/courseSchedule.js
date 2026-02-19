@@ -697,11 +697,7 @@ export const courseSchedules = {
       assignment: false,
       goal: "Understand imperative statements and learn how to use them in your Sprechen exams, especially in Teil 3.",
       instruction:
-        "Use the Day 15 guide to learn the polite request structures, then open Chat • Grammar • Exams, pick A1, and ask for Teil 3-style prompts to practice.",
-      instructionLink: {
-        label: "Open the Day 15 guide: Introduction to Speaking Exams",
-        to: "/campus/course/speaking-exams-intro-4-7",
-      },
+        "Open Chat • Grammar • Exams, pick A1, and ask for Teil 3-style prompts to practice polite request structures.",
       grammar_topic: "Imperative",
       schreiben_sprechen: {
         video: "https://youtu.be/o6Ve1NSg0A4",
@@ -793,17 +789,13 @@ export const courseSchedules = {
       chapter: "5.9",
       goal: "Understand the difference between Erlaubt and Verboten and how to use it in the exams hall",
       instruction:
-        "This chapter has no assignment. Use the grammar guide for workbook notes and Goethe A1 speaking practice tips.",
-      instructionLink: {
-        label: "Open the Verboten & Erlaubt guide (A1 workbook notes)",
-        to: "/campus/course/verboten-erlaubt-5-9",
-      },
+        "This chapter has no assignment. Use the workbook notes and Goethe A1 speaking practice tips.",
       grammar_topic: "Erlaubt and Verboten",
       schreiben_sprechen: {
         video: "https://youtu.be/K5mzR9nY3vM",
         youtube_link: "https://youtu.be/K5mzR9nY3vM",
         assignment: false,
-        workbook_link: "",
+        workbook_link: "https://www.falowen.app/campus/course/verboten-erlaubt-5-9",
       },
     },
     {
@@ -862,17 +854,13 @@ export const courseSchedules = {
       topic: "Dative Verbs and Adjective Declension",
       chapter: "14.2",
       goal: "Understand adjective declension and dative verbs",
-      instruction: "This chapter has no assignment. Use the grammar guide for the lesson notes.",
-      instructionLink: {
-        label: "Open the Day 23 guide: Dative verbs and adjective declension",
-        to: "/campus/course/dative-verbs-adjective-declension-14-2",
-      },
+      instruction: "This chapter has no assignment. Use the lesson notes.",
       grammar_topic: "Adjective Declension and Dative Verbs",
       lesen_hören: {
         video: "https://youtu.be/sAd8rWu9O0Q",
         youtube_link: "https://youtu.be/sAd8rWu9O0Q",
         assignment: false,
-        grammarbook_link: "",
+        grammarbook_link: "https://www.falowen.app/campus/course/dative-verbs-adjective-declension-14-2",
         workbook_link: "",
       },
     },
