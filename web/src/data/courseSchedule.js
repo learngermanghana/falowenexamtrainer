@@ -578,7 +578,7 @@ const RAW_COURSE_SCHEDULES = {
       day: 8,
       topic: "Countries and Languages",
       chapter: "4",
-      goal: "Learn to talk about countries and languages using schon mal/noch nie, irregular verbs, and man vs Mann",
+      goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann",
       instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
       grammar_topic: "schon mal, noch nie; irregular verbs; man vs Mann",
       assignment: true,
