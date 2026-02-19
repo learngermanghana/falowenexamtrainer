@@ -1,4 +1,52 @@
 const SERVICE_WORKER_PATH = `${process.env.PUBLIC_URL || ""}/firebase-messaging-sw.js`;
+const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
+const FORCE_REFRESH_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
+const FORCE_REFRESH_QUERY_PARAM = "refresh";
+
+const getLastForceRefreshAt = () => {
+  try {
+    return Number(window.localStorage.getItem(FORCE_REFRESH_KEY) || 0);
+  } catch (error) {
+    return 0;
+  }
+};
+
+const markForceRefreshAt = (timestamp) => {
+  try {
+    window.localStorage.setItem(FORCE_REFRESH_KEY, String(timestamp));
+  } catch (error) {
+    // Ignore storage write failures.
+  }
+};
+
+const clearOfflineCaches = async () => {
+  if (!("caches" in window)) return;
+  const cacheKeys = await window.caches.keys();
+  await Promise.all(cacheKeys.filter((key) => key.startsWith("apzla-offline")).map((key) => window.caches.delete(key)));
+};
+
+const forcePeriodicRefresh = async (registration) => {
+  if (typeof window === "undefined") return;
+
+  const now = Date.now();
+  const lastRefreshAt = getLastForceRefreshAt();
+  const shouldForceRefresh = !lastRefreshAt || now - lastRefreshAt >= FORCE_REFRESH_INTERVAL_MS;
+
+  if (!shouldForceRefresh) return;
+
+  markForceRefreshAt(now);
+
+  try {
+    await registration.update();
+    await clearOfflineCaches();
+  } catch (error) {
+    console.error("Failed to refresh service worker assets", error);
+  }
+
+  const nextUrl = new URL(window.location.href);
+  nextUrl.searchParams.set(FORCE_REFRESH_QUERY_PARAM, String(now));
+  window.location.replace(nextUrl.toString());
+};
 
 export const registerOfflineServiceWorker = () => {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
@@ -18,6 +66,7 @@ export const registerOfflineServiceWorker = () => {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register(SERVICE_WORKER_PATH)
+      .then((registration) => forcePeriodicRefresh(registration))
       .catch((error) => console.error("Service worker registration failed", error));
   });
 };
