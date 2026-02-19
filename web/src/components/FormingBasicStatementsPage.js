@@ -6,6 +6,7 @@ const sectionStyle = { ...styles.card, display: "grid", gap: 10 };
 
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
+  const grammarbookResourceViewerUrl = "/campus/course/resource-viewer?label=Grammarbook&url=https%3A%2F%2Fwww.falowen.app%2Fcampus%2Fcourse%2Fforming-basic-statements-german-a1-day-8";
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -24,6 +25,28 @@ const FormingBasicStatementsPage = () => {
         <p style={{ margin: 0 }}>
           <strong>schon mal, noch nie; irregular verbs; man vs Mann.</strong>
         </p>
+        <p style={{ margin: 0 }}>
+          Goal: form short statements and questions about experience, location, and movement with clear word order.
+        </p>
+      </div>
+
+      <div style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Open the Grammarbook in-app</h2>
+        <p style={{ margin: 0 }}>
+          Use the in-app viewer for zoom controls when text looks too small.
+        </p>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            style={{ ...styles.secondaryButton, width: "fit-content" }}
+            onClick={() => navigate(grammarbookResourceViewerUrl)}
+          >
+            Open Grammarbook viewer
+          </button>
+          <a href="https://www.falowen.app/campus/course/resource-viewer?label=Grammarbook&url=https%3A%2F%2Fwww.falowen.app%2Fcampus%2Fcourse%2Fforming-basic-statements-german-a1-day-8" target="_blank" rel="noreferrer">
+            Open direct URL
+          </a>
+        </div>
       </div>
 
       <div style={sectionStyle}>
@@ -35,6 +58,7 @@ const FormingBasicStatementsPage = () => {
           <li>Ich bin in Berlin. / Ich war in Berlin.</li>
           <li>Gestern hatte ich keinen Stadtplan.</li>
         </ul>
+        <p style={{ margin: 0 }}><strong>Mini pattern:</strong> Subject + verb + information. Example: <em>Ich war gestern krank.</em></p>
       </div>
 
       <div style={sectionStyle}>
@@ -46,6 +70,10 @@ const FormingBasicStatementsPage = () => {
         </ul>
         <p style={{ margin: 0 }}><strong>Perfekt:</strong> Bist du schon mal ... gewesen? / Ich bin noch nie ... gewesen.</p>
         <p style={{ margin: 0 }}><strong>Präteritum:</strong> Warst du schon mal ...? / Ich war noch nie in Deutschland.</p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>Bist du schon mal in Accra gewesen? – Ja, ich bin schon mal in Accra gewesen.</li>
+          <li>Warst du schon mal in Wien? – Nein, ich war noch nie in Wien.</li>
+        </ul>
       </div>
 
       <div style={sectionStyle}>
@@ -69,6 +97,11 @@ const FormingBasicStatementsPage = () => {
         <p style={{ margin: 0 }}>
           Use <em>nach</em> for most cities/countries without article, but <em>in</em> + article for places like <em>die USA</em>.
         </p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>Wo wohnst du? – Ich wohne in Kumasi.</li>
+          <li>Woher kommt er? – Er kommt aus der Schweiz.</li>
+          <li>Wohin fahrt ihr morgen? – Wir fahren in die USA.</li>
+        </ul>
       </div>
 
       <div style={sectionStyle}>
@@ -88,6 +121,15 @@ const FormingBasicStatementsPage = () => {
           <li><strong>Mann</strong> (noun) = adult male person. Example: Der Mann ist Lehrer.</li>
           <li>With verbs: Er/Sie/Es/<strong>man isst</strong>.</li>
         </ul>
+      </div>
+
+      <div style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Quick Practice (A1)</h2>
+        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+          <li>Build a sentence with <em>noch nie</em> about a country.</li>
+          <li>Answer: <em>Woher kommst du?</em> and <em>Wohin fährst du morgen?</em></li>
+          <li>Write one sentence with <em>man</em> and one with <em>Mann</em>.</li>
+        </ol>
       </div>
     </div>
   );
