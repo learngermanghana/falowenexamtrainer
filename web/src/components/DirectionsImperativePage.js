@@ -250,7 +250,7 @@ const DirectionsImperativePage = () => {
       <Section title="5) Imperative for directions (Sie / du / ihr)">
         <Callout>
           <strong>Formal (Sie)</strong>
-          <p style={{ margin: 0 }}>Use infinitive + Sie.</p>
+          <p style={{ margin: 0 }}>Use the infinitive + <em>Sie</em>, and end command sentences with an exclamation mark.</p>
           <BulletList
             items={[
               "Gehen Sie geradeaus.",
@@ -261,13 +261,24 @@ const DirectionsImperativePage = () => {
         </Callout>
         <Callout>
           <strong>Informal singular (du)</strong>
-          <p style={{ margin: 0 }}>Use verb stem (drop -en/-n, no du).</p>
+          <p style={{ margin: 0 }}>Conjugate for <em>du</em> (stem form), remove the pronoun, and use an exclamation mark.</p>
           <BulletList items={["Geh geradeaus.", "Bieg rechts ab.", "Nimm die erste Straße links."]} />
         </Callout>
         <Callout>
           <strong>Informal plural (ihr)</strong>
-          <p style={{ margin: 0 }}>Use verb stem + -t (no ihr).</p>
+          <p style={{ margin: 0 }}>Conjugate for <em>ihr</em>, remove only the pronoun, and use an exclamation mark.</p>
           <BulletList items={["Geht geradeaus.", "Biegt rechts ab.", "Nehmt die erste Straße links."]} />
+        </Callout>
+        <Callout>
+          <strong>Quick formation notes</strong>
+          <BulletList
+            items={[
+              "Imperative commands are not yes/no questions; they are direct commands and usually end with an exclamation mark (!).",
+              "Sie: infinitive + Sie → Gehen Sie geradeaus!",
+              "du: conjugate for du form, then remove pronoun → Geh geradeaus!",
+              "ihr: conjugate for ihr form, then remove pronoun only → Geht geradeaus!",
+            ]}
+          />
         </Callout>
       </Section>
 
