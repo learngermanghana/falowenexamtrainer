@@ -84,13 +84,13 @@ const mapSteps = [
     answer: "Bieg rechts ab.",
   },
   {
-    prompt: "Step 3: The hospital is across from you.",
+    prompt: "Step 3: Go to the side with the Krankenhaus.",
     options: ["Überquere die Straße.", "Bieg links ab.", "Geh zurück."],
     answer: "Überquere die Straße.",
   },
   {
-    prompt: "Step 4: Final move to get to the Schule entrance.",
-    options: ["Nimm die erste Straße links.", "Nimm die erste Straße rechts.", "Bieg rechts ab."],
+    prompt: "Step 4: After crossing, turn at the first side street to reach the Schule.",
+    options: ["Nimm die erste Straße links.", "Geh geradeaus.", "Nimm die erste Straße rechts."],
     answer: "Nimm die erste Straße links.",
   },
 ];
@@ -378,13 +378,12 @@ const DirectionsImperativePage = () => {
         >
 {`[Bahnhof] --- geradeaus ---> [Kreuzung] --- rechts ---> [Straße]
                                         |
-                                   überqueren
+                              überquere die Straße
                                         |
-                                [Krankenhaus]
+                                [Krankenhaus-Seite]
                                         |
-                               erste Straße links
-                                        |
-                                    [Schule]`}
+                        nimm die erste Straße links ↖
+                                      [Schule]`}
         </pre>
         <div style={{ border: "1px solid #e2e8f0", borderRadius: 10, padding: 12, display: "grid", gap: 8 }}>
           <strong>
