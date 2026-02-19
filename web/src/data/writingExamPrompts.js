@@ -1,11 +1,11 @@
 export const WRITING_PROMPTS = {
   "A1": [
     {
-      "Thema": "Schreiben Sie eine E-Mail an Ihren Arzt und sagen Sie Ihren Termin ab.",
+      "Thema": "Sie reisen bald zusammen mit Ihrem deutschen Freund Patrick nach Köln. Vor der Reise haben Sie noch Fragen. Schreiben Sie Patrick eine E-Mail.",
       "Punkte": [
         "Warum schreiben Sie?",
-        "Sagen Sie: den Grund für die Absage.",
-        "Fragen Sie: nach einem neuen Termin.",
+        "Bitten Sie: Informationen über die Stadt.",
+        "Fragen Sie: übernachten?",
       ],
     },
     {
@@ -33,11 +33,11 @@ export const WRITING_PROMPTS = {
       ],
     },
     {
-      "Thema": "Schreiben Sie eine Nachricht an Ihren Vermieter wegen einer kaputten Heizung.",
+      "Thema": "Schreiben Sie eine E-Mail an Ihren Arzt und sagen Sie Ihren Termin ab.",
       "Punkte": [
         "Warum schreiben Sie?",
-        "Was ist das Problem?",
-        "Was möchten Sie vom Vermieter?",
+        "Sagen Sie: den Grund für die Absage.",
+        "Fragen Sie: nach einem neuen Termin.",
       ],
     },
     {
