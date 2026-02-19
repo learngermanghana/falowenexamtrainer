@@ -8,6 +8,7 @@ import { classCatalog } from "../data/classCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
+import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 
 const extractLevelToken = (value) => {
   if (!value) return "";
@@ -142,54 +143,12 @@ const LessonList = ({ title, lessons }) => {
               {lesson.video || lesson.youtube_link ? (
                 <li>
                   <a href={lesson.video || lesson.youtube_link} target="_blank" rel="noreferrer">
-                    Video ansehen
+                    {RESOURCE_ACTION_LABELS.video}
                   </a>
                 </li>
               ) : null}
-              {lesson.grammarbook_link ? (
-                <li style={{ display: "grid", gap: 4 }}>
-                  <a href={lesson.grammarbook_link} target="_blank" rel="noreferrer">
-                    Grammarbook
-                  </a>{" "}
-                  ·{" "}
-                  <a
-                    href={`/campus/course/resource-viewer?label=${encodeURIComponent("Grammarbook")}&url=${encodeURIComponent(
-                      lesson.grammarbook_link
-                    )}`}
-                  >
-                    Zoom in app
-                  </a>
-                  <a
-                    href={`/campus/course/resource-viewer?label=${encodeURIComponent("Grammarbook")}&url=${encodeURIComponent(
-                      lesson.grammarbook_link
-                    )}`}
-                  >
-                    Open in app (zoom)
-                  </a>
-                </li>
-              ) : null}
-              {lesson.workbook_link ? (
-                <li style={{ display: "grid", gap: 4 }}>
-                  <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
-                    Workbook
-                  </a>{" "}
-                  ·{" "}
-                  <a
-                    href={`/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(
-                      lesson.workbook_link
-                    )}`}
-                  >
-                    Zoom in app
-                  </a>
-                  <a
-                    href={`/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(
-                      lesson.workbook_link
-                    )}`}
-                  >
-                    Open in app (zoom)
-                  </a>
-                </li>
-              ) : null}
+              <ResourceLinkRow label="Grammarbook" url={lesson.grammarbook_link} />
+              <ResourceLinkRow label="Workbook" url={lesson.workbook_link} />
             </ul>
           </div>
         ))}
@@ -401,7 +360,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             href={entry.instructionLink.to}
                             style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
                           >
-                            {entry.instructionLink.label}
+                            {entry.instructionLink.label || RESOURCE_ACTION_LABELS.guideOpenInApp}
                           </a>
                         ) : null}
                       </div>
