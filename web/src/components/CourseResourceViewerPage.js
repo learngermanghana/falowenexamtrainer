@@ -130,9 +130,13 @@ const CourseResourceViewerPage = () => {
           </button>
           <span style={{ fontSize: 13, color: "#334155" }}>Zoom: {Math.round(zoom * 100)}%</span>
           {resourceUrl ? (
-            <a href={resourceUrl} target="_blank" rel="noreferrer" style={{ marginLeft: "auto" }}>
-              Open original link
-            </a>
+            <p style={{ margin: "0 0 0 auto", fontSize: 13, color: "#334155" }}>
+              To view this document full screen, click{" "}
+              <a href={resourceUrl} target="_blank" rel="noreferrer">
+                this link
+              </a>
+              .
+            </p>
           ) : null}
         </div>
       </div>

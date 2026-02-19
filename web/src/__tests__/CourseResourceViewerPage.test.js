@@ -15,4 +15,18 @@ describe("CourseResourceViewerPage", () => {
 
     expect(screen.getByText(/No resource link provided/i)).toBeInTheDocument();
   });
+
+  it("shows full-screen helper link copy when url query is present", () => {
+    render(
+      <MemoryRouter initialEntries={["/campus/course/resource-viewer?label=Workbook&url=https%3A%2F%2Fexample.com%2Fdoc"]}>
+        <Routes>
+          <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText(/To view this document full screen, click/i)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /this link/i })).toHaveAttribute("href", "https://example.com/doc");
+  });
+
 });
