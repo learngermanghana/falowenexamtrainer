@@ -44,7 +44,7 @@ jest.mock("../data/courseSchedules", () => ({
 import CourseTab from "../components/CourseTab";
 
 describe("CourseTab", () => {
-  it("renders derived schedule resources including zoom-in-app links", () => {
+  it("renders deduplicated resource links with optional in-app viewer links", () => {
     render(<CourseTab defaultLevel="Z1" />);
 
     expect(
@@ -60,20 +60,17 @@ describe("CourseTab", () => {
     expect(workbookLinks).toHaveLength(1);
     expect(workbookLinks[0]).toHaveAttribute("href", workbookLink);
 
-    expect(
-      screen.getByRole("link", {
-        name: /Grammarbook\s*·\s*Zoom in app/i,
-      })
-    ).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Grammarbook" })).toHaveAttribute("href", grammarbookLink);
+
+    const openInAppLinks = screen.getAllByRole("link", { name: /Open in app/i });
+    expect(openInAppLinks).toHaveLength(2);
+
+    expect(openInAppLinks[0]).toHaveAttribute(
       "href",
       `/campus/course/resource-viewer?label=${encodeURIComponent("Grammarbook")}&url=${encodeURIComponent(grammarbookLink)}`
     );
 
-    expect(
-      screen.getByRole("link", {
-        name: /Workbook\s*·\s*Zoom in app/i,
-      })
-    ).toHaveAttribute(
+    expect(openInAppLinks[1]).toHaveAttribute(
       "href",
       `/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(workbookLink)}`
     );
