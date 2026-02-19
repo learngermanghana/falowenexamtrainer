@@ -44,7 +44,7 @@ jest.mock("../data/courseSchedules", () => ({
 import CourseTab from "../components/CourseTab";
 
 describe("CourseTab", () => {
-  it("renders deduplicated resource links with direct in-app and external options", () => {
+  it("renders deduplicated resource links that open in-app", () => {
     render(<CourseTab defaultLevel="Z1" />);
 
     expect(
@@ -63,10 +63,6 @@ describe("CourseTab", () => {
       `/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(workbookLink)}`
     );
 
-    const openExternalLinks = screen.getAllByRole("link", { name: /View externally/i });
-    expect(openExternalLinks).toHaveLength(2);
-
-    expect(openExternalLinks[0]).toHaveAttribute("href", grammarbookLink);
-    expect(openExternalLinks[1]).toHaveAttribute("href", workbookLink);
+    expect(screen.queryByRole("link", { name: /View externally/i })).not.toBeInTheDocument();
   });
 });
