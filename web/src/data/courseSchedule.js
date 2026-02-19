@@ -254,6 +254,10 @@ const A2_SCHEDULE = [
     assignment: true,
     instruction:
       "Complete Lesen & Hören; your tutor will mark it. Open the speaking exams practice link and try it for self-practice only. Read the exam guide: https://blog.falowen.app/blog/a1-speaking-exam-guide/. Practice speaking exams: https://www.falowen.app/exams.",
+    instructionLink: {
+      label: "Open Chapter 11 guide: Directions + Imperative",
+      to: "/campus/course/directions-imperative-11",
+    },
     grammar_topic: "Imperative (instructions and requests)",
     video: "https://youtu.be/Xjp2A1hU1ag",
     youtube_link: "https://youtu.be/Xjp2A1hU1ag",
