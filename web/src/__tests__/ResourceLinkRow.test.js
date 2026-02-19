@@ -3,18 +3,24 @@ import { render, screen } from "@testing-library/react";
 import ResourceLinkRow from "../components/ResourceLinkRow";
 
 describe("ResourceLinkRow", () => {
-  it("shows only one link when the resource is already in-app", () => {
+  it("opens resources in-app first and keeps external option", () => {
     render(
       <ul>
         <ResourceLinkRow label="Workbook" url="/campus/workbook/day-1" />
       </ul>
     );
 
-    expect(screen.getByRole("link", { name: "Workbook" })).toHaveAttribute("href", "/campus/workbook/day-1");
-    expect(screen.queryByRole("link", { name: /View externally/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Workbook" })).toHaveAttribute(
+      "href",
+      "/campus/course/resource-viewer?label=Workbook&url=%2Fcampus%2Fworkbook%2Fday-1"
+    );
+    expect(screen.getByRole("link", { name: /View externally/i })).toHaveAttribute(
+      "href",
+      "/campus/workbook/day-1"
+    );
   });
 
-  it("shows only one link for absolute falowen in-app campus URLs", () => {
+  it("opens external links in-app first and still exposes external link", () => {
     render(
       <ul>
         <ResourceLinkRow
@@ -26,8 +32,11 @@ describe("ResourceLinkRow", () => {
 
     expect(screen.getByRole("link", { name: "Grammarbook" })).toHaveAttribute(
       "href",
+      "/campus/course/resource-viewer?label=Grammarbook&url=https%3A%2F%2Fwww.falowen.app%2Fcampus%2Fcourse%2Fdirections-imperative-11"
+    );
+    expect(screen.getByRole("link", { name: /View externally/i })).toHaveAttribute(
+      "href",
       "https://www.falowen.app/campus/course/directions-imperative-11"
     );
-    expect(screen.queryByRole("link", { name: /View externally/i })).not.toBeInTheDocument();
   });
 });
