@@ -2,7 +2,8 @@ import React from "react";
 
 export const RESOURCE_ACTION_LABELS = {
   video: "Video ansehen",
-  openInApp: "Open in app",
+  openInApp: "View in app",
+  openExternal: "Open external",
   guideOpenInApp: "Guide · Open in app",
 };
 
@@ -40,12 +41,10 @@ const ResourceLinkRow = ({ label, url }) => {
 
   return (
     <li>
-      <a href={url} target="_blank" rel="noreferrer">
-        {label}
-      </a>{" "}
+      <a href={buildViewerHref(label, url)}>{label}</a>{" "}
       ·{" "}
-      <a href={buildViewerHref(label, url)}>
-        {RESOURCE_ACTION_LABELS.openInApp}
+      <a href={url} target="_blank" rel="noreferrer">
+        {RESOURCE_ACTION_LABELS.openExternal}
       </a>
     </li>
   );
