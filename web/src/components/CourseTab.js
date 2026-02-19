@@ -150,6 +150,14 @@ const LessonList = ({ title, lessons }) => {
                 <li style={{ display: "grid", gap: 4 }}>
                   <a href={lesson.grammarbook_link} target="_blank" rel="noreferrer">
                     Grammarbook
+                  </a>{" "}
+                  ·{" "}
+                  <a
+                    href={`/campus/course/resource-viewer?label=${encodeURIComponent("Grammarbook")}&url=${encodeURIComponent(
+                      lesson.grammarbook_link
+                    )}`}
+                  >
+                    Zoom in app
                   </a>
                   <a
                     href={`/campus/course/resource-viewer?label=${encodeURIComponent("Grammarbook")}&url=${encodeURIComponent(
@@ -164,6 +172,14 @@ const LessonList = ({ title, lessons }) => {
                 <li style={{ display: "grid", gap: 4 }}>
                   <a href={lesson.workbook_link} target="_blank" rel="noreferrer">
                     Workbook
+                  </a>{" "}
+                  ·{" "}
+                  <a
+                    href={`/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(
+                      lesson.workbook_link
+                    )}`}
+                  >
+                    Zoom in app
                   </a>
                   <a
                     href={`/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(
