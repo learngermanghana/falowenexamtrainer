@@ -63,7 +63,7 @@ describe("CourseTab", () => {
       `/campus/course/resource-viewer?label=${encodeURIComponent("Workbook")}&url=${encodeURIComponent(workbookLink)}`
     );
 
-    const openExternalLinks = screen.getAllByRole("link", { name: /Open external/i });
+    const openExternalLinks = screen.getAllByRole("link", { name: /View externally/i });
     expect(openExternalLinks).toHaveLength(2);
 
     expect(openExternalLinks[0]).toHaveAttribute("href", grammarbookLink);

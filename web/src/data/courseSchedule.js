@@ -420,7 +420,7 @@ Use:
   },
 ].map(buildA2Lesson);
 
-export const courseSchedules = {
+const RAW_COURSE_SCHEDULES = {
   A1: [
     {
       day: 0,
@@ -1790,3 +1790,77 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
   ],
   FRENCH_A1: FRENCH_A1_SCHEDULE,
 };
+
+
+const DEFAULT_INSTRUCTION_EN = "Watch the video, review grammar, and complete your workbook.";
+const DEFAULT_INSTRUCTION_DE = "Schau das Video, wiederhole die Grammatik und mache die Aufgabe.";
+const DEFAULT_INSTRUCTION_DE_FORMAL = "Schauen Sie das Video, wiederholen Sie die Grammatik und bearbeiten Sie das Arbeitsbuch.";
+const SELF_PRACTICE_NOTE = "Self-practice only; no video or grammar book for this lesson.";
+
+const normalizeResourceUrl = (value) => {
+  if (!value || !String(value).trim()) return null;
+  return value;
+};
+
+const normalizeLessonResources = (lesson) => {
+  if (!lesson || typeof lesson !== "object") return lesson;
+
+  return {
+    ...lesson,
+    video: normalizeResourceUrl(lesson.video),
+    youtube_link: normalizeResourceUrl(lesson.youtube_link),
+    grammarbook_link: normalizeResourceUrl(lesson.grammarbook_link),
+    workbook_link: normalizeResourceUrl(lesson.workbook_link),
+  };
+};
+
+const normalizeLessonCollection = (lessonCollection) => {
+  if (Array.isArray(lessonCollection)) return lessonCollection.map(normalizeLessonResources);
+  if (lessonCollection && typeof lessonCollection === "object") return normalizeLessonResources(lessonCollection);
+  return lessonCollection;
+};
+
+const hasNoVideoAndNoGrammar = (lesson) => {
+  if (!lesson || typeof lesson !== "object") return false;
+  return !lesson.video && !lesson.youtube_link && !lesson.grammarbook_link;
+};
+
+const getDefaultInstruction = (instruction) => {
+  if (!instruction) return instruction;
+  if (instruction.includes("Watch the video") || instruction.includes("review grammar")) return DEFAULT_INSTRUCTION_EN;
+  if (instruction.includes("Schau das Video")) return DEFAULT_INSTRUCTION_DE;
+  if (instruction.includes("Schauen Sie das Video")) return DEFAULT_INSTRUCTION_DE_FORMAL;
+  return instruction;
+};
+
+const normalizeCourseSchedules = (schedules) =>
+  Object.fromEntries(
+    Object.entries(schedules).map(([level, entries]) => {
+      if (!Array.isArray(entries)) return [level, entries];
+
+      return [
+        level,
+        entries.map((entry) => {
+          const lesen_hören = normalizeLessonCollection(entry.lesen_hören);
+          const schreiben_sprechen = normalizeLessonCollection(entry.schreiben_sprechen);
+          const lessons = [
+            ...(Array.isArray(lesen_hören) ? lesen_hören : lesen_hören ? [lesen_hören] : []),
+            ...(Array.isArray(schreiben_sprechen) ? schreiben_sprechen : schreiben_sprechen ? [schreiben_sprechen] : []),
+          ];
+
+          const needsSelfPracticeNote = lessons.some(hasNoVideoAndNoGrammar);
+          const instruction = getDefaultInstruction(entry.instruction);
+          const hasNote = instruction && instruction.includes(SELF_PRACTICE_NOTE);
+
+          return {
+            ...entry,
+            instruction: needsSelfPracticeNote && instruction && !hasNote ? `${instruction} ${SELF_PRACTICE_NOTE}` : instruction,
+            lesen_hören,
+            schreiben_sprechen,
+          };
+        }),
+      ];
+    })
+  );
+
+export const courseSchedules = normalizeCourseSchedules(RAW_COURSE_SCHEDULES);
