@@ -22,7 +22,6 @@ import {
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
-const RESUBMISSION_COLLECTION = "submissionResubmissions";
 const MIN_SUBMISSION_CHARACTERS = 80;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
 const ACTION_COOLDOWN_MS = 45 * 1000;
@@ -819,7 +818,6 @@ const AssignmentSubmissionPage = () => {
         updatedAt: serverTimestamp(),
       };
 
-      await addDoc(collection(db, RESUBMISSION_COLLECTION), payload);
       await addDoc(collection(db, SUBMISSION_COLLECTION), payload);
 
       setResubmissionStatus({ loading: false, error: "", success: "Resubmission sent successfully." });
@@ -1043,7 +1041,7 @@ const AssignmentSubmissionPage = () => {
         {isSelectedLocked ? (
           <>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved.
+              You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved so tutors can see this is stronger work.
             </p>
 
             <label style={{ ...styles.field, margin: 0 }}>
@@ -1061,12 +1059,12 @@ const AssignmentSubmissionPage = () => {
             </label>
 
             <label style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>What changed or what objective still needs work? *</span>
+              <span style={styles.label}>What did you improve in this submission? *</span>
               <textarea
                 value={resubmissionImprovement}
                 onChange={(event) => setResubmissionImprovement(event.target.value)}
                 style={{ ...styles.textArea, minHeight: 120 }}
-                placeholder="Example: Word order is still wrong in Nebensätze. Please review objective 2 with me."
+                placeholder="Example: I fixed verb placement in Nebensätze, corrected article endings, and rewrote the opening paragraph to match the prompt."
               />
               <span style={styles.helperText}>Add at least {MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS} characters.</span>
             </label>
