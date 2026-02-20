@@ -744,11 +744,7 @@ const courseSchedules = {
       chapter: "12.1_12.2",
       goal: "Learn about German professions and how to use two-way prepositions",
       instruction:
-        "Do assignments for 12.1 and 12.2 and use the schreiben and sprechen below for practicals for full understanding",
-      instructionLink: {
-        label: "Open Day 18 guide: Two-Case Prepositions (Wechselpräpositionen)",
-        to: "/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
-      },
+        "Do the assignments for chapters 12.1 and 12.2 under Lesen & Hören.",
       grammar_topic: "Two Case Preposition",
       lesen_hören: [
         {
@@ -768,13 +764,6 @@ const courseSchedules = {
           workbook_link: "https://drive.google.com/file/d/1xojH7Tgb5LeJj3nzNSATUVppWnJgJLEF/view?usp=sharing",
         },
       ],
-      schreiben_sprechen: {
-        chapter: "12.2",
-        video: "https://youtu.be/xVyYo7upDGo",
-        youtube_link: "https://youtu.be/xVyYo7upDGo",
-        assignment: false,
-        workbook_link: "https://drive.google.com/file/d/1iyYBuxu3bBEovxz0j9QeSu_1URX92fvN/view?usp=sharing",
-      },
     },
     {
       day: 19,
