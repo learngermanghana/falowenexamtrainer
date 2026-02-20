@@ -112,6 +112,63 @@ const fullExamples = [
   },
 ];
 
+const clueMatchingPuzzle = [
+  {
+    sentence: "Eine Lampe ist ____ dem Tisch befestigt.",
+    answer: "über",
+    translation: "over / above",
+    reference: "Static location (Wo?) + position above something.",
+  },
+  {
+    sentence: "Die Katze schläft ____ dem Stuhl.",
+    answer: "unter",
+    translation: "under / below",
+    reference: "Static location (Wo?) + lower position.",
+  },
+  {
+    sentence: "Die Schule ist ____ dem Museum und der Bibliothek.",
+    answer: "zwischen",
+    translation: "between",
+    reference: "Static location between two places.",
+  },
+  {
+    sentence: "Ich lege meine Tasche ____ den Tisch.",
+    answer: "auf",
+    translation: "on / onto",
+    reference: "Movement to a new position (Wohin?) onto the table.",
+  },
+  {
+    sentence: "Das Fahrrad steht ____ dem Haus.",
+    answer: "vor",
+    translation: "in front of",
+    reference: "Static location in front of the house.",
+  },
+  {
+    sentence: "Das Kind steht ____ der Tür.",
+    answer: "an",
+    translation: "at / on",
+    reference: "Static location at/next to a vertical surface.",
+  },
+  {
+    sentence: "Der Hund sitzt ____ dem Sofa.",
+    answer: "neben",
+    translation: "next to",
+    reference: "Static location next to the sofa.",
+  },
+  {
+    sentence: "Sie geht ____ das Klassenzimmer.",
+    answer: "in",
+    translation: "in / into",
+    reference: "Movement into an enclosed place (Wohin?).",
+  },
+  {
+    sentence: "Er versteckt sich ____ dem Baum.",
+    answer: "hinter",
+    translation: "behind",
+    reference: "Static location hidden behind something.",
+  },
+];
+
 
 const articleTables = [
   {
@@ -384,6 +441,47 @@ const TwoCasePrepositionsPage = () => {
             "If the verb implies no movement and the location is static, use dative.",
           ]}
         />
+      </Section>
+
+      <Section title="9) Reference key for clue-matching puzzle">
+        <p style={{ margin: 0 }}>
+          If learners score <strong>0/9</strong>, they usually need a clearer clue-to-preposition reference. The answer
+          must be the <strong>German preposition</strong> (for example <em>über</em>, not English <em>above</em>).
+          Use this key to check each sentence and understand <em>why</em> the preposition fits.
+        </p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
+            <thead>
+              <tr>
+                {[
+                  "Sentence",
+                  "Correct preposition (German)",
+                  "English meaning",
+                  "Reference clue",
+                ].map((header) => (
+                  <th
+                    key={`clue-match-${header}`}
+                    style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {clueMatchingPuzzle.map((item) => (
+                <tr key={item.sentence}>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{item.sentence}</td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>
+                    <strong>{item.answer}</strong>
+                  </td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{item.translation}</td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{item.reference}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </Section>
     </div>
   );
