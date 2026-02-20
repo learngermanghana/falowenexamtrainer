@@ -201,6 +201,7 @@ function App() {
     !Number.isFinite(contractEndMs) && (["paid", "partial"].includes(paymentStatus) || balanceCleared);
   const awaitingPayment =
     Boolean(studentProfile) && !isStaff && !(hasActiveContract || canAccessLegacy || balanceCleared);
+  const shouldShowStudyBuddyBar = location.pathname !== "/campus/course/resource-viewer";
 
   if (!isFirebaseConfigured) {
     return (
@@ -512,7 +513,7 @@ const AppShell = ({
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <StudyBuddyBar studentProfile={studentProfile} />
+      {shouldShowStudyBuddyBar ? <StudyBuddyBar studentProfile={studentProfile} /> : null}
     </div>
   );
 };
