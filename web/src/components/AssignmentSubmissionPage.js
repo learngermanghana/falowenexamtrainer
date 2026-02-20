@@ -135,7 +135,8 @@ const AssignmentSubmissionPage = () => {
   const [copyStatus, setCopyStatus] = useState("");
   const [autosaveStatus, setAutosaveStatus] = useState({ state: "idle", savedAt: null });
   const [resubmissionText, setResubmissionText] = useState("");
-  const [resubmissionCopyStatus, setResubmissionCopyStatus] = useState("");
+  const [resubmissionImprovement, setResubmissionImprovement] = useState("");
+  const [resubmissionStatus, setResubmissionStatus] = useState({ loading: false, error: "", success: "" });
 
   const lastAssignmentRef = useRef(assignmentOptions[0]);
   const autosaveTimerRef = useRef(null);
@@ -420,7 +421,8 @@ const AssignmentSubmissionPage = () => {
       setCopyStatus("");
       setAutosaveStatus((prev) => ({ ...prev, state: "idle" }));
       setResubmissionText("");
-      setResubmissionCopyStatus("");
+      setResubmissionImprovement("");
+      setResubmissionStatus({ loading: false, error: "", success: "" });
     } else if (!form.submissionText && draft?.submissionText) {
       setForm((prev) => ({
         ...prev,
@@ -650,65 +652,70 @@ const AssignmentSubmissionPage = () => {
     }
   };
 
-  // ✅ Resubmission mailto (per selected assignment)
-  const resubmissionRequestBody = useMemo(() => {
-    const subject = `Resubmission request - ${assignmentInfo} - ${studentCode || "no-code"}`;
+  const handleResubmit = async () => {
+    setResubmissionStatus({ loading: true, error: "", success: "" });
 
-    const body = `Hello team,
+    const trimmedResubmission = resubmissionText.trim();
+    const trimmedImprovement = resubmissionImprovement.trim();
 
-I would like to resubmit.
+    if (!trimmedResubmission) {
+      setResubmissionStatus({ loading: false, error: "Please add your improved text before resubmitting.", success: "" });
+      return;
+    }
 
-IMPORTANT (please keep these details):
-- Assignment name + day number: ${assignmentInfo}
-- Student code: ${studentCode || "-"}
-- Email: ${user?.email || "-" }
-- Level: ${preferredLevel}
-- Class: ${studentProfile?.className || "-"}
+    if (!trimmedImprovement) {
+      setResubmissionStatus({
+        loading: false,
+        error: "Please explain what you improved in this submission.",
+        success: "",
+      });
+      return;
+    }
 
-Please paste your corrected letter/text below (do NOT attach screenshots):
-
---- PASTE YOUR CORRECTED TEXT HERE ---
-`;
-
-    return { subject, body };
-  }, [assignmentInfo, preferredLevel, studentCode, studentProfile?.className, user?.email]);
-
-  const resubmissionMailto = useMemo(() => {
-    const mergedBody = `${resubmissionRequestBody.body.replace(
-      "--- PASTE YOUR CORRECTED TEXT HERE ---",
-      resubmissionText || "--- PASTE YOUR CORRECTED TEXT HERE ---"
-    )}`;
-    return `mailto:learngermanghana@gmail.com?subject=${encodeURIComponent(
-      resubmissionRequestBody.subject
-    )}&body=${encodeURIComponent(mergedBody)}`;
-  }, [resubmissionRequestBody.body, resubmissionRequestBody.subject, resubmissionText]);
-
-  const handleCopyResubmission = async () => {
-    setResubmissionCopyStatus("");
-    const mergedBody = `${resubmissionRequestBody.body.replace(
-      "--- PASTE YOUR CORRECTED TEXT HERE ---",
-      resubmissionText || "--- PASTE YOUR CORRECTED TEXT HERE ---"
-    )}`;
+    if (!db || !user?.uid || !isSelectedLocked) {
+      setResubmissionStatus({
+        loading: false,
+        error: "Resubmission is only available after your first submission is locked.",
+        success: "",
+      });
+      return;
+    }
 
     try {
-      if (navigator?.clipboard?.writeText) {
-        await navigator.clipboard.writeText(mergedBody);
-      } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = mergedBody;
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
-      }
-      setResubmissionCopyStatus("Copied ✅");
-      setTimeout(() => setResubmissionCopyStatus(""), 1500);
-    } catch (err) {
-      console.error("Copy failed", err);
-      setResubmissionCopyStatus("Copy failed");
-      setTimeout(() => setResubmissionCopyStatus(""), 2000);
+      const payload = {
+        title: form.assignmentTitle,
+        assignmentTitle: form.assignmentTitle,
+        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+        chapter: deriveChapterValue(form.assignmentTitle),
+        chapterKey: buildChapterKey(form.assignmentTitle),
+        studentId: user.uid,
+        studentEmail: user?.email || "",
+        studentCode,
+        studentName: studentProfile?.name || "",
+        className: studentProfile?.className || "",
+        submissionText: trimmedResubmission,
+        improvementSummary: trimmedImprovement,
+        previousSubmissionText: selectedPreview?.submissionText || "",
+        originalSubmittedAt: selectedLockInfo?.lockedAt || selectedPreview?.createdAt || null,
+        status: "resubmitted",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      await addDoc(collection(db, SUBMISSION_COLLECTION), payload);
+
+      setResubmissionStatus({ loading: false, error: "", success: "Resubmission sent successfully." });
+      setResubmissionText("");
+      setResubmissionImprovement("");
+
+      const submissionsRef = collection(db, SUBMISSION_COLLECTION);
+      const snapshot = await getDocs(
+        query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
+      );
+      setRecentSubmissions(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+    } catch (error) {
+      console.error("Failed to save resubmission", error);
+      setResubmissionStatus({ loading: false, error: "Could not save your resubmission.", success: "" });
     }
   };
 
@@ -909,7 +916,7 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
         {isSelectedLocked ? (
           <>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              You can request resubmission for <strong>{assignmentInfo}</strong>. Paste your corrected text below so it is ready to send.
+              You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved.
             </p>
 
             <label style={{ ...styles.field, margin: 0 }}>
@@ -922,26 +929,32 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
               />
             </label>
 
+            <label style={{ ...styles.field, margin: 0 }}>
+              <span style={styles.label}>What did you improve in this submission? *</span>
+              <textarea
+                value={resubmissionImprovement}
+                onChange={(event) => setResubmissionImprovement(event.target.value)}
+                style={{ ...styles.textArea, minHeight: 120 }}
+                placeholder="Example: I corrected word order in Nebensätze and fixed article endings."
+              />
+            </label>
+
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               <button
                 type="button"
-                style={styles.secondaryButton}
-                onClick={handleCopyResubmission}
+                style={styles.primaryButton}
+                onClick={handleResubmit}
+                disabled={resubmissionStatus.loading}
               >
-                Copy resubmission request
+                {resubmissionStatus.loading ? "Saving ..." : "Submit resubmission"}
               </button>
-              <a href={resubmissionMailto} style={styles.primaryButton}>
-                Open email with resubmission details
-              </a>
-              {resubmissionCopyStatus ? (
-                <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
-                  {resubmissionCopyStatus}
-                </span>
-              ) : null}
             </div>
 
+            {resubmissionStatus.error ? <InfoBox tone="error">{resubmissionStatus.error}</InfoBox> : null}
+            {resubmissionStatus.success ? <InfoBox tone="success">{resubmissionStatus.success}</InfoBox> : null}
+
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Tip: Do not send screenshots. Paste the corrected letter/text so we can review quickly.
+              Tip: describe concrete changes so we can confirm this is improved work.
             </p>
           </>
         ) : (
@@ -963,32 +976,55 @@ Please paste your corrected letter/text below (do NOT attach screenshots):
         ) : null}
 
         <div style={{ display: "grid", gap: 8 }}>
-          {recentSubmissions.map((entry) => (
-            <div
-              key={entry.id}
-              style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: 10,
-                padding: 10,
-                background: "#f9fafb",
-                display: "grid",
-                gap: 4,
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                <strong>{entry.assignmentTitle || entry.title || "Submission"}</strong>
-                <span style={styles.levelPill}>{entry.level || preferredLevel}</span>
-              </div>
-              <div style={{ ...styles.helperText, margin: 0 }}>Class: {entry.className || "–"}</div>
-              <div style={{ ...styles.helperText, margin: 0 }}>Saved: {formatDate(entry.createdAt)}</div>
-              {entry.submissionText ? (
-                <div style={{ ...styles.helperText, margin: 0 }}>
-                  Preview: {String(entry.submissionText).slice(0, 110)}
-                  {String(entry.submissionText).length > 110 ? "..." : ""}
+          {recentSubmissions.map((entry) => {
+            const isResubmitted = safeLower(entry.status) === "resubmitted";
+            const statusLabel = isResubmitted ? "Resubmitted" : "Submitted";
+            const statusBadgeStyle = isResubmitted
+              ? { background: "#ede9fe", borderColor: "#c4b5fd", color: "#5b21b6" }
+              : { background: "#ecfdf5", borderColor: "#bbf7d0", color: "#065f46" };
+
+            return (
+              <div
+                key={entry.id}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 10,
+                  padding: 10,
+                  background: "#f9fafb",
+                  display: "grid",
+                  gap: 6,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <strong>{entry.assignmentTitle || entry.title || "Submission"}</strong>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                    <span style={{ ...styles.badge, ...statusBadgeStyle }}>{statusLabel}</span>
+                    <span style={styles.levelPill}>{entry.level || preferredLevel}</span>
+                  </div>
                 </div>
-              ) : null}
-            </div>
-          ))}
+
+                <div style={{ ...styles.helperText, margin: 0 }}>Class: {entry.className || "–"}</div>
+                <div style={{ ...styles.helperText, margin: 0 }}>
+                  Timeline: {isResubmitted ? "Resubmitted" : "Submitted"} on {formatDate(entry.createdAt)}
+                  {isResubmitted && entry.originalSubmittedAt ? ` · Original submitted ${formatDate(entry.originalSubmittedAt)}` : ""}
+                </div>
+
+                {entry.improvementSummary ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>
+                    Improvement summary: {String(entry.improvementSummary).slice(0, 180)}
+                    {String(entry.improvementSummary).length > 180 ? "..." : ""}
+                  </div>
+                ) : null}
+
+                {entry.submissionText ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>
+                    Preview: {String(entry.submissionText).slice(0, 110)}
+                    {String(entry.submissionText).length > 110 ? "..." : ""}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
