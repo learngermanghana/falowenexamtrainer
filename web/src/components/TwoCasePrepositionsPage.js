@@ -138,6 +138,10 @@ const matchOptions = [
 
 const articleTables = [
   {
+    title: "Original noun articles (Nominative)",
+    rows: [{ caseName: "Nominative", masculine: "der", feminine: "die", neuter: "das", plural: "die" }],
+  },
+  {
     title: "Definite articles (bestimmter Artikel)",
     rows: [
       { caseName: "Accusative", masculine: "den", feminine: "die", neuter: "das", plural: "die" },
@@ -151,6 +155,17 @@ const articleTables = [
       { caseName: "Dative", masculine: "einem", feminine: "einer", neuter: "einem", plural: "—" },
     ],
   },
+];
+
+const vocabularyPlaces = [
+  "die Apotheke (the pharmacy)",
+  "die Buchhandlung (the bookstore)",
+  "das Kino (the cinema)",
+  "das Museum (the museum)",
+  "die Schule (the school)",
+  "das Theater (the theater)",
+  "der Supermarkt (the supermarket)",
+  "der Zirkus (the circus)",
 ];
 
 const quickRuleExamples = [
@@ -204,6 +219,15 @@ const TwoCasePrepositionsPage = () => {
           In German, prepositions belong to their own “families” just like verbs. The preposition you choose can change
           the case of the noun that follows.
         </p>
+        <p style={{ margin: 0 }}>
+          Before we focus on prepositions, remember that some common verbs already create a sentence with a nominative
+          subject and an accusative object (for example: <em>Ich sehe den Mann</em>, <em>Sie kauft das Buch</em>,
+          <em> Wir lernen die Sprache</em>). We are not adding dative verbs yet.
+        </p>
+        <p style={{ margin: 0 }}>
+          Then with prepositions, German has three groups: accusative prepositions, dative prepositions, and two-case
+          prepositions. For now, we focus only on two-case prepositions (Wechselpräpositionen).
+        </p>
       </div>
 
       <Section title="1) What are Wechselpräpositionen?">
@@ -229,6 +253,7 @@ const TwoCasePrepositionsPage = () => {
       <Section title="2) Accusative vs Dative (quick rule)">
         <BulletList
           items={[
+            "Start by identifying the noun's original article in nominative (der, die, das, die).",
             "Accusative (den, die, das, die): movement or change of location.",
             "Dative (dem, der, dem, den): no movement, static location.",
             "Example: Ich gehe in die Schule. (accusative)",
@@ -294,7 +319,12 @@ const TwoCasePrepositionsPage = () => {
         </div>
       </Section>
 
-      <Section title='4) Assignment: Answer "Wo bist du?"'>
+      <Section title="4) Vocabulary (before practice)">
+        <p style={{ margin: 0 }}>Learn the following places:</p>
+        <BulletList items={vocabularyPlaces} />
+      </Section>
+
+      <Section title='5) Assignment: Answer "Wo bist du?"'>
         <p style={{ margin: 0 }}>Use static location + dative case.</p>
         <BulletList items={woAnswers} />
         <p style={{ margin: 0 }}>
@@ -302,7 +332,7 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
-      <Section title='5) Assignment: Answer "Wohin gehst du?"'>
+      <Section title='6) Assignment: Answer "Wohin gehst du?"'>
         <p style={{ margin: 0 }}>Use destination + accusative case.</p>
         <BulletList items={wohinAnswers} />
         <p style={{ margin: 0 }}>
@@ -310,7 +340,7 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
-      <Section title="6) Simple game: Place the article correctly">
+      <Section title="7) Simple game: Place the article correctly">
         <p style={{ margin: 0 }}>Choose the best article for each sentence.</p>
         <div style={{ display: "grid", gap: 12 }}>
           {gameQuestions.map((question, index) => {
@@ -355,7 +385,7 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
-      <Section title="7) Puzzle: Ordne den Hinweis der richtigen Präposition zu">
+      <Section title="8) Puzzle: Ordne den Hinweis der richtigen Präposition zu">
         <p style={{ margin: 0 }}>
           Lies den Mini-Hinweis und ordne ihn einem dieser Wörter zu: {matchOptions.join(", ")}.
         </p>
@@ -393,7 +423,7 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
-      <Section title="8) Tips for remembering">
+      <Section title="9) Tips for remembering">
         <BulletList
           items={[
             "If the verb implies movement toward a destination or a change of position, use accusative.",
