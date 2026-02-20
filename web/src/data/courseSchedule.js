@@ -775,7 +775,7 @@ const RAW_COURSE_SCHEDULES = {
           video: "",
           youtube_link: "",
           assignment: true,
-          grammarbook_link: "",
+          grammarbook_link: "https://www.falowen.app/campus/course/a1-12-2-dative-articles-mit-bei-zu",
           workbook_link: "https://drive.google.com/file/d/1xojH7Tgb5LeJj3nzNSATUVppWnJgJLEF/view?usp=sharing",
         },
       ],
