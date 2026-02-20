@@ -318,7 +318,6 @@ const AppShell = ({
   user,
 }) => {
   const location = useLocation();
-  const shouldShowStudyBuddyBar = location.pathname !== "/campus/course/resource-viewer";
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { i18n, t } = useTranslation();
@@ -513,7 +512,7 @@ const AppShell = ({
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      {shouldShowStudyBuddyBar ? <StudyBuddyBar studentProfile={studentProfile} /> : null}
+      <StudyBuddyBar studentProfile={studentProfile} />
     </div>
   );
 };
