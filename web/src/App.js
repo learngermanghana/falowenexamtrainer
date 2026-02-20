@@ -201,7 +201,6 @@ function App() {
     !Number.isFinite(contractEndMs) && (["paid", "partial"].includes(paymentStatus) || balanceCleared);
   const awaitingPayment =
     Boolean(studentProfile) && !isStaff && !(hasActiveContract || canAccessLegacy || balanceCleared);
-  const shouldShowStudyBuddyBar = location.pathname !== "/campus/course/resource-viewer";
 
   if (!isFirebaseConfigured) {
     return (
@@ -319,6 +318,7 @@ const AppShell = ({
   user,
 }) => {
   const location = useLocation();
+  const shouldShowStudyBuddyBar = location.pathname !== "/campus/course/resource-viewer";
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { i18n, t } = useTranslation();
