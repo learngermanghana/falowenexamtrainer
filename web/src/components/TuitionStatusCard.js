@@ -8,6 +8,7 @@ import { getBackendUrl } from "../services/backendUrl";
 import { formatCurrency } from "../lib/formatters";
 
 const MIN_INSTALLMENT_GHS = 2000;
+const PAYMENT_GRACE_PERIOD_DAYS = 7;
 
 const clampNumber = (value, { min = 0, max = Number.POSITIVE_INFINITY } = {}) => {
   const numeric = Number(value);
@@ -123,6 +124,27 @@ const TuitionStatusCard = ({
     meetsMinimum &&
     Boolean(idToken);
 
+  const paymentGraceNotice = useMemo(() => {
+    const paymentStatus = `${studentProfile?.paymentStatus || ""}`.toLowerCase();
+    if (paymentStatus === "paid") return null;
+
+    const joinedAtRaw = studentProfile?.joined_at;
+    if (!joinedAtRaw) return null;
+
+    const joinedAt = new Date(joinedAtRaw);
+    if (Number.isNaN(joinedAt.getTime())) return null;
+
+    const expiresAt = new Date(joinedAt.getTime() + PAYMENT_GRACE_PERIOD_DAYS * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    const millisecondsLeft = expiresAt.getTime() - now.getTime();
+    const daysLeft = Math.max(Math.ceil(millisecondsLeft / (24 * 60 * 60 * 1000)), 0);
+
+    return {
+      daysLeft,
+      isExpired: millisecondsLeft <= 0,
+    };
+  }, [studentProfile?.joined_at, studentProfile?.paymentStatus]);
+
   const startPayment = async () => {
     setPaymentError("");
 
@@ -203,6 +225,27 @@ const TuitionStatusCard = ({
 
       {paymentsEnabled && showPaymentAction ? (
         <div style={{ marginTop: 12 }}>
+          {paymentGraceNotice ? (
+            <div
+              style={{
+                ...styles.errorBox,
+                background: "#fff7ed",
+                borderColor: "#fdba74",
+                color: "#9a3412",
+                marginBottom: 10,
+              }}
+            >
+              <strong>
+                {paymentGraceNotice.isExpired
+                  ? "Payment grace period ended."
+                  : `Payment window: ${paymentGraceNotice.daysLeft} day${paymentGraceNotice.daysLeft === 1 ? "" : "s"} left.`}
+              </strong>
+              <p style={{ ...styles.helperText, margin: "4px 0 0", color: "#9a3412" }}>
+                Please make payment within 7 days of signup. If no payment is made, your student data will be deleted after 7 days.
+              </p>
+            </div>
+          ) : null}
+
           <p style={{ ...styles.helperText, margin: "0 0 8px", color: "#334155" }}>
             {t("payments.notice.nonRefundable")}
             {" "}
