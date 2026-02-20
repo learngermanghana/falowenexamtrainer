@@ -23,6 +23,11 @@ const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
 const RESUBMISSION_COLLECTION = "submissionResubmissions";
+const MIN_SUBMISSION_CHARACTERS = 80;
+const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
+const ACTION_COOLDOWN_MS = 45 * 1000;
+const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
+const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
 
 const formatDate = (timestamp) => {
   if (!timestamp) return "–";
@@ -51,6 +56,19 @@ const normalizeIdPart = (value) =>
     .slice(0, 120);
 
 const safeLower = (v) => String(v || "").toLowerCase();
+
+const toDateValue = (timestamp) => {
+  if (!timestamp) return null;
+  if (typeof timestamp?.toDate === "function") return timestamp.toDate();
+  if (timestamp?.seconds) return new Date(timestamp.seconds * 1000);
+
+  const fallback = new Date(timestamp);
+  return Number.isNaN(fallback.getTime()) ? null : fallback;
+};
+
+const getBaseMaxByLevel = (level) => BASE_MAX_BY_LEVEL[level] || 4200;
+
+const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
 
 const AssignmentSubmissionPage = () => {
   const { user, studentProfile } = useAuth();
@@ -517,8 +535,43 @@ const AssignmentSubmissionPage = () => {
     });
   }, [assignmentOptions, buildChapterKey, lockedChapters]);
 
+
+  const dynamicMaxSubmissionCharacters = useMemo(() => {
+    const baseLimit = getBaseMaxByLevel(preferredLevel);
+    const previousLength = (selectedPreview?.submissionText || "").trim().length;
+    const expectedLimit = previousLength > 0 ? Math.ceil(previousLength * 1.6) : baseLimit;
+    const bounded = Math.min(ABSOLUTE_MAX_SUBMISSION_CHARACTERS, Math.max(baseLimit, expectedLimit));
+    return Math.max(MIN_SUBMISSION_CHARACTERS + 200, bounded);
+  }, [preferredLevel, selectedPreview?.submissionText]);
+
   const selectedDraft = useMemo(() => draftsByAssignment[form.assignmentTitle], [draftsByAssignment, form.assignmentTitle]);
   const hasDraftForSelection = Boolean(selectedDraft?.submissionText);
+
+  const latestSubmissionActionAt = useMemo(() => {
+    const latest = recentSubmissions.reduce((acc, item) => {
+      const statusLabel = safeLower(item?.status);
+      if (!["submitted", "resubmitted"].includes(statusLabel)) return acc;
+
+      const itemDate = toDateValue(item.createdAt || item.updatedAt);
+      if (!itemDate) return acc;
+      if (!acc || itemDate > acc) return itemDate;
+      return acc;
+    }, null);
+
+    return latest;
+  }, [recentSubmissions]);
+
+  const submissionCooldownRemainingMs = useMemo(() => {
+    if (!latestSubmissionActionAt) return 0;
+    const elapsed = Date.now() - latestSubmissionActionAt.getTime();
+    return Math.max(0, ACTION_COOLDOWN_MS - elapsed);
+  }, [latestSubmissionActionAt]);
+
+  const submissionCooldownLabel = useMemo(() => {
+    if (!submissionCooldownRemainingMs) return "";
+    const secondsRemaining = Math.ceil(submissionCooldownRemainingMs / 1000);
+    return `${secondsRemaining}s`;
+  }, [submissionCooldownRemainingMs]);
 
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
@@ -560,6 +613,24 @@ const AssignmentSubmissionPage = () => {
       return;
     }
 
+    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
+      setStatus({
+        loading: false,
+        error: `Please add a fuller response (${MIN_SUBMISSION_CHARACTERS}+ characters) before submitting.`,
+        success: "",
+      });
+      return;
+    }
+
+    if (form.submissionText.trim().length > dynamicMaxSubmissionCharacters) {
+      setStatus({
+        loading: false,
+        error: `Your response is too long for this task (${formatCharacterCount(dynamicMaxSubmissionCharacters)} characters max for now).`,
+        success: "",
+      });
+      return;
+    }
+
     if (isOrientationDay) {
       setStatus({
         loading: false,
@@ -571,6 +642,15 @@ const AssignmentSubmissionPage = () => {
 
     if (!form.confirmed) {
       setStatus({ loading: false, error: "Please confirm that you are submitting the correct task.", success: "" });
+      return;
+    }
+
+    if (submissionCooldownRemainingMs > 0) {
+      setStatus({
+        loading: false,
+        error: `Please wait ${submissionCooldownLabel} before sending another submission.`,
+        success: "",
+      });
       return;
     }
 
@@ -673,10 +753,46 @@ const AssignmentSubmissionPage = () => {
       return;
     }
 
+    if (trimmedResubmission.length < MIN_SUBMISSION_CHARACTERS) {
+      setResubmissionStatus({
+        loading: false,
+        error: `Please add a fuller corrected text (${MIN_SUBMISSION_CHARACTERS}+ characters).`,
+        success: "",
+      });
+      return;
+    }
+
+    if (trimmedResubmission.length > dynamicMaxSubmissionCharacters) {
+      setResubmissionStatus({
+        loading: false,
+        error: `Your corrected text is too long for this task (${formatCharacterCount(dynamicMaxSubmissionCharacters)} characters max for now).`,
+        success: "",
+      });
+      return;
+    }
+
+    if (trimmedImprovement.length < MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS) {
+      setResubmissionStatus({
+        loading: false,
+        error: `Please give a more specific improvement summary (${MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS}+ characters).`,
+        success: "",
+      });
+      return;
+    }
+
     if (!db || !user?.uid || !isSelectedLocked) {
       setResubmissionStatus({
         loading: false,
         error: "Resubmission is only available after your first submission is locked.",
+        success: "",
+      });
+      return;
+    }
+
+    if (submissionCooldownRemainingMs > 0) {
+      setResubmissionStatus({
+        loading: false,
+        error: `Please wait ${submissionCooldownLabel} before sending another submission.`,
         success: "",
       });
       return;
@@ -808,6 +924,7 @@ const AssignmentSubmissionPage = () => {
               <textarea
                 value={form.submissionText}
                 onChange={handleChange("submissionText")}
+                maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 200 }}
                 placeholder={
                   isSelectedLocked
@@ -816,6 +933,9 @@ const AssignmentSubmissionPage = () => {
                 }
                 disabled={isSelectedLocked}
               />
+              <span style={styles.helperText}>
+                Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
+              </span>
             </label>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
               <span style={styles.helperText}>
@@ -854,7 +974,7 @@ const AssignmentSubmissionPage = () => {
             <button
               type="submit"
               style={styles.primaryButton}
-              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay}
+              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay || submissionCooldownRemainingMs > 0}
             >
               {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>
@@ -868,6 +988,11 @@ const AssignmentSubmissionPage = () => {
             {isOrientationDay ? (
               <span style={{ ...styles.helperText, color: "#b45309" }}>
                 Orientation Day (Day 0) cannot be submitted.
+              </span>
+            ) : null}
+            {submissionCooldownRemainingMs > 0 ? (
+              <span style={{ ...styles.helperText, color: "#b45309" }}>
+                Anti-spam cooldown: wait {submissionCooldownLabel} before submitting.
               </span>
             ) : null}
           </div>
@@ -926,19 +1051,24 @@ const AssignmentSubmissionPage = () => {
               <textarea
                 value={resubmissionText}
                 onChange={(event) => setResubmissionText(event.target.value)}
+                maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 160 }}
                 placeholder="Paste your corrected letter/text here."
               />
+              <span style={styles.helperText}>
+                Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
+              </span>
             </label>
 
             <label style={{ ...styles.field, margin: 0 }}>
-              <span style={styles.label}>What did you improve in this submission? *</span>
+              <span style={styles.label}>What changed or what objective still needs work? *</span>
               <textarea
                 value={resubmissionImprovement}
                 onChange={(event) => setResubmissionImprovement(event.target.value)}
                 style={{ ...styles.textArea, minHeight: 120 }}
-                placeholder="Example: I corrected word order in Nebensätze and fixed article endings."
+                placeholder="Example: Word order is still wrong in Nebensätze. Please review objective 2 with me."
               />
+              <span style={styles.helperText}>Add at least {MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS} characters.</span>
             </label>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -956,8 +1086,13 @@ const AssignmentSubmissionPage = () => {
             {resubmissionStatus.success ? <InfoBox tone="success">{resubmissionStatus.success}</InfoBox> : null}
 
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Tip: describe concrete changes so we can confirm this is improved work.
+              Tip: if your text is mostly the same, explain clearly which objective you still need help with.
             </p>
+            {submissionCooldownRemainingMs > 0 ? (
+              <p style={{ ...styles.helperText, margin: 0, color: "#b45309" }}>
+                Anti-spam cooldown active: wait {submissionCooldownLabel} before submitting again.
+              </p>
+            ) : null}
           </>
         ) : (
           <p style={{ ...styles.helperText, margin: 0 }}>
