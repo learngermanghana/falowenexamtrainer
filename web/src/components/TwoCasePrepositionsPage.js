@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -17,207 +17,28 @@ const BulletList = ({ items }) => (
   </ul>
 );
 
-const woAnswers = [
-  "Ich bin in der Apotheke.",
-  "Ich bin in der Buchhandlung.",
-  "Ich bin im Kino.",
-  "Ich bin im Museum.",
-  "Ich bin in der Schule.",
-  "Ich bin im Theater.",
-  "Ich bin im Supermarkt.",
-  "Ich bin im Zirkus.",
+const examplePairs = [
+  ["in", "Ich gehe in die Schule.", "Ich bin in der Schule."],
+  ["auf", "Er legt das Buch auf den Tisch.", "Das Buch liegt auf dem Tisch."],
+  ["an", "Sie hängt das Bild an die Wand.", "Das Bild hängt an der Wand."],
+  ["unter", "Der Hund läuft unter den Tisch.", "Der Hund liegt unter dem Tisch."],
+  ["zwischen", "Ich stelle den Stuhl zwischen die Tische.", "Der Stuhl steht zwischen den Tischen."],
 ];
 
-const wohinAnswers = [
-  "Ich gehe in die Apotheke.",
-  "Ich gehe in die Buchhandlung.",
-  "Ich gehe ins Kino.",
-  "Ich gehe ins Museum.",
-  "Ich gehe in die Schule.",
-  "Ich gehe ins Theater.",
-  "Ich gehe in den Supermarkt.",
-  "Ich gehe in den Zirkus.",
+const visualGameItems = [
+  "Die Katze ist ______ dem Tisch.",
+  "Die Katze ist ______ dem Tisch.",
+  "Die Schule ist ______ der Bank und der Bibliothek.",
+  "Ich lege die Tasche ______ den Tisch.",
+  "Der Junge steht ______ dem Baum.",
+  "Das Auto steht ______ dem Haus.",
+  "Die Lampe hängt ______ der Tür.",
+  "Der Hund sitzt ______ dem Sofa.",
+  "Die Kiste ist ______ dem Tisch.",
 ];
-
-const gameQuestions = [
-  {
-    sentence: "Ich gehe in ___ Schule.",
-    correct: "die",
-    hint: "Movement to a destination: accusative.",
-  },
-  {
-    sentence: "Ich bin in ___ Schule.",
-    correct: "der",
-    hint: "Static location: dative.",
-  },
-  {
-    sentence: "Das Buch liegt auf ___ Tisch.",
-    correct: "dem",
-    hint: "No movement: dative.",
-  },
-  {
-    sentence: "Er legt das Buch auf ___ Tisch.",
-    correct: "den",
-    hint: "Change of location: accusative.",
-  },
-];
-
-const articleOptions = ["den", "die", "das", "dem", "der"];
-
-const fullExamples = [
-  {
-    preposition: "an",
-    accusative: "Ich hänge das Bild an die Wand. (I am hanging the picture on the wall.)",
-    dative: "Das Bild hängt an der Wand. (The picture is hanging on the wall.)",
-  },
-  {
-    preposition: "auf",
-    accusative: "Ich stelle die Vase auf den Tisch. (I am placing the vase on the table.)",
-    dative: "Die Vase steht auf dem Tisch. (The vase is on the table.)",
-  },
-  {
-    preposition: "hinter",
-    accusative: "Er geht hinter das Haus. (He is going behind the house.)",
-    dative: "Er ist hinter dem Haus. (He is behind the house.)",
-  },
-  {
-    preposition: "in",
-    accusative: "Sie geht in die Stadt. (She is going into the city.)",
-    dative: "Sie ist in der Stadt. (She is in the city.)",
-  },
-  {
-    preposition: "neben",
-    accusative: "Stell den Stuhl neben die Tür. (Place the chair next to the door.)",
-    dative: "Der Stuhl steht neben der Tür. (The chair is next to the door.)",
-  },
-  {
-    preposition: "über",
-    accusative: "Der Vogel fliegt über das Haus. (The bird is flying over the house.)",
-    dative: "Die Lampe hängt über dem Tisch. (The lamp is hanging over the table.)",
-  },
-  {
-    preposition: "unter",
-    accusative: "Die Katze läuft unter den Tisch. (The cat runs under the table.)",
-    dative: "Die Katze schläft unter dem Tisch. (The cat is sleeping under the table.)",
-  },
-  {
-    preposition: "vor",
-    accusative: "Ich stelle das Auto vor das Haus. (I am parking the car in front of the house.)",
-    dative: "Das Auto steht vor dem Haus. (The car is in front of the house.)",
-  },
-  {
-    preposition: "zwischen",
-    accusative: "Er legt das Buch zwischen die anderen Bücher. (He is placing the book between the other books.)",
-    dative: "Das Buch ist zwischen den anderen Büchern. (The book is between the other books.)",
-  },
-];
-
-const clueMatchingPuzzle = [
-  {
-    sentence: "Eine Lampe ist ____ dem Tisch befestigt.",
-    answer: "über",
-    translation: "over / above",
-    reference: "Static location (Wo?) + position above something.",
-  },
-  {
-    sentence: "Die Katze schläft ____ dem Stuhl.",
-    answer: "unter",
-    translation: "under / below",
-    reference: "Static location (Wo?) + lower position.",
-  },
-  {
-    sentence: "Die Schule ist ____ dem Museum und der Bibliothek.",
-    answer: "zwischen",
-    translation: "between",
-    reference: "Static location between two places.",
-  },
-  {
-    sentence: "Ich lege meine Tasche ____ den Tisch.",
-    answer: "auf",
-    translation: "on / onto",
-    reference: "Movement to a new position (Wohin?) onto the table.",
-  },
-  {
-    sentence: "Das Fahrrad steht ____ dem Haus.",
-    answer: "vor",
-    translation: "in front of",
-    reference: "Static location in front of the house.",
-  },
-  {
-    sentence: "Das Kind steht ____ der Tür.",
-    answer: "an",
-    translation: "at / on",
-    reference: "Static location at/next to a vertical surface.",
-  },
-  {
-    sentence: "Der Hund sitzt ____ dem Sofa.",
-    answer: "neben",
-    translation: "next to",
-    reference: "Static location next to the sofa.",
-  },
-  {
-    sentence: "Sie geht ____ das Klassenzimmer.",
-    answer: "in",
-    translation: "in / into",
-    reference: "Movement into an enclosed place (Wohin?).",
-  },
-  {
-    sentence: "Er versteckt sich ____ dem Baum.",
-    answer: "hinter",
-    translation: "behind",
-    reference: "Static location hidden behind something.",
-  },
-];
-
-
-const articleTables = [
-  {
-    title: "Original noun articles (Nominative)",
-    rows: [{ caseName: "Nominative", masculine: "der", feminine: "die", neuter: "das", plural: "die" }],
-  },
-  {
-    title: "Definite articles (bestimmter Artikel)",
-    rows: [
-      { caseName: "Accusative", masculine: "den", feminine: "die", neuter: "das", plural: "die" },
-      { caseName: "Dative", masculine: "dem", feminine: "der", neuter: "dem", plural: "den" },
-    ],
-  },
-  {
-    title: "Indefinite articles (unbestimmter Artikel)",
-    rows: [
-      { caseName: "Accusative", masculine: "einen", feminine: "eine", neuter: "ein", plural: "—" },
-      { caseName: "Dative", masculine: "einem", feminine: "einer", neuter: "einem", plural: "—" },
-    ],
-  },
-];
-
-const vocabularyPlaces = [
-  "die Apotheke (the pharmacy)",
-  "die Buchhandlung (the bookstore)",
-  "das Kino (the cinema)",
-  "das Museum (the museum)",
-  "die Schule (the school)",
-  "das Theater (the theater)",
-  "der Supermarkt (the supermarket)",
-  "der Zirkus (the circus)",
-];
-
 
 const TwoCasePrepositionsPage = () => {
   const navigate = useNavigate();
-  const [answers, setAnswers] = useState({});
-
-  const score = useMemo(
-    () =>
-      gameQuestions.reduce((total, question, index) => {
-        if (answers[index] === question.correct) {
-          return total + 1;
-        }
-        return total;
-      }, 0),
-    [answers]
-  );
-
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -226,26 +47,20 @@ const TwoCasePrepositionsPage = () => {
           Back to Course
         </button>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Day 18: Two-Case Prepositions (Wechselpräpositionen)</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          In German, prepositions belong to their own “families” just like verbs. The preposition you choose can change
-          the case of the noun that follows.
+        <p style={{ margin: 0 }}>
+          In German, some prepositions can take two different cases. They are called <em>Wechselpräpositionen</em>
+          (two-case prepositions).
+        </p>
+        <p style={{ margin: 0 }}>The case depends on meaning:</p>
+        <p style={{ margin: 0 }}>
+          <strong>Movement → Accusative (Wohin?)</strong>
         </p>
         <p style={{ margin: 0 }}>
-          Before we focus on prepositions, remember that some common verbs already create a sentence with a nominative
-          subject and an accusative object (for example: <em>Ich sehe den Mann</em>, <em>Sie kauft das Buch</em>,
-          <em> Wir lernen die Sprache</em>). We are not adding dative verbs yet.
-        </p>
-        <p style={{ margin: 0 }}>
-          Then with prepositions, German has three groups: accusative prepositions, dative prepositions, and two-case
-          prepositions. For now, we focus only on two-case prepositions (Wechselpräpositionen).
+          <strong>Position → Dative (Wo?)</strong>
         </p>
       </div>
 
-      <Section title="1) What are Wechselpräpositionen?">
-        <p style={{ margin: 0 }}>
-          Wechselpräpositionen can take either the accusative or the dative case. Use accusative when there is movement
-          to a new location (Wohin?), and dative for a static position (Wo?).
-        </p>
+      <Section title="1) The 9 Wechselpräpositionen">
         <BulletList
           items={[
             "an (on, at)",
@@ -254,234 +69,92 @@ const TwoCasePrepositionsPage = () => {
             "in (in, into)",
             "neben (next to)",
             "über (over, above)",
-            "unter (under, below)",
+            "unter (under)",
             "vor (in front of)",
             "zwischen (between)",
           ]}
         />
       </Section>
 
-      <Section title="2) Accusative vs Dative (quick rule)">
-        <BulletList
-          items={[
-            "Start by identifying the noun's original article in nominative (der, die, das, die).",
-            "Accusative (den, die, das, die): movement or change of location.",
-            "Dative (dem, der, dem, den): no movement, static location.",
-            "Example: Ich gehe in die Schule. (accusative)",
-            "Example: Ich bin in der Schule. (dative)",
-          ]}
-        />
-        <div style={{ display: "grid", gap: 12 }}>
-          {articleTables.map((table) => (
-            <div key={table.title} style={{ display: "grid", gap: 8 }}>
-              <strong>{table.title}</strong>
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
-                  <thead>
-                    <tr>
-                      {["Case", "Masculine", "Feminine", "Neuter", "Plural"].map((header) => (
-                        <th
-                          key={`${table.title}-${header}`}
-                          style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {table.rows.map((row) => (
-                      <tr key={`${table.title}-${row.caseName}`}>
-                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.caseName}</td>
-                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.masculine}</td>
-                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.feminine}</td>
-                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.neuter}</td>
-                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.plural}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
-        </div>
+      <Section title="2) The Golden Rule">
+        <p style={{ margin: 0 }}>🔵 ACCUSATIVE → Movement (Wohin?)</p>
+        <p style={{ margin: 0 }}>Use accusative when something moves to a new location.</p>
+        <p style={{ margin: 0 }}>🟢 DATIVE → Position (Wo?)</p>
+        <p style={{ margin: 0 }}>Use dative when something is already in a position.</p>
       </Section>
 
-      <Section title="3) Full examples for all Wechselpräpositionen">
-        <p style={{ margin: 0 }}>
-          Accusative is used for movement/change (Wohin?), and dative for static location (Wo?).
-        </p>
-        <div style={{ display: "grid", gap: 10 }}>
-          {fullExamples.map((item) => (
-            <div key={item.preposition} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
-              <strong style={{ textTransform: "capitalize" }}>{item.preposition}</strong>
-              <p style={{ margin: "8px 0 0" }}>
-                <strong>Accusative:</strong> {item.accusative}
-              </p>
-              <p style={{ margin: "6px 0 0" }}>
-                <strong>Dative:</strong> {item.dative}
-              </p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="4) Vocabulary (before practice)">
-        <p style={{ margin: 0 }}>Learn the following places:</p>
-        <BulletList items={vocabularyPlaces} />
-      </Section>
-
-      <Section title='5) Assignment: Answer "Wo bist du?"'>
-        <p style={{ margin: 0 }}>Use static location + dative case.</p>
-        <BulletList items={woAnswers} />
-        <p style={{ margin: 0 }}>
-          Short note: <strong>im = in dem</strong>.
-        </p>
-      </Section>
-
-      <Section title='6) Assignment: Answer "Wohin gehst du?"'>
-        <p style={{ margin: 0 }}>Use destination + accusative case.</p>
-        <BulletList items={wohinAnswers} />
-        <p style={{ margin: 0 }}>
-          Short note: <strong>ins = in das</strong> and <strong>am = an dem</strong>.
-        </p>
-      </Section>
-
-      <Section title="6) Simple game: Place the article correctly">
-        <p style={{ margin: 0 }}>Choose the best article for each sentence.</p>
-        <div style={{ display: "grid", gap: 12 }}>
-          {gameQuestions.map((question, index) => {
-            const selected = answers[index];
-            const isCorrect = selected && selected === question.correct;
-            const isWrong = selected && selected !== question.correct;
-            return (
-              <div
-                key={question.sentence}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 12,
-                  display: "grid",
-                  gap: 8,
-                }}
-              >
-                <strong>{question.sentence}</strong>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {articleOptions.map((option) => (
-                    <button
-                      key={`${question.sentence}-${option}`}
-                      onClick={() => setAnswers((prev) => ({ ...prev, [index]: option }))}
-                      style={{
-                        ...styles.secondaryButton,
-                        minWidth: 70,
-                        background: selected === option ? "#dbeafe" : styles.secondaryButton.background,
-                      }}
-                    >
-                      {option}
-                    </button>
-                  ))}
-                </div>
-                {isCorrect && <span style={{ color: "#166534" }}>Correct ✅ {question.hint}</span>}
-                {isWrong && <span style={{ color: "#b91c1c" }}>Try again. Hint: {question.hint}</span>}
-              </div>
-            );
-          })}
-        </div>
-        <p style={{ margin: 0 }}>
-          Score: {score}/{gameQuestions.length}
-        </p>
-      </Section>
-
-
-
-      <Section title="7) Match German prepositions with English translations">
-        <p style={{ margin: 0 }}><strong>Learn Language Education. All rights reserved</strong></p>
-        <p style={{ margin: 0 }}>Practice: Two-Way Prepositions (Wechselpräpositionen)</p>
-        <p style={{ margin: 0 }}><strong>Introduction</strong></p>
-        <p style={{ margin: 0 }}>
-          Two-way prepositions in German can govern either the accusative or the dative case, depending on the context.
-          Use the accusative case when there is a movement or direction involved and the dative case when there is no
-          movement, indicating a position.
-        </p>
-        <p style={{ margin: 0 }}><strong>Match each German preposition to its English translation:</strong></p>
+      <Section title="3) Article Overview">
         <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
             <thead>
               <tr>
-                <th style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}>German</th>
-                <th style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}>English translation</th>
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["an", "on, at"],
-                ["auf", "on, upon"],
-                ["hinter", "behind"],
-                ["in", "in, into"],
-                ["neben", "next to"],
-                ["über", "over, above"],
-                ["unter", "under"],
-                ["vor", "in front of"],
-                ["zwischen", "between"],
-              ].map(([german, english]) => (
-                <tr key={german}>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{german}</td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{english}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Section>
-
-      <Section title="8) Tips for remembering">
-        <BulletList
-          items={[
-            "If the verb implies movement toward a destination or a change of position, use accusative.",
-            "If the verb implies no movement and the location is static, use dative.",
-          ]}
-        />
-      </Section>
-
-      <Section title="9) Reference key for clue-matching puzzle">
-        <p style={{ margin: 0 }}>
-          If learners score <strong>0/9</strong>, they usually need a clearer clue-to-preposition reference. The answer
-          must be the <strong>German preposition</strong> (for example <em>über</em>, not English <em>above</em>).
-          Use this key to check each sentence and understand <em>why</em> the preposition fits.
-        </p>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 560 }}>
-            <thead>
-              <tr>
-                {[
-                  "Sentence",
-                  "Correct preposition (German)",
-                  "English meaning",
-                  "Reference clue",
-                ].map((header) => (
-                  <th
-                    key={`clue-match-${header}`}
-                    style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}
-                  >
+                {["Case", "Masculine", "Feminine", "Neuter", "Plural"].map((header) => (
+                  <th key={header} style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}>
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {clueMatchingPuzzle.map((item) => (
-                <tr key={item.sentence}>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{item.sentence}</td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>
-                    <strong>{item.answer}</strong>
-                  </td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{item.translation}</td>
-                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{item.reference}</td>
+              {[
+                ["Accusative (def.)", "den", "die", "das", "die"],
+                ["Accusative (indef.)", "einen", "eine", "ein", "—"],
+                ["Dative (def.)", "dem", "der", "dem", "den (+n)"],
+                ["Dative (indef.)", "einem", "einer", "einem", "—"],
+              ].map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell) => (
+                    <td key={`${row[0]}-${cell}`} style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>
+                      {cell}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      </Section>
+
+      <Section title="4) Clear Example Pairs (Movement vs Position)">
+        <div style={{ display: "grid", gap: 10 }}>
+          {examplePairs.map(([preposition, movement, position]) => (
+            <div key={preposition} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+              <strong>🔹 {preposition}</strong>
+              <p style={{ margin: "8px 0 0" }}>{movement} (movement)</p>
+              <p style={{ margin: "6px 0 0" }}>{position} (position)</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="5) Short Forms (Important!)">
+        <BulletList items={["im = in dem", "ins = in das", "am = an dem", "ans = an das"]} />
+      </Section>
+
+      <Section title="6) Practice A – Wo oder Wohin?">
+        <p style={{ margin: 0 }}>Fill in the correct article.</p>
+        <BulletList
+          items={[
+            "Ich gehe in ___ Park.",
+            "Ich bin im ___ Park.",
+            "Er legt das Handy auf ___ Tisch.",
+            "Das Handy liegt auf ___ Tisch.",
+            "Wir setzen uns neben ___ Lehrer.",
+            "Wir sitzen neben ___ Lehrer.",
+          ]}
+        />
+      </Section>
+
+      <Section title="7) Visual Position Game">
+        <p style={{ margin: 0 }}>🧩 Welche Präposition ist das?</p>
+        <p style={{ margin: 0 }}>
+          Look at the drawing and choose the correct preposition: an – auf – hinter – in – neben – über – unter – vor – zwischen
+        </p>
+        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          {visualGameItems.map((sentence, index) => (
+            <li key={`${index}-${sentence}`}>{sentence}</li>
+          ))}
+        </ol>
       </Section>
     </div>
   );
