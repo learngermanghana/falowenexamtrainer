@@ -131,6 +131,23 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </header>
 
+      <Section title="0) Start Here: How prepositions change a sentence in German">
+        <p style={{ margin: 0 }}>
+          You already know <strong>Nominative</strong> and <strong>Akkusative</strong>. Now learn this: a <strong>preposition</strong>
+          can change the article/case in your sentence.
+        </p>
+        <p style={{ margin: 0 }}>
+          Today we focus on <strong>two-case prepositions</strong>. Here, the <strong>verb + meaning</strong> decide the case:
+        </p>
+        <BulletList
+          items={[
+            "Movement to a place (Wohin?) → Akkusative.",
+            "Position in a place (Wo?) → Dative.",
+            "Same preposition, different meaning: Ich gehe in die Schule. / Ich bin in der Schule.",
+          ]}
+        />
+      </Section>
+
       <Section title="1) The 9 Wechselpräpositionen">
         <BulletList
           items={[
