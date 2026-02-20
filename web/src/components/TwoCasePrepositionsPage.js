@@ -213,6 +213,8 @@ const TwoCasePrepositionsPage = () => {
           For two-case prepositions, the <strong>verb + meaning</strong> decide the case: movement (Wohin?) → Akkusative,
           position (Wo?) → Dative.
         </p>
+      </Section>
+
       <Section title="0) Start Here: How prepositions change a sentence in German">
         <p style={{ margin: 0 }}>
           You already know <strong>Nominative</strong> and <strong>Akkusative</strong>. Now learn this: a <strong>preposition</strong>
