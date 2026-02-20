@@ -756,6 +756,10 @@ const RAW_COURSE_SCHEDULES = {
       goal: "Learn about German professions and how to use two-way prepositions",
       instruction:
         "Do assignments for 12.1 and 12.2 and use the schreiben and sprechen below for practicals for full understanding",
+      instructionLink: {
+        label: "Open Day 18 guide: Two-Case Prepositions (Wechselpräpositionen)",
+        to: "/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
+      },
       grammar_topic: "Two Case Preposition",
       lesen_hören: [
         {
@@ -763,7 +767,7 @@ const RAW_COURSE_SCHEDULES = {
           video: "https://youtu.be/-vTEvx9a8Ts",
           youtube_link: "https://youtu.be/-vTEvx9a8Ts",
           assignment: true,
-          grammarbook_link: "https://drive.google.com/file/d/1wdWYVxBhu4QtRoETDpDww-LjjzsGDYva/view?usp=sharing",
+          grammarbook_link: "https://www.falowen.app/campus/course/two-case-prepositions-wechselpraepositionen-day-18",
           workbook_link: "https://drive.google.com/file/d/1A0NkFl1AG68jHeqSytI3ygJ0k7H74AEX/view?usp=sharing",
         },
         {
@@ -771,7 +775,7 @@ const RAW_COURSE_SCHEDULES = {
           video: "",
           youtube_link: "",
           assignment: true,
-          grammarbook_link: "",
+          grammarbook_link: "https://www.falowen.app/campus/course/dative-prepositions-mit-bei-zu-12-2",
           workbook_link: "https://drive.google.com/file/d/1xojH7Tgb5LeJj3nzNSATUVppWnJgJLEF/view?usp=sharing",
         },
       ],
