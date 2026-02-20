@@ -23,6 +23,7 @@ import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import DirectionsImperativePage from "./components/DirectionsImperativePage";
+import TwoCasePrepositionsPage from "./components/TwoCasePrepositionsPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -491,6 +492,10 @@ const AppShell = ({
           />
           <Route path="/campus/course/verboten-erlaubt-5-9" element={<VerbotenErlaubtPage />} />
           <Route path="/campus/course/directions-imperative-11" element={<DirectionsImperativePage />} />
+          <Route
+            path="/campus/course/two-case-prepositions-wechselpraepositionen-day-18"
+            element={<TwoCasePrepositionsPage />}
+          />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
