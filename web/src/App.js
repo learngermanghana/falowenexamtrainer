@@ -24,6 +24,7 @@ import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage"
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import DirectionsImperativePage from "./components/DirectionsImperativePage";
 import TwoCasePrepositionsPage from "./components/TwoCasePrepositionsPage";
+import DativeArticlesMitBeiZuPage from "./components/DativeArticlesMitBeiZuPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -495,6 +496,10 @@ const AppShell = ({
           <Route
             path="/campus/course/two-case-prepositions-wechselpraepositionen-day-18"
             element={<TwoCasePrepositionsPage />}
+          />
+          <Route
+            path="/campus/course/a1-12-2-dative-articles-mit-bei-zu"
+            element={<DativeArticlesMitBeiZuPage />}
           />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
