@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -18,27 +18,63 @@ const BulletList = ({ items }) => (
 );
 
 const examplePairs = [
-  ["in", "Ich gehe in die Schule.", "Ich bin in der Schule."],
-  ["auf", "Er legt das Buch auf den Tisch.", "Das Buch liegt auf dem Tisch."],
-  ["an", "Sie hängt das Bild an die Wand.", "Das Bild hängt an der Wand."],
-  ["unter", "Der Hund läuft unter den Tisch.", "Der Hund liegt unter dem Tisch."],
-  ["zwischen", "Ich stelle den Stuhl zwischen die Tische.", "Der Stuhl steht zwischen den Tischen."],
+  ["an", "Sie hängt das Bild an die Wand. (Akkusativ)", "Das Bild hängt an der Wand. (Dativ)"],
+  ["auf", "Er legt das Buch auf den Tisch. (Akkusativ)", "Das Buch liegt auf dem Tisch. (Dativ)"],
+  ["hinter", "Der Junge läuft hinter das Haus. (Akkusativ)", "Der Junge steht hinter dem Haus. (Dativ)"],
+  ["in", "Ich gehe in die Schule. (Akkusativ)", "Ich bin in der Schule. (Dativ)"],
+  ["neben", "Ich stelle den Stuhl neben den Tisch. (Akkusativ)", "Der Stuhl steht neben dem Tisch. (Dativ)"],
+  ["über", "Der Vogel fliegt über das Haus. (Akkusativ)", "Der Vogel ist über dem Haus. (Dativ)"],
+  ["unter", "Der Hund läuft unter den Tisch. (Akkusativ)", "Der Hund liegt unter dem Tisch. (Dativ)"],
+  ["vor", "Wir gehen vor das Kino. (Akkusativ)", "Wir warten vor dem Kino. (Dativ)"],
+  ["zwischen", "Ich stelle den Stuhl zwischen die Tische. (Akkusativ)", "Der Stuhl steht zwischen den Tischen. (Dativ)"],
 ];
 
 const visualGameItems = [
-  "Die Katze ist ______ dem Tisch.",
-  "Die Katze ist ______ dem Tisch.",
-  "Die Schule ist ______ der Bank und der Bibliothek.",
-  "Ich lege die Tasche ______ den Tisch.",
-  "Der Junge steht ______ dem Baum.",
-  "Das Auto steht ______ dem Haus.",
-  "Die Lampe hängt ______ der Tür.",
-  "Der Hund sitzt ______ dem Sofa.",
-  "Die Kiste ist ______ dem Tisch.",
+  {
+    sentence: "Die Katze ist ______ dem Tisch.",
+    options: ["auf", "unter", "zwischen"],
+  },
+  {
+    sentence: "Die Katze ist ______ dem Tisch.",
+    options: ["vor", "unter", "über"],
+  },
+  {
+    sentence: "Die Schule ist ______ der Bank und der Bibliothek.",
+    options: ["zwischen", "hinter", "vor"],
+  },
+  {
+    sentence: "Ich lege die Tasche ______ den Tisch.",
+    options: ["an", "auf", "unter"],
+  },
+  {
+    sentence: "Der Junge steht ______ dem Baum.",
+    options: ["hinter", "zwischen", "über"],
+  },
+  {
+    sentence: "Das Auto steht ______ dem Haus.",
+    options: ["vor", "an", "in"],
+  },
+  {
+    sentence: "Die Lampe hängt ______ der Tür.",
+    options: ["über", "neben", "unter"],
+  },
+  {
+    sentence: "Der Hund sitzt ______ dem Sofa.",
+    options: ["neben", "in", "an"],
+  },
+  {
+    sentence: "Die Kiste ist ______ dem Tisch.",
+    options: ["unter", "über", "zwischen"],
+  },
 ];
 
 const TwoCasePrepositionsPage = () => {
   const navigate = useNavigate();
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+
+  const handleAnswerSelect = (index, option) => {
+    setSelectedAnswers((previous) => ({ ...previous, [index]: option }));
+  };
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -120,8 +156,8 @@ const TwoCasePrepositionsPage = () => {
           {examplePairs.map(([preposition, movement, position]) => (
             <div key={preposition} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
               <strong>🔹 {preposition}</strong>
-              <p style={{ margin: "8px 0 0" }}>{movement} (movement)</p>
-              <p style={{ margin: "6px 0 0" }}>{position} (position)</p>
+              <p style={{ margin: "8px 0 0" }}>{movement}</p>
+              <p style={{ margin: "6px 0 0" }}>{position}</p>
             </div>
           ))}
         </div>
@@ -147,12 +183,32 @@ const TwoCasePrepositionsPage = () => {
 
       <Section title="7) Visual Position Game">
         <p style={{ margin: 0 }}>🧩 Welche Präposition ist das?</p>
-        <p style={{ margin: 0 }}>
-          Look at the drawing and choose the correct preposition: an – auf – hinter – in – neben – über – unter – vor – zwischen
-        </p>
-        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-          {visualGameItems.map((sentence, index) => (
-            <li key={`${index}-${sentence}`}>{sentence}</li>
+        <p style={{ margin: 0 }}>Choose the correct preposition for each sentence.</p>
+        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 10 }}>
+          {visualGameItems.map(({ sentence, options }, index) => (
+            <li key={`${index}-${sentence}`}>
+              <p style={{ margin: "0 0 6px" }}>{sentence}</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {options.map((option) => {
+                  const isSelected = selectedAnswers[index] === option;
+                  return (
+                    <button
+                      key={`${sentence}-${option}`}
+                      type="button"
+                      onClick={() => handleAnswerSelect(index, option)}
+                      style={{
+                        ...styles.secondaryButton,
+                        padding: "6px 10px",
+                        borderColor: isSelected ? "#2563eb" : undefined,
+                        background: isSelected ? "#dbeafe" : undefined,
+                      }}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
+            </li>
           ))}
         </ol>
       </Section>
