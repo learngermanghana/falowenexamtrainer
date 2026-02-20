@@ -112,29 +112,6 @@ const fullExamples = [
   },
 ];
 
-const matchItems = [
-  { clue: "Eine Lampe ist ____ dem Tisch befestigt.", answer: "über" },
-  { clue: "Die Katze schläft ____ dem Stuhl.", answer: "unter" },
-  { clue: "Die Schule ist ____ dem Museum und der Bibliothek.", answer: "zwischen" },
-  { clue: "Ich lege meine Tasche ____ den Tisch.", answer: "auf" },
-  { clue: "Das Fahrrad steht ____ dem Haus.", answer: "vor" },
-  { clue: "Das Kind steht ____ der Tür.", answer: "an" },
-  { clue: "Der Hund sitzt ____ dem Sofa.", answer: "neben" },
-  { clue: "Sie geht ____ das Klassenzimmer.", answer: "in" },
-  { clue: "Er versteckt sich ____ dem Baum.", answer: "hinter" },
-];
-
-const matchOptions = [
-  "an (an, bei)",
-  "auf (auf, auf ... drauf)",
-  "hinter (hinter)",
-  "in (in, hinein)",
-  "neben (neben)",
-  "über (über)",
-  "unter (unter)",
-  "vor (vor)",
-  "zwischen (zwischen)",
-];
 
 const articleTables = [
   {
@@ -168,23 +145,10 @@ const vocabularyPlaces = [
   "der Zirkus (the circus)",
 ];
 
-const quickRuleExamples = [
-  "Ich gehe in die Schule. → Bewegung (Akkusativ)",
-  "Ich bin in der Schule. → Position (Dativ)",
-  "Er legt das Handy auf den Tisch. → Bewegung (Akkusativ)",
-  "Das Handy liegt auf dem Tisch. → Position (Dativ)",
-  "Wir stellen die Stühle vor das Haus. → Bewegung (Akkusativ)",
-  "Die Stühle stehen vor dem Haus. → Position (Dativ)",
-  "Sie hängt die Jacke an den Haken. → Bewegung (Akkusativ)",
-  "Die Jacke hängt an dem Haken. → Position (Dativ)",
-  "Ich setze mich neben den Lehrer. → Bewegung (Akkusativ)",
-  "Ich sitze neben dem Lehrer. → Position (Dativ)",
-];
 
 const TwoCasePrepositionsPage = () => {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
-  const [matchAnswers, setMatchAnswers] = useState({});
 
   const score = useMemo(
     () =>
@@ -197,16 +161,6 @@ const TwoCasePrepositionsPage = () => {
     [answers]
   );
 
-  const matchScore = useMemo(
-    () =>
-      matchItems.reduce((total, item, index) => {
-        if (matchAnswers[index] === item.answer) {
-          return total + 1;
-        }
-        return total;
-      }, 0),
-    [matchAnswers]
-  );
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -294,10 +248,6 @@ const TwoCasePrepositionsPage = () => {
             </div>
           ))}
         </div>
-        <p style={{ margin: 0 }}>
-          More examples (10):
-        </p>
-        <BulletList items={quickRuleExamples} />
       </Section>
 
       <Section title="3) Full examples for all Wechselpräpositionen">
@@ -340,7 +290,7 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
-      <Section title="7) Simple game: Place the article correctly">
+      <Section title="6) Simple game: Place the article correctly">
         <p style={{ margin: 0 }}>Choose the best article for each sentence.</p>
         <div style={{ display: "grid", gap: 12 }}>
           {gameQuestions.map((question, index) => {
@@ -385,45 +335,49 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
-      <Section title="8) Puzzle: Ordne den Hinweis der richtigen Präposition zu">
+
+
+      <Section title="7) Match German prepositions with English translations">
+        <p style={{ margin: 0 }}><strong>Learn Language Education. All rights reserved</strong></p>
+        <p style={{ margin: 0 }}>Practice: Two-Way Prepositions (Wechselpräpositionen)</p>
+        <p style={{ margin: 0 }}><strong>Introduction</strong></p>
         <p style={{ margin: 0 }}>
-          Lies den Mini-Hinweis und ordne ihn einem dieser Wörter zu: {matchOptions.join(", ")}.
+          Two-way prepositions in German can govern either the accusative or the dative case, depending on the context.
+          Use the accusative case when there is a movement or direction involved and the dative case when there is no
+          movement, indicating a position.
         </p>
-        <div style={{ display: "grid", gap: 12 }}>
-          {matchItems.map((item, index) => {
-            const selected = matchAnswers[index] || "";
-            const isCorrect = selected && selected === item.answer;
-            const isWrong = selected && selected !== item.answer;
-            return (
-              <div key={item.clue} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
-                <strong>{item.clue}</strong>
-                <select
-                  value={selected}
-                  onChange={(event) => setMatchAnswers((prev) => ({ ...prev, [index]: event.target.value }))}
-                  style={{ ...styles.input, maxWidth: 280 }}
-                >
-                  <option value="">Choose...</option>
-                  {matchOptions.map((option) => {
-                    const value = option.split(" ")[0];
-                    return (
-                      <option key={`${item.clue}-${option}`} value={value}>
-                        {option}
-                      </option>
-                    );
-                  })}
-                </select>
-                {isCorrect && <span style={{ color: "#166534" }}>Correct ✅</span>}
-                {isWrong && <span style={{ color: "#b91c1c" }}>Not yet. Try another preposition.</span>}
-              </div>
-            );
-          })}
+        <p style={{ margin: 0 }}><strong>Match each German preposition to its English translation:</strong></p>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 420 }}>
+            <thead>
+              <tr>
+                <th style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}>German</th>
+                <th style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}>English translation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["an", "on, at"],
+                ["auf", "on, upon"],
+                ["hinter", "behind"],
+                ["in", "in, into"],
+                ["neben", "next to"],
+                ["über", "over, above"],
+                ["unter", "under"],
+                ["vor", "in front of"],
+                ["zwischen", "between"],
+              ].map(([german, english]) => (
+                <tr key={german}>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{german}</td>
+                  <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{english}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-        <p style={{ margin: 0 }}>
-          Match score: {matchScore}/{matchItems.length}
-        </p>
       </Section>
 
-      <Section title="9) Tips for remembering">
+      <Section title="8) Tips for remembering">
         <BulletList
           items={[
             "If the verb implies movement toward a destination or a change of position, use accusative.",
