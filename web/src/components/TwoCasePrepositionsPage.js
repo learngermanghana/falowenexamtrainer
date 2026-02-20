@@ -113,27 +113,57 @@ const fullExamples = [
 ];
 
 const matchItems = [
-  { clue: "A lamp is fixed ____ the table.", answer: "über" },
-  { clue: "The cat is sleeping ____ the chair.", answer: "unter" },
-  { clue: "The school is ____ the museum and the library.", answer: "zwischen" },
-  { clue: "I put my bag ____ the table.", answer: "auf" },
-  { clue: "The bike is parked ____ the house.", answer: "vor" },
-  { clue: "The child is standing ____ the door.", answer: "an" },
-  { clue: "The dog sits ____ the sofa.", answer: "neben" },
-  { clue: "She walks ____ the classroom.", answer: "in" },
-  { clue: "He hides ____ the tree.", answer: "hinter" },
+  { clue: "Eine Lampe ist ____ dem Tisch befestigt.", answer: "über" },
+  { clue: "Die Katze schläft ____ dem Stuhl.", answer: "unter" },
+  { clue: "Die Schule ist ____ dem Museum und der Bibliothek.", answer: "zwischen" },
+  { clue: "Ich lege meine Tasche ____ den Tisch.", answer: "auf" },
+  { clue: "Das Fahrrad steht ____ dem Haus.", answer: "vor" },
+  { clue: "Das Kind steht ____ der Tür.", answer: "an" },
+  { clue: "Der Hund sitzt ____ dem Sofa.", answer: "neben" },
+  { clue: "Sie geht ____ das Klassenzimmer.", answer: "in" },
+  { clue: "Er versteckt sich ____ dem Baum.", answer: "hinter" },
 ];
 
 const matchOptions = [
-  "an (on, at)",
-  "auf (on, upon)",
-  "hinter (behind)",
-  "in (in, into)",
-  "neben (next to)",
-  "über (over, above)",
-  "unter (under)",
-  "vor (in front of)",
-  "zwischen (between)",
+  "an (an, bei)",
+  "auf (auf, auf ... drauf)",
+  "hinter (hinter)",
+  "in (in, hinein)",
+  "neben (neben)",
+  "über (über)",
+  "unter (unter)",
+  "vor (vor)",
+  "zwischen (zwischen)",
+];
+
+const articleTables = [
+  {
+    title: "Definite articles (bestimmter Artikel)",
+    rows: [
+      { caseName: "Accusative", masculine: "den", feminine: "die", neuter: "das", plural: "die" },
+      { caseName: "Dative", masculine: "dem", feminine: "der", neuter: "dem", plural: "den" },
+    ],
+  },
+  {
+    title: "Indefinite articles (unbestimmter Artikel)",
+    rows: [
+      { caseName: "Accusative", masculine: "einen", feminine: "eine", neuter: "ein", plural: "—" },
+      { caseName: "Dative", masculine: "einem", feminine: "einer", neuter: "einem", plural: "—" },
+    ],
+  },
+];
+
+const quickRuleExamples = [
+  "Ich gehe in die Schule. → Bewegung (Akkusativ)",
+  "Ich bin in der Schule. → Position (Dativ)",
+  "Er legt das Handy auf den Tisch. → Bewegung (Akkusativ)",
+  "Das Handy liegt auf dem Tisch. → Position (Dativ)",
+  "Wir stellen die Stühle vor das Haus. → Bewegung (Akkusativ)",
+  "Die Stühle stehen vor dem Haus. → Position (Dativ)",
+  "Sie hängt die Jacke an den Haken. → Bewegung (Akkusativ)",
+  "Die Jacke hängt an dem Haken. → Position (Dativ)",
+  "Ich setze mich neben den Lehrer. → Bewegung (Akkusativ)",
+  "Ich sitze neben dem Lehrer. → Position (Dativ)",
 ];
 
 const TwoCasePrepositionsPage = () => {
@@ -205,6 +235,44 @@ const TwoCasePrepositionsPage = () => {
             "Example: Ich bin in der Schule. (dative)",
           ]}
         />
+        <div style={{ display: "grid", gap: 12 }}>
+          {articleTables.map((table) => (
+            <div key={table.title} style={{ display: "grid", gap: 8 }}>
+              <strong>{table.title}</strong>
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+                  <thead>
+                    <tr>
+                      {["Case", "Masculine", "Feminine", "Neuter", "Plural"].map((header) => (
+                        <th
+                          key={`${table.title}-${header}`}
+                          style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {table.rows.map((row) => (
+                      <tr key={`${table.title}-${row.caseName}`}>
+                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.caseName}</td>
+                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.masculine}</td>
+                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.feminine}</td>
+                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.neuter}</td>
+                        <td style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>{row.plural}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p style={{ margin: 0 }}>
+          More examples (10):
+        </p>
+        <BulletList items={quickRuleExamples} />
       </Section>
 
       <Section title="3) Full examples for all Wechselpräpositionen">
@@ -287,9 +355,9 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
-      <Section title="7) Match the image clue to the correct preposition">
+      <Section title="7) Puzzle: Ordne den Hinweis der richtigen Präposition zu">
         <p style={{ margin: 0 }}>
-          Read the mini image description and match it with one of these words: {matchOptions.join(", ")}.
+          Lies den Mini-Hinweis und ordne ihn einem dieser Wörter zu: {matchOptions.join(", ")}.
         </p>
         <div style={{ display: "grid", gap: 12 }}>
           {matchItems.map((item, index) => {
