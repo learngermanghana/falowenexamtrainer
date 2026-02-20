@@ -88,12 +88,55 @@ const visualGame = [
   },
 ];
 
+
+const practiceQuiz = [
+  {
+    sentence: "Ich gehe in ___ Park.",
+    choices: ["dem", "den", "der"],
+    answer: "den",
+  },
+  {
+    sentence: "Ich bin im ___ Park.",
+    choices: ["den", "dem", "die"],
+    answer: "dem",
+  },
+  {
+    sentence: "Er stellt den Laptop auf ___ Tisch.",
+    choices: ["den", "dem", "des"],
+    answer: "den",
+  },
+  {
+    sentence: "Der Laptop steht auf ___ Tisch.",
+    choices: ["dem", "den", "der"],
+    answer: "dem",
+  },
+  {
+    sentence: "Wir setzen uns neben ___ Lehrer.",
+    choices: ["dem", "den", "der"],
+    answer: "den",
+  },
+  {
+    sentence: "Wir sitzen neben ___ Lehrer.",
+    choices: ["den", "dem", "des"],
+    answer: "dem",
+  },
+  {
+    sentence: "Sie hängt das Bild an ___ Wand.",
+    choices: ["der", "die", "den"],
+    answer: "die",
+  },
+];
+
 const TwoCasePrepositionsPage = () => {
   const navigate = useNavigate();
 
   // Visual Game state
   const [choices, setChoices] = useState(() => visualGame.map(() => ""));
   const [checked, setChecked] = useState(false);
+
+  // Practice quiz state
+  const [practiceChoices, setPracticeChoices] = useState(() => practiceQuiz.map(() => ""));
+  const [practiceChecked, setPracticeChecked] = useState(false);
 
   const score = useMemo(() => {
     if (!checked) return null;
@@ -118,6 +161,29 @@ const TwoCasePrepositionsPage = () => {
     setChecked(false);
   };
 
+  const practiceScore = useMemo(() => {
+    if (!practiceChecked) return null;
+    let s = 0;
+    practiceQuiz.forEach((q, i) => {
+      if (practiceChoices[i] === q.answer) s += 1;
+    });
+    return s;
+  }, [practiceChecked, practiceChoices]);
+
+  const onChangePracticeChoice = (index, value) => {
+    setPracticeChoices((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+    setPracticeChecked(false);
+  };
+
+  const resetPractice = () => {
+    setPracticeChoices(practiceQuiz.map(() => ""));
+    setPracticeChecked(false);
+  };
+
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -131,6 +197,22 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </header>
 
+      <Section title="0) Start Here: Prepositions have families">
+        <p style={{ margin: 0 }}>
+          Every preposition belongs to a <strong>family/category</strong>. Prepositions affect your sentence because they control
+          which case/article comes after them.
+        </p>
+        <BulletList
+          items={[
+            "Some prepositions always take Dative.",
+            "Some prepositions always take Akkusative.",
+            "Today we check two-case prepositions (Wechselpräpositionen): they can be Dative or Akkusative depending on usage.",
+          ]}
+        />
+        <p style={{ margin: 0 }}>
+          For two-case prepositions, the <strong>verb + meaning</strong> decide the case: movement (Wohin?) → Akkusative,
+          position (Wo?) → Dative.
+        </p>
       <Section title="0) Start Here: How prepositions change a sentence in German">
         <p style={{ margin: 0 }}>
           You already know <strong>Nominative</strong> and <strong>Akkusative</strong>. Now learn this: a <strong>preposition</strong>
@@ -223,18 +305,54 @@ const TwoCasePrepositionsPage = () => {
         <BulletList items={["im = in dem", "ins = in das", "am = an dem", "ans = an das"]} />
       </Section>
 
-      <Section title="6) Practice A – Wo oder Wohin?">
-        <p style={{ margin: 0 }}>Fill in the correct article.</p>
-        <BulletList
-          items={[
-            "Ich gehe in ___ Park.",
-            "Ich bin im ___ Park.",
-            "Er legt das Handy auf ___ Tisch.",
-            "Das Handy liegt auf ___ Tisch.",
-            "Wir setzen uns neben ___ Lehrer.",
-            "Wir sitzen neben ___ Lehrer.",
-          ]}
-        />
+      <Section title="6) Quick Check: Choose the correct article (7 questions)">
+        <p style={{ margin: 0 }}>Pick one answer for each sentence.</p>
+
+        <div style={{ display: "grid", gap: 10, marginTop: 8 }}>
+          {practiceQuiz.map((q, i) => {
+            const isCorrect = practiceChecked && practiceChoices[i] === q.answer;
+            const isWrong = practiceChecked && practiceChoices[i] && practiceChoices[i] !== q.answer;
+
+            return (
+              <div key={q.sentence} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+                <div style={{ fontWeight: 600 }}>{i + 1}. {q.sentence}</div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {q.choices.map((option) => (
+                    <button
+                      key={`${q.sentence}-${option}`}
+                      onClick={() => onChangePracticeChoice(i, option)}
+                      style={{
+                        ...styles.secondaryButton,
+                        width: "fit-content",
+                        borderColor: practiceChoices[i] === option ? "#111827" : undefined,
+                        fontWeight: practiceChoices[i] === option ? 700 : 500,
+                      }}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                  {isCorrect && <span style={{ fontWeight: 700 }}>✅ richtig</span>}
+                  {isWrong && <span style={{ fontWeight: 700 }}>❌ falsch</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 10 }}>
+          <button style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => setPracticeChecked(true)}>
+            Check answers
+          </button>
+          <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={resetPractice}>
+            Reset
+          </button>
+
+          {practiceChecked && (
+            <div style={{ marginLeft: "auto", fontWeight: 800 }}>
+              Score: {practiceScore}/{practiceQuiz.length}
+            </div>
+          )}
+        </div>
       </Section>
 
       <Section title="7) Visual Position Game (Interactive)">
