@@ -98,36 +98,6 @@ const FormingBasicStatementsPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Countries and languages quick reference</h2>
-        <TableScroll caption="Say where someone is from and what language they speak">
-          <thead>
-            <tr>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>Land</th>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>Sprache(n)</th>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>A1 sentence</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Deutschland</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Deutsch</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich komme aus Deutschland. Ich spreche Deutsch.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ghana</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Englisch</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich komme aus Ghana. Ich spreche Englisch.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Schweiz</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Deutsch / Französisch / Italienisch</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich komme aus der Schweiz. Ich spreche Deutsch.</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-      </section>
-
-      <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Past Tense for haben and sein (Präteritum)</h2>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -238,14 +208,6 @@ const FormingBasicStatementsPage = () => {
           </tbody>
         </TableScroll>
 
-        <RuleCard title="Try now (2 prompts)" rule="Use liegen + cardinal direction." example="München liegt im Süden von Deutschland.">
-          <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
-            <li>Answer: <strong>Wo liegt Hamburg?</strong></li>
-            <li>Write one sentence: <strong>Wo liegt deine Stadt?</strong></li>
-          </ol>
-        </RuleCard>
-      </section>
-
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>wo, woher, wohin</h2>
 
@@ -287,14 +249,6 @@ const FormingBasicStatementsPage = () => {
           rule="nach for no-article countries/cities. in + article for exceptions."
           example="nach Ghana / nach Berlin — but in die Schweiz, in die USA"
         />
-
-        <RuleCard title="Try now (2 prompts)" rule="Pick the correct question word and answer in full sentence." example="Wohin gehst du heute? – Ich gehe zur Schule.">
-          <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
-            <li>___ kommst du? – Ich komme aus Ghana.</li>
-            <li>___ fährst du am Wochenende? – Ich fahre nach Kumasi.</li>
-          </ol>
-        </RuleCard>
-      </section>
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Irregular Verbs with Vowel Change</h2>
