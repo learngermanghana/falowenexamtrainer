@@ -2,9 +2,6 @@ import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
-/** =========================
- *  Small UI blocks (notes-first)
- *  ========================= */
 const sectionStyle = { ...styles.card, display: "grid", gap: 10 };
 
 const chipStyle = {
@@ -63,20 +60,11 @@ const TableScroll = ({ caption, children }) => (
   </div>
 );
 
-/** =========================
- *  Free-to-use images
- *  ========================= */
 const IMG_GRAMMAR = "/grammar/past-tense-haben.svg";
-const IMG_TRAVEL = "/grammar/past-tense-sein.svg";
 const IMG_MAP = "/grammar/directions-german.svg";
-const IMG_SIMON = "/falo.png";
 
-/** =========================
- *  Content
- *  ========================= */
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
-
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -88,6 +76,17 @@ const FormingBasicStatementsPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>Day 8 Grammar: Countries and Languages (Chapter 4)</p>
       </header>
 
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Lesson at a glance</h2>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          <li>You can ask about travel experience with <strong>schon mal</strong> and <strong>noch nie</strong>.</li>
+          <li>You can say where a city is with <strong>liegen</strong>.</li>
+          <li>You can choose between <strong>wo</strong>, <strong>woher</strong>, and <strong>wohin</strong>.</li>
+          <li>You can use key irregular verbs in short A1 statements.</li>
+          <li>You can distinguish <strong>man</strong> (pronoun) and <strong>Mann</strong> (noun).</li>
+        </ul>
+      </section>
+
       <ImageBreak src={IMG_GRAMMAR} alt="Past tense haben conjugation" title="Grammar Notes" subtitle="Important A1 grammar points for day 8." />
 
       <section style={sectionStyle}>
@@ -98,7 +97,35 @@ const FormingBasicStatementsPage = () => {
         <RuleCard title="Core sentence pattern" rule="Subject + Verb + Information." example="Ich war gestern krank." />
       </section>
 
-      <ImageBreak src={IMG_TRAVEL} alt="Past tense sein conjugation" title="1) Präteritum for sein & haben" subtitle="Past tense forms to memorize first." />
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Countries and languages quick reference</h2>
+        <TableScroll caption="Say where someone is from and what language they speak">
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>Land</th>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>Sprache(n)</th>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>A1 sentence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Deutschland</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Deutsch</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich komme aus Deutschland. Ich spreche Deutsch.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ghana</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Englisch</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich komme aus Ghana. Ich spreche Englisch.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Schweiz</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Deutsch / Französisch / Italienisch</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich komme aus der Schweiz. Ich spreche Deutsch.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+      </section>
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Past Tense for haben and sein (Präteritum)</h2>
@@ -125,10 +152,16 @@ const FormingBasicStatementsPage = () => {
           </ul>
         </RuleCard>
 
-        <RuleCard title="schon mal + noch nie" rule="Use war + schon mal / noch nie for life experience." example="Bist du schon mal in Deutschland gewesen? – Ja, ich war schon mal in Deutschland." />
+        <RuleCard
+          title="schon mal + noch nie"
+          rule="Use war + schon mal / noch nie for life experience."
+          example="Bist du schon mal in Deutschland gewesen? – Ja, ich war schon mal in Deutschland."
+        >
+          <div style={{ padding: 8, borderRadius: 8, background: "#eef6ff", border: "1px solid #bfdbfe" }}>
+            <strong>Tip:</strong> The question is often in <strong>Perfekt</strong> (<em>Bist du ... gewesen?</em>), while short spoken answers often use <strong>war</strong>.
+          </div>
+        </RuleCard>
       </section>
-
-      <ImageBreak src={IMG_TRAVEL} alt="Experience" title="2) schon mal / noch nie" subtitle="Talk about experiences." />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>schon mal and noch nie</h2>
@@ -169,6 +202,13 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
+
+        <RuleCard title="Try now (2 prompts)" rule="Answer with your own country/city." example="Warst du schon mal in Berlin?">
+          <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+            <li>Write one <strong>Ja</strong>-answer with <em>schon mal</em>.</li>
+            <li>Write one <strong>Nein</strong>-answer with <em>noch nie</em>.</li>
+          </ol>
+        </RuleCard>
       </section>
 
       <ImageBreak src={IMG_MAP} alt="Map" title="3) liegen (city location)" subtitle="Where is the city located?" />
@@ -197,9 +237,14 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
-      </section>
 
-      <ImageBreak src={IMG_MAP} alt="Directions" title="4) wo / woher / wohin" subtitle="3 question words." />
+        <RuleCard title="Try now (2 prompts)" rule="Use liegen + cardinal direction." example="München liegt im Süden von Deutschland.">
+          <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+            <li>Answer: <strong>Wo liegt Hamburg?</strong></li>
+            <li>Write one sentence: <strong>Wo liegt deine Stadt?</strong></li>
+          </ol>
+        </RuleCard>
+      </section>
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>wo, woher, wohin</h2>
@@ -242,50 +287,71 @@ const FormingBasicStatementsPage = () => {
           rule="nach for no-article countries/cities. in + article for exceptions."
           example="nach Ghana / nach Berlin — but in die Schweiz, in die USA"
         />
-      </section>
 
-      <ImageBreak src={IMG_GRAMMAR} alt="Grammar" title="5) Irregular verbs with vowel change" subtitle="Conjugation focus for du and er/sie/es." />
+        <RuleCard title="Try now (2 prompts)" rule="Pick the correct question word and answer in full sentence." example="Wohin gehst du heute? – Ich gehe zur Schule.">
+          <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+            <li>___ kommst du? – Ich komme aus Ghana.</li>
+            <li>___ fährst du am Wochenende? – Ich fahre nach Kumasi.</li>
+          </ol>
+        </RuleCard>
+      </section>
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Irregular Verbs with Vowel Change</h2>
 
         <RuleCard title="Easy rule" rule="Many vowel changes happen in du + er/sie/es." example="fahren: du fährst, er fährt" />
 
-        <TableScroll caption="Full conjugation (only du and er/sie/es change)">
+        <TableScroll caption="Full conjugation (mobile-friendly view)">
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>Verb</th>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>ich / wir / ihr / sie(Sie)</th>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>du</th>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>er/sie/es</th>
+            </tr>
+          </thead>
           <tbody>
             <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
-                <strong>nehmen</strong>: ich nehme, <strong>du nimmst</strong>, <strong>er/sie/es nimmt</strong>, wir nehmen, ihr nehmt, sie/Sie nehmen
-              </td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>nehmen</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>nehme / nehmen / nehmt / nehmen</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>nimmst</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>nimmt</td>
             </tr>
             <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
-                <strong>sprechen</strong>: ich spreche, <strong>du sprichst</strong>, <strong>er/sie/es spricht</strong>, wir sprechen, ihr sprecht, sie/Sie sprechen
-              </td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>sprechen</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>spreche / sprechen / sprecht / sprechen</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>sprichst</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>spricht</td>
             </tr>
             <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
-                <strong>essen</strong>: ich esse, <strong>du isst</strong>, <strong>er/sie/es isst</strong>, wir essen, ihr esst, sie/Sie essen
-              </td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>essen</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>esse / essen / esst / essen</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>isst</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>isst</td>
             </tr>
             <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
-                <strong>fahren</strong>: ich fahre, <strong>du fährst</strong>, <strong>er/sie/es fährt</strong>, wir fahren, ihr fahrt, sie/Sie fahren
-              </td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>fahren</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>fahre / fahren / fahrt / fahren</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>fährst</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>fährt</td>
             </tr>
             <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
-                <strong>laufen</strong>: ich laufe, <strong>du läufst</strong>, <strong>er/sie/es läuft</strong>, wir laufen, ihr lauft, sie/Sie laufen
-              </td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>laufen</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>laufe / laufen / lauft / laufen</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>läufst</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>läuft</td>
             </tr>
           </tbody>
         </TableScroll>
       </section>
 
-      <ImageBreak src={IMG_SIMON} alt="Simon speaking German" title="6) man vs Mann" subtitle="One small word, big meaning." />
-
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>man vs Mann</h2>
+
+        <div style={{ border: "1px solid #fecaca", background: "#fff1f2", borderLeft: "6px solid #ef4444", borderRadius: 10, padding: 12 }}>
+          <strong>Common mistakes:</strong> <em>man</em> is a pronoun (lowercase), but <em>Mann</em> is a noun (capitalized).<br />
+          Correction: <strong>Man spricht hier Deutsch.</strong> (not <strong>Mann spricht hier Deutsch.</strong>)
+        </div>
 
         <RuleCard title="Difference" rule="man = people in general | Mann = a man (noun)" example="Man kann hier gut essen. / Der Mann ist Lehrer." />
 
@@ -313,7 +379,6 @@ const FormingBasicStatementsPage = () => {
           </tbody>
         </TableScroll>
       </section>
-
     </main>
   );
 };
