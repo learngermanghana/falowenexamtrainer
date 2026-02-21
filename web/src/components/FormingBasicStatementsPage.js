@@ -68,7 +68,8 @@ const TableScroll = ({ caption, children }) => (
  *  ========================= */
 const IMG_GRAMMAR = "/grammar/past-tense-haben.svg";
 const IMG_TRAVEL = "/grammar/past-tense-sein.svg";
-const IMG_MAP = "https://source.unsplash.com/6dW3xyQvcYE/1600x900";
+const IMG_MAP = "/grammar/directions-german.svg";
+const IMG_SIMON = "/falo.png";
 
 /** =========================
  *  Content
@@ -151,6 +152,23 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
+
+        <TableScroll caption="Exam phrases with meaning (German + English)">
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Warst du schon mal in Deutschland?</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Have you ever been to Germany?</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Ja, ich war schon mal in Deutschland.</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Yes, I have been to Germany before.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Nein, ich war noch nie in Deutschland.</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>No, I have never been to Germany.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
       </section>
 
       <ImageBreak src={IMG_MAP} alt="Map" title="3) liegen (city location)" subtitle="Where is the city located?" />
@@ -166,6 +184,19 @@ const FormingBasicStatementsPage = () => {
           <li>München liegt im Süden von Deutschland.</li>
           <li>Hamburg liegt im Norden von Deutschland.</li>
         </ul>
+
+        <TableScroll caption="Location exam phrases with translation">
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo liegt Berlin?</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where is Berlin located?</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Berlin liegt im Osten von Deutschland.</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Berlin is in the east of Germany.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
       </section>
 
       <ImageBreak src={IMG_MAP} alt="Directions" title="4) wo / woher / wohin" subtitle="3 question words." />
@@ -185,6 +216,23 @@ const FormingBasicStatementsPage = () => {
             </tr>
             <tr>
               <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin</strong> fliegst du? – Ich fliege nach Deutschland.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+
+        <TableScroll caption="Exam question phrases with translation">
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo wohnst du?</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where do you live?</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher kommst du?</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you from?</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin gehst du heute?</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you going today?</td>
             </tr>
           </tbody>
         </TableScroll>
@@ -234,12 +282,25 @@ const FormingBasicStatementsPage = () => {
         </TableScroll>
       </section>
 
-      <ImageBreak src={IMG_GRAMMAR} alt="People" title="6) man vs Mann" subtitle="One small word, big meaning." />
+      <ImageBreak src={IMG_SIMON} alt="Simon speaking German" title="6) man vs Mann" subtitle="One small word, big meaning." />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>man vs Mann</h2>
 
         <RuleCard title="Difference" rule="man = people in general | Mann = a man (noun)" example="Man kann hier gut essen. / Der Mann ist Lehrer." />
+
+        <TableScroll caption="A1 exam phrases with translation">
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Man spricht hier Deutsch.</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>People speak German here.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Der Mann heißt Simon.</strong></td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>The man's name is Simon.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
 
         <TableScroll caption="Conjugation with man (using essen)">
           <tbody>
