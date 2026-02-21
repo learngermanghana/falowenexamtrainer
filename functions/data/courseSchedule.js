@@ -596,8 +596,7 @@ const courseSchedules = {
       topic: "Objects and Colors",
       chapter: "6",
       goal: "Understand Possessive Determiners and its usage in connection with nouns",
-      instruction:
-        "The assignment is the lesen and horen chapter 6 but you must also go through schreiben and sprechnen 2.4 for full understanding",
+      instruction: "The assignment is the Lesen & Hören chapter 6.",
       lesen_hören: {
         chapter: "6",
         video: "https://youtu.be/SXwDqcwrR3k",
@@ -605,13 +604,6 @@ const courseSchedules = {
         grammarbook_link: "https://drive.google.com/file/d/1Fy4bKhaHHb4ahS2xIumrLtuqdQ0YAFB4/view?usp=sharing",
         assignment: true,
         workbook_link: "https://drive.google.com/file/d/1Da1iw54oAqoaY-UIw6oyIn8tsDmIi1YR/view?usp=sharing",
-      },
-      schreiben_sprechen: {
-        chapter: "2.4",
-        video: "",
-        youtube_link: "",
-        workbook_link: "https://drive.google.com/file/d/1GbIc44ToWh2upnHv6eX3ZjFrvnf4fcEM/view?usp=sharing",
-        assignment: false,
       },
     },
     {
