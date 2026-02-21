@@ -223,12 +223,12 @@ const A1LetterWritingQuestionBookPage = () => {
   // Q2: weil sentence (choose correct)
   const [b_weilPick, setB_weilPick] = useState("");
   // Q3 word order sentence
-  const [b_wordOrderSentence, setB_wordOrderSentence] = useState("");
+  const [b_wordOrderSentence] = useState("");
 
   // Body choices (simple buttons)
   const [b_wish, setB_wish] = useState("Alles Gute zum Geburtstag!");
   const [b_partyQuestion, setB_partyQuestion] = useState("Planst du eine Feier?");
-  const [b_extra, setB_extra] = useState("Kann ich mit meiner Familie kommen?"); // optional
+  const [b_extra] = useState("Kann ich mit meiner Familie kommen?"); // optional
   const [b_includeExtra, setB_includeExtra] = useState(false);
 
   // Closing choice
@@ -238,12 +238,7 @@ const A1LetterWritingQuestionBookPage = () => {
   /** =========================
    *  Formal (Language School) – states
    *  ========================= */
-  const [f_receiver, setF_receiver] = useState("unknown"); // unknown | school
-  const [f_schoolName, setF_schoolName] = useState("Sprachschule");
-  const formalGreeting = useMemo(() => {
-    if (f_receiver === "school") return `Sehr geehrte Damen und Herren,`;
-    return `Sehr geehrte Damen und Herren,`;
-  }, [f_receiver]);
+  const formalGreeting = `Sehr geehrte Damen und Herren,`;
 
   const [f_weilPick, setF_weilPick] = useState("");
   const [f_requestPick, setF_requestPick] = useState("");
