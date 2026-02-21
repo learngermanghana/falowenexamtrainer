@@ -783,7 +783,7 @@ const courseSchedules = {
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
         youtube_link: "https://youtu.be/2iJQFYGUqRE",
-        workbook_link: "https://drive.google.com/file/d/1SjaDH1bYR7O-BnIbM2N82XOEjeLCfPFb/view?usp=sharing",
+        workbook_link: "https://www.falowen.app/campus/course/letter-writing-12-3",
         assignment: true,
       },
     },
@@ -845,7 +845,7 @@ const courseSchedules = {
       schreiben_sprechen: {
         video: "https://youtu.be/ztFf2WJhj_Q",
         youtube_link: "https://youtu.be/ztFf2WJhj_Q",
-        workbook_link: "https://drive.google.com/file/d/1LE1b9ilkLLobE5Uw0TVLG0RIVpLK5k1t/view?usp=sharing",
+        workbook_link: "https://www.falowen.app/campus/course/conjunctions-5-10",
         assignment: false,
       },
     },
