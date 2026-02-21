@@ -573,7 +573,7 @@ const ObjectsAndColorsPage = () => {
         </ul>
       </Section>
 
-      <Section title="Note on Using Adjectives with \"zu,\" \"super,\" and \"sehr\"">
+      <Section title={'Note on Using Adjectives with "zu," "super," and "sehr"'}>
         <p style={{ margin: 0 }}>
           Adjectives are essential in any language to describe nouns and add detail to your sentences. In German,
           adjectives can be modified by words like <strong>zu</strong>, <strong>super</strong>, and <strong>sehr</strong>
