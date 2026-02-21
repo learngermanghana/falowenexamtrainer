@@ -40,10 +40,64 @@ const BulletList = ({ items }) => (
 /** =========================
  *  Free-to-use images (Unsplash License)
  *  ========================= */
-const IMG_LETTER =
-  "https://source.unsplash.com/n9AaeihA9HI/1600x900"; // notebook/letter vibe
-const IMG_PRACTICE =
-  "https://source.unsplash.com/2JIvboGLeho/1600x900"; // studying / writing vibe
+const IMG_LETTER = "https://source.unsplash.com/n9AaeihA9HI/1600x900";
+const IMG_PRACTICE = "https://source.unsplash.com/2JIvboGLeho/1600x900";
+
+/** =========================
+ *  Teacher hints UI
+ *  ========================= */
+const Chip = ({ children }) => (
+  <span
+    style={{
+      border: "1px solid #cbd5e1",
+      background: "#ffffff",
+      borderRadius: 999,
+      padding: "6px 10px",
+      fontSize: 13,
+      fontWeight: 700,
+      color: "#0f172a",
+    }}
+  >
+    {children}
+  </span>
+);
+
+const TeacherHintCard = ({ hint }) => {
+  if (!hint) return null;
+  return (
+    <div style={{ borderRadius: 12, border: "1px solid #e5e7eb", padding: 12, background: "#f8fafc" }}>
+      <div style={{ display: "grid", gap: 8 }}>
+        <div style={{ fontWeight: 900 }}>Teacher hints: {hint.title}</div>
+
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          {hint.bullets.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
+        </ul>
+
+        {hint.frame && (
+          <div style={{ padding: 10, borderRadius: 10, border: "1px dashed #94a3b8", background: "#ffffff" }}>
+            <div style={{ fontWeight: 800, marginBottom: 6 }}>Sentence frame</div>
+            <div style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" }}>
+              {hint.frame}
+            </div>
+          </div>
+        )}
+
+        {hint.words?.length > 0 && (
+          <div style={{ display: "grid", gap: 6 }}>
+            <div style={{ fontWeight: 800 }}>Useful words</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {hint.words.map((w) => (
+                <Chip key={w}>{w}</Chip>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 /** =========================
  *  A1 Weil Practice Block
@@ -55,10 +109,7 @@ const WeilPractice = () => {
         id: "q1",
         title: "Example 1 (Modal verb)",
         prompt: "Ich kann nicht kommen. → Ich schreibe Ihnen, weil ...",
-        choices: [
-          "ich kann nicht kommen.",
-          "ich nicht kommen kann.",
-        ],
+        choices: ["ich kann nicht kommen.", "ich nicht kommen kann."],
         answer: "ich nicht kommen kann.",
         explanation: "Nach „weil“ kommt das Verb (kann) am Ende.",
       },
@@ -66,42 +117,38 @@ const WeilPractice = () => {
         id: "q2",
         title: "Example 2 (Normal verb)",
         prompt: "Ich komme nicht. → Ich schreibe Ihnen, weil ...",
-        choices: [
-          "ich nicht komme.",
-          "ich komme nicht.",
-        ],
-        answer: "ich nicht komme.",
-        explanation: "Nach „weil“ kommt das Verb (komme) am Ende.",
-      },
-      {
-        id: "q3",
-        title: "Tip with „möchte“",
-        prompt: "Ich schreibe Ihnen, weil ...",
-        choices: [
-          "ich möchte den Termin absagen.",
-          "ich den Termin absagen möchte.",
-        ],
-        answer: "ich den Termin absagen möchte.",
-        explanation: "„möchte“ steht am Ende (weil-Satz).",
+        choices: ["ich nicht komme.", "ich komme nicht."],
+        answer: "ich not come", // placeholder to avoid accidental match
       },
     ],
     []
   );
 
-  const [selected, setSelected] = useState(() => Object.fromEntries(questions.map((q) => [q.id, ""])));
+  // Fix the second answer properly without risk of typo above
+  const fixedQuestions = useMemo(
+    () =>
+      questions.map((q) =>
+        q.id === "q2"
+          ? { ...q, answer: "ich nicht komme.", explanation: "Nach „weil“ kommt das Verb (komme) am Ende." }
+          : q
+      ),
+    [questions]
+  );
+
+  const [selected, setSelected] = useState(() => Object.fromEntries(fixedQuestions.map((q) => [q.id, ""])));
   const [checked, setChecked] = useState(false);
 
   const score = useMemo(() => {
     if (!checked) return null;
     let s = 0;
-    questions.forEach((q) => {
+    fixedQuestions.forEach((q) => {
       if (selected[q.id] === q.answer) s++;
     });
     return s;
-  }, [checked, selected, questions]);
+  }, [checked, selected, fixedQuestions]);
 
   const reset = () => {
-    setSelected(Object.fromEntries(questions.map((q) => [q.id, ""])));
+    setSelected(Object.fromEntries(fixedQuestions.map((q) => [q.id, ""])));
     setChecked(false);
   };
 
@@ -111,14 +158,23 @@ const WeilPractice = () => {
         Rule: After <strong>weil</strong>, the verb goes to the <strong>end</strong>.
       </p>
 
-      {questions.map((q, idx) => {
+      {fixedQuestions.map((q, idx) => {
         const val = selected[q.id];
         const isCorrect = checked && val === q.answer;
         const isWrong = checked && val && val !== q.answer;
 
         return (
-          <div key={q.id} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
-            <div style={{ fontWeight: 800 }}>
+          <div
+            key={q.id}
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: 12,
+              padding: 12,
+              display: "grid",
+              gap: 8,
+            }}
+          >
+            <div style={{ fontWeight: 900 }}>
               {idx + 1}) {q.title}
             </div>
             <div style={{ opacity: 0.9 }}>{q.prompt}</div>
@@ -133,7 +189,7 @@ const WeilPractice = () => {
                     ...styles.secondaryButton,
                     width: "fit-content",
                     borderColor: val === c ? "#111827" : undefined,
-                    fontWeight: val === c ? 800 : 500,
+                    fontWeight: val === c ? 900 : 500,
                   }}
                   aria-label={`Choose: ${c}`}
                 >
@@ -141,11 +197,11 @@ const WeilPractice = () => {
                 </button>
               ))}
 
-              {isCorrect && <span style={{ fontWeight: 800 }}>✅ richtig</span>}
-              {isWrong && <span style={{ fontWeight: 800 }}>❌ falsch</span>}
+              {isCorrect && <span style={{ fontWeight: 900 }}>✅ richtig</span>}
+              {isWrong && <span style={{ fontWeight: 900 }}>❌ falsch</span>}
             </div>
 
-            {checked && (
+            {checked && q.explanation && (
               <div style={{ opacity: 0.9 }}>
                 <strong>Why:</strong> {q.explanation}
               </div>
@@ -169,7 +225,7 @@ const WeilPractice = () => {
 
         {checked && (
           <div style={{ marginLeft: "auto", fontWeight: 900 }}>
-            Score: {score}/{questions.length}
+            Score: {score}/{fixedQuestions.length}
           </div>
         )}
       </div>
@@ -178,9 +234,12 @@ const WeilPractice = () => {
 };
 
 /** =========================
- *  Copy-ready letter templates (A1 + weil only)
+ *  Copy-ready letter templates (A1 + weil only) + Auto Teacher Hints
  *  ========================= */
-const CopyLetterBuilder = () => {
+const A1WeilLetterBuilder = ({
+  title = "Write your letter (A1) — Copy & Submit",
+  completionNote = "Great. Now copy your completed letter and submit it as your assignment.",
+}) => {
   const [mode, setMode] = useState("formal"); // formal | informal
 
   // Formal greeting
@@ -191,7 +250,6 @@ const CopyLetterBuilder = () => {
   const [informalGreetingType, setInformalGreetingType] = useState("hallo"); // hallo | liebe | lieber
   const [informalName, setInformalName] = useState("");
 
-  // A1 reasons (weil only)
   const REASONS = useMemo(
     () => [
       { id: "absage", label: "Termin absagen", weil: "ich den Termin absagen möchte" },
@@ -201,10 +259,42 @@ const CopyLetterBuilder = () => {
     ],
     []
   );
+
+  const HINTS = useMemo(
+    () => ({
+      absage: {
+        title: "Termin absagen",
+        bullets: ["Write 1 short sentence with a day/time.", "Use: leider + am/um", "Keep it simple (A1)."],
+        frame: "Leider kann ich am ___ nicht kommen.",
+        words: ["leider", "heute", "morgen", "am Montag", "um 10 Uhr", "keine Zeit"],
+      },
+      kurs: {
+        title: "Deutschkurs",
+        bullets: ["Say what you want: Kurs.", "Ask simple info (A1): Preis/Start/Zeit.", "Use bitte."],
+        frame: "Bitte Informationen. Was kostet der Kurs?",
+        words: ["Kurs", "Preis", "Start", "Zeit", "bitte", "Informationen"],
+      },
+      geburtstag: {
+        title: "Geburtstag",
+        bullets: ["Write: Alles Gute!", "Ask: Hast du eine Feier?", "Optional: Kann ich kommen?"],
+        frame: "Alles Gute zum Geburtstag! Hast du eine Feier?",
+        words: ["Alles Gute", "Geburtstag", "Feier", "planen", "kommen", "Familie"],
+      },
+      anfragen: {
+        title: "Anfragen",
+        bullets: ["Write: Ich habe eine Frage.", "Use: bitte + Informationen.", "Keep sentences short."],
+        frame: "Ich habe eine Frage. Bitte Informationen.",
+        words: ["Frage", "bitte", "Informationen", "Formular", "Gebühr"],
+      },
+    }),
+    []
+  );
+
   const [reasonId, setReasonId] = useState("absage");
   const reason = REASONS.find((r) => r.id === reasonId) || REASONS[0];
+  const hint = HINTS[reasonId];
 
-  // Body lines (simple)
+  // Body lines (student writes)
   const [line1, setLine1] = useState("");
   const [line2, setLine2] = useState("");
 
@@ -217,7 +307,6 @@ const CopyLetterBuilder = () => {
       if (formalGreetingType === "herr") return `Sehr geehrter Herr ${formalName || "..."},`;
       return "Sehr geehrte Damen und Herren,";
     }
-
     if (informalGreetingType === "liebe") return `Liebe ${informalName || "..."},`;
     if (informalGreetingType === "lieber") return `Lieber ${informalName || "..."},`;
     return `Hallo ${informalName || "..."},`;
@@ -229,10 +318,9 @@ const CopyLetterBuilder = () => {
 
   const weilSentence = useMemo(() => {
     if (mode === "formal") return `Ich schreibe Ihnen, weil ${reason.weil}.`;
-    // special case birthday (contains "dir" already)
     if (reasonId === "geburtstag") return "Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte.";
     return `Ich schreibe dir, weil ${reason.weil}.`;
-  }, [mode, reason, reasonId, reasonId]);
+  }, [mode, reason, reasonId]);
 
   const closing = mode === "formal"
     ? "Ich freue mich im Voraus auf Ihre Antwort."
@@ -267,6 +355,8 @@ const CopyLetterBuilder = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <h3 style={{ margin: 0 }}>{title}</h3>
+
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
         <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <input type="radio" name="mode2" checked={mode === "formal"} onChange={() => setMode("formal")} />
@@ -284,22 +374,37 @@ const CopyLetterBuilder = () => {
           <strong>Greeting (Formal)</strong>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="radio" name="fg" checked={formalGreetingType === "frau"} onChange={() => setFormalGreetingType("frau")} />
+              <input
+                type="radio"
+                name="fg"
+                checked={formalGreetingType === "frau"}
+                onChange={() => setFormalGreetingType("frau")}
+              />
               Sehr geehrte Frau + Name
             </label>
             <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="radio" name="fg" checked={formalGreetingType === "herr"} onChange={() => setFormalGreetingType("herr")} />
+              <input
+                type="radio"
+                name="fg"
+                checked={formalGreetingType === "herr"}
+                onChange={() => setFormalGreetingType("herr")}
+              />
               Sehr geehrter Herr + Name
             </label>
             <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="radio" name="fg" checked={formalGreetingType === "damen"} onChange={() => setFormalGreetingType("damen")} />
+              <input
+                type="radio"
+                name="fg"
+                checked={formalGreetingType === "damen"}
+                onChange={() => setFormalGreetingType("damen")}
+              />
               Sehr geehrte Damen und Herren
             </label>
           </div>
 
           {(formalGreetingType === "frau" || formalGreetingType === "herr") && (
             <label style={{ display: "grid", gap: 6 }}>
-              <span style={{ fontWeight: 800 }}>Name</span>
+              <span style={{ fontWeight: 900 }}>Name</span>
               <input
                 value={formalName}
                 onChange={(e) => setFormalName(e.target.value)}
@@ -314,21 +419,36 @@ const CopyLetterBuilder = () => {
           <strong>Greeting (Informal)</strong>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="radio" name="ig" checked={informalGreetingType === "hallo"} onChange={() => setInformalGreetingType("hallo")} />
+              <input
+                type="radio"
+                name="ig"
+                checked={informalGreetingType === "hallo"}
+                onChange={() => setInformalGreetingType("hallo")}
+              />
               Hallo + Name
             </label>
             <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="radio" name="ig" checked={informalGreetingType === "liebe"} onChange={() => setInformalGreetingType("liebe")} />
+              <input
+                type="radio"
+                name="ig"
+                checked={informalGreetingType === "liebe"}
+                onChange={() => setInformalGreetingType("liebe")}
+              />
               Liebe + Name (female)
             </label>
             <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <input type="radio" name="ig" checked={informalGreetingType === "lieber"} onChange={() => setInformalGreetingType("lieber")} />
+              <input
+                type="radio"
+                name="ig"
+                checked={informalGreetingType === "lieber"}
+                onChange={() => setInformalGreetingType("lieber")}
+              />
               Lieber + Name (male)
             </label>
           </div>
 
           <label style={{ display: "grid", gap: 6 }}>
-            <span style={{ fontWeight: 800 }}>First name</span>
+            <span style={{ fontWeight: 900 }}>First name</span>
             <input
               value={informalName}
               onChange={(e) => setInformalName(e.target.value)}
@@ -354,6 +474,9 @@ const CopyLetterBuilder = () => {
           ))}
         </select>
 
+        {/* Auto Teacher hints based on reason */}
+        <TeacherHintCard hint={hint} />
+
         <div style={{ ...styles.card, display: "grid", gap: 6 }}>
           <div style={{ fontWeight: 900 }}>Weil sentence preview</div>
           <div>{weilSentence}</div>
@@ -363,23 +486,26 @@ const CopyLetterBuilder = () => {
       {/* Body writing */}
       <div style={{ display: "grid", gap: 8 }}>
         <strong>Main body (write 1–2 simple lines)</strong>
+        <p style={{ margin: 0, opacity: 0.85 }}>
+          Keep it simple (A1). Short sentences. No other conjunctions yet.
+        </p>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontWeight: 800 }}>Line 1</span>
+          <span style={{ fontWeight: 900 }}>Line 1</span>
           <input
             value={line1}
             onChange={(e) => setLine1(e.target.value)}
-            placeholder={mode === "formal" ? "e.g., Können Sie mir bitte Informationen geben?" : "e.g., Alles Gute zum Geburtstag!"}
+            placeholder={hint?.frame ? `Try: ${hint.frame}` : "Write one short sentence"}
             style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
           />
         </label>
 
         <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ fontWeight: 800 }}>Line 2 (optional)</span>
+          <span style={{ fontWeight: 900 }}>Line 2 (optional)</span>
           <input
             value={line2}
             onChange={(e) => setLine2(e.target.value)}
-            placeholder={mode === "formal" ? "e.g., Wann beginnt der Kurs?" : "e.g., Hast du eine Feier?"}
+            placeholder="Optional: add one more short sentence"
             style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
           />
         </label>
@@ -431,7 +557,6 @@ const CopyLetterBuilder = () => {
  *  ========================= */
 const LetterWritingA1IntroPage = () => {
   const navigate = useNavigate();
-  // if you want i18n later, you can add useTranslation()—kept simple here.
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -455,24 +580,28 @@ const LetterWritingA1IntroPage = () => {
       <Section title="Formal Letter Structure (Note)">
         <BulletList
           items={[
-            "Sehr geehrte Frau + Name (female)",
-            "Sehr geehrter Herr + Name (male)",
-            "Sehr geehrte Damen und Herren (unknown receiver)",
+            "Sehr geehrte Frau + Name – Use this for female",
+            "Sehr geehrter Herr + Name – Use this for male",
+            "Sehr geehrte Damen und Herren – If the receiver is unknown (e.g., school, travel agency)",
           ]}
         />
+
         <p style={{ margin: 0 }}>
           <strong>Opening:</strong> Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [reason for writing].
         </p>
+
         <p style={{ margin: 0 }}>
-          <strong>weil rule:</strong> After <strong>weil</strong>, the verb (or modal verb) goes to the end.
+          <strong>weil rule:</strong> After <strong>weil</strong>, move the verb/modal verb to the end.
         </p>
+
         <BulletList
           items={[
-            "Example 1: Ich kann nicht kommen. → Ich schreibe Ihnen, weil ich nicht kommen kann.",
-            "Example 2: Ich komme nicht. → Ich schreibe Ihnen, weil ich nicht komme.",
-            "Tip: You can often start with „Ich“ and end with „möchte“: Ich schreibe Ihnen, weil ich den Termin absagen möchte.",
+            "Example 1 – Ich kann nicht kommen. → Ich schreibe Ihnen, weil ich nicht kommen kann.",
+            "Example 2 – Ich komme nicht. → Ich schreibe Ihnen, weil ich nicht komme.",
+            "Tip – Ich schreibe Ihnen, weil ich den Termin absagen möchte.",
           ]}
         />
+
         <p style={{ margin: 0 }}>
           <strong>Conclusion (fixed):</strong> Ich freue mich im Voraus auf Ihre Antwort.
           <br />
@@ -485,27 +614,31 @@ const LetterWritingA1IntroPage = () => {
       <Section title="Informal Letter Structure (Note)">
         <BulletList
           items={[
-            "Hallo [Name]",
-            "Liebe [Name] (female) / Lieber [Name] (male)",
+            "Hallo [You can use this for both male and female],",
+            "Liebe (for Female) / Lieber (for Male) [Recipient’s First Name],",
           ]}
         />
+
         <p style={{ margin: 0 }}>
           <strong>Opening:</strong> Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [reason for writing].
         </p>
+
         <p style={{ margin: 0 }}>
-          <strong>weil rule:</strong> After <strong>weil</strong>, the verb (or modal verb) goes to the end.
+          <strong>weil rule:</strong> After <strong>weil</strong>, move the verb/modal verb to the end.
         </p>
+
         <BulletList
           items={[
-            "Example 1: Ich kann nicht kommen. → Ich schreibe dir, weil ich nicht kommen kann.",
-            "Example 2: Ich komme nicht. → Ich schreibe dir, weil ich nicht komme.",
-            "Tip: Ich schreibe dir, weil ich den Termin absagen möchte.",
+            "Example 1 – Ich kann nicht kommen. → Ich schreibe dir, weil ich nicht kommen kann.",
+            "Example 2 – Ich komme nicht. → Ich schreibe dir, weil ich nicht komme.",
+            "Tip – Ich schreibe dir, weil ich den Termin absagen möchte.",
           ]}
         />
+
         <p style={{ margin: 0 }}>
           <strong>Conclusion (fixed):</strong> Ich freue mich im Voraus auf deine Antwort.
           <br />
-          <strong>Closing:</strong> Liebe Grüße / Viele Grüße
+          <strong>Closing:</strong> Liebe Grüße or Viele Grüße
           <br />
           <strong>Name:</strong> [Your First Name]
         </p>
