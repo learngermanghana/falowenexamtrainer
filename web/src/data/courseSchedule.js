@@ -798,7 +798,7 @@ const RAW_COURSE_SCHEDULES = {
       goal: "Practice how to write both formal and informal letters",
       assignment: true,
       instruction:
-        "For your first letter, start with the Letter Writing 12.3 guide and follow the model step by step (greeting, structure, body, and closing). Write your first full draft by yourself first, then use the Falowen Schreiben Trainer only to review and improve your ideas, grammar, and sentence flow: https://www.falowen.app/campus/writing.",
+        "For your first letter, open Letter Writing 12.3 and complete the drag-and-drop template first (fill the missing parts of the letter). Then copy the full letter by yourself and submit it using your normal assignment flow.",
       instructionLink: {
         label: "Assignment link: Open the Letter Writing 12.3 guide",
         to: "/campus/course/letter-writing-12-3",

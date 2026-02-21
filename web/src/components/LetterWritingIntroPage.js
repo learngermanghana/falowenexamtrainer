@@ -76,6 +76,139 @@ const AnnotatedSample = ({ title, items, accentColor, accentBackground }) => (
   </div>
 );
 
+const FillInTemplateExercise = ({ title, instructions, templateLines, optionsLabel, options, completionNote }) => {
+  const [filledSlots, setFilledSlots] = useState({});
+  const [draggedOption, setDraggedOption] = useState(null);
+
+  useEffect(() => {
+    setFilledSlots({});
+  }, [templateLines, options]);
+
+  const allSlots = templateLines
+    .flatMap((line) => line.parts)
+    .filter((part) => typeof part === "object" && part.slotId);
+
+  const usedOptionIds = new Set(Object.values(filledSlots));
+  const availableOptions = options.filter((option) => !usedOptionIds.has(option.id));
+
+  const assignOptionToSlot = (slotId, optionId) => {
+    setFilledSlots((prev) => {
+      const next = { ...prev };
+      Object.keys(next).forEach((existingSlotId) => {
+        if (next[existingSlotId] === optionId) {
+          delete next[existingSlotId];
+        }
+      });
+      next[slotId] = optionId;
+      return next;
+    });
+  };
+
+  const clearSlot = (slotId) => {
+    setFilledSlots((prev) => {
+      const next = { ...prev };
+      delete next[slotId];
+      return next;
+    });
+  };
+
+  const isComplete = allSlots.length > 0 && allSlots.every((slot) => filledSlots[slot.slotId]);
+
+  return (
+    <div style={{ ...styles.card, display: "grid", gap: 12, border: "1px solid #cbd5e1" }}>
+      <h3 style={{ margin: 0 }}>{title}</h3>
+      <p style={{ margin: 0 }}>{instructions}</p>
+
+      <div style={{ display: "grid", gap: 10, background: "#f8fafc", borderRadius: 12, padding: 14 }}>
+        {templateLines.map((line) => (
+          <p key={line.id} style={{ margin: 0, lineHeight: 1.7 }}>
+            {line.parts.map((part, index) => {
+              if (typeof part === "string") {
+                return <span key={`${line.id}-${index}`}>{part}</span>;
+              }
+
+              const filledOptionId = filledSlots[part.slotId];
+              const filledOption = options.find((option) => option.id === filledOptionId);
+
+              return (
+                <button
+                  key={part.slotId}
+                  type="button"
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    const droppedId = event.dataTransfer.getData("text/plain") || draggedOption;
+                    if (droppedId) {
+                      assignOptionToSlot(part.slotId, droppedId);
+                    }
+                    setDraggedOption(null);
+                  }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onClick={() => clearSlot(part.slotId)}
+                  style={{
+                    margin: "0 4px",
+                    minWidth: 150,
+                    borderRadius: 8,
+                    border: `2px dashed ${filledOption ? "#0ea5e9" : "#94a3b8"}`,
+                    background: filledOption ? "#e0f2fe" : "#ffffff",
+                    color: "#0f172a",
+                    padding: "6px 10px",
+                    textAlign: "left",
+                    cursor: "pointer",
+                    fontSize: 14,
+                  }}
+                >
+                  {filledOption ? filledOption.label : part.placeholder}
+                </button>
+              );
+            })}
+          </p>
+        ))}
+      </div>
+
+      <div style={{ display: "grid", gap: 8 }}>
+        <strong style={{ fontSize: 14, color: "#334155" }}>{optionsLabel}</strong>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {availableOptions.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              draggable
+              onDragStart={(event) => {
+                event.dataTransfer.setData("text/plain", option.id);
+                setDraggedOption(option.id);
+              }}
+              onClick={() => {
+                const firstEmptySlot = allSlots.find((slot) => !filledSlots[slot.slotId]);
+                if (firstEmptySlot) {
+                  assignOptionToSlot(firstEmptySlot.slotId, option.id);
+                }
+              }}
+              style={{
+                border: "1px solid #94a3b8",
+                borderRadius: 999,
+                padding: "6px 12px",
+                background: "#ffffff",
+                color: "#0f172a",
+                cursor: "grab",
+                fontSize: 14,
+              }}
+              title={option.helpText}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {isComplete && (
+        <div style={{ borderRadius: 10, background: "#ecfdf5", border: "1px solid #86efac", padding: 10 }}>
+          {completionNote}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const LetterWritingIntroPage = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -88,6 +221,20 @@ const LetterWritingIntroPage = () => {
   const formalSample = t("letterWritingIntro.annotatedSamples.formal.items", { returnObjects: true });
   const informalSample = t("letterWritingIntro.annotatedSamples.informal.items", { returnObjects: true });
   const additionalTips = t("letterWritingIntro.additionalTips.items", { returnObjects: true });
+  const firstLetterTemplate = t("letterWritingIntro.firstLetterTemplate", { returnObjects: true });
+
+  const firstLetterTemplateData = {
+    exerciseTitle: firstLetterTemplate?.exerciseTitle || "Build your first letter",
+    instructions: firstLetterTemplate?.instructions || "Drag each phrase into the correct blank.",
+    templateLines: Array.isArray(firstLetterTemplate?.templateLines) ? firstLetterTemplate.templateLines : [],
+    optionsLabel: firstLetterTemplate?.optionsLabel || "Drag options:",
+    options: Array.isArray(firstLetterTemplate?.options) ? firstLetterTemplate.options : [],
+    completionNote:
+      firstLetterTemplate?.completionNote || "Great. Now copy your completed letter and submit it as your assignment.",
+    afterTemplate:
+      firstLetterTemplate?.afterTemplate ||
+      "After completing the template, copy the full letter in your notebook and submit it through your normal assignment flow.",
+  };
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -113,6 +260,9 @@ const LetterWritingIntroPage = () => {
           </a>
           <a href="#formal-assignment" style={{ fontSize: 13, color: "#2563eb", fontWeight: 600 }}>
             {t("letterWritingIntro.toc.formalAssignment")}
+          </a>
+          <a href="#first-letter-template" style={{ fontSize: 13, color: "#d97706", fontWeight: 600 }}>
+            {t("letterWritingIntro.toc.firstLetterTemplate")}
           </a>
           <a href="#additional-tips" style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600 }}>
             {t("letterWritingIntro.toc.additionalTips")}
@@ -176,6 +326,23 @@ const LetterWritingIntroPage = () => {
           accentColor="#6ee7b7"
           accentBackground="#ecfdf3"
         />
+      </Section>
+
+      <Section
+        id="first-letter-template"
+        title={t("letterWritingIntro.firstLetterTemplateTitle")}
+        accentColor="#f59e0b"
+        accentBackground="#fffbeb"
+      >
+        <FillInTemplateExercise
+          title={firstLetterTemplateData.exerciseTitle}
+          instructions={firstLetterTemplateData.instructions}
+          templateLines={firstLetterTemplateData.templateLines}
+          optionsLabel={firstLetterTemplateData.optionsLabel}
+          options={firstLetterTemplateData.options}
+          completionNote={firstLetterTemplateData.completionNote}
+        />
+        <p style={{ margin: 0 }}>{firstLetterTemplateData.afterTemplate}</p>
       </Section>
 
       <Section

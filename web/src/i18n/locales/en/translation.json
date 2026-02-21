@@ -846,7 +846,8 @@
       "informal": "Informal structure",
       "informalAssignment": "Informal assignment",
       "formalAssignment": "Formal assignment",
-      "additionalTips": "Additional tips"
+      "additionalTips": "Additional tips",
+      "firstLetterTemplate": "First letter template practice"
     },
     "formalTitle": "Formal letter structure",
     "formal": {
@@ -1001,6 +1002,69 @@
     "cta": {
       "startWriting": "Start Writing",
       "openIdeas": "Open Ideas Generator"
+    },
+    "firstLetterTemplateTitle": "First letter: drag-and-drop template",
+    "firstLetterTemplate": {
+      "exerciseTitle": "Fill the template before writing alone",
+      "instructions": "Drag each phrase into the right blank (or click an option to place it in the next empty blank).",
+      "templateLines": [
+        {
+          "id": "l1",
+          "parts": [
+            "Hallo Tom,"
+          ]
+        },
+        {
+          "id": "l2",
+          "parts": [
+            {
+              "slotId": "reason",
+              "placeholder": "[Reason sentence]"
+            }
+          ]
+        },
+        {
+          "id": "l3",
+          "parts": [
+            {
+              "slotId": "wish",
+              "placeholder": "[Birthday wish]"
+            }
+          ]
+        },
+        {
+          "id": "l4",
+          "parts": [
+            {
+              "slotId": "question",
+              "placeholder": "[Question about celebration]"
+            }
+          ]
+        },
+        {
+          "id": "l5",
+          "parts": [
+            "Liebe Grüße, Sara"
+          ]
+        }
+      ],
+      "optionsLabel": "Options to drag:",
+      "options": [
+        {
+          "id": "reason_opt",
+          "label": "ich schreibe dir, weil du Geburtstag hast."
+        },
+        {
+          "id": "wish_opt",
+          "label": "Ich wünsche dir alles Gute zum Geburtstag!"
+        },
+        {
+          "id": "question_opt",
+          "label": "Feierst du am Samstag mit deiner Familie?"
+        }
+      ],
+      "completionNote": "Nice work. Now copy this full letter in your notebook and submit it as your assignment.",
+      "afterTemplate": "After this guided template, write the same letter again by yourself and submit it through your usual assignment process."
     }
   },
   "examFile": {
