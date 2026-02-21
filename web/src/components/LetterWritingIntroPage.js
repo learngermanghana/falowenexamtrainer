@@ -1,415 +1,539 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Trans, useTranslation } from "react-i18next";
 import { styles } from "../styles";
 
-const Section = ({ id, title, accentColor, accentBackground, children }) => (
-  <section
-    id={id}
-    style={{
-      ...styles.card,
-      display: "grid",
-      gap: 12,
-      borderLeft: accentColor ? `6px solid ${accentColor}` : styles.card.border,
-      background: accentBackground || styles.card.background,
-    }}
-  >
+/** =========================
+ *  UI helpers
+ *  ========================= */
+const Section = ({ title, children }) => (
+  <section style={{ ...styles.card, display: "grid", gap: 10 }} aria-label={title}>
     <h2 style={{ margin: 0 }}>{title}</h2>
     {children}
   </section>
 );
 
+const TopicImageBreak = ({ src, alt, title, subtitle }) => (
+  <div style={{ ...styles.card, padding: 0, overflow: "hidden" }} aria-label={title || "Topic image"}>
+    <img
+      src={src}
+      alt={alt}
+      style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
+      loading="lazy"
+    />
+    {(title || subtitle) && (
+      <div style={{ padding: 12, display: "grid", gap: 4 }}>
+        {title && <div style={{ fontWeight: 900 }}>{title}</div>}
+        {subtitle && <div style={{ opacity: 0.85 }}>{subtitle}</div>}
+      </div>
+    )}
+  </div>
+);
+
 const BulletList = ({ items }) => (
   <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-    {items.map((item) => (
-      <li key={item}>{item}</li>
+    {items.map((x) => (
+      <li key={x}>{x}</li>
     ))}
   </ul>
 );
 
-const Checklist = ({ items }) => {
-  const [checkedItems, setCheckedItems] = useState(() => items.map(() => false));
+/** =========================
+ *  Free-to-use images (Unsplash License)
+ *  ========================= */
+const IMG_LETTER =
+  "https://source.unsplash.com/n9AaeihA9HI/1600x900"; // notebook/letter vibe
+const IMG_PRACTICE =
+  "https://source.unsplash.com/2JIvboGLeho/1600x900"; // studying / writing vibe
 
-  useEffect(() => {
-    setCheckedItems(items.map(() => false));
-  }, [items]);
+/** =========================
+ *  A1 Weil Practice Block
+ *  ========================= */
+const WeilPractice = () => {
+  const questions = useMemo(
+    () => [
+      {
+        id: "q1",
+        title: "Example 1 (Modal verb)",
+        prompt: "Ich kann nicht kommen. → Ich schreibe Ihnen, weil ...",
+        choices: [
+          "ich kann nicht kommen.",
+          "ich nicht kommen kann.",
+        ],
+        answer: "ich nicht kommen kann.",
+        explanation: "Nach „weil“ kommt das Verb (kann) am Ende.",
+      },
+      {
+        id: "q2",
+        title: "Example 2 (Normal verb)",
+        prompt: "Ich komme nicht. → Ich schreibe Ihnen, weil ...",
+        choices: [
+          "ich nicht komme.",
+          "ich komme nicht.",
+        ],
+        answer: "ich nicht komme.",
+        explanation: "Nach „weil“ kommt das Verb (komme) am Ende.",
+      },
+      {
+        id: "q3",
+        title: "Tip with „möchte“",
+        prompt: "Ich schreibe Ihnen, weil ...",
+        choices: [
+          "ich möchte den Termin absagen.",
+          "ich den Termin absagen möchte.",
+        ],
+        answer: "ich den Termin absagen möchte.",
+        explanation: "„möchte“ steht am Ende (weil-Satz).",
+      },
+    ],
+    []
+  );
+
+  const [selected, setSelected] = useState(() => Object.fromEntries(questions.map((q) => [q.id, ""])));
+  const [checked, setChecked] = useState(false);
+
+  const score = useMemo(() => {
+    if (!checked) return null;
+    let s = 0;
+    questions.forEach((q) => {
+      if (selected[q.id] === q.answer) s++;
+    });
+    return s;
+  }, [checked, selected, questions]);
+
+  const reset = () => {
+    setSelected(Object.fromEntries(questions.map((q) => [q.id, ""])));
+    setChecked(false);
+  };
 
   return (
-    <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
-      {items.map((item, index) => (
-        <li key={item}>
-          <label style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
-            <input
-              type="checkbox"
-              checked={checkedItems[index] || false}
-              onChange={() =>
-                setCheckedItems((prev) => prev.map((value, idx) => (idx === index ? !value : value)))
-              }
-            />
-            <span>{item}</span>
-          </label>
-        </li>
-      ))}
-    </ol>
+    <div style={{ display: "grid", gap: 12 }}>
+      <p style={{ margin: 0 }}>
+        Rule: After <strong>weil</strong>, the verb goes to the <strong>end</strong>.
+      </p>
+
+      {questions.map((q, idx) => {
+        const val = selected[q.id];
+        const isCorrect = checked && val === q.answer;
+        const isWrong = checked && val && val !== q.answer;
+
+        return (
+          <div key={q.id} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+            <div style={{ fontWeight: 800 }}>
+              {idx + 1}) {q.title}
+            </div>
+            <div style={{ opacity: 0.9 }}>{q.prompt}</div>
+
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {q.choices.map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setSelected((p) => ({ ...p, [q.id]: c }))}
+                  style={{
+                    ...styles.secondaryButton,
+                    width: "fit-content",
+                    borderColor: val === c ? "#111827" : undefined,
+                    fontWeight: val === c ? 800 : 500,
+                  }}
+                  aria-label={`Choose: ${c}`}
+                >
+                  {c}
+                </button>
+              ))}
+
+              {isCorrect && <span style={{ fontWeight: 800 }}>✅ richtig</span>}
+              {isWrong && <span style={{ fontWeight: 800 }}>❌ falsch</span>}
+            </div>
+
+            {checked && (
+              <div style={{ opacity: 0.9 }}>
+                <strong>Why:</strong> {q.explanation}
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, width: "fit-content" }}
+          onClick={() => setChecked(true)}
+          disabled={Object.values(selected).some((v) => !v)}
+        >
+          Check answers
+        </button>
+        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={reset}>
+          Reset
+        </button>
+
+        {checked && (
+          <div style={{ marginLeft: "auto", fontWeight: 900 }}>
+            Score: {score}/{questions.length}
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
-const AnnotatedSample = ({ title, items, accentColor, accentBackground }) => (
-  <div
-    style={{
-      borderRadius: 12,
-      border: `1px solid ${accentColor}`,
-      background: accentBackground,
-      padding: 16,
-      display: "grid",
-      gap: 12,
-    }}
-  >
-    <h3 style={{ margin: 0 }}>{title}</h3>
-    <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
-      {items.map((item) => (
-        <li key={item.label}>
-          <strong>{item.label}:</strong> {item.text}
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+/** =========================
+ *  Copy-ready letter templates (A1 + weil only)
+ *  ========================= */
+const CopyLetterBuilder = () => {
+  const [mode, setMode] = useState("formal"); // formal | informal
 
-const FillInTemplateExercise = ({ title, instructions, templateLines, optionsLabel, options, completionNote }) => {
-  const [filledSlots, setFilledSlots] = useState({});
-  const [draggedOption, setDraggedOption] = useState(null);
+  // Formal greeting
+  const [formalGreetingType, setFormalGreetingType] = useState("damen"); // frau | herr | damen
+  const [formalName, setFormalName] = useState("");
 
-  useEffect(() => {
-    setFilledSlots({});
-  }, [templateLines, options]);
+  // Informal greeting
+  const [informalGreetingType, setInformalGreetingType] = useState("hallo"); // hallo | liebe | lieber
+  const [informalName, setInformalName] = useState("");
 
-  const allSlots = templateLines
-    .flatMap((line) => line.parts)
-    .filter((part) => typeof part === "object" && part.slotId);
+  // A1 reasons (weil only)
+  const REASONS = useMemo(
+    () => [
+      { id: "absage", label: "Termin absagen", weil: "ich den Termin absagen möchte" },
+      { id: "kurs", label: "Deutschkurs besuchen", weil: "ich einen Deutschkurs besuchen möchte" },
+      { id: "geburtstag", label: "Gratulieren (Geburtstag)", weil: "ich dir zum Geburtstag gratulieren möchte" },
+      { id: "anfragen", label: "Anfragen stellen", weil: "ich Anfragen stellen möchte" },
+    ],
+    []
+  );
+  const [reasonId, setReasonId] = useState("absage");
+  const reason = REASONS.find((r) => r.id === reasonId) || REASONS[0];
 
-  const usedOptionIds = new Set(Object.values(filledSlots));
-  const availableOptions = options.filter((option) => !usedOptionIds.has(option.id));
+  // Body lines (simple)
+  const [line1, setLine1] = useState("");
+  const [line2, setLine2] = useState("");
 
-  const assignOptionToSlot = (slotId, optionId) => {
-    setFilledSlots((prev) => {
-      const next = { ...prev };
-      Object.keys(next).forEach((existingSlotId) => {
-        if (next[existingSlotId] === optionId) {
-          delete next[existingSlotId];
-        }
-      });
-      next[slotId] = optionId;
-      return next;
-    });
+  // Name
+  const [senderName, setSenderName] = useState("");
+
+  const greeting = useMemo(() => {
+    if (mode === "formal") {
+      if (formalGreetingType === "frau") return `Sehr geehrte Frau ${formalName || "..."},`;
+      if (formalGreetingType === "herr") return `Sehr geehrter Herr ${formalName || "..."},`;
+      return "Sehr geehrte Damen und Herren,";
+    }
+
+    if (informalGreetingType === "liebe") return `Liebe ${informalName || "..."},`;
+    if (informalGreetingType === "lieber") return `Lieber ${informalName || "..."},`;
+    return `Hallo ${informalName || "..."},`;
+  }, [mode, formalGreetingType, formalName, informalGreetingType, informalName]);
+
+  const opener = mode === "formal"
+    ? "Ich hoffe, es geht Ihnen gut."
+    : "Wie geht es dir? Ich hoffe, es geht dir gut.";
+
+  const weilSentence = useMemo(() => {
+    if (mode === "formal") return `Ich schreibe Ihnen, weil ${reason.weil}.`;
+    // special case birthday (contains "dir" already)
+    if (reasonId === "geburtstag") return "Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte.";
+    return `Ich schreibe dir, weil ${reason.weil}.`;
+  }, [mode, reason, reasonId, reasonId]);
+
+  const closing = mode === "formal"
+    ? "Ich freue mich im Voraus auf Ihre Antwort."
+    : "Ich freue mich im Voraus auf deine Antwort.";
+
+  const signoff = mode === "formal" ? "Mit freundlichen Grüßen," : "Liebe Grüße,";
+
+  const letter = useMemo(() => {
+    const out = [];
+    out.push(greeting);
+    out.push("");
+    out.push(opener);
+    out.push(weilSentence);
+    out.push("");
+    if ((line1 || "").trim()) out.push(line1.trim());
+    if ((line2 || "").trim()) out.push(line2.trim());
+    out.push("");
+    out.push(closing);
+    out.push(signoff);
+    out.push(senderName || (mode === "formal" ? "[Your Full Name]" : "[Your First Name]"));
+    return out.join("\n");
+  }, [greeting, opener, weilSentence, line1, line2, closing, signoff, senderName, mode]);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(letter);
+      alert("Copied!");
+    } catch {
+      alert("Copy failed. Please copy manually.");
+    }
   };
-
-  const clearSlot = (slotId) => {
-    setFilledSlots((prev) => {
-      const next = { ...prev };
-      delete next[slotId];
-      return next;
-    });
-  };
-
-  const isComplete = allSlots.length > 0 && allSlots.every((slot) => filledSlots[slot.slotId]);
 
   return (
-    <div style={{ ...styles.card, display: "grid", gap: 12, border: "1px solid #cbd5e1" }}>
-      <h3 style={{ margin: 0 }}>{title}</h3>
-      <p style={{ margin: 0 }}>{instructions}</p>
-
-      <div style={{ display: "grid", gap: 10, background: "#f8fafc", borderRadius: 12, padding: 14 }}>
-        {templateLines.map((line) => (
-          <p key={line.id} style={{ margin: 0, lineHeight: 1.7 }}>
-            {line.parts.map((part, index) => {
-              if (typeof part === "string") {
-                return <span key={`${line.id}-${index}`}>{part}</span>;
-              }
-
-              const filledOptionId = filledSlots[part.slotId];
-              const filledOption = options.find((option) => option.id === filledOptionId);
-
-              return (
-                <button
-                  key={part.slotId}
-                  type="button"
-                  onDrop={(event) => {
-                    event.preventDefault();
-                    const droppedId = event.dataTransfer.getData("text/plain") || draggedOption;
-                    if (droppedId) {
-                      assignOptionToSlot(part.slotId, droppedId);
-                    }
-                    setDraggedOption(null);
-                  }}
-                  onDragOver={(event) => event.preventDefault()}
-                  onClick={() => clearSlot(part.slotId)}
-                  style={{
-                    margin: "0 4px",
-                    minWidth: 150,
-                    borderRadius: 8,
-                    border: `2px dashed ${filledOption ? "#0ea5e9" : "#94a3b8"}`,
-                    background: filledOption ? "#e0f2fe" : "#ffffff",
-                    color: "#0f172a",
-                    padding: "6px 10px",
-                    textAlign: "left",
-                    cursor: "pointer",
-                    fontSize: 14,
-                  }}
-                >
-                  {filledOption ? filledOption.label : part.placeholder}
-                </button>
-              );
-            })}
-          </p>
-        ))}
+    <div style={{ display: "grid", gap: 12 }}>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="radio" name="mode2" checked={mode === "formal"} onChange={() => setMode("formal")} />
+          Formal (Sie)
+        </label>
+        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <input type="radio" name="mode2" checked={mode === "informal"} onChange={() => setMode("informal")} />
+          Informal (du)
+        </label>
       </div>
 
+      {/* Greeting choices */}
+      {mode === "formal" ? (
+        <div style={{ display: "grid", gap: 10 }}>
+          <strong>Greeting (Formal)</strong>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input type="radio" name="fg" checked={formalGreetingType === "frau"} onChange={() => setFormalGreetingType("frau")} />
+              Sehr geehrte Frau + Name
+            </label>
+            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input type="radio" name="fg" checked={formalGreetingType === "herr"} onChange={() => setFormalGreetingType("herr")} />
+              Sehr geehrter Herr + Name
+            </label>
+            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input type="radio" name="fg" checked={formalGreetingType === "damen"} onChange={() => setFormalGreetingType("damen")} />
+              Sehr geehrte Damen und Herren
+            </label>
+          </div>
+
+          {(formalGreetingType === "frau" || formalGreetingType === "herr") && (
+            <label style={{ display: "grid", gap: 6 }}>
+              <span style={{ fontWeight: 800 }}>Name</span>
+              <input
+                value={formalName}
+                onChange={(e) => setFormalName(e.target.value)}
+                placeholder="e.g., Müller"
+                style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+              />
+            </label>
+          )}
+        </div>
+      ) : (
+        <div style={{ display: "grid", gap: 10 }}>
+          <strong>Greeting (Informal)</strong>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input type="radio" name="ig" checked={informalGreetingType === "hallo"} onChange={() => setInformalGreetingType("hallo")} />
+              Hallo + Name
+            </label>
+            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input type="radio" name="ig" checked={informalGreetingType === "liebe"} onChange={() => setInformalGreetingType("liebe")} />
+              Liebe + Name (female)
+            </label>
+            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+              <input type="radio" name="ig" checked={informalGreetingType === "lieber"} onChange={() => setInformalGreetingType("lieber")} />
+              Lieber + Name (male)
+            </label>
+          </div>
+
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ fontWeight: 800 }}>First name</span>
+            <input
+              value={informalName}
+              onChange={(e) => setInformalName(e.target.value)}
+              placeholder="e.g., Max"
+              style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+            />
+          </label>
+        </div>
+      )}
+
+      {/* Reason */}
       <div style={{ display: "grid", gap: 8 }}>
-        <strong style={{ fontSize: 14, color: "#334155" }}>{optionsLabel}</strong>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {availableOptions.map((option) => (
-            <button
-              key={option.id}
-              type="button"
-              draggable
-              onDragStart={(event) => {
-                event.dataTransfer.setData("text/plain", option.id);
-                setDraggedOption(option.id);
-              }}
-              onClick={() => {
-                const firstEmptySlot = allSlots.find((slot) => !filledSlots[slot.slotId]);
-                if (firstEmptySlot) {
-                  assignOptionToSlot(firstEmptySlot.slotId, option.id);
-                }
-              }}
-              style={{
-                border: "1px solid #94a3b8",
-                borderRadius: 999,
-                padding: "6px 12px",
-                background: "#ffffff",
-                color: "#0f172a",
-                cursor: "grab",
-                fontSize: 14,
-              }}
-              title={option.helpText}
-            >
-              {option.label}
-            </button>
+        <strong>Reason (weil)</strong>
+        <select
+          value={reasonId}
+          onChange={(e) => setReasonId(e.target.value)}
+          style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+        >
+          {REASONS.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.label}
+            </option>
           ))}
+        </select>
+
+        <div style={{ ...styles.card, display: "grid", gap: 6 }}>
+          <div style={{ fontWeight: 900 }}>Weil sentence preview</div>
+          <div>{weilSentence}</div>
         </div>
       </div>
 
-      {isComplete && (
+      {/* Body writing */}
+      <div style={{ display: "grid", gap: 8 }}>
+        <strong>Main body (write 1–2 simple lines)</strong>
+
+        <label style={{ display: "grid", gap: 6 }}>
+          <span style={{ fontWeight: 800 }}>Line 1</span>
+          <input
+            value={line1}
+            onChange={(e) => setLine1(e.target.value)}
+            placeholder={mode === "formal" ? "e.g., Können Sie mir bitte Informationen geben?" : "e.g., Alles Gute zum Geburtstag!"}
+            style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+          />
+        </label>
+
+        <label style={{ display: "grid", gap: 6 }}>
+          <span style={{ fontWeight: 800 }}>Line 2 (optional)</span>
+          <input
+            value={line2}
+            onChange={(e) => setLine2(e.target.value)}
+            placeholder={mode === "formal" ? "e.g., Wann beginnt der Kurs?" : "e.g., Hast du eine Feier?"}
+            style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+          />
+        </label>
+      </div>
+
+      {/* Name + copy */}
+      <div style={{ display: "grid", gap: 8 }}>
+        <strong>Sign your name</strong>
+        <input
+          value={senderName}
+          onChange={(e) => setSenderName(e.target.value)}
+          placeholder={mode === "formal" ? "Your full name" : "Your first name"}
+          style={{ padding: 10, borderRadius: 10, border: "1px solid #d1d5db" }}
+        />
+
+        <strong>Final letter (copy & submit)</strong>
+        <pre
+          style={{
+            margin: 0,
+            padding: 12,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            background: "#0b1220",
+            color: "#e5e7eb",
+            overflowX: "auto",
+            lineHeight: 1.6,
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {letter}
+        </pre>
+
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={copy}>
+            Copy letter
+          </button>
+        </div>
+
         <div style={{ borderRadius: 10, background: "#ecfdf5", border: "1px solid #86efac", padding: 10 }}>
           {completionNote}
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-const LetterWritingIntroPage = () => {
+/** =========================
+ *  Page: Note → Practice → Copy & Submit
+ *  ========================= */
+const LetterWritingA1IntroPage = () => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  const formalSalutations = t("letterWritingIntro.formal.salutations", { returnObjects: true });
-  const formalOpeningExamples = t("letterWritingIntro.formal.openingExamples", { returnObjects: true });
-  const informalSalutations = t("letterWritingIntro.informal.salutations", { returnObjects: true });
-  const informalOpeningExamples = t("letterWritingIntro.informal.openingExamples", { returnObjects: true });
-  const informalSteps = t("letterWritingIntro.informalAssignment.steps", { returnObjects: true });
-  const formalSteps = t("letterWritingIntro.formalAssignment.steps", { returnObjects: true });
-  const formalSample = t("letterWritingIntro.annotatedSamples.formal.items", { returnObjects: true });
-  const informalSample = t("letterWritingIntro.annotatedSamples.informal.items", { returnObjects: true });
-  const additionalTips = t("letterWritingIntro.additionalTips.items", { returnObjects: true });
-  const firstLetterTemplate = t("letterWritingIntro.firstLetterTemplate", { returnObjects: true });
-
-  const firstLetterTemplateData = {
-    exerciseTitle: firstLetterTemplate?.exerciseTitle || "Build your first letter",
-    instructions: firstLetterTemplate?.instructions || "Drag each phrase into the correct blank.",
-    templateLines: Array.isArray(firstLetterTemplate?.templateLines) ? firstLetterTemplate.templateLines : [],
-    optionsLabel: firstLetterTemplate?.optionsLabel || "Drag options:",
-    options: Array.isArray(firstLetterTemplate?.options) ? firstLetterTemplate.options : [],
-    completionNote:
-      firstLetterTemplate?.completionNote || "Great. Now copy your completed letter and submit it as your assignment.",
-    afterTemplate:
-      firstLetterTemplate?.afterTemplate ||
-      "After completing the template, copy the full letter in your notebook and submit it through your normal assignment flow.",
-  };
+  // if you want i18n later, you can add useTranslation()—kept simple here.
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+    <main style={{ ...styles.container, display: "grid", gap: 16 }}>
+      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          {t("letterWritingIntro.backToCourse")}
+          Back to Course
         </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>{t("letterWritingIntro.title")}</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>{t("letterWritingIntro.subtitle")}</p>
-        <p style={{ margin: 0, fontSize: 13, color: "#6b7280" }}>{t("letterWritingIntro.languageNote")}</p>
-        <nav style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <span style={{ fontSize: 13, color: "#4b5563", fontWeight: 600 }}>
-            {t("letterWritingIntro.toc.label")}
-          </span>
-          <a href="#formal" style={{ fontSize: 13, color: "#2563eb", fontWeight: 600 }}>
-            {t("letterWritingIntro.toc.formal")}
-          </a>
-          <a href="#informal" style={{ fontSize: 13, color: "#059669", fontWeight: 600 }}>
-            {t("letterWritingIntro.toc.informal")}
-          </a>
-          <a href="#informal-assignment" style={{ fontSize: 13, color: "#059669", fontWeight: 600 }}>
-            {t("letterWritingIntro.toc.informalAssignment")}
-          </a>
-          <a href="#formal-assignment" style={{ fontSize: 13, color: "#2563eb", fontWeight: 600 }}>
-            {t("letterWritingIntro.toc.formalAssignment")}
-          </a>
-          <a href="#first-letter-template" style={{ fontSize: 13, color: "#d97706", fontWeight: 600 }}>
-            {t("letterWritingIntro.toc.firstLetterTemplate")}
-          </a>
-          <a href="#additional-tips" style={{ fontSize: 13, color: "#7c3aed", fontWeight: 600 }}>
-            {t("letterWritingIntro.toc.additionalTips")}
-          </a>
-        </nav>
-      </div>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 Letter Writing: Formal & Informal (weil)</h1>
+        <p style={{ ...styles.subtitle, margin: 0 }}>
+          Read the structure → practice “weil” word order → build your own letter and copy it.
+        </p>
+      </header>
 
-      <Section
-        id="formal"
-        title={t("letterWritingIntro.formalTitle")}
-        accentColor="#2563eb"
-        accentBackground="#eff6ff"
-      >
-        <BulletList items={formalSalutations} />
-        <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.formal.openingLine" components={{ strong: <strong />, em: <em /> }} />
-        </p>
-        <BulletList items={formalOpeningExamples} />
-        <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.formal.mainBody" components={{ strong: <strong />, em: <em /> }} />
-        </p>
-        <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.formal.conclusion" components={{ strong: <strong />, em: <em /> }} />
-        </p>
-      </Section>
+      <TopicImageBreak
+        src={IMG_LETTER}
+        alt="Notebook and writing materials"
+        title="Step 1: Read the note"
+        subtitle="First understand the structure. Then you practice."
+      />
 
-      <Section
-        id="informal"
-        title={t("letterWritingIntro.informalTitle")}
-        accentColor="#059669"
-        accentBackground="#ecfdf3"
-      >
-        <BulletList items={informalSalutations} />
-        <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.informal.openingLine" components={{ strong: <strong />, em: <em /> }} />
-        </p>
-        <BulletList items={informalOpeningExamples} />
-        <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.informal.mainBody" components={{ strong: <strong />, em: <em /> }} />
-        </p>
-        <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.informal.conclusion" components={{ strong: <strong />, em: <em /> }} />
-        </p>
-      </Section>
-
-      <Section
-        id="annotated-samples"
-        title={t("letterWritingIntro.annotatedSamplesTitle")}
-        accentColor="#7c3aed"
-        accentBackground="#f5f3ff"
-      >
-        <AnnotatedSample
-          title={t("letterWritingIntro.annotatedSamples.formal.title")}
-          items={formalSample}
-          accentColor="#93c5fd"
-          accentBackground="#eff6ff"
+      <Section title="Formal Letter Structure (Note)">
+        <BulletList
+          items={[
+            "Sehr geehrte Frau + Name (female)",
+            "Sehr geehrter Herr + Name (male)",
+            "Sehr geehrte Damen und Herren (unknown receiver)",
+          ]}
         />
-        <AnnotatedSample
-          title={t("letterWritingIntro.annotatedSamples.informal.title")}
-          items={informalSample}
-          accentColor="#6ee7b7"
-          accentBackground="#ecfdf3"
-        />
-      </Section>
-
-      <Section
-        id="first-letter-template"
-        title={t("letterWritingIntro.firstLetterTemplateTitle")}
-        accentColor="#f59e0b"
-        accentBackground="#fffbeb"
-      >
-        <FillInTemplateExercise
-          title={firstLetterTemplateData.exerciseTitle}
-          instructions={firstLetterTemplateData.instructions}
-          templateLines={firstLetterTemplateData.templateLines}
-          optionsLabel={firstLetterTemplateData.optionsLabel}
-          options={firstLetterTemplateData.options}
-          completionNote={firstLetterTemplateData.completionNote}
-        />
-        <p style={{ margin: 0 }}>{firstLetterTemplateData.afterTemplate}</p>
-      </Section>
-
-      <Section
-        id="additional-tips"
-        title={t("letterWritingIntro.additionalTipsTitle")}
-        accentColor="#7c3aed"
-        accentBackground="#f5f3ff"
-      >
-        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 12 }}>
-          {additionalTips.map((tip) => (
-            <li key={tip.title} style={{ display: "grid", gap: 6 }}>
-              <strong>{tip.title}</strong>
-              <div style={{ display: "grid", gap: 4 }}>
-                {tip.lines.map((line) => (
-                  <span key={line}>{line}</span>
-                ))}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section
-        id="informal-assignment"
-        title={t("letterWritingIntro.informalAssignmentTitle")}
-        accentColor="#059669"
-        accentBackground="#ecfdf3"
-      >
-        <p style={{ margin: 0 }}>{t("letterWritingIntro.informalAssignment.intro")}</p>
-        <Checklist items={informalSteps} />
         <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.informalAssignment.sampleQuestion" components={{ strong: <strong /> }} />
+          <strong>Opening:</strong> Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [reason for writing].
         </p>
-        <p style={{ margin: 0 }}>{t("letterWritingIntro.informalAssignment.afterWriting")}</p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <button style={styles.primaryButton} onClick={() => navigate("/campus/writing")}>
-            {t("letterWritingIntro.cta.startWriting")}
-          </button>
-          <button style={styles.secondaryButton} onClick={() => navigate("/campus/writing?tab=ideas")}>
-            {t("letterWritingIntro.cta.openIdeas")}
-          </button>
-        </div>
+        <p style={{ margin: 0 }}>
+          <strong>weil rule:</strong> After <strong>weil</strong>, the verb (or modal verb) goes to the end.
+        </p>
+        <BulletList
+          items={[
+            "Example 1: Ich kann nicht kommen. → Ich schreibe Ihnen, weil ich nicht kommen kann.",
+            "Example 2: Ich komme nicht. → Ich schreibe Ihnen, weil ich nicht komme.",
+            "Tip: You can often start with „Ich“ and end with „möchte“: Ich schreibe Ihnen, weil ich den Termin absagen möchte.",
+          ]}
+        />
+        <p style={{ margin: 0 }}>
+          <strong>Conclusion (fixed):</strong> Ich freue mich im Voraus auf Ihre Antwort.
+          <br />
+          <strong>Closing:</strong> Mit freundlichen Grüßen,
+          <br />
+          <strong>Name:</strong> [Your Full Name]
+        </p>
       </Section>
 
-      <Section
-        id="formal-assignment"
-        title={t("letterWritingIntro.formalAssignmentTitle")}
-        accentColor="#2563eb"
-        accentBackground="#eff6ff"
-      >
-        <p style={{ margin: 0 }}>{t("letterWritingIntro.formalAssignment.intro")}</p>
-        <Checklist items={formalSteps} />
+      <Section title="Informal Letter Structure (Note)">
+        <BulletList
+          items={[
+            "Hallo [Name]",
+            "Liebe [Name] (female) / Lieber [Name] (male)",
+          ]}
+        />
         <p style={{ margin: 0 }}>
-          <Trans i18nKey="letterWritingIntro.formalAssignment.sampleQuestion" components={{ strong: <strong /> }} />
+          <strong>Opening:</strong> Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [reason for writing].
         </p>
-        <p style={{ margin: 0 }}>{t("letterWritingIntro.formalAssignment.afterWriting")}</p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <button style={styles.primaryButton} onClick={() => navigate("/campus/writing")}>
-            {t("letterWritingIntro.cta.startWriting")}
-          </button>
-          <button style={styles.secondaryButton} onClick={() => navigate("/campus/writing?tab=ideas")}>
-            {t("letterWritingIntro.cta.openIdeas")}
-          </button>
-        </div>
+        <p style={{ margin: 0 }}>
+          <strong>weil rule:</strong> After <strong>weil</strong>, the verb (or modal verb) goes to the end.
+        </p>
+        <BulletList
+          items={[
+            "Example 1: Ich kann nicht kommen. → Ich schreibe dir, weil ich nicht kommen kann.",
+            "Example 2: Ich komme nicht. → Ich schreibe dir, weil ich nicht komme.",
+            "Tip: Ich schreibe dir, weil ich den Termin absagen möchte.",
+          ]}
+        />
+        <p style={{ margin: 0 }}>
+          <strong>Conclusion (fixed):</strong> Ich freue mich im Voraus auf deine Antwort.
+          <br />
+          <strong>Closing:</strong> Liebe Grüße / Viele Grüße
+          <br />
+          <strong>Name:</strong> [Your First Name]
+        </p>
       </Section>
-    </div>
+
+      <TopicImageBreak
+        src={IMG_PRACTICE}
+        alt="Person writing and studying"
+        title="Step 2: Practice"
+        subtitle="Train the weil rule before writing the full letter."
+      />
+
+      <Section title="Practice: weil word order (A1)">
+        <WeilPractice />
+      </Section>
+
+      <TopicImageBreak
+        src={IMG_LETTER}
+        alt="Notebook and writing materials"
+        title="Step 3: Write + copy"
+        subtitle="Build your own letter and submit it."
+      />
+
+      <Section title="Write your letter (A1) — Copy & Submit">
+        <A1WeilLetterBuilder />
+      </Section>
+    </main>
   );
 };
 
-export default LetterWritingIntroPage;
+export default memo(LetterWritingA1IntroPage);
