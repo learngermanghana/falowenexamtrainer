@@ -455,6 +455,9 @@ const IMG_COLORS =
 const IMG_ROOM =
   "https://images.unsplash.com/photo-1652882861012-95f3263cab63?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
 
+const IMG_GRAMMAR_NOTES =
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
+
 /** =========================
  *  Page
  *  ========================= */
@@ -536,6 +539,13 @@ const ObjectsAndColorsPage = () => {
         <SimpleTable caption="Articles in accusative" columns={articleColumns} rows={accusativeRows} />
       </Section>
 
+      <TopicImageBreak
+        src={IMG_GRAMMAR_NOTES}
+        alt="Notebook and pen used as a visual break before grammar notes"
+        title="Grammar Focus"
+        subtitle="Indefinite articles and possessive determiners in action."
+      />
+
       <Section title="Indefinite Articles and Possessive Determiners">
         <p style={{ margin: 0 }}>
           Possessive determiners follow the same ending pattern as <strong>ein / eine / einen</strong>.
@@ -561,6 +571,117 @@ const ObjectsAndColorsPage = () => {
           <li>Ich suche einen Tisch → Ich suche meinen/deinen/seinen/ihren/unseren/euren/Ihren Tisch.</li>
           <li>Ich nehme eine Tasche → Ich nehme meine/deine/seine/ihre/unsere/eure/Ihre Tasche.</li>
         </ul>
+        <h3 style={{ margin: 0 }}>Note on Using Adjectives with "zu," "super," and "sehr"</h3>
+        <p style={{ margin: 0 }}>
+          Adjectives are essential in any language to describe nouns and add detail to your sentences. In German,
+          adjectives can be modified by words like <strong>zu</strong>, <strong>super</strong>, and <strong>sehr</strong>
+          to change their intensity or degree.
+        </p>
+
+        <p style={{ margin: 0 }}>
+          <strong>Adjectives with "zu"</strong>
+          <br />
+          "Zu" means "too" in English and is used to indicate that something is excessive or beyond what is desired.
+          <br />
+          Structure: <strong>zu + adjective</strong>
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>Das Auto ist <strong>zu teuer</strong>. (The car is too expensive.)</li>
+          <li>Der Film ist <strong>zu lang</strong>. (The movie is too long.)</li>
+        </ul>
+
+        <p style={{ margin: 0 }}>
+          <strong>Adjectives with "super"</strong>
+          <br />
+          "Super" means "super" or "very" and is used to indicate a very high degree (often positive and informal).
+          <br />
+          Structure: <strong>super + adjective</strong>
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>Das Essen ist <strong>super lecker</strong>. (The food is super delicious.)</li>
+          <li>Der Lehrer ist <strong>super nett</strong>. (The teacher is super nice.)</li>
+        </ul>
+
+        <p style={{ margin: 0 }}>
+          <strong>Adjectives with "sehr"</strong>
+          <br />
+          "Sehr" means "very" and intensifies the adjective in a neutral or positive way.
+          <br />
+          Structure: <strong>sehr + adjective</strong>
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>Das Buch ist <strong>sehr interessant</strong>. (The book is very interesting.)</li>
+          <li>Sie ist <strong>sehr freundlich</strong>. (She is very friendly.)</li>
+        </ul>
+
+        <p style={{ margin: 0 }}>
+          <strong>Comparison of "zu," "super," and "sehr"</strong>
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>
+            <strong>zu</strong>: excessive degree (often negative).
+            <br />
+            Example: Das Wetter ist <strong>zu kalt</strong>. (The weather is too cold.)
+          </li>
+          <li>
+            <strong>super</strong>: very high degree (positive/informal).
+            <br />
+            Example: Das Konzert war <strong>super toll</strong>. (The concert was super great.)
+          </li>
+          <li>
+            <strong>sehr</strong>: high degree (neutral or positive).
+            <br />
+            Example: Er ist <strong>sehr klug</strong>. (He is very smart.)
+          </li>
+        </ul>
+
+        <p style={{ margin: 0 }}>
+          <strong>Usage Tips</strong>
+        </p>
+        <ol style={{ margin: 0, paddingLeft: 20 }}>
+          <li>
+            Choose the right modifier: use <strong>zu</strong> for "more than needed," <strong>super</strong> for
+            enthusiastic informal emphasis, and <strong>sehr</strong> for standard intensification.
+          </li>
+          <li>
+            Practice with the same adjective to feel the nuance:
+            <ul style={{ marginTop: 6, paddingLeft: 20 }}>
+              <li>Das Haus ist <strong>zu groß</strong>. (The house is too big.)</li>
+              <li>Das Haus ist <strong>super groß</strong>. (The house is super big.)</li>
+              <li>Das Haus ist <strong>sehr groß</strong>. (The house is very big.)</li>
+            </ul>
+          </li>
+          <li>
+            Remember adjective placement in German:
+            <br />
+            <strong>Ein sehr schönes Haus.</strong> (A very beautiful house.)
+          </li>
+        </ol>
+
+        <p style={{ margin: 0 }}>
+          <strong>Summary</strong>
+        </p>
+        <ul style={{ margin: 0, paddingLeft: 20 }}>
+          <li>
+            <strong>Zu</strong> means "too" and indicates an excessive degree.
+            <br />
+            Example: Die Aufgabe ist <strong>zu schwer</strong>. (The task is too difficult.)
+          </li>
+          <li>
+            <strong>Super</strong> means "super/very" and indicates a very high degree.
+            <br />
+            Example: Das Spiel war <strong>super spannend</strong>. (The game was super exciting.)
+          </li>
+          <li>
+            <strong>Sehr</strong> means "very" and indicates a high degree.
+            <br />
+            Example: Er ist <strong>sehr müde</strong>. (He is very tired.)
+          </li>
+        </ul>
+        <p style={{ margin: 0 }}>
+          By using <strong>zu</strong>, <strong>super</strong>, and <strong>sehr</strong> correctly, you can add more
+          detail and precision to descriptions in German.
+        </p>
       </Section>
 
       <Section title="Practice: Choose the Correct Form">
