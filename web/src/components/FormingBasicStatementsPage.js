@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -15,12 +15,6 @@ const chipStyle = {
   border: "1px solid #c7d2fe",
   fontSize: 13,
   fontWeight: 700,
-};
-
-const bigTapButton = {
-  ...styles.secondaryButton,
-  width: "fit-content",
-  minHeight: 44,
 };
 
 const primaryTapButton = {
@@ -76,195 +70,15 @@ const TableScroll = ({ caption, children }) => (
 );
 
 /** =========================
- *  Tiny Tap Check (1 question)
- *  ========================= */
-const TapCheck = ({ title = "Quick check", prompt, options, answer, explain }) => {
-  const [picked, setPicked] = useState("");
-  const [checked, setChecked] = useState(false);
-
-  const isCorrect = checked && picked === answer;
-  const isWrong = checked && picked && picked !== answer;
-
-  const choose = (opt) => {
-    setPicked(opt);
-    setChecked(true);
-  };
-
-  const reset = () => {
-    setPicked("");
-    setChecked(false);
-  };
-
-  return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
-      <div style={{ fontWeight: 900 }}>{title}</div>
-      <div style={{ fontWeight: 800 }}>{prompt}</div>
-
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {options.map((opt) => (
-          <button
-            key={opt}
-            type="button"
-            onClick={() => choose(opt)}
-            style={{
-              ...bigTapButton,
-              borderColor: picked === opt ? "#111827" : undefined,
-              fontWeight: picked === opt ? 900 : 600,
-            }}
-          >
-            {opt}
-          </button>
-        ))}
-        {isCorrect && <span style={{ fontWeight: 900 }}>✅ richtig</span>}
-        {isWrong && <span style={{ fontWeight: 900 }}>❌ falsch</span>}
-      </div>
-
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <button type="button" style={bigTapButton} onClick={reset}>
-          Reset
-        </button>
-        <details>
-          <summary style={{ cursor: "pointer", fontWeight: 800 }}>Show answer (Teacher)</summary>
-          <div style={{ marginTop: 8 }}>
-            <strong>Answer:</strong> {answer}
-            {explain ? (
-              <div style={{ marginTop: 6, opacity: 0.9 }}>
-                <strong>Why:</strong> {explain}
-              </div>
-            ) : null}
-          </div>
-        </details>
-      </div>
-    </div>
-  );
-};
-
-/** =========================
- *  Optional: One Sentence Builder (only once)
- *  ========================= */
-const SentenceBuilder = ({ title, subjects, verbs, phrases }) => {
-  const [subject, setSubject] = useState("");
-  const [verb, setVerb] = useState("");
-  const [phrase, setPhrase] = useState("");
-
-  const sentence = useMemo(() => {
-    const s = [subject, verb, phrase].filter(Boolean).join(" ").trim();
-    return s ? `${s}.` : "";
-  }, [subject, verb, phrase]);
-
-  const reset = () => {
-    setSubject("");
-    setVerb("");
-    setPhrase("");
-  };
-
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(sentence || "");
-      alert("Copied!");
-    } catch {
-      alert("Copy failed. Please copy manually.");
-    }
-  };
-
-  return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
-      <div style={{ fontWeight: 900 }}>{title}</div>
-      <div style={{ opacity: 0.85 }}>3 clicks only: Subject → Verb → Phrase.</div>
-
-      <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 800 }}>Subject</div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {subjects.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => setSubject(opt)}
-              style={{
-                ...bigTapButton,
-                borderColor: subject === opt ? "#111827" : undefined,
-                fontWeight: subject === opt ? 900 : 600,
-              }}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 800 }}>Verb</div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {verbs.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => setVerb(opt)}
-              style={{
-                ...bigTapButton,
-                borderColor: verb === opt ? "#111827" : undefined,
-                fontWeight: verb === opt ? 900 : 600,
-              }}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 800 }}>Phrase</div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {phrases.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => setPhrase(opt)}
-              style={{
-                ...bigTapButton,
-                borderColor: phrase === opt ? "#111827" : undefined,
-                fontWeight: phrase === opt ? 900 : 600,
-              }}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ ...styles.card, display: "grid", gap: 6 }}>
-        <div style={{ fontWeight: 900 }}>Preview</div>
-        <div style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" }}>
-          {sentence || "—"}
-        </div>
-      </div>
-
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <button type="button" style={primaryTapButton} onClick={copy} disabled={!sentence}>
-          Copy sentence
-        </button>
-        <button type="button" style={bigTapButton} onClick={reset}>
-          Reset
-        </button>
-      </div>
-    </div>
-  );
-};
-
-/** =========================
  *  Free-to-use images
  *  ========================= */
-const IMG_GRAMMAR = "https://source.unsplash.com/n9AaeihA9HI/1600x900";
-const IMG_TRAVEL = "https://source.unsplash.com/2JIvboGLeho/1600x900";
+const IMG_GRAMMAR = "/grammar/past-tense-haben.svg";
+const IMG_TRAVEL = "/grammar/past-tense-sein.svg";
 const IMG_MAP = "https://source.unsplash.com/6dW3xyQvcYE/1600x900";
 
 /** =========================
  *  Content
  *  ========================= */
-const BUILDER_SUBJECTS = ["Ich", "Du", "Er"];
-const BUILDER_VERBS = ["war", "hatte", "komme", "fahre"];
-const BUILDER_PHRASES = ["schon mal in Accra", "noch nie in Tamale", "in Kumasi", "aus Ghana", "nach Berlin", "in die Schweiz"];
-
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
 
@@ -308,17 +122,17 @@ const FormingBasicStatementsPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>Day 8 Grammar: Countries and Languages (Chapter 4)</p>
       </header>
 
-      <ImageBreak src={IMG_GRAMMAR} alt="Notebook and studying" title="Grammar Notes" subtitle="Short rules + one example + one quick check." />
+      <ImageBreak src={IMG_GRAMMAR} alt="Past tense haben conjugation" title="Grammar Notes" subtitle="Important A1 grammar points for day 8." />
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Assignment Focus (what to understand)</h2>
+        <h2 style={{ margin: 0 }}>Grammar Focus (important information)</h2>
         <p style={{ margin: 0 }}>
           <strong>schon mal, noch nie; irregular verbs; man vs Mann.</strong>
         </p>
         <RuleCard title="Core sentence pattern" rule="Subject + Verb + Information." example="Ich war gestern krank." />
       </section>
 
-      <ImageBreak src={IMG_TRAVEL} alt="Travel" title="1) Präteritum for sein & haben" subtitle="Only two verbs today." />
+      <ImageBreak src={IMG_TRAVEL} alt="Past tense sein conjugation" title="1) Präteritum for sein & haben" subtitle="Past tense forms to memorize first." />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Past Tense for haben and sein (Präteritum)</h2>
@@ -345,13 +159,7 @@ const FormingBasicStatementsPage = () => {
           </ul>
         </RuleCard>
 
-        <TapCheck
-          title="Quick check (1)"
-          prompt="Choose the correct past form: ___ du gestern in Accra?"
-          options={["war", "warst", "waren"]}
-          answer="warst"
-          explain="du → warst"
-        />
+        <RuleCard title="schon mal + noch nie" rule="Use war + schon mal / noch nie for life experience." example="Bist du schon mal in Deutschland gewesen? – Ja, ich war schon mal in Deutschland." />
       </section>
 
       <ImageBreak src={IMG_TRAVEL} alt="Experience" title="2) schon mal / noch nie" subtitle="Talk about experiences." />
@@ -363,14 +171,6 @@ const FormingBasicStatementsPage = () => {
           title="Meaning"
           rule="schon mal = at least once before | noch nie = never until now"
           example="Warst du schon mal in Accra? – Ja, ich war schon mal in Accra."
-        />
-
-        <TapCheck
-          title="Quick check (1)"
-          prompt="Warst du schon mal in Tamale?"
-          options={["Ja, ich war schon mal in Tamale.", "Nein, ich war noch nie in Tamale."]}
-          answer="Nein, ich war noch nie in Tamale."
-          explain="noch nie = never until now"
         />
 
         <TableScroll caption="Copy patterns (A1)">
@@ -395,13 +195,12 @@ const FormingBasicStatementsPage = () => {
 
         <RuleCard title="liegen" rule="liegen = to be located (a city)." example="Berlin liegt im Osten von Deutschland." />
 
-        <TapCheck
-          title="Quick check (1)"
-          prompt="Berlin liegt im ___ von Deutschland."
-          options={["Osten", "Ost", "östlich"]}
-          answer="Osten"
-          explain="im Osten = in the east (location)"
-        />
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          <li>Berlin liegt im Osten von Deutschland.</li>
+          <li>Köln liegt im Westen von Deutschland.</li>
+          <li>München liegt im Süden von Deutschland.</li>
+          <li>Hamburg liegt im Norden von Deutschland.</li>
+        </ul>
       </section>
 
       <ImageBreak src={IMG_MAP} alt="Directions" title="4) wo / woher / wohin" subtitle="3 question words." />
@@ -411,22 +210,19 @@ const FormingBasicStatementsPage = () => {
 
         <RuleCard title="3 questions" rule="wo = location | woher = origin | wohin = direction" example="Wohin fährst du? – Ich fahre nach Berlin." />
 
-        {/* only 2 checks here (big topic) */}
-        <TapCheck
-          title="Quick check (1)"
-          prompt="___ kommst du? → Ich komme aus Ghana."
-          options={["Wo", "Woher", "Wohin"]}
-          answer="Woher"
-          explain="woher = origin"
-        />
-
-        <TapCheck
-          title="Quick check (2)"
-          prompt="Wir fliegen ___ Schweiz."
-          options={["nach", "in die", "in den"]}
-          answer="in die"
-          explain="Die Schweiz has an article → in die Schweiz"
-        />
+        <TableScroll caption="Useful patterns">
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo</strong> bist du? – Ich bin in der Schule.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin</strong> fährst du? – Ich fahre nach Berlin.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin</strong> fliegst du? – Ich fliege nach Deutschland.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
 
         <RuleCard
           title="nach vs in (A1)"
@@ -458,22 +254,16 @@ const FormingBasicStatementsPage = () => {
 
         <RuleCard title="Difference" rule="man = people in general | Mann = a man (noun)" example="Man kann hier gut essen. / Der Mann ist Lehrer." />
 
-        <TapCheck
-          title="Quick check (1)"
-          prompt="___ kann hier gut essen."
-          options={["man", "Mann"]}
-          answer="man"
-          explain="man = people in general"
-        />
-      </section>
-
-      {/* Optional: ONE builder only (notes-friendly) */}
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Optional: 3-click sentence builder</h2>
-        <p style={{ margin: 0, opacity: 0.85 }}>
-          Use once to practice. This is NOT an assignment.
-        </p>
-        <SentenceBuilder title="Build a sentence" subjects={BUILDER_SUBJECTS} verbs={BUILDER_VERBS} phrases={BUILDER_PHRASES} />
+        <TableScroll caption="Conjugation with man (using essen)">
+          <tbody>
+            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>ich esse</td></tr>
+            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>du isst</td></tr>
+            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>er/sie/es/man isst</td></tr>
+            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>wir essen</td></tr>
+            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>ihr esst</td></tr>
+            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>sie/Sie essen</td></tr>
+          </tbody>
+        </TableScroll>
       </section>
 
       <ImageBreak src={IMG_TRAVEL} alt="Recap" title="1-minute recap (copyable)" subtitle="Students can screenshot or copy." />
