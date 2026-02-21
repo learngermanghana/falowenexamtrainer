@@ -82,35 +82,6 @@ const IMG_MAP = "https://source.unsplash.com/6dW3xyQvcYE/1600x900";
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
 
-  const recapText = useMemo(() => {
-    return [
-      "A1 RECAP (Day 8)",
-      "",
-      "sein (past): ich war, du warst, er/sie/es war, wir waren, ihr wart, sie/Sie waren",
-      "haben (past): ich hatte, du hattest, er/sie/es hatte, wir hatten, ihr hattet, sie/Sie hatten",
-      "",
-      "schon mal / noch nie:",
-      "Warst du schon mal in ...?",
-      "Ja, ich war schon mal in ... .",
-      "Nein, ich war noch nie in ... .",
-      "",
-      "wo / woher / wohin:",
-      "wo = location | woher = origin | wohin = direction",
-      "",
-      "nach vs in die (A1):",
-      "nach Ghana / nach Berlin / nach Deutschland",
-      "in die Schweiz / in die USA",
-    ].join("\n");
-  }, []);
-
-  const copyRecap = async () => {
-    try {
-      await navigator.clipboard.writeText(recapText);
-      alert("Recap copied!");
-    } catch {
-      alert("Copy failed. Please copy manually.");
-    }
-  };
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -231,19 +202,19 @@ const FormingBasicStatementsPage = () => {
         />
       </section>
 
-      <ImageBreak src={IMG_GRAMMAR} alt="Grammar" title="5) Irregular verbs (quick note)" subtitle="du + er/sie/es often change." />
+      <ImageBreak src={IMG_GRAMMAR} alt="Grammar" title="5) Irregular verbs with vowel change" subtitle="Conjugation focus for du and er/sie/es." />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Irregular Verbs with Vowel Change</h2>
 
         <RuleCard title="Easy rule" rule="Many vowel changes happen in du + er/sie/es." example="fahren: du fährst, er fährt" />
 
-        <ul style={{ margin: 0, paddingLeft: 20 }}>
-          <li>nehmen: du <strong>nimmst</strong>, er <strong>nimmt</strong></li>
-          <li>sprechen: du <strong>sprichst</strong>, er <strong>spricht</strong></li>
-          <li>essen: du <strong>isst</strong>, er <strong>isst</strong></li>
-          <li>fahren: du <strong>fährst</strong>, er <strong>fährt</strong></li>
-          <li>laufen: du <strong>läufst</strong>, er <strong>läuft</strong></li>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          <li><strong>nehmen</strong>: du <strong>nimmst</strong>, er/sie/es <strong>nimmt</strong></li>
+          <li><strong>sprechen</strong>: du <strong>sprichst</strong>, er/sie/es <strong>spricht</strong></li>
+          <li><strong>essen</strong>: du <strong>isst</strong>, er/sie/es <strong>isst</strong></li>
+          <li><strong>fahren</strong>: du <strong>fährst</strong>, er/sie/es <strong>fährt</strong></li>
+          <li><strong>laufen</strong>: du <strong>läufst</strong>, er/sie/es <strong>läuft</strong></li>
         </ul>
       </section>
 
@@ -266,31 +237,6 @@ const FormingBasicStatementsPage = () => {
         </TableScroll>
       </section>
 
-      <ImageBreak src={IMG_TRAVEL} alt="Recap" title="1-minute recap (copyable)" subtitle="Students can screenshot or copy." />
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>1-Minute Recap</h2>
-
-        <pre
-          style={{
-            margin: 0,
-            padding: 12,
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-            background: "#0b1220",
-            color: "#e5e7eb",
-            overflowX: "auto",
-            lineHeight: 1.6,
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {recapText}
-        </pre>
-
-        <button type="button" style={primaryTapButton} onClick={copyRecap}>
-          Copy recap
-        </button>
-      </section>
     </main>
   );
 };
