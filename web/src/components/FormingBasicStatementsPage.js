@@ -67,9 +67,7 @@ const TableScroll = ({ caption, children }) => (
  *  Free-to-use images
  *  ========================= */
 const IMG_GRAMMAR = "/grammar/past-tense-haben.svg";
-const IMG_TRAVEL = "/grammar/past-tense-sein.svg";
 const IMG_MAP = "/grammar/directions-german.svg";
-const IMG_SIMON = "/falo.png";
 
 /** =========================
  *  Content
@@ -98,8 +96,6 @@ const FormingBasicStatementsPage = () => {
         <RuleCard title="Core sentence pattern" rule="Subject + Verb + Information." example="Ich war gestern krank." />
       </section>
 
-      <ImageBreak src={IMG_TRAVEL} alt="Past tense sein conjugation" title="1) Präteritum for sein & haben" subtitle="Past tense forms to memorize first." />
-
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Past Tense for haben and sein (Präteritum)</h2>
 
@@ -127,8 +123,6 @@ const FormingBasicStatementsPage = () => {
 
         <RuleCard title="schon mal + noch nie" rule="Use war + schon mal / noch nie for life experience." example="Bist du schon mal in Deutschland gewesen? – Ja, ich war schon mal in Deutschland." />
       </section>
-
-      <ImageBreak src={IMG_TRAVEL} alt="Experience" title="2) schon mal / noch nie" subtitle="Talk about experiences." />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>schon mal and noch nie</h2>
@@ -199,8 +193,6 @@ const FormingBasicStatementsPage = () => {
         </TableScroll>
       </section>
 
-      <ImageBreak src={IMG_MAP} alt="Directions" title="4) wo / woher / wohin" subtitle="3 question words." />
-
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>wo, woher, wohin</h2>
 
@@ -244,8 +236,6 @@ const FormingBasicStatementsPage = () => {
         />
       </section>
 
-      <ImageBreak src={IMG_GRAMMAR} alt="Grammar" title="5) Irregular verbs with vowel change" subtitle="Conjugation focus for du and er/sie/es." />
-
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Irregular Verbs with Vowel Change</h2>
 
@@ -281,8 +271,6 @@ const FormingBasicStatementsPage = () => {
           </tbody>
         </TableScroll>
       </section>
-
-      <ImageBreak src={IMG_SIMON} alt="Simon speaking German" title="6) man vs Mann" subtitle="One small word, big meaning." />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>man vs Mann</h2>
