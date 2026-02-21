@@ -96,6 +96,8 @@ const FormingBasicStatementsPage = () => {
       "",
       "wo / woher / wohin:",
       "wo = location | woher = origin | wohin = direction",
+      "Osten = east, Westen = west, Süden = south, Norden = north",
+      "Ost (short form) vs Osten (the east region, e.g. im Osten)",
       "",
       "nach vs in die (A1):",
       "nach Ghana / nach Berlin / nach Deutschland",
