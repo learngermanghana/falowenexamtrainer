@@ -21,6 +21,7 @@ import CourseStructurePage from "./components/CourseStructurePage";
 import CourseResourceViewerPage from "./components/CourseResourceViewerPage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage";
+import ObjectsAndColorsPage from "./components/ObjectsAndColorsPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import DirectionsImperativePage from "./components/DirectionsImperativePage";
 import TwoCasePrepositionsPage from "./components/TwoCasePrepositionsPage";
@@ -503,6 +504,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
+          <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
 
