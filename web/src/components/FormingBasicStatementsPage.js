@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -15,12 +15,6 @@ const chipStyle = {
   border: "1px solid #c7d2fe",
   fontSize: 13,
   fontWeight: 700,
-};
-
-const primaryTapButton = {
-  ...styles.primaryButton,
-  width: "fit-content",
-  minHeight: 44,
 };
 
 const ImageBreak = ({ src, alt, title, subtitle }) => (
