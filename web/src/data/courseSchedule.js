@@ -799,7 +799,7 @@ const RAW_COURSE_SCHEDULES = {
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
         youtube_link: "https://youtu.be/2iJQFYGUqRE",
-        workbook_link: "",
+        workbook_link: "/campus/course/letter-writing-12-3",
         assignment: true,
       },
     },
@@ -864,7 +864,7 @@ const RAW_COURSE_SCHEDULES = {
       schreiben_sprechen: {
         video: "https://youtu.be/isTL6k7gMMA",
         youtube_link: "https://youtu.be/isTL6k7gMMA",
-        workbook_link: "",
+        workbook_link: "/campus/course/conjunctions-5-10",
         assignment: false,
       },
     },

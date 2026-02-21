@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -15,6 +15,12 @@ const chipStyle = {
   border: "1px solid #c7d2fe",
   fontSize: 13,
   fontWeight: 700,
+};
+
+const primaryTapButton = {
+  ...styles.primaryButton,
+  width: "fit-content",
+  minHeight: 44,
 };
 
 const ImageBreak = ({ src, alt, title, subtitle }) => (
@@ -68,7 +74,7 @@ const TableScroll = ({ caption, children }) => (
  *  ========================= */
 const IMG_GRAMMAR = "/grammar/past-tense-haben.svg";
 const IMG_TRAVEL = "/grammar/past-tense-sein.svg";
-const IMG_MAP = "/grammar/directions-german.svg";
+const IMG_MAP = "https://source.unsplash.com/6dW3xyQvcYE/1600x900";
 
 /** =========================
  *  Content
@@ -166,21 +172,6 @@ const FormingBasicStatementsPage = () => {
           <li>München liegt im Süden von Deutschland.</li>
           <li>Hamburg liegt im Norden von Deutschland.</li>
         </ul>
-
-        <TableScroll caption="Directions (meaning in English)">
-          <tbody>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>der Osten</strong> = east</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>der Westen</strong> = west</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>der Süden</strong> = south</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>der Norden</strong> = north</td></tr>
-          </tbody>
-        </TableScroll>
-
-        <RuleCard
-          title="Ost vs Osten"
-          rule="Ost is a short base form. Osten is the noun you use in location phrases like im Osten."
-          example="Berlin liegt im Osten von Deutschland."
-        />
       </section>
 
       <ImageBreak src={IMG_MAP} alt="Directions" title="4) wo / woher / wohin" subtitle="3 question words." />
