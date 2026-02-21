@@ -224,8 +224,7 @@ const ColorsInteractive = () => {
   const [favColor, setFavColor] = useState("");
   const [showEN, setShowEN] = useState(false);
 
-  const [quizKey, setQuizKey] = useState(0);
-  const quizItems = useMemo(() => shuffleArray(COLORS).slice(0, 5), [quizKey]);
+  const [quizItems, setQuizItems] = useState(() => shuffleArray(COLORS).slice(0, 5));
   const [answers, setAnswers] = useState({}); // { de: selectedEn }
 
   const score = useMemo(() => {
@@ -244,7 +243,7 @@ const ColorsInteractive = () => {
 
   const resetQuiz = () => {
     setAnswers({});
-    setQuizKey((k) => k + 1);
+    setQuizItems(shuffleArray(COLORS).slice(0, 5));
   };
 
   return (
