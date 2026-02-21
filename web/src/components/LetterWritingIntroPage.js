@@ -236,10 +236,10 @@ const WeilPractice = () => {
 /** =========================
  *  Copy-ready letter templates (A1 + weil only) + Auto Teacher Hints
  *  ========================= */
-const A1WeilLetterBuilder = ({
+function A1WeilLetterBuilder({
   title = "Write your letter (A1) — Copy & Submit",
   completionNote = "Great. Now copy your completed letter and submit it as your assignment.",
-}) => {
+}) {
   const [mode, setMode] = useState("formal"); // formal | informal
 
   // Formal greeting
@@ -550,7 +550,7 @@ const A1WeilLetterBuilder = ({
       </div>
     </div>
   );
-};
+}
 
 /** =========================
  *  Page: Note → Practice → Copy & Submit
