@@ -249,6 +249,7 @@ const FormingBasicStatementsPage = () => {
           rule="nach for no-article countries/cities. in + article for exceptions."
           example="nach Ghana / nach Berlin — but in die Schweiz, in die USA"
         />
+      </section>
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Irregular Verbs with Vowel Change</h2>
