@@ -223,7 +223,7 @@ const A1LetterWritingQuestionBookPage = () => {
   // Q2: weil sentence (choose correct)
   const [b_weilPick, setB_weilPick] = useState("");
   // Q3 word order sentence
-  const [b_wordOrderSentence] = useState("");
+  const [, setB_wordOrderSentence] = useState("");
 
   // Body choices (simple buttons)
   const [b_wish, setB_wish] = useState("Alles Gute zum Geburtstag!");
