@@ -82,35 +82,6 @@ const IMG_MAP = "https://source.unsplash.com/6dW3xyQvcYE/1600x900";
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
 
-  const recapText = useMemo(() => {
-    return [
-      "A1 RECAP (Day 8)",
-      "",
-      "sein (past): ich war, du warst, er/sie/es war, wir waren, ihr wart, sie/Sie waren",
-      "haben (past): ich hatte, du hattest, er/sie/es hatte, wir hatten, ihr hattet, sie/Sie hatten",
-      "",
-      "schon mal / noch nie:",
-      "Warst du schon mal in ...?",
-      "Ja, ich war schon mal in ... .",
-      "Nein, ich war noch nie in ... .",
-      "",
-      "wo / woher / wohin:",
-      "wo = location | woher = origin | wohin = direction",
-      "",
-      "nach vs in die (A1):",
-      "nach Ghana / nach Berlin / nach Deutschland",
-      "in die Schweiz / in die USA",
-    ].join("\n");
-  }, []);
-
-  const copyRecap = async () => {
-    try {
-      await navigator.clipboard.writeText(recapText);
-      alert("Recap copied!");
-    } catch {
-      alert("Copy failed. Please copy manually.");
-    }
-  };
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -231,20 +202,42 @@ const FormingBasicStatementsPage = () => {
         />
       </section>
 
-      <ImageBreak src={IMG_GRAMMAR} alt="Grammar" title="5) Irregular verbs (quick note)" subtitle="du + er/sie/es often change." />
+      <ImageBreak src={IMG_GRAMMAR} alt="Grammar" title="5) Irregular verbs with vowel change" subtitle="Conjugation focus for du and er/sie/es." />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Irregular Verbs with Vowel Change</h2>
 
         <RuleCard title="Easy rule" rule="Many vowel changes happen in du + er/sie/es." example="fahren: du fährst, er fährt" />
 
-        <ul style={{ margin: 0, paddingLeft: 20 }}>
-          <li>nehmen: du <strong>nimmst</strong>, er <strong>nimmt</strong></li>
-          <li>sprechen: du <strong>sprichst</strong>, er <strong>spricht</strong></li>
-          <li>essen: du <strong>isst</strong>, er <strong>isst</strong></li>
-          <li>fahren: du <strong>fährst</strong>, er <strong>fährt</strong></li>
-          <li>laufen: du <strong>läufst</strong>, er <strong>läuft</strong></li>
-        </ul>
+        <TableScroll caption="Full conjugation (only du and er/sie/es change)">
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
+                <strong>nehmen</strong>: ich nehme, <strong>du nimmst</strong>, <strong>er/sie/es nimmt</strong>, wir nehmen, ihr nehmt, sie/Sie nehmen
+              </td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
+                <strong>sprechen</strong>: ich spreche, <strong>du sprichst</strong>, <strong>er/sie/es spricht</strong>, wir sprechen, ihr sprecht, sie/Sie sprechen
+              </td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
+                <strong>essen</strong>: ich esse, <strong>du isst</strong>, <strong>er/sie/es isst</strong>, wir essen, ihr esst, sie/Sie essen
+              </td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
+                <strong>fahren</strong>: ich fahre, <strong>du fährst</strong>, <strong>er/sie/es fährt</strong>, wir fahren, ihr fahrt, sie/Sie fahren
+              </td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>
+                <strong>laufen</strong>: ich laufe, <strong>du läufst</strong>, <strong>er/sie/es läuft</strong>, wir laufen, ihr lauft, sie/Sie laufen
+              </td>
+            </tr>
+          </tbody>
+        </TableScroll>
       </section>
 
       <ImageBreak src={IMG_GRAMMAR} alt="People" title="6) man vs Mann" subtitle="One small word, big meaning." />
@@ -266,31 +259,6 @@ const FormingBasicStatementsPage = () => {
         </TableScroll>
       </section>
 
-      <ImageBreak src={IMG_TRAVEL} alt="Recap" title="1-minute recap (copyable)" subtitle="Students can screenshot or copy." />
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>1-Minute Recap</h2>
-
-        <pre
-          style={{
-            margin: 0,
-            padding: 12,
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-            background: "#0b1220",
-            color: "#e5e7eb",
-            overflowX: "auto",
-            lineHeight: 1.6,
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {recapText}
-        </pre>
-
-        <button type="button" style={primaryTapButton} onClick={copyRecap}>
-          Copy recap
-        </button>
-      </section>
     </main>
   );
 };
