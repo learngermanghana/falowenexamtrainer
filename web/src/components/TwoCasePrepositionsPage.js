@@ -2,8 +2,11 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
+/** =========================
+ *  Reusable UI bits
+ *  ========================= */
 const Section = ({ title, children }) => (
-  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+  <section style={{ ...styles.card, display: "grid", gap: 12 }} aria-label={title}>
     <h2 style={{ margin: 0 }}>{title}</h2>
     {children}
   </section>
@@ -16,6 +19,34 @@ const BulletList = ({ items }) => (
     ))}
   </ul>
 );
+
+/** =========================
+ *  Topic image break (graphic separator)
+ *  ========================= */
+const TopicImageBreak = ({ src, alt, title, subtitle }) => (
+  <div style={{ ...styles.card, padding: 0, overflow: "hidden" }} aria-label={title || "Topic image"}>
+    <img
+      src={src}
+      alt={alt}
+      style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
+      loading="lazy"
+    />
+    {(title || subtitle) && (
+      <div style={{ padding: 12, display: "grid", gap: 4 }}>
+        {title && <div style={{ fontWeight: 900 }}>{title}</div>}
+        {subtitle && <div style={{ opacity: 0.85 }}>{subtitle}</div>}
+      </div>
+    )}
+  </div>
+);
+
+/** =========================
+ *  Free-to-use images (Unsplash License)
+ *  Use source.unsplash.com/<PHOTO_ID>/<WxH> for easy embedding
+ *  ========================= */
+const IMG_NOTEBOOK = "https://source.unsplash.com/n9AaeihA9HI/1600x900"; // notebook on desk
+const IMG_DIRECTIONS = "https://source.unsplash.com/0YYUG9SuRMc/1600x900"; // direction arrows sign
+const IMG_SIGNPOST = "https://source.unsplash.com/fxu_SdgcNAQ/1600x900"; // sign with arrows
 
 const PREPOSITIONS = ["an", "auf", "hinter", "in", "neben", "über", "unter", "vor", "zwischen"];
 
@@ -88,43 +119,14 @@ const visualGame = [
   },
 ];
 
-
 const practiceQuiz = [
-  {
-    sentence: "Ich gehe in ___ Park.",
-    choices: ["dem", "den", "der"],
-    answer: "den",
-  },
-  {
-    sentence: "Ich bin im ___ Park.",
-    choices: ["den", "dem", "die"],
-    answer: "dem",
-  },
-  {
-    sentence: "Er stellt den Laptop auf ___ Tisch.",
-    choices: ["den", "dem", "des"],
-    answer: "den",
-  },
-  {
-    sentence: "Der Laptop steht auf ___ Tisch.",
-    choices: ["dem", "den", "der"],
-    answer: "dem",
-  },
-  {
-    sentence: "Wir setzen uns neben ___ Lehrer.",
-    choices: ["dem", "den", "der"],
-    answer: "den",
-  },
-  {
-    sentence: "Wir sitzen neben ___ Lehrer.",
-    choices: ["den", "dem", "des"],
-    answer: "dem",
-  },
-  {
-    sentence: "Sie hängt das Bild an ___ Wand.",
-    choices: ["der", "die", "den"],
-    answer: "die",
-  },
+  { sentence: "Ich gehe in ___ Park.", choices: ["dem", "den", "der"], answer: "den" },
+  { sentence: "Ich bin im ___ Park.", choices: ["den", "dem", "die"], answer: "dem" },
+  { sentence: "Er stellt den Laptop auf ___ Tisch.", choices: ["den", "dem", "des"], answer: "den" },
+  { sentence: "Der Laptop steht auf ___ Tisch.", choices: ["dem", "den", "der"], answer: "dem" },
+  { sentence: "Wir setzen uns neben ___ Lehrer.", choices: ["dem", "den", "der"], answer: "den" },
+  { sentence: "Wir sitzen neben ___ Lehrer.", choices: ["den", "dem", "des"], answer: "dem" },
+  { sentence: "Sie hängt das Bild an ___ Wand.", choices: ["der", "die", "den"], answer: "die" },
 ];
 
 const TwoCasePrepositionsPage = () => {
@@ -187,7 +189,11 @@ const TwoCasePrepositionsPage = () => {
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
+        <button
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+          onClick={() => navigate("/campus/course")}
+          aria-label="Back to course overview"
+        >
           Back to Course
         </button>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Day 18: Two-Case Prepositions (Wechselpräpositionen)</h1>
@@ -196,6 +202,14 @@ const TwoCasePrepositionsPage = () => {
           <strong>Dative</strong> for position (Wo?).
         </p>
       </header>
+
+      {/* Break image: “lesson starts” */}
+      <TopicImageBreak
+        src={IMG_NOTEBOOK}
+        alt="Notebook on a desk"
+        title="Lesson Notes"
+        subtitle="We’ll add a visual break when a new main topic starts."
+      />
 
       <Section title="0) Start Here: Prepositions have families">
         <p style={{ margin: 0 }}>
@@ -215,9 +229,17 @@ const TwoCasePrepositionsPage = () => {
         </p>
       </Section>
 
+      {/* Break image: “direction / movement vs position” */}
+      <TopicImageBreak
+        src={IMG_DIRECTIONS}
+        alt="A sign with arrows showing different directions"
+        title="Movement vs Position"
+        subtitle="Wohin? → Akkusativ • Wo? → Dativ"
+      />
+
       <Section title="0) Start Here: How prepositions change a sentence in German">
         <p style={{ margin: 0 }}>
-          You already know <strong>Nominative</strong> and <strong>Akkusative</strong>. Now learn this: a <strong>preposition</strong>
+          You already know <strong>Nominative</strong> and <strong>Akkusative</strong>. Now learn this: a <strong>preposition</strong>{" "}
           can change the article/case in your sentence.
         </p>
         <p style={{ margin: 0 }}>
@@ -249,22 +271,43 @@ const TwoCasePrepositionsPage = () => {
       </Section>
 
       <Section title="2) The Golden Rule">
-        <p style={{ margin: 0 }}>🔵 <strong>ACCUSATIVE</strong> → Movement (Wohin?)</p>
-        <p style={{ margin: 0 }}>🟢 <strong>DATIVE</strong> → Position (Wo?)</p>
+        <p style={{ margin: 0 }}>
+          🔵 <strong>ACCUSATIVE</strong> → Movement (Wohin?)
+        </p>
+        <p style={{ margin: 0 }}>
+          🟢 <strong>DATIVE</strong> → Position (Wo?)
+        </p>
         <p style={{ margin: 0, fontSize: 14, opacity: 0.9 }}>
           Tipp: <strong>legen/stellen/hängen</strong> → Wohin? (Akk.) | <strong>liegen/stehen/hängen</strong> → Wo? (Dat.)
         </p>
       </Section>
 
+      {/* Break image: “tables / overview” */}
+      <TopicImageBreak
+        src={IMG_NOTEBOOK}
+        alt="Notebook on a desk"
+        title="Quick Overview"
+        subtitle="Articles and example pairs (reference section)"
+      />
+
       <Section title="3) Article Overview">
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 520 }}>
+            <caption style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>
+              Articles for Akkusativ vs Dativ (quick reference)
+            </caption>
             <thead>
               <tr>
                 {["Case", "Masculine", "Feminine", "Neuter", "Plural"].map((header) => (
                   <th
                     key={header}
-                    style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left", background: "#f8fafc" }}
+                    scope="col"
+                    style={{
+                      border: "1px solid #e5e7eb",
+                      padding: "8px 10px",
+                      textAlign: "left",
+                      background: "#f8fafc",
+                    }}
                   >
                     {header}
                   </th>
@@ -279,11 +322,21 @@ const TwoCasePrepositionsPage = () => {
                 ["Dative (indef.)", "einem", "einer", "einem", "—"],
               ].map((row) => (
                 <tr key={row[0]}>
-                  {row.map((cell) => (
-                    <td key={`${row[0]}-${cell}`} style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>
-                      {cell}
-                    </td>
-                  ))}
+                  {row.map((cell, idx) =>
+                    idx === 0 ? (
+                      <th
+                        key={`${row[0]}-${cell}`}
+                        scope="row"
+                        style={{ border: "1px solid #e5e7eb", padding: "8px 10px", textAlign: "left" }}
+                      >
+                        {cell}
+                      </th>
+                    ) : (
+                      <td key={`${row[0]}-${cell}`} style={{ border: "1px solid #e5e7eb", padding: "8px 10px" }}>
+                        {cell}
+                      </td>
+                    )
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -296,8 +349,12 @@ const TwoCasePrepositionsPage = () => {
           {examplePairs.map(([preposition, movement, position]) => (
             <div key={preposition} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
               <strong>🔹 {preposition}</strong>
-              <p style={{ margin: "8px 0 0" }}>{movement} <span style={{ opacity: 0.8 }}>(Wohin?)</span></p>
-              <p style={{ margin: "6px 0 0" }}>{position} <span style={{ opacity: 0.8 }}>(Wo?)</span></p>
+              <p style={{ margin: "8px 0 0" }}>
+                {movement} <span style={{ opacity: 0.8 }}>(Wohin?)</span>
+              </p>
+              <p style={{ margin: "6px 0 0" }}>
+                {position} <span style={{ opacity: 0.8 }}>(Wo?)</span>
+              </p>
             </div>
           ))}
         </div>
@@ -306,6 +363,14 @@ const TwoCasePrepositionsPage = () => {
       <Section title="5) Short Forms (Important!)">
         <BulletList items={["im = in dem", "ins = in das", "am = an dem", "ans = an das"]} />
       </Section>
+
+      {/* Break image: “practice begins” */}
+      <TopicImageBreak
+        src={IMG_SIGNPOST}
+        alt="A street sign with arrows pointing in different directions"
+        title="Practice Time"
+        subtitle="Now: choose the correct articles and prepositions."
+      />
 
       <Section title="6) Quick Check: Choose the correct article (7 questions)">
         <p style={{ margin: 0 }}>Pick one answer for each sentence.</p>
@@ -316,12 +381,24 @@ const TwoCasePrepositionsPage = () => {
             const isWrong = practiceChecked && practiceChoices[i] && practiceChoices[i] !== q.answer;
 
             return (
-              <div key={q.sentence} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
-                <div style={{ fontWeight: 600 }}>{i + 1}. {q.sentence}</div>
+              <div
+                key={q.sentence}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 12,
+                  padding: 12,
+                  display: "grid",
+                  gap: 8,
+                }}
+              >
+                <div style={{ fontWeight: 600 }}>
+                  {i + 1}. {q.sentence}
+                </div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                   {q.choices.map((option) => (
                     <button
                       key={`${q.sentence}-${option}`}
+                      type="button"
                       onClick={() => onChangePracticeChoice(i, option)}
                       style={{
                         ...styles.secondaryButton,
@@ -329,6 +406,7 @@ const TwoCasePrepositionsPage = () => {
                         borderColor: practiceChoices[i] === option ? "#111827" : undefined,
                         fontWeight: practiceChoices[i] === option ? 700 : 500,
                       }}
+                      aria-label={`Choose ${option} for: ${q.sentence}`}
                     >
                       {option}
                     </button>
@@ -357,6 +435,14 @@ const TwoCasePrepositionsPage = () => {
         </div>
       </Section>
 
+      {/* Break image: “visual game” */}
+      <TopicImageBreak
+        src={IMG_DIRECTIONS}
+        alt="A sign with arrows showing different directions"
+        title="Visual Game"
+        subtitle="Use the picture → choose the correct preposition."
+      />
+
       <Section title="7) Visual Position Game (Interactive)">
         <p style={{ margin: 0 }}>
           Choose the correct preposition: <strong>{PREPOSITIONS.join(" – ")}</strong>
@@ -368,7 +454,10 @@ const TwoCasePrepositionsPage = () => {
             const isWrong = checked && choices[i] && choices[i] !== q.answer;
 
             return (
-              <div key={i} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
+              <div
+                key={i}
+                style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}
+              >
                 <pre
                   style={{
                     margin: 0,
@@ -438,9 +527,7 @@ const TwoCasePrepositionsPage = () => {
           <summary style={{ cursor: "pointer", fontWeight: 700 }}>Antworten anzeigen (Teacher)</summary>
           <ol style={{ margin: "10px 0 0", paddingLeft: 20, display: "grid", gap: 6 }}>
             {visualGame.map((q, i) => (
-              <li key={i}>
-                {q.answer}
-              </li>
+              <li key={i}>{q.answer}</li>
             ))}
           </ol>
         </details>
