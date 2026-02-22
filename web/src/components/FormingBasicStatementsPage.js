@@ -218,12 +218,19 @@ const FormingBasicStatementsPage = () => {
           <tbody>
             <tr>
               <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo</strong> bist du? – Ich bin in der Schule.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you? – I am at school.</td>
             </tr>
             <tr>
               <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin</strong> fährst du? – Ich fahre nach Berlin.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you going (by vehicle)? – I am going to Berlin.</td>
             </tr>
             <tr>
               <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin</strong> fliegst du? – Ich fliege nach Deutschland.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you flying to? – I am flying to Germany.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher</strong> kommst du? – Ich komme aus der Schweiz.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you from? – I come from Switzerland.</td>
             </tr>
           </tbody>
         </TableScroll>
@@ -250,6 +257,54 @@ const FormingBasicStatementsPage = () => {
           rule="nach for no-article countries/cities. in + article for exceptions."
           example="nach Ghana / nach Berlin — but in die Schweiz, in die USA"
         />
+
+        <TableScroll caption="Countries with and without articles (direction: wohin?)">
+          <thead>
+            <tr>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>No article → <em>nach</em></th>
+              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>With article → <em>in + article (accusative)</em></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich fliege <strong>nach Deutschland</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich fliege <strong>in die Schweiz</strong>.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Wir fahren <strong>nach Italien</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Wir reisen <strong>in die USA</strong>.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Sie fährt <strong>nach Ghana</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Er fährt <strong>in den Iran</strong>.</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich reise <strong>nach Spanien</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Wir fahren <strong>in die Türkei</strong>.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+
+        <TableScroll caption="Origin (woher?) and location (wo?) with article countries">
+          <tbody>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher</strong> kommst du? – Ich komme <strong>aus der Schweiz</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>origin: from Switzerland</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo</strong> wohnst du? – Ich wohne <strong>in der Schweiz</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>location: in Switzerland</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher</strong> kommt ihr? – Wir kommen <strong>aus den USA</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>origin: from the USA</td>
+            </tr>
+            <tr>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo</strong> seid ihr? – Wir sind <strong>in den USA</strong>.</td>
+              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>location: in the USA</td>
+            </tr>
+          </tbody>
+        </TableScroll>
       </section>
 
       <section style={sectionStyle}>

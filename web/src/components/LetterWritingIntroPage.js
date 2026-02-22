@@ -364,15 +364,11 @@ const A1LetterWritingQuestionBookPage = () => {
 
       <Section title="How to use this page">
         <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-          <li>
-            Open Workbook 12.3 here:
-            <a href={WORKBOOK_12_3_LINK} target="_blank" rel="noreferrer"> {WORKBOOK_12_3_LINK}</a>
-          </li>
           <li>Read the formal and informal letter structures carefully.</li>
           <li>Complete the informal birthday question book first.</li>
           <li>Complete the formal language-school question book next.</li>
           <li>Use StuddyBuddy for ideas and sentence support before writing.</li>
-          <li>Before submission, use Marky My Letter to pre-check basic mistakes: <a href={MARK_MY_LETTER_LINK} target="_blank" rel="noreferrer">{MARK_MY_LETTER_LINK}</a></li>
+          <li>Before submission, use Marky My Letter to fix basic errors: <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">https://www.falowen.app/campus/writing</a></li>
         </ol>
       </Section>
 
