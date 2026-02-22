@@ -795,7 +795,7 @@ const RAW_COURSE_SCHEDULES = {
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
         youtube_link: "https://youtu.be/2iJQFYGUqRE",
-        workbook_link: "",
+        workbook_link: "/campus/course/letter-writing-intro-12-3",
         assignment: true,
       },
     },
