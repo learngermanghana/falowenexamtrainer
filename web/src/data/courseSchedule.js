@@ -791,15 +791,11 @@ const RAW_COURSE_SCHEDULES = {
       assignment: true,
       instruction:
         "For your first letter, open Letter Writing 12.3 and complete the drag-and-drop template first (fill the missing parts of the letter). Then copy the full letter by yourself and submit it using your normal assignment flow.",
-      instructionLink: {
-        label: "Assignment link: Open the Letter Writing 12.3 guide",
-        to: "/campus/course/letter-writing-12-3",
-      },
       grammar_topic: "Formal and Informal Letter",
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
         youtube_link: "https://youtu.be/2iJQFYGUqRE",
-        workbook_link: "/campus/course/letter-writing-12-3",
+        workbook_link: "",
         assignment: true,
       },
     },

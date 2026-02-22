@@ -783,7 +783,7 @@ const courseSchedules = {
       schreiben_sprechen: {
         video: "https://youtu.be/2iJQFYGUqRE",
         youtube_link: "https://youtu.be/2iJQFYGUqRE",
-        workbook_link: "/campus/course/letter-writing-12-3",
+        workbook_link: "",
         assignment: true,
       },
     },

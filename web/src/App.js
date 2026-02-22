@@ -14,7 +14,6 @@ import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
-import LetterWritingIntroPage from "./components/LetterWritingIntroPage";
 import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensionPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
@@ -486,7 +485,6 @@ const AppShell = ({
               />
             }
           />
-          <Route path="/campus/course/letter-writing-12-3" element={<LetterWritingIntroPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route
             path="/campus/course/dative-verbs-adjective-declension-14-2"
