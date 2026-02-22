@@ -502,6 +502,10 @@ const AppShell = ({
             element={<DativeArticlesMitBeiZuPage />}
           />
           <Route path="/campus/course/letter-writing-intro-12-3" element={<LetterWritingIntroPage />} />
+          <Route
+            path="/campus/course/letter-writing-intro-german-a1-day-12-3"
+            element={<LetterWritingIntroPage />}
+          />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
