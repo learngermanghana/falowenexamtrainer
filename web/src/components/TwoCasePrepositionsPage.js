@@ -42,11 +42,14 @@ const TopicImageBreak = ({ src, alt, title, subtitle }) => (
 
 /** =========================
  *  Free-to-use images (Unsplash License)
- *  Use source.unsplash.com/<PHOTO_ID>/<WxH> for easy embedding
+ *  Use direct images.unsplash.com links for more reliable loading in-app.
  *  ========================= */
-const IMG_NOTEBOOK = "https://source.unsplash.com/n9AaeihA9HI/1600x900"; // notebook on desk
-const IMG_DIRECTIONS = "https://source.unsplash.com/0YYUG9SuRMc/1600x900"; // direction arrows sign
-const IMG_SIGNPOST = "https://source.unsplash.com/fxu_SdgcNAQ/1600x900"; // sign with arrows
+const IMG_NOTEBOOK =
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400"; // notebook on desk
+const IMG_DIRECTIONS =
+  "https://images.unsplash.com/photo-1503435980610-a51f3ddfee50?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400"; // direction arrows sign
+const IMG_SIGNPOST =
+  "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400"; // sign with arrows
 
 const PREPOSITIONS = ["an", "auf", "hinter", "in", "neben", "über", "unter", "vor", "zwischen"];
 
