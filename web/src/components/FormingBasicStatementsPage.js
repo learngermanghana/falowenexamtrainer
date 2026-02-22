@@ -207,6 +207,7 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
+      </section>
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>wo, woher, wohin</h2>
