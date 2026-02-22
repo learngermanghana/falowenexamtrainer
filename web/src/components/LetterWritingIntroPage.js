@@ -171,6 +171,8 @@ const IMG_LETTER =
   "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
 const IMG_SCHOOL =
   "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
+const WORKBOOK_12_3_LINK = "/campus/course/letter-writing-intro-12-3";
+const MARK_MY_LETTER_LINK = "https://www.falowen.app/campus/writing";
 
 /** =========================
  *  Page
@@ -182,12 +184,23 @@ const A1LetterWritingQuestionBookPage = () => {
   const VOCAB = useMemo(
     () => ({
       verbs: [
-        "absagen (cancel)",
-        "gratulieren (congratulate)",
-        "planen (plan)",
-        "einladen (invite)",
-        "vereinbaren (arrange)",
+        "abholen (pick up)",
         "anmelden (register)",
+        "anmachen (switch on)",
+        "ausmachen (switch off)",
+        "anreisen (arrive)",
+        "ankommen (arrive)",
+        "abreisen (depart)",
+        "absagen (cancel)",
+        "zusagen (accept)",
+        "zumachen (close)",
+        "aufmachen (open)",
+        "einsteigen (get in)",
+        "umsteigen (change trains)",
+        "aussteigen (get out)",
+        "vereinbaren (arrange)",
+        "einladen (invite)",
+        "gratulieren (congratulate)",
       ],
       key: [
         "der Geburtstag (birthday)",
@@ -202,11 +215,21 @@ const A1LetterWritingQuestionBookPage = () => {
         "der Termin (appointment)",
       ],
       travelWeather: [
+        "der Koffer (suitcase)",
+        "die Ferien / der Urlaub (vacation)",
+        "das Meer (sea)",
+        "das Ausland (abroad)",
+        "der Ausflug (excursion)",
         "das Wetter (weather)",
         "die Sonne (sun)",
         "der Regen (rain)",
+        "der Schnee (snow)",
         "der Wind (wind)",
         "die Wolke (cloud)",
+        "das Gewitter (thunderstorm)",
+        "der Sturm (storm)",
+        "die Temperatur (temperature)",
+        "der Himmel (sky)",
       ],
     }),
     []
@@ -331,11 +354,27 @@ const A1LetterWritingQuestionBookPage = () => {
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 Letter Writing — Question Book (2 Letters) + Vocab</h1>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>Introduction to Letter Writing 12.3</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Read the note → answer the questions → copy the two letters and submit.
+          Assignment: Formal and Informal Letter.
         </p>
       </header>
+
+
+
+      <Section title="How to use this page">
+        <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          <li>
+            Open Workbook 12.3 here:
+            <a href={WORKBOOK_12_3_LINK} target="_blank" rel="noreferrer"> {WORKBOOK_12_3_LINK}</a>
+          </li>
+          <li>Read the formal and informal letter structures carefully.</li>
+          <li>Complete the informal birthday question book first.</li>
+          <li>Complete the formal language-school question book next.</li>
+          <li>Use StuddyBuddy for ideas and sentence support before writing.</li>
+          <li>Before submission, use Marky My Letter to pre-check basic mistakes: <a href={MARK_MY_LETTER_LINK} target="_blank" rel="noreferrer">{MARK_MY_LETTER_LINK}</a></li>
+        </ol>
+      </Section>
 
       <TopicImageBreak
         src={IMG_LETTER}
@@ -364,6 +403,31 @@ const A1LetterWritingQuestionBookPage = () => {
         </div>
       </Section>
 
+
+
+      <Section title="Formal Letter Structure (quick guide)">
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          <li>Sehr geehrte Frau + Name (female recipient)</li>
+          <li>Sehr geehrter Herr + Name (male recipient)</li>
+          <li>Sehr geehrte Damen und Herren (unknown recipient)</li>
+          <li>Opening: Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil ...</li>
+          <li>Use these in the body: Ich möchte wissen, ob / deshalb / weil.</li>
+          <li>Conclusion (fixed): Ich freue mich im Voraus auf Ihre Antwort.</li>
+          <li>Sign-off: Mit freundlichen Grüßen, + full name</li>
+        </ul>
+      </Section>
+
+      <Section title="Informal Letter Structure (quick guide)">
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+          <li>Hallo [Name], or Liebe/Lieber [first name],</li>
+          <li>Opening: Wie geht es dir? Ich hoffe, es geht dir gut.</li>
+          <li>Reason: Ich schreibe dir, weil ... (verb goes to the end).</li>
+          <li>Use these in the body: Ich möchte wissen, ob / deshalb / weil.</li>
+          <li>Conclusion (fixed): Ich freue mich im Voraus auf deine Antwort.</li>
+          <li>Sign-off: Viele Grüße / Liebe Grüße + first name</li>
+        </ul>
+      </Section>
+
       {/* VOCAB ON PAGE */}
       <Section title="Essential A1 Vocabulary (for these letters)">
         <div style={{ display: "grid", gap: 10 }}>
@@ -381,9 +445,23 @@ const A1LetterWritingQuestionBookPage = () => {
             ))}
           </div>
 
-          <div style={{ fontWeight: 900, marginTop: 6 }}>Bonus (weather/travel words)</div>
+          <div style={{ fontWeight: 900, marginTop: 6 }}>Travel/weather words</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {VOCAB.travelWeather.map((w) => (
+              <Chip key={w}>{w}</Chip>
+            ))}
+          </div>
+
+          <div style={{ fontWeight: 900, marginTop: 6 }}>Special occasions</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {[
+              "die Glückwünsche (congratulations)",
+              "die Hochzeit (wedding)",
+              "Alles Gute zum Geburtstag (happy birthday)",
+              "Herzlichen Glückwunsch (congratulations)",
+              "der Geburtstag (birthday)",
+              "die Feier (celebration)",
+            ].map((w) => (
               <Chip key={w}>{w}</Chip>
             ))}
           </div>
@@ -399,21 +477,21 @@ const A1LetterWritingQuestionBookPage = () => {
             <div style={{ fontWeight: 900 }}>Instructions</div>
             <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
               <li>Start with an informal greeting.</li>
-              <li>Explain why you are writing (weil).</li>
-              <li>Give birthday wishes.</li>
-              <li>Ask if they plan a celebration.</li>
-              <li>Conclude politely.</li>
+              <li>Write why you are writing to your friend.</li>
+              <li>Give birthday wishes and congratulate them.</li>
+              <li>Ask if they are planning a celebration.</li>
+              <li>Close politely and sign with your first name.</li>
             </ol>
-
             <div style={{ fontWeight: 900, marginTop: 6 }}>Sample Question</div>
             <div>
               Ihr Freund hat Geburtstag. Schreiben Sie an Ihren Freund:
               <ul style={{ margin: "6px 0 0", paddingLeft: 20 }}>
                 <li>Warum schreiben Sie?</li>
                 <li>Gratulieren Sie ihm.</li>
-                <li>Fragen Sie nach der Feier.</li>
+                <li>Fragen Sie: ob er eine Feier plant?</li>
               </ul>
             </div>
+            <div style={{ opacity: 0.9 }}>Encouragement: Take your time and use the hints. Practice makes perfect.</div>
           </div>
 
           {/* Q1 */}
@@ -550,6 +628,7 @@ const A1LetterWritingQuestionBookPage = () => {
               <li>Ask about dates, prices, and payment.</li>
               <li>Conclude politely.</li>
             </ol>
+            <div style={{ opacity: 0.9 }}>Encouragement: Use formal language and include all required details.</div>
 
             <div style={{ fontWeight: 900, marginTop: 6 }}>Sample Question</div>
             <div>
