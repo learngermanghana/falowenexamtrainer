@@ -171,8 +171,6 @@ const IMG_LETTER =
   "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
 const IMG_SCHOOL =
   "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
-const WORKBOOK_12_3_LINK = "/campus/course/letter-writing-intro-12-3";
-const MARK_MY_LETTER_LINK = "https://www.falowen.app/campus/writing";
 
 /** =========================
  *  Page
