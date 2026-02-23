@@ -493,7 +493,7 @@ const A1LetterWritingQuestionBookPage = () => {
             label="Q1) Choose the greeting (Max)"
             options={[
               { value: "male", label: "Lieber Max," },
-              { value: "female", label: "Liebe Max," (/* intentionally odd */) },
+              { value: "female", label: "Liebe Max," },
             ]}
             value={b_gender}
             onChange={(v) => setB_gender(v)}
