@@ -98,23 +98,15 @@ const MiniCheck = ({ prompt, options, value, onChange, answer, checked }) => {
   );
 };
 
-/** Tap words in order (A1-friendly, no drag) */
-const WordOrderTap = ({ label, words, correctSentence, onSentenceChange }) => {
-  const [picked, setPicked] = useState([]);
-  const remaining = words.filter((w) => !picked.includes(w));
+/** Read the bullet words and type the sentence (no drag/tap ordering) */
+const WordOrderBulletExercise = ({ label, words, correctSentence, onSentenceChange }) => {
+  const [typedSentence, setTypedSentence] = useState("");
+  const normalizedTyped = typedSentence.trim().replace(/\s+/g, " ");
+  const isDone = normalizedTyped.length > 0;
 
-  const sentence = picked.join(" ");
-  const isDone = picked.length === words.length;
-
-  const reset = () => {
-    setPicked([]);
-    onSentenceChange("");
-  };
-
-  const pick = (w) => {
-    const next = [...picked, w];
-    setPicked(next);
-    onSentenceChange(next.join(" "));
+  const handleChange = (value) => {
+    setTypedSentence(value);
+    onSentenceChange(value);
   };
 
   return (
@@ -122,37 +114,50 @@ const WordOrderTap = ({ label, words, correctSentence, onSentenceChange }) => {
       <div style={{ fontWeight: 900 }}>{label}</div>
 
       <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 800 }}>Tap the words in order:</div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {remaining.map((w) => (
-            <button
-              key={w}
-              type="button"
-              onClick={() => pick(w)}
-              style={{ ...styles.secondaryButton, width: "fit-content" }}
-            >
-              {w}
-            </button>
+        <div style={{ fontWeight: 800 }}>Read the words, then write the correct sentence:</div>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+          {words.map((w) => (
+            <li key={w}>{w}</li>
           ))}
+        </ul>
+        <div style={{ opacity: 0.9, fontSize: 13 }}>
+          Tip: With <strong>möchte</strong>, keep the second verb <strong>gratulieren</strong> at the end.
         </div>
       </div>
 
       <div style={{ ...styles.card, display: "grid", gap: 6 }}>
-        <div style={{ fontWeight: 900 }}>Your sentence</div>
-        <div style={{ fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" }}>
-          {sentence || "—"}
-        </div>
+        <label htmlFor="word-order-answer" style={{ fontWeight: 900 }}>
+          Your sentence
+        </label>
+        <textarea
+          id="word-order-answer"
+          value={typedSentence}
+          onChange={(e) => handleChange(e.target.value)}
+          rows={2}
+          placeholder="Ich möchte dir ..."
+          style={{
+            width: "100%",
+            borderRadius: 10,
+            border: "1px solid #d1d5db",
+            padding: 10,
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          }}
+        />
 
         {isDone && (
           <div style={{ fontWeight: 900 }}>
-            {sentence === correctSentence ? "✅ Correct order!" : "❌ Check word order again."}
+            {normalizedTyped === correctSentence ? "✅ Correct order!" : "❌ Check word order again."}
           </div>
         )}
       </div>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={reset}>
-          Reset
+        <button
+          type="button"
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+          onClick={() => handleChange("")}
+        >
+          Clear
         </button>
         <details>
           <summary style={{ cursor: "pointer", fontWeight: 800 }}>Show answer (Teacher)</summary>
@@ -525,9 +530,9 @@ const A1LetterWritingQuestionBookPage = () => {
             checked={checkedBirthday}
           />
 
-          {/* Q3 word order (tap words) */}
-          <WordOrderTap
-            label="Q3) Tap words in correct order (modal verb rule)"
+          {/* Q3 word order (bullet list + writing) */}
+          <WordOrderBulletExercise
+            label="Q3) Build the sentence from this bullet list (modal verb rule)"
             words={["Ich", "möchte", "dir", "zu", "deinem", "Geburtstag", "gratulieren."]}
             correctSentence="Ich möchte dir zu deinem Geburtstag gratulieren."
             onSentenceChange={setB_wordOrderSentence}
