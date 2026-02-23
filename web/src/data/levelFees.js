@@ -12,15 +12,7 @@ export const LEVEL_FEES = {
 
 export const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1"];
 
-export const MIN_INSTALLMENT_GHS = 2000;
-
 export const getTuitionFeeForLevel = (level) => LEVEL_FEES[level] ?? 0;
-
-export const defaultPaymentIntentForTuition = (tuitionFee) => {
-  const normalizedFee = Math.max(Number(tuitionFee) || 0, 0);
-  if (normalizedFee <= 0) return 0;
-  return Math.min(normalizedFee, MIN_INSTALLMENT_GHS);
-};
 
 export const getNextLevel = (level) => {
   const normalizedLevel = typeof level === "string" ? level.toUpperCase() : "";

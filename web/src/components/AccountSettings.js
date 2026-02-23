@@ -8,12 +8,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { formatCurrency } from "../lib/formatters";
-import {
-  defaultPaymentIntentForTuition,
-  getNextLevel,
-  getTuitionFeeForLevel,
-  MIN_INSTALLMENT_GHS,
-} from "../data/levelFees";
+import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -119,17 +114,6 @@ const AccountSettings = () => {
     };
   }, [balanceDue, formatMoney, numberFormatter, studentProfile?.contractEnd, t]);
 
-  const activeContractInfo = useMemo(() => {
-    const contractEndMs = toDateMs(studentProfile?.contractEnd);
-    const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > Date.now();
-
-    return {
-      hasActiveContract,
-      contractEnd: studentProfile?.contractEnd || "",
-      contractEndLabel: formatDate(studentProfile?.contractEnd),
-    };
-  }, [studentProfile?.contractEnd]);
-
   const levelUpgrade = useMemo(() => {
     const currentLevel = String(studentProfile?.level || "").toUpperCase();
     const nextLevel = getNextLevel(currentLevel);
@@ -173,38 +157,22 @@ const AccountSettings = () => {
     try {
       const nextLevel = levelUpgrade.nextLevel;
       const nextTuitionFee = levelUpgrade.nextTuitionFee || 0;
-      const defaultPaymentIntent = defaultPaymentIntentForTuition(nextTuitionFee);
 
-      const upgradePayload = {
+      await saveStudentProfile({
         level: nextLevel,
         className: "",
         paid: 0,
         initialPaymentAmount: 0,
-        paymentIntentAmount: defaultPaymentIntent,
+        paymentIntentAmount: nextTuitionFee,
         tuitionFee: nextTuitionFee,
         balanceDue: nextTuitionFee,
         paymentStatus: "pending",
-        upgradeFromLevel: levelUpgrade.currentLevel,
-        upgradeToLevel: nextLevel,
-        upgradeQueuedAt: new Date().toISOString(),
-      };
+        contractTermMonths: null,
+        contractStart: "",
+        contractEnd: "",
+      });
 
-      if (activeContractInfo.hasActiveContract) {
-        upgradePayload.contractMergeMode = "append_after_active_contract";
-        upgradePayload.upgradeCarryoverUntil = activeContractInfo.contractEnd;
-      } else {
-        upgradePayload.contractMergeMode = "start_after_payment";
-        upgradePayload.contractTermMonths = null;
-        upgradePayload.contractStart = "";
-        upgradePayload.contractEnd = "";
-      }
-
-      await saveStudentProfile(upgradePayload);
-
-      const statusMessage = activeContractInfo.hasActiveContract
-        ? `You're now on ${nextLevel}. Your current contract stays active until ${activeContractInfo.contractEndLabel}; the new level contract will append after that once payment is confirmed.`
-        : `You're now on ${nextLevel}. Please complete payment to unlock access.`;
-      setStatus(statusMessage);
+      setStatus(`You're now on ${nextLevel}. Please complete payment to unlock access.`);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Could not upgrade level.";
       setStatus(message);
@@ -432,14 +400,7 @@ const AccountSettings = () => {
                 <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                   Completed {levelUpgrade.currentLevel}? Move to <strong>{levelUpgrade.nextLevel}</strong>.
                   Next level tuition: <strong>{formatMoney(levelUpgrade.nextTuitionFee || 0)}</strong>.
-                  Minimum first payment is <strong>{formatMoney(MIN_INSTALLMENT_GHS)}</strong> (or the full remaining balance if lower). You can also pay the full next-level tuition immediately.
                 </p>
-                {activeContractInfo.hasActiveContract ? (
-                  <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#1e3a8a" }}>
-                    Contract merge: your current contract remains active until <strong>{activeContractInfo.contractEndLabel}</strong>.
-                    After payment for {levelUpgrade.nextLevel}, the next contract should be appended after this date (no contract time is lost).
-                  </p>
-                ) : null}
                 <button
                   type="button"
                   style={{ ...styles.primaryButton, marginTop: 10 }}
