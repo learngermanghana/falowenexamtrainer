@@ -12,332 +12,392 @@ const Section = ({ title, children }) => (
   </section>
 );
 
-const TopicImageBreak = ({ src, alt, title, subtitle }) => (
-  <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
-    <img
-      src={src}
-      alt={alt}
-      style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
-      loading="lazy"
+const Tabs = ({ value, onChange, tabs }) => (
+  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+    {tabs.map((t) => (
+      <button
+        key={t.value}
+        type="button"
+        onClick={() => onChange(t.value)}
+        style={{
+          ...styles.secondaryButton,
+          width: "fit-content",
+          borderColor: value === t.value ? "#111827" : undefined,
+          fontWeight: value === t.value ? 900 : 600,
+        }}
+      >
+        {t.label}
+      </button>
+    ))}
+  </div>
+);
+
+const InfoBox = ({ title, children }) => (
+  <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+    {title && <div style={{ fontWeight: 900 }}>{title}</div>}
+    {children}
+  </div>
+);
+
+const BulletList = ({ items }) => (
+  <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+    {items.map((x, i) => (
+      <li key={`${i}-${String(x).slice(0, 20)}`}>{x}</li>
+    ))}
+  </ul>
+);
+
+const LabeledTextArea = ({ label, value, onChange, placeholder }) => (
+  <div style={{ display: "grid", gap: 6 }}>
+    <div style={{ fontWeight: 900 }}>{label}</div>
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      rows={3}
+      placeholder={placeholder}
+      style={{
+        width: "100%",
+        borderRadius: 10,
+        border: "1px solid #d1d5db",
+        padding: 10,
+      }}
     />
-    {(title || subtitle) && (
-      <div style={{ padding: 12, display: "grid", gap: 4 }}>
-        {title && <div style={{ fontWeight: 900 }}>{title}</div>}
-        {subtitle && <div style={{ opacity: 0.85 }}>{subtitle}</div>}
+  </div>
+);
+
+const QuestionCard = ({ q, value, onChange }) => (
+  <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
+    <div style={{ fontWeight: 900 }}>{q.title}</div>
+
+    {q.hint && (
+      <div style={{ borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", padding: 10 }}>
+        <div style={{ fontWeight: 900, marginBottom: 6 }}>Hint</div>
+        <div style={{ opacity: 0.95, lineHeight: 1.5 }}>{q.hint}</div>
       </div>
     )}
+
+    <textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      rows={q.rows ?? 3}
+      placeholder={q.placeholder ?? "Type your answer in German..."}
+      style={{
+        width: "100%",
+        borderRadius: 10,
+        border: "1px solid #d1d5db",
+        padding: 10,
+        fontFamily: q.mono ? "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" : undefined,
+      }}
+    />
   </div>
 );
-
-const ChoiceRow = ({ label, options, value, onChange }) => (
-  <div style={{ display: "grid", gap: 8 }}>
-    <div style={{ fontWeight: 900 }}>{label}</div>
-    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-      {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          onClick={() => onChange(o.value)}
-          style={{
-            ...styles.secondaryButton,
-            width: "fit-content",
-            borderColor: value === o.value ? "#111827" : undefined,
-            fontWeight: value === o.value ? 900 : 500,
-          }}
-        >
-          {o.label}
-        </button>
-      ))}
-    </div>
-  </div>
-);
-
-const MiniCheck = ({ prompt, options, value, onChange, answer, checked }) => {
-  const isCorrect = checked && value === answer;
-  const isWrong = checked && value && value !== answer;
-
-  return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
-      <div style={{ fontWeight: 900 }}>{prompt}</div>
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        {options.map((o) => (
-          <button
-            key={o}
-            type="button"
-            onClick={() => onChange(o)}
-            style={{
-              ...styles.secondaryButton,
-              width: "fit-content",
-              borderColor: value === o ? "#111827" : undefined,
-              fontWeight: value === o ? 900 : 500,
-            }}
-          >
-            {o}
-          </button>
-        ))}
-        {isCorrect && <span style={{ fontWeight: 900 }}>✅ richtig</span>}
-        {isWrong && <span style={{ fontWeight: 900 }}>❌ falsch</span>}
-      </div>
-    </div>
-  );
-};
-
-/** =========================
- *  NEW: Bullet Letter Task (NO drag & drop)
- *  - Students read bullets, tick them, then write notes
- *  ========================= */
-const LetterBulletTask = ({ title, bullets, tips = [], noteLabel = "Your quick notes (optional)" }) => {
-  const [checks, setChecks] = useState(() => bullets.map(() => false));
-  const [notes, setNotes] = useState("");
-
-  const toggle = (idx) => {
-    setChecks((prev) => prev.map((v, i) => (i === idx ? !v : v)));
-  };
-
-  const doneCount = checks.filter(Boolean).length;
-
-  return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center" }}>
-        <div style={{ fontWeight: 900 }}>{title}</div>
-        <div style={{ fontWeight: 900, opacity: 0.9 }}>
-          {doneCount}/{bullets.length} done
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 800 }}>Read the points, then tick ✅ as you include them:</div>
-
-        <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
-          {bullets.map((b, i) => (
-            <li key={`${b}-${i}`} style={{ display: "grid", gap: 6 }}>
-              <label style={{ display: "flex", gap: 10, alignItems: "flex-start", cursor: "pointer" }}>
-                <input type="checkbox" checked={checks[i]} onChange={() => toggle(i)} style={{ marginTop: 3 }} />
-                <span>
-                  <span style={{ fontWeight: 900 }}>{b.title}</span>
-                  {b.example && (
-                    <div style={{ marginTop: 3, opacity: 0.9 }}>
-                      Beispiel: <strong>{b.example}</strong>
-                    </div>
-                  )}
-                </span>
-              </label>
-            </li>
-          ))}
-        </ul>
-
-        {tips.length > 0 && (
-          <div style={{ borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", padding: 10 }}>
-            <div style={{ fontWeight: 900, marginBottom: 6 }}>Tips</div>
-            <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
-              {tips.map((t, idx) => (
-                <li key={idx} style={{ opacity: 0.95 }}>
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-
-      <div style={{ ...styles.card, display: "grid", gap: 6 }}>
-        <label style={{ fontWeight: 900 }}>{noteLabel}</label>
-        <textarea
-          value={notes}
-          onChange={(e) => setNotes(e.target.value)}
-          rows={3}
-          placeholder="Write 1–2 short lines to help you remember what to say..."
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            border: "1px solid #d1d5db",
-            padding: 10,
-          }}
-        />
-        <div style={{ fontSize: 13, opacity: 0.85 }}>
-          Tip: Don’t copy the bullets as-is. Convert them into full sentences.
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/** Read the bullet words and type the sentence (no drag/tap ordering) */
-const WordOrderBulletExercise = ({ id, label, words, correctSentence, tip, onSentenceChange }) => {
-  const [typedSentence, setTypedSentence] = useState("");
-  const normalizedTyped = typedSentence.trim().replace(/\s+/g, " ");
-  const isDone = normalizedTyped.length > 0;
-
-  const handleChange = (value) => {
-    setTypedSentence(value);
-    onSentenceChange(value);
-  };
-
-  return (
-    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
-      <div style={{ fontWeight: 900 }}>{label}</div>
-
-      <div style={{ display: "grid", gap: 8 }}>
-        <div style={{ fontWeight: 800 }}>Read the words, then write the correct sentence:</div>
-        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
-          {words.map((w, idx) => (
-            <li key={`${w}-${idx}`}>{w}</li>
-          ))}
-        </ul>
-        {tip && (
-          <div style={{ opacity: 0.9, fontSize: 13 }}>
-            Tip: {tip}
-          </div>
-        )}
-      </div>
-
-      <div style={{ ...styles.card, display: "grid", gap: 6 }}>
-        <label htmlFor={id} style={{ fontWeight: 900 }}>
-          Your sentence
-        </label>
-        <textarea
-          id={id}
-          value={typedSentence}
-          onChange={(e) => handleChange(e.target.value)}
-          rows={2}
-          placeholder="Ich möchte dir ..."
-          style={{
-            width: "100%",
-            borderRadius: 10,
-            border: "1px solid #d1d5db",
-            padding: 10,
-            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-          }}
-        />
-
-        {isDone && (
-          <div style={{ fontWeight: 900 }}>
-            {normalizedTyped === correctSentence ? "✅ Correct order!" : "❌ Check word order again."}
-          </div>
-        )}
-      </div>
-
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => handleChange("")}>
-          Clear
-        </button>
-        <details>
-          <summary style={{ cursor: "pointer", fontWeight: 800 }}>Show answer (Teacher)</summary>
-          <div style={{ marginTop: 8 }}>{correctSentence}</div>
-        </details>
-      </div>
-    </div>
-  );
-};
-
-/** =========================
- *  Free-to-use images (Unsplash License)
- *  ========================= */
-const IMG_SCHOOL =
-  "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
 
 /** =========================
  *  Page
  *  ========================= */
 const A1LetterWritingQuestionBookPage = () => {
   const navigate = useNavigate();
-
-  /** ===== Vocabulary (on page) ===== */
-  /** =========================
-   *  Birthday (Informal) – states
-   *  ========================= */
-  const [b_gender, setB_gender] = useState("male"); // male|female
-  const [b_name] = useState("Max");
-
-  const birthdayGreeting = useMemo(() => {
-    if (!b_name) return b_gender === "female" ? "Liebe ...," : "Lieber ...,";
-    return b_gender === "female" ? `Liebe ${b_name},` : `Lieber ${b_name},`;
-  }, [b_gender, b_name]);
-
-  const [b_weilPick, setB_weilPick] = useState("");
-  const [, setB_wordOrderSentence] = useState("");
-
-  const [b_wish] = useState("Alles Gute zum Geburtstag!");
-  const [b_partyQuestion] = useState("Planst du eine Feier?");
-  const [b_extra] = useState("Kann ich mit meiner Familie kommen?");
-  const [b_includeExtra] = useState(false);
-
-  const [b_closing] = useState("Ich freue mich im Voraus auf deine Antwort.");
-  const [b_sign] = useState("Viele Grüße,");
+  const [tab, setTab] = useState("learn"); // learn | submit
 
   /** =========================
-   *  Formal (Language School) – states
+   *  READ-FIRST CONTENT (your exact text)
    *  ========================= */
-  const formalGreeting = `Sehr geehrte Damen und Herren,`;
+  const FORMAL_STRUCTURE = useMemo(
+    () => [
+      "Sehr geehrte Frau + Name – Use this for female",
+      "Sehr geehrter Herr + Name – Use this for male",
+      "Sehr geehrte Damen und Herren – If the receiver is unknown (e.g., school or travel agency).",
+      "Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [reason for writing].",
+      "Weil rule: move the verb (or main verb after modal) to the end.",
+      "Example 1 – Ich kann nicht kommen… → Ich schreibe Ihnen, weil ich nicht kommen kann.",
+      "Example 2 – Ich komme nicht… → Ich schreibe Ihnen, weil ich nicht komme.",
+      'Tip: Often you can start with "Ich" and end with "möchte" because of "weil". Example: Ich schreibe Ihnen, weil ich den Termin absagen möchte.',
+      "Main Body: Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
+      "Conclusion (don’t change): Ich freue mich im Voraus auf Ihre Antwort.",
+      "Mit freundlichen Grüßen,",
+      "[Your Full Name]",
+    ],
+    []
+  );
 
-  const [f_weilPick, setF_weilPick] = useState("");
-  const [f_requestPick, setF_requestPick] = useState("");
-  const [f_datesPick, setF_datesPick] = useState("");
-  const [f_closing, setF_closing] = useState("Ich freue mich im Voraus auf Ihre Antwort.");
-  const [f_sign, setF_sign] = useState("Mit freundlichen Grüßen,");
+  const INFORMAL_STRUCTURE = useMemo(
+    () => [
+      "Hallo [Name], (can be used for both male and female)",
+      "Liebe (female) / Lieber (male) [Recipient’s First Name],",
+      "Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [reason for writing].",
+      "Weil rule: move the verb (or main verb after modal) to the end.",
+      "Example 1 – Ich kann nicht kommen… → Ich schreibe dir, weil ich nicht kommen kann.",
+      "Example 2 – Ich komme nicht… → Ich schreibe dir, weil ich nicht komme.",
+      'Tip: Often you can start with "Ich" and end with "möchte" because of "weil". Example: Ich schreibe dir, weil ich den Termin absagen möchte.',
+      "Main Body: Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
+      "Conclusion (don’t change): Ich freue mich im Voraus auf deine Antwort.",
+      "Liebe Grüße / Viele Grüße (you can use any)",
+      "[Your First Name]",
+    ],
+    []
+  );
 
-  const [checkedBirthday, setCheckedBirthday] = useState(false);
-  const [checkedFormal, setCheckedFormal] = useState(false);
+  /** =========================
+   *  QUESTION BOOK (READ ONLY)
+   *  ========================= */
+  const BIRTHDAY_STEPS = useMemo(
+    () => [
+      "Start with an informal greeting.",
+      "Explain why you are writing.",
+      "Give your birthday wishes.",
+      "Ask if they are planning a celebration.",
+      "Conclude the letter politely.",
+    ],
+    []
+  );
 
-  const birthdayLetter = useMemo(() => {
-    const lines = [];
-    lines.push(birthdayGreeting);
-    lines.push("");
-    lines.push("Wie geht es dir? Ich hoffe, es geht dir gut.");
-    lines.push("Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte.");
-    lines.push("");
-    lines.push(b_wish);
-    lines.push(b_partyQuestion);
-    if (b_includeExtra) lines.push(b_extra);
-    lines.push("");
-    lines.push(b_closing);
-    lines.push(b_sign);
-    lines.push("[Dein Name]");
-    return lines.join("\n");
-  }, [birthdayGreeting, b_wish, b_partyQuestion, b_includeExtra, b_extra, b_closing, b_sign]);
+  const BIRTHDAY_SAMPLE = useMemo(
+    () => [
+      "Warum schreiben Sie?",
+      "Gratulieren Sie ihm.",
+      "Fragen Sie: ob er eine Feier plant?",
+    ],
+    []
+  );
 
-  const formalLetter = useMemo(() => {
-    const lines = [];
-    lines.push(formalGreeting);
-    lines.push("");
-    lines.push("Ich hoffe, es geht Ihnen gut.");
-    lines.push("Ich schreibe Ihnen, weil ich einen Deutschkurs besuchen möchte.");
-    lines.push("");
-    lines.push("Könnten Sie mir bitte Informationen über Ihre Deutschkurse geben?");
-    lines.push("Könnten Sie mir auch die Kurstermine mitteilen?");
-    lines.push("Wie viel kostet der Kurs?");
-    lines.push("Wie soll ich bezahlen? Mit Kreditkarte oder bar?");
-    lines.push("");
-    lines.push(f_closing);
-    lines.push(f_sign);
-    lines.push("[Ihr voller Name]");
-    return lines.join("\n");
-  }, [formalGreeting, f_closing, f_sign]);
+  const FORMAL_STEPS = useMemo(
+    () => [
+      "Start with a formal greeting.",
+      "Explain why you are writing.",
+      "Request information about the courses.",
+      "Ask about course dates, prices, and payment options.",
+      "Conclude the letter politely.",
+    ],
+    []
+  );
 
-  const fullPack = useMemo(() => {
-    return `=== Birthday Letter (Informal) ===\n\n${birthdayLetter}\n\n\n=== Formal Letter (Language School) ===\n\n${formalLetter}`;
-  }, [birthdayLetter, formalLetter]);
+  const FORMAL_SAMPLE = useMemo(
+    () => [
+      "Warum schreiben Sie?",
+      "Bitten Sie um Informationen über Kurse.",
+      "Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
+    ],
+    []
+  );
 
-  const copy = async () => {
+  /** =========================
+   *  SUBMIT TAB QUESTIONS (students type here)
+   *  ========================= */
+  const birthdayQuestions = useMemo(
+    () => [
+      {
+        key: "bq1",
+        title: 'Q1) Start the letter to your friend Max (use "Lieber" or "Liebe").',
+        hint: 'Male: "Lieber Max," | Female: "Liebe Anna,"',
+        placeholder: "Lieber Max,",
+      },
+      {
+        key: "bq2",
+        title: 'Q2) Translate: "How are you? I hope you are well. I am writing to you because..."',
+        hint:
+          'Use: "Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil ..." (weil verb at the end)',
+        rows: 4,
+      },
+      {
+        key: "bq3",
+        title: "Q3) Rearrange and write the correct sentence (modal verb rule).",
+        hint: "Words: gratulieren, Ich, dir, möchte, Geburtstag, zu deinem.",
+        placeholder: "Ich möchte dir zu deinem Geburtstag gratulieren.",
+        mono: true,
+      },
+      {
+        key: "bq4",
+        title: 'Q4) How do you say "Happy Birthday" in German?',
+        placeholder: "Alles Gute zum Geburtstag!",
+      },
+      {
+        key: "bq5",
+        title: "Q5) Ask: Where are you planning the party? (W-question rule, end with: die Feier)",
+        hint: 'Start with "Wo" and use "planen".',
+        placeholder: "Wo planst du die Feier?",
+      },
+      {
+        key: "bq6",
+        title: "Q6) Ask: Can I come with my family? (modal question rule + main verb “kommen”)",
+        hint: 'Use: "Kann ich ... mit meiner Familie ... kommen?" (main verb at the end)',
+        placeholder: "Kann ich mit meiner Familie kommen?",
+      },
+      {
+        key: "bq7",
+        title: 'Q7) Translate: "We drive with the car." (fahren + Auto)',
+        placeholder: "Wir fahren mit dem Auto.",
+      },
+      {
+        key: "bq8",
+        title: 'Q8) End sentence: "I look forward to your reply in advance."',
+        placeholder: "Ich freue mich im Voraus auf deine Antwort.",
+      },
+      {
+        key: "bq9",
+        title: 'Q9) Closing: write "Viele Grüße" and sign with your first name.',
+        placeholder: "Viele Grüße,\nFelix",
+        rows: 3,
+      },
+    ],
+    []
+  );
+
+  const formalQuestions = useMemo(
+    () => [
+      {
+        key: "fq1",
+        title: "Q1) Start a formal letter to a language school (unknown receiver).",
+        hint: 'Use: "Sehr geehrte Damen und Herren,"',
+        placeholder: "Sehr geehrte Damen und Herren,",
+      },
+      {
+        key: "fq2",
+        title:
+          'Q2) Write: "I hope you are well." + explain why you are writing using "Ich schreibe Ihnen, weil..."',
+        hint:
+          'Use "Anfragen stellen". Example: "Ich schreibe Ihnen, weil ich Anfragen stellen möchte." (weil → verb at end)',
+        rows: 4,
+      },
+      {
+        key: "fq3",
+        title: "Q3) Formally ask for course information (modal verb + geben at the end).",
+        hint: 'Pattern: "Könnten Sie mir bitte Informationen über ... geben?"',
+        placeholder: "Könnten Sie mir bitte Informationen über Ihre Deutschkurse geben?",
+        rows: 3,
+      },
+      {
+        key: "fq4",
+        title: "Q4) Ask about prices + payment options (credit card or cash).",
+        hint: 'Use: "Wie viel kostet ...?" + "Wie soll ich bezahlen? Mit Kreditkarte oder bar?"',
+        rows: 4,
+      },
+      {
+        key: "fq5",
+        title: "Q5) Ask about course dates (Kurstermine).",
+        hint: 'Use: "Könnten Sie mir auch die Kurstermine mitteilen?"',
+        placeholder: "Könnten Sie mir auch die Kurstermine mitteilen?",
+      },
+      {
+        key: "fq6",
+        title: "Q6) Polite conclusion (don’t change).",
+        placeholder: "Ich freue mich im Voraus auf Ihre Antwort.",
+      },
+      {
+        key: "fq7",
+        title: 'Q7) Closing: write "Mit freundlichen Grüßen" and sign with your full name.',
+        placeholder: "Mit freundlichen Grüßen,\nFelix Asadu",
+        rows: 3,
+      },
+    ],
+    []
+  );
+
+  /** =========================
+   *  Answers state (Submit tab)
+   *  ========================= */
+  const [birthdayAns, setBirthdayAns] = useState(() =>
+    Object.fromEntries(birthdayQuestions.map((q) => [q.key, ""]))
+  );
+  const [formalAns, setFormalAns] = useState(() =>
+    Object.fromEntries(formalQuestions.map((q) => [q.key, ""]))
+  );
+
+  const copySubmit = async () => {
+    const pack = [
+      "=== Birthday Letter Question Book (Answers) ===",
+      ...birthdayQuestions.map((q) => `${q.title}\n${birthdayAns[q.key] || ""}\n`),
+      "\n=== Formal Letter Question Book (Answers) ===",
+      ...formalQuestions.map((q) => `${q.title}\n${formalAns[q.key] || ""}\n`),
+    ].join("\n");
+
     try {
-      await navigator.clipboard.writeText(fullPack);
-      alert("Copied!");
+      await navigator.clipboard.writeText(pack);
+      alert("Copied answers!");
     } catch {
       alert("Copy failed. Please copy manually.");
     }
   };
 
-  const B_WEIL_CORRECT = "Ich schreibe dir, weil ich dir zum Geburtstag gratulieren möchte.";
-  const B_WEIL_WRONG = "Ich schreibe dir, weil ich möchte dir gratulieren.";
-
-  const F_WEIL_CORRECT = "Ich schreibe Ihnen, weil ich Anfragen stellen möchte.";
-  const F_WEIL_WRONG = "Ich schreibe Ihnen, weil ich möchte Anfragen stellen.";
-
-  const F_REQUEST_CORRECT = "Könnten Sie mir bitte Informationen über Ihre Deutschkurse geben?";
-  const F_REQUEST_WRONG = "Können mir Sie bitte Informationen geben?";
-
-  const F_DATES_CORRECT = "Könnten Sie mir auch die Kurstermine mitteilen?";
-  const F_DATES_WRONG = "Könnten Sie auch mitteilen mir die Kurstermine?";
+  /** =========================
+   *  Vocabulary list (read only)
+   *  ========================= */
+  const VOCAB_LIST = useMemo(
+    () => ({
+      separable: [
+        "Abholen – to pick up/take",
+        "Anmelden – to register",
+        "Anmachen – to switch on",
+        "Ausmachen – to switch off",
+        "Anreisen – to arrive",
+        "Ankommen – to arrive",
+        "Abreisen – to depart",
+        "Absagen – to cancel",
+        "Zusagen – to accept",
+        "Zumachen – to close",
+        "Aufmachen – to open",
+        "Einsteigen – to enter (e.g., a car)",
+        "Umsteigen – to change (e.g., trains)",
+        "Aussteigen – to get out/drop off",
+        "Vereinbaren – to arrange",
+        "Einladen – to invite",
+        "Gratulieren – to congratulate",
+      ],
+      key: [
+        "Günstig/Billig – cheap",
+        "Koffer – suitcase",
+        "Feiern – to celebrate",
+        "Übernachten – stay overnight",
+        "Angebot – offer",
+        "Ferien – vacation",
+        "Wanderung – hiking",
+        "Führerschein – license",
+        "Urlaub – vacation",
+        "Meer – sea",
+        "Ausland – abroad",
+        "Ausflug – excursion",
+        "Das Wetter – weather",
+        "Die Sonne – sun",
+        "Der Regen – rain",
+        "Der Schnee – snow",
+        "Der Wind – wind",
+        "Die Wolke – cloud",
+        "Das Gewitter – thunderstorm",
+        "Der Sturm – storm",
+        "Die Temperatur – temperature",
+        "Der Himmel – sky",
+      ],
+      additional: [
+        "Die Ankunft – arrival",
+        "Die Abreise – departure",
+        "Die Absage – cancellation",
+        "Die Anreise – arrival (travel)",
+        "Das Angebot – offer",
+        "Die Wanderung – hike",
+        "Der Führerschein – driver’s license",
+        "Der Urlaub – vacation",
+        "Das Meer – sea",
+        "Das Ausland – abroad",
+        "Der Ausflug – excursion",
+        "Der Kurs – course",
+        "Die Anmeldung – registration",
+        "Die Gebühr – fee",
+        "Das Formular – form",
+        "Das Büro – office",
+        "Der Lehrer / die Lehrerin – teacher",
+        "Der Teilnehmer / die Teilnehmerin – participant",
+        "Die Bestätigung – confirmation",
+      ],
+      occasions: [
+        "Die Glückwünsche – congratulations",
+        "Die Hochzeit – wedding",
+        "Alles Gute zum Geburtstag – Happy Birthday",
+        "Herzlichen Glückwunsch – Congratulations",
+        "Der Geburtstag – birthday",
+        "Die Feier – celebration",
+      ],
+    }),
+    []
+  );
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -345,207 +405,143 @@ const A1LetterWritingQuestionBookPage = () => {
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Introduction to Letter Writing 12.3</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Assignment: Formal and Informal Letter.</p>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First, Then Submit</h1>
+        <p style={{ ...styles.subtitle, margin: 0 }}>
+          Students must read the structures and question books first. Answers are typed only in the Submit tab.
+        </p>
+
+        <Tabs
+          value={tab}
+          onChange={setTab}
+          tabs={[
+            { value: "learn", label: "📘 Learn (Read)" },
+            { value: "submit", label: "📝 Submit Answers" },
+          ]}
+        />
       </header>
 
-      {/* ... keep your existing sections above ... */}
+      {tab === "learn" && (
+        <>
+          <Section title="Formal Letter Structure (Read First)">
+            <InfoBox title="Structure + Rules">
+              <BulletList items={FORMAL_STRUCTURE} />
+            </InfoBox>
+          </Section>
 
-      <Section title="1) Birthday Letter (Informal) — Question Book">
-        <div style={{ display: "grid", gap: 12 }}>
-          {/* NEW: Bullet letter task (no drag & drop) */}
-          <LetterBulletTask
-            title="Letter Task (Read bullets → tick → write)"
-            bullets={[
-              { title: "Greeting (informal)", example: "Lieber Max," },
-              { title: "Reason (weil)", example: "…weil ich dir gratulieren möchte." },
-              { title: "Congratulate / wish", example: "Alles Gute zum Geburtstag!" },
-              { title: "Ask about party", example: "Planst du eine Feier?" },
-              { title: "Closing + sign-off", example: "Viele Grüße, + Name" },
-            ]}
-            tips={[
-              "Don’t write single words. Write full sentences.",
-              "Because of **weil**, the verb goes to the end.",
-              "Keep it short: 5–7 lines is enough for A1.",
-            ]}
-          />
+          <Section title="Informal Letter Structure (Read First)">
+            <InfoBox title="Structure + Rules">
+              <BulletList items={INFORMAL_STRUCTURE} />
+            </InfoBox>
+          </Section>
 
-          {/* Q1 */}
-          <ChoiceRow
-            label="Q1) Choose the greeting (Max)"
-            options={[
-              { value: "male", label: "Lieber Max," },
-              { value: "female", label: "Liebe Max," },
-            ]}
-            value={b_gender}
-            onChange={(v) => setB_gender(v)}
-          />
+          <Section title="Assignment 1 — Birthday Letter Question Book (Read First)">
+            <InfoBox title="Instructions (Steps)">
+              <BulletList items={BIRTHDAY_STEPS} />
+              <div style={{ marginTop: 8, opacity: 0.9 }}>
+                Encouragement: Take your time and use the hints. Practice makes perfect.
+              </div>
+            </InfoBox>
 
-          {/* Q2 weil */}
-          <MiniCheck
-            prompt="Q2) Choose the correct weil sentence"
-            options={[B_WEIL_CORRECT, B_WEIL_WRONG]}
-            value={b_weilPick}
-            onChange={setB_weilPick}
-            answer={B_WEIL_CORRECT}
-            checked={checkedBirthday}
-          />
+            <InfoBox title="Sample Question">
+              <div style={{ marginBottom: 8 }}>Ihr Freund hat Geburtstag. Schreiben Sie an Ihren Freund:</div>
+              <BulletList items={BIRTHDAY_SAMPLE} />
+            </InfoBox>
 
-          {/* Q3 word order (bullet list + writing) */}
-          <WordOrderBulletExercise
-            id="b-wordorder-1"
-            label="Q3) Build the sentence from this bullet list (modal verb rule)"
-            words={["Ich", "möchte", "dir", "zu", "deinem", "Geburtstag", "gratulieren."]}
-            correctSentence="Ich möchte dir zu deinem Geburtstag gratulieren."
-            tip={
-              <>
-                With <strong>möchte</strong>, keep the second verb <strong>gratulieren</strong> at the end.
-              </>
-            }
-            onSentenceChange={setB_wordOrderSentence}
-          />
+            <InfoBox title="Important tip (for this assignment)">
+              <div style={{ lineHeight: 1.6 }}>
+                Don’t rush to submit. Read the structure again, then answer in full sentences. Use <strong>weil</strong>{" "}
+                and place the verb at the end.
+              </div>
+            </InfoBox>
 
-          {/* ... keep the rest of your birthday questions ... */}
-
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button
-              type="button"
-              style={{ ...styles.primaryButton, width: "fit-content" }}
-              onClick={() => setCheckedBirthday(true)}
-            >
-              Check Birthday answers
-            </button>
-            <div style={{ opacity: 0.85 }}>(This will mark only the weil question. Others are choices + practice.)</div>
-          </div>
-        </div>
-      </Section>
-
-      <TopicImageBreak src={IMG_SCHOOL} alt="School and studying" title="Now the second letter" subtitle="Formal letter to a language school." />
-
-      <Section title="2) Formal Letter — Question Book (Language School)">
-        <div style={{ display: "grid", gap: 12 }}>
-          {/* NEW: Bullet letter task (no drag & drop) */}
-          <LetterBulletTask
-            title="Letter Task (Read bullets → tick → write)"
-            bullets={[
-              { title: "Greeting (formal)", example: "Sehr geehrte Damen und Herren," },
-              { title: "Reason (weil)", example: "…weil ich einen Deutschkurs besuchen möchte." },
-              { title: "Request course info", example: "Könnten Sie mir bitte Informationen … geben?" },
-              { title: "Ask about dates", example: "Könnten Sie mir auch die Kurstermine mitteilen?" },
-              { title: "Ask about price + payment", example: "Wie viel kostet…? Wie soll ich bezahlen?" },
-              { title: "Closing + sign-off", example: "Mit freundlichen Grüßen, + voller Name" },
-            ]}
-            tips={[
-              "Use **Sie/Ihnen/Ihre** (formal). Don’t use **du/dir/dein**.",
-              "Because of **weil**, the verb goes to the end.",
-              "Ask in questions (Könnten Sie…?). Keep it polite.",
-            ]}
-          />
-
-          {/* Q1 greeting */}
-          <div style={{ display: "grid", gap: 8 }}>
-            <div style={{ fontWeight: 900 }}>Q1) Greeting</div>
-            <div style={{ ...styles.card }}>
-              <div style={{ fontWeight: 900 }}>{formalGreeting}</div>
-              <div style={{ opacity: 0.85, fontSize: 13 }}>Tip: Use this when receiver is unknown (a school/office).</div>
+            <div style={{ borderRadius: 10, background: "#fff7ed", border: "1px solid #fdba74", padding: 10 }}>
+              ✅ When you finish reading, go to <strong>Submit Answers</strong> tab and type your answers.
             </div>
-          </div>
+          </Section>
 
-          {/* Q2 weil */}
-          <MiniCheck
-            prompt="Q2) Choose the correct weil sentence"
-            options={[F_WEIL_CORRECT, F_WEIL_WRONG]}
-            value={f_weilPick}
-            onChange={setF_weilPick}
-            answer={F_WEIL_CORRECT}
-            checked={checkedFormal}
-          />
+          <Section title="Assignment 2 — Formal Letter Question Book (Read First)">
+            <InfoBox title="Instructions (Steps)">
+              <BulletList items={FORMAL_STEPS} />
+              <div style={{ marginTop: 8, opacity: 0.9 }}>
+                Encouragement: Use formal language and include the required details.
+              </div>
+            </InfoBox>
 
-          {/* Q3 request info */}
-          <MiniCheck
-            prompt="Q3) Choose the correct request sentence"
-            options={[F_REQUEST_CORRECT, F_REQUEST_WRONG]}
-            value={f_requestPick}
-            onChange={setF_requestPick}
-            answer={F_REQUEST_CORRECT}
-            checked={checkedFormal}
-          />
+            <InfoBox title="Sample Question">
+              <div style={{ marginBottom: 8 }}>
+                Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule:
+              </div>
+              <BulletList items={FORMAL_SAMPLE} />
+            </InfoBox>
 
-          {/* Q5 course dates */}
-          <MiniCheck
-            prompt="Q5) Choose the correct course dates sentence"
-            options={[F_DATES_CORRECT, F_DATES_WRONG]}
-            value={f_datesPick}
-            onChange={setF_datesPick}
-            answer={F_DATES_CORRECT}
-            checked={checkedFormal}
-          />
+            <div style={{ borderRadius: 10, background: "#fff7ed", border: "1px solid #fdba74", padding: 10 }}>
+              ✅ When you finish reading, go to <strong>Submit Answers</strong> tab and type your answers.
+            </div>
+          </Section>
 
-          {/* Q6 closing */}
-          <ChoiceRow
-            label="Q6) Closing sentence (fixed)"
-            options={[
-              { value: "Ich freue mich im Voraus auf Ihre Antwort.", label: "Ich freue mich im Voraus auf Ihre Antwort." },
-              { value: "Ich warte auf Ihre Antwort.", label: "Ich warte auf Ihre Antwort." },
-            ]}
-            value={f_closing}
-            onChange={setF_closing}
-          />
+          <Section title="Essential A1 Vocabulary List (Read & use in your answers)">
+            <InfoBox title="Separable Verbs (Trennbare Verben)">
+              <BulletList items={VOCAB_LIST.separable} />
+            </InfoBox>
+            <InfoBox title="Key Vocabulary">
+              <BulletList items={VOCAB_LIST.key} />
+            </InfoBox>
+            <InfoBox title="Additional Words">
+              <BulletList items={VOCAB_LIST.additional} />
+            </InfoBox>
+            <InfoBox title="Special Occasions">
+              <BulletList items={VOCAB_LIST.occasions} />
+            </InfoBox>
+          </Section>
+        </>
+      )}
 
-          {/* Q7 sign-off */}
-          <ChoiceRow
-            label="Q7) Sign-off"
-            options={[
-              { value: "Mit freundlichen Grüßen,", label: "Mit freundlichen Grüßen," },
-              { value: "Viele Grüße,", label: "Viele Grüße," },
-            ]}
-            value={f_sign}
-            onChange={setF_sign}
-          />
+      {tab === "submit" && (
+        <>
+          <Section title="Submit Answers (Birthday Letter — Question Book)">
+            <div style={{ borderRadius: 10, background: "#ecfeff", border: "1px solid #67e8f9", padding: 10 }}>
+              Tip: Answer in full sentences. Check <strong>weil</strong> verb-at-the-end before submitting.
+            </div>
 
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button
-              type="button"
-              style={{ ...styles.primaryButton, width: "fit-content" }}
-              onClick={() => setCheckedFormal(true)}
-              disabled={!f_weilPick || !f_requestPick || !f_datesPick}
-            >
-              Check Formal answers
+            <div style={{ display: "grid", gap: 12 }}>
+              {birthdayQuestions.map((q) => (
+                <QuestionCard
+                  key={q.key}
+                  q={q}
+                  value={birthdayAns[q.key]}
+                  onChange={(val) => setBirthdayAns((prev) => ({ ...prev, [q.key]: val }))}
+                />
+              ))}
+            </div>
+          </Section>
+
+          <Section title="Submit Answers (Formal Letter — Question Book)">
+            <div style={{ borderRadius: 10, background: "#f0fdf4", border: "1px solid #86efac", padding: 10 }}>
+              Tip: Use <strong>Sie/Ihnen/Ihre</strong>. Don’t use du/dir/dein in a formal letter.
+            </div>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              {formalQuestions.map((q) => (
+                <QuestionCard
+                  key={q.key}
+                  q={q}
+                  value={formalAns[q.key]}
+                  onChange={(val) => setFormalAns((prev) => ({ ...prev, [q.key]: val }))}
+                />
+              ))}
+            </div>
+          </Section>
+
+          <Section title="Copy Answers (Optional)">
+            <p style={{ margin: 0 }}>
+              If you want, copy your answers and paste into your submission system.
+            </p>
+            <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={copySubmit}>
+              Copy all answers
             </button>
-            <div style={{ opacity: 0.85 }}>(Marks Q2, Q3, Q5.)</div>
-          </div>
-        </div>
-      </Section>
-
-      <Section title="Copy & Submit (2 Letters)">
-        <p style={{ margin: 0 }}>Copy the two letters below and submit as your assignment.</p>
-
-        <pre
-          style={{
-            margin: 0,
-            padding: 12,
-            borderRadius: 12,
-            border: "1px solid #e5e7eb",
-            background: "#0b1220",
-            color: "#e5e7eb",
-            overflowX: "auto",
-            lineHeight: 1.6,
-            whiteSpace: "pre-wrap",
-          }}
-        >
-          {fullPack}
-        </pre>
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={copy}>
-            Copy both letters
-          </button>
-        </div>
-
-        <div style={{ borderRadius: 10, background: "#ecfdf5", border: "1px solid #86efac", padding: 10 }}>
-          ✅ After copying, replace <strong>[Dein Name]</strong> / <strong>[Ihr voller Name]</strong> with your name.
-        </div>
-      </Section>
+          </Section>
+        </>
+      )}
     </main>
   );
 };
