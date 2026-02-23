@@ -17,6 +17,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     attendanceSessions: 0,
     completedAssignments: [],
     totalAssignments: null,
+    scoreSummary: null,
+    scoreSummaryLoaded: false,
   });
 
   const className = studentProfile?.className || "";
@@ -36,6 +38,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         attendanceSessions: 0,
         completedAssignments: [],
         totalAssignments: null,
+        scoreSummary: null,
+        scoreSummaryLoaded: false,
       });
       return;
     }
@@ -49,6 +53,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         attendanceSessions: 0,
         completedAssignments: [],
         totalAssignments: null,
+        scoreSummary: null,
+        scoreSummaryLoaded: false,
       });
       return;
     }
@@ -70,6 +76,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         attendanceSessions: attendance?.sessions || 0,
         completedAssignments,
         totalAssignments,
+        scoreSummary: score?.student || null,
+        scoreSummaryLoaded: true,
       });
     } catch (_e) {
       setState({
@@ -78,6 +86,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         attendanceSessions: 0,
         completedAssignments: [],
         totalAssignments: null,
+        scoreSummary: null,
+        scoreSummaryLoaded: false,
       });
     }
   }, [className, idToken, levelKey, studentCode]);
@@ -100,7 +110,62 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     ? `${state.completedAssignments.length}/${state.totalAssignments}`
     : `${state.completedAssignments.length}`;
 
-  const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${assignmentsLabel}`;
+  const certificateReadiness = useMemo(() => {
+    const missedAssignments = state.scoreSummary?.missedAssignments || [];
+    const failedAssignments = state.scoreSummary?.failedAssignments || [];
+    const blocked = Boolean(state.scoreSummary?.recommendationBlocked);
+    const nextRecommendation = state.scoreSummary?.nextRecommendation?.label || "";
+
+    if (state.loading) {
+      return {
+        label: "Checking...",
+        detail: "Loading assignment progress",
+        pillBg: "#e5e7eb",
+        pillBorder: "#d1d5db",
+        pillText: "#111827",
+      };
+    }
+
+    if (!state.scoreSummaryLoaded || !state.scoreSummary) {
+      return {
+        label: "Needs sync",
+        detail: state.error || "Could not load assignment progress",
+        pillBg: "#e5e7eb",
+        pillBorder: "#d1d5db",
+        pillText: "#111827",
+      };
+    }
+
+    if (blocked || failedAssignments.length > 0) {
+      return {
+        label: "Fix failed tasks",
+        detail: `Failed: ${failedAssignments.length}`,
+        pillBg: "#fee2e2",
+        pillBorder: "#fecaca",
+        pillText: "#991b1b",
+      };
+    }
+
+    if (missedAssignments.length > 0) {
+      return {
+        label: "Incomplete",
+        detail: `Missed: ${missedAssignments.length}`,
+        pillBg: "#fef3c7",
+        pillBorder: "#fde68a",
+        pillText: "#92400e",
+      };
+    }
+
+    return {
+      label: "On track",
+      detail: nextRecommendation ? `Next: ${nextRecommendation}` : "No missed assignments",
+      pillBg: "#dcfce7",
+      pillBorder: "#86efac",
+      pillText: "#166534",
+    };
+  }, [state.error, state.loading, state.scoreSummary, state.scoreSummaryLoaded]);
+
+  const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${assignmentsLabel}\nCertificate readiness: ${certificateReadiness.label} (${certificateReadiness.detail})`;
 
   // ✅ Compact button (for hero row)
   if (variant === "button") {
@@ -128,21 +193,39 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
 
         {/* status pill */}
         {!state.loading ? (
-          <span
-            style={{
-              padding: "6px 10px",
-              borderRadius: 999,
-              border: `1px solid ${readiness.statusPillBorder || "#e5e7eb"}`,
-              background: readiness.statusPillBg || "#f3f4f6",
-              color: readiness.statusPillText || "#111827",
-              fontSize: 12,
-              fontWeight: 800,
-              lineHeight: 1,
-              whiteSpace: "nowrap",
-            }}
-          >
-            {readiness.statusLabel || "Status"}
-          </span>
+          <>
+            <span
+              style={{
+                padding: "6px 10px",
+                borderRadius: 999,
+                border: `1px solid ${readiness.statusPillBorder || "#e5e7eb"}`,
+                background: readiness.statusPillBg || "#f3f4f6",
+                color: readiness.statusPillText || "#111827",
+                fontSize: 12,
+                fontWeight: 800,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              Exams: {readiness.statusLabel || "Status"}
+            </span>
+
+            <span
+              style={{
+                padding: "6px 10px",
+                borderRadius: 999,
+                border: `1px solid ${certificateReadiness.pillBorder}`,
+                background: certificateReadiness.pillBg,
+                color: certificateReadiness.pillText,
+                fontSize: 12,
+                fontWeight: 800,
+                lineHeight: 1,
+                whiteSpace: "nowrap",
+              }}
+            >
+              Certificate: {certificateReadiness.label}
+            </span>
+          </>
         ) : null}
       </button>
     );
