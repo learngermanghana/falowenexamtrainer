@@ -259,6 +259,7 @@ function App() {
     return <PlacementTestPage />;
   }
 
+
   if (!user) {
     if (authMode === "signup") {
       if (signupProgram === "french") {
