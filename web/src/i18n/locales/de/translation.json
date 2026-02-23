@@ -1213,5 +1213,36 @@
       "contractLink": "Vertragsdetails",
       "emailReminder": "Bitte prüfe direkt nach der Zahlung deine E-Mail auf Beleg, Einschreibebestätigung und weitere wichtige Informationen."
     }
+  },
+  "examReadiness": {
+    "title": "Prüfungsbereitschaft",
+    "attendanceTitle": "Anwesenheit",
+    "sessions": "Sitzungen",
+    "markedIdentifiers": "Markierte Kennungen",
+    "refresh": "Aktualisieren",
+    "openExamFile": "Meine Prüfungsakte öffnen",
+    "errorMissingProfile": "Füge Klasse und Studentencode hinzu, um die Prüfungsbereitschaft zu sehen.",
+    "errorFirebase": "Verbinde Firebase, um die Prüfungsbereitschaft zu laden.",
+    "errorLoad": "Prüfungsbereitschaft kann gerade nicht geladen werden.",
+    "certificate": {
+      "title": "Zertifikatsbereitschaft",
+      "submitHelper": "Vor jeder Abgabe sichtbar, damit du verpasste oder nicht bestandene Aufgaben früh siehst.",
+      "resultsHelper": "Immer bei deinen Ergebnissen sichtbar, damit du den Zertifikatsfortschritt vor Kursende prüfst.",
+      "resolveNow": "Jetzt lösen",
+      "stateChecking": "Prüfe...",
+      "stateNeedsSync": "Synchronisierung nötig",
+      "stateBlocked": "Blockiert",
+      "stateIncomplete": "Unvollständig",
+      "stateReady": "Bereit",
+      "detailLoading": "Aufgabenfortschritt wird geladen",
+      "detailNeedsSync": "Noch keine Zusammenfassung verfügbar",
+      "failedCount": "{{count}} fehlgeschlagene Aufgabe",
+      "detailBlockedWithItem": "{{countLabel}}: {{item}}",
+      "detailBlocked": "{{countLabel}}. Schließe fehlgeschlagene Aufgaben ab, um das Zertifikat freizuschalten.",
+      "detailIncompleteWithItem": "{{count}} verpasste Aufgaben: {{item}}",
+      "detailIncomplete": "{{count}} verpasste Aufgaben. Schließe sie ab, um das Zertifikat freizuschalten.",
+      "detailReady": "Keine fehlgeschlagenen oder verpassten Aufgaben",
+      "failedCount_plural": "{{count}} fehlgeschlagene Aufgaben"
+    }
   }
 }

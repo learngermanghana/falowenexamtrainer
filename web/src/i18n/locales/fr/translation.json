@@ -1217,5 +1217,36 @@
       "contractLink": "détails du contrat",
       "emailReminder": "Après le paiement, vérifie immédiatement ton e-mail pour le reçu, la lettre d’inscription et les autres informations importantes."
     }
+  },
+  "examReadiness": {
+    "title": "Préparation à l'examen",
+    "attendanceTitle": "Présence",
+    "sessions": "sessions",
+    "markedIdentifiers": "Identifiants marqués",
+    "refresh": "Rafraîchir",
+    "openExamFile": "Ouvrir mon dossier d'examen",
+    "errorMissingProfile": "Ajoutez votre classe et code étudiant pour activer le suivi.",
+    "errorFirebase": "Connectez Firebase pour charger la préparation à l'examen.",
+    "errorLoad": "Impossible de charger la préparation à l'examen maintenant.",
+    "certificate": {
+      "title": "Éligibilité au certificat",
+      "submitHelper": "Gardez cette section visible avant chaque envoi pour repérer les tâches manquées ou échouées.",
+      "resultsHelper": "Toujours visible avec vos résultats pour vérifier votre progression vers le certificat.",
+      "resolveNow": "Résoudre maintenant",
+      "stateChecking": "Vérification...",
+      "stateNeedsSync": "Synchronisation requise",
+      "stateBlocked": "Bloqué",
+      "stateIncomplete": "Incomplet",
+      "stateReady": "Prêt",
+      "detailLoading": "Chargement de la progression des devoirs",
+      "detailNeedsSync": "Aucun résumé de score pour le moment",
+      "failedCount": "{{count}} élément échoué",
+      "detailBlockedWithItem": "{{countLabel}}: {{item}}",
+      "detailBlocked": "{{countLabel}}. Terminez les tâches échouées pour débloquer le certificat.",
+      "detailIncompleteWithItem": "{{count}} tâches manquées : {{item}}",
+      "detailIncomplete": "{{count}} tâches manquées. Terminez-les pour débloquer le certificat.",
+      "detailReady": "Aucune tâche échouée ou manquée",
+      "failedCount_plural": "{{count}} éléments échoués"
+    }
   }
 }

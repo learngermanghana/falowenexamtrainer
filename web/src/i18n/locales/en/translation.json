@@ -1329,5 +1329,36 @@
       "contractLink": "contract details",
       "emailReminder": "After payment, please check your email right away for your receipt, letter of enrollment, and other important details."
     }
+  },
+  "examReadiness": {
+    "title": "Exam readiness",
+    "attendanceTitle": "Attendance",
+    "sessions": "sessions",
+    "markedIdentifiers": "Marked identifiers",
+    "refresh": "Refresh",
+    "openExamFile": "Open My Exam File",
+    "errorMissingProfile": "Add your class and student code to unlock readiness tracking.",
+    "errorFirebase": "Connect Firebase to load exam readiness.",
+    "errorLoad": "Could not load readiness right now.",
+    "certificate": {
+      "title": "Certificate readiness",
+      "submitHelper": "Keep this visible before every submission so you can spot missed or failed tasks early.",
+      "resultsHelper": "Always visible with your results so you can confirm certificate progress before course completion.",
+      "resolveNow": "Resolve now",
+      "stateChecking": "Checking...",
+      "stateNeedsSync": "Needs sync",
+      "stateBlocked": "Blocked",
+      "stateIncomplete": "Incomplete",
+      "stateReady": "Ready",
+      "detailLoading": "Loading assignment progress",
+      "detailNeedsSync": "No score summary yet",
+      "failedCount": "{{count}} failed item",
+      "detailBlockedWithItem": "{{countLabel}}: {{item}}",
+      "detailBlocked": "{{countLabel}}. Resolve failed tasks to unlock certificate eligibility.",
+      "detailIncompleteWithItem": "{{count}} missed items: {{item}}",
+      "detailIncomplete": "{{count}} missed items. Complete them to unlock certificate eligibility.",
+      "detailReady": "No failed or missed assignments",
+      "failedCount_plural": "{{count}} failed items"
+    }
   }
 }

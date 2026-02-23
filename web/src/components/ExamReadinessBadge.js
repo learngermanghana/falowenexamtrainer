@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
+import { computeCertificateReadiness } from "../lib/certificateReadiness";
 
-const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }) => {
+const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", refreshToken = 0 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { idToken } = useAuth();
 
   const [state, setState] = useState({
@@ -29,11 +32,15 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     navigate("/campus/examFile");
   };
 
+  const handleResolveNow = () => {
+    navigate("/campus/examFile?section=assignments");
+  };
+
   const loadReadiness = useCallback(async () => {
     if (!className || !studentCode) {
       setState({
         loading: false,
-        error: "Add your class and student code to unlock readiness tracking.",
+        error: t("examReadiness.errorMissingProfile"),
         attendanceSessions: 0,
         completedAssignments: [],
         totalAssignments: null,
@@ -47,7 +54,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     if (!isFirebaseConfigured) {
       setState({
         loading: false,
-        error: "Connect Firebase to load exam readiness.",
+        error: t("examReadiness.errorFirebase"),
         attendanceSessions: 0,
         completedAssignments: [],
         totalAssignments: null,
@@ -78,18 +85,18 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     } catch (_e) {
       setState({
         loading: false,
-        error: "Could not load readiness right now.",
+        error: t("examReadiness.errorLoad"),
         attendanceSessions: 0,
         completedAssignments: [],
         totalAssignments: null,
         scoreSummary: null,
       });
     }
-  }, [className, idToken, levelKey, studentCode]);
+  }, [className, idToken, levelKey, studentCode, t]);
 
   useEffect(() => {
     loadReadiness();
-  }, [loadReadiness]);
+  }, [loadReadiness, refreshToken]);
 
   const readiness = useMemo(
     () =>
@@ -105,114 +112,84 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     ? `${state.completedAssignments.length}/${state.totalAssignments}`
     : `${state.completedAssignments.length}`;
 
-  const certificateReadiness = useMemo(() => {
-    const missedAssignments = state.scoreSummary?.missedAssignments || [];
-    const failedAssignments = state.scoreSummary?.failedAssignments || [];
-    const blocked = Boolean(state.scoreSummary?.recommendationBlocked);
-    const nextRecommendation = state.scoreSummary?.nextRecommendation?.label || "";
+  const certificateReadiness = useMemo(
+    () => computeCertificateReadiness({ loading: state.loading, scoreSummary: state.scoreSummary, t }),
+    [state.loading, state.scoreSummary, t]
+  );
 
-    if (state.loading) {
-      return {
-        label: "Checking...",
-        detail: "Loading assignment progress",
-        pillBg: "#e5e7eb",
-        pillBorder: "#d1d5db",
-        pillText: "#111827",
-      };
-    }
-
-    if (blocked) {
-      return {
-        label: "Fix failed tasks",
-        detail: `Failed: ${failedAssignments.length}`,
-        pillBg: "#fee2e2",
-        pillBorder: "#fecaca",
-        pillText: "#991b1b",
-      };
-    }
-
-    if (missedAssignments.length > 0) {
-      return {
-        label: "Incomplete",
-        detail: `Missed: ${missedAssignments.length}`,
-        pillBg: "#fef3c7",
-        pillBorder: "#fde68a",
-        pillText: "#92400e",
-      };
-    }
-
-    return {
-      label: "On track",
-      detail: nextRecommendation ? `Next: ${nextRecommendation}` : "No missed assignments",
-      pillBg: "#dcfce7",
-      pillBorder: "#86efac",
-      pillText: "#166534",
-    };
-  }, [state.loading, state.scoreSummary]);
-
-  const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${assignmentsLabel}\nCertificate readiness: ${certificateReadiness.label} (${certificateReadiness.detail})`;
+  const title = `${t("examReadiness.title")}: ${readiness.text}\n${t("examReadiness.attendanceTitle")}: ${state.attendanceSessions} ${t(
+    "examReadiness.sessions"
+  )}\n${t("examReadiness.markedIdentifiers")}: ${assignmentsLabel}\n${t("examReadiness.certificate.title")}: ${certificateReadiness.label} (${certificateReadiness.detail})`;
 
   // ✅ Compact button (for hero row)
   if (variant === "button") {
     return (
-      <button
-        type="button"
-        title={title}
-        onClick={handleOpenExamFile}
-        disabled={state.loading}
-        style={{
-          ...styles.primaryButton,
-          background: "#f8fafc",
-          color: "#111827",
-          borderColor: "#e5e7eb",
-          whiteSpace: "nowrap",
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 10,
-        }}
-      >
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-          <span aria-hidden>{state.loading ? "⏳" : readiness.icon}</span>
-          <span style={{ fontWeight: 800 }}>{state.loading ? "Checking..." : "My Exam File"}</span>
-        </span>
-
-        {/* status pill */}
-        {!state.loading ? (
-          <>
-            <span
-              style={{
-                padding: "6px 10px",
-                borderRadius: 999,
-                border: `1px solid ${readiness.statusPillBorder || "#e5e7eb"}`,
-                background: readiness.statusPillBg || "#f3f4f6",
-                color: readiness.statusPillText || "#111827",
-                fontSize: 12,
-                fontWeight: 800,
-                lineHeight: 1,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Exams: {readiness.statusLabel || "Status"}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          title={title}
+          onClick={handleOpenExamFile}
+          disabled={state.loading}
+          style={{
+            ...styles.primaryButton,
+            background: "#f8fafc",
+            color: "#111827",
+            borderColor: "#e5e7eb",
+            whiteSpace: "nowrap",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
+          }}
+        >
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span aria-hidden>{state.loading ? "⏳" : readiness.icon}</span>
+            <span style={{ fontWeight: 800 }}>
+              {state.loading ? t("examReadiness.certificate.stateChecking") : t("examReadiness.openExamFile")}
             </span>
+          </span>
 
-            <span
-              style={{
-                padding: "6px 10px",
-                borderRadius: 999,
-                border: `1px solid ${certificateReadiness.pillBorder}`,
-                background: certificateReadiness.pillBg,
-                color: certificateReadiness.pillText,
-                fontSize: 12,
-                fontWeight: 800,
-                lineHeight: 1,
-                whiteSpace: "nowrap",
-              }}
-            >
-              Certificate: {certificateReadiness.label}
-            </span>
-          </>
+          {!state.loading ? (
+            <>
+              <span
+                style={{
+                  padding: "6px 10px",
+                  borderRadius: 999,
+                  border: `1px solid ${readiness.statusPillBorder || "#e5e7eb"}`,
+                  background: readiness.statusPillBg || "#f3f4f6",
+                  color: readiness.statusPillText || "#111827",
+                  fontSize: 12,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Exams: {readiness.statusLabel || "Status"}
+              </span>
+
+              <span
+                style={{
+                  padding: "6px 10px",
+                  borderRadius: 999,
+                  border: `1px solid ${certificateReadiness.pillBorder}`,
+                  background: certificateReadiness.pillBg,
+                  color: certificateReadiness.pillText,
+                  fontSize: 12,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t("examReadiness.certificate.title")}: {certificateReadiness.label}
+              </span>
+            </>
+          ) : null}
+        </button>
+        {certificateReadiness.canResolve ? (
+          <button type="button" style={styles.secondaryButton} onClick={handleResolveNow}>
+            {t("examReadiness.certificate.resolveNow")}
+          </button>
         ) : null}
-      </button>
+      </div>
     );
   }
 
@@ -229,7 +206,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         }}
       >
         <div style={{ minWidth: 240 }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Exam readiness</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("examReadiness.title")}</p>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>
@@ -255,15 +232,24 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
           </div>
 
           <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{readiness.detail}</p>
+          <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+            {t("examReadiness.certificate.title")}: <strong>{certificateReadiness.label}</strong> · {certificateReadiness.detail}
+          </p>
         </div>
 
         <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+          {certificateReadiness.canResolve ? (
+            <button type="button" style={styles.secondaryButton} onClick={handleResolveNow}>
+              {t("examReadiness.certificate.resolveNow")}
+            </button>
+          ) : null}
+
           <button type="button" style={styles.secondaryButton} onClick={loadReadiness} disabled={state.loading}>
-            {state.loading ? "Checking..." : "Refresh"}
+            {state.loading ? t("examReadiness.certificate.stateChecking") : t("examReadiness.refresh")}
           </button>
 
           <button type="button" style={styles.primaryButton} onClick={handleOpenExamFile}>
-            Open My Exam File
+            {t("examReadiness.openExamFile")}
           </button>
         </div>
       </div>
