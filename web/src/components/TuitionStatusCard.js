@@ -127,6 +127,13 @@ const TuitionStatusCard = ({
     const paymentStatus = `${studentProfile?.paymentStatus || ""}`.toLowerCase();
     if (paymentStatus === "paid") return null;
 
+    const carryoverUntilMs = new Date(studentProfile?.upgradeCarryoverUntil || "").getTime();
+    const hasQueuedUpgradeAccess =
+      String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
+      Number.isFinite(carryoverUntilMs) &&
+      carryoverUntilMs > Date.now();
+    if (hasQueuedUpgradeAccess) return null;
+
     const joinedAtRaw = studentProfile?.joined_at;
     if (!joinedAtRaw) return null;
 
@@ -142,7 +149,7 @@ const TuitionStatusCard = ({
       daysLeft,
       isExpired: millisecondsLeft <= 0,
     };
-  }, [studentProfile?.joined_at, studentProfile?.paymentStatus]);
+  }, [studentProfile?.contractMergeMode, studentProfile?.joined_at, studentProfile?.paymentStatus, studentProfile?.upgradeCarryoverUntil]);
 
   const startPayment = async () => {
     setPaymentError("");

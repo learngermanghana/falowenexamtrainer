@@ -192,16 +192,27 @@ function App() {
     const parsed = toDateMs(studentProfile.contractEnd);
     return Number.isFinite(parsed) ? parsed : NaN;
   }, [studentProfile?.contractEnd]);
+  const upgradeCarryoverMs = useMemo(() => {
+    if (!studentProfile?.upgradeCarryoverUntil) return NaN;
+    const parsed = toDateMs(studentProfile.upgradeCarryoverUntil);
+    return Number.isFinite(parsed) ? parsed : NaN;
+  }, [studentProfile?.upgradeCarryoverUntil]);
   const balanceCleared = useMemo(
     () => hasClearedBalance(studentProfile?.balanceDue),
     [studentProfile?.balanceDue]
   );
 
   const hasActiveContract = Number.isFinite(contractEndMs) && contractEndMs > Date.now();
+  const hasQueuedUpgradeAccess =
+    String(studentProfile?.contractMergeMode || "").toLowerCase() === "append_after_active_contract" &&
+    Number.isFinite(upgradeCarryoverMs) &&
+    upgradeCarryoverMs > Date.now();
   const canAccessLegacy =
     !Number.isFinite(contractEndMs) && (["paid", "partial"].includes(paymentStatus) || balanceCleared);
   const awaitingPayment =
-    Boolean(studentProfile) && !isStaff && !(hasActiveContract || canAccessLegacy || balanceCleared);
+    Boolean(studentProfile) &&
+    !isStaff &&
+    !(hasActiveContract || hasQueuedUpgradeAccess || canAccessLegacy || balanceCleared);
 
   if (!isFirebaseConfigured) {
     return (
