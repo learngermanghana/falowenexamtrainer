@@ -259,8 +259,8 @@ const A2_SCHEDULE = [
       to: "/campus/course/directions-imperative-11",
     },
     grammar_topic: "Imperative (instructions and requests)",
-    video: "https://youtu.be/Xjp2A1hU1ag",
-    youtube_link: "https://youtu.be/Xjp2A1hU1ag",
+    video: "https://youtu.be/8ryvhkRqQPc",
+    youtube_link: "https://youtu.be/8ryvhkRqQPc",
     grammarbook_link: "https://drive.google.com/file/d/1O040UoSuBdy4llTK7MbGIsib63uNNcrV/view?usp=sharing",
     workbook_link: "https://drive.google.com/file/d/1vsdVR_ubbu5gbXnm70vZS5xGFivjBYoA/view?usp=sharing",
   },
@@ -734,8 +734,8 @@ const RAW_COURSE_SCHEDULES = {
     instruction:
       "Complete Lesen & Hören; your tutor will mark it.",
     lesen_hören: {
-      video: "https://youtu.be/k2ZC3rXPe1k",
-      youtube_link: "https://youtu.be/k2ZC3rXPe1k",
+      video: "https://youtu.be/8ryvhkRqQPc",
+      youtube_link: "https://youtu.be/8ryvhkRqQPc",
         assignment: true,
         grammarbook_link: "https://www.falowen.app/campus/course/directions-imperative-11",
         workbook_link: "https://drive.google.com/file/d/17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A/view?usp=sharing",
