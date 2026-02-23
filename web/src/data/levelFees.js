@@ -10,7 +10,17 @@ export const LEVEL_FEES = {
   C1: 3000,
 };
 
+export const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1"];
+
 export const getTuitionFeeForLevel = (level) => LEVEL_FEES[level] ?? 0;
+
+export const getNextLevel = (level) => {
+  const normalizedLevel = typeof level === "string" ? level.toUpperCase() : "";
+  const currentIndex = LEVEL_ORDER.indexOf(normalizedLevel);
+  if (currentIndex < 0) return LEVEL_ORDER[0];
+  if (currentIndex >= LEVEL_ORDER.length - 1) return null;
+  return LEVEL_ORDER[currentIndex + 1];
+};
 
 const DEFAULT_PAYSTACK_LINKS = {
   A1: "https://paystack.shop/pay/yzz468-lbj",

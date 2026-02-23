@@ -1,4 +1,4 @@
-import { computeTuitionStatus, paystackLinkForLevel } from "./levelFees";
+import { computeTuitionStatus, getNextLevel, paystackLinkForLevel } from "./levelFees";
 
 describe("computeTuitionStatus", () => {
   it("marks tuition as paid when the amount covers the fee", () => {
@@ -33,5 +33,21 @@ describe("computeTuitionStatus", () => {
 
     const checkoutUrl = new URL(summary.paystackLink);
     expect(checkoutUrl.searchParams.get("amount")).toBe("300000");
+  });
+});
+
+
+describe("getNextLevel", () => {
+  it("returns the next level when available", () => {
+    expect(getNextLevel("A1")).toBe("A2");
+    expect(getNextLevel("a2")).toBe("B1");
+  });
+
+  it("returns null for the final level", () => {
+    expect(getNextLevel("C1")).toBeNull();
+  });
+
+  it("defaults unknown levels to A1", () => {
+    expect(getNextLevel("UNKNOWN")).toBe("A1");
   });
 });
