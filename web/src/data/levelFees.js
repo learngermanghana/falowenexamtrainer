@@ -12,6 +12,8 @@ export const LEVEL_FEES = {
 
 export const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1"];
 
+export const MIN_INSTALLMENT_GHS = 2000;
+
 export const getTuitionFeeForLevel = (level) => LEVEL_FEES[level] ?? 0;
 
 export const getNextLevel = (level) => {
