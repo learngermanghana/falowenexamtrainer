@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { InfoBox } from "./ui";
+import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
@@ -837,6 +838,13 @@ const AssignmentSubmissionPage = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <section style={{ ...styles.card, display: "grid", gap: 8 }}>
+        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Certificate readiness</h3>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Keep this visible before every submission so you can spot missed or failed tasks early.
+        </p>
+        <ExamReadinessBadge studentProfile={studentProfile} variant="button" />
+      </section>
       <div style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div>
           <h2 style={styles.sectionTitle}>Submit Assignment</h2>
