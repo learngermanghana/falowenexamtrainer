@@ -124,11 +124,11 @@ const A1LetterWritingQuestionBookPage = () => {
    *  ========================= */
   const BIRTHDAY_STEPS = useMemo(
     () => [
-      "Start with an informal greeting.",
-      "Explain why you are writing.",
-      "Give your birthday wishes.",
-      "Ask if they are planning a celebration.",
-      "Conclude the letter politely.",
+      "Introduction: Start with an informal greeting and a short opening (How are you? / I hope you are well / reason for writing).",
+      "Body: Give birthday wishes and ask where the party is planned.",
+      "Body: Ask if you can come with your family and add one extra sentence (for example: Wir fahren mit dem Auto).",
+      "Conclusion: End politely with ‘Ich freue mich im Voraus auf deine Antwort.’",
+      "Conclusion: Close with ‘Viele Grüße’ (or ‘Liebe Grüße’) and your first name.",
     ],
     []
   );
@@ -144,11 +144,11 @@ const A1LetterWritingQuestionBookPage = () => {
 
   const FORMAL_STEPS = useMemo(
     () => [
-      "Start with a formal greeting.",
-      "Explain why you are writing.",
-      "Request information about the courses.",
-      "Ask about course dates, prices, and payment options.",
-      "Conclude the letter politely.",
+      "Introduction: Start with a formal greeting (‘Sehr geehrte Damen und Herren’) and opening sentence.",
+      "Introduction: State why you are writing using ‘Ich schreibe Ihnen, weil ...’.",
+      "Body: Request information about German courses (Könnten Sie mir bitte Informationen über ... geben?).",
+      "Body: Ask about course dates, prices, and payment methods.",
+      "Conclusion: End with ‘Ich freue mich im Voraus auf Ihre Antwort.’ + ‘Mit freundlichen Grüßen’ and your full name.",
     ],
     []
   );
@@ -436,6 +436,20 @@ const A1LetterWritingQuestionBookPage = () => {
               </div>
             </InfoBox>
 
+            <InfoBox title="Write your letter in 3 clear parts">
+              <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
+                <div>
+                  <strong>1) Introduction:</strong> Greeting + opening sentences + reason for writing.
+                </div>
+                <div>
+                  <strong>2) Body:</strong> Main message (birthday wishes, questions, and details).
+                </div>
+                <div>
+                  <strong>3) Conclusion:</strong> Polite ending sentence + closing phrase + your name.
+                </div>
+              </div>
+            </InfoBox>
+
             <div style={{ borderRadius: 10, background: "#fff7ed", border: "1px solid #fdba74", padding: 10 }}>
               ✅ When you finish reading, go to <strong>Submit Answers</strong> tab and type your answers.
             </div>
@@ -454,6 +468,20 @@ const A1LetterWritingQuestionBookPage = () => {
                 Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule:
               </div>
               <BulletList items={FORMAL_SAMPLE} />
+            </InfoBox>
+
+            <InfoBox title="Write your letter in 3 clear parts">
+              <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
+                <div>
+                  <strong>1) Introduction:</strong> Formal greeting + polite opening + reason for writing.
+                </div>
+                <div>
+                  <strong>2) Body:</strong> Ask for required information (courses, dates, price, payment).
+                </div>
+                <div>
+                  <strong>3) Conclusion:</strong> Fixed polite sentence + formal sign-off + full name.
+                </div>
+              </div>
             </InfoBox>
 
             <div style={{ borderRadius: 10, background: "#fff7ed", border: "1px solid #fdba74", padding: 10 }}>
