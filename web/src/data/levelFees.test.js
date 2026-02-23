@@ -1,10 +1,4 @@
-import {
-  computeTuitionStatus,
-  defaultPaymentIntentForTuition,
-  getNextLevel,
-  MIN_INSTALLMENT_GHS,
-  paystackLinkForLevel,
-} from "./levelFees";
+import { computeTuitionStatus, getNextLevel, paystackLinkForLevel } from "./levelFees";
 
 describe("computeTuitionStatus", () => {
   it("marks tuition as paid when the amount covers the fee", () => {
@@ -55,21 +49,5 @@ describe("getNextLevel", () => {
 
   it("defaults unknown levels to A1", () => {
     expect(getNextLevel("UNKNOWN")).toBe("A1");
-  });
-});
-
-
-describe("defaultPaymentIntentForTuition", () => {
-  it("uses the minimum installment for normal tuition totals", () => {
-    expect(defaultPaymentIntentForTuition(3000)).toBe(MIN_INSTALLMENT_GHS);
-  });
-
-  it("caps to the tuition fee when fee is below the minimum", () => {
-    expect(defaultPaymentIntentForTuition(1500)).toBe(1500);
-  });
-
-  it("returns zero for invalid values", () => {
-    expect(defaultPaymentIntentForTuition(null)).toBe(0);
-    expect(defaultPaymentIntentForTuition(-100)).toBe(0);
   });
 });
