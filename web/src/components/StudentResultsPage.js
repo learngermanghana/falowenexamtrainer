@@ -259,9 +259,9 @@ const StudentResultsPage = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Certificate readiness</h3>
+        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{t("examReadiness.certificate.title")}</h3>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Always visible with your results so you can confirm certificate progress before course completion.
+          {t("examReadiness.certificate.resultsHelper")}
         </p>
         <ExamReadinessBadge studentProfile={studentProfile} variant="button" />
       </section>

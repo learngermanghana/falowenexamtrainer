@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { InfoBox } from "./ui";
 import ExamReadinessBadge from "./ExamReadinessBadge";
@@ -71,7 +72,9 @@ const getBaseMaxByLevel = (level) => BASE_MAX_BY_LEVEL[level] || 4200;
 const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
 
 const AssignmentSubmissionPage = () => {
+  const { t } = useTranslation();
   const { user, studentProfile } = useAuth();
+  const [badgeRefreshToken, setBadgeRefreshToken] = useState(0);
 
   const preferredLevel = useMemo(
     () => (studentProfile?.level || "A1").toUpperCase(),
@@ -672,6 +675,7 @@ const AssignmentSubmissionPage = () => {
       }
 
       setStatus({ loading: false, error: "", success: "Thanks! Your submission has been saved." });
+      setBadgeRefreshToken((prev) => prev + 1);
 
       // Clear editor after submission (preview remains available below)
       setForm((prev) => ({ ...prev, submissionText: "", confirmed: true }));
@@ -839,11 +843,11 @@ const AssignmentSubmissionPage = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Certificate readiness</h3>
+        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{t("examReadiness.certificate.title")}</h3>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Keep this visible before every submission so you can spot missed or failed tasks early.
+          {t("examReadiness.certificate.submitHelper")}
         </p>
-        <ExamReadinessBadge studentProfile={studentProfile} variant="button" />
+        <ExamReadinessBadge studentProfile={studentProfile} variant="button" refreshToken={badgeRefreshToken} />
       </section>
       <div style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div>
