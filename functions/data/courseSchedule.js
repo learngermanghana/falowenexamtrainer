@@ -457,7 +457,7 @@ const courseSchedules = {
           chapter: "0.2",
           video: "https://youtu.be/S7n6TlAQRLQ",
           youtube_link: "https://youtu.be/S7n6TlAQRLQ",
-          grammarbook_link: "https://drive.google.com/file/d/1KtJCF15Ng4cLU88wdUCX5iumOLY7ZA0a/view?usp=sharing",
+          grammarbook_link: "https://www.falowen.app/campus/course/singular-pronouns-verb-conjugation-day-2",
           assignment: true,
           workbook_link: "https://drive.google.com/file/d/1R6PqzgsPm9f5iVn7JZXSNVa_NttoPU9Q/view?usp=sharing",
         },
