@@ -173,6 +173,36 @@ async function upsertStudentToSheet(student) {
   );
   const colLearningMode = findCol(headerMap, "LearningMode", "Learning Mode", "learningMode");
   const colAddress = findCol(headerMap, "Address", "Home Address", "address", "homeaddress");
+  const colContractMergeMode = findCol(
+    headerMap,
+    "ContractMergeMode",
+    "Contract Merge Mode",
+    "contractMergeMode"
+  );
+  const colUpgradeCarryoverUntil = findCol(
+    headerMap,
+    "UpgradeCarryoverUntil",
+    "Upgrade Carryover Until",
+    "upgradeCarryoverUntil"
+  );
+  const colUpgradeFromLevel = findCol(
+    headerMap,
+    "UpgradeFromLevel",
+    "Upgrade From Level",
+    "upgradeFromLevel"
+  );
+  const colUpgradeToLevel = findCol(
+    headerMap,
+    "UpgradeToLevel",
+    "Upgrade To Level",
+    "upgradeToLevel"
+  );
+  const colUpgradeQueuedAt = findCol(
+    headerMap,
+    "UpgradeQueuedAt",
+    "Upgrade Queued At",
+    "upgradeQueuedAt"
+  );
 
   if (colStudentCode === null) {
     const headerNames = headers && headers.length ? headers.join(" | ") : "(none)";
@@ -237,6 +267,11 @@ async function upsertStudentToSheet(student) {
     pushCell(colContractEnd, student.contractEnd || "");
     pushCell(colLearningMode, student.learningMode || "");
     pushCell(colAddress, student.address || "");
+    pushCell(colContractMergeMode, student.contractMergeMode || "");
+    pushCell(colUpgradeCarryoverUntil, student.upgradeCarryoverUntil || "");
+    pushCell(colUpgradeFromLevel, student.upgradeFromLevel || "");
+    pushCell(colUpgradeToLevel, student.upgradeToLevel || "");
+    pushCell(colUpgradeQueuedAt, student.upgradeQueuedAt || "");
     pushCell(colEmergencyPhone, student.emergencyContactPhone || "");
     pushCell(colDailyLimit, student.dailyLimit ?? "");
     pushCell(colUsesToday, student.usesToday ?? "");
@@ -283,6 +318,16 @@ async function upsertStudentToSheet(student) {
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
   if (colLearningMode !== null) row[colLearningMode] = student.learningMode || "";
   if (colAddress !== null) row[colAddress] = student.address || "";
+  if (colContractMergeMode !== null)
+    row[colContractMergeMode] = student.contractMergeMode || "";
+  if (colUpgradeCarryoverUntil !== null)
+    row[colUpgradeCarryoverUntil] = student.upgradeCarryoverUntil || "";
+  if (colUpgradeFromLevel !== null)
+    row[colUpgradeFromLevel] = student.upgradeFromLevel || "";
+  if (colUpgradeToLevel !== null)
+    row[colUpgradeToLevel] = student.upgradeToLevel || "";
+  if (colUpgradeQueuedAt !== null)
+    row[colUpgradeQueuedAt] = student.upgradeQueuedAt || "";
   if (colEmergencyPhone !== null)
     row[colEmergencyPhone] = student.emergencyContactPhone || "";
   if (colDailyLimit !== null) row[colDailyLimit] = student.dailyLimit ?? "";

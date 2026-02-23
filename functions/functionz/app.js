@@ -1136,33 +1136,53 @@ app.post("/paystack/webhook", async (req, res) => {
      * - Any successful partial payment grants at least 1-month access.
      * - Fully clearing tuition grants 6-month access.
      *
-     * Important: Do NOT reset contractStart every time.
-     * - If existing contract is active (contractEnd > now), keep existing start.
-     * - If expired or missing, start from now.
-     * - If upgrading to 6-month, extend end date.
+     * Merge rule for level-up during active contract:
+     * - If contractMergeMode === "append_after_active_contract", start the new contract
+     *   at upgradeCarryoverUntil (or current contract end) so the learner does not lose time.
      */
     const now = new Date();
 
     const existingStart = studentData.contractStart ? new Date(studentData.contractStart) : null;
     const existingEnd = studentData.contractEnd ? new Date(studentData.contractEnd) : null;
+    const carryoverUntil = studentData.upgradeCarryoverUntil
+      ? new Date(studentData.upgradeCarryoverUntil)
+      : null;
 
     const startIsValid = existingStart && !Number.isNaN(existingStart.getTime());
     const endIsValid = existingEnd && !Number.isNaN(existingEnd.getTime());
+    const carryoverIsValid = carryoverUntil && !Number.isNaN(carryoverUntil.getTime());
 
     const contractWasActive = endIsValid && existingEnd > now;
-
-    const contractStartDate = contractWasActive && startIsValid ? existingStart : now;
+    const mergeMode = String(studentData.contractMergeMode || "").toLowerCase();
+    const shouldAppendAfterActiveContract =
+      mergeMode === "append_after_active_contract" && (contractWasActive || carryoverIsValid);
 
     const targetMonths = paymentStatus === "paid" ? 6 : 1;
     const currentMonths = Number(studentData.contractTermMonths || 0);
 
-    // Keep the bigger access (never reduce)
-    const finalMonths = Math.max(currentMonths, targetMonths);
+    let contractStartDate;
+    let finalMonths;
+    let contractEndDate;
 
-    const proposedEnd = addMonths(contractStartDate, finalMonths);
+    if (shouldAppendAfterActiveContract) {
+      const appendStartCandidate = [carryoverIsValid ? carryoverUntil : null, endIsValid ? existingEnd : null]
+        .filter(Boolean)
+        .sort((a, b) => b.getTime() - a.getTime())[0];
 
-    // If they already had a later end date, preserve it
-    const contractEndDate = endIsValid && existingEnd > proposedEnd ? existingEnd : proposedEnd;
+      contractStartDate = appendStartCandidate && appendStartCandidate > now ? appendStartCandidate : now;
+      finalMonths = targetMonths;
+      contractEndDate = addMonths(contractStartDate, finalMonths);
+    } else {
+      contractStartDate = contractWasActive && startIsValid ? existingStart : now;
+
+      // Keep the bigger access (never reduce)
+      finalMonths = Math.max(currentMonths, targetMonths);
+
+      const proposedEnd = addMonths(contractStartDate, finalMonths);
+
+      // If they already had a later end date, preserve it
+      contractEndDate = endIsValid && existingEnd > proposedEnd ? existingEnd : proposedEnd;
+    }
 
     const updates = {
       initialPaymentAmount: totalPaid,
@@ -1173,6 +1193,9 @@ app.post("/paystack/webhook", async (req, res) => {
       contractTermMonths: finalMonths,
       status: "Active",
       paystackReference: data?.reference || studentData.paystackReference || "",
+      // clear one-time level-up merge queue fields after payment processing
+      contractMergeMode: "",
+      upgradeCarryoverUntil: "",
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
     };
 
