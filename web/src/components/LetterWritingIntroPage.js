@@ -29,22 +29,6 @@ const TopicImageBreak = ({ src, alt, title, subtitle }) => (
   </div>
 );
 
-const Chip = ({ children }) => (
-  <span
-    style={{
-      border: "1px solid #cbd5e1",
-      background: "#ffffff",
-      borderRadius: 999,
-      padding: "6px 10px",
-      fontSize: 13,
-      fontWeight: 700,
-      color: "#0f172a",
-    }}
-  >
-    {children}
-  </span>
-);
-
 const ChoiceRow = ({ label, options, value, onChange }) => (
   <div style={{ display: "grid", gap: 8 }}>
     <div style={{ fontWeight: 900 }}>{label}</div>
@@ -249,8 +233,6 @@ const WordOrderBulletExercise = ({ id, label, words, correctSentence, tip, onSen
 /** =========================
  *  Free-to-use images (Unsplash License)
  *  ========================= */
-const IMG_LETTER =
-  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
 const IMG_SCHOOL =
   "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
 
@@ -261,65 +243,11 @@ const A1LetterWritingQuestionBookPage = () => {
   const navigate = useNavigate();
 
   /** ===== Vocabulary (on page) ===== */
-  const VOCAB = useMemo(
-    () => ({
-      verbs: [
-        "abholen (pick up)",
-        "anmelden (register)",
-        "anmachen (switch on)",
-        "ausmachen (switch off)",
-        "anreisen (arrive)",
-        "ankommen (arrive)",
-        "abreisen (depart)",
-        "absagen (cancel)",
-        "zusagen (accept)",
-        "zumachen (close)",
-        "aufmachen (open)",
-        "einsteigen (get in)",
-        "umsteigen (change trains)",
-        "aussteigen (get out)",
-        "vereinbaren (arrange)",
-        "einladen (invite)",
-        "gratulieren (congratulate)",
-      ],
-      key: [
-        "der Geburtstag (birthday)",
-        "die Feier (celebration/party)",
-        "der Kurs (course)",
-        "die Anmeldung (registration)",
-        "die Gebühr (fee)",
-        "das Formular (form)",
-        "das Büro (office)",
-        "die Informationen (information)",
-        "der Preis (price)",
-        "der Termin (appointment)",
-      ],
-      travelWeather: [
-        "der Koffer (suitcase)",
-        "die Ferien / der Urlaub (vacation)",
-        "das Meer (sea)",
-        "das Ausland (abroad)",
-        "der Ausflug (excursion)",
-        "das Wetter (weather)",
-        "die Sonne (sun)",
-        "der Regen (rain)",
-        "der Schnee (snow)",
-        "der Wind (wind)",
-        "die Wolke (cloud)",
-        "das Gewitter (thunderstorm)",
-        "der Sturm (storm)",
-        "die Temperatur (temperature)",
-        "der Himmel (sky)",
-      ],
-    }),
-    []
-  );
-
   /** =========================
    *  Birthday (Informal) – states
    *  ========================= */
   const [b_gender, setB_gender] = useState("male"); // male|female
-  const [b_name, setB_name] = useState("Max");
+  const [b_name] = useState("Max");
 
   const birthdayGreeting = useMemo(() => {
     if (!b_name) return b_gender === "female" ? "Liebe ...," : "Lieber ...,";
@@ -329,13 +257,13 @@ const A1LetterWritingQuestionBookPage = () => {
   const [b_weilPick, setB_weilPick] = useState("");
   const [, setB_wordOrderSentence] = useState("");
 
-  const [b_wish, setB_wish] = useState("Alles Gute zum Geburtstag!");
-  const [b_partyQuestion, setB_partyQuestion] = useState("Planst du eine Feier?");
+  const [b_wish] = useState("Alles Gute zum Geburtstag!");
+  const [b_partyQuestion] = useState("Planst du eine Feier?");
   const [b_extra] = useState("Kann ich mit meiner Familie kommen?");
-  const [b_includeExtra, setB_includeExtra] = useState(false);
+  const [b_includeExtra] = useState(false);
 
-  const [b_closing, setB_closing] = useState("Ich freue mich im Voraus auf deine Antwort.");
-  const [b_sign, setB_sign] = useState("Viele Grüße,");
+  const [b_closing] = useState("Ich freue mich im Voraus auf deine Antwort.");
+  const [b_sign] = useState("Viele Grüße,");
 
   /** =========================
    *  Formal (Language School) – states
