@@ -20,7 +20,13 @@ import { jsPDF } from "jspdf";
 const formatDate = (value) => {
   if (!value) return "";
   const parsed = toDate(value);
-  return parsed ? parsed.toLocaleDateString() : "";
+  return parsed
+    ? parsed.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "";
 };
 
 const formatDateTime = (value) => {
