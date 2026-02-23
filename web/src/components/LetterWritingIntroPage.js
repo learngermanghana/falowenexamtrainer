@@ -47,24 +47,6 @@ const BulletList = ({ items }) => (
   </ul>
 );
 
-const LabeledTextArea = ({ label, value, onChange, placeholder }) => (
-  <div style={{ display: "grid", gap: 6 }}>
-    <div style={{ fontWeight: 900 }}>{label}</div>
-    <textarea
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      rows={3}
-      placeholder={placeholder}
-      style={{
-        width: "100%",
-        borderRadius: 10,
-        border: "1px solid #d1d5db",
-        padding: 10,
-      }}
-    />
-  </div>
-);
-
 const QuestionCard = ({ q, value, onChange }) => (
   <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
     <div style={{ fontWeight: 900 }}>{q.title}</div>
