@@ -8,12 +8,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { formatCurrency } from "../lib/formatters";
-import {
-  defaultPaymentIntentForTuition,
-  getNextLevel,
-  getTuitionFeeForLevel,
-  MIN_INSTALLMENT_GHS,
-} from "../data/levelFees";
+import { getNextLevel, getTuitionFeeForLevel } from "../data/levelFees";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -162,14 +157,13 @@ const AccountSettings = () => {
     try {
       const nextLevel = levelUpgrade.nextLevel;
       const nextTuitionFee = levelUpgrade.nextTuitionFee || 0;
-      const defaultPaymentIntent = defaultPaymentIntentForTuition(nextTuitionFee);
 
       await saveStudentProfile({
         level: nextLevel,
         className: "",
         paid: 0,
         initialPaymentAmount: 0,
-        paymentIntentAmount: defaultPaymentIntent,
+        paymentIntentAmount: nextTuitionFee,
         tuitionFee: nextTuitionFee,
         balanceDue: nextTuitionFee,
         paymentStatus: "pending",
@@ -406,7 +400,6 @@ const AccountSettings = () => {
                 <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
                   Completed {levelUpgrade.currentLevel}? Move to <strong>{levelUpgrade.nextLevel}</strong>.
                   Next level tuition: <strong>{formatMoney(levelUpgrade.nextTuitionFee || 0)}</strong>.
-                  Minimum first payment is <strong>{formatMoney(MIN_INSTALLMENT_GHS)}</strong> (or the full remaining balance if lower). You can also pay the full next-level tuition immediately.
                 </p>
                 <button
                   type="button"
