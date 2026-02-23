@@ -1,4 +1,10 @@
-import { computeTuitionStatus, paystackLinkForLevel } from "./levelFees";
+import {
+  computeTuitionStatus,
+  defaultPaymentIntentForTuition,
+  getNextLevel,
+  MIN_INSTALLMENT_GHS,
+  paystackLinkForLevel,
+} from "./levelFees";
 
 describe("computeTuitionStatus", () => {
   it("marks tuition as paid when the amount covers the fee", () => {
@@ -33,5 +39,37 @@ describe("computeTuitionStatus", () => {
 
     const checkoutUrl = new URL(summary.paystackLink);
     expect(checkoutUrl.searchParams.get("amount")).toBe("300000");
+  });
+});
+
+
+describe("getNextLevel", () => {
+  it("returns the next level when available", () => {
+    expect(getNextLevel("A1")).toBe("A2");
+    expect(getNextLevel("a2")).toBe("B1");
+  });
+
+  it("returns null for the final level", () => {
+    expect(getNextLevel("C1")).toBeNull();
+  });
+
+  it("defaults unknown levels to A1", () => {
+    expect(getNextLevel("UNKNOWN")).toBe("A1");
+  });
+});
+
+
+describe("defaultPaymentIntentForTuition", () => {
+  it("uses the minimum installment for normal tuition totals", () => {
+    expect(defaultPaymentIntentForTuition(3000)).toBe(MIN_INSTALLMENT_GHS);
+  });
+
+  it("caps to the tuition fee when fee is below the minimum", () => {
+    expect(defaultPaymentIntentForTuition(1500)).toBe(1500);
+  });
+
+  it("returns zero for invalid values", () => {
+    expect(defaultPaymentIntentForTuition(null)).toBe(0);
+    expect(defaultPaymentIntentForTuition(-100)).toBe(0);
   });
 });

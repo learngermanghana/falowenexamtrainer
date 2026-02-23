@@ -8,6 +8,12 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
 import { formatCurrency } from "../lib/formatters";
+import {
+  defaultPaymentIntentForTuition,
+  getNextLevel,
+  getTuitionFeeForLevel,
+  MIN_INSTALLMENT_GHS,
+} from "../data/levelFees";
 
 const formatDate = (value) => {
   if (!value) return "–";
@@ -36,6 +42,7 @@ const AccountSettings = () => {
   const [status, setStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isCorrectingBio, setIsCorrectingBio] = useState(false);
+  const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
 
   useEffect(() => {
     setProfile((prev) => ({
@@ -111,6 +118,74 @@ const AccountSettings = () => {
           : `You still owe ${formatMoney(balanceDue)} and have ${daysLabel} left. Please make a payment to keep access.`,
     };
   }, [balanceDue, formatMoney, numberFormatter, studentProfile?.contractEnd, t]);
+
+  const levelUpgrade = useMemo(() => {
+    const currentLevel = String(studentProfile?.level || "").toUpperCase();
+    const nextLevel = getNextLevel(currentLevel);
+
+    if (!nextLevel) {
+      return {
+        currentLevel,
+        nextLevel: null,
+        canUpgrade: false,
+        reason: "You're already at the highest available level.",
+      };
+    }
+
+    const hasOutstandingBalance = (Number(balanceDue) || 0) > 0;
+    if (hasOutstandingBalance) {
+      return {
+        currentLevel,
+        nextLevel,
+        canUpgrade: false,
+        reason: "Clear your current balance before moving to the next level.",
+      };
+    }
+
+    const nextTuitionFee = getTuitionFeeForLevel(nextLevel);
+
+    return {
+      currentLevel,
+      nextLevel,
+      nextTuitionFee,
+      canUpgrade: true,
+      reason: "",
+    };
+  }, [balanceDue, studentProfile?.level]);
+
+  const handleUpgradeToNextLevel = async () => {
+    if (!levelUpgrade?.canUpgrade || !levelUpgrade?.nextLevel) return;
+
+    setIsUpgradingLevel(true);
+    setStatus("");
+
+    try {
+      const nextLevel = levelUpgrade.nextLevel;
+      const nextTuitionFee = levelUpgrade.nextTuitionFee || 0;
+      const defaultPaymentIntent = defaultPaymentIntentForTuition(nextTuitionFee);
+
+      await saveStudentProfile({
+        level: nextLevel,
+        className: "",
+        paid: 0,
+        initialPaymentAmount: 0,
+        paymentIntentAmount: defaultPaymentIntent,
+        tuitionFee: nextTuitionFee,
+        balanceDue: nextTuitionFee,
+        paymentStatus: "pending",
+        contractTermMonths: null,
+        contractStart: "",
+        contractEnd: "",
+      });
+
+      setStatus(`You're now on ${nextLevel}. Please complete payment to unlock access.`);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not upgrade level.";
+      setStatus(message);
+    } finally {
+      setIsUpgradingLevel(false);
+    }
+  };
 
   const handleChange = (field) => (event) => {
     setProfile((prev) => ({ ...prev, [field]: event.target.value }));
@@ -319,6 +394,37 @@ const AccountSettings = () => {
                 <strong>{studentProfile.paymentStatus || "pending"}</strong>
               </div>
             </div>
+          </div>
+
+          <div style={{ ...styles.card, margin: 0, background: "#f8fafc", borderColor: "#e2e8f0" }}>
+            <div style={styles.metaRow}>
+              <h3 style={{ margin: 0 }}>Level progression</h3>
+              <span style={styles.badge}>{levelUpgrade.currentLevel || "No level"}</span>
+            </div>
+            {levelUpgrade.nextLevel ? (
+              <>
+                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                  Completed {levelUpgrade.currentLevel}? Move to <strong>{levelUpgrade.nextLevel}</strong>.
+                  Next level tuition: <strong>{formatMoney(levelUpgrade.nextTuitionFee || 0)}</strong>.
+                  Minimum first payment is <strong>{formatMoney(MIN_INSTALLMENT_GHS)}</strong> (or the full remaining balance if lower). You can also pay the full next-level tuition immediately.
+                </p>
+                <button
+                  type="button"
+                  style={{ ...styles.primaryButton, marginTop: 10 }}
+                  onClick={handleUpgradeToNextLevel}
+                  disabled={!levelUpgrade.canUpgrade || isUpgradingLevel}
+                >
+                  {isUpgradingLevel ? "Upgrading ..." : `Upgrade to ${levelUpgrade.nextLevel}`}
+                </button>
+              </>
+            ) : (
+              <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{levelUpgrade.reason}</p>
+            )}
+            {levelUpgrade.reason && levelUpgrade.nextLevel ? (
+              <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#92400e" }}>
+                {levelUpgrade.reason}
+              </p>
+            ) : null}
           </div>
 
           <TuitionStatusCard
