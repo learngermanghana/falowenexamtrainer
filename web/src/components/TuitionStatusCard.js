@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
-import { computeTuitionStatus } from "../data/levelFees";
+import { computeTuitionStatus, MIN_INSTALLMENT_GHS } from "../data/levelFees";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useAuth } from "../context/AuthContext";
 import { getBackendUrl } from "../services/backendUrl";
 import { formatCurrency } from "../lib/formatters";
 
-const MIN_INSTALLMENT_GHS = 2000;
 const PAYMENT_GRACE_PERIOD_DAYS = 7;
 
 const clampNumber = (value, { min = 0, max = Number.POSITIVE_INFINITY } = {}) => {
@@ -293,14 +292,28 @@ const TuitionStatusCard = ({
               />
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
 
-              <button
-                type="button"
-                style={{ ...styles.primaryButton, marginTop: 10 }}
-                onClick={startPayment}
-                disabled={!canPay || isStartingPayment}
-              >
-                {isStartingPayment ? "Opening Paystack ..." : "Pay tuition online"}
-              </button>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => {
+                    setPaymentError("");
+                    setAmountText(String(maxPayable));
+                  }}
+                  disabled={maxPayable <= 0 || isStartingPayment}
+                >
+                  Pay full balance ({formatMoney(maxPayable)})
+                </button>
+
+                <button
+                  type="button"
+                  style={styles.primaryButton}
+                  onClick={startPayment}
+                  disabled={!canPay || isStartingPayment}
+                >
+                  {isStartingPayment ? "Opening Paystack ..." : "Pay tuition online"}
+                </button>
+              </div>
             </>
           )}
 
