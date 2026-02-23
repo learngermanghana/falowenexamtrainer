@@ -20,7 +20,13 @@ import { jsPDF } from "jspdf";
 const formatDate = (value) => {
   if (!value) return "";
   const parsed = toDate(value);
-  return parsed ? parsed.toLocaleDateString() : "";
+  return parsed
+    ? parsed.toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "";
 };
 
 const formatDateTime = (value) => {
@@ -766,7 +772,7 @@ const MyExamFilePage = () => {
 
       <CollapsibleCard
         title="Goethe exam countdowns (Accra)"
-        subtitle="Monitor upcoming exam dates and keep registration windows handy."
+        subtitle="Monitor upcoming exam dates and registration windows by level."
         defaultOpen
         right={
           detectedLevel ? (
@@ -791,7 +797,7 @@ const MyExamFilePage = () => {
             </div>
           ) : null}
           <div style={{ ...styles.helperText, margin: "-2px 0 0" }}>
-            Date format: day / month / year (DD/MM/YYYY). Example: 05/03/2025 = 5 March 2025.
+            Date format: month day, year (e.g., March 5, 2025). Exams are arranged by level and then by date.
           </div>
           {visibleExamLevels.map((levelInfo) => {
             const isDetectedLevel = levelInfo.level === detectedLevel;
