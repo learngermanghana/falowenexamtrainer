@@ -18,7 +18,6 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
     completedAssignments: [],
     totalAssignments: null,
     scoreSummary: null,
-    scoreSummaryLoaded: false,
   });
 
   const className = studentProfile?.className || "";
@@ -39,7 +38,6 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         completedAssignments: [],
         totalAssignments: null,
         scoreSummary: null,
-        scoreSummaryLoaded: false,
       });
       return;
     }
@@ -54,7 +52,6 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         completedAssignments: [],
         totalAssignments: null,
         scoreSummary: null,
-        scoreSummaryLoaded: false,
       });
       return;
     }
@@ -77,7 +74,6 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         completedAssignments,
         totalAssignments,
         scoreSummary: score?.student || null,
-        scoreSummaryLoaded: true,
       });
     } catch (_e) {
       setState({
@@ -87,7 +83,6 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
         completedAssignments: [],
         totalAssignments: null,
         scoreSummary: null,
-        scoreSummaryLoaded: false,
       });
     }
   }, [className, idToken, levelKey, studentCode]);
@@ -126,17 +121,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
       };
     }
 
-    if (!state.scoreSummaryLoaded || !state.scoreSummary) {
-      return {
-        label: "Needs sync",
-        detail: state.error || "Could not load assignment progress",
-        pillBg: "#e5e7eb",
-        pillBorder: "#d1d5db",
-        pillText: "#111827",
-      };
-    }
-
-    if (blocked || failedAssignments.length > 0) {
+    if (blocked) {
       return {
         label: "Fix failed tasks",
         detail: `Failed: ${failedAssignments.length}`,
@@ -163,7 +148,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card" }
       pillBorder: "#86efac",
       pillText: "#166534",
     };
-  }, [state.error, state.loading, state.scoreSummary, state.scoreSummaryLoaded]);
+  }, [state.loading, state.scoreSummary]);
 
   const title = `Exam readiness: ${readiness.text}\nAttendance: ${state.attendanceSessions} sessions\nMarked identifiers: ${assignmentsLabel}\nCertificate readiness: ${certificateReadiness.label} (${certificateReadiness.detail})`;
 
