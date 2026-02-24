@@ -8,6 +8,7 @@ import { classCatalog } from "../data/classCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
+import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 
 const extractLevelToken = (value) => {
@@ -204,6 +205,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [assignmentsOnly, setAssignmentsOnly] = useState(false);
+  const [activeSubTab, setActiveSubTab] = useState("courseBook");
 
   useEffect(() => {
     const normalizedDefault = resolvedDefaultLevel;
@@ -257,6 +259,26 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            style={activeSubTab === "courseBook" ? styles.navButtonActive : styles.navButton}
+            onClick={() => setActiveSubTab("courseBook")}
+          >
+            Course book
+          </button>
+          <button
+            type="button"
+            style={activeSubTab === "classMembers" ? styles.navButtonActive : styles.navButton}
+            onClick={() => setActiveSubTab("classMembers")}
+          >
+            Class members
+          </button>
+        </div>
+
+        {activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
+
+        {activeSubTab === "courseBook" ? (
         <div style={{ display: "grid", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <div style={{ display: "grid", gap: 4 }}>
@@ -403,6 +425,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             </div>
           </>
         )}
+        </div>
+        ) : null}
       </div>
     </div>
   );
