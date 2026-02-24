@@ -465,7 +465,7 @@ const WritingPage = ({ mode = "course" }) => {
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
   const isA1Student = isLevelLocked && profileLevel === "A1";
   const canUseIdeasGenerator = !isA1Student;
-  const canUsePracticeLetters = !isA1Student;
+  const canUsePracticeLetters = isExamMode ? true : !isA1Student;
   const availableTabs = useMemo(() => {
     const tabs = [{ key: "mark", label: "Mark my letter" }];
 
@@ -880,6 +880,7 @@ const WritingPage = ({ mode = "course" }) => {
         studentName,
         idToken,
         program: studentProfile?.program,
+        submissionContext: isExamMode ? "exam-room" : "course",
       });
       const breakdown = buildRubricBreakdown(data.feedback);
       const overallScore = breakdown.reduce((sum, item) => sum + (item.score || 0), 0);
@@ -967,7 +968,7 @@ const WritingPage = ({ mode = "course" }) => {
       });
       setTutorSaveState({
         loading: false,
-        success: "Saved. Your tutor can review this exam-room letter after the AI feedback.",
+        success: "Saved successfully. Your tutor can now review this exam-room letter.",
         error: "",
       });
       setLatestTutorReview({ reviewStatus: "pending", tutorFeedback: "", reviewedAt: null });
@@ -976,7 +977,7 @@ const WritingPage = ({ mode = "course" }) => {
       setTutorSaveState({
         loading: false,
         success: "",
-        error: err?.message || "Could not save for tutor review right now.",
+        error: `Save failed: ${err?.message || "Could not save for tutor review right now."}`,
       });
     }
   };
