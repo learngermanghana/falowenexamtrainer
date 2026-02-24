@@ -1284,7 +1284,7 @@ app.post("/writing/ideas", async (req, res) => {
 
 app.post("/writing/mark", async (req, res) => {
   try {
-    const { text, level = "A2", studentName = "Student", program } = req.body || {};
+    const { text, level = "A2", studentName = "Student", program, submissionContext } = req.body || {};
 
     if (!text || !String(text).trim()) {
       return res.status(400).json({ error: "Letter text is required" });
@@ -1292,7 +1292,7 @@ app.post("/writing/mark", async (req, res) => {
 
     if (!ensureOpenAIConfigured(res)) return;
 
-    const systemPrompt = markPrompt({ schreibenLevel: level, studentName, program });
+    const systemPrompt = markPrompt({ schreibenLevel: level, studentName, program, submissionContext });
     const messages = [
       { role: "system", content: systemPrompt },
       { role: "user", content: String(text).trim() },

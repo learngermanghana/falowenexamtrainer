@@ -465,7 +465,7 @@ const WritingPage = ({ mode = "course" }) => {
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
   const isA1Student = isLevelLocked && profileLevel === "A1";
   const canUseIdeasGenerator = !isA1Student;
-  const canUsePracticeLetters = !isA1Student;
+  const canUsePracticeLetters = isExamMode ? true : !isA1Student;
   const availableTabs = useMemo(() => {
     const tabs = [{ key: "mark", label: "Mark my letter" }];
 
@@ -880,6 +880,7 @@ const WritingPage = ({ mode = "course" }) => {
         studentName,
         idToken,
         program: studentProfile?.program,
+        submissionContext: isExamMode ? "exam-room" : "course",
       });
       const breakdown = buildRubricBreakdown(data.feedback);
       const overallScore = breakdown.reduce((sum, item) => sum + (item.score || 0), 0);
@@ -967,7 +968,7 @@ const WritingPage = ({ mode = "course" }) => {
       });
       setTutorSaveState({
         loading: false,
-        success: "Saved. Your tutor can review this exam-room letter after the AI feedback.",
+        success: "Saved successfully. Your tutor can now review this exam-room letter.",
         error: "",
       });
       setLatestTutorReview({ reviewStatus: "pending", tutorFeedback: "", reviewedAt: null });
@@ -976,7 +977,7 @@ const WritingPage = ({ mode = "course" }) => {
       setTutorSaveState({
         loading: false,
         success: "",
-        error: err?.message || "Could not save for tutor review right now.",
+        error: `Save failed: ${err?.message || "Could not save for tutor review right now."}`,
       });
     }
   };
@@ -1103,6 +1104,20 @@ const WritingPage = ({ mode = "course" }) => {
       bestScore,
     };
   }, [completionLog]);
+
+  const practicedPromptIds = useMemo(
+    () =>
+      new Set(
+        completionLog
+          .map((entry) => String(entry.promptId || "").trim())
+          .filter(Boolean)
+      ),
+    [completionLog]
+  );
+  const practicedPromptCount = practicedPromptIds.size;
+  const promptCoverage = filteredWritingTasks.length
+    ? `${practicedPromptCount}/${filteredWritingTasks.length}`
+    : "0/0";
   const revisionTasks = useMemo(() => buildRevisionTasks(errorBank), [errorBank]);
   const latestImprovementNotes = useMemo(() => {
     if (!draftHistory.length) return [];
@@ -1245,6 +1260,9 @@ const WritingPage = ({ mode = "course" }) => {
             <div style={{ ...styles.helperCard, marginTop: 12 }}>
               <div style={{ fontWeight: 700, marginBottom: 6 }}>Progress snapshot</div>
               <div style={{ display: "grid", gap: 6 }}>
+                <div>
+                  <strong>Prompt coverage:</strong> {promptCoverage} practiced
+                </div>
                 <div>
                   <strong>Streak:</strong> {completionStats.streak} day
                   {completionStats.streak === 1 ? "" : "s"}
@@ -1429,18 +1447,19 @@ const WritingPage = ({ mode = "course" }) => {
                   </select>
                 </label>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button
-                  style={styles.secondaryButton}
-                  onClick={() => setPromptFilters({ theme: "all", type: "all", formality: "all" })}
-                >
-                  Clear filters
-                </button>
-                <span style={styles.helperText}>
-                  Showing {filteredWritingTasks.length} prompts
-                </span>
-              </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button
+                style={styles.secondaryButton}
+                onClick={() => setPromptFilters({ theme: "all", type: "all", formality: "all" })}
+              >
+                Clear filters
+              </button>
+              <span style={styles.helperText}>
+                Showing {filteredWritingTasks.length} prompts
+              </span>
+              <span style={styles.helperText}>✅ = practiced · ⏳ = not yet practiced</span>
             </div>
+          </div>
             {writingTasksError && (
               <div style={{ ...styles.helperText, color: "#b91c1c" }}>
                 <p style={{ marginBottom: 8 }}>{writingTasksError}</p>
@@ -1467,6 +1486,7 @@ const WritingPage = ({ mode = "course" }) => {
               <div style={styles.gridTwo}>
                 {filteredWritingTasks.map((item) => {
                   const meta = derivePromptMeta(item);
+                  const hasBeenPracticed = practicedPromptIds.has(String(item.id));
                   return (
                   <div
                     key={item.id}
@@ -1486,6 +1506,17 @@ const WritingPage = ({ mode = "course" }) => {
                       <div style={{ fontWeight: 800 }}>{item.letter}</div>
                       <span style={styles.levelPill}>Level {item.level}</span>
                     </div>
+                    <div style={{ marginBottom: 8 }}>
+                      <span
+                        style={{
+                          ...styles.badge,
+                          background: hasBeenPracticed ? "#dcfce7" : "#fef3c7",
+                          color: hasBeenPracticed ? "#166534" : "#92400e",
+                        }}
+                      >
+                        {hasBeenPracticed ? "✅ Practiced" : "⏳ Not practiced yet"}
+                      </span>
+                    </div>
                     <p style={styles.helperText}>{item.situation}</p>
                     <div style={styles.tagRow}>
                       <span style={styles.tagPill}>{meta.theme}</span>
@@ -1504,7 +1535,7 @@ const WritingPage = ({ mode = "course" }) => {
                         }
                         onClick={() => setSelectedLetterId(item.id)}
                       >
-                        {selectedLetterId === item.id ? "Selected" : "Practice"}
+                        {selectedLetterId === item.id ? "Selected" : hasBeenPracticed ? "Practice again" : "Start practice"}
                       </button>
                     </div>
                   </div>

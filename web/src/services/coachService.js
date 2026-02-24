@@ -95,7 +95,7 @@ export const analyzeText = async ({ text, teil, level, targetLevel, userId, idTo
   return response.data;
 };
 
-export const markLetterWithAI = async ({ text, level, studentName, program, idToken }) => {
+export const markLetterWithAI = async ({ text, level, studentName, program, submissionContext, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/writing/mark`,
     {
@@ -103,6 +103,7 @@ export const markLetterWithAI = async ({ text, level, studentName, program, idTo
       level,
       studentName,
       program,
+      submissionContext,
     },
     { headers: authHeaders(idToken) }
   );
