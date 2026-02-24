@@ -7,6 +7,11 @@ import { useAuth } from "../context/AuthContext";
 import { writingLetters as courseWritingLetters } from "../data/writingLetters";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
 import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
+import {
+  isTutorReviewCloudEnabled,
+  loadLatestTutorReviewForStudent,
+  saveExamLetterForTutorReview,
+} from "../services/tutorReviewService";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -346,6 +351,7 @@ const WritingPage = ({ mode = "course" }) => {
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "";
   const isExamMode = mode === "exam";
+  const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   const examWritingLetters = useMemo(
     () => mapExamPromptsToLetters(WRITING_PROMPTS),
@@ -371,6 +377,8 @@ const WritingPage = ({ mode = "course" }) => {
   const [reflectionText, setReflectionText] = useState("");
   const [revisedDraftText, setRevisedDraftText] = useState("");
   const [workflowComplete, setWorkflowComplete] = useState(false);
+  const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
+  const [latestTutorReview, setLatestTutorReview] = useState(null);
   const [mockExamMode, setMockExamMode] = useState(false);
   const [showOutlineHelper, setShowOutlineHelper] = useState(true);
   const [examFocusMode, setExamFocusMode] = useState(false);
@@ -790,6 +798,12 @@ const WritingPage = ({ mode = "course" }) => {
     exportWindow.print();
   };
 
+  const formatTutorReviewStatus = (status) => {
+    if (status === "approved") return "Approved";
+    if (status === "needs_improvement") return "Needs improvement";
+    return "Pending tutor review";
+  };
+
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60)
       .toString()
@@ -798,9 +812,32 @@ const WritingPage = ({ mode = "course" }) => {
     return `${mins}:${secs}`;
   };
 
+  useEffect(() => {
+    if (!isExamMode || !userId) {
+      setLatestTutorReview(null);
+      return;
+    }
+
+    let cancelled = false;
+    loadLatestTutorReviewForStudent({ userId, studentCode })
+      .then((review) => {
+        if (!cancelled) {
+          setLatestTutorReview(review);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to load latest tutor review", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isExamMode, studentCode, tutorSaveState.success, userId]);
+
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
     setError("");
+    setTutorSaveState({ loading: false, success: "", error: "" });
     if (tabKey !== "mark") {
       setMarkFeedback("");
     }
@@ -890,6 +927,59 @@ const WritingPage = ({ mode = "course" }) => {
     () => summarizeDraftChanges(firstDraftSnapshot, revisedDraftText, level),
     [firstDraftSnapshot, revisedDraftText, level]
   );
+
+  const handleSaveForTutorReview = async () => {
+    if (!isExamMode) return;
+    const draftToSave = revisedDraftText.trim() || typedAnswer.trim();
+
+    if (!draftToSave) {
+      setTutorSaveState({ loading: false, success: "", error: "Please add your final draft before saving for tutor review." });
+      return;
+    }
+
+    if (!markFeedback) {
+      setTutorSaveState({ loading: false, success: "", error: "Get AI feedback first, then save for tutor review." });
+      return;
+    }
+
+    if (!tutorReviewCloudEnabled) {
+      setTutorSaveState({
+        loading: false,
+        success: "",
+        error: "Tutor workflow requires Firebase. Please enable Firebase config before saving.",
+      });
+      return;
+    }
+
+    setTutorSaveState({ loading: true, success: "", error: "" });
+
+    try {
+      await saveExamLetterForTutorReview({
+        user,
+        studentProfile,
+        level,
+        promptId: selectedLetterId || "custom",
+        promptTitle: selectedLetter?.letter || "Custom prompt",
+        draft: firstDraftSnapshot || typedAnswer,
+        aiFeedback: markFeedback,
+        revisedDraft: revisedDraftText,
+        reflection: reflectionText,
+      });
+      setTutorSaveState({
+        loading: false,
+        success: "Saved. Your tutor can review this exam-room letter after the AI feedback.",
+        error: "",
+      });
+      setLatestTutorReview({ reviewStatus: "pending", tutorFeedback: "", reviewedAt: null });
+    } catch (err) {
+      console.error("Failed to save tutor review draft", err);
+      setTutorSaveState({
+        loading: false,
+        success: "",
+        error: err?.message || "Could not save for tutor review right now.",
+      });
+    }
+  };
 
   const handleCompleteWorkflow = () => {
     if (!markFeedback) {
@@ -1528,7 +1618,47 @@ const WritingPage = ({ mode = "course" }) => {
                 <button style={styles.secondaryButton} type="button" onClick={handleExportDraft}>
                   Export final draft (PDF/print)
                 </button>
+                {isExamMode ? (
+                  <button
+                    style={styles.secondaryButton}
+                    type="button"
+                    onClick={handleSaveForTutorReview}
+                    disabled={tutorSaveState.loading}
+                  >
+                    {tutorSaveState.loading ? "Saving for tutor..." : "Save for tutor review"}
+                  </button>
+                ) : null}
               </div>
+              {isExamMode ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <p style={styles.helperText}>
+                    Exam room only: save this marked letter so your tutor can review it after AI feedback.
+                  </p>
+                  {!tutorReviewCloudEnabled ? (
+                    <p style={{ ...styles.helperText, color: "#b45309", margin: "0" }}>
+                      Firebase is not configured in this environment, so tutor responses cannot be synced yet.
+                    </p>
+                  ) : null}
+                  <div style={styles.helperCard}>
+                    <div style={{ fontWeight: 700 }}>
+                      Tutor review status: {formatTutorReviewStatus(latestTutorReview?.reviewStatus)}
+                    </div>
+                    {latestTutorReview?.tutorFeedback ? (
+                      <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{latestTutorReview.tutorFeedback}</p>
+                    ) : (
+                      <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+                        Tutor feedback appears here after they respond with approval or improvement notes.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : null}
+              {tutorSaveState.error ? (
+                <div style={{ ...styles.helperText, color: "#b91c1c" }}>{tutorSaveState.error}</div>
+              ) : null}
+              {tutorSaveState.success ? (
+                <div style={{ ...styles.helperText, color: "#166534" }}>{tutorSaveState.success}</div>
+              ) : null}
             </div>
 
             {markFeedback ? (

@@ -152,6 +152,68 @@ const resolveNotificationRoute = (data = {}) => {
 
 const getFirestore = () => getAdmin().firestore();
 
+const normalizeTutorReviewStatus = (value) => {
+  const normalized = normalizeValue(value);
+  if (["approved", "approve", "done", "pass"].includes(normalized)) return "approved";
+  if (["needs_improvement", "needs-improvement", "improve", "revision"].includes(normalized)) {
+    return "needs_improvement";
+  }
+  if (["pending", "queued", "new"].includes(normalized)) return "pending";
+  return normalized || "pending";
+};
+
+const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterData = {} }) => {
+  const beforeStatus = normalizeTutorReviewStatus(beforeData.reviewStatus || beforeData.status);
+  const afterStatus = normalizeTutorReviewStatus(afterData.reviewStatus || afterData.status);
+  if (!afterStatus || afterStatus === "pending" || afterStatus === beforeStatus) {
+    return null;
+  }
+
+  const studentCode =
+    afterData.studentCode || afterData.studentcode || afterData.ownerKey || beforeData.studentCode || "";
+
+  const tokenInfo = await fetchStudentMessagingToken(studentCode);
+  if (!tokenInfo?.tokens?.length) {
+    console.log(`notifyTutorReviewStatusUpdate: no messaging token for ${studentCode}`);
+    return null;
+  }
+
+  const reviewLabel = afterData.promptTitle || afterData.assignmentTitle || "your exam letter";
+  const tutorFeedback = afterData.tutorFeedback || afterData.reviewComment || "";
+  const notification = {
+    title: afterStatus === "approved" ? "Tutor approved your exam letter" : "Tutor requested improvements",
+    body: safeTruncate(
+      tutorFeedback ||
+        (afterStatus === "approved"
+          ? `${reviewLabel} is approved. Great work!`
+          : `${reviewLabel} has tutor feedback. Please review and revise.`),
+      140
+    ),
+  };
+
+  const data = {
+    type: "exam_tutor_review",
+    reviewId: reviewId || "",
+    reviewStatus: afterStatus,
+    studentCode: String(studentCode || ""),
+    level: afterData.level || "",
+    route: "/exams/writing",
+  };
+
+  const tokenOwners = tokenInfo.docId
+    ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+    : new Map();
+
+  await sendNotifications({
+    tokens: tokenInfo.tokens,
+    notification,
+    data,
+    tokenOwners,
+  });
+
+  return null;
+};
+
 const getTokensFromStudentData = (data = {}) => {
   const tokens = new Set();
   if (data.messagingToken) {
@@ -914,6 +976,24 @@ exports.onAttendanceSessionUpdated = onDocumentUpdated(
       })
     );
 
+    return null;
+  }
+);
+
+
+exports.onExamTutorReviewUpdated = onDocumentUpdated(
+  {
+    region: "europe-west1",
+    document: "examTutorReviewQueue/{reviewId}",
+  },
+  async (event) => {
+    const beforeData = event.data?.before?.data() || {};
+    const afterData = event.data?.after?.data() || {};
+    await notifyTutorReviewStatusUpdate({
+      reviewId: event.params.reviewId,
+      beforeData,
+      afterData,
+    });
     return null;
   }
 );
