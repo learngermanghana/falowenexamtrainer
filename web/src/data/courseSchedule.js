@@ -1795,10 +1795,44 @@ const normalizeLessonResources = (lesson) => {
   };
 };
 
-const normalizeLessonCollection = (lessonCollection) => {
-  if (Array.isArray(lessonCollection)) return lessonCollection.map(normalizeLessonResources);
-  if (lessonCollection && typeof lessonCollection === "object") return normalizeLessonResources(lessonCollection);
+const normalizeLessonCollection = (lessonCollection, fallbackValues = []) => {
+  if (Array.isArray(lessonCollection)) {
+    return lessonCollection.map((lesson) => withAssignmentId(normalizeLessonResources(lesson), ...fallbackValues));
+  }
+  if (lessonCollection && typeof lessonCollection === "object") {
+    return withAssignmentId(normalizeLessonResources(lessonCollection), ...fallbackValues);
+  }
   return lessonCollection;
+};
+
+
+const parseAssignmentId = (...values) => {
+  for (const value of values) {
+    const raw = String(value || "").trim();
+    if (!raw) continue;
+
+    const explicitMatch = raw.match(/assignment\s*#?\s*(\d+(?:\.\d+)?)/i);
+    if (explicitMatch) return explicitMatch[1];
+
+    const numericMatch = raw.match(/(\d+(?:\.\d+)?)/);
+    if (numericMatch) return numericMatch[1];
+  }
+
+  return null;
+};
+
+const withAssignmentId = (item, ...fallbackValues) => {
+  if (!item || typeof item !== "object") return item;
+
+  const resolvedAssignmentId =
+    item.assignment === true
+      ? parseAssignmentId(item.assignmentId, item.chapter, item.title, item.topic, item.assignmentTitle, ...fallbackValues)
+      : item.assignmentId || null;
+
+  return {
+    ...item,
+    assignmentId: resolvedAssignmentId,
+  };
 };
 
 const hasNoVideoAndNoGrammar = (lesson) => {
@@ -1822,19 +1856,26 @@ const normalizeCourseSchedules = (schedules) =>
       return [
         level,
         entries.map((entry) => {
-          const lesen_hören = normalizeLessonCollection(entry.lesen_hören);
-          const schreiben_sprechen = normalizeLessonCollection(entry.schreiben_sprechen);
+          const entryWithAssignmentId = withAssignmentId(entry);
+          const fallbackAssignmentValues = [
+            entryWithAssignmentId.assignmentId,
+            entryWithAssignmentId.chapter,
+            entryWithAssignmentId.topic,
+            entryWithAssignmentId.title,
+          ];
+          const lesen_hören = normalizeLessonCollection(entryWithAssignmentId.lesen_hören, fallbackAssignmentValues);
+          const schreiben_sprechen = normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, fallbackAssignmentValues);
           const lessons = [
             ...(Array.isArray(lesen_hören) ? lesen_hören : lesen_hören ? [lesen_hören] : []),
             ...(Array.isArray(schreiben_sprechen) ? schreiben_sprechen : schreiben_sprechen ? [schreiben_sprechen] : []),
           ];
 
           const needsSelfPracticeNote = lessons.some(hasNoVideoAndNoGrammar);
-          const instruction = getDefaultInstruction(entry.instruction);
+          const instruction = getDefaultInstruction(entryWithAssignmentId.instruction);
           const hasNote = instruction && instruction.includes(SELF_PRACTICE_NOTE);
 
           return {
-            ...entry,
+            ...entryWithAssignmentId,
             instruction: needsSelfPracticeNote && instruction && !hasNote ? `${instruction} ${SELF_PRACTICE_NOTE}` : instruction,
             lesen_hören,
             schreiben_sprechen,
