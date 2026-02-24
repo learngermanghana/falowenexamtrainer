@@ -47,6 +47,16 @@ const BulletList = ({ items }) => (
   </ul>
 );
 
+const RuleParagraphs = ({ items }) => (
+  <div style={{ display: "grid", gap: 8 }}>
+    {items.map((item, index) => (
+      <p key={`${index}-${item.label}`} style={{ margin: 0, lineHeight: 1.6 }}>
+        <strong>{item.label}:</strong> {item.text}
+      </p>
+    ))}
+  </div>
+);
+
 const QuestionCard = ({ q, value, onChange }) => (
   <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
     <div style={{ fontWeight: 900 }}>{q.title}</div>
@@ -86,35 +96,59 @@ const A1LetterWritingQuestionBookPage = () => {
    *  ========================= */
   const FORMAL_STRUCTURE = useMemo(
     () => [
-      "Sehr geehrte Frau + Name – Use this for female",
-      "Sehr geehrter Herr + Name – Use this for male",
-      "Sehr geehrte Damen und Herren – If the receiver is unknown (e.g., school or travel agency).",
-      "Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [reason for writing].",
-      "Weil rule: move the verb (or main verb after modal) to the end.",
-      "Example 1 – Ich kann nicht kommen… → Ich schreibe Ihnen, weil ich nicht kommen kann.",
-      "Example 2 – Ich komme nicht… → Ich schreibe Ihnen, weil ich nicht komme.",
-      'Tip: Often you can start with "Ich" and end with "möchte" because of "weil". Example: Ich schreibe Ihnen, weil ich den Termin absagen möchte.',
-      "Main Body: Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
-      "Conclusion (don’t change): Ich freue mich im Voraus auf Ihre Antwort.",
-      "Mit freundlichen Grüßen,",
-      "[Your Full Name]",
+      { label: "Sehr geehrte Frau + Name", text: "Use this for female." },
+      { label: "Sehr geehrter Herr + Name", text: "Use this for male." },
+      {
+        label: "Sehr geehrte Damen und Herren",
+        text: "Use this if the receiver is unknown (e.g., school or travel agency).",
+      },
+      {
+        label: "Opening",
+        text: "Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil [reason for writing].",
+      },
+      { label: "Weil rule", text: "Move the verb (or main verb after modal) to the end." },
+      {
+        label: "Example 1",
+        text: "Ich kann nicht kommen… → Ich schreibe Ihnen, weil ich nicht kommen kann.",
+      },
+      { label: "Example 2", text: "Ich komme nicht… → Ich schreibe Ihnen, weil ich nicht komme." },
+      {
+        label: "Tip",
+        text: 'Often you can start with "Ich" and end with "möchte" because of "weil". Example: Ich schreibe Ihnen, weil ich den Termin absagen möchte.',
+      },
+      {
+        label: "Main Body",
+        text: "Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
+      },
+      { label: "Conclusion (don’t change)", text: "Ich freue mich im Voraus auf Ihre Antwort." },
+      { label: "Closing", text: "Mit freundlichen Grüßen," },
+      { label: "Signature", text: "[Your Full Name]" },
     ],
     []
   );
 
   const INFORMAL_STRUCTURE = useMemo(
     () => [
-      "Hallo [Name], (can be used for both male and female)",
-      "Liebe (female) / Lieber (male) [Recipient’s First Name],",
-      "Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [reason for writing].",
-      "Weil rule: move the verb (or main verb after modal) to the end.",
-      "Example 1 – Ich kann nicht kommen… → Ich schreibe dir, weil ich nicht kommen kann.",
-      "Example 2 – Ich komme nicht… → Ich schreibe dir, weil ich nicht komme.",
-      'Tip: Often you can start with "Ich" and end with "möchte" because of "weil". Example: Ich schreibe dir, weil ich den Termin absagen möchte.',
-      "Main Body: Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
-      "Conclusion (don’t change): Ich freue mich im Voraus auf deine Antwort.",
-      "Liebe Grüße / Viele Grüße (you can use any)",
-      "[Your First Name]",
+      { label: "Hallo [Name]", text: "Can be used for both male and female." },
+      { label: "Liebe / Lieber [Recipient’s First Name]", text: "Liebe for female, Lieber for male." },
+      {
+        label: "Opening",
+        text: "Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil [reason for writing].",
+      },
+      { label: "Weil rule", text: "Move the verb (or main verb after modal) to the end." },
+      { label: "Example 1", text: "Ich kann nicht kommen… → Ich schreibe dir, weil ich nicht kommen kann." },
+      { label: "Example 2", text: "Ich komme nicht… → Ich schreibe dir, weil ich nicht komme." },
+      {
+        label: "Tip",
+        text: 'Often you can start with "Ich" and end with "möchte" because of "weil". Example: Ich schreibe dir, weil ich den Termin absagen möchte.',
+      },
+      {
+        label: "Main Body",
+        text: "Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
+      },
+      { label: "Conclusion (don’t change)", text: "Ich freue mich im Voraus auf deine Antwort." },
+      { label: "Closing", text: "Liebe Grüße / Viele Grüße (you can use any)." },
+      { label: "Signature", text: "[Your First Name]" },
     ],
     []
   );
@@ -406,13 +440,13 @@ const A1LetterWritingQuestionBookPage = () => {
         <>
           <Section title="Formal Letter Structure (Read First)">
             <InfoBox title="Structure + Rules">
-              <BulletList items={FORMAL_STRUCTURE} />
+              <RuleParagraphs items={FORMAL_STRUCTURE} />
             </InfoBox>
           </Section>
 
           <Section title="Informal Letter Structure (Read First)">
             <InfoBox title="Structure + Rules">
-              <BulletList items={INFORMAL_STRUCTURE} />
+              <RuleParagraphs items={INFORMAL_STRUCTURE} />
             </InfoBox>
           </Section>
 
@@ -546,9 +580,18 @@ const A1LetterWritingQuestionBookPage = () => {
             <p style={{ margin: 0 }}>
               If you want, copy your answers and paste into your submission system.
             </p>
-            <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={copySubmit}>
-              Copy all answers
-            </button>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={copySubmit}>
+                Copy all answers
+              </button>
+              <button
+                type="button"
+                style={{ ...styles.secondaryButton, width: "fit-content" }}
+                onClick={() => navigate("/campus/submit")}
+              >
+                Go to Submit Assignment Page
+              </button>
+            </div>
           </Section>
         </>
       )}
