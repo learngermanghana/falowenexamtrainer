@@ -8,6 +8,8 @@
  *
  * Expected headers (case-insensitive) in row 1:
  * studentcode | name | assignment | score | comments | date | level | link
+ * Optional headers:
+ * assignment_id | assignmentid | assgnment_id (legacy typo)
  *
  * Env vars (Windows cmd: set VAR=value):
  *   GOOGLE_SERVICE_ACCOUNT_FILE=C:\path\to\key.json
@@ -34,7 +36,7 @@ function normalizeHeader(h) {
   return String(h || "")
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, ""); // "student code" -> "studentcode"
+    .replace(/[\s_-]+/g, ""); // "student code" / "assignment_id" -> "studentcode" / "assignmentid"
 }
 
 function safeStr(v) {
@@ -224,6 +226,15 @@ async function main() {
     const studentCode = safeStr(row[headerMap.get("studentcode")]);
     const name = safeStr(row[headerMap.get("name")]);
     const assignment = safeStr(row[headerMap.get("assignment")]);
+    const assignmentIdRaw = safeStr(
+      row[
+        headerMap.has("assignmentid")
+          ? headerMap.get("assignmentid")
+          : headerMap.has("assgnmentid")
+            ? headerMap.get("assgnmentid")
+            : -1
+      ]
+    );
     const score = safeNum(row[headerMap.get("score")]);
     const comments = safeStr(row[headerMap.get("comments")]);
     const date = safeStr(row[headerMap.get("date")]);
@@ -236,7 +247,7 @@ async function main() {
       continue;
     }
 
-    const assignmentId = parseAssignmentId(assignment);
+    const assignmentId = parseAssignmentId(assignmentIdRaw) || parseAssignmentId(assignment);
     const isoDate = parseIsoDate(date);
 
     const attempt = {
