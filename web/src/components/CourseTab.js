@@ -279,7 +279,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         {activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
 
         {activeSubTab === "courseBook" ? (
-        <div style={{ display: "grid", gap: 12 }}>
+          <>
+            <div style={{ display: "grid", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <div style={{ display: "grid", gap: 4 }}>
               <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Course Book</h2>
@@ -327,7 +328,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               </label>
             </div>
           )}
-        </div>
+            </div>
 
         {isB2SelfLearning || isC1SelfLearning ? (
           isB2SelfLearning ? <B2SelfLearningCourse /> : <C1SelfLearningCourse />
@@ -425,7 +426,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             </div>
           </>
         )}
-        </div>
+          </>
         ) : null}
       </div>
     </div>
