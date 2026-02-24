@@ -44,6 +44,14 @@ const CourseResourceViewerPage = () => {
   const label = query.get("label") || "Course resource";
   const embedUrl = useMemo(() => toEmbeddableUrl(resourceUrl), [resourceUrl]);
   const zoomStorageKey = `${ZOOM_STORAGE_PREFIX}:${resourceUrl || "default"}`;
+  const campusQuickTabs = [
+    { key: "course", label: "My Course", path: "/campus/course" },
+    { key: "submit", label: "Submit", path: "/campus/submit" },
+    { key: "examFile", label: "My Exam File", path: "/campus/examFile" },
+    { key: "results", label: "Results", path: "/campus/results" },
+    { key: "discussion", label: "Discussion", path: "/campus/discussion" },
+    { key: "account", label: "Account", path: "/campus/account" },
+  ];
 
   useEffect(() => {
     const stored = window.sessionStorage.getItem(zoomStorageKey);
@@ -105,6 +113,17 @@ const CourseResourceViewerPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <div style={{ ...styles.nav, justifyContent: "flex-start" }}>
+          {campusQuickTabs.map((tab) => (
+            <button
+              key={tab.key}
+              style={tab.key === "course" ? styles.navButtonActive : styles.navButton}
+              onClick={() => navigate(tab.path)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
