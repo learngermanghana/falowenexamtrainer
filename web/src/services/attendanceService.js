@@ -1,4 +1,4 @@
-import { collection, db, getDocs, isFirebaseConfigured } from "../firebase";
+import { collection, db, doc, getDoc, getDocs, isFirebaseConfigured } from "../firebase";
 
 const normalizeValue = (value = "") => String(value || "").trim();
 
@@ -112,6 +112,39 @@ const getDefaultSessionHours = (level = "") => {
   return 0;
 };
 
+const getCheckinPresentState = (checkin = {}) => {
+  if (!checkin || typeof checkin !== "object") return null;
+
+  if (checkin.present !== undefined) {
+    return toBoolean(checkin.present);
+  }
+
+  const status = String(checkin.status || checkin.attendance || "").trim().toLowerCase();
+  if (!status) return null;
+  if (status.includes("present") || status.includes("attended")) return true;
+  if (status.includes("absent") || status.includes("missed")) return false;
+  return null;
+};
+
+const applyCheckinOverride = (record, checkin = {}) => {
+  const checkinPresent = getCheckinPresentState(checkin);
+  if (checkinPresent === null) return record;
+
+  return {
+    ...record,
+    present: checkinPresent,
+    status: checkinPresent ? "Present" : "Absent",
+    marked: true,
+    markedAt:
+      checkin.checkedInAt ||
+      checkin.submittedAt ||
+      checkin.updatedAt ||
+      checkin.createdAt ||
+      record.markedAt,
+    note: record.note || checkin.note || "",
+  };
+};
+
 export const formatAttendanceRecord = (id, data = {}, studentCode = "", options = {}) => {
   const { level } = options;
   const studentEntry = getStudentAttendance(data, studentCode);
@@ -175,9 +208,10 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
   return { record, sessionHours: resolvedHours, present, hours: resolvedHours };
 };
 
-export const fetchAttendanceRecords = async ({ className, studentCode, level } = {}) => {
+export const fetchAttendanceRecords = async ({ className, studentCode, studentUid, level } = {}) => {
   const normalizedClassName = normalizeValue(className);
   const normalizedStudentCode = normalizeValue(studentCode);
+  const normalizedStudentUid = normalizeValue(studentUid);
 
   if (!normalizedClassName || !normalizedStudentCode || !isFirebaseReady()) {
     return { records: [], sessions: 0, hours: 0 };
@@ -185,18 +219,44 @@ export const fetchAttendanceRecords = async ({ className, studentCode, level } =
 
   try {
     const snap = await getDocs(collection(db, "attendance", normalizedClassName, "sessions"));
+    const entries = await Promise.all(
+      snap.docs.map(async (sessionDoc) => {
+        const data = sessionDoc.data() || {};
+        const { record, sessionHours } = formatAttendanceRecord(
+          sessionDoc.id,
+          data,
+          normalizedStudentCode,
+          { level }
+        );
+
+        if (!normalizedStudentUid) {
+          return { record, sessionHours };
+        }
+
+        const checkinRef = doc(
+          db,
+          "attendance",
+          normalizedClassName,
+          "sessions",
+          sessionDoc.id,
+          "checkins",
+          normalizedStudentUid
+        );
+        const checkinSnap = await getDoc(checkinRef);
+        if (!checkinSnap.exists()) {
+          return { record, sessionHours };
+        }
+
+        const overriddenRecord = applyCheckinOverride(record, checkinSnap.data() || {});
+        return { record: overriddenRecord, sessionHours };
+      })
+    );
+
     const records = [];
     let sessions = 0;
     let hours = 0;
 
-    snap.forEach((doc) => {
-      const data = doc.data() || {};
-      const { record, sessionHours } = formatAttendanceRecord(
-        doc.id,
-        data,
-        normalizedStudentCode,
-        { level }
-      );
+    entries.forEach(({ record, sessionHours }) => {
       records.push(record);
       if (record.present) {
         sessions += 1;

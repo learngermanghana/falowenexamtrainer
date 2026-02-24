@@ -126,6 +126,7 @@ export const fetchPersonalizedPlan = async ({
   className,
   level,
   userId,
+  studentUid,
 } = {}) => {
   if (!studentCode && !email) {
     return {
@@ -149,7 +150,7 @@ export const fetchPersonalizedPlan = async ({
 
   const [results, attendance, writingProgress] = await Promise.all([
     fetchResults({ studentCode, email, level }),
-    fetchAttendanceRecords({ className, studentCode, level }),
+    fetchAttendanceRecords({ className, studentCode, studentUid: studentUid || userId, level }),
     loadWritingProgress({ userId, studentCode, mode: "course" }),
   ]);
 
