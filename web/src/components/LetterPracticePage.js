@@ -8,18 +8,39 @@ import ResultHistory from "./ResultHistory";
 import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService";
 import { writingLetters } from "../data/writingLetters";
 
-const LEARNING_LOOP_STEPS = [
-  "Underline 2–3 sentences you are unsure about.",
-  "Ask the coach to explain the grammar or word order in simple words.",
-  "Rewrite the corrected sentence without looking.",
-  "Compare and note one new phrase to reuse next time.",
-];
-
 const IDEAS_COACHING_PROMPTS = [
   "Start with the task and ask: What is unclear to me?",
   "Request a short explanation and one example sentence.",
   "End by summarizing the idea in your own words.",
 ];
+
+const countWords = (text = "") => {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+};
+
+const summarizeDraftChanges = (firstDraft = "", revisedDraft = "") => {
+  const firstWords = countWords(firstDraft);
+  const revisedWords = countWords(revisedDraft);
+  const delta = revisedWords - firstWords;
+  const connectors = ["und", "aber", "weil", "dann", "zuerst", "außerdem", "zum schluss"];
+  const lower = revisedDraft.toLowerCase();
+  const usedConnector = connectors.some((item) => lower.includes(item));
+  const changed = firstDraft.trim() !== revisedDraft.trim();
+
+  return {
+    firstWords,
+    revisedWords,
+    delta,
+    changed,
+    badges: [
+      changed ? "Rewrote sentence" : null,
+      usedConnector ? "Used connector" : null,
+      /\b(ich|du|er|sie|wir)\b/.test(lower) && /\b(bin|bist|ist|sind)\b/.test(lower) ? "Fixed word order" : null,
+    ].filter(Boolean),
+  };
+};
 
 const LetterPracticePage = ({ mode = "exams" }) => {
   const { i18n, t } = useTranslation();
@@ -42,31 +63,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     [coachDisplayName]
   );
 
-  const availableTabs = useMemo(
-    () => {
-      const baseTabs = [
-        { key: "mark", label: "Mark my letter" },
-        { key: "ideas", label: "Ideas generator" },
-      ];
-
-      if (isExamMode && !isFrenchProgram) {
-        baseTabs.unshift({ key: "practice", label: "Practice letters" });
-      }
-
-      return baseTabs;
-    },
-    [isExamMode, isFrenchProgram]
-  );
-
   const requestedTab = useMemo(() => new URLSearchParams(location.search).get("tab"), [location.search]);
-  const [activeTab, setActiveTab] = useState(() => {
-    if (requestedTab && availableTabs.some((tab) => tab.key === requestedTab)) {
-      return requestedTab;
-    }
-    return availableTabs[0].key;
-  });
+  const [activeTab, setActiveTab] = useState("mark");
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [firstDraftSnapshot, setFirstDraftSnapshot] = useState("");
+  const [reflectionText, setReflectionText] = useState("");
+  const [revisedDraftText, setRevisedDraftText] = useState("");
+  const [markCompletionMessage, setMarkCompletionMessage] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([ideaCoachIntro]);
   const [ideasLoading, setIdeasLoading] = useState(false);
@@ -92,6 +96,26 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+  const isA1Student = isLevelLocked && profileLevel === "A1";
+  const canUseIdeasGenerator = !isA1Student;
+  const canUsePracticeLetters = isExamMode && !isFrenchProgram && !isA1Student;
+
+  const availableTabs = useMemo(
+    () => {
+      const baseTabs = [{ key: "mark", label: "Mark my letter" }];
+
+      if (canUseIdeasGenerator) {
+        baseTabs.push({ key: "ideas", label: "Ideas generator" });
+      }
+
+      if (canUsePracticeLetters) {
+        baseTabs.unshift({ key: "practice", label: "Practice letters" });
+      }
+
+      return baseTabs;
+    },
+    [canUseIdeasGenerator, canUsePracticeLetters]
+  );
 
   const resetErrors = () => {
     setError("");
@@ -242,6 +266,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       });
 
       setMarkFeedback(data.feedback);
+      setFirstDraftSnapshot(trimmed);
+      setRevisedDraftText(trimmed);
+      setReflectionText("");
+      setMarkCompletionMessage("");
       addResultToHistory({
         id: Date.now(),
         mode: "Mark my letter",
@@ -256,6 +284,30 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const changeSummary = useMemo(
+    () => summarizeDraftChanges(firstDraftSnapshot, revisedDraftText),
+    [firstDraftSnapshot, revisedDraftText]
+  );
+
+  const handleCompleteMarkWorkflow = () => {
+    if (!markFeedback) {
+      setError("Step 1 first: get AI feedback.");
+      return;
+    }
+    if (reflectionText.trim().length < 12) {
+      setError("Step 2: write a short reflection (at least 12 characters) about what you fixed.");
+      return;
+    }
+    if (!changeSummary.changed || !revisedDraftText.trim()) {
+      setError("Step 2: submit a revised version that is different from your first draft.");
+      return;
+    }
+
+    setLetterText(revisedDraftText);
+    setMarkCompletionMessage("Great job — workflow completed. Keep using this 2-step loop for every letter.");
+    setError("");
   };
 
   const makeChatMessage = (role, content) => ({
@@ -352,27 +404,33 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               {isFrenchProgram ? "French writing coach" : "Schreiben trainer"}
             </p>
             <h2 style={{ ...styles.sectionTitle, margin: 0 }}>
-              {isExamMode
-                ? isFrenchProgram
-                  ? "French writing help + ideas"
-                  : "Timed letters + Herr Felix ideas"
-                : isFrenchProgram
-                  ? "Mark my letter + French ideas"
-                  : "Mark my letter + Herr Felix ideas"}
+              {canUseIdeasGenerator
+                ? isExamMode
+                  ? isFrenchProgram
+                    ? "French writing help + ideas"
+                    : "Timed letters + Herr Felix ideas"
+                  : isFrenchProgram
+                    ? "Mark my letter + French ideas"
+                    : "Mark my letter + Herr Felix ideas"
+                : "Mark my letter"}
             </h2>
             <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-              {isExamMode ? (
-                <>
-                  {isFrenchProgram
-                    ? "Start with a draft in French, then paste it into “Mark my letter”. Use the ideas generator to stay organized."
-                    : 'Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator (prompts in '}
-                  {isFrenchProgram ? null : <code>functions/functionz/prompts.js</code>}
-                  {isFrenchProgram ? null : ") to keep moving."}
-                </>
+              {canUseIdeasGenerator ? (
+                isExamMode ? (
+                  <>
+                    {isFrenchProgram
+                      ? "Start with a draft in French, then paste it into “Mark my letter”. Use the ideas generator to stay organized."
+                      : 'Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator (prompts in '}
+                    {isFrenchProgram ? null : <code>functions/functionz/prompts.js</code>}
+                    {isFrenchProgram ? null : ") to keep moving."}
+                  </>
+                ) : (
+                  isFrenchProgram
+                    ? "Timed practice lives in the Exams Room. Here you can paste French drafts for marking and use the ideas generator to build your letter."
+                    : "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
+                )
               ) : (
-                isFrenchProgram
-                  ? "Timed practice lives in the Exams Room. Here you can paste French drafts for marking and use the ideas generator to build your letter."
-                  : "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
+                "A1 students use Mark my letter only."
               )}
             </p>
           </div>
@@ -393,7 +451,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         </div>
       </section>
 
-      {activeTab === "practice" && isExamMode && !isFrenchProgram && (
+      {activeTab === "practice" && canUsePracticeLetters && (
         <section style={styles.card}>
           <div style={{ display: "grid", gap: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
@@ -534,12 +592,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           <div style={{ display: "grid", gap: 12 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Mark my letter</h3>
             <div style={styles.infoBox}>
-              <strong>Learning loop (don’t just copy):</strong>
-              <ul style={styles.promptList}>
-                {LEARNING_LOOP_STEPS.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ul>
+              <strong>3-step workflow:</strong>
+              <ol style={styles.promptList}>
+                <li>Paste draft</li>
+                <li>Read 2 corrections</li>
+                <li>Rewrite 1 paragraph</li>
+              </ol>
             </div>
             <div style={{ display: "grid", gap: 6 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -595,16 +653,51 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             )}
 
             {markFeedback && (
-              <div>
-                <h4 style={styles.sectionTitle}>AI feedback</h4>
-                <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+              <div style={{ display: "grid", gap: 10 }}>
+                <div>
+                  <h4 style={styles.sectionTitle}>AI feedback</h4>
+                  <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+                </div>
+                <div style={styles.infoBox}>
+                  <strong>Step 2 (required): reflect + revise before completion</strong>
+                  <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                    <textarea
+                      style={styles.textareaSmall}
+                      rows={2}
+                      value={reflectionText}
+                      onChange={(e) => setReflectionText(e.target.value)}
+                      placeholder="What I fixed: ..."
+                    />
+                    <textarea
+                      style={styles.textArea}
+                      rows={6}
+                      value={revisedDraftText}
+                      onChange={(e) => setRevisedDraftText(e.target.value)}
+                      placeholder="Submit revised version here"
+                    />
+                  </div>
+                  <p style={{ ...styles.helperText, margin: "8px 0 0 0" }}>
+                    Attempt 1: {changeSummary.firstWords} words · Attempt 2: {changeSummary.revisedWords} words · Δ {changeSummary.delta}
+                  </p>
+                  {changeSummary.badges.length ? (
+                    <div style={styles.tagRow}>
+                      {changeSummary.badges.map((badge) => (
+                        <span key={badge} style={styles.tagPill}>{badge}</span>
+                      ))}
+                    </div>
+                  ) : null}
+                  <button style={{ ...styles.primaryButton, marginTop: 8 }} onClick={handleCompleteMarkWorkflow}>
+                    Complete
+                  </button>
+                  {markCompletionMessage ? <div style={{ ...styles.successBox, marginTop: 8 }}>{markCompletionMessage}</div> : null}
+                </div>
               </div>
             )}
           </div>
         </section>
       )}
 
-      {activeTab === "ideas" && (
+      {activeTab === "ideas" && canUseIdeasGenerator && (
         <section style={styles.card} className="idea-generator-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 260 }}>

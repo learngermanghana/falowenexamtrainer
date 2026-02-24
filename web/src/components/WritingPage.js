@@ -39,13 +39,6 @@ const WORD_TARGET_RANGES = {
   C1: { min: 180, max: 220 },
 };
 
-const LEARNING_LOOP_STEPS = [
-  "Underline 2–3 sentences you are unsure about.",
-  "Ask the coach to explain the grammar or word order in simple words.",
-  "Rewrite the corrected sentence without looking.",
-  "Compare and note one new phrase to reuse next time.",
-];
-
 const IDEAS_COACHING_PROMPTS = [
   "Start with the task and ask: What is unclear to me?",
   "Request a short explanation and one example sentence.",
@@ -132,6 +125,34 @@ const splitSentences = (text = "") => {
   if (!normalized) return [];
   const matches = normalized.match(/[^.!?]+[.!?]+|[^.!?]+$/g);
   return matches ? matches.map((sentence) => sentence.trim()) : [];
+};
+
+const countWords = (value = "") => {
+  const trimmed = value.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+};
+
+const summarizeDraftChanges = (firstDraft = "", revisedDraft = "", level = "A1") => {
+  const firstWords = countWords(firstDraft);
+  const revisedWords = countWords(revisedDraft);
+  const delta = revisedWords - firstWords;
+  const changed = firstDraft.trim() !== revisedDraft.trim();
+  const connectors = CONNECTORS_BY_LEVEL[level] || [];
+  const lower = revisedDraft.toLowerCase();
+  const usedConnector = connectors.some((item) => lower.includes(item.toLowerCase()));
+
+  return {
+    firstWords,
+    revisedWords,
+    delta,
+    changed,
+    badges: [
+      changed ? "Rewrote sentence" : null,
+      usedConnector ? "Used connector" : null,
+      revisedWords >= firstWords && changed ? "Expanded clarity" : null,
+    ].filter(Boolean),
+  };
 };
 
 const scoreFromFeedback = (feedback) => {
@@ -331,7 +352,7 @@ const WritingPage = ({ mode = "course" }) => {
     []
   );
 
-  const [activeTab, setActiveTab] = useState("practice");
+  const [activeTab, setActiveTab] = useState("mark");
   const [writingTasks, setWritingTasks] = useState(() =>
     isExamMode ? examWritingLetters : courseWritingLetters
   );
@@ -346,6 +367,10 @@ const WritingPage = ({ mode = "course" }) => {
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [firstDraftSnapshot, setFirstDraftSnapshot] = useState("");
+  const [reflectionText, setReflectionText] = useState("");
+  const [revisedDraftText, setRevisedDraftText] = useState("");
+  const [workflowComplete, setWorkflowComplete] = useState(false);
   const [mockExamMode, setMockExamMode] = useState(false);
   const [showOutlineHelper, setShowOutlineHelper] = useState(true);
   const [examFocusMode, setExamFocusMode] = useState(false);
@@ -430,6 +455,22 @@ const WritingPage = ({ mode = "course" }) => {
 
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+  const isA1Student = isLevelLocked && profileLevel === "A1";
+  const canUseIdeasGenerator = !isA1Student;
+  const canUsePracticeLetters = !isA1Student;
+  const availableTabs = useMemo(() => {
+    const tabs = [{ key: "mark", label: "Mark my letter" }];
+
+    if (canUseIdeasGenerator) {
+      tabs.push({ key: "ideas", label: "Idea generator" });
+    }
+
+    if (canUsePracticeLetters) {
+      tabs.unshift({ key: "practice", label: "Practice letters" });
+    }
+
+    return tabs;
+  }, [canUseIdeasGenerator, canUsePracticeLetters]);
   const progressMode = isExamMode ? "exam" : "course";
   const activeTargetLevel = selectedLetter?.level || level;
   const wordTarget = WORD_TARGETS[activeTargetLevel];
@@ -441,6 +482,15 @@ const WritingPage = ({ mode = "course" }) => {
       setLevel(profileLevel);
     }
   }, [isLevelLocked, level, profileLevel, setLevel]);
+
+  useEffect(() => {
+    if (!availableTabs.some((tab) => tab.key === activeTab)) {
+      setActiveTab(availableTabs[0]?.key || "mark");
+      setIdeaError("");
+      setIdeaSuccess("");
+      setError("");
+    }
+  }, [activeTab, availableTabs, setError]);
 
   const loadWritingTasks = useCallback(async () => {
     setWritingTasksLoading(true);
@@ -563,6 +613,10 @@ const WritingPage = ({ mode = "course" }) => {
         if (typeof saved.typedAnswer === "string") setTypedAnswer(saved.typedAnswer);
         if (typeof saved.practiceDraft === "string") setPracticeDraft(saved.practiceDraft);
         if (typeof saved.markFeedback === "string") setMarkFeedback(saved.markFeedback);
+        if (typeof saved.firstDraftSnapshot === "string") setFirstDraftSnapshot(saved.firstDraftSnapshot);
+        if (typeof saved.reflectionText === "string") setReflectionText(saved.reflectionText);
+        if (typeof saved.revisedDraftText === "string") setRevisedDraftText(saved.revisedDraftText);
+        if (typeof saved.workflowComplete === "boolean") setWorkflowComplete(saved.workflowComplete);
         if (typeof saved.ideaInput === "string") setIdeaInput(saved.ideaInput);
         if (Array.isArray(saved.chatMessages) && saved.chatMessages.length > 0) {
           setChatMessages(saved.chatMessages);
@@ -631,6 +685,10 @@ const WritingPage = ({ mode = "course" }) => {
           typedAnswer,
           practiceDraft,
           markFeedback,
+          firstDraftSnapshot,
+          reflectionText,
+          revisedDraftText,
+          workflowComplete,
           ideaInput,
           chatMessages,
           selectedDraftIds,
@@ -655,8 +713,11 @@ const WritingPage = ({ mode = "course" }) => {
     completionLog,
     draftHistory,
     errorBank,
+    firstDraftSnapshot,
     ideaInput,
     markFeedback,
+    reflectionText,
+    revisedDraftText,
     planOutline,
     promptFilters,
     practiceDraft,
@@ -668,15 +729,10 @@ const WritingPage = ({ mode = "course" }) => {
     showOutlineHelper,
     timerRunning,
     typedAnswer,
+    workflowComplete,
     userId,
     studentCode,
   ]);
-
-  const countWords = (value) => {
-    const trimmed = value.trim();
-    if (!trimmed) return 0;
-    return trimmed.split(/\s+/).length;
-  };
 
   const handleInsertSnippet = (snippet) => {
     setPracticeDraft((prev) => {
@@ -798,6 +854,10 @@ const WritingPage = ({ mode = "course" }) => {
         createdAt: new Date().toISOString(),
       };
       setMarkFeedback(data.feedback);
+      setFirstDraftSnapshot(trimmed);
+      setRevisedDraftText(trimmed);
+      setReflectionText("");
+      setWorkflowComplete(false);
       setRubricBreakdown(breakdown);
       setErrorBank(extractErrorBank(data.feedback));
       setDraftHistory((prev) => [
@@ -813,17 +873,6 @@ const WritingPage = ({ mode = "course" }) => {
           score: overallScore,
         },
       ]);
-      setCompletionLog((prev) => [
-        ...prev,
-        {
-          id: Date.now(),
-          completedAt: new Date().toISOString(),
-          promptId: selectedLetterId || "custom",
-          promptTitle: selectedLetter?.letter || "Custom prompt",
-          score: overallScore,
-          level,
-        },
-      ]);
       addResultToHistory(enrichedResult);
     } catch (err) {
       console.error("Falowen frontend error:", err);
@@ -835,6 +884,41 @@ const WritingPage = ({ mode = "course" }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const revisionSummary = useMemo(
+    () => summarizeDraftChanges(firstDraftSnapshot, revisedDraftText, level),
+    [firstDraftSnapshot, revisedDraftText, level]
+  );
+
+  const handleCompleteWorkflow = () => {
+    if (!markFeedback) {
+      setError("Step 1 first: get AI feedback.");
+      return;
+    }
+    if (reflectionText.trim().length < 12) {
+      setError("Step 2: add a short reflection about what you fixed.");
+      return;
+    }
+    if (!revisedDraftText.trim() || !revisionSummary.changed) {
+      setError("Step 2: submit a revised version that differs from your first draft.");
+      return;
+    }
+
+    setTypedAnswer(revisedDraftText);
+    setWorkflowComplete(true);
+    setError("");
+    setCompletionLog((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        completedAt: new Date().toISOString(),
+        promptId: selectedLetterId || "custom",
+        promptTitle: selectedLetter?.letter || "Custom prompt",
+        score: revisionSummary.badges.length,
+        level,
+      },
+    ]);
   };
 
   const makeChatMessage = (role, content) => ({
@@ -1039,16 +1123,14 @@ const WritingPage = ({ mode = "course" }) => {
         </div>
       )}
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>Writing – Practice exam letters</h2>
+        <h2 style={styles.sectionTitle}>{canUseIdeasGenerator ? "Writing – Practice exam letters" : "Writing – Mark my letter"}</h2>
         <p style={styles.helperText}>
-          Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help.
+          {canUseIdeasGenerator
+            ? "Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help."
+            : "A1 students should use Mark my letter to get focused feedback on their draft."}
         </p>
         <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
-          {[
-            { key: "practice", label: "Practice letters" },
-            { key: "mark", label: "Mark my letter" },
-            { key: "ideas", label: "Idea generator" },
-          ].map((tab) => (
+          {availableTabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
@@ -1065,7 +1147,7 @@ const WritingPage = ({ mode = "course" }) => {
         </div>
       </section>
 
-      {activeTab === "practice" && (
+      {activeTab === "practice" && canUsePracticeLetters && (
         <>
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Your simulation room</h3>
@@ -1352,12 +1434,12 @@ const WritingPage = ({ mode = "course" }) => {
               Paste your finished letter in one box. Herr Felix will score it with the new rubric and highlight what to fix.
             </p>
             <div style={styles.infoBox}>
-              <strong>Learning loop (don’t just copy):</strong>
-              <ul style={styles.promptList}>
-                {LEARNING_LOOP_STEPS.map((step) => (
-                  <li key={step}>{step}</li>
-                ))}
-              </ul>
+              <strong>3-step workflow:</strong>
+              <ol style={styles.promptList}>
+                <li>Paste draft</li>
+                <li>Read 2 corrections</li>
+                <li>Rewrite 1 paragraph</li>
+              </ol>
             </div>
 
             <div style={{ display: "grid", gap: 8, marginBottom: 10 }}>
@@ -1448,6 +1530,40 @@ const WritingPage = ({ mode = "course" }) => {
                 </button>
               </div>
             </div>
+
+            {markFeedback ? (
+              <div style={{ ...styles.infoBox, marginTop: 12 }}>
+                <strong>Step 2 (required): reflection + revised submission</strong>
+                <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+                  <textarea
+                    value={reflectionText}
+                    onChange={(e) => setReflectionText(e.target.value)}
+                    placeholder="What I fixed: ..."
+                    style={styles.textareaSmall}
+                    rows={2}
+                  />
+                  <textarea
+                    value={revisedDraftText}
+                    onChange={(e) => setRevisedDraftText(e.target.value)}
+                    placeholder="Submit revised version"
+                    style={styles.textArea}
+                    rows={7}
+                  />
+                </div>
+                <p style={{ ...styles.helperText, margin: "8px 0 0 0" }}>
+                  Attempt 1: {revisionSummary.firstWords} words · Attempt 2: {revisionSummary.revisedWords} words · Δ {revisionSummary.delta}
+                </p>
+                {revisionSummary.badges.length ? (
+                  <div style={styles.tagRow}>
+                    {revisionSummary.badges.map((badge) => (
+                      <span key={badge} style={styles.tagPill}>{badge}</span>
+                    ))}
+                  </div>
+                ) : null}
+                <button style={{ ...styles.primaryButton, marginTop: 8 }} onClick={handleCompleteWorkflow}>Complete</button>
+                {workflowComplete ? <div style={{ ...styles.successBox, marginTop: 8 }}>Workflow complete. Great revision discipline.</div> : null}
+              </div>
+            ) : null}
 
             {error && (
               <div style={styles.errorBox}>
@@ -1542,7 +1658,7 @@ const WritingPage = ({ mode = "course" }) => {
         </>
       )}
 
-      {activeTab === "ideas" && (
+      {activeTab === "ideas" && canUseIdeasGenerator && (
         <section style={styles.card} className="idea-generator-card">
           <h3 style={styles.sectionTitle}>Idea generator</h3>
           <p style={styles.helperText}>
