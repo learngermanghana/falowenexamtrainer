@@ -39,6 +39,7 @@ const A2_SCHEDULE = [
     goal: "Practice basic greetings and small talk.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
     assignment: true,
+    assignmentId: "1.1",
     video: "https://youtu.be/siF0jWZdIwk",
     youtube_link: "https://youtu.be/siF0jWZdIwk",
     grammarbook_link: "https://drive.google.com/file/d/1NsCKO4K7MWI-queLWCeBuclmaqPN04YQ/view?usp=sharing",
@@ -409,7 +410,7 @@ Use:
   },
 ].map(buildA2Lesson);
 
-const courseSchedules = {
+const RAW_COURSE_SCHEDULES = {
   A1: [
     {
       day: 0,
@@ -1747,5 +1748,87 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
     },
   ],
 };
+
+
+const parseAssignmentId = (...values) => {
+  for (const value of values) {
+    const raw = String(value || "").trim();
+    if (!raw) continue;
+
+    const explicitMatch = raw.match(/assignment\s*#?\s*(\d+(?:\.\d+)?)/i);
+    if (explicitMatch) return explicitMatch[1];
+
+    const prefixedMatch = raw.match(/^[A-Za-z0-9]+\s*-\s*(\d+(?:\.\d+)?)/);
+    if (prefixedMatch) return prefixedMatch[1];
+
+    const numericMatch = raw.match(/(\d+(?:\.\d+)?)/);
+    if (numericMatch) return numericMatch[1];
+  }
+
+  return null;
+};
+
+const formatAssignmentId = (level, assignmentNumber) => {
+  if (!assignmentNumber) return null;
+
+  const rawLevel = String(level || "").trim().toUpperCase();
+  const rawAssignmentId = String(assignmentNumber).trim();
+  if (!rawLevel) return rawAssignmentId;
+  if (rawAssignmentId.includes("-")) return rawAssignmentId;
+
+  return `${rawLevel}-${rawAssignmentId}`;
+};
+
+const withAssignmentId = (item, level, ...fallbackValues) => {
+  if (!item || typeof item !== "object") return item;
+
+  const assignmentNumber =
+    item.assignment === false
+      ? item.assignmentId || null
+      : parseAssignmentId(item.assignmentId, item.chapter, item.title, item.topic, item.assignmentTitle, ...fallbackValues);
+
+  return {
+    ...item,
+    assignmentId: formatAssignmentId(level, assignmentNumber),
+  };
+};
+
+const normalizeLessonCollection = (lessonCollection, level, fallbackValues = []) => {
+  if (Array.isArray(lessonCollection)) {
+    return lessonCollection.map((lesson) => withAssignmentId(lesson, level, ...fallbackValues));
+  }
+  if (lessonCollection && typeof lessonCollection === "object") {
+    return withAssignmentId(lessonCollection, level, ...fallbackValues);
+  }
+  return lessonCollection;
+};
+
+const normalizeCourseSchedules = (schedules) =>
+  Object.fromEntries(
+    Object.entries(schedules).map(([level, entries]) => {
+      if (!Array.isArray(entries)) return [level, entries];
+
+      return [
+        level,
+        entries.map((entry) => {
+          const entryWithAssignmentId = withAssignmentId(entry, level);
+          const fallbackAssignmentValues = [
+            entryWithAssignmentId.assignmentId,
+            entryWithAssignmentId.chapter,
+            entryWithAssignmentId.topic,
+            entryWithAssignmentId.title,
+          ];
+
+          return {
+            ...entryWithAssignmentId,
+            lesen_hören: normalizeLessonCollection(entryWithAssignmentId.lesen_hören, level, fallbackAssignmentValues),
+            schreiben_sprechen: normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, level, fallbackAssignmentValues),
+          };
+        }),
+      ];
+    })
+  );
+
+const courseSchedules = normalizeCourseSchedules(RAW_COURSE_SCHEDULES);
 
 module.exports = { courseSchedules };

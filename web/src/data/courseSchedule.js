@@ -45,6 +45,7 @@ const A2_SCHEDULE = [
     goal: "Practice basic greetings and small talk.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
     assignment: true,
+    assignmentId: "1.1",
     video: "https://youtu.be/siF0jWZdIwk",
     youtube_link: "https://youtu.be/siF0jWZdIwk",
     grammarbook_link: "https://drive.google.com/file/d/1NsCKO4K7MWI-queLWCeBuclmaqPN04YQ/view?usp=sharing",
@@ -1795,12 +1796,12 @@ const normalizeLessonResources = (lesson) => {
   };
 };
 
-const normalizeLessonCollection = (lessonCollection, fallbackValues = []) => {
+const normalizeLessonCollection = (lessonCollection, level, fallbackValues = []) => {
   if (Array.isArray(lessonCollection)) {
-    return lessonCollection.map((lesson) => withAssignmentId(normalizeLessonResources(lesson), ...fallbackValues));
+    return lessonCollection.map((lesson) => withAssignmentId(normalizeLessonResources(lesson), level, ...fallbackValues));
   }
   if (lessonCollection && typeof lessonCollection === "object") {
-    return withAssignmentId(normalizeLessonResources(lessonCollection), ...fallbackValues);
+    return withAssignmentId(normalizeLessonResources(lessonCollection), level, ...fallbackValues);
   }
   return lessonCollection;
 };
@@ -1814,6 +1815,9 @@ const parseAssignmentId = (...values) => {
     const explicitMatch = raw.match(/assignment\s*#?\s*(\d+(?:\.\d+)?)/i);
     if (explicitMatch) return explicitMatch[1];
 
+    const prefixedMatch = raw.match(/^[A-Za-z0-9]+\s*-\s*(\d+(?:\.\d+)?)/);
+    if (prefixedMatch) return prefixedMatch[1];
+
     const numericMatch = raw.match(/(\d+(?:\.\d+)?)/);
     if (numericMatch) return numericMatch[1];
   }
@@ -1821,17 +1825,28 @@ const parseAssignmentId = (...values) => {
   return null;
 };
 
-const withAssignmentId = (item, ...fallbackValues) => {
+const formatAssignmentId = (level, assignmentNumber) => {
+  if (!assignmentNumber) return null;
+
+  const rawLevel = String(level || "").trim().toUpperCase();
+  const rawAssignmentId = String(assignmentNumber).trim();
+  if (!rawLevel) return rawAssignmentId;
+  if (rawAssignmentId.includes("-")) return rawAssignmentId;
+
+  return `${rawLevel}-${rawAssignmentId}`;
+};
+
+const withAssignmentId = (item, level, ...fallbackValues) => {
   if (!item || typeof item !== "object") return item;
 
-  const resolvedAssignmentId =
-    item.assignment === true
-      ? parseAssignmentId(item.assignmentId, item.chapter, item.title, item.topic, item.assignmentTitle, ...fallbackValues)
-      : item.assignmentId || null;
+  const assignmentNumber =
+    item.assignment === false
+      ? item.assignmentId || null
+      : parseAssignmentId(item.assignmentId, item.chapter, item.title, item.topic, item.assignmentTitle, ...fallbackValues);
 
   return {
     ...item,
-    assignmentId: resolvedAssignmentId,
+    assignmentId: formatAssignmentId(level, assignmentNumber),
   };
 };
 
@@ -1856,15 +1871,15 @@ const normalizeCourseSchedules = (schedules) =>
       return [
         level,
         entries.map((entry) => {
-          const entryWithAssignmentId = withAssignmentId(entry);
+          const entryWithAssignmentId = withAssignmentId(entry, level);
           const fallbackAssignmentValues = [
             entryWithAssignmentId.assignmentId,
             entryWithAssignmentId.chapter,
             entryWithAssignmentId.topic,
             entryWithAssignmentId.title,
           ];
-          const lesen_hören = normalizeLessonCollection(entryWithAssignmentId.lesen_hören, fallbackAssignmentValues);
-          const schreiben_sprechen = normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, fallbackAssignmentValues);
+          const lesen_hören = normalizeLessonCollection(entryWithAssignmentId.lesen_hören, level, fallbackAssignmentValues);
+          const schreiben_sprechen = normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, level, fallbackAssignmentValues);
           const lessons = [
             ...(Array.isArray(lesen_hören) ? lesen_hören : lesen_hören ? [lesen_hören] : []),
             ...(Array.isArray(schreiben_sprechen) ? schreiben_sprechen : schreiben_sprechen ? [schreiben_sprechen] : []),
