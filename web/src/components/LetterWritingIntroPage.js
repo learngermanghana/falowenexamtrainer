@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -10,26 +10,6 @@ const Section = ({ title, children }) => (
     <h2 style={{ margin: 0 }}>{title}</h2>
     {children}
   </section>
-);
-
-const Tabs = ({ value, onChange, tabs }) => (
-  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-    {tabs.map((t) => (
-      <button
-        key={t.value}
-        type="button"
-        onClick={() => onChange(t.value)}
-        style={{
-          ...styles.secondaryButton,
-          width: "fit-content",
-          borderColor: value === t.value ? "#111827" : undefined,
-          fontWeight: value === t.value ? 900 : 600,
-        }}
-      >
-        {t.label}
-      </button>
-    ))}
-  </div>
 );
 
 const InfoBox = ({ title, children }) => (
@@ -57,39 +37,11 @@ const RuleParagraphs = ({ items }) => (
   </div>
 );
 
-const QuestionCard = ({ q, value, onChange }) => (
-  <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 10 }}>
-    <div style={{ fontWeight: 900 }}>{q.title}</div>
-
-    {q.hint && (
-      <div style={{ borderRadius: 10, background: "#f8fafc", border: "1px solid #e2e8f0", padding: 10 }}>
-        <div style={{ fontWeight: 900, marginBottom: 6 }}>Hint</div>
-        <div style={{ opacity: 0.95, lineHeight: 1.5 }}>{q.hint}</div>
-      </div>
-    )}
-
-    <textarea
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      rows={q.rows ?? 3}
-      placeholder={q.placeholder ?? "Type your answer in German..."}
-      style={{
-        width: "100%",
-        borderRadius: 10,
-        border: "1px solid #d1d5db",
-        padding: 10,
-        fontFamily: q.mono ? "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" : undefined,
-      }}
-    />
-  </div>
-);
-
 /** =========================
  *  Page
  *  ========================= */
 const A1LetterWritingQuestionBookPage = () => {
   const navigate = useNavigate();
-  const [tab, setTab] = useState("learn"); // learn | submit
 
   /** =========================
    *  READ-FIRST CONTENT (your exact text)
@@ -197,144 +149,6 @@ const A1LetterWritingQuestionBookPage = () => {
   );
 
   /** =========================
-   *  SUBMIT TAB QUESTIONS (students type here)
-   *  ========================= */
-  const birthdayQuestions = useMemo(
-    () => [
-      {
-        key: "bq1",
-        title: 'Q1) Start the letter to your friend Max (use "Lieber" or "Liebe").',
-        hint: 'Male: "Lieber Max," | Female: "Liebe Anna,"',
-        placeholder: "Lieber Max,",
-      },
-      {
-        key: "bq2",
-        title: 'Q2) Translate: "How are you? I hope you are well. I am writing to you because..."',
-        hint:
-          'Use: "Wie geht es dir? Ich hoffe, es geht dir gut. Ich schreibe dir, weil ..." (weil verb at the end)',
-        rows: 4,
-      },
-      {
-        key: "bq3",
-        title: "Q3) Rearrange and write the correct sentence (modal verb rule).",
-        hint: "Words: gratulieren, Ich, dir, möchte, Geburtstag, zu deinem.",
-        placeholder: "Ich möchte dir zu deinem Geburtstag gratulieren.",
-        mono: true,
-      },
-      {
-        key: "bq4",
-        title: 'Q4) How do you say "Happy Birthday" in German?',
-        placeholder: "Alles Gute zum Geburtstag!",
-      },
-      {
-        key: "bq5",
-        title: "Q5) Ask: Where are you planning the party? (W-question rule, end with: die Feier)",
-        hint: 'Start with "Wo" and use "planen".',
-        placeholder: "Wo planst du die Feier?",
-      },
-      {
-        key: "bq6",
-        title: "Q6) Ask: Can I come with my family? (modal question rule + main verb “kommen”)",
-        hint: 'Use: "Kann ich ... mit meiner Familie ... kommen?" (main verb at the end)',
-        placeholder: "Kann ich mit meiner Familie kommen?",
-      },
-      {
-        key: "bq7",
-        title: 'Q7) Translate: "We drive with the car." (fahren + Auto)',
-        placeholder: "Wir fahren mit dem Auto.",
-      },
-      {
-        key: "bq8",
-        title: 'Q8) End sentence: "I look forward to your reply in advance."',
-        placeholder: "Ich freue mich im Voraus auf deine Antwort.",
-      },
-      {
-        key: "bq9",
-        title: 'Q9) Closing: write "Viele Grüße" and sign with your first name.',
-        placeholder: "Viele Grüße,\nFelix",
-        rows: 3,
-      },
-    ],
-    []
-  );
-
-  const formalQuestions = useMemo(
-    () => [
-      {
-        key: "fq1",
-        title: "Q1) Start a formal letter to a language school (unknown receiver).",
-        hint: 'Use: "Sehr geehrte Damen und Herren,"',
-        placeholder: "Sehr geehrte Damen und Herren,",
-      },
-      {
-        key: "fq2",
-        title:
-          'Q2) Write: "I hope you are well." + explain why you are writing using "Ich schreibe Ihnen, weil..."',
-        hint:
-          'Use "Anfragen stellen". Example: "Ich schreibe Ihnen, weil ich Anfragen stellen möchte." (weil → verb at end)',
-        rows: 4,
-      },
-      {
-        key: "fq3",
-        title: "Q3) Formally ask for course information (modal verb + geben at the end).",
-        hint: 'Pattern: "Könnten Sie mir bitte Informationen über ... geben?"',
-        placeholder: "Könnten Sie mir bitte Informationen über Ihre Deutschkurse geben?",
-        rows: 3,
-      },
-      {
-        key: "fq4",
-        title: "Q4) Ask about prices + payment options (credit card or cash).",
-        hint: 'Use: "Wie viel kostet ...?" + "Wie soll ich bezahlen? Mit Kreditkarte oder bar?"',
-        rows: 4,
-      },
-      {
-        key: "fq5",
-        title: "Q5) Ask about course dates (Kurstermine).",
-        hint: 'Use: "Könnten Sie mir auch die Kurstermine mitteilen?"',
-        placeholder: "Könnten Sie mir auch die Kurstermine mitteilen?",
-      },
-      {
-        key: "fq6",
-        title: "Q6) Polite conclusion (don’t change).",
-        placeholder: "Ich freue mich im Voraus auf Ihre Antwort.",
-      },
-      {
-        key: "fq7",
-        title: 'Q7) Closing: write "Mit freundlichen Grüßen" and sign with your full name.',
-        placeholder: "Mit freundlichen Grüßen,\nFelix Asadu",
-        rows: 3,
-      },
-    ],
-    []
-  );
-
-  /** =========================
-   *  Answers state (Submit tab)
-   *  ========================= */
-  const [birthdayAns, setBirthdayAns] = useState(() =>
-    Object.fromEntries(birthdayQuestions.map((q) => [q.key, ""]))
-  );
-  const [formalAns, setFormalAns] = useState(() =>
-    Object.fromEntries(formalQuestions.map((q) => [q.key, ""]))
-  );
-
-  const copySubmit = async () => {
-    const pack = [
-      "=== Birthday Letter Question Book (Answers) ===",
-      ...birthdayQuestions.map((q) => `${q.title}\n${birthdayAns[q.key] || ""}\n`),
-      "\n=== Formal Letter Question Book (Answers) ===",
-      ...formalQuestions.map((q) => `${q.title}\n${formalAns[q.key] || ""}\n`),
-    ].join("\n");
-
-    try {
-      await navigator.clipboard.writeText(pack);
-      alert("Copied answers!");
-    } catch {
-      alert("Copy failed. Please copy manually.");
-    }
-  };
-
-  /** =========================
    *  Vocabulary list (read only)
    *  ========================= */
   const VOCAB_LIST = useMemo(
@@ -421,23 +235,13 @@ const A1LetterWritingQuestionBookPage = () => {
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First, Then Submit</h1>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Students must read the structures and question books first. Answers are typed only in the Submit tab.
+          Students must read the structures and question books first. Submit your work from the Submit page.
         </p>
-
-        <Tabs
-          value={tab}
-          onChange={setTab}
-          tabs={[
-            { value: "learn", label: "📘 Learn (Read)" },
-            { value: "submit", label: "📝 Submit Answers" },
-          ]}
-        />
       </header>
 
-      {tab === "learn" && (
-        <>
+      <>
           <Section title="Formal Letter Structure (Read First)">
             <InfoBox title="Structure + Rules">
               <RuleParagraphs items={FORMAL_STRUCTURE} />
@@ -485,7 +289,7 @@ const A1LetterWritingQuestionBookPage = () => {
             </InfoBox>
 
             <div style={{ borderRadius: 10, background: "#fff7ed", border: "1px solid #fdba74", padding: 10 }}>
-              ✅ When you finish reading, go to <strong>Submit Answers</strong> tab and type your answers.
+              ✅ When you finish reading, submit your work on the <strong>Submit Assignment</strong> page.
             </div>
           </Section>
 
@@ -519,7 +323,7 @@ const A1LetterWritingQuestionBookPage = () => {
             </InfoBox>
 
             <div style={{ borderRadius: 10, background: "#fff7ed", border: "1px solid #fdba74", padding: 10 }}>
-              ✅ When you finish reading, go to <strong>Submit Answers</strong> tab and type your answers.
+              ✅ When you finish reading, submit your work on the <strong>Submit Assignment</strong> page.
             </div>
           </Section>
 
@@ -537,64 +341,15 @@ const A1LetterWritingQuestionBookPage = () => {
               <BulletList items={VOCAB_LIST.occasions} />
             </InfoBox>
           </Section>
-        </>
-      )}
-
-      {tab === "submit" && (
-        <>
-          <Section title="Submit Answers (Birthday Letter — Question Book)">
-            <div style={{ borderRadius: 10, background: "#ecfeff", border: "1px solid #67e8f9", padding: 10 }}>
-              Tip: Answer in full sentences. Check <strong>weil</strong> verb-at-the-end before submitting.
-            </div>
-
-            <div style={{ display: "grid", gap: 12 }}>
-              {birthdayQuestions.map((q) => (
-                <QuestionCard
-                  key={q.key}
-                  q={q}
-                  value={birthdayAns[q.key]}
-                  onChange={(val) => setBirthdayAns((prev) => ({ ...prev, [q.key]: val }))}
-                />
-              ))}
-            </div>
-          </Section>
-
-          <Section title="Submit Answers (Formal Letter — Question Book)">
-            <div style={{ borderRadius: 10, background: "#f0fdf4", border: "1px solid #86efac", padding: 10 }}>
-              Tip: Use <strong>Sie/Ihnen/Ihre</strong>. Don’t use du/dir/dein in a formal letter.
-            </div>
-
-            <div style={{ display: "grid", gap: 12 }}>
-              {formalQuestions.map((q) => (
-                <QuestionCard
-                  key={q.key}
-                  q={q}
-                  value={formalAns[q.key]}
-                  onChange={(val) => setFormalAns((prev) => ({ ...prev, [q.key]: val }))}
-                />
-              ))}
-            </div>
-          </Section>
-
-          <Section title="Copy Answers (Optional)">
-            <p style={{ margin: 0 }}>
-              If you want, copy your answers and paste into your submission system.
-            </p>
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={copySubmit}>
-                Copy all answers
-              </button>
-              <button
-                type="button"
-                style={{ ...styles.secondaryButton, width: "fit-content" }}
-                onClick={() => navigate("/campus/submit")}
-              >
+          <Section title="Next step">
+            <p style={{ margin: 0 }}>Ready to submit your work? Open the assignment submission page.</p>
+            <div>
+              <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => navigate("/campus/submit")}>
                 Go to Submit Assignment Page
               </button>
             </div>
           </Section>
-        </>
-      )}
+      </>
     </main>
   );
 };
