@@ -29,7 +29,7 @@ const buildWeeklyClassDays = ({ startDate, endDate, weekdays, sessionTemplate })
   return days;
 };
 
-export const courseSchedulesByName = {
+const rawCourseSchedulesByName = {
   "A1 Stuttgart Klasse": {
     course: "A1",
     title: "Course Schedule: A1",
@@ -1313,3 +1313,24 @@ export const courseSchedulesByName = {
     generatedNote: "Schedule generated for the French A1 Paris class.",
   },
 };
+
+
+const parseAssignmentId = (value) => {
+  const match = String(value || "").match(/(\d+(?:\.\d+)?)/);
+  return match ? match[1] : null;
+};
+
+const withAssignmentIds = (schedule) => ({
+  ...schedule,
+  days: (schedule.days || []).map((day) => ({
+    ...day,
+    sessions: (day.sessions || []).map((session) => ({
+      ...session,
+      assignmentId: session.assignmentId || parseAssignmentId(session.chapter || session.title),
+    })),
+  })),
+});
+
+export const courseSchedulesByName = Object.fromEntries(
+  Object.entries(rawCourseSchedulesByName).map(([className, schedule]) => [className, withAssignmentIds(schedule)])
+);

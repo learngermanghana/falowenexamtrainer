@@ -58,6 +58,7 @@ const buildLevelSchedules = () => {
 
         return {
           chapter: session.chapter || session.title || `Session ${index + 1}`,
+          assignmentId: session.assignmentId || session.chapter || null,
           title: session.title,
           // ✅ FIX: keep real assignment value if it exists
           assignment: Boolean(session.assignment),
@@ -100,6 +101,7 @@ const getLessonKey = (lesson) =>
     lesson.chapter || lesson.title || "",
     lesson.video || "",
     lesson.youtube_link || "",
+    lesson.assignmentId || "",
     lesson.grammarbook_link || "",
     lesson.workbook_link || "",
     Boolean(lesson.assignment),
