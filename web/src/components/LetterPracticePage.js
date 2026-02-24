@@ -42,22 +42,6 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     [coachDisplayName]
   );
 
-  const availableTabs = useMemo(
-    () => {
-      const baseTabs = [
-        { key: "mark", label: "Mark my letter" },
-        { key: "ideas", label: "Ideas generator" },
-      ];
-
-      if (isExamMode && !isFrenchProgram) {
-        baseTabs.unshift({ key: "practice", label: "Practice letters" });
-      }
-
-      return baseTabs;
-    },
-    [isExamMode, isFrenchProgram]
-  );
-
   const requestedTab = useMemo(() => new URLSearchParams(location.search).get("tab"), [location.search]);
   const [activeTab, setActiveTab] = useState(() => {
     if (requestedTab && availableTabs.some((tab) => tab.key === requestedTab)) {
@@ -92,6 +76,26 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+  const isA1Student = isLevelLocked && profileLevel === "A1";
+  const canUseIdeasGenerator = !isA1Student;
+  const canUsePracticeLetters = isExamMode && !isFrenchProgram && !isA1Student;
+
+  const availableTabs = useMemo(
+    () => {
+      const baseTabs = [{ key: "mark", label: "Mark my letter" }];
+
+      if (canUseIdeasGenerator) {
+        baseTabs.push({ key: "ideas", label: "Ideas generator" });
+      }
+
+      if (canUsePracticeLetters) {
+        baseTabs.unshift({ key: "practice", label: "Practice letters" });
+      }
+
+      return baseTabs;
+    },
+    [canUseIdeasGenerator, canUsePracticeLetters]
+  );
 
   const resetErrors = () => {
     setError("");
@@ -352,27 +356,33 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               {isFrenchProgram ? "French writing coach" : "Schreiben trainer"}
             </p>
             <h2 style={{ ...styles.sectionTitle, margin: 0 }}>
-              {isExamMode
-                ? isFrenchProgram
-                  ? "French writing help + ideas"
-                  : "Timed letters + Herr Felix ideas"
-                : isFrenchProgram
-                  ? "Mark my letter + French ideas"
-                  : "Mark my letter + Herr Felix ideas"}
+              {canUseIdeasGenerator
+                ? isExamMode
+                  ? isFrenchProgram
+                    ? "French writing help + ideas"
+                    : "Timed letters + Herr Felix ideas"
+                  : isFrenchProgram
+                    ? "Mark my letter + French ideas"
+                    : "Mark my letter + Herr Felix ideas"
+                : "Mark my letter"}
             </h2>
             <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-              {isExamMode ? (
-                <>
-                  {isFrenchProgram
-                    ? "Start with a draft in French, then paste it into “Mark my letter”. Use the ideas generator to stay organized."
-                    : 'Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator (prompts in '}
-                  {isFrenchProgram ? null : <code>functions/functionz/prompts.js</code>}
-                  {isFrenchProgram ? null : ") to keep moving."}
-                </>
+              {canUseIdeasGenerator ? (
+                isExamMode ? (
+                  <>
+                    {isFrenchProgram
+                      ? "Start with a draft in French, then paste it into “Mark my letter”. Use the ideas generator to stay organized."
+                      : 'Start with a timed practice letter, then paste your draft into "Mark my letter". Use the ideas generator (prompts in '}
+                    {isFrenchProgram ? null : <code>functions/functionz/prompts.js</code>}
+                    {isFrenchProgram ? null : ") to keep moving."}
+                  </>
+                ) : (
+                  isFrenchProgram
+                    ? "Timed practice lives in the Exams Room. Here you can paste French drafts for marking and use the ideas generator to build your letter."
+                    : "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
+                )
               ) : (
-                isFrenchProgram
-                  ? "Timed practice lives in the Exams Room. Here you can paste French drafts for marking and use the ideas generator to build your letter."
-                  : "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
+                "A1 students use Mark my letter only."
               )}
             </p>
           </div>
@@ -393,7 +403,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         </div>
       </section>
 
-      {activeTab === "practice" && isExamMode && !isFrenchProgram && (
+      {activeTab === "practice" && canUsePracticeLetters && (
         <section style={styles.card}>
           <div style={{ display: "grid", gap: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
@@ -604,7 +614,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         </section>
       )}
 
-      {activeTab === "ideas" && (
+      {activeTab === "ideas" && canUseIdeasGenerator && (
         <section style={styles.card} className="idea-generator-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 260 }}>

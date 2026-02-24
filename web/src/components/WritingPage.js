@@ -331,7 +331,7 @@ const WritingPage = ({ mode = "course" }) => {
     []
   );
 
-  const [activeTab, setActiveTab] = useState("practice");
+  const [activeTab, setActiveTab] = useState("mark");
   const [writingTasks, setWritingTasks] = useState(() =>
     isExamMode ? examWritingLetters : courseWritingLetters
   );
@@ -430,6 +430,22 @@ const WritingPage = ({ mode = "course" }) => {
 
   const profileLevel = normalizeProfileLevel(studentProfile?.level);
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
+  const isA1Student = isLevelLocked && profileLevel === "A1";
+  const canUseIdeasGenerator = !isA1Student;
+  const canUsePracticeLetters = !isA1Student;
+  const availableTabs = useMemo(() => {
+    const tabs = [{ key: "mark", label: "Mark my letter" }];
+
+    if (canUseIdeasGenerator) {
+      tabs.push({ key: "ideas", label: "Idea generator" });
+    }
+
+    if (canUsePracticeLetters) {
+      tabs.unshift({ key: "practice", label: "Practice letters" });
+    }
+
+    return tabs;
+  }, [canUseIdeasGenerator, canUsePracticeLetters]);
   const progressMode = isExamMode ? "exam" : "course";
   const activeTargetLevel = selectedLetter?.level || level;
   const wordTarget = WORD_TARGETS[activeTargetLevel];
@@ -441,6 +457,15 @@ const WritingPage = ({ mode = "course" }) => {
       setLevel(profileLevel);
     }
   }, [isLevelLocked, level, profileLevel, setLevel]);
+
+  useEffect(() => {
+    if (!availableTabs.some((tab) => tab.key === activeTab)) {
+      setActiveTab(availableTabs[0]?.key || "mark");
+      setIdeaError("");
+      setIdeaSuccess("");
+      setError("");
+    }
+  }, [activeTab, availableTabs, setError]);
 
   const loadWritingTasks = useCallback(async () => {
     setWritingTasksLoading(true);
@@ -1039,16 +1064,14 @@ const WritingPage = ({ mode = "course" }) => {
         </div>
       )}
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>Writing – Practice exam letters</h2>
+        <h2 style={styles.sectionTitle}>{canUseIdeasGenerator ? "Writing – Practice exam letters" : "Writing – Mark my letter"}</h2>
         <p style={styles.helperText}>
-          Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help.
+          {canUseIdeasGenerator
+            ? "Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help."
+            : "A1 students should use Mark my letter to get focused feedback on their draft."}
         </p>
         <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
-          {[
-            { key: "practice", label: "Practice letters" },
-            { key: "mark", label: "Mark my letter" },
-            { key: "ideas", label: "Idea generator" },
-          ].map((tab) => (
+          {availableTabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
@@ -1065,7 +1088,7 @@ const WritingPage = ({ mode = "course" }) => {
         </div>
       </section>
 
-      {activeTab === "practice" && (
+      {activeTab === "practice" && canUsePracticeLetters && (
         <>
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Your simulation room</h3>
@@ -1542,7 +1565,7 @@ const WritingPage = ({ mode = "course" }) => {
         </>
       )}
 
-      {activeTab === "ideas" && (
+      {activeTab === "ideas" && canUseIdeasGenerator && (
         <section style={styles.card} className="idea-generator-card">
           <h3 style={styles.sectionTitle}>Idea generator</h3>
           <p style={styles.helperText}>
