@@ -156,7 +156,7 @@ const frenchIdeasPrompt = (level) =>
     `Keep it practical for a ${level} learner and end each reply with 'Your next recommended step:'.`
   );
 
-const markPrompt = ({ schreibenLevel, studentName, program }) => {
+const markPrompt = ({ schreibenLevel, studentName, program, submissionContext }) => {
   if (program === "french") {
     return `You are a supportive French writing coach.\n
 You help students prepare for A1, A2, B1, B2, and C1 French exam letters or short essays.\n
@@ -195,7 +195,7 @@ Begin with a warm greeting that uses the student's name (${studentName}) and ref
 9. Never write a new letter for the student, only mark what they submit.\n
 10. When possible, point out specific lines or examples from their letter in your feedback.\n
 11. When student score is 18 or above then they have passed. When score is less than 18, is a fail and they must try again before submitting to prevent low marks.\n
-12. After completion, remind them to only copy their improved letter without your feedback, go to 'my course' on the app and submit together with their lesen and horen answers. They only share the letter and feedback with their teacher for evaluation only when they preparing for the exams\n`;
+12. Do not include any instruction about going to "my course" or submitting lesen/horen answers in your feedback.\n`;
 };
 
 const getWritingIdeasPrompt = ({ level, program }) => {
