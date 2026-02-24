@@ -279,6 +279,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         {activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
 
         {activeSubTab === "courseBook" ? (
+        <>
         <div style={{ display: "grid", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <div style={{ display: "grid", gap: 4 }}>
@@ -425,7 +426,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             </div>
           </>
         )}
-        </div>
+        </>
         ) : null}
       </div>
     </div>
