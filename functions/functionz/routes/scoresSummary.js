@@ -313,6 +313,7 @@ const scoresSummaryHandler = async (req, res) => {
       ]),
       name: findIndexByHeader(header, ["name", "studentname", "student name"]),
       assignment: findIndexByHeader(header, ["assignment", "task", "topic", "day", "title"]),
+      assignmentId: findIndexByHeader(header, ["assignment_id", "assignmentid", "assgnment_id", "assgnmentid"]),
       score: findIndexByHeader(header, ["score", "mark", "marks", "result"]),
       date: findIndexByHeader(header, ["date", "timestamp", "createdat", "created_at", "time"]),
       comments: findIndexByHeader(header, ["comments", "feedback", "comment"]),
@@ -325,6 +326,12 @@ const scoresSummaryHandler = async (req, res) => {
     }
 
     const get = (row, i) => (i >= 0 && i < row.length ? String(row[i] || "").trim() : "");
+    const resolveIdentifier = (row) => {
+      const explicitId = get(row, idx.assignmentId);
+      const fromExplicit = pickIdentifierFromText(explicitId, plannedSet);
+      if (fromExplicit) return fromExplicit;
+      return pickIdentifierFromText(get(row, idx.assignment), plannedSet);
+    };
 
     const leaderboardEntries = new Map();
     rows.slice(1).forEach((row) => {
@@ -334,7 +341,7 @@ const scoresSummaryHandler = async (req, res) => {
       if (rowLevel && rowLevel !== level) return;
 
       const assignment = get(row, idx.assignment);
-      const identifier = pickIdentifierFromText(assignment, plannedSet);
+      const identifier = resolveIdentifier(row);
       if (!identifier) return;
 
       const scoreNum = Number(get(row, idx.score));
@@ -392,7 +399,7 @@ const scoresSummaryHandler = async (req, res) => {
         const dateMs = parseDateMs(dateRaw);
         const rowLevel = get(r, idx.level) || "";
 
-        const identifier = pickIdentifierFromText(assignment, plannedSet);
+        const identifier = resolveIdentifier(r);
 
         return {
           assignment: assignment || "",
