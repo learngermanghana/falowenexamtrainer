@@ -219,6 +219,7 @@ export const fetchStudentNotifications = async (profile) => {
   if (!profile || !isFirebaseConfigured || !db) return [];
 
   const studentCode = studentCodeFromProfile(profile);
+  const studentUid = profile.uid || profile.id || "";
 
   const fetchStoredNotifications = async () => {
     if (!profile?.id) return [];
@@ -241,7 +242,7 @@ export const fetchStudentNotifications = async (profile) => {
   const levelTokens = normalizeLevelTokens(profile.level);
   const [resultsPayload, attendancePayload, classBoard, storedNotifications] = await Promise.all([
     fetchResults({ level: levelTokens.length ? levelTokens : profile.level, studentCode, email: profile.email }),
-    fetchAttendanceRecords({ className: profile.className, studentCode }),
+    fetchAttendanceRecords({ className: profile.className, studentCode, studentUid }),
     fetchClassBoardAnnouncements({ level: profile.level, className: profile.className }),
     fetchStoredNotifications(),
   ]);
