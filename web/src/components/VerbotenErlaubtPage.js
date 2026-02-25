@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { speakingSheetQuestions } from "../data/speakingSheet";
@@ -69,14 +69,14 @@ const VerbotenErlaubtPage = () => {
 
   const pickRandomPrompt = (items) => items[Math.floor(Math.random() * items.length)] || null;
 
-  const drawRandomPracticeCards = () => {
+  const drawRandomPracticeCards = useCallback(() => {
     setTeil2Prompt(pickRandomPrompt(teil2Questions));
     setTeil3Prompt(pickRandomPrompt(teil3Questions));
-  };
+  }, [teil2Questions, teil3Questions]);
 
   useEffect(() => {
     drawRandomPracticeCards();
-  }, []);
+  }, [drawRandomPracticeCards]);
 
   useEffect(() => {
     if (!isRunning) {
