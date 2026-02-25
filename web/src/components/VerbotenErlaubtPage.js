@@ -51,6 +51,32 @@ const Checklist = ({ items }) => (
   </ul>
 );
 
+const PrimaryCTA = ({ onClick, label = "Open Goethe Speaking Exams" }) => (
+  <button
+    style={{
+      ...styles.primaryButton,
+      width: "fit-content",
+      minHeight: 44,
+    }}
+    onClick={onClick}
+  >
+    {label}
+  </button>
+);
+
+const SecondaryCTA = ({ onClick, label }) => (
+  <button
+    style={{
+      ...styles.secondaryButton,
+      width: "fit-content",
+      minHeight: 44,
+    }}
+    onClick={onClick}
+  >
+    {label}
+  </button>
+);
+
 const VerbotenErlaubtPage = () => {
   const navigate = useNavigate();
 
@@ -92,7 +118,6 @@ const VerbotenErlaubtPage = () => {
   const drawRandomPracticeCards = useCallback(() => {
     setTeil2Prompt(pickRandomPrompt(teil2Questions));
     setTeil3Prompt(pickRandomPrompt(teil3Questions));
-    // When they draw new cards, hide next-step until they finish the next round
     setShowFalowenNextStep(false);
   }, [teil2Questions, teil3Questions]);
 
@@ -108,7 +133,6 @@ const VerbotenErlaubtPage = () => {
         if (current <= 1) {
           window.clearInterval(intervalId);
           setIsRunning(false);
-          // Timer finished → show Falowen next step
           setShowFalowenNextStep(true);
           return 0;
         }
@@ -137,13 +161,13 @@ const VerbotenErlaubtPage = () => {
     window.open(FALOWEN_SPEAKING_URL, "_blank", "noopener,noreferrer");
   };
 
-  // --- Helpers to label "Thema" vs "Stichwort" for A1 learners ---
   const topicText = (p) => (p?.text ? String(p.text) : "");
   const keywordText = (p) => (p?.hint ? String(p.hint) : "");
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+      {/* ✅ TOP: Official app CTA (keep visible at top) */}
+      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <button
           style={{ ...styles.secondaryButton, width: "fit-content" }}
           onClick={() => navigate("/campus/course")}
@@ -158,6 +182,26 @@ const VerbotenErlaubtPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Chapter 5.9 — random Teil 2 & Teil 3 cards + timed confidence drill.
         </p>
+
+        <Callout>
+          <strong>Official Speaking Practice App</strong>
+          <p style={{ margin: 0 }}>
+            Use our official practice tool to train exactly like the real Goethe
+            exam.
+          </p>
+          <BulletList
+            items={[
+              "Open the app",
+              "Enter your Student Code",
+              "Choose Teil 1 / Teil 2 / Teil 3",
+              "Record + click “Ask & AI” for marking",
+            ]}
+          />
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <PrimaryCTA onClick={openSpeakingPractice} />
+            <SecondaryCTA onClick={openSpeakingPractice} label="Open in New Tab" />
+          </div>
+        </Callout>
 
         <a
           href="https://www.youtube.com/watch?v=O6m-GslH2kM"
@@ -291,14 +335,12 @@ const VerbotenErlaubtPage = () => {
         </Callout>
       </Section>
 
-      {/* ✅ Random cards first */}
       <Section title="5) Random practice cards for Teil 2 + Teil 3">
         <p style={{ margin: 0 }}>
           We pull random <strong>A1 only</strong> prompts from the speaking
           question sheet. Practise both cards back-to-back.
         </p>
 
-        {/* ✅ Very simple A1 explanation box */}
         <Callout>
           <strong>Quick help (very important)</strong>
           <BulletList
@@ -353,11 +395,10 @@ const VerbotenErlaubtPage = () => {
         </div>
       </Section>
 
-      {/* ✅ Timer AFTER random cards and connected to them */}
       <Section title="6) Confidence Timer (Press Play and Speak)">
         <p style={{ margin: 0 }}>
-          Use the <strong>cards you just drew above</strong>. Press play and speak
-          continuously for 60 seconds, calm and clear.
+          Use the <strong>cards you just drew above</strong>. Press play and
+          speak continuously for 60 seconds, calm and clear.
         </p>
 
         <Callout>
@@ -383,7 +424,7 @@ const VerbotenErlaubtPage = () => {
           }}
         >
           <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: 1 }}>
-            {formatTime(secondsLeft)}
+            {String(formatTime(secondsLeft))}
           </div>
 
           <div
@@ -422,22 +463,19 @@ const VerbotenErlaubtPage = () => {
           ]}
         />
 
-        {/* ✅ Appears ONLY after timer ends */}
         {showFalowenNextStep && (
           <Callout>
             <strong>✅ Time! Next step (real exam mode)</strong>
             <BulletList
               items={[
-                "Now open Falowen",
+                "Now open the Official Speaking Practice App",
                 "Enter your Student Code",
                 "Do 1 real prompt (Teil 2 or Teil 3)",
                 "Click “Ask & AI” for marking and feedback",
               ]}
             />
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              <button style={styles.primaryButton} onClick={openSpeakingPractice}>
-                Open Falowen Practice
-              </button>
+              <PrimaryCTA onClick={openSpeakingPractice} label="Open Speaking Practice App" />
             </div>
           </Callout>
         )}
@@ -476,6 +514,18 @@ const VerbotenErlaubtPage = () => {
           />
         </Callout>
       </Section>
+
+      {/* ✅ BOTTOM: keep official app CTA visible again */}
+      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <h2 style={{ margin: 0 }}>Practice Now (Official Speaking Practice App)</h2>
+        <p style={{ margin: 0 }}>
+          Ready? Open the app and practise immediately with your Student Code.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <PrimaryCTA onClick={openSpeakingPractice} />
+          <SecondaryCTA onClick={openSpeakingPractice} label="Open in New Tab" />
+        </div>
+      </div>
     </div>
   );
 };
