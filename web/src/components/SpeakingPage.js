@@ -3,7 +3,8 @@ import { styles } from "../styles";
 import { getTasksForLevel, useExam } from "../context/ExamContext";
 
 const SPEAKING_LINK =
-  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
+  "https://script.google.com/macros/s/AKfycbyWHrf5snW93gvPOqHbiMd63C8Kc_z6-JRVUCymslwFlgMEli5V52OdmEm47TyVT6sG/exec";
+const SPEAKING_PAGE_LINK = "https://www.falowen.app/exams/speaking";
 
 const COMMON_MISTAKES = [
   {
@@ -72,6 +73,46 @@ const SpeakingPage = () => {
           <p style={styles.subtitle}>
             Open the Goethe Speaking Exams practice page to start your speaking prep.
           </p>
+        </div>
+
+        <div
+          style={{
+            ...styles.card,
+            margin: 0,
+            boxShadow: "none",
+            border: "1px solid #BFDBFE",
+            background: "#EFF6FF",
+            display: "grid",
+            gap: 10,
+          }}
+        >
+          <p style={{ margin: 0, color: "#1E3A8A", fontWeight: 700 }}>Start here</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+            <a
+              href={SPEAKING_LINK}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...styles.buttonPrimary,
+                textDecoration: "none",
+                textAlign: "center",
+              }}
+            >
+              Open Goethe Speaking Exams
+            </a>
+            <a
+              href={SPEAKING_PAGE_LINK}
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                ...styles.buttonSecondary,
+                textDecoration: "none",
+                textAlign: "center",
+              }}
+            >
+              Open speaking page
+            </a>
+          </div>
         </div>
 
         <div style={{ display: "grid", gap: 14 }}>
@@ -172,19 +213,6 @@ const SpeakingPage = () => {
               </ChecklistItem>
             </ul>
           </div>
-
-          <a
-            href={SPEAKING_LINK}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              ...styles.buttonPrimary,
-              textDecoration: "none",
-              textAlign: "center",
-            }}
-          >
-            Open Goethe Speaking Exams
-          </a>
 
           <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.5, margin: 0 }}>
             Further information:{" "}
