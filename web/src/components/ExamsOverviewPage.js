@@ -5,7 +5,6 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { loadWritingProgress } from "../services/writingProgressService";
-import { fetchPersonalizedPlan } from "../services/personalizationService";
 
 const LAST_VISIT_STORAGE_KEY = "falowen_exam_last_visit";
 const LAST_SECTION_STORAGE_KEY = "falowen_exam_last_section";
@@ -20,14 +19,13 @@ const formatDate = (value, formatter) => {
 
 const ExamsOverviewPage = () => {
   const navigate = useNavigate();
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const { level, resultHistory } = useExam();
   const { user, studentProfile } = useAuth();
   const [lastVisits, setLastVisits] = useState({});
   const [lastSection, setLastSection] = useState("speaking");
   const [writingUpdatedAt, setWritingUpdatedAt] = useState("");
   const [downloadCount, setDownloadCount] = useState(0);
-  const [personalization, setPersonalization] = useState(null);
 
   const dateFormatter = useMemo(
     () =>
@@ -69,68 +67,19 @@ const ExamsOverviewPage = () => {
       setWritingUpdatedAt(progress?.updatedAt || "");
     };
 
-    const fetchPersonalization = async () => {
-      const userId = user?.uid;
-      const studentCode =
-        studentProfile?.studentCode || studentProfile?.studentcode || userId || "";
-      const response = await fetchPersonalizedPlan({
-        studentCode,
-        email: studentProfile?.email,
-        className: studentProfile?.className,
-        level,
-        userId,
-        writingMode: "exam",
-      });
-      if (!isMounted) return;
-      setPersonalization(response || null);
-    };
-
     fetchWritingProgress();
-    fetchPersonalization();
 
     return () => {
       isMounted = false;
     };
   }, [
-    level,
-    studentProfile?.className,
-    studentProfile?.email,
     studentProfile?.studentCode,
     studentProfile?.studentcode,
     user?.uid,
   ]);
 
-  const personalizationRecommendations = personalization?.recommendations || [];
-  const personalizationHighlights = personalization?.highlights || [];
-
   const latestResult = resultHistory[0];
   const resumeSection = lastSection || "speaking";
-
-  const quickStartSteps = [
-    {
-      title: "Confirm your exam level",
-      body: "Use the selector above so every tab (speaking, writing, resources) matches your target level.",
-    },
-    {
-      title: "Choose your focus",
-      body: "Start with speaking warm-ups, then move into writing practice or the study calendar.",
-    },
-    {
-      title: "Save & review",
-      body: "Download your study calendar and keep track of the last session for each tab.",
-    },
-  ];
-
-  const shortcuts = [
-    { key: "speaking", label: "Speaking warm-up", helper: "Prompts + sample PDFs", to: "/exams/speaking" },
-    { key: "writing", label: "Writing practice", helper: "Timed letters + feedback", to: "/exams/writing" },
-    { key: "lesen", label: "Lesen", helper: "Reading practice", to: "/exams/lesen" },
-    { key: "horen", label: "Hören", helper: "Listening practice", to: "/exams/horen" },
-    { key: "vocab", label: "Vocab", helper: "Exam vocabulary", to: "/exams/vocab" },
-    { key: "resources", label: "Resources", helper: "Level links + tips", to: "/exams/resources" },
-    { key: "study", label: "Study calendar", helper: "Download your plan", to: "/exams/study" },
-    { key: "file", label: "Exam file", helper: "Save documents", to: "/exams/file" },
-  ];
 
   const snapshotCards = [
     {
@@ -201,89 +150,6 @@ const ExamsOverviewPage = () => {
         </div>
       </section>
 
-      <section style={{ ...styles.card, border: "1px solid #dbeafe", background: "#eff6ff" }}>
-        <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>{t("personalization.title")}</h3>
-        <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>{t("personalization.subtitle")}</p>
-        {personalizationRecommendations.length ? (
-          <div style={{ display: "grid", gap: 10 }}>
-            <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
-              {personalizationRecommendations.map((item) => (
-                <li key={item.title}>
-                  <strong>{item.title}.</strong>{" "}
-                  <span style={{ color: "#4b5563" }}>{item.detail}</span>
-                </li>
-              ))}
-            </ol>
-            <div>
-              <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
-                {t("personalization.feedbackLabel")}
-              </div>
-              <div style={{ ...styles.helperText, margin: 0 }}>{personalization?.feedback}</div>
-            </div>
-            {personalizationHighlights.length ? (
-              <div>
-                <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
-                  {t("personalization.highlightsLabel")}
-                </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {personalizationHighlights.map((item) => (
-                    <span
-                      key={`${item.label}-${item.value}`}
-                      style={{
-                        padding: "6px 10px",
-                        background: "#fff",
-                        borderRadius: 999,
-                        border: "1px solid #bfdbfe",
-                        fontSize: 12,
-                        color: "#1f2937",
-                      }}
-                    >
-                      <strong>{item.label}:</strong> {item.value}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <p style={{ ...styles.helperText, margin: 0 }}>{t("personalization.fallback")}</p>
-        )}
-      </section>
-
-      <section style={styles.card}>
-        <h3 style={{ ...styles.sectionTitle, marginBottom: 10 }}>Start here</h3>
-        <ol style={{ display: "grid", gap: 10, margin: 0, paddingLeft: 18 }}>
-          {quickStartSteps.map((step) => (
-            <li key={step.title}>
-              <strong>{step.title}.</strong> <span style={{ color: "#4b5563" }}>{step.body}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section style={styles.card}>
-        <h3 style={{ ...styles.sectionTitle, marginBottom: 10 }}>Shortcuts</h3>
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-          {shortcuts.map((shortcut) => (
-            <button
-              key={shortcut.key}
-              type="button"
-              onClick={() => navigate(shortcut.to)}
-              style={{
-                border: "1px solid #e5e7eb",
-                borderRadius: 12,
-                padding: 12,
-                textAlign: "left",
-                background: "#ffffff",
-                cursor: "pointer",
-              }}
-            >
-              <div style={{ fontWeight: 700 }}>{shortcut.label}</div>
-              <div style={{ fontSize: 13, color: "#6b7280", marginTop: 4 }}>{shortcut.helper}</div>
-            </button>
-          ))}
-        </div>
-      </section>
     </div>
   );
 };
