@@ -15,6 +15,19 @@ const getCodeAliases = (studentCode = "") => {
   return [trimmed, trimmed.toLowerCase(), trimmed.toUpperCase()].filter(Boolean);
 };
 
+const getCheckinDocIds = ({ studentUid = "", studentCode = "" } = {}) => {
+  const unique = new Set();
+  const push = (value) => {
+    const normalized = normalizeValue(value);
+    if (normalized) unique.add(normalized);
+  };
+
+  push(studentUid);
+  getCodeAliases(studentCode).forEach((alias) => push(alias));
+
+  return Array.from(unique);
+};
+
 const toBoolean = (value) => {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return value > 0;
@@ -118,6 +131,9 @@ const getCheckinPresentState = (checkin = {}) => {
   if (checkin.present !== undefined) {
     return toBoolean(checkin.present);
   }
+  if (checkin.attended !== undefined) {
+    return toBoolean(checkin.attended);
+  }
 
   const status = String(checkin.status || checkin.attendance || "").trim().toLowerCase();
   if (!status) return null;
@@ -169,12 +185,19 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
   const hasLateFlag =
     (entryIsObject && studentEntry.late === true) || data.late === true;
   const isLate = hasLateFlag || /\b(late|tardy)\b/.test(normalizedStatus);
+  const hasExplicitPresentFlag =
+    entryIsObject && ("present" in studentEntry || "attended" in studentEntry);
+  const explicitPresentValue = hasExplicitPresentFlag
+    ? toBoolean(studentEntry.present ?? studentEntry.attended)
+    : null;
   const statusImpliesPresent = normalizedStatus.includes("present") || normalizedStatus.includes("attended");
   const statusImpliesAbsent = normalizedStatus.includes("absent") || normalizedStatus.includes("missed");
   const present = isPending
     ? null
     : isLate
     ? true
+    : explicitPresentValue !== null
+    ? explicitPresentValue
     : statusImpliesPresent
     ? true
     : statusImpliesAbsent
@@ -212,6 +235,10 @@ export const fetchAttendanceRecords = async ({ className, studentCode, studentUi
   const normalizedClassName = normalizeValue(className);
   const normalizedStudentCode = normalizeValue(studentCode);
   const normalizedStudentUid = normalizeValue(studentUid);
+  const checkinDocIds = getCheckinDocIds({
+    studentUid: normalizedStudentUid,
+    studentCode: normalizedStudentCode,
+  });
 
   if (!normalizedClassName || !normalizedStudentCode || !isFirebaseReady()) {
     return { records: [], sessions: 0, hours: 0 };
@@ -229,26 +256,30 @@ export const fetchAttendanceRecords = async ({ className, studentCode, studentUi
           { level }
         );
 
-        if (!normalizedStudentUid) {
+        if (!checkinDocIds.length) {
           return { record, sessionHours };
         }
 
-        const checkinRef = doc(
-          db,
-          "attendance",
-          normalizedClassName,
-          "sessions",
-          sessionDoc.id,
-          "checkins",
-          normalizedStudentUid
-        );
-        const checkinSnap = await getDoc(checkinRef);
-        if (!checkinSnap.exists()) {
-          return { record, sessionHours };
+        for (const checkinDocId of checkinDocIds) {
+          const checkinRef = doc(
+            db,
+            "attendance",
+            normalizedClassName,
+            "sessions",
+            sessionDoc.id,
+            "checkins",
+            checkinDocId
+          );
+          const checkinSnap = await getDoc(checkinRef);
+          if (!checkinSnap.exists()) {
+            continue;
+          }
+
+          const overriddenRecord = applyCheckinOverride(record, checkinSnap.data() || {});
+          return { record: overriddenRecord, sessionHours };
         }
 
-        const overriddenRecord = applyCheckinOverride(record, checkinSnap.data() || {});
-        return { record: overriddenRecord, sessionHours };
+        return { record, sessionHours };
       })
     );
 
