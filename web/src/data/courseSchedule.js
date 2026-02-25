@@ -770,15 +770,15 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 19,
-      topic: "Verboten and Erlaubt",
+      topic: "Goethe A1 Speaking Confidence Lab",
       chapter: "5.9",
-      goal: "Understand the difference between Erlaubt and Verboten and how to use it in the exams hall",
+      goal: "Build speaking confidence for Goethe A1 with timed drills and exam-style prompts",
       instruction:
         "This chapter has no assignment. Use the workbook notes and Goethe A1 speaking practice tips.",
-      grammar_topic: "Erlaubt and Verboten",
+      grammar_topic: "Goethe A1 Speaking Practice",
       schreiben_sprechen: {
-        video: "https://youtu.be/K5mzR9nY3vM",
-        youtube_link: "https://youtu.be/K5mzR9nY3vM",
+        video: "https://www.youtube.com/watch?v=O6m-GslH2kM",
+        youtube_link: "https://www.youtube.com/watch?v=O6m-GslH2kM",
         assignment: false,
         workbook_link: "https://www.falowen.app/campus/course/verboten-erlaubt-5-9",
       },
