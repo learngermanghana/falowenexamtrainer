@@ -23,6 +23,8 @@ const goetheLevelLinks = {
     { level: "B2", url: "https://bfu.goethe.de/b2_mod_2MX6/hoeren.php" },
     { level: "C1", url: "https://bfu.goethe.de/c1mod/#hoeren" },
   ],
+  sprechen: [{ level: "A1", url: "https://bfu.goethe.de/a1_sd1/sprechen.php" }],
+  schreiben: [{ level: "A1", url: "https://bfu.goethe.de/a1_sd1/schreiben.php" }],
 };
 
 const resources = [
@@ -53,6 +55,8 @@ const ExamResources = () => {
     () => ({
       lesen: goetheLevelLinks.lesen.find((item) => item.level === level),
       horen: goetheLevelLinks.horen.find((item) => item.level === level),
+      sprechen: goetheLevelLinks.sprechen.find((item) => item.level === level),
+      schreiben: goetheLevelLinks.schreiben.find((item) => item.level === level),
     }),
     [level]
   );
@@ -69,7 +73,7 @@ const ExamResources = () => {
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
         <h3 style={{ ...styles.sectionTitle, margin: "0 0 6px 0" }}>
-          Level-aware Goethe links (Lesen & Hören)
+          Level-aware Goethe links (Lesen, Hören, Sprechen & Schreiben)
         </h3>
         <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>
           Showing links for level <strong>{level}</strong>. Switch levels in the Exams Room header.
@@ -113,6 +117,42 @@ const ExamResources = () => {
             ) : (
               <p style={{ ...styles.helperText, margin: 0 }}>
                 No listening link is available for this level yet.
+              </p>
+            )}
+          </div>
+
+          <div style={{ ...styles.card, margin: 0, boxShadow: "none" }}>
+            <h4 style={{ margin: "0 0 6px 0" }}>Sprechen</h4>
+            {levelLinks.sprechen ? (
+              <ul style={{ ...styles.checklist, margin: 0 }}>
+                <li>
+                  <strong>{levelLinks.sprechen.level}:</strong>{" "}
+                  <a href={levelLinks.sprechen.url} target="_blank" rel="noreferrer">
+                    Goethe Sprechen practice
+                  </a>
+                </li>
+              </ul>
+            ) : (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                No speaking link is available for this level yet.
+              </p>
+            )}
+          </div>
+
+          <div style={{ ...styles.card, margin: 0, boxShadow: "none" }}>
+            <h4 style={{ margin: "0 0 6px 0" }}>Schreiben</h4>
+            {levelLinks.schreiben ? (
+              <ul style={{ ...styles.checklist, margin: 0 }}>
+                <li>
+                  <strong>{levelLinks.schreiben.level}:</strong>{" "}
+                  <a href={levelLinks.schreiben.url} target="_blank" rel="noreferrer">
+                    Goethe Schreiben practice
+                  </a>
+                </li>
+              </ul>
+            ) : (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                No writing link is available for this level yet.
               </p>
             )}
           </div>
