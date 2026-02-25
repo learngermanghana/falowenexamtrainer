@@ -4,6 +4,13 @@ import { styles } from "../styles";
 
 const sectionStyle = { ...styles.card, display: "grid", gap: 10 };
 const tableCell = { border: "1px solid #d1d5db", padding: 8, verticalAlign: "top" };
+const quizPromptStyle = {
+  margin: 0,
+  padding: "10px 12px",
+  border: "1px dashed #9ca3af",
+  borderRadius: 8,
+  background: "#f9fafb",
+};
 
 const numbersOneToTwenty = [
   ["0", "Null", "nuu"],
@@ -67,6 +74,16 @@ const GermanNumbersGrammarPage = () => {
             </tbody>
           </table>
         </div>
+        <p style={quizPromptStyle}><strong>Quick test (1-10):</strong> Guess the German word for <strong>8</strong>.</p>
+        <details>
+          <summary>Show answer</summary>
+          <p style={{ marginBottom: 0 }}><strong>8 = acht</strong> (pronounced <em>ahkt</em>).</p>
+        </details>
+        <p style={{ margin: 0 }}>
+          After this 1-10 lesson, go to the <strong>Class members</strong> page from the course area and add your phone number to your bio. Use this sentence starter:
+          {" "}<strong>Meine Telefonnummer ist ...</strong>. Open: {" "}
+          <a href="https://www.falowen.app/campus/course">https://www.falowen.app/campus/course</a>.
+        </p>
       </section>
 
       <section style={sectionStyle}>
@@ -94,6 +111,11 @@ const GermanNumbersGrammarPage = () => {
           <li>90: Neunzig</li>
           <li>100: Hundert</li>
         </ul>
+        <p style={quizPromptStyle}><strong>Quick test (21-100):</strong> Guess the German word for <strong>47</strong>.</p>
+        <details>
+          <summary>Show answer</summary>
+          <p style={{ marginBottom: 0 }}><strong>47 = siebenundvierzig</strong>.</p>
+        </details>
       </section>
 
       <section style={sectionStyle}>
@@ -134,6 +156,11 @@ const GermanNumbersGrammarPage = () => {
           <li>777: Siebenhundertsiebenundsiebzig</li>
           <li>1000: Tausend</li>
         </ul>
+        <p style={quizPromptStyle}><strong>Quick test (100-1000):</strong> Guess the German word for <strong>642</strong>.</p>
+        <details>
+          <summary>Show answer</summary>
+          <p style={{ marginBottom: 0 }}><strong>642 = sechshundertzweiundvierzig</strong>.</p>
+        </details>
       </section>
 
       <section style={sectionStyle}>
@@ -146,6 +173,11 @@ const GermanNumbersGrammarPage = () => {
           <li>7867: Siebentausendachthundertsiebenundsechzig</li>
           <li>10000: Zehntausend</li>
         </ul>
+        <p style={quizPromptStyle}><strong>Quick test (1000-10000):</strong> Guess the German word for <strong>4,326</strong>.</p>
+        <details>
+          <summary>Show answer</summary>
+          <p style={{ marginBottom: 0 }}><strong>4,326 = viertausenddreihundertsechsundzwanzig</strong>.</p>
+        </details>
       </section>
     </main>
   );
