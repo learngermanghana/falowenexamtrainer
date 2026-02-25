@@ -345,27 +345,6 @@ const buildRevisionTasks = (errors) => {
   ];
 };
 
-const calculateStreak = (logEntries) => {
-  if (!logEntries.length) return 0;
-  const dates = [...logEntries]
-    .map((entry) => new Date(entry.completedAt).toDateString())
-    .filter(Boolean);
-  const uniqueDates = Array.from(new Set(dates)).sort((a, b) => new Date(b) - new Date(a));
-  let streak = 1;
-  let current = new Date(uniqueDates[0]);
-  for (let index = 1; index < uniqueDates.length; index += 1) {
-    const date = new Date(uniqueDates[index]);
-    const diffDays = Math.round((current - date) / (1000 * 60 * 60 * 24));
-    if (diffDays === 1) {
-      streak += 1;
-      current = date;
-    } else {
-      break;
-    }
-  }
-  return streak;
-};
-
 const WordCountMeter = ({ count, range }) => {
   if (!range) return null;
   const progress = Math.min((count / range.max) * 100, 100);
@@ -447,15 +426,8 @@ const WritingPage = ({ mode = "course" }) => {
   const [workflowComplete, setWorkflowComplete] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
   const [latestTutorReview, setLatestTutorReview] = useState(null);
-  const [mockExamMode, setMockExamMode] = useState(false);
-  const [showOutlineHelper, setShowOutlineHelper] = useState(true);
   const [examFocusMode, setExamFocusMode] = useState(false);
   const [pendingExamStart, setPendingExamStart] = useState(false);
-  const [promptFilters, setPromptFilters] = useState({
-    theme: "all",
-    type: "all",
-    formality: "all",
-  });
   const [rubricChecklist, setRubricChecklist] = useState({
     task: false,
     coherence: false,
@@ -482,35 +454,9 @@ const WritingPage = ({ mode = "course" }) => {
 
     return writingTasks;
   }, [isExamMode, level, writingTasks]);
-  const taskFilterOptions = useMemo(() => {
-    const themes = new Set();
-    const types = new Set();
-    const formalities = new Set();
-    visibleWritingTasks.forEach((task) => {
-      const meta = derivePromptMeta(task);
-      themes.add(meta.theme);
-      types.add(meta.type);
-      formalities.add(meta.formality);
-    });
-    return {
-      themes: Array.from(themes).sort(),
-      types: Array.from(types).sort(),
-      formalities: Array.from(formalities).sort(),
-    };
-  }, [visibleWritingTasks]);
-  const filteredWritingTasks = useMemo(() => {
-    return visibleWritingTasks.filter((task) => {
-      const meta = derivePromptMeta(task);
-      const themeMatch = promptFilters.theme === "all" || meta.theme === promptFilters.theme;
-      const typeMatch = promptFilters.type === "all" || meta.type === promptFilters.type;
-      const formalityMatch =
-        promptFilters.formality === "all" || meta.formality === promptFilters.formality;
-      return themeMatch && typeMatch && formalityMatch;
-    });
-  }, [promptFilters, visibleWritingTasks]);
   const selectedLetter = useMemo(
-    () => filteredWritingTasks.find((item) => item.id === selectedLetterId),
-    [selectedLetterId, filteredWritingTasks]
+    () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
+    [selectedLetterId, visibleWritingTasks]
   );
   const [remainingSeconds, setRemainingSeconds] = useState(
     (selectedLetter?.durationMinutes || 0) * 60
@@ -557,8 +503,6 @@ const WritingPage = ({ mode = "course" }) => {
   const activeTargetLevel = selectedLetter?.level || level;
   const wordTarget = WORD_TARGETS[activeTargetLevel];
   const wordRange = WORD_TARGET_RANGES[activeTargetLevel];
-  const mockHintsLocked = mockExamMode && remainingSeconds > 0;
-
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
       setLevel(profileLevel);
@@ -612,14 +556,14 @@ const WritingPage = ({ mode = "course" }) => {
   }, [examWritingLetters, isExamMode, loadWritingTasks]);
 
   useEffect(() => {
-    if (!filteredWritingTasks.length) return;
+    if (!visibleWritingTasks.length) return;
     if (
       !selectedLetterId ||
-      !filteredWritingTasks.some((item) => item.id === selectedLetterId)
+      !visibleWritingTasks.some((item) => item.id === selectedLetterId)
     ) {
-      setSelectedLetterId(filteredWritingTasks[0].id);
+      setSelectedLetterId(visibleWritingTasks[0].id);
     }
-  }, [filteredWritingTasks, selectedLetterId]);
+  }, [visibleWritingTasks, selectedLetterId]);
 
   const selectedDurationMinutes = selectedLetter?.durationMinutes;
 
@@ -669,10 +613,8 @@ const WritingPage = ({ mode = "course" }) => {
       setCompletionLog([]);
       setErrorBank([]);
       setPlanOutline([]);
-      setShowOutlineHelper(true);
       setExamFocusMode(false);
       setPendingExamStart(false);
-      setPromptFilters({ theme: "all", type: "all", formality: "all" });
     };
 
     const loadProgress = async () => {
@@ -731,16 +673,6 @@ const WritingPage = ({ mode = "course" }) => {
         if (Array.isArray(saved.planOutline)) {
           setPlanOutline(saved.planOutline);
         }
-        if (typeof saved.showOutlineHelper === "boolean") {
-          setShowOutlineHelper(saved.showOutlineHelper);
-        }
-        if (saved.promptFilters) {
-          setPromptFilters({
-            theme: saved.promptFilters.theme || "all",
-            type: saved.promptFilters.type || "all",
-            formality: saved.promptFilters.formality || "all",
-          });
-        }
       } catch (err) {
         console.error("Failed to load writing progress", err);
       } finally {
@@ -781,8 +713,6 @@ const WritingPage = ({ mode = "course" }) => {
           completionLog,
           errorBank,
           planOutline,
-          showOutlineHelper,
-          promptFilters,
         },
       }).catch((err) => {
         console.error("Failed to save writing progress", err);
@@ -801,14 +731,12 @@ const WritingPage = ({ mode = "course" }) => {
     reflectionText,
     revisedDraftText,
     planOutline,
-    promptFilters,
     practiceDraft,
     progressLoaded,
     progressMode,
     remainingSeconds,
     rubricBreakdown,
     selectedDraftIds,
-    showOutlineHelper,
     timerRunning,
     typedAnswer,
     workflowComplete,
@@ -824,16 +752,15 @@ const WritingPage = ({ mode = "course" }) => {
   };
 
   const handleRandomPrompt = () => {
-    if (!filteredWritingTasks.length) return;
-    const random = filteredWritingTasks[Math.floor(Math.random() * filteredWritingTasks.length)];
+    if (!visibleWritingTasks.length) return;
+    const random = visibleWritingTasks[Math.floor(Math.random() * visibleWritingTasks.length)];
     setSelectedLetterId(random.id);
   };
 
   const handleStartExamPreset = () => {
-    if (!filteredWritingTasks.length) return;
-    const random = filteredWritingTasks[Math.floor(Math.random() * filteredWritingTasks.length)];
+    if (!visibleWritingTasks.length) return;
+    const random = visibleWritingTasks[Math.floor(Math.random() * visibleWritingTasks.length)];
     setSelectedLetterId(random.id);
-    setMockExamMode(true);
     setPendingExamStart(true);
     setRemainingSeconds((random.durationMinutes || 0) * 60);
     setExamFocusMode(true);
@@ -1169,15 +1096,6 @@ const WritingPage = ({ mode = "course" }) => {
   const practiceWordCount = countWords(practiceDraft);
   const typedWordCount = countWords(typedAnswer);
   const typedWordRange = WORD_TARGET_RANGES[level];
-  const completionStats = useMemo(() => {
-    const lastEntry = completionLog[completionLog.length - 1];
-    const bestScore = completionLog.reduce((best, entry) => Math.max(best, entry.score || 0), 0);
-    return {
-      streak: calculateStreak(completionLog),
-      lastCompleted: lastEntry?.completedAt || null,
-      bestScore,
-    };
-  }, [completionLog]);
   const revisionTasks = useMemo(() => buildRevisionTasks(errorBank), [errorBank]);
   const latestImprovementNotes = useMemo(() => {
     if (!draftHistory.length) return [];
@@ -1256,14 +1174,14 @@ const WritingPage = ({ mode = "course" }) => {
         <button
           style={styles.secondaryButton}
           onClick={handleRandomPrompt}
-          disabled={!filteredWritingTasks.length}
+          disabled={!visibleWritingTasks.length}
         >
           Random prompt
         </button>
         <button
           style={styles.primaryButton}
           onClick={handleStartExamPreset}
-          disabled={!filteredWritingTasks.length}
+          disabled={!visibleWritingTasks.length}
         >
           Start exam preset
         </button>
@@ -1325,76 +1243,19 @@ const WritingPage = ({ mode = "course" }) => {
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Your simulation room</h3>
             {practiceTimerControls}
-            <div style={{ ...styles.helperCard, marginTop: 12 }}>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>Progress snapshot</div>
-              <div style={{ display: "grid", gap: 6 }}>
-                <div>
-                  <strong>Streak:</strong> {completionStats.streak} day
-                  {completionStats.streak === 1 ? "" : "s"}
-                </div>
-                <div>
-                  <strong>Last completed:</strong>{" "}
-                  {completionStats.lastCompleted
-                    ? new Date(completionStats.lastCompleted).toLocaleDateString()
-                    : "No submissions yet"}
-                </div>
-                <div>
-                  <strong>Best feedback score:</strong> {completionStats.bestScore || "—"}
-                </div>
-              </div>
-            </div>
-            <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-              <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14 }}>
-                <input
-                  type="checkbox"
-                  checked={mockExamMode}
-                  onChange={(event) => setMockExamMode(event.target.checked)}
-                />
-                Mock exam mode (hide hints until timer ends)
-              </label>
-              {mockExamMode ? (
-                <span style={{ ...styles.badge, background: "#fee2e2", color: "#991b1b" }}>
-                  Hints locked while timer is running
-                </span>
-              ) : null}
-            </div>
             {selectedLetter && (
               <>
                 <div style={styles.badge}>Topic: {selectedLetter.letter}</div>
                 <p style={styles.helperText}>{selectedLetter.situation}</p>
-                {mockHintsLocked ? (
-                  <p style={{ ...styles.helperText, marginTop: 6 }}>
-                    Checklist and hints unlock once the timer reaches 00:00.
-                  </p>
-                ) : (
-                  <>
-                    <h4 style={styles.resultHeading}>Checklist</h4>
-                    <ul style={styles.checklist}>
-                      {(selectedLetter.whatToInclude || []).map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </>
-                )}
+                <h4 style={styles.resultHeading}>Checklist</h4>
+                <ul style={styles.checklist}>
+                  {(selectedLetter.whatToInclude || []).map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
               </>
             )}
             <div style={{ marginTop: 12 }}>
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
-                <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 14 }}>
-                  <input
-                    type="checkbox"
-                    checked={showOutlineHelper}
-                    onChange={(event) => setShowOutlineHelper(event.target.checked)}
-                    disabled={mockHintsLocked}
-                  />
-                  Show outline helper
-                </label>
-                {mockHintsLocked ? (
-                  <span style={{ ...styles.badge, background: "#fee2e2", color: "#991b1b" }}>
-                    Outline hidden during mock exam timer
-                  </span>
-                ) : null}
-              </div>
               <label style={styles.label}>Your draft</label>
               <textarea
                 style={styles.textArea}
@@ -1403,42 +1264,21 @@ const WritingPage = ({ mode = "course" }) => {
                 onChange={(e) => setPracticeDraft(e.target.value)}
                 rows={7}
               />
-              {!mockHintsLocked && showOutlineHelper ? (
-                <div style={{ ...styles.helperCard, marginTop: 10 }}>
-                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Outline helper</div>
-                  <div style={{ display: "grid", gap: 8 }}>
-                    {(selectedLetter?.whatToInclude?.length
-                      ? selectedLetter.whatToInclude.map((point) => ({
-                          title: "Bullet point",
-                          hint: point,
-                        }))
-                      : DEFAULT_OUTLINE
-                    ).map((step, index) => (
-                      <div key={`${step.title}-${index}`} style={styles.outlineStep}>
-                        <div style={{ fontWeight: 700 }}>{step.title}</div>
-                        <div style={styles.helperText}>{step.hint}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
               <p style={styles.helperText}>
                 Words: {practiceWordCount} · Characters: {practiceDraft.length}
-                {!mockHintsLocked && wordTarget ? ` · Target: ${wordTarget}` : ""}
+                {wordTarget ? ` · Target: ${wordTarget}` : ""}
               </p>
-              {!mockHintsLocked ? <WordCountMeter count={practiceWordCount} range={wordRange} /> : null}
+              <WordCountMeter count={practiceWordCount} range={wordRange} />
               <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button
                   style={styles.secondaryButton}
                   onClick={() => handleInsertSnippet(TEMPLATE_SNIPPETS.formal)}
-                  disabled={mockHintsLocked}
                 >
                   Insert formal snippet
                 </button>
                 <button
                   style={styles.secondaryButton}
                   onClick={() => handleInsertSnippet(TEMPLATE_SNIPPETS.informal)}
-                  disabled={mockHintsLocked}
                 >
                   Insert informal snippet
                 </button>
@@ -1457,73 +1297,6 @@ const WritingPage = ({ mode = "course" }) => {
 
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Letters from the practice set</h3>
-            <div style={styles.filterPanel}>
-              <div style={{ fontWeight: 700 }}>Prompt filters</div>
-              <div style={styles.filterRow}>
-                <label style={styles.label}>
-                  Topic/theme
-                  <select
-                    style={styles.select}
-                    value={promptFilters.theme}
-                    onChange={(event) =>
-                      setPromptFilters((prev) => ({ ...prev, theme: event.target.value }))
-                    }
-                  >
-                    <option value="all">All themes</option>
-                    {taskFilterOptions.themes.map((theme) => (
-                      <option key={theme} value={theme}>
-                        {theme}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label style={styles.label}>
-                  Type
-                  <select
-                    style={styles.select}
-                    value={promptFilters.type}
-                    onChange={(event) =>
-                      setPromptFilters((prev) => ({ ...prev, type: event.target.value }))
-                    }
-                  >
-                    <option value="all">All types</option>
-                    {taskFilterOptions.types.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label style={styles.label}>
-                  Formality
-                  <select
-                    style={styles.select}
-                    value={promptFilters.formality}
-                    onChange={(event) =>
-                      setPromptFilters((prev) => ({ ...prev, formality: event.target.value }))
-                    }
-                  >
-                    <option value="all">All formalities</option>
-                    {taskFilterOptions.formalities.map((formality) => (
-                      <option key={formality} value={formality}>
-                        {formality}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button
-                  style={styles.secondaryButton}
-                  onClick={() => setPromptFilters({ theme: "all", type: "all", formality: "all" })}
-                >
-                  Clear filters
-                </button>
-                <span style={styles.helperText}>
-                  Showing {filteredWritingTasks.length} prompts
-                </span>
-              </div>
-            </div>
             {writingTasksError && (
               <div style={{ ...styles.helperText, color: "#b91c1c" }}>
                 <p style={{ marginBottom: 8 }}>{writingTasksError}</p>
@@ -1542,13 +1315,9 @@ const WritingPage = ({ mode = "course" }) => {
               <p style={styles.helperText}>
                 No writing tasks are available for this level. Please adjust your level or try again later.
               </p>
-            ) : filteredWritingTasks.length === 0 ? (
-              <p style={styles.helperText}>
-                No prompts match the selected filters. Try clearing one filter.
-              </p>
             ) : (
               <div style={styles.gridTwo}>
-                {filteredWritingTasks.map((item) => {
+                {visibleWritingTasks.map((item) => {
                   const meta = derivePromptMeta(item);
                   return (
                   <div
