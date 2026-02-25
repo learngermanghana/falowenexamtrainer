@@ -524,7 +524,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "https://youtu.be/lN7xxSbkPZ4",
         youtube_link: "https://youtu.be/lN7xxSbkPZ4",
-        grammarbook_link: "https://drive.google.com/file/d/12jHQvlNK-2JV0G6vY1UMho_UvzlcIrB8/view?usp=sharing",
+        grammarbook_link: "https://www.falowen.app/campus/course/german-numbers-1-10-with-pronunciation",
         workbook_link: "https://drive.google.com/file/d/1C4VZDUj7VT27Qrn9vS5MNc3QfRqpmDGE/view?usp=sharing",
         assignment: true,
       },

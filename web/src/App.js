@@ -20,6 +20,7 @@ import CourseStructurePage from "./components/CourseStructurePage";
 import CourseResourceViewerPage from "./components/CourseResourceViewerPage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage";
+import GermanNumbersGrammarPage from "./components/GermanNumbersGrammarPage";
 import ObjectsAndColorsPage from "./components/ObjectsAndColorsPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
@@ -521,6 +522,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
+          <Route path="/campus/course/german-numbers-1-10-with-pronunciation" element={<GermanNumbersGrammarPage />} />
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
           <Route
             path="/campus/course/singular-pronouns-verb-conjugation-day-2"
