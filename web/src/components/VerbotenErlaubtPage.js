@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 
+const FALOWEN_SPEAKING_URL =
+  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
+
 const Section = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 12 }}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -37,7 +40,10 @@ const Callout = ({ children }) => (
 const Checklist = ({ items }) => (
   <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
     {items.map((item) => (
-      <li key={item} style={{ display: "grid", gridTemplateColumns: "18px 1fr", gap: 8 }}>
+      <li
+        key={item}
+        style={{ display: "grid", gridTemplateColumns: "18px 1fr", gap: 8 }}
+      >
         <span>✅</span>
         <span>{item}</span>
       </li>
@@ -47,19 +53,32 @@ const Checklist = ({ items }) => (
 
 const VerbotenErlaubtPage = () => {
   const navigate = useNavigate();
+
+  // Timer state
   const [secondsLeft, setSecondsLeft] = useState(60);
   const [isRunning, setIsRunning] = useState(false);
+
+  // Random practice cards state
   const [teil2Prompt, setTeil2Prompt] = useState(null);
   const [teil3Prompt, setTeil3Prompt] = useState(null);
 
-  const teil2Questions = useMemo(
-    () => speakingSheetQuestions.filter((item) => item.teilId === "teil-2"),
-    []
-  );
-  const teil3Questions = useMemo(
-    () => speakingSheetQuestions.filter((item) => item.teilId === "teil-3"),
-    []
-  );
+  // ✅ Show Falowen next-step callout after timer ends
+  const [showFalowenNextStep, setShowFalowenNextStep] = useState(false);
+
+  // ✅ ONLY A1 (no A2, no B levels)
+  const a1Only = useMemo(() => {
+    return speakingSheetQuestions.filter(
+      (item) => String(item.level || "").toUpperCase().trim() === "A1"
+    );
+  }, []);
+
+  const teil2Questions = useMemo(() => {
+    return a1Only.filter((item) => item.teilId === "teil-2");
+  }, [a1Only]);
+
+  const teil3Questions = useMemo(() => {
+    return a1Only.filter((item) => item.teilId === "teil-3");
+  }, [a1Only]);
 
   const formatTime = (totalSeconds) => {
     const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
@@ -67,11 +86,14 @@ const VerbotenErlaubtPage = () => {
     return `${minutes}:${seconds}`;
   };
 
-  const pickRandomPrompt = (items) => items[Math.floor(Math.random() * items.length)] || null;
+  const pickRandomPrompt = (items) =>
+    items[Math.floor(Math.random() * items.length)] || null;
 
   const drawRandomPracticeCards = useCallback(() => {
     setTeil2Prompt(pickRandomPrompt(teil2Questions));
     setTeil3Prompt(pickRandomPrompt(teil3Questions));
+    // When they draw new cards, hide next-step until they finish the next round
+    setShowFalowenNextStep(false);
   }, [teil2Questions, teil3Questions]);
 
   useEffect(() => {
@@ -79,94 +101,81 @@ const VerbotenErlaubtPage = () => {
   }, [drawRandomPracticeCards]);
 
   useEffect(() => {
-    if (!isRunning) {
-      return undefined;
-    }
+    if (!isRunning) return undefined;
+
     const intervalId = window.setInterval(() => {
       setSecondsLeft((current) => {
         if (current <= 1) {
           window.clearInterval(intervalId);
           setIsRunning(false);
+          // ✅ Timer finished → show Falowen next step
+          setShowFalowenNextStep(true);
           return 0;
         }
         return current - 1;
       });
     }, 1000);
+
     return () => window.clearInterval(intervalId);
   }, [isRunning]);
 
   const startTimer = () => {
-    if (secondsLeft === 0) {
-      setSecondsLeft(60);
-    }
+    // Starting a new timed round hides the next-step callout (until time ends)
+    setShowFalowenNextStep(false);
+    if (secondsLeft === 0) setSecondsLeft(60);
     setIsRunning(true);
   };
 
   const pauseTimer = () => setIsRunning(false);
+
   const resetTimer = () => {
     setIsRunning(false);
     setSecondsLeft(60);
+    setShowFalowenNextStep(false);
+  };
+
+  const openSpeakingPractice = () => {
+    window.open(FALOWEN_SPEAKING_URL, "_blank", "noopener,noreferrer");
   };
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
+        <button
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+          onClick={() => navigate("/campus/course")}
+        >
           Back to Course
         </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Day 19: Goethe A1 Speaking Confidence Lab</h1>
+
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>
+          Day 19: Goethe A1 Speaking Confidence Lab
+        </h1>
+
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Chapter 5.9 — timed speaking drills + random Teil 2 and Teil 3 prompts from our speaking exam sheet.
+          Chapter 5.9 — random Teil 2 & Teil 3 cards + timed confidence drill.
         </p>
-        <a href="https://www.youtube.com/watch?v=O6m-GslH2kM" target="_blank" rel="noreferrer">
+
+        <a
+          href="https://www.youtube.com/watch?v=O6m-GslH2kM"
+          target="_blank"
+          rel="noreferrer"
+        >
           Watch: Goethe-Zertifikat A1 Start Deutsch 1 – Sprechen (oral exam)
         </a>
       </div>
 
-      <Section title="1) Confidence Timer (Press Play and Speak)">
-        <p style={{ margin: 0 }}>
-          Most students lose marks because of confidence, not grammar. Use this one-minute timer: press play, speak
-          continuously, and keep your voice calm and clear.
-        </p>
-        <div
-          style={{
-            border: "1px solid #dbeafe",
-            borderRadius: 12,
-            background: "#eff6ff",
-            padding: 16,
-            display: "grid",
-            gap: 12,
-            justifyItems: "center",
-          }}
-        >
-          <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: 1 }}>{formatTime(secondsLeft)}</div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
-            <button style={styles.primaryButton} onClick={startTimer} disabled={isRunning}>
-              ▶️ Play
-            </button>
-            <button style={styles.secondaryButton} onClick={pauseTimer} disabled={!isRunning}>
-              ⏸ Pause
-            </button>
-            <button style={styles.secondaryButton} onClick={resetTimer}>
-              ↺ Reset
-            </button>
-          </div>
-        </div>
-        <Checklist
-          items={[
-            "Teil 1: speak about yourself for 60 seconds without stopping.",
-            "Teil 2: ask one question + answer one question in full sentences.",
-            "Teil 3: make one polite request and react politely.",
-            "Repeat daily. Confidence comes from timed repetition.",
-          ]}
-        />
-      </Section>
-
       <Section title="2) Chapter 5.9 quick language recap — erlaubt vs. verboten">
         <Callout>
           <strong>Meaning</strong>
-          <BulletList items={["erlaubt = allowed / permitted", "verboten = forbidden / not allowed"]} />
+          <BulletList
+            items={[
+              "erlaubt = allowed / permitted",
+              "verboten = forbidden / not allowed",
+            ]}
+          />
         </Callout>
+
         <h3 style={{ margin: "8px 0 0" }}>The easiest A1 sentences</h3>
         <BulletList
           items={[
@@ -175,7 +184,10 @@ const VerbotenErlaubtPage = () => {
             "Das ist verboten. (That is forbidden.)",
           ]}
         />
-        <h3 style={{ margin: "8px 0 0" }}>Questions you can use in the exam center / exam hall</h3>
+
+        <h3 style={{ margin: "8px 0 0" }}>
+          Questions you can use in the exam center / exam hall
+        </h3>
         <BulletList
           items={[
             "Ist das erlaubt? (Is that allowed?)",
@@ -186,9 +198,12 @@ const VerbotenErlaubtPage = () => {
             "Darf ich hier essen oder trinken?",
           ]}
         />
+
         <Callout>
           <strong>Very common sign</strong>
-          <p style={{ margin: 0 }}>A typical card/sign is <em>nicht rauchen!</em> (no smoking).</p>
+          <p style={{ margin: 0 }}>
+            A typical card/sign is <em>nicht rauchen!</em> (no smoking).
+          </p>
           <BulletList
             items={[
               "Rauchen ist hier verboten.",
@@ -208,6 +223,7 @@ const VerbotenErlaubtPage = () => {
             "Each part is about 5 minutes",
           ]}
         />
+
         <h3 style={{ margin: "8px 0 0" }}>The 3 parts</h3>
         <BulletList
           items={[
@@ -216,16 +232,20 @@ const VerbotenErlaubtPage = () => {
             "Teil 3: Bitte formulieren und darauf reagieren (make requests + respond)",
           ]}
         />
+
         <Callout>
           <strong>Important exam hall rule</strong>
           <p style={{ margin: 0 }}>
-            During the real exam, aids like dictionaries or mobile phones are <strong>not allowed</strong>.
+            During the real exam, aids like dictionaries or mobile phones are{" "}
+            <strong>not allowed</strong>.
           </p>
         </Callout>
       </Section>
 
       <Section title="4) What to do in each Teil (simple A1 templates)">
-        <h3 style={{ margin: 0 }}>Teil 1 — Introduce yourself (short + clear)</h3>
+        <h3 style={{ margin: 0 }}>
+          Teil 1 — Introduce yourself (short + clear)
+        </h3>
         <BulletList
           items={[
             "Ich heiße …",
@@ -237,9 +257,16 @@ const VerbotenErlaubtPage = () => {
             "Mein Hobby ist …",
           ]}
         />
+
         <h3 style={{ margin: "8px 0 0" }}>Teil 2 — Ask & answer questions</h3>
-        <BulletList items={["Wo …? / Wann …? / Was …? / Wie …?", "Haben Sie …? / Essen Sie …? / Kaufen Sie …?"]} />
+        <BulletList
+          items={[
+            "Wo …? / Wann …? / Was …? / Wie …?",
+            "Haben Sie …? / Essen Sie …? / Kaufen Sie …?",
+          ]}
+        />
         <p style={{ margin: 0 }}>Then answer with a simple full sentence.</p>
+
         <h3 style={{ margin: "8px 0 0" }}>Teil 3 — Requests + reactions</h3>
         <Callout>
           <strong>Make a request (choose one)</strong>
@@ -256,30 +283,32 @@ const VerbotenErlaubtPage = () => {
         </Callout>
       </Section>
 
+      {/* ✅ Random cards first */}
       <Section title="5) Random practice cards for Teil 2 + Teil 3">
         <p style={{ margin: 0 }}>
-          We now pull random prompts from the speaking question sheet (headers: Level, Teil, Topic/Prompt,
-          Keyword/Subtopic). Click below and practise both cards back-to-back.
+          We pull random <strong>A1 only</strong> prompts from the speaking question sheet.
+          Practise both cards back-to-back.
         </p>
+
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <button style={styles.primaryButton} onClick={drawRandomPracticeCards}>
             Draw Random Questions
           </button>
-          <a
-            style={{ ...styles.secondaryButton, textDecoration: "none", display: "inline-flex", alignItems: "center" }}
-            href="https://docs.google.com/spreadsheets/d/e/2PACX-1vQOBThuga7fR-PiYFEkR0zsfBanlQiRRDAQKl0FQkc--GUkZBkS4SrOz9p6R9ONTCGzSGdDmMBBiTK3/pub?output=csv"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Open Published CSV
-          </a>
         </div>
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+
+        <div
+          style={{
+            display: "grid",
+            gap: 12,
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          }}
+        >
           <Callout>
             <strong>Teil 2 prompt</strong>
             <p style={{ margin: 0 }}>{teil2Prompt?.text || "No prompt available yet."}</p>
             <p style={{ margin: 0, color: "#0f172a" }}>{teil2Prompt?.hint || ""}</p>
           </Callout>
+
           <Callout>
             <strong>Teil 3 prompt</strong>
             <p style={{ margin: 0 }}>{teil3Prompt?.text || "No prompt available yet."}</p>
@@ -288,35 +317,80 @@ const VerbotenErlaubtPage = () => {
         </div>
       </Section>
 
-      <Section title="6) How to practise on Falowen">
+      {/* ✅ Timer AFTER random cards and connected to them */}
+      <Section title="6) Confidence Timer (Press Play and Speak)">
         <p style={{ margin: 0 }}>
-          Open the speaking practice link and use your checklist exactly like exam training:
+          Use the <strong>cards you just drew above</strong>. Press play and speak continuously for 60 seconds,
+          calm and clear.
         </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          <button
-            style={styles.primaryButton}
-            onClick={() =>
-              window.open(
-                "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec",
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
-          >
-            Open Goethe Speaking Exams
-          </button>
+
+        <Callout>
+          <strong>How to use it (connect it to the cards)</strong>
+          <BulletList
+            items={[
+              "Look at the Teil 2 card: ask ONE full question + answer it.",
+              "Look at the Teil 3 card: make ONE polite request + react politely.",
+              "Repeat smoothly without stopping until the timer ends.",
+            ]}
+          />
+        </Callout>
+
+        <div
+          style={{
+            border: "1px solid #dbeafe",
+            borderRadius: 12,
+            background: "#eff6ff",
+            padding: 16,
+            display: "grid",
+            gap: 12,
+            justifyItems: "center",
+          }}
+        >
+          <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: 1 }}>
+            {formatTime(secondsLeft)}
+          </div>
+
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
+            <button style={styles.primaryButton} onClick={startTimer} disabled={isRunning}>
+              ▶️ Play
+            </button>
+            <button style={styles.secondaryButton} onClick={pauseTimer} disabled={!isRunning}>
+              ⏸ Pause
+            </button>
+            <button style={styles.secondaryButton} onClick={resetTimer}>
+              ↺ Reset
+            </button>
+          </div>
         </div>
+
         <Checklist
           items={[
-            "Click Open Goethe Speaking Exams and enter your Student Code.",
-            "Go to Question tab and choose: Teil 1 / Teil 2 / Teil 3.",
-            "Read the description carefully before you start.",
-            "Click Start Recording, then ask/answer yourself (like a real exam).",
-            "Click Ask & AI for marking, feedback, and results.",
-            "Optional: tick the checkbox to use the AI as your speaking partner.",
-            "Tip: do Teil 3 daily — it builds fast confidence.",
+            "Teil 1: speak about yourself for 60 seconds without stopping (optional warm-up).",
+            "Teil 2: ask one question + answer one question in full sentences (use the drawn card).",
+            "Teil 3: make one polite request and react politely (use the drawn card).",
+            "Repeat daily. Confidence comes from timed repetition.",
           ]}
         />
+
+        {/* ✅ Appears ONLY after timer ends */}
+        {showFalowenNextStep && (
+          <Callout>
+            <strong>✅ Time! Next step (real exam mode)</strong>
+            <BulletList
+              items={[
+                "Open Falowen",
+                "Enter your Student Code",
+                "Do 1 real prompt (Teil 2 or Teil 3)",
+                "Click “Ask & AI” for marking and feedback",
+              ]}
+            />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <button style={styles.primaryButton} onClick={openSpeakingPractice}>
+                Open Falowen Practice
+              </button>
+            </div>
+          </Callout>
+        )}
       </Section>
 
       <Section title="7) Pass strategy (A1 speaking) — simple rules that work">
@@ -329,6 +403,7 @@ const VerbotenErlaubtPage = () => {
             "You speak actively (don’t stay silent)",
           ]}
         />
+
         <h3 style={{ margin: "8px 0 0" }}>✅ Common mistakes to avoid</h3>
         <BulletList
           items={[
@@ -337,6 +412,7 @@ const VerbotenErlaubtPage = () => {
             "Speaking too fast (slow = clearer = better)",
           ]}
         />
+
         <Callout>
           <strong>Mini final checklist (before the exam)</strong>
           <Checklist
