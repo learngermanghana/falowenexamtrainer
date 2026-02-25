@@ -113,6 +113,74 @@ const DEFAULT_OUTLINE = [
   { title: "Closing", hint: "Polite closing line." },
 ];
 
+const A1_FORM_PRACTICE_TASKS = [
+  {
+    id: "lake-tour-booking",
+    title: "Family day trip booking",
+    context:
+      "Your friend Ana travels with her husband and two children (ages 7 and 10). She wants to book a Sunday bus tour around a lake resort area and can only pay in cash.",
+    prompt:
+      "Complete the missing details in the registration form.",
+    formFields: [
+      { label: "Surname, first name", value: "Neto, Ana (example)" },
+      { label: "Number of people", value: "(1)" },
+      { label: "Children", value: "(2)" },
+      {
+        label: "Holiday address",
+        value: "Hotel Seeblick, Lindenweg 12, 78462 (3)",
+      },
+      { label: "Payment method", value: "(4) cash / card" },
+      { label: "Travel date", value: "(5)" },
+      { label: "Signature", value: "Ana Neto" },
+    ],
+    answers: [
+      { blank: "(1)", answer: "4 / vier", explanation: "Ana, her husband, and two children = four people." },
+      { blank: "(2)", answer: "2 / zwei", explanation: "Two of the travelers are children." },
+      {
+        blank: "(3)",
+        answer: "Seedorf",
+        explanation: "The town name belongs after the postal code.",
+      },
+      {
+        blank: "(4)",
+        answer: "cash / bar",
+        explanation: "The context says she does not use a credit card.",
+      },
+      {
+        blank: "(5)",
+        answer: "Sunday / nächsten Sonntag",
+        explanation: "She booked the bus tour for next Sunday.",
+      },
+    ],
+  },
+  {
+    id: "youth-camp-registration",
+    title: "Youth camp registration",
+    context:
+      "Your cousin Karim registers for a German summer camp. He travels with his sister (13) and his brother (9). They stay in München and arrive on Monday.",
+    prompt: "Fill in the missing information in the camp form.",
+    formFields: [
+      { label: "Surname, first name", value: "Benali, Karim (example)" },
+      { label: "Total participants", value: "(1)" },
+      { label: "Children under 14", value: "(2)" },
+      { label: "City", value: "(3)" },
+      { label: "Payment", value: "bank transfer / (4)" },
+      { label: "Arrival day", value: "(5)" },
+    ],
+    answers: [
+      { blank: "(1)", answer: "3 / drei", explanation: "Karim plus two siblings equals three participants." },
+      { blank: "(2)", answer: "2 / zwei", explanation: "The sister and brother are both under 14." },
+      { blank: "(3)", answer: "München", explanation: "Their holiday location is München." },
+      {
+        blank: "(4)",
+        answer: "cash / bar",
+        explanation: "Alternative payment option in the form is cash.",
+      },
+      { blank: "(5)", answer: "Monday / Montag", explanation: "The context states they arrive on Monday." },
+    ],
+  },
+];
+
 const mapExamPromptsToLetters = (prompts) =>
   Object.entries(prompts).flatMap(([level, entries]) =>
     (entries || []).map((item, index) => ({
@@ -466,6 +534,8 @@ const WritingPage = ({ mode = "course" }) => {
   const isA1Student = isLevelLocked && profileLevel === "A1";
   const canUseIdeasGenerator = !isA1Student;
   const canUsePracticeLetters = isExamMode ? true : !isA1Student;
+  const canUseFormsPractice = isExamMode && level === "A1";
+  const [revealedFormAnswers, setRevealedFormAnswers] = useState({});
   const availableTabs = useMemo(() => {
     const tabs = [{ key: "mark", label: "Mark my letter" }];
 
@@ -477,8 +547,12 @@ const WritingPage = ({ mode = "course" }) => {
       tabs.unshift({ key: "practice", label: "Practice letters" });
     }
 
+    if (canUseFormsPractice) {
+      tabs.push({ key: "forms", label: "Forms (A1 Teil 1)" });
+    }
+
     return tabs;
-  }, [canUseIdeasGenerator, canUsePracticeLetters]);
+  }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters]);
   const progressMode = isExamMode ? "exam" : "course";
   const activeTargetLevel = selectedLetter?.level || level;
   const wordTarget = WORD_TARGETS[activeTargetLevel];
@@ -1220,6 +1294,14 @@ const WritingPage = ({ mode = "course" }) => {
             ? "Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help."
             : "A1 students should use Mark my letter to get focused feedback on their draft."}
         </p>
+        <div style={{ ...styles.helperCard, marginTop: 10 }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            This page gives you two writing paths: practice letters (Teil 2) and A1 forms (Teil 1).
+            Use <strong>Mark my letter</strong> whenever you want corrections and tutor feedback.
+            In the <strong>Forms</strong> tab, you can train short form-filling tasks with click-to-reveal answers.
+            Start with the goal that matches your exam plan.
+          </p>
+        </div>
         <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
           {availableTabs.map((tab) => (
             <button
@@ -2031,6 +2113,74 @@ const WritingPage = ({ mode = "course" }) => {
                 )}
               </div>
             </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === "forms" && canUseFormsPractice && (
+        <section style={styles.card}>
+          <h3 style={styles.sectionTitle}>A1 Forms Practice (Teil 1)</h3>
+          <p style={styles.helperText}>
+            Train form completion before moving to Teil 2 letters. These examples are original practice tasks inspired by exam format,
+            so you can learn the pattern without copyright issues. Click to reveal model answers and compare your choices.
+          </p>
+          <div style={{ display: "grid", gap: 14 }}>
+            {A1_FORM_PRACTICE_TASKS.map((task) => {
+              const isOpen = Boolean(revealedFormAnswers[task.id]);
+              return (
+                <article
+                  key={task.id}
+                  style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 14, background: "#fff" }}
+                >
+                  <div style={styles.metaRow}>
+                    <h4 style={{ margin: 0 }}>{task.title}</h4>
+                    <span style={styles.badge}>Sample practice</span>
+                  </div>
+                  <p style={{ ...styles.helperText, marginTop: 8 }}>{task.context}</p>
+                  <p style={{ margin: "8px 0", fontWeight: 600 }}>{task.prompt}</p>
+                  <div style={{ border: "1px dashed #d1d5db", borderRadius: 10, padding: 10, background: "#f8fafc" }}>
+                    {task.formFields.map((field) => (
+                      <p key={field.label} style={{ margin: "6px 0" }}>
+                        <strong>{field.label}:</strong> {field.value}
+                      </p>
+                    ))}
+                  </div>
+                  <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      style={styles.primaryButton}
+                      onClick={() =>
+                        setRevealedFormAnswers((prev) => ({
+                          ...prev,
+                          [task.id]: !prev[task.id],
+                        }))
+                      }
+                    >
+                      {isOpen ? "Hide answers" : "Show answers"}
+                    </button>
+                  </div>
+                  {isOpen && (
+                    <div style={{ ...styles.successBox, marginTop: 10 }}>
+                      <div style={{ fontWeight: 800, marginBottom: 6 }}>Model answers + why</div>
+                      <ul style={{ margin: 0, paddingLeft: 18 }}>
+                        {task.answers.map((item) => (
+                          <li key={item.blank} style={{ marginBottom: 6 }}>
+                            <strong>{item.blank}</strong> → {item.answer}. {item.explanation}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+          <div style={{ ...styles.helperCard, marginTop: 14 }}>
+            <strong>After Forms (Teil 1):</strong>
+            <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
+              Your main submitted assignment should still focus on Teil 2: one formal and one informal letter.
+              Use “Mark my letter” to send those drafts for grading and tutor review.
+            </p>
           </div>
         </section>
       )}
