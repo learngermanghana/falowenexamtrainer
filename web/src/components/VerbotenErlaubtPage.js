@@ -118,28 +118,12 @@ const VerbotenErlaubtPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Chapter 5.9 — timed speaking drills + random Teil 2 and Teil 3 prompts from our speaking exam sheet.
         </p>
+        <a href="https://www.youtube.com/watch?v=O6m-GslH2kM" target="_blank" rel="noreferrer">
+          Watch: Goethe-Zertifikat A1 Start Deutsch 1 – Sprechen (oral exam)
+        </a>
       </div>
 
-      <Section title="1) Main note: see how the Goethe A1 speaking exam works">
-        <p style={{ margin: 0 }}>
-          Click play and watch this real Goethe-Zertifikat A1 oral exam example before you start practice.
-        </p>
-        <div style={{ position: "relative", paddingTop: "56.25%", borderRadius: 12, overflow: "hidden", border: "1px solid #e5e7eb" }}>
-          <iframe
-            title="Goethe-Zertifikat A1: Start Deutsch 1 – Sprechen"
-            src="https://www.youtube.com/embed/O6m-GslH2kM"
-            style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", border: 0 }}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
-        </div>
-        <a href="https://www.youtube.com/watch?v=O6m-GslH2kM" target="_blank" rel="noreferrer">
-          Open on YouTube
-        </a>
-      </Section>
-
-      <Section title="2) Confidence Timer (Press Play and Speak)">
+      <Section title="1) Confidence Timer (Press Play and Speak)">
         <p style={{ margin: 0 }}>
           Most students lose marks because of confidence, not grammar. Use this one-minute timer: press play, speak
           continuously, and keep your voice calm and clear.
@@ -178,7 +162,7 @@ const VerbotenErlaubtPage = () => {
         />
       </Section>
 
-      <Section title="3) Chapter 5.9 quick language recap — erlaubt vs. verboten">
+      <Section title="2) Chapter 5.9 quick language recap — erlaubt vs. verboten">
         <Callout>
           <strong>Meaning</strong>
           <BulletList items={["erlaubt = allowed / permitted", "verboten = forbidden / not allowed"]} />
@@ -215,7 +199,7 @@ const VerbotenErlaubtPage = () => {
         </Callout>
       </Section>
 
-      <Section title="4) Goethe A1 Sprechen — Structure">
+      <Section title="3) Goethe A1 Sprechen — Structure">
         <BulletList
           items={[
             "Prüfungszeit: 15 Minuten",
@@ -240,7 +224,7 @@ const VerbotenErlaubtPage = () => {
         </Callout>
       </Section>
 
-      <Section title="5) What to do in each Teil (simple A1 templates)">
+      <Section title="4) What to do in each Teil (simple A1 templates)">
         <h3 style={{ margin: 0 }}>Teil 1 — Introduce yourself (short + clear)</h3>
         <BulletList
           items={[
@@ -272,7 +256,7 @@ const VerbotenErlaubtPage = () => {
         </Callout>
       </Section>
 
-      <Section title="6) Random practice cards for Teil 2 + Teil 3">
+      <Section title="5) Random practice cards for Teil 2 + Teil 3">
         <p style={{ margin: 0 }}>
           We now pull random prompts from the speaking question sheet (headers: Level, Teil, Topic/Prompt,
           Keyword/Subtopic). Click below and practise both cards back-to-back.
@@ -304,7 +288,7 @@ const VerbotenErlaubtPage = () => {
         </div>
       </Section>
 
-      <Section title="7) How to practise on Falowen">
+      <Section title="6) How to practise on Falowen">
         <p style={{ margin: 0 }}>
           Open the speaking practice link and use your checklist exactly like exam training:
         </p>
@@ -335,7 +319,7 @@ const VerbotenErlaubtPage = () => {
         />
       </Section>
 
-      <Section title="8) Pass strategy (A1 speaking) — simple rules that work">
+      <Section title="7) Pass strategy (A1 speaking) — simple rules that work">
         <h3 style={{ margin: 0 }}>✅ What examiners love</h3>
         <BulletList
           items={[
