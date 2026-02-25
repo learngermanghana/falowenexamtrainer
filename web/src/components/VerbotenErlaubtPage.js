@@ -62,7 +62,7 @@ const VerbotenErlaubtPage = () => {
   const [teil2Prompt, setTeil2Prompt] = useState(null);
   const [teil3Prompt, setTeil3Prompt] = useState(null);
 
-  // ✅ Show Falowen next-step callout after timer ends
+  // Show Falowen next-step callout after timer ends
   const [showFalowenNextStep, setShowFalowenNextStep] = useState(false);
 
   // ✅ ONLY A1 (no A2, no B levels)
@@ -108,7 +108,7 @@ const VerbotenErlaubtPage = () => {
         if (current <= 1) {
           window.clearInterval(intervalId);
           setIsRunning(false);
-          // ✅ Timer finished → show Falowen next step
+          // Timer finished → show Falowen next step
           setShowFalowenNextStep(true);
           return 0;
         }
@@ -120,7 +120,6 @@ const VerbotenErlaubtPage = () => {
   }, [isRunning]);
 
   const startTimer = () => {
-    // Starting a new timed round hides the next-step callout (until time ends)
     setShowFalowenNextStep(false);
     if (secondsLeft === 0) setSecondsLeft(60);
     setIsRunning(true);
@@ -137,6 +136,10 @@ const VerbotenErlaubtPage = () => {
   const openSpeakingPractice = () => {
     window.open(FALOWEN_SPEAKING_URL, "_blank", "noopener,noreferrer");
   };
+
+  // --- Helpers to label "Thema" vs "Stichwort" for A1 learners ---
+  const topicText = (p) => (p?.text ? String(p.text) : "");
+  const keywordText = (p) => (p?.hint ? String(p.hint) : "");
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -270,7 +273,12 @@ const VerbotenErlaubtPage = () => {
         <h3 style={{ margin: "8px 0 0" }}>Teil 3 — Requests + reactions</h3>
         <Callout>
           <strong>Make a request (choose one)</strong>
-          <BulletList items={["Können Sie bitte + Infinitiv …?", "Verb + Sie bitte."]} />
+          <BulletList
+            items={[
+              "Können Sie bitte + Infinitiv …?",
+              "Verb + Sie bitte.",
+            ]}
+          />
         </Callout>
         <Callout>
           <strong>React (accept or refuse politely)</strong>
@@ -286,9 +294,27 @@ const VerbotenErlaubtPage = () => {
       {/* ✅ Random cards first */}
       <Section title="5) Random practice cards for Teil 2 + Teil 3">
         <p style={{ margin: 0 }}>
-          We pull random <strong>A1 only</strong> prompts from the speaking question sheet.
-          Practise both cards back-to-back.
+          We pull random <strong>A1 only</strong> prompts from the speaking
+          question sheet. Practise both cards back-to-back.
         </p>
+
+        {/* ✅ Very simple A1 explanation box */}
+        <Callout>
+          <strong>Quick help (very important)</strong>
+          <BulletList
+            items={[
+              "Thema = WHAT are we talking about? (Topic/Situation)",
+              "Stichwort = USE THIS WORD in your sentence (Keyword)",
+              "Rule: Always say the Stichwort in your question or answer.",
+            ]}
+          />
+          <p style={{ margin: 0 }}>
+            Example: <strong>Thema:</strong> Hausaufgabe •{" "}
+            <strong>Stichwort:</strong> machen →{" "}
+            <em>Machst du die Hausaufgabe?</em> /{" "}
+            <em>Ja, ich mache die Hausaufgabe.</em>
+          </p>
+        </Callout>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           <button style={styles.primaryButton} onClick={drawRandomPracticeCards}>
@@ -305,14 +331,24 @@ const VerbotenErlaubtPage = () => {
         >
           <Callout>
             <strong>Teil 2 prompt</strong>
-            <p style={{ margin: 0 }}>{teil2Prompt?.text || "No prompt available yet."}</p>
-            <p style={{ margin: 0, color: "#0f172a" }}>{teil2Prompt?.hint || ""}</p>
+            <p style={{ margin: 0 }}>
+              <strong>Thema:</strong>{" "}
+              {topicText(teil2Prompt) || "No prompt available yet."}
+            </p>
+            <p style={{ margin: 0 }}>
+              <strong>Stichwort:</strong> {keywordText(teil2Prompt) || "—"}
+            </p>
           </Callout>
 
           <Callout>
             <strong>Teil 3 prompt</strong>
-            <p style={{ margin: 0 }}>{teil3Prompt?.text || "No prompt available yet."}</p>
-            <p style={{ margin: 0, color: "#0f172a" }}>{teil3Prompt?.hint || ""}</p>
+            <p style={{ margin: 0 }}>
+              <strong>Thema:</strong>{" "}
+              {topicText(teil3Prompt) || "No prompt available yet."}
+            </p>
+            <p style={{ margin: 0 }}>
+              <strong>Stichwort:</strong> {keywordText(teil3Prompt) || "—"}
+            </p>
           </Callout>
         </div>
       </Section>
@@ -320,16 +356,16 @@ const VerbotenErlaubtPage = () => {
       {/* ✅ Timer AFTER random cards and connected to them */}
       <Section title="6) Confidence Timer (Press Play and Speak)">
         <p style={{ margin: 0 }}>
-          Use the <strong>cards you just drew above</strong>. Press play and speak continuously for 60 seconds,
-          calm and clear.
+          Use the <strong>cards you just drew above</strong>. Press play and speak
+          continuously for 60 seconds, calm and clear.
         </p>
 
         <Callout>
           <strong>How to use it (connect it to the cards)</strong>
           <BulletList
             items={[
-              "Look at the Teil 2 card: ask ONE full question + answer it.",
-              "Look at the Teil 3 card: make ONE polite request + react politely.",
+              "Teil 2: Ask ONE question + answer it (use Thema + Stichwort).",
+              "Teil 3: Make ONE request + react politely (use Thema + Stichwort).",
               "Repeat smoothly without stopping until the timer ends.",
             ]}
           />
@@ -350,11 +386,26 @@ const VerbotenErlaubtPage = () => {
             {formatTime(secondsLeft)}
           </div>
 
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
-            <button style={styles.primaryButton} onClick={startTimer} disabled={isRunning}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              justifyContent: "center",
+            }}
+          >
+            <button
+              style={styles.primaryButton}
+              onClick={startTimer}
+              disabled={isRunning}
+            >
               ▶️ Play
             </button>
-            <button style={styles.secondaryButton} onClick={pauseTimer} disabled={!isRunning}>
+            <button
+              style={styles.secondaryButton}
+              onClick={pauseTimer}
+              disabled={!isRunning}
+            >
               ⏸ Pause
             </button>
             <button style={styles.secondaryButton} onClick={resetTimer}>
@@ -365,9 +416,8 @@ const VerbotenErlaubtPage = () => {
 
         <Checklist
           items={[
-            "Teil 1: speak about yourself for 60 seconds without stopping (optional warm-up).",
-            "Teil 2: ask one question + answer one question in full sentences (use the drawn card).",
-            "Teil 3: make one polite request and react politely (use the drawn card).",
+            "Teil 2: ask one question + answer one question in full sentences.",
+            "Teil 3: make one polite request and react politely.",
             "Repeat daily. Confidence comes from timed repetition.",
           ]}
         />
@@ -378,7 +428,7 @@ const VerbotenErlaubtPage = () => {
             <strong>✅ Time! Next step (real exam mode)</strong>
             <BulletList
               items={[
-                "Open Falowen",
+                "Now open Falowen",
                 "Enter your Student Code",
                 "Do 1 real prompt (Teil 2 or Teil 3)",
                 "Click “Ask & AI” for marking and feedback",
