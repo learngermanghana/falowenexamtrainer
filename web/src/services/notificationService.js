@@ -103,9 +103,12 @@ const normalizeAttendanceStatus = (record = {}) => {
   if (record.present === true) return "present";
   if (record.present === false) return "absent";
 
+  if (record.attended === true) return "present";
+  if (record.attended === false) return "absent";
+
   const raw =
     (record.status || record.attendance || record.state || "").toString().toLowerCase();
-  if (raw.includes("present")) return "present";
+  if (raw.includes("present") || raw.includes("attended") || raw.includes("late")) return "present";
   if (raw.includes("absent")) return "absent";
   return "";
 };
@@ -156,7 +159,8 @@ const buildAttendanceNotification = (attendancePayload) => {
 
   const timestamp =
     parseTimestamp(latest.markedAt) || parseTimestamp(latest.date) || Date.now();
-  const status = normalizeAttendanceStatus(latest) || "present";
+  const status = normalizeAttendanceStatus(latest);
+  if (!status) return null;
   const label = latest.title || "Class session";
 
   const isPresent = status === "present";
