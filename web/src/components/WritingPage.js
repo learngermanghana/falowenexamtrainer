@@ -486,11 +486,11 @@ const WritingPage = ({ mode = "course" }) => {
     const tabs = [{ key: "mark", label: "Mark my letter" }];
 
     if (canUseIdeasGenerator) {
-      tabs.push({ key: "ideas", label: "Idea generator" });
+      tabs.push({ key: "ideas", label: "Ideas helper" });
     }
 
     if (canUsePracticeLetters) {
-      tabs.unshift({ key: "practice", label: "Practice letters" });
+      tabs.push({ key: "practice", label: "Practice prompts" });
     }
 
     if (canUseFormsPractice) {
@@ -1209,15 +1209,13 @@ const WritingPage = ({ mode = "course" }) => {
         <h2 style={styles.sectionTitle}>{canUseIdeasGenerator ? "Writing – Practice exam letters" : "Writing – Mark my letter"}</h2>
         <p style={styles.helperText}>
           {canUseIdeasGenerator
-            ? "Choose a letter, write with the timer, get your text graded, or ask the idea generator for wording help."
+            ? "Simple flow: paste your letter, get feedback, improve one section, then save the version for your tutor."
             : "A1 students should use Mark my letter to get focused feedback on their draft."}
         </p>
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            This page gives you two writing paths: practice letters (Teil 2) and A1 forms (Teil 1).
-            Use <strong>Mark my letter</strong> whenever you want corrections and tutor feedback.
-            In the <strong>Forms</strong> tab, you can train short form-filling tasks with click-to-reveal answers.
-            Start with the goal that matches your exam plan.
+            Start in <strong>Mark my letter</strong> for your main workflow. Use the other tabs only when you need extra
+            practice or idea support.
           </p>
         </div>
         <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
@@ -1373,14 +1371,14 @@ const WritingPage = ({ mode = "course" }) => {
           <section style={styles.card}>
             <h3 style={styles.sectionTitle}>Mark my letter</h3>
             <p style={styles.helperText}>
-              Paste your finished letter in one box. Herr Felix will score it with the new rubric and highlight what to fix.
+              Keep it simple: one text box for your draft, one click for feedback, one revised version to save.
             </p>
             <div style={styles.infoBox}>
-              <strong>3-step workflow:</strong>
+              <strong>Student workflow:</strong>
               <ol style={styles.promptList}>
-                <li>Paste draft</li>
-                <li>Read 2 corrections</li>
-                <li>Rewrite 1 paragraph</li>
+                <li>Paste your full letter draft</li>
+                <li>Click <strong>Get AI feedback</strong></li>
+                <li>Revise and save a clean tutor version</li>
               </ol>
             </div>
 
@@ -1557,82 +1555,88 @@ const WritingPage = ({ mode = "course" }) => {
           {markFeedback && (
             <>
               <section style={styles.card}>
-                <h3 style={styles.sectionTitle}>Rubric scoring breakdown</h3>
-                <div style={{ display: "grid", gap: 10 }}>
-                  {rubricBreakdown.map((item) => (
-                    <div key={item.key} style={styles.scoreCard}>
-                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                        <strong>{item.label}</strong>
-                        <span style={styles.scoreBadge}>
-                          {item.score ? `${item.score}/5` : "—"}
-                        </span>
-                      </div>
-                      <div style={styles.helperText}>{item.explanation}</div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-              <section style={styles.card}>
                 <h3 style={styles.sectionTitle}>AI feedback</h3>
                 <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+              </section>
+              <section style={styles.card}>
+                <details>
+                  <summary style={{ cursor: "pointer", fontWeight: 700 }}>Rubric scoring breakdown (optional)</summary>
+                  <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+                    {rubricBreakdown.map((item) => (
+                      <div key={item.key} style={styles.scoreCard}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                          <strong>{item.label}</strong>
+                          <span style={styles.scoreBadge}>
+                            {item.score ? `${item.score}/5` : "—"}
+                          </span>
+                        </div>
+                        <div style={styles.helperText}>{item.explanation}</div>
+                      </div>
+                    ))}
+                  </div>
+                </details>
               </section>
             </>
           )}
 
           {draftHistory.length >= 2 && (
             <section style={styles.card}>
-              <h3 style={styles.sectionTitle}>Compare drafts</h3>
-              <p style={styles.helperText}>
-                Review the last two submissions to see improvements before your next attempt.
-              </p>
-              <div style={styles.gridTwo}>
-                {draftHistory.slice(-2).map((entry, index) => (
-                  <div key={entry.id} style={styles.helperCard}>
-                    <div style={{ fontWeight: 700, marginBottom: 6 }}>
-                      {index === 0 ? "Previous draft" : "Latest draft"}
+              <details>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>Compare drafts (optional)</summary>
+                <p style={{ ...styles.helperText, marginTop: 8 }}>
+                  Review the last two submissions to track improvements.
+                </p>
+                <div style={styles.gridTwo}>
+                  {draftHistory.slice(-2).map((entry, index) => (
+                    <div key={entry.id} style={styles.helperCard}>
+                      <div style={{ fontWeight: 700, marginBottom: 6 }}>
+                        {index === 0 ? "Previous draft" : "Latest draft"}
+                      </div>
+                      <div style={styles.helperText}>
+                        {entry.promptTitle} · {new Date(entry.createdAt).toLocaleString()}
+                      </div>
+                      <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{entry.draft}</pre>
                     </div>
-                    <div style={styles.helperText}>
-                      {entry.promptTitle} · {new Date(entry.createdAt).toLocaleString()}
-                    </div>
-                    <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{entry.draft}</pre>
-                  </div>
-                ))}
-              </div>
-              {latestImprovementNotes.length > 0 ? (
-                <>
-                  <div style={{ fontWeight: 700, marginTop: 10 }}>Improvement notes</div>
-                  <ul style={styles.checklist}>
-                    {latestImprovementNotes.map((note) => (
-                      <li key={note}>{note}</li>
-                    ))}
-                  </ul>
-                </>
-              ) : null}
+                  ))}
+                </div>
+                {latestImprovementNotes.length > 0 ? (
+                  <>
+                    <div style={{ fontWeight: 700, marginTop: 10 }}>Improvement notes</div>
+                    <ul style={styles.checklist}>
+                      {latestImprovementNotes.map((note) => (
+                        <li key={note}>{note}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </details>
             </section>
           )}
 
           {(errorBank.length > 0 || revisionTasks.length > 0) && (
             <section style={styles.card}>
-              <h3 style={styles.sectionTitle}>Error bank & quick fixes</h3>
-              {errorBank.length > 0 ? (
-                <ul style={styles.checklist}>
-                  {errorBank.map((item, index) => (
-                    <li key={`${item}-${index}`}>{item}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p style={styles.helperText}>No recurring errors flagged yet.</p>
-              )}
-              {revisionTasks.length > 0 ? (
-                <>
-                  <div style={{ fontWeight: 700, marginTop: 10 }}>Quick revision tasks</div>
+              <details>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>Error bank & quick fixes (optional)</summary>
+                {errorBank.length > 0 ? (
                   <ul style={styles.checklist}>
-                    {revisionTasks.map((task) => (
-                      <li key={task}>{task}</li>
+                    {errorBank.map((item, index) => (
+                      <li key={`${item}-${index}`}>{item}</li>
                     ))}
                   </ul>
-                </>
-              ) : null}
+                ) : (
+                  <p style={styles.helperText}>No recurring errors flagged yet.</p>
+                )}
+                {revisionTasks.length > 0 ? (
+                  <>
+                    <div style={{ fontWeight: 700, marginTop: 10 }}>Quick revision tasks</div>
+                    <ul style={styles.checklist}>
+                      {revisionTasks.map((task) => (
+                        <li key={task}>{task}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </details>
             </section>
           )}
 
