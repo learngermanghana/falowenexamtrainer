@@ -43,6 +43,27 @@ const RuleParagraphs = ({ items }) => (
 const A1LetterWritingQuestionBookPage = () => {
   const navigate = useNavigate();
 
+  const TEIL1_FORM_SAMPLE = useMemo(
+    () => [
+      "Ihre Bekannte Eva Kadavy verbringt mit ihrem Ehemann und zwei Söhnen (8 und 11 Jahre) Ferien in Seeheim.",
+      "Im Reisebüro reserviert sie für den kommenden Sonntag eine Rundfahrt am Bodensee.",
+      "Eva Kadavy kann nicht mit Kreditkarte bezahlen.",
+      "Ergänzen Sie für sie die fünf fehlenden Angaben im Anmeldeformular.",
+    ],
+    []
+  );
+
+  const TEIL1_SOLUTIONS = useMemo(
+    () => [
+      "(1) Anzahl der Personen: 4 / vier",
+      "(2) Davon Kinder: 2 / zwei",
+      "(3) PLZ, Urlaubsort: 78014 Seeheim",
+      "(4) Zahlungsweise: bar",
+      "(5) Reisetermin: Sonntag / nächsten Sonntag",
+    ],
+    []
+  );
+
   /** =========================
    *  READ-FIRST CONTENT (your exact text)
    *  ========================= */
@@ -237,11 +258,68 @@ const A1LetterWritingQuestionBookPage = () => {
         </button>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Students must read the structures and question books first. Submit your work from the Submit page.
+          Schreiben has two parts: Teil 1 (Formular) and Teil 2 (Brief). Start with Teil 1 practice in the app,
+          then move to formal and informal letters for submission.
         </p>
       </header>
 
       <>
+          <Section title="How Schreiben works (A1 exam)">
+            <InfoBox title="Two parts you must know">
+              <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
+                <div>
+                  <strong>Teil 1:</strong> Formular ausfüllen (forms). You read a short situation and write missing
+                  details in the form.
+                </div>
+                <div>
+                  <strong>Teil 2:</strong> Brief schreiben (letter writing). This is where you write a complete formal
+                  or informal text.
+                </div>
+              </div>
+            </InfoBox>
+            <InfoBox title="Important for this course">
+              <div style={{ lineHeight: 1.6 }}>
+                Teil 1 is available as <strong>in-app practice</strong> with answers shown after you click to check.
+                The assignment you submit is focused on <strong>formal and informal writing (Teil 2)</strong>.
+              </div>
+            </InfoBox>
+          </Section>
+
+          <Section title="Teil 1 Practice — Formular (Bodensee-Rundfahrt)">
+            <InfoBox title="Practice scenario">
+              <BulletList items={TEIL1_FORM_SAMPLE} />
+            </InfoBox>
+
+            <InfoBox title="Form snippet (what to fill)">
+              <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
+                <div>
+                  <strong>Anmeldung zur Bodensee-Rundfahrt</strong>
+                </div>
+                <div>Name: Kadavy, Eva (Beispiel)</div>
+                <div>Anzahl der Personen: (1)</div>
+                <div>Davon Kinder: (2)</div>
+                <div>Ferienadresse: Hotel Schönblick, Burgstraße 34, 78014 (3)</div>
+                <div>Zahlungsweise: (4) / Kreditkarte</div>
+                <div>Reisetermin: (5)</div>
+              </div>
+            </InfoBox>
+
+            <InfoBox title="Antworten (erst nach dem Versuch prüfen)">
+              <BulletList items={TEIL1_SOLUTIONS} />
+            </InfoBox>
+
+            <InfoBox title="How to think in Teil 1">
+              <BulletList
+                items={[
+                  "Count all people carefully (parents + children) before writing numbers.",
+                  "For place fields, combine PLZ + Urlaubsort exactly as given in the text.",
+                  "If the task says no credit card, select/pay with ‘bar’.",
+                  "For dates, use the exact day phrase from the prompt (e.g., nächsten Sonntag).",
+                ]}
+              />
+            </InfoBox>
+          </Section>
+
           <Section title="Formal Letter Structure (Read First)">
             <InfoBox title="Structure + Rules">
               <RuleParagraphs items={FORMAL_STRUCTURE} />
@@ -342,7 +420,9 @@ const A1LetterWritingQuestionBookPage = () => {
             </InfoBox>
           </Section>
           <Section title="Next step">
-            <p style={{ margin: 0 }}>Ready to submit your work? Open the assignment submission page.</p>
+            <p style={{ margin: 0 }}>
+              After Teil 1 practice, write and submit your formal/informal letter assignment from the submission page.
+            </p>
             <div>
               <button type="button" style={{ ...styles.primaryButton, width: "fit-content" }} onClick={() => navigate("/campus/submit")}>
                 Go to Submit Assignment Page
