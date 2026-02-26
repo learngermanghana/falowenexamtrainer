@@ -80,7 +80,6 @@ const GeneralHome = ({
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
   const [announcementIndex, setAnnouncementIndex] = useState(0);
-  const [expandedAnnouncements, setExpandedAnnouncements] = useState(() => new Set());
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
@@ -153,18 +152,6 @@ const GeneralHome = ({
 
     return () => clearInterval(interval);
   }, [announcements]);
-
-  const toggleAnnouncementExpansion = useCallback((announcementId) => {
-    setExpandedAnnouncements((prev) => {
-      const next = new Set(prev);
-      if (next.has(announcementId)) {
-        next.delete(announcementId);
-      } else {
-        next.add(announcementId);
-      }
-      return next;
-    });
-  }, []);
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -242,30 +229,11 @@ const GeneralHome = ({
             <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
               {(() => {
                 const announcement = announcements[announcementIndex] || {};
-                const announcementId = announcement.id || `announcement-${announcementIndex}`;
-                const body = (announcement.body || "").trim();
-                const maxPreviewLength = 140;
-                const isLong = body.length > maxPreviewLength;
-                const isExpanded = expandedAnnouncements.has(announcementId);
-                const visibleBody =
-                  isExpanded || !isLong ? body : `${body.slice(0, maxPreviewLength).trim()}…`;
 
                 return (
                   <>
                     <div className="announcement-message">
                       <span className="announcement-ticker-title">{announcement.title}</span>
-                      {body ? <span className="announcement-ticker-body">— {visibleBody}</span> : null}
-                      {isLong ? (
-                        <button
-                          type="button"
-                          className="announcement-read-more"
-                          onClick={() => toggleAnnouncementExpansion(announcementId)}
-                        >
-                          {isExpanded
-                            ? t("generalHome.announcements.showLess")
-                            : t("generalHome.announcements.readMore")}
-                        </button>
-                      ) : null}
                     </div>
                     {announcement.linkUrl ? (
                       <a

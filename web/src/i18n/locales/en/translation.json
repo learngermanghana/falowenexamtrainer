@@ -254,15 +254,15 @@
     },
     "announcements": {
       "eyebrow": "Updates",
-      "title": "Announcements",
-      "subtitle": "Latest school and class notices, including language-specific updates.",
-      "loading": "Loading announcements…",
-      "error": "We could not load announcements right now. Please refresh soon.",
-      "empty": "No announcements yet. Check back later for new updates.",
-      "ariaLabel": "Latest announcements",
+      "title": "Latest blog",
+      "subtitle": "Fresh posts from blog.falowen.app.",
+      "loading": "Loading latest blog posts…",
+      "error": "We could not load the latest blog posts right now. Please refresh soon.",
+      "empty": "No blog posts yet. Check back later for new updates.",
+      "ariaLabel": "Latest blog posts",
       "readMore": "Read more",
       "showLess": "Show less",
-      "openUpdate": "Open update"
+      "openUpdate": "Open post"
     },
     "learningSpace": {
       "eyebrow": "Welcome back",

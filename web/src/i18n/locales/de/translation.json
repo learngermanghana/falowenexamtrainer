@@ -259,15 +259,15 @@
     },
     "announcements": {
       "eyebrow": "Updates",
-      "title": "Ankündigungen",
-      "subtitle": "Neueste Schul- und Klassenhinweise, inklusive sprachspezifischer Updates.",
-      "loading": "Ankündigungen werden geladen…",
-      "error": "Ankündigungen können gerade nicht geladen werden. Bitte aktualisiere bald.",
-      "empty": "Noch keine Ankündigungen. Schau später für neue Updates vorbei.",
-      "ariaLabel": "Neueste Ankündigungen",
+      "title": "Neueste Blogbeiträge",
+      "subtitle": "Aktuelle Beiträge von blog.falowen.app.",
+      "loading": "Neueste Blogbeiträge werden geladen…",
+      "error": "Die neuesten Blogbeiträge können gerade nicht geladen werden. Bitte aktualisiere bald.",
+      "empty": "Noch keine Blogbeiträge. Schau später für neue Updates vorbei.",
+      "ariaLabel": "Neueste Blogbeiträge",
       "readMore": "Mehr lesen",
       "showLess": "Weniger anzeigen",
-      "openUpdate": "Update öffnen"
+      "openUpdate": "Beitrag öffnen"
     },
     "learningSpace": {
       "eyebrow": "Willkommen zurück",
