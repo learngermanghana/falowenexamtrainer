@@ -79,7 +79,6 @@ function initFirebaseAdmin() {
 initFirebaseAdmin();
 
 const { scoresSummaryHandler } = require("./routes/scoresSummary");
-const { registerGoetheRecorderRoutes } = require("./routes/goetheRecorder");
 
 async function getAuthedUser(req) {
   const authHeader = req.headers?.authorization || "";
@@ -437,12 +436,6 @@ app.get("/", (_req, res) => res.send("OK"));
 app.get("/health", (_req, res) =>
   res.json({ ok: true, timestamp: new Date().toISOString(), uptimeSeconds: process.uptime() })
 );
-
-registerGoetheRecorderRoutes(app, {
-  audioUpload,
-  ensureOpenAIConfigured,
-  requireAuthenticatedUser,
-});
 
 app.get("/metrics", (_req, res) => {
   const snapshot = getMetricsSnapshot();
