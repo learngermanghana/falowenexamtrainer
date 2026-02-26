@@ -601,11 +601,42 @@
 }
 
 @media (max-width: 640px) {
+  .study-buddy-bar {
+    max-height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .study-buddy-inner {
-    padding: 12px 14px 14px;
+    padding: 12px 14px calc(14px + env(safe-area-inset-bottom));
   }
 }
 
+
+.study-buddy-mobile-close {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .study-buddy-mobile-close {
+    display: block;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    background: #2563eb;
+    color: #f8fafc;
+    cursor: pointer;
+  }
+
+  .study-buddy-bar.is-high-contrast .study-buddy-mobile-close {
+    background: #facc15;
+    color: #111827;
+  }
+}
 .study-buddy-plan {
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 12px;
