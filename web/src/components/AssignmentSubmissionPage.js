@@ -442,8 +442,8 @@ const AssignmentSubmissionPage = () => {
       setStatus((prev) => ({ ...prev, error: "", success: "" }));
       setCopyStatus("");
       setAutosaveStatus((prev) => ({ ...prev, state: "idle" }));
-      setResubmissionText("");
-      setResubmissionImprovement("");
+      setResubmissionText(draft?.resubmissionText || "");
+      setResubmissionImprovement(draft?.resubmissionImprovement || "");
       setResubmissionStatus({ loading: false, error: "", success: "" });
     } else if (!form.submissionText && draft?.submissionText) {
       setForm((prev) => ({
@@ -452,7 +452,21 @@ const AssignmentSubmissionPage = () => {
         confirmed: false,
       }));
     }
-  }, [draftsByAssignment, form.assignmentTitle, form.submissionText]);
+
+    if (!assignmentChanged && !resubmissionText && draft?.resubmissionText) {
+      setResubmissionText(draft.resubmissionText);
+    }
+
+    if (!assignmentChanged && !resubmissionImprovement && draft?.resubmissionImprovement) {
+      setResubmissionImprovement(draft.resubmissionImprovement);
+    }
+  }, [
+    draftsByAssignment,
+    form.assignmentTitle,
+    form.submissionText,
+    resubmissionImprovement,
+    resubmissionText,
+  ]);
 
   // Locked state for currently selected assignment.
   const selectedChapterKey = useMemo(
@@ -707,6 +721,68 @@ const AssignmentSubmissionPage = () => {
     } catch (error) {
       console.error("Failed to save draft", error);
       setStatus({ loading: false, error: "Could not save your draft.", success: "" });
+    }
+  };
+
+  const handleSaveResubmissionDraft = async () => {
+    setResubmissionStatus({ loading: true, error: "", success: "" });
+
+    const trimmedResubmission = resubmissionText.trim();
+    const trimmedImprovement = resubmissionImprovement.trim();
+
+    if (!db || !user?.uid || !form.assignmentTitle) {
+      setResubmissionStatus({ loading: false, error: "Could not save your resubmission draft.", success: "" });
+      return;
+    }
+
+    if (!trimmedResubmission && !trimmedImprovement) {
+      setResubmissionStatus({
+        loading: false,
+        error: "Add corrected text or an improvement summary before saving a draft.",
+        success: "",
+      });
+      return;
+    }
+
+    try {
+      const draftId = getDraftDocId(form.assignmentTitle);
+      const draftRef = doc(db, DRAFT_COLLECTION, draftId);
+      const existingDraft = draftsByAssignment[form.assignmentTitle];
+      const nowLocal = new Date();
+
+      const payload = {
+        title: form.assignmentTitle,
+        assignmentTitle: form.assignmentTitle,
+        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+        chapter: deriveChapterValue(form.assignmentTitle),
+        chapterKey: buildChapterKey(form.assignmentTitle),
+        studentId: user.uid,
+        studentEmail: user?.email || "",
+        studentCode,
+        studentName: studentProfile?.name || "",
+        className: studentProfile?.className || "",
+        status: "resubmission_draft",
+        resubmissionText: trimmedResubmission,
+        resubmissionImprovement: trimmedImprovement,
+        createdAt: existingDraft?.createdAt || serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+
+      await setDoc(draftRef, payload, { merge: true });
+
+      setDraftsByAssignment((prev) => ({
+        ...prev,
+        [form.assignmentTitle]: {
+          ...(prev[form.assignmentTitle] || {}),
+          ...payload,
+          updatedAt: nowLocal,
+        },
+      }));
+
+      setResubmissionStatus({ loading: false, error: "", success: "Resubmission draft saved." });
+    } catch (error) {
+      console.error("Failed to save resubmission draft", error);
+      setResubmissionStatus({ loading: false, error: "Could not save your resubmission draft.", success: "" });
     }
   };
 
@@ -1082,6 +1158,14 @@ const AssignmentSubmissionPage = () => {
             </label>
 
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={handleSaveResubmissionDraft}
+                disabled={resubmissionStatus.loading}
+              >
+                {resubmissionStatus.loading ? "Saving ..." : "Save draft"}
+              </button>
               <button
                 type="button"
                 style={styles.primaryButton}
