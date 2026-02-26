@@ -1,9 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { getTasksForLevel, useExam } from "../context/ExamContext";
-
-const SPEAKING_LINK =
-  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
+import { useAuth } from "../context/AuthContext";
+import {
+  evaluateGoetheAudio,
+  getGoetheLevels,
+  getGoethePartnerScript,
+  getGoetheQuestions,
+} from "../services/goetheRecorderService";
 
 const COMMON_MISTAKES = [
   {
@@ -54,55 +58,242 @@ const ChecklistItem = ({ icon, children }) => (
       {icon}
     </span>
 
-    <div style={{ lineHeight: 1.55, color: "#111827", fontSize: 15 }}>
-      {children}
-    </div>
+    <div style={{ lineHeight: 1.55, color: "#111827", fontSize: 15 }}>{children}</div>
   </li>
 );
 
 const SpeakingPage = () => {
-  const { level } = useExam();
-  const tasks = useMemo(() => getTasksForLevel(level), [level]);
+  const { level: examLevel } = useExam();
+  const { idToken } = useAuth();
+  const tasks = useMemo(() => getTasksForLevel(examLevel), [examLevel]);
+
+  const [levels, setLevels] = useState([]);
+  const [level, setLevel] = useState(examLevel || "");
+  const [questions, setQuestions] = useState([]);
+  const [questionId, setQuestionId] = useState("");
+  const [partnerLines, setPartnerLines] = useState([]);
+  const [result, setResult] = useState(null);
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioBlob, setAudioBlob] = useState(null);
+  const [audioUrl, setAudioUrl] = useState("");
+
+  const mediaRecorderRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const recordedChunksRef = useRef([]);
+
+  useEffect(() => {
+    let active = true;
+
+    getGoetheLevels()
+      .then((items) => {
+        if (!active) return;
+        const nextLevels = Array.isArray(items) ? items : [];
+        setLevels(nextLevels);
+        if (examLevel && nextLevels.includes(examLevel)) {
+          setLevel(examLevel);
+        } else if (!level && nextLevels.length) {
+          setLevel(nextLevels[0]);
+        }
+      })
+      .catch((err) => setError(err?.response?.data?.error || err.message || "Failed to load levels."));
+
+    return () => {
+      active = false;
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!level) {
+      setQuestions([]);
+      setQuestionId("");
+      return;
+    }
+
+    getGoetheQuestions({ level })
+      .then((items) => {
+        const next = Array.isArray(items) ? items : [];
+        setQuestions(next);
+        setQuestionId(next[0]?.id || "");
+      })
+      .catch((err) => {
+        setQuestions([]);
+        setQuestionId("");
+        setError(err?.response?.data?.error || err.message || "Failed to load questions.");
+      });
+  }, [level]);
+
+  const startRecording = async () => {
+    setError("");
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      recordedChunksRef.current = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data?.size > 0) recordedChunksRef.current.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
+        setAudioBlob(blob);
+        if (audioUrl) URL.revokeObjectURL(audioUrl);
+        setAudioUrl(URL.createObjectURL(blob));
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setIsRecording(true);
+    } catch (_err) {
+      setError("Microphone permission denied or unavailable.");
+    }
+  };
+
+  const stopRecording = () => {
+    const recorder = mediaRecorderRef.current;
+    if (!recorder || recorder.state === "inactive") return;
+    recorder.stop();
+    setIsRecording(false);
+  };
+
+  const handleGeneratePartnerLines = async () => {
+    if (!level || !questionId) return;
+    setBusy(true);
+    setError("");
+    try {
+      const response = await getGoethePartnerScript({ level, questionId, idToken });
+      setPartnerLines(response?.lines || []);
+    } catch (err) {
+      setError(err?.response?.data?.error || err.message || "Failed to generate partner lines.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleEvaluate = async () => {
+    if (!audioBlob) {
+      setError("Please record audio first.");
+      return;
+    }
+
+    setBusy(true);
+    setError("");
+    setResult(null);
+
+    try {
+      const response = await evaluateGoetheAudio({
+        audioBlob,
+        level,
+        questionId,
+        idToken,
+      });
+      setResult(response);
+    } catch (err) {
+      setError(err?.response?.data?.error || err.message || "Failed to evaluate audio.");
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
         <div style={{ marginBottom: 12 }}>
-          <h1 style={{ ...styles.title, marginBottom: 8 }}>Speaking Exams – Level {level}</h1>
-          <p style={styles.subtitle}>
-            Open the Goethe Speaking Exams practice page to start your speaking prep.
-          </p>
+          <h1 style={{ ...styles.title, marginBottom: 8 }}>Speaking Exams – Level {examLevel}</h1>
+          <p style={styles.subtitle}>Practice inside the exam room and get instant AI feedback.</p>
         </div>
 
-        <div
-          style={{
-            ...styles.card,
-            margin: 0,
-            boxShadow: "none",
-            border: "1px solid #BFDBFE",
-            background: "#EFF6FF",
-            display: "grid",
-            gap: 10,
-          }}
-        >
-          <p style={{ margin: 0, color: "#1E3A8A", fontWeight: 700 }}>Start here</p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            <a
-              href={SPEAKING_LINK}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                ...styles.buttonPrimary,
-                textDecoration: "none",
-                textAlign: "center",
-              }}
-            >
-              Open Goethe Speaking Exams
-            </a>
+        <div style={{ ...styles.card, margin: 0, boxShadow: "none", border: "1px solid #BFDBFE", background: "#EFF6FF" }}>
+          <h3 style={{ marginTop: 0 }}>Goethe Recorder</h3>
+          <div style={styles.row}>
+            <div style={styles.field}>
+              <label style={styles.label}>Level</label>
+              <select style={styles.select} value={level} onChange={(e) => setLevel(e.target.value)}>
+                <option value="">Select level</option>
+                {levels.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={styles.field}>
+              <label style={styles.label}>Task prompt</label>
+              <select style={styles.select} value={questionId} onChange={(e) => setQuestionId(e.target.value)}>
+                <option value="">Select task</option>
+                {questions.map((question) => (
+                  <option key={question.id} value={question.id}>
+                    {question.part}: {question.prompt}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+            {!isRecording ? (
+              <button style={styles.primaryButton} onClick={startRecording} disabled={busy}>
+                Start recording
+              </button>
+            ) : (
+              <button style={styles.dangerButton} onClick={stopRecording}>
+                Stop recording
+              </button>
+            )}
+            <button style={styles.secondaryButton} onClick={handleGeneratePartnerLines} disabled={busy || !questionId}>
+              Generate partner lines
+            </button>
+            <button style={styles.primaryButton} onClick={handleEvaluate} disabled={busy || !audioBlob || !questionId}>
+              {busy ? "Scoring..." : "Evaluate audio"}
+            </button>
+          </div>
+
+          {audioUrl ? <audio controls src={audioUrl} style={{ marginTop: 12, width: "100%" }} /> : null}
+
+          {partnerLines.length ? (
+            <div style={{ marginTop: 12 }}>
+              <h4 style={{ margin: "0 0 6px 0" }}>AI Partner lines</h4>
+              <ul style={{ margin: 0, paddingLeft: 18 }}>
+                {partnerLines.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {error ? (
+            <p role="alert" style={{ color: "#b91c1c", marginTop: 12, marginBottom: 0 }}>
+              {error}
+            </p>
+          ) : null}
+
+          {result ? (
+            <div style={{ marginTop: 12, background: "#fff", border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+              <p style={{ margin: 0 }}>
+                Total: <strong>{result.total}</strong> / 20
+              </p>
+              <p style={{ ...styles.resultText, marginTop: 8 }}>
+                Pronunciation: {result?.scores?.pronunciation} | Grammar: {result?.scores?.grammar} | Content: {result?.scores?.content} | Fluency: {result?.scores?.fluency}
+              </p>
+              <h4 style={styles.resultHeading}>Transcript</h4>
+              <p style={styles.resultText}>{result.transcript || "-"}</p>
+              <h4 style={styles.resultHeading}>Improved answer (German)</h4>
+              <p style={styles.resultText}>{result.improved_answer || "-"}</p>
+              <h4 style={styles.resultHeading}>Feedback (English)</h4>
+              <p style={styles.resultText}>{result.feedback_text || "-"}</p>
+            </div>
+          ) : null}
         </div>
 
-        <div style={{ display: "grid", gap: 14 }}>
+        <div style={{ display: "grid", gap: 14, marginTop: 14 }}>
           <div style={{ ...styles.card, margin: 0, boxShadow: "none" }}>
             <h3 style={{ ...styles.sectionTitle, margin: "0 0 8px 0" }}>Scoring rubric focus</h3>
             <div style={{ display: "grid", gap: 10 }}>
@@ -118,27 +309,12 @@ const SpeakingPage = () => {
             </div>
           </div>
 
-          <div
-            style={{
-              padding: 12,
-              borderRadius: 14,
-              border: "1px solid #E5E7EB",
-              background: "#F9FAFB",
-            }}
-          >
+          <div style={{ padding: 12, borderRadius: 14, border: "1px solid #E5E7EB", background: "#F9FAFB" }}>
             <div style={{ fontSize: 14, color: "#111827", marginBottom: 8 }}>
               <strong>Common mistakes to avoid</strong>
             </div>
 
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                display: "grid",
-                gap: 10,
-              }}
-            >
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
               {COMMON_MISTAKES.map((item) => (
                 <ChecklistItem key={item.title} icon="⚠️">
                   <strong>{item.title}:</strong> {item.example} <em>Fix:</em> {item.fix}
@@ -146,72 +322,6 @@ const SpeakingPage = () => {
               ))}
             </ul>
           </div>
-
-          <div
-            style={{
-              padding: 12,
-              borderRadius: 14,
-              border: "1px solid #E5E7EB",
-              background: "#F9FAFB",
-            }}
-          >
-            <div style={{ fontSize: 14, color: "#111827", marginBottom: 8 }}>
-              <strong>Quick checklist</strong>
-            </div>
-
-            <ul
-              style={{
-                listStyle: "none",
-                padding: 0,
-                margin: 0,
-                display: "grid",
-                gap: 10,
-              }}
-            >
-              <ChecklistItem icon="🔓">
-                Click <strong>Open Goethe Speaking Exams</strong> and enter your{" "}
-                <strong>Student Code</strong>.
-              </ChecklistItem>
-
-              <ChecklistItem icon="🧭">
-                Go to the <strong>Question</strong> tab and choose what you want to
-                practice: <strong>Teil 1</strong>, <strong>Teil 2</strong>, or{" "}
-                <strong>Teil 3</strong>.
-              </ChecklistItem>
-
-              <ChecklistItem icon="📌">
-                Under your Question selection, read the <strong>description</strong>{" "}
-                carefully before you start.
-              </ChecklistItem>
-
-              <ChecklistItem icon="🎙️">
-                Click <strong>Start Recording</strong>, then <strong>ask and answer</strong>{" "}
-                the questions yourself (like a real exam).
-              </ChecklistItem>
-
-              <ChecklistItem icon="🤖">
-                Click <strong>Ask &amp; AI</strong> to get marking, feedback, and see your{" "}
-                results.
-              </ChecklistItem>
-
-              <ChecklistItem icon="✅">
-                Optional: tick the checkbox above <strong>Start Recording</strong> to use{" "}
-                the <strong>AI as your speaking partner</strong>.
-              </ChecklistItem>
-            </ul>
-          </div>
-
-          <p style={{ fontSize: 13, color: "#374151", lineHeight: 1.5, margin: 0 }}>
-            Further information:{" "}
-            <a href={SPEAKING_LINK} target="_blank" rel="noreferrer" style={{ color: "#2563eb" }}>
-              Goethe Speaking Exams practice page
-            </a>
-            .
-          </p>
-
-          <p style={{ fontSize: 13, color: "#6B7280", lineHeight: 1.5, margin: 0 }}>
-            Tip: Keep your microphone close and speak clearly for better AI feedback.
-          </p>
         </div>
       </div>
     </div>
