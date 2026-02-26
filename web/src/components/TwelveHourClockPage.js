@@ -215,7 +215,37 @@ const TwelveHourClockPage = () => {
       </div>
 
       <Section
-        title="1) The 4 core building blocks"
+        title="1) Start simple: full hours with \"Es ist … Uhr\""
+        subtitle="First learn how to say the hour clearly before adding minutes."
+      >
+        <Callout title='Use this frame every time: "Es ist …"'>
+          <div style={{ display: "grid", gap: 8 }}>
+            <div>
+              <strong>Es ist ein Uhr.</strong> (1:00)
+            </div>
+            <div>
+              <strong>Es ist zwei Uhr.</strong> (2:00)
+            </div>
+            <div>
+              <strong>Es ist drei Uhr.</strong> (3:00)
+            </div>
+            <div style={{ opacity: 0.85 }}>
+              Tipp: For 1:00, use <strong>ein Uhr</strong> (not *eins Uhr*).
+            </div>
+          </div>
+        </Callout>
+        <MiniTable
+          rows={[
+            ["1:00", "Es ist ein Uhr.", "It is one o’clock."],
+            ["2:00", "Es ist zwei Uhr.", "It is two o’clock."],
+            ["3:00", "Es ist drei Uhr.", "It is three o’clock."],
+            ["4:00", "Es ist vier Uhr.", "It is four o’clock."],
+          ]}
+        />
+      </Section>
+
+      <Section
+        title="2) The 4 core building blocks"
         subtitle="If you learn these four patterns, you can say most times correctly."
       >
         <ChipRow
@@ -246,7 +276,58 @@ const TwelveHourClockPage = () => {
       </Section>
 
       <Section
-        title="2) Minutes around the half hour (the common spoken style)"
+        title="3) Understand Viertel + nach/vor first"
+        subtitle="Use these before learning more complex minute patterns."
+      >
+        <MiniTable
+          rows={[
+            ["1:15", "Viertel nach eins", "quarter past one"],
+            ["2:15", "Viertel nach zwei", "quarter past two"],
+            ["1:45", "Viertel vor zwei", "quarter to two"],
+            ["2:45", "Viertel vor drei", "quarter to three"],
+          ]}
+        />
+        <Callout title="Quick meaning">
+          <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+            <li>
+              <strong>nach</strong> = after / past
+            </li>
+            <li>
+              <strong>vor</strong> = before / to
+            </li>
+            <li>
+              <strong>Viertel</strong> = 15 minutes
+            </li>
+          </ul>
+        </Callout>
+      </Section>
+
+      <Section
+        title="4) Halb is different from English"
+        subtitle="In German, halb points to the next hour."
+      >
+        <Callout title="Important A1 rule">
+          <div style={{ display: "grid", gap: 6 }}>
+            <div>
+              In English, people think of "half past 4" for 4:30.
+            </div>
+            <div>
+              In German, <strong>halb fünf</strong> = 4:30 (half <strong>to</strong> five).
+            </div>
+          </div>
+        </Callout>
+        <MiniTable
+          rows={[
+            ["1:30", "halb zwei", "half to two"],
+            ["2:30", "halb drei", "half to three"],
+            ["3:30", "halb vier", "half to four"],
+            ["4:30", "halb fünf", "half to five"],
+          ]}
+        />
+      </Section>
+
+      <Section
+        title="5) Minutes around the half hour (the common spoken style)"
         subtitle='These are super common in daily life: "vor halb" and "nach halb".'
       >
         <MiniTable
@@ -268,19 +349,29 @@ const TwelveHourClockPage = () => {
         </Callout>
       </Section>
 
-      <Section title="3) Morning / afternoon / evening (AM/PM without AM/PM)">
+      <Section title="6) AM and PM in German (without saying AM/PM)">
         <div style={{ display: "grid", gap: 10 }}>
           <p style={{ margin: 0, lineHeight: 1.6 }}>
-            German usually doesn’t say “AM/PM”. Instead, we add context words:
+            German usually doesn’t say “AM/PM”. Instead, use time-of-day words:
           </p>
           <MiniTable
             rows={[
-              ['8:00', 'acht Uhr morgens', '8:00 in the morning'],
-              ['2:00', 'zwei Uhr nachmittags', '2:00 in the afternoon'],
-              ['6:00', 'sechs Uhr abends', '6:00 in the evening'],
-              ['11:00', 'elf Uhr nachts', '11:00 at night'],
+              ["8:00", "Es ist acht Uhr morgens.", "8:00 AM (morning)"],
+              ["2:00", "Es ist zwei Uhr nachmittags.", "2:00 PM (afternoon)"],
+              ["6:00", "Es ist sechs Uhr abends.", "6:00 PM (evening)"],
+              ["11:00", "Es ist elf Uhr nachts.", "11:00 PM (night)"],
             ]}
           />
+          <Callout title="How to differentiate 8:00 AM vs 8:00 PM">
+            <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+              <li>
+                <strong>Es ist acht Uhr morgens.</strong> (8:00 AM)
+              </li>
+              <li>
+                <strong>Es ist acht Uhr abends.</strong> (8:00 PM)
+              </li>
+            </ul>
+          </Callout>
           <Callout title="A1 mini-examples (daily routine)">
             <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
               <li>
@@ -301,7 +392,7 @@ const TwelveHourClockPage = () => {
       </Section>
 
       <Section
-        title='4) Asking and answering time: "Wann", "um", "von … bis"'
+        title='7) Asking and answering time: "Wann", "um", "von … bis"'
         subtitle="These are the most useful question patterns for A1 conversations."
       >
         <div style={{ display: "grid", gap: 10 }}>
@@ -344,150 +435,8 @@ const TwelveHourClockPage = () => {
       </Section>
 
       <Section
-        title="5) Useful A1 grammar with time (separable verbs + word order)"
-        subtitle="Time words are easy — but word order matters. This section gives exam-ready patterns."
-      >
-        <div style={{ display: "grid", gap: 10 }}>
-          <Callout title="Separable verbs (Trennbare Verben): quick rule">
-            <div style={{ display: "grid", gap: 8 }}>
-              <div>
-                A separable verb has a <strong>verb stem</strong> + a <strong>prefix</strong>.
-              </div>
-              <div>
-                <strong>Main clause rule:</strong> verb in position 2, prefix at the end.
-              </div>
-              <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 10, padding: 10 }}>
-                <strong>Pattern:</strong> Ich + VERB (stem) + … + PREFIX <br />
-                <strong>Example:</strong> Ich fange um 8 Uhr <strong>an</strong>.
-              </div>
-              <MiniTable
-                rows={[
-                  ["Ich fange um 8 Uhr an.", "anfangen → … an", "I start at 8."],
-                  ["Er steht um 7 Uhr auf.", "aufstehen → … auf", "He gets up at 7."],
-                  ["Wir laden unsere Freunde ein.", "einladen → … ein", "We invite our friends."],
-                  ["Sie holt ihren Bruder ab.", "abholen → … ab", "She picks up her brother."],
-                  ["Er bringt einen Kuchen mit.", "mitbringen → … mit", "He brings a cake along."],
-                  ["Ich melde mich für den Kurs an.", "anmelden → … an", "I register for the course."],
-                  ["Sie kommt morgen zurück.", "zurückkommen → … zurück", "She comes back tomorrow."],
-                  ["Wir steigen in den Bus ein.", "einsteigen → … ein", "We get on the bus."],
-                ]}
-              />
-            </div>
-          </Callout>
-
-          <Callout title="Separable verbs in common exam tenses">
-            <div style={{ display: "grid", gap: 10 }}>
-              <div>
-                <strong>A) Present (Präsens)</strong>
-                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
-                  <li>Ich fange heute um 8 Uhr an.</li>
-                  <li>Er steht jeden Morgen um 7 Uhr auf.</li>
-                  <li>Wir laden alle unsere Freunde ein.</li>
-                </ul>
-              </div>
-
-              <div>
-                <strong>B) Perfect (Perfekt)</strong> — very common in speaking/writing
-                <div style={{ marginTop: 4, opacity: 0.9 }}>
-                  Pattern: <strong>haben/sein + Partizip II</strong>
-                </div>
-                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
-                  <li>Ich habe um 8 Uhr angefangen.</li>
-                  <li>Er ist um 7 Uhr aufgestanden.</li>
-                  <li>Wir haben unsere Freunde eingeladen.</li>
-                </ul>
-              </div>
-
-              <div>
-                <strong>C) Modal verbs</strong> (können, müssen, wollen, dürfen…)
-                <div style={{ marginTop: 4, opacity: 0.9 }}>
-                  With modal verbs, the separable verb stays together in infinitive at the end.
-                </div>
-                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
-                  <li>Ich kann um 8 Uhr anfangen.</li>
-                  <li>Er muss um 7 Uhr aufstehen.</li>
-                  <li>Wir wollen unsere Freunde einladen.</li>
-                </ul>
-              </div>
-            </div>
-          </Callout>
-
-          <Callout title="Questions, negation, and subordinate clauses">
-            <div style={{ display: "grid", gap: 10 }}>
-              <div>
-                <strong>Questions</strong>
-                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
-                  <li>Wann fängst du an?</li>
-                  <li>Stehst du jeden Tag um 7 Uhr auf?</li>
-                  <li>Bringst du etwas mit?</li>
-                </ul>
-              </div>
-              <div>
-                <strong>Negation</strong>
-                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
-                  <li>Ich fange heute nicht um 8 Uhr an.</li>
-                  <li>Wir laden unsere Freunde nicht ein.</li>
-                  <li>Er bringt keinen Kuchen mit.</li>
-                </ul>
-              </div>
-              <div>
-                <strong>Subordinate clause (weil / dass / wenn)</strong>
-                <div style={{ marginTop: 4 }}>
-                  In subordinate clauses, the verb goes to the end and the separable verb stays together.
-                </div>
-                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
-                  <li>Ich bleibe zu Hause, weil ich um 8 Uhr anfange.</li>
-                  <li>Ich weiß, dass er seine Freunde einlädt.</li>
-                  <li>Wir glauben, dass sie morgen zurückkommt.</li>
-                </ul>
-              </div>
-            </div>
-          </Callout>
-
-          <Callout title="Common separable prefixes + mini practice">
-            <div style={{ display: "grid", gap: 8 }}>
-              <ChipRow
-                items={[
-                  "an- (start): anfangen, anrufen",
-                  "auf- (up/open): aufstehen, aufmachen",
-                  "ab- (away/off): abholen, abfahren",
-                  "ein- (in): einladen, einsteigen",
-                  "mit- (with): mitbringen, mitkommen",
-                  "zurück- (back): zurückkommen, zurückfahren",
-                ]}
-              />
-              <div>
-                <strong>Quick class practice:</strong>
-                <ol style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
-                  <li>Ich fange um 8 Uhr _____. (an)</li>
-                  <li>Er steht jeden Morgen um 7 Uhr _____. (auf)</li>
-                  <li>Wir laden unsere Freunde _____. (ein)</li>
-                  <li>Rewrite with <em>weil</em>: Er steht um 7 Uhr auf.</li>
-                </ol>
-              </div>
-            </div>
-          </Callout>
-
-          <Callout title="Frequency words (immer / oft / manchmal …)">
-            <div style={{ display: "grid", gap: 8 }}>
-              <ChipRow items={["immer", "oft", "manchmal", "selten", "nie", "fast nie"]} />
-              <div style={{ lineHeight: 1.6 }}>
-                Simple main clause pattern:
-                <div style={{ marginTop: 6 }}>
-                  <strong>Ich</strong> stehe <strong>oft</strong> um sieben Uhr auf.
-                </div>
-                <div style={{ opacity: 0.85, marginTop: 6 }}>
-                  Tipp: Frequency words often come after the verb in very simple A1 sentences.
-                </div>
-              </div>
-            </div>
-          </Callout>
-        </div>
-      </Section>
-
-      <Section
-        title="6) Practice: Convert times (self-check)"
-        subtitle="Type your answer, check, and learn from the correct form."
+        title="8) Practice: same topics, one place (self-check)"
+        subtitle="Practice full hours, Viertel, halb, and AM/PM context together."
       >
         <div style={{ display: "grid", gap: 12 }}>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
