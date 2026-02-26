@@ -263,15 +263,15 @@
     },
     "announcements": {
       "eyebrow": "Nouveautés",
-      "title": "Annonces",
-      "subtitle": "Dernières informations de l’école et de la classe, y compris les mises à jour par langue.",
-      "loading": "Chargement des annonces…",
-      "error": "Impossible de charger les annonces pour le moment. Merci d’actualiser bientôt.",
-      "empty": "Pas encore d’annonces. Reviens plus tard pour les nouveautés.",
-      "ariaLabel": "Dernières annonces",
+      "title": "Derniers articles du blog",
+      "subtitle": "Nouveaux articles de blog.falowen.app.",
+      "loading": "Chargement des derniers articles du blog…",
+      "error": "Impossible de charger les derniers articles du blog pour le moment. Merci d’actualiser bientôt.",
+      "empty": "Pas encore d’articles de blog. Reviens plus tard pour les nouveautés.",
+      "ariaLabel": "Derniers articles du blog",
       "readMore": "Lire la suite",
       "showLess": "Réduire",
-      "openUpdate": "Ouvrir la mise à jour"
+      "openUpdate": "Ouvrir l’article"
     },
     "learningSpace": {
       "eyebrow": "Bon retour",
