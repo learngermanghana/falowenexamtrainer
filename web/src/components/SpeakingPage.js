@@ -3,8 +3,7 @@ import { styles } from "../styles";
 import { getTasksForLevel, useExam } from "../context/ExamContext";
 
 const SPEAKING_LINK =
-  "https://script.google.com/macros/s/AKfycbyWHrf5snW93gvPOqHbiMd63C8Kc_z6-JRVUCymslwFlgMEli5V52OdmEm47TyVT6sG/exec";
-const SPEAKING_PAGE_LINK = "https://www.falowen.app/exams/speaking";
+  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
 
 const COMMON_MISTAKES = [
   {
@@ -99,18 +98,6 @@ const SpeakingPage = () => {
               }}
             >
               Open Goethe Speaking Exams
-            </a>
-            <a
-              href={SPEAKING_PAGE_LINK}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                ...styles.buttonSecondary,
-                textDecoration: "none",
-                textAlign: "center",
-              }}
-            >
-              Open speaking page
             </a>
           </div>
         </div>
