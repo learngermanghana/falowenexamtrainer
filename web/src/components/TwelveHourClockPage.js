@@ -345,17 +345,127 @@ const TwelveHourClockPage = () => {
 
       <Section
         title="5) Useful A1 grammar with time (separable verbs + word order)"
-        subtitle="Time words are easy — but word order matters!"
+        subtitle="Time words are easy — but word order matters. This section gives exam-ready patterns."
       >
         <div style={{ display: "grid", gap: 10 }}>
-          <Callout title="Separable verbs (very common with routines)">
-            <MiniTable
-              rows={[
-                ['Ich fange um 8 Uhr an.', "anfangen → … an", "I start at 8."],
-                ['Er steht um 7 Uhr auf.', "aufstehen → … auf", "He gets up at 7."],
-                ['Wir hören um 18 Uhr auf.', "aufhören → … auf", "We stop at 6 pm."],
-              ]}
-            />
+          <Callout title="Separable verbs (Trennbare Verben): quick rule">
+            <div style={{ display: "grid", gap: 8 }}>
+              <div>
+                A separable verb has a <strong>verb stem</strong> + a <strong>prefix</strong>.
+              </div>
+              <div>
+                <strong>Main clause rule:</strong> verb in position 2, prefix at the end.
+              </div>
+              <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 10, padding: 10 }}>
+                <strong>Pattern:</strong> Ich + VERB (stem) + … + PREFIX <br />
+                <strong>Example:</strong> Ich fange um 8 Uhr <strong>an</strong>.
+              </div>
+              <MiniTable
+                rows={[
+                  ["Ich fange um 8 Uhr an.", "anfangen → … an", "I start at 8."],
+                  ["Er steht um 7 Uhr auf.", "aufstehen → … auf", "He gets up at 7."],
+                  ["Wir laden unsere Freunde ein.", "einladen → … ein", "We invite our friends."],
+                  ["Sie holt ihren Bruder ab.", "abholen → … ab", "She picks up her brother."],
+                  ["Er bringt einen Kuchen mit.", "mitbringen → … mit", "He brings a cake along."],
+                  ["Ich melde mich für den Kurs an.", "anmelden → … an", "I register for the course."],
+                  ["Sie kommt morgen zurück.", "zurückkommen → … zurück", "She comes back tomorrow."],
+                  ["Wir steigen in den Bus ein.", "einsteigen → … ein", "We get on the bus."],
+                ]}
+              />
+            </div>
+          </Callout>
+
+          <Callout title="Separable verbs in common exam tenses">
+            <div style={{ display: "grid", gap: 10 }}>
+              <div>
+                <strong>A) Present (Präsens)</strong>
+                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
+                  <li>Ich fange heute um 8 Uhr an.</li>
+                  <li>Er steht jeden Morgen um 7 Uhr auf.</li>
+                  <li>Wir laden alle unsere Freunde ein.</li>
+                </ul>
+              </div>
+
+              <div>
+                <strong>B) Perfect (Perfekt)</strong> — very common in speaking/writing
+                <div style={{ marginTop: 4, opacity: 0.9 }}>
+                  Pattern: <strong>haben/sein + Partizip II</strong>
+                </div>
+                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
+                  <li>Ich habe um 8 Uhr angefangen.</li>
+                  <li>Er ist um 7 Uhr aufgestanden.</li>
+                  <li>Wir haben unsere Freunde eingeladen.</li>
+                </ul>
+              </div>
+
+              <div>
+                <strong>C) Modal verbs</strong> (können, müssen, wollen, dürfen…)
+                <div style={{ marginTop: 4, opacity: 0.9 }}>
+                  With modal verbs, the separable verb stays together in infinitive at the end.
+                </div>
+                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
+                  <li>Ich kann um 8 Uhr anfangen.</li>
+                  <li>Er muss um 7 Uhr aufstehen.</li>
+                  <li>Wir wollen unsere Freunde einladen.</li>
+                </ul>
+              </div>
+            </div>
+          </Callout>
+
+          <Callout title="Questions, negation, and subordinate clauses">
+            <div style={{ display: "grid", gap: 10 }}>
+              <div>
+                <strong>Questions</strong>
+                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
+                  <li>Wann fängst du an?</li>
+                  <li>Stehst du jeden Tag um 7 Uhr auf?</li>
+                  <li>Bringst du etwas mit?</li>
+                </ul>
+              </div>
+              <div>
+                <strong>Negation</strong>
+                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
+                  <li>Ich fange heute nicht um 8 Uhr an.</li>
+                  <li>Wir laden unsere Freunde nicht ein.</li>
+                  <li>Er bringt keinen Kuchen mit.</li>
+                </ul>
+              </div>
+              <div>
+                <strong>Subordinate clause (weil / dass / wenn)</strong>
+                <div style={{ marginTop: 4 }}>
+                  In subordinate clauses, the verb goes to the end and the separable verb stays together.
+                </div>
+                <ul style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
+                  <li>Ich bleibe zu Hause, weil ich um 8 Uhr anfange.</li>
+                  <li>Ich weiß, dass er seine Freunde einlädt.</li>
+                  <li>Wir glauben, dass sie morgen zurückkommt.</li>
+                </ul>
+              </div>
+            </div>
+          </Callout>
+
+          <Callout title="Common separable prefixes + mini practice">
+            <div style={{ display: "grid", gap: 8 }}>
+              <ChipRow
+                items={[
+                  "an- (start): anfangen, anrufen",
+                  "auf- (up/open): aufstehen, aufmachen",
+                  "ab- (away/off): abholen, abfahren",
+                  "ein- (in): einladen, einsteigen",
+                  "mit- (with): mitbringen, mitkommen",
+                  "zurück- (back): zurückkommen, zurückfahren",
+                ]}
+              />
+              <div>
+                <strong>Quick class practice:</strong>
+                <ol style={{ margin: "6px 0 0", paddingLeft: 18, display: "grid", gap: 4 }}>
+                  <li>Ich fange um 8 Uhr _____. (an)</li>
+                  <li>Er steht jeden Morgen um 7 Uhr _____. (auf)</li>
+                  <li>Wir laden unsere Freunde _____. (ein)</li>
+                  <li>Rewrite with <em>weil</em>: Er steht um 7 Uhr auf.</li>
+                </ol>
+              </div>
+            </div>
           </Callout>
 
           <Callout title="Frequency words (immer / oft / manchmal …)">
