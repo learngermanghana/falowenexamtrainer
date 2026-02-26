@@ -200,7 +200,7 @@ const TwelveHourClockPage = () => {
         <Callout title="Big idea (A1-friendly)">
           <div style={{ display: "grid", gap: 8 }}>
             <div>
-              <strong>Full hour</strong> is simple: <em>ein Uhr, zwei Uhr, drei Uhr…</em>
+              <strong>Full hour</strong> is simple: <em>ein Uhr, zwei Uhr, drei Uhr...</em>
             </div>
             <div>
               <strong>Half hour</strong> uses the <strong>next hour</strong>:{" "}
@@ -215,10 +215,10 @@ const TwelveHourClockPage = () => {
       </div>
 
       <Section
-        title="1) Start simple: full hours with \"Es ist … Uhr\""
+        title="1) Start simple: full hours with \"Es ist ... Uhr\""
         subtitle="First learn how to say the hour clearly before adding minutes."
       >
-        <Callout title='Use this frame every time: "Es ist …"'>
+        <Callout title='Use this frame every time: "Es ist ..."'>
           <div style={{ display: "grid", gap: 8 }}>
             <div>
               <strong>Es ist ein Uhr.</strong> (1:00)
@@ -392,7 +392,7 @@ const TwelveHourClockPage = () => {
       </Section>
 
       <Section
-        title='7) Asking and answering time: "Wann", "um", "von … bis"'
+        title='7) Asking and answering time: "Wann", "um", "von ... bis"'
         subtitle="These are the most useful question patterns for A1 conversations."
       >
         <div style={{ display: "grid", gap: 10 }}>
@@ -402,7 +402,7 @@ const TwelveHourClockPage = () => {
                 <strong>Question:</strong> Wann beginnt der Film?
               </div>
               <div>
-                <strong>Answer:</strong> Der Film beginnt <strong>um</strong> 20 Uhr. / … <strong>um</strong> acht Uhr abends.
+                <strong>Answer:</strong> Der Film beginnt <strong>um</strong> 20 Uhr. / ... <strong>um</strong> acht Uhr abends.
               </div>
               <div style={{ opacity: 0.85 }}>
                 Tipp: <strong>um</strong> = “at (a time)”
@@ -410,7 +410,7 @@ const TwelveHourClockPage = () => {
             </div>
           </Callout>
 
-          <Callout title='B) Time range → use "von … bis"'>
+          <Callout title='B) Time range → use "von ... bis"'>
             <div style={{ display: "grid", gap: 8 }}>
               <div>
                 <strong>Question:</strong> Wann arbeitest du?
@@ -426,9 +426,9 @@ const TwelveHourClockPage = () => {
 
           <Callout title="C) Quick A1 practice sentences">
             <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
-              <li>Wann beginnt der Deutschkurs? — Er beginnt um …</li>
-              <li>Wann hast du Zeit? — Ich habe von … bis … Zeit.</li>
-              <li>Wann kommst du? — Ich komme um …</li>
+              <li>Wann beginnt der Deutschkurs? — Er beginnt um ...</li>
+              <li>Wann hast du Zeit? — Ich habe von ... bis ... Zeit.</li>
+              <li>Wann kommst du? — Ich komme um ...</li>
             </ul>
           </Callout>
         </div>
@@ -620,7 +620,7 @@ const TwelveHourClockPage = () => {
             </ol>
           </Callout>
 
-          <Callout title='C) Make full sentences (use "um" / "von…bis")'>
+          <Callout title='C) Make full sentences (use "um" / "von...bis")'>
             <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
               <li>Film / beginnen / 19:45</li>
               <li>Deutschkurs / sein / 18:00</li>
