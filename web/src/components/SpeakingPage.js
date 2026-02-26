@@ -27,6 +27,23 @@ const COMMON_MISTAKES = [
   },
 ];
 
+const RECORDING_MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"];
+const TARGET_AUDIO_BITRATE = 48_000;
+
+const formatBytes = (bytes = 0) => {
+  if (!bytes) return "0 KB";
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+};
+
+const pickRecordingMimeType = () => {
+  if (typeof MediaRecorder === "undefined" || typeof MediaRecorder.isTypeSupported !== "function") {
+    return "";
+  }
+
+  return RECORDING_MIME_CANDIDATES.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+};
+
 const ChecklistItem = ({ icon, children }) => (
   <li
     style={{
@@ -79,6 +96,7 @@ const SpeakingPage = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState(null);
   const [audioUrl, setAudioUrl] = useState("");
+  const [audioMeta, setAudioMeta] = useState({ sizeLabel: "", mimeType: "" });
 
   const mediaRecorderRef = useRef(null);
   const mediaStreamRef = useRef(null);
@@ -147,25 +165,40 @@ const SpeakingPage = () => {
   const startRecording = async () => {
     setError("");
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          noiseSuppression: true,
+          echoCancellation: true,
+          autoGainControl: true,
+        },
+      });
       mediaStreamRef.current = stream;
-      const recorder = new MediaRecorder(stream);
+      const mimeType = pickRecordingMimeType();
+      const recorderOptions = {
+        audioBitsPerSecond: TARGET_AUDIO_BITRATE,
+      };
+      if (mimeType) recorderOptions.mimeType = mimeType;
+      const recorder = new MediaRecorder(stream, recorderOptions);
       recordedChunksRef.current = [];
+      setAudioMeta({ sizeLabel: "", mimeType: recorder.mimeType || mimeType || "audio/webm" });
 
       recorder.ondataavailable = (event) => {
         if (event.data?.size > 0) recordedChunksRef.current.push(event.data);
       };
 
       recorder.onstop = () => {
-        const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
+        const blobType = recorder.mimeType || mimeType || "audio/webm";
+        const blob = new Blob(recordedChunksRef.current, { type: blobType });
         setAudioBlob(blob);
+        setAudioMeta({ sizeLabel: formatBytes(blob.size), mimeType: blobType });
         if (audioUrl) URL.revokeObjectURL(audioUrl);
         setAudioUrl(URL.createObjectURL(blob));
         stream.getTracks().forEach((track) => track.stop());
       };
 
       mediaRecorderRef.current = recorder;
-      recorder.start();
+      recorder.start(1000);
       setIsRecording(true);
     } catch (_err) {
       setError("Microphone permission denied or unavailable.");
@@ -271,7 +304,14 @@ const SpeakingPage = () => {
             </button>
           </div>
 
-          {audioUrl ? <audio controls src={audioUrl} style={{ marginTop: 12, width: "100%" }} /> : null}
+          {audioUrl ? (
+            <div style={{ marginTop: 12, display: "grid", gap: 6 }}>
+              <audio controls src={audioUrl} style={{ width: "100%" }} />
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                Compressed recording: {audioMeta.sizeLabel || "pending"} ({audioMeta.mimeType || "audio/webm"}, 48 kbps target)
+              </p>
+            </div>
+          ) : null}
 
           {partnerLines.length ? (
             <div style={{ marginTop: 12 }}>
