@@ -22,8 +22,8 @@ const SpeechTrainerPage = () => {
           display: "grid",
           gap: 12,
         }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div style={{ display: "grid", gap: 6 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>
               {isFrenchProgram ? "French speech trainer" : "Speech Trainer"}
