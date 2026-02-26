@@ -95,6 +95,10 @@ const A1LetterWritingQuestionBookPage = () => {
       },
       { label: "Conclusion (don’t change)", text: "Ich freue mich im Voraus auf Ihre Antwort." },
       { label: "Closing", text: "Mit freundlichen Grüßen," },
+      {
+        label: "Opening/Closing split",
+        text: "Keep formal style together: use Ihnen + Mit freundlichen Grüßen. Do not mix formal opening with informal closing.",
+      },
       { label: "Signature", text: "[Your Full Name]" },
     ],
     []
@@ -121,12 +125,51 @@ const A1LetterWritingQuestionBookPage = () => {
       },
       { label: "Conclusion (don’t change)", text: "Ich freue mich im Voraus auf deine Antwort." },
       { label: "Closing", text: "Liebe Grüße / Viele Grüße (you can use any)." },
+      {
+        label: "Opening/Closing split",
+        text: "Keep informal style together: use dir + Liebe Grüße/Viele Grüße. Do not mix informal opening with formal closing.",
+      },
       { label: "Signature", text: "[Your First Name]" },
     ],
     []
   );
 
-  /** =========================
+  
+  const FORMAL_FULL_SAMPLE = useMemo(
+    () => [
+      "Sehr geehrte Damen und Herren,",
+      "",
+      "Ich hoffe, es geht Ihnen gut.",
+      "Ich schreibe Ihnen, weil ich lerne.",
+      "Wie viel kostet das?",
+      "Wie soll ich bezahlen?",
+      "Mit Kreditkarte oder bar?",
+      "",
+      "Ich freue mich im Voraus auf Ihre Antwort.",
+      "Mit freundlichen Grüßen,",
+      "Max Mustermann",
+    ],
+    []
+  );
+
+  const INFORMAL_FULL_SAMPLE = useMemo(
+    () => [
+      "Hallo Anna,",
+      "",
+      "Wie geht es dir?",
+      "Ich hoffe, es geht dir gut.",
+      "Ich schreibe dir, weil ich komme.",
+      "Wann beginnt deine Feier?",
+      "Kann ich meine Familie mitbringen?",
+      "",
+      "Ich freue mich im Voraus auf deine Antwort.",
+      "Viele Grüße",
+      "Mia",
+    ],
+    []
+  );
+
+/** =========================
    *  QUESTION BOOK (READ ONLY)
    *  ========================= */
   const BIRTHDAY_STEPS = useMemo(
@@ -333,12 +376,25 @@ const A1LetterWritingQuestionBookPage = () => {
             <InfoBox title="Structure + Rules">
               <RuleParagraphs items={FORMAL_STRUCTURE} />
             </InfoBox>
+            <InfoBox title="Very short A1 sample (formal)">
+              <div style={{ whiteSpace: "pre-line", lineHeight: 1.6 }}>
+                {FORMAL_FULL_SAMPLE.join("\n")}
+              </div>
+            </InfoBox>
           </Section>
 
           <Section title="Informal Letter Structure (Read First)">
             <InfoBox title="Structure + Rules">
               <RuleParagraphs items={INFORMAL_STRUCTURE} />
             </InfoBox>
+            <InfoBox title="Very short A1 sample (informal)">
+              <div style={{ whiteSpace: "pre-line", lineHeight: 1.6 }}>
+                {INFORMAL_FULL_SAMPLE.join("\n")}
+              </div>
+            </InfoBox>
+            <div style={{ marginTop: -8, opacity: 0.9 }}>
+              Use the same rules above when answering the steps below.
+            </div>
           </Section>
 
           <Section title="Assignment 1 — Birthday Letter Question Book (Read First)">
