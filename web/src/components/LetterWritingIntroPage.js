@@ -290,6 +290,15 @@ const A1LetterWritingQuestionBookPage = () => {
               <BulletList items={TEIL1_FORM_SAMPLE} />
             </InfoBox>
 
+            <InfoBox title="Goethe sample (direct)">
+              <div style={{ lineHeight: 1.6 }}>
+                You can also view a direct sample from the Goethe website here: {" "}
+                <a href="https://bfu.goethe.de/a1_sd1/schreiben.php" target="_blank" rel="noreferrer">
+                  https://bfu.goethe.de/a1_sd1/schreiben.php
+                </a>
+              </div>
+            </InfoBox>
+
             <InfoBox title="Form snippet (what to fill)">
               <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
                 <div>
