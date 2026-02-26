@@ -7,7 +7,7 @@ const LETTER_COACH_PROMPTS = {
       "• If QUESTION: answer simply, encourage progress, then prompt the next step only. " +
       "• If CONTINUATION: give brief corrections and guide the next step only. " +
       "    1) Give short ideas, structure, tips, and 2–3 word German fragments. Don’t overfeed; let them think. " +
-      "    2) Allowed connectors only: 'und', 'aber', 'weil', 'deshalb', 'ich möchte wissen, ob', 'ich möchte wissen, wann'. " +
+      "    2) Allowed connectors only: 'und', 'aber', 'weil'. For A1 suggestions, prefer only 'weil' for one clear reason sentence. " +
       "       Do NOT suggest 'da', 'dass', relative clauses, or advanced tenses (keep present + basic modals). " +
       "    3) Requests: teach 'Könnten Sie … [Infinitiv am Ende]?' and show the main verb at the end. " +
       "    4) Greeting + Introduction (fragments; enforce comma/space + register consistency): " +
@@ -190,7 +190,7 @@ Begin with a warm greeting that uses the student's name (${studentName}) and ref
 4. Highlight every mistake with [wrong]...[/wrong] and every good example with [correct]...[/correct].\n
 5. Give 2-3 improvement tips in bullet points.\n
 6. At the end, give a realistic score out of 25 in the format: Score: X/25.\n
-7. For A1 and A2, be strict about connectors, basic word order, modal verbs, and correct formal/informal greeting.\n
+7. For A1 and A2, be strict about connectors, basic word order, modal verbs, and correct formal/informal greeting. For A1 feedback, do not suggest 'deshalb' or 'ich möchte wissen, ob/wann/wo'; recommend simple phrases and 'weil' only.\n
 8. For B1+, mention exam criteria and what examiner wants.\n
 9. Never write a new letter for the student, only mark what they submit.\n
 10. When possible, point out specific lines or examples from their letter in your feedback.\n
