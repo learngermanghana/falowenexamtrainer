@@ -613,6 +613,16 @@ const StudyBuddyBar = ({ studentProfile }) => {
             <p className="study-buddy-plan-nudge">{nudgeMessage}</p>
           </div>
         </div>
+        {!isCollapsed ? (
+          <button
+            type="button"
+            className="study-buddy-mobile-close"
+            onClick={() => setIsCollapsed(true)}
+            aria-label={t("studyBuddy.actions.collapse")}
+          >
+            {t("studyBuddy.actions.collapse")}
+          </button>
+        ) : null}
       </div>
     </section>
   );
