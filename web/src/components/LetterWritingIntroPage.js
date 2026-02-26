@@ -91,7 +91,7 @@ const A1LetterWritingQuestionBookPage = () => {
       },
       {
         label: "Main Body",
-        text: "Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
+        text: "Structure + Rules: write 5 or 6 words, follow statement rule, question rule, yes/no-question rule, and modal-verb statement rule.",
       },
       { label: "Conclusion (don’t change)", text: "Ich freue mich im Voraus auf Ihre Antwort." },
       { label: "Closing", text: "Mit freundlichen Grüßen," },
@@ -117,7 +117,7 @@ const A1LetterWritingQuestionBookPage = () => {
       },
       {
         label: "Main Body",
-        text: "Use these conjunctions: Ich möchte wissen, ob / deshalb / weil.",
+        text: "Structure + Rules: write 5 or 6 words, follow statement rule, question rule, yes/no-question rule, and modal-verb statement rule.",
       },
       { label: "Conclusion (don’t change)", text: "Ich freue mich im Voraus auf deine Antwort." },
       { label: "Closing", text: "Liebe Grüße / Viele Grüße (you can use any)." },
