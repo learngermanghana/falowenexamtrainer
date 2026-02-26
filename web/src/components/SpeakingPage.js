@@ -92,22 +92,37 @@ const SpeakingPage = () => {
         if (!active) return;
         const nextLevels = Array.isArray(items) ? items : [];
         setLevels(nextLevels);
-        if (examLevel && nextLevels.includes(examLevel)) {
-          setLevel(examLevel);
-        } else if (!level && nextLevels.length) {
-          setLevel(nextLevels[0]);
-        }
+        setLevel((currentLevel) => {
+          if (examLevel && nextLevels.includes(examLevel)) return examLevel;
+          if (!currentLevel && nextLevels.length) return nextLevels[0];
+          return currentLevel;
+        });
       })
-      .catch((err) => setError(err?.response?.data?.error || err.message || "Failed to load levels."));
+      .catch((err) => {
+        if (!active) return;
+        setError(err?.response?.data?.error || err.message || "Failed to load levels.");
+      });
 
     return () => {
       active = false;
-      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    };
+  }, [examLevel]);
+
+  useEffect(() => {
+    if (!audioUrl) return undefined;
+    return () => {
+      URL.revokeObjectURL(audioUrl);
+    };
+  }, [audioUrl]);
+
+  useEffect(
+    () => () => {
       if (mediaStreamRef.current) {
         mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       }
-    };
-  }, []);
+    },
+    []
+  );
 
   useEffect(() => {
     if (!level) {
