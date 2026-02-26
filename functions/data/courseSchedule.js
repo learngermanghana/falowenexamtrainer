@@ -38,10 +38,11 @@ const A2_SCHEDULE = [
     chapter: "1.1",
     goal: "Practice basic greetings and small talk.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
+    grammar_topic: "A2 Starter Conjunctions: weil, deshalb, denn",
     assignment: true,
     video: "https://youtu.be/siF0jWZdIwk",
     youtube_link: "https://youtu.be/siF0jWZdIwk",
-    grammarbook_link: "https://drive.google.com/file/d/1NsCKO4K7MWI-queLWCeBuclmaqPN04YQ/view?usp=sharing",
+    grammarbook_link: "/campus/course/a2-starter-conjunctions-day-1",
     workbook_link: "https://drive.google.com/file/d/1LXDI1yyJ4aT4LhX5eGDbKnkCkJZ2EE2T/view?usp=sharing",
   },
   {

@@ -29,6 +29,7 @@ import TwoCasePrepositionsPage from "./components/TwoCasePrepositionsPage";
 import DativeArticlesMitBeiZuPage from "./components/DativeArticlesMitBeiZuPage";
 import LetterWritingIntroPage from "./components/LetterWritingIntroPage";
 import WeatherPerfektLetterPage from "./components/WeatherPerfektLetterPage";
+import A2StarterConjunctionsPage from "./components/A2StarterConjunctionsPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -522,6 +523,7 @@ const AppShell = ({
             element={<LetterWritingIntroPage />}
           />
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
+          <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
           <Route path="/campus/course/german-numbers-1-10-with-pronunciation" element={<GermanNumbersGrammarPage />} />
