@@ -22,6 +22,7 @@ import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage";
 import GermanNumbersGrammarPage from "./components/GermanNumbersGrammarPage";
 import ObjectsAndColorsPage from "./components/ObjectsAndColorsPage";
+import TwelveHourClockPage from "./components/TwelveHourClockPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import DirectionsImperativePage from "./components/DirectionsImperativePage";
@@ -528,6 +529,7 @@ const AppShell = ({
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
           <Route path="/campus/course/german-numbers-1-10-with-pronunciation" element={<GermanNumbersGrammarPage />} />
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
+          <Route path="/campus/course/the-12-hour-clock-system-in-german-chapter-7" element={<TwelveHourClockPage />} />
           <Route
             path="/campus/course/singular-pronouns-verb-conjugation-day-2"
             element={<SingularPronounsConjugationPage />}
