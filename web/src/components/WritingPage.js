@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import ResultHistory from "./ResultHistory";
@@ -348,6 +348,9 @@ const WritingPage = ({ mode = "course" }) => {
   const [typedAnswer, setTypedAnswer] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
+  const [hasUnreadCoachReply, setHasUnreadCoachReply] = useState(false);
+  const [isPreviewOverflowing, setIsPreviewOverflowing] = useState(false);
+  const [isPreviewScrolled, setIsPreviewScrolled] = useState(false);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
@@ -392,6 +395,8 @@ const WritingPage = ({ mode = "course" }) => {
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
+  const chatLogRef = useRef(null);
+  const previewRef = useRef(null);
   const resetWritingWorkspace = useCallback(() => {
     setTypedAnswer("");
     setMarkFeedback("");
@@ -404,6 +409,9 @@ const WritingPage = ({ mode = "course" }) => {
     setImprovedLoading(false);
     setIdeaInput("");
     setChatMessages([IDEA_COACH_INTRO]);
+    setHasUnreadCoachReply(false);
+    setIsPreviewOverflowing(false);
+    setIsPreviewScrolled(false);
     setSelectedDraftIds([]);
     setIdeaError("");
     setIdeaSuccess("");
@@ -985,6 +993,44 @@ const WritingPage = ({ mode = "course" }) => {
     setIdeaInput((prev) => `${prev}${prev.trim() ? " " : ""}${connector}`);
   };
 
+  const isNearBottom = useCallback((element) => {
+    if (!element) return true;
+    const remaining = element.scrollHeight - element.scrollTop - element.clientHeight;
+    return remaining < 28;
+  }, []);
+
+  const scrollChatToBottom = useCallback(() => {
+    if (!chatLogRef.current) return;
+    chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
+  }, []);
+
+  useEffect(() => {
+    const chatLog = chatLogRef.current;
+    if (!chatLog) return;
+
+    const lastMessage = chatMessages[chatMessages.length - 1];
+    const shouldAutoScroll = !lastMessage || lastMessage.role === "user" || isNearBottom(chatLog);
+
+    if (shouldAutoScroll) {
+      scrollChatToBottom();
+      setHasUnreadCoachReply(false);
+      return;
+    }
+
+    if (lastMessage?.role === "assistant") {
+      setHasUnreadCoachReply(true);
+    }
+  }, [chatMessages, isNearBottom, scrollChatToBottom]);
+
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+
+    const overflowing = preview.scrollHeight > preview.clientHeight + 4;
+    setIsPreviewOverflowing(overflowing);
+    setIsPreviewScrolled(overflowing && preview.scrollTop > 4);
+  }, [ideaInput]);
+
   const userMessages = useMemo(
     () => chatMessages.filter((msg) => msg.role === "user"),
     [chatMessages]
@@ -1471,7 +1517,16 @@ const WritingPage = ({ mode = "course" }) => {
               ))}
             </ul>
           </div>
-          <div style={styles.chatLog} className="idea-generator-chat">
+          <div
+            ref={chatLogRef}
+            style={styles.chatLog}
+            className="idea-generator-chat"
+            onScroll={() => {
+              if (isNearBottom(chatLogRef.current)) {
+                setHasUnreadCoachReply(false);
+              }
+            }}
+          >
             {chatMessages.map((msg, idx) => (
               <div
                 key={msg.id || `${msg.role}-${idx}`}
@@ -1483,12 +1538,26 @@ const WritingPage = ({ mode = "course" }) => {
                 className={`idea-generator-bubble ${msg.role === "assistant" ? "idea-generator-bubble--coach" : "idea-generator-bubble--user"}`}
               >
                 <strong style={{ display: "block", marginBottom: 4 }}>
-                  {msg.role === "assistant" ? "Coach" : "You"}
+                  {msg.role === "assistant"
+                    ? "🤖 Herr Felix (AI coach)"
+                    : `👩‍🎓 ${user?.displayName || "Student"}`}
                 </strong>
                 <span>{msg.content}</span>
               </div>
             ))}
           </div>
+          {hasUnreadCoachReply ? (
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, marginTop: 8 }}
+              onClick={() => {
+                scrollChatToBottom();
+                setHasUnreadCoachReply(false);
+              }}
+            >
+              New coach reply ↓
+            </button>
+          ) : null}
           <div style={{ marginTop: 12 }}>
             <label style={styles.label}>Your prompt (single box)</label>
             <textarea
@@ -1567,16 +1636,27 @@ const WritingPage = ({ mode = "course" }) => {
                 <p style={styles.helperText}>
                   See what you're typing before you send it.
                 </p>
+                {isPreviewOverflowing ? (
+                  <div style={{ ...styles.badge, marginBottom: 8, background: "#fff7ed", borderColor: "#fed7aa" }}>
+                    {isPreviewScrolled ? "You are viewing part of your text. Scroll up for the beginning." : "Long draft detected. Scroll to review all text."}
+                  </div>
+                ) : null}
                 <div
+                  ref={previewRef}
                   style={{
                     border: "1px dashed #d1d5db",
                     borderRadius: 10,
                     padding: 10,
                     minHeight: 80,
+                    maxHeight: 160,
+                    overflowY: "auto",
                     background: "#f8fafc",
                     whiteSpace: "pre-wrap",
                   }}
                   className="idea-generator-preview"
+                  onScroll={(event) => {
+                    setIsPreviewScrolled(event.currentTarget.scrollTop > 4);
+                  }}
                 >
                   {ideaInput.trim() || "No draft typed yet."}
                 </div>
