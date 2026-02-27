@@ -452,6 +452,8 @@ const WritingPage = ({ mode = "course" }) => {
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
+  const [, setPendingExamStart] = useState(false);
+  const [, setExamFocusMode] = useState(false);
   const normalizeProfileLevel = (rawLevel) => {
     const normalized = (rawLevel || "").trim().toUpperCase();
     if (ALLOWED_LEVELS.includes(normalized)) {
