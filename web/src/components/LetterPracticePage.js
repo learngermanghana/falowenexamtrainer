@@ -14,34 +14,6 @@ const IDEAS_COACHING_PROMPTS = [
   "End by summarizing the idea in your own words.",
 ];
 
-const countWords = (text = "") => {
-  const trimmed = text.trim();
-  if (!trimmed) return 0;
-  return trimmed.split(/\s+/).length;
-};
-
-const summarizeDraftChanges = (firstDraft = "", revisedDraft = "") => {
-  const firstWords = countWords(firstDraft);
-  const revisedWords = countWords(revisedDraft);
-  const delta = revisedWords - firstWords;
-  const connectors = ["und", "aber", "weil", "dann", "zuerst", "außerdem", "zum schluss"];
-  const lower = revisedDraft.toLowerCase();
-  const usedConnector = connectors.some((item) => lower.includes(item));
-  const changed = firstDraft.trim() !== revisedDraft.trim();
-
-  return {
-    firstWords,
-    revisedWords,
-    delta,
-    changed,
-    badges: [
-      changed ? "Rewrote sentence" : null,
-      usedConnector ? "Used connector" : null,
-      /\b(ich|du|er|sie|wir)\b/.test(lower) && /\b(bin|bist|ist|sind)\b/.test(lower) ? "Fixed word order" : null,
-    ].filter(Boolean),
-  };
-};
-
 const LetterPracticePage = ({ mode = "exams" }) => {
   const { i18n, t } = useTranslation();
   const numberFormatter = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language]);
@@ -67,10 +39,6 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [activeTab, setActiveTab] = useState("mark");
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
-  const [firstDraftSnapshot, setFirstDraftSnapshot] = useState("");
-  const [reflectionText, setReflectionText] = useState("");
-  const [revisedDraftText, setRevisedDraftText] = useState("");
-  const [markCompletionMessage, setMarkCompletionMessage] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([ideaCoachIntro]);
   const [ideasLoading, setIdeasLoading] = useState(false);
@@ -266,10 +234,6 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       });
 
       setMarkFeedback(data.feedback);
-      setFirstDraftSnapshot(trimmed);
-      setRevisedDraftText(trimmed);
-      setReflectionText("");
-      setMarkCompletionMessage("");
       addResultToHistory({
         id: Date.now(),
         mode: "Mark my letter",
@@ -284,30 +248,6 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const changeSummary = useMemo(
-    () => summarizeDraftChanges(firstDraftSnapshot, revisedDraftText),
-    [firstDraftSnapshot, revisedDraftText]
-  );
-
-  const handleCompleteMarkWorkflow = () => {
-    if (!markFeedback) {
-      setError("Step 1 first: get AI feedback.");
-      return;
-    }
-    if (reflectionText.trim().length < 12) {
-      setError("Step 2: write a short reflection (at least 12 characters) about what you fixed.");
-      return;
-    }
-    if (!changeSummary.changed || !revisedDraftText.trim()) {
-      setError("Step 2: submit a revised version that is different from your first draft.");
-      return;
-    }
-
-    setLetterText(revisedDraftText);
-    setMarkCompletionMessage("Great job — workflow completed. Keep using this 2-step loop for every letter.");
-    setError("");
   };
 
   const makeChatMessage = (role, content) => ({
@@ -591,14 +531,6 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         <section style={styles.card}>
           <div style={{ display: "grid", gap: 12 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Mark my letter</h3>
-            <div style={styles.infoBox}>
-              <strong>3-step workflow:</strong>
-              <ol style={styles.promptList}>
-                <li>Paste draft</li>
-                <li>Read 2 corrections</li>
-                <li>Rewrite 1 paragraph</li>
-              </ol>
-            </div>
             <div style={{ display: "grid", gap: 6 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <label style={styles.label}>Level for feedback</label>
@@ -657,39 +589,6 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                 <div>
                   <h4 style={styles.sectionTitle}>AI feedback</h4>
                   <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
-                </div>
-                <div style={styles.infoBox}>
-                  <strong>Step 2 (required): reflect + revise before completion</strong>
-                  <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
-                    <textarea
-                      style={styles.textareaSmall}
-                      rows={2}
-                      value={reflectionText}
-                      onChange={(e) => setReflectionText(e.target.value)}
-                      placeholder="What I fixed: ..."
-                    />
-                    <textarea
-                      style={styles.textArea}
-                      rows={6}
-                      value={revisedDraftText}
-                      onChange={(e) => setRevisedDraftText(e.target.value)}
-                      placeholder="Submit revised version here"
-                    />
-                  </div>
-                  <p style={{ ...styles.helperText, margin: "8px 0 0 0" }}>
-                    Attempt 1: {changeSummary.firstWords} words · Attempt 2: {changeSummary.revisedWords} words · Δ {changeSummary.delta}
-                  </p>
-                  {changeSummary.badges.length ? (
-                    <div style={styles.tagRow}>
-                      {changeSummary.badges.map((badge) => (
-                        <span key={badge} style={styles.tagPill}>{badge}</span>
-                      ))}
-                    </div>
-                  ) : null}
-                  <button style={{ ...styles.primaryButton, marginTop: 8 }} onClick={handleCompleteMarkWorkflow}>
-                    Complete
-                  </button>
-                  {markCompletionMessage ? <div style={{ ...styles.successBox, marginTop: 8 }}>{markCompletionMessage}</div> : null}
                 </div>
               </div>
             )}
