@@ -5,8 +5,6 @@ import {
   db,
   getDocs,
   isFirebaseConfigured,
-  limit,
-  orderBy,
   query,
   serverTimestamp,
   updateDoc,
@@ -14,6 +12,39 @@ import {
 } from "../firebase";
 
 const COLLECTION_NAME = "examTutorReviewQueue";
+
+const toMillis = (value) => {
+  if (!value) return 0;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  if (typeof value === "object") {
+    if (typeof value.seconds === "number") {
+      const nanos = typeof value.nanoseconds === "number" ? value.nanoseconds : 0;
+      return (value.seconds * 1000) + Math.floor(nanos / 1e6);
+    }
+    if (typeof value._seconds === "number") {
+      const nanos = typeof value._nanoseconds === "number" ? value._nanoseconds : 0;
+      return (value._seconds * 1000) + Math.floor(nanos / 1e6);
+    }
+  }
+  return 0;
+};
+
+const normalizeReviewTimestamps = (review = {}) => {
+  if (!review || typeof review !== "object") return review;
+
+  const createdAtMs = toMillis(review.createdAt);
+  const reviewedAtMs = toMillis(review.reviewedAt);
+  return {
+    ...review,
+    createdAtMs,
+    reviewedAt: reviewedAtMs ? new Date(reviewedAtMs).toISOString() : review.reviewedAt || null,
+  };
+};
 
 export const isTutorReviewCloudEnabled = () => Boolean(isFirebaseConfigured && db);
 
@@ -80,15 +111,15 @@ export const loadLatestTutorReviewForStudent = async ({ userId, studentCode } = 
     return null;
   }
 
-  const reviewQuery = query(
-    collection(db, COLLECTION_NAME),
-    where("ownerKey", "in", ownerCandidates),
-    orderBy("createdAt", "desc"),
-    limit(1)
-  );
+  const reviewQuery = query(collection(db, COLLECTION_NAME), where("ownerKey", "in", ownerCandidates));
   const snapshot = await getDocs(reviewQuery);
   if (snapshot.empty) return null;
-  return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+
+  const latest = snapshot.docs
+    .map((docSnap) => normalizeReviewTimestamps({ id: docSnap.id, ...docSnap.data() }))
+    .sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0))[0];
+
+  return latest || null;
 };
 
 export const saveTutorReviewResponse = async ({ reviewId, reviewStatus, tutorFeedback = "" } = {}) => {
