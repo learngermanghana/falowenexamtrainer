@@ -349,6 +349,9 @@ const WritingPage = ({ mode = "course" }) => {
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
   const [hasUnreadCoachReply, setHasUnreadCoachReply] = useState(false);
+  const [isChatOverflowing, setIsChatOverflowing] = useState(false);
+  const [isChatScrolled, setIsChatScrolled] = useState(false);
+  const [hasHiddenNewerMessages, setHasHiddenNewerMessages] = useState(false);
   const [isPreviewOverflowing, setIsPreviewOverflowing] = useState(false);
   const [isPreviewScrolled, setIsPreviewScrolled] = useState(false);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
@@ -410,6 +413,9 @@ const WritingPage = ({ mode = "course" }) => {
     setIdeaInput("");
     setChatMessages([IDEA_COACH_INTRO]);
     setHasUnreadCoachReply(false);
+    setIsChatOverflowing(false);
+    setIsChatScrolled(false);
+    setHasHiddenNewerMessages(false);
     setIsPreviewOverflowing(false);
     setIsPreviewScrolled(false);
     setSelectedDraftIds([]);
@@ -1004,6 +1010,17 @@ const WritingPage = ({ mode = "course" }) => {
     chatLogRef.current.scrollTop = chatLogRef.current.scrollHeight;
   }, []);
 
+  const updateChatScrollMeta = useCallback(() => {
+    const chatLog = chatLogRef.current;
+    if (!chatLog) return;
+    const overflowing = chatLog.scrollHeight > chatLog.clientHeight + 4;
+    setIsChatOverflowing(overflowing);
+    setIsChatScrolled(overflowing && chatLog.scrollTop > 4);
+    setHasHiddenNewerMessages(
+      overflowing && !isNearBottom(chatLog)
+    );
+  }, [isNearBottom]);
+
   useEffect(() => {
     const chatLog = chatLogRef.current;
     if (!chatLog) return;
@@ -1014,13 +1031,26 @@ const WritingPage = ({ mode = "course" }) => {
     if (shouldAutoScroll) {
       scrollChatToBottom();
       setHasUnreadCoachReply(false);
+      setHasHiddenNewerMessages(false);
+      updateChatScrollMeta();
       return;
     }
 
     if (lastMessage?.role === "assistant") {
       setHasUnreadCoachReply(true);
     }
-  }, [chatMessages, isNearBottom, scrollChatToBottom]);
+    updateChatScrollMeta();
+  }, [chatMessages, isNearBottom, scrollChatToBottom, updateChatScrollMeta]);
+
+  useEffect(() => {
+    updateChatScrollMeta();
+  }, [activeTab, chatMessages, updateChatScrollMeta]);
+
+  useEffect(() => {
+    const handleResize = () => updateChatScrollMeta();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [updateChatScrollMeta]);
 
   useEffect(() => {
     const preview = previewRef.current;
@@ -1522,9 +1552,12 @@ const WritingPage = ({ mode = "course" }) => {
             style={styles.chatLog}
             className="idea-generator-chat"
             onScroll={() => {
-              if (isNearBottom(chatLogRef.current)) {
+              const atBottom = isNearBottom(chatLogRef.current);
+              if (atBottom) {
                 setHasUnreadCoachReply(false);
+                setHasHiddenNewerMessages(false);
               }
+              updateChatScrollMeta();
             }}
           >
             {chatMessages.map((msg, idx) => (
@@ -1546,6 +1579,23 @@ const WritingPage = ({ mode = "course" }) => {
               </div>
             ))}
           </div>
+          {isChatOverflowing ? (
+            <div
+              style={{
+                ...styles.badge,
+                marginTop: 8,
+                background: "#fff7ed",
+                borderColor: "#fed7aa",
+                display: "block",
+              }}
+            >
+              {hasHiddenNewerMessages
+                ? "You are viewing older messages. Scroll down to see the newest reply."
+                : isChatScrolled
+                  ? "You are not at the beginning. Scroll up to see earlier context."
+                  : "Long chat detected. Scroll to review all messages."}
+            </div>
+          ) : null}
           {hasUnreadCoachReply ? (
             <button
               type="button"
@@ -1553,9 +1603,11 @@ const WritingPage = ({ mode = "course" }) => {
               onClick={() => {
                 scrollChatToBottom();
                 setHasUnreadCoachReply(false);
+                setHasHiddenNewerMessages(false);
+                updateChatScrollMeta();
               }}
             >
-              New coach reply ↓
+              New AI reply below ↓
             </button>
           ) : null}
           <div style={{ marginTop: 12 }}>
@@ -1606,6 +1658,10 @@ const WritingPage = ({ mode = "course" }) => {
                 setIdeaInput("");
                 setSelectedDraftIds([]);
                 setIdeaSuccess("");
+                setHasUnreadCoachReply(false);
+                setHasHiddenNewerMessages(false);
+                setIsChatScrolled(false);
+                setIsChatOverflowing(false);
               }}
             >
               Reset chat
