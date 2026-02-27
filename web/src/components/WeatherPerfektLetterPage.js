@@ -51,13 +51,16 @@ const WeatherPerfektLetterPage = () => {
 
       {/* INTRO */}
       <section style={cardStyle}>
-        <h1 style={{ margin: 0 }}>Chapter 13: Weather + Seasons + Dates/Time + Simple Letter Writing (A1)</h1>
+        <h1 style={{ margin: 0 }}>
+          Chapter 13: Weather + Seasons + Dates/Time + Simple Letter Writing (A1)
+        </h1>
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          This chapter helps you talk about <strong>weather</strong>, <strong>seasons</strong>, and use{" "}
-          <strong>im</strong> (months), <strong>am</strong> (days/dates), <strong>um</strong> (time).
+          This chapter helps you talk about <strong>weather</strong>,{" "}
+          <strong>seasons</strong>, and use <strong>im</strong> (months),{" "}
+          <strong>am</strong> (days/dates), <strong>um</strong> (time).
           <br />
-          You also learn A1 connectors with a focus on <strong>weil</strong> for simple letter reasons
-          (Urlaub, appointment cancelling).
+          You also learn A1 connectors with a focus on <strong>weil</strong> for
+          simple letter reasons (Urlaub, appointment cancelling).
         </p>
 
         <div style={chipRow}>
@@ -120,8 +123,8 @@ const WeatherPerfektLetterPage = () => {
           </ul>
 
           <p style={{ margin: "10px 0 0" }}>
-            <strong>Months (Monate):</strong> Januar, Februar, März, April, Mai, Juni, Juli, August, September,
-            Oktober, November, Dezember
+            <strong>Months (Monate):</strong> Januar, Februar, März, April, Mai,
+            Juni, Juli, August, September, Oktober, November, Dezember
           </p>
         </div>
 
@@ -181,7 +184,7 @@ const WeatherPerfektLetterPage = () => {
         </div>
       </section>
 
-      {/* 4) CONNECTORS (UND/ABER/WEIL) but only WEIL examples */}
+      {/* 4) CONNECTORS (UND/ABER/WEIL) */}
       <section style={cardStyle}>
         <h2 style={{ margin: 0 }}>4) Simple A1 connectors (focus: weil)</h2>
 
@@ -203,17 +206,6 @@ const WeatherPerfektLetterPage = () => {
             <div>• Ich kann nicht zum Strand gehen, weil es regnet.</div>
             <div>• Ich fahre nicht ans Meer, weil es windig ist.</div>
             <div>• Ich bleibe zu Hause, weil es kalt ist.</div>
-          </div>
-
-          <div style={{ marginTop: 10 }}>
-            <strong>Strand &amp; Meer (simple A1):</strong>
-            <div>• der Strand = beach</div>
-            <div>• das Meer = sea</div>
-            <div style={{ marginTop: 6 }}>
-              <strong>Useful verbs:</strong>
-              <div>• zum Strand gehen</div>
-              <div>• ans Meer fahren</div>
-            </div>
           </div>
 
           <div style={{ marginTop: 10 }}>
@@ -267,8 +259,8 @@ const WeatherPerfektLetterPage = () => {
         <h2 style={{ margin: 0 }}>6) Letter sample: Urlaub + weather reason (A1)</h2>
 
         <div style={noteStyle}>
-          <strong>Goal:</strong> Students learn to connect <strong>Urlaub</strong> with <strong>im/am/um</strong> and
-          give one simple reason using <strong>weil</strong>.
+          <strong>Goal:</strong> Students learn to connect <strong>Urlaub</strong> with{" "}
+          <strong>im/am/um</strong> and give one simple reason using <strong>weil</strong>.
           <div style={{ marginTop: 8 }}>
             <strong>Key word:</strong> der Urlaub = vacation/holiday
           </div>
@@ -289,13 +281,9 @@ const WeatherPerfektLetterPage = () => {
             Ich kann am Montag um 10 Uhr nicht kommen, weil es regnet.
           </p>
 
-          <p style={{ margin: "10px 0 0" }}>
-            Können wir einen neuen Termin machen?
-          </p>
+          <p style={{ margin: "10px 0 0" }}>Können wir einen neuen Termin machen?</p>
 
-          <p style={{ margin: "10px 0 0" }}>
-            Ich freue mich auf Ihre Antwort.
-          </p>
+          <p style={{ margin: "10px 0 0" }}>Ich freue mich auf Ihre Antwort.</p>
 
           <p style={{ margin: "10px 0 0" }}>
             Mit freundlichen Grüßen <br />
@@ -306,7 +294,9 @@ const WeatherPerfektLetterPage = () => {
 
       {/* 7) W-WORDS + BASIC VERBS + REQUESTS */}
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>7) Question words + Haben / Essen / Kaufen + Polite request</h2>
+        <h2 style={{ margin: 0 }}>
+          7) Question words + Haben / Essen / Kaufen + Price + Polite requests (A1)
+        </h2>
 
         <div style={boxStyle}>
           <p style={{ margin: 0 }}>
@@ -343,23 +333,51 @@ const WeatherPerfektLetterPage = () => {
           </ul>
         </div>
 
+        {/* NEW: PRICE + PAYMENT */}
+        <div style={noteStyle}>
+          <strong>A1 Tip: Asking for price (keep it SIMPLE)</strong>
+          <div style={{ marginTop: 6 }}>
+            ✅ For A1, use short questions (students make fewer mistakes).
+          </div>
+
+          <div style={{ marginTop: 10 }}>
+            <strong>Price questions (A1):</strong>
+            <div>• Wie viel kostet der Kurs?</div>
+            <div>• Was kostet der Kurs?</div>
+          </div>
+
+          <div style={{ marginTop: 10 }}>
+            <strong>Payment questions (A1):</strong>
+            <div>• Wie kann ich bezahlen?</div>
+            <div>• Kann ich bar bezahlen oder mit Karte?</div>
+            <div>• Mit Kreditkarte oder bar?</div>
+          </div>
+
+          <div style={{ marginTop: 10, fontSize: 13 }}>
+            ❌ Avoid long A2/B1-style words like <em>Zahlungsmodalitäten</em> in A1 writing.
+          </div>
+        </div>
+
+        {/* UPDATED: POLITE REQUEST */}
         <div style={noteStyle}>
           <strong>Polite request (A1): “Könnten Sie …?”</strong>
-          <div>✅ Rule: In the request, the <strong>main verb goes to the end</strong>.</div>
+          <div>✅ Use this to ask for <strong>information</strong> or make a <strong>request</strong>.</div>
+          <div style={{ marginTop: 6 }}>Rule: In the request, the <strong>main verb goes to the end</strong>.</div>
 
-          <div style={{ marginTop: 8 }}>
-            <strong>Examples:</strong>
+          <div style={{ marginTop: 10 }}>
+            <strong>Safe examples (A1):</strong>
             <div>• Könnten Sie mir bitte helfen?</div>
-            <div>• Könnten Sie mir einen neuen Termin geben?</div>
-            <div>• Könnten Sie mir sagen, wann der Termin ist?</div>
-            <div>• Könnten Sie mir sagen, wo der Strand ist?</div>
+            <div>• Könnten Sie mir bitte Informationen zum Kurs geben?</div>
+            <div>• Könnten Sie mir bitte sagen, wann der Kurs beginnt?</div>
+            <div>• Könnten Sie mir bitte sagen, wie viel der Kurs kostet?</div>
+            <div>• Könnten Sie mir bitte sagen, wie ich bezahlen kann?</div>
           </div>
 
           <div style={{ marginTop: 10 }}>
             <strong>Weather connection (usable in letters):</strong>
             <div>• Könnten Sie mir bitte einen neuen Termin geben, weil es regnet?</div>
             <div style={{ fontSize: 13, marginTop: 6 }}>
-              (Yes, it’s simple A1. Later you can learn more elegant options, but this is fine for now.)
+              (Simple A1 is okay. Later you can learn more elegant options.)
             </div>
           </div>
         </div>
