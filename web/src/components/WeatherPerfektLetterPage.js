@@ -231,50 +231,95 @@ const WeatherPerfektLetterPage = () => {
           students so you can talk about the past in a simple, correct way.
         </div>
 
-        {/* EXACT NOTE (kept as-is) */}
         <div style={boxStyle}>
-          <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontFamily: "inherit" }}>
-{`A1 Grammar Notes: Perfekt (Past Tense) Statements Using "Haben" and "Sein"
-1. Overview of Perfekt
-The Perfekt tense is used to talk about actions or events that happened in the past. It is commonly used
-in spoken German and is formed with an auxiliary verb (haben or sein) and the past participle of the
-main verb.
-2. Auxiliary Verbs: "Haben" and "Sein"
-• Haben: Used for actions or events that you can control.
-• Sein: Used for movements (directional verbs) or changes of state (things you can't control).
-3. Forming the Past Participle
-• Regular Verbs: Start with "ge-" and end with "-t".
-o Example: spielen (to play) → gespielt
-• Irregular Verbs: Start with "ge-" and end with "-en".
-o Example: sprechen (to speak) → gesprochen
-• Separable Verbs: "ge-" is placed in the middle, between the prefix and the verb stem.
-o Example: aufräumen (to tidy up) → aufgeräumt
-4. Using "Haben" in Perfekt
-Most verbs use "haben" as the auxiliary verb. These include:
-• Verbs that describe actions you can control.
-o Example: Ich habe gespielt. (I played.)
-o Example: Er hat gegessen. (He ate.)
-5. Using "Sein" in Perfekt
-"Sein" is used with:
-• Verbs indicating a change of place or state.
-o Example: Ich bin gegangen. (I went.)
-o Example: Sie ist gefahren. (She drove.)
-• Some exceptions include verbs that are neither clearly directional nor state-changing but still use "sein"
-(e.g., bleiben - to stay, sein - to be).
-6. Examples
-• Regular Verbs with "Haben":
-o machen (to do/make) → Ich habe gemacht. (I did/made.)
-o arbeiten (to work) → Du hast gearbeitet. (You worked.)
-• Irregular Verbs with "Haben":
-o sehen (to see) → Er hat gesehen. (He saw.)
-o schreiben (to write) → Wir haben geschrieben. (We wrote.)
-• Directional Verbs with "Sein":
-o kommen (to come) → Ihr seid gekommen. (You all came.)
-o fahren (to drive/go) → Sie sind gefahren. (They drove/went.)
-• Separable Verbs:
-o aufräumen (to tidy up) → Ich habe aufgeräumt. (I tidied up.)
-o anrufen (to call) → Du hast angerufen. (You called.)`}
-          </pre>
+          <h3 style={{ marginTop: 0 }}>Statements using "haben" and "sein"</h3>
+
+          <h4 style={{ marginBottom: 8 }}>1) Overview of Perfekt</h4>
+          <p style={{ marginTop: 0 }}>
+            The <strong>Perfekt</strong> tense is used to talk about actions or
+            events that happened in the past. It is commonly used in spoken
+            German and is formed with an auxiliary verb (<strong>haben</strong>{" "}
+            or <strong>sein</strong>) and the past participle of the main verb.
+          </p>
+
+          <h4 style={{ marginBottom: 8 }}>2) Auxiliary verbs: "haben" and "sein"</h4>
+          <ul style={listStyle}>
+            <li>
+              <strong>Haben:</strong> Used for actions or events that you can
+              control.
+            </li>
+            <li>
+              <strong>Sein:</strong> Used for movements (directional verbs) or
+              changes of state (things you cannot control).
+            </li>
+          </ul>
+
+          <h4 style={{ marginBottom: 8 }}>3) Forming the past participle</h4>
+          <ul style={listStyle}>
+            <li>
+              <strong>Regular verbs:</strong> start with "ge-" and end with "-t".
+              <br />
+              <em>Example:</em> spielen (to play) → gespielt
+            </li>
+            <li>
+              <strong>Irregular verbs:</strong> start with "ge-" and end with
+              "-en".
+              <br />
+              <em>Example:</em> sprechen (to speak) → gesprochen
+            </li>
+            <li>
+              <strong>Separable verbs:</strong> "ge-" is placed in the middle,
+              between the prefix and the verb stem.
+              <br />
+              <em>Example:</em> aufräumen (to tidy up) → aufgeräumt
+            </li>
+          </ul>
+
+          <h4 style={{ marginBottom: 8 }}>4) Using "haben" in Perfekt</h4>
+          <p style={{ marginTop: 0 }}>Most verbs use <strong>haben</strong> as the auxiliary verb.</p>
+          <ul style={listStyle}>
+            <li>Ich habe gespielt. (I played.)</li>
+            <li>Er hat gegessen. (He ate.)</li>
+          </ul>
+
+          <h4 style={{ marginBottom: 8 }}>5) Using "sein" in Perfekt</h4>
+          <p style={{ marginTop: 0 }}>
+            <strong>Sein</strong> is used with verbs indicating a change of place
+            or state.
+          </p>
+          <ul style={listStyle}>
+            <li>Ich bin gegangen. (I went.)</li>
+            <li>Sie ist gefahren. (She drove.)</li>
+            <li>
+              Some exceptions still use <strong>sein</strong>, such as <em>bleiben</em>{" "}
+              (to stay) and <em>sein</em> (to be).
+            </li>
+          </ul>
+
+          <h4 style={{ marginBottom: 8 }}>6) More examples</h4>
+          <p style={{ marginBottom: 6 }}><strong>Regular verbs with "haben":</strong></p>
+          <ul style={listStyle}>
+            <li>machen (to do/make) → Ich habe gemacht. (I did/made.)</li>
+            <li>arbeiten (to work) → Du hast gearbeitet. (You worked.)</li>
+          </ul>
+
+          <p style={{ marginBottom: 6 }}><strong>Irregular verbs with "haben":</strong></p>
+          <ul style={listStyle}>
+            <li>sehen (to see) → Er hat gesehen. (He saw.)</li>
+            <li>schreiben (to write) → Wir haben geschrieben. (We wrote.)</li>
+          </ul>
+
+          <p style={{ marginBottom: 6 }}><strong>Directional verbs with "sein":</strong></p>
+          <ul style={listStyle}>
+            <li>kommen (to come) → Ihr seid gekommen. (You all came.)</li>
+            <li>fahren (to drive/go) → Sie sind gefahren. (They drove/went.)</li>
+          </ul>
+
+          <p style={{ marginBottom: 6 }}><strong>Separable verbs:</strong></p>
+          <ul style={listStyle}>
+            <li>aufräumen (to tidy up) → Ich habe aufgeräumt. (I tidied up.)</li>
+            <li>anrufen (to call) → Du hast angerufen. (You called.)</li>
+          </ul>
         </div>
 
         {/* small quick practice */}
