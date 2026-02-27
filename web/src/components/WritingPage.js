@@ -191,6 +191,25 @@ const summarizeDraftChanges = (firstDraft = "", revisedDraft = "", level = "A1")
   };
 };
 
+const buildDeltaLines = (firstDraft = "", revisedDraft = "") => {
+  const firstLines = firstDraft
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const revisedLines = revisedDraft
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const removed = firstLines.filter((line) => !revisedLines.includes(line));
+  const added = revisedLines.filter((line) => !firstLines.includes(line));
+
+  return {
+    removed,
+    added,
+  };
+};
+
 const scoreFromFeedback = (feedback) => {
   if (!feedback) return 0;
   const positive = [
@@ -366,6 +385,11 @@ const WritingPage = ({ mode = "course" }) => {
   const [reflectionText, setReflectionText] = useState("");
   const [revisedDraftText, setRevisedDraftText] = useState("");
   const [workflowComplete, setWorkflowComplete] = useState(false);
+  const [improvedFeedback, setImprovedFeedback] = useState("");
+  const [improvedRubricBreakdown, setImprovedRubricBreakdown] = useState(() =>
+    buildRubricBreakdown("")
+  );
+  const [improvedLoading, setImprovedLoading] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
   const [latestTutorReview, setLatestTutorReview] = useState(null);
   const [rubricBreakdown, setRubricBreakdown] = useState(() =>
@@ -403,6 +427,9 @@ const WritingPage = ({ mode = "course" }) => {
     setReflectionText("");
     setRevisedDraftText("");
     setWorkflowComplete(false);
+    setImprovedFeedback("");
+    setImprovedRubricBreakdown(buildRubricBreakdown(""));
+    setImprovedLoading(false);
     setIdeaInput("");
     setChatMessages([IDEA_COACH_INTRO]);
     setSelectedDraftIds([]);
@@ -809,6 +836,8 @@ const WritingPage = ({ mode = "course" }) => {
       setRevisedDraftText(trimmed);
       setReflectionText("");
       setWorkflowComplete(false);
+      setImprovedFeedback("");
+      setImprovedRubricBreakdown(buildRubricBreakdown(""));
       setRubricBreakdown(breakdown);
       setErrorBank(extractErrorBank(data.feedback));
       setDraftHistory((prev) => [
@@ -844,15 +873,24 @@ const WritingPage = ({ mode = "course" }) => {
 
   const handleSaveForTutorReview = async () => {
     if (!isExamMode) return;
-    const draftToSave = revisedDraftText.trim() || typedAnswer.trim();
+    const draftToSave = revisedDraftText.trim();
 
     if (!draftToSave) {
-      setTutorSaveState({ loading: false, success: "", error: "Please add your final draft before saving for tutor review." });
+      setTutorSaveState({ loading: false, success: "", error: "Please add your improved draft before saving for tutor review." });
       return;
     }
 
     if (!markFeedback) {
       setTutorSaveState({ loading: false, success: "", error: "Get AI feedback first, then save for tutor review." });
+      return;
+    }
+
+    if (!revisionSummary.changed || !workflowComplete) {
+      setTutorSaveState({
+        loading: false,
+        success: "",
+        error: "Please complete the improve step first, then submit only the improved draft to tutor.",
+      });
       return;
     }
 
@@ -925,6 +963,42 @@ const WritingPage = ({ mode = "course" }) => {
     ]);
   };
 
+  const handleMarkAndCompareImproved = async () => {
+    if (!markFeedback) {
+      setError("Step 1 first: get AI feedback.");
+      return;
+    }
+    if (!revisedDraftText.trim() || !revisionSummary.changed) {
+      setError("Add a revised draft first so I can compare improvements.");
+      return;
+    }
+
+    setImprovedLoading(true);
+    setError("");
+
+    try {
+      const studentName = user?.displayName || user?.email || "Student";
+      const data = await markLetterWithAI({
+        text: revisedDraftText.trim(),
+        level,
+        studentName,
+        idToken,
+        program: studentProfile?.program,
+        submissionContext: isExamMode ? "exam-room-improved" : "course-improved",
+      });
+      setImprovedFeedback(data.feedback);
+      setImprovedRubricBreakdown(buildRubricBreakdown(data.feedback));
+    } catch (err) {
+      const msg =
+        err?.response?.data?.error ||
+        err.message ||
+        "Could not mark improved draft right now.";
+      setError(msg);
+    } finally {
+      setImprovedLoading(false);
+    }
+  };
+
   const makeChatMessage = (role, content) => ({
     id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
     role,
@@ -995,6 +1069,18 @@ const WritingPage = ({ mode = "course" }) => {
     const latest = draftHistory[draftHistory.length - 1];
     return extractErrorBank(latest.feedback).slice(0, 3);
   }, [draftHistory]);
+  const firstOverallScore = useMemo(
+    () => rubricBreakdown.reduce((sum, item) => sum + (item.score || 0), 0),
+    [rubricBreakdown]
+  );
+  const improvedOverallScore = useMemo(
+    () => improvedRubricBreakdown.reduce((sum, item) => sum + (item.score || 0), 0),
+    [improvedRubricBreakdown]
+  );
+  const draftDeltaLines = useMemo(
+    () => buildDeltaLines(firstDraftSnapshot, revisedDraftText),
+    [firstDraftSnapshot, revisedDraftText]
+  );
 
   const handleAskCoach = async () => {
     const trimmed = ideaInput.trim();
@@ -1268,7 +1354,7 @@ const WritingPage = ({ mode = "course" }) => {
             <WordCountMeter count={typedWordCount} range={typedWordRange} />
 
             <div style={{ marginTop: 12 }}>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <div className="writing-mark-actions" style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <button
                   style={styles.primaryButton}
                   onClick={sendTypedAnswerForCorrection}
@@ -1339,7 +1425,12 @@ const WritingPage = ({ mode = "course" }) => {
                     ))}
                   </div>
                 ) : null}
-                <button style={{ ...styles.primaryButton, marginTop: 8 }} onClick={handleCompleteWorkflow}>Complete</button>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                  <button style={styles.primaryButton} onClick={handleCompleteWorkflow}>Complete</button>
+                  <button style={styles.secondaryButton} onClick={handleMarkAndCompareImproved} disabled={improvedLoading}>
+                    {improvedLoading ? "Marking improved draft..." : "Mark & compare improved"}
+                  </button>
+                </div>
                 {workflowComplete ? <div style={{ ...styles.successBox, marginTop: 8 }}>Workflow complete. Great revision discipline.</div> : null}
               </div>
             ) : null}
@@ -1355,7 +1446,7 @@ const WritingPage = ({ mode = "course" }) => {
             <>
               <section style={styles.card}>
                 <h3 style={styles.sectionTitle}>AI feedback</h3>
-                <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+                <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
               </section>
               <section style={styles.card}>
                 <details>
@@ -1377,6 +1468,41 @@ const WritingPage = ({ mode = "course" }) => {
               </section>
             </>
           )}
+
+          {improvedFeedback ? (
+            <section style={styles.card}>
+              <h3 style={styles.sectionTitle}>Improvement delta (AI)</h3>
+              <p style={styles.helperText}>
+                Initial score: {firstOverallScore}/15 · Improved score: {improvedOverallScore}/15 · Delta: {improvedOverallScore - firstOverallScore >= 0 ? "+" : ""}{improvedOverallScore - firstOverallScore}
+              </p>
+              <div style={styles.gridTwo}>
+                <div style={styles.helperCard}>
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Removed lines</div>
+                  {draftDeltaLines.removed.length ? (
+                    <ul style={styles.checklist}>
+                      {draftDeltaLines.removed.slice(0, 6).map((line) => (
+                        <li key={line}>− {line}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={styles.helperText}>No removed lines detected.</p>
+                  )}
+                </div>
+                <div style={styles.helperCard}>
+                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Added lines</div>
+                  {draftDeltaLines.added.length ? (
+                    <ul style={styles.checklist}>
+                      {draftDeltaLines.added.slice(0, 6).map((line) => (
+                        <li key={line}>+ {line}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={styles.helperText}>No added lines detected.</p>
+                  )}
+                </div>
+              </div>
+            </section>
+          ) : null}
 
           {draftHistory.length >= 2 && (
             <section style={styles.card}>
