@@ -396,6 +396,39 @@ const WritingPage = ({ mode = "course" }) => {
     (selectedLetter?.durationMinutes || 0) * 60
   );
   const [timerRunning, setTimerRunning] = useState(false);
+  const resetWritingWorkspace = useCallback(() => {
+    setTypedAnswer("");
+    setMarkFeedback("");
+    setFirstDraftSnapshot("");
+    setReflectionText("");
+    setRevisedDraftText("");
+    setWorkflowComplete(false);
+    setIdeaInput("");
+    setChatMessages([IDEA_COACH_INTRO]);
+    setSelectedDraftIds([]);
+    setIdeaError("");
+    setIdeaSuccess("");
+    setTutorSaveState({ loading: false, success: "", error: "" });
+    setRemainingSeconds((selectedLetter?.durationMinutes || 0) * 60);
+    setTimerRunning(false);
+    setRubricBreakdown(buildRubricBreakdown(""));
+    setDraftHistory([]);
+    setCompletionLog([]);
+    setErrorBank([]);
+    setError("");
+  }, [selectedLetter?.durationMinutes, setError]);
+
+  const handleResetWorkspace = () => {
+    const confirmed = window.confirm(
+      "Start fresh? This will clear your draft, AI feedback, and ideas chat history for this writing mode."
+    );
+
+    if (!confirmed) return;
+
+    resetWritingWorkspace();
+    setActiveTab("mark");
+  };
+
   const normalizeProfileLevel = (rawLevel) => {
     const normalized = (rawLevel || "").trim().toUpperCase();
     if (ALLOWED_LEVELS.includes(normalized)) {
@@ -529,24 +562,9 @@ const WritingPage = ({ mode = "course" }) => {
   useEffect(() => {
     let isMounted = true;
 
-    const resetProgressState = () => {
-      setTypedAnswer("");
-      setMarkFeedback("");
-      setIdeaInput("");
-      setChatMessages([IDEA_COACH_INTRO]);
-      setSelectedDraftIds([]);
-      setIdeaSuccess("");
-      setRemainingSeconds((selectedDurationMinutes || 0) * 60);
-      setTimerRunning(false);
-      setRubricBreakdown(buildRubricBreakdown(""));
-      setDraftHistory([]);
-      setCompletionLog([]);
-      setErrorBank([]);
-    };
-
     const loadProgress = async () => {
       if (!userId) {
-        resetProgressState();
+        resetWritingWorkspace();
         setProgressLoaded(true);
         return;
       }
@@ -557,7 +575,7 @@ const WritingPage = ({ mode = "course" }) => {
         if (!isMounted) return;
 
         if (!saved) {
-          resetProgressState();
+          resetWritingWorkspace();
           return;
         }
 
@@ -608,7 +626,7 @@ const WritingPage = ({ mode = "course" }) => {
     return () => {
       isMounted = false;
     };
-  }, [progressMode, selectedDurationMinutes, studentCode, userId]);
+  }, [progressMode, resetWritingWorkspace, studentCode, userId]);
 
   useEffect(() => {
     if (!progressLoaded || (!userId && !studentCode)) return;
@@ -1080,6 +1098,15 @@ const WritingPage = ({ mode = "course" }) => {
               {tab.label}
             </button>
           ))}
+        </div>
+        <div style={{ marginTop: 12 }}>
+          <button
+            style={styles.dangerButton}
+            onClick={handleResetWorkspace}
+            type="button"
+          >
+            Reset writing workspace
+          </button>
         </div>
       </section>
 
