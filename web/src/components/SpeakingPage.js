@@ -3,7 +3,7 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 
 const PRACTICE_LINK =
-  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
+  "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
 
 const SpeakingPage = () => {
   const { level: examLevel } = useExam();
