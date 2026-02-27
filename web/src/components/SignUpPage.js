@@ -327,7 +327,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
         status: "Active",
         contractStart: "",
         contractEnd: "",
-        contractTermMonths: 6,
+        contractTermMonths: 0,
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);

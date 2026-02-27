@@ -86,6 +86,8 @@ describe("SignUpPage", () => {
 
     await waitFor(() => expect(mockSignup).toHaveBeenCalled());
 
+    const signupPayload = mockSignup.mock.calls[0][2];
+    expect(signupPayload.contractTermMonths).toBe(0);
     expect(window.open).not.toHaveBeenCalled();
   });
 });
