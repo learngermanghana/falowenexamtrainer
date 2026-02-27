@@ -215,7 +215,7 @@ const TwelveHourClockPage = () => {
       </div>
 
       <Section
-        title="1) Start simple: full hours with \"Es ist ... Uhr\""
+        title='1) Start simple: full hours with "Es ist ... Uhr"'
         subtitle="First learn how to say the hour clearly before adding minutes."
       >
         <Callout title='Use this frame every time: "Es ist ..."'>
