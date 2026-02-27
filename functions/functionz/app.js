@@ -1292,14 +1292,53 @@ app.post("/writing/mark", async (req, res) => {
 
     if (!ensureOpenAIConfigured(res)) return;
 
+    const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: true });
+    if (!authedUser) return;
+
+    const trimmedText = String(text).trim();
     const systemPrompt = markPrompt({ schreibenLevel: level, studentName, program, submissionContext });
     const messages = [
       { role: "system", content: systemPrompt },
-      { role: "user", content: String(text).trim() },
+      { role: "user", content: trimmedText },
     ];
 
     const feedback = await createChatCompletion(messages, { max_tokens: 750 });
-    res.json({ feedback });
+
+    const db = getFirestoreSafe();
+    let submissionSaved = false;
+    let submissionId = null;
+
+    if (db) {
+      const docRef = await db.collection("writingSubmissions").add({
+        uid: authedUser.uid || null,
+        email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
+        studentName,
+        level,
+        program: program || null,
+        submissionContext: submissionContext || null,
+        text: trimmedText,
+        feedback,
+        source: "mark-tab",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      submissionSaved = true;
+      submissionId = docRef.id;
+    }
+
+    await auditAIRequest({
+      route: "/writing/mark",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      success: true,
+      metadata: {
+        level,
+        program: program || null,
+        submissionSaved,
+        submissionId,
+      },
+    });
+
+    res.json({ feedback, submissionSaved, submissionId });
   } catch (err) {
     console.error("/writing/mark error", err);
     res.status(500).json({ error: err.message || "Failed to mark letter" });

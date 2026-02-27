@@ -13,6 +13,7 @@ const IDEAS_COACHING_PROMPTS = [
   "Request a short explanation and one example sentence.",
   "End by summarizing the idea in your own words.",
 ];
+const IDEAS_SESSION_TURN_LIMIT = 2;
 
 const LetterPracticePage = ({ mode = "exams" }) => {
   const { i18n, t } = useTranslation();
@@ -39,11 +40,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [activeTab, setActiveTab] = useState("mark");
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [markSubmitStatus, setMarkSubmitStatus] = useState(null);
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([ideaCoachIntro]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
+  const [ideaSessionActive, setIdeaSessionActive] = useState(false);
+  const [ideaTurnCount, setIdeaTurnCount] = useState(0);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
   const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
   const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
@@ -221,7 +225,9 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     if (!validateLevel()) return;
 
     setLoading(true);
+    setError("");
     setMarkFeedback("");
+    setMarkSubmitStatus(null);
 
     try {
       const studentName = user?.displayName || user?.email || "Student";
@@ -234,6 +240,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       });
 
       setMarkFeedback(data.feedback);
+      setMarkSubmitStatus({
+        submissionSaved: Boolean(data?.submissionSaved),
+        submissionId: data?.submissionId || null,
+      });
       addResultToHistory({
         id: Date.now(),
         mode: "Mark my letter",
@@ -304,12 +314,39 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     setIdeaSuccess("Your selected lines are now pasted into the “Mark my letter” tab.");
     setIdeaError("");
     setSelectedDraftIds([]);
+    setIdeaSessionActive(false);
     setActiveTab("mark");
+  };
+
+  const startIdeasSession = () => {
+    setChatMessages([ideaCoachIntro]);
+    setIdeaInput("");
+    setIdeaError("");
+    setIdeaSuccess(`Ideas session started. Ask up to ${IDEAS_SESSION_TURN_LIMIT} focused questions, then move your final draft to Mark my letter.`);
+    setSelectedDraftIds([]);
+    setIdeaTurnCount(0);
+    setIdeaSessionActive(true);
+  };
+
+  const endIdeasSession = () => {
+    setIdeaSessionActive(false);
+    setIdeaSuccess("Ideas session ended. Use your best draft in Mark my letter for final feedback.");
   };
 
   const handleAskForIdeas = async () => {
     const trimmed = ideaInput.trim();
     if (!trimmed || ideasLoading) return;
+
+    if (!ideaSessionActive) {
+      setIdeaError("Start an ideas session first, then send your question.");
+      return;
+    }
+
+    if (ideaTurnCount >= IDEAS_SESSION_TURN_LIMIT) {
+      setIdeaSessionActive(false);
+      setIdeaError("This ideas session is complete. Start a new session or move your draft to Mark my letter.");
+      return;
+    }
 
     resetErrors();
 
@@ -326,6 +363,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         program: studentProfile?.program,
       });
       addChatMessage("assistant", reply);
+      setIdeaTurnCount((prev) => {
+        const next = prev + 1;
+        if (next >= IDEAS_SESSION_TURN_LIMIT) {
+          setIdeaSessionActive(false);
+          setIdeaSuccess("Ideas session complete. You can now send your best draft to Mark my letter.");
+        }
+        return next;
+      });
     } catch (err) {
       const message =
         err?.response?.data?.error || err.message || `Could not fetch ideas from ${coachDisplayName}.`;
@@ -564,13 +609,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading}>
-                {loading ? "Marking your letter..." : "Get AI marking"}
+                {loading ? "Submitting for tutor review..." : "Submit for tutor review"}
               </button>
               <button
                 style={styles.secondaryButton}
                 onClick={() => {
                   setLetterText("");
                   setMarkFeedback("");
+                  setMarkSubmitStatus(null);
                   resetErrors();
                 }}
               >
@@ -581,6 +627,20 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             {error && (
               <div style={styles.errorBox}>
                 <strong>{isFrenchProgram ? "Note" : "Hinweis"}:</strong> {error}
+              </div>
+            )}
+
+
+            {markSubmitStatus && (
+              <div style={markSubmitStatus.submissionSaved ? styles.successBox : styles.infoBox}>
+                {markSubmitStatus.submissionSaved ? (
+                  <>
+                    ✅ Submission saved successfully for tutor review.
+                    {markSubmitStatus.submissionId ? ` Firestore record: ${markSubmitStatus.submissionId}` : ""}
+                  </>
+                ) : (
+                  "Feedback generated, but submission save could not be confirmed in Firestore."
+                )}
               </div>
             )}
 
@@ -627,6 +687,9 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                 <li key={prompt}>{prompt}</li>
               ))}
             </ul>
+            <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
+              Session status: <strong>{ideaSessionActive ? "Active" : "Ended"}</strong> · Turns used: {ideaTurnCount}/{IDEAS_SESSION_TURN_LIMIT}
+            </p>
           </div>
 
           <div style={{ ...styles.chatLog, marginTop: 12 }} className="idea-generator-chat">
@@ -660,6 +723,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             <button style={styles.primaryButton} onClick={handleAskForIdeas} disabled={ideasLoading}>
               {ideasLoading ? "Coach is typing..." : "Send to ideas coach"}
             </button>
+            <button style={styles.secondaryButton} onClick={startIdeasSession}>
+              {ideaSessionActive ? "Restart ideas session" : "Start ideas session"}
+            </button>
+            <button style={styles.secondaryButton} onClick={endIdeasSession} disabled={!ideaSessionActive}>
+              End ideas session
+            </button>
             <button
               style={styles.secondaryButton}
               onClick={() => {
@@ -667,6 +736,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                 setIdeaInput("");
                 resetErrors();
                 setSelectedDraftIds([]);
+                setIdeaSessionActive(false);
+                setIdeaTurnCount(0);
               }}
             >
               Reset chat
