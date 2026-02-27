@@ -1202,16 +1202,26 @@ const WritingPage = ({ mode = "course" }) => {
             <h3 style={styles.sectionTitle}>Your simulation room</h3>
             {practiceTimerControls}
             {selectedLetter && (
-              <>
+              <div style={{ display: "grid", gap: 10 }}>
                 <div style={styles.badge}>Topic: {selectedLetter.letter}</div>
-                <p style={styles.helperText}>{selectedLetter.situation}</p>
-                <h4 style={styles.resultHeading}>Checklist</h4>
-                <ul style={styles.checklist}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 16,
+                    lineHeight: 1.6,
+                    color: "#111827",
+                    fontWeight: 500,
+                  }}
+                >
+                  {selectedLetter.situation}
+                </p>
+                <h4 style={{ ...styles.resultHeading, fontSize: 14, marginTop: 2 }}>Checklist</h4>
+                <ul style={{ ...styles.checklist, marginTop: 0, fontSize: 14 }}>
                   {(selectedLetter.whatToInclude || []).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-              </>
+              </div>
             )}
           </section>
 
