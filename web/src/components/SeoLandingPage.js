@@ -52,6 +52,24 @@ const HighlightCard = ({ title, description }) => (
   </div>
 );
 
+const faq = [
+  {
+    question: "Is Falowen available in Ghana and Nigeria?",
+    answer:
+      "Yes. Falowen supports learners in Ghana and Nigeria with live online classes, WhatsApp support, and flexible schedules.",
+  },
+  {
+    question: "What level of German do you teach?",
+    answer:
+      "We teach beginner to intermediate levels (A1 to B1), with structured practice for speaking, writing, and vocabulary.",
+  },
+  {
+    question: "Do I need prior German knowledge?",
+    answer:
+      "No. Beginners can start at A1 and follow the cohort learning plan with guided lessons and practice.",
+  },
+];
+
 const SeoLandingPage = ({ onSignUp, onLogin }) => {
   const [leadCaptureOpen, setLeadCaptureOpen] = useState(false);
 
@@ -144,24 +162,6 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
     "Complete daily practice tasks on your phone or laptop.",
     "Attend live classes and receive tutor feedback.",
     "Prepare confidently for certification exams or relocation goals.",
-  ];
-
-  const faq = [
-    {
-      question: "Is Falowen available in Ghana and Nigeria?",
-      answer:
-        "Yes. Falowen supports learners in Ghana and Nigeria with live online classes, WhatsApp support, and flexible schedules.",
-    },
-    {
-      question: "What level of German do you teach?",
-      answer:
-        "We teach beginner to intermediate levels (A1 to B1), with structured practice for speaking, writing, and vocabulary.",
-    },
-    {
-      question: "Do I need prior German knowledge?",
-      answer:
-        "No. Beginners can start at A1 and follow the cohort learning plan with guided lessons and practice.",
-    },
   ];
 
   const faqBotQuestions = [
