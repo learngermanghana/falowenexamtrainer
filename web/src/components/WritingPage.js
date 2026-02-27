@@ -191,25 +191,6 @@ const summarizeDraftChanges = (firstDraft = "", revisedDraft = "", level = "A1")
   };
 };
 
-const buildDeltaLines = (firstDraft = "", revisedDraft = "") => {
-  const firstLines = firstDraft
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-  const revisedLines = revisedDraft
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  const removed = firstLines.filter((line) => !revisedLines.includes(line));
-  const added = revisedLines.filter((line) => !firstLines.includes(line));
-
-  return {
-    removed,
-    added,
-  };
-};
-
 const scoreFromFeedback = (feedback) => {
   if (!feedback) return 0;
   const positive = [
@@ -296,15 +277,6 @@ const extractErrorBank = (feedback) => {
   return sentences.filter((sentence) =>
     keywords.some((keyword) => sentence.toLowerCase().includes(keyword))
   );
-};
-
-const buildRevisionTasks = (errors) => {
-  if (!errors.length) return [];
-  return [
-    "Rewrite 3 sentences using weil + correct word order.",
-    "Underline articles and check case endings.",
-    "Swap 3 connectors with higher-level alternatives.",
-  ];
 };
 
 const WordCountMeter = ({ count, range }) => {
@@ -1063,24 +1035,11 @@ const WritingPage = ({ mode = "course" }) => {
 
   const typedWordCount = countWords(typedAnswer);
   const typedWordRange = WORD_TARGET_RANGES[level];
-  const revisionTasks = useMemo(() => buildRevisionTasks(errorBank), [errorBank]);
   const latestImprovementNotes = useMemo(() => {
     if (!draftHistory.length) return [];
     const latest = draftHistory[draftHistory.length - 1];
     return extractErrorBank(latest.feedback).slice(0, 3);
   }, [draftHistory]);
-  const firstOverallScore = useMemo(
-    () => rubricBreakdown.reduce((sum, item) => sum + (item.score || 0), 0),
-    [rubricBreakdown]
-  );
-  const improvedOverallScore = useMemo(
-    () => improvedRubricBreakdown.reduce((sum, item) => sum + (item.score || 0), 0),
-    [improvedRubricBreakdown]
-  );
-  const draftDeltaLines = useMemo(
-    () => buildDeltaLines(firstDraftSnapshot, revisedDraftText),
-    [firstDraftSnapshot, revisedDraftText]
-  );
 
   const handleAskCoach = async () => {
     const trimmed = ideaInput.trim();
@@ -1442,65 +1401,21 @@ const WritingPage = ({ mode = "course" }) => {
             )}
           </section>
 
-          {markFeedback && (
-            <>
-              <section style={styles.card}>
-                <h3 style={styles.sectionTitle}>AI feedback</h3>
-                <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
-              </section>
-              <section style={styles.card}>
-                <details>
-                  <summary style={{ cursor: "pointer", fontWeight: 700 }}>Rubric scoring breakdown (optional)</summary>
-                  <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
-                    {rubricBreakdown.map((item) => (
-                      <div key={item.key} style={styles.scoreCard}>
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                          <strong>{item.label}</strong>
-                          <span style={styles.scoreBadge}>
-                            {item.score ? `${item.score}/5` : "—"}
-                          </span>
-                        </div>
-                        <div style={styles.helperText}>{item.explanation}</div>
-                      </div>
-                    ))}
-                  </div>
-                </details>
-              </section>
-            </>
-          )}
+          {markFeedback && !improvedFeedback ? (
+            <section style={styles.card}>
+              <h3 style={styles.sectionTitle}>AI feedback</h3>
+              <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+            </section>
+          ) : null}
 
           {improvedFeedback ? (
             <section style={styles.card}>
-              <h3 style={styles.sectionTitle}>Improvement delta (AI)</h3>
-              <p style={styles.helperText}>
-                Initial score: {firstOverallScore}/15 · Improved score: {improvedOverallScore}/15 · Delta: {improvedOverallScore - firstOverallScore >= 0 ? "+" : ""}{improvedOverallScore - firstOverallScore}
-              </p>
-              <div style={styles.gridTwo}>
-                <div style={styles.helperCard}>
-                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Removed lines</div>
-                  {draftDeltaLines.removed.length ? (
-                    <ul style={styles.checklist}>
-                      {draftDeltaLines.removed.slice(0, 6).map((line) => (
-                        <li key={line}>− {line}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p style={styles.helperText}>No removed lines detected.</p>
-                  )}
-                </div>
-                <div style={styles.helperCard}>
-                  <div style={{ fontWeight: 700, marginBottom: 6 }}>Added lines</div>
-                  {draftDeltaLines.added.length ? (
-                    <ul style={styles.checklist}>
-                      {draftDeltaLines.added.slice(0, 6).map((line) => (
-                        <li key={line}>+ {line}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p style={styles.helperText}>No added lines detected.</p>
-                  )}
-                </div>
-              </div>
+              <h3 style={styles.sectionTitle}>Updated AI feedback</h3>
+              <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{improvedFeedback}</pre>
+              <details style={{ marginTop: 10 }}>
+                <summary style={{ cursor: "pointer", fontWeight: 700 }}>Previous AI feedback</summary>
+                <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap", marginTop: 10 }}>{markFeedback}</pre>
+              </details>
             </section>
           ) : null}
 
@@ -1535,39 +1450,6 @@ const WritingPage = ({ mode = "course" }) => {
                   </>
                 ) : null}
               </details>
-            </section>
-          )}
-
-          {(errorBank.length > 0 || revisionTasks.length > 0) && (
-            <section style={styles.card}>
-              <h3 style={styles.sectionTitle}>Error bank & quick fixes</h3>
-              <p style={styles.helperText}>Most recent patterns from your draft, with focused next actions.</p>
-              <div style={styles.gridTwo}>
-                <div style={{ border: "1px solid #fecaca", background: "#fff1f2", borderRadius: 12, padding: 12 }}>
-                  <div style={{ fontWeight: 800, color: "#9f1239", marginBottom: 8 }}>Frequent errors</div>
-                  {errorBank.length > 0 ? (
-                    <ul style={{ ...styles.checklist, marginTop: 0 }}>
-                      {errorBank.map((item, index) => (
-                        <li key={`${item}-${index}`}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p style={styles.helperText}>No recurring errors flagged yet.</p>
-                  )}
-                </div>
-                <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 12, padding: 12 }}>
-                  <div style={{ fontWeight: 800, color: "#166534", marginBottom: 8 }}>Quick fixes</div>
-                  {revisionTasks.length > 0 ? (
-                    <ul style={{ ...styles.checklist, marginTop: 0 }}>
-                      {revisionTasks.map((task) => (
-                        <li key={task}>{task}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p style={styles.helperText}>No revision tasks yet. Get AI feedback to generate fixes.</p>
-                  )}
-                </div>
-              </div>
             </section>
           )}
 
