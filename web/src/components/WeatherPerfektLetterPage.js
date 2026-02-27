@@ -40,6 +40,15 @@ const chip = {
   fontWeight: 700,
 };
 
+const imgStyle = {
+  width: "100%",
+  borderRadius: 12,
+  marginBottom: 12,
+  objectFit: "cover",
+  maxHeight: 180, // 🔹 reduced for cleaner UI
+  border: "1px solid #e5e7eb",
+};
+
 const WeatherPerfektLetterPage = () => {
   const navigate = useNavigate();
 
@@ -54,331 +63,105 @@ const WeatherPerfektLetterPage = () => {
         <h1 style={{ margin: 0 }}>
           Chapter 13: Weather + Seasons + Dates/Time + Simple Letter Writing (A1)
         </h1>
+
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          This chapter helps you talk about <strong>weather</strong>,{" "}
-          <strong>seasons</strong>, and use <strong>im</strong> (months),{" "}
-          <strong>am</strong> (days/dates), <strong>um</strong> (time).
+          Learn to talk about <strong>weather</strong>, <strong>seasons</strong>,
+          and use <strong>im</strong>, <strong>am</strong>, <strong>um</strong>.
           <br />
-          You also learn A1 connectors with a focus on <strong>weil</strong> for
-          simple letter reasons (Urlaub, appointment cancelling).
+          Practice simple letters using <strong>weil</strong>.
         </p>
 
         <div style={chipRow}>
           <span style={chip}>im = months</span>
-          <span style={chip}>am = days / dates</span>
+          <span style={chip}>am = days</span>
           <span style={chip}>um = time</span>
-          <span style={chip}>weil = reason (verb at the end)</span>
+          <span style={chip}>weil = verb at end</span>
         </div>
       </section>
 
-      {/* 1) WEATHER WORDS + ASKING */}
+      {/* WEATHER */}
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>1) Weather words (A1) + How to ask</h2>
+        <h2 style={{ margin: 0 }}>1) Weather (A1)</h2>
+
+        <img
+          src="https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1600&q=70"
+          alt="Weather"
+          style={imgStyle}
+        />
 
         <ul style={listStyle}>
-          <li>Es regnet. (It is raining.)</li>
-          <li>Es schneit. (It is snowing.)</li>
-          <li>Es ist windig. (It is windy.)</li>
-          <li>Es ist kalt. (It is cold.)</li>
-          <li>Es ist warm. (It is warm.)</li>
-          <li>Es ist heiß. (It is hot.)</li>
-          <li>Die Sonne scheint. (The sun is shining.)</li>
+          <li>Es regnet.</li>
+          <li>Es schneit.</li>
+          <li>Es ist kalt / warm / windig.</li>
+          <li>Die Sonne scheint.</li>
         </ul>
-
-        <div style={noteStyle}>
-          <strong>Ask about the weather (simple A1 questions):</strong>
-          <div>• Wie ist das Wetter?</div>
-          <div>• Regnet es?</div>
-          <div>• Schneit es?</div>
-          <div>• Ist es kalt / warm / windig?</div>
-          <div style={{ marginTop: 8 }}>
-            <strong>Short answers:</strong>
-            <div>• Ja, es regnet. / Nein, es regnet nicht.</div>
-            <div>• Ja, es ist kalt. / Nein, es ist nicht kalt.</div>
-          </div>
-        </div>
       </section>
 
-      {/* 2) SEASONS + MONTHS */}
+      {/* SEASONS */}
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>2) Seasons in German (Jahreszeiten) + Months</h2>
+        <h2 style={{ margin: 0 }}>2) Seasons + Months</h2>
+
+        <img
+          src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1600&q=70"
+          alt="Seasons"
+          style={imgStyle}
+        />
 
         <div style={boxStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>Die Jahreszeiten (seasons):</strong>
-          </p>
+          <strong>Seasons:</strong>
           <ul style={listStyle}>
-            <li>
-              <strong>der Frühling</strong> (spring)
-            </li>
-            <li>
-              <strong>der Sommer</strong> (summer)
-            </li>
-            <li>
-              <strong>der Herbst</strong> (autumn)
-            </li>
-            <li>
-              <strong>der Winter</strong> (winter)
-            </li>
+            <li>der Frühling</li>
+            <li>der Sommer</li>
+            <li>der Herbst</li>
+            <li>der Winter</li>
           </ul>
 
-          <p style={{ margin: "10px 0 0" }}>
-            <strong>Months (Monate):</strong> Januar, Februar, März, April, Mai,
-            Juni, Juli, August, September, Oktober, November, Dezember
+          <strong>Months:</strong>
+          <p>
+            Januar, Februar, März, April, Mai, Juni, Juli, August, September,
+            Oktober, November, Dezember
           </p>
-        </div>
-
-        <div style={noteStyle}>
-          <strong>Simple season sentences (A1):</strong>
-          <div>• Im Sommer ist es oft heiß.</div>
-          <div>• Im Winter ist es oft kalt.</div>
-          <div>• Im Frühling ist es manchmal windig.</div>
-          <div>• Im Herbst regnet es oft.</div>
         </div>
       </section>
 
-      {/* 3) IM / AM / UM */}
+      {/* IM AM UM */}
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>3) im / am / um (A1)</h2>
+        <h2 style={{ margin: 0 }}>3) im / am / um</h2>
 
         <div style={boxStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>im</strong> = with months / seasons (in)
-          </p>
           <ul style={listStyle}>
-            <li>im Januar</li>
-            <li>im August</li>
-            <li>im Sommer</li>
-            <li>im Winter</li>
+            <li>Im August fahre ich in den Urlaub.</li>
+            <li>Am Montag habe ich einen Termin.</li>
+            <li>Um 10 Uhr komme ich.</li>
           </ul>
-
-          <p style={{ margin: "10px 0 0" }}>
-            <strong>am</strong> = with days / dates (on)
-          </p>
-          <ul style={listStyle}>
-            <li>am Montag</li>
-            <li>am Dienstag</li>
-            <li>am 3. März</li>
-            <li>am 10. August</li>
-          </ul>
-
-          <p style={{ margin: "10px 0 0" }}>
-            <strong>um</strong> = with time (at)
-          </p>
-          <ul style={listStyle}>
-            <li>um 8 Uhr</li>
-            <li>um 14 Uhr</li>
-            <li>um 9:30 Uhr</li>
-          </ul>
-        </div>
-
-        <div style={noteStyle}>
-          <strong>Full example sentences:</strong>
-          <div>• Im August fahre ich in den Urlaub.</div>
-          <div>• Am Montag habe ich einen Termin.</div>
-          <div>• Um 10 Uhr komme ich.</div>
-          <div style={{ marginTop: 8 }}>
-            <strong>Mini pattern you can copy:</strong>
-            <div>• Im + Monat … / Am + Tag/Datum … / Um + Uhrzeit …</div>
-          </div>
         </div>
       </section>
 
-      {/* 4) CONNECTORS (UND/ABER/WEIL) */}
+      {/* PRICE + REQUEST */}
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>4) Simple A1 connectors (focus: weil)</h2>
+        <h2 style={{ margin: 0 }}>4) Asking for Price (A1)</h2>
 
-        <ul style={listStyle}>
-          <li>
-            <strong>und</strong>: Ich komme heute nicht, <strong>und</strong> ich schreibe Ihnen.
-          </li>
-          <li>
-            <strong>aber</strong>: Ich möchte kommen, <strong>aber</strong> es regnet stark.
-          </li>
-        </ul>
+        <img
+          src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1600&q=70"
+          alt="Payment"
+          style={imgStyle}
+        />
 
         <div style={noteStyle}>
-          <strong>Important: “weil” = because</strong>
-          <div>✅ With <strong>weil</strong>, the <strong>verb goes to the end</strong>.</div>
-          <div style={{ marginTop: 8 }}>
-            <strong>Only “weil” examples (A1):</strong>
-            <div>• Ich komme heute nicht, weil es regnet.</div>
-            <div>• Ich kann nicht zum Strand gehen, weil es regnet.</div>
-            <div>• Ich fahre nicht ans Meer, weil es windig ist.</div>
-            <div>• Ich bleibe zu Hause, weil es kalt ist.</div>
-          </div>
+          <strong>Simple price questions:</strong>
+          <div>• Wie viel kostet der Kurs?</div>
+          <div>• Was kostet der Kurs?</div>
 
           <div style={{ marginTop: 10 }}>
-            <strong>Letter tip:</strong> Use <strong>weil</strong> to give one clear reason.
-            <div>Example idea: “Ich schreibe Ihnen, weil …”</div>
-          </div>
-        </div>
-      </section>
-
-      {/* 5) LETTER STEPS: TERMIN ABSAGEN */}
-      <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>5) Letter steps: Termin absagen (A1)</h2>
-
-        <ol style={listStyle}>
-          <li>
-            <strong>Greeting:</strong> Sehr geehrte Damen und Herren,
-          </li>
-          <li>
-            <strong>Cancel:</strong> Ich möchte den Termin absagen.
-          </li>
-          <li>
-            <strong>Reason (weil + verb at end):</strong> Ich kann heute nicht kommen, weil es regnet.
-          </li>
-          <li>
-            <strong>Request a new appointment:</strong> Können wir einen neuen Termin machen?
-          </li>
-          <li>
-            <strong>Polite ending:</strong> Ich freue mich auf Ihre Antwort. Mit freundlichen Grüßen
-          </li>
-        </ol>
-
-        <div style={boxStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>Mini sample (formal):</strong>
-          </p>
-          <p style={{ margin: "10px 0 0" }}>Sehr geehrte Damen und Herren,</p>
-          <p style={{ margin: "10px 0 0" }}>
-            ich möchte den Termin absagen, weil es heute stark regnet.
-          </p>
-          <p style={{ margin: "10px 0 0" }}>Können wir einen neuen Termin für nächste Woche machen?</p>
-          <p style={{ margin: "10px 0 0" }}>Ich freue mich auf Ihre Antwort.</p>
-          <p style={{ margin: "10px 0 0" }}>
-            Mit freundlichen Grüßen <br />
-            [Ihr Name]
-          </p>
-        </div>
-      </section>
-
-      {/* 6) LETTER SAMPLE: URLAUB + WEATHER */}
-      <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>6) Letter sample: Urlaub + weather reason (A1)</h2>
-
-        <div style={noteStyle}>
-          <strong>Goal:</strong> Students learn to connect <strong>Urlaub</strong> with{" "}
-          <strong>im/am/um</strong> and give one simple reason using <strong>weil</strong>.
-          <div style={{ marginTop: 8 }}>
-            <strong>Key word:</strong> der Urlaub = vacation/holiday
-          </div>
-        </div>
-
-        <div style={boxStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>Sample letter (A1 – simple):</strong>
-          </p>
-
-          <p style={{ margin: "10px 0 0" }}>Sehr geehrte Damen und Herren,</p>
-
-          <p style={{ margin: "10px 0 0" }}>
-            ich schreibe Ihnen, weil ich im August im Urlaub bin.
-          </p>
-
-          <p style={{ margin: "10px 0 0" }}>
-            Ich kann am Montag um 10 Uhr nicht kommen, weil es regnet.
-          </p>
-
-          <p style={{ margin: "10px 0 0" }}>Können wir einen neuen Termin machen?</p>
-
-          <p style={{ margin: "10px 0 0" }}>Ich freue mich auf Ihre Antwort.</p>
-
-          <p style={{ margin: "10px 0 0" }}>
-            Mit freundlichen Grüßen <br />
-            [Ihr Name]
-          </p>
-        </div>
-      </section>
-
-      {/* 7) W-WORDS + BASIC VERBS + REQUESTS */}
-      <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>
-          7) Question words + Haben / Essen / Kaufen + Price + Polite requests (A1)
-        </h2>
-
-        <div style={boxStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>W-Fragen (A1):</strong>
-          </p>
-          <ul style={listStyle}>
-            <li>
-              <strong>Wo?</strong> (Where?) — Wo ist der Strand?
-            </li>
-            <li>
-              <strong>Was?</strong> (What?) — Was essen Sie?
-            </li>
-            <li>
-              <strong>Wie?</strong> (How?) — Wie ist das Wetter?
-            </li>
-            <li>
-              <strong>Wann?</strong> (When?) — Wann ist der Termin?
-            </li>
-          </ul>
-
-          <p style={{ margin: "10px 0 0" }}>
-            <strong>Useful verbs:</strong>
-          </p>
-          <ul style={listStyle}>
-            <li>
-              <strong>haben</strong>: Ich habe einen Termin.
-            </li>
-            <li>
-              <strong>essen</strong>: Ich esse gern Reis.
-            </li>
-            <li>
-              <strong>kaufen</strong>: Ich kaufe Brot.
-            </li>
-          </ul>
-        </div>
-
-        {/* NEW: PRICE + PAYMENT */}
-        <div style={noteStyle}>
-          <strong>A1 Tip: Asking for price (keep it SIMPLE)</strong>
-          <div style={{ marginTop: 6 }}>
-            ✅ For A1, use short questions (students make fewer mistakes).
-          </div>
-
-          <div style={{ marginTop: 10 }}>
-            <strong>Price questions (A1):</strong>
-            <div>• Wie viel kostet der Kurs?</div>
-            <div>• Was kostet der Kurs?</div>
-          </div>
-
-          <div style={{ marginTop: 10 }}>
-            <strong>Payment questions (A1):</strong>
+            <strong>Payment:</strong>
             <div>• Wie kann ich bezahlen?</div>
-            <div>• Kann ich bar bezahlen oder mit Karte?</div>
             <div>• Mit Kreditkarte oder bar?</div>
           </div>
 
-          <div style={{ marginTop: 10, fontSize: 13 }}>
-            ❌ Avoid long A2/B1-style words like <em>Zahlungsmodalitäten</em> in A1 writing.
-          </div>
-        </div>
-
-        {/* UPDATED: POLITE REQUEST */}
-        <div style={noteStyle}>
-          <strong>Polite request (A1): “Könnten Sie …?”</strong>
-          <div>✅ Use this to ask for <strong>information</strong> or make a <strong>request</strong>.</div>
-          <div style={{ marginTop: 6 }}>Rule: In the request, the <strong>main verb goes to the end</strong>.</div>
-
           <div style={{ marginTop: 10 }}>
-            <strong>Safe examples (A1):</strong>
-            <div>• Könnten Sie mir bitte helfen?</div>
-            <div>• Könnten Sie mir bitte Informationen zum Kurs geben?</div>
+            <strong>Polite request:</strong>
+            <div>• Könnten Sie mir bitte Informationen geben?</div>
             <div>• Könnten Sie mir bitte sagen, wann der Kurs beginnt?</div>
-            <div>• Könnten Sie mir bitte sagen, wie viel der Kurs kostet?</div>
-            <div>• Könnten Sie mir bitte sagen, wie ich bezahlen kann?</div>
-          </div>
-
-          <div style={{ marginTop: 10 }}>
-            <strong>Weather connection (usable in letters):</strong>
-            <div>• Könnten Sie mir bitte einen neuen Termin geben, weil es regnet?</div>
-            <div style={{ fontSize: 13, marginTop: 6 }}>
-              (Simple A1 is okay. Later you can learn more elegant options.)
-            </div>
           </div>
         </div>
       </section>
