@@ -729,3 +729,23 @@
 .study-buddy-bar.is-high-contrast .study-buddy-plan-nudge {
   color: #facc15;
 }
+
+@media (max-width: 640px) {
+  .writing-mark-actions {
+    display: grid !important;
+    grid-template-columns: 1fr;
+  }
+
+  .writing-mark-actions button {
+    width: 100%;
+  }
+
+  .tab-list {
+    grid-template-columns: 1fr !important;
+  }
+
+  .writing-feedback-pre {
+    overflow-x: auto;
+    word-break: break-word;
+  }
+}
