@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
+import { updatePageMeta } from "../lib/pageMeta";
 import LeadCaptureModal from "./LeadCaptureModal";
 import { captureLead } from "../services/leadCaptureService";
 
@@ -59,50 +60,64 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
   };
 
   useEffect(() => {
-    const previousTitle = document.title;
-    document.title = "Learn German in Ghana & Nigeria | Falowen";
-
     const descriptionContent =
       "Falowen offers German lessons in Ghana and Nigeria with live classes, tutor feedback, and exam-focused practice. Join a cohort to learn German the right way.";
 
-    let meta = document.querySelector('meta[name="description"]');
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.setAttribute("name", "description");
-      document.head.appendChild(meta);
-    }
-    const previousDescription = meta.getAttribute("content");
-    meta.setAttribute("content", descriptionContent);
-
-    const schema = {
+    const organizationSchema = {
       "@context": "https://schema.org",
-      "@type": "EducationalOrganization",
+      "@type": "Organization",
       name: "Falowen",
-      description:
-        "German language training in Ghana and Nigeria with live classes, tutor feedback, and exam preparation.",
-      areaServed: ["Ghana", "Nigeria"],
-      url: "https://falowen.app/learn-german-ghana",
+      url: "https://www.falowen.app/learn-german-ghana",
+      logo: "https://www.falowen.app/logo512.png",
       sameAs: [
         "https://www.instagram.com/lleaghana",
         "https://www.youtube.com/@LLEAGhana",
         "https://web.facebook.com/lleaghana",
       ],
+      areaServed: ["Ghana", "Nigeria"],
     };
 
-    const script = document.createElement("script");
-    script.type = "application/ld+json";
-    script.text = JSON.stringify(schema);
-    document.head.appendChild(script);
-
-    return () => {
-      document.title = previousTitle;
-      if (previousDescription !== null) {
-        meta.setAttribute("content", previousDescription);
-      }
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
+    const serviceSchema = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "German language lessons and exam preparation",
+      provider: {
+        "@type": "Organization",
+        name: "Falowen",
+      },
+      serviceType: "German language training",
+      areaServed: ["Ghana", "Nigeria"],
+      url: "https://www.falowen.app/learn-german-ghana",
+      offers: {
+        "@type": "Offer",
+        availability: "https://schema.org/OnlineOnly",
+      },
     };
+
+    const faqSchema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faq.map((item) => ({
+        "@type": "Question",
+        name: item.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: item.answer,
+        },
+      })),
+    };
+
+    updatePageMeta({
+      title: "Learn German in Ghana & Nigeria | Falowen",
+      description: descriptionContent,
+      canonicalPath: "/learn-german-ghana",
+      ogType: "website",
+      structuredData: [
+        { id: "organization", schema: organizationSchema },
+        { id: "service", schema: serviceSchema },
+        { id: "faq", schema: faqSchema },
+      ],
+    });
   }, []);
 
   const highlights = [
@@ -256,6 +271,32 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
                 <p style={{ margin: "6px 0 0", fontSize: 13, color: "#4b5563", lineHeight: 1.6 }}>{item.answer}</p>
               </div>
             ))}
+          </div>
+        </SectionCard>
+
+        <SectionCard style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+          <div style={{ display: "grid", gap: 8 }}>
+            <h2 style={{ ...styles.sectionTitle, marginBottom: 0 }}>Explore assessments, tools, and the blog</h2>
+            <p style={{ margin: 0, fontSize: 13, color: "#334155", lineHeight: 1.7 }}>
+              Move between our placement assessment, exam practice tools, and latest blog articles to build a complete
+              study flow.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+              <a href="/placement-test" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+                Take placement assessment
+              </a>
+              <a href="/exams/overview" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+                Open exam tools
+              </a>
+              <a
+                href="https://blog.falowen.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ ...styles.secondaryButton, textDecoration: "none" }}
+              >
+                Read Falowen blog
+              </a>
+            </div>
           </div>
         </SectionCard>
 
