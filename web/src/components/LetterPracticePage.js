@@ -11,9 +11,11 @@ import { writingLetters } from "../data/writingLetters";
 const IDEAS_COACHING_PROMPTS = [
   "Start with the task and ask: What is unclear to me?",
   "Request a short explanation and one example sentence.",
+  "Keep requests simple, e.g. 'Könnten wir einen anderen Termin vereinbaren?'.",
   "End by summarizing the idea in your own words.",
 ];
 const IDEAS_SESSION_TURN_LIMIT = 2;
+const CAMPUS_IMPROVEMENT_TRIAL_LIMIT = 3;
 
 const LetterPracticePage = ({ mode = "exams" }) => {
   const { i18n, t } = useTranslation();
@@ -25,6 +27,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const location = useLocation();
 
   const isExamMode = mode === "exams";
+  const isCampusMode = mode === "campus";
   const isFrenchProgram = studentProfile?.program === "french";
   const coachDisplayName = isFrenchProgram ? "the French coach" : "Herr Felix";
   const ideaCoachIntro = useMemo(
@@ -41,6 +44,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
   const [markSubmitStatus, setMarkSubmitStatus] = useState(null);
+  const [improvedLetterText, setImprovedLetterText] = useState("");
+  const [improvedFeedback, setImprovedFeedback] = useState("");
+  const [improvedLoading, setImprovedLoading] = useState(false);
+  const [campusImproveTrials, setCampusImproveTrials] = useState(0);
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([ideaCoachIntro]);
   const [ideasLoading, setIdeasLoading] = useState(false);
@@ -71,6 +78,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const isA1Student = isLevelLocked && profileLevel === "A1";
   const canUseIdeasGenerator = !isA1Student;
   const canUsePracticeLetters = isExamMode && !isFrenchProgram && !isA1Student;
+  const campusImprovementLocked = isCampusMode && campusImproveTrials >= CAMPUS_IMPROVEMENT_TRIAL_LIMIT;
 
   const availableTabs = useMemo(
     () => {
@@ -237,9 +245,15 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         studentName,
         idToken,
         program: studentProfile?.program,
+        submissionContext: isCampusMode ? "campus-mark" : "exam-room",
       });
 
       setMarkFeedback(data.feedback);
+      if (isCampusMode) {
+        setImprovedLetterText(trimmed);
+        setImprovedFeedback("");
+        setCampusImproveTrials(0);
+      }
       setMarkSubmitStatus({
         submissionSaved: Boolean(data?.submissionSaved),
         submissionId: data?.submissionId || null,
@@ -257,6 +271,53 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       setError(message);
     } finally {
       setLoading(false);
+    }
+  };
+
+
+  const handleMarkImprovedDraft = async () => {
+    if (!isCampusMode) return;
+
+    if (!markFeedback) {
+      setError("Submit your first letter for marking before using the improvement box.");
+      return;
+    }
+
+    if (campusImprovementLocked) {
+      setError("Improvement attempts are now locked. Please read the instructions, fix your errors, and then submit.");
+      return;
+    }
+
+    const trimmed = improvedLetterText.trim();
+    if (!trimmed) {
+      setError("Paste your improved letter in the improvement box first.");
+      return;
+    }
+
+    if (!validateLevel()) return;
+
+    setImprovedLoading(true);
+    setError("");
+
+    try {
+      const studentName = user?.displayName || user?.email || "Student";
+      const data = await markLetterWithAI({
+        text: trimmed,
+        level,
+        studentName,
+        idToken,
+        program: studentProfile?.program,
+        submissionContext: "campus-improved",
+      });
+
+      setImprovedFeedback(data.feedback);
+      setCampusImproveTrials((prev) => prev + 1);
+    } catch (err) {
+      const message =
+        err?.response?.data?.error || err.message || "Could not mark improved draft right now.";
+      setError(message);
+    } finally {
+      setImprovedLoading(false);
     }
   };
 
@@ -604,11 +665,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                 value={letterText}
                 onChange={(e) => setLetterText(e.target.value)}
                 rows={10}
+                disabled={campusImprovementLocked}
               />
             </div>
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading}>
+              <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading || campusImprovementLocked}>
                 {loading ? "Submitting for tutor review..." : "Submit for tutor review"}
               </button>
               <button
@@ -617,6 +679,9 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                   setLetterText("");
                   setMarkFeedback("");
                   setMarkSubmitStatus(null);
+                  setImprovedLetterText("");
+                  setImprovedFeedback("");
+                  setCampusImproveTrials(0);
                   resetErrors();
                 }}
               >
@@ -644,12 +709,53 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               </div>
             )}
 
+            {isCampusMode && campusImprovementLocked && (
+              <div style={styles.infoBox}>
+                Improvement box locked after {CAMPUS_IMPROVEMENT_TRIAL_LIMIT} AI trials. Please read the feedback instructions, fix your errors, and then submit.
+              </div>
+            )}
+
             {markFeedback && (
               <div style={{ display: "grid", gap: 10 }}>
                 <div>
                   <h4 style={styles.sectionTitle}>AI feedback</h4>
                   <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
                 </div>
+
+                {isCampusMode && (
+                  <div style={{ display: "grid", gap: 8, border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+                    <h4 style={{ ...styles.sectionTitle, margin: 0 }}>Improvement with AI (Campus only)</h4>
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      Try up to {CAMPUS_IMPROVEMENT_TRIAL_LIMIT} improved drafts. After that, the boxes lock so you can review instructions and fix errors before submission.
+                    </p>
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      Trials used: {campusImproveTrials}/{CAMPUS_IMPROVEMENT_TRIAL_LIMIT}
+                    </p>
+                    <textarea
+                      style={styles.textArea}
+                      placeholder="Paste your improved version based on AI feedback."
+                      value={improvedLetterText}
+                      onChange={(e) => setImprovedLetterText(e.target.value)}
+                      rows={8}
+                      disabled={campusImprovementLocked}
+                    />
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        style={styles.primaryButton}
+                        onClick={handleMarkImprovedDraft}
+                        disabled={improvedLoading || campusImprovementLocked}
+                      >
+                        {improvedLoading ? "Marking improved draft..." : "Mark improvement with AI"}
+                      </button>
+                    </div>
+                    {improvedFeedback && (
+                      <div>
+                        <h5 style={{ ...styles.sectionTitle, margin: "4px 0" }}>AI feedback (improved draft)</h5>
+                        <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{improvedFeedback}</pre>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

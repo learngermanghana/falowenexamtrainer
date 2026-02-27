@@ -27,7 +27,7 @@ const LETTER_COACH_PROMPTS = {
       "        • Cancellation: Wetter/Gesundheit + 'Termin absagen' " +
       "        • Enquiry/registration: 'Anfrage stellen'; add 'Wie viel kostet …?' " +
       "        • Registration/course: 'anfangen'/'beginnen' " +
-      "        • Appointment: 'neuen Termin vereinbaren' " +
+      "        • Appointment: 'neuen Termin vereinbaren' (simple full request: 'Könnten wir einen anderen Termin vereinbaren?') " +
       "        • Apology: 'Es tut mir leid.' " +
       "    10b) Simplicity guard rails: avoid advanced formal phrases like 'hiermit', " +
       "        'darüber informieren', 'wahrnehmen', 'Unannehmlichkeiten', 'Verständnis', or " +
@@ -57,7 +57,7 @@ const LETTER_COACH_PROMPTS = {
       "    4) After every reply, give one tip or one phrase fragment—never full sentences. " +
       "    5) Keep lines short: ~7–8 words; split long lines. " +
       "    6) Letter length target: 30–40 words. " +
-      "    7) Scenarios: cancellations (health/weather; 'absagen'), enquiries/registrations ('Anfrage stellen'; include 'Wie viel kostet …?'), appointments ('neuen Termin vereinbaren'). " +
+      "    7) Scenarios: cancellations (health/weather; 'absagen'), enquiries/registrations ('Anfrage stellen'; include 'Wie viel kostet …?'), appointments ('neuen Termin vereinbaren'). For appointment changes, suggest very simple request fragments like 'Könnten wir einen anderen Termin vereinbaren?'. " +
       "    8) Apologies: 'Es tut mir leid.' " +
       "    9) Always correct grammar and suggest improved fragments when needed. " +
       "Steps: greeting → introduction → 'Zuerst' idea → 'Außerdem' (or 'Dann') → 'Zum Schluss' → polite closing cue ('Ich freue mich …'). " +
@@ -157,6 +157,14 @@ const frenchIdeasPrompt = (level) =>
   );
 
 const markPrompt = ({ schreibenLevel, studentName, program, submissionContext }) => {
+  const isCampusSubmission = String(submissionContext || "").startsWith("campus");
+  const isCampusImprovedSubmission = submissionContext === "campus-improved";
+  const campusInstruction = isCampusSubmission
+    ? "13. Campus mode rule: end your feedback with a heading 'Next improvement task' and provide exactly 3 short actions the student must fix before submission. Keep each action simple and specific.\n"
+    : "";
+  const campusImprovedInstruction = isCampusImprovedSubmission
+    ? "14. This is an improved campus draft. Briefly compare against the previous attempt and state whether the student fixed key issues.\n"
+    : "";
   if (program === "french") {
     return `You are a supportive French writing coach.\n
 You help students prepare for A1, A2, B1, B2, and C1 French exam letters or short essays.\n
@@ -174,7 +182,7 @@ Begin with a warm greeting that uses the student's name (${studentName}) and ref
 7. For A1 and A2, be strict about connectors, basic word order, and correct formal/informal greeting.\n
 8. For B1+, mention exam criteria and what examiner wants.\n
 9. Never write a new letter for the student, only mark what they submit.\n
-10. When possible, point out specific lines or examples from their letter in your feedback.\n`;
+10. When possible, point out specific lines or examples from their letter in your feedback.\n${campusInstruction}${campusImprovedInstruction}`;
   }
 
   return `You are Herr Felix, a supportive and innovative German letter writing trainer.\n
@@ -190,12 +198,12 @@ Begin with a warm greeting that uses the student's name (${studentName}) and ref
 4. Highlight every mistake with [wrong]...[/wrong] and every good example with [correct]...[/correct].\n
 5. Give 2-3 improvement tips in bullet points.\n
 6. At the end, give a realistic score out of 25 in the format: Score: X/25.\n
-7. For A1 and A2, be strict about connectors, basic word order, modal verbs, and correct formal/informal greeting. For A1 feedback, do not suggest 'deshalb' or 'ich möchte wissen, ob/wann/wo'; recommend simple phrases and 'weil' only.\n
+7. For A1 and A2, be strict about connectors, basic word order, modal verbs, and correct formal/informal greeting. For A1 feedback, do not suggest 'deshalb' or 'ich möchte wissen, ob/wann/wo'; recommend simple phrases and 'weil' only. For appointment-change requests, prefer a simple model phrase like 'Könnten wir einen anderen Termin vereinbaren?'.\n
 8. For B1+, mention exam criteria and what examiner wants.\n
 9. Never write a new letter for the student, only mark what they submit.\n
 10. When possible, point out specific lines or examples from their letter in your feedback.\n
 11. When student score is 18 or above then they have passed. When score is less than 18, is a fail and they must try again before submitting to prevent low marks.\n
-12. Do not include any instruction about going to "my course" or submitting lesen/horen answers in your feedback.\n`;
+12. Do not include any instruction about going to "my course" or submitting lesen/horen answers in your feedback.\n${campusInstruction}${campusImprovedInstruction}`;
 };
 
 const getWritingIdeasPrompt = ({ level, program }) => {
