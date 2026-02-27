@@ -516,6 +516,39 @@ exports.onStudentCreated = onDocumentCreated(
   }
 );
 
+
+// Keep Students sheet in sync when student records change (e.g., payment webhooks)
+exports.onStudentUpdated = onDocumentUpdated(
+  {
+    region: "europe-west1",
+    document: "students/{studentCode}",
+    secrets: [
+      GOOGLE_SERVICE_ACCOUNT_JSON_B64,
+      STUDENTS_SHEET_ID,
+      STUDENTS_SHEET_TAB,
+    ],
+  },
+  async (event) => {
+    const after = event.data?.after;
+    if (!after?.exists) return;
+
+    const student = after.data();
+    if (!student) return;
+
+    process.env.GOOGLE_SERVICE_ACCOUNT_JSON_B64 = GOOGLE_SERVICE_ACCOUNT_JSON_B64.value();
+    process.env.STUDENTS_SHEET_ID = STUDENTS_SHEET_ID.value();
+    process.env.STUDENTS_SHEET_TAB = STUDENTS_SHEET_TAB.value();
+
+    const studentCode = String(student.studentCode || event.params.studentCode || "").trim();
+    const result = await getStudentAppender()({
+      ...student,
+      studentCode,
+    });
+
+    console.log("onStudentUpdated -> sheet sync result:", result);
+  }
+);
+
 exports.archiveOldThreads = onSchedule(
   {
     region: "europe-west1",
