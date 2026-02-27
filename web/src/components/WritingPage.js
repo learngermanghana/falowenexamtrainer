@@ -722,21 +722,6 @@ const WritingPage = ({ mode = "course" }) => {
     studentCode,
   ]);
 
-  const handleRandomPrompt = () => {
-    if (!visibleWritingTasks.length) return;
-    const random = visibleWritingTasks[Math.floor(Math.random() * visibleWritingTasks.length)];
-    setSelectedLetterId(random.id);
-  };
-
-  const handleStartExamPreset = () => {
-    if (!visibleWritingTasks.length) return;
-    const random = visibleWritingTasks[Math.floor(Math.random() * visibleWritingTasks.length)];
-    setSelectedLetterId(random.id);
-    setPendingExamStart(true);
-    setRemainingSeconds((random.durationMinutes || 0) * 60);
-    setExamFocusMode(true);
-  };
-
   const handleExportDraft = () => {
     const trimmed = typedAnswer.trim();
     if (!trimmed) {
