@@ -99,13 +99,6 @@ const CONNECTORS_BY_LEVEL = {
   C1: ["hingegen", "nichtsdestotrotz", "folglich", "dementsprechend"],
 };
 
-const DEFAULT_OUTLINE = [
-  { title: "Greeting + context", hint: "Greet and name the situation." },
-  { title: "Purpose", hint: "State why you are writing." },
-  { title: "Bullet points", hint: "Answer the task points with details." },
-  { title: "Closing", hint: "Polite closing line." },
-];
-
 const A1_FORM_PRACTICE_TASKS = [
   {
     id: "lake-tour-booking",
@@ -300,26 +293,6 @@ const derivePromptMeta = (task) => {
   return { type, formality, theme };
 };
 
-const buildPlanOutline = ({ selectedLetter, ideaInput }) => {
-  if (selectedLetter?.whatToInclude?.length) {
-    return selectedLetter.whatToInclude.map((point, index) => ({
-      title: `Bullet point ${index + 1}`,
-      hint: point,
-      draft: "",
-    }));
-  }
-
-  if (ideaInput?.trim()) {
-    return DEFAULT_OUTLINE.map((step) => ({
-      ...step,
-      draft: "",
-      hint: `${step.hint} (${ideaInput.slice(0, 60)}...)`,
-    }));
-  }
-
-  return DEFAULT_OUTLINE.map((step) => ({ ...step, draft: "" }));
-};
-
 const extractErrorBank = (feedback) => {
   if (!feedback) return [];
   const sentences = splitSentences(feedback);
@@ -429,7 +402,6 @@ const WritingPage = ({ mode = "course" }) => {
   const [draftHistory, setDraftHistory] = useState([]);
   const [completionLog, setCompletionLog] = useState([]);
   const [errorBank, setErrorBank] = useState([]);
-  const [planOutline, setPlanOutline] = useState([]);
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [selectedLetterId, setSelectedLetterId] = useState(() => {
     const initialList = isExamMode
@@ -598,7 +570,6 @@ const WritingPage = ({ mode = "course" }) => {
       setDraftHistory([]);
       setCompletionLog([]);
       setErrorBank([]);
-      setPlanOutline([]);
     };
 
     const loadProgress = async () => {
@@ -653,9 +624,6 @@ const WritingPage = ({ mode = "course" }) => {
         if (Array.isArray(saved.errorBank)) {
           setErrorBank(saved.errorBank);
         }
-        if (Array.isArray(saved.planOutline)) {
-          setPlanOutline(saved.planOutline);
-        }
       } catch (err) {
         console.error("Failed to load writing progress", err);
       } finally {
@@ -694,7 +662,6 @@ const WritingPage = ({ mode = "course" }) => {
           draftHistory,
           completionLog,
           errorBank,
-          planOutline,
         },
       }).catch((err) => {
         console.error("Failed to save writing progress", err);
@@ -712,7 +679,6 @@ const WritingPage = ({ mode = "course" }) => {
     markFeedback,
     reflectionText,
     revisedDraftText,
-    planOutline,
     progressLoaded,
     progressMode,
     remainingSeconds,
@@ -1497,63 +1463,6 @@ const WritingPage = ({ mode = "course" }) => {
                 <li key={prompt}>{prompt}</li>
               ))}
             </ul>
-          </div>
-          <div style={{ ...styles.helperCard, marginTop: 12 }}>
-            <div style={{ fontWeight: 700, marginBottom: 6 }}>Plan before you write</div>
-            <p style={styles.helperText}>
-              Generate a quick outline from the prompt, then expand each bullet before sending to the coach.
-            </p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button
-                style={styles.secondaryButton}
-                onClick={() =>
-                  setPlanOutline(buildPlanOutline({ selectedLetter, ideaInput }))
-                }
-              >
-                Generate outline
-              </button>
-              <button
-                style={styles.secondaryButton}
-                onClick={() => setPlanOutline([])}
-                disabled={!planOutline.length}
-              >
-                Clear outline
-              </button>
-            </div>
-            {planOutline.length > 0 && (
-              <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
-                {planOutline.map((step, index) => (
-                  <div key={`${step.title}-${index}`} style={styles.outlineStep}>
-                    <div style={{ fontWeight: 700 }}>{step.title}</div>
-                    <div style={styles.helperText}>{step.hint}</div>
-                    <textarea
-                      style={{ ...styles.textareaSmall, marginTop: 6 }}
-                      rows={2}
-                      placeholder="Expand this bullet with your own sentence."
-                      value={step.draft || ""}
-                      onChange={(event) =>
-                        setPlanOutline((prev) =>
-                          prev.map((item, itemIndex) =>
-                            itemIndex === index ? { ...item, draft: event.target.value } : item
-                          )
-                        )
-                      }
-                    />
-                  </div>
-                ))}
-                <button
-                  style={styles.primaryButton}
-                  onClick={() => {
-                    const compiled = planOutline
-                      .map((step) => `- ${step.draft || step.hint}`)
-                      .join("\n");
-                    setIdeaInput((prev) => `${prev}${prev.trim() ? "\n\n" : ""}${compiled}`);
-                  }}
-                >
-                  Add outline to prompt
-                </button>
-              </div>
-            )}
           </div>
           <div style={styles.chatLog} className="idea-generator-chat">
             {chatMessages.map((msg, idx) => (
