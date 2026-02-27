@@ -84,11 +84,17 @@ export const loadLatestTutorReviewForStudent = async ({ userId, studentCode } = 
     collection(db, COLLECTION_NAME),
     where("ownerKey", "in", ownerCandidates),
     orderBy("createdAt", "desc"),
-    limit(1)
+    limit(10)
   );
   const snapshot = await getDocs(reviewQuery);
   if (snapshot.empty) return null;
-  return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+
+  const docs = snapshot.docs.map((item) => ({ id: item.id, ...item.data() }));
+  const latestWithTutorFeedback = docs.find(
+    (item) => typeof item.tutorFeedback === "string" && item.tutorFeedback.trim().length > 0
+  );
+
+  return latestWithTutorFeedback || docs[0];
 };
 
 export const saveTutorReviewResponse = async ({ reviewId, reviewStatus, tutorFeedback = "" } = {}) => {
