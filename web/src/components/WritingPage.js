@@ -471,6 +471,7 @@ const WritingPage = ({ mode = "course" }) => {
   const canUseIdeasGenerator = !isA1Student;
   const canUsePracticeLetters = isExamMode ? true : !isA1Student;
   const canUseFormsPractice = isExamMode && level === "A1";
+  const canUseTutorFeedback = isExamMode;
   const [revealedFormAnswers, setRevealedFormAnswers] = useState({});
   const availableTabs = useMemo(() => {
     const tabs = [{ key: "mark", label: "Mark my letter" }];
@@ -487,8 +488,12 @@ const WritingPage = ({ mode = "course" }) => {
       tabs.push({ key: "forms", label: "Forms (A1 Teil 1)" });
     }
 
+    if (canUseTutorFeedback) {
+      tabs.push({ key: "tutor", label: "Tutor feedback" });
+    }
+
     return tabs;
-  }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters]);
+  }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters, canUseTutorFeedback]);
   const progressMode = isExamMode ? "exam" : "course";
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
@@ -793,9 +798,6 @@ const WritingPage = ({ mode = "course" }) => {
     setActiveTab(tabKey);
     setError("");
     setTutorSaveState({ loading: false, success: "", error: "" });
-    if (tabKey !== "mark") {
-      setMarkFeedback("");
-    }
     if (tabKey !== "ideas") {
       setIdeaError("");
       setIdeaSuccess("");
@@ -923,7 +925,7 @@ const WritingPage = ({ mode = "course" }) => {
       });
       setTutorSaveState({
         loading: false,
-        success: "Saved successfully. Your tutor can now review this exam-room letter.",
+        success: "Submitted. A tutor copy is now in the review queue.",
         error: "",
       });
       setLatestTutorReview({ reviewStatus: "pending", tutorFeedback: "", reviewedAt: null });
@@ -1301,41 +1303,6 @@ const WritingPage = ({ mode = "course" }) => {
             <WordCountMeter count={typedWordCount} range={typedWordRange} />
 
             <div style={{ marginTop: 12 }}>
-              <h4 style={styles.resultHeading}>Final draft rubric checklist</h4>
-              <div style={{ display: "grid", gap: 8 }}>
-                {[
-                  { key: "task", label: "Task completion: all bullet points answered" },
-                  { key: "coherence", label: "Coherence: logical order + connectors" },
-                  { key: "grammar", label: "Grammar & spelling: quick proofread done" },
-                ].map((item) => (
-                  <label key={item.key} style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                    <input
-                      type="checkbox"
-                      checked={rubricChecklist[item.key]}
-                      onChange={() =>
-                        setRubricChecklist((prev) => ({ ...prev, [item.key]: !prev[item.key] }))
-                      }
-                    />
-                    <span>{item.label}</span>
-                  </label>
-                ))}
-              </div>
-              <details style={{ marginTop: 10 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 700 }}>
-                  See rubric examples for {level}
-                </summary>
-                <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
-                  <div style={styles.outlineStep}>
-                    <strong>Good:</strong> {RUBRIC_EXAMPLES[level]?.good}
-                  </div>
-                  <div style={styles.outlineStep}>
-                    <strong>Excellent:</strong> {RUBRIC_EXAMPLES[level]?.excellent}
-                  </div>
-                </div>
-              </details>
-            </div>
-
-            <div style={{ marginTop: 12 }}>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <button
                   style={styles.primaryButton}
@@ -1354,32 +1321,20 @@ const WritingPage = ({ mode = "course" }) => {
                     onClick={handleSaveForTutorReview}
                     disabled={tutorSaveState.loading}
                   >
-                    {tutorSaveState.loading ? "Saving for tutor..." : "Save for tutor review"}
+                    {tutorSaveState.loading ? "Submitting to tutor..." : "Submit copy to tutor"}
                   </button>
                 ) : null}
               </div>
               {isExamMode ? (
                 <div style={{ display: "grid", gap: 6 }}>
                   <p style={styles.helperText}>
-                    Exam room only: save this marked letter so your tutor can review it after AI feedback.
+                    Exam room only: submit this marked draft so your tutor receives your latest practice.
                   </p>
                   {!tutorReviewCloudEnabled ? (
                     <p style={{ ...styles.helperText, color: "#b45309", margin: "0" }}>
                       Firebase is not configured in this environment, so tutor responses cannot be synced yet.
                     </p>
                   ) : null}
-                  <div style={styles.helperCard}>
-                    <div style={{ fontWeight: 700 }}>
-                      Tutor review status: {formatTutorReviewStatus(latestTutorReview?.reviewStatus)}
-                    </div>
-                    {latestTutorReview?.tutorFeedback ? (
-                      <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{latestTutorReview.tutorFeedback}</p>
-                    ) : (
-                      <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-                        Tutor feedback appears here after they respond with approval or improvement notes.
-                      </p>
-                    )}
-                  </div>
                 </div>
               ) : null}
               {tutorSaveState.error ? (
@@ -1494,28 +1449,34 @@ const WritingPage = ({ mode = "course" }) => {
 
           {(errorBank.length > 0 || revisionTasks.length > 0) && (
             <section style={styles.card}>
-              <details>
-                <summary style={{ cursor: "pointer", fontWeight: 700 }}>Error bank & quick fixes (optional)</summary>
-                {errorBank.length > 0 ? (
-                  <ul style={styles.checklist}>
-                    {errorBank.map((item, index) => (
-                      <li key={`${item}-${index}`}>{item}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p style={styles.helperText}>No recurring errors flagged yet.</p>
-                )}
-                {revisionTasks.length > 0 ? (
-                  <>
-                    <div style={{ fontWeight: 700, marginTop: 10 }}>Quick revision tasks</div>
-                    <ul style={styles.checklist}>
+              <h3 style={styles.sectionTitle}>Error bank & quick fixes</h3>
+              <p style={styles.helperText}>Most recent patterns from your draft, with focused next actions.</p>
+              <div style={styles.gridTwo}>
+                <div style={{ border: "1px solid #fecaca", background: "#fff1f2", borderRadius: 12, padding: 12 }}>
+                  <div style={{ fontWeight: 800, color: "#9f1239", marginBottom: 8 }}>Frequent errors</div>
+                  {errorBank.length > 0 ? (
+                    <ul style={{ ...styles.checklist, marginTop: 0 }}>
+                      {errorBank.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={styles.helperText}>No recurring errors flagged yet.</p>
+                  )}
+                </div>
+                <div style={{ border: "1px solid #bbf7d0", background: "#f0fdf4", borderRadius: 12, padding: 12 }}>
+                  <div style={{ fontWeight: 800, color: "#166534", marginBottom: 8 }}>Quick fixes</div>
+                  {revisionTasks.length > 0 ? (
+                    <ul style={{ ...styles.checklist, marginTop: 0 }}>
                       {revisionTasks.map((task) => (
                         <li key={task}>{task}</li>
                       ))}
                     </ul>
-                  </>
-                ) : null}
-              </details>
+                  ) : (
+                    <p style={styles.helperText}>No revision tasks yet. Get AI feedback to generate fixes.</p>
+                  )}
+                </div>
+              </div>
             </section>
           )}
 
@@ -1790,9 +1751,9 @@ const WritingPage = ({ mode = "course" }) => {
                   </div>
                   <p style={{ ...styles.helperText, marginTop: 8 }}>{task.context}</p>
                   <p style={{ margin: "8px 0", fontWeight: 600 }}>{task.prompt}</p>
-                  <div style={{ border: "1px dashed #d1d5db", borderRadius: 10, padding: 10, background: "#f8fafc" }}>
+                  <div style={{ border: "1px dashed #d1d5db", borderRadius: 10, padding: 12, background: "#f8fafc" }}>
                     {task.formFields.map((field) => (
-                      <p key={field.label} style={{ margin: "6px 0" }}>
+                      <p key={field.label} style={{ margin: "8px 0", fontSize: 16, lineHeight: 1.5 }}>
                         <strong>{field.label}:</strong> {field.value}
                       </p>
                     ))}
@@ -1833,6 +1794,37 @@ const WritingPage = ({ mode = "course" }) => {
               Your main submitted assignment should still focus on Teil 2: one formal and one informal letter.
               Use “Mark my letter” to send those drafts for grading and tutor review.
             </p>
+          </div>
+        </section>
+      )}
+
+      {activeTab === "tutor" && canUseTutorFeedback && (
+        <section style={styles.card}>
+          <h3 style={styles.sectionTitle}>Tutor feedback</h3>
+          <p style={styles.helperText}>
+            This tab is only for tutor responses on your submitted writing practice.
+          </p>
+          {!tutorReviewCloudEnabled ? (
+            <div style={styles.errorBox}>
+              Tutor feedback sync is unavailable because Firebase is not configured in this environment.
+            </div>
+          ) : null}
+          <div style={styles.helperCard}>
+            <div style={{ fontWeight: 800, marginBottom: 6 }}>
+              Status: {formatTutorReviewStatus(latestTutorReview?.reviewStatus)}
+            </div>
+            {latestTutorReview?.reviewedAt ? (
+              <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
+                Reviewed: {new Date(latestTutorReview.reviewedAt).toLocaleString()}
+              </p>
+            ) : null}
+            {latestTutorReview?.tutorFeedback ? (
+              <pre style={{ ...styles.pre, background: "#0f172a", fontSize: 14 }}>{latestTutorReview.tutorFeedback}</pre>
+            ) : (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                No tutor notes yet. Submit a copy from “Mark my letter” and check back here.
+              </p>
+            )}
           </div>
         </section>
       )}
