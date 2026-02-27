@@ -99,13 +99,6 @@ const CONNECTORS_BY_LEVEL = {
   C1: ["hingegen", "nichtsdestotrotz", "folglich", "dementsprechend"],
 };
 
-const TEMPLATE_SNIPPETS = {
-  formal:
-    "Sehr geehrte Damen und Herren,\n\nich schreibe Ihnen, weil ...\n\nMit freundlichen Grüßen\n[Name]",
-  informal:
-    "Hallo [Name],\n\nich wollte dir kurz schreiben, weil ...\n\nLiebe Grüße\n[Name]",
-};
-
 const DEFAULT_OUTLINE = [
   { title: "Greeting + context", hint: "Greet and name the situation." },
   { title: "Purpose", hint: "State why you are writing." },
@@ -412,7 +405,6 @@ const WritingPage = ({ mode = "course" }) => {
   const [writingTasksLoading, setWritingTasksLoading] = useState(!isExamMode);
   const [writingTasksError, setWritingTasksError] = useState("");
   const [typedAnswer, setTypedAnswer] = useState("");
-  const [practiceDraft, setPracticeDraft] = useState("");
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([IDEA_COACH_INTRO]);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
@@ -500,9 +492,6 @@ const WritingPage = ({ mode = "course" }) => {
     return tabs;
   }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters]);
   const progressMode = isExamMode ? "exam" : "course";
-  const activeTargetLevel = selectedLetter?.level || level;
-  const wordTarget = WORD_TARGETS[activeTargetLevel];
-  const wordRange = WORD_TARGET_RANGES[activeTargetLevel];
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
       setLevel(profileLevel);
@@ -635,7 +624,6 @@ const WritingPage = ({ mode = "course" }) => {
         }
 
         if (typeof saved.typedAnswer === "string") setTypedAnswer(saved.typedAnswer);
-        if (typeof saved.practiceDraft === "string") setPracticeDraft(saved.practiceDraft);
         if (typeof saved.markFeedback === "string") setMarkFeedback(saved.markFeedback);
         if (typeof saved.firstDraftSnapshot === "string") setFirstDraftSnapshot(saved.firstDraftSnapshot);
         if (typeof saved.reflectionText === "string") setReflectionText(saved.reflectionText);
@@ -697,7 +685,6 @@ const WritingPage = ({ mode = "course" }) => {
         mode: progressMode,
         data: {
           typedAnswer,
-          practiceDraft,
           markFeedback,
           firstDraftSnapshot,
           reflectionText,
@@ -731,7 +718,6 @@ const WritingPage = ({ mode = "course" }) => {
     reflectionText,
     revisedDraftText,
     planOutline,
-    practiceDraft,
     progressLoaded,
     progressMode,
     remainingSeconds,
@@ -743,13 +729,6 @@ const WritingPage = ({ mode = "course" }) => {
     userId,
     studentCode,
   ]);
-
-  const handleInsertSnippet = (snippet) => {
-    setPracticeDraft((prev) => {
-      const spacer = prev.trim() ? "\n\n" : "";
-      return `${prev}${spacer}${snippet}`;
-    });
-  };
 
   const handleRandomPrompt = () => {
     if (!visibleWritingTasks.length) return;
@@ -1075,25 +1054,6 @@ const WritingPage = ({ mode = "course" }) => {
     setActiveTab("mark");
   };
 
-  const sendPracticeDraftToMarkTab = () => {
-    const trimmed = practiceDraft.trim();
-
-    if (!trimmed) {
-      alert("Please write your practice draft before sending it to be marked.");
-      return;
-    }
-
-    setTypedAnswer((prev) => {
-      const existing = prev.trim();
-      const parts = [existing, trimmed].filter(Boolean);
-      return parts.join("\n\n");
-    });
-    setError("");
-    setMarkFeedback("");
-    setActiveTab("mark");
-  };
-
-  const practiceWordCount = countWords(practiceDraft);
   const typedWordCount = countWords(typedAnswer);
   const typedWordRange = WORD_TARGET_RANGES[level];
   const revisionTasks = useMemo(() => buildRevisionTasks(errorBank), [errorBank]);
@@ -1242,59 +1202,31 @@ const WritingPage = ({ mode = "course" }) => {
             <h3 style={styles.sectionTitle}>Your simulation room</h3>
             {practiceTimerControls}
             {selectedLetter && (
-              <>
+              <div style={{ display: "grid", gap: 10 }}>
                 <div style={styles.badge}>Topic: {selectedLetter.letter}</div>
-                <p style={styles.helperText}>{selectedLetter.situation}</p>
-                <h4 style={styles.resultHeading}>Checklist</h4>
-                <ul style={styles.checklist}>
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: 16,
+                    lineHeight: 1.6,
+                    color: "#111827",
+                    fontWeight: 500,
+                  }}
+                >
+                  {selectedLetter.situation}
+                </p>
+                <h4 style={{ ...styles.resultHeading, fontSize: 14, marginTop: 2 }}>Checklist</h4>
+                <ul style={{ ...styles.checklist, marginTop: 0, fontSize: 14 }}>
                   {(selectedLetter.whatToInclude || []).map((item) => (
                     <li key={item}>{item}</li>
                   ))}
                 </ul>
-              </>
+              </div>
             )}
-            <div style={{ marginTop: 12 }}>
-              <label style={styles.label}>Your draft</label>
-              <textarea
-                style={styles.textArea}
-                placeholder="Write your letter here while the timer is running..."
-                value={practiceDraft}
-                onChange={(e) => setPracticeDraft(e.target.value)}
-                rows={7}
-              />
-              <p style={styles.helperText}>
-                Words: {practiceWordCount} · Characters: {practiceDraft.length}
-                {wordTarget ? ` · Target: ${wordTarget}` : ""}
-              </p>
-              <WordCountMeter count={practiceWordCount} range={wordRange} />
-              <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button
-                  style={styles.secondaryButton}
-                  onClick={() => handleInsertSnippet(TEMPLATE_SNIPPETS.formal)}
-                >
-                  Insert formal snippet
-                </button>
-                <button
-                  style={styles.secondaryButton}
-                  onClick={() => handleInsertSnippet(TEMPLATE_SNIPPETS.informal)}
-                >
-                  Insert informal snippet
-                </button>
-              </div>
-              <div style={{ marginTop: 10 }}>
-                <button
-                  style={styles.secondaryButton}
-                  onClick={sendPracticeDraftToMarkTab}
-                  disabled={!practiceDraft.trim()}
-                >
-                  Send practice draft to “Mark my letter”
-                </button>
-              </div>
-            </div>
           </section>
 
           <section style={styles.card}>
-            <h3 style={styles.sectionTitle}>Letters from the practice set</h3>
+            <h3 style={styles.sectionTitle}>Practice prompts</h3>
             {writingTasksError && (
               <div style={{ ...styles.helperText, color: "#b91c1c" }}>
                 <p style={{ marginBottom: 8 }}>{writingTasksError}</p>
