@@ -163,7 +163,43 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     const title = t("landing.meta.title");
     const description = t("landing.meta.description");
 
-    updatePageMeta({ title, description, lang: i18n.language });
+    const organizationSchema = {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Falowen",
+      url: "https://www.falowen.app/",
+      logo: "https://www.falowen.app/logo512.png",
+      sameAs: [
+        "https://www.instagram.com/lleaghana",
+        "https://www.youtube.com/@LLEAGhana",
+        "https://web.facebook.com/lleaghana",
+      ],
+    };
+
+    const serviceSchema = {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "Falowen language learning tools",
+      serviceType: "Online language learning and exam practice",
+      provider: {
+        "@type": "Organization",
+        name: "Falowen",
+      },
+      areaServed: ["Ghana", "Nigeria"],
+      url: "https://www.falowen.app/",
+    };
+
+    updatePageMeta({
+      title,
+      description,
+      lang: i18n.language,
+      canonicalPath: "/",
+      ogType: "website",
+      structuredData: [
+        { id: "organization", schema: organizationSchema },
+        { id: "service", schema: serviceSchema },
+      ],
+    });
   }, [i18n.language, t]);
 
   const handleProgramSelect = (nextProgram) => {
@@ -412,6 +448,24 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 starLabel={t("landing.reviews.starRating", { count: r.stars })}
               />
             ))}
+          </div>
+        </section>
+
+        <section style={{ ...styles.card, display: "grid", gap: 10, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+          <h2 style={{ ...styles.sectionTitle, marginBottom: 0 }}>Continue with assessments, tools, and blog guides</h2>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Use these internal links to move from assessment to practice tools and then to deeper reading on our blog.
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <a href="/placement-test" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+              Placement assessment
+            </a>
+            <a href="/exams/overview" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+              Exam practice tools
+            </a>
+            <a href="https://blog.falowen.app" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+              Blog articles
+            </a>
           </div>
         </section>
 

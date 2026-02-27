@@ -304,10 +304,37 @@ const PlacementTestPage = () => {
   const placementRecommendationRoute = getPlacementRecommendationRoute(placementLevel);
 
   useEffect(() => {
+    const pageTitle = t("placementPage.meta.title", { defaultValue: placementTest.title });
+    const pageDescription = t("placementPage.meta.description", { defaultValue: placementTest.subtitle });
+
+    const articleSchema = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: pageTitle,
+      description: pageDescription,
+      author: {
+        "@type": "Organization",
+        name: "Falowen",
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "Falowen",
+        logo: {
+          "@type": "ImageObject",
+          url: "https://www.falowen.app/logo512.png",
+        },
+      },
+      mainEntityOfPage: "https://www.falowen.app/placement-test",
+      dateModified: new Date().toISOString(),
+    };
+
     updatePageMeta({
-      title: t("placementPage.meta.title", { defaultValue: placementTest.title }),
-      description: t("placementPage.meta.description", { defaultValue: placementTest.subtitle }),
+      title: pageTitle,
+      description: pageDescription,
       lang: i18n.language,
+      canonicalPath: "/placement-test",
+      ogType: "article",
+      structuredData: [{ id: "article", schema: articleSchema }],
     });
   }, [i18n.language, t]);
 
@@ -471,6 +498,20 @@ const PlacementTestPage = () => {
         <div>
           <a href="/" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
             {t("placementPage.backHome")}
+          </a>
+        </div>
+      </section>
+
+      <section style={{ ...styles.card, display: "grid", gap: 10, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+        <h2 style={{ margin: 0, fontSize: 20 }}>Next steps after this assessment</h2>
+        <p style={{ margin: 0, color: "#4b5563", fontSize: 14 }}>
+          Move from this assessment to practice tools, then reinforce with study guides from the Falowen blog.
+        </p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <a href="/exams/overview" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open exam tools</a>
+          <a href="/learn-german-ghana" style={{ ...styles.secondaryButton, textDecoration: "none" }}>View learning service</a>
+          <a href="https://blog.falowen.app" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+            Read blog guides
           </a>
         </div>
       </section>
