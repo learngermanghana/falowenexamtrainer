@@ -68,29 +68,6 @@ const RUBRIC_CRITERIA = [
   },
 ];
 
-const RUBRIC_EXAMPLES = {
-  A1: {
-    good: "Short note with clear purpose, 2-3 details, polite closing.",
-    excellent: "All points covered + simple connectors (und, aber), no major grammar slips.",
-  },
-  A2: {
-    good: "Clear email with context, request, and polite closing.",
-    excellent: "Includes reasons, polite modal verbs, and 1–2 supporting details.",
-  },
-  B1: {
-    good: "Organized letter with paragraphs and clear request/complaint.",
-    excellent: "Adds justification, cohesive connectors, and accurate tenses.",
-  },
-  B2: {
-    good: "Structured opinion with examples and a clear conclusion.",
-    excellent: "Balances pros/cons, varied connectors, and precise grammar.",
-  },
-  C1: {
-    good: "Formal, coherent response with clear stance and examples.",
-    excellent: "Sophisticated structure, nuanced argument, and near-native accuracy.",
-  },
-};
-
 const CONNECTORS_BY_LEVEL = {
   A1: ["und", "aber", "dann", "weil"],
   A2: ["zuerst", "außerdem", "deshalb", "trotzdem"],
@@ -391,11 +368,6 @@ const WritingPage = ({ mode = "course" }) => {
   const [workflowComplete, setWorkflowComplete] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
   const [latestTutorReview, setLatestTutorReview] = useState(null);
-  const [rubricChecklist, setRubricChecklist] = useState({
-    task: false,
-    coherence: false,
-    grammar: false,
-  });
   const [rubricBreakdown, setRubricBreakdown] = useState(() =>
     buildRubricBreakdown("")
   );
