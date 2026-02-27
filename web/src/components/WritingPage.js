@@ -358,7 +358,7 @@ const WritingPage = ({ mode = "course" }) => {
   const [revisedDraftText, setRevisedDraftText] = useState("");
   const [workflowComplete, setWorkflowComplete] = useState(false);
   const [improvedFeedback, setImprovedFeedback] = useState("");
-  const [improvedRubricBreakdown, setImprovedRubricBreakdown] = useState(() =>
+  const [, setImprovedRubricBreakdown] = useState(() =>
     buildRubricBreakdown("")
   );
   const [improvedLoading, setImprovedLoading] = useState(false);
