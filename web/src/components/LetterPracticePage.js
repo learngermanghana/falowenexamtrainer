@@ -40,6 +40,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [activeTab, setActiveTab] = useState("mark");
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [markSubmitStatus, setMarkSubmitStatus] = useState(null);
   const [ideaInput, setIdeaInput] = useState("");
   const [chatMessages, setChatMessages] = useState([ideaCoachIntro]);
   const [ideasLoading, setIdeasLoading] = useState(false);
@@ -224,7 +225,9 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     if (!validateLevel()) return;
 
     setLoading(true);
+    setError("");
     setMarkFeedback("");
+    setMarkSubmitStatus(null);
 
     try {
       const studentName = user?.displayName || user?.email || "Student";
@@ -237,6 +240,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       });
 
       setMarkFeedback(data.feedback);
+      setMarkSubmitStatus({
+        submissionSaved: Boolean(data?.submissionSaved),
+        submissionId: data?.submissionId || null,
+      });
       addResultToHistory({
         id: Date.now(),
         mode: "Mark my letter",
@@ -602,13 +609,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading}>
-                {loading ? "Marking your letter..." : "Get AI marking"}
+                {loading ? "Submitting for tutor review..." : "Submit for tutor review"}
               </button>
               <button
                 style={styles.secondaryButton}
                 onClick={() => {
                   setLetterText("");
                   setMarkFeedback("");
+                  setMarkSubmitStatus(null);
                   resetErrors();
                 }}
               >
@@ -619,6 +627,20 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             {error && (
               <div style={styles.errorBox}>
                 <strong>{isFrenchProgram ? "Note" : "Hinweis"}:</strong> {error}
+              </div>
+            )}
+
+
+            {markSubmitStatus && (
+              <div style={markSubmitStatus.submissionSaved ? styles.successBox : styles.infoBox}>
+                {markSubmitStatus.submissionSaved ? (
+                  <>
+                    ✅ Submission saved successfully for tutor review.
+                    {markSubmitStatus.submissionId ? ` Firestore record: ${markSubmitStatus.submissionId}` : ""}
+                  </>
+                ) : (
+                  "Feedback generated, but submission save could not be confirmed in Firestore."
+                )}
               </div>
             )}
 
