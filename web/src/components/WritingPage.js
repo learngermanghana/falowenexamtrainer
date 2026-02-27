@@ -418,8 +418,6 @@ const WritingPage = ({ mode = "course" }) => {
   const [workflowComplete, setWorkflowComplete] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
   const [latestTutorReview, setLatestTutorReview] = useState(null);
-  const [examFocusMode, setExamFocusMode] = useState(false);
-  const [pendingExamStart, setPendingExamStart] = useState(false);
   const [rubricChecklist, setRubricChecklist] = useState({
     task: false,
     coherence: false,
@@ -560,12 +558,8 @@ const WritingPage = ({ mode = "course" }) => {
     if (typeof selectedDurationMinutes === "number") {
       setRemainingSeconds(selectedDurationMinutes * 60);
       setTimerRunning(false);
-      if (pendingExamStart) {
-        setTimerRunning(true);
-        setPendingExamStart(false);
-      }
     }
-  }, [pendingExamStart, selectedDurationMinutes]);
+  }, [selectedDurationMinutes]);
 
   useEffect(() => {
     if (!timerRunning) return;
@@ -574,7 +568,6 @@ const WritingPage = ({ mode = "course" }) => {
       setRemainingSeconds((prev) => {
         if (prev <= 1) {
           setTimerRunning(false);
-          setExamFocusMode(false);
           return 0;
         }
         return prev - 1;
@@ -589,7 +582,6 @@ const WritingPage = ({ mode = "course" }) => {
 
     const resetProgressState = () => {
       setTypedAnswer("");
-      setPracticeDraft("");
       setMarkFeedback("");
       setIdeaInput("");
       setChatMessages([IDEA_COACH_INTRO]);
@@ -602,8 +594,6 @@ const WritingPage = ({ mode = "course" }) => {
       setCompletionLog([]);
       setErrorBank([]);
       setPlanOutline([]);
-      setExamFocusMode(false);
-      setPendingExamStart(false);
     };
 
     const loadProgress = async () => {
@@ -1131,40 +1121,12 @@ const WritingPage = ({ mode = "course" }) => {
         >
           Reset
         </button>
-        <button
-          style={styles.secondaryButton}
-          onClick={handleRandomPrompt}
-          disabled={!visibleWritingTasks.length}
-        >
-          Random prompt
-        </button>
-        <button
-          style={styles.primaryButton}
-          onClick={handleStartExamPreset}
-          disabled={!visibleWritingTasks.length}
-        >
-          Start exam preset
-        </button>
       </div>
     </div>
   );
 
   return (
     <>
-      {examFocusMode && (
-        <div style={styles.focusOverlay}>
-          <div style={styles.focusTimer}>{formatTime(remainingSeconds)}</div>
-          <p style={{ margin: "0 0 16px", maxWidth: 520 }}>
-            Focus mode is on. Keep writing until the timer ends. Hints stay locked during the exam preset.
-          </p>
-          <button
-            style={styles.focusButton}
-            onClick={() => setExamFocusMode(false)}
-          >
-            Exit focus mode
-          </button>
-        </div>
-      )}
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{canUseIdeasGenerator ? "Writing – Practice exam letters" : "Writing – Mark my letter"}</h2>
         <p style={styles.helperText}>
