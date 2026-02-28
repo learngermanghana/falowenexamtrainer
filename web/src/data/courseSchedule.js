@@ -48,7 +48,7 @@ const A2_SCHEDULE = [
     video: "https://youtu.be/siF0jWZdIwk",
     youtube_link: "https://youtu.be/siF0jWZdIwk",
     grammarbook_link: "/campus/course/a2-starter-conjunctions-day-1",
-    workbook_link: "/campus/course/a2-small-talk-1-1-workbook",
+    workbook_link: "https://drive.google.com/file/d/1LXDI1yyJ4aT4LhX5eGDbKnkCkJZ2EE2T/view?usp=sharing",
   },
   {
     day: 2,
