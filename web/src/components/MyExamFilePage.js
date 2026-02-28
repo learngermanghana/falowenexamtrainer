@@ -851,6 +851,8 @@ const MyExamFilePage = () => {
 
               <div style={{ display: "grid", gap: 8 }}>
                 {levelInfo.exams
+                  .slice()
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                   .filter((exam) => {
                     const registrationEnd = new Date(exam.registrationEnd);
                     return now <= registrationEnd;
@@ -861,6 +863,7 @@ const MyExamFilePage = () => {
                     const registrationEnd = new Date(exam.registrationEnd);
                     const registrationStatus =
                       now < registrationStart ? "Upcoming" : now > registrationEnd ? "Closed" : "Open";
+                    const canRegister = registrationStatus === "Open" && Boolean(levelInfo.registrationUrl);
                     const isSingleDayRegistration =
                       registrationStart.toDateString() === registrationEnd.toDateString();
                     const registrationLabel = isSingleDayRegistration
@@ -939,6 +942,23 @@ const MyExamFilePage = () => {
                           >
                             Add reminder (.ics)
                           </button>
+                          {levelInfo.registrationUrl ? (
+                            <button
+                              type="button"
+                              style={{
+                                ...styles.secondaryButton,
+                                padding: "4px 8px",
+                                fontSize: 12,
+                                opacity: canRegister ? 1 : 0.75,
+                                cursor: canRegister ? "pointer" : "not-allowed",
+                              }}
+                              disabled={!canRegister}
+                              title={canRegister ? "Open Goethe registration page" : "Registration is not open yet"}
+                              onClick={() => window.location.assign(levelInfo.registrationUrl)}
+                            >
+                              Register
+                            </button>
+                          ) : null}
                         </div>
                       </div>
                     );
