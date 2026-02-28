@@ -140,7 +140,7 @@ const buildScoreNotification = (resultsPayload) => {
 // -------------------------------------------
 // Attendance notification (fixed)
 // -------------------------------------------
-const buildAttendanceNotification = (attendancePayload) => {
+const buildAttendanceNotification = (attendancePayload, options = {}) => {
   const records = attendancePayload?.records || [];
   if (!records.length) return null;
 
@@ -148,14 +148,18 @@ const buildAttendanceNotification = (attendancePayload) => {
   const markedRecords = records.filter((r) => r && r.marked);
   if (!markedRecords.length) return null;
 
-  const latest = markedRecords
-    .slice()
-    .sort((a, b) => {
-      const aMarkedAt = parseTimestamp(a?.markedAt) || 0;
-      const bMarkedAt = parseTimestamp(b?.markedAt) || 0;
-      if (bMarkedAt !== aMarkedAt) return bMarkedAt - aMarkedAt;
-      return (parseTimestamp(b?.date) || 0) - (parseTimestamp(a?.date) || 0);
-    })[0];
+  const resolveAttendanceSortTimestamp = (record = {}) =>
+    parseTimestamp(record?.markedAt) || parseTimestamp(record?.date) || 0;
+
+  const targetSessionId = String(options.sessionId || "").trim();
+  const matchedSessionRecord =
+    targetSessionId && markedRecords.find((record) => String(record?.id || "").trim() === targetSessionId);
+
+  const latest =
+    matchedSessionRecord ||
+    markedRecords
+      .slice()
+      .sort((a, b) => resolveAttendanceSortTimestamp(b) - resolveAttendanceSortTimestamp(a))[0];
 
   const timestamp =
     parseTimestamp(latest.markedAt) || parseTimestamp(latest.date) || Date.now();
@@ -251,10 +255,23 @@ export const fetchStudentNotifications = async (profile) => {
     fetchStoredNotifications(),
   ]);
 
+  const latestAttendancePush = (storedNotifications || []).find((entry) => {
+    const type = String(entry?.type || "").toLowerCase();
+    const source = String(entry?.source || "").toLowerCase();
+    return (
+      source === "push" &&
+      (type.includes("attendance") || String(entry?.data?.type || "").toLowerCase().includes("attendance"))
+    );
+  });
+
+  const attendanceContext = {
+    sessionId: latestAttendancePush?.data?.sessionId || "",
+  };
+
   const candidates = [
     ...(storedNotifications || []),
     buildScoreNotification(resultsPayload),
-    buildAttendanceNotification(attendancePayload),
+    buildAttendanceNotification(attendancePayload, attendanceContext),
     ...classBoard,
   ].filter(Boolean);
 
@@ -311,4 +328,4 @@ export const persistPushNotification = async ({ studentId, payload, notification
   return docRef.id;
 };
 
-export { fetchClassBoardAnnouncements };
+export { fetchClassBoardAnnouncements, buildAttendanceNotification };
