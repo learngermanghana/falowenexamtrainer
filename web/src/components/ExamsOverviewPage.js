@@ -1,11 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-import { useExam } from "../context/ExamContext";
 
-const LAST_SECTION_STORAGE_KEY = "falowen_exam_last_section";
-const EXAMS_OVERVIEW_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1742724655215-714c68be8fd8?auto=format&fit=crop&w=1400&q=80";
 const EXAM_TABS_OVERVIEW = [
   {
     key: "lesen",
@@ -51,68 +47,10 @@ const EXAM_TABS_OVERVIEW = [
 
 const ExamsOverviewPage = () => {
   const navigate = useNavigate();
-  const { level } = useExam();
-  const [lastSection, setLastSection] = useState("speaking");
 
-  useEffect(() => {
-    try {
-      const storedSection = localStorage.getItem(LAST_SECTION_STORAGE_KEY);
-      if (storedSection) {
-        setLastSection(storedSection);
-      }
-    } catch (error) {
-      console.warn("Failed to load exam overview storage", error);
-    }
-  }, []);
-
-  const resumeSection = lastSection || "speaking";
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <section
-        style={{
-          ...styles.card,
-          backgroundImage: `linear-gradient(130deg, rgba(17, 24, 39, 0.74), rgba(30, 64, 175, 0.58)), url(${EXAMS_OVERVIEW_HERO_IMAGE})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          color: "#f8fafc",
-          border: "none",
-        }}
-      >
-        <p style={{ ...styles.helperText, margin: 0 }}>Exams Room overview</p>
-        <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>Start here for level {level}</h2>
-        <p style={{ ...styles.helperText, margin: 0, color: "#e2e8f0" }}>
-          Get a quick snapshot of your activity, then jump into the tab you need most today.
-        </p>
-        <p style={{ ...styles.helperText, margin: 0, color: "#cbd5e1", fontSize: 12 }}>
-          Photo by{" "}
-          <a
-            href="https://unsplash.com/photos/a-skier-with-a-bag-on-a-snowy-slope-bY7uZyolzGk"
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "#bfdbfe" }}
-          >
-            Erik Mclean / Unsplash
-          </a>
-        </p>
-        <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button
-            type="button"
-            style={styles.primaryButton}
-            onClick={() => navigate(`/exams/${resumeSection}`)}
-          >
-            Resume last session
-          </button>
-          <button
-            type="button"
-            style={styles.secondaryButton}
-            onClick={() => navigate("/exams/speaking")}
-          >
-            Start speaking warm-up
-          </button>
-        </div>
-      </section>
-
       <section style={styles.card}>
         <h3 style={styles.sectionTitle}>What each tab is for</h3>
         <p style={{ ...styles.helperText, marginTop: -4 }}>
