@@ -5,7 +5,7 @@ import { useExam } from "../context/ExamContext";
 
 const LAST_SECTION_STORAGE_KEY = "falowen_exam_last_section";
 const EXAMS_OVERVIEW_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1742724655215-714c68be8fd8?auto=format&fit=crop&w=1400&q=80";
+  "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000";
 const EXAM_TABS_OVERVIEW = [
   {
     key: "lesen",
@@ -87,12 +87,12 @@ const ExamsOverviewPage = () => {
         <p style={{ ...styles.helperText, margin: 0, color: "#cbd5e1", fontSize: 12 }}>
           Photo by{" "}
           <a
-            href="https://unsplash.com/photos/a-skier-with-a-bag-on-a-snowy-slope-bY7uZyolzGk"
+            href="https://www.pexels.com/photo/woman-in-white-long-sleeve-shirt-writing-on-brown-wooden-table-4145153/"
             target="_blank"
             rel="noreferrer"
             style={{ color: "#bfdbfe" }}
           >
-            Erik Mclean / Unsplash
+            Julia M Cameron / Pexels
           </a>
         </p>
         <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
