@@ -1,10 +1,10 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
-const SpeechTrainerPage = () => {
-  const navigate = useNavigate();
+const CAMPUS_SPEAKING_LINK =
+  "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
 
+const SpeechTrainerPage = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div
@@ -16,14 +16,14 @@ const SpeechTrainerPage = () => {
           gap: 12,
         }}
       >
-        <h2 style={{ margin: 0 }}>Speaking practice moved</h2>
+        <h2 style={{ margin: 0 }}>Campus Speaking Practice</h2>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Goethe speaking recorder is now available only in the Exams room.
+          Open the dedicated campus speaking practice page.
         </p>
         <div>
-          <button style={styles.primaryButton} onClick={() => navigate("/exams/speaking")}>
-            Open Exams Speaking Room
-          </button>
+          <a href={CAMPUS_SPEAKING_LINK} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none" }}>
+            Open Campus Speaking Page
+          </a>
         </div>
       </div>
     </div>
