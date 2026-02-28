@@ -3,7 +3,7 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 
 const PRACTICE_LINK =
-  "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
+  "https://www.falowen.app/campus/speech";
 
 const SpeakingPage = () => {
   const { level: examLevel } = useExam();
