@@ -177,11 +177,11 @@ export const WRITING_PROMPTS = {
       ],
     },
     {
-      "Thema": "Sie möchten in Ihrer Freizeit ein wenig arbeiten. Die Familie Weber braucht Hilfe zu Hause. Schreiben Sie einen Brief an Jonathan Weber, den Vater der Familie.",
+      "Thema": "Sie möchten im Sommer in München Urlaub machen. Schreiben Sie an die Touristeninformation.",
       "Punkte": [
         "Warum schreiben Sie?",
-        "Wie können Sie der Familie helfen?",
-        "Wann können Sie anfangen?",
+        "Günstige Hotels?",
+        "Sehenswürdigkeiten?",
       ],
     },
   ],
