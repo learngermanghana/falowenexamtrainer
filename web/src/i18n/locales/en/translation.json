@@ -1224,7 +1224,8 @@
     "status": {
       "passed": "Passed",
       "failed": "Below pass mark ({{mark}})",
-      "score": "Score"
+      "score": "Score",
+      "completedByRetake": "Completed after retake"
     },
     "attempt": "Attempt {{attempt}} of {{total}}",
     "attemptSingle": "First attempt",
@@ -1237,6 +1238,10 @@
       "title": "No results yet",
       "description": "Try another search or complete an exam to see results here.",
       "reset": "Reset filters"
+    },
+    "completionGuide": {
+      "title": "Retake completion rule",
+      "description": "If you needed multiple attempts on an assignment, a later pass (≥ {{mark}}) means that assignment is complete. You do not need to redo it again just because an earlier attempt was below the pass mark."
     }
   },
   "placementPage": {
