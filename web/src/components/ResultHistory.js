@@ -240,12 +240,22 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
 
   if (!normalized.length) return null;
 
+  const hasCompletedRetake = normalized.some(
+    (item) => item.totalAttempts > 1 && item.passedOverall === true
+  );
+
   return (
     <section style={{ ...styles.card, marginTop: 16 }}>
       <SectionHeader
         title={t("resultHistory.title")}
         subtitle={t("resultHistory.subtitle")}
       />
+
+      {hasCompletedRetake ? (
+        <InfoBox tone="success" title={t("resultHistory.completionGuide.title")}>
+          {t("resultHistory.completionGuide.description", { mark: PASS_MARK })}
+        </InfoBox>
+      ) : null}
 
       {/* Filters */}
       <div
@@ -324,14 +334,22 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
           const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
           const studentMeta = [item.name, item.studentcode].filter(Boolean).join(" · ");
           const statusVariant =
-            item.attemptStatus === "failed" || item.passedOverall === false
+            item.passedOverall === true
+              ? "pass"
+              : item.attemptStatus === "failed" || item.passedOverall === false
               ? "fail"
               : item.attemptStatus === "passed"
               ? "pass"
               : "neutral";
           const statusStyles =
             statusVariant === "pass"
-              ? { tone: "success", label: t("resultHistory.status.passed") }
+              ? {
+                  tone: "success",
+                  label:
+                    item.totalAttempts > 1
+                      ? t("resultHistory.status.completedByRetake")
+                      : t("resultHistory.status.passed"),
+                }
               : statusVariant === "fail"
               ? { tone: "error", label: t("resultHistory.status.failed", { mark: PASS_MARK }) }
               : { tone: "info", label: t("resultHistory.status.score") };

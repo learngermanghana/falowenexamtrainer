@@ -1116,7 +1116,8 @@
     "status": {
       "passed": "Bestanden",
       "failed": "Unter der Bestehensgrenze ({{mark}})",
-      "score": "Punktzahl"
+      "score": "Punktzahl",
+      "completedByRetake": "Nach Wiederholung abgeschlossen"
     },
     "attempt": "Versuch {{attempt}} von {{total}}",
     "attemptSingle": "Erster Versuch",
@@ -1129,6 +1130,10 @@
       "title": "Noch keine Ergebnisse",
       "description": "Versuche eine andere Suche oder schließe eine Prüfung ab, um Ergebnisse zu sehen.",
       "reset": "Filter zurücksetzen"
+    },
+    "completionGuide": {
+      "title": "Regel für abgeschlossene Wiederholung",
+      "description": "Wenn du für eine Aufgabe mehrere Versuche gebraucht hast, gilt die Aufgabe mit einem späteren Bestehen (≥ {{mark}}) als abgeschlossen. Du musst sie nicht erneut bearbeiten, nur weil ein früherer Versuch unter der Bestehensgrenze lag."
     }
   },
   "placementPage": {

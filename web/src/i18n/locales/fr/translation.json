@@ -1120,7 +1120,8 @@
     "status": {
       "passed": "Réussi",
       "failed": "Sous le seuil de réussite ({{mark}})",
-      "score": "Score"
+      "score": "Score",
+      "completedByRetake": "Terminé après rattrapage"
     },
     "attempt": "Tentative {{attempt}} sur {{total}}",
     "attemptSingle": "Première tentative",
@@ -1133,6 +1134,10 @@
       "title": "Pas encore de résultats",
       "description": "Essayez une autre recherche ou terminez un examen pour voir des résultats ici.",
       "reset": "Réinitialiser les filtres"
+    },
+    "completionGuide": {
+      "title": "Règle de validation après rattrapage",
+      "description": "Si tu as eu besoin de plusieurs tentatives pour un devoir, une réussite ultérieure (≥ {{mark}}) signifie que ce devoir est terminé. Tu n’as pas besoin de le refaire juste parce qu’une tentative précédente était sous le seuil de réussite."
     }
   },
   "placementPage": {
