@@ -14,7 +14,7 @@ const IDEAS_COACHING_PROMPTS = [
   "Keep requests simple, e.g. 'Könnten wir einen anderen Termin vereinbaren?'.",
   "End by summarizing the idea in your own words.",
 ];
-const IDEAS_SESSION_TURN_LIMIT = 2;
+const IDEAS_SESSION_TURN_LIMIT = 12;
 const CAMPUS_IMPROVEMENT_TRIAL_LIMIT = 3;
 
 const LetterPracticePage = ({ mode = "exams" }) => {
@@ -398,12 +398,16 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     const trimmed = ideaInput.trim();
     if (!trimmed || ideasLoading) return;
 
+    const currentTurnCount = ideaSessionActive ? ideaTurnCount : 0;
+
     if (!ideaSessionActive) {
-      setIdeaError("Start an ideas session first, then send your question.");
-      return;
+      setIdeaSessionActive(true);
+      setIdeaTurnCount(0);
+      setIdeaSuccess(`Ideas session started. Ask up to ${IDEAS_SESSION_TURN_LIMIT} focused questions, then move your final draft to Mark my letter.`);
+      setIdeaError("");
     }
 
-    if (ideaTurnCount >= IDEAS_SESSION_TURN_LIMIT) {
+    if (currentTurnCount >= IDEAS_SESSION_TURN_LIMIT) {
       setIdeaSessionActive(false);
       setIdeaError("This ideas session is complete. Start a new session or move your draft to Mark my letter.");
       return;
@@ -794,7 +798,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               ))}
             </ul>
             <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-              Session status: <strong>{ideaSessionActive ? "Active" : "Ended"}</strong> · Turns used: {ideaTurnCount}/{IDEAS_SESSION_TURN_LIMIT}
+              Ideas turns used: <strong>{ideaTurnCount}/{IDEAS_SESSION_TURN_LIMIT}</strong>
             </p>
           </div>
 
