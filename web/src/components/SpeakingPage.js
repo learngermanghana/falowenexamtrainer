@@ -2,11 +2,14 @@ import React from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 
-const PRACTICE_LINK =
-  "https://www.falowen.app/campus/speech";
+const EXAMS_PRACTICE_LINK =
+  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
+const CAMPUS_PRACTICE_LINK =
+  "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
 
-const SpeakingPage = () => {
+const SpeakingPage = ({ mode = "exam" }) => {
   const { level: examLevel } = useExam();
+  const practiceLink = mode === "campus" ? CAMPUS_PRACTICE_LINK : EXAMS_PRACTICE_LINK;
 
   return (
     <div style={styles.container}>
@@ -25,10 +28,10 @@ const SpeakingPage = () => {
             background: "#F9FAFB",
           }}
         >
-          <a href={PRACTICE_LINK} target="_blank" rel="noreferrer" style={styles.primaryButton}>
+          <a href={practiceLink} target="_blank" rel="noreferrer" style={styles.primaryButton}>
             Open speaking exam practice link
           </a>
-          <p style={{ ...styles.helperText, marginTop: 12, marginBottom: 0, wordBreak: "break-all" }}>{PRACTICE_LINK}</p>
+          <p style={{ ...styles.helperText, marginTop: 12, marginBottom: 0, wordBreak: "break-all" }}>{practiceLink}</p>
         </div>
       </div>
     </div>
