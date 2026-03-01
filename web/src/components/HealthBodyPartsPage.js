@@ -137,8 +137,20 @@ const HealthBodyPartsPage = () => {
           <p style={{ marginTop: 8, lineHeight: 1.7, marginBottom: 0 }}>
             Ich schreibe Ihnen, weil ich den Termin absagen möchte. <br />
             Ich bin krank. <br />
-            Ich habe Kopfschmerzen.
+            Ich habe Kopfschmerzen. <br />
+            Können wir einen anderen Termin vereinbaren?
           </p>
+        </div>
+
+        <div style={boxStyle}>
+          <strong>Ways to ask for a new appointment:</strong>
+          <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, lineHeight: 1.7 }}>
+            <li>Können wir einen anderen Termin vereinbaren?</li>
+            <li>Könnten wir einen neuen Termin vereinbaren?</li>
+            <li>Wäre ein anderer Termin möglich?</li>
+            <li>Ist es möglich, einen neuen Termin zu bekommen?</li>
+            <li>Ist es möglich, den Termin zu verschieben?</li>
+          </ul>
         </div>
 
         <div style={boxStyle}>
@@ -147,6 +159,7 @@ const HealthBodyPartsPage = () => {
             Sehr geehrte Damen und Herren, <br />
             ich schreibe Ihnen, weil ich den Termin am Montag absagen möchte. <br />
             Ich bin krank. Ich habe Kopfschmerzen. <br />
+            Können wir einen anderen Termin vereinbaren? <br />
             Mit freundlichen Grüßen <br />
             Max Mustermann
           </p>
