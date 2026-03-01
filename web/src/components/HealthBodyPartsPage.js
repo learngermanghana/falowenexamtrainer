@@ -41,13 +41,68 @@ const tdStyle = {
   verticalAlign: "top",
 };
 
+// Simple reusable hero image block (Unsplash)
+const HeroImage = ({ src, alt, creditName, creditUrl }) => (
+  <div
+    style={{
+      borderRadius: 16,
+      overflow: "hidden",
+      border: "1px solid #e5e7eb",
+      background: "#fff",
+    }}
+  >
+    <div style={{ position: "relative" }}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        style={{
+          width: "100%",
+          height: 220,
+          objectFit: "cover",
+          display: "block",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: 10,
+          bottom: 10,
+          background: "rgba(255,255,255,0.88)",
+          border: "1px solid rgba(229,231,235,0.9)",
+          borderRadius: 999,
+          padding: "6px 10px",
+          fontSize: 12,
+          color: "#374151",
+        }}
+      >
+        Photo by{" "}
+        <a
+          href={creditUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={{ color: "#111827", fontWeight: 700, textDecoration: "none" }}
+        >
+          {creditName}
+        </a>{" "}
+        on Unsplash
+      </div>
+    </div>
+  </div>
+);
+
 const HealthBodyPartsPage = () => {
   const navigate = useNavigate();
+
+  // ✅ Pick any Unsplash image you like. This one is “medical / health” themed.
+  // Tip: you can change the URL to any Unsplash photo (keep the ?auto=format... part).
+  const heroSrc =
+    "https://images.unsplash.com/photo-1584515933487-779824d29309?auto=format&fit=crop&w=1400&q=80";
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 18 }}>
       {/* HEADER */}
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+      <div style={{ ...styles.card, display: "grid", gap: 12 }}>
         <button
           style={{ ...styles.secondaryButton, width: "fit-content" }}
           onClick={() => navigate("/campus/course")}
@@ -55,18 +110,28 @@ const HealthBodyPartsPage = () => {
           Back to Course
         </button>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          Day 22: Health and Body Parts
-        </h1>
+        <div style={{ display: "grid", gap: 8 }}>
+          <h1 style={{ ...styles.title, marginBottom: 0 }}>
+            Day 22: Health and Body Parts
+          </h1>
 
-        <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 14.1</p>
+          <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 14.1</p>
 
-        <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-          Today you will learn how to talk about health problems, ask about
-          someone’s health, and write a formal cancellation message.
-          You will also learn a simple A1 trick for adjective endings with
-          indefinite articles (ein/eine/kein).
-        </p>
+          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
+            Today you will learn how to talk about health problems, ask about
+            someone’s health, and write a formal cancellation message. You will
+            also learn a simple A1 trick for adjective endings with indefinite
+            articles (ein/eine/kein).
+          </p>
+        </div>
+
+        {/* ✅ NEW: Unsplash hero image */}
+        <HeroImage
+          src={heroSrc}
+          alt="Health and body parts learning"
+          creditName="National Cancer Institute"
+          creditUrl="https://unsplash.com/@nci"
+        />
       </div>
 
       {/* PART 1 */}
@@ -99,7 +164,8 @@ const HealthBodyPartsPage = () => {
             <li>Mein Hals tut mir weh.</li>
           </ul>
           <p style={{ marginTop: 8, marginBottom: 0 }}>
-            Short question you can answer with this: <strong>Was tut dir weh?</strong>
+            Short question you can answer with this:{" "}
+            <strong>Was tut dir weh?</strong>
           </p>
         </div>
       </Section>
@@ -144,7 +210,14 @@ const HealthBodyPartsPage = () => {
 
         <div style={boxStyle}>
           <strong>Ways to ask for a new appointment:</strong>
-          <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0, lineHeight: 1.7 }}>
+          <ul
+            style={{
+              paddingLeft: 20,
+              marginTop: 8,
+              marginBottom: 0,
+              lineHeight: 1.7,
+            }}
+          >
             <li>Können wir einen anderen Termin vereinbaren?</li>
             <li>Könnten wir einen neuen Termin vereinbaren?</li>
             <li>Wäre ein anderer Termin möglich?</li>
@@ -157,7 +230,8 @@ const HealthBodyPartsPage = () => {
           <strong>Complete example:</strong>
           <p style={{ marginTop: 8, lineHeight: 1.7 }}>
             Sehr geehrte Damen und Herren, <br />
-            ich schreibe Ihnen, weil ich den Termin am Montag absagen möchte. <br />
+            ich schreibe Ihnen, weil ich den Termin am Montag absagen möchte.{" "}
+            <br />
             Ich bin krank. Ich habe Kopfschmerzen. <br />
             Können wir einen anderen Termin vereinbaren? <br />
             Mit freundlichen Grüßen <br />
@@ -263,7 +337,8 @@ const HealthBodyPartsPage = () => {
         <div style={boxStyle}>
           <strong>Step 2: How to Get the Adjective Ending (Simple Trick)</strong>
           <p style={{ marginTop: 8 }}>
-            Look at the article (der/die/das/den). The article tells you the adjective ending:
+            Look at the article (der/die/das/den). The article tells you the
+            adjective ending:
           </p>
 
           <table style={tableStyle}>
@@ -298,7 +373,8 @@ const HealthBodyPartsPage = () => {
           </table>
 
           <p style={{ marginTop: 10, marginBottom: 0 }}>
-            We use simple adjectives: groß, klein, rot, blau, grün, schön, neu, alt.
+            We use simple adjectives: groß, klein, rot, blau, grün, schön, neu,
+            alt.
           </p>
         </div>
 
@@ -307,10 +383,12 @@ const HealthBodyPartsPage = () => {
           <strong>Mistakes to avoid</strong>
           <ul style={{ paddingLeft: 20, marginTop: 8 }}>
             <li>
-              Neuter uses <strong>ein + -es</strong>: ein klein<strong>es</strong> Auto (not ein kleine Auto).
+              Neuter uses <strong>ein + -es</strong>: ein klein
+              <strong>es</strong> Auto (not ein kleine Auto).
             </li>
             <li>
-              Masculine accusative uses <strong>einen + -en</strong>: einen klein<strong>en</strong> Hund.
+              Masculine accusative uses <strong>einen + -en</strong>: einen klein
+              <strong>en</strong> Hund.
             </li>
           </ul>
         </div>
@@ -336,25 +414,33 @@ const HealthBodyPartsPage = () => {
                     <td style={tdStyle}>Masculine</td>
                     <td style={tdStyle}>ein</td>
                     <td style={tdStyle}>-er</td>
-                    <td style={tdStyle}>ein groß<span style={{ fontWeight: 700 }}>er</span> Hund</td>
+                    <td style={tdStyle}>
+                      ein groß<span style={{ fontWeight: 700 }}>er</span> Hund
+                    </td>
                   </tr>
                   <tr>
                     <td style={tdStyle}>Feminine</td>
                     <td style={tdStyle}>eine</td>
                     <td style={tdStyle}>-e</td>
-                    <td style={tdStyle}>eine rot<span style={{ fontWeight: 700 }}>e</span> Blume</td>
+                    <td style={tdStyle}>
+                      eine rot<span style={{ fontWeight: 700 }}>e</span> Blume
+                    </td>
                   </tr>
                   <tr>
                     <td style={tdStyle}>Neuter</td>
                     <td style={tdStyle}>ein</td>
                     <td style={tdStyle}>-es</td>
-                    <td style={tdStyle}>ein klein<span style={{ fontWeight: 700 }}>es</span> Auto</td>
+                    <td style={tdStyle}>
+                      ein klein<span style={{ fontWeight: 700 }}>es</span> Auto
+                    </td>
                   </tr>
                   <tr>
                     <td style={tdStyle}>Plural</td>
                     <td style={tdStyle}>keine</td>
                     <td style={tdStyle}>-en</td>
-                    <td style={tdStyle}>keine neu<span style={{ fontWeight: 700 }}>en</span> Bücher</td>
+                    <td style={tdStyle}>
+                      keine neu<span style={{ fontWeight: 700 }}>en</span> Bücher
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -376,25 +462,33 @@ const HealthBodyPartsPage = () => {
                     <td style={tdStyle}>Masculine</td>
                     <td style={tdStyle}>einen</td>
                     <td style={tdStyle}>-en</td>
-                    <td style={tdStyle}>einen klein<span style={{ fontWeight: 700 }}>en</span> Hund</td>
+                    <td style={tdStyle}>
+                      einen klein<span style={{ fontWeight: 700 }}>en</span> Hund
+                    </td>
                   </tr>
                   <tr>
                     <td style={tdStyle}>Feminine</td>
                     <td style={tdStyle}>eine</td>
                     <td style={tdStyle}>-e</td>
-                    <td style={tdStyle}>eine blau<span style={{ fontWeight: 700 }}>e</span> Blume</td>
+                    <td style={tdStyle}>
+                      eine blau<span style={{ fontWeight: 700 }}>e</span> Blume
+                    </td>
                   </tr>
                   <tr>
                     <td style={tdStyle}>Neuter</td>
                     <td style={tdStyle}>ein</td>
                     <td style={tdStyle}>-es</td>
-                    <td style={tdStyle}>ein grün<span style={{ fontWeight: 700 }}>es</span> Auto</td>
+                    <td style={tdStyle}>
+                      ein grün<span style={{ fontWeight: 700 }}>es</span> Auto
+                    </td>
                   </tr>
                   <tr>
                     <td style={tdStyle}>Plural</td>
                     <td style={tdStyle}>keine</td>
                     <td style={tdStyle}>-en</td>
-                    <td style={tdStyle}>keine alt<span style={{ fontWeight: 700 }}>en</span> Bücher</td>
+                    <td style={tdStyle}>
+                      keine alt<span style={{ fontWeight: 700 }}>en</span> Bücher
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -410,20 +504,38 @@ const HealthBodyPartsPage = () => {
             <strong>Nominative</strong>
           </p>
           <ul style={{ paddingLeft: 20, marginTop: 0 }}>
-            <li>Ich bin ein groß<span style={{ fontWeight: 700 }}>er</span> Mann.</li>
-            <li>Sie hat eine rot<span style={{ fontWeight: 700 }}>e</span> Tasche.</li>
-            <li>Das ist ein neu<span style={{ fontWeight: 700 }}>es</span> Auto.</li>
-            <li>Wir haben keine klein<span style={{ fontWeight: 700 }}>en</span> Kinder.</li>
+            <li>
+              Ich bin ein groß<span style={{ fontWeight: 700 }}>er</span> Mann.
+            </li>
+            <li>
+              Sie hat eine rot<span style={{ fontWeight: 700 }}>e</span> Tasche.
+            </li>
+            <li>
+              Das ist ein neu<span style={{ fontWeight: 700 }}>es</span> Auto.
+            </li>
+            <li>
+              Wir haben keine klein<span style={{ fontWeight: 700 }}>en</span>{" "}
+              Kinder.
+            </li>
           </ul>
 
           <p style={{ marginTop: 10, marginBottom: 6 }}>
             <strong>Accusative</strong>
           </p>
           <ul style={{ paddingLeft: 20, marginTop: 0 }}>
-            <li>Ich habe einen klein<span style={{ fontWeight: 700 }}>en</span> Hund.</li>
-            <li>Er sieht eine schön<span style={{ fontWeight: 700 }}>e</span> Blume.</li>
-            <li>Wir kaufen ein gelb<span style={{ fontWeight: 700 }}>es</span> Buch.</li>
-            <li>Du liest keine lang<span style={{ fontWeight: 700 }}>en</span> Texte.</li>
+            <li>
+              Ich habe einen klein<span style={{ fontWeight: 700 }}>en</span>{" "}
+              Hund.
+            </li>
+            <li>
+              Er sieht eine schön<span style={{ fontWeight: 700 }}>e</span> Blume.
+            </li>
+            <li>
+              Wir kaufen ein gelb<span style={{ fontWeight: 700 }}>es</span> Buch.
+            </li>
+            <li>
+              Du liest keine lang<span style={{ fontWeight: 700 }}>en</span> Texte.
+            </li>
           </ul>
         </div>
 
@@ -431,8 +543,8 @@ const HealthBodyPartsPage = () => {
         <div style={boxStyle}>
           <strong>Mini Adjective Ending Test (A1)</strong>
           <p style={{ marginTop: 8, marginBottom: 8 }}>
-            Complete the sentences with the correct adjective endings
-            (use: groß, klein, rot, schön, neu).
+            Complete the sentences with the correct adjective endings (use:
+            groß, klein, rot, schön, neu).
           </p>
 
           <ol style={{ paddingLeft: 20, marginTop: 0 }}>
@@ -443,7 +555,15 @@ const HealthBodyPartsPage = () => {
             <li>Er ist ein ___ Mann. (groß)</li>
           </ol>
 
-          <div style={{ marginTop: 10, padding: 12, borderRadius: 10, background: "#ffffff", border: "1px dashed #d1d5db" }}>
+          <div
+            style={{
+              marginTop: 10,
+              padding: 12,
+              borderRadius: 10,
+              background: "#ffffff",
+              border: "1px dashed #d1d5db",
+            }}
+          >
             <strong>Check your answers:</strong>
             <p style={{ margin: "8px 0 0", lineHeight: 1.7 }}>
               1) einen klein<strong>en</strong> Hund <br />
