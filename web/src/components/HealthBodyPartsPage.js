@@ -16,31 +16,6 @@ const boxStyle = {
   padding: 14,
 };
 
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  background: "#fff",
-  border: "1px solid #e5e7eb",
-  borderRadius: 12,
-  overflow: "hidden",
-};
-
-const thStyle = {
-  textAlign: "left",
-  padding: "10px 12px",
-  borderBottom: "1px solid #e5e7eb",
-  background: "#f3f4f6",
-  fontWeight: 700,
-  fontSize: 14,
-};
-
-const tdStyle = {
-  padding: "10px 12px",
-  borderBottom: "1px solid #e5e7eb",
-  fontSize: 14,
-  verticalAlign: "top",
-};
-
 const HeroImage = ({ src, alt }) => (
   <div
     style={{
