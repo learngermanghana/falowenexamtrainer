@@ -841,7 +841,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/sAd8rWu9O0Q",
         youtube_link: "https://youtu.be/sAd8rWu9O0Q",
         assignment: false,
-        grammarbook_link: "https://www.falowen.app/campus/course/dative-verbs-adjective-declension-14-2",
+        grammarbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
         workbook_link: "",
       },
     },

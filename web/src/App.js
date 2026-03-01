@@ -506,6 +506,10 @@ const AppShell = ({
           />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route
+            path="/campus/course/dative-and-accusative-verbs-14-2"
+            element={<DativeAdjectiveDeclensionPage />}
+          />
+          <Route
             path="/campus/course/dative-verbs-adjective-declension-14-2"
             element={<DativeAdjectiveDeclensionPage />}
           />

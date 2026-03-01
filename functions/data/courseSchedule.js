@@ -830,7 +830,7 @@ const courseSchedules = {
         video: "https://youtu.be/sAd8rWu9O0Q",
         youtube_link: "https://youtu.be/sAd8rWu9O0Q",
         assignment: false,
-        grammarbook_link: "https://drive.google.com/file/d/16h-yS0gkB2_FL1zxCC4MaqRBbKne7GI1/view?usp=sharing",
+        grammarbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
         workbook_link: "",
       },
     },
