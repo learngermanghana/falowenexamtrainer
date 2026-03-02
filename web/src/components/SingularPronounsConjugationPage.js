@@ -140,6 +140,11 @@ const SingularPronounsConjugationPage = () => {
           <div>
             <strong>du heißt</strong> (you are called - informal)
             <div>Example: Du heißt Anna. (You are called Anna.)</div>
+            <div>
+              Note: We write <strong>heißt</strong>, not <strong>heißst</strong>. The letter <strong>ß</strong>
+              already carries the same "s" sound, so German does not add another <strong>s</strong> before
+              <strong>-t</strong> in this form.
+            </div>
           </div>
 
           <div>
