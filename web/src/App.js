@@ -24,6 +24,7 @@ import GermanNumbersGrammarPage from "./components/GermanNumbersGrammarPage";
 import ObjectsAndColorsPage from "./components/ObjectsAndColorsPage";
 import TwelveHourClockPage from "./components/TwelveHourClockPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
+import PersonenBeschreibenGrammarPage from "./components/PersonenBeschreibenGrammarPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import DirectionsImperativePage from "./components/DirectionsImperativePage";
 import TwoCasePrepositionsPage from "./components/TwoCasePrepositionsPage";
@@ -539,6 +540,10 @@ const AppShell = ({
           <Route
             path="/campus/course/singular-pronouns-verb-conjugation-day-2"
             element={<SingularPronounsConjugationPage />}
+          />
+          <Route
+            path="/campus/course/personen-beschreiben-1-2-grammar-notes"
+            element={<PersonenBeschreibenGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />

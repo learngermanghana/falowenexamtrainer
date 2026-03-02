@@ -55,7 +55,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Subordinate Clauses (Nebensätze) with dass and weil",
     video: "https://youtu.be/FYaXSvZsEDM?si=0e_sHxslHQL7FGDk",
     youtube_link: "https://youtu.be/FYaXSvZsEDM?si=0e_sHxslHQL7FGDk",
-    grammarbook_link: "https://drive.google.com/file/d/1xMpEAPD8C0HtIFsmgqYO-wZaKDrQtiYp/view?usp=sharing",
+    grammarbook_link: "/campus/course/personen-beschreiben-1-2-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/128lWaKgCZ2V-3tActM-dwNy6igLLlzH3/view?usp=sharing",
   },
   {
