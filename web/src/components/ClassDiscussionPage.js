@@ -7,13 +7,12 @@ import {
   addDoc,
   collection,
   db,
+  deleteDoc,
   doc,
-  getDoc,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
-  Timestamp,
   setDoc,
   deleteField,
 } from "../firebase";
@@ -84,9 +83,11 @@ const normalizeTimestamp = (value) => {
   return null;
 };
 
-const formatDateTime = (value) => {
+const formatDateTime = (value, timezonePreference = "ghana") => {
   const ms = normalizeTimestamp(value);
   if (!ms) return "";
+
+  const useLocalTimezone = timezonePreference === "local";
 
   return new Intl.DateTimeFormat("en-GB", {
     year: "numeric",
@@ -95,9 +96,26 @@ const formatDateTime = (value) => {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-    timeZone: "Africa/Accra",
+    ...(useLocalTimezone ? {} : { timeZone: "Africa/Accra" }),
   }).format(new Date(ms));
 };
+
+const formatRelativeTime = (value, now) => {
+  const ms = normalizeTimestamp(value);
+  if (!ms) return "";
+
+  const diffSeconds = Math.round((ms - now) / 1000);
+  const absSeconds = Math.abs(diffSeconds);
+  if (absSeconds < 5) return "just now";
+
+  const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
+  if (absSeconds < 60) return rtf.format(diffSeconds, "second");
+  if (absSeconds < 3600) return rtf.format(Math.round(diffSeconds / 60), "minute");
+  if (absSeconds < 86400) return rtf.format(Math.round(diffSeconds / 3600), "hour");
+  return rtf.format(Math.round(diffSeconds / 86400), "day");
+};
+
+const repliesCollectionRef = (threadId) => collection(db, "qa_posts", threadId, "responses");
 
 const ClassDiscussionPage = () => {
   const { user, studentProfile, idToken } = useAuth();
@@ -117,6 +135,15 @@ const ClassDiscussionPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingThread, setIsSavingThread] = useState(false);
   const [activeTab, setActiveTab] = useState("discussion");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("newest");
+  const [showMyPostsOnly, setShowMyPostsOnly] = useState(false);
+  const [showNoRepliesOnly, setShowNoRepliesOnly] = useState(false);
+  const [lessonFilter, setLessonFilter] = useState("all");
+  const [timezonePreference, setTimezonePreference] = useState(() =>
+    window.localStorage.getItem("discussionTimezonePreference") || "ghana"
+  );
   const [form, setForm] = useState({
     lessonId: "",
     topic: "",
@@ -224,43 +251,41 @@ const ClassDiscussionPage = () => {
   }, [studentProfile?.level, studentProfile?.className]);
 
   useEffect(() => {
-    if (!db) return undefined;
+    if (!db || threads.length === 0) {
+      setRepliesByThread({});
+      return undefined;
+    }
 
-    const repliesQuery = collection(db, "qa_posts");
-    const unsubscribe = onSnapshot(
-      repliesQuery,
-      (snapshot) => {
-        const grouped = {};
+    const unsubs = threads.map((thread) => {
+      if (!thread?.id) return () => {};
+      const repliesQuery = query(repliesCollectionRef(thread.id), orderBy("createdAt", "asc"));
+      return onSnapshot(
+        repliesQuery,
+        (snapshot) => {
+          const replies = snapshot.docs.map((docSnapshot) => {
+            const data = docSnapshot.data();
+            return {
+              id: docSnapshot.id,
+              author: data.author || data.responder || "Student",
+              responderCode: data.responderCode || data.studentCode || null,
+              responderUid: data.responderUid || null,
+              text: data.text || "",
+              createdAt: normalizeTimestamp(data.createdAt) || Date.now(),
+              editedAt: normalizeTimestamp(data.editedAt),
+            };
+          });
 
-        snapshot.forEach((docSnapshot) => {
-          const data = docSnapshot.data();
-          const responses = Array.isArray(data?.responses) ? data.responses : [];
-          const replies = responses
-            .map((response, index) => ({
-              id: response.id || `${docSnapshot.id}-${index}`,
-              author: response.responder || response.author || "Student",
-              responderCode: response.responderCode || response.studentCode || null,
-              responderUid: response.responderUid || null,
-              text: response.text || "",
-              createdAt: normalizeTimestamp(response.createdAt) || Date.now(),
-              editedAt: normalizeTimestamp(response.editedAt),
-            }))
-            .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+          setRepliesByThread((prev) => ({ ...prev, [thread.id]: replies }));
+        },
+        (err) => {
+          console.error("Failed to subscribe to replies", err);
+          setError("Responses could not be loaded. Please try again later.");
+        }
+      );
+    });
 
-          grouped[docSnapshot.id] = replies;
-        });
-
-        setError("");
-        setRepliesByThread(grouped);
-      },
-      (err) => {
-        console.error("Failed to subscribe to replies", err);
-        setError("Responses could not be loaded. Please try again later.");
-      }
-    );
-
-    return () => unsubscribe();
-  }, []);
+    return () => unsubs.forEach((unsub) => unsub());
+  }, [threads]);
 
   useEffect(() => {
     if (!db || !studentProfile?.level || !studentProfile?.className) return undefined;
@@ -323,38 +348,8 @@ const ClassDiscussionPage = () => {
   );
 
   useEffect(() => {
-    const ensureStatuses = async () => {
-      if (!db || threads.length === 0) return;
-
-      const updates = threads.map(async (thread) => {
-        const status = resolveStatus(thread);
-        if (!thread.id || status === thread.status || status === "archived") return null;
-
-        const threadRef = getThreadDocRef(thread);
-        if (!threadRef) return null;
-
-        const payload = { status };
-        if (status === "expired" && !thread.expiredAt) {
-          payload.expiredAt = serverTimestamp();
-        }
-        if (status === "open") {
-          payload.expiredAt = deleteField();
-        }
-
-        try {
-          await setDoc(threadRef, payload, { merge: true });
-        } catch (err) {
-          console.error("Failed to update thread status", err);
-        }
-
-        return null;
-      });
-
-      await Promise.all(updates);
-    };
-
-    ensureStatuses();
-  }, [getThreadDocRef, resolveStatus, threads]);
+    window.localStorage.setItem("discussionTimezonePreference", timezonePreference);
+  }, [timezonePreference]);
 
   useEffect(
     () => () => {
@@ -593,28 +588,14 @@ const ClassDiscussionPage = () => {
     setError("");
 
     try {
-      const qaDocRef = doc(db, "qa_posts", threadId);
-      const existingSnap = await getDoc(qaDocRef);
-      const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
-
       const replyId = makeUUID();
-      const payload = {
-        id: replyId,
-        responder: getDisplayName(),
+      await setDoc(doc(repliesCollectionRef(threadId), replyId), {
+        author: getDisplayName(),
         responderCode: getResponderCode(),
         responderUid: user?.uid || null,
         text: draft,
-        createdAt: Timestamp.now(),
-      };
-
-      await setDoc(
-        qaDocRef,
-        {
-          responses: [...responses, payload],
-          updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
+        createdAt: serverTimestamp(),
+      });
 
       setReplyDrafts((prev) => ({ ...prev, [threadId]: "" }));
       stopTypingIndicator(threadId);
@@ -670,16 +651,7 @@ const ClassDiscussionPage = () => {
     }
 
     try {
-      const qaDocRef = doc(db, "qa_posts", threadId);
-      const existingSnap = await getDoc(qaDocRef);
-      const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
-      const nextResponses = responses.filter((response) => response.id !== reply.id);
-
-      await setDoc(
-        qaDocRef,
-        { responses: nextResponses, updatedAt: serverTimestamp() },
-        { merge: true }
-      );
+      await deleteDoc(doc(repliesCollectionRef(threadId), reply.id));
 
       if (editingReply?.replyId === reply.id) {
         setEditingReply(null);
@@ -711,19 +683,9 @@ const ClassDiscussionPage = () => {
     }
 
     try {
-      const qaDocRef = doc(db, "qa_posts", editingReply.threadId);
-      const existingSnap = await getDoc(qaDocRef);
-      const responses = Array.isArray(existingSnap.data()?.responses) ? existingSnap.data().responses : [];
-
-      const updatedResponses = responses.map((response) =>
-        response.id === editingReply.replyId
-          ? { ...response, text: editingReply.text, editedAt: Timestamp.now() }
-          : response
-      );
-
       await setDoc(
-        qaDocRef,
-        { responses: updatedResponses, updatedAt: serverTimestamp() },
+        doc(repliesCollectionRef(editingReply.threadId), editingReply.replyId),
+        { text: editingReply.text, editedAt: serverTimestamp() },
         { merge: true }
       );
 
@@ -771,6 +733,33 @@ const ClassDiscussionPage = () => {
       })),
     [threads, repliesByThread, resolveStatus]
   );
+
+  const filteredThreadsWithReplies = useMemo(() => {
+    const queryTerm = searchTerm.trim().toLowerCase();
+
+    const filtered = threadsWithReplies.filter((thread) => {
+      const status = thread.status;
+      const isMine = user?.uid && thread.createdByUid === user.uid;
+      const hasNoReplies = thread.replies.length === 0;
+
+      if (statusFilter !== "all" && status !== statusFilter) return false;
+      if (showMyPostsOnly && !isMine) return false;
+      if (showNoRepliesOnly && !hasNoReplies) return false;
+      if (lessonFilter !== "all" && thread.lessonId !== lessonFilter) return false;
+
+      if (!queryTerm) return true;
+
+      return [thread.topic, thread.questionTitle, thread.question, thread.lessonLabel, thread.createdBy]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(queryTerm));
+    });
+
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "oldest") return (a.createdAt || 0) - (b.createdAt || 0);
+      if (sortBy === "mostReplies") return b.replies.length - a.replies.length;
+      return (b.createdAt || 0) - (a.createdAt || 0);
+    });
+  }, [lessonFilter, searchTerm, showMyPostsOnly, showNoRepliesOnly, sortBy, statusFilter, threadsWithReplies, user?.uid]);
 
   const renderThread = (thread) => {
     const status = thread.status || resolveStatus(thread);
@@ -829,9 +818,14 @@ const ClassDiscussionPage = () => {
 
             <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
 
-            <div style={{ fontSize: 12, color: "#6b7280" }}>
-              Posted: {formatDateTime(thread.createdAt)}
+            <div style={{ fontSize: 12, color: "#6b7280" }} title={formatDateTime(thread.createdAt, timezonePreference)}>
+              Posted {formatRelativeTime(thread.createdAt, now)}
             </div>
+            {thread.editedAt ? (
+              <div style={{ fontSize: 12, color: "#6b7280" }} title={formatDateTime(thread.editedAt, timezonePreference)}>
+                Edited at {formatDateTime(thread.editedAt, timezonePreference)}
+              </div>
+            ) : null}
 
             {thread.extraLink ? (
               <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
@@ -1013,9 +1007,9 @@ const ClassDiscussionPage = () => {
                   >
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 14 }}>{reply.author || "Student"}</div>
-                      <div style={{ fontSize: 12, color: "#6b7280" }}>
-                        {formatDateTime(reply.createdAt)}
-                        {reply.editedAt ? ` · edited ${formatDateTime(reply.editedAt)}` : ""}
+                      <div style={{ fontSize: 12, color: "#6b7280" }} title={formatDateTime(reply.createdAt, timezonePreference)}>
+                        Posted {formatRelativeTime(reply.createdAt, now)}
+                        {reply.editedAt ? ` · edited ${formatDateTime(reply.editedAt, timezonePreference)}` : ""}
                       </div>
                     </div>
 
@@ -1201,6 +1195,17 @@ const ClassDiscussionPage = () => {
 
         {activeTab === "discussion" ? (
           <form onSubmit={handleCreateThread} style={{ display: "grid", gap: 10, marginTop: 12 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <span style={styles.helperText}>Time display</span>
+              <select
+                value={timezonePreference}
+                onChange={(e) => setTimezonePreference(e.target.value)}
+                style={{ ...styles.select, maxWidth: 220 }}
+              >
+                <option value="ghana">Ghana time (Africa/Accra)</option>
+                <option value="local">My local time</option>
+              </select>
+            </div>
             <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
               <div style={styles.field}>
                 <label style={styles.label}>Select lesson</label>
@@ -1305,6 +1310,49 @@ const ClassDiscussionPage = () => {
 
       {activeTab === "discussion" ? (
         <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+            <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+              <input
+                style={styles.select}
+                placeholder="Search topic, question, author"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={styles.select}>
+                <option value="all">All statuses</option>
+                <option value="open">Open</option>
+                <option value="expired">Expired</option>
+                <option value="archived">Archived</option>
+              </select>
+              <select value={lessonFilter} onChange={(e) => setLessonFilter(e.target.value)} style={styles.select}>
+                <option value="all">All lessons</option>
+                {lessonOptions.map((lesson) => (
+                  <option key={lesson.id} value={lesson.id}>
+                    {lesson.label}
+                  </option>
+                ))}
+              </select>
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} style={styles.select}>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="mostReplies">Most replies</option>
+              </select>
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <label style={{ ...styles.helperText, margin: 0 }}>
+                <input type="checkbox" checked={showMyPostsOnly} onChange={(e) => setShowMyPostsOnly(e.target.checked)} /> My posts
+              </label>
+              <label style={{ ...styles.helperText, margin: 0 }}>
+                <input
+                  type="checkbox"
+                  checked={showNoRepliesOnly}
+                  onChange={(e) => setShowNoRepliesOnly(e.target.checked)}
+                />{" "}
+                No replies
+              </label>
+            </div>
+          </div>
+
           {error ? (
             <div style={{ ...styles.card, borderColor: "#fca5a5", background: "#fef2f2" }}>
               <div style={{ fontWeight: 700, marginBottom: 6 }}>Error</div>
@@ -1315,15 +1363,15 @@ const ClassDiscussionPage = () => {
               <div style={{ fontWeight: 700, marginBottom: 6 }}>Loading discussions ...</div>
               <p style={{ ...styles.helperText, margin: 0 }}>Fetching the latest posts.</p>
             </div>
-          ) : threadsWithReplies.length === 0 ? (
+          ) : filteredThreadsWithReplies.length === 0 ? (
             <div style={styles.card}>
-              <div style={{ fontWeight: 700, marginBottom: 6 }}>No discussions started</div>
+              <div style={{ fontWeight: 700, marginBottom: 6 }}>No matching discussions</div>
               <p style={{ ...styles.helperText, margin: 0 }}>
-                Create the first post, pick the right lesson, and set a timer for your class.
+                Try adjusting your filters, or create a new post for your class.
               </p>
             </div>
           ) : (
-            threadsWithReplies.map((thread) => renderThread(thread))
+            filteredThreadsWithReplies.map((thread) => renderThread(thread))
           )}
         </div>
       ) : null}
