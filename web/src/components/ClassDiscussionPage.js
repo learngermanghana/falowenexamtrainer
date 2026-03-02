@@ -38,8 +38,6 @@ const minutesFromValue = (value, unit) => (Number(value) || 0) * getUnitMultipli
 const valueFromMinutes = (minutes, unit) =>
   (Number(minutes) || 0) / Math.max(1, getUnitMultiplier(unit));
 
-const TIMER_SKEW_TOLERANCE_MS = 5 * 60 * 1000;
-
 const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "No timer";
   const diff = Math.max(0, expiresAt - now);
@@ -61,20 +59,44 @@ const makeUUID = () =>
 
 const normalizeTimestamp = (value) => {
   if (!value) return null;
+
   if (typeof value === "number" && Number.isFinite(value)) {
     return value < 1e12 ? value * 1000 : value;
   }
+
   if (typeof value === "string") {
     const parsed = Date.parse(value);
     return Number.isNaN(parsed) ? null : parsed;
   }
+
+  if (value instanceof Date) {
+    return value.getTime();
+  }
+
   if (typeof value?.toMillis === "function") {
     return value.toMillis();
   }
+
   if (typeof value?.seconds === "number") {
     return value.seconds * 1000;
   }
+
   return null;
+};
+
+const formatDateTime = (value) => {
+  const ms = normalizeTimestamp(value);
+  if (!ms) return "";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Africa/Accra",
+  }).format(new Date(ms));
 };
 
 const ClassDiscussionPage = () => {
@@ -148,24 +170,16 @@ const ClassDiscussionPage = () => {
       (snapshot) => {
         const nextThreads = snapshot.docs.map((docSnapshot) => {
           const data = docSnapshot.data();
-          const createdAt = normalizeTimestamp(data.createdAt) || Date.now();
+
+          const createdAt = normalizeTimestamp(data.createdAt);
           const timerMinutes = Number(data.timerMinutes) || 0;
           const timerStartedAt = normalizeTimestamp(data.timerStartedAt) || createdAt;
-          let expiresAt = normalizeTimestamp(data.expiresAt);
 
-          const expectedExpiresAt = timerMinutes > 0 && timerStartedAt ? timerStartedAt + timerMinutes * 60000 : null;
+          const expiresAt =
+            timerMinutes > 0 && timerStartedAt
+              ? timerStartedAt + timerMinutes * 60000
+              : null;
 
-          if (
-            expiresAt &&
-            expectedExpiresAt &&
-            Math.abs(expiresAt - expectedExpiresAt) > TIMER_SKEW_TOLERANCE_MS
-          ) {
-            expiresAt = expectedExpiresAt;
-          }
-
-          if ((!expiresAt || (createdAt && expiresAt < createdAt)) && timerMinutes > 0) {
-            expiresAt = expectedExpiresAt;
-          }
           return {
             id: docSnapshot.id,
             level: data.level || studentProfile?.level || "",
@@ -194,6 +208,7 @@ const ClassDiscussionPage = () => {
             expiredAt: normalizeTimestamp(data.expiredAt),
           };
         });
+
         setError("");
         setThreads(nextThreads);
         setIsLoading(false);
@@ -216,6 +231,7 @@ const ClassDiscussionPage = () => {
       repliesQuery,
       (snapshot) => {
         const grouped = {};
+
         snapshot.forEach((docSnapshot) => {
           const data = docSnapshot.data();
           const responses = Array.isArray(data?.responses) ? data.responses : [];
@@ -226,14 +242,14 @@ const ClassDiscussionPage = () => {
               responderCode: response.responderCode || response.studentCode || null,
               responderUid: response.responderUid || null,
               text: response.text || "",
-              createdAt: response.createdAt?.toMillis
-                ? response.createdAt.toMillis()
-                : response.createdAt || Date.now(),
-              editedAt: response.editedAt?.toMillis ? response.editedAt.toMillis() : response.editedAt || null,
+              createdAt: normalizeTimestamp(response.createdAt) || Date.now(),
+              editedAt: normalizeTimestamp(response.editedAt),
             }))
             .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+
           grouped[docSnapshot.id] = replies;
         });
+
         setError("");
         setRepliesByThread(grouped);
       },
@@ -260,6 +276,7 @@ const ClassDiscussionPage = () => {
           const data = docSnapshot.data();
           const typingFor = data.typingFor;
           const typedAt = data.typingAt?.toMillis ? data.typingAt.toMillis() : data.typingAt || 0;
+
           if (!typingFor || !typedAt || nowTs - typedAt > 15000) return;
 
           const name = data.displayName || data.responder || data.author || "Student";
@@ -329,6 +346,7 @@ const ClassDiscussionPage = () => {
         } catch (err) {
           console.error("Failed to update thread status", err);
         }
+
         return null;
       });
 
@@ -336,11 +354,14 @@ const ClassDiscussionPage = () => {
     };
 
     ensureStatuses();
-  }, [getThreadDocRef, resolveStatus, threads, now]);
+  }, [getThreadDocRef, resolveStatus, threads]);
 
-  useEffect(() => () => {
-    Object.values(typingTimeouts.current).forEach((timeoutId) => clearTimeout(timeoutId));
-  }, []);
+  useEffect(
+    () => () => {
+      Object.values(typingTimeouts.current).forEach((timeoutId) => clearTimeout(timeoutId));
+    },
+    []
+  );
 
   const selectedLesson = lessonOptions.find((option) => option.id === form.lessonId) || lessonOptions[0];
 
@@ -360,10 +381,10 @@ const ClassDiscussionPage = () => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Everyone can create threads (students + tutors)
   const handleCreateThread = async (event) => {
     event.preventDefault();
     if (!form.question.trim() || !db) return;
+
     if (!studentProfile?.level || !studentProfile?.className) {
       setError("Please add your course level and class name in your account settings.");
       return;
@@ -372,7 +393,6 @@ const ClassDiscussionPage = () => {
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
     const timerValue = Number(form.timerMinutes) || 0;
     const timerMinutes = minutesFromValue(timerValue, form.timerUnit);
-    const expiresAtMillis = timerMinutes ? Date.now() + timerMinutes * 60000 : null;
 
     setIsSavingThread(true);
     setError("");
@@ -395,7 +415,6 @@ const ClassDiscussionPage = () => {
         createdAt: serverTimestamp(),
         createdBy: getDisplayName(),
         createdByUid: user?.uid || null,
-        expiresAt: expiresAtMillis ? Timestamp.fromMillis(expiresAtMillis) : null,
         status: "open",
       });
 
@@ -437,6 +456,7 @@ const ClassDiscussionPage = () => {
       setError("You can only edit a post you created.");
       return;
     }
+
     setError("");
     setEditingThread({
       threadId: thread.id,
@@ -497,7 +517,6 @@ const ClassDiscussionPage = () => {
       const replyCode = String(reply.responderCode || "").toLowerCase();
       if (myCode && replyCode && myCode === replyCode) return true;
 
-      // Optional UID matching if you store it
       if (reply.responderUid && user?.uid && reply.responderUid === user.uid) return true;
 
       return false;
@@ -583,7 +602,7 @@ const ClassDiscussionPage = () => {
         id: replyId,
         responder: getDisplayName(),
         responderCode: getResponderCode(),
-        responderUid: user?.uid || null, // helpful for permissions
+        responderUid: user?.uid || null,
         text: draft,
         createdAt: Timestamp.now(),
       };
@@ -610,7 +629,10 @@ const ClassDiscussionPage = () => {
     if (!thread) return;
 
     const unit = extensionUnits[threadId] || thread.timerUnit || "minutes";
-    const minutes = minutesFromValue(extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes, unit);
+    const minutes = minutesFromValue(
+      extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes,
+      unit
+    );
     const threadRef = getThreadDocRef(thread);
 
     if (!threadRef) {
@@ -619,15 +641,14 @@ const ClassDiscussionPage = () => {
     }
 
     try {
-      const newExpiresAt = minutes > 0 ? Timestamp.fromMillis(Date.now() + minutes * 60000) : null;
       await setDoc(
         threadRef,
         {
-          expiresAt: newExpiresAt,
           timerMinutes: minutes,
           timerUnit: unit,
           timerValue: extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes,
           timerStartedAt: serverTimestamp(),
+          expiresAt: deleteField(),
           status: "open",
           expiredAt: deleteField(),
         },
@@ -642,6 +663,7 @@ const ClassDiscussionPage = () => {
 
   const handleDeleteReply = async (threadId, reply) => {
     if (!db) return;
+
     if (!canEditReply(reply)) {
       setError("You can only delete your own response.");
       return;
@@ -673,6 +695,7 @@ const ClassDiscussionPage = () => {
       setError("You can only edit your own response.");
       return;
     }
+
     setError("");
     setEditingReply({ threadId, replyId: reply.id, text: reply.text, author: reply.author });
   };
@@ -803,7 +826,13 @@ const ClassDiscussionPage = () => {
                 <span style={{ ...styles.helperText, marginLeft: 8 }}>· edited</span>
               ) : null}
             </div>
+
             <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
+
+            <div style={{ fontSize: 12, color: "#6b7280" }}>
+              Posted: {formatDateTime(thread.createdAt)}
+            </div>
+
             {thread.extraLink ? (
               <a href={thread.extraLink} target="_blank" rel="noreferrer" style={{ fontSize: 13 }}>
                 Open external link
@@ -811,7 +840,15 @@ const ClassDiscussionPage = () => {
             ) : null}
           </div>
 
-          <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              flexWrap: "wrap",
+              justifyContent: "flex-end",
+            }}
+          >
             <span style={styles.badge}>Posted by {thread.createdBy}</span>
             <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
 
@@ -906,6 +943,7 @@ const ClassDiscussionPage = () => {
               <div style={{ ...styles.helperText, ...styles.discussionLongText, margin: 0, fontSize: 14 }}>
                 <strong>Question:</strong> {thread.question}
               </div>
+
               {thread.instructions ? (
                 <div
                   style={{
@@ -917,7 +955,8 @@ const ClassDiscussionPage = () => {
                     borderRadius: 10,
                   }}
                 >
-                  <strong>Instructions (English):</strong> {thread.instructions} — Refer to chapter "Tutorial" in the course book.
+                  <strong>Instructions (English):</strong> {thread.instructions} — Refer to chapter "Tutorial" in the
+                  course book.
                 </div>
               ) : null}
             </div>
@@ -960,6 +999,7 @@ const ClassDiscussionPage = () => {
           <div style={{ display: "grid", gap: 10 }}>
             {thread.replies.map((reply) => {
               const canManage = canEditReply(reply);
+
               return (
                 <div key={reply.id} style={{ ...styles.card, marginBottom: 0, background: "#f9fafb" }}>
                   <div
@@ -971,7 +1011,13 @@ const ClassDiscussionPage = () => {
                       flexWrap: "wrap",
                     }}
                   >
-                    <div style={{ fontWeight: 700, fontSize: 14 }}>{reply.author || "Student"}</div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: 14 }}>{reply.author || "Student"}</div>
+                      <div style={{ fontSize: 12, color: "#6b7280" }}>
+                        {formatDateTime(reply.createdAt)}
+                        {reply.editedAt ? ` · edited ${formatDateTime(reply.editedAt)}` : ""}
+                      </div>
+                    </div>
 
                     {canManage ? (
                       <div style={{ display: "flex", gap: 8 }}>
@@ -1036,9 +1082,12 @@ const ClassDiscussionPage = () => {
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
               <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
             </div>
+
             <textarea
               style={styles.textareaSmall}
-              placeholder={isThreadOpen ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"}
+              placeholder={
+                isThreadOpen ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"
+              }
               value={replyDrafts[thread.id] || ""}
               onChange={(e) => {
                 setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
@@ -1091,21 +1140,37 @@ const ClassDiscussionPage = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={styles.card}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+          }}
+        >
           <div>
             <h2 style={styles.sectionTitle}>Class discussion</h2>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              Anyone in your class (students + tutors) can create a timed discussion post. Replies update live, and you can edit your own
-              posts if you make mistakes.
+              Anyone in your class (students + tutors) can create a timed discussion post. Replies update live, and
+              you can edit your own posts if you make mistakes.
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
               <span style={styles.badge}>Level: {studentProfile?.level || "(missing)"}</span>
               <span style={styles.badge}>Class: {studentProfile?.className || "(missing)"}</span>
-              <span style={{ ...styles.badge, background: "#f8fafc", borderColor: "#cbd5e1", color: "#0f172a" }}>
+              <span
+                style={{
+                  ...styles.badge,
+                  background: "#f8fafc",
+                  borderColor: "#cbd5e1",
+                  color: "#0f172a",
+                }}
+              >
                 Only members of your class can view and post here.
               </span>
             </div>
           </div>
+
           {activeTab === "discussion" ? (
             <span style={{ ...styles.badge, background: "#ecfeff", borderColor: "#a5f3fc", color: "#0ea5e9" }}>
               Live updates
@@ -1150,7 +1215,9 @@ const ClassDiscussionPage = () => {
                     </option>
                   ))}
                 </select>
-                {selectedLesson?.goal ? <div style={{ ...styles.helperText, margin: 0 }}>Goal: {selectedLesson.goal}</div> : null}
+                {selectedLesson?.goal ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>Goal: {selectedLesson.goal}</div>
+                ) : null}
               </div>
 
               <div style={styles.field}>
@@ -1228,7 +1295,8 @@ const ClassDiscussionPage = () => {
         ) : (
           <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              This read-only directory lists classmates in your level and class. They update their biographies from the account page.
+              This read-only directory lists classmates in your level and class. They update their biographies from
+              the account page.
             </p>
             <ClassMembersTab />
           </div>
