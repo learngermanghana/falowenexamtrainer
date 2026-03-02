@@ -28,6 +28,64 @@ const getCheckinDocIds = ({ studentUid = "", studentCode = "" } = {}) => {
   return Array.from(unique);
 };
 
+const normalizeChapterLabel = (value = "") => {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  if (/^chapter\b/i.test(text)) return text;
+  return `Chapter ${text}`;
+};
+
+const resolveSessionLabel = (data = {}) => {
+  const chapterRaw =
+    data.chapter ||
+    data.chapterName ||
+    data.chapterLabel ||
+    data.chapterNumber ||
+    "";
+  const chapter = normalizeChapterLabel(chapterRaw);
+  const topic = String(data.topic || data.title || data.meetingTopic || "").trim();
+  const sessionName = String(data.session || data.name || "").trim();
+  const titleToken = /^(session|class|lesson)\b/i;
+
+  if (chapter && topic && !titleToken.test(topic)) {
+    return {
+      title: `${chapter} · ${topic}`,
+      chapter,
+      topic,
+    };
+  }
+
+  if (chapter) {
+    return {
+      title: chapter,
+      chapter,
+      topic,
+    };
+  }
+
+  if (topic) {
+    return {
+      title: topic,
+      chapter: "",
+      topic,
+    };
+  }
+
+  if (sessionName) {
+    return {
+      title: sessionName,
+      chapter: "",
+      topic: "",
+    };
+  }
+
+  return {
+    title: "Session",
+    chapter: "",
+    topic: "",
+  };
+};
+
 const toBoolean = (value) => {
   if (typeof value === "boolean") return value;
   if (typeof value === "number") return value > 0;
@@ -209,10 +267,14 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
   const defaultHours = sessionHours ? 0 : getDefaultSessionHours(level);
   const resolvedHours = sessionHours || defaultHours;
 
+  const sessionLabel = resolveSessionLabel(data);
+
   const record = {
     id,
     date: data.date || data.sessionDate || id,
-    title: data.topic || data.chapter || data.title || "Session",
+    title: sessionLabel.title,
+    chapter: sessionLabel.chapter,
+    topic: sessionLabel.topic,
     present,
     status,
     marked: !isPending,
