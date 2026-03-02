@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
 const sectionStyle = { ...styles.card, display: "grid", gap: 10 };
+
 const tableCellStyle = {
   border: "1px solid #d1d5db",
   padding: 8,
@@ -25,6 +26,21 @@ const exampleBoxStyle = {
   gap: 8,
 };
 
+const imageStyle = {
+  width: "100%",
+  maxHeight: 340,
+  objectFit: "cover",
+  borderRadius: 16,
+  border: "1px solid #e5e7eb",
+  marginTop: 8,
+};
+
+const captionStyle = {
+  margin: 0,
+  fontSize: 14,
+  color: "#6b7280",
+};
+
 const SingularPronounsConjugationPage = () => {
   const navigate = useNavigate();
 
@@ -44,6 +60,16 @@ const SingularPronounsConjugationPage = () => {
 
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Day 2 Grammar Note: Alphabets and Personal Pronouns
+        </p>
+
+        <img
+          src="https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1200&q=80"
+          alt="Students learning in a classroom"
+          style={imageStyle}
+        />
+
+        <p style={captionStyle}>
+          German learning and classroom study
         </p>
       </header>
 
@@ -141,8 +167,10 @@ const SingularPronounsConjugationPage = () => {
             <strong>du heißt</strong> (you are called - informal)
             <div>Example: Du heißt Anna. (You are called Anna.)</div>
             <div>
-              Note: We write <strong>heißt</strong>, not <strong>heißst</strong>. The letter <strong>ß</strong>
-              already carries the same "s" sound, so German does not add another <strong>s</strong> before
+              Note: We write <strong>heißt</strong>, not <strong>heißst</strong>. The letter{" "}
+              <strong>ß</strong>
+              already carries the same "s" sound, so German does not add another <strong>s</strong>{" "}
+              before
               <strong>-t</strong> in this form.
             </div>
           </div>
@@ -271,7 +299,8 @@ const SingularPronounsConjugationPage = () => {
           <div style={exampleBoxStyle}>
             <strong>Sie</strong>
             <div>
-              Use for strangers, superiors, and in professional contexts (formal). It shows respect and politeness.
+              Use for strangers, superiors, and in professional contexts (formal). It shows respect and
+              politeness.
             </div>
           </div>
         </div>
@@ -352,7 +381,8 @@ const SingularPronounsConjugationPage = () => {
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Quick practice (multiple choice)</h2>
         <p style={{ margin: 0 }}>
-          Choose the correct verb form. (Do not worry about checking answers here—students can type and submit.)
+          Choose the correct verb form. (Do not worry about checking answers here—students can type and
+          submit.)
         </p>
 
         <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 10 }}>
