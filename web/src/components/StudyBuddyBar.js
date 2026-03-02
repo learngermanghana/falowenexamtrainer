@@ -14,15 +14,6 @@ const toNumber = (value) => {
   return Number.isFinite(parsed) ? parsed : null;
 };
 
-const getWeekStartIso = (value = new Date()) => {
-  const date = new Date(value);
-  date.setHours(0, 0, 0, 0);
-  const day = date.getDay();
-  const offset = (day + 6) % 7;
-  date.setDate(date.getDate() - offset);
-  return date.toISOString().slice(0, 10);
-};
-
 const StudyBuddyBar = ({ studentProfile }) => {
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
@@ -121,21 +112,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const trimmedQuestion = questionInput.trim();
   const isQuestionTooLong = questionInput.length > maxQuestionLength;
   const isSendDisabled = !trimmedQuestion || isReplyLoading || isQuestionTooLong;
-  const completionStorageKey = useMemo(
-    () => `studyBuddyWeeklyPlan:${String(studentCode || "guest").toLowerCase()}:${resolvedLevel || "level"}`,
-    [resolvedLevel, studentCode]
-  );
-  const [weeklyCompletion, setWeeklyCompletion] = useState({});
-
-  useEffect(() => {
-    try {
-      const savedValue = localStorage.getItem(completionStorageKey);
-      setWeeklyCompletion(savedValue ? JSON.parse(savedValue) : {});
-    } catch (error) {
-      setWeeklyCompletion({});
-    }
-  }, [completionStorageKey]);
-
   const paymentReminder = useMemo(() => {
     const balanceDue = Number(studentProfile?.balanceDue);
     if (!Number.isFinite(balanceDue) || balanceDue <= 0) return null;
@@ -257,124 +233,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
   }, [attendanceRate, assignmentLabel, hasAssignment, latestScore, paymentReminder, t]);
 
   const primarySuggestion = suggestions[0];
-  const weekStart = useMemo(() => getWeekStartIso(), []);
-
-  const weeklyPlan = useMemo(() => {
-    const weakItems = [];
-    const failedAssignments = scoreSummary?.student?.failedAssignments || [];
-    const daysToExam = (() => {
-      const examDateMs = toDateMs(
-        studentProfile?.examDate || studentProfile?.targetExamDate || studentProfile?.nextExamDate || null
-      );
-      if (!Number.isFinite(examDateMs)) return null;
-      return Math.ceil((examDateMs - Date.now()) / (1000 * 60 * 60 * 24));
-    })();
-
-    if (latestScore !== null && latestScore < 70) {
-      weakItems.push({
-        id: "grammar-repair",
-        label: t("studyBuddy.weeklyPlan.items.grammarRepair"),
-        helper: t("studyBuddy.weeklyPlan.helpers.grammarRepair"),
-      });
-    }
-
-    if (attendanceRate !== null && attendanceRate < 85) {
-      weakItems.push({
-        id: "attendance-reset",
-        label: t("studyBuddy.weeklyPlan.items.attendanceReset"),
-        helper: t("studyBuddy.weeklyPlan.helpers.attendanceReset"),
-      });
-    }
-
-    if (failedAssignments.length) {
-      weakItems.push({
-        id: "redo-failed",
-        label: t("studyBuddy.weeklyPlan.items.redoFailed", {
-          assignment: failedAssignments[0]?.label || failedAssignments[0]?.identifier || assignmentLabel,
-        }),
-        helper: t("studyBuddy.weeklyPlan.helpers.redoFailed"),
-      });
-    }
-
-    weakItems.push({
-      id: "writing-practice",
-      label: t("studyBuddy.weeklyPlan.items.writingPractice"),
-      helper: t("studyBuddy.weeklyPlan.helpers.writingPractice"),
-    });
-
-    if (daysToExam !== null && daysToExam <= 21) {
-      weakItems.push({
-        id: "exam-simulation",
-        label: t("studyBuddy.weeklyPlan.items.examSimulation"),
-        helper: t("studyBuddy.weeklyPlan.helpers.examSimulation", {
-          days: numberFormatter.format(Math.max(daysToExam, 0)),
-        }),
-      });
-    } else {
-      weakItems.push({
-        id: "vocab-recall",
-        label: t("studyBuddy.weeklyPlan.items.vocabRecall"),
-        helper: t("studyBuddy.weeklyPlan.helpers.vocabRecall"),
-      });
-    }
-
-    return weakItems.slice(0, 4);
-  }, [assignmentLabel, attendanceRate, latestScore, numberFormatter, scoreSummary?.student?.failedAssignments, studentProfile, t]);
-
-  const planWithCompletion = useMemo(
-    () =>
-      weeklyPlan.map((item) => ({
-        ...item,
-        completed: Boolean(weeklyCompletion?.[weekStart]?.[item.id]),
-      })),
-    [weekStart, weeklyCompletion, weeklyPlan]
-  );
-
-  const completedCount = useMemo(
-    () => planWithCompletion.filter((item) => item.completed).length,
-    [planWithCompletion]
-  );
-  const pendingCount = Math.max(planWithCompletion.length - completedCount, 0);
-  const nudgeMessage =
-    pendingCount === 0
-      ? t("studyBuddy.weeklyPlan.nudges.allDone")
-      : pendingCount === 1
-      ? t("studyBuddy.weeklyPlan.nudges.oneLeft")
-      : t("studyBuddy.weeklyPlan.nudges.pending", { count: numberFormatter.format(pendingCount) });
-
-  const toggleWeeklyItem = useCallback(
-    (itemId) => {
-      setWeeklyCompletion((prev) => {
-        const previousWeek = prev?.[weekStart] || {};
-        const nextValue = !previousWeek[itemId];
-        const next = {
-          ...prev,
-          [weekStart]: {
-            ...previousWeek,
-            [itemId]: nextValue,
-          },
-        };
-        try {
-          localStorage.setItem(completionStorageKey, JSON.stringify(next));
-        } catch (error) {
-          // Ignore storage failures.
-        }
-        logStudyBuddyUsage({
-          event: "weekly_plan_completion",
-          studentCode,
-          studentEmail,
-          className,
-          userId: user?.uid || null,
-          itemId,
-          completed: nextValue,
-          weekStart,
-        }).catch(() => {});
-        return next;
-      });
-    },
-    [className, completionStorageKey, studentCode, studentEmail, user?.uid, weekStart]
-  );
-
   const submitQuickQuestion = useCallback(
     async (question) => {
       const trimmed = question.trim();
@@ -581,37 +439,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
             ) : null}
           </div>
 
-          <div className="study-buddy-plan" aria-live="polite">
-            <div className="study-buddy-plan-header">
-              <p className="study-buddy-qa-title">{t("studyBuddy.weeklyPlan.title")}</p>
-              <p className="study-buddy-plan-progress">
-                {t("studyBuddy.weeklyPlan.progress", {
-                  done: numberFormatter.format(completedCount),
-                  total: numberFormatter.format(planWithCompletion.length),
-                })}
-              </p>
-            </div>
-            <p className="study-buddy-qa-helper">{t("studyBuddy.weeklyPlan.description")}</p>
-            <ul className="study-buddy-plan-list">
-              {planWithCompletion.map((item) => (
-                <li key={item.id} className="study-buddy-plan-item">
-                  <button
-                    type="button"
-                    className={`study-buddy-plan-check${item.completed ? " is-complete" : ""}`}
-                    aria-pressed={item.completed}
-                    onClick={() => toggleWeeklyItem(item.id)}
-                  >
-                    {item.completed ? "✓" : "○"}
-                  </button>
-                  <div>
-                    <p className="study-buddy-plan-item-title">{item.label}</p>
-                    <p className="study-buddy-plan-item-helper">{item.helper}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-            <p className="study-buddy-plan-nudge">{nudgeMessage}</p>
-          </div>
         </div>
         {!isCollapsed ? (
           <button
