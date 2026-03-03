@@ -7,6 +7,13 @@ import { useAuth } from "../context/AuthContext";
 import ResultHistory from "./ResultHistory";
 import { fetchIdeasFromCoach, markLetterWithAI } from "../services/coachService";
 import { writingLetters } from "../data/writingLetters";
+import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
+import {
+  isTutorReviewCloudEnabled,
+  loadLatestTutorReviewForStudent,
+  saveExamLetterForTutorReview,
+  saveStudentReplyToTutorReview,
+} from "../services/tutorReviewService";
 
 const IDEAS_COACHING_PROMPTS = [
   "Start with the task and ask: What is unclear to me?",
@@ -29,6 +36,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const isExamMode = mode === "exams";
   const isCampusMode = mode === "campus";
   const isFrenchProgram = studentProfile?.program === "french";
+  const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
+  const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "";
   const coachDisplayName = isFrenchProgram ? "the French coach" : "Herr Felix";
   const ideaCoachIntro = useMemo(
     () => ({
@@ -59,6 +68,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
   const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [latestTutorReview, setLatestTutorReview] = useState(null);
+  const [tutorRequestText, setTutorRequestText] = useState("");
+  const [tutorRequestState, setTutorRequestState] = useState({ loading: false, success: "", error: "" });
+  const [studentReplyText, setStudentReplyText] = useState("");
+  const [studentReplyState, setStudentReplyState] = useState({ loading: false, success: "", error: "" });
+  const [ideasProgressLoaded, setIdeasProgressLoaded] = useState(false);
   const [practiceLevel, setPracticeLevel] = useState("All");
 
   const normalizeProfileLevel = (rawLevel) => {
@@ -92,9 +107,13 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         baseTabs.unshift({ key: "practice", label: "Practice letters" });
       }
 
+      if (isCampusMode) {
+        baseTabs.push({ key: "tutor", label: "Tutor feedback" });
+      }
+
       return baseTabs;
     },
-    [canUseIdeasGenerator, canUsePracticeLetters]
+    [canUseIdeasGenerator, canUsePracticeLetters, isCampusMode]
   );
 
   const resetErrors = () => {
@@ -161,6 +180,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   }, [ideaCoachIntro]);
 
   const selectedLetter = useMemo(() => writingLetters.find((item) => item.id === selectedLetterId), [selectedLetterId]);
+  const ideasProgressMode = useMemo(() => (isCampusMode ? "campus-ideas" : "exam-ideas"), [isCampusMode]);
   const filteredPracticeLetters = useMemo(
     () => writingLetters.filter((item) => (practiceLevel === "All" ? true : item.level === practiceLevel)),
     [practiceLevel]
@@ -169,6 +189,93 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     () => filteredPracticeLetters.findIndex((item) => item.id === selectedLetterId) + 1,
     [filteredPracticeLetters, selectedLetterId]
   );
+
+  useEffect(() => {
+    let mounted = true;
+
+    const hydrateIdeas = async () => {
+      if (!user?.uid) {
+        if (mounted) {
+          setIdeasProgressLoaded(true);
+          setChatMessages([ideaCoachIntro]);
+          setIdeaInput("");
+          setSelectedDraftIds([]);
+          setIdeaSessionActive(false);
+          setIdeaTurnCount(0);
+        }
+        return;
+      }
+
+      setIdeasProgressLoaded(false);
+      try {
+        const saved = await loadWritingProgress({
+          userId: user.uid,
+          studentCode,
+          mode: ideasProgressMode,
+        });
+        if (!mounted) return;
+
+        if (!saved) {
+          setChatMessages([ideaCoachIntro]);
+          setIdeasProgressLoaded(true);
+          return;
+        }
+
+        if (Array.isArray(saved.chatMessages) && saved.chatMessages.length > 0) {
+          setChatMessages(saved.chatMessages);
+        } else {
+          setChatMessages([ideaCoachIntro]);
+        }
+        if (typeof saved.ideaInput === "string") setIdeaInput(saved.ideaInput);
+        if (Array.isArray(saved.selectedDraftIds)) setSelectedDraftIds(saved.selectedDraftIds);
+        if (typeof saved.ideaSessionActive === "boolean") setIdeaSessionActive(saved.ideaSessionActive);
+        if (typeof saved.ideaTurnCount === "number") setIdeaTurnCount(saved.ideaTurnCount);
+      } catch (error) {
+        console.error("Failed to load idea chat progress", error);
+      } finally {
+        if (mounted) setIdeasProgressLoaded(true);
+      }
+    };
+
+    hydrateIdeas();
+
+    return () => {
+      mounted = false;
+    };
+  }, [ideaCoachIntro, ideasProgressMode, studentCode, user?.uid]);
+
+  useEffect(() => {
+    if (!ideasProgressLoaded || !user?.uid) return;
+
+    const timeout = setTimeout(() => {
+      saveWritingProgress({
+        userId: user.uid,
+        studentCode,
+        mode: ideasProgressMode,
+        data: {
+          chatMessages,
+          ideaInput,
+          selectedDraftIds,
+          ideaSessionActive,
+          ideaTurnCount,
+        },
+      }).catch((error) => {
+        console.error("Failed to save idea chat progress", error);
+      });
+    }, 700);
+
+    return () => clearTimeout(timeout);
+  }, [
+    chatMessages,
+    ideaInput,
+    ideaSessionActive,
+    ideaTurnCount,
+    ideasProgressLoaded,
+    ideasProgressMode,
+    selectedDraftIds,
+    studentCode,
+    user?.uid,
+  ]);
 
   useEffect(() => {
     if (!selectedLetter) return;
@@ -453,6 +560,99 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     }
   };
 
+  const formatTutorReviewStatus = (status) => {
+    if (status === "approved") return "Approved";
+    if (status === "needs_improvement") return "Needs improvement";
+    return "Pending tutor review";
+  };
+
+  useEffect(() => {
+    if (!user?.uid || !tutorReviewCloudEnabled) {
+      setLatestTutorReview(null);
+      return;
+    }
+
+    let cancelled = false;
+    loadLatestTutorReviewForStudent({ userId: user.uid, studentCode })
+      .then((review) => {
+        if (!cancelled) setLatestTutorReview(review);
+      })
+      .catch(() => {
+        if (!cancelled) setLatestTutorReview(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [studentCode, tutorRequestState.success, tutorReviewCloudEnabled, user?.uid]);
+
+  const handleSubmitTutorRequest = async () => {
+    const message = tutorRequestText.trim();
+    if (!message) {
+      setTutorRequestState({ loading: false, success: "", error: "Add your question before sending to tutor." });
+      return;
+    }
+
+    if (!tutorReviewCloudEnabled) {
+      setTutorRequestState({ loading: false, success: "", error: "Tutor sync is unavailable in this environment." });
+      return;
+    }
+
+    setTutorRequestState({ loading: true, success: "", error: "" });
+    try {
+      await saveExamLetterForTutorReview({
+        user,
+        studentProfile,
+        level,
+        promptTitle: "Campus writing help request",
+        promptId: selectedLetterId || "campus-writing",
+        draft: improvedLetterText || letterText,
+        aiFeedback: markFeedback,
+        revisedDraft: improvedLetterText || "",
+        reflection: message,
+        source: "campus-writing",
+      });
+      setTutorRequestText("");
+      setTutorRequestState({ loading: false, success: "Sent to tutor. Check the Tutor feedback tab for updates.", error: "" });
+    } catch (err) {
+      setTutorRequestState({ loading: false, success: "", error: err?.message || "Could not send your request right now." });
+    }
+  };
+
+  const handleStudentReply = async () => {
+    if (!latestTutorReview?.id) {
+      setStudentReplyState({ loading: false, success: "", error: "No tutor feedback yet." });
+      return;
+    }
+
+    const message = studentReplyText.trim();
+    if (!message) {
+      setStudentReplyState({ loading: false, success: "", error: "Write a reply before sending." });
+      return;
+    }
+
+    setStudentReplyState({ loading: true, success: "", error: "" });
+    try {
+      await saveStudentReplyToTutorReview({
+        reviewId: latestTutorReview.id,
+        message,
+        studentName: studentProfile?.name || user?.displayName || user?.email || "",
+        studentCode,
+      });
+      setStudentReplyText("");
+      setStudentReplyState({ loading: false, success: "Reply sent to tutor.", error: "" });
+      setLatestTutorReview((prev) => ({
+        ...(prev || {}),
+        studentReplies: [
+          ...((prev?.studentReplies || [])),
+          { message, createdAt: new Date().toISOString() },
+        ],
+      }));
+    } catch (err) {
+      setStudentReplyState({ loading: false, success: "", error: err?.message || "Could not send reply right now." });
+    }
+  };
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
@@ -684,7 +884,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <button style={styles.primaryButton} onClick={handleMarkSubmit} disabled={loading || campusImprovementLocked}>
-                {loading ? "Submitting for tutor review..." : "Submit for tutor review"}
+                {loading ? "Getting AI feedback..." : isCampusMode ? "Get AI feedback" : "Submit for tutor review"}
               </button>
               <button
                 style={styles.secondaryButton}
@@ -713,12 +913,41 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               <div style={markSubmitStatus.submissionSaved ? styles.successBox : styles.infoBox}>
                 {markSubmitStatus.submissionSaved ? (
                   <>
-                    ✅ Submission saved successfully for tutor review.
+                    ✅ AI feedback generated and submission recorded.
                     {markSubmitStatus.submissionId ? ` Firestore record: ${markSubmitStatus.submissionId}` : ""}
                   </>
                 ) : (
                   "Feedback generated, but submission save could not be confirmed in Firestore."
                 )}
+              </div>
+            )}
+
+            {isCampusMode && (
+              <div style={{ ...styles.helperCard, border: "1px solid #dbeafe" }}>
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Need tutor help with AI grammar feedback?</div>
+                <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
+                  If any grammar correction from AI is confusing, send your question here for tutor review. Include what you tried and where you are stuck.
+                </p>
+                <textarea
+                  style={styles.textArea}
+                  rows={4}
+                  placeholder="Example: Why is this sentence in dative, and how should I rewrite it correctly?"
+                  value={tutorRequestText}
+                  onChange={(event) => {
+                    setTutorRequestText(event.target.value);
+                    setTutorRequestState({ loading: false, success: "", error: "" });
+                  }}
+                />
+                <button
+                  type="button"
+                  style={{ ...styles.primaryButton, marginTop: 8 }}
+                  onClick={handleSubmitTutorRequest}
+                  disabled={tutorRequestState.loading}
+                >
+                  {tutorRequestState.loading ? "Sending to tutor..." : "Send question to tutor"}
+                </button>
+                {tutorRequestState.error ? <p style={{ ...styles.helperText, color: "#b91c1c" }}>{tutorRequestState.error}</p> : null}
+                {tutorRequestState.success ? <p style={{ ...styles.helperText, color: "#166534" }}>{tutorRequestState.success}</p> : null}
               </div>
             )}
 
@@ -963,6 +1192,52 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               </div>
             </div>
           </div>
+        </section>
+      )}
+
+      {activeTab === "tutor" && isCampusMode && (
+        <section style={styles.card}>
+          <h3 style={{ ...styles.sectionTitle, marginTop: 0 }}>Tutor feedback</h3>
+          {!tutorReviewCloudEnabled ? (
+            <div style={styles.errorBox}>Tutor feedback sync is unavailable because Firebase is not configured.</div>
+          ) : (
+            <>
+              <div style={styles.helperCard}>
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Status: {formatTutorReviewStatus(latestTutorReview?.reviewStatus)}</div>
+                {latestTutorReview?.reviewedAt ? (
+                  <p style={{ ...styles.helperText, margin: "0 0 8px" }}>Reviewed: {new Date(latestTutorReview.reviewedAt).toLocaleString()}</p>
+                ) : null}
+                {latestTutorReview?.tutorFeedback ? (
+                  <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{latestTutorReview.tutorFeedback}</pre>
+                ) : (
+                  <p style={{ ...styles.helperText, margin: 0 }}>No tutor notes yet. Send a question from Mark my letter.</p>
+                )}
+              </div>
+              <div style={{ ...styles.helperCard, marginTop: 10 }}>
+                <label style={styles.label}>Reply to tutor</label>
+                <textarea
+                  style={{ ...styles.textArea, marginTop: 6 }}
+                  rows={4}
+                  value={studentReplyText}
+                  onChange={(event) => {
+                    setStudentReplyText(event.target.value);
+                    setStudentReplyState({ loading: false, success: "", error: "" });
+                  }}
+                  placeholder="Ask a follow-up question or confirm what you will fix next."
+                />
+                <button
+                  type="button"
+                  style={{ ...styles.primaryButton, marginTop: 8 }}
+                  onClick={handleStudentReply}
+                  disabled={studentReplyState.loading || !latestTutorReview?.id}
+                >
+                  {studentReplyState.loading ? "Sending..." : "Send reply"}
+                </button>
+                {studentReplyState.error ? <p style={{ ...styles.helperText, color: "#b91c1c" }}>{studentReplyState.error}</p> : null}
+                {studentReplyState.success ? <p style={{ ...styles.helperText, color: "#166534" }}>{studentReplyState.success}</p> : null}
+              </div>
+            </>
+          )}
         </section>
       )}
 

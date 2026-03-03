@@ -11,6 +11,7 @@ import {
   isTutorReviewCloudEnabled,
   loadLatestTutorReviewForStudent,
   saveExamLetterForTutorReview,
+  saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
 
 const DEFAULT_EXAM_TIMINGS = {
@@ -370,6 +371,8 @@ const WritingPage = ({ mode = "course" }) => {
   const [improvedLoading, setImprovedLoading] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
   const [latestTutorReview, setLatestTutorReview] = useState(null);
+  const [studentReplyText, setStudentReplyText] = useState("");
+  const [studentReplyState, setStudentReplyState] = useState({ loading: false, success: "", error: "" });
   const [rubricBreakdown, setRubricBreakdown] = useState(() =>
     buildRubricBreakdown("")
   );
@@ -422,6 +425,8 @@ const WritingPage = ({ mode = "course" }) => {
     setIdeaError("");
     setIdeaSuccess("");
     setTutorSaveState({ loading: false, success: "", error: "" });
+    setStudentReplyText("");
+    setStudentReplyState({ loading: false, success: "", error: "" });
     setRemainingSeconds((selectedLetter?.durationMinutes || 0) * 60);
     setTimerRunning(false);
     setRubricBreakdown(buildRubricBreakdown(""));
@@ -762,6 +767,50 @@ const WritingPage = ({ mode = "course" }) => {
       cancelled = true;
     };
   }, [isExamMode, studentCode, tutorSaveState.success, userId]);
+
+  const handleStudentReplySubmit = async () => {
+    if (!latestTutorReview?.id) {
+      setStudentReplyState({ loading: false, success: "", error: "Tutor has not posted feedback yet." });
+      return;
+    }
+
+    const message = studentReplyText.trim();
+    if (!message) {
+      setStudentReplyState({ loading: false, success: "", error: "Write your question or response before sending." });
+      return;
+    }
+
+    setStudentReplyState({ loading: true, success: "", error: "" });
+
+    try {
+      await saveStudentReplyToTutorReview({
+        reviewId: latestTutorReview.id,
+        message,
+        studentName: studentProfile?.name || user?.displayName || user?.email || "",
+        studentCode,
+      });
+      setStudentReplyText("");
+      setStudentReplyState({ loading: false, success: "Reply sent to tutor.", error: "" });
+      setLatestTutorReview((prev) => ({
+        ...(prev || {}),
+        studentReplies: [
+          ...((prev?.studentReplies || [])),
+          {
+            message,
+            studentName: studentProfile?.name || user?.displayName || "",
+            studentCode,
+            createdAt: new Date().toISOString(),
+          },
+        ],
+      }));
+    } catch (err) {
+      setStudentReplyState({
+        loading: false,
+        success: "",
+        error: err?.message || "Could not send your reply right now.",
+      });
+    }
+  };
 
   const handleTabChange = (tabKey) => {
     setActiveTab(tabKey);
@@ -1877,7 +1926,49 @@ const WritingPage = ({ mode = "course" }) => {
                 No tutor notes yet. Submit a copy from “Mark my letter” and check back here.
               </p>
             )}
+            {Array.isArray(latestTutorReview?.studentReplies) && latestTutorReview.studentReplies.length ? (
+              <div style={{ marginTop: 10 }}>
+                <div style={{ fontWeight: 700, marginBottom: 6 }}>Your replies</div>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {latestTutorReview.studentReplies.map((reply, index) => (
+                    <div key={`${reply?.createdAt || "reply"}-${index}`} style={{ ...styles.infoBox, margin: 0 }}>
+                      <div style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                        {reply?.createdAt ? new Date(reply.createdAt).toLocaleString() : "Just now"}
+                      </div>
+                      <div>{reply?.message || ""}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
+          {tutorReviewCloudEnabled ? (
+            <div style={{ ...styles.helperCard, marginTop: 10 }}>
+              <label style={styles.label}>Reply to tutor feedback</label>
+              <textarea
+                style={{ ...styles.textArea, marginTop: 6 }}
+                rows={4}
+                placeholder="Tell your tutor what is still confusing or ask a follow-up question."
+                value={studentReplyText}
+                onChange={(event) => {
+                  setStudentReplyText(event.target.value);
+                  setStudentReplyState({ loading: false, success: "", error: "" });
+                }}
+              />
+              <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  style={styles.primaryButton}
+                  onClick={handleStudentReplySubmit}
+                  disabled={studentReplyState.loading || !latestTutorReview?.id}
+                >
+                  {studentReplyState.loading ? "Sending..." : "Send reply to tutor"}
+                </button>
+              </div>
+              {studentReplyState.error ? <p style={{ ...styles.helperText, color: "#b91c1c" }}>{studentReplyState.error}</p> : null}
+              {studentReplyState.success ? <p style={{ ...styles.helperText, color: "#166534" }}>{studentReplyState.success}</p> : null}
+            </div>
+          ) : null}
         </section>
       )}
     </>

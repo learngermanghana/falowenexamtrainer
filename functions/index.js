@@ -165,7 +165,12 @@ const normalizeTutorReviewStatus = (value) => {
 const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterData = {} }) => {
   const beforeStatus = normalizeTutorReviewStatus(beforeData.reviewStatus || beforeData.status);
   const afterStatus = normalizeTutorReviewStatus(afterData.reviewStatus || afterData.status);
-  if (!afterStatus || afterStatus === "pending" || afterStatus === beforeStatus) {
+  const feedbackBefore = String(beforeData.tutorFeedback || beforeData.reviewComment || "").trim();
+  const feedbackAfter = String(afterData.tutorFeedback || afterData.reviewComment || "").trim();
+  const feedbackChanged = feedbackAfter && feedbackAfter !== feedbackBefore;
+  const statusChangedFromPending = afterStatus && afterStatus !== "pending" && afterStatus !== beforeStatus;
+
+  if (!statusChangedFromPending && !feedbackChanged) {
     return null;
   }
 
@@ -181,7 +186,12 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
   const reviewLabel = afterData.promptTitle || afterData.assignmentTitle || "your exam letter";
   const tutorFeedback = afterData.tutorFeedback || afterData.reviewComment || "";
   const notification = {
-    title: afterStatus === "approved" ? "Tutor approved your exam letter" : "Tutor requested improvements",
+    title:
+      afterStatus === "approved"
+        ? "Tutor approved your exam letter"
+        : afterStatus === "needs_improvement"
+          ? "Tutor requested improvements"
+          : "New tutor feedback is available",
     body: safeTruncate(
       tutorFeedback ||
         (afterStatus === "approved"
@@ -197,7 +207,7 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
     reviewStatus: afterStatus,
     studentCode: String(studentCode || ""),
     level: afterData.level || "",
-    route: "/exams/writing",
+    route: afterData.source === "campus-writing" ? "/campus/writing?tab=tutor" : "/exams/writing?tab=tutor",
   };
 
   const tokenOwners = tokenInfo.docId
