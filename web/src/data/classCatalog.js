@@ -35,16 +35,6 @@ export const classCatalog = {
     ],
     docUrl: "https://drive.google.com/file/d/1eYBFqrJdlTtCdV9ZPg2gc-a0zZxCiXJS/view?usp=sharing",
   },
-  "A1 Munich Klasse": {
-    startDate: "2025-12-03",
-    endDate: "2026-02-09",
-    schedule: [
-      { day: "Monday", startTime: "18:00", endTime: "19:00" },
-      { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
-      { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/1YaML32aP8L0Uk_-fu2HEW1b0Qo4CceDg/view?usp=sharing",
-  },
   "A1 Dortmund Klasse": {
     startDate: "2026-03-04",
     endDate: "2026-04-28",
@@ -54,16 +44,6 @@ export const classCatalog = {
       { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
     docUrl: "https://drive.google.com/file/d/1qhXA0dw6ULuo1_IlUtnPTgMAwhVNiLRl/view?usp=sharing",
-  },
-  "A2 Bonn Klasse": {
-    startDate: "2025-11-25",
-    endDate: "2026-02-11",
-    schedule: [
-      { day: "Monday", startTime: "19:30", endTime: "21:00" },
-      { day: "Tuesday", startTime: "19:30", endTime: "21:00" },
-      { day: "Wednesday", startTime: "19:30", endTime: "21:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/11YeRxocz9P5WUQHM3ojWaZ3wB6p1_8sE/view?usp=drive_link",
   },
   "A2 Stuttgart Klasse": {
     startDate: "2026-03-02",
@@ -75,15 +55,6 @@ export const classCatalog = {
     ],
     docUrl: "https://drive.google.com/file/d/1rzxoGqNSphKCyYLYA_3nYTnLcbjQ0QDz/view?usp=sharing",
   },
-  "B1 Koln Klasse": {
-    startDate: "2025-11-20",
-    endDate: "2026-02-27",
-    schedule: [
-      { day: "Thursday", startTime: "19:30", endTime: "21:00" },
-      { day: "Friday", startTime: "19:30", endTime: "21:00" },
-    ],
-    docUrl: "https://drive.google.com/file/d/1ttjnOj10xo-baddfUHthHJ9dKYwqByk2/view?usp=sharing",
-    },
   "B1 Stuttgart Klasse": {
     startDate: "2026-03-12",
     endDate: "2026-06-12",
