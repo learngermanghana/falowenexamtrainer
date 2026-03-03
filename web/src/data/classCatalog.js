@@ -45,6 +45,17 @@ export const classCatalog = {
     ],
     docUrl: "https://drive.google.com/file/d/1qhXA0dw6ULuo1_IlUtnPTgMAwhVNiLRl/view?usp=sharing",
   },
+  "A1 Koln Klasse": {
+    startDate: "2026-04-15",
+    orientationDate: "2026-04-15",
+    endDate: "2026-06-10",
+    schedule: [
+      { day: "Monday", startTime: "11:00", endTime: "12:00" },
+      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
+      { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
+    ],
+    docUrl: "https://drive.google.com/file/d/1YICRJEY4i0dJOZd6NdYOb3pAuKsQC091/view?usp=sharing",
+  },
   "A2 Stuttgart Klasse": {
     startDate: "2026-03-02",
     endDate: "2026-05-04",
