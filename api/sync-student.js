@@ -65,7 +65,14 @@ module.exports = async function handler(req, res) {
 
     // Map normalizedHeader -> columnIndex
     const headerIndex = new Map();
-    headers.forEach((h, i) => headerIndex.set(normalizeHeader(h), i));
+    headers.forEach((h, i) => {
+      const normalized = normalizeHeader(h);
+      // Keep first matching column to avoid duplicate headers in far-right columns
+      // (e.g. AH onward) overriding the intended A-based table layout.
+      if (normalized && !headerIndex.has(normalized)) {
+        headerIndex.set(normalized, i);
+      }
+    });
 
     // Helper: find a column by trying multiple aliases
     function findCol(...aliases) {

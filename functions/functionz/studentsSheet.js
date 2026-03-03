@@ -93,7 +93,9 @@ async function loadHeaderMap(sheets, sheetId, tabName) {
 
   headers.forEach((h, idx) => {
     const key = normalizeHeader(h);
-    if (key) headerMap.set(key, idx);
+    // Keep the first occurrence so duplicate headers farther right (e.g. AH, AI...)
+    // do not override canonical columns at the start of the sheet.
+    if (key && !headerMap.has(key)) headerMap.set(key, idx);
   });
 
   return { headers, headerMap };
