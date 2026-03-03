@@ -185,6 +185,7 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
 
   const reviewLabel = afterData.promptTitle || afterData.assignmentTitle || "your exam letter";
   const tutorFeedback = afterData.tutorFeedback || afterData.reviewComment || "";
+  const replyMessage = String(latestReply?.message || latestReply?.text || "").trim();
   const notification = {
     title:
       afterStatus === "approved"
@@ -193,10 +194,12 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
           ? "Tutor requested improvements"
           : "New tutor feedback is available",
     body: safeTruncate(
-      tutorFeedback ||
-        (afterStatus === "approved"
-          ? `${reviewLabel} is approved. Great work!`
-          : `${reviewLabel} has tutor feedback. Please review and revise.`),
+      replyLooksTutorAuthored
+        ? (replyMessage || `${reviewLabel} has a new tutor reply.`)
+        : tutorFeedback ||
+          (afterStatus === "approved"
+            ? `${reviewLabel} is approved. Great work!`
+            : `${reviewLabel} has tutor feedback. Please review and revise.`),
       140
     ),
   };
