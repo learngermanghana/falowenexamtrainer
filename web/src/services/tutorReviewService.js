@@ -167,7 +167,6 @@ export const saveStudentReplyToTutorReview = async ({
       message: trimmed,
       studentName,
       studentCode,
-      senderRole: "student",
       createdAt: new Date().toISOString(),
     }),
     updatedAt: serverTimestamp(),

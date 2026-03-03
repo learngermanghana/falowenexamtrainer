@@ -170,18 +170,7 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
   const feedbackChanged = feedbackAfter && feedbackAfter !== feedbackBefore;
   const statusChangedFromPending = afterStatus && afterStatus !== "pending" && afterStatus !== beforeStatus;
 
-  const beforeReplies = Array.isArray(beforeData.studentReplies) ? beforeData.studentReplies : [];
-  const afterReplies = Array.isArray(afterData.studentReplies) ? afterData.studentReplies : [];
-  const hasNewReply = afterReplies.length > beforeReplies.length;
-  const latestReply = hasNewReply ? afterReplies[afterReplies.length - 1] || {} : null;
-  const latestReplyRole = normalizeValue(latestReply?.senderRole || latestReply?.role || "");
-  const latestReplyStudentCode = normalizeStudentCode(latestReply?.studentCode || latestReply?.ownerKey || "");
-  const ownerStudentCode = normalizeStudentCode(afterData.studentCode || afterData.studentcode || afterData.ownerKey || "");
-  const replyLooksTutorAuthored =
-    hasNewReply &&
-    (latestReplyRole === "tutor" || (latestReplyRole !== "student" && latestReplyStudentCode && latestReplyStudentCode !== ownerStudentCode));
-
-  if (!statusChangedFromPending && !feedbackChanged && !replyLooksTutorAuthored) {
+  if (!statusChangedFromPending && !feedbackChanged) {
     return null;
   }
 
@@ -198,9 +187,8 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
   const tutorFeedback = afterData.tutorFeedback || afterData.reviewComment || "";
   const replyMessage = String(latestReply?.message || latestReply?.text || "").trim();
   const notification = {
-    title: replyLooksTutorAuthored
-      ? "Tutor replied to your question"
-      : afterStatus === "approved"
+    title:
+      afterStatus === "approved"
         ? "Tutor approved your exam letter"
         : afterStatus === "needs_improvement"
           ? "Tutor requested improvements"
@@ -223,7 +211,6 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
     studentCode: String(studentCode || ""),
     level: afterData.level || "",
     route: afterData.source === "campus-writing" ? "/campus/writing?tab=tutor" : "/exams/writing?tab=tutor",
-    hasNewReply: replyLooksTutorAuthored ? "1" : "0",
   };
 
   const tokenOwners = tokenInfo.docId
