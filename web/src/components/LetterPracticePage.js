@@ -161,6 +161,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   }, [ideaCoachIntro]);
 
   const selectedLetter = useMemo(() => writingLetters.find((item) => item.id === selectedLetterId), [selectedLetterId]);
+  const filteredPracticeLetters = useMemo(
+    () => writingLetters.filter((item) => (practiceLevel === "All" ? true : item.level === practiceLevel)),
+    [practiceLevel]
+  );
+  const selectedLetterPosition = useMemo(
+    () => filteredPracticeLetters.findIndex((item) => item.id === selectedLetterId) + 1,
+    [filteredPracticeLetters, selectedLetterId]
+  );
 
   useEffect(() => {
     if (!selectedLetter) return;
@@ -529,9 +537,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
             <div style={{ display: "grid", gap: 10 }}>
               <div style={{ ...styles.promptList, paddingLeft: 0, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
-                {writingLetters
-                  .filter((item) => (practiceLevel === "All" ? true : item.level === practiceLevel))
-                  .map((item) => (
+                {filteredPracticeLetters.map((item, index) => (
                     <button
                       key={item.id}
                       onClick={() => setSelectedLetterId(item.id)}
@@ -542,7 +548,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                       }
                     >
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                        <span>{item.letter}</span>
+                        <span>{`${index + 1}. ${item.letter}`}</span>
                         <span style={styles.levelPill}>{item.level}</span>
                       </div>
                       <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
@@ -568,6 +574,9 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                   <div style={{ display: "grid", gap: 6 }}>
                     <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                       <span style={styles.levelPill}>{selectedLetter.level}</span>
+                      {selectedLetterPosition > 0 ? (
+                        <span style={styles.badge}>{`${selectedLetterPosition}/${filteredPracticeLetters.length}`}</span>
+                      ) : null}
                       <strong>{selectedLetter.letter}</strong>
                       <span style={styles.badge}>
                         {t("letterPractice.minuteTarget", {
