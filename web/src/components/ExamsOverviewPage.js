@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-import { useExam } from "../context/ExamContext";
-
-const LAST_SECTION_STORAGE_KEY = "falowen_exam_last_section";
 const EXAMS_OVERVIEW_HERO_IMAGE =
   "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000";
 const EXAM_TABS_OVERVIEW = [
@@ -51,21 +48,6 @@ const EXAM_TABS_OVERVIEW = [
 
 const ExamsOverviewPage = () => {
   const navigate = useNavigate();
-  const { level } = useExam();
-  const [lastSection, setLastSection] = useState("speaking");
-
-  useEffect(() => {
-    try {
-      const storedSection = localStorage.getItem(LAST_SECTION_STORAGE_KEY);
-      if (storedSection) {
-        setLastSection(storedSection);
-      }
-    } catch (error) {
-      console.warn("Failed to load exam overview storage", error);
-    }
-  }, []);
-
-  const resumeSection = lastSection || "speaking";
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -80,9 +62,13 @@ const ExamsOverviewPage = () => {
         }}
       >
         <p style={{ ...styles.helperText, margin: 0 }}>Exams Room overview</p>
-        <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>Start here for level {level}</h2>
+        <h2 style={{ ...styles.sectionTitle, margin: "6px 0" }}>Start here for your exam prep</h2>
         <p style={{ ...styles.helperText, margin: 0, color: "#e2e8f0" }}>
           Get a quick snapshot of your activity, then jump into the tab you need most today.
+        </p>
+        <p style={{ ...styles.helperText, margin: 0, color: "#e2e8f0" }}>
+          Start practicing in the Writing tab, then save a copy for your tutor so they can give
+          manual feedback while you prepare for your exam.
         </p>
         <p style={{ ...styles.helperText, margin: 0, color: "#cbd5e1", fontSize: 12 }}>
           Photo by{" "}
@@ -99,16 +85,16 @@ const ExamsOverviewPage = () => {
           <button
             type="button"
             style={styles.primaryButton}
-            onClick={() => navigate(`/exams/${resumeSection}`)}
+            onClick={() => navigate("/exams/writing")}
           >
-            Resume last session
+            Open writing practice
           </button>
           <button
             type="button"
             style={styles.secondaryButton}
-            onClick={() => navigate("/exams/speaking")}
+            onClick={() => navigate("/exams/writing")}
           >
-            Start speaking warm-up
+            Tutor feedback
           </button>
         </div>
       </section>
