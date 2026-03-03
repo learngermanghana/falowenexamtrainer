@@ -1,5 +1,6 @@
 import {
   addDoc,
+  arrayUnion,
   collection,
   doc,
   db,
@@ -58,6 +59,7 @@ export const saveExamLetterForTutorReview = async ({
   aiFeedback,
   revisedDraft,
   reflection,
+  source = "exam-room",
 }) => {
   const createdAt = new Date().toISOString();
   const ownerKey = String(studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "")
@@ -72,7 +74,7 @@ export const saveExamLetterForTutorReview = async ({
     className: studentProfile?.className || "",
     program: studentProfile?.program || "",
     level: level || "",
-    source: "exam-room",
+    source,
     ownerKey,
     reviewStatus: "pending",
     tutorFeedback: "",
@@ -135,6 +137,39 @@ export const saveTutorReviewResponse = async ({ reviewId, reviewStatus, tutorFee
     reviewStatus,
     tutorFeedback,
     reviewedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  return true;
+};
+
+export const saveStudentReplyToTutorReview = async ({
+  reviewId,
+  message,
+  studentName = "",
+  studentCode = "",
+} = {}) => {
+  if (!reviewId) {
+    throw new Error("Missing reviewId for student response.");
+  }
+
+  const trimmed = String(message || "").trim();
+  if (!trimmed) {
+    throw new Error("Write a message before sending your reply.");
+  }
+
+  if (!isFirebaseConfigured || !db) {
+    throw new Error("Student responses require Firebase/Firestore configuration.");
+  }
+
+  await updateDoc(doc(db, COLLECTION_NAME, reviewId), {
+    studentReplies: arrayUnion({
+      message: trimmed,
+      studentName,
+      studentCode,
+      senderRole: "student",
+      createdAt: new Date().toISOString(),
+    }),
     updatedAt: serverTimestamp(),
   });
 

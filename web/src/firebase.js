@@ -31,6 +31,7 @@ import {
   Timestamp,
   collectionGroup,
   deleteField,
+  arrayUnion,
 } from "firebase/firestore";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
@@ -279,4 +280,5 @@ export {
   Timestamp,
   collectionGroup,
   deleteField,
+  arrayUnion,
 };

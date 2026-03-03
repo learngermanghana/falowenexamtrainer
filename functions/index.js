@@ -165,7 +165,23 @@ const normalizeTutorReviewStatus = (value) => {
 const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterData = {} }) => {
   const beforeStatus = normalizeTutorReviewStatus(beforeData.reviewStatus || beforeData.status);
   const afterStatus = normalizeTutorReviewStatus(afterData.reviewStatus || afterData.status);
-  if (!afterStatus || afterStatus === "pending" || afterStatus === beforeStatus) {
+  const feedbackBefore = String(beforeData.tutorFeedback || beforeData.reviewComment || "").trim();
+  const feedbackAfter = String(afterData.tutorFeedback || afterData.reviewComment || "").trim();
+  const feedbackChanged = feedbackAfter && feedbackAfter !== feedbackBefore;
+  const statusChangedFromPending = afterStatus && afterStatus !== "pending" && afterStatus !== beforeStatus;
+
+  const beforeReplies = Array.isArray(beforeData.studentReplies) ? beforeData.studentReplies : [];
+  const afterReplies = Array.isArray(afterData.studentReplies) ? afterData.studentReplies : [];
+  const hasNewReply = afterReplies.length > beforeReplies.length;
+  const latestReply = hasNewReply ? afterReplies[afterReplies.length - 1] || {} : null;
+  const latestReplyRole = normalizeValue(latestReply?.senderRole || latestReply?.role || "");
+  const latestReplyStudentCode = normalizeStudentCode(latestReply?.studentCode || latestReply?.ownerKey || "");
+  const ownerStudentCode = normalizeStudentCode(afterData.studentCode || afterData.studentcode || afterData.ownerKey || "");
+  const replyLooksTutorAuthored =
+    hasNewReply &&
+    (latestReplyRole === "tutor" || (latestReplyRole !== "student" && latestReplyStudentCode && latestReplyStudentCode !== ownerStudentCode));
+
+  if (!statusChangedFromPending && !feedbackChanged && !replyLooksTutorAuthored) {
     return null;
   }
 
@@ -180,13 +196,22 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
 
   const reviewLabel = afterData.promptTitle || afterData.assignmentTitle || "your exam letter";
   const tutorFeedback = afterData.tutorFeedback || afterData.reviewComment || "";
+  const replyMessage = String(latestReply?.message || latestReply?.text || "").trim();
   const notification = {
-    title: afterStatus === "approved" ? "Tutor approved your exam letter" : "Tutor requested improvements",
+    title: replyLooksTutorAuthored
+      ? "Tutor replied to your question"
+      : afterStatus === "approved"
+        ? "Tutor approved your exam letter"
+        : afterStatus === "needs_improvement"
+          ? "Tutor requested improvements"
+          : "New tutor feedback is available",
     body: safeTruncate(
-      tutorFeedback ||
-        (afterStatus === "approved"
-          ? `${reviewLabel} is approved. Great work!`
-          : `${reviewLabel} has tutor feedback. Please review and revise.`),
+      replyLooksTutorAuthored
+        ? (replyMessage || `${reviewLabel} has a new tutor reply.`)
+        : tutorFeedback ||
+          (afterStatus === "approved"
+            ? `${reviewLabel} is approved. Great work!`
+            : `${reviewLabel} has tutor feedback. Please review and revise.`),
       140
     ),
   };
@@ -197,7 +222,8 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
     reviewStatus: afterStatus,
     studentCode: String(studentCode || ""),
     level: afterData.level || "",
-    route: "/exams/writing",
+    route: afterData.source === "campus-writing" ? "/campus/writing?tab=tutor" : "/exams/writing?tab=tutor",
+    hasNewReply: replyLooksTutorAuthored ? "1" : "0",
   };
 
   const tokenOwners = tokenInfo.docId
