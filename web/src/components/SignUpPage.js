@@ -70,7 +70,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("B1");
+  const [selectedLevel, setSelectedLevel] = useState("A1");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [address, setAddress] = useState("");

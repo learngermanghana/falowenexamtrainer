@@ -31,7 +31,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
   // signup-only fields
   const [name, setName] = useState("");
-  const [selectedLevel, setSelectedLevel] = useState("B1");
+  const [selectedLevel, setSelectedLevel] = useState("A1");
   const [phone, setPhone] = useState("");
   const [location, setLocation] = useState("");
   const [address, setAddress] = useState(""); // ✅ NEW
