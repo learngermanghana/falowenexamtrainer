@@ -29,6 +29,48 @@ function colToA1(colIdx0) {
   return s;
 }
 
+
+async function getTabSheetId(sheets, spreadsheetId, tabName) {
+  const meta = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: "sheets(properties(sheetId,title))",
+  });
+  const sheet = (meta.data.sheets || []).find(
+    (entry) => entry?.properties?.title === tabName
+  );
+  if (!sheet?.properties?.sheetId && sheet?.properties?.sheetId !== 0) {
+    throw new Error(`Sheet tab "${tabName}" not found in spreadsheet.`);
+  }
+  return sheet.properties.sheetId;
+}
+
+async function deleteDuplicateRows(sheets, spreadsheetId, tabName, rowNumbers) {
+  const uniqueSorted = Array.from(new Set(rowNumbers || []))
+    .filter((n) => Number.isInteger(n) && n > 1)
+    .sort((a, b) => b - a);
+  if (!uniqueSorted.length) return 0;
+
+  const tabSheetId = await getTabSheetId(sheets, spreadsheetId, tabName);
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: uniqueSorted.map((rowNumber) => ({
+        deleteDimension: {
+          range: {
+            sheetId: tabSheetId,
+            dimension: "ROWS",
+            startIndex: rowNumber - 1,
+            endIndex: rowNumber,
+          },
+        },
+      })),
+    },
+  });
+
+  return uniqueSorted.length;
+}
+
 async function getSheets() {
   const sa = getServiceAccount();
   const auth = new google.auth.JWT({
@@ -65,7 +107,14 @@ module.exports = async function handler(req, res) {
 
     // Map normalizedHeader -> columnIndex
     const headerIndex = new Map();
-    headers.forEach((h, i) => headerIndex.set(normalizeHeader(h), i));
+    headers.forEach((h, i) => {
+      const normalized = normalizeHeader(h);
+      // Keep first matching column to avoid duplicate headers in far-right columns
+      // (e.g. AH onward) overriding the intended A-based table layout.
+      if (normalized && !headerIndex.has(normalized)) {
+        headerIndex.set(normalized, i);
+      }
+    });
 
     // Helper: find a column by trying multiple aliases
     function findCol(...aliases) {
@@ -112,30 +161,50 @@ module.exports = async function handler(req, res) {
     });
     const codes = (codesRes.data.values || []).map((r) => (r?.[0] ? String(r[0]).trim() : ""));
 
-    let rowIndex0 = -1;
-    if (studentCode) rowIndex0 = codes.findIndex((v) => v === studentCode);
-
-    if (rowIndex0 === -1 && COL.UID !== undefined && uid) {
+    let uids = [];
+    if (COL.UID !== undefined) {
       const uidA1 = colToA1(COL.UID);
       const uRes = await sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
         range: `${TAB}!${uidA1}2:${uidA1}`,
       });
-      const uids = (uRes.data.values || []).map((r) => (r?.[0] ? String(r[0]).trim() : ""));
-      rowIndex0 = uids.findIndex((v) => v === uid);
+      uids = (uRes.data.values || []).map((r) => (r?.[0] ? String(r[0]).trim() : ""));
     }
 
-    if (rowIndex0 === -1 && COL.Email !== undefined && email) {
+    let emails = [];
+    if (COL.Email !== undefined) {
       const emailA1 = colToA1(COL.Email);
       const eRes = await sheets.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
         range: `${TAB}!${emailA1}2:${emailA1}`,
       });
-      const emails = (eRes.data.values || []).map((r) => (r?.[0] ? String(r[0]).trim() : ""));
-      rowIndex0 = emails.findIndex((v) => v.toLowerCase() === email.toLowerCase());
+      emails = (eRes.data.values || []).map((r) => (r?.[0] ? String(r[0]).trim() : ""));
     }
 
-    const rowNumber = rowIndex0 >= 0 ? rowIndex0 + 2 : null;
+    const matchedRows = new Set();
+    if (studentCode) {
+      codes.forEach((v, idx) => {
+        if (v === studentCode) matchedRows.add(idx + 2);
+      });
+    }
+    if (uid && uids.length) {
+      uids.forEach((v, idx) => {
+        if (v === uid) matchedRows.add(idx + 2);
+      });
+    }
+    if (email && emails.length) {
+      const emailLower = email.toLowerCase();
+      emails.forEach((v, idx) => {
+        if (String(v || "").toLowerCase() === emailLower) matchedRows.add(idx + 2);
+      });
+    }
+
+    const sortedMatches = Array.from(matchedRows).sort((a, b) => a - b);
+    const rowNumber = sortedMatches.length ? sortedMatches[0] : null;
+
+    if (sortedMatches.length > 1) {
+      await deleteDuplicateRows(sheets, SHEET_ID, TAB, sortedMatches.slice(1));
+    }
 
     const get = (k, alt) => (student[k] ?? student[alt] ?? "");
     const updates = [];

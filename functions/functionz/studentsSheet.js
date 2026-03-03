@@ -93,7 +93,9 @@ async function loadHeaderMap(sheets, sheetId, tabName) {
 
   headers.forEach((h, idx) => {
     const key = normalizeHeader(h);
-    if (key) headerMap.set(key, idx);
+    // Keep the first occurrence so duplicate headers farther right (e.g. AH, AI...)
+    // do not override canonical columns at the start of the sheet.
+    if (key && !headerMap.has(key)) headerMap.set(key, idx);
   });
 
   return { headers, headerMap };
@@ -117,6 +119,72 @@ async function getColumnValues(sheets, sheetId, tabName, colIdx0) {
   const values = res.data.values || [];
   // values is [["x"],["y"]...]
   return values.map((r) => (r && r[0] ? String(r[0]).trim() : ""));
+}
+
+async function getTabSheetId(sheets, spreadsheetId, tabName) {
+  const meta = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: "sheets(properties(sheetId,title))",
+  });
+  const sheet = (meta.data.sheets || []).find(
+    (entry) => entry?.properties?.title === tabName
+  );
+  if (!sheet?.properties?.sheetId && sheet?.properties?.sheetId !== 0) {
+    throw new Error(`Sheet tab "${tabName}" not found in spreadsheet.`);
+  }
+  return sheet.properties.sheetId;
+}
+
+async function deleteDuplicateRows(sheets, spreadsheetId, tabName, rowNumbers) {
+  const uniqueSorted = Array.from(new Set(rowNumbers || []))
+    .filter((n) => Number.isInteger(n) && n > 1)
+    .sort((a, b) => b - a);
+  if (!uniqueSorted.length) return 0;
+
+  const tabSheetId = await getTabSheetId(sheets, spreadsheetId, tabName);
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      requests: uniqueSorted.map((rowNumber) => ({
+        deleteDimension: {
+          range: {
+            sheetId: tabSheetId,
+            dimension: "ROWS",
+            startIndex: rowNumber - 1,
+            endIndex: rowNumber,
+          },
+        },
+      })),
+    },
+  });
+
+  return uniqueSorted.length;
+}
+
+function collectMatchingRows({ studentCodes = [], uids = [], emails = [], targetStudentCode = "", targetUid = "", targetEmail = "" }) {
+  const matches = new Set();
+
+  if (targetStudentCode) {
+    studentCodes.forEach((v, idx) => {
+      if (v === targetStudentCode) matches.add(idx + 2);
+    });
+  }
+
+  if (targetUid && uids.length) {
+    uids.forEach((v, idx) => {
+      if (v === targetUid) matches.add(idx + 2);
+    });
+  }
+
+  if (targetEmail && emails.length) {
+    const targetEmailLc = targetEmail.toLowerCase();
+    emails.forEach((v, idx) => {
+      if (String(v || "").toLowerCase() === targetEmailLc) matches.add(idx + 2);
+    });
+  }
+
+  return Array.from(matches).sort((a, b) => a - b);
 }
 
 async function upsertStudentToSheet(student) {
@@ -226,18 +294,23 @@ async function upsertStudentToSheet(student) {
   const targetEmail = String(student.email || "").trim();
   const enrollDateValue = student.enrollDate || student.joined_at || "";
 
-  let rowIndex0 = -1; // data index in arrays (0 means sheet row 2)
-  if (targetStudentCode) {
-    rowIndex0 = studentCodes.findIndex((v) => v === targetStudentCode);
-  }
-  if (rowIndex0 === -1 && targetUid && uids.length) {
-    rowIndex0 = uids.findIndex((v) => v === targetUid);
-  }
-  if (rowIndex0 === -1 && targetEmail && emails.length) {
-    rowIndex0 = emails.findIndex((v) => v.toLowerCase() === targetEmail.toLowerCase());
-  }
+  const matchedRows = collectMatchingRows({
+    studentCodes,
+    uids,
+    emails,
+    targetStudentCode,
+    targetUid,
+    targetEmail,
+  });
 
-  const sheetRowNumber = rowIndex0 >= 0 ? rowIndex0 + 2 : null;
+  let sheetRowNumber = matchedRows.length ? matchedRows[0] : null;
+
+  // If duplicates already exist (e.g. same student saved multiple times),
+  // keep the first row and remove the extra rows so future upserts stay stable.
+  if (matchedRows.length > 1) {
+    const duplicateRows = matchedRows.slice(1);
+    await deleteDuplicateRows(sheets, sheetId, tabName, duplicateRows);
+  }
 
   // Prepare cell updates (ONLY update columns that exist)
   const updates = [];
