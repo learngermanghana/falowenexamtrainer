@@ -9,6 +9,22 @@ export const WRITING_PROMPTS = {
       ],
     },
     {
+      "Thema": "Sie möchten am Sonntag Fahrrad fahren. Ihr deutscher Freund Moritz wohnt in Ihrer Stadt und fährt auch gern Fahrrad. Schreiben Sie Moritz eine E-Mail.",
+      "Punkte": [
+        "Warum schreiben Sie?",
+        "Fragen Sie: zusammen?",
+        "Sagen Sie: von wann bis wann haben Sie Zeit.",
+      ],
+    },
+    {
+      "Thema": "Ihr neuer Kollege, Herr Peter, hat Sie am Dienstag um 15 Uhr zu seiner Geburtstagsfeier im Büro eingeladen. Schreiben Sie an Herrn Peter.",
+      "Punkte": [
+        "Warum schreiben Sie?",
+        "Später kommen?",
+        "Helfen?",
+      ],
+    },
+    {
       "Thema": "Schreiben Sie eine Einladung an Ihren Freund zur Feier Ihres neuen Jobs.",
       "Punkte": [
         "Warum schreiben Sie?",
