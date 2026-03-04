@@ -162,15 +162,12 @@ const AssignmentSubmissionPage = () => {
     if (Array.isArray(studentProfile?.assignments)) studentProfile.assignments.forEach(addName);
     if (Array.isArray(studentProfile?.assignmentTitles)) studentProfile.assignmentTitles.forEach(addName);
 
-    if (studentProfile?.className) addName(`${studentProfile.className} Assignment`);
-
     return names.length ? names : ["General submission", "Standard assignment"];
   }, [
     assignmentDictionary,
     studentProfile?.assignmentTitle,
     studentProfile?.assignmentTitles,
     studentProfile?.assignments,
-    studentProfile?.className,
   ]);
 
   const [form, setForm] = useState({
