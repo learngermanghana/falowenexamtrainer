@@ -71,10 +71,14 @@ const getBaseMaxByLevel = (level) => BASE_MAX_BY_LEVEL[level] || 4200;
 
 const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
 
+const getFeedbackFromSubmission = (entry) =>
+  entry?.feedback || entry?.tutorFeedback || entry?.reviewFeedback || entry?.reviewNotes || "";
+
 const AssignmentSubmissionPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, studentProfile } = useAuth();
   const [badgeRefreshToken, setBadgeRefreshToken] = useState(0);
+  const [openedFeedbackId, setOpenedFeedbackId] = useState(null);
 
   const preferredLevel = useMemo(
     () => (studentProfile?.level || "A1").toUpperCase(),
@@ -159,6 +163,35 @@ const AssignmentSubmissionPage = () => {
   const [resubmissionText, setResubmissionText] = useState("");
   const [resubmissionImprovement, setResubmissionImprovement] = useState("");
   const [resubmissionStatus, setResubmissionStatus] = useState({ loading: false, error: "", success: "" });
+
+  const isGerman = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("de");
+  const uiText = useMemo(
+    () =>
+      isGerman
+        ? {
+            pageTitle: "Aufgabe einreichen",
+            pageHelper:
+              "Lade deine Lösung als Text hoch. Klasse, Niveau, Schülercode und E-Mail werden automatisch ergänzt.",
+            orientationOnly: "Nur Orientierungstag",
+            statusSubmittable: "Diese Aufgabe ist einreichbar",
+            statusNotSubmittable: "Diese Aufgabe ist nicht einreichbar",
+            reasonLabel: "Grund",
+            ctaFirstSubmission: "Reiche deine erste Aufgabe ein.",
+            quickOpenFeedback: "Feedback öffnen",
+          }
+        : {
+            pageTitle: "Submit Assignment",
+            pageHelper:
+              "Upload your solution as text. Your class, level, student code, and email are auto-filled to avoid mistakes.",
+            orientationOnly: "Orientation only",
+            statusSubmittable: "This assignment is submittable",
+            statusNotSubmittable: "This assignment is not submittable",
+            reasonLabel: "Reason",
+            ctaFirstSubmission: "Submit your first assignment.",
+            quickOpenFeedback: "Open feedback",
+          },
+    [isGerman]
+  );
 
   const lastAssignmentRef = useRef(assignmentOptions[0]);
   const autosaveTimerRef = useRef(null);
@@ -544,13 +577,37 @@ const AssignmentSubmissionPage = () => {
     };
   }, [form.assignmentTitle, preview, recentSubmissions]);
 
+  const maxUnlockedDay = useMemo(() => {
+    const availableDays = recentSubmissions
+      .map((entry) => Number(entry?.chapter))
+      .filter((value) => Number.isFinite(value) && value >= 0);
+    if (!availableDays.length) return 1;
+    return Math.max(1, ...availableDays) + 1;
+  }, [recentSubmissions]);
+
   const decoratedAssignmentOptions = useMemo(() => {
     return assignmentOptions.map((opt) => {
       const key = buildChapterKey(opt);
-      const locked = key ? lockedChapters.has(key) : false;
-      return { label: locked ? `${opt}  ✅ locked` : opt, value: opt, locked };
+      const submitted = key ? lockedChapters.has(key) : false;
+      const dayNumber = deriveChapterValue(opt);
+      const isDayZero = dayNumber === 0;
+      const isNotYetAvailable = Number.isFinite(dayNumber) && dayNumber > maxUnlockedDay;
+
+      let stateLabel = isGerman ? "Bereit zur Abgabe" : "Ready to submit";
+      if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
+      if (submitted) stateLabel = isGerman ? "Eingereicht" : "Submitted";
+      if (isNotYetAvailable) stateLabel = isGerman ? "Gesperrt (noch nicht verfügbar)" : "Locked (not yet available)";
+
+      return {
+        label: `${opt} — ${stateLabel}`,
+        value: opt,
+        submitted,
+        isDayZero,
+        isNotYetAvailable,
+        disabled: isDayZero || isNotYetAvailable,
+      };
     });
-  }, [assignmentOptions, buildChapterKey, lockedChapters]);
+  }, [assignmentOptions, buildChapterKey, deriveChapterValue, isGerman, lockedChapters, maxUnlockedDay]);
 
 
   const dynamicMaxSubmissionCharacters = useMemo(() => {
@@ -616,6 +673,31 @@ const AssignmentSubmissionPage = () => {
     [deriveChapterValue, form.assignmentTitle]
   );
   const isOrientationDay = selectedDayNumber === 0;
+  const selectedOptionMeta = useMemo(
+    () => decoratedAssignmentOptions.find((option) => option.value === form.assignmentTitle) || null,
+    [decoratedAssignmentOptions, form.assignmentTitle]
+  );
+  const selectedAssignmentEligibility = useMemo(() => {
+    if (selectedOptionMeta?.isDayZero) {
+      return {
+        submittable: false,
+        reason: isGerman ? "Nur Selbstübung" : "Self-practice only",
+      };
+    }
+    if (selectedOptionMeta?.isNotYetAvailable) {
+      return {
+        submittable: false,
+        reason: isGerman ? "Noch nicht verfügbar" : "Locked",
+      };
+    }
+    if (isSelectedLocked) {
+      return {
+        submittable: false,
+        reason: isGerman ? "Bereits eingereicht" : "Already submitted",
+      };
+    }
+    return { submittable: true, reason: isGerman ? "Bereit" : "Ready to submit" };
+  }, [isGerman, isSelectedLocked, selectedOptionMeta]);
   const assignmentInfo = useMemo(() => {
     const base = form.assignmentTitle || assignmentOptions[0] || "Assignment";
     return selectedDayNumber ? `${base} (Day ${selectedDayNumber})` : base;
@@ -927,9 +1009,9 @@ const AssignmentSubmissionPage = () => {
       </section>
       <div style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div>
-          <h2 style={styles.sectionTitle}>Submit Assignment</h2>
+          <h2 style={styles.sectionTitle}>{uiText.pageTitle}</h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Upload your solution as text. Your class, level, student code, and email are auto-filled to avoid mistakes.
+            {uiText.pageHelper}
           </p>
         </div>
 
@@ -952,7 +1034,7 @@ const AssignmentSubmissionPage = () => {
                 style={styles.select}
               >
                 {decoratedAssignmentOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
+                  <option key={opt.value} value={opt.value} disabled={opt.disabled} title={opt.disabled ? uiText.orientationOnly : ""}>
                     {opt.label}
                   </option>
                 ))}
@@ -968,7 +1050,7 @@ const AssignmentSubmissionPage = () => {
                       color: "#065f46",
                     }}
                   >
-                    Locked ✅ submitted on {formatDate(selectedLockInfo?.lockedAt || selectedPreview?.createdAt)}
+                    {(isGerman ? "Eingereicht am" : "Submitted on")} {formatDate(selectedLockInfo?.lockedAt || selectedPreview?.createdAt)}
                   </span>
                   <span style={styles.helperText}>This assignment is locked. Resubmission is available for THIS assignment only.</span>
                 </div>
@@ -998,6 +1080,22 @@ const AssignmentSubmissionPage = () => {
           </div>
 
           <div>
+            <div
+              style={{
+                border: "1px solid #e5e7eb",
+                borderRadius: 10,
+                background: selectedAssignmentEligibility.submittable ? "#ecfdf5" : "#fff7ed",
+                padding: "10px 12px",
+                marginBottom: 10,
+              }}
+            >
+              <div style={{ fontWeight: 700 }}>
+                {selectedAssignmentEligibility.submittable ? uiText.statusSubmittable : uiText.statusNotSubmittable}
+              </div>
+              <div style={styles.helperText}>
+                {uiText.reasonLabel}: {selectedAssignmentEligibility.reason}
+              </div>
+            </div>
             <label style={{ ...styles.field, margin: 0 }}>
               <span style={{ ...styles.label, display: "flex", alignItems: "center", gap: 8 }}>
                 Your text *
@@ -1021,6 +1119,9 @@ const AssignmentSubmissionPage = () => {
               />
               <span style={styles.helperText}>
                 Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
+              </span>
+              <span style={styles.helperText}>
+                {formatCharacterCount(form.submissionText.length)} / {formatCharacterCount(dynamicMaxSubmissionCharacters)} · {form.submissionText.length < MIN_SUBMISSION_CHARACTERS ? `Need ${MIN_SUBMISSION_CHARACTERS} minimum to submit.` : "Minimum reached."}
               </span>
             </label>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
@@ -1046,6 +1147,14 @@ const AssignmentSubmissionPage = () => {
             />
             <span style={{ ...styles.label, margin: 0 }}>I confirm this is the correct assignment.</span>
           </label>
+
+          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
+            <div style={{ fontWeight: 700, marginBottom: 6 }}>{isGerman ? "Einreichungsübersicht" : "Submission summary"}</div>
+            <div style={styles.helperText}>Assignment: {form.assignmentTitle || "–"}</div>
+            <div style={styles.helperText}>Class: {studentProfile?.className || "–"}</div>
+            <div style={styles.helperText}>Level: {preferredLevel}</div>
+            <div style={styles.helperText}>Student code: {studentCode || "–"}</div>
+          </div>
 
           <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
             <button
@@ -1126,6 +1235,19 @@ const AssignmentSubmissionPage = () => {
           <span style={styles.badge}>{isSelectedLocked ? "Available" : "Not available"}</span>
         </div>
 
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
+          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: !isSelectedLocked ? "#ecfdf5" : "#f9fafb" }}>
+            <strong>{isGerman ? "Noch nicht eingereicht" : "Not submitted yet"}</strong>
+            <div style={styles.helperText}>{!isSelectedLocked ? (isGerman ? "Aktueller Status" : "Current state") : ""}</div>
+          </div>
+          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: isSelectedLocked && !resubmissionStatus.success ? "#fff7ed" : "#f9fafb" }}>
+            <strong>{isGerman ? "Eingereicht – wartet auf Korrektur" : "Submitted – awaiting review"}</strong>
+          </div>
+          <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: isSelectedLocked ? "#ecfdf5" : "#f9fafb" }}>
+            <strong>{isGerman ? "Wiedereinreichung freigeschaltet" : "Resubmission unlocked"}</strong>
+          </div>
+        </div>
+
         {isSelectedLocked ? (
           <>
             <p style={{ ...styles.helperText, margin: 0 }}>
@@ -1203,7 +1325,7 @@ const AssignmentSubmissionPage = () => {
         </div>
 
         {recentSubmissions.length === 0 && !submissionsLoading ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>No submissions saved yet.</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>{uiText.ctaFirstSubmission}</p>
         ) : null}
 
         <div style={{ display: "grid", gap: 8 }}>
@@ -1225,10 +1347,27 @@ const AssignmentSubmissionPage = () => {
               </div>
               <div style={{ ...styles.helperText, margin: 0 }}>Class: {entry.className || "–"}</div>
               <div style={{ ...styles.helperText, margin: 0 }}>Saved: {formatDate(entry.createdAt)}</div>
+              <div style={{ ...styles.helperText, margin: 0 }}>
+                Status: {safeLower(entry.status) === "resubmitted" ? "pending" : getFeedbackFromSubmission(entry) ? "marked" : "pending"}
+              </div>
               {entry.submissionText ? (
                 <div style={{ ...styles.helperText, margin: 0 }}>
                   Preview: {String(entry.submissionText).slice(0, 110)}
                   {String(entry.submissionText).length > 110 ? "..." : ""}
+                </div>
+              ) : null}
+              {getFeedbackFromSubmission(entry) ? (
+                <button
+                  type="button"
+                  onClick={() => setOpenedFeedbackId((prev) => (prev === entry.id ? null : entry.id))}
+                  style={{ ...styles.secondaryButton, width: "fit-content", padding: "6px 10px" }}
+                >
+                  {uiText.quickOpenFeedback}
+                </button>
+              ) : null}
+              {openedFeedbackId === entry.id && getFeedbackFromSubmission(entry) ? (
+                <div style={{ ...styles.helperText, margin: 0, background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: 8 }}>
+                  {getFeedbackFromSubmission(entry)}
                 </div>
               ) : null}
             </div>
