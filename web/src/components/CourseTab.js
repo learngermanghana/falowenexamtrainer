@@ -299,13 +299,15 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       return String(entry.chapter || "").toLowerCase() === chapterFilter;
     };
 
-    return schedule.filter(
-      (entry) =>
-        matchesSearch(entry) &&
-        (!assignmentsOnly || hasAssignment(entry)) &&
-        (!unfinishedOnly || getStatusForDay(dayStatuses, entry.day) !== "submitted") &&
-        matchesSkill(entry) &&
-        matchesChapter(entry)
+    return sortByDay(
+      schedule.filter(
+        (entry) =>
+          matchesSearch(entry) &&
+          (!assignmentsOnly || hasAssignment(entry)) &&
+          (!unfinishedOnly || getStatusForDay(dayStatuses, entry.day) !== "submitted") &&
+          matchesSkill(entry) &&
+          matchesChapter(entry)
+      )
     );
   }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, skillFilter, unfinishedOnly]);
 
