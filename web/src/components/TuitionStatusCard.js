@@ -113,7 +113,7 @@ const TuitionStatusCard = ({
 
     const remaining = Math.max(maxPayable - amountToPay, 0);
     return t("accountSettings.tuition.afterPayment", { access: accessAfterPayment, remaining: formatMoney(remaining) });
-  }, [accessAfterPayment, amountToPay, formatMoney, isFinalTopUp, maxPayable, meetsMinimum]);
+  }, [accessAfterPayment, amountToPay, formatMoney, isFinalTopUp, maxPayable, meetsMinimum, t]);
 
   const canPay =
     paymentsEnabled &&
