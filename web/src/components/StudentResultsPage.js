@@ -322,6 +322,21 @@ const StudentResultsPage = () => {
     ];
   }, [assignmentProgress]);
 
+  const visibleProgressInsights = useMemo(() => {
+    const isA1Student = studentLevel === "A1";
+    const isA2ToC1Student = ["A2", "B1", "B2", "C1"].includes(studentLevel);
+
+    if (isA1Student) {
+      return progressInsights.filter((item) => item.label === "A1");
+    }
+
+    if (isA2ToC1Student) {
+      return progressInsights.filter((item) => item.label === "A2-B2");
+    }
+
+    return progressInsights;
+  }, [progressInsights, studentLevel]);
+
   const personalizationRecommendations = personalization?.recommendations || [];
   const personalizationHighlights = personalization?.highlights || [];
 
@@ -351,7 +366,7 @@ const StudentResultsPage = () => {
 
         {!loading && !error ? (
           <div style={{ display: "grid", gap: 10, marginTop: 6 }}>
-            {progressInsights.map((item) => (
+            {visibleProgressInsights.map((item) => (
               <div
                 key={item.label}
                 style={{
