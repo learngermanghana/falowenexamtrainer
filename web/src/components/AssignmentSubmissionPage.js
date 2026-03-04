@@ -581,7 +581,7 @@ const AssignmentSubmissionPage = () => {
     const availableDays = recentSubmissions
       .map((entry) => Number(entry?.chapter))
       .filter((value) => Number.isFinite(value) && value >= 0);
-    if (!availableDays.length) return 1;
+    if (!availableDays.length) return Number.POSITIVE_INFINITY;
     return Math.max(1, ...availableDays) + 1;
   }, [recentSubmissions]);
 
@@ -591,7 +591,8 @@ const AssignmentSubmissionPage = () => {
       const submitted = key ? lockedChapters.has(key) : false;
       const dayNumber = deriveChapterValue(opt);
       const isDayZero = dayNumber === 0;
-      const isNotYetAvailable = Number.isFinite(dayNumber) && dayNumber > maxUnlockedDay;
+      const isNotYetAvailable =
+        Number.isFinite(dayNumber) && Number.isFinite(maxUnlockedDay) && dayNumber > maxUnlockedDay;
 
       let stateLabel = isGerman ? "Bereit zur Abgabe" : "Ready to submit";
       if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
