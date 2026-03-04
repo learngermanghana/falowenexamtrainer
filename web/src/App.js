@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ALLOWED_LEVELS, ExamProvider, useExam } from "./context/ExamContext";
+import { ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
@@ -679,7 +679,7 @@ const ExamArea = ({ onBack }) => {
   const { t } = useTranslation();
   const { section } = useParams();
   const navigate = useNavigate();
-  const { level, setLevel } = useExam();
+  const { level } = useExam();
 
   const lastVisitStorageKey = "falowen_exam_last_visit";
   const lastSectionStorageKey = "falowen_exam_last_section";
@@ -767,22 +767,10 @@ const ExamArea = ({ onBack }) => {
             <p style={{ ...styles.helperText, margin: 0 }}>Exam level</p>
             <strong style={{ fontSize: 16 }}>{level}</strong>
           </div>
-          <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
-            <label htmlFor="exam-level-selector" style={styles.helperText}>
-              Switch level for all tabs
-            </label>
-            <select
-              id="exam-level-selector"
-              value={level}
-              onChange={(event) => setLevel(event.target.value)}
-              style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
-            >
-              {ALLOWED_LEVELS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
+          <div style={{ display: "grid", gap: 6, minWidth: 240 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Level is picked automatically from your student file.
+            </p>
           </div>
         </div>
       </div>
