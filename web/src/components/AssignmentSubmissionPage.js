@@ -465,7 +465,9 @@ const AssignmentSubmissionPage = () => {
           query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
         );
 
-        const entries = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const entries = submissionSnapshot.docs
+          .map((entry) => ({ id: entry.id, ...entry.data() }))
+          .filter((entry) => levelMatches(entry.level, preferredLevel));
         setRecentSubmissions(entries);
 
         // Locks
@@ -478,6 +480,8 @@ const AssignmentSubmissionPage = () => {
 
           lockSnapshot.docs.forEach((docSnap) => {
             const data = docSnap.data();
+            if (!levelMatches(data.level, preferredLevel)) return;
+
             const chapterKey =
               data.chapterKey ||
               buildChapterKey(data.assignmentTitle) ||
@@ -506,6 +510,8 @@ const AssignmentSubmissionPage = () => {
           const latestDrafts = {};
           draftSnapshot.docs.forEach((docSnap) => {
             const data = docSnap.data();
+            if (!levelMatches(data.level, preferredLevel)) return;
+
             const assignmentKey = data.assignmentTitle || data.title || assignmentOptions[0];
             if (!latestDrafts[assignmentKey]) latestDrafts[assignmentKey] = { id: docSnap.id, ...data };
           });
@@ -520,7 +526,7 @@ const AssignmentSubmissionPage = () => {
     };
 
     loadDraftsAndSubmissions();
-  }, [assignmentOptions, buildChapterKey, user?.uid]);
+  }, [assignmentOptions, buildChapterKey, preferredLevel, user?.uid]);
 
   // When assignment changes, pull draft text (if any) into editor.
   useEffect(() => {
