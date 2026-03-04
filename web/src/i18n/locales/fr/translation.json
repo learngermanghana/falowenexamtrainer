@@ -1252,6 +1252,30 @@
       "detailIncomplete": "{{count}} tâches manquées. Terminez-les pour débloquer le certificat.",
       "detailReady": "Aucune tâche échouée ou manquée",
       "failedCount_plural": "{{count}} éléments échoués"
+    },
+    "examStatusLabel": "Examens",
+    "statusFallback": "Statut",
+    "states": {
+      "ready": {
+        "text": "Prêt pour la période d’examen",
+        "detail": "Résultats réguliers (moyenne {{averageScore}}/100, {{passRate}}% de réussite) avec {{completionDetail}} et une bonne assiduité.",
+        "statusLabel": "Prêt"
+      },
+      "almost": {
+        "text": "Renforcez encore la marge",
+        "detail": "Visez 75+/100 sur les travaux récents et terminez au moins 5 identifiants marqués pour obtenir le statut vert.",
+        "detailWithTotal": "Visez 75+/100 sur les travaux récents et atteignez {{readyTarget}}/{{plannedTotal}} devoirs pour obtenir le statut vert.",
+        "statusLabel": "Presque prêt"
+      },
+      "notReady": {
+        "text": "Pas encore prêt",
+        "detail": "Soumettez plus de devoirs avec note pour activer le suivi de préparation.",
+        "detailWithTotal": "Terminez au moins {{almostTarget}}/{{plannedTotal}} devoirs avec notes et {{evidenceTarget}} éléments notés pour activer le suivi de préparation.",
+        "statusLabel": "Pas prêt"
+      }
     }
+  },
+  "navigationGuide": {
+    "message": "Utilisez les cartes du tableau de bord ci-dessous pour passer rapidement entre les cours, les devoirs et votre dossier d’examen."
   }
 }

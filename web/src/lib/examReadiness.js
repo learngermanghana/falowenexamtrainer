@@ -1,4 +1,15 @@
-export const computeExamReadiness = ({ attendanceSessions, completedAssignments, totalAssignments }) => {
+const fallbackTranslate = (key, optionsOrFallback) => {
+  if (typeof optionsOrFallback === "string") return optionsOrFallback;
+  if (optionsOrFallback && typeof optionsOrFallback === "object") return optionsOrFallback.defaultValue || key;
+  return key;
+};
+
+export const computeExamReadiness = ({
+  attendanceSessions,
+  completedAssignments,
+  totalAssignments,
+  t = fallbackTranslate,
+}) => {
   const completed = completedAssignments || [];
   const completedCount = completed.length;
   const plannedTotal = Number.isFinite(Number(totalAssignments)) ? Number(totalAssignments) : null;
@@ -36,9 +47,14 @@ export const computeExamReadiness = ({ attendanceSessions, completedAssignments,
     return {
       icon: "✅",
       tone: "#dcfce7",
-      text: "Ready for exam window",
-      detail: `Consistent scores (${averageScore}/100 avg, ${passRate ?? 0}% pass) with ${completionDetail} and solid attendance.`,
-      statusLabel: "Ready",
+      text: t("examReadiness.states.ready.text", "Ready for exam window"),
+      detail: t("examReadiness.states.ready.detail", {
+        averageScore,
+        passRate: passRate ?? 0,
+        completionDetail,
+        defaultValue: `Consistent scores (${averageScore}/100 avg, ${passRate ?? 0}% pass) with ${completionDetail} and solid attendance.`,
+      }),
+      statusLabel: t("examReadiness.states.ready.statusLabel", "Ready"),
       statusPillBg: "#dcfce7",
       statusPillBorder: "#86efac",
       statusPillText: "#166534",
@@ -58,11 +74,18 @@ export const computeExamReadiness = ({ attendanceSessions, completedAssignments,
     return {
       icon: "⚠️",
       tone: "#fef3c7",
-      text: "Build a stronger buffer",
+      text: t("examReadiness.states.almost.text", "Build a stronger buffer"),
       detail: plannedTotal
-        ? `Keep aiming for 75+/100 on recent work and reach ${readyTarget}/${plannedTotal} assignments for a green check.`
-        : "Keep aiming for 75+/100 on recent work and finish at least 5 marked identifiers for a green check.",
-      statusLabel: "Almost Ready",
+        ? t("examReadiness.states.almost.detailWithTotal", {
+            readyTarget,
+            plannedTotal,
+            defaultValue: `Keep aiming for 75+/100 on recent work and reach ${readyTarget}/${plannedTotal} assignments for a green check.`,
+          })
+        : t(
+            "examReadiness.states.almost.detail",
+            "Keep aiming for 75+/100 on recent work and finish at least 5 marked identifiers for a green check."
+          ),
+      statusLabel: t("examReadiness.states.almost.statusLabel", "Almost Ready"),
       statusPillBg: "#fef3c7",
       statusPillBorder: "#fcd34d",
       statusPillText: "#92400e",
@@ -73,11 +96,16 @@ export const computeExamReadiness = ({ attendanceSessions, completedAssignments,
   return {
     icon: "❌",
     tone: "#fee2e2",
-    text: "Not ready yet",
+    text: t("examReadiness.states.notReady.text", "Not ready yet"),
     detail: plannedTotal
-      ? `Complete at least ${almostTarget}/${plannedTotal} assignments with scores and ${evidenceTarget} scored items to unlock readiness tracking.`
-      : "Submit more assignments with scores to unlock readiness tracking.",
-    statusLabel: "Not ready",
+      ? t("examReadiness.states.notReady.detailWithTotal", {
+          almostTarget,
+          plannedTotal,
+          evidenceTarget,
+          defaultValue: `Complete at least ${almostTarget}/${plannedTotal} assignments with scores and ${evidenceTarget} scored items to unlock readiness tracking.`,
+        })
+      : t("examReadiness.states.notReady.detail", "Submit more assignments with scores to unlock readiness tracking."),
+    statusLabel: t("examReadiness.states.notReady.statusLabel", "Not ready"),
     statusPillBg: "#fee2e2",
     statusPillBorder: "#fca5a5",
     statusPillText: "#991b1b",

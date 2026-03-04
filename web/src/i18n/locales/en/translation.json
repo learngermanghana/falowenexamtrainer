@@ -1364,6 +1364,30 @@
       "detailIncomplete": "{{count}} missed items. Complete them to unlock certificate eligibility.",
       "detailReady": "No failed or missed assignments",
       "failedCount_plural": "{{count}} failed items"
+    },
+    "examStatusLabel": "Exams",
+    "statusFallback": "Status",
+    "states": {
+      "ready": {
+        "text": "Ready for exam window",
+        "detail": "Consistent scores ({{averageScore}}/100 avg, {{passRate}}% pass) with {{completionDetail}} and solid attendance.",
+        "statusLabel": "Ready"
+      },
+      "almost": {
+        "text": "Build a stronger buffer",
+        "detail": "Keep aiming for 75+/100 on recent work and finish at least 5 marked identifiers for a green check.",
+        "detailWithTotal": "Keep aiming for 75+/100 on recent work and reach {{readyTarget}}/{{plannedTotal}} assignments for a green check.",
+        "statusLabel": "Almost Ready"
+      },
+      "notReady": {
+        "text": "Not ready yet",
+        "detail": "Submit more assignments with scores to unlock readiness tracking.",
+        "detailWithTotal": "Complete at least {{almostTarget}}/{{plannedTotal}} assignments with scores and {{evidenceTarget}} scored items to unlock readiness tracking.",
+        "statusLabel": "Not ready"
+      }
     }
+  },
+  "navigationGuide": {
+    "message": "Use the dashboard cards below to jump quickly between classes, assignments, and your exam file."
   }
 }

@@ -1248,6 +1248,30 @@
       "detailIncomplete": "{{count}} verpasste Aufgaben. Schließe sie ab, um das Zertifikat freizuschalten.",
       "detailReady": "Keine fehlgeschlagenen oder verpassten Aufgaben",
       "failedCount_plural": "{{count}} fehlgeschlagene Aufgaben"
+    },
+    "examStatusLabel": "Prüfungen",
+    "statusFallback": "Status",
+    "states": {
+      "ready": {
+        "text": "Bereit für das Prüfungsfenster",
+        "detail": "Konstante Ergebnisse (Durchschnitt {{averageScore}}/100, {{passRate}}% bestanden) mit {{completionDetail}} und stabiler Anwesenheit.",
+        "statusLabel": "Bereit"
+      },
+      "almost": {
+        "text": "Puffer weiter ausbauen",
+        "detail": "Arbeite weiter auf 75+/100 in den letzten Aufgaben hin und schließe mindestens 5 markierte Kennungen für den grünen Status ab.",
+        "detailWithTotal": "Arbeite weiter auf 75+/100 in den letzten Aufgaben hin und erreiche {{readyTarget}}/{{plannedTotal}} Aufgaben für den grünen Status.",
+        "statusLabel": "Fast bereit"
+      },
+      "notReady": {
+        "text": "Noch nicht bereit",
+        "detail": "Reiche weitere bewertete Aufgaben ein, um die Bereitschaftsverfolgung zu aktivieren.",
+        "detailWithTotal": "Schließe mindestens {{almostTarget}}/{{plannedTotal}} Aufgaben mit Bewertungen und {{evidenceTarget}} bewertete Einträge ab, um die Bereitschaftsverfolgung zu aktivieren.",
+        "statusLabel": "Nicht bereit"
+      }
     }
+  },
+  "navigationGuide": {
+    "message": "Nutze die Dashboard-Karten unten, um schnell zwischen Klassen, Aufgaben und deiner Prüfungsakte zu wechseln."
   }
 }
