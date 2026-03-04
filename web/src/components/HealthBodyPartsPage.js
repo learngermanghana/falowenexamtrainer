@@ -130,22 +130,22 @@ const bodyParts = [
 ];
 
 const schmerzenExamples = [
-  "Ich habe Kopfschmerzen.",
-  "Ich habe Bauchschmerzen.",
-  "Ich habe Rückenschmerzen.",
-  "Ich habe Halsschmerzen.",
+  "Ich habe Kopfschmerzen. (I have a headache.)",
+  "Ich habe Bauchschmerzen. (I have a stomachache.)",
+  "Ich habe Rückenschmerzen. (I have back pain.)",
+  "Ich habe Halsschmerzen. (I have a sore throat.)",
 ];
 
 const wehExamplesSingular = [
-  "Mein Kopf tut mir weh.",
-  "Mein Rücken tut mir weh.",
-  "Mein Bauch tut mir weh.",
-  "Mein Hals tut mir weh.",
+  "Mein Kopf tut mir weh. (My head hurts / My head hurts me.)",
+  "Mein Rücken tut mir weh. (My back hurts / My back hurts me.)",
+  "Mein Bauch tut mir weh. (My stomach hurts / My stomach hurts me.)",
+  "Mein Hals tut mir weh. (My throat hurts / My throat hurts me.)",
 ];
 
 const wehExamplesPlural = [
-  "Meine Hände tun mir weh.",
-  "Meine Beine tun mir weh.",
+  "Meine Hände tun mir weh. (My hands hurt me.)",
+  "Meine Beine tun mir weh. (My legs hurt me.)",
 ];
 
 const healthQuestions = [
@@ -306,6 +306,9 @@ const HealthBodyPartsPage = () => {
           <p style={{ marginTop: 0 }}>
             Use: <strong>Ich habe + body part + Schmerzen.</strong>
           </p>
+          <p style={{ marginTop: 0 }}>
+            <strong>Schmerzen</strong> means <strong>"pain"</strong>.
+          </p>
           <BulletList items={schmerzenExamples} />
           <p style={{ marginBottom: 0 }}>
             Note: <strong>Schmerzen</strong> is plural.
@@ -319,6 +322,10 @@ const HealthBodyPartsPage = () => {
           <p style={{ margin: "0 0 8px" }}>
             <strong>Singular:</strong> Mein / Meine + body part +{" "}
             <strong>tut mir weh</strong>
+          </p>
+          <p style={{ margin: "0 0 8px" }}>
+            <strong>tut weh</strong> = <strong>"it hurts"</strong>, and{" "}
+            <strong>tut mir weh</strong> = <strong>"it hurts me"</strong>.
           </p>
           <BulletList items={wehExamplesSingular} marginBottom={10} />
 
