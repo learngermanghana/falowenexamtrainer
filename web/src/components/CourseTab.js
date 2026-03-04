@@ -10,8 +10,6 @@ import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
-import { useAuth } from "../context/AuthContext";
-import { db, doc, getDoc, isFirebaseConfigured, setDoc, serverTimestamp } from "../firebase";
 
 const ASSIGNMENT_STATUSES = {
   notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
@@ -190,34 +188,11 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
   return levels.filter((level) => allowed.has(level));
 };
 
-const resolveTodayTask = (schedule, getStatus) => {
-  const ordered = sortByDay(schedule);
-  if (!ordered.length) return null;
-
-  const inProgressAssignment = ordered.find(
-    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "inProgress"
-  );
-  if (inProgressAssignment) return inProgressAssignment;
-
-  const needsRedoAssignment = ordered.find(
-    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "needsRedo"
-  );
-  if (needsRedoAssignment) return needsRedoAssignment;
-
-  const nextPendingAssignment = ordered.find(
-    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) !== "submitted"
-  );
-  if (nextPendingAssignment) return nextPendingAssignment;
-
-  return ordered.find((entry) => getStatus(entry.day) !== "submitted") || ordered[ordered.length - 1];
-};
-
 const getStatusForDay = (dayStatuses, day) => dayStatuses[String(day)]?.value || "notStarted";
 
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user, studentProfile } = useAuth();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
