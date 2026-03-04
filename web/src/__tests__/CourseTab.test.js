@@ -21,6 +21,7 @@ jest.mock("../data/courseSchedules", () => ({
             {
               chapter: "1.1",
               type: "Lesen & Hören",
+              assignment: true,
               note: "Bring workbook.",
               youtube_link: youtubeLink,
               grammarbook_link: grammarbookLink,
@@ -64,5 +65,6 @@ describe("CourseTab", () => {
     );
 
     expect(screen.queryByRole("link", { name: /View externally/i })).not.toBeInTheDocument();
+    expect(screen.getByText("Tutor-marked assignment")).toBeInTheDocument();
   });
 });
