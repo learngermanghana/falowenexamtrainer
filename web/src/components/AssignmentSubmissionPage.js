@@ -72,6 +72,18 @@ const getBaseMaxByLevel = (level) => BASE_MAX_BY_LEVEL[level] || 4200;
 
 const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
 
+const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
+const hasAssignmentMarker = (entry) => {
+  if (!entry || typeof entry !== "object") return false;
+  if (entry.assignment) return true;
+  if (entry.assignmentId || entry.assignmentKey) return true;
+
+  return [entry.lesen_hören, entry.schreiben_sprechen].some((lessonGroup) =>
+    toLessonArray(lessonGroup).some((lesson) => lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey)
+  );
+};
+
 const getFeedbackFromSubmission = (entry) =>
   entry?.feedback || entry?.tutorFeedback || entry?.reviewFeedback || entry?.reviewNotes || "";
 
@@ -119,7 +131,7 @@ const AssignmentSubmissionPage = () => {
           chapter,
           occurrence,
           label,
-          assignment: Boolean(entry.assignment),
+          assignment: hasAssignmentMarker(entry),
         };
       });
   }, [preferredLevel]);
