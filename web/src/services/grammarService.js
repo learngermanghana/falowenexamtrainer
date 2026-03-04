@@ -2,12 +2,14 @@ import {
   addDoc,
   collection,
   db,
+  doc,
   getDocs,
   limit,
   orderBy,
   serverTimestamp,
   startAfter,
   query,
+  updateDoc,
 } from "../firebase";
 import { callAI } from "./aiClient";
 
@@ -15,13 +17,33 @@ const grammarAnswersCollection = (studentId) => collection(db, "students", stude
 
 const toMillis = (value) => (value?.toMillis ? value.toMillis() : value || null);
 
-const saveGrammarSubmission = async ({ studentId, question, level, answer }) => {
+const saveGrammarSubmission = async ({
+  studentId,
+  question,
+  level,
+  answer,
+  normalizedQuestion = "",
+  cleanedPrompt = "",
+  responseLanguage = "de_only",
+  responseMode = "short_exam",
+  promptTemplate = "",
+  tags = [],
+}) => {
   if (!db || !studentId) return null;
   return addDoc(grammarAnswersCollection(studentId), {
     studentId,
     question,
+    normalizedQuestion,
+    cleanedPrompt,
     level,
     answer,
+    responseLanguage,
+    responseMode,
+    promptTemplate,
+    pinned: false,
+    practiced: false,
+    tags,
+    issueReported: false,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
@@ -54,16 +76,29 @@ export const fetchGrammarHistory = async ({ studentId, pageSize = 10, cursor, id
 
 export async function askGrammarQuestion({
   question,
+  cleanedPrompt,
   level,
   studentId,
   program,
+  responseLanguage,
+  responseMode,
+  promptTemplate,
   idToken,
   timeoutMs = 20000,
 }) {
   try {
     const response = await callAI({
       path: "/grammar/ask",
-      payload: { question, level, studentId, program },
+      payload: {
+        question,
+        cleanedPrompt,
+        level,
+        studentId,
+        program,
+        responseLanguage,
+        responseMode,
+        promptTemplate,
+      },
       idToken,
       timeoutMs,
     });
@@ -72,8 +107,13 @@ export async function askGrammarQuestion({
       await saveGrammarSubmission({
         studentId,
         question,
+        normalizedQuestion: cleanedPrompt || "",
+        cleanedPrompt: response?.cleanedPrompt || cleanedPrompt || question,
         level,
         answer: response?.answer || "",
+        responseLanguage,
+        responseMode,
+        promptTemplate,
       });
     } catch (loggingError) {
       console.error("Failed to save grammar submission", loggingError);
@@ -88,3 +128,12 @@ export async function askGrammarQuestion({
     throw error;
   }
 }
+
+export const updateGrammarHistoryEntry = async ({ studentId, entryId, patch }) => {
+  if (!db || !studentId || !entryId || !patch || typeof patch !== "object") return;
+  const targetRef = doc(db, "students", studentId, "grammar_answers", entryId);
+  await updateDoc(targetRef, {
+    ...patch,
+    updatedAt: serverTimestamp(),
+  });
+};

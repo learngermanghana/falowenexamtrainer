@@ -1407,12 +1407,23 @@ app.post("/grammar/ask", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const { question, level = "A2", studentId, program } = req.body || {};
+    const {
+      question,
+      cleanedPrompt,
+      level = "A2",
+      studentId,
+      program,
+      responseLanguage = "de_only",
+      responseMode = "short_exam",
+      promptTemplate = "",
+    } = req.body || {};
     const trimmedQuestion = String(question || "").trim();
+    const trimmedCleanedPrompt = String(cleanedPrompt || "").trim();
     const trimmedStudentId = typeof studentId === "string" ? studentId.trim() : "";
 
     const validationError =
       validateString(trimmedQuestion, { required: true, maxLength: 400, label: "question" }) ||
+      validateString(trimmedCleanedPrompt, { maxLength: 500, label: "cleanedPrompt" }) ||
       validateString(level, { maxLength: 10, label: "level" });
 
     if (validationError) return res.status(400).json({ error: validationError });
@@ -1429,9 +1440,28 @@ app.post("/grammar/ask", async (req, res) => {
       return res.status(429).json({ error: "Daily grammar question limit reached" });
     }
 
+    const validLanguageModes = ["de_only", "de_gloss", "en_support"];
+    const validResponseModes = ["short_exam", "detailed", "correction_only"];
+    const selectedResponseLanguage = validLanguageModes.includes(responseLanguage)
+      ? responseLanguage
+      : "de_only";
+    const selectedResponseMode = validResponseModes.includes(responseMode)
+      ? responseMode
+      : "short_exam";
+
+    const finalQuestion = trimmedCleanedPrompt || trimmedQuestion;
+
     const messages = [
-      { role: "system", content: grammarPrompt({ level, program }) },
-      { role: "user", content: trimmedQuestion },
+      {
+        role: "system",
+        content: grammarPrompt({
+          level,
+          program,
+          responseLanguage: selectedResponseLanguage,
+          responseMode: selectedResponseMode,
+        }),
+      },
+      { role: "user", content: finalQuestion },
     ];
 
     const answer = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 450 });
@@ -1439,7 +1469,11 @@ app.post("/grammar/ask", async (req, res) => {
     const db = getFirestoreSafe();
     const logEntry = {
       question: trimmedQuestion,
+      cleanedPrompt: finalQuestion,
       level,
+      responseLanguage: selectedResponseLanguage,
+      responseMode: selectedResponseMode,
+      promptTemplate: String(promptTemplate || "").trim(),
       source: "grammar-tab",
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     };
@@ -1458,10 +1492,22 @@ app.post("/grammar/ask", async (req, res) => {
       route: "/grammar/ask",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level, studentId: trimmedStudentId, quotaRemaining: quota.remaining },
+      metadata: {
+        level,
+        studentId: trimmedStudentId,
+        quotaRemaining: quota.remaining,
+        responseLanguage: selectedResponseLanguage,
+        responseMode: selectedResponseMode,
+      },
     });
 
-    return res.json({ answer, quotaRemaining: quota.remaining });
+    return res.json({
+      answer,
+      cleanedPrompt: finalQuestion,
+      responseLanguage: selectedResponseLanguage,
+      responseMode: selectedResponseMode,
+      quotaRemaining: quota.remaining,
+    });
   } catch (err) {
     console.error("/grammar/ask error", err);
     auditAIRequest({

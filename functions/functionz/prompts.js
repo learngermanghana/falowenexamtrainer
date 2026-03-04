@@ -129,20 +129,46 @@ const LETTER_COACH_PROMPTS = {
   ),
 };
 
-const grammarPrompt = ({ level, program }) => {
+const grammarPrompt = ({ level, program, responseLanguage = "de_only", responseMode = "short_exam" }) => {
+  const languageInstructionMap = {
+    de_only:
+      "Write in German only. Keep wording very simple for A1 learners and avoid advanced vocabulary unless asked.",
+    de_gloss:
+      "Write in German first and add a short English gloss in parentheses for key words or phrases.",
+    en_support:
+      "Use mostly German and add brief English support when needed for clarity.",
+  };
+
+  const modeInstructionMap = {
+    short_exam:
+      "Response mode: Short exam style. Use 2-4 concise lines and only the essentials.",
+    detailed:
+      "Response mode: Detailed explanation. Explain the rule step by step, but keep each step short and clear.",
+    correction_only:
+      "Response mode: Only correction. Provide corrected text first, then one short reason.",
+  };
+
+  const languageInstruction =
+    languageInstructionMap[responseLanguage] || languageInstructionMap.de_only;
+  const modeInstruction = modeInstructionMap[responseMode] || modeInstructionMap.short_exam;
+
   if (program === "french") {
     return (
       "You are a concise French grammar coach for language learners. " +
-      "Explain rules simply in English, then give 1–2 short French examples with quick English glosses. " +
+      "Support A1 learners with short sentences and practical examples. " +
       "Avoid long lists; focus on the student's exact question and show how to fix it. " +
+      `${languageInstruction} ${modeInstruction} ` +
+      "Always end with: 'Try this next:' and give exactly one follow-up exercise. " +
       `Keep it practical for a ${level} learner.`
     );
   }
 
   return (
     "You are a concise German grammar coach for language learners. " +
-    "Explain rules simply in English, then give 1–2 short German examples with quick English glosses. " +
+    "Support A1 learners with short, practical guidance and corrections. " +
     "Avoid long lists; focus on the student's exact question and show how to fix it. " +
+    `${languageInstruction} ${modeInstruction} ` +
+    "Always end with: 'Try this next:' and give exactly one follow-up exercise. " +
     `Keep it practical for a ${level} learner.`
   );
 };
