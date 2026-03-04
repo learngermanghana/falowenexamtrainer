@@ -10,6 +10,7 @@ import { fetchPersonalizedPlan } from "../services/personalizationService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
+const PASS_MARK = 60;
 
 const StudentResultsPage = () => {
   const { t } = useTranslation();
@@ -236,22 +237,91 @@ const StudentResultsPage = () => {
 
   const assignmentProgress = useMemo(() => {
     const normalizeAssignment = (value) => String(value || "").trim().toLowerCase();
-    const uniqueAssignments = (levels) => {
-      const set = new Set();
+    const toNumericScore = (value) => {
+      if (typeof value === "number") return Number.isFinite(value) ? value : null;
+      if (typeof value === "string") {
+        const parsed = Number(value.replace(/[^\d.+-]+/g, ""));
+        return Number.isFinite(parsed) ? parsed : null;
+      }
+      return null;
+    };
+
+    const buildAssignmentStatus = (levels) => {
+      const bestByAssignment = new Map();
       results.forEach((entry) => {
         const level = String(entry.level || "").toUpperCase();
         if (!levels.includes(level)) return;
         const assignmentKey = normalizeAssignment(entry.assignment);
-        if (assignmentKey) set.add(assignmentKey);
+        if (!assignmentKey) return;
+        const score = toNumericScore(entry.score);
+        const currentBest = bestByAssignment.get(assignmentKey);
+        if (score !== null && (typeof currentBest !== "number" || score > currentBest)) {
+          bestByAssignment.set(assignmentKey, score);
+        } else if (currentBest === undefined) {
+          bestByAssignment.set(assignmentKey, null);
+        }
       });
-      return set.size;
+
+      let completed = 0;
+      let failed = 0;
+      bestByAssignment.forEach((bestScore) => {
+        if (typeof bestScore === "number" && bestScore >= PASS_MARK) completed += 1;
+        else failed += 1;
+      });
+
+      return {
+        completed,
+        failed,
+      };
     };
 
+    const a1 = buildAssignmentStatus(["A1"]);
+    const a2b2 = buildAssignmentStatus(["A2", "B1", "B2"]);
+
     return {
-      a1Completed: uniqueAssignments(["A1"]),
-      a2b2Completed: uniqueAssignments(["A2", "B1", "B2"]),
+      a1Completed: a1.completed,
+      a1Failed: a1.failed,
+      a2b2Completed: a2b2.completed,
+      a2b2Failed: a2b2.failed,
     };
   }, [results]);
+
+  const progressInsights = useMemo(() => {
+    const buildProgress = (label, completed, total, failed = 0) => {
+      const safeCompleted = Math.max(0, Math.min(completed, total));
+      const percent = total > 0 ? Math.round((safeCompleted / total) * 100) : 0;
+      const remaining = Math.max(total - safeCompleted, 0);
+
+      let milestoneCopy;
+      if (remaining === 0) {
+        milestoneCopy = "Milestone reached: this level is complete 🎉";
+      } else if (safeCompleted === 0) {
+        milestoneCopy = "Next milestone: complete your first assignment.";
+      } else if (remaining <= 3) {
+        milestoneCopy = `Next milestone: ${remaining} more assignment${remaining === 1 ? "" : "s"} to finish ${label}.`;
+      } else {
+        milestoneCopy = `Next milestone: complete ${Math.min(5, remaining)} more assignment${Math.min(5, remaining) === 1 ? "" : "s"} in ${label}.`;
+      }
+
+      if (failed > 0) {
+        milestoneCopy += ` Retry ${failed} assignment${failed === 1 ? "" : "s"} below ${PASS_MARK}%.`;
+      }
+
+      return {
+        label,
+        completed: safeCompleted,
+        total,
+        percent,
+        failed,
+        milestoneCopy,
+      };
+    };
+
+    return [
+      buildProgress("A1", assignmentProgress.a1Completed, TOTAL_ASSIGNMENTS.A1, assignmentProgress.a1Failed),
+      buildProgress("A2-B2", assignmentProgress.a2b2Completed, TOTAL_ASSIGNMENTS.A2_B2, assignmentProgress.a2b2Failed),
+    ];
+  }, [assignmentProgress]);
 
   const personalizationRecommendations = personalization?.recommendations || [];
   const personalizationHighlights = personalization?.highlights || [];
@@ -281,10 +351,54 @@ const StudentResultsPage = () => {
         </p>
 
         {!loading && !error ? (
-          <p style={{ ...styles.helperText, marginTop: 6 }}>
-            Assignments completed · A1 {assignmentProgress.a1Completed}/{TOTAL_ASSIGNMENTS.A1} · A2-B2{" "}
-            {assignmentProgress.a2b2Completed}/{TOTAL_ASSIGNMENTS.A2_B2}
-          </p>
+          <div style={{ display: "grid", gap: 10, marginTop: 6 }}>
+            {progressInsights.map((item) => (
+              <div
+                key={item.label}
+                style={{
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 10,
+                  padding: "10px 12px",
+                  background: "#f9fafb",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
+                    {item.label}
+                  </p>
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    {item.completed}/{item.total}
+                  </p>
+                </div>
+                <div
+                  aria-hidden="true"
+                  style={{
+                    marginTop: 8,
+                    width: "100%",
+                    height: 8,
+                    borderRadius: 999,
+                    overflow: "hidden",
+                    background: "#e5e7eb",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${item.percent}%`,
+                      height: "100%",
+                      background: "linear-gradient(90deg, #2563eb 0%, #14b8a6 100%)",
+                    }}
+                  />
+                </div>
+                <p style={{ ...styles.helperText, margin: "8px 0 0 0" }}>
+                  {item.percent}% complete · {item.milestoneCopy}
+                </p>
+                <p style={{ ...styles.helperText, margin: "6px 0 0 0", color: "#6b7280" }}>
+                  Completion counts passed assignments (score ≥ {PASS_MARK}%).
+                  {item.failed > 0 ? ` ${item.failed} need${item.failed === 1 ? "s" : ""} a retry.` : ""}
+                </p>
+              </div>
+            ))}
+          </div>
         ) : null}
 
         {!loading && !error ? (
