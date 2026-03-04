@@ -230,7 +230,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [unfinishedOnly, setUnfinishedOnly] = useState(false);
   const [skillFilter, setSkillFilter] = useState("all");
   const [chapterFilter, setChapterFilter] = useState("all");
-  const [collapsedDays, setCollapsedDays] = useState({});
   const [dayStatuses, setDayStatuses] = useState({});
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
 
@@ -519,7 +518,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       : [];
                     const status = getStatusForDay(dayStatuses, entry.day);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
-                    const isCollapsed = Boolean(collapsedDays[String(entry.day)]);
                     const isTutorMarked = isTutorMarkedEntry(entry);
 
                     return (
@@ -567,57 +565,45 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          style={styles.secondaryButton}
-                          onClick={() => setCollapsedDays((prev) => ({ ...prev, [String(entry.day)]: !prev[String(entry.day)] }))}
-                        >
-                          {isCollapsed ? t("courseTab.expand") : t("courseTab.collapse")}
-                        </button>
+                        {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
+                        {entry.instruction ? (
+                          <div style={{ display: "grid", gap: 6 }}>
+                            <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
+                            <p style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-line" }}>
+                              {entry.instruction}
+                            </p>
+                            {entry.instructionLink ? (
+                              <a
+                                href={entry.instructionLink.to}
+                                style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
+                              >
+                                {entry.instructionLink.label || RESOURCE_ACTION_LABELS.guideOpenInApp}
+                              </a>
+                            ) : null}
+                          </div>
+                        ) : null}
 
-                        {isCollapsed ? null : (
-                          <>
-                            {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-                            {entry.instruction ? (
-                              <div style={{ display: "grid", gap: 6 }}>
-                                <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
-                                <p style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-line" }}>
-                                  {entry.instruction}
-                                </p>
-                                {entry.instructionLink ? (
-                                  <a
-                                    href={entry.instructionLink.to}
-                                    style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
-                                  >
-                                    {entry.instructionLink.label || RESOURCE_ACTION_LABELS.guideOpenInApp}
-                                  </a>
-                                ) : null}
-                              </div>
-                            ) : null}
+                        <LessonList title="Lesen & Hören" lessons={lesenHorenList} t={t} />
+                        <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} t={t} />
 
-                            <LessonList title="Lesen & Hören" lessons={lesenHorenList} t={t} />
-                            <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} t={t} />
-
-                            {entry.schreiben ? (
-                              <div style={{ display: "grid", gap: 6 }}>
-                                <h4 style={{ margin: 0 }}>Schreiben</h4>
-                                <p style={{ margin: 0 }}>{entry.schreiben}</p>
-                              </div>
-                            ) : null}
-                            {entry.sprechen ? (
-                              <div style={{ display: "grid", gap: 6 }}>
-                                <h4 style={{ margin: 0 }}>Sprechen</h4>
-                                <p style={{ margin: 0 }}>{entry.sprechen}</p>
-                              </div>
-                            ) : null}
-                            {entry.zusatzmaterial ? (
-                              <div style={{ display: "grid", gap: 6 }}>
-                                <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
-                                <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
-                              </div>
-                            ) : null}
-                          </>
-                        )}
+                        {entry.schreiben ? (
+                          <div style={{ display: "grid", gap: 6 }}>
+                            <h4 style={{ margin: 0 }}>Schreiben</h4>
+                            <p style={{ margin: 0 }}>{entry.schreiben}</p>
+                          </div>
+                        ) : null}
+                        {entry.sprechen ? (
+                          <div style={{ display: "grid", gap: 6 }}>
+                            <h4 style={{ margin: 0 }}>Sprechen</h4>
+                            <p style={{ margin: 0 }}>{entry.sprechen}</p>
+                          </div>
+                        ) : null}
+                        {entry.zusatzmaterial ? (
+                          <div style={{ display: "grid", gap: 6 }}>
+                            <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
+                            <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
+                          </div>
+                        ) : null}
                       </div>
                     );
                   })}
