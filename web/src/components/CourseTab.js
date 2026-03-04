@@ -27,6 +27,7 @@ const hasTutorMarkedWork = (entry) => {
     toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
   );
 };
+const isTutorMarkedEntry = (entry) => hasTutorMarkedWork(entry);
 
 const extractLevelToken = (value) => {
   if (!value) return "";
@@ -321,16 +322,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const todayTask = useMemo(
     () =>
-      schedule.find((entry) => entry.assignment && getStatusForDay(dayStatuses, entry.day) !== "submitted") ||
+      schedule.find((entry) => isTutorMarkedEntry(entry) && getStatusForDay(dayStatuses, entry.day) !== "submitted") ||
       filteredSchedule[0],
     [dayStatuses, filteredSchedule, schedule]
   );
 
   const overview = useMemo(() => {
     const daysCompleted = schedule.filter((entry) => getStatusForDay(dayStatuses, entry.day) === "submitted").length;
-    const totalAssignments = schedule.filter((entry) => entry.assignment).length;
+    const totalAssignments = schedule.filter((entry) => isTutorMarkedEntry(entry)).length;
     const assignmentsSubmitted = schedule.filter(
-      (entry) => entry.assignment && getStatusForDay(dayStatuses, entry.day) === "submitted"
+      (entry) => isTutorMarkedEntry(entry) && getStatusForDay(dayStatuses, entry.day) === "submitted"
     ).length;
     let streak = 0;
     for (const entry of schedule) {
@@ -494,7 +495,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
                 </p>
 
-                {todayTask?.assignment ? (
+                {todayTask && isTutorMarkedEntry(todayTask) ? (
                   <button
                     type="button"
                     style={styles.primaryButton}
@@ -519,6 +520,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const status = getStatusForDay(dayStatuses, entry.day);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isCollapsed = Boolean(collapsedDays[String(entry.day)]);
+                    const isTutorMarked = isTutorMarkedEntry(entry);
 
                     return (
                       <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
@@ -532,17 +534,15 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </div>
 
                           <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                            {entry.assignment !== undefined ? (
-                              <span
-                                style={{
-                                  ...styles.badge,
-                                  background: entry.assignment ? "#fee2e2" : "#dcfce7",
-                                  color: entry.assignment ? "#991b1b" : "#166534",
-                                }}
-                              >
-                                {entry.assignment ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
-                              </span>
-                            ) : null}
+                            <span
+                              style={{
+                                ...styles.badge,
+                                background: isTutorMarked ? "#fee2e2" : "#dcfce7",
+                                color: isTutorMarked ? "#991b1b" : "#166534",
+                              }}
+                            >
+                              {isTutorMarked ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
+                            </span>
                             <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
                               {t(statusMeta.key)}
                             </span>
