@@ -309,7 +309,51 @@
     }
   },
   "courseTab": {
-    "instructionLabel": "Instruction"
+    "instructionLabel": "Instruction",
+    "title": "Cours",
+    "subtitle": "Consulte le plan mis à jour et continue ton prochain devoir requis.",
+    "level": "Niveau du cours :",
+    "submit": "Soumettre le devoir",
+    "todayTask": "Tâche du jour",
+    "metrics": {
+      "days": "Jours complétés : {{completed}}/{{total}}",
+      "assignments": "Devoirs soumis : {{submitted}}/{{total}}",
+      "streak": "Série en cours : {{count}}",
+      "lastActivity": "Dernière activité : {{date}}"
+    },
+    "searchLabel": "Rechercher par jour, sujet ou grammaire",
+    "searchPlaceholder": "ex. Day 4 ou Pronouns",
+    "assignmentsOnly": "Avec devoir",
+    "unfinishedOnly": "Non terminé seulement",
+    "filterBySkill": "Filtrer par compétence",
+    "filterByChapter": "Filtrer par chapitre",
+    "all": "Tous",
+    "jump": {
+      "week1": "Day 1–7",
+      "week2": "Day 8–14",
+      "revision": "Révision",
+      "assignmentDue": "Devoir dû"
+    },
+    "continueAssignment": "Continuer le prochain devoir requis",
+    "chapter": "Chapitre",
+    "tutorMarked": "Devoir corrigé par le tuteur",
+    "selfPractice": "Auto-pratique seulement",
+    "fromClassSchedule": "Depuis le planning de classe",
+    "expand": "Développer le jour",
+    "collapse": "Réduire le jour",
+    "noResults": "Aucun jour ne correspond aux filtres. Essaie une autre recherche ou retire un filtre.",
+    "assignment": "Devoir",
+    "resources": "Ressources",
+    "status": {
+      "notStarted": "Non commencé",
+      "inProgress": "En cours",
+      "submitted": "Soumis",
+      "needsRedo": "À refaire"
+    },
+    "nav": {
+      "courseBook": "Cours",
+      "classMembers": "Membres de classe"
+    }
   },
   "planPage": {
     "meta": {
