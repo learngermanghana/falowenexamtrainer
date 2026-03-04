@@ -87,6 +87,18 @@ const toDateValue = (timestamp) => {
 
 const getBaseMaxByLevel = (level) => BASE_MAX_BY_LEVEL[level] || 4200;
 
+const normalizeLevel = (level) => {
+  const normalized = String(level || "").toUpperCase();
+  return ALLOWED_LEVELS.includes(normalized) ? normalized : "GENERAL";
+};
+
+const levelMatches = (entryLevel, selectedLevel) => {
+  const normalizedEntryLevel = normalizeLevel(entryLevel);
+  const normalizedSelectedLevel = normalizeLevel(selectedLevel);
+
+  return normalizedEntryLevel === "GENERAL" || normalizedEntryLevel === normalizedSelectedLevel;
+};
+
 const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
