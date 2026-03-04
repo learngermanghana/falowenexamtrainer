@@ -130,13 +130,15 @@ const LETTER_COACH_PROMPTS = {
 };
 
 const grammarPrompt = ({ level, program, responseLanguage = "de_only", responseMode = "short_exam" }) => {
+  const targetLanguage = program === "french" ? "French" : "German";
+
   const languageInstructionMap = {
     de_only:
-      "Write in German only. Keep wording very simple for A1 learners and avoid advanced vocabulary unless asked.",
+      `Write in ${targetLanguage} only. Keep wording at the student's level and avoid advanced vocabulary unless asked.`,
     de_gloss:
-      "Write in German first and add a short English gloss in parentheses for key words or phrases.",
+      `Write in ${targetLanguage} first and add short English glosses in parentheses for key words or phrases.`,
     en_support:
-      "Use mostly German and add brief English support when needed for clarity.",
+      `Use English as the main explanation language, but include short ${targetLanguage} examples that directly answer the question.`,
   };
 
   const modeInstructionMap = {
@@ -155,7 +157,7 @@ const grammarPrompt = ({ level, program, responseLanguage = "de_only", responseM
   if (program === "french") {
     return (
       "You are a concise French grammar coach for language learners. " +
-      "Support A1 learners with short sentences and practical examples. " +
+      "Adapt to the learner's CEFR level and keep examples practical. " +
       "Avoid long lists; focus on the student's exact question and show how to fix it. " +
       `${languageInstruction} ${modeInstruction} ` +
       "Always end with: 'Try this next:' and give exactly one follow-up exercise. " +
@@ -165,7 +167,7 @@ const grammarPrompt = ({ level, program, responseLanguage = "de_only", responseM
 
   return (
     "You are a concise German grammar coach for language learners. " +
-    "Support A1 learners with short, practical guidance and corrections. " +
+    "Adapt to the learner's CEFR level and keep guidance practical. " +
     "Avoid long lists; focus on the student's exact question and show how to fix it. " +
     `${languageInstruction} ${modeInstruction} ` +
     "Always end with: 'Try this next:' and give exactly one follow-up exercise. " +

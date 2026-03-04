@@ -9,9 +9,9 @@ import {
 import { styles } from "../styles";
 
 const levelOptions = ["A1", "A2", "B1", "B2", "C1", "C2"];
-const languageOptions = [
-  { value: "de_only", label: "Deutsch only" },
-  { value: "de_gloss", label: "Deutsch + gloss" },
+const buildLanguageOptions = (languageLabel) => [
+  { value: "de_only", label: `${languageLabel} only` },
+  { value: "de_gloss", label: `${languageLabel} + gloss` },
   { value: "en_support", label: "English support" },
 ];
 const responseModes = [
@@ -65,6 +65,7 @@ const GrammarQuestionTab = () => {
   const [lastPayload, setLastPayload] = useState(null);
   const isFrenchProgram = studentProfile?.program === "french";
   const languageLabel = isFrenchProgram ? t("programLanguages.french") : t("programLanguages.german");
+  const languageOptions = useMemo(() => buildLanguageOptions(languageLabel), [languageLabel]);
   const examplePrompt = isFrenchProgram
     ? t("grammarQuestionTab.examplePrompt.french")
     : t("grammarQuestionTab.examplePrompt.german");
