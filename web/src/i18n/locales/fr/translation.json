@@ -1321,5 +1321,100 @@
   },
   "navigationGuide": {
     "message": "Utilisez les cartes du tableau de bord ci-dessous pour passer rapidement entre les cours, les devoirs et votre dossier d’examen."
+  },
+  "accountSettings": {
+    "noProfile": "Nous n'avons pas encore trouvé vos données de compte. Merci de réessayer bientôt.",
+    "overview": {
+      "title": "Aperçu du compte",
+      "subtitle": "Vue rapide de vos informations principales.",
+      "renewal": "Prochain renouvellement : {{date}}"
+    },
+    "profile": {
+      "title": "Paramètres du compte",
+      "adminManaged": "Votre nom et votre e-mail de connexion sont gérés par l'administration. Utilisez le support pour demander des modifications.",
+      "requestChange": "Demander un changement de profil",
+      "supportSubject": "Demande de modification du profil",
+      "supportBody": "Bonjour équipe Falowen,%0D%0A%0D%0AMerci de m'aider à mettre à jour mes informations de profil.%0D%0ANom : {{name}}%0D%0AE-mail : {{email}}%0D%0ACode étudiant : {{studentCode}}%0D%0A%0D%0AMerci.",
+      "biographyLabel": "Biographie de classe",
+      "biographyPlaceholder": "Écrivez 2 à 4 phrases sur votre travail, vos objectifs ou vos loisirs.",
+      "correcting": "L'IA améliore ...",
+      "correctCta": "Corriger avec l'IA",
+      "saving": "Enregistrement ...",
+      "save": "Enregistrer les modifications",
+      "lastSaved": "Dernière sauvegarde : {{time}}",
+      "bioSaved": "Biographie enregistrée avec succès.",
+      "bioError": "Impossible d'enregistrer le profil.",
+      "bioEmpty": "Ajoutez une courte biographie avant de demander la correction IA.",
+      "bioAiApplied": "Suggestions IA appliquées à votre biographie.",
+      "bioCorrectError": "Impossible de corriger votre biographie."
+    },
+    "billing": {
+      "title": "Abonnement et facturation",
+      "subtitle": "Informations de paiement essentielles en un coup d'œil.",
+      "balanceTitle": "Solde et frais",
+      "email": "E-mail de facturation : {{email}}",
+      "addEmail": "ajouter un e-mail",
+      "statusActive": "Actif",
+      "statusPending": "En attente",
+      "paymentMethodWeb": "Portail web",
+      "nextRenewal": "Prochain renouvellement",
+      "countdown": "Compte à rebours du renouvellement",
+      "inDays": "dans {{count}} jours",
+      "dueNow": "à payer maintenant",
+      "renewalMode": "Mode de renouvellement",
+      "autoRenew": "Automatique",
+      "manualRenew": "Manuel",
+      "policySummary": "Les renouvellements suivent la durée de votre contrat. Pour modifier les conditions ou arrêter les renouvellements futurs, contactez le support avant la date de renouvellement.",
+      "alertToday": "Votre accès se termine aujourd'hui et il reste {{amount}} à payer. Veuillez effectuer un paiement pour conserver l'accès.",
+      "alertDays": "Il reste {{amount}} à payer et il vous reste {{daysLabel}}. Veuillez effectuer un paiement pour conserver l'accès.",
+      "contract": {
+        "sixMonth": "Contrat de 6 mois",
+        "oneMonth": "Accès d'un mois",
+        "paymentRequired": "Paiement requis"
+      },
+      "transaction": {
+        "title": "Historique des transactions",
+        "empty": "Aucune transaction pour le moment.",
+        "channel": "Canal",
+        "reference": "Référence",
+        "status": "Statut",
+        "statusCompleted": "terminé",
+        "receipt": "Ouvrir le reçu"
+      }
+    },
+    "tuition": {
+      "tuition": "Frais de cours",
+      "paidSoFar": "Déjà payé",
+      "balanceRemaining": "Solde restant",
+      "noBalance": "Aucun solde dû.",
+      "finalTopUp": "Dernier complément : payer {{amount}} finalise vos frais et vous donne {{access}} d'accès.",
+      "enterAmount": "Saisissez un montant (min {{min}} ou payer le solde restant).",
+      "minimumRule": "Le minimum est {{min}}, sauf si vous payez le solde restant de {{remaining}}.",
+      "afterPayment": "Après ce paiement : accès pendant {{access}}. Solde restant : {{remaining}}.",
+      "graceEnded": "La période de grâce de paiement est terminée.",
+      "graceDays": "Fenêtre de paiement : {{count}} jour restant.",
+      "graceDays_plural": "Fenêtre de paiement : {{count}} jours restants.",
+      "graceBody": "Veuillez payer dans les 7 jours suivant l'inscription. Sans paiement, vos données étudiantes seront supprimées après 7 jours.",
+      "finalPayment": "Paiement final",
+      "finalPaymentHelp": "Votre solde restant est inférieur au minimum de versement {{min}}, vous pouvez donc payer le montant exact.",
+      "opening": "Ouverture de Paystack ...",
+      "payToFinish": "Payer {{amount}} pour terminer",
+      "amountNow": "Montant à payer maintenant",
+      "amountPlaceholder": "Min {{min}} (ou payer le solde)",
+      "payOutstanding": "Payer le solde restant maintenant ({{amount}})",
+      "payOnline": "Payer les frais en ligne",
+      "webOnlyTitle": "Les paiements sont disponibles uniquement sur l'application web.",
+      "webOnlyBody": "Pour payer ou renouveler votre contrat, veuillez utiliser l'application web. Les paiements sont masqués dans l'application Android pour respecter les règles du Play Store."
+    },
+    "upgrade": {
+      "title": "Progression de niveau",
+      "description": "Niveau {{currentLevel}} terminé ? Passez à {{nextLevel}}. Frais du niveau suivant : {{amount}}.",
+      "button": "Passer à {{nextLevel}}",
+      "upgrading": "Mise à niveau ...",
+      "success": "Vous êtes maintenant au niveau {{level}}. Veuillez payer pour débloquer l'accès.",
+      "error": "Impossible de mettre à niveau le niveau.",
+      "maxedOut": "Vous êtes déjà au niveau le plus élevé disponible.",
+      "clearBalance": "Veuillez d'abord régler votre solde actuel."
+    }
   }
 }

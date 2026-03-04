@@ -1433,5 +1433,100 @@
   },
   "navigationGuide": {
     "message": "Use the dashboard cards below to jump quickly between classes, assignments, and your exam file."
+  },
+  "accountSettings": {
+    "noProfile": "We couldn't find account data yet. Please try again shortly.",
+    "overview": {
+      "title": "Account overview",
+      "subtitle": "Quick view of your key info.",
+      "renewal": "Next renewal: {{date}}"
+    },
+    "profile": {
+      "title": "Account settings",
+      "adminManaged": "Your name and login email are admin-managed. Use support to request profile changes.",
+      "requestChange": "Request profile change",
+      "supportSubject": "Profile change request",
+      "supportBody": "Hello Falowen team,%0D%0A%0D%0APlease help me update my profile details.%0D%0AName: {{name}}%0D%0AEmail: {{email}}%0D%0AStudent code: {{studentCode}}%0D%0A%0D%0AThank you.",
+      "biographyLabel": "Class biography",
+      "biographyPlaceholder": "Write 2-4 sentences about your work, goals, or hobbies.",
+      "correcting": "AI is polishing ...",
+      "correctCta": "Correct with AI",
+      "saving": "Saving ...",
+      "save": "Save changes",
+      "lastSaved": "Last saved: {{time}}",
+      "bioSaved": "Biography saved successfully.",
+      "bioError": "Could not save profile.",
+      "bioEmpty": "Please add a short bio before asking the AI to correct it.",
+      "bioAiApplied": "AI suggestions applied to your bio.",
+      "bioCorrectError": "Could not correct your biography."
+    },
+    "billing": {
+      "title": "Subscription & billing",
+      "subtitle": "Essential billing info at a glance.",
+      "balanceTitle": "Balance & tuition",
+      "email": "Billing email: {{email}}",
+      "addEmail": "add an email",
+      "statusActive": "Active",
+      "statusPending": "Pending",
+      "paymentMethodWeb": "Web portal",
+      "nextRenewal": "Next renewal",
+      "countdown": "Renewal countdown",
+      "inDays": "in {{count}} days",
+      "dueNow": "due now",
+      "renewalMode": "Renewal mode",
+      "autoRenew": "Automatic",
+      "manualRenew": "Manual",
+      "policySummary": "Renewals follow your contract term. You can switch terms or stop future renewals by contacting support before the renewal date.",
+      "alertToday": "Your access ends today and you still owe {{amount}}. Please make a payment to keep access.",
+      "alertDays": "You still owe {{amount}} and have {{daysLabel}} left. Please make a payment to keep access.",
+      "contract": {
+        "sixMonth": "6-month contract",
+        "oneMonth": "1-month access",
+        "paymentRequired": "Payment required"
+      },
+      "transaction": {
+        "title": "Transaction history",
+        "empty": "No transactions yet.",
+        "channel": "Channel",
+        "reference": "Reference",
+        "status": "Status",
+        "statusCompleted": "completed",
+        "receipt": "Open receipt"
+      }
+    },
+    "tuition": {
+      "tuition": "Tuition",
+      "paidSoFar": "Paid so far",
+      "balanceRemaining": "Balance remaining",
+      "noBalance": "No balance due.",
+      "finalTopUp": "Final top-up: paying {{amount}} completes your tuition and gives access for {{access}}.",
+      "enterAmount": "Enter an amount (min {{min}}, or pay the remaining balance).",
+      "minimumRule": "Minimum is {{min}} unless you're paying the remaining {{remaining}}.",
+      "afterPayment": "After this payment: access for {{access}}. Remaining balance: {{remaining}}.",
+      "graceEnded": "Payment grace period ended.",
+      "graceDays": "Payment window: {{count}} day left.",
+      "graceDays_plural": "Payment window: {{count}} days left.",
+      "graceBody": "Please make payment within 7 days of signup. If no payment is made, your student data will be deleted after 7 days.",
+      "finalPayment": "Final payment",
+      "finalPaymentHelp": "Your remaining balance is below the {{min}} installment minimum, so you can pay the exact balance to finish.",
+      "opening": "Opening Paystack ...",
+      "payToFinish": "Pay {{amount}} to finish",
+      "amountNow": "Amount to pay now",
+      "amountPlaceholder": "Min {{min}} (or pay remaining)",
+      "payOutstanding": "Pay outstanding balance now ({{amount}})",
+      "payOnline": "Pay tuition online",
+      "webOnlyTitle": "Payments are only available on the web app.",
+      "webOnlyBody": "To pay or renew your contract, please visit the web app. Payments are hidden in the Android app to meet Play Store rules."
+    },
+    "upgrade": {
+      "title": "Level progression",
+      "description": "Completed {{currentLevel}}? Move to {{nextLevel}}. Next level tuition: {{amount}}.",
+      "button": "Upgrade to {{nextLevel}}",
+      "upgrading": "Upgrading ...",
+      "success": "You're now on {{level}}. Please complete payment to unlock access.",
+      "error": "Could not upgrade level.",
+      "maxedOut": "You're already at the highest available level.",
+      "clearBalance": "Clear your current balance before moving to the next level."
+    }
   }
 }
