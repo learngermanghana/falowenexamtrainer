@@ -112,9 +112,28 @@ const AssignmentSubmissionPage = () => {
         const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
         const label = `Day ${entry.day}${duplicateSuffix}: ${entry.topic}${chapterSuffix}`;
 
-        return { day: entry.day, topic: entry.topic, chapter, occurrence, label };
+        return {
+          day: entry.day,
+          topic: entry.topic,
+          chapter,
+          occurrence,
+          label,
+          assignment: Boolean(entry.assignment),
+        };
       });
   }, [preferredLevel]);
+
+  const assignmentRequiredDaysLabel = useMemo(() => {
+    const assignmentDays = assignmentDictionary
+      .filter((entry) => entry.assignment)
+      .map((entry) => entry.day)
+      .filter((day, index, arr) => arr.indexOf(day) === index)
+      .sort((a, b) => Number(a) - Number(b));
+
+    if (!assignmentDays.length) return "";
+
+    return assignmentDays.map((day) => `Day ${day}`).join(", ");
+  }, [assignmentDictionary]);
 
   const assignmentOptions = useMemo(() => {
     const names = [];
@@ -124,7 +143,7 @@ const AssignmentSubmissionPage = () => {
       if (!names.includes(label)) names.push(label);
     };
 
-    assignmentDictionary.forEach(({ label }) => addName(label));
+    assignmentDictionary.filter(({ assignment }) => assignment).forEach(({ label }) => addName(label));
     addName(studentProfile?.assignmentTitle);
 
     if (Array.isArray(studentProfile?.assignments)) studentProfile.assignments.forEach(addName);
@@ -1063,6 +1082,11 @@ const AssignmentSubmissionPage = () => {
               {isOrientationDay ? (
                 <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#b45309" }}>
                   Day 0 is orientation only, so submissions are disabled for this selection.
+                </p>
+              ) : null}
+              {assignmentRequiredDaysLabel ? (
+                <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                  Assignment-required days from the course book: {assignmentRequiredDaysLabel}
                 </p>
               ) : null}
             </div>
