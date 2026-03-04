@@ -1,10 +1,48 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
-import { askGrammarQuestion, fetchGrammarHistory } from "../services/grammarService";
+import {
+  askGrammarQuestion,
+  fetchGrammarHistory,
+  reportGrammarIssue,
+  updateGrammarHistoryEntry,
+} from "../services/grammarService";
 import { styles } from "../styles";
 
 const levelOptions = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const languageOptions = [
+  { value: "de_only", label: "Deutsch only" },
+  { value: "de_gloss", label: "Deutsch + gloss" },
+  { value: "en_support", label: "English support" },
+];
+const responseModes = [
+  { value: "short_exam", label: "Short (exam style)" },
+  { value: "detailed", label: "Detailed explanation" },
+  { value: "correction_only", label: "Only correction" },
+];
+const templateActions = [
+  { key: "correct_sentence", label: "Correct this sentence", prefix: "Correct this sentence:" },
+  {
+    key: "grammar_simple",
+    label: "Explain this grammar rule simply",
+    prefix: "Explain this grammar rule simply:",
+  },
+  { key: "a1_examples", label: "Give 5 A1 examples", prefix: "Give 5 A1 examples for:" },
+  { key: "mini_quiz", label: "Make a mini quiz", prefix: "Make a mini quiz about:" },
+];
+const topicTags = ["verbs", "cases", "word order"];
+
+const typoMap = {
+  conjuagte: "conjugate",
+  conjuagtion: "conjugation",
+  grammer: "grammar",
+  sentense: "sentence",
+  articel: "article",
+  detials: "details",
+};
+
+const normalizePrompt = (text = "") =>
+  text.replace(/\b([a-zA-Z]+)\b/g, (token) => typoMap[token.toLowerCase()] || token);
 
 const GrammarQuestionTab = () => {
   const { t } = useTranslation();
@@ -22,6 +60,11 @@ const GrammarQuestionTab = () => {
   const [sortOrder, setSortOrder] = useState("newest");
   const [levelFilter, setLevelFilter] = useState("all");
   const [keywordFilter, setKeywordFilter] = useState("");
+  const [responseLanguage, setResponseLanguage] = useState("de_only");
+  const [responseMode, setResponseMode] = useState("short_exam");
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [lastPayload, setLastPayload] = useState(null);
+  const [issueStatusById, setIssueStatusById] = useState({});
   const isFrenchProgram = studentProfile?.program === "french";
   const languageLabel = isFrenchProgram ? t("programLanguages.french") : t("programLanguages.german");
   const examplePrompt = isFrenchProgram
@@ -96,14 +139,19 @@ const GrammarQuestionTab = () => {
     return filtered
       .slice()
       .sort((a, b) => {
+        if (Boolean(a.pinned) !== Boolean(b.pinned)) return a.pinned ? -1 : 1;
         const aTime = a.createdAt || 0;
         const bTime = b.createdAt || 0;
         return sortOrder === "newest" ? bTime - aTime : aTime - bTime;
       });
   }, [history, keywordFilter, levelFilter, sortOrder]);
 
-  const submitQuestion = async ({ questionText, levelValue }) => {
+  const cleanedPrompt = useMemo(() => normalizePrompt(question).trim(), [question]);
+  const hasPromptCleanup = question.trim() && cleanedPrompt !== question.trim();
+
+  const submitQuestion = async ({ questionText, levelValue, template = "" }) => {
     const trimmedQuestion = questionText.trim();
+    const normalizedQuestion = normalizePrompt(trimmedQuestion).trim();
     if (!trimmedQuestion) {
       setError(t("grammarQuestionTab.errors.missingQuestion"));
       return;
@@ -113,20 +161,36 @@ const GrammarQuestionTab = () => {
       setIsLoading(true);
       setError("");
       setAnswer("");
-      const { answer: reply } = await askGrammarQuestion({
+      const payload = {
         question: trimmedQuestion,
+        cleanedPrompt: normalizedQuestion,
         level: levelValue,
         idToken,
         studentId: studentProfile?.id,
         program: studentProfile?.program,
+        responseLanguage,
+        responseMode,
+        promptTemplate: template,
+      };
+      setLastPayload(payload);
+      const { answer: reply } = await askGrammarQuestion({
+        ...payload,
       });
       setAnswer(reply);
       setHistory((prev) => [
         {
           id: `local-${Date.now()}`,
           question: trimmedQuestion,
+          cleanedPrompt: normalizedQuestion,
           level: levelValue,
           answer: reply,
+          responseLanguage,
+          responseMode,
+          promptTemplate: template,
+          pinned: false,
+          practiced: false,
+          issueReported: false,
+          tags: [],
           createdAt: Date.now(),
         },
         ...prev,
@@ -140,13 +204,65 @@ const GrammarQuestionTab = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    submitQuestion({ questionText: question, levelValue: level });
+    submitQuestion({ questionText: question, levelValue: level, template: selectedTemplate });
   };
 
   const handleReask = (entry) => {
     setQuestion(entry.question || "");
     if (entry.level) setLevel(entry.level);
-    submitQuestion({ questionText: entry.question || "", levelValue: entry.level || level });
+    submitQuestion({
+      questionText: entry.question || "",
+      levelValue: entry.level || level,
+      template: entry.promptTemplate || "",
+    });
+  };
+
+  const handleRetry = async () => {
+    if (!lastPayload) return;
+    submitQuestion({
+      questionText: lastPayload.question,
+      levelValue: lastPayload.level,
+      template: lastPayload.promptTemplate,
+    });
+  };
+
+  const patchHistoryEntry = async (entryId, patch) => {
+    setHistory((prev) => prev.map((entry) => (entry.id === entryId ? { ...entry, ...patch } : entry)));
+    if (!studentProfile?.id || String(entryId).startsWith("local-")) return;
+    try {
+      await updateGrammarHistoryEntry({ studentId: studentProfile.id, entryId, patch });
+    } catch (err) {
+      console.error("Failed to update grammar history entry", err);
+    }
+  };
+
+  const applyTemplate = (templateConfig) => {
+    setSelectedTemplate(templateConfig.key);
+    setQuestion((prev) => {
+      const trimmed = prev.trim();
+      if (!trimmed) return `${templateConfig.prefix} `;
+      if (trimmed.toLowerCase().startsWith(templateConfig.prefix.toLowerCase())) return prev;
+      return `${templateConfig.prefix} ${trimmed}`;
+    });
+  };
+
+  const handleReportIssue = async (entry) => {
+    if (!entry?.id || !studentProfile?.id || issueStatusById[entry.id] === "saving") return;
+
+    setIssueStatusById((prev) => ({ ...prev, [entry.id]: "saving" }));
+    try {
+      await reportGrammarIssue({
+        studentId: studentProfile.id,
+        entry,
+        idToken,
+      });
+      await patchHistoryEntry(entry.id, { issueReported: true });
+      setIssueStatusById((prev) => ({ ...prev, [entry.id]: "saved" }));
+    } catch (err) {
+      console.error("Failed to report grammar issue", err);
+      setIssueStatusById((prev) => ({ ...prev, [entry.id]: "error" }));
+      setError(err.message || "Could not report this answer issue.");
+    }
   };
 
   return (
@@ -172,6 +288,34 @@ const GrammarQuestionTab = () => {
               ))}
             </select>
           </label>
+          <label style={styles.field}>
+            <span style={styles.label}>Response language</span>
+            <select
+              value={responseLanguage}
+              onChange={(e) => setResponseLanguage(e.target.value)}
+              style={{ ...styles.select, maxWidth: 240 }}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label style={styles.field}>
+            <span style={styles.label}>Answer quality</span>
+            <select
+              value={responseMode}
+              onChange={(e) => setResponseMode(e.target.value)}
+              style={{ ...styles.select, maxWidth: 240 }}
+            >
+              {responseModes.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
         <div style={styles.field}>
@@ -184,12 +328,41 @@ const GrammarQuestionTab = () => {
           />
         </div>
 
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {templateActions.map((templateConfig) => (
+            <button
+              key={templateConfig.key}
+              type="button"
+              style={{
+                ...styles.secondaryButton,
+                borderColor: selectedTemplate === templateConfig.key ? "#2563eb" : "#d1d5db",
+                color: selectedTemplate === templateConfig.key ? "#1d4ed8" : "#111827",
+              }}
+              onClick={() => applyTemplate(templateConfig)}
+            >
+              {templateConfig.label}
+            </button>
+          ))}
+        </div>
+
+        {hasPromptCleanup ? (
+          <div style={{ ...styles.resultCard, background: "#f8fafc" }}>
+            <p style={{ ...styles.label, marginBottom: 4 }}>Cleaned prompt preview</p>
+            <p style={{ ...styles.resultText, margin: 0 }}>{cleanedPrompt}</p>
+          </div>
+        ) : null}
+
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <button type="submit" style={styles.primaryButton} disabled={isLoading}>
             {isLoading ? t("grammarQuestionTab.submitLoading") : t("grammarQuestionTab.submit")}
           </button>
           {isLoading ? (
-            <span style={{ fontSize: 13, color: "#4b5563" }}>{t("grammarQuestionTab.waiting")}</span>
+            <span style={{ fontSize: 13, color: "#4b5563" }}>Coach is thinking…</span>
+          ) : null}
+          {!isLoading && error ? (
+            <button type="button" style={styles.secondaryButton} onClick={handleRetry}>
+              Retry
+            </button>
           ) : null}
         </div>
       </form>
@@ -274,6 +447,67 @@ const GrammarQuestionTab = () => {
                 <strong>{t("grammarQuestionTab.entryAnswerPrefix")}:</strong>{" "}
                 {entry.answer || t("grammarQuestionTab.pendingResponse")}
               </p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 8 }}>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => navigator.clipboard?.writeText(entry.answer || "")}
+                >
+                  Copy corrected answer
+                </button>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => patchHistoryEntry(entry.id, { pinned: !entry.pinned })}
+                >
+                  {entry.pinned ? "Unpin" : "Pin/Save"}
+                </button>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => patchHistoryEntry(entry.id, { practiced: !entry.practiced })}
+                >
+                  {entry.practiced ? "Practiced" : "Mark as practiced"}
+                </button>
+                <button
+                  type="button"
+                  style={styles.secondaryButton}
+                  onClick={() => handleReportIssue(entry)}
+                  disabled={Boolean(entry.issueReported) || issueStatusById[entry.id] === "saving"}
+                >
+                  {entry.issueReported
+                    ? "Issue reported"
+                    : issueStatusById[entry.id] === "saving"
+                    ? "Reporting..."
+                    : "Report answer issue"}
+                </button>
+              </div>
+              {issueStatusById[entry.id] === "saved" ? (
+                <p style={{ ...styles.helperText, marginTop: 6 }}>
+                  Saved to Firestore issue queue for tutor/admin review.
+                </p>
+              ) : null}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                {topicTags.map((tag) => {
+                  const tags = Array.isArray(entry.tags) ? entry.tags : [];
+                  const isActive = tags.includes(tag);
+                  const nextTags = isActive ? tags.filter((value) => value !== tag) : [...tags, tag];
+                  return (
+                    <button
+                      key={`${entry.id}-${tag}`}
+                      type="button"
+                      style={{
+                        ...styles.secondaryButton,
+                        borderColor: isActive ? "#2563eb" : "#d1d5db",
+                        color: isActive ? "#1d4ed8" : "#374151",
+                      }}
+                      onClick={() => patchHistoryEntry(entry.id, { tags: nextTags })}
+                    >
+                      #{tag}
+                    </button>
+                  );
+                })}
+              </div>
               <p style={{ ...styles.helperText, marginTop: 6 }}>
                 {t("grammarQuestionTab.askedAt", { date: formatDate(entry.createdAt) })}
               </p>
