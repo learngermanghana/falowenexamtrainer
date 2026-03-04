@@ -98,6 +98,19 @@ const HealthBodyPartsPage = () => {
       {/* PART 1 */}
       <Section title="Part 1: Two Ways to Say You Are Not Feeling Well">
         <div style={boxStyle}>
+          <strong>Body Parts Vocabulary (Singular + Plural)</strong>
+          <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0 }}>
+            <li>der Kopf → die Köpfe (head → heads)</li>
+            <li>die Hand → die Hände (hand → hands)</li>
+            <li>das Bein → die Beine (leg → legs)</li>
+            <li>der Arm → die Arme (arm → arms)</li>
+            <li>der Bauch → die Bäuche (stomach/belly → stomachs/bellies)</li>
+            <li>der Rücken → die Rücken (back → backs)</li>
+            <li>der Hals → die Hälse (throat/neck → throats/necks)</li>
+          </ul>
+        </div>
+
+        <div style={boxStyle}>
           <strong>1) Using “Ich habe … Schmerzen”</strong>
           <p style={{ marginTop: 8 }}>
             Use: <strong>Ich habe + body part + Schmerzen.</strong>
