@@ -344,8 +344,7 @@
     "nav": {
       "courseBook": "Course book",
       "classMembers": "Class members"
-    },
-    "todayTaskHint": "Automatically chosen from your current progress: in progress first, then the next required assignment."
+    }
   },
   "planPage": {
     "meta": {

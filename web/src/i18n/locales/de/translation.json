@@ -349,8 +349,7 @@
     "nav": {
       "courseBook": "Kursbuch",
       "classMembers": "Klassenmitglieder"
-    },
-    "todayTaskHint": "Automatisch aus deinem Fortschritt gewählt: zuerst In Bearbeitung, dann das nächste Pflicht-Assignment."
+    }
   },
   "planPage": {
     "meta": {

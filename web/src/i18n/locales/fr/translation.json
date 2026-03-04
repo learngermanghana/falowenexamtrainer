@@ -353,8 +353,7 @@
     "nav": {
       "courseBook": "Cours",
       "classMembers": "Membres de classe"
-    },
-    "todayTaskHint": "Choisie automatiquement selon ta progression : d’abord en cours, puis le prochain devoir requis."
+    }
   },
   "planPage": {
     "meta": {

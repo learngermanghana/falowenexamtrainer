@@ -1,13 +1,12 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { styles } from "../styles";
 
-const Section = ({ title, children }) => (
-  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-    <h2 style={{ margin: 0 }}>{title}</h2>
-    {children}
-  </section>
-);
+const heroSrc =
+  "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1400&q=80";
+
+const grammarBreakSrc =
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80";
 
 const boxStyle = {
   background: "#f9fafb",
@@ -16,7 +15,60 @@ const boxStyle = {
   padding: 14,
 };
 
-const HeroImage = ({ src, alt }) => (
+const tagStyle = {
+  display: "inline-block",
+  width: "fit-content",
+  padding: "6px 10px",
+  borderRadius: 999,
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: 0.2,
+  background: "#eef2ff",
+  color: "#3730a3",
+  border: "1px solid #c7d2fe",
+};
+
+const mutedText = {
+  margin: 0,
+  color: "#4b5563",
+  lineHeight: 1.6,
+};
+
+const Section = ({ title, children }) => (
+  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+    <h2 style={{ margin: 0 }}>{title}</h2>
+    {children}
+  </section>
+);
+
+const InfoBox = ({ title, children }) => (
+  <div style={boxStyle}>
+    <strong>{title}</strong>
+    <div style={{ marginTop: 8 }}>{children}</div>
+  </div>
+);
+
+const BulletList = ({ items, marginBottom = 0 }) => (
+  <ul style={{ paddingLeft: 20, marginTop: 6, marginBottom }}>
+    {items.map((item, index) => (
+      <li key={`${item}-${index}`} style={{ marginBottom: 4 }}>
+        {item}
+      </li>
+    ))}
+  </ul>
+);
+
+const NumberedList = ({ items, marginBottom = 0 }) => (
+  <ol style={{ paddingLeft: 20, marginTop: 6, marginBottom }}>
+    {items.map((item, index) => (
+      <li key={`${item}-${index}`} style={{ marginBottom: 4 }}>
+        {item}
+      </li>
+    ))}
+  </ol>
+);
+
+const HeroImage = ({ src, alt, label = "Photo from Unsplash", height = 220 }) => (
   <div
     style={{
       borderRadius: 16,
@@ -29,10 +81,11 @@ const HeroImage = ({ src, alt }) => (
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading="eager"
+        fetchPriority="high"
         style={{
           width: "100%",
-          height: 220,
+          height,
           objectFit: "cover",
           display: "block",
         }}
@@ -50,268 +103,368 @@ const HeroImage = ({ src, alt }) => (
           color: "#374151",
         }}
       >
-        Photo from Unsplash
+        {label}
       </div>
     </div>
   </div>
 );
 
+const TopicLabel = ({ children }) => <div style={tagStyle}>{children}</div>;
+
+const bodyParts = [
+  "der Kopf → die Köpfe (head → heads)",
+  "das Gesicht → die Gesichter (face → faces)",
+  "das Auge → die Augen (eye → eyes)",
+  "das Ohr → die Ohren (ear → ears)",
+  "die Nase → die Nasen (nose → noses)",
+  "der Mund → die Münder (mouth → mouths)",
+  "der Zahn → die Zähne (tooth → teeth)",
+  "der Hals → die Hälse (neck/throat → necks/throats)",
+  "der Arm → die Arme (arm → arms)",
+  "die Hand → die Hände (hand → hands)",
+  "der Finger → die Finger (finger → fingers)",
+  "der Bauch → die Bäuche (stomach/belly → stomachs/bellies)",
+  "der Rücken → die Rücken (back → backs)",
+  "das Bein → die Beine (leg → legs)",
+  "der Fuß → die Füße (foot → feet)",
+];
+
+const schmerzenExamples = [
+  "Ich habe Kopfschmerzen.",
+  "Ich habe Bauchschmerzen.",
+  "Ich habe Rückenschmerzen.",
+  "Ich habe Halsschmerzen.",
+];
+
+const wehExamplesSingular = [
+  "Mein Kopf tut mir weh.",
+  "Mein Rücken tut mir weh.",
+  "Mein Bauch tut mir weh.",
+  "Mein Hals tut mir weh.",
+];
+
+const wehExamplesPlural = [
+  "Meine Hände tun mir weh.",
+  "Meine Beine tun mir weh.",
+];
+
+const healthQuestions = [
+  "Wie geht es dir? (How are you?)",
+  "Wie geht es Ihnen? (How are you? - formal)",
+  "Geht es dir gut? (Are you okay?)",
+  "Geht es Ihnen gut? (Are you okay? - formal)",
+  "Was ist los? (What’s wrong?)",
+  "Was tut dir weh? (What hurts?)",
+  "Fehlt dir etwas? (Is something wrong?)",
+];
+
+const healthAnswers = [
+  "Mir geht es nicht gut. (I am not feeling well.)",
+  "Ich bin krank. (I am sick.)",
+  "Ich habe Kopfschmerzen. (I have a headache.)",
+  "Mein Kopf tut mir weh. (My head hurts.)",
+];
+
+const cancellationLines = [
+  "Ich schreibe Ihnen, weil ich den Termin absagen möchte.",
+  "Ich bin krank.",
+  "Ich habe Kopfschmerzen.",
+  "Können wir einen anderen Termin vereinbaren?",
+];
+
+const bodyPartsQuiz = [
+  "I have a stomachache. → Ich habe ________.",
+  "My head hurts. → Mein ________ tut mir weh.",
+  "ear → ________",
+  "nose → ________",
+  "hand → ________",
+];
+
+const bodyPartsQuizAnswers = [
+  "Bauchschmerzen",
+  "Kopf",
+  "das Ohr",
+  "die Nase",
+  "die Hand",
+];
+
+const nominativeArticles = [
+  "Masculine: der / ein → der Hund, ein Hund",
+  "Feminine: die / eine → die Blume, eine Blume",
+  "Neuter: das / ein → das Auto, ein Auto",
+  "Plural: die / keine → die Bücher, keine Bücher",
+];
+
+const accusativeArticles = [
+  "Masculine: den / einen → den Hund, einen Hund",
+  "Feminine: die / eine → die Blume, eine Blume",
+  "Neuter: das / ein → das Auto, ein Auto",
+  "Plural: die / keine → die Bücher, keine Bücher",
+];
+
+const endingRules = [
+  "der → -er",
+  "die → -e",
+  "das → -es",
+  "den → -en",
+  "plural (die / keine) → -en",
+];
+
+const nominativeExamples = [
+  "Masculine: ein + -er → ein großer Mann",
+  "Feminine: eine + -e → eine schöne Frau",
+  "Neuter: ein + -es → ein kleines Auto",
+  "Plural: keine + -en → keine kleinen Kinder",
+];
+
+const accusativeExamples = [
+  "Masculine: einen + -en → einen kleinen Hund",
+  "Feminine: eine + -e → eine rote Blume",
+  "Neuter: ein + -es → ein grünes Auto",
+  "Plural: keine + -en → keine alten Bücher",
+];
+
+const correctedNominativeSentences = [
+  "Er ist ein großer Mann.",
+  "Sie ist eine schöne Frau.",
+  "Das ist ein neues Auto.",
+  "Das sind keine kleinen Kinder.",
+];
+
+const correctedAccusativeSentences = [
+  "Ich habe einen kleinen Hund.",
+  "Er sieht eine schöne Blume.",
+  "Wir kaufen ein gelbes Buch.",
+  "Du liest keine langen Texte.",
+];
+
+const adjectiveTest = [
+  "Ich habe einen ___ Hund. (klein)",
+  "Das ist ein ___ Auto. (neu)",
+  "Sie ist eine ___ Frau. (schön)",
+  "Ich sehe eine ___ Blume. (rot)",
+  "Er ist ein ___ Mann. (groß)",
+];
+
+const adjectiveAnswers = [
+  "einen kleinen Hund",
+  "ein neues Auto",
+  "eine schöne Frau",
+  "eine rote Blume",
+  "ein großer Mann",
+];
+
+const summaryPoints = [
+  "Ich habe Kopfschmerzen. = I have a headache.",
+  "Mein Kopf tut mir weh. = My head hurts.",
+  "Wie geht es dir? = How are you?",
+  "Ich möchte den Termin absagen. = I would like to cancel the appointment.",
+];
+
 const HealthBodyPartsPage = () => {
-  const navigate = useNavigate();
-
-  // ✅ Updated hero image
-  const heroSrc =
-    "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1400&q=80";
-
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 18 }}>
-      {/* HEADER */}
-      <div style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
+    <main style={{ ...styles.container, display: "grid", gap: 18 }}>
+      <header style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <Link
+          to="/campus/course"
+          style={{
+            ...styles.secondaryButton,
+            width: "fit-content",
+            display: "inline-block",
+            textDecoration: "none",
+          }}
         >
           Back to Course
-        </button>
+        </Link>
 
         <div style={{ display: "grid", gap: 8 }}>
+          <TopicLabel>Health Vocabulary</TopicLabel>
+
           <h1 style={{ ...styles.title, marginBottom: 0 }}>
             Day 22: Health and Body Parts
           </h1>
 
           <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 14.1</p>
 
-          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
+          <p style={mutedText}>
             Today you will learn how to talk about health problems, ask about
-            someone’s health, and write a formal cancellation message.
-            You will also learn a simple A1 trick for adjective endings with
-            indefinite articles (ein/eine/kein).
+            someone’s health, and write a formal cancellation message. You will
+            also learn a simple A1 grammar topic: adjective endings with
+            indefinite articles (ein / eine / einen / kein / keine).
+          </p>
+        </div>
+
+        <HeroImage src={heroSrc} alt="Doctor consultation in clinic" />
+      </header>
+
+      <Section title="Part 1: Two Ways to Say You Are Not Feeling Well">
+        <InfoBox title="Body Parts Vocabulary (Singular + Plural)">
+          <BulletList items={bodyParts} />
+        </InfoBox>
+
+        <InfoBox title='1) Using "Ich habe ... Schmerzen"'>
+          <p style={{ marginTop: 0 }}>
+            Use: <strong>Ich habe + body part + Schmerzen.</strong>
+          </p>
+          <BulletList items={schmerzenExamples} />
+          <p style={{ marginBottom: 0 }}>
+            Note: <strong>Schmerzen</strong> is plural.
+          </p>
+        </InfoBox>
+
+        <InfoBox title='2) Using "... tut mir weh"'>
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            Use this pattern when one body part hurts:
+          </p>
+          <p style={{ margin: "0 0 8px" }}>
+            <strong>Singular:</strong> Mein / Meine + body part +{" "}
+            <strong>tut mir weh</strong>
+          </p>
+          <BulletList items={wehExamplesSingular} marginBottom={10} />
+
+          <p style={{ margin: "0 0 8px" }}>
+            For more than one body part, use <strong>tun mir weh</strong>:
+          </p>
+          <BulletList items={wehExamplesPlural} />
+          <p style={{ marginTop: 8, marginBottom: 0 }}>
+            <strong>Question:</strong> Was tut dir weh?
+          </p>
+        </InfoBox>
+
+        <InfoBox title="Mini Practice: Body Parts">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            Complete the answers:
+          </p>
+          <NumberedList items={bodyPartsQuiz} marginBottom={10} />
+          <p style={{ margin: "0 0 4px" }}>
+            <strong>Answers</strong>
+          </p>
+          <NumberedList items={bodyPartsQuizAnswers} />
+        </InfoBox>
+      </Section>
+
+      <Section title="Part 2: How to Ask About Someone’s Health">
+        <InfoBox title="Questions">
+          <BulletList items={healthQuestions} />
+        </InfoBox>
+
+        <InfoBox title="Possible Answers">
+          <BulletList items={healthAnswers} />
+        </InfoBox>
+      </Section>
+
+      <Section title="Part 3: Writing – Cancel an Appointment">
+        <InfoBox title="Model Sentences">
+          <div style={{ lineHeight: 1.8 }}>
+            {cancellationLines.map((line, index) => (
+              <div key={`${line}-${index}`}>{line}</div>
+            ))}
+          </div>
+        </InfoBox>
+      </Section>
+
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <TopicLabel>Grammar</TopicLabel>
+
+        <div style={{ display: "grid", gap: 6 }}>
+          <h2 style={{ margin: 0 }}>Grammar Break</h2>
+          <p style={mutedText}>
+            Now we move from health vocabulary to a new grammar topic:
+            adjective endings.
           </p>
         </div>
 
         <HeroImage
-          src={heroSrc}
-          alt="Doctor consultation in clinic"
+          src={grammarBreakSrc}
+          alt="Study desk with notebook and laptop"
+          label="Grammar topic break"
+          height={200}
         />
-      </div>
+      </section>
 
-      {/* PART 1 */}
-      <Section title="Part 1: Two Ways to Say You Are Not Feeling Well">
-        <div style={boxStyle}>
-          <strong>Body Parts Vocabulary (Singular + Plural)</strong>
-          <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0 }}>
-            <li>der Kopf → die Köpfe (head → heads)</li>
-            <li>die Hand → die Hände (hand → hands)</li>
-            <li>das Bein → die Beine (leg → legs)</li>
-            <li>der Arm → die Arme (arm → arms)</li>
-            <li>der Bauch → die Bäuche (stomach/belly → stomachs/bellies)</li>
-            <li>der Rücken → die Rücken (back → backs)</li>
-            <li>der Hals → die Hälse (throat/neck → throats/necks)</li>
-          </ul>
-        </div>
-
-        <div style={boxStyle}>
-          <strong>1) Using “Ich habe … Schmerzen”</strong>
-          <p style={{ marginTop: 8 }}>
-            Use: <strong>Ich habe + body part + Schmerzen.</strong>
-          </p>
-          <ul style={{ paddingLeft: 20, marginTop: 6 }}>
-            <li>Ich habe Kopfschmerzen.</li>
-            <li>Ich habe Bauchschmerzen.</li>
-            <li>Ich habe Rückenschmerzen.</li>
-            <li>Ich habe Halsschmerzen.</li>
-          </ul>
-          <p style={{ marginTop: 8, marginBottom: 0 }}>
-            Note: <strong>Schmerzen</strong> is plural.
-          </p>
-        </div>
-
-        <div style={boxStyle}>
-          <strong>2) Using “... tut mir weh”</strong>
-          <p style={{ marginTop: 8 }}>
-            Use: <strong>Mein/Meine + body part + tut mir weh.</strong>
-          </p>
-          <ul style={{ paddingLeft: 20, marginTop: 6 }}>
-            <li>Mein Kopf tut mir weh.</li>
-            <li>Mein Rücken tut mir weh.</li>
-            <li>Mein Bauch tut mir weh.</li>
-            <li>Mein Hals tut mir weh.</li>
-          </ul>
-          <p style={{ marginTop: 8, marginBottom: 0 }}>
-            <strong>Was tut dir weh?</strong>
-          </p>
-        </div>
-      </Section>
-
-      {/* PART 2 */}
-      <Section title="Part 2: How to Ask About Someone’s Health">
-        <div style={boxStyle}>
-          <strong>Questions:</strong>
-          <ul style={{ paddingLeft: 20, marginTop: 8 }}>
-            <li>Wie geht es dir?</li>
-            <li>Wie geht es Ihnen?</li>
-            <li>Geht es dir gut?</li>
-            <li>Geht es Ihnen gut?</li>
-            <li>Was ist los?</li>
-            <li>Was tut dir weh?</li>
-            <li>Fehlt dir etwas?</li>
-          </ul>
-        </div>
-
-        <div style={boxStyle}>
-          <strong>Possible answers:</strong>
-          <ul style={{ paddingLeft: 20, marginTop: 8 }}>
-            <li>Mir geht es nicht gut.</li>
-            <li>Ich bin krank.</li>
-            <li>Ich habe Kopfschmerzen.</li>
-            <li>Mein Kopf tut mir weh.</li>
-          </ul>
-        </div>
-      </Section>
-
-      {/* PART 3 */}
-      <Section title="Part 3: Writing – Cancel an Appointment">
-        <div style={boxStyle}>
-          <strong>Model sentences:</strong>
-          <p style={{ marginTop: 8, lineHeight: 1.7 }}>
-            Ich schreibe Ihnen, weil ich den Termin absagen möchte. <br />
-            Ich bin krank. <br />
-            Ich habe Kopfschmerzen. <br />
-            Können wir einen anderen Termin vereinbaren?
-          </p>
-        </div>
-      </Section>
-
-      {/* PART 4 */}
-      <Section title="Part 4: Adjective Endings with ein, eine, einen, kein/keine">
-        <div style={boxStyle}>
-          <strong>How to Describe People and Things</strong>
-          <p style={{ marginTop: 8, marginBottom: 0, lineHeight: 1.7 }}>
+      <Section title="Part 4: Adjective Endings with ein, eine, einen, kein / keine">
+        <InfoBox title="How to Describe People and Things">
+          <p style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7 }}>
             Learn a simple way to choose adjective endings in nominative and
-            accusative with <strong>ein/eine/einen</strong> and
-            <strong> kein/keine</strong>.
+            accusative with <strong>ein / eine / einen</strong> and{" "}
+            <strong>kein / keine</strong>.
           </p>
-        </div>
+        </InfoBox>
 
-        <div style={boxStyle}>
-          <strong>Step 1: Review the Articles</strong>
-          <p style={{ marginTop: 8, marginBottom: 8 }}>
+        <InfoBox title="Step 1: Review the Articles">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
             Nouns in German have gender and use different articles.
           </p>
+
           <p style={{ margin: "8px 0 4px" }}>
-            <strong>Nominative Case</strong> (subject = who/what does
+            <strong>Nominative Case</strong> (subject = who / what does
             something)
           </p>
-          <ul style={{ paddingLeft: 20, marginTop: 4 }}>
-            <li>Masculine: der / ein → der Hund, ein Hund</li>
-            <li>Feminine: die / eine → die Blume, eine Blume</li>
-            <li>Neuter: das / ein → das Auto, ein Auto</li>
-            <li>Plural: die / keine → die Bücher, keine Bücher</li>
-          </ul>
+          <BulletList items={nominativeArticles} marginBottom={12} />
 
-          <p style={{ margin: "12px 0 4px" }}>
-            <strong>Accusative Case</strong> (object = who/what receives the
+          <p style={{ margin: "0 0 4px" }}>
+            <strong>Accusative Case</strong> (object = who / what receives the
             action)
           </p>
-          <ul style={{ paddingLeft: 20, marginTop: 4, marginBottom: 0 }}>
-            <li>Masculine: den / einen → den Hund, einen Hund</li>
-            <li>Feminine: die / eine → die Blume, eine Blume</li>
-            <li>Neuter: das / ein → das Auto, ein Auto</li>
-            <li>Plural: die / keine → die Bücher, keine Bücher</li>
-          </ul>
-        </div>
+          <BulletList items={accusativeArticles} />
+        </InfoBox>
 
-        <div style={boxStyle}>
-          <strong>Step 2: How to Get the Adjective Ending</strong>
-          <p style={{ marginTop: 8, marginBottom: 8 }}>
-            Very simple trick: look at the article (der/die/das/den/plural)
-            and use the matching ending.
+        <InfoBox title="Step 2: How to Get the Adjective Ending">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            Simple trick: look at the article meaning behind the form and use
+            the matching ending.
           </p>
-          <ul style={{ paddingLeft: 20, marginTop: 4, marginBottom: 0 }}>
-            <li>der → -er</li>
-            <li>die → -e</li>
-            <li>das → -es</li>
-            <li>den → -en</li>
-            <li>plural (die/keine) → -en</li>
-          </ul>
-        </div>
+          <BulletList items={endingRules} />
+        </InfoBox>
 
-        <div style={boxStyle}>
-          <strong>Step 3: Combine Article + Adjective + Noun</strong>
-          <p style={{ marginTop: 8, marginBottom: 8 }}>
+        <InfoBox title="Step 3: Combine Article + Adjective + Noun">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
             Common adjectives: groß, klein, rot, blau, grün, schön, neu, alt.
           </p>
 
           <p style={{ margin: "10px 0 4px" }}>
             <strong>Nominative Case</strong>
           </p>
-          <ul style={{ paddingLeft: 20, marginTop: 4 }}>
-            <li>Masculine: ein + -er → ein großer Hund</li>
-            <li>Feminine: eine + -e → eine rote Blume</li>
-            <li>Neuter: ein + -es → ein kleines Auto</li>
-            <li>Plural: keine + -en → keine neuen Bücher</li>
-          </ul>
+          <BulletList items={nominativeExamples} marginBottom={12} />
 
-          <p style={{ margin: "10px 0 4px" }}>
+          <p style={{ margin: "0 0 4px" }}>
             <strong>Accusative Case</strong>
           </p>
-          <ul style={{ paddingLeft: 20, marginTop: 4, marginBottom: 0 }}>
-            <li>Masculine: einen + -en → einen kleinen Hund</li>
-            <li>Feminine: eine + -e → eine blaue Blume</li>
-            <li>Neuter: ein + -es → ein grünes Auto</li>
-            <li>Plural: keine + -en → keine alten Bücher</li>
-          </ul>
-        </div>
+          <BulletList items={accusativeExamples} />
+        </InfoBox>
 
-        <div style={boxStyle}>
-          <strong>Example Sentences</strong>
-          <p style={{ margin: "8px 0 4px" }}>
+        <InfoBox title="Example Sentences">
+          <p style={{ margin: "0 0 4px" }}>
             <strong>Nominative:</strong>
           </p>
-          <ul style={{ paddingLeft: 20, marginTop: 4 }}>
-            <li>Ich bin ein großer Mann.</li>
-            <li>Sie hat eine rote Tasche.</li>
-            <li>Das ist ein neues Auto.</li>
-            <li>Wir haben keine kleinen Kinder.</li>
-          </ul>
+          <BulletList items={correctedNominativeSentences} marginBottom={12} />
 
-          <p style={{ margin: "10px 0 4px" }}>
+          <p style={{ margin: "0 0 4px" }}>
             <strong>Accusative:</strong>
           </p>
-          <ul style={{ paddingLeft: 20, marginTop: 4, marginBottom: 0 }}>
-            <li>Ich habe einen kleinen Hund.</li>
-            <li>Er sieht eine schöne Blume.</li>
-            <li>Wir kaufen ein gelbes Buch.</li>
-            <li>Du liest keine langen Texte.</li>
-          </ul>
-        </div>
+          <BulletList items={correctedAccusativeSentences} />
+        </InfoBox>
 
-        <div style={boxStyle}>
-          <strong>Mini Adjective Ending Test (A1)</strong>
-          <p style={{ marginTop: 8 }}>
+        <InfoBox title="Mini Adjective Ending Test (A1)">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
             Complete with the correct adjective endings (groß, klein, rot,
             schön, neu):
           </p>
-          <ol style={{ paddingLeft: 20, marginTop: 4, marginBottom: 8 }}>
-            <li>Ich habe einen ___ Hund. (klein)</li>
-            <li>Das ist ein ___ Auto. (neu)</li>
-            <li>Sie ist eine ___ Frau. (schön)</li>
-            <li>Ich sehe eine ___ Blume. (rot)</li>
-            <li>Er ist ein ___ Mann. (groß)</li>
-          </ol>
-          <p style={{ margin: "8px 0 4px" }}>
+          <NumberedList items={adjectiveTest} marginBottom={10} />
+
+          <p style={{ margin: "0 0 4px" }}>
             <strong>Answers</strong>
           </p>
-          <ol style={{ paddingLeft: 20, marginTop: 4, marginBottom: 0 }}>
-            <li>einen kleinen Hund</li>
-            <li>ein neues Auto</li>
-            <li>eine schöne Frau</li>
-            <li>eine rote Blume</li>
-            <li>ein großer Mann</li>
-          </ol>
-        </div>
+          <NumberedList items={adjectiveAnswers} />
+        </InfoBox>
       </Section>
-    </div>
+
+      <Section title="Quick Summary">
+        <InfoBox title="Remember">
+          <BulletList items={summaryPoints} />
+        </InfoBox>
+      </Section>
+    </main>
   );
 };
 

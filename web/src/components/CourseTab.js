@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -29,6 +29,14 @@ const hasTutorMarkedWork = (entry) => {
     toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
   );
 };
+
+const ASSIGNMENT_STATUSES = {
+  notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
+  inProgress: { key: "courseTab.status.inProgress", color: "#2563eb" },
+  submitted: { key: "courseTab.status.submitted", color: "#16a34a" },
+  needsRedo: { key: "courseTab.status.needsRedo", color: "#dc2626" },
+};
+const STATUS_ORDER = ["notStarted", "inProgress", "submitted", "needsRedo"];
 
 const extractLevelToken = (value) => {
   if (!value) return "";
@@ -254,7 +262,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [chapterFilter, setChapterFilter] = useState("all");
   const [collapsedDays, setCollapsedDays] = useState({});
   const [dayStatuses, setDayStatuses] = useState({});
-  const [statusesLoaded, setStatusesLoaded] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
 
   useEffect(() => {
@@ -274,75 +281,20 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     }
   }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
 
-  const studentId = studentProfile?.id || user?.uid || null;
+  useEffect(() => {
+    if (!selectedCourseLevel) return;
+    try {
+      const raw = window.localStorage.getItem(`course-status-${selectedCourseLevel}`);
+      setDayStatuses(raw ? JSON.parse(raw) : {});
+    } catch (error) {
+      setDayStatuses({});
+    }
+  }, [selectedCourseLevel]);
 
   useEffect(() => {
     if (!selectedCourseLevel) return;
-
-    let isMounted = true;
-    setStatusesLoaded(false);
-    const loadStatuses = async () => {
-      try {
-        const localKey = `course-status-${selectedCourseLevel}`;
-        const raw = window.localStorage.getItem(localKey);
-        const localStatuses = raw ? JSON.parse(raw) : {};
-
-        if (!isFirebaseConfigured || !db || !studentId) {
-          if (isMounted) {
-            setDayStatuses(localStatuses);
-            setStatusesLoaded(true);
-          }
-          return;
-        }
-
-        const progressRef = doc(db, "students", studentId, "courseProgress", selectedCourseLevel);
-        const snapshot = await getDoc(progressRef);
-        const remoteStatuses = snapshot.exists() ? snapshot.data()?.dayStatuses || {} : {};
-        const mergedStatuses = { ...localStatuses, ...remoteStatuses };
-
-        if (isMounted) {
-          setDayStatuses(mergedStatuses);
-          setStatusesLoaded(true);
-        }
-        window.localStorage.setItem(localKey, JSON.stringify(mergedStatuses));
-      } catch (error) {
-        if (isMounted) {
-          setDayStatuses({});
-          setStatusesLoaded(true);
-        }
-      }
-    };
-
-    loadStatuses();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [selectedCourseLevel, studentId]);
-
-  useEffect(() => {
-    if (!selectedCourseLevel) return;
-    if (!statusesLoaded) return;
-    const persistStatuses = async () => {
-      const localKey = `course-status-${selectedCourseLevel}`;
-      window.localStorage.setItem(localKey, JSON.stringify(dayStatuses));
-
-      if (!isFirebaseConfigured || !db || !studentId) return;
-
-      const progressRef = doc(db, "students", studentId, "courseProgress", selectedCourseLevel);
-      await setDoc(
-        progressRef,
-        {
-          dayStatuses,
-          updatedAt: serverTimestamp(),
-          level: selectedCourseLevel,
-        },
-        { merge: true }
-      );
-    };
-
-    persistStatuses().catch(() => {});
-  }, [dayStatuses, selectedCourseLevel, statusesLoaded, studentId]);
+    window.localStorage.setItem(`course-status-${selectedCourseLevel}`, JSON.stringify(dayStatuses));
+  }, [dayStatuses, selectedCourseLevel]);
 
   const schedule = useMemo(() => schedules[selectedCourseLevel] || [], [schedules, selectedCourseLevel]);
   const isDerivedLevel = useMemo(
@@ -352,7 +304,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const isB2SelfLearning = selectedCourseLevel === "B2";
   const isC1SelfLearning = selectedCourseLevel === "C1";
 
-  const getStatus = (day) => dayStatuses[String(day)]?.value || "notStarted";
+  const getStatus = useCallback((day) => dayStatuses[String(day)]?.value || "notStarted", [dayStatuses]);
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
@@ -375,6 +327,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       return text.includes(skillFilter);
     };
 
+    const matchesSkill = (entry) => {
+      if (skillFilter === "all") return true;
+      const text = `${entry.topic || ""} ${entry.grammar_topic || ""} ${entry.instruction || ""}`.toLowerCase();
+      return text.includes(skillFilter);
+    };
+
     const matchesChapter = (entry) => {
       if (chapterFilter === "all") return true;
       return String(entry.chapter || "").toLowerCase() === chapterFilter;
@@ -388,7 +346,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         matchesSkill(entry) &&
         matchesChapter(entry)
     );
-  }, [assignmentsOnly, chapterFilter, schedule, searchTerm, skillFilter, unfinishedOnly, dayStatuses]);
+  }, [assignmentsOnly, chapterFilter, getStatus, schedule, searchTerm, skillFilter, unfinishedOnly]);
 
   const chapterOptions = useMemo(() => {
     const set = new Set();
@@ -398,13 +356,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return [...set].sort();
   }, [schedule]);
 
-  const todayTask = useMemo(() => resolveTodayTask(schedule, getStatus), [schedule, dayStatuses]);
+  const todayTask = useMemo(
+    () => schedule.find((entry) => entry.assignment && getStatus(entry.day) !== "submitted") || filteredSchedule[0],
+    [filteredSchedule, getStatus, schedule]
+  );
 
   const overview = useMemo(() => {
     const daysCompleted = schedule.filter((entry) => getStatus(entry.day) === "submitted").length;
-    const totalAssignments = schedule.filter((entry) => hasTutorMarkedWork(entry)).length;
+    const totalAssignments = schedule.filter((entry) => entry.assignment).length;
     const assignmentsSubmitted = schedule.filter(
-      (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "submitted"
+      (entry) => entry.assignment && getStatus(entry.day) === "submitted"
     ).length;
     let streak = 0;
     for (const entry of schedule) {
@@ -424,7 +385,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       streak,
       lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, schedule]);
+  }, [dayStatuses, getStatus, schedule]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -482,7 +443,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
                   <strong>{t("courseTab.todayTask")}: </strong>
                   Day {todayTask.day} · {todayTask.topic}
-                  <div style={{ ...styles.helperText, marginTop: 6 }}>{t("courseTab.todayTaskHint")}</div>
                 </div>
               ) : null}
 
@@ -569,7 +529,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
                 </p>
 
-                {todayTask && hasTutorMarkedWork(todayTask) ? (
+                {todayTask?.assignment ? (
                   <button
                     type="button"
                     style={styles.primaryButton}
@@ -594,7 +554,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const status = getStatus(entry.day);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isCollapsed = Boolean(collapsedDays[String(entry.day)]);
-                    const isTutorMarkedAssignment = hasTutorMarkedWork(entry);
 
                     return (
                       <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
@@ -608,15 +567,15 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </div>
 
                           <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                            {entry.assignment !== undefined || isTutorMarkedAssignment ? (
+                            {entry.assignment !== undefined ? (
                               <span
                                 style={{
                                   ...styles.badge,
-                                  background: isTutorMarkedAssignment ? "#fee2e2" : "#dcfce7",
-                                  color: isTutorMarkedAssignment ? "#991b1b" : "#166534",
+                                  background: entry.assignment ? "#fee2e2" : "#dcfce7",
+                                  color: entry.assignment ? "#991b1b" : "#166534",
                                 }}
                               >
-                                {isTutorMarkedAssignment ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
+                                {entry.assignment ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
                               </span>
                             ) : null}
                             <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
