@@ -275,11 +275,21 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
+    const compactTerm = normalizedTerm.replace(/\s+/g, "");
 
     const matchesSearch = (entry) => {
       if (!normalizedTerm) return true;
+
+      const dayValue = String(entry.day || "").toLowerCase();
+      const dayLabel = `day ${dayValue}`;
+      const compactDayValue = dayValue.replace(/\s+/g, "");
+      const compactDayLabel = dayLabel.replace(/\s+/g, "");
+
       return (
-        `${entry.day}`.includes(normalizedTerm) ||
+        dayValue.includes(normalizedTerm) ||
+        dayLabel.includes(normalizedTerm) ||
+        compactDayValue.includes(compactTerm) ||
+        compactDayLabel.includes(compactTerm) ||
         (entry.topic || "").toLowerCase().includes(normalizedTerm) ||
         (entry.chapter || "").toLowerCase().includes(normalizedTerm) ||
         (entry.grammar_topic || "").toLowerCase().includes(normalizedTerm)
@@ -493,16 +503,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     ? "This level uses the class schedule because the course book dictionary does not yet include it."
                     : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
                 </p>
-
-                {todayTask && isTutorMarkedEntry(todayTask) ? (
-                  <button
-                    type="button"
-                    style={styles.primaryButton}
-                    onClick={() => navigate("/campus/submit")}
-                  >
-                    {t("courseTab.continueAssignment")}
-                  </button>
-                ) : null}
 
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
                   {filteredSchedule.map((entry) => {
