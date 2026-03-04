@@ -11,6 +11,10 @@ import ExamReadinessBadge from "./ExamReadinessBadge";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
 const PASS_MARK = 60;
+const TOTAL_ASSIGNMENTS = {
+  A1: 19,
+  A2_B2: 28,
+};
 
 const StudentResultsPage = () => {
   const { t } = useTranslation();
@@ -32,11 +36,6 @@ const StudentResultsPage = () => {
     .toUpperCase();
   const useSheetResults = ["A1", "A2", "B1"].includes(studentLevel);
   const useFirestoreResults = ["B2", "C1"].includes(studentLevel);
-
-  const TOTAL_ASSIGNMENTS = {
-    A1: 19,
-    A2_B2: 28,
-  };
 
   // Put your sheet URL here via env (CSV or edit URL):
   // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
