@@ -26,6 +26,7 @@ const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
 const MIN_SUBMISSION_CHARACTERS = 80;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
+const MAX_RESUBMISSION_TRIES = 3;
 const ACTION_COOLDOWN_MS = 45 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
@@ -533,6 +534,21 @@ const AssignmentSubmissionPage = () => {
 
   const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
 
+  const selectedResubmissionCount = useMemo(() => {
+    return recentSubmissions.reduce((count, entry) => {
+      if (safeLower(entry?.status) !== "resubmitted") return count;
+
+      const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
+      if (selectedChapterKey && entryChapterKey) return entryChapterKey === selectedChapterKey ? count + 1 : count;
+
+      const entryTitle = safeLower(entry?.assignmentTitle || entry?.title);
+      return entryTitle && entryTitle === safeLower(form.assignmentTitle) ? count + 1 : count;
+    }, 0);
+  }, [buildChapterKey, form.assignmentTitle, recentSubmissions, selectedChapterKey]);
+
+  const remainingResubmissions = Math.max(0, MAX_RESUBMISSION_TRIES - selectedResubmissionCount);
+  const resubmissionLimitReached = remainingResubmissions === 0;
+
   useEffect(() => {
     setConfirmationLocked(isSelectedLocked);
     if (isSelectedLocked) setForm((prev) => ({ ...prev, confirmed: true }));
@@ -971,6 +987,15 @@ const AssignmentSubmissionPage = () => {
       return;
     }
 
+    if (resubmissionLimitReached) {
+      setResubmissionStatus({
+        loading: false,
+        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmission tries for this assignment.`,
+        success: "",
+      });
+      return;
+    }
+
     if (submissionCooldownRemainingMs > 0) {
       setResubmissionStatus({
         loading: false,
@@ -1278,6 +1303,11 @@ const AssignmentSubmissionPage = () => {
             <p style={{ ...styles.helperText, margin: 0 }}>
               You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved so tutors can see this is stronger work.
             </p>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              {resubmissionLimitReached
+                ? `Resubmission tries used: ${selectedResubmissionCount}/${MAX_RESUBMISSION_TRIES}.`
+                : `Resubmission tries left: ${remainingResubmissions}/${MAX_RESUBMISSION_TRIES}.`}
+            </p>
 
             <label style={{ ...styles.field, margin: 0 }}>
               <span style={styles.label}>Corrected text</span>
@@ -1309,7 +1339,7 @@ const AssignmentSubmissionPage = () => {
                 type="button"
                 style={styles.secondaryButton}
                 onClick={handleSaveResubmissionDraft}
-                disabled={resubmissionStatus.loading}
+                disabled={resubmissionStatus.loading || resubmissionLimitReached}
               >
                 {resubmissionStatus.loading ? "Saving ..." : "Save draft"}
               </button>
@@ -1317,7 +1347,7 @@ const AssignmentSubmissionPage = () => {
                 type="button"
                 style={styles.primaryButton}
                 onClick={handleResubmit}
-                disabled={resubmissionStatus.loading}
+                disabled={resubmissionStatus.loading || resubmissionLimitReached}
               >
                 {resubmissionStatus.loading ? "Saving ..." : "Submit resubmission"}
               </button>
