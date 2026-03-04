@@ -5,11 +5,33 @@ import { styles } from "../styles";
 const heroSrc =
   "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1400&q=80";
 
+const grammarBreakSrc =
+  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80";
+
 const boxStyle = {
   background: "#f9fafb",
   border: "1px solid #e5e7eb",
   borderRadius: 12,
   padding: 14,
+};
+
+const tagStyle = {
+  display: "inline-block",
+  width: "fit-content",
+  padding: "6px 10px",
+  borderRadius: 999,
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: 0.2,
+  background: "#eef2ff",
+  color: "#3730a3",
+  border: "1px solid #c7d2fe",
+};
+
+const mutedText = {
+  margin: 0,
+  color: "#4b5563",
+  lineHeight: 1.6,
 };
 
 const Section = ({ title, children }) => (
@@ -29,7 +51,9 @@ const InfoBox = ({ title, children }) => (
 const BulletList = ({ items, marginBottom = 0 }) => (
   <ul style={{ paddingLeft: 20, marginTop: 6, marginBottom }}>
     {items.map((item, index) => (
-      <li key={`${item}-${index}`}>{item}</li>
+      <li key={`${item}-${index}`} style={{ marginBottom: 4 }}>
+        {item}
+      </li>
     ))}
   </ul>
 );
@@ -37,12 +61,14 @@ const BulletList = ({ items, marginBottom = 0 }) => (
 const NumberedList = ({ items, marginBottom = 0 }) => (
   <ol style={{ paddingLeft: 20, marginTop: 6, marginBottom }}>
     {items.map((item, index) => (
-      <li key={`${item}-${index}`}>{item}</li>
+      <li key={`${item}-${index}`} style={{ marginBottom: 4 }}>
+        {item}
+      </li>
     ))}
   </ol>
 );
 
-const HeroImage = ({ src, alt }) => (
+const HeroImage = ({ src, alt, label = "Photo from Unsplash", height = 220 }) => (
   <div
     style={{
       borderRadius: 16,
@@ -59,7 +85,7 @@ const HeroImage = ({ src, alt }) => (
         fetchPriority="high"
         style={{
           width: "100%",
-          height: 220,
+          height,
           objectFit: "cover",
           display: "block",
         }}
@@ -77,20 +103,30 @@ const HeroImage = ({ src, alt }) => (
           color: "#374151",
         }}
       >
-        Photo from Unsplash
+        {label}
       </div>
     </div>
   </div>
 );
 
+const TopicLabel = ({ children }) => <div style={tagStyle}>{children}</div>;
+
 const bodyParts = [
   "der Kopf → die Köpfe (head → heads)",
-  "die Hand → die Hände (hand → hands)",
-  "das Bein → die Beine (leg → legs)",
+  "das Gesicht → die Gesichter (face → faces)",
+  "das Auge → die Augen (eye → eyes)",
+  "das Ohr → die Ohren (ear → ears)",
+  "die Nase → die Nasen (nose → noses)",
+  "der Mund → die Münder (mouth → mouths)",
+  "der Zahn → die Zähne (tooth → teeth)",
+  "der Hals → die Hälse (neck/throat → necks/throats)",
   "der Arm → die Arme (arm → arms)",
+  "die Hand → die Hände (hand → hands)",
+  "der Finger → die Finger (finger → fingers)",
   "der Bauch → die Bäuche (stomach/belly → stomachs/bellies)",
   "der Rücken → die Rücken (back → backs)",
-  "der Hals → die Hälse (throat/neck → throats/necks)",
+  "das Bein → die Beine (leg → legs)",
+  "der Fuß → die Füße (foot → feet)",
 ];
 
 const schmerzenExamples = [
@@ -134,6 +170,22 @@ const cancellationLines = [
   "Ich bin krank.",
   "Ich habe Kopfschmerzen.",
   "Können wir einen anderen Termin vereinbaren?",
+];
+
+const bodyPartsQuiz = [
+  "I have a stomachache. → Ich habe ________.",
+  "My head hurts. → Mein ________ tut mir weh.",
+  "ear → ________",
+  "nose → ________",
+  "hand → ________",
+];
+
+const bodyPartsQuizAnswers = [
+  "Bauchschmerzen",
+  "Kopf",
+  "das Ohr",
+  "die Nase",
+  "die Hand",
 ];
 
 const nominativeArticles = [
@@ -226,17 +278,19 @@ const HealthBodyPartsPage = () => {
         </Link>
 
         <div style={{ display: "grid", gap: 8 }}>
+          <TopicLabel>Health Vocabulary</TopicLabel>
+
           <h1 style={{ ...styles.title, marginBottom: 0 }}>
             Day 22: Health and Body Parts
           </h1>
 
           <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 14.1</p>
 
-          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
+          <p style={mutedText}>
             Today you will learn how to talk about health problems, ask about
             someone’s health, and write a formal cancellation message. You will
-            also learn a simple A1 trick for adjective endings with indefinite
-            articles (ein / eine / einen / kein / keine).
+            also learn a simple A1 grammar topic: adjective endings with
+            indefinite articles (ein / eine / einen / kein / keine).
           </p>
         </div>
 
@@ -276,6 +330,17 @@ const HealthBodyPartsPage = () => {
             <strong>Question:</strong> Was tut dir weh?
           </p>
         </InfoBox>
+
+        <InfoBox title="Mini Practice: Body Parts">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            Complete the answers:
+          </p>
+          <NumberedList items={bodyPartsQuiz} marginBottom={10} />
+          <p style={{ margin: "0 0 4px" }}>
+            <strong>Answers</strong>
+          </p>
+          <NumberedList items={bodyPartsQuizAnswers} />
+        </InfoBox>
       </Section>
 
       <Section title="Part 2: How to Ask About Someone’s Health">
@@ -297,6 +362,25 @@ const HealthBodyPartsPage = () => {
           </div>
         </InfoBox>
       </Section>
+
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <TopicLabel>Grammar</TopicLabel>
+
+        <div style={{ display: "grid", gap: 6 }}>
+          <h2 style={{ margin: 0 }}>Grammar Break</h2>
+          <p style={mutedText}>
+            Now we move from health vocabulary to a new grammar topic:
+            adjective endings.
+          </p>
+        </div>
+
+        <HeroImage
+          src={grammarBreakSrc}
+          alt="Study desk with notebook and laptop"
+          label="Grammar topic break"
+          height={200}
+        />
+      </section>
 
       <Section title="Part 4: Adjective Endings with ein, eine, einen, kein / keine">
         <InfoBox title="How to Describe People and Things">
