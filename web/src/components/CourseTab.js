@@ -30,14 +30,6 @@ const hasTutorMarkedWork = (entry) => {
   );
 };
 
-const ASSIGNMENT_STATUSES = {
-  notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
-  inProgress: { key: "courseTab.status.inProgress", color: "#2563eb" },
-  submitted: { key: "courseTab.status.submitted", color: "#16a34a" },
-  needsRedo: { key: "courseTab.status.needsRedo", color: "#dc2626" },
-};
-const STATUS_ORDER = ["notStarted", "inProgress", "submitted", "needsRedo"];
-
 const extractLevelToken = (value) => {
   if (!value) return "";
   const match = String(value).toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
