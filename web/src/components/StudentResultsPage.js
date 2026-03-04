@@ -32,6 +32,7 @@ const StudentResultsPage = () => {
   const studentLevel = String(studentProfile?.level || studentProfile?.course || "")
     .trim()
     .toUpperCase();
+  const studentEmail = studentProfile?.email || "";
   const useSheetResults = ["A1", "A2", "B1"].includes(studentLevel);
   const useFirestoreResults = ["B2", "C1"].includes(studentLevel);
 
@@ -103,7 +104,7 @@ const StudentResultsPage = () => {
     };
 
     const loadFromResultsStore = async () => {
-      const response = await fetchResults({ studentCode, email: studentProfile?.email });
+      const response = await fetchResults({ studentCode, email: studentEmail });
       if (!Array.isArray(response?.results)) return [];
       return response.results.map((entry) => ({
         ...entry,
@@ -184,6 +185,7 @@ const StudentResultsPage = () => {
     studentLevel,
     useFirestoreResults,
     useSheetResults,
+    studentEmail,
     SHEET_CSV_URL,
     buildLeaderboard,
   ]);
