@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -220,6 +220,8 @@ const resolveTodayTask = (schedule, getStatus) => {
   return ordered.find((entry) => getStatus(entry.day) !== "submitted") || ordered[ordered.length - 1];
 };
 
+const getStatusForDay = (dayStatuses, day) => dayStatuses[String(day)]?.value || "notStarted";
+
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -304,8 +306,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const isB2SelfLearning = selectedCourseLevel === "B2";
   const isC1SelfLearning = selectedCourseLevel === "C1";
 
-  const getStatus = useCallback((day) => dayStatuses[String(day)]?.value || "notStarted", [dayStatuses]);
-
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
 
@@ -342,11 +342,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       (entry) =>
         matchesSearch(entry) &&
         (!assignmentsOnly || hasAssignment(entry)) &&
-        (!unfinishedOnly || getStatus(entry.day) !== "submitted") &&
+        (!unfinishedOnly || getStatusForDay(dayStatuses, entry.day) !== "submitted") &&
         matchesSkill(entry) &&
         matchesChapter(entry)
     );
-  }, [assignmentsOnly, chapterFilter, getStatus, schedule, searchTerm, skillFilter, unfinishedOnly]);
+  }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, skillFilter, unfinishedOnly]);
 
   const chapterOptions = useMemo(() => {
     const set = new Set();
@@ -357,19 +357,21 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   }, [schedule]);
 
   const todayTask = useMemo(
-    () => schedule.find((entry) => entry.assignment && getStatus(entry.day) !== "submitted") || filteredSchedule[0],
-    [filteredSchedule, getStatus, schedule]
+    () =>
+      schedule.find((entry) => entry.assignment && getStatusForDay(dayStatuses, entry.day) !== "submitted") ||
+      filteredSchedule[0],
+    [dayStatuses, filteredSchedule, schedule]
   );
 
   const overview = useMemo(() => {
-    const daysCompleted = schedule.filter((entry) => getStatus(entry.day) === "submitted").length;
+    const daysCompleted = schedule.filter((entry) => getStatusForDay(dayStatuses, entry.day) === "submitted").length;
     const totalAssignments = schedule.filter((entry) => entry.assignment).length;
     const assignmentsSubmitted = schedule.filter(
-      (entry) => entry.assignment && getStatus(entry.day) === "submitted"
+      (entry) => entry.assignment && getStatusForDay(dayStatuses, entry.day) === "submitted"
     ).length;
     let streak = 0;
     for (const entry of schedule) {
-      if (getStatus(entry.day) === "submitted") streak += 1;
+      if (getStatusForDay(dayStatuses, entry.day) === "submitted") streak += 1;
       else break;
     }
     const lastActivityTs = Object.values(dayStatuses)
@@ -385,7 +387,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       streak,
       lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, getStatus, schedule]);
+  }, [dayStatuses, schedule]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -551,7 +553,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         ? entry.schreiben_sprechen
                         : [entry.schreiben_sprechen]
                       : [];
-                    const status = getStatus(entry.day);
+                    const status = getStatusForDay(dayStatuses, entry.day);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isCollapsed = Boolean(collapsedDays[String(entry.day)]);
 
