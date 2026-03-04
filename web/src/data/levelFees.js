@@ -43,11 +43,13 @@ export const computeTuitionStatus = ({ level, paidAmount = 0, tuitionFee, balanc
   const normalizedPaid = Math.max(Number(paidAmount) || 0, 0);
   const computedTuitionFee =
     typeof tuitionFee === "number" ? tuitionFee : getTuitionFeeForLevel(level);
+  const derivedBalance = Math.max(computedTuitionFee - normalizedPaid, 0);
+  const providedBalance = typeof balanceDue === "number" ? Math.max(balanceDue, 0) : null;
 
   const computedBalance =
-    typeof balanceDue === "number"
-      ? Math.max(balanceDue, 0)
-      : Math.max(computedTuitionFee - normalizedPaid, 0);
+    providedBalance === null
+      ? derivedBalance
+      : Math.min(providedBalance, derivedBalance);
 
   let statusLabel = "Pending";
   if (computedTuitionFee > 0 && normalizedPaid >= computedTuitionFee) {

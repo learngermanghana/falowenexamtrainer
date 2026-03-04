@@ -28,7 +28,7 @@ const TuitionStatusCard = ({
   balanceDue,
   tuitionFee,
   showPaymentAction = true,
-  title = "Balance & tuition",
+  title,
   description,
   checkoutAmountOverride,
 }) => {
@@ -97,22 +97,22 @@ const TuitionStatusCard = ({
   const accessAfterPayment = willClearTuition ? "6 months" : "1 month";
 
   const amountHelper = useMemo(() => {
-    if (maxPayable <= 0) return "No balance due.";
+    if (maxPayable <= 0) return t("accountSettings.tuition.noBalance");
 
     if (isFinalTopUp) {
-      return `Final top-up: paying ${formatMoney(maxPayable)} completes your tuition and gives access for ${accessAfterPayment}.`;
+      return t("accountSettings.tuition.finalTopUp", { amount: formatMoney(maxPayable), access: accessAfterPayment });
     }
 
     if (!amountToPay) {
-      return `Enter an amount (min ${formatMoney(MIN_INSTALLMENT_GHS)}, or pay the remaining balance).`;
+      return t("accountSettings.tuition.enterAmount", { min: formatMoney(MIN_INSTALLMENT_GHS) });
     }
 
     if (!meetsMinimum) {
-      return `Minimum is ${formatMoney(MIN_INSTALLMENT_GHS)} unless you're paying the remaining ${formatMoney(maxPayable)}.`;
+      return t("accountSettings.tuition.minimumRule", { min: formatMoney(MIN_INSTALLMENT_GHS), remaining: formatMoney(maxPayable) });
     }
 
     const remaining = Math.max(maxPayable - amountToPay, 0);
-    return `After this payment: access for ${accessAfterPayment}. Remaining balance: ${formatMoney(remaining)}.`;
+    return t("accountSettings.tuition.afterPayment", { access: accessAfterPayment, remaining: formatMoney(remaining) });
   }, [accessAfterPayment, amountToPay, formatMoney, isFinalTopUp, maxPayable, meetsMinimum]);
 
   const canPay =
@@ -208,7 +208,7 @@ const TuitionStatusCard = ({
   return (
     <div style={{ ...styles.card, margin: 0 }} data-testid="tuition-status-card">
       <div style={styles.metaRow}>
-        <h3 style={{ margin: 0 }}>{title}</h3>
+        <h3 style={{ margin: 0 }}>{title || t("accountSettings.billing.balanceTitle")}</h3>
         <span style={styles.badge}>{summary.statusLabel}</span>
       </div>
 
@@ -216,15 +216,15 @@ const TuitionStatusCard = ({
 
       <div style={{ display: "grid", gap: 8, marginTop: 10 }}>
         <div style={styles.metaRow}>
-          <span>Tuition</span>
+          <span>{t("accountSettings.tuition.tuition")}</span>
           <strong>{formatMoney(summary.tuitionFee)}</strong>
         </div>
         <div style={styles.metaRow}>
-          <span>Paid so far</span>
+          <span>{t("accountSettings.tuition.paidSoFar")}</span>
           <strong>{formatMoney(summary.paidAmount)}</strong>
         </div>
         <div style={styles.metaRow}>
-          <span>Balance remaining</span>
+          <span>{t("accountSettings.tuition.balanceRemaining")}</span>
           <strong>{formatMoney(summary.balanceDue)}</strong>
         </div>
       </div>
@@ -243,11 +243,11 @@ const TuitionStatusCard = ({
             >
               <strong>
                 {paymentGraceNotice.isExpired
-                  ? "Payment grace period ended."
-                  : `Payment window: ${paymentGraceNotice.daysLeft} day${paymentGraceNotice.daysLeft === 1 ? "" : "s"} left.`}
+                  ? t("accountSettings.tuition.graceEnded")
+                  : t("accountSettings.tuition.graceDays", { count: paymentGraceNotice.daysLeft })}
               </strong>
               <p style={{ ...styles.helperText, margin: "4px 0 0", color: "#9a3412" }}>
-                Please make payment within 7 days of signup. If no payment is made, your student data will be deleted after 7 days.
+                {t("accountSettings.tuition.graceBody")}
               </p>
             </div>
           ) : null}
@@ -264,11 +264,11 @@ const TuitionStatusCard = ({
             <>
               <div style={{ ...styles.card, margin: 0, background: "#f8fafc", borderColor: "#e2e8f0" }}>
                 <div style={styles.metaRow}>
-                  <span>Final payment</span>
+                  <span>{t("accountSettings.tuition.finalPayment")}</span>
                   <strong>{formatMoney(maxPayable)}</strong>
                 </div>
                 <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                  Your remaining balance is below the {formatMoney(MIN_INSTALLMENT_GHS)} installment minimum, so you can pay the exact balance to finish.
+                  {t("accountSettings.tuition.finalPaymentHelp", { min: formatMoney(MIN_INSTALLMENT_GHS) })}
                 </p>
               </div>
 
@@ -280,12 +280,12 @@ const TuitionStatusCard = ({
                 onClick={startPayment}
                 disabled={!canPay || isStartingPayment}
               >
-                {isStartingPayment ? "Opening Paystack ..." : `Pay ${formatMoney(maxPayable)} to finish`}
+                {isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payToFinish", { amount: formatMoney(maxPayable) })}
               </button>
             </>
           ) : (
             <>
-              <label style={{ ...styles.label, marginBottom: 6 }}>Amount to pay now</label>
+              <label style={{ ...styles.label, marginBottom: 6 }}>{t("accountSettings.tuition.amountNow")}</label>
               <input
                 type="text"
                 inputMode="numeric"
@@ -295,7 +295,7 @@ const TuitionStatusCard = ({
                   setAmountText(e.target.value);
                 }}
                 style={{ ...styles.textArea, minHeight: "auto", height: 44 }}
-                placeholder={`Min ${formatMoney(MIN_INSTALLMENT_GHS)} (or pay remaining)`}
+                placeholder={t("accountSettings.tuition.amountPlaceholder", { min: formatMoney(MIN_INSTALLMENT_GHS) })}
               />
               <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{amountHelper}</p>
 
@@ -309,7 +309,7 @@ const TuitionStatusCard = ({
                   }}
                   disabled={maxPayable <= 0 || isStartingPayment}
                 >
-                  Pay full balance ({formatMoney(maxPayable)})
+                  {t("accountSettings.tuition.payOutstanding", { amount: formatMoney(maxPayable) })}
                 </button>
 
                 <button
@@ -318,7 +318,7 @@ const TuitionStatusCard = ({
                   onClick={startPayment}
                   disabled={!canPay || isStartingPayment}
                 >
-                  {isStartingPayment ? "Opening Paystack ..." : "Pay tuition online"}
+                  {isStartingPayment ? t("accountSettings.tuition.opening") : t("accountSettings.tuition.payOnline")}
                 </button>
               </div>
             </>
@@ -336,9 +336,9 @@ const TuitionStatusCard = ({
             marginTop: 12,
           }}
         >
-          <strong>Payments are only available on the web app.</strong>
+          <strong>{t("accountSettings.tuition.webOnlyTitle")}</strong>
           <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-            To pay or renew your contract, please visit the web app. Payments are hidden in the Android app to meet Play Store rules.
+            {t("accountSettings.tuition.webOnlyBody")}
           </p>
         </div>
       )}

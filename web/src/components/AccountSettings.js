@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { styles } from "../styles";
 import { correctBiography } from "../services/profileService";
 import TuitionStatusCard from "./TuitionStatusCard";
@@ -23,6 +24,7 @@ const formatDate = (value) => {
 
 const AccountSettings = () => {
   const { user, studentProfile, idToken, saveStudentProfile } = useAuth();
+  const { showToast } = useToast();
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -31,13 +33,12 @@ const AccountSettings = () => {
     [locale]
   );
   const paymentsEnabled = isPaymentsEnabled();
-  const [profile, setProfile] = useState({
-    biography: "",
-  });
+  const [profile, setProfile] = useState({ biography: "" });
   const [status, setStatus] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isCorrectingBio, setIsCorrectingBio] = useState(false);
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
+  const [lastSavedAt, setLastSavedAt] = useState(null);
 
   useEffect(() => {
     setProfile((prev) => ({
@@ -46,16 +47,43 @@ const AccountSettings = () => {
     }));
   }, [studentProfile, user]);
 
-  const paidAmount = useMemo(() => {
-    const paid = studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0;
-    return Math.max(Number(paid) || 0, 0);
-  }, [studentProfile?.initialPaymentAmount, studentProfile?.paid]);
+  const billingSummary = useMemo(() => {
+    const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
+    const tuition = Math.max(Number(studentProfile?.tuitionFee ?? getTuitionFeeForLevel(studentProfile?.level)) || 0, 0);
+    const explicitBalanceRaw = studentProfile?.balanceDue ?? studentProfile?.balance;
+    const explicitBalance = explicitBalanceRaw === undefined || explicitBalanceRaw === null
+      ? null
+      : Math.max(Number(explicitBalanceRaw) || 0, 0);
+    const derivedBalance = Math.max(tuition - paid, 0);
+    const balanceDue = explicitBalance === null ? derivedBalance : Math.min(explicitBalance, derivedBalance);
+    return { paidAmount: paid, tuitionFee: tuition, balanceDue };
+  }, [studentProfile]);
 
-  const balanceDue = useMemo(() => {
-    const balance = studentProfile?.balanceDue ?? studentProfile?.balance;
-    if (balance === null || balance === undefined) return undefined;
-    return Math.max(Number(balance) || 0, 0);
-  }, [studentProfile?.balance, studentProfile?.balanceDue]);
+  const paidAmount = billingSummary.paidAmount;
+  const balanceDue = billingSummary.balanceDue;
+
+  const transactionHistory = useMemo(() => {
+    const candidates = [
+      ...(Array.isArray(studentProfile?.payments) ? studentProfile.payments : []),
+      ...(Array.isArray(studentProfile?.paymentHistory) ? studentProfile.paymentHistory : []),
+      ...(Array.isArray(studentProfile?.transactions) ? studentProfile.transactions : []),
+    ];
+
+    return candidates
+      .map((entry, index) => {
+        const amount = Number(entry?.amount ?? entry?.paidAmount ?? 0) || 0;
+        return {
+          id: entry?.id || entry?.reference || `tx-${index}`,
+          date: formatDate(entry?.date || entry?.paidAt || entry?.createdAt),
+          amount,
+          channel: entry?.channel || entry?.provider || "Paystack",
+          reference: entry?.reference || entry?.transactionReference || "—",
+          status: entry?.status || t("accountSettings.billing.transaction.statusCompleted"),
+          receiptUrl: entry?.receiptUrl || entry?.receipt || entry?.receiptLink || "",
+        };
+      })
+      .sort((a, b) => (a.date < b.date ? 1 : -1));
+  }, [studentProfile?.paymentHistory, studentProfile?.payments, studentProfile?.transactions, t]);
 
   const subscription = useMemo(() => {
     const contractEnd = studentProfile?.contractEnd ? toDate(studentProfile.contractEnd) : null;
@@ -67,31 +95,37 @@ const AccountSettings = () => {
 
     const plan =
       contractMonths === 6
-        ? "6-month contract"
+        ? t("accountSettings.billing.contract.sixMonth")
         : contractMonths === 1
-        ? "1-month access"
+        ? t("accountSettings.billing.contract.oneMonth")
         : hasPaid
-        ? "6-month contract"
+        ? t("accountSettings.billing.contract.sixMonth")
         : paymentStatus === "partial"
-        ? "1-month access"
-        : "Payment required";
+        ? t("accountSettings.billing.contract.oneMonth")
+        : t("accountSettings.billing.contract.paymentRequired");
+
+    const renewalDays = contractEnd ? Math.ceil((contractEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
 
     return {
       plan,
       renewalDate: formatDate(studentProfile?.contractEnd),
-      status: isActive ? "Active" : "Pending",
+      renewalDays,
+      status: isActive ? t("accountSettings.billing.statusActive") : t("accountSettings.billing.statusPending"),
       seats: 1,
-      paymentMethod: paymentsEnabled ? "Paystack" : "Web portal",
+      paymentMethod: paymentsEnabled ? "Paystack" : t("accountSettings.billing.paymentMethodWeb"),
       invoiceEmail: studentProfile?.email || user?.email || "",
+      autoRenew: Boolean(studentProfile?.autoRenew),
     };
   }, [
     paymentsEnabled,
     studentProfile?.contractEnd,
     studentProfile?.contractTermMonths,
     studentProfile?.paymentStatus,
+    studentProfile?.autoRenew,
     balanceDue,
     studentProfile?.email,
     user?.email,
+    t,
   ]);
 
   const paymentAlert = useMemo(() => {
@@ -105,12 +139,10 @@ const AccountSettings = () => {
     const daysLabel = t("common.day", { count: daysLeft, formattedCount: numberFormatter.format(daysLeft) });
 
     return {
-      balanceDue,
-      daysLeft,
       message:
         daysLeft === 0
-          ? `Your access ends today and you still owe ${formatMoney(balanceDue)}. Please make a payment to keep access.`
-          : `You still owe ${formatMoney(balanceDue)} and have ${daysLabel} left. Please make a payment to keep access.`,
+          ? t("accountSettings.billing.alertToday", { amount: formatMoney(balanceDue) })
+          : t("accountSettings.billing.alertDays", { amount: formatMoney(balanceDue), daysLabel }),
     };
   }, [balanceDue, formatMoney, numberFormatter, studentProfile?.contractEnd, t]);
 
@@ -123,7 +155,7 @@ const AccountSettings = () => {
         currentLevel,
         nextLevel: null,
         canUpgrade: false,
-        reason: "You're already at the highest available level.",
+        reason: t("accountSettings.upgrade.maxedOut"),
       };
     }
 
@@ -133,7 +165,7 @@ const AccountSettings = () => {
         currentLevel,
         nextLevel,
         canUpgrade: false,
-        reason: "Clear your current balance before moving to the next level.",
+        reason: t("accountSettings.upgrade.clearBalance"),
       };
     }
 
@@ -146,7 +178,7 @@ const AccountSettings = () => {
       canUpgrade: true,
       reason: "",
     };
-  }, [balanceDue, studentProfile?.level]);
+  }, [balanceDue, studentProfile?.level, t]);
 
   const handleUpgradeToNextLevel = async () => {
     if (!levelUpgrade?.canUpgrade || !levelUpgrade?.nextLevel) return;
@@ -172,47 +204,37 @@ const AccountSettings = () => {
         contractEnd: "",
       });
 
-      setStatus(`You're now on ${nextLevel}. Please complete payment to unlock access.`);
+      setStatus(t("accountSettings.upgrade.success", { level: nextLevel }));
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Could not upgrade level.";
+      const message = error instanceof Error ? error.message : t("accountSettings.upgrade.error");
       setStatus(message);
     } finally {
       setIsUpgradingLevel(false);
     }
   };
 
-  const handleChange = (field) => (event) => {
-    setProfile((prev) => ({ ...prev, [field]: event.target.value }));
-    setStatus("");
-  };
-
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    const payload = {
-      biography: profile.biography.trim(),
-    };
-
     setIsSaving(true);
     setStatus("");
 
-    saveStudentProfile(payload)
+    saveStudentProfile({ biography: profile.biography.trim() })
       .then(() => {
-        setStatus("Profile saved. Your classmates can now read your bio.");
+        setLastSavedAt(new Date());
+        showToast(t("accountSettings.profile.bioSaved"), "success");
       })
       .catch((error) => {
-        const message = error instanceof Error ? error.message : "Could not save profile.";
+        const message = error instanceof Error ? error.message : t("accountSettings.profile.bioError");
         setStatus(message);
+        showToast(message, "error");
       })
-      .finally(() => {
-        setIsSaving(false);
-      });
+      .finally(() => setIsSaving(false));
   };
 
   const handleCorrectBiography = async () => {
     const draft = profile.biography || "";
     if (!draft.trim()) {
-      setStatus("Please add a short bio before asking the AI to correct it.");
+      setStatus(t("accountSettings.profile.bioEmpty"));
       return;
     }
 
@@ -223,217 +245,123 @@ const AccountSettings = () => {
       const { corrected } = await correctBiography({ text: draft, level: studentProfile?.level, idToken });
       if (corrected) {
         setProfile((prev) => ({ ...prev, biography: corrected }));
-        setStatus("AI suggestions applied to your bio.");
+        showToast(t("accountSettings.profile.bioAiApplied"), "success");
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Could not correct your biography.";
+      const message = error instanceof Error ? error.message : t("accountSettings.profile.bioCorrectError");
       setStatus(message);
+      showToast(message, "error");
     } finally {
       setIsCorrectingBio(false);
     }
   };
 
   if (!studentProfile) {
-    return (
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Account &amp; Billing</h2>
-          <span style={styles.badge}>No profile data</span>
-        </div>
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          We couldn't find any account data for this login. Once your campus profile syncs, we'll show contracts,
-          payments, and billing details here.
-        </p>
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          Please contact your instructor or try again later.
-        </p>
-      </div>
-    );
+    return <div style={styles.card}>{t("accountSettings.noProfile")}</div>;
   }
+
+  const supportMailTo = `mailto:learngermanghana@gmail.com?subject=${encodeURIComponent(t("accountSettings.profile.supportSubject"))}&body=${encodeURIComponent(
+    t("accountSettings.profile.supportBody", {
+      name: studentProfile?.name || user?.displayName || "",
+      email: studentProfile?.email || user?.email || "",
+      studentCode: studentProfile?.studentCode || "",
+    })
+  )}`;
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <section style={styles.card}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Account overview</h2>
-          <span style={styles.levelPill}>{studentProfile.className || "No course"}</span>
-        </div>
-        <p style={styles.helperText}>Quick view of your key info.</p>
-
-        <div
-          style={{
-            display: "grid",
-            gap: 10,
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          }}
-        >
-          <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
-            <div style={styles.metaRow}>
-              <span>Student code</span>
-              <span style={styles.badge}>{studentProfile.status || "–"}</span>
-            </div>
-            <strong style={{ fontSize: 20 }}>{studentProfile.studentCode}</strong>
-          </div>
-
-          <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
-            <div style={styles.metaRow}>
-              <span>Course</span>
-              <span style={styles.badge}>{studentProfile.level || "–"}</span>
-            </div>
-            <strong style={{ fontSize: 16 }}>{studentProfile.className || "(no class selected)"}</strong>
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Next renewal: <strong>{subscription.renewalDate}</strong>
-            </p>
-          </div>
-
-          <div style={{ ...styles.card, margin: 0, background: "#ecfdf3", border: "1px solid #34d399" }}>
-            <div style={styles.metaRow}>
-              <span>Contact</span>
-              <span style={styles.badge}>current</span>
-            </div>
-            <strong style={{ fontSize: 16 }}>{studentProfile.phone || "(no number)"}</strong>
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              {studentProfile.location || "(location unknown)"}
-            </p>
-          </div>
-        </div>
+        <h2 style={styles.sectionTitle}>{t("accountSettings.overview.title")}</h2>
+        <p style={styles.helperText}>{t("accountSettings.overview.subtitle")}</p>
+        <p style={styles.helperText}>{t("accountSettings.overview.renewal", { date: subscription.renewalDate })}</p>
       </section>
 
       <section style={styles.card}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Account settings</h2>
-          <span style={styles.badge}>Profile &amp; communication</span>
-        </div>
-        <p style={styles.helperText}>
-          Your name and login email are managed by Falowen to keep linked apps in sync. Contact support to update them.
-        </p>
-
+        <h2 style={styles.sectionTitle}>{t("accountSettings.profile.title")}</h2>
+        <p style={styles.helperText}>{t("accountSettings.profile.adminManaged")}</p>
+        <a href={supportMailTo} style={{ ...styles.secondaryButton, display: "inline-block", textDecoration: "none", marginBottom: 10 }}>
+          {t("accountSettings.profile.requestChange")}
+        </a>
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 10 }}>
-          <div style={{
-            ...styles.card,
-            margin: 0,
-            padding: 12,
-            background: "#f8fafc",
-            borderColor: "#e2e8f0",
-          }}>
-            <div style={styles.metaRow}>
-              <span>Display name</span>
-              <span style={styles.badge}>read-only</span>
-            </div>
-            <strong style={{ fontSize: 16 }}>{studentProfile?.name || user?.displayName || "Unknown"}</strong>
-            <div style={{ ...styles.metaRow, marginTop: 8 }}>
-              <span>Login email</span>
-              <span style={styles.badge}>managed by admin</span>
-            </div>
-            <strong style={{ fontSize: 16 }}>{studentProfile?.email || user?.email || "(no email)"}</strong>
+          <label style={styles.label} htmlFor="biography">{t("accountSettings.profile.biographyLabel")}</label>
+          <textarea
+            id="biography"
+            style={styles.textArea}
+            value={profile.biography}
+            onChange={(event) => setProfile((prev) => ({ ...prev, biography: event.target.value }))}
+            placeholder={t("accountSettings.profile.biographyPlaceholder")}
+          />
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
+            <button type="button" style={styles.secondaryButton} onClick={handleCorrectBiography} disabled={isCorrectingBio}>
+              {isCorrectingBio ? t("accountSettings.profile.correcting") : t("accountSettings.profile.correctCta")}
+            </button>
+            <button type="submit" style={styles.primaryButton} disabled={isSaving}>
+              {isSaving ? t("accountSettings.profile.saving") : t("accountSettings.profile.save")}
+            </button>
           </div>
-
-          <div style={styles.field}>
-            <label style={styles.label} htmlFor="biography">
-              Class biography
-            </label>
-            <textarea
-              id="biography"
-              style={styles.textArea}
-              value={profile.biography}
-              onChange={handleChange("biography")}
-              placeholder="Write 2-4 sentences about your work, goals, or hobbies. Classmates will see this on the member page."
-            />
-            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 6, flexWrap: "wrap" }}>
-              <button
-                type="button"
-                style={styles.secondaryButton}
-                onClick={handleCorrectBiography}
-                disabled={isCorrectingBio}
-              >
-                {isCorrectingBio ? "AI is polishing ..." : "Correct with AI"}
-              </button>
-              <button type="submit" style={styles.primaryButton} disabled={isSaving}>
-                {isSaving ? "Saving ..." : "Save changes"}
-              </button>
-            </div>
-            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-              Your bio is read-only on the member page. Edit it here anytime.
+          {lastSavedAt ? (
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              {t("accountSettings.profile.lastSaved", { time: lastSavedAt.toLocaleString(locale) })}
             </p>
-          </div>
-          {status && (
-            <div style={{ ...styles.errorBox, background: "#ecfdf3", color: "#065f46", borderColor: "#34d399" }}>
-              {status}
-            </div>
-          )}
+          ) : null}
+          {status ? <div style={styles.errorBox}>{status}</div> : null}
         </form>
       </section>
 
       <section style={styles.card}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-          <h2 style={styles.sectionTitle}>Subscription &amp; billing</h2>
-          <span style={styles.levelPill}>{subscription.status}</span>
-        </div>
-        <p style={styles.helperText}>Essential billing info at a glance.</p>
+        <h2 style={styles.sectionTitle}>{t("accountSettings.billing.title")}</h2>
+        <p style={styles.helperText}>{t("accountSettings.billing.subtitle")}</p>
         {paymentAlert ? <div style={styles.errorBox}>{paymentAlert.message}</div> : null}
-
-        <div style={{ ...styles.gridTwo, gap: 10 }}>
-          <div style={{ ...styles.card, margin: 0 }}>
-            <div style={styles.metaRow}>
-              <h3 style={{ margin: 0 }}>{subscription.plan}</h3>
-              <span style={styles.badge}>Seat: {subscription.seats}</span>
-            </div>
-            <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
-              <div style={styles.metaRow}>
-                <span>Next renewal</span>
-                <strong>{subscription.renewalDate}</strong>
-              </div>
-              <div style={styles.metaRow}>
-                <span>Payment</span>
-                <strong>{studentProfile.paymentStatus || "pending"}</strong>
-              </div>
-            </div>
-          </div>
-
-          <div style={{ ...styles.card, margin: 0, background: "#f8fafc", borderColor: "#e2e8f0" }}>
-            <div style={styles.metaRow}>
-              <h3 style={{ margin: 0 }}>Level progression</h3>
-              <span style={styles.badge}>{levelUpgrade.currentLevel || "No level"}</span>
-            </div>
-            {levelUpgrade.nextLevel ? (
-              <>
-                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                  Completed {levelUpgrade.currentLevel}? Move to <strong>{levelUpgrade.nextLevel}</strong>.
-                  Next level tuition: <strong>{formatMoney(levelUpgrade.nextTuitionFee || 0)}</strong>.
-                </p>
-                <button
-                  type="button"
-                  style={{ ...styles.primaryButton, marginTop: 10 }}
-                  onClick={handleUpgradeToNextLevel}
-                  disabled={!levelUpgrade.canUpgrade || isUpgradingLevel}
-                >
-                  {isUpgradingLevel ? "Upgrading ..." : `Upgrade to ${levelUpgrade.nextLevel}`}
-                </button>
-              </>
-            ) : (
-              <p style={{ ...styles.helperText, margin: "8px 0 0" }}>{levelUpgrade.reason}</p>
-            )}
-            {levelUpgrade.reason && levelUpgrade.nextLevel ? (
-              <p style={{ ...styles.helperText, margin: "8px 0 0", color: "#92400e" }}>
-                {levelUpgrade.reason}
-              </p>
-            ) : null}
-          </div>
-
-          <TuitionStatusCard
-            level={studentProfile.level}
-            paidAmount={paidAmount}
-            balanceDue={balanceDue}
-            tuitionFee={studentProfile.tuitionFee}
-            checkoutAmountOverride={
-              paidAmount > 0
-                ? undefined
-                : studentProfile?.paymentIntentAmount
-            }
-            title="Balance & tuition"
-            description={`Billing email: ${subscription.invoiceEmail || "add an email"}`}
-          />
+        <div style={{ ...styles.card, margin: "8px 0 0" }}>
+          <div style={styles.metaRow}><span>{t("accountSettings.billing.nextRenewal")}</span><strong>{subscription.renewalDate}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.billing.countdown")}</span><strong>{subscription.renewalDays > 0 ? t("accountSettings.billing.inDays", { count: subscription.renewalDays }) : t("accountSettings.billing.dueNow")}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.billing.renewalMode")}</span><strong>{subscription.autoRenew ? t("accountSettings.billing.autoRenew") : t("accountSettings.billing.manualRenew")}</strong></div>
+          <p style={{ ...styles.helperText, marginTop: 8 }}>{t("accountSettings.billing.policySummary")}</p>
         </div>
+
+        <TuitionStatusCard
+          level={studentProfile.level}
+          paidAmount={paidAmount}
+          balanceDue={balanceDue}
+          tuitionFee={billingSummary.tuitionFee}
+          checkoutAmountOverride={paidAmount > 0 ? undefined : studentProfile?.paymentIntentAmount}
+          title={t("accountSettings.billing.balanceTitle")}
+          description={t("accountSettings.billing.email", { email: subscription.invoiceEmail || t("accountSettings.billing.addEmail") })}
+        />
+
+        <div style={{ ...styles.card, marginTop: 12 }}>
+          <h3 style={{ marginTop: 0 }}>{t("accountSettings.billing.transaction.title")}</h3>
+          {transactionHistory.length === 0 ? (
+            <p style={styles.helperText}>{t("accountSettings.billing.transaction.empty")}</p>
+          ) : (
+            <div style={{ display: "grid", gap: 8 }}>
+              {transactionHistory.map((tx) => (
+                <div key={tx.id} style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+                  <div style={styles.metaRow}><span>{tx.date}</span><strong>{formatMoney(tx.amount)}</strong></div>
+                  <div style={styles.metaRow}><span>{t("accountSettings.billing.transaction.channel")}</span><span>{tx.channel}</span></div>
+                  <div style={styles.metaRow}><span>{t("accountSettings.billing.transaction.reference")}</span><span>{tx.reference}</span></div>
+                  <div style={styles.metaRow}><span>{t("accountSettings.billing.transaction.status")}</span><span>{tx.status}</span></div>
+                  {tx.receiptUrl ? <a href={tx.receiptUrl} target="_blank" rel="noreferrer">{t("accountSettings.billing.transaction.receipt")}</a> : null}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>{t("accountSettings.upgrade.title")}</h2>
+        {levelUpgrade.nextLevel ? (
+          <>
+            <p style={styles.helperText}>{t("accountSettings.upgrade.description", { currentLevel: levelUpgrade.currentLevel, nextLevel: levelUpgrade.nextLevel, amount: formatMoney(levelUpgrade.nextTuitionFee || 0) })}</p>
+            <button type="button" style={styles.primaryButton} onClick={handleUpgradeToNextLevel} disabled={!levelUpgrade.canUpgrade || isUpgradingLevel}>
+              {isUpgradingLevel ? t("accountSettings.upgrade.upgrading") : t("accountSettings.upgrade.button", { nextLevel: levelUpgrade.nextLevel })}
+            </button>
+            {levelUpgrade.reason ? <p style={{ ...styles.helperText, color: "#92400e" }}>{levelUpgrade.reason}</p> : null}
+          </>
+        ) : (
+          <p style={styles.helperText}>{levelUpgrade.reason}</p>
+        )}
       </section>
     </div>
   );

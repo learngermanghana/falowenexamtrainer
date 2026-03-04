@@ -1317,5 +1317,100 @@
   },
   "navigationGuide": {
     "message": "Nutze die Dashboard-Karten unten, um schnell zwischen Klassen, Aufgaben und deiner Prüfungsakte zu wechseln."
+  },
+  "accountSettings": {
+    "noProfile": "Wir konnten noch keine Kontodaten finden. Bitte versuche es bald erneut.",
+    "overview": {
+      "title": "Kontoübersicht",
+      "subtitle": "Schneller Überblick über deine wichtigsten Daten.",
+      "renewal": "Nächste Verlängerung: {{date}}"
+    },
+    "profile": {
+      "title": "Kontoeinstellungen",
+      "adminManaged": "Dein Name und deine Login-E-Mail werden vom Admin verwaltet. Nutze den Support für Profiländerungen.",
+      "requestChange": "Profiländerung anfragen",
+      "supportSubject": "Anfrage zur Profiländerung",
+      "supportBody": "Hallo Falowen-Team,%0D%0A%0D%0ABitte helft mir bei der Aktualisierung meiner Profildaten.%0D%0AName: {{name}}%0D%0AE-Mail: {{email}}%0D%0ASchülercode: {{studentCode}}%0D%0A%0D%0ADanke.",
+      "biographyLabel": "Klassenbiografie",
+      "biographyPlaceholder": "Schreibe 2–4 Sätze über Arbeit, Ziele oder Hobbys.",
+      "correcting": "KI optimiert ...",
+      "correctCta": "Mit KI korrigieren",
+      "saving": "Speichern ...",
+      "save": "Änderungen speichern",
+      "lastSaved": "Zuletzt gespeichert: {{time}}",
+      "bioSaved": "Biografie erfolgreich gespeichert.",
+      "bioError": "Profil konnte nicht gespeichert werden.",
+      "bioEmpty": "Bitte füge zuerst eine kurze Biografie hinzu.",
+      "bioAiApplied": "KI-Vorschläge wurden übernommen.",
+      "bioCorrectError": "Biografie konnte nicht korrigiert werden."
+    },
+    "billing": {
+      "title": "Abo & Abrechnung",
+      "subtitle": "Wichtige Zahlungsinfos auf einen Blick.",
+      "balanceTitle": "Saldo & Kursgebühr",
+      "email": "Rechnungs-E-Mail: {{email}}",
+      "addEmail": "E-Mail hinzufügen",
+      "statusActive": "Aktiv",
+      "statusPending": "Ausstehend",
+      "paymentMethodWeb": "Web-Portal",
+      "nextRenewal": "Nächste Verlängerung",
+      "countdown": "Countdown zur Verlängerung",
+      "inDays": "in {{count}} Tagen",
+      "dueNow": "jetzt fällig",
+      "renewalMode": "Verlängerungsmodus",
+      "autoRenew": "Automatisch",
+      "manualRenew": "Manuell",
+      "policySummary": "Verlängerungen richten sich nach deiner Vertragslaufzeit. Für Änderungen oder Stoppen künftiger Verlängerungen kontaktiere den Support vor dem Verlängerungsdatum.",
+      "alertToday": "Dein Zugang endet heute und es fehlen noch {{amount}}. Bitte zahle, um den Zugang zu behalten.",
+      "alertDays": "Es fehlen noch {{amount}} und du hast noch {{daysLabel}} Zeit. Bitte zahle, um den Zugang zu behalten.",
+      "contract": {
+        "sixMonth": "6-Monats-Vertrag",
+        "oneMonth": "1-Monat-Zugang",
+        "paymentRequired": "Zahlung erforderlich"
+      },
+      "transaction": {
+        "title": "Transaktionsverlauf",
+        "empty": "Noch keine Transaktionen.",
+        "channel": "Kanal",
+        "reference": "Referenz",
+        "status": "Status",
+        "statusCompleted": "abgeschlossen",
+        "receipt": "Beleg öffnen"
+      }
+    },
+    "tuition": {
+      "tuition": "Kursgebühr",
+      "paidSoFar": "Bereits bezahlt",
+      "balanceRemaining": "Restbetrag",
+      "noBalance": "Kein offener Betrag.",
+      "finalTopUp": "Letzte Nachzahlung: Mit {{amount}} ist deine Kursgebühr vollständig bezahlt und du erhältst {{access}} Zugang.",
+      "enterAmount": "Betrag eingeben (mind. {{min}} oder Restbetrag zahlen).",
+      "minimumRule": "Mindestens {{min}}, außer du zahlst den Restbetrag von {{remaining}}.",
+      "afterPayment": "Nach dieser Zahlung: Zugang für {{access}}. Restbetrag: {{remaining}}.",
+      "graceEnded": "Zahlungsfrist ist abgelaufen.",
+      "graceDays": "Zahlungsfenster: noch {{count}} Tag.",
+      "graceDays_plural": "Zahlungsfenster: noch {{count}} Tage.",
+      "graceBody": "Bitte zahle innerhalb von 7 Tagen nach der Anmeldung. Ohne Zahlung werden die Profildaten nach 7 Tagen gelöscht.",
+      "finalPayment": "Abschlusszahlung",
+      "finalPaymentHelp": "Dein Restbetrag liegt unter der Mindestrate von {{min}}, daher kannst du den exakten Restbetrag zahlen.",
+      "opening": "Paystack wird geöffnet ...",
+      "payToFinish": "{{amount}} zahlen und abschließen",
+      "amountNow": "Jetzt zu zahlender Betrag",
+      "amountPlaceholder": "Mind. {{min}} (oder Restbetrag)",
+      "payOutstanding": "Offenen Betrag jetzt zahlen ({{amount}})",
+      "payOnline": "Kursgebühr online zahlen",
+      "webOnlyTitle": "Zahlungen sind nur in der Web-App verfügbar.",
+      "webOnlyBody": "Für Zahlung oder Vertragsverlängerung nutze bitte die Web-App. In der Android-App sind Zahlungen wegen Play-Store-Regeln ausgeblendet."
+    },
+    "upgrade": {
+      "title": "Level-Fortschritt",
+      "description": "{{currentLevel}} abgeschlossen? Wechsle zu {{nextLevel}}. Kursgebühr für das nächste Level: {{amount}}.",
+      "button": "Auf {{nextLevel}} upgraden",
+      "upgrading": "Upgrade läuft ...",
+      "success": "Du bist jetzt auf {{level}}. Bitte zahle, um den Zugang freizuschalten.",
+      "error": "Level-Upgrade fehlgeschlagen.",
+      "maxedOut": "Du bist bereits auf dem höchsten verfügbaren Level.",
+      "clearBalance": "Bitte begleiche zuerst deinen offenen Betrag."
+    }
   }
 }
