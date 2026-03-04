@@ -73,7 +73,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Positive, Comparative, and Superlative in German",
     video: "https://youtu.be/oo3pUo5OSDE",
     youtube_link: "https://youtu.be/oo3pUo5OSDE",
-    grammarbook_link: "https://drive.google.com/file/d/1Z3sSDCxPQz27TDSpN9r8lQUpHhBVfhYZ/view?usp=sharing",
+    grammarbook_link: "/campus/course/dinge-und-personen-vergleichen-1-3-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/18YXe9mxyyKTars1gL5cgFsXrbM25kiN8/view?usp=sharing",
   },
   {
