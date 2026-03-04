@@ -27,7 +27,7 @@ const LOCK_COLLECTION = "submissionLocks";
 const MIN_SUBMISSION_CHARACTERS = 80;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
 const MAX_RESUBMISSION_TRIES = 3;
-const ACTION_COOLDOWN_MS = 45 * 1000;
+const ACTION_COOLDOWN_MS = 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
 
@@ -58,6 +58,23 @@ const normalizeIdPart = (value) =>
     .slice(0, 120);
 
 const safeLower = (v) => String(v || "").toLowerCase();
+
+const normalizeSubmissionText = (value) =>
+  String(value || "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+
+const buildStudentScopeKey = ({ userId, studentCode, studentEmail }) =>
+  [userId, studentCode, studentEmail]
+    .map((part) => normalizeIdPart(part || ""))
+    .filter(Boolean)
+    .join("__") || "anonymous";
+
+const buildSubmissionFingerprint = ({ assignmentTitle, chapterKey, submissionText }) =>
+  `${normalizeIdPart(assignmentTitle)}::${normalizeIdPart(chapterKey)}::${normalizeIdPart(
+    normalizeSubmissionText(submissionText)
+  ).slice(0, 240)}`;
 
 const toDateValue = (timestamp) => {
   if (!timestamp) return null;
@@ -101,6 +118,16 @@ const AssignmentSubmissionPage = () => {
   const studentCode = useMemo(
     () => studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "",
     [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
+  );
+
+  const studentScopeKey = useMemo(
+    () =>
+      buildStudentScopeKey({
+        userId: user?.uid,
+        studentCode,
+        studentEmail: user?.email,
+      }),
+    [studentCode, user?.email, user?.uid]
   );
 
   const assignmentDictionary = useMemo(() => {
@@ -265,17 +292,17 @@ const AssignmentSubmissionPage = () => {
   const getLockDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
-      return `${normalizeIdPart(user?.uid)}__${normalizeIdPart(preferredLevel)}__${normalizeIdPart(chapterKey)}`;
+      return `${studentScopeKey}__${normalizeIdPart(preferredLevel)}__${normalizeIdPart(chapterKey)}`;
     },
-    [buildChapterKey, preferredLevel, user?.uid]
+    [buildChapterKey, preferredLevel, studentScopeKey]
   );
 
   const getDraftDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
-      return `${normalizeIdPart(user?.uid)}__${normalizeIdPart(preferredLevel)}__${normalizeIdPart(chapterKey)}`;
+      return `${studentScopeKey}__${normalizeIdPart(preferredLevel)}__${normalizeIdPart(chapterKey)}`;
     },
-    [buildChapterKey, preferredLevel, user?.uid]
+    [buildChapterKey, preferredLevel, studentScopeKey]
   );
 
   const buildSubmissionPayload = useCallback(
@@ -290,6 +317,12 @@ const AssignmentSubmissionPage = () => {
       studentEmail: user?.email || "",
       studentId: user?.uid || "",
       studentCode,
+      studentScopeKey,
+      submissionFingerprint: buildSubmissionFingerprint({
+        assignmentTitle: form.assignmentTitle,
+        chapterKey: buildChapterKey(form.assignmentTitle),
+        submissionText: form.submissionText,
+      }),
       studentName: studentProfile?.name || "",
       className: studentProfile?.className || "",
       status: statusLabel,
@@ -303,6 +336,7 @@ const AssignmentSubmissionPage = () => {
       form.submissionText,
       preferredLevel,
       studentCode,
+      studentScopeKey,
       studentProfile?.className,
       studentProfile?.name,
       user?.email,
@@ -683,7 +717,8 @@ const AssignmentSubmissionPage = () => {
   const submissionCooldownRemainingMs = useMemo(() => {
     if (!latestSubmissionActionAt) return 0;
     const elapsed = Date.now() - latestSubmissionActionAt.getTime();
-    return Math.max(0, ACTION_COOLDOWN_MS - elapsed);
+    const boundedElapsed = Math.max(0, elapsed);
+    return Math.max(0, Math.min(ACTION_COOLDOWN_MS, ACTION_COOLDOWN_MS - boundedElapsed));
   }, [latestSubmissionActionAt]);
 
   const submissionCooldownLabel = useMemo(() => {
@@ -748,6 +783,32 @@ const AssignmentSubmissionPage = () => {
     return selectedDayNumber ? `${base} (Day ${selectedDayNumber})` : base;
   }, [assignmentOptions, form.assignmentTitle, selectedDayNumber]);
 
+  const hasMatchingRecentSubmission = useCallback(
+    (submissionText, { includeResubmitted = true } = {}) => {
+      const currentChapterKey = buildChapterKey(form.assignmentTitle);
+      const fingerprint = buildSubmissionFingerprint({
+        assignmentTitle: form.assignmentTitle,
+        chapterKey: currentChapterKey,
+        submissionText,
+      });
+
+      return recentSubmissions.some((entry) => {
+        const statusLabel = safeLower(entry?.status);
+        if (statusLabel !== "submitted" && (!includeResubmitted || statusLabel !== "resubmitted")) return false;
+
+        const entryFingerprint = entry?.submissionFingerprint
+          || buildSubmissionFingerprint({
+            assignmentTitle: entry?.assignmentTitle || entry?.title,
+            chapterKey: entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title),
+            submissionText: entry?.submissionText,
+          });
+
+        return entryFingerprint === fingerprint;
+      });
+    },
+    [buildChapterKey, form.assignmentTitle, recentSubmissions]
+  );
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ loading: true, error: "", success: "" });
@@ -770,6 +831,15 @@ const AssignmentSubmissionPage = () => {
       setStatus({
         loading: false,
         error: `Your response is too long for this task (${formatCharacterCount(dynamicMaxSubmissionCharacters)} characters max for now).`,
+        success: "",
+      });
+      return;
+    }
+
+    if (hasMatchingRecentSubmission(form.submissionText, { includeResubmitted: true })) {
+      setStatus({
+        loading: false,
+        error: "Duplicate submission detected for this assignment. Please edit your text before submitting again.",
         success: "",
       });
       return;
@@ -886,6 +956,7 @@ const AssignmentSubmissionPage = () => {
         studentId: user.uid,
         studentEmail: user?.email || "",
         studentCode,
+        studentScopeKey,
         studentName: studentProfile?.name || "",
         className: studentProfile?.className || "",
         status: "resubmission_draft",
@@ -987,6 +1058,15 @@ const AssignmentSubmissionPage = () => {
       return;
     }
 
+    if (hasMatchingRecentSubmission(trimmedResubmission, { includeResubmitted: true })) {
+      setResubmissionStatus({
+        loading: false,
+        error: "This corrected text is the same as a recent submission. Please make it unique before resubmitting.",
+        success: "",
+      });
+      return;
+    }
+
     if (!db || !user?.uid || !isSelectedLocked) {
       setResubmissionStatus({
         loading: false,
@@ -1024,8 +1104,14 @@ const AssignmentSubmissionPage = () => {
         studentId: user.uid,
         studentEmail: user?.email || "",
         studentCode,
+        studentScopeKey,
         studentName: studentProfile?.name || "",
         className: studentProfile?.className || "",
+        submissionFingerprint: buildSubmissionFingerprint({
+          assignmentTitle: form.assignmentTitle,
+          chapterKey: buildChapterKey(form.assignmentTitle),
+          submissionText: trimmedResubmission,
+        }),
         submissionText: trimmedResubmission,
         improvementSummary: trimmedImprovement,
         previousSubmissionText: selectedPreview?.submissionText || "",
