@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
@@ -262,7 +262,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const isB2SelfLearning = selectedCourseLevel === "B2";
   const isC1SelfLearning = selectedCourseLevel === "C1";
 
-  const getStatus = (day) => dayStatuses[String(day)]?.value || "notStarted";
+  const getStatus = useCallback((day) => dayStatuses[String(day)]?.value || "notStarted", [dayStatuses]);
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
@@ -304,7 +304,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         matchesSkill(entry) &&
         matchesChapter(entry)
     );
-  }, [assignmentsOnly, chapterFilter, schedule, searchTerm, skillFilter, unfinishedOnly, dayStatuses]);
+  }, [assignmentsOnly, chapterFilter, getStatus, schedule, searchTerm, skillFilter, unfinishedOnly]);
 
   const chapterOptions = useMemo(() => {
     const set = new Set();
@@ -316,7 +316,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const todayTask = useMemo(
     () => schedule.find((entry) => entry.assignment && getStatus(entry.day) !== "submitted") || filteredSchedule[0],
-    [filteredSchedule, schedule, dayStatuses]
+    [filteredSchedule, getStatus, schedule]
   );
 
   const overview = useMemo(() => {
@@ -343,7 +343,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       streak,
       lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, schedule]);
+  }, [dayStatuses, getStatus, schedule]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
