@@ -305,7 +305,52 @@
     }
   },
   "courseTab": {
-    "instructionLabel": "Anleitung"
+    "instructionLabel": "Anleitung",
+    "title": "Kursbuch",
+    "subtitle": "Prüfe den aktualisierten Kursplan und setze dein nächstes Pflicht-Assignment fort.",
+    "level": "Kursniveau:",
+    "submit": "Assignment abgeben",
+    "todayTask": "Heutige Aufgabe",
+    "metrics": {
+      "days": "Abgeschlossene Tage: {{completed}}/{{total}}",
+      "assignments": "Eingereichte Assignments: {{submitted}}/{{total}}",
+      "streak": "Aktuelle Serie: {{count}}",
+      "lastActivity": "Letzte Aktivität: {{date}}"
+    },
+    "searchLabel": "Nach Tag, Thema oder Grammatikfokus suchen",
+    "searchPlaceholder": "z. B. Day 4 oder Pronouns",
+    "assignmentsOnly": "Nur mit Assignment",
+    "unfinishedOnly": "Nur unfertige",
+    "filterBySkill": "Nach Skill filtern",
+    "filterByChapter": "Nach Kapitel filtern",
+    "all": "Alle",
+    "jump": {
+      "week1": "Day 1–7",
+      "week2": "Day 8–14",
+      "revision": "Revision",
+      "assignmentDue": "Assignment fällig"
+    },
+    "continueAssignment": "Nächstes Pflicht-Assignment fortsetzen",
+    "chapter": "Kapitel",
+    "tutorMarked": "Tutor-bewertetes Assignment",
+    "selfPractice": "Nur Selbstübung",
+    "fromClassSchedule": "Aus dem Klassenplan",
+    "expand": "Tag ausklappen",
+    "collapse": "Tag einklappen",
+    "noResults": "Keine Kurstage passen zu deinen Filtern. Suche anpassen oder Filter deaktivieren.",
+    "assignment": "Assignment",
+    "resources": "Ressourcen",
+    "status": {
+      "notStarted": "Nicht begonnen",
+      "inProgress": "In Bearbeitung",
+      "submitted": "Eingereicht",
+      "needsRedo": "Neu bearbeiten"
+    },
+    "nav": {
+      "courseBook": "Kursbuch",
+      "classMembers": "Klassenmitglieder"
+    },
+    "todayTaskHint": "Automatisch aus deinem Fortschritt gewählt: zuerst In Bearbeitung, dann das nächste Pflicht-Assignment."
   },
   "planPage": {
     "meta": {

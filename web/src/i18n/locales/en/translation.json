@@ -300,7 +300,52 @@
     }
   },
   "courseTab": {
-    "instructionLabel": "Instruction"
+    "instructionLabel": "Instruction",
+    "title": "Course Book",
+    "subtitle": "Review the updated course plan and continue your next required assignment.",
+    "level": "Course level:",
+    "submit": "Submit assignment",
+    "todayTask": "Today's task",
+    "metrics": {
+      "days": "Days completed: {{completed}}/{{total}}",
+      "assignments": "Assignments submitted: {{submitted}}/{{total}}",
+      "streak": "Current streak: {{count}}",
+      "lastActivity": "Last activity: {{date}}"
+    },
+    "searchLabel": "Search by day, topic, or grammar focus",
+    "searchPlaceholder": "e.g., Day 4 or Pronouns",
+    "assignmentsOnly": "Has assignment",
+    "unfinishedOnly": "Unfinished only",
+    "filterBySkill": "Filter by skill",
+    "filterByChapter": "Filter by chapter",
+    "all": "All",
+    "jump": {
+      "week1": "Day 1–7",
+      "week2": "Day 8–14",
+      "revision": "Revision",
+      "assignmentDue": "Assignment due"
+    },
+    "continueAssignment": "Continue next required assignment",
+    "chapter": "Chapter",
+    "tutorMarked": "Tutor-marked assignment",
+    "selfPractice": "Self-practice only",
+    "fromClassSchedule": "From class schedule",
+    "expand": "Expand day",
+    "collapse": "Collapse day",
+    "noResults": "No course days match your filters. Try another search term or turn off a filter.",
+    "assignment": "Assignment",
+    "resources": "Resources",
+    "status": {
+      "notStarted": "Not started",
+      "inProgress": "In progress",
+      "submitted": "Submitted",
+      "needsRedo": "Needs redo"
+    },
+    "nav": {
+      "courseBook": "Course book",
+      "classMembers": "Class members"
+    },
+    "todayTaskHint": "Automatically chosen from your current progress: in progress first, then the next required assignment."
   },
   "planPage": {
     "meta": {

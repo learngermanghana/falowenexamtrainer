@@ -10,6 +10,25 @@ import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
+import { useAuth } from "../context/AuthContext";
+import { db, doc, getDoc, isFirebaseConfigured, setDoc, serverTimestamp } from "../firebase";
+
+const ASSIGNMENT_STATUSES = {
+  notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
+  inProgress: { key: "courseTab.status.inProgress", color: "#2563eb" },
+  submitted: { key: "courseTab.status.submitted", color: "#16a34a" },
+  needsRedo: { key: "courseTab.status.needsRedo", color: "#dc2626" },
+};
+const STATUS_ORDER = ["notStarted", "inProgress", "submitted", "needsRedo"];
+
+const sortByDay = (entries) => [...entries].sort((a, b) => Number(a.day || 0) - Number(b.day || 0));
+const hasTutorMarkedWork = (entry) => {
+  if (entry?.assignment) return true;
+  return (
+    toLessonArray(entry?.lesen_hören).some((lesson) => lesson?.assignment) ||
+    toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
+  );
+};
 
 const extractLevelToken = (value) => {
   if (!value) return "";
@@ -61,7 +80,6 @@ const buildLevelSchedules = () => {
           chapter: session.chapter || session.title || `Session ${index + 1}`,
           assignmentId: session.assignmentId || session.chapter || null,
           title: session.title,
-          // ✅ FIX: keep real assignment value if it exists
           assignment: Boolean(session.assignment),
           note: session.note,
           type: session.type,
@@ -108,7 +126,7 @@ const getLessonKey = (lesson) =>
     Boolean(lesson.assignment),
   ].join("::");
 
-const LessonList = ({ title, lessons }) => {
+const LessonList = ({ title, lessons, t }) => {
   const uniqueLessons = useMemo(() => {
     const seen = new Set();
     return lessons.filter((lesson) => {
@@ -139,20 +157,23 @@ const LessonList = ({ title, lessons }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
               <div style={{ fontWeight: 700 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}</div>
-              {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
+              {lesson.assignment ? <span style={styles.badge}>{t("courseTab.assignment")}</span> : null}
             </div>
 
-            <ul style={{ ...styles.checklist, margin: 0 }}>
-              {lesson.video || lesson.youtube_link ? (
-                <li>
-                  <a href={lesson.video || lesson.youtube_link} target="_blank" rel="noreferrer">
-                    {RESOURCE_ACTION_LABELS.video}
-                  </a>
-                </li>
-              ) : null}
-              <ResourceLinkRow label="Grammarbook" url={lesson.grammarbook_link} />
-              <ResourceLinkRow label="Workbook" url={lesson.workbook_link} />
-            </ul>
+            <details open>
+              <summary style={{ cursor: "pointer", fontWeight: 700 }}>{t("courseTab.resources")}</summary>
+              <ul style={{ ...styles.checklist, margin: "6px 0 0 0" }}>
+                {lesson.video || lesson.youtube_link ? (
+                  <li>
+                    <a href={lesson.video || lesson.youtube_link} target="_blank" rel="noreferrer">
+                      {RESOURCE_ACTION_LABELS.video}
+                    </a>
+                  </li>
+                ) : null}
+                <ResourceLinkRow label="Grammarbook" url={lesson.grammarbook_link} />
+                <ResourceLinkRow label="Workbook" url={lesson.workbook_link} />
+              </ul>
+            </details>
           </div>
         ))}
       </div>
@@ -169,9 +190,32 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
   return levels.filter((level) => allowed.has(level));
 };
 
+const resolveTodayTask = (schedule, getStatus) => {
+  const ordered = sortByDay(schedule);
+  if (!ordered.length) return null;
+
+  const inProgressAssignment = ordered.find(
+    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "inProgress"
+  );
+  if (inProgressAssignment) return inProgressAssignment;
+
+  const needsRedoAssignment = ordered.find(
+    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "needsRedo"
+  );
+  if (needsRedoAssignment) return needsRedoAssignment;
+
+  const nextPendingAssignment = ordered.find(
+    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) !== "submitted"
+  );
+  if (nextPendingAssignment) return nextPendingAssignment;
+
+  return ordered.find((entry) => getStatus(entry.day) !== "submitted") || ordered[ordered.length - 1];
+};
+
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user, studentProfile } = useAuth();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
@@ -205,6 +249,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [assignmentsOnly, setAssignmentsOnly] = useState(false);
+  const [unfinishedOnly, setUnfinishedOnly] = useState(false);
+  const [skillFilter, setSkillFilter] = useState("all");
+  const [chapterFilter, setChapterFilter] = useState("all");
+  const [collapsedDays, setCollapsedDays] = useState({});
+  const [dayStatuses, setDayStatuses] = useState({});
+  const [statusesLoaded, setStatusesLoaded] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
 
   useEffect(() => {
@@ -224,6 +274,76 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     }
   }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
 
+  const studentId = studentProfile?.id || user?.uid || null;
+
+  useEffect(() => {
+    if (!selectedCourseLevel) return;
+
+    let isMounted = true;
+    setStatusesLoaded(false);
+    const loadStatuses = async () => {
+      try {
+        const localKey = `course-status-${selectedCourseLevel}`;
+        const raw = window.localStorage.getItem(localKey);
+        const localStatuses = raw ? JSON.parse(raw) : {};
+
+        if (!isFirebaseConfigured || !db || !studentId) {
+          if (isMounted) {
+            setDayStatuses(localStatuses);
+            setStatusesLoaded(true);
+          }
+          return;
+        }
+
+        const progressRef = doc(db, "students", studentId, "courseProgress", selectedCourseLevel);
+        const snapshot = await getDoc(progressRef);
+        const remoteStatuses = snapshot.exists() ? snapshot.data()?.dayStatuses || {} : {};
+        const mergedStatuses = { ...localStatuses, ...remoteStatuses };
+
+        if (isMounted) {
+          setDayStatuses(mergedStatuses);
+          setStatusesLoaded(true);
+        }
+        window.localStorage.setItem(localKey, JSON.stringify(mergedStatuses));
+      } catch (error) {
+        if (isMounted) {
+          setDayStatuses({});
+          setStatusesLoaded(true);
+        }
+      }
+    };
+
+    loadStatuses();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCourseLevel, studentId]);
+
+  useEffect(() => {
+    if (!selectedCourseLevel) return;
+    if (!statusesLoaded) return;
+    const persistStatuses = async () => {
+      const localKey = `course-status-${selectedCourseLevel}`;
+      window.localStorage.setItem(localKey, JSON.stringify(dayStatuses));
+
+      if (!isFirebaseConfigured || !db || !studentId) return;
+
+      const progressRef = doc(db, "students", studentId, "courseProgress", selectedCourseLevel);
+      await setDoc(
+        progressRef,
+        {
+          dayStatuses,
+          updatedAt: serverTimestamp(),
+          level: selectedCourseLevel,
+        },
+        { merge: true }
+      );
+    };
+
+    persistStatuses().catch(() => {});
+  }, [dayStatuses, selectedCourseLevel, statusesLoaded, studentId]);
+
   const schedule = useMemo(() => schedules[selectedCourseLevel] || [], [schedules, selectedCourseLevel]);
   const isDerivedLevel = useMemo(
     () => resolvedDerivedLevels.has(selectedCourseLevel),
@@ -231,6 +351,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   );
   const isB2SelfLearning = selectedCourseLevel === "B2";
   const isC1SelfLearning = selectedCourseLevel === "C1";
+
+  const getStatus = (day) => dayStatuses[String(day)]?.value || "notStarted";
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
@@ -245,16 +367,64 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       );
     };
 
-    const hasAssignment = (entry) => {
-      if (entry.assignment) return true;
-      return (
-        toLessonArray(entry.lesen_hören).some((lesson) => lesson.assignment) ||
-        toLessonArray(entry.schreiben_sprechen).some((lesson) => lesson.assignment)
-      );
+    const hasAssignment = (entry) => hasTutorMarkedWork(entry);
+
+    const matchesSkill = (entry) => {
+      if (skillFilter === "all") return true;
+      const text = `${entry.topic || ""} ${entry.grammar_topic || ""} ${entry.instruction || ""}`.toLowerCase();
+      return text.includes(skillFilter);
     };
 
-    return schedule.filter((entry) => matchesSearch(entry) && (!assignmentsOnly || hasAssignment(entry)));
-  }, [schedule, searchTerm, assignmentsOnly]);
+    const matchesChapter = (entry) => {
+      if (chapterFilter === "all") return true;
+      return String(entry.chapter || "").toLowerCase() === chapterFilter;
+    };
+
+    return schedule.filter(
+      (entry) =>
+        matchesSearch(entry) &&
+        (!assignmentsOnly || hasAssignment(entry)) &&
+        (!unfinishedOnly || getStatus(entry.day) !== "submitted") &&
+        matchesSkill(entry) &&
+        matchesChapter(entry)
+    );
+  }, [assignmentsOnly, chapterFilter, schedule, searchTerm, skillFilter, unfinishedOnly, dayStatuses]);
+
+  const chapterOptions = useMemo(() => {
+    const set = new Set();
+    schedule.forEach((entry) => {
+      if (entry.chapter) set.add(String(entry.chapter).toLowerCase());
+    });
+    return [...set].sort();
+  }, [schedule]);
+
+  const todayTask = useMemo(() => resolveTodayTask(schedule, getStatus), [schedule, dayStatuses]);
+
+  const overview = useMemo(() => {
+    const daysCompleted = schedule.filter((entry) => getStatus(entry.day) === "submitted").length;
+    const totalAssignments = schedule.filter((entry) => hasTutorMarkedWork(entry)).length;
+    const assignmentsSubmitted = schedule.filter(
+      (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "submitted"
+    ).length;
+    let streak = 0;
+    for (const entry of schedule) {
+      if (getStatus(entry.day) === "submitted") streak += 1;
+      else break;
+    }
+    const lastActivityTs = Object.values(dayStatuses)
+      .map((entry) => entry?.updatedAt)
+      .filter(Boolean)
+      .sort((a, b) => b - a)[0];
+
+    return {
+      daysCompleted,
+      totalDays: schedule.length,
+      totalAssignments,
+      assignmentsSubmitted,
+      streak,
+      lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
+    };
+  }, [dayStatuses, schedule]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -265,168 +435,278 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             style={activeSubTab === "courseBook" ? styles.navButtonActive : styles.navButton}
             onClick={() => setActiveSubTab("courseBook")}
           >
-            Course book
+            {t("courseTab.nav.courseBook")}
           </button>
           <button
             type="button"
             style={activeSubTab === "classMembers" ? styles.navButtonActive : styles.navButton}
             onClick={() => setActiveSubTab("classMembers")}
           >
-            Class members
+            {t("courseTab.nav.classMembers")}
           </button>
         </div>
 
         {activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
 
         {activeSubTab === "courseBook" ? (
-        <>
-        <div style={{ display: "grid", gap: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-            <div style={{ display: "grid", gap: 4 }}>
-              <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Course Book</h2>
-              <span style={styles.helperText}>
-                Review the updated course book plan below, then submit your assignment when you are ready.
-              </span>
-            </div>
-            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-              <span style={styles.helperText}>Course level:</span>
-              <select
-                style={styles.select}
-                value={selectedCourseLevel}
-                onChange={(e) => {
-                  setSelectedCourseLevel(e.target.value);
-                  setHasManualSelection(true);
-                }}
-              >
-                {levels.map((level) => (
-                  <option key={level} value={level}>
-                    {level}
-                  </option>
-                ))}
-              </select>
-              <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/submit")}>
-                Submit assignment
-              </button>
-            </div>
-          </div>
-
-          {isB2SelfLearning || isC1SelfLearning ? null : (
-            <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-              <label style={{ display: "grid", gap: 6 }}>
-                <span style={styles.helperText}>Search by day, topic, or grammar focus</span>
-                <input
-                  style={{ ...styles.input, width: "100%" }}
-                  placeholder="e.g., Day 4 or Pronouns"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </label>
-
-              <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
-                <span style={styles.helperText}>Show only items with assignments</span>
-              </label>
-            </div>
-          )}
-        </div>
-
-        {isB2SelfLearning || isC1SelfLearning ? (
-          isB2SelfLearning ? <B2SelfLearningCourse /> : <C1SelfLearningCourse />
-        ) : (
           <>
-            <p style={styles.helperText}>
-              {isDerivedLevel
-                ? "This level uses the class schedule because the course book dictionary does not yet include it."
-                : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
-            </p>
+            <div style={{ display: "grid", gap: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                <div style={{ display: "grid", gap: 4 }}>
+                  <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("courseTab.title")}</h2>
+                  <span style={styles.helperText}>{t("courseTab.subtitle")}</span>
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                  <span style={styles.helperText}>{t("courseTab.level")}</span>
+                  <select
+                    style={styles.select}
+                    value={selectedCourseLevel}
+                    onChange={(e) => {
+                      setSelectedCourseLevel(e.target.value);
+                      setHasManualSelection(true);
+                    }}
+                  >
+                    {levels.map((level) => (
+                      <option key={level} value={level}>
+                        {level}
+                      </option>
+                    ))}
+                  </select>
+                  <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/submit")}>
+                    {t("courseTab.submit")}
+                  </button>
+                </div>
+              </div>
 
-            <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
-              {filteredSchedule.map((entry) => {
-                const lesenHorenList = Array.isArray(entry.lesen_hören)
-                  ? entry.lesen_hören
-                  : entry.lesen_hören
-                  ? [entry.lesen_hören]
-                  : [];
-                const schreibenSprechenList = entry.schreiben_sprechen
-                  ? Array.isArray(entry.schreiben_sprechen)
-                    ? entry.schreiben_sprechen
-                    : [entry.schreiben_sprechen]
-                  : [];
-
-                return (
-                  <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                      <div>
-                        <span style={styles.levelPill}>Day {entry.day}</span>
-                        <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
-                        {entry.chapter ? (
-                          <div style={{ ...styles.helperText, marginBottom: 4 }}>Chapter: {entry.chapter}</div>
-                        ) : null}
-                      </div>
-
-                      <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                        {entry.assignment !== undefined ? (
-                          <span style={styles.badge}>{entry.assignment ? "Assignment" : "Self-practice"}</span>
-                        ) : null}
-                        {isDerivedLevel ? <span style={styles.levelPill}>From class schedule</span> : null}
-                        {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
-                      </div>
-                    </div>
-
-                    {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-                    {entry.instruction ? (
-                      <div style={{ display: "grid", gap: 6 }}>
-                        <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
-                        <p style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-line" }}>
-                          {entry.instruction}
-                        </p>
-                        {entry.instructionLink ? (
-                          <a
-                            href={entry.instructionLink.to}
-                            style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
-                          >
-                            {entry.instructionLink.label || RESOURCE_ACTION_LABELS.guideOpenInApp}
-                          </a>
-                        ) : null}
-                      </div>
-                    ) : null}
-
-                    <LessonList title="Lesen & Hören" lessons={lesenHorenList} />
-                    <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} />
-
-                    {entry.schreiben ? (
-                      <div style={{ display: "grid", gap: 6 }}>
-                        <h4 style={{ margin: 0 }}>Schreiben</h4>
-                        <p style={{ margin: 0 }}>{entry.schreiben}</p>
-                      </div>
-                    ) : null}
-                    {entry.sprechen ? (
-                      <div style={{ display: "grid", gap: 6 }}>
-                        <h4 style={{ margin: 0 }}>Sprechen</h4>
-                        <p style={{ margin: 0 }}>{entry.sprechen}</p>
-                      </div>
-                    ) : null}
-                    {entry.zusatzmaterial ? (
-                      <div style={{ display: "grid", gap: 6 }}>
-                        <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
-                        <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
-                      </div>
-                    ) : null}
-                  </div>
-                );
-              })}
-
-              {!filteredSchedule.length ? (
-                <div style={{ ...styles.card, marginBottom: 0 }}>
-                  <p style={{ margin: 0 }}>
-                    No course days match your filters. Try another search term or turn off the assignment filter.
-                  </p>
+              {todayTask ? (
+                <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
+                  <strong>{t("courseTab.todayTask")}: </strong>
+                  Day {todayTask.day} · {todayTask.topic}
+                  <div style={{ ...styles.helperText, marginTop: 6 }}>{t("courseTab.todayTaskHint")}</div>
                 </div>
               ) : null}
+
+              <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
+                <div style={{ ...styles.card, marginBottom: 0 }}>
+                  {t("courseTab.metrics.days", { completed: overview.daysCompleted, total: overview.totalDays })}
+                </div>
+                <div style={{ ...styles.card, marginBottom: 0 }}>
+                  {t("courseTab.metrics.assignments", {
+                    submitted: overview.assignmentsSubmitted,
+                    total: overview.totalAssignments,
+                  })}
+                </div>
+                <div style={{ ...styles.card, marginBottom: 0 }}>{t("courseTab.metrics.streak", { count: overview.streak })}</div>
+                <div style={{ ...styles.card, marginBottom: 0 }}>
+                  {t("courseTab.metrics.lastActivity", { date: overview.lastActivity })}
+                </div>
+              </div>
+
+              {isB2SelfLearning || isC1SelfLearning ? null : (
+                <>
+                  <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={styles.helperText}>{t("courseTab.searchLabel")}</span>
+                      <input
+                        style={{ ...styles.input, width: "100%" }}
+                        placeholder={t("courseTab.searchPlaceholder")}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
+                      <span style={styles.helperText}>{t("courseTab.assignmentsOnly")}</span>
+                    </label>
+
+                    <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <input type="checkbox" checked={unfinishedOnly} onChange={(e) => setUnfinishedOnly(e.target.checked)} />
+                      <span style={styles.helperText}>{t("courseTab.unfinishedOnly")}</span>
+                    </label>
+
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={styles.helperText}>{t("courseTab.filterBySkill")}</span>
+                      <select style={styles.select} value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)}>
+                        <option value="all">{t("courseTab.all")}</option>
+                        <option value="lesen">Reading</option>
+                        <option value="hören">Listening</option>
+                        <option value="schreiben">Writing</option>
+                        <option value="sprechen">Speaking</option>
+                      </select>
+                    </label>
+
+                    <label style={{ display: "grid", gap: 6 }}>
+                      <span style={styles.helperText}>{t("courseTab.filterByChapter")}</span>
+                      <select style={styles.select} value={chapterFilter} onChange={(e) => setChapterFilter(e.target.value)}>
+                        <option value="all">{t("courseTab.all")}</option>
+                        {chapterOptions.map((chapter) => (
+                          <option key={chapter} value={chapter}>
+                            {chapter}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 1")}>{t("courseTab.jump.week1")}</button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 8")}>{t("courseTab.jump.week2")}</button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Revision")}>{t("courseTab.jump.revision")}</button>
+                    <button type="button" style={styles.secondaryButton} onClick={() => setAssignmentsOnly(true)}>{t("courseTab.jump.assignmentDue")}</button>
+                  </div>
+                </>
+              )}
             </div>
+
+            {isB2SelfLearning || isC1SelfLearning ? (
+              isB2SelfLearning ? <B2SelfLearningCourse /> : <C1SelfLearningCourse />
+            ) : (
+              <>
+                <p style={styles.helperText}>
+                  {isDerivedLevel
+                    ? "This level uses the class schedule because the course book dictionary does not yet include it."
+                    : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
+                </p>
+
+                {todayTask && hasTutorMarkedWork(todayTask) ? (
+                  <button
+                    type="button"
+                    style={styles.primaryButton}
+                    onClick={() => navigate("/campus/submit")}
+                  >
+                    {t("courseTab.continueAssignment")}
+                  </button>
+                ) : null}
+
+                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+                  {filteredSchedule.map((entry) => {
+                    const lesenHorenList = Array.isArray(entry.lesen_hören)
+                      ? entry.lesen_hören
+                      : entry.lesen_hören
+                      ? [entry.lesen_hören]
+                      : [];
+                    const schreibenSprechenList = entry.schreiben_sprechen
+                      ? Array.isArray(entry.schreiben_sprechen)
+                        ? entry.schreiben_sprechen
+                        : [entry.schreiben_sprechen]
+                      : [];
+                    const status = getStatus(entry.day);
+                    const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
+                    const isCollapsed = Boolean(collapsedDays[String(entry.day)]);
+                    const isTutorMarkedAssignment = hasTutorMarkedWork(entry);
+
+                    return (
+                      <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+                          <div>
+                            <span style={styles.levelPill}>Day {entry.day}</span>
+                            <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
+                            {entry.chapter ? (
+                              <div style={{ ...styles.helperText, marginBottom: 4 }}>{t("courseTab.chapter")}: {entry.chapter}</div>
+                            ) : null}
+                          </div>
+
+                          <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
+                            {entry.assignment !== undefined || isTutorMarkedAssignment ? (
+                              <span
+                                style={{
+                                  ...styles.badge,
+                                  background: isTutorMarkedAssignment ? "#fee2e2" : "#dcfce7",
+                                  color: isTutorMarkedAssignment ? "#991b1b" : "#166534",
+                                }}
+                              >
+                                {isTutorMarkedAssignment ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
+                              </span>
+                            ) : null}
+                            <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
+                              {t(statusMeta.key)}
+                            </span>
+                            <select
+                              style={styles.select}
+                              value={status}
+                              onChange={(e) =>
+                                setDayStatuses((prev) => ({
+                                  ...prev,
+                                  [String(entry.day)]: { value: e.target.value, updatedAt: Date.now() },
+                                }))
+                              }
+                            >
+                              {STATUS_ORDER.map((statusOption) => (
+                                <option key={statusOption} value={statusOption}>
+                                  {t(ASSIGNMENT_STATUSES[statusOption].key)}
+                                </option>
+                              ))}
+                            </select>
+                            {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
+                            {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          style={styles.secondaryButton}
+                          onClick={() => setCollapsedDays((prev) => ({ ...prev, [String(entry.day)]: !prev[String(entry.day)] }))}
+                        >
+                          {isCollapsed ? t("courseTab.expand") : t("courseTab.collapse")}
+                        </button>
+
+                        {isCollapsed ? null : (
+                          <>
+                            {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
+                            {entry.instruction ? (
+                              <div style={{ display: "grid", gap: 6 }}>
+                                <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
+                                <p style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-line" }}>
+                                  {entry.instruction}
+                                </p>
+                                {entry.instructionLink ? (
+                                  <a
+                                    href={entry.instructionLink.to}
+                                    style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
+                                  >
+                                    {entry.instructionLink.label || RESOURCE_ACTION_LABELS.guideOpenInApp}
+                                  </a>
+                                ) : null}
+                              </div>
+                            ) : null}
+
+                            <LessonList title="Lesen & Hören" lessons={lesenHorenList} t={t} />
+                            <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} t={t} />
+
+                            {entry.schreiben ? (
+                              <div style={{ display: "grid", gap: 6 }}>
+                                <h4 style={{ margin: 0 }}>Schreiben</h4>
+                                <p style={{ margin: 0 }}>{entry.schreiben}</p>
+                              </div>
+                            ) : null}
+                            {entry.sprechen ? (
+                              <div style={{ display: "grid", gap: 6 }}>
+                                <h4 style={{ margin: 0 }}>Sprechen</h4>
+                                <p style={{ margin: 0 }}>{entry.sprechen}</p>
+                              </div>
+                            ) : null}
+                            {entry.zusatzmaterial ? (
+                              <div style={{ display: "grid", gap: 6 }}>
+                                <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
+                                <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
+                              </div>
+                            ) : null}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {!filteredSchedule.length ? (
+                    <div style={{ ...styles.card, marginBottom: 0 }}>
+                      <p style={{ margin: 0 }}>{t("courseTab.noResults")}</p>
+                    </div>
+                  ) : null}
+                </div>
+              </>
+            )}
           </>
-        )}
-        </>
         ) : null}
       </div>
     </div>
