@@ -94,8 +94,9 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         attendanceSessions: state.attendanceSessions,
         completedAssignments: state.completedAssignments,
         totalAssignments: state.totalAssignments,
+        t,
       }),
-    [state.attendanceSessions, state.completedAssignments, state.totalAssignments]
+    [state.attendanceSessions, state.completedAssignments, state.totalAssignments, t]
   );
 
   const assignmentsLabel = state.totalAssignments
@@ -148,7 +149,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
                   whiteSpace: "nowrap",
                 }}
               >
-                Exams: {readiness.statusLabel || "Status"}
+                {t("examReadiness.examStatusLabel", "Exams")}: {readiness.statusLabel || t("examReadiness.statusFallback", "Status")}
               </span>
             </>
           ) : null}
@@ -191,7 +192,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
                 whiteSpace: "nowrap",
               }}
             >
-              {readiness.statusLabel || "Status"}
+              {readiness.statusLabel || t("examReadiness.statusFallback", "Status")}
             </span>
           </div>
 
@@ -210,8 +211,12 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
       </div>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-        <span style={styles.badge}>Attendance: {state.attendanceSessions} sessions</span>
-        <span style={styles.badge}>Marked identifiers: {assignmentsLabel}</span>
+        <span style={styles.badge}>
+          {t("examReadiness.attendanceTitle")}: {state.attendanceSessions} {t("examReadiness.sessions")}
+        </span>
+        <span style={styles.badge}>
+          {t("examReadiness.markedIdentifiers")}: {assignmentsLabel}
+        </span>
 
         {state.error ? (
           <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span>

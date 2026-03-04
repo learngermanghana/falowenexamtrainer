@@ -359,8 +359,9 @@ const MyExamFilePage = () => {
       attendanceSessions: attendanceState.sessions,
       completedAssignments: assignmentState.completed,
       totalAssignments: assignmentState.totalAssignments,
+      t,
     });
-  }, [assignmentState.completed, assignmentState.totalAssignments, attendanceState.sessions]);
+  }, [assignmentState.completed, assignmentState.totalAssignments, attendanceState.sessions, t]);
 
   const lockedAssignments = useMemo(() => {
     return (assignmentState.completed || [])
