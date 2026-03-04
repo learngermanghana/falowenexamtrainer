@@ -319,12 +319,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       return text.includes(skillFilter);
     };
 
-    const matchesSkill = (entry) => {
-      if (skillFilter === "all") return true;
-      const text = `${entry.topic || ""} ${entry.grammar_topic || ""} ${entry.instruction || ""}`.toLowerCase();
-      return text.includes(skillFilter);
-    };
-
     const matchesChapter = (entry) => {
       if (chapterFilter === "all") return true;
       return String(entry.chapter || "").toLowerCase() === chapterFilter;
