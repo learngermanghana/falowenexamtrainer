@@ -10,6 +10,25 @@ import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
+import { useAuth } from "../context/AuthContext";
+import { db, doc, getDoc, isFirebaseConfigured, setDoc, serverTimestamp } from "../firebase";
+
+const ASSIGNMENT_STATUSES = {
+  notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
+  inProgress: { key: "courseTab.status.inProgress", color: "#2563eb" },
+  submitted: { key: "courseTab.status.submitted", color: "#16a34a" },
+  needsRedo: { key: "courseTab.status.needsRedo", color: "#dc2626" },
+};
+const STATUS_ORDER = ["notStarted", "inProgress", "submitted", "needsRedo"];
+
+const sortByDay = (entries) => [...entries].sort((a, b) => Number(a.day || 0) - Number(b.day || 0));
+const hasTutorMarkedWork = (entry) => {
+  if (entry?.assignment) return true;
+  return (
+    toLessonArray(entry?.lesen_hören).some((lesson) => lesson?.assignment) ||
+    toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
+  );
+};
 
 const ASSIGNMENT_STATUSES = {
   notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
@@ -179,9 +198,32 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
   return levels.filter((level) => allowed.has(level));
 };
 
+const resolveTodayTask = (schedule, getStatus) => {
+  const ordered = sortByDay(schedule);
+  if (!ordered.length) return null;
+
+  const inProgressAssignment = ordered.find(
+    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "inProgress"
+  );
+  if (inProgressAssignment) return inProgressAssignment;
+
+  const needsRedoAssignment = ordered.find(
+    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) === "needsRedo"
+  );
+  if (needsRedoAssignment) return needsRedoAssignment;
+
+  const nextPendingAssignment = ordered.find(
+    (entry) => hasTutorMarkedWork(entry) && getStatus(entry.day) !== "submitted"
+  );
+  if (nextPendingAssignment) return nextPendingAssignment;
+
+  return ordered.find((entry) => getStatus(entry.day) !== "submitted") || ordered[ordered.length - 1];
+};
+
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user, studentProfile } = useAuth();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
@@ -277,12 +319,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       );
     };
 
-    const hasAssignment = (entry) => {
-      if (entry.assignment) return true;
-      return (
-        toLessonArray(entry.lesen_hören).some((lesson) => lesson.assignment) ||
-        toLessonArray(entry.schreiben_sprechen).some((lesson) => lesson.assignment)
-      );
+    const hasAssignment = (entry) => hasTutorMarkedWork(entry);
+
+    const matchesSkill = (entry) => {
+      if (skillFilter === "all") return true;
+      const text = `${entry.topic || ""} ${entry.grammar_topic || ""} ${entry.instruction || ""}`.toLowerCase();
+      return text.includes(skillFilter);
     };
 
     const matchesSkill = (entry) => {
