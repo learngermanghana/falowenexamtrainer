@@ -33,11 +33,11 @@ export const WRITING_PROMPTS = {
       ],
     },
     {
-      "Thema": "Schreiben Sie eine Postkarte an Ihren Freund aus dem Urlaub in Spanien.",
+      "Thema": "Ihre Nachbarin Anna hat am 4.Mai Geburtstag. Sie hat Sie eingeladen. Schreiben Sie an Anna.",
       "Punkte": [
-        "Wo sind Sie?",
-        "Wie ist das Wetter?",
-        "Was machen Sie morgen?",
+        "Dank für die Einladung!",
+        "Warum können Sie nicht kommen?",
+        "Welches Geschenk?",
       ],
     },
     {
@@ -57,11 +57,12 @@ export const WRITING_PROMPTS = {
       ],
     },
     {
-      "Thema": "Schreiben Sie einen Zettel an Ihren Nachbarn, Sie fahren in den Urlaub.",
+      "Thema": "Sie möchten am Samstagabend ein großes Familienfest mit 150 Leuten feiern. Sie brauchen einen großen Raum. Schreiben Sie an das Hotel AMANO:",
       "Punkte": [
         "Warum schreiben Sie?",
-        "Wann sind Sie zurück?",
-        "Was soll der Nachbar machen?",
+        "Essen und Trinken: Preis?",
+        "Raum: frei?",
+        "Wann?",
       ],
     },
     {
@@ -73,11 +74,11 @@ export const WRITING_PROMPTS = {
       ],
     },
     {
-      "Thema": "Schreiben Sie eine Postkarte an Ihre Eltern aus Berlin.",
+      "Thema": "Ihr Freund Peter ist Computeringenieur. Schreiben Sie eine E-Mail an Peter.",
       "Punkte": [
-        "Warum schreiben Sie?",
-        "Was haben Sie gesehen?",
-        "Wann fahren Sie zurück?",
+        "Sie sollten einen neuen Computer kaufen.",
+        "Sie sollten zusammen einkaufen.",
+        "Fragen Sie: Wann hat Peter Zeit?",
       ],
     },
     {
