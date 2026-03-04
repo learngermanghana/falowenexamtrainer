@@ -6,7 +6,6 @@ import ResultHistory from "./ResultHistory";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { fetchResults } from "../services/resultsService";
-import { fetchPersonalizedPlan } from "../services/personalizationService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
@@ -18,11 +17,10 @@ const TOTAL_ASSIGNMENTS = {
 
 const StudentResultsPage = () => {
   const { t } = useTranslation();
-  const { idToken, studentProfile, user } = useAuth();
+  const { idToken, studentProfile } = useAuth();
 
   const [results, setResults] = useState([]);
   const [leaderboard, setLeaderboard] = useState(null);
-  const [personalization, setPersonalization] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -133,60 +131,32 @@ const StudentResultsPage = () => {
         }
 
         if (useFirestoreResults) {
-          const [rows, leaderboardRows, personalizationResponse] = await Promise.all([
+          const [rows, leaderboardRows] = await Promise.all([
             loadFromResultsStore(),
             loadLeaderboardFromResultsStore(),
-            fetchPersonalizedPlan({
-              studentCode,
-              email: studentProfile?.email,
-              className: studentProfile?.className,
-              level: studentLevel,
-              userId: user?.uid,
-            }),
           ]);
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(buildLeaderboard(leaderboardRows));
-          setPersonalization(personalizationResponse || null);
           return;
         }
 
         // Prefer sheet for A1/A2/B1 if configured
         if (useSheetResults && SHEET_CSV_URL) {
-          const [sheetResponse, personalizationResponse] = await Promise.all([
-            loadFromSheet(),
-            fetchPersonalizedPlan({
-              studentCode,
-              email: studentProfile?.email,
-              className: studentProfile?.className,
-              level: studentLevel,
-              userId: user?.uid,
-            }),
-          ]);
+          const sheetResponse = await loadFromSheet();
           const { mine, all } = sheetResponse;
           if (!mounted) return;
           setResults(mine);
           setLeaderboard(buildLeaderboard(all));
-          setPersonalization(personalizationResponse || null);
           return;
         }
 
         // Otherwise fall back to API
         if (idToken) {
-          const [rows, personalizationResponse] = await Promise.all([
-            loadFromApi(),
-            fetchPersonalizedPlan({
-              studentCode,
-              email: studentProfile?.email,
-              className: studentProfile?.className,
-              level: studentLevel,
-              userId: user?.uid,
-            }),
-          ]);
+          const rows = await loadFromApi();
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(null);
-          setPersonalization(personalizationResponse || null);
           return;
         }
 
@@ -194,13 +164,11 @@ const StudentResultsPage = () => {
         if (!mounted) return;
         setResults([]);
         setLeaderboard(null);
-        setPersonalization(null);
       } catch (e) {
         if (!mounted) return;
         setError(e?.message || "Failed to load results.");
         setResults([]);
         setLeaderboard(null);
-        setPersonalization(null);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -217,9 +185,6 @@ const StudentResultsPage = () => {
     useFirestoreResults,
     useSheetResults,
     SHEET_CSV_URL,
-    studentProfile?.className,
-    studentProfile?.email,
-    user?.uid,
     buildLeaderboard,
   ]);
 
@@ -322,8 +287,6 @@ const StudentResultsPage = () => {
     ];
   }, [assignmentProgress]);
 
-  const personalizationRecommendations = personalization?.recommendations || [];
-  const personalizationHighlights = personalization?.highlights || [];
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -423,54 +386,6 @@ const StudentResultsPage = () => {
         {error ? <div style={styles.errorBox}>{error}</div> : null}
       </section>
 
-      <section style={{ ...styles.card, border: "1px solid #dbeafe", background: "#eff6ff" }}>
-        <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>{t("personalization.title")}</h3>
-        <p style={{ ...styles.helperText, margin: "0 0 12px 0" }}>{t("personalization.subtitle")}</p>
-        {personalizationRecommendations.length ? (
-          <div style={{ display: "grid", gap: 10 }}>
-            <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
-              {personalizationRecommendations.map((item) => (
-                <li key={item.title}>
-                  <strong>{item.title}.</strong>{" "}
-                  <span style={{ color: "#4b5563" }}>{item.detail}</span>
-                </li>
-              ))}
-            </ol>
-            <div>
-              <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
-                {t("personalization.feedbackLabel")}
-              </div>
-              <div style={{ ...styles.helperText, margin: 0 }}>{personalization?.feedback}</div>
-            </div>
-            {personalizationHighlights.length ? (
-              <div>
-                <div style={{ ...styles.helperText, fontWeight: 600, marginBottom: 6 }}>
-                  {t("personalization.highlightsLabel")}
-                </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  {personalizationHighlights.map((item) => (
-                    <span
-                      key={`${item.label}-${item.value}`}
-                      style={{
-                        padding: "6px 10px",
-                        background: "#fff",
-                        borderRadius: 999,
-                        border: "1px solid #bfdbfe",
-                        fontSize: 12,
-                        color: "#1f2937",
-                      }}
-                    >
-                      <strong>{item.label}:</strong> {item.value}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        ) : (
-          <p style={{ ...styles.helperText, margin: 0 }}>{t("personalization.fallback")}</p>
-        )}
-      </section>
 
       {loading ? (
         <section style={styles.card}>
