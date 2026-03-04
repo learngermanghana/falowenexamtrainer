@@ -314,7 +314,7 @@ const StudentResultsPage = () => {
 
         {!loading && !error ? (
           <div style={{ display: "grid", gap: 10, marginTop: 6 }}>
-            {progressInsights.map((item) => (
+            {visibleProgressInsights.map((item) => (
               <div
                 key={item.label}
                 style={{
