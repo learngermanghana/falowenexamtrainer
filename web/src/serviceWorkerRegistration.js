@@ -1,7 +1,6 @@
 const SERVICE_WORKER_PATH = `${process.env.PUBLIC_URL || ""}/firebase-messaging-sw.js`;
 const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
 const FORCE_REFRESH_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
-const FORCE_REFRESH_QUERY_PARAM = "refresh";
 
 const getLastForceRefreshAt = () => {
   try {
@@ -19,10 +18,9 @@ const markForceRefreshAt = (timestamp) => {
   }
 };
 
-const clearOfflineCaches = async () => {
-  if (!("caches" in window)) return;
-  const cacheKeys = await window.caches.keys();
-  await Promise.all(cacheKeys.filter((key) => key.startsWith("apzla-offline")).map((key) => window.caches.delete(key)));
+const requestSkipWaiting = (worker) => {
+  if (!worker || typeof worker.postMessage !== "function") return;
+  worker.postMessage({ type: "SKIP_WAITING" });
 };
 
 const forcePeriodicRefresh = async (registration) => {
@@ -38,35 +36,48 @@ const forcePeriodicRefresh = async (registration) => {
 
   try {
     await registration.update();
-    await clearOfflineCaches();
   } catch (error) {
     console.error("Failed to refresh service worker assets", error);
   }
 
-  const nextUrl = new URL(window.location.href);
-  nextUrl.searchParams.set(FORCE_REFRESH_QUERY_PARAM, String(now));
-  window.location.replace(nextUrl.toString());
-};
-
-const reloadWithRefreshMarker = () => {
-  const nextUrl = new URL(window.location.href);
-  nextUrl.searchParams.set(FORCE_REFRESH_QUERY_PARAM, String(Date.now()));
-  window.location.replace(nextUrl.toString());
+  window.location.reload();
 };
 
 const setupUpdateHandlers = (registration) => {
+  let hasRefreshed = false;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hasRefreshed || !navigator.serviceWorker.controller) return;
+    hasRefreshed = true;
+    window.location.reload();
+  });
+
+  if (registration.waiting) {
+    requestSkipWaiting(registration.waiting);
+  }
+
   registration.addEventListener("updatefound", () => {
     const installingWorker = registration.installing;
     if (!installingWorker) return;
 
     installingWorker.addEventListener("statechange", () => {
-      if (installingWorker.state !== "installed") return;
-
-      if (navigator.serviceWorker.controller) {
-        reloadWithRefreshMarker();
+      if (installingWorker.state === "installed") {
+        requestSkipWaiting(registration.waiting || installingWorker);
       }
     });
   });
+};
+
+const setupUpdateChecks = (registration) => {
+  const runUpdate = () => registration.update().catch((error) => console.error("Service worker update check failed", error));
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      runUpdate();
+    }
+  });
+
+  window.addEventListener("online", runUpdate);
 };
 
 export const registerOfflineServiceWorker = () => {
@@ -89,9 +100,18 @@ export const registerOfflineServiceWorker = () => {
       .register(SERVICE_WORKER_PATH)
       .then(async (registration) => {
         setupUpdateHandlers(registration);
+        setupUpdateChecks(registration);
         await registration.update();
         await forcePeriodicRefresh(registration);
       })
       .catch((error) => console.error("Service worker registration failed", error));
   });
+};
+
+export const __private__ = {
+  forcePeriodicRefresh,
+  setupUpdateHandlers,
+  setupUpdateChecks,
+  getLastForceRefreshAt,
+  markForceRefreshAt,
 };
