@@ -267,7 +267,8 @@ const A2Day3ComparisonsWorkbookPage = () => {
           </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Please submit your answers in the assignment submission area, not directly on this page.
+            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3, and
+            Teil 4.
           </p>
 
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
