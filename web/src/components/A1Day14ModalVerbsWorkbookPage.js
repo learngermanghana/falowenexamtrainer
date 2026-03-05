@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+
+/* ----------------------------- UI helpers ----------------------------- */
 
 const card = {
   ...styles.card,
@@ -11,66 +13,378 @@ const card = {
 const sectionTitle = { margin: 0, fontSize: "1.1rem" };
 const listStyle = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 
+const primaryBtn = styles.primaryButton || styles.secondaryButton;
+const secondaryBtn = styles.secondaryButton || styles.primaryButton;
+
+function normalizeGermanInput(text) {
+  return (text || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/[.。]$/g, "")
+    .toLowerCase();
+}
+
+function isCorrect(user, expected) {
+  return normalizeGermanInput(user) === normalizeGermanInput(expected);
+}
+
+const SectionCard = ({ title, children }) => (
+  <div style={card}>
+    <h2 style={sectionTitle}>{title}</h2>
+    {children}
+  </div>
+);
+
+const ChipRow = ({ items }) => (
+  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+    {items.map((w, idx) => (
+      <span
+        key={`${w}-${idx}`}
+        style={{
+          padding: "6px 10px",
+          borderRadius: 999,
+          background: "#f3f4f6",
+          border: "1px solid #e5e7eb",
+          fontSize: 14,
+        }}
+      >
+        {w}
+      </span>
+    ))}
+  </div>
+);
+
+function ExerciseItem({
+  id,
+  index,
+  words,
+  answer,
+  placeholder = "Type the correct sentence…",
+  resetKey,
+  onMark,
+}) {
+  const [value, setValue] = useState("");
+  const [checked, setChecked] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(false);
+
+  const correct = useMemo(() => isCorrect(value, answer), [value, answer]);
+
+  useEffect(() => {
+    // Reset when parent requests it
+    setValue("");
+    setChecked(false);
+    setShowAnswer(false);
+    onMark?.(id, null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
+
+  return (
+    <li style={{ marginBottom: 14 }}>
+      <div style={{ display: "grid", gap: 10 }}>
+        <ChipRow items={words} />
+
+        <input
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            setChecked(false);
+            onMark?.(id, null);
+          }}
+          placeholder={placeholder}
+          aria-label={`Exercise ${index + 1}`}
+          style={{
+            padding: "10px 12px",
+            borderRadius: 10,
+            border: "1px solid #d1d5db",
+            outline: "none",
+            fontSize: 15,
+          }}
+        />
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+          <button
+            style={{ ...primaryBtn, width: "fit-content" }}
+            onClick={() => {
+              setChecked(true);
+              onMark?.(id, correct);
+            }}
+            disabled={!value.trim()}
+          >
+            Check
+          </button>
+
+          <button
+            style={{ ...secondaryBtn, width: "fit-content" }}
+            onClick={() => setShowAnswer((s) => !s)}
+          >
+            {showAnswer ? "Hide Answer" : "Show Answer"}
+          </button>
+
+          {checked && (
+            <span style={{ fontWeight: 600, color: correct ? "#16a34a" : "#dc2626" }}>
+              {correct ? "Correct ✅" : "Not quite ❌ (try again)"}
+            </span>
+          )}
+        </div>
+
+        {showAnswer && (
+          <div style={{ color: "#4b5563" }}>
+            <strong>Answer:</strong> {answer}
+          </div>
+        )}
+      </div>
+    </li>
+  );
+}
+
+const TicketRow = ({ label, time, place }) => (
+  <div style={{ display: "flex", gap: 18 }}>
+    <span style={{ minWidth: 70 }}>
+      <strong>{label}</strong>
+    </span>
+    <span style={{ minWidth: 60 }}>{time}</span>
+    <span>{place}</span>
+  </div>
+);
+
+/* ----------------------------- Content data ---------------------------- */
+
 const modalVerbs = [
-  { verb: "können", meaning: "can, to be able to", forms: "ich kann · du kannst · er/sie/es kann" },
-  { verb: "müssen", meaning: "must, to have to", forms: "ich muss · du musst · er/sie/es muss" },
-  { verb: "dürfen", meaning: "may, to be allowed to", forms: "ich darf · du darfst · er/sie/es darf" },
-  { verb: "wollen", meaning: "to want to", forms: "ich will · du willst · er/sie/es will" },
-  { verb: "sollen", meaning: "should, to be supposed to", forms: "ich soll · du sollst · er/sie/es soll" },
+  { verb: "können", meaning: "can / to be able to", forms: "ich kann · du kannst · er/sie/es kann" },
+  { verb: "müssen", meaning: "must / to have to", forms: "ich muss · du musst · er/sie/es muss" },
+  { verb: "dürfen", meaning: "may / to be allowed to", forms: "ich darf · du darfst · er/sie/es darf" },
+  { verb: "wollen", meaning: "to want to (strong)", forms: "ich will · du willst · er/sie/es will" },
+  { verb: "sollen", meaning: "should / to be supposed to", forms: "ich soll · du sollst · er/sie/es soll" },
   { verb: "mögen", meaning: "to like", forms: "ich mag · du magst · er/sie/es mag" },
+  { verb: "möchten", meaning: "would like (polite)", forms: "ich möchte · du möchtest · er/sie/es möchte" },
 ];
 
 const sentenceBuilding = [
-  "können, ich, morgen, einchecken, um 15 Uhr",
-  "müssen, wir, um 10 Uhr, auschecken, heute",
-  "darf, hier, er, nicht, rauchen",
-  "möchte, ich, in Deutschland, Urlaub, machen",
-  "will, sie, ein, Zimmer, mit Balkon, buchen",
+  {
+    id: "m1",
+    words: ["können", "ich", "morgen", "um 15 Uhr", "einchecken"],
+    answer: "Ich kann morgen um 15 Uhr einchecken.",
+  },
+  {
+    id: "m2",
+    words: ["müssen", "wir", "heute", "um 10 Uhr", "auschecken"],
+    answer: "Wir müssen heute um 10 Uhr auschecken.",
+  },
+  {
+    id: "m3",
+    words: ["dürfen", "er", "hier", "nicht", "rauchen"],
+    answer: "Er darf hier nicht rauchen.",
+  },
+  {
+    id: "m4",
+    words: ["möchten", "ich", "in Deutschland", "Urlaub", "machen"],
+    answer: "Ich möchte in Deutschland Urlaub machen.",
+  },
+  {
+    id: "m5",
+    words: ["wollen", "sie", "ein Zimmer", "mit Balkon", "buchen"],
+    answer: "Sie will ein Zimmer mit Balkon buchen.",
+  },
 ];
 
 const separableNoModal = [
-  "ich / um 6 Uhr / aufstehen",
-  "er / abends / fernsehen",
-  "wir / am Samstag / einkaufen",
-  "sie / einen Kuchen / mitbringen",
-  "du / um 7 Uhr / aufwachen",
+  { id: "s1", words: ["ich", "stehe", "um 6 Uhr", "auf"], answer: "Ich stehe um 6 Uhr auf." },
+  { id: "s2", words: ["er", "sieht", "abends", "fern"], answer: "Er sieht abends fern." },
+  { id: "s3", words: ["wir", "kaufen", "am Samstag", "ein"], answer: "Wir kaufen am Samstag ein." },
+  { id: "s4", words: ["sie", "bringt", "einen Kuchen", "mit"], answer: "Sie bringt einen Kuchen mit." },
+  { id: "s5", words: ["du", "wachst", "um 7 Uhr", "auf"], answer: "Du wachst um 7 Uhr auf." },
 ];
+
+// NEW: separable verbs WITH modal verbs
+const separableWithModal = [
+  {
+    id: "sm1",
+    words: ["müssen", "ich", "morgen", "um 6 Uhr", "aufstehen"],
+    answer: "Ich muss morgen um 6 Uhr aufstehen.",
+  },
+  {
+    id: "sm2",
+    words: ["wollen", "wir", "am Samstag", "einkaufen"],
+    answer: "Wir wollen am Samstag einkaufen.",
+  },
+  {
+    id: "sm3",
+    words: ["können", "er", "heute", "fernsehen"],
+    answer: "Er kann heute fernsehen.",
+  },
+  {
+    id: "sm4",
+    words: ["möchten", "sie", "morgen", "einen Kuchen", "mitbringen"],
+    answer: "Sie möchte morgen einen Kuchen mitbringen.",
+  },
+  {
+    id: "sm5",
+    words: ["sollen", "du", "früh", "aufwachen"],
+    answer: "Du sollst früh aufwachen.",
+  },
+];
+
+// NEW: nicht practice
+const nichtPractice = [
+  { id: "n1", words: ["können", "ich", "heute", "nicht", "kommen"], answer: "Ich kann heute nicht kommen." },
+  { id: "n2", words: ["dürfen", "wir", "hier", "nicht", "parken"], answer: "Wir dürfen hier nicht parken." },
+  { id: "n3", words: ["wollen", "sie", "heute", "nicht", "bezahlen"], answer: "Sie will heute nicht bezahlen." },
+  { id: "n4", words: ["müssen", "er", "nicht", "früh", "aufstehen"], answer: "Er muss nicht früh aufstehen." },
+  {
+    id: "n5",
+    words: ["möchten", "ich", "nicht", "in diesem Zimmer", "rauchen"],
+    answer: "Ich möchte nicht in diesem Zimmer rauchen.",
+  },
+];
+
+/* ------------------------------ Page component ------------------------------ */
 
 const A1Day14ModalVerbsWorkbookPage = () => {
   const navigate = useNavigate();
 
+  // Unsplash image (simple + no API key needed). You can replace the keywords to match your lesson theme.
+  const heroImg = "https://source.unsplash.com/featured/1600x700/?germany,train,station";
+  const heroCredit = "Unsplash";
+
+  // Score tracking: id -> true/false (null/undefined = not counted)
+  const [marks, setMarks] = useState({});
+  const [resetKey, setResetKey] = useState(0);
+
+  const allExercises = useMemo(
+    () => [...sentenceBuilding, ...separableNoModal, ...separableWithModal, ...nichtPractice],
+    []
+  );
+  const totalExercises = allExercises.length;
+
+  const attemptedCount = useMemo(
+    () => Object.values(marks).filter((v) => typeof v === "boolean").length,
+    [marks]
+  );
+  const correctCount = useMemo(
+    () => Object.values(marks).filter((v) => v === true).length,
+    [marks]
+  );
+
+  const progressPct = totalExercises ? Math.round((correctCount / totalExercises) * 100) : 0;
+
+  function handleMark(id, value) {
+    setMarks((prev) => {
+      const next = { ...prev };
+      if (value === null) {
+        delete next[id];
+      } else {
+        next[id] = value;
+      }
+      return next;
+    });
+  }
+
+  function resetAll() {
+    setMarks({});
+    setResetKey((k) => k + 1);
+  }
+
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+      {/* HERO / HEADER */}
+      <div style={{ ...card, gap: 14, overflow: "hidden", padding: 0 }}>
+        <div style={{ position: "relative" }}>
+          <img
+            src={heroImg}
+            alt="Germany travel theme"
+            loading="lazy"
+            style={{ width: "100%", height: 220, objectFit: "cover", display: "block" }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: "linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0.12))",
+            }}
+          />
+          <div style={{ position: "absolute", left: 14, right: 14, bottom: 12, color: "white" }}>
+            <div style={{ fontWeight: 800, fontSize: 18 }}>A1 · Day 14 · Modal Verbs</div>
+            <div style={{ opacity: 0.92, fontSize: 13 }}>Travel & hotel sentences · Ab / An ticket language</div>
+          </div>
+        </div>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 14 In-App Workbook · Modal Verbs</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Chapter 3.6 · Schreiben &amp; Sprechen · Self-practice only
-        </p>
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Objective: Understand modal verbs with main verbs and separable verbs, then build correct A1-level sentences.
-        </p>
+        <div style={{ padding: 16, display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+            <button
+              style={{ ...secondaryBtn, width: "fit-content" }}
+              onClick={() => navigate("/campus/course")}
+            >
+              Back to Course
+            </button>
+
+            <button
+              style={{ ...secondaryBtn, width: "fit-content" }}
+              onClick={resetAll}
+              title="Clear all inputs and scores"
+            >
+              Reset Exercises
+            </button>
+          </div>
+
+          <div style={{ display: "grid", gap: 6 }}>
+            <h1 style={{ ...styles.title, margin: 0 }}>A1 · Day 14 In-App Workbook · Modal Verbs</h1>
+            <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 3.6 · Schreiben &amp; Sprechen · Self-practice</p>
+            <p style={{ margin: 0, color: "#4b5563" }}>
+              Objective: Use modal verbs + infinitive correctly, and understand separable verbs with/without a modal.
+            </p>
+            <p style={{ margin: 0, color: "#6b7280", fontSize: 12 }}>Photo: {heroCredit}</p>
+          </div>
+
+          {/* Score / progress */}
+          <div
+            style={{
+              padding: 12,
+              borderRadius: 12,
+              border: "1px solid #e5e7eb",
+              background: "#ffffff",
+              display: "grid",
+              gap: 8,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+              <div style={{ fontWeight: 700 }}>Progress</div>
+              <div style={{ color: "#4b5563" }}>
+                Correct: <strong>{correctCount}</strong> / {totalExercises} · Attempted:{" "}
+                <strong>{attemptedCount}</strong>
+              </div>
+            </div>
+
+            <div style={{ height: 10, borderRadius: 999, background: "#f3f4f6", overflow: "hidden" }}>
+              <div
+                style={{
+                  height: "100%",
+                  width: `${progressPct}%`,
+                  background: "#111827",
+                }}
+              />
+            </div>
+
+            <div style={{ color: "#6b7280", fontSize: 12 }}>
+              Tip: Students should aim for <strong>80–100%</strong> before moving to the next day.
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>1) Introduction to German Modal Verbs</h2>
+      <SectionCard title="1) Modal verbs — the basic rule">
         <p style={{ margin: 0 }}>
-          Modal verbs are used with the infinitive form of the main verb. The modal verb is conjugated and the main verb goes
-          to the end of the sentence.
+          In a normal main sentence, the <strong>modal verb</strong> is conjugated (Position 2),
+          and the <strong>main verb</strong> stays in the <strong>infinitive</strong> at the end.
         </p>
         <p style={{ margin: 0 }}>
-          <strong>Rule:</strong> Subject + modal verb + time + other details + main verb (infinitive).
+          <strong>Pattern:</strong> Subject + modal + time + details + main verb (infinitive)
         </p>
         <p style={{ margin: 0 }}>
           <strong>Example:</strong> Ich möchte morgen nach Deutschland reisen.
         </p>
-      </div>
+      </SectionCard>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>2) Modal Verbs and Meaning (Präsens)</h2>
+      <SectionCard title="2) Modal verbs + meanings (Präsens)">
         <ul style={listStyle}>
           {modalVerbs.map((item) => (
             <li key={item.verb}>
@@ -80,80 +394,191 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             </li>
           ))}
         </ul>
-      </div>
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          Note: <strong>möchten</strong> is the polite “would like” form (very common in hotels/restaurants).
+        </p>
+      </SectionCard>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>3) Example Sentences</h2>
+      <SectionCard title="3) Example sentences">
         <ol style={listStyle}>
           <li>Ich kann um 15 Uhr einchecken.</li>
           <li>Wir müssen um 12 Uhr auschecken.</li>
           <li>Du darfst nicht in diesem Zimmer rauchen.</li>
           <li>Ich will ein Zimmer mit Blick aufs Meer.</li>
           <li>Wir sollen unseren Reiseplan ändern.</li>
-          <li>Er mag in Hotels übernachten.</li>
+          <li>Er mag Hotels. / Ich mag in Hotels übernachten.</li>
         </ol>
-      </div>
+      </SectionCard>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>4) Difference: wollen vs. möchten</h2>
+      <SectionCard title="4) Difference: wollen vs. möchten">
         <ul style={listStyle}>
           <li>
-            <strong>wollen</strong> = strong intention. Example: Ich will nach Deutschland reisen.
+            <strong>wollen</strong> = strong intention: <em>Ich will nach Deutschland reisen.</em>
           </li>
           <li>
-            <strong>möchten</strong> = polite / softer desire. Example: Ich möchte nach Deutschland reisen.
+            <strong>möchten</strong> = polite/softer: <em>Ich möchte nach Deutschland reisen.</em>
           </li>
         </ul>
-      </div>
+      </SectionCard>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>5) Arrival and Departure (Ankunft und Abreise)</h2>
-        <p style={{ margin: 0 }}><strong>Abreise:</strong> die Abreise, die Abfahrt, abfahren, verlassen</p>
-        <p style={{ margin: 0 }}><strong>Ankunft:</strong> die Ankunft, die Anreise, ankommen, eintreffen</p>
-      </div>
+      <SectionCard title="5) Arrival & Departure on German tickets (Ab / An)">
+        <p style={{ margin: 0 }}>
+          On German tickets and station displays you often see:
+          <strong> Ab</strong> = Abfahrt (Departure) and <strong> An</strong> = Ankunft (Arrival).
+        </p>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>6) Übung: Modalverb-Satzbildung (Self-practice)</h2>
-        <p style={{ margin: 0 }}>Ordnen Sie die Wörter zu einem korrekten Satz mit einem Modalverb.</p>
-        <ol style={listStyle}>
-          {sentenceBuilding.map((prompt) => (
-            <li key={prompt}>{prompt}</li>
+        <div
+          style={{
+            marginTop: 10,
+            padding: 12,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            background: "#f9fafb",
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+            lineHeight: 1.8,
+          }}
+        >
+          <div style={{ fontWeight: 800, marginBottom: 6, color: "#111827" }}>TICKET / BOARD</div>
+          <TicketRow label="Ab" time="10:12" place="Frankfurt (Main) Hbf" />
+          <TicketRow label="An" time="13:48" place="Berlin Hbf" />
+          <div style={{ marginTop: 8, color: "#6b7280" }}>
+            Often also: <strong>Gleis</strong> (platform), <strong>Umst.</strong> (transfers)
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: 10,
+            padding: 12,
+            borderRadius: 12,
+            border: "1px dashed #d1d5db",
+            background: "#ffffff",
+          }}
+        >
+          <strong>Mini practice:</strong> Write a sentence using “abfahren” and “ankommen”.
+          <div style={{ marginTop: 8, color: "#4b5563" }}>
+            Example: <em>Der Zug fährt um 10:12 Uhr ab und kommt um 13:48 Uhr an.</em>
+          </div>
+        </div>
+      </SectionCard>
+
+      <SectionCard title="6) Übung: Satzbildung mit Modalverben (Type + Check)">
+        <p style={{ margin: 0 }}>
+          Ordnen Sie die Wörter zu einem korrekten Satz. Tippen Sie den Satz und klicken Sie <strong>Check</strong>.
+        </p>
+
+        <ol style={{ ...listStyle, marginTop: 10 }}>
+          {sentenceBuilding.map((ex, idx) => (
+            <ExerciseItem
+              key={ex.id}
+              id={ex.id}
+              index={idx}
+              words={ex.words}
+              answer={ex.answer}
+              placeholder="Type the full German sentence…"
+              resetKey={resetKey}
+              onMark={handleMark}
+            />
           ))}
         </ol>
-        <h3 style={sectionTitle}>Answers (self-check)</h3>
-        <ol style={listStyle}>
-          <li>Ich kann morgen um 15 Uhr einchecken.</li>
-          <li>Wir müssen heute um 10 Uhr auschecken.</li>
-          <li>Er darf hier nicht rauchen.</li>
-          <li>Ich möchte in Deutschland Urlaub machen.</li>
-          <li>Sie will ein Zimmer mit Balkon buchen.</li>
-        </ol>
-      </div>
+      </SectionCard>
 
-      <div style={card}>
-        <h2 style={sectionTitle}>7) Separable Verbs (Trennbare Verben)</h2>
+      <SectionCard title="7) Trennbare Verben (separable verbs)">
         <p style={{ margin: 0 }}>
-          Without a modal verb, the prefix separates in present tense: Ich stehe um 6 Uhr <strong>auf</strong>.
+          <strong>Without</strong> a modal: the prefix separates → Ich stehe um 6 Uhr <strong>auf</strong>.
         </p>
         <p style={{ margin: 0 }}>
-          With a modal verb, the separable verb stays together in infinitive form at sentence end: Ich muss um 6 Uhr
-          <strong> aufstehen</strong>.
+          <strong>With</strong> a modal: the separable verb stays together as infinitive at the end →
+          Ich muss um 6 Uhr <strong>aufstehen</strong>.
         </p>
-        <h3 style={sectionTitle}>Practice (without modal verb)</h3>
-        <ol style={listStyle}>
-          {separableNoModal.map((prompt) => (
-            <li key={prompt}>{prompt}</li>
+
+        <h3 style={{ ...sectionTitle, marginTop: 10 }}>Practice (without modal) — Type + Check</h3>
+
+        <ol style={{ ...listStyle, marginTop: 10 }}>
+          {separableNoModal.map((ex, idx) => (
+            <ExerciseItem
+              key={ex.id}
+              id={ex.id}
+              index={idx}
+              words={ex.words}
+              answer={ex.answer}
+              placeholder="Type the full sentence…"
+              resetKey={resetKey}
+              onMark={handleMark}
+            />
           ))}
         </ol>
-        <h3 style={sectionTitle}>Answers</h3>
-        <ol style={listStyle}>
-          <li>Ich stehe um 6 Uhr auf.</li>
-          <li>Er sieht abends fern.</li>
-          <li>Wir kaufen am Samstag ein.</li>
-          <li>Sie bringt einen Kuchen mit.</li>
-          <li>Du wachst um 7 Uhr auf.</li>
+      </SectionCard>
+
+      {/* NEW SECTION 8 */}
+      <SectionCard title="8) Extra practice: Separable verbs + Modal verbs + 'nicht'">
+        <p style={{ margin: 0 }}>
+          <strong>Word order reminder:</strong> Subject + modal (Position 2) + time + details + main verb (infinitive at the
+          end)
+        </p>
+
+        <div
+          style={{
+            marginTop: 10,
+            padding: 12,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            background: "#f9fafb",
+            fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+            lineHeight: 1.8,
+          }}
+        >
+          <div style={{ fontWeight: 800, marginBottom: 6, color: "#111827" }}>SLOT MAP</div>
+          <div>Ich | muss | morgen | um 6 Uhr | aufstehen.</div>
+          <div>Wir | dürfen | hier | nicht | rauchen.</div>
+        </div>
+
+        <h3 style={{ ...sectionTitle, marginTop: 12 }}>A) Separable verbs with a modal (verb stays together)</h3>
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          With a modal verb, the separable verb stays together in infinitive form at the end:
+          <strong> aufstehen</strong>, <strong> einkaufen</strong>, <strong> mitbringen</strong>.
+        </p>
+
+        <ol style={{ ...listStyle, marginTop: 10 }}>
+          {separableWithModal.map((ex, idx) => (
+            <ExerciseItem
+              key={ex.id}
+              id={ex.id}
+              index={idx}
+              words={ex.words}
+              answer={ex.answer}
+              placeholder="Type the full sentence…"
+              resetKey={resetKey}
+              onMark={handleMark}
+            />
+          ))}
         </ol>
-      </div>
+
+        <h3 style={{ ...sectionTitle, marginTop: 12 }}>B) 'nicht' practice (negation)</h3>
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          In many A1 sentences, <strong>nicht</strong> goes before the infinitive (or before what you want to negate).
+        </p>
+
+        <ol style={{ ...listStyle, marginTop: 10 }}>
+          {nichtPractice.map((ex, idx) => (
+            <ExerciseItem
+              key={ex.id}
+              id={ex.id}
+              index={idx}
+              words={ex.words}
+              answer={ex.answer}
+              placeholder="Type the full sentence with 'nicht'…"
+              resetKey={resetKey}
+              onMark={handleMark}
+            />
+          ))}
+        </ol>
+
+        <p style={{ margin: 0, color: "#6b7280", fontSize: 13 }}>
+          Quick tip: For nouns, German often uses <strong>kein</strong> (e.g., <em>Ich habe kein Ticket.</em>). For
+          verbs/activities, German often uses <strong>nicht</strong> (e.g., <em>Ich kann nicht kommen.</em>).
+        </p>
+      </SectionCard>
     </div>
   );
 };
