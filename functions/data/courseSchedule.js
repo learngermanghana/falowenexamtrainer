@@ -1237,7 +1237,7 @@ const courseSchedules = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1If0R3cIT8KwjeXjouWlQ-VT03QGYOSZz/view?usp=sharing",
+        workbook_link: "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook",
       },
     },
     {
