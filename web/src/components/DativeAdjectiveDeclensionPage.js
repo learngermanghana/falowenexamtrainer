@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -102,6 +102,7 @@ const ExampleCard = ({ title, items }) => (
 
 const DativeAdjectiveDeclensionPage = () => {
   const navigate = useNavigate();
+  const [showAnswers, setShowAnswers] = useState(false);
 
   const practiceItems = [
     {
@@ -291,6 +292,13 @@ const DativeAdjectiveDeclensionPage = () => {
         <p style={{ margin: 0 }}>
           After reading the notes, try these 10 quick practice items in-app. This is <strong>not</strong> an assignment.
         </p>
+        <button
+          type="button"
+          onClick={() => setShowAnswers((prev) => !prev)}
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+        >
+          {showAnswers ? "Hide answers" : "Show answers"}
+        </button>
         <div style={{ display: "grid", gap: 10 }}>
           {practiceItems.map((item, index) => (
             <div
@@ -301,12 +309,18 @@ const DativeAdjectiveDeclensionPage = () => {
                 {index + 1}. {item.prompt}
               </strong>
               <div style={{ color: "#4b5563", fontSize: 14 }}>Options: {item.options.join(" / ")}</div>
-              <div style={{ fontSize: 14 }}>
-                <strong>Answer:</strong> {item.answer}
-              </div>
-              <div style={{ color: "#4b5563", fontSize: 14 }}>
-                <strong>Why:</strong> {item.reason}
-              </div>
+              {showAnswers ? (
+                <>
+                  <div style={{ fontSize: 14 }}>
+                    <strong>Answer:</strong> {item.answer}
+                  </div>
+                  <div style={{ color: "#4b5563", fontSize: 14 }}>
+                    <strong>Why:</strong> {item.reason}
+                  </div>
+                </>
+              ) : (
+                <div style={{ color: "#6b7280", fontSize: 14 }}>Answer is hidden. Try it first 👀</div>
+              )}
             </div>
           ))}
         </div>
