@@ -1189,13 +1189,14 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Lebensformen heute – Familie, Wohnge 7.21",
       chapter: "7.21",
       goal: "Lebensformen, Familie und Wohngemeinschaften beschreiben.",
-      instruction: "Schau das Video, wiederhole die Grammatik und mache die Aufgabe.",
+      instruction: "Nutze das neue Workbook für Sprechen (Group Practice), Schreiben, Lesen und Hören. Reiche Antworten im Abgabebereich ein.",
+      grammar_topic: "Lebensformen heute: Familie, Wohngemeinschaft, Singleleben und neue Lebensformen",
       assignment: true,
       lesen_hören: {
-        video: "",
-        youtube_link: "",
+        video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
+        youtube_link: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
         grammarbook_link: "https://drive.google.com/file/d/1-5hQoiAohD-lB-keyi7mTidjw8YJbvgT/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/1y9B__4gEvvdgNzaD17SSWJO0TVRYxFBa/view?usp=sharing",
+        workbook_link: "/campus/course/b1-day-21-lebensformen-heute-workbook",
       },
     },
     {
