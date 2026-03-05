@@ -79,6 +79,14 @@ const resolvePushTimestamp = (payload = {}) =>
 const resolvePushId = (payload = {}) =>
   payload?.messageId || payload?.data?.notificationId || payload?.data?.id || null;
 
+const getStoredNotificationData = (record = {}) => ({
+  ...(record?.data || {}),
+  sessionId: record?.data?.sessionId || record?.sessionId || "",
+  status: record?.data?.status || record?.status || "",
+  type: record?.data?.type || record?.type || "",
+  route: record?.data?.route || record?.route || "",
+});
+
 // -------------------------------------------
 // Student code resolver
 // -------------------------------------------
@@ -243,6 +251,7 @@ export const fetchStudentNotifications = async (profile) => {
         body: data.body || "",
         timestamp,
         source: data.source || "push",
+        data: getStoredNotificationData(data),
       };
     });
   };
@@ -258,14 +267,14 @@ export const fetchStudentNotifications = async (profile) => {
   const latestAttendancePush = (storedNotifications || []).find((entry) => {
     const type = String(entry?.type || "").toLowerCase();
     const source = String(entry?.source || "").toLowerCase();
-    return (
-      source === "push" &&
-      (type.includes("attendance") || String(entry?.data?.type || "").toLowerCase().includes("attendance"))
-    );
+    const data = getStoredNotificationData(entry);
+    const dataType = String(data?.type || "").toLowerCase();
+    return source === "push" && (type.includes("attendance") || dataType.includes("attendance"));
   });
 
+  const attendancePushData = getStoredNotificationData(latestAttendancePush);
   const attendanceContext = {
-    sessionId: latestAttendancePush?.data?.sessionId || "",
+    sessionId: attendancePushData?.sessionId || "",
   };
 
   const candidates = [
