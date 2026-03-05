@@ -828,8 +828,8 @@ const courseSchedules = {
         "This chapter has no assignment. Read the lesson notes first, then complete the in-app practice book for self-practice.",
       grammar_topic: "Dative and Accusative Verbs",
       lesen_hören: {
-        video: "https://youtu.be/sAd8rWu9O0Q",
-        youtube_link: "https://youtu.be/sAd8rWu9O0Q",
+        video: "https://youtu.be/J98JJU2v4Uw",
+        youtube_link: "https://youtu.be/J98JJU2v4Uw",
         assignment: false,
         grammarbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
         workbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
