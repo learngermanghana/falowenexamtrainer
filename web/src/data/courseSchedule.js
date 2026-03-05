@@ -672,7 +672,7 @@ const RAW_COURSE_SCHEDULES = {
       goal: "Understand how to use modal verbs with main verbs and separable verbs",
       assignment: false,
       instruction:
-        "This is a practical exercise. All the answers are included in the document except for the last paragraph. You can send a screenshot of that to your tutor",
+        "This is a self-practice workbook lesson. Complete the Modal Verbs exercises in the workbook; no work submission is required.",
       grammar_topic: "Modal Verbs",
       schreiben_sprechen: {
         video: "https://youtu.be/vMfOb_nPRNc",
