@@ -65,6 +65,6 @@ describe("CourseTab", () => {
     );
 
     expect(screen.queryByRole("link", { name: /View externally/i })).not.toBeInTheDocument();
-    expect(screen.getByText("Tutor-marked assignment")).toBeInTheDocument();
+    expect(screen.queryByText("Tutor-marked assignment")).not.toBeInTheDocument();
   });
 });
