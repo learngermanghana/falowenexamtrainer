@@ -26,6 +26,13 @@ const listStyle = {
   lineHeight: 1.7,
 };
 
+const tabImageStyle = {
+  width: "100%",
+  borderRadius: 10,
+  maxHeight: 260,
+  objectFit: "cover",
+};
+
 function TabButton({ active, onClick, children }) {
   return (
     <button
@@ -72,6 +79,12 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
 
       {activeTab === "sprechen" && (
         <div style={card}>
+          <img
+            src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80"
+            alt="Person shopping online on a laptop"
+            loading="lazy"
+            style={tabImageStyle}
+          />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) (Group Practice)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             In this chapter, we&apos;ll engage in group exercises discussing these topics.
@@ -170,6 +183,12 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
 
       {activeTab === "schreiben" && (
         <div style={card}>
+          <img
+            src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
+            alt="Writing notes about online shopping rights"
+            loading="lazy"
+            style={tabImageStyle}
+          />
           <h2 style={sectionTitle}>Teil 2 - Assignment: Schreiben</h2>
           <p style={{ margin: 0 }}>
             <strong>Aufgabe – B1 Schreiben (Formeller Brief)</strong>
@@ -190,6 +209,12 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
 
       {activeTab === "lesen" && (
         <div style={card}>
+          <img
+            src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=1600&q=80"
+            alt="Reading article pages about consumer rights"
+            loading="lazy"
+            style={tabImageStyle}
+          />
           <h2 style={sectionTitle}>Teil 3 – Lesen</h2>
           <h3 style={sectionTitle}>Essay: Selbstständigkeit, Umweltschutz und Verbraucherberatung in Deutschland</h3>
           <p style={{ margin: 0, lineHeight: 1.8 }}>
@@ -292,6 +317,12 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
 
       {activeTab === "hoeren" && (
         <div style={card}>
+          <img
+            src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
+            alt="Headphones prepared for listening practice"
+            loading="lazy"
+            style={tabImageStyle}
+          />
           <h2 style={sectionTitle}>Teil 4 (Hören) (Exercise)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Please note that this is a Goethe-standard Hörverstehen (listening comprehension) test, and the answers are
