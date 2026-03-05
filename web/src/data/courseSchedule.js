@@ -100,7 +100,7 @@ const A2_SCHEDULE = [
     video: "https://youtu.be/8dX40NXG_gI",
     youtube_link: "https://youtu.be/8dX40NXG_gI",
     grammarbook_link: "https://drive.google.com/file/d/11yEcMioSB9x1ZD-x5_67ApFzP53iau-N/view?usp=sharing",
-    workbook_link: "https://drive.google.com/file/d/1dIsFg7wNaqyyOHm95h7xv4Ssll5Fm0V1/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-5-freizeit-workbook",
   },
   {
     day: 6,
