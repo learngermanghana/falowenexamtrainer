@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
-const HERO_IMAGE_URL =
-  "https://source.unsplash.com/featured/1600x500?writing,notebook,study";
+const DEFAULT_HERO_IMAGE_URL =
+  "https://images.unsplash.com/photo-1672679813065-adb4e17e9be0?auto=format&fit=crop&w=1600&q=80";
+const FALLBACK_HERO_IMAGE_URL =
+  "https://images.unsplash.com/photo-1765867967050-30db3e7a3be8?auto=format&fit=crop&w=1600&q=80";
 
 const keyTakeaways = [
   "Denn joins two main clauses and keeps the verb order the same.",
@@ -279,6 +281,7 @@ const PracticeSectionBlock = ({ title, explanation, exercises }) => (
 
 const ConjunctionNotesPage = () => {
   const navigate = useNavigate();
+  const [heroImageUrl, setHeroImageUrl] = useState(DEFAULT_HERO_IMAGE_URL);
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -291,12 +294,17 @@ const ConjunctionNotesPage = () => {
           Back to Course
         </button>
 
-        {/* Unsplash hero image */}
+        {/* Hero image */}
         <div style={{ display: "grid", gap: 6 }}>
           <img
-            src={HERO_IMAGE_URL}
+            src={heroImageUrl}
             alt="Notebook and study desk"
             loading="lazy"
+            onError={() => {
+              if (heroImageUrl !== FALLBACK_HERO_IMAGE_URL) {
+                setHeroImageUrl(FALLBACK_HERO_IMAGE_URL);
+              }
+            }}
             style={{
               width: "100%",
               height: 190,
