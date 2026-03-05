@@ -48,6 +48,27 @@ const forcePeriodicRefresh = async (registration) => {
   window.location.replace(nextUrl.toString());
 };
 
+const reloadWithRefreshMarker = () => {
+  const nextUrl = new URL(window.location.href);
+  nextUrl.searchParams.set(FORCE_REFRESH_QUERY_PARAM, String(Date.now()));
+  window.location.replace(nextUrl.toString());
+};
+
+const setupUpdateHandlers = (registration) => {
+  registration.addEventListener("updatefound", () => {
+    const installingWorker = registration.installing;
+    if (!installingWorker) return;
+
+    installingWorker.addEventListener("statechange", () => {
+      if (installingWorker.state !== "installed") return;
+
+      if (navigator.serviceWorker.controller) {
+        reloadWithRefreshMarker();
+      }
+    });
+  });
+};
+
 export const registerOfflineServiceWorker = () => {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
     return;
@@ -66,7 +87,11 @@ export const registerOfflineServiceWorker = () => {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register(SERVICE_WORKER_PATH)
-      .then((registration) => forcePeriodicRefresh(registration))
+      .then(async (registration) => {
+        setupUpdateHandlers(registration);
+        await registration.update();
+        await forcePeriodicRefresh(registration);
+      })
       .catch((error) => console.error("Service worker registration failed", error));
   });
 };
