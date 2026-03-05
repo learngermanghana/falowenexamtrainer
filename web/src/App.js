@@ -39,6 +39,7 @@ import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWor
 import A2Day2PersonenBeschreibenWorkbookPage from "./components/A2Day2PersonenBeschreibenWorkbookPage";
 import A2Day3ComparisonsWorkbookPage from "./components/A2Day3ComparisonsWorkbookPage";
 import A2Day4WoMoechtenWirUnsTreffenWorkbookPage from "./components/A2Day4WoMoechtenWirUnsTreffenWorkbookPage";
+import A2Day5FreizeitSeparableVerbsGrammarPage from "./components/A2Day5FreizeitSeparableVerbsGrammarPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
