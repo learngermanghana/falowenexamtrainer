@@ -116,6 +116,8 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 
 const A2Day5FreizeitWorkbookPage = () => {
   const navigate = useNavigate();
+  const splashImageUrl =
+    "https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&fit=crop&w=1800&q=80";
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
 
@@ -131,6 +133,26 @@ const A2Day5FreizeitWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 5 Workbook · Was machst du in deiner Freizeit?</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 2.5 · Dative Preposition · Talk about free time activities.</p>
+
+        <div
+          style={{
+            borderRadius: 14,
+            overflow: "hidden",
+            border: "1px solid rgba(0,0,0,0.08)",
+          }}
+        >
+          <img
+            src={splashImageUrl}
+            alt="Freizeitaktivitäten im Park"
+            loading="lazy"
+            style={{
+              width: "100%",
+              height: 220,
+              objectFit: "cover",
+              display: "block",
+            }}
+          />
+        </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {tabs.map((tab) => (

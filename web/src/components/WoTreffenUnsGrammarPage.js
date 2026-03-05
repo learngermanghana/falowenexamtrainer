@@ -518,7 +518,8 @@ const WoTreffenUnsGrammarPage = () => {
     },
   ];
 
-  const unsplashImageUrl = "https://source.unsplash.com/featured/?germany,cafe";
+  const splashImageUrl =
+    "https://images.unsplash.com/photo-1488900128323-21503983a07e?auto=format&fit=crop&w=1800&q=80";
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -546,7 +547,7 @@ const WoTreffenUnsGrammarPage = () => {
           }}
         >
           <img
-            src={unsplashImageUrl}
+            src={splashImageUrl}
             alt="Meeting place in Germany"
             loading="lazy"
             style={{

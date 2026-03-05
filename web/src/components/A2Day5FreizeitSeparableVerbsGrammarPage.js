@@ -27,6 +27,8 @@ const InlineCode = ({ children }) => (
 
 const A2Day5FreizeitSeparableVerbsGrammarPage = () => {
   const navigate = useNavigate();
+  const splashImageUrl =
+    "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=1800&q=80";
 
   const verbs = [
     { infinitive: "fernsehen", stem: "sehen", prefix: "fern", meaning: "to watch TV" },
@@ -58,6 +60,27 @@ const A2Day5FreizeitSeparableVerbsGrammarPage = () => {
           <p style={{ margin: 0, opacity: 0.85 }}>
             Grammar focus: <strong>Trennbare Verben (Separable Verbs)</strong>
           </p>
+
+          <div
+            style={{
+              marginTop: 12,
+              borderRadius: 14,
+              overflow: "hidden",
+              border: "1px solid rgba(0,0,0,0.08)",
+            }}
+          >
+            <img
+              src={splashImageUrl}
+              alt="Freizeitaktivitäten in der Stadt"
+              loading="lazy"
+              style={{
+                width: "100%",
+                height: 220,
+                objectFit: "cover",
+                display: "block",
+              }}
+            />
+          </div>
         </header>
 
         <div style={{ display: "grid", gap: 14 }}>
@@ -124,4 +147,3 @@ const A2Day5FreizeitSeparableVerbsGrammarPage = () => {
 };
 
 export default memo(A2Day5FreizeitSeparableVerbsGrammarPage);
-
