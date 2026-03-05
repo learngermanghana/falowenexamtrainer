@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
-const HERO_IMAGE_URL = "/falo.png";
+const DEFAULT_HERO_IMAGE_URL =
+  "https://images.unsplash.com/photo-1672679813065-adb4e17e9be0?auto=format&fit=crop&w=1600&q=80";
+const FALLBACK_HERO_IMAGE_URL =
+  "https://images.unsplash.com/photo-1765867967050-30db3e7a3be8?auto=format&fit=crop&w=1600&q=80";
 
 const keyTakeaways = [
   "Denn joins two main clauses and keeps the verb order the same.",
@@ -278,6 +281,7 @@ const PracticeSectionBlock = ({ title, explanation, exercises }) => (
 
 const ConjunctionNotesPage = () => {
   const navigate = useNavigate();
+  const [heroImageUrl, setHeroImageUrl] = useState(DEFAULT_HERO_IMAGE_URL);
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -293,9 +297,14 @@ const ConjunctionNotesPage = () => {
         {/* Hero image */}
         <div style={{ display: "grid", gap: 6 }}>
           <img
-            src={HERO_IMAGE_URL}
+            src={heroImageUrl}
             alt="Notebook and study desk"
             loading="lazy"
+            onError={() => {
+              if (heroImageUrl !== FALLBACK_HERO_IMAGE_URL) {
+                setHeroImageUrl(FALLBACK_HERO_IMAGE_URL);
+              }
+            }}
             style={{
               width: "100%",
               height: 190,
@@ -304,7 +313,7 @@ const ConjunctionNotesPage = () => {
               border: "1px solid #e6e8ef",
             }}
           />
-          <span style={{ fontSize: 12, color: "#6b7280" }}>Image: Falowen</span>
+          <span style={{ fontSize: 12, color: "#6b7280" }}>Image: Unsplash</span>
         </div>
 
         <h1 style={{ ...styles.title, margin: 0 }}>
