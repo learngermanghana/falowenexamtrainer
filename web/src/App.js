@@ -26,6 +26,7 @@ import TwelveHourClockPage from "./components/TwelveHourClockPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
 import PersonenBeschreibenGrammarPage from "./components/PersonenBeschreibenGrammarPage";
 import ComparingThingsAndPeopleGrammarPage from "./components/ComparingThingsAndPeopleGrammarPage";
+import WoTreffenUnsGrammarPage from "./components/WoTreffenUnsGrammarPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
 import DirectionsImperativePage from "./components/DirectionsImperativePage";
 import TwoCasePrepositionsPage from "./components/TwoCasePrepositionsPage";
@@ -555,6 +556,10 @@ const AppShell = ({
           <Route
             path="/campus/course/dinge-und-personen-vergleichen-1-3-grammar-notes"
             element={<ComparingThingsAndPeopleGrammarPage />}
+          />
+          <Route
+            path="/campus/course/wo-moechten-wir-uns-treffen-2-4-grammar-notes"
+            element={<WoTreffenUnsGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
