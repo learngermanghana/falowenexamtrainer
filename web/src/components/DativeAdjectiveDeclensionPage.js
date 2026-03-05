@@ -103,6 +103,69 @@ const ExampleCard = ({ title, items }) => (
 const DativeAdjectiveDeclensionPage = () => {
   const navigate = useNavigate();
 
+  const practiceItems = [
+    {
+      prompt: "Ich danke ___ Lehrer.",
+      options: ["den", "dem", "der"],
+      answer: "dem",
+      reason: "danken is a dative verb, so der Lehrer → dem Lehrer.",
+    },
+    {
+      prompt: "Wir sehen ___ Mann.",
+      options: ["dem", "den", "der"],
+      answer: "den",
+      reason: "sehen is an accusative verb, so der Mann → den Mann.",
+    },
+    {
+      prompt: "Sie schreibt ___ Freundin.",
+      options: ["eine", "einer", "einen"],
+      answer: "einer",
+      reason: "schreiben (to someone) takes dative here: eine Freundin → einer Freundin.",
+    },
+    {
+      prompt: "Er hat ___ Hund.",
+      options: ["einen", "einem", "eine"],
+      answer: "einen",
+      reason: "haben takes accusative: ein Hund → einen Hund.",
+    },
+    {
+      prompt: "Ich helfe ___. (du)",
+      options: ["dich", "dir", "du"],
+      answer: "dir",
+      reason: "helfen is a dative verb, so du → dir.",
+    },
+    {
+      prompt: "Wir kaufen ___ Stuhl.",
+      options: ["ein", "einen", "einem"],
+      answer: "einen",
+      reason: "kaufen takes accusative: ein Stuhl → einen Stuhl.",
+    },
+    {
+      prompt: "Er gratuliert ___ Frau.",
+      options: ["die", "der", "den"],
+      answer: "der",
+      reason: "gratulieren takes dative: die Frau → der Frau.",
+    },
+    {
+      prompt: "Sie brauchen ___ Termin.",
+      options: ["einen", "einem", "ein"],
+      answer: "einen",
+      reason: "brauchen is accusative here: ein Termin → einen Termin.",
+    },
+    {
+      prompt: "Ich sende ___ die Adresse. (Sie, formal)",
+      options: ["Sie", "Ihnen", "ihnen"],
+      answer: "Ihnen",
+      reason: "formal receiver pronoun with a dative verb is Ihnen.",
+    },
+    {
+      prompt: "Wir lieben ___ Stadt.",
+      options: ["die", "der", "den"],
+      answer: "die",
+      reason: "lieben takes accusative, and feminine article stays die in accusative.",
+    },
+  ];
+
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -221,6 +284,31 @@ const DativeAdjectiveDeclensionPage = () => {
               "Er sendet einer Kollegin eine Nachricht.",
             ]}
           />
+        </div>
+      </Section>
+
+      <Section title="Step 6: Practice Book (Self-practice, no assignment)">
+        <p style={{ margin: 0 }}>
+          After reading the notes, try these 10 quick practice items in-app. This is <strong>not</strong> an assignment.
+        </p>
+        <div style={{ display: "grid", gap: 10 }}>
+          {practiceItems.map((item, index) => (
+            <div
+              key={item.prompt}
+              style={{ border: "1px solid #e6e8ef", borderRadius: 10, padding: 12, display: "grid", gap: 8 }}
+            >
+              <strong>
+                {index + 1}. {item.prompt}
+              </strong>
+              <div style={{ color: "#4b5563", fontSize: 14 }}>Options: {item.options.join(" / ")}</div>
+              <div style={{ fontSize: 14 }}>
+                <strong>Answer:</strong> {item.answer}
+              </div>
+              <div style={{ color: "#4b5563", fontSize: 14 }}>
+                <strong>Why:</strong> {item.reason}
+              </div>
+            </div>
+          ))}
         </div>
       </Section>
     </div>
