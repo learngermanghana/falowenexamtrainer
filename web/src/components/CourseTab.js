@@ -27,7 +27,7 @@ const hasTutorMarkedWork = (entry) => {
     toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
   );
 };
-const isTutorMarkedEntry = (entry) => hasTutorMarkedWork(entry);
+const isTutorMarkedEntry = (entry, level) => extractLevelToken(level) === "A1" && hasTutorMarkedWork(entry);
 
 const extractLevelToken = (value) => {
   if (!value) return "";
@@ -518,7 +518,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       : [];
                     const status = getStatusForDay(dayStatuses, entry.day);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
-                    const isTutorMarked = isTutorMarkedEntry(entry);
+                    const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
+                    const showAssignmentTypeBadge = selectedCourseLevel === "A1";
 
                     return (
                       <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
@@ -532,15 +533,17 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </div>
 
                           <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                            <span
-                              style={{
-                                ...styles.badge,
-                                background: isTutorMarked ? "#fee2e2" : "#dcfce7",
-                                color: isTutorMarked ? "#991b1b" : "#166534",
-                              }}
-                            >
-                              {isTutorMarked ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
-                            </span>
+                            {showAssignmentTypeBadge ? (
+                              <span
+                                style={{
+                                  ...styles.badge,
+                                  background: isTutorMarked ? "#fee2e2" : "#dcfce7",
+                                  color: isTutorMarked ? "#991b1b" : "#166534",
+                                }}
+                              >
+                                {isTutorMarked ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
+                              </span>
+                            ) : null}
                             <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
                               {t(statusMeta.key)}
                             </span>
