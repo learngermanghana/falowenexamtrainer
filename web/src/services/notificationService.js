@@ -251,7 +251,7 @@ export const fetchStudentNotifications = async (profile) => {
         body: data.body || "",
         timestamp,
         source: data.source || "push",
-        data: getStoredNotificationData(data),
+        data: data.data || {},
       };
     });
   };
