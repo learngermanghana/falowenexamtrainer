@@ -96,7 +96,7 @@ const A2_SCHEDULE = [
     goal: "Talk about free time activities.",
     assignment: true,
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Dative Preposition",
+    grammar_topic: "Separable Verbs (Trennbare Verben)",
     video: "https://youtu.be/8dX40NXG_gI",
     youtube_link: "https://youtu.be/8dX40NXG_gI",
     grammarbook_link: "https://drive.google.com/file/d/11yEcMioSB9x1ZD-x5_67ApFzP53iau-N/view?usp=sharing",
@@ -1251,7 +1251,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "",
         youtube_link: "",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1If0R3cIT8KwjeXjouWlQ-VT03QGYOSZz/view?usp=sharing",
+        workbook_link: "/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook",
       },
     },
     {
