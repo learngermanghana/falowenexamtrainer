@@ -35,6 +35,13 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const videoPreviewStyle = {
+  width: "100%",
+  minHeight: 315,
+  border: 0,
+  borderRadius: 10,
+};
+
 const lesenQuestions = [
   {
     stem: "Wie lange arbeitet der Erzähler schon im Büro?",
@@ -328,6 +335,13 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
           </p>
+          <p style={{ margin: 0 }}>
+            Practice your draft before submission on the writing page: {" "}
+            <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
+              Open Writing Practice
+            </a>{" "}
+            (you can use the Ideas Generator there for support).
+          </p>
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
@@ -435,6 +449,13 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
               Deutsch lernen (A2) | Nicos Weg | Folge 10: Personen beschreiben
             </a>
           </p>
+          <iframe
+            style={videoPreviewStyle}
+            src="https://www.youtube.com/embed/Tor-mPRS3j4"
+            title="Deutsch lernen (A2) | Nicos Weg | Folge 10: Personen beschreiben"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
 
           <p style={{ margin: 0, color: "#4b5563" }}>
             Please submit your listening answers in the assignment submission area, not directly on this page.
