@@ -35,6 +35,13 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const videoPreviewStyle = {
+  width: "100%",
+  minHeight: 315,
+  border: 0,
+  borderRadius: 10,
+};
+
 const lesenQuestions = [
   {
     stem: "Wo arbeitet Lisa?",
@@ -270,6 +277,13 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
           </p>
+          <p style={{ margin: 0 }}>
+            Practice your draft before submission on the writing page: {" "}
+            <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
+              Open Writing Practice
+            </a>{" "}
+            (you can use the Ideas Generator there for support).
+          </p>
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
@@ -369,6 +383,13 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
               How do you make SMALL TALK in German?
             </a>
           </p>
+          <iframe
+            style={videoPreviewStyle}
+            src="https://www.youtube.com/embed/r-DuOo0vrqc"
+            title="How do you make SMALL TALK in German?"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
 
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
