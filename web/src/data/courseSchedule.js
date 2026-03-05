@@ -448,7 +448,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Greetings",
       chapter: "0.1",
       goal: "You will learn to greet others in German, and ask about people's well-being.",
-      instruction: "Watch the video, review grammar, do the workbook, submit assignment.",
+      instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "Formal and Informal Greetings",
       assignment: true,
       lesen_hören: {
@@ -518,7 +518,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Numbers",
       chapter: "2",
       goal: "Learn numbers from one to 10 thousand. Also know the difference between city and street",
-      instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
+      instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "German Numbers",
       assignment: true,
       lesen_hören: {
@@ -562,8 +562,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Asking About Prices",
       chapter: "3",
       goal: "Know how to ask for a price and also the use of mogen and gern to express your hobby",
-      instruction:
-        "Watch the video, study the grammar, complete the workbook, and send your answers.Do schreiben and sprechen 2.3 before this chapter for better understanding",
+      instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "Fragen nach dem Preis; gern/lieber/mögen (Talking about price and preferences)",
       assignment: true,
       lesen_hören: {
@@ -579,7 +578,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Countries and Languages",
       chapter: "4",
       goal: "Learn about schon mal, noch nie, irregular verbs, and man vs Mann",
-      instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
+      instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "schon mal, noch nie; irregular verbs; man vs Mann",
       assignment: true,
       lesen_hören: {
@@ -595,7 +594,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "German Cases",
       chapter: "5",
       goal: "Learn about the German articles and cases",
-      instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
+      instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "Nominative & Akkusative, Definite & Indefinite Articles",
       assignment: true,
       lesen_hören: {
@@ -626,7 +625,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "12 Hour Clock",
       chapter: "7",
       goal: "Understand the 12 hour clock system",
-      instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
+      instruction: "Watch the video, review grammar, and complete your workbook.",
       assignment: true,
       lesen_hören: {
         video: "https://youtu.be/DklpySXqAmg",
@@ -641,7 +640,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "24 Hour Clock",
       chapter: "8",
       goal: "Understand the 24 hour clock and date system in German",
-      instruction: "Watch the video, study the grammar, complete the workbook, and send your answers.",
+      instruction: "Watch the video, review grammar, and complete your workbook.",
       assignment: true,
       lesen_hören: {
         video: "https://youtu.be/hLpPFOthVkU",
@@ -726,16 +725,15 @@ const RAW_COURSE_SCHEDULES = {
       ],
     },
     {
-    day: 17,
-    topic: "Instructions",
-    chapter: "11",
-    goal: "Understand instructions and request in German using the Imperative rule",
-    grammar_topic: "Direction",
-    instruction:
-      "Complete Lesen & Hören; your tutor will mark it.",
-    lesen_hören: {
-      video: "https://youtu.be/k2ZC3rXPe1k",
-      youtube_link: "https://youtu.be/k2ZC3rXPe1k",
+      day: 17,
+      topic: "Instructions",
+      chapter: "11",
+      goal: "Understand instructions and request in German using the Imperative rule",
+      grammar_topic: "Direction",
+      instruction: "Complete Lesen & Hören; your tutor will mark it.",
+      lesen_hören: {
+        video: "https://youtu.be/k2ZC3rXPe1k",
+        youtube_link: "https://youtu.be/k2ZC3rXPe1k",
         assignment: true,
         grammarbook_link: "https://www.falowen.app/campus/course/directions-imperative-11",
         workbook_link: "https://drive.google.com/file/d/17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A/view?usp=sharing",
@@ -804,7 +802,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Weather",
       chapter: "13",
       assignment: true,
-      goal: "",
+      goal: "Weather and simple connectors for letter writing",
       instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "Weather and simple connectors for letter writing",
       lesen_hören: {
