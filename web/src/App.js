@@ -40,6 +40,7 @@ import A2Day2PersonenBeschreibenWorkbookPage from "./components/A2Day2PersonenBe
 import A2Day3ComparisonsWorkbookPage from "./components/A2Day3ComparisonsWorkbookPage";
 import A2Day4WoMoechtenWirUnsTreffenWorkbookPage from "./components/A2Day4WoMoechtenWirUnsTreffenWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
+import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -552,6 +553,7 @@ const AppShell = ({
           <Route path="/campus/course/german-numbers-1-10-with-pronunciation" element={<GermanNumbersGrammarPage />} />
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
           <Route path="/campus/course/the-12-hour-clock-system-in-german-chapter-7" element={<TwelveHourClockPage />} />
+          <Route path="/campus/course/modal-verbs-day-14-3-6" element={<A1Day14ModalVerbsWorkbookPage />} />
           <Route
             path="/campus/course/singular-pronouns-verb-conjugation-day-2"
             element={<SingularPronounsConjugationPage />}
