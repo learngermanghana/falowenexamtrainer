@@ -41,6 +41,8 @@ import A2Day3ComparisonsWorkbookPage from "./components/A2Day3ComparisonsWorkboo
 import A2Day4WoMoechtenWirUnsTreffenWorkbookPage from "./components/A2Day4WoMoechtenWirUnsTreffenWorkbookPage";
 import A2Day5FreizeitWorkbookPage from "./components/A2Day5FreizeitWorkbookPage";
 import A2Day5FreizeitSeparableVerbsGrammarPage from "./components/A2Day5FreizeitSeparableVerbsGrammarPage";
+import A2Day6MoebelRaeumeWorkbookPage from "./components/A2Day6MoebelRaeumeWorkbookPage";
+import A2Day6TwoCasePrepositionsGrammarPage from "./components/A2Day6TwoCasePrepositionsGrammarPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
@@ -547,6 +549,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook" element={<A2Day3ComparisonsWorkbookPage />} />
           <Route path="/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook" element={<A2Day4WoMoechtenWirUnsTreffenWorkbookPage />} />
           <Route path="/campus/course/a2-day-5-freizeit-workbook" element={<A2Day5FreizeitWorkbookPage />} />
+          <Route path="/campus/course/a2-day-6-moebel-und-raeume-workbook" element={<A2Day6MoebelRaeumeWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route
             path="/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook"
@@ -578,6 +581,10 @@ const AppShell = ({
           <Route
             path="/campus/course/was-machst-du-in-deiner-freizeit-2-5-grammar-notes"
             element={<A2Day5FreizeitSeparableVerbsGrammarPage />}
+          />
+          <Route
+            path="/campus/course/moebel-und-raeume-3-6-grammar-notes"
+            element={<A2Day6TwoCasePrepositionsGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
