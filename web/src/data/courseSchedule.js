@@ -1773,8 +1773,8 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
 };
 
 
-const DEFAULT_INSTRUCTION_EN = "Watch the video, review grammar, and complete your workbook.";
-const DEFAULT_INSTRUCTION_DE = "Schau das Video, wiederhole die Grammatik und mache die Aufgabe.";
+const DEFAULT_INSTRUCTION_EN = "Watch the video, review grammar, and complete your workbook. Assignment: complete only Teil 2, Teil 3, and Teil 4. Teil 1 is group practice.";
+const DEFAULT_INSTRUCTION_DE = "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch. Abgabe: Bearbeite nur Teil 2, Teil 3 und Teil 4. Teil 1 ist Gruppenübung.";
 const DEFAULT_INSTRUCTION_DE_FORMAL = "Schauen Sie das Video, wiederholen Sie die Grammatik und bearbeiten Sie das Arbeitsbuch.";
 const SELF_PRACTICE_NOTE = "Self-practice only; no video or grammar book for this lesson.";
 
@@ -1871,12 +1871,21 @@ const normalizeCourseSchedules = (schedules) =>
           ];
 
           const needsSelfPracticeNote = lessons.some(hasNoVideoAndNoGrammar);
-          const instruction = getDefaultInstruction(entryWithAssignmentId.instruction);
-          const hasNote = instruction && instruction.includes(SELF_PRACTICE_NOTE);
+          const baseInstruction = getDefaultInstruction(entryWithAssignmentId.instruction);
+          const levelSpecificInstruction =
+            level === "A2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+              ? DEFAULT_INSTRUCTION_EN
+              : level === "B1" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+                ? DEFAULT_INSTRUCTION_DE
+                : baseInstruction;
+          const hasNote = levelSpecificInstruction && levelSpecificInstruction.includes(SELF_PRACTICE_NOTE);
 
           return {
             ...entryWithAssignmentId,
-            instruction: needsSelfPracticeNote && instruction && !hasNote ? `${instruction} ${SELF_PRACTICE_NOTE}` : instruction,
+            instruction:
+              needsSelfPracticeNote && levelSpecificInstruction && !hasNote
+                ? `${levelSpecificInstruction} ${SELF_PRACTICE_NOTE}`
+                : levelSpecificInstruction,
             lesen_hören,
             schreiben_sprechen,
           };

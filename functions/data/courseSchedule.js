@@ -1752,6 +1752,17 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
   ],
 };
 
+
+const DEFAULT_INSTRUCTION_EN = "Watch the video, review grammar, and complete your workbook. Assignment: complete only Teil 2, Teil 3, and Teil 4. Teil 1 is group practice.";
+const DEFAULT_INSTRUCTION_DE = "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch. Abgabe: Bearbeite nur Teil 2, Teil 3 und Teil 4. Teil 1 ist Gruppenübung.";
+
+const getDefaultInstruction = (instruction) => {
+  if (!instruction) return instruction;
+  if (instruction.includes("Watch the video") || instruction.includes("review grammar")) return DEFAULT_INSTRUCTION_EN;
+  if (instruction.includes("Schau das Video")) return DEFAULT_INSTRUCTION_DE;
+  return instruction;
+};
+
 const parseAssignmentId = (...values) => {
   for (const value of values) {
     const raw = String(value || "").trim();
@@ -1809,8 +1820,17 @@ const normalizeCourseSchedules = (schedules) =>
             entryWithAssignmentId.title,
           ];
 
+          const baseInstruction = getDefaultInstruction(entryWithAssignmentId.instruction);
+          const instruction =
+            level === "A2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+              ? DEFAULT_INSTRUCTION_EN
+              : level === "B1" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+                ? DEFAULT_INSTRUCTION_DE
+                : baseInstruction;
+
           return {
             ...entryWithAssignmentId,
+            instruction,
             lesen_hören: normalizeLessonCollection(entryWithAssignmentId.lesen_hören, fallbackAssignmentValues),
             schreiben_sprechen: normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, fallbackAssignmentValues),
           };
