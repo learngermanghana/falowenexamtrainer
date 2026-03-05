@@ -568,6 +568,10 @@ const AppShell = ({
             path="/campus/course/wo-moechten-wir-uns-treffen-2-4-grammar-notes"
             element={<WoTreffenUnsGrammarPage />}
           />
+          <Route
+            path="/campus/course/was-machst-du-in-deiner-freizeit-2-5-grammar-notes"
+            element={<A2Day5FreizeitSeparableVerbsGrammarPage />}
+          />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
 
