@@ -35,6 +35,7 @@ import WeatherPerfektLetterPage from "./components/WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./components/HealthBodyPartsPage";
 import A2StarterConjunctionsPage from "./components/A2StarterConjunctionsPage";
 import A2Day2SmallTalkWorkbookPage from "./components/A2Day2SmallTalkWorkbookPage";
+import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -534,6 +535,7 @@ const AppShell = ({
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
           <Route path="/campus/course/a2-day-2-small-talk-workbook" element={<A2Day2SmallTalkWorkbookPage />} />
+          <Route path="/campus/course/a2-day-2-small-talk-workbook-enhanced" element={<A2Day2SmallTalkWorkbookEnhancedPage />} />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />
           <Route path="/campus/course/health-and-body-parts-14-1" element={<HealthBodyPartsPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
