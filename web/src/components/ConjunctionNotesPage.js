@@ -73,7 +73,7 @@ const ConjunctionNotesPage = () => {
             "Denn joins two main clauses and keeps the verb order the same.",
             "Weil sends the conjugated verb to the end of the clause.",
             "Deshalb starts a new clause, so the verb comes right after it.",
-            "Indirect questions with ich möchte wissen put the verb at the end.",
+            "Use these structures to build clear, exam-ready sentences in letters and messages.",
           ]}
         />
       </Section>
@@ -81,8 +81,7 @@ const ConjunctionNotesPage = () => {
       <Section title="Introduction to Conjunctions">
         <p style={{ margin: 0 }}>
           Conjunctions connect clauses or sentences to make your writing clearer, more coherent, and smoother to read.
-          In A1 German, common conjunctions include <em>denn</em>, <em>weil</em>, <em>deshalb</em>, and the phrases{" "}
-          <em>ich möchte wissen, ob</em>, <em>wann</em>, and <em>wo</em>.
+          In A1 German, common conjunctions for letters include <em>denn</em>, <em>weil</em>, and <em>deshalb</em>.
         </p>
       </Section>
 
@@ -123,34 +122,6 @@ const ConjunctionNotesPage = () => {
             "Example → Ich habe gute Nachrichten, deshalb schreibe ich dir.",
           ]}
         />
-
-        <h3 style={{ margin: 0 }}>4. Ich möchte wissen, ob / wann / wo</h3>
-        <Callout>
-          <strong>Word order:</strong> Indirect question → verb goes to the end of the clause.
-        </Callout>
-        <BulletList
-          items={[
-            "Rule → Ich möchte wissen + question word + subject + ... + verb (at the end).",
-            "Use it to ask for information politely in letters.",
-          ]}
-        />
-        <div style={{ display: "grid", gap: 12 }}>
-          <MiniExample
-            title="Use ob for yes/no questions"
-            prompt="Prompt: Ask if someone has time tomorrow."
-            example="Ich möchte wissen, ob du morgen Zeit hast."
-          />
-          <MiniExample
-            title="Use wann for time questions"
-            prompt="Prompt: Ask when the train arrives."
-            example="Ich möchte wissen, wann der Zug ankommt."
-          />
-          <MiniExample
-            title="Use wo for place questions"
-            prompt="Prompt: Ask where the post office is."
-            example="Ich möchte wissen, wo die Post ist."
-          />
-        </div>
       </Section>
 
       <Section title="Quick Comparison: denn, weil, deshalb">
@@ -259,17 +230,6 @@ const ConjunctionNotesPage = () => {
           </div>
         </div>
 
-        <h3 style={{ margin: 0 }}>4. Ich möchte wissen, ob</h3>
-        <div style={{ display: "grid", gap: 10 }}>
-          <div>
-            <h4 style={{ margin: "4px 0" }}>A1 core</h4>
-            <BulletList items={["Du hast morgen Zeit.", "Ihr kommt am Wochenende zu Besuch."]} />
-          </div>
-          <div>
-            <h4 style={{ margin: "4px 0" }}>A1+</h4>
-            <BulletList items={["Sie kann ihm helfen."]} />
-          </div>
-        </div>
       </Section>
 
       <Section title="Solutions">
@@ -308,19 +268,57 @@ const ConjunctionNotesPage = () => {
                 ]}
               />
             </div>
-
-            <div style={{ display: "grid", gap: 8 }}>
-              <h3 style={{ margin: 0 }}>4. Ich möchte wissen, ob</h3>
-              <BulletList
-                items={[
-                  "Ich möchte wissen, ob du morgen Zeit hast.",
-                  "Wir möchten wissen, ob ihr am Wochenende zu Besuch kommt.",
-                  "Er möchte wissen, ob sie ihm helfen kann.",
-                ]}
-              />
-            </div>
           </div>
         </details>
+      </Section>
+
+      <Section title="Final Revision: Sentence Formulation Check">
+        <p style={{ margin: 0 }}>
+          Before your exam, test yourself by building complete sentences correctly. Focus on meaning, punctuation,
+          and word order.
+        </p>
+        <div style={{ display: "grid", gap: 10 }}>
+          <MiniExample
+            title="1) Statement"
+            prompt="Prompt: Say that you live in Berlin."
+            example="Ich wohne in Berlin."
+          />
+          <MiniExample
+            title="2) Modal verb statement"
+            prompt="Prompt: Say that you want to learn German today."
+            example="Ich möchte heute Deutsch lernen."
+          />
+          <MiniExample
+            title="3) W-question"
+            prompt="Prompt: Ask where the language school is."
+            example="Wo ist die Sprachschule?"
+          />
+          <MiniExample
+            title="4) Yes/No question"
+            prompt="Prompt: Ask if your friend is coming tomorrow."
+            example="Kommst du morgen?"
+          />
+          <MiniExample
+            title="5) Weil sentence"
+            prompt="Prompt: Explain that you are staying home because you are tired."
+            example="Ich bleibe zu Hause, weil ich müde bin."
+          />
+          <MiniExample
+            title="6) Grammar mixed check"
+            prompt="Prompt: Write one sentence each with correct capitalization, verb position, and punctuation."
+            example="Heute lerne ich Deutsch. Danach schreibe ich eine E-Mail an meinen Lehrer."
+          />
+        </div>
+        <Callout>
+          <strong>Exam path guidance:</strong>
+          <BulletList
+            items={[
+              "If you are preparing for A1 exams, go to the exam room and make a clear preparation plan with daily sentence practice.",
+              "If you are preparing for A2 exams, review letter-writing concepts and important grammar points to keep progressing.",
+              "Wishing you success in your German learning journey — keep going!",
+            ]}
+          />
+        </Callout>
       </Section>
     </div>
   );
