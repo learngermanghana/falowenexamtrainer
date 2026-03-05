@@ -39,6 +39,7 @@ import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWor
 import A2Day2PersonenBeschreibenWorkbookPage from "./components/A2Day2PersonenBeschreibenWorkbookPage";
 import A2Day3ComparisonsWorkbookPage from "./components/A2Day3ComparisonsWorkbookPage";
 import A2Day4WoMoechtenWirUnsTreffenWorkbookPage from "./components/A2Day4WoMoechtenWirUnsTreffenWorkbookPage";
+import A2Day5FreizeitWorkbookPage from "./components/A2Day5FreizeitWorkbookPage";
 import A2Day5FreizeitSeparableVerbsGrammarPage from "./components/A2Day5FreizeitSeparableVerbsGrammarPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
@@ -544,6 +545,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-2-personen-beschreiben-workbook" element={<A2Day2PersonenBeschreibenWorkbookPage />} />
           <Route path="/campus/course/a2-day-3-dinge-und-personen-vergleichen-workbook" element={<A2Day3ComparisonsWorkbookPage />} />
           <Route path="/campus/course/a2-day-4-wo-moechten-wir-uns-treffen-workbook" element={<A2Day4WoMoechtenWirUnsTreffenWorkbookPage />} />
+          <Route path="/campus/course/a2-day-5-freizeit-workbook" element={<A2Day5FreizeitWorkbookPage />} />
           <Route
             path="/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook"
             element={<B1Day25OnlineShoppingRightsRisksWorkbookPage />}

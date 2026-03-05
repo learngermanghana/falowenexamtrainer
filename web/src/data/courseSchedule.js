@@ -99,7 +99,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Separable Verbs (Trennbare Verben)",
     video: "https://youtu.be/8dX40NXG_gI",
     youtube_link: "https://youtu.be/8dX40NXG_gI",
-    grammarbook_link: "https://drive.google.com/file/d/11yEcMioSB9x1ZD-x5_67ApFzP53iau-N/view?usp=sharing",
+    grammarbook_link: "/campus/course/was-machst-du-in-deiner-freizeit-2-5-grammar-notes",
     workbook_link: "/campus/course/a2-day-5-freizeit-workbook",
   },
   {
