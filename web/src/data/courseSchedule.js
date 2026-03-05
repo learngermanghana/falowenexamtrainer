@@ -677,7 +677,7 @@ const RAW_COURSE_SCHEDULES = {
       schreiben_sprechen: {
         video: "https://youtu.be/vMfOb_nPRNc",
         youtube_link: "https://youtu.be/vMfOb_nPRNc",
-        workbook_link: "https://drive.google.com/file/d/1oOT_b3S4MZIqZ10Kui-dR6qlM0AZfWZ4/view?usp=sharing",
+        workbook_link: "https://www.falowen.app/campus/course/modal-verbs-day-14-3-6",
         assignment: false,
       },
     },
