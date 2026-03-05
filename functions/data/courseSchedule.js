@@ -1819,6 +1819,25 @@ const normalizeCourseSchedules = (schedules) =>
     })
   );
 
-const normalizedCourseSchedules = normalizeCourseSchedules(courseSchedules);
+const EXAM_TEIL_GROUP_SPRECHEN_INSTRUCTION =
+  "Prepare for Teil 1 (group Sprechen). There is no assignment for Teil 1; assignments are only in Teil 2, Teil 3, and Teil 4.";
+
+const applyExamTeilInstruction = (entries = []) =>
+  entries.map((entry) => {
+    if (!entry || typeof entry !== "object" || Number(entry.day) === 0 || !entry.chapter) {
+      return entry;
+    }
+
+    return {
+      ...entry,
+      instruction: EXAM_TEIL_GROUP_SPRECHEN_INSTRUCTION,
+    };
+  });
+
+const normalizedCourseSchedules = normalizeCourseSchedules({
+  ...courseSchedules,
+  A2: applyExamTeilInstruction(courseSchedules.A2),
+  B1: applyExamTeilInstruction(courseSchedules.B1),
+});
 
 module.exports = { courseSchedules: normalizedCourseSchedules };

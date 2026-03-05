@@ -1847,6 +1847,21 @@ const getDefaultInstruction = (instruction) => {
   return instruction;
 };
 
+const EXAM_TEIL_GROUP_SPRECHEN_INSTRUCTION =
+  "Prepare for Teil 1 (group Sprechen). There is no assignment for Teil 1; assignments are only in Teil 2, Teil 3, and Teil 4.";
+
+const applyExamTeilInstruction = (entries = []) =>
+  entries.map((entry) => {
+    if (!entry || typeof entry !== "object" || Number(entry.day) === 0 || !entry.chapter) {
+      return entry;
+    }
+
+    return {
+      ...entry,
+      instruction: EXAM_TEIL_GROUP_SPRECHEN_INSTRUCTION,
+    };
+  });
+
 const normalizeCourseSchedules = (schedules) =>
   Object.fromEntries(
     Object.entries(schedules).map(([level, entries]) => {
@@ -1884,4 +1899,8 @@ const normalizeCourseSchedules = (schedules) =>
     })
   );
 
-export const courseSchedules = normalizeCourseSchedules(RAW_COURSE_SCHEDULES);
+export const courseSchedules = normalizeCourseSchedules({
+  ...RAW_COURSE_SCHEDULES,
+  A2: applyExamTeilInstruction(RAW_COURSE_SCHEDULES.A2),
+  B1: applyExamTeilInstruction(RAW_COURSE_SCHEDULES.B1),
+});
