@@ -2,8 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
-const HERO_IMAGE_URL =
-  "https://source.unsplash.com/featured/1600x500?writing,notebook,study";
+const HERO_IMAGE_URL = "/falo.png";
 
 const keyTakeaways = [
   "Denn joins two main clauses and keeps the verb order the same.",
@@ -291,7 +290,7 @@ const ConjunctionNotesPage = () => {
           Back to Course
         </button>
 
-        {/* Unsplash hero image */}
+        {/* Hero image */}
         <div style={{ display: "grid", gap: 6 }}>
           <img
             src={HERO_IMAGE_URL}
@@ -305,7 +304,7 @@ const ConjunctionNotesPage = () => {
               border: "1px solid #e6e8ef",
             }}
           />
-          <span style={{ fontSize: 12, color: "#6b7280" }}>Image: Unsplash</span>
+          <span style={{ fontSize: 12, color: "#6b7280" }}>Image: Falowen</span>
         </div>
 
         <h1 style={{ ...styles.title, margin: 0 }}>
