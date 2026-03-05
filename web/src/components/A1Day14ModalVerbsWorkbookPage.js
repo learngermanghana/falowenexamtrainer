@@ -242,9 +242,11 @@ const nichtPractice = [
 const A1Day14ModalVerbsWorkbookPage = () => {
   const navigate = useNavigate();
 
-  // Unsplash image (simple + no API key needed). You can replace the keywords to match your lesson theme.
-  const heroImg = "https://source.unsplash.com/featured/1600x700/?germany,train,station";
-  const heroCredit = "Unsplash";
+  // Stable Unsplash CDN image URL (no login/API key required for simple embedding).
+  const heroImg =
+    "https://images.unsplash.com/photo-1470246973918-29a93221c455?auto=format&fit=crop&w=1600&q=80";
+  const heroCreditName = "Lukas S";
+  const heroCreditUrl = "https://unsplash.com/photos/blue-and-white-train-on-railway-station-9QjA0rNQp4s";
 
   // Score tracking: id -> true/false (null/undefined = not counted)
   const [marks, setMarks] = useState({});
@@ -332,7 +334,13 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             <p style={{ margin: 0, color: "#4b5563" }}>
               Objective: Use modal verbs + infinitive correctly, and understand separable verbs with/without a modal.
             </p>
-            <p style={{ margin: 0, color: "#6b7280", fontSize: 12 }}>Photo: {heroCredit}</p>
+            <p style={{ margin: 0, color: "#6b7280", fontSize: 12 }}>
+              Photo by{" "}
+              <a href={heroCreditUrl} target="_blank" rel="noreferrer" style={{ color: "inherit" }}>
+                {heroCreditName}
+              </a>{" "}
+              on Unsplash
+            </p>
           </div>
 
           {/* Score / progress */}
