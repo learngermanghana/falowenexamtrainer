@@ -39,6 +39,7 @@ import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWor
 import A2Day2PersonenBeschreibenWorkbookPage from "./components/A2Day2PersonenBeschreibenWorkbookPage";
 import A2Day3ComparisonsWorkbookPage from "./components/A2Day3ComparisonsWorkbookPage";
 import A2Day4WoMoechtenWirUnsTreffenWorkbookPage from "./components/A2Day4WoMoechtenWirUnsTreffenWorkbookPage";
+import A2Day5FreizeitSeparableVerbsGrammarPage from "./components/A2Day5FreizeitSeparableVerbsGrammarPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
 import { useAuth } from "./context/AuthContext";
@@ -562,6 +563,10 @@ const AppShell = ({
           <Route
             path="/campus/course/wo-moechten-wir-uns-treffen-2-4-grammar-notes"
             element={<WoTreffenUnsGrammarPage />}
+          />
+          <Route
+            path="/campus/course/was-machst-du-in-deiner-freizeit-2-5-grammar-notes"
+            element={<A2Day5FreizeitSeparableVerbsGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
