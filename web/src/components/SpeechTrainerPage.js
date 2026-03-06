@@ -33,6 +33,34 @@ const extractTag = (text, tag) => {
   return match?.[1]?.trim() || "";
 };
 
+const extractAllTaggedFields = (text) => {
+  const fields = [];
+  const regex = /<([a-z_]+)>([\s\S]*?)<\/\1>/gi;
+  let match = regex.exec(String(text || ""));
+  while (match) {
+    fields.push({ tag: match[1].toLowerCase(), value: match[2].trim() });
+    match = regex.exec(String(text || ""));
+  }
+  return fields;
+};
+
+const normalizeLabel = (tag) =>
+  ({
+    question_de: "Nächste Frage",
+    feedback_en: "Feedback",
+    feedback_mix: "Feedback",
+    motivation_de: "Motivation",
+    vocab_explain: "Wortschatz",
+    progress_de: "Fortschritt",
+    abschluss_de: "Abschluss",
+    praesentation_de: "Präsentation",
+    script_short: "Short script",
+    script_medium: "Medium script",
+    script_long: "Long script",
+    error_intel: "Error intelligence",
+    rubric: "Rubric",
+  }[tag] || tag.replace(/_/g, " "));
+
 
 const extractErrorTags = (text) => {
   const normalized = String(text || "").toLowerCase();
@@ -66,6 +94,40 @@ const scorePill = (label, value) => (
     <div style={{ ...styles.helperText, margin: 0 }}>{value}/5</div>
   </div>
 );
+
+const renderAssistantContent = (content) => {
+  const taggedFields = extractAllTaggedFields(content).filter((field) => field.value);
+  if (!taggedFields.length) {
+    return <div style={{ whiteSpace: "pre-wrap" }}>{content}</div>;
+  }
+
+  const hasAnyXml = /<([a-z_]+)>[\s\S]*?<\/\1>/i.test(String(content || ""));
+  if (!hasAnyXml) {
+    return <div style={{ whiteSpace: "pre-wrap" }}>{content}</div>;
+  }
+
+  const blockStyle = {
+    padding: "8px 10px",
+    borderRadius: 10,
+    background: "#ffffff",
+    border: "1px solid #dbeafe",
+    display: "grid",
+    gap: 4,
+  };
+
+  return (
+    <div style={{ display: "grid", gap: 8 }}>
+      {taggedFields.map((field) => (
+        <div key={`${field.tag}-${field.value.slice(0, 20)}`} style={blockStyle}>
+          <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
+            {normalizeLabel(field.tag)}
+          </strong>
+          <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const SpeechTrainerPage = () => {
   const { idToken, studentProfile } = useAuth();
@@ -307,7 +369,9 @@ const SpeechTrainerPage = () => {
             const isUser = message.role === "user";
             return (
               <div key={`${message.role}-${index}`} style={{ display: "grid", gap: 6 }}>
-                <div style={isUser ? styles.chatBubbleUser : styles.chatBubbleCoach}>{message.content}</div>
+                <div style={isUser ? styles.chatBubbleUser : styles.chatBubbleCoach}>
+                  {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content)}
+                </div>
                 {!isUser && extractTag(message.content, "error_intel") ? (
                   <div style={{ ...styles.card, margin: 0, background: "#fff7ed" }}>
                     <strong style={{ fontSize: 13 }}>Error intelligence</strong>
