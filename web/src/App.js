@@ -48,6 +48,7 @@ import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21Lebensform
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
 import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3AskingAboutPricesWorkbookPage";
+import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCasesWorkbookPage";
 import A1Day1GreetingsGrammarPage from "./components/A1Day1GreetingsGrammarPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
@@ -576,6 +577,10 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-chapter-3-asking-about-prices-workbook"
             element={<A1Chapter3AskingAboutPricesWorkbookPage />}
+          />
+          <Route
+            path="/campus/course/a1-chapter-5-german-cases-workbook"
+            element={<A1Chapter5GermanCasesWorkbookPage />}
           />
           <Route
             path="/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1"
