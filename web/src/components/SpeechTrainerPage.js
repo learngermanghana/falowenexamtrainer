@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -15,37 +16,9 @@ const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
 const CHAT_DRAFT_STORAGE_KEY = "falowen.speechTrainer.chatDraft.v1";
 
-const TOPIC_PRESETS = ["My hometown", "My studies", "A cultural festival", "An environmental problem + solution"];
-
-const FLOW_STEPS = [
-  "Describe your topic",
-  "Explain your situation",
-  "Present your solution",
-  "Give supporting details",
-  "Use richer vocabulary and structure",
-  "Deliver your final presentation",
-];
-
-const FLOW_STEPS_A1_A2 = [
-  "Say your topic",
-  "Talk about your situation",
-  "Say your idea or solution",
-  "Give one simple example",
-  "Use linking words",
-  "Say your final presentation",
-];
-
-const UPGRADE_OPTIONS = [
-  { label: "Make it A2/B1", mode: "a2-b1", description: "Targets clear A2/B1 grammar and natural exam-ready phrasing." },
-  { label: "Make it more formal", mode: "formal", description: "Emphasises politeness, formality, and clearer sentence patterns." },
-  { label: "Add linking words", mode: "linking", description: "Adds connectors like zuerst, dann, außerdem, deshalb, and zum Schluss." },
-];
-
-const getInitialCoachMessage = (isA1A2) => ({
+const getInitialCoachMessage = (isA1A2, t) => ({
   role: "assistant",
-  content: isA1A2
-    ? "Hallo! I am Herr Felix 👋. Wir üben mit einfachem Deutsch + little English help. Wähle ein Thema, dann starten wir."
-    : "Hallo! Ich bin Herr Felix, dein Präsentations-Coach. Wähle zuerst einen Kontext oder schreibe dein eigenes Thema, dann starten wir.",
+  content: isA1A2 ? t("speechTrainer.initialCoachMessage.a1a2") : t("speechTrainer.initialCoachMessage.default"),
 });
 
 const extractTag = (text, tag) => {
@@ -64,21 +37,21 @@ const extractAllTaggedFields = (text) => {
   return fields;
 };
 
-const normalizeLabel = (tag) =>
+const normalizeLabel = (tag, t) =>
   ({
-    question_de: "Nächste Frage",
-    feedback_en: "Feedback",
-    feedback_mix: "Feedback",
-    motivation_de: "Motivation",
-    vocab_explain: "Wortschatz",
-    progress_de: "Fortschritt",
-    abschluss_de: "Abschluss",
-    praesentation_de: "Präsentation",
-    script_short: "Short script",
-    script_medium: "Medium script",
-    script_long: "Long script",
-    error_intel: "Error intelligence",
-    rubric: "Rubric",
+    question_de: t("speechTrainer.tags.nextQuestion"),
+    feedback_en: t("speechTrainer.tags.feedback"),
+    feedback_mix: t("speechTrainer.tags.feedback"),
+    motivation_de: t("speechTrainer.tags.motivation"),
+    vocab_explain: t("speechTrainer.tags.vocabulary"),
+    progress_de: t("speechTrainer.tags.progress"),
+    abschluss_de: t("speechTrainer.tags.closing"),
+    praesentation_de: t("speechTrainer.tags.presentation"),
+    script_short: t("speechTrainer.tags.shortScript"),
+    script_medium: t("speechTrainer.tags.mediumScript"),
+    script_long: t("speechTrainer.tags.longScript"),
+    error_intel: t("speechTrainer.tags.errorIntelligence"),
+    rubric: t("speechTrainer.tags.rubric"),
   }[tag] || tag.replace(/_/g, " "));
 
 const extractErrorTags = (text) => {
@@ -116,7 +89,7 @@ const scorePill = (label, value) => (
 
 const PRIMARY_TAGS = ["question_de", "abschluss_de", "praesentation_de"];
 
-const renderAssistantContent = (content, isA1A2Level) => {
+const renderAssistantContent = (content, isA1A2Level, t) => {
   const taggedFields = extractAllTaggedFields(content).filter((field) => field.value);
   if (!taggedFields.length) {
     return <div style={{ whiteSpace: "pre-wrap" }}>{content}</div>;
@@ -144,24 +117,24 @@ const renderAssistantContent = (content, isA1A2Level) => {
       {(primaryFields.length ? primaryFields : taggedFields).map((field) => (
         <div key={`${field.tag}-${field.value.slice(0, 20)}`} style={blockStyle}>
           <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
-            {normalizeLabel(field.tag)}
+            {normalizeLabel(field.tag, t)}
           </strong>
           <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
         </div>
       ))}
       {secondaryFields.length ? (
         <details style={{ ...blockStyle, background: "#f8fafc", borderColor: "#e5e7eb" }}>
-          <summary style={{ cursor: "pointer", fontWeight: 600 }}>{isA1A2Level ? "Mehr Hilfe öffnen (Tipps + Beispiele)" : "Weitere Coaching‑Tipps & Vorschläge anzeigen"}</summary>
+          <summary style={{ cursor: "pointer", fontWeight: 600 }}>{isA1A2Level ? t("speechTrainer.moreHelpA1A2") : t("speechTrainer.moreHelp")}</summary>
           {isA1A2Level ? (
             <div style={{ fontSize: 12, color: "#475569", marginTop: 6 }}>
-              Hier findest du extra Satzideen, Wörter und kleine Beispiele.
+              {t("speechTrainer.moreHelpDescription")}
             </div>
           ) : null}
           <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
             {secondaryFields.map((field) => (
               <div key={`${field.tag}-${field.value.slice(0, 30)}`}>
                 <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
-                  {normalizeLabel(field.tag)}
+                  {normalizeLabel(field.tag, t)}
                 </strong>
                 <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
               </div>
@@ -174,9 +147,10 @@ const renderAssistantContent = (content, isA1A2Level) => {
 };
 
 const SpeechTrainerPage = () => {
+  const { t } = useTranslation();
   const { idToken, studentProfile } = useAuth();
   const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([getInitialCoachMessage(false)]);
+  const [chatMessages, setChatMessages] = useState([getInitialCoachMessage(false, t)]);
   const [answersDone, setAnswersDone] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -200,7 +174,15 @@ const SpeechTrainerPage = () => {
 
 
   const isA1A2Level = level === "A1" || level === "A2";
-  const flowStepsForLevel = isA1A2Level ? FLOW_STEPS_A1_A2 : FLOW_STEPS;
+  const topicPresets = useMemo(() => t("speechTrainer.topicPresets", { returnObjects: true }), [t]);
+  const flowStepsForLevel = useMemo(
+    () =>
+      isA1A2Level
+        ? t("speechTrainer.flowSteps.a1a2", { returnObjects: true })
+        : t("speechTrainer.flowSteps.default", { returnObjects: true }),
+    [isA1A2Level, t]
+  );
+  const upgradeOptions = useMemo(() => t("speechTrainer.upgradeOptions", { returnObjects: true }), [t]);
 
   const studentCode = String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim();
   const studentName =
@@ -208,8 +190,8 @@ const SpeechTrainerPage = () => {
     studentProfile?.displayName ||
     studentProfile?.name ||
     studentProfile?.fullName ||
-    "Student";
-  const tutorName = "Sir Felix";
+    t("speechTrainer.studentFallbackName");
+  const tutorName = t("speechTrainer.tutorName");
 
   const progressPercent = Math.min(100, Math.round((answersDone / TURN_LIMIT) * 100));
   const recorderLink = `${CAMPUS_SPEAKING_LINK}?code=${encodeURIComponent(studentCode)}`;
@@ -219,13 +201,13 @@ const SpeechTrainerPage = () => {
     flowStepsForLevel[Math.min(answersDone, TURN_LIMIT - 1)] || flowStepsForLevel[flowStepsForLevel.length - 1];
 
   const getDynamicHelperText = useCallback((done) => {
-    if (done <= 0) return "Start with a clear topic introduction and one key point.";
-    if (done === 1) return "Great start. Now expand vocabulary range and vary your sentence structure.";
-    if (done === 2) return "Add a concrete example so your explanation is persuasive.";
-    if (done === 3) return "Link ideas with connectors and show cause/effect clearly.";
-    if (done === 4) return "Refine grammar and make your conclusion concise and confident.";
-    return "Final step: deliver a fluent full response with strong structure.";
-  }, []);
+    if (done <= 0) return t("speechTrainer.dynamicHelper.0");
+    if (done === 1) return t("speechTrainer.dynamicHelper.1");
+    if (done === 2) return t("speechTrainer.dynamicHelper.2");
+    if (done === 3) return t("speechTrainer.dynamicHelper.3");
+    if (done === 4) return t("speechTrainer.dynamicHelper.4");
+    return t("speechTrainer.dynamicHelper.5");
+  }, [t]);
 
   const classifyError = useCallback((requestError) => {
     const message = String(requestError?.message || "").toLowerCase();
@@ -302,7 +284,7 @@ const SpeechTrainerPage = () => {
 
     try {
       const coachingHistory = isA1A2Level
-        ? [...priorHistory, { role: "assistant", content: "Coach style: use easy German (A1/A2), short sentences, and brief English support for difficult words." }]
+        ? [...priorHistory, { role: "assistant", content: t("speechTrainer.coachStyleA1A2") }]
         : priorHistory;
 
       const response = await requestPresentationCoachReply({
@@ -337,11 +319,11 @@ const SpeechTrainerPage = () => {
       }
       setErrorType(type);
       if (type === "auth") {
-        setError("Your session expired. Please log in again to continue.");
+        setError(t("speechTrainer.errors.auth"));
       } else if (type === "transient") {
-        setError("Temporary network issue. Please retry in a moment.");
+        setError(t("speechTrainer.errors.transient"));
       } else {
-        setError(requestError?.message || "Could not reach the presentation coach. Please try again.");
+        setError(requestError?.message || t("speechTrainer.errors.generic"));
       }
     } finally {
       setLoading(false);
@@ -352,7 +334,7 @@ const SpeechTrainerPage = () => {
     const trimmed = chatInput.trim();
     if (!trimmed || loading || completed) return;
     if (trimmed.length < MIN_ANSWER_LENGTH) {
-      setError(`Please write at least ${MIN_ANSWER_LENGTH} characters so Sir Felix can coach you better.`);
+      setError(t("speechTrainer.errors.minLength", { minLength: MIN_ANSWER_LENGTH, tutorName }));
       return;
     }
 
@@ -369,8 +351,8 @@ const SpeechTrainerPage = () => {
     if (loading || completed) return;
     setTopic(presetTopic);
     const message = isA1A2Level
-      ? `Topic selected: ${presetTopic}. Please start with easy German + short English help for A1/A2 learner.`
-      : `Topic selected: ${presetTopic}. Please start the 6-step coaching flow with the first German question.`;
+      ? t("speechTrainer.topicSelectedA1A2", { presetTopic })
+      : t("speechTrainer.topicSelected", { presetTopic });
     const history = chatMessages.map(({ role, content }) => ({ role, content }));
     await submitMessage({ message, history });
   };
@@ -387,9 +369,9 @@ const SpeechTrainerPage = () => {
       });
       const upgraded = extractTag(response?.reply || "", "upgrade_de") || response?.reply || "";
       const why = extractTag(response?.reply || "", "why_en");
-      setChatMessages((prev) => [...prev, { role: "assistant", content: `Upgrade (${label}):\n${upgraded}`, meta: { type: "upgrade", why } }]);
+      setChatMessages((prev) => [...prev, { role: "assistant", content: t("speechTrainer.upgradeResult", { label, upgraded }), meta: { type: "upgrade", why } }]);
     } catch (upgradeError) {
-      setError(upgradeError?.message || "Could not upgrade your answer right now.");
+      setError(upgradeError?.message || t("speechTrainer.errors.upgrade"));
     } finally {
       setUpgradeLoadingByIndex((prev) => ({ ...prev, [index]: "" }));
     }
@@ -409,7 +391,7 @@ const SpeechTrainerPage = () => {
     if (!selectedModes.length || loading) return;
 
     for (const mode of selectedModes) {
-      const option = UPGRADE_OPTIONS.find((item) => item.mode === mode);
+      const option = upgradeOptions.find((item) => item.mode === mode);
       // eslint-disable-next-line no-await-in-loop
       await handleUpgrade({ message, index, mode, label: option?.label || mode });
     }
@@ -417,9 +399,9 @@ const SpeechTrainerPage = () => {
 
   const handleReset = () => {
     const hasContent = chatMessages.length > 1 || chatInput.trim();
-    if (hasContent && !window.confirm("Are you sure you want to reset? Your current chat will be cleared.")) return;
+    if (hasContent && !window.confirm(t("speechTrainer.confirmReset"))) return;
 
-    setChatMessages([getInitialCoachMessage(isA1A2Level)]);
+    setChatMessages([getInitialCoachMessage(isA1A2Level, t)]);
     setChatInput("");
     setAnswersDone(0);
     setCompleted(false);
@@ -456,7 +438,7 @@ const SpeechTrainerPage = () => {
         await savePresentationSession({
           idToken,
           payload: {
-            topic: topic || "Custom topic",
+            topic: topic || t("speechTrainer.customTopic"),
             level,
             finalScript,
             commonErrorTags: inferredTags,
@@ -503,26 +485,23 @@ const SpeechTrainerPage = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-          <h2 style={{ margin: 0 }}>Class presentation chat coach</h2>
-          <span style={styles.levelPill}>Level {level}</span>
+        <div style={{ ...styles.filterRow, gridTemplateColumns: "1fr auto" }}>
+          <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("speechTrainer.title")}</h2>
+          <span style={styles.levelPill}>{t("speechTrainer.levelBadge", { level })}</span>
         </div>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Welcome {studentName}. You are chatting with {tutorName}. {isA1A2Level ? "Simple German + English support mode." : "6-step preparation flow with corrections, upgrades, and final speaking scripts."}
+          {t("speechTrainer.welcome", { studentName, tutorName })} {isA1A2Level ? t("speechTrainer.mode.a1a2") : t("speechTrainer.mode.default")}
         </p>
-        <div style={{ ...styles.card, margin: 0, background: "#eff6ff" }}>
-          <strong style={{ fontSize: 13 }}>Before you begin</strong>
-          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-            You will answer six guided prompts. After each reply, Sir Felix gives feedback and asks the next question. Aim for clear structure,
-            varied vocabulary, and complete sentences.
-          </p>
+        <div style={{ ...styles.filterPanel, margin: 0, background: "#eff6ff" }}>
+          <strong style={{ fontSize: 13 }}>{t("speechTrainer.beforeStartTitle")}</strong>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{t("speechTrainer.beforeStartDescription")}</p>
         </div>
 
         {!answersDone ? (
-          <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 8 }}>
-            <strong style={{ fontSize: 14 }}>Presentation contexts</strong>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {TOPIC_PRESETS.map((presetTopic) => (
+          <div style={{ ...styles.filterPanel, margin: 0 }}>
+            <strong style={{ fontSize: 14 }}>{t("speechTrainer.contextsTitle")}</strong>
+            <div style={styles.filterRow}>
+              {topicPresets.map((presetTopic) => (
                 <button
                   key={presetTopic}
                   type="button"
@@ -537,20 +516,20 @@ const SpeechTrainerPage = () => {
           </div>
         ) : null}
 
-        <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 8 }}>
+        <div style={{ ...styles.filterPanel, margin: 0 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            You can stay here for chat practice, or open the recorder if you want to submit an audio recording.
+            {t("speechTrainer.recorderDescription")}
           </p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <a href={recorderLink} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none" }} aria-label="Open speech recorder link">
-              Open recorder link
+          <div style={styles.filterRow}>
+            <a href={recorderLink} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, ...styles.primaryButtonLink }} aria-label={t("speechTrainer.recorderAriaLabel")}>
+              {t("speechTrainer.recorderButton")}
             </a>
           </div>
         </div>
 
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ ...styles.helperText, margin: 0 }}>
-            Progress: {answersDone}/{TURN_LIMIT} • Current step: {currentStepLabel}
+            {t("speechTrainer.progress", { answersDone, turnLimit: TURN_LIMIT, currentStepLabel })}
           </div>
           <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone)}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -568,7 +547,7 @@ const SpeechTrainerPage = () => {
               </span>
             ))}
           </div>
-          <div style={{ width: "100%", height: 8, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }} role="progressbar" aria-label="Six-step coaching progress" aria-valuemin={0} aria-valuemax={TURN_LIMIT} aria-valuenow={answersDone}>
+          <div style={{ width: "100%", height: 8, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }} role="progressbar" aria-label={t("speechTrainer.progressAria")} aria-valuemin={0} aria-valuemax={TURN_LIMIT} aria-valuenow={answersDone}>
             <div style={{ width: `${progressPercent}%`, height: "100%", background: "#2563eb" }} />
           </div>
         </div>
@@ -583,23 +562,23 @@ const SpeechTrainerPage = () => {
             return (
               <div key={`${message.role}-${index}`} style={{ display: "grid", gap: 6 }}>
                 <div style={isUser ? styles.chatBubbleUser : styles.chatBubbleCoach}>
-                  {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content, isA1A2Level)}
+                  {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content, isA1A2Level, t)}
                   {message?.meta?.type === "upgrade" && message?.meta?.why ? (
                     <details style={{ marginTop: 8 }}>
-                      <summary style={{ cursor: "pointer" }}>Why this upgrade</summary>
+                      <summary style={{ cursor: "pointer" }}>{t("speechTrainer.whyUpgrade")}</summary>
                       <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{message.meta.why}</p>
                     </details>
                   ) : null}
                 </div>
                 {!isUser && extractTag(message.content, "error_intel") ? (
                   <div style={{ ...styles.card, margin: 0, background: "#fff7ed" }}>
-                    <strong style={{ fontSize: 13 }}>Error intelligence</strong>
+                    <strong style={{ fontSize: 13 }}>{t("speechTrainer.tags.errorIntelligence")}</strong>
                     <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{extractTag(message.content, "error_intel")}</p>
                   </div>
                 ) : null}
                 {isUser ? (
                   <div style={{ display: "grid", gap: 6 }}>
-                    {UPGRADE_OPTIONS.map((option) => (
+                    {upgradeOptions.map((option) => (
                       <label key={`${index}-${option.mode}`} style={{ display: "flex", gap: 6, alignItems: "center", ...styles.helperText, margin: 0 }} title={option.description}>
                         <input
                           type="checkbox"
@@ -615,9 +594,9 @@ const SpeechTrainerPage = () => {
                       style={styles.secondaryButton}
                       disabled={Boolean(upgradeLoadingByIndex[index]) || loading || !(selectedUpgradesByIndex[index] || []).length}
                       onClick={() => handleApplySelectedUpgrades(message, index)}
-                      aria-label="Apply selected upgrade options"
+                      aria-label={t("speechTrainer.applyUpgradesAria")}
                     >
-                      {upgradeLoadingByIndex[index] ? "Upgrading..." : "Apply selected upgrades"}
+                      {upgradeLoadingByIndex[index] ? t("speechTrainer.upgrading") : t("speechTrainer.applyUpgrades")}
                     </button>
                   </div>
                 ) : null}
@@ -628,21 +607,21 @@ const SpeechTrainerPage = () => {
 
         {completed && rubric ? (
           <div style={{ ...styles.card, margin: 0, background: "#eff6ff", display: "grid", gap: 8 }}>
-            <strong style={{ fontSize: 14 }}>Rubric-based feedback (1–5)</strong>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} aria-label="Rubric scores">
-              {scorePill("Grammar", rubric.grammar)}
-              {scorePill("Vocabulary range", rubric.vocabulary)}
-              {scorePill("Structure", rubric.structure)}
+            <strong style={{ fontSize: 14 }}>{t("speechTrainer.rubricTitle")}</strong>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} aria-label={t("speechTrainer.rubricScoresAria")}>
+              {scorePill(t("speechTrainer.rubric.grammar"), rubric.grammar)}
+              {scorePill(t("speechTrainer.rubric.vocabulary"), rubric.vocabulary)}
+              {scorePill(t("speechTrainer.rubric.structure"), rubric.structure)}
             </div>
           </div>
         ) : null}
 
         {completed ? (
           <div style={{ ...styles.card, margin: 0, background: "#ecfdf5", display: "grid", gap: 8 }}>
-            <strong style={{ fontSize: 14 }}>Speaking-ready output block</strong>
-            {finalScripts.short ? <div><strong>Short (45 sec):</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.short}</p></div> : null}
-            {finalScripts.medium ? <div><strong>Medium (90 sec):</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.medium}</p></div> : null}
-            {finalScripts.long ? <div><strong>Long (2 min):</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.long}</p></div> : null}
+            <strong style={{ fontSize: 14 }}>{t("speechTrainer.outputTitle")}</strong>
+            {finalScripts.short ? <div><strong>{t("speechTrainer.scriptLabels.short")}</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.short}</p></div> : null}
+            {finalScripts.medium ? <div><strong>{t("speechTrainer.scriptLabels.medium")}</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.medium}</p></div> : null}
+            {finalScripts.long ? <div><strong>{t("speechTrainer.scriptLabels.long")}</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.long}</p></div> : null}
           </div>
         ) : null}
 
@@ -653,38 +632,38 @@ const SpeechTrainerPage = () => {
             onKeyDown={handleInputKeyDown}
             rows={4}
             style={styles.textareaSmall}
-            placeholder={isA1A2Level ? "Write simple German. You may add small English support words..." : "Type your answer in German..."}
+            placeholder={isA1A2Level ? t("speechTrainer.placeholderA1A2") : t("speechTrainer.placeholder")}
             disabled={loading || completed}
           />
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-            {charsCount}/{MIN_ANSWER_LENGTH} characters minimum
+            {t("speechTrainer.charCounter", { charsCount, minLength: MIN_ANSWER_LENGTH })}
           </div>
           <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div style={styles.filterRow}>
             {minLengthReached ? (
-              <button type="button" style={styles.primaryButton} onClick={handleSend} disabled={loading || completed || !chatInput.trim()} aria-label="Send message">
-                {loading ? "Sir Felix is thinking..." : "Send"}
+              <button type="button" style={styles.primaryButton} onClick={handleSend} disabled={loading || completed || !chatInput.trim()} aria-label={t("speechTrainer.sendAria")}>
+                {loading ? t("speechTrainer.sending", { tutorName }) : t("speechTrainer.send")}
               </button>
             ) : null}
-            <button type="button" style={styles.secondaryButton} onClick={handleReset} aria-label="Reset chat and clear messages" disabled={loading}>
-              Reset chat
+            <button type="button" style={styles.secondaryButton} onClick={handleReset} aria-label={t("speechTrainer.resetAria")} disabled={loading}>
+              {t("speechTrainer.reset")}
             </button>
             {errorType === "auth" ? (
-              <button type="button" style={styles.secondaryButton} onClick={() => window.location.assign("/login")} aria-label="Log in again">
-                Re-login
+              <button type="button" style={styles.secondaryButton} onClick={() => window.location.assign("/login")} aria-label={t("speechTrainer.reloginAria")}>
+                {t("speechTrainer.relogin")}
               </button>
             ) : null}
             {error ? (
-              <button type="button" style={styles.secondaryButton} onClick={handleRetry} disabled={!retryablePayload || loading} aria-label="Retry last message">
-                Retry
+              <button type="button" style={styles.secondaryButton} onClick={handleRetry} disabled={!retryablePayload || loading} aria-label={t("speechTrainer.retryAria")}>
+                {t("speechTrainer.retry")}
               </button>
             ) : null}
           </div>
           {completed ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>
-              Great! You completed all 6 answers. Your final speaking scripts are ready above.
+              {t("speechTrainer.completedMessage")}
             </p>
           ) : null}
           {error ? <p style={{ ...styles.helperText, margin: 0, color: "#b91c1c" }}>{error}</p> : null}
@@ -692,30 +671,30 @@ const SpeechTrainerPage = () => {
       </div>
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h3 style={{ margin: 0 }}>Session history</h3>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <h3 style={{ margin: 0 }}>{t("speechTrainer.sessionHistoryTitle")}</h3>
+        <div style={styles.filterRow}>
           <input
             type="text"
             value={historyFilter.topic}
             onChange={(event) => setHistoryFilter((prev) => ({ ...prev, topic: event.target.value }))}
-            placeholder="Filter by topic"
+            placeholder={t("speechTrainer.filterByTopic")}
             style={{ ...styles.input, minWidth: 180 }}
-            aria-label="Filter session history by topic"
+            aria-label={t("speechTrainer.filterByTopicAria")}
           />
           <select
             value={historyFilter.level}
             onChange={(event) => setHistoryFilter((prev) => ({ ...prev, level: event.target.value }))}
             style={{ ...styles.input, minWidth: 120 }}
-            aria-label="Filter session history by level"
+            aria-label={t("speechTrainer.filterByLevelAria")}
           >
-            <option value="">All levels</option>
+            <option value="">{t("speechTrainer.allLevels")}</option>
             {["A1", "A2", "B1", "B2", "C1"].map((sessionLevel) => (
               <option key={sessionLevel} value={sessionLevel}>{sessionLevel}</option>
             ))}
           </select>
         </div>
         {!filteredSessionHistory.length ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>No saved presentation sessions yet.</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("speechTrainer.noSessions")}</p>
         ) : (
           filteredSessionHistory.map((session) => {
             const createdAt = session?.createdAt?._seconds
@@ -725,26 +704,26 @@ const SpeechTrainerPage = () => {
             return (
               <details key={session.id} style={{ ...styles.card, margin: 0 }}>
                 <summary style={{ cursor: "pointer" }}>
-                  <strong>{session.topic}</strong> • Level {session.level} • {createdAt.toLocaleString()}
+                  <strong>{session.topic}</strong> • {t("speechTrainer.levelBadge", { level: session.level })} • {createdAt.toLocaleString()}
                 </summary>
-                <div style={{ ...styles.helperText, margin: "8px 0 0" }}>Status: {session.completionStatus || "unknown"}</div>
-                {session.finalScript ? <div style={{ ...styles.helperText, margin: "4px 0" }}>Final script: {session.finalScript}</div> : null}
+                <div style={{ ...styles.helperText, margin: "8px 0 0" }}>{t("speechTrainer.status", { status: session.completionStatus || t("speechTrainer.unknown") })}</div>
+                {session.finalScript ? <div style={{ ...styles.helperText, margin: "4px 0" }}>{t("speechTrainer.finalScript", { finalScript: session.finalScript })}</div> : null}
                 {session.rubric ? (
                   <div style={{ ...styles.helperText, margin: "4px 0" }}>
-                    Rubric — Grammar: {Number(session.rubric.grammar || 0)}/5, Vocabulary: {Number(session.rubric.vocabulary || 0)}/5, Structure: {Number(session.rubric.structure || 0)}/5
+                    {t("speechTrainer.rubricHistory", { grammar: Number(session.rubric.grammar || 0), vocabulary: Number(session.rubric.vocabulary || 0), structure: Number(session.rubric.structure || 0) })}
                   </div>
                 ) : null}
                 {isIncomplete ? (
                   <button
                     type="button"
                     style={styles.secondaryButton}
-                    aria-label="Continue incomplete session"
+                    aria-label={t("speechTrainer.continueAria")}
                     onClick={() => {
                       setTopic(session.topic || "");
                       setChatInput(session.finalScript || "");
                     }}
                   >
-                    Continue
+                    {t("speechTrainer.continue")}
                   </button>
                 ) : null}
               </details>

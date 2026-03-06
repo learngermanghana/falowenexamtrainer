@@ -158,6 +158,12 @@ export const styles = {
     maxWidth: 260,
     justifySelf: "center",
   },
+  primaryButtonLink: {
+    textDecoration: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   secondaryButton: {
     padding: "8px 16px",
     borderRadius: 999,
