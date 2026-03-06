@@ -748,27 +748,57 @@ const AssignmentSubmissionPage = () => {
   const decoratedAssignmentOptions = useMemo(() => {
     return assignmentOptions.map((opt) => {
       const key = buildChapterKey(opt);
-      const submitted = key ? lockedChapters.has(key) : false;
+      const optionAssignmentId = buildAssignmentId(opt);
       const dayNumber = deriveChapterValue(opt);
       const isDayZero = dayNumber === 0;
       const isNotYetAvailable =
         Number.isFinite(dayNumber) && Number.isFinite(maxUnlockedDay) && dayNumber > maxUnlockedDay;
 
-      let stateLabel = isGerman ? "Bereit zur Abgabe" : "Ready to submit";
-      if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
+      const hasSubmission = recentSubmissions.some((entry) => {
+        const statusLabel = safeLower(entry?.status);
+        if (!["submitted", "resubmitted"].includes(statusLabel)) return false;
+
+        const entryAssignmentId = entry?.assignmentId || entry?.assignment_id || entry?.assignmentKey || null;
+        if (optionAssignmentId && entryAssignmentId) {
+          return normalizeAssignmentIdentity(optionAssignmentId) === normalizeAssignmentIdentity(entryAssignmentId);
+        }
+
+        const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
+        if (key && entryChapterKey) return key === entryChapterKey;
+
+        return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(opt);
+      });
+
+      const submitted = Boolean((key && lockedChapters.has(key)) || hasSubmission);
+      const hasDraft = Boolean(String(draftsByAssignment?.[opt]?.submissionText || "").trim());
+
+      let stateLabel = isGerman ? "Nicht gestartet" : "Not started";
+      if (hasDraft) stateLabel = isGerman ? "In Bearbeitung" : "In progress";
       if (submitted) stateLabel = isGerman ? "Eingereicht" : "Submitted";
+      if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
       if (isNotYetAvailable) stateLabel = isGerman ? "Gesperrt (noch nicht verfügbar)" : "Locked (not yet available)";
 
       return {
         label: `${opt} — ${stateLabel}`,
         value: opt,
         submitted,
+        hasDraft,
         isDayZero,
         isNotYetAvailable,
         disabled: isDayZero || isNotYetAvailable,
       };
     });
-  }, [assignmentOptions, buildChapterKey, deriveChapterValue, isGerman, lockedChapters, maxUnlockedDay]);
+  }, [
+    assignmentOptions,
+    buildAssignmentId,
+    buildChapterKey,
+    deriveChapterValue,
+    draftsByAssignment,
+    isGerman,
+    lockedChapters,
+    maxUnlockedDay,
+    recentSubmissions,
+  ]);
 
 
   const dynamicMaxSubmissionCharacters = useMemo(() => {
