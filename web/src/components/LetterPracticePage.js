@@ -10,7 +10,7 @@ import { writingLetters } from "../data/writingLetters";
 import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
 import {
   isTutorReviewCloudEnabled,
-  loadLatestTutorReviewForStudent,
+  subscribeTutorReviewsForStudent,
   saveExamLetterForTutorReview,
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
@@ -68,13 +68,18 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
   const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
   const [timerRunning, setTimerRunning] = useState(false);
-  const [latestTutorReview, setLatestTutorReview] = useState(null);
+  const [tutorReviews, setTutorReviews] = useState([]);
+  const [selectedTutorReviewId, setSelectedTutorReviewId] = useState("");
   const [tutorRequestText, setTutorRequestText] = useState("");
   const [tutorRequestState, setTutorRequestState] = useState({ loading: false, success: "", error: "" });
   const [studentReplyText, setStudentReplyText] = useState("");
   const [studentReplyState, setStudentReplyState] = useState({ loading: false, success: "", error: "" });
   const [ideasProgressLoaded, setIdeasProgressLoaded] = useState(false);
   const [practiceLevel, setPracticeLevel] = useState("All");
+  const latestTutorReview = useMemo(
+    () => tutorReviews.find((review) => review.id === selectedTutorReviewId) || tutorReviews[0] || null,
+    [selectedTutorReviewId, tutorReviews]
+  );
 
   const normalizeProfileLevel = (rawLevel) => {
     const normalized = (rawLevel || "").trim().toUpperCase();
@@ -568,23 +573,30 @@ const LetterPracticePage = ({ mode = "exams" }) => {
 
   useEffect(() => {
     if (!user?.uid || !tutorReviewCloudEnabled) {
-      setLatestTutorReview(null);
+      setTutorReviews([]);
+      setSelectedTutorReviewId("");
       return;
     }
 
-    let cancelled = false;
-    loadLatestTutorReviewForStudent({ userId: user.uid, studentCode })
-      .then((review) => {
-        if (!cancelled) setLatestTutorReview(review);
-      })
-      .catch(() => {
-        if (!cancelled) setLatestTutorReview(null);
-      });
+    const unsubscribe = subscribeTutorReviewsForStudent(
+      { userId: user.uid, studentCode },
+      (reviews) => {
+        setTutorReviews(reviews);
+        setSelectedTutorReviewId((current) => {
+          if (current && reviews.some((review) => review.id === current)) return current;
+          return reviews[0]?.id || "";
+        });
+      },
+      () => {
+        setTutorReviews([]);
+        setSelectedTutorReviewId("");
+      }
+    );
 
     return () => {
-      cancelled = true;
+      unsubscribe();
     };
-  }, [studentCode, tutorRequestState.success, tutorReviewCloudEnabled, user?.uid]);
+  }, [studentCode, tutorReviewCloudEnabled, user?.uid]);
 
   const handleSubmitTutorRequest = async () => {
     const message = tutorRequestText.trim();
@@ -641,13 +653,18 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       });
       setStudentReplyText("");
       setStudentReplyState({ loading: false, success: "Reply sent to tutor.", error: "" });
-      setLatestTutorReview((prev) => ({
-        ...(prev || {}),
-        studentReplies: [
-          ...((prev?.studentReplies || [])),
-          { message, createdAt: new Date().toISOString() },
-        ],
-      }));
+      setTutorReviews((prev) =>
+        prev.map((review) => {
+          if (review.id !== latestTutorReview.id) return review;
+          return {
+            ...review,
+            studentReplies: [
+              ...(review.studentReplies || []),
+              { message, createdAt: new Date().toISOString() },
+            ],
+          };
+        })
+      );
     } catch (err) {
       setStudentReplyState({ loading: false, success: "", error: err?.message || "Could not send reply right now." });
     }
@@ -1203,6 +1220,22 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           ) : (
             <>
               <div style={styles.helperCard}>
+                {tutorReviews.length ? (
+                  <>
+                    <label style={styles.label}>Choose submission</label>
+                    <select
+                      style={{ ...styles.input, marginTop: 6, marginBottom: 10 }}
+                      value={latestTutorReview?.id || ""}
+                      onChange={(event) => setSelectedTutorReviewId(event.target.value)}
+                    >
+                      {tutorReviews.map((review, index) => (
+                        <option key={review.id} value={review.id}>
+                          {`#${tutorReviews.length - index} · ${review.promptTitle || "Writing submission"} · ${new Date(review.createdAtMs || Date.now()).toLocaleString()}`}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                ) : null}
                 <div style={{ fontWeight: 700, marginBottom: 6 }}>Status: {formatTutorReviewStatus(latestTutorReview?.reviewStatus)}</div>
                 {latestTutorReview?.reviewedAt ? (
                   <p style={{ ...styles.helperText, margin: "0 0 8px" }}>Reviewed: {new Date(latestTutorReview.reviewedAt).toLocaleString()}</p>

@@ -9,7 +9,7 @@ import { WRITING_PROMPTS } from "../data/writingExamPrompts";
 import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
 import {
   isTutorReviewCloudEnabled,
-  loadLatestTutorReviewForStudent,
+  subscribeTutorReviewsForStudent,
   saveExamLetterForTutorReview,
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
@@ -370,9 +370,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   );
   const [improvedLoading, setImprovedLoading] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
-  const [latestTutorReview, setLatestTutorReview] = useState(null);
+  const [tutorReviews, setTutorReviews] = useState([]);
+  const [selectedTutorReviewId, setSelectedTutorReviewId] = useState("");
   const [studentReplyText, setStudentReplyText] = useState("");
   const [studentReplyState, setStudentReplyState] = useState({ loading: false, success: "", error: "" });
+  const latestTutorReview = useMemo(
+    () => tutorReviews.find((review) => review.id === selectedTutorReviewId) || tutorReviews[0] || null,
+    [selectedTutorReviewId, tutorReviews]
+  );
   const [rubricBreakdown, setRubricBreakdown] = useState(() =>
     buildRubricBreakdown("")
   );
@@ -754,25 +759,29 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
 
   useEffect(() => {
     if (!isExamMode || !userId) {
-      setLatestTutorReview(null);
+      setTutorReviews([]);
+      setSelectedTutorReviewId("");
       return;
     }
 
-    let cancelled = false;
-    loadLatestTutorReviewForStudent({ userId, studentCode })
-      .then((review) => {
-        if (!cancelled) {
-          setLatestTutorReview(review);
-        }
-      })
-      .catch((error) => {
-        console.error("Failed to load latest tutor review", error);
-      });
+    const unsubscribe = subscribeTutorReviewsForStudent(
+      { userId, studentCode },
+      (reviews) => {
+        setTutorReviews(reviews);
+        setSelectedTutorReviewId((current) => {
+          if (current && reviews.some((review) => review.id === current)) return current;
+          return reviews[0]?.id || "";
+        });
+      },
+      (error) => {
+        console.error("Failed to subscribe to tutor reviews", error);
+      }
+    );
 
     return () => {
-      cancelled = true;
+      unsubscribe();
     };
-  }, [isExamMode, studentCode, tutorSaveState.success, userId]);
+  }, [isExamMode, studentCode, userId]);
 
   const handleStudentReplySubmit = async () => {
     if (!latestTutorReview?.id) {
@@ -797,18 +806,23 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       });
       setStudentReplyText("");
       setStudentReplyState({ loading: false, success: "Reply sent to tutor.", error: "" });
-      setLatestTutorReview((prev) => ({
-        ...(prev || {}),
-        studentReplies: [
-          ...((prev?.studentReplies || [])),
-          {
-            message,
-            studentName: studentProfile?.name || user?.displayName || "",
-            studentCode,
-            createdAt: new Date().toISOString(),
-          },
-        ],
-      }));
+      setTutorReviews((prev) =>
+        prev.map((review) => {
+          if (review.id !== latestTutorReview.id) return review;
+          return {
+            ...review,
+            studentReplies: [
+              ...(review.studentReplies || []),
+              {
+                message,
+                studentName: studentProfile?.name || user?.displayName || "",
+                studentCode,
+                createdAt: new Date().toISOString(),
+              },
+            ],
+          };
+        })
+      );
     } catch (err) {
       setStudentReplyState({
         loading: false,
@@ -963,7 +977,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         success: "Submitted. A tutor copy is now in the review queue.",
         error: "",
       });
-      setLatestTutorReview({ reviewStatus: "pending", tutorFeedback: "", reviewedAt: null });
     } catch (err) {
       console.error("Failed to save tutor review draft", err);
       setTutorSaveState({
@@ -1931,6 +1944,22 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             </div>
           ) : null}
           <div style={styles.helperCard}>
+            {tutorReviews.length ? (
+              <>
+                <label style={styles.label}>Choose submission</label>
+                <select
+                  style={{ ...styles.input, marginTop: 6, marginBottom: 10 }}
+                  value={latestTutorReview?.id || ""}
+                  onChange={(event) => setSelectedTutorReviewId(event.target.value)}
+                >
+                  {tutorReviews.map((review, index) => (
+                    <option key={review.id} value={review.id}>
+                      {`#${tutorReviews.length - index} · ${review.promptTitle || "Writing submission"} · ${new Date(review.createdAtMs || Date.now()).toLocaleString()}`}
+                    </option>
+                  ))}
+                </select>
+              </>
+            ) : null}
             <div style={{ fontWeight: 800, marginBottom: 6 }}>
               Status: {formatTutorReviewStatus(latestTutorReview?.reviewStatus)}
             </div>
