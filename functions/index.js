@@ -47,6 +47,8 @@ const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 const NOTIFICATION_BATCH_SIZE = 500;
 const UNPAID_SIGNUP_GRACE_DAYS = 7;
 const UNPAID_SIGNUP_GRACE_MS = UNPAID_SIGNUP_GRACE_DAYS * 24 * 60 * 60 * 1000;
+const CONTRACT_EXPIRY_GRACE_DAYS = 30;
+const CONTRACT_EXPIRY_GRACE_MS = CONTRACT_EXPIRY_GRACE_DAYS * 24 * 60 * 60 * 1000;
 
 const safeTruncate = (text = "", maxLength = 140) => {
   const str = String(text || "").trim();
@@ -104,6 +106,25 @@ const getMillisFromTimestampLike = (value) => {
   if (!value) return Number.NaN;
   if (typeof value?.toMillis === "function") {
     return value.toMillis();
+  }
+  if (typeof value === "string" || value instanceof Date || typeof value === "number") {
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? parsed : Number.NaN;
+  }
+  return Number.NaN;
+};
+
+const getContractEndMillis = (value) => {
+  if (!value) return Number.NaN;
+  if (typeof value?.toMillis === "function") {
+    return value.toMillis();
+  }
+  if (typeof value?.toDate === "function") {
+    const parsed = value.toDate();
+    if (parsed instanceof Date) {
+      const ms = parsed.getTime();
+      return Number.isFinite(ms) ? ms : Number.NaN;
+    }
   }
   if (typeof value === "string" || value instanceof Date || typeof value === "number") {
     const parsed = new Date(value).getTime();
@@ -691,6 +712,131 @@ exports.cleanupStaleUnpaidSignups = onSchedule(
       deletedDocs,
       deletedAuthUsers,
       graceDays: UNPAID_SIGNUP_GRACE_DAYS,
+    });
+
+    return null;
+  }
+);
+
+exports.cleanupExpiredStudentContracts = onSchedule(
+  {
+    region: "europe-west1",
+    schedule: "every day 03:00",
+    timeZone: "Etc/UTC",
+  },
+  async () => {
+    const db = getAdmin().firestore();
+    const auth = getAdmin().auth();
+    const nowMs = Date.now();
+
+    let scanned = 0;
+    let deletedDocs = 0;
+    let deletedAuthUsers = 0;
+    let missingAuthUsers = 0;
+    let skippedWithinGrace = 0;
+    let skippedInvalid = 0;
+    let skippedNonStudent = 0;
+    let skippedFailed = 0;
+    let firestoreFailed = 0;
+
+    let lastDoc = null;
+    while (true) {
+      let query = db
+        .collection("students")
+        .where("contractEnd", ">", "")
+        .orderBy("contractEnd")
+        .limit(50);
+
+      if (lastDoc) {
+        query = query.startAfter(lastDoc);
+      }
+
+      const snapshot = await query.get();
+      if (snapshot.empty) break;
+
+      lastDoc = snapshot.docs[snapshot.docs.length - 1];
+
+      for (const docSnap of snapshot.docs) {
+        scanned += 1;
+        const student = docSnap.data() || {};
+
+        if (student.purgeStatus === "failed") {
+          skippedFailed += 1;
+          continue;
+        }
+
+        if (student.role && student.role !== "student") {
+          skippedNonStudent += 1;
+          continue;
+        }
+
+        const contractEndMs = getContractEndMillis(student.contractEnd);
+        if (!Number.isFinite(contractEndMs)) {
+          skippedInvalid += 1;
+          continue;
+        }
+
+        if (contractEndMs + CONTRACT_EXPIRY_GRACE_MS >= nowMs) {
+          skippedWithinGrace += 1;
+          continue;
+        }
+
+        const uid = String(student.uid || "").trim();
+        if (uid) {
+          try {
+            await auth.deleteUser(uid);
+            deletedAuthUsers += 1;
+          } catch (error) {
+            if (error?.code === "auth/user-not-found") {
+              missingAuthUsers += 1;
+            } else {
+              console.error("cleanupExpiredStudentContracts: failed to delete auth user", {
+                studentId: docSnap.id,
+                uid,
+                errorMessage: error?.message,
+                code: error?.code,
+              });
+            }
+          }
+        }
+
+        try {
+          if (typeof db.recursiveDelete === "function") {
+            await db.recursiveDelete(docSnap.ref);
+          } else {
+            await docSnap.ref.delete();
+          }
+          deletedDocs += 1;
+        } catch (error) {
+          firestoreFailed += 1;
+          console.error("cleanupExpiredStudentContracts: failed to delete firestore doc", {
+            studentId: docSnap.id,
+            errorMessage: error?.message,
+          });
+
+          await docSnap.ref.set(
+            {
+              purgeStatus: "failed",
+              purgeError: String(error?.message || "unknown"),
+              purgeFailedAt: FieldValue.serverTimestamp(),
+            },
+            { merge: true }
+          );
+        }
+      }
+    }
+
+    console.log("cleanupExpiredStudentContracts: completed", {
+      scanned,
+      deletedDocs,
+      deletedAuthUsers,
+      missingAuthUsers,
+      skippedWithinGrace,
+      skippedInvalid,
+      skippedNonStudent,
+      skippedFailed,
+      firestoreFailed,
+      graceDays: CONTRACT_EXPIRY_GRACE_DAYS,
     });
 
     return null;
