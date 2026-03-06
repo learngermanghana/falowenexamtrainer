@@ -840,10 +840,6 @@ const courseSchedules = {
       chapter: "5.10",
       goal: "Learn about conjunctions and how to apply them in your exams",
       instruction: "Open the conjunctions notes to learn how to use them in A1 German letters.",
-      instructionLink: {
-        label: "Open the conjunctions notes",
-        to: "/campus/course/conjunctions-5-10",
-      },
       grammar_topic: "German Conjunctions",
       assignment: false,
       schreiben_sprechen: {
