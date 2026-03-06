@@ -292,6 +292,7 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
 
 const getStatusForDay = (dayStatuses, day) => dayStatuses[String(day)]?.value || "notStarted";
 
+
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -354,21 +355,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   useEffect(() => {
     if (!selectedCourseLevel) return;
-    try {
-      const raw = window.localStorage.getItem(`course-status-${selectedCourseLevel}`);
-      const localStatuses = raw ? JSON.parse(raw) : {};
-      const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel];
-      setDayStatuses(profileStatuses || localStatuses);
-    } catch (error) {
-      const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel];
-      setDayStatuses(profileStatuses || {});
-    }
+    const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel];
+    setDayStatuses(profileStatuses || {});
   }, [selectedCourseLevel, studentProfile]);
-
-  useEffect(() => {
-    if (!selectedCourseLevel) return;
-    window.localStorage.setItem(`course-status-${selectedCourseLevel}`, JSON.stringify(dayStatuses));
-  }, [dayStatuses, selectedCourseLevel]);
 
   useEffect(() => {
     if (!selectedCourseLevel || !studentProfile?.id) return;
