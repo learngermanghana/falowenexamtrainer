@@ -256,7 +256,7 @@ const B1Day26ReiseproblemeUndLoesungenWorkbookPage = () => {
             <strong>Speaking self-practice confidence check</strong>
             <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
             <a
-              href="https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec"
+              href="https://www.falowen.app/campus/speech"
               target="_blank"
               rel="noreferrer"
             >
