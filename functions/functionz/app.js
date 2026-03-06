@@ -1252,6 +1252,48 @@ app.post("/paystack/webhook", async (req, res) => {
   }
 });
 
+
+const buildImprovedDraftContext = ({ latestDraftText, latestFeedback, revisedDraftText }) => {
+  const parts = ["Current draft to mark:", revisedDraftText];
+
+  if (latestDraftText) {
+    parts.push("", "Previous draft:", latestDraftText);
+  }
+
+  if (latestFeedback) {
+    parts.push("", "Previous AI feedback:", latestFeedback);
+  }
+
+  return parts.join("\n");
+};
+
+const loadLatestCampusMarkContext = async ({ db, uid }) => {
+  if (!db || !uid) return { latestDraftText: "", latestFeedback: "" };
+
+  try {
+    const snap = await db
+      .collection("writingSubmissions")
+      .where("uid", "==", uid)
+      .where("submissionContext", "in", ["campus-mark", "campus-improved"])
+      .orderBy("createdAt", "desc")
+      .limit(1)
+      .get();
+
+    if (snap.empty) {
+      return { latestDraftText: "", latestFeedback: "" };
+    }
+
+    const data = snap.docs[0].data() || {};
+    return {
+      latestDraftText: String(data.text || "").trim(),
+      latestFeedback: String(data.feedback || "").trim(),
+    };
+  } catch (error) {
+    console.warn("Failed to load latest campus mark context", error?.message || error);
+    return { latestDraftText: "", latestFeedback: "" };
+  }
+};
+
 /**
  * =========================
  * AI / WRITING ROUTES
@@ -1284,7 +1326,15 @@ app.post("/writing/ideas", async (req, res) => {
 
 app.post("/writing/mark", async (req, res) => {
   try {
-    const { text, level = "A2", studentName = "Student", program, submissionContext } = req.body || {};
+    const {
+      text,
+      level = "A2",
+      studentName = "Student",
+      program,
+      submissionContext,
+      previousText,
+      previousFeedback,
+    } = req.body || {};
 
     if (!text || !String(text).trim()) {
       return res.status(400).json({ error: "Letter text is required" });
@@ -1295,16 +1345,37 @@ app.post("/writing/mark", async (req, res) => {
     const authedUser = await requireAuthenticatedUser(req, res, { allowGuest: true });
     if (!authedUser) return;
 
+    const db = getFirestoreSafe();
     const trimmedText = String(text).trim();
+    const trimmedPreviousText = String(previousText || "").trim();
+    const trimmedPreviousFeedback = String(previousFeedback || "").trim();
+
+    let latestDraftText = trimmedPreviousText;
+    let latestFeedback = trimmedPreviousFeedback;
+
+    if (submissionContext === "campus-improved" && (!latestDraftText || !latestFeedback)) {
+      const loaded = await loadLatestCampusMarkContext({ db, uid: authedUser.uid });
+      latestDraftText = latestDraftText || loaded.latestDraftText;
+      latestFeedback = latestFeedback || loaded.latestFeedback;
+    }
+
+    const userContent =
+      submissionContext === "campus-improved"
+        ? buildImprovedDraftContext({
+            latestDraftText,
+            latestFeedback,
+            revisedDraftText: trimmedText,
+          })
+        : trimmedText;
+
     const systemPrompt = markPrompt({ schreibenLevel: level, studentName, program, submissionContext });
     const messages = [
       { role: "system", content: systemPrompt },
-      { role: "user", content: trimmedText },
+      { role: "user", content: userContent },
     ];
 
     const feedback = await createChatCompletion(messages, { max_tokens: 750 });
 
-    const db = getFirestoreSafe();
     let submissionSaved = false;
     let submissionId = null;
 
