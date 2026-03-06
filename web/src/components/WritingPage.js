@@ -503,13 +503,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   }, [isLevelLocked, level, profileLevel, setLevel]);
 
   useEffect(() => {
-    if (!availableTabs.some((tab) => tab.key === activeTab)) {
-      setActiveTab(availableTabs[0]?.key || "mark");
+    if (!visibleTabs.some((tab) => tab.key === activeTab)) {
+      setActiveTab(visibleTabs[0]?.key || "mark");
       setIdeaError("");
       setIdeaSuccess("");
       setError("");
     }
-  }, [activeTab, availableTabs, setError]);
+  }, [activeTab, setError, visibleTabs]);
 
   const loadWritingTasks = useCallback(async () => {
     setWritingTasksLoading(true);
@@ -1247,20 +1247,34 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   return (
     <>
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>{canUseIdeasGenerator ? "Writing – Practice exam letters" : "Writing – Mark my letter"}</h2>
+        <h2 style={styles.sectionTitle}>
+          {isTutorOnlyView
+            ? "Writing – Tutor feedback"
+            : canUseIdeasGenerator
+              ? "Writing – Practice exam letters"
+              : "Writing – Mark my letter"}
+        </h2>
         <p style={styles.helperText}>
-          {canUseIdeasGenerator
-            ? "Simple flow: paste your letter, get feedback, improve one section, then save the version for your tutor."
-            : "A1 students should use Mark my letter to get focused feedback on their draft."}
+          {isTutorOnlyView
+            ? "View tutor comments and reply from here."
+            : canUseIdeasGenerator
+              ? "Simple flow: paste your letter, get feedback, improve one section, then save the version for your tutor."
+              : "A1 students should use Mark my letter to get focused feedback on their draft."}
         </p>
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Start in <strong>Mark my letter</strong> for your main workflow. Use the other tabs only when you need extra
-            practice or idea support.
+            {isTutorOnlyView
+              ? "This page is focused on tutor updates only to keep feedback easy to track."
+              : (
+                <>
+                  Start in <strong>Mark my letter</strong> for your main workflow. Use the other tabs only when you need
+                  extra practice or idea support.
+                </>
+              )}
           </p>
         </div>
         <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
-          {availableTabs.map((tab) => (
+          {visibleTabs.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
