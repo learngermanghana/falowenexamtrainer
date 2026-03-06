@@ -740,6 +740,41 @@ const chatBuddyPrompt = ({ level }) =>
     "Always ask one follow-up question in English to keep the conversation going.",
   ].join(" ");
 
+const PRESENTATION_TURN_LIMIT = 6;
+
+const presentationCoachPrompt = ({ level = "A1", answersDone = 0 }) =>
+  [
+    "You are Falowen's German presentation coach.",
+    `Target CEFR level: ${level}.`,
+    "The student is preparing for a short class presentation.",
+    "Rules:",
+    "1) Ask exactly ONE short question in German per turn.",
+    "2) First provide gentle correction of the student's latest answer (if needed).",
+    "3) Keep feedback simple and practical for class presentation practice.",
+    "4) Track progress for a 6-question flow.",
+    `5) Current completed student answers: ${answersDone}/${PRESENTATION_TURN_LIMIT}.`,
+    `6) If answersDone < ${PRESENTATION_TURN_LIMIT}, respond in this format:\nKORREKTUR:\n...\n\nNÄCHSTE_FRAGE:\n...`,
+    `7) If answersDone >= ${PRESENTATION_TURN_LIMIT}, do NOT ask another question. Respond in this format:\nKURZE_ZUSAMMENFASSUNG:\n(3-5 bullets)\n\nPRÄSENTATION:\n(~60 Wörter, klare einfache Sätze für den Vortrag).`,
+    "8) Stay in German except very short clarification words when absolutely necessary.",
+    "9) Never output XML/HTML tags.",
+  ].join("\n");
+
+function sanitizePresentationHistory(messages = []) {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .filter((item) => item && (item.role === "user" || item.role === "assistant"))
+    .map((item) => ({
+      role: item.role,
+      content: String(item.content || "").slice(0, 1200),
+    }))
+    .filter((item) => item.content.trim())
+    .slice(-20);
+}
+
+function countUserAnswers(messages = []) {
+  return messages.reduce((count, item) => (item?.role === "user" ? count + 1 : count), 0);
+}
+
 const speechTrainerPrompt = ({ level, note }) =>
   [
     "You are an encouraging German pronunciation coach working from a Whisper transcript.",
@@ -2103,6 +2138,75 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
     return res.status(500).json({ error: err.message || "Failed to chat with buddy" });
   }
 });
+
+app.post("/speaking/presentation-chat", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const { message, level = "A1", history = [] } = req.body || {};
+    const trimmedMessage = String(message || "").trim();
+
+    const validationError =
+      validateString(trimmedMessage, { required: true, maxLength: 800, label: "message" }) ||
+      validateString(level, { maxLength: 10, label: "level" });
+
+    if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
+    if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/speaking/presentation-chat", uid: authedUser.uid, category: "chatbuddy" });
+      return res.status(429).json({ error: "Daily presentation chat limit reached" });
+    }
+
+    const safeHistory = sanitizePresentationHistory(history);
+    const answersDoneBeforeCurrent = countUserAnswers(safeHistory);
+    const cappedAnswersDone = Math.min(answersDoneBeforeCurrent + 1, PRESENTATION_TURN_LIMIT);
+
+    const chatMessages = [
+      { role: "system", content: presentationCoachPrompt({ level, answersDone: cappedAnswersDone }) },
+      ...safeHistory,
+      { role: "user", content: trimmedMessage },
+    ];
+
+    let fallbackUsed = false;
+    let reply;
+
+    try {
+      reply = await createChatCompletion(chatMessages, { temperature: 0.45, max_tokens: 520 });
+    } catch (err) {
+      log.error("presentation.chat.failed", { errorMessage: err?.message || "unknown", uid: authedUser.uid });
+      fallbackUsed = true;
+      reply = "Entschuldigung, der Präsentations-Chat ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.";
+    }
+
+    const completed = cappedAnswersDone >= PRESENTATION_TURN_LIMIT;
+
+    auditAIRequest({
+      route: "/speaking/presentation-chat",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { level, quotaRemaining: quota.remaining, completed },
+      success: !fallbackUsed,
+    });
+
+    return res.json({
+      reply,
+      answersDone: cappedAnswersDone,
+      turnLimit: PRESENTATION_TURN_LIMIT,
+      completed,
+      quotaRemaining: quota.remaining,
+      degraded: fallbackUsed,
+    });
+  } catch (err) {
+    console.error("/speaking/presentation-chat error", err);
+    auditAIRequest({ route: "/speaking/presentation-chat", uid: authedUser?.uid, email: authedUser?.email, success: false });
+    return res.status(500).json({ error: err.message || "Failed to run presentation chat" });
+  }
+});
+
 
 app.post("/tutor/placement", async (req, res) => {
   let authedUser;
