@@ -142,11 +142,7 @@ export const loadTutorReviewsForStudent = async ({ userId, studentCode } = {}) =
     return [];
   }
 
-  const reviewQuery = query(
-    collection(db, COLLECTION_NAME),
-    where("ownerKey", "in", ownerCandidates),
-    orderBy("createdAt", "desc")
-  );
+  const reviewQuery = query(collection(db, COLLECTION_NAME), where("ownerKey", "in", ownerCandidates));
   const snapshot = await getDocs(reviewQuery);
   if (snapshot.empty) return [];
 
@@ -167,11 +163,7 @@ export const subscribeTutorReviewsForStudent = ({ userId, studentCode } = {}, on
     return () => {};
   }
 
-  const reviewQuery = query(
-    collection(db, COLLECTION_NAME),
-    where("ownerKey", "in", ownerCandidates),
-    orderBy("createdAt", "desc")
-  );
+  const reviewQuery = query(collection(db, COLLECTION_NAME), where("ownerKey", "in", ownerCandidates));
 
   return onSnapshot(
     reviewQuery,
