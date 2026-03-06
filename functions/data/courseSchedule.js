@@ -1,5 +1,40 @@
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
+const COMPLETION_CONTACT_EMAIL = "learngermanghana@gmail.com";
+const COMPLETION_ACTIONS = [
+  { label: "Open Exams page", labelKey: "courseTab.completion.actions.openExams", href: "https://www.falowen.app/exams" },
+  { label: "Download study calendar", labelKey: "courseTab.completion.actions.downloadStudyCalendar", href: "https://www.falowen.app/exams/study?force=1" },
+];
+
+const buildCompletionMessage = ({ level, nextLevel }) => ({
+  goal: "🎯 Goal: Celebrate your achievement and plan your next steps.",
+  instruction: `📝 Instruction: Congratulations on finishing your ${level} course.
+
+You worked hard and made great progress. Completing the course is a big milestone—now let’s focus on exam preparation.
+
+1. Visit the Exams page.
+2. Download your study calendar.
+
+The school will confirm your results and send your completion certificate to your email.
+
+Please tell us what you would like to do next by emailing ${COMPLETION_CONTACT_EMAIL}.
+You can prepare for the ${level} exam or continue to ${nextLevel}.
+
+We wish you continued success in your learning journey!`,
+  completion: {
+    messageKey: "courseTab.completion.message",
+    message:
+      `Congratulations on finishing your ${level} course. Choose your next step and keep your momentum going.`,
+    level,
+    nextLevel,
+    actions: COMPLETION_ACTIONS,
+    contact: {
+      email: COMPLETION_CONTACT_EMAIL,
+    },
+    nonActionableStatus: "milestoneComplete",
+  },
+});
+
 const buildA2Lesson = (lesson) => {
   const { video, youtube_link, grammarbook_link, workbook_link, ...rest } = lesson;
 
@@ -387,20 +422,7 @@ const A2_SCHEDULE = [
     day: 29,
     topic: "Course Completed!",
     chapter: null,
-    goal: "🎯 Goal: Celebrate your achievement and plan your next steps.",
-    instruction: `📝 Instruction: Congratulations on finishing your A2 course. 
-You worked hard and made excellent progress. Finishing the course is one step—now it's time to prepare for your exams. Visit the [Exams page](https://www.falowen.app/exams). The school will confirm your results and send your completion certificate to your email. 
-
-Kindly communicate with us what you would like to do next by emailing **learngermanghana@gmail.com**. 
-You can prepare for the A2 exams or progress to B1. We wish you continued success in your journey. 
-
-Use:
-- **Chat • Grammar • Exams** for guided speaking practice and pronunciation feedback.  
-- **Vocabulary Trainer**  
-- **Schreiben Trainer** (includes pre-filled questions on typical exam topics)  
-
-ℹ️ Note: You’ll keep access to your tutor until your contract officially ends.  
-🎉 If you enjoyed the course, please [leave us a positive review on Google](https://g.page/r/Cdogveq3Hy69EBE/review).  `,
+    ...buildCompletionMessage({ level: "A2", nextLevel: "B1" }),
     grammar_topic: null,
     assignment: false,
     video: null,
@@ -853,9 +875,7 @@ const courseSchedules = {
       day: 25,
       topic: "Course Completed!",
       chapter: null,
-      goal: "🎯 Goal: Celebrate your achievement and plan your next steps.",
-      instruction:
-        "📝 Instruction: Congratulations on finishing your A1 course.\n\nYou worked hard and made great progress. Completing the course is a big milestone—now let’s focus on exam preparation.\n\n1. Visit the [Exams page](https://www.falowen.app/exams).\n2. Download your study calendar here: https://www.falowen.app/exams/study?force=1.\n\nThe school will confirm your results and send your completion certificate to your email.\n\nPlease tell us what you would like to do next by emailing **learngermanghana@gmail.com**.\nYou can prepare for the A1 exam or continue to A2.\n\nWe wish you continued success in your learning journey!",
+      ...buildCompletionMessage({ level: "A1", nextLevel: "A2" }),
     },
   ],
   A2: A2_SCHEDULE,

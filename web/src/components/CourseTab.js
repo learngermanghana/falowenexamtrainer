@@ -16,6 +16,7 @@ const ASSIGNMENT_STATUSES = {
   inProgress: { key: "courseTab.status.inProgress", color: "#2563eb" },
   submitted: { key: "courseTab.status.submitted", color: "#16a34a" },
   needsRedo: { key: "courseTab.status.needsRedo", color: "#dc2626" },
+  milestoneComplete: { key: "courseTab.status.milestoneComplete", color: "#0f766e" },
 };
 const STATUS_ORDER = ["notStarted", "inProgress", "submitted", "needsRedo"];
 
@@ -113,6 +114,105 @@ const buildLevelSchedules = () => {
 const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules();
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
+
+const renderInlineMarkdown = (text, keyPrefix) => {
+  if (!text) return null;
+
+  const tokenRegex = /(\*\*([^*]+)\*\*)|(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s]+)/g;
+  const nodes = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = tokenRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      nodes.push(<React.Fragment key={`${keyPrefix}-txt-${lastIndex}`}>{text.slice(lastIndex, match.index)}</React.Fragment>);
+    }
+
+    if (match[2]) {
+      nodes.push(<strong key={`${keyPrefix}-bold-${match.index}`}>{match[2]}</strong>);
+    } else if (match[4] && match[5]) {
+      nodes.push(
+        <a key={`${keyPrefix}-mdlink-${match.index}`} href={match[5]} target="_blank" rel="noreferrer">
+          {match[4]}
+        </a>
+      );
+    } else if (match[6]) {
+      nodes.push(
+        <a key={`${keyPrefix}-link-${match.index}`} href={match[6]} target="_blank" rel="noreferrer">
+          {match[6]}
+        </a>
+      );
+    }
+
+    lastIndex = tokenRegex.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    nodes.push(<React.Fragment key={`${keyPrefix}-txt-end`}>{text.slice(lastIndex)}</React.Fragment>);
+  }
+
+  return nodes;
+};
+
+const renderInstructionBlocks = (instruction = "") => {
+  const lines = String(instruction)
+    .split(/\n/)
+    .map((line) => line.trimEnd());
+
+  const blocks = [];
+  let paragraphLines = [];
+  let listItems = [];
+  let listType = null;
+
+  const flushParagraph = () => {
+    if (!paragraphLines.length) return;
+    blocks.push({ type: "paragraph", lines: paragraphLines });
+    paragraphLines = [];
+  };
+
+  const flushList = () => {
+    if (!listItems.length) return;
+    blocks.push({ type: listType, items: listItems });
+    listItems = [];
+    listType = null;
+  };
+
+  lines.forEach((line) => {
+    const ordered = line.match(/^\d+\.\s+(.*)$/);
+    const unordered = line.match(/^[-*]\s+(.*)$/);
+
+    if (!line.trim()) {
+      flushParagraph();
+      flushList();
+      return;
+    }
+
+    if (ordered) {
+      flushParagraph();
+      if (listType && listType !== "ordered") flushList();
+      listType = "ordered";
+      listItems.push(ordered[1]);
+      return;
+    }
+
+    if (unordered) {
+      flushParagraph();
+      if (listType && listType !== "unordered") flushList();
+      listType = "unordered";
+      listItems.push(unordered[1]);
+      return;
+    }
+
+    flushList();
+    paragraphLines.push(line);
+  });
+
+  flushParagraph();
+  flushList();
+
+  return blocks;
+};
 
 const getLessonKey = (lesson) =>
   [
@@ -516,7 +616,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         ? entry.schreiben_sprechen
                         : [entry.schreiben_sprechen]
                       : [];
-                    const status = getStatusForDay(dayStatuses, entry.day);
+                    const milestoneEntry = isMilestoneEntry(entry);
+                    const status = milestoneEntry ? "milestoneComplete" : getStatusForDay(dayStatuses, entry.day);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
@@ -550,6 +651,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             <select
                               style={styles.select}
                               value={status}
+                              disabled={milestoneEntry}
                               onChange={(e) =>
                                 setDayStatuses((prev) => ({
                                   ...prev,
@@ -557,7 +659,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 }))
                               }
                             >
-                              {STATUS_ORDER.map((statusOption) => (
+                              {(milestoneEntry ? ["milestoneComplete"] : STATUS_ORDER).map((statusOption) => (
                                 <option key={statusOption} value={statusOption}>
                                   {t(ASSIGNMENT_STATUSES[statusOption].key)}
                                 </option>
@@ -572,9 +674,65 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         {entry.instruction ? (
                           <div style={{ display: "grid", gap: 6 }}>
                             <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
-                            <p style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-line" }}>
-                              {entry.instruction}
-                            </p>
+                            <div style={{ ...styles.helperText, margin: 0, display: "grid", gap: 8 }}>
+                              {renderInstructionBlocks(entry.instruction).map((block, index) => {
+                                if (block.type === "ordered") {
+                                  return (
+                                    <ol key={`ins-ol-${index}`} style={{ margin: 0, paddingLeft: 20 }}>
+                                      {block.items.map((item, itemIndex) => (
+                                        <li key={`ins-ol-item-${itemIndex}`}>{renderInlineMarkdown(item, `ins-ol-${index}-${itemIndex}`)}</li>
+                                      ))}
+                                    </ol>
+                                  );
+                                }
+                                if (block.type === "unordered") {
+                                  return (
+                                    <ul key={`ins-ul-${index}`} style={{ margin: 0, paddingLeft: 20 }}>
+                                      {block.items.map((item, itemIndex) => (
+                                        <li key={`ins-ul-item-${itemIndex}`}>{renderInlineMarkdown(item, `ins-ul-${index}-${itemIndex}`)}</li>
+                                      ))}
+                                    </ul>
+                                  );
+                                }
+
+                                return (
+                                  <p key={`ins-p-${index}`} style={{ margin: 0 }}>
+                                    {block.lines.map((line, lineIndex) => (
+                                      <React.Fragment key={`ins-p-line-${index}-${lineIndex}`}>
+                                        {lineIndex ? <br /> : null}
+                                        {renderInlineMarkdown(line, `ins-p-${index}-${lineIndex}`)}
+                                      </React.Fragment>
+                                    ))}
+                                  </p>
+                                );
+                              })}
+                            </div>
+                            {entry.completion ? (
+                              <p style={{ ...styles.helperText, margin: 0 }}>
+                                {entry.completion.messageKey
+                                  ? t(entry.completion.messageKey, {
+                                      level: entry.completion.level,
+                                      nextLevel: entry.completion.nextLevel,
+                                      defaultValue: entry.completion.message,
+                                    })
+                                  : entry.completion.message}
+                              </p>
+                            ) : null}
+                            {Array.isArray(entry.completion?.actions) && entry.completion.actions.length ? (
+                              <div style={{ display: "grid", gap: 4 }}>
+                                {entry.completion.actions.map((action) => (
+                                  <a
+                                    key={`${entry.day}-${action.href}`}
+                                    href={action.href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
+                                  >
+                                    {action.labelKey ? t(action.labelKey, { defaultValue: action.label }) : action.label}
+                                  </a>
+                                ))}
+                              </div>
+                            ) : null}
                             {entry.instructionLink ? (
                               <a
                                 href={entry.instructionLink.to}
