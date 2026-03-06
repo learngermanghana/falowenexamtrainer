@@ -472,6 +472,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const canUsePracticeLetters = isExamMode ? true : !isA1Student;
   const canUseFormsPractice = isExamMode && level === "A1";
   const canUseTutorFeedback = isExamMode;
+  const isTutorOnlyView = initialTab === "tutor" && canUseTutorFeedback;
   const [revealedFormAnswers, setRevealedFormAnswers] = useState({});
   const availableTabs = useMemo(() => {
     const tabs = [{ key: "mark", label: "Mark my letter" }];
@@ -494,6 +495,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
 
     return tabs;
   }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters, canUseTutorFeedback]);
+  const visibleTabs = useMemo(() => {
+    if (!isTutorOnlyView) {
+      return availableTabs;
+    }
+
+    const tutorTabs = availableTabs.filter((tab) => tab.key === "tutor");
+    return tutorTabs.length ? tutorTabs : availableTabs;
+  }, [availableTabs, isTutorOnlyView]);
 
   useEffect(() => {
     if (availableTabs.some((tab) => tab.key === initialTab)) {
