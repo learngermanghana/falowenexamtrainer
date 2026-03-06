@@ -60,7 +60,6 @@ import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
 import GeneralHome from "./components/GeneralHome";
 import SpeakingPage from "./components/SpeakingPage";
-import ExamsOverviewPage from "./components/ExamsOverviewPage";
 import ExamResources from "./components/ExamResources";
 import HorenPage from "./components/HorenPage";
 import LesenPage from "./components/LesenPage";
@@ -811,7 +810,7 @@ const ExamArea = ({ onBack }) => {
   const examSection = useMemo(() => {
     if (
       [
-        "overview",
+        "tutor",
         "speaking",
         "writing",
         "resources",
@@ -824,7 +823,7 @@ const ExamArea = ({ onBack }) => {
     ) {
       return section;
     }
-    return "overview";
+    return "tutor";
   }, [section]);
 
   useEffect(() => {
@@ -849,7 +848,7 @@ const ExamArea = ({ onBack }) => {
   }, [examSection, lastSectionStorageKey, lastVisitStorageKey]);
 
   const tabs = [
-    { key: "overview", label: t("appNav.examTabs.overview") },
+    { key: "tutor", label: t("appNav.examTabs.tutor") },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "writing", label: t("appNav.examTabs.writing") },
@@ -911,7 +910,7 @@ const ExamArea = ({ onBack }) => {
         </div>
       </div>
 
-      {examSection === "overview" ? <ExamsOverviewPage /> : null}
+      {examSection === "tutor" ? <WritingPage mode="exam" initialTab="tutor" allowedTabKeys={["tutor"]} /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
