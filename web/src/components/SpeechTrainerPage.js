@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -13,13 +13,23 @@ const CAMPUS_SPEAKING_LINK =
 
 const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
+const CHAT_DRAFT_STORAGE_KEY = "falowen.speechTrainer.chatDraft.v1";
 
 const TOPIC_PRESETS = ["My hometown", "My studies", "A cultural festival", "An environmental problem + solution"];
 
+const FLOW_STEPS = [
+  "Describe your topic",
+  "Explain your situation",
+  "Present your solution",
+  "Give supporting details",
+  "Use richer vocabulary and structure",
+  "Deliver your final presentation",
+];
+
 const UPGRADE_OPTIONS = [
-  { label: "Make it A2/B1", mode: "a2-b1" },
-  { label: "Make it more formal", mode: "formal" },
-  { label: "Add linking words", mode: "linking" },
+  { label: "Make it A2/B1", mode: "a2-b1", description: "Targets clear A2/B1 grammar and natural exam-ready phrasing." },
+  { label: "Make it more formal", mode: "formal", description: "Emphasises politeness, formality, and clearer sentence patterns." },
+  { label: "Add linking words", mode: "linking", description: "Adds connectors like zuerst, dann, außerdem, deshalb, and zum Schluss." },
 ];
 
 const initialCoachMessage = {
@@ -61,7 +71,6 @@ const normalizeLabel = (tag) =>
     rubric: "Rubric",
   }[tag] || tag.replace(/_/g, " "));
 
-
 const extractErrorTags = (text) => {
   const normalized = String(text || "").toLowerCase();
   const tags = [];
@@ -89,7 +98,7 @@ const parseRubric = (text) => {
 };
 
 const scorePill = (label, value) => (
-  <div style={{ ...styles.card, margin: 0, padding: "8px 10px", minWidth: 140 }}>
+  <div style={{ ...styles.card, margin: 0, padding: "8px 10px", minWidth: 140 }} role="group" aria-label={`${label} rubric score`}>
     <div style={{ fontWeight: 700, fontSize: 13 }}>{label}</div>
     <div style={{ ...styles.helperText, margin: 0 }}>{value}/5</div>
   </div>
@@ -158,12 +167,16 @@ const SpeechTrainerPage = () => {
   const [loading, setLoading] = useState(false);
   const [retryablePayload, setRetryablePayload] = useState(null);
   const [error, setError] = useState("");
+  const [errorType, setErrorType] = useState("");
   const [topic, setTopic] = useState("");
   const [finalScripts, setFinalScripts] = useState({ short: "", medium: "", long: "" });
   const [rubric, setRubric] = useState(null);
   const [sessionSaved, setSessionSaved] = useState(false);
   const [sessionHistory, setSessionHistory] = useState([]);
   const [upgradeLoadingByIndex, setUpgradeLoadingByIndex] = useState({});
+  const [selectedUpgradesByIndex, setSelectedUpgradesByIndex] = useState({});
+  const [historyFilter, setHistoryFilter] = useState({ topic: "", level: "" });
+  const chatLogRef = useRef(null);
 
   const level = useMemo(() => {
     const raw = String(studentProfile?.level || "A1").toUpperCase();
@@ -183,6 +196,35 @@ const SpeechTrainerPage = () => {
   const recorderLink = `${CAMPUS_SPEAKING_LINK}?code=${encodeURIComponent(studentCode)}`;
   const charsCount = chatInput.trim().length;
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
+  const currentStepLabel = FLOW_STEPS[Math.min(answersDone, TURN_LIMIT - 1)] || FLOW_STEPS[FLOW_STEPS.length - 1];
+
+  const getDynamicHelperText = useCallback((done) => {
+    if (done <= 0) return "Start with a clear topic introduction and one key point.";
+    if (done === 1) return "Great start. Now expand vocabulary range and vary your sentence structure.";
+    if (done === 2) return "Add a concrete example so your explanation is persuasive.";
+    if (done === 3) return "Link ideas with connectors and show cause/effect clearly.";
+    if (done === 4) return "Refine grammar and make your conclusion concise and confident.";
+    return "Final step: deliver a fluent full response with strong structure.";
+  }, []);
+
+  const classifyError = useCallback((requestError) => {
+    const message = String(requestError?.message || "").toLowerCase();
+    if (message.includes("unauthorized") || message.includes("forbidden") || message.includes("token") || message.includes("login")) {
+      return "auth";
+    }
+    if (
+      message.includes("failed to fetch") ||
+      message.includes("network") ||
+      message.includes("too long") ||
+      message.includes("timed out") ||
+      message.includes("503") ||
+      message.includes("502") ||
+      message.includes("429")
+    ) {
+      return "transient";
+    }
+    return "generic";
+  }, []);
 
   const refreshHistory = useCallback(async () => {
     if (!idToken) return;
@@ -198,16 +240,45 @@ const SpeechTrainerPage = () => {
     refreshHistory();
   }, [refreshHistory]);
 
-  const submitMessage = async (payload) => {
+  useEffect(() => {
+    try {
+      const cachedDraft = window.localStorage.getItem(CHAT_DRAFT_STORAGE_KEY);
+      if (cachedDraft) setChatInput(cachedDraft);
+    } catch (storageError) {
+      console.warn("Could not restore speech trainer draft", storageError);
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (chatInput) window.localStorage.setItem(CHAT_DRAFT_STORAGE_KEY, chatInput);
+      else window.localStorage.removeItem(CHAT_DRAFT_STORAGE_KEY);
+    } catch (storageError) {
+      console.warn("Could not persist speech trainer draft", storageError);
+    }
+  }, [chatInput]);
+
+  useEffect(() => {
+    const lastMessage = chatLogRef.current?.lastElementChild;
+    if (lastMessage?.scrollIntoView) {
+      lastMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [chatMessages]);
+
+  const submitMessage = async (payload, attempt = 0) => {
     setError("");
+    setErrorType("");
     setLoading(true);
-    setRetryablePayload(payload);
+    setRetryablePayload({ ...payload, messageAlreadyAppended: true });
 
     const nextUserMessage = { role: "user", content: payload.message };
     const priorHistory = payload.history;
 
-    setChatMessages((prev) => [...prev, nextUserMessage]);
-    setChatInput("");
+    if (!payload.messageAlreadyAppended) {
+      setChatMessages((prev) => [...prev, nextUserMessage]);
+      setChatInput("");
+      window.localStorage.removeItem(CHAT_DRAFT_STORAGE_KEY);
+    }
 
     try {
       const response = await requestPresentationCoachReply({
@@ -233,7 +304,21 @@ const SpeechTrainerPage = () => {
       }
     } catch (requestError) {
       console.error("Presentation chat error", requestError);
-      setError(requestError?.message || "Could not reach the presentation coach. Please try again.");
+      const type = classifyError(requestError);
+      if (type === "transient" && attempt === 0) {
+        setTimeout(() => {
+          submitMessage(payload, 1);
+        }, 1200);
+        return;
+      }
+      setErrorType(type);
+      if (type === "auth") {
+        setError("Your session expired. Please log in again to continue.");
+      } else if (type === "transient") {
+        setError("Temporary network issue. Please retry in a moment.");
+      } else {
+        setError(requestError?.message || "Could not reach the presentation coach. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -276,12 +361,31 @@ const SpeechTrainerPage = () => {
       });
       const upgraded = extractTag(response?.reply || "", "upgrade_de") || response?.reply || "";
       const why = extractTag(response?.reply || "", "why_en");
-      const prefixed = `Upgrade (${label}):\n${upgraded}${why ? `\n\nWhy: ${why}` : ""}`;
-      setChatMessages((prev) => [...prev, { role: "assistant", content: prefixed }]);
+      setChatMessages((prev) => [...prev, { role: "assistant", content: `Upgrade (${label}):\n${upgraded}`, meta: { type: "upgrade", why } }]);
     } catch (upgradeError) {
       setError(upgradeError?.message || "Could not upgrade your answer right now.");
     } finally {
       setUpgradeLoadingByIndex((prev) => ({ ...prev, [index]: "" }));
+    }
+  };
+
+  const handleToggleUpgradeMode = (index, mode) => {
+    setSelectedUpgradesByIndex((prev) => {
+      const activeModes = new Set(prev[index] || []);
+      if (activeModes.has(mode)) activeModes.delete(mode);
+      else activeModes.add(mode);
+      return { ...prev, [index]: Array.from(activeModes) };
+    });
+  };
+
+  const handleApplySelectedUpgrades = async (message, index) => {
+    const selectedModes = selectedUpgradesByIndex[index] || [];
+    if (!selectedModes.length || loading) return;
+
+    for (const mode of selectedModes) {
+      const option = UPGRADE_OPTIONS.find((item) => item.mode === mode);
+      // eslint-disable-next-line no-await-in-loop
+      await handleUpgrade({ message, index, mode, label: option?.label || mode });
     }
   };
 
@@ -295,10 +399,24 @@ const SpeechTrainerPage = () => {
     setCompleted(false);
     setLoading(false);
     setError("");
+    setErrorType("");
     setTopic("");
     setRubric(null);
     setFinalScripts({ short: "", medium: "", long: "" });
     setSessionSaved(false);
+    window.localStorage.removeItem(CHAT_DRAFT_STORAGE_KEY);
+  };
+
+  const handleInputKeyDown = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      handleReset();
+      return;
+    }
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      handleSend();
+    }
   };
 
   useEffect(() => {
@@ -336,6 +454,26 @@ const SpeechTrainerPage = () => {
     persistSession();
   }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, refreshHistory]);
 
+  const sortedSessionHistory = useMemo(() => {
+    const clone = [...sessionHistory];
+    clone.sort((a, b) => {
+      const aMs = a?.createdAt?._seconds ? a.createdAt._seconds * 1000 : new Date(a?.createdAt || 0).getTime();
+      const bMs = b?.createdAt?._seconds ? b.createdAt._seconds * 1000 : new Date(b?.createdAt || 0).getTime();
+      return bMs - aMs;
+    });
+    return clone;
+  }, [sessionHistory]);
+
+  const filteredSessionHistory = useMemo(
+    () =>
+      sortedSessionHistory.filter((session) => {
+        const topicPass = !historyFilter.topic || String(session.topic || "").toLowerCase().includes(historyFilter.topic.toLowerCase());
+        const levelPass = !historyFilter.level || String(session.level || "").toUpperCase() === historyFilter.level;
+        return topicPass && levelPass;
+      }),
+    [sortedSessionHistory, historyFilter]
+  );
+
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
@@ -346,6 +484,13 @@ const SpeechTrainerPage = () => {
         <p style={{ ...styles.helperText, margin: 0 }}>
           Welcome {studentName}. You are chatting with {tutorName}. 6-step preparation flow with corrections, upgrades, and final speaking scripts.
         </p>
+        <div style={{ ...styles.card, margin: 0, background: "#eff6ff" }}>
+          <strong style={{ fontSize: 13 }}>Before you begin</strong>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+            You will answer six guided prompts. After each reply, Sir Felix gives feedback and asks the next question. Aim for clear structure,
+            varied vocabulary, and complete sentences.
+          </p>
+        </div>
 
         {!answersDone ? (
           <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 8 }}>
@@ -371,26 +516,54 @@ const SpeechTrainerPage = () => {
             You can stay here for chat practice, or open the recorder if you want to submit an audio recording.
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <a href={recorderLink} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none" }}>
+            <a href={recorderLink} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none" }} aria-label="Open speech recorder link">
               Open recorder link
             </a>
           </div>
         </div>
 
         <div style={{ display: "grid", gap: 6 }}>
-          <div style={{ ...styles.helperText, margin: 0 }}>Progress: {answersDone}/{TURN_LIMIT}</div>
-          <div style={{ width: "100%", height: 8, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
+          <div style={{ ...styles.helperText, margin: 0 }}>
+            Progress: {answersDone}/{TURN_LIMIT} • Current step: {currentStepLabel}
+          </div>
+          <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone)}</div>
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            {FLOW_STEPS.map((step, index) => (
+              <span
+                key={step}
+                title={step}
+                style={{
+                  ...styles.levelPill,
+                  background: index < answersDone ? "#dbeafe" : "#f3f4f6",
+                  color: index < answersDone ? "#1d4ed8" : "#4b5563",
+                }}
+              >
+                {index + 1}. {step}
+              </span>
+            ))}
+          </div>
+          <div style={{ width: "100%", height: 8, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }} role="progressbar" aria-label="Six-step coaching progress" aria-valuemin={0} aria-valuemax={TURN_LIMIT} aria-valuenow={answersDone}>
             <div style={{ width: `${progressPercent}%`, height: "100%", background: "#2563eb" }} />
           </div>
         </div>
 
-        <div style={{ ...styles.chatLog, background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
+        <div
+          style={{ ...styles.chatLog, background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+          aria-live="polite"
+          ref={chatLogRef}
+        >
           {chatMessages.map((message, index) => {
             const isUser = message.role === "user";
             return (
               <div key={`${message.role}-${index}`} style={{ display: "grid", gap: 6 }}>
                 <div style={isUser ? styles.chatBubbleUser : styles.chatBubbleCoach}>
                   {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content)}
+                  {message?.meta?.type === "upgrade" && message?.meta?.why ? (
+                    <details style={{ marginTop: 8 }}>
+                      <summary style={{ cursor: "pointer" }}>Why this upgrade</summary>
+                      <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{message.meta.why}</p>
+                    </details>
+                  ) : null}
                 </div>
                 {!isUser && extractTag(message.content, "error_intel") ? (
                   <div style={{ ...styles.card, margin: 0, background: "#fff7ed" }}>
@@ -399,18 +572,27 @@ const SpeechTrainerPage = () => {
                   </div>
                 ) : null}
                 {isUser ? (
-                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  <div style={{ display: "grid", gap: 6 }}>
                     {UPGRADE_OPTIONS.map((option) => (
-                      <button
-                        key={`${index}-${option.mode}`}
-                        type="button"
-                        style={styles.secondaryButton}
-                        disabled={Boolean(upgradeLoadingByIndex[index]) || loading}
-                        onClick={() => handleUpgrade({ message, index, mode: option.mode, label: option.label })}
-                      >
-                        {upgradeLoadingByIndex[index] === option.mode ? "Upgrading..." : option.label}
-                      </button>
+                      <label key={`${index}-${option.mode}`} style={{ display: "flex", gap: 6, alignItems: "center", ...styles.helperText, margin: 0 }} title={option.description}>
+                        <input
+                          type="checkbox"
+                          checked={Boolean((selectedUpgradesByIndex[index] || []).includes(option.mode))}
+                          onChange={() => handleToggleUpgradeMode(index, option.mode)}
+                          disabled={Boolean(upgradeLoadingByIndex[index]) || loading}
+                        />
+                        {option.label}
+                      </label>
                     ))}
+                    <button
+                      type="button"
+                      style={styles.secondaryButton}
+                      disabled={Boolean(upgradeLoadingByIndex[index]) || loading || !(selectedUpgradesByIndex[index] || []).length}
+                      onClick={() => handleApplySelectedUpgrades(message, index)}
+                      aria-label="Apply selected upgrade options"
+                    >
+                      {upgradeLoadingByIndex[index] ? "Upgrading..." : "Apply selected upgrades"}
+                    </button>
                   </div>
                 ) : null}
               </div>
@@ -421,7 +603,7 @@ const SpeechTrainerPage = () => {
         {completed && rubric ? (
           <div style={{ ...styles.card, margin: 0, background: "#eff6ff", display: "grid", gap: 8 }}>
             <strong style={{ fontSize: 14 }}>Rubric-based feedback (1–5)</strong>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} aria-label="Rubric scores">
               {scorePill("Grammar", rubric.grammar)}
               {scorePill("Vocabulary range", rubric.vocabulary)}
               {scorePill("Structure", rubric.structure)}
@@ -442,23 +624,34 @@ const SpeechTrainerPage = () => {
           <textarea
             value={chatInput}
             onChange={(event) => setChatInput(event.target.value)}
+            onKeyDown={handleInputKeyDown}
             rows={4}
             style={styles.textareaSmall}
             placeholder="Type your answer in German..."
             disabled={loading || completed}
           />
-          <div style={{ ...styles.helperText, margin: 0 }}>
-            {charsCount} characters{!minLengthReached ? ` • Write at least ${MIN_ANSWER_LENGTH} characters` : ""}
+          <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
+            {charsCount}/{MIN_ANSWER_LENGTH} characters minimum
+          </div>
+          <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
+            <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={styles.primaryButton} onClick={handleSend} disabled={loading || completed || !chatInput.trim()}>
-              {loading ? "Sir Felix is thinking..." : "Send"}
-            </button>
-            <button type="button" style={styles.secondaryButton} onClick={handleReset}>
+            {minLengthReached ? (
+              <button type="button" style={styles.primaryButton} onClick={handleSend} disabled={loading || completed || !chatInput.trim()} aria-label="Send message">
+                {loading ? "Sir Felix is thinking..." : "Send"}
+              </button>
+            ) : null}
+            <button type="button" style={styles.secondaryButton} onClick={handleReset} aria-label="Reset chat and clear messages" disabled={loading}>
               Reset chat
             </button>
+            {errorType === "auth" ? (
+              <button type="button" style={styles.secondaryButton} onClick={() => window.location.assign("/login")} aria-label="Log in again">
+                Re-login
+              </button>
+            ) : null}
             {error ? (
-              <button type="button" style={styles.secondaryButton} onClick={handleRetry} disabled={!retryablePayload || loading}>
+              <button type="button" style={styles.secondaryButton} onClick={handleRetry} disabled={!retryablePayload || loading} aria-label="Retry last message">
                 Retry
               </button>
             ) : null}
@@ -474,16 +667,63 @@ const SpeechTrainerPage = () => {
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
         <h3 style={{ margin: 0 }}>Session history</h3>
-        {!sessionHistory.length ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <input
+            type="text"
+            value={historyFilter.topic}
+            onChange={(event) => setHistoryFilter((prev) => ({ ...prev, topic: event.target.value }))}
+            placeholder="Filter by topic"
+            style={{ ...styles.input, minWidth: 180 }}
+            aria-label="Filter session history by topic"
+          />
+          <select
+            value={historyFilter.level}
+            onChange={(event) => setHistoryFilter((prev) => ({ ...prev, level: event.target.value }))}
+            style={{ ...styles.input, minWidth: 120 }}
+            aria-label="Filter session history by level"
+          >
+            <option value="">All levels</option>
+            {["A1", "A2", "B1", "B2", "C1"].map((sessionLevel) => (
+              <option key={sessionLevel} value={sessionLevel}>{sessionLevel}</option>
+            ))}
+          </select>
+        </div>
+        {!filteredSessionHistory.length ? (
           <p style={{ ...styles.helperText, margin: 0 }}>No saved presentation sessions yet.</p>
         ) : (
-          sessionHistory.map((session) => (
-            <div key={session.id} style={{ ...styles.card, margin: 0 }}>
-              <div><strong>{session.topic}</strong> • Level {session.level}</div>
-              <div style={{ ...styles.helperText, margin: "4px 0" }}>Status: {session.completionStatus || "unknown"}</div>
-              {session.finalScript ? <div style={{ ...styles.helperText, margin: 0 }}>Final script: {String(session.finalScript).slice(0, 180)}...</div> : null}
-            </div>
-          ))
+          filteredSessionHistory.map((session) => {
+            const createdAt = session?.createdAt?._seconds
+              ? new Date(session.createdAt._seconds * 1000)
+              : new Date(session?.createdAt || Date.now());
+            const isIncomplete = String(session.completionStatus || "").toLowerCase() !== "completed";
+            return (
+              <details key={session.id} style={{ ...styles.card, margin: 0 }}>
+                <summary style={{ cursor: "pointer" }}>
+                  <strong>{session.topic}</strong> • Level {session.level} • {createdAt.toLocaleString()}
+                </summary>
+                <div style={{ ...styles.helperText, margin: "8px 0 0" }}>Status: {session.completionStatus || "unknown"}</div>
+                {session.finalScript ? <div style={{ ...styles.helperText, margin: "4px 0" }}>Final script: {session.finalScript}</div> : null}
+                {session.rubric ? (
+                  <div style={{ ...styles.helperText, margin: "4px 0" }}>
+                    Rubric — Grammar: {Number(session.rubric.grammar || 0)}/5, Vocabulary: {Number(session.rubric.vocabulary || 0)}/5, Structure: {Number(session.rubric.structure || 0)}/5
+                  </div>
+                ) : null}
+                {isIncomplete ? (
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    aria-label="Continue incomplete session"
+                    onClick={() => {
+                      setTopic(session.topic || "");
+                      setChatInput(session.finalScript || "");
+                    }}
+                  >
+                    Continue
+                  </button>
+                ) : null}
+              </details>
+            );
+          })
         )}
       </div>
     </div>
