@@ -26,15 +26,6 @@ const FLOW_STEPS = [
   "Deliver your final presentation",
 ];
 
-const FLOW_STEPS_A1_A2 = [
-  "Topic (Thema)",
-  "Situation (Situation)",
-  "My idea (Meine Idee)",
-  "Example (Beispiel)",
-  "Link words (Verbinder)",
-  "Final talk (Präsentation)",
-];
-
 const UPGRADE_OPTIONS = [
   { label: "Make it A2/B1", mode: "a2-b1", description: "Targets clear A2/B1 grammar and natural exam-ready phrasing." },
   { label: "Make it more formal", mode: "formal", description: "Emphasises politeness, formality, and clearer sentence patterns." },
@@ -210,17 +201,9 @@ const SpeechTrainerPage = () => {
   const recorderLink = `${CAMPUS_SPEAKING_LINK}?code=${encodeURIComponent(studentCode)}`;
   const charsCount = chatInput.trim().length;
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
-  const currentStepLabel = flowStepsForLevel[Math.min(answersDone, TURN_LIMIT - 1)] || flowStepsForLevel[flowStepsForLevel.length - 1];
+  const currentStepLabel = FLOW_STEPS[Math.min(answersDone, TURN_LIMIT - 1)] || FLOW_STEPS[FLOW_STEPS.length - 1];
 
-  const getDynamicHelperText = useCallback((done, isA1A2) => {
-    if (isA1A2) {
-      if (done <= 0) return "Use short sentences. Sag 1-2 klare Ideen.";
-      if (done === 1) return "Good! Add one new word (neues Wort) and one connector (z.B. dann).";
-      if (done === 2) return "Give one example: Zum Beispiel...";
-      if (done === 3) return "Try cause/effect: weil / deshalb.";
-      if (done === 4) return "Almost done. Speak slowly and clearly.";
-      return "Final step: complete short talk with simple structure.";
-    }
+  const getDynamicHelperText = useCallback((done) => {
     if (done <= 0) return "Start with a clear topic introduction and one key point.";
     if (done === 1) return "Great start. Now expand vocabulary range and vary your sentence structure.";
     if (done === 2) return "Add a concrete example so your explanation is persuasive.";
@@ -261,13 +244,6 @@ const SpeechTrainerPage = () => {
   useEffect(() => {
     refreshHistory();
   }, [refreshHistory]);
-
-  useEffect(() => {
-    if (chatMessages.length === 1 && chatMessages[0]?.role === "assistant") {
-      setChatMessages([getInitialCoachMessage(isA1A2Level)]);
-    }
-  }, [isA1A2Level]);
-
 
   useEffect(() => {
     try {
@@ -522,9 +498,8 @@ const SpeechTrainerPage = () => {
         <div style={{ ...styles.card, margin: 0, background: "#eff6ff" }}>
           <strong style={{ fontSize: 13 }}>Before you begin</strong>
           <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-            {isA1A2Level
-              ? "You will answer six short prompts. Du kannst einfach schreiben. Sir Felix hilft mit leichtem Deutsch und kurzen English hints."
-              : "You will answer six guided prompts. After each reply, Sir Felix gives feedback and asks the next question. Aim for clear structure, varied vocabulary, and complete sentences."}
+            You will answer six guided prompts. After each reply, Sir Felix gives feedback and asks the next question. Aim for clear structure,
+            varied vocabulary, and complete sentences.
           </p>
         </div>
 
@@ -562,9 +537,9 @@ const SpeechTrainerPage = () => {
           <div style={{ ...styles.helperText, margin: 0 }}>
             Progress: {answersDone}/{TURN_LIMIT} • Current step: {currentStepLabel}
           </div>
-          <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone, isA1A2Level)}</div>
+          <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone)}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {flowStepsForLevel.map((step, index) => (
+            {FLOW_STEPS.map((step, index) => (
               <span
                 key={step}
                 title={step}
@@ -667,7 +642,7 @@ const SpeechTrainerPage = () => {
             disabled={loading || completed}
           />
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-            {charsCount}/{MIN_ANSWER_LENGTH} {isA1A2Level ? "minimum chars (kurz ist okay)" : "characters minimum"}
+            {charsCount}/{MIN_ANSWER_LENGTH} characters minimum
           </div>
           <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
             <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
