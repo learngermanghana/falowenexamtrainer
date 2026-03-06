@@ -26,6 +26,15 @@ const FLOW_STEPS = [
   "Deliver your final presentation",
 ];
 
+const FLOW_STEPS_A1_A2 = [
+  "Say your topic",
+  "Talk about your situation",
+  "Say your idea or solution",
+  "Give one simple example",
+  "Use linking words",
+  "Say your final presentation",
+];
+
 const UPGRADE_OPTIONS = [
   { label: "Make it A2/B1", mode: "a2-b1", description: "Targets clear A2/B1 grammar and natural exam-ready phrasing." },
   { label: "Make it more formal", mode: "formal", description: "Emphasises politeness, formality, and clearer sentence patterns." },
@@ -201,7 +210,8 @@ const SpeechTrainerPage = () => {
   const recorderLink = `${CAMPUS_SPEAKING_LINK}?code=${encodeURIComponent(studentCode)}`;
   const charsCount = chatInput.trim().length;
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
-  const currentStepLabel = FLOW_STEPS[Math.min(answersDone, TURN_LIMIT - 1)] || FLOW_STEPS[FLOW_STEPS.length - 1];
+  const currentStepLabel =
+    flowStepsForLevel[Math.min(answersDone, TURN_LIMIT - 1)] || flowStepsForLevel[flowStepsForLevel.length - 1];
 
   const getDynamicHelperText = useCallback((done) => {
     if (done <= 0) return "Start with a clear topic introduction and one key point.";
@@ -539,7 +549,7 @@ const SpeechTrainerPage = () => {
           </div>
           <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone)}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {FLOW_STEPS.map((step, index) => (
+            {flowStepsForLevel.map((step, index) => (
               <span
                 key={step}
                 title={step}
