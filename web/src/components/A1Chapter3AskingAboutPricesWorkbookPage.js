@@ -42,10 +42,10 @@ function TabButton({ active, onClick, children }) {
 }
 
 const pronounPrompts = [
-  "Wie viel kostet das Buch? – ______ kostet 20 Euro.",
-  "Wie viel kostet die Lampe? – ______ kostet 15 Euro.",
-  "Wie viel kostet das Auto? – ______ kostet 25.000 Euro.",
-  "Wie viel kostet der Stuhl? – ______ kostet 50 Euro.",
+  { question: "Wie viel kostet das Buch?", answer: "Es kostet 20 Euro." },
+  { question: "Wie viel kostet die Lampe?", answer: "Sie kostet 15 Euro." },
+  { question: "Wie viel kostet das Auto?", answer: "Es kostet 25.000 Euro." },
+  { question: "Wie viel kostet der Stuhl?", answer: "Er kostet 50 Euro." },
 ];
 
 const hobbiesQuestions = [
@@ -105,26 +105,20 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             <strong>Übung 3: Frage nach dem Preis.</strong> Übe Fragen nach dem Preis und antworte darauf.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Practice asking for the price and answering the questions by using the pronouns.
+            Practice asking for the price and answering the questions by using the correct pronouns.
           </p>
-          <p
-            style={{
-              margin: 0,
-              background: "#fef3c7",
-              borderRadius: 8,
-              padding: "10px 12px",
-              fontWeight: 700,
-            }}
-          >
+          <p style={{ margin: 0, background: "#fef3c7", borderRadius: 8, padding: "10px 12px", fontWeight: 700 }}>
             Use the pronouns to answer.
           </p>
           <ol style={listSpacing}>
             {pronounPrompts.map((item) => (
-              <li key={item}>{item}</li>
+              <li key={item.question}>
+                {item.question} — <strong>{item.answer}</strong>
+              </li>
             ))}
           </ol>
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Do not type answers on this page. Complete the assignment and submit it through the Submit Assignment tab.
+            No typing is required on this page. Prepare your answers and submit through the assignment submission tab.
           </p>
         </div>
       )}
@@ -139,7 +133,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 2: Writing About Family (Exercise 2)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Schreibe über deine Familie.</strong> Write a short text about your family. Use the following ideas:
+            <strong>Schreibe über deine Familie.</strong> Write a short text about your family using the ideas below.
           </p>
           <ol style={listSpacing}>
             <li>Familienmitglieder: Wer gehört zu deiner Familie? (Mutter, Vater, Geschwister, etc.)</li>
@@ -165,7 +159,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             </p>
           </div>
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Write your own family text and submit in the assignment tab.
+            Write your own version in your notebook and submit in the assignment area.
           </p>
         </div>
       )}
@@ -205,46 +199,14 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             <li>Hiking – Wandern</li>
           </ul>
 
-          <h3 style={sectionTitle}>Useful Verbs</h3>
-          <ul style={listSpacing}>
-            <li>to read – lesen</li>
-            <li>to swim – schwimmen</li>
-            <li>to play – spielen</li>
-            <li>to paint – malen</li>
-            <li>to listen – hören</li>
-            <li>to cook – kochen</li>
-            <li>to travel – reisen</li>
-            <li>to garden – gärtnern</li>
-            <li>to cycle – radfahren</li>
-            <li>to hike – wandern</li>
-          </ul>
-
-          <h3 style={sectionTitle}>Phrases</h3>
+          <h3 style={sectionTitle}>Useful Phrases</h3>
           <ul style={listSpacing}>
             <li>My hobby is... – Mein Hobby ist...</li>
             <li>I like to... – Ich mag...</li>
             <li>I enjoy... – Ich genieße...</li>
             <li>In my free time, I... – In meiner Freizeit...</li>
-            <li>I do this hobby... – Ich mache dieses Hobby...</li>
-            <li>I often... – Ich mache oft...</li>
-            <li>I sometimes... – Ich mache manchmal...</li>
-            <li>My favorite moment was... – Mein Lieblingsmoment war...</li>
             <li>I do this hobby with... – Ich mache dieses Hobby mit...</li>
             <li>I do this hobby alone. – Ich mache dieses Hobby allein.</li>
-          </ul>
-
-          <h3 style={sectionTitle}>Adjectives</h3>
-          <ul style={listSpacing}>
-            <li>Relaxing – entspannend</li>
-            <li>Fun – lustig</li>
-            <li>Exciting – aufregend</li>
-            <li>Interesting – interessant</li>
-            <li>Challenging – herausfordernd</li>
-            <li>Healthy – gesund</li>
-            <li>Creative – kreativ</li>
-            <li>Adventurous – abenteuerlich</li>
-            <li>Energetic – energiegeladen</li>
-            <li>Inspiring – inspirierend</li>
           </ul>
 
           <h3 style={sectionTitle}>Example Sentences</h3>
@@ -260,10 +222,6 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             <li>Cycling keeps me healthy. – Radfahren hält mich gesund.</li>
             <li>Hiking is adventurous. – Wandern ist abenteuerlich.</li>
           </ul>
-
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Do not type answers on this page. Prepare your responses and submit in the assignment tab.
-          </p>
         </div>
       )}
     </div>
