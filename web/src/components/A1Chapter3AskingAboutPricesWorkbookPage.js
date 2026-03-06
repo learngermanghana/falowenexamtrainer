@@ -1,12 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-
-const tabs = [
-  { key: "preise", label: "Teil 1 · Preise und Kosten" },
-  { key: "familie", label: "Teil 2 · Writing About Family" },
-  { key: "hobbys", label: "Teil 3 · Hobbys" },
-];
 
 const card = {
   ...styles.card,
@@ -39,22 +33,6 @@ const mutedText = {
   color: "#4b5563",
   lineHeight: 1.6,
 };
-
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
 
 const priceQuestions = [
   "1. Wie viel kostet das Buch? – ______ kostet 20 Euro.",
@@ -151,12 +129,6 @@ const exampleSentences = [
 
 const A1Chapter3AskingAboutPricesWorkbookPage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("preise");
-
-  const activeIndex = useMemo(
-    () => tabs.findIndex((tab) => tab.key === activeTab),
-    [activeTab]
-  );
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -176,26 +148,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
           In-app workbook for Chapter 3. Complete the exercises in your notebook
           first, then submit your final work in the assignment submission tab.
         </p>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton
-              key={tab.key}
-              active={tab.key === activeTab}
-              onClick={() => setActiveTab(tab.key)}
-            >
-              {tab.label}
-            </TabButton>
-          ))}
-        </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Tab {activeIndex + 1} of {tabs.length}
-        </p>
       </div>
 
-      {activeTab === "preise" && (
-        <div style={card}>
+      <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80"
             alt="Shopping and prices in a store"
@@ -259,11 +214,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             No text box is needed here. Write your answers in your notebook and
             submit them through the assignment submission tab.
           </p>
-        </div>
-      )}
+      </div>
 
-      {activeTab === "familie" && (
-        <div style={card}>
+      <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1600&q=80"
             alt="Family together at home"
@@ -330,11 +283,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             Write your own family text in your notebook. Do not type your answer
             on this page. Submit it in the assignment area.
           </p>
-        </div>
-      )}
+      </div>
 
-      {activeTab === "hobbys" && (
-        <div style={card}>
+      <div style={card}>
           <img
             src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80"
             alt="People enjoying hobbies together"
@@ -421,8 +372,7 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             No typing area is needed here. Answer the questions in your notebook
             and submit them through the assignment submission tab.
           </p>
-        </div>
-      )}
+      </div>
     </div>
   );
 };
