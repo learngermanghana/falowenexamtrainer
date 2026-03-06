@@ -601,7 +601,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
         youtube_link: "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
         grammarbook_link: "https://drive.google.com/file/d/17y5fGW8nAbfeVgolV7tEW4BLiLXZDoO6/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/1zjAqvQqNb7iKknuhJ79bUclimEaTg-mt/view?usp=sharing",
+        workbook_link: "/campus/course/a1-chapter-5-german-cases-workbook",
         assignment: true,
       },
     },
