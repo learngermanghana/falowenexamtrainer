@@ -875,8 +875,8 @@ const RAW_COURSE_SCHEDULES = {
       grammar_topic: "German Conjunctions",
       assignment: false,
       schreiben_sprechen: {
-        video: "https://youtu.be/isTL6k7gMMA",
-        youtube_link: "https://youtu.be/isTL6k7gMMA",
+        video: "https://youtu.be/8l1LiXGYqFA",
+        youtube_link: "https://youtu.be/8l1LiXGYqFA",
         workbook_link: "/campus/course/conjunctions-5-10",
         assignment: false,
       },
