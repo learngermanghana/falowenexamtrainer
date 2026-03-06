@@ -7,6 +7,7 @@ import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { fetchResults } from "../services/resultsService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
+import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
 const PASS_MARK = 60;
@@ -202,7 +203,6 @@ const StudentResultsPage = () => {
   }, [results]);
 
   const assignmentProgress = useMemo(() => {
-    const normalizeAssignment = (value) => String(value || "").trim().toLowerCase();
     const toNumericScore = (value) => {
       if (typeof value === "number") return Number.isFinite(value) ? value : null;
       if (typeof value === "string") {
@@ -217,7 +217,11 @@ const StudentResultsPage = () => {
       results.forEach((entry) => {
         const level = String(entry.level || "").toUpperCase();
         if (!levels.includes(level)) return;
-        const assignmentKey = normalizeAssignment(entry.assignment);
+        const assignmentKey = resolveAssignmentCanonicalKey({
+          level,
+          assignmentId: entry.assignmentId || entry.assignment_id,
+          assignmentTitle: entry.assignment || entry.assignmentTitle || entry.title,
+        });
         if (!assignmentKey) return;
         const score = toNumericScore(entry.score);
         const currentBest = bestByAssignment.get(assignmentKey);

@@ -6,6 +6,7 @@ import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
+import { buildAssignmentCatalogForLevel, resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import {
   addDoc,
   collection,
@@ -157,6 +158,11 @@ const AssignmentSubmissionPage = () => {
 
   const assignmentDictionary = useMemo(() => {
     const levelSchedule = courseSchedules[preferredLevel] || [];
+    const catalogByDay = new Map(
+      buildAssignmentCatalogForLevel(preferredLevel)
+        .filter((entry) => typeof entry?.day !== "undefined")
+        .map((entry) => [String(entry.day), entry])
+    );
     const duplicateCountByDay = levelSchedule.reduce((acc, entry) => {
       if (typeof entry.day === "undefined" || !entry.topic) return acc;
       const key = String(entry.day);
@@ -184,6 +190,13 @@ const AssignmentSubmissionPage = () => {
           occurrence,
           label,
           assignmentId: entry.assignmentId || null,
+          canonicalAssignmentId:
+            catalogByDay.get(String(entry.day))?.canonicalAssignmentId ||
+            resolveAssignmentCanonicalKey({
+              level: preferredLevel,
+              assignmentId: entry.assignmentId,
+              assignmentTitle: label,
+            }),
           assignment: hasAssignmentMarker(entry),
         };
       });
@@ -322,6 +335,7 @@ const AssignmentSubmissionPage = () => {
       const entry = assignmentDictionary.find((item) => item.label === title);
       const normalizedLevel = normalizeIdPart(preferredLevel || "general");
 
+      if (entry?.canonicalAssignmentId) return entry.canonicalAssignmentId;
       if (entry?.assignmentId) return `${normalizedLevel}-${normalizeIdPart(entry.assignmentId)}`;
       if (entry?.chapter) return `${normalizedLevel}-${normalizeIdPart(entry.chapter)}`;
 
@@ -353,12 +367,22 @@ const AssignmentSubmissionPage = () => {
   );
 
   const buildSubmissionPayload = useCallback(
-    (statusLabel) => ({
+    (statusLabel) => {
+      const resolvedLevel = ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL";
+      const resolvedAssignmentId = buildAssignmentId(form.assignmentTitle);
+      const canonicalAssignmentKey = resolveAssignmentCanonicalKey({
+        level: resolvedLevel,
+        assignmentId: resolvedAssignmentId,
+        assignmentTitle: form.assignmentTitle,
+      });
+
+      return {
       title: form.assignmentTitle,
       assignmentTitle: form.assignmentTitle,
-      level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+      level: resolvedLevel,
       chapter: deriveChapterValue(form.assignmentTitle),
-      assignmentId: buildAssignmentId(form.assignmentTitle),
+      assignmentId: resolvedAssignmentId,
+      canonicalAssignmentKey,
       chapterKey: buildChapterKey(form.assignmentTitle),
       submissionLink: null,
       submissionText: form.submissionText.trim(),
@@ -376,7 +400,8 @@ const AssignmentSubmissionPage = () => {
       status: statusLabel,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-    }),
+    };
+    },
     [
       buildChapterKey,
       buildAssignmentId,
