@@ -24,6 +24,7 @@ import GermanNumbersGrammarPage from "./components/GermanNumbersGrammarPage";
 import ObjectsAndColorsPage from "./components/ObjectsAndColorsPage";
 import TwelveHourClockPage from "./components/TwelveHourClockPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
+import GermanAlphabetGrammarNotesPage from "./components/GermanAlphabetGrammarNotesPage";
 import PersonenBeschreibenGrammarPage from "./components/PersonenBeschreibenGrammarPage";
 import ComparingThingsAndPeopleGrammarPage from "./components/ComparingThingsAndPeopleGrammarPage";
 import WoTreffenUnsGrammarPage from "./components/WoTreffenUnsGrammarPage";
@@ -574,6 +575,10 @@ const AppShell = ({
           <Route
             path="/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1"
             element={<A1Day1GreetingsGrammarPage />}
+          />
+          <Route
+            path="/campus/course/german-alphabet-grammar-notes-day-2"
+            element={<GermanAlphabetGrammarNotesPage />}
           />
           <Route
             path="/campus/course/singular-pronouns-verb-conjugation-day-2"
