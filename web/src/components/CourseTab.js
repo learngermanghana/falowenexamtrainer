@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
@@ -294,6 +295,7 @@ const getStatusForDay = (dayStatuses, day) => dayStatuses[String(day)]?.value ||
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { studentProfile, saveStudentProfile } = useAuth();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
@@ -354,16 +356,41 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     if (!selectedCourseLevel) return;
     try {
       const raw = window.localStorage.getItem(`course-status-${selectedCourseLevel}`);
-      setDayStatuses(raw ? JSON.parse(raw) : {});
+      const localStatuses = raw ? JSON.parse(raw) : {};
+      const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel];
+      setDayStatuses(profileStatuses || localStatuses);
     } catch (error) {
-      setDayStatuses({});
+      const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel];
+      setDayStatuses(profileStatuses || {});
     }
-  }, [selectedCourseLevel]);
+  }, [selectedCourseLevel, studentProfile]);
 
   useEffect(() => {
     if (!selectedCourseLevel) return;
     window.localStorage.setItem(`course-status-${selectedCourseLevel}`, JSON.stringify(dayStatuses));
   }, [dayStatuses, selectedCourseLevel]);
+
+  useEffect(() => {
+    if (!selectedCourseLevel || !studentProfile?.id) return;
+
+    const existingStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel] || {};
+    if (JSON.stringify(existingStatuses) === JSON.stringify(dayStatuses)) return;
+
+    const syncProgress = async () => {
+      try {
+        await saveStudentProfile({
+          courseProgressByLevel: {
+            ...(studentProfile?.courseProgressByLevel || {}),
+            [selectedCourseLevel]: dayStatuses,
+          },
+        });
+      } catch (error) {
+        console.error("Failed to sync course progress", error);
+      }
+    };
+
+    syncProgress();
+  }, [dayStatuses, saveStudentProfile, selectedCourseLevel, studentProfile]);
 
   const schedule = useMemo(() => schedules[selectedCourseLevel] || [], [schedules, selectedCourseLevel]);
   const isDerivedLevel = useMemo(
