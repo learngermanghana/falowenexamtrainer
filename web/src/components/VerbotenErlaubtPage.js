@@ -6,9 +6,23 @@ import { speakingSheetQuestions } from "../data/speakingSheet";
 const FALOWEN_SPEAKING_URL =
   "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
 
+const HERO_IMAGE_URL =
+  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=80";
+
 const Section = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-    <h2 style={{ margin: 0 }}>{title}</h2>
+    <div style={{ display: "grid", gap: 8 }}>
+      <h2 style={{ margin: 0 }}>{title}</h2>
+      <div
+        aria-hidden="true"
+        style={{
+          width: 72,
+          height: 3,
+          borderRadius: 999,
+          background: "linear-gradient(90deg, #2563eb, #7c3aed)",
+        }}
+      />
+    </div>
     {children}
   </section>
 );
@@ -182,6 +196,28 @@ const VerbotenErlaubtPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Chapter 5.9 — random Teil 2 & Teil 3 cards + timed confidence drill.
         </p>
+
+        <div
+          aria-hidden="true"
+          style={{
+            width: "100%",
+            height: 1,
+            background: "linear-gradient(90deg, #bfdbfe, #e9d5ff)",
+          }}
+        />
+
+        <img
+          src={HERO_IMAGE_URL}
+          alt="Goethe A1 speaking practice students in classroom"
+          style={{
+            width: "100%",
+            maxHeight: 230,
+            objectFit: "cover",
+            borderRadius: 12,
+            border: "1px solid #dbeafe",
+          }}
+          loading="lazy"
+        />
 
         <Callout>
           <strong>Official Speaking Practice App</strong>
