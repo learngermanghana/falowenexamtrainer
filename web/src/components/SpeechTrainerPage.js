@@ -286,12 +286,9 @@ const SpeechTrainerPage = () => {
 
         <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 8 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            You can stay here for chat practice, or open the speaking recorder if you want to submit an audio recording.
+            You can stay here for chat practice, or open the recorder if you want to submit an audio recording.
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <a href={CAMPUS_SPEAKING_LINK} target="_blank" rel="noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-              Open speaking page
-            </a>
             <a href={recorderLink} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, textDecoration: "none" }}>
               Open recorder link
             </a>
