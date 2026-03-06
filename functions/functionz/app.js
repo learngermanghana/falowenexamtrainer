@@ -817,6 +817,9 @@ const presentationCoachPrompt = ({ level = "A1", answersDone = 0 }) => {
     `When completed answers are fewer than ${PRESENTATION_TURN_LIMIT}, use <question_de>.`,
     `When completed answers are ${PRESENTATION_TURN_LIMIT}, replace <question_de> with <abschluss_de> and include <praesentation_de>.`,
     `Use this exact recording link token in the final section: ${PRESENTATION_RECORDING_LINK}`,
+    "For every turn also include <error_intel> with three bullets for article/case, verb position, tense slips. Each bullet: short rule + one corrected example.",
+    "On final turn include <rubric>Grammar:X/5|Vocabulary:Y/5|Pronunciation readiness:Z/5|Structure:W/5</rubric>.",
+    "On final turn include <script_short>, <script_medium>, and <script_long> with speaking-ready German scripts for about 45s, 90s, and 2min.",
     "Never output markdown outside the required XML-like structure.",
   ].join("\n\n");
 };
@@ -836,6 +839,24 @@ function sanitizePresentationHistory(messages = []) {
 function countUserAnswers(messages = []) {
   return messages.reduce((count, item) => (item?.role === "user" ? count + 1 : count), 0);
 }
+
+
+const presentationUpgradePrompt = ({ level = "A1", mode = "a2-b1" }) => {
+  const modes = {
+    "a2-b1": "Rewrite the student answer to CEFR A2/B1 German that is natural and exam-ready.",
+    formal: "Rewrite the student answer in a more formal register suitable for a class presentation.",
+    linking: "Rewrite the student answer and add clear linking words (zuerst, dann, außerdem, deshalb, zum Schluss).",
+  };
+
+  return [
+    "You are Herr Felix, a German exam coach.",
+    `Target level context: ${level}.`,
+    modes[mode] || modes["a2-b1"],
+    "Return compact XML with <upgrade_de>...</upgrade_de><why_en>...</why_en>.",
+    "Keep the upgraded text 2-4 sentences and preserve the student's meaning.",
+  ].join(" ");
+};
+
 
 const speechTrainerPrompt = ({ level, note }) =>
   [
@@ -2269,6 +2290,130 @@ app.post("/speaking/presentation-chat", async (req, res) => {
   }
 });
 
+
+app.post("/speaking/presentation-upgrade", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const { answer, level = "A1", mode = "a2-b1" } = req.body || {};
+    const trimmedAnswer = String(answer || "").trim();
+
+    const validationError =
+      validateString(trimmedAnswer, { required: true, maxLength: 800, label: "answer" }) ||
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(mode, { maxLength: 30, label: "mode" });
+
+    if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const messages = [
+      { role: "system", content: presentationUpgradePrompt({ level, mode }) },
+      { role: "user", content: trimmedAnswer },
+    ];
+
+    const reply = await createChatCompletion(messages, { temperature: 0.35, max_tokens: 260 });
+
+    auditAIRequest({
+      route: "/speaking/presentation-upgrade",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { level, mode },
+      success: true,
+    });
+
+    return res.json({ reply });
+  } catch (err) {
+    console.error("/speaking/presentation-upgrade error", err);
+    auditAIRequest({ route: "/speaking/presentation-upgrade", uid: authedUser?.uid, email: authedUser?.email, success: false });
+    return res.status(500).json({ error: err.message || "Failed to upgrade presentation answer" });
+  }
+});
+
+app.post("/speaking/presentation-session", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const {
+      topic = "",
+      level = "A1",
+      finalScript = "",
+      completionStatus = "in_progress",
+      commonErrorTags = [],
+      rubric = {},
+      studentName = "",
+      tutorName = "Sir Felix",
+    } = req.body || {};
+
+    const validationError =
+      validateString(topic, { maxLength: 120, label: "topic" }) ||
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(finalScript, { maxLength: 6000, label: "finalScript" }) ||
+      validateString(completionStatus, { maxLength: 40, label: "completionStatus" });
+
+    if (validationError) return res.status(400).json({ error: validationError });
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Storage unavailable" });
+
+    const cleanedTags = Array.isArray(commonErrorTags)
+      ? Array.from(new Set(commonErrorTags.map((tag) => String(tag || "").trim()).filter(Boolean))).slice(0, 10)
+      : [];
+
+    const payload = {
+      uid: authedUser.uid,
+      topic: String(topic || "").trim() || "Custom topic",
+      level: String(level || "A1").trim().toUpperCase(),
+      finalScript: String(finalScript || "").trim(),
+      completionStatus: String(completionStatus || "in_progress").trim(),
+      commonErrorTags: cleanedTags,
+      rubric: {
+        grammar: Number(rubric?.grammar || 0),
+        vocabulary: Number(rubric?.vocabulary || 0),
+        pronunciationReadiness: Number(rubric?.pronunciationReadiness || 0),
+        structure: Number(rubric?.structure || 0),
+      },
+      studentName: String(studentName || "").trim() || null,
+      tutorName: String(tutorName || "").trim() || "Sir Felix",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    const docRef = await db.collection("presentationSessions").add(payload);
+    return res.json({ ok: true, id: docRef.id });
+  } catch (err) {
+    console.error("/speaking/presentation-session error", err);
+    return res.status(500).json({ error: err.message || "Failed to save presentation session" });
+  }
+});
+
+app.post("/speaking/presentation-session/history", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Storage unavailable" });
+
+    const snap = await db
+      .collection("presentationSessions")
+      .where("uid", "==", authedUser.uid)
+      .orderBy("createdAt", "desc")
+      .limit(10)
+      .get();
+
+    const sessions = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    return res.json({ sessions });
+  } catch (err) {
+    console.error("/speaking/presentation-session/history error", err);
+    return res.status(500).json({ error: err.message || "Failed to load presentation sessions" });
+  }
+});
 
 app.post("/tutor/placement", async (req, res) => {
   let authedUser;
