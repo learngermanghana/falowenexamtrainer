@@ -95,6 +95,8 @@ const scorePill = (label, value) => (
   </div>
 );
 
+const PRIMARY_TAGS = ["question_de", "abschluss_de", "praesentation_de"];
+
 const renderAssistantContent = (content) => {
   const taggedFields = extractAllTaggedFields(content).filter((field) => field.value);
   if (!taggedFields.length) {
@@ -115,9 +117,12 @@ const renderAssistantContent = (content) => {
     gap: 4,
   };
 
+  const primaryFields = taggedFields.filter((field) => PRIMARY_TAGS.includes(field.tag));
+  const secondaryFields = taggedFields.filter((field) => !PRIMARY_TAGS.includes(field.tag));
+
   return (
     <div style={{ display: "grid", gap: 8 }}>
-      {taggedFields.map((field) => (
+      {(primaryFields.length ? primaryFields : taggedFields).map((field) => (
         <div key={`${field.tag}-${field.value.slice(0, 20)}`} style={blockStyle}>
           <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
             {normalizeLabel(field.tag)}
@@ -125,6 +130,21 @@ const renderAssistantContent = (content) => {
           <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
         </div>
       ))}
+      {secondaryFields.length ? (
+        <details style={{ ...blockStyle, background: "#f8fafc", borderColor: "#e5e7eb" }}>
+          <summary style={{ cursor: "pointer", fontWeight: 600 }}>Mehr Hinweise anzeigen</summary>
+          <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
+            {secondaryFields.map((field) => (
+              <div key={`${field.tag}-${field.value.slice(0, 30)}`}>
+                <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
+                  {normalizeLabel(field.tag)}
+                </strong>
+                <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
+              </div>
+            ))}
+          </div>
+        </details>
+      ) : null}
     </div>
   );
 };
