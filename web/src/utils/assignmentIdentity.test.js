@@ -1,0 +1,27 @@
+import { resolveAssignmentCanonicalKey, toCanonicalAssignmentId } from "./assignmentIdentity";
+
+describe("assignment identity canonical keys", () => {
+  test("duplicate day entries use task token from title fallback", () => {
+    expect(
+      resolveAssignmentCanonicalKey({
+        level: "A1",
+        assignmentTitle: "Day 2 • Task 2: Modal verbs",
+      })
+    ).toBe("A1-DAY-2-TASK-2");
+  });
+
+  test("assignment IDs with and without level prefix normalize consistently", () => {
+    expect(toCanonicalAssignmentId({ level: "A1", assignmentId: "0.1" })).toBe("A1-0.1");
+    expect(toCanonicalAssignmentId({ level: "A1", assignmentId: "a1-0.1" })).toBe("A1-0.1");
+  });
+
+  test("title-only rows use strict TITLE key format", () => {
+    expect(resolveAssignmentCanonicalKey({ level: "B1", assignmentTitle: "My custom assignment" })).toBe(
+      "B1-TITLE-MY-CUSTOM-ASSIGNMENT"
+    );
+  });
+
+  test("mixed case and underscore inputs normalize to strict format", () => {
+    expect(toCanonicalAssignmentId({ level: "a2", assignmentId: "day_5" })).toBe("A2-DAY-5");
+  });
+});

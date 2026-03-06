@@ -32,6 +32,7 @@ import {
   collectionGroup,
   deleteField,
   arrayUnion,
+  runTransaction,
 } from "firebase/firestore";
 import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
@@ -281,4 +282,5 @@ export {
   collectionGroup,
   deleteField,
   arrayUnion,
+  runTransaction,
 };
