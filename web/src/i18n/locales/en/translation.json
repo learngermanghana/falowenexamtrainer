@@ -339,11 +339,19 @@
       "notStarted": "Not started",
       "inProgress": "In progress",
       "submitted": "Submitted",
-      "needsRedo": "Needs redo"
+      "needsRedo": "Needs redo",
+      "milestoneComplete": "Milestone complete"
     },
     "nav": {
       "courseBook": "Course book",
       "classMembers": "Class members"
+    },
+    "completion": {
+      "message": "Congratulations on finishing your {{level}} course. Choose your next step and keep your momentum going.",
+      "actions": {
+        "openExams": "Open Exams page",
+        "downloadStudyCalendar": "Download study calendar"
+      }
     }
   },
   "planPage": {

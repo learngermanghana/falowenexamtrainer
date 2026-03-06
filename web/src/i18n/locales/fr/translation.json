@@ -348,11 +348,19 @@
       "notStarted": "Non commencé",
       "inProgress": "En cours",
       "submitted": "Soumis",
-      "needsRedo": "À refaire"
+      "needsRedo": "À refaire",
+      "milestoneComplete": "Étape clé terminée"
     },
     "nav": {
       "courseBook": "Cours",
       "classMembers": "Membres de classe"
+    },
+    "completion": {
+      "message": "Félicitations pour la fin de ton cours {{level}}. Choisis la prochaine étape et garde ton élan.",
+      "actions": {
+        "openExams": "Ouvrir la page Examens",
+        "downloadStudyCalendar": "Télécharger le calendrier d’étude"
+      }
     }
   },
   "planPage": {

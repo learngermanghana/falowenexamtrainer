@@ -344,11 +344,19 @@
       "notStarted": "Nicht begonnen",
       "inProgress": "In Bearbeitung",
       "submitted": "Eingereicht",
-      "needsRedo": "Neu bearbeiten"
+      "needsRedo": "Neu bearbeiten",
+      "milestoneComplete": "Meilenstein abgeschlossen"
     },
     "nav": {
       "courseBook": "Kursbuch",
       "classMembers": "Klassenmitglieder"
+    },
+    "completion": {
+      "message": "Glückwunsch zum Abschluss deines {{level}}-Kurses. Wähle deinen nächsten Schritt und bleib dran.",
+      "actions": {
+        "openExams": "Prüfungsseite öffnen",
+        "downloadStudyCalendar": "Lernkalender herunterladen"
+      }
     }
   },
   "planPage": {
