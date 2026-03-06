@@ -183,33 +183,6 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             ))}
           </ol>
 
-          <div
-            style={{
-              border: "1px solid #e5e7eb",
-              borderRadius: 10,
-              padding: 12,
-              background: "#fff",
-            }}
-          >
-            <h3 style={{ ...sectionTitle, marginBottom: 8 }}>
-              Quick Help / Hilfe
-            </h3>
-            <ul style={listSpacing}>
-              <li>
-                <strong>das Buch</strong> → <strong>es</strong>
-              </li>
-              <li>
-                <strong>die Lampe</strong> → <strong>sie</strong>
-              </li>
-              <li>
-                <strong>das Auto</strong> → <strong>es</strong>
-              </li>
-              <li>
-                <strong>der Stuhl</strong> → <strong>er</strong>
-              </li>
-            </ul>
-          </div>
-
           <p style={mutedText}>
             No text box is needed here. Write your answers in your notebook and
             submit them through the assignment submission tab.
@@ -324,6 +297,9 @@ const A1Chapter3AskingAboutPricesWorkbookPage = () => {
             </p>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               <strong>Answer 2:</strong> Ja, ich mag Fußball.
+            </p>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              <strong>Answer 3:</strong> Nein, ich spiele nicht gern Fußball.
             </p>
           </div>
 
