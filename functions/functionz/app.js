@@ -775,14 +775,6 @@ function countUserAnswers(messages = []) {
   return messages.reduce((count, item) => (item?.role === "user" ? count + 1 : count), 0);
 }
 
-function validateConversationId(value) {
-  if (typeof value === "undefined" || value === null || value === "") return null;
-  if (typeof value !== "string") return "conversationId must be a string";
-  if (value.length > 80) return "conversationId must be at most 80 characters";
-  if (!/^[A-Za-z0-9_-]+$/.test(value)) return "conversationId contains invalid characters";
-  return null;
-}
-
 const speechTrainerPrompt = ({ level, note }) =>
   [
     "You are an encouraging German pronunciation coach working from a Whisper transcript.",
@@ -2153,43 +2145,23 @@ app.post("/speaking/presentation-chat", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const { message, level = "A1", history = [], conversationId } = req.body || {};
+    const { message, level = "A1", history = [] } = req.body || {};
     const trimmedMessage = String(message || "").trim();
 
     const validationError =
       validateString(trimmedMessage, { required: true, maxLength: 800, label: "message" }) ||
-      validateString(level, { maxLength: 10, label: "level" }) ||
-      validateConversationId(conversationId);
+      validateString(level, { maxLength: 10, label: "level" });
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
 
-    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "speaking", limit: DAILY_LIMITS.speaking });
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
     if (!quota.allowed) {
-      log.warn("quota.blocked", { route: "/speaking/presentation-chat", uid: authedUser.uid, category: "speaking" });
+      log.warn("quota.blocked", { route: "/speaking/presentation-chat", uid: authedUser.uid, category: "chatbuddy" });
       return res.status(429).json({ error: "Daily presentation chat limit reached" });
     }
 
-    const db = getFirestoreSafe();
-    const resolvedConversationId = conversationId || (crypto.randomUUID ? crypto.randomUUID() : `pc_${Date.now()}`);
-
-    let safeHistory = sanitizePresentationHistory(history);
-    let conversationRef = null;
-
-    if (db) {
-      conversationRef = db
-        .collection("presentationChats")
-        .doc(authedUser.uid)
-        .collection("conversations")
-        .doc(resolvedConversationId);
-
-      const existingConversation = await conversationRef.get();
-      if (existingConversation.exists) {
-        const persistedMessages = sanitizePresentationHistory(existingConversation.data()?.messages || []);
-        if (persistedMessages.length) safeHistory = persistedMessages;
-      }
-    }
-
+    const safeHistory = sanitizePresentationHistory(history);
     const answersDoneBeforeCurrent = countUserAnswers(safeHistory);
     const cappedAnswersDone = Math.min(answersDoneBeforeCurrent + 1, PRESENTATION_TURN_LIMIT);
 
@@ -2211,39 +2183,17 @@ app.post("/speaking/presentation-chat", async (req, res) => {
     }
 
     const completed = cappedAnswersDone >= PRESENTATION_TURN_LIMIT;
-    const updatedHistory = sanitizePresentationHistory([
-      ...safeHistory,
-      { role: "user", content: trimmedMessage },
-      { role: "assistant", content: reply },
-    ]);
-
-    if (conversationRef) {
-      await conversationRef.set(
-        {
-          uid: authedUser.uid,
-          level,
-          answersDone: cappedAnswersDone,
-          completed,
-          messages: updatedHistory,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-        { merge: true }
-      );
-    }
 
     auditAIRequest({
       route: "/speaking/presentation-chat",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level, quotaRemaining: quota.remaining, completed, conversationId: resolvedConversationId },
+      metadata: { level, quotaRemaining: quota.remaining, completed },
       success: !fallbackUsed,
     });
 
     return res.json({
       reply,
-      conversationId: resolvedConversationId,
-      history: updatedHistory,
       answersDone: cappedAnswersDone,
       turnLimit: PRESENTATION_TURN_LIMIT,
       completed,
@@ -2256,7 +2206,6 @@ app.post("/speaking/presentation-chat", async (req, res) => {
     return res.status(500).json({ error: err.message || "Failed to run presentation chat" });
   }
 });
-
 
 
 app.post("/tutor/placement", async (req, res) => {

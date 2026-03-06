@@ -7,7 +7,6 @@ const CAMPUS_SPEAKING_LINK =
   "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
 
 const TURN_LIMIT = 6;
-const PRESENTATION_CONVERSATION_KEY = "falowen_campus_presentation_conversation";
 
 const initialCoachMessage = {
   role: "assistant",
@@ -15,15 +14,8 @@ const initialCoachMessage = {
     "Hallo! Ich bin dein Präsentations-Coach. Schreib bitte 2–3 Sätze über dein heutiges Präsentationsthema, dann korrigiere ich kurz und stelle die nächste Frage.",
 };
 
-const extractFinalPresentation = (text = "") => {
-  const marker = "PRÄSENTATION:";
-  const index = text.indexOf(marker);
-  if (index === -1) return "";
-  return text.slice(index + marker.length).trim();
-};
-
 const SpeechTrainerPage = () => {
-  const { idToken, studentProfile, user } = useAuth();
+  const { idToken, studentProfile } = useAuth();
   const [activeTab, setActiveTab] = useState("external");
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([initialCoachMessage]);
@@ -31,14 +23,6 @@ const SpeechTrainerPage = () => {
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [copyStatus, setCopyStatus] = useState("");
-  const [conversationId, setConversationId] = useState(() => {
-    try {
-      return localStorage.getItem(`${PRESENTATION_CONVERSATION_KEY}_${user?.uid || "guest"}`) || "";
-    } catch {
-      return "";
-    }
-  });
 
   const level = useMemo(() => {
     const raw = String(studentProfile?.level || "A1").toUpperCase();
@@ -46,8 +30,6 @@ const SpeechTrainerPage = () => {
   }, [studentProfile?.level]);
 
   const progressPercent = Math.min(100, Math.round((answersDone / TURN_LIMIT) * 100));
-  const latestAssistantMessage = [...chatMessages].reverse().find((message) => message.role === "assistant")?.content || "";
-  const finalPresentation = completed ? extractFinalPresentation(latestAssistantMessage) : "";
 
   const handleSend = async () => {
     const trimmed = chatInput.trim();
@@ -59,34 +41,17 @@ const SpeechTrainerPage = () => {
     setChatMessages((prev) => [...prev, nextUserMessage]);
     setChatInput("");
     setError("");
-    setCopyStatus("");
     setLoading(true);
 
     try {
       const response = await requestPresentationCoachReply({
         message: trimmed,
         level,
-        conversationId,
         history: priorHistory,
         idToken,
       });
 
-      const nextConversationId = String(response?.conversationId || "");
-      if (nextConversationId) {
-        setConversationId(nextConversationId);
-        try {
-          localStorage.setItem(`${PRESENTATION_CONVERSATION_KEY}_${user?.uid || "guest"}`, nextConversationId);
-        } catch {
-          // noop
-        }
-      }
-
-      if (Array.isArray(response?.history) && response.history.length) {
-        setChatMessages(response.history);
-      } else {
-        setChatMessages((prev) => [...prev, { role: "assistant", content: response?.reply || "" }]);
-      }
-
+      setChatMessages((prev) => [...prev, { role: "assistant", content: response?.reply || "" }]);
       setAnswersDone(response?.answersDone || 0);
       setCompleted(Boolean(response?.completed));
     } catch (requestError) {
@@ -104,24 +69,6 @@ const SpeechTrainerPage = () => {
     setCompleted(false);
     setLoading(false);
     setError("");
-    setCopyStatus("");
-    setConversationId("");
-    try {
-      localStorage.removeItem(`${PRESENTATION_CONVERSATION_KEY}_${user?.uid || "guest"}`);
-    } catch {
-      // noop
-    }
-  };
-
-  const handleCopyPresentation = async () => {
-    if (!finalPresentation) return;
-    try {
-      await navigator.clipboard.writeText(finalPresentation);
-      setCopyStatus("Copied presentation.");
-    } catch (copyError) {
-      console.error("Copy failed", copyError);
-      setCopyStatus("Could not copy automatically. Please copy manually.");
-    }
   };
 
   return (
@@ -191,19 +138,6 @@ const SpeechTrainerPage = () => {
               </div>
             ))}
           </div>
-
-          {completed && finalPresentation ? (
-            <div style={{ ...styles.resultCard, margin: 0, display: "grid", gap: 8 }}>
-              <p style={{ ...styles.label, margin: 0 }}>Final presentation (copy-ready)</p>
-              <p style={{ ...styles.helperText, margin: 0 }}>{finalPresentation}</p>
-              <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                <button type="button" style={styles.secondaryButton} onClick={handleCopyPresentation}>
-                  Copy presentation
-                </button>
-                {copyStatus ? <span style={{ ...styles.helperText, margin: 0 }}>{copyStatus}</span> : null}
-              </div>
-            </div>
-          ) : null}
 
           <div style={{ display: "grid", gap: 8 }}>
             <textarea
