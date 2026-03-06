@@ -1421,5 +1421,149 @@
       "maxedOut": "Du bist bereits auf dem höchsten verfügbaren Level.",
       "clearBalance": "Bitte begleiche zuerst deinen offenen Betrag."
     }
+  },
+  "speechTrainer": {
+    "title": "Class presentation chat coach",
+    "levelBadge": "Level {{level}}",
+    "welcome": "Welcome {{studentName}}. You are chatting with {{tutorName}}.",
+    "mode": {
+      "a1a2": "Simple German + English support mode.",
+      "default": "6-step preparation flow with corrections, upgrades, and final speaking scripts."
+    },
+    "beforeStartTitle": "Before you begin",
+    "beforeStartDescription": "You will answer six guided prompts. After each reply, your coach gives feedback and asks the next question. Aim for clear structure, varied vocabulary, and complete sentences.",
+    "contextsTitle": "Presentation contexts",
+    "recorderDescription": "You can stay here for chat practice, or open the recorder if you want to submit an audio recording.",
+    "recorderButton": "Open recorder link",
+    "recorderAriaLabel": "Open speech recorder link",
+    "progress": "Progress: {{answersDone}}/{{turnLimit}} • Current step: {{currentStepLabel}}",
+    "progressAria": "Six-step coaching progress",
+    "whyUpgrade": "Why this upgrade",
+    "applyUpgrades": "Apply selected upgrades",
+    "applyUpgradesAria": "Apply selected upgrade options",
+    "upgrading": "Upgrading...",
+    "rubricTitle": "Rubric-based feedback (1–5)",
+    "rubricScoresAria": "Rubric scores",
+    "outputTitle": "Speaking-ready output block",
+    "scriptLabels": {
+      "short": "Short (45 sec):",
+      "medium": "Medium (90 sec):",
+      "long": "Long (2 min):"
+    },
+    "placeholderA1A2": "Write simple German. You may add small English support words...",
+    "placeholder": "Type your answer in German...",
+    "charCounter": "{{charsCount}}/{{minLength}} characters minimum",
+    "send": "Send",
+    "sendAria": "Send message",
+    "sending": "{{tutorName}} is thinking...",
+    "reset": "Reset chat",
+    "resetAria": "Reset chat and clear messages",
+    "relogin": "Re-login",
+    "reloginAria": "Log in again",
+    "retry": "Retry",
+    "retryAria": "Retry last message",
+    "completedMessage": "Great! You completed all 6 answers. Your final speaking scripts are ready above.",
+    "sessionHistoryTitle": "Session history",
+    "filterByTopic": "Filter by topic",
+    "filterByTopicAria": "Filter session history by topic",
+    "filterByLevelAria": "Filter session history by level",
+    "allLevels": "All levels",
+    "noSessions": "No saved presentation sessions yet.",
+    "status": "Status: {{status}}",
+    "unknown": "unknown",
+    "finalScript": "Final script: {{finalScript}}",
+    "rubricHistory": "Rubric — Grammar: {{grammar}}/5, Vocabulary: {{vocabulary}}/5, Structure: {{structure}}/5",
+    "continue": "Continue",
+    "continueAria": "Continue incomplete session",
+    "studentFallbackName": "Student",
+    "tutorName": "Coach Felix",
+    "customTopic": "Custom topic",
+    "confirmReset": "Are you sure you want to reset? Your current chat will be cleared.",
+    "topicSelectedA1A2": "Topic selected: {{presetTopic}}. Please start with easy German + short English help for A1/A2 learner.",
+    "topicSelected": "Topic selected: {{presetTopic}}. Please start the 6-step coaching flow with the first German question.",
+    "upgradeResult": "Upgrade ({{label}}):\n{{upgraded}}",
+    "coachStyleA1A2": "Coach style: use easy German (A1/A2), short sentences, and brief English support for difficult words.",
+    "moreHelpA1A2": "Open more help (tips + examples)",
+    "moreHelp": "Show more coaching tips and suggestions",
+    "moreHelpDescription": "Here you can find extra sentence ideas, vocabulary, and short examples.",
+    "topicPresets": [
+      "My hometown",
+      "My studies",
+      "A cultural festival",
+      "An environmental problem + solution"
+    ],
+    "flowSteps": {
+      "default": [
+        "Describe your topic",
+        "Explain your situation",
+        "Present your solution",
+        "Give supporting details",
+        "Use richer vocabulary and structure",
+        "Deliver your final presentation"
+      ],
+      "a1a2": [
+        "Say your topic",
+        "Talk about your situation",
+        "Say your idea or solution",
+        "Give one simple example",
+        "Use linking words",
+        "Say your final presentation"
+      ]
+    },
+    "upgradeOptions": [
+      {
+        "label": "Make it A2/B1",
+        "mode": "a2-b1",
+        "description": "Targets clear A2/B1 grammar and natural exam-ready phrasing."
+      },
+      {
+        "label": "Make it more formal",
+        "mode": "formal",
+        "description": "Emphasises politeness, formality, and clearer sentence patterns."
+      },
+      {
+        "label": "Add linking words",
+        "mode": "linking",
+        "description": "Adds connectors like zuerst, dann, außerdem, deshalb, and zum Schluss."
+      }
+    ],
+    "dynamicHelper": {
+      "0": "Start with a clear topic introduction and one key point.",
+      "1": "Great start. Now expand vocabulary range and vary your sentence structure.",
+      "2": "Add a concrete example so your explanation is persuasive.",
+      "3": "Link ideas with connectors and show cause/effect clearly.",
+      "4": "Refine grammar and make your conclusion concise and confident.",
+      "5": "Final step: deliver a fluent full response with strong structure."
+    },
+    "errors": {
+      "auth": "Your session expired. Please log in again to continue.",
+      "transient": "Temporary network issue. Please retry in a moment.",
+      "generic": "Could not reach the presentation coach. Please try again.",
+      "upgrade": "Could not upgrade your answer right now.",
+      "minLength": "Please write at least {{minLength}} characters so {{tutorName}} can coach you better."
+    },
+    "initialCoachMessage": {
+      "a1a2": "Hallo! I am Coach Felix 👋. We practise simple German with short English help. Pick a topic and we begin.",
+      "default": "Hallo! I am Coach Felix, your presentation coach. First choose a context or write your own topic, then we begin."
+    },
+    "tags": {
+      "nextQuestion": "Next question",
+      "feedback": "Feedback",
+      "motivation": "Motivation",
+      "vocabulary": "Vocabulary",
+      "progress": "Progress",
+      "closing": "Closing",
+      "presentation": "Presentation",
+      "shortScript": "Short script",
+      "mediumScript": "Medium script",
+      "longScript": "Long script",
+      "errorIntelligence": "Error intelligence",
+      "rubric": "Rubric"
+    },
+    "rubric": {
+      "grammar": "Grammar",
+      "vocabulary": "Vocabulary range",
+      "structure": "Structure"
+    }
   }
 }
