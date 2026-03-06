@@ -11,6 +11,7 @@ const keyTakeaways = [
   "Denn joins two main clauses and keeps the verb order the same.",
   "Weil sends the conjugated verb to the end of the clause.",
   "Deshalb is usually placed in position 1, and the conjugated verb stays in position 2.",
+  "With modal verbs, keep the infinitive + modal pair together in the right order.",
   "Use these structures to build clear, exam-ready sentences in letters and messages.",
 ];
 
@@ -350,6 +351,7 @@ const ConjunctionNotesPage = () => {
             "Rule → Coordinating conjunction; verb order stays the same.",
             "Structure → Main clause + , denn + subject + verb + ...",
             "Example → Ich schreibe dir, denn ich habe gute Nachrichten.",
+            "Example with modal → Ich bleibe zu Hause, denn ich möchte heute lernen.",
             "Letter example → Ich komme heute nicht, denn ich bin krank.",
           ]}
         />
@@ -379,7 +381,33 @@ const ConjunctionNotesPage = () => {
             "Rule → Adverb / conjunctional adverb; it connects ideas across clauses.",
             "Structure → Main clause + , deshalb + verb + subject + ...",
             "Example → Ich habe gute Nachrichten, deshalb schreibe ich dir.",
+            "Example with modal → Ich bin müde, deshalb möchte ich früh schlafen.",
             "Letter example → Ich bin müde, deshalb schreibe ich die E-Mail später.",
+          ]}
+        />
+      </Section>
+
+      <Section title="Main Verb vs Modal Verb: How the Pattern Changes">
+        <p style={{ margin: 0 }}>
+          Students often confuse where the verb goes when a sentence has both a
+          main verb and a modal verb. Use this quick rule:
+        </p>
+        <Callout>
+          <strong>Quick rule:</strong> The <em>conjugated verb</em> controls
+          position.
+          <br />
+          • In a main clause, the conjugated verb is in position 2.
+          <br />
+          • In a <em>weil</em>-clause, the conjugated verb goes to the end.
+          <br />
+          • With modals, the main verb usually stays in infinitive form.
+        </Callout>
+        <BulletList
+          items={[
+            "Without modal (main verb conjugated) → Ich lerne heute, weil ich morgen eine Prüfung habe.",
+            "With modal (modal conjugated) → Ich lerne heute, weil ich morgen eine Prüfung bestehen möchte.",
+            "denn + modal → Ich lerne heute, denn ich möchte morgen bestehen.",
+            "deshalb + modal → Ich habe morgen eine Prüfung, deshalb möchte ich heute lernen.",
           ]}
         />
       </Section>
