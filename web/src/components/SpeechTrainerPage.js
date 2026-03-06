@@ -32,11 +32,12 @@ const UPGRADE_OPTIONS = [
   { label: "Add linking words", mode: "linking", description: "Adds connectors like zuerst, dann, außerdem, deshalb, and zum Schluss." },
 ];
 
-const initialCoachMessage = {
+const getInitialCoachMessage = (isA1A2) => ({
   role: "assistant",
-  content:
-    "Hallo! Ich bin Herr Felix, dein Präsentations-Coach. Wähle zuerst einen Kontext oder schreibe dein eigenes Thema, dann starten wir.",
-};
+  content: isA1A2
+    ? "Hallo! I am Herr Felix 👋. Wir üben mit einfachem Deutsch + little English help. Wähle ein Thema, dann starten wir."
+    : "Hallo! Ich bin Herr Felix, dein Präsentations-Coach. Wähle zuerst einen Kontext oder schreibe dein eigenes Thema, dann starten wir.",
+});
 
 const extractTag = (text, tag) => {
   const match = String(text || "").match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i"));
@@ -161,7 +162,7 @@ const renderAssistantContent = (content) => {
 const SpeechTrainerPage = () => {
   const { idToken, studentProfile } = useAuth();
   const [chatInput, setChatInput] = useState("");
-  const [chatMessages, setChatMessages] = useState([initialCoachMessage]);
+  const [chatMessages, setChatMessages] = useState([getInitialCoachMessage(false)]);
   const [answersDone, setAnswersDone] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -182,6 +183,10 @@ const SpeechTrainerPage = () => {
     const raw = String(studentProfile?.level || "A1").toUpperCase();
     return ["A1", "A2", "B1", "B2", "C1"].includes(raw) ? raw : "A1";
   }, [studentProfile?.level]);
+
+
+  const isA1A2Level = level === "A1" || level === "A2";
+  const flowStepsForLevel = isA1A2Level ? FLOW_STEPS_A1_A2 : FLOW_STEPS;
 
   const studentCode = String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim();
   const studentName =
@@ -281,10 +286,14 @@ const SpeechTrainerPage = () => {
     }
 
     try {
+      const coachingHistory = isA1A2Level
+        ? [...priorHistory, { role: "assistant", content: "Coach style: use easy German (A1/A2), short sentences, and brief English support for difficult words." }]
+        : priorHistory;
+
       const response = await requestPresentationCoachReply({
         message: payload.message,
         level,
-        history: priorHistory,
+        history: coachingHistory,
         idToken,
       });
 
@@ -344,7 +353,9 @@ const SpeechTrainerPage = () => {
   const handleTopicPresetClick = async (presetTopic) => {
     if (loading || completed) return;
     setTopic(presetTopic);
-    const message = `Topic selected: ${presetTopic}. Please start the 6-step coaching flow with the first German question.`;
+    const message = isA1A2Level
+      ? `Topic selected: ${presetTopic}. Please start with easy German + short English help for A1/A2 learner.`
+      : `Topic selected: ${presetTopic}. Please start the 6-step coaching flow with the first German question.`;
     const history = chatMessages.map(({ role, content }) => ({ role, content }));
     await submitMessage({ message, history });
   };
@@ -393,7 +404,7 @@ const SpeechTrainerPage = () => {
     const hasContent = chatMessages.length > 1 || chatInput.trim();
     if (hasContent && !window.confirm("Are you sure you want to reset? Your current chat will be cleared.")) return;
 
-    setChatMessages([initialCoachMessage]);
+    setChatMessages([getInitialCoachMessage(isA1A2Level)]);
     setChatInput("");
     setAnswersDone(0);
     setCompleted(false);
@@ -482,7 +493,7 @@ const SpeechTrainerPage = () => {
           <span style={styles.levelPill}>Level {level}</span>
         </div>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          Welcome {studentName}. You are chatting with {tutorName}. 6-step preparation flow with corrections, upgrades, and final speaking scripts.
+          Welcome {studentName}. You are chatting with {tutorName}. {isA1A2Level ? "Simple German + English support mode." : "6-step preparation flow with corrections, upgrades, and final speaking scripts."}
         </p>
         <div style={{ ...styles.card, margin: 0, background: "#eff6ff" }}>
           <strong style={{ fontSize: 13 }}>Before you begin</strong>
@@ -627,7 +638,7 @@ const SpeechTrainerPage = () => {
             onKeyDown={handleInputKeyDown}
             rows={4}
             style={styles.textareaSmall}
-            placeholder="Type your answer in German..."
+            placeholder={isA1A2Level ? "Write simple German. You may add small English support words..." : "Type your answer in German..."}
             disabled={loading || completed}
           />
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
