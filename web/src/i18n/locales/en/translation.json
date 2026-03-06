@@ -60,6 +60,7 @@
     },
     "examTabs": {
       "overview": "Overview",
+      "tutor": "Tutor feedback",
       "speaking": "Speaking",
       "writing": "Writing",
       "vocab": "Vocab",
