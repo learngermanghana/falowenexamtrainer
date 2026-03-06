@@ -30,6 +30,7 @@ const MAX_RESUBMISSION_TRIES = 3;
 const ACTION_COOLDOWN_MS = 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
+const PASS_THRESHOLD_SCORE = 60;
 
 const formatDate = (timestamp) => {
   if (!timestamp) return "–";
@@ -58,6 +59,8 @@ const normalizeIdPart = (value) =>
     .slice(0, 120);
 
 const safeLower = (v) => String(v || "").toLowerCase();
+
+const normalizeAssignmentIdentity = (value) => String(value || "").toLowerCase().replace(/\s+/g, "").replace(/_/g, "-").trim();
 
 const normalizeSubmissionText = (value) =>
   String(value || "")
@@ -116,6 +119,16 @@ const hasAssignmentMarker = (entry) => {
 const getFeedbackFromSubmission = (entry) =>
   entry?.feedback || entry?.tutorFeedback || entry?.reviewFeedback || entry?.reviewNotes || "";
 
+const toNumericScore = (value) => {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const normalized = value.replace("%", "").trim();
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
 const AssignmentSubmissionPage = () => {
   const { t, i18n } = useTranslation();
   const { user, studentProfile } = useAuth();
@@ -170,6 +183,7 @@ const AssignmentSubmissionPage = () => {
           chapter,
           occurrence,
           label,
+          assignmentId: entry.assignmentId || null,
           assignment: hasAssignmentMarker(entry),
         };
       });
@@ -301,6 +315,27 @@ const AssignmentSubmissionPage = () => {
     [assignmentDictionary]
   );
 
+  const buildAssignmentId = useCallback(
+    (title) => {
+      if (!title) return null;
+
+      const entry = assignmentDictionary.find((item) => item.label === title);
+      const normalizedLevel = normalizeIdPart(preferredLevel || "general");
+
+      if (entry?.assignmentId) return `${normalizedLevel}-${normalizeIdPart(entry.assignmentId)}`;
+      if (entry?.chapter) return `${normalizedLevel}-${normalizeIdPart(entry.chapter)}`;
+
+      const chapterMatch = String(title).match(/\b(\d+(?:\.\d+)?)\b/);
+      if (chapterMatch?.[1]) return `${normalizedLevel}-${normalizeIdPart(chapterMatch[1])}`;
+
+      const chapterKey = buildChapterKey(title);
+      if (chapterKey) return `${normalizedLevel}-${normalizeIdPart(chapterKey)}`;
+
+      return `${normalizedLevel}-${normalizeIdPart(title)}`;
+    },
+    [assignmentDictionary, buildChapterKey, preferredLevel]
+  );
+
   const getLockDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
@@ -323,6 +358,7 @@ const AssignmentSubmissionPage = () => {
       assignmentTitle: form.assignmentTitle,
       level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
       chapter: deriveChapterValue(form.assignmentTitle),
+      assignmentId: buildAssignmentId(form.assignmentTitle),
       chapterKey: buildChapterKey(form.assignmentTitle),
       submissionLink: null,
       submissionText: form.submissionText.trim(),
@@ -343,6 +379,7 @@ const AssignmentSubmissionPage = () => {
     }),
     [
       buildChapterKey,
+      buildAssignmentId,
       deriveChapterValue,
       form.assignmentTitle,
       form.submissionText,
@@ -594,18 +631,45 @@ const AssignmentSubmissionPage = () => {
   );
 
   const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
+  const selectedAssignmentId = useMemo(
+    () => buildAssignmentId(form.assignmentTitle),
+    [buildAssignmentId, form.assignmentTitle]
+  );
+
+  const isSameSelectedAssignment = useCallback(
+    (entry) => {
+      const entryAssignmentId = entry?.assignmentId || entry?.assignment_id || entry?.assignmentKey || null;
+      if (selectedAssignmentId && entryAssignmentId) {
+        return normalizeAssignmentIdentity(entryAssignmentId) === normalizeAssignmentIdentity(selectedAssignmentId);
+      }
+
+      const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
+      if (selectedChapterKey && entryChapterKey) return entryChapterKey === selectedChapterKey;
+
+      return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(form.assignmentTitle);
+    },
+    [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedChapterKey]
+  );
 
   const selectedResubmissionCount = useMemo(() => {
     return recentSubmissions.reduce((count, entry) => {
       if (safeLower(entry?.status) !== "resubmitted") return count;
 
-      const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
-      if (selectedChapterKey && entryChapterKey) return entryChapterKey === selectedChapterKey ? count + 1 : count;
-
-      const entryTitle = safeLower(entry?.assignmentTitle || entry?.title);
-      return entryTitle && entryTitle === safeLower(form.assignmentTitle) ? count + 1 : count;
+      return isSameSelectedAssignment(entry) ? count + 1 : count;
     }, 0);
-  }, [buildChapterKey, form.assignmentTitle, recentSubmissions, selectedChapterKey]);
+  }, [isSameSelectedAssignment, recentSubmissions]);
+
+  const selectedAssignmentPassed = useMemo(() => {
+    return recentSubmissions.some((entry) => {
+      if (!isSameSelectedAssignment(entry)) return false;
+
+      const normalizedStatus = safeLower(entry?.reviewStatus || entry?.status || entry?.result);
+      if (["approved", "pass", "passed", "complete", "completed"].includes(normalizedStatus)) return true;
+
+      const score = toNumericScore(entry?.score ?? entry?.finalScore ?? entry?.mark ?? entry?.grade);
+      return typeof score === "number" && score >= PASS_THRESHOLD_SCORE;
+    });
+  }, [isSameSelectedAssignment, recentSubmissions]);
 
   const remainingResubmissions = Math.max(0, MAX_RESUBMISSION_TRIES - selectedResubmissionCount);
   const resubmissionLimitReached = remainingResubmissions === 0;
@@ -684,27 +748,57 @@ const AssignmentSubmissionPage = () => {
   const decoratedAssignmentOptions = useMemo(() => {
     return assignmentOptions.map((opt) => {
       const key = buildChapterKey(opt);
-      const submitted = key ? lockedChapters.has(key) : false;
+      const optionAssignmentId = buildAssignmentId(opt);
       const dayNumber = deriveChapterValue(opt);
       const isDayZero = dayNumber === 0;
       const isNotYetAvailable =
         Number.isFinite(dayNumber) && Number.isFinite(maxUnlockedDay) && dayNumber > maxUnlockedDay;
 
-      let stateLabel = isGerman ? "Bereit zur Abgabe" : "Ready to submit";
-      if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
+      const hasSubmission = recentSubmissions.some((entry) => {
+        const statusLabel = safeLower(entry?.status);
+        if (!["submitted", "resubmitted"].includes(statusLabel)) return false;
+
+        const entryAssignmentId = entry?.assignmentId || entry?.assignment_id || entry?.assignmentKey || null;
+        if (optionAssignmentId && entryAssignmentId) {
+          return normalizeAssignmentIdentity(optionAssignmentId) === normalizeAssignmentIdentity(entryAssignmentId);
+        }
+
+        const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
+        if (key && entryChapterKey) return key === entryChapterKey;
+
+        return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(opt);
+      });
+
+      const submitted = Boolean((key && lockedChapters.has(key)) || hasSubmission);
+      const hasDraft = Boolean(String(draftsByAssignment?.[opt]?.submissionText || "").trim());
+
+      let stateLabel = isGerman ? "Nicht gestartet" : "Not started";
+      if (hasDraft) stateLabel = isGerman ? "In Bearbeitung" : "In progress";
       if (submitted) stateLabel = isGerman ? "Eingereicht" : "Submitted";
+      if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
       if (isNotYetAvailable) stateLabel = isGerman ? "Gesperrt (noch nicht verfügbar)" : "Locked (not yet available)";
 
       return {
         label: `${opt} — ${stateLabel}`,
         value: opt,
         submitted,
+        hasDraft,
         isDayZero,
         isNotYetAvailable,
         disabled: isDayZero || isNotYetAvailable,
       };
     });
-  }, [assignmentOptions, buildChapterKey, deriveChapterValue, isGerman, lockedChapters, maxUnlockedDay]);
+  }, [
+    assignmentOptions,
+    buildAssignmentId,
+    buildChapterKey,
+    deriveChapterValue,
+    draftsByAssignment,
+    isGerman,
+    lockedChapters,
+    maxUnlockedDay,
+    recentSubmissions,
+  ]);
 
 
   const dynamicMaxSubmissionCharacters = useMemo(() => {
@@ -970,6 +1064,7 @@ const AssignmentSubmissionPage = () => {
         assignmentTitle: form.assignmentTitle,
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
         chapter: deriveChapterValue(form.assignmentTitle),
+        assignmentId: buildAssignmentId(form.assignmentTitle),
         chapterKey: buildChapterKey(form.assignmentTitle),
         studentId: user.uid,
         studentEmail: user?.email || "",
@@ -1094,6 +1189,15 @@ const AssignmentSubmissionPage = () => {
       return;
     }
 
+    if (selectedAssignmentPassed) {
+      setResubmissionStatus({
+        loading: false,
+        error: "This assignment is already passed, so resubmission is disabled.",
+        success: "",
+      });
+      return;
+    }
+
     if (resubmissionLimitReached) {
       setResubmissionStatus({
         loading: false,
@@ -1118,6 +1222,7 @@ const AssignmentSubmissionPage = () => {
         assignmentTitle: form.assignmentTitle,
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
         chapter: deriveChapterValue(form.assignmentTitle),
+        assignmentId: buildAssignmentId(form.assignmentTitle),
         chapterKey: buildChapterKey(form.assignmentTitle),
         studentId: user.uid,
         studentEmail: user?.email || "",
@@ -1198,7 +1303,7 @@ const AssignmentSubmissionPage = () => {
                 ))}
               </select>
 
-              {isSelectedLocked ? (
+              {isSelectedLocked && !selectedAssignmentPassed ? (
                 <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span
                     style={{
@@ -1338,7 +1443,7 @@ const AssignmentSubmissionPage = () => {
             </button>
 
             <span style={styles.helperText}>Drafts can be saved anytime. Submission is locked after the first confirmed send.</span>
-            {isSelectedLocked ? (
+            {isSelectedLocked && !selectedAssignmentPassed ? (
               <span style={{ ...styles.helperText, color: "#b45309" }}>
                 Locked: you already submitted this assignment.
               </span>
@@ -1395,7 +1500,7 @@ const AssignmentSubmissionPage = () => {
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
           <h3 style={{ margin: 0 }}>Resubmission</h3>
-          <span style={styles.badge}>{isSelectedLocked ? "Available" : "Not available"}</span>
+          <span style={styles.badge}>{isSelectedLocked && !selectedAssignmentPassed ? "Available" : "Not available"}</span>
         </div>
 
         <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
@@ -1411,7 +1516,7 @@ const AssignmentSubmissionPage = () => {
           </div>
         </div>
 
-        {isSelectedLocked ? (
+        {isSelectedLocked && !selectedAssignmentPassed ? (
           <>
             <p style={{ ...styles.helperText, margin: 0 }}>
               You can resubmit <strong>{assignmentInfo}</strong> here in the app. Tell us exactly what improved so tutors can see this is stronger work.
@@ -1480,8 +1585,12 @@ const AssignmentSubmissionPage = () => {
           </>
         ) : (
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Resubmission is only available after you submit <strong>this selected assignment</strong>.  
-            If you haven’t submitted it yet, submit first — then the resubmission button will appear here.
+            {selectedAssignmentPassed
+              ? "Great news: this assignment is already passed, so no resubmission is needed."
+              : <>
+                  Resubmission is only available after you submit <strong>this selected assignment</strong>.  
+                  If you haven’t submitted it yet, submit first — then the resubmission button will appear here.
+                </>}
           </p>
         )}
       </div>
