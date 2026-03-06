@@ -55,6 +55,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [markSubmitStatus, setMarkSubmitStatus] = useState(null);
   const [improvedLetterText, setImprovedLetterText] = useState("");
   const [improvedFeedback, setImprovedFeedback] = useState("");
+  const [latestMarkedDraftText, setLatestMarkedDraftText] = useState("");
+  const [latestMarkedFeedback, setLatestMarkedFeedback] = useState("");
   const [improvedLoading, setImprovedLoading] = useState(false);
   const [campusImproveTrials, setCampusImproveTrials] = useState(0);
   const [ideaInput, setIdeaInput] = useState("");
@@ -373,6 +375,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         setImprovedLetterText(trimmed);
         setImprovedFeedback("");
         setCampusImproveTrials(0);
+        setLatestMarkedDraftText(trimmed);
+        setLatestMarkedFeedback(data.feedback || "");
       }
       setMarkSubmitStatus({
         submissionSaved: Boolean(data?.submissionSaved),
@@ -428,10 +432,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         idToken,
         program: studentProfile?.program,
         submissionContext: "campus-improved",
+        previousText: latestMarkedDraftText || letterText,
+        previousFeedback: latestMarkedFeedback || markFeedback,
       });
 
       setImprovedFeedback(data.feedback);
       setCampusImproveTrials((prev) => prev + 1);
+      setLatestMarkedDraftText(trimmed);
+      setLatestMarkedFeedback(data.feedback || "");
     } catch (err) {
       const message =
         err?.response?.data?.error || err.message || "Could not mark improved draft right now.";

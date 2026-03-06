@@ -191,7 +191,7 @@ const markPrompt = ({ schreibenLevel, studentName, program, submissionContext })
     ? "13. Campus mode rule: end your feedback with a heading 'Next improvement task' and provide exactly 3 short actions the student must fix before submission. Keep each action simple and specific.\n"
     : "";
   const campusImprovedInstruction = isCampusImprovedSubmission
-    ? "14. This is an improved campus draft. Briefly compare against the previous attempt and state whether the student fixed key issues.\n"
+    ? "14. This is an improved campus draft. You will receive a current draft plus previous draft/feedback context in the user message. Compare concretely and state what improved, what is still wrong, and how that affects the score.\n"
     : "";
   if (program === "french") {
     return `You are a supportive French writing coach.\n
