@@ -47,6 +47,7 @@ import A2Day6TwoCasePrepositionsGrammarPage from "./components/A2Day6TwoCasePrep
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
+import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3AskingAboutPricesWorkbookPage";
 import A1Day1GreetingsGrammarPage from "./components/A1Day1GreetingsGrammarPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
@@ -572,6 +573,10 @@ const AppShell = ({
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
           <Route path="/campus/course/the-12-hour-clock-system-in-german-chapter-7" element={<TwelveHourClockPage />} />
           <Route path="/campus/course/modal-verbs-day-14-3-6" element={<A1Day14ModalVerbsWorkbookPage />} />
+          <Route
+            path="/campus/course/a1-chapter-3-asking-about-prices-workbook"
+            element={<A1Chapter3AskingAboutPricesWorkbookPage />}
+          />
           <Route
             path="/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1"
             element={<A1Day1GreetingsGrammarPage />}
