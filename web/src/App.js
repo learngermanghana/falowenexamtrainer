@@ -910,7 +910,7 @@ const ExamArea = ({ onBack }) => {
         </div>
       </div>
 
-      {examSection === "tutor" ? <WritingPage mode="exam" initialTab="tutor" allowedTabKeys={["tutor"]} /> : null}
+      {examSection === "tutor" ? <WritingPage mode="exam" initialTab="tutor" /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}

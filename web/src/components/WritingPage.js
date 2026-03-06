@@ -317,7 +317,7 @@ const WordCountMeter = ({ count, range }) => {
   );
 };
 
-const WritingPage = ({ mode = "course", initialTab = "mark", allowedTabKeys = null }) => {
+const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const {
     level,
     setLevel,
@@ -490,20 +490,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark", allowedTabKeys = nu
     return tabs;
   }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters, canUseTutorFeedback]);
 
-  const visibleTabs = useMemo(() => {
-    if (!Array.isArray(allowedTabKeys) || allowedTabKeys.length === 0) {
-      return availableTabs;
-    }
-
-    return availableTabs.filter((tab) => allowedTabKeys.includes(tab.key));
-  }, [allowedTabKeys, availableTabs]);
-  const isTutorOnlyView = visibleTabs.length === 1 && visibleTabs[0]?.key === "tutor";
-
   useEffect(() => {
-    if (visibleTabs.some((tab) => tab.key === initialTab)) {
+    if (availableTabs.some((tab) => tab.key === initialTab)) {
       setActiveTab(initialTab);
     }
-  }, [visibleTabs, initialTab]);
+  }, [availableTabs, initialTab]);
   const progressMode = isExamMode ? "exam" : "course";
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
