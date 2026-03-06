@@ -869,7 +869,7 @@ const RAW_COURSE_SCHEDULES = {
       chapter: null,
       goal: "🎯 Goal: Celebrate your achievement and plan your next steps.",
       instruction:
-        "📝 Instruction: Congratulations on finishing your A1 course. \nYou worked hard and made great progress. Finishing the course is one step—now it's time to prepare for your exams. Visit the [Exams page](https://www.falowen.app/exams) and download your study calendar: https://www.falowen.app/exams/study?force=1. The school will confirm your results and send your completion certificate to your email. \n\nKindly communicate with us what you would like to do next by emailing **learngermanghana@gmail.com**. \nYou can prepare for the A1 exams or progress to A2. We wish you continued success in your journey.",
+        "📝 Instruction: Congratulations on finishing your A1 course.\n\nYou worked hard and made great progress. Completing the course is a big milestone—now let’s focus on exam preparation.\n\n1. Visit the [Exams page](https://www.falowen.app/exams).\n2. Download your study calendar here: https://www.falowen.app/exams/study?force=1.\n\nThe school will confirm your results and send your completion certificate to your email.\n\nPlease tell us what you would like to do next by emailing **learngermanghana@gmail.com**.\nYou can prepare for the A1 exam or continue to A2.\n\nWe wish you continued success in your learning journey!",
     },
   ],
   A2: A2_SCHEDULE,
