@@ -47,6 +47,7 @@ import A2Day6TwoCasePrepositionsGrammarPage from "./components/A2Day6TwoCasePrep
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import B1Day26ReiseproblemeUndLoesungenWorkbookPage from "./components/B1Day26ReiseproblemeUndLoesungenWorkbookPage";
+import B1Day27UmweltfreundlichImAlltagWorkbookPage from "./components/B1Day27UmweltfreundlichImAlltagWorkbookPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
 import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3AskingAboutPricesWorkbookPage";
 import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCasesWorkbookPage";
@@ -570,6 +571,10 @@ const AppShell = ({
           <Route
             path="/campus/course/b1-day-26-reiseprobleme-und-loesungen-workbook"
             element={<B1Day26ReiseproblemeUndLoesungenWorkbookPage />}
+          />
+          <Route
+            path="/campus/course/b1-day-27-umweltfreundlich-im-alltag-workbook"
+            element={<B1Day27UmweltfreundlichImAlltagWorkbookPage />}
           />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />
           <Route path="/campus/course/health-and-body-parts-14-1" element={<HealthBodyPartsPage />} />

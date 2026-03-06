@@ -1291,13 +1291,14 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Umweltfreundlich im Alltag 10.27",
       chapter: "10.27",
       goal: "Umweltfreundliches Verhalten im Alltag beschreiben.",
-      instruction: "Schau das Video, wiederhole die Grammatik und mache die Aufgabe.",
+      instruction: "Arbeite alle vier Teile im in-app Workbook durch. Reiche Antworten nur im Abgabebereich ein; markiert werden Lesen und Schreiben.",
       assignment: true,
+      grammar_topic: "Umweltfreundliches Verhalten im Alltag, nachhaltige Gewohnheiten und bewusste Entscheidungen",
       lesen_hören: {
-        video: "",
-        youtube_link: "",
+        video: "https://youtu.be/jzm-MnWC7I0",
+        youtube_link: "https://youtu.be/jzm-MnWC7I0",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/15fjOKp_u75GfcbvRJVbR8UbHg-cgrgWL/view?usp=sharing",
+        workbook_link: "/campus/course/b1-day-27-umweltfreundlich-im-alltag-workbook",
       },
     },
     {
