@@ -488,6 +488,14 @@ const AppShell = ({
       </header>
       <OfflineBanner />
 
+      {location.pathname.startsWith("/campus/course/") ? (
+        <CampusQuickNavigation
+          allowedSections={allowedSections}
+          availableTabs={availableTabs}
+          tabStructure={tabStructure}
+        />
+      ) : null}
+
       <main className="layout-main" style={{ minWidth: 0 }}>
         <Routes>
           <Route
@@ -602,6 +610,66 @@ const AppShell = ({
       </main>
       <StudyBuddyBar studentProfile={studentProfile} />
     </div>
+  );
+};
+
+
+const CampusQuickNavigation = ({ allowedSections, availableTabs, tabStructure }) => {
+  const navigate = useNavigate();
+
+  const activeMainTabConfig = useMemo(
+    () => getMainTabForSection("course", tabStructure),
+    [tabStructure]
+  );
+
+  const handleMainTabClick = (tab) => {
+    if (tab.section) {
+      navigate(`/campus/${tab.section}`);
+      return;
+    }
+
+    const firstAllowed = tab.sections.find((entry) => allowedSections[entry.key]);
+    if (firstAllowed) {
+      navigate(`/campus/${firstAllowed.key}`);
+    }
+  };
+
+  return (
+    <>
+      <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
+        {availableTabs.map((tab) => {
+          const activeMainTab = activeMainTabConfig?.key;
+          return (
+            <button
+              key={tab.key}
+              style={activeMainTab === tab.key ? styles.navButtonActive : styles.navButton}
+              onClick={() => handleMainTabClick(tab)}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {activeMainTabConfig?.sections ? (
+        <div
+          className="nav-row"
+          style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 12, marginTop: -4 }}
+        >
+          {activeMainTabConfig.sections
+            .filter((subTab) => allowedSections[subTab.key])
+            .map((subTab) => (
+              <button
+                key={subTab.key}
+                style={subTab.key === "course" ? styles.navButtonActive : styles.navButton}
+                onClick={() => navigate(`/campus/${subTab.key}`)}
+              >
+                {subTab.label}
+              </button>
+            ))}
+        </div>
+      ) : null}
+    </>
   );
 };
 
