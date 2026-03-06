@@ -8,6 +8,7 @@ import {
   onSnapshot,
   isFirebaseConfigured,
   query,
+  orderBy,
   serverTimestamp,
   updateDoc,
   where,
@@ -114,7 +115,11 @@ export const loadLatestTutorReviewForStudent = async ({ userId, studentCode } = 
     return null;
   }
 
-  const reviewQuery = query(collection(db, COLLECTION_NAME), where("ownerKey", "in", ownerCandidates));
+  const reviewQuery = query(
+    collection(db, COLLECTION_NAME),
+    where("ownerKey", "in", ownerCandidates),
+    orderBy("createdAt", "desc")
+  );
   const snapshot = await getDocs(reviewQuery);
   if (snapshot.empty) return null;
 
