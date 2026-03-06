@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -56,7 +56,6 @@ const parseRubric = (text) => {
   return {
     grammar: parseScore("grammar"),
     vocabulary: parseScore("vocabulary"),
-    pronunciationReadiness: parseScore("pronunciation readiness"),
     structure: parseScore("structure"),
   };
 };
@@ -103,7 +102,7 @@ const SpeechTrainerPage = () => {
   const charsCount = chatInput.trim().length;
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
 
-  const refreshHistory = async () => {
+  const refreshHistory = useCallback(async () => {
     if (!idToken) return;
     try {
       const response = await loadPresentationSessions({ idToken });
@@ -111,11 +110,11 @@ const SpeechTrainerPage = () => {
     } catch (historyError) {
       console.warn("Could not load presentation session history", historyError);
     }
-  };
+  }, [idToken]);
 
   useEffect(() => {
     refreshHistory();
-  }, [idToken]);
+  }, [refreshHistory]);
 
   const submitMessage = async (payload) => {
     setError("");
@@ -239,7 +238,6 @@ const SpeechTrainerPage = () => {
             rubric: rubric || {
               grammar: 0,
               vocabulary: 0,
-              pronunciationReadiness: 0,
               structure: 0,
             },
             studentName,
@@ -254,7 +252,7 @@ const SpeechTrainerPage = () => {
     };
 
     persistSession();
-  }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName]);
+  }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, refreshHistory]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -345,7 +343,6 @@ const SpeechTrainerPage = () => {
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {scorePill("Grammar", rubric.grammar)}
               {scorePill("Vocabulary range", rubric.vocabulary)}
-              {scorePill("Pronunciation readiness", rubric.pronunciationReadiness)}
               {scorePill("Structure", rubric.structure)}
             </div>
           </div>
