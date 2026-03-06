@@ -5,8 +5,10 @@ import {
   doc,
   db,
   getDocs,
+  onSnapshot,
   isFirebaseConfigured,
   query,
+  orderBy,
   serverTimestamp,
   updateDoc,
   where,
@@ -113,7 +115,11 @@ export const loadLatestTutorReviewForStudent = async ({ userId, studentCode } = 
     return null;
   }
 
-  const reviewQuery = query(collection(db, COLLECTION_NAME), where("ownerKey", "in", ownerCandidates));
+  const reviewQuery = query(
+    collection(db, COLLECTION_NAME),
+    where("ownerKey", "in", ownerCandidates),
+    orderBy("createdAt", "desc")
+  );
   const snapshot = await getDocs(reviewQuery);
   if (snapshot.empty) return null;
 
@@ -124,6 +130,63 @@ export const loadLatestTutorReviewForStudent = async ({ userId, studentCode } = 
   return latest || null;
 };
 
+export const loadTutorReviewsForStudent = async ({ userId, studentCode } = {}) => {
+  const ownerCandidates = [
+    String(studentCode || "").trim().toLowerCase(),
+    String(userId || "").trim().toLowerCase(),
+  ].filter(Boolean);
+
+  if (!ownerCandidates.length) return [];
+
+  if (!isFirebaseConfigured || !db) {
+    return [];
+  }
+
+  const reviewQuery = query(
+    collection(db, COLLECTION_NAME),
+    where("ownerKey", "in", ownerCandidates),
+    orderBy("createdAt", "desc")
+  );
+  const snapshot = await getDocs(reviewQuery);
+  if (snapshot.empty) return [];
+
+  return snapshot.docs
+    .map((docSnap) => normalizeReviewTimestamps({ id: docSnap.id, ...docSnap.data() }))
+    .sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+};
+
+
+export const subscribeTutorReviewsForStudent = ({ userId, studentCode } = {}, onChange, onError) => {
+  const ownerCandidates = [
+    String(studentCode || "").trim().toLowerCase(),
+    String(userId || "").trim().toLowerCase(),
+  ].filter(Boolean);
+
+  if (!ownerCandidates.length || !isFirebaseConfigured || !db) {
+    if (typeof onChange === "function") onChange([]);
+    return () => {};
+  }
+
+  const reviewQuery = query(
+    collection(db, COLLECTION_NAME),
+    where("ownerKey", "in", ownerCandidates),
+    orderBy("createdAt", "desc")
+  );
+
+  return onSnapshot(
+    reviewQuery,
+    (snapshot) => {
+      const reviews = snapshot.docs
+        .map((docSnap) => normalizeReviewTimestamps({ id: docSnap.id, ...docSnap.data() }))
+        .sort((a, b) => (b.createdAtMs || 0) - (a.createdAtMs || 0));
+
+      if (typeof onChange === "function") onChange(reviews);
+    },
+    (error) => {
+      if (typeof onError === "function") onError(error);
+    }
+  );
+};
 export const saveTutorReviewResponse = async ({ reviewId, reviewStatus, tutorFeedback = "" } = {}) => {
   if (!reviewId) {
     throw new Error("Missing reviewId for tutor response.");
