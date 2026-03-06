@@ -10,7 +10,8 @@
     "serve": "firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
-    "seed:announcements": "node scripts/seedAnnouncements.js"
+    "seed:announcements": "node scripts/seedAnnouncements.js",
+    "migrate:assignment-keys": "node scripts/backfillAssignmentKeys.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
