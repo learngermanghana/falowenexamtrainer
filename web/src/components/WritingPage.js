@@ -317,7 +317,7 @@ const WordCountMeter = ({ count, range }) => {
   );
 };
 
-const WritingPage = ({ mode = "course" }) => {
+const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const {
     level,
     setLevel,
@@ -340,7 +340,7 @@ const WritingPage = ({ mode = "course" }) => {
     []
   );
 
-  const [activeTab, setActiveTab] = useState("mark");
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [writingTasks, setWritingTasks] = useState(() =>
     isExamMode ? examWritingLetters : courseWritingLetters
   );
@@ -489,6 +489,12 @@ const WritingPage = ({ mode = "course" }) => {
 
     return tabs;
   }, [canUseFormsPractice, canUseIdeasGenerator, canUsePracticeLetters, canUseTutorFeedback]);
+
+  useEffect(() => {
+    if (availableTabs.some((tab) => tab.key === initialTab)) {
+      setActiveTab(initialTab);
+    }
+  }, [availableTabs, initialTab]);
   const progressMode = isExamMode ? "exam" : "course";
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
