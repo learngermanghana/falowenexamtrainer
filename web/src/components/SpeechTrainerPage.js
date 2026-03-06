@@ -116,7 +116,7 @@ const scorePill = (label, value) => (
 
 const PRIMARY_TAGS = ["question_de", "abschluss_de", "praesentation_de"];
 
-const renderAssistantContent = (content) => {
+const renderAssistantContent = (content, isA1A2Level) => {
   const taggedFields = extractAllTaggedFields(content).filter((field) => field.value);
   if (!taggedFields.length) {
     return <div style={{ whiteSpace: "pre-wrap" }}>{content}</div>;
@@ -151,7 +151,12 @@ const renderAssistantContent = (content) => {
       ))}
       {secondaryFields.length ? (
         <details style={{ ...blockStyle, background: "#f8fafc", borderColor: "#e5e7eb" }}>
-          <summary style={{ cursor: "pointer", fontWeight: 600 }}>Mehr Hinweise anzeigen</summary>
+          <summary style={{ cursor: "pointer", fontWeight: 600 }}>{isA1A2Level ? "Mehr Hilfe öffnen (Tipps + Beispiele)" : "Weitere Coaching‑Tipps & Vorschläge anzeigen"}</summary>
+          {isA1A2Level ? (
+            <div style={{ fontSize: 12, color: "#475569", marginTop: 6 }}>
+              Hier findest du extra Satzideen, Wörter und kleine Beispiele.
+            </div>
+          ) : null}
           <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
             {secondaryFields.map((field) => (
               <div key={`${field.tag}-${field.value.slice(0, 30)}`}>
@@ -578,7 +583,7 @@ const SpeechTrainerPage = () => {
             return (
               <div key={`${message.role}-${index}`} style={{ display: "grid", gap: 6 }}>
                 <div style={isUser ? styles.chatBubbleUser : styles.chatBubbleCoach}>
-                  {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content)}
+                  {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content, isA1A2Level)}
                   {message?.meta?.type === "upgrade" && message?.meta?.why ? (
                     <details style={{ marginTop: 8 }}>
                       <summary style={{ cursor: "pointer" }}>Why this upgrade</summary>
