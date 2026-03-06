@@ -207,35 +207,81 @@ const Callout = ({ children }) => (
   </div>
 );
 
-const ChallengeCard = ({ title, prompt, hint, answer, level }) => (
-  <div
-    style={{
-      border: "1px solid #e6e8ef",
-      borderRadius: 12,
-      padding: 12,
-      display: "grid",
-      gap: 8,
-      background: "#fbfbfd",
-    }}
-  >
-    {title && <strong>{title}</strong>}
-    {level && (
-      <span
+const formatPrompt = (prompt) => {
+  const [instruction, ...parts] = prompt.split(": ");
+
+  if (!parts.length) {
+    return { instruction: prompt, sentenceA: "", sentenceB: "" };
+  }
+
+  const combinedSentences = parts.join(": ");
+  const [sentenceA = "", sentenceB = ""] = combinedSentences
+    .split(". ")
+    .map((part) => part.trim().replace(/\.$/, ""));
+
+  return { instruction, sentenceA, sentenceB };
+};
+
+const ChallengeCard = ({ title, prompt, hint, answer, level }) => {
+  const { instruction, sentenceA, sentenceB } = formatPrompt(prompt);
+
+  return (
+    <div
+      style={{
+        border: "1px solid #dce1f0",
+        borderRadius: 14,
+        padding: 14,
+        display: "grid",
+        gap: 10,
+        background: "#fbfbfd",
+      }}
+    >
+      {title && <strong>{title}</strong>}
+      {level && (
+        <span
+          style={{
+            width: "fit-content",
+            fontSize: 12,
+            fontWeight: 600,
+            padding: "4px 8px",
+            borderRadius: 999,
+            background: "#eef2ff",
+            color: "#3f51d6",
+          }}
+        >
+          {level}
+        </span>
+      )}
+
+      <div
         style={{
-          width: "fit-content",
-          fontSize: 12,
-          fontWeight: 600,
-          padding: "4px 8px",
-          borderRadius: 999,
-          background: "#eef2ff",
-          color: "#3f51d6",
+          background: "#ffffff",
+          border: "1px solid #e4e8f5",
+          borderRadius: 10,
+          padding: "10px 12px",
+          display: "grid",
+          gap: 8,
         }}
       >
-        {level}
-      </span>
-    )}
+        <strong style={{ color: "#20263a" }}>Question</strong>
+        <span style={{ color: "#1f2430", fontWeight: 500 }}>{instruction}</span>
 
-    <span style={{ color: "#1f2430" }}>{prompt}</span>
+        {(sentenceA || sentenceB) && (
+          <div
+            style={{
+              display: "grid",
+              gap: 6,
+              padding: "8px 10px",
+              borderRadius: 8,
+              background: "#f5f8ff",
+              border: "1px solid #e2e9ff",
+            }}
+          >
+            {sentenceA && <span>• {sentenceA}.</span>}
+            {sentenceB && <span>• {sentenceB}.</span>}
+          </div>
+        )}
+      </div>
 
     <div
       style={{
@@ -255,8 +301,9 @@ const ChallengeCard = ({ title, prompt, hint, answer, level }) => (
       </summary>
       <p style={{ margin: "8px 0 0" }}>{answer}</p>
     </details>
-  </div>
-);
+    </div>
+  );
+};
 
 const PracticeSectionBlock = ({ title, explanation, exercises }) => (
   <div style={{ display: "grid", gap: 12 }}>
