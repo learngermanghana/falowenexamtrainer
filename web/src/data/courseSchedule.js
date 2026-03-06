@@ -454,7 +454,7 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: {
         video: "https://youtu.be/NmaHd9xsGvw",
         youtube_link: "https://youtu.be/NmaHd9xsGvw",
-        grammarbook_link: "https://drive.google.com/file/d/10UPl4n5FzukSDiTIlcM-WjmNuJGz9OgL/view?usp=sharing",
+        grammarbook_link: "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
         workbook_link: "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
         assignment: true,
       },
