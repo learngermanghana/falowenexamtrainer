@@ -274,6 +274,14 @@ const GeneralHome = ({
         />
       </section>
 
+      <section style={{ ...styles.card, padding: 0, overflow: "hidden" }} aria-hidden="true">
+        <img
+          src="/learning-space-hero.svg"
+          alt=""
+          style={{ display: "block", width: "100%", height: "auto" }}
+        />
+      </section>
+
       <div style={styles.gridTwo}>
         <section
           style={{
