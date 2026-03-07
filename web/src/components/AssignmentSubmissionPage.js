@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { InfoBox } from "./ui";
 import ExamReadinessBadge from "./ExamReadinessBadge";
@@ -7,6 +8,7 @@ import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
 import { buildAssignmentCatalogForLevel, resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { fetchAnswerKeyRegistry, resolveAnswerKeySource } from "../services/answerKeyRegistryService";
 import {
   addDoc,
   collection,
@@ -132,6 +134,7 @@ const toNumericScore = (value) => {
 
 const AssignmentSubmissionPage = () => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const { user, studentProfile } = useAuth();
   const [badgeRefreshToken, setBadgeRefreshToken] = useState(0);
   const [openedFeedbackId, setOpenedFeedbackId] = useState(null);
@@ -158,10 +161,10 @@ const AssignmentSubmissionPage = () => {
 
   const assignmentDictionary = useMemo(() => {
     const levelSchedule = courseSchedules[preferredLevel] || [];
-    const catalogByDay = new Map(
+    const catalogByComposite = new Map(
       buildAssignmentCatalogForLevel(preferredLevel)
         .filter((entry) => typeof entry?.day !== "undefined")
-        .map((entry) => [String(entry.day), entry])
+        .map((entry) => [`${String(entry.day)}::${entry.occurrence || 1}`, entry])
     );
     const duplicateCountByDay = levelSchedule.reduce((acc, entry) => {
       if (typeof entry.day === "undefined" || !entry.topic) return acc;
@@ -191,7 +194,14 @@ const AssignmentSubmissionPage = () => {
           label,
           assignmentId: entry.assignmentId || null,
           canonicalAssignmentId:
-            catalogByDay.get(String(entry.day))?.canonicalAssignmentId ||
+            catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.canonicalAssignmentId ||
+            resolveAssignmentCanonicalKey({
+              level: preferredLevel,
+              assignmentId: entry.assignmentId,
+              assignmentTitle: label,
+            }),
+          assignmentKey:
+            catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.assignmentKey ||
             resolveAssignmentCanonicalKey({
               level: preferredLevel,
               assignmentId: entry.assignmentId,
@@ -258,6 +268,7 @@ const AssignmentSubmissionPage = () => {
   const [resubmissionText, setResubmissionText] = useState("");
   const [resubmissionImprovement, setResubmissionImprovement] = useState("");
   const [resubmissionStatus, setResubmissionStatus] = useState({ loading: false, error: "", success: "" });
+  const [answerKeyRegistry, setAnswerKeyRegistry] = useState(new Map());
 
   const isGerman = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("de");
   const uiText = useMemo(
@@ -375,6 +386,7 @@ const AssignmentSubmissionPage = () => {
         assignmentId: resolvedAssignmentId,
         assignmentTitle: form.assignmentTitle,
       });
+      const answerKeySource = resolveAnswerKeySource(answerKeyRegistry, canonicalAssignmentKey);
 
       return {
       title: form.assignmentTitle,
@@ -382,7 +394,16 @@ const AssignmentSubmissionPage = () => {
       level: resolvedLevel,
       chapter: deriveChapterValue(form.assignmentTitle),
       assignmentId: resolvedAssignmentId,
+      assignmentKey: canonicalAssignmentKey,
       canonicalAssignmentKey,
+      answerKeySource: answerKeySource
+        ? {
+            assignmentKey: answerKeySource.assignmentKey || canonicalAssignmentKey,
+            answerUrl: answerKeySource.answer_url || answerKeySource.answerUrl || null,
+            format: answerKeySource.format || null,
+            version: answerKeySource.version || null,
+          }
+        : null,
       chapterKey: buildChapterKey(form.assignmentTitle),
       submissionLink: null,
       submissionText: form.submissionText.trim(),
@@ -403,6 +424,7 @@ const AssignmentSubmissionPage = () => {
     };
     },
     [
+      answerKeyRegistry,
       buildChapterKey,
       buildAssignmentId,
       deriveChapterValue,
@@ -513,6 +535,37 @@ const AssignmentSubmissionPage = () => {
   );
 
   useEffect(() => {
+    let mounted = true;
+    fetchAnswerKeyRegistry()
+      .then((registry) => {
+        if (mounted) setAnswerKeyRegistry(registry);
+      })
+      .catch(() => {
+        if (mounted) setAnswerKeyRegistry(new Map());
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const requestedKey =
+      location?.state?.assignmentKey ||
+      location?.state?.canonicalAssignmentKey ||
+      new URLSearchParams(location?.search || "").get("assignmentKey") ||
+      "";
+    if (!requestedKey || !assignmentDictionary.length) return;
+
+    const requestedNormalized = normalizeAssignmentIdentity(requestedKey);
+    const match = assignmentDictionary.find(
+      (entry) => normalizeAssignmentIdentity(entry.assignmentKey || entry.canonicalAssignmentId || "") === requestedNormalized
+    );
+    if (!match) return;
+
+    setForm((prev) => ({ ...prev, assignmentTitle: match.label }));
+  }, [assignmentDictionary, location?.search, location?.state]);
+
+  useEffect(() => {
     const defaultAssignment = assignmentOptions[0];
     const currentAssignment = form.assignmentTitle;
     const hasCurrentAssignment = currentAssignment && assignmentOptions.includes(currentAssignment);
@@ -540,7 +593,28 @@ const AssignmentSubmissionPage = () => {
         );
 
         const entries = submissionSnapshot.docs
-          .map((entry) => ({ id: entry.id, ...entry.data() }))
+          .map((entry) => {
+            const data = entry.data() || {};
+            const computedAssignmentKey =
+              data.assignmentKey ||
+              data.canonicalAssignmentKey ||
+              resolveAssignmentCanonicalKey({
+                level: data.level || preferredLevel,
+                assignmentId: data.assignmentId,
+                assignmentTitle: data.assignmentTitle || data.title,
+              });
+
+            if (!data.assignmentKey && computedAssignmentKey) {
+              setDoc(doc(db, SUBMISSION_COLLECTION, entry.id), { assignmentKey: computedAssignmentKey }, { merge: true }).catch(() => {});
+            }
+
+            return {
+              id: entry.id,
+              ...data,
+              assignmentKey: computedAssignmentKey,
+              canonicalAssignmentKey: computedAssignmentKey,
+            };
+          })
           .filter((entry) => levelMatches(entry.level, preferredLevel));
         setRecentSubmissions(entries);
 
@@ -584,10 +658,29 @@ const AssignmentSubmissionPage = () => {
           const latestDrafts = {};
           draftSnapshot.docs.forEach((docSnap) => {
             const data = docSnap.data();
+            const computedAssignmentKey =
+              data.assignmentKey ||
+              data.canonicalAssignmentKey ||
+              resolveAssignmentCanonicalKey({
+                level: data.level || preferredLevel,
+                assignmentId: data.assignmentId,
+                assignmentTitle: data.assignmentTitle || data.title,
+              });
             if (!levelMatches(data.level, preferredLevel)) return;
 
+            if (!data.assignmentKey && computedAssignmentKey) {
+              setDoc(doc(db, DRAFT_COLLECTION, docSnap.id), { assignmentKey: computedAssignmentKey }, { merge: true }).catch(() => {});
+            }
+
             const assignmentKey = data.assignmentTitle || data.title || assignmentOptions[0];
-            if (!latestDrafts[assignmentKey]) latestDrafts[assignmentKey] = { id: docSnap.id, ...data };
+            if (!latestDrafts[assignmentKey]) {
+              latestDrafts[assignmentKey] = {
+                id: docSnap.id,
+                ...data,
+                assignmentKey: computedAssignmentKey,
+                canonicalAssignmentKey: computedAssignmentKey,
+              };
+            }
           });
           setDraftsByAssignment(latestDrafts);
         }
@@ -1085,6 +1178,8 @@ const AssignmentSubmissionPage = () => {
       const nowLocal = new Date();
 
       const payload = {
+        assignmentKey: selectedAssignmentId,
+        canonicalAssignmentKey: selectedAssignmentId,
         title: form.assignmentTitle,
         assignmentTitle: form.assignmentTitle,
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
@@ -1243,6 +1338,8 @@ const AssignmentSubmissionPage = () => {
 
     try {
       const payload = {
+        assignmentKey: selectedAssignmentId,
+        canonicalAssignmentKey: selectedAssignmentId,
         title: form.assignmentTitle,
         assignmentTitle: form.assignmentTitle,
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
