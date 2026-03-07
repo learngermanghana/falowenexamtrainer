@@ -302,16 +302,45 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
   return levels.filter((level) => allowed.has(level));
 };
 
-const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
+export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
   resolveAssignmentCanonicalKey({
     level,
     assignmentId: entry.assignmentId || entry.assignment_id,
     assignmentTitle: `Day ${entry.day}${occurrence > 1 ? ` Task ${occurrence}` : ""} ${entry.topic || entry.chapter || ""}`,
   }) || `${String(level || "GENERAL").toUpperCase()}-DAY-${entry.day}${occurrence > 1 ? `-TASK-${occurrence}` : ""}`;
 
-const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => {
+const getStatusValue = (candidate) => {
+  if (!candidate) return "";
+  if (typeof candidate === "string") return candidate;
+  if (typeof candidate.value === "string") return candidate.value;
+  return "";
+};
+
+export const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => {
   const assignmentKey = getEntryAssignmentKey(entry, level, occurrence);
-  return dayStatuses[assignmentKey]?.value || dayStatuses[String(entry.day)]?.value || "notStarted";
+  const levelToken = normalizeLevel(level);
+  const dayNumber = String(entry?.day || "").trim();
+  const dayAlias = levelToken && dayNumber ? `${levelToken}-DAY-${dayNumber}` : "";
+  const dayTaskAlias = dayAlias && occurrence > 1 ? `${dayAlias}-TASK-${occurrence}` : "";
+
+  const directMatch =
+    getStatusValue(dayStatuses[assignmentKey]) ||
+    getStatusValue(dayStatuses[dayTaskAlias]) ||
+    getStatusValue(dayStatuses[dayAlias]) ||
+    getStatusValue(dayStatuses[dayNumber]);
+
+  if (directMatch) return directMatch;
+
+  const aliases = new Set([assignmentKey, dayTaskAlias, dayAlias].filter(Boolean));
+  for (const [key, statusEntry] of Object.entries(dayStatuses || {})) {
+    if (!statusEntry || typeof statusEntry !== "object") continue;
+    const referenceKey = String(statusEntry.assignmentKey || key || "").trim();
+    if (!referenceKey || !aliases.has(referenceKey)) continue;
+    const resolvedStatus = getStatusValue(statusEntry);
+    if (resolvedStatus) return resolvedStatus;
+  }
+
+  return "notStarted";
 };
 
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
