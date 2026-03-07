@@ -15,6 +15,7 @@ import { sendSpeechTrainerAttempt } from "../services/speechTrainerService";
 const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
 const SESSION_HISTORY_PAGE_SIZE = 10;
+const SPEECH_HERO_IMAGE_URL = "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1600&q=80";
 
 const getInitialCoachMessage = (isA1A2, t) => ({
   role: "assistant",
@@ -170,6 +171,7 @@ const SpeechTrainerPage = () => {
   const [audioCoachError, setAudioCoachError] = useState("");
   const chatLogRef = useRef(null);
   const autosaveTimerRef = useRef(null);
+  const skipAutoRestoreRef = useRef(false);
 
   const level = useMemo(() => {
     const raw = String(studentProfile?.level || "A1").toUpperCase();
@@ -486,6 +488,7 @@ const SpeechTrainerPage = () => {
     const hasContent = chatMessages.length > 1 || chatInput.trim();
     if (hasContent && !window.confirm(t("speechTrainer.confirmReset"))) return;
 
+    skipAutoRestoreRef.current = true;
     setChatMessages([getInitialCoachMessage(isA1A2Level, t)]);
     setChatInput("");
     setAnswersDone(0);
@@ -584,6 +587,10 @@ const SpeechTrainerPage = () => {
   }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, tutorName, t, refreshHistory, activeSessionId, answersDone]);
 
   useEffect(() => {
+    if (skipAutoRestoreRef.current) {
+      skipAutoRestoreRef.current = false;
+      return;
+    }
     if (!sessionHistory.length || activeSessionId || answersDone > 0 || chatMessages.length > 1 || chatInput.trim()) return;
     const openSession = [...sessionHistory].find(
       (session) => String(session.completionStatus || "").toLowerCase() !== "completed" && Array.isArray(session.chatHistory) && session.chatHistory.length
@@ -620,25 +627,23 @@ const SpeechTrainerPage = () => {
           </div>
         ) : null}
 
-        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
-          <div style={{ display: "grid", gap: 8 }}>
-            <textarea
-              value={chatInput}
-              onChange={(event) => setChatInput(event.target.value)}
-              onKeyDown={handleInputKeyDown}
-              rows={4}
-              style={styles.textareaSmall}
-              placeholder={isA1A2Level ? t("speechTrainer.placeholderA1A2") : t("speechTrainer.placeholder")}
-              disabled={loading || completed}
-            />
-            <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-              {t("speechTrainer.charCounter", { charsCount, minLength: MIN_ANSWER_LENGTH })}
-            </div>
-            <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
-              <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
-            </div>
-          </div>
-
+        <div
+          style={{
+            ...styles.card,
+            margin: 0,
+            minHeight: 180,
+            display: "grid",
+            alignContent: "end",
+            color: "#fff",
+            backgroundImage: `linear-gradient(130deg, rgba(15, 23, 42, 0.78), rgba(37, 99, 235, 0.45)), url(${SPEECH_HERO_IMAGE_URL})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+          role="img"
+          aria-label="Speech practice hero banner"
+        >
+          <strong style={{ fontSize: 18, lineHeight: 1.3 }}>{t("speechTrainer.title")}</strong>
+          <span style={{ fontSize: 13, opacity: 0.95 }}>{t("speechTrainer.progress", { answersDone, turnLimit: TURN_LIMIT, currentStepLabel })}</span>
         </div>
 
         <div style={{ display: "grid", gap: 6 }}>

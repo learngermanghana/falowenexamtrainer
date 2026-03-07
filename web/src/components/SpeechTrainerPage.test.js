@@ -161,3 +161,50 @@ test("renders user bubbles right-aligned and coach bubbles left-aligned", async 
   expect(userRow).toHaveStyle({ justifyItems: "end" });
   expect(coachRow).toHaveStyle({ justifyItems: "start" });
 });
+
+
+test("renders a single main answer textbox and hero banner", async () => {
+  render(<SpeechTrainerPage />);
+
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  expect(screen.getByRole("img", { name: "Speech practice hero banner" })).toBeInTheDocument();
+  expect(screen.getAllByRole("textbox")).toHaveLength(1);
+});
+
+test("reset keeps chat cleared instead of auto-restoring previous open session", async () => {
+  loadPresentationSessions.mockResolvedValueOnce({
+    sessions: [
+      {
+        id: "session-3",
+        topic: "Campus speech",
+        level: "B1",
+        completionStatus: "in_progress",
+        answersDone: 1,
+        chatHistory: [
+          { role: "assistant", content: "Coach old message" },
+          { role: "user", content: "Student old answer" },
+        ],
+        createdAt: { _seconds: 1710000000 },
+      },
+    ],
+    hasMore: false,
+    nextCursor: "",
+  });
+
+  render(<SpeechTrainerPage />);
+
+  await screen.findByText("Coach old message");
+  fireEvent.click(screen.getByRole("button", { name: "speechTrainer.resetAria" }));
+
+  await waitFor(() => {
+    expect(screen.queryByText("Coach old message")).not.toBeInTheDocument();
+    expect(screen.queryByText("Student old answer")).not.toBeInTheDocument();
+  });
+
+  act(() => {
+    jest.advanceTimersByTime(2000);
+  });
+
+  expect(screen.queryByText("Coach old message")).not.toBeInTheDocument();
+});
