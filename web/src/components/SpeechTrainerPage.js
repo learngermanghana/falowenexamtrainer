@@ -732,7 +732,7 @@ const SpeechTrainerPage = () => {
   );
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
+    <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", alignItems: "start" }}>
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ ...styles.filterRow, gridTemplateColumns: "1fr auto" }}>
           <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("speechTrainer.title")}</h2>
@@ -741,7 +741,7 @@ const SpeechTrainerPage = () => {
         <p style={{ ...styles.helperText, margin: 0 }}>
           {t("speechTrainer.welcome", { studentName, tutorName })} {isA1A2Level ? t("speechTrainer.mode.a1a2") : t("speechTrainer.mode.default")}
         </p>
-        <div style={{ ...styles.filterPanel, margin: 0, background: "#eff6ff" }}>
+        <div style={{ ...styles.filterPanel, margin: 0 }}>
           <strong style={{ fontSize: 13 }}>{t("speechTrainer.beforeStartTitle")}</strong>
           <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{t("speechTrainer.beforeStartDescription")}</p>
         </div>
@@ -765,7 +765,7 @@ const SpeechTrainerPage = () => {
           </div>
         ) : null}
 
-        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10, background: "#f8fafc", border: "1px solid #e5e7eb" }}>
+        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
           <strong style={{ fontSize: 14 }}>{t("speechTrainer.answerWorkspaceTitle")}</strong>
           <p style={{ ...styles.helperText, margin: 0 }}>
             {t("speechTrainer.answerWorkspaceDescription")}
@@ -818,7 +818,7 @@ const SpeechTrainerPage = () => {
         </div>
 
         <div
-          style={{ ...styles.chatLog, background: "#f1f5f9", border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+          style={{ ...styles.chatLog, border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
           aria-live="polite"
           ref={chatLogRef}
         >
