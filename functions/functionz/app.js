@@ -2439,9 +2439,12 @@ app.post("/speaking/presentation-session", async (req, res) => {
     if (!authedUser) return;
 
     const {
+      sessionId = "",
       topic = "",
       level = "A1",
       finalScript = "",
+      chatHistory = [],
+      answersDone = 0,
       completionStatus = "in_progress",
       commonErrorTags = [],
       rubric = {},
@@ -2450,6 +2453,7 @@ app.post("/speaking/presentation-session", async (req, res) => {
     } = req.body || {};
 
     const validationError =
+      validateString(sessionId, { maxLength: 120, label: "sessionId" }) ||
       validateString(topic, { maxLength: 120, label: "topic" }) ||
       validateString(level, { maxLength: 10, label: "level" }) ||
       validateString(finalScript, { maxLength: 6000, label: "finalScript" }) ||
@@ -2463,12 +2467,16 @@ app.post("/speaking/presentation-session", async (req, res) => {
     const cleanedTags = Array.isArray(commonErrorTags)
       ? Array.from(new Set(commonErrorTags.map((tag) => String(tag || "").trim()).filter(Boolean))).slice(0, 10)
       : [];
+    const safeChatHistory = sanitizePresentationHistory(chatHistory).slice(-30);
+    const safeAnswersDone = Math.max(0, Math.min(PRESENTATION_TURN_LIMIT, Number(answersDone) || 0));
 
     const payload = {
       uid: authedUser.uid,
       topic: String(topic || "").trim() || "Custom topic",
       level: String(level || "A1").trim().toUpperCase(),
       finalScript: String(finalScript || "").trim(),
+      chatHistory: safeChatHistory,
+      answersDone: safeAnswersDone,
       completionStatus: String(completionStatus || "in_progress").trim(),
       commonErrorTags: cleanedTags,
       rubric: {
@@ -2480,10 +2488,26 @@ app.post("/speaking/presentation-session", async (req, res) => {
       studentName: String(studentName || "").trim() || null,
       tutorName: String(tutorName || "").trim() || "Sir Felix",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
-    const docRef = await db.collection("presentationSessions").add(payload);
+    const trimmedSessionId = String(sessionId || "").trim();
+    if (trimmedSessionId) {
+      const docRef = db.collection("presentationSessions").doc(trimmedSessionId);
+      const snapshot = await docRef.get();
+
+      if (snapshot.exists && snapshot.data()?.uid !== authedUser.uid) {
+        return res.status(403).json({ error: "Cannot update this presentation session" });
+      }
+
+      if (snapshot.exists) {
+        await docRef.set(payload, { merge: true });
+      } else {
+        await docRef.set({ ...payload, createdAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+      }
+      return res.json({ ok: true, id: docRef.id });
+    }
+
+    const docRef = await db.collection("presentationSessions").add({ ...payload, createdAt: admin.firestore.FieldValue.serverTimestamp() });
     return res.json({ ok: true, id: docRef.id });
   } catch (err) {
     console.error("/speaking/presentation-session error", err);
