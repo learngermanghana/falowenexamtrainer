@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import {
   loadPresentationSessions,
+  deletePresentationSession,
   requestPresentationCoachReply,
   requestPresentationUpgrade,
   savePresentationSession,
@@ -164,6 +165,7 @@ const SpeechTrainerPage = () => {
   const [upgradeLoadingByIndex, setUpgradeLoadingByIndex] = useState({});
   const [selectedUpgradesByIndex, setSelectedUpgradesByIndex] = useState({});
   const [historyFilter, setHistoryFilter] = useState({ topic: "", level: "" });
+  const [deletingSessionId, setDeletingSessionId] = useState("");
   const chatLogRef = useRef(null);
 
   const level = useMemo(() => {
@@ -437,6 +439,25 @@ const SpeechTrainerPage = () => {
     setActiveSessionId("");
   };
 
+  const handleDeleteSession = async (sessionId) => {
+    if (!sessionId || deletingSessionId || loading) return;
+    const confirmed = window.confirm(t("speechTrainer.confirmDeleteSession", { defaultValue: "Delete this practice session? This cannot be undone." }));
+    if (!confirmed) return;
+
+    try {
+      setDeletingSessionId(sessionId);
+      await deletePresentationSession({ sessionId, idToken });
+      setSessionHistory((prev) => prev.filter((session) => session.id !== sessionId));
+      if (activeSessionId === sessionId) {
+        handleReset();
+      }
+    } catch (deleteError) {
+      setError(deleteError?.message || t("speechTrainer.deleteSessionError", { defaultValue: "Could not delete the session right now." }));
+    } finally {
+      setDeletingSessionId("");
+    }
+  };
+
   const handleInputKeyDown = (event) => {
     if (event.key === "Escape") {
       event.preventDefault();
@@ -618,15 +639,15 @@ const SpeechTrainerPage = () => {
         </div>
 
         <div
-          style={{ ...styles.chatLog, background: "#f8fafc", border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+          style={{ ...styles.chatLog, background: "#f1f5f9", border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
           aria-live="polite"
           ref={chatLogRef}
         >
           {chatMessages.map((message, index) => {
             const isUser = message.role === "user";
             return (
-              <div key={`${message.role}-${index}`} style={{ display: "grid", gap: 6 }}>
-                <div style={isUser ? styles.chatBubbleUser : styles.chatBubbleCoach}>
+              <div key={`${message.role}-${index}`} style={{ display: "grid", gap: 6, justifyItems: isUser ? "end" : "start" }}>
+                <div style={{ ...(isUser ? styles.chatBubbleUser : styles.chatBubbleCoach), maxWidth: "80%", borderBottomRightRadius: isUser ? 6 : 14, borderBottomLeftRadius: isUser ? 14 : 6 }}>
                   {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content, isA1A2Level, t)}
                   {message?.meta?.type === "upgrade" && message?.meta?.why ? (
                     <details style={{ marginTop: 8 }}>
@@ -763,18 +784,31 @@ const SpeechTrainerPage = () => {
                     {t("speechTrainer.rubricHistory", { grammar: Number(session.rubric.grammar || 0), vocabulary: Number(session.rubric.vocabulary || 0), structure: Number(session.rubric.structure || 0) })}
                   </div>
                 ) : null}
-                {isIncomplete ? (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                  {isIncomplete ? (
+                    <button
+                      type="button"
+                      style={styles.secondaryButton}
+                      aria-label={t("speechTrainer.continueAria")}
+                      onClick={() => {
+                        restoreSessionFromFirestore(session);
+                      }}
+                    >
+                      {t("speechTrainer.continue")}
+                    </button>
+                  ) : null}
                   <button
                     type="button"
-                    style={styles.secondaryButton}
-                    aria-label={t("speechTrainer.continueAria")}
-                    onClick={() => {
-                      restoreSessionFromFirestore(session);
-                    }}
+                    style={{ ...styles.secondaryButton, borderColor: "#fecaca", color: "#b91c1c", background: "#fff1f2" }}
+                    onClick={() => handleDeleteSession(session.id)}
+                    disabled={deletingSessionId === session.id}
+                    aria-label={t("speechTrainer.deleteSessionAria", { defaultValue: "Delete session" })}
                   >
-                    {t("speechTrainer.continue")}
+                    {deletingSessionId === session.id
+                      ? t("speechTrainer.deletingSession", { defaultValue: "Deleting…" })
+                      : t("speechTrainer.deleteSession", { defaultValue: "Delete" })}
                   </button>
-                ) : null}
+                </div>
               </details>
             );
           })
