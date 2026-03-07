@@ -1595,6 +1595,7 @@
     "audioFallbackError": "Le coach est indisponible pour le moment. Réessayez dans un instant.",
     "audioTranscriptLabel": "Transcription",
     "audioFeedbackLabel": "Feedback",
-    "audioNextStepsLabel": "Prochaines étapes"
+    "audioNextStepsLabel": "Prochaines étapes",
+    "composerStatusHintRecordingPriority": "Statut : l’enregistrement est prêt. Envoyez-le pour continuer le chat avec votre texte ou la transcription."
   }
 }

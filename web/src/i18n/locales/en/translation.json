@@ -1707,6 +1707,7 @@
     "audioFallbackError": "Could not reach the coach right now. Please try again in a moment.",
     "audioTranscriptLabel": "Transcript",
     "audioFeedbackLabel": "Feedback",
-    "audioNextStepsLabel": "Next steps"
+    "audioNextStepsLabel": "Next steps",
+    "composerStatusHintRecordingPriority": "Status: recording is ready. Send to continue the chat with your typed note or transcript."
   }
 }
