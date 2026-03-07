@@ -19,7 +19,7 @@ const randomCoachReply = (selectedQuestion) => {
   }
 
   const keyword = selectedQuestion.keywordSubtopic
-    ? ` and include \"${selectedQuestion.keywordSubtopic}\"`
+    ? ` and include "${selectedQuestion.keywordSubtopic}"`
     : "";
 
   const replyBank = [
