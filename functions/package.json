@@ -11,8 +11,7 @@
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
     "seed:announcements": "node scripts/seedAnnouncements.js",
-    "migrate:assignment-keys": "node scripts/backfillAssignmentKeys.js",
-    "upsert:answer-key": "node scripts/upsertAnswerKeyRegistryEntry.js"
+    "migrate:assignment-keys": "node scripts/backfillAssignmentKeys.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
