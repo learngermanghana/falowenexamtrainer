@@ -620,6 +620,26 @@ const SpeechTrainerPage = () => {
           </div>
         ) : null}
 
+        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10 }}>
+          <div style={{ display: "grid", gap: 8 }}>
+            <textarea
+              value={chatInput}
+              onChange={(event) => setChatInput(event.target.value)}
+              onKeyDown={handleInputKeyDown}
+              rows={4}
+              style={styles.textareaSmall}
+              placeholder={isA1A2Level ? t("speechTrainer.placeholderA1A2") : t("speechTrainer.placeholder")}
+              disabled={loading || completed}
+            />
+            <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
+              {t("speechTrainer.charCounter", { charsCount, minLength: MIN_ANSWER_LENGTH })}
+            </div>
+            <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
+              <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
+            </div>
+          </div>
+
+        </div>
 
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ ...styles.helperText, margin: 0 }}>
