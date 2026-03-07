@@ -444,9 +444,7 @@ const SpeechTrainerPage = () => {
           : "",
       ].filter(Boolean);
       if (feedbackParts.length) {
-        setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("
-
-"), meta: { type: "audio_feedback" } }]);
+        setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
       }
       setAudioCoachStatus(t("speechTrainer.audioReadyStatus"));
       if (inlineAudioState?.clearAudio) inlineAudioState.clearAudio();
