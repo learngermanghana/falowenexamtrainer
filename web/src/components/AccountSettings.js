@@ -260,7 +260,7 @@ const AccountSettings = () => {
     return <div style={styles.card}>{t("accountSettings.noProfile")}</div>;
   }
 
-  const supportMailTo = `mailto:learngermanghana@gmail.com?subject=${encodeURIComponent(t("accountSettings.profile.supportSubject"))}&body=${encodeURIComponent(
+  const supportMailTo = `mailto:info@falowen.app?subject=${encodeURIComponent(t("accountSettings.profile.supportSubject"))}&body=${encodeURIComponent(
     t("accountSettings.profile.supportBody", {
       name: studentProfile?.name || user?.displayName || "",
       email: studentProfile?.email || user?.email || "",

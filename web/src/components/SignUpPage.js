@@ -189,7 +189,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
     return {
       field: null,
       message:
-        "We couldn't create your account right now. Please try again in a moment or contact support@falowen.com for help.",
+        "We couldn't create your account right now. Please try again in a moment or contact info@falowen.app for help.",
     };
   };
 
@@ -356,7 +356,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const errorMessage = friendlyError.message;
       const nextStep = friendlyError.field
         ? "Review the highlighted field and try again."
-        : "Try again shortly. If it keeps failing, contact support@falowen.com.";
+        : "Try again shortly. If it keeps failing, contact info@falowen.app.";
       const combinedMessage = `${errorMessage} ${nextStep}`;
       setAuthError(combinedMessage);
       showToast(combinedMessage, "error");
