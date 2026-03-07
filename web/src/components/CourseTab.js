@@ -13,15 +13,10 @@ import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import {
-  collection,
   db,
   doc,
-  getDocs,
-  limit,
-  query,
   runTransaction,
   serverTimestamp,
-  where,
 } from "../firebase";
 
 const ASSIGNMENT_STATUSES = {
@@ -384,124 +379,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [skillFilter, setSkillFilter] = useState("all");
   const [chapterFilter, setChapterFilter] = useState("all");
   const [dayStatuses, setDayStatuses] = useState({});
-  const [, setDerivedStatusesByAssignment] = useState({});
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
-
-  const studentCode = useMemo(
-    () => studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "",
-    [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
-  );
   const [hasHydratedCourseProgress, setHasHydratedCourseProgress] = useState(false);
-
-  useEffect(() => {
-    if (!db || !selectedCourseLevel || !studentProfile?.id) {
-      setDerivedStatusesByAssignment({});
-      return;
-    }
-
-    let mounted = true;
-
-    const safeUpper = (value) => String(value || "").trim().toUpperCase();
-
-    const toStatusByKeyFromRows = (rows = []) => {
-      const map = {};
-
-      rows.forEach((entry) => {
-        const entryLevel = String(entry?.level || "").toUpperCase();
-        if (entryLevel && entryLevel !== selectedCourseLevel) return;
-
-        const scoreRaw = Number(entry?.score);
-        const hasNumericScore = Number.isFinite(scoreRaw);
-        const isPassing = hasNumericScore && scoreRaw >= 60;
-        const isFailing = hasNumericScore && scoreRaw < 60;
-        const assignmentKey = resolveAssignmentCanonicalKey({
-          level: selectedCourseLevel,
-          assignmentId: entry.assignmentKey || entry.canonicalAssignmentKey || entry.assignmentId || entry.assignment_id,
-          assignmentTitle: entry.assignmentTitle || entry.assignment || entry.title,
-        });
-
-        if (!assignmentKey) return;
-
-        if (isFailing) {
-          map[assignmentKey] = "needsRedo";
-          return;
-        }
-
-        const current = map[assignmentKey] || "notStarted";
-        if (current === "needsRedo") return;
-
-        const statusToken = safeUpper(entry.status);
-        if (isPassing || statusToken === "MARKED" || statusToken === "SUBMITTED" || statusToken === "RESUBMITTED") {
-          map[assignmentKey] = "submitted";
-          return;
-        }
-
-        if (
-          ["DRAFT", "RESUBMISSION_DRAFT", "IN_PROGRESS", "STARTED"].includes(statusToken) &&
-          current === "notStarted"
-        ) {
-          map[assignmentKey] = "inProgress";
-        }
-      });
-
-      return map;
-    };
-
-    const mergeStatusMaps = (base, incoming) => {
-      const merged = { ...base };
-      Object.entries(incoming).forEach(([assignmentKey, status]) => {
-        const current = merged[assignmentKey];
-        if (status === "needsRedo") {
-          merged[assignmentKey] = "needsRedo";
-          return;
-        }
-        if (status === "submitted") {
-          if (current !== "needsRedo") merged[assignmentKey] = "submitted";
-          return;
-        }
-        if (!current) merged[assignmentKey] = status;
-      });
-      return merged;
-    };
-
-    const loadDerivedStatuses = async () => {
-      try {
-        const submissionsRef = collection(db, "submissions");
-        const draftsRef = collection(db, "submissionDrafts");
-        const scoresRef = collection(db, "scores");
-
-        const scoreCodeCandidates = Array.from(new Set([studentCode, studentCode?.toLowerCase(), studentCode?.toUpperCase()].filter(Boolean)));
-
-        const [submissionsSnap, draftsSnap, scoresSnap] = await Promise.all([
-          getDocs(query(submissionsRef, where("studentId", "==", studentProfile.id), limit(400))),
-          getDocs(query(draftsRef, where("studentId", "==", studentProfile.id), limit(400))),
-          scoreCodeCandidates.length > 1
-            ? getDocs(query(scoresRef, where("studentcode", "in", scoreCodeCandidates), where("level", "==", selectedCourseLevel), limit(400)))
-            : scoreCodeCandidates.length === 1
-            ? getDocs(query(scoresRef, where("studentcode", "==", scoreCodeCandidates[0]), where("level", "==", selectedCourseLevel), limit(400)))
-            : Promise.resolve({ docs: [] }),
-        ]);
-
-        if (!mounted) return;
-
-        const merged = mergeStatusMaps(
-          toStatusByKeyFromRows([...(submissionsSnap.docs || []).map((d) => d.data()), ...(draftsSnap.docs || []).map((d) => d.data())]),
-          toStatusByKeyFromRows([...(scoresSnap.docs || []).map((d) => d.data())])
-        );
-
-        setDerivedStatusesByAssignment(merged);
-      } catch (error) {
-        console.error("Failed to load derived assignment statuses", error);
-        if (mounted) setDerivedStatusesByAssignment({});
-      }
-    };
-
-    loadDerivedStatuses();
-
-    return () => {
-      mounted = false;
-    };
-  }, [selectedCourseLevel, studentCode, studentProfile?.id]);
 
   useEffect(() => {
     const normalizedDefault = resolvedDefaultLevel;
