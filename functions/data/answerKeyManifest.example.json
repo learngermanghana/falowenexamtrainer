@@ -1,0 +1,20 @@
+{
+  "A1 Greetings 0.1": {
+    "answers": {
+      "Answer1": "C) Guten Morgen",
+      "Answer2": "D) Guten Tag"
+    },
+    "answer_url": "https://docs.google.com/spreadsheets/d/EXAMPLE/gviz/tq?tqx=out:html&sheet=Key",
+    "format": "objective",
+    "assignment_id": "A1-0.1"
+  },
+  "A1 Alphabets 0.2": {
+    "answers": {
+      "Answer1": "C) 26",
+      "Answer2": "A) A, O, U, B"
+    },
+    "answer_url": "https://docs.google.com/spreadsheets/d/EXAMPLE2/gviz/tq?tqx=out:html&sheet=Key",
+    "format": "objective",
+    "assignment_id": "A1-0.2"
+  }
+}
