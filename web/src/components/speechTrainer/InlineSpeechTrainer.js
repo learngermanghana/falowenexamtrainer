@@ -3,7 +3,7 @@ import { styles } from "../../styles";
 import { useAuth } from "../../context/AuthContext";
 import { sendSpeechTrainerAttempt } from "../../services/speechTrainerService";
 
-const InlineSpeechTrainer = ({ profileLevel, compact = false }) => {
+const InlineSpeechTrainer = ({ profileLevel, compact = false, onAudioStateChange }) => {
   const { idToken } = useAuth();
 
   const [note, setNote] = useState("");
@@ -153,6 +153,18 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false }) => {
 
   const hasReadableFeedback = feedbackEntries.some((entry) => Boolean(entry.value));
 
+  useEffect(() => {
+    if (!onAudioStateChange) return;
+    onAudioStateChange({
+      hasAudio: Boolean(audioBlob),
+      audioBlob,
+      audioUrl,
+      isRecording,
+      recordingTime,
+      clearAudio: resetAudio,
+    });
+  }, [onAudioStateChange, audioBlob, audioUrl, isRecording, recordingTime]);
+
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
       {compact ? null : <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Practice inside the app</h3>}
@@ -220,15 +232,17 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false }) => {
           ) : null}
         </div>
 
-        <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <button type="submit" style={{ ...styles.primaryButton }}>
-            Send for feedback
-          </button>
-          {status ? <span style={{ ...styles.helperText, margin: 0 }}>{status}</span> : null}
-          {error ? (
-            <span style={{ ...styles.helperText, margin: 0, color: "#b91c1c" }}>{error}</span>
-          ) : null}
-        </div>
+        {compact ? null : (
+          <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+            <button type="submit" style={{ ...styles.primaryButton }}>
+              Send for feedback
+            </button>
+            {status ? <span style={{ ...styles.helperText, margin: 0 }}>{status}</span> : null}
+            {error ? (
+              <span style={{ ...styles.helperText, margin: 0, color: "#b91c1c" }}>{error}</span>
+            ) : null}
+          </div>
+        )}
       </form>
 
       {feedback ? (
