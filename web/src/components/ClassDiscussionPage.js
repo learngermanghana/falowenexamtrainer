@@ -200,14 +200,17 @@ const ClassDiscussionPage = () => {
         const nextThreads = snapshot.docs.map((docSnapshot) => {
           const data = docSnapshot.data();
 
-          const createdAt = normalizeTimestamp(data.createdAt);
+          const createdAt = normalizeTimestamp(data.createdAt) || normalizeTimestamp(data.createdAtMs);
           const timerMinutes = Number(data.timerMinutes) || 0;
-          const timerStartedAt = normalizeTimestamp(data.timerStartedAt) || createdAt;
+          const timerStartedAt =
+            normalizeTimestamp(data.timerStartedAt) ||
+            normalizeTimestamp(data.timerStartedAtMs) ||
+            createdAt;
+          const explicitExpiresAt = normalizeTimestamp(data.expiresAt);
 
           const expiresAt =
-            timerMinutes > 0 && timerStartedAt
-              ? timerStartedAt + timerMinutes * 60000
-              : null;
+            explicitExpiresAt ||
+            (timerMinutes > 0 && timerStartedAt ? timerStartedAt + timerMinutes * 60000 : null);
 
           return {
             id: docSnapshot.id,
@@ -390,6 +393,7 @@ const ClassDiscussionPage = () => {
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
     const timerValue = Number(form.timerMinutes) || 0;
     const timerMinutes = minutesFromValue(timerValue, form.timerUnit);
+    const nowTimestamp = Date.now();
 
     setIsSavingThread(true);
     setError("");
@@ -408,6 +412,8 @@ const ClassDiscussionPage = () => {
         timerMinutes,
         timerUnit: form.timerUnit,
         timerValue,
+        createdAtMs: nowTimestamp,
+        timerStartedAtMs: nowTimestamp,
         timerStartedAt: serverTimestamp(),
         createdAt: serverTimestamp(),
         createdBy: getDisplayName(),
