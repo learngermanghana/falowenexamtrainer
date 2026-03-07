@@ -597,7 +597,7 @@ const SpeechTrainerPage = () => {
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <div style={{ ...styles.filterRow, gridTemplateColumns: "1fr auto" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
           <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("speechTrainer.title")}</h2>
           <span style={styles.levelPill}>{t("speechTrainer.levelBadge", { level })}</span>
         </div>
@@ -667,7 +667,7 @@ const SpeechTrainerPage = () => {
         </div>
 
         <div
-          style={{ ...styles.chatLog, border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+          style={{ ...styles.chatLog, border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, maxHeight: "55vh" }}
           aria-live="polite"
           ref={chatLogRef}
         >
@@ -675,7 +675,7 @@ const SpeechTrainerPage = () => {
             const isUser = message.role === "user";
             return (
               <div key={`${message.role}-${index}`} style={{ display: "grid", gap: 6, justifyItems: isUser ? "end" : "start" }}>
-                <div style={{ ...(isUser ? styles.chatBubbleUser : styles.chatBubbleCoach), maxWidth: "80%", borderBottomRightRadius: isUser ? 6 : 14, borderBottomLeftRadius: isUser ? 14 : 6 }}>
+                <div style={{ ...(isUser ? styles.chatBubbleUser : styles.chatBubbleCoach), maxWidth: "min(92%, 680px)", borderBottomRightRadius: isUser ? 6 : 14, borderBottomLeftRadius: isUser ? 14 : 6 }}>
                   {isUser ? <div style={{ whiteSpace: "pre-wrap" }}>{message.content}</div> : renderAssistantContent(message.content, isA1A2Level, t)}
                   {message?.meta?.type === "upgrade" && message?.meta?.why ? (
                     <details style={{ marginTop: 8 }}>
@@ -738,6 +738,24 @@ const SpeechTrainerPage = () => {
             {finalScripts.long ? <div><strong>{t("speechTrainer.scriptLabels.long")}</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.long}</p></div> : null}
           </div>
         ) : null}
+
+        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 8 }}>
+          <textarea
+            value={chatInput}
+            onChange={(event) => setChatInput(event.target.value)}
+            onKeyDown={handleInputKeyDown}
+            rows={4}
+            style={styles.textareaSmall}
+            placeholder={isA1A2Level ? t("speechTrainer.placeholderA1A2") : t("speechTrainer.placeholder")}
+            disabled={loading || completed}
+          />
+          <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
+            {t("speechTrainer.charCounter", { charsCount, minLength: MIN_ANSWER_LENGTH })}
+          </div>
+          <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
+            <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
+          </div>
+        </div>
 
         <div style={{ display: "grid", gap: 8 }}>
           <InlineSpeechTrainer profileLevel={level} compact onAudioStateChange={setInlineAudioState} />
