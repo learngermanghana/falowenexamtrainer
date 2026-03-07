@@ -57,3 +57,12 @@ export const requestSpeakingTextAnalysis = async ({ text, teil, level, question,
     },
     idToken,
   });
+
+export const deletePresentationSession = async ({ sessionId, idToken }) =>
+  callAI({
+    path: "/speaking/presentation-session/delete",
+    payload: {
+      sessionId,
+    },
+    idToken,
+  });

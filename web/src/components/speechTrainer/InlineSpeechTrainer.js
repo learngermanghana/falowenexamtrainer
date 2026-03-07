@@ -3,7 +3,7 @@ import { styles } from "../../styles";
 import { useAuth } from "../../context/AuthContext";
 import { sendSpeechTrainerAttempt } from "../../services/speechTrainerService";
 
-const InlineSpeechTrainer = ({ profileLevel }) => {
+const InlineSpeechTrainer = ({ profileLevel, compact = false }) => {
   const { idToken } = useAuth();
 
   const [note, setNote] = useState("");
@@ -155,27 +155,30 @@ const InlineSpeechTrainer = ({ profileLevel }) => {
 
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Practice inside the app</h3>
+      {compact ? null : <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Practice inside the app</h3>}
       <p style={{ ...styles.helperText, margin: 0 }}>
-        Type a short answer or record yourself here. When you submit, the coach will listen and send focused notes for
-        your level {profileLevel ? `(${profileLevel})` : ""}.
+        {compact
+          ? `Record your response and send it for feedback at your level${profileLevel ? ` (${profileLevel})` : ""}.`
+          : `Type a short answer or record yourself here. When you submit, the coach will listen and send focused notes for your level${profileLevel ? ` (${profileLevel})` : ""}.`}
       </p>
 
       <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
-        <label style={{ display: "grid", gap: 6 }}>
-          <span style={{ ...styles.label, margin: 0 }}>Type your answer</span>
-          <textarea
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-            placeholder="Give a 2–3 sentence answer or key points before you record."
-            rows={4}
-            style={{
-              ...styles.input,
-              resize: "vertical",
-              minHeight: 96,
-            }}
-          />
-        </label>
+        {compact ? null : (
+          <label style={{ display: "grid", gap: 6 }}>
+            <span style={{ ...styles.label, margin: 0 }}>Type your answer</span>
+            <textarea
+              value={note}
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="Give a 2–3 sentence answer or key points before you record."
+              rows={4}
+              style={{
+                ...styles.input,
+                resize: "vertical",
+                minHeight: 96,
+              }}
+            />
+          </label>
+        )}
 
         <div
           style={{

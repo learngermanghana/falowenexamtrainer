@@ -2579,6 +2579,38 @@ app.post("/speaking/presentation-session", async (req, res) => {
   }
 });
 
+app.post("/speaking/presentation-session/delete", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
+    const { sessionId = "" } = req.body || {};
+    const validationError = validateString(sessionId, { maxLength: 120, label: "sessionId" });
+    if (validationError) return res.status(400).json({ error: validationError });
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Storage unavailable" });
+
+    const trimmedSessionId = String(sessionId || "").trim();
+    if (!trimmedSessionId) return res.status(400).json({ error: "sessionId is required" });
+
+    const docRef = db.collection("presentationSessions").doc(trimmedSessionId);
+    const snapshot = await docRef.get();
+    if (!snapshot.exists) return res.json({ ok: true, deleted: false });
+
+    if (snapshot.data()?.uid !== authedUser.uid) {
+      return res.status(403).json({ error: "Cannot delete this presentation session" });
+    }
+
+    await docRef.delete();
+    return res.json({ ok: true, deleted: true, id: trimmedSessionId });
+  } catch (err) {
+    console.error("/speaking/presentation-session/delete error", err);
+    return res.status(500).json({ error: err.message || "Failed to delete presentation session" });
+  }
+});
+
 app.post("/speaking/presentation-session/history", async (req, res) => {
   let authedUser;
   try {
