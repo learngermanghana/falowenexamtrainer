@@ -1591,6 +1591,7 @@
     "audioFallbackError": "Coach ist gerade nicht erreichbar. Bitte versuche es gleich noch einmal.",
     "audioTranscriptLabel": "Transkript",
     "audioFeedbackLabel": "Feedback",
-    "audioNextStepsLabel": "Nächste Schritte"
+    "audioNextStepsLabel": "Nächste Schritte",
+    "composerStatusHintRecordingPriority": "Status: Aufnahme ist bereit. Sende sie, um den Chat mit deinem Text oder Transkript fortzusetzen."
   }
 }

@@ -207,7 +207,7 @@ const SpeechTrainerPage = () => {
   const canSubmitText = hasText && minLengthReached;
   const canSubmitAudio = hasAudio;
   const canSubmitComposer = !loading && !completed && (canSubmitText || canSubmitAudio);
-  const composerCtaLabel = hasText && hasAudio
+  const composerCtaLabel = hasAudio && hasText
     ? t("speechTrainer.composerSendTextAndRecording")
     : hasAudio
       ? t("speechTrainer.composerSendRecording")
@@ -314,7 +314,7 @@ const SpeechTrainerPage = () => {
     setLoading(true);
     setRetryablePayload({ ...payload, messageAlreadyAppended: true });
 
-    const nextUserMessage = { role: "user", content: payload.message };
+    const nextUserMessage = { role: "user", content: payload.userMessageContent || payload.message };
     const priorHistory = payload.history;
 
     if (!payload.messageAlreadyAppended) {
@@ -393,18 +393,33 @@ const SpeechTrainerPage = () => {
         level,
         idToken,
       });
-      const feedbackParts = [
-        response?.transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${response.transcript}` : "",
-        response?.feedback || response?.notes || response?.summary
-          ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
-          : "",
-        response?.nextSteps || response?.actions
-          ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
-          : "",
-      ].filter(Boolean);
-      if (feedbackParts.length) {
-        setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
+
+      const transcript = String(response?.transcript || "").trim();
+      const note = trimmedInput;
+      const messageForCoach = note || transcript;
+      const hasCoachMessage = messageForCoach.length >= MIN_ANSWER_LENGTH;
+
+      if (hasCoachMessage) {
+        const history = chatMessages.map(({ role, content }) => ({ role, content }));
+        const userMessageContent = note && transcript && note !== transcript
+          ? `${note}\n\n${t("speechTrainer.audioTranscriptLabel")}: ${transcript}`
+          : messageForCoach;
+        await submitMessage({ message: messageForCoach, history, userMessageContent });
+      } else {
+        const feedbackParts = [
+          transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${transcript}` : "",
+          response?.feedback || response?.notes || response?.summary
+            ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
+            : "",
+          response?.nextSteps || response?.actions
+            ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
+            : "",
+        ].filter(Boolean);
+        if (feedbackParts.length) {
+          setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
+        }
       }
+
       setAudioCoachStatus(t("speechTrainer.audioReadyStatus"));
       if (inlineAudioState?.clearAudio) inlineAudioState.clearAudio();
       if (trimmedInput) setChatInput("");
@@ -421,11 +436,12 @@ const SpeechTrainerPage = () => {
 
   const handleComposerSubmit = async () => {
     if (!canSubmitComposer) return;
-    if (canSubmitText) {
-      await handleSend();
-    }
     if (canSubmitAudio) {
       await handleSendRecording();
+      return;
+    }
+    if (canSubmitText) {
+      await handleSend();
     }
   };
 
@@ -789,7 +805,7 @@ const SpeechTrainerPage = () => {
             ) : null}
           </div>
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-            {audioCoachStatus || t("speechTrainer.composerStatusHint")}
+            {audioCoachStatus || (hasAudio ? t("speechTrainer.composerStatusHintRecordingPriority") : t("speechTrainer.composerStatusHint"))}
           </div>
           {completed ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>
