@@ -465,7 +465,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           matchesChapter(entry)
       )
     );
-  }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, skillFilter, unfinishedOnly]);
+  }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
 
   const chapterOptions = useMemo(() => {
     const set = new Set();
@@ -479,7 +479,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     () =>
       schedule.find((entry) => isTutorMarkedEntry(entry) && getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) !== "submitted") ||
       filteredSchedule[0],
-    [dayStatuses, filteredSchedule, schedule]
+    [dayStatuses, filteredSchedule, schedule, selectedCourseLevel]
   );
 
   const overview = useMemo(() => {
@@ -506,7 +506,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       streak,
       lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, schedule]);
+  }, [dayStatuses, schedule, selectedCourseLevel]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
