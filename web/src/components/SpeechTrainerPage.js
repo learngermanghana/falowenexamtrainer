@@ -586,6 +586,33 @@ const SpeechTrainerPage = () => {
           </div>
         ) : null}
 
+        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10, background: "#f8fafc", border: "1px solid #e5e7eb" }}>
+          <strong style={{ fontSize: 14 }}>{t("speechTrainer.answerWorkspaceTitle", { defaultValue: "Answer workspace" })}</strong>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            {t("speechTrainer.answerWorkspaceDescription", { defaultValue: "Use one place to prepare your answer: type in the box and/or record your voice below." })}
+          </p>
+
+          <div style={{ display: "grid", gap: 8 }}>
+            <textarea
+              value={chatInput}
+              onChange={(event) => setChatInput(event.target.value)}
+              onKeyDown={handleInputKeyDown}
+              rows={4}
+              style={styles.textareaSmall}
+              placeholder={isA1A2Level ? t("speechTrainer.placeholderA1A2") : t("speechTrainer.placeholder")}
+              disabled={loading || completed}
+            />
+            <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
+              {t("speechTrainer.charCounter", { charsCount, minLength: MIN_ANSWER_LENGTH })}
+            </div>
+            <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
+              <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
+            </div>
+          </div>
+
+          <InlineSpeechTrainer profileLevel={level} compact />
+        </div>
+
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ ...styles.helperText, margin: 0 }}>
             {t("speechTrainer.progress", { answersDone, turnLimit: TURN_LIMIT, currentStepLabel })}
@@ -683,34 +710,6 @@ const SpeechTrainerPage = () => {
             {finalScripts.long ? <div><strong>{t("speechTrainer.scriptLabels.long")}</strong><p style={{ margin: "4px 0 0" }}>{finalScripts.long}</p></div> : null}
           </div>
         ) : null}
-
-        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10, background: "#f8fafc", border: "1px solid #e5e7eb" }}>
-          <strong style={{ fontSize: 14 }}>{t("speechTrainer.answerWorkspaceTitle", { defaultValue: "Answer workspace" })}</strong>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {t("speechTrainer.answerWorkspaceDescription", { defaultValue: "Use one place to prepare your answer: type in the box and/or record your voice below." })}
-          </p>
-
-          <div style={{ display: "grid", gap: 8 }}>
-            <textarea
-              value={chatInput}
-              onChange={(event) => setChatInput(event.target.value)}
-              onKeyDown={handleInputKeyDown}
-              rows={4}
-              style={styles.textareaSmall}
-              placeholder={isA1A2Level ? t("speechTrainer.placeholderA1A2") : t("speechTrainer.placeholder")}
-              disabled={loading || completed}
-            />
-            <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-              {t("speechTrainer.charCounter", { charsCount, minLength: MIN_ANSWER_LENGTH })}
-            </div>
-            <div style={{ width: "100%", height: 6, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }}>
-              <div style={{ width: `${Math.min((charsCount / MIN_ANSWER_LENGTH) * 100, 100)}%`, height: "100%", background: minLengthReached ? "#16a34a" : "#f59e0b" }} />
-            </div>
-          </div>
-
-          <InlineSpeechTrainer profileLevel={level} compact />
-        </div>
-
 
         <div style={{ display: "grid", gap: 8 }}>
           <div style={styles.filterRow}>
