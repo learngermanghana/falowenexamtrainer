@@ -311,6 +311,34 @@ const getStatusValue = (candidate) => {
   return "";
 };
 
+const getUpdatedAtValue = (candidate) => {
+  if (!candidate || typeof candidate !== "object") return 0;
+  const updatedAt = Number(candidate.updatedAt || 0);
+  return Number.isFinite(updatedAt) ? updatedAt : 0;
+};
+
+export const mergeCourseProgressStatuses = (localStatuses = {}, profileStatuses = {}) => {
+  const merged = { ...profileStatuses };
+
+  Object.entries(localStatuses || {}).forEach(([key, localEntry]) => {
+    const incomingEntry = profileStatuses?.[key];
+
+    if (!incomingEntry) {
+      merged[key] = localEntry;
+      return;
+    }
+
+    const localUpdatedAt = getUpdatedAtValue(localEntry);
+    const incomingUpdatedAt = getUpdatedAtValue(incomingEntry);
+
+    if (localUpdatedAt > incomingUpdatedAt) {
+      merged[key] = localEntry;
+    }
+  });
+
+  return merged;
+};
+
 export const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => {
   const assignmentKey = getEntryAssignmentKey(entry, level, occurrence);
   const levelToken = normalizeLevel(level);
@@ -409,14 +437,15 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel] || {};
 
     setDayStatuses((prev) => {
-      if (JSON.stringify(prev) === JSON.stringify(profileStatuses)) return prev;
-      return profileStatuses;
+      const mergedStatuses = mergeCourseProgressStatuses(prev, profileStatuses);
+      if (JSON.stringify(prev) === JSON.stringify(mergedStatuses)) return prev;
+      return mergedStatuses;
     });
     setHasHydratedCourseProgress(true);
   }, [authLoading, selectedCourseLevel, studentProfile?.courseProgressByLevel]);
 
   useEffect(() => {
-    if (!selectedCourseLevel || !studentProfile?.id) return;
+    if (!hasHydratedCourseProgress || !selectedCourseLevel || !studentProfile?.id) return;
 
     const existingStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel] || {};
     if (JSON.stringify(existingStatuses) === JSON.stringify(dayStatuses)) return;
@@ -446,7 +475,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     };
 
     syncProgress();
-  }, [dayStatuses, selectedCourseLevel, studentProfile]);
+  }, [dayStatuses, hasHydratedCourseProgress, selectedCourseLevel, studentProfile]);
 
   const schedule = useMemo(() => {
     const seenByDay = {};
