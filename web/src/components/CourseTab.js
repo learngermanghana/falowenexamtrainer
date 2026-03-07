@@ -548,13 +548,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return [...set].sort();
   }, [schedule]);
 
-  const todayTask = useMemo(
-    () =>
-      schedule.find((entry) => isTutorMarkedEntry(entry) && getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) !== "submitted") ||
-      filteredSchedule[0],
-    [dayStatuses, filteredSchedule, schedule, selectedCourseLevel]
-  );
-
   const overview = useMemo(() => {
     if (!hasHydratedCourseProgress) {
       return {
@@ -619,6 +612,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
             <div style={{ display: "grid", gap: 12 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ display: "grid", gap: 4 }}>
+                  <img
+                    src="/learning-space-hero.svg"
+                    alt="Falowen course header"
+                    style={{ width: "100%", maxWidth: 560, borderRadius: 12, border: "1px solid #e5e7eb" }}
+                  />
                   <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("courseTab.title")}</h2>
                   <span style={styles.helperText}>{t("courseTab.subtitle")}</span>
                 </div>
@@ -644,24 +642,10 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 </div>
               </div>
 
-              {todayTask ? (
-                <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
-                  <strong>{t("courseTab.todayTask")}: </strong>
-                  Day {todayTask.day} · {todayTask.topic}
-                </div>
-              ) : null}
-
               <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
                 <div style={{ ...styles.card, marginBottom: 0 }}>
                   {t("courseTab.metrics.days", { completed: overview.daysCompleted, total: overview.totalDays })}
                 </div>
-                <div style={{ ...styles.card, marginBottom: 0 }}>
-                  {t("courseTab.metrics.assignments", {
-                    submitted: overview.assignmentsSubmitted,
-                    total: overview.totalAssignments,
-                  })}
-                </div>
-                <div style={{ ...styles.card, marginBottom: 0 }}>{t("courseTab.metrics.streak", { count: overview.streak })}</div>
                 <div style={{ ...styles.card, marginBottom: 0 }}>
                   {t("courseTab.metrics.lastActivity", { date: overview.lastActivity })}
                 </div>
