@@ -356,7 +356,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [skillFilter, setSkillFilter] = useState("all");
   const [chapterFilter, setChapterFilter] = useState("all");
   const [dayStatuses, setDayStatuses] = useState({});
-  const [derivedStatusesByAssignment, setDerivedStatusesByAssignment] = useState({});
+  const [, setDerivedStatusesByAssignment] = useState({});
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
 
   const studentCode = useMemo(
