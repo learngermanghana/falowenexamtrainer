@@ -920,6 +920,27 @@ async function findStudentByCodeOrEmail({ studentCode, email }) {
   return null;
 }
 
+const normalizeCefrLevel = (rawLevel, fallback = "A1") => {
+  const normalizedLevel = String(rawLevel || "")
+    .trim()
+    .toUpperCase();
+  return ["A1", "A2", "B1", "B2", "C1"].includes(normalizedLevel) ? normalizedLevel : fallback;
+};
+
+async function resolveStudentLevelForUser({ uid, fallbackLevel = "A1" }) {
+  if (!uid) return normalizeCefrLevel(fallbackLevel);
+  try {
+    const db = admin.firestore();
+    const snapshot = await db.collection("students").where("uid", "==", uid).limit(1).get();
+    if (snapshot.empty) return normalizeCefrLevel(fallbackLevel);
+    const student = snapshot.docs[0]?.data() || {};
+    return normalizeCefrLevel(student.level, normalizeCefrLevel(fallbackLevel));
+  } catch (error) {
+    log.warn("student.level.lookup.failed", { uid, errorMessage: error?.message || "unknown" });
+    return normalizeCefrLevel(fallbackLevel);
+  }
+}
+
 /**
  * =========================
  * PAYSTACK: INITIALIZE
@@ -2164,6 +2185,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
     if (!authedUser) return;
 
     const { message, level = "B1" } = req.body || {};
+    const requestedLevel = normalizeCefrLevel(level, "B1");
 
     if (!req.file && (!message || !String(message).trim())) {
       return res.status(400).json({ error: "A message or audio recording is required" });
@@ -2175,6 +2197,8 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
+
+    const effectiveLevel = await resolveStudentLevelForUser({ uid: authedUser.uid, fallbackLevel: requestedLevel });
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
     if (!quota.allowed) {
@@ -2191,7 +2215,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
       .join("\n\n");
 
     const chatMessages = [
-      { role: "system", content: chatBuddyPrompt({ level }) },
+      { role: "system", content: chatBuddyPrompt({ level: effectiveLevel }) },
       { role: "user", content: combinedMessage || transcript || "Student sent an empty message." },
     ];
 
@@ -2210,7 +2234,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
       route: "/chatbuddy/respond",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level, quotaRemaining: quota.remaining },
+      metadata: { level: effectiveLevel, requestedLevel, quotaRemaining: quota.remaining },
       success: !fallbackUsed,
     });
 
@@ -2230,6 +2254,7 @@ app.post("/speaking/presentation-chat", async (req, res) => {
 
     const { message, level = "A1", history = [] } = req.body || {};
     const trimmedMessage = String(message || "").trim();
+    const requestedLevel = normalizeCefrLevel(level);
 
     const validationError =
       validateString(trimmedMessage, { required: true, maxLength: 800, label: "message" }) ||
@@ -2237,6 +2262,8 @@ app.post("/speaking/presentation-chat", async (req, res) => {
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
+
+    const effectiveLevel = await resolveStudentLevelForUser({ uid: authedUser.uid, fallbackLevel: requestedLevel });
 
     const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
     if (!quota.allowed) {
@@ -2249,7 +2276,7 @@ app.post("/speaking/presentation-chat", async (req, res) => {
     const cappedAnswersDone = Math.min(answersDoneBeforeCurrent + 1, PRESENTATION_TURN_LIMIT);
 
     const chatMessages = [
-      { role: "system", content: presentationCoachPrompt({ level, answersDone: cappedAnswersDone }) },
+      { role: "system", content: presentationCoachPrompt({ level: effectiveLevel, answersDone: cappedAnswersDone }) },
       ...safeHistory,
       { role: "user", content: trimmedMessage },
     ];
@@ -2271,7 +2298,7 @@ app.post("/speaking/presentation-chat", async (req, res) => {
       route: "/speaking/presentation-chat",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level, quotaRemaining: quota.remaining, completed },
+      metadata: { level: effectiveLevel, requestedLevel, quotaRemaining: quota.remaining, completed },
       success: !fallbackUsed,
     });
 
@@ -2299,6 +2326,7 @@ app.post("/speaking/presentation-upgrade", async (req, res) => {
 
     const { answer, level = "A1", mode = "a2-b1" } = req.body || {};
     const trimmedAnswer = String(answer || "").trim();
+    const requestedLevel = normalizeCefrLevel(level);
 
     const validationError =
       validateString(trimmedAnswer, { required: true, maxLength: 800, label: "answer" }) ||
@@ -2308,8 +2336,10 @@ app.post("/speaking/presentation-upgrade", async (req, res) => {
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
 
+    const effectiveLevel = await resolveStudentLevelForUser({ uid: authedUser.uid, fallbackLevel: requestedLevel });
+
     const messages = [
-      { role: "system", content: presentationUpgradePrompt({ level, mode }) },
+      { role: "system", content: presentationUpgradePrompt({ level: effectiveLevel, mode }) },
       { role: "user", content: trimmedAnswer },
     ];
 
@@ -2319,7 +2349,7 @@ app.post("/speaking/presentation-upgrade", async (req, res) => {
       route: "/speaking/presentation-upgrade",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level, mode },
+      metadata: { level: effectiveLevel, requestedLevel, mode },
       success: true,
     });
 
