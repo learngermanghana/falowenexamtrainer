@@ -205,12 +205,14 @@ const SpeakingPage = ({ mode = "exam" }) => {
   }, [chatMessages, chatLoading]);
 
   useEffect(() => {
+    const audioElements = audioRefs.current;
+
     return () => {
       if (recordingIntervalRef.current) window.clearInterval(recordingIntervalRef.current);
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
-      Object.values(audioRefs.current).forEach((audio) => {
+      Object.values(audioElements).forEach((audio) => {
         if (audio) audio.pause();
       });
     };
@@ -488,7 +490,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
                   <button
                     key={topic}
                     style={{ ...styles.secondaryButton, padding: "6px 10px", fontSize: 12 }}
-                    onClick={() => setDraftMessage(`Zum Thema \"${topic}\": `)}
+                    onClick={() => setDraftMessage(`Zum Thema "${topic}": `)}
                   >
                     {topic.slice(0, 40)}{topic.length > 40 ? "…" : ""}
                   </button>
