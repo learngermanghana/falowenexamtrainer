@@ -49,6 +49,7 @@ import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25On
 import B1Day26ReiseproblemeUndLoesungenWorkbookPage from "./components/B1Day26ReiseproblemeUndLoesungenWorkbookPage";
 import B1Day27UmweltfreundlichImAlltagWorkbookPage from "./components/B1Day27UmweltfreundlichImAlltagWorkbookPage";
 import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkbookPage";
+import A1Day16FoodAndNegationGrammarPage from "./components/A1Day16FoodAndNegationGrammarPage";
 import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3AskingAboutPricesWorkbookPage";
 import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCasesWorkbookPage";
 import A1Day1GreetingsGrammarPage from "./components/A1Day1GreetingsGrammarPage";
@@ -583,6 +584,7 @@ const AppShell = ({
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
           <Route path="/campus/course/the-12-hour-clock-system-in-german-chapter-7" element={<TwelveHourClockPage />} />
           <Route path="/campus/course/modal-verbs-day-14-3-6" element={<A1Day14ModalVerbsWorkbookPage />} />
+          <Route path="/campus/course/food-and-negation-day-16-9-10" element={<A1Day16FoodAndNegationGrammarPage />} />
           <Route
             path="/campus/course/a1-chapter-3-asking-about-prices-workbook"
             element={<A1Chapter3AskingAboutPricesWorkbookPage />}

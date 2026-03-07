@@ -29,24 +29,6 @@ const args = process.argv.slice(2).reduce((acc, arg, index, arr) => {
   return acc;
 }, {});
 
-
-const resolveBucketName = () => {
-  const explicit = args.bucket || process.env.ANSWER_KEY_BUCKET || process.env.FIREBASE_STORAGE_BUCKET;
-  if (explicit) return String(explicit).trim();
-
-  try {
-    const configRaw = process.env.FIREBASE_CONFIG;
-    if (!configRaw) return "";
-    const config = JSON.parse(configRaw);
-    if (config?.storageBucket) return String(config.storageBucket).trim();
-    if (config?.projectId) return `${String(config.projectId).trim()}.appspot.com`;
-  } catch (error) {
-    // ignore malformed FIREBASE_CONFIG and fall back to empty
-  }
-
-  return process.env.GCLOUD_PROJECT ? `${String(process.env.GCLOUD_PROJECT).trim()}.appspot.com` : "";
-};
-
 const required = ["assignmentKey", "file", "version"];
 const missing = required.filter((k) => !args[k]);
 if (missing.length) {
@@ -72,16 +54,10 @@ if (!fs.existsSync(filePath)) {
 const fileBuffer = fs.readFileSync(filePath);
 const checksum = crypto.createHash("sha256").update(fileBuffer).digest("hex");
 
-const bucketName = resolveBucketName();
-if (!bucketName) {
-  console.error("Missing storage bucket. Provide --bucket <bucket-name> or set ANSWER_KEY_BUCKET/FIREBASE_STORAGE_BUCKET.");
-  process.exit(1);
-}
-
-if (!admin.apps.length) admin.initializeApp({ storageBucket: bucketName });
+if (!admin.apps.length) admin.initializeApp();
 
 const db = admin.firestore();
-const bucket = admin.storage().bucket(bucketName);
+const bucket = admin.storage().bucket();
 const ext = path.extname(filePath) || (format === "json" ? ".json" : "");
 const objectPath = `answer-keys/${assignmentKey}/v${version}${ext}`;
 

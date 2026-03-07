@@ -12,7 +12,7 @@ import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
-import { collection, db, doc, getDocs, limit, query, runTransaction, serverTimestamp, where } from "../firebase";
+import { db, doc, runTransaction, serverTimestamp } from "../firebase";
 
 const ASSIGNMENT_STATUSES = {
   notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
@@ -299,14 +299,9 @@ const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
     assignmentTitle: `Day ${entry.day}${occurrence > 1 ? ` Task ${occurrence}` : ""} ${entry.topic || entry.chapter || ""}`,
   }) || `${String(level || "GENERAL").toUpperCase()}-DAY-${entry.day}${occurrence > 1 ? `-TASK-${occurrence}` : ""}`;
 
-const getStatusForEntry = (dayStatuses, derivedStatuses, entry, level, occurrence = 1) => {
+const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => {
   const assignmentKey = getEntryAssignmentKey(entry, level, occurrence);
-  return (
-    derivedStatuses[assignmentKey] ||
-    dayStatuses[assignmentKey]?.value ||
-    dayStatuses[String(entry.day)]?.value ||
-    "notStarted"
-  );
+  return dayStatuses[assignmentKey]?.value || dayStatuses[String(entry.day)]?.value || "notStarted";
 };
 
 
@@ -581,13 +576,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         (entry) =>
           matchesSearch(entry) &&
           (!assignmentsOnly || hasAssignment(entry)) &&
-          (!unfinishedOnly ||
-            getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) !== "submitted") &&
+          (!unfinishedOnly || getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) !== "submitted") &&
           matchesSkill(entry) &&
           matchesChapter(entry)
       )
     );
-  }, [assignmentsOnly, chapterFilter, dayStatuses, derivedStatusesByAssignment, schedule, searchTerm, skillFilter, unfinishedOnly, selectedCourseLevel]);
+  }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
 
   const chapterOptions = useMemo(() => {
     const set = new Set();
@@ -599,31 +593,20 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const todayTask = useMemo(
     () =>
-      schedule.find((entry) =>
-        isTutorMarkedEntry(entry) &&
-        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) !==
-          "submitted") ||
+      schedule.find((entry) => isTutorMarkedEntry(entry) && getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) !== "submitted") ||
       filteredSchedule[0],
-    [dayStatuses, derivedStatusesByAssignment, filteredSchedule, schedule, selectedCourseLevel]
+    [dayStatuses, filteredSchedule, schedule, selectedCourseLevel]
   );
 
   const overview = useMemo(() => {
-    const daysCompleted = schedule.filter(
-      (entry) =>
-        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) === "submitted"
-    ).length;
+    const daysCompleted = schedule.filter((entry) => getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted").length;
     const totalAssignments = schedule.filter((entry) => isTutorMarkedEntry(entry)).length;
     const assignmentsSubmitted = schedule.filter(
-      (entry) =>
-        isTutorMarkedEntry(entry) &&
-        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) === "submitted"
+      (entry) => isTutorMarkedEntry(entry) && getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted"
     ).length;
     let streak = 0;
     for (const entry of schedule) {
-      if (
-        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) === "submitted"
-      )
-        streak += 1;
+      if (getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted") streak += 1;
       else break;
     }
     const lastActivityTs = Object.values(dayStatuses)
@@ -639,7 +622,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       streak,
       lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, derivedStatusesByAssignment, schedule, selectedCourseLevel]);
+  }, [dayStatuses, schedule, selectedCourseLevel]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -796,10 +779,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         : [entry.schreiben_sprechen]
                       : [];
                     const milestoneEntry = isMilestoneEntry(entry);
-                    const status =
-                      milestoneEntry
-                        ? "milestoneComplete"
-                        : getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence);
+                    const status = milestoneEntry ? "milestoneComplete" : getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence);
                     const entryAssignmentKey = getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
