@@ -314,11 +314,10 @@ const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => {
   return dayStatuses[assignmentKey]?.value || dayStatuses[String(entry.day)]?.value || "notStarted";
 };
 
-
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { studentProfile } = useAuth();
+  const { studentProfile, loading: authLoading } = useAuth();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
@@ -363,6 +362,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     () => studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "",
     [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
   );
+  const [hasHydratedCourseProgress, setHasHydratedCourseProgress] = useState(false);
 
   useEffect(() => {
     if (!db || !selectedCourseLevel || !studentProfile?.id) {
@@ -492,10 +492,20 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
 
   useEffect(() => {
-    if (!selectedCourseLevel) return;
-    const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel];
-    setDayStatuses(profileStatuses || {});
-  }, [selectedCourseLevel, studentProfile]);
+    setHasHydratedCourseProgress(false);
+  }, [selectedCourseLevel]);
+
+  useEffect(() => {
+    if (!selectedCourseLevel || authLoading) return;
+
+    const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel] || {};
+
+    setDayStatuses((prev) => {
+      if (JSON.stringify(prev) === JSON.stringify(profileStatuses)) return prev;
+      return profileStatuses;
+    });
+    setHasHydratedCourseProgress(true);
+  }, [authLoading, selectedCourseLevel, studentProfile?.courseProgressByLevel]);
 
   useEffect(() => {
     if (!selectedCourseLevel || !studentProfile?.id) return;
@@ -609,6 +619,17 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   );
 
   const overview = useMemo(() => {
+    if (!hasHydratedCourseProgress) {
+      return {
+        daysCompleted: "—",
+        totalDays: schedule.length,
+        totalAssignments: "—",
+        assignmentsSubmitted: "—",
+        streak: "—",
+        lastActivity: "—",
+      };
+    }
+
     const daysCompleted = schedule.filter((entry) => getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted").length;
     const totalAssignments = schedule.filter((entry) => isTutorMarkedEntry(entry)).length;
     const assignmentsSubmitted = schedule.filter(
@@ -632,7 +653,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       streak,
       lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, schedule, selectedCourseLevel]);
+  }, [dayStatuses, hasHydratedCourseProgress, schedule, selectedCourseLevel]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
