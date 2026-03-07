@@ -30,17 +30,13 @@ const uploadSpeechTrainerAudio = async (audioBlob) => {
     cacheControl: "private, max-age=0, no-cache",
   });
 
-  return {
-    audioUrl: await getDownloadURL(storageRef),
-    audioPath: storageRef.fullPath,
-  };
+  return getDownloadURL(storageRef);
 };
 
 const submitViaFirebaseUrl = async ({ audioBlob, note, level, idToken }) => {
-  const uploadResult = audioBlob ? await uploadSpeechTrainerAudio(audioBlob) : { audioUrl: "", audioPath: "" };
+  const audioUrl = audioBlob ? await uploadSpeechTrainerAudio(audioBlob) : "";
   const payload = {
-    audioUrl: uploadResult.audioUrl,
-    audioPath: uploadResult.audioPath,
+    audioUrl,
     note: note || "",
     level: level || "",
   };

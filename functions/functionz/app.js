@@ -765,52 +765,6 @@ const downloadAudioFromUrl = async (audioUrl) => {
   };
 };
 
-
-const downloadAudioFromStoragePath = async (audioPath) => {
-  const normalizedPath = String(audioPath || "").trim();
-
-  if (!normalizedPath) {
-    throw new Error("audioPath is required");
-  }
-
-  if (!normalizedPath.startsWith("speech-trainer/")) {
-    throw new Error("audioPath prefix is not allowed");
-  }
-
-  const bucketName =
-    process.env.FIREBASE_STORAGE_BUCKET ||
-    process.env.REACT_APP_FIREBASE_STORAGE_BUCKET ||
-    (process.env.FIREBASE_PROJECT_ID ? `${process.env.FIREBASE_PROJECT_ID}.appspot.com` : "");
-
-  const bucket = bucketName ? admin.storage().bucket(bucketName) : admin.storage().bucket();
-  const file = bucket.file(normalizedPath);
-  const [exists] = await file.exists();
-
-  if (!exists) {
-    throw new Error("Audio file not found in storage");
-  }
-
-  const [metadata] = await file.getMetadata().catch(() => [{ contentType: "audio/webm", size: 0 }]);
-  const size = Number(metadata?.size || 0);
-  const maxBytes = 25 * 1024 * 1024;
-  if (size > maxBytes) {
-    throw new Error("Audio file is too large");
-  }
-
-  const [buffer] = await file.download();
-
-  if (!buffer?.length) {
-    throw new Error("Downloaded audio is empty");
-  }
-
-  return {
-    buffer,
-    originalname: `speech-trainer-${Date.now()}.webm`,
-    mimetype: metadata?.contentType || "audio/webm",
-    size: buffer.length,
-  };
-};
-
 const parseSpeakingQuestionContext = (question) => {
   const source = String(question || "").trim();
   if (!source) return null;
@@ -2299,13 +2253,12 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const { note = "", level = "B1", userId = "guest", audioUrl = "", audioPath = "" } = req.body || {};
+    const { note = "", level = "B1", userId = "guest", audioUrl = "" } = req.body || {};
 
     const validationError =
       validateString(note, { maxLength: 300, label: "note" }) ||
       validateString(level, { maxLength: 10, label: "level" }) ||
-      validateString(audioUrl, { maxLength: 3000, label: "audioUrl" }) ||
-      validateString(audioPath, { maxLength: 500, label: "audioPath" });
+      validateString(audioUrl, { maxLength: 3000, label: "audioUrl" });
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
@@ -2322,9 +2275,6 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
     }
 
     let audioFile = req.file;
-    if (!audioFile && audioPath) {
-      audioFile = await downloadAudioFromStoragePath(audioPath);
-    }
     if (!audioFile && audioUrl) {
       audioFile = await downloadAudioFromUrl(audioUrl);
     }
@@ -2351,7 +2301,7 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
         userId,
         quotaRemaining: quota.remaining,
         hasTranscript: Boolean(transcript),
-        audioSource: req.file ? "multipart" : audioPath ? "firebase_path" : audioUrl ? "firebase_url" : "none",
+        audioSource: req.file ? "multipart" : audioUrl ? "firebase_url" : "none",
       },
     });
 
