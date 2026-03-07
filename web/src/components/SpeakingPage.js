@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
@@ -40,6 +40,20 @@ const parseRubric = (text) => {
   };
 };
 
+const formatTime = (seconds = 0) => {
+  const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const ss = String(seconds % 60).padStart(2, "0");
+  return `${mm}:${ss}`;
+};
+
+const formatClock = (date) =>
+  new Date(date).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+const waveHeights = [8, 16, 24, 18, 26, 14, 20, 30, 22, 28, 16, 24, 14, 20, 12];
+
 const SpeakingPage = ({ mode = "exam" }) => {
   const { level: examLevel } = useExam();
   const { idToken, user, studentProfile } = useAuth();
@@ -54,8 +68,11 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
   const [chatMessages, setChatMessages] = useState([
     {
+      id: "welcome-1",
       role: "coach",
-      text: "Hi! Pick a question, then chat your answer. I'll analyze it and score key speaking criteria.",
+      type: "text",
+      text: "Hallo! Pick a speaking prompt and send text or voice. I will coach you step by step.",
+      createdAt: new Date().toISOString(),
     },
   ]);
   const [draftMessage, setDraftMessage] = useState("");
@@ -64,6 +81,17 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [lastRubric, setLastRubric] = useState(null);
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [recordingError, setRecordingError] = useState("");
+  const [playingMessageId, setPlayingMessageId] = useState("");
+
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const streamRef = useRef(null);
+  const recordingIntervalRef = useRef(null);
+  const audioRefs = useRef({});
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (isExamMode && examLevel) {
@@ -127,6 +155,11 @@ const SpeakingPage = ({ mode = "exam" }) => {
     [filteredQuestions, selectedQuestionId]
   );
 
+  const quickTopics = useMemo(() => {
+    const fromSheet = filteredQuestions.slice(0, 3).map((question) => question.topicPrompt);
+    return [...new Set([...(selectedQuestion ? [selectedQuestion.topicPrompt] : []), ...fromSheet])].slice(0, 4);
+  }, [filteredQuestions, selectedQuestion]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -167,6 +200,22 @@ const SpeakingPage = ({ mode = "exam" }) => {
     });
   }, [completedQuestionIds, mode, progressLoaded, selectedLevel, selectedQuestionId, selectedTeil, studentCode, userId]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [chatMessages, chatLoading]);
+
+  useEffect(() => {
+    return () => {
+      if (recordingIntervalRef.current) window.clearInterval(recordingIntervalRef.current);
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+      Object.values(audioRefs.current).forEach((audio) => {
+        if (audio) audio.pause();
+      });
+    };
+  }, []);
+
   const markPromptCompleted = () => {
     if (!selectedQuestion) return;
 
@@ -181,11 +230,30 @@ const SpeakingPage = ({ mode = "exam" }) => {
     });
   };
 
+  const appendCoachText = (text) => {
+    setChatMessages((current) => [
+      ...current,
+      {
+        id: `coach-${Date.now()}`,
+        role: "coach",
+        type: "text",
+        text,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+  };
+
   const sendMessage = async () => {
     const trimmed = draftMessage.trim();
     if (!trimmed || chatLoading || !selectedQuestion) return;
 
-    const studentMessage = { role: "student", text: trimmed };
+    const studentMessage = {
+      id: `student-${Date.now()}`,
+      role: "student",
+      type: "text",
+      text: trimmed,
+      createdAt: new Date().toISOString(),
+    };
     setChatMessages((current) => [...current, studentMessage]);
     setDraftMessage("");
     setChatLoading(true);
@@ -211,20 +279,114 @@ const SpeakingPage = ({ mode = "exam" }) => {
       });
       const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
       setLastRubric(parseRubric(replyText));
-      setChatMessages((current) => [...current, { role: "coach", text: replyText }]);
+      appendCoachText(replyText);
       markPromptCompleted();
     } catch (error) {
       setChatError(error?.message || "Could not reach the AI coach.");
-      setChatMessages((current) => [
-        ...current,
-        {
-          role: "coach",
-          text: "I couldn't analyze your answer right now. Please try again in a moment.",
-        },
-      ]);
+      appendCoachText("I couldn't analyze your answer right now. Please try again in a moment.");
     } finally {
       setChatLoading(false);
     }
+  };
+
+  const startRecording = async () => {
+    if (isRecording || !selectedQuestion) return;
+    setRecordingError("");
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      const recorder = new MediaRecorder(stream);
+      audioChunksRef.current = [];
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) audioChunksRef.current.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        if (recordingIntervalRef.current) {
+          window.clearInterval(recordingIntervalRef.current);
+          recordingIntervalRef.current = null;
+        }
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const url = URL.createObjectURL(blob);
+        const duration = recordingSeconds;
+
+        setChatMessages((current) => [
+          ...current,
+          {
+            id: `voice-${Date.now()}`,
+            role: "student",
+            type: "audio",
+            audioUrl: url,
+            duration,
+            createdAt: new Date().toISOString(),
+          },
+        ]);
+        setRecordingSeconds(0);
+        setIsRecording(false);
+        markPromptCompleted();
+        appendCoachText("Nice recording! Now type a short transcript or key sentence so I can give precise grammar feedback.");
+
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+      };
+
+      mediaRecorderRef.current = recorder;
+      recorder.start();
+      setRecordingSeconds(0);
+      setIsRecording(true);
+      recordingIntervalRef.current = window.setInterval(() => {
+        setRecordingSeconds((value) => value + 1);
+      }, 1000);
+    } catch (error) {
+      setRecordingError(error?.message || "Microphone access was blocked.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (!mediaRecorderRef.current || mediaRecorderRef.current.state !== "recording") return;
+    mediaRecorderRef.current.stop();
+  };
+
+  const toggleAudioPlayback = (messageId) => {
+    const currentAudio = audioRefs.current[messageId];
+    if (!currentAudio) return;
+
+    if (playingMessageId && playingMessageId !== messageId) {
+      const previousAudio = audioRefs.current[playingMessageId];
+      if (previousAudio) {
+        previousAudio.pause();
+        previousAudio.currentTime = 0;
+      }
+    }
+
+    if (playingMessageId === messageId) {
+      currentAudio.pause();
+      setPlayingMessageId("");
+      return;
+    }
+
+    currentAudio.play();
+    setPlayingMessageId(messageId);
+  };
+
+  const clearConversation = () => {
+    setChatMessages([
+      {
+        id: `welcome-${Date.now()}`,
+        role: "coach",
+        type: "text",
+        text: "Conversation cleared. Pick a prompt and start again.",
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+    setLastRubric(null);
+    setChatError("");
+    setDraftMessage("");
+    setPlayingMessageId("");
   };
 
   const completedCount = useMemo(
@@ -236,47 +398,41 @@ const SpeakingPage = ({ mode = "exam" }) => {
 
   return (
     <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>Speaking Exams{examLevel ? ` – Level ${examLevel}` : ""}</h1>
-        <p style={styles.subtitle}>
-          Recorder and chat are now on one page. Open the recorder anytime, then type your answer below for instant feedback.
-        </p>
-
+      <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
         <div
           style={{
-            marginTop: 16,
-            padding: 16,
-            borderRadius: 12,
-            border: "1px solid #E5E7EB",
-            background: "#F9FAFB",
-            display: "grid",
-            gap: 10,
+            background: "linear-gradient(120deg, #4f46e5, #8b5cf6, #a21caf)",
+            color: "#ffffff",
+            padding: "18px 20px",
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            alignItems: "center",
           }}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <h3 style={{ margin: 0 }}>🎙️ Speaking Recorder</h3>
-            <span style={styles.badge}>
-              Progress: {Math.min(completedCount, totalCount)}/{totalCount} completed
-            </span>
+          <div>
+            <p style={{ margin: 0, opacity: 0.85, fontSize: 13 }}>Online • Ready to practice</p>
+            <h1 style={{ margin: "4px 0 0", fontSize: 28 }}>Deutsch AI Tutor</h1>
+            <p style={{ margin: "6px 0 0", opacity: 0.9, fontSize: 13 }}>
+              Speaking Exams {examLevel ? `• Level ${examLevel}` : ""}
+            </p>
           </div>
-          <p style={{ ...styles.helperText, margin: 0 }}>Use the recorder first, then return below and paste/type what you said.</p>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <a href={practiceLink} target="_blank" rel="noreferrer" style={styles.primaryButton}>
-              Open speaking recorder
-            </a>
-            <button style={styles.secondaryButton} onClick={markPromptCompleted} disabled={!selectedQuestion}>
-              Mark selected prompt completed
-            </button>
-          </div>
-          <p style={{ ...styles.helperText, margin: 0, wordBreak: "break-all" }}>{practiceLink}</p>
+          <button style={{ ...styles.secondaryButton, background: "rgba(255,255,255,0.95)" }} onClick={clearConversation}>
+            Clear conversation
+          </button>
         </div>
 
-        <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-          <div style={{ ...styles.uploadCard, display: "grid", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(240px, 320px) 1fr", gap: 0 }}>
+          <aside style={{ borderRight: "1px solid #E5E7EB", background: "#F8FAFC", padding: 16, display: "grid", gap: 14 }}>
+            <span style={styles.badge}>
+              Progress: {Math.min(completedCount, totalCount)}/{totalCount}
+            </span>
+
             <div style={{ display: "grid", gap: 6 }}>
               <label style={styles.label}>Level</label>
               {isExamMode ? (
-                <div style={{ ...styles.input, background: "#F3F4F6", color: "#111827", fontWeight: 700 }}>{selectedLevel}</div>
+                <div style={{ ...styles.input, background: "#EEF2FF", fontWeight: 700 }}>{selectedLevel}</div>
               ) : (
                 <select
                   style={styles.select}
@@ -306,90 +462,175 @@ const SpeakingPage = ({ mode = "exam" }) => {
             </div>
 
             <div style={{ display: "grid", gap: 6 }}>
-              <label style={styles.label}>Question from sheet</label>
-              <select
-                style={styles.select}
-                value={selectedQuestionId}
-                onChange={(event) => setSelectedQuestionId(event.target.value)}
-              >
+              <label style={styles.label}>Question</label>
+              <select style={styles.select} value={selectedQuestionId} onChange={(event) => setSelectedQuestionId(event.target.value)}>
                 {filteredQuestions.map((question) => (
                   <option key={question.id} value={question.id}>
-                    {`${question.teilLabel} • ${question.topicPrompt}${
-                      question.keywordSubtopic ? ` (${question.keywordSubtopic})` : ""
-                    }`}
+                    {`${question.teilLabel} • ${question.topicPrompt}`}
                   </option>
                 ))}
               </select>
             </div>
 
-            {selectedQuestion ? (
-              <div style={{ ...styles.card, margin: 0, padding: 12, background: "#F8FAFC" }}>
-                <p style={{ margin: 0, fontWeight: 600 }}>
-                  {selectedQuestion.teilLabel} · {selectedQuestion.topicPrompt}
-                </p>
-                {selectedQuestion.keywordSubtopic ? (
-                  <p style={{ ...styles.helperText, margin: "6px 0 0" }}>Keyword: {selectedQuestion.keywordSubtopic}</p>
-                ) : null}
-                {selectedLevel === "A1" && selectedTeil === "1" ? (
-                  <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#4338CA" }}>
-                    A1 Teil 1 tip: write/say all intro points in one answer line.
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
+            <button style={styles.primaryButton} onClick={isRecording ? stopRecording : startRecording} disabled={!selectedQuestion}>
+              {isRecording ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
+            </button>
+            {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
 
-          <div style={{ ...styles.uploadCard, display: "grid", gap: 10 }}>
-            <div style={{ maxHeight: 220, overflowY: "auto", display: "grid", gap: 8 }}>
-              {chatMessages.map((message, index) => (
-                <div
-                  key={`${message.role}-${index}`}
-                  style={{
-                    alignSelf: message.role === "student" ? "end" : "start",
-                    background: message.role === "student" ? "#EEF2FF" : "#F3F4F6",
-                    borderRadius: 10,
-                    padding: "8px 10px",
-                    maxWidth: "90%",
-                  }}
-                >
-                  <p style={{ margin: 0, fontSize: 13, color: "#111827" }}>{message.text}</p>
+            <a href={practiceLink} target="_blank" rel="noreferrer" style={{ ...styles.linkButton, fontSize: 12 }}>
+              Open external recorder
+            </a>
+
+            <div style={{ ...styles.card, margin: 0, padding: 12, background: "#EEF2FF", border: "1px solid #C7D2FE" }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>Quick practice topics</p>
+              <div style={{ marginTop: 8, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {quickTopics.map((topic) => (
+                  <button
+                    key={topic}
+                    style={{ ...styles.secondaryButton, padding: "6px 10px", fontSize: 12 }}
+                    onClick={() => setDraftMessage(`Zum Thema \"${topic}\": `)}
+                  >
+                    {topic.slice(0, 40)}{topic.length > 40 ? "…" : ""}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          <section style={{ background: "#E5E7EB", minHeight: 580, display: "grid", gridTemplateRows: "1fr auto" }}>
+            <div style={{ padding: 16, overflowY: "auto", display: "grid", gap: 12 }}>
+              {chatMessages.map((message) => {
+                const isStudent = message.role === "student";
+                return (
+                  <div
+                    key={message.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: isStudent ? "flex-end" : "flex-start",
+                      alignItems: "flex-start",
+                      gap: 10,
+                    }}
+                  >
+                    {!isStudent ? (
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#C7D2FE", display: "grid", placeItems: "center" }}>
+                        🤖
+                      </div>
+                    ) : null}
+                    <div
+                      style={{
+                        maxWidth: "78%",
+                        borderRadius: 18,
+                        padding: "10px 14px",
+                        boxShadow: "0 2px 8px rgba(15, 23, 42, 0.08)",
+                        background: isStudent ? "linear-gradient(120deg, #4f46e5, #9333ea)" : "#ffffff",
+                        color: isStudent ? "#ffffff" : "#1f2937",
+                      }}
+                    >
+                      {message.type === "audio" ? (
+                        <div style={{ display: "grid", gap: 8 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                            <button
+                              style={{
+                                border: "none",
+                                borderRadius: "50%",
+                                width: 34,
+                                height: 34,
+                                cursor: "pointer",
+                                background: "rgba(255,255,255,0.25)",
+                                color: "#fff",
+                              }}
+                              onClick={() => toggleAudioPlayback(message.id)}
+                            >
+                              {playingMessageId === message.id ? "⏸" : "▶"}
+                            </button>
+                            <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                              {waveHeights.map((height, index) => (
+                                <span
+                                  key={`${message.id}-wave-${index}`}
+                                  style={{
+                                    display: "inline-block",
+                                    width: 3,
+                                    height,
+                                    borderRadius: 999,
+                                    background: "rgba(255,255,255,0.55)",
+                                  }}
+                                />
+                              ))}
+                            </div>
+                            <span style={{ fontSize: 12, opacity: 0.95 }}>{formatTime(message.duration || 0)}</span>
+                          </div>
+                          <audio
+                            ref={(node) => {
+                              if (node) {
+                                audioRefs.current[message.id] = node;
+                                node.onended = () => setPlayingMessageId("");
+                              }
+                            }}
+                            src={message.audioUrl}
+                          />
+                        </div>
+                      ) : (
+                        <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{message.text}</p>
+                      )}
+                      <p style={{ margin: "6px 0 0", opacity: 0.75, fontSize: 11 }}>{formatClock(message.createdAt)}</p>
+                    </div>
+                    {isStudent ? (
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#E9D5FF", display: "grid", placeItems: "center" }}>
+                        👤
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+
+              {chatLoading ? (
+                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                  <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#C7D2FE", display: "grid", placeItems: "center" }}>
+                    🤖
+                  </div>
+                  <div style={{ background: "#ffffff", borderRadius: 16, padding: "10px 14px", color: "#4B5563", fontSize: 13 }}>
+                    AI is typing…
+                  </div>
                 </div>
-              ))}
+              ) : null}
+              <div ref={messagesEndRef} />
             </div>
 
-            {lastRubric ? (
-              <div style={{ ...styles.card, margin: 0, padding: 12, background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
-                <p style={{ margin: 0, fontWeight: 700 }}>Latest AI scoring</p>
-                <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-                  Grammar: {lastRubric.grammar}/5 · Vocabulary: {lastRubric.vocabulary}/5 · Pronunciation readiness: {lastRubric.pronunciationReadiness}/5 · Structure: {lastRubric.structure}/5
+            <div style={{ borderTop: "1px solid #D1D5DB", padding: 14, background: "#F9FAFB", display: "grid", gap: 10 }}>
+              {selectedQuestion ? (
+                <p style={{ margin: 0, fontSize: 12, color: "#4338CA" }}>
+                  {selectedQuestion.teilLabel} • {selectedQuestion.topicPrompt}
                 </p>
+              ) : null}
+
+              {lastRubric ? (
+                <p style={{ margin: 0, fontSize: 12, color: "#1E3A8A" }}>
+                  Latest score — Grammar: {lastRubric.grammar}/5 · Vocabulary: {lastRubric.vocabulary}/5 · Pronunciation: {lastRubric.pronunciationReadiness}/5 · Structure: {lastRubric.structure}/5
+                </p>
+              ) : null}
+
+              {chatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 12 }}>{chatError}</p> : null}
+
+              <div style={{ display: "flex", gap: 8 }}>
+                <textarea
+                  style={{ ...styles.input, minHeight: 56, maxHeight: 120, resize: "vertical" }}
+                  placeholder="Type your German response and press Enter..."
+                  value={draftMessage}
+                  onChange={(event) => setDraftMessage(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                      event.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                  disabled={chatLoading}
+                />
+                <button style={{ ...styles.primaryButton, borderRadius: 12, minWidth: 88 }} onClick={sendMessage} disabled={chatLoading || !selectedQuestion}>
+                  Send
+                </button>
               </div>
-            ) : null}
-
-            {chatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 13 }}>{chatError}</p> : null}
-
-            <textarea
-              style={{ ...styles.input, minHeight: 90, resize: "vertical" }}
-              placeholder="Type your German answer or question here..."
-              value={draftMessage}
-              onChange={(event) => setDraftMessage(event.target.value)}
-              disabled={chatLoading}
-            />
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button style={styles.primaryButton} onClick={sendMessage} disabled={chatLoading || !selectedQuestion}>
-                {chatLoading ? "Analyzing..." : "Send"}
-              </button>
             </div>
-          </div>
-
-          <div style={{ ...styles.card, background: "#F8FAFC", border: "1px solid #E5E7EB", margin: 0 }}>
-            <h3 style={{ marginTop: 0, marginBottom: 8 }}>Suggested next updates</h3>
-            <ul style={{ margin: 0, paddingLeft: 18, color: "#374151" }}>
-              <li>Add auto-transcription from recorder audio into the chat box to save typing time.</li>
-              <li>Show per-Teil completion bars so students know which speaking section needs more work.</li>
-              <li>Attach teacher review comments to completed prompts directly from Firestore history.</li>
-            </ul>
-          </div>
+          </section>
         </div>
       </div>
     </div>
