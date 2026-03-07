@@ -2617,22 +2617,79 @@ app.post("/speaking/presentation-session/history", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
     if (!authedUser) return;
 
+    const { limit = 10, startAfter = "" } = req.body || {};
+    const safeLimit = Math.max(1, Math.min(30, Number(limit) || 10));
+    const validationError = validateString(startAfter, { maxLength: 120, label: "startAfter" });
+    if (validationError) return res.status(400).json({ error: validationError });
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Storage unavailable" });
+
+    let query = db
+      .collection("presentationSessions")
+      .where("uid", "==", authedUser.uid)
+      .orderBy("createdAt", "desc")
+      .limit(safeLimit);
+
+    const trimmedStartAfter = String(startAfter || "").trim();
+    if (trimmedStartAfter) {
+      const startAfterRef = db.collection("presentationSessions").doc(trimmedStartAfter);
+      const startAfterSnap = await startAfterRef.get();
+      if (startAfterSnap.exists && startAfterSnap.data()?.uid === authedUser.uid) {
+        query = query.startAfter(startAfterSnap);
+      }
+    }
+
+    const snap = await query.get();
+
+    const sessions = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const nextCursor = snap.docs.length === safeLimit ? snap.docs[snap.docs.length - 1].id : "";
+
+    return res.json({ sessions, nextCursor, hasMore: Boolean(nextCursor) });
+  } catch (err) {
+    console.error("/speaking/presentation-session/history error", err);
+    return res.status(500).json({ error: err.message || "Failed to load presentation sessions" });
+  }
+});
+
+app.post("/speaking/presentation-session/delete-all", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res, { allowGuest: false });
+    if (!authedUser) return;
+
     const db = getFirestoreSafe();
     if (!db) return res.status(503).json({ error: "Storage unavailable" });
 
     const snap = await db
       .collection("presentationSessions")
       .where("uid", "==", authedUser.uid)
-      .orderBy("createdAt", "desc")
-      .limit(10)
       .get();
 
-    const sessions = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    if (snap.empty) return res.json({ ok: true, deletedCount: 0 });
 
-    return res.json({ sessions });
+    const chunks = [];
+    let current = [];
+    snap.docs.forEach((doc) => {
+      current.push(doc.ref);
+      if (current.length === 400) {
+        chunks.push(current);
+        current = [];
+      }
+    });
+    if (current.length) chunks.push(current);
+
+    for (const refs of chunks) {
+      const batch = db.batch();
+      refs.forEach((ref) => batch.delete(ref));
+      // eslint-disable-next-line no-await-in-loop
+      await batch.commit();
+    }
+
+    return res.json({ ok: true, deletedCount: snap.docs.length });
   } catch (err) {
-    console.error("/speaking/presentation-session/history error", err);
-    return res.status(500).json({ error: err.message || "Failed to load presentation sessions" });
+    console.error("/speaking/presentation-session/delete-all error", err);
+    return res.status(500).json({ error: err.message || "Failed to delete all presentation sessions" });
   }
 });
 

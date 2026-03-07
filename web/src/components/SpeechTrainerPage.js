@@ -5,15 +5,20 @@ import { useAuth } from "../context/AuthContext";
 import {
   loadPresentationSessions,
   deletePresentationSession,
+  deleteAllPresentationSessions,
   requestPresentationCoachReply,
   requestPresentationUpgrade,
   savePresentationSession,
   updatePresentationSession,
 } from "../services/presentationCoachService";
 import InlineSpeechTrainer from "./speechTrainer/InlineSpeechTrainer";
+import { sendSpeechTrainerAttempt } from "../services/speechTrainerService";
+import { useToast } from "../context/ToastContext";
 
 const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
+const SESSION_HISTORY_PAGE_SIZE = 10;
+const DELETE_UNDO_MS = 8000;
 
 const getInitialCoachMessage = (isA1A2, t) => ({
   role: "assistant",
@@ -148,6 +153,7 @@ const renderAssistantContent = (content, isA1A2Level, t) => {
 const SpeechTrainerPage = () => {
   const { t } = useTranslation();
   const { idToken, studentProfile } = useAuth();
+  const { showToast } = useToast();
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState([getInitialCoachMessage(false, t)]);
   const [answersDone, setAnswersDone] = useState(0);
@@ -166,7 +172,17 @@ const SpeechTrainerPage = () => {
   const [selectedUpgradesByIndex, setSelectedUpgradesByIndex] = useState({});
   const [historyFilter, setHistoryFilter] = useState({ topic: "", level: "" });
   const [deletingSessionId, setDeletingSessionId] = useState("");
+  const [deletingAllSessions, setDeletingAllSessions] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const [historyNextCursor, setHistoryNextCursor] = useState("");
+  const [historyHasMore, setHistoryHasMore] = useState(false);
+  const [historyLoadingMore, setHistoryLoadingMore] = useState(false);
+  const [inlineAudioState, setInlineAudioState] = useState({ hasAudio: false, audioBlob: null, clearAudio: null });
+  const [audioCoachStatus, setAudioCoachStatus] = useState("");
+  const [audioCoachError, setAudioCoachError] = useState("");
   const chatLogRef = useRef(null);
+  const autosaveTimerRef = useRef(null);
+  const pendingDeleteTimerRef = useRef(null);
 
   const level = useMemo(() => {
     const raw = String(studentProfile?.level || "A1").toUpperCase();
@@ -194,8 +210,19 @@ const SpeechTrainerPage = () => {
   const tutorName = t("speechTrainer.tutorName");
 
   const progressPercent = Math.min(100, Math.round((answersDone / TURN_LIMIT) * 100));
-  const charsCount = chatInput.trim().length;
+  const trimmedInput = chatInput.trim();
+  const charsCount = trimmedInput.length;
+  const hasText = Boolean(trimmedInput);
+  const hasAudio = Boolean(inlineAudioState?.hasAudio && inlineAudioState?.audioBlob);
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
+  const canSubmitText = hasText && minLengthReached;
+  const canSubmitAudio = hasAudio;
+  const canSubmitComposer = !loading && !completed && (canSubmitText || canSubmitAudio);
+  const composerCtaLabel = hasText && hasAudio
+    ? t("speechTrainer.composerSendTextAndRecording")
+    : hasAudio
+      ? t("speechTrainer.composerSendRecording")
+      : t("speechTrainer.composerSendMessage");
   const currentStepLabel =
     flowStepsForLevel[Math.min(answersDone, TURN_LIMIT - 1)] || flowStepsForLevel[flowStepsForLevel.length - 1];
 
@@ -230,8 +257,10 @@ const SpeechTrainerPage = () => {
   const refreshHistory = useCallback(async () => {
     if (!idToken) return;
     try {
-      const response = await loadPresentationSessions({ idToken });
+      const response = await loadPresentationSessions({ idToken, limit: SESSION_HISTORY_PAGE_SIZE });
       setSessionHistory(Array.isArray(response?.sessions) ? response.sessions : []);
+      setHistoryNextCursor(String(response?.nextCursor || ""));
+      setHistoryHasMore(Boolean(response?.hasMore));
     } catch (historyError) {
       console.warn("Could not load presentation session history", historyError);
     }
@@ -240,6 +269,34 @@ const SpeechTrainerPage = () => {
   useEffect(() => {
     refreshHistory();
   }, [refreshHistory]);
+
+
+  const loadMoreHistory = useCallback(async () => {
+    if (!idToken || !historyHasMore || !historyNextCursor || historyLoadingMore) return;
+    try {
+      setHistoryLoadingMore(true);
+      const response = await loadPresentationSessions({
+        idToken,
+        limit: SESSION_HISTORY_PAGE_SIZE,
+        startAfter: historyNextCursor,
+      });
+      const nextSessions = Array.isArray(response?.sessions) ? response.sessions : [];
+      setSessionHistory((prev) => {
+        const seen = new Set(prev.map((session) => session.id));
+        const merged = [...prev];
+        nextSessions.forEach((session) => {
+          if (!seen.has(session.id)) merged.push(session);
+        });
+        return merged;
+      });
+      setHistoryNextCursor(String(response?.nextCursor || ""));
+      setHistoryHasMore(Boolean(response?.hasMore));
+    } catch (historyError) {
+      console.warn("Could not load more presentation sessions", historyError);
+    } finally {
+      setHistoryLoadingMore(false);
+    }
+  }, [idToken, historyHasMore, historyNextCursor, historyLoadingMore]);
 
   const restoreSessionFromFirestore = useCallback(
     (session) => {
@@ -355,15 +412,64 @@ const SpeechTrainerPage = () => {
   };
 
   const handleSend = async () => {
-    const trimmed = chatInput.trim();
-    if (!trimmed || loading || completed) return;
-    if (trimmed.length < MIN_ANSWER_LENGTH) {
+    if (!trimmedInput || loading || completed) return;
+    if (trimmedInput.length < MIN_ANSWER_LENGTH) {
       setError(t("speechTrainer.errors.minLength", { minLength: MIN_ANSWER_LENGTH, tutorName }));
       return;
     }
 
     const history = chatMessages.map(({ role, content }) => ({ role, content }));
-    await submitMessage({ message: trimmed, history });
+    await submitMessage({ message: trimmedInput, history });
+  };
+
+  const handleSendRecording = async () => {
+    if (!inlineAudioState?.audioBlob || loading || completed) return;
+
+    try {
+      setAudioCoachError("");
+      setAudioCoachStatus(t("speechTrainer.audioSendingStatus"));
+      const response = await sendSpeechTrainerAttempt({
+        audioBlob: inlineAudioState.audioBlob,
+        note: trimmedInput,
+        level,
+        idToken,
+      });
+      const feedbackParts = [
+        response?.transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${response.transcript}` : "",
+        response?.feedback || response?.notes || response?.summary
+          ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
+          : "",
+        response?.nextSteps || response?.actions
+          ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
+          : "",
+      ].filter(Boolean);
+      if (feedbackParts.length) {
+        setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("
+
+"), meta: { type: "audio_feedback" } }]);
+      }
+      setAudioCoachStatus(t("speechTrainer.audioReadyStatus"));
+      if (inlineAudioState?.clearAudio) inlineAudioState.clearAudio();
+      if (trimmedInput) setChatInput("");
+    } catch (submitError) {
+      const backendError =
+        submitError?.response?.data?.error ||
+        submitError?.response?.data?.message ||
+        submitError?.message ||
+        t("speechTrainer.audioFallbackError");
+      setAudioCoachError(String(backendError));
+      setAudioCoachStatus("");
+    }
+  };
+
+  const handleComposerSubmit = async () => {
+    if (!canSubmitComposer) return;
+    if (canSubmitText) {
+      await handleSend();
+    }
+    if (canSubmitAudio) {
+      await handleSendRecording();
+    }
   };
 
   const handleRetry = async () => {
@@ -439,22 +545,54 @@ const SpeechTrainerPage = () => {
     setActiveSessionId("");
   };
 
-  const handleDeleteSession = async (sessionId) => {
-    if (!sessionId || deletingSessionId || loading) return;
-    const confirmed = window.confirm(t("speechTrainer.confirmDeleteSession", { defaultValue: "Delete this practice session? This cannot be undone." }));
-    if (!confirmed) return;
-
+  const finalizePendingDelete = useCallback(async (pending) => {
+    if (!pending?.session?.id) return;
     try {
-      setDeletingSessionId(sessionId);
-      await deletePresentationSession({ sessionId, idToken });
-      setSessionHistory((prev) => prev.filter((session) => session.id !== sessionId));
-      if (activeSessionId === sessionId) {
-        handleReset();
-      }
+      setDeletingSessionId(pending.session.id);
+      await deletePresentationSession({ sessionId: pending.session.id, idToken });
     } catch (deleteError) {
-      setError(deleteError?.message || t("speechTrainer.deleteSessionError", { defaultValue: "Could not delete the session right now." }));
+      setSessionHistory((prev) => [pending.session, ...prev]);
+      setError(deleteError?.message || t("speechTrainer.deleteSessionError"));
     } finally {
       setDeletingSessionId("");
+      setPendingDelete((current) => (current?.session?.id === pending.session.id ? null : current));
+    }
+  }, [idToken, t]);
+
+  const handleUndoDelete = useCallback(() => {
+    if (!pendingDelete) return;
+    if (pendingDeleteTimerRef.current) {
+      clearTimeout(pendingDeleteTimerRef.current);
+      pendingDeleteTimerRef.current = null;
+    }
+    setSessionHistory((prev) => [pendingDelete.session, ...prev]);
+    setPendingDelete(null);
+    showToast(t("speechTrainer.sessionDeleteUndone"), "info");
+  }, [pendingDelete, showToast, t]);
+
+  const handleDeleteSession = (sessionId) => {
+    if (!sessionId || deletingSessionId || loading || pendingDelete) return;
+    const confirmed = window.confirm(t("speechTrainer.confirmDeleteSession"));
+    if (!confirmed) return;
+
+    const target = sessionHistory.find((session) => session.id === sessionId);
+    if (!target) return;
+
+    if (pendingDeleteTimerRef.current) {
+      clearTimeout(pendingDeleteTimerRef.current);
+      pendingDeleteTimerRef.current = null;
+    }
+
+    setSessionHistory((prev) => prev.filter((session) => session.id !== sessionId));
+    setPendingDelete({ session: target });
+    showToast(t("speechTrainer.sessionDeletePending"), "info");
+
+    pendingDeleteTimerRef.current = setTimeout(() => {
+      finalizePendingDelete({ session: target });
+    }, DELETE_UNDO_MS);
+
+    if (activeSessionId === sessionId) {
+      handleReset();
     }
   };
 
@@ -473,6 +611,10 @@ const SpeechTrainerPage = () => {
   useEffect(() => {
     const persistSession = async () => {
       if (!idToken) return;
+
+      const hasMeaningfulActivity = answersDone > 0 || chatMessages.some((message) => message.role === "user" && String(message.content || "").trim());
+      if (!hasMeaningfulActivity) return;
+
       const finalScript = finalScripts.long || finalScripts.medium || finalScripts.short || extractTag(chatMessages.at(-1)?.content, "praesentation_de") || "";
       const errorIntel = extractTag(chatMessages.at(-1)?.content, "error_intel");
       const inferredTags = extractErrorTags(errorIntel);
@@ -521,7 +663,20 @@ const SpeechTrainerPage = () => {
       }
     };
 
-    persistSession();
+    if (autosaveTimerRef.current) {
+      clearTimeout(autosaveTimerRef.current);
+    }
+
+    autosaveTimerRef.current = setTimeout(() => {
+      persistSession();
+    }, 900);
+
+    return () => {
+      if (autosaveTimerRef.current) {
+        clearTimeout(autosaveTimerRef.current);
+        autosaveTimerRef.current = null;
+      }
+    };
   }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, tutorName, t, refreshHistory, activeSessionId, answersDone]);
 
   useEffect(() => {
@@ -531,6 +686,32 @@ const SpeechTrainerPage = () => {
     );
     if (openSession) restoreSessionFromFirestore(openSession);
   }, [sessionHistory, activeSessionId, answersDone, chatMessages, chatInput, restoreSessionFromFirestore]);
+
+
+  const handleDeleteAllSessions = async () => {
+    if (!idToken || deletingAllSessions || loading) return;
+    const confirmed = window.confirm(t("speechTrainer.confirmDeleteAllSessions"));
+    if (!confirmed) return;
+
+    try {
+      setDeletingAllSessions(true);
+      await deleteAllPresentationSessions({ idToken });
+      setSessionHistory([]);
+      setHistoryNextCursor("");
+      setHistoryHasMore(false);
+      if (activeSessionId) handleReset();
+      showToast(t("speechTrainer.deleteAllSuccess"), "success");
+    } catch (deleteError) {
+      setError(deleteError?.message || t("speechTrainer.deleteAllError"));
+    } finally {
+      setDeletingAllSessions(false);
+    }
+  };
+
+  useEffect(() => () => {
+    if (pendingDeleteTimerRef.current) clearTimeout(pendingDeleteTimerRef.current);
+    if (autosaveTimerRef.current) clearTimeout(autosaveTimerRef.current);
+  }, []);
 
   const sortedSessionHistory = useMemo(() => {
     const clone = [...sessionHistory];
@@ -587,9 +768,9 @@ const SpeechTrainerPage = () => {
         ) : null}
 
         <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10, background: "#f8fafc", border: "1px solid #e5e7eb" }}>
-          <strong style={{ fontSize: 14 }}>{t("speechTrainer.answerWorkspaceTitle", { defaultValue: "Answer workspace" })}</strong>
+          <strong style={{ fontSize: 14 }}>{t("speechTrainer.answerWorkspaceTitle")}</strong>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            {t("speechTrainer.answerWorkspaceDescription", { defaultValue: "Use one place to prepare your answer: type in the box and/or record your voice below." })}
+            {t("speechTrainer.answerWorkspaceDescription")}
           </p>
 
           <div style={{ display: "grid", gap: 8 }}>
@@ -610,7 +791,7 @@ const SpeechTrainerPage = () => {
             </div>
           </div>
 
-          <InlineSpeechTrainer profileLevel={level} compact />
+          <InlineSpeechTrainer profileLevel={level} compact onAudioStateChange={setInlineAudioState} />
         </div>
 
         <div style={{ display: "grid", gap: 6 }}>
@@ -712,12 +893,16 @@ const SpeechTrainerPage = () => {
         ) : null}
 
         <div style={{ display: "grid", gap: 8 }}>
-          <div style={styles.filterRow}>
-            {minLengthReached ? (
-              <button type="button" style={styles.primaryButton} onClick={handleSend} disabled={loading || completed || !chatInput.trim()} aria-label={t("speechTrainer.sendAria")}>
-                {loading ? t("speechTrainer.sending", { tutorName }) : t("speechTrainer.send")}
-              </button>
-            ) : null}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            <button
+              type="button"
+              style={styles.primaryButton}
+              onClick={handleComposerSubmit}
+              disabled={!canSubmitComposer}
+              aria-label={t("speechTrainer.sendAria")}
+            >
+              {loading ? t("speechTrainer.sending", { tutorName }) : composerCtaLabel}
+            </button>
             <button type="button" style={styles.secondaryButton} onClick={handleReset} aria-label={t("speechTrainer.resetAria")} disabled={loading}>
               {t("speechTrainer.reset")}
             </button>
@@ -732,17 +917,31 @@ const SpeechTrainerPage = () => {
               </button>
             ) : null}
           </div>
+          <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
+            {audioCoachStatus || t("speechTrainer.composerStatusHint")}
+          </div>
           {completed ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>
               {t("speechTrainer.completedMessage")}
             </p>
           ) : null}
+          {audioCoachError ? <p style={{ ...styles.helperText, margin: 0, color: "#b91c1c" }}>{audioCoachError}</p> : null}
           {error ? <p style={{ ...styles.helperText, margin: 0, color: "#b91c1c" }}>{error}</p> : null}
         </div>
       </div>
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h3 style={{ margin: 0 }}>{t("speechTrainer.sessionHistoryTitle")}</h3>
+        <div style={{ display: "flex", gap: 8, justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
+          <h3 style={{ margin: 0 }}>{t("speechTrainer.sessionHistoryTitle")}</h3>
+          <button
+            type="button"
+            style={{ ...styles.secondaryButton, borderColor: "#fecaca", color: "#b91c1c", background: "#fff1f2" }}
+            onClick={handleDeleteAllSessions}
+            disabled={deletingAllSessions || !sessionHistory.length}
+          >
+            {deletingAllSessions ? t("speechTrainer.deletingAllSessions") : t("speechTrainer.deleteAllSessions")}
+          </button>
+        </div>
         <div style={styles.filterRow}>
           <input
             type="text"
@@ -801,18 +1000,28 @@ const SpeechTrainerPage = () => {
                     type="button"
                     style={{ ...styles.secondaryButton, borderColor: "#fecaca", color: "#b91c1c", background: "#fff1f2" }}
                     onClick={() => handleDeleteSession(session.id)}
-                    disabled={deletingSessionId === session.id}
-                    aria-label={t("speechTrainer.deleteSessionAria", { defaultValue: "Delete session" })}
+                    disabled={deletingSessionId === session.id || Boolean(pendingDelete)}
+                    aria-label={t("speechTrainer.deleteSessionAria")}
                   >
                     {deletingSessionId === session.id
-                      ? t("speechTrainer.deletingSession", { defaultValue: "Deleting…" })
-                      : t("speechTrainer.deleteSession", { defaultValue: "Delete" })}
+                      ? t("speechTrainer.deletingSession")
+                      : t("speechTrainer.deleteSession")}
                   </button>
                 </div>
               </details>
             );
           })
         )}
+        {historyHasMore ? (
+          <button type="button" style={styles.secondaryButton} onClick={loadMoreHistory} disabled={historyLoadingMore}>
+            {historyLoadingMore ? t("speechTrainer.loadingMore") : t("speechTrainer.loadMore")}
+          </button>
+        ) : null}
+        {pendingDelete ? (
+          <button type="button" style={styles.secondaryButton} onClick={handleUndoDelete}>
+            {t("speechTrainer.undoDelete")}
+          </button>
+        ) : null}
       </div>
     </div>
   );

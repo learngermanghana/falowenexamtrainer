@@ -39,10 +39,13 @@ export const updatePresentationSession = async ({ sessionId, payload, idToken })
     idToken,
   });
 
-export const loadPresentationSessions = async ({ idToken }) =>
+export const loadPresentationSessions = async ({ idToken, limit = 10, startAfter = "" } = {}) =>
   callAI({
     path: "/speaking/presentation-session/history",
-    payload: {},
+    payload: {
+      limit,
+      startAfter,
+    },
     idToken,
   });
 
@@ -64,5 +67,13 @@ export const deletePresentationSession = async ({ sessionId, idToken }) =>
     payload: {
       sessionId,
     },
+    idToken,
+  });
+
+
+export const deleteAllPresentationSessions = async ({ idToken } = {}) =>
+  callAI({
+    path: "/speaking/presentation-session/delete-all",
+    payload: {},
     idToken,
   });
