@@ -29,6 +29,16 @@ export const savePresentationSession = async ({ payload, idToken }) =>
     idToken,
   });
 
+export const updatePresentationSession = async ({ sessionId, payload, idToken }) =>
+  callAI({
+    path: "/speaking/presentation-session",
+    payload: {
+      ...payload,
+      sessionId,
+    },
+    idToken,
+  });
+
 export const loadPresentationSessions = async ({ idToken }) =>
   callAI({
     path: "/speaking/presentation-session/history",

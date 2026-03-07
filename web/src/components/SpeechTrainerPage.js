@@ -7,6 +7,7 @@ import {
   requestPresentationCoachReply,
   requestPresentationUpgrade,
   savePresentationSession,
+  updatePresentationSession,
 } from "../services/presentationCoachService";
 
 const CAMPUS_SPEAKING_LINK =
@@ -14,7 +15,6 @@ const CAMPUS_SPEAKING_LINK =
 
 const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
-const CHAT_DRAFT_STORAGE_KEY = "falowen.speechTrainer.chatDraft.v1";
 
 const getInitialCoachMessage = (isA1A2, t) => ({
   role: "assistant",
@@ -161,6 +161,7 @@ const SpeechTrainerPage = () => {
   const [finalScripts, setFinalScripts] = useState({ short: "", medium: "", long: "" });
   const [rubric, setRubric] = useState(null);
   const [sessionSaved, setSessionSaved] = useState(false);
+  const [activeSessionId, setActiveSessionId] = useState("");
   const [sessionHistory, setSessionHistory] = useState([]);
   const [upgradeLoadingByIndex, setUpgradeLoadingByIndex] = useState({});
   const [selectedUpgradesByIndex, setSelectedUpgradesByIndex] = useState({});
@@ -242,23 +243,49 @@ const SpeechTrainerPage = () => {
     refreshHistory();
   }, [refreshHistory]);
 
-  useEffect(() => {
-    try {
-      const cachedDraft = window.localStorage.getItem(CHAT_DRAFT_STORAGE_KEY);
-      if (cachedDraft) setChatInput(cachedDraft);
-    } catch (storageError) {
-      console.warn("Could not restore speech trainer draft", storageError);
-    }
-  }, []);
+  const restoreSessionFromFirestore = useCallback(
+    (session) => {
+      if (!session?.id) return;
+      const restoredHistory = Array.isArray(session.chatHistory)
+        ? session.chatHistory
+            .map((entry) => ({ role: entry?.role === "user" ? "user" : "assistant", content: String(entry?.content || "").trim() }))
+            .filter((entry) => entry.content)
+            .slice(-30)
+        : [];
 
-  useEffect(() => {
-    try {
-      if (chatInput) window.localStorage.setItem(CHAT_DRAFT_STORAGE_KEY, chatInput);
-      else window.localStorage.removeItem(CHAT_DRAFT_STORAGE_KEY);
-    } catch (storageError) {
-      console.warn("Could not persist speech trainer draft", storageError);
-    }
-  }, [chatInput]);
+      if (restoredHistory.length) {
+        setChatMessages(restoredHistory);
+      } else {
+        setChatMessages([getInitialCoachMessage(isA1A2Level, t)]);
+      }
+
+      setActiveSessionId(session.id);
+      setTopic(String(session.topic || ""));
+      const done = Math.max(0, Math.min(TURN_LIMIT, Number(session.answersDone) || 0));
+      setAnswersDone(done);
+      const isDone = String(session.completionStatus || "").toLowerCase() === "completed";
+      setCompleted(isDone);
+      setSessionSaved(isDone);
+      setChatInput("");
+
+      const savedRubric = session?.rubric
+        ? {
+            grammar: Number(session.rubric.grammar || 0),
+            vocabulary: Number(session.rubric.vocabulary || 0),
+            structure: Number(session.rubric.structure || 0),
+          }
+        : null;
+      setRubric(savedRubric);
+      const savedFinalScript = String(session.finalScript || "").trim();
+      setFinalScripts((prev) => ({
+        short: prev.short || "",
+        medium: prev.medium || "",
+        long: savedFinalScript || prev.long || "",
+      }));
+    },
+    [isA1A2Level, t]
+  );
+
 
   useEffect(() => {
     const lastMessage = chatLogRef.current?.lastElementChild;
@@ -279,7 +306,6 @@ const SpeechTrainerPage = () => {
     if (!payload.messageAlreadyAppended) {
       setChatMessages((prev) => [...prev, nextUserMessage]);
       setChatInput("");
-      window.localStorage.removeItem(CHAT_DRAFT_STORAGE_KEY);
     }
 
     try {
@@ -412,7 +438,7 @@ const SpeechTrainerPage = () => {
     setRubric(null);
     setFinalScripts({ short: "", medium: "", long: "" });
     setSessionSaved(false);
-    window.localStorage.removeItem(CHAT_DRAFT_STORAGE_KEY);
+    setActiveSessionId("");
   };
 
   const handleInputKeyDown = (event) => {
@@ -429,30 +455,49 @@ const SpeechTrainerPage = () => {
 
   useEffect(() => {
     const persistSession = async () => {
-      if (!completed || sessionSaved || !idToken) return;
+      if (!idToken) return;
       const finalScript = finalScripts.long || finalScripts.medium || finalScripts.short || extractTag(chatMessages.at(-1)?.content, "praesentation_de") || "";
       const errorIntel = extractTag(chatMessages.at(-1)?.content, "error_intel");
       const inferredTags = extractErrorTags(errorIntel);
+      const filteredChatHistory = chatMessages
+        .map(({ role, content }) => ({ role, content: String(content || "").trim() }))
+        .filter((entry) => entry.content)
+        .slice(-30);
+
+      if (!filteredChatHistory.length) return;
+
+      const basePayload = {
+        topic: topic || t("speechTrainer.customTopic"),
+        level,
+        finalScript,
+        chatHistory: filteredChatHistory,
+        answersDone,
+        commonErrorTags: inferredTags,
+        completionStatus: completed ? "completed" : "in_progress",
+        rubric: rubric || {
+          grammar: 0,
+          vocabulary: 0,
+          structure: 0,
+        },
+        studentName,
+        tutorName,
+      };
 
       try {
-        await savePresentationSession({
-          idToken,
-          payload: {
-            topic: topic || t("speechTrainer.customTopic"),
-            level,
-            finalScript,
-            commonErrorTags: inferredTags,
-            completionStatus: "completed",
-            rubric: rubric || {
-              grammar: 0,
-              vocabulary: 0,
-              structure: 0,
-            },
-            studentName,
-            tutorName,
-          },
-        });
-        setSessionSaved(true);
+        if (activeSessionId) {
+          await updatePresentationSession({
+            idToken,
+            sessionId: activeSessionId,
+            payload: basePayload,
+          });
+        } else {
+          const response = await savePresentationSession({
+            idToken,
+            payload: basePayload,
+          });
+          if (response?.id) setActiveSessionId(response.id);
+        }
+        if (completed) setSessionSaved(true);
         refreshHistory();
       } catch (persistError) {
         console.error("Failed to save presentation session", persistError);
@@ -460,7 +505,15 @@ const SpeechTrainerPage = () => {
     };
 
     persistSession();
-  }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, tutorName, t, refreshHistory]);
+  }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, tutorName, t, refreshHistory, activeSessionId, answersDone]);
+
+  useEffect(() => {
+    if (!sessionHistory.length || activeSessionId || answersDone > 0 || chatMessages.length > 1 || chatInput.trim()) return;
+    const openSession = [...sessionHistory].find(
+      (session) => String(session.completionStatus || "").toLowerCase() !== "completed" && Array.isArray(session.chatHistory) && session.chatHistory.length
+    );
+    if (openSession) restoreSessionFromFirestore(openSession);
+  }, [sessionHistory, activeSessionId, answersDone, chatMessages, chatInput, restoreSessionFromFirestore]);
 
   const sortedSessionHistory = useMemo(() => {
     const clone = [...sessionHistory];
@@ -719,8 +772,7 @@ const SpeechTrainerPage = () => {
                     style={styles.secondaryButton}
                     aria-label={t("speechTrainer.continueAria")}
                     onClick={() => {
-                      setTopic(session.topic || "");
-                      setChatInput(session.finalScript || "");
+                      restoreSessionFromFirestore(session);
                     }}
                   >
                     {t("speechTrainer.continue")}
