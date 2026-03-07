@@ -967,7 +967,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/kR8SmSY99c8",
         youtube_link: "https://youtu.be/kR8SmSY99c8",
         grammarbook_link: "https://drive.google.com/file/d/1NW5F0R5zj6nn2SqDjhpQlkGcfK-UBUqk/view?usp=drive_link",
-        workbook_link: "https://drive.google.com/file/d/12r_HE51QtpknXSSU0R75ur-EDFpTjzXU/view?usp=sharing",
+        workbook_link: "/campus/course/b1-day-4-wohnung-suchen-workbook",
       },
     },
     {
