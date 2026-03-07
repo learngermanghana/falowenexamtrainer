@@ -163,7 +163,7 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false, onAudioStateChange
       recordingTime,
       clearAudio: resetAudio,
     });
-  }, [onAudioStateChange, audioBlob, audioUrl, isRecording, recordingTime]);
+  }, [onAudioStateChange, audioBlob, audioUrl, isRecording, recordingTime, resetAudio]);
 
   return (
     <div style={{ ...styles.card, display: "grid", gap: 12 }}>
