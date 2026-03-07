@@ -12,7 +12,17 @@ import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
-import { db, doc, runTransaction, serverTimestamp } from "../firebase";
+import {
+  collection,
+  db,
+  doc,
+  getDocs,
+  limit,
+  query,
+  runTransaction,
+  serverTimestamp,
+  where,
+} from "../firebase";
 
 const ASSIGNMENT_STATUSES = {
   notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
