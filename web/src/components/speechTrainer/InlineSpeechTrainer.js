@@ -165,8 +165,12 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false, onAudioStateChange
     });
   }, [onAudioStateChange, audioBlob, audioUrl, isRecording, recordingTime, resetAudio]);
 
+  const containerStyle = compact
+    ? { display: "grid", gap: 8 }
+    : { ...styles.card, display: "grid", gap: 12 };
+
   return (
-    <div style={{ ...styles.card, display: "grid", gap: 12 }}>
+    <div style={containerStyle}>
       {compact ? null : <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Practice inside the app</h3>}
       <p style={{ ...styles.helperText, margin: 0 }}>
         {compact
@@ -193,14 +197,18 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false, onAudioStateChange
         )}
 
         <div
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: 12,
-            padding: 12,
-            display: "grid",
-            gap: 8,
-            background: "#f9fafb",
-          }}
+          style={
+            compact
+              ? { display: "grid", gap: 8 }
+              : {
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 12,
+                  padding: 12,
+                  display: "grid",
+                  gap: 8,
+                  background: "#f9fafb",
+                }
+          }
         >
           <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
             <button
@@ -213,9 +221,7 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false, onAudioStateChange
             >
               {recordingLabel}
             </button>
-            <span style={{ ...styles.helperText, margin: 0 }}>
-              {isRecording ? "Recording…" : "Max 2 minutes is plenty."}
-            </span>
+            {compact ? null : <span style={{ ...styles.helperText, margin: 0 }}>{isRecording ? "Recording…" : "Max 2 minutes is plenty."}</span>}
             <span style={{ ...styles.badge, alignSelf: "center" }}>{formatTime(recordingTime)}</span>
             {audioUrl ? (
               <button type="button" onClick={resetAudio} style={{ ...styles.secondaryButton }}>
