@@ -17,12 +17,31 @@ const args = process.argv.slice(2).reduce((acc, arg, index, arr) => {
   return acc;
 }, {});
 
-const filePath = path.resolve(process.cwd(), String(args.file || "./data/answerKeyManifest.json"));
+const filePath = path.resolve(
+  process.cwd(),
+  String(args.file || "./data/answerKeyManifest.json")
+);
+
 const version = Number(args.version || 1);
-const includeAnswers = String(args.includeAnswers || "true").toLowerCase() !== "false";
+const includeAnswers =
+  String(args.includeAnswers || "true").toLowerCase() !== "false";
+
+const bucketName = String(
+  args.bucket ||
+    process.env.ANSWER_KEY_BUCKET ||
+    process.env.FIREBASE_STORAGE_BUCKET ||
+    "falowen-examiner-trainer.firebasestorage.app"
+).trim();
 
 if (!Number.isInteger(version) || version <= 0) {
   console.error("--version must be a positive integer");
+  process.exit(1);
+}
+
+if (!bucketName) {
+  console.error(
+    "Missing storage bucket. Pass --bucket or set ANSWER_KEY_BUCKET / FIREBASE_STORAGE_BUCKET."
+  );
   process.exit(1);
 }
 
@@ -33,6 +52,7 @@ if (!fs.existsSync(filePath)) {
 
 const raw = fs.readFileSync(filePath, "utf8");
 let parsed;
+
 try {
   parsed = JSON.parse(raw);
 } catch (error) {
@@ -45,9 +65,14 @@ if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
   process.exit(1);
 }
 
-if (!admin.apps.length) admin.initializeApp();
+if (!admin.apps.length) {
+  admin.initializeApp({
+    storageBucket: bucketName,
+  });
+}
+
 const db = admin.firestore();
-const bucket = admin.storage().bucket();
+const bucket = admin.storage().bucket(bucketName);
 const now = admin.firestore.FieldValue.serverTimestamp();
 
 const toCanonicalAssignmentKey = (value) =>
@@ -57,14 +82,23 @@ const toCanonicalAssignmentKey = (value) =>
     .replace(/[\s_]+/g, "-");
 
 const getPreferredUrl = (entry) =>
-  entry.answer_url || entry.answerUrl || entry.sheet_url || entry.sheetUrl || null;
+  entry.answer_url ||
+  entry.answerUrl ||
+  entry.sheet_url ||
+  entry.sheetUrl ||
+  null;
 
 async function upsertOne(sourceTitle, entry) {
-  if (!entry || typeof entry !== "object") return { skipped: true };
+  if (!entry || typeof entry !== "object") {
+    return { skipped: true };
+  }
 
   const assignmentId = entry.assignment_id || entry.assignmentId || "";
   const assignmentKey = toCanonicalAssignmentKey(assignmentId || sourceTitle);
-  if (!assignmentKey) return { skipped: true };
+
+  if (!assignmentKey) {
+    return { skipped: true };
+  }
 
   const payload = entry.answers || null;
   let answerUrl = getPreferredUrl(entry);
@@ -79,7 +113,11 @@ async function upsertOne(sourceTitle, entry) {
       resumable: false,
       metadata: {
         contentType: "application/json",
-        metadata: { assignmentKey, version: String(version), checksum },
+        metadata: {
+          assignmentKey,
+          version: String(version),
+          checksum,
+        },
       },
     });
 
@@ -109,8 +147,15 @@ async function upsertOne(sourceTitle, entry) {
     createdAt: now,
   };
 
-  await db.collection(REGISTRY_COLLECTION).doc(assignmentKey).set(registryDoc, { merge: true });
-  await db.collection(VERSION_COLLECTION).doc(`${assignmentKey}__v${version}`).set(versionDoc, { merge: true });
+  await db
+    .collection(REGISTRY_COLLECTION)
+    .doc(assignmentKey)
+    .set(registryDoc, { merge: true });
+
+  await db
+    .collection(VERSION_COLLECTION)
+    .doc(`${assignmentKey}__v${version}`)
+    .set(versionDoc, { merge: true });
 
   return { skipped: false, assignmentKey };
 }
@@ -118,6 +163,10 @@ async function upsertOne(sourceTitle, entry) {
 async function run() {
   const entries = Object.entries(parsed);
   let imported = 0;
+
+  console.log(`Using bucket: ${bucketName}`);
+  console.log(`Reading manifest: ${filePath}`);
+  console.log(`Include answers upload: ${includeAnswers ? "yes" : "no"}`);
 
   for (const [sourceTitle, entry] of entries) {
     // eslint-disable-next-line no-await-in-loop
