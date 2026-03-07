@@ -715,6 +715,56 @@ const transcribeAudio = async (fileBuffer) => {
   }
 };
 
+
+const isAllowedAudioUrlHost = (host) => {
+  const allowedHosts = new Set([
+    "firebasestorage.googleapis.com",
+    "storage.googleapis.com",
+  ]);
+  return allowedHosts.has(String(host || "").toLowerCase());
+};
+
+const downloadAudioFromUrl = async (audioUrl) => {
+  const parsedUrl = new URL(String(audioUrl || ""));
+  if (parsedUrl.protocol !== "https:") {
+    throw new Error("audioUrl must use https");
+  }
+
+  if (!isAllowedAudioUrlHost(parsedUrl.hostname)) {
+    throw new Error("audioUrl host is not allowed");
+  }
+
+  const response = await fetch(parsedUrl.toString(), {
+    method: "GET",
+    redirect: "follow",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to download audio (${response.status})`);
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  if (!buffer.length) {
+    throw new Error("Downloaded audio is empty");
+  }
+
+  const maxBytes = 25 * 1024 * 1024;
+  if (buffer.length > maxBytes) {
+    throw new Error("Audio file is too large");
+  }
+
+  const contentType = response.headers.get("content-type") || "audio/webm";
+
+  return {
+    buffer,
+    originalname: "speech-trainer-remote.webm",
+    mimetype: contentType,
+    size: buffer.length,
+  };
+};
+
 const parseSpeakingQuestionContext = (question) => {
   const source = String(question || "").trim();
   if (!source) return null;
@@ -2203,13 +2253,12 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    if (!req.file) return res.status(400).json({ error: "Audio recording is required" });
-
-    const { note = "", level = "B1", userId = "guest" } = req.body || {};
+    const { note = "", level = "B1", userId = "guest", audioUrl = "" } = req.body || {};
 
     const validationError =
       validateString(note, { maxLength: 300, label: "note" }) ||
-      validateString(level, { maxLength: 10, label: "level" });
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(audioUrl, { maxLength: 3000, label: "audioUrl" });
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
@@ -2225,7 +2274,16 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
       return res.status(429).json({ error: "Daily speech trainer limit reached" });
     }
 
-    const transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1500);
+    let audioFile = req.file;
+    if (!audioFile && audioUrl) {
+      audioFile = await downloadAudioFromUrl(audioUrl);
+    }
+
+    if (!audioFile) {
+      return res.status(400).json({ error: "Audio recording is required" });
+    }
+
+    const transcript = ((await transcribeAudio(audioFile)) || "").slice(0, 1500);
 
     const messages = [
       { role: "system", content: speechTrainerPrompt({ level, note: String(note || "").trim() }) },
@@ -2238,7 +2296,13 @@ app.post("/speech-trainer/feedback", upload.single("audio"), async (req, res) =>
       route: "/speech-trainer/feedback",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level, userId, quotaRemaining: quota.remaining, hasTranscript: Boolean(transcript) },
+      metadata: {
+        level,
+        userId,
+        quotaRemaining: quota.remaining,
+        hasTranscript: Boolean(transcript),
+        audioSource: req.file ? "multipart" : audioUrl ? "firebase_url" : "none",
+      },
     });
 
     return res.json({ transcript: transcript || null, feedback, quotaRemaining: quota.remaining });
