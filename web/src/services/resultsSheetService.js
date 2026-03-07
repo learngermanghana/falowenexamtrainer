@@ -113,7 +113,7 @@ const fetchCsv = async (url) => {
 
 /**
  * Fetches a published Google Sheet (CSV) containing results.
- * The sheet should include columns like: assignment, level, name, studentcode, score, comments, link, date.
+ * The sheet should include columns like: studentcode, name, assignment, score, comments, date, level, link, assignment_id.
  */
 export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
   const normalizedUrl = normalizeSheetCsvUrl(sheetCsvUrl);
@@ -133,6 +133,14 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     comments: findIndexByHeader(headerRow, ["comments", "feedback", "comment"]),
     link: findIndexByHeader(headerRow, ["link", "url"]),
     date: findIndexByHeader(headerRow, ["date", "createdat", "created_at", "timestamp", "time"]),
+    assignmentId: findIndexByHeader(headerRow, [
+      "assignment_id",
+      "assignmentid",
+      "assignment key",
+      "assignmentkey",
+      "canonicalassignmentkey",
+      "canonical_assignment_key",
+    ]),
   };
 
   const getValue = (row, idx) => (idx >= 0 && idx < row.length ? String(row[idx] || "").trim() : "");
@@ -147,5 +155,7 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     comments: getValue(row, indices.comments),
     link: getValue(row, indices.link),
     date: getValue(row, indices.date),
+    assignment_id: getValue(row, indices.assignmentId),
+    assignmentId: getValue(row, indices.assignmentId),
   }));
 };
