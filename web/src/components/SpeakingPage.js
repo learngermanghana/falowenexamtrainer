@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
+import { useAuth } from "../context/AuthContext";
 import { speakingSheetQuestions } from "../data/speakingSheet";
+import { requestSpeakingTextAnalysis } from "../services/presentationCoachService";
 
 const EXAMS_PRACTICE_LINK =
   "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
@@ -13,26 +15,32 @@ const parseTeilNumber = (teilLabel = "") => {
   return match ? match[1] : "";
 };
 
-const randomCoachReply = (selectedQuestion) => {
-  if (!selectedQuestion) {
-    return "Choose a question first, then I can guide your speaking practice.";
-  }
+const extractTag = (text, tag) => {
+  const match = String(text || "").match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i"));
+  return match?.[1]?.trim() || "";
+};
 
-  const keyword = selectedQuestion.keywordSubtopic
-    ? ` and include "${selectedQuestion.keywordSubtopic}"`
-    : "";
-
-  const replyBank = [
-    `Great start. Answer in 3-4 simple sentences${keyword}.`,
-    "Good. Add one reason using weil/denn and one example.",
-    `Nice attempt. Repeat this prompt once more with a different detail${keyword}.`,
-  ];
-
-  return replyBank[Math.floor(Math.random() * replyBank.length)];
+const parseRubric = (text) => {
+  const raw = extractTag(text, "rubric");
+  if (!raw) return null;
+  const parts = raw.split("|").map((item) => item.trim());
+  const parseScore = (label) => {
+    const hit = parts.find((item) => item.toLowerCase().startsWith(label.toLowerCase()));
+    const score = Number((hit?.match(/(\d+)/) || [])[1] || 0);
+    return Math.max(0, Math.min(5, score));
+  };
+  return {
+    grammar: parseScore("grammar"),
+    vocabulary: parseScore("vocabulary"),
+    pronunciationReadiness: parseScore("pronunciation readiness"),
+    structure: parseScore("structure"),
+  };
 };
 
 const SpeakingPage = ({ mode = "exam" }) => {
   const { level: examLevel } = useExam();
+  const { idToken } = useAuth();
+  const isExamMode = mode === "exam";
   const practiceLink = mode === "campus" ? CAMPUS_PRACTICE_LINK : EXAMS_PRACTICE_LINK;
 
   const [practiceMode, setPracticeMode] = useState("record");
@@ -42,16 +50,19 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [chatMessages, setChatMessages] = useState([
     {
       role: "coach",
-      text: "Hi! Pick a level and question, then chat your answer. You can still open the recording link anytime.",
+      text: "Hi! Pick a question, then chat your answer. I'll analyze it and score key speaking criteria.",
     },
   ]);
   const [draftMessage, setDraftMessage] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatError, setChatError] = useState("");
+  const [lastRubric, setLastRubric] = useState(null);
 
   useEffect(() => {
-    if (examLevel) {
+    if (isExamMode && examLevel) {
       setSelectedLevel(String(examLevel).toUpperCase());
     }
-  }, [examLevel]);
+  }, [examLevel, isExamMode]);
 
   const levelOptions = useMemo(() => {
     const levels = new Set(speakingSheetQuestions.map((question) => question.level));
@@ -88,16 +99,49 @@ const SpeakingPage = ({ mode = "exam" }) => {
     [filteredQuestions, selectedQuestionId]
   );
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     const trimmed = draftMessage.trim();
-    if (!trimmed) return;
+    if (!trimmed || chatLoading || !selectedQuestion) return;
 
-    setChatMessages((current) => [
-      ...current,
-      { role: "student", text: trimmed },
-      { role: "coach", text: randomCoachReply(selectedQuestion) },
-    ]);
+    const studentMessage = { role: "student", text: trimmed };
+    setChatMessages((current) => [...current, studentMessage]);
     setDraftMessage("");
+    setChatLoading(true);
+    setChatError("");
+
+    const promptHeader = [
+      `Exam speaking level: ${selectedLevel}`,
+      `Task: ${selectedQuestion.teilLabel}`,
+      `Prompt: ${selectedQuestion.topicPrompt}`,
+      selectedQuestion.keywordSubtopic ? `Keyword to include: ${selectedQuestion.keywordSubtopic}` : null,
+      "Please mark and analyze this answer based on Goethe-style speaking expectations.",
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    try {
+      const response = await requestSpeakingTextAnalysis({
+        text: `${promptHeader}\n\nStudent answer:\n${trimmed}`,
+        teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
+        level: selectedLevel,
+        question: selectedQuestion.topicPrompt || "",
+        idToken,
+      });
+      const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
+      setLastRubric(parseRubric(replyText));
+      setChatMessages((current) => [...current, { role: "coach", text: replyText }]);
+    } catch (error) {
+      setChatError(error?.message || "Could not reach the AI coach.");
+      setChatMessages((current) => [
+        ...current,
+        {
+          role: "coach",
+          text: "I couldn't analyze your answer right now. Please try again in a moment.",
+        },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
   };
 
   return (
@@ -144,20 +188,24 @@ const SpeakingPage = ({ mode = "exam" }) => {
             <div style={{ ...styles.uploadCard, display: "grid", gap: 10 }}>
               <div style={{ display: "grid", gap: 6 }}>
                 <label style={styles.label}>Level</label>
-                <select
-                  style={styles.select}
-                  value={selectedLevel}
-                  onChange={(event) => {
-                    setSelectedLevel(event.target.value);
-                    setSelectedTeil("all");
-                  }}
-                >
-                  {levelOptions.map((level) => (
-                    <option key={level} value={level}>
-                      {level}
-                    </option>
-                  ))}
-                </select>
+                {isExamMode ? (
+                  <div style={{ ...styles.input, background: "#F3F4F6", color: "#111827", fontWeight: 700 }}>{selectedLevel}</div>
+                ) : (
+                  <select
+                    style={styles.select}
+                    value={selectedLevel}
+                    onChange={(event) => {
+                      setSelectedLevel(event.target.value);
+                      setSelectedTeil("all");
+                    }}
+                  >
+                    {levelOptions.map((level) => (
+                      <option key={level} value={level}>
+                        {level}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               <div style={{ display: "grid", gap: 6 }}>
@@ -217,15 +265,27 @@ const SpeakingPage = ({ mode = "exam" }) => {
                 ))}
               </div>
 
+              {lastRubric ? (
+                <div style={{ ...styles.card, margin: 0, padding: 12, background: "#EFF6FF", border: "1px solid #BFDBFE" }}>
+                  <p style={{ margin: 0, fontWeight: 700 }}>Latest AI scoring</p>
+                  <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                    Grammar: {lastRubric.grammar}/5 · Vocabulary: {lastRubric.vocabulary}/5 · Pronunciation readiness: {lastRubric.pronunciationReadiness}/5 · Structure: {lastRubric.structure}/5
+                  </p>
+                </div>
+              ) : null}
+
+              {chatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 13 }}>{chatError}</p> : null}
+
               <textarea
                 style={{ ...styles.input, minHeight: 90, resize: "vertical" }}
                 placeholder="Type your German answer or question here..."
                 value={draftMessage}
                 onChange={(event) => setDraftMessage(event.target.value)}
+                disabled={chatLoading}
               />
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <button style={styles.primaryButton} onClick={sendMessage}>
-                  Send
+                <button style={styles.primaryButton} onClick={sendMessage} disabled={chatLoading || !selectedQuestion}>
+                  {chatLoading ? "Analyzing..." : "Send"}
                 </button>
                 <a href={practiceLink} target="_blank" rel="noreferrer" style={styles.secondaryButton}>
                   Prefer recording? Open link

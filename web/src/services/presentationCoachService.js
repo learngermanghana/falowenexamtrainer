@@ -35,3 +35,15 @@ export const loadPresentationSessions = async ({ idToken }) =>
     payload: {},
     idToken,
   });
+
+export const requestSpeakingTextAnalysis = async ({ text, teil, level, question, idToken }) =>
+  callAI({
+    path: "/speaking/analyze-text",
+    payload: {
+      text,
+      teil,
+      level,
+      question,
+    },
+    idToken,
+  });
