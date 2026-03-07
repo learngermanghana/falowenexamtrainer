@@ -123,7 +123,12 @@ const InlineSpeechTrainer = ({ profileLevel }) => {
       setStatus("Feedback ready below.");
     } catch (submitError) {
       console.error(submitError);
-      setError("Could not reach the coach right now. Please try again in a moment.");
+      const backendError =
+        submitError?.response?.data?.error ||
+        submitError?.response?.data?.message ||
+        submitError?.message ||
+        "Could not reach the coach right now. Please try again in a moment.";
+      setError(String(backendError));
       setStatus("");
     }
   };

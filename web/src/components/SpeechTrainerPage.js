@@ -9,9 +9,7 @@ import {
   savePresentationSession,
   updatePresentationSession,
 } from "../services/presentationCoachService";
-
-const CAMPUS_SPEAKING_LINK =
-  "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
+import InlineSpeechTrainer from "./speechTrainer/InlineSpeechTrainer";
 
 const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
@@ -185,7 +183,6 @@ const SpeechTrainerPage = () => {
   );
   const upgradeOptions = useMemo(() => t("speechTrainer.upgradeOptions", { returnObjects: true }), [t]);
 
-  const studentCode = String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim();
   const studentName =
     studentProfile?.firstName ||
     studentProfile?.displayName ||
@@ -195,7 +192,6 @@ const SpeechTrainerPage = () => {
   const tutorName = t("speechTrainer.tutorName");
 
   const progressPercent = Math.min(100, Math.round((answersDone / TURN_LIMIT) * 100));
-  const recorderLink = `${CAMPUS_SPEAKING_LINK}?code=${encodeURIComponent(studentCode)}`;
   const charsCount = chatInput.trim().length;
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
   const currentStepLabel =
@@ -573,12 +569,9 @@ const SpeechTrainerPage = () => {
           <p style={{ ...styles.helperText, margin: 0 }}>
             {t("speechTrainer.recorderDescription")}
           </p>
-          <div style={styles.filterRow}>
-            <a href={recorderLink} target="_blank" rel="noreferrer" style={{ ...styles.primaryButton, ...styles.primaryButtonLink }} aria-label={t("speechTrainer.recorderAriaLabel")}>
-              {t("speechTrainer.recorderButton")}
-            </a>
-          </div>
         </div>
+
+        <InlineSpeechTrainer profileLevel={level} />
 
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ ...styles.helperText, margin: 0 }}>
