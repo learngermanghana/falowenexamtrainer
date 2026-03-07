@@ -11,6 +11,8 @@ import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
+import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { collection, db, doc, getDocs, limit, query, runTransaction, serverTimestamp, where } from "../firebase";
 
 const ASSIGNMENT_STATUSES = {
   notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
@@ -290,13 +292,28 @@ const getAllowedCourseLevels = (levels, defaultLevel) => {
   return levels.filter((level) => allowed.has(level));
 };
 
-const getStatusForDay = (dayStatuses, day) => dayStatuses[String(day)]?.value || "notStarted";
+const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
+  resolveAssignmentCanonicalKey({
+    level,
+    assignmentId: entry.assignmentId || entry.assignment_id,
+    assignmentTitle: `Day ${entry.day}${occurrence > 1 ? ` Task ${occurrence}` : ""} ${entry.topic || entry.chapter || ""}`,
+  }) || `${String(level || "GENERAL").toUpperCase()}-DAY-${entry.day}${occurrence > 1 ? `-TASK-${occurrence}` : ""}`;
+
+const getStatusForEntry = (dayStatuses, derivedStatuses, entry, level, occurrence = 1) => {
+  const assignmentKey = getEntryAssignmentKey(entry, level, occurrence);
+  return (
+    derivedStatuses[assignmentKey] ||
+    dayStatuses[assignmentKey]?.value ||
+    dayStatuses[String(entry.day)]?.value ||
+    "notStarted"
+  );
+};
 
 
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { studentProfile, saveStudentProfile } = useAuth();
+  const { studentProfile } = useAuth();
   const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
@@ -334,7 +351,123 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [skillFilter, setSkillFilter] = useState("all");
   const [chapterFilter, setChapterFilter] = useState("all");
   const [dayStatuses, setDayStatuses] = useState({});
+  const [derivedStatusesByAssignment, setDerivedStatusesByAssignment] = useState({});
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
+
+  const studentCode = useMemo(
+    () => studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "",
+    [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
+  );
+
+  useEffect(() => {
+    if (!db || !selectedCourseLevel || !studentProfile?.id) {
+      setDerivedStatusesByAssignment({});
+      return;
+    }
+
+    let mounted = true;
+
+    const safeUpper = (value) => String(value || "").trim().toUpperCase();
+
+    const toStatusByKeyFromRows = (rows = []) => {
+      const map = {};
+
+      rows.forEach((entry) => {
+        const entryLevel = String(entry?.level || "").toUpperCase();
+        if (entryLevel && entryLevel !== selectedCourseLevel) return;
+
+        const scoreRaw = Number(entry?.score);
+        const hasNumericScore = Number.isFinite(scoreRaw);
+        const isPassing = hasNumericScore && scoreRaw >= 60;
+        const isFailing = hasNumericScore && scoreRaw < 60;
+        const assignmentKey = resolveAssignmentCanonicalKey({
+          level: selectedCourseLevel,
+          assignmentId: entry.assignmentKey || entry.canonicalAssignmentKey || entry.assignmentId || entry.assignment_id,
+          assignmentTitle: entry.assignmentTitle || entry.assignment || entry.title,
+        });
+
+        if (!assignmentKey) return;
+
+        if (isFailing) {
+          map[assignmentKey] = "needsRedo";
+          return;
+        }
+
+        const current = map[assignmentKey] || "notStarted";
+        if (current === "needsRedo") return;
+
+        const statusToken = safeUpper(entry.status);
+        if (isPassing || statusToken === "MARKED" || statusToken === "SUBMITTED" || statusToken === "RESUBMITTED") {
+          map[assignmentKey] = "submitted";
+          return;
+        }
+
+        if (
+          ["DRAFT", "RESUBMISSION_DRAFT", "IN_PROGRESS", "STARTED"].includes(statusToken) &&
+          current === "notStarted"
+        ) {
+          map[assignmentKey] = "inProgress";
+        }
+      });
+
+      return map;
+    };
+
+    const mergeStatusMaps = (base, incoming) => {
+      const merged = { ...base };
+      Object.entries(incoming).forEach(([assignmentKey, status]) => {
+        const current = merged[assignmentKey];
+        if (status === "needsRedo") {
+          merged[assignmentKey] = "needsRedo";
+          return;
+        }
+        if (status === "submitted") {
+          if (current !== "needsRedo") merged[assignmentKey] = "submitted";
+          return;
+        }
+        if (!current) merged[assignmentKey] = status;
+      });
+      return merged;
+    };
+
+    const loadDerivedStatuses = async () => {
+      try {
+        const submissionsRef = collection(db, "submissions");
+        const draftsRef = collection(db, "submissionDrafts");
+        const scoresRef = collection(db, "scores");
+
+        const scoreCodeCandidates = Array.from(new Set([studentCode, studentCode?.toLowerCase(), studentCode?.toUpperCase()].filter(Boolean)));
+
+        const [submissionsSnap, draftsSnap, scoresSnap] = await Promise.all([
+          getDocs(query(submissionsRef, where("studentId", "==", studentProfile.id), limit(400))),
+          getDocs(query(draftsRef, where("studentId", "==", studentProfile.id), limit(400))),
+          scoreCodeCandidates.length > 1
+            ? getDocs(query(scoresRef, where("studentcode", "in", scoreCodeCandidates), where("level", "==", selectedCourseLevel), limit(400)))
+            : scoreCodeCandidates.length === 1
+            ? getDocs(query(scoresRef, where("studentcode", "==", scoreCodeCandidates[0]), where("level", "==", selectedCourseLevel), limit(400)))
+            : Promise.resolve({ docs: [] }),
+        ]);
+
+        if (!mounted) return;
+
+        const merged = mergeStatusMaps(
+          toStatusByKeyFromRows([...(submissionsSnap.docs || []).map((d) => d.data()), ...(draftsSnap.docs || []).map((d) => d.data())]),
+          toStatusByKeyFromRows([...(scoresSnap.docs || []).map((d) => d.data())])
+        );
+
+        setDerivedStatusesByAssignment(merged);
+      } catch (error) {
+        console.error("Failed to load derived assignment statuses", error);
+        if (mounted) setDerivedStatusesByAssignment({});
+      }
+    };
+
+    loadDerivedStatuses();
+
+    return () => {
+      mounted = false;
+    };
+  }, [selectedCourseLevel, studentCode, studentProfile?.id]);
 
   useEffect(() => {
     const normalizedDefault = resolvedDefaultLevel;
@@ -367,11 +500,22 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
     const syncProgress = async () => {
       try {
-        await saveStudentProfile({
-          courseProgressByLevel: {
-            ...(studentProfile?.courseProgressByLevel || {}),
-            [selectedCourseLevel]: dayStatuses,
-          },
+        const studentRef = doc(db, "students", studentProfile.id);
+        await runTransaction(db, async (tx) => {
+          const snap = await tx.get(studentRef);
+          const base = snap.data()?.courseProgressByLevel || {};
+          tx.set(
+            studentRef,
+            {
+              courseProgressByLevel: {
+                ...base,
+                [selectedCourseLevel]: dayStatuses,
+              },
+              courseProgressUpdatedAt: serverTimestamp(),
+              updated_at: serverTimestamp(),
+            },
+            { merge: true }
+          );
         });
       } catch (error) {
         console.error("Failed to sync course progress", error);
@@ -379,9 +523,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     };
 
     syncProgress();
-  }, [dayStatuses, saveStudentProfile, selectedCourseLevel, studentProfile]);
+  }, [dayStatuses, selectedCourseLevel, studentProfile]);
 
-  const schedule = useMemo(() => schedules[selectedCourseLevel] || [], [schedules, selectedCourseLevel]);
+  const schedule = useMemo(() => {
+    const seenByDay = {};
+    return (schedules[selectedCourseLevel] || []).map((entry) => {
+      const dayKey = String(entry.day || "");
+      seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
+      return { ...entry, occurrence: seenByDay[dayKey] };
+    });
+  }, [schedules, selectedCourseLevel]);
   const isDerivedLevel = useMemo(
     () => resolvedDerivedLevels.has(selectedCourseLevel),
     [resolvedDerivedLevels, selectedCourseLevel]
@@ -430,12 +581,13 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         (entry) =>
           matchesSearch(entry) &&
           (!assignmentsOnly || hasAssignment(entry)) &&
-          (!unfinishedOnly || getStatusForDay(dayStatuses, entry.day) !== "submitted") &&
+          (!unfinishedOnly ||
+            getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) !== "submitted") &&
           matchesSkill(entry) &&
           matchesChapter(entry)
       )
     );
-  }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, skillFilter, unfinishedOnly]);
+  }, [assignmentsOnly, chapterFilter, dayStatuses, derivedStatusesByAssignment, schedule, searchTerm, skillFilter, unfinishedOnly, selectedCourseLevel]);
 
   const chapterOptions = useMemo(() => {
     const set = new Set();
@@ -447,20 +599,31 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
   const todayTask = useMemo(
     () =>
-      schedule.find((entry) => isTutorMarkedEntry(entry) && getStatusForDay(dayStatuses, entry.day) !== "submitted") ||
+      schedule.find((entry) =>
+        isTutorMarkedEntry(entry) &&
+        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) !==
+          "submitted") ||
       filteredSchedule[0],
-    [dayStatuses, filteredSchedule, schedule]
+    [dayStatuses, derivedStatusesByAssignment, filteredSchedule, schedule, selectedCourseLevel]
   );
 
   const overview = useMemo(() => {
-    const daysCompleted = schedule.filter((entry) => getStatusForDay(dayStatuses, entry.day) === "submitted").length;
+    const daysCompleted = schedule.filter(
+      (entry) =>
+        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) === "submitted"
+    ).length;
     const totalAssignments = schedule.filter((entry) => isTutorMarkedEntry(entry)).length;
     const assignmentsSubmitted = schedule.filter(
-      (entry) => isTutorMarkedEntry(entry) && getStatusForDay(dayStatuses, entry.day) === "submitted"
+      (entry) =>
+        isTutorMarkedEntry(entry) &&
+        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) === "submitted"
     ).length;
     let streak = 0;
     for (const entry of schedule) {
-      if (getStatusForDay(dayStatuses, entry.day) === "submitted") streak += 1;
+      if (
+        getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence) === "submitted"
+      )
+        streak += 1;
       else break;
     }
     const lastActivityTs = Object.values(dayStatuses)
@@ -476,7 +639,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       streak,
       lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, schedule]);
+  }, [dayStatuses, derivedStatusesByAssignment, schedule, selectedCourseLevel]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
@@ -633,7 +796,11 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         : [entry.schreiben_sprechen]
                       : [];
                     const milestoneEntry = isMilestoneEntry(entry);
-                    const status = milestoneEntry ? "milestoneComplete" : getStatusForDay(dayStatuses, entry.day);
+                    const status =
+                      milestoneEntry
+                        ? "milestoneComplete"
+                        : getStatusForEntry(dayStatuses, derivedStatusesByAssignment, entry, selectedCourseLevel, entry.occurrence);
+                    const entryAssignmentKey = getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
@@ -671,7 +838,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               onChange={(e) =>
                                 setDayStatuses((prev) => ({
                                   ...prev,
-                                  [String(entry.day)]: { value: e.target.value, updatedAt: Date.now() },
+                                  [entryAssignmentKey]: { value: e.target.value, updatedAt: Date.now(), assignmentKey: entryAssignmentKey },
                                 }))
                               }
                             >
@@ -683,6 +850,25 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             </select>
                             {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
                             {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
+                            {isTutorMarked ? (
+                              <button
+                                type="button"
+                                style={styles.secondaryButton}
+                                onClick={() =>
+                                  navigate(`/campus/submit?assignmentKey=${encodeURIComponent(entryAssignmentKey)}`, {
+                                    state: {
+                                      assignmentKey: entryAssignmentKey,
+                                      assignmentId: entry.assignmentId || null,
+                                      day: entry.day,
+                                      occurrence: entry.occurrence,
+                                      level: selectedCourseLevel,
+                                    },
+                                  })
+                                }
+                              >
+                                Submit this assignment
+                              </button>
+                            ) : null}
                           </div>
                         </div>
 

@@ -1,4 +1,5 @@
 import { collection, db, doc, getDoc, getDocs, query, where } from "../firebase";
+import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 
 const normalizeString = (value) => value?.toString().trim();
 const normalizeStudentCode = (value) => normalizeString(value)?.toLowerCase();
@@ -126,6 +127,11 @@ const buildResults = (scores = []) => {
       const attemptNumber = attemptsTracker[key];
       return {
         assignment: normalizedAssignment,
+        assignmentKey: resolveAssignmentCanonicalKey({
+          level: row.level,
+          assignmentId: row.assignmentKey || row.canonicalAssignmentKey || row.assignmentId || row.assignment_id,
+          assignmentTitle: normalizedAssignment,
+        }),
         studentCode: normalizeString(row.studentcode || row.studentCode) || "",
         studentName: normalizeString(row.name) || "",
         level: (row.level || "").toUpperCase(),
