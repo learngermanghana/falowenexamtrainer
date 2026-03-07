@@ -645,7 +645,7 @@ export const styles = {
   chatLog: {
     display: "grid",
     gap: 10,
-    maxHeight: 320,
+    maxHeight: "60vh",
     overflowY: "auto",
     padding: 4,
   },
@@ -684,7 +684,7 @@ export const styles = {
     border: "1px solid #e5e7eb",
     borderRadius: 12,
     padding: 12,
-    background: "#f8fafc",
+    background: "#ffffff",
     display: "grid",
     gap: 10,
   },
