@@ -261,7 +261,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
     } catch (error) {
       console.error(error);
       const errorMessage =
-        "We couldn't create your French account right now. Please try again or contact support@falowen.com.";
+        "We couldn't create your French account right now. Please try again or contact info@falowen.app.";
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
     } finally {

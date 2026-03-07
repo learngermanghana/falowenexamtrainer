@@ -549,9 +549,9 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                     {t("landing.darkCta.contactEmail")}
                     <a
                       style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }}
-                      href="mailto:learngermanghana@gmail.com"
+                      href="mailto:info@falowen.app"
                     >
-                      learngermanghana@gmail.com
+                      info@falowen.app
                     </a>
                   </li>
                   <li>{t("landing.darkCta.contactChat")}</li>

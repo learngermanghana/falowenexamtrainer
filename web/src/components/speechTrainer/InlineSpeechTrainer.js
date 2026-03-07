@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { styles } from "../../styles";
 import { useAuth } from "../../context/AuthContext";
 import { sendSpeechTrainerAttempt } from "../../services/speechTrainerService";
@@ -32,12 +32,12 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false, onAudioStateChange
     };
   }, [audioUrl]);
 
-  const stopTimer = () => {
+  const stopTimer = useCallback(() => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
-  };
+  }, []);
 
   const startRecording = async () => {
     if (isRecording) return;
@@ -86,19 +86,19 @@ const InlineSpeechTrainer = ({ profileLevel, compact = false, onAudioStateChange
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
       mediaRecorderRef.current.stop();
     }
     stopTimer();
-  };
+  }, [stopTimer]);
 
-  const resetAudio = () => {
+  const resetAudio = useCallback(() => {
     stopRecording();
     setAudioBlob(null);
     setAudioUrl(null);
     setRecordingTime(0);
-  };
+  }, [stopRecording]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();

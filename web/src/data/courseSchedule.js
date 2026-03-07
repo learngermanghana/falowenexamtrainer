@@ -2,7 +2,7 @@ import { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule";
 
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
-const COMPLETION_CONTACT_EMAIL = "learngermanghana@gmail.com";
+const COMPLETION_CONTACT_EMAIL = "info@falowen.app";
 const COMPLETION_ACTIONS = [
   { label: "Open Exams page", labelKey: "courseTab.completion.actions.openExams", href: "https://www.falowen.app/exams" },
   { label: "Download study calendar", labelKey: "courseTab.completion.actions.downloadStudyCalendar", href: "https://www.falowen.app/exams/study?force=1" },
