@@ -258,7 +258,15 @@ const GeneralHome = ({
         ) : null}
       </section>
 
-      <section style={styles.card}>
+      <section
+        style={{
+          ...styles.card,
+          backgroundImage:
+            "linear-gradient(110deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)), url('/learning-space-hero.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
         <SectionHeader
           eyebrow={t("generalHome.learningSpace.eyebrow")}
           title={t("generalHome.learningSpace.title")}
@@ -267,7 +275,16 @@ const GeneralHome = ({
       </section>
 
       <div style={styles.gridTwo}>
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 10,
+            background:
+              "linear-gradient(130deg, rgba(238, 242, 255, 0.9), rgba(255, 255, 255, 0.96))",
+            borderColor: "#c7d2fe",
+          }}
+        >
           <SectionHeader
             eyebrow={t("generalHome.campus.eyebrow")}
             title={t("generalHome.campus.title")}
@@ -293,7 +310,16 @@ const GeneralHome = ({
           </PrimaryActionBar>
         </section>
 
-        <section style={{ ...styles.card, display: "grid", gap: 10 }}>
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 10,
+            background:
+              "linear-gradient(130deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.97))",
+            borderColor: "#bfdbfe",
+          }}
+        >
           <SectionHeader
             eyebrow={t("generalHome.exams.eyebrow")}
             title={t("generalHome.exams.title")}
