@@ -214,15 +214,19 @@ const StudentResultsPage = () => {
 
     const buildAssignmentStatus = (levels) => {
       const bestByAssignment = new Map();
+      const unresolvedEntries = [];
       results.forEach((entry) => {
         const level = String(entry.level || "").toUpperCase();
         if (!levels.includes(level)) return;
         const assignmentKey = resolveAssignmentCanonicalKey({
           level,
-          assignmentId: entry.assignmentId || entry.assignment_id,
+          assignmentId: entry.assignmentKey || entry.canonicalAssignmentKey || entry.assignmentId || entry.assignment_id,
           assignmentTitle: entry.assignment || entry.assignmentTitle || entry.title,
         });
-        if (!assignmentKey) return;
+        if (!assignmentKey) {
+          unresolvedEntries.push(entry);
+          return;
+        }
         const score = toNumericScore(entry.score);
         const currentBest = bestByAssignment.get(assignmentKey);
         if (score !== null && (typeof currentBest !== "number" || score > currentBest)) {
@@ -231,6 +235,13 @@ const StudentResultsPage = () => {
           bestByAssignment.set(assignmentKey, null);
         }
       });
+
+      if (unresolvedEntries.length) {
+        console.warn("Unresolved assignment keys in results rows", {
+          count: unresolvedEntries.length,
+          sample: unresolvedEntries.slice(0, 5),
+        });
+      }
 
       let completed = 0;
       let failed = 0;

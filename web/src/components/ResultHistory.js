@@ -26,7 +26,16 @@ const toNumericScore = (value) => {
   return null;
 };
 
-const getAssignmentKey = (assignment, fallback) => safeLower(assignment) || fallback;
+const getAssignmentKey = (entry, fallback) => {
+  const fromExplicit =
+    entry.assignmentKey ||
+    entry.canonicalAssignmentKey ||
+    entry.assignmentId ||
+    entry.assignment_id ||
+    entry.key;
+  if (fromExplicit) return safeLower(fromExplicit);
+  return safeLower(entry.assignment) || fallback;
+};
 
 const TextBlock = ({ title, text, maxChars = 650 }) => {
   const { t } = useTranslation();
@@ -130,7 +139,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     const attemptNumbers = new Map();
 
     chronological.forEach((entry) => {
-      const assignmentKey = getAssignmentKey(entry.assignment, entry.key);
+      const assignmentKey = getAssignmentKey(entry, entry.key);
       const aggregate = attemptsByAssignment.get(assignmentKey) || { total: 0, scores: [] };
       aggregate.total += 1;
       aggregate.scores.push(entry.numericScore);
@@ -153,7 +162,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     });
 
     const annotated = list.map((entry) => {
-      const assignmentKey = getAssignmentKey(entry.assignment, entry.key);
+      const assignmentKey = getAssignmentKey(entry, entry.key);
       const summary = attemptSummaries.get(assignmentKey) || {
         totalAttempts: 1,
         bestScore: entry.numericScore,
