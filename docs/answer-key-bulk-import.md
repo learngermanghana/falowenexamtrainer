@@ -11,7 +11,8 @@ Use `functions/data/answerKeyManifest.example.json` as shape reference.
 ## 2) Run one command
 ```bash
 cd functions
-npm run import:answer-keys -- --file ./data/answerKeyManifest.json --version 1 --includeAnswers true
+npm run import:answer-keys -- --file ./data/answerKeyManifest.json --version 1 --includeAnswers true \
+  --bucket your-project.appspot.com
 ```
 
 ## What the script does
@@ -27,3 +28,6 @@ For each entry:
 ## Why this helps
 You do **not** need to run one assignment at a time anymore.
 You can keep one manifest in repo and import all in one shot.
+
+
+If you get a "Bucket name not specified" error, pass `--bucket` explicitly (or set `ANSWER_KEY_BUCKET`).

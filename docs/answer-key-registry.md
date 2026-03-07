@@ -44,7 +44,8 @@ npm run upsert:answer-key -- \
   --assignmentKey A1-DAY-1 \
   --file ../answer-keys/a1-day-1.json \
   --version 1 \
-  --format json
+  --format json \
+  --bucket your-project.appspot.com
 ```
 
 This script:
@@ -55,3 +56,6 @@ This script:
 
 ## Client usage
 Clients should read only metadata (`assignmentKey`, `answerUrl`, `version`, etc.), not inline dictionaries. Full answer content should be fetched in controlled backend/admin flows.
+
+
+If you get a "Bucket name not specified" error, pass `--bucket` explicitly (or set `ANSWER_KEY_BUCKET`).
