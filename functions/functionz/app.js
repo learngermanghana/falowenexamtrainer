@@ -715,20 +715,90 @@ const transcribeAudio = async (fileBuffer) => {
   }
 };
 
+const parseSpeakingQuestionContext = (question) => {
+  const source = String(question || "").trim();
+  if (!source) return null;
+
+  const levelMatch = source.match(/(?:^|\n|\b)level\s*[:\-]?\s*([A-C][12])/i);
+  const teilMatch = source.match(/(?:^|\n|\b)(?:teil|part)\s*[:\-]?\s*(?:teil\s*)?(\d)/i);
+  const topicMatch = source.match(/(?:^|\n|\b)(?:topic|prompt|task)\s*[:\-]\s*(.+)/i);
+  const keywordMatch = source.match(/(?:^|\n|\b)(?:keyword|subtopic)\s*[:\-]\s*(.+)/i);
+
+  let topic = topicMatch ? String(topicMatch[1]).trim() : "";
+  let keyword = keywordMatch ? String(keywordMatch[1]).trim() : "";
+
+  if (!topic && !keyword) {
+    const inlineTopic = source.match(/topic\s*[:\-]?\s*([^\n()]+)(?:\(([^)]+)\))?/i);
+    if (inlineTopic) {
+      topic = String(inlineTopic[1] || "").trim();
+      if (!keyword && inlineTopic[2]) {
+        keyword = String(inlineTopic[2]).replace(/^keyword\s*[:\-]?/i, "").trim();
+      }
+    }
+  }
+
+  return {
+    source,
+    level: levelMatch ? String(levelMatch[1]).toUpperCase() : "",
+    teil: teilMatch ? String(teilMatch[1]) : "",
+    topic,
+    keyword,
+  };
+};
+
 const speakingPrompt = ({ teil, level, contextType, question, interactionMode }) => {
-  const teilLabel = teil ? `Teil ${teil}` : "your last speaking sample";
+  const targetLevel = String(level || "A2").toUpperCase();
+  const parsed = parseSpeakingQuestionContext(question);
+  const teilNumber = String(teil || parsed?.teil || "").trim();
+  const teilLabel = teilNumber ? `Teil ${teilNumber}` : "the selected speaking task";
   const context = contextType ? `Context: ${contextType}.` : "";
   const interaction =
     typeof interactionMode === "undefined" ? "" : `Interaction mode: ${interactionMode}.`;
 
-  return (
-    "You are a German speaking examiner and supportive coach. " +
-    "Score pronunciation, grammar, vocabulary, fluency, and task achievement. " +
-    "Give concise feedback in English, but include short German fragments to model corrections. " +
-    `Focus on ${teilLabel}. Level target: ${level || "A2"}. ${context} ${interaction} ` +
-    "If the student seems below target, explain the biggest gaps and suggest one focused drill. " +
-    (question ? `The prompt/question was: ${question}.` : "")
-  );
+  const taskCard = parsed
+    ? [
+        "EXAM TASK CARD (from sheet prompt):",
+        `- Level: ${parsed.level || targetLevel}`,
+        `- Teil: ${parsed.teil ? `Teil ${parsed.teil}` : teilLabel}`,
+        `- Topic/Prompt: ${parsed.topic || parsed.source}`,
+        `- Keyword/Subtopic: ${parsed.keyword || "(none)"}`,
+      ].join("\n")
+    : question
+      ? `EXAM TASK CARD: ${question}`
+      : "EXAM TASK CARD: not provided; infer from transcript and Teil.";
+
+  const partRules =
+    targetLevel === "A1"
+      ? [
+          "A1 GOETHE CHECKS:",
+          "- Teil 1: one-line self-introduction (name + age + place) with simple A1 grammar.",
+          "- Teil 2: ask one clear question and answer it simply in German.",
+          "- Teil 3: make a request (Bitte/Können Sie...) and add a suitable response.",
+        ].join("\n")
+      : targetLevel === "A2"
+        ? [
+            "A2 GOETHE CHECKS:",
+            "- Evaluate task fulfilment, interaction quality, clarity, range, and control.",
+            "- Especially for Teil 3, check proposing options, negotiating, and confirming.",
+          ].join("\n")
+        : "B1+ GOETHE CHECKS: judge by exam readiness for task fulfilment, interaction, language range/control, and coherence.";
+
+  return [
+    "You are a strict but supportive Goethe speaking examiner.",
+    `Target CEFR level: ${targetLevel}. Focus on ${teilLabel}.`,
+    context,
+    interaction,
+    taskCard,
+    partRules,
+    "OUTPUT FORMAT (plain text, concise):",
+    "1) Scores: Pronunciation, Grammar, Vocabulary, Fluency, Task achievement (0-25 each) and Overall (0-100).",
+    "2) Examiner verdict in English (2-4 bullets).",
+    "3) Corrected German version (2-6 lines) that matches the task card.",
+    "4) What examiner looked for (task checklist with ✅/❌).",
+    "If below target, include one focused drill for the weakest criterion.",
+  ]
+    .filter(Boolean)
+    .join("\n\n");
 };
 
 const chatBuddyPrompt = ({ level }) =>
@@ -2027,14 +2097,15 @@ app.post("/speaking/analyze-text", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const { text, teil, level = "A2", targetLevel, userId = "guest" } = req.body || {};
+    const { text, teil, level = "A2", targetLevel, question, userId = "guest" } = req.body || {};
     const trimmed = String(text || "").trim();
 
     const validationError =
       validateString(trimmed, { required: true, maxLength: 2000, label: "transcript" }) ||
       validateString(teil, { maxLength: 20, label: "teil" }) ||
       validateString(level, { maxLength: 10, label: "level" }) ||
-      validateString(targetLevel, { maxLength: 10, label: "targetLevel" });
+      validateString(targetLevel, { maxLength: 10, label: "targetLevel" }) ||
+      validateString(question, { maxLength: 500, label: "question" });
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
@@ -2046,7 +2117,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
     }
 
     const messages = [
-      { role: "system", content: speakingPrompt({ teil, level: targetLevel || level }) },
+      { role: "system", content: speakingPrompt({ teil, level: targetLevel || level, question }) },
       { role: "user", content: `User ${authedUser.uid || userId} transcript: ${trimmed}` },
     ];
 
@@ -2056,7 +2127,7 @@ app.post("/speaking/analyze-text", async (req, res) => {
       route: "/speaking/analyze-text",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { teil, level, targetLevel, quotaRemaining: quota.remaining },
+      metadata: { teil, level, targetLevel, hasQuestion: Boolean(question), quotaRemaining: quota.remaining },
     });
 
     return res.json({ feedback, quotaRemaining: quota.remaining });
@@ -2098,7 +2169,7 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
       {
         role: "system",
         content:
-          speakingPrompt({ teil, level: targetLevel || level }) +
+          speakingPrompt({ teil, level: targetLevel || level, question: followUpQuestion }) +
           " Return a 3-sentence breakdown and a score out of 10 for interaction quality.",
       },
       {
@@ -2115,7 +2186,7 @@ app.post("/speaking/interaction-score", audioUpload, async (req, res) => {
       route: "/speaking/interaction-score",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { teil, level, targetLevel, quotaRemaining: quota.remaining },
+      metadata: { teil, level, targetLevel, hasQuestion: Boolean(followUpQuestion), quotaRemaining: quota.remaining },
     });
 
     return res.json({ feedback, transcript, quotaRemaining: quota.remaining });
