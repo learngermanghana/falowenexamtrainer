@@ -460,7 +460,7 @@ const SpeechTrainerPage = () => {
     };
 
     persistSession();
-  }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, refreshHistory]);
+  }, [completed, sessionSaved, idToken, topic, level, finalScripts, rubric, chatMessages, studentName, tutorName, t, refreshHistory]);
 
   const sortedSessionHistory = useMemo(() => {
     const clone = [...sessionHistory];
