@@ -815,6 +815,7 @@ const ExamArea = ({ onBack }) => {
   const { section } = useParams();
   const navigate = useNavigate();
   const { level, setLevel } = useExam();
+  const { studentProfile } = useAuth();
 
   const lastVisitStorageKey = "falowen_exam_last_visit";
   const lastSectionStorageKey = "falowen_exam_last_section";
@@ -858,6 +859,18 @@ const ExamArea = ({ onBack }) => {
       console.warn("Failed to store exam last visit metadata", error);
     }
   }, [examSection, lastSectionStorageKey, lastVisitStorageKey]);
+
+
+  const profileExamLevel = useMemo(() => {
+    const normalized = String(studentProfile?.level || "").toUpperCase();
+    return ALLOWED_LEVELS.includes(normalized) ? normalized : "";
+  }, [studentProfile?.level]);
+
+  useEffect(() => {
+    if (profileExamLevel && profileExamLevel !== level) {
+      setLevel(profileExamLevel);
+    }
+  }, [level, profileExamLevel, setLevel]);
 
   const tabs = [
     { key: "tutor", label: t("appNav.examTabs.tutor") },
@@ -904,12 +917,13 @@ const ExamArea = ({ onBack }) => {
           </div>
           <div style={{ display: "grid", gap: 6, minWidth: 200 }}>
             <label htmlFor="exam-level-selector" style={styles.helperText}>
-              Switch level for all tabs
+              Exam level is selected automatically from your student profile
             </label>
             <select
               id="exam-level-selector"
               value={level}
               onChange={(event) => setLevel(event.target.value)}
+              disabled={Boolean(profileExamLevel)}
               style={{ ...styles.input, padding: "8px 10px", borderRadius: 8 }}
             >
               {ALLOWED_LEVELS.map((option) => (
