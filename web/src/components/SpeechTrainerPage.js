@@ -16,6 +16,7 @@ const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
 const SESSION_HISTORY_PAGE_SIZE = 10;
 const SPEECH_HERO_IMAGE_URL = "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1600&q=80";
+const AUDIO_FALLBACK_CHAT_MESSAGE = "[Audio submission]";
 
 const getInitialCoachMessage = (isA1A2, t) => ({
   role: "assistant",
@@ -382,7 +383,7 @@ const SpeechTrainerPage = () => {
   };
 
   const handleSendRecording = async () => {
-    if (!inlineAudioState?.audioBlob || loading || completed) return;
+    if (!inlineAudioState?.audioBlob || loading) return;
 
     try {
       setAudioCoachError("");
@@ -419,7 +420,6 @@ const SpeechTrainerPage = () => {
           setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
         }
       }
-
       setAudioCoachStatus(t("speechTrainer.audioReadyStatus"));
       if (inlineAudioState?.clearAudio) inlineAudioState.clearAudio();
       if (trimmedInput) setChatInput("");
@@ -807,7 +807,7 @@ const SpeechTrainerPage = () => {
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
             {audioCoachStatus || (hasAudio ? t("speechTrainer.composerStatusHintRecordingPriority") : t("speechTrainer.composerStatusHint"))}
           </div>
-          {completed ? (
+          {completed && !hasAudio ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>
               {t("speechTrainer.completedMessage")}
             </p>
