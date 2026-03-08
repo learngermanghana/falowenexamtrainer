@@ -4,6 +4,7 @@ import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 import { requestSpeakingTextAnalysis } from "../services/presentationCoachService";
+import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
 
 const EXAMS_PRACTICE_LINK =
@@ -305,7 +306,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
         if (event.data.size > 0) audioChunksRef.current.push(event.data);
       };
 
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         if (recordingIntervalRef.current) {
           window.clearInterval(recordingIntervalRef.current);
           recordingIntervalRef.current = null;
@@ -328,7 +329,33 @@ const SpeakingPage = ({ mode = "exam" }) => {
         setRecordingSeconds(0);
         setIsRecording(false);
         markPromptCompleted();
-        appendCoachText("Nice recording! Now type a short transcript or key sentence so I can give precise grammar feedback.");
+        setChatLoading(true);
+        setChatError("");
+
+        try {
+          const response = await analyzeAudio({
+            audioBlob: blob,
+            teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
+            level: selectedLevel,
+            question: selectedQuestion.topicPrompt || "",
+            userId,
+            idToken,
+          });
+
+          const transcript = String(response?.transcript || "").trim();
+          const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
+
+          if (transcript) {
+            appendCoachText(`Transcript I heard: ${transcript}`);
+          }
+          setLastRubric(parseRubric(replyText));
+          appendCoachText(replyText);
+        } catch (error) {
+          setChatError(error?.message || "Could not reach the AI coach.");
+          appendCoachText("I couldn't analyze your recording right now. Please try again in a moment.");
+        } finally {
+          setChatLoading(false);
+        }
 
         if (streamRef.current) {
           streamRef.current.getTracks().forEach((track) => track.stop());

@@ -817,21 +817,41 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
       ? `EXAM TASK CARD: ${question}`
       : "EXAM TASK CARD: not provided; infer from transcript and Teil.";
 
+  const partRulesByLevel = {
+    A1: [
+      "A1 GOETHE CHECKS:",
+      "- Teil 1: self-introduction (e.g., Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby) in short simple sentences.",
+      "- Teil 2: student should ask and answer their own short question (W-question or Ja/Nein question).",
+      "- Teil 3: student should make a request using patterns like 'Verb + Sie + bitte' or 'Können Sie ...' with infinitive at the end.",
+    ].join("\n"),
+    A2: [
+      "A2 GOETHE CHECKS:",
+      "- Teil 1: student asks personal questions and answers them themselves (single-candidate simulation).",
+      "- Teil 2: student tells about themselves and their life with connected simple sentences.",
+      "- Teil 3: student plans something with a partner role and should show proposing + reacting language (single-candidate simulation).",
+    ].join("\n"),
+    B1: [
+      "B1 GOETHE CHECKS:",
+      "- Teil 1: student plans something jointly with a partner role (single-candidate simulation accepted).",
+      "- Teil 2: student presents a chosen topic with clear structure.",
+      "- Teil 3: student discusses both their own topic and the partner's topic (simulate both sides if alone).",
+    ].join("\n"),
+    B2: [
+      "B2 GOETHE CHECKS:",
+      "- Teil 1: student gives a short talk on a chosen topic, then responds to follow-up discussion points.",
+      "- Teil 2: student exchanges viewpoints in a discussion with reasons, reactions, and contrast markers.",
+    ].join("\n"),
+    C1: [
+      "C1 GOETHE CHECKS:",
+      "- Teil 1: student gives a structured, nuanced presentation on a chosen abstract or societal topic and can clarify key points.",
+      "- Teil 2: student sustains an argument-driven discussion, comparing perspectives and defending position precisely.",
+      "- If student is alone, accept simulated interaction where they ask/anticipate and answer partner viewpoints.",
+    ].join("\n"),
+  };
+
   const partRules =
-    targetLevel === "A1"
-      ? [
-          "A1 GOETHE CHECKS:",
-          "- Teil 1: one-line self-introduction (name + age + place) with simple A1 grammar.",
-          "- Teil 2: ask one clear question and answer it simply in German.",
-          "- Teil 3: make a request (Bitte/Können Sie...) and add a suitable response.",
-        ].join("\n")
-      : targetLevel === "A2"
-        ? [
-            "A2 GOETHE CHECKS:",
-            "- Evaluate task fulfilment, interaction quality, clarity, range, and control.",
-            "- Especially for Teil 3, check proposing options, negotiating, and confirming.",
-          ].join("\n")
-        : "B1+ GOETHE CHECKS: judge by exam readiness for task fulfilment, interaction, language range/control, and coherence.";
+    partRulesByLevel[targetLevel] ||
+    "GOETHE CHECKS: judge by exam readiness for task fulfilment, interaction, language range/control, and coherence.";
 
   return [
     "You are a strict but supportive Goethe speaking examiner.",
