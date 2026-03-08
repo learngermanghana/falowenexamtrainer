@@ -1141,6 +1141,27 @@ const ClassDiscussionPage = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <section
+        style={{
+          ...styles.card,
+          minHeight: 200,
+          display: "grid",
+          alignContent: "end",
+          gap: 8,
+          border: "none",
+          boxShadow: "0 14px 40px rgba(15, 23, 42, 0.2)",
+          backgroundImage:
+            "linear-gradient(120deg, rgba(15,23,42,0.72), rgba(30,64,175,0.42)), url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <h2 style={{ ...styles.sectionTitle, margin: 0, color: "#f8fafc" }}>Group discussion hub</h2>
+        <p style={{ ...styles.helperText, margin: 0, color: "#dbeafe" }}>
+          Share ideas with your classmates, practise clear responses, and improve together.
+        </p>
+      </section>
+
       <div style={styles.card}>
         <div
           style={{

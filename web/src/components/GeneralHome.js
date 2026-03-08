@@ -274,12 +274,27 @@ const GeneralHome = ({
         />
       </section>
 
-      <section style={{ ...styles.card, padding: 0, overflow: "hidden" }} aria-hidden="true">
-        <img
-          src="/learning-space-hero.svg"
-          alt=""
-          style={{ display: "block", width: "100%", height: "auto" }}
-        />
+      <section style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
+        <button
+          type="button"
+          onClick={() => navigate("/campus/discussion")}
+          style={{
+            border: "none",
+            padding: 0,
+            margin: 0,
+            display: "block",
+            width: "100%",
+            background: "transparent",
+            cursor: "pointer",
+          }}
+          aria-label="Open group discussion"
+        >
+          <img
+            src="/learning-space-hero.svg"
+            alt="Open group discussion"
+            style={{ display: "block", width: "100%", height: "auto" }}
+          />
+        </button>
       </section>
 
       <div style={styles.gridTwo}>

@@ -246,7 +246,31 @@ const GrammarQuestionTab = () => {
   };
 
   return (
-    <div style={{ ...styles.card, marginTop: 12 }}>
+    <div style={{ display: "grid", gap: 12 }}>
+      <section
+        style={{
+          ...styles.card,
+          minHeight: 200,
+          display: "grid",
+          alignContent: "end",
+          gap: 8,
+          border: "none",
+          boxShadow: "0 14px 40px rgba(15, 23, 42, 0.18)",
+          backgroundImage:
+            "linear-gradient(120deg, rgba(15,23,42,0.72), rgba(20,184,166,0.35)), url('https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1600&q=80')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <h2 style={{ ...styles.sectionTitle, margin: 0, color: "#f8fafc" }}>
+          {t("grammarQuestionTab.title", { language: languageLabel })}
+        </h2>
+        <p style={{ ...styles.helperText, margin: 0, color: "#d1fae5" }}>
+          Ask targeted questions and get guided examples for faster grammar progress.
+        </p>
+      </section>
+
+      <div style={{ ...styles.card, marginTop: 0 }}>
       <h2 style={styles.sectionTitle}>{t("grammarQuestionTab.title", { language: languageLabel })}</h2>
       <p style={styles.helperText}>
         {t("grammarQuestionTab.description", { language: languageLabel, examplePrompt })}
@@ -505,6 +529,7 @@ const GrammarQuestionTab = () => {
           ) : null}
         </div>
       </div>
+    </div>
     </div>
   );
 };
