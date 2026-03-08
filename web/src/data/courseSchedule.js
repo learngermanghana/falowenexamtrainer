@@ -1,4 +1,5 @@
 import { FRENCH_A1_SCHEDULE } from "./frenchCourseSchedule";
+import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
 
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
@@ -1814,12 +1815,68 @@ const normalizeLessonResources = (lesson) => {
   };
 };
 
-const normalizeLessonCollection = (lessonCollection, fallbackValues = []) => {
+const splitChapterTokens = (value) =>
+  String(value || "")
+    .split(/[_,/]/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+const resolveDictionaryEntry = ({ level, assignmentId, chapter }) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+  if (!normalizedLevel) return null;
+
+  const assignmentToken = String(assignmentId || "").trim();
+  const chapterCandidates = splitChapterTokens(chapter);
+  const assignmentCandidates = [
+    assignmentToken,
+    assignmentToken ? `${normalizedLevel}-${assignmentToken}` : "",
+  ].filter(Boolean);
+
+  for (const candidate of assignmentCandidates) {
+    const fromId = getAssignmentDictionaryEntry({ level: normalizedLevel, assignmentId: candidate, chapter });
+    if (fromId) return fromId;
+  }
+
+  for (const chapterToken of chapterCandidates) {
+    const byChapter = getAssignmentDictionaryEntry({
+      level: normalizedLevel,
+      chapter: chapterToken,
+      assignmentId: `${normalizedLevel}-${chapterToken}`,
+    });
+    if (byChapter) return byChapter;
+  }
+
+  return null;
+};
+
+const withDictionaryMetadata = (item, level) => {
+  if (!item || typeof item !== "object") return item;
+
+  const dictionaryEntry = resolveDictionaryEntry({
+    level,
+    assignmentId: item.assignmentId,
+    chapter: item.chapter,
+  });
+
+  if (!dictionaryEntry) return item;
+
+  return {
+    ...item,
+    chapter: dictionaryEntry.chapter,
+    assignmentId: dictionaryEntry.assignment_id,
+    assignmentTitle: item.assignmentTitle || dictionaryEntry.en,
+    title: item.title || dictionaryEntry.en,
+  };
+};
+
+const normalizeLessonCollection = (lessonCollection, fallbackValues = [], level = "") => {
   if (Array.isArray(lessonCollection)) {
-    return lessonCollection.map((lesson) => withAssignmentId(normalizeLessonResources(lesson), ...fallbackValues));
+    return lessonCollection.map((lesson) =>
+      withDictionaryMetadata(withAssignmentId(normalizeLessonResources(lesson), ...fallbackValues), level)
+    );
   }
   if (lessonCollection && typeof lessonCollection === "object") {
-    return withAssignmentId(normalizeLessonResources(lessonCollection), ...fallbackValues);
+    return withDictionaryMetadata(withAssignmentId(normalizeLessonResources(lessonCollection), ...fallbackValues), level);
   }
   return lessonCollection;
 };
@@ -1867,6 +1924,40 @@ const getDefaultInstruction = (instruction) => {
   return instruction;
 };
 
+const resolveA1TopicName = (entry, lesen_hören, schreiben_sprechen) => {
+  if (!entry || typeof entry !== "object") return entry?.topic || "";
+
+  const chapterTokens = splitChapterTokens(entry.chapter);
+  const lessonItems = [
+    ...(Array.isArray(lesen_hören) ? lesen_hören : lesen_hören ? [lesen_hören] : []),
+    ...(Array.isArray(schreiben_sprechen) ? schreiben_sprechen : schreiben_sprechen ? [schreiben_sprechen] : []),
+  ];
+
+  lessonItems.forEach((lesson) => {
+    splitChapterTokens(lesson?.chapter).forEach((token) => chapterTokens.push(token));
+  });
+
+  const seen = new Set();
+  const dictionaryEntries = chapterTokens
+    .map((token) =>
+      resolveDictionaryEntry({
+        level: "A1",
+        chapter: token,
+        assignmentId: `A1-${token}`,
+      })
+    )
+    .filter((entryValue) => {
+      if (!entryValue?.assignment_id || seen.has(entryValue.assignment_id)) return false;
+      seen.add(entryValue.assignment_id);
+      return true;
+    });
+
+  if (!dictionaryEntries.length) return entry.topic;
+  if (dictionaryEntries.length === 1) return dictionaryEntries[0].en;
+
+  return dictionaryEntries.map((entryValue) => entryValue.en).join(" + ");
+};
+
 const normalizeCourseSchedules = (schedules) =>
   Object.fromEntries(
     Object.entries(schedules).map(([level, entries]) => {
@@ -1875,15 +1966,19 @@ const normalizeCourseSchedules = (schedules) =>
       return [
         level,
         entries.map((entry) => {
-          const entryWithAssignmentId = withAssignmentId(entry);
+          const entryWithAssignmentId = withDictionaryMetadata(withAssignmentId(entry), level);
           const fallbackAssignmentValues = [
             entryWithAssignmentId.assignmentId,
             entryWithAssignmentId.chapter,
             entryWithAssignmentId.topic,
             entryWithAssignmentId.title,
           ];
-          const lesen_hören = normalizeLessonCollection(entryWithAssignmentId.lesen_hören, fallbackAssignmentValues);
-          const schreiben_sprechen = normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, fallbackAssignmentValues);
+          const lesen_hören = normalizeLessonCollection(entryWithAssignmentId.lesen_hören, fallbackAssignmentValues, level);
+          const schreiben_sprechen = normalizeLessonCollection(
+            entryWithAssignmentId.schreiben_sprechen,
+            fallbackAssignmentValues,
+            level
+          );
           const lessons = [
             ...(Array.isArray(lesen_hören) ? lesen_hören : lesen_hören ? [lesen_hören] : []),
             ...(Array.isArray(schreiben_sprechen) ? schreiben_sprechen : schreiben_sprechen ? [schreiben_sprechen] : []),
@@ -1898,9 +1993,14 @@ const normalizeCourseSchedules = (schedules) =>
                 ? DEFAULT_INSTRUCTION_DE
                 : baseInstruction;
           const hasNote = levelSpecificInstruction && levelSpecificInstruction.includes(SELF_PRACTICE_NOTE);
+          const resolvedTopic =
+            level === "A1"
+              ? resolveA1TopicName(entryWithAssignmentId, lesen_hören, schreiben_sprechen)
+              : entryWithAssignmentId.topic;
 
           return {
             ...entryWithAssignmentId,
+            topic: resolvedTopic,
             instruction:
               needsSelfPracticeNote && levelSpecificInstruction && !hasNote
                 ? `${levelSpecificInstruction} ${SELF_PRACTICE_NOTE}`

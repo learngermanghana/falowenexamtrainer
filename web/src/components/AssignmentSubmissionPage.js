@@ -7,6 +7,7 @@ import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
+import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
 import { buildAssignmentCatalogForLevel, resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { fetchAnswerKeyRegistry, resolveAnswerKeySource } from "../services/answerKeyRegistryService";
 import {
@@ -181,18 +182,24 @@ const AssignmentSubmissionPage = () => {
         const dayKey = String(entry.day);
         seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
         const occurrence = seenByDay[dayKey];
-        const chapter = entry.chapter || entry?.lesen_hören?.chapter || "";
+        const dictionaryEntry = getAssignmentDictionaryEntry({
+          level: preferredLevel,
+          assignmentId: entry.assignmentId,
+          chapter: entry.chapter || entry?.lesen_hören?.chapter,
+        });
+        const chapter = dictionaryEntry?.chapter || entry.chapter || entry?.lesen_hören?.chapter || "";
         const chapterSuffix = chapter ? ` • Chapter ${chapter}` : "";
         const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
-        const label = `Day ${entry.day}${duplicateSuffix}: ${entry.topic}${chapterSuffix}`;
+        const topicTitle = dictionaryEntry?.en || entry.topic;
+        const label = `Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}`;
 
         return {
           day: entry.day,
-          topic: entry.topic,
+          topic: topicTitle,
           chapter,
           occurrence,
           label,
-          assignmentId: entry.assignmentId || null,
+          assignmentId: dictionaryEntry?.assignment_id || entry.assignmentId || null,
           canonicalAssignmentId:
             catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.canonicalAssignmentId ||
             resolveAssignmentCanonicalKey({

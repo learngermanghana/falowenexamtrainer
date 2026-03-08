@@ -159,7 +159,7 @@ const toLocalDateString = (date) => {
 
 const buildSessionTitles = (sessions = []) =>
   sessions.map((session) => {
-    const base = [session.chapter, session.type].filter(Boolean).join(" – ");
+    const base = [session.assignmentId || session.chapter, session.title || session.type].filter(Boolean).join(" – ");
     return session.note ? `${base} (${session.note})` : base;
   });
 

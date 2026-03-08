@@ -1,3 +1,9 @@
+import { classCatalog } from "./classCatalog";
+import {
+  getAssignmentDictionaryEntry,
+  getAssignmentSequenceForLevel,
+} from "./germanAssignmentCatalog";
+
 const WEEKDAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const toDateString = (date) => {
@@ -1516,6 +1522,126 @@ const withAssignmentIds = (schedule) => ({
   })),
 });
 
+const toLevelToken = (value) => {
+  const match = String(value || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
+  return match ? match[1] : "";
+};
+
+const listClassDates = ({ startDate, endDate, weekdays = [] }) => {
+  if (!startDate || !endDate || !weekdays.length) return [];
+  const allowedDays = new Set(weekdays);
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+  const days = [];
+
+  for (const current = new Date(start); current <= end; current.setDate(current.getDate() + 1)) {
+    const weekday = WEEKDAY_NAMES[current.getDay()];
+    if (!allowedDays.has(weekday)) continue;
+    days.push({ date: toDateString(current), weekday });
+  }
+
+  return days;
+};
+
+const buildSessionsFromSequence = (level, currentSessions = [], fallbackSessions = []) => {
+  const sequence = getAssignmentSequenceForLevel(level);
+  if (!sequence.length) return currentSessions.length ? currentSessions : fallbackSessions;
+
+  return sequence.map((entry) => ({
+    chapter: entry.chapter,
+    assignmentId: entry.assignment_id,
+    title: entry.en,
+    type: entry.de,
+  }));
+};
+
+const distributeSessionsAcrossDates = (dates = [], sessions = []) => {
+  if (!dates.length || !sessions.length) return [];
+
+  const mappedDays = [];
+  let sessionIndex = 0;
+
+  dates.forEach((dateEntry, idx) => {
+    const remainingSessions = sessions.length - sessionIndex;
+    const remainingDays = dates.length - idx;
+    const takeCount = remainingSessions > 0 ? Math.ceil(remainingSessions / Math.max(remainingDays, 1)) : 0;
+    const daySessions = sessions.slice(sessionIndex, sessionIndex + takeCount);
+    sessionIndex += takeCount;
+
+    if (!daySessions.length) return;
+
+    mappedDays.push({
+      dayNumber: mappedDays.length + 1,
+      date: dateEntry.date,
+      weekday: dateEntry.weekday,
+      sessions: daySessions,
+    });
+  });
+
+  return mappedDays;
+};
+
+const enrichSessionFromDictionary = (level, session = {}) => {
+  const inferredAssignmentId = session.assignmentId || parseAssignmentId(session.chapter || session.title || session.type);
+  const canonicalAssignmentId = inferredAssignmentId
+    ? `${level}-${String(inferredAssignmentId).replace(new RegExp(`^${level}-`, "i"), "")}`.toUpperCase()
+    : null;
+  const dictionaryEntry = getAssignmentDictionaryEntry({
+    level,
+    assignmentId: canonicalAssignmentId,
+    chapter: session.chapter,
+  });
+
+  if (!dictionaryEntry) {
+    return {
+      ...session,
+      assignmentId: canonicalAssignmentId || inferredAssignmentId || session.assignmentId || null,
+    };
+  }
+
+  return {
+    ...session,
+    chapter: dictionaryEntry.chapter,
+    assignmentId: dictionaryEntry.assignment_id,
+    title: dictionaryEntry.en,
+    type: dictionaryEntry.de,
+  };
+};
+
+const autoBuildScheduleFromClassDates = (className, schedule) => {
+  const classMeta = classCatalog[className];
+  if (!classMeta?.startDate || !classMeta?.endDate || !Array.isArray(classMeta?.schedule)) {
+    return schedule;
+  }
+
+  const level = toLevelToken(schedule.course || className);
+  const classDates = listClassDates({
+    startDate: classMeta.startDate,
+    endDate: classMeta.endDate,
+    weekdays: classMeta.schedule.map((entry) => entry.day),
+  });
+
+  if (!classDates.length) return schedule;
+
+  const fallbackSessions = (schedule.days || []).flatMap((day) =>
+    (day.sessions || []).map((session) => enrichSessionFromDictionary(level, session))
+  );
+  const sequenceSessions = buildSessionsFromSequence(level, fallbackSessions, fallbackSessions).map((session) =>
+    enrichSessionFromDictionary(level, session)
+  );
+  const days = distributeSessionsAcrossDates(classDates, sequenceSessions.length ? sequenceSessions : fallbackSessions);
+
+  return {
+    ...schedule,
+    startDateIso: classMeta.startDate,
+    endDateIso: classMeta.endDate,
+    days: days.length ? days : schedule.days,
+  };
+};
+
 export const courseSchedulesByName = Object.fromEntries(
-  Object.entries(rawCourseSchedulesByName).map(([className, schedule]) => [className, withAssignmentIds(schedule)])
+  Object.entries(rawCourseSchedulesByName).map(([className, schedule]) => [
+    className,
+    withAssignmentIds(autoBuildScheduleFromClassDates(className, schedule)),
+  ])
 );
