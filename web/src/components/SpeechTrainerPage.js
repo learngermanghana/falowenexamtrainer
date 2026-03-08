@@ -499,26 +499,15 @@ const SpeechTrainerPage = () => {
       const messageForCoach = note || transcript;
       const hasCoachMessage = messageForCoach.length >= MIN_ANSWER_LENGTH;
 
-      if (hasCoachMessage) {
-        const history = chatMessages.map(({ role, content }) => ({ role, content }));
-        const userMessageContent = note && transcript && note !== transcript
-          ? `${note}\n\n${t("speechTrainer.audioTranscriptLabel")}: ${transcript}`
-          : messageForCoach;
-        await submitMessage({ message: messageForCoach, history, userMessageContent });
-      } else {
-        const feedbackParts = [
-          transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${transcript}` : "",
-          response?.feedback || response?.notes || response?.summary
-            ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
-            : "",
-          response?.nextSteps || response?.actions
-            ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
-            : "",
-        ].filter(Boolean);
-        if (feedbackParts.length) {
-          setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
-        }
-      }
+      const feedbackParts = [
+        transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${transcript}` : "",
+        response?.feedback || response?.notes || response?.summary
+          ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
+          : "",
+        response?.nextSteps || response?.actions
+          ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
+          : "",
+      ].filter(Boolean);
 
       if (!completed) {
         const history = chatMessages.map(({ role, content }) => ({ role, content }));
