@@ -600,8 +600,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                 <div style={{ display: "grid", gap: 4 }}>
                   <img
-                    src="/learning-space-hero.svg"
-                    alt="Falowen course header"
+                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
+                    alt="Students learning together in a course"
                     style={{ width: "100%", maxWidth: 560, borderRadius: 12, border: "1px solid #e5e7eb" }}
                   />
                   <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("courseTab.title")}</h2>
