@@ -1,185 +1,390 @@
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import { toDateMs } from "../lib/dateUtils";
+import { ZOOM_DETAILS } from "../data/classCatalog";
+import ClassCalendarCard from "./ClassCalendarCard";
+import HomeMetrics from "./HomeMetrics";
+import OnboardingChecklist from "./OnboardingChecklist";
+import NavigationGuide from "./NavigationGuide";
+import ExamReadinessBadge from "./ExamReadinessBadge";
+import { fetchAnnouncements } from "../services/announcementService";
+import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
+import { formatCurrency } from "../lib/formatters";
 
-const progressBar = {
-  width: "100%",
-  height: 10,
-  borderRadius: 999,
-  background: "rgba(255,255,255,0.25)",
-  overflow: "hidden",
-};
-
-const GeneralHome = ({ onSelectArea }) => {
-  const navigate = useNavigate();
+const WelcomeHero = ({ studentProfile, onOpenExamFile }) => {
+  const { t } = useTranslation();
+  const studentName =
+    studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
+  const className = studentProfile?.className || t("generalHome.welcome.classFallback");
 
   return (
-    <div className="home-page" style={{ display: "grid", gap: 16 }}>
-      <section className="welcome-banner" style={{ ...styles.card, marginBottom: 0 }}>
-        <div>
-          <p className="welcome-eyebrow">Welcome back</p>
-          <h2 className="welcome-title">Felix Asadu, your campus is ready</h2>
-          <p className="welcome-description">
-            Personalised tips, attendance, and assignments for A1 Hamburg Klasse—jump straight into the
-            space you need today.
+    <section
+      style={{
+        ...styles.card,
+        background: "linear-gradient(135deg, #312e81, #2563eb)",
+        color: "#eef2ff",
+        border: "none",
+        boxShadow: "0 20px 45px rgba(37, 99, 235, 0.25)",
+      }}
+    >
+      <p style={{ ...styles.helperText, color: "#c7d2fe", margin: 0 }}>{t("generalHome.welcome.eyebrow")}</p>
+      <h2 style={{ margin: "4px 0 8px", fontSize: 26, letterSpacing: -0.3 }}>
+        {t("generalHome.welcome.title", { studentName })}
+      </h2>
+      <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 12 }}>
+        {t("generalHome.welcome.subtitle", { className })}
+      </p>
+
+      <PrimaryActionBar align="start">
+        <PillBadge tone="success">{t("generalHome.welcome.streakBadge")}</PillBadge>
+
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
+          onClick={() => window.open(ZOOM_DETAILS.url, "_blank", "noreferrer")}
+        >
+          {t("generalHome.welcome.joinZoom")}
+        </button>
+
+        {/* ✅ Compact: sits beside Zoom */}
+        <ExamReadinessBadge
+          variant="button"
+          studentProfile={studentProfile}
+          onOpenExamFile={onOpenExamFile}
+        />
+      </PrimaryActionBar>
+    </section>
+  );
+};
+
+const GeneralHome = ({
+  onSelectArea,
+  studentProfile,
+  notificationStatus,
+  onEnableNotifications,
+  onSaveOnboarding,
+}) => {
+  const { i18n, t } = useTranslation();
+  const locale = i18n.language;
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
+  const formatTimeUnit = useCallback(
+    (unit, count) => t(`common.${unit}`, { count, formattedCount: numberFormatter.format(count) }),
+    [numberFormatter, t]
+  );
+  const translate = useCallback((key, values) => t(key, values), [t]);
+  const preferredClass = studentProfile?.className;
+  const navigate = useNavigate();
+  const classCalendarId = "class-calendar-card";
+  const [announcements, setAnnouncements] = useState([]);
+  const [announcementStatus, setAnnouncementStatus] = useState("idle");
+  const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const paymentAlert = useMemo(() => {
+    const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
+    if (balanceDue <= 0) return null;
+    if (!studentProfile?.contractEnd) return null;
+    const contractEndMs = toDateMs(studentProfile.contractEnd);
+    if (!Number.isFinite(contractEndMs)) return null;
+    const dayMs = 1000 * 60 * 60 * 24;
+    const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
+    if (daysLeft < 0 || daysLeft > 15) return null;
+
+    const amount = formatCurrency(balanceDue, { locale, maximumFractionDigits: 2 });
+    const daysLabel = formatTimeUnit("day", daysLeft);
+
+    return {
+      daysLeft,
+      message:
+        daysLeft === 0
+          ? translate("generalHome.paymentAlert.endsToday", { amount })
+          : translate("generalHome.paymentAlert.endsSoon", { amount, time: daysLabel }),
+    };
+  }, [formatTimeUnit, locale, studentProfile?.balanceDue, studentProfile?.contractEnd, translate]);
+
+  const handleSelectLevel = () => navigate("/campus/account");
+  const handleConfirmClass = () => {
+    const calendarSection = document.getElementById(classCalendarId);
+    if (calendarSection) {
+      calendarSection.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    navigate("/");
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    const loadAnnouncements = async () => {
+      setAnnouncementStatus("loading");
+      try {
+        const items = await fetchAnnouncements({
+          className: studentProfile?.className,
+          program: studentProfile?.program,
+          locale,
+        });
+        if (!mounted) return;
+        setAnnouncements(items);
+        setAnnouncementStatus("success");
+      } catch (error) {
+        console.error("Failed to load announcements", error);
+        if (!mounted) return;
+        setAnnouncements([]);
+        setAnnouncementStatus("error");
+      }
+    };
+
+    loadAnnouncements();
+    return () => {
+      mounted = false;
+    };
+  }, [locale, studentProfile?.className, studentProfile?.program]);
+
+  useEffect(() => {
+    if (announcements.length <= 1) {
+      setAnnouncementIndex(0);
+      return undefined;
+    }
+
+    const interval = setInterval(() => {
+      setAnnouncementIndex((current) => (current + 1) % announcements.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [announcements]);
+
+  return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <WelcomeHero
+        studentProfile={studentProfile}
+        onOpenExamFile={() => navigate("/campus/examFile")}
+      />
+
+      {paymentAlert ? (
+        <section
+          style={{
+            ...styles.card,
+            background: "#fffbeb",
+            border: "1px solid #f59e0b",
+            display: "grid",
+            gap: 8,
+          }}
+        >
+          <span style={{ ...styles.badge, background: "#f59e0b", color: "#fff" }}>
+            {t("generalHome.paymentAlert.badge")}
+          </span>
+          <strong style={{ fontSize: 16 }}>{paymentAlert.message}</strong>
+          <PrimaryActionBar align="start">
+            <button style={styles.primaryButton} onClick={() => navigate("/campus/account")}>
+              {t("generalHome.paymentAlert.cta")}
+            </button>
+          </PrimaryActionBar>
+        </section>
+      ) : null}
+
+      {/* ❌ Remove the big readiness card from the home page */}
+      {/* 
+      <ExamReadinessBadge
+        studentProfile={studentProfile}
+        onOpenExamFile={() => navigate("/campus/examFile")}
+      />
+      */}
+
+      <OnboardingChecklist
+        notificationStatus={notificationStatus}
+        onEnableNotifications={onEnableNotifications}
+        onSelectLevel={handleSelectLevel}
+        onConfirmClass={handleConfirmClass}
+        studentProfile={studentProfile}
+        onSaveOnboarding={onSaveOnboarding}
+      />
+
+      <NavigationGuide />
+
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <SectionHeader
+          eyebrow={t("generalHome.announcements.eyebrow")}
+          title={t("generalHome.announcements.title")}
+          subtitle={t("generalHome.announcements.subtitle")}
+        />
+        {announcementStatus === "loading" ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.loading")}</p>
+        ) : null}
+        {announcementStatus === "error" ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            {t("generalHome.announcements.error")}
           </p>
-          <div className="welcome-actions">
-            <button type="button" className="white-chip-button">Keep your streak alive</button>
-            <button type="button" className="white-chip-button" onClick={() => navigate("/coursebook")}>Open class materials</button>
-            <button type="button" className="white-chip-button warning">Not ready</button>
-          </div>
-        </div>
+        ) : null}
+        {announcementStatus === "success" && announcements.length === 0 ? (
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            {t("generalHome.announcements.empty")}
+          </p>
+        ) : null}
+        {announcementStatus === "success" && announcements.length > 0 ? (
+          <div
+            className="announcement-slider"
+            aria-label={t("generalHome.announcements.ariaLabel")}
+            aria-live="polite"
+          >
+            <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
+              {(() => {
+                const announcement = announcements[announcementIndex] || {};
 
-        <aside className="floating-progress-card">
-          <p>Course Progress</p>
-          <strong>66%</strong>
-          <span>20 days left</span>
-        </aside>
-      </section>
-
-      <section className="metrics-grid">
-        <article className="metric-card blue-border">
-          <p>Attendance</p>
-          <h3>13 <span>sessions</span></h3>
-          <small>13 hours total</small>
-        </article>
-
-        <article className="metric-card yellow-card yellow-border">
-          <p>Next recommendation</p>
-          <h3 className="small-title">Day 1: Chapter 0.1 — Greetings</h3>
-          <small>You will learn to greet others in German and ask about people&apos;s well-being.</small>
-        </article>
-
-        <article className="metric-card gray-border">
-          <p>Missed items</p>
-          <h3>None</h3>
-          <small>Missed items are only those before your last fully completed day.</small>
-        </article>
-
-        <article className="metric-card red-card red-border">
-          <p>Failed Items</p>
-          <h3>None</h3>
-          <small>Revisit failed tasks to keep momentum.</small>
-        </article>
-      </section>
-
-      <section className="weekly-progress" style={styles.card}>
-        <div>
-          <h3>This Week&apos;s Progress</h3>
-          <p>1 assignments, 1 attempts, 0 retries, 0-day streak</p>
-        </div>
-        <button type="button" className="outline-button">↗ View leaderboard</button>
-      </section>
-
-      <section className="navigation-grid">
-        <article className="nav-card">
-          <div className="nav-card-hero indigo-gradient">
-            <div className="bar-chart-icon" aria-hidden="true">
-              <span style={{ height: "82%" }} />
-              <span style={{ height: "56%" }} />
-              <span style={{ height: "92%" }} />
-              <span style={{ height: "68%" }} />
-              <span style={{ height: "52%" }} />
+                return (
+                  <>
+                    <div className="announcement-message">
+                      <span className="announcement-ticker-title">{announcement.title}</span>
+                    </div>
+                    {announcement.linkUrl ? (
+                      <a
+                        href={announcement.linkUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="announcement-ticker-link"
+                      >
+                        {announcement.linkLabel || t("generalHome.announcements.openUpdate")}
+                      </a>
+                    ) : null}
+                  </>
+                );
+              })()}
             </div>
-            <h3>Campus</h3>
-            <p>Daily classes, assignments, and AI helpers</p>
+            {announcements.length > 1 ? (
+              <div className="announcement-slide-count" aria-hidden="true">
+                {announcementIndex + 1} / {announcements.length}
+              </div>
+            ) : null}
           </div>
+        ) : null}
+      </section>
 
-          <div className="nav-card-body">
-            <div className="badge-row">
-              <span className="badge badge-green">Start here</span>
-              <span className="badge">Daily work</span>
-            </div>
-            <ul>
-              <li>✓ Course book access, assignment submission, and results.</li>
-              <li>✓ Grammar Q&amp;A, Speech Trainer, and original writing coach.</li>
-              <li>✓ Group discussion and account settings.</li>
-            </ul>
-            <button type="button" className="solid-button" onClick={() => navigate("/coursebook")}>
-              Enter Campus
+      <section
+        style={{
+          ...styles.card,
+          backgroundImage:
+            "linear-gradient(110deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)), url('/learning-space-hero.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <SectionHeader
+          eyebrow={t("generalHome.learningSpace.eyebrow")}
+          title={t("generalHome.learningSpace.title")}
+          subtitle={t("generalHome.learningSpace.subtitle")}
+        />
+      </section>
+
+      <section style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
+        <button
+          type="button"
+          onClick={() => navigate("/campus/discussion")}
+          style={{
+            border: "none",
+            padding: 0,
+            margin: 0,
+            display: "block",
+            width: "100%",
+            background: "transparent",
+            cursor: "pointer",
+          }}
+          aria-label="Open group discussion"
+        >
+          <img
+            src="/learning-space-hero.svg"
+            alt="Open group discussion"
+            style={{ display: "block", width: "100%", height: "auto" }}
+          />
+        </button>
+      </section>
+
+      <div style={styles.gridTwo}>
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 10,
+            background:
+              "linear-gradient(130deg, rgba(238, 242, 255, 0.9), rgba(255, 255, 255, 0.96))",
+            borderColor: "#c7d2fe",
+          }}
+        >
+          <SectionHeader
+            eyebrow={t("generalHome.campus.eyebrow")}
+            title={t("generalHome.campus.title")}
+            actions={
+              <PrimaryActionBar align="flex-end">
+                <PillBadge tone="success">{t("generalHome.campus.badgePrimary")}</PillBadge>
+                <PillBadge>{t("generalHome.campus.badgeSecondary")}</PillBadge>
+              </PrimaryActionBar>
+            }
+          />
+          <ul style={{ ...styles.checklist, margin: 0 }}>
+            <li>{t("generalHome.campus.points.0")}</li>
+            <li>{t("generalHome.campus.points.1")}</li>
+            <li>{t("generalHome.campus.points.2")}</li>
+          </ul>
+          <p style={{ ...styles.helperText, marginBottom: 6 }}>
+            {t("generalHome.campus.helper")}
+          </p>
+          <PrimaryActionBar align="start">
+            <button style={styles.primaryButton} onClick={() => onSelectArea("campus")}>
+              {t("generalHome.campus.cta")}
             </button>
-          </div>
-        </article>
+          </PrimaryActionBar>
+        </section>
 
-        <article className="nav-card">
-          <div className="nav-card-hero blue-gradient">
-            <div className="exam-icon-row" aria-hidden="true">
-              <span>📄</span>
-              <span>✅</span>
-            </div>
-            <h3>Exams Room</h3>
-            <p>Mock speaking, writing, and exam resources</p>
-          </div>
-
-          <div className="nav-card-body">
-            <div className="badge-row">
-              <span className="badge badge-blue">Exam mode</span>
-            </div>
-            <ul>
-              <li>✓ Speaking practice prompts organised by level.</li>
-              <li>✓ Schreiben trainer with timed letters and idea generation.</li>
-              <li>✓ Goethe Lesen/Hören links and quick exam-day reminders.</li>
-            </ul>
-            <button type="button" className="solid-button exams" onClick={() => onSelectArea("exams")}>
-              Go to Exams Room
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 10,
+            background:
+              "linear-gradient(130deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.97))",
+            borderColor: "#bfdbfe",
+          }}
+        >
+          <SectionHeader
+            eyebrow={t("generalHome.exams.eyebrow")}
+            title={t("generalHome.exams.title")}
+            actions={
+              <PrimaryActionBar align="flex-end">
+                <PillBadge tone="info">{t("generalHome.exams.badge")}</PillBadge>
+              </PrimaryActionBar>
+            }
+          />
+          <ul style={{ ...styles.checklist, margin: 0 }}>
+            <li>{t("generalHome.exams.points.0")}</li>
+            <li>{t("generalHome.exams.points.1")}</li>
+            <li>{t("generalHome.exams.points.2")}</li>
+          </ul>
+          <p style={{ ...styles.helperText, marginBottom: 6 }}>
+            {t("generalHome.exams.helper")}
+          </p>
+          <PrimaryActionBar align="start">
+            <button style={styles.secondaryButton} onClick={() => onSelectArea("exams")}>
+              {t("generalHome.exams.cta")}
             </button>
+          </PrimaryActionBar>
+        </section>
+      </div>
+
+      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+        <details style={{ ...styles.card, background: "#f8fafc" }}>
+          <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>
+            {t("generalHome.more.summary")}
+          </summary>
+          <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              {t("generalHome.more.helper")}
+            </p>
+            <HomeMetrics studentProfile={studentProfile} />
+            <ClassCalendarCard
+              id={classCalendarId}
+              initialClassName={preferredClass}
+              program={studentProfile?.program}
+            />
           </div>
-        </article>
-      </section>
-
-      <section className="live-class-card" style={styles.card}>
-        <div className="live-header">
-          <h3>Live class access</h3>
-          <span className="badge badge-green">Zoom ready</span>
-        </div>
-
-        <div className="live-grid">
-          <div>
-            <h4>Your class</h4>
-            <select style={styles.select} defaultValue="A1 Hamburg Klasse">
-              <option>A1 Hamburg Klasse</option>
-            </select>
-            <p>Thursday: 18:00-19:00 · Friday: 18:00-19:00 · Saturday: 8:00-9:00</p>
-          </div>
-
-          <div>
-            <h4>Zoom meeting</h4>
-            <button type="button" className="outline-button full">🎥 Join Zoom Meeting</button>
-            <p>Meeting ID: 688 690 0916 · Passcode: german</p>
-            <h4>Course docs</h4>
-            <a href="/coursebook">↗ Open class materials</a>
-          </div>
-
-          <div>
-            <h4>Timeline</h4>
-            <div className="timeline-card">
-              <strong>20 days left</strong>
-              <p>66% done</p>
-              <div style={progressBar}><div className="progress-fill" /></div>
-              <span>20 days until graduation</span>
-            </div>
-            <h4>CLASS DATES</h4>
-            <p>Jan 30, 2026 — Mar 27, 2026</p>
-          </div>
-        </div>
-
-        <div className="next-live-class">
-          <div>
-            <h4>🕒 Next live class</h4>
-            <p>Thursday, Mar 12, 2026 · 18:00-19:00 (GMT, Ghana)</p>
-          </div>
-          <button type="button" className="outline-button">🗓 Add to calendar</button>
-        </div>
-
-        <button type="button" className="outline-button">⬇ Download calendar (.ics)</button>
-      </section>
-
-      <section style={styles.card}>
-        <h3>Latest blog</h3>
-        <article className="blog-card">
-          <h4>New on Falowen: Placement Test for Learners Who Don&apos;t Know Their Level</h4>
-          <a href="https://blog.falowen.app" target="_blank" rel="noreferrer">Read on blog</a>
-        </article>
+        </details>
       </section>
     </div>
   );
