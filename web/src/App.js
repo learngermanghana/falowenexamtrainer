@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Navigate, Route, Routes, createBrowserRouter, RouterProvider, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ALLOWED_LEVELS, ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
@@ -150,7 +150,7 @@ const getPreferredSection = (allowedSections, preferred, tabStructure) => {
   return findFirstAllowedSection(allowedSections, tabStructure);
 };
 
-function AppRoot() {
+function App() {
   const { t } = useTranslation();
   const {
     user,
@@ -343,12 +343,6 @@ function AppRoot() {
   );
 }
 
-const appRouter = createBrowserRouter([{ path: "*", element: <AppRoot /> }]);
-
-function App() {
-  return <RouterProvider router={appRouter} />;
-}
-
 export default App;
 
 const AppShell = ({
@@ -524,7 +518,6 @@ const AppShell = ({
             }
           />
           <Route path="/placement-test" element={<PlacementTestPage />} />
-          <Route path="/coursebook" element={<Navigate to="/campus/course" replace />} />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
           <Route
