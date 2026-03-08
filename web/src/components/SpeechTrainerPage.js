@@ -420,7 +420,18 @@ const SpeechTrainerPage = () => {
           setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
         }
       }
-      setAudioCoachStatus(t("speechTrainer.audioReadyStatus"));
+
+      if (!completed) {
+        const history = chatMessages.map(({ role, content }) => ({ role, content }));
+        const userMessageContent = note && transcript && note !== transcript
+          ? `${note}\n\n${t("speechTrainer.audioTranscriptLabel")}: ${transcript}`
+          : messageForCoach;
+        await submitMessage({ message: messageForCoach, history, userMessageContent });
+      } else if (feedbackParts.length) {
+        setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
+      }
+
+      setAudioCoachStatus(completed ? t("speechTrainer.audioAssessmentReadyStatus") : t("speechTrainer.audioReadyStatus"));
       if (inlineAudioState?.clearAudio) inlineAudioState.clearAudio();
       if (trimmedInput) setChatInput("");
     } catch (submitError) {
