@@ -772,6 +772,8 @@ const ClassDiscussionPage = () => {
   const renderThread = (thread) => {
     const status = thread.status || resolveStatus(thread);
     const isThreadOpen = status === "open";
+    const isMyThread = Boolean(user?.uid && thread.createdByUid === user.uid);
+    const postAgeLabel = `${isMyThread ? "You posted" : "Posted"} ${formatRelativeTime(thread.createdAt, now)}`;
 
     const timeRemainingLabel =
       status === "archived"
@@ -827,7 +829,7 @@ const ClassDiscussionPage = () => {
             <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
 
             <div style={{ fontSize: 12, color: "#6b7280" }} title={formatDateTime(thread.createdAt, timezonePreference)}>
-              Posted {formatRelativeTime(thread.createdAt, now)}
+              {postAgeLabel}
             </div>
             {thread.editedAt ? (
               <div style={{ fontSize: 12, color: "#6b7280" }} title={formatDateTime(thread.editedAt, timezonePreference)}>
@@ -851,7 +853,7 @@ const ClassDiscussionPage = () => {
               justifyContent: "flex-end",
             }}
           >
-            <span style={styles.badge}>Posted by {thread.createdBy}</span>
+            <span style={styles.badge}>{isMyThread ? "Your post" : `Posted by ${thread.createdBy}`}</span>
             <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
 
             {canEditThread(thread) ? (
