@@ -1708,6 +1708,34 @@
     "audioTranscriptLabel": "Transcript",
     "audioFeedbackLabel": "Feedback",
     "audioNextStepsLabel": "Next steps",
-    "composerStatusHintRecordingPriority": "Status: recording is ready. Send to continue the chat with your typed note or transcript."
+    "composerStatusHintRecordingPriority": "Status: recording is ready. Send to continue the chat with your typed note or transcript.",
+    "ideaBuilder": {
+      "title": "Idea builder",
+      "description": "Use these ideas before you record so your answer has structure and better vocabulary.",
+      "focus": "Focus topic: {{topic}}",
+      "talkingPointsTitle": "Quick talking points",
+      "point1": "Introduce {{topic}} in one sentence and state why it matters.",
+      "point2": "Describe one real example, experience, or observation about {{topic}}.",
+      "point3": "Give your opinion and one practical next step related to {{topic}}.",
+      "sentenceStartersTitle": "Sentence starters",
+      "startersA1A2": [
+        "Ich denke, dass…",
+        "In meiner Stadt…",
+        "Zum Beispiel…"
+      ],
+      "startersDefault": [
+        "Meiner Meinung nach…",
+        "Ein wichtiger Aspekt ist…",
+        "Zusammenfassend kann man sagen…"
+      ],
+      "usefulWordsTitle": "Useful words",
+      "words": [
+        "zuerst",
+        "außerdem",
+        "deshalb",
+        "zum Schluss"
+      ],
+      "fallbackTopic": "your topic"
+    }
   }
 }

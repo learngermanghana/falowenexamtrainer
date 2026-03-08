@@ -1596,6 +1596,34 @@
     "audioTranscriptLabel": "Transcription",
     "audioFeedbackLabel": "Feedback",
     "audioNextStepsLabel": "Prochaines étapes",
-    "composerStatusHintRecordingPriority": "Statut : l’enregistrement est prêt. Envoyez-le pour continuer le chat avec votre texte ou la transcription."
+    "composerStatusHintRecordingPriority": "Statut : l’enregistrement est prêt. Envoyez-le pour continuer le chat avec votre texte ou la transcription.",
+    "ideaBuilder": {
+      "title": "Générateur d'idées",
+      "description": "Utilise ces idées avant d'enregistrer pour structurer ta réponse et améliorer ton vocabulaire.",
+      "focus": "Sujet principal : {{topic}}",
+      "talkingPointsTitle": "Points rapides à dire",
+      "point1": "Présente {{topic}} en une phrase et explique pourquoi c'est important.",
+      "point2": "Donne un exemple concret ou une expérience liée à {{topic}}.",
+      "point3": "Donne ton opinion et une prochaine étape pratique pour {{topic}}.",
+      "sentenceStartersTitle": "Débuts de phrase",
+      "startersA1A2": [
+        "Ich denke, dass…",
+        "In meiner Stadt…",
+        "Zum Beispiel…"
+      ],
+      "startersDefault": [
+        "Meiner Meinung nach…",
+        "Ein wichtiger Aspekt ist…",
+        "Zusammenfassend kann man sagen…"
+      ],
+      "usefulWordsTitle": "Mots utiles",
+      "words": [
+        "zuerst",
+        "außerdem",
+        "deshalb",
+        "zum Schluss"
+      ],
+      "fallbackTopic": "ton sujet"
+    }
   }
 }

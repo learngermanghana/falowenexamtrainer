@@ -1592,6 +1592,34 @@
     "audioTranscriptLabel": "Transkript",
     "audioFeedbackLabel": "Feedback",
     "audioNextStepsLabel": "Nächste Schritte",
-    "composerStatusHintRecordingPriority": "Status: Aufnahme ist bereit. Sende sie, um den Chat mit deinem Text oder Transkript fortzusetzen."
+    "composerStatusHintRecordingPriority": "Status: Aufnahme ist bereit. Sende sie, um den Chat mit deinem Text oder Transkript fortzusetzen.",
+    "ideaBuilder": {
+      "title": "Ideen-Builder",
+      "description": "Nutze diese Ideen vor der Aufnahme, damit deine Antwort klar strukturiert und sprachlich stärker ist.",
+      "focus": "Fokusthema: {{topic}}",
+      "talkingPointsTitle": "Schnelle Sprechpunkte",
+      "point1": "Führe {{topic}} in einem Satz ein und erkläre, warum es wichtig ist.",
+      "point2": "Beschreibe ein konkretes Beispiel oder eine Erfahrung zu {{topic}}.",
+      "point3": "Gib deine Meinung und einen praktischen nächsten Schritt zu {{topic}}.",
+      "sentenceStartersTitle": "Satzanfänge",
+      "startersA1A2": [
+        "Ich denke, dass…",
+        "In meiner Stadt…",
+        "Zum Beispiel…"
+      ],
+      "startersDefault": [
+        "Meiner Meinung nach…",
+        "Ein wichtiger Aspekt ist…",
+        "Zusammenfassend kann man sagen…"
+      ],
+      "usefulWordsTitle": "Nützliche Wörter",
+      "words": [
+        "zuerst",
+        "außerdem",
+        "deshalb",
+        "zum Schluss"
+      ],
+      "fallbackTopic": "dein Thema"
+    }
   }
 }
