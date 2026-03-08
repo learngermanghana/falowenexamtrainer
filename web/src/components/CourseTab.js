@@ -239,6 +239,12 @@ const getLessonKey = (lesson) =>
     Boolean(lesson.assignment),
   ].join("::");
 
+const RESOURCE_ICONS = {
+  video: "🎥",
+  grammarbook: "📘",
+  workbook: "📄",
+};
+
 const LessonList = ({ title, lessons, t }) => {
   const uniqueLessons = useMemo(() => {
     const seen = new Set();
@@ -252,41 +258,53 @@ const LessonList = ({ title, lessons, t }) => {
 
   if (!uniqueLessons.length) return null;
 
+  const hasAssignmentLesson = uniqueLessons.some((lesson) => lesson.assignment);
+
   return (
     <div style={{ display: "grid", gap: 8 }}>
-      <h4 style={{ margin: 0 }}>{title}</h4>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <h4 style={{ margin: 0 }}>{title}</h4>
+        {hasAssignmentLesson ? (
+          <span style={{ ...styles.badge, background: "#dbeafe", color: "#1d4ed8", border: "1px solid #93c5fd" }}>
+            {t("courseTab.assignment")}
+          </span>
+        ) : null}
+      </div>
       <div style={{ display: "grid", gap: 8 }}>
         {uniqueLessons.map((lesson, index) => (
           <div
             key={`${lesson.chapter || title}-${index}`}
             style={{
-              padding: 10,
-              borderRadius: 10,
-              border: "1px solid #e5e7eb",
-              background: "#f9fafb",
               display: "grid",
-              gap: 6,
+              gap: 4,
             }}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-              <div style={{ fontWeight: 700 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}</div>
-              {lesson.assignment ? <span style={styles.badge}>{t("courseTab.assignment")}</span> : null}
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <div style={{ fontWeight: 700, fontSize: 14 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}</div>
+              {lesson.assignment ? (
+                <span style={{ ...styles.badge, background: "#dbeafe", color: "#1d4ed8", border: "1px solid #93c5fd" }}>
+                  {t("courseTab.assignment")}
+                </span>
+              ) : null}
             </div>
 
-            <details open>
-              <summary style={{ cursor: "pointer", fontWeight: 700 }}>{t("courseTab.resources")}</summary>
-              <ul style={{ ...styles.checklist, margin: "6px 0 0 0" }}>
-                {lesson.video || lesson.youtube_link ? (
-                  <li>
-                    <a href={lesson.video || lesson.youtube_link} target="_blank" rel="noreferrer">
-                      {RESOURCE_ACTION_LABELS.video}
-                    </a>
-                  </li>
-                ) : null}
-                <ResourceLinkRow label="Grammarbook" url={lesson.grammarbook_link} />
-                <ResourceLinkRow label="Workbook" url={lesson.workbook_link} />
-              </ul>
-            </details>
+            <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+              {lesson.video || lesson.youtube_link ? (
+                <li>
+                  <a
+                    href={lesson.video || lesson.youtube_link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="coursebook-resource-link"
+                    style={{ color: "#2563eb", textDecoration: "none" }}
+                  >
+                    {RESOURCE_ICONS.video} {RESOURCE_ACTION_LABELS.video}
+                  </a>
+                </li>
+              ) : null}
+              <ResourceLinkRow label={`${RESOURCE_ICONS.grammarbook} Grammarbook`} url={lesson.grammarbook_link} />
+              <ResourceLinkRow label={`${RESOURCE_ICONS.workbook} Workbook`} url={lesson.workbook_link} />
+            </ul>
           </div>
         ))}
       </div>
@@ -648,15 +666,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
-                <div style={{ ...styles.card, marginBottom: 0 }}>
-                  {t("courseTab.metrics.days", { completed: overview.daysCompleted, total: overview.totalDays })}
-                </div>
-                <div style={{ ...styles.card, marginBottom: 0 }}>
-                  {t("courseTab.metrics.lastActivity", { date: overview.lastActivity })}
-                </div>
-              </div>
-
               {isB2SelfLearning || isC1SelfLearning ? null : (
                 <>
                   <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
@@ -724,7 +733,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
                 </p>
 
-                <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
+                <div className="coursebook-grid">
                   {filteredSchedule.map((entry) => {
                     const lesenHorenList = Array.isArray(entry.lesen_hören)
                       ? entry.lesen_hören
@@ -741,36 +750,46 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const entryAssignmentKey = getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
-                    const showAssignmentTypeBadge = selectedCourseLevel === "A1";
+                    const assignmentTypeLabel = milestoneEntry
+                      ? "Milestone complete"
+                      : isTutorMarked
+                      ? t("courseTab.tutorMarked")
+                      : t("courseTab.selfPractice");
+                    const assignmentTypeStyle = milestoneEntry
+                      ? { background: "#fef9c3", color: "#854d0e", border: "1px solid #fde68a" }
+                      : isTutorMarked
+                      ? { background: "#fce7f3", color: "#9d174d", border: "1px solid #f9a8d4" }
+                      : { background: "#dcfce7", color: "#166534", border: "1px solid #86efac" };
 
                     return (
-                      <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                          <div>
+                      <div
+                        key={`day-${entry.day}-${entry.occurrence}`}
+                        className="coursebook-card"
+                        style={{
+                          ...styles.card,
+                          marginBottom: 0,
+                          display: "grid",
+                          gap: 10,
+                          background: "#fff",
+                          boxShadow: "0 10px 24px rgba(15, 23, 42, 0.08)",
+                          alignContent: "start",
+                          height: "100%",
+                        }}
+                      >
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                          <div style={{ display: "grid", gap: 6 }}>
                             <span style={styles.levelPill}>Day {entry.day}</span>
-                            <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
+                            <h3 style={{ margin: 0, fontSize: 36, lineHeight: 1.05 }}>{entry.topic}</h3>
                             {entry.chapter ? (
                               <div style={{ ...styles.helperText, marginBottom: 4 }}>{t("courseTab.chapter")}: {entry.chapter}</div>
                             ) : null}
+                            {entry.grammar_topic ? <div style={{ margin: 0, color: "#4f46e5", fontWeight: 600 }}>{entry.grammar_topic}</div> : null}
                           </div>
 
                           <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                            {showAssignmentTypeBadge ? (
-                              <span
-                                style={{
-                                  ...styles.badge,
-                                  background: isTutorMarked ? "#fee2e2" : "#dcfce7",
-                                  color: isTutorMarked ? "#991b1b" : "#166534",
-                                }}
-                              >
-                                {isTutorMarked ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
-                              </span>
-                            ) : null}
-                            <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
-                              {t(statusMeta.key)}
-                            </span>
+                            <span style={{ ...styles.badge, ...assignmentTypeStyle }}>{assignmentTypeLabel}</span>
                             <select
-                              style={styles.select}
+                              style={{ ...styles.select, minWidth: 170 }}
                               value={status}
                               disabled={milestoneEntry}
                               onChange={(e) =>
@@ -786,12 +805,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 </option>
                               ))}
                             </select>
+                            <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
+                              {t(statusMeta.key)}
+                            </span>
                             {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
-                            {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
                             {isTutorMarked ? (
                               <button
                                 type="button"
-                                style={styles.secondaryButton}
+                                style={{ ...styles.secondaryButton, background: "#2563eb", color: "#fff", borderColor: "#2563eb", width: "100%" }}
                                 onClick={() =>
                                   navigate(`/campus/submit?assignmentKey=${encodeURIComponent(entryAssignmentKey)}`, {
                                     state: {
@@ -812,9 +833,21 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
                         {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
                         {entry.instruction ? (
-                          <div style={{ display: "grid", gap: 6 }}>
-                            <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
-                            <div style={{ ...styles.helperText, margin: 0, display: "grid", gap: 8 }}>
+                          <details>
+                            <summary
+                              style={{
+                                cursor: "pointer",
+                                listStyle: "none",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                fontWeight: 700,
+                              }}
+                            >
+                              <span>📝 {t("courseTab.instructionLabel")}</span>
+                              <span className="coursebook-details-arrow" aria-hidden>⌄</span>
+                            </summary>
+                            <div style={{ ...styles.helperText, margin: "8px 0 0 0", display: "grid", gap: 8 }}>
                               {renderInstructionBlocks(entry.instruction).map((block, index) => {
                                 if (block.type === "ordered") {
                                   return (
@@ -881,7 +914,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 {entry.instructionLink.label || RESOURCE_ACTION_LABELS.guideOpenInApp}
                               </a>
                             ) : null}
-                          </div>
+                          </details>
                         ) : null}
 
                         <LessonList title="Lesen & Hören" lessons={lesenHorenList} t={t} />
