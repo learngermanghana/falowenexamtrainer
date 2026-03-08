@@ -6,6 +6,7 @@ import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
+import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
@@ -74,6 +75,11 @@ const buildLevelSchedules = () => {
       let usedFallbackResource = false;
 
       const lessonList = sessions.map((session, index) => {
+        const dictionaryEntry = getAssignmentDictionaryEntry({
+          level,
+          assignmentId: session.assignmentId,
+          chapter: session.chapter,
+        });
         const video = session.video || session.youtube_link || fallback.video || null;
         const grammarbook_link = session.grammarbook_link ?? fallback.grammarbook_link ?? null;
         const workbook_link = session.workbook_link ?? fallback.workbook_link ?? null;
@@ -85,12 +91,12 @@ const buildLevelSchedules = () => {
           (!session.workbook_link && Boolean(fallback.workbook_link));
 
         return {
-          chapter: session.chapter || session.title || `Session ${index + 1}`,
-          assignmentId: session.assignmentId || session.chapter || null,
-          title: session.title,
+          chapter: dictionaryEntry?.chapter || session.chapter || session.title || `Session ${index + 1}`,
+          assignmentId: dictionaryEntry?.assignment_id || session.assignmentId || session.chapter || null,
+          title: dictionaryEntry?.en || session.title,
           assignment: Boolean(session.assignment),
           note: session.note,
-          type: session.type,
+          type: dictionaryEntry?.de || session.type,
           video,
           youtube_link: session.youtube_link || session.video || fallback.video || null,
           grammarbook_link,
