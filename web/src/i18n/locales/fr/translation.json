@@ -805,13 +805,13 @@
     "labels": {
       "class": "Ta classe",
       "zoomMeeting": "Réunion Zoom",
-      "courseDocs": "Documents de cours",
+      "courseDocs": "Full class calendar",
       "classDates": "Dates de cours",
       "timeline": "Chronologie"
     },
     "actions": {
       "joinZoom": "Rejoindre la réunion Zoom",
-      "openMaterials": "Ouvrir les supports de cours",
+      "openMaterials": "Open full class calendar",
       "joinNow": "Rejoindre maintenant",
       "addToCalendar": "Ajouter au calendrier",
       "downloadCalendar": "Télécharger le calendrier (.ics)"

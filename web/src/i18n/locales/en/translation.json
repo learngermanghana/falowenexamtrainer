@@ -796,13 +796,13 @@
     "labels": {
       "class": "Your class",
       "zoomMeeting": "Zoom meeting",
-      "courseDocs": "Course docs",
+      "courseDocs": "Full class calendar",
       "classDates": "Class dates",
       "timeline": "Timeline"
     },
     "actions": {
       "joinZoom": "Join Zoom Meeting",
-      "openMaterials": "Open class materials",
+      "openMaterials": "Open full class calendar",
       "joinNow": "Join now",
       "addToCalendar": "Add to calendar",
       "downloadCalendar": "Download calendar (.ics)"
