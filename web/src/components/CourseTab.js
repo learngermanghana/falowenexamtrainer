@@ -546,6 +546,24 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     );
   }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
 
+  const overview = useMemo(() => {
+    const totalDays = schedule.length;
+    const completedDays = schedule.filter((entry) =>
+      getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted"
+    ).length;
+
+    const mostRecentUpdate = Object.values(dayStatuses || {}).reduce((latest, entry) => {
+      const updatedAt = getUpdatedAtValue(entry);
+      return updatedAt > latest ? updatedAt : latest;
+    }, 0);
+
+    return {
+      totalDays,
+      daysCompleted: completedDays,
+      lastActivity: mostRecentUpdate ? new Date(mostRecentUpdate).toLocaleDateString() : "—",
+    };
+  }, [dayStatuses, schedule, selectedCourseLevel]);
+
   const chapterOptions = useMemo(() => {
     const set = new Set();
     schedule.forEach((entry) => {
