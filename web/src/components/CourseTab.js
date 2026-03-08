@@ -572,43 +572,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return [...set].sort();
   }, [schedule]);
 
-  const overview = useMemo(() => {
-    if (!hasHydratedCourseProgress) {
-      return {
-        daysCompleted: "—",
-        totalDays: schedule.length,
-        totalAssignments: "—",
-        assignmentsSubmitted: "—",
-        streak: "—",
-        lastActivity: "—",
-      };
-    }
-
-    const daysCompleted = schedule.filter((entry) => getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted").length;
-    const totalAssignments = schedule.filter((entry) => isTutorMarkedEntry(entry)).length;
-    const assignmentsSubmitted = schedule.filter(
-      (entry) => isTutorMarkedEntry(entry) && getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted"
-    ).length;
-    let streak = 0;
-    for (const entry of schedule) {
-      if (getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted") streak += 1;
-      else break;
-    }
-    const lastActivityTs = Object.values(dayStatuses)
-      .map((entry) => entry?.updatedAt)
-      .filter(Boolean)
-      .sort((a, b) => b - a)[0];
-
-    return {
-      daysCompleted,
-      totalDays: schedule.length,
-      totalAssignments,
-      assignmentsSubmitted,
-      streak,
-      lastActivity: lastActivityTs ? new Date(lastActivityTs).toLocaleDateString() : "—",
-    };
-  }, [dayStatuses, hasHydratedCourseProgress, schedule, selectedCourseLevel]);
-
   return (
     <div style={{ display: "grid", gap: 12 }}>
       <div style={{ display: "grid", gap: 12 }}>

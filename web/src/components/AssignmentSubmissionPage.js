@@ -110,16 +110,6 @@ const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
-const hasAssignmentMarker = (entry) => {
-  if (!entry || typeof entry !== "object") return false;
-  if (entry.assignment) return true;
-  if (entry.assignmentId || entry.assignmentKey) return true;
-
-  return [entry.lesen_hören, entry.schreiben_sprechen].some((lessonGroup) =>
-    toLessonArray(lessonGroup).some((lesson) => lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey)
-  );
-};
-
 const getAssignmentLessons = (entry) => {
   if (!entry || typeof entry !== "object") return [];
 
