@@ -90,7 +90,6 @@ const scorePill = (label, value) => (
 
 const PRIMARY_TAGS = ["question_de", "abschluss_de", "praesentation_de"];
 
-const CAMPUS_LEVELS = ["A1", "A2", "B1"];
 
 const TOPIC_PRESET_META = [
   { emoji: "🏘️", fallback: "My hometown" },
@@ -175,7 +174,6 @@ const SpeechTrainerPage = () => {
   const [sessionSaved, setSessionSaved] = useState(false);
   const [activeSessionId, setActiveSessionId] = useState("");
   const [sessionHistory, setSessionHistory] = useState([]);
-  const [upgradeLoadingByIndex, setUpgradeLoadingByIndex] = useState({});
   const [inlineAudioState, setInlineAudioState] = useState({ hasAudio: false, audioBlob: null, clearAudio: null });
   const [audioCoachStatus, setAudioCoachStatus] = useState("");
   const [audioCoachError, setAudioCoachError] = useState("");
@@ -186,15 +184,10 @@ const SpeechTrainerPage = () => {
   const autosaveTimerRef = useRef(null);
   const skipAutoRestoreRef = useRef(false);
 
-  const profileLevel = useMemo(() => {
+  const level = useMemo(() => {
     const raw = String(studentProfile?.level || "A1").toUpperCase();
     return ["A1", "A2", "B1", "B2", "C1"].includes(raw) ? raw : "A1";
   }, [studentProfile?.level]);
-  const [level, setLevel] = useState(profileLevel);
-
-  useEffect(() => {
-    setLevel(profileLevel);
-  }, [profileLevel]);
 
 
 
@@ -230,7 +223,6 @@ const SpeechTrainerPage = () => {
         : t("speechTrainer.flowSteps.default", { returnObjects: true }),
     [isA1A2Level, t]
   );
-  const upgradeOptions = useMemo(() => t("speechTrainer.upgradeOptions", { returnObjects: true }), [t]);
 
   const studentName =
     studentProfile?.firstName ||
@@ -510,25 +502,6 @@ const SpeechTrainerPage = () => {
     await handleTopicPresetClick(selectedTopic);
   };
 
-  const handleUpgrade = async ({ message, index, mode, label }) => {
-    if (loading || !message?.content) return;
-    setUpgradeLoadingByIndex((prev) => ({ ...prev, [index]: mode }));
-    try {
-      const response = await requestPresentationUpgrade({
-        answer: message.content,
-        level,
-        mode,
-        idToken,
-      });
-      const upgraded = extractTag(response?.reply || "", "upgrade_de") || response?.reply || "";
-      const why = extractTag(response?.reply || "", "why_en");
-      setChatMessages((prev) => [...prev, { role: "assistant", content: t("speechTrainer.upgradeResult", { label, upgraded }), meta: { type: "upgrade", why } }]);
-    } catch (upgradeError) {
-      setError(upgradeError?.message || t("speechTrainer.errors.upgrade"));
-    } finally {
-      setUpgradeLoadingByIndex((prev) => ({ ...prev, [index]: "" }));
-    }
-  };
 
   const handleReset = () => {
     const hasContent = chatMessages.length > 1 || chatInput.trim();
@@ -653,26 +626,7 @@ const SpeechTrainerPage = () => {
       <div style={{ ...styles.card, display: "grid", gap: 10, borderRadius: isCompactViewport ? 0 : styles.card.borderRadius }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
           <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("speechTrainer.title")}</h2>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {CAMPUS_LEVELS.map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setLevel(option)}
-                style={{
-                  ...styles.secondaryButton,
-                  padding: "8px 14px",
-                  borderRadius: 12,
-                  background: option === level ? "#dbeafe" : "#fff",
-                  color: option === level ? "#1d4ed8" : "#334155",
-                  border: option === level ? "1px solid #60a5fa" : "1px solid #cbd5e1",
-                }}
-                disabled={loading}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
+          <span style={styles.helperText}>Level: {level}</span>
         </div>
         <div style={{ ...styles.card, margin: 0, background: "#f8fafc", border: "1px solid #e2e8f0", display: "grid", gap: 8 }}>
           <p style={{ margin: 0, fontWeight: 700, fontSize: 16 }}>{t("speechTrainer.progress", { answersDone: completedSteps, turnLimit: TURN_LIMIT, currentStepLabel })}</p>
@@ -762,25 +716,6 @@ const SpeechTrainerPage = () => {
                     <p style={{ ...styles.helperText, margin: 0 }}>{extractTag(message.content, "error_intel")}</p>
 
                   </div>
-                ) : null}
-                {isUser ? (
-                  <details style={{ width: "100%" }}>
-                    <summary style={{ cursor: "pointer", ...styles.helperText }}>{t("speechTrainer.moreHelpA1A2")}</summary>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-                      {upgradeOptions.map((option) => (
-                        <button
-                          key={`${index}-${option.mode}`}
-                          type="button"
-                          style={styles.secondaryButton}
-                          onClick={() => handleUpgrade({ message, index, mode: option.mode, label: option.label })}
-                          disabled={Boolean(upgradeLoadingByIndex[index]) || loading}
-                          title={option.description}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  </details>
                 ) : null}
               </div>
             );
