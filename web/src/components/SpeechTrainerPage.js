@@ -87,7 +87,8 @@ const scorePill = (label, value) => (
   </div>
 );
 
-const PRIMARY_TAGS = ["question_de", "abschluss_de", "praesentation_de"];
+const PRIMARY_TAGS = ["feedback_en", "feedback_mix", "motivation_de", "vocab_explain", "progress_de", "error_intel"];
+const NEXT_QUESTION_TAGS = ["question_de", "abschluss_de", "praesentation_de"];
 
 
 const TOPIC_PRESET_META = [
@@ -99,7 +100,7 @@ const TOPIC_PRESET_META = [
   { emoji: "🎓", fallback: "My campus life" },
 ];
 
-const renderAssistantContent = (content, isA1A2Level, t) => {
+const renderAssistantContent = (content, _isA1A2Level, t) => {
   const taggedFields = extractAllTaggedFields(content).filter((field) => field.value);
   if (!taggedFields.length) {
     return <div style={{ whiteSpace: "pre-wrap" }}>{content}</div>;
@@ -120,11 +121,19 @@ const renderAssistantContent = (content, isA1A2Level, t) => {
   };
 
   const primaryFields = taggedFields.filter((field) => PRIMARY_TAGS.includes(field.tag));
-  const secondaryFields = taggedFields.filter((field) => !PRIMARY_TAGS.includes(field.tag));
+  const secondaryFields = taggedFields.filter((field) => !PRIMARY_TAGS.includes(field.tag) && !NEXT_QUESTION_TAGS.includes(field.tag));
+  const nextQuestionFields = taggedFields.filter((field) => NEXT_QUESTION_TAGS.includes(field.tag));
+  const orderedPrimaryFields = ["feedback_en", "feedback_mix", "motivation_de", "vocab_explain", "progress_de", "error_intel"]
+    .map((tag) => primaryFields.find((field) => field.tag === tag))
+    .filter(Boolean);
+  const coachingFields = orderedPrimaryFields.length ? [...orderedPrimaryFields, ...secondaryFields] : taggedFields;
 
   return (
     <div style={{ display: "grid", gap: 8 }}>
-      {(primaryFields.length ? primaryFields : taggedFields).map((field) => (
+      {orderedPrimaryFields.length ? (
+        <strong style={{ fontSize: 13, color: "#1f2937" }}>{t("speechTrainer.grammarAndFeedbackTitle")}</strong>
+      ) : null}
+      {coachingFields.map((field) => (
         <div key={`${field.tag}-${field.value.slice(0, 20)}`} style={blockStyle}>
           <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
             {normalizeLabel(field.tag, t)}
@@ -132,25 +141,17 @@ const renderAssistantContent = (content, isA1A2Level, t) => {
           <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
         </div>
       ))}
-      {secondaryFields.length ? (
-        <details style={{ ...blockStyle, background: "#f8fafc", borderColor: "#e5e7eb" }}>
-          <summary style={{ cursor: "pointer", fontWeight: 600 }}>{isA1A2Level ? t("speechTrainer.moreHelpA1A2") : t("speechTrainer.moreHelp")}</summary>
-          {isA1A2Level ? (
-            <div style={{ fontSize: 12, color: "#475569", marginTop: 6 }}>
-              {t("speechTrainer.moreHelpDescription")}
+      {nextQuestionFields.length ? (
+        <div style={{ display: "grid", gap: 8 }}>
+          {nextQuestionFields.map((field) => (
+            <div key={`${field.tag}-${field.value.slice(0, 20)}`} style={blockStyle}>
+              <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
+                {normalizeLabel(field.tag, t)}
+              </strong>
+              <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
             </div>
-          ) : null}
-          <div style={{ display: "grid", gap: 8, marginTop: 8 }}>
-            {secondaryFields.map((field) => (
-              <div key={`${field.tag}-${field.value.slice(0, 30)}`}>
-                <strong style={{ fontSize: 12, color: "#1d4ed8", textTransform: "uppercase", letterSpacing: 0.3 }}>
-                  {normalizeLabel(field.tag, t)}
-                </strong>
-                <div style={{ whiteSpace: "pre-wrap" }}>{field.value}</div>
-              </div>
-            ))}
-          </div>
-        </details>
+          ))}
+        </div>
       ) : null}
     </div>
   );
@@ -177,7 +178,6 @@ const SpeechTrainerPage = () => {
   const [audioCoachStatus, setAudioCoachStatus] = useState("");
   const [audioCoachError, setAudioCoachError] = useState("");
   const [customTopicInput, setCustomTopicInput] = useState("");
-  const [errorIntelExpanded, setErrorIntelExpanded] = useState(false);
   const [isCompactViewport, setIsCompactViewport] = useState(false);
   const chatLogRef = useRef(null);
   const autosaveTimerRef = useRef(null);
@@ -703,19 +703,6 @@ const SpeechTrainerPage = () => {
                     </details>
                   ) : null}
                 </div>
-                {!isUser && extractTag(message.content, "error_intel") ? (
-                  <div style={{ ...styles.card, margin: 0, background: "#fef2f2", border: "1px solid #fca5a5", display: "grid", gap: 8 }}>
-                    <button
-                      type="button"
-                      onClick={() => setErrorIntelExpanded((prev) => !prev)}
-                      style={{ background: "transparent", border: "none", textAlign: "left", padding: 0, cursor: "pointer", color: "#991b1b", fontWeight: 700 }}
-                    >
-                      {t("speechTrainer.tags.errorIntelligence")} {errorIntelExpanded ? "▾" : "▸"}
-                    </button>
-                    <p style={{ ...styles.helperText, margin: 0 }}>{extractTag(message.content, "error_intel")}</p>
-
-                  </div>
-                ) : null}
               </div>
             );
           })}

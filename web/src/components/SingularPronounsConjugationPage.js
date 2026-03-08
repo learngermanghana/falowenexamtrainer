@@ -59,7 +59,7 @@ const SingularPronounsConjugationPage = () => {
         </h1>
 
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Day 2 Grammar Note (Chapter 1.1): Personal Pronouns and Verb Conjugation
+          Day 2 Grammar Note (Chapter 1.1): Introducing Yourself and Reviewing Pronouns
         </p>
 
         <img
