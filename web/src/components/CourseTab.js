@@ -602,7 +602,15 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   <img
                     src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80"
                     alt="Students learning together in a course"
-                    style={{ width: "100%", maxWidth: 560, borderRadius: 12, border: "1px solid #e5e7eb" }}
+                    style={{
+                      width: "100%",
+                      maxWidth: 560,
+                      height: 120,
+                      objectFit: "cover",
+                      objectPosition: "center",
+                      borderRadius: 12,
+                      border: "1px solid #e5e7eb",
+                    }}
                   />
                   <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("courseTab.title")}</h2>
                   <span style={styles.helperText}>{t("courseTab.subtitle")}</span>

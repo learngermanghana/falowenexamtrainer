@@ -2,8 +2,8 @@ export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = {
   A1: {
     "A1-0.1": { assignment_id: "A1-0.1", chapter: "0.1", de: "Begrüßungen und Wohlbefinden", en: "Greetings and Asking About Well-being" },
     "A1-0.2": { assignment_id: "A1-0.2", chapter: "0.2", de: "Alphabet", en: "German Alphabet" },
-    "A1-1.1": { assignment_id: "A1-1.1", chapter: "1.1", de: "Personalpronomen und Verbkonjugation", en: "Personal Pronouns and Verb Conjugation" },
-    "A1-1.2": { assignment_id: "A1-1.2", chapter: "1.2", de: "Sich vorstellen und Pronomen wiederholen", en: "Introducing Yourself" },
+    "A1-1.1": { assignment_id: "A1-1.1", chapter: "1.1", de: "Personalpronomen und Verbkonjugation", en: "Reviewing Pronouns and Verb Conjugation" },
+    "A1-1.2": { assignment_id: "A1-1.2", chapter: "1.2", de: "Sich vorstellen und Pronomen wiederholen", en: "Introducing Yourself and Reviewing Pronouns" },
     "A1-2": { assignment_id: "A1-2", chapter: "2", de: "Zahlen und Adressen", en: "Numbers and Addresses" },
     "A1-2.3": { assignment_id: "A1-2.3", chapter: "2.3", de: "Familie und Hobbys", en: "Family and Hobbies" },
     "A1-3": { assignment_id: "A1-3", chapter: "3", de: "Nach dem Preis fragen und Vorlieben ausdrücken", en: "Asking About Prices and Preferences" },

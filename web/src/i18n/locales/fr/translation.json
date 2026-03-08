@@ -1487,6 +1487,7 @@
     "topicSelected": "Topic selected: {{presetTopic}}. Please start the 6-step coaching flow with the first German question.",
     "upgradeResult": "Upgrade ({{label}}):\n{{upgraded}}",
     "coachStyleA1A2": "Coach style: use easy German (A1/A2), short sentences, and brief English support for difficult words.",
+    "grammarAndFeedbackTitle": "Grammar and Feedback",
     "moreHelpA1A2": "Open more help (tips + examples)",
     "moreHelp": "Show more coaching tips and suggestions",
     "moreHelpDescription": "Here you can find extra sentence ideas, vocabulary, and short examples.",
@@ -1552,7 +1553,7 @@
     },
     "tags": {
       "nextQuestion": "Next question",
-      "feedback": "Feedback",
+      "feedback": "Grammar and Feedback",
       "motivation": "Motivation",
       "vocabulary": "Vocabulary",
       "progress": "Progress",
