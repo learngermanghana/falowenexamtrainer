@@ -10,6 +10,7 @@ import {
   requestPresentationCoachReply,
   requestPresentationUpgrade,
 } from "../services/presentationCoachService";
+import { sendSpeechTrainerAttempt } from "../services/speechTrainerService";
 
 jest.mock("../context/AuthContext", () => ({
   useAuth: () => ({
@@ -23,11 +24,13 @@ jest.mock("../context/ToastContext", () => ({
   useToast: () => ({ showToast: showToastMock }),
 }));
 
+let inlineSpeechTrainerState = { hasAudio: false, audioBlob: null, clearAudio: jest.fn() };
+
 jest.mock("../components/speechTrainer/InlineSpeechTrainer", () => {
   const React = require("react");
   return ({ onAudioStateChange }) => {
     React.useEffect(() => {
-      if (onAudioStateChange) onAudioStateChange({ hasAudio: false, audioBlob: null, clearAudio: jest.fn() });
+      if (onAudioStateChange) onAudioStateChange(inlineSpeechTrainerState);
     }, [onAudioStateChange]);
     return <div data-testid="inline-speech-trainer" />;
   };
@@ -77,6 +80,8 @@ beforeEach(() => {
   deleteAllPresentationSessions.mockResolvedValue({ ok: true });
   requestPresentationCoachReply.mockResolvedValue({ reply: "<question_de>next</question_de>", answersDone: 1, completed: false });
   requestPresentationUpgrade.mockResolvedValue({ reply: "<upgrade_de>better</upgrade_de>" });
+  sendSpeechTrainerAttempt.mockResolvedValue({ transcript: "Hallo" });
+  inlineSpeechTrainerState = { hasAudio: false, audioBlob: null, clearAudio: jest.fn() };
   window.confirm = jest.fn(() => true);
 });
 
@@ -207,4 +212,108 @@ test("reset keeps chat cleared instead of auto-restoring previous open session",
   });
 
   expect(screen.queryByText("Coach old message")).not.toBeInTheDocument();
+});
+
+
+test("recording submission continues chat when text is present", async () => {
+  inlineSpeechTrainerState = {
+    hasAudio: true,
+    audioBlob: new Blob(["audio"], { type: "audio/webm" }),
+    clearAudio: jest.fn(),
+  };
+  sendSpeechTrainerAttempt.mockResolvedValueOnce({ transcript: "Short transcript" });
+
+  render(<SpeechTrainerPage />);
+
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  fireEvent.change(screen.getByRole("textbox"), { target: { value: "This text is long enough to pass minimum length." } });
+
+  expect(screen.getByText("speechTrainer.composerSendTextAndRecording")).toBeInTheDocument();
+  fireEvent.click(screen.getByRole("button", { name: "speechTrainer.sendAria" }));
+
+  await waitFor(() => {
+    expect(sendSpeechTrainerAttempt).toHaveBeenCalledTimes(1);
+    expect(requestPresentationCoachReply).toHaveBeenCalledTimes(1);
+    expect(requestPresentationCoachReply).toHaveBeenCalledWith(expect.objectContaining({
+      message: "This text is long enough to pass minimum length.",
+    }));
+  });
+});
+
+test("shows recording-priority status when audio is ready", async () => {
+  inlineSpeechTrainerState = {
+    hasAudio: true,
+    audioBlob: new Blob(["audio"], { type: "audio/webm" }),
+    clearAudio: jest.fn(),
+  };
+
+  render(<SpeechTrainerPage />);
+
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  expect(screen.getByText("speechTrainer.composerStatusHintRecordingPriority")).toBeInTheDocument();
+});
+
+
+test("recording-only submission continues chat before completion", async () => {
+  inlineSpeechTrainerState = {
+    hasAudio: true,
+    audioBlob: new Blob(["audio"], { type: "audio/webm" }),
+    clearAudio: jest.fn(),
+  };
+  sendSpeechTrainerAttempt.mockResolvedValueOnce({ transcript: "short" });
+
+  render(<SpeechTrainerPage />);
+
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  fireEvent.click(screen.getByRole("button", { name: "speechTrainer.sendAria" }));
+
+  await waitFor(() => {
+    expect(sendSpeechTrainerAttempt).toHaveBeenCalledTimes(1);
+    expect(requestPresentationCoachReply).toHaveBeenCalledTimes(1);
+    expect(requestPresentationCoachReply).toHaveBeenCalledWith(expect.objectContaining({
+      message: "short",
+    }));
+  });
+});
+
+test("after completion, recording sends presentation assessment without reopening chat turns", async () => {
+  loadPresentationSessions.mockResolvedValueOnce({
+    sessions: [
+      {
+        id: "session-complete",
+        topic: "Campus speech",
+        level: "B1",
+        completionStatus: "completed",
+        answersDone: 6,
+        chatHistory: [{ role: "assistant", content: "Done" }],
+        createdAt: { _seconds: 1710000000 },
+      },
+    ],
+    hasMore: false,
+    nextCursor: "",
+  });
+
+  inlineSpeechTrainerState = {
+    hasAudio: true,
+    audioBlob: new Blob(["audio"], { type: "audio/webm" }),
+    clearAudio: jest.fn(),
+  };
+  sendSpeechTrainerAttempt.mockResolvedValueOnce({ transcript: "full presentation", feedback: "Great flow" });
+
+  render(<SpeechTrainerPage />);
+
+  await screen.findByText("Done");
+  expect(screen.getByText("speechTrainer.composerStatusHintRecordingAssessment")).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: "speechTrainer.sendAria" }));
+
+  await waitFor(() => {
+    expect(sendSpeechTrainerAttempt).toHaveBeenCalledTimes(1);
+    expect(requestPresentationCoachReply).not.toHaveBeenCalled();
+  });
+
+  expect(screen.getByText(/speechTrainer.audioTranscriptLabel: full presentation/)).toBeInTheDocument();
 });
