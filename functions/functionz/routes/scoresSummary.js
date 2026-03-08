@@ -129,15 +129,40 @@ const normalizeIdentifier = (raw = "") => {
   return `${major}.${minor}`;
 };
 
+const toCanonicalIdentifier = (level, raw = "") => {
+  const token = String(raw || "").trim().toUpperCase();
+  if (!token) return null;
+  if (/^(A1|A2|B1|B2|C1|C2)-/.test(token)) return token;
+
+  const normalized = normalizeIdentifier(token);
+  if (!normalized) return null;
+
+  const normalizedLevel = normalizeLevelKey(level || "");
+  if (!normalizedLevel) return normalized;
+  return `${normalizedLevel}-${normalized}`;
+};
+
 const extractIdentifiers = (value = "") => {
   const nums = _extractAllNums(value);
   const ids = nums.map(normalizeIdentifier).filter(Boolean);
   return Array.from(new Set(ids));
 };
 
+const extractCanonicalIdentifiers = (value = "", level = "") => {
+  const fromPrefixed = String(value || "")
+    .match(/\b(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?\b/gi)
+    ?.map((item) => String(item).toUpperCase()) || [];
+  const fromNumeric = extractIdentifiers(value)
+    .map((item) => toCanonicalIdentifier(level, item))
+    .filter(Boolean);
+
+  return Array.from(new Set([...fromPrefixed, ...fromNumeric]));
+};
+
 // Prefer identifiers that exist in the planned schedule; prefer the LAST planned match in the string.
 const pickIdentifierFromText = (assignmentText, plannedSet) => {
-  const found = extractIdentifiers(assignmentText);
+  const levelMatch = Array.from(plannedSet)[0]?.split("-")?.[0] || "";
+  const found = extractCanonicalIdentifiers(assignmentText, levelMatch);
   if (!found.length) return null;
 
   // last-to-first so we favor the later number in titles like "12 Hour Clock 7"
@@ -170,33 +195,39 @@ const getAssignmentSummary = (level = "A1") => {
     const identifiers = [];
 
     // top-level chapter (only if it's marked assignment:true)
-    if (lesson.assignment === true && lesson.chapter) {
-      identifiers.push(...extractIdentifiers(lesson.chapter));
+    if (lesson.assignment === true && (lesson.assignmentId || lesson.chapter)) {
+      identifiers.push(
+        ...extractCanonicalIdentifiers(lesson.assignmentId || lesson.chapter, level)
+      );
     }
 
     // nested lesen_hören
     if (Array.isArray(lesson.lesen_hören)) {
       for (const block of lesson.lesen_hören) {
         if (isRealAssignment(block) && block.chapter) {
-          identifiers.push(...extractIdentifiers(block.chapter));
+          identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
         }
       }
     } else if (isRealAssignment(lesson.lesen_hören)) {
       // sometimes lesen_hören is an object
-      const ch = lesson.lesen_hören.chapter || lesson.chapter;
-      if (ch) identifiers.push(...extractIdentifiers(ch));
+      const ch = lesson.lesen_hören.assignmentId || lesson.lesen_hören.chapter || lesson.assignmentId || lesson.chapter;
+      if (ch) identifiers.push(...extractCanonicalIdentifiers(ch, level));
     }
 
     // nested schreiben_sprechen
     if (Array.isArray(lesson.schreiben_sprechen)) {
       for (const block of lesson.schreiben_sprechen) {
         if (isRealAssignment(block) && block.chapter) {
-          identifiers.push(...extractIdentifiers(block.chapter));
+          identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
         }
       }
     } else if (isRealAssignment(lesson.schreiben_sprechen)) {
-      const ch = lesson.schreiben_sprechen.chapter || lesson.chapter;
-      if (ch) identifiers.push(...extractIdentifiers(ch));
+      const ch =
+        lesson.schreiben_sprechen.assignmentId ||
+        lesson.schreiben_sprechen.chapter ||
+        lesson.assignmentId ||
+        lesson.chapter;
+      if (ch) identifiers.push(...extractCanonicalIdentifiers(ch, level));
     }
 
     const clean = Array.from(new Set(identifiers)).filter(Boolean);
@@ -204,7 +235,8 @@ const getAssignmentSummary = (level = "A1") => {
     // Skip practice-only lessons (no real assignment identifiers)
     if (!clean.length) continue;
 
-    const label = `Day ${dayNumber}: Chapter ${lesson.chapter || clean.join(", ")} – ${topic}`.trim();
+    const displayTitle = String(lesson.assignmentTitle || lesson.title || topic || "").trim();
+    const label = `Day ${dayNumber}: ${displayTitle || `Assignment ${clean.join(", ")}`}`.trim();
 
     lessons.push({
       dayNumber,
@@ -279,6 +311,14 @@ const scoresSummaryHandler = async (req, res) => {
     // Build schedule targets
     const { lessons: plannedLessons, plannedSet } = getAssignmentSummary(level);
     const totalAssignments = plannedSet.size;
+    const labelByIdentifier = new Map();
+    plannedLessons.forEach((lesson) => {
+      lesson.identifiers.forEach((identifier) => {
+        if (!labelByIdentifier.has(identifier)) {
+          labelByIdentifier.set(identifier, lesson.label);
+        }
+      });
+    });
 
     const CSV_URL =
       process.env.SCORES_SHEET_PUBLISHED_CSV_URL ||
@@ -328,6 +368,10 @@ const scoresSummaryHandler = async (req, res) => {
     const get = (row, i) => (i >= 0 && i < row.length ? String(row[i] || "").trim() : "");
     const resolveIdentifier = (row) => {
       const explicitId = get(row, idx.assignmentId);
+      if (explicitId && plannedSet.has(String(explicitId).toUpperCase())) {
+        return String(explicitId).toUpperCase();
+      }
+
       const fromExplicit = pickIdentifierFromText(explicitId, plannedSet);
       if (fromExplicit) return fromExplicit;
       return pickIdentifierFromText(get(row, idx.assignment), plannedSet);
@@ -529,7 +573,7 @@ const scoresSummaryHandler = async (req, res) => {
       const best = bestById.get(id);
       return {
         identifier: id,
-        label: best?.assignment || `Assignment ${id}`,
+        label: labelByIdentifier.get(id) || best?.assignment || `Assignment ${id}`,
         score: best?.score ?? null,
         date: best?.dateRaw || "",
         level: best?.level || "",
