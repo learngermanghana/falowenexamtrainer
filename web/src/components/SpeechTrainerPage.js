@@ -15,7 +15,6 @@ import { sendSpeechTrainerAttempt } from "../services/speechTrainerService";
 const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
 const SESSION_HISTORY_PAGE_SIZE = 10;
-const SPEECH_HERO_IMAGE_URL = "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1600&q=80";
 const AUDIO_FALLBACK_CHAT_MESSAGE = "[Audio submission]";
 
 const getInitialCoachMessage = (isA1A2, t) => ({
@@ -90,6 +89,17 @@ const scorePill = (label, value) => (
 );
 
 const PRIMARY_TAGS = ["question_de", "abschluss_de", "praesentation_de"];
+
+const CAMPUS_LEVELS = ["A1", "A2", "B1"];
+
+const TOPIC_PRESET_META = [
+  { emoji: "🏘️", fallback: "My hometown" },
+  { emoji: "⚽", fallback: "My favorite hobby" },
+  { emoji: "💼", fallback: "My dream job" },
+  { emoji: "✈️", fallback: "A place I want to visit" },
+  { emoji: "🍲", fallback: "Traditional food" },
+  { emoji: "🎓", fallback: "My campus life" },
+];
 
 const getTopicKeyword = (topic = "", fallbackTopic = "") => {
   const cleaned = String(topic || "").trim();
@@ -203,22 +213,35 @@ const SpeechTrainerPage = () => {
   const [activeSessionId, setActiveSessionId] = useState("");
   const [sessionHistory, setSessionHistory] = useState([]);
   const [upgradeLoadingByIndex, setUpgradeLoadingByIndex] = useState({});
-  const [selectedUpgradesByIndex, setSelectedUpgradesByIndex] = useState({});
   const [inlineAudioState, setInlineAudioState] = useState({ hasAudio: false, audioBlob: null, clearAudio: null });
   const [audioCoachStatus, setAudioCoachStatus] = useState("");
   const [audioCoachError, setAudioCoachError] = useState("");
+  const [customTopicInput, setCustomTopicInput] = useState("");
+  const [errorIntelExpanded, setErrorIntelExpanded] = useState(false);
   const chatLogRef = useRef(null);
   const autosaveTimerRef = useRef(null);
   const skipAutoRestoreRef = useRef(false);
 
-  const level = useMemo(() => {
+  const profileLevel = useMemo(() => {
     const raw = String(studentProfile?.level || "A1").toUpperCase();
     return ["A1", "A2", "B1", "B2", "C1"].includes(raw) ? raw : "A1";
   }, [studentProfile?.level]);
+  const [level, setLevel] = useState(profileLevel);
+
+  useEffect(() => {
+    setLevel(profileLevel);
+  }, [profileLevel]);
 
 
   const isA1A2Level = level === "A1" || level === "A2";
-  const topicPresets = useMemo(() => t("speechTrainer.topicPresets", { returnObjects: true }), [t]);
+  const topicPresets = useMemo(() => {
+    const translated = t("speechTrainer.topicPresets", { returnObjects: true });
+    const presets = Array.isArray(translated) ? translated : [];
+    return TOPIC_PRESET_META.map((entry, index) => ({
+      emoji: entry.emoji,
+      label: presets[index] || entry.fallback,
+    }));
+  }, [t]);
   const flowStepsForLevel = useMemo(
     () =>
       isA1A2Level
@@ -252,6 +275,23 @@ const SpeechTrainerPage = () => {
       : t("speechTrainer.composerSendMessage");
   const currentStepLabel =
     flowStepsForLevel[Math.min(answersDone, TURN_LIMIT - 1)] || flowStepsForLevel[flowStepsForLevel.length - 1];
+  const completedSteps = Math.min(answersDone + 1, TURN_LIMIT);
+  const selectedTopicLabel = topic || customTopicInput.trim();
+  const remainingQuestions = Math.max(0, TURN_LIMIT - answersDone);
+  const lastAssistantMessage = [...chatMessages].reverse().find((message) => message.role === "assistant")?.content || "";
+  const latestFeedback = useMemo(() => {
+    const feedback = extractTag(lastAssistantMessage, "feedback_en") || extractTag(lastAssistantMessage, "feedback_mix");
+    const motivation = extractTag(lastAssistantMessage, "motivation_de");
+    const vocabRaw = extractTag(lastAssistantMessage, "vocab_explain");
+    const vocab = vocabRaw
+      .split(/\n|\|/)
+      .map((item) => item.replace(/^[-•\d.)\s]+/, "").trim())
+      .filter(Boolean)
+      .slice(0, 4);
+    const errorIntel = extractTag(lastAssistantMessage, "error_intel");
+
+    return { feedback, motivation, vocab, errorIntel };
+  }, [lastAssistantMessage]);
   const ideaCoachPack = useMemo(
     () => buildIdeaCoachPack({ topic, level, t }),
     [level, t, topic]
@@ -512,6 +552,12 @@ const SpeechTrainerPage = () => {
     await submitMessage({ message, history });
   };
 
+  const handleStartWithCustomTopic = async () => {
+    const selectedTopic = customTopicInput.trim();
+    if (!selectedTopic || loading || completed) return;
+    await handleTopicPresetClick(selectedTopic);
+  };
+
   const handleUpgrade = async ({ message, index, mode, label }) => {
     if (loading || !message?.content) return;
     setUpgradeLoadingByIndex((prev) => ({ ...prev, [index]: mode }));
@@ -532,26 +578,6 @@ const SpeechTrainerPage = () => {
     }
   };
 
-  const handleToggleUpgradeMode = (index, mode) => {
-    setSelectedUpgradesByIndex((prev) => {
-      const activeModes = new Set(prev[index] || []);
-      if (activeModes.has(mode)) activeModes.delete(mode);
-      else activeModes.add(mode);
-      return { ...prev, [index]: Array.from(activeModes) };
-    });
-  };
-
-  const handleApplySelectedUpgrades = async (message, index) => {
-    const selectedModes = selectedUpgradesByIndex[index] || [];
-    if (!selectedModes.length || loading) return;
-
-    for (const mode of selectedModes) {
-      const option = upgradeOptions.find((item) => item.mode === mode);
-      // eslint-disable-next-line no-await-in-loop
-      await handleUpgrade({ message, index, mode, label: option?.label || mode });
-    }
-  };
-
   const handleReset = () => {
     const hasContent = chatMessages.length > 1 || chatInput.trim();
     if (hasContent && !window.confirm(t("speechTrainer.confirmReset"))) return;
@@ -567,6 +593,7 @@ const SpeechTrainerPage = () => {
     setTopic("");
     setRubric(null);
     setFinalScripts({ short: "", medium: "", long: "" });
+    setCustomTopicInput("");
     setSessionSaved(false);
     setActiveSessionId("");
   };
@@ -674,23 +701,74 @@ const SpeechTrainerPage = () => {
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
           <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("speechTrainer.title")}</h2>
-          <span style={styles.levelPill}>{t("speechTrainer.levelBadge", { level })}</span>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {CAMPUS_LEVELS.map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setLevel(option)}
+                style={{
+                  ...styles.secondaryButton,
+                  padding: "8px 14px",
+                  borderRadius: 12,
+                  background: option === level ? "#dbeafe" : "#fff",
+                  color: option === level ? "#1d4ed8" : "#334155",
+                  border: option === level ? "1px solid #60a5fa" : "1px solid #cbd5e1",
+                }}
+                disabled={loading}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
         </div>
+        <div style={{ ...styles.card, margin: 0, background: "#f8fafc", border: "1px solid #e2e8f0", display: "grid", gap: 8 }}>
+          <p style={{ margin: 0, fontWeight: 700, fontSize: 16 }}>{t("speechTrainer.progress", { answersDone: completedSteps, turnLimit: TURN_LIMIT, currentStepLabel })}</p>
+          <div style={{ width: "100%", height: 8, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }} role="progressbar" aria-label={t("speechTrainer.progressAria")} aria-valuemin={0} aria-valuemax={TURN_LIMIT} aria-valuenow={answersDone}>
+            <div style={{ width: `${progressPercent}%`, height: "100%", background: answersDone >= TURN_LIMIT ? "#22c55e" : "#f97316", transition: "width 180ms ease" }} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8 }}>
+            {flowStepsForLevel.map((step, index) => {
+              const active = index === answersDone;
+              const done = index < answersDone;
+              return (
+                <div key={step} style={{ ...styles.card, margin: 0, padding: "10px 12px", background: active ? "#fff7ed" : done ? "#ecfdf5" : "#f8fafc", border: active ? "1px solid #fb923c" : done ? "1px solid #86efac" : "1px solid #e2e8f0" }}>
+                  <div style={{ fontWeight: 700, color: active ? "#ea580c" : done ? "#166534" : "#64748b" }}>{index + 1}</div>
+                  <div style={{ fontSize: 14, color: active ? "#c2410c" : "#334155" }}>{step}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {!answersDone ? (
-          <div style={{ ...styles.filterPanel, margin: 0 }}>
-            <strong style={{ fontSize: 14 }}>{t("speechTrainer.contextsTitle")}</strong>
-            <div style={styles.filterRow}>
+          <div style={{ ...styles.filterPanel, margin: 0, display: "grid", gap: 10 }}>
+            <strong style={{ fontSize: 16 }}>{t("speechTrainer.initialCoachMessage.default")}</strong>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
               {topicPresets.map((presetTopic) => (
                 <button
-                  key={presetTopic}
+                  key={presetTopic.label}
                   type="button"
-                  style={styles.secondaryButton}
-                  onClick={() => handleTopicPresetClick(presetTopic)}
+                  style={{ ...styles.secondaryButton, padding: "16px", minHeight: 90, textAlign: "left", display: "grid", gap: 8 }}
+                  onClick={() => handleTopicPresetClick(presetTopic.label)}
                   disabled={loading}
                 >
-                  {presetTopic}
+                  <span style={{ fontSize: 24 }}>{presetTopic.emoji}</span>
+                  <span style={{ fontWeight: 700 }}>{presetTopic.label}</span>
                 </button>
               ))}
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <input
+                value={customTopicInput}
+                onChange={(event) => setCustomTopicInput(event.target.value)}
+                placeholder={t("speechTrainer.customTopic")}
+                style={{ ...styles.input, flex: "1 1 240px" }}
+                disabled={loading || completed}
+              />
+              <button type="button" style={styles.primaryButton} onClick={handleStartWithCustomTopic} disabled={!customTopicInput.trim() || loading || completed}>
+                Start
+              </button>
             </div>
           </div>
         ) : null}
@@ -725,47 +803,11 @@ const SpeechTrainerPage = () => {
           </div>
         </div>
 
-        <div
-          style={{
-            ...styles.card,
-            margin: 0,
-            minHeight: 180,
-            display: "grid",
-            alignContent: "end",
-            color: "#fff",
-            backgroundImage: `linear-gradient(130deg, rgba(15, 23, 42, 0.78), rgba(37, 99, 235, 0.45)), url(${SPEECH_HERO_IMAGE_URL})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-          role="img"
-          aria-label="Speech practice hero banner"
-        >
-          <strong style={{ fontSize: 18, lineHeight: 1.3 }}>{t("speechTrainer.title")}</strong>
-          <span style={{ fontSize: 13, opacity: 0.95 }}>{t("speechTrainer.progress", { answersDone, turnLimit: TURN_LIMIT, currentStepLabel })}</span>
-        </div>
-
         <div style={{ display: "grid", gap: 6 }}>
-          <div style={{ ...styles.helperText, margin: 0 }}>
-            {t("speechTrainer.progress", { answersDone, turnLimit: TURN_LIMIT, currentStepLabel })}
-          </div>
+          <div style={{ ...styles.helperText, margin: 0 }}>{selectedTopicLabel ? `Topic: ${selectedTopicLabel}` : ""}</div>
           <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone)}</div>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {flowStepsForLevel.map((step, index) => (
-              <span
-                key={step}
-                title={step}
-                style={{
-                  ...styles.levelPill,
-                  background: index < answersDone ? "#dbeafe" : "#f3f4f6",
-                  color: index < answersDone ? "#1d4ed8" : "#4b5563",
-                }}
-              >
-                {index + 1}. {step}
-              </span>
-            ))}
-          </div>
-          <div style={{ width: "100%", height: 8, background: "#e5e7eb", borderRadius: 999, overflow: "hidden" }} role="progressbar" aria-label={t("speechTrainer.progressAria")} aria-valuemin={0} aria-valuemax={TURN_LIMIT} aria-valuenow={answersDone}>
-            <div style={{ width: `${progressPercent}%`, height: "100%", background: "#2563eb" }} />
+          <div style={{ ...styles.card, margin: 0, background: "#fff7ed", border: "1px solid #fdba74", color: "#9a3412" }}>
+            {`Noch ${remainingQuestions} Frage(n)`}
           </div>
         </div>
 
@@ -788,32 +830,40 @@ const SpeechTrainerPage = () => {
                   ) : null}
                 </div>
                 {!isUser && extractTag(message.content, "error_intel") ? (
-                  <div style={{ ...styles.card, margin: 0, background: "#fff7ed" }}>
-                    <strong style={{ fontSize: 13 }}>{t("speechTrainer.tags.errorIntelligence")}</strong>
-                    <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{extractTag(message.content, "error_intel")}</p>
+                  <div style={{ ...styles.card, margin: 0, background: "#fef2f2", border: "1px solid #fca5a5", display: "grid", gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={() => setErrorIntelExpanded((prev) => !prev)}
+                      style={{ background: "transparent", border: "none", textAlign: "left", padding: 0, cursor: "pointer", color: "#991b1b", fontWeight: 700 }}
+                    >
+                      {t("speechTrainer.tags.errorIntelligence")} {errorIntelExpanded ? "▾" : "▸"}
+                    </button>
+                    <p style={{ ...styles.helperText, margin: 0 }}>{extractTag(message.content, "error_intel")}</p>
+                    {errorIntelExpanded ? (
+                      <ul style={{ margin: 0, paddingLeft: 18, color: "#7f1d1d" }}>
+                        <li>🗣️ Aussprache & Betonung</li>
+                        <li>📝 Grammatik & Wortschatz</li>
+                        <li>💪 Übung</li>
+                      </ul>
+                    ) : null}
                   </div>
                 ) : null}
                 {isUser ? (
-                  <div style={{ display: "grid", gap: 6 }}>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     {upgradeOptions.map((option) => (
-                      <label key={`${index}-${option.mode}`} style={{ display: "flex", gap: 6, alignItems: "center", ...styles.helperText, margin: 0 }} title={option.description}>
-                        <input
-                          type="checkbox"
-                          checked={Boolean((selectedUpgradesByIndex[index] || []).includes(option.mode))}
-                          onChange={() => handleToggleUpgradeMode(index, option.mode)}
-                          disabled={Boolean(upgradeLoadingByIndex[index]) || loading}
-                        />
+                      <button
+                        key={`${index}-${option.mode}`}
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={() => handleUpgrade({ message, index, mode: option.mode, label: option.label })}
+                        disabled={Boolean(upgradeLoadingByIndex[index]) || loading}
+                        title={option.description}
+                      >
                         {option.label}
-                      </label>
+                      </button>
                     ))}
-                    <button
-                      type="button"
-                      style={styles.secondaryButton}
-                      disabled={Boolean(upgradeLoadingByIndex[index]) || loading || !(selectedUpgradesByIndex[index] || []).length}
-                      onClick={() => handleApplySelectedUpgrades(message, index)}
-                      aria-label={t("speechTrainer.applyUpgradesAria")}
-                    >
-                      {upgradeLoadingByIndex[index] ? t("speechTrainer.upgrading") : t("speechTrainer.applyUpgrades")}
+                    <button type="button" style={styles.secondaryButton} onClick={() => handleUpgrade({ message, index, mode: "a2-b1", label: "Expand vocabulary" })} disabled={Boolean(upgradeLoadingByIndex[index]) || loading}>
+                      Expand vocabulary
                     </button>
                   </div>
                 ) : null}
@@ -821,6 +871,19 @@ const SpeechTrainerPage = () => {
             );
           })}
         </div>
+
+        {(latestFeedback.feedback || latestFeedback.motivation || latestFeedback.vocab.length) ? (
+          <div style={{ display: "grid", gap: 8 }}>
+            {latestFeedback.feedback ? <div style={{ ...styles.card, margin: 0, background: "#ecfdf5", border: "1px solid #86efac" }}><strong>Feedback</strong><p style={{ margin: "6px 0 0" }}>{latestFeedback.feedback}</p></div> : null}
+            {latestFeedback.motivation ? <div style={{ ...styles.card, margin: 0, background: "#eff6ff", border: "1px solid #93c5fd" }}><strong>Motivation</strong><p style={{ margin: "6px 0 0" }}>{latestFeedback.motivation}</p></div> : null}
+            {latestFeedback.vocab.length ? (
+              <div style={{ ...styles.card, margin: 0, background: "#f5f3ff", border: "1px solid #c4b5fd", display: "grid", gap: 6 }}>
+                <strong>Vocabulary</strong>
+                {latestFeedback.vocab.map((word) => <div key={word} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{word}</span><button type="button" style={styles.secondaryButton}>🔊</button></div>)}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
 
         {completed && rubric ? (
           <div style={{ ...styles.card, margin: 0, background: "#eff6ff", display: "grid", gap: 8 }}>
@@ -870,7 +933,7 @@ const SpeechTrainerPage = () => {
               disabled={!canSubmitComposer}
               aria-label={t("speechTrainer.sendAria")}
             >
-              {loading ? t("speechTrainer.sending", { tutorName }) : composerCtaLabel}
+              {loading ? t("speechTrainer.sending", { tutorName }) : `${composerCtaLabel} at Level ${level}`}
             </button>
             <button type="button" style={styles.secondaryButton} onClick={handleReset} aria-label={t("speechTrainer.resetAria")} disabled={loading}>
               {t("speechTrainer.reset")}
@@ -891,7 +954,7 @@ const SpeechTrainerPage = () => {
           </div>
           {completed && !hasAudio ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>
-              {t("speechTrainer.completedMessage")}
+              🏆 {t("speechTrainer.completedMessage")}
             </p>
           ) : null}
           {audioCoachError ? <p style={{ ...styles.helperText, margin: 0, color: "#b91c1c" }}>{audioCoachError}</p> : null}
