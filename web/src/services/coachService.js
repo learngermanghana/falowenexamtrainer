@@ -1,4 +1,6 @@
 import axios from "axios";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { app } from "../firebase";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 import { writingLetters as writingSheetLetters } from "../data/writingLetters";
 import { getBackendUrl, getSpeakingApiUrl } from "./backendUrl";
@@ -13,6 +15,27 @@ const authHeaders = (idToken) =>
       }
     : {};
 
+const buildSpeakingAudioPath = () => {
+  const random = Math.random().toString(36).slice(2, 10);
+  return `speech-trainer/speaking-exams/${Date.now()}-${random}.webm`;
+};
+
+const uploadSpeakingAudio = async (audioBlob) => {
+  if (!app) {
+    throw new Error("Firebase is not configured for storage uploads.");
+  }
+
+  const storage = getStorage(app);
+  const storageRef = ref(storage, buildSpeakingAudioPath());
+
+  await uploadBytes(storageRef, audioBlob, {
+    contentType: audioBlob?.type || "audio/webm",
+    cacheControl: "private, max-age=0, no-cache",
+  });
+
+  return getDownloadURL(storageRef);
+};
+
 export const analyzeAudio = async ({
   audioBlob,
   teil,
@@ -23,26 +46,61 @@ export const analyzeAudio = async ({
   userId,
   idToken,
 }) => {
-  const formData = new FormData();
-  const filename = audioBlob?.name || "recording.webm";
-  formData.append("audio", audioBlob, filename);
-  formData.append("teil", teil);
-  formData.append("level", level);
-  formData.append("userId", userId || "guest");
+  const submitViaFirebaseUrl = async () => {
+    const audioUrl = audioBlob ? await uploadSpeakingAudio(audioBlob) : "";
+    const payload = {
+      teil,
+      level,
+      contextType,
+      question,
+      interactionMode,
+      userId: userId || "guest",
+      audioUrl,
+    };
 
-  if (contextType) formData.append("contextType", contextType);
-  if (question) formData.append("question", question);
-  if (typeof interactionMode !== "undefined") {
-    formData.append("interactionMode", interactionMode);
+    const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, payload, {
+      headers: {
+        "Content-Type": "application/json",
+        ...authHeaders(idToken),
+      },
+    });
+
+    return response.data;
+  };
+
+  const submitAsMultipartFallback = async () => {
+    const formData = new FormData();
+    const filename = audioBlob?.name || "recording.webm";
+    formData.append("audio", audioBlob, filename);
+    formData.append("teil", teil);
+    formData.append("level", level);
+    formData.append("userId", userId || "guest");
+
+    if (contextType) formData.append("contextType", contextType);
+    if (question) formData.append("question", question);
+    if (typeof interactionMode !== "undefined") {
+      formData.append("interactionMode", interactionMode);
+    }
+
+    const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, formData, {
+      headers: {
+        ...authHeaders(idToken),
+      },
+    });
+
+    return response.data;
+  };
+
+  if (!audioBlob) {
+    return submitAsMultipartFallback();
   }
 
-  const response = await axios.post(`${speakingApiUrl}/speaking/analyze`, formData, {
-    headers: {
-      ...authHeaders(idToken),
-    },
-  });
-
-  return response.data;
+  try {
+    return await submitViaFirebaseUrl();
+  } catch (error) {
+    console.warn("Falling back to direct audio upload for speaking analyze", error);
+    return submitAsMultipartFallback();
+  }
 };
 
 export const scoreInteractionAudio = async ({

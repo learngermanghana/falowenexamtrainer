@@ -2114,15 +2114,14 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    if (!req.file) return res.status(400).json({ error: "Audio file is required" });
-
-    const { teil, level = "A2", contextType, question, interactionMode, userId = "guest" } = req.body || {};
+    const { teil, level = "A2", contextType, question, interactionMode, userId = "guest", audioUrl = "" } = req.body || {};
 
     const validationError =
       validateString(teil, { maxLength: 20, label: "teil" }) ||
       validateString(level, { maxLength: 10, label: "level" }) ||
       validateString(contextType, { maxLength: 60, label: "context" }) ||
-      validateString(question, { maxLength: 400, label: "question" });
+      validateString(question, { maxLength: 400, label: "question" }) ||
+      validateString(audioUrl, { maxLength: 3000, label: "audioUrl" });
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
@@ -2133,7 +2132,14 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
       return res.status(429).json({ error: "Daily speaking analysis limit reached" });
     }
 
-    const transcript = ((await transcribeAudio(req.file)) || "").slice(0, 1800);
+    let audioFile = req.file;
+    if (!audioFile && audioUrl) {
+      audioFile = await downloadAudioFromUrl(audioUrl);
+    }
+
+    if (!audioFile) return res.status(400).json({ error: "Audio file is required" });
+
+    const transcript = ((await transcribeAudio(audioFile)) || "").slice(0, 1800);
     if (!transcript) return res.status(500).json({ error: "Could not transcribe audio" });
 
     const messages = [
@@ -2147,7 +2153,12 @@ app.post("/speaking/analyze", audioUpload, async (req, res) => {
       route: "/speaking/analyze",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { teil, level, quotaRemaining: quota.remaining },
+      metadata: {
+        teil,
+        level,
+        quotaRemaining: quota.remaining,
+        audioSource: req.file ? "multipart" : audioUrl ? "firebase_url" : "none",
+      },
     });
 
     return res.json({ transcript, feedback, quotaRemaining: quota.remaining });
