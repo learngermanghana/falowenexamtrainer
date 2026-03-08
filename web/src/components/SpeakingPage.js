@@ -7,11 +7,6 @@ import { requestSpeakingTextAnalysis } from "../services/presentationCoachServic
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
 
-const EXAMS_PRACTICE_LINK =
-  "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
-const CAMPUS_PRACTICE_LINK =
-  "https://script.google.com/macros/s/AKfycbzMIhHuWKqM2ODaOCgtS7uZCikiZJRBhpqv2p6OyBmK1yAVba8HlmVC1zgTcGWSTfrsHA/exec";
-
 const A1_TEIL_ONE_LINE = "Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby";
 
 const parseTeilNumber = (teilLabel = "") => {
@@ -59,7 +54,6 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const { level: examLevel } = useExam();
   const { idToken, user, studentProfile } = useAuth();
   const isExamMode = mode === "exam";
-  const practiceLink = mode === "campus" ? CAMPUS_PRACTICE_LINK : EXAMS_PRACTICE_LINK;
   const userId = user?.uid || "";
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
@@ -466,7 +460,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
         >
           <div>
             <p style={{ margin: 0, opacity: 0.85, fontSize: 13 }}>Online • Ready to practice</p>
-            <h1 style={{ margin: "4px 0 0", fontSize: 28 }}>Deutsch AI Tutor</h1>
+            <h1 style={{ margin: "4px 0 0", fontSize: 28 }}>Goethe Speaking Exam Coach</h1>
             <p style={{ margin: "6px 0 0", opacity: 0.9, fontSize: 13 }}>
               Speaking Exams {examLevel ? `• Level ${examLevel}` : ""}
             </p>
@@ -538,10 +532,6 @@ const SpeakingPage = ({ mode = "exam" }) => {
               {isRecording ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
             </button>
             {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
-
-            <a href={practiceLink} target="_blank" rel="noreferrer" style={{ ...styles.linkButton, fontSize: 12 }}>
-              Open external recorder
-            </a>
 
             <div style={{ ...styles.card, margin: 0, padding: 12, background: "#EEF2FF", border: "1px solid #C7D2FE" }}>
               <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>Quick practice topics</p>
