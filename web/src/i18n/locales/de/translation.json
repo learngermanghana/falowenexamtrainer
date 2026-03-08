@@ -1592,9 +1592,6 @@
     "audioTranscriptLabel": "Transkript",
     "audioFeedbackLabel": "Feedback",
     "audioNextStepsLabel": "Nächste Schritte",
-    "composerStatusHintRecordingPriority": "Status: Aufnahme ist bereit. Du kannst frei sprechen (ohne Prompt) und für sofortiges Feedback senden.",
-    "audioSubmissionFallbackMessage": "Audio-Einreichung",
-    "audioAssessmentReadyStatus": "Feedback zur Präsentationsbewertung ist jetzt im Chat.",
-    "composerStatusHintRecordingAssessment": "Status: Der Chat ist abgeschlossen. Sende eine Aufnahme für die vollständige Präsentationsbewertung."
+    "composerStatusHintRecordingPriority": "Status: Aufnahme ist bereit. Sende sie, um den Chat mit deinem Text oder Transkript fortzusetzen."
   }
 }

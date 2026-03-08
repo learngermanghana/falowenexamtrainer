@@ -207,7 +207,7 @@ const SpeechTrainerPage = () => {
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
   const canSubmitText = hasText && minLengthReached;
   const canSubmitAudio = hasAudio;
-  const canSubmitComposer = !loading && (canSubmitAudio || (!completed && canSubmitText));
+  const canSubmitComposer = !loading && !completed && (canSubmitText || canSubmitAudio);
   const composerCtaLabel = hasAudio && hasText
     ? t("speechTrainer.composerSendTextAndRecording")
     : hasAudio
@@ -397,19 +397,28 @@ const SpeechTrainerPage = () => {
 
       const transcript = String(response?.transcript || "").trim();
       const note = trimmedInput;
-      const messageForCoach = note || transcript || t("speechTrainer.audioSubmissionFallbackMessage", { defaultValue: AUDIO_FALLBACK_CHAT_MESSAGE });
-      const feedbackParts = [
-        transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${transcript}` : "",
-        response?.feedback || response?.notes || response?.summary
-          ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
-          : "",
-        response?.nextSteps || response?.actions
-          ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
-          : "",
-      ].filter(Boolean);
+      const messageForCoach = note || transcript;
+      const hasCoachMessage = messageForCoach.length >= MIN_ANSWER_LENGTH;
 
-      if (!completed && !note && feedbackParts.length) {
-        setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
+      if (hasCoachMessage) {
+        const history = chatMessages.map(({ role, content }) => ({ role, content }));
+        const userMessageContent = note && transcript && note !== transcript
+          ? `${note}\n\n${t("speechTrainer.audioTranscriptLabel")}: ${transcript}`
+          : messageForCoach;
+        await submitMessage({ message: messageForCoach, history, userMessageContent });
+      } else {
+        const feedbackParts = [
+          transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${transcript}` : "",
+          response?.feedback || response?.notes || response?.summary
+            ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
+            : "",
+          response?.nextSteps || response?.actions
+            ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
+            : "",
+        ].filter(Boolean);
+        if (feedbackParts.length) {
+          setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
+        }
       }
 
       if (!completed) {
@@ -807,7 +816,7 @@ const SpeechTrainerPage = () => {
             ) : null}
           </div>
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-            {audioCoachStatus || (hasAudio ? (completed ? t("speechTrainer.composerStatusHintRecordingAssessment") : t("speechTrainer.composerStatusHintRecordingPriority")) : t("speechTrainer.composerStatusHint"))}
+            {audioCoachStatus || (hasAudio ? t("speechTrainer.composerStatusHintRecordingPriority") : t("speechTrainer.composerStatusHint"))}
           </div>
           {completed && !hasAudio ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>
