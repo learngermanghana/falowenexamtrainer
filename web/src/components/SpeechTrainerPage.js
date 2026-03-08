@@ -218,6 +218,7 @@ const SpeechTrainerPage = () => {
   const [audioCoachError, setAudioCoachError] = useState("");
   const [customTopicInput, setCustomTopicInput] = useState("");
   const [errorIntelExpanded, setErrorIntelExpanded] = useState(false);
+  const [isCompactViewport, setIsCompactViewport] = useState(false);
   const chatLogRef = useRef(null);
   const autosaveTimerRef = useRef(null);
   const skipAutoRestoreRef = useRef(false);
@@ -232,6 +233,23 @@ const SpeechTrainerPage = () => {
     setLevel(profileLevel);
   }, [profileLevel]);
 
+
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
+
+    const mediaQuery = window.matchMedia("(max-width: 900px)");
+    const applyViewportMode = (event) => setIsCompactViewport(event.matches);
+    setIsCompactViewport(mediaQuery.matches);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", applyViewportMode);
+      return () => mediaQuery.removeEventListener("change", applyViewportMode);
+    }
+
+    mediaQuery.addListener(applyViewportMode);
+    return () => mediaQuery.removeListener(applyViewportMode);
+  }, []);
 
   const isA1A2Level = level === "A1" || level === "A2";
   const topicPresets = useMemo(() => {
@@ -697,8 +715,8 @@ const SpeechTrainerPage = () => {
   }, []);
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div style={{ ...styles.card, display: "grid", gap: 10 }}>
+    <div style={{ display: "grid", gap: 12, marginInline: isCompactViewport ? -12 : 0 }}>
+      <div style={{ ...styles.card, display: "grid", gap: 10, borderRadius: isCompactViewport ? 0 : styles.card.borderRadius }}>
         <div style={{ display: "flex", gap: 8, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
           <h2 style={{ ...styles.sectionTitle, margin: 0 }}>{t("speechTrainer.title")}</h2>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -925,17 +943,23 @@ const SpeechTrainerPage = () => {
 
         <div style={{ display: "grid", gap: 8 }}>
           <InlineSpeechTrainer profileLevel={level} compact onAudioStateChange={setInlineAudioState} />
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", flexDirection: isCompactViewport ? "column" : "row" }}>
             <button
               type="button"
-              style={styles.primaryButton}
+              style={{ ...styles.primaryButton, width: isCompactViewport ? "100%" : "auto" }}
               onClick={handleComposerSubmit}
               disabled={!canSubmitComposer}
               aria-label={t("speechTrainer.sendAria")}
             >
               {loading ? t("speechTrainer.sending", { tutorName }) : `${composerCtaLabel} at Level ${level}`}
             </button>
-            <button type="button" style={styles.secondaryButton} onClick={handleReset} aria-label={t("speechTrainer.resetAria")} disabled={loading}>
+            <button
+              type="button"
+              style={{ ...styles.secondaryButton, width: isCompactViewport ? "100%" : "auto" }}
+              onClick={handleReset}
+              aria-label={t("speechTrainer.resetAria")}
+              disabled={loading}
+            >
               {t("speechTrainer.reset")}
             </button>
             {errorType === "auth" ? (

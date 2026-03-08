@@ -86,6 +86,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [recordingError, setRecordingError] = useState("");
   const [playingMessageId, setPlayingMessageId] = useState("");
+  const [isCompactViewport, setIsCompactViewport] = useState(false);
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -99,6 +100,22 @@ const SpeakingPage = ({ mode = "exam" }) => {
       setSelectedLevel(String(examLevel).toUpperCase());
     }
   }, [examLevel, isExamMode]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
+
+    const mediaQuery = window.matchMedia("(max-width: 900px)");
+    const applyViewportMode = (event) => setIsCompactViewport(event.matches);
+    setIsCompactViewport(mediaQuery.matches);
+
+    if (typeof mediaQuery.addEventListener === "function") {
+      mediaQuery.addEventListener("change", applyViewportMode);
+      return () => mediaQuery.removeEventListener("change", applyViewportMode);
+    }
+
+    mediaQuery.addListener(applyViewportMode);
+    return () => mediaQuery.removeListener(applyViewportMode);
+  }, []);
 
   const levelOptions = useMemo(() => {
     const levels = new Set(speakingSheetQuestions.map((question) => question.level));
@@ -426,8 +443,15 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const totalCount = speakingSheetQuestions.filter((question) => question.level === selectedLevel).length;
 
   return (
-    <div style={styles.container}>
-      <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
+    <div style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
+      <div
+        style={{
+          ...styles.card,
+          padding: 0,
+          overflow: "hidden",
+          borderRadius: isCompactViewport ? 0 : styles.card.borderRadius,
+        }}
+      >
         <div
           style={{
             background: "linear-gradient(120deg, #4f46e5, #8b5cf6, #a21caf)",
@@ -452,8 +476,17 @@ const SpeakingPage = ({ mode = "exam" }) => {
           </button>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(240px, 320px) 1fr", gap: 0 }}>
-          <aside style={{ borderRight: "1px solid #E5E7EB", background: "#F8FAFC", padding: 16, display: "grid", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
+          <aside
+            style={{
+              borderRight: isCompactViewport ? "none" : "1px solid #E5E7EB",
+              borderBottom: isCompactViewport ? "1px solid #E5E7EB" : "none",
+              background: "#F8FAFC",
+              padding: isCompactViewport ? 12 : 16,
+              display: "grid",
+              gap: 14,
+            }}
+          >
             <span style={styles.badge}>
               Progress: {Math.min(completedCount, totalCount)}/{totalCount}
             </span>
@@ -526,7 +559,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
             </div>
           </aside>
 
-          <section style={{ background: "#E5E7EB", minHeight: 580, display: "grid", gridTemplateRows: "1fr auto" }}>
+          <section style={{ background: "#E5E7EB", minHeight: isCompactViewport ? 480 : 580, display: "grid", gridTemplateRows: "1fr auto" }}>
             <div style={{ padding: 16, overflowY: "auto", display: "grid", gap: 12 }}>
               {chatMessages.map((message) => {
                 const isStudent = message.role === "student";
@@ -640,7 +673,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
 
               {chatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 12 }}>{chatError}</p> : null}
 
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8, flexDirection: isCompactViewport ? "column" : "row" }}>
                 <textarea
                   style={{ ...styles.input, minHeight: 56, maxHeight: 120, resize: "vertical" }}
                   placeholder="Type your German response and press Enter..."
@@ -654,7 +687,11 @@ const SpeakingPage = ({ mode = "exam" }) => {
                   }}
                   disabled={chatLoading}
                 />
-                <button style={{ ...styles.primaryButton, borderRadius: 12, minWidth: 88 }} onClick={sendMessage} disabled={chatLoading || !selectedQuestion}>
+                <button
+                  style={{ ...styles.primaryButton, borderRadius: 12, minWidth: isCompactViewport ? "100%" : 88 }}
+                  onClick={sendMessage}
+                  disabled={chatLoading || !selectedQuestion}
+                >
                   Send
                 </button>
               </div>
