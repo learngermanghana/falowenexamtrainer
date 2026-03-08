@@ -496,7 +496,7 @@ const SpeechTrainerPage = () => {
 
       const transcript = String(response?.transcript || "").trim();
       const note = trimmedInput;
-      const messageForCoach = note || transcript;
+      const messageForCoach = note || transcript || AUDIO_FALLBACK_CHAT_MESSAGE;
       const hasCoachMessage = messageForCoach.length >= MIN_ANSWER_LENGTH;
 
       const feedbackParts = [
@@ -509,7 +509,7 @@ const SpeechTrainerPage = () => {
           : "",
       ].filter(Boolean);
 
-      if (!completed) {
+      if (!completed && hasCoachMessage) {
         const history = chatMessages.map(({ role, content }) => ({ role, content }));
         const userMessageContent = note && transcript && note !== transcript
           ? `${note}\n\n${t("speechTrainer.audioTranscriptLabel")}: ${transcript}`
