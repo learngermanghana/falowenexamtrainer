@@ -17,7 +17,9 @@ const authHeaders = (idToken) =>
 
 const buildSpeakingAudioPath = () => {
   const random = Math.random().toString(36).slice(2, 10);
-  return `speaking/${Date.now()}-${random}.webm`;
+  // Keep speaking uploads under the same Storage prefix covered by our
+  // authenticated Firebase Storage rules.
+  return `speech-trainer/speaking/${Date.now()}-${random}.webm`;
 };
 
 const uploadSpeakingAudio = async (audioBlob) => {
