@@ -13,8 +13,11 @@ const norm = (v) => String(v || "").trim().toLowerCase();
 const PASS_MARK = 60;
 const TOTAL_ASSIGNMENTS = {
   A1: 19,
-  A2_B2: 28,
+  A2: 28,
+  B1: 28,
+  B2: 28,
 };
+const TRACKED_LEVELS = Object.keys(TOTAL_ASSIGNMENTS);
 
 const StudentResultsPage = () => {
   const { t } = useTranslation();
@@ -33,6 +36,7 @@ const StudentResultsPage = () => {
   const studentLevel = String(studentProfile?.level || studentProfile?.course || "")
     .trim()
     .toUpperCase();
+  const trackedLevel = TRACKED_LEVELS.includes(studentLevel) ? studentLevel : "A1";
   const studentEmail = studentProfile?.email || "";
   const useSheetResults = ["A1", "A2", "B1"].includes(studentLevel);
   const useFirestoreResults = ["B2", "C1"].includes(studentLevel);
@@ -256,16 +260,10 @@ const StudentResultsPage = () => {
       };
     };
 
-    const a1 = buildAssignmentStatus(["A1"]);
-    const a2b2 = buildAssignmentStatus(["A2", "B1", "B2"]);
-
     return {
-      a1Completed: a1.completed,
-      a1Failed: a1.failed,
-      a2b2Completed: a2b2.completed,
-      a2b2Failed: a2b2.failed,
+      ...buildAssignmentStatus([trackedLevel]),
     };
-  }, [results]);
+  }, [results, trackedLevel]);
 
   const progressInsights = useMemo(() => {
     const buildProgress = (label, completed, total, failed = 0) => {
@@ -299,20 +297,51 @@ const StudentResultsPage = () => {
     };
 
     return [
-      buildProgress("A1", assignmentProgress.a1Completed, TOTAL_ASSIGNMENTS.A1, assignmentProgress.a1Failed),
-      buildProgress("A2-B2", assignmentProgress.a2b2Completed, TOTAL_ASSIGNMENTS.A2_B2, assignmentProgress.a2b2Failed),
+      buildProgress(
+        trackedLevel,
+        assignmentProgress.completed,
+        TOTAL_ASSIGNMENTS[trackedLevel],
+        assignmentProgress.failed
+      ),
     ];
-  }, [assignmentProgress]);
+  }, [assignmentProgress, trackedLevel]);
 
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
-      <section style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{t("examReadiness.certificate.title")}</h3>
-        <p style={{ ...styles.helperText, margin: 0 }}>
-          {t("examReadiness.certificate.resultsHelper")}
-        </p>
-        <ExamReadinessBadge studentProfile={studentProfile} variant="button" />
+      <section
+        style={{
+          ...styles.card,
+          display: "grid",
+          gap: 10,
+          padding: 0,
+          overflow: "hidden",
+          border: "1px solid #dbeafe",
+        }}
+      >
+        <div
+          style={{
+            minHeight: 200,
+            padding: 18,
+            display: "grid",
+            alignContent: "end",
+            gap: 8,
+            backgroundImage:
+              "linear-gradient(120deg, rgba(15,23,42,0.7), rgba(37,99,235,0.45)), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          <h3 style={{ ...styles.sectionTitle, margin: 0, color: "#eff6ff" }}>
+            {t("examReadiness.certificate.title")}
+          </h3>
+          <p style={{ ...styles.helperText, margin: 0, color: "#dbeafe" }}>
+            Track your readiness while you complete your level.
+          </p>
+        </div>
+        <div style={{ padding: "0 18px 16px" }}>
+          <ExamReadinessBadge studentProfile={studentProfile} variant="button" />
+        </div>
       </section>
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>Results</h2>
