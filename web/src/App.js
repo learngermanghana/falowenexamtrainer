@@ -18,6 +18,7 @@ import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensio
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
 import CourseResourceViewerPage from "./components/CourseResourceViewerPage";
+import FullClassCalendarPage from "./components/FullClassCalendarPage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
 import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage";
 import GermanNumbersGrammarPage from "./components/GermanNumbersGrammarPage";
@@ -634,6 +635,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
+          <Route path="/campus/course/full-class-calendar/:className" element={<FullClassCalendarPage />} />
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
