@@ -101,43 +101,6 @@ const TOPIC_PRESET_META = [
   { emoji: "🎓", fallback: "My campus life" },
 ];
 
-const getTopicKeyword = (topic = "", fallbackTopic = "") => {
-  const cleaned = String(topic || "").trim();
-  if (!cleaned) return fallbackTopic;
-  return cleaned;
-};
-
-const buildIdeaCoachPack = ({ topic, level, t }) => {
-  const topicKeyword = getTopicKeyword(topic, t("speechTrainer.ideaBuilder.fallbackTopic"));
-  const isA1A2 = level === "A1" || level === "A2";
-
-  return {
-    focus: t("speechTrainer.ideaBuilder.focus", { topic: topicKeyword }),
-    talkingPoints: [
-      t("speechTrainer.ideaBuilder.point1", { topic: topicKeyword }),
-      t("speechTrainer.ideaBuilder.point2", { topic: topicKeyword }),
-      t("speechTrainer.ideaBuilder.point3", { topic: topicKeyword }),
-    ],
-    sentenceStarters: isA1A2
-      ? [
-          t("speechTrainer.ideaBuilder.startersA1A2.0"),
-          t("speechTrainer.ideaBuilder.startersA1A2.1"),
-          t("speechTrainer.ideaBuilder.startersA1A2.2"),
-        ]
-      : [
-          t("speechTrainer.ideaBuilder.startersDefault.0"),
-          t("speechTrainer.ideaBuilder.startersDefault.1"),
-          t("speechTrainer.ideaBuilder.startersDefault.2"),
-        ],
-    usefulWords: [
-      t("speechTrainer.ideaBuilder.words.0"),
-      t("speechTrainer.ideaBuilder.words.1"),
-      t("speechTrainer.ideaBuilder.words.2"),
-      t("speechTrainer.ideaBuilder.words.3"),
-    ],
-  };
-};
-
 const renderAssistantContent = (content, isA1A2Level, t) => {
   const taggedFields = extractAllTaggedFields(content).filter((field) => field.value);
   if (!taggedFields.length) {
@@ -296,24 +259,6 @@ const SpeechTrainerPage = () => {
   const completedSteps = Math.min(answersDone + 1, TURN_LIMIT);
   const selectedTopicLabel = topic || customTopicInput.trim();
   const remainingQuestions = Math.max(0, TURN_LIMIT - answersDone);
-  const lastAssistantMessage = [...chatMessages].reverse().find((message) => message.role === "assistant")?.content || "";
-  const latestFeedback = useMemo(() => {
-    const feedback = extractTag(lastAssistantMessage, "feedback_en") || extractTag(lastAssistantMessage, "feedback_mix");
-    const motivation = extractTag(lastAssistantMessage, "motivation_de");
-    const vocabRaw = extractTag(lastAssistantMessage, "vocab_explain");
-    const vocab = vocabRaw
-      .split(/\n|\|/)
-      .map((item) => item.replace(/^[-•\d.)\s]+/, "").trim())
-      .filter(Boolean)
-      .slice(0, 4);
-    const errorIntel = extractTag(lastAssistantMessage, "error_intel");
-
-    return { feedback, motivation, vocab, errorIntel };
-  }, [lastAssistantMessage]);
-  const ideaCoachPack = useMemo(
-    () => buildIdeaCoachPack({ topic, level, t }),
-    [level, t, topic]
-  );
 
   const getDynamicHelperText = useCallback((done) => {
     if (done <= 0) return t("speechTrainer.dynamicHelper.0");
@@ -779,37 +724,6 @@ const SpeechTrainerPage = () => {
             </div>
           </div>
         ) : null}
-
-        <div style={{ ...styles.card, margin: 0, display: "grid", gap: 10, background: "#f8fafc", border: "1px solid #e2e8f0" }}>
-          <div style={{ display: "grid", gap: 4 }}>
-            <strong style={{ fontSize: 14 }}>{t("speechTrainer.ideaBuilder.title")}</strong>
-            <p style={{ ...styles.helperText, margin: 0 }}>{t("speechTrainer.ideaBuilder.description")}</p>
-            <p style={{ margin: 0, fontSize: 13, color: "#1e3a8a" }}>{ideaCoachPack.focus}</p>
-          </div>
-          <div style={{ display: "grid", gap: 6 }}>
-            <strong style={{ fontSize: 13 }}>{t("speechTrainer.ideaBuilder.talkingPointsTitle")}</strong>
-            <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 4 }}>
-              {ideaCoachPack.talkingPoints.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </div>
-          <div style={{ display: "grid", gap: 6 }}>
-            <strong style={{ fontSize: 13 }}>{t("speechTrainer.ideaBuilder.sentenceStartersTitle")}</strong>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {ideaCoachPack.sentenceStarters.map((starter) => (
-                <span key={starter} style={{ ...styles.levelPill, background: "#ffffff", border: "1px solid #cbd5e1", color: "#1e293b" }}>
-                  {starter}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div style={{ display: "grid", gap: 6 }}>
-            <strong style={{ fontSize: 13 }}>{t("speechTrainer.ideaBuilder.usefulWordsTitle")}</strong>
-            <p style={{ margin: 0, fontSize: 13 }}>{ideaCoachPack.usefulWords.join(" • ")}</p>
-          </div>
-        </div>
-
         <div style={{ display: "grid", gap: 6 }}>
           <div style={{ ...styles.helperText, margin: 0 }}>{selectedTopicLabel ? `Topic: ${selectedTopicLabel}` : ""}</div>
           <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone)}</div>
@@ -846,51 +760,32 @@ const SpeechTrainerPage = () => {
                       {t("speechTrainer.tags.errorIntelligence")} {errorIntelExpanded ? "▾" : "▸"}
                     </button>
                     <p style={{ ...styles.helperText, margin: 0 }}>{extractTag(message.content, "error_intel")}</p>
-                    {errorIntelExpanded ? (
-                      <ul style={{ margin: 0, paddingLeft: 18, color: "#7f1d1d" }}>
-                        <li>🗣️ Aussprache & Betonung</li>
-                        <li>📝 Grammatik & Wortschatz</li>
-                        <li>💪 Übung</li>
-                      </ul>
-                    ) : null}
+
                   </div>
                 ) : null}
                 {isUser ? (
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    {upgradeOptions.map((option) => (
-                      <button
-                        key={`${index}-${option.mode}`}
-                        type="button"
-                        style={styles.secondaryButton}
-                        onClick={() => handleUpgrade({ message, index, mode: option.mode, label: option.label })}
-                        disabled={Boolean(upgradeLoadingByIndex[index]) || loading}
-                        title={option.description}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                    <button type="button" style={styles.secondaryButton} onClick={() => handleUpgrade({ message, index, mode: "a2-b1", label: "Expand vocabulary" })} disabled={Boolean(upgradeLoadingByIndex[index]) || loading}>
-                      Expand vocabulary
-                    </button>
-                  </div>
+                  <details style={{ width: "100%" }}>
+                    <summary style={{ cursor: "pointer", ...styles.helperText }}>{t("speechTrainer.moreHelpA1A2")}</summary>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                      {upgradeOptions.map((option) => (
+                        <button
+                          key={`${index}-${option.mode}`}
+                          type="button"
+                          style={styles.secondaryButton}
+                          onClick={() => handleUpgrade({ message, index, mode: option.mode, label: option.label })}
+                          disabled={Boolean(upgradeLoadingByIndex[index]) || loading}
+                          title={option.description}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </details>
                 ) : null}
               </div>
             );
           })}
         </div>
-
-        {(latestFeedback.feedback || latestFeedback.motivation || latestFeedback.vocab.length) ? (
-          <div style={{ display: "grid", gap: 8 }}>
-            {latestFeedback.feedback ? <div style={{ ...styles.card, margin: 0, background: "#ecfdf5", border: "1px solid #86efac" }}><strong>Feedback</strong><p style={{ margin: "6px 0 0" }}>{latestFeedback.feedback}</p></div> : null}
-            {latestFeedback.motivation ? <div style={{ ...styles.card, margin: 0, background: "#eff6ff", border: "1px solid #93c5fd" }}><strong>Motivation</strong><p style={{ margin: "6px 0 0" }}>{latestFeedback.motivation}</p></div> : null}
-            {latestFeedback.vocab.length ? (
-              <div style={{ ...styles.card, margin: 0, background: "#f5f3ff", border: "1px solid #c4b5fd", display: "grid", gap: 6 }}>
-                <strong>Vocabulary</strong>
-                {latestFeedback.vocab.map((word) => <div key={word} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{word}</span><button type="button" style={styles.secondaryButton}>🔊</button></div>)}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
 
         {completed && rubric ? (
           <div style={{ ...styles.card, margin: 0, background: "#eff6ff", display: "grid", gap: 8 }}>
