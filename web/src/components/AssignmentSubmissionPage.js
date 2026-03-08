@@ -120,6 +120,29 @@ const hasAssignmentMarker = (entry) => {
   );
 };
 
+const getAssignmentLessons = (entry) => {
+  if (!entry || typeof entry !== "object") return [];
+
+  const topLevelAssignment =
+    entry.assignment || entry.assignmentId || entry.assignmentKey
+      ? [
+          {
+            assignment: entry.assignment,
+            assignmentId: entry.assignmentId,
+            assignmentKey: entry.assignmentKey,
+            chapter: entry.chapter,
+            topic: entry.topic,
+          },
+        ]
+      : [];
+
+  const nestedAssignments = [entry.lesen_hören, entry.schreiben_sprechen]
+    .flatMap((lessonGroup) => toLessonArray(lessonGroup))
+    .filter((lesson) => lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey);
+
+  return nestedAssignments.length ? nestedAssignments : topLevelAssignment;
+};
+
 const getFeedbackFromSubmission = (entry) =>
   entry?.feedback || entry?.tutorFeedback || entry?.reviewFeedback || entry?.reviewNotes || "";
 
@@ -167,30 +190,38 @@ const AssignmentSubmissionPage = () => {
         .filter((entry) => typeof entry?.day !== "undefined")
         .map((entry) => [`${String(entry.day)}::${entry.occurrence || 1}`, entry])
     );
-    const duplicateCountByDay = levelSchedule.reduce((acc, entry) => {
-      if (typeof entry.day === "undefined" || !entry.topic) return acc;
+    const entriesWithLessons = levelSchedule
+      .filter((entry) => typeof entry.day !== "undefined" && entry.topic)
+      .map((entry) => ({
+        ...entry,
+        __assignmentLessons: getAssignmentLessons(entry),
+      }));
+
+    const duplicateCountByDay = entriesWithLessons.reduce((acc, entry) => {
       const key = String(entry.day);
-      acc[key] = (acc[key] || 0) + 1;
+      const count = entry.__assignmentLessons.length || 1;
+      acc[key] = (acc[key] || 0) + count;
       return acc;
     }, {});
 
     const seenByDay = {};
 
-    return levelSchedule
-      .filter((entry) => typeof entry.day !== "undefined" && entry.topic)
-      .map((entry) => {
+    return entriesWithLessons.flatMap((entry) => {
+      const lessons = entry.__assignmentLessons.length ? entry.__assignmentLessons : [entry];
+
+      return lessons.map((lesson) => {
         const dayKey = String(entry.day);
         seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
         const occurrence = seenByDay[dayKey];
         const dictionaryEntry = getAssignmentDictionaryEntry({
           level: preferredLevel,
-          assignmentId: entry.assignmentId,
-          chapter: entry.chapter || entry?.lesen_hören?.chapter,
+          assignmentId: lesson?.assignmentId || entry.assignmentId,
+          chapter: lesson?.chapter || entry.chapter,
         });
-        const chapter = dictionaryEntry?.chapter || entry.chapter || entry?.lesen_hören?.chapter || "";
+        const chapter = dictionaryEntry?.chapter || lesson?.chapter || entry.chapter || "";
         const chapterSuffix = chapter ? ` • Chapter ${chapter}` : "";
         const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
-        const topicTitle = dictionaryEntry?.en || entry.topic;
+        const topicTitle = dictionaryEntry?.en || lesson?.topic || entry.topic;
         const label = `Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}`;
 
         return {
@@ -199,24 +230,25 @@ const AssignmentSubmissionPage = () => {
           chapter,
           occurrence,
           label,
-          assignmentId: dictionaryEntry?.assignment_id || entry.assignmentId || null,
+          assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId || null,
           canonicalAssignmentId:
             catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.canonicalAssignmentId ||
             resolveAssignmentCanonicalKey({
               level: preferredLevel,
-              assignmentId: entry.assignmentId,
+              assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId,
               assignmentTitle: label,
             }),
           assignmentKey:
             catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.assignmentKey ||
             resolveAssignmentCanonicalKey({
               level: preferredLevel,
-              assignmentId: entry.assignmentId,
+              assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId,
               assignmentTitle: label,
             }),
-          assignment: hasAssignmentMarker(entry),
+          assignment: Boolean(lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey),
         };
       });
+    });
   }, [preferredLevel]);
 
   const assignmentRequiredDaysLabel = useMemo(() => {
