@@ -16,6 +16,7 @@ const TURN_LIMIT = 6;
 const MIN_ANSWER_LENGTH = 20;
 const SESSION_HISTORY_PAGE_SIZE = 10;
 const SPEECH_HERO_IMAGE_URL = "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=1600&q=80";
+const AUDIO_FALLBACK_CHAT_MESSAGE = "[Audio submission]";
 
 const getInitialCoachMessage = (isA1A2, t) => ({
   role: "assistant",
@@ -206,8 +207,8 @@ const SpeechTrainerPage = () => {
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
   const canSubmitText = hasText && minLengthReached;
   const canSubmitAudio = hasAudio;
-  const canSubmitComposer = !loading && !completed && (canSubmitText || canSubmitAudio);
-  const composerCtaLabel = hasText && hasAudio
+  const canSubmitComposer = !loading && (canSubmitAudio || (!completed && canSubmitText));
+  const composerCtaLabel = hasAudio && hasText
     ? t("speechTrainer.composerSendTextAndRecording")
     : hasAudio
       ? t("speechTrainer.composerSendRecording")
@@ -314,7 +315,7 @@ const SpeechTrainerPage = () => {
     setLoading(true);
     setRetryablePayload({ ...payload, messageAlreadyAppended: true });
 
-    const nextUserMessage = { role: "user", content: payload.message };
+    const nextUserMessage = { role: "user", content: payload.userMessageContent || payload.message };
     const priorHistory = payload.history;
 
     if (!payload.messageAlreadyAppended) {
@@ -382,7 +383,7 @@ const SpeechTrainerPage = () => {
   };
 
   const handleSendRecording = async () => {
-    if (!inlineAudioState?.audioBlob || loading || completed) return;
+    if (!inlineAudioState?.audioBlob || loading) return;
 
     try {
       setAudioCoachError("");
@@ -393,8 +394,12 @@ const SpeechTrainerPage = () => {
         level,
         idToken,
       });
+
+      const transcript = String(response?.transcript || "").trim();
+      const note = trimmedInput;
+      const messageForCoach = note || transcript || t("speechTrainer.audioSubmissionFallbackMessage", { defaultValue: AUDIO_FALLBACK_CHAT_MESSAGE });
       const feedbackParts = [
-        response?.transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${response.transcript}` : "",
+        transcript ? `${t("speechTrainer.audioTranscriptLabel")}: ${transcript}` : "",
         response?.feedback || response?.notes || response?.summary
           ? `${t("speechTrainer.audioFeedbackLabel")}: ${response.feedback || response?.notes || response?.summary}`
           : "",
@@ -402,10 +407,22 @@ const SpeechTrainerPage = () => {
           ? `${t("speechTrainer.audioNextStepsLabel")}: ${response.nextSteps || response?.actions}`
           : "",
       ].filter(Boolean);
-      if (feedbackParts.length) {
+
+      if (!completed && !note && feedbackParts.length) {
         setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
       }
-      setAudioCoachStatus(t("speechTrainer.audioReadyStatus"));
+
+      if (!completed) {
+        const history = chatMessages.map(({ role, content }) => ({ role, content }));
+        const userMessageContent = note && transcript && note !== transcript
+          ? `${note}\n\n${t("speechTrainer.audioTranscriptLabel")}: ${transcript}`
+          : messageForCoach;
+        await submitMessage({ message: messageForCoach, history, userMessageContent });
+      } else if (feedbackParts.length) {
+        setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
+      }
+
+      setAudioCoachStatus(completed ? t("speechTrainer.audioAssessmentReadyStatus") : t("speechTrainer.audioReadyStatus"));
       if (inlineAudioState?.clearAudio) inlineAudioState.clearAudio();
       if (trimmedInput) setChatInput("");
     } catch (submitError) {
@@ -421,11 +438,12 @@ const SpeechTrainerPage = () => {
 
   const handleComposerSubmit = async () => {
     if (!canSubmitComposer) return;
-    if (canSubmitText) {
-      await handleSend();
-    }
     if (canSubmitAudio) {
       await handleSendRecording();
+      return;
+    }
+    if (canSubmitText) {
+      await handleSend();
     }
   };
 
@@ -789,9 +807,9 @@ const SpeechTrainerPage = () => {
             ) : null}
           </div>
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-            {audioCoachStatus || t("speechTrainer.composerStatusHint")}
+            {audioCoachStatus || (hasAudio ? (completed ? t("speechTrainer.composerStatusHintRecordingAssessment") : t("speechTrainer.composerStatusHintRecordingPriority")) : t("speechTrainer.composerStatusHint"))}
           </div>
-          {completed ? (
+          {completed && !hasAudio ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>
               {t("speechTrainer.completedMessage")}
             </p>

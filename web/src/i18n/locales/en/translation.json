@@ -1707,6 +1707,10 @@
     "audioFallbackError": "Could not reach the coach right now. Please try again in a moment.",
     "audioTranscriptLabel": "Transcript",
     "audioFeedbackLabel": "Feedback",
-    "audioNextStepsLabel": "Next steps"
+    "audioNextStepsLabel": "Next steps",
+    "composerStatusHintRecordingPriority": "Status: recording is ready. You can speak freely (no prompt needed) and send for instant feedback.",
+    "audioSubmissionFallbackMessage": "Audio submission",
+    "audioAssessmentReadyStatus": "Presentation assessment feedback is now in chat.",
+    "composerStatusHintRecordingAssessment": "Status: chat is complete. Send recording for full presentation assessment."
   }
 }
