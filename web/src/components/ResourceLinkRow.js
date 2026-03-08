@@ -43,12 +43,7 @@ const ResourceLinkRow = ({ label, url }) => {
 
   return (
     <li>
-      <a
-        href={resolveHref(label, url)}
-        aria-label={`${label} (${RESOURCE_ACTION_LABELS.openInApp})`}
-        className="coursebook-resource-link"
-        style={{ color: "#2563eb", textDecoration: "none" }}
-      >
+      <a href={resolveHref(label, url)} aria-label={`${label} (${RESOURCE_ACTION_LABELS.openInApp})`}>
         {label}
       </a>
     </li>
