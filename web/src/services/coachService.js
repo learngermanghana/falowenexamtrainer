@@ -17,7 +17,7 @@ const authHeaders = (idToken) =>
 
 const buildSpeakingAudioPath = () => {
   const random = Math.random().toString(36).slice(2, 10);
-  return `speech-trainer/speaking-exams/${Date.now()}-${random}.webm`;
+  return `speaking/${Date.now()}-${random}.webm`;
 };
 
 const uploadSpeakingAudio = async (audioBlob) => {
