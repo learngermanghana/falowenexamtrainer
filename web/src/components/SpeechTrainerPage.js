@@ -207,7 +207,7 @@ const SpeechTrainerPage = () => {
   const minLengthReached = charsCount >= MIN_ANSWER_LENGTH;
   const canSubmitText = hasText && minLengthReached;
   const canSubmitAudio = hasAudio;
-  const canSubmitComposer = !loading && (canSubmitAudio || (!completed && canSubmitText));
+  const canSubmitComposer = !loading && !completed && (canSubmitText || canSubmitAudio);
   const composerCtaLabel = hasAudio && hasText
     ? t("speechTrainer.composerSendTextAndRecording")
     : hasAudio
@@ -397,9 +397,10 @@ const SpeechTrainerPage = () => {
 
       const transcript = String(response?.transcript || "").trim();
       const note = trimmedInput;
-      const messageForCoach = note || transcript || t("speechTrainer.audioSubmissionFallbackMessage", { defaultValue: AUDIO_FALLBACK_CHAT_MESSAGE });
+      const messageForCoach = note || transcript;
+      const hasCoachMessage = messageForCoach.length >= MIN_ANSWER_LENGTH;
 
-      if (!completed) {
+      if (hasCoachMessage) {
         const history = chatMessages.map(({ role, content }) => ({ role, content }));
         const userMessageContent = note && transcript && note !== transcript
           ? `${note}\n\n${t("speechTrainer.audioTranscriptLabel")}: ${transcript}`
@@ -419,8 +420,7 @@ const SpeechTrainerPage = () => {
           setChatMessages((prev) => [...prev, { role: "assistant", content: feedbackParts.join("\n\n"), meta: { type: "audio_feedback" } }]);
         }
       }
-
-      setAudioCoachStatus(completed ? t("speechTrainer.audioAssessmentReadyStatus") : t("speechTrainer.audioReadyStatus"));
+      setAudioCoachStatus(t("speechTrainer.audioReadyStatus"));
       if (inlineAudioState?.clearAudio) inlineAudioState.clearAudio();
       if (trimmedInput) setChatInput("");
     } catch (submitError) {
@@ -805,7 +805,7 @@ const SpeechTrainerPage = () => {
             ) : null}
           </div>
           <div style={{ ...styles.helperText, margin: 0 }} aria-live="polite">
-            {audioCoachStatus || (hasAudio ? (completed ? t("speechTrainer.composerStatusHintRecordingAssessment") : t("speechTrainer.composerStatusHintRecordingPriority")) : t("speechTrainer.composerStatusHint"))}
+            {audioCoachStatus || (hasAudio ? t("speechTrainer.composerStatusHintRecordingPriority") : t("speechTrainer.composerStatusHint"))}
           </div>
           {completed && !hasAudio ? (
             <p style={{ ...styles.helperText, margin: 0, color: "#065f46" }}>

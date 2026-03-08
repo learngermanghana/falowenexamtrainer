@@ -1708,9 +1708,6 @@
     "audioTranscriptLabel": "Transcript",
     "audioFeedbackLabel": "Feedback",
     "audioNextStepsLabel": "Next steps",
-    "composerStatusHintRecordingPriority": "Status: recording is ready. Send to continue the chat with your typed note or transcript.",
-    "audioSubmissionFallbackMessage": "Audio submission",
-    "audioAssessmentReadyStatus": "Presentation assessment feedback is now in chat.",
-    "composerStatusHintRecordingAssessment": "Status: chat is complete. Send recording for full presentation assessment."
+    "composerStatusHintRecordingPriority": "Status: recording is ready. Send to continue the chat with your typed note or transcript."
   }
 }

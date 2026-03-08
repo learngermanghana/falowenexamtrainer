@@ -1596,9 +1596,6 @@
     "audioTranscriptLabel": "Transcription",
     "audioFeedbackLabel": "Feedback",
     "audioNextStepsLabel": "Prochaines étapes",
-    "composerStatusHintRecordingPriority": "Statut : l’enregistrement est prêt. Envoyez-le pour continuer le chat avec votre texte ou la transcription.",
-    "audioSubmissionFallbackMessage": "Soumission audio",
-    "audioAssessmentReadyStatus": "Le retour d’évaluation de la présentation est maintenant dans le chat.",
-    "composerStatusHintRecordingAssessment": "Statut : le chat est terminé. Envoyez un enregistrement pour l’évaluation complète de la présentation."
+    "composerStatusHintRecordingPriority": "Statut : l’enregistrement est prêt. Envoyez-le pour continuer le chat avec votre texte ou la transcription."
   }
 }
