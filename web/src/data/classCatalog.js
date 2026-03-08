@@ -36,8 +36,8 @@ export const classCatalog = {
     docUrl: "https://drive.google.com/file/d/1eYBFqrJdlTtCdV9ZPg2gc-a0zZxCiXJS/view?usp=sharing",
   },
   "A1 Dortmund Klasse": {
-    startDate: "2026-03-04",
-    endDate: "2026-04-28",
+    startDate: "2026-03-09",
+    endDate: "2026-04-29",
     schedule: [
       { day: "Monday", startTime: "18:00", endTime: "19:00" },
       { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
