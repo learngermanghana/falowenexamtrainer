@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext";
 import {
   loadPresentationSessions,
   requestPresentationCoachReply,
-  requestPresentationUpgrade,
   savePresentationSession,
   updatePresentationSession,
 } from "../services/presentationCoachService";
