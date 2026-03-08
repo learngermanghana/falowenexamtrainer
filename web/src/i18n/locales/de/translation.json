@@ -801,13 +801,13 @@
     "labels": {
       "class": "Deine Klasse",
       "zoomMeeting": "Zoom-Meeting",
-      "courseDocs": "Kursunterlagen",
+      "courseDocs": "Full class calendar",
       "classDates": "Kurstermine",
       "timeline": "Zeitplan"
     },
     "actions": {
       "joinZoom": "Zoom-Meeting beitreten",
-      "openMaterials": "Kursmaterial öffnen",
+      "openMaterials": "Open full class calendar",
       "joinNow": "Jetzt beitreten",
       "addToCalendar": "Zum Kalender hinzufügen",
       "downloadCalendar": "Kalender herunterladen (.ics)"

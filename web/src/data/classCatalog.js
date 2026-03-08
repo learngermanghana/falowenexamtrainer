@@ -4,6 +4,9 @@ export const ZOOM_DETAILS = {
   passcode: "german",
 };
 
+export const buildFullClassCalendarRoute = (className) =>
+  className ? `/campus/course/full-class-calendar/${encodeURIComponent(className)}` : "";
+
 export const classCatalog = {
   "A1 Stuttgart Klasse": {
     startDate: "2026-01-14",
@@ -13,7 +16,6 @@ export const classCatalog = {
       { day: "Thursday", startTime: "11:00", endTime: "12:00" },
       { day: "Friday", startTime: "11:00", endTime: "12:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1Bzb1-cHO10m_KsrTHfbhaZAfQcmbssFt/view?usp=sharing",
   },
   "A1 Berlin Klasse": {
     startDate: "2026-02-18",
@@ -23,7 +25,6 @@ export const classCatalog = {
       { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
       { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1H87C3y6Xj09PY-giD1N73Mv8qbzCb8zk/view?usp=sharing",
   },
   "A1 Hamburg Klasse": {
     startDate: "2026-01-30",
@@ -33,7 +34,6 @@ export const classCatalog = {
       { day: "Friday", startTime: "18:00", endTime: "19:00" },
       { day: "Saturday", startTime: "8:00", endTime: "9:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1eYBFqrJdlTtCdV9ZPg2gc-a0zZxCiXJS/view?usp=sharing",
   },
   "A1 Dortmund Klasse": {
     startDate: "2026-03-09",
@@ -43,7 +43,6 @@ export const classCatalog = {
       { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
       { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1qhXA0dw6ULuo1_IlUtnPTgMAwhVNiLRl/view?usp=sharing",
   },
   "A1 Koln Klasse": {
     startDate: "2026-04-15",
@@ -54,7 +53,6 @@ export const classCatalog = {
       { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
       { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1YICRJEY4i0dJOZd6NdYOb3pAuKsQC091/view?usp=sharing",
   },
   "A2 Stuttgart Klasse": {
     startDate: "2026-03-02",
@@ -64,7 +62,6 @@ export const classCatalog = {
       { day: "Tuesday", startTime: "17:30", endTime: "19:00" },
       { day: "Wednesday", startTime: "17:30", endTime: "19:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1rzxoGqNSphKCyYLYA_3nYTnLcbjQ0QDz/view?usp=sharing",
   },
   "B1 Stuttgart Klasse": {
     startDate: "2026-03-12",
@@ -73,7 +70,6 @@ export const classCatalog = {
       { day: "Thursday", startTime: "19:30", endTime: "21:00" },
       { day: "Friday", startTime: "19:30", endTime: "21:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1QcKorNLQtveE-NYbZajDlAijrWhgknwp/view?usp=sharing",
   },
   "B2 Munich Klasse": {
     isSelfLearning: true,
@@ -84,7 +80,6 @@ export const classCatalog = {
       { day: "Friday", startTime: "14:00", endTime: "15:30" },
       { day: "Saturday", startTime: "09:30", endTime: "10:00" },
     ],
-    docUrl: "https://drive.google.com/file/d/1gn6vYBbRyHSvKgqvpj5rr8OfUOYRL09W/view?usp=sharing",
   },
   "C1 Self-learning": {
     isSelfLearning: true,
@@ -92,6 +87,9 @@ export const classCatalog = {
     startDate: "",
     endDate: "",
     schedule: [],
-    docUrl: "",
   },
 };
+
+Object.entries(classCatalog).forEach(([className, details]) => {
+  details.docUrl = buildFullClassCalendarRoute(className);
+});
