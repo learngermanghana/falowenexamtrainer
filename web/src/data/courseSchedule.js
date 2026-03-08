@@ -540,7 +540,7 @@ const RAW_COURSE_SCHEDULES = {
       day: 4,
       topic: "Numbers",
       chapter: "2",
-      goal: "Learn numbers from one to 10 thousand. Also know the difference between city and street",
+      goal: "Learn numbers from one to ten thousand. Also know the difference between city and street",
       instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "German Numbers",
       assignment: true,
@@ -1916,8 +1916,9 @@ const hasNoVideoAndNoGrammar = (lesson) => {
   return !lesson.video && !lesson.youtube_link && !lesson.grammarbook_link;
 };
 
-const getDefaultInstruction = (instruction) => {
+const getDefaultInstruction = (instruction, level) => {
   if (!instruction) return instruction;
+  if (level === "A1") return instruction;
   if (instruction.includes("Watch the video") || instruction.includes("review grammar")) return DEFAULT_INSTRUCTION_EN;
   if (instruction.includes("Schau das Video")) return DEFAULT_INSTRUCTION_DE;
   if (instruction.includes("Schauen Sie das Video")) return DEFAULT_INSTRUCTION_DE_FORMAL;
@@ -1985,7 +1986,7 @@ const normalizeCourseSchedules = (schedules) =>
           ];
 
           const needsSelfPracticeNote = lessons.some(hasNoVideoAndNoGrammar);
-          const baseInstruction = getDefaultInstruction(entryWithAssignmentId.instruction);
+          const baseInstruction = getDefaultInstruction(entryWithAssignmentId.instruction, level);
           const levelSpecificInstruction =
             level === "A2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
               ? DEFAULT_INSTRUCTION_EN
