@@ -760,6 +760,11 @@ const CampusArea = ({
     navigate(`/campus/${sectionKey}`);
   };
 
+  const campusHeroSections = new Set(["speech", "account"]);
+  const showCampusHero = campusHeroSections.has(resolvedSection);
+  const campusHeroTitle =
+    resolvedSection === "speech" ? t("appNav.campusTabs.speech") : resolvedSection === "account" ? t("appNav.campusTabs.account") : "";
+
   return (
     <>
       <div className="nav-row" style={{ ...styles.nav, justifyContent: "flex-start", marginBottom: 8 }}>
@@ -797,6 +802,31 @@ const CampusArea = ({
               </button>
             ))}
         </div>
+      ) : null}
+
+      {showCampusHero ? (
+        <section
+          style={{
+            ...styles.card,
+            margin: "0 0 12px",
+            minHeight: 160,
+            display: "grid",
+            alignContent: "end",
+            gap: 4,
+            color: "#ffffff",
+            backgroundImage:
+              "linear-gradient(115deg, rgba(15, 23, 42, 0.76), rgba(30, 64, 175, 0.5)), url('/learning-space-hero.svg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+          role="img"
+          aria-label={`${campusHeroTitle} hero banner`}
+        >
+          <p style={{ margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.92 }}>
+            Falowen Campus
+          </p>
+          <h2 style={{ margin: 0 }}>{campusHeroTitle}</h2>
+        </section>
       ) : null}
 
       {resolvedSection === "course" && allowedSections.course ? (
@@ -893,6 +923,19 @@ const ExamArea = ({ onBack }) => {
     { key: "file", label: t("appNav.examTabs.file") },
   ];
 
+  const examHeroSections = new Set(["tutor", "lesen", "writing", "vocab", "horen", "resources", "study", "file"]);
+  const showExamHero = examHeroSections.has(examSection);
+  const examHeroLabels = {
+    tutor: t("appNav.examTabs.tutor"),
+    lesen: t("appNav.examTabs.lesen"),
+    writing: t("appNav.examTabs.writing"),
+    vocab: t("appNav.examTabs.vocab"),
+    horen: t("appNav.examTabs.horen"),
+    resources: t("appNav.examTabs.resources"),
+    study: t("appNav.examTabs.study"),
+    file: t("appNav.examTabs.file"),
+  };
+
   return (
     <>
       <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
@@ -943,6 +986,31 @@ const ExamArea = ({ onBack }) => {
             </select>
           </div>
         </div>
+
+        {showExamHero ? (
+          <section
+            style={{
+              ...styles.card,
+              margin: 0,
+              minHeight: 180,
+              display: "grid",
+              alignContent: "end",
+              gap: 4,
+              color: "#ffffff",
+              backgroundImage:
+                "linear-gradient(115deg, rgba(15, 23, 42, 0.8), rgba(29, 78, 216, 0.56)), url('/learning-space-hero.svg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+            role="img"
+            aria-label={`${examHeroLabels[examSection]} hero banner`}
+          >
+            <p style={{ margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.92 }}>
+              Falowen Exam Coach
+            </p>
+            <h2 style={{ margin: 0 }}>{examHeroLabels[examSection]}</h2>
+          </section>
+        ) : null}
       </div>
 
       {examSection === "tutor" ? <WritingPage mode="exam" initialTab="tutor" /> : null}

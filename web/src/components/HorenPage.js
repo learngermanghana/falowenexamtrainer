@@ -4,6 +4,9 @@ import { styles } from "../styles";
 
 const HorenPage = () => {
   const { t } = useTranslation();
+  const horenPlaylistUrl =
+    "https://www.youtube.com/watch?list=PLg78ckjpHfZy5lkbq8bw26rLXkZ8jLRUN&v=H2eUgxXfkS4&feature=youtu.be";
+  const horenThumbnailUrl = "https://i.ytimg.com/vi/H2eUgxXfkS4/hqdefault.jpg";
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -21,7 +24,7 @@ const HorenPage = () => {
           {t("horenPage.actions.openSamples")}
         </a>
         <a
-          href="https://www.youtube.com/watch?list=PLg78ckjpHfZy5lkbq8bw26rLXkZ8jLRUN&v=H2eUgxXfkS4&feature=youtu.be"
+          href={horenPlaylistUrl}
           target="_blank"
           rel="noreferrer"
           style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
@@ -29,6 +32,30 @@ const HorenPage = () => {
           {t("horenPage.actions.playlist")}
         </a>
       </div>
+      <a
+        href={horenPlaylistUrl}
+        target="_blank"
+        rel="noreferrer"
+        style={{
+          display: "grid",
+          gap: 8,
+          textDecoration: "none",
+          color: "inherit",
+          borderRadius: 12,
+          overflow: "hidden",
+          border: "1px solid #dbeafe",
+          background: "#ffffff",
+          maxWidth: 440,
+        }}
+      >
+        <img
+          src={horenThumbnailUrl}
+          alt="Hören practice playlist thumbnail"
+          style={{ width: "100%", height: "auto", display: "block" }}
+          loading="lazy"
+        />
+        <div style={{ padding: "0 10px 10px", color: "#1f2937", fontWeight: 600 }}>{t("horenPage.actions.playlist")}</div>
+      </a>
     </section>
   );
 };
