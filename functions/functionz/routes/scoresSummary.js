@@ -239,6 +239,7 @@ const getAssignmentSummary = (level = "A1") => {
     const label = `Day ${dayNumber}: ${displayTitle || `Assignment ${clean.join(", ")}`}`.trim();
 
     lessons.push({
+      order: lessons.length,
       dayNumber,
       label,
       goal,
@@ -516,25 +517,18 @@ const scoresSummaryHandler = async (req, res) => {
       return { ...l, isCompleted, hasFailed };
     });
 
-    // Determine highest day that is FULLY done
-    const dayMap = new Map();
-    for (const l of lessonStatus) {
-      if (!dayMap.has(l.dayNumber)) dayMap.set(l.dayNumber, []);
-      dayMap.get(l.dayNumber).push(l);
-    }
+    // Determine the furthest lesson position reached in schedule order.
+    // This keeps next/missed logic stable even when day numbers are duplicated
+    // or reordered in dictionary updates.
+    const latestCompletedOrder = lessonStatus.reduce((max, lesson) => {
+      if (!lesson.isCompleted) return max;
+      return Math.max(max, lesson.order);
+    }, -1);
 
-    let maxDayFullyDone = 0;
-    const sortedDays = Array.from(dayMap.keys()).sort((a, b) => a - b);
-    for (const d of sortedDays) {
-      const dayLessons = dayMap.get(d) || [];
-      if (dayLessons.length && dayLessons.every((x) => x.isCompleted)) {
-        maxDayFullyDone = d;
-      }
-    }
-
-    // Missed: <= maxDayFullyDone but incomplete and not failed
+    // Missed: lesson appears before our furthest completed lesson,
+    // is still incomplete, and is not currently failed.
     const missedAssignments = lessonStatus
-      .filter((l) => l.dayNumber <= maxDayFullyDone && !l.isCompleted && !l.hasFailed)
+      .filter((l) => l.order < latestCompletedOrder && !l.isCompleted && !l.hasFailed)
       .map((l) => ({
         label: l.label,
         identifiers: l.identifiers,
