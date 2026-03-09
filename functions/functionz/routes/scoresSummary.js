@@ -105,6 +105,11 @@ const anonymizeDisplayName = (name, studentCode) => {
   return "Student";
 };
 
+const normalizeStudentCode = (value = "") =>
+  String(value || "")
+    .trim()
+    .toLowerCase();
+
 /* ------------------------ Identifier parsing (strings) ------------------------ */
 
 // Extract numbers like 0.2, 1.1, 4.10 from a string.
@@ -296,6 +301,7 @@ const scoresSummaryHandler = async (req, res) => {
     const decoded = await requireAuth(req);
 
     const studentCode = String(req.query.studentCode || "").trim();
+    const normalizedStudentCode = normalizeStudentCode(studentCode);
     if (!studentCode) return res.status(400).json({ error: "studentCode is required" });
 
     const db = admin.firestore();
@@ -392,7 +398,7 @@ const scoresSummaryHandler = async (req, res) => {
       const scoreNum = Number(get(row, idx.score));
       if (!Number.isFinite(scoreNum)) return;
 
-      const key = rowStudentCode.toLowerCase();
+      const key = normalizeStudentCode(rowStudentCode);
       const current = leaderboardEntries.get(key) || {
         studentCode: rowStudentCode,
         name: get(row, idx.name) || "",
@@ -436,7 +442,7 @@ const scoresSummaryHandler = async (req, res) => {
     // Pull attempts for this student + (optional) level match
     const mine = rows
       .slice(1)
-      .filter((r) => get(r, idx.studentCode) === studentCode)
+      .filter((r) => normalizeStudentCode(get(r, idx.studentCode)) === normalizedStudentCode)
       .map((r) => {
         const assignment = get(r, idx.assignment);
         const scoreNum = Number(get(r, idx.score));
