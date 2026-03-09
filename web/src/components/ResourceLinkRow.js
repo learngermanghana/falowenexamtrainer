@@ -1,7 +1,9 @@
 import React from "react";
 
 export const RESOURCE_ACTION_LABELS = {
-  video: "Video ansehen",
+  video: "🎬 Video ansehen",
+  grammarbook: "📘 Grammar",
+  workbook: "📝 Workbook",
   openInApp: "View in app",
   guideOpenInApp: "Guide · View in app",
 };
