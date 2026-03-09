@@ -531,7 +531,7 @@ const RAW_COURSE_SCHEDULES = {
           video: "https://youtu.be/NVCN4fZXEk0",
           youtube_link: "https://youtu.be/NVCN4fZXEk0",
           grammarbook_link: "https://drive.google.com/file/d/1OUJT9aSU1XABi3cdZlstUvfBIndyEOwb/view?usp=sharing",
-          workbook_link: "/campus/course/a1-day-3-german-alphabet-reviewing-workbook",
+          workbook_link: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
           assignment: true,
         },
       ],
