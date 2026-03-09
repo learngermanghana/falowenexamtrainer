@@ -497,7 +497,7 @@ const RAW_COURSE_SCHEDULES = {
           youtube_link: "https://youtu.be/S7n6TlAQRLQ",
           grammarbook_link: "https://www.falowen.app/campus/course/german-alphabet-grammar-notes-day-2",
           assignment: true,
-          workbook_link: "https://drive.google.com/file/d/1R6PqzgsPm9f5iVn7JZXSNVa_NttoPU9Q/view?usp=sharing",
+          workbook_link: "/campus/course/a1-day-3-german-alphabet-reviewing-workbook",
         },
         {
           chapter: "1.1",
@@ -505,7 +505,7 @@ const RAW_COURSE_SCHEDULES = {
           youtube_link: "https://youtu.be/AjsnO1hxDs4",
           grammarbook_link: "https://www.falowen.app/campus/course/singular-pronouns-verb-conjugation-day-2",
           assignment: true,
-          workbook_link: "https://drive.google.com/file/d/1A1D1pAssnoncF1JY0v54XT2npPb6mQZv/view?usp=sharing",
+          workbook_link: "/campus/course/a1-day-2-kapitel-1-1-workbook",
         },
       ],
     },

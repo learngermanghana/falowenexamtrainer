@@ -38,6 +38,7 @@ import WeatherPerfektLetterPage from "./components/WeatherPerfektLetterPage";
 import HealthBodyPartsPage from "./components/HealthBodyPartsPage";
 import A2StarterConjunctionsPage from "./components/A2StarterConjunctionsPage";
 import A1Day1GreetingsWorkbookPage from "./components/A1Day1GreetingsWorkbookPage";
+import A1Day2Kapitel11WorkbookPage from "./components/A1Day2Kapitel11WorkbookPage";
 import A1Day3GermanAlphabetReviewingWorkbookPage from "./components/A1Day3GermanAlphabetReviewingWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
 import A2Day2PersonenBeschreibenWorkbookPage from "./components/A2Day2PersonenBeschreibenWorkbookPage";
@@ -564,6 +565,7 @@ const AppShell = ({
           <Route path="/campus/course/conjunctions-5-10" element={<ConjunctionNotesPage />} />
           <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
           <Route path="/campus/course/a1-day-1-greetings-workbook" element={<A1Day1GreetingsWorkbookPage />} />
+          <Route path="/campus/course/a1-day-2-kapitel-1-1-workbook" element={<A1Day2Kapitel11WorkbookPage />} />
           <Route
             path="/campus/course/a1-day-3-german-alphabet-reviewing-workbook"
             element={<A1Day3GermanAlphabetReviewingWorkbookPage />}
