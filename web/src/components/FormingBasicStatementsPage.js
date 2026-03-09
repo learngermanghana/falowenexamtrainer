@@ -43,29 +43,6 @@ const warningBox = {
   lineHeight: 1.7,
 };
 
-const promptCard = {
-  border: "1px solid #dbeafe",
-  borderRadius: 14,
-  padding: 14,
-  background: "#eff6ff",
-  fontWeight: 700,
-  lineHeight: 1.6,
-};
-
-const answerCard = {
-  border: "1px dashed #cbd5e1",
-  borderRadius: 14,
-  padding: 14,
-  background: "#ffffff",
-  minHeight: 88,
-  lineHeight: 1.7,
-};
-
-const practiceWrapStyle = {
-  display: "grid",
-  gap: 12,
-};
-
 const thStyle = {
   border: "1px solid #d1d5db",
   padding: 10,
@@ -81,8 +58,23 @@ const tdStyle = {
   lineHeight: 1.6,
 };
 
-const heroSrc =
+const heroMain =
   "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1400&q=80";
+
+const imgLiegen =
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80";
+
+const imgWo =
+  "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80";
+
+const imgNachIn =
+  "https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1400&q=80";
+
+const imgIrregular =
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1400&q=80";
+
+const imgManMann =
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1400&q=80";
 
 const ImageBreak = ({ src, alt, title, subtitle }) => (
   <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
@@ -92,7 +84,7 @@ const ImageBreak = ({ src, alt, title, subtitle }) => (
       loading="lazy"
       style={{
         width: "100%",
-        height: "clamp(200px, 30vw, 340px)",
+        height: "clamp(180px, 28vw, 300px)",
         objectFit: "cover",
         display: "block",
       }}
@@ -108,13 +100,7 @@ const TableScroll = ({ caption, children }) => (
   <div style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
     <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 560 }}>
       {caption ? (
-        <caption
-          style={{
-            textAlign: "left",
-            paddingBottom: 10,
-            fontWeight: 800,
-          }}
-        >
+        <caption style={{ textAlign: "left", paddingBottom: 10, fontWeight: 800 }}>
           {caption}
         </caption>
       ) : null}
@@ -123,7 +109,21 @@ const TableScroll = ({ caption, children }) => (
   </div>
 );
 
-const PracticeCard = ({ title, instruction, children }) => (
+const Choice = ({ children }) => (
+  <div
+    style={{
+      border: "1px solid #d1d5db",
+      borderRadius: 12,
+      padding: 12,
+      background: "#fff",
+      lineHeight: 1.6,
+    }}
+  >
+    {children}
+  </div>
+);
+
+const MCQCard = ({ number, question, options }) => (
   <div
     style={{
       border: "1px solid #e5e7eb",
@@ -134,10 +134,42 @@ const PracticeCard = ({ title, instruction, children }) => (
       gap: 12,
     }}
   >
-    <div style={{ fontWeight: 900, fontSize: 17 }}>{title}</div>
-    {instruction ? <div style={{ lineHeight: 1.7 }}>{instruction}</div> : null}
-    {children}
+    <div
+      style={{
+        border: "1px solid #dbeafe",
+        borderRadius: 14,
+        padding: 14,
+        background: "#eff6ff",
+        fontWeight: 800,
+        lineHeight: 1.6,
+      }}
+    >
+      {number}. {question}
+    </div>
+
+    <div style={{ display: "grid", gap: 10 }}>
+      {options.map((option, index) => (
+        <Choice key={index}>{option}</Choice>
+      ))}
+    </div>
   </div>
+);
+
+const MCQSection = ({ title, instruction, questions }) => (
+  <section style={sectionStyle}>
+    <h2 style={{ margin: 0 }}>{title}</h2>
+    <div style={softBox}>{instruction}</div>
+    <div style={{ display: "grid", gap: 14 }}>
+      {questions.map((q, idx) => (
+        <MCQCard
+          key={idx}
+          number={idx + 1}
+          question={q.question}
+          options={q.options}
+        />
+      ))}
+    </div>
+  </section>
 );
 
 const FormingBasicStatementsPage = () => {
@@ -154,7 +186,7 @@ const FormingBasicStatementsPage = () => {
         </button>
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 Practice Book – Day 4
+          A1 Practice Book – Day 8
         </h1>
         <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
           Topic: countries, cities, direction words, and simple past forms with{" "}
@@ -163,10 +195,10 @@ const FormingBasicStatementsPage = () => {
       </header>
 
       <ImageBreak
-        src={heroSrc}
+        src={heroMain}
         alt="Students learning grammar"
         title="Today’s lesson"
-        subtitle="Today we practise how to say where a city is, where someone comes from, where someone is going, and how to see the difference between present and past."
+        subtitle="Today we practise where a city is, where someone comes from, where someone is going, and how to understand present and past with sein and haben."
       />
 
       <section style={sectionStyle}>
@@ -180,14 +212,12 @@ const FormingBasicStatementsPage = () => {
         </div>
 
         <div style={softBox}>
-          <strong>Important for Day 4:</strong> Do not worry if everything is
-          still new. You are only on your fourth day, so the goal today is to
-          understand the main ideas and copy simple sentence patterns correctly.
+          <strong>Important:</strong> Today we focus on <strong>Präteritum</strong>.
           <br />
           <br />
-          <strong>Today we focus on:</strong> <em>Präteritum</em>. This is the
-          simple past in German. You will see it especially with{" "}
-          <strong>sein</strong> and <strong>haben</strong>.
+          In A1, students should first learn to <strong>recognize</strong> these forms.
+          They do not need very long grammar explanations yet. The goal is to see the
+          pattern and use simple sentences correctly.
         </div>
 
         <TableScroll caption="German tense names with English translation">
@@ -227,21 +257,17 @@ const FormingBasicStatementsPage = () => {
         <h2 style={{ margin: 0 }}>sein and haben: present and past</h2>
 
         <div style={softBox}>
-          In A1, two very important verbs are <strong>sein</strong> (to be) and{" "}
+          Two very important verbs in German are <strong>sein</strong> (to be) and{" "}
           <strong>haben</strong> (to have).
           <br />
           <br />
-          In the present, we say:
+          In the present:
           <br />
           <strong>ich bin</strong>, <strong>ich habe</strong>
           <br />
-          In the past, we say:
+          In the simple past:
           <br />
           <strong>ich war</strong>, <strong>ich hatte</strong>
-          <br />
-          <br />
-          These forms are very common, so students should begin to recognize
-          them early.
         </div>
 
         <TableScroll caption="Conjugation comparison">
@@ -303,46 +329,54 @@ const FormingBasicStatementsPage = () => {
         <div style={noteBox}>
           <strong>Examples:</strong>
           <br />
-          Heute <strong>bin</strong> ich in der Schule. = Today I am at school.
+          Heute <strong>bin</strong> ich in der Schule.
           <br />
-          Gestern <strong>war</strong> ich in der Schule. = Yesterday I was at
-          school.
+          Gestern <strong>war</strong> ich in der Schule.
           <br />
-          Heute <strong>habe</strong> ich Unterricht. = Today I have class.
+          Heute <strong>habe</strong> ich Unterricht.
           <br />
-          Gestern <strong>hatte</strong> ich Unterricht. = Yesterday I had
-          class.
+          Gestern <strong>hatte</strong> ich Unterricht.
         </div>
-
-        <PracticeCard
-          title="Practice 1"
-          instruction="Complete the sentences with the correct form of sein or haben. This practice is designed to be easy to read on phone."
-        >
-          <div style={practiceWrapStyle}>
-            <div style={promptCard}>1. Ich ___ heute in Accra.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>2. Gestern ich ___ in Kumasi.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>3. Wir ___ heute Unterricht.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>4. Letzte Woche wir ___ keinen Unterricht.</div>
-            <div style={answerCard}></div>
-          </div>
-        </PracticeCard>
       </section>
+
+      <MCQSection
+        title="Practice 1"
+        instruction="Choose the correct verb form."
+        questions={[
+          {
+            question: "Ich ___ heute in Accra.",
+            options: ["A. bin", "B. war", "C. hatte"],
+          },
+          {
+            question: "Gestern ich ___ in Kumasi.",
+            options: ["A. bin", "B. war", "C. habe"],
+          },
+          {
+            question: "Wir ___ heute Unterricht.",
+            options: ["A. haben", "B. hatten", "C. sind"],
+          },
+          {
+            question: "Letzte Woche wir ___ keinen Unterricht.",
+            options: ["A. haben", "B. sind", "C. hatten"],
+          },
+        ]}
+      />
+
+      <ImageBreak
+        src={imgLiegen}
+        alt="Map and city landscape"
+        title="liegen = to be located"
+        subtitle="Now we learn how to say where a city is."
+      />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>liegen = to be located</h2>
 
         <div style={softBox}>
-          We use <strong>liegen</strong> to say where a city or place is
-          located.
+          We use <strong>liegen</strong> to say where a city or place is located.
           <br />
           <br />
-          First, learn the four direction words:
+          First learn the four direction words:
           <br />
           <strong>der Osten</strong> = east
           <br />
@@ -379,42 +413,58 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
-
-        <PracticeCard
-          title="Practice 2"
-          instruction="Write full sentences. Use the model sentence to help you."
-        >
-          <div style={noteBox}>
-            <strong>Model:</strong> Berlin liegt im Osten von Deutschland.
-          </div>
-
-          <div style={practiceWrapStyle}>
-            <div style={promptCard}>1. Wo liegt Hamburg?</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>2. Wo liegt München?</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>
-              3. Write one sentence about a city in your country.
-            </div>
-            <div style={answerCard}></div>
-          </div>
-        </PracticeCard>
       </section>
+
+      <MCQSection
+        title="Practice 2"
+        instruction="Choose the correct answer."
+        questions={[
+          {
+            question: "Wo liegt Berlin?",
+            options: [
+              "A. Berlin liegt im Osten von Deutschland.",
+              "B. Berlin liegt im Norden von Deutschland.",
+              "C. Berlin liegt im Süden von Deutschland.",
+            ],
+          },
+          {
+            question: "Wo liegt Hamburg?",
+            options: [
+              "A. Hamburg liegt im Westen von Deutschland.",
+              "B. Hamburg liegt im Norden von Deutschland.",
+              "C. Hamburg liegt im Osten von Deutschland.",
+            ],
+          },
+          {
+            question: "What does 'Wo liegt München?' mean?",
+            options: [
+              "A. Where does Munich come from?",
+              "B. Where is Munich located?",
+              "C. Where is Munich going?",
+            ],
+          },
+        ]}
+      />
+
+      <ImageBreak
+        src={imgWo}
+        alt="Travel signs"
+        title="wo, woher, wohin"
+        subtitle="These three question words are very important in A1."
+      />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>wo, woher, wohin</h2>
 
         <div style={softBox}>
-          These three question words are very important.
+          These three question words are very important:
           <br />
           <br />
-          <strong>wo</strong> asks about location
+          <strong>wo</strong> = where (location)
           <br />
-          <strong>woher</strong> asks about origin
+          <strong>woher</strong> = where from (origin)
           <br />
-          <strong>wohin</strong> asks about direction
+          <strong>wohin</strong> = where to (direction)
         </div>
 
         <TableScroll caption="Meaning and use">
@@ -444,7 +494,7 @@ const FormingBasicStatementsPage = () => {
           </tbody>
         </TableScroll>
 
-        <TableScroll caption="Useful patterns with English translation">
+        <TableScroll caption="Useful patterns with translation">
           <tbody>
             <tr>
               <td style={tdStyle}>Wo bist du? – Ich bin in der Schule.</td>
@@ -460,33 +510,46 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
-
-        <PracticeCard
-          title="Practice 3"
-          instruction="Read the question carefully. Then answer with a full sentence."
-        >
-          <div style={practiceWrapStyle}>
-            <div style={promptCard}>1. Wo bist du?</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>2. Woher kommst du?</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>3. Wohin gehst du heute?</div>
-            <div style={answerCard}></div>
-          </div>
-        </PracticeCard>
       </section>
+
+      <MCQSection
+        title="Practice 3"
+        instruction="Choose the correct question word or meaning."
+        questions={[
+          {
+            question: "___ kommst du?",
+            options: ["A. Wo", "B. Woher", "C. Wohin"],
+          },
+          {
+            question: "___ gehst du heute?",
+            options: ["A. Wohin", "B. Woher", "C. Wo"],
+          },
+          {
+            question: "What does 'Wo bist du?' mean?",
+            options: [
+              "A. Where are you?",
+              "B. Where do you come from?",
+              "C. Where are you going?",
+            ],
+          },
+        ]}
+      />
+
+      <ImageBreak
+        src={imgNachIn}
+        alt="Airport travel scene"
+        title="nach vs in"
+        subtitle="Now we learn when to use nach and when to use in + article."
+      />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>nach vs in</h2>
 
         <div style={softBox}>
-          This is the easy rule for A1:
+          Easy A1 rule:
           <br />
           <br />
-          Use <strong>nach</strong> for cities and countries with{" "}
-          <strong>no article</strong>.
+          Use <strong>nach</strong> for cities and countries with <strong>no article</strong>.
           <br />
           Example: <strong>nach Ghana</strong>, <strong>nach Deutschland</strong>,{" "}
           <strong>nach Berlin</strong>
@@ -501,18 +564,16 @@ const FormingBasicStatementsPage = () => {
         <div style={noteBox}>
           <strong>Why?</strong>
           <br />
-          Some countries stand alone without an article, for example:
-          <strong> Deutschland</strong>, <strong>Ghana</strong>,{" "}
-          <strong>Italien</strong>.
+          Some countries do not use an article: <strong>Deutschland</strong>,{" "}
+          <strong>Ghana</strong>, <strong>Italien</strong>.
           <br />
-          So we use <strong>nach</strong>.
+          So we say <strong>nach Deutschland</strong>, <strong>nach Ghana</strong>.
           <br />
           <br />
-          Some countries use an article:
-          <strong> die Schweiz</strong>, <strong>die Türkei</strong>,{" "}
-          <strong>die USA</strong>, <strong>der Iran</strong>.
+          Some countries use an article: <strong>die Schweiz</strong>,{" "}
+          <strong>die Türkei</strong>, <strong>die USA</strong>, <strong>der Iran</strong>.
           <br />
-          So we use <strong>in + article</strong>.
+          So we say <strong>in die Schweiz</strong>, <strong>in den Iran</strong>.
         </div>
 
         <TableScroll caption="Direction: wohin?">
@@ -541,53 +602,37 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
-
-        <TableScroll caption="Origin and location with article countries">
-          <tbody>
-            <tr>
-              <td style={tdStyle}>
-                Woher kommst du? – Ich komme aus der Schweiz.
-              </td>
-              <td style={tdStyle}>I come from Switzerland.</td>
-            </tr>
-            <tr>
-              <td style={tdStyle}>
-                Wo wohnst du? – Ich wohne in der Schweiz.
-              </td>
-              <td style={tdStyle}>I live in Switzerland.</td>
-            </tr>
-            <tr>
-              <td style={tdStyle}>
-                Woher kommt ihr? – Wir kommen aus den USA.
-              </td>
-              <td style={tdStyle}>We come from the USA.</td>
-            </tr>
-            <tr>
-              <td style={tdStyle}>Wo seid ihr? – Wir sind in den USA.</td>
-              <td style={tdStyle}>We are in the USA.</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-
-        <PracticeCard
-          title="Practice 4"
-          instruction="Choose the correct form and write the full sentence."
-        >
-          <div style={practiceWrapStyle}>
-            <div style={promptCard}>1. Ich fliege ___ Deutschland.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>2. Wir reisen ___ Schweiz.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>3. Er fährt ___ Iran.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>4. Sie fährt ___ Accra.</div>
-            <div style={answerCard}></div>
-          </div>
-        </PracticeCard>
       </section>
+
+      <MCQSection
+        title="Practice 4"
+        instruction="Choose the correct form."
+        questions={[
+          {
+            question: "Ich fliege ___ Deutschland.",
+            options: ["A. nach", "B. in die", "C. aus"],
+          },
+          {
+            question: "Wir reisen ___ Schweiz.",
+            options: ["A. nach", "B. in die", "C. aus der"],
+          },
+          {
+            question: "Er fährt ___ Iran.",
+            options: ["A. in den", "B. nach", "C. aus dem"],
+          },
+          {
+            question: "Sie fährt ___ Accra.",
+            options: ["A. in die", "B. nach", "C. aus"],
+          },
+        ]}
+      />
+
+      <ImageBreak
+        src={imgIrregular}
+        alt="Notebook and grammar study"
+        title="Irregular verbs with vowel change"
+        subtitle="Some verbs change their vowel in du and er/sie/es."
+      />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Irregular verbs with vowel change</h2>
@@ -602,11 +647,11 @@ const FormingBasicStatementsPage = () => {
           in the <strong>er / sie / es</strong> form.
           <br />
           <br />
-          This is why:
+          Example:
           <br />
-          <strong>ich fahre</strong> but <strong>du fährst</strong>
+          <strong>ich fahre</strong> → <strong>du fährst</strong>
           <br />
-          <strong>ich spreche</strong> but <strong>du sprichst</strong>
+          <strong>ich spreche</strong> → <strong>du sprichst</strong>
         </div>
 
         <TableScroll caption="Common vowel changes">
@@ -645,26 +690,37 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
-
-        <PracticeCard
-          title="Practice 5"
-          instruction="Complete each sentence with the correct verb form."
-        >
-          <div style={practiceWrapStyle}>
-            <div style={promptCard}>1. Du ___ nach Berlin. (fahren)</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>2. Er ___ Deutsch. (sprechen)</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>3. Sie ___ Pizza. (essen)</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>4. Du ___ den Bus. (nehmen)</div>
-            <div style={answerCard}></div>
-          </div>
-        </PracticeCard>
       </section>
+
+      <MCQSection
+        title="Practice 5"
+        instruction="Choose the correct verb form."
+        questions={[
+          {
+            question: "Du ___ nach Berlin. (fahren)",
+            options: ["A. fahre", "B. fährst", "C. fährt"],
+          },
+          {
+            question: "Er ___ Deutsch. (sprechen)",
+            options: ["A. sprichst", "B. sprechen", "C. spricht"],
+          },
+          {
+            question: "Sie ___ Pizza. (essen)",
+            options: ["A. isst", "B. essen", "C. esst"],
+          },
+          {
+            question: "Du ___ den Bus. (nehmen)",
+            options: ["A. nimmst", "B. nimmt", "C. nehme"],
+          },
+        ]}
+      />
+
+      <ImageBreak
+        src={imgManMann}
+        alt="A man standing outdoors"
+        title="man vs Mann"
+        subtitle="These two words look similar, but they are not the same."
+      />
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>man vs Mann</h2>
@@ -676,11 +732,9 @@ const FormingBasicStatementsPage = () => {
           <em>Mann</em> is a noun, so it is written with a capital letter.
           <br />
           <br />
-          Correct:
-          <strong> Man spricht hier Deutsch.</strong>
+          Correct: <strong>Man spricht hier Deutsch.</strong>
           <br />
-          Not:
-          <strong> Mann spricht hier Deutsch.</strong>
+          Not correct: <strong>Mann spricht hier Deutsch.</strong>
         </div>
 
         <div style={softBox}>
@@ -733,49 +787,63 @@ const FormingBasicStatementsPage = () => {
             </tr>
           </tbody>
         </TableScroll>
-
-        <PracticeCard
-          title="Practice 6"
-          instruction="Choose man or Mann."
-        >
-          <div style={practiceWrapStyle}>
-            <div style={promptCard}>1. ___ spricht hier Deutsch.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>2. Der ___ kommt aus Berlin.</div>
-            <div style={answerCard}></div>
-
-            <div style={promptCard}>
-              3. In Deutschland spricht ___ Deutsch.
-            </div>
-            <div style={answerCard}></div>
-          </div>
-        </PracticeCard>
       </section>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Final speaking and writing practice</h2>
+      <MCQSection
+        title="Practice 6"
+        instruction="Choose the correct word."
+        questions={[
+          {
+            question: "___ spricht hier Deutsch.",
+            options: ["A. Mann", "B. man", "C. Männer"],
+          },
+          {
+            question: "Der ___ kommt aus Berlin.",
+            options: ["A. man", "B. Mann", "C. spricht"],
+          },
+          {
+            question: "In Deutschland spricht ___ Deutsch.",
+            options: ["A. man", "B. Mann", "C. Männer"],
+          },
+        ]}
+      />
 
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Final mixed practice</h2>
         <div style={softBox}>
-          Try to answer with short, correct A1 sentences. You do not need long
-          answers.
+          Choose the best answer.
         </div>
 
-        <div style={practiceWrapStyle}>
-          <div style={promptCard}>1. Wo liegt Berlin?</div>
-          <div style={answerCard}></div>
-
-          <div style={promptCard}>2. Woher kommst du?</div>
-          <div style={answerCard}></div>
-
-          <div style={promptCard}>3. Wohin gehst du morgen?</div>
-          <div style={answerCard}></div>
-
-          <div style={promptCard}>4. Wo warst du gestern?</div>
-          <div style={answerCard}></div>
-
-          <div style={promptCard}>5. Hattest du gestern Unterricht?</div>
-          <div style={answerCard}></div>
+        <div style={{ display: "grid", gap: 14 }}>
+          <MCQCard
+            number={1}
+            question="Wo liegt Berlin?"
+            options={[
+              "A. Berlin liegt im Osten von Deutschland.",
+              "B. Berlin kommt aus Deutschland.",
+              "C. Berlin fährt nach Deutschland.",
+            ]}
+          />
+          <MCQCard
+            number={2}
+            question="___ kommst du?"
+            options={["A. Wo", "B. Woher", "C. Wohin"]}
+          />
+          <MCQCard
+            number={3}
+            question="Ich fliege ___ Deutschland."
+            options={["A. nach", "B. in die", "C. aus"]}
+          />
+          <MCQCard
+            number={4}
+            question="Du ___ nach Berlin. (fahren)"
+            options={["A. fährst", "B. fahre", "C. fährt"]}
+          />
+          <MCQCard
+            number={5}
+            question="___ spricht hier Deutsch."
+            options={["A. Mann", "B. man", "C. Männer"]}
+          />
         </div>
       </section>
     </main>
