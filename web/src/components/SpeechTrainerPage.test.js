@@ -254,3 +254,47 @@ test("shows recording-priority status when audio is ready", async () => {
 
   expect(screen.getByText("speechTrainer.composerStatusHintRecordingPriority")).toBeInTheDocument();
 });
+
+test("uses praesentation_de as fallback final output when script tags are missing", async () => {
+  requestPresentationCoachReply.mockResolvedValueOnce({
+    reply: "<abschluss_de>Gut gemacht.</abschluss_de><praesentation_de>Ich spreche heute über meinen Campus und meine Ideen.</praesentation_de>",
+    answersDone: 6,
+    completed: true,
+  });
+
+  render(<SpeechTrainerPage />);
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "This answer is definitely long enough for final submission." },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "speechTrainer.sendAria" }));
+
+  await waitFor(() => {
+    expect(screen.getByText("speechTrainer.outputTitle")).toBeInTheDocument();
+    expect(screen.getByText("Ich spreche heute über meinen Campus und meine Ideen.")).toBeInTheDocument();
+  });
+});
+
+
+test("extracts script tags even when model returns tag attributes", async () => {
+  requestPresentationCoachReply.mockResolvedValueOnce({
+    reply: '<script_short format="plain">Kurztext.</script_short><script_medium data-kind="coach">Mitteltext.</script_medium><script_long class="final">Langtext.</script_long>',
+    answersDone: 6,
+    completed: true,
+  });
+
+  render(<SpeechTrainerPage />);
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  fireEvent.change(screen.getByRole("textbox"), {
+    target: { value: "This answer is definitely long enough for final submission." },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "speechTrainer.sendAria" }));
+
+  await waitFor(() => {
+    expect(screen.getByText("Kurztext.")).toBeInTheDocument();
+    expect(screen.getByText("Mitteltext.")).toBeInTheDocument();
+    expect(screen.getByText("Langtext.")).toBeInTheDocument();
+  });
+});
