@@ -22,6 +22,8 @@ This React app guides learner through recording or typing answers for speaking p
    REACT_APP_FIREBASE_MESSAGING_SENDER_ID=xxxx
    REACT_APP_FIREBASE_APP_ID=xxxx
    REACT_APP_FIREBASE_VAPID_KEY=your-web-push-key
+   # Optional: random learner testimonial source used on the public landing page
+   REACT_APP_STUDENT_REVIEWS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
    # Optional: override the URL used in password reset and email verification links
    REACT_APP_AUTH_CONTINUE_URL=https://your-app-url
    ```
