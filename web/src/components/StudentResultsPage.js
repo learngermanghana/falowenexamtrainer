@@ -61,32 +61,80 @@ const StudentResultsPage = () => {
       const code = norm(row.studentcode || row.studentCode);
       const score = Number(row.score);
       if (!code || !Number.isFinite(score)) return;
-      if (!scoresByStudent.has(code)) scoresByStudent.set(code, []);
-      scoresByStudent.get(code).push(score);
+      const level = String(row.level || "").trim().toUpperCase();
+      const assignmentKey = resolveAssignmentCanonicalKey({
+        level,
+        assignmentId:
+          row.assignmentKey ||
+          row.canonicalAssignmentKey ||
+          row.assignmentId ||
+          row.assignment_id,
+        assignmentTitle: row.assignment || row.assignmentTitle || row.title,
+      });
+
+      if (!scoresByStudent.has(code)) {
+        scoresByStudent.set(code, {
+          totalScore: 0,
+          assignmentCount: 0,
+          bestByAssignment: new Map(),
+        });
+      }
+
+      const student = scoresByStudent.get(code);
+      if (!assignmentKey) {
+        student.totalScore += score;
+        student.assignmentCount += 1;
+        return;
+      }
+
+      const previous = student.bestByAssignment.get(assignmentKey);
+      if (!Number.isFinite(previous) || score > previous) {
+        if (Number.isFinite(previous)) student.totalScore -= previous;
+        student.totalScore += score;
+        student.bestByAssignment.set(assignmentKey, score);
+      }
+      student.assignmentCount = student.bestByAssignment.size;
     });
 
     if (!scoresByStudent.size) return null;
 
-    const averages = Array.from(scoresByStudent.entries()).map(([code, scores]) => {
-      const avg =
-        Math.round((scores.reduce((sum, value) => sum + value, 0) / scores.length) * 10) /
-        10;
-      return { code, avg };
-    });
+    const totals = Array.from(scoresByStudent.entries())
+      .map(([code, stats]) => ({
+        code,
+        totalScore: stats.totalScore,
+        assignmentCount: stats.assignmentCount,
+      }))
+      .sort((a, b) => {
+        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+        if (b.assignmentCount !== a.assignmentCount) return b.assignmentCount - a.assignmentCount;
+        return a.code.localeCompare(b.code);
+      });
 
-    const studentEntry = averages.find((entry) => entry.code === norm(studentCode));
-    const totalStudents = averages.length;
+    const studentEntry = totals.find((entry) => entry.code === norm(studentCode));
+    const totalStudents = totals.length;
 
     if (!studentEntry) {
-      return { totalStudents, rank: null, average: null, level: levelFilter || "All levels" };
+      return {
+        totalStudents,
+        rank: null,
+        totalScore: null,
+        assignmentCount: 0,
+        level: levelFilter || "All levels",
+      };
     }
 
-    const higherCount = averages.filter((entry) => entry.avg > studentEntry.avg).length;
+    const higherCount = totals.filter(
+      (entry) =>
+        entry.totalScore > studentEntry.totalScore ||
+        (entry.totalScore === studentEntry.totalScore &&
+          entry.assignmentCount > studentEntry.assignmentCount)
+    ).length;
 
     return {
       totalStudents,
       rank: higherCount + 1,
-      average: studentEntry.avg,
+      totalScore: studentEntry.totalScore,
+      assignmentCount: studentEntry.assignmentCount,
       level: levelFilter || "All levels",
     };
   }, [studentCode, studentLevel]);
@@ -421,9 +469,9 @@ const StudentResultsPage = () => {
             </p>
             <p style={{ ...styles.helperText, marginTop: 4 }}>
               {leaderboard
-                ? `This compares your average score${
-                    leaderboard.average !== null ? ` (${leaderboard.average})` : ""
-                  } with ${leaderboard.totalStudents} students. We average all recorded scores per student, then order from highest to lowest. Students with the same average share a rank.`
+                ? `This compares your total score${
+                    leaderboard.totalScore !== null ? ` (${leaderboard.totalScore})` : ""
+                  } and completed assignments (${leaderboard.assignmentCount || 0}) with ${leaderboard.totalStudents} students. We total each student's best score per assignment, then rank by total score (highest first) and use assignment count as a tie-breaker.`
                 : "We’ll show your leaderboard position once we have enough class scores to compare."}
             </p>
           </>
