@@ -350,6 +350,14 @@ const A1Day1GreetingsGrammarPage = () => {
           <div>Hallo, Anna! Wie geht es dir?</div>
           <div>Guten Tag, Frau Müller! Wie geht es Ihnen?</div>
         </div>
+
+        <div style={practiceBoxStyle}>
+          <strong>Common mistakes and correct forms</strong>
+          <div>❌ Wie geht es du? → ✅ <strong>Wie geht es dir?</strong></div>
+          <div>❌ Wie geht Ihnen? → ✅ <strong>Wie geht es Ihnen?</strong></div>
+          <div>❌ guten nacht → ✅ <strong>Gute Nacht</strong></div>
+          <div>❌ bis spater / bis später! (random capitalization) → ✅ <strong>Bis später.</strong></div>
+        </div>
       </section>
 
       <section style={cardStyle}>
