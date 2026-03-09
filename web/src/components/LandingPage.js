@@ -5,6 +5,7 @@ import { persistInterfaceLanguage } from "../i18n";
 import { updatePageMeta } from "../lib/pageMeta";
 import LeadCaptureModal from "./LeadCaptureModal";
 import { captureLead } from "../services/leadCaptureService";
+import { fetchStudentReviewsFromPublishedSheet } from "../services/studentReviewsService";
 
 const FeatureCard = ({ icon, title, description }) => (
   <div
@@ -154,10 +155,50 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     language: selectedProgram.shortLabel,
   });
   const reviewItems = t("landing.reviews.items", { returnObjects: true });
-  const featuredReviews = useMemo(() => shuffleArray(reviewItems).slice(0, 6), [reviewItems]);
+  const [sheetReview, setSheetReview] = useState(null);
+  const featuredReview = useMemo(() => {
+    if (sheetReview) return sheetReview;
+    const fallbackItems = Array.isArray(reviewItems) ? reviewItems : [];
+    if (!fallbackItems.length) return null;
+    return shuffleArray(fallbackItems)[0] || null;
+  }, [reviewItems, sheetReview]);
   const heroBadges = t("landing.heroBadges", { returnObjects: true });
   const howItWorksBenefits = t("landing.howItWorks.benefits", { returnObjects: true });
   const whyStayPoints = t("landing.footer.stayPoints", { returnObjects: true });
+
+
+  useEffect(() => {
+    let mounted = true;
+    const sheetUrl = process.env.REACT_APP_STUDENT_REVIEWS_SHEET_CSV_URL || "";
+
+    if (!sheetUrl) {
+      setSheetReview(null);
+      return undefined;
+    }
+
+    const loadSheetReview = async () => {
+      try {
+        const rows = await fetchStudentReviewsFromPublishedSheet(sheetUrl);
+        if (!mounted) return;
+        if (!rows.length) {
+          setSheetReview(null);
+          return;
+        }
+        const randomReview = rows[Math.floor(Math.random() * rows.length)] || null;
+        setSheetReview(randomReview);
+      } catch (error) {
+        console.error("Failed to load student reviews", error);
+        if (!mounted) return;
+        setSheetReview(null);
+      }
+    };
+
+    loadSheetReview();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const title = t("landing.meta.title");
@@ -436,18 +477,18 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             </div>
           </div>
 
-          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
-            {featuredReviews.map((r) => (
+          <div style={{ display: "grid", gap: 12, gridTemplateColumns: "minmax(240px, 560px)" }}>
+            {featuredReview ? (
               <ReviewCard
-                key={`${r.name}-${r.country}-${r.level}`}
-                name={r.name}
-                country={r.country}
-                level={r.level}
-                stars={r.stars}
-                text={r.text}
-                starLabel={t("landing.reviews.starRating", { count: r.stars })}
+                key={`${featuredReview.name}-${featuredReview.country}-${featuredReview.level}`}
+                name={featuredReview.name}
+                country={featuredReview.country}
+                level={featuredReview.level}
+                stars={featuredReview.stars}
+                text={featuredReview.text}
+                starLabel={t("landing.reviews.starRating", { count: featuredReview.stars })}
               />
-            ))}
+            ) : null}
           </div>
         </section>
 
