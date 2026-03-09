@@ -21,14 +21,18 @@ const getInitialCoachMessage = (isA1A2, t) => ({
   content: isA1A2 ? t("speechTrainer.initialCoachMessage.a1a2") : t("speechTrainer.initialCoachMessage.default"),
 });
 
+const escapeRegex = (value) => String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 const extractTag = (text, tag) => {
-  const match = String(text || "").match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i"));
+  const safeTag = escapeRegex(tag);
+  const pattern = new RegExp(`<${safeTag}(?:\\s+[^>]*)?>([\\s\\S]*?)<\\/${safeTag}\\s*>`, "i");
+  const match = String(text || "").match(pattern);
   return match?.[1]?.trim() || "";
 };
 
 const extractAllTaggedFields = (text) => {
   const fields = [];
-  const regex = /<([a-z_]+)>([\s\S]*?)<\/\1>/gi;
+  const regex = /<([a-z_]+)(?:\s+[^>]*)?>([\s\S]*?)<\/\1\s*>/gi;
   let match = regex.exec(String(text || ""));
   while (match) {
     fields.push({ tag: match[1].toLowerCase(), value: match[2].trim() });
@@ -77,6 +81,19 @@ const parseRubric = (text) => {
     grammar: parseScore("grammar"),
     vocabulary: parseScore("vocabulary"),
     structure: parseScore("structure"),
+  };
+};
+
+const deriveFinalScripts = (coachReply) => {
+  const short = extractTag(coachReply, "script_short");
+  const medium = extractTag(coachReply, "script_medium");
+  const taggedLong = extractTag(coachReply, "script_long");
+  const presentationFallback = extractTag(coachReply, "praesentation_de") || extractTag(coachReply, "abschluss_de");
+
+  return {
+    short,
+    medium,
+    long: taggedLong || presentationFallback,
   };
 };
 
@@ -378,11 +395,7 @@ const SpeechTrainerPage = () => {
 
       if (isCompleted) {
         setRubric(parseRubric(coachReply));
-        setFinalScripts({
-          short: extractTag(coachReply, "script_short"),
-          medium: extractTag(coachReply, "script_medium"),
-          long: extractTag(coachReply, "script_long"),
-        });
+        setFinalScripts(deriveFinalScripts(coachReply));
       }
     } catch (requestError) {
       console.error("Presentation chat error", requestError);
