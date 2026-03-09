@@ -279,6 +279,7 @@ const AccountSettings = () => {
             <button type="button" style={styles.primaryButton} onClick={handleUpgradeToNextLevel} disabled={!levelUpgrade.canUpgrade || isUpgradingLevel}>
               {isUpgradingLevel ? t("accountSettings.upgrade.upgrading") : t("accountSettings.upgrade.button", { nextLevel: levelUpgrade.nextLevel })}
             </button>
+            {status ? <p style={{ ...styles.helperText, marginTop: 8 }}>{status}</p> : null}
             {levelUpgrade.reason ? <p style={{ ...styles.helperText, color: "#92400e" }}>{levelUpgrade.reason}</p> : null}
           </>
         ) : (
