@@ -24,35 +24,6 @@ const postsCollectionRef = (level, className) =>
 const presenceCollectionRef = (level, className) =>
   collection(db, "class_board", level, "classes", className, "presence");
 
-const UNIT_MULTIPLIERS = {
-  minutes: 1,
-  hours: 60,
-  days: 60 * 24,
-};
-
-const getUnitMultiplier = (unit) => UNIT_MULTIPLIERS[unit] || UNIT_MULTIPLIERS.minutes;
-
-const minutesFromValue = (value, unit) => (Number(value) || 0) * getUnitMultiplier(unit);
-
-const valueFromMinutes = (minutes, unit) =>
-  (Number(minutes) || 0) / Math.max(1, getUnitMultiplier(unit));
-
-const formatTimeRemaining = (expiresAt, now) => {
-  if (!expiresAt) return "No timer";
-  const rawDiff = Math.max(0, expiresAt - now);
-  const diff = rawDiff;
-  const totalSeconds = Math.floor(diff / 1000);
-  const days = Math.floor(totalSeconds / 86400);
-  const hours = Math.floor((totalSeconds % 86400) / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
-
-  if (diff <= 0) return "Expired";
-  if (days > 0) return `${days}d ${hours}h`;
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
-};
-
 const makeUUID = () =>
   (window.crypto && window.crypto.randomUUID && window.crypto.randomUUID()) ||
   `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -130,8 +101,6 @@ const ClassDiscussionPage = () => {
   const [editingThread, setEditingThread] = useState(null); // { threadId, topic, question, instructions, extraLink }
   const [isSavingThreadEdit, setIsSavingThreadEdit] = useState(false);
 
-  const [extensionValues, setExtensionValues] = useState({});
-  const [extensionUnits, setExtensionUnits] = useState({});
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingThread, setIsSavingThread] = useState(false);
@@ -151,8 +120,6 @@ const ClassDiscussionPage = () => {
     question: "",
     instructions: "",
     extraLink: "",
-    timerMinutes: 15,
-    timerUnit: "minutes",
   });
   const typingTimeouts = useRef({});
 
@@ -200,17 +167,6 @@ const ClassDiscussionPage = () => {
           const data = docSnapshot.data();
 
           const createdAt = normalizeTimestamp(data.createdAt) || normalizeTimestamp(data.createdAtMs);
-          const timerMinutes = Number(data.timerMinutes) || 0;
-          const timerStartedAt =
-            normalizeTimestamp(data.timerStartedAt) ||
-            normalizeTimestamp(data.timerStartedAtMs) ||
-            createdAt;
-          const explicitExpiresAt = normalizeTimestamp(data.expiresAt);
-
-          const expiresAt =
-            explicitExpiresAt ||
-            (timerMinutes > 0 && timerStartedAt ? timerStartedAt + timerMinutes * 60000 : null);
-
           return {
             id: docSnapshot.id,
             level: data.level || studentProfile?.level || "",
@@ -222,21 +178,12 @@ const ClassDiscussionPage = () => {
             questionTitle: data.questionTitle || data.topic || "",
             instructions: data.instructions || "",
             extraLink: data.extraLink || "",
-            timerUnit: data.timerUnit || "minutes",
-            timerMinutes,
-            timerValue:
-              data.timerValue !== undefined
-                ? data.timerValue
-                : valueFromMinutes(timerMinutes, data.timerUnit || "minutes"),
             createdAt,
-            timerStartedAt,
             createdBy: data.createdBy || "Student",
             createdByUid: data.createdByUid || null,
             editedAt: normalizeTimestamp(data.editedAt),
             editedByUid: data.editedByUid || null,
-            expiresAt,
             status: data.status || "open",
-            expiredAt: normalizeTimestamp(data.expiredAt),
           };
         });
 
@@ -324,23 +271,6 @@ const ClassDiscussionPage = () => {
     return () => unsubscribe();
   }, [studentProfile?.level, studentProfile?.className]);
 
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const resolveStatus = useCallback(
-    (thread) => {
-      if (!thread) return "open";
-      if (thread.status === "archived") return "archived";
-      if (thread.expiresAt) {
-        return thread.expiresAt <= now ? "expired" : "open";
-      }
-      if (thread.status === "expired") return "expired";
-      return "open";
-    },
-    [now]
-  );
 
   const getThreadDocRef = useCallback(
     (thread) => {
@@ -356,6 +286,11 @@ const ClassDiscussionPage = () => {
   useEffect(() => {
     window.localStorage.setItem("discussionTimezonePreference", timezonePreference);
   }, [timezonePreference]);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(
     () => () => {
@@ -392,8 +327,6 @@ const ClassDiscussionPage = () => {
     }
 
     const lesson = lessonOptions.find((option) => option.id === form.lessonId) || selectedLesson;
-    const timerValue = Number(form.timerMinutes) || 0;
-    const timerMinutes = minutesFromValue(timerValue, form.timerUnit);
     const nowTimestamp = Date.now();
 
     setIsSavingThread(true);
@@ -410,12 +343,7 @@ const ClassDiscussionPage = () => {
         instructions: form.instructions || "",
         question: form.question,
         extraLink: form.extraLink,
-        timerMinutes,
-        timerUnit: form.timerUnit,
-        timerValue,
         createdAtMs: nowTimestamp,
-        timerStartedAtMs: nowTimestamp,
-        timerStartedAt: serverTimestamp(),
         createdAt: serverTimestamp(),
         createdBy: getDisplayName(),
         createdByUid: user?.uid || null,
@@ -428,8 +356,6 @@ const ClassDiscussionPage = () => {
         question: "",
         instructions: "",
         extraLink: "",
-        timerMinutes: timerValue,
-        timerUnit: form.timerUnit,
       });
     } catch (err) {
       console.error("Failed to create discussion thread", err);
@@ -585,12 +511,6 @@ const ClassDiscussionPage = () => {
   };
 
   const handleReply = async (threadId) => {
-    const thread = threads.find((item) => item.id === threadId);
-    if (thread && resolveStatus(thread) !== "open") {
-      setError("Replies are closed for this thread. A tutor can reopen it with the timer controls.");
-      return;
-    }
-
     const draft = replyDrafts[threadId] || "";
     if (!draft.trim() || !db) return;
 
@@ -614,42 +534,6 @@ const ClassDiscussionPage = () => {
     }
   };
 
-  const handleExtendThread = async (threadId) => {
-    const thread = threads.find((item) => item.id === threadId);
-    if (!thread) return;
-
-    const unit = extensionUnits[threadId] || thread.timerUnit || "minutes";
-    const minutes = minutesFromValue(
-      extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes,
-      unit
-    );
-    const threadRef = getThreadDocRef(thread);
-
-    if (!threadRef) {
-      setError("Missing class context. Please reload the page.");
-      return;
-    }
-
-    try {
-      await setDoc(
-        threadRef,
-        {
-          timerMinutes: minutes,
-          timerUnit: unit,
-          timerValue: extensionValues[threadId] ?? thread.timerValue ?? thread.timerMinutes,
-          timerStartedAt: serverTimestamp(),
-          expiresAt: deleteField(),
-          status: "open",
-          expiredAt: deleteField(),
-        },
-        { merge: true }
-      );
-      setError("");
-    } catch (err) {
-      console.error("Failed to extend or reopen thread", err);
-      setError("Could not extend or reopen this thread. Try again.");
-    }
-  };
 
   const handleDeleteReply = async (threadId, reply) => {
     if (!db) return;
@@ -737,10 +621,10 @@ const ClassDiscussionPage = () => {
     () =>
       threads.map((thread) => ({
         ...thread,
-        status: resolveStatus(thread),
+        status: thread.status || "open",
         replies: repliesByThread[thread.id] || [],
       })),
-    [threads, repliesByThread, resolveStatus]
+    [threads, repliesByThread]
   );
 
   const filteredThreadsWithReplies = useMemo(() => {
@@ -771,38 +655,15 @@ const ClassDiscussionPage = () => {
   }, [lessonFilter, searchTerm, showMyPostsOnly, showNoRepliesOnly, sortBy, statusFilter, threadsWithReplies, user?.uid]);
 
   const renderThread = (thread) => {
-    const status = thread.status || resolveStatus(thread);
-    const isThreadOpen = status === "open";
+    const status = thread.status || "open";
 
-    const timeRemainingLabel =
-      status === "archived"
-        ? "Archived"
-        : status === "expired"
-        ? "Expired"
-        : thread.expiresAt
-        ? `Time left ${formatTimeRemaining(thread.expiresAt, now)}`
-        : "No timer set";
 
     const statusBadgeStyle = {
       ...styles.badge,
-      background:
-        status === "archived"
-          ? "#fef3c7"
-          : status === "expired"
-          ? "#fee2e2"
-          : "#ecfeff",
-      borderColor:
-        status === "archived"
-          ? "#fcd34d"
-          : status === "expired"
-          ? "#fecaca"
-          : "#a5f3fc",
-      color: status === "archived" ? "#92400e" : status === "expired" ? "#991b1b" : "#0ea5e9",
+      background: status === "archived" ? "#fef3c7" : "#ecfeff",
+      borderColor: status === "archived" ? "#fcd34d" : "#a5f3fc",
+      color: status === "archived" ? "#92400e" : "#0ea5e9",
     };
-
-    const tutorUnit = extensionUnits[thread.id] || thread.timerUnit || "minutes";
-    const tutorMinutes = valueFromMinutes(thread.timerMinutes || 0, tutorUnit);
-    const tutorValue = extensionValues[thread.id] ?? tutorMinutes ?? 10;
 
     const isEditingThisThread = editingThread?.threadId === thread.id;
 
@@ -853,7 +714,7 @@ const ClassDiscussionPage = () => {
             }}
           >
             <span style={styles.badge}>Posted by {thread.createdBy}</span>
-            <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
+            <span style={statusBadgeStyle}>{status}</span>
 
             {canEditThread(thread) ? (
               <button
@@ -927,7 +788,7 @@ const ClassDiscussionPage = () => {
           </div>
         ) : (
           <>
-            {!isThreadOpen ? (
+            {status === "archived" ? (
               <div
                 style={{
                   ...styles.helperText,
@@ -938,7 +799,7 @@ const ClassDiscussionPage = () => {
                   color: "#0f172a",
                 }}
               >
-                Replies are closed because this thread is {status}. Tutors can reopen it with the timer controls.
+                Replies are closed because this thread is {status}.
               </div>
             ) : null}
 
@@ -966,35 +827,6 @@ const ClassDiscussionPage = () => {
           </>
         )}
 
-        {isTutor ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-            <label style={{ ...styles.helperText, margin: 0 }}>Extend or reopen timer</label>
-            <input
-              type="number"
-              min="0"
-              step="1"
-              style={{ ...styles.select, maxWidth: 120 }}
-              value={tutorValue}
-              onChange={(e) => setExtensionValues((prev) => ({ ...prev, [thread.id]: e.target.value }))}
-            />
-            <select
-              value={tutorUnit}
-              onChange={(e) => setExtensionUnits((prev) => ({ ...prev, [thread.id]: e.target.value }))}
-              style={{ ...styles.select, maxWidth: 140 }}
-            >
-              <option value="minutes">Minutes</option>
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-            </select>
-            <button
-              style={{ ...styles.primaryButton, padding: "10px 12px" }}
-              type="button"
-              onClick={() => handleExtendThread(thread.id)}
-            >
-              Reopen / extend
-            </button>
-          </div>
-        ) : null}
 
         <div style={{ display: "grid", gap: 8 }}>
           <div style={{ fontWeight: 700, fontSize: 14 }}>Responses ({thread.replies.length})</div>
@@ -1083,21 +915,21 @@ const ClassDiscussionPage = () => {
 
           <div style={{ display: "grid", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "flex-end" }}>
-              <span style={statusBadgeStyle}>{timeRemainingLabel}</span>
+              <span style={statusBadgeStyle}>{status}</span>
             </div>
 
             <textarea
               style={styles.textareaSmall}
               placeholder={
-                isThreadOpen ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"
+                status !== "archived" ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"
               }
               value={replyDrafts[thread.id] || ""}
               onChange={(e) => {
                 setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
-                if (isThreadOpen) markTypingForThread(thread.id);
+                if (status !== "archived") markTypingForThread(thread.id);
               }}
               onBlur={() => stopTypingIndicator(thread.id)}
-              disabled={!isThreadOpen}
+              disabled={status === "archived"}
             />
 
             {typingByThread[thread.id]?.length ? (
@@ -1111,21 +943,21 @@ const ClassDiscussionPage = () => {
                 style={{ ...styles.secondaryButton, padding: "10px 12px" }}
                 type="button"
                 onClick={() => handleCorrectDraft(thread.id)}
-                disabled={isCorrectingDraft[thread.id] || !isThreadOpen}
+                disabled={isCorrectingDraft[thread.id] || status === "archived"}
               >
                 {isCorrectingDraft[thread.id] ? "AI is correcting ..." : "Correct with AI"}
               </button>
               <button
                 style={styles.primaryButton}
                 onClick={() => handleReply(thread.id)}
-                disabled={!isThreadOpen}
+                disabled={status === "archived"}
                 type="button"
               >
                 Post response
               </button>
             </div>
 
-            {!isThreadOpen ? (
+            {status === "archived" ? (
               <p style={{ ...styles.helperText, margin: 0, color: "#0f172a" }}>
                 Replies are disabled for this {status} thread.
               </p>
@@ -1176,8 +1008,8 @@ const ClassDiscussionPage = () => {
           <div>
             <h2 style={styles.sectionTitle}>Class discussion</h2>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>
-              Anyone in your class (students + tutors) can create a timed discussion post. Replies update live, and
-              you can edit your own posts if you make mistakes.
+              Anyone in your class (students + tutors) can create a discussion post. Replies update live, and you can
+              edit your own posts if you make mistakes.
             </p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
               <span style={styles.badge}>Level: {studentProfile?.level || "(missing)"}</span>
@@ -1267,29 +1099,6 @@ const ClassDiscussionPage = () => {
               </div>
 
               <div style={styles.field}>
-                <label style={styles.label}>Timer</label>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <input
-                    type="number"
-                    min="0"
-                    step="1"
-                    style={{ ...styles.select, flex: 1 }}
-                    value={form.timerMinutes}
-                    onChange={(e) => handleFormChange("timerMinutes", e.target.value)}
-                  />
-                  <select
-                    value={form.timerUnit}
-                    onChange={(e) => handleFormChange("timerUnit", e.target.value)}
-                    style={{ ...styles.select, width: 140 }}
-                  >
-                    <option value="minutes">Minutes</option>
-                    <option value="hours">Hours</option>
-                    <option value="days">Days</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style={styles.field}>
                 <label style={styles.label}>Additional link (optional)</label>
                 <input
                   type="url"
@@ -1351,7 +1160,6 @@ const ClassDiscussionPage = () => {
               <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} style={styles.select}>
                 <option value="all">All statuses</option>
                 <option value="open">Open</option>
-                <option value="expired">Expired</option>
                 <option value="archived">Archived</option>
               </select>
               <select value={lessonFilter} onChange={(e) => setLessonFilter(e.target.value)} style={styles.select}>
