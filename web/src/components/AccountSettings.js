@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
-import { useToast } from "../context/ToastContext";
 import { styles } from "../styles";
-import { correctBiography } from "../services/profileService";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
@@ -23,8 +21,7 @@ const formatDate = (value) => {
 };
 
 const AccountSettings = () => {
-  const { user, studentProfile, idToken, saveStudentProfile } = useAuth();
-  const { showToast } = useToast();
+  const { user, studentProfile, saveStudentProfile } = useAuth();
   const { i18n, t } = useTranslation();
   const locale = i18n.language;
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -33,19 +30,8 @@ const AccountSettings = () => {
     [locale]
   );
   const paymentsEnabled = isPaymentsEnabled();
-  const [profile, setProfile] = useState({ biography: "" });
   const [status, setStatus] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const [isCorrectingBio, setIsCorrectingBio] = useState(false);
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
-  const [lastSavedAt, setLastSavedAt] = useState(null);
-
-  useEffect(() => {
-    setProfile((prev) => ({
-      ...prev,
-      biography: studentProfile?.biography || "",
-    }));
-  }, [studentProfile, user]);
 
   const billingSummary = useMemo(() => {
     const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
@@ -213,49 +199,6 @@ const AccountSettings = () => {
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    setIsSaving(true);
-    setStatus("");
-
-    saveStudentProfile({ biography: profile.biography.trim() })
-      .then(() => {
-        setLastSavedAt(new Date());
-        showToast(t("accountSettings.profile.bioSaved"), "success");
-      })
-      .catch((error) => {
-        const message = error instanceof Error ? error.message : t("accountSettings.profile.bioError");
-        setStatus(message);
-        showToast(message, "error");
-      })
-      .finally(() => setIsSaving(false));
-  };
-
-  const handleCorrectBiography = async () => {
-    const draft = profile.biography || "";
-    if (!draft.trim()) {
-      setStatus(t("accountSettings.profile.bioEmpty"));
-      return;
-    }
-
-    setIsCorrectingBio(true);
-    setStatus("");
-
-    try {
-      const { corrected } = await correctBiography({ text: draft, level: studentProfile?.level, idToken });
-      if (corrected) {
-        setProfile((prev) => ({ ...prev, biography: corrected }));
-        showToast(t("accountSettings.profile.bioAiApplied"), "success");
-      }
-    } catch (error) {
-      const message = error instanceof Error ? error.message : t("accountSettings.profile.bioCorrectError");
-      setStatus(message);
-      showToast(message, "error");
-    } finally {
-      setIsCorrectingBio(false);
-    }
-  };
-
   if (!studentProfile) {
     return <div style={styles.card}>{t("accountSettings.noProfile")}</div>;
   }
@@ -282,30 +225,9 @@ const AccountSettings = () => {
         <a href={supportMailTo} style={{ ...styles.secondaryButton, display: "inline-block", textDecoration: "none", marginBottom: 10 }}>
           {t("accountSettings.profile.requestChange")}
         </a>
-        <form onSubmit={handleSubmit} style={{ display: "grid", gap: 10 }}>
-          <label style={styles.label} htmlFor="biography">{t("accountSettings.profile.biographyLabel")}</label>
-          <textarea
-            id="biography"
-            style={styles.textArea}
-            value={profile.biography}
-            onChange={(event) => setProfile((prev) => ({ ...prev, biography: event.target.value }))}
-            placeholder={t("accountSettings.profile.biographyPlaceholder")}
-          />
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", flexWrap: "wrap" }}>
-            <button type="button" style={styles.secondaryButton} onClick={handleCorrectBiography} disabled={isCorrectingBio}>
-              {isCorrectingBio ? t("accountSettings.profile.correcting") : t("accountSettings.profile.correctCta")}
-            </button>
-            <button type="submit" style={styles.primaryButton} disabled={isSaving}>
-              {isSaving ? t("accountSettings.profile.saving") : t("accountSettings.profile.save")}
-            </button>
-          </div>
-          {lastSavedAt ? (
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              {t("accountSettings.profile.lastSaved", { time: lastSavedAt.toLocaleString(locale) })}
-            </p>
-          ) : null}
-          {status ? <div style={styles.errorBox}>{status}</div> : null}
-        </form>
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          Biography editing has moved to the Class Members tab so it is easier to find.
+        </p>
       </section>
 
       <section style={styles.card}>
