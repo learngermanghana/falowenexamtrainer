@@ -95,7 +95,7 @@ const A1Day1GreetingsWorkbookPage = () => {
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 1 Workbook · Greetings and Asking About Well-being</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 0.1</p>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Complete all sections on this single page. Submit your final answers in the submission area, not directly on this page.
+          Complete Teil 1 and submit only Teil 2 answers in the submission area (not directly on this page).
         </p>
       </div>
 
@@ -133,64 +133,9 @@ const A1Day1GreetingsWorkbookPage = () => {
         ))}
       </section>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Vocabulary List</h2>
-        <p style={{ margin: 0 }}><strong>Greetings (Begrüßungen):</strong></p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          1. Guten Morgen! - Good morning!<br />
-          2. Guten Tag! - Good day!<br />
-          3. Guten Abend! - Good evening!<br />
-          4. Gute Nacht! - Good night!<br />
-          5. Hallo! - Hello!<br />
-          6. Hi! - Hi!
-        </p>
-        <p style={{ margin: 0 }}><strong>Saying Goodbye (Verabschiedungen):</strong></p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          1. Auf Wiedersehen! - Goodbye! (formal)<br />
-          2. Tschüss! - Bye! (informal)<br />
-          3. Bis später! - See you later!<br />
-          4. Bis morgen! - See you tomorrow!<br />
-          5. Bis bald! - See you soon!<br />
-          6. Mach’s gut! - Take care!
-        </p>
-        <p style={{ margin: 0 }}><strong>Asking "How are you?" (Fragen nach dem Befinden):</strong></p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          1. Wie geht es dir? - How are you? (informal)<br />
-          2. Wie geht es Ihnen? - How are you? (formal)<br />
-          3. Wie geht&apos;s? - How&apos;s it going? (informal)<br />
-          4. Alles klar? - Everything okay?<br />
-          5. Wie läuft&apos;s? - How&apos;s it going?
-        </p>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 4 · Responses and Time of Day</h2>
-        <p style={{ margin: 0 }}><strong>Responding to "How are you?" (Antworten auf „Wie geht es dir?“):</strong></p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          1. Mir geht es gut. - I am good.<br />
-          2. Mir geht es schlecht. - I am bad.<br />
-          3. Ich bin müde. - I am tired.<br />
-          4. Ich bin glücklich. - I am happy.<br />
-          5. Ich bin ein bisschen müde. - I am a bit tired.<br />
-          6. Es geht. - It&apos;s going.<br />
-          7. Nicht so gut. - Not so well.
-        </p>
-        <p style={{ margin: 0 }}><strong>Time of Day (Tageszeiten):</strong></p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          1. der Morgen - the morning<br />
-          2. der Tag - the day<br />
-          3. der Abend - the evening<br />
-          4. die Nacht - the night<br />
-          5. der Nachmittag - the afternoon<br />
-          6. die Uhrzeit - the time of day<br />
-          7. die Stunde - the hour<br />
-          8. die Minute - the minute
-        </p>
-      </section>
-
       <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
         <p style={{ margin: 0, fontWeight: 600 }}>
-          When you finish, submit your answers in the submission area.
+          Assignment submission ends at Teil 2. When you finish, submit your Teil 2 answers in the submission area.
         </p>
         <a
           href="https://www.falowen.app/campus/submit"
