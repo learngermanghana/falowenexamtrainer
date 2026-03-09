@@ -478,7 +478,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/NmaHd9xsGvw",
         youtube_link: "https://youtu.be/NmaHd9xsGvw",
         grammarbook_link: "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
-        workbook_link: "https://drive.google.com/file/d/1wjtEyPphP0N7jLbF3AWb5wN_FuJZ5jUQ/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-1-greetings-workbook",
         assignment: true,
       },
     },
