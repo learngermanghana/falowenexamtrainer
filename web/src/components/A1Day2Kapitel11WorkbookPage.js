@@ -108,6 +108,14 @@ const A1Day2Kapitel11WorkbookPage = () => {
           Friend.
           <br />Listen to the audio and answer the questions below.
         </p>
+        <a
+          href="https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing"
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        >
+          Open Hören Material (Google Drive)
+        </a>
         {questions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>
             <strong>{question.stem}</strong>
@@ -117,21 +125,6 @@ const A1Day2Kapitel11WorkbookPage = () => {
             ))}
           </div>
         ))}
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
-        <a
-          href="https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete Hören from Google Drive, then return to submit answers.
-        </p>
       </section>
 
       <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
