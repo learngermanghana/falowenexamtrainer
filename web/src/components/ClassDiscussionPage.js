@@ -1329,8 +1329,8 @@ const ClassDiscussionPage = () => {
         ) : (
           <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              This read-only directory lists classmates in your level and class. They update their biographies from
-              the account page.
+              This directory lists classmates in your level and class. You can also update your own biography directly
+              from this tab.
             </p>
             <ClassMembersTab />
           </div>
