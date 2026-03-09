@@ -283,8 +283,8 @@ const LessonList = ({ title, lessons, t }) => {
                     </a>
                   </li>
                 ) : null}
-                <ResourceLinkRow label="Grammarbook" url={lesson.grammarbook_link} />
-                <ResourceLinkRow label="Workbook" url={lesson.workbook_link} />
+                <ResourceLinkRow label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
+                <ResourceLinkRow label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
               </ul>
             </details>
           </div>
@@ -775,6 +775,9 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 </option>
                               ))}
                             </select>
+                            <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 220 }}>
+                              Status is manually controlled — update your own progress here.
+                            </span>
                             {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
                             {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
                             {isTutorMarked ? (
