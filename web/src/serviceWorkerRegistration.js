@@ -1,6 +1,6 @@
 const SERVICE_WORKER_PATH = `${process.env.PUBLIC_URL || ""}/firebase-messaging-sw.js`;
 const FORCE_REFRESH_KEY = "app-last-force-refresh-at";
-const FORCE_REFRESH_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
+const FORCE_REFRESH_INTERVAL_MS = 24 * 60 * 60 * 1000;
 
 const getLastForceRefreshAt = () => {
   try {
