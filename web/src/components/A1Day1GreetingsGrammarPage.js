@@ -273,6 +273,23 @@ const A1Day1GreetingsGrammarPage = () => {
           <div>Auf Wiedersehen, Herr Müller.</div>
           <div>Tschüss, Anna!</div>
         </div>
+
+        <div style={infoCardStyle}>
+          <h3 style={{ margin: "0 0 8px 0" }}>Extra notes: Gute Nacht and Bis später</h3>
+          <p style={{ margin: 0 }}>
+            <strong>Gute Nacht</strong> means <strong>good night</strong>. Use it when someone is
+            going to bed or when it is late and you are ending the day.
+          </p>
+          <p style={{ margin: "8px 0 0 0" }}>
+            <strong>Bis später</strong> means <strong>see you later</strong>. Use it when you plan
+            to see the same person again later the same day.
+          </p>
+          <p style={{ margin: "8px 0 0 0", fontSize: 14 }}>
+            Grammar note: In German, nouns are capitalized, so <strong>Nacht</strong> starts with a
+            capital letter. The word <strong>später</strong> has an umlaut (ä). If you cannot type
+            ä, write <strong>spaeter</strong>.
+          </p>
+        </div>
       </section>
 
       <section style={cardStyle}>
@@ -332,6 +349,14 @@ const A1Day1GreetingsGrammarPage = () => {
           <div>Hallo, Tom! Wie geht’s?</div>
           <div>Hallo, Anna! Wie geht es dir?</div>
           <div>Guten Tag, Frau Müller! Wie geht es Ihnen?</div>
+        </div>
+
+        <div style={practiceBoxStyle}>
+          <strong>Common mistakes and correct forms</strong>
+          <div>❌ Wie geht es du? → ✅ <strong>Wie geht es dir?</strong></div>
+          <div>❌ Wie geht Ihnen? → ✅ <strong>Wie geht es Ihnen?</strong></div>
+          <div>❌ guten nacht → ✅ <strong>Gute Nacht</strong></div>
+          <div>❌ bis spater / bis später! (random capitalization) → ✅ <strong>Bis später.</strong></div>
         </div>
       </section>
 
