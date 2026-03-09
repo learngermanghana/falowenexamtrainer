@@ -2,11 +2,11 @@ import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
-const sectionStyle = { ...styles.card, display: "grid", gap: 10 };
+const sectionStyle = { ...styles.card, display: "grid", gap: 12 };
 
 const chipStyle = {
   display: "inline-block",
-  padding: "4px 8px",
+  padding: "6px 10px",
   borderRadius: 999,
   background: "#eef2ff",
   border: "1px solid #c7d2fe",
@@ -14,381 +14,367 @@ const chipStyle = {
   fontWeight: 700,
 };
 
-const ImageBreak = ({ src, alt, title, subtitle }) => (
+const softBox = {
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: 12,
+  background: "#f8fafc",
+};
+
+const promptBox = {
+  border: "1px solid #dbeafe",
+  borderRadius: 12,
+  padding: 12,
+  background: "#eff6ff",
+};
+
+const answerBox = {
+  border: "1px dashed #cbd5e1",
+  borderRadius: 12,
+  padding: 12,
+  minHeight: 70,
+};
+
+const heroSrc =
+  "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1400&q=80";
+
+const ImageBreak = ({ src, title, subtitle }) => (
   <div style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
     <img
       src={src}
-      alt={alt}
-      loading="lazy"
+      alt=""
       style={{
         width: "100%",
-        height: "clamp(160px, 22vw, 220px)",
+        height: "clamp(220px,30vw,340px)",
         objectFit: "cover",
-        display: "block",
       }}
     />
-    {(title || subtitle) && (
-      <div style={{ padding: 12, display: "grid", gap: 4 }}>
-        {title && <div style={{ fontWeight: 900 }}>{title}</div>}
-        {subtitle && <div style={{ opacity: 0.85 }}>{subtitle}</div>}
-      </div>
-    )}
-  </div>
-);
-
-const RuleCard = ({ title, rule, example, children }) => (
-  <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#f8fafc" }}>
-    <div style={{ fontWeight: 900, marginBottom: 8 }}>{title}</div>
-    <div style={{ display: "grid", gap: 6 }}>
-      <div>
-        <strong>Rule:</strong> {rule}
-      </div>
-      <div>
-        <strong>Example:</strong> <em>{example}</em>
-      </div>
-      {children ? <div style={{ marginTop: 6 }}>{children}</div> : null}
+    <div style={{ padding: 14 }}>
+      <strong>{title}</strong>
+      <div>{subtitle}</div>
     </div>
   </div>
 );
 
-const TableScroll = ({ caption, children }) => (
+const TableScroll = ({ children }) => (
   <div style={{ overflowX: "auto" }}>
-    <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 520 }}>
-      <caption style={{ textAlign: "left", paddingBottom: 8, fontWeight: 800 }}>{caption}</caption>
-      {children}
-    </table>
+    <table style={{ borderCollapse: "collapse", width: "100%" }}>{children}</table>
   </div>
 );
 
-const IMG_GRAMMAR = "/grammar/past-tense-haben.svg";
-const IMG_MAP = "/grammar/directions-german.svg";
+const th = {
+  border: "1px solid #d1d5db",
+  padding: 8,
+  background: "#f9fafb",
+};
+
+const td = {
+  border: "1px solid #d1d5db",
+  padding: 8,
+};
 
 const FormingBasicStatementsPage = () => {
   const navigate = useNavigate();
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
+      <header style={{ ...styles.card }}>
+        <button
+          style={{ ...styles.secondaryButton }}
+          onClick={() => navigate("/campus/course")}
+        >
           Back to Course
         </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Forming Basic Statements in German (A1)</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>Day 8 Grammar: Countries and Languages (Chapter 4)</p>
+
+        <h1>A1 Practice Book – Cities, Countries and Direction</h1>
+        <p>Day 8 focus: location, movement and Präteritum.</p>
       </header>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Lesson at a glance</h2>
-        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-          <li>You can ask about travel experience with <strong>schon mal</strong> and <strong>noch nie</strong>.</li>
-          <li>You can say where a city is with <strong>liegen</strong>.</li>
-          <li>You can choose between <strong>wo</strong>, <strong>woher</strong>, and <strong>wohin</strong>.</li>
-          <li>You can use key irregular verbs in short A1 statements.</li>
-          <li>You can distinguish <strong>man</strong> (pronoun) and <strong>Mann</strong> (noun).</li>
-        </ul>
-      </section>
+      <ImageBreak
+        src={heroSrc}
+        title="Today's focus: Präteritum"
+        subtitle="We compare present and past forms and practise direction questions."
+      />
 
-      <ImageBreak src={IMG_GRAMMAR} alt="Past tense haben conjugation" title="Grammar Notes" subtitle="Important A1 grammar points for day 8." />
+      {/* TENSES */}
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Grammar Focus (important information)</h2>
-        <p style={{ margin: 0 }}>
-          <strong>schon mal, noch nie; irregular verbs; man vs Mann.</strong>
-        </p>
-        <RuleCard title="Core sentence pattern" rule="Subject + Verb + Information." example="Ich war gestern krank." />
-      </section>
+        <h2>German Tenses</h2>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Past Tense for haben and sein (Präteritum)</h2>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        <div style={{ display: "flex", gap: 6 }}>
           <span style={chipStyle}>Präsens</span>
           <span style={chipStyle}>Perfekt</span>
           <span style={chipStyle}>Präteritum</span>
           <span style={chipStyle}>Futur</span>
         </div>
 
-        <RuleCard
-          title="Must memorize"
-          rule="sein/haben in Präteritum are very common in speaking."
-          example="Ich war in Berlin. / Ich hatte keinen Stadtplan."
-        >
-          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-            <li>
-              <strong>haben:</strong> ich hatte, du hattest, er/sie/es hatte, wir hatten, ihr hattet, sie/Sie hatten
-            </li>
-            <li>
-              <strong>sein:</strong> ich war, du warst, er/sie/es war, wir waren, ihr wart, sie/Sie waren
-            </li>
+        <TableScroll>
+          <thead>
+            <tr>
+              <th style={th}>German</th>
+              <th style={th}>English</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={td}>Präsens</td>
+              <td style={td}>Present</td>
+            </tr>
+            <tr>
+              <td style={td}>Perfekt</td>
+              <td style={td}>Present Perfect</td>
+            </tr>
+            <tr>
+              <td style={td}>Präteritum</td>
+              <td style={td}>Simple Past</td>
+            </tr>
+            <tr>
+              <td style={td}>Futur</td>
+              <td style={td}>Future</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+
+        <div style={softBox}>
+          Today we focus on <strong>Präteritum</strong>.
+        </div>
+      </section>
+
+      {/* HABEN SEIN */}
+
+      <section style={sectionStyle}>
+        <h2>sein / haben present vs past</h2>
+
+        <TableScroll>
+          <thead>
+            <tr>
+              <th style={th}>Pronoun</th>
+              <th style={th}>sein (present)</th>
+              <th style={th}>sein (past)</th>
+              <th style={th}>haben (present)</th>
+              <th style={th}>haben (past)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={td}>ich</td>
+              <td style={td}>bin</td>
+              <td style={td}>war</td>
+              <td style={td}>habe</td>
+              <td style={td}>hatte</td>
+            </tr>
+            <tr>
+              <td style={td}>du</td>
+              <td style={td}>bist</td>
+              <td style={td}>warst</td>
+              <td style={td}>hast</td>
+              <td style={td}>hattest</td>
+            </tr>
+            <tr>
+              <td style={td}>er/sie/es</td>
+              <td style={td}>ist</td>
+              <td style={td}>war</td>
+              <td style={td}>hat</td>
+              <td style={td}>hatte</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+      </section>
+
+      {/* LIEGEN */}
+
+      <section style={sectionStyle}>
+        <h2>liegen (city location)</h2>
+
+        <div style={softBox}>
+          Directions:
+          <ul>
+            <li>Osten = East</li>
+            <li>Westen = West</li>
+            <li>Süden = South</li>
+            <li>Norden = North</li>
           </ul>
-        </RuleCard>
-
-        <RuleCard
-          title="schon mal + noch nie"
-          rule="Use war + schon mal / noch nie for life experience."
-          example="Bist du schon mal in Deutschland gewesen? – Ja, ich war schon mal in Deutschland."
-        >
-          <div style={{ padding: 8, borderRadius: 8, background: "#eef6ff", border: "1px solid #bfdbfe" }}>
-            <strong>Tip:</strong> The question is often in <strong>Perfekt</strong> (<em>Bist du ... gewesen?</em>), while short spoken answers often use <strong>war</strong>.
-          </div>
-        </RuleCard>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>schon mal and noch nie</h2>
-
-        <RuleCard
-          title="Meaning"
-          rule="schon mal = at least once before | noch nie = never until now"
-          example="Warst du schon mal in Accra? – Ja, ich war schon mal in Accra."
-        />
-
-        <TableScroll caption="Copy patterns (A1)">
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Warst du schon mal in ...?</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ja, ich war schon mal in ... .</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Nein, ich war noch nie in ... .</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-
-        <TableScroll caption="Exam phrases with meaning (German + English)">
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Warst du schon mal in Deutschland?</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Have you ever been to Germany?</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Ja, ich war schon mal in Deutschland.</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Yes, I have been to Germany before.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Nein, ich war noch nie in Deutschland.</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>No, I have never been to Germany.</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-
-        <RuleCard title="Try now (2 prompts)" rule="Answer with your own country/city." example="Warst du schon mal in Berlin?">
-          <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
-            <li>Write one <strong>Ja</strong>-answer with <em>schon mal</em>.</li>
-            <li>Write one <strong>Nein</strong>-answer with <em>noch nie</em>.</li>
-          </ol>
-        </RuleCard>
-      </section>
-
-      <ImageBreak src={IMG_MAP} alt="Map" title="3) liegen (city location)" subtitle="Where is the city located?" />
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Location Statements with liegen</h2>
-
-        <RuleCard title="liegen" rule="liegen = to be located (a city)." example="Berlin liegt im Osten von Deutschland." />
-
-        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-          <li>Berlin liegt im Osten von Deutschland.</li>
-          <li>Köln liegt im Westen von Deutschland.</li>
-          <li>München liegt im Süden von Deutschland.</li>
-          <li>Hamburg liegt im Norden von Deutschland.</li>
-        </ul>
-
-        <TableScroll caption="Location exam phrases with translation">
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo liegt Berlin?</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where is Berlin located?</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Berlin liegt im Osten von Deutschland.</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Berlin is in the east of Germany.</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>wo, woher, wohin</h2>
-
-        <RuleCard title="3 questions" rule="wo = location | woher = origin | wohin = direction" example="Wohin fährst du? – Ich fahre nach Berlin." />
-
-        <TableScroll caption="Useful patterns">
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo</strong> bist du? – Ich bin in der Schule.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you? – I am at school.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin</strong> fährst du? – Ich fahre nach Berlin.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you going (by vehicle)? – I am going to Berlin.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin</strong> fliegst du? – Ich fliege nach Deutschland.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you flying to? – I am flying to Germany.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher</strong> kommst du? – Ich komme aus der Schweiz.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you from? – I come from Switzerland.</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-
-        <TableScroll caption="Exam question phrases with translation">
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo wohnst du?</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where do you live?</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher kommst du?</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you from?</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wohin gehst du heute?</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Where are you going today?</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-
-        <RuleCard
-          title="nach vs in (A1)"
-          rule="nach for no-article countries/cities. in + article for exceptions."
-          example="nach Ghana / nach Berlin — but in die Schweiz, in die USA"
-        />
-
-        <TableScroll caption="Countries with and without articles (direction: wohin?)">
-          <thead>
-            <tr>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>No article → <em>nach</em></th>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>With article → <em>in + article (accusative)</em></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich fliege <strong>nach Deutschland</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich fliege <strong>in die Schweiz</strong>.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Wir fahren <strong>nach Italien</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Wir reisen <strong>in die USA</strong>.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Sie fährt <strong>nach Ghana</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Er fährt <strong>in den Iran</strong>.</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Ich reise <strong>nach Spanien</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>Wir fahren <strong>in die Türkei</strong>.</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-
-        <TableScroll caption="Origin (woher?) and location (wo?) with article countries">
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher</strong> kommst du? – Ich komme <strong>aus der Schweiz</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>origin: from Switzerland</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo</strong> wohnst du? – Ich wohne <strong>in der Schweiz</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>location: in Switzerland</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Woher</strong> kommt ihr? – Wir kommen <strong>aus den USA</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>origin: from the USA</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Wo</strong> seid ihr? – Wir sind <strong>in den USA</strong>.</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>location: in the USA</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Irregular Verbs with Vowel Change</h2>
-
-        <RuleCard title="Easy rule" rule="Many vowel changes happen in du + er/sie/es." example="fahren: du fährst, er fährt" />
-
-        <TableScroll caption="Full conjugation (mobile-friendly view)">
-          <thead>
-            <tr>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>Verb</th>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>ich / wir / ihr / sie(Sie)</th>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>du</th>
-              <th style={{ border: "1px solid #d1d5db", padding: 8, textAlign: "left" }}>er/sie/es</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>nehmen</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>nehme / nehmen / nehmt / nehmen</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>nimmst</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>nimmt</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>sprechen</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>spreche / sprechen / sprecht / sprechen</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>sprichst</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>spricht</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>essen</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>esse / essen / esst / essen</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>isst</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>isst</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>fahren</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>fahre / fahren / fahrt / fahren</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>fährst</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>fährt</td>
-            </tr>
-            <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>laufen</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>laufe / laufen / lauft / laufen</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>läufst</td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>läuft</td>
-            </tr>
-          </tbody>
-        </TableScroll>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>man vs Mann</h2>
-
-        <div style={{ border: "1px solid #fecaca", background: "#fff1f2", borderLeft: "6px solid #ef4444", borderRadius: 10, padding: 12 }}>
-          <strong>Common mistakes:</strong> <em>man</em> is a pronoun (lowercase), but <em>Mann</em> is a noun (capitalized).<br />
-          Correction: <strong>Man spricht hier Deutsch.</strong> (not <strong>Mann spricht hier Deutsch.</strong>)
         </div>
 
-        <RuleCard title="Difference" rule="man = people in general | Mann = a man (noun)" example="Man kann hier gut essen. / Der Mann ist Lehrer." />
-
-        <TableScroll caption="A1 exam phrases with translation">
+        <TableScroll>
           <tbody>
             <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Man spricht hier Deutsch.</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>People speak German here.</td>
+              <td style={td}>Berlin liegt im Osten von Deutschland.</td>
+              <td style={td}>Berlin is in the east of Germany.</td>
             </tr>
             <tr>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}><strong>Der Mann heißt Simon.</strong></td>
-              <td style={{ border: "1px solid #d1d5db", padding: 8 }}>The man's name is Simon.</td>
+              <td style={td}>Hamburg liegt im Norden von Deutschland.</td>
+              <td style={td}>Hamburg is in the north of Germany.</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+      </section>
+
+      {/* WO WOHER WOHIN */}
+
+      <section style={sectionStyle}>
+        <h2>wo / woher / wohin</h2>
+
+        <TableScroll>
+          <thead>
+            <tr>
+              <th style={th}>Word</th>
+              <th style={th}>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={td}>wo</td>
+              <td style={td}>where (location)</td>
+            </tr>
+            <tr>
+              <td style={td}>woher</td>
+              <td style={td}>where from</td>
+            </tr>
+            <tr>
+              <td style={td}>wohin</td>
+              <td style={td}>where to</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+      </section>
+
+      {/* NACH VS IN */}
+
+      <section style={sectionStyle}>
+        <h2>nach vs in</h2>
+
+        <div style={softBox}>
+          Use <strong>nach</strong> for countries with no article.
+          <br />
+          Use <strong>in + article</strong> for countries with article.
+        </div>
+
+        <TableScroll>
+          <thead>
+            <tr>
+              <th style={th}>nach</th>
+              <th style={th}>in + article</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={td}>nach Deutschland</td>
+              <td style={td}>in die Schweiz</td>
+            </tr>
+            <tr>
+              <td style={td}>nach Ghana</td>
+              <td style={td}>in die USA</td>
+            </tr>
+            <tr>
+              <td style={td}>nach Italien</td>
+              <td style={td}>in den Iran</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+      </section>
+
+      {/* IRREGULAR */}
+
+      <section style={sectionStyle}>
+        <h2>Irregular verbs with vowel change</h2>
+
+        <div style={softBox}>
+          German vowels: <strong>a, e, i, o, u</strong>
+        </div>
+
+        <TableScroll>
+          <thead>
+            <tr>
+              <th style={th}>Verb</th>
+              <th style={th}>ich</th>
+              <th style={th}>du</th>
+              <th style={th}>er/sie/es</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={td}>fahren</td>
+              <td style={td}>fahre</td>
+              <td style={td}>fährst</td>
+              <td style={td}>fährt</td>
+            </tr>
+            <tr>
+              <td style={td}>sprechen</td>
+              <td style={td}>spreche</td>
+              <td style={td}>sprichst</td>
+              <td style={td}>spricht</td>
+            </tr>
+            <tr>
+              <td style={td}>essen</td>
+              <td style={td}>esse</td>
+              <td style={td}>isst</td>
+              <td style={td}>isst</td>
+            </tr>
+          </tbody>
+        </TableScroll>
+      </section>
+
+      {/* MAN VS MANN */}
+
+      <section style={sectionStyle}>
+        <h2>man vs Mann</h2>
+
+        <div
+          style={{
+            border: "1px solid #fecaca",
+            background: "#fff1f2",
+            borderLeft: "6px solid #ef4444",
+            padding: 12,
+          }}
+        >
+          <strong>Common mistakes:</strong> man is a pronoun (lowercase), but Mann is a noun
+          (capitalized). <br />
+          Correction: <strong>Man spricht hier Deutsch.</strong> (not Mann spricht hier Deutsch.)
+        </div>
+
+        <div style={softBox}>
+          Rule: <strong>man</strong> = people in general | <strong>Mann</strong> = a man
+        </div>
+
+        <TableScroll>
+          <tbody>
+            <tr>
+              <td style={td}>Man spricht hier Deutsch.</td>
+              <td style={td}>People speak German here.</td>
+            </tr>
+            <tr>
+              <td style={td}>Der Mann heißt Simon.</td>
+              <td style={td}>The man's name is Simon.</td>
             </tr>
           </tbody>
         </TableScroll>
 
-        <TableScroll caption="Conjugation with man (using essen)">
+        <TableScroll>
           <tbody>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>ich esse</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>du isst</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>er/sie/es/man isst</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>wir essen</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>ihr esst</td></tr>
-            <tr><td style={{ border: "1px solid #d1d5db", padding: 8 }}>sie/Sie essen</td></tr>
+            <tr><td style={td}>ich esse</td></tr>
+            <tr><td style={td}>du isst</td></tr>
+            <tr><td style={td}>er/sie/es/man isst</td></tr>
+            <tr><td style={td}>wir essen</td></tr>
+            <tr><td style={td}>ihr esst</td></tr>
+            <tr><td style={td}>sie/Sie essen</td></tr>
           </tbody>
         </TableScroll>
+      </section>
+
+      {/* FINAL PRACTICE */}
+
+      <section style={sectionStyle}>
+        <h2>Practice</h2>
+
+        <div style={promptBox}>Wo liegt Berlin?</div>
+        <div style={answerBox}></div>
+
+        <div style={promptBox}>Woher kommst du?</div>
+        <div style={answerBox}></div>
+
+        <div style={promptBox}>Wohin gehst du morgen?</div>
+        <div style={answerBox}></div>
       </section>
     </main>
   );
