@@ -37,11 +37,10 @@ const minutesFromValue = (value, unit) => (Number(value) || 0) * getUnitMultipli
 const valueFromMinutes = (minutes, unit) =>
   (Number(minutes) || 0) / Math.max(1, getUnitMultiplier(unit));
 
-const formatTimeRemaining = (expiresAt, now, timerMinutes = 0) => {
+const formatTimeRemaining = (expiresAt, now) => {
   if (!expiresAt) return "No timer";
-  const configuredDurationMs = Math.max(0, Number(timerMinutes) || 0) * 60000;
   const rawDiff = Math.max(0, expiresAt - now);
-  const diff = configuredDurationMs > 0 ? Math.min(rawDiff, configuredDurationMs) : rawDiff;
+  const diff = rawDiff;
   const totalSeconds = Math.floor(diff / 1000);
   const days = Math.floor(totalSeconds / 86400);
   const hours = Math.floor((totalSeconds % 86400) / 3600);
@@ -334,8 +333,10 @@ const ClassDiscussionPage = () => {
     (thread) => {
       if (!thread) return "open";
       if (thread.status === "archived") return "archived";
+      if (thread.expiresAt) {
+        return thread.expiresAt <= now ? "expired" : "open";
+      }
       if (thread.status === "expired") return "expired";
-      if (thread.expiresAt && thread.expiresAt <= now) return "expired";
       return "open";
     },
     [now]
@@ -779,7 +780,7 @@ const ClassDiscussionPage = () => {
         : status === "expired"
         ? "Expired"
         : thread.expiresAt
-        ? `Time left ${formatTimeRemaining(thread.expiresAt, now, thread.timerMinutes)}`
+        ? `Time left ${formatTimeRemaining(thread.expiresAt, now)}`
         : "No timer set";
 
     const statusBadgeStyle = {
