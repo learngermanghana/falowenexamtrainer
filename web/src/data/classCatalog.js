@@ -48,7 +48,8 @@ const classCatalogDictionary = {
       { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
       { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
-    docId: "1qhXA0dw6ULuo1_IlUtnPTgMAwhVNiLRl",
+    docUrl:
+      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-03-09&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "A1 Koln Klasse": {
     startDate: "2026-04-15",
@@ -106,7 +107,7 @@ export const classCatalog = Object.fromEntries(
     className,
     {
       ...details,
-      docUrl: buildClassDocUrl(details.docId),
+      docUrl: details.docUrl || buildClassDocUrl(details.docId),
     },
   ])
 );
