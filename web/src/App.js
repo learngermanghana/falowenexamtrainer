@@ -923,18 +923,45 @@ const ExamArea = ({ onBack }) => {
     { key: "file", label: t("appNav.examTabs.file") },
   ];
 
-  const examHeroSections = new Set(["tutor", "lesen", "writing", "vocab", "horen", "resources", "study", "file"]);
-  const showExamHero = examHeroSections.has(examSection);
-  const examHeroLabels = {
-    tutor: t("appNav.examTabs.tutor"),
-    lesen: t("appNav.examTabs.lesen"),
-    writing: t("appNav.examTabs.writing"),
-    vocab: t("appNav.examTabs.vocab"),
-    horen: t("appNav.examTabs.horen"),
-    resources: t("appNav.examTabs.resources"),
-    study: t("appNav.examTabs.study"),
-    file: t("appNav.examTabs.file"),
+  const examHeroConfig = {
+    tutor: {
+      label: t("appNav.examTabs.tutor"),
+      image: "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    lesen: {
+      label: t("appNav.examTabs.lesen"),
+      image: "https://images.pexels.com/photos/590493/pexels-photo-590493.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    speaking: {
+      label: t("appNav.examTabs.speaking"),
+      image: "https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    writing: {
+      label: t("appNav.examTabs.writing"),
+      image: "https://images.pexels.com/photos/4050315/pexels-photo-4050315.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    vocab: {
+      label: t("appNav.examTabs.vocab"),
+      image: "https://images.pexels.com/photos/267669/pexels-photo-267669.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    horen: {
+      label: t("appNav.examTabs.horen"),
+      image: "https://images.pexels.com/photos/164938/pexels-photo-164938.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    resources: {
+      label: t("appNav.examTabs.resources"),
+      image: "https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    study: {
+      label: t("appNav.examTabs.study"),
+      image: "https://images.pexels.com/photos/8197543/pexels-photo-8197543.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
+    file: {
+      label: t("appNav.examTabs.file"),
+      image: "https://images.pexels.com/photos/1005324/pexels-photo-1005324.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
+    },
   };
+  const activeExamHero = examHeroConfig[examSection];
 
   return (
     <>
@@ -987,7 +1014,7 @@ const ExamArea = ({ onBack }) => {
           </div>
         </div>
 
-        {showExamHero ? (
+        {activeExamHero ? (
           <section
             style={{
               ...styles.card,
@@ -998,17 +1025,17 @@ const ExamArea = ({ onBack }) => {
               gap: 4,
               color: "#ffffff",
               backgroundImage:
-                "linear-gradient(115deg, rgba(15, 23, 42, 0.8), rgba(29, 78, 216, 0.56)), url('/learning-space-hero.svg')",
+                `linear-gradient(115deg, rgba(15, 23, 42, 0.8), rgba(29, 78, 216, 0.56)), url(${activeExamHero.image})`,
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}
             role="img"
-            aria-label={`${examHeroLabels[examSection]} hero banner`}
+            aria-label={`${activeExamHero.label} hero banner`}
           >
             <p style={{ margin: 0, fontSize: 12, fontWeight: 700, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.92 }}>
               Falowen Exam Coach
             </p>
-            <h2 style={{ margin: 0 }}>{examHeroLabels[examSection]}</h2>
+            <h2 style={{ margin: 0 }}>{activeExamHero.label}</h2>
           </section>
         ) : null}
       </div>
