@@ -817,6 +817,11 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
       ? `EXAM TASK CARD: ${question}`
       : "EXAM TASK CARD: not provided; infer from transcript and Teil.";
 
+  const keywordPriorityRule =
+    targetLevel === "A1" && teilNumber === "2"
+      ? "A1 Teil 2 priority: if Keyword/Subtopic exists, evaluate question formation against the keyword/subtopic first (not only the broad topic title)."
+      : "";
+
   const partRulesByLevel = {
     A1: [
       "A1 GOETHE CHECKS:",
@@ -859,6 +864,7 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
     context,
     interaction,
     taskCard,
+    keywordPriorityRule,
     partRules,
     "OUTPUT FORMAT (plain text, concise):",
     "1) Scores: Pronunciation, Grammar, Vocabulary, Fluency, Task achievement (0-25 each) and Overall (0-100).",
