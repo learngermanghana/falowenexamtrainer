@@ -548,7 +548,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/lN7xxSbkPZ4",
         youtube_link: "https://youtu.be/lN7xxSbkPZ4",
         grammarbook_link: "https://www.falowen.app/campus/course/german-numbers-1-10-with-pronunciation",
-        workbook_link: "https://drive.google.com/file/d/1C4VZDUj7VT27Qrn9vS5MNc3QfRqpmDGE/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-4-numbers-for-beginners-workbook",
         assignment: true,
       },
     },
