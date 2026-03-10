@@ -211,7 +211,13 @@ const AssignmentSubmissionPage = () => {
         const chapter = dictionaryEntry?.chapter || lesson?.chapter || entry.chapter || "";
         const chapterSuffix = chapter ? ` • Chapter ${chapter}` : "";
         const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
-        const topicTitle = dictionaryEntry?.en || lesson?.topic || entry.topic;
+        const prefersEnglishTitle = preferredLevel === "A1";
+        const topicTitle =
+          (prefersEnglishTitle ? dictionaryEntry?.en : dictionaryEntry?.de) ||
+          dictionaryEntry?.en ||
+          dictionaryEntry?.de ||
+          lesson?.topic ||
+          entry.topic;
         const label = `Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}`;
 
         return {
