@@ -166,24 +166,27 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we practice vocabulary for <strong>furniture and rooms</strong> and use two-case prepositions to
-            describe positions and movement.
+            In this chapter, we practice vocabulary for furniture and rooms and use two-case prepositions to describe
+            positions and movement.
           </p>
 
-          <h3 style={sectionTitle}>Zentrales Thema: Möbel und Räume</h3>
-          <ul style={listSpacing}>
-            <li>Describe rooms: Wohnzimmer, Schlafzimmer, Küche, Bad, Flur.</li>
-            <li>Identify furniture: Sofa, Tisch, Stuhl, Schrank, Bett, Regal, Lampe, Teppich.</li>
-            <li>Use two-case prepositions with <strong>Wo?</strong> (Dativ) and <strong>Wohin?</strong> (Akkusativ).</li>
-          </ul>
+          <h3 style={sectionTitle}>Zentrales Thema</h3>
+          <p style={{ margin: 0 }}>
+            <strong>Möbel und Räume</strong>
+          </p>
 
-          <h3 style={sectionTitle}>Diskussionsfragen (A2)</h3>
-          <ul style={listSpacing}>
-            <li>Welche Möbel hast du in deinem Wohnzimmer?</li>
-            <li>Wo steht dein Bett?</li>
-            <li>Wohin stellst du den Stuhl?</li>
-            <li>Was hängt an der Wand in deinem Zimmer?</li>
-          </ul>
+          <h3 style={sectionTitle}>Hauptäste</h3>
+          <ol style={listSpacing}>
+            <li>Zimmer benennen (Wohnzimmer, Schlafzimmer, Küche, Bad).</li>
+            <li>Möbel beschreiben (Sofa, Tisch, Stuhl, Bett, Regal, Lampe).</li>
+            <li>Position sagen mit <strong>Wo?</strong> + Dativ.</li>
+            <li>Bewegung sagen mit <strong>Wohin?</strong> + Akkusativ.</li>
+          </ol>
+
+          <h3 style={sectionTitle}>Frage des Tages</h3>
+          <p style={{ margin: 0 }}>
+            <strong>Wie sieht dein Zimmer aus und wohin stellst du ein neues Möbelstück?</strong>
+          </p>
 
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Speaking self-practice confidence check</strong>

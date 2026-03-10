@@ -513,7 +513,7 @@ const courseSchedules = {
         chapter: "1.1",
         video: "https://youtu.be/hEe6rs0lkRg",
         youtube_link: "https://youtu.be/hEe6rs0lkRg",
-        workbook_link: "https://drive.google.com/file/d/1GXWzy3cvbl_goP4-ymFuYDtX4X23D70j/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
         assignment: false,
       },
       lesen_hören: [
