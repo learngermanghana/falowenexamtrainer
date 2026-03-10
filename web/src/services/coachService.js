@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { app } from "../firebase";
-import { speakingSheetQuestions } from "../data/speakingSheet";
+import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import { writingLetters as writingSheetLetters } from "../data/writingLetters";
 import { getBackendUrl, getSpeakingApiUrl } from "./backendUrl";
 
@@ -187,7 +187,7 @@ export const fetchSpeakingQuestions = async (level, teil, idToken) => {
   const normalizedLevel = (level || "").toUpperCase();
   const normalizedTeil = (teil || "").toLowerCase();
 
-  const filtered = speakingSheetQuestions.filter((question) => {
+  const filtered = speakingQuestionDictionary.filter((question) => {
     const matchesLevel = normalizedLevel ? question.level === normalizedLevel : true;
     const matchesTeil = normalizedTeil
       ? question.teilLabel?.toLowerCase() === normalizedTeil || question.teilId?.toLowerCase() === normalizedTeil
@@ -201,11 +201,11 @@ export const fetchSpeakingQuestions = async (level, teil, idToken) => {
 
   // fallback: return all questions for the level or the full list
   if (normalizedLevel) {
-    const levelOnly = speakingSheetQuestions.filter((question) => question.level === normalizedLevel);
+    const levelOnly = speakingQuestionDictionary.filter((question) => question.level === normalizedLevel);
     if (levelOnly.length) return levelOnly;
   }
 
-  return speakingSheetQuestions;
+  return speakingQuestionDictionary;
 };
 
 export const fetchWritingLetters = async (level, idToken) => {
