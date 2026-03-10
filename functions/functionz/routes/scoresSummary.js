@@ -164,6 +164,13 @@ const extractCanonicalIdentifiers = (value = "", level = "") => {
   return Array.from(new Set([...fromPrefixed, ...fromNumeric]));
 };
 
+const hasSpecificIdentifierHint = (value = "") => {
+  const text = String(value || "");
+  if (/\bchapter\b/i.test(text)) return true;
+  if (/\b(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?\b/i.test(text)) return true;
+  return /\d+\.\d+/.test(text);
+};
+
 // Prefer identifiers that exist in the planned schedule; prefer the LAST planned match in the string.
 const pickIdentifierFromText = (assignmentText, plannedSet) => {
   const levelMatch = Array.from(plannedSet)[0]?.split("-")?.[0] || "";
@@ -375,13 +382,20 @@ const scoresSummaryHandler = async (req, res) => {
     const get = (row, i) => (i >= 0 && i < row.length ? String(row[i] || "").trim() : "");
     const resolveIdentifier = (row) => {
       const explicitId = get(row, idx.assignmentId);
+      const assignmentText = get(row, idx.assignment);
+      const fromAssignment = pickIdentifierFromText(assignmentText, plannedSet);
+
       if (explicitId && plannedSet.has(String(explicitId).toUpperCase())) {
         return String(explicitId).toUpperCase();
       }
 
+      if (fromAssignment && hasSpecificIdentifierHint(assignmentText)) {
+        return fromAssignment;
+      }
+
       const fromExplicit = pickIdentifierFromText(explicitId, plannedSet);
       if (fromExplicit) return fromExplicit;
-      return pickIdentifierFromText(get(row, idx.assignment), plannedSet);
+      return fromAssignment;
     };
 
     const leaderboardEntries = new Map();
