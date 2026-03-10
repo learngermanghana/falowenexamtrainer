@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { updatePageMeta } from "../lib/pageMeta";
 import { styles } from "../styles";
 
 const cardStyle = {
@@ -108,6 +109,13 @@ const listeningBoxStyle = {
 const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    updatePageMeta({
+      title: "A1 · Day 2 Workbook · German Alphabet + Reviewing",
+      canonicalPath: "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
+    });
+  }, []);
+
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
@@ -119,7 +127,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
         </button>
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 3 Workbook · German Alphabet + Reviewing
+          A1 · Day 2 Workbook · German Alphabet + Reviewing
         </h1>
 
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 0.2</p>

@@ -568,6 +568,10 @@ const AppShell = ({
           <Route path="/campus/course/a1-day-1-greetings-workbook" element={<A1Day1GreetingsWorkbookPage />} />
           <Route path="/campus/course/a1-day-2-kapitel-1-1-workbook" element={<A1Day2Kapitel11WorkbookPage />} />
           <Route
+            path="/campus/course/a1-day-2-german-alphabet-reviewing-workbook"
+            element={<A1Day3GermanAlphabetReviewingWorkbookPage />}
+          />
+          <Route
             path="/campus/course/a1-day-3-german-alphabet-reviewing-workbook"
             element={<A1Day3GermanAlphabetReviewingWorkbookPage />}
           />
