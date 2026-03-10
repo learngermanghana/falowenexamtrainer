@@ -40,6 +40,14 @@ const formatTime = (seconds = 0) => {
   return `${mm}:${ss}`;
 };
 
+
+const formatQuestionDisplay = (question) => {
+  if (!question) return "";
+  const keyword = String(question.keywordSubtopic || "").trim();
+  if (!keyword) return `${question.teilLabel} • ${question.topicPrompt}`;
+  return `${question.teilLabel} • ${question.topicPrompt} (Keyword: ${keyword})`;
+};
+
 const formatClock = (date) =>
   new Date(date).toLocaleTimeString([], {
     hour: "numeric",
@@ -266,7 +274,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
         text: `${promptHeader}\n\nStudent answer:\n${trimmed}`,
         teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
         level: selectedLevel,
-        question: selectedQuestion.topicPrompt || "",
+        question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
         idToken,
       });
       const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
@@ -326,7 +334,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
             audioBlob: blob,
             teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
             level: selectedLevel,
-            question: selectedQuestion.topicPrompt || "",
+            question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
             userId,
             idToken,
           });
@@ -500,7 +508,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
               <select style={styles.select} value={selectedQuestionId} onChange={(event) => setSelectedQuestionId(event.target.value)}>
                 {filteredQuestions.map((question) => (
                   <option key={question.id} value={question.id}>
-                    {`${question.teilLabel} • ${question.topicPrompt}`}
+                    {formatQuestionDisplay(question)}
                   </option>
                 ))}
               </select>
@@ -629,7 +637,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
             <div style={{ borderTop: "1px solid #D1D5DB", padding: 14, background: "#F9FAFB", display: "grid", gap: 10 }}>
               {selectedQuestion ? (
                 <p style={{ margin: 0, fontSize: 12, color: "#4338CA" }}>
-                  {selectedQuestion.teilLabel} • {selectedQuestion.topicPrompt}
+                  {formatQuestionDisplay(selectedQuestion)}
                 </p>
               ) : null}
 
