@@ -30,7 +30,7 @@ const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
 const MIN_SUBMISSION_CHARACTERS = 80;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
-const MAX_RESUBMISSION_TRIES = 3;
+const MAX_RESUBMISSION_TRIES = 2;
 const ACTION_COOLDOWN_MS = 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
@@ -1356,7 +1356,7 @@ const AssignmentSubmissionPage = () => {
     if (resubmissionLimitReached) {
       setResubmissionStatus({
         loading: false,
-        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmission tries for this assignment.`,
+        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. This work has already been submitted 3 times in total, so a late mark of ${PASS_THRESHOLD_SCORE} is applied.`,
         success: "",
       });
       return;
@@ -1680,8 +1680,11 @@ const AssignmentSubmissionPage = () => {
             </p>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
               {resubmissionLimitReached
-                ? `Resubmission tries used: ${selectedResubmissionCount}/${MAX_RESUBMISSION_TRIES}.`
-                : `Resubmission tries left: ${remainingResubmissions}/${MAX_RESUBMISSION_TRIES}.`}
+                ? `Resubmissions used: ${selectedResubmissionCount}/${MAX_RESUBMISSION_TRIES}.`
+                : `Resubmissions left: ${remainingResubmissions}/${MAX_RESUBMISSION_TRIES}.`}
+            </p>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              First submission is #1. The school can mark only two resubmissions (#2 and #3). If one work reaches 3 total submissions, a late mark of {PASS_THRESHOLD_SCORE} is given.
             </p>
 
             <label style={{ ...styles.field, margin: 0 }}>
