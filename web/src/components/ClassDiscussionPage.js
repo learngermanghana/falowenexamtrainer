@@ -87,6 +87,52 @@ const formatRelativeTime = (value, now) => {
   return rtf.format(Math.round(diffSeconds / 86400), "day");
 };
 
+const clampTimerMinutes = (value) => {
+  const parsed = Number.parseInt(value, 10);
+  if (Number.isNaN(parsed)) return 0;
+  return Math.min(20, Math.max(0, parsed));
+};
+
+const formatCountdown = (msRemaining) => {
+  if (msRemaining <= 0) return "00:00";
+  const totalSeconds = Math.ceil(msRemaining / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+};
+
+const getTimerMeta = (thread, now) => {
+  const durationMinutes = clampTimerMinutes(thread?.timerDurationMinutes);
+  const expiresAtMs = normalizeTimestamp(thread?.timerExpiresAt);
+  const isTimed = durationMinutes > 0;
+
+  if (!isTimed) {
+    return {
+      isTimed: false,
+      durationMinutes,
+      isExpired: false,
+      isWarning: false,
+      remainingMs: null,
+      label: "No timer",
+    };
+  }
+
+  const fallbackCreatedAt = normalizeTimestamp(thread?.createdAt);
+  const computedExpiresAt = expiresAtMs || (fallbackCreatedAt ? fallbackCreatedAt + durationMinutes * 60 * 1000 : null);
+  const remainingMs = computedExpiresAt ? computedExpiresAt - now : 0;
+  const isExpired = remainingMs <= 0;
+  const isWarning = !isExpired && remainingMs <= 3 * 60 * 1000;
+
+  return {
+    isTimed,
+    durationMinutes,
+    isExpired,
+    isWarning,
+    remainingMs,
+    label: isExpired ? "Time ended" : `${formatCountdown(remainingMs)} left`,
+  };
+};
+
 const repliesCollectionRef = (threadId) => collection(db, "qa_posts", threadId, "responses");
 
 const ClassDiscussionPage = () => {
@@ -120,6 +166,7 @@ const ClassDiscussionPage = () => {
     question: "",
     instructions: "",
     extraLink: "",
+    timerDurationMinutes: 0,
   });
   const typingTimeouts = useRef({});
 
@@ -178,6 +225,8 @@ const ClassDiscussionPage = () => {
             questionTitle: data.questionTitle || data.topic || "",
             instructions: data.instructions || "",
             extraLink: data.extraLink || "",
+            timerDurationMinutes: clampTimerMinutes(data.timerDurationMinutes),
+            timerExpiresAt: normalizeTimestamp(data.timerExpiresAt),
             createdAt,
             createdBy: data.createdBy || "Student",
             createdByUid: data.createdByUid || null,
@@ -343,6 +392,11 @@ const ClassDiscussionPage = () => {
         instructions: form.instructions || "",
         question: form.question,
         extraLink: form.extraLink,
+        timerDurationMinutes: clampTimerMinutes(form.timerDurationMinutes),
+        timerExpiresAt:
+          clampTimerMinutes(form.timerDurationMinutes) > 0
+            ? nowTimestamp + clampTimerMinutes(form.timerDurationMinutes) * 60 * 1000
+            : null,
         createdAtMs: nowTimestamp,
         createdAt: serverTimestamp(),
         createdBy: getDisplayName(),
@@ -356,6 +410,7 @@ const ClassDiscussionPage = () => {
         question: "",
         instructions: "",
         extraLink: "",
+        timerDurationMinutes: 0,
       });
     } catch (err) {
       console.error("Failed to create discussion thread", err);
@@ -656,6 +711,8 @@ const ClassDiscussionPage = () => {
 
   const renderThread = (thread) => {
     const status = thread.status || "open";
+    const timerMeta = getTimerMeta(thread, now);
+    const repliesLocked = status === "archived" || timerMeta.isExpired;
 
 
     const statusBadgeStyle = {
@@ -687,6 +744,17 @@ const ClassDiscussionPage = () => {
             </div>
 
             <div style={{ fontSize: 13, color: "#4b5563" }}>{thread.lessonLabel}</div>
+
+            <div
+              style={{
+                ...styles.helperText,
+                margin: 0,
+                color: timerMeta.isExpired ? "#b91c1c" : timerMeta.isWarning ? "#b45309" : "#0f172a",
+              }}
+            >
+              Timer: {timerMeta.label}
+              {timerMeta.isTimed ? ` (${timerMeta.durationMinutes} min)` : ""}
+            </div>
 
             <div style={{ fontSize: 12, color: "#6b7280" }} title={formatDateTime(thread.createdAt, timezonePreference)}>
               Posted {formatRelativeTime(thread.createdAt, now)}
@@ -800,6 +868,21 @@ const ClassDiscussionPage = () => {
                 }}
               >
                 Replies are closed because this thread is {status}.
+              </div>
+            ) : null}
+
+            {timerMeta.isExpired ? (
+              <div
+                style={{
+                  ...styles.helperText,
+                  margin: 0,
+                  background: "#fef2f2",
+                  borderRadius: 10,
+                  padding: 10,
+                  color: "#991b1b",
+                }}
+              >
+                Time is up. Reply box is now locked for this discussion.
               </div>
             ) : null}
 
@@ -921,16 +1004,31 @@ const ClassDiscussionPage = () => {
             <textarea
               style={styles.textareaSmall}
               placeholder={
-                status !== "archived" ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"
+                !repliesLocked ? "Share your opinion or give feedback ..." : "Replies are disabled for this thread"
               }
               value={replyDrafts[thread.id] || ""}
               onChange={(e) => {
                 setReplyDrafts((prev) => ({ ...prev, [thread.id]: e.target.value }));
-                if (status !== "archived") markTypingForThread(thread.id);
+                if (!repliesLocked) markTypingForThread(thread.id);
               }}
               onBlur={() => stopTypingIndicator(thread.id)}
-              disabled={status === "archived"}
+              disabled={repliesLocked}
             />
+
+            <p
+              style={{
+                ...styles.helperText,
+                margin: 0,
+                color: timerMeta.isExpired ? "#b91c1c" : timerMeta.isWarning ? "#b45309" : "#334155",
+              }}
+            >
+              {timerMeta.isTimed
+                ? timerMeta.isExpired
+                  ? "Timer finished. You can no longer send a reply to this post."
+                  : `Time remaining to send: ${timerMeta.label}.`
+                : "No timer for this post — replies stay open."}
+              {timerMeta.isWarning && !timerMeta.isExpired ? " Get ready to send your work in the next 3 minutes." : ""}
+            </p>
 
             {typingByThread[thread.id]?.length ? (
               <div style={{ ...styles.helperText, margin: 0, color: "#0ea5e9" }}>
@@ -943,14 +1041,14 @@ const ClassDiscussionPage = () => {
                 style={{ ...styles.secondaryButton, padding: "10px 12px" }}
                 type="button"
                 onClick={() => handleCorrectDraft(thread.id)}
-                disabled={isCorrectingDraft[thread.id] || status === "archived"}
+                disabled={isCorrectingDraft[thread.id] || repliesLocked}
               >
                 {isCorrectingDraft[thread.id] ? "AI is correcting ..." : "Correct with AI"}
               </button>
               <button
                 style={styles.primaryButton}
                 onClick={() => handleReply(thread.id)}
-                disabled={status === "archived"}
+                disabled={repliesLocked}
                 type="button"
               >
                 Post response
@@ -1107,6 +1205,21 @@ const ClassDiscussionPage = () => {
                   onChange={(e) => handleFormChange("extraLink", e.target.value)}
                   placeholder="https://..."
                 />
+              </div>
+
+              <div style={styles.field}>
+                <label style={styles.label}>Timer (minutes)</label>
+                <input
+                  type="number"
+                  min={0}
+                  max={20}
+                  style={styles.select}
+                  value={form.timerDurationMinutes}
+                  onChange={(e) => handleFormChange("timerDurationMinutes", clampTimerMinutes(e.target.value))}
+                />
+                <div style={{ ...styles.helperText, margin: 0 }}>
+                  0 = no timer. Set 1–20 to lock replies when time ends.
+                </div>
               </div>
             </div>
 
