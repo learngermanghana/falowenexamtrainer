@@ -88,7 +88,11 @@ const deriveFinalScripts = (coachReply) => {
   const short = extractTag(coachReply, "script_short");
   const medium = extractTag(coachReply, "script_medium");
   const taggedLong = extractTag(coachReply, "script_long");
-  const presentationFallback = extractTag(coachReply, "praesentation_de") || extractTag(coachReply, "abschluss_de");
+  const presentationFallback =
+    extractTag(coachReply, "praesentation_de") ||
+    extractTag(coachReply, "abschluss_de") ||
+    extractTag(coachReply, "question_de") ||
+    String(coachReply || "").trim();
 
   return {
     short,
@@ -344,10 +348,12 @@ const SpeechTrainerPage = () => {
         : null;
       setRubric(savedRubric);
       const savedFinalScript = String(session.finalScript || "").trim();
+      const lastAssistantMessage = [...restoredHistory].reverse().find((entry) => entry.role === "assistant")?.content || "";
+      const recoveredScripts = deriveFinalScripts(lastAssistantMessage);
       setFinalScripts((prev) => ({
         short: prev.short || "",
         medium: prev.medium || "",
-        long: savedFinalScript || prev.long || "",
+        long: savedFinalScript || recoveredScripts.long || prev.long || "",
       }));
     },
     [isA1A2Level, t]
@@ -694,7 +700,7 @@ const SpeechTrainerPage = () => {
           <div style={{ ...styles.helperText, margin: 0 }}>{selectedTopicLabel ? `Topic: ${selectedTopicLabel}` : ""}</div>
           <div style={{ ...styles.helperText, margin: 0 }}>{getDynamicHelperText(answersDone)}</div>
           <div style={{ ...styles.card, margin: 0, background: "#fff7ed", border: "1px solid #fdba74", color: "#9a3412" }}>
-            {`Noch ${remainingQuestions} Frage(n)`}
+            {completed ? t("speechTrainer.completedMessage") : `Noch ${remainingQuestions} Frage(n)`}
           </div>
         </div>
 

@@ -298,3 +298,29 @@ test("extracts script tags even when model returns tag attributes", async () => 
     expect(screen.getByText("Langtext.")).toBeInTheDocument();
   });
 });
+
+test("shows completion status instead of remaining questions when session is already completed", async () => {
+  loadPresentationSessions.mockResolvedValueOnce({
+    sessions: [
+      {
+        id: "session-4",
+        topic: "Campus speech",
+        level: "B1",
+        completionStatus: "completed",
+        answersDone: 6,
+        finalScript: "Meine Präsentation ist bereit.",
+        chatHistory: [
+          { role: "assistant", content: "<abschluss_de>Gut gemacht.</abschluss_de>" },
+        ],
+        createdAt: { _seconds: 1710000000 },
+      },
+    ],
+    hasMore: false,
+    nextCursor: "",
+  });
+
+  render(<SpeechTrainerPage />);
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  expect(screen.queryByText(/Noch\s+\d+\s+Frage\(n\)/i)).not.toBeInTheDocument();
+});
