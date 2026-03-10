@@ -280,6 +280,84 @@ const extractErrorBank = (feedback) => {
   );
 };
 
+const FEEDBACK_HIGHLIGHT_KEYWORDS = {
+  strong: ["excellent", "great", "strong", "clear", "well", "effective", "accurate", "good"],
+  error: ["error", "incorrect", "wrong", "fix", "grammar", "spelling", "missing", "unclear", "needs"],
+};
+
+const classifyFeedbackSentence = (sentence = "") => {
+  const lower = sentence.toLowerCase();
+  if (FEEDBACK_HIGHLIGHT_KEYWORDS.error.some((keyword) => lower.includes(keyword))) {
+    return "error";
+  }
+  if (FEEDBACK_HIGHLIGHT_KEYWORDS.strong.some((keyword) => lower.includes(keyword))) {
+    return "strong";
+  }
+  return "neutral";
+};
+
+const FeedbackAnnotations = ({ feedback = "" }) => {
+  const [copyState, setCopyState] = useState("");
+  const annotatedSentences = useMemo(
+    () => splitSentences(feedback).map((sentence) => ({ sentence, tone: classifyFeedbackSentence(sentence) })),
+    [feedback]
+  );
+
+  const handleCopy = useCallback(async () => {
+    if (!feedback.trim() || typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+      setCopyState("Copy is unavailable in this browser.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(feedback);
+      setCopyState("Feedback copied.");
+    } catch (err) {
+      setCopyState("Could not copy feedback right now.");
+    }
+  }, [feedback]);
+
+  useEffect(() => {
+    if (!copyState) return undefined;
+    const timer = window.setTimeout(() => setCopyState(""), 2000);
+    return () => window.clearTimeout(timer);
+  }, [copyState]);
+
+  return (
+    <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <strong>Annotations</strong>
+        <button type="button" style={styles.secondaryButton} onClick={handleCopy}>Copy feedback</button>
+      </div>
+      <p style={{ ...styles.helperText, margin: 0 }}>
+        Red = items to fix. Green = strong sentences to keep.
+      </p>
+      {copyState ? <p style={{ ...styles.helperText, margin: 0 }}>{copyState}</p> : null}
+      {annotatedSentences.map(({ sentence, tone }, index) => {
+        const toneStyle =
+          tone === "error"
+            ? { background: "#fee2e2", border: "1px solid #fca5a5", color: "#991b1b" }
+            : tone === "strong"
+              ? { background: "#dcfce7", border: "1px solid #86efac", color: "#166534" }
+              : { background: "#f3f4f6", border: "1px solid #e5e7eb", color: "#374151" };
+        return (
+          <div
+            key={`${sentence}-${index}`}
+            style={{
+              borderRadius: 10,
+              padding: "8px 10px",
+              fontSize: 14,
+              lineHeight: 1.5,
+              ...toneStyle,
+            }}
+          >
+            {sentence}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const WordCountMeter = ({ count, range }) => {
   if (!range) return null;
   const progress = Math.min((count / range.max) * 100, 100);
@@ -1601,6 +1679,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             <section style={styles.card}>
               <h3 style={styles.sectionTitle}>AI feedback</h3>
               <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+              <FeedbackAnnotations feedback={markFeedback} />
             </section>
           ) : null}
 
@@ -1608,6 +1687,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             <section style={styles.card}>
               <h3 style={styles.sectionTitle}>Updated AI feedback</h3>
               <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{improvedFeedback}</pre>
+              <FeedbackAnnotations feedback={improvedFeedback} />
               <details style={{ marginTop: 10 }}>
                 <summary style={{ cursor: "pointer", fontWeight: 700 }}>Previous AI feedback</summary>
                 <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap", marginTop: 10 }}>{markFeedback}</pre>
