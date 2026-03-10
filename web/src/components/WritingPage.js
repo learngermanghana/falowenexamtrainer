@@ -30,7 +30,7 @@ const IDEA_COACH_INTRO = {
 };
 
 const WORD_TARGETS = {
-  A1: "30–50 words",
+  A1: "20–50 words",
   A2: "50–80 words",
   B1: "80–120 words",
   B2: "120–180 words",
@@ -38,7 +38,7 @@ const WORD_TARGETS = {
 };
 
 const WORD_TARGET_RANGES = {
-  A1: { min: 30, max: 50 },
+  A1: { min: 20, max: 50 },
   A2: { min: 50, max: 80 },
   B1: { min: 80, max: 120 },
   B2: { min: 120, max: 180 },
