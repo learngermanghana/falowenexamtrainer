@@ -2455,7 +2455,7 @@ app.post("/speaking/presentation-chat", async (req, res) => {
       reply = "Entschuldigung, der Präsentations-Chat ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.";
     }
 
-    const completed = cappedAnswersDone >= PRESENTATION_TURN_LIMIT;
+    const completed = cappedAnswersDone >= PRESENTATION_TURN_LIMIT && !fallbackUsed;
 
     auditAIRequest({
       route: "/speaking/presentation-chat",
