@@ -30,6 +30,34 @@ const questionBoxStyle = {
   background: "#fff",
 };
 
+const listeningItems = [
+  {
+    number: 1,
+    prompt: "W _ _ s _ _ r",
+    link: "https://drive.google.com/file/d/1fPjvzp0V05rNSohX7juS0qqvvcMHGmLb/view?usp=sharing",
+  },
+  {
+    number: 2,
+    prompt: "K _ _ f _",
+    link: "https://drive.google.com/file/d/1Kvd8GeoQ8Dv30ySvYfVEtXKK_bqoqQJ-/view?usp=sharing",
+  },
+  {
+    number: 3,
+    prompt: "B _ _ _ _ _",
+    link: "https://drive.google.com/file/d/1v1YEj3qD0aSO0fiFHkq312Ek_lU6HzkM/view?usp=sharing",
+  },
+  {
+    number: 4,
+    prompt: "S _ _ _ _ _",
+    link: "https://drive.google.com/file/d/1MZ1hCy0aXGJbj3aLEsHfnXuxI6xLXxlI/view?usp=sharing",
+  },
+  {
+    number: 5,
+    prompt: "T _ _ _ _",
+    link: "https://drive.google.com/file/d/1n0r_1mLeWPINZSADyFeU7o6pZ8C9FfWG/view?usp=sharing",
+  },
+];
+
 const questions = [
   {
     stem: "1. Wie viele Buchstaben hat das deutsche Alphabet?",
@@ -68,19 +96,37 @@ const questions = [
   },
 ];
 
+const listeningBoxStyle = {
+  border: "1px solid #e5e7eb",
+  borderRadius: 10,
+  padding: 12,
+  display: "grid",
+  gap: 8,
+  background: "#fff",
+};
+
 const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
   const navigate = useNavigate();
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
+        <button
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+          onClick={() => navigate("/campus/course")}
+        >
           Back to Course
         </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 3 Workbook · German Alphabet + Reviewing</h1>
+
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>
+          A1 · Day 3 Workbook · German Alphabet + Reviewing
+        </h1>
+
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 0.2</p>
+
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Complete all sections on this page, then submit your final answers in the submission area, not directly on this page.
+          Complete all sections on this page, then submit your final answers in the submission area, not directly on this
+          page.
         </p>
       </div>
 
@@ -91,11 +137,14 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
           loading="lazy"
           style={imageStyle}
         />
+
         <h2 style={{ margin: 0 }}>Teil 1 · Reading and Writing</h2>
+
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Instruction:</strong> Read the text carefully and answer the questions below. Each question has one correct
           answer.
         </p>
+
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Text:</strong> The German alphabet has 26 letters. There are also some additional letters like Ä, Ö, Ü, and
           ß, which is called "Eszett" or "sharp S." Each letter has a name and a sound. The letters of the alphabet are: A,
@@ -108,10 +157,12 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Teil 2 · Questions</h2>
+
         {questions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>
             <strong>{question.stem}</strong>
             <span style={{ color: "#4b5563" }}>Translation: {question.translation}</span>
+
             {question.options.map((option) => (
               <span key={option}>{option}</span>
             ))}
@@ -121,36 +172,45 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
+
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          <strong>Instruction:</strong> Listen to the audio of a native speaker spelling out words. Write down the letters you
-          hear.
+          <strong>Instruction:</strong> Listen to each audio from Google Drive. Each question has its own audio link. Write
+          the missing letters to complete the word, then return and submit your answers.
         </p>
-        <a
-          href="https://drive.google.com/file/d/1fPjvzp0V05rNSohX7juS0qqvvcMHGmLb/view?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
+
         <p style={{ margin: 0, color: "#4b5563" }}>
           Complete Hören from Google Drive, then return to submit answers.
         </p>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          1. W _ _ s _ _ r<br />
-          2. K _ _ f _<br />
-          3. B _ _ _ _ _<br />
-          4. S _ _ _ _ _<br />
-          5. T _ _ _ _
-        </p>
+
+        <div style={{ display: "grid", gap: 12 }}>
+          {listeningItems.map((item) => (
+            <div key={item.number} style={listeningBoxStyle}>
+              <strong style={{ fontSize: 16 }}>
+                {item.number}. {item.prompt}
+              </strong>
+
+              <a
+                href={item.link}
+                target="_blank"
+                rel="noreferrer"
+                style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+              >
+                Open Audio {item.number}
+              </a>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Vocabulary Notes · Alphabet in German</h2>
+
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           <strong>Additional Letters (Zusätzliche Buchstaben):</strong> Ä (A-Umlaut), Ö (O-Umlaut), Ü (U-Umlaut), ß (Eszett /
-          scharfes S).<br />
-          <strong>Example Words (Beispielwörter):</strong> Apfel, Ball, Computer, Deutschland.<br />
+          scharfes S).
+          <br />
+          <strong>Example Words (Beispielwörter):</strong> Apfel, Ball, Computer, Deutschland.
+          <br />
           <strong>Useful Phrases:</strong> Wie buchstabiert man...?, Wie viele Buchstaben...?, Welche Buchstaben...?, Das
           Alphabet, der Buchstabe, das Wort, das Lesen, das Schreiben, lernen, buchstabieren, richtig, falsch.
         </p>
@@ -160,6 +220,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
         <p style={{ margin: 0, fontWeight: 600 }}>
           Finished the workbook? Submit all final answers in the submission area.
         </p>
+
         <a
           href="https://www.falowen.app/campus/submit"
           target="_blank"
