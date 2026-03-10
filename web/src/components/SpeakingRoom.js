@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
-import { speakingSheetQuestions } from "../data/speakingSheet";
+import { speakingQuestionDictionary } from "../data/speakingDictionary";
 
 const levels = ["A1", "A2", "B1", "B2", "C1"];
 const goethePracticeLink =
@@ -115,7 +115,7 @@ const SpeakingRoom = () => {
   const mediaRecorderRef = useRef(null);
 
   const promptsForLevel = useMemo(
-    () => speakingSheetQuestions.filter((prompt) => prompt.level === levelFilter),
+    () => speakingQuestionDictionary.filter((prompt) => prompt.level === levelFilter),
     [levelFilter]
   );
 

@@ -2,12 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
-import { speakingSheetQuestions } from "../data/speakingSheet";
+import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import { requestSpeakingTextAnalysis } from "../services/presentationCoachService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
-
-const A1_TEIL_ONE_LINE = "Name, Alter, Wohnort, Land, Sprache, Familie, Beruf, Hobby";
 
 const parseTeilNumber = (teilLabel = "") => {
   const match = String(teilLabel).match(/teil\s*(\d+)/i);
@@ -40,6 +38,14 @@ const formatTime = (seconds = 0) => {
   const mm = String(Math.floor(seconds / 60)).padStart(2, "0");
   const ss = String(seconds % 60).padStart(2, "0");
   return `${mm}:${ss}`;
+};
+
+
+const formatQuestionDisplay = (question) => {
+  if (!question) return "";
+  const keyword = String(question.keywordSubtopic || "").trim();
+  if (!keyword) return `${question.teilLabel} • ${question.topicPrompt}`;
+  return `${question.teilLabel} • ${question.topicPrompt} (Keyword: ${keyword})`;
 };
 
 const formatClock = (date) =>
@@ -112,41 +118,21 @@ const SpeakingPage = ({ mode = "exam" }) => {
   }, []);
 
   const levelOptions = useMemo(() => {
-    const levels = new Set(speakingSheetQuestions.map((question) => question.level));
+    const levels = new Set(speakingQuestionDictionary.map((question) => question.level));
     const ordered = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
     return ordered.filter((level) => levels.has(level));
   }, []);
 
   const baseFilteredQuestions = useMemo(() => {
-    return speakingSheetQuestions.filter((question) => {
+    return speakingQuestionDictionary.filter((question) => {
       const levelMatches = selectedLevel ? question.level === selectedLevel : true;
       const teilNumber = parseTeilNumber(question.teilLabel || question.teilId);
       const teilMatches = selectedTeil === "all" ? true : teilNumber === selectedTeil;
       return levelMatches && teilMatches;
     });
   }, [selectedLevel, selectedTeil]);
-
-  const filteredQuestions = useMemo(() => {
-    if (!(selectedLevel === "A1" && (selectedTeil === "1" || selectedTeil === "all"))) {
-      return baseFilteredQuestions;
-    }
-
-    const introQuestions = baseFilteredQuestions.filter((question) => parseTeilNumber(question.teilLabel || question.teilId) === "1");
-    if (!introQuestions.length) return baseFilteredQuestions;
-
-    const introQuestionIds = introQuestions.map((question) => question.id);
-    const firstIntro = introQuestions[0];
-    const mergedIntroQuestion = {
-      ...firstIntro,
-      id: "a1-teil-1-intro-line",
-      topicPrompt: A1_TEIL_ONE_LINE,
-      keywordSubtopic: "Type all intro details in one answer.",
-      sourceQuestionIds: introQuestionIds,
-    };
-
-    return [mergedIntroQuestion, ...baseFilteredQuestions.filter((question) => !introQuestionIds.includes(question.id))];
-  }, [baseFilteredQuestions, selectedLevel, selectedTeil]);
+  const filteredQuestions = baseFilteredQuestions;
 
   useEffect(() => {
     if (!filteredQuestions.length) {
@@ -288,7 +274,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
         text: `${promptHeader}\n\nStudent answer:\n${trimmed}`,
         teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
         level: selectedLevel,
-        question: selectedQuestion.topicPrompt || "",
+        question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
         idToken,
       });
       const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
@@ -348,7 +334,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
             audioBlob: blob,
             teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
             level: selectedLevel,
-            question: selectedQuestion.topicPrompt || "",
+            question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
             userId,
             idToken,
           });
@@ -434,7 +420,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
     [completedQuestionIds]
   );
 
-  const totalCount = speakingSheetQuestions.filter((question) => question.level === selectedLevel).length;
+  const totalCount = speakingQuestionDictionary.filter((question) => question.level === selectedLevel).length;
 
   return (
     <div style={{ ...styles.container, padding: isCompactViewport ? "10px 0 28px" : styles.container.padding }}>
@@ -522,7 +508,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
               <select style={styles.select} value={selectedQuestionId} onChange={(event) => setSelectedQuestionId(event.target.value)}>
                 {filteredQuestions.map((question) => (
                   <option key={question.id} value={question.id}>
-                    {`${question.teilLabel} • ${question.topicPrompt}`}
+                    {formatQuestionDisplay(question)}
                   </option>
                 ))}
               </select>
@@ -651,7 +637,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
             <div style={{ borderTop: "1px solid #D1D5DB", padding: 14, background: "#F9FAFB", display: "grid", gap: 10 }}>
               {selectedQuestion ? (
                 <p style={{ margin: 0, fontSize: 12, color: "#4338CA" }}>
-                  {selectedQuestion.teilLabel} • {selectedQuestion.topicPrompt}
+                  {formatQuestionDisplay(selectedQuestion)}
                 </p>
               ) : null}
 

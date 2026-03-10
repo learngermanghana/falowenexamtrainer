@@ -86,32 +86,6 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   const consentHighlights = t("signupPage.consent.highlights", { returnObjects: true });
 
-  const overviewSections = [
-    {
-      title: "What you get",
-      items: [
-        "Daily Plan, mock exams, and speaking/writing rooms in one account.",
-        "Progress saved across web and mobile with reminders.",
-        "Tuition tracker with secure Paystack checkout when payments are enabled.",
-      ],
-    },
-    {
-      title: "What happens now",
-      items: [
-        "Pay now to reserve your class. Partial payment unlocks 1 month; full payment unlocks 6 months.",
-        "Pick your level so we can match you to the right materials.",
-        "Create a password and confirm your consent to our terms and privacy policy.",
-      ],
-    },
-    {
-      title: "Finish later",
-      items: [
-        "You can reopen your checkout link anytime if you close it accidentally.",
-        "Need help? Use the contact links in the terms to reach support.",
-      ],
-    },
-  ];
-
   const classOptions = useMemo(() => {
     return Object.keys(classCatalog)
       .filter((className) => {
@@ -390,62 +364,30 @@ const SignUpPage = ({ onLogin, onBack }) => {
         </p>
         <div
           style={{
-            ...styles.uploadCard,
-            background: "#f8fafc",
+            borderRadius: 14,
+            overflow: "hidden",
             marginBottom: 12,
-            display: "grid",
-            gap: 12,
+            border: "1px solid #dbeafe",
+            position: "relative",
+            minHeight: 170,
+            backgroundImage:
+              "linear-gradient(120deg, rgba(30,64,175,0.9), rgba(56,189,248,0.82)), url('/learning-space-hero.svg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            color: "#fff",
+            display: "flex",
+            alignItems: "flex-end",
           }}
         >
-          <p style={{ ...styles.helperText, marginBottom: 2 }}>
-            {t("signupPage.orientation")}
-          </p>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: 10,
-            }}
-          >
-            {overviewSections.map((section) => (
-              <div
-                key={section.title}
-                style={{
-                  background: "#fff",
-                  borderRadius: 10,
-                  padding: 12,
-                  border: "1px solid #e5e7eb",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-                }}
-              >
-                <strong style={{ display: "block", marginBottom: 6, color: "#0f172a" }}>{section.title}</strong>
-                <ul style={{ margin: 0, paddingLeft: 16, display: "grid", gap: 6 }}>
-                  {section.items.map((item) => (
-                    <li key={item} style={{ color: styles.helperText.color, fontSize: 13, lineHeight: 1.5 }}>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+          <div style={{ padding: 16, background: "linear-gradient(0deg, rgba(2,6,23,0.55), rgba(2,6,23,0.05))", width: "100%" }}>
+            <p style={{ margin: 0, fontSize: 12, letterSpacing: 0.4, textTransform: "uppercase", opacity: 0.95 }}>
+              Welcome to Falowen
+            </p>
+            <h3 style={{ margin: "6px 0 4px", fontSize: 20, lineHeight: 1.25 }}>Start strong. Learn with confidence.</h3>
+            <p style={{ margin: 0, fontSize: 13, lineHeight: 1.5, opacity: 0.95 }}>
+              Create your account to unlock guided exam practice, tutor feedback, and your personalized learning path.
+            </p>
           </div>
-          <details style={{ background: "#eef2ff", padding: 12, borderRadius: 10, border: "1px solid #c7d2fe" }}>
-            <summary style={{ cursor: "pointer", fontWeight: 700, color: "#312e81", marginBottom: 6 }}>
-              Need the full explanation?
-            </summary>
-            <div style={{ display: "grid", gap: 8, color: styles.helperText.color, fontSize: 13, lineHeight: 1.6 }}>
-              <p style={{ margin: 0 }}>
-                Signing up saves your profile to the Falowen cloud so you can reuse the same login on web and mobile.
-              </p>
-              <p style={{ margin: 0 }}>
-                Returning Falowen student from our old system? Go to Login and reuse that email to set a new password. We'll
-                migrate your profile automatically.
-              </p>
-              <p style={{ margin: 0 }}>
-                Want reminders? Enable push notifications after login to get weekly goals and practice nudges.
-              </p>
-            </div>
-          </details>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
