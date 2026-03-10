@@ -307,36 +307,6 @@ const A2Day4WoMoechtenWirUnsTreffenWorkbookPage = () => {
             </li>
           </ol>
 
-          <h3 style={sectionTitle}>Struktur des Briefes</h3>
-          <ol style={listSpacing}>
-            <li>
-              <strong>Anrede und Begrüßung</strong>
-              <ul style={listSpacing}>
-                <li>Beginne mit: „Sehr geehrte Damen und Herren,“</li>
-                <li>Schreibe: „Ich hoffe, es geht Ihnen gut. Ich schreibe Ihnen, weil...“</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Hauptteil</strong>
-              <ul style={listSpacing}>
-                <li>a) Beschreibe den Grund für dein Schreiben (Warum schreiben Sie?).</li>
-                <li>b) Äußere eine konkrete Bitte (Bitten Sie um etwas).</li>
-                <li>c) Stelle zusätzliche Fragen (Fragen Sie nach Informationen).</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Schluss und Verabschiedung</strong>
-              <ul style={listSpacing}>
-                <li>Schreibe: „Ich freue mich im Voraus auf Ihre Antwort.“</li>
-                <li>
-                  Verabschiede dich: „Mit freundlichen Grüßen,
-                  <br />
-                  [Dein Name]“
-                </li>
-              </ul>
-            </li>
-          </ol>
-
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area, not directly on this page.
           </p>
