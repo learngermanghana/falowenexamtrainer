@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-import { speakingSheetQuestions } from "../data/speakingSheet";
+import { speakingQuestionDictionary } from "../data/speakingDictionary";
 
 const FALOWEN_SPEAKING_URL =
   "https://script.google.com/macros/s/AKfycbyJ5lTeXUgaGw-rejDuh_2ex7El_28JgKLurOOsO1c8LWfVE-Em2-vuWuMn1hC5-_IN/exec";
@@ -107,7 +107,7 @@ const VerbotenErlaubtPage = () => {
 
   // ✅ ONLY A1 (no A2, no B levels)
   const a1Only = useMemo(() => {
-    return speakingSheetQuestions.filter(
+    return speakingQuestionDictionary.filter(
       (item) => String(item.level || "").toUpperCase().trim() === "A1"
     );
   }, []);

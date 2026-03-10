@@ -861,11 +861,10 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
     taskCard,
     partRules,
     "OUTPUT FORMAT (plain text, concise):",
-    "1) Scores: Pronunciation, Grammar, Vocabulary, Fluency, Task achievement (0-25 each) and Overall (0-100).",
-    "2) Examiner verdict in English (2-4 bullets).",
-    "3) Corrected German version (2-6 lines) that matches the task card.",
-    "4) What examiner looked for (task checklist with ✅/❌).",
-    "If below target, include one focused drill for the weakest criterion.",
+    "1) Personal tutor feedback in English (4-6 short lines) speaking directly to the student as 'you'.",
+    "2) Keep it human and direct: what you did well, what to fix next, and one clear next step.",
+    "3) Add a short corrected German version (1-3 lines) that matches the task card.",
+    "4) Do NOT output score tables, rubric labels, criterion checklists, or weighted breakdowns.",
   ]
     .filter(Boolean)
     .join("\n\n");
