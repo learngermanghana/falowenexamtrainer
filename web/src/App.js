@@ -41,6 +41,7 @@ import A1Day1GreetingsWorkbookPage from "./components/A1Day1GreetingsWorkbookPag
 import A1Day2Kapitel11WorkbookPage from "./components/A1Day2Kapitel11WorkbookPage";
 import A1Day3GermanAlphabetReviewingWorkbookPage from "./components/A1Day3GermanAlphabetReviewingWorkbookPage";
 import A1Day3SchreibenSprechenKapitel11WorkbookPage from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
+import A1Day3Kapitel12WorkbookPage from "./components/A1Day3Kapitel12WorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
 import A2Day2PersonenBeschreibenWorkbookPage from "./components/A2Day2PersonenBeschreibenWorkbookPage";
 import A2Day3ComparisonsWorkbookPage from "./components/A2Day3ComparisonsWorkbookPage";
@@ -578,6 +579,10 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook"
             element={<A1Day3SchreibenSprechenKapitel11WorkbookPage />}
+          />
+          <Route
+            path="/campus/course/a1-day-3-kapitel-1-2-workbook"
+            element={<A1Day3Kapitel12WorkbookPage />}
           />
           <Route path="/campus/course/a2-day-2-small-talk-workbook" element={<A2Day2SmallTalkWorkbookEnhancedPage />} />
           <Route path="/campus/course/a2-day-2-personen-beschreiben-workbook" element={<A2Day2PersonenBeschreibenWorkbookPage />} />
