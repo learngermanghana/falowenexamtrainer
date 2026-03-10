@@ -164,45 +164,124 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+
+          <h2 style={sectionTitle}>Teil 1 (Group Practice)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In this chapter, we practice vocabulary for furniture and rooms and use two-case prepositions to describe
-            positions and movement.
+            In this chapter, we'll engage in group exercises discussing these topics. Following this, I'll revise the
+            questions and invite you to record an audio about yourself.
           </p>
 
-          <h3 style={sectionTitle}>Zentrales Thema</h3>
-          <p style={{ margin: 0 }}>
-            <strong>Möbel und Räume</strong>
+          <h3 style={sectionTitle}>1. Zentrales Thema (Central Topic)</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>Möbel und Räume</strong> (Furniture and rooms)
           </p>
 
-          <h3 style={sectionTitle}>Hauptäste</h3>
-          <ol style={listSpacing}>
-            <li>Zimmer benennen (Wohnzimmer, Schlafzimmer, Küche, Bad).</li>
-            <li>Möbel beschreiben (Sofa, Tisch, Stuhl, Bett, Regal, Lampe).</li>
-            <li>Position sagen mit <strong>Wo?</strong> + Dativ.</li>
-            <li>Bewegung sagen mit <strong>Wohin?</strong> + Akkusativ.</li>
-          </ol>
+          <h3 style={sectionTitle}>2. Hauptäste (Main Branches)</h3>
+          <ul style={listSpacing}>
+            <li>Zimmer (Rooms)</li>
+            <li>Möbel (Furniture)</li>
+            <li>Position (Wo?)</li>
+            <li>Bewegung / Veränderung (Wohin?)</li>
+            <li>Meinung und Beschreibung (Opinion and description)</li>
+          </ul>
 
-          <h3 style={sectionTitle}>Frage des Tages</h3>
-          <p style={{ margin: 0 }}>
-            <strong>Wie sieht dein Zimmer aus und wohin stellst du ein neues Möbelstück?</strong>
-          </p>
+          <h3 style={sectionTitle}>3. Unteräste (Sub-Branches)</h3>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            <div style={questionCardStyle}>
+              <strong>Zimmer (Rooms)</strong>
+              <ul style={listSpacing}>
+                <li>Wohnzimmer (Living room)</li>
+                <li>Schlafzimmer (Bedroom)</li>
+                <li>Küche (Kitchen)</li>
+                <li>Bad (Bathroom)</li>
+                <li>Esszimmer (Dining room)</li>
+                <li>Flur (Hallway)</li>
+                <li>Balkon (Balcony)</li>
+                <li>Arbeitszimmer (Study / office)</li>
+              </ul>
+            </div>
+
+            <div style={questionCardStyle}>
+              <strong>Möbel (Furniture)</strong>
+              <ul style={listSpacing}>
+                <li>Sofa (Sofa)</li>
+                <li>Tisch (Table)</li>
+                <li>Stuhl (Chair)</li>
+                <li>Bett (Bed)</li>
+                <li>Schrank (Wardrobe / cupboard)</li>
+                <li>Regal (Shelf)</li>
+                <li>Lampe (Lamp)</li>
+                <li>Teppich (Carpet)</li>
+              </ul>
+            </div>
+
+            <div style={questionCardStyle}>
+              <strong>Position (Wo?)</strong>
+              <ul style={listSpacing}>
+                <li>an der Wand (on the wall / against the wall)</li>
+                <li>neben dem Sofa (next to the sofa)</li>
+                <li>unter dem Tisch (under the table)</li>
+                <li>vor dem Fenster (in front of the window)</li>
+                <li>hinter der Tür (behind the door)</li>
+                <li>in der Ecke (in the corner)</li>
+              </ul>
+            </div>
+
+            <div style={questionCardStyle}>
+              <strong>Bewegung / Veränderung (Wohin?)</strong>
+              <ul style={listSpacing}>
+                <li>an die Wand (onto the wall)</li>
+                <li>neben das Sofa (next to the sofa)</li>
+                <li>unter den Tisch (under the table)</li>
+                <li>vor das Fenster (in front of the window)</li>
+                <li>hinter die Tür (behind the door)</li>
+                <li>in die Ecke (into the corner)</li>
+              </ul>
+            </div>
+
+            <div style={questionCardStyle}>
+              <strong>Meinung und Beschreibung (Opinion and description)</strong>
+              <ul style={listSpacing}>
+                <li>gemütlich (comfortable / cozy)</li>
+                <li>modern (modern)</li>
+                <li>hell (bright)</li>
+                <li>groß (big)</li>
+                <li>klein (small)</li>
+                <li>praktisch (practical)</li>
+                <li>Ich mag ... (I like ...)</li>
+                <li>Mein Lieblingszimmer ist ... (My favorite room is ...)</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3 style={sectionTitle}>Questions</h3>
+          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Talk for two minutes about a room in your home. Describe the room, mention the furniture inside it, and
+              explain where the furniture is. Also say what you would like to change in the room and why. After your
+              talk, your classmates will ask you questions.
+            </p>
+          </div>
+
+          <div style={{ ...questionCardStyle, background: "#f9fafb" }}>
+            <strong>Zimmer · Möbel · Wo? · Wohin?</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              <strong>Wie sieht dein Zimmer aus und was möchtest du darin verändern?</strong>
+            </p>
+          </div>
 
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Speaking self-practice confidence check</strong>
             <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
-            <a
-              href="https://www.falowen.app/campus/speech"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
               Open speaking self-practice
             </a>
           </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3, and
-            Teil 4.
+            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3,
+            and Teil 4.
           </p>
 
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
