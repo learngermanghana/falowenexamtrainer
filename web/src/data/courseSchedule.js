@@ -531,7 +531,7 @@ const RAW_COURSE_SCHEDULES = {
           video: "https://youtu.be/NVCN4fZXEk0",
           youtube_link: "https://youtu.be/NVCN4fZXEk0",
           grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
-          workbook_link: "/campus/course/a1-day-3-schreiben-sprechen-kapitel-1-1-workbook",
+          workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
           assignment: true,
         },
       ],
