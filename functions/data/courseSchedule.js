@@ -157,7 +157,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Identifying German Nouns and their Gender",
     video: "https://youtu.be/ScU6w8VQgNg",
     youtube_link: "https://youtu.be/ScU6w8VQgNg",
-    grammarbook_link: "https://drive.google.com/file/d/1clWbDAvLlXpgWx7pKc71Oq3H2p0_GZnV/view?usp=sharing",
+    grammarbook_link: "/campus/course/relativsaetze-die-der-das-wohnung-suchen-3-7-notes",
     workbook_link: "https://drive.google.com/file/d/1EF87TdHa6Y-qgLFUx8S6GAom9g5EBQNP/view?usp=sharing",
   },
   {
