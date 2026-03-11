@@ -488,7 +488,7 @@ const courseSchedules = {
           youtube_link: "https://youtu.be/S7n6TlAQRLQ",
           grammarbook_link: "https://www.falowen.app/campus/course/german-alphabet-grammar-notes-day-2",
           assignment: true,
-          workbook_link: "https://youtu.be/u1KLZmJ37jg",
+          workbook_link: "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
         },
         {
           chapter: "1.1",
