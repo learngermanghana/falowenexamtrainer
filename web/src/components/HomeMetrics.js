@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { fetchAttendanceSummary } from "../services/attendanceService";
+import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
@@ -69,9 +70,46 @@ const completionIdentifiersByLevel = {
 
 const COURSE_COMPLETION_CALENDAR_KEY = "falowen_course_completion_calendar_download";
 
+const extractCanonicalAssignmentIds = (entry = {}, level = "") => {
+  const ids = Array.isArray(entry?.identifiers) ? entry.identifiers : [];
+  const normalizedLevel = String(level || "").toUpperCase();
+  const normalized = ids
+    .map((id) => String(id || "").trim().toUpperCase())
+    .filter(Boolean)
+    .map((id) => {
+      if (/^(A1|A2|B1|B2|C1|C2)-/.test(id)) return id;
+      return normalizedLevel ? `${normalizedLevel}-${id}` : id;
+    });
+  return Array.from(new Set(normalized));
+};
+
+const buildDictionaryLabel = (entry = {}, level = "") => {
+  const canonicalIds = extractCanonicalAssignmentIds(entry, level);
+  if (!canonicalIds.length) return entry?.label || "";
+
+  const topics = canonicalIds
+    .map((canonicalId) => {
+      const chapter = canonicalId.split("-").slice(1).join("-");
+      const dictionaryEntry = getAssignmentDictionaryEntry({
+        level,
+        assignmentId: canonicalId,
+        chapter,
+      });
+      return dictionaryEntry?.topic || dictionaryEntry?.en || dictionaryEntry?.de || "";
+    })
+    .filter(Boolean);
+
+  if (!topics.length) return entry?.label || "";
+
+  const day = Number(entry?.dayNumber);
+  const dayPrefix = Number.isFinite(day) && day > 0 ? `Day ${day}: ` : "";
+  const mergedTopic = Array.from(new Set(topics)).join(" + ");
+  return `${dayPrefix}${mergedTopic}`.trim();
+};
+
 const HomeMetrics = ({ studentProfile }) => {
   const { t } = useTranslation();
-  const { idToken } = useAuth();
+  const { idToken, user } = useAuth();
   const navigate = useNavigate();
 
   const [attendance, setAttendance] = useState({ sessions: 0, hours: 0 });
@@ -119,7 +157,7 @@ const HomeMetrics = ({ studentProfile }) => {
 
     try {
       const [attendanceResponse, scoreResponse] = await Promise.all([
-        fetchAttendanceSummary({ className, studentCode, level: levelKey }),
+        fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey }),
         idToken && studentCode ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
@@ -136,7 +174,7 @@ const HomeMetrics = ({ studentProfile }) => {
     } finally {
       if (isMountedRef.current) setLoading(false);
     }
-  }, [className, idToken, levelKey, studentCode, t]);
+  }, [className, idToken, levelKey, studentCode, t, user?.uid]);
 
   useEffect(() => {
     refreshMetrics();
@@ -157,10 +195,31 @@ const HomeMetrics = ({ studentProfile }) => {
     };
   }, [refreshMetrics]);
 
-  const missedAssignments = useMemo(() => assignmentStats?.missedAssignments || [], [assignmentStats]);
-  const failedAssignments = useMemo(() => assignmentStats?.failedAssignments || [], [assignmentStats]);
+  const missedAssignments = useMemo(
+    () =>
+      (assignmentStats?.missedAssignments || []).map((entry) => ({
+        ...entry,
+        label: buildDictionaryLabel(entry, levelKey) || entry?.label,
+      })),
+    [assignmentStats, levelKey]
+  );
+  const failedAssignments = useMemo(
+    () =>
+      (assignmentStats?.failedAssignments || []).map((entry) => ({
+        ...entry,
+        label: buildDictionaryLabel(entry, levelKey) || entry?.label,
+      })),
+    [assignmentStats, levelKey]
+  );
   const blocked = Boolean(assignmentStats?.recommendationBlocked);
-  const nextObj = assignmentStats?.nextRecommendation || null;
+  const nextObj = useMemo(() => {
+    const next = assignmentStats?.nextRecommendation;
+    if (!next) return null;
+    return {
+      ...next,
+      label: buildDictionaryLabel(next, levelKey) || next?.label,
+    };
+  }, [assignmentStats, levelKey]);
 
   const isCourseCompleter = useMemo(() => {
     const targetIdentifier = completionIdentifiersByLevel[levelKey];

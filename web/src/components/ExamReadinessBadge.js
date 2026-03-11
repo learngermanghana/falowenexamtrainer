@@ -11,7 +11,7 @@ import { computeExamReadiness } from "../lib/examReadiness";
 const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", refreshToken = 0 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { idToken } = useAuth();
+  const { idToken, user } = useAuth();
 
   const [state, setState] = useState({
     loading: false,
@@ -59,7 +59,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
     try {
       const [attendance, score] = await Promise.all([
-        fetchAttendanceSummary({ className, studentCode, level: levelKey }),
+        fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey }),
         idToken ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
@@ -82,7 +82,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         totalAssignments: null,
       });
     }
-  }, [className, idToken, levelKey, studentCode, t]);
+  }, [className, idToken, levelKey, studentCode, t, user?.uid]);
 
   useEffect(() => {
     loadReadiness();
