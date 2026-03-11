@@ -30,6 +30,9 @@ const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
 const MIN_SUBMISSION_CHARACTERS = 80;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
+const MIN_RESUBMISSION_CHANGED_CHARACTERS = 40;
+const MIN_RESUBMISSION_NEW_WORDS = 8;
+const MIN_OBJECTIVE_CHANGED_ANSWERS = 3;
 const MAX_RESUBMISSION_TRIES = 2;
 const ACTION_COOLDOWN_MS = 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
@@ -71,6 +74,84 @@ const normalizeSubmissionText = (value) =>
     .toLowerCase()
     .replace(/\s+/g, " ")
     .trim();
+
+const tokenizeSubmission = (value) =>
+  normalizeSubmissionText(value)
+    .replace(/[^\p{L}\p{N}\s'-]/gu, " ")
+    .split(" ")
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+const parseObjectiveAnswers = (value) => {
+  const text = String(value || "");
+  const matches = [...text.matchAll(/(\d+)\s*[\).:-]?\s*([a-zA-Z0-9]+)/g)];
+  if (!matches.length) return null;
+
+  const answersByQuestion = new Map();
+  matches.forEach((match) => {
+    const questionNumber = String(match[1] || "").trim();
+    const answer = String(match[2] || "").trim().toLowerCase();
+    if (questionNumber && answer) answersByQuestion.set(questionNumber, answer);
+  });
+
+  return answersByQuestion.size ? answersByQuestion : null;
+};
+
+const countCharacterChanges = (previousText, currentText) => {
+  const previousNormalized = normalizeSubmissionText(previousText);
+  const currentNormalized = normalizeSubmissionText(currentText);
+  const minLength = Math.min(previousNormalized.length, currentNormalized.length);
+
+  let mismatches = 0;
+  for (let index = 0; index < minLength; index += 1) {
+    if (previousNormalized[index] !== currentNormalized[index]) mismatches += 1;
+  }
+
+  return mismatches + Math.abs(currentNormalized.length - previousNormalized.length);
+};
+
+const buildResubmissionDiff = ({ previousSubmissionText, currentSubmissionText }) => {
+  const previousNormalized = normalizeSubmissionText(previousSubmissionText);
+  const currentNormalized = normalizeSubmissionText(currentSubmissionText);
+
+  if (!previousNormalized || !currentNormalized) {
+    return {
+      mode: "text",
+      changedCharacters: 0,
+      newWordsCount: 0,
+    };
+  }
+
+  const previousObjective = parseObjectiveAnswers(previousSubmissionText);
+  const currentObjective = parseObjectiveAnswers(currentSubmissionText);
+
+  if (previousObjective && currentObjective) {
+    const overlappingQuestions = [...previousObjective.keys()].filter((question) => currentObjective.has(question));
+    if (overlappingQuestions.length >= 3) {
+      const changedAnswers = overlappingQuestions.filter(
+        (question) => previousObjective.get(question) !== currentObjective.get(question)
+      ).length;
+
+      return {
+        mode: "objective",
+        changedAnswers,
+        overlappingQuestions: overlappingQuestions.length,
+      };
+    }
+  }
+
+  const changedCharacters = countCharacterChanges(previousSubmissionText, currentSubmissionText);
+
+  const previousWords = new Set(tokenizeSubmission(previousNormalized));
+  const currentWords = new Set(tokenizeSubmission(currentNormalized));
+  const newWordsCount = [...currentWords].filter((word) => !previousWords.has(word)).length;
+
+  return {
+    mode: "text",
+    changedCharacters,
+    newWordsCount,
+  };
+};
 
 const buildStudentScopeKey = ({ userId, studentCode, studentEmail }) =>
   [userId, studentCode, studentEmail]
@@ -1326,6 +1407,36 @@ const AssignmentSubmissionPage = () => {
       return;
     }
 
+    const resubmissionDiff = buildResubmissionDiff({
+      previousSubmissionText: selectedPreview?.submissionText || "",
+      currentSubmissionText: trimmedResubmission,
+    });
+
+    if (selectedPreview?.submissionText && resubmissionDiff.mode === "objective") {
+      if (resubmissionDiff.changedAnswers < MIN_OBJECTIVE_CHANGED_ANSWERS) {
+        setResubmissionStatus({
+          loading: false,
+          error: `For short answer lists (for example: 1.a 2.b 3.c), change at least ${MIN_OBJECTIVE_CHANGED_ANSWERS} answers from your previous attempt before resubmitting.`,
+          success: "",
+        });
+        return;
+      }
+    }
+
+    if (
+      selectedPreview?.submissionText &&
+      resubmissionDiff.mode === "text" &&
+      (resubmissionDiff.changedCharacters < MIN_RESUBMISSION_CHANGED_CHARACTERS ||
+        resubmissionDiff.newWordsCount < MIN_RESUBMISSION_NEW_WORDS)
+    ) {
+      setResubmissionStatus({
+        loading: false,
+        error: `Please make stronger edits before resubmitting (at least ${MIN_RESUBMISSION_CHANGED_CHARACTERS} changed characters and ${MIN_RESUBMISSION_NEW_WORDS} new words compared with your last attempt).`,
+        success: "",
+      });
+      return;
+    }
+
     if (hasMatchingRecentSubmission(trimmedResubmission, { includeResubmitted: true })) {
       setResubmissionStatus({
         loading: false,
@@ -1736,6 +1847,9 @@ const AssignmentSubmissionPage = () => {
 
             <p style={{ ...styles.helperText, margin: 0 }}>
               Tip: if your text is mostly the same, explain clearly which objective you still need help with.
+            </p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Resubmissions must include clear edits. For full text: at least {MIN_RESUBMISSION_CHANGED_CHARACTERS} changed characters and {MIN_RESUBMISSION_NEW_WORDS} new words. For short answer lists (1.a, 2.b...), change at least {MIN_OBJECTIVE_CHANGED_ANSWERS} answers.
             </p>
             {submissionCooldownRemainingMs > 0 ? (
               <p style={{ ...styles.helperText, margin: 0, color: "#b45309" }}>
