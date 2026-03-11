@@ -1864,8 +1864,8 @@ const withDictionaryMetadata = (item, level) => {
     ...item,
     chapter: dictionaryEntry.chapter,
     assignmentId: dictionaryEntry.assignment_id,
-    assignmentTitle: item.assignmentTitle || dictionaryEntry.en,
-    title: item.title || dictionaryEntry.en,
+    assignmentTitle: item.assignmentTitle || dictionaryEntry.topic || dictionaryEntry.en,
+    title: item.title || dictionaryEntry.topic || dictionaryEntry.en,
   };
 };
 
@@ -1954,9 +1954,12 @@ const resolveA1TopicName = (entry, lesen_hören, schreiben_sprechen) => {
     });
 
   if (!dictionaryEntries.length) return entry.topic;
-  if (dictionaryEntries.length === 1) return dictionaryEntries[0].en;
+  if (dictionaryEntries.length === 1) return dictionaryEntries[0].topic || dictionaryEntries[0].en;
 
-  return dictionaryEntries.map((entryValue) => entryValue.en).join(" + ");
+  return dictionaryEntries
+    .map((entryValue) => entryValue.topic || entryValue.en)
+    .filter(Boolean)
+    .join(" + ") || entry.topic;
 };
 
 const normalizeCourseSchedules = (schedules) =>
