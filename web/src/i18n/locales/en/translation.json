@@ -1197,7 +1197,9 @@
       "blocked": "Complete failed tasks to unlock the next recommendation.",
       "blockedWithIds": "Complete failed tasks ({{items}}) to unlock the next recommendation.",
       "goal": "{{goal}}",
-      "defaultHelper": "Keep going with your next recommended task."
+      "defaultHelper": "Keep going with your next recommended task.",
+      "catchUpFirst": "Catch up {{item}}",
+      "catchUpHelper": "Catch up this missed task to close earlier gaps."
     },
     "missed": {
       "label": "Missed items",

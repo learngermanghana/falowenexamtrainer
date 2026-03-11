@@ -620,18 +620,52 @@ const scoresSummaryHandler = async (req, res) => {
 
     const recommendationBlocked = failedAssignments.length > 0;
 
-    // Next: first incomplete lesson in schedule order (blocked if failures exist)
+    const firstByOrder = (items = []) =>
+      [...items].sort((a, b) => {
+        const leftOrder = Number.isFinite(a.logicalOrder) ? a.logicalOrder : Number.POSITIVE_INFINITY;
+        const rightOrder = Number.isFinite(b.logicalOrder) ? b.logicalOrder : Number.POSITIVE_INFINITY;
+        if (leftOrder !== rightOrder) return leftOrder - rightOrder;
+        return (a.order || 0) - (b.order || 0);
+      })[0] || null;
+
+    const firstFailedLesson = firstByOrder(lessonStatus.filter((l) => l.hasFailed));
+    const firstMissedLesson = firstByOrder(
+      lessonStatus.filter((l) => {
+        if (l.isCompleted || l.hasFailed) return false;
+        if (Number.isFinite(latestCompletedLogicalOrder) && Number.isFinite(l.logicalOrder)) {
+          return l.logicalOrder < latestCompletedLogicalOrder;
+        }
+        return l.order < latestCompletedScheduleOrder;
+      })
+    );
+    const firstIncompleteLesson = firstByOrder(lessonStatus.filter((l) => !l.isCompleted));
+
+    // Next recommendation prioritizes failed -> missed -> next incomplete.
     let nextRecommendation = null;
-    if (!recommendationBlocked) {
-      const firstIncomplete = lessonStatus.find((l) => !l.isCompleted);
-      if (firstIncomplete) {
-        nextRecommendation = {
-          label: firstIncomplete.label,
-          identifiers: firstIncomplete.identifiers,
-          dayNumber: firstIncomplete.dayNumber,
-          goal: firstIncomplete.goal,
-        };
-      }
+    if (firstFailedLesson) {
+      nextRecommendation = {
+        label: firstFailedLesson.label,
+        identifiers: firstFailedLesson.identifiers,
+        dayNumber: firstFailedLesson.dayNumber,
+        goal: firstFailedLesson.goal,
+        type: "retry_failed",
+      };
+    } else if (firstMissedLesson) {
+      nextRecommendation = {
+        label: firstMissedLesson.label,
+        identifiers: firstMissedLesson.identifiers,
+        dayNumber: firstMissedLesson.dayNumber,
+        goal: firstMissedLesson.goal,
+        type: "catch_up_missed",
+      };
+    } else if (firstIncompleteLesson) {
+      nextRecommendation = {
+        label: firstIncompleteLesson.label,
+        identifiers: firstIncompleteLesson.identifiers,
+        dayNumber: firstIncompleteLesson.dayNumber,
+        goal: firstIncompleteLesson.goal,
+        type: "continue_plan",
+      };
     }
 
     // Completed list for UI (by identifier)
