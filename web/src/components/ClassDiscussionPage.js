@@ -394,7 +394,7 @@ const ClassDiscussionPage = () => {
         console.error("Failed to auto-archive expired thread", err);
       }
     });
-  }, [db, getThreadDocRef, now, threads]);
+  }, [getThreadDocRef, now, threads]);
 
   useEffect(
     () => () => {
