@@ -110,28 +110,7 @@ const normalizeStudentCode = (value = "") =>
     .trim()
     .toLowerCase();
 
-const identifierOrdinal = (identifier = "") => {
-  const plain = String(identifier || "")
-    .trim()
-    .toUpperCase()
-    .replace(/^(A1|A2|B1|B2|C1|C2)-/, "");
 
-  const match = plain.match(/^(\d+)(?:\.(\d+))?$/);
-  if (!match) return null;
-
-  const major = Number(match[1]);
-  const minor = Number(match[2] || 0);
-  if (!Number.isFinite(major) || !Number.isFinite(minor)) return null;
-  return major * 1000 + minor;
-};
-
-const lessonOrdinal = (lesson = {}) => {
-  const values = (lesson.identifiers || [])
-    .map((identifier) => identifierOrdinal(identifier))
-    .filter((value) => Number.isFinite(value));
-  if (!values.length) return null;
-  return Math.min(...values);
-};
 
 const getIdentifierLabel = (identifier = "") =>
   String(identifier || "")
@@ -204,25 +183,46 @@ const extractCanonicalIdentifiers = (value = "", level = "") => {
   return Array.from(new Set([...fromPrefixed, ...fromNumeric]));
 };
 
-const hasSpecificIdentifierHint = (value = "") => {
-  const text = String(value || "");
-  if (/\bchapter\b/i.test(text)) return true;
-  if (/\b(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?\b/i.test(text)) return true;
-  return /\d+\.\d+/.test(text);
-};
 
 // Prefer identifiers that exist in the planned schedule; prefer the LAST planned match in the string.
-const pickIdentifierFromText = (assignmentText, plannedSet) => {
+const pickIdentifierFromText = (assignmentText, plannedSet, { onlyCurriculumLike = false } = {}) => {
   const levelMatch = Array.from(plannedSet)[0]?.split("-")?.[0] || "";
   const found = extractCanonicalIdentifiers(assignmentText, levelMatch);
   if (!found.length) return null;
 
+  const candidates = onlyCurriculumLike
+    ? found.filter((item) => /-\d+\.\d+$/.test(item))
+    : found;
+  if (!candidates.length) return null;
+
   // last-to-first so we favor the later number in titles like "12 Hour Clock 7"
-  for (let i = found.length - 1; i >= 0; i -= 1) {
-    if (plannedSet.has(found[i])) return found[i];
+  for (let i = candidates.length - 1; i >= 0; i -= 1) {
+    if (plannedSet.has(candidates[i])) return candidates[i];
   }
   // fallback: first number
-  return found[0];
+  return candidates[0];
+};
+
+const extractChapterIdentifierFromTitle = (title = "", plannedSet = new Set()) => {
+  const text = String(title || "");
+  const match = text.match(/chapter\s*([0-9]+(?:\.[0-9]+)?)/i);
+  if (!match?.[1]) return null;
+  return pickIdentifierFromText(match[1], plannedSet) || null;
+};
+
+const chooseBestIdentifier = ({ assignmentText = "", explicitId = "", plannedSet = new Set() }) => {
+  const fromChapterHint = extractChapterIdentifierFromTitle(assignmentText, plannedSet);
+  if (fromChapterHint) return fromChapterHint;
+
+  const fromCurriculumLikeTitle = pickIdentifierFromText(assignmentText, plannedSet, {
+    onlyCurriculumLike: true,
+  });
+  if (fromCurriculumLikeTitle) return fromCurriculumLikeTitle;
+
+  const fromExplicit = pickIdentifierFromText(explicitId, plannedSet);
+  if (fromExplicit) return fromExplicit;
+
+  return pickIdentifierFromText(assignmentText, plannedSet);
 };
 
 /* ------------------------ Schedule scanning (web schedule) ------------------------ */
@@ -245,9 +245,11 @@ const getAssignmentSummary = (level = "A1") => {
     if (!dayNumber || scheduleTopicIsIgnored(topic)) continue;
 
     const identifiers = [];
+    let hasGeneralOrReadingAssignmentSignal = false;
 
     // top-level chapter (only if it's marked assignment:true)
     if (lesson.assignment === true && (lesson.assignmentId || lesson.chapter)) {
+      hasGeneralOrReadingAssignmentSignal = true;
       identifiers.push(
         ...extractCanonicalIdentifiers(lesson.assignmentId || lesson.chapter, level)
       );
@@ -257,13 +259,17 @@ const getAssignmentSummary = (level = "A1") => {
     if (Array.isArray(lesson.lesen_hören)) {
       for (const block of lesson.lesen_hören) {
         if (isRealAssignment(block) && block.chapter) {
+          hasGeneralOrReadingAssignmentSignal = true;
           identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
         }
       }
     } else if (isRealAssignment(lesson.lesen_hören)) {
       // sometimes lesen_hören is an object
       const ch = lesson.lesen_hören.assignmentId || lesson.lesen_hören.chapter || lesson.assignmentId || lesson.chapter;
-      if (ch) identifiers.push(...extractCanonicalIdentifiers(ch, level));
+      if (ch) {
+        hasGeneralOrReadingAssignmentSignal = true;
+        identifiers.push(...extractCanonicalIdentifiers(ch, level));
+      }
     }
 
     // nested schreiben_sprechen
@@ -286,6 +292,9 @@ const getAssignmentSummary = (level = "A1") => {
 
     // Skip practice-only lessons (no real assignment identifiers)
     if (!clean.length) continue;
+
+    // Ignore writing/speaking-only lessons from next/missed progression logic.
+    if (!hasGeneralOrReadingAssignmentSignal) continue;
 
     const displayTitle = ensureTitleHasIdentifier(
       String(lesson.assignmentTitle || lesson.title || topic || "").trim(),
@@ -426,19 +435,12 @@ const scoresSummaryHandler = async (req, res) => {
     const resolveIdentifier = (row) => {
       const explicitId = get(row, idx.assignmentId);
       const assignmentText = get(row, idx.assignment);
-      const fromAssignment = pickIdentifierFromText(assignmentText, plannedSet);
 
       if (explicitId && plannedSet.has(String(explicitId).toUpperCase())) {
         return String(explicitId).toUpperCase();
       }
 
-      if (fromAssignment && hasSpecificIdentifierHint(assignmentText)) {
-        return fromAssignment;
-      }
-
-      const fromExplicit = pickIdentifierFromText(explicitId, plannedSet);
-      if (fromExplicit) return fromExplicit;
-      return fromAssignment;
+      return chooseBestIdentifier({ assignmentText, explicitId, plannedSet });
     };
 
     const leaderboardEntries = new Map();
@@ -577,29 +579,21 @@ const scoresSummaryHandler = async (req, res) => {
     const lessonStatus = plannedLessons.map((l) => {
       const isCompleted = l.identifiers.every((id) => passed.has(id));
       const hasFailed = l.identifiers.some((id) => failed.has(id));
-      return { ...l, isCompleted, hasFailed, logicalOrder: lessonOrdinal(l) };
+      return { ...l, isCompleted, hasFailed };
     });
 
-    // Determine progress by logical identifier order first (0.1, 1.1, 1.2...),
-    // with schedule order as fallback when identifiers are missing.
-    const latestCompletedLogicalOrder = lessonStatus.reduce((max, lesson) => {
-      if (!lesson.isCompleted || !Number.isFinite(lesson.logicalOrder)) return max;
-      return Math.max(max, lesson.logicalOrder);
-    }, -1);
-    const latestCompletedScheduleOrder = lessonStatus.reduce((max, lesson) => {
-      if (!lesson.isCompleted) return max;
-      return Math.max(max, lesson.order);
-    }, -1);
+    const latestAttemptedDayNumber = lessonStatus.reduce((max, lesson) => {
+      const hasAnyAttempt = lesson.identifiers.some((id) => bestById.has(id));
+      if (!hasAnyAttempt) return max;
+      return Math.max(max, lesson.dayNumber || 0);
+    }, 0);
 
-    // Missed: lesson appears before our furthest completed lesson,
-    // is still incomplete, and is not currently failed.
+    // Missed/jumped: lesson is incomplete, not currently failed, and sits on/before
+    // the furthest day where the student has submitted any assignment attempt.
     const missedAssignments = lessonStatus
       .filter((l) => {
         if (l.isCompleted || l.hasFailed) return false;
-        if (Number.isFinite(latestCompletedLogicalOrder) && Number.isFinite(l.logicalOrder)) {
-          return l.logicalOrder < latestCompletedLogicalOrder;
-        }
-        return l.order < latestCompletedScheduleOrder;
+        return Number(l.dayNumber || 0) <= latestAttemptedDayNumber;
       })
       .map((l) => ({
         label: l.label,
