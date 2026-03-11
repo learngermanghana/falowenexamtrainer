@@ -140,6 +140,17 @@ const getTimerMeta = (thread, now) => {
 
 const repliesCollectionRef = (threadId) => collection(db, "qa_posts", threadId, "responses");
 
+const REPLY_INTENT_OPTIONS = [
+  { value: "main_answer", label: "My answer to the main question" },
+  { value: "feedback", label: "Feedback to a classmate" },
+  { value: "follow_up", label: "New follow-up question" },
+];
+
+const REPLY_INTENT_LABELS = REPLY_INTENT_OPTIONS.reduce((acc, option) => {
+  acc[option.value] = option.label;
+  return acc;
+}, {});
+
 const ClassDiscussionPage = () => {
   const { user, studentProfile, idToken } = useAuth();
   const [threads, setThreads] = useState([]);
@@ -147,6 +158,8 @@ const ClassDiscussionPage = () => {
   const [typingByThread, setTypingByThread] = useState({});
   const [now, setNow] = useState(Date.now());
   const [replyDrafts, setReplyDrafts] = useState({});
+  const [replyIntents, setReplyIntents] = useState({});
+  const [showQuestionReminderByThread, setShowQuestionReminderByThread] = useState({});
   const [isCorrectingDraft, setIsCorrectingDraft] = useState({});
   const [editingReply, setEditingReply] = useState(null);
   const [editingThread, setEditingThread] = useState(null); // { threadId, topic, question, instructions, extraLink }
@@ -281,6 +294,7 @@ const ClassDiscussionPage = () => {
               responderCode: data.responderCode || data.studentCode || null,
               responderUid: data.responderUid || null,
               text: data.text || "",
+              intent: data.intent || "",
               createdAt: normalizeTimestamp(data.createdAt) || Date.now(),
               editedAt: normalizeTimestamp(data.editedAt),
             };
@@ -351,6 +365,36 @@ const ClassDiscussionPage = () => {
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
+
+  useEffect(() => {
+    if (!db) return;
+
+    const expiredOpenThreads = threads.filter((thread) => {
+      if ((thread.status || "open") !== "open") return false;
+      const timerMeta = getTimerMeta(thread, now);
+      return timerMeta.isTimed && timerMeta.isExpired;
+    });
+
+    if (expiredOpenThreads.length === 0) return;
+
+    expiredOpenThreads.forEach(async (thread) => {
+      const threadRef = getThreadDocRef(thread);
+      if (!threadRef) return;
+
+      try {
+        await setDoc(
+          threadRef,
+          {
+            status: "archived",
+            archivedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error("Failed to auto-archive expired thread", err);
+      }
+    });
+  }, [db, getThreadDocRef, now, threads]);
 
   useEffect(
     () => () => {
@@ -539,6 +583,37 @@ const ClassDiscussionPage = () => {
     }
   };
 
+  const handleSetThreadStatus = async (thread, nextStatus) => {
+    if (!db || !thread?.id || !nextStatus) return;
+
+    if (!canEditThread(thread)) {
+      setError("You can only manage post status for a thread you created.");
+      return;
+    }
+
+    const threadRef = getThreadDocRef(thread);
+    if (!threadRef) {
+      setError("Missing class context. Please reload the page.");
+      return;
+    }
+
+    try {
+      await setDoc(
+        threadRef,
+        {
+          status: nextStatus,
+          archivedAt: nextStatus === "archived" ? serverTimestamp() : null,
+          editedAt: serverTimestamp(),
+          editedByUid: user?.uid || null,
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error("Failed to update thread status", err);
+      setError("Thread status could not be updated. Please try again.");
+    }
+  };
+
   const canEditReply = useCallback(
     (reply) => {
       if (!reply) return false;
@@ -613,7 +688,13 @@ const ClassDiscussionPage = () => {
 
   const handleReply = async (threadId) => {
     const draft = replyDrafts[threadId] || "";
+    const replyIntent = replyIntents[threadId] || "";
     if (!draft.trim() || !db) return;
+
+    if (!replyIntent) {
+      setError("Choose what kind of response this is before posting.");
+      return;
+    }
 
     setError("");
 
@@ -624,10 +705,12 @@ const ClassDiscussionPage = () => {
         responderCode: getResponderCode(),
         responderUid: user?.uid || null,
         text: draft,
+        intent: replyIntent,
         createdAt: serverTimestamp(),
       });
 
       setReplyDrafts((prev) => ({ ...prev, [threadId]: "" }));
+      setReplyIntents((prev) => ({ ...prev, [threadId]: "" }));
       stopTypingIndicator(threadId);
     } catch (err) {
       console.error("Failed to post reply", err);
@@ -849,6 +932,26 @@ const ClassDiscussionPage = () => {
                 Delete post
               </button>
             ) : null}
+
+            {canEditThread(thread) && status !== "archived" ? (
+              <button
+                style={{ ...styles.secondaryButton, padding: "8px 10px" }}
+                type="button"
+                onClick={() => handleSetThreadStatus(thread, "archived")}
+              >
+                Archive now
+              </button>
+            ) : null}
+
+            {canEditThread(thread) && status === "archived" ? (
+              <button
+                style={{ ...styles.secondaryButton, padding: "8px 10px" }}
+                type="button"
+                onClick={() => handleSetThreadStatus(thread, "open")}
+              >
+                Reopen thread
+              </button>
+            ) : null}
           </div>
         </div>
 
@@ -987,6 +1090,11 @@ const ClassDiscussionPage = () => {
                   >
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 14 }}>{reply.author || "Student"}</div>
+                      {reply.intent ? (
+                        <div style={{ ...styles.helperText, margin: 0, fontSize: 12, color: "#0369a1" }}>
+                          {REPLY_INTENT_LABELS[reply.intent] || "Class response"}
+                        </div>
+                      ) : null}
                       <div style={{ fontSize: 12, color: "#6b7280" }} title={formatDateTime(reply.createdAt, timezonePreference)}>
                         Posted {formatRelativeTime(reply.createdAt, now)}
                         {reply.editedAt ? ` · edited ${formatDateTime(reply.editedAt, timezonePreference)}` : ""}
@@ -1057,6 +1165,40 @@ const ClassDiscussionPage = () => {
               <span style={statusBadgeStyle}>{status}</span>
             </div>
 
+            <div
+              style={{
+                ...styles.helperText,
+                margin: 0,
+                position: "sticky",
+                top: 8,
+                zIndex: 1,
+                background: "#eff6ff",
+                border: "1px solid #bfdbfe",
+                borderRadius: 10,
+                padding: 10,
+                color: "#1e3a8a",
+              }}
+            >
+              <strong>You are answering:</strong> {thread.question}
+            </div>
+
+            <div style={{ display: "grid", gap: 6 }}>
+              <label style={styles.label}>What is this response?</label>
+              <select
+                style={styles.select}
+                value={replyIntents[thread.id] || ""}
+                onChange={(e) => setReplyIntents((prev) => ({ ...prev, [thread.id]: e.target.value }))}
+                disabled={repliesLocked}
+              >
+                <option value="">Select response type</option>
+                {REPLY_INTENT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <textarea
               style={styles.textareaSmall}
               placeholder={
@@ -1096,6 +1238,18 @@ const ClassDiscussionPage = () => {
               <button
                 style={{ ...styles.secondaryButton, padding: "10px 12px" }}
                 type="button"
+                onClick={() =>
+                  setShowQuestionReminderByThread((prev) => ({
+                    ...prev,
+                    [thread.id]: !prev[thread.id],
+                  }))
+                }
+              >
+                {showQuestionReminderByThread[thread.id] ? "Hide question" : "Show question"}
+              </button>
+              <button
+                style={{ ...styles.secondaryButton, padding: "10px 12px" }}
+                type="button"
                 onClick={() => handleCorrectDraft(thread.id)}
                 disabled={isCorrectingDraft[thread.id] || repliesLocked}
               >
@@ -1110,6 +1264,27 @@ const ClassDiscussionPage = () => {
                 Post response
               </button>
             </div>
+
+            {showQuestionReminderByThread[thread.id] ? (
+              <div
+                style={{
+                  background: "#f8fafc",
+                  border: "1px solid #cbd5e1",
+                  borderRadius: 10,
+                  padding: 10,
+                  display: "grid",
+                  gap: 6,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: "#0f172a" }}>Question reminder</div>
+                <div style={{ ...styles.helperText, margin: 0, color: "#0f172a" }}>{thread.question}</div>
+                {thread.instructions ? (
+                  <div style={{ ...styles.helperText, margin: 0 }}>
+                    <strong>Instructions:</strong> {thread.instructions}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
 
             {status === "archived" ? (
               <p style={{ ...styles.helperText, margin: 0, color: "#0f172a" }}>
