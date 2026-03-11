@@ -110,6 +110,29 @@ const normalizeStudentCode = (value = "") =>
     .trim()
     .toLowerCase();
 
+const identifierOrdinal = (identifier = "") => {
+  const plain = String(identifier || "")
+    .trim()
+    .toUpperCase()
+    .replace(/^(A1|A2|B1|B2|C1|C2)-/, "");
+
+  const match = plain.match(/^(\d+)(?:\.(\d+))?$/);
+  if (!match) return null;
+
+  const major = Number(match[1]);
+  const minor = Number(match[2] || 0);
+  if (!Number.isFinite(major) || !Number.isFinite(minor)) return null;
+  return major * 1000 + minor;
+};
+
+const lessonOrdinal = (lesson = {}) => {
+  const values = (lesson.identifiers || [])
+    .map((identifier) => identifierOrdinal(identifier))
+    .filter((value) => Number.isFinite(value));
+  if (!values.length) return null;
+  return Math.min(...values);
+};
+
 /* ------------------------ Identifier parsing (strings) ------------------------ */
 
 // Extract numbers like 0.2, 1.1, 4.10 from a string.
@@ -534,13 +557,16 @@ const scoresSummaryHandler = async (req, res) => {
     const lessonStatus = plannedLessons.map((l) => {
       const isCompleted = l.identifiers.every((id) => passed.has(id));
       const hasFailed = l.identifiers.some((id) => failed.has(id));
-      return { ...l, isCompleted, hasFailed };
+      return { ...l, isCompleted, hasFailed, logicalOrder: lessonOrdinal(l) };
     });
 
-    // Determine the furthest lesson position reached in schedule order.
-    // This keeps next/missed logic stable even when day numbers are duplicated
-    // or reordered in dictionary updates.
-    const latestCompletedOrder = lessonStatus.reduce((max, lesson) => {
+    // Determine progress by logical identifier order first (0.1, 1.1, 1.2...),
+    // with schedule order as fallback when identifiers are missing.
+    const latestCompletedLogicalOrder = lessonStatus.reduce((max, lesson) => {
+      if (!lesson.isCompleted || !Number.isFinite(lesson.logicalOrder)) return max;
+      return Math.max(max, lesson.logicalOrder);
+    }, -1);
+    const latestCompletedScheduleOrder = lessonStatus.reduce((max, lesson) => {
       if (!lesson.isCompleted) return max;
       return Math.max(max, lesson.order);
     }, -1);
@@ -548,7 +574,13 @@ const scoresSummaryHandler = async (req, res) => {
     // Missed: lesson appears before our furthest completed lesson,
     // is still incomplete, and is not currently failed.
     const missedAssignments = lessonStatus
-      .filter((l) => l.order < latestCompletedOrder && !l.isCompleted && !l.hasFailed)
+      .filter((l) => {
+        if (l.isCompleted || l.hasFailed) return false;
+        if (Number.isFinite(latestCompletedLogicalOrder) && Number.isFinite(l.logicalOrder)) {
+          return l.logicalOrder < latestCompletedLogicalOrder;
+        }
+        return l.order < latestCompletedScheduleOrder;
+      })
       .map((l) => ({
         label: l.label,
         identifiers: l.identifiers,
