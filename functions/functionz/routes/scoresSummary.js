@@ -133,6 +133,23 @@ const lessonOrdinal = (lesson = {}) => {
   return Math.min(...values);
 };
 
+const getIdentifierLabel = (identifier = "") =>
+  String(identifier || "")
+    .trim()
+    .toUpperCase()
+    .replace(/^(A1|A2|B1|B2|C1|C2)-/, "");
+
+const ensureTitleHasIdentifier = (title = "", identifiers = []) => {
+  const cleanTitle = String(title || "").trim();
+  const firstIdentifier = getIdentifierLabel(identifiers[0] || "");
+  if (!firstIdentifier) return cleanTitle;
+
+  const hasIdentifierInTitle = /\d+(?:\.\d+)?/.test(cleanTitle);
+  if (hasIdentifierInTitle) return cleanTitle;
+  if (!cleanTitle) return firstIdentifier;
+  return `${firstIdentifier} ${cleanTitle}`;
+};
+
 /* ------------------------ Identifier parsing (strings) ------------------------ */
 
 // Extract numbers like 0.2, 1.1, 4.10 from a string.
@@ -270,7 +287,10 @@ const getAssignmentSummary = (level = "A1") => {
     // Skip practice-only lessons (no real assignment identifiers)
     if (!clean.length) continue;
 
-    const displayTitle = String(lesson.assignmentTitle || lesson.title || topic || "").trim();
+    const displayTitle = ensureTitleHasIdentifier(
+      String(lesson.assignmentTitle || lesson.title || topic || "").trim(),
+      clean
+    );
     const label = `Day ${dayNumber}: ${displayTitle || `Assignment ${clean.join(", ")}`}`.trim();
 
     lessons.push({
