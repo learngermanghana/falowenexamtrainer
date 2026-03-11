@@ -84,7 +84,7 @@ const tokenizeSubmission = (value) =>
 
 const parseObjectiveAnswers = (value) => {
   const text = String(value || "");
-  const matches = [...text.matchAll(/(\d+)\s*[\).:-]?\s*([a-zA-Z0-9]+)/g)];
+  const matches = [...text.matchAll(/(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)/g)];
   if (!matches.length) return null;
 
   const answersByQuestion = new Map();
