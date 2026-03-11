@@ -698,7 +698,13 @@ const AssignmentSubmissionPage = () => {
 
   useEffect(() => {
     const loadDraftsAndSubmissions = async () => {
-      if (!db || !user?.uid) return;
+      if (!db || !user?.uid) {
+        setRecentSubmissions([]);
+        setLockedChapters(new Set());
+        setLockInfoByChapterKey({});
+        setDraftsByAssignment({});
+        return;
+      }
 
       setSubmissionsLoading(true);
       try {
@@ -738,31 +744,29 @@ const AssignmentSubmissionPage = () => {
         const lockRef = collection(db, LOCK_COLLECTION);
         const lockSnapshot = await getDocs(query(lockRef, where("studentId", "==", user.uid)));
 
-        if (!lockSnapshot.empty) {
-          const locked = new Set();
-          const lockMeta = {};
+        const locked = new Set();
+        const lockMeta = {};
 
-          lockSnapshot.docs.forEach((docSnap) => {
-            const data = docSnap.data();
-            if (!levelMatches(data.level, preferredLevel)) return;
+        lockSnapshot.docs.forEach((docSnap) => {
+          const data = docSnap.data();
+          if (!levelMatches(data.level, preferredLevel)) return;
 
-            const chapterKey =
-              data.chapterKey ||
-              buildChapterKey(data.assignmentTitle) ||
-              (data.chapter ? `day-${data.chapter}` : null);
+          const chapterKey =
+            data.chapterKey ||
+            buildChapterKey(data.assignmentTitle) ||
+            (data.chapter ? `day-${data.chapter}` : null);
 
-            if (chapterKey) {
-              locked.add(chapterKey);
-              lockMeta[chapterKey] = {
-                assignmentTitle: data.assignmentTitle || "",
-                lockedAt: data.lockedAt || data.createdAt || null,
-              };
-            }
-          });
+          if (chapterKey) {
+            locked.add(chapterKey);
+            lockMeta[chapterKey] = {
+              assignmentTitle: data.assignmentTitle || "",
+              lockedAt: data.lockedAt || data.createdAt || null,
+            };
+          }
+        });
 
-          setLockedChapters(locked);
-          setLockInfoByChapterKey(lockMeta);
-        }
+        setLockedChapters(locked);
+        setLockInfoByChapterKey(lockMeta);
 
         // Drafts
         const draftsRef = collection(db, DRAFT_COLLECTION);
@@ -770,36 +774,34 @@ const AssignmentSubmissionPage = () => {
           query(draftsRef, where("studentId", "==", user.uid), orderBy("updatedAt", "desc"), limit(30))
         );
 
-        if (!draftSnapshot.empty) {
-          const latestDrafts = {};
-          draftSnapshot.docs.forEach((docSnap) => {
-            const data = docSnap.data();
-            const computedAssignmentKey =
-              data.assignmentKey ||
-              data.canonicalAssignmentKey ||
-              resolveAssignmentCanonicalKey({
-                level: data.level || preferredLevel,
-                assignmentId: data.assignmentId,
-                assignmentTitle: data.assignmentTitle || data.title,
-              });
-            if (!levelMatches(data.level, preferredLevel)) return;
+        const latestDrafts = {};
+        draftSnapshot.docs.forEach((docSnap) => {
+          const data = docSnap.data();
+          const computedAssignmentKey =
+            data.assignmentKey ||
+            data.canonicalAssignmentKey ||
+            resolveAssignmentCanonicalKey({
+              level: data.level || preferredLevel,
+              assignmentId: data.assignmentId,
+              assignmentTitle: data.assignmentTitle || data.title,
+            });
+          if (!levelMatches(data.level, preferredLevel)) return;
 
-            if (!data.assignmentKey && computedAssignmentKey) {
-              setDoc(doc(db, DRAFT_COLLECTION, docSnap.id), { assignmentKey: computedAssignmentKey }, { merge: true }).catch(() => {});
-            }
+          if (!data.assignmentKey && computedAssignmentKey) {
+            setDoc(doc(db, DRAFT_COLLECTION, docSnap.id), { assignmentKey: computedAssignmentKey }, { merge: true }).catch(() => {});
+          }
 
-            const assignmentKey = data.assignmentTitle || data.title || assignmentOptions[0];
-            if (!latestDrafts[assignmentKey]) {
-              latestDrafts[assignmentKey] = {
-                id: docSnap.id,
-                ...data,
-                assignmentKey: computedAssignmentKey,
-                canonicalAssignmentKey: computedAssignmentKey,
-              };
-            }
-          });
-          setDraftsByAssignment(latestDrafts);
-        }
+          const assignmentKey = data.assignmentTitle || data.title || assignmentOptions[0];
+          if (!latestDrafts[assignmentKey]) {
+            latestDrafts[assignmentKey] = {
+              id: docSnap.id,
+              ...data,
+              assignmentKey: computedAssignmentKey,
+              canonicalAssignmentKey: computedAssignmentKey,
+            };
+          }
+        });
+        setDraftsByAssignment(latestDrafts);
       } catch (error) {
         console.error("Failed to load submissions", error);
         setStatus((prev) => ({ ...prev, error: "Could not load your previous submissions." }));
