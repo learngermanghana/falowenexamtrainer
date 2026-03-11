@@ -36,6 +36,11 @@ const normalizeTimestamp = (value) => {
   }
 
   if (typeof value === "string") {
+    const asNumber = Number(value);
+    if (!Number.isNaN(asNumber) && Number.isFinite(asNumber)) {
+      return asNumber < 1e12 ? asNumber * 1000 : asNumber;
+    }
+
     const parsed = Date.parse(value);
     return Number.isNaN(parsed) ? null : parsed;
   }
@@ -188,6 +193,12 @@ const ClassDiscussionPage = () => {
     const role = (studentProfile?.role || "").toLowerCase();
     return role === "tutor" || role === "admin" || studentProfile?.isTutor === true;
   }, [studentProfile?.role, studentProfile?.isTutor]);
+
+  const isDiscussionAdmin = useMemo(() => {
+    const email = String(user?.email || studentProfile?.email || "").toLowerCase().trim();
+    const name = String(studentProfile?.name || user?.displayName || "").toLowerCase().trim();
+    return isTutor || email === "moxflex@gmail.com" || name === "felix asadu";
+  }, [isTutor, studentProfile?.email, studentProfile?.name, user?.displayName, user?.email]);
 
   useEffect(() => {
     if (!db) {
@@ -436,6 +447,15 @@ const ClassDiscussionPage = () => {
     [isTutor, user?.uid]
   );
 
+  const canDeleteThread = useCallback(
+    (thread) => {
+      if (!thread) return false;
+      if (isDiscussionAdmin) return true;
+      return Boolean(user?.uid) && thread.createdByUid === user.uid;
+    },
+    [isDiscussionAdmin, user?.uid]
+  );
+
   const startEditThread = (thread) => {
     if (!canEditThread(thread)) {
       setError("You can only edit a post you created.");
@@ -490,6 +510,32 @@ const ClassDiscussionPage = () => {
       setError("Thread could not be edited. Please try again.");
     } finally {
       setIsSavingThreadEdit(false);
+    }
+  };
+
+  const handleDeleteThread = async (thread) => {
+    if (!db || !thread?.id) return;
+
+    if (!canDeleteThread(thread)) {
+      setError("You can only delete your own post.");
+      return;
+    }
+
+    const threadRef = getThreadDocRef(thread);
+    if (!threadRef) {
+      setError("Missing class context. Please reload the page.");
+      return;
+    }
+
+    try {
+      await deleteDoc(threadRef);
+
+      if (editingThread?.threadId === thread.id) {
+        setEditingThread(null);
+      }
+    } catch (err) {
+      console.error("Failed to delete thread", err);
+      setError("Post could not be deleted. Please try again.");
     }
   };
 
@@ -791,6 +837,16 @@ const ClassDiscussionPage = () => {
                 onClick={() => startEditThread(thread)}
               >
                 Edit post
+              </button>
+            ) : null}
+
+            {canDeleteThread(thread) ? (
+              <button
+                style={{ ...styles.dangerButton, padding: "8px 10px" }}
+                type="button"
+                onClick={() => handleDeleteThread(thread)}
+              >
+                Delete post
               </button>
             ) : null}
           </div>
