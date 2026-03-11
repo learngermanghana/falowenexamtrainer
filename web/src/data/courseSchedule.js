@@ -735,7 +735,7 @@ const RAW_COURSE_SCHEDULES = {
           youtube_link: "https://youtu.be/MrB3BPtQN6A",
           assignment: true,
           grammarbook_link: "https://www.falowen.app/campus/course/food-and-negation-day-16-9-10",
-          workbook_link: "https://drive.google.com/file/d/1hKtQdXg5y3yJyFBQsCMr7fZ11cYbuG7D/view?usp=sharing",
+          workbook_link: "/campus/course/a1-day-16-food-and-negation-food-and-daily-life-workbook",
         },
         {
           chapter: "10",
