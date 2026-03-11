@@ -364,7 +364,7 @@ export const fetchAttendanceRecords = async ({ className, studentCode, studentUi
   }
 };
 
-export const fetchAttendanceSummary = async ({ className, studentCode, level } = {}) => {
-  const { sessions, hours } = await fetchAttendanceRecords({ className, studentCode, level });
+export const fetchAttendanceSummary = async ({ className, studentCode, studentUid, level } = {}) => {
+  const { sessions, hours } = await fetchAttendanceRecords({ className, studentCode, studentUid, level });
   return { sessions, hours };
 };

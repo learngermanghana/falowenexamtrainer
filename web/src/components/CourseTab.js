@@ -93,10 +93,10 @@ const buildLevelSchedules = () => {
         return {
           chapter: dictionaryEntry?.chapter || session.chapter || session.title || `Session ${index + 1}`,
           assignmentId: dictionaryEntry?.assignment_id || session.assignmentId || session.chapter || null,
-          title: dictionaryEntry?.en || session.title,
+          title: dictionaryEntry?.topic || dictionaryEntry?.en || session.title,
           assignment: Boolean(session.assignment),
           note: session.note,
-          type: dictionaryEntry?.de || session.type,
+          type: dictionaryEntry?.topic || dictionaryEntry?.de || session.type,
           video,
           youtube_link: session.youtube_link || session.video || fallback.video || null,
           grammarbook_link,
@@ -110,7 +110,15 @@ const buildLevelSchedules = () => {
 
       return {
         day: day.dayNumber,
-        topic: primarySession.title || primarySession.chapter || `Day ${day.dayNumber}`,
+        topic:
+          getAssignmentDictionaryEntry({
+            level,
+            assignmentId: primarySession.assignmentId,
+            chapter: primarySession.chapter,
+          })?.topic ||
+          primarySession.title ||
+          primarySession.chapter ||
+          `Day ${day.dayNumber}`,
         chapter: primarySession.chapter || primarySession.title || null,
         instruction:
           notes.length > 0

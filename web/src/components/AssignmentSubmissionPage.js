@@ -294,6 +294,7 @@ const AssignmentSubmissionPage = () => {
         const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
         const prefersEnglishTitle = preferredLevel === "A1";
         const topicTitle =
+          dictionaryEntry?.topic ||
           (prefersEnglishTitle ? dictionaryEntry?.en : dictionaryEntry?.de) ||
           dictionaryEntry?.en ||
           dictionaryEntry?.de ||
