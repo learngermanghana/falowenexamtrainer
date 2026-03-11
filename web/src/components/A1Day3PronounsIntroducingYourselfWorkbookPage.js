@@ -103,7 +103,7 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Schreiben (Exercise) &amp; Fragen</h2>
+        <h2 style={{ margin: 0 }}>Teil 2 · Schreiben (Exercise)</h2>
         <div style={questionBoxStyle}>
           <strong>Writing Task: Introduce Yourself (16.6)</strong>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -119,6 +119,22 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
             <em>Example:</em> Hallo! Ich heiße Anna. Ich komme aus Spanien und ich wohne in Madrid.
           </p>
         </div>
+
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
+        <a
+          href="https://drive.google.com/file/d/13LAdG1vlR6Bcid2NycKO0BEROpuHv7-f/view?usp=sharing"
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        >
+          Open Hören Material (Google Drive)
+        </a>
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          Complete Hören from Google Drive, then return to submit answers.
+        </p>
 
         <h3 style={{ margin: 0 }}>Fragen und Multiple-Choice-Antworten</h3>
         {multipleChoiceQuestions.map((question) => (
@@ -140,21 +156,6 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
             (street), die Adresse (address)
           </p>
         </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
-        <a
-          href="https://drive.google.com/file/d/13LAdG1vlR6Bcid2NycKO0BEROpuHv7-f/view?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Complete Hören from Google Drive, then return to submit answers.
-        </p>
       </section>
 
       <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
