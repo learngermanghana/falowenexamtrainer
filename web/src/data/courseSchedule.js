@@ -640,7 +640,7 @@ const RAW_COURSE_SCHEDULES = {
         youtube_link: "https://youtu.be/sDL5z3lsITk",
         grammarbook_link: "https://www.falowen.app/campus/course/objects-and-colors-chapter-6",
         assignment: true,
-        workbook_link: "https://drive.google.com/file/d/18B1O4Jr_CYKtlGlINPRM3z2Es5YGkMAf/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-10-objects-colors-possessive-articles-workbook",
       },
     },
     {
