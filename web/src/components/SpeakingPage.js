@@ -170,7 +170,10 @@ const SpeakingPage = ({ mode = "exam" }) => {
       const saved = await loadSpeakingProgress({ userId, studentCode, mode });
       if (cancelled) return;
       setCompletedQuestionIds(saved?.completedQuestionIds || {});
-      if (saved?.selectedLevel) setSelectedLevel(saved.selectedLevel);
+      const shouldUseSavedLevel = !(isExamMode && examLevel);
+      if (saved?.selectedLevel && shouldUseSavedLevel) {
+        setSelectedLevel(String(saved.selectedLevel).toUpperCase());
+      }
       if (saved?.selectedTeil) setSelectedTeil(saved.selectedTeil);
       setProgressLoaded(true);
     };
@@ -180,7 +183,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
     return () => {
       cancelled = true;
     };
-  }, [mode, studentCode, userId]);
+  }, [examLevel, isExamMode, mode, studentCode, userId]);
 
   useEffect(() => {
     if (!progressLoaded || (!userId && !studentCode)) return;
