@@ -177,6 +177,11 @@ const DirectionsImperativePage = () => {
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
+        <img
+          src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80"
+          alt="City intersection with roads and buildings for practicing German directions"
+          style={{ width: "100%", maxHeight: 260, objectFit: "cover", borderRadius: 12 }}
+        />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Day 17: Directions + Imperative (Chapter 11)</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Understand instructions and requests in German with useful direction phrases and imperative forms.
