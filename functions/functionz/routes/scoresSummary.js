@@ -253,6 +253,12 @@ const isRealAssignment = (obj) => obj && obj.assignment === true;
 const scheduleTopicIsIgnored = (topic = "") =>
   String(topic || "").toLowerCase().includes("goethe");
 
+const isA1PracticalWritingLesson = (level = "", lesson = {}) => {
+  if (String(level || "").toUpperCase() !== "A1") return false;
+  const text = `${lesson?.topic || ""} ${lesson?.title || ""} ${lesson?.goal || ""}`.toLowerCase();
+  return text.includes("schreiben") || text.includes("sprechen");
+};
+
 // Build a linear list of lessons in schedule order with the identifiers that must be passed.
 const getAssignmentSummary = (level = "A1") => {
   const schedule = courseSchedules?.[String(level || "A1").toUpperCase()] || [];
@@ -269,7 +275,11 @@ const getAssignmentSummary = (level = "A1") => {
     let hasGeneralOrReadingAssignmentSignal = false;
 
     // top-level chapter (only if it's marked assignment:true)
-    if (lesson.assignment === true && (lesson.assignmentId || lesson.chapter)) {
+    if (
+      lesson.assignment === true &&
+      (lesson.assignmentId || lesson.chapter) &&
+      !isA1PracticalWritingLesson(level, lesson)
+    ) {
       hasGeneralOrReadingAssignmentSignal = true;
       identifiers.push(
         ...extractCanonicalIdentifiers(lesson.assignmentId || lesson.chapter, level)
@@ -293,20 +303,22 @@ const getAssignmentSummary = (level = "A1") => {
       }
     }
 
-    // nested schreiben_sprechen
-    if (Array.isArray(lesson.schreiben_sprechen)) {
-      for (const block of lesson.schreiben_sprechen) {
-        if (isRealAssignment(block) && block.chapter) {
-          identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
+    // nested schreiben_sprechen (A1 speaking/writing blocks are practical-only)
+    if (String(level || "").toUpperCase() !== "A1") {
+      if (Array.isArray(lesson.schreiben_sprechen)) {
+        for (const block of lesson.schreiben_sprechen) {
+          if (isRealAssignment(block) && block.chapter) {
+            identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
+          }
         }
+      } else if (isRealAssignment(lesson.schreiben_sprechen)) {
+        const ch =
+          lesson.schreiben_sprechen.assignmentId ||
+          lesson.schreiben_sprechen.chapter ||
+          lesson.assignmentId ||
+          lesson.chapter;
+        if (ch) identifiers.push(...extractCanonicalIdentifiers(ch, level));
       }
-    } else if (isRealAssignment(lesson.schreiben_sprechen)) {
-      const ch =
-        lesson.schreiben_sprechen.assignmentId ||
-        lesson.schreiben_sprechen.chapter ||
-        lesson.assignmentId ||
-        lesson.chapter;
-      if (ch) identifiers.push(...extractCanonicalIdentifiers(ch, level));
     }
 
     const clean = Array.from(new Set(identifiers)).filter(Boolean);

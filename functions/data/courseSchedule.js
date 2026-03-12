@@ -1988,6 +1988,24 @@ const resolveA1TopicName = (entry, lesen_hören, schreiben_sprechen) => {
     .join(" + ") || entry.topic;
 };
 
+const isA1PracticalTopic = (entry = {}, level = "") => {
+  if (String(level || "").toUpperCase() !== "A1") return false;
+  const text = `${entry?.topic || ""} ${entry?.title || ""} ${entry?.goal || ""}`.toLowerCase();
+  return text.includes("schreiben") || text.includes("sprechen");
+};
+
+const markPracticalAsNonAssignment = (lessonCollection) => {
+  if (Array.isArray(lessonCollection)) {
+    return lessonCollection.map((lesson) => ({ ...(lesson || {}), assignment: false }));
+  }
+
+  if (lessonCollection && typeof lessonCollection === "object") {
+    return { ...lessonCollection, assignment: false };
+  }
+
+  return lessonCollection;
+};
+
 const normalizeLessonCollection = (lessonCollection, fallbackValues = [], level = "") => {
   if (Array.isArray(lessonCollection)) {
     return lessonCollection.map((lesson) => withDictionaryMetadata(withAssignmentId(lesson, ...fallbackValues), level));
@@ -2017,7 +2035,8 @@ const normalizeCourseSchedules = (schedules) =>
           ];
 
           const lesen_hören = normalizeLessonCollection(entryWithAssignmentId.lesen_hören, fallbackAssignmentValues, level);
-          const schreiben_sprechen = normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, fallbackAssignmentValues, level);
+          const schreiben_sprechenRaw = normalizeLessonCollection(entryWithAssignmentId.schreiben_sprechen, fallbackAssignmentValues, level);
+          const schreiben_sprechen = level === "A1" ? markPracticalAsNonAssignment(schreiben_sprechenRaw) : schreiben_sprechenRaw;
 
           const baseInstruction = getDefaultInstruction(entryWithAssignmentId.instruction);
           const instruction =
@@ -2029,6 +2048,7 @@ const normalizeCourseSchedules = (schedules) =>
 
           return {
             ...entryWithAssignmentId,
+            assignment: isA1PracticalTopic(entryWithAssignmentId, level) ? false : entryWithAssignmentId.assignment,
             instruction,
             topic:
               level === "A1"
