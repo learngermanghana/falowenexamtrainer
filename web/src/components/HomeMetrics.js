@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { fetchAttendanceSummary } from "../services/attendanceService";
-import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
+import { getCourseScheduleAssignmentMetadata } from "../data/assignmentMetadata";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
@@ -87,21 +87,23 @@ const buildDictionaryLabel = (entry = {}, level = "") => {
   const canonicalIds = extractCanonicalAssignmentIds(entry, level);
   if (!canonicalIds.length) return entry?.label || "";
 
-  const topics = canonicalIds
+  const scheduleEntries = canonicalIds
     .map((canonicalId) => {
       const chapter = canonicalId.split("-").slice(1).join("-");
-      const dictionaryEntry = getAssignmentDictionaryEntry({
+      return getCourseScheduleAssignmentMetadata({
         level,
         assignmentId: canonicalId,
         chapter,
       });
-      return dictionaryEntry?.topic || dictionaryEntry?.en || dictionaryEntry?.de || "";
     })
     .filter(Boolean);
 
+  const topics = scheduleEntries.map((scheduleEntry) => scheduleEntry?.topic || "").filter(Boolean);
+
   if (!topics.length) return entry?.label || "";
 
-  const day = Number(entry?.dayNumber);
+  const dictionaryDay = Number(scheduleEntries[0]?.assignmentDay || 0);
+  const day = dictionaryDay || Number(entry?.dayNumber);
   const dayPrefix = Number.isFinite(day) && day > 0 ? `Day ${day}: ` : "";
   const mergedTopic = Array.from(new Set(topics)).join(" + ");
   return `${dayPrefix}${mergedTopic}`.trim();
