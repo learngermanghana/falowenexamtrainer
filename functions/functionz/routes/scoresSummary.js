@@ -173,14 +173,20 @@ const extractIdentifiers = (value = "") => {
 };
 
 const extractCanonicalIdentifiers = (value = "", level = "") => {
+  const text = String(value || "");
+  const fromLevelWithSeparator = Array.from(
+    text.matchAll(/\b(A1|A2|B1|B2|C1|C2)[\s-]+(\d+(?:\.\d+)?)\b/gi)
+  ).map(([, lvl, num]) => `${String(lvl || "").toUpperCase()}-${normalizeIdentifier(num)}`);
+
   const fromPrefixed = String(value || "")
     .match(/\b(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?\b/gi)
     ?.map((item) => String(item).toUpperCase()) || [];
-  const fromNumeric = extractIdentifiers(value)
+  const cleanedForNumericScan = text.replace(/\b(A1|A2|B1|B2|C1|C2)[\s-]+\d+(?:\.\d+)?\b/gi, " ");
+  const fromNumeric = extractIdentifiers(cleanedForNumericScan)
     .map((item) => toCanonicalIdentifier(level, item))
     .filter(Boolean);
 
-  return Array.from(new Set([...fromPrefixed, ...fromNumeric]));
+  return Array.from(new Set([...fromLevelWithSeparator, ...fromPrefixed, ...fromNumeric]));
 };
 
 
