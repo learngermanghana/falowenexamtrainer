@@ -13,9 +13,8 @@ const toCanonicalId = ({ level, value }) => {
 
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
-const collectAssignmentBlocks = (lesson = {}, level = "") => {
+const collectAssignmentBlocks = (lesson = {}) => {
   const blocks = [];
-  const normalizedLevel = normalizeLevel(level);
 
   if (lesson.assignment === true && (lesson.assignmentId || lesson.chapter)) {
     blocks.push({
@@ -24,12 +23,7 @@ const collectAssignmentBlocks = (lesson = {}, level = "") => {
     });
   }
 
-  const nestedBlocks = [
-    ...toArray(lesson.lesen_hören),
-    ...(normalizedLevel === "A1" ? [] : toArray(lesson.schreiben_sprechen)),
-  ];
-
-  for (const nested of nestedBlocks) {
+  for (const nested of [...toArray(lesson.lesen_hören), ...toArray(lesson.schreiben_sprechen)]) {
     if (nested?.assignment === true && (nested.assignmentId || nested.chapter)) {
       blocks.push({
         assignmentId: nested.assignmentId,
@@ -53,7 +47,7 @@ export const buildAssignmentMetadataByLevel = (schedules = courseSchedules) => {
       const dayNumber = Number(lesson.day || lesson.dayNumber || 0) || null;
       const topic = String(lesson.topic || lesson.title || "").trim();
 
-      collectAssignmentBlocks(lesson, level).forEach((block) => {
+      collectAssignmentBlocks(lesson).forEach((block) => {
         const chapter = String(block.chapter || "").trim();
         const canonical = toCanonicalId({ level, value: block.assignmentId || chapter });
         if (!canonical) return;

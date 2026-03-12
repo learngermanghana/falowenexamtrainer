@@ -1847,11 +1847,7 @@ const buildCoursebookDictionaryByLevel = (schedules = {}) => {
         blocks.push(lesson);
       }
 
-      const nestedAssignmentBlocks = [
-        ...toLessonArray(lesson?.lesen_hören),
-        ...(level === "A1" ? [] : toLessonArray(lesson?.schreiben_sprechen)),
-      ];
-      nestedAssignmentBlocks.forEach((nested) => {
+      [...toLessonArray(lesson?.lesen_hören), ...toLessonArray(lesson?.schreiben_sprechen)].forEach((nested) => {
         if (nested?.assignment === true && (nested?.assignmentId || nested?.chapter)) {
           blocks.push(nested);
         }

@@ -144,7 +144,6 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Fragen</h2>
         <p style={{ margin: 0, fontWeight: 600 }}>A) True or False Questions</p>
         {readingQuestions.map((question) => (
           <div key={question} style={questionBoxStyle}>
@@ -153,7 +152,21 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
             <span>B) Falsch</span>
           </div>
         ))}
+      </section>
 
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Teil 2 · Hören</h2>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Complete Hören from Google Drive, then return to submit answers.
+        </p>
+        <a
+          href="https://drive.google.com/file/d/12RITYz1tYLee-FMw9WFzAD9YrtqrjwmC/view?usp=sharing"
+          target="_blank"
+          rel="noreferrer"
+          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        >
+          Open Hören Material (Google Drive)
+        </a>
         <p style={{ margin: "8px 0 0", fontWeight: 600 }}>B) Hören Fragen (Multiple Choice)</p>
         {listeningQuestions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>
@@ -171,21 +184,6 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
           <span><strong>Adjektive:</strong> {vocabList.adjektive.join(" · ")}</span>
           <span><strong>Phrasen:</strong> {vocabList.phrasen.join(" · ")}</span>
         </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete Hören from Google Drive, then return to submit answers.
-        </p>
-        <a
-          href="https://drive.google.com/file/d/12RITYz1tYLee-FMw9WFzAD9YrtqrjwmC/view?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
       </section>
 
       <div style={{ ...cardStyle, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
