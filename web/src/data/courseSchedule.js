@@ -743,7 +743,7 @@ const RAW_COURSE_SCHEDULES = {
           youtube_link: "",
           grammarbook_link: "",
           assignment: true,
-          workbook_link: "https://drive.google.com/file/d/1rJXshXQSS5Or4ipv1VmUMsoB0V1Vx4VK/view?usp=sharing",
+          workbook_link: "/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook",
         },
       ],
     },
