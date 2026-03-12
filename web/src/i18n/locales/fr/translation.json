@@ -43,7 +43,8 @@
       "aiFrench": "Falowen A.I (Français)",
       "results": "Résultats",
       "discussion": "Discussion de classe",
-      "account": "Compte"
+      "account": "Compte",
+      "attendance": "Présence"
     },
     "sections": {
       "courseBook": "Livre de cours",
@@ -56,7 +57,8 @@
       "speech": "Entraînement à l’oral",
       "speechFrench": "Entraînement à l’oral français",
       "vocab": "Entraînement au vocabulaire",
-      "vocabFrench": "Vocabulaire français"
+      "vocabFrench": "Vocabulaire français",
+      "attendance": "Présence"
     },
     "examTabs": {
       "overview": "Aperçu",

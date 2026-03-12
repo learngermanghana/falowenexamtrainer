@@ -43,7 +43,8 @@
       "aiFrench": "Falowen A.I (Französisch)",
       "results": "Ergebnisse",
       "discussion": "Klassendiskussion",
-      "account": "Konto"
+      "account": "Konto",
+      "attendance": "Anwesenheit"
     },
     "sections": {
       "courseBook": "Kursbuch",
@@ -56,7 +57,8 @@
       "speech": "Sprechtraining",
       "speechFrench": "Französisches Sprechtraining",
       "vocab": "Vokabeltraining",
-      "vocabFrench": "Französisches Vokabeltraining"
+      "vocabFrench": "Französisches Vokabeltraining",
+      "attendance": "Anwesenheit"
     },
     "examTabs": {
       "overview": "Überblick",

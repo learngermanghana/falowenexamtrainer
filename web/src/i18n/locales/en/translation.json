@@ -43,7 +43,8 @@
       "aiFrench": "Falowen A.I (French)",
       "results": "Results",
       "discussion": "Group Discussion",
-      "account": "Account"
+      "account": "Account",
+      "attendance": "Attendance"
     },
     "sections": {
       "courseBook": "Course Book",
@@ -56,7 +57,8 @@
       "speech": "Speech Trainer",
       "speechFrench": "French Speech Trainer",
       "vocab": "Vocab Practice",
-      "vocabFrench": "French Vocab Practice"
+      "vocabFrench": "French Vocab Practice",
+      "attendance": "Attendance"
     },
     "examTabs": {
       "overview": "Overview",
