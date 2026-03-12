@@ -1869,6 +1869,24 @@ const withDictionaryMetadata = (item, level) => {
   };
 };
 
+const isA1PracticalTopic = (entry = {}, level = "") => {
+  if (String(level || "").toUpperCase() !== "A1") return false;
+  const text = `${entry?.topic || ""} ${entry?.title || ""} ${entry?.goal || ""}`.toLowerCase();
+  return text.includes("schreiben") || text.includes("sprechen");
+};
+
+const markPracticalAsNonAssignment = (lessonCollection) => {
+  if (Array.isArray(lessonCollection)) {
+    return lessonCollection.map((lesson) => ({ ...(lesson || {}), assignment: false }));
+  }
+
+  if (lessonCollection && typeof lessonCollection === "object") {
+    return { ...lessonCollection, assignment: false };
+  }
+
+  return lessonCollection;
+};
+
 const normalizeLessonCollection = (lessonCollection, fallbackValues = [], level = "") => {
   if (Array.isArray(lessonCollection)) {
     return lessonCollection.map((lesson) =>
@@ -1978,11 +1996,12 @@ const normalizeCourseSchedules = (schedules) =>
             entryWithAssignmentId.title,
           ];
           const lesen_hören = normalizeLessonCollection(entryWithAssignmentId.lesen_hören, fallbackAssignmentValues, level);
-          const schreiben_sprechen = normalizeLessonCollection(
+          const schreiben_sprechenRaw = normalizeLessonCollection(
             entryWithAssignmentId.schreiben_sprechen,
             fallbackAssignmentValues,
             level
           );
+          const schreiben_sprechen = level === "A1" ? markPracticalAsNonAssignment(schreiben_sprechenRaw) : schreiben_sprechenRaw;
           const lessons = [
             ...(Array.isArray(lesen_hören) ? lesen_hören : lesen_hören ? [lesen_hören] : []),
             ...(Array.isArray(schreiben_sprechen) ? schreiben_sprechen : schreiben_sprechen ? [schreiben_sprechen] : []),
@@ -2004,6 +2023,7 @@ const normalizeCourseSchedules = (schedules) =>
 
           return {
             ...entryWithAssignmentId,
+            assignment: isA1PracticalTopic(entryWithAssignmentId, level) ? false : entryWithAssignmentId.assignment,
             topic: resolvedTopic,
             instruction:
               needsSelfPracticeNote && levelSpecificInstruction && !hasNote
