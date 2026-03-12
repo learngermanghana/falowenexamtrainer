@@ -616,8 +616,13 @@ const scoresSummaryHandler = async (req, res) => {
       const hasFailed = l.identifiers.some((id) => failed.has(id));
       return { ...l, isCompleted, hasFailed };
     });
+    const lessonStatusByDay = [...lessonStatus].sort((a, b) => {
+      const dayDiff = Number(a.dayNumber || 0) - Number(b.dayNumber || 0);
+      if (dayDiff !== 0) return dayDiff;
+      return Number(a.order || 0) - Number(b.order || 0);
+    });
 
-    const latestAttemptedDayNumber = lessonStatus.reduce((max, lesson) => {
+    const latestAttemptedDayNumber = lessonStatusByDay.reduce((max, lesson) => {
       const hasAnyAttempt = lesson.identifiers.some((id) => bestById.has(id));
       if (!hasAnyAttempt) return max;
       return Math.max(max, lesson.dayNumber || 0);
@@ -625,7 +630,7 @@ const scoresSummaryHandler = async (req, res) => {
 
     // Missed/jumped: lesson is incomplete, not currently failed, and sits on/before
     // the furthest day where the student has submitted any assignment attempt.
-    const missedAssignments = lessonStatus
+    const missedAssignments = lessonStatusByDay
       .filter((l) => {
         if (l.isCompleted || l.hasFailed) return false;
         return Number(l.dayNumber || 0) <= latestAttemptedDayNumber;
@@ -638,7 +643,7 @@ const scoresSummaryHandler = async (req, res) => {
       }));
 
     // Failed lessons
-    const failedAssignments = lessonStatus
+    const failedAssignments = lessonStatusByDay
       .filter((l) => l.hasFailed)
       .map((l) => ({
         label: l.label,
@@ -652,7 +657,7 @@ const scoresSummaryHandler = async (req, res) => {
     // Next: first incomplete lesson in schedule order (blocked if failures exist)
     let nextRecommendation = null;
     if (!recommendationBlocked) {
-      const firstIncomplete = lessonStatus.find((l) => !l.isCompleted);
+      const firstIncomplete = lessonStatusByDay.find((l) => !l.isCompleted);
       if (firstIncomplete) {
         nextRecommendation = {
           label: firstIncomplete.label,
