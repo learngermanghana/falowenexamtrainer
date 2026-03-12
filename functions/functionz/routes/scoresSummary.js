@@ -225,6 +225,21 @@ const chooseBestIdentifier = ({ assignmentText = "", explicitId = "", plannedSet
   return pickIdentifierFromText(assignmentText, plannedSet);
 };
 
+const mapToPlannedIdentifier = (identifier = "", plannedSet = new Set()) => {
+  const candidate = String(identifier || "").trim().toUpperCase();
+  if (!candidate) return null;
+  if (plannedSet.has(candidate)) return candidate;
+
+  const [level = "", chapter = ""] = candidate.split("-");
+  const chapterMatch = chapter.match(/^(\d+)(?:\.(\d+))?$/);
+  if (!chapterMatch) return null;
+
+  const majorOnly = `${level}-${chapterMatch[1]}`;
+  if (plannedSet.has(majorOnly)) return majorOnly;
+
+  return null;
+};
+
 /* ------------------------ Schedule scanning (web schedule) ------------------------ */
 
 const isRealAssignment = (obj) => obj && obj.assignment === true;
@@ -436,11 +451,13 @@ const scoresSummaryHandler = async (req, res) => {
       const explicitId = get(row, idx.assignmentId);
       const assignmentText = get(row, idx.assignment);
 
-      if (explicitId && plannedSet.has(String(explicitId).toUpperCase())) {
-        return String(explicitId).toUpperCase();
+      if (explicitId) {
+        const matchedExplicitId = mapToPlannedIdentifier(explicitId, plannedSet);
+        if (matchedExplicitId) return matchedExplicitId;
       }
 
-      return chooseBestIdentifier({ assignmentText, explicitId, plannedSet });
+      const bestIdentifier = chooseBestIdentifier({ assignmentText, explicitId, plannedSet });
+      return mapToPlannedIdentifier(bestIdentifier, plannedSet) || bestIdentifier;
     };
 
     const leaderboardEntries = new Map();
