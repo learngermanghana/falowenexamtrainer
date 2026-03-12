@@ -83,11 +83,11 @@ const extractCanonicalAssignmentIds = (entry = {}, level = "") => {
   return Array.from(new Set(normalized));
 };
 
-const buildDictionaryLabel = (entry = {}, level = "") => {
+const getDictionaryEntries = (entry = {}, level = "") => {
   const canonicalIds = extractCanonicalAssignmentIds(entry, level);
-  if (!canonicalIds.length) return entry?.label || "";
+  if (!canonicalIds.length) return [];
 
-  const scheduleEntries = canonicalIds
+  return canonicalIds
     .map((canonicalId) => {
       const chapter = canonicalId.split("-").slice(1).join("-");
       return getCourseScheduleAssignmentMetadata({
@@ -96,8 +96,17 @@ const buildDictionaryLabel = (entry = {}, level = "") => {
         chapter,
       });
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .sort((a, b) => {
+      const aDay = Number(a?.assignmentDay || 0);
+      const bDay = Number(b?.assignmentDay || 0);
+      if (aDay !== bDay) return aDay - bDay;
+      return String(a?.chapter || "").localeCompare(String(b?.chapter || ""));
+    });
+};
 
+const buildDictionaryLabel = (entry = {}, level = "") => {
+  const scheduleEntries = getDictionaryEntries(entry, level);
   const topics = scheduleEntries.map((scheduleEntry) => scheduleEntry?.topic || "").filter(Boolean);
 
   if (!topics.length) return entry?.label || "";
@@ -107,6 +116,11 @@ const buildDictionaryLabel = (entry = {}, level = "") => {
   const dayPrefix = Number.isFinite(day) && day > 0 ? `Day ${day}: ` : "";
   const mergedTopic = Array.from(new Set(topics)).join(" + ");
   return `${dayPrefix}${mergedTopic}`.trim();
+};
+
+const buildDictionaryGoal = (entry = {}, level = "") => {
+  const scheduleEntries = getDictionaryEntries(entry, level);
+  return scheduleEntries.find((scheduleEntry) => scheduleEntry?.goal)?.goal || entry?.goal || "";
 };
 
 const HomeMetrics = ({ studentProfile }) => {
@@ -220,6 +234,7 @@ const HomeMetrics = ({ studentProfile }) => {
     return {
       ...next,
       label: buildDictionaryLabel(next, levelKey) || next?.label,
+      goal: buildDictionaryGoal(next, levelKey) || next?.goal,
     };
   }, [assignmentStats, levelKey]);
 

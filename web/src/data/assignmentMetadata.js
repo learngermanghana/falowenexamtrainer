@@ -57,6 +57,7 @@ export const buildAssignmentMetadataByLevel = (schedules = courseSchedules) => {
           assignmentDay: dayNumber,
           chapter,
           topic,
+          goal: String(lesson.goal || "").trim(),
         };
       });
     });
