@@ -262,18 +262,24 @@ const HomeMetrics = ({ studentProfile }) => {
   }, [completionStorageKey, hasPromptedCompletion, isCourseCompleter, navigate]);
 
   const recommendedNext = useMemo(() => {
+    if (nextObj?.label) {
+      if (nextObj.type === "retry_failed") {
+        return t("homeMetrics.nextRecommendation.redoFirst", { item: nextObj.label });
+      }
+      if (nextObj.type === "catch_up_missed") {
+        return t("homeMetrics.nextRecommendation.catchUpFirst", { item: nextObj.label });
+      }
+      if (isPassingScoreGoal(nextObj.goal)) {
+        return t("homeMetrics.nextRecommendation.allCaughtUp");
+      }
+      return nextObj.label;
+    }
+
     if (blocked) {
       const firstFail = failedAssignments[0];
       return firstFail
         ? t("homeMetrics.nextRecommendation.redoFirst", { item: labelOf(firstFail) })
         : t("homeMetrics.nextRecommendation.redoFailed");
-    }
-
-    if (nextObj?.label) {
-      if (isPassingScoreGoal(nextObj.goal)) {
-        return t("homeMetrics.nextRecommendation.allCaughtUp");
-      }
-      return nextObj.label;
     }
 
     if (missedAssignments.length) return labelOf(missedAssignments[0]);
@@ -390,6 +396,8 @@ const HomeMetrics = ({ studentProfile }) => {
               ? failedIdentifiersText
                 ? t("homeMetrics.nextRecommendation.blockedWithIds", { items: failedIdentifiersText })
                 : t("homeMetrics.nextRecommendation.blocked")
+              : nextObj?.type === "catch_up_missed"
+              ? t("homeMetrics.nextRecommendation.catchUpHelper")
               : nextObj?.goal && !isPassingScoreGoal(nextObj.goal)
               ? t("homeMetrics.nextRecommendation.goal", { goal: nextObj.goal })
               : t("homeMetrics.nextRecommendation.defaultHelper")
