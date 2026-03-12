@@ -1,5 +1,3 @@
-const { getAssignmentDictionaryEntry } = require("./germanAssignmentCatalog");
-
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
 
 const COMPLETION_CONTACT_EMAIL = "info@falowen.app";
@@ -1811,11 +1809,99 @@ const withAssignmentId = (item, ...fallbackValues) => {
 };
 
 
+
+const LESSON_LEVEL_PREFIX = /^(A1|A2|B1|B2|C1|C2)-/i;
+
+const normalizeLevelToken = (value = "") => String(value || "").trim().toUpperCase();
+
+const toCanonicalAssignmentId = ({ level, value }) => {
+  const token = String(value || "").trim().toUpperCase();
+  if (!token) return "";
+  if (LESSON_LEVEL_PREFIX.test(token)) return token;
+  return level ? `${level}-${token}` : token;
+};
+
+const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
 const splitChapterTokens = (value) =>
   String(value || "")
     .split(/[_,/]/)
     .map((token) => token.trim())
     .filter(Boolean);
+
+const buildCoursebookDictionaryByLevel = (schedules = {}) => {
+  const byLevel = {};
+
+  Object.entries(schedules || {}).forEach(([rawLevel, lessons]) => {
+    const level = normalizeLevelToken(rawLevel);
+    if (!level || !Array.isArray(lessons)) return;
+
+    const levelMap = {};
+
+    lessons.forEach((lesson) => {
+      const dayNumber = Number(lesson?.day || lesson?.dayNumber || 0) || null;
+      const topic = String(lesson?.topic || lesson?.title || "").trim();
+
+      const blocks = [];
+      if (lesson?.assignment === true && (lesson?.assignmentId || lesson?.chapter)) {
+        blocks.push(lesson);
+      }
+
+      [...toLessonArray(lesson?.lesen_hören), ...toLessonArray(lesson?.schreiben_sprechen)].forEach((nested) => {
+        if (nested?.assignment === true && (nested?.assignmentId || nested?.chapter)) {
+          blocks.push(nested);
+        }
+      });
+
+      blocks.forEach((block) => {
+        const rawId = parseAssignmentId(block?.assignmentId, block?.chapter, block?.title, lesson?.chapter, lesson?.topic);
+        const canonicalId = toCanonicalAssignmentId({ level, value: rawId || block?.assignmentId || block?.chapter });
+        if (!canonicalId || levelMap[canonicalId]) return;
+
+        const chapter = String(block?.chapter || rawId || canonicalId.split("-").slice(1).join("-") || "").trim();
+        const label = String(block?.title || topic || chapter).trim();
+
+        levelMap[canonicalId] = {
+          assignment_id: canonicalId,
+          chapter,
+          topic: label,
+          en: label,
+          assignment: true,
+          assignmentDay: dayNumber,
+        };
+      });
+    });
+
+    byLevel[level] = levelMap;
+  });
+
+  return byLevel;
+};
+
+const COURSEBOOK_ASSIGNMENT_DICTIONARY_BY_LEVEL = buildCoursebookDictionaryByLevel(courseSchedules);
+
+const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter }) => {
+  const normalizedLevel = normalizeLevelToken(level);
+  const levelMap = COURSEBOOK_ASSIGNMENT_DICTIONARY_BY_LEVEL[normalizedLevel];
+  if (!levelMap) return null;
+
+  const canonicalId = toCanonicalAssignmentId({ level: normalizedLevel, value: assignmentId });
+  if (canonicalId && levelMap[canonicalId]) return levelMap[canonicalId];
+
+  const chapterToken = String(chapter || "").trim();
+  if (!chapterToken) return null;
+
+  const chapterCandidates = splitChapterTokens(chapterToken);
+  for (const token of chapterCandidates) {
+    const byId = toCanonicalAssignmentId({ level: normalizedLevel, value: token });
+    if (byId && levelMap[byId]) return levelMap[byId];
+
+    const byChapter = Object.values(levelMap).find((entry) => String(entry?.chapter || "") === token);
+    if (byChapter) return byChapter;
+  }
+
+  return null;
+};
 
 const resolveDictionaryEntry = ({ level, assignmentId, chapter }) => {
   const normalizedLevel = String(level || "").toUpperCase();
