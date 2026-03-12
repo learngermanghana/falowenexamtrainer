@@ -63,6 +63,7 @@ import A1Day14ModalVerbsWorkbookPage from "./components/A1Day14ModalVerbsWorkboo
 import A1Day16FoodAndNegationGrammarPage from "./components/A1Day16FoodAndNegationGrammarPage";
 import A1Day16FoodAndDailyLifeWorkbookPage from "./components/A1Day16FoodAndDailyLifeWorkbookPage";
 import A1Day16FoodAndNegationKapitel10WorkbookPage from "./components/A1Day16FoodAndNegationKapitel10WorkbookPage";
+import A1Day17InstructionsDirectionsKapitel11WorkbookPage from "./components/A1Day17InstructionsDirectionsKapitel11WorkbookPage";
 import A1Day4NumbersForBeginnersWorkbookPage from "./components/A1Day4NumbersForBeginnersWorkbookPage";
 import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3AskingAboutPricesWorkbookPage";
 import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCasesWorkbookPage";
@@ -636,6 +637,10 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-day-16-food-and-negation-kapitel-10-workbook"
             element={<A1Day16FoodAndNegationKapitel10WorkbookPage />}
+          />
+          <Route
+            path="/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook"
+            element={<A1Day17InstructionsDirectionsKapitel11WorkbookPage />}
           />
           <Route
             path="/campus/course/a1-day-4-numbers-for-beginners-workbook"
