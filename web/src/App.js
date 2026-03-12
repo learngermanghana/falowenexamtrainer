@@ -12,6 +12,7 @@ import AssignmentSubmissionPage from "./components/AssignmentSubmissionPage";
 import AccountSettings from "./components/AccountSettings";
 import ClassDiscussionPage from "./components/ClassDiscussionPage";
 import GrammarQuestionTab from "./components/GrammarQuestionTab";
+import AttendanceTab from "./components/AttendanceTab";
 import SpeechTrainerPage from "./components/SpeechTrainerPage";
 import LetterPracticePage from "./components/LetterPracticePage";
 import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensionPage";
@@ -109,6 +110,7 @@ const getTabStructure = (program, t) => {
         { key: "course", label: t("appNav.sections.courseBook") },
         { key: "submit", label: t("appNav.sections.submit") },
         { key: "examFile", label: t("appNav.sections.examFile") },
+        { key: "attendance", label: t("appNav.sections.attendance") },
       ],
     },
     {
@@ -194,6 +196,7 @@ function App() {
       submit: true,
       course: isEnrolled,
       examFile: isEnrolled || isStaff,
+      attendance: isEnrolled || isStaff,
       results: isEnrolled || isStaff,
       grammar: true,
       writing: true,
@@ -885,6 +888,7 @@ const CampusArea = ({
         />
       ) : null}
       {resolvedSection === "examFile" && allowedSections.examFile ? <MyExamFilePage /> : null}
+      {resolvedSection === "attendance" && allowedSections.attendance ? <AttendanceTab /> : null}
       {resolvedSection === "grammar" && allowedSections.grammar ? <GrammarQuestionTab /> : null}
       {resolvedSection === "writing" && allowedSections.writing ? <LetterPracticePage mode="campus" /> : null}
       {resolvedSection === "speech" && allowedSections.speech ? <SpeechTrainerPage /> : null}
