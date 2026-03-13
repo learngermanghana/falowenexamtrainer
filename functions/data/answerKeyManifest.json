@@ -1,5 +1,5 @@
 {
-  "A1 Greetings 0.1": {
+  "A1 Greetings and Asking About Well-being 0.1": {
     "answers": {
       "Answer1": "C) Guten Morgen",
       "Answer2": "D) Guten Tag",
@@ -16,7 +16,7 @@
     "format": "objective",
     "assignment_id": "A1-0.1"
   },
-  "A1 Alphabets 0.2": {
+  "A1 Alphabets German Alphabet  0.2": {
     "answers": {
       "Answer1": "C) 26",
       "Answer2": "A) A, O, U, B",
@@ -35,7 +35,7 @@
     "format": "objective",
     "assignment_id": "A1-0.2"
   },
-  "A1 Personal Pronouns 1.1": {
+  "A1 Pronouns and Verb Conjugation 1.1": {
     "answers": {
       "Answer1": "C Anna",
       "Answer2": "C München",
@@ -46,7 +46,7 @@
     "format": "objective",
     "assignment_id": "A1-1.1"
   },
-  "A1 Numbers 2": {
+  "A1 Numbers and Addresses 2": {
     "answers": {
       "Answer1": "A) sieben",
       "Answer2": "B) Drei",
@@ -68,7 +68,7 @@
     "format": "objective",
     "assignment_id": "A1-2"
   },
-  "A1 Pronouns 1.2": {
+  "A1 Introducing Yourself and Reviewing Pronouns 1.2": {
     "answers": {
       "Answer1": "Ich heiße Anna",
       "Answer2": "Du heißt Max",
@@ -139,7 +139,7 @@
     "format": "objective",
     "assignment_id": "A1-6"
   },
-  "A1 German Cases 5": {
+  "A1 Nominative and Accusative Cases 5": {
     "answers": {
       "Answer1": "Der Tisch – the table",
       "Answer2": "Die Lampe – the lamp",
@@ -203,7 +203,7 @@
     "format": "objective",
     "assignment_id": "A1-12"
   },
-  "A1 24 Hour Clock 8": {
+  "A1 The 24 Hour Clock and Dates 8": {
     "answers": {
       "Answer1": "B) Zwei Uhr nachmittags",
       "Answer2": "B) 29 Tage",
@@ -225,7 +225,7 @@
     "format": "objective",
     "assignment_id": "A1-24"
   },
-  "A1 Negation 9": {
+  "A1 Food and Negation 9": {
     "answers": {
       "Answer1": "B) Apfel und Karotten",
       "Answer2": "C) Karotten",
@@ -247,7 +247,7 @@
     "format": "objective",
     "assignment_id": "A1-9"
   },
-  "A1 Food 10": {
+  "A1 Food and Daily Life 10": {
     "answers": {
       "Answer1": "Falsch",
       "Answer2": "Wahr",
@@ -269,7 +269,7 @@
     "format": "objective",
     "assignment_id": "A1-10"
   },
-  "A1 Instructions 11": {
+  "A1 Instructions and Directions 11": {
     "answers": {
       "teil1": {
         "Answer1": "B) Entschuldigung, wo ist der Bahnhof?",
@@ -325,7 +325,7 @@
     "format": "objective",
     "assignment_id": "A1-12.1"
   },
-  "A1 Two Case Preposition 12.2": {
+  "A1 Professions and Prepositions 12.2": {
     "answers": {
       "Teil 1": {
         "Answer1": "In Berlin",
@@ -375,7 +375,7 @@
     "format": "objective",
     "assignment_id": "A1-13"
   },
-  "A1 Health 14.1": {
+  "A1 Health and Body Parts 14.1": {
     "answers": {
       "Answer1": "Frage 1: Anzeige A",
       "Answer2": "Frage 2: Anzeige B",
