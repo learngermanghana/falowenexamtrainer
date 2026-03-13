@@ -54,6 +54,7 @@ import A2Day5FreizeitSeparableVerbsGrammarPage from "./components/A2Day5Freizeit
 import A2Day6MoebelRaeumeWorkbookPage from "./components/A2Day6MoebelRaeumeWorkbookPage";
 import A2Day6TwoCasePrepositionsGrammarPage from "./components/A2Day6TwoCasePrepositionsGrammarPage";
 import A2Day7RelativeClausesWohnungGrammarPage from "./components/A2Day7RelativeClausesWohnungGrammarPage";
+import A2Day8ImperativBefehlsformGrammarPage from "./components/A2Day8ImperativBefehlsformGrammarPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import B1Day26ReiseproblemeUndLoesungenWorkbookPage from "./components/B1Day26ReiseproblemeUndLoesungenWorkbookPage";
@@ -693,6 +694,10 @@ const AppShell = ({
           <Route
             path="/campus/course/relativsaetze-die-der-das-wohnung-suchen-3-7-notes"
             element={<A2Day7RelativeClausesWohnungGrammarPage />}
+          />
+          <Route
+            path="/campus/course/imperativ-befehlsform-3-8-notes"
+            element={<A2Day8ImperativBefehlsformGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
