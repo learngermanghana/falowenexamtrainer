@@ -26,6 +26,22 @@ const normalizeTitleToken = (value) =>
     .replace(/^-|-$/g, "")
     .toUpperCase();
 
+const extractChapterTokenFromTitle = (title = "") => {
+  const text = String(title || "").trim();
+  if (!text) return "";
+
+  const explicitLevelChapter = text.match(/\b(?:A1|A2|B1|B2|C1|C2)[\s-]+(\d+(?:\.\d+)?)\b/i);
+  if (explicitLevelChapter?.[1]) return explicitLevelChapter[1];
+
+  const decimalMatches = text.match(/\b\d+\.\d+\b/g);
+  if (decimalMatches?.length) return decimalMatches[decimalMatches.length - 1];
+
+  const chapterHint = text.match(/\b(?:chapter|lektion|lesson|aufgabe)\s*(\d+(?:\.\d+)?)\b/i);
+  if (chapterHint?.[1]) return chapterHint[1];
+
+  return "";
+};
+
 export const toCanonicalAssignmentId = ({ assignmentId, level }) => {
   const normalizedLevel = normalizeLevel(level);
   const token = normalizeAssignmentToken(assignmentId);
@@ -45,9 +61,9 @@ const getFallbackKeyFromTitle = ({ level, assignmentTitle }) => {
   const explicitLevelChapter = title.match(/\b(A1|A2|B1|B2|C1|C2)-(\d+(?:\.\d+)?)\b/i);
   if (explicitLevelChapter?.[0]) return explicitLevelChapter[0].toUpperCase();
 
-  const chapterMatch = title.match(/\b(\d+(?:\.\d+)?)\b/);
-  if (chapterMatch?.[1] && normalizedLevel) {
-    return `${normalizedLevel}-${chapterMatch[1]}`;
+  const chapterToken = extractChapterTokenFromTitle(title);
+  if (chapterToken && normalizedLevel) {
+    return `${normalizedLevel}-${chapterToken}`;
   }
 
   const dayTaskMatch = title.match(/\bday\s*(\d+)\b[^\n\r]*?\btask\s*(\d+)\b/i);
