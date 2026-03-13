@@ -82,7 +82,7 @@ const AttendanceTab = () => {
       studentProfile?.displayName ||
       user?.displayName ||
       "Student",
-    [studentProfile, t, user?.displayName]
+    [studentProfile, user?.displayName]
   );
   const className = useMemo(() => studentProfile?.className || "", [studentProfile]);
   const level = useMemo(() => String(studentProfile?.level || "").toUpperCase(), [studentProfile?.level]);
