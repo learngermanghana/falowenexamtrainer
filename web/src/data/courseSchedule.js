@@ -833,7 +833,7 @@ const RAW_COURSE_SCHEDULES = {
         youtube_link: "https://youtu.be/n9D5rh_Joz4",
         assignment: true,
         grammarbook_link: "https://www.falowen.app/campus/course/weather-perfekt-letter-13",
-        workbook_link: "https://drive.google.com/file/d/1GZeUi5p6ayDGnPcebFVFfaNavmoWyoVM/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-21-weather-workbook",
       },
     },
     {
