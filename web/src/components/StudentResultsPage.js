@@ -6,9 +6,9 @@ import ResultHistory from "./ResultHistory";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { fetchResults } from "../services/resultsService";
+import { fetchAssignmentSummary } from "../services/assignmentService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
-import { fetchScoreSummary } from "../services/scoreSummaryService";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
 const PASS_MARK = 60;
@@ -187,6 +187,15 @@ const StudentResultsPage = () => {
       return response.results;
     };
 
+    const buildAssignmentSummary = async (rows = []) => {
+      if (!studentCode) return null;
+      const scoreSummary = await fetchAssignmentSummary({
+        studentCode,
+        resultsRows: rows,
+      });
+      return scoreSummary?.student || null;
+    };
+
     const load = async () => {
       setLoading(true);
       setError("");
@@ -200,42 +209,39 @@ const StudentResultsPage = () => {
           return;
         }
 
-        const summaryPromise = idToken
-          ? fetchScoreSummary({ idToken, studentCode }).catch(() => null)
-          : Promise.resolve(null);
-
         if (useFirestoreResults) {
-          const [rows, leaderboardRows, scoreSummary] = await Promise.all([
+          const [rows, leaderboardRows] = await Promise.all([
             loadFromResultsStore(),
             loadLeaderboardFromResultsStore(),
-            summaryPromise,
           ]);
+          const scoreSummary = await buildAssignmentSummary(rows);
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(buildLeaderboard(leaderboardRows));
-          setAssignmentSummary(scoreSummary?.student || null);
+          setAssignmentSummary(scoreSummary);
           return;
         }
 
         // Prefer sheet for A1/A2/B1 if configured
         if (useSheetResults && SHEET_CSV_URL) {
-          const scoreSummary = await summaryPromise;
           const sheetResponse = await loadFromSheet();
           const { mine, all } = sheetResponse;
+          const scoreSummary = await buildAssignmentSummary(mine);
           if (!mounted) return;
           setResults(mine);
           setLeaderboard(buildLeaderboard(all));
-          setAssignmentSummary(scoreSummary?.student || null);
+          setAssignmentSummary(scoreSummary);
           return;
         }
 
         // Otherwise fall back to API
         if (idToken) {
-          const [rows, scoreSummary] = await Promise.all([loadFromApi(), summaryPromise]);
+          const rows = await loadFromApi();
+          const scoreSummary = await buildAssignmentSummary(rows);
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(null);
-          setAssignmentSummary(scoreSummary?.student || null);
+          setAssignmentSummary(scoreSummary);
           return;
         }
 
@@ -515,7 +521,10 @@ const StudentResultsPage = () => {
               <strong>Next recommended:</strong>{" "}
               {assignmentSummary?.recommendationBlocked
                 ? "Blocked by failed assignment"
-                : labelOf(assignmentSummary?.nextRecommendation) || "All caught up"}
+                : labelOf(
+                    assignmentSummary?.nextRecommendation ||
+                      assignmentSummary?.nextRecommendedAssignment
+                  ) || "All caught up"}
             </p>
             <p style={{ ...styles.helperText, margin: 0 }}>
               <strong>Missed (jumped):</strong> {formatList(assignmentSummary?.missedAssignments || [])}
