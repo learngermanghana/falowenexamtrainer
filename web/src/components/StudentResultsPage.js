@@ -8,6 +8,7 @@ import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService"
 import { fetchResults } from "../services/resultsService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { fetchScoreSummary } from "../services/scoreSummaryService";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
 const PASS_MARK = 60;
@@ -19,12 +20,26 @@ const TOTAL_ASSIGNMENTS = {
 };
 const TRACKED_LEVELS = Object.keys(TOTAL_ASSIGNMENTS);
 
+const labelOf = (entry) => {
+  if (!entry) return "";
+  if (typeof entry === "string") return entry;
+  return String(entry.label || entry.assignment || "").trim();
+};
+
+const formatList = (items = [], maxItems = 3) => {
+  const labels = (items || []).map(labelOf).filter(Boolean);
+  if (!labels.length) return "None";
+  if (labels.length <= maxItems) return labels.join(", ");
+  return `${labels.slice(0, maxItems).join(", ")} +${labels.length - maxItems} more`;
+};
+
 const StudentResultsPage = () => {
   const { t } = useTranslation();
   const { idToken, studentProfile } = useAuth();
 
   const [results, setResults] = useState([]);
   const [leaderboard, setLeaderboard] = useState(null);
+  const [assignmentSummary, setAssignmentSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -181,36 +196,46 @@ const StudentResultsPage = () => {
           if (!mounted) return;
           setResults([]);
           setLeaderboard(null);
+          setAssignmentSummary(null);
           return;
         }
 
+        const summaryPromise = idToken
+          ? fetchScoreSummary({ idToken, studentCode }).catch(() => null)
+          : Promise.resolve(null);
+
         if (useFirestoreResults) {
-          const [rows, leaderboardRows] = await Promise.all([
+          const [rows, leaderboardRows, scoreSummary] = await Promise.all([
             loadFromResultsStore(),
             loadLeaderboardFromResultsStore(),
+            summaryPromise,
           ]);
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(buildLeaderboard(leaderboardRows));
+          setAssignmentSummary(scoreSummary?.student || null);
           return;
         }
 
         // Prefer sheet for A1/A2/B1 if configured
         if (useSheetResults && SHEET_CSV_URL) {
+          const scoreSummary = await summaryPromise;
           const sheetResponse = await loadFromSheet();
           const { mine, all } = sheetResponse;
           if (!mounted) return;
           setResults(mine);
           setLeaderboard(buildLeaderboard(all));
+          setAssignmentSummary(scoreSummary?.student || null);
           return;
         }
 
         // Otherwise fall back to API
         if (idToken) {
-          const rows = await loadFromApi();
+          const [rows, scoreSummary] = await Promise.all([loadFromApi(), summaryPromise]);
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(null);
+          setAssignmentSummary(scoreSummary?.student || null);
           return;
         }
 
@@ -218,11 +243,13 @@ const StudentResultsPage = () => {
         if (!mounted) return;
         setResults([]);
         setLeaderboard(null);
+        setAssignmentSummary(null);
       } catch (e) {
         if (!mounted) return;
         setError(e?.message || "Failed to load results.");
         setResults([]);
         setLeaderboard(null);
+        setAssignmentSummary(null);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -479,6 +506,26 @@ const StudentResultsPage = () => {
 
         {error ? <div style={styles.errorBox}>{error}</div> : null}
       </section>
+
+      {!loading && !error ? (
+        <section style={styles.card}>
+          <h3 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Assignment recommendation</h3>
+          <div style={{ display: "grid", gap: 8 }}>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              <strong>Next recommended:</strong>{" "}
+              {assignmentSummary?.recommendationBlocked
+                ? "Blocked by failed assignment"
+                : labelOf(assignmentSummary?.nextRecommendation) || "All caught up"}
+            </p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              <strong>Missed (jumped):</strong> {formatList(assignmentSummary?.missedAssignments || [])}
+            </p>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              <strong>Failed:</strong> {formatList(assignmentSummary?.failedAssignments || [])}
+            </p>
+          </div>
+        </section>
+      ) : null}
 
 
       {loading ? (
