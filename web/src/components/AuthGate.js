@@ -18,6 +18,45 @@ const isFullName = (value) => {
   return parts.length >= 2 && parts.every((part) => part.length >= 2);
 };
 
+const formatAuthErrorMessage = (error, mode = "login") => {
+  const code = error?.code;
+
+  if (mode === "login") {
+    switch (code) {
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+        return "Your email (or student code) and password do not match. Please check and try again.";
+      case "auth/user-not-found":
+        return "We could not find an account with these details. Please check your email/student code or create an account.";
+      case "auth/too-many-requests":
+        return "Too many login attempts were made. Please wait a few minutes and try again, or reset your password.";
+      case "auth/user-disabled":
+        return "This account is currently disabled. Please contact support for help.";
+      case "auth/network-request-failed":
+        return "We could not connect to the internet. Please check your connection and try again.";
+      default:
+        break;
+    }
+  }
+
+  if (mode === "signup") {
+    switch (code) {
+      case "auth/email-already-in-use":
+        return "This email is already registered. Please log in or reset your password.";
+      case "auth/weak-password":
+        return "Your password is too weak. Please use at least 8 characters, including letters and numbers.";
+      case "auth/invalid-email":
+        return "This email address looks invalid. Please check and try again.";
+      case "auth/network-request-failed":
+        return "We could not connect to the internet. Please check your connection and try again.";
+      default:
+        break;
+    }
+  }
+
+  return error?.message || "Something went wrong. Please try again.";
+};
+
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
   const { signup, login, loginWithGoogle, authError, setAuthError, resetPassword } = useAuth();
   const { showToast } = useToast();
@@ -118,7 +157,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       }
     } catch (error) {
       console.error(error);
-      const errorMessage = error?.message || "Login failed. Please try again.";
+      const errorMessage = formatAuthErrorMessage(error, mode);
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
       setMessage("");
@@ -140,12 +179,17 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
     try {
       await resetPassword(email);
-      const resetMessage = "Password reset email sent. Please check your inbox.";
+      const resetMessage = "Password reset email sent. Please check your inbox and spam folder.";
       setMessage(resetMessage);
       showToast(resetMessage, "info");
     } catch (error) {
       console.error(error);
-      const errorMessage = error?.message || "Could not send password reset email.";
+      const errorMessage =
+        error?.code === "auth/user-not-found"
+          ? "We could not find an account with that email address."
+          : error?.code === "auth/invalid-email"
+            ? "That email address looks invalid. Please check and try again."
+            : error?.message || "Could not send password reset email.";
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
     } finally {
@@ -296,7 +340,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           {mode === "signup" && <PasswordGuidance password={password} />}
 
           {mode === "login" && (
-            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
+              <p style={{ margin: 0, fontSize: 12, color: "#6b7280", textAlign: "right" }}>
+                Forgot your password? Use this button, then check your inbox or spam folder.
+              </p>
               <button
                 type="button"
                 onClick={handlePasswordReset}
