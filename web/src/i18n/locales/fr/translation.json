@@ -1628,5 +1628,38 @@
       ],
       "fallbackTopic": "ton sujet"
     }
+  },
+  "attendanceTab": {
+    "helper": {
+      "withLevel": "Affichage des séances pour le niveau {{level}}.",
+      "allLevels": "Affichage de toutes les séances disponibles."
+    },
+    "loading": "Chargement de la présence...",
+    "present": "Présent ({{count}})",
+    "notPresent": "Absent / en attente ({{count}})",
+    "empty": {
+      "present": "Aucune séance marquée présente pour le moment.",
+      "notPresent": "Super ! Aucune absence ni présence en attente."
+    },
+    "alerts": {
+      "lowAttendance": "Votre présence est de {{percent}} %. Essayez d'assister au prochain cours pour revenir sur la bonne voie.",
+      "multipleMissed": "{{count}} séances sont absentes ou en attente. Contactez votre tuteur pour un plan de rattrapage."
+    },
+    "export": {
+      "pdf": "📄 Télécharger le résumé (PDF)",
+      "pdfTitle": "Résumé de présence",
+      "sessionCount": "Séances",
+      "attendanceRate": "Taux de présence"
+    },
+    "errors": {
+      "missingProfile": "Ajoutez votre classe et votre code étudiant dans le compte pour voir la présence.",
+      "firebase": "Connectez Firebase pour charger la présence.",
+      "load": "Impossible de charger la présence pour le moment."
+    },
+    "sessionBadge": "{{count}} séances",
+    "fallback": {
+      "session": "Séance",
+      "pending": "En attente"
+    }
   }
 }

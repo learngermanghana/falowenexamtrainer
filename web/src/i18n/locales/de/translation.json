@@ -1624,5 +1624,38 @@
       ],
       "fallbackTopic": "dein Thema"
     }
+  },
+  "attendanceTab": {
+    "helper": {
+      "withLevel": "Sitzungen für Niveau {{level}} werden angezeigt.",
+      "allLevels": "Alle verfügbaren Sitzungen werden angezeigt."
+    },
+    "loading": "Anwesenheit wird geladen...",
+    "present": "Anwesend ({{count}})",
+    "notPresent": "Nicht anwesend / ausstehend ({{count}})",
+    "empty": {
+      "present": "Noch keine als anwesend markierten Sitzungen.",
+      "notPresent": "Super! Keine Fehlzeiten oder ausstehenden Markierungen."
+    },
+    "alerts": {
+      "lowAttendance": "Deine Anwesenheit liegt bei {{percent}}%. Versuche die nächste Stunde zu besuchen, um aufzuholen.",
+      "multipleMissed": "{{count}} Sitzungen sind abwesend oder ausstehend. Kontaktiere deine Lehrkraft für einen Nachholplan."
+    },
+    "export": {
+      "pdf": "📄 Zusammenfassung herunterladen (PDF)",
+      "pdfTitle": "Anwesenheitsübersicht",
+      "sessionCount": "Sitzungen",
+      "attendanceRate": "Anwesenheitsquote"
+    },
+    "errors": {
+      "missingProfile": "Füge in deinem Konto Klasse und Studentencode hinzu, um die Anwesenheit zu sehen.",
+      "firebase": "Verbinde Firebase, um die Anwesenheit zu laden.",
+      "load": "Die Anwesenheit konnte gerade nicht geladen werden."
+    },
+    "sessionBadge": "{{count}} Sitzungen",
+    "fallback": {
+      "session": "Sitzung",
+      "pending": "Ausstehend"
+    }
   }
 }
