@@ -649,18 +649,27 @@ const scoresSummaryHandler = async (req, res) => {
       return Number(a.order || 0) - Number(b.order || 0);
     });
 
-    const latestAttemptedDayNumber = lessonStatusByDay.reduce((max, lesson) => {
-      const hasAnyAttempt = lesson.identifiers.some((id) => bestById.has(id));
-      if (!hasAnyAttempt) return max;
-      return Math.max(max, lesson.dayNumber || 0);
-    }, 0);
+    const dayCompletionByDayNumber = lessonStatusByDay.reduce((acc, lesson) => {
+      const day = Number(lesson.dayNumber || 0);
+      if (!day) return acc;
+      const previous = acc.get(day) ?? true;
+      acc.set(day, previous && Boolean(lesson.isCompleted));
+      return acc;
+    }, new Map());
 
-    // Missed/jumped: lesson is incomplete, not currently failed, and sits on/before
-    // the furthest day where the student has submitted any assignment attempt.
+    const sortedDayNumbers = Array.from(dayCompletionByDayNumber.keys()).sort((a, b) => a - b);
+    let lastFullyCompletedDayNumber = 0;
+    for (const dayNumber of sortedDayNumbers) {
+      if (!dayCompletionByDayNumber.get(dayNumber)) break;
+      lastFullyCompletedDayNumber = dayNumber;
+    }
+
+    // Missed items are incomplete lessons that sit before (or on) the most recent
+    // fully completed day in the student's contiguous day progression.
     const missedAssignments = lessonStatusByDay
       .filter((l) => {
         if (l.isCompleted || l.hasFailed) return false;
-        return Number(l.dayNumber || 0) <= latestAttemptedDayNumber;
+        return Number(l.dayNumber || 0) <= lastFullyCompletedDayNumber;
       })
       .map((l) => ({
         label: l.label,
