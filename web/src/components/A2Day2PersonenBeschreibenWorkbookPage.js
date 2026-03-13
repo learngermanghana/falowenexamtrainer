@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -405,16 +406,10 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
           <p style={{ margin: 0 }}>
             Note: The audio has been uploaded among the files in this chapter, or you can open the link below.
           </p>
-          <p style={{ margin: 0 }}>
-            Audio link: {" "}
-            <a
-              href="https://drive.google.com/file/d/1SIFA08DquWp-dU86pi7pHC6eElF_39I9/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Teil 4 audio
-            </a>
-          </p>
+          <CoursebookAudioPlayer
+            url="https://drive.google.com/file/d/1SIFA08DquWp-dU86pi7pHC6eElF_39I9/view?usp=sharing"
+            linkLabel="Open Teil 4 audio"
+          />
 
           <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
             <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />

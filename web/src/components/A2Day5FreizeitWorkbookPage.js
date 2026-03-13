@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -248,12 +249,10 @@ const A2Day5FreizeitWorkbookPage = () => {
       {activeTab === "hoeren" && (
         <div style={card}>
           <h2 style={sectionTitle}>Teil 4 - Hören: Listening Comprehension</h2>
-          <p style={{ margin: 0 }}>
-            Audio link:{" "}
-            <a href="https://drive.google.com/file/d/1TTqHwLUdG8yIZGkegj_UEAamiFpr1DMh/view?usp=sharing" target="_blank" rel="noreferrer">
-              Open Teil 4 audio
-            </a>
-          </p>
+          <CoursebookAudioPlayer
+            url="https://drive.google.com/file/d/1TTqHwLUdG8yIZGkegj_UEAamiFpr1DMh/view?usp=sharing"
+            linkLabel="Open Teil 4 audio"
+          />
           {hoerenQuestions.map((question, index) => (
             <div key={question.stem} style={questionCardStyle}>
               <strong>{index + 1}. {question.stem}</strong>

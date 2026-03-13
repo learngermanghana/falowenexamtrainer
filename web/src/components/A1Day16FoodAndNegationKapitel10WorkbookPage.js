@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const cardStyle = {
   ...styles.card,
@@ -159,14 +160,11 @@ const A1Day16FoodAndNegationKapitel10WorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Complete Hören from Google Drive, then return to submit answers.
         </p>
-        <a
-          href="https://drive.google.com/file/d/12RITYz1tYLee-FMw9WFzAD9YrtqrjwmC/view?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
+        <CoursebookAudioPlayer
+          url="https://drive.google.com/file/d/12RITYz1tYLee-FMw9WFzAD9YrtqrjwmC/view?usp=sharing"
+          linkLabel="Open Hören Material (Google Drive)"
+          linkStyle={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+        />
         <p style={{ margin: "8px 0 0", fontWeight: 600 }}>B) Hören Fragen (Multiple Choice)</p>
         {listeningQuestions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>

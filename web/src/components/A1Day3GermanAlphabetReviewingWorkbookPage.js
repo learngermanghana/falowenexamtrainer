@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { updatePageMeta } from "../lib/pageMeta";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const cardStyle = {
   ...styles.card,
@@ -197,14 +198,11 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
                 {item.number}. {item.prompt}
               </strong>
 
-              <a
-                href={item.link}
-                target="_blank"
-                rel="noreferrer"
-                style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-              >
-                Open Audio {item.number}
-              </a>
+              <CoursebookAudioPlayer
+                url={item.link}
+                linkLabel={`Open Audio ${item.number}`}
+                linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+              />
             </div>
           ))}
         </div>
