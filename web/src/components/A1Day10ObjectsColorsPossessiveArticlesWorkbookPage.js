@@ -115,7 +115,7 @@ const horenAssignments = [
   {
     number: 4,
     title: "Passage 4: Das Schlafzimmer",
-    link: "https://drive.google.com/file/d/1u_A6UFrWHSJitLh1uUzo8nswQt1rPu/view?usp=sharing",
+    link: "https://drive.google.com/file/d/1u_A6UFrWHSJ__itLh1uUzo8nswQt1rPu/view",
     question: "Welches Möbelstück steht im Schlafzimmer?",
     options: ["a) Ein Sofa", "b) Ein Herd", "c) Ein großes Bett", "d) Ein Fernseher"],
   },
