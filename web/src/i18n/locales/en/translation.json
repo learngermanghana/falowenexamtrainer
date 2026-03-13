@@ -1740,5 +1740,38 @@
       ],
       "fallbackTopic": "your topic"
     }
+  },
+  "attendanceTab": {
+    "helper": {
+      "withLevel": "Showing session records for level {{level}}.",
+      "allLevels": "Showing all available session records."
+    },
+    "loading": "Loading attendance...",
+    "present": "Present ({{count}})",
+    "notPresent": "Not present / pending ({{count}})",
+    "empty": {
+      "present": "No marked present sessions yet.",
+      "notPresent": "Great! No absences or pending marks."
+    },
+    "alerts": {
+      "lowAttendance": "Attendance is {{percent}}%. Try to attend the next class to get back on track.",
+      "multipleMissed": "{{count}} sessions are absent or pending. Reach out to your tutor for a catch-up plan."
+    },
+    "export": {
+      "pdf": "📄 Download summary (PDF)",
+      "pdfTitle": "Attendance summary",
+      "sessionCount": "Sessions",
+      "attendanceRate": "Attendance rate"
+    },
+    "errors": {
+      "missingProfile": "Add your class and student code in Account to see attendance.",
+      "firebase": "Connect Firebase to load attendance.",
+      "load": "Could not load attendance right now."
+    },
+    "sessionBadge": "{{count}} sessions",
+    "fallback": {
+      "session": "Session",
+      "pending": "Pending"
+    }
   }
 }
