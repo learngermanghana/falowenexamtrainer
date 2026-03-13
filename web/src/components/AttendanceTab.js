@@ -75,6 +75,15 @@ const AttendanceTab = () => {
     () => studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "",
     [studentProfile]
   );
+  const studentName = useMemo(
+    () =>
+      studentProfile?.name ||
+      studentProfile?.fullName ||
+      studentProfile?.displayName ||
+      user?.displayName ||
+      "Student",
+    [studentProfile, t, user?.displayName]
+  );
   const className = useMemo(() => studentProfile?.className || "", [studentProfile]);
   const level = useMemo(() => String(studentProfile?.level || "").toUpperCase(), [studentProfile?.level]);
 
@@ -155,22 +164,108 @@ const AttendanceTab = () => {
 
   const downloadPdf = () => {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
-    doc.setFontSize(16);
-    doc.text(t("attendanceTab.export.pdfTitle"), 40, 42);
-    doc.setFontSize(11);
-    doc.text(`${t("attendanceTab.export.sessionCount")}: ${levelRecords.length}`, 40, 62);
-    doc.text(`${t("attendanceTab.export.attendanceRate")}: ${attendanceRate !== null ? `${attendanceRate}%` : "—"}`, 40, 78);
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = 40;
+    const rowHeight = 22;
+    const generatedAt = new Date().toLocaleString();
+    const details = [
+      ["Student Name", studentName],
+      ["Student Code", studentCode || "—"],
+      ["Class", className || "—"],
+      ["Level", level || "—"],
+      ["Total Sessions", String(levelRecords.length)],
+      ["Attendance Rate", attendanceRate !== null ? `${attendanceRate}%` : "—"],
+      ["Present", String(presentRecords.length)],
+      ["Not Present", String(notPresentRecords.length)],
+      ["Generated", generatedAt],
+    ];
 
-    let y = 106;
-    levelRecords.forEach((record, index) => {
-      if (y > 760) {
-        doc.addPage();
-        y = 50;
-      }
-      const line = `${index + 1}. ${record.title || t("attendanceTab.fallback.session")} • ${formatDate(record.date)} • ${record.status || t("attendanceTab.fallback.pending")}`;
-      doc.text(line, 40, y);
-      y += 18;
+    doc.setFillColor(17, 24, 39);
+    doc.rect(0, 0, pageWidth, 92, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("Attendance Record", margin, 38);
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.text("Learn Language Education Academy", margin, 58);
+    doc.text("Official Student Attendance Transcript", margin, 74);
+
+    doc.setTextColor(17, 24, 39);
+    doc.setDrawColor(229, 231, 235);
+    doc.roundedRect(margin, 108, pageWidth - margin * 2, 200, 8, 8);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("Student Information", margin + 14, 128);
+
+    let infoY = 150;
+    details.forEach(([label, value]) => {
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(75, 85, 99);
+      doc.text(label, margin + 14, infoY);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(17, 24, 39);
+      doc.text(String(value), margin + 150, infoY);
+      infoY += 18;
     });
+
+    let y = 340;
+    const drawTableHeader = () => {
+      doc.setFillColor(243, 244, 246);
+      doc.rect(margin, y, pageWidth - margin * 2, rowHeight, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(31, 41, 55);
+      doc.text("#", margin + 8, y + 15);
+      doc.text("Session", margin + 28, y + 15);
+      doc.text("Date", margin + 285, y + 15);
+      doc.text("Status", margin + 390, y + 15);
+      y += rowHeight;
+    };
+
+    drawTableHeader();
+
+    const safeRecords = levelRecords.length
+      ? levelRecords
+      : [{ id: "none", title: "No sessions found", date: "", status: "Pending" }];
+
+    safeRecords.forEach((record, index) => {
+      if (y > pageHeight - 120) {
+        doc.addPage();
+        y = 60;
+        drawTableHeader();
+      }
+
+      doc.setDrawColor(229, 231, 235);
+      doc.line(margin, y, pageWidth - margin, y);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(17, 24, 39);
+
+      const sessionTitle = String(record.title || t("attendanceTab.fallback.session")).slice(0, 44);
+      doc.text(String(index + 1), margin + 8, y + 15);
+      doc.text(sessionTitle, margin + 28, y + 15);
+      doc.text(formatDate(record.date) || "—", margin + 285, y + 15);
+      doc.text(String(record.status || t("attendanceTab.fallback.pending")), margin + 390, y + 15);
+      y += rowHeight;
+    });
+
+    const signatureY = pageHeight - 74;
+    doc.setDrawColor(156, 163, 175);
+    doc.line(pageWidth - 220, signatureY, pageWidth - margin, signatureY);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(55, 65, 81);
+    doc.text("Signed by Learn Language Education Academy", pageWidth - 220, signatureY + 16);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(107, 114, 128);
+    doc.text("This attendance statement is generated from academy records.", margin, pageHeight - 32);
+
     doc.save("attendance-summary.pdf");
   };
 
