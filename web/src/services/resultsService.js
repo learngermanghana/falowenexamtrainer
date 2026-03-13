@@ -28,8 +28,7 @@ const normalizeLevels = (level) => {
     .map((entry) => entry.toUpperCase());
 };
 
-const loadScores = async ({ level, studentCode } = {}) => {
-  const scoresRef = collection(db, "scores");
+const buildScoreQueryConstraints = ({ level, studentCode, studentCodeField = "studentcode" } = {}) => {
   const constraints = [];
   const normalizedLevels = normalizeLevels(level);
   if (normalizedLevels.length && !normalizedLevels.includes("ALL")) {
@@ -49,6 +48,7 @@ const loadScores = async ({ level, studentCode } = {}) => {
         : where("level", "==", levelOptions[0])
     );
   }
+
   if (studentCode) {
     const normalizedCodes = Array.from(
       new Set(
@@ -60,12 +60,36 @@ const loadScores = async ({ level, studentCode } = {}) => {
 
     constraints.push(
       normalizedCodes.length > 1
-        ? where("studentcode", "in", normalizedCodes)
-        : where("studentcode", "==", normalizedCodes[0])
+        ? where(studentCodeField, "in", normalizedCodes)
+        : where(studentCodeField, "==", normalizedCodes[0])
     );
   }
-  const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+  return constraints;
+};
+
+const loadScores = async ({ level, studentCode } = {}) => {
+  const scoresRef = collection(db, "scores");
+
+  if (!studentCode) {
+    const constraints = buildScoreQueryConstraints({ level });
+    const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  }
+
+  const [legacySnapshot, currentSnapshot] = await Promise.all([
+    getDocs(query(scoresRef, ...buildScoreQueryConstraints({ level, studentCode, studentCodeField: "studentcode" }))),
+    getDocs(query(scoresRef, ...buildScoreQueryConstraints({ level, studentCode, studentCodeField: "studentCode" }))),
+  ]);
+
+  const uniqueRows = new Map();
+  [legacySnapshot, currentSnapshot].forEach((snapshot) => {
+    snapshot.docs.forEach((docEntry) => {
+      uniqueRows.set(docEntry.id, { id: docEntry.id, ...docEntry.data() });
+    });
+  });
+
+  return Array.from(uniqueRows.values());
 };
 
 const loadStudentProfile = async ({ studentCode, email } = {}) => {
@@ -122,16 +146,18 @@ const buildResults = (scores = []) => {
         row.studentcode || row.studentCode
       ) || "";
       const normalizedAssignment = normalizeString(row.assignment) || "Assignment";
-      const key = `${normalizedCode}::${normalizedAssignment}`;
+      const canonicalAssignmentKey = resolveAssignmentCanonicalKey({
+        level: row.level,
+        assignmentId: row.assignmentKey || row.canonicalAssignmentKey || row.assignmentId || row.assignment_id,
+        assignmentTitle: normalizedAssignment,
+      });
+
+      const key = `${normalizedCode}::${canonicalAssignmentKey || normalizedAssignment}`;
       attemptsTracker[key] = (attemptsTracker[key] || 0) + 1;
       const attemptNumber = attemptsTracker[key];
       return {
         assignment: normalizedAssignment,
-        assignmentKey: resolveAssignmentCanonicalKey({
-          level: row.level,
-          assignmentId: row.assignmentKey || row.canonicalAssignmentKey || row.assignmentId || row.assignment_id,
-          assignmentTitle: normalizedAssignment,
-        }),
+        assignmentKey: canonicalAssignmentKey,
         studentCode: normalizeString(row.studentcode || row.studentCode) || "",
         studentName: normalizeString(row.name) || "",
         level: (row.level || "").toUpperCase(),

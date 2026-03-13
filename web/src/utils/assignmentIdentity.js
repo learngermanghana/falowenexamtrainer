@@ -68,8 +68,12 @@ export const buildAssignmentCatalogForLevel = (level) => {
       const dayKey = String(entry?.day ?? "");
       seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
       const occurrence = seenByDay[dayKey];
-      const rawAssignmentId = entry.assignmentId || entry.assignment_id || entry.assignmentKey || "";
-      const label = `Day ${entry.day}: ${entry.topic || "Assignment"}`;
+      const rawAssignmentId =
+        entry.assignmentId ||
+        entry.assignment_id ||
+        entry.assignmentKey ||
+        `DAY-${entry.day}${occurrence > 1 ? `-TASK-${occurrence}` : ""}`;
+      const label = `Day ${entry.day}${occurrence > 1 ? ` Task ${occurrence}` : ""}: ${entry.topic || "Assignment"}`;
       const canonicalAssignmentId =
         toCanonicalAssignmentId({ assignmentId: rawAssignmentId, level: normalizedLevel }) ||
         getFallbackKeyFromTitle({ level: normalizedLevel, assignmentTitle: label });
