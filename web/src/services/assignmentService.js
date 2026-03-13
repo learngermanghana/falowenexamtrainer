@@ -1,13 +1,12 @@
-import { collection, db, getDoc, getDocs, doc, query, where } from "../firebase";
-import { courseSchedulesByName } from "../data/courseSchedules";
-import { courseSchedules } from "../data/courseSchedule";
+import { db, doc, getDoc } from "../firebase";
+import { fetchResults } from "./resultsService";
+import {
+  buildAssignmentCatalogForLevel,
+  resolveAssignmentCanonicalKey,
+  resolveAssignmentMatchKey,
+} from "../utils/assignmentIdentity";
 
 const PASS_MARK = 60;
-
-const parseAssignmentNumber = (assignment = "") => {
-  const match = assignment.match(/(\d+(?:\.\d+)?)/);
-  return match ? Number(match[1]) : null;
-};
 
 const toDate = (value) => {
   const parsed = new Date(value);
@@ -16,22 +15,24 @@ const toDate = (value) => {
 
 const unique = (arr) => Array.from(new Set(arr));
 
-const loadScores = async ({ studentCode } = {}) => {
-  const scoresRef = collection(db, "scores");
-  const constraints = [];
-  if (studentCode) {
-    constraints.push(where("studentcode", "==", studentCode));
-  }
-  const snapshot = await getDocs(constraints.length ? query(scoresRef, ...constraints) : scoresRef);
-  return snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
-};
+const normalizeStudentCode = (value) => String(value || "").trim().toLowerCase();
 
 const loadStudent = async (studentCode) => {
   if (!studentCode) return null;
+
   const ref = doc(db, "students", studentCode);
   const snap = await getDoc(ref);
   return snap.exists() ? { id: ref.id, ...snap.data() } : null;
 };
+
+const normalizeResultRow = (row = {}) => ({
+  ...row,
+  studentCode: row.studentCode || row.studentcode || "",
+  assignment: row.assignment || "",
+  level: String(row.level || "").toUpperCase(),
+  score: Number(row.score) || 0,
+  date: row.date || row.created_at || "",
+});
 
 const computeLeaderboard = (scores = []) => {
   const perLevel = {};
@@ -39,10 +40,21 @@ const computeLeaderboard = (scores = []) => {
   scores.forEach((row) => {
     const level = (row.level || "").toUpperCase();
     if (!level) return;
+
     if (!perLevel[level]) perLevel[level] = {};
 
-    const studentCode = (row.studentcode || row.studentCode || "").toLowerCase();
+    const studentCode = normalizeStudentCode(row.studentCode || row.studentcode);
     if (!studentCode) return;
+
+    const canonicalAssignmentKey = resolveAssignmentCanonicalKey({
+      level,
+      assignmentId:
+        row.assignmentKey ||
+        row.canonicalAssignmentKey ||
+        row.assignmentId ||
+        row.assignment_id,
+      assignmentTitle: row.assignment || "",
+    });
 
     const studentEntry = perLevel[level][studentCode] || {
       studentcode: studentCode,
@@ -50,11 +62,12 @@ const computeLeaderboard = (scores = []) => {
       bestScores: {},
     };
 
-    const assignment = row.assignment || "";
-    const currentBest = studentEntry.bestScores[assignment] || 0;
     const score = Number(row.score) || 0;
+    const bucketKey = canonicalAssignmentKey || row.assignment || "UNKNOWN";
+    const currentBest = studentEntry.bestScores[bucketKey] || 0;
+
     if (score > currentBest) {
-      studentEntry.bestScores[assignment] = score;
+      studentEntry.bestScores[bucketKey] = score;
     }
 
     perLevel[level][studentCode] = studentEntry;
@@ -63,13 +76,18 @@ const computeLeaderboard = (scores = []) => {
   const leaderboard = {};
 
   Object.entries(perLevel).forEach(([level, students]) => {
-    const rows = Object.values(students)
+    leaderboard[level] = Object.values(students)
       .map((entry) => {
         const passedAssignments = Object.entries(entry.bestScores).filter(
           ([, score]) => Number(score) >= PASS_MARK
         );
+
         const completions = passedAssignments.length;
-        const totalScore = passedAssignments.reduce((sum, [, score]) => sum + (Number(score) || 0), 0);
+        const totalScore = passedAssignments.reduce(
+          (sum, [, score]) => sum + (Number(score) || 0),
+          0
+        );
+
         return {
           ...entry,
           completions,
@@ -82,9 +100,10 @@ const computeLeaderboard = (scores = []) => {
         if (b.completions !== a.completions) return b.completions - a.completions;
         return (a.name || "").localeCompare(b.name || "");
       })
-      .map((entry, index) => ({ ...entry, rank: index + 1 }));
-
-    leaderboard[level] = rows;
+      .map((entry, index) => ({
+        ...entry,
+        rank: index + 1,
+      }));
   });
 
   return leaderboard;
@@ -92,6 +111,7 @@ const computeLeaderboard = (scores = []) => {
 
 const computeStreak = (dates = []) => {
   if (!dates.length) return 0;
+
   const sorted = unique(dates)
     .map(toDate)
     .filter(Boolean)
@@ -102,9 +122,11 @@ const computeStreak = (dates = []) => {
   today.setHours(0, 0, 0, 0);
 
   let cursor = today;
+
   for (const date of sorted) {
     const day = new Date(date);
     day.setHours(0, 0, 0, 0);
+
     if (day.getTime() === cursor.getTime()) {
       streak += 1;
       cursor = new Date(cursor);
@@ -121,128 +143,116 @@ const computeStreak = (dates = []) => {
   return streak;
 };
 
-const normalizeAssignmentEntry = (session = {}, fallbackTitle = null) => {
-  if (session.assignment !== true) return null;
-
-  const chapter = session.chapter || session.assignmentId || session.id || null;
-  const number = parseAssignmentNumber(chapter);
-  const label =
-    session.assignmentTitle ||
-    session.title ||
-    session.keyAssignment ||
-    fallbackTitle ||
-    chapter ||
-    (number !== null ? `Assignment ${number}` : null);
-
-  return number !== null || label
-    ? {
-        label,
-        number,
-      }
-    : null;
-};
-
-const collectDaySessions = (day = {}) => {
-  const collected = [];
-  const pushEntry = (entry, fallbackTitle) => {
-    const normalized = normalizeAssignmentEntry(entry, fallbackTitle);
-    if (normalized) collected.push(normalized);
-  };
-
-  pushEntry({ ...day, chapter: day.chapter || day.topic }, day.topic);
-
-  const processGroup = (group, fallbackTitle) => {
-    if (Array.isArray(group)) {
-      group.forEach((item) => pushEntry(item, fallbackTitle));
-    } else if (group) {
-      pushEntry(group, fallbackTitle);
-    }
-  };
-
-  processGroup(day.sessions, day.topic);
-  processGroup(day.lesen_hören, day.topic);
-  processGroup(day.schreiben_sprechen, day.topic);
-
-  return collected;
-};
-
-const collectPlannedAssignments = ({ classSchedule, courseSchedule } = {}) => {
-  const scheduleDays = classSchedule?.days || courseSchedule || [];
-  return scheduleDays.flatMap((day) => collectDaySessions(day)).filter(Boolean);
-};
-
 const computeStudentStats = (scores = [], student) => {
   const studentCode = student?.id || "";
-  const classSchedule = student?.className ? courseSchedulesByName[student.className] : null;
-  const courseSchedule = student?.level ? courseSchedules[(student.level || "").toUpperCase()] : null;
+  const level = String(student?.level || "").toUpperCase();
+  const catalog = buildAssignmentCatalogForLevel(level);
 
-  const bestPerAssignment = {};
-  const attemptsByAssignment = {};
+  const bestPerCanonicalAssignment = {};
+  const attemptsByCanonicalAssignment = {};
+  const bestPerMatchKey = {};
   const submissionDates = [];
 
-  const plannedAssignments = collectPlannedAssignments({ classSchedule, courseSchedule });
-  const plannedAssignmentLabels = new Map();
-  plannedAssignments
-    .filter((entry) => typeof entry.number === "number")
-    .forEach((entry) => {
-      if (!plannedAssignmentLabels.has(entry.number) && entry.label) {
-        plannedAssignmentLabels.set(entry.number, entry.label);
-      }
-    });
-
   scores.forEach((row) => {
-    const assignment = row.assignment || "";
     const score = Number(row.score) || 0;
     const date = row.date || row.created_at;
     const asDate = toDate(date);
     if (asDate) submissionDates.push(asDate);
 
-    bestPerAssignment[assignment] = Math.max(bestPerAssignment[assignment] || 0, score);
-    attemptsByAssignment[assignment] = (attemptsByAssignment[assignment] || 0) + 1;
+    const canonicalAssignmentKey = resolveAssignmentCanonicalKey({
+      level: row.level || level,
+      assignmentId:
+        row.assignmentKey ||
+        row.canonicalAssignmentKey ||
+        row.assignmentId ||
+        row.assignment_id,
+      assignmentTitle: row.assignment || "",
+    });
+
+    const matchKey = resolveAssignmentMatchKey({
+      level: row.level || level,
+      assignmentId:
+        row.assignmentKey ||
+        row.canonicalAssignmentKey ||
+        row.assignmentId ||
+        row.assignment_id,
+      assignmentTitle: row.assignment || "",
+    });
+
+    const canonicalBucket = canonicalAssignmentKey || row.assignment || "UNKNOWN";
+
+    bestPerCanonicalAssignment[canonicalBucket] = Math.max(
+      bestPerCanonicalAssignment[canonicalBucket] || 0,
+      score
+    );
+
+    attemptsByCanonicalAssignment[canonicalBucket] =
+      (attemptsByCanonicalAssignment[canonicalBucket] || 0) + 1;
+
+    if (matchKey) {
+      bestPerMatchKey[matchKey] = Math.max(bestPerMatchKey[matchKey] || 0, score);
+    }
   });
 
-  const failedAssignments = Object.entries(bestPerAssignment)
-    .filter(([, score]) => score < PASS_MARK)
-    .map(([assignment]) => assignment);
-
-  const passedAssignments = Object.entries(bestPerAssignment).filter(
-    ([, score]) => score >= PASS_MARK
+  const completedMatchKeys = new Set(
+    Object.entries(bestPerMatchKey)
+      .filter(([, score]) => Number(score) >= PASS_MARK)
+      .map(([key]) => key)
   );
 
-  const completedNumbers = passedAssignments
-    .map(([assignment]) => assignment)
-    .map(parseAssignmentNumber)
-    .filter((value) => typeof value === "number");
+  const failedAssignments = Object.entries(bestPerCanonicalAssignment)
+    .filter(([, score]) => score < PASS_MARK)
+    .map(([assignmentKey]) => assignmentKey);
 
-  const completedAssignments = passedAssignments.map(([assignment, score]) => {
-    const number = parseAssignmentNumber(assignment);
-    return {
-      assignment,
-      bestScore: score,
-      number,
-      label: number !== null && plannedAssignmentLabels.has(number)
-        ? plannedAssignmentLabels.get(number)
-        : assignment,
-      attempts: attemptsByAssignment[assignment] || 0,
-    };
+  const completedAssignments = Object.entries(bestPerCanonicalAssignment)
+    .filter(([, score]) => score >= PASS_MARK)
+    .map(([assignmentKey, score]) => {
+      const catalogEntry = catalog.find(
+        (entry) =>
+          entry.canonicalAssignmentId === assignmentKey ||
+          entry.assignmentKey === assignmentKey
+      );
+
+      return {
+        assignment: catalogEntry?.label || assignmentKey,
+        assignmentKey,
+        bestScore: score,
+        label: catalogEntry?.label || assignmentKey,
+        day: catalogEntry?.day ?? null,
+        attempts: attemptsByCanonicalAssignment[assignmentKey] || 0,
+      };
+    })
+    .sort((a, b) => {
+      const dayA = Number.isFinite(a.day) ? a.day : Number.MAX_SAFE_INTEGER;
+      const dayB = Number.isFinite(b.day) ? b.day : Number.MAX_SAFE_INTEGER;
+      return dayA - dayB;
+    });
+
+  let latestCompletedDay = null;
+  catalog.forEach((entry) => {
+    if (completedMatchKeys.has(entry.matchKey) && Number.isFinite(entry.day)) {
+      latestCompletedDay = Math.max(latestCompletedDay || 0, entry.day);
+    }
   });
 
-  let missedAssignments = [];
-  if (plannedAssignments.length) {
-    const plannedNumbers = plannedAssignments
-      .map((session) => session.number)
-      .filter((value) => typeof value === "number");
-    const latestCompleted = completedNumbers.length ? Math.max(...completedNumbers) : null;
-    if (latestCompleted !== null) {
-      missedAssignments = plannedNumbers
-        .filter((number) => number <= latestCompleted && !completedNumbers.includes(number))
-        .sort((a, b) => a - b)
-        .map((num) => ({
-          number: num,
-          label: plannedAssignmentLabels.get(num) || `Assignment ${num}`,
-        }));
-    }
-  }
+  const missedAssignments = catalog
+    .filter(
+      (entry) =>
+        Number.isFinite(latestCompletedDay) &&
+        Number.isFinite(entry.day) &&
+        entry.day < latestCompletedDay &&
+        !completedMatchKeys.has(entry.matchKey)
+    )
+    .map((entry) => ({
+      day: entry.day,
+      label: entry.label,
+      assignmentId: entry.assignmentId,
+      assignmentKey: entry.canonicalAssignmentId,
+      matchKey: entry.matchKey,
+    }));
+
+  const nextRecommendedAssignment =
+    catalog.find((entry) => !completedMatchKeys.has(entry.matchKey)) || null;
 
   const today = new Date();
   const weekday = today.getDay() === 0 ? 7 : today.getDay();
@@ -254,42 +264,86 @@ const computeStudentStats = (scores = [], student) => {
     const date = toDate(row.date || row.created_at);
     return date && date >= monday;
   });
-  const weeklyAssignments = unique(weeklyAttempts.map((row) => row.assignment || "")).filter(Boolean);
-  const weeklyRetryCount = weeklyAttempts.reduce((count, row) => {
-    const assignment = row.assignment || "";
-    const attempts = weeklyAttempts.filter((r) => (r.assignment || "") === assignment).length;
-    return count + (attempts > 1 ? 1 : 0);
-  }, 0);
+
+  const weeklyCanonicalAssignments = unique(
+    weeklyAttempts
+      .map(
+        (row) =>
+          resolveAssignmentCanonicalKey({
+            level: row.level || level,
+            assignmentId:
+              row.assignmentKey ||
+              row.canonicalAssignmentKey ||
+              row.assignmentId ||
+              row.assignment_id,
+            assignmentTitle: row.assignment || "",
+          }) || row.assignment || ""
+      )
+      .filter(Boolean)
+  );
+
+  const retryBuckets = weeklyAttempts.reduce((acc, row) => {
+    const key =
+      resolveAssignmentCanonicalKey({
+        level: row.level || level,
+        assignmentId:
+          row.assignmentKey ||
+          row.canonicalAssignmentKey ||
+          row.assignmentId ||
+          row.assignment_id,
+        assignmentTitle: row.assignment || "",
+      }) ||
+      row.assignment ||
+      "UNKNOWN";
+
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const retriesThisWeek = Object.values(retryBuckets).filter((count) => count > 1).length;
 
   const latest = scores
     .slice()
-    .sort((a, b) => (toDate(b.date || b.created_at) || 0) - (toDate(a.date || a.created_at) || 0))[0];
+    .sort(
+      (a, b) =>
+        (toDate(b.date || b.created_at)?.getTime() || 0) -
+        (toDate(a.date || a.created_at)?.getTime() || 0)
+    )[0];
 
   return {
     studentCode,
-    level: (student?.level || "").toUpperCase(),
+    level,
     failedAssignments,
     missedAssignments,
+    nextRecommendedAssignment,
     streakDays: computeStreak(submissionDates),
-    weekAssignments: weeklyAssignments.length,
+    weekAssignments: weeklyCanonicalAssignments.length,
     weekAttempts: weeklyAttempts.length,
-    retriesThisWeek: weeklyRetryCount,
+    retriesThisWeek,
     lastAssignment: latest?.assignment || null,
     completedAssignments,
   };
 };
 
-export const fetchAssignmentSummary = async ({ studentCode } = {}) => {
-  const [scores, student] = await Promise.all([
-    loadScores({}),
+export const fetchAssignmentSummary = async ({ studentCode, resultsRows } = {}) => {
+  const [student, fetchedResults] = await Promise.all([
     loadStudent(studentCode),
+    resultsRows
+      ? Promise.resolve({
+          results: resultsRows.map(normalizeResultRow),
+        })
+      : fetchResults({ studentCode }),
   ]);
 
-  const leaderboard = computeLeaderboard(scores);
-  const studentScores = scores.filter(
-    (row) => (row.studentcode || row.studentCode || "").toLowerCase() === (studentCode || "").toLowerCase()
+  const allRows = (fetchedResults?.results || []).map(normalizeResultRow);
+
+  const leaderboard = computeLeaderboard(allRows);
+
+  const studentRows = allRows.filter(
+    (row) => normalizeStudentCode(row.studentCode) === normalizeStudentCode(studentCode)
   );
-  const studentStats = studentCode ? computeStudentStats(studentScores, student) : null;
+
+  const studentStats = studentCode ? computeStudentStats(studentRows, student) : null;
 
   return {
     leaderboard,
