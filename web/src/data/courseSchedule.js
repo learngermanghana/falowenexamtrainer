@@ -169,14 +169,14 @@ const A2_SCHEDULE = [
     topic: "Rezepte und Essen (Exercise) 3.8",
     chapter: "3.8",
     assignment: true,
-    goal:
-      "Learn about recipes and food. Practice using sequence words like 'zuerst', 'nachdem', and 'außerdem' to organize your letter.",
-    instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Zuerst, Nachdem, and Talking About Sequence in German",
-    video: "https://youtu.be/_xQMNp3qcDQ",
-    youtube_link: "https://youtu.be/_xQMNp3qcDQ",
+    goal: "Discuss recipes, ingredients, and food culture while strengthening practical communication about meals.",
+    instruction:
+      "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
+    grammar_topic: "Zuerst, nachdem, außerdem (sequence and linking words)",
+    video: "https://www.youtube.com/watch?v=IyMgjkY0LgU",
+    youtube_link: "https://www.youtube.com/watch?v=IyMgjkY0LgU",
     grammarbook_link: "https://drive.google.com/file/d/16lh8sPl_IDZ3dLwYNvL73PqOFCixidrI/view?usp=sharing",
-    workbook_link: "https://drive.google.com/file/d/1c8JJyVlKYI2mz6xLZZ6RkRHLnH3Dtv0c/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-8-rezepte-und-essen-workbook",
   },
   {
     day: 9,
