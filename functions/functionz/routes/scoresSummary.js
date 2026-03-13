@@ -86,6 +86,33 @@ const parseDateMs = (value) => {
   return Number.isFinite(ms) ? ms : 0;
 };
 
+const parseScoreValue = (value) => {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+
+  const asNumber = Number(raw);
+  if (Number.isFinite(asNumber)) return asNumber;
+
+  const normalized = raw.replace(/,/g, ".").replace(/\s+/g, "");
+
+  const percentMatch = normalized.match(/^(-?\d+(?:\.\d+)?)%$/);
+  if (percentMatch) {
+    const percent = Number(percentMatch[1]);
+    return Number.isFinite(percent) ? percent : null;
+  }
+
+  const fractionMatch = normalized.match(/^(-?\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
+  if (fractionMatch) {
+    const score = Number(fractionMatch[1]);
+    const total = Number(fractionMatch[2]);
+    if (Number.isFinite(score) && Number.isFinite(total) && total > 0) {
+      return (score / total) * 100;
+    }
+  }
+
+  return null;
+};
+
 const anonymizeDisplayName = (name, studentCode) => {
   const trimmedName = String(name || "").trim();
   if (trimmedName) {
@@ -489,7 +516,7 @@ const scoresSummaryHandler = async (req, res) => {
       const identifier = resolveIdentifier(row);
       if (!identifier) return;
 
-      const scoreNum = Number(get(row, idx.score));
+      const scoreNum = parseScoreValue(get(row, idx.score));
       if (!Number.isFinite(scoreNum)) return;
 
       const key = normalizeStudentCode(rowStudentCode);
@@ -539,7 +566,7 @@ const scoresSummaryHandler = async (req, res) => {
       .filter((r) => normalizeStudentCode(get(r, idx.studentCode)) === normalizedStudentCode)
       .map((r) => {
         const assignment = get(r, idx.assignment);
-        const scoreNum = Number(get(r, idx.score));
+        const scoreNum = parseScoreValue(get(r, idx.score));
         const dateRaw = get(r, idx.date);
         const dateMs = parseDateMs(dateRaw);
         const rowLevel = get(r, idx.level) || "";
