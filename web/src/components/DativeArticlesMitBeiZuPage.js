@@ -2,6 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
+const heroImageUrl =
+  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1800&q=80";
+
 const Section = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 10 }}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -73,6 +76,11 @@ const DativeArticlesMitBeiZuPage = () => {
           There are several dative prepositions in German, but today we focus only on <strong>mit</strong>, <strong>bei</strong>,
           and <strong>zu</strong>.
         </p>
+        <img
+          src={heroImageUrl}
+          alt="Students learning German in a classroom"
+          style={{ width: "100%", height: "clamp(180px, 30vw, 280px)", objectFit: "cover", borderRadius: 12, marginTop: 8 }}
+        />
       </div>
 
       <Section title="Introduction">
