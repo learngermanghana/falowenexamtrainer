@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -413,16 +414,13 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
             allowFullScreen
           />
 
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Audio source for this exercise: {" "}
-            <a
-              href="https://drive.google.com/file/d/1zErUZFGcTIUw_I3aasDXM2VlAoPfKsBP/view?usp=sharing"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open listening audio
-            </a>
-          </p>
+          <div style={{ display: "grid", gap: 8 }}>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>Audio source for this exercise:</p>
+            <CoursebookAudioPlayer
+              url="https://drive.google.com/file/d/1zErUZFGcTIUw_I3aasDXM2VlAoPfKsBP/view?usp=sharing"
+              linkLabel="Open listening audio"
+            />
+          </div>
 
           <h3 style={sectionTitle}>Multiple-Choice Questions</h3>
           <div style={{ display: "grid", gap: 10 }}>

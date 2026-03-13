@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -367,12 +368,7 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
           <p style={{ margin: 0 }}>
             Listen to the audio, then submit your answers in the assignment area (do not answer directly on this page).
           </p>
-          <p style={{ margin: 0 }}>
-            Audio link:{" "}
-            <a href="https://youtu.be/am3WqQaCibE" target="_blank" rel="noreferrer">
-              Open Teil 4 audio
-            </a>
-          </p>
+          <CoursebookAudioPlayer url="https://youtu.be/am3WqQaCibE" linkLabel="Open Teil 4 audio" />
 
           <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
             <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />

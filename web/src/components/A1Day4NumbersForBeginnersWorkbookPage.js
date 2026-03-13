@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const card = {
   ...styles.card,
@@ -160,14 +161,11 @@ const A1Day4NumbersForBeginnersWorkbookPage = () => {
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           Complete Hören from Google Drive, then return to submit answers.
         </p>
-        <a
-          href={horenLink}
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
+        <CoursebookAudioPlayer
+          url={horenLink}
+          linkLabel="Open Hören Material (Google Drive)"
+          linkStyle={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+        />
       </div>
 
       <div
