@@ -97,21 +97,6 @@ const isStructuredAssignmentId = (assignmentId = "") => {
   );
 };
 
-const isStructuredAssignmentId = (assignmentId = "") => {
-  const raw = String(assignmentId || "").trim();
-  const token = normalizeAssignmentToken(raw);
-
-  if (!token) return false;
-
-  return (
-    /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i.test(token) ||
-    /^\d+(?:\.\d+)?$/.test(raw) ||
-    /^(A1|A2|B1|B2|C1|C2)-DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
-    /^DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
-    /^TITLE-/.test(token)
-  );
-};
-
 export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentTitle }) => {
   const normalizedLevel = normalizeLevel(level);
   const fromId = toCanonicalAssignmentId({ assignmentId, level: normalizedLevel });
