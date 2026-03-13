@@ -6,7 +6,6 @@ import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchResults } from "../services/resultsService";
-import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
 
 const toNumber = (value) => {
@@ -43,7 +42,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
     return (normalized || "").toUpperCase();
   }, [levelKey]);
   const [latestResult, setLatestResult] = useState(null);
-  const [scoreSummary, setScoreSummary] = useState(null);
   const [attendanceSummary, setAttendanceSummary] = useState(null);
 
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
@@ -80,13 +78,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
     studentProfile?.attendanceSessions ??
     studentProfile?.attendance?.sessions ??
     null;
-  const assignmentLabel =
-    scoreSummary?.student?.nextRecommendation?.label ||
-    studentProfile?.nextAssignment ||
-    studentProfile?.assignmentRecommendation ||
-    studentProfile?.assignmentTitle ||
-    t("studyBuddy.metrics.awaitingAssignment");
-
   const resultsLabel =
     latestScore !== null
       ? t("studyBuddy.metrics.scoreValue", {
@@ -103,7 +94,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
           count: numberFormatter.format(attendanceSessions),
         })
       : t("studyBuddy.metrics.notSynced");
-  const hasAssignment = assignmentLabel !== t("studyBuddy.metrics.awaitingAssignment");
   const [questionInput, setQuestionInput] = useState("");
   const [quickReply, setQuickReply] = useState("");
   const [quickReplyError, setQuickReplyError] = useState("");
@@ -172,20 +162,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
         setAttendanceSummary(null);
       }
 
-      if (idToken && studentCode) {
-        tasks.push(
-          fetchScoreSummary({ idToken, studentCode })
-            .then((response) => {
-              if (isMounted) setScoreSummary(response || null);
-            })
-            .catch(() => {
-              if (isMounted) setScoreSummary(null);
-            })
-        );
-      } else {
-        setScoreSummary(null);
-      }
-
       if (tasks.length) {
         await Promise.all(tasks);
       }
@@ -195,7 +171,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     return () => {
       isMounted = false;
     };
-  }, [className, idToken, resolvedLevel, studentCode, studentEmail]);
+  }, [className, resolvedLevel, studentCode, studentEmail]);
 
   const suggestions = useMemo(() => {
     const tips = [];
@@ -217,20 +193,12 @@ const StudyBuddyBar = ({ studentProfile }) => {
       );
     }
 
-    if (assignmentLabel && hasAssignment) {
-      tips.push(
-        t("studyBuddy.suggestions.assignmentPlan", {
-          assignment: assignmentLabel,
-        })
-      );
-    }
-
     if (!tips.length) {
       tips.push(t("studyBuddy.suggestions.default"));
     }
 
     return tips;
-  }, [attendanceRate, assignmentLabel, hasAssignment, latestScore, paymentReminder, t]);
+  }, [attendanceRate, latestScore, paymentReminder, t]);
 
   const primarySuggestion = suggestions[0];
   const submitQuickQuestion = useCallback(
@@ -386,10 +354,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
             <div className="study-buddy-insight">
               <p className="study-buddy-label">{t("studyBuddy.insights.attendance")}</p>
               <div className="study-buddy-value">{attendanceLabel}</div>
-            </div>
-            <div className="study-buddy-insight">
-              <p className="study-buddy-label">{t("studyBuddy.insights.assignment")}</p>
-              <div className="study-buddy-value">{assignmentLabel}</div>
             </div>
           </div>
 
