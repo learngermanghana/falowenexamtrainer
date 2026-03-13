@@ -89,13 +89,22 @@ const isWeakAssignmentId = (assignmentId = "") => {
   // Weak examples: "1", "2", "8"
   if (/^\d+$/.test(token)) return true;
 
-  // Strong examples: A1-0.1, 0.1, DAY-8, DAY-8-TASK-1, A1-DAY-8, TITLE-...
-  if (/^(A1|A2|B1|B2|C1|C2)-/.test(token)) return false;
-  if (/^\d+\.\d+$/.test(token)) return false;
-  if (/^DAY-\d+/.test(token)) return false;
-  if (/^TITLE-/.test(token)) return false;
-
   return false;
+};
+
+const isStructuredAssignmentId = (assignmentId = "") => {
+  const raw = String(assignmentId || "").trim();
+  const token = normalizeAssignmentToken(raw);
+
+  if (!token) return false;
+
+  return (
+    /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i.test(token) ||
+    /^\d+(?:\.\d+)?$/.test(raw) ||
+    /^(A1|A2|B1|B2|C1|C2)-DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
+    /^DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
+    /^TITLE-/.test(token)
+  );
 };
 
 export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentTitle }) => {
@@ -109,7 +118,10 @@ export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentT
   if (!fromId) return fromTitle;
   if (!fromTitle) return fromId;
 
-  // If assignmentId is weak like "1", but title yields "0.1", trust the title.
+  if (!isStructuredAssignmentId(assignmentId)) {
+    return fromTitle;
+  }
+
   if (isWeakAssignmentId(assignmentId) && fromTitle !== fromId) {
     return fromTitle;
   }

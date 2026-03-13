@@ -57,10 +57,27 @@ function safeNum(v) {
  */
 function parseAssignmentId(assignmentText) {
   const t = safeStr(assignmentText);
+  if (!t) return "";
+
+  const explicitLevelMatch = t.match(/\b(?:A1|A2|B1|B2|C1|C2)\s*[-:]?\s*(\d+(?:\.\d+)?)\b/i);
+  if (explicitLevelMatch?.[1]) return explicitLevelMatch[1];
+
+  const decimalMatches = t.match(/\b\d+\.\d+\b/g);
+  if (decimalMatches?.length) return decimalMatches[decimalMatches.length - 1];
 
   // Prefer patterns containing underscores too (e.g. "0.2_1.1", "9_10")
-  const m = t.match(/(\d+(?:\.\d+)?(?:_\d+(?:\.\d+)?)*)/);
-  return m ? m[1] : "";
+  const tokenMatches = t.match(/\b\d+(?:\.\d+)?(?:_\d+(?:\.\d+)?)*\b/g);
+  if (!tokenMatches?.length) return "";
+
+  const levelPrefix = /^\s*(A1|A2|B1|B2|C1|C2)\b/i.exec(t);
+  if (levelPrefix && tokenMatches.length > 1) {
+    const [first] = tokenMatches;
+    if (first === levelPrefix[1].slice(1)) {
+      return tokenMatches[tokenMatches.length - 1];
+    }
+  }
+
+  return tokenMatches[tokenMatches.length - 1];
 }
 
 function parseIsoDate(dateText) {

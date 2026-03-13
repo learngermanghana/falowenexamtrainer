@@ -34,4 +34,24 @@ describe("assignment identity canonical keys", () => {
     ).toBe("A1-0.1");
   });
 
+  test("bad sentence-like assignmentId falls back to title key", () => {
+    expect(
+      resolveAssignmentCanonicalKey({
+        level: "A1",
+        assignmentId: "A1 Greetings and Asking About Well-being 0.1",
+        assignmentTitle: "A1 Greetings and Asking About Well-being 0.1",
+      })
+    ).toBe("A1-0.1");
+  });
+
+  test("weak integer assignmentId still prefers title-derived chapter key", () => {
+    expect(
+      resolveAssignmentCanonicalKey({
+        level: "A1",
+        assignmentId: "1",
+        assignmentTitle: "Day 1: 0.1 Greetings and Asking About Well-being",
+      })
+    ).toBe("A1-0.1");
+  });
+
 });
