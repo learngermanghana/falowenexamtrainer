@@ -80,7 +80,6 @@
     "tags": {
       "results": "Ergebnisse",
       "attendance": "Anwesenheit",
-      "assignments": "Aufgaben",
       "quickQa": "Kurzfragen"
     },
     "shortcuts": {
@@ -103,8 +102,7 @@
     "insights": {
       "nextUp": "Als Nächstes",
       "results": "Letztes Ergebnis",
-      "attendance": "Anwesenheit",
-      "assignment": "Nächste Aufgabe"
+      "attendance": "Anwesenheit"
     },
     "data": {
       "title": "Datenquellen",
@@ -113,11 +111,8 @@
     "metrics": {
       "latestResult": "Letztes Ergebnis",
       "attendance": "Anwesenheit",
-      "nextAssignment": "Nächste Aufgabe",
       "latestHelper": "Behalte deinen Fortschritt nach jeder Korrektur im Blick.",
       "attendanceHelper": "Bleib regelmäßig dran, so machst du schneller Fortschritte.",
-      "assignmentHelper": "Basierend auf deinen letzten Abgaben.",
-      "awaitingAssignment": "Empfehlung ausstehend",
       "scoreValue": "{{score}}/100",
       "noResults": "Noch keine Ergebnisse",
       "attendancePercent": "{{percent}}%",
@@ -129,7 +124,6 @@
       "lowScore": "Konzentriere dich auf die letzte Aufgabe und korrigiere sie, bevor du etwas Neues startest.",
       "lowAttendance": "Versuche, die nächsten zwei Termine zu besuchen, um stabil zu bleiben.",
       "paymentReminder": "Zahlungserinnerung: {{amount}} fällig in {{time}}. Öffne dein Konto, um eingeschrieben zu bleiben.",
-      "assignmentPlan": "Plane diese Woche zwei kurze Lernblöcke, um {{assignment}} zu schaffen.",
       "default": "Sag mir dein aktuelles Ziel, dann erstelle ich einen kurzen Wochenplan."
     },
     "qa": {
@@ -304,7 +298,7 @@
     },
     "more": {
       "summary": "Mehr für dich",
-      "helper": "Behalte deine Anwesenheitsserie im Blick, sieh dir kommende Kurstermine an und prüfe den Kalender, damit du keine Stunde verpasst."
+      "helper": "Verfolge deine Anwesenheitsserie, behalte die nächsten Kurstermine im Blick und prüfe den Kalender, damit du keine Stunde verpasst."
     }
   },
   "courseTab": {

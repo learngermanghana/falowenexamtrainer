@@ -5,7 +5,6 @@ import { styles } from "../styles";
 import { toDateMs } from "../lib/dateUtils";
 import { ZOOM_DETAILS } from "../data/classCatalog";
 import ClassCalendarCard from "./ClassCalendarCard";
-import HomeMetrics from "./HomeMetrics";
 import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
@@ -74,8 +73,8 @@ const GeneralHome = ({
     [numberFormatter, t]
   );
   const translate = useCallback((key, values) => t(key, values), [t]);
-  const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
+  const preferredClass = studentProfile?.className;
   const classCalendarId = "class-calendar-card";
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
@@ -377,7 +376,6 @@ const GeneralHome = ({
             <p style={{ ...styles.helperText, margin: 0 }}>
               {t("generalHome.more.helper")}
             </p>
-            <HomeMetrics studentProfile={studentProfile} />
             <ClassCalendarCard
               id={classCalendarId}
               initialClassName={preferredClass}
@@ -386,6 +384,7 @@ const GeneralHome = ({
           </div>
         </details>
       </section>
+
     </div>
   );
 };

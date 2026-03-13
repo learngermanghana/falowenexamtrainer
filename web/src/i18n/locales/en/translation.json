@@ -80,7 +80,6 @@
     "tags": {
       "results": "Results",
       "attendance": "Attendance",
-      "assignments": "Assignments",
       "quickQa": "Quick Q&A"
     },
     "shortcuts": {
@@ -103,17 +102,13 @@
     "insights": {
       "nextUp": "Next up",
       "results": "Latest result",
-      "attendance": "Attendance",
-      "assignment": "Next assignment"
+      "attendance": "Attendance"
     },
     "metrics": {
       "latestResult": "Latest result",
       "attendance": "Attendance",
-      "nextAssignment": "Next assignment",
       "latestHelper": "Track progress after each marked task.",
       "attendanceHelper": "Keep a steady routine to improve faster.",
-      "assignmentHelper": "Based on your latest submissions.",
-      "awaitingAssignment": "Awaiting recommendation",
       "scoreValue": "{{score}}/100",
       "noResults": "No results yet",
       "attendancePercent": "{{percent}}%",
@@ -125,7 +120,6 @@
       "lowScore": "Focus on the last marked task and redo corrections before starting a new assignment.",
       "lowAttendance": "Aim to attend the next two classes to keep your progress steady.",
       "paymentReminder": "Payment reminder: {{amount}} due in {{time}}. Review your account to stay enrolled.",
-      "assignmentPlan": "Plan 2 short study blocks this week to finish {{assignment}}.",
       "default": "Share your current goal, and I'll build a quick weekly plan for you."
     },
     "qa": {
