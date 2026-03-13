@@ -23,7 +23,7 @@ const { createChatCompletion, getOpenAIClient } = require("./openaiClient");
 const { appendStudentToStudentsSheetSafely } = require("./studentsSheet");
 const { createLogger, logRequest } = require("./logger");
 const { incrementCounter, getMetricsSnapshot } = require("./metrics");
-const { courseSchedulesByName } = require("../data/courseSchedulesByName");
+const { courseSchedulesByName } = require("../data/classSchedules");
 
 let getScoresForStudent;
 
