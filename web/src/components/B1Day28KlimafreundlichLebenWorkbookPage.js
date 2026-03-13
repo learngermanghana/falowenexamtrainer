@@ -131,7 +131,7 @@ const B1Day28KlimafreundlichLebenWorkbookPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: group speaking, writing, reading and listening practice.</p>
         <img
           src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1600&q=80"
-          alt="Wind turbines in a green field as a hero image for climate-friendly living"
+          alt="Wind turbines in a green field for climate-friendly living"
           loading="lazy"
           style={tabImageStyle}
         />
