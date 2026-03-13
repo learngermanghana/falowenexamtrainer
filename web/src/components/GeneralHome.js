@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { toDateMs } from "../lib/dateUtils";
 import { ZOOM_DETAILS } from "../data/classCatalog";
-import ClassCalendarCard from "./ClassCalendarCard";
-import HomeMetrics from "./HomeMetrics";
 import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
@@ -74,9 +72,7 @@ const GeneralHome = ({
     [numberFormatter, t]
   );
   const translate = useCallback((key, values) => t(key, values), [t]);
-  const preferredClass = studentProfile?.className;
   const navigate = useNavigate();
-  const classCalendarId = "class-calendar-card";
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
   const [announcementIndex, setAnnouncementIndex] = useState(0);
@@ -104,12 +100,6 @@ const GeneralHome = ({
 
   const handleSelectLevel = () => navigate("/campus/account");
   const handleConfirmClass = () => {
-    const calendarSection = document.getElementById(classCalendarId);
-    if (calendarSection) {
-      calendarSection.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-
     navigate("/");
   };
 
@@ -368,24 +358,6 @@ const GeneralHome = ({
         </section>
       </div>
 
-      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <details style={{ ...styles.card, background: "#f8fafc" }}>
-          <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>
-            {t("generalHome.more.summary")}
-          </summary>
-          <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              {t("generalHome.more.helper")}
-            </p>
-            <HomeMetrics studentProfile={studentProfile} />
-            <ClassCalendarCard
-              id={classCalendarId}
-              initialClassName={preferredClass}
-              program={studentProfile?.program}
-            />
-          </div>
-        </details>
-      </section>
     </div>
   );
 };
