@@ -82,15 +82,39 @@ const getFallbackKeyFromTitle = ({ level, assignmentTitle }) => {
   return `${normalizedLevel}-TITLE-${titleToken}`;
 };
 
+const isWeakAssignmentId = (assignmentId = "") => {
+  const token = String(assignmentId || "").trim().toUpperCase();
+  if (!token) return true;
+
+  // Weak examples: "1", "2", "8"
+  if (/^\d+$/.test(token)) return true;
+
+  // Strong examples: A1-0.1, 0.1, DAY-8, DAY-8-TASK-1, A1-DAY-8, TITLE-...
+  if (/^(A1|A2|B1|B2|C1|C2)-/.test(token)) return false;
+  if (/^\d+\.\d+$/.test(token)) return false;
+  if (/^DAY-\d+/.test(token)) return false;
+  if (/^TITLE-/.test(token)) return false;
+
+  return false;
+};
+
 export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentTitle }) => {
   const normalizedLevel = normalizeLevel(level);
   const fromId = toCanonicalAssignmentId({ assignmentId, level: normalizedLevel });
-  if (fromId) return fromId;
-
-  return getFallbackKeyFromTitle({
+  const fromTitle = getFallbackKeyFromTitle({
     level: normalizedLevel,
     assignmentTitle,
   });
+
+  if (!fromId) return fromTitle;
+  if (!fromTitle) return fromId;
+
+  // If assignmentId is weak like "1", but title yields "0.1", trust the title.
+  if (isWeakAssignmentId(assignmentId) && fromTitle !== fromId) {
+    return fromTitle;
+  }
+
+  return fromId;
 };
 
 export const resolveAssignmentMatchKey = ({ level, assignmentId, assignmentTitle }) => {
