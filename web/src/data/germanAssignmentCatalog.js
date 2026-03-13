@@ -83,6 +83,28 @@ export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = {
   },
 };
 
+
+const resolveAssignmentDisplayTitle = (entry = {}, { preferEnglish = true } = {}) =>
+  String(
+    entry.topic ||
+      (preferEnglish ? entry.en || entry.de : entry.de || entry.en) ||
+      entry.en ||
+      entry.de ||
+      ""
+  ).trim();
+
+const resolveAssignmentDisplayType = (entry = {}, { preferEnglish = false } = {}) =>
+  String(
+    (preferEnglish ? entry.en || entry.de : entry.de || entry.en) ||
+      entry.topic ||
+      entry.de ||
+      entry.en ||
+      ""
+  ).trim();
+
+export const getAssignmentDisplayTitle = (entry, options) => resolveAssignmentDisplayTitle(entry, options);
+export const getAssignmentDisplayType = (entry, options) => resolveAssignmentDisplayType(entry, options);
+
 export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter }) => {
   const normalizedLevel = String(level || "").toUpperCase();
   const levelDictionary = GERMAN_ASSIGNMENT_COURSE_DICTIONARY[normalizedLevel];

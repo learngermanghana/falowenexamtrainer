@@ -6,7 +6,11 @@ import { useAuth } from "../context/AuthContext";
 import { courseSchedules } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
-import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
+import {
+  getAssignmentDictionaryEntry,
+  getAssignmentDisplayTitle,
+  getAssignmentDisplayType,
+} from "../data/germanAssignmentCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
@@ -93,10 +97,10 @@ const buildLevelSchedules = () => {
         return {
           chapter: dictionaryEntry?.chapter || session.chapter || session.title || `Session ${index + 1}`,
           assignmentId: dictionaryEntry?.assignment_id || session.assignmentId || session.chapter || null,
-          title: dictionaryEntry?.topic || dictionaryEntry?.en || session.title,
+          title: session.title || getAssignmentDisplayTitle(dictionaryEntry, { preferEnglish: true }),
           assignment: Boolean(session.assignment),
           note: session.note,
-          type: dictionaryEntry?.topic || dictionaryEntry?.de || session.type,
+          type: session.type || getAssignmentDisplayType(dictionaryEntry),
           video,
           youtube_link: session.youtube_link || session.video || fallback.video || null,
           grammarbook_link,
@@ -111,12 +115,15 @@ const buildLevelSchedules = () => {
       return {
         day: day.dayNumber,
         topic:
-          getAssignmentDictionaryEntry({
-            level,
-            assignmentId: primarySession.assignmentId,
-            chapter: primarySession.chapter,
-          })?.topic ||
           primarySession.title ||
+          getAssignmentDisplayTitle(
+            getAssignmentDictionaryEntry({
+              level,
+              assignmentId: primarySession.assignmentId,
+              chapter: primarySession.chapter,
+            }),
+            { preferEnglish: true }
+          ) ||
           primarySession.chapter ||
           `Day ${day.dayNumber}`,
         chapter: primarySession.chapter || primarySession.title || null,
