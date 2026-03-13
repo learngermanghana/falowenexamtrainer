@@ -84,25 +84,6 @@ const lesenQuestions = [
   },
 ];
 
-const hoerenQuestions = [
-  {
-    stem: "Welches Hauptthema wird im Hörtext behandelt?",
-    options: ["A) Klimafreundliche Gewohnheiten im Alltag", "B) Urlaubsplanung mit dem Auto", "C) Technikangebote im Internet"],
-  },
-  {
-    stem: "Welche Maßnahme wird für umweltfreundliche Mobilität genannt?",
-    options: ["A) Kürzere Strecken fliegen", "B) Fahrrad und öffentliche Verkehrsmittel nutzen", "C) Mehr alleine Auto fahren"],
-  },
-  {
-    stem: "Welche Aussage passt zum Konsumverhalten?",
-    options: ["A) Regionale Produkte und weniger Plastik", "B) Mehr Einwegverpackungen", "C) Nur importierte Produkte"],
-  },
-  {
-    stem: "Was ist die zentrale Botschaft des Beitrags?",
-    options: ["A) Nur große politische Maßnahmen helfen", "B) Kleine Schritte vieler Menschen können viel bewirken", "C) Klimaschutz ist im Alltag nicht möglich"],
-  },
-];
-
 function TabButton({ active, onClick, children }) {
   return (
     <button
@@ -129,7 +110,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day28KlimafreundlichLebenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -149,6 +129,12 @@ const B1Day28KlimafreundlichLebenWorkbookPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 · Day 28 Workbook · Klimafreundlich leben</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: group speaking, writing, reading and listening practice.</p>
+        <img
+          src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=1600&q=80"
+          alt="Wind turbines in a green field as a hero image for climate-friendly living"
+          loading="lazy"
+          style={tabImageStyle}
+        />
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {tabs.map((tab) => (
@@ -261,17 +247,14 @@ const B1Day28KlimafreundlichLebenWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 2 (Schreiben) (Assignment)</h2>
           <p style={{ margin: 0 }}>
-            Thema: <strong>„Kann jeder Mensch klimafreundlich leben? Schreiben Sie Ihre Meinung.“</strong>
+            Thema: <strong>Klimafreundlich leben</strong>
           </p>
-          <p style={{ margin: 0 }}>Beziehen Sie sich dabei auf folgende Punkte:</p>
+          <p style={{ margin: 0 }}>
+            Frage: <strong>„Kann jeder Mensch klimafreundlich leben? Schreiben Sie kurz Ihre Meinung.“</strong>
+          </p>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            In der heutigen Zeit ist der Klimawandel ein großes Problem. Viele Menschen fragen sich, was sie persönlich tun können, um die Umwelt
-            zu schützen. Meiner Meinung nach kann jeder im Alltag kleine Schritte machen. Man kann zum Beispiel öfter mit dem Fahrrad fahren oder
-            öffentliche Verkehrsmittel nutzen, statt mit dem Auto zu fahren. Auch beim Einkaufen kann man klimafreundlich handeln – etwa durch den
-            Kauf regionaler Produkte oder durch Vermeidung von Plastik. Zu Hause hilft es, Strom zu sparen, Geräte nicht im Standby-Modus zu lassen
-            und weniger zu heizen. Natürlich ist es manchmal nicht einfach, klimafreundlich zu leben, besonders wenn man auf dem Land wohnt oder
-            wenig Geld hat. Trotzdem glaube ich, dass jeder einen Beitrag leisten kann. Zusammenfassend denke ich, dass viele kleine Taten eine
-            große Wirkung haben können, wenn alle mitmachen.
+            <strong>Kurze Meinung (Beispiel):</strong> Meiner Meinung nach kann jeder Mensch klimafreundlicher leben. Man kann zum Beispiel weniger
+            Plastik benutzen, Strom sparen oder öfter mit dem Fahrrad fahren. Kleine Schritte im Alltag können der Umwelt helfen.
           </p>
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
@@ -357,35 +340,6 @@ const B1Day28KlimafreundlichLebenWorkbookPage = () => {
             allowFullScreen
             style={videoPreviewStyle}
           />
-
-          <p style={{ margin: 0 }}>
-            Listen carefully and answer the multiple-choice questions in the submission area. <strong>Do not answer directly on this page.</strong>
-          </p>
-
-          <h3 style={sectionTitle}>Hörverstehen: Fragen und Antwortoptionen</h3>
-          {hoerenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#f9fafb" }}>
-              <strong>Optional transcript support (Teacher Mode)</strong>
-              <p style={{ margin: 0 }}>
-                This section is intentionally concise. Teachers can guide learners to focus on climate-friendly actions: energy saving, sustainable
-                transport, conscious consumption, and realistic challenges in different living situations.
-              </p>
-            </div>
-          )}
 
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
