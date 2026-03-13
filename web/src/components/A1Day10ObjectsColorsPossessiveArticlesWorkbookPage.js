@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const card = {
   ...styles.card,
@@ -266,14 +267,11 @@ const A1Day10ObjectsColorsPossessiveArticlesWorkbookPage = () => {
         {horenAssignments.map((assignment) => (
           <div key={assignment.number} style={questionBlock}>
             <p style={{ margin: 0, fontWeight: 700 }}>{assignment.title}</p>
-            <a
-              href={assignment.link}
-              target="_blank"
-              rel="noreferrer"
-              style={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
-            >
-              Open Hören Material (Google Drive) — Assignment {assignment.number}
-            </a>
+            <CoursebookAudioPlayer
+              url={assignment.link}
+              linkLabel={`Open Hören Material (Google Drive) — Assignment ${assignment.number}`}
+              linkStyle={{ ...styles.secondaryButton, textDecoration: "none", width: "fit-content" }}
+            />
             <p style={{ margin: 0, fontWeight: 700 }}>{assignment.number}. {assignment.question}</p>
             {assignment.options.map((option) => (
               <p key={option} style={optionLine}>

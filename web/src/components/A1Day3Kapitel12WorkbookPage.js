@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const cardStyle = {
   ...styles.card,
@@ -144,14 +145,11 @@ const A1Day3Kapitel12WorkbookPage = () => {
 
       <section style={sectionStyle}>
         <h2 style={{ margin: 0 }}>Teil 3 · Hören</h2>
-        <a
-          href="https://drive.google.com/file/d/13LAdG1vlR6Bcid2NycKO0BEROpuHv7-f/view?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
+        <CoursebookAudioPlayer
+          url="https://drive.google.com/file/d/13LAdG1vlR6Bcid2NycKO0BEROpuHv7-f/view?usp=sharing"
+          linkLabel="Open Hören Material (Google Drive)"
+          linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        />
         <p style={{ margin: 0, color: "#4b5563" }}>
           Complete Hören from Google Drive, then return to submit answers.
         </p>

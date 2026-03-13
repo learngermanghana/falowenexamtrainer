@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const cardStyle = {
   ...styles.card,
@@ -108,14 +109,11 @@ const A1Day2Kapitel11WorkbookPage = () => {
           Friend.
           <br />Listen to the audio and answer the questions below.
         </p>
-        <a
-          href="https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing"
-          target="_blank"
-          rel="noreferrer"
-          style={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
-        >
-          Open Hören Material (Google Drive)
-        </a>
+        <CoursebookAudioPlayer
+          url="https://drive.google.com/file/d/1GfxXLlzz_MWKtY1MgbYaVw3F3mZvW7xx/view?usp=sharing"
+          linkLabel="Open Hören Material (Google Drive)"
+          linkStyle={{ ...styles.button, width: "fit-content", textDecoration: "none" }}
+        />
         {questions.map((question) => (
           <div key={question.stem} style={questionBoxStyle}>
             <strong>{question.stem}</strong>
