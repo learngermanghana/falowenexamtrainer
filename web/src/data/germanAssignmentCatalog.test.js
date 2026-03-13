@@ -1,4 +1,8 @@
-import { getAssignmentDictionaryEntry } from "./germanAssignmentCatalog";
+import {
+  getAssignmentDictionaryEntry,
+  getAssignmentDisplayTitle,
+  getAssignmentDisplayType,
+} from "./germanAssignmentCatalog";
 
 describe("getAssignmentDictionaryEntry", () => {
   test("adds assignment metadata and assignmentDay", () => {
@@ -29,4 +33,18 @@ describe("getAssignmentDictionaryEntry", () => {
     expect(b1Entry).toMatchObject({ assignment: true });
   });
 
+});
+
+
+describe("assignment display helpers", () => {
+  test("prefers topic for A1 entries", () => {
+    const entry = getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-0.1" });
+    expect(getAssignmentDisplayTitle(entry, { preferEnglish: true })).toBe("Greetings and Asking About Well-being");
+  });
+
+  test("resolves A2/B1 display title and type consistently", () => {
+    const entry = getAssignmentDictionaryEntry({ level: "A2", assignmentId: "A2-3.7" });
+    expect(getAssignmentDisplayTitle(entry, { preferEnglish: true })).toBe("Looking for an Apartment");
+    expect(getAssignmentDisplayType(entry)).toBe("Eine Wohnung suchen");
+  });
 });

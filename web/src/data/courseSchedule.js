@@ -468,7 +468,7 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 1,
-      topic: "Greetings",
+      topic: "Greetings and Asking About Well-being",
       chapter: "0.1",
       goal: "You will learn to greet others in German, and ask about people's well-being.",
       instruction: "Watch the video, review grammar, and complete your workbook.",
@@ -484,12 +484,12 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 2,
-      topic: "Alphabets and Personal Pronouns ",
+      topic: "German Alphabet + Personal Pronouns and Verb Conjugation",
       chapter: "0.2_1.1",
       goal: "Understand the German alphabets, personal pronouns and verb conjugation in German.",
       instruction:
         "You are doing Lesen and Hören chapter 0.2 and 1.1. Make sure to follow up attentively.",
-      grammar_topic: "German Alphabets and Personal Pronouns",
+      grammar_topic: "German Alphabet + Personal Pronouns and Verb Conjugation",
       lesen_hören: [
         {
           chapter: "0.2",

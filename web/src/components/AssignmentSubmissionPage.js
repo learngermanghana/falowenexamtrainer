@@ -7,7 +7,10 @@ import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
-import { getAssignmentDictionaryEntry } from "../data/germanAssignmentCatalog";
+import {
+  getAssignmentDictionaryEntry,
+  getAssignmentDisplayTitle,
+} from "../data/germanAssignmentCatalog";
 import { buildAssignmentCatalogForLevel, resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { fetchAnswerKeyRegistry, resolveAnswerKeySource } from "../services/answerKeyRegistryService";
 import {
@@ -293,13 +296,10 @@ const AssignmentSubmissionPage = () => {
         const chapterSuffix = chapter ? ` • Chapter ${chapter}` : "";
         const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
         const prefersEnglishTitle = preferredLevel === "A1";
-        const topicTitle =
-          dictionaryEntry?.topic ||
-          (prefersEnglishTitle ? dictionaryEntry?.en : dictionaryEntry?.de) ||
-          dictionaryEntry?.en ||
-          dictionaryEntry?.de ||
-          lesson?.topic ||
-          entry.topic;
+        const dictionaryTitle = getAssignmentDisplayTitle(dictionaryEntry, {
+          preferEnglish: prefersEnglishTitle,
+        });
+        const topicTitle = lesson?.topic || entry.topic || dictionaryTitle;
         const label = `Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}`;
 
         return {

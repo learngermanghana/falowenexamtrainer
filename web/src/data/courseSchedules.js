@@ -1,6 +1,8 @@
 import { classCatalog } from "./classCatalog";
 import {
   getAssignmentDictionaryEntry,
+  getAssignmentDisplayTitle,
+  getAssignmentDisplayType,
   getAssignmentSequenceForLevel,
 } from "./germanAssignmentCatalog";
 
@@ -1550,8 +1552,8 @@ const buildSessionsFromSequence = (level, currentSessions = [], fallbackSessions
   return sequence.map((entry) => ({
     chapter: entry.chapter,
     assignmentId: entry.assignment_id,
-    title: entry.en,
-    type: entry.de,
+    title: getAssignmentDisplayTitle(entry, { preferEnglish: true }),
+    type: getAssignmentDisplayType(entry),
   }));
 };
 
@@ -1603,8 +1605,8 @@ const enrichSessionFromDictionary = (level, session = {}) => {
     ...session,
     chapter: dictionaryEntry.chapter,
     assignmentId: dictionaryEntry.assignment_id,
-    title: dictionaryEntry.en,
-    type: dictionaryEntry.de,
+    title: getAssignmentDisplayTitle(dictionaryEntry, { preferEnglish: true }) || session.title || session.chapter || "",
+    type: getAssignmentDisplayType(dictionaryEntry) || session.type || "",
   };
 };
 
