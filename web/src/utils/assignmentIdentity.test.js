@@ -24,4 +24,14 @@ describe("assignment identity canonical keys", () => {
   test("mixed case and underscore inputs normalize to strict format", () => {
     expect(toCanonicalAssignmentId({ level: "a2", assignmentId: "day_5" })).toBe("A2-DAY-5");
   });
+
+  test("title chapter token extraction prefers chapter-like decimal over day number", () => {
+    expect(
+      resolveAssignmentCanonicalKey({
+        level: "A1",
+        assignmentTitle: "Day 1: 0.1 Greetings and Asking About Well-being",
+      })
+    ).toBe("A1-0.1");
+  });
+
 });
