@@ -15,7 +15,7 @@ const extractGoogleDriveFileId = (url) => {
   }
 };
 
-const CoursebookAudioPlayer = ({ url, linkLabel = "Open audio in a new tab", linkStyle }) => {
+const CoursebookAudioPlayer = ({ url, linkLabel = "Open audio in a new tab" }) => {
   const fileId = useMemo(() => extractGoogleDriveFileId(url), [url]);
   const streamUrl = fileId ? `https://drive.google.com/uc?export=download&id=${fileId}` : "";
 
@@ -26,7 +26,7 @@ const CoursebookAudioPlayer = ({ url, linkLabel = "Open audio in a new tab", lin
           Your browser does not support the audio element.
         </audio>
       ) : null}
-      <a href={url} target="_blank" rel="noreferrer" style={linkStyle}>
+      <a href={url} target="_blank" rel="noreferrer">
         {linkLabel}
       </a>
     </div>
