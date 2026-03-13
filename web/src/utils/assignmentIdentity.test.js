@@ -44,14 +44,4 @@ describe("assignment identity canonical keys", () => {
     ).toBe("A1-0.1");
   });
 
-  test("weak integer assignmentId still prefers title-derived chapter key", () => {
-    expect(
-      resolveAssignmentCanonicalKey({
-        level: "A1",
-        assignmentId: "1",
-        assignmentTitle: "Day 1: 0.1 Greetings and Asking About Well-being",
-      })
-    ).toBe("A1-0.1");
-  });
-
 });

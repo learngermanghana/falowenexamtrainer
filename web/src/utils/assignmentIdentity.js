@@ -82,14 +82,19 @@ const getFallbackKeyFromTitle = ({ level, assignmentTitle }) => {
   return `${normalizedLevel}-TITLE-${titleToken}`;
 };
 
-const isWeakAssignmentId = (assignmentId = "") => {
-  const token = String(assignmentId || "").trim().toUpperCase();
-  if (!token) return true;
+const isStructuredAssignmentId = (assignmentId = "") => {
+  const raw = String(assignmentId || "").trim();
+  const token = normalizeAssignmentToken(raw);
 
-  // Weak examples: "1", "2", "8"
-  if (/^\d+$/.test(token)) return true;
+  if (!token) return false;
 
-  return false;
+  return (
+    /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i.test(token) ||
+    /^\d+(?:\.\d+)?$/.test(raw) ||
+    /^(A1|A2|B1|B2|C1|C2)-DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
+    /^DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
+    /^TITLE-/.test(token)
+  );
 };
 
 const isStructuredAssignmentId = (assignmentId = "") => {
@@ -118,15 +123,7 @@ export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentT
   if (!fromId) return fromTitle;
   if (!fromTitle) return fromId;
 
-  if (!isStructuredAssignmentId(assignmentId)) {
-    return fromTitle;
-  }
-
-  if (isWeakAssignmentId(assignmentId) && fromTitle !== fromId) {
-    return fromTitle;
-  }
-
-  return fromId;
+  return isStructuredAssignmentId(assignmentId) ? fromId : fromTitle;
 };
 
 export const resolveAssignmentMatchKey = ({ level, assignmentId, assignmentTitle }) => {
