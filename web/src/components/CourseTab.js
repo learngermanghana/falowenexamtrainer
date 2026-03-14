@@ -17,12 +17,16 @@ import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
-import { toCourseTabStatus } from "../utils/assignmentProgress";
+import { mergeAssignmentProgress, toCourseTabStatus } from "../utils/assignmentProgress";
+import { fetchResults } from "../services/resultsService";
 import {
+  collection,
   db,
-  doc,
-  runTransaction,
-  serverTimestamp,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
 } from "../firebase";
 
 const ASSIGNMENT_STATUSES = {
@@ -32,7 +36,6 @@ const ASSIGNMENT_STATUSES = {
   needsRedo: { key: "courseTab.status.needsRedo", color: "#dc2626" },
   milestoneComplete: { key: "courseTab.status.milestoneComplete", color: "#0f766e" },
 };
-const STATUS_ORDER = ["notStarted", "inProgress", "submitted", "needsRedo"];
 
 const sortByDay = (entries) => [...entries].sort((a, b) => Number(a.day || 0) - Number(b.day || 0));
 const hasTutorMarkedWork = (entry) => {
@@ -43,6 +46,8 @@ const hasTutorMarkedWork = (entry) => {
   );
 };
 const isTutorMarkedEntry = (entry, level) => extractLevelToken(level) === "A1" && hasTutorMarkedWork(entry);
+const SUBMISSION_COLLECTION = "submissions";
+const DRAFT_COLLECTION = "submissionDrafts";
 
 const extractLevelToken = (value) => {
   if (!value) return "";
@@ -326,6 +331,30 @@ export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
     assignmentTitle: `Day ${entry.day}${occurrence > 1 ? ` Task ${occurrence}` : ""} ${entry.topic || entry.chapter || ""}`,
   }) || `${String(level || "GENERAL").toUpperCase()}-DAY-${entry.day}${occurrence > 1 ? `-TASK-${occurrence}` : ""}`;
 
+const getEntryAssignmentId = (entry, level, occurrence = 1) => {
+  if (!entry) return "";
+  const direct = resolveAssignmentCanonicalKey({
+    level,
+    assignmentId: entry.assignmentId || entry.assignment_id,
+    assignmentTitle: entry.topic || entry.chapter || `Day ${entry.day}`,
+  });
+  if (direct) return direct;
+
+  const lessonCandidates = [...toLessonArray(entry.lesen_hören), ...toLessonArray(entry.schreiben_sprechen)].filter(
+    (lesson) => lesson?.assignment
+  );
+  for (const lesson of lessonCandidates) {
+    const resolved = resolveAssignmentCanonicalKey({
+      level,
+      assignmentId: lesson.assignmentId || lesson.assignment_id || lesson.chapter,
+      assignmentTitle: lesson.title || lesson.chapter || entry.topic,
+    });
+    if (resolved) return resolved;
+  }
+
+  return getEntryAssignmentKey(entry, level, occurrence);
+};
+
 const getStatusValue = (candidate) => {
   if (!candidate) return "";
   if (typeof candidate === "string") return toCourseTabStatus(candidate);
@@ -389,6 +418,19 @@ export const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => 
   return "notStarted";
 };
 
+const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrence }) => {
+  const assignmentId = getEntryAssignmentId(entry, level, occurrence);
+  if (!assignmentId) return { status: "notStarted", assignmentId, missingAssignmentId: true };
+  const progress = progressByAssignmentId[assignmentId];
+  if (!progress) return { status: "notStarted", assignmentId, missingAssignmentId: false };
+  return {
+    status: toCourseTabStatus(progress.status),
+    assignmentId,
+    missingAssignmentId: false,
+    rawStatus: progress.status,
+  };
+};
+
 const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -429,9 +471,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [unfinishedOnly, setUnfinishedOnly] = useState(false);
   const [skillFilter, setSkillFilter] = useState("all");
   const [chapterFilter, setChapterFilter] = useState("all");
-  const [dayStatuses, setDayStatuses] = useState({});
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
-  const [hasHydratedCourseProgress, setHasHydratedCourseProgress] = useState(false);
+  const [autoStatusMap, setAutoStatusMap] = useState({});
 
   useEffect(() => {
     const normalizedDefault = resolvedDefaultLevel;
@@ -451,54 +492,68 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
 
   useEffect(() => {
-    setHasHydratedCourseProgress(false);
-  }, [selectedCourseLevel]);
+    if (!selectedCourseLevel || authLoading || !studentProfile?.id || !db) {
+      setAutoStatusMap({});
+      return;
+    }
 
-  useEffect(() => {
-    if (!selectedCourseLevel || authLoading) return;
-
-    const profileStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel] || {};
-
-    setDayStatuses((prev) => {
-      const mergedStatuses = mergeCourseProgressStatuses(prev, profileStatuses);
-      if (JSON.stringify(prev) === JSON.stringify(mergedStatuses)) return prev;
-      return mergedStatuses;
-    });
-    setHasHydratedCourseProgress(true);
-  }, [authLoading, selectedCourseLevel, studentProfile?.courseProgressByLevel]);
-
-  useEffect(() => {
-    if (!hasHydratedCourseProgress || !selectedCourseLevel || !studentProfile?.id) return;
-
-    const existingStatuses = studentProfile?.courseProgressByLevel?.[selectedCourseLevel] || {};
-    if (JSON.stringify(existingStatuses) === JSON.stringify(dayStatuses)) return;
-
-    const syncProgress = async () => {
+    const hydrateAutoStatuses = async () => {
       try {
-        const studentRef = doc(db, "students", studentProfile.id);
-        await runTransaction(db, async (tx) => {
-          const snap = await tx.get(studentRef);
-          const base = snap.data()?.courseProgressByLevel || {};
-          tx.set(
-            studentRef,
-            {
-              courseProgressByLevel: {
-                ...base,
-                [selectedCourseLevel]: dayStatuses,
-              },
-              courseProgressUpdatedAt: serverTimestamp(),
-              updated_at: serverTimestamp(),
-            },
-            { merge: true }
-          );
+        const studentId = studentProfile.id;
+        const studentCode = studentProfile.studentCode || studentProfile.studentcode || studentProfile.id || "";
+        const [submissionSnapshot, draftSnapshot, resultsResponse] = await Promise.all([
+          getDocs(
+            query(collection(db, SUBMISSION_COLLECTION), where("studentId", "==", studentId), orderBy("createdAt", "desc"), limit(200))
+          ),
+          getDocs(
+            query(collection(db, DRAFT_COLLECTION), where("studentId", "==", studentId), orderBy("updatedAt", "desc"), limit(200))
+          ),
+          fetchResults({ studentCode, level: selectedCourseLevel, email: studentProfile.email }),
+        ]);
+
+        const seenByDay = {};
+        const curriculumEntries = (schedules[selectedCourseLevel] || [])
+          .map((entry) => {
+            const dayKey = String(entry.day || "");
+            seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
+            const occurrence = seenByDay[dayKey];
+            const assignmentId = getEntryAssignmentId(entry, selectedCourseLevel, occurrence);
+            return {
+              level: selectedCourseLevel,
+              assignmentId,
+              title: entry.topic || entry.chapter || `Day ${entry.day}`,
+              chapter: entry.chapter,
+              assignmentDay: entry.day,
+              assignment: isTutorMarkedEntry(entry, selectedCourseLevel),
+            };
+          })
+          .filter((entry) => entry.assignment && entry.assignmentId);
+
+        const firestoreSubmissions = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const firestoreDrafts = draftSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const mergedProgress = mergeAssignmentProgress({
+          curriculumEntries,
+          firestoreDrafts,
+          firestoreSubmissions,
+          sheetResults: resultsResponse?.results || [],
+          studentCode,
         });
+
+        const byAssignmentId = mergedProgress.reduce((acc, row) => {
+          if (!row.assignmentId) return acc;
+          acc[row.assignmentId] = row;
+          return acc;
+        }, {});
+
+        setAutoStatusMap(byAssignmentId);
       } catch (error) {
-        console.error("Failed to sync course progress", error);
+        console.error("Failed to hydrate automatic course statuses", error);
+        setAutoStatusMap({});
       }
     };
 
-    syncProgress();
-  }, [dayStatuses, hasHydratedCourseProgress, selectedCourseLevel, studentProfile]);
+    hydrateAutoStatuses();
+  }, [authLoading, schedules, selectedCourseLevel, studentProfile]);
 
   const schedule = useMemo(() => {
     const seenByDay = {};
@@ -556,30 +611,37 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         (entry) =>
           matchesSearch(entry) &&
           (!assignmentsOnly || hasAssignment(entry)) &&
-          (!unfinishedOnly || getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) !== "submitted") &&
+          (!unfinishedOnly ||
+            getAutoStatusForEntry({
+              progressByAssignmentId: autoStatusMap,
+              entry,
+              level: selectedCourseLevel,
+              occurrence: entry.occurrence,
+            }).status !== "submitted") &&
           matchesSkill(entry) &&
           matchesChapter(entry)
       )
     );
-  }, [assignmentsOnly, chapterFilter, dayStatuses, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
+  }, [assignmentsOnly, autoStatusMap, chapterFilter, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
 
   const overview = useMemo(() => {
     const totalDays = schedule.length;
     const completedDays = schedule.filter((entry) =>
-      getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence) === "submitted"
+      getAutoStatusForEntry({
+        progressByAssignmentId: autoStatusMap,
+        entry,
+        level: selectedCourseLevel,
+        occurrence: entry.occurrence,
+      }).status === "submitted"
     ).length;
-
-    const mostRecentUpdate = Object.values(dayStatuses || {}).reduce((latest, entry) => {
-      const updatedAt = getUpdatedAtValue(entry);
-      return updatedAt > latest ? updatedAt : latest;
-    }, 0);
+    const mostRecentUpdate = 0;
 
     return {
       totalDays,
       daysCompleted: completedDays,
       lastActivity: mostRecentUpdate ? new Date(mostRecentUpdate).toLocaleDateString() : "—",
     };
-  }, [dayStatuses, schedule, selectedCourseLevel]);
+  }, [autoStatusMap, schedule, selectedCourseLevel]);
 
   const chapterOptions = useMemo(() => {
     const set = new Set();
@@ -743,8 +805,14 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         : [entry.schreiben_sprechen]
                       : [];
                     const milestoneEntry = isMilestoneEntry(entry);
-                    const status = milestoneEntry ? "milestoneComplete" : getStatusForEntry(dayStatuses, entry, selectedCourseLevel, entry.occurrence);
-                    const entryAssignmentKey = getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
+                    const statusInfo = getAutoStatusForEntry({
+                      progressByAssignmentId: autoStatusMap,
+                      entry,
+                      level: selectedCourseLevel,
+                      occurrence: entry.occurrence,
+                    });
+                    const status = milestoneEntry ? "milestoneComplete" : statusInfo.status;
+                    const entryAssignmentKey = statusInfo.assignmentId || getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
@@ -775,26 +843,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
                               {t(statusMeta.key)}
                             </span>
-                            <select
-                              style={styles.select}
-                              value={status}
-                              disabled={milestoneEntry}
-                              onChange={(e) =>
-                                setDayStatuses((prev) => ({
-                                  ...prev,
-                                  [entryAssignmentKey]: { value: e.target.value, updatedAt: Date.now(), assignmentKey: entryAssignmentKey },
-                                }))
-                              }
-                            >
-                              {(milestoneEntry ? ["milestoneComplete"] : STATUS_ORDER).map((statusOption) => (
-                                <option key={statusOption} value={statusOption}>
-                                  {t(ASSIGNMENT_STATUSES[statusOption].key)}
-                                </option>
-                              ))}
-                            </select>
-                            <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 220 }}>
-                              Status is manually controlled — update your own progress here.
-                            </span>
+                            {!isTutorMarked ? <span style={{ ...styles.helperText, margin: 0 }}>Practice only</span> : null}
+                            {isTutorMarked && statusInfo.missingAssignmentId ? (
+                              <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 240 }}>
+                                Assignment ID missing in curriculum data. Showing Not started until synced.
+                              </span>
+                            ) : null}
                             {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
                             {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
                             {isTutorMarked ? (
@@ -805,7 +859,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                   navigate(`/campus/submit?assignmentKey=${encodeURIComponent(entryAssignmentKey)}`, {
                                     state: {
                                       assignmentKey: entryAssignmentKey,
-                                      assignmentId: entry.assignmentId || null,
+                                      assignmentId: entryAssignmentKey || entry.assignmentId || null,
                                       day: entry.day,
                                       occurrence: entry.occurrence,
                                       level: selectedCourseLevel,
