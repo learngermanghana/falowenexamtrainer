@@ -32,9 +32,6 @@ const pickLatestIso = (...values) => {
   return valid[0] || null;
 };
 
-const toCanonicalAssignmentId = ({ assignmentId, level, assignmentTitle }) =>
-  resolveAssignmentCanonicalKey({ level, assignmentId, assignmentTitle }) || "";
-
 const DAY_ALIAS_PATTERN = /^(A1|A2|B1|B2|C1|C2)-DAY-(\d+)(?:-TASK-(\d+))?$/i;
 const LEVEL_TOKEN_PATTERN = /(A1|A2|B1|B2|C1|C2)/i;
 const TARGET_DEBUG_ASSIGNMENT_TITLES = [
@@ -92,8 +89,17 @@ export const resolveAssignmentIdWithFallback = ({
   // - canonical assignmentId should always be present on all NEW write paths.
   // - fallbackKey exists only to keep legacy records (missing assignmentId / assignmentKey) visible.
   // - once legacy backfill is complete, fallbackKey branches can be removed safely.
-  toCanonicalAssignmentId({ assignmentId, level, assignmentTitle }) ||
-  (fallbackKey ? String(fallbackKey).trim().toUpperCase() : "");
+  (() => {
+    const canonical = resolveAssignmentCanonicalKey({
+      level,
+      assignmentId,
+      assignmentTitle,
+    });
+    if (canonical) {
+      return String(canonical).trim().toUpperCase();
+    }
+    return fallbackKey ? String(fallbackKey).trim().toUpperCase() : "";
+  })();
 
 export const resolveAssignmentStatus = ({
   assignmentId,

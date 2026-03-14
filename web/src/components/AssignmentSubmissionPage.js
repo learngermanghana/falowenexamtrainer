@@ -40,7 +40,6 @@ const MIN_OBJECTIVE_CHANGED_ANSWERS = 3;
 const MAX_RESUBMISSION_TRIES = 2;
 const ACTION_COOLDOWN_MS = 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
-const CONSISTENT_SUBMIT_DICTIONARY_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
 const PASS_THRESHOLD_SCORE = 60;
 
@@ -255,10 +254,9 @@ const getAssignmentLessons = (entry) => {
 
 const isTutorMarkedSubmissionCandidate = ({ assignmentFlag, dictionaryEntry }) => {
   if (dictionaryEntry) {
-    const progressionEligible = dictionaryEntry.progressionEligible !== false;
-    return Boolean(dictionaryEntry.assignment && progressionEligible);
+    return Boolean(dictionaryEntry.assignment === true && dictionaryEntry.progressionEligible !== false);
   }
-  return Boolean(assignmentFlag);
+  return Boolean(assignmentFlag === true);
 };
 
 const getFeedbackFromSubmission = (entry) =>
@@ -303,7 +301,7 @@ const AssignmentSubmissionPage = () => {
 
   const assignmentDictionary = useMemo(
     () =>
-      CONSISTENT_SUBMIT_DICTIONARY_LEVELS.flatMap((dictionaryLevel) => {
+      [preferredLevel].flatMap((dictionaryLevel) => {
         const levelSchedule = courseSchedules[dictionaryLevel] || [];
         const catalogByComposite = new Map(
           buildAssignmentCatalogForLevel(dictionaryLevel)
@@ -381,7 +379,7 @@ const AssignmentSubmissionPage = () => {
           });
         });
       }),
-    []
+    [preferredLevel]
   );
 
   const assignmentRequiredDaysLabel = useMemo(() => {
@@ -1107,6 +1105,7 @@ const AssignmentSubmissionPage = () => {
 
   const maxUnlockedDay = useMemo(() => {
     const availableDays = recentSubmissions
+      .filter((entry) => entry?.assignment)
       .map((entry) => Number(entry?.chapter))
       .filter((value) => Number.isFinite(value) && value >= 0);
     if (!availableDays.length) return Number.POSITIVE_INFINITY;
