@@ -219,6 +219,14 @@ const HomeMetrics = ({ studentProfile }) => {
       })),
     [assignmentStats, levelKey]
   );
+  const jumpedAssignments = useMemo(() => {
+    const jumped = assignmentStats?.jumpedAssignments;
+    if (!Array.isArray(jumped) || jumped.length === 0) return missedAssignments;
+    return jumped.map((entry) => ({
+      ...entry,
+      label: buildDictionaryLabel(entry, levelKey) || entry?.label,
+    }));
+  }, [assignmentStats, levelKey, missedAssignments]);
   const failedAssignments = useMemo(
     () =>
       (assignmentStats?.failedAssignments || []).map((entry) => ({
@@ -293,13 +301,13 @@ const HomeMetrics = ({ studentProfile }) => {
       return nextObj.label;
     }
 
-    if (missedAssignments.length) return labelOf(missedAssignments[0]);
+    if (jumpedAssignments.length) return labelOf(jumpedAssignments[0]);
 
     // If we have any stats at all and nothing is pending, you're caught up.
     if (assignmentStats) return t("homeMetrics.nextRecommendation.allCaughtUp");
 
     return t("homeMetrics.nextRecommendation.startDayOne");
-  }, [assignmentStats, blocked, failedAssignments, missedAssignments, nextObj, t]);
+  }, [assignmentStats, blocked, failedAssignments, jumpedAssignments, nextObj, t]);
 
   const failedIdentifiersText = useMemo(() => {
     const ids = assignmentStats?.failedIdentifiers || [];
@@ -343,7 +351,7 @@ const HomeMetrics = ({ studentProfile }) => {
     [t]
   );
 
-  const missedHelperText = useMemo(() => t("homeMetrics.missed.helper"), [t]);
+  const missedHelperText = useMemo(() => t("homeMetrics.missed.helper", { defaultValue: "Assignments you jumped or skipped earlier in the schedule." }), [t]);
 
 
   return (
@@ -415,7 +423,7 @@ const HomeMetrics = ({ studentProfile }) => {
         />
         <StatCard
           label={t("homeMetrics.missed.label")}
-          value={formatCountedList(missedAssignments)}
+          value={formatCountedList(jumpedAssignments)}
           helper={missedHelperText}
           tone="neutral"
         />
