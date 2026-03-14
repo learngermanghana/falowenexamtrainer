@@ -286,6 +286,21 @@ const isA1PracticalWritingLesson = (level = "", lesson = {}) => {
   return text.includes("schreiben") || text.includes("sprechen");
 };
 
+
+const isMajorOnlyIdentifierToken = (value = "") => /^\d+$/.test(String(value || "").trim());
+
+const lessonHasDecimalIdentifier = (lesson = {}) => {
+  const source = `${lesson?.assignmentId || ""} ${lesson?.chapter || ""}`;
+  return /\d+\.\d+/.test(source);
+};
+
+const shouldSkipNestedMajorOnlyAssignmentId = ({ level = "", lesson = {}, rawValue = "", cameFromAssignmentId = false }) => {
+  if (!cameFromAssignmentId) return false;
+  if (String(level || "").toUpperCase() !== "A1") return false;
+  if (!isMajorOnlyIdentifierToken(rawValue)) return false;
+  return lessonHasDecimalIdentifier(lesson);
+};
+
 // Build a linear list of lessons in schedule order with the identifiers that must be passed.
 const getAssignmentSummary = (level = "A1") => {
   const schedule = courseSchedules?.[String(level || "A1").toUpperCase()] || [];
@@ -318,15 +333,36 @@ const getAssignmentSummary = (level = "A1") => {
       for (const block of lesson.lesen_hören) {
         if (isRealAssignment(block) && (block.assignmentId || block.chapter)) {
           hasGeneralOrReadingAssignmentSignal = true;
-          identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
+          const blockRaw = block.chapter || block.assignmentId;
+          const blockFromAssignmentId = Boolean(!block.chapter && block.assignmentId);
+          if (
+            shouldSkipNestedMajorOnlyAssignmentId({
+              level,
+              lesson,
+              rawValue: blockRaw,
+              cameFromAssignmentId: blockFromAssignmentId,
+            })
+          ) {
+            continue;
+          }
+          identifiers.push(...extractCanonicalIdentifiers(blockRaw, level));
         }
       }
     } else if (isRealAssignment(lesson.lesen_hören)) {
       // sometimes lesen_hören is an object
-      const ch = lesson.lesen_hören.assignmentId || lesson.lesen_hören.chapter || lesson.assignmentId || lesson.chapter;
-      if (ch) {
+      const lesenRaw = lesson.lesen_hören.chapter || lesson.lesen_hören.assignmentId || lesson.assignmentId || lesson.chapter;
+      const lesenFromAssignmentId = Boolean(!lesson.lesen_hören.chapter && lesson.lesen_hören.assignmentId);
+      if (
+        lesenRaw &&
+        !shouldSkipNestedMajorOnlyAssignmentId({
+          level,
+          lesson,
+          rawValue: lesenRaw,
+          cameFromAssignmentId: lesenFromAssignmentId,
+        })
+      ) {
         hasGeneralOrReadingAssignmentSignal = true;
-        identifiers.push(...extractCanonicalIdentifiers(ch, level));
+        identifiers.push(...extractCanonicalIdentifiers(lesenRaw, level));
       }
     }
 
