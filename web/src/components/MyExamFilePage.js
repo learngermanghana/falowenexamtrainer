@@ -363,11 +363,6 @@ const MyExamFilePage = () => {
     return assignmentState.nextRecommendation.label || assignmentState.nextRecommendation.identifier || "Next task";
   }, [assignmentState.blocked, assignmentState.error, assignmentState.loading, assignmentState.nextRecommendation]);
 
-  const formatHours = useCallback((value) => {
-    if (!Number.isFinite(value)) return "0 hrs";
-    return `${value.toFixed(1)} hrs`;
-  }, []);
-
   const downloadContract = () => {
     const studentName = studentProfile?.name || user?.email || "Unknown";
     downloadSimplePdf({
