@@ -3,6 +3,7 @@ import { getCurriculumEntriesForLevel } from "../data/curriculumManifest";
 import { resolveAssignmentCanonicalKey } from "./assignmentIdentity";
 
 export const PASS_MARK = 60;
+const TARGET_DEBUG_ASSIGNMENT_IDS = new Set(["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"]);
 
 const toIsoDate = (value) => {
   if (!value) return null;
@@ -80,6 +81,21 @@ export const resolveAssignmentStatus = ({
 }) => {
   const results = Array.isArray(resultRecords) ? resultRecords : resultRecords ? [resultRecords] : [];
 
+  const hasExplicitPassed = results.some((row) => {
+    if (row?.passed === true) return true;
+    return String(row?.status || "").trim().toLowerCase() === "passed";
+  });
+  const hasExplicitFailed = results.some((row) => {
+    if (row?.failed === true) return true;
+    return String(row?.status || "").trim().toLowerCase() === "failed";
+  });
+  const hasExplicitSubmitted = results.some((row) => {
+    if (row?.submitted === true || row?.inProgress === true) return true;
+    return ["submitted", "in_progress", "inprogress", "in-progress"].includes(
+      String(row?.status || "").trim().toLowerCase()
+    );
+  });
+
   const scored = results
     .map((row) => ({
       score: toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade),
@@ -102,10 +118,10 @@ export const resolveAssignmentStatus = ({
 
   const hasDraft = Boolean(draftRecord);
   const hasSubmission = Boolean(submissionRecord);
-  const hasResult = scored.length > 0;
+  const hasResult = scored.length > 0 || hasExplicitPassed || hasExplicitFailed || hasExplicitSubmitted;
 
-  const passed = hasResult && bestScore >= passMark;
-  const failed = hasResult && !passed;
+  const passed = hasExplicitPassed || (scored.length > 0 && bestScore >= passMark);
+  const failed = !passed && (hasExplicitFailed || (scored.length > 0 && bestScore < passMark));
   const submitted = hasSubmission || hasResult;
   const inProgress = hasDraft && !submitted;
 
@@ -162,6 +178,7 @@ export const mergeAssignmentProgress = ({
   passMark = PASS_MARK,
 }) => {
   const normalizedStudentCode = String(studentCode || "").trim().toLowerCase();
+  const shouldRunTargetDiagnostics = normalizedStudentCode === "comfortarmah295";
   const curriculum = Array.isArray(curriculumEntries) ? curriculumEntries : [];
   const drafts = Array.isArray(firestoreDrafts) ? firestoreDrafts : [];
   const submissions = Array.isArray(firestoreSubmissions) ? firestoreSubmissions : [];
@@ -257,6 +274,28 @@ export const mergeAssignmentProgress = ({
       level,
     });
 
+    if (shouldRunTargetDiagnostics) {
+      const rawAssignmentKey = String(
+        result?.assignmentId || result?.assignment_id || result?.assignmentKey || ""
+      )
+        .trim()
+        .toUpperCase();
+      if (TARGET_DEBUG_ASSIGNMENT_IDS.has(canonicalForMerge) || /A1-DAY-(4|7|8|9|11)(?:-TASK-\d+)?/i.test(rawAssignmentKey)) {
+        console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][ResultRow]", {
+          rawResultRowKey: rawAssignmentKey || null,
+          resolvedCanonicalKey: canonical || null,
+          mergedCanonicalKey: canonicalForMerge || null,
+          score: result?.score ?? null,
+          status: result?.status ?? null,
+          passed: result?.passed ?? null,
+          failed: result?.failed ?? null,
+          submitted: result?.submitted ?? null,
+          inProgress: result?.inProgress ?? null,
+          resultRow: result,
+        });
+      }
+    }
+
     const bucket = ensureBucket(canonicalForMerge, { level });
     if (!bucket) return;
     bucket.resultRecords.push(result);
@@ -269,6 +308,15 @@ export const mergeAssignmentProgress = ({
       chapter: item.chapter,
     });
 
+    if (shouldRunTargetDiagnostics && TARGET_DEBUG_ASSIGNMENT_IDS.has(item.assignmentId)) {
+      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][BeforeStatusResolution]", {
+        assignmentId: item.assignmentId,
+        resultRecords: item.resultRecords,
+        draftRecord: item.draftRecord,
+        submissionRecord: item.submissionRecord,
+      });
+    }
+
     const resolved = resolveAssignmentStatus({
       assignmentId: item.assignmentId,
       draftRecord: item.draftRecord,
@@ -276,6 +324,13 @@ export const mergeAssignmentProgress = ({
       resultRecords: item.resultRecords,
       passMark,
     });
+
+    if (shouldRunTargetDiagnostics && TARGET_DEBUG_ASSIGNMENT_IDS.has(item.assignmentId)) {
+      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][AfterStatusResolution]", {
+        assignmentId: item.assignmentId,
+        resolved,
+      });
+    }
 
     return {
       assignmentId: item.assignmentId,
