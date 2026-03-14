@@ -200,6 +200,12 @@ const computeStudentStats = (scores = [], student) => {
       .map(([key]) => key)
   );
 
+  const failedMatchKeys = new Set(
+    Object.entries(bestPerMatchKey)
+      .filter(([, score]) => Number(score) < PASS_MARK)
+      .map(([key]) => key)
+  );
+
   const failedAssignments = Object.entries(bestPerCanonicalAssignment)
     .filter(([, score]) => score < PASS_MARK)
     .map(([assignmentKey]) => assignmentKey);
@@ -228,21 +234,44 @@ const computeStudentStats = (scores = [], student) => {
       return dayA - dayB;
     });
 
-  let latestCompletedDay = null;
-  catalog.forEach((entry) => {
-    if (completedMatchKeys.has(entry.matchKey) && Number.isFinite(entry.day)) {
-      latestCompletedDay = Math.max(latestCompletedDay || 0, entry.day);
-    }
-  });
+  const dayStatusMap = catalog.reduce((acc, entry) => {
+    if (!Number.isFinite(entry.day)) return acc;
+
+    const day = entry.day;
+    const current = acc.get(day) || {
+      isCompleted: true,
+      hasFailed: false,
+    };
+
+    const isPassed = completedMatchKeys.has(entry.matchKey);
+    const isFailed = failedMatchKeys.has(entry.matchKey);
+
+    current.isCompleted = current.isCompleted && isPassed;
+    current.hasFailed = current.hasFailed || isFailed;
+    acc.set(day, current);
+
+    return acc;
+  }, new Map());
+
+  const sortedDayNumbers = Array.from(dayStatusMap.keys()).sort((a, b) => a - b);
+  let lastFullyCompletedDay = 0;
+
+  for (const dayNumber of sortedDayNumbers) {
+    const dayStatus = dayStatusMap.get(dayNumber);
+    if (!dayStatus?.isCompleted || dayStatus?.hasFailed) break;
+    lastFullyCompletedDay = dayNumber;
+  }
 
   const missedAssignments = catalog
-    .filter(
-      (entry) =>
-        Number.isFinite(latestCompletedDay) &&
+    .filter((entry) => {
+      const dayStatus = dayStatusMap.get(entry.day);
+      return (
         Number.isFinite(entry.day) &&
-        entry.day < latestCompletedDay &&
-        !completedMatchKeys.has(entry.matchKey)
-    )
+        entry.day <= lastFullyCompletedDay &&
+        !dayStatus?.isCompleted &&
+        !dayStatus?.hasFailed
+      );
+    })
     .map((entry) => ({
       day: entry.day,
       label: entry.label,
@@ -251,8 +280,11 @@ const computeStudentStats = (scores = [], student) => {
       matchKey: entry.matchKey,
     }));
 
-  const nextRecommendedAssignment =
-    catalog.find((entry) => !completedMatchKeys.has(entry.matchKey)) || null;
+  const recommendationBlocked = catalog.some((entry) => failedMatchKeys.has(entry.matchKey));
+
+  const nextRecommendedAssignment = recommendationBlocked
+    ? null
+    : catalog.find((entry) => !completedMatchKeys.has(entry.matchKey)) || null;
 
   const today = new Date();
   const weekday = today.getDay() === 0 ? 7 : today.getDay();
@@ -316,6 +348,7 @@ const computeStudentStats = (scores = [], student) => {
     failedAssignments,
     missedAssignments,
     nextRecommendedAssignment,
+    recommendationBlocked,
     streakDays: computeStreak(submissionDates),
     weekAssignments: weeklyCanonicalAssignments.length,
     weekAttempts: weeklyAttempts.length,
