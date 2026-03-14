@@ -1,91 +1,13 @@
-export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = {
-  A1: {
-    "A1-0.1": { assignment_id: "A1 1", week: "Week Two", day: "Day 1", assignment: true, assignmentDay: 1, date: "Monday, 15 March 2026", topic: "Greetings and Asking About Well-being", chapter: "0.1" },
-    "A1-0.2": { assignment_id: "A1 2", week: "Week Two", day: "Day 2", assignment: true, assignmentDay: 2, date: "Monday, 16 March 2026", topic: "German Alphabet", chapter: "0.2" },
-    "A1-1.1": { assignment_id: "A1 3", week: "Week Two", day: "Day 3", assignment: true, assignmentDay: 3, date: "Tuesday, 17 March 2026", topic: "Personal Pronouns and Verb Conjugation", chapter: "1.1" },
-    "A1-2": { assignment_id: "A1 4", week: "Week Two", day: "Day 4", assignment: true, assignmentDay: 4, date: "Wednesday, 18 March 2026", topic: "Numbers and Addresses", chapter: "2" },
-    "A1-1.2": { assignment_id: "A1 5", week: "Week Three", day: "Day 5", assignment: false, assignmentDay: 5, date: "Monday, 23 March 2026", topic: "Introducing Yourself", chapter: "1.2" },
-    "A1-2.3": { assignment_id: "A1 6", week: "Week Three", day: "Day 6", assignment: false, assignmentDay: 6, date: "Tuesday, 24 March 2026", topic: "Family and Hobbies", chapter: "2.3" },
-    "A1-3": { assignment_id: "A1 7", week: "Week Three", day: "Day 7", assignment: true, assignmentDay: 7, date: "Wednesday, 25 March 2026", topic: "Asking About Prices and Preferences", chapter: "3" },
-    "A1-4": { assignment_id: "A1 8", week: "Week Four", day: "Day 8", assignment: true, assignmentDay: 8, date: "Monday, 30 March 2026", topic: "Countries and Languages", chapter: "4" },
-    "A1-5": { assignment_id: "A1 9", week: "Week Four", day: "Day 9", assignment: true, assignmentDay: 9, date: "Tuesday, 31 March 2026", topic: "Nominative and Accusative Cases", chapter: "5" },
-    "A1-6": { assignment_id: "A1 10", week: "Week Four", day: "Day 10", assignment: true, assignmentDay: 10, date: "Wednesday, 01 April 2026", topic: "Objects, Colors and Possessive Articles", chapter: "6" },
-    "A1-7": { assignment_id: "A1 11", week: "Week Five", day: "Day 11", assignment: true, assignmentDay: 11, date: "Monday, 06 April 2026", topic: "The 12 Hour Clock", chapter: "7" },
-    "A1-8": { assignment_id: "A1 12", week: "Week Five", day: "Day 12", assignment: true, assignmentDay: 12, date: "Tuesday, 07 April 2026", topic: "The 24 Hour Clock and Dates", chapter: "8" },
-    "A1-3.5": { assignment_id: "A1 13", week: "Week Five", day: "Day 13", assignment: true, assignmentDay: 13, date: "Wednesday, 08 April 2026", topic: "Revision: Numbers, Time and Prices", chapter: "3.5" },
-    "A1-3.6": { assignment_id: "A1 14", week: "Week Six", day: "Day 14", assignment: false, assignmentDay: 14, date: "Monday, 13 April 2026", topic: "Modal Verbs", chapter: "3.6" },
-    "A1-4.7": { assignment_id: "A1 15", week: "Week Six", day: "Day 15", assignment: false, assignmentDay: 15, date: "Tuesday, 14 April 2026", topic: "Imperatives", chapter: "4.7" },
-    "A1-9": { assignment_id: "A1 16", week: "Week Six", day: "Day 16", assignment: true, assignmentDay: 16, date: "Wednesday, 15 April 2026", topic: "Food and Negation", chapter: "9" },
-    "A1-11": { assignment_id: "A1 17", week: "Week Seven", day: "Day 17", assignment: true, assignmentDay: 17, date: "Monday, 20 April 2026", topic: "Instructions and Directions", chapter: "11" },
-    "A1-12.1": { assignment_id: "A1 18", week: "Week Seven", day: "Day 18", assignment: true, assignmentDay: 18, date: "Tuesday, 21 April 2026", topic: "Two-way Prepositions", chapter: "12.1" },
-    "A1-5.9": { assignment_id: "A1 19", week: "Week Seven", day: "Day 19", assignment: false, assignmentDay: 19, date: "Wednesday, 22 April 2026", topic: "Goethe A1 Speaking Practice", chapter: "5.9" },
-    "A1-6.10": { assignment_id: "A1 20", week: "Week Eight", day: "Day 20", assignment: false, assignmentDay: 20, date: "Monday, 27 April 2026", topic: "Schreiben & Sprechen (Intro to letter writing)", chapter: "6.10" },
-    "A1-13": { assignment_id: "A1 21", week: "Week Eight", day: "Day 21", assignment: true, assignmentDay: 21, date: "Tuesday, 28 April 2026", topic: "Weather", chapter: "13" },
-    "A1-14.1": { assignment_id: "A1 22", week: "Week Eight", day: "Day 22", assignment: true, assignmentDay: 22, date: "Wednesday, 29 April 2026", topic: "Health and Body Parts", chapter: "14.1" },
-    "A1-14.2": { assignment_id: "A1 23", week: "Week Nine", day: "Day 23", assignment: false, assignmentDay: 23, date: "Monday, 04 May 2026", topic: "Dative and Accusative Verbs", chapter: "14.2" },
-    "A1-8.13": { assignment_id: "A1 24", week: "Week Nine", day: "Day 24", assignment: false, assignmentDay: 24, date: "Tuesday, 05 May 2026", topic: "Schreiben & Sprechen", chapter: "8.13" },
-  },
-  A2: {
-    "A2-1.1": { assignment_id: "A2-1.1", chapter: "1.1", de: "Small Talk", en: "Small Talk", assignment: true },
-    "A2-1.2": { assignment_id: "A2-1.2", chapter: "1.2", de: "Personen beschreiben", en: "Describing People", assignment: true },
-    "A2-1.3": { assignment_id: "A2-1.3", chapter: "1.3", de: "Dinge und Personen vergleichen", en: "Comparing Things and People", assignment: true },
-    "A2-2.4": { assignment_id: "A2-2.4", chapter: "2.4", de: "Wo möchten wir uns treffen?", en: "Where Shall We Meet?", assignment: true },
-    "A2-2.5": { assignment_id: "A2-2.5", chapter: "2.5", de: "Was machst du in deiner Freizeit?", en: "What Do You Do in Your Free Time?", assignment: true },
-    "A2-3.6": { assignment_id: "A2-3.6", chapter: "3.6", de: "Möbel und Räume kennenlernen", en: "Furniture and Rooms", assignment: true },
-    "A2-3.7": { assignment_id: "A2-3.7", chapter: "3.7", de: "Eine Wohnung suchen", en: "Looking for an Apartment", assignment: true },
-    "A2-3.8": { assignment_id: "A2-3.8", chapter: "3.8", de: "Rezepte und Essen", en: "Recipes and Food", assignment: true },
-    "A2-4.9": { assignment_id: "A2-4.9", chapter: "4.9", de: "Urlaub", en: "Vacation", assignment: true },
-    "A2-4.10": { assignment_id: "A2-4.10", chapter: "4.10", de: "Tourismus und traditionelle Feste", en: "Tourism and Traditional Festivals", assignment: true },
-    "A2-4.11": { assignment_id: "A2-4.11", chapter: "4.11", de: "Verkehrsmittel vergleichen", en: "Comparing Transportation", assignment: true },
-    "A2-5.12": { assignment_id: "A2-5.12", chapter: "5.12", de: "Ein Tag im Leben", en: "A Day in Life", assignment: true },
-    "A2-5.13": { assignment_id: "A2-5.13", chapter: "5.13", de: "Ein Vorstellungsgespräch", en: "A Job Interview", assignment: true },
-    "A2-5.14": { assignment_id: "A2-5.14", chapter: "5.14", de: "Beruf und Karriere", en: "Career and Profession", assignment: true },
-    "A2-6.15": { assignment_id: "A2-6.15", chapter: "6.15", de: "Mein Lieblingssport", en: "My Favorite Sport", assignment: true },
-    "A2-6.16": { assignment_id: "A2-6.16", chapter: "6.16", de: "Wohlbefinden und Entspannung", en: "Well-being and Relaxation", assignment: true },
-    "A2-6.17": { assignment_id: "A2-6.17", chapter: "6.17", de: "In die Apotheke gehen", en: "Going to the Pharmacy", assignment: true },
-    "A2-7.18": { assignment_id: "A2-7.18", chapter: "7.18", de: "Die Bank anrufen", en: "Calling the Bank", assignment: true },
-    "A2-7.19": { assignment_id: "A2-7.19", chapter: "7.19", de: "Einkaufen – wo und wie?", en: "Shopping – Where and How", assignment: true },
-    "A2-7.20": { assignment_id: "A2-7.20", chapter: "7.20", de: "Reklamationssituationen", en: "Complaint Situations", assignment: true },
-    "A2-8.21": { assignment_id: "A2-8.21", chapter: "8.21", de: "Ein Wochenende planen", en: "Planning a Weekend", assignment: true },
-    "A2-8.22": { assignment_id: "A2-8.22", chapter: "8.22", de: "Die Woche planen", en: "Planning the Week", assignment: true },
-    "A2-9.23": { assignment_id: "A2-9.23", chapter: "9.23", de: "Wie kommst du zur Schule oder zur Arbeit?", en: "How Do You Go to School or Work", assignment: true },
-    "A2-9.24": { assignment_id: "A2-9.24", chapter: "9.24", de: "Einen Urlaub planen", en: "Planning a Vacation", assignment: true },
-    "A2-9.25": { assignment_id: "A2-9.25", chapter: "9.25", de: "Tagesablauf", en: "Daily Routine", assignment: true },
-    "A2-10.26": { assignment_id: "A2-10.26", chapter: "10.26", de: "Gefühle beschreiben", en: "Describing Feelings", assignment: true },
-    "A2-10.27": { assignment_id: "A2-10.27", chapter: "10.27", de: "Digitale Kommunikation", en: "Digital Communication", assignment: true },
-    "A2-10.28": { assignment_id: "A2-10.28", chapter: "10.28", de: "Über die Zukunft sprechen", en: "Talking About the Future", assignment: true },
-  },
-  B1: {
-    "B1-2.5": { assignment_id: "B1-2.5", chapter: "2.5", de: "Der Besichtigungstermin", en: "Apartment Viewing Appointment", assignment: true },
-    "B1-2.6": { assignment_id: "B1-2.6", chapter: "2.6", de: "Leben in der Stadt oder auf dem Land", en: "Living in the City or Countryside", assignment: true },
-    "B1-3.7": { assignment_id: "B1-3.7", chapter: "3.7", de: "Fast Food vs Hausmannskost", en: "Fast Food vs Home Cooking", assignment: true },
-    "B1-3.8": { assignment_id: "B1-3.8", chapter: "3.8", de: "Alles für die Gesundheit", en: "Everything for Health", assignment: true },
-    "B1-3.9": { assignment_id: "B1-3.9", chapter: "3.9", de: "Work-Life-Balance im modernen Arbeitsumfeld", en: "Work-Life Balance in the Modern Workplace", assignment: true },
-    "B1-4.10": { assignment_id: "B1-4.10", chapter: "4.10", de: "Digitale Auszeit und Selbstfürsorge", en: "Digital Detox and Self-care", assignment: true },
-    "B1-4.11": { assignment_id: "B1-4.11", chapter: "4.11", de: "Teamspiele und kooperative Aktivitäten", en: "Team Games and Cooperative Activities", assignment: true },
-    "B1-4.12": { assignment_id: "B1-4.12", chapter: "4.12", de: "Abenteuer in der Natur", en: "Adventures in Nature", assignment: true },
-    "B1-4.13": { assignment_id: "B1-4.13", chapter: "4.13", de: "Eine Filmkritik schreiben", en: "Writing a Film Review", assignment: true },
-    "B1-5.14": { assignment_id: "B1-5.14", chapter: "5.14", de: "Traditionelles vs digitales Lernen", en: "Traditional vs Digital Learning", assignment: true },
-    "B1-5.15": { assignment_id: "B1-5.15", chapter: "5.15", de: "Medien und Arbeiten im Homeoffice", en: "Media and Working from Home", assignment: true },
-    "B1-5.16": { assignment_id: "B1-5.16", chapter: "5.16", de: "Prüfungsangst und Stressbewältigung", en: "Exam Anxiety and Stress Management", assignment: true },
-    "B1-5.17": { assignment_id: "B1-5.17", chapter: "5.17", de: "Wie lernt man am besten?", en: "How Do We Learn Best?", assignment: true },
-    "B1-6.18": { assignment_id: "B1-6.18", chapter: "6.18", de: "Wege zum Wunschberuf", en: "Paths to Your Dream Job", assignment: true },
-    "B1-6.19": { assignment_id: "B1-6.19", chapter: "6.19", de: "Das Vorstellungsgespräch", en: "The Job Interview", assignment: true },
-    "B1-6.20": { assignment_id: "B1-6.20", chapter: "6.20", de: "Wie wird man …? (Ausbildung und Qualifikation)", en: "How Do You Become …? (Training and Qualification)", assignment: true },
-    "B1-7.21": { assignment_id: "B1-7.21", chapter: "7.21", de: "Lebensformen heute – Familie und Wohngemeinschaft", en: "Modern Lifestyles – Family and Shared Living", assignment: true },
-    "B1-7.22": { assignment_id: "B1-7.22", chapter: "7.22", de: "Was ist dir in einer Beziehung wichtig?", en: "What Is Important to You in a Relationship?", assignment: true },
-    "B1-7.23": { assignment_id: "B1-7.23", chapter: "7.23", de: "Erstes Date – typische Situationen", en: "First Date – Typical Situations", assignment: true },
-    "B1-8.24": { assignment_id: "B1-8.24", chapter: "8.24", de: "Konsum und Nachhaltigkeit", en: "Consumption and Sustainability", assignment: true },
-    "B1-8.25": { assignment_id: "B1-8.25", chapter: "8.25", de: "Online einkaufen – Rechte und Risiken", en: "Online Shopping – Rights and Risks", assignment: true },
-    "B1-9.26": { assignment_id: "B1-9.26", chapter: "9.26", de: "Reiseprobleme und Lösungen", en: "Travel Problems and Solutions", assignment: true },
-    "B1-10.27": { assignment_id: "B1-10.27", chapter: "10.27", de: "Umweltfreundlich im Alltag", en: "Environmentally Friendly in Everyday Life", assignment: true },
-    "B1-10.28": { assignment_id: "B1-10.28", chapter: "10.28", de: "Klimafreundlich leben", en: "Living in a Climate-Friendly Way", assignment: true },
-  },
-};
+const LEVEL_PATTERN = /^(A1|A2|B1|B2|C1|C2)$/;
 
 const normalizeLevel = (value) => {
   const token = String(value || "").trim().toUpperCase();
-  return /^(A1|A2|B1|B2|C1|C2)$/.test(token) ? token : "";
+  return LEVEL_PATTERN.test(token) ? token : "";
+};
+
+const normalizeChapter = (value) => {
+  const token = String(value || "").trim();
+  return /^\d+(?:\.\d+)?$/.test(token) ? token : "";
 };
 
 const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {
@@ -97,74 +19,245 @@ const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {
     return explicitToken.toUpperCase();
   }
 
-  const chapterToken = String(chapter || "").trim();
-  if (/^\d+(?:\.\d+)?$/.test(chapterToken)) {
+  const chapterToken = normalizeChapter(chapter);
+  if (chapterToken) {
     return `${normalizedLevel}-${chapterToken}`;
   }
 
   const chapterFromId = explicitToken.match(/(\d+(?:\.\d+)?)/)?.[1] || "";
-  return /^\d+(?:\.\d+)?$/.test(chapterFromId) ? `${normalizedLevel}-${chapterFromId}` : "";
+  return normalizeChapter(chapterFromId) ? `${normalizedLevel}-${chapterFromId}` : "";
 };
 
+const A1_CURRICULUM_ENTRIES = [
+  { level: "A1", assignmentDay: 1, chapter: "0.1", mode: "Lesen & Hören", assignment: true, topic: "Greetings and Asking About Well-being" },
+  { level: "A1", assignmentDay: 2, chapter: "0.2", mode: "Lesen & Hören", assignment: true, topic: "German Alphabet" },
+  { level: "A1", assignmentDay: 2, chapter: "1.1", mode: "Lesen & Hören", assignment: true, topic: "Personal Pronouns and Verb Conjugation" },
+  { level: "A1", assignmentDay: 3, chapter: "1.1", mode: "Schreiben & Sprechen", assignment: false, topic: "Personal Pronouns and Verb Conjugation + Introducing Yourself" },
+  { level: "A1", assignmentDay: 3, chapter: "1.2", mode: "Lesen & Hören", assignment: true, topic: "Introducing Yourself" },
+  { level: "A1", assignmentDay: 4, chapter: "2", mode: "Lesen & Hören", assignment: true, topic: "Numbers and Addresses" },
+  { level: "A1", assignmentDay: 5, chapter: "1.2", mode: "Schreiben & Sprechen", assignment: false, topic: "Introducing Yourself (Practical Recap)" },
+  { level: "A1", assignmentDay: 6, chapter: "2.3", mode: "Schreiben & Sprechen", assignment: false, topic: "Family and Hobbies" },
+  { level: "A1", assignmentDay: 7, chapter: "3", mode: "Lesen & Hören", assignment: true, topic: "Asking About Prices and Preferences" },
+  { level: "A1", assignmentDay: 8, chapter: "4", mode: "Lesen & Hören", assignment: true, topic: "Countries and Languages" },
+  { level: "A1", assignmentDay: 9, chapter: "5", mode: "Lesen & Hören", assignment: true, topic: "Nominative and Accusative Cases" },
+  { level: "A1", assignmentDay: 10, chapter: "6", mode: "Lesen & Hören", assignment: true, topic: "Objects, Colors and Possessive Articles" },
+  { level: "A1", assignmentDay: 10, chapter: "2.4", mode: "Schreiben & Sprechen", assignment: false, topic: "Asking for and Giving Directions" },
+  { level: "A1", assignmentDay: 11, chapter: "7", mode: "Lesen & Hören", assignment: true, topic: "The 12 Hour Clock" },
+  { level: "A1", assignmentDay: 12, chapter: "8", mode: "Lesen & Hören", assignment: true, topic: "The 24 Hour Clock and Dates" },
+  { level: "A1", assignmentDay: 13, chapter: "3.5", mode: "Lesen & Hören", assignment: false, topic: "Revision: Numbers, Time and Prices" },
+  { level: "A1", assignmentDay: 14, chapter: "3.6", mode: "Schreiben & Sprechen", assignment: false, topic: "Modal Verbs" },
+  { level: "A1", assignmentDay: 15, chapter: "4.7", mode: "Schreiben & Sprechen", assignment: false, topic: "Imperatives" },
+  { level: "A1", assignmentDay: 16, chapter: "9", mode: "Lesen & Hören", assignment: true, topic: "Food and Negation" },
+  { level: "A1", assignmentDay: 16, chapter: "10", mode: "Lesen & Hören", assignment: true, topic: "Daily Activities" },
+  { level: "A1", assignmentDay: 17, chapter: "11", mode: "Lesen & Hören", assignment: true, topic: "Instructions and Directions" },
+  { level: "A1", assignmentDay: 18, chapter: "12.1", mode: "Lesen & Hören", assignment: true, topic: "Two-way Prepositions" },
+  { level: "A1", assignmentDay: 18, chapter: "12.2", mode: "Lesen & Hören", assignment: true, topic: "Directions and Movement" },
+  { level: "A1", assignmentDay: 19, chapter: "5.9", mode: "Schreiben & Sprechen", assignment: false, topic: "Goethe A1 Speaking Practice" },
+  {
+    level: "A1",
+    assignmentDay: 20,
+    chapter: "12.3",
+    mode: "Schreiben & Sprechen",
+    assignment: true,
+    topic: "Introduction to Letter Writing 12.3",
+    goal: "Practice how to write both formal and informal letters",
+    instruction:
+      "For your first letter, open Letter Writing 12.3 and complete the drag-and-drop template first (fill the missing parts of the letter). Then copy the full letter by yourself and submit it using your normal assignment flow.",
+    grammar_topic: "Formal and Informal Letter",
+    schreiben_sprechen: {
+      video: "https://youtu.be/2iJQFYGUqRE",
+      youtube_link: "https://youtu.be/2iJQFYGUqRE",
+      workbook_link: "https://www.falowen.app/campus/course/letter-writing-intro-german-a1-day-12-3",
+    },
+  },
+  { level: "A1", assignmentDay: 21, chapter: "13", mode: "Lesen & Hören", assignment: true, topic: "Weather" },
+  { level: "A1", assignmentDay: 21, chapter: "6.11", mode: "Schreiben & Sprechen", assignment: false, topic: "Weather Speaking Practice" },
+  { level: "A1", assignmentDay: 22, chapter: "14.1", mode: "Lesen & Hören", assignment: true, topic: "Health and Body Parts" },
+  { level: "A1", assignmentDay: 22, chapter: "7.12", mode: "Schreiben & Sprechen", assignment: false, topic: "Health Speaking Practice" },
+  { level: "A1", assignmentDay: 23, chapter: "14.2", mode: "Lesen & Hören", assignment: false, topic: "Dative and Accusative Verbs" },
+  { level: "A1", assignmentDay: 24, chapter: "8.13", mode: "Schreiben & Sprechen", assignment: false, topic: "Schreiben & Sprechen" },
+];
+
+const A2_ENTRIES = [
+  ["1.1", "Small Talk", "Small Talk"],
+  ["1.2", "Personen beschreiben", "Describing People"],
+  ["1.3", "Dinge und Personen vergleichen", "Comparing Things and People"],
+  ["2.4", "Wo möchten wir uns treffen?", "Where Shall We Meet?"],
+  ["2.5", "Was machst du in deiner Freizeit?", "What Do You Do in Your Free Time?"],
+  ["3.6", "Möbel und Räume kennenlernen", "Furniture and Rooms"],
+  ["3.7", "Eine Wohnung suchen", "Looking for an Apartment"],
+  ["3.8", "Rezepte und Essen", "Recipes and Food"],
+  ["4.9", "Urlaub", "Vacation"],
+  ["4.10", "Tourismus und traditionelle Feste", "Tourism and Traditional Festivals"],
+  ["4.11", "Verkehrsmittel vergleichen", "Comparing Transportation"],
+  ["5.12", "Ein Tag im Leben", "A Day in Life"],
+  ["5.13", "Ein Vorstellungsgespräch", "A Job Interview"],
+  ["5.14", "Beruf und Karriere", "Career and Profession"],
+  ["6.15", "Mein Lieblingssport", "My Favorite Sport"],
+  ["6.16", "Wohlbefinden und Entspannung", "Well-being and Relaxation"],
+  ["6.17", "In die Apotheke gehen", "Going to the Pharmacy"],
+  ["7.18", "Die Bank anrufen", "Calling the Bank"],
+  ["7.19", "Einkaufen – wo und wie?", "Shopping – Where and How"],
+  ["7.20", "Reklamationssituationen", "Complaint Situations"],
+  ["8.21", "Ein Wochenende planen", "Planning a Weekend"],
+  ["8.22", "Die Woche planen", "Planning the Week"],
+  ["9.23", "Wie kommst du zur Schule oder zur Arbeit?", "How Do You Go to School or Work"],
+  ["9.24", "Einen Urlaub planen", "Planning a Vacation"],
+  ["9.25", "Tagesablauf", "Daily Routine"],
+  ["10.26", "Gefühle beschreiben", "Describing Feelings"],
+  ["10.27", "Digitale Kommunikation", "Digital Communication"],
+  ["10.28", "Über die Zukunft sprechen", "Talking About the Future"],
+].map(([chapter, de, en], index) => ({
+  level: "A2",
+  assignmentDay: index + 1,
+  chapter,
+  mode: "Lesen & Hören",
+  assignment: true,
+  de,
+  en,
+  topic: en,
+}));
+
+const B1_ENTRIES = [
+  ["2.5", "Der Besichtigungstermin", "Apartment Viewing Appointment"],
+  ["2.6", "Leben in der Stadt oder auf dem Land", "Living in the City or Countryside"],
+  ["3.7", "Fast Food vs Hausmannskost", "Fast Food vs Home Cooking"],
+  ["3.8", "Alles für die Gesundheit", "Everything for Health"],
+  ["3.9", "Work-Life-Balance im modernen Arbeitsumfeld", "Work-Life Balance in the Modern Workplace"],
+  ["4.10", "Digitale Auszeit und Selbstfürsorge", "Digital Detox and Self-care"],
+  ["4.11", "Teamspiele und kooperative Aktivitäten", "Team Games and Cooperative Activities"],
+  ["4.12", "Abenteuer in der Natur", "Adventures in Nature"],
+  ["4.13", "Eine Filmkritik schreiben", "Writing a Film Review"],
+  ["5.14", "Traditionelles vs digitales Lernen", "Traditional vs Digital Learning"],
+  ["5.15", "Medien und Arbeiten im Homeoffice", "Media and Working from Home"],
+  ["5.16", "Prüfungsangst und Stressbewältigung", "Exam Anxiety and Stress Management"],
+  ["5.17", "Wie lernt man am besten?", "How Do We Learn Best?"],
+  ["6.18", "Wege zum Wunschberuf", "Paths to Your Dream Job"],
+  ["6.19", "Das Vorstellungsgespräch", "The Job Interview"],
+  ["6.20", "Wie wird man …? (Ausbildung und Qualifikation)", "How Do You Become …? (Training and Qualification)"],
+  ["7.21", "Lebensformen heute – Familie und Wohngemeinschaft", "Modern Lifestyles – Family and Shared Living"],
+  ["7.22", "Was ist dir in einer Beziehung wichtig?", "What Is Important to You in a Relationship?"],
+  ["7.23", "Erstes Date – typische Situationen", "First Date – Typical Situations"],
+  ["8.24", "Konsum und Nachhaltigkeit", "Consumption and Sustainability"],
+  ["8.25", "Online einkaufen – Rechte und Risiken", "Online Shopping – Rights and Risks"],
+  ["9.26", "Reiseprobleme und Lösungen", "Travel Problems and Solutions"],
+  ["10.27", "Umweltfreundlich im Alltag", "Environmentally Friendly in Everyday Life"],
+  ["10.28", "Klimafreundlich leben", "Living in a Climate-Friendly Way"],
+].map(([chapter, de, en], index) => ({
+  level: "B1",
+  assignmentDay: index + 1,
+  chapter,
+  mode: "Lesen & Hören",
+  assignment: true,
+  de,
+  en,
+  topic: en,
+}));
+
+const CURRICULUM_ENTRIES = [...A1_CURRICULUM_ENTRIES, ...A2_ENTRIES, ...B1_ENTRIES].map((entry) => {
+  const canonicalAssignmentId = `${entry.level}-${entry.chapter}`;
+  return {
+    ...entry,
+    canonicalAssignmentId,
+    assignment_id: canonicalAssignmentId,
+    title: entry.topic || entry.en || entry.de || "",
+    type: entry.mode,
+  };
+});
+
+const byLevel = CURRICULUM_ENTRIES.reduce((acc, entry) => {
+  if (!acc[entry.level]) acc[entry.level] = [];
+  acc[entry.level].push(entry);
+  return acc;
+}, {});
+
+export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = Object.fromEntries(
+  Object.entries(byLevel).map(([level, entries]) => [
+    level,
+    Object.fromEntries(entries.map((entry, index) => [`${entry.assignment_id}::${entry.mode || "default"}::${entry.assignmentDay}::${index}`, entry])),
+  ])
+);
+
+export const getCurriculumEntriesForLevel = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+  return normalizedLevel ? [...(byLevel[normalizedLevel] || [])] : [];
+};
+
+export const getCurriculumEntriesByDayForLevel = (level) => {
+  const entries = getCurriculumEntriesForLevel(level);
+  return entries.reduce((acc, entry) => {
+    const day = Number(entry.assignmentDay || 0);
+    if (!day) return acc;
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(entry);
+    return acc;
+  }, {});
+};
 
 const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true } = {}) => {
   const entry = entryParam || {};
-  return String(
-    entry.topic ||
-      (preferEnglish ? entry.en || entry.de : entry.de || entry.en) ||
-      entry.en ||
-      entry.de ||
-      ""
-  ).trim();
+  return String(entry.topic || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || "").trim();
 };
 
 const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false } = {}) => {
   const entry = entryParam || {};
-  return String(
-    (preferEnglish ? entry.en || entry.de : entry.de || entry.en) ||
-      entry.topic ||
-      entry.de ||
-      entry.en ||
-      ""
-  ).trim();
+  return String(entry.mode || (preferEnglish ? entry.en || entry.de : entry.de || entry.en) || entry.topic || "").trim();
 };
 
 export const getAssignmentDisplayTitle = (entry, options) => resolveAssignmentDisplayTitle(entry, options);
 export const getAssignmentDisplayType = (entry, options) => resolveAssignmentDisplayType(entry, options);
 
-export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter }) => {
+export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter, mode, assignmentDay } = {}) => {
   const normalizedLevel = normalizeLevel(level);
-  const levelDictionary = GERMAN_ASSIGNMENT_COURSE_DICTIONARY[normalizedLevel];
-  if (!levelDictionary) return null;
+  if (!normalizedLevel) return null;
 
-  const canonicalId = toCanonicalAssignmentId({ level: normalizedLevel, assignmentId, chapter }) || String(assignmentId || "").toUpperCase();
-  const chapterToken = String(chapter || "").trim();
-  const entry = (
-    levelDictionary[canonicalId] ||
-    levelDictionary[`${normalizedLevel}-${chapterToken}`] ||
-    Object.values(levelDictionary).find((entry) => String(entry.chapter) === chapterToken) ||
-    null
-  );
+  const canonicalId = toCanonicalAssignmentId({ level: normalizedLevel, assignmentId, chapter });
+  const chapterToken = normalizeChapter(chapter);
+  const modeToken = String(mode || "").trim();
+  const dayToken = Number(assignmentDay || 0);
 
-  if (!entry) return null;
-  const canonicalAssignmentId =
-    toCanonicalAssignmentId({
-      level: normalizedLevel,
-      assignmentId: canonicalId || entry.assignment_id,
-      chapter: entry.chapter,
-    }) || canonicalId;
+  const matches = (byLevel[normalizedLevel] || []).filter((entry) => {
+    if (canonicalId && entry.assignment_id !== canonicalId) return false;
+    if (!canonicalId && chapterToken && entry.chapter !== chapterToken) return false;
+    if (modeToken && entry.mode !== modeToken) return false;
+    if (dayToken && Number(entry.assignmentDay) !== dayToken) return false;
+    return true;
+  });
 
-  return {
-    ...entry,
-    assignment_id: canonicalAssignmentId || entry.assignment_id,
-    canonicalAssignmentId: canonicalAssignmentId || null,
-    assignment: entry.assignment !== false,
-  };
+  const prioritized = matches.sort((a, b) => {
+    if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
+    return Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
+  });
+
+  const entry = prioritized[0] || null;
+  return entry
+    ? {
+        ...entry,
+        assignment: entry.assignment === true,
+        canonicalAssignmentId: entry.assignment_id,
+      }
+    : null;
 };
 
-export const getAssignmentSequenceForLevel = (level) => {
-  const normalizedLevel = String(level || "").toUpperCase();
-  const levelDictionary = GERMAN_ASSIGNMENT_COURSE_DICTIONARY[normalizedLevel];
-  if (!levelDictionary) return [];
-  return Object.values(levelDictionary);
+export const getAssignmentSequenceForLevel = (level, { includePractical = true } = {}) => {
+  const entries = getCurriculumEntriesForLevel(level)
+    .filter((entry) => includePractical || entry.assignment === true)
+    .sort((a, b) => {
+      const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
+      if (dayDiff !== 0) return dayDiff;
+      if (a.assignment !== b.assignment) return a.assignment ? -1 : 1;
+      return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
+    });
+
+  if (includePractical) return entries;
+
+  const seen = new Set();
+  return entries.filter((entry) => {
+    if (seen.has(entry.assignment_id)) return false;
+    seen.add(entry.assignment_id);
+    return true;
+  });
 };
+
+export const getValidProgressionIdentifiersForLevel = (level) =>
+  new Set(getAssignmentSequenceForLevel(level, { includePractical: false }).map((entry) => entry.assignment_id));
