@@ -149,6 +149,32 @@ describe("mergeAssignmentProgress", () => {
   });
 
 
+  test("maps legacy day aliases from score rows to canonical tutor-marked assignment IDs", () => {
+    const merged = mergeAssignmentProgress({
+      curriculumEntries: [
+        { level: "A1", assignmentId: "2", chapter: "2", title: "Numbers", assignmentDay: 4, assignment: true },
+        { level: "A1", assignmentId: "3", chapter: "3", title: "Asking Prices", assignmentDay: 7, assignment: true },
+        { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
+        { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
+        { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+      ],
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: [
+        { assignmentId: "A1-DAY-4", score: 83, studentCode: "st-1", level: "A1" },
+        { assignmentId: "A1-DAY-7", score: 80, studentCode: "st-1", level: "A1" },
+        { assignmentId: "A1-DAY-8", score: 79, studentCode: "st-1", level: "A1" },
+        { assignmentId: "A1-DAY-9", score: 78, studentCode: "st-1", level: "A1" },
+        { assignmentId: "A1-DAY-11", score: 81, studentCode: "st-1", level: "A1" },
+      ],
+      studentCode: "st-1",
+    });
+
+    ["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"].forEach((id) => {
+      expect(merged.find((row) => row.assignmentId === id)?.status).toBe("passed");
+    });
+  });
+
   test("includes later tutor-marked A1 assignments beyond day 3 as passed", () => {
     const curriculumEntries = [
       { level: "A1", assignmentId: "2", chapter: "2", title: "Numbers", assignmentDay: 4, assignment: true },

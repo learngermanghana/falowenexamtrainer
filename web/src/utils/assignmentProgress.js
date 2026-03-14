@@ -1,4 +1,5 @@
 import { getCourseScheduleAssignmentMetadata } from "../data/assignmentMetadata";
+import { getCurriculumEntriesForLevel } from "../data/curriculumManifest";
 import { resolveAssignmentCanonicalKey } from "./assignmentIdentity";
 
 export const PASS_MARK = 60;
@@ -32,6 +33,30 @@ const pickLatestIso = (...values) => {
 
 const toCanonicalAssignmentId = ({ assignmentId, level, assignmentTitle }) =>
   resolveAssignmentCanonicalKey({ level, assignmentId, assignmentTitle }) || "";
+
+const DAY_ALIAS_PATTERN = /^(A1|A2|B1|B2|C1|C2)-DAY-(\d+)(?:-TASK-(\d+))?$/i;
+
+const remapDayAliasToCanonicalAssignmentId = ({ canonicalAssignmentId, level }) => {
+  const canonicalToken = String(canonicalAssignmentId || "").trim().toUpperCase();
+  if (!canonicalToken) return "";
+
+  const match = canonicalToken.match(DAY_ALIAS_PATTERN);
+  if (!match) return canonicalToken;
+
+  const resolvedLevel = String(level || match[1] || "").trim().toUpperCase();
+  const assignmentDay = Number(match[2] || 0);
+  const taskIndex = Math.max(Number(match[3] || 1), 1);
+  if (!resolvedLevel || !assignmentDay) return canonicalToken;
+
+  const tutorMarkedEntries = getCurriculumEntriesForLevel(resolvedLevel)
+    .filter((entry) => Number(entry?.assignmentDay || 0) === assignmentDay)
+    .filter((entry) => entry?.assignment === true)
+    .sort((left, right) => String(left?.chapter || "").localeCompare(String(right?.chapter || ""), undefined, { numeric: true }));
+
+  if (!tutorMarkedEntries.length) return canonicalToken;
+
+  return tutorMarkedEntries[Math.min(taskIndex - 1, tutorMarkedEntries.length - 1)]?.assignment_id || canonicalToken;
+};
 
 export const resolveAssignmentIdWithFallback = ({
   assignmentId,
@@ -227,7 +252,12 @@ export const mergeAssignmentProgress = ({
       assignmentTitle: result?.assignment || result?.assignmentTitle || result?.title,
       fallbackKey: `RESULT-${index}`,
     });
-    const bucket = ensureBucket(canonical, { level });
+    const canonicalForMerge = remapDayAliasToCanonicalAssignmentId({
+      canonicalAssignmentId: canonical,
+      level,
+    });
+
+    const bucket = ensureBucket(canonicalForMerge, { level });
     if (!bucket) return;
     bucket.resultRecords.push(result);
   });
