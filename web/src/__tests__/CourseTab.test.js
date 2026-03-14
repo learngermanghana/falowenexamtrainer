@@ -57,6 +57,34 @@ jest.mock("../data/courseSchedule", () => ({
         assignment: false,
         schreiben_sprechen: { chapter: "2.3", assignment: false },
       },
+      {
+        day: 7,
+        topic: "Asking Prices",
+        chapter: "3",
+        assignment: true,
+        lesen_hören: { chapter: "3", assignment: true },
+      },
+      {
+        day: 8,
+        topic: "Countries and Languages",
+        chapter: "4",
+        assignment: true,
+        lesen_hören: { chapter: "4", assignment: true },
+      },
+      {
+        day: 9,
+        topic: "German Cases",
+        chapter: "5",
+        assignment: true,
+        lesen_hören: { chapter: "5", assignment: true },
+      },
+      {
+        day: 11,
+        topic: "12 Hour Clock",
+        chapter: "7",
+        assignment: true,
+        lesen_hören: { chapter: "7", assignment: true },
+      },
     ],
     A2: [
       {
@@ -74,6 +102,13 @@ jest.mock("../data/courseSchedule", () => ({
         chapter: "1",
         assignment: true,
         lesen_hören: { chapter: "1", assignment: true },
+      },
+      {
+        day: 9,
+        topic: "B1 Later Unit",
+        chapter: "11",
+        assignment: true,
+        lesen_hören: { chapter: "11", assignment: true },
       },
     ],
   },
@@ -101,17 +136,27 @@ describe("CourseTab", () => {
     expect(screen.queryAllByText("Submitted").length).toBe(0);
   });
 
-  it("renders Day 4 chapter 2 (A1-2) as Passed when score is 83", async () => {
+  it("renders Passed for later tutor-marked days (4, 7, 8, 9, 11) from merged progress", async () => {
     mockFetchResults.mockResolvedValueOnce({
-      results: [{ assignmentId: "A1-2", score: 83, studentCode: "ComfortArmah295" }],
+      results: [
+        { assignmentId: "A1-2", score: 83, studentCode: "ComfortArmah295" },
+        { assignmentId: "A1-3", score: 80, studentCode: "ComfortArmah295" },
+        { assignmentId: "A1-4", score: 79, studentCode: "ComfortArmah295" },
+        { assignmentId: "A1-5", score: 78, studentCode: "ComfortArmah295" },
+        { assignmentId: "A1-7", score: 81, studentCode: "ComfortArmah295" },
+        // Simulate legacy rows where level is missing in backend result data.
+        { assignmentId: "A1-8", score: 84, studentCode: "ComfortArmah295", level: "" },
+      ],
     });
 
     render(<CourseTab defaultLevel="A1" />);
 
     await waitFor(() => {
-      expect(screen.getByText("Numbers")).toBeInTheDocument();
-      const card = screen.getByText("Numbers").closest("div");
-      expect(within(card).getByText("Passed")).toBeInTheDocument();
+      ["Numbers", "Asking Prices", "Countries and Languages", "German Cases", "12 Hour Clock"].forEach((topic) => {
+        expect(screen.getByText(topic)).toBeInTheDocument();
+        const card = screen.getByText(topic).closest("div");
+        expect(within(card).getByText("Passed")).toBeInTheDocument();
+      });
     });
   });
 
@@ -126,6 +171,41 @@ describe("CourseTab", () => {
     expect(within(card).getByText("Practice only")).toBeInTheDocument();
     expect(within(card).queryByText("Submitted")).not.toBeInTheDocument();
     expect(within(card).queryByText("Not started")).not.toBeInTheDocument();
+  });
+
+
+  it("renders Failed for A2 tutor-marked assignments below pass mark", async () => {
+    mockFetchResults.mockResolvedValueOnce({
+      results: [{ assignmentId: "A2-1", score: 42, studentCode: "ComfortArmah295" }],
+    });
+
+    render(<CourseTab defaultLevel="A2" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("A2 Intro")).toBeInTheDocument();
+      const card = screen.getByText("A2 Intro").closest("div");
+      expect(within(card).getByText("Failed")).toBeInTheDocument();
+      expect(within(card).queryByText("Practice only")).not.toBeInTheDocument();
+    });
+  });
+
+  it("keeps later B1 passed assignments when result rows miss explicit level", async () => {
+    mockFetchResults.mockResolvedValueOnce({
+      results: [
+        { assignmentId: "B1-1", score: 77, studentCode: "ComfortArmah295" },
+        { assignmentId: "B1-11", score: 79, studentCode: "ComfortArmah295", level: "" },
+      ],
+    });
+
+    render(<CourseTab defaultLevel="B1" />);
+
+    await waitFor(() => {
+      ["B1 Intro", "B1 Later Unit"].forEach((topic) => {
+        expect(screen.getByText(topic)).toBeInTheDocument();
+        const card = screen.getByText(topic).closest("div");
+        expect(within(card).getByText("Passed")).toBeInTheDocument();
+      });
+    });
   });
 
   it("keeps tutor-marked status rendering active for A2 and B1 levels", async () => {

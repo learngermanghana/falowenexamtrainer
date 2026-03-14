@@ -148,6 +148,57 @@ describe("mergeAssignmentProgress", () => {
     expect(merged[0].bestScore).toBe(83);
   });
 
+
+  test("includes later tutor-marked A1 assignments beyond day 3 as passed", () => {
+    const curriculumEntries = [
+      { level: "A1", assignmentId: "2", chapter: "2", title: "Numbers", assignmentDay: 4, assignment: true },
+      { level: "A1", assignmentId: "3", chapter: "3", title: "Asking Prices", assignmentDay: 7, assignment: true },
+      { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
+      { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
+      { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+    ];
+
+    const merged = mergeAssignmentProgress({
+      curriculumEntries,
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: [
+        { assignmentId: "A1-2", score: 83, studentCode: "st-1" },
+        { assignmentId: "A1-3", score: 80, studentCode: "st-1" },
+        { assignmentId: "A1-4", score: 79, studentCode: "st-1" },
+        { assignmentId: "A1-5", score: 78, studentCode: "st-1" },
+        { assignmentId: "A1-7", score: 81, studentCode: "st-1" },
+      ],
+      studentCode: "st-1",
+    });
+
+    const mergedIds = merged.map((row) => row.assignmentId);
+    expect(mergedIds).toEqual(expect.arrayContaining(["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"]));
+    ["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"].forEach((id) => {
+      expect(merged.find((row) => row.assignmentId === id)?.status).toBe("passed");
+    });
+  });
+
+
+  test("is level-agnostic for A2/B1 canonical IDs and preserves failed statuses", () => {
+    const merged = mergeAssignmentProgress({
+      curriculumEntries: [
+        { level: "A2", assignmentId: "1", chapter: "1", title: "A2 Intro", assignment: true },
+        { level: "B1", assignmentId: "11", chapter: "11", title: "B1 Later Unit", assignment: true },
+      ],
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: [
+        { assignmentId: "A2-1", score: 42, studentCode: "st-2" },
+        { assignmentId: "B1-11", score: 79, studentCode: "st-2", level: "" },
+      ],
+      studentCode: "st-2",
+    });
+
+    expect(merged.find((row) => row.assignmentId === "A2-1")?.status).toBe("failed");
+    expect(merged.find((row) => row.assignmentId === "B1-11")?.status).toBe("passed");
+  });
+
   test("canonical merge resolves A2 and B1 assignment IDs as passed", () => {
     const a2Merged = mergeAssignmentProgress({
       curriculumEntries: [{ level: "A2", assignmentId: "1", chapter: "1", title: "A2 Intro", assignment: true }],
