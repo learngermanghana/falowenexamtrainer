@@ -1,42 +1,21 @@
 "use strict";
 
 const admin = require("firebase-admin");
+const {
+  getCurriculumEntriesForLevel,
+  normalizeLevel,
+} = require("../../../web/src/data/curriculumManifest");
 
 // If you're on Node 18+ in Firebase Functions, global fetch exists.
 // If not, uncomment the next line and install node-fetch@2.
 // const fetch = require("node-fetch");
 
 const PASS_MARK = 60;
+const ENABLE_LEGACY_PROGRESSION_PLAN_FALLBACK = false;
 
-const LEVEL_PROGRESSION_PLAN = {
-  A1: [
-    { dayNumber: 1, identifiers: ["A1-0.1"], label: "Day 1: Greetings and Asking About Well-being" },
-    { dayNumber: 2, identifiers: ["A1-0.2", "A1-1.1"], label: "Day 2: German Alphabet + Personal Pronouns" },
-    { dayNumber: 3, identifiers: ["A1-1.2"], label: "Day 3: Introducing Yourself" },
-    { dayNumber: 4, identifiers: ["A1-2"], label: "Day 4: Numbers and Addresses" },
-    { dayNumber: 7, identifiers: ["A1-3"], label: "Day 7: Asking About Prices and Preferences" },
-    { dayNumber: 8, identifiers: ["A1-4"], label: "Day 8: Countries and Languages" },
-    { dayNumber: 9, identifiers: ["A1-5"], label: "Day 9: Nominative and Accusative Cases" },
-    { dayNumber: 10, identifiers: ["A1-6"], label: "Day 10: Objects, Colors and Possessive Articles" },
-    { dayNumber: 11, identifiers: ["A1-7"], label: "Day 11: The 12 Hour Clock" },
-    { dayNumber: 12, identifiers: ["A1-8"], label: "Day 12: The 24 Hour Clock and Dates" },
-    { dayNumber: 16, identifiers: ["A1-9", "A1-10"], label: "Day 16: Food, Negation and Daily Activities" },
-    { dayNumber: 17, identifiers: ["A1-11"], label: "Day 17: Instructions and Directions" },
-    { dayNumber: 18, identifiers: ["A1-12.1", "A1-12.2"], label: "Day 18: Two-way Prepositions + Directions and Movement" },
-    { dayNumber: 20, identifiers: ["A1-12.3"], label: "Day 20: Introduction to Letter Writing 12.3" },
-    { dayNumber: 21, identifiers: ["A1-13"], label: "Day 21: Weather" },
-    { dayNumber: 22, identifiers: ["A1-14.1"], label: "Day 22: Health and Body Parts" },
-  ],
-};
-
-const VALID_ASSIGNMENT_IDS_BY_LEVEL = Object.fromEntries(
-  Object.entries(LEVEL_PROGRESSION_PLAN).map(([level, lessons]) => [
-    level,
-    new Set(lessons.flatMap((lesson) => lesson.identifiers)),
-  ])
-);
-
-const { courseSchedules } = require("../../data/courseSchedule");
+// Migration guard: keep the legacy plan only for emergency rollback.
+// Safe to delete once all deployed environments load curriculumManifest successfully.
+const LEGACY_LEVEL_PROGRESSION_PLAN = {};
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -162,15 +141,6 @@ const normalizeStudentCode = (value = "") =>
     .trim()
     .toLowerCase();
 
-const filterValidIdentifiersForLevel = (level = "", identifiers = []) => {
-  const normalizedLevel = normalizeLevelKey(level);
-  const allowList = VALID_ASSIGNMENT_IDS_BY_LEVEL[normalizedLevel];
-  if (!allowList) return identifiers;
-  return identifiers.filter((identifier) => allowList.has(String(identifier || "").toUpperCase()));
-};
-
-
-
 const getIdentifierLabel = (identifier = "") =>
   String(identifier || "")
     .trim()
@@ -220,7 +190,7 @@ const toCanonicalIdentifier = (level, raw = "") => {
   const normalized = normalizeIdentifier(token);
   if (!normalized) return null;
 
-  const normalizedLevel = normalizeLevelKey(level || "");
+  const normalizedLevel = normalizeLevel(level || "");
   if (!normalizedLevel) return normalized;
   return `${normalizedLevel}-${normalized}`;
 };
@@ -334,124 +304,60 @@ const shouldSkipNestedMajorOnlyAssignmentId = ({ level = "", lesson = {}, rawVal
 };
 
 const getAssignmentSummary = (level = "A1") => {
-  const normalizedLevel = String(level || "A1").toUpperCase();
-  const plan = LEVEL_PROGRESSION_PLAN[normalizedLevel];
-  const schedule = courseSchedules?.[normalizedLevel] || [];
-  const lessons = [];
-
-  for (const lesson of schedule) {
-    const dayNumber = Number(lesson.day || lesson.dayNumber || 0);
-    const topic = String(lesson.topic || "");
-    const goal = String(lesson.goal || "");
-
-    if (!dayNumber || scheduleTopicIsIgnored(topic)) continue;
-
-    const identifiers = [];
-    let hasGeneralOrReadingAssignmentSignal = false;
-
-    // top-level chapter (only if it's marked assignment:true)
-    if (
-      lesson.assignment === true &&
-      (lesson.assignmentId || lesson.chapter) &&
-      !isA1PracticalWritingLesson(level, lesson)
-    ) {
-      hasGeneralOrReadingAssignmentSignal = true;
-      identifiers.push(
-        ...extractCanonicalIdentifiers(lesson.assignmentId || lesson.chapter, level)
-      );
-    }
-
-    // nested lesen_hören
-    if (Array.isArray(lesson.lesen_hören)) {
-      for (const block of lesson.lesen_hören) {
-        if (isRealAssignment(block) && (block.assignmentId || block.chapter)) {
-          hasGeneralOrReadingAssignmentSignal = true;
-          const blockRaw = block.chapter || block.assignmentId;
-          const blockFromAssignmentId = Boolean(!block.chapter && block.assignmentId);
-          if (
-            shouldSkipNestedMajorOnlyAssignmentId({
-              level,
-              lesson,
-              rawValue: blockRaw,
-              cameFromAssignmentId: blockFromAssignmentId,
-            })
-          ) {
-            continue;
-          }
-          identifiers.push(...extractCanonicalIdentifiers(blockRaw, level));
-        }
-      }
-    } else if (isRealAssignment(lesson.lesen_hören)) {
-      // sometimes lesen_hören is an object
-      const lesenRaw = lesson.lesen_hören.chapter || lesson.lesen_hören.assignmentId || lesson.assignmentId || lesson.chapter;
-      const lesenFromAssignmentId = Boolean(!lesson.lesen_hören.chapter && lesson.lesen_hören.assignmentId);
-      if (
-        lesenRaw &&
-        !shouldSkipNestedMajorOnlyAssignmentId({
-          level,
-          lesson,
-          rawValue: lesenRaw,
-          cameFromAssignmentId: lesenFromAssignmentId,
-        })
-      ) {
-        hasGeneralOrReadingAssignmentSignal = true;
-        identifiers.push(...extractCanonicalIdentifiers(lesenRaw, level));
-      }
-    }
-
-    // nested schreiben_sprechen (A1 speaking/writing blocks are practical-only)
-    if (String(level || "").toUpperCase() !== "A1") {
-      if (Array.isArray(lesson.schreiben_sprechen)) {
-        for (const block of lesson.schreiben_sprechen) {
-          if (isRealAssignment(block) && (block.assignmentId || block.chapter)) {
-            identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
-          }
-        }
-      } else if (isRealAssignment(lesson.schreiben_sprechen)) {
-        const ch =
-          lesson.schreiben_sprechen.assignmentId ||
-          lesson.schreiben_sprechen.chapter ||
-          lesson.assignmentId ||
-          lesson.chapter;
-        if (ch) identifiers.push(...extractCanonicalIdentifiers(ch, level));
-      }
-    }
-
-    const clean = Array.from(new Set(identifiers)).filter(Boolean);
-
-    // Skip practice-only lessons (no real assignment identifiers)
-    if (!clean.length) continue;
-
-    // Ignore writing/speaking-only lessons from next/missed progression logic.
-    if (!hasGeneralOrReadingAssignmentSignal) continue;
-
-    const displayTitle = ensureTitleHasIdentifier(
-      String(lesson.assignmentTitle || lesson.title || topic || "").trim(),
-      clean
-    );
-    const label = `Day ${dayNumber}: ${displayTitle || `Assignment ${clean.join(", ")}`}`.trim();
-
-    lessons.push({
-      order: lessons.length,
-      dayNumber,
-      label,
-      goal,
-      identifiers: clean, // array of string identifiers
+  const normalizedLevel = normalizeLevel(level || "A1") || "A1";
+  const entries = getCurriculumEntriesForLevel(normalizedLevel)
+    .filter((entry) => entry.progressionEligible === true)
+    .sort((a, b) => {
+      const dayDiff = Number(a.assignmentDay || 0) - Number(b.assignmentDay || 0);
+      if (dayDiff !== 0) return dayDiff;
+      return String(a.chapter || "").localeCompare(String(b.chapter || ""), undefined, { numeric: true });
     });
-  }
 
-  const plannedSet = new Set(lessons.flatMap((l) => l.identifiers));
+  const byDay = new Map();
+  entries.forEach((entry) => {
+    const dayNumber = Number(entry.assignmentDay || 0);
+    if (!dayNumber) return;
+    if (!byDay.has(dayNumber)) {
+      byDay.set(dayNumber, {
+        dayNumber,
+        order: byDay.size,
+        goal: String(entry.goal || "").trim(),
+        topics: new Set(),
+        identifiers: [],
+      });
+    }
+    const bucket = byDay.get(dayNumber);
+    const canonicalId = String(entry.assignment_id || entry.canonicalAssignmentId || "").trim().toUpperCase();
+    if (canonicalId) bucket.identifiers.push(canonicalId);
+    if (entry.topic) bucket.topics.add(String(entry.topic).trim());
+    if (!bucket.goal && entry.goal) bucket.goal = String(entry.goal || "").trim();
+  });
+
+  const lessons = Array.from(byDay.values()).map((bucket, index) => {
+    const identifiers = Array.from(new Set(bucket.identifiers));
+    const topics = Array.from(bucket.topics).filter(Boolean);
+    const displayTitle = ensureTitleHasIdentifier(topics.join(" + "), identifiers);
+    return {
+      order: index,
+      dayNumber: bucket.dayNumber,
+      goal: bucket.goal,
+      label: `Day ${bucket.dayNumber}: ${displayTitle || `Assignment ${identifiers.join(", ")}`}`.trim(),
+      identifiers,
+    };
+  });
+
+  const plannedSet = new Set(lessons.flatMap((lesson) => lesson.identifiers));
   if (plannedSet.size > 0) {
     return { lessons, plannedSet };
   }
 
-  if (Array.isArray(plan) && plan.length) {
-    const fallbackLessons = plan.map((lesson, index) => ({
+  if (ENABLE_LEGACY_PROGRESSION_PLAN_FALLBACK) {
+    const fallbackLessons = (LEGACY_LEVEL_PROGRESSION_PLAN[normalizedLevel] || []).map((lesson, index) => ({
       order: index,
       dayNumber: lesson.dayNumber,
       label: lesson.label,
       goal: lesson.goal || "",
-      identifiers: filterValidIdentifiersForLevel(normalizedLevel, lesson.identifiers),
+      identifiers: lesson.identifiers || [],
     }));
     return {
       lessons: fallbackLessons,
@@ -494,12 +400,6 @@ const requireAuth = async (req) => {
   return decoded;
 };
 
-const normalizeLevelKey = (value = "") => {
-  const text = String(value || "").toUpperCase();
-  const match = text.match(/\b(A1|A2|B1|B2|C1|C2)\b/);
-  return (match ? match[1] : text).trim();
-};
-
 /* ----------------------------- Main handler ----------------------------- */
 
 const scoresSummaryHandler = async (req, res) => {
@@ -524,7 +424,7 @@ const scoresSummaryHandler = async (req, res) => {
       return res.status(403).json({ error: "Not authorized" });
     }
 
-    const level = normalizeLevelKey(student.level || student.course || "A1") || "A1";
+    const level = normalizeLevel(student.level || student.course || "A1") || "A1";
 
     // Build schedule targets
     const { lessons: plannedLessons, plannedSet } = getAssignmentSummary(level);
@@ -588,6 +488,10 @@ const scoresSummaryHandler = async (req, res) => {
       const explicitId = get(row, idx.assignmentId);
       const assignmentText = get(row, idx.assignment);
 
+      // Migration safety notes:
+      // - canonical-only operation requires score rows to include assignment_id in canonical LEVEL-CHAPTER form.
+      // - this fallback parser remains for legacy sheet rows where only assignment text/title was stored.
+      // - once historical sheet rows are backfilled with canonical assignment_id values, bestIdentifier parsing can be removed.
       if (explicitId) {
         const matchedExplicitId = mapToPlannedIdentifier(explicitId, plannedSet);
         if (matchedExplicitId) return matchedExplicitId;
@@ -601,7 +505,7 @@ const scoresSummaryHandler = async (req, res) => {
     rows.slice(1).forEach((row) => {
       const rowStudentCode = get(row, idx.studentCode);
       if (!rowStudentCode) return;
-      const rowLevel = normalizeLevelKey(get(row, idx.level) || "");
+      const rowLevel = normalizeLevel(get(row, idx.level) || "");
       if (rowLevel && rowLevel !== level) return;
 
       const identifier = resolveIdentifier(row);
@@ -674,7 +578,7 @@ const scoresSummaryHandler = async (req, res) => {
         };
       })
       .filter((row) => {
-        const rowLevel = normalizeLevelKey(row.level || "");
+        const rowLevel = normalizeLevel(row.level || "");
         if (!rowLevel) return true;
         return rowLevel === level;
       });
@@ -688,7 +592,7 @@ const scoresSummaryHandler = async (req, res) => {
             const explicitId = get(r, idx.assignmentId);
             const resolvedIdentifier = resolveIdentifier(r);
             const rawLevel = get(r, idx.level) || "";
-            const normalizedRowLevel = normalizeLevelKey(rawLevel);
+            const normalizedRowLevel = normalizeLevel(rawLevel);
             const levelMatches = !normalizedRowLevel || normalizedRowLevel === level;
 
             return {

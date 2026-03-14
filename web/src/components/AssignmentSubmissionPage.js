@@ -1372,13 +1372,13 @@ const AssignmentSubmissionPage = () => {
       const nowLocal = new Date();
 
       const payload = {
-        assignmentKey: selectedAssignmentId,
-        canonicalAssignmentKey: selectedAssignmentId,
+        assignmentKey: buildAssignmentId(form.assignmentTitle),
+        canonicalAssignmentKey: buildAssignmentId(form.assignmentTitle),
         title: form.assignmentTitle,
         assignmentTitle: form.assignmentTitle,
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
         chapter: deriveChapterValue(form.assignmentTitle),
-        assignmentId: selectedAssignmentId || buildAssignmentId(form.assignmentTitle),
+        assignmentId: buildAssignmentId(form.assignmentTitle),
         chapterKey: buildChapterKey(form.assignmentTitle),
         studentId: user.uid,
         studentEmail: user?.email || "",
@@ -1562,8 +1562,8 @@ const AssignmentSubmissionPage = () => {
 
     try {
       const payload = {
-        assignmentKey: selectedAssignmentId,
-        canonicalAssignmentKey: selectedAssignmentId,
+        assignmentKey: buildAssignmentId(form.assignmentTitle),
+        canonicalAssignmentKey: buildAssignmentId(form.assignmentTitle),
         title: form.assignmentTitle,
         assignmentTitle: form.assignmentTitle,
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",

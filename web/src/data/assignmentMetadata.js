@@ -1,4 +1,4 @@
-import { courseSchedules } from "./courseSchedule";
+const { CURRICULUM_BY_LEVEL } = require("./curriculumManifest");
 
 const LEVEL_PREFIX = /^(A1|A2|B1|B2|C1|C2)-/i;
 
@@ -11,55 +11,27 @@ const toCanonicalId = ({ level, value }) => {
   return level ? `${level}-${token}` : token;
 };
 
-const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
-
-const collectAssignmentBlocks = (lesson = {}) => {
-  const blocks = [];
-
-  if (lesson.assignment === true && (lesson.assignmentId || lesson.chapter)) {
-    blocks.push({
-      assignmentId: lesson.assignmentId,
-      chapter: lesson.chapter,
-    });
-  }
-
-  for (const nested of [...toArray(lesson.lesen_hören), ...toArray(lesson.schreiben_sprechen)]) {
-    if (nested?.assignment === true && (nested.assignmentId || nested.chapter)) {
-      blocks.push({
-        assignmentId: nested.assignmentId,
-        chapter: nested.chapter,
-      });
-    }
-  }
-
-  return blocks;
-};
-
-export const buildAssignmentMetadataByLevel = (schedules = courseSchedules) => {
+export const buildAssignmentMetadataByLevel = (manifestByLevel = CURRICULUM_BY_LEVEL) => {
   const byLevel = {};
 
-  Object.entries(schedules || {}).forEach(([rawLevel, lessons]) => {
+  Object.entries(manifestByLevel || {}).forEach(([rawLevel, entries]) => {
     const level = normalizeLevel(rawLevel);
     if (!level) return;
 
     const lookup = {};
-    (lessons || []).forEach((lesson) => {
-      const dayNumber = Number(lesson.day || lesson.dayNumber || 0) || null;
-      const topic = String(lesson.topic || lesson.title || "").trim();
+    (entries || []).forEach((entry) => {
+      const canonical = toCanonicalId({ level, value: entry.assignment_id || entry.canonicalAssignmentId || entry.chapter });
+      if (!canonical) return;
 
-      collectAssignmentBlocks(lesson).forEach((block) => {
-        const chapter = String(block.chapter || "").trim();
-        const canonical = toCanonicalId({ level, value: block.assignmentId || chapter });
-        if (!canonical) return;
-
-        lookup[canonical] = {
-          assignment: true,
-          assignmentDay: dayNumber,
-          chapter,
-          topic,
-          goal: String(lesson.goal || "").trim(),
-        };
-      });
+      lookup[canonical] = {
+        assignment: Boolean(entry.assignment),
+        progressionEligible: Boolean(entry.progressionEligible),
+        assignmentDay: Number(entry.assignmentDay || 0) || null,
+        chapter: String(entry.chapter || "").trim(),
+        topic: String(entry.topic || entry.title || "").trim(),
+        goal: String(entry.goal || "").trim(),
+        mode: String(entry.mode || entry.type || "").trim(),
+      };
     });
 
     byLevel[level] = lookup;

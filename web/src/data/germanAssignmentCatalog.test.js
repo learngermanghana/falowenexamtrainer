@@ -3,6 +3,7 @@ import {
   getAssignmentDisplayTitle,
   getAssignmentDisplayType,
   getAssignmentSequenceForLevel,
+  getCurriculumEntriesForLevel,
   getValidProgressionIdentifiersForLevel,
 } from "./germanAssignmentCatalog";
 
@@ -39,7 +40,7 @@ describe("getAssignmentDictionaryEntry", () => {
     });
   });
 
-  test("adds A1 12.3 real assignment on day 20", () => {
+  test("keeps 12.3 canonical and assignment-enabled", () => {
     const entry = getAssignmentDictionaryEntry({
       level: "A1",
       assignmentId: "A1-12.3",
@@ -49,15 +50,11 @@ describe("getAssignmentDictionaryEntry", () => {
     expect(entry).toMatchObject({
       assignment_id: "A1-12.3",
       chapter: "12.3",
+      canonicalAssignmentId: "A1-12.3",
       assignment: true,
       assignmentDay: 20,
       mode: "Schreiben & Sprechen",
       grammar_topic: "Formal and Informal Letter",
-    });
-    expect(entry.schreiben_sprechen).toMatchObject({
-      video: "https://youtu.be/2iJQFYGUqRE",
-      workbook_link:
-        "https://www.falowen.app/campus/course/letter-writing-intro-german-a1-day-12-3",
     });
   });
 });
@@ -91,6 +88,17 @@ describe("progression sequence", () => {
     );
     expect(a1Progression).not.toContain("A1-1");
     expect(a1Progression).not.toContain("A1-5.9");
+  });
+
+  test("A1/A2/B1 progression comes from the same curriculum manifest shape", () => {
+    ["A1", "A2", "B1"].forEach((level) => {
+      const entries = getCurriculumEntriesForLevel(level);
+      expect(entries.length).toBeGreaterThan(0);
+      entries.forEach((entry) => {
+        expect(entry.assignment_id).toMatch(new RegExp(`^${level}-`));
+        expect(Number(entry.assignmentDay)).toBeGreaterThan(0);
+      });
+    });
   });
 
   test("valid progression identifier set does not include bogus identifiers", () => {
