@@ -43,6 +43,24 @@ describe("getStatusForEntry", () => {
     expect(status).toBe("inProgress");
   });
 
+  it("prefers canonical curriculum assignment IDs over synthetic day keys", () => {
+    const status = getStatusForEntry(
+      {
+        "A1-1.1": { assignmentKey: "A1-1.1", value: "submitted" },
+      },
+      {
+        day: 2,
+        chapter: "1.1",
+        topic: "Personal Pronouns and Verb Conjugation",
+        lesen_hören: [{ assignment: true, chapter: "1.1" }],
+      },
+      "A1",
+      1
+    );
+
+    expect(status).toBe("submitted");
+  });
+
 });
 
 
