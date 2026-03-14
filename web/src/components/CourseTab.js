@@ -388,6 +388,26 @@ const getEntryAssignmentId = (entry, level, occurrence = 1) => {
 
 const isSyntheticAssignmentId = (assignmentId = "") => SYNTHETIC_ASSIGNMENT_ID_PATTERN.test(String(assignmentId || "").trim());
 
+const resolveResultCanonicalAssignmentId = (result = {}, level = "") =>
+  resolveAssignmentCanonicalKey({
+    level,
+    assignmentId: result?.assignmentId || result?.assignment_id || result?.assignmentKey,
+    assignmentTitle: result?.assignment || result?.assignmentTitle || result?.title,
+  }) || "";
+
+const filterResultsForLevel = (results = [], level = "") => {
+  const normalizedLevel = normalizeLevel(level);
+  if (!normalizedLevel) return [];
+
+  return (Array.isArray(results) ? results : []).filter((result) => {
+    const rowLevel = normalizeLevel(result?.level);
+    if (rowLevel) return rowLevel === normalizedLevel;
+
+    const canonicalId = resolveResultCanonicalAssignmentId(result, normalizedLevel);
+    return canonicalId.startsWith(`${normalizedLevel}-`);
+  });
+};
+
 const buildMissingAssignmentIdDiagnostic = ({ entry, level, occurrence, assignmentId }) => {
   const normalizedLevel = normalizeLevel(level);
   const tutorLessons = [...toLessonArray(entry?.lesen_hören), ...toLessonArray(entry?.schreiben_sprechen)].filter(
@@ -677,7 +697,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           getDocs(
             query(collection(db, DRAFT_COLLECTION), where("studentId", "==", studentId), orderBy("updatedAt", "desc"), limit(200))
           ),
-          fetchResults({ studentCode, level: selectedCourseLevel, email: studentProfile.email }),
+          fetchResults({ studentCode, email: studentProfile.email }),
         ]);
 
         const seenByDay = {};
@@ -700,11 +720,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
         const firestoreSubmissions = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
         const firestoreDrafts = draftSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const levelResults = filterResultsForLevel(resultsResponse?.results || [], selectedCourseLevel);
         const mergedProgress = mergeAssignmentProgress({
           curriculumEntries,
           firestoreDrafts,
           firestoreSubmissions,
-          sheetResults: resultsResponse?.results || [],
+          sheetResults: levelResults,
           studentCode,
         });
 
@@ -727,6 +748,51 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           scheduleWithOccurrence,
           selectedCourseLevel
         );
+
+        const isTargetStudent = String(studentCode || "").trim() === "ComfortArmah295" && selectedCourseLevel === "A1";
+        if (isTargetStudent) {
+          const targetDays = [4, 7, 8, 9, 11];
+          const dayAssignmentDiagnostics = targetDays.map((day) => {
+            const scheduleEntry = scheduleWithOccurrence.find((item) => Number(item.day) === day);
+            const assignmentId = scheduleEntry
+              ? getEntryAssignmentId(scheduleEntry, selectedCourseLevel, scheduleEntry.occurrence)
+              : "";
+            const mergedStatus = assignmentId ? byAssignmentId[assignmentId] : null;
+            const statusInfo = scheduleEntry
+              ? getAutoStatusForEntry({
+                  progressByAssignmentId: byAssignmentId,
+                  entry: scheduleEntry,
+                  level: selectedCourseLevel,
+                  occurrence: scheduleEntry.occurrence,
+                })
+              : null;
+
+            return {
+              day,
+              chapter: scheduleEntry?.chapter || null,
+              resolvedAssignmentId: assignmentId || null,
+              mergedStatus: mergedStatus?.status || null,
+              finalRenderedBadgeStatus: statusInfo?.finalStatus || statusInfo?.status || "notStarted",
+            };
+          });
+
+          const mergedKeys = Object.keys(byAssignmentId);
+          console.debug("[CourseTab][Diagnostic][ComfortArmah295][Hydration]", {
+            selectedCourseLevel,
+            fetchedResultCount: (resultsResponse?.results || []).length,
+            levelFilteredResultCount: levelResults.length,
+            mergedProgressCount: mergedProgress.length,
+            containsA1_2: mergedKeys.includes("A1-2"),
+            containsA1_3: mergedKeys.includes("A1-3"),
+            containsA1_4: mergedKeys.includes("A1-4"),
+            containsA1_5: mergedKeys.includes("A1-5"),
+            containsA1_7: mergedKeys.includes("A1-7"),
+            containsA1_8: mergedKeys.includes("A1-8"),
+            mergedProgressKeys: mergedKeys,
+            dayAssignmentDiagnostics,
+          });
+        }
+
         setMissingAssignmentDiagnostics(unresolvedTutorEntries);
         if (unresolvedTutorEntries.length) {
           console.warn("[CourseTab] Tutor-marked curriculum entries without canonical assignment IDs", {
@@ -1054,7 +1120,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const shouldLogTargetedDiagnostic =
                       String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim() === "ComfortArmah295" &&
                       selectedCourseLevel === "A1" &&
-                      [1, 2, 3, 4, 5, 6].includes(Number(entry.day));
+                      [4, 7, 8, 9, 11].includes(Number(entry.day));
 
                     if (shouldLogTargetedDiagnostic) {
                       console.debug("[CourseTab][Diagnostic][ComfortArmah295]", {
@@ -1069,7 +1135,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     }
 
                     return (
-                      <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
+                      <div key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                           <div>
                             <span style={styles.levelPill}>Day {entry.day}</span>
