@@ -160,10 +160,10 @@ const StudyCalendarPage = () => {
   ]);
 
   useEffect(() => {
-    if (!forceDownload || !isFormReady || hasDownloaded || autoDownloadTriggered.current) return;
+    if (!forceDownload || !isFormReady || autoDownloadTriggered.current) return;
     autoDownloadTriggered.current = true;
     handleDownload();
-  }, [forceDownload, handleDownload, hasDownloaded, isFormReady]);
+  }, [forceDownload, handleDownload, isFormReady]);
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
