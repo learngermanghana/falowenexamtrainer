@@ -244,11 +244,6 @@ const MyExamFilePage = () => {
       return;
     }
 
-    if (!idToken) {
-      setAssignmentState({ ...initialAssignmentState, error: "Sign in again to load your score summary." });
-      return;
-    }
-
     setAssignmentState((prev) => ({ ...prev, loading: true, error: "" }));
     try {
       const response = await fetchScoreSummary({ idToken, studentCode });
