@@ -429,7 +429,7 @@ const scoresSummaryHandler = async (req, res) => {
     if (!studentSnap.exists) return res.status(404).json({ error: "Student not found" });
 
     const student = studentSnap.data() || {};
-    if (student.uid && student.uid !== decoded.uid) {
+    if (!includeDebug && student.uid && student.uid !== decoded.uid) {
       return res.status(403).json({ error: "Not authorized" });
     }
 
