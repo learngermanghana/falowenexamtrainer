@@ -84,23 +84,27 @@ export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = {
 };
 
 
-const resolveAssignmentDisplayTitle = (entry = {}, { preferEnglish = true } = {}) =>
-  String(
+const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true } = {}) => {
+  const entry = entryParam || {};
+  return String(
     entry.topic ||
       (preferEnglish ? entry.en || entry.de : entry.de || entry.en) ||
       entry.en ||
       entry.de ||
       ""
   ).trim();
+};
 
-const resolveAssignmentDisplayType = (entry = {}, { preferEnglish = false } = {}) =>
-  String(
+const resolveAssignmentDisplayType = (entryParam = {}, { preferEnglish = false } = {}) => {
+  const entry = entryParam || {};
+  return String(
     (preferEnglish ? entry.en || entry.de : entry.de || entry.en) ||
       entry.topic ||
       entry.de ||
       entry.en ||
       ""
   ).trim();
+};
 
 export const getAssignmentDisplayTitle = (entry, options) => resolveAssignmentDisplayTitle(entry, options);
 export const getAssignmentDisplayType = (entry, options) => resolveAssignmentDisplayType(entry, options);
