@@ -537,6 +537,29 @@ const pickHigherStatus = (left, right) => {
   return rightPriority > leftPriority ? right : left;
 };
 
+const deriveMergedProgressStatus = (progress = {}) => {
+  const statusFromStatusField = toCourseTabStatus(progress.status);
+  const statusFromRawField = toCourseTabStatus(progress.rawStatus || progress.status);
+  const statusFromFlags =
+    progress.passed === true
+      ? "passed"
+      : progress.failed === true
+        ? "failed"
+        : progress.submitted === true
+          ? "submitted"
+          : progress.inProgress === true
+            ? "inProgress"
+            : "notStarted";
+
+  return {
+    statusFromStatusField,
+    statusFromRawField,
+    statusFromFlags,
+    normalizedStatus: pickHigherStatus(statusFromStatusField, statusFromRawField),
+    finalStatus: pickHigherStatus(pickHigherStatus(statusFromStatusField, statusFromRawField), statusFromFlags),
+  };
+};
+
 export const mergeCourseProgressStatuses = (localStatuses = {}, profileStatuses = {}) => {
   const merged = { ...profileStatuses };
 
@@ -586,7 +609,7 @@ export const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => 
   return "notStarted";
 };
 
-const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrence }) => {
+export const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrence }) => {
   const assignmentId = getEntryAssignmentId(entry, level, occurrence);
   const missingCanonicalAssignmentId = !assignmentId || isSyntheticAssignmentId(assignmentId);
   if (!assignmentId) {
@@ -606,16 +629,28 @@ const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrenc
       diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
     };
   }
-  const normalizedStatus = toCourseTabStatus(progress.status);
+  const derivedStatus = deriveMergedProgressStatus(progress);
 
   return {
-    status: normalizedStatus,
-    finalStatus: pickHigherStatus(normalizedStatus, toCourseTabStatus(progress.rawStatus || progress.status)),
+    status: derivedStatus.normalizedStatus,
+    finalStatus: derivedStatus.finalStatus,
     assignmentId,
     missingAssignmentId: missingCanonicalAssignmentId,
     diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
     rawStatus: progress.status,
     mergedStatus: progress,
+    statusDebug: {
+      mergedStatus: progress.status ?? null,
+      mergedPassed: progress.passed === true,
+      mergedFailed: progress.failed === true,
+      mergedSubmitted: progress.submitted === true,
+      mergedInProgress: progress.inProgress === true,
+      statusFromStatusField: derivedStatus.statusFromStatusField,
+      statusFromRawField: derivedStatus.statusFromRawField,
+      statusFromFlags: derivedStatus.statusFromFlags,
+      normalizedStatus: derivedStatus.normalizedStatus,
+      finalStatus: derivedStatus.finalStatus,
+    },
   };
 };
 
@@ -1128,6 +1163,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         chapter: entry.chapter || null,
                         resolvedAssignmentId: statusInfo.assignmentId || null,
                         mergedStatusObject: statusInfo.mergedStatus || null,
+                        mergedStatus: statusInfo.mergedStatus?.status ?? null,
+                        mergedPassed: statusInfo.mergedStatus?.passed ?? null,
+                        mergedFailed: statusInfo.mergedStatus?.failed ?? null,
+                        mergedSubmitted: statusInfo.mergedStatus?.submitted ?? null,
+                        mergedInProgress: statusInfo.mergedStatus?.inProgress ?? null,
+                        statusDebug: statusInfo.statusDebug || null,
                         isTutorMarked,
                         isPracticeOnlyEntry,
                         finalRenderedBadgeStatus: isTutorMarked ? status : "practice_only",

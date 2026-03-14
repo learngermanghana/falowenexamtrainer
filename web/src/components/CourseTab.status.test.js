@@ -1,6 +1,7 @@
 import {
   aggregateUnresolvedTutorDiagnostics,
   collectUnresolvedTutorAssignmentDiagnostics,
+  getAutoStatusForEntry,
   getStatusForEntry,
   mergeCourseProgressStatuses,
 } from "./CourseTab";
@@ -161,5 +162,73 @@ describe("unresolved tutor assignment diagnostics", () => {
       fallbackReason: "syntheticAssignmentId",
       fallbackAssignmentId: "A1-DAY-14",
     });
+  });
+});
+
+
+describe("getAutoStatusForEntry", () => {
+  const entry = {
+    day: 4,
+    chapter: "2",
+    topic: "Numbers",
+    assignment: true,
+    lesen_hören: [{ assignment: true, chapter: "2" }],
+  };
+
+  it("uses merged passed flag to produce passed final badge status", () => {
+    const statusInfo = getAutoStatusForEntry({
+      progressByAssignmentId: {
+        "A1-2": { assignmentId: "A1-2", status: "not_started", passed: true, failed: false, submitted: true, inProgress: false },
+      },
+      entry,
+      level: "A1",
+      occurrence: 1,
+    });
+
+    expect(statusInfo.assignmentId).toBe("A1-2");
+    expect(statusInfo.finalStatus).toBe("passed");
+    expect(statusInfo.statusDebug).toMatchObject({
+      mergedStatus: "not_started",
+      mergedPassed: true,
+      mergedFailed: false,
+      mergedSubmitted: true,
+      mergedInProgress: false,
+      statusFromStatusField: "notStarted",
+      statusFromFlags: "passed",
+      finalStatus: "passed",
+    });
+  });
+
+  it("maps failed/submitted/inProgress statuses from merged flags", () => {
+    const failedStatus = getAutoStatusForEntry({
+      progressByAssignmentId: {
+        "A1-2": { assignmentId: "A1-2", status: "not_started", passed: false, failed: true, submitted: true, inProgress: false },
+      },
+      entry,
+      level: "A1",
+      occurrence: 1,
+    });
+
+    const submittedStatus = getAutoStatusForEntry({
+      progressByAssignmentId: {
+        "A1-2": { assignmentId: "A1-2", status: "not_started", passed: false, failed: false, submitted: true, inProgress: false },
+      },
+      entry,
+      level: "A1",
+      occurrence: 1,
+    });
+
+    const inProgressStatus = getAutoStatusForEntry({
+      progressByAssignmentId: {
+        "A1-2": { assignmentId: "A1-2", status: "not_started", passed: false, failed: false, submitted: false, inProgress: true },
+      },
+      entry,
+      level: "A1",
+      occurrence: 1,
+    });
+
+    expect(failedStatus.finalStatus).toBe("failed");
+    expect(submittedStatus.finalStatus).toBe("submitted");
+    expect(inProgressStatus.finalStatus).toBe("inProgress");
   });
 });
