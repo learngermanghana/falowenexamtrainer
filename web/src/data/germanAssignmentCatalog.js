@@ -7,7 +7,19 @@ const {
 
 const normalizeChapter = (value) => {
   const token = String(value || "").trim();
-  return /^\d+(?:\.\d+)?$/.test(token) ? token : "";
+  if (!token) return "";
+  if (/^\d+(?:\.\d+)?$/.test(token)) return token;
+
+  const levelPrefixed = token.match(/\b(?:A1|A2|B1|B2|C1|C2)\s*[- ]\s*(\d+(?:\.\d+)?)\b/i);
+  if (levelPrefixed?.[1]) return levelPrefixed[1];
+
+  const chapterLabeled = token.match(/\b(?:chapter|kapitel|lektion|lesson|aufgabe)\s*(\d+(?:\.\d+)?)\b/i);
+  if (chapterLabeled?.[1]) return chapterLabeled[1];
+
+  const decimalToken = token.match(/\b(\d+\.\d+)\b/);
+  if (decimalToken?.[1]) return decimalToken[1];
+
+  return "";
 };
 
 const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {

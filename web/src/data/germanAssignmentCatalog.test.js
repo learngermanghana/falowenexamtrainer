@@ -57,6 +57,21 @@ describe("getAssignmentDictionaryEntry", () => {
       grammar_topic: "Formal and Informal Letter",
     });
   });
+
+  test("normalizes chapter labels from noisy schedule text", () => {
+    const entry = getAssignmentDictionaryEntry({
+      level: "A1",
+      chapter: "Kapitel 12.3 – Letter writing",
+      assignmentDay: 20,
+    });
+
+    expect(entry).toMatchObject({
+      assignment_id: "A1-12.3",
+      chapter: "12.3",
+      assignment: true,
+    });
+  });
+
 });
 
 describe("assignment display helpers", () => {
