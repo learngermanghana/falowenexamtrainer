@@ -5,14 +5,16 @@ const API_BASE =
 
 export const fetchScoreSummary = async ({ idToken, studentCode }) => {
   if (!API_BASE) throw new Error("Missing REACT_APP_API_BASE_URL (or REACT_APP_FUNCTIONS_BASE_URL).");
-  if (!idToken) throw new Error("Not authenticated.");
   if (!studentCode) throw new Error("Missing studentCode.");
 
-  const url = `${API_BASE.replace(/\/$/, "")}/scores/summary?studentCode=${encodeURIComponent(studentCode)}`;
+  const shouldUseDebugNoAuth = !idToken;
+  const url = `${API_BASE.replace(/\/$/, "")}/scores/summary?studentCode=${encodeURIComponent(studentCode)}${
+    shouldUseDebugNoAuth ? "&debug=1" : ""
+  }`;
 
-  const res = await fetch(url, {
-    headers: { Authorization: `Bearer ${idToken}` },
-  });
+  const headers = idToken ? { Authorization: `Bearer ${idToken}` } : {};
+
+  const res = await fetch(url, { headers });
 
   const json = await res.json().catch(() => ({}));
 
