@@ -3,15 +3,12 @@ import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import { useExam } from "../context/ExamContext";
-import { fetchAttendanceRecords } from "../services/attendanceService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { downloadExamReminder } from "../services/examCalendar";
-import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
 import { goetheExamLevels } from "../data/goetheExamSchedule";
-import { courseSchedulesByName } from "../data/courseSchedules";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { formatCurrency } from "../lib/formatters";
 import { jsPDF } from "jspdf";
@@ -66,8 +63,6 @@ const parseScore = (value) => {
   const num = Number(match[1]);
   return Number.isFinite(num) ? num : null;
 };
-
-const initialAttendanceState = { sessions: 0, hours: 0, records: [], loading: false, error: "" };
 
 const initialAssignmentState = {
   loading: false,
@@ -208,15 +203,9 @@ const MyExamFilePage = () => {
   const locale = i18n.language;
   const formatMoney = useCallback((value) => formatCurrency(value, { locale }), [locale]);
 
-  const [attendanceState, setAttendanceState] = useState(initialAttendanceState);
   const [assignmentState, setAssignmentState] = useState(initialAssignmentState);
   const [feedbackState, setFeedbackState] = useState(initialFeedbackState);
   const [now, setNow] = useState(() => new Date());
-  const currentMonthKey = useMemo(() => {
-    const base = new Date();
-    return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}`;
-  }, []);
-  const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 60 * 1000);
     return () => clearInterval(timer);
@@ -248,34 +237,6 @@ const MyExamFilePage = () => {
     const matchedLevels = goetheExamLevels.filter((levelInfo) => levelInfo.level === detectedLevel);
     return matchedLevels.length > 0 ? matchedLevels : goetheExamLevels;
   }, [detectedLevel, showAllLevels]);
-
-  const loadAttendance = useCallback(async () => {
-    if (!className || !studentCode) {
-      setAttendanceState({ ...initialAttendanceState, error: "Add your class and student code to view attendance." });
-      return;
-    }
-
-    // NOTE: some setups export isFirebaseConfigured as boolean, others as function.
-    // If yours is a function, change this to: if (!isFirebaseConfigured())
-    if (!isFirebaseConfigured) {
-      setAttendanceState({ ...initialAttendanceState, error: "Connect Firebase to load attendance." });
-      return;
-    }
-
-    setAttendanceState((prev) => ({ ...prev, loading: true, error: "" }));
-    try {
-      const summary = await fetchAttendanceRecords({ className, studentCode, studentUid: user?.uid, level: detectedLevel });
-      setAttendanceState({
-        sessions: summary.sessions || 0,
-        hours: summary.hours || 0,
-        records: summary.records || [],
-        loading: false,
-        error: "",
-      });
-    } catch (error) {
-      setAttendanceState({ ...initialAttendanceState, error: "Could not load attendance right now." });
-    }
-  }, [className, detectedLevel, studentCode, user?.uid]);
 
   const loadAssignments = useCallback(async () => {
     if (!studentCode) {
@@ -343,10 +304,6 @@ const MyExamFilePage = () => {
   }, [idToken, studentCode]);
 
   useEffect(() => {
-    loadAttendance();
-  }, [loadAttendance]);
-
-  useEffect(() => {
     loadAssignments();
   }, [loadAssignments]);
 
@@ -356,12 +313,11 @@ const MyExamFilePage = () => {
 
   const readiness = useMemo(() => {
     return computeExamReadiness({
-      attendanceSessions: attendanceState.sessions,
       completedAssignments: assignmentState.completed,
       totalAssignments: assignmentState.totalAssignments,
       t,
     });
-  }, [assignmentState.completed, assignmentState.totalAssignments, attendanceState.sessions, t]);
+  }, [assignmentState.completed, assignmentState.totalAssignments, t]);
 
   const lockedAssignments = useMemo(() => {
     return (assignmentState.completed || [])
@@ -375,202 +331,6 @@ const MyExamFilePage = () => {
     const latest = feedbackState.items?.[0];
     return latest?.date || latest?.created_at || latest?.createdAt || "";
   }, [feedbackState.items]);
-
-  const attendanceRecords = useMemo(() => attendanceState.records || [], [attendanceState.records]);
-  const sortedAttendanceRecords = useMemo(
-    () => attendanceRecords.slice().sort((a, b) => toTime(b) - toTime(a)),
-    [attendanceRecords]
-  );
-
-  const normalizedAttendanceRecords = useMemo(() => {
-    const scheduleDays = courseSchedulesByName[className]?.days || [];
-    const scheduleDates = scheduleDays.map((day) => toDate(day.date)).filter(Boolean);
-
-    let minYear = null;
-    let maxYear = null;
-
-    if (scheduleDates.length) {
-      minYear = Math.min(...scheduleDates.map((date) => date.getFullYear())) - 1;
-      maxYear = Math.max(...scheduleDates.map((date) => date.getFullYear())) + 1;
-    } else {
-      const currentYear = new Date().getFullYear();
-      minYear = currentYear - 2;
-      maxYear = currentYear + 2;
-    }
-
-    return sortedAttendanceRecords.filter((record) => {
-      const date = toDate(record.date);
-      if (!date) return false;
-      const year = date.getFullYear();
-      return year >= minYear && year <= maxYear;
-    });
-  }, [className, sortedAttendanceRecords]);
-
-  const monthOptions = useMemo(() => {
-    const months = new Map();
-    normalizedAttendanceRecords.forEach((record) => {
-      const date = toDate(record.date);
-      if (!date) return;
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      if (!months.has(key)) {
-        months.set(
-          key,
-          date.toLocaleDateString(locale, {
-            month: "long",
-            year: "numeric",
-          })
-        );
-      }
-    });
-    return Array.from(months.entries())
-      .sort((a, b) => b[0].localeCompare(a[0]))
-      .map(([key, label]) => ({ key, label }));
-  }, [locale, normalizedAttendanceRecords]);
-
-  useEffect(() => {
-    if (selectedMonth === "all") return;
-    if (!monthOptions.length) return;
-    if (monthOptions.some((option) => option.key === selectedMonth)) return;
-    setSelectedMonth(monthOptions[0]?.key || currentMonthKey);
-  }, [currentMonthKey, monthOptions, selectedMonth]);
-
-  const attendancePeriodLabel = useMemo(() => {
-    if (selectedMonth === "all") return "All time";
-    return monthOptions.find((option) => option.key === selectedMonth)?.label || "Selected month";
-  }, [monthOptions, selectedMonth]);
-
-  const filteredAttendanceRecords = useMemo(() => {
-    if (selectedMonth === "all") return normalizedAttendanceRecords;
-    return normalizedAttendanceRecords.filter((record) => {
-      const date = toDate(record.date);
-      if (!date) return false;
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      return key === selectedMonth;
-    });
-  }, [normalizedAttendanceRecords, selectedMonth]);
-
-  const attendanceStats = useMemo(() => {
-    return filteredAttendanceRecords.reduce(
-      (acc, record) => {
-        const status = (record.status || "").toLowerCase();
-        if (status.includes("late")) {
-          acc.late += 1;
-          acc.attended += 1;
-        } else if (status.includes("present")) {
-          acc.present += 1;
-          acc.attended += 1;
-        } else if (status.includes("absent")) {
-          acc.absent += 1;
-        } else {
-          acc.pending += 1;
-        }
-        acc.total += 1;
-        acc.hours += record.creditedHours || 0;
-        return acc;
-      },
-      {
-        total: 0,
-        attended: 0,
-        present: 0,
-        late: 0,
-        absent: 0,
-        pending: 0,
-        hours: 0,
-      }
-    );
-  }, [filteredAttendanceRecords]);
-
-  const scheduledSessions = useMemo(() => {
-    const scheduleDays = courseSchedulesByName[className]?.days || [];
-
-    if (!scheduleDays.length) {
-      return selectedMonth === "all" ? attendanceStats.total : filteredAttendanceRecords.length;
-    }
-
-    let monthStart = null;
-    let monthEnd = null;
-    if (selectedMonth !== "all") {
-      const [year, month] = selectedMonth.split("-");
-      monthStart = new Date(Number(year), Number(month) - 1, 1);
-      monthEnd = new Date(Number(year), Number(month), 0);
-    }
-
-    return scheduleDays.reduce((count, day) => {
-      const dayDate = toDate(day.date);
-      if (!dayDate) return count;
-
-      if (selectedMonth !== "all" && (dayDate < monthStart || dayDate > monthEnd)) {
-        return count;
-      }
-
-      return count + (day.sessions?.length || 0);
-    }, 0);
-  }, [attendanceStats.total, className, filteredAttendanceRecords.length, selectedMonth]);
-
-  const attendanceRate = useMemo(() => {
-    if (!scheduledSessions) return null;
-    return Math.round((attendanceStats.attended / scheduledSessions) * 100);
-  }, [attendanceStats.attended, scheduledSessions]);
-
-  const monthlyGoal = scheduledSessions || attendanceStats.total || 0;
-  const attendanceGoalProgress = useMemo(() => {
-    if (!monthlyGoal) return 0;
-    return Math.min((attendanceStats.attended / monthlyGoal) * 100, 100);
-  }, [attendanceStats.attended, monthlyGoal]);
-
-  const attendanceAlerts = useMemo(() => {
-    const alerts = [];
-    if (attendanceStats.pending > 0) {
-      alerts.push(`${attendanceStats.pending} sessions awaiting tutor confirmation.`);
-    }
-    if (attendanceStats.absent > 0) {
-      alerts.push(`${attendanceStats.absent} sessions marked absent in this period.`);
-    }
-    return alerts;
-  }, [attendanceStats.absent, attendanceStats.pending]);
-
-  const attendanceWeeks = useMemo(() => {
-    const weekMap = new Map();
-    filteredAttendanceRecords.forEach((record) => {
-      const date = toDate(record.date);
-      if (!date) return;
-      const status = (record.status || "").toLowerCase();
-      if (!status.includes("present") && !status.includes("late")) return;
-      const day = date.getDay();
-      const diff = (day + 6) % 7;
-      const weekStart = new Date(date);
-      weekStart.setDate(date.getDate() - diff);
-      weekStart.setHours(0, 0, 0, 0);
-      const key = weekStart.getTime();
-      weekMap.set(key, (weekMap.get(key) || 0) + 1);
-    });
-    const entries = Array.from(weekMap.entries())
-      .map(([key, count]) => ({ key, count }))
-      .sort((a, b) => b.key - a.key);
-    return { entries, weekMap };
-  }, [filteredAttendanceRecords]);
-
-  const currentStreak = useMemo(() => {
-    if (!attendanceWeeks.entries.length) return 0;
-    const millisInWeek = 7 * 24 * 60 * 60 * 1000;
-    let streak = 0;
-    let expectedKey = attendanceWeeks.entries[0].key;
-    while (attendanceWeeks.weekMap.has(expectedKey)) {
-      streak += 1;
-      expectedKey -= millisInWeek;
-    }
-    return streak;
-  }, [attendanceWeeks.entries, attendanceWeeks.weekMap]);
-
-  const bestWeek = useMemo(() => {
-    if (!attendanceWeeks.entries.length) return null;
-    return attendanceWeeks.entries.reduce(
-      (best, entry) => (entry.count > (best?.count || 0) ? entry : best),
-      null
-    );
-  }, [attendanceWeeks.entries]);
-
-  const recentAttendance = useMemo(() => filteredAttendanceRecords.slice(0, 5), [filteredAttendanceRecords]);
 
   const pointsSummary = useMemo(() => {
     if (assignmentState.pointsEarned === null || assignmentState.expectedPoints === null) return "Not yet";
@@ -647,62 +407,6 @@ const MyExamFilePage = () => {
     });
   };
 
-  const downloadAttendanceSummary = () => {
-    const studentName = studentProfile?.name || user?.email || "Unknown";
-    downloadSimplePdf({
-      filename: "attendance-summary.pdf",
-      title: "Falowen Learning Hub",
-      subtitle: `Attendance summary (${attendancePeriodLabel})`,
-      pairs: [
-        ["Student", studentName],
-        ["Student code", studentCode || "—"],
-        ["Class", className || "—"],
-        ["Period", attendancePeriodLabel],
-        ["Attendance rate", attendanceRate !== null ? `${attendanceRate}%` : "—"],
-        ["Sessions attended", `${attendanceStats.attended}/${scheduledSessions}`],
-        ["Hours credited", formatHours(attendanceStats.hours)],
-        ["Present", attendanceStats.present],
-        ["Late", attendanceStats.late],
-        ["Absent", attendanceStats.absent],
-        ["Pending", attendanceStats.pending],
-        ["Goal progress", `${attendanceStats.attended}/${monthlyGoal} sessions`],
-        ["Current streak", currentStreak ? `${currentStreak}-week streak` : "No streak yet"],
-        ["Best week", bestWeek ? `${bestWeek.count} sessions` : "No data yet"],
-      ],
-      footer: "Generated from the student attendance tracker. For official records, ask your tutor.",
-    });
-  };
-
-  const downloadAttendanceCsv = () => {
-    const rows = [
-      ["Date", "Session", "Duration (hrs)", "Status", "Note"],
-      ...filteredAttendanceRecords.map((record) => [
-        formatDate(record.date) || "—",
-        record.title || "Session",
-        record.hours ? record.hours.toFixed(2) : "0.00",
-        record.status || "Pending",
-        record.note || "",
-      ]),
-    ];
-
-    const escapeCsv = (value) => {
-      const text = String(value ?? "");
-      if (text.includes(",") || text.includes("\"") || text.includes("\n")) {
-        return `"${text.replace(/"/g, "\"\"")}"`;
-      }
-      return text;
-    };
-
-    const csvContent = rows.map((row) => row.map(escapeCsv).join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "attendance-summary.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <div style={{ display: "grid", gap: 12 }}>
       {/* Report header */}
@@ -712,7 +416,7 @@ const MyExamFilePage = () => {
             <p style={{ ...styles.helperText, margin: 0 }}>Exam dossier</p>
             <h2 style={{ ...styles.sectionTitle, margin: "4px 0" }}>My Exam File</h2>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              A quick report of your level, readiness, attendance, scores, and tutor feedback.
+              A quick report of your level, readiness, scores, and tutor feedback.
             </p>
           </div>
 
@@ -731,7 +435,6 @@ const MyExamFilePage = () => {
             sub={className ? `Class: ${className}` : "Add class name in your profile"}
           />
           <StatCard icon={readiness.icon || "📌"} label="Readiness" value={readiness.text} sub={readiness.detail} />
-          <StatCard icon="🧾" label="Attendance" value={`${attendanceState.sessions} sessions`} sub={`${attendanceState.hours} hours`} />
           <StatCard
             icon="🗓️"
             label="Last feedback"
@@ -967,197 +670,6 @@ const MyExamFilePage = () => {
               </div>
             </div>
           )})}
-        </div>
-      </CollapsibleCard>
-
-      {/* Attendance (collapsible) */}
-      <CollapsibleCard
-        title="Attendance summary"
-        subtitle="Sessions and hours credited to your class."
-        defaultOpen
-        right={
-          <button
-            type="button"
-            style={styles.secondaryButton}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              loadAttendance();
-            }}
-            disabled={attendanceState.loading}
-          >
-            {attendanceState.loading ? "Refreshing..." : "Refresh"}
-          </button>
-        }
-      >
-        <div style={{ display: "grid", gap: 10 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            <label style={{ display: "grid", gap: 4, fontSize: 12, color: "#6B7280" }}>
-              Month filter
-              <select
-                value={selectedMonth}
-                onChange={(event) => setSelectedMonth(event.target.value)}
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 8,
-                  border: "1px solid #e5e7eb",
-                  background: "#ffffff",
-                  fontSize: 13,
-                  fontWeight: 600,
-                }}
-              >
-                <option value="all">All time</option>
-                {monthOptions.map((option) => (
-                  <option key={option.key} value={option.key}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button type="button" style={styles.secondaryButton} onClick={downloadAttendanceSummary}>
-                📄 Download summary (PDF)
-              </button>
-              <button type="button" style={styles.secondaryButton} onClick={downloadAttendanceCsv}>
-                📥 Download summary (CSV)
-              </button>
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>✅ Sessions attended ({attendancePeriodLabel})</div>
-              <div style={{ fontSize: 22, fontWeight: 900 }}>
-                {attendanceStats.attended} / {scheduledSessions}
-              </div>
-            </div>
-            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>⏱️ Hours credited</div>
-              <div style={{ fontSize: 22, fontWeight: 900 }}>{formatHours(attendanceStats.hours)}</div>
-            </div>
-            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>📈 Attendance rate</div>
-              <div style={{ fontSize: 22, fontWeight: 900 }}>{attendanceRate !== null ? `${attendanceRate}%` : "—"}</div>
-              <div style={{ fontSize: 12, color: "#6B7280" }}>Attended vs scheduled sessions</div>
-            </div>
-          </div>
-
-          <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14, boxShadow: "0 1px 2px rgba(0,0,0,0.04)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-              <div>
-                <div style={{ ...styles.helperText, margin: 0 }}>🎯 Monthly goal progress</div>
-                <div style={{ fontSize: 18, fontWeight: 900 }}>
-                  {attendanceStats.attended}/{monthlyGoal} sessions
-                </div>
-              </div>
-              <div style={{ fontSize: 12, color: "#6B7280" }}>{attendancePeriodLabel}</div>
-            </div>
-            <div style={{ marginTop: 10, height: 10, borderRadius: 999, background: "#e5e7eb", overflow: "hidden" }}>
-              <div
-                style={{
-                  width: `${attendanceGoalProgress}%`,
-                  height: "100%",
-                  background: attendanceGoalProgress >= 100 ? "#22c55e" : "#2563eb",
-                }}
-              />
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))" }}>
-            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14 }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>✅ Present</div>
-              <div style={{ fontSize: 18, fontWeight: 900 }}>{attendanceStats.present}</div>
-            </div>
-            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14 }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>⏳ Late</div>
-              <div style={{ fontSize: 18, fontWeight: 900 }}>{attendanceStats.late}</div>
-            </div>
-            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14 }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>❌ Absent</div>
-              <div style={{ fontSize: 18, fontWeight: 900 }}>{attendanceStats.absent}</div>
-            </div>
-            <div style={{ ...styles.uploadCard, background: "#ffffff", borderRadius: 14 }}>
-              <div style={{ ...styles.helperText, margin: 0 }}>🕒 Pending</div>
-              <div style={{ fontSize: 18, fontWeight: 900 }}>{attendanceStats.pending}</div>
-            </div>
-          </div>
-
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            <span style={styles.badge}>🔥 {currentStreak ? `${currentStreak}-week streak` : "No streak yet"}</span>
-            <span style={styles.badge}>
-              🏆 Best week: {bestWeek ? `${bestWeek.count} sessions` : "No data yet"}
-            </span>
-          </div>
-
-          {attendanceAlerts.length ? (
-            <div style={styles.errorBox}>
-              <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 4 }}>
-                {attendanceAlerts.map((alert) => (
-                  <li key={alert}>{alert}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {attendanceState.error ? <div style={styles.errorBox}>{attendanceState.error}</div> : null}
-
-          <div style={{ display: "grid", gap: 10 }}>
-            <div style={{ fontWeight: 900 }}>Recent sessions</div>
-            {recentAttendance.length === 0 ? (
-              <div style={styles.helperText}>No recent sessions recorded yet.</div>
-            ) : (
-              <div style={{ display: "grid", gap: 8 }}>
-                {recentAttendance.map((record) => {
-                  const statusLabel = record.status || "Pending";
-                  const statusColor = statusLabel.toLowerCase().includes("present")
-                    ? { background: "#dcfce7", color: "#166534", borderColor: "#86efac" }
-                    : statusLabel.toLowerCase().includes("late")
-                    ? { background: "#ffedd5", color: "#9a3412", borderColor: "#fdba74" }
-                    : statusLabel.toLowerCase().includes("absent")
-                    ? { background: "#fee2e2", color: "#991b1b", borderColor: "#fecaca" }
-                    : { background: "#f3f4f6", color: "#6b7280", borderColor: "#e5e7eb" };
-                  return (
-                    <div
-                      key={record.id}
-                      style={{
-                        border: "1px solid #e5e7eb",
-                        borderRadius: 12,
-                        padding: 10,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        gap: 10,
-                        flexWrap: "wrap",
-                        background: "#ffffff",
-                      }}
-                    >
-                      <div>
-                        <div style={{ fontWeight: 800 }}>{record.title || "Session"}</div>
-                        <div style={{ fontSize: 12, color: "#6B7280" }}>
-                          {formatDate(record.date) || "Date pending"} · {record.hours ? `${record.hours.toFixed(1)} hrs` : "—"}
-                        </div>
-                      </div>
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          padding: "4px 10px",
-                          borderRadius: 999,
-                          fontSize: 12,
-                          fontWeight: 800,
-                          border: "1px solid",
-                          ...statusColor,
-                        }}
-                      >
-                        {statusLabel}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
       </CollapsibleCard>
 
