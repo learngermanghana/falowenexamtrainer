@@ -316,7 +316,7 @@ const getAssignmentSummary = (level = "A1") => {
     // nested lesen_hören
     if (Array.isArray(lesson.lesen_hören)) {
       for (const block of lesson.lesen_hören) {
-        if (isRealAssignment(block) && block.chapter) {
+        if (isRealAssignment(block) && (block.assignmentId || block.chapter)) {
           hasGeneralOrReadingAssignmentSignal = true;
           identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
         }
@@ -334,7 +334,7 @@ const getAssignmentSummary = (level = "A1") => {
     if (String(level || "").toUpperCase() !== "A1") {
       if (Array.isArray(lesson.schreiben_sprechen)) {
         for (const block of lesson.schreiben_sprechen) {
-          if (isRealAssignment(block) && block.chapter) {
+          if (isRealAssignment(block) && (block.assignmentId || block.chapter)) {
             identifiers.push(...extractCanonicalIdentifiers(block.assignmentId || block.chapter, level));
           }
         }
