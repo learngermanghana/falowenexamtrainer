@@ -6,6 +6,7 @@ import ResultHistory from "./ResultHistory";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { fetchResults } from "../services/resultsService";
+import { fetchScoreSummary } from "../services/scoreSummaryService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress, PASS_MARK } from "../utils/assignmentProgress";
@@ -166,6 +167,16 @@ const StudentResultsPage = () => {
       }));
     };
 
+    const loadLeaderboardFromSummary = async () => {
+      if (!studentCode) return null;
+      try {
+        const response = await fetchScoreSummary({ idToken, studentCode });
+        return response?.leaderboard || null;
+      } catch (summaryError) {
+        return null;
+      }
+    };
+
     const loadLeaderboardFromResultsStore = async () => {
       const response = await fetchResults({ level: studentLevel });
       if (!Array.isArray(response?.results)) return [];
@@ -184,6 +195,8 @@ const StudentResultsPage = () => {
           return;
         }
 
+        const summaryLeaderboard = await loadLeaderboardFromSummary();
+
         if (useFirestoreResults) {
           const [rows, leaderboardRows] = await Promise.all([
             loadFromResultsStore(),
@@ -191,7 +204,7 @@ const StudentResultsPage = () => {
           ]);
           if (!mounted) return;
           setResults(rows);
-          setLeaderboard(buildLeaderboard(leaderboardRows));
+          setLeaderboard(summaryLeaderboard || buildLeaderboard(leaderboardRows));
           return;
         }
 
@@ -201,7 +214,7 @@ const StudentResultsPage = () => {
           const { mine, all } = sheetResponse;
           if (!mounted) return;
           setResults(mine);
-          setLeaderboard(buildLeaderboard(all));
+          setLeaderboard(summaryLeaderboard || buildLeaderboard(all));
           return;
         }
 
@@ -210,7 +223,7 @@ const StudentResultsPage = () => {
           const rows = await loadFromApi();
           if (!mounted) return;
           setResults(rows);
-          setLeaderboard(null);
+          setLeaderboard(summaryLeaderboard);
           return;
         }
 

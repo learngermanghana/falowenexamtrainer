@@ -71,6 +71,10 @@
       "resources": "Resources",
       "study": "Study calendar",
       "file": "My Exam File"
+    },
+    "campusTabs": {
+      "speech": "Speech trainer",
+      "account": "Account & payments"
     }
   },
   "studyBuddy": {

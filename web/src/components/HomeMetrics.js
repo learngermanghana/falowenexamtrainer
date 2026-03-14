@@ -172,18 +172,31 @@ const HomeMetrics = ({ studentProfile }) => {
     }
 
     try {
-      const [attendanceResponse, scoreResponse] = await Promise.all([
+      const [attendanceResult, scoreResult] = await Promise.allSettled([
         fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey }),
         studentCode ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
       if (!isMountedRef.current) return;
 
-      setAttendance(attendanceResponse || { sessions: 0, hours: 0 });
-      setAssignmentStats(scoreResponse?.student || null);
-      setLeaderboard(scoreResponse?.leaderboard || null);
-      setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");
-      setRefreshError("");
+      if (attendanceResult.status === "fulfilled") {
+        setAttendance(attendanceResult.value || { sessions: 0, hours: 0 });
+      } else {
+        setAttendance({ sessions: 0, hours: 0 });
+      }
+
+      if (scoreResult.status === "fulfilled") {
+        const scoreResponse = scoreResult.value;
+        setAssignmentStats(scoreResponse?.student || null);
+        setLeaderboard(scoreResponse?.leaderboard || null);
+        setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");
+      } else {
+        setAssignmentStats(null);
+        setLeaderboard(null);
+        setLeaderboardGeneratedAt("");
+      }
+
+      setRefreshError(attendanceResult.status === "rejected" ? t("homeMetrics.refreshError") : "");
     } catch (error) {
       if (!isMountedRef.current) return;
       setRefreshError(t("homeMetrics.refreshError"));

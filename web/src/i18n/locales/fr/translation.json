@@ -71,6 +71,10 @@
       "resources": "Ressources",
       "study": "Calendrier d’étude",
       "file": "Mon dossier d’examen"
+    },
+    "campusTabs": {
+      "speech": "Entraînement à l’oral",
+      "account": "Compte et paiements"
     }
   },
   "studyBuddy": {
