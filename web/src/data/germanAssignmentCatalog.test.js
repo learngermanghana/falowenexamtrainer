@@ -5,23 +5,36 @@ import {
 } from "./germanAssignmentCatalog";
 
 describe("getAssignmentDictionaryEntry", () => {
-  test("adds assignment metadata and assignmentDay", () => {
+  test("adds assignment metadata and canonical assignment id", () => {
     const entry = getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1-3" });
 
     expect(entry).toMatchObject({
       topic: "Asking About Prices and Preferences",
       assignment: true,
-      assignmentDay: 7,
+      assignment_id: "A1-3",
+      canonicalAssignmentId: "A1-3",
+    });
+    expect(entry).not.toHaveProperty("assignmentDay");
+  });
+
+  test("resolves weak assignment ids using chapter-based canonical id", () => {
+    const entry = getAssignmentDictionaryEntry({ level: "A1", assignmentId: "A1 1", chapter: "0.1" });
+
+    expect(entry).toMatchObject({
+      topic: "Greetings and Asking About Well-being",
+      assignment_id: "A1-0.1",
+      canonicalAssignmentId: "A1-0.1",
     });
   });
 
-  test("resolves by chapter and provides assignmentDay for day-accurate labels", () => {
+  test("resolves by chapter", () => {
     const entry = getAssignmentDictionaryEntry({ level: "A1", chapter: "2" });
 
     expect(entry).toMatchObject({
       topic: "Numbers and Addresses",
       assignment: true,
-      assignmentDay: 4,
+      assignment_id: "A1-2",
+      canonicalAssignmentId: "A1-2",
     });
   });
 
