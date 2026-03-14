@@ -1996,6 +1996,8 @@ const normalizeCourseSchedules = (schedules) =>
       return [
         level,
         entries.map((entry) => {
+          if (!entry || typeof entry !== "object") return entry;
+
           const entryWithAssignmentId = withDictionaryMetadata(withAssignmentId(entry), level);
           const fallbackAssignmentValues = [
             entryWithAssignmentId.assignmentId,
