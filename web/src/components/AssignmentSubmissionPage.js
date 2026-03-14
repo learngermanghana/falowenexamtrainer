@@ -66,7 +66,7 @@ const normalizeIdPart = (value) =>
   String(value || "")
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9_-]/g, "_")
+    .replace(/[^a-z0-9._-]/g, "_")
     .slice(0, 120);
 
 const safeLower = (v) => String(v || "").toLowerCase();
@@ -1378,7 +1378,7 @@ const AssignmentSubmissionPage = () => {
         assignmentTitle: form.assignmentTitle,
         level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
         chapter: deriveChapterValue(form.assignmentTitle),
-        assignmentId: buildAssignmentId(form.assignmentTitle),
+        assignmentId: selectedAssignmentId || buildAssignmentId(form.assignmentTitle),
         chapterKey: buildChapterKey(form.assignmentTitle),
         studentId: user.uid,
         studentEmail: user?.email || "",
