@@ -384,14 +384,27 @@ const AssignmentSubmissionPage = () => {
     };
 
     assignmentDictionary.filter(({ assignment }) => assignment).forEach(({ label }) => addName(label));
-    addName(studentProfile?.assignmentTitle);
+    const profileAssignmentTitle = studentProfile?.assignmentTitle;
+    const profileDayNumber = deriveChapterValue(profileAssignmentTitle);
+    if (profileDayNumber !== 0) addName(profileAssignmentTitle);
 
-    if (Array.isArray(studentProfile?.assignments)) studentProfile.assignments.forEach(addName);
-    if (Array.isArray(studentProfile?.assignmentTitles)) studentProfile.assignmentTitles.forEach(addName);
+    if (Array.isArray(studentProfile?.assignments)) {
+      studentProfile.assignments.forEach((name) => {
+        const dayNumber = deriveChapterValue(name);
+        if (dayNumber !== 0) addName(name);
+      });
+    }
+    if (Array.isArray(studentProfile?.assignmentTitles)) {
+      studentProfile.assignmentTitles.forEach((name) => {
+        const dayNumber = deriveChapterValue(name);
+        if (dayNumber !== 0) addName(name);
+      });
+    }
 
     return names.length ? names : ["General submission", "Standard assignment"];
   }, [
     assignmentDictionary,
+    deriveChapterValue,
     studentProfile?.assignmentTitle,
     studentProfile?.assignmentTitles,
     studentProfile?.assignments,
@@ -1086,7 +1099,6 @@ const AssignmentSubmissionPage = () => {
       else if (progress?.status === "failed") stateLabel = isGerman ? "Wiederholen" : "Failed";
       else if (progress?.status === "submitted") stateLabel = isGerman ? "Eingereicht" : "Submitted";
       else if (hasDraft || progress?.status === "in_progress") stateLabel = isGerman ? "In Bearbeitung" : "In progress";
-      if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
       if (isNotYetAvailable) stateLabel = isGerman ? "Gesperrt (noch nicht verfügbar)" : "Locked (not yet available)";
 
       return {
@@ -1096,7 +1108,7 @@ const AssignmentSubmissionPage = () => {
         hasDraft,
         isDayZero,
         isNotYetAvailable,
-        disabled: isDayZero || isNotYetAvailable,
+        disabled: isNotYetAvailable,
       };
     });
   }, [

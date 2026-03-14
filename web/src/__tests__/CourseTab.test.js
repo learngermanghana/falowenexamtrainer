@@ -27,10 +27,16 @@ jest.mock("../data/courseSchedules", () => ({
               grammarbook_link: grammarbookLink,
               workbook_link: workbookLink,
             },
+          ],
+        },
+        {
+          dayNumber: 2,
+          sessions: [
             {
-              chapter: "1.1",
+              chapter: "1.2",
               type: "Lesen & Hören",
-              note: "Bring workbook.",
+              assignment: false,
+              note: "Self-practice review.",
               youtube_link: youtubeLink,
               grammarbook_link: grammarbookLink,
               workbook_link: workbookLink,
@@ -66,5 +72,12 @@ describe("CourseTab", () => {
 
     expect(screen.queryByRole("link", { name: /View externally/i })).not.toBeInTheDocument();
     expect(screen.queryByText("Tutor-marked assignment")).not.toBeInTheDocument();
+  });
+
+  it("shows only Practice only for self-practice entries and no assignment status badge", () => {
+    render(<CourseTab defaultLevel="Z1" />);
+
+    expect(screen.getByText("Practice only")).toBeInTheDocument();
+    expect(screen.getAllByText("Not started")).toHaveLength(1);
   });
 });
