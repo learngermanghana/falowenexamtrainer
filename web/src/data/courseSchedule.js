@@ -1905,8 +1905,16 @@ const parseAssignmentId = (...values) => {
     const raw = String(value || "").trim();
     if (!raw) continue;
 
+    const levelPrefixedMatch = raw.match(/\b(?:A1|A2|B1|B2|C1|C2)\s*[- ]\s*(\d+(?:\.\d+)?)\b/i);
+    if (levelPrefixedMatch) return levelPrefixedMatch[1];
+
+    const chapterStyleMatch = raw.match(/\b(\d+\.\d+)\b/);
+    if (chapterStyleMatch) return chapterStyleMatch[1];
+
     const explicitMatch = raw.match(/assignment\s*#?\s*(\d+(?:\.\d+)?)/i);
     if (explicitMatch) return explicitMatch[1];
+
+    if (/\bday\s+\d+\b/i.test(raw)) continue;
 
     const numericMatch = raw.match(/(\d+(?:\.\d+)?)/);
     if (numericMatch) return numericMatch[1];
