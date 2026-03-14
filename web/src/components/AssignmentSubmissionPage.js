@@ -40,6 +40,7 @@ const MIN_OBJECTIVE_CHANGED_ANSWERS = 3;
 const MAX_RESUBMISSION_TRIES = 2;
 const ACTION_COOLDOWN_MS = 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
+const CONSISTENT_SUBMIT_DICTIONARY_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
 const PASS_THRESHOLD_SCORE = 60;
 
@@ -300,83 +301,88 @@ const AssignmentSubmissionPage = () => {
     [studentCode, user?.email, user?.uid]
   );
 
-  const assignmentDictionary = useMemo(() => {
-    const levelSchedule = courseSchedules[preferredLevel] || [];
-    const catalogByComposite = new Map(
-      buildAssignmentCatalogForLevel(preferredLevel)
-        .filter((entry) => typeof entry?.day !== "undefined")
-        .map((entry) => [`${String(entry.day)}::${entry.occurrence || 1}`, entry])
-    );
-    const entriesWithLessons = levelSchedule
-      .filter((entry) => entry && typeof entry === "object" && typeof entry.day !== "undefined" && entry.topic)
-      .map((entry) => ({
-        ...entry,
-        __assignmentLessons: getAssignmentLessons(entry),
-      }));
+  const assignmentDictionary = useMemo(
+    () =>
+      CONSISTENT_SUBMIT_DICTIONARY_LEVELS.flatMap((dictionaryLevel) => {
+        const levelSchedule = courseSchedules[dictionaryLevel] || [];
+        const catalogByComposite = new Map(
+          buildAssignmentCatalogForLevel(dictionaryLevel)
+            .filter((entry) => typeof entry?.day !== "undefined")
+            .map((entry) => [`${String(entry.day)}::${entry.occurrence || 1}`, entry])
+        );
+        const entriesWithLessons = levelSchedule
+          .filter((entry) => entry && typeof entry === "object" && typeof entry.day !== "undefined" && entry.topic)
+          .map((entry) => ({
+            ...entry,
+            __assignmentLessons: getAssignmentLessons(entry),
+          }));
 
-    const duplicateCountByDay = entriesWithLessons.reduce((acc, entry) => {
-      const key = String(entry.day);
-      const count = entry.__assignmentLessons.length || 1;
-      acc[key] = (acc[key] || 0) + count;
-      return acc;
-    }, {});
+        const duplicateCountByDay = entriesWithLessons.reduce((acc, entry) => {
+          const key = String(entry.day);
+          const count = entry.__assignmentLessons.length || 1;
+          acc[key] = (acc[key] || 0) + count;
+          return acc;
+        }, {});
 
-    const seenByDay = {};
+        const seenByDay = {};
 
-    return entriesWithLessons.flatMap((entry) => {
-      const lessons = entry.__assignmentLessons.length ? entry.__assignmentLessons : [entry];
+        return entriesWithLessons.flatMap((entry) => {
+          const lessons = entry.__assignmentLessons.length ? entry.__assignmentLessons : [entry];
 
-      return lessons.map((lesson) => {
-        const dayKey = String(entry.day);
-        seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
-        const occurrence = seenByDay[dayKey];
-        const dictionaryEntry = getAssignmentDictionaryEntry({
-          level: preferredLevel,
-          assignmentId: lesson?.assignmentId || entry.assignmentId,
-          chapter: lesson?.chapter || entry.chapter,
+          return lessons.map((lesson) => {
+            const dayKey = String(entry.day);
+            seenByDay[dayKey] = (seenByDay[dayKey] || 0) + 1;
+            const occurrence = seenByDay[dayKey];
+            const dictionaryEntry = getAssignmentDictionaryEntry({
+              level: dictionaryLevel,
+              assignmentId: lesson?.assignmentId || entry.assignmentId,
+              chapter: lesson?.chapter || entry.chapter,
+            });
+            const chapter = dictionaryEntry?.chapter || lesson?.chapter || entry.chapter || "";
+            const chapterSuffix = chapter ? ` • Chapter ${chapter}` : "";
+            const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
+            const prefersEnglishTitle = dictionaryLevel === "A1";
+            const dictionaryTitle = getAssignmentDisplayTitle(dictionaryEntry, {
+              preferEnglish: prefersEnglishTitle,
+            });
+            const topicTitle = lesson?.topic || entry.topic || dictionaryTitle;
+            const lessonTypeSuffix = lesson?.lessonType ? ` • ${lesson.lessonType}` : "";
+            const label = `${dictionaryLevel} • Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}${lessonTypeSuffix}`;
+
+            return {
+              level: dictionaryLevel,
+              day: entry.day,
+              topic: topicTitle,
+              chapter,
+              occurrence,
+              label,
+              assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId || null,
+              canonicalAssignmentId:
+                catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.canonicalAssignmentId ||
+                resolveAssignmentCanonicalKey({
+                  level: dictionaryLevel,
+                  assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId,
+                  assignmentTitle: label,
+                }),
+              assignmentKey:
+                catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.assignmentKey ||
+                resolveAssignmentCanonicalKey({
+                  level: dictionaryLevel,
+                  assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId,
+                  assignmentTitle: label,
+                }),
+              assignment: isTutorMarkedSubmissionCandidate({
+                assignmentFlag: lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey,
+                dictionaryEntry,
+              }),
+              progressionEligible: dictionaryEntry?.progressionEligible !== false,
+              sourceType: lesson?.lessonType || "topLevel",
+            };
+          });
         });
-        const chapter = dictionaryEntry?.chapter || lesson?.chapter || entry.chapter || "";
-        const chapterSuffix = chapter ? ` • Chapter ${chapter}` : "";
-        const duplicateSuffix = duplicateCountByDay[dayKey] > 1 ? ` • Task ${occurrence}` : "";
-        const prefersEnglishTitle = preferredLevel === "A1";
-        const dictionaryTitle = getAssignmentDisplayTitle(dictionaryEntry, {
-          preferEnglish: prefersEnglishTitle,
-        });
-        const topicTitle = lesson?.topic || entry.topic || dictionaryTitle;
-        const lessonTypeSuffix = lesson?.lessonType ? ` • ${lesson.lessonType}` : "";
-        const label = `Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}${lessonTypeSuffix}`;
-
-        return {
-          day: entry.day,
-          topic: topicTitle,
-          chapter,
-          occurrence,
-          label,
-          assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId || null,
-          canonicalAssignmentId:
-            catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.canonicalAssignmentId ||
-            resolveAssignmentCanonicalKey({
-              level: preferredLevel,
-              assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId,
-              assignmentTitle: label,
-            }),
-          assignmentKey:
-            catalogByComposite.get(`${String(entry.day)}::${occurrence}`)?.assignmentKey ||
-            resolveAssignmentCanonicalKey({
-              level: preferredLevel,
-              assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId,
-              assignmentTitle: label,
-            }),
-          assignment: isTutorMarkedSubmissionCandidate({
-            assignmentFlag: lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey,
-            dictionaryEntry,
-          }),
-          progressionEligible: dictionaryEntry?.progressionEligible !== false,
-          sourceType: lesson?.lessonType || "topLevel",
-        };
-      });
-    });
-  }, [preferredLevel]);
+      }),
+    []
+  );
 
   const assignmentRequiredDaysLabel = useMemo(() => {
     const assignmentDays = assignmentDictionary
@@ -545,7 +551,7 @@ const AssignmentSubmissionPage = () => {
       if (!title) return null;
 
       const entry = assignmentDictionary.find((item) => item.label === title);
-      const normalizedLevel = normalizeIdPart(preferredLevel || "general");
+      const normalizedLevel = normalizeIdPart(entry?.level || preferredLevel || "general");
 
       if (entry?.canonicalAssignmentId) return entry.canonicalAssignmentId;
       if (entry?.assignmentId) return `${normalizedLevel}-${normalizeIdPart(entry.assignmentId)}`;
@@ -565,22 +571,25 @@ const AssignmentSubmissionPage = () => {
   const getLockDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
-      return `${studentScopeKey}__${normalizeIdPart(preferredLevel)}__${normalizeIdPart(chapterKey)}`;
+      const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || preferredLevel;
+      return `${studentScopeKey}__${normalizeIdPart(assignmentLevel)}__${normalizeIdPart(chapterKey)}`;
     },
-    [buildChapterKey, preferredLevel, studentScopeKey]
+    [assignmentDictionary, buildChapterKey, preferredLevel, studentScopeKey]
   );
 
   const getDraftDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
-      return `${studentScopeKey}__${normalizeIdPart(preferredLevel)}__${normalizeIdPart(chapterKey)}`;
+      const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || preferredLevel;
+      return `${studentScopeKey}__${normalizeIdPart(assignmentLevel)}__${normalizeIdPart(chapterKey)}`;
     },
-    [buildChapterKey, preferredLevel, studentScopeKey]
+    [assignmentDictionary, buildChapterKey, preferredLevel, studentScopeKey]
   );
 
   const buildSubmissionPayload = useCallback(
     (statusLabel) => {
-      const resolvedLevel = ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL";
+      const assignmentLevel = assignmentDictionary.find((item) => item.label === form.assignmentTitle)?.level || preferredLevel;
+      const resolvedLevel = ALLOWED_LEVELS.includes(assignmentLevel) ? assignmentLevel : "GENERAL";
       const resolvedAssignmentId = buildAssignmentId(form.assignmentTitle);
       const canonicalAssignmentKey = resolveAssignmentCanonicalKey({
         level: resolvedLevel,
@@ -631,6 +640,7 @@ const AssignmentSubmissionPage = () => {
       deriveChapterValue,
       form.assignmentTitle,
       form.submissionText,
+      assignmentDictionary,
       preferredLevel,
       studentCode,
       studentScopeKey,
