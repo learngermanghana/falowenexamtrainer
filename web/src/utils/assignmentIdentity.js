@@ -119,6 +119,12 @@ export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentT
   if (!fromId) return fromTitle;
   if (!fromTitle) return fromId;
 
+  const idNum = fromId.match(/-(\d+(?:\.\d+)?)$/)?.[1];
+  const titleNum = fromTitle.match(/-(\d+(?:\.\d+)?)$/)?.[1];
+  if (idNum && titleNum && idNum !== titleNum) {
+    return fromTitle;
+  }
+
   return isStructuredAssignmentId(assignmentId) ? fromId : fromTitle;
 };
 
