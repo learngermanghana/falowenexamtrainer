@@ -83,6 +83,29 @@ export const GERMAN_ASSIGNMENT_COURSE_DICTIONARY = {
   },
 };
 
+const normalizeLevel = (value) => {
+  const token = String(value || "").trim().toUpperCase();
+  return /^(A1|A2|B1|B2|C1|C2)$/.test(token) ? token : "";
+};
+
+const toCanonicalAssignmentId = ({ level, assignmentId, chapter }) => {
+  const normalizedLevel = normalizeLevel(level);
+  if (!normalizedLevel) return "";
+
+  const explicitToken = String(assignmentId || "").trim();
+  if (/^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i.test(explicitToken)) {
+    return explicitToken.toUpperCase();
+  }
+
+  const chapterToken = String(chapter || "").trim();
+  if (/^\d+(?:\.\d+)?$/.test(chapterToken)) {
+    return `${normalizedLevel}-${chapterToken}`;
+  }
+
+  const chapterFromId = explicitToken.match(/(\d+(?:\.\d+)?)/)?.[1] || "";
+  return /^\d+(?:\.\d+)?$/.test(chapterFromId) ? `${normalizedLevel}-${chapterFromId}` : "";
+};
+
 
 const resolveAssignmentDisplayTitle = (entryParam = {}, { preferEnglish = true } = {}) => {
   const entry = entryParam || {};
@@ -110,11 +133,11 @@ export const getAssignmentDisplayTitle = (entry, options) => resolveAssignmentDi
 export const getAssignmentDisplayType = (entry, options) => resolveAssignmentDisplayType(entry, options);
 
 export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter }) => {
-  const normalizedLevel = String(level || "").toUpperCase();
+  const normalizedLevel = normalizeLevel(level);
   const levelDictionary = GERMAN_ASSIGNMENT_COURSE_DICTIONARY[normalizedLevel];
   if (!levelDictionary) return null;
 
-  const canonicalId = String(assignmentId || "").toUpperCase();
+  const canonicalId = toCanonicalAssignmentId({ level: normalizedLevel, assignmentId, chapter }) || String(assignmentId || "").toUpperCase();
   const chapterToken = String(chapter || "").trim();
   const entry = (
     levelDictionary[canonicalId] ||
@@ -124,14 +147,18 @@ export const getAssignmentDictionaryEntry = ({ level, assignmentId, chapter }) =
   );
 
   if (!entry) return null;
-
-  const assignmentDay =
-    Number(entry.assignmentDay) || Number(String(entry.day || "").match(/\d+/)?.[0] || 0) || null;
+  const canonicalAssignmentId =
+    toCanonicalAssignmentId({
+      level: normalizedLevel,
+      assignmentId: canonicalId || entry.assignment_id,
+      chapter: entry.chapter,
+    }) || canonicalId;
 
   return {
     ...entry,
+    assignment_id: canonicalAssignmentId || entry.assignment_id,
+    canonicalAssignmentId: canonicalAssignmentId || null,
     assignment: entry.assignment !== false,
-    assignmentDay,
   };
 };
 
