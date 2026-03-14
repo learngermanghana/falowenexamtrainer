@@ -8,6 +8,7 @@ import ClassCalendarCard from "./ClassCalendarCard";
 import OnboardingChecklist from "./OnboardingChecklist";
 import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
+import HomeMetrics from "./HomeMetrics";
 import { fetchAnnouncements } from "../services/announcementService";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
@@ -188,6 +189,8 @@ const GeneralHome = ({
         onOpenExamFile={() => navigate("/campus/examFile")}
       />
       */}
+
+      <HomeMetrics studentProfile={studentProfile} />
 
       <OnboardingChecklist
         notificationStatus={notificationStatus}

@@ -597,6 +597,7 @@ const scoresSummaryHandler = async (req, res) => {
         student: {
           completedAssignments: [],
           missedAssignments: [],
+          jumpedAssignments: [],
           failedAssignments: [],
           failedIdentifiers: [],
           nextRecommendation: null,
@@ -649,27 +650,19 @@ const scoresSummaryHandler = async (req, res) => {
       return Number(a.order || 0) - Number(b.order || 0);
     });
 
-    const dayCompletionByDayNumber = lessonStatusByDay.reduce((acc, lesson) => {
-      const day = Number(lesson.dayNumber || 0);
-      if (!day) return acc;
-      const previous = acc.get(day) ?? true;
-      acc.set(day, previous && Boolean(lesson.isCompleted));
-      return acc;
-    }, new Map());
+    const furthestCompletedLessonIndex = lessonStatusByDay.reduce((maxIndex, lesson, index) => {
+      if (!lesson.isCompleted || lesson.hasFailed) return maxIndex;
+      return Math.max(maxIndex, index);
+    }, -1);
 
-    const sortedDayNumbers = Array.from(dayCompletionByDayNumber.keys()).sort((a, b) => a - b);
-    let lastFullyCompletedDayNumber = 0;
-    for (const dayNumber of sortedDayNumbers) {
-      if (!dayCompletionByDayNumber.get(dayNumber)) break;
-      lastFullyCompletedDayNumber = dayNumber;
-    }
-
-    // Missed items are incomplete lessons that sit before (or on) the most recent
-    // fully completed day in the student's contiguous day progression.
+    // Missed/jumped items are incomplete lessons that appear before the furthest
+    // lesson the student has already completed in schedule order.
+    // This handles A1 correctly where some days have no assignment and some days
+    // contain multiple assignment identifiers.
     const missedAssignments = lessonStatusByDay
-      .filter((l) => {
+      .filter((l, index) => {
         if (l.isCompleted || l.hasFailed) return false;
-        return Number(l.dayNumber || 0) <= lastFullyCompletedDayNumber;
+        return index < furthestCompletedLessonIndex;
       })
       .map((l) => ({
         label: l.label,
@@ -677,6 +670,10 @@ const scoresSummaryHandler = async (req, res) => {
         dayNumber: l.dayNumber,
         goal: l.goal,
       }));
+
+    // "Jumped" is a student-facing alias for previously scheduled lessons
+    // that were skipped before progressing to later days.
+    const jumpedAssignments = missedAssignments;
 
     // Failed lessons
     const failedAssignments = lessonStatusByDay
@@ -745,6 +742,7 @@ const scoresSummaryHandler = async (req, res) => {
       student: {
         completedAssignments,
         missedAssignments,
+        jumpedAssignments,
         failedAssignments,
         failedIdentifiers: Array.from(failed),
         nextRecommendation,
