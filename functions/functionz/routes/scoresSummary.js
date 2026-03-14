@@ -8,33 +8,34 @@ const admin = require("firebase-admin");
 
 const PASS_MARK = 60;
 
-const VALID_ASSIGNMENT_IDS_BY_LEVEL = {
-  A1: new Set([
-    "A1-0.1",
-    "A1-0.2",
-    "A1-1.1",
-    "A1-1.2",
-    "A1-2",
-    "A1-3",
-    "A1-4",
-    "A1-5",
-    "A1-6",
-    "A1-7",
-    "A1-8",
-    "A1-9",
-    "A1-10",
-    "A1-11",
-    "A1-12.1",
-    "A1-12.2",
-    "A1-12.3",
-    "A1-13",
-    "A1-14.1",
-  ]),
+const LEVEL_PROGRESSION_PLAN = {
+  A1: [
+    { dayNumber: 1, identifiers: ["A1-0.1"], label: "Day 1: Greetings and Asking About Well-being" },
+    { dayNumber: 2, identifiers: ["A1-0.2", "A1-1.1"], label: "Day 2: German Alphabet + Personal Pronouns" },
+    { dayNumber: 3, identifiers: ["A1-1.2"], label: "Day 3: Introducing Yourself" },
+    { dayNumber: 4, identifiers: ["A1-2"], label: "Day 4: Numbers and Addresses" },
+    { dayNumber: 7, identifiers: ["A1-3"], label: "Day 7: Asking About Prices and Preferences" },
+    { dayNumber: 8, identifiers: ["A1-4"], label: "Day 8: Countries and Languages" },
+    { dayNumber: 9, identifiers: ["A1-5"], label: "Day 9: Nominative and Accusative Cases" },
+    { dayNumber: 10, identifiers: ["A1-6"], label: "Day 10: Objects, Colors and Possessive Articles" },
+    { dayNumber: 11, identifiers: ["A1-7"], label: "Day 11: The 12 Hour Clock" },
+    { dayNumber: 12, identifiers: ["A1-8"], label: "Day 12: The 24 Hour Clock and Dates" },
+    { dayNumber: 16, identifiers: ["A1-9", "A1-10"], label: "Day 16: Food, Negation and Daily Activities" },
+    { dayNumber: 17, identifiers: ["A1-11"], label: "Day 17: Instructions and Directions" },
+    { dayNumber: 18, identifiers: ["A1-12.1", "A1-12.2"], label: "Day 18: Two-way Prepositions + Directions and Movement" },
+    { dayNumber: 20, identifiers: ["A1-12.3"], label: "Day 20: Introduction to Letter Writing 12.3" },
+    { dayNumber: 21, identifiers: ["A1-13"], label: "Day 21: Weather" },
+    { dayNumber: 22, identifiers: ["A1-14.1"], label: "Day 22: Health and Body Parts" },
+  ],
 };
 
-// IMPORTANT:
-// Create: functions/data/courseSchedule.js
-// and export `courseSchedules` from web/src/data/courseSchedule.js (copy-paste the object).
+const VALID_ASSIGNMENT_IDS_BY_LEVEL = Object.fromEntries(
+  Object.entries(LEVEL_PROGRESSION_PLAN).map(([level, lessons]) => [
+    level,
+    new Set(lessons.flatMap((lesson) => lesson.identifiers)),
+  ])
+);
+
 const { courseSchedules } = require("../../data/courseSchedule");
 
 if (!admin.apps.length) {
@@ -332,9 +333,22 @@ const shouldSkipNestedMajorOnlyAssignmentId = ({ level = "", lesson = {}, rawVal
   return lessonHasDecimalIdentifier(lesson);
 };
 
-// Build a linear list of lessons in schedule order with the identifiers that must be passed.
 const getAssignmentSummary = (level = "A1") => {
-  const schedule = courseSchedules?.[String(level || "A1").toUpperCase()] || [];
+  const normalizedLevel = String(level || "A1").toUpperCase();
+  const plan = LEVEL_PROGRESSION_PLAN[normalizedLevel];
+  if (Array.isArray(plan) && plan.length) {
+    const lessons = plan.map((lesson, index) => ({
+      order: index,
+      dayNumber: lesson.dayNumber,
+      label: lesson.label,
+      goal: lesson.goal || "",
+      identifiers: filterValidIdentifiersForLevel(normalizedLevel, lesson.identifiers),
+    }));
+    const plannedSet = new Set(lessons.flatMap((lesson) => lesson.identifiers));
+    return { lessons, plannedSet };
+  }
+
+  const schedule = courseSchedules?.[normalizedLevel] || [];
   const lessons = [];
 
   for (const lesson of schedule) {
