@@ -91,7 +91,7 @@ const getCurriculumEntriesForLevel = (level) => {
   return normalizedLevel ? [...(CURRICULUM_BY_LEVEL[normalizedLevel] || [])] : [];
 };
 
-module.exports = {
+export {
   CURRICULUM_ENTRIES,
   CURRICULUM_BY_LEVEL,
   getCurriculumEntriesForLevel,

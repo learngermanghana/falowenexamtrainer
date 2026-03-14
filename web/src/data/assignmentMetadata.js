@@ -1,4 +1,4 @@
-const { CURRICULUM_BY_LEVEL } = require("./curriculumManifest");
+import { CURRICULUM_BY_LEVEL } from "./curriculumManifest";
 
 const LEVEL_PREFIX = /^(A1|A2|B1|B2|C1|C2)-/i;
 
