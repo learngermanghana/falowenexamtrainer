@@ -1532,6 +1532,25 @@
       "error": "Could not upgrade level.",
       "maxedOut": "You're already at the highest available level.",
       "clearBalance": "Clear your current balance before moving to the next level."
+    },
+    "tabs": {
+      "overview": "Overview",
+      "studentData": "Student data",
+      "billing": "Billing",
+      "upgrade": "Upgrade"
+    },
+    "studentData": {
+      "title": "Student data",
+      "subtitle": "These are the details saved on your student profile.",
+      "fields": {
+        "name": "Name",
+        "phone": "Phone number",
+        "email": "Email",
+        "studentCode": "Student code",
+        "className": "Class",
+        "level": "Level",
+        "location": "Email location"
+      }
     }
   },
   "speechTrainer": {
