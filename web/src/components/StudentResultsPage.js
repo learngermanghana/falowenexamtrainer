@@ -8,9 +8,9 @@ import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService"
 import { fetchResults } from "../services/resultsService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { mergeAssignmentProgress, PASS_MARK } from "../utils/assignmentProgress";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
-const PASS_MARK = 60;
 const TOTAL_ASSIGNMENTS = {
   A1: 19,
   A2: 28,
@@ -255,63 +255,20 @@ const StudentResultsPage = () => {
   }, [results]);
 
   const assignmentProgress = useMemo(() => {
-    const toNumericScore = (value) => {
-      if (typeof value === "number") return Number.isFinite(value) ? value : null;
-      if (typeof value === "string") {
-        const parsed = Number(value.replace(/[^\d.+-]+/g, ""));
-        return Number.isFinite(parsed) ? parsed : null;
-      }
-      return null;
-    };
+    const merged = mergeAssignmentProgress({
+      curriculumEntries: [],
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: results,
+      studentCode,
+      passMark: PASS_MARK,
+    }).filter((entry) => String(entry.assignmentId || "").startsWith(`${trackedLevel}-`));
 
-    const buildAssignmentStatus = (levels) => {
-      const bestByAssignment = new Map();
-      const unresolvedEntries = [];
-      results.forEach((entry) => {
-        const level = String(entry.level || "").toUpperCase();
-        if (!levels.includes(level)) return;
-        const assignmentKey = resolveAssignmentCanonicalKey({
-          level,
-          assignmentId: entry.assignmentKey || entry.canonicalAssignmentKey || entry.assignmentId || entry.assignment_id,
-          assignmentTitle: entry.assignment || entry.assignmentTitle || entry.title,
-        });
-        if (!assignmentKey) {
-          unresolvedEntries.push(entry);
-          return;
-        }
-        const score = toNumericScore(entry.score);
-        const currentBest = bestByAssignment.get(assignmentKey);
-        if (score !== null && (typeof currentBest !== "number" || score > currentBest)) {
-          bestByAssignment.set(assignmentKey, score);
-        } else if (currentBest === undefined) {
-          bestByAssignment.set(assignmentKey, null);
-        }
-      });
+    const completed = merged.filter((entry) => entry.status === "passed").length;
+    const failed = merged.filter((entry) => entry.status === "failed").length;
 
-      if (unresolvedEntries.length) {
-        console.warn("Unresolved assignment keys in results rows", {
-          count: unresolvedEntries.length,
-          sample: unresolvedEntries.slice(0, 5),
-        });
-      }
-
-      let completed = 0;
-      let failed = 0;
-      bestByAssignment.forEach((bestScore) => {
-        if (typeof bestScore === "number" && bestScore >= PASS_MARK) completed += 1;
-        else failed += 1;
-      });
-
-      return {
-        completed,
-        failed,
-      };
-    };
-
-    return {
-      ...buildAssignmentStatus([trackedLevel]),
-    };
-  }, [results, trackedLevel]);
+    return { completed, failed };
+  }, [results, studentCode, trackedLevel]);
 
   const progressInsights = useMemo(() => {
     const buildProgress = (label, completed, total, failed = 0) => {

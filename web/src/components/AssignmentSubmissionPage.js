@@ -12,6 +12,7 @@ import {
   getAssignmentDisplayTitle,
 } from "../data/germanAssignmentCatalog";
 import { buildAssignmentCatalogForLevel, resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { mergeAssignmentProgress } from "../utils/assignmentProgress";
 import { fetchAnswerKeyRegistry, resolveAnswerKeySource } from "../services/answerKeyRegistryService";
 import {
   addDoc,
@@ -1007,6 +1008,43 @@ const AssignmentSubmissionPage = () => {
     };
   }, [form.assignmentTitle, preview, recentSubmissions]);
 
+  const mergedProgressByTitle = useMemo(() => {
+    const curriculumEntries = assignmentOptions.map((label) => ({
+      level: preferredLevel,
+      assignmentId: buildAssignmentId(label),
+      title: label,
+      assignmentDay: deriveChapterValue(label),
+      assignment: true,
+    }));
+
+    const firestoreDrafts = Object.entries(draftsByAssignment || {}).map(([title, draft]) => ({
+      ...(draft || {}),
+      level: preferredLevel,
+      assignmentTitle: title,
+      assignmentId: buildAssignmentId(title),
+    }));
+
+    const firestoreSubmissions = (recentSubmissions || []).map((entry) => ({
+      ...entry,
+      level: entry.level || preferredLevel,
+      assignmentId: entry.assignmentId || entry.assignment_id || entry.assignmentKey || buildAssignmentId(entry.assignmentTitle || entry.title),
+    }));
+
+    const merged = mergeAssignmentProgress({
+      curriculumEntries,
+      firestoreDrafts,
+      firestoreSubmissions,
+      sheetResults: firestoreSubmissions,
+      studentCode,
+    });
+
+    return merged.reduce((acc, entry) => {
+      const title = curriculumEntries.find((item) => item.assignmentId && item.assignmentId === entry.assignmentId)?.title;
+      if (title) acc[title] = entry;
+      return acc;
+    }, {});
+  }, [assignmentOptions, buildAssignmentId, deriveChapterValue, draftsByAssignment, preferredLevel, recentSubmissions, studentCode]);
+
   const maxUnlockedDay = useMemo(() => {
     const availableDays = recentSubmissions
       .map((entry) => Number(entry?.chapter))
@@ -1039,12 +1077,15 @@ const AssignmentSubmissionPage = () => {
         return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(opt);
       });
 
-      const submitted = Boolean((key && lockedChapters.has(key)) || hasSubmission);
-      const hasDraft = Boolean(String(draftsByAssignment?.[opt]?.submissionText || "").trim());
+      const progress = mergedProgressByTitle[opt] || null;
+      const submitted = Boolean((key && lockedChapters.has(key)) || hasSubmission || progress?.submitted);
+      const hasDraft = Boolean(progress?.hasDraft || String(draftsByAssignment?.[opt]?.submissionText || "").trim());
 
       let stateLabel = isGerman ? "Nicht gestartet" : "Not started";
-      if (hasDraft) stateLabel = isGerman ? "In Bearbeitung" : "In progress";
-      if (submitted) stateLabel = isGerman ? "Eingereicht" : "Submitted";
+      if (progress?.status === "passed") stateLabel = isGerman ? "Bestanden" : "Passed";
+      else if (progress?.status === "failed") stateLabel = isGerman ? "Wiederholen" : "Failed";
+      else if (progress?.status === "submitted") stateLabel = isGerman ? "Eingereicht" : "Submitted";
+      else if (hasDraft || progress?.status === "in_progress") stateLabel = isGerman ? "In Bearbeitung" : "In progress";
       if (isDayZero) stateLabel = isGerman ? "Nur Selbstübung (keine Abgabe)" : "Self-practice only (no submission)";
       if (isNotYetAvailable) stateLabel = isGerman ? "Gesperrt (noch nicht verfügbar)" : "Locked (not yet available)";
 
@@ -1068,6 +1109,7 @@ const AssignmentSubmissionPage = () => {
     lockedChapters,
     maxUnlockedDay,
     recentSubmissions,
+    mergedProgressByTitle,
   ]);
 
 

@@ -17,6 +17,7 @@ import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { toCourseTabStatus } from "../utils/assignmentProgress";
 import {
   db,
   doc,
@@ -327,8 +328,9 @@ export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
 
 const getStatusValue = (candidate) => {
   if (!candidate) return "";
-  if (typeof candidate === "string") return candidate;
-  if (typeof candidate.value === "string") return candidate.value;
+  if (typeof candidate === "string") return toCourseTabStatus(candidate);
+  if (typeof candidate.value === "string") return toCourseTabStatus(candidate.value);
+  if (typeof candidate.status === "string") return toCourseTabStatus(candidate.status);
   return "";
 };
 

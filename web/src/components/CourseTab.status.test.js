@@ -30,6 +30,19 @@ describe("getStatusForEntry", () => {
 
     expect(status).toBe("inProgress");
   });
+  it("maps shared resolver status names", () => {
+    const status = getStatusForEntry(
+      {
+        "A1-DAY-2": { assignmentKey: "A1-DAY-2", status: "in_progress" },
+      },
+      { day: 2, topic: "Test" },
+      "A1",
+      1
+    );
+
+    expect(status).toBe("inProgress");
+  });
+
 });
 
 
