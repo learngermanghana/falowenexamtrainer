@@ -33,8 +33,9 @@ import {
 const ASSIGNMENT_STATUSES = {
   notStarted: { key: "courseTab.status.notStarted", color: "#9ca3af" },
   inProgress: { key: "courseTab.status.inProgress", color: "#2563eb" },
+  passed: { key: "courseTab.status.passed", color: "#0f766e" },
+  failed: { key: "courseTab.status.failed", color: "#dc2626" },
   submitted: { key: "courseTab.status.submitted", color: "#16a34a" },
-  needsRedo: { key: "courseTab.status.needsRedo", color: "#dc2626" },
   milestoneComplete: { key: "courseTab.status.milestoneComplete", color: "#0f766e" },
 };
 
@@ -46,7 +47,7 @@ const hasTutorMarkedWork = (entry) => {
     toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
   );
 };
-const isTutorMarkedEntry = (entry, level) => extractLevelToken(level) === "A1" && hasTutorMarkedWork(entry);
+const isTutorMarkedEntry = (entry) => hasTutorMarkedWork(entry);
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 
@@ -500,6 +501,22 @@ const getUpdatedAtValue = (candidate) => {
   return Number.isFinite(updatedAt) ? updatedAt : 0;
 };
 
+const STATUS_PRIORITY = {
+  passed: 5,
+  failed: 4,
+  submitted: 3,
+  inProgress: 2,
+  notStarted: 1,
+};
+
+const isCompleteStatus = (status) => status === "passed" || status === "submitted" || status === "milestoneComplete";
+
+const pickHigherStatus = (left, right) => {
+  const leftPriority = STATUS_PRIORITY[left] || 0;
+  const rightPriority = STATUS_PRIORITY[right] || 0;
+  return rightPriority > leftPriority ? right : left;
+};
+
 export const mergeCourseProgressStatuses = (localStatuses = {}, profileStatuses = {}) => {
   const merged = { ...profileStatuses };
 
@@ -569,12 +586,16 @@ const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrenc
       diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
     };
   }
+  const normalizedStatus = toCourseTabStatus(progress.status);
+
   return {
-    status: toCourseTabStatus(progress.status),
+    status: normalizedStatus,
+    finalStatus: pickHigherStatus(normalizedStatus, toCourseTabStatus(progress.rawStatus || progress.status)),
     assignmentId,
     missingAssignmentId: missingCanonicalAssignmentId,
     diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
     rawStatus: progress.status,
+    mergedStatus: progress,
   };
 };
 
@@ -815,32 +836,38 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
     return sortByDay(
       schedule.filter(
-        (entry) =>
-          matchesSearch(entry) &&
-          (!assignmentsOnly || hasAssignment(entry)) &&
-          (!unfinishedOnly ||
-            getAutoStatusForEntry({
-              progressByAssignmentId: autoStatusMap,
-              entry,
-              level: selectedCourseLevel,
-              occurrence: entry.occurrence,
-            }).status !== "submitted") &&
-          matchesSkill(entry) &&
-          matchesChapter(entry)
+        (entry) => {
+          const statusInfo = getAutoStatusForEntry({
+            progressByAssignmentId: autoStatusMap,
+            entry,
+            level: selectedCourseLevel,
+            occurrence: entry.occurrence,
+          });
+          const effectiveStatus = statusInfo.finalStatus || statusInfo.status;
+
+          return (
+            matchesSearch(entry) &&
+            (!assignmentsOnly || hasAssignment(entry)) &&
+            (!unfinishedOnly || !isCompleteStatus(effectiveStatus)) &&
+            matchesSkill(entry) &&
+            matchesChapter(entry)
+          );
+        }
       )
     );
   }, [assignmentsOnly, autoStatusMap, chapterFilter, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
 
   const overview = useMemo(() => {
     const totalDays = schedule.length;
-    const completedDays = schedule.filter((entry) =>
-      getAutoStatusForEntry({
+    const completedDays = schedule.filter((entry) => {
+      const statusInfo = getAutoStatusForEntry({
         progressByAssignmentId: autoStatusMap,
         entry,
         level: selectedCourseLevel,
         occurrence: entry.occurrence,
-      }).status === "submitted"
-    ).length;
+      });
+      return isCompleteStatus(statusInfo.finalStatus || statusInfo.status);
+    }).length;
     const mostRecentUpdate = 0;
 
     return {
@@ -1018,12 +1045,28 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       level: selectedCourseLevel,
                       occurrence: entry.occurrence,
                     });
-                    const status = milestoneEntry ? "milestoneComplete" : statusInfo.status;
+                    const status = milestoneEntry ? "milestoneComplete" : statusInfo.finalStatus || statusInfo.status;
                     const entryAssignmentKey = statusInfo.assignmentId || getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
-                    const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
+                    const isTutorMarked = isTutorMarkedEntry(entry);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
                     const isPracticeOnlyEntry = !isTutorMarked;
+                    const shouldLogTargetedDiagnostic =
+                      String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim() === "ComfortArmah295" &&
+                      selectedCourseLevel === "A1" &&
+                      [1, 2, 3, 4, 5, 6].includes(Number(entry.day));
+
+                    if (shouldLogTargetedDiagnostic) {
+                      console.debug("[CourseTab][Diagnostic][ComfortArmah295]", {
+                        day: entry.day,
+                        chapter: entry.chapter || null,
+                        resolvedAssignmentId: statusInfo.assignmentId || null,
+                        mergedStatusObject: statusInfo.mergedStatus || null,
+                        isTutorMarked,
+                        isPracticeOnlyEntry,
+                        finalRenderedBadgeStatus: isTutorMarked ? status : "practice_only",
+                      });
+                    }
 
                     return (
                       <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>

@@ -339,6 +339,8 @@
     "status": {
       "notStarted": "Not started",
       "inProgress": "In progress",
+      "passed": "Passed",
+      "failed": "Failed",
       "submitted": "Submitted",
       "needsRedo": "Needs redo",
       "milestoneComplete": "Milestone complete"

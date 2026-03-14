@@ -264,10 +264,11 @@ export const mergeAssignmentProgress = ({
 export const toCourseTabStatus = (status = "") => {
   switch (String(status || "").toLowerCase()) {
     case "passed":
+      return "passed";
+    case "failed":
+      return "failed";
     case "submitted":
       return "submitted";
-    case "failed":
-      return "needsRedo";
     case "in_progress":
       return "inProgress";
     default:

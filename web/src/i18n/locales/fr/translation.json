@@ -348,6 +348,8 @@
     "status": {
       "notStarted": "Non commencé",
       "inProgress": "En cours",
+      "passed": "Réussi",
+      "failed": "Échoué",
       "submitted": "Soumis",
       "needsRedo": "À refaire",
       "milestoneComplete": "Étape clé terminée"
