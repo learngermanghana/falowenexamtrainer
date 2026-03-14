@@ -44,4 +44,12 @@ describe("assignment identity canonical keys", () => {
     ).toBe("A1-0.1");
   });
 
+  test("assignment titles ending with numeric token map to chapter/day", () => {
+    expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 Numbers 2" })).toBe("A1-2");
+    expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 Asking About Prices 3" })).toBe("A1-3");
+    expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 Countries and Languages 4" })).toBe("A1-4");
+    expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 German Cases 5" })).toBe("A1-5");
+    expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 12 Hour Clock 7" })).toBe("A1-7");
+  });
+
 });

@@ -39,6 +39,17 @@ const extractChapterTokenFromTitle = (title = "") => {
   const chapterHint = text.match(/\b(?:chapter|lektion|lesson|aufgabe)\s*(\d+(?:\.\d+)?)\b/i);
   if (chapterHint?.[1]) return chapterHint[1];
 
+  // As a final heuristic, check if the title ends with a standalone number (e.g. "A1 German Cases 5").
+  // Many older assignment titles include the day/chapter number at the end without any
+  // explicit "Day" or "Chapter" keyword. If we see a trailing number at the end of the
+  // string, treat it as the chapter/day token. We avoid matching numbers that are part of
+  // other tokens (e.g. "12 Hour Clock" should resolve to the trailing "7" in
+  // "A1 12 Hour Clock 7").
+  const trailingNumber = text.match(/(?:^|[^\d])(\d+(?:\.\d+)?)\s*$/);
+  if (trailingNumber?.[1]) {
+    return trailingNumber[1];
+  }
+
   return "";
 };
 
