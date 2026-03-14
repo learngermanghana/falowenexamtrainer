@@ -265,7 +265,7 @@ const AssignmentSubmissionPage = () => {
         .map((entry) => [`${String(entry.day)}::${entry.occurrence || 1}`, entry])
     );
     const entriesWithLessons = levelSchedule
-      .filter((entry) => typeof entry.day !== "undefined" && entry.topic)
+      .filter((entry) => entry && typeof entry === "object" && typeof entry.day !== "undefined" && entry.topic)
       .map((entry) => ({
         ...entry,
         __assignmentLessons: getAssignmentLessons(entry),
