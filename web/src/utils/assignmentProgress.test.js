@@ -205,6 +205,53 @@ describe("mergeAssignmentProgress", () => {
     });
   });
 
+  test("explicit pass state rows map A1-2/A1-3/A1-4/A1-5/A1-7 to passed even without numeric score", () => {
+    const curriculumEntries = [
+      { level: "A1", assignmentId: "2", chapter: "2", title: "Numbers", assignmentDay: 4, assignment: true },
+      { level: "A1", assignmentId: "3", chapter: "3", title: "Asking Prices", assignmentDay: 7, assignment: true },
+      { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
+      { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
+      { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+    ];
+
+    const merged = mergeAssignmentProgress({
+      curriculumEntries,
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: [
+        { assignmentId: "A1-2", studentCode: "st-1", passed: true, status: "passed" },
+        { assignmentId: "A1-3", studentCode: "st-1", passed: true, status: "passed" },
+        { assignmentId: "A1-4", studentCode: "st-1", passed: true, status: "passed" },
+        { assignmentId: "A1-5", studentCode: "st-1", passed: true, status: "passed" },
+        { assignmentId: "A1-7", studentCode: "st-1", passed: true, status: "passed" },
+      ],
+      studentCode: "st-1",
+    });
+
+    ["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"].forEach((id) => {
+      expect(merged.find((row) => row.assignmentId === id)?.status).toBe("passed");
+      expect(merged.find((row) => row.assignmentId === id)?.passed).toBe(true);
+    });
+  });
+
+  test("legacy day alias remap preserves explicit passed state and does not create not_started placeholders", () => {
+    const merged = mergeAssignmentProgress({
+      curriculumEntries: [
+        { level: "A1", assignmentId: "2", chapter: "2", title: "Numbers", assignmentDay: 4, assignment: true },
+      ],
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: [{ assignmentId: "A1-DAY-4", level: "A1", studentCode: "st-1", passed: true, status: "passed" }],
+      studentCode: "st-1",
+    });
+
+    expect(merged).toHaveLength(1);
+    expect(merged[0].assignmentId).toBe("A1-2");
+    expect(merged[0].status).toBe("passed");
+    expect(merged[0].passed).toBe(true);
+    expect(merged[0].failed).toBe(false);
+  });
+
 
   test("is level-agnostic for A2/B1 canonical IDs and preserves failed statuses", () => {
     const merged = mergeAssignmentProgress({
