@@ -417,20 +417,8 @@ const normalizeLevelKey = (value = "") => {
 
 const scoresSummaryHandler = async (req, res) => {
   try {
-    const debugRaw = String(req.query.debug || "").trim().toLowerCase();
-    const includeDebug = ["1", "true", "yes", "on"].includes(debugRaw);
-    const allowNoAuthFromEnv = String(process.env.ALLOW_SCORES_SUMMARY_NO_AUTH || "").trim() === "1";
-
-    let decoded = null;
-    if (!includeDebug && !allowNoAuthFromEnv) {
-      decoded = await requireAuth(req);
-    } else {
-      try {
-        decoded = await requireAuth(req);
-      } catch (_error) {
-        decoded = null;
-      }
-    }
+    const decoded = await requireAuth(req);
+    const includeDebug = String(req.query.debug || "").trim() === "1";
 
     const studentCode = String(req.query.studentCode || "").trim();
     const normalizedStudentCode = normalizeStudentCode(studentCode);
@@ -441,7 +429,7 @@ const scoresSummaryHandler = async (req, res) => {
     if (!studentSnap.exists) return res.status(404).json({ error: "Student not found" });
 
     const student = studentSnap.data() || {};
-    if (!includeDebug && !allowNoAuthFromEnv && student.uid && student.uid !== decoded?.uid) {
+    if (!includeDebug && student.uid && student.uid !== decoded.uid) {
       return res.status(403).json({ error: "Not authorized" });
     }
 
