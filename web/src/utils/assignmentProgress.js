@@ -39,6 +39,10 @@ export const resolveAssignmentIdWithFallback = ({
   assignmentTitle,
   fallbackKey,
 }) =>
+  // Migration safety:
+  // - canonical assignmentId should always be present on all NEW write paths.
+  // - fallbackKey exists only to keep legacy records (missing assignmentId / assignmentKey) visible.
+  // - once legacy backfill is complete, fallbackKey branches can be removed safely.
   toCanonicalAssignmentId({ assignmentId, level, assignmentTitle }) ||
   (fallbackKey ? String(fallbackKey).trim().toUpperCase() : "");
 
