@@ -60,7 +60,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
     try {
       const [attendance, score] = await Promise.all([
         fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey }),
-        idToken ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
+        fetchScoreSummary({ idToken, studentCode }),
       ]);
 
       const completedAssignments = score?.student?.completedAssignments || [];
