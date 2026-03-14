@@ -1023,6 +1023,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
                     const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
+                    const isPracticeOnlyEntry = !isTutorMarked;
 
                     return (
                       <div key={`day-${entry.day}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
@@ -1036,21 +1037,23 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           </div>
 
                           <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
-                            {showAssignmentTypeBadge ? (
+                            {showAssignmentTypeBadge && isTutorMarked ? (
                               <span
                                 style={{
                                   ...styles.badge,
-                                  background: isTutorMarked ? "#fee2e2" : "#dcfce7",
-                                  color: isTutorMarked ? "#991b1b" : "#166534",
+                                  background: "#fee2e2",
+                                  color: "#991b1b",
                                 }}
                               >
-                                {isTutorMarked ? t("courseTab.tutorMarked") : t("courseTab.selfPractice")}
+                                {t("courseTab.tutorMarked")}
                               </span>
                             ) : null}
-                            <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
-                              {t(statusMeta.key)}
-                            </span>
-                            {!isTutorMarked ? <span style={{ ...styles.helperText, margin: 0 }}>Practice only</span> : null}
+                            {isTutorMarked ? (
+                              <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
+                                {t(statusMeta.key)}
+                              </span>
+                            ) : null}
+                            {isPracticeOnlyEntry ? <span style={styles.badge}>Practice only</span> : null}
                             {isTutorMarked && statusInfo.missingAssignmentId ? (
                               <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 240 }}>
                                 Status will update soon.
