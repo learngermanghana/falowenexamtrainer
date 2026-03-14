@@ -234,6 +234,37 @@ describe("mergeAssignmentProgress", () => {
     });
   });
 
+
+
+  test("maps text-only fetched result rows for A1 later assignments into canonical buckets", () => {
+    const curriculumEntries = [
+      { level: "A1", assignmentId: "2", chapter: "2", title: "Numbers", assignmentDay: 4, assignment: true },
+      { level: "A1", assignmentId: "3", chapter: "3", title: "Asking About Prices", assignmentDay: 7, assignment: true },
+      { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
+      { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
+      { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+    ];
+
+    const merged = mergeAssignmentProgress({
+      curriculumEntries,
+      firestoreDrafts: [],
+      firestoreSubmissions: [],
+      sheetResults: [
+        { assignment: "A1 Numbers 2", studentCode: "st-1", passed: true, status: "passed" },
+        { assignment: "A1 Asking About Prices 3", studentCode: "st-1", passed: true, status: "passed" },
+        { assignment: "A1 Countries and Languages 4", studentCode: "st-1", passed: true, status: "passed" },
+        { assignment: "A1 German Cases 5", studentCode: "st-1", passed: true, status: "passed" },
+        { assignment: "A1 12 Hour Clock 7", studentCode: "st-1", passed: true, status: "passed" },
+      ],
+      studentCode: "st-1",
+    });
+
+    ["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"].forEach((id) => {
+      const row = merged.find((entry) => entry.assignmentId === id);
+      expect(row?.status).toBe("passed");
+      expect(row?.passed).toBe(true);
+    });
+  });
   test("legacy day alias remap preserves explicit passed state and does not create not_started placeholders", () => {
     const merged = mergeAssignmentProgress({
       curriculumEntries: [

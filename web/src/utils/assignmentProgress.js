@@ -36,6 +36,29 @@ const toCanonicalAssignmentId = ({ assignmentId, level, assignmentTitle }) =>
   resolveAssignmentCanonicalKey({ level, assignmentId, assignmentTitle }) || "";
 
 const DAY_ALIAS_PATTERN = /^(A1|A2|B1|B2|C1|C2)-DAY-(\d+)(?:-TASK-(\d+))?$/i;
+const LEVEL_TOKEN_PATTERN = /(A1|A2|B1|B2|C1|C2)/i;
+const TARGET_DEBUG_ASSIGNMENT_TITLES = [
+  /numbers\s*2/i,
+  /asking\s+about\s+prices\s*3/i,
+  /countries\s+and\s+languages\s*4/i,
+  /german\s+cases\s*5/i,
+  /12\s*hour\s*clock\s*7/i,
+];
+
+const inferLevelFromText = (value = "") => {
+  const match = String(value || "").toUpperCase().match(LEVEL_TOKEN_PATTERN);
+  return match?.[1] || "";
+};
+
+const inferResultLevel = (result = {}) =>
+  String(
+    result?.level ||
+      inferLevelFromText(result?.assignmentId || result?.assignment_id || result?.assignmentKey || result?.explicitId) ||
+      inferLevelFromText(result?.assignment || result?.assignmentTitle || result?.title || result?.text || result?.chapter) ||
+      ""
+  )
+    .trim()
+    .toUpperCase();
 
 const remapDayAliasToCanonicalAssignmentId = ({ canonicalAssignmentId, level }) => {
   const canonicalToken = String(canonicalAssignmentId || "").trim().toUpperCase();
@@ -262,11 +285,17 @@ export const mergeAssignmentProgress = ({
     const rowStudentCode = String(result?.studentCode || result?.studentcode || "").trim().toLowerCase();
     if (normalizedStudentCode && rowStudentCode && rowStudentCode !== normalizedStudentCode) return;
 
-    const level = String(result?.level || "").toUpperCase();
+    const level = inferResultLevel(result);
+    const rawAssignmentTitle = String(
+      result?.assignment || result?.assignmentTitle || result?.title || result?.text || ""
+    ).trim();
+    const rawAssignmentId = String(
+      result?.assignmentId || result?.assignment_id || result?.assignmentKey || result?.explicitId || ""
+    ).trim();
     const canonical = resolveAssignmentIdWithFallback({
-      assignmentId: result?.assignmentId || result?.assignment_id || result?.assignmentKey,
+      assignmentId: rawAssignmentId,
       level,
-      assignmentTitle: result?.assignment || result?.assignmentTitle || result?.title,
+      assignmentTitle: rawAssignmentTitle,
       fallbackKey: `RESULT-${index}`,
     });
     const canonicalForMerge = remapDayAliasToCanonicalAssignmentId({
@@ -275,16 +304,22 @@ export const mergeAssignmentProgress = ({
     });
 
     if (shouldRunTargetDiagnostics) {
-      const rawAssignmentKey = String(
-        result?.assignmentId || result?.assignment_id || result?.assignmentKey || ""
-      )
-        .trim()
-        .toUpperCase();
-      if (TARGET_DEBUG_ASSIGNMENT_IDS.has(canonicalForMerge) || /A1-DAY-(4|7|8|9|11)(?:-TASK-\d+)?/i.test(rawAssignmentKey)) {
-        console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][ResultRow]", {
-          rawResultRowKey: rawAssignmentKey || null,
-          resolvedCanonicalKey: canonical || null,
-          mergedCanonicalKey: canonicalForMerge || null,
+      const rawAssignmentKey = rawAssignmentId.toUpperCase();
+      const isTargetTitle = TARGET_DEBUG_ASSIGNMENT_TITLES.some((pattern) => pattern.test(rawAssignmentTitle));
+      const shouldLogTargetRow =
+        TARGET_DEBUG_ASSIGNMENT_IDS.has(canonicalForMerge) ||
+        /A1-DAY-(4|7|8|9|11)(?:-TASK-\d+)?/i.test(rawAssignmentKey) ||
+        isTargetTitle;
+      if (shouldLogTargetRow) {
+        console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][ResultRowToBucket]", {
+          rawAssignmentTitle: rawAssignmentTitle || null,
+          rawAssignmentId: rawAssignmentKey || null,
+          rawExplicitId: result?.explicitId || null,
+          rawLevel: result?.level || null,
+          rawChapter: result?.chapter || null,
+          inferredLevel: level || null,
+          derivedCanonicalKey: canonical || null,
+          finalBucketKey: canonicalForMerge || null,
           score: result?.score ?? null,
           status: result?.status ?? null,
           passed: result?.passed ?? null,
@@ -299,7 +334,25 @@ export const mergeAssignmentProgress = ({
     const bucket = ensureBucket(canonicalForMerge, { level });
     if (!bucket) return;
     bucket.resultRecords.push(result);
+
+    if (shouldRunTargetDiagnostics && TARGET_DEBUG_ASSIGNMENT_IDS.has(bucket.assignmentId)) {
+      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][BucketInsert]", {
+        assignmentId: bucket.assignmentId,
+        finalBucketKey: canonicalForMerge || null,
+        resultRecordsLength: bucket.resultRecords.length,
+      });
+    }
   });
+
+  if (shouldRunTargetDiagnostics) {
+    ["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"].forEach((assignmentId) => {
+      const bucket = byAssignmentId.get(assignmentId);
+      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][FinalBucketLengths]", {
+        assignmentId,
+        resultRecordsLength: bucket?.resultRecords?.length || 0,
+      });
+    });
+  }
 
   return Array.from(byAssignmentId.values()).map((item) => {
     const metadata = getCourseScheduleAssignmentMetadata({
