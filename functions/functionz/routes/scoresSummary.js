@@ -336,18 +336,6 @@ const shouldSkipNestedMajorOnlyAssignmentId = ({ level = "", lesson = {}, rawVal
 const getAssignmentSummary = (level = "A1") => {
   const normalizedLevel = String(level || "A1").toUpperCase();
   const plan = LEVEL_PROGRESSION_PLAN[normalizedLevel];
-  if (Array.isArray(plan) && plan.length) {
-    const lessons = plan.map((lesson, index) => ({
-      order: index,
-      dayNumber: lesson.dayNumber,
-      label: lesson.label,
-      goal: lesson.goal || "",
-      identifiers: filterValidIdentifiersForLevel(normalizedLevel, lesson.identifiers),
-    }));
-    const plannedSet = new Set(lessons.flatMap((lesson) => lesson.identifiers));
-    return { lessons, plannedSet };
-  }
-
   const schedule = courseSchedules?.[normalizedLevel] || [];
   const lessons = [];
 
@@ -429,7 +417,7 @@ const getAssignmentSummary = (level = "A1") => {
       }
     }
 
-    const clean = filterValidIdentifiersForLevel(level, Array.from(new Set(identifiers)).filter(Boolean));
+    const clean = Array.from(new Set(identifiers)).filter(Boolean);
 
     // Skip practice-only lessons (no real assignment identifiers)
     if (!clean.length) continue;
@@ -453,7 +441,25 @@ const getAssignmentSummary = (level = "A1") => {
   }
 
   const plannedSet = new Set(lessons.flatMap((l) => l.identifiers));
-  return { lessons, plannedSet };
+  if (plannedSet.size > 0) {
+    return { lessons, plannedSet };
+  }
+
+  if (Array.isArray(plan) && plan.length) {
+    const fallbackLessons = plan.map((lesson, index) => ({
+      order: index,
+      dayNumber: lesson.dayNumber,
+      label: lesson.label,
+      goal: lesson.goal || "",
+      identifiers: filterValidIdentifiersForLevel(normalizedLevel, lesson.identifiers),
+    }));
+    return {
+      lessons: fallbackLessons,
+      plannedSet: new Set(fallbackLessons.flatMap((lesson) => lesson.identifiers)),
+    };
+  }
+
+  return { lessons: [], plannedSet: new Set() };
 };
 
 /* ------------------------ Streak + auth helpers ------------------------ */

@@ -1,5 +1,6 @@
 import { classCatalog } from "./classCatalog";
 import {
+  getAssignmentDictionaryEntry,
   getAssignmentDisplayTitle,
   getAssignmentDisplayType,
   getCurriculumEntriesByDayForLevel,
@@ -40,18 +41,32 @@ const buildGeneratedDays = ({ level, classDates }) => {
   return classDates
     .map((dateEntry, index) => {
       const dayNumber = index + 1;
-      const sessions = (curriculumByDay[dayNumber] || []).map((entry) => ({
-        chapter: entry.chapter,
-        assignmentId: entry.assignment_id,
-        assignment: entry.assignment === true,
-        title: getAssignmentDisplayTitle(entry, { preferEnglish: true }),
-        type: getAssignmentDisplayType(entry),
-        mode: entry.mode,
-        instruction: entry.instruction || null,
-        goal: entry.goal || null,
-        grammar_topic: entry.grammar_topic || null,
-        resources: entry.schreiben_sprechen || null,
-      }));
+      const sessions = (curriculumByDay[dayNumber] || []).map((entry) => {
+        const dictionaryEntry =
+          getAssignmentDictionaryEntry({
+            level,
+            assignmentId: entry.assignment_id,
+            chapter: entry.chapter,
+            mode: entry.mode,
+            assignmentDay: dayNumber,
+          }) || entry;
+
+        return {
+          chapter: dictionaryEntry.chapter || entry.chapter,
+          assignmentId: dictionaryEntry.assignment_id || entry.assignment_id,
+          assignment_id: dictionaryEntry.assignment_id || entry.assignment_id,
+          canonicalAssignmentId: dictionaryEntry.assignment_id || entry.assignment_id,
+          assignment: dictionaryEntry.assignment === true,
+          assignmentDay: Number(dictionaryEntry.assignmentDay || dayNumber) || dayNumber,
+          title: getAssignmentDisplayTitle(dictionaryEntry, { preferEnglish: true }),
+          type: getAssignmentDisplayType(dictionaryEntry),
+          mode: dictionaryEntry.mode || entry.mode,
+          instruction: dictionaryEntry.instruction || entry.instruction || null,
+          goal: dictionaryEntry.goal || entry.goal || null,
+          grammar_topic: dictionaryEntry.grammar_topic || entry.grammar_topic || null,
+          resources: dictionaryEntry.schreiben_sprechen || entry.schreiben_sprechen || null,
+        };
+      });
 
       return {
         dayNumber,
