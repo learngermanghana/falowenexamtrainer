@@ -1,9 +1,9 @@
-const {
+import {
   CURRICULUM_ENTRIES,
   CURRICULUM_BY_LEVEL,
   getCurriculumEntriesForLevel,
   normalizeLevel,
-} = require("./curriculumManifest");
+} from "./curriculumManifest";
 
 const normalizeChapter = (value) => {
   const token = String(value || "").trim();
