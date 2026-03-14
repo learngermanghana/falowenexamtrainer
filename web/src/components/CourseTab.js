@@ -10,6 +10,7 @@ import {
   getAssignmentDictionaryEntry,
   getAssignmentDisplayTitle,
   getAssignmentDisplayType,
+  getCurriculumEntriesByDayForLevel,
 } from "../data/germanAssignmentCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import B2SelfLearningCourse from "./B2SelfLearningCourse";
@@ -57,6 +58,7 @@ const extractLevelToken = (value) => {
 
 const normalizeLevel = (level) => extractLevelToken(level);
 const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const SYNTHETIC_ASSIGNMENT_ID_PATTERN = /(?:-DAY-\d+(?:-TASK-\d+)?)|(?:-TITLE-)/i;
 
 const LEVEL_FALLBACK_RESOURCES = {
   A2: {
@@ -333,6 +335,25 @@ export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
 
 const getEntryAssignmentId = (entry, level, occurrence = 1) => {
   if (!entry) return "";
+  const normalizedLevel = normalizeLevel(level);
+
+  const entryDictionaryMatch =
+    getAssignmentDictionaryEntry({
+      level: normalizedLevel,
+      assignmentId: entry.assignmentId || entry.assignment_id,
+      chapter: entry.chapter,
+      assignmentDay: entry.day,
+    }) ||
+    getAssignmentDictionaryEntry({
+      level: normalizedLevel,
+      chapter: entry.chapter,
+      assignmentDay: entry.day,
+    });
+
+  if (entryDictionaryMatch?.assignment_id) {
+    return entryDictionaryMatch.assignment_id;
+  }
+
   const direct = resolveAssignmentCanonicalKey({
     level,
     assignmentId: entry.assignmentId || entry.assignment_id,
@@ -344,6 +365,15 @@ const getEntryAssignmentId = (entry, level, occurrence = 1) => {
     (lesson) => lesson?.assignment
   );
   for (const lesson of lessonCandidates) {
+    const dictionaryMatch = getAssignmentDictionaryEntry({
+      level: normalizedLevel,
+      assignmentId: lesson.assignmentId || lesson.assignment_id || entry.assignmentId || entry.assignment_id,
+      chapter: lesson.chapter || entry.chapter,
+      mode: lesson.type || lesson.mode,
+      assignmentDay: entry.day,
+    });
+    if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
+
     const resolved = resolveAssignmentCanonicalKey({
       level,
       assignmentId: lesson.assignmentId || lesson.assignment_id || lesson.chapter,
@@ -353,6 +383,39 @@ const getEntryAssignmentId = (entry, level, occurrence = 1) => {
   }
 
   return getEntryAssignmentKey(entry, level, occurrence);
+};
+
+const isSyntheticAssignmentId = (assignmentId = "") => SYNTHETIC_ASSIGNMENT_ID_PATTERN.test(String(assignmentId || "").trim());
+
+const buildMissingAssignmentIdDiagnostic = ({ entry, level, occurrence, assignmentId }) => {
+  const normalizedLevel = normalizeLevel(level);
+  const tutorLessons = [...toLessonArray(entry?.lesen_hören), ...toLessonArray(entry?.schreiben_sprechen)].filter(
+    (lesson) => lesson?.assignment
+  );
+  const curriculumDayEntries = (getCurriculumEntriesByDayForLevel(normalizedLevel)?.[Number(entry?.day)] || []).map((item) => ({
+    assignment_id: item.assignment_id,
+    chapter: item.chapter,
+    mode: item.mode,
+    assignment: item.assignment,
+  }));
+
+  return {
+    issue: "missingCanonicalAssignmentId",
+    level: normalizedLevel || level,
+    day: entry?.day ?? null,
+    occurrence,
+    topic: entry?.topic || "",
+    chapter: entry?.chapter || "",
+    fallbackAssignmentId: assignmentId || "",
+    tutorLessonCount: tutorLessons.length,
+    tutorLessons: tutorLessons.map((lesson) => ({
+      chapter: lesson?.chapter || "",
+      title: lesson?.title || "",
+      assignmentId: lesson?.assignmentId || lesson?.assignment_id || "",
+      mode: lesson?.mode || lesson?.type || "",
+    })),
+    curriculumDayEntries,
+  };
 };
 
 const getStatusValue = (candidate) => {
@@ -420,13 +483,29 @@ export const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => 
 
 const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrence }) => {
   const assignmentId = getEntryAssignmentId(entry, level, occurrence);
-  if (!assignmentId) return { status: "notStarted", assignmentId, missingAssignmentId: true };
+  const missingCanonicalAssignmentId = !assignmentId || isSyntheticAssignmentId(assignmentId);
+  if (!assignmentId) {
+    return {
+      status: "notStarted",
+      assignmentId,
+      missingAssignmentId: true,
+      diagnostics: buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }),
+    };
+  }
   const progress = progressByAssignmentId[assignmentId];
-  if (!progress) return { status: "notStarted", assignmentId, missingAssignmentId: false };
+  if (!progress) {
+    return {
+      status: "notStarted",
+      assignmentId,
+      missingAssignmentId: missingCanonicalAssignmentId,
+      diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
+    };
+  }
   return {
     status: toCourseTabStatus(progress.status),
     assignmentId,
-    missingAssignmentId: false,
+    missingAssignmentId: missingCanonicalAssignmentId,
+    diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
     rawStatus: progress.status,
   };
 };
@@ -473,6 +552,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [chapterFilter, setChapterFilter] = useState("all");
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
   const [autoStatusMap, setAutoStatusMap] = useState({});
+  const [missingAssignmentDiagnostics, setMissingAssignmentDiagnostics] = useState([]);
 
   useEffect(() => {
     const normalizedDefault = resolvedDefaultLevel;
@@ -546,14 +626,35 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         }, {});
 
         setAutoStatusMap(byAssignmentId);
+
+        const unresolvedTutorEntries = curriculumEntries.filter(
+          (entry) => entry.assignment && (!entry.assignmentId || isSyntheticAssignmentId(entry.assignmentId))
+        );
+        setMissingAssignmentDiagnostics(unresolvedTutorEntries);
+        if (unresolvedTutorEntries.length) {
+          console.warn("[CourseTab] Tutor-marked curriculum entries without canonical assignment IDs", {
+            level: selectedCourseLevel,
+            count: unresolvedTutorEntries.length,
+            entries: unresolvedTutorEntries,
+          });
+        }
       } catch (error) {
         console.error("Failed to hydrate automatic course statuses", error);
         setAutoStatusMap({});
+        setMissingAssignmentDiagnostics([]);
       }
     };
 
     hydrateAutoStatuses();
   }, [authLoading, schedules, selectedCourseLevel, studentProfile]);
+
+  useEffect(() => {
+    if (!missingAssignmentDiagnostics.length) return;
+    console.debug("[CourseTab] Missing canonical assignment diagnostics", {
+      level: selectedCourseLevel,
+      entries: missingAssignmentDiagnostics,
+    });
+  }, [missingAssignmentDiagnostics, selectedCourseLevel]);
 
   const schedule = useMemo(() => {
     const seenByDay = {};
@@ -569,6 +670,31 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   );
   const isB2SelfLearning = selectedCourseLevel === "B2";
   const isC1SelfLearning = selectedCourseLevel === "C1";
+
+  const unresolvedTutorScheduleEntries = useMemo(() => {
+    return schedule
+      .filter((entry) => isTutorMarkedEntry(entry, selectedCourseLevel))
+      .map((entry) => {
+        const assignmentId = getEntryAssignmentId(entry, selectedCourseLevel, entry.occurrence || 1);
+        if (assignmentId && !isSyntheticAssignmentId(assignmentId)) return null;
+        return buildMissingAssignmentIdDiagnostic({
+          entry,
+          level: selectedCourseLevel,
+          occurrence: entry.occurrence || 1,
+          assignmentId,
+        });
+      })
+      .filter(Boolean);
+  }, [schedule, selectedCourseLevel]);
+
+  useEffect(() => {
+    if (!unresolvedTutorScheduleEntries.length) return;
+    console.warn("[CourseTab] Tutor-marked schedule entries still using fallback assignment IDs", {
+      level: selectedCourseLevel,
+      count: unresolvedTutorScheduleEntries.length,
+      entries: unresolvedTutorScheduleEntries,
+    });
+  }, [selectedCourseLevel, unresolvedTutorScheduleEntries]);
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
@@ -846,7 +972,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             {!isTutorMarked ? <span style={{ ...styles.helperText, margin: 0 }}>Practice only</span> : null}
                             {isTutorMarked && statusInfo.missingAssignmentId ? (
                               <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 240 }}>
-                                Assignment ID missing in curriculum data. Showing Not started until synced.
+                                Status will update soon.
                               </span>
                             ) : null}
                             {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
@@ -856,15 +982,20 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 type="button"
                                 style={styles.secondaryButton}
                                 onClick={() =>
-                                  navigate(`/campus/submit?assignmentKey=${encodeURIComponent(entryAssignmentKey)}`, {
+                                  navigate(
+                                    `/campus/submit?assignmentKey=${encodeURIComponent(entryAssignmentKey)}&assignmentId=${encodeURIComponent(entryAssignmentKey)}`,
+                                    {
                                     state: {
                                       assignmentKey: entryAssignmentKey,
                                       assignmentId: entryAssignmentKey || entry.assignmentId || null,
+                                      canonicalAssignmentId: entryAssignmentKey || entry.assignmentId || null,
                                       day: entry.day,
                                       occurrence: entry.occurrence,
                                       level: selectedCourseLevel,
+                                      assignmentDiagnostics: statusInfo.diagnostics || null,
                                     },
-                                  })
+                                    }
+                                  )
                                 }
                               >
                                 Submit this assignment
