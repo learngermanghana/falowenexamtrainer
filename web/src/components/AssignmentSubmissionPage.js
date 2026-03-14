@@ -194,6 +194,16 @@ const formatCharacterCount = (count) => new Intl.NumberFormat().format(count);
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
+const toChapterSortValue = (chapter) => {
+  const token = String(chapter || "").trim();
+  if (!token) return Number.POSITIVE_INFINITY;
+
+  const parts = token.split(".").map((part) => Number(part));
+  if (!parts.every((part) => Number.isFinite(part))) return Number.POSITIVE_INFINITY;
+
+  return parts.reduce((acc, part, index) => acc + part / 10 ** (index * 2), 0);
+};
+
 const getAssignmentLessons = (entry) => {
   if (!entry || typeof entry !== "object") return [];
 
@@ -210,9 +220,31 @@ const getAssignmentLessons = (entry) => {
         ]
       : [];
 
-  const nestedAssignments = [entry.lesen_hören, entry.schreiben_sprechen]
-    .flatMap((lessonGroup) => toLessonArray(lessonGroup))
-    .filter((lesson) => lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey);
+  const nestedAssignments = [
+    { type: "Schreiben & Sprechen", items: toLessonArray(entry.schreiben_sprechen), order: 0 },
+    { type: "Lesen & Hören", items: toLessonArray(entry.lesen_hören), order: 1 },
+  ]
+    .flatMap((group) =>
+      group.items.map((lesson, index) => ({
+        ...lesson,
+        lessonType: group.type,
+        __sourceOrder: group.order,
+        __sourceIndex: index,
+      }))
+    )
+    .filter((lesson) => {
+      const explicitlyNotAssignment = lesson?.assignment === false;
+      if (explicitlyNotAssignment) return false;
+      return lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey;
+    })
+    .sort((a, b) => {
+      const chapterDiff = toChapterSortValue(a?.chapter) - toChapterSortValue(b?.chapter);
+      if (chapterDiff !== 0) return chapterDiff;
+      if ((a?.__sourceOrder || 0) !== (b?.__sourceOrder || 0)) {
+        return (a?.__sourceOrder || 0) - (b?.__sourceOrder || 0);
+      }
+      return (a?.__sourceIndex || 0) - (b?.__sourceIndex || 0);
+    });
 
   return nestedAssignments.length ? nestedAssignments : topLevelAssignment;
 };
@@ -300,7 +332,8 @@ const AssignmentSubmissionPage = () => {
           preferEnglish: prefersEnglishTitle,
         });
         const topicTitle = lesson?.topic || entry.topic || dictionaryTitle;
-        const label = `Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}`;
+        const lessonTypeSuffix = lesson?.lessonType ? ` • ${lesson.lessonType}` : "";
+        const label = `Day ${entry.day}${duplicateSuffix}: ${topicTitle}${chapterSuffix}${lessonTypeSuffix}`;
 
         return {
           day: entry.day,
