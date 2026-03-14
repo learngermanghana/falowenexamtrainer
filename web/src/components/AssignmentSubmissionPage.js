@@ -375,6 +375,17 @@ const AssignmentSubmissionPage = () => {
     return assignmentDays.map((day) => `Day ${day}`).join(", ");
   }, [assignmentDictionary]);
 
+  const deriveChapterValue = useCallback(
+    (title) => {
+      const entry = assignmentDictionary.find((item) => item.label === title);
+      if (typeof entry?.day !== "undefined") return entry.day;
+
+      const dayMatch = /^day\s*(\d+)/i.exec(title || "");
+      return dayMatch?.[1] ? Number(dayMatch[1]) : null;
+    },
+    [assignmentDictionary]
+  );
+
   const assignmentOptions = useMemo(() => {
     const names = [];
     const addName = (value) => {
@@ -488,17 +499,6 @@ const AssignmentSubmissionPage = () => {
       if (dayMatch?.[1]) return `day-${dayMatch[1]}`;
 
       return String(title).toLowerCase().trim();
-    },
-    [assignmentDictionary]
-  );
-
-  const deriveChapterValue = useCallback(
-    (title) => {
-      const entry = assignmentDictionary.find((item) => item.label === title);
-      if (typeof entry?.day !== "undefined") return entry.day;
-
-      const dayMatch = /^day\s*(\d+)/i.exec(title || "");
-      return dayMatch?.[1] ? Number(dayMatch[1]) : null;
     },
     [assignmentDictionary]
   );

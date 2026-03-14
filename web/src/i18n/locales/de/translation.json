@@ -344,6 +344,8 @@
     "status": {
       "notStarted": "Nicht begonnen",
       "inProgress": "In Bearbeitung",
+      "passed": "Bestanden",
+      "failed": "Nicht bestanden",
       "submitted": "Eingereicht",
       "needsRedo": "Neu bearbeiten",
       "milestoneComplete": "Meilenstein abgeschlossen"
