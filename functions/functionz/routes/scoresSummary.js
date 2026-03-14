@@ -417,8 +417,8 @@ const normalizeLevelKey = (value = "") => {
 
 const scoresSummaryHandler = async (req, res) => {
   try {
+    const decoded = await requireAuth(req);
     const includeDebug = String(req.query.debug || "").trim() === "1";
-    const decoded = includeDebug ? null : await requireAuth(req);
 
     const studentCode = String(req.query.studentCode || "").trim();
     const normalizedStudentCode = normalizeStudentCode(studentCode);
