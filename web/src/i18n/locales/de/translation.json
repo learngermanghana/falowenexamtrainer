@@ -71,6 +71,10 @@
       "resources": "Ressourcen",
       "study": "Lernkalender",
       "file": "Meine Prüfungsmappe"
+    },
+    "campusTabs": {
+      "speech": "Sprechtraining",
+      "account": "Konto & Zahlungen"
     }
   },
   "studyBuddy": {
