@@ -1,10 +1,30 @@
 "use strict";
 
+const path = require("path");
 const admin = require("firebase-admin");
-const {
-  getCurriculumEntriesForLevel,
-  normalizeLevel,
-} = require("../../../web/src/data/curriculumManifest");
+
+const loadCurriculumManifest = () => {
+  const candidatePaths = [
+    path.resolve(__dirname, "../../../web/src/data/curriculumManifest"),
+    path.resolve(__dirname, "../../web/src/data/curriculumManifest"),
+  ];
+
+  for (const candidatePath of candidatePaths) {
+    try {
+      return require(candidatePath);
+    } catch (error) {
+      if (error && error.code !== "MODULE_NOT_FOUND") {
+        throw error;
+      }
+    }
+  }
+
+  throw new Error(
+    `Unable to load curriculumManifest from known locations: ${candidatePaths.join(", ")}`
+  );
+};
+
+const { getCurriculumEntriesForLevel, normalizeLevel } = loadCurriculumManifest();
 
 // If you're on Node 18+ in Firebase Functions, global fetch exists.
 // If not, uncomment the next line and install node-fetch@2.
