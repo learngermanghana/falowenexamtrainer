@@ -399,6 +399,12 @@ const buildMissingAssignmentIdDiagnostic = ({ entry, level, occurrence, assignme
     assignment: item.assignment,
   }));
 
+  const fallbackReason = !assignmentId
+    ? "missingAssignmentId"
+    : isSyntheticAssignmentId(assignmentId)
+      ? "syntheticAssignmentId"
+      : "unknown";
+
   return {
     issue: "missingCanonicalAssignmentId",
     level: normalizedLevel || level,
@@ -407,6 +413,7 @@ const buildMissingAssignmentIdDiagnostic = ({ entry, level, occurrence, assignme
     topic: entry?.topic || "",
     chapter: entry?.chapter || "",
     fallbackAssignmentId: assignmentId || "",
+    fallbackReason,
     tutorLessonCount: tutorLessons.length,
     tutorLessons: tutorLessons.map((lesson) => ({
       chapter: lesson?.chapter || "",
@@ -417,6 +424,67 @@ const buildMissingAssignmentIdDiagnostic = ({ entry, level, occurrence, assignme
     curriculumDayEntries,
   };
 };
+
+const buildUnresolvedDiagnosticSignature = (diagnostic = {}) => {
+  const level = normalizeLevel(diagnostic.level) || String(diagnostic.level || "").toUpperCase();
+  const day = Number(diagnostic.day || 0) || 0;
+  const occurrence = Number(diagnostic.occurrence || 1) || 1;
+  const chapter = String(diagnostic.chapter || "").trim().toLowerCase();
+  const topic = String(diagnostic.topic || "").trim().toLowerCase();
+  const fallbackAssignmentId = String(diagnostic.fallbackAssignmentId || "").trim().toUpperCase();
+  const tutorLessonSignature = (diagnostic.tutorLessons || [])
+    .map((lesson) => `${String(lesson.chapter || "").trim().toLowerCase()}::${String(lesson.title || "").trim().toLowerCase()}`)
+    .filter(Boolean)
+    .join("|");
+
+  return [level, `day-${day}`, `task-${occurrence}`, chapter, topic, fallbackAssignmentId, tutorLessonSignature].join("::");
+};
+
+export const aggregateUnresolvedTutorDiagnostics = (diagnostics = []) => {
+  const grouped = diagnostics.reduce((acc, diagnostic) => {
+    const signature = buildUnresolvedDiagnosticSignature(diagnostic);
+    if (!acc[signature]) {
+      acc[signature] = {
+        signature,
+        occurrences: 0,
+        fallbackAssignmentIds: new Set(),
+        days: new Set(),
+        fallbackReasonCounts: {},
+        sample: diagnostic,
+      };
+    }
+
+    acc[signature].occurrences += 1;
+    if (diagnostic?.fallbackAssignmentId) acc[signature].fallbackAssignmentIds.add(diagnostic.fallbackAssignmentId);
+    if (diagnostic?.day) acc[signature].days.add(diagnostic.day);
+    const fallbackReason = String(diagnostic?.fallbackReason || "unknown");
+    acc[signature].fallbackReasonCounts[fallbackReason] = (acc[signature].fallbackReasonCounts[fallbackReason] || 0) + 1;
+    return acc;
+  }, {});
+
+  return Object.values(grouped)
+    .map((entry) => ({
+      ...entry,
+      fallbackAssignmentIds: [...entry.fallbackAssignmentIds],
+      days: [...entry.days].sort((a, b) => Number(a) - Number(b)),
+    }))
+    .sort((a, b) => b.occurrences - a.occurrences || String(a.signature).localeCompare(String(b.signature)));
+};
+
+export const collectUnresolvedTutorAssignmentDiagnostics = (schedule = [], level = "") =>
+  schedule
+    .filter((entry) => isTutorMarkedEntry(entry, level))
+    .map((entry) => {
+      const assignmentId = getEntryAssignmentId(entry, level, entry.occurrence || 1);
+      if (assignmentId && !isSyntheticAssignmentId(assignmentId)) return null;
+      return buildMissingAssignmentIdDiagnostic({
+        entry,
+        level,
+        occurrence: entry.occurrence || 1,
+        assignmentId,
+      });
+    })
+    .filter(Boolean);
 
 const getStatusValue = (candidate) => {
   if (!candidate) return "";
@@ -627,8 +695,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
         setAutoStatusMap(byAssignmentId);
 
-        const unresolvedTutorEntries = curriculumEntries.filter(
-          (entry) => entry.assignment && (!entry.assignmentId || isSyntheticAssignmentId(entry.assignmentId))
+        const diagnosticOccurrenceByDay = {};
+        const scheduleWithOccurrence = (schedules[selectedCourseLevel] || []).map((entry) => {
+          const dayKey = String(entry.day || "");
+          diagnosticOccurrenceByDay[dayKey] = (diagnosticOccurrenceByDay[dayKey] || 0) + 1;
+          return { ...entry, occurrence: diagnosticOccurrenceByDay[dayKey] };
+        });
+
+        const unresolvedTutorEntries = collectUnresolvedTutorAssignmentDiagnostics(
+          scheduleWithOccurrence,
+          selectedCourseLevel
         );
         setMissingAssignmentDiagnostics(unresolvedTutorEntries);
         if (unresolvedTutorEntries.length) {
@@ -653,6 +729,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     console.debug("[CourseTab] Missing canonical assignment diagnostics", {
       level: selectedCourseLevel,
       entries: missingAssignmentDiagnostics,
+      grouped: aggregateUnresolvedTutorDiagnostics(missingAssignmentDiagnostics),
     });
   }, [missingAssignmentDiagnostics, selectedCourseLevel]);
 
@@ -671,21 +748,23 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const isB2SelfLearning = selectedCourseLevel === "B2";
   const isC1SelfLearning = selectedCourseLevel === "C1";
 
-  const unresolvedTutorScheduleEntries = useMemo(() => {
-    return schedule
-      .filter((entry) => isTutorMarkedEntry(entry, selectedCourseLevel))
-      .map((entry) => {
-        const assignmentId = getEntryAssignmentId(entry, selectedCourseLevel, entry.occurrence || 1);
-        if (assignmentId && !isSyntheticAssignmentId(assignmentId)) return null;
-        return buildMissingAssignmentIdDiagnostic({
-          entry,
-          level: selectedCourseLevel,
-          occurrence: entry.occurrence || 1,
-          assignmentId,
-        });
-      })
-      .filter(Boolean);
-  }, [schedule, selectedCourseLevel]);
+  const unresolvedTutorScheduleEntries = useMemo(
+    () => collectUnresolvedTutorAssignmentDiagnostics(schedule, selectedCourseLevel),
+    [schedule, selectedCourseLevel]
+  );
+
+  const unresolvedTutorScheduleSummary = useMemo(
+    () => aggregateUnresolvedTutorDiagnostics(unresolvedTutorScheduleEntries),
+    [unresolvedTutorScheduleEntries]
+  );
+
+  const unresolvedTutorScheduleReasonCounts = useMemo(() => {
+    return unresolvedTutorScheduleEntries.reduce((acc, item) => {
+      const reason = String(item?.fallbackReason || "unknown");
+      acc[reason] = (acc[reason] || 0) + 1;
+      return acc;
+    }, {});
+  }, [unresolvedTutorScheduleEntries]);
 
   useEffect(() => {
     if (!unresolvedTutorScheduleEntries.length) return;
@@ -693,8 +772,10 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
       level: selectedCourseLevel,
       count: unresolvedTutorScheduleEntries.length,
       entries: unresolvedTutorScheduleEntries,
+      grouped: unresolvedTutorScheduleSummary,
+      byFallbackReason: unresolvedTutorScheduleReasonCounts,
     });
-  }, [selectedCourseLevel, unresolvedTutorScheduleEntries]);
+  }, [selectedCourseLevel, unresolvedTutorScheduleEntries, unresolvedTutorScheduleReasonCounts, unresolvedTutorScheduleSummary]);
 
   const filteredSchedule = useMemo(() => {
     const normalizedTerm = searchTerm.trim().toLowerCase();
