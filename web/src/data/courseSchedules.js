@@ -168,7 +168,7 @@ const rawCourseSchedulesByName = {
         weekday: "Friday",
         sessions: [
           { chapter: "12.1", type: "Lesen & Hören" },
-          { chapter: "12.1", type: "Schreiben & Sprechen", note: "including 5.8" },
+          { chapter: "12.2", type: "Lesen & Hören" },
         ],
       },
       {
@@ -726,7 +726,7 @@ const rawCourseSchedulesByName = {
         weekday: "Wednesday",
         sessions: [
           { chapter: "12.1", type: "Lesen & Hören" },
-          { chapter: "12.1", type: "Schreiben & Sprechen", note: "including 5.8" },
+          { chapter: "12.2", type: "Lesen & Hören" },
         ],
       },
       {
@@ -1088,7 +1088,7 @@ const rawCourseSchedulesByName = {
         weekday: "Tuesday",
         sessions: [
           { chapter: "12.1", type: "Lesen & Hören" },
-          { chapter: "12.1", type: "Schreiben & Sprechen", note: "including 5.8" },
+          { chapter: "12.2", type: "Lesen & Hören" },
         ],
       },
       {
@@ -1429,7 +1429,7 @@ const rawCourseSchedulesByName = {
         weekday: "Thursday",
         sessions: [
           { chapter: "12.1", type: "Lesen & Hören" },
-          { chapter: "12.1", type: "Schreiben & Sprechen", note: "including 5.8" },
+          { chapter: "12.2", type: "Lesen & Hören" },
         ],
       },
       {

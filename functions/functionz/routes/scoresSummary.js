@@ -8,6 +8,30 @@ const admin = require("firebase-admin");
 
 const PASS_MARK = 60;
 
+const VALID_ASSIGNMENT_IDS_BY_LEVEL = {
+  A1: new Set([
+    "A1-0.1",
+    "A1-0.2",
+    "A1-1.1",
+    "A1-1.2",
+    "A1-2",
+    "A1-3",
+    "A1-4",
+    "A1-5",
+    "A1-6",
+    "A1-7",
+    "A1-8",
+    "A1-9",
+    "A1-10",
+    "A1-11",
+    "A1-12.1",
+    "A1-12.2",
+    "A1-12.3",
+    "A1-13",
+    "A1-14.1",
+  ]),
+};
+
 // IMPORTANT:
 // Create: functions/data/courseSchedule.js
 // and export `courseSchedules` from web/src/data/courseSchedule.js (copy-paste the object).
@@ -136,6 +160,13 @@ const normalizeStudentCode = (value = "") =>
   String(value || "")
     .trim()
     .toLowerCase();
+
+const filterValidIdentifiersForLevel = (level = "", identifiers = []) => {
+  const normalizedLevel = normalizeLevelKey(level);
+  const allowList = VALID_ASSIGNMENT_IDS_BY_LEVEL[normalizedLevel];
+  if (!allowList) return identifiers;
+  return identifiers.filter((identifier) => allowList.has(String(identifier || "").toUpperCase()));
+};
 
 
 
@@ -384,7 +415,7 @@ const getAssignmentSummary = (level = "A1") => {
       }
     }
 
-    const clean = Array.from(new Set(identifiers)).filter(Boolean);
+    const clean = filterValidIdentifiersForLevel(level, Array.from(new Set(identifiers)).filter(Boolean));
 
     // Skip practice-only lessons (no real assignment identifiers)
     if (!clean.length) continue;
