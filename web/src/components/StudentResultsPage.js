@@ -6,7 +6,6 @@ import ResultHistory from "./ResultHistory";
 import { fetchStudentResultsHistory } from "../services/resultsApi";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
 import { fetchResults } from "../services/resultsService";
-import { fetchAssignmentSummary } from "../services/assignmentService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 
@@ -20,26 +19,12 @@ const TOTAL_ASSIGNMENTS = {
 };
 const TRACKED_LEVELS = Object.keys(TOTAL_ASSIGNMENTS);
 
-const labelOf = (entry) => {
-  if (!entry) return "";
-  if (typeof entry === "string") return entry;
-  return String(entry.label || entry.assignment || "").trim();
-};
-
-const formatList = (items = [], maxItems = 3) => {
-  const labels = (items || []).map(labelOf).filter(Boolean);
-  if (!labels.length) return "None";
-  if (labels.length <= maxItems) return labels.join(", ");
-  return `${labels.slice(0, maxItems).join(", ")} +${labels.length - maxItems} more`;
-};
-
 const StudentResultsPage = () => {
   const { t } = useTranslation();
   const { idToken, studentProfile } = useAuth();
 
   const [results, setResults] = useState([]);
   const [leaderboard, setLeaderboard] = useState(null);
-  const [assignmentSummary, setAssignmentSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -187,15 +172,6 @@ const StudentResultsPage = () => {
       return response.results;
     };
 
-    const buildAssignmentSummary = async (rows = []) => {
-      if (!studentCode) return null;
-      const scoreSummary = await fetchAssignmentSummary({
-        studentCode,
-        resultsRows: rows,
-      });
-      return scoreSummary?.student || null;
-    };
-
     const load = async () => {
       setLoading(true);
       setError("");
@@ -205,7 +181,6 @@ const StudentResultsPage = () => {
           if (!mounted) return;
           setResults([]);
           setLeaderboard(null);
-          setAssignmentSummary(null);
           return;
         }
 
@@ -214,11 +189,9 @@ const StudentResultsPage = () => {
             loadFromResultsStore(),
             loadLeaderboardFromResultsStore(),
           ]);
-          const scoreSummary = await buildAssignmentSummary(rows);
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(buildLeaderboard(leaderboardRows));
-          setAssignmentSummary(scoreSummary);
           return;
         }
 
@@ -226,22 +199,18 @@ const StudentResultsPage = () => {
         if (useSheetResults && SHEET_CSV_URL) {
           const sheetResponse = await loadFromSheet();
           const { mine, all } = sheetResponse;
-          const scoreSummary = await buildAssignmentSummary(mine);
           if (!mounted) return;
           setResults(mine);
           setLeaderboard(buildLeaderboard(all));
-          setAssignmentSummary(scoreSummary);
           return;
         }
 
         // Otherwise fall back to API
         if (idToken) {
           const rows = await loadFromApi();
-          const scoreSummary = await buildAssignmentSummary(rows);
           if (!mounted) return;
           setResults(rows);
           setLeaderboard(null);
-          setAssignmentSummary(scoreSummary);
           return;
         }
 
@@ -249,13 +218,11 @@ const StudentResultsPage = () => {
         if (!mounted) return;
         setResults([]);
         setLeaderboard(null);
-        setAssignmentSummary(null);
       } catch (e) {
         if (!mounted) return;
         setError(e?.message || "Failed to load results.");
         setResults([]);
         setLeaderboard(null);
-        setAssignmentSummary(null);
       } finally {
         if (mounted) setLoading(false);
       }
@@ -512,30 +479,6 @@ const StudentResultsPage = () => {
 
         {error ? <div style={styles.errorBox}>{error}</div> : null}
       </section>
-
-      {!loading && !error ? (
-        <section style={styles.card}>
-          <h3 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Assignment recommendation</h3>
-          <div style={{ display: "grid", gap: 8 }}>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              <strong>Next recommended:</strong>{" "}
-              {assignmentSummary?.recommendationBlocked
-                ? "Blocked by failed assignment"
-                : labelOf(
-                    assignmentSummary?.nextRecommendation ||
-                      assignmentSummary?.nextRecommendedAssignment
-                  ) || "All caught up"}
-            </p>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              <strong>Missed (jumped):</strong> {formatList(assignmentSummary?.missedAssignments || [])}
-            </p>
-            <p style={{ ...styles.helperText, margin: 0 }}>
-              <strong>Failed:</strong> {formatList(assignmentSummary?.failedAssignments || [])}
-            </p>
-          </div>
-        </section>
-      ) : null}
-
 
       {loading ? (
         <section style={styles.card}>
