@@ -250,6 +250,16 @@ const getAssignmentLessons = (entry) => {
   return nestedAssignments.length ? nestedAssignments : topLevelAssignment;
 };
 
+
+
+const isTutorMarkedSubmissionCandidate = ({ assignmentFlag, dictionaryEntry }) => {
+  if (dictionaryEntry) {
+    const progressionEligible = dictionaryEntry.progressionEligible !== false;
+    return Boolean(dictionaryEntry.assignment && progressionEligible);
+  }
+  return Boolean(assignmentFlag);
+};
+
 const getFeedbackFromSubmission = (entry) =>
   entry?.feedback || entry?.tutorFeedback || entry?.reviewFeedback || entry?.reviewNotes || "";
 
@@ -357,7 +367,12 @@ const AssignmentSubmissionPage = () => {
               assignmentId: dictionaryEntry?.assignment_id || lesson?.assignmentId || entry.assignmentId,
               assignmentTitle: label,
             }),
-          assignment: Boolean(lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey),
+          assignment: isTutorMarkedSubmissionCandidate({
+            assignmentFlag: lesson?.assignment || lesson?.assignmentId || lesson?.assignmentKey,
+            dictionaryEntry,
+          }),
+          progressionEligible: dictionaryEntry?.progressionEligible !== false,
+          sourceType: lesson?.lessonType || "topLevel",
         };
       });
     });
@@ -388,27 +403,48 @@ const AssignmentSubmissionPage = () => {
 
   const assignmentOptions = useMemo(() => {
     const names = [];
-    const addName = (value) => {
+    const includeDiagnostics = [];
+    const tutorMarkedLabels = new Set(
+      assignmentDictionary.filter(({ assignment, progressionEligible }) => assignment && progressionEligible).map(({ label }) => label)
+    );
+
+    const addIfTutorMarked = (value, source) => {
       if (!value) return;
       const label = value.toString();
-      if (!names.includes(label)) names.push(label);
+      if (tutorMarkedLabels.has(label)) {
+        if (!names.includes(label)) names.push(label);
+        return;
+      }
+
+      const dayNumber = deriveChapterValue(label);
+      const blockedByDayZero = dayNumber === 0;
+      includeDiagnostics.push({
+        source,
+        label,
+        dayNumber: Number.isFinite(dayNumber) ? dayNumber : null,
+        blocked: true,
+        blockedByDayZero,
+        blockedByTutorMarkedFilter: true,
+      });
     };
 
-    assignmentDictionary.filter(({ assignment }) => assignment).forEach(({ label }) => addName(label));
-    const profileAssignmentTitle = studentProfile?.assignmentTitle;
-    const profileDayNumber = deriveChapterValue(profileAssignmentTitle);
-    if (profileDayNumber !== 0) addName(profileAssignmentTitle);
+    assignmentDictionary
+      .filter(({ assignment, progressionEligible }) => assignment && progressionEligible)
+      .forEach(({ label }) => addIfTutorMarked(label, "courseSchedule"));
+
+    addIfTutorMarked(studentProfile?.assignmentTitle, "studentProfile.assignmentTitle");
 
     if (Array.isArray(studentProfile?.assignments)) {
-      studentProfile.assignments.forEach((name) => {
-        const dayNumber = deriveChapterValue(name);
-        if (dayNumber !== 0) addName(name);
-      });
+      studentProfile.assignments.forEach((name) => addIfTutorMarked(name, "studentProfile.assignments"));
     }
     if (Array.isArray(studentProfile?.assignmentTitles)) {
-      studentProfile.assignmentTitles.forEach((name) => {
-        const dayNumber = deriveChapterValue(name);
-        if (dayNumber !== 0) addName(name);
+      studentProfile.assignmentTitles.forEach((name) => addIfTutorMarked(name, "studentProfile.assignmentTitles"));
+    }
+
+    if (includeDiagnostics.length) {
+      console.debug("[AssignmentSubmissionPage][Diagnostic][FilteredNonTutorOptions]", {
+        preferredLevel,
+        blockedSources: includeDiagnostics,
       });
     }
 
@@ -416,6 +452,7 @@ const AssignmentSubmissionPage = () => {
   }, [
     assignmentDictionary,
     deriveChapterValue,
+    preferredLevel,
     studentProfile?.assignmentTitle,
     studentProfile?.assignmentTitles,
     studentProfile?.assignments,
