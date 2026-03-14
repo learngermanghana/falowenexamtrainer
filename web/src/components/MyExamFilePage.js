@@ -257,7 +257,7 @@ const MyExamFilePage = () => {
         loading: false,
         completed: student.completedAssignments || [],
         failedLessons: student.failedAssignments || [],
-        missedLessons: student.missedAssignments || [],
+        missedLessons: student.jumpedAssignments || student.missedAssignments || [],
         nextRecommendation: student.nextRecommendation || null,
         blocked: Boolean(student.recommendationBlocked),
         lastAssignment: student.lastAssignment || null,

@@ -91,6 +91,79 @@ describe("fetchAssignmentSummary recommendation flow", () => {
     expect(summary.student.recommendationBlocked).toBe(false);
     expect(summary.student.nextRecommendedAssignment?.label).toBe("Day 2: 0.2");
     expect(summary.student.nextRecommendedAssignment?.day).toBe(2);
+    expect(summary.student.jumpedAssignments).toEqual([]);
+  });
+
+
+  it("marks jumped assignments when a student completes a later day before finishing earlier items", async () => {
+    const summary = await fetchAssignmentSummary({
+      studentCode: "st-1",
+      resultsRows: [
+        {
+          studentCode: "st-1",
+          assignmentId: "0.1",
+          assignment: "A1 0.1",
+          score: 86,
+          level: "A1",
+        },
+        {
+          studentCode: "st-1",
+          assignmentId: "1.2",
+          assignment: "A1 1.2",
+          score: 81,
+          level: "A1",
+        },
+      ],
+    });
+
+    expect(summary.student.recommendationBlocked).toBe(false);
+    expect(summary.student.jumpedAssignments.map((entry) => entry.label)).toEqual([
+      "Day 2: 0.2",
+      "Day 2: 1.1",
+    ]);
+  });
+
+
+  it("does not create jumped assignments for calendar days that have no scheduled assignment", async () => {
+    buildAssignmentCatalogForLevel.mockReturnValueOnce([
+      {
+        day: 1,
+        label: "Day 1: 0.1",
+        assignmentId: "0.1",
+        canonicalAssignmentId: "A1-0.1",
+        matchKey: "A1-0.1",
+      },
+      {
+        day: 3,
+        label: "Day 3: 1.2",
+        assignmentId: "1.2",
+        canonicalAssignmentId: "A1-1.2",
+        matchKey: "A1-1.2",
+      },
+    ]);
+
+    const summary = await fetchAssignmentSummary({
+      studentCode: "st-1",
+      resultsRows: [
+        {
+          studentCode: "st-1",
+          assignmentId: "0.1",
+          assignment: "A1 0.1",
+          score: 88,
+          level: "A1",
+        },
+        {
+          studentCode: "st-1",
+          assignmentId: "1.2",
+          assignment: "A1 1.2",
+          score: 82,
+          level: "A1",
+        },
+      ],
+    });
+
+    expect(summary.student.jumpedAssignments).toEqual([]);
+    expect(summary.student.nextRecommendedAssignment).toBeNull();
   });
 
   it("blocks recommendations when any assignment is failed", async () => {

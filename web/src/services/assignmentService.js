@@ -234,44 +234,19 @@ const computeStudentStats = (scores = [], student) => {
       return dayA - dayB;
     });
 
-  const dayStatusMap = catalog.reduce((acc, entry) => {
-    if (!Number.isFinite(entry.day)) return acc;
+  const lessonStatuses = catalog.map((entry) => {
+    const isCompleted = completedMatchKeys.has(entry.matchKey);
+    const hasFailed = failedMatchKeys.has(entry.matchKey);
+    return { ...entry, isCompleted, hasFailed };
+  });
 
-    const day = entry.day;
-    const current = acc.get(day) || {
-      isCompleted: true,
-      hasFailed: false,
-    };
+  const furthestCompletedLessonIndex = lessonStatuses.reduce((maxIndex, entry, index) => {
+    if (!entry.isCompleted || entry.hasFailed) return maxIndex;
+    return Math.max(maxIndex, index);
+  }, -1);
 
-    const isPassed = completedMatchKeys.has(entry.matchKey);
-    const isFailed = failedMatchKeys.has(entry.matchKey);
-
-    current.isCompleted = current.isCompleted && isPassed;
-    current.hasFailed = current.hasFailed || isFailed;
-    acc.set(day, current);
-
-    return acc;
-  }, new Map());
-
-  const sortedDayNumbers = Array.from(dayStatusMap.keys()).sort((a, b) => a - b);
-  let lastFullyCompletedDay = 0;
-
-  for (const dayNumber of sortedDayNumbers) {
-    const dayStatus = dayStatusMap.get(dayNumber);
-    if (!dayStatus?.isCompleted || dayStatus?.hasFailed) break;
-    lastFullyCompletedDay = dayNumber;
-  }
-
-  const missedAssignments = catalog
-    .filter((entry) => {
-      const dayStatus = dayStatusMap.get(entry.day);
-      return (
-        Number.isFinite(entry.day) &&
-        entry.day <= lastFullyCompletedDay &&
-        !dayStatus?.isCompleted &&
-        !dayStatus?.hasFailed
-      );
-    })
+  const missedAssignments = lessonStatuses
+    .filter((entry, index) => !entry.isCompleted && !entry.hasFailed && index < furthestCompletedLessonIndex)
     .map((entry) => ({
       day: entry.day,
       label: entry.label,
@@ -279,6 +254,9 @@ const computeStudentStats = (scores = [], student) => {
       assignmentKey: entry.canonicalAssignmentId,
       matchKey: entry.matchKey,
     }));
+
+  // "Jumped" is a student-facing alias for previously scheduled tasks that were skipped.
+  const jumpedAssignments = missedAssignments;
 
   const recommendationBlocked = catalog.some((entry) => failedMatchKeys.has(entry.matchKey));
 
@@ -347,6 +325,7 @@ const computeStudentStats = (scores = [], student) => {
     level,
     failedAssignments,
     missedAssignments,
+    jumpedAssignments,
     nextRecommendedAssignment,
     recommendationBlocked,
     streakDays: computeStreak(submissionDates),
