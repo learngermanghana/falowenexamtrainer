@@ -1416,6 +1416,25 @@
       "error": "Level-Upgrade fehlgeschlagen.",
       "maxedOut": "Du bist bereits auf dem höchsten verfügbaren Level.",
       "clearBalance": "Bitte begleiche zuerst deinen offenen Betrag."
+    },
+    "tabs": {
+      "overview": "Übersicht",
+      "studentData": "Studentendaten",
+      "billing": "Abrechnung",
+      "upgrade": "Upgrade"
+    },
+    "studentData": {
+      "title": "Studentendaten",
+      "subtitle": "Diese Daten sind in deinem Studentenprofil gespeichert.",
+      "fields": {
+        "name": "Name",
+        "phone": "Telefonnummer",
+        "email": "E-Mail",
+        "studentCode": "Studentencode",
+        "className": "Klasse",
+        "level": "Niveau",
+        "location": "E-Mail-Standort"
+      }
     }
   },
   "speechTrainer": {

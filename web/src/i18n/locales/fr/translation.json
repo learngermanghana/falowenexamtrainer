@@ -1420,6 +1420,25 @@
       "error": "Impossible de mettre à niveau le niveau.",
       "maxedOut": "Vous êtes déjà au niveau le plus élevé disponible.",
       "clearBalance": "Veuillez d'abord régler votre solde actuel."
+    },
+    "tabs": {
+      "overview": "Aperçu",
+      "studentData": "Données étudiant",
+      "billing": "Facturation",
+      "upgrade": "Niveau suivant"
+    },
+    "studentData": {
+      "title": "Données étudiant",
+      "subtitle": "Voici les informations enregistrées dans votre profil étudiant.",
+      "fields": {
+        "name": "Nom",
+        "phone": "Téléphone",
+        "email": "E-mail",
+        "studentCode": "Code étudiant",
+        "className": "Classe",
+        "level": "Niveau",
+        "location": "Localisation e-mail"
+      }
     }
   },
   "speechTrainer": {

@@ -32,6 +32,7 @@ const AccountSettings = () => {
   const paymentsEnabled = isPaymentsEnabled();
   const [status, setStatus] = useState("");
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   const billingSummary = useMemo(() => {
     const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
@@ -213,14 +214,47 @@ const AccountSettings = () => {
 
   return (
     <div style={{ display: "grid", gap: 12 }}>
+      <div style={styles.tabList}>
+        {[
+          { key: "overview", label: t("accountSettings.tabs.overview") },
+          { key: "studentData", label: t("accountSettings.tabs.studentData") },
+          { key: "billing", label: t("accountSettings.tabs.billing") },
+          { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            onClick={() => setActiveTab(tab.key)}
+            style={activeTab === tab.key ? styles.tabButtonActive : styles.tabButton}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "overview" ? (
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.overview.title")}</h2>
         <p style={styles.helperText}>{t("accountSettings.overview.subtitle")}</p>
         <p style={styles.helperText}>{t("accountSettings.overview.renewal", { date: subscription.renewalDate })}</p>
       </section>
+      ) : null}
 
+      {activeTab === "studentData" ? (
       <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>{t("accountSettings.profile.title")}</h2>
+        <h2 style={styles.sectionTitle}>{t("accountSettings.studentData.title")}</h2>
+        <p style={styles.helperText}>{t("accountSettings.studentData.subtitle")}</p>
+        <div style={{ ...styles.card, margin: "8px 0 10px" }}>
+          <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.name")}</span><strong>{studentProfile?.name || user?.displayName || "–"}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.phone")}</span><strong>{studentProfile?.phone || studentProfile?.phoneNumber || "–"}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.email")}</span><strong>{studentProfile?.email || user?.email || "–"}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.studentCode")}</span><strong>{studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "–"}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.className")}</span><strong>{studentProfile?.className || "–"}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.level")}</span><strong>{studentProfile?.level || "–"}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.location")}</span><strong>{studentProfile?.emailLocation || studentProfile?.location || studentProfile?.country || "–"}</strong></div>
+        </div>
+
+        <h3 style={{ marginTop: 0 }}>{t("accountSettings.profile.title")}</h3>
         <p style={styles.helperText}>{t("accountSettings.profile.adminManaged")}</p>
         <a href={supportMailTo} style={{ ...styles.secondaryButton, display: "inline-block", textDecoration: "none", marginBottom: 10 }}>
           {t("accountSettings.profile.requestChange")}
@@ -229,7 +263,9 @@ const AccountSettings = () => {
           Biography editing has moved to the Class Members tab so it is easier to find.
         </p>
       </section>
+      ) : null}
 
+      {activeTab === "billing" ? (
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.billing.title")}</h2>
         <p style={styles.helperText}>{t("accountSettings.billing.subtitle")}</p>
@@ -270,7 +306,9 @@ const AccountSettings = () => {
           )}
         </div>
       </section>
+      ) : null}
 
+      {activeTab === "upgrade" ? (
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.upgrade.title")}</h2>
         {levelUpgrade.nextLevel ? (
@@ -286,6 +324,7 @@ const AccountSettings = () => {
           <p style={styles.helperText}>{levelUpgrade.reason}</p>
         )}
       </section>
+      ) : null}
     </div>
   );
 };
