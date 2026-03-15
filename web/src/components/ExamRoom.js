@@ -4,6 +4,8 @@ import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { styles } from "../styles";
 
 const STORAGE_KEY = "falowen_examroom_active_tab";
@@ -38,6 +40,7 @@ const ExamRoom = () => {
   const { t } = useTranslation();
   const { setResult, setError } = useExam();
   const { studentProfile } = useAuth();
+  const { showToast } = useToast();
 
   const studentLevel = useMemo(() => normalizeLevel(studentProfile?.level) || "B1", [studentProfile?.level]);
 
@@ -63,6 +66,37 @@ const ExamRoom = () => {
     setResult(null);
     setError("");
     setActiveTab(tab);
+
+    const feedbackByTab = {
+      schreiben: {
+        sound: "open",
+        toastMessage: "Writing exam room opened.",
+        notificationTitle: "Exam room: Writing",
+        notificationBody: "You are now in the writing practice tab.",
+      },
+      sprechen: {
+        sound: "open",
+        toastMessage: "Speaking exam room opened.",
+        notificationTitle: "Exam room: Speaking",
+        notificationBody: "You are now in the speaking practice tab.",
+      },
+      resources: {
+        sound: "info",
+        toastMessage: "Exam resources tab opened.",
+        notificationTitle: "Exam resources ready",
+        notificationBody: "Practice links are ready to open.",
+      },
+    };
+
+    const selectedFeedback = feedbackByTab[tab] || { sound: "open" };
+
+    triggerInteractionFeedback({
+      ...selectedFeedback,
+      toastVariant: "info",
+      showToast,
+      notificationTag: `exam-room-tab-${tab}`,
+      vibratePattern: [35],
+    });
   };
 
   const renderContent = () => {
@@ -108,6 +142,18 @@ const ExamRoom = () => {
                     target="_blank"
                     rel="noreferrer noopener"
                     style={{ ...styles.primaryButton, textDecoration: "none" }}
+                    onClick={() => {
+                      triggerInteractionFeedback({
+                        sound: "open",
+                        toastMessage: `${resource.label} opened.`,
+                        toastVariant: "success",
+                        showToast,
+                        notificationTitle: "Exam practice link opened",
+                        notificationBody: resource.label,
+                        notificationTag: "exam-resource-open",
+                        vibratePattern: [40],
+                      });
+                    }}
                   >
                     {t("common.open")}
                   </a>
