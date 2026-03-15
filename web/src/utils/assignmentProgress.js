@@ -3,7 +3,7 @@ import { getCurriculumEntriesForLevel } from "../data/curriculumManifest";
 import { resolveAssignmentCanonicalKey } from "./assignmentIdentity";
 
 export const PASS_MARK = 60;
-const TARGET_DEBUG_ASSIGNMENT_IDS = new Set(["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"]);
+const ASSIGNMENT_PROGRESS_DEBUG = String(process.env.REACT_APP_ASSIGNMENT_PROGRESS_DEBUG || "").trim() === "1";
 
 const toIsoDate = (value) => {
   if (!value) return null;
@@ -34,14 +34,6 @@ const pickLatestIso = (...values) => {
 
 const DAY_ALIAS_PATTERN = /^(A1|A2|B1|B2|C1|C2)-DAY-(\d+)(?:-TASK-(\d+))?$/i;
 const LEVEL_TOKEN_PATTERN = /(A1|A2|B1|B2|C1|C2)/i;
-const TARGET_DEBUG_ASSIGNMENT_TITLES = [
-  /numbers\s*2/i,
-  /asking\s+about\s+prices\s*3/i,
-  /countries\s+and\s+languages\s*4/i,
-  /german\s+cases\s*5/i,
-  /12\s*hour\s*clock\s*7/i,
-];
-
 const inferLevelFromText = (value = "") => {
   const match = String(value || "").toUpperCase().match(LEVEL_TOKEN_PATTERN);
   return match?.[1] || "";
@@ -207,11 +199,20 @@ export const mergeAssignmentProgress = ({
   passMark = PASS_MARK,
 }) => {
   const normalizedStudentCode = String(studentCode || "").trim().toLowerCase();
-  const shouldRunTargetDiagnostics = normalizedStudentCode === "comfortarmah295";
   const curriculum = Array.isArray(curriculumEntries) ? curriculumEntries : [];
   const drafts = Array.isArray(firestoreDrafts) ? firestoreDrafts : [];
   const submissions = Array.isArray(firestoreSubmissions) ? firestoreSubmissions : [];
   const results = Array.isArray(sheetResults) ? sheetResults : [];
+
+  if (ASSIGNMENT_PROGRESS_DEBUG) {
+    console.debug("[assignmentProgress][mergeAssignmentProgress] inputCounts", {
+      studentCode: normalizedStudentCode || null,
+      curriculumCount: curriculum.length,
+      draftCount: drafts.length,
+      submissionCount: submissions.length,
+      resultCount: results.length,
+    });
+  }
 
   const byAssignmentId = new Map();
 
@@ -309,72 +310,17 @@ export const mergeAssignmentProgress = ({
       level,
     });
 
-    if (shouldRunTargetDiagnostics) {
-      const rawAssignmentKey = rawAssignmentId.toUpperCase();
-      const isTargetTitle = TARGET_DEBUG_ASSIGNMENT_TITLES.some((pattern) => pattern.test(rawAssignmentTitle));
-      const shouldLogTargetRow =
-        TARGET_DEBUG_ASSIGNMENT_IDS.has(canonicalForMerge) ||
-        /A1-DAY-(4|7|8|9|11)(?:-TASK-\d+)?/i.test(rawAssignmentKey) ||
-        isTargetTitle;
-      if (shouldLogTargetRow) {
-        console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][ResultRowToBucket]", {
-          rawAssignmentTitle: rawAssignmentTitle || null,
-          rawAssignmentId: rawAssignmentKey || null,
-          rawExplicitId: result?.explicitId || null,
-          rawLevel: result?.level || null,
-          rawChapter: result?.chapter || null,
-          inferredLevel: level || null,
-          derivedCanonicalKey: canonical || null,
-          finalBucketKey: canonicalForMerge || null,
-          score: result?.score ?? null,
-          status: result?.status ?? null,
-          passed: result?.passed ?? null,
-          failed: result?.failed ?? null,
-          submitted: result?.submitted ?? null,
-          inProgress: result?.inProgress ?? null,
-          resultRow: result,
-        });
-      }
-    }
-
     const bucket = ensureBucket(canonicalForMerge, { level });
     if (!bucket) return;
     bucket.resultRecords.push(result);
-
-    if (shouldRunTargetDiagnostics && TARGET_DEBUG_ASSIGNMENT_IDS.has(bucket.assignmentId)) {
-      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][BucketInsert]", {
-        assignmentId: bucket.assignmentId,
-        finalBucketKey: canonicalForMerge || null,
-        resultRecordsLength: bucket.resultRecords.length,
-      });
-    }
   });
 
-  if (shouldRunTargetDiagnostics) {
-    ["A1-2", "A1-3", "A1-4", "A1-5", "A1-7"].forEach((assignmentId) => {
-      const bucket = byAssignmentId.get(assignmentId);
-      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][FinalBucketLengths]", {
-        assignmentId,
-        resultRecordsLength: bucket?.resultRecords?.length || 0,
-      });
-    });
-  }
-
-  return Array.from(byAssignmentId.values()).map((item) => {
+  const mergedAssignments = Array.from(byAssignmentId.values()).map((item) => {
     const metadata = getCourseScheduleAssignmentMetadata({
       level: item.level,
       assignmentId: item.assignmentId,
       chapter: item.chapter,
     });
-
-    if (shouldRunTargetDiagnostics && TARGET_DEBUG_ASSIGNMENT_IDS.has(item.assignmentId)) {
-      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][BeforeStatusResolution]", {
-        assignmentId: item.assignmentId,
-        resultRecords: item.resultRecords,
-        draftRecord: item.draftRecord,
-        submissionRecord: item.submissionRecord,
-      });
-    }
 
     const resolved = resolveAssignmentStatus({
       assignmentId: item.assignmentId,
@@ -383,13 +329,6 @@ export const mergeAssignmentProgress = ({
       resultRecords: item.resultRecords,
       passMark,
     });
-
-    if (shouldRunTargetDiagnostics && TARGET_DEBUG_ASSIGNMENT_IDS.has(item.assignmentId)) {
-      console.debug("[assignmentProgress][Diagnostic][ComfortArmah295][AfterStatusResolution]", {
-        assignmentId: item.assignmentId,
-        resolved,
-      });
-    }
 
     return {
       assignmentId: item.assignmentId,
@@ -403,6 +342,15 @@ export const mergeAssignmentProgress = ({
       ...resolved,
     };
   });
+
+  if (ASSIGNMENT_PROGRESS_DEBUG) {
+    console.debug("[assignmentProgress][mergeAssignmentProgress] outputCount", {
+      studentCode: normalizedStudentCode || null,
+      assignmentCount: mergedAssignments.length,
+    });
+  }
+
+  return mergedAssignments;
 };
 
 export const toCourseTabStatus = (status = "") => {
