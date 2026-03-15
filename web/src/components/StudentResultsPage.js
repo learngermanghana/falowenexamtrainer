@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
@@ -8,7 +8,6 @@ import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService"
 import { fetchResults } from "../services/resultsService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import ExamReadinessBadge from "./ExamReadinessBadge";
-import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress, PASS_MARK } from "../utils/assignmentProgress";
 
 const norm = (v) => String(v || "").trim().toLowerCase();
@@ -47,99 +46,6 @@ const StudentResultsPage = () => {
   // REACT_APP_RESULTS_SHEET_CSV_URL=https://docs.google.com/spreadsheets/d/<sheetId>/edit
   const SHEET_CSV_URL = process.env.REACT_APP_RESULTS_SHEET_CSV_URL || "";
 
-  const buildLeaderboard = useCallback((rows = []) => {
-    if (!rows.length || !studentCode) return null;
-
-    const levelFilter = studentLevel ? studentLevel : "";
-    const relevantRows = levelFilter
-      ? rows.filter(
-          (row) => String(row.level || "").trim().toUpperCase() === levelFilter
-        )
-      : rows;
-    const scoresByStudent = new Map();
-
-    relevantRows.forEach((row) => {
-      const code = norm(row.studentcode || row.studentCode);
-      const score = Number(row.score);
-      if (!code || !Number.isFinite(score)) return;
-      const level = String(row.level || "").trim().toUpperCase();
-      const assignmentKey = resolveAssignmentCanonicalKey({
-        level,
-        assignmentId:
-          row.assignmentKey ||
-          row.canonicalAssignmentKey ||
-          row.assignmentId ||
-          row.assignment_id,
-        assignmentTitle: row.assignment || row.assignmentTitle || row.title,
-      });
-
-      if (!scoresByStudent.has(code)) {
-        scoresByStudent.set(code, {
-          totalScore: 0,
-          assignmentCount: 0,
-          bestByAssignment: new Map(),
-        });
-      }
-
-      const student = scoresByStudent.get(code);
-      if (!assignmentKey) {
-        student.totalScore += score;
-        student.assignmentCount += 1;
-        return;
-      }
-
-      const previous = student.bestByAssignment.get(assignmentKey);
-      if (!Number.isFinite(previous) || score > previous) {
-        if (Number.isFinite(previous)) student.totalScore -= previous;
-        student.totalScore += score;
-        student.bestByAssignment.set(assignmentKey, score);
-      }
-      student.assignmentCount = student.bestByAssignment.size;
-    });
-
-    if (!scoresByStudent.size) return null;
-
-    const totals = Array.from(scoresByStudent.entries())
-      .map(([code, stats]) => ({
-        code,
-        totalScore: stats.totalScore,
-        assignmentCount: stats.assignmentCount,
-      }))
-      .sort((a, b) => {
-        if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
-        if (b.assignmentCount !== a.assignmentCount) return b.assignmentCount - a.assignmentCount;
-        return a.code.localeCompare(b.code);
-      });
-
-    const studentEntry = totals.find((entry) => entry.code === norm(studentCode));
-    const totalStudents = totals.length;
-
-    if (!studentEntry) {
-      return {
-        totalStudents,
-        rank: null,
-        totalScore: null,
-        assignmentCount: 0,
-        level: levelFilter || "All levels",
-      };
-    }
-
-    const higherCount = totals.filter(
-      (entry) =>
-        entry.totalScore > studentEntry.totalScore ||
-        (entry.totalScore === studentEntry.totalScore &&
-          entry.assignmentCount > studentEntry.assignmentCount)
-    ).length;
-
-    return {
-      totalStudents,
-      rank: higherCount + 1,
-      totalScore: studentEntry.totalScore,
-      assignmentCount: studentEntry.assignmentCount,
-      level: levelFilter || "All levels",
-    };
-  }, [studentCode, studentLevel]);
-
   useEffect(() => {
     let mounted = true;
 
@@ -177,12 +83,6 @@ const StudentResultsPage = () => {
       }
     };
 
-    const loadLeaderboardFromResultsStore = async () => {
-      const response = await fetchResults({ level: studentLevel });
-      if (!Array.isArray(response?.results)) return [];
-      return response.results;
-    };
-
     const load = async () => {
       setLoading(true);
       setError("");
@@ -198,23 +98,20 @@ const StudentResultsPage = () => {
         const summaryLeaderboard = await loadLeaderboardFromSummary();
 
         if (useFirestoreResults) {
-          const [rows, leaderboardRows] = await Promise.all([
-            loadFromResultsStore(),
-            loadLeaderboardFromResultsStore(),
-          ]);
+          const rows = await loadFromResultsStore();
           if (!mounted) return;
           setResults(rows);
-          setLeaderboard(summaryLeaderboard || buildLeaderboard(leaderboardRows));
+          setLeaderboard(summaryLeaderboard);
           return;
         }
 
         // Prefer sheet for A1/A2/B1 if configured
         if (useSheetResults && SHEET_CSV_URL) {
           const sheetResponse = await loadFromSheet();
-          const { mine, all } = sheetResponse;
+          const { mine } = sheetResponse;
           if (!mounted) return;
           setResults(mine);
-          setLeaderboard(summaryLeaderboard || buildLeaderboard(all));
+          setLeaderboard(summaryLeaderboard);
           return;
         }
 
@@ -253,7 +150,6 @@ const StudentResultsPage = () => {
     useSheetResults,
     studentEmail,
     SHEET_CSV_URL,
-    buildLeaderboard,
   ]);
 
   const summary = useMemo(() => {
@@ -323,6 +219,14 @@ const StudentResultsPage = () => {
       ),
     ];
   }, [assignmentProgress, trackedLevel]);
+
+  const leaderboardRows = useMemo(() => leaderboard?.rows || [], [leaderboard]);
+  const qualificationMinimum = Number(leaderboard?.qualificationMinimum || 3);
+  const myLeaderboardEntry = useMemo(() => {
+    const normalizedCode = norm(studentCode);
+    return leaderboardRows.find((row) => norm(row.studentCode || row.studentcode) === normalizedCode) || null;
+  }, [leaderboardRows, studentCode]);
+  const leaderboardTotal = leaderboardRows.length;
 
 
   return (
@@ -431,17 +335,19 @@ const StudentResultsPage = () => {
           <>
             <p style={{ ...styles.helperText, marginTop: 12 }}>
               <strong>Leaderboard position:</strong>{" "}
-              {leaderboard?.rank
-                ? `${leaderboard.rank} of ${leaderboard.totalStudents} (${leaderboard.level})`
+              {myLeaderboardEntry?.rank
+                ? `${myLeaderboardEntry.rank} of ${leaderboardTotal} (${leaderboard?.level || studentLevel || "Level"})`
                 : leaderboard
-                ? `Not ranked yet (${leaderboard.level})`
+                ? `Not ranked yet (${leaderboard?.level || studentLevel || "Level"})`
                 : "Not available yet"}
             </p>
             <p style={{ ...styles.helperText, marginTop: 4 }}>
-              {leaderboard
+              {leaderboard && myLeaderboardEntry
                 ? `This compares your total score${
-                    leaderboard.totalScore !== null ? ` (${leaderboard.totalScore})` : ""
-                  } and completed assignments (${leaderboard.assignmentCount || 0}) with ${leaderboard.totalStudents} students. We total each student's best score per assignment, then rank by total score (highest first) and use assignment count as a tie-breaker.`
+                    myLeaderboardEntry.totalScore !== null ? ` (${myLeaderboardEntry.totalScore})` : ""
+                  } and completed assignments (${myLeaderboardEntry.completedCount || 0}) with ${leaderboardTotal} qualified students. Rank is based on total marks first, then completed assignments as tie-breaker. Minimum ${qualificationMinimum} completed assignments are required to qualify.`
+                : leaderboard
+                ? `You need at least ${qualificationMinimum} completed assignments to qualify for ranking.`
                 : "We’ll show your leaderboard position once we have enough class scores to compare."}
             </p>
           </>

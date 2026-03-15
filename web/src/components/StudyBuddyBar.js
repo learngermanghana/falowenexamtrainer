@@ -6,6 +6,7 @@ import { formatCurrency } from "../lib/formatters";
 import { toDateMs } from "../lib/dateUtils";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchResults } from "../services/resultsService";
+import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
 
 const toNumber = (value) => {
@@ -43,6 +44,9 @@ const StudyBuddyBar = ({ studentProfile }) => {
   }, [levelKey]);
   const [latestResult, setLatestResult] = useState(null);
   const [attendanceSummary, setAttendanceSummary] = useState(null);
+  const [recommendedAssignment, setRecommendedAssignment] = useState("");
+  const [leaderboardPosition, setLeaderboardPosition] = useState(null);
+  const [leaderboardLevel, setLeaderboardLevel] = useState("");
 
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const formatTimeUnit = useCallback(
@@ -79,7 +83,11 @@ const StudyBuddyBar = ({ studentProfile }) => {
     studentProfile?.attendance?.sessions ??
     null;
   const resultsLabel =
-    latestScore !== null
+    leaderboardPosition
+      ? `#${numberFormatter.format(leaderboardPosition.rank)} / ${numberFormatter.format(leaderboardPosition.total)}${
+          leaderboardLevel ? ` (${leaderboardLevel})` : ""
+        }`
+      : latestScore !== null
       ? t("studyBuddy.metrics.scoreValue", {
           score: numberFormatter.format(latestScore),
         })
@@ -148,6 +156,31 @@ const StudyBuddyBar = ({ studentProfile }) => {
         );
       }
 
+      if (studentCode) {
+        tasks.push(
+          fetchScoreSummary({ idToken, studentCode })
+            .then((response) => {
+              if (!isMounted) return;
+              setRecommendedAssignment(response?.student?.nextRecommendation?.label || "");
+              const rows = response?.leaderboard?.rows || [];
+              setLeaderboardLevel(String(response?.leaderboard?.level || "").trim().toUpperCase());
+              const mine = rows.find(
+                (row) => String(row.studentCode || "").trim().toLowerCase() === String(studentCode || "").trim().toLowerCase()
+              );
+              setLeaderboardPosition(mine ? { rank: mine.rank, total: rows.length } : null);
+            })
+            .catch(() => {
+              if (isMounted) setRecommendedAssignment("");
+              if (isMounted) setLeaderboardPosition(null);
+              if (isMounted) setLeaderboardLevel("");
+            })
+        );
+      } else {
+        setRecommendedAssignment("");
+        setLeaderboardPosition(null);
+        setLeaderboardLevel("");
+      }
+
       if (className && studentCode) {
         tasks.push(
           fetchAttendanceSummary({ className, studentCode, level: resolvedLevel })
@@ -171,7 +204,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     return () => {
       isMounted = false;
     };
-  }, [className, resolvedLevel, studentCode, studentEmail]);
+  }, [className, idToken, resolvedLevel, studentCode, studentEmail]);
 
   const suggestions = useMemo(() => {
     const tips = [];
@@ -194,11 +227,11 @@ const StudyBuddyBar = ({ studentProfile }) => {
     }
 
     if (!tips.length) {
-      tips.push(t("studyBuddy.suggestions.default"));
+      tips.push(recommendedAssignment || t("studyBuddy.suggestions.default"));
     }
 
     return tips;
-  }, [attendanceRate, latestScore, paymentReminder, t]);
+  }, [attendanceRate, latestScore, paymentReminder, recommendedAssignment, t]);
 
   const primarySuggestion = suggestions[0];
   const submitQuickQuestion = useCallback(
