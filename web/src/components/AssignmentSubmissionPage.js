@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { InfoBox } from "./ui";
 import ExamReadinessBadge from "./ExamReadinessBadge";
+import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
 import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
@@ -11,6 +12,7 @@ import { getCurriculumEntriesForLevel } from "../data/germanAssignmentCatalog";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress } from "../utils/assignmentProgress";
 import { fetchAnswerKeyRegistry, resolveAnswerKeySource } from "../services/answerKeyRegistryService";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import {
   addDoc,
   collection,
@@ -230,6 +232,7 @@ const toNumericScore = (value) => {
 const AssignmentSubmissionPage = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
+  const { showToast } = useToast();
   const { user, studentProfile } = useAuth();
   const [badgeRefreshToken, setBadgeRefreshToken] = useState(0);
   const [openedFeedbackId, setOpenedFeedbackId] = useState(null);
@@ -1338,6 +1341,16 @@ const AssignmentSubmissionPage = () => {
       }
 
       setStatus({ loading: false, error: "", success: "Thanks! Your submission has been saved." });
+      triggerInteractionFeedback({
+        sound: "success",
+        toastMessage: "Submission saved successfully.",
+        toastVariant: "success",
+        showToast,
+        notificationTitle: "Assignment submitted",
+        notificationBody: "Great work — your submission is now saved.",
+        notificationTag: "submission-success",
+        vibratePattern: [70, 40, 100],
+      });
       setBadgeRefreshToken((prev) => prev + 1);
 
       // Clear editor after submission (preview remains available below)
@@ -1367,6 +1380,12 @@ const AssignmentSubmissionPage = () => {
         return;
       }
       setStatus({ loading: false, error: "", success: "Draft saved. You can keep editing before submitting." });
+      triggerInteractionFeedback({
+        sound: "info",
+        toastMessage: "Draft saved.",
+        toastVariant: "info",
+        showToast,
+      });
     } catch (error) {
       console.error("Failed to save draft", error);
       setStatus({ loading: false, error: "Could not save your draft.", success: "" });
@@ -1621,6 +1640,16 @@ const AssignmentSubmissionPage = () => {
       await addDoc(collection(db, SUBMISSION_COLLECTION), payload);
 
       setResubmissionStatus({ loading: false, error: "", success: "Resubmission sent successfully." });
+      triggerInteractionFeedback({
+        sound: "success",
+        toastMessage: "Resubmission sent successfully.",
+        toastVariant: "success",
+        showToast,
+        notificationTitle: "Resubmission received",
+        notificationBody: "Your corrected work has been sent to tutors.",
+        notificationTag: "resubmission-success",
+        vibratePattern: [70, 30, 70],
+      });
       setResubmissionText("");
       setResubmissionImprovement("");
 
