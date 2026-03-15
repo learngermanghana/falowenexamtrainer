@@ -405,7 +405,7 @@ const AssignmentSubmissionPage = () => {
     if (!assignmentDays.length) return "";
 
     return assignmentDays.map((day) => `Day ${day}`).join(", ");
-  }, [assignmentDictionary]);
+  }, [assignmentDictionary, preferredLevel]);
 
   function deriveChapterValue(title) {
     const entry = assignmentDictionary.find((item) => item.label === title);
