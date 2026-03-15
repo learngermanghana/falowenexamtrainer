@@ -972,8 +972,53 @@ function sanitizePresentationHistory(messages = []) {
     .slice(-20);
 }
 
+function isLikelyPresentationSetupMessage(text = "") {
+  const normalized = String(text || "").toLowerCase();
+  if (!normalized) return false;
+
+  const setupMarkers = [
+    "coach felix",
+    "grammar and feedback",
+    "motivation",
+    "vocabulary",
+    "progress",
+    "gliederung",
+    "noch 5 frage",
+    "noch 5 fragen",
+    "first choose a context",
+    "hallo! i am coach",
+  ];
+
+  if (setupMarkers.some((marker) => normalized.includes(marker))) return true;
+
+  const structureLines = [
+    "begrüßung + thema nennen",
+    "begriff kurz erklären oder definieren",
+    "zwei konkrete beispiele nennen",
+    "vergleich oder kontrast herstellen",
+    "eigene meinung + begründung geben",
+    "kurz zusammenfassen und abschließen",
+  ];
+
+  const matchedStructureLines = structureLines.filter((line) => normalized.includes(line)).length;
+  if (matchedStructureLines >= 2) return true;
+
+  const lineCount = normalized.split(/\n+/).filter(Boolean).length;
+  const bulletCount = (normalized.match(/[•\-*]\s/g) || []).length;
+  return lineCount >= 8 && bulletCount >= 2;
+}
+
+function isCountablePresentationAnswer(text = "") {
+  const trimmed = String(text || "").trim();
+  if (!trimmed) return false;
+  return !isLikelyPresentationSetupMessage(trimmed);
+}
+
 function countUserAnswers(messages = []) {
-  return messages.reduce((count, item) => (item?.role === "user" ? count + 1 : count), 0);
+  return messages.reduce(
+    (count, item) => (item?.role === "user" && isCountablePresentationAnswer(item?.content) ? count + 1 : count),
+    0
+  );
 }
 
 
@@ -2435,7 +2480,11 @@ app.post("/speaking/presentation-chat", async (req, res) => {
 
     const safeHistory = sanitizePresentationHistory(history);
     const answersDoneBeforeCurrent = countUserAnswers(safeHistory);
-    const cappedAnswersDone = Math.min(answersDoneBeforeCurrent + 1, PRESENTATION_TURN_LIMIT);
+    const currentMessageCountsAsAnswer = isCountablePresentationAnswer(trimmedMessage);
+    const cappedAnswersDone = Math.min(
+      answersDoneBeforeCurrent + (currentMessageCountsAsAnswer ? 1 : 0),
+      PRESENTATION_TURN_LIMIT
+    );
 
     const chatMessages = [
       { role: "system", content: presentationCoachPrompt({ level: effectiveLevel, answersDone: cappedAnswersDone }) },
