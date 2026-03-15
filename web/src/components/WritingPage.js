@@ -438,6 +438,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [isChatScrolled, setIsChatScrolled] = useState(false);
   const [hasHiddenNewerMessages, setHasHiddenNewerMessages] = useState(false);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
+  const [hiddenDraftIds, setHiddenDraftIds] = useState([]);
   const [editableDraftById, setEditableDraftById] = useState({});
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
@@ -507,6 +508,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setIsChatScrolled(false);
     setHasHiddenNewerMessages(false);
     setSelectedDraftIds([]);
+    setHiddenDraftIds([]);
     setEditableDraftById({});
     setIdeaError("");
     setIdeaSuccess("");
@@ -715,6 +717,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         } else {
           setSelectedDraftIds([]);
         }
+        if (Array.isArray(saved.hiddenDraftIds)) {
+          setHiddenDraftIds(saved.hiddenDraftIds);
+        } else {
+          setHiddenDraftIds([]);
+        }
         if (saved.editableDraftById && typeof saved.editableDraftById === "object") {
           setEditableDraftById(saved.editableDraftById);
         } else {
@@ -770,6 +777,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           ideaInput,
           chatMessages,
           selectedDraftIds,
+          hiddenDraftIds,
           editableDraftById,
           remainingSeconds,
           timerRunning,
@@ -800,6 +808,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     remainingSeconds,
     rubricBreakdown,
     selectedDraftIds,
+    hiddenDraftIds,
     timerRunning,
     typedAnswer,
     workflowComplete,
