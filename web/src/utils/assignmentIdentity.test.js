@@ -49,10 +49,19 @@ describe("assignment identity canonical keys", () => {
     expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 Asking About Prices 3" })).toBe("A1-3");
     expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 Countries and Languages 4" })).toBe("A1-4");
     expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 German Cases 5" })).toBe("A1-5");
+    expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 Objects and Colours 6" })).toBe("A1-6");
     expect(resolveAssignmentCanonicalKey({ level: "A1", assignmentTitle: "A1 12 Hour Clock 7" })).toBe("A1-7");
   });
 
   test("prefers title chapter token when structured assignmentId number mismatches", () => {
+    expect(
+      resolveAssignmentCanonicalKey({
+        level: "A1",
+        assignmentId: "A1-12",
+        assignmentTitle: "A1 Objects and Colours 6",
+      })
+    ).toBe("A1-6");
+
     expect(
       resolveAssignmentCanonicalKey({
         level: "A1",
