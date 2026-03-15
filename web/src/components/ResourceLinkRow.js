@@ -1,4 +1,5 @@
 import React from "react";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 export const RESOURCE_ACTION_LABELS = {
   video: "🎬 Video ansehen",
@@ -43,9 +44,23 @@ const resolveHref = (label, url) => {
 const ResourceLinkRow = ({ label, url }) => {
   if (!url) return null;
 
+  const handleResourceOpen = () => {
+    triggerInteractionFeedback({
+      sound: "open",
+      notificationTitle: "Course resource opened",
+      notificationBody: `Now opening ${label}.`,
+      notificationTag: "course-resource-open",
+      vibratePattern: [40],
+    });
+  };
+
   return (
     <li>
-      <a href={resolveHref(label, url)} aria-label={`${label} (${RESOURCE_ACTION_LABELS.openInApp})`}>
+      <a
+        href={resolveHref(label, url)}
+        aria-label={`${label} (${RESOURCE_ACTION_LABELS.openInApp})`}
+        onClick={handleResourceOpen}
+      >
         {label}
       </a>
     </li>
