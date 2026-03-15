@@ -41,6 +41,7 @@ const MAX_RESUBMISSION_TRIES = 2;
 const ACTION_COOLDOWN_MS = 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
+const MAX_ASSIGNMENT_DAY_BY_LEVEL = { A1: 22, A2: 28, B1: 28 };
 const PASS_THRESHOLD_SCORE = 60;
 
 const formatDate = (timestamp) => {
@@ -259,6 +260,18 @@ const isTutorMarkedSubmissionCandidate = ({ assignmentFlag, dictionaryEntry }) =
   return Boolean(assignmentFlag === true);
 };
 
+const getMaxAssignmentDayForLevel = (level) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+  return MAX_ASSIGNMENT_DAY_BY_LEVEL[normalizedLevel] ?? 28;
+};
+
+const isDayWithinSubmissionWindow = (level, day) => {
+  const numericDay = Number(day);
+  if (!Number.isFinite(numericDay)) return true;
+  if (numericDay <= 0) return false;
+  return numericDay <= getMaxAssignmentDayForLevel(level);
+};
+
 const getFeedbackFromSubmission = (entry) =>
   entry?.feedback || entry?.tutorFeedback || entry?.reviewFeedback || entry?.reviewNotes || "";
 
@@ -384,7 +397,7 @@ const AssignmentSubmissionPage = () => {
 
   const assignmentRequiredDaysLabel = useMemo(() => {
     const assignmentDays = assignmentDictionary
-      .filter((entry) => entry.assignment)
+      .filter((entry) => entry.assignment && isDayWithinSubmissionWindow(entry.level || preferredLevel, entry.day))
       .map((entry) => entry.day)
       .filter((day, index, arr) => arr.indexOf(day) === index)
       .sort((a, b) => Number(a) - Number(b));
@@ -421,19 +434,26 @@ const AssignmentSubmissionPage = () => {
       }
 
       const dayNumber = deriveChapterValue(label);
+      const maxDayForLevel = getMaxAssignmentDayForLevel(preferredLevel);
       const blockedByDayZero = dayNumber === 0;
+      const blockedByAssignmentWindow = Number.isFinite(dayNumber) && dayNumber > maxDayForLevel;
       includeDiagnostics.push({
         source,
         label,
         dayNumber: Number.isFinite(dayNumber) ? dayNumber : null,
         blocked: true,
         blockedByDayZero,
+        blockedByAssignmentWindow,
+        maxDayForLevel,
         blockedByTutorMarkedFilter: true,
       });
     };
 
     assignmentDictionary
-      .filter(({ assignment, progressionEligible }) => assignment && progressionEligible)
+      .filter(
+        ({ assignment, progressionEligible, day, level }) =>
+          assignment && progressionEligible && isDayWithinSubmissionWindow(level || preferredLevel, day)
+      )
       .forEach(({ label }) => addIfTutorMarked(label, "courseSchedule"));
 
     addIfTutorMarked(studentProfile?.assignmentTitle, "studentProfile.assignmentTitle");
@@ -1240,6 +1260,12 @@ const AssignmentSubmissionPage = () => {
     [decoratedAssignmentOptions, form.assignmentTitle]
   );
   const selectedAssignmentEligibility = useMemo(() => {
+    if (!isDayWithinSubmissionWindow(preferredLevel, selectedDayNumber)) {
+      return {
+        submittable: false,
+        reason: isGerman ? "Außerhalb des Aufgabenzeitraums" : "Outside assignment window",
+      };
+    }
     if (selectedOptionMeta?.isDayZero) {
       return {
         submittable: false,
@@ -1259,7 +1285,7 @@ const AssignmentSubmissionPage = () => {
       };
     }
     return { submittable: true, reason: isGerman ? "Bereit" : "Ready to submit" };
-  }, [isGerman, isSelectedLocked, selectedOptionMeta]);
+  }, [isGerman, isSelectedLocked, preferredLevel, selectedDayNumber, selectedOptionMeta]);
   const assignmentInfo = useMemo(() => {
     const base = form.assignmentTitle || assignmentOptions[0] || "Assignment";
     return selectedDayNumber ? `${base} (Day ${selectedDayNumber})` : base;
