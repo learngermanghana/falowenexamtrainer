@@ -2,10 +2,12 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import { requestSpeakingTextAnalysis } from "../services/presentationCoachService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const parseTeilNumber = (teilLabel = "") => {
   const match = String(teilLabel).match(/teil\s*(\d+)/i);
@@ -59,6 +61,7 @@ const waveHeights = [8, 16, 24, 18, 26, 14, 20, 30, 22, 28, 16, 24, 14, 20, 12];
 const SpeakingPage = ({ mode = "exam" }) => {
   const { level: examLevel } = useExam();
   const { idToken, user, studentProfile } = useAuth();
+  const { showToast } = useToast();
   const isExamMode = mode === "exam";
   const userId = user?.uid || "";
   const studentCode =
@@ -284,9 +287,26 @@ const SpeakingPage = ({ mode = "exam" }) => {
       setLastRubric(parseRubric(replyText));
       appendCoachText(replyText);
       markPromptCompleted();
+      triggerInteractionFeedback({
+        sound: "success",
+        toastMessage: "Speaking coach replied.",
+        toastVariant: "success",
+        showToast,
+        notificationTitle: "Speaking coach response",
+        notificationBody: "Your text answer has been reviewed.",
+        notificationTag: "speaking-text-reply",
+        vibratePattern: [45],
+      });
     } catch (error) {
       setChatError(error?.message || "Could not reach the AI coach.");
       appendCoachText("I couldn't analyze your answer right now. Please try again in a moment.");
+      triggerInteractionFeedback({
+        sound: "error",
+        toastMessage: "Speaking coach is unavailable right now.",
+        toastVariant: "error",
+        showToast,
+        vibratePattern: [120],
+      });
     } finally {
       setChatLoading(false);
     }
@@ -350,9 +370,26 @@ const SpeakingPage = ({ mode = "exam" }) => {
           }
           setLastRubric(parseRubric(replyText));
           appendCoachText(replyText);
+          triggerInteractionFeedback({
+            sound: "success",
+            toastMessage: "Voice feedback received.",
+            toastVariant: "success",
+            showToast,
+            notificationTitle: "Speaking voice review ready",
+            notificationBody: "Your recording has been analyzed.",
+            notificationTag: "speaking-audio-reply",
+            vibratePattern: [45],
+          });
         } catch (error) {
           setChatError(error?.message || "Could not reach the AI coach.");
           appendCoachText("I couldn't analyze your recording right now. Please try again in a moment.");
+          triggerInteractionFeedback({
+            sound: "error",
+            toastMessage: "Could not analyze your recording right now.",
+            toastVariant: "error",
+            showToast,
+            vibratePattern: [120],
+          });
         } finally {
           setChatLoading(false);
         }

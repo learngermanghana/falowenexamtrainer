@@ -4,6 +4,7 @@ import { useExam, ALLOWED_LEVELS } from "../context/ExamContext";
 import ResultHistory from "./ResultHistory";
 import { fetchIdeasFromCoach, fetchWritingLetters, markLetterWithAI } from "../services/coachService";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { writingLetters as courseWritingLetters } from "../data/writingLetters";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
 import { loadWritingProgress, saveWritingProgress } from "../services/writingProgressService";
@@ -13,6 +14,7 @@ import {
   saveExamLetterForTutorReview,
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -407,6 +409,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setLoading,
   } = useExam();
   const { user, idToken, studentProfile } = useAuth();
+  const { showToast } = useToast();
   const userId = user?.uid;
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "";
@@ -922,6 +925,16 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       });
       setStudentReplyText("");
       setStudentReplyState({ loading: false, success: "Reply sent to tutor.", error: "" });
+      triggerInteractionFeedback({
+        sound: "success",
+        toastMessage: "Reply sent to tutor.",
+        toastVariant: "success",
+        showToast,
+        notificationTitle: "Tutor reply sent",
+        notificationBody: "Your message was sent from Writing tab.",
+        notificationTag: "writing-reply-sent",
+        vibratePattern: [60, 30, 60],
+      });
       setTutorReviews((prev) =>
         prev.map((review) => {
           if (review.id !== latestTutorReview.id) return review;
@@ -944,6 +957,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         loading: false,
         success: "",
         error: err?.message || "Could not send your reply right now.",
+      });
+      triggerInteractionFeedback({
+        sound: "error",
+        toastMessage: "Could not send your tutor reply.",
+        toastVariant: "error",
+        showToast,
+        vibratePattern: [120],
       });
     }
   };
@@ -1325,6 +1345,16 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         program: studentProfile?.program,
       });
       addChatMessage("assistant", reply);
+      triggerInteractionFeedback({
+        sound: "open",
+        toastMessage: "Writing coach replied.",
+        toastVariant: "success",
+        showToast,
+        notificationTitle: "Writing coach response",
+        notificationBody: "New feedback is available in your writing chat.",
+        notificationTag: "writing-coach-reply",
+        vibratePattern: [45],
+      });
     } catch (err) {
       console.error("Ideas generator error:", err);
       const msg =
@@ -1332,6 +1362,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         err.message ||
         "Could not fetch ideas from Herr Felix.";
       setIdeaError(msg);
+      triggerInteractionFeedback({
+        sound: "error",
+        toastMessage: "Writing coach is unavailable right now.",
+        toastVariant: "error",
+        showToast,
+        vibratePattern: [120],
+      });
     } finally {
       setIdeasLoading(false);
     }
