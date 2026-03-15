@@ -109,12 +109,8 @@ const isStructuredAssignmentId = (assignmentId = "") => {
 };
 
 export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentTitle }) => {
-  const normalizedLevel = normalizeLevel(level);
-  const fromId = toCanonicalAssignmentId({ assignmentId, level: normalizedLevel });
-  const fromTitle = getFallbackKeyFromTitle({
-    level: normalizedLevel,
-    assignmentTitle,
-  });
+  const fromId = toCanonicalAssignmentId({ assignmentId, level });
+  const fromTitle = getFallbackKeyFromTitle({ level, assignmentTitle });
 
   if (!fromId) return fromTitle;
   if (!fromTitle) return fromId;
