@@ -15,6 +15,7 @@ import {
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import { parseImportantPhraseLine } from "../lib/writingCoachFormatting";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -1319,8 +1320,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   }, [updateChatScrollMeta]);
 
   const userMessages = useMemo(
-    () => chatMessages.filter((msg) => msg.role === "user"),
-    [chatMessages]
+    () => chatMessages.filter((msg) => msg.role === "user" && !hiddenDraftIds.includes(msg.id)),
+    [chatMessages, hiddenDraftIds]
   );
 
   const updateDraftText = (id, value) => {
@@ -1956,6 +1957,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 setIdeaError("");
                 setIdeaInput("");
                 setSelectedDraftIds([]);
+                setEditableDraftById({});
+                setHiddenDraftIds([]);
                 setIdeaSuccess("");
                 setHasUnreadCoachReply(false);
                 setHasHiddenNewerMessages(false);
