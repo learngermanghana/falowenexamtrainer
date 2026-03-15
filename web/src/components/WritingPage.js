@@ -15,7 +15,6 @@ import {
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
-import { parseImportantPhraseLine } from "../lib/writingCoachFormatting";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
