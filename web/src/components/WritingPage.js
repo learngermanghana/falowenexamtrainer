@@ -53,6 +53,8 @@ const IDEAS_COACHING_PROMPTS = [
   "End by summarizing the idea in your own words.",
 ];
 
+const IMPORTANT_PHRASE_COLORS = ["#1d4ed8", "#7c3aed", "#be123c", "#0f766e", "#b45309"];
+
 const RUBRIC_CRITERIA = [
   {
     key: "task",
@@ -1203,6 +1205,62 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setChatMessages((prev) => [...prev, makeChatMessage(role, content)]);
   };
 
+  const renderImportantPhraseLine = (line) => {
+    const importantPattern = /^(?:[-•\d.)\s]*)?(important phrases?|key phrases?)\s*:\s*(.*)$/i;
+    const matches = line.match(importantPattern);
+    if (!matches) return line;
+
+    const label = matches[1];
+    const rawPhrases = matches[2] || "";
+    const phrases = rawPhrases
+      .split(/[,;\n]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    if (!phrases.length) {
+      return <strong>{line}</strong>;
+    }
+
+    return (
+      <>
+        <strong style={{ color: "#111827" }}>{label}: </strong>
+        {phrases.map((phrase, index) => (
+          <span
+            key={`${phrase}-${index}`}
+            style={{
+              display: "inline-block",
+              marginRight: 6,
+              marginBottom: 6,
+              padding: "2px 8px",
+              borderRadius: 999,
+              background: "#f3f4f6",
+              color: IMPORTANT_PHRASE_COLORS[index % IMPORTANT_PHRASE_COLORS.length],
+              fontWeight: 800,
+            }}
+          >
+            {phrase}
+          </span>
+        ))}
+      </>
+    );
+  };
+
+  const renderCoachMessage = (content) => {
+    const message = String(content || "");
+    const lines = message.split("\n");
+
+    return lines.map((line, index) => {
+      const lineKey = `line-${index}`;
+      const renderedLine = renderImportantPhraseLine(line);
+      return (
+        <React.Fragment key={lineKey}>
+          <span>{renderedLine}</span>
+          {index < lines.length - 1 ? <br /> : null}
+        </React.Fragment>
+      );
+    });
+  };
+
   const insertConnector = (connector) => {
     setIdeaInput((prev) => `${prev}${prev.trim() ? " " : ""}${connector}`);
   };
@@ -1814,7 +1872,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                     ? "🤖 Herr Felix (AI coach)"
                     : `👩‍🎓 ${user?.displayName || "Student"}`}
                 </strong>
-                <span>{msg.content}</span>
+                <div style={{ whiteSpace: "pre-wrap" }}>
+                  {msg.role === "assistant" ? renderCoachMessage(msg.content) : msg.content}
+                </div>
               </div>
             ))}
           </div>
