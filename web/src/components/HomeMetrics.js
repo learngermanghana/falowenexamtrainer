@@ -490,7 +490,7 @@ const HomeMetrics = ({ studentProfile }) => {
                 {leaderboardUpdatedLabel ? ` · ${leaderboardUpdatedLabel}` : ""}
               </div>
 
-              {assignmentStats && assignmentStats.completedCount < qualificationMinimum ? (
+              {assignmentStats && (assignmentStats.completedCount || 0) < qualificationMinimum ? (
                 <div style={{ ...styles.helperText, margin: 0, fontStyle: "italic" }}>
                   {t("homeMetrics.leaderboard.joinSoon", { minimum: qualificationMinimum })}
                 </div>

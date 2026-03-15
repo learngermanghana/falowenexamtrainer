@@ -532,23 +532,28 @@ const scoresSummaryHandler = async (req, res) => {
       leaderboardEntries.set(key, current);
     });
 
+    const qualificationMinimum = 3;
+
     const leaderboard = Array.from(leaderboardEntries.values())
       .map((entry) => {
         const scores = Array.from(entry.bestScores.values());
+        const submittedCount = scores.length;
         const passedScores = scores.filter((value) => value >= PASS_MARK);
         const failedScores = scores.filter((value) => value < PASS_MARK);
-        const completedCount = passedScores.length;
-        const totalScore = passedScores.reduce((sum, value) => sum + value, 0);
+        const passedCount = passedScores.length;
+        const totalScore = Math.round(passedScores.reduce((sum, value) => sum + value, 0) * 10) / 10;
         return {
           studentCode: entry.studentCode,
           name: anonymizeDisplayName(entry.name, entry.studentCode),
-          completedCount,
+          submittedCount,
+          completedCount: passedCount,
+          passedCount,
           failedCount: failedScores.length,
           totalScore,
           expectedPoints: totalAssignments * 100,
         };
       })
-      .filter((entry) => entry.completedCount >= 3)
+      .filter((entry) => entry.completedCount >= qualificationMinimum)
       .sort((a, b) => {
         if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
         if (b.completedCount !== a.completedCount) return b.completedCount - a.completedCount;
@@ -662,6 +667,7 @@ const scoresSummaryHandler = async (req, res) => {
 
     const passed = new Set();
     const failed = new Set();
+    const submittedCount = bestById.size;
 
     for (const [id, best] of bestById.entries()) {
       if ((best.score ?? -Infinity) >= PASS_MARK) passed.add(id);
@@ -773,6 +779,7 @@ const scoresSummaryHandler = async (req, res) => {
         streakDays,
         retriesThisWeek,
         totalAssignments,
+        submittedCount,
         completedCount: completedAssignments.length,
         pointsEarned,
         expectedPoints: totalAssignments * 100,
@@ -794,7 +801,7 @@ const scoresSummaryHandler = async (req, res) => {
       leaderboard: {
         level,
         rows: leaderboard,
-        qualificationMinimum: 3,
+        qualificationMinimum,
       },
     });
   } catch (err) {

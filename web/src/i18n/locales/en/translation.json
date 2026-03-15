@@ -341,7 +341,7 @@
       "inProgress": "In progress",
       "passed": "Passed",
       "failed": "Failed",
-      "submitted": "Submitted",
+      "passed": "Passed",
       "needsRedo": "Needs redo",
       "milestoneComplete": "Milestone complete"
     },
