@@ -35,7 +35,8 @@ const normalizeChapterLabel = (value = "") => {
   return `Chapter ${text}`;
 };
 
-const resolveSessionLabel = (data = {}) => {
+export const resolveSessionLabel = (data = {}) => {
+  const sessionLabel = String(data.sessionLabel || "").trim();
   const chapterRaw =
     data.chapter ||
     data.chapterName ||
@@ -46,6 +47,14 @@ const resolveSessionLabel = (data = {}) => {
   const topic = String(data.topic || data.title || data.meetingTopic || "").trim();
   const sessionName = String(data.session || data.name || "").trim();
   const titleToken = /^(session|class|lesson)\b/i;
+
+  if (sessionLabel) {
+    return {
+      title: sessionLabel,
+      chapter,
+      topic: topic || sessionLabel,
+    };
+  }
 
   if (chapter && topic && !titleToken.test(topic)) {
     return {
@@ -272,6 +281,7 @@ export const formatAttendanceRecord = (id, data = {}, studentCode = "", options 
   const record = {
     id,
     date: data.date || data.sessionDate || id,
+    sessionLabel: String(data.sessionLabel || sessionLabel.title || "").trim(),
     title: sessionLabel.title,
     chapter: sessionLabel.chapter,
     topic: sessionLabel.topic,

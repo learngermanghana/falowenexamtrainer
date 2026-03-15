@@ -3,6 +3,7 @@ const { onRequest } = require("firebase-functions/v2/https");
 const {
   onDocumentCreated,
   onDocumentUpdated,
+  onDocumentWritten,
 } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
@@ -101,6 +102,35 @@ const getNewlyPresentCodes = ({ before = {}, after = {} } = {}) => {
   const afterSet = getPresentCodesFromAttendanceSession(after);
   return Array.from(afterSet).filter((code) => !beforeSet.has(code));
 };
+
+const ASSIGNMENT_LEVEL_PREFIX = /^(A1|A2|B1|B2|C1|C2)-/i;
+
+const normalizeAssignmentToken = (value = "") =>
+  String(value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .replace(/_/g, "-")
+    .replace(/[^a-z0-9.-]/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .toUpperCase();
+
+const normalizeAssignmentLevel = (value = "") => {
+  const token = String(value || "").trim().toUpperCase();
+  return /^(A1|A2|B1|B2|C1|C2)$/.test(token) ? token : "";
+};
+
+const toCanonicalAssignmentId = ({ assignmentId, level }) => {
+  const token = normalizeAssignmentToken(assignmentId);
+  if (!token) return "";
+  if (ASSIGNMENT_LEVEL_PREFIX.test(token)) return token;
+  const normalizedLevel = normalizeAssignmentLevel(level);
+  if (!normalizedLevel) return token;
+  return `${normalizedLevel}-${token}`;
+};
+
+const resolveAssignmentCanonicalKey = ({ level, assignmentId } = {}) =>
+  toCanonicalAssignmentId({ assignmentId, level });
 
 const getMillisFromTimestampLike = (value) => {
   if (!value) return Number.NaN;
@@ -1125,9 +1155,11 @@ exports.onAttendanceSessionUpdated = onDocumentUpdated(
     const { className = "", sessionId = "" } = event.params;
     const level = afterData.level || beforeData.level || "";
     const topic =
+      afterData.sessionLabel ||
       afterData.topic ||
       afterData.title ||
       afterData.chapter ||
+      beforeData.sessionLabel ||
       beforeData.topic ||
       beforeData.title ||
       beforeData.chapter ||
@@ -1166,6 +1198,68 @@ exports.onAttendanceSessionUpdated = onDocumentUpdated(
         });
         return null;
       })
+    );
+
+    return null;
+  }
+);
+
+
+exports.onAttendanceCheckinWritten = onDocumentWritten(
+  {
+    region: "europe-west1",
+    document: "attendance/{classId}/sessions/{sessionId}/checkins/{checkinId}",
+  },
+  async (event) => {
+    const afterData = event.data?.after?.data() || {};
+    if (!event.data?.after?.exists) return null;
+
+    const { classId = "", sessionId = "", checkinId = "" } = event.params;
+    const db = getFirestore();
+
+    const sessionRef = db.collection("attendance").doc(classId).collection("sessions").doc(sessionId);
+    const sessionSnap = await sessionRef.get();
+    const sessionData = sessionSnap.exists ? sessionSnap.data() || {} : {};
+
+    const assignmentId = String(afterData.assignmentId || sessionData.assignmentId || "").trim();
+    if (!assignmentId) return null;
+
+    const level =
+      String(afterData.level || sessionData.level || "")
+        .trim()
+        .toUpperCase() || "";
+    const canonicalAssignmentKey = resolveAssignmentCanonicalKey({ level, assignmentId });
+    if (!canonicalAssignmentKey) return null;
+
+    const studentCode = normalizeStudentCode(
+      afterData.studentCode ||
+        afterData.studentcode ||
+        sessionData.studentCode ||
+        sessionData.studentcode ||
+        checkinId
+    );
+    if (!studentCode) return null;
+
+    const progressRef = db
+      .collection("students")
+      .doc(studentCode)
+      .collection("assignmentProgress")
+      .doc(canonicalAssignmentKey);
+
+    await progressRef.set(
+      {
+        assignmentId,
+        canonicalAssignmentKey,
+        completed: true,
+        completedAt: FieldValue.serverTimestamp(),
+        source: "attendance_checkin",
+        classId,
+        sessionId,
+        checkinId,
+        level,
+        updatedAt: FieldValue.serverTimestamp(),
+      },
+      { merge: true }
     );
 
     return null;

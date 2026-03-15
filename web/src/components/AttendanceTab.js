@@ -5,6 +5,16 @@ import { fetchAttendanceRecords } from "../services/attendanceService";
 import { isFirebaseConfigured } from "../firebase";
 import { jsPDF } from "jspdf";
 
+const getRecordSessionTitle = (record = {}, fallbackLabel = "") =>
+  String(
+    record.sessionLabel ||
+      record.title ||
+      record.topic ||
+      record.chapter ||
+      record.dateLabel ||
+      fallbackLabel
+  ).trim();
+
 const styles = {
   card: {
     background: "#fff",
@@ -245,7 +255,7 @@ const AttendanceTab = () => {
       doc.setFontSize(10);
       doc.setTextColor(17, 24, 39);
 
-      const sessionTitle = String(record.title || t("attendanceTab.fallback.session")).slice(0, 44);
+      const sessionTitle = getRecordSessionTitle(record, t("attendanceTab.fallback.session")).slice(0, 44);
       doc.text(String(index + 1), margin + 8, y + 15);
       doc.text(sessionTitle, margin + 28, y + 15);
       doc.text(formatDate(record.date) || "—", margin + 285, y + 15);
@@ -310,7 +320,7 @@ const AttendanceTab = () => {
             {presentRecords.length ? (
               <ul style={styles.list}>
                 {presentRecords.map((record) => (
-                  <li key={record.id}>{record.title || record.dateLabel || t("attendanceTab.fallback.session")}</li>
+                  <li key={record.id}>{getRecordSessionTitle(record, t("attendanceTab.fallback.session"))}</li>
                 ))}
               </ul>
             ) : (
@@ -323,7 +333,7 @@ const AttendanceTab = () => {
             {notPresentRecords.length ? (
               <ul style={styles.list}>
                 {notPresentRecords.map((record) => (
-                  <li key={record.id}>{record.title || record.dateLabel || t("attendanceTab.fallback.session")}</li>
+                  <li key={record.id}>{getRecordSessionTitle(record, t("attendanceTab.fallback.session"))}</li>
                 ))}
               </ul>
             ) : (
