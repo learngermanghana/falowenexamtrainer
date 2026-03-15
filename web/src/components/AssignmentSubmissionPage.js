@@ -351,13 +351,16 @@ const AssignmentSubmissionPage = () => {
     return assignmentDays.map((day) => `Day ${day}`).join(", ");
   }, [assignmentDictionary, preferredLevel]);
 
-  function deriveChapterValue(title) {
-    const entry = assignmentDictionary.find((item) => item.label === title);
-    if (typeof entry?.day !== "undefined") return entry.day;
+  const deriveChapterValue = useCallback(
+    (title) => {
+      const entry = assignmentDictionary.find((item) => item.label === title);
+      if (typeof entry?.day !== "undefined") return entry.day;
 
-    const dayMatch = /^day\s*(\d+)/i.exec(title || "");
-    return dayMatch?.[1] ? Number(dayMatch[1]) : null;
-  }
+      const dayMatch = /^day\s*(\d+)/i.exec(title || "");
+      return dayMatch?.[1] ? Number(dayMatch[1]) : null;
+    },
+    [assignmentDictionary]
+  );
 
   const assignmentOptions = useMemo(() => {
     const names = [];
