@@ -15,6 +15,7 @@ import {
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import { parseImportantPhraseLine } from "../lib/writingCoachFormatting";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -52,6 +53,8 @@ const IDEAS_COACHING_PROMPTS = [
   "Request a short explanation and one example sentence.",
   "End by summarizing the idea in your own words.",
 ];
+
+const IMPORTANT_PHRASE_COLORS = ["#1d4ed8", "#7c3aed", "#be123c", "#0f766e", "#b45309"];
 
 const RUBRIC_CRITERIA = [
   {
@@ -434,9 +437,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [isChatOverflowing, setIsChatOverflowing] = useState(false);
   const [isChatScrolled, setIsChatScrolled] = useState(false);
   const [hasHiddenNewerMessages, setHasHiddenNewerMessages] = useState(false);
-  const [isPreviewOverflowing, setIsPreviewOverflowing] = useState(false);
-  const [isPreviewScrolled, setIsPreviewScrolled] = useState(false);
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
+  const [editableDraftById, setEditableDraftById] = useState({});
+  const [hiddenDraftIds, setHiddenDraftIds] = useState([]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
@@ -488,7 +491,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   );
   const [timerRunning, setTimerRunning] = useState(false);
   const chatLogRef = useRef(null);
-  const previewRef = useRef(null);
   const resetWritingWorkspace = useCallback(() => {
     setTypedAnswer("");
     setMarkFeedback("");
@@ -505,9 +507,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setIsChatOverflowing(false);
     setIsChatScrolled(false);
     setHasHiddenNewerMessages(false);
-    setIsPreviewOverflowing(false);
-    setIsPreviewScrolled(false);
     setSelectedDraftIds([]);
+    setEditableDraftById({});
+    setHiddenDraftIds([]);
     setIdeaError("");
     setIdeaSuccess("");
     setTutorSaveState({ loading: false, success: "", error: "" });
@@ -715,6 +717,16 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         } else {
           setSelectedDraftIds([]);
         }
+        if (saved.editableDraftById && typeof saved.editableDraftById === "object") {
+          setEditableDraftById(saved.editableDraftById);
+        } else {
+          setEditableDraftById({});
+        }
+        if (Array.isArray(saved.hiddenDraftIds)) {
+          setHiddenDraftIds(saved.hiddenDraftIds);
+        } else {
+          setHiddenDraftIds([]);
+        }
         if (typeof saved.remainingSeconds === "number") {
           setRemainingSeconds(saved.remainingSeconds);
         }
@@ -765,6 +777,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           ideaInput,
           chatMessages,
           selectedDraftIds,
+          editableDraftById,
+          hiddenDraftIds,
           remainingSeconds,
           timerRunning,
           rubricBreakdown,
@@ -783,6 +797,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     completionLog,
     draftHistory,
     errorBank,
+    editableDraftById,
+    hiddenDraftIds,
     firstDraftSnapshot,
     ideaInput,
     markFeedback,
@@ -1199,6 +1215,59 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setChatMessages((prev) => [...prev, makeChatMessage(role, content)]);
   };
 
+  const renderImportantPhraseLine = (line) => {
+    const parsed = parseImportantPhraseLine(line);
+    if (!parsed) return line;
+
+    if (!parsed.phrases.length) {
+      return <strong>{line}</strong>;
+    }
+
+    return (
+      <>
+        <strong style={{ color: "#111827" }}>{parsed.label}: </strong>
+        {parsed.phrases.map((phrase, index) => (
+          <span
+            key={`${phrase}-${index}`}
+            style={{
+              display: "inline-block",
+              marginRight: 6,
+              marginBottom: 6,
+              padding: "2px 8px",
+              borderRadius: 999,
+              background: "#f3f4f6",
+              color: IMPORTANT_PHRASE_COLORS[index % IMPORTANT_PHRASE_COLORS.length],
+              border: `1px solid ${IMPORTANT_PHRASE_COLORS[index % IMPORTANT_PHRASE_COLORS.length]}`,
+              fontWeight: 800,
+              textDecoration: "underline",
+              textUnderlineOffset: 2,
+            }}
+            aria-label={`Important phrase ${index + 1}: ${phrase}`}
+            title="Important phrase"
+          >
+            ★ {phrase}
+          </span>
+        ))}
+      </>
+    );
+  };
+
+  const renderCoachMessage = (content) => {
+    const message = String(content || "");
+    const lines = message.split("\n");
+
+    return lines.map((line, index) => {
+      const lineKey = `line-${index}`;
+      const renderedLine = renderImportantPhraseLine(line);
+      return (
+        <React.Fragment key={lineKey}>
+          <span>{renderedLine}</span>
+          {index < lines.length - 1 ? <br /> : null}
+        </React.Fragment>
+      );
+    });
+  };
+
   const insertConnector = (connector) => {
     setIdeaInput((prev) => `${prev}${prev.trim() ? " " : ""}${connector}`);
   };
@@ -1256,19 +1325,39 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [updateChatScrollMeta]);
 
-  useEffect(() => {
-    const preview = previewRef.current;
-    if (!preview) return;
-
-    const overflowing = preview.scrollHeight > preview.clientHeight + 4;
-    setIsPreviewOverflowing(overflowing);
-    setIsPreviewScrolled(overflowing && preview.scrollTop > 4);
-  }, [ideaInput]);
-
   const userMessages = useMemo(
-    () => chatMessages.filter((msg) => msg.role === "user"),
-    [chatMessages]
+    () => chatMessages.filter((msg) => msg.role === "user" && !hiddenDraftIds.includes(msg.id)),
+    [chatMessages, hiddenDraftIds]
   );
+
+  const updateDraftText = (id, value) => {
+    setIdeaSuccess("");
+    setIdeaError("");
+    setEditableDraftById((prev) => ({ ...prev, [id]: value }));
+    setSelectedDraftIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  };
+
+  const selectOnlyDraft = (id) => {
+    setIdeaSuccess("");
+    setIdeaError("");
+    setSelectedDraftIds([id]);
+  };
+
+  const duplicateDraft = (message) => {
+    const base = typeof editableDraftById[message.id] === "string" ? editableDraftById[message.id] : message.content;
+    const duplicate = makeChatMessage("user", base);
+    setChatMessages((prev) => [...prev, duplicate]);
+    setSelectedDraftIds((prev) => [...prev.filter((item) => item !== duplicate.id), duplicate.id]);
+    setIdeaSuccess("Draft duplicated. You can edit and send the new copy.");
+    setIdeaError("");
+  };
+
+  const hideDraftFromPicker = (message) => {
+    setIdeaSuccess("");
+    setIdeaError("");
+    setHiddenDraftIds((prev) => (prev.includes(message.id) ? prev : [...prev, message.id]));
+    setSelectedDraftIds((prev) => prev.filter((item) => item !== message.id));
+  };
 
   const toggleDraftSelection = (id) => {
     setIdeaSuccess("");
@@ -1281,20 +1370,21 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const selectedDraftText = useMemo(() => {
     return userMessages
       .filter((msg) => selectedDraftIds.includes(msg.id))
-      .map((msg) => msg.content.trim())
+      .map((msg) => {
+        const draftText = editableDraftById[msg.id];
+        const raw = typeof draftText === "string" ? draftText : msg.content;
+        return raw.trim();
+      })
       .filter(Boolean)
       .join("\n\n");
-  }, [selectedDraftIds, userMessages]);
+  }, [editableDraftById, selectedDraftIds, userMessages]);
 
   const sendDraftsToMarkTab = () => {
-    const livePreview = ideaInput.trim();
-    const combinedDraft = [selectedDraftText, livePreview]
-      .filter(Boolean)
-      .join("\n\n");
+    const combinedDraft = selectedDraftText;
 
     if (!combinedDraft) {
       setIdeaError(
-        "Select at least one draft or type something in the live preview before sending it for marking."
+        "Select at least one chat draft before sending it for marking."
       );
       setIdeaSuccess("");
       return;
@@ -1812,7 +1902,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                     ? "🤖 Herr Felix (AI coach)"
                     : `👩‍🎓 ${user?.displayName || "Student"}`}
                 </strong>
-                <span>{msg.content}</span>
+                <div style={{ whiteSpace: "pre-wrap" }}>
+                  {msg.role === "assistant" ? renderCoachMessage(msg.content) : msg.content}
+                </div>
               </div>
             ))}
           </div>
@@ -1894,6 +1986,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 setIdeaError("");
                 setIdeaInput("");
                 setSelectedDraftIds([]);
+                setEditableDraftById({});
+                setHiddenDraftIds([]);
                 setIdeaSuccess("");
                 setHasUnreadCoachReply(false);
                 setHasHiddenNewerMessages(false);
@@ -1914,51 +2008,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <div style={{ marginTop: 16 }}>
             <h4 style={styles.resultHeading}>Preview & quick copy</h4>
             <p style={styles.helperText}>
-              Choose parts from your chat messages or use the live preview below.
+              Pick and edit parts from your chat messages below.
               We will place them in the “Mark my letter” tab so you can get them graded quickly.
             </p>
-            <div style={styles.gridTwo} className="idea-generator-grid">
-              <div
-                style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
-                className="idea-generator-panel"
-              >
-                <div style={styles.metaRow}>
-                  <div style={{ fontWeight: 800 }}>Live preview</div>
-                  <span style={styles.badge}>Visible only to you</span>
-                </div>
-                <p style={styles.helperText}>
-                  See what you're typing before you send it.
-                </p>
-                {isPreviewOverflowing ? (
-                  <div style={{ ...styles.badge, marginBottom: 8, background: "#fff7ed", borderColor: "#fed7aa" }}>
-                    {isPreviewScrolled ? "You are viewing part of your text. Scroll up for the beginning." : "Long draft detected. Scroll to review all text."}
-                  </div>
-                ) : null}
-                <div
-                  ref={previewRef}
-                  style={{
-                    border: "1px dashed #d1d5db",
-                    borderRadius: 10,
-                    padding: 10,
-                    minHeight: 80,
-                    maxHeight: 160,
-                    overflowY: "auto",
-                    background: "#f8fafc",
-                    whiteSpace: "pre-wrap",
-                  }}
-                  className="idea-generator-preview"
-                  onScroll={(event) => {
-                    setIsPreviewScrolled(event.currentTarget.scrollTop > 4);
-                  }}
-                >
-                  {ideaInput.trim() || "No draft typed yet."}
-                </div>
-              </div>
-
-              <div
-                style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
-                className="idea-generator-panel"
-              >
+            <div
+              style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
+              className="idea-generator-panel"
+            >
                 <div style={styles.metaRow}>
                   <div style={{ fontWeight: 800 }}>Pick from your chat</div>
                   <span style={styles.badge}>{userMessages.length} drafts</span>
@@ -1992,11 +2048,40 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                           onChange={() => toggleDraftSelection(msg.id)}
                           style={{ marginTop: 4 }}
                         />
-                        <div>
+                        <div style={{ flex: 1 }}>
                           <div style={{ fontWeight: 700, fontSize: 13, color: "#1f2937" }}>Your chat entry</div>
-                          <p style={{ ...styles.helperText, marginBottom: 0, whiteSpace: "pre-wrap" }}>
-                            {msg.content}
-                          </p>
+                          <textarea
+                            value={
+                              typeof editableDraftById[msg.id] === "string"
+                                ? editableDraftById[msg.id]
+                                : msg.content
+                            }
+                            onChange={(event) => updateDraftText(msg.id, event.target.value)}
+                            style={{
+                              ...styles.textarea,
+                              minHeight: 76,
+                              marginTop: 6,
+                              background: "#fff",
+                            }}
+                          />
+                          <div style={{ ...styles.helperText, marginTop: 4, marginBottom: 0 }}>
+                            {countWords(
+                              typeof editableDraftById[msg.id] === "string"
+                                ? editableDraftById[msg.id]
+                                : msg.content
+                            )} words
+                          </div>
+                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                            <button type="button" style={styles.secondaryButton} onClick={() => selectOnlyDraft(msg.id)}>
+                              Use this only
+                            </button>
+                            <button type="button" style={styles.secondaryButton} onClick={() => duplicateDraft(msg)}>
+                              Duplicate draft
+                            </button>
+                            <button type="button" style={styles.secondaryButton} onClick={() => hideDraftFromPicker(msg)}>
+                              Remove from pick list
+                            </button>
+                          </div>
                         </div>
                       </label>
                     ))}
@@ -2013,7 +2098,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                     {ideaSuccess}
                   </div>
                 )}
-              </div>
             </div>
           </div>
         </section>
