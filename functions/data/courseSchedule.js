@@ -715,7 +715,7 @@ const courseSchedules = {
       chapter: "9_10",
       goal: "Understand how to negate statements using nicht,kein and nein",
       instruction:
-        "This chapter has two assignments. Do the assignments for chapter 9 and after chapter 10. Chapter 10 has no grammar",
+        "This chapter has two assignments. Complete both chapter 9 (Food and Negation) and chapter 10 (Food and Daily Life).",
       grammar_topic: "Negation",
       lesen_hören: [
         {

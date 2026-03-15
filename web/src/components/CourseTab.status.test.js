@@ -231,4 +231,64 @@ describe("getAutoStatusForEntry", () => {
     expect(submittedStatus.finalStatus).toBe("submitted");
     expect(inProgressStatus.finalStatus).toBe("inProgress");
   });
+
+  it("requires all assignment chapters in a combined day entry before marking complete", () => {
+    const multiAssignmentEntry = {
+      day: 16,
+      chapter: "9_10",
+      topic: "Food and Negation",
+      lesen_hören: [
+        { assignment: true, chapter: "9" },
+        { assignment: true, chapter: "10" },
+      ],
+    };
+
+    const partlySubmitted = getAutoStatusForEntry({
+      progressByAssignmentId: {
+        "A1-9": { assignmentId: "A1-9", status: "submitted", passed: false, failed: false, submitted: true, inProgress: false },
+      },
+      entry: multiAssignmentEntry,
+      level: "A1",
+      occurrence: 1,
+    });
+
+    const fullySubmitted = getAutoStatusForEntry({
+      progressByAssignmentId: {
+        "A1-9": { assignmentId: "A1-9", status: "submitted", passed: false, failed: false, submitted: true, inProgress: false },
+        "A1-10": { assignmentId: "A1-10", status: "submitted", passed: false, failed: false, submitted: true, inProgress: false },
+      },
+      entry: multiAssignmentEntry,
+      level: "A1",
+      occurrence: 1,
+    });
+
+    expect(partlySubmitted.finalStatus).toBe("inProgress");
+    expect(fullySubmitted.finalStatus).toBe("submitted");
+    expect(fullySubmitted.requiredAssignmentIds).toEqual(["A1-9", "A1-10"]);
+  });
+
+  it("applies the same all-required rule to other two-chapter assignment days", () => {
+    const day18Entry = {
+      day: 18,
+      chapter: "12.1_12.2",
+      topic: "Two Case Preposition",
+      lesen_hören: [
+        { assignment: true, chapter: "12.1" },
+        { assignment: true, chapter: "12.2" },
+      ],
+    };
+
+    const statusInfo = getAutoStatusForEntry({
+      progressByAssignmentId: {
+        "A1-12.1": { assignmentId: "A1-12.1", status: "passed", passed: true, failed: false, submitted: true, inProgress: false },
+      },
+      entry: day18Entry,
+      level: "A1",
+      occurrence: 1,
+    });
+
+    expect(statusInfo.finalStatus).toBe("inProgress");
+    expect(statusInfo.requiredAssignmentIds).toEqual(["A1-12.1", "A1-12.2"]);
+  });
+
 });
