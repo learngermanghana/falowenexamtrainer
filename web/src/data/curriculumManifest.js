@@ -41,7 +41,7 @@ const A1_CURRICULUM_ENTRIES = [
   { level: "A1", assignmentDay: 14, chapter: "3.6", mode: "Schreiben & Sprechen", assignment: false, topic: "Modal Verbs" },
   { level: "A1", assignmentDay: 15, chapter: "4.7", mode: "Schreiben & Sprechen", assignment: false, topic: "Imperatives" },
   { level: "A1", assignmentDay: 16, chapter: "9", mode: "Lesen & Hören", assignment: true, topic: "Food and Negation" },
-  { level: "A1", assignmentDay: 16, chapter: "10", mode: "Lesen & Hören", assignment: true, topic: "Daily Activities" },
+  { level: "A1", assignmentDay: 16, chapter: "10", mode: "Lesen & Hören", assignment: true, topic: "Food and Daily Life" },
   { level: "A1", assignmentDay: 17, chapter: "11", mode: "Lesen & Hören", assignment: true, topic: "Instructions and Directions" },
   { level: "A1", assignmentDay: 18, chapter: "12.1", mode: "Lesen & Hören", assignment: true, topic: "Two-way Prepositions" },
   { level: "A1", assignmentDay: 18, chapter: "12.2", mode: "Lesen & Hören", assignment: true, topic: "Directions and Movement" },

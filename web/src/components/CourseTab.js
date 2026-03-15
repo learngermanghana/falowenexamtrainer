@@ -388,6 +388,50 @@ const getEntryAssignmentId = (entry, level, occurrence = 1) => {
 
 const isSyntheticAssignmentId = (assignmentId = "") => SYNTHETIC_ASSIGNMENT_ID_PATTERN.test(String(assignmentId || "").trim());
 
+const getRequiredAssignmentIdsForEntry = (entry, level) => {
+  const normalizedLevel = normalizeLevel(level);
+  const lessonCandidates = [...toLessonArray(entry?.lesen_hören), ...toLessonArray(entry?.schreiben_sprechen)].filter(
+    (lesson) => lesson?.assignment
+  );
+
+  const lessonAssignmentIds = lessonCandidates
+    .map((lesson) => {
+      const dictionaryMatch = getAssignmentDictionaryEntry({
+        level: normalizedLevel,
+        assignmentId: lesson.assignmentId || lesson.assignment_id || entry?.assignmentId || entry?.assignment_id,
+        chapter: lesson.chapter || entry?.chapter,
+        mode: lesson.type || lesson.mode,
+        assignmentDay: entry?.day,
+      });
+      if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
+
+      return (
+        resolveAssignmentCanonicalKey({
+          level: normalizedLevel || level,
+          assignmentId: lesson.assignmentId || lesson.assignment_id || lesson.chapter,
+          assignmentTitle: lesson.title || lesson.chapter || entry?.topic,
+        }) || ""
+      );
+    })
+    .filter(Boolean);
+
+  if (lessonAssignmentIds.length > 1) {
+    return [...new Set(lessonAssignmentIds)];
+  }
+
+  const curriculumMatches = (getCurriculumEntriesByDayForLevel(normalizedLevel)?.[Number(entry?.day)] || [])
+    .filter((item) => item?.assignment === true)
+    .map((item) => item.assignment_id)
+    .filter(Boolean);
+
+  if (curriculumMatches.length > 1) {
+    return [...new Set(curriculumMatches)];
+  }
+
+  const primaryAssignmentId = getEntryAssignmentId(entry, level, 1);
+  return primaryAssignmentId ? [primaryAssignmentId] : [];
+};
+
 const resolveResultCanonicalAssignmentId = (result = {}, level = "") =>
   resolveAssignmentCanonicalKey({
     level,
@@ -610,8 +654,10 @@ export const getStatusForEntry = (dayStatuses, entry, level, occurrence = 1) => 
 };
 
 export const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, occurrence }) => {
-  const assignmentId = getEntryAssignmentId(entry, level, occurrence);
+  const requiredAssignmentIds = getRequiredAssignmentIdsForEntry(entry, level);
+  const assignmentId = requiredAssignmentIds[0] || getEntryAssignmentId(entry, level, occurrence);
   const missingCanonicalAssignmentId = !assignmentId || isSyntheticAssignmentId(assignmentId);
+
   if (!assignmentId) {
     return {
       status: "notStarted",
@@ -620,21 +666,77 @@ export const getAutoStatusForEntry = ({ progressByAssignmentId, entry, level, oc
       diagnostics: buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }),
     };
   }
+
+  const requiredProgress = requiredAssignmentIds.map((requiredAssignmentId) => {
+    const progress = progressByAssignmentId[requiredAssignmentId];
+    if (!progress) {
+      return {
+        assignmentId: requiredAssignmentId,
+        status: "notStarted",
+        finalStatus: "notStarted",
+      };
+    }
+
+    const derivedStatus = deriveMergedProgressStatus(progress);
+    return {
+      assignmentId: requiredAssignmentId,
+      status: derivedStatus.normalizedStatus,
+      finalStatus: derivedStatus.finalStatus,
+      rawStatus: progress.status,
+      mergedStatus: progress,
+    };
+  });
+
+  const hasMultipleRequiredAssignments = requiredProgress.length > 1;
+  if (hasMultipleRequiredAssignments) {
+    const finalStatuses = requiredProgress.map((item) => item.finalStatus || item.status || "notStarted");
+    const allPassed = finalStatuses.every((status) => status === "passed");
+    const allCompleted = finalStatuses.every((status) => isCompleteStatus(status));
+    const hasFailed = finalStatuses.some((status) => status === "failed");
+    const hasActivity = finalStatuses.some((status) => status !== "notStarted");
+
+    const aggregateStatus = allPassed
+      ? "passed"
+      : hasFailed
+        ? "failed"
+        : allCompleted
+          ? "submitted"
+          : hasActivity
+            ? "inProgress"
+            : "notStarted";
+
+    return {
+      status: aggregateStatus,
+      finalStatus: aggregateStatus,
+      assignmentId,
+      requiredAssignmentIds,
+      missingAssignmentId: missingCanonicalAssignmentId,
+      diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
+      statusDebug: {
+        aggregateStatus,
+        requiredAssignments: requiredProgress.map((item) => ({ assignmentId: item.assignmentId, status: item.finalStatus || item.status })),
+      },
+    };
+  }
+
   const progress = progressByAssignmentId[assignmentId];
   if (!progress) {
     return {
       status: "notStarted",
       assignmentId,
+      requiredAssignmentIds,
       missingAssignmentId: missingCanonicalAssignmentId,
       diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
     };
   }
+
   const derivedStatus = deriveMergedProgressStatus(progress);
 
   return {
     status: derivedStatus.normalizedStatus,
     finalStatus: derivedStatus.finalStatus,
     assignmentId,
+    requiredAssignmentIds,
     missingAssignmentId: missingCanonicalAssignmentId,
     diagnostics: missingCanonicalAssignmentId ? buildMissingAssignmentIdDiagnostic({ entry, level, occurrence, assignmentId }) : null,
     rawStatus: progress.status,
