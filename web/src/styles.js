@@ -672,7 +672,7 @@ export const styles = {
     border: "1px solid #d1d5db",
     fontSize: 14,
     resize: "vertical",
-    minHeight: 80,
+    minHeight: 140,
     boxSizing: "border-box",
   },
   gridTwo: {

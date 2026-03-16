@@ -62,6 +62,7 @@
   border-radius: 16px;
   background: linear-gradient(180deg, #f8fbff 0%, #f1f5f9 100%);
   padding: 10px !important;
+  min-height: 320px;
   scrollbar-width: thin;
   scrollbar-color: #93c5fd transparent;
 }
@@ -169,7 +170,8 @@
   }
 
   .idea-generator-chat {
-    max-height: 240px;
+    min-height: 260px;
+    max-height: 360px;
     gap: 8px;
   }
 
