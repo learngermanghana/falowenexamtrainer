@@ -29,7 +29,7 @@
 }
 
 .app-shell {
-  padding: 24px 16px 220px;
+  padding: 24px 16px 270px;
 }
 
 .app-header {
@@ -136,7 +136,7 @@
   }
 
   .app-shell {
-    padding: 16px 12px 240px;
+    padding: 16px 12px 286px;
   }
 
   .app-header {
@@ -338,6 +338,47 @@
   text-decoration: underline;
 }
 
+
+.global-quick-nav {
+  position: fixed;
+  right: 12px;
+  bottom: calc(66px + env(safe-area-inset-bottom));
+  z-index: 1101;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.global-quick-nav-button {
+  border: 1px solid rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.84);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+  cursor: pointer;
+}
+
+.global-quick-nav-button.is-active {
+  border-color: #93c5fd;
+  background: #1d4ed8;
+}
+
+.global-quick-nav-button:hover {
+  background: rgba(30, 64, 175, 0.96);
+}
+
+
+.global-quick-nav-button:focus-visible {
+  outline: 2px solid #bfdbfe;
+  outline-offset: 2px;
+}
 
 @keyframes skeletonPulse {
   0% {
@@ -683,6 +724,21 @@
   }
 }
 
+
+
+@media (max-width: 640px) {
+  .global-quick-nav {
+    right: 10px;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+    gap: 6px;
+  }
+
+  .global-quick-nav-button {
+    max-width: 42vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
 
 .study-buddy-mobile-close {
   display: none;

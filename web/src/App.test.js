@@ -36,4 +36,6 @@ test("renders home actions for authenticated users", () => {
   render(<App />);
   expect(screen.getByText(/Falowen Learning Hub/i)).toBeInTheDocument();
   expect(screen.getByRole("button", { name: /Kursbuch öffnen/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /campus/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /exams room/i })).toBeInTheDocument();
 });
