@@ -1332,10 +1332,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, [updateChatScrollMeta]);
 
-  const userMessages = useMemo(
-    () => chatMessages.filter((msg) => msg.role === "user" && !hiddenDraftIds.includes(msg.id)),
-    [chatMessages, hiddenDraftIds]
-  );
 
   const sendDraftsToMarkTab = () => {
     const combinedDraft = ideaDraftWorkspace.trim();
@@ -1972,42 +1968,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <div style={{ marginTop: 16 }}>
             <h4 style={styles.resultHeading}>Preview & quick copy</h4>
             <p style={styles.helperText}>
-              Keep one running draft box. New messages can be added or used to replace the workspace so you can always copy and improve in one place.
+              Keep one running draft box so students can keep building and refining what they type.
             </p>
             <div
               style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
               className="idea-generator-panel"
             >
-              <div style={styles.metaRow}>
-                <div style={{ fontWeight: 800 }}>Pick from your chat</div>
-                <span style={styles.badge}>{userMessages.length} messages</span>
-              </div>
-
-              {userMessages.length ? (
-                <div style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }} className="idea-generator-drafts">
-                  {userMessages.map((msg) => (
-                    <div key={msg.id} style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
-                      <div style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-wrap" }}>{msg.content}</div>
-                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-                        <button
-                          type="button"
-                          style={styles.secondaryButton}
-                          onClick={() => setIdeaDraftWorkspace((prev) => [prev.trim(), msg.content.trim()].filter(Boolean).join("\n\n"))}
-                        >
-                          Add to workspace
-                        </button>
-                        <button type="button" style={styles.secondaryButton} onClick={() => setIdeaDraftWorkspace(msg.content)}>
-                          Use this only
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p style={styles.helperText}>Send a question in chat first, then build your single draft workspace from your messages.</p>
-              )}
-
-              <div style={{ marginTop: 10 }}>
+              <div>
                 <label style={styles.label}>Single draft workspace</label>
                 <textarea
                   style={styles.textareaSmall}
