@@ -201,7 +201,7 @@ const HomeMetrics = ({ studentProfile }) => {
       } else {
         console.error("[HomeMetrics] Score summary failed", {
           studentCode,
-          hasIdToken: Boolean(idToken || user),
+          hasIdToken: Boolean(idToken || user?.uid),
           apiBaseUrl: process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_FUNCTIONS_BASE_URL || "",
           error: scoreResult.reason,
         });
