@@ -2,6 +2,7 @@ import {
   aggregateUnresolvedTutorDiagnostics,
   collectUnresolvedTutorAssignmentDiagnostics,
   getAutoStatusForEntry,
+  getScoreBadgeForEntry,
   getStatusForEntry,
   mergeCourseProgressStatuses,
 } from "./CourseTab";
@@ -291,4 +292,64 @@ describe("getAutoStatusForEntry", () => {
     expect(statusInfo.requiredAssignmentIds).toEqual(["A1-12.1", "A1-12.2"]);
   });
 
+});
+
+
+describe("getScoreBadgeForEntry", () => {
+  it("shows latest scored badge when score data exists", () => {
+    const badge = getScoreBadgeForEntry({
+      statusInfo: {
+        status: "submitted",
+        finalStatus: "submitted",
+        assignmentId: "A1-2",
+        requiredAssignmentIds: ["A1-2"],
+      },
+      progressByAssignmentId: {
+        "A1-2": { latestScore: 82, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+      },
+    });
+
+    expect(badge).toEqual({
+      tone: "scored",
+      text: "Latest score: 82/100",
+    });
+  });
+
+  it("shows awaiting badge when entry is submitted but score is not available yet", () => {
+    const badge = getScoreBadgeForEntry({
+      statusInfo: {
+        status: "submitted",
+        finalStatus: "submitted",
+        assignmentId: "A1-2",
+      },
+      progressByAssignmentId: {
+        "A1-2": { latestScore: null, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+      },
+    });
+
+    expect(badge).toEqual({
+      tone: "awaiting",
+      text: "Awaiting score",
+    });
+  });
+
+  it("uses the most recently updated score across required assignments", () => {
+    const badge = getScoreBadgeForEntry({
+      statusInfo: {
+        status: "submitted",
+        finalStatus: "submitted",
+        assignmentId: "A1-9",
+        requiredAssignmentIds: ["A1-9", "A1-10"],
+      },
+      progressByAssignmentId: {
+        "A1-9": { latestScore: 67, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+        "A1-10": { latestScore: 78.5, lastUpdatedAt: "2024-10-04T08:00:00.000Z" },
+      },
+    });
+
+    expect(badge).toEqual({
+      tone: "scored",
+      text: "Latest score: 78.5/100",
+    });
+  });
 });
