@@ -35,13 +35,6 @@ const questionCardStyle = {
   gap: 6,
 };
 
-const videoPreviewStyle = {
-  width: "100%",
-  minHeight: 315,
-  border: 0,
-  borderRadius: 10,
-};
-
 const lesenQuestions = [
   {
     stem: "1. Wo findet man Wohnungsanzeigen?",
@@ -389,21 +382,6 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
           <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
-
-          <div style={questionCardStyle}>
-            <strong>Recommended video</strong>
-            <a href="https://youtu.be/ScU6w8VQgNg" target="_blank" rel="noreferrer">
-              Watch the lesson video
-            </a>
-          </div>
-
-          <iframe
-            title="Eine Wohnung suchen lesson video"
-            src="https://www.youtube.com/embed/ScU6w8VQgNg"
-            style={videoPreviewStyle}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
 
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Audio link: <a href="https://drive.google.com/file/d/1ULPeE_f3e12R4TXJaB2LE5qO7sa6vY0t/view?usp=sharing" target="_blank" rel="noreferrer">Open listening audio</a>
