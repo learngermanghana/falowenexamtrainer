@@ -4,15 +4,12 @@ import { styles } from "../styles";
 
 /* =========================================================
    A1 LESSON SET
-   - Grammar Book
-   - Light Practice Book
+   - Grammar Book with embedded mini practice
+   - Standalone Practice Book
    Topics:
    1) Days of the week
    2) 12-hour clock + halb / Viertel
    3) Separable verbs
-
-   Default export at bottom is Grammar Book.
-   Change default export if you want Practice first.
 ========================================================= */
 
 const splashImage =
@@ -88,6 +85,15 @@ const successStyle = {
   gap: 8,
 };
 
+const accentStyle = {
+  border: "1px solid #bfdbfe",
+  borderRadius: 12,
+  padding: 12,
+  background: "#eff6ff",
+  display: "grid",
+  gap: 8,
+};
+
 const chipStyle = {
   border: "1px solid #e5e7eb",
   borderRadius: 999,
@@ -122,6 +128,8 @@ const Callout = ({ title, children, variant = "default" }) => {
       ? warningStyle
       : variant === "success"
       ? successStyle
+      : variant === "accent"
+      ? accentStyle
       : calloutStyle;
 
   return (
@@ -285,6 +293,7 @@ const QuickBack = ({ navigate, to = "/campus/course" }) => (
     <button
       style={{ ...styles.secondaryButton, width: "fit-content" }}
       onClick={() => navigate(to)}
+      type="button"
     >
       Back to Course
     </button>
@@ -302,12 +311,477 @@ const Checklist = ({ items }) => (
   </div>
 );
 
+const ProgressBar = ({ checkedCount, total, correctCount }) => {
+  const percent = total ? Math.round((checkedCount / total) * 100) : 0;
+
+  return (
+    <div style={whiteCard}>
+      <div style={{ display: "grid", gap: 8 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+          <strong>Lesson progress</strong>
+          <span style={{ fontSize: 14, opacity: 0.85 }}>
+            {checkedCount}/{total} checked • {correctCount} correct
+          </span>
+        </div>
+
+        <div
+          style={{
+            width: "100%",
+            height: 12,
+            borderRadius: 999,
+            background: "#e5e7eb",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              width: `${percent}%`,
+              height: "100%",
+              background: "linear-gradient(90deg, #2563eb, #16a34a)",
+              transition: "width 0.25s ease",
+            }}
+          />
+        </div>
+
+        <div style={{ fontSize: 14, opacity: 0.8 }}>{percent}% completed</div>
+      </div>
+    </div>
+  );
+};
+
+const SpeakingTaskCard = ({ title = "Speaking task", prompts = [] }) => (
+  <div style={whiteCard}>
+    <div style={{ display: "grid", gap: 6 }}>
+      <h3 style={{ margin: 0, fontSize: 18 }}>{title}</h3>
+      <p style={{ ...paragraph, opacity: 0.9 }}>
+        Say your answers aloud in German. This helps students move from recognition to production.
+      </p>
+    </div>
+
+    <Callout title="Try speaking" variant="accent">
+      <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+        {prompts.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ol>
+    </Callout>
+  </div>
+);
+
+/* =========================
+   Practice helpers
+========================= */
+
+const normalize = (value) =>
+  String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/[“”"]/g, '"')
+    .replace(/[’]/g, "'")
+    .replace(/\s*\.\s*$/, "");
+
+const mcButtonStyle = (selected, correct, checked) => ({
+  width: "100%",
+  textAlign: "left",
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: checked
+    ? selected
+      ? correct
+        ? "1px solid #16a34a"
+        : "1px solid #dc2626"
+      : "1px solid #e5e7eb"
+    : selected
+    ? "1px solid #111827"
+    : "1px solid #d1d5db",
+  background: checked
+    ? selected
+      ? correct
+        ? "#f0fdf4"
+        : "#fef2f2"
+      : "#fff"
+    : selected
+    ? "#f8fafc"
+    : "#fff",
+  cursor: "pointer",
+  fontSize: 15,
+});
+
+const PracticeQuestion = ({
+  questionKey,
+  number,
+  type,
+  prompt,
+  options = [],
+  answer,
+  explanation,
+  placeholder = "Write your answer here",
+  onResult,
+  showAnswersDefault = false,
+}) => {
+  const [selected, setSelected] = useState("");
+  const [text, setText] = useState("");
+  const [checked, setChecked] = useState(false);
+  const [showAnswer, setShowAnswer] = useState(showAnswersDefault);
+
+  const isText = type === "text";
+  const userValue = isText ? normalize(text) : normalize(selected);
+  const correctValues = Array.isArray(answer)
+    ? answer.map((a) => normalize(a))
+    : [normalize(answer)];
+  const isCorrect = checked ? correctValues.includes(userValue) : false;
+
+  const handleCheck = () => {
+    setChecked(true);
+    const nextUserValue = isText ? normalize(text) : normalize(selected);
+    const nextCorrect = correctValues.includes(nextUserValue);
+    onResult?.(questionKey, nextCorrect);
+  };
+
+  const handleReset = () => {
+    setSelected("");
+    setText("");
+    setChecked(false);
+    setShowAnswer(false);
+    onResult?.(questionKey, null);
+  };
+
+  const renderedAnswer = Array.isArray(answer) ? answer.join(" / ") : answer;
+
+  return (
+    <div style={softCard}>
+      <div style={{ display: "grid", gap: 6 }}>
+        <div style={{ fontSize: 13, opacity: 0.75 }}>Question {number}</div>
+        <div style={{ fontWeight: 700, fontSize: 16 }}>{prompt}</div>
+      </div>
+
+      {isText ? (
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={placeholder}
+          style={{
+            padding: "11px 12px",
+            borderRadius: 10,
+            border: "1px solid #d1d5db",
+            outline: "none",
+            fontSize: 15,
+          }}
+        />
+      ) : (
+        <div style={{ display: "grid", gap: 8 }}>
+          {options.map((opt) => (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => !checked && setSelected(opt)}
+              style={mcButtonStyle(
+                normalize(selected) === normalize(opt),
+                correctValues.includes(normalize(opt)),
+                checked
+              )}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, width: "fit-content" }}
+          onClick={handleCheck}
+        >
+          Check
+        </button>
+        <button
+          type="button"
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+          onClick={handleReset}
+        >
+          Reset
+        </button>
+        <button
+          type="button"
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+          onClick={() => setShowAnswer((prev) => !prev)}
+        >
+          {showAnswer ? "Hide Answer" : "Show Answer"}
+        </button>
+      </div>
+
+      {showAnswer ? (
+        <Callout title="Model answer" variant="accent">
+          <div>
+            <strong>Answer:</strong> {renderedAnswer}
+          </div>
+          {explanation ? <div style={{ marginTop: 4 }}>{explanation}</div> : null}
+        </Callout>
+      ) : null}
+
+      {checked ? (
+        <div
+          style={{
+            border: "1px solid #e5e7eb",
+            borderRadius: 10,
+            padding: 10,
+            background: "#fff",
+            lineHeight: 1.6,
+          }}
+        >
+          {isCorrect ? (
+            <div>
+              ✅ <strong>Correct.</strong>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: 6 }}>
+              <div>
+                ❌ <strong>Not quite.</strong>
+              </div>
+              <div>
+                <strong>Correct answer:</strong> {renderedAnswer}
+              </div>
+            </div>
+          )}
+          {explanation ? <div style={{ marginTop: 6, opacity: 0.92 }}>{explanation}</div> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+const EmbeddedPracticeBlock = ({
+  title,
+  subtitle,
+  questions,
+  onScoreChange,
+}) => {
+  const [results, setResults] = useState({});
+
+  const checkedCount = Object.values(results).filter((v) => v !== null).length;
+  const correctCount = Object.values(results).filter(Boolean).length;
+  const total = questions.length;
+
+  const handleResult = (questionKey, value) => {
+    setResults((prev) => {
+      const next = {
+        ...prev,
+        [questionKey]: value,
+      };
+      onScoreChange?.(next);
+      return next;
+    });
+  };
+
+  return (
+    <div style={whiteCard}>
+      <div style={{ display: "grid", gap: 6 }}>
+        <h3 style={{ margin: 0, fontSize: 18 }}>{title}</h3>
+        {subtitle ? <p style={{ ...paragraph, opacity: 0.9 }}>{subtitle}</p> : null}
+      </div>
+
+      <Callout title="Your mini score" variant="success">
+        <div style={{ display: "grid", gap: 4 }}>
+          <div>
+            <strong>{correctCount}</strong> correct out of <strong>{total}</strong>
+          </div>
+          <div style={{ opacity: 0.85 }}>
+            Checked: {checkedCount}/{total}
+          </div>
+        </div>
+      </Callout>
+
+      <div style={{ display: "grid", gap: 14 }}>
+        {questions.map((q) => (
+          <PracticeQuestion
+            key={q.questionKey}
+            {...q}
+            onResult={handleResult}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 /* =========================
    Grammar Book
 ========================= */
 
 export const WeekTimeSeparableGrammarBook = () => {
   const navigate = useNavigate();
+
+  const [sectionScores, setSectionScores] = useState({
+    days: {},
+    time: {},
+    verbs: {},
+    mixed: {},
+  });
+
+  const daysPractice = useMemo(
+    () => [
+      {
+        questionKey: "days-1",
+        number: 1,
+        type: "multiple",
+        prompt: 'Which one means "on Friday"?',
+        options: ["um Freitag", "am Freitag", "im Freitag"],
+        answer: "am Freitag",
+        explanation: 'Use "am" with days of the week.',
+      },
+      {
+        questionKey: "days-2",
+        number: 2,
+        type: "multiple",
+        prompt: "What comes after Dienstag?",
+        options: ["Montag", "Mittwoch", "Donnerstag"],
+        answer: "Mittwoch",
+      },
+      {
+        questionKey: "days-3",
+        number: 3,
+        type: "text",
+        prompt: 'Write this in German: "On Sunday"',
+        answer: ["am Sonntag", "Am Sonntag"],
+        placeholder: 'Example: "am ..."',
+      },
+    ],
+    []
+  );
+
+  const timePractice = useMemo(
+    () => [
+      {
+        questionKey: "time-1",
+        number: 1,
+        type: "multiple",
+        prompt: "What is 7:30 in German?",
+        options: ["halb sieben", "halb acht", "Viertel nach sieben"],
+        answer: "halb acht",
+        explanation: '"halb" points to the next hour.',
+      },
+      {
+        questionKey: "time-2",
+        number: 2,
+        type: "multiple",
+        prompt: 'What does "Viertel vor neun" mean?',
+        options: ["8:15", "8:45", "9:15"],
+        answer: "8:45",
+      },
+      {
+        questionKey: "time-3",
+        number: 3,
+        type: "text",
+        prompt: "Write 8:15 in German.",
+        answer: ["Viertel nach acht", "viertel nach acht"],
+        placeholder: 'Example: "Viertel nach ..."',
+      },
+    ],
+    []
+  );
+
+  const verbPractice = useMemo(
+    () => [
+      {
+        questionKey: "verbs-1",
+        number: 1,
+        type: "multiple",
+        prompt: 'Choose the correct sentence with "aufstehen".',
+        options: [
+          "Ich aufstehe um sechs Uhr.",
+          "Ich stehe um sechs Uhr auf.",
+          "Ich stehe auf um sechs Uhr.",
+        ],
+        answer: "Ich stehe um sechs Uhr auf.",
+        explanation: "The separable prefix goes to the end in a simple sentence.",
+      },
+      {
+        questionKey: "verbs-2",
+        number: 2,
+        type: "multiple",
+        prompt: 'Choose the correct sentence with "anrufen".',
+        options: [
+          "Ich anrufe meine Mutter am Abend.",
+          "Ich rufe meine Mutter am Abend an.",
+          "Ich rufe an meine Mutter am Abend.",
+        ],
+        answer: "Ich rufe meine Mutter am Abend an.",
+      },
+      {
+        questionKey: "verbs-3",
+        number: 3,
+        type: "text",
+        prompt: 'Write a short sentence with "einkaufen".',
+        answer: [
+          "Wir kaufen am Samstag ein.",
+          "wir kaufen am samstag ein.",
+          "Ich kaufe am Samstag ein.",
+          "ich kaufe am samstag ein.",
+        ],
+        explanation:
+          "More than one sentence can be correct. These are accepted model answers for this mini-check.",
+        placeholder: 'Example: "Ich kaufe ..."',
+      },
+    ],
+    []
+  );
+
+  const mixedPractice = useMemo(
+    () => [
+      {
+        questionKey: "mixed-1",
+        number: 1,
+        type: "multiple",
+        prompt: 'Which sentence is correct?',
+        options: [
+          "Am Montag ich stehe um halb sieben auf.",
+          "Am Montag stehe ich um halb sieben auf.",
+          "Am Montag stehe ich auf um halb sieben.",
+        ],
+        answer: "Am Montag stehe ich um halb sieben auf.",
+      },
+      {
+        questionKey: "mixed-2",
+        number: 2,
+        type: "multiple",
+        prompt: 'What does this mean? "Am Dienstag rufe ich meine Freundin um Viertel nach acht an."',
+        options: [
+          "On Tuesday I call my friend at 8:15.",
+          "On Tuesday I call my friend at 8:30.",
+          "On Tuesday I call my friend at 7:45.",
+        ],
+        answer: "On Tuesday I call my friend at 8:15.",
+      },
+      {
+        questionKey: "mixed-3",
+        number: 3,
+        type: "text",
+        prompt:
+          "Write one full sentence with a day + time + separable verb using this idea: Mittwoch / Viertel vor sieben / aufstehen",
+        answer: [
+          "Am Mittwoch stehe ich um Viertel vor sieben auf.",
+          "am mittwoch stehe ich um viertel vor sieben auf.",
+        ],
+        explanation: "This mini-assignment checks if you can combine all 3 lesson topics.",
+        placeholder: 'Example: "Am Mittwoch ..."',
+      },
+    ],
+    []
+  );
+
+  const allResults = [
+    ...Object.values(sectionScores.days),
+    ...Object.values(sectionScores.time),
+    ...Object.values(sectionScores.verbs),
+    ...Object.values(sectionScores.mixed),
+  ];
+
+  const totalQuestions =
+    daysPractice.length + timePractice.length + verbPractice.length + mixedPractice.length;
+  const checkedCount = allResults.filter((v) => v !== null).length;
+  const correctCount = allResults.filter(Boolean).length;
 
   return (
     <main style={pageWrap}>
@@ -324,6 +798,12 @@ export const WeekTimeSeparableGrammarBook = () => {
           "trennbare Verben",
           "daily routine",
         ]}
+      />
+
+      <ProgressBar
+        checkedCount={checkedCount}
+        total={totalQuestions}
+        correctCount={correctCount}
       />
 
       <Section
@@ -430,10 +910,17 @@ export const WeekTimeSeparableGrammarBook = () => {
 
         <MiniRecap
           items={[
-            'Days of the week begin with a capital letter.',
+            "Days of the week begin with a capital letter.",
             'Use "am" with days: am Montag, am Dienstag...',
             "Days are often used to talk about routines.",
           ]}
+        />
+
+        <EmbeddedPracticeBlock
+          title="Mini practice: Wochentage"
+          subtitle="Quick check before you move to the next topic."
+          questions={daysPractice}
+          onScoreChange={(score) => setSectionScores((prev) => ({ ...prev, days: score }))}
         />
       </Section>
 
@@ -542,25 +1029,24 @@ export const WeekTimeSeparableGrammarBook = () => {
 
         <Callout title="Pronunciation tip">
           <div style={{ display: "grid", gap: 6 }}>
-            <div>
-              Say these as one smooth phrase:
-            </div>
-            <ChipRow
-              items={[
-                "Viertel nach acht",
-                "halb sieben",
-                "Viertel vor neun",
-              ]}
-            />
+            <div>Say these as one smooth phrase:</div>
+            <ChipRow items={["Viertel nach acht", "halb sieben", "Viertel vor neun"]} />
           </div>
         </Callout>
 
         <MiniRecap
           items={[
-            'Viertel nach = 15 minutes after.',
-            'Viertel vor = 15 minutes before.',
+            "Viertel nach = 15 minutes after.",
+            "Viertel vor = 15 minutes before.",
             '"halb" points to the next hour.',
           ]}
+        />
+
+        <EmbeddedPracticeBlock
+          title="Mini practice: Uhrzeit"
+          subtitle="Check if you really understand halb and Viertel."
+          questions={timePractice}
+          onScoreChange={(score) => setSectionScores((prev) => ({ ...prev, time: score }))}
         />
       </Section>
 
@@ -577,9 +1063,7 @@ export const WeekTimeSeparableGrammarBook = () => {
 
         <Callout title="What is a separable verb?">
           <div style={{ display: "grid", gap: 8 }}>
-            <div>
-              A separable verb has two parts:
-            </div>
+            <div>A separable verb has two parts:</div>
             <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
               <li>prefix</li>
               <li>main verb</li>
@@ -602,9 +1086,7 @@ export const WeekTimeSeparableGrammarBook = () => {
 
         <Callout title="Rule">
           <div style={{ display: "grid", gap: 8 }}>
-            <div>
-              In a simple present sentence, the verb splits:
-            </div>
+            <div>In a simple present sentence, the verb splits:</div>
             <div>
               <strong>Ich stehe um sechs Uhr auf.</strong>
             </div>
@@ -632,6 +1114,13 @@ export const WeekTimeSeparableGrammarBook = () => {
             "The verb splits in a simple sentence: Ich stehe ... auf.",
             "Many daily routine verbs are separable.",
           ]}
+        />
+
+        <EmbeddedPracticeBlock
+          title="Mini practice: Trennbare Verben"
+          subtitle="Now test whether you can spot and build separable verb sentences."
+          questions={verbPractice}
+          onScoreChange={(score) => setSectionScores((prev) => ({ ...prev, verbs: score }))}
         />
       </Section>
 
@@ -688,6 +1177,23 @@ export const WeekTimeSeparableGrammarBook = () => {
             </ul>
           </div>
         </Callout>
+
+        <EmbeddedPracticeBlock
+          title="Mini assignment inside the note"
+          subtitle="This is only a short embedded check. The full assignment can still stay in the separate sheet."
+          questions={mixedPractice}
+          onScoreChange={(score) => setSectionScores((prev) => ({ ...prev, mixed: score }))}
+        />
+
+        <SpeakingTaskCard
+          title="Final speaking task"
+          prompts={[
+            "Sage, was du am Montag machst.",
+            "Sage eine Uhrzeit mit halb oder Viertel.",
+            "Benutze ein trennbares Verb in einem Satz.",
+            "Sprich 3 kurze Sätze über deine Woche.",
+          ]}
+        />
       </Section>
 
       <Section
@@ -745,159 +1251,8 @@ export const WeekTimeSeparableGrammarBook = () => {
 };
 
 /* =========================
-   Practice Book
-   Lighter and more mobile-friendly
+   Standalone Practice Book
 ========================= */
-
-const normalize = (value) =>
-  String(value || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, " ")
-    .replace(/[“”"]/g, '"')
-    .replace(/[’]/g, "'");
-
-const mcButtonStyle = (selected, correct, checked) => ({
-  width: "100%",
-  textAlign: "left",
-  padding: "12px 14px",
-  borderRadius: 12,
-  border: checked
-    ? selected
-      ? correct
-        ? "1px solid #16a34a"
-        : "1px solid #dc2626"
-      : "1px solid #e5e7eb"
-    : selected
-    ? "1px solid #111827"
-    : "1px solid #d1d5db",
-  background: checked
-    ? selected
-      ? correct
-        ? "#f0fdf4"
-        : "#fef2f2"
-      : "#fff"
-    : selected
-    ? "#f8fafc"
-    : "#fff",
-  cursor: "pointer",
-  fontSize: 15,
-});
-
-const PracticeQuestion = ({
-  number,
-  type,
-  prompt,
-  options = [],
-  answer,
-  explanation,
-  placeholder = "Write your answer here",
-}) => {
-  const [selected, setSelected] = useState("");
-  const [text, setText] = useState("");
-  const [checked, setChecked] = useState(false);
-
-  const isText = type === "text";
-  const userValue = isText ? normalize(text) : normalize(selected);
-  const correctValues = Array.isArray(answer)
-    ? answer.map((a) => normalize(a))
-    : [normalize(answer)];
-  const isCorrect = checked ? correctValues.includes(userValue) : false;
-
-  const handleCheck = () => setChecked(true);
-  const handleReset = () => {
-    setSelected("");
-    setText("");
-    setChecked(false);
-  };
-
-  return (
-    <div style={softCard}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <div style={{ fontSize: 13, opacity: 0.75 }}>Question {number}</div>
-        <div style={{ fontWeight: 700, fontSize: 16 }}>{prompt}</div>
-      </div>
-
-      {isText ? (
-        <input
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={placeholder}
-          style={{
-            padding: "11px 12px",
-            borderRadius: 10,
-            border: "1px solid #d1d5db",
-            outline: "none",
-            fontSize: 15,
-          }}
-        />
-      ) : (
-        <div style={{ display: "grid", gap: 8 }}>
-          {options.map((opt) => (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => !checked && setSelected(opt)}
-              style={mcButtonStyle(
-                normalize(selected) === normalize(opt),
-                correctValues.includes(normalize(opt)),
-                checked
-              )}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button
-          type="button"
-          style={{ ...styles.primaryButton, width: "fit-content" }}
-          onClick={handleCheck}
-        >
-          Check
-        </button>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={handleReset}
-        >
-          Reset
-        </button>
-      </div>
-
-      {checked ? (
-        <div
-          style={{
-            border: "1px solid #e5e7eb",
-            borderRadius: 10,
-            padding: 10,
-            background: "#fff",
-            lineHeight: 1.6,
-          }}
-        >
-          {isCorrect ? (
-            <div>
-              ✅ <strong>Correct.</strong>
-            </div>
-          ) : (
-            <div style={{ display: "grid", gap: 6 }}>
-              <div>
-                ❌ <strong>Not quite.</strong>
-              </div>
-              <div>
-                <strong>Correct answer:</strong>{" "}
-                {Array.isArray(answer) ? answer.join(" / ") : answer}
-              </div>
-            </div>
-          )}
-          {explanation ? <div style={{ marginTop: 6, opacity: 0.92 }}>{explanation}</div> : null}
-        </div>
-      ) : null}
-    </div>
-  );
-};
 
 export const WeekTimeSeparablePracticeBook = () => {
   const navigate = useNavigate();
@@ -905,6 +1260,7 @@ export const WeekTimeSeparablePracticeBook = () => {
   const questions = useMemo(
     () => [
       {
+        questionKey: "practice-1",
         number: 1,
         type: "multiple",
         prompt: 'Which one means "on Monday"?',
@@ -913,6 +1269,7 @@ export const WeekTimeSeparablePracticeBook = () => {
         explanation: 'Use "am" with days of the week.',
       },
       {
+        questionKey: "practice-2",
         number: 2,
         type: "multiple",
         prompt: "What comes after Mittwoch?",
@@ -920,6 +1277,7 @@ export const WeekTimeSeparablePracticeBook = () => {
         answer: "Donnerstag",
       },
       {
+        questionKey: "practice-3",
         number: 3,
         type: "multiple",
         prompt: "What is 7:30 in common German?",
@@ -928,6 +1286,7 @@ export const WeekTimeSeparablePracticeBook = () => {
         explanation: '"halb" uses the next hour.',
       },
       {
+        questionKey: "practice-4",
         number: 4,
         type: "multiple",
         prompt: 'What is "Viertel vor acht"?',
@@ -935,6 +1294,7 @@ export const WeekTimeSeparablePracticeBook = () => {
         answer: "7:45",
       },
       {
+        questionKey: "practice-5",
         number: 5,
         type: "text",
         prompt: "Write 8:15 in German.",
@@ -942,6 +1302,7 @@ export const WeekTimeSeparablePracticeBook = () => {
         placeholder: 'Example: "Viertel nach ..."',
       },
       {
+        questionKey: "practice-6",
         number: 6,
         type: "multiple",
         prompt: "Which sentence is correct?",
@@ -954,6 +1315,7 @@ export const WeekTimeSeparablePracticeBook = () => {
         explanation: "In a simple sentence, the separable prefix goes to the end.",
       },
       {
+        questionKey: "practice-7",
         number: 7,
         type: "multiple",
         prompt: 'Choose the correct sentence with "anrufen".',
@@ -965,6 +1327,7 @@ export const WeekTimeSeparablePracticeBook = () => {
         answer: "Ich rufe meine Mutter am Abend an.",
       },
       {
+        questionKey: "practice-8",
         number: 8,
         type: "multiple",
         prompt: 'What does this sentence mean? "Am Dienstag stehe ich um Viertel nach sechs auf."',
@@ -976,10 +1339,11 @@ export const WeekTimeSeparablePracticeBook = () => {
         answer: "On Tuesday I get up at 6:15.",
       },
       {
+        questionKey: "practice-9",
         number: 9,
         type: "text",
         prompt:
-          'Write one short sentence with a day + time + separable verb. Use this idea: Montag / halb sieben / aufstehen',
+          "Write one short sentence with a day + time + separable verb. Use this idea: Montag / halb sieben / aufstehen",
         answer: [
           "Am Montag stehe ich um halb sieben auf.",
           "am montag stehe ich um halb sieben auf.",
@@ -990,6 +1354,18 @@ export const WeekTimeSeparablePracticeBook = () => {
     ],
     []
   );
+
+  const [results, setResults] = useState({});
+
+  const checkedCount = Object.values(results).filter((v) => v !== null).length;
+  const correctCount = Object.values(results).filter(Boolean).length;
+
+  const handleResult = (questionKey, value) => {
+    setResults((prev) => ({
+      ...prev,
+      [questionKey]: value,
+    }));
+  };
 
   return (
     <main style={pageWrap}>
@@ -1006,6 +1382,12 @@ export const WeekTimeSeparablePracticeBook = () => {
           "halb / Viertel",
           "separable verbs",
         ]}
+      />
+
+      <ProgressBar
+        checkedCount={checkedCount}
+        total={questions.length}
+        correctCount={correctCount}
       />
 
       <Section
@@ -1035,13 +1417,27 @@ export const WeekTimeSeparablePracticeBook = () => {
       >
         <div style={{ display: "grid", gap: 14 }}>
           {questions.map((q) => (
-            <PracticeQuestion key={q.number} {...q} />
+            <PracticeQuestion key={q.questionKey} {...q} onResult={handleResult} />
           ))}
         </div>
       </Section>
 
       <Section
-        title="3) Final reminder"
+        title="3) Final speaking task"
+        subtitle="Let students produce language, not only choose answers."
+      >
+        <SpeakingTaskCard
+          prompts={[
+            "Sage: Wann stehst du am Montag auf?",
+            "Sage eine Zeit mit Viertel oder halb.",
+            "Sage einen Satz mit anrufen, aufstehen oder einkaufen.",
+            "Sprich 3 kurze Sätze über deinen Tagesablauf.",
+          ]}
+        />
+      </Section>
+
+      <Section
+        title="4) Final reminder"
         subtitle="Keep these 3 key ideas in your head."
       >
         <Callout title="Remember" variant="success">
