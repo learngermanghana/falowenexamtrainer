@@ -6,12 +6,11 @@ const API_BASE =
 export const fetchScoreSummary = async ({ idToken, studentCode }) => {
   if (!studentCode) throw new Error("Missing studentCode.");
 
-  const shouldUseDebugNoAuth = !idToken;
-  const url = `${API_BASE.replace(/\/$/, "")}/scores/summary?studentCode=${encodeURIComponent(studentCode)}${
-    shouldUseDebugNoAuth ? "&debug=1" : ""
-  }`;
+  if (!idToken) throw new Error("Missing Firebase ID token.");
 
-  const headers = idToken ? { Authorization: `Bearer ${idToken}` } : {};
+  const url = `${API_BASE.replace(/\/$/, "")}/scores/summary?studentCode=${encodeURIComponent(studentCode)}`;
+
+  const headers = { Authorization: `Bearer ${idToken}` };
 
   const res = await fetch(url, { headers });
 

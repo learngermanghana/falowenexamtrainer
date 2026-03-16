@@ -172,9 +172,11 @@ const HomeMetrics = ({ studentProfile }) => {
     }
 
     try {
+      const freshIdToken = idToken || (user ? await user.getIdToken() : null);
+
       const [attendanceResult, scoreResult] = await Promise.allSettled([
         fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey }),
-        studentCode ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
+        studentCode ? fetchScoreSummary({ idToken: freshIdToken, studentCode }) : Promise.resolve(null),
       ]);
 
       if (!isMountedRef.current) return;
@@ -199,7 +201,7 @@ const HomeMetrics = ({ studentProfile }) => {
       } else {
         console.error("[HomeMetrics] Score summary failed", {
           studentCode,
-          hasIdToken: Boolean(idToken),
+          hasIdToken: Boolean(idToken || user),
           apiBaseUrl: process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_FUNCTIONS_BASE_URL || "",
           error: scoreResult.reason,
         });
