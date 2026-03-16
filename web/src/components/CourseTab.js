@@ -39,6 +39,53 @@ const ASSIGNMENT_STATUSES = {
   milestoneComplete: { key: "courseTab.status.milestoneComplete", color: "#0f766e" },
 };
 
+const formatAssignmentScore = (score) => {
+  const numericScore = Number(score);
+  if (!Number.isFinite(numericScore)) return "";
+  return Number.isInteger(numericScore) ? String(numericScore) : numericScore.toFixed(1);
+};
+
+const SCORE_RELEVANT_STATUSES = new Set(["submitted", "passed", "failed"]);
+
+export const getScoreBadgeForEntry = ({ statusInfo, progressByAssignmentId }) => {
+  const fallbackStatus = String(statusInfo?.finalStatus || statusInfo?.status || "").trim();
+  const assignmentIds = Array.isArray(statusInfo?.requiredAssignmentIds) && statusInfo.requiredAssignmentIds.length
+    ? statusInfo.requiredAssignmentIds
+    : [statusInfo?.assignmentId].filter(Boolean);
+
+  const scoreCandidates = assignmentIds
+    .map((assignmentId) => progressByAssignmentId?.[assignmentId])
+    .filter(Boolean)
+    .map((progress) => {
+      const bestScore = Number(progress?.bestScore);
+      if (Number.isFinite(bestScore)) return bestScore;
+
+      const latestScore = Number(progress?.latestScore);
+      return Number.isFinite(latestScore) && latestScore > 0 ? latestScore : null;
+    })
+    .filter((value) => Number.isFinite(value));
+
+  if (scoreCandidates.length) {
+    const highestScore = scoreCandidates.reduce((max, score) => Math.max(max, score), Number.NEGATIVE_INFINITY);
+    const label = formatAssignmentScore(highestScore);
+    if (label) {
+      return {
+        tone: "scored",
+        text: `Latest score: ${label}/100`,
+      };
+    }
+  }
+
+  if (SCORE_RELEVANT_STATUSES.has(fallbackStatus)) {
+    return {
+      tone: "awaiting",
+      text: "Awaiting score",
+    };
+  }
+
+  return null;
+};
+
 const sortByDay = (entries) => [...entries].sort((a, b) => Number(a.day || 0) - Number(b.day || 0));
 const hasTutorMarkedWork = (entry) => {
   if (entry?.assignment) return true;
@@ -1254,6 +1301,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const isTutorMarked = isTutorMarkedEntry(entry);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
                     const isPracticeOnlyEntry = !isTutorMarked;
+                    const scoreBadge = getScoreBadgeForEntry({ statusInfo, progressByAssignmentId: autoStatusMap });
                     const shouldLogTargetedDiagnostic =
                       String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim() === "ComfortArmah295" &&
                       selectedCourseLevel === "A1" &&
@@ -1303,6 +1351,18 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             {isTutorMarked ? (
                               <span style={{ ...styles.badge, background: "#fff", color: statusMeta.color, border: `1px solid ${statusMeta.color}` }}>
                                 {t(statusMeta.key)}
+                              </span>
+                            ) : null}
+                            {isTutorMarked && scoreBadge ? (
+                              <span
+                                style={{
+                                  ...styles.badge,
+                                  background: scoreBadge.tone === "scored" ? "#f0fdf4" : "#eff6ff",
+                                  color: scoreBadge.tone === "scored" ? "#166534" : "#1d4ed8",
+                                  border: scoreBadge.tone === "scored" ? "1px solid #86efac" : "1px solid #93c5fd",
+                                }}
+                              >
+                                {scoreBadge.text}
                               </span>
                             ) : null}
                             {isPracticeOnlyEntry ? <span style={styles.badge}>Practice only</span> : null}
