@@ -184,18 +184,14 @@ const GlobalQuickNavigation = () => {
         className={`global-quick-nav-button${isCampusActive ? " is-active" : ""}`}
         type="button"
         onClick={() => navigate("/campus/course")}
-        aria-current={isCampusActive ? "page" : undefined}
       >
-        <span aria-hidden="true">🏫 </span>
         {campusLabel}
       </button>
       <button
         className={`global-quick-nav-button${isExamsActive ? " is-active" : ""}`}
         type="button"
         onClick={() => navigate("/exams/overview")}
-        aria-current={isExamsActive ? "page" : undefined}
       >
-        <span aria-hidden="true">📝 </span>
         {examsLabel}
       </button>
     </nav>
