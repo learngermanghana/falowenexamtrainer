@@ -134,7 +134,7 @@ const HomeMetrics = ({ studentProfile }) => {
   const [leaderboardGeneratedAt, setLeaderboardGeneratedAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [refreshError, setRefreshError] = useState("");
-  const [showLeaderboard] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const className = studentProfile?.className || "";
   const studentCode =
@@ -172,11 +172,9 @@ const HomeMetrics = ({ studentProfile }) => {
     }
 
     try {
-      const freshIdToken = idToken || (user ? await user.getIdToken() : null);
-
       const [attendanceResult, scoreResult] = await Promise.allSettled([
         fetchAttendanceSummary({ className, studentCode, studentUid: user?.uid, level: levelKey }),
-        studentCode ? fetchScoreSummary({ idToken: freshIdToken, studentCode }) : Promise.resolve(null),
+        studentCode ? fetchScoreSummary({ idToken, studentCode }) : Promise.resolve(null),
       ]);
 
       if (!isMountedRef.current) return;
@@ -184,12 +182,6 @@ const HomeMetrics = ({ studentProfile }) => {
       if (attendanceResult.status === "fulfilled") {
         setAttendance(attendanceResult.value || { sessions: 0, hours: 0 });
       } else {
-        console.error("[HomeMetrics] Attendance summary failed", {
-          className,
-          studentCode,
-          level: levelKey,
-          error: attendanceResult.reason,
-        });
         setAttendance({ sessions: 0, hours: 0 });
       }
 
@@ -199,12 +191,6 @@ const HomeMetrics = ({ studentProfile }) => {
         setLeaderboard(scoreResponse?.leaderboard || null);
         setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");
       } else {
-        console.error("[HomeMetrics] Score summary failed", {
-          studentCode,
-          hasIdToken: Boolean(idToken || user?.uid),
-          apiBaseUrl: process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_FUNCTIONS_BASE_URL || "",
-          error: scoreResult.reason,
-        });
         setAssignmentStats(null);
         setLeaderboard(null);
         setLeaderboardGeneratedAt("");
@@ -212,12 +198,6 @@ const HomeMetrics = ({ studentProfile }) => {
 
       setRefreshError(attendanceResult.status === "rejected" ? t("homeMetrics.refreshError") : "");
     } catch (error) {
-      console.error("[HomeMetrics] refreshMetrics crashed", {
-        className,
-        studentCode,
-        level: levelKey,
-        error,
-      });
       if (!isMountedRef.current) return;
       setRefreshError(t("homeMetrics.refreshError"));
     } finally {
@@ -485,10 +465,11 @@ const HomeMetrics = ({ studentProfile }) => {
           <div style={{ display: "flex", justifyContent: "flex-start" }}>
             <button
               type="button"
-              onClick={() => navigate("/campus/results")}
+              onClick={() => setShowLeaderboard((prev) => !prev)}
               style={{ ...styles.secondaryButton, padding: "8px 12px" }}
+              aria-expanded={showLeaderboard}
             >
-              {t("homeMetrics.tutorComments.view")}
+              {showLeaderboard ? t("homeMetrics.leaderboard.hide") : t("homeMetrics.leaderboard.view")}
             </button>
           </div>
 
