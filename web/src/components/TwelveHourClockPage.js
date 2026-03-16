@@ -826,7 +826,12 @@ export const WeekTimeSeparableGrammarBook = () => {
               <strong>auf</strong>.
             </div>
             <div style={{ opacity: 0.9 }}>
-              This one sentence already shows the 3 main lesson topics.
+              Quick statement rule: <strong>Subject + verb + time + other details</strong>.
+              If you start with time, use <strong>Time + verb + subject + other details</strong>.
+            </div>
+            <div style={{ opacity: 0.9 }}>
+              This one sentence already shows the 3 main lesson topics: day, time, and a
+              separable verb.
             </div>
           </div>
         </Callout>
