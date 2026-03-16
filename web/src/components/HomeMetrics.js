@@ -182,6 +182,12 @@ const HomeMetrics = ({ studentProfile }) => {
       if (attendanceResult.status === "fulfilled") {
         setAttendance(attendanceResult.value || { sessions: 0, hours: 0 });
       } else {
+        console.error("[HomeMetrics] Attendance summary failed", {
+          className,
+          studentCode,
+          level: levelKey,
+          error: attendanceResult.reason,
+        });
         setAttendance({ sessions: 0, hours: 0 });
       }
 
@@ -191,6 +197,12 @@ const HomeMetrics = ({ studentProfile }) => {
         setLeaderboard(scoreResponse?.leaderboard || null);
         setLeaderboardGeneratedAt(scoreResponse?.generatedAt || "");
       } else {
+        console.error("[HomeMetrics] Score summary failed", {
+          studentCode,
+          hasIdToken: Boolean(idToken),
+          apiBaseUrl: process.env.REACT_APP_API_BASE_URL || process.env.REACT_APP_FUNCTIONS_BASE_URL || "",
+          error: scoreResult.reason,
+        });
         setAssignmentStats(null);
         setLeaderboard(null);
         setLeaderboardGeneratedAt("");
@@ -198,6 +210,12 @@ const HomeMetrics = ({ studentProfile }) => {
 
       setRefreshError(attendanceResult.status === "rejected" ? t("homeMetrics.refreshError") : "");
     } catch (error) {
+      console.error("[HomeMetrics] refreshMetrics crashed", {
+        className,
+        studentCode,
+        level: levelKey,
+        error,
+      });
       if (!isMountedRef.current) return;
       setRefreshError(t("homeMetrics.refreshError"));
     } finally {
