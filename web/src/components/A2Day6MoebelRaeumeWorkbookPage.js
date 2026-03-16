@@ -45,54 +45,91 @@ const videoPreviewStyle = {
 
 const lesenQuestions = [
   {
-    stem: "Wo liegt der Teppich?",
-    options: ["A) Auf dem Tisch", "B) Unter dem Tisch", "C) Neben dem Sofa", "D) Hinter der Lampe"],
-  },
-  {
-    stem: "Wohin stellt Anna den Stuhl?",
-    options: ["A) In die Küche", "B) Auf den Balkon", "C) Neben den Tisch", "D) Hinter das Regal"],
-  },
-  {
-    stem: "Wo steht der Schrank?",
-    options: ["A) An der Wand", "B) In den Flur", "C) Unter den Teppich", "D) Auf das Sofa"],
-  },
-  {
-    stem: "Wohin hängt Paul das Bild?",
-    options: ["A) An die Wand", "B) Auf dem Bett", "C) Unter dem Fenster", "D) In dem Bad"],
-  },
-  {
-    stem: "Warum benutzt der Text die Präpositionen in / auf / an?",
+    stem: "Warum bin ich in die Stadt gezogen?",
     options: [
-      "A) Nur für Zeitangaben",
-      "B) Um Möbel und Orte genau zu beschreiben",
-      "C) Nur mit Dativ",
-      "D) Nur mit Akkusativ",
+      "a) Weil ich in einer Wohngemeinschaft wohne",
+      "b) Weil ich studiere",
+      "c) Weil ich gerne lese",
+      "d) Weil ich manchmal in den Zoo gehe",
+    ],
+  },
+  {
+    stem: "Wann gehe ich zu Fuß zur Universität?",
+    options: [
+      "a) Wenn ich Hunger habe",
+      "b) Wenn es nicht regnet, stürmt oder schneit",
+      "c) Wenn die Vorlesungen früh beginnen",
+      "d) Wenn die Professoren streng sind",
+    ],
+  },
+  {
+    stem: "Wie ist das Essen in der Mensa?",
+    options: [
+      "a) Es ist gesund",
+      "b) Es ist sehr gut",
+      "c) Es ist vegetarisch",
+      "d) Es ist billig",
+    ],
+  },
+  {
+    stem: "Was ist in der WG verboten?",
+    options: [
+      "a) Schuhe",
+      "b) Fahrräder",
+      "c) Bücher",
+      "d) Haustiere",
+    ],
+  },
+  {
+    stem: "Wo möchte ich später arbeiten?",
+    options: [
+      "a) In der U-Bahn",
+      "b) An der Universität",
+      "c) Im Zoo",
+      "d) In der Mensa",
     ],
   },
 ];
 
 const hoerenQuestions = [
   {
-    stem: "Wohin trägt Mia den kleinen Tisch?",
-    options: ["A) Ins Schlafzimmer", "B) In die Küche", "C) Ins Wohnzimmer", "D) In den Flur"],
+    stem: "Welche Wohnung ist 70 Quadratmeter groß?",
+    options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"],
   },
   {
-    stem: "Wo stehen die Stühle am Ende?",
-    options: ["A) Hinter dem Sofa", "B) Am Fenster", "C) Im Bad", "D) Unter dem Bett"],
+    stem: "Welche Wohnung hat einen Balkon?",
+    options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"],
   },
   {
-    stem: "Welche Aussage ist richtig?",
-    options: ["A) Bewegung = Dativ", "B) Position = Akkusativ", "C) Wohin? = Akkusativ", "D) Wo? = Nominativ"],
+    stem: "Wie hoch sind die Nebenkosten für die 3-Zimmer-Wohnung?",
+    options: ["a) 150 Euro pro Monat", "b) 200 Euro pro Monat"],
   },
   {
-    stem: "Was hängt Mia an die Wand?",
-    options: ["A) Eine Uhr", "B) Ein Regal", "C) Eine Lampe", "D) Einen Teppich"],
+    stem: "Welche Wohnung erlaubt Haustiere?",
+    options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"],
   },
   {
-    stem: "Was sagt Mia zum Schluss?",
-    options: ["A) Das Zimmer ist zu klein", "B) Jetzt ist das Zimmer gemütlich", "C) Wir kaufen neue Möbel", "D) Alles bleibt draußen"],
+    stem: "Welche Wohnung ist ab dem 1. August verfügbar?",
+    options: ["a) Die 2-Zimmer-Wohnung", "b) Die 3-Zimmer-Wohnung"],
   },
 ];
+
+const HOEREN_GOOGLE_DRIVE_LINK =
+  "https://drive.google.com/file/d/13oaVnn-WTSJnIeKBFC0Zhlz7cfBtpKFx/view?usp=sharing";
+
+function getGoogleDrivePreviewLink(link) {
+  const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) return link;
+  const fileId = match[1];
+  return `https://drive.google.com/file/d/${fileId}/preview`;
+}
+
+function getGoogleDriveDirectAudioLink(link) {
+  const match = link.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) return link;
+  const fileId = match[1];
+  return `https://drive.google.com/uc?export=download&id=${fileId}`;
+}
 
 function TabButton({ active, onClick, children }) {
   return (
@@ -130,7 +167,9 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
 
-  const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+  const setPreparedFor =
+    (tabKey) => (event) =>
+      setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -139,7 +178,9 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
           Back to Course
         </button>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 6 Workbook · Möbel und Räume kennenlernen (3.6)</h1>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>
+          A2 · Day 6 Workbook · Möbel und Räume kennenlernen (3.6)
+        </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
           4-part workbook: group speaking, writing, reading and listening practice.
         </p>
@@ -324,30 +365,45 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
       {activeTab === "lesen" && (
         <div style={card}>
           <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1600&q=80"
-            alt="Bedroom interior with furniture"
+            src="https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=1600&q=80"
+            alt="Student reading books"
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
+          <h2 style={sectionTitle}>Teil 3 – Lesen - Anzeige</h2>
           <p style={{ margin: 0 }}>
             Read the text and review the questions. <strong>Do not answer directly on this page.</strong> Use the submit section at
             the bottom of the lesson to send your answers.
           </p>
 
-          <h3 style={sectionTitle}>Unser neues Wohnzimmer</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Heute räumen wir unser Wohnzimmer um. Der Teppich liegt unter dem Tisch. Das Sofa steht an der Wand. Eine Lampe
-            steht neben dem Sofa. Am Nachmittag stellt Anna einen Stuhl neben den Tisch und hängt ein neues Bild an die Wand.
-            Später trägt Paul ein kleines Regal in die Ecke. Jetzt ist das Wohnzimmer hell, ordentlich und gemütlich.
+          <h3 style={sectionTitle}>Neu in der Stadt</h3>
+          <p style={{ margin: 0, lineHeight: 1.8 }}>
+            Ich bin vor einem Monat in diese Stadt gezogen, um zu studieren.
+            <br />
+            Ich wohne zusammen mit drei anderen Mädchen in einer Wohngemeinschaft. Unsere Wohnung ist nicht weit von der
+            Universität entfernt, ich muss nur drei Stationen mit der U-Bahn fahren.
+            <br />
+            Wenn das Wetter schön ist, gehe ich manchmal zu Fuß. Die Professoren an der Universität sind sehr nett,
+            manche sind aber auch streng. Die Vorlesungen, die schon früh beginnen, mag ich nicht so gerne. Ich schlafe
+            lieber lange.
+            <br />
+            Mittags esse ich mit meinen Freundinnen in der Mensa. Das Essen ist nicht sehr gut, aber es kostet nicht
+            viel.
+            <br />
+            In meiner Freizeit lese ich gerne, in meinem Zimmer stehen viele Bücher. Manchmal gehe ich in den Zoo und
+            beobachte die Tiere. Früher hatte ich zwei Katzen, aber in der WG sind keine Haustiere erlaubt.
+            <br />
+            Wenn ich das Studium abgeschlossen habe, möchte ich als Tierärztin im Zoo arbeiten.
           </p>
 
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
+          <h3 style={sectionTitle}>Fragen zum Text</h3>
           {lesenQuestions.map((question, index) => (
             <div key={question.stem} style={questionCardStyle}>
-              <strong>{index + 1}. {question.stem}</strong>
+              <strong>
+                Frage {index + 1}: {question.stem}
+              </strong>
               {question.options.map((option) => (
-                <span key={option}>{option}</span>
+                <span key={option}>• {option}</span>
               ))}
             </div>
           ))}
@@ -359,56 +415,59 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
       {activeTab === "hoeren" && (
         <div style={card}>
           <img
-            src="https://images.unsplash.com/photo-1486946255434-2466348c2166?auto=format&fit=crop&w=1600&q=80"
-            alt="Headphones and laptop for listening practice"
+            src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80"
+            alt="Headphones for listening practice"
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
+          <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
           <p style={{ margin: 0 }}>
-            Listen to the audio, then submit your answers in the assignment area (do not answer directly on this page).
+            Listen to the audio, then submit your answers in the assignment area. <strong>Do not answer directly on this page.</strong>
           </p>
-          <CoursebookAudioPlayer url="https://youtu.be/am3WqQaCibE" linkLabel="Open Teil 4 audio" />
+
+          <CoursebookAudioPlayer
+            url={getGoogleDriveDirectAudioLink(HOEREN_GOOGLE_DRIVE_LINK)}
+            linkLabel="Open Teil 4 audio"
+          />
+
+          <p style={{ margin: 0 }}>
+            Audio link:{" "}
+            <a href={HOEREN_GOOGLE_DRIVE_LINK} target="_blank" rel="noreferrer">
+              Open Google Drive audio
+            </a>
+          </p>
+
+          <iframe
+            style={videoPreviewStyle}
+            src={getGoogleDrivePreviewLink(HOEREN_GOOGLE_DRIVE_LINK)}
+            title="Teil 4 Audio Preview"
+            allow="autoplay"
+          />
 
           <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
             <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
+            Teacher mode
           </label>
 
           {teacherMode && (
             <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
+              <strong>Teacher note</strong>
               <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Mia und Leon räumen das Wohnzimmer um. Zuerst stellen sie den Tisch in die Mitte. Dann stellen sie zwei Stühle
-                an das Fenster. Mia hängt eine Uhr an die Wand und legt den Teppich unter den Tisch. Am Ende sagt sie: Jetzt
-                ist das Zimmer gemütlich und praktisch.
+                No transcript has been added yet for this listening exercise. You can add the transcript here later if
+                you want teachers to review it in class.
               </p>
             </div>
           )}
 
-          <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
+          <h3 style={sectionTitle}>Fragen zum Hörtext</h3>
           {hoerenQuestions.map((question, index) => (
             <div key={question.stem} style={questionCardStyle}>
               <strong>{index + 1}. {question.stem}</strong>
               {question.options.map((option) => (
-                <span key={option}>{option}</span>
+                <span key={option}>o {option}</span>
               ))}
             </div>
           ))}
-
-          <p style={{ margin: 0 }}>
-            Recommended video:{" "}
-            <a href="https://youtu.be/am3WqQaCibE" target="_blank" rel="noreferrer">
-              Möbel und Räume kennenlernen · A2
-            </a>
-          </p>
-          <iframe
-            style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/am3WqQaCibE"
-            title="Möbel und Räume kennenlernen · A2"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
 
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
