@@ -1222,6 +1222,9 @@
       "helper": "Download your study calendar to keep momentum toward your exam date.",
       "cta": "Download study calendar"
     },
+    "tutorComments": {
+      "view": "View tutor comments"
+    },
     "leaderboard": {
       "view": "View leaderboard",
       "hide": "Hide leaderboard",

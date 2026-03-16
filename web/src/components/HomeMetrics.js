@@ -134,7 +134,7 @@ const HomeMetrics = ({ studentProfile }) => {
   const [leaderboardGeneratedAt, setLeaderboardGeneratedAt] = useState("");
   const [loading, setLoading] = useState(false);
   const [refreshError, setRefreshError] = useState("");
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showLeaderboard] = useState(false);
 
   const className = studentProfile?.className || "";
   const studentCode =
@@ -465,11 +465,10 @@ const HomeMetrics = ({ studentProfile }) => {
           <div style={{ display: "flex", justifyContent: "flex-start" }}>
             <button
               type="button"
-              onClick={() => setShowLeaderboard((prev) => !prev)}
+              onClick={() => navigate("/campus/results")}
               style={{ ...styles.secondaryButton, padding: "8px 12px" }}
-              aria-expanded={showLeaderboard}
             >
-              {showLeaderboard ? t("homeMetrics.leaderboard.hide") : t("homeMetrics.leaderboard.view")}
+              {t("homeMetrics.tutorComments.view")}
             </button>
           </div>
 
