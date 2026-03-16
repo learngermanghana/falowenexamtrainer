@@ -56,18 +56,16 @@ export const getScoreBadgeForEntry = ({ statusInfo, progressByAssignmentId }) =>
   const scoreCandidates = assignmentIds
     .map((assignmentId) => progressByAssignmentId?.[assignmentId])
     .filter(Boolean)
-    .map((progress) => {
-      const bestScore = Number(progress?.bestScore);
-      if (Number.isFinite(bestScore)) return bestScore;
-
-      const latestScore = Number(progress?.latestScore);
-      return Number.isFinite(latestScore) && latestScore > 0 ? latestScore : null;
-    })
-    .filter((value) => Number.isFinite(value));
+    .map((progress) => ({
+      score: Number(progress?.latestScore),
+      updatedAt: new Date(progress?.lastUpdatedAt || 0).getTime(),
+    }))
+    .filter((row) => Number.isFinite(row.score));
 
   if (scoreCandidates.length) {
-    const highestScore = scoreCandidates.reduce((max, score) => Math.max(max, score), Number.NEGATIVE_INFINITY);
-    const label = formatAssignmentScore(highestScore);
+    const latestScore = scoreCandidates
+      .sort((a, b) => b.updatedAt - a.updatedAt)[0]?.score;
+    const label = formatAssignmentScore(latestScore);
     if (label) {
       return {
         tone: "scored",

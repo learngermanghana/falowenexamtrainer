@@ -305,7 +305,7 @@ describe("getScoreBadgeForEntry", () => {
         requiredAssignmentIds: ["A1-2"],
       },
       progressByAssignmentId: {
-        "A1-2": { bestScore: 82, latestScore: 82, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+        "A1-2": { latestScore: 82, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
       },
     });
 
@@ -323,7 +323,7 @@ describe("getScoreBadgeForEntry", () => {
         assignmentId: "A1-2",
       },
       progressByAssignmentId: {
-        "A1-2": { bestScore: null, latestScore: null, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+        "A1-2": { latestScore: null, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
       },
     });
 
@@ -333,26 +333,7 @@ describe("getScoreBadgeForEntry", () => {
     });
   });
 
-
-  it("shows awaiting score when latestScore defaults to 0 but no best score exists", () => {
-    const badge = getScoreBadgeForEntry({
-      statusInfo: {
-        status: "submitted",
-        finalStatus: "submitted",
-        assignmentId: "A1-2",
-      },
-      progressByAssignmentId: {
-        "A1-2": { bestScore: null, latestScore: 0, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
-      },
-    });
-
-    expect(badge).toEqual({
-      tone: "awaiting",
-      text: "Awaiting score",
-    });
-  });
-
-  it("uses the highest score across required assignments", () => {
+  it("uses the most recently updated score across required assignments", () => {
     const badge = getScoreBadgeForEntry({
       statusInfo: {
         status: "submitted",
@@ -361,14 +342,14 @@ describe("getScoreBadgeForEntry", () => {
         requiredAssignmentIds: ["A1-9", "A1-10"],
       },
       progressByAssignmentId: {
-        "A1-9": { bestScore: 82, latestScore: 82, lastUpdatedAt: "2024-10-05T10:00:00.000Z" },
-        "A1-10": { bestScore: 78.5, latestScore: 78.5, lastUpdatedAt: "2024-10-06T08:00:00.000Z" },
+        "A1-9": { latestScore: 67, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+        "A1-10": { latestScore: 78.5, lastUpdatedAt: "2024-10-04T08:00:00.000Z" },
       },
     });
 
     expect(badge).toEqual({
       tone: "scored",
-      text: "Latest score: 82/100",
+      text: "Latest score: 78.5/100",
     });
   });
 });
