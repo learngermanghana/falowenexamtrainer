@@ -166,10 +166,10 @@ const A2_SCHEDULE = [
     goal:
       "Learn about recipes and food. Practice using sequence words like 'zuerst', 'nachdem', and 'außerdem' to organize your letter.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Zuerst, Nachdem, and Talking About Sequence in German",
+    grammar_topic: "Imperative (commands and instructions)",
     video: "https://youtu.be/_xQMNp3qcDQ",
     youtube_link: "https://youtu.be/_xQMNp3qcDQ",
-    grammarbook_link: "https://drive.google.com/file/d/16lh8sPl_IDZ3dLwYNvL73PqOFCixidrI/view?usp=sharing",
+    grammarbook_link: "/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1c8JJyVlKYI2mz6xLZZ6RkRHLnH3Dtv0c/view?usp=sharing",
   },
   {
