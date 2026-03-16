@@ -156,7 +156,7 @@ describe("mergeAssignmentProgress", () => {
         { level: "A1", assignmentId: "3", chapter: "3", title: "Asking Prices", assignmentDay: 7, assignment: true },
         { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
         { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
-        { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+        { level: "A1", assignmentId: "7", chapter: "7", title: "Understanding Time", assignmentDay: 11, assignment: true },
       ],
       firestoreDrafts: [],
       firestoreSubmissions: [],
@@ -181,7 +181,7 @@ describe("mergeAssignmentProgress", () => {
       { level: "A1", assignmentId: "3", chapter: "3", title: "Asking Prices", assignmentDay: 7, assignment: true },
       { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
       { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
-      { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+      { level: "A1", assignmentId: "7", chapter: "7", title: "Understanding Time", assignmentDay: 11, assignment: true },
     ];
 
     const merged = mergeAssignmentProgress({
@@ -211,7 +211,7 @@ describe("mergeAssignmentProgress", () => {
       { level: "A1", assignmentId: "3", chapter: "3", title: "Asking Prices", assignmentDay: 7, assignment: true },
       { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
       { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
-      { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+      { level: "A1", assignmentId: "7", chapter: "7", title: "Understanding Time", assignmentDay: 11, assignment: true },
     ];
 
     const merged = mergeAssignmentProgress({
@@ -242,7 +242,7 @@ describe("mergeAssignmentProgress", () => {
       { level: "A1", assignmentId: "3", chapter: "3", title: "Asking About Prices", assignmentDay: 7, assignment: true },
       { level: "A1", assignmentId: "4", chapter: "4", title: "Countries and Languages", assignmentDay: 8, assignment: true },
       { level: "A1", assignmentId: "5", chapter: "5", title: "German Cases", assignmentDay: 9, assignment: true },
-      { level: "A1", assignmentId: "7", chapter: "7", title: "12 Hour Clock", assignmentDay: 11, assignment: true },
+      { level: "A1", assignmentId: "7", chapter: "7", title: "Understanding Time", assignmentDay: 11, assignment: true },
     ];
 
     const merged = mergeAssignmentProgress({
@@ -254,7 +254,7 @@ describe("mergeAssignmentProgress", () => {
         { assignment: "A1 Asking About Prices 3", studentCode: "st-1", passed: true, status: "passed" },
         { assignment: "A1 Countries and Languages 4", studentCode: "st-1", passed: true, status: "passed" },
         { assignment: "A1 German Cases 5", studentCode: "st-1", passed: true, status: "passed" },
-        { assignment: "A1 12 Hour Clock 7", studentCode: "st-1", passed: true, status: "passed" },
+        { assignment: "A1 Understanding Time 7", studentCode: "st-1", passed: true, status: "passed" },
       ],
       studentCode: "st-1",
     });
