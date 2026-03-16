@@ -341,12 +341,14 @@
 
 .global-quick-nav {
   position: fixed;
-  right: 16px;
+  left: 0;
+  right: 0;
   bottom: 108px;
   z-index: 1101;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 10px;
+  padding: 0 16px;
 }
 
 .global-quick-nav-button {
@@ -717,9 +719,10 @@
 
 @media (max-width: 640px) {
   .global-quick-nav {
-    right: 12px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 4px;
     bottom: 90px;
-    gap: 8px;
   }
 
   .global-quick-nav-button {
