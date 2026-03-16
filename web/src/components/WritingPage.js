@@ -439,6 +439,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [selectedDraftIds, setSelectedDraftIds] = useState([]);
   const [hiddenDraftIds, setHiddenDraftIds] = useState([]);
   const [editableDraftById, setEditableDraftById] = useState({});
+  const [ideaDraftWorkspace, setIdeaDraftWorkspace] = useState("");
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
@@ -509,6 +510,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setSelectedDraftIds([]);
     setHiddenDraftIds([]);
     setEditableDraftById({});
+    setIdeaDraftWorkspace("");
     setIdeaError("");
     setIdeaSuccess("");
     setTutorSaveState({ loading: false, success: "", error: "" });
@@ -726,6 +728,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         } else {
           setEditableDraftById({});
         }
+        if (typeof saved.ideaDraftWorkspace === "string") setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
         if (typeof saved.remainingSeconds === "number") {
           setRemainingSeconds(saved.remainingSeconds);
         }
@@ -778,6 +781,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           selectedDraftIds,
           hiddenDraftIds,
           editableDraftById,
+          ideaDraftWorkspace,
           remainingSeconds,
           timerRunning,
           rubricBreakdown,
@@ -797,6 +801,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     draftHistory,
     errorBank,
     editableDraftById,
+    ideaDraftWorkspace,
     firstDraftSnapshot,
     ideaInput,
     markFeedback,
@@ -1332,38 +1337,12 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     [chatMessages, hiddenDraftIds]
   );
 
-  const updateDraftText = (id, value) => {
-    setIdeaSuccess("");
-    setIdeaError("");
-    setEditableDraftById((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const toggleDraftSelection = (id) => {
-    setIdeaSuccess("");
-    setIdeaError("");
-    setSelectedDraftIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const selectedDraftText = useMemo(() => {
-    return userMessages
-      .filter((msg) => selectedDraftIds.includes(msg.id))
-      .map((msg) => {
-        const draftText = editableDraftById[msg.id];
-        const raw = typeof draftText === "string" ? draftText : msg.content;
-        return raw.trim();
-      })
-      .filter(Boolean)
-      .join("\n\n");
-  }, [editableDraftById, selectedDraftIds, userMessages]);
-
   const sendDraftsToMarkTab = () => {
-    const combinedDraft = selectedDraftText;
+    const combinedDraft = ideaDraftWorkspace.trim();
 
     if (!combinedDraft) {
       setIdeaError(
-        "Select at least one chat draft before sending it for marking."
+        "Add text to the workspace before sending it for marking."
       );
       setIdeaSuccess("");
       return;
@@ -1376,7 +1355,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     });
     setError("");
     setMarkFeedback("");
-    setIdeaSuccess("Your selected lines are now pasted into the “Mark my letter” tab.");
+    setIdeaSuccess("Your workspace draft is now pasted into the “Mark my letter” tab.");
     setIdeaError("");
     setSelectedDraftIds([]);
     setActiveTab("mark");
@@ -1399,6 +1378,12 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     const userMessage = makeChatMessage("user", trimmed);
     const updatedMessages = [...chatMessages, userMessage];
     setChatMessages(updatedMessages);
+    setIdeaDraftWorkspace((prev) => {
+      const existing = prev.trim();
+      const next = userMessage.content.trim();
+      if (!next) return existing;
+      return [existing, next].filter(Boolean).join("\n\n");
+    });
     setIdeaInput("");
     setIdeasLoading(true);
 
@@ -1987,78 +1972,64 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <div style={{ marginTop: 16 }}>
             <h4 style={styles.resultHeading}>Preview & quick copy</h4>
             <p style={styles.helperText}>
-              Pick and edit parts from your chat messages below.
-              We will place them in the “Mark my letter” tab so you can get them graded quickly.
+              Keep one running draft box. New messages can be added or used to replace the workspace so you can always copy and improve in one place.
             </p>
             <div
               style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
               className="idea-generator-panel"
             >
-                <div style={styles.metaRow}>
-                  <div style={{ fontWeight: 800 }}>Pick from your chat</div>
-                  <span style={styles.badge}>{userMessages.length} drafts</span>
+              <div style={styles.metaRow}>
+                <div style={{ fontWeight: 800 }}>Pick from your chat</div>
+                <span style={styles.badge}>{userMessages.length} messages</span>
+              </div>
+
+              {userMessages.length ? (
+                <div style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }} className="idea-generator-drafts">
+                  {userMessages.map((msg) => (
+                    <div key={msg.id} style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
+                      <div style={{ ...styles.helperText, margin: 0, whiteSpace: "pre-wrap" }}>{msg.content}</div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                        <button
+                          type="button"
+                          style={styles.secondaryButton}
+                          onClick={() => setIdeaDraftWorkspace((prev) => [prev.trim(), msg.content.trim()].filter(Boolean).join("\n\n"))}
+                        >
+                          Add to workspace
+                        </button>
+                        <button type="button" style={styles.secondaryButton} onClick={() => setIdeaDraftWorkspace(msg.content)}>
+                          Use this only
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                {userMessages.length === 0 ? (
-                  <p style={styles.helperText}>
-                    Send a question in the chat, then you can select your own messages here.
-                  </p>
-                ) : (
-                  <div
-                    style={{ display: "grid", gap: 8, maxHeight: 200, overflowY: "auto" }}
-                    className="idea-generator-drafts"
-                  >
-                    {userMessages.map((msg) => (
-                      <label
-                        key={msg.id}
-                        style={{
-                          display: "flex",
-                          gap: 10,
-                          alignItems: "flex-start",
-                          border: "1px solid #e5e7eb",
-                          borderRadius: 10,
-                          padding: 10,
-                          background: selectedDraftIds.includes(msg.id) ? "#eef2ff" : "#f9fafb",
-                          cursor: "pointer",
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={selectedDraftIds.includes(msg.id)}
-                          onChange={() => toggleDraftSelection(msg.id)}
-                          style={{ marginTop: 4 }}
-                        />
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 700, fontSize: 13, color: "#1f2937" }}>Your chat entry</div>
-                          <textarea
-                            value={
-                              typeof editableDraftById[msg.id] === "string"
-                                ? editableDraftById[msg.id]
-                                : msg.content
-                            }
-                            onChange={(event) => updateDraftText(msg.id, event.target.value)}
-                            style={{
-                              ...styles.textarea,
-                              minHeight: 76,
-                              marginTop: 6,
-                              background: "#fff",
-                            }}
-                          />
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                )}
-                <button
-                  style={{ ...styles.primaryButton, marginTop: 10 }}
-                  onClick={sendDraftsToMarkTab}
-                >
-                  Send to “Mark my letter”
-                </button>
-                {ideaSuccess && (
-                  <div style={{ ...styles.successBox, marginTop: 8 }}>
-                    {ideaSuccess}
-                  </div>
-                )}
+              ) : (
+                <p style={styles.helperText}>Send a question in chat first, then build your single draft workspace from your messages.</p>
+              )}
+
+              <div style={{ marginTop: 10 }}>
+                <label style={styles.label}>Single draft workspace</label>
+                <textarea
+                  style={styles.textareaSmall}
+                  value={ideaDraftWorkspace}
+                  onChange={(event) => {
+                    setIdeaDraftWorkspace(event.target.value);
+                    setIdeaError("");
+                    setIdeaSuccess("");
+                  }}
+                  placeholder="Your best evolving draft stays here. Keep refining it before sending to Mark my letter."
+                />
+                <div style={{ ...styles.helperText, marginTop: 4, marginBottom: 0 }}>{countWords(ideaDraftWorkspace)} words</div>
+              </div>
+
+              <button style={{ ...styles.primaryButton, marginTop: 10 }} onClick={sendDraftsToMarkTab}>
+                Send to “Mark my letter”
+              </button>
+              {ideaSuccess && (
+                <div style={{ ...styles.successBox, marginTop: 8 }}>
+                  {ideaSuccess}
+                </div>
+              )}
             </div>
           </div>
         </section>
