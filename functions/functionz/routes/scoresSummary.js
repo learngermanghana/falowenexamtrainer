@@ -401,6 +401,12 @@ const requireAuth = async (req) => {
   return decoded;
 };
 
+const maybeRequireAuth = async (req) => {
+  const authHeader = String(req.headers.authorization || "").trim();
+  if (!authHeader) return null;
+  return requireAuth(req);
+};
+
 /* ----------------------------- Main handler ----------------------------- */
 
 const scoresSummaryHandler = async (req, res) => {
@@ -409,7 +415,7 @@ const scoresSummaryHandler = async (req, res) => {
 
     let decoded = null;
     if (!includeDebug) {
-      decoded = await requireAuth(req);
+      decoded = await maybeRequireAuth(req);
     }
 
     const studentCode = String(req.query.studentCode || "").trim();
@@ -421,7 +427,7 @@ const scoresSummaryHandler = async (req, res) => {
     if (!studentSnap.exists) return res.status(404).json({ error: "Student not found" });
 
     const student = studentSnap.data() || {};
-    if (!includeDebug && student.uid && student.uid !== decoded.uid) {
+    if (!includeDebug && decoded?.uid && student.uid && student.uid !== decoded.uid) {
       return res.status(403).json({ error: "Not authorized" });
     }
 
