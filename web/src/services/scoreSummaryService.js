@@ -1,10 +1,9 @@
 const API_BASE =
   process.env.REACT_APP_API_BASE_URL ||
   process.env.REACT_APP_FUNCTIONS_BASE_URL ||
-  "";
+  "/api";
 
 export const fetchScoreSummary = async ({ idToken, studentCode }) => {
-  if (!API_BASE) throw new Error("Missing REACT_APP_API_BASE_URL (or REACT_APP_FUNCTIONS_BASE_URL).");
   if (!studentCode) throw new Error("Missing studentCode.");
 
   const shouldUseDebugNoAuth = !idToken;
