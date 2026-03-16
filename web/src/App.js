@@ -169,35 +169,6 @@ const getPreferredSection = (allowedSections, preferred, tabStructure) => {
   return findFirstAllowedSection(allowedSections, tabStructure);
 };
 
-const GlobalQuickNavigation = () => {
-  const { t } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const isCampusActive = location.pathname.startsWith("/campus");
-  const isExamsActive = location.pathname.startsWith("/exams");
-  const campusLabel = t("generalHome.campus.eyebrow", { defaultValue: "Campus" });
-  const examsLabel = t("generalHome.exams.eyebrow", { defaultValue: "Exams Room" });
-
-  return (
-    <nav className="global-quick-nav" aria-label={t("studyBuddy.shortcuts.ariaLabel")}>
-      <button
-        className={`global-quick-nav-button${isCampusActive ? " is-active" : ""}`}
-        type="button"
-        onClick={() => navigate("/campus/course")}
-      >
-        {campusLabel}
-      </button>
-      <button
-        className={`global-quick-nav-button${isExamsActive ? " is-active" : ""}`}
-        type="button"
-        onClick={() => navigate("/exams/overview")}
-      >
-        {examsLabel}
-      </button>
-    </nav>
-  );
-};
-
 function App() {
   const { t } = useTranslation();
   const {
@@ -744,7 +715,6 @@ const AppShell = ({
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      {user ? <GlobalQuickNavigation /> : null}
       <StudyBuddyBar studentProfile={studentProfile} />
     </div>
   );
