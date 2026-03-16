@@ -29,7 +29,7 @@
 }
 
 .app-shell {
-  padding: 24px 16px 270px;
+  padding: 24px 16px 220px;
 }
 
 .app-header {
@@ -136,7 +136,7 @@
   }
 
   .app-shell {
-    padding: 16px 12px 286px;
+    padding: 16px 12px 240px;
   }
 
   .app-header {
@@ -339,37 +339,6 @@
 }
 
 
-.global-quick-nav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 108px;
-  z-index: 1101;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding: 0 16px;
-}
-
-.global-quick-nav-button {
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  background: rgba(15, 23, 42, 0.92);
-  color: #f8fafc;
-  padding: 8px 14px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.global-quick-nav-button.is-active {
-  border-color: #93c5fd;
-  background: #1d4ed8;
-}
-
-.global-quick-nav-button:hover {
-  background: rgba(30, 64, 175, 0.96);
-}
 
 @keyframes skeletonPulse {
   0% {
@@ -717,18 +686,6 @@
 
 
 
-@media (max-width: 640px) {
-  .global-quick-nav {
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    bottom: 90px;
-  }
-
-  .global-quick-nav-button {
-    flex: 0 0 auto;
-  }
-}
 
 .study-buddy-mobile-close {
   display: none;
