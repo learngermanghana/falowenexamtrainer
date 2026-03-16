@@ -368,6 +368,12 @@ const AssignmentSubmissionPage = () => {
   const assignmentOptions = useMemo(() => {
     const names = [];
     const includeDiagnostics = [];
+    const courseFallbackNames = assignmentDictionary
+      .filter(
+        ({ assignment, progressionEligible, day, level }) =>
+          assignment && progressionEligible && isDayWithinSubmissionWindow(level || preferredLevel, day)
+      )
+      .map(({ label }) => label);
     const tutorMarkedLabels = new Set(
       assignmentDictionary.filter(({ assignment, progressionEligible }) => assignment && progressionEligible).map(({ label }) => label)
     );
@@ -419,7 +425,9 @@ const AssignmentSubmissionPage = () => {
       });
     }
 
-    return names.length ? names : ["General submission", "Standard assignment"];
+    if (names.length) return names;
+    if (courseFallbackNames.length) return courseFallbackNames;
+    return ["General submission", "Standard assignment"];
   }, [
     assignmentDictionary,
     deriveChapterValue,
