@@ -35,7 +35,7 @@ const A1_CURRICULUM_ENTRIES = [
   { level: "A1", assignmentDay: 9, chapter: "5", mode: "Lesen & Hören", assignment: true, topic: "Nominative and Accusative Cases" },
   { level: "A1", assignmentDay: 10, chapter: "6", mode: "Lesen & Hören", assignment: true, topic: "Objects, Colors and Possessive Articles" },
   { level: "A1", assignmentDay: 10, chapter: "2.4", mode: "Schreiben & Sprechen", assignment: false, topic: "Asking for and Giving Directions" },
-  { level: "A1", assignmentDay: 11, chapter: "7", mode: "Lesen & Hören", assignment: true, topic: "The 12 Hour Clock" },
+  { level: "A1", assignmentDay: 11, chapter: "7", mode: "Lesen & Hören", assignment: true, topic: "Understanding Time" },
   { level: "A1", assignmentDay: 12, chapter: "8", mode: "Lesen & Hören", assignment: true, topic: "The 24 Hour Clock and Dates" },
   { level: "A1", assignmentDay: 13, chapter: "3.5", mode: "Lesen & Hören", assignment: false, topic: "Revision: Numbers, Time and Prices" },
   { level: "A1", assignmentDay: 14, chapter: "3.6", mode: "Schreiben & Sprechen", assignment: false, topic: "Modal Verbs" },

@@ -80,7 +80,7 @@ jest.mock("../data/courseSchedule", () => ({
       },
       {
         day: 11,
-        topic: "12 Hour Clock",
+        topic: "Understanding Time",
         chapter: "7",
         assignment: true,
         lesen_hören: { chapter: "7", assignment: true },
@@ -152,7 +152,7 @@ describe("CourseTab", () => {
     render(<CourseTab defaultLevel="A1" />);
 
     await waitFor(() => {
-      ["Numbers", "Asking Prices", "Countries and Languages", "German Cases", "12 Hour Clock"].forEach((topic) => {
+      ["Numbers", "Asking Prices", "Countries and Languages", "German Cases", "Understanding Time"].forEach((topic) => {
         expect(screen.getByText(topic)).toBeInTheDocument();
         const card = screen.getByText(topic).closest("div");
         expect(within(card).getByText("Passed")).toBeInTheDocument();

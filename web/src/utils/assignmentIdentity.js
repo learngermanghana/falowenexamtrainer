@@ -43,8 +43,8 @@ const extractChapterTokenFromTitle = (title = "") => {
   // Many older assignment titles include the day/chapter number at the end without any
   // explicit "Day" or "Chapter" keyword. If we see a trailing number at the end of the
   // string, treat it as the chapter/day token. We avoid matching numbers that are part of
-  // other tokens (e.g. "12 Hour Clock" should resolve to the trailing "7" in
-  // "A1 12 Hour Clock 7").
+  // other tokens (e.g. "Understanding Time" should resolve to the trailing "7" in
+  // "A1 Understanding Time 7").
   const trailingNumber = text.match(/(?:^|[^\d])(\d+(?:\.\d+)?)\s*$/);
   if (trailingNumber?.[1]) {
     return trailingNumber[1];

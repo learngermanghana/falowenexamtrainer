@@ -634,7 +634,7 @@ const courseSchedules = {
     },
     {
       day: 11,
-      topic: "12 Hour Clock",
+      topic: "Understanding Time",
       chapter: "7",
       goal: "Understand the 12 hour clock system",
       instruction: "Watch the video, review grammar, and complete your workbook.",
