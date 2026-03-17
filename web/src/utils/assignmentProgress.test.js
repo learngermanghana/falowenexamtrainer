@@ -61,6 +61,27 @@ describe("resolveAssignmentStatus", () => {
     expect(status.bestScore).toBe(74);
     expect(status.latestScore).toBe(74);
   });
+  test("prefers explicit canonical assignment rows when picking latestScore", () => {
+    const status = resolveAssignmentStatus({
+      assignmentId: "A2-3.6",
+      resultRecords: [
+        {
+          assignmentId: "A2-3.6",
+          score: 71,
+          date: "2026-03-16T13:12:39.000Z",
+        },
+        {
+          assignment: "Day 6: Möbel und Räume kennenlernen 3.6",
+          score: 60,
+          date: "2026-03-17T08:00:00.000Z",
+        },
+      ],
+    });
+
+    expect(status.bestScore).toBe(71);
+    expect(status.latestScore).toBe(71);
+  });
+
 
   test("result precedence over draft", () => {
     const status = resolveAssignmentStatus({
