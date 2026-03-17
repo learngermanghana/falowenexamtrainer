@@ -723,6 +723,7 @@ const AppShell = ({
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
           <Route path="/campus/course/full-class-calendar/:className" element={<FullClassCalendarPage />} />
+          <Route path="/attendance/:className" element={<LegacyAttendanceRedirect />} />
 
           <Route path="/exams" element={<Navigate to="/exams/overview" replace />} />
           <Route path="/exams/:section" element={<ExamArea onBack={goHome} />} />
@@ -733,6 +734,11 @@ const AppShell = ({
       <StudyBuddyBar studentProfile={studentProfile} />
     </div>
   );
+};
+
+const LegacyAttendanceRedirect = () => {
+  const { className = "" } = useParams();
+  return <Navigate to={`/campus/course/full-class-calendar/${encodeURIComponent(className)}`} replace />;
 };
 
 
