@@ -76,11 +76,6 @@ const arrowStyle = {
   alignSelf: "center",
 };
 
-const legendWrap = {
-  display: "flex",
-  flexWrap: "wrap",
-  gap: 8,
-};
 
 const placeValueGrid = {
   display: "grid",
