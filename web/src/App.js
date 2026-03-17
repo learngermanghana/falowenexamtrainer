@@ -45,6 +45,7 @@ import A1Day3GermanAlphabetReviewingWorkbookPage from "./components/A1Day3German
 import A1Day3SchreibenSprechenKapitel11WorkbookPage from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
 import A1Day3Kapitel12WorkbookPage from "./components/A1Day3Kapitel12WorkbookPage";
 import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3PronounsIntroducingYourselfWorkbookPage";
+import A1Day12TwentyFourHourClockAndDatesWorkbookPage from "./components/A1Day12TwentyFourHourClockAndDatesWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
 import A2Day2PersonenBeschreibenWorkbookPage from "./components/A2Day2PersonenBeschreibenWorkbookPage";
 import A2Day3ComparisonsWorkbookPage from "./components/A2Day3ComparisonsWorkbookPage";
@@ -583,6 +584,10 @@ const AppShell = ({
           <Route path="/campus/course/a2-starter-conjunctions-day-1" element={<A2StarterConjunctionsPage />} />
           <Route path="/campus/course/a1-day-1-greetings-workbook" element={<A1Day1GreetingsWorkbookPage />} />
           <Route path="/campus/course/a1-day-2-kapitel-1-1-workbook" element={<A1Day2Kapitel11WorkbookPage />} />
+          <Route
+            path="/campus/course/a1-day-12-24-hour-clock-and-dates-workbook"
+            element={<A1Day12TwentyFourHourClockAndDatesWorkbookPage />}
+          />
           <Route
             path="/campus/course/a1-day-2-german-alphabet-reviewing-workbook"
             element={<A1Day3GermanAlphabetReviewingWorkbookPage />}
