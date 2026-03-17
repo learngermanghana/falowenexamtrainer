@@ -1422,6 +1422,10 @@
       "button": "Auf {{nextLevel}} upgraden",
       "upgrading": "Upgrade läuft ...",
       "success": "Du bist jetzt auf {{level}}. Bitte zahle, um den Zugang freizuschalten.",
+      "queued": "Upgrade zu {{level}} wurde vorgemerkt. Wir stellen dein Level um, sobald die vollständige Zahlung bestätigt ist.",
+      "pending": "Upgrade zu {{level}} wartet auf Zahlung.",
+      "cancel": "Ausstehendes Upgrade abbrechen",
+      "cancelled": "Ausstehendes Upgrade abgebrochen und dein vorheriges Profil wurde wiederhergestellt.",
       "error": "Level-Upgrade fehlgeschlagen.",
       "maxedOut": "Du bist bereits auf dem höchsten verfügbaren Level.",
       "clearBalance": "Bitte begleiche zuerst deinen offenen Betrag."

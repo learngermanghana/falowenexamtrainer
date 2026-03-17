@@ -1538,6 +1538,10 @@
       "button": "Upgrade to {{nextLevel}}",
       "upgrading": "Upgrading ...",
       "success": "You're now on {{level}}. Please complete payment to unlock access.",
+      "queued": "Upgrade to {{level}} is queued. We will move your level after full payment is confirmed.",
+      "pending": "Upgrade to {{level}} is pending payment.",
+      "cancel": "Cancel pending upgrade",
+      "cancelled": "Pending upgrade cancelled and your previous profile has been restored.",
       "error": "Could not upgrade level.",
       "maxedOut": "You're already at the highest available level.",
       "clearBalance": "Clear your current balance before moving to the next level."
