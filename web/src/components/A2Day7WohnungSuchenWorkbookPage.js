@@ -384,7 +384,7 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
           <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
 
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Audio link: <a href="https://drive.google.com/file/d/1ULPeE_f3e12R4TXJaB2LE5qO7sa6vY0t/view?usp=sharing" target="_blank" rel="noreferrer">Open listening audio</a>
+            Video link: <a href="https://youtu.be/r0q_luPDZ0A" target="_blank" rel="noreferrer">Open Day 7 YouTube practice</a>
           </p>
 
           <h3 style={sectionTitle}>Multiple-Choice-Fragen</h3>
