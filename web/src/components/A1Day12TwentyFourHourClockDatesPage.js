@@ -673,7 +673,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.t6}
               onChange={(v) => setAnswer("t6", v)}
-              placeholder="Type your answer"
+              placeholder="Example: eins Uhr achtzehn"
             />
 
             <p style={{ margin: 0 }}>
@@ -682,7 +682,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.t7}
               onChange={(v) => setAnswer("t7", v)}
-              placeholder="Type your answer"
+              placeholder="Example: zwei Uhr fünfunddreißig"
             />
 
             <p style={{ margin: 0 }}>
@@ -691,7 +691,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.t8}
               onChange={(v) => setAnswer("t8", v)}
-              placeholder="Type your answer"
+              placeholder="Example: sechs Uhr achtundvierzig"
             />
 
             <p style={{ margin: 0 }}>
@@ -735,41 +735,19 @@ const A1TimeAndDatesGrammarPage = () => {
               <div>
                 <b>Score:</b> {results.correct}/{results.total}
               </div>
-              <p style={{ margin: "8px 0 0" }}>
-                Great effort. Your answers are marked above as correct/incorrect.
-              </p>
-              {!showAnswerKey ? (
-                <button
-                  type="button"
-                  onClick={() => setShowAnswerKey(true)}
-                  style={{
-                    marginTop: 10,
-                    padding: "8px 12px",
-                    borderRadius: 10,
-                    border: "1px solid rgba(0,0,0,0.2)",
-                    background: "#fff",
-                    cursor: "pointer",
-                  }}
-                >
-                  Show answer key
-                </button>
-              ) : (
-                <div style={{ display: "grid", gap: 4, marginTop: 10 }}>
-                  <div>1. {results.checks.t1 ? "✅" : "❌"} halb neun = 8:30</div>
-                  <div>2. {results.checks.t2 ? "✅" : "❌"} 14:30 = halb drei</div>
-                  <div>3. {results.checks.t3 ? "✅" : "❌"} viertel vor zehn = 09:45</div>
-                  <div>4. {results.checks.t4 ? "✅" : "❌"} 01:05 = fünf nach eins</div>
-                  <div>5. {results.checks.t5 ? "✅" : "❌"} fünf vor halb zwei = 1:25</div>
-                  <div>6. {results.checks.d1 ? "✅" : "❌"} der fünfte Mai = 5 May</div>
-                  <div>7. {results.checks.d2 ? "✅" : "❌"} 25th December = der fünfundzwanzigste Dezember</div>
-                  <div>8. {results.checks.d3 ? "✅" : "❌"} 3rd = dritte / der dritte</div>
-                  <div>9. {results.checks.t6 ? "✅" : "❌"} 01:18 = eins Uhr achtzehn / achtzehn nach eins</div>
-                  <div>10. {results.checks.t7 ? "✅" : "❌"} 02:35 = zwei Uhr fünfunddreißig / fünf nach halb drei</div>
-                  <div>11. {results.checks.t8 ? "✅" : "❌"} 06:48 = sechs Uhr achtundvierzig / zwölf vor sieben</div>
-                  <div>12. {results.checks.d4 ? "✅" : "❌"} 5th March 2023 = 05.03.2023</div>
-                  <div>13. {results.checks.d5 ? "✅" : "❌"} Monday = Montag</div>
-                </div>
-              )}
+              <div>1. {results.checks.t1 ? "✅" : "❌"} halb neun = 8:30</div>
+              <div>2. {results.checks.t2 ? "✅" : "❌"} 14:30 = halb drei</div>
+              <div>3. {results.checks.t3 ? "✅" : "❌"} viertel vor zehn = 09:45</div>
+              <div>4. {results.checks.t4 ? "✅" : "❌"} 01:05 = fünf nach eins</div>
+              <div>5. {results.checks.t5 ? "✅" : "❌"} fünf vor halb zwei = 1:25</div>
+              <div>6. {results.checks.d1 ? "✅" : "❌"} der fünfte Mai = 5 May</div>
+              <div>7. {results.checks.d2 ? "✅" : "❌"} 25th December = der fünfundzwanzigste Dezember</div>
+              <div>8. {results.checks.d3 ? "✅" : "❌"} 3rd = dritte / der dritte</div>
+              <div>9. {results.checks.t6 ? "✅" : "❌"} 01:18 = eins Uhr achtzehn / achtzehn nach eins</div>
+              <div>10. {results.checks.t7 ? "✅" : "❌"} 02:35 = zwei Uhr fünfunddreißig / fünf nach halb drei</div>
+              <div>11. {results.checks.t8 ? "✅" : "❌"} 06:48 = sechs Uhr achtundvierzig / zwölf vor sieben</div>
+              <div>12. {results.checks.d4 ? "✅" : "❌"} 5th March 2023 = 05.03.2023</div>
+              <div>13. {results.checks.d5 ? "✅" : "❌"} Monday = Montag</div>
             </NoteBox>
           )}
         </Section>
