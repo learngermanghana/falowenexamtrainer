@@ -411,7 +411,7 @@ const SingularPronounsConjugationPage = () => {
         </button>
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          Day 3: Reviewing Pronouns and Verb Conjugation + Introducing Yourself
+          Day 3: Pronouns and Identity Expressions in German
         </h1>
 
         <p style={{ ...styles.subtitle, margin: 0 }}>

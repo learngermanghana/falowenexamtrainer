@@ -511,13 +511,13 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 3,
-      topic: "Pronouns",
+      topic: "Pronouns and Identity Expressions in German",
       chapter: "1.1_1.2",
       goal:
         "Recap what we have learned so far: be able to introduce yourself in German and know all the pronouns.",
       instruction:
         "Begin with the practicals at **Schreiben & Sprechen** (writing & speaking). Then, move to **Lesen & Hören** (reading & listening). **Do assignments only at Lesen & Hören.**\n\nSchreiben & Sprechen activities are for self-practice and have answers provided for self-check. Main assignment to be marked is under Lesen & Hören below.",
-      grammar_topic: "German Pronouns",
+      grammar_topic: "Pronouns and Identity Expressions in German",
       schreiben_sprechen: {
         chapter: "1.1",
         video: "https://youtu.be/iZDv1rcYWsQ",

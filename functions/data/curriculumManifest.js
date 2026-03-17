@@ -25,7 +25,7 @@ const A1_CURRICULUM_ENTRIES = [
   { level: "A1", assignmentDay: 1, chapter: "0.1", mode: "Lesen & Hören", assignment: true, topic: "Greetings and Asking About Well-being" },
   { level: "A1", assignmentDay: 2, chapter: "0.2", mode: "Lesen & Hören", assignment: true, topic: "German Alphabet" },
   { level: "A1", assignmentDay: 2, chapter: "1.1", mode: "Lesen & Hören", assignment: true, topic: "Personal Pronouns and Verb Conjugation" },
-  { level: "A1", assignmentDay: 3, chapter: "1.1", mode: "Schreiben & Sprechen", assignment: false, topic: "Personal Pronouns and Verb Conjugation + Introducing Yourself" },
+  { level: "A1", assignmentDay: 3, chapter: "1.1", mode: "Schreiben & Sprechen", assignment: false, topic: "Pronouns and Identity Expressions in German" },
   { level: "A1", assignmentDay: 3, chapter: "1.2", mode: "Lesen & Hören", assignment: true, topic: "Introducing Yourself" },
   { level: "A1", assignmentDay: 4, chapter: "2", mode: "Lesen & Hören", assignment: true, topic: "Numbers and Addresses" },
   { level: "A1", assignmentDay: 5, chapter: "1.2", mode: "Schreiben & Sprechen", assignment: false, topic: "Introducing Yourself (Practical Recap)" },
