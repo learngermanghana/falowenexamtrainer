@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
+const heroImage =
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1400&q=80";
+
 const sectionStyle = { ...styles.card, display: "grid", gap: 12 };
 
 const tableCell = {
@@ -35,6 +38,15 @@ const noteBox = {
   padding: 12,
   display: "grid",
   gap: 6,
+};
+
+const practiceBox = {
+  border: "1px solid #c7d2fe",
+  background: "#eef2ff",
+  borderRadius: 12,
+  padding: 14,
+  display: "grid",
+  gap: 10,
 };
 
 const builderWrap = {
@@ -86,7 +98,9 @@ const placeValueCard = {
 
 const getPlaceValueRowStyle = (isMobile) => ({
   display: "grid",
-  gridTemplateColumns: isMobile ? "repeat(2, minmax(0, 1fr))" : "repeat(4, minmax(0, 1fr))",
+  gridTemplateColumns: isMobile
+    ? "repeat(2, minmax(0, 1fr))"
+    : "repeat(4, minmax(0, 1fr))",
   gap: 8,
 });
 
@@ -167,7 +181,7 @@ const BuilderPiece = ({ children, type }) => (
   <span style={getPieceStyle(type)}>{children}</span>
 );
 
-const numbersOneToTwenty = [
+const numbersZeroToTwenty = [
   ["0", "Null", "nuu"],
   ["1", "Eins", "ains"],
   ["2", "Zwei", "tsvai"],
@@ -208,44 +222,80 @@ const GermanNumbersGrammarPage = () => {
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
+      <header
+        style={{
+          ...styles.card,
+          overflow: "hidden",
+          padding: 0,
+          display: "grid",
+          gap: 0,
+        }}
+      >
+        <div
+          style={{
+            width: "100%",
+            height: isMobile ? 180 : 280,
+            backgroundImage: `linear-gradient(rgba(17,24,39,0.45), rgba(17,24,39,0.45)), url(${heroImage})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            display: "flex",
+            alignItems: "end",
+          }}
         >
-          Back to Course
-        </button>
+          <div style={{ padding: 20, color: "#fff", width: "100%" }}>
+            <button
+              style={{
+                ...styles.secondaryButton,
+                width: "fit-content",
+                marginBottom: 14,
+                background: "rgba(255,255,255,0.9)",
+              }}
+              onClick={() => navigate("/campus/course")}
+            >
+              Back to Course
+            </button>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          German Numbers 0–10,000 and Address Expressions
-        </h1>
+            <h1 style={{ ...styles.title, marginBottom: 6, color: "#fff" }}>
+              German Numbers 0–10,000 and Address Expressions
+            </h1>
 
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Chapter 2 • German Numbers and Using <strong>wohnen</strong> with <strong>in</strong> and{" "}
-          <strong>in der</strong>
-        </p>
+            <p style={{ ...styles.subtitle, margin: 0, color: "#f3f4f6" }}>
+              Chapter 2 • Learn numbers step by step and say where you live in
+              German.
+            </p>
+          </div>
+        </div>
       </header>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Goal</h2>
+        <h2 style={{ margin: 0 }}>Lesson Goal</h2>
 
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          In this lesson you will learn how German numbers work from <strong>0 to 10,000</strong>. You
-          will also learn how to say where you live using <strong>wohnen</strong>.
+          In this lesson you will learn German numbers in a clear order:
+          <strong> 0–20</strong>, <strong>20–100</strong>,
+          <strong> 100–1000</strong>, and <strong>1000–10000</strong>. At the
+          end, you will also learn how to say your city, street, and address
+          using <strong>wohnen</strong>.
         </p>
 
         <div style={infoBox}>
           <strong>Today you will learn:</strong>
           <span>✔ Numbers from 0–20</span>
-          <span>✔ Numbers from 21–100</span>
+          <span>✔ Numbers from 20–100</span>
           <span>✔ Numbers from 100–1000</span>
           <span>✔ Numbers from 1000–10000</span>
           <span>✔ How to say where you live</span>
+          <span>✔ A small practice check inside the notes</span>
         </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>German Numbers 0–20</h2>
+        <h2 style={{ margin: 0 }}>Part 1: Numbers 0–20</h2>
+
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Start by learning these numbers very well. They are the foundation for
+          bigger numbers.
+        </p>
 
         <div style={{ overflowX: "auto" }}>
           <table
@@ -264,7 +314,7 @@ const GermanNumbersGrammarPage = () => {
             </thead>
 
             <tbody>
-              {numbersOneToTwenty.map(([num, word, pronunciation]) => (
+              {numbersZeroToTwenty.map(([num, word, pronunciation]) => (
                 <tr key={num}>
                   <td style={tableCell}>{num}</td>
                   <td style={tableCell}>
@@ -276,37 +326,51 @@ const GermanNumbersGrammarPage = () => {
             </tbody>
           </table>
         </div>
-      </section>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>How German Numbers Work</h2>
-
-        <div style={infoBox}>
-          <p style={{ margin: 0 }}>German numbers are built from smaller parts.</p>
-          <p style={{ margin: 0 }}>
-            <strong>21</strong> = ein + und + zwanzig → <strong>einundzwanzig</strong>
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>47</strong> = sieben + und + vierzig → <strong>siebenundvierzig</strong>
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>315</strong> = drei + hundert + fünfzehn → <strong>dreihundertfünfzehn</strong>
-          </p>
+        <div style={practiceBox}>
+          <strong>Quick Check: 0–20</strong>
+          <span>Write these in German:</span>
+          <span>1. 6 = ______</span>
+          <span>2. 11 = ______</span>
+          <span>3. 17 = ______</span>
+          <span>4. 20 = ______</span>
         </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Visual Number Builder</h2>
+        <h2 style={{ margin: 0 }}>Part 2: Numbers 20–100</h2>
+
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          From 21 to 99, German usually follows this pattern:
+        </p>
+
+        <div style={infoBox}>
+          <strong>unit + und + tens</strong>
+          <span>
+            21 = <strong>ein + und + zwanzig</strong> →
+            <strong> einundzwanzig</strong>
+          </span>
+          <span>
+            34 = <strong>vier + und + dreißig</strong> →
+            <strong> vierunddreißig</strong>
+          </span>
+          <span>
+            47 = <strong>sieben + und + vierzig</strong> →
+            <strong> siebenundvierzig</strong>
+          </span>
+        </div>
 
         <div style={noteBox}>
-          <strong>Color Guide</strong>
-          <div style={legendWrap}>
-            <BuilderPiece type="one">ones</BuilderPiece>
-            <BuilderPiece type="ten">tens</BuilderPiece>
-            <BuilderPiece type="hundred">hundreds</BuilderPiece>
-            <BuilderPiece type="thousand">thousands</BuilderPiece>
-            <BuilderPiece type="link">und / link</BuilderPiece>
-          </div>
+          <strong>Tens to know</strong>
+          <span>20 – zwanzig</span>
+          <span>30 – dreißig</span>
+          <span>40 – vierzig</span>
+          <span>50 – fünfzig</span>
+          <span>60 – sechzig</span>
+          <span>70 – siebzig</span>
+          <span>80 – achtzig</span>
+          <span>90 – neunzig</span>
+          <span>100 – hundert</span>
         </div>
 
         <div style={builderWrap}>
@@ -333,6 +397,51 @@ const GermanNumbersGrammarPage = () => {
           </div>
 
           <div style={builderRow}>
+            <strong>99</strong>
+            <div style={builderPieces}>
+              <BuilderPiece type="one">neun</BuilderPiece>
+              <BuilderPiece type="link">und</BuilderPiece>
+              <BuilderPiece type="ten">neunzig</BuilderPiece>
+              <span style={arrowStyle}>→</span>
+              <BuilderPiece>neunundneunzig</BuilderPiece>
+            </div>
+          </div>
+        </div>
+
+        <div style={practiceBox}>
+          <strong>Quick Check: 20–100</strong>
+          <span>Write these in German:</span>
+          <span>1. 21 = ______</span>
+          <span>2. 38 = ______</span>
+          <span>3. 54 = ______</span>
+          <span>4. 96 = ______</span>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Part 3: Numbers 100–1000</h2>
+
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Hundreds are also written as one long word in German.
+        </p>
+
+        <div style={infoBox}>
+          <span>
+            100 = <strong>hundert</strong>
+          </span>
+          <span>
+            200 = <strong>zweihundert</strong>
+          </span>
+          <span>
+            315 = <strong>dreihundertfünfzehn</strong>
+          </span>
+          <span>
+            642 = <strong>sechshundertzweiundvierzig</strong>
+          </span>
+        </div>
+
+        <div style={builderWrap}>
+          <div style={builderRow}>
             <strong>315</strong>
             <div style={builderPieces}>
               <BuilderPiece type="one">drei</BuilderPiece>
@@ -355,62 +464,9 @@ const GermanNumbersGrammarPage = () => {
               <BuilderPiece>sechshundertzweiundvierzig</BuilderPiece>
             </div>
           </div>
-
-          <div style={builderRow}>
-            <strong>7,842</strong>
-            <div style={builderPieces}>
-              <BuilderPiece type="one">sieben</BuilderPiece>
-              <BuilderPiece type="thousand">tausend</BuilderPiece>
-              <BuilderPiece type="one">acht</BuilderPiece>
-              <BuilderPiece type="hundred">hundert</BuilderPiece>
-              <BuilderPiece type="one">zwei</BuilderPiece>
-              <BuilderPiece type="link">und</BuilderPiece>
-              <BuilderPiece type="ten">vierzig</BuilderPiece>
-              <span style={arrowStyle}>→</span>
-              <BuilderPiece>siebentausendachthundertzweiundvierzig</BuilderPiece>
-            </div>
-          </div>
         </div>
-
-        <div style={noteBox}>
-          <strong>Important idea</strong>
-          <span>German often puts the parts together into one long word.</span>
-          <span>For 21–99, the ones usually come before the tens.</span>
-          <span>
-            That is why 47 is <strong>sieben-und-vierzig</strong>, not <strong>vierzig-und-sieben</strong>.
-          </span>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Place-Value Chart</h2>
 
         <div style={placeValueGrid}>
-          <div style={placeValueCard}>
-            <strong>47</strong>
-            <div style={getPlaceValueRowStyle(isMobile)}>
-              <div style={placeValueBox("#f3e8ff", "#d8b4fe", "#7e22ce")}>
-                <span style={{ fontWeight: 700 }}>0</span>
-                <span>thousands</span>
-              </div>
-              <div style={placeValueBox("#fef3c7", "#fcd34d", "#b45309")}>
-                <span style={{ fontWeight: 700 }}>0</span>
-                <span>hundreds</span>
-              </div>
-              <div style={placeValueBox("#dcfce7", "#86efac", "#15803d")}>
-                <span style={{ fontWeight: 700 }}>4</span>
-                <span>tens</span>
-              </div>
-              <div style={placeValueBox("#dbeafe", "#93c5fd", "#1d4ed8")}>
-                <span style={{ fontWeight: 700 }}>7</span>
-                <span>ones</span>
-              </div>
-            </div>
-            <span>
-              47 = 4 tens + 7 ones → <strong>siebenundvierzig</strong>
-            </span>
-          </div>
-
           <div style={placeValueCard}>
             <strong>315</strong>
             <div style={getPlaceValueRowStyle(isMobile)}>
@@ -457,34 +513,98 @@ const GermanNumbersGrammarPage = () => {
               </div>
             </div>
             <span>
-              642 = 6 hundreds + 42 → <strong>sechshundertzweiundvierzig</strong>
+              642 = 6 hundreds + 42 →{" "}
+              <strong>sechshundertzweiundvierzig</strong>
             </span>
           </div>
+        </div>
 
-          <div style={placeValueCard}>
-            <strong>7,842</strong>
-            <div style={getPlaceValueRowStyle(isMobile)}>
-              <div style={placeValueBox("#f3e8ff", "#d8b4fe", "#7e22ce")}>
-                <span style={{ fontWeight: 700 }}>7</span>
-                <span>thousands</span>
-              </div>
-              <div style={placeValueBox("#fef3c7", "#fcd34d", "#b45309")}>
-                <span style={{ fontWeight: 700 }}>8</span>
-                <span>hundreds</span>
-              </div>
-              <div style={placeValueBox("#dcfce7", "#86efac", "#15803d")}>
-                <span style={{ fontWeight: 700 }}>4</span>
-                <span>tens</span>
-              </div>
-              <div style={placeValueBox("#dbeafe", "#93c5fd", "#1d4ed8")}>
-                <span style={{ fontWeight: 700 }}>2</span>
-                <span>ones</span>
-              </div>
-            </div>
-            <span>
-              7,842 = 7 thousands + 8 hundreds + 42 → <strong>siebentausendachthundertzweiundvierzig</strong>
-            </span>
+        <div style={practiceBox}>
+          <strong>Quick Check: 100–1000</strong>
+          <span>Write these in German:</span>
+          <span>1. 100 = ______</span>
+          <span>2. 209 = ______</span>
+          <span>3. 451 = ______</span>
+          <span>4. 777 = ______</span>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Part 4: Numbers 1000–10000</h2>
+
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Bigger numbers combine thousands, hundreds, tens, and ones into one
+          word.
+        </p>
+
+        <div style={infoBox}>
+          <span>
+            1000 = <strong>tausend</strong>
+          </span>
+          <span>
+            2000 = <strong>zweitausend</strong>
+          </span>
+          <span>
+            3015 = <strong>dreitausendfünfzehn</strong>
+          </span>
+          <span>
+            7842 = <strong>siebentausendachthundertzweiundvierzig</strong>
+          </span>
+          <span>
+            10000 = <strong>zehntausend</strong>
+          </span>
+        </div>
+
+        <div style={builderRow}>
+          <strong>7,842</strong>
+          <div style={builderPieces}>
+            <BuilderPiece type="one">sieben</BuilderPiece>
+            <BuilderPiece type="thousand">tausend</BuilderPiece>
+            <BuilderPiece type="one">acht</BuilderPiece>
+            <BuilderPiece type="hundred">hundert</BuilderPiece>
+            <BuilderPiece type="one">zwei</BuilderPiece>
+            <BuilderPiece type="link">und</BuilderPiece>
+            <BuilderPiece type="ten">vierzig</BuilderPiece>
+            <span style={arrowStyle}>→</span>
+            <BuilderPiece>
+              siebentausendachthundertzweiundvierzig
+            </BuilderPiece>
           </div>
+        </div>
+
+        <div style={placeValueCard}>
+          <strong>7,842</strong>
+          <div style={getPlaceValueRowStyle(isMobile)}>
+            <div style={placeValueBox("#f3e8ff", "#d8b4fe", "#7e22ce")}>
+              <span style={{ fontWeight: 700 }}>7</span>
+              <span>thousands</span>
+            </div>
+            <div style={placeValueBox("#fef3c7", "#fcd34d", "#b45309")}>
+              <span style={{ fontWeight: 700 }}>8</span>
+              <span>hundreds</span>
+            </div>
+            <div style={placeValueBox("#dcfce7", "#86efac", "#15803d")}>
+              <span style={{ fontWeight: 700 }}>4</span>
+              <span>tens</span>
+            </div>
+            <div style={placeValueBox("#dbeafe", "#93c5fd", "#1d4ed8")}>
+              <span style={{ fontWeight: 700 }}>2</span>
+              <span>ones</span>
+            </div>
+          </div>
+          <span>
+            7,842 = 7 thousands + 8 hundreds + 42 →{" "}
+            <strong>siebentausendachthundertzweiundvierzig</strong>
+          </span>
+        </div>
+
+        <div style={practiceBox}>
+          <strong>Quick Check: 1000–10000</strong>
+          <span>Write these in German:</span>
+          <span>1. 1000 = ______</span>
+          <span>2. 2500 = ______</span>
+          <span>3. 4312 = ______</span>
+          <span>4. 9999 = ______</span>
         </div>
       </section>
 
@@ -493,75 +613,22 @@ const GermanNumbersGrammarPage = () => {
 
         <div style={warningBox}>
           <span>❌ siebenzehn</span>
-          <span>✔ <strong>siebzehn</strong></span>
+          <span>
+            ✔ <strong>siebzehn</strong>
+          </span>
           <span>❌ sechszehn</span>
-          <span>✔ <strong>sechzehn</strong></span>
+          <span>
+            ✔ <strong>sechzehn</strong>
+          </span>
           <span>❌ zwanzigundeins</span>
-          <span>✔ <strong>einundzwanzig</strong></span>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Numbers 21–100</h2>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Numbers between 21 and 99 follow this pattern:
-        </p>
-
-        <div style={noteBox}>
-          <strong>unit + und + tens</strong>
           <span>
-            21 → <strong>einundzwanzig</strong>
+            ✔ <strong>einundzwanzig</strong>
           </span>
+          <span>❌ vierzigundsieben</span>
           <span>
-            43 → <strong>dreiundvierzig</strong>
-          </span>
-          <span>
-            99 → <strong>neunundneunzig</strong>
+            ✔ <strong>siebenundvierzig</strong>
           </span>
         </div>
-
-        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-          <li>30 – Dreißig</li>
-          <li>40 – Vierzig</li>
-          <li>50 – Fünfzig</li>
-          <li>60 – Sechzig</li>
-          <li>70 – Siebzig</li>
-          <li>80 – Achtzig</li>
-          <li>90 – Neunzig</li>
-          <li>100 – Hundert</li>
-        </ul>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Numbers 100–1000</h2>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>Hundreds are written as one word.</p>
-
-        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-          <li>101 – Einhunderteins</li>
-          <li>209 – Zweihundertneun</li>
-          <li>315 – Dreihundertfünfzehn</li>
-          <li>551 – Fünfhunderteinundfünfzig</li>
-          <li>777 – Siebenhundertsiebenundsiebzig</li>
-          <li>1000 – Tausend</li>
-        </ul>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Numbers 1000–10000</h2>
-
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          German numbers combine thousands, hundreds, tens, and ones.
-        </p>
-
-        <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-          <li>2000 – Zweitausend</li>
-          <li>3015 – Dreitausendfünfzehn</li>
-          <li>5551 – Fünftausendfünfhunderteinundfünfzig</li>
-          <li>7867 – Siebentausendachthundertsiebenundsechzig</li>
-          <li>10000 – Zehntausend</li>
-        </ul>
       </section>
 
       <section style={sectionStyle}>
@@ -577,19 +644,25 @@ const GermanNumbersGrammarPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Using “in” and “in der” with wohnen</h2>
+        <h2 style={{ margin: 0 }}>
+          At the End: City, Street, and Address with wohnen
+        </h2>
+
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          After learning numbers, you can now use them in addresses.
+        </p>
 
         <div style={{ overflowX: "auto" }}>
           <table
             style={{
               borderCollapse: "collapse",
               width: "100%",
-              minWidth: 520,
+              minWidth: 560,
             }}
           >
             <thead>
               <tr>
-                <th style={tableCell}>Context</th>
+                <th style={tableCell}>Situation</th>
                 <th style={tableCell}>Pattern</th>
                 <th style={tableCell}>Example</th>
               </tr>
@@ -605,7 +678,6 @@ const GermanNumbersGrammarPage = () => {
                   <em>Ich wohne in Berlin.</em>
                 </td>
               </tr>
-
               <tr>
                 <td style={tableCell}>Living on a street</td>
                 <td style={tableCell}>
@@ -615,30 +687,51 @@ const GermanNumbersGrammarPage = () => {
                   <em>Ich wohne in der Hauptstraße.</em>
                 </td>
               </tr>
+              <tr>
+                <td style={tableCell}>Full address</td>
+                <td style={tableCell}>
+                  <strong>in der</strong> + street + number
+                </td>
+                <td style={tableCell}>
+                  <em>Ich wohne in der Hauptstraße 12.</em>
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
 
         <div style={noteBox}>
-          <strong>Why?</strong>
-          <span>Straße = die Straße (feminine)</span>
-          <span>Dative form → der Straße</span>
+          <strong>Why do we say “in der Straße”?</strong>
+          <span>Straße = die Straße (feminine noun)</span>
+          <span>With wohnen, we use the dative here: die → der</span>
           <span>
-            So we say: <strong>in der Straße</strong>
+            So we say: <strong>in der Hauptstraße</strong>
           </span>
+        </div>
+
+        <div style={practiceBox}>
+          <strong>Mini Practice: Address Expressions</strong>
+          <span>Complete the sentences:</span>
+          <span>1. Ich wohne ___ Accra.</span>
+          <span>2. Ich wohne ___ Ringstraße.</span>
+          <span>3. Ich wohne in der Ringstraße ___.</span>
+          <span>4. Write one full sentence about where you live.</span>
         </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Summary</h2>
+        <h2 style={{ margin: 0 }}>Lesson Summary</h2>
 
         <div style={infoBox}>
-          <span>✔ German numbers from 0–10,000</span>
-          <span>✔ How numbers are built from smaller words</span>
-          <span>✔ Pattern: unit + und + tens</span>
-          <span>✔ Hundreds and thousands</span>
+          <span>✔ Numbers are now grouped in easy learning stages</span>
+          <span>✔ 0–20 first</span>
+          <span>✔ 20–100 next</span>
+          <span>✔ 100–1000 after that</span>
+          <span>✔ 1000–10000 last</span>
+          <span>✔ You also learned how to use numbers in addresses</span>
           <span>
-            ✔ Difference between <strong>in Berlin</strong> and <strong>in der Hauptstraße</strong>
+            ✔ You can now say <strong>in Berlin</strong> and{" "}
+            <strong>in der Hauptstraße 12</strong>
           </span>
         </div>
       </section>
