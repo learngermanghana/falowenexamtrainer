@@ -10,10 +10,11 @@ import NavigationGuide from "./NavigationGuide";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import HomeMetrics from "./HomeMetrics";
 import { fetchAnnouncements } from "../services/announcementService";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 
-const WelcomeHero = ({ studentProfile, onOpenExamFile }) => {
+const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
@@ -43,7 +44,7 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile }) => {
         <button
           type="button"
           style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
-          onClick={() => window.open(ZOOM_DETAILS.url, "_blank", "noreferrer")}
+          onClick={onJoinZoom}
         >
           {t("generalHome.welcome.joinZoom")}
         </button>
@@ -75,6 +76,9 @@ const GeneralHome = ({
   );
   const translate = useCallback((key, values) => t(key, values), [t]);
   const navigate = useNavigate();
+  const playOpenFeedback = useCallback(() => {
+    triggerInteractionFeedback({ sound: "open" });
+  }, []);
   const preferredClass = studentProfile?.className;
   const classCalendarId = "class-calendar-card";
   const [announcements, setAnnouncements] = useState([]);
@@ -157,7 +161,14 @@ const GeneralHome = ({
     <div style={{ display: "grid", gap: 16 }}>
       <WelcomeHero
         studentProfile={studentProfile}
-        onOpenExamFile={() => navigate("/campus/examFile")}
+        onOpenExamFile={() => {
+          playOpenFeedback();
+          navigate("/campus/examFile");
+        }}
+        onJoinZoom={() => {
+          playOpenFeedback();
+          window.open(ZOOM_DETAILS.url, "_blank", "noreferrer");
+        }}
       />
 
       {paymentAlert ? (
@@ -175,7 +186,13 @@ const GeneralHome = ({
           </span>
           <strong style={{ fontSize: 16 }}>{paymentAlert.message}</strong>
           <PrimaryActionBar align="start">
-            <button style={styles.primaryButton} onClick={() => navigate("/campus/account")}>
+            <button
+              style={styles.primaryButton}
+              onClick={() => {
+                playOpenFeedback();
+                navigate("/campus/account");
+              }}
+            >
               {t("generalHome.paymentAlert.cta")}
             </button>
           </PrimaryActionBar>
@@ -279,7 +296,10 @@ const GeneralHome = ({
       <section style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
         <button
           type="button"
-          onClick={() => navigate("/campus/discussion")}
+          onClick={() => {
+            playOpenFeedback();
+            navigate("/campus/discussion");
+          }}
           style={{
             border: "none",
             padding: 0,
@@ -329,7 +349,13 @@ const GeneralHome = ({
             {t("generalHome.campus.helper")}
           </p>
           <PrimaryActionBar align="start">
-            <button style={styles.primaryButton} onClick={() => onSelectArea("campus")}>
+            <button
+              style={styles.primaryButton}
+              onClick={() => {
+                playOpenFeedback();
+                onSelectArea("campus");
+              }}
+            >
               {t("generalHome.campus.cta")}
             </button>
           </PrimaryActionBar>
@@ -363,7 +389,13 @@ const GeneralHome = ({
             {t("generalHome.exams.helper")}
           </p>
           <PrimaryActionBar align="start">
-            <button style={styles.secondaryButton} onClick={() => onSelectArea("exams")}>
+            <button
+              style={styles.secondaryButton}
+              onClick={() => {
+                playOpenFeedback();
+                onSelectArea("exams");
+              }}
+            >
               {t("generalHome.exams.cta")}
             </button>
           </PrimaryActionBar>
