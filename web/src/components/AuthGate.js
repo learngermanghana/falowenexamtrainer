@@ -10,6 +10,7 @@ import { savePreferredLevel } from "../services/levelStorage";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import { persistInterfaceLanguage } from "../i18n";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const isFullName = (value) => {
   const cleaned = String(value || "").trim();
@@ -113,6 +114,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             "Please enter your full name (first and last). It will be used on certificates and transcripts.";
           setAuthError(errorMessage);
           showToast(errorMessage, "error");
+          triggerInteractionFeedback({
+            sound: "error",
+            vibratePattern: [120],
+          });
           setLoading(false);
           return;
         }
@@ -138,6 +143,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
         const successMessage = `Account created! Your student code is ${studentCode}.`;
         setMessage(successMessage);
         showToast(`${successMessage} Finish setup inside the app.`, "success");
+        triggerInteractionFeedback({
+          sound: "success",
+          vibratePattern: [60, 30, 80],
+        });
       } else {
         const loginResult = await login(email, password);
         const credential = loginResult?.credential || loginResult;
@@ -154,12 +163,20 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
 
         setMessage(loginMessage);
         showToast(loginMessage, "success");
+        triggerInteractionFeedback({
+          sound: "success",
+          vibratePattern: [60],
+        });
       }
     } catch (error) {
       console.error(error);
       const errorMessage = formatAuthErrorMessage(error, mode);
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
+      triggerInteractionFeedback({
+        sound: "error",
+        vibratePattern: [120],
+      });
       setMessage("");
     } finally {
       setLoading(false);
@@ -171,6 +188,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       const resetMessage = "Enter your email address to reset your password.";
       setAuthError(resetMessage);
       showToast(resetMessage, "error");
+      triggerInteractionFeedback({
+        sound: "error",
+        vibratePattern: [120],
+      });
       return;
     }
     setResetting(true);
@@ -182,6 +203,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       const resetMessage = "Password reset email sent. Please check your inbox and spam folder.";
       setMessage(resetMessage);
       showToast(resetMessage, "info");
+      triggerInteractionFeedback({
+        sound: "info",
+        vibratePattern: [45],
+      });
     } catch (error) {
       console.error(error);
       const errorMessage =
@@ -192,6 +217,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
             : error?.message || "Could not send password reset email.";
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
+      triggerInteractionFeedback({
+        sound: "error",
+        vibratePattern: [120],
+      });
     } finally {
       setResetting(false);
     }
@@ -214,11 +243,19 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       const successMessage = "Welcome back! Your student profile is ready.";
       setMessage(successMessage);
       showToast(successMessage, "success");
+      triggerInteractionFeedback({
+        sound: "success",
+        vibratePattern: [60],
+      });
     } catch (error) {
       console.error(error);
       const errorMessage = error?.message || "Google sign-in failed. Please try again.";
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
+      triggerInteractionFeedback({
+        sound: "error",
+        vibratePattern: [120],
+      });
     } finally {
       setGoogleLoading(false);
     }
@@ -228,6 +265,10 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
     setAuthError("");
     setMessage("");
+    triggerInteractionFeedback({
+      sound: "open",
+      vibratePattern: [35],
+    });
   };
 
   return (
