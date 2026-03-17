@@ -221,7 +221,6 @@ const A1TimeAndDatesGrammarPage = () => {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
-  const [showAnswerKey, setShowAnswerKey] = useState(false);
 
   const setAnswer = (key, value) =>
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -717,7 +716,6 @@ const A1TimeAndDatesGrammarPage = () => {
             type="button"
             onClick={() => {
               setShowResults(true);
-              setShowAnswerKey(false);
             }}
             style={{
               padding: "10px 14px",
