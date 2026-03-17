@@ -217,6 +217,9 @@ const A1TimeAndDatesGrammarPage = () => {
       t3: answers.t3 === "09:45",
       t4: isOneOf(answers.t4, ["fünf nach eins", "5 nach eins"]),
       t5: isOneOf(answers.t5, ["1:25", "01:25"]),
+      t6: isOneOf(answers.t6, ["eins uhr achtzehn", "ein uhr achtzehn", "achtzehn nach eins"]),
+      t7: isOneOf(answers.t7, ["fünf nach halb drei", "zwei uhr fünfunddreißig"]),
+      t8: isOneOf(answers.t8, ["sechs uhr achtundvierzig", "zwölf vor sieben"]),
       d1: answers.d1 === "5 May",
       d2: answers.d2 === "der fünfundzwanzigste Dezember",
       d3: isOneOf(answers.d3, ["dritte", "der dritte"]),
@@ -321,6 +324,27 @@ const A1TimeAndDatesGrammarPage = () => {
                 ["19:45", "neunzehn Uhr fünfundvierzig"],
               ]}
             />
+
+            <NoteBox>
+              Important: a time is <b>not always :30</b>.<br />
+              Say the exact minute number, e.g. <b>eins Uhr achtzehn</b> (1:18).
+            </NoteBox>
+          </SubSection>
+
+          <SubSection title="3b. Real-life minute examples (not only :30)">
+            <Table
+              headers={["Time", "Formal", "Natural spoken option"]}
+              rows={[
+                ["01:18", "eins Uhr achtzehn", "achtzehn nach eins"],
+                ["02:35", "zwei Uhr fünfunddreißig", "fünf nach halb drei"],
+                ["06:48", "sechs Uhr achtundvierzig", "zwölf vor sieben"],
+              ]}
+            />
+
+            <MistakeBox>
+              Do not force every time into <b>halb</b>. For <b>1:18</b>, do not say <b>halb zwei</b>.
+              Say <b>eins Uhr achtzehn</b> or <b>achtzehn nach eins</b>.
+            </MistakeBox>
           </SubSection>
 
           <SubSection title="4. Natural spoken time">
@@ -616,7 +640,34 @@ const A1TimeAndDatesGrammarPage = () => {
             />
 
             <p style={{ margin: 0 }}>
-              <b>9. Write 5th March 2023 in German format:</b>
+              <b>9. Say 01:18 in German (formal or natural):</b>
+            </p>
+            <FillInput
+              value={answers.t6}
+              onChange={(v) => setAnswer("t6", v)}
+              placeholder="Example: eins Uhr achtzehn"
+            />
+
+            <p style={{ margin: 0 }}>
+              <b>10. Say 02:35 in German (formal or natural):</b>
+            </p>
+            <FillInput
+              value={answers.t7}
+              onChange={(v) => setAnswer("t7", v)}
+              placeholder="Example: zwei Uhr fünfunddreißig"
+            />
+
+            <p style={{ margin: 0 }}>
+              <b>11. Say 06:48 in German (formal or natural):</b>
+            </p>
+            <FillInput
+              value={answers.t8}
+              onChange={(v) => setAnswer("t8", v)}
+              placeholder="Example: sechs Uhr achtundvierzig"
+            />
+
+            <p style={{ margin: 0 }}>
+              <b>12. Write 5th March 2023 in German format:</b>
             </p>
             <FillInput
               value={answers.d4}
@@ -625,7 +676,7 @@ const A1TimeAndDatesGrammarPage = () => {
             />
 
             <p style={{ margin: 0 }}>
-              <b>10. Monday in German = </b>
+              <b>13. Monday in German = </b>
             </p>
             <FillInput
               value={answers.d5}
@@ -661,8 +712,11 @@ const A1TimeAndDatesGrammarPage = () => {
               <div>6. {results.checks.d1 ? "✅" : "❌"} der fünfte Mai = 5 May</div>
               <div>7. {results.checks.d2 ? "✅" : "❌"} 25th December = der fünfundzwanzigste Dezember</div>
               <div>8. {results.checks.d3 ? "✅" : "❌"} 3rd = dritte / der dritte</div>
-              <div>9. {results.checks.d4 ? "✅" : "❌"} 5th March 2023 = 05.03.2023</div>
-              <div>10. {results.checks.d5 ? "✅" : "❌"} Monday = Montag</div>
+              <div>9. {results.checks.t6 ? "✅" : "❌"} 01:18 = eins Uhr achtzehn / achtzehn nach eins</div>
+              <div>10. {results.checks.t7 ? "✅" : "❌"} 02:35 = zwei Uhr fünfunddreißig / fünf nach halb drei</div>
+              <div>11. {results.checks.t8 ? "✅" : "❌"} 06:48 = sechs Uhr achtundvierzig / zwölf vor sieben</div>
+              <div>12. {results.checks.d4 ? "✅" : "❌"} 5th March 2023 = 05.03.2023</div>
+              <div>13. {results.checks.d5 ? "✅" : "❌"} Monday = Montag</div>
             </NoteBox>
           )}
         </Section>
