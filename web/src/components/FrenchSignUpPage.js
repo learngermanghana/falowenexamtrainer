@@ -11,6 +11,7 @@ import { generateStudentCode } from "../services/studentCode";
 import PasswordGuidance from "./PasswordGuidance";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { formatCurrency } from "../lib/formatters";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const MIN_INITIAL_PAYMENT = 2000;
 const FRENCH_LEVELS = ["A1"];
@@ -217,6 +218,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
       const summaryMessage = `${validationMessages[0]} Fix the highlighted fields, then submit again.`;
       setAuthError(summaryMessage);
       showToast(summaryMessage, "error");
+      triggerInteractionFeedback({ sound: "error", vibratePattern: [120] });
       return;
     }
 
@@ -258,12 +260,14 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
         "Open the tuition card in the app to complete your Paystack payment.";
       setMessage(successMessage);
       showToast(successMessage, "success");
+      triggerInteractionFeedback({ sound: "success", vibratePattern: [60, 30, 80] });
     } catch (error) {
       console.error(error);
       const errorMessage =
         "We couldn't create your French account right now. Please try again or contact info@falowen.app.";
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
+      triggerInteractionFeedback({ sound: "error", vibratePattern: [120] });
     } finally {
       setLoading(false);
     }

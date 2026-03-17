@@ -14,6 +14,7 @@ import { isPaymentsEnabled } from "../lib/featureFlags";
 import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import { formatCurrency } from "../lib/formatters";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const MIN_INITIAL_PAYMENT = 2000;
 const isFullName = (value) => {
@@ -265,6 +266,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const summaryMessage = `${validationMessages[0]} Fix the highlighted fields, then submit again.`;
       setAuthError(summaryMessage);
       showToast(summaryMessage, "error");
+      triggerInteractionFeedback({ sound: "error", vibratePattern: [120] });
       return;
     }
 
@@ -320,6 +322,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const successMessage = `Account created! Your student code is ${studentCode}. ${amountCopy} ${accessCopy} ${paymentInstruction} ${paymentRedirectNote}${balanceText}`;
       setMessage(successMessage);
       showToast(`${successMessage} Finish setup inside the app.`, "success");
+      triggerInteractionFeedback({ sound: "success", vibratePattern: [60, 30, 80] });
     } catch (error) {
       console.error(error);
       const friendlyError = interpretSignupError(error);
@@ -334,6 +337,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const combinedMessage = `${errorMessage} ${nextStep}`;
       setAuthError(combinedMessage);
       showToast(combinedMessage, "error");
+      triggerInteractionFeedback({ sound: "error", vibratePattern: [120] });
     } finally {
       setLoading(false);
     }
