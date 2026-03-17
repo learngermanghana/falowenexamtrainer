@@ -35,6 +35,9 @@ const questionBlock = {
 };
 
 const horenLink = "https://drive.google.com/file/d/1CaSUhSWFlX1P8BT3BP22aGGy3Sl1R6BO/view?usp=sharing";
+const teil1HeroImage = "https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=1600&q=80";
+const teil2HeroImage = "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?auto=format&fit=crop&w=1600&q=80";
+const teil3HeroImage = "https://images.unsplash.com/photo-1495364141860-b0d03eccd065?auto=format&fit=crop&w=1600&q=80";
 
 const teil1Questions = [
   {
@@ -112,7 +115,7 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
 
       <section style={card}>
         <img
-          src="https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=1600&q=80"
+          src={teil1HeroImage}
           alt="Analog wall clock beside a monthly calendar"
           loading="lazy"
           style={{ width: "100%", borderRadius: 10, maxHeight: 300, objectFit: "cover" }}
@@ -145,6 +148,12 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
       </section>
 
       <section style={card}>
+        <img
+          src={teil2HeroImage}
+          alt="Analog wall clock beside a monthly calendar"
+          loading="lazy"
+          style={{ width: "100%", borderRadius: 10, maxHeight: 300, objectFit: "cover" }}
+        />
         <h2 style={sectionTitle}>Teil 2: Lesen (Richtig/Falsch)</h2>
         <p style={paragraph}>
           Heute ist der fünfte April. In Deutschland benutzen wir oft die 24-Stunden-Uhr. Das bedeutet, dass der Tag um
@@ -168,6 +177,12 @@ const A1Day12TwentyFourHourClockAndDatesWorkbookPage = () => {
       </section>
 
       <section style={card}>
+        <img
+          src={teil3HeroImage}
+          alt="Analog wall clock beside a monthly calendar"
+          loading="lazy"
+          style={{ width: "100%", borderRadius: 10, maxHeight: 300, objectFit: "cover" }}
+        />
         <h2 style={sectionTitle}>Teil 3: Hörverstehen</h2>
         <p style={paragraph}>
           Hören Thema: 24-Stunden-Uhr und Daten. Use the in-app player first. If playback fails, open the Google Drive
