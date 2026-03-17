@@ -24,6 +24,22 @@ const toNumericScore = (value) => {
   return null;
 };
 
+const STRUCTURED_ASSIGNMENT_ID_PATTERN = /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i;
+const DAY_ALIAS_ID_PATTERN = /^(A1|A2|B1|B2|C1|C2)-DAY-\d+(?:-TASK-\d+)?$/i;
+
+const getResultIdentityRank = (row = {}) => {
+  const rawKey = String(
+    row?.assignmentId || row?.assignment_id || row?.assignmentKey || row?.explicitId || ""
+  )
+    .trim()
+    .toUpperCase();
+
+  if (!rawKey) return 0;
+  if (STRUCTURED_ASSIGNMENT_ID_PATTERN.test(rawKey)) return 3;
+  if (DAY_ALIAS_ID_PATTERN.test(rawKey)) return 1;
+  return 2;
+};
+
 const pickLatestIso = (...values) => {
   const valid = values
     .map(toIsoDate)
@@ -120,6 +136,7 @@ export const resolveAssignmentStatus = ({
   const scored = results
     .map((row) => ({
       score: toNumericScore(row?.score ?? row?.finalScore ?? row?.mark ?? row?.grade),
+      identityRank: getResultIdentityRank(row),
       updatedAt:
         row?.updatedAt ||
         row?.date ||
@@ -134,7 +151,19 @@ export const resolveAssignmentStatus = ({
     scored.length > 0 ? scored.reduce((max, row) => Math.max(max, row.score), Number.NEGATIVE_INFINITY) : null;
   const latestScored =
     scored.length > 0
-      ? scored.slice().sort((a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime())[0]
+      ? scored
+          .slice()
+          .sort((a, b) => {
+            if (b.identityRank !== a.identityRank) return b.identityRank - a.identityRank;
+
+            const bUpdatedAt = new Date(b.updatedAt || 0).getTime();
+            const aUpdatedAt = new Date(a.updatedAt || 0).getTime();
+            const safeBUpdatedAt = Number.isFinite(bUpdatedAt) ? bUpdatedAt : 0;
+            const safeAUpdatedAt = Number.isFinite(aUpdatedAt) ? aUpdatedAt : 0;
+            if (safeBUpdatedAt !== safeAUpdatedAt) return safeBUpdatedAt - safeAUpdatedAt;
+
+            return b.score - a.score;
+          })[0]
       : null;
 
   const hasDraft = Boolean(draftRecord);
