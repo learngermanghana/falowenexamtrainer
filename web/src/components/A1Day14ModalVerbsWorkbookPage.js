@@ -224,19 +224,6 @@ const separableWithModal = [
   },
 ];
 
-// NEW: nicht practice
-const nichtPractice = [
-  { id: "n1", words: ["können", "ich", "heute", "nicht", "kommen"], answer: "Ich kann heute nicht kommen." },
-  { id: "n2", words: ["dürfen", "wir", "hier", "nicht", "parken"], answer: "Wir dürfen hier nicht parken." },
-  { id: "n3", words: ["wollen", "sie", "heute", "nicht", "bezahlen"], answer: "Sie will heute nicht bezahlen." },
-  { id: "n4", words: ["müssen", "er", "nicht", "früh", "aufstehen"], answer: "Er muss nicht früh aufstehen." },
-  {
-    id: "n5",
-    words: ["möchten", "ich", "nicht", "in diesem Zimmer", "rauchen"],
-    answer: "Ich möchte nicht in diesem Zimmer rauchen.",
-  },
-];
-
 /* ------------------------------ Page component ------------------------------ */
 
 const A1Day14ModalVerbsWorkbookPage = () => {
@@ -252,10 +239,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
   const [marks, setMarks] = useState({});
   const [resetKey, setResetKey] = useState(0);
 
-  const allExercises = useMemo(
-    () => [...sentenceBuilding, ...separableNoModal, ...separableWithModal, ...nichtPractice],
-    []
-  );
+  const allExercises = useMemo(() => [...sentenceBuilding, ...separableNoModal, ...separableWithModal], []);
   const totalExercises = allExercises.length;
 
   const attemptedCount = useMemo(
@@ -448,6 +432,9 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         >
           <div style={{ fontWeight: 800, marginBottom: 6, color: "#111827" }}>TICKET / BOARD</div>
           <TicketRow label="Ab" time="10:12" place="Frankfurt (Main) Hbf" />
+          <TicketRow label="Halt" time="10:58" place="Kassel-Wilhelmshöhe" />
+          <TicketRow label="Halt" time="11:46" place="Göttingen" />
+          <TicketRow label="Halt" time="12:32" place="Hannover Hbf" />
           <TicketRow label="An" time="13:48" place="Berlin Hbf" />
           <div style={{ marginTop: 8, color: "#6b7280" }}>
             Often also: <strong>Gleis</strong> (platform), <strong>Umst.</strong> (transfers)
@@ -519,7 +506,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
       </SectionCard>
 
       {/* NEW SECTION 8 */}
-      <SectionCard title="8) Extra practice: Separable verbs + Modal verbs + 'nicht'">
+      <SectionCard title="8) Extra practice: Separable verbs + Modal verbs">
         <p style={{ margin: 0 }}>
           <strong>Word order reminder:</strong> Subject + modal (Position 2) + time + details + main verb (infinitive at the
           end)
@@ -561,31 +548,6 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             />
           ))}
         </ol>
-
-        <h3 style={{ ...sectionTitle, marginTop: 12 }}>B) 'nicht' practice (negation)</h3>
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          In many A1 sentences, <strong>nicht</strong> goes before the infinitive (or before what you want to negate).
-        </p>
-
-        <ol style={{ ...listStyle, marginTop: 10 }}>
-          {nichtPractice.map((ex, idx) => (
-            <ExerciseItem
-              key={ex.id}
-              id={ex.id}
-              index={idx}
-              words={ex.words}
-              answer={ex.answer}
-              placeholder="Type the full sentence with 'nicht'…"
-              resetKey={resetKey}
-              onMark={handleMark}
-            />
-          ))}
-        </ol>
-
-        <p style={{ margin: 0, color: "#6b7280", fontSize: 13 }}>
-          Quick tip: For nouns, German often uses <strong>kein</strong> (e.g., <em>Ich habe kein Ticket.</em>). For
-          verbs/activities, German often uses <strong>nicht</strong> (e.g., <em>Ich kann nicht kommen.</em>).
-        </p>
       </SectionCard>
     </div>
   );
