@@ -685,7 +685,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/VLRCia5TENI",
         youtube_link: "https://youtu.be/VLRCia5TENI",
         assignment: false,
-        workbook_link: "https://drive.google.com/file/d/12oFKrKrHBwSpSnzxLX_e-cjPSiYtCFVs/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-13-revision-numbers-time-and-prices-workbook",
       },
     },
     {
