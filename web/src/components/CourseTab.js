@@ -46,6 +46,19 @@ const formatAssignmentScore = (score) => {
 };
 
 const SCORE_RELEVANT_STATUSES = new Set(["submitted", "passed", "failed"]);
+const CANONICAL_ASSIGNMENT_ID_PATTERN = /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i;
+
+const isCanonicalAssignmentId = (value = "") => CANONICAL_ASSIGNMENT_ID_PATTERN.test(String(value || "").trim());
+
+const resolveStrictResultAssignmentId = (result = {}, level = "") => {
+  const canonical = resolveAssignmentCanonicalKey({
+    level,
+    assignmentId: result?.assignmentId || result?.assignment_id || result?.assignmentKey,
+    assignmentTitle: "",
+  });
+
+  return isCanonicalAssignmentId(canonical) ? String(canonical).trim().toUpperCase() : "";
+};
 
 export const getScoreBadgeForEntry = ({ statusInfo, progressByAssignmentId }) => {
   const fallbackStatus = String(statusInfo?.finalStatus || statusInfo?.status || "").trim();
@@ -57,7 +70,7 @@ export const getScoreBadgeForEntry = ({ statusInfo, progressByAssignmentId }) =>
     .map((assignmentId) => progressByAssignmentId?.[assignmentId])
     .filter(Boolean)
     .map((progress) => ({
-      score: Number(progress?.latestScore),
+      score: Number(progress?.bestScore),
       updatedAt: new Date(progress?.lastUpdatedAt || 0).getTime(),
     }))
     .filter((row) => Number.isFinite(row.score));
@@ -69,7 +82,7 @@ export const getScoreBadgeForEntry = ({ statusInfo, progressByAssignmentId }) =>
     if (label) {
       return {
         tone: "scored",
-        text: `Latest score: ${label}/100`,
+        text: `Best score: ${label}/100`,
       };
     }
   }
@@ -478,11 +491,7 @@ const getRequiredAssignmentIdsForEntry = (entry, level) => {
 };
 
 const resolveResultCanonicalAssignmentId = (result = {}, level = "") =>
-  resolveAssignmentCanonicalKey({
-    level,
-    assignmentId: result?.assignmentId || result?.assignment_id || result?.assignmentKey,
-    assignmentTitle: result?.assignment || result?.assignmentTitle || result?.title,
-  }) || "";
+  resolveStrictResultAssignmentId(result, level);
 
 const filterResultsForLevel = (results = [], level = "") => {
   const normalizedLevel = normalizeLevel(level);
@@ -903,16 +912,51 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
         const firestoreSubmissions = submissionSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
         const firestoreDrafts = draftSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
         const levelResults = filterResultsForLevel(resultsResponse?.results || [], selectedCourseLevel);
+        const strictLevelResults = levelResults
+          .map((result) => {
+            const assignmentId = resolveStrictResultAssignmentId(result, selectedCourseLevel);
+            if (!assignmentId) {
+              console.warn("[CourseTab] Skipping result row without canonical assignmentId", {
+                assignmentText: result?.assignment || result?.assignmentTitle || "",
+                parsedId: result?.assignmentId || result?.assignment_id || result?.assignmentKey || "",
+                canonicalId: assignmentId,
+                score: result?.score,
+              });
+              return null;
+            }
+
+            return {
+              ...result,
+              assignmentId,
+              assignment_id: assignmentId,
+              assignmentKey: assignmentId,
+            };
+          })
+          .filter(Boolean);
+
         const mergedProgress = mergeAssignmentProgress({
           curriculumEntries,
           firestoreDrafts,
           firestoreSubmissions,
-          sheetResults: levelResults,
+          sheetResults: strictLevelResults,
           studentCode,
         });
 
         const byAssignmentId = mergedProgress.reduce((acc, row) => {
-          if (!row.assignmentId) return acc;
+          if (!isCanonicalAssignmentId(row.assignmentId)) {
+            console.warn("[CourseTab] Skipping merged progress row with non-canonical assignmentId", {
+              assignmentId: row.assignmentId || "",
+              bestScore: row.bestScore,
+              attempts: Array.isArray(row.resultRecords) ? row.resultRecords.length : 0,
+            });
+            return acc;
+          }
+
+          console.log("[CourseTab][Progress]", {
+            assignmentId: row.assignmentId,
+            bestScore: row.bestScore,
+            attempts: Array.isArray(row.resultRecords) ? row.resultRecords.length : 0,
+          });
           acc[row.assignmentId] = row;
           return acc;
         }, {});

@@ -13,7 +13,8 @@
     "seed:announcements": "node scripts/seedAnnouncements.js",
     "migrate:assignment-keys": "node scripts/backfillAssignmentKeys.js",
     "upsert:answer-key": "node scripts/upsertAnswerKeyRegistryEntry.js",
-    "import:answer-keys": "node scripts/importAnswerKeyManifest.js"
+    "import:answer-keys": "node scripts/importAnswerKeyManifest.js",
+    "migrate:scores-assignment-ids": "node scripts/migrateScoreAssignmentIds.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
