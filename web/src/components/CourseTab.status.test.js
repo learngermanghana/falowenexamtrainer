@@ -305,13 +305,13 @@ describe("getScoreBadgeForEntry", () => {
         requiredAssignmentIds: ["A1-2"],
       },
       progressByAssignmentId: {
-        "A1-2": { latestScore: 82, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+        "A1-2": { bestScore: 82, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
       },
     });
 
     expect(badge).toEqual({
       tone: "scored",
-      text: "Latest score: 82/100",
+      text: "Best score: 82/100",
     });
   });
 
@@ -323,7 +323,7 @@ describe("getScoreBadgeForEntry", () => {
         assignmentId: "A1-2",
       },
       progressByAssignmentId: {
-        "A1-2": { latestScore: null, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+        "A1-2": { bestScore: null, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
       },
     });
 
@@ -342,14 +342,14 @@ describe("getScoreBadgeForEntry", () => {
         requiredAssignmentIds: ["A1-9", "A1-10"],
       },
       progressByAssignmentId: {
-        "A1-9": { latestScore: 67, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
-        "A1-10": { latestScore: 78.5, lastUpdatedAt: "2024-10-04T08:00:00.000Z" },
+        "A1-9": { bestScore: 67, lastUpdatedAt: "2024-10-01T10:00:00.000Z" },
+        "A1-10": { bestScore: 78.5, lastUpdatedAt: "2024-10-04T08:00:00.000Z" },
       },
     });
 
     expect(badge).toEqual({
       tone: "scored",
-      text: "Latest score: 78.5/100",
+      text: "Best score: 78.5/100",
     });
   });
 });
