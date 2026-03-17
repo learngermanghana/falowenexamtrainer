@@ -657,8 +657,8 @@ const courseSchedules = {
       lesen_hören: {
         video: "https://youtu.be/hLpPFOthVkU",
         youtube_link: "https://youtu.be/hLpPFOthVkU",
-        grammarbook_link: "https://drive.google.com/file/d/1fW2ChjnDKW_5SEr65ZgE1ylJy1To46_p/view?usp=sharing",
-        workbook_link: "https://drive.google.com/file/d/1onzokN8kQualNO6MSsPndFXiRwsnsVM9/view?usp=sharing",
+        grammarbook_link: "https://www.falowen.app/campus/course/a1-day-12-the-24-hour-clock-and-dates",
+        workbook_link: "/campus/course/a1-day-12-24-hour-clock-and-dates-workbook",
         assignment: true,
       },
     },
