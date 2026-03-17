@@ -64,7 +64,7 @@ const A1Day3PronounsIntroducingYourselfWorkbookPage = () => {
           Back to Course
         </button>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 3 Workbook · Reviewing Pronouns and Verb Conjugation + Introducing Yourself and Reviewing Pronouns
+          A1 · Day 3 Workbook · Pronouns and Identity Expressions in German
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.1</p>
         <p style={{ ...styles.subtitle, margin: 0 }}>
