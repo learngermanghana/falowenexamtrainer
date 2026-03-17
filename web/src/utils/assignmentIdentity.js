@@ -1,11 +1,9 @@
 import { courseSchedules } from "../data/courseSchedule";
+import { CURRICULUM_BY_LEVEL, normalizeLevel as normalizeManifestLevel } from "../data/curriculumManifest";
 
 const normalizeText = (value) => String(value || "").trim().toLowerCase();
 
-const normalizeLevel = (level) => {
-  const token = String(level || "").trim().toUpperCase();
-  return /^(A1|A2|B1|B2|C1|C2)$/.test(token) ? token : "";
-};
+const normalizeLevel = (level) => normalizeManifestLevel(level);
 
 const normalizeAssignmentToken = (value) =>
   String(value || "")
@@ -17,37 +15,47 @@ const normalizeAssignmentToken = (value) =>
     .replace(/^-|-$/g, "")
     .toUpperCase();
 
-const normalizeTitleToken = (value) =>
-  String(value || "")
-    .trim()
-    .replace(/[_\s]+/g, "-")
-    .replace(/[^a-z0-9-]/gi, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .toUpperCase();
+const getValidCanonicalIdsForLevel = (level) =>
+  new Set((CURRICULUM_BY_LEVEL[level] || []).map((entry) => entry.canonicalAssignmentId));
 
-const extractChapterTokenFromTitle = (title = "") => {
-  const text = String(title || "").trim();
-  if (!text) return "";
+const collectCandidateChapterTokens = (value = "") => {
+  const text = String(value || "").trim();
+  if (!text) return [];
 
-  const explicitLevelChapter = text.match(/\b(?:A1|A2|B1|B2|C1|C2)[\s-]+(\d+(?:\.\d+)?)\b/i);
-  if (explicitLevelChapter?.[1]) return explicitLevelChapter[1];
+  const out = [];
+  const add = (token) => {
+    if (!token) return;
+    const normalized = String(token).trim();
+    if (!normalized || out.includes(normalized)) return;
+    out.push(normalized);
+  };
 
-  const decimalMatches = text.match(/\b\d+\.\d+\b/g);
-  if (decimalMatches?.length) return decimalMatches[decimalMatches.length - 1];
+  const levelExplicit = text.match(/\b(?:A1|A2|B1|B2|C1|C2)[\s-]*(\d+(?:\.\d+)?)\b/gi) || [];
+  levelExplicit.forEach((match) => add(match.match(/(\d+(?:\.\d+)?)/)?.[1] || ""));
 
-  const chapterHint = text.match(/\b(?:chapter|lektion|lesson|aufgabe)\s*(\d+(?:\.\d+)?)\b/i);
-  if (chapterHint?.[1]) return chapterHint[1];
+  const chapterExplicit = text.match(/\b(?:chapter|lektion|lesson|aufgabe|assignment|kapitel|id)\s*#?\s*(\d+(?:\.\d+)?)\b/gi) || [];
+  chapterExplicit.forEach((match) => add(match.match(/(\d+(?:\.\d+)?)/)?.[1] || ""));
 
-  // As a final heuristic, check if the title ends with a standalone number (e.g. "A1 German Cases 5").
-  // Many older assignment titles include the day/chapter number at the end without any
-  // explicit "Day" or "Chapter" keyword. If we see a trailing number at the end of the
-  // string, treat it as the chapter/day token. We avoid matching numbers that are part of
-  // other tokens (e.g. "Understanding Time" should resolve to the trailing "7" in
-  // "A1 Understanding Time 7").
-  const trailingNumber = text.match(/(?:^|[^\d])(\d+(?:\.\d+)?)\s*$/);
-  if (trailingNumber?.[1]) {
-    return trailingNumber[1];
+  const decimals = text.match(/\b\d+\.\d+\b/g) || [];
+  decimals.forEach(add);
+
+  const numerics = text.match(/\b\d+(?:\.\d+)?\b/g) || [];
+  numerics.forEach(add);
+
+  return out;
+};
+
+const resolveFromTextWithManifest = ({ level, text }) => {
+  const normalizedLevel = normalizeLevel(level);
+  if (!normalizedLevel) return "";
+
+  const validCanonicalIds = getValidCanonicalIdsForLevel(normalizedLevel);
+  if (!validCanonicalIds.size) return "";
+
+  const candidates = collectCandidateChapterTokens(text);
+  for (const chapterToken of candidates) {
+    const canonical = `${normalizedLevel}-${chapterToken}`;
+    if (validCanonicalIds.has(canonical)) return canonical;
   }
 
   return "";
@@ -57,96 +65,38 @@ export const toCanonicalAssignmentId = ({ assignmentId, level }) => {
   const normalizedLevel = normalizeLevel(level);
   const token = normalizeAssignmentToken(assignmentId);
 
-  if (!token) return "";
-  if (/^(A1|A2|B1|B2|C1|C2)-/i.test(token)) return token.toUpperCase();
-  if (normalizedLevel) return `${normalizedLevel}-${token}`;
-  return token;
-};
+  if (!token || !normalizedLevel) return "";
 
-const getFallbackKeyFromTitle = ({ level, assignmentTitle }) => {
-  const normalizedLevel = normalizeLevel(level);
-  const title = String(assignmentTitle || "").trim();
-
-  if (!title) return "";
-
-  const explicitLevelChapter = title.match(/\b(A1|A2|B1|B2|C1|C2)-(\d+(?:\.\d+)?)\b/i);
-  if (explicitLevelChapter?.[0]) return explicitLevelChapter[0].toUpperCase();
-
-  const chapterToken = extractChapterTokenFromTitle(title);
-  if (chapterToken && normalizedLevel) {
-    return `${normalizedLevel}-${chapterToken}`;
-  }
-
-  const dayTaskMatch = title.match(/\bday\s*(\d+)\b[^\n\r]*?\btask\s*(\d+)\b/i);
-  if (dayTaskMatch?.[1] && dayTaskMatch?.[2] && normalizedLevel) {
-    return `${normalizedLevel}-DAY-${dayTaskMatch[1]}-TASK-${dayTaskMatch[2]}`;
-  }
-
-  const dayMatch = title.match(/\bday\s*(\d+)\b/i);
-  if (dayMatch?.[1] && normalizedLevel) {
-    return `${normalizedLevel}-DAY-${dayMatch[1]}`;
-  }
-
-  const titleToken = normalizeTitleToken(title);
-  if (!titleToken || !normalizedLevel) return "";
-
-  return `${normalizedLevel}-TITLE-${titleToken}`;
-};
-
-const isStructuredAssignmentId = (assignmentId = "") => {
-  const raw = String(assignmentId || "").trim();
-  const token = normalizeAssignmentToken(raw);
-
-  if (!token) return false;
-
-  return (
-    /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i.test(token) ||
-    /^\d+(?:\.\d+)?$/.test(raw) ||
-    /^(A1|A2|B1|B2|C1|C2)-DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
-    /^DAY-\d+(?:-TASK-\d+)?$/i.test(token) ||
-    /^TITLE-/.test(token)
-  );
+  const canonical = /^(A1|A2|B1|B2|C1|C2)-/i.test(token) ? token.toUpperCase() : `${normalizedLevel}-${token}`;
+  return getValidCanonicalIdsForLevel(normalizedLevel).has(canonical) ? canonical : "";
 };
 
 export const resolveAssignmentCanonicalKey = ({ level, assignmentId, assignmentTitle }) => {
-  const fromId = toCanonicalAssignmentId({ assignmentId, level });
-  const fromTitle = getFallbackKeyFromTitle({ level, assignmentTitle });
+  const normalizedLevel = normalizeLevel(level);
+  if (!normalizedLevel) return "";
 
-  if (!fromId) return fromTitle;
-  if (!fromTitle) return fromId;
+  const fromId = resolveFromTextWithManifest({ level: normalizedLevel, text: assignmentId });
+  if (fromId) return fromId;
 
-  const idNum = fromId.match(/-(\d+(?:\.\d+)?)$/)?.[1];
-  const titleNum = fromTitle.match(/-(\d+(?:\.\d+)?)$/)?.[1];
-  if (idNum && titleNum && idNum !== titleNum) {
-    return fromTitle;
+  if (!String(assignmentId || "").trim()) {
+    return resolveFromTextWithManifest({ level: normalizedLevel, text: assignmentTitle });
   }
 
-  return isStructuredAssignmentId(assignmentId) ? fromId : fromTitle;
+  // Explicit assignment identifier was provided but did not resolve to a manifest entry.
+  return "";
 };
 
 export const resolveAssignmentMatchKey = ({ level, assignmentId, assignmentTitle }) => {
   const normalizedLevel = normalizeLevel(level);
   if (!normalizedLevel) return "";
 
-  const canonicalKey = resolveAssignmentCanonicalKey({
-    level: normalizedLevel,
-    assignmentId,
-    assignmentTitle,
-  });
-
-  if (!canonicalKey) return "";
-
-  const chapterMatch = canonicalKey.match(/\b(A1|A2|B1|B2|C1|C2)-(\d+(?:\.\d+)?)\b/i);
-  if (chapterMatch?.[2]) {
-    return `${normalizedLevel}-${chapterMatch[2]}`;
-  }
-
-  const dayMatch = canonicalKey.match(/\bDAY-(\d+)\b/i);
-  if (dayMatch?.[1]) {
-    return `${normalizedLevel}-DAY-${dayMatch[1]}`;
-  }
-
-  return canonicalKey;
+  return (
+    resolveAssignmentCanonicalKey({
+      level: normalizedLevel,
+      assignmentId,
+      assignmentTitle,
+    }) || ""
+  );
 };
 
 export const buildAssignmentCatalogForLevel = (level) => {
@@ -181,19 +131,9 @@ export const buildAssignmentCatalogForLevel = (level) => {
           ? `Day ${entry.day}: ${entry.chapter} ${entry.topic || "Assignment"}`
           : `Day ${entry.day}: ${entry.topic || "Assignment"}`);
 
-      const canonicalAssignmentId =
-        toCanonicalAssignmentId({
-          assignmentId: rawAssignmentId,
-          level: normalizedLevel,
-        }) ||
-        getFallbackKeyFromTitle({
-          level: normalizedLevel,
-          assignmentTitle: label,
-        });
-
-      const matchKey = resolveAssignmentMatchKey({
+      const canonicalAssignmentId = resolveAssignmentCanonicalKey({
         level: normalizedLevel,
-        assignmentId: canonicalAssignmentId || rawAssignmentId,
+        assignmentId: rawAssignmentId,
         assignmentTitle: label,
       });
 
@@ -206,7 +146,7 @@ export const buildAssignmentCatalogForLevel = (level) => {
         assignmentId: rawAssignmentId,
         assignmentKey: canonicalAssignmentId,
         canonicalAssignmentId,
-        matchKey,
+        matchKey: canonicalAssignmentId,
       };
     });
 };

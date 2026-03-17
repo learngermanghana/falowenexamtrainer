@@ -6,17 +6,7 @@ const { CURRICULUM_BY_LEVEL, normalizeLevel } = require("../data/curriculumManif
 if (!admin.apps.length) admin.initializeApp();
 const db = admin.firestore();
 
-const PASS_MARK_DEFAULT = 60;
 const CANONICAL_PATTERN = /^(A1|A2|B1|B2|C1|C2)-(\d+(?:\.\d+)?)$/i;
-
-const normalizeScore = (value) => {
-  if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (typeof value === "string") {
-    const parsed = Number(value.replace(/[^\d.+-]+/g, ""));
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-};
 
 const getValidCanonicalIdsForLevel = (level) =>
   new Set((CURRICULUM_BY_LEVEL[level] || []).map((entry) => entry.canonicalAssignmentId));
@@ -75,75 +65,71 @@ const resolveCanonicalId = ({ level, assignmentId, assignmentText }) => {
   return "";
 };
 
-const migrateScores = async () => {
+const repairScores = async () => {
   const snapshot = await db.collection("scores").get();
-  let updatedCount = 0;
-  let skippedCount = 0;
-  const changedDocs = [];
+  const changes = [];
+  let unresolved = 0;
 
   for (const doc of snapshot.docs) {
     const data = doc.data() || {};
+    const hadMigrationMarker = Boolean(data?.migration?.assignmentIdNormalizedAt || data?.migration?.assignmentIdResolver || data?.canonicalAssignmentKey);
+    if (!hadMigrationMarker) continue;
+
     const assignmentText = String(data.assignment || data.assignmentTitle || data.title || "").trim();
-    const oldId = String(data.assignmentId || data.assignment_id || data.assignmentKey || "").trim();
-    const canonicalId = resolveCanonicalId({
+    const currentId = String(data.assignmentId || data.assignment_id || data.assignmentKey || "").trim();
+
+    const strictCanonicalId = resolveCanonicalId({
       level: data.level,
-      assignmentId: oldId,
+      assignmentId: currentId,
       assignmentText,
-    });
+    }) || resolveCanonicalId({ level: data.level, assignmentId: "", assignmentText });
 
-    const score = normalizeScore(data.score);
-    const passMark = Number.isFinite(Number(data.passMark)) ? Number(data.passMark) : PASS_MARK_DEFAULT;
-
-    if (!canonicalId) {
-      skippedCount += 1;
-      console.warn("[migrateScoreAssignmentIds] unresolved row skipped", {
-        docId: doc.id,
-        level: data.level || "",
-        assignmentText,
-        oldId,
-      });
+    if (!strictCanonicalId) {
+      unresolved += 1;
+      await doc.ref.set(
+        {
+          migration: {
+            assignmentIdRepairAttemptedAt: admin.firestore.FieldValue.serverTimestamp(),
+            assignmentIdRepairStatus: "unresolved",
+            assignmentIdRepairResolver: "manifest-strict-v2",
+          },
+        },
+        { merge: true }
+      );
       continue;
     }
 
-    const passed = Number.isFinite(score) ? score >= passMark : Boolean(data.passed);
-    const nextPatch = {
-      assignmentId: canonicalId,
-      assignment_id: canonicalId,
-      assignmentKey: canonicalId,
-      canonicalAssignmentKey: canonicalId,
-      passMark,
-      passed,
-      migration: {
-        assignmentIdNormalizedAt: admin.firestore.FieldValue.serverTimestamp(),
-        assignmentIdResolver: "manifest-strict-v2",
+    if (currentId.toUpperCase() === strictCanonicalId) continue;
+
+    await doc.ref.set(
+      {
+        assignmentId: strictCanonicalId,
+        assignment_id: strictCanonicalId,
+        assignmentKey: strictCanonicalId,
+        canonicalAssignmentKey: strictCanonicalId,
+        migration: {
+          assignmentIdRepairAttemptedAt: admin.firestore.FieldValue.serverTimestamp(),
+          assignmentIdRepairStatus: "corrected",
+          assignmentIdRepairResolver: "manifest-strict-v2",
+          assignmentIdRepairedFrom: currentId || "",
+        },
       },
-    };
+      { merge: true }
+    );
 
-    const isAlreadyNormalized =
-      oldId.toUpperCase() === canonicalId &&
-      String(data.assignment_id || "").trim().toUpperCase() === canonicalId &&
-      String(data.assignmentKey || "").trim().toUpperCase() === canonicalId &&
-      Number(data.passMark) === passMark &&
-      data.passed === passed;
-
-    if (isAlreadyNormalized) continue;
-
-    await doc.ref.set(nextPatch, { merge: true });
-    updatedCount += 1;
-    changedDocs.push({ docId: doc.id, from: oldId || "(empty)", to: canonicalId });
+    changes.push({ docId: doc.id, from: currentId || "(empty)", to: strictCanonicalId });
   }
 
-  console.log("[migrateScoreAssignmentIds] Completed", {
-    updatedCount,
-    skippedCount,
-    total: snapshot.size,
-    changedDocs,
+  console.log("[repairScoreAssignmentIds] Completed", {
+    correctedCount: changes.length,
+    unresolved,
+    changedDocs: changes,
   });
 };
 
-migrateScores()
+repairScores()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error("[migrateScoreAssignmentIds] Failed", error);
+    console.error("[repairScoreAssignmentIds] Failed", error);
     process.exit(1);
   });
