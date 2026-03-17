@@ -25,6 +25,7 @@ import FormingBasicStatementsPage from "./components/FormingBasicStatementsPage"
 import GermanNumbersGrammarPage from "./components/GermanNumbersGrammarPage";
 import ObjectsAndColorsPage from "./components/ObjectsAndColorsPage";
 import TwelveHourClockPage from "./components/TwelveHourClockPage";
+import A1Day12TwentyFourHourClockDatesPage from "./components/A1Day12TwentyFourHourClockDatesPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
 import GermanAlphabetGrammarNotesPage from "./components/GermanAlphabetGrammarNotesPage";
 import PersonenBeschreibenGrammarPage from "./components/PersonenBeschreibenGrammarPage";
@@ -634,6 +635,10 @@ const AppShell = ({
           <Route path="/campus/course/german-numbers-1-10-with-pronunciation" element={<GermanNumbersGrammarPage />} />
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
           <Route path="/campus/course/the-12-hour-clock-system-in-german-chapter-7" element={<TwelveHourClockPage />} />
+          <Route
+            path="/campus/course/a1-day-12-the-24-hour-clock-and-dates"
+            element={<A1Day12TwentyFourHourClockDatesPage />}
+          />
           <Route path="/campus/course/modal-verbs-day-14-3-6" element={<A1Day14ModalVerbsWorkbookPage />} />
           <Route path="/campus/course/food-and-negation-day-16-9-10" element={<A1Day16FoodAndNegationGrammarPage />} />
           <Route
