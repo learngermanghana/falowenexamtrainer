@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { styles } from "../styles";
+
+const heroImage =
+  "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1400&q=80";
 
 const pageWrap = {
   ...styles.container,
   display: "grid",
-  gap: 16,
+  gap: 18,
 };
 
 const card = {
@@ -13,132 +16,242 @@ const card = {
   gap: 12,
 };
 
+const paragraph = {
+  margin: 0,
+  lineHeight: 1.75,
+};
+
 const listStyle = {
   margin: 0,
   paddingLeft: 20,
-  lineHeight: 1.7,
-};
-
-const paragraph = {
-  margin: 0,
-  lineHeight: 1.7,
+  lineHeight: 1.75,
 };
 
 const tableCell = {
   textAlign: "left",
-  padding: 8,
+  padding: 10,
   borderBottom: "1px solid #e5e7eb",
-  verticalAlign: "top",
 };
 
-const pdfLink = "https://drive.google.com/file/d/1fW2ChjnDKW_5SEr65ZgE1ylJy1To46_p/view?usp=sharing";
+const mutedBox = {
+  padding: 12,
+  borderRadius: 12,
+  background: "rgba(0,0,0,0.04)",
+};
+
+const heroWrap = {
+  ...styles.card,
+  overflow: "hidden",
+  padding: 0,
+};
+
+const heroImageStyle = {
+  width: "100%",
+  height: 260,
+  objectFit: "cover",
+};
+
+const heroContent = {
+  padding: 18,
+  display: "grid",
+  gap: 10,
+};
+
+const badge = {
+  display: "inline-block",
+  padding: "6px 10px",
+  borderRadius: 999,
+  fontSize: 12,
+  fontWeight: 700,
+  background: "rgba(0,0,0,0.06)",
+};
+
+const actionBtn = {
+  border: "none",
+  borderRadius: 10,
+  padding: "10px 14px",
+  fontWeight: 700,
+  cursor: "pointer",
+  background: "#111827",
+  color: "#fff",
+};
+
+function KnowledgeCheck({ question, options, correctIndex, explanation }) {
+  const [selected, setSelected] = useState(null);
+  const [checked, setChecked] = useState(false);
+
+  const isCorrect = selected === correctIndex;
+
+  return (
+    <div style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 14, display: "grid", gap: 10 }}>
+      <p style={{ ...paragraph, fontWeight: 700 }}>{question}</p>
+
+      {options.map((option, i) => (
+        <button
+          key={option}
+          onClick={() => setSelected(i)}
+          style={{
+            textAlign: "left",
+            padding: 10,
+            borderRadius: 10,
+            border: selected === i ? "2px solid #111827" : "1px solid #d1d5db",
+            background: selected === i ? "rgba(17,24,39,0.06)" : "#fff",
+            cursor: "pointer",
+          }}
+        >
+          {option}
+        </button>
+      ))}
+
+      <button onClick={() => setChecked(true)} style={actionBtn} disabled={selected === null}>
+        Check answer
+      </button>
+
+      {checked && (
+        <div style={{ padding: 10, borderRadius: 10, background: isCorrect ? "#dcfce7" : "#fee2e2" }}>
+          <strong>{isCorrect ? "Correct." : "Not correct."}</strong> {explanation}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function A1Day12TwentyFourHourClockDatesPage() {
+  const [showAnswers, setShowAnswers] = useState(false);
+
+  const examples = useMemo(
+    () => [
+      { time: "08:00", german: "acht Uhr" },
+      { time: "15:30", german: "fünfzehn Uhr dreißig" },
+      { time: "19:45", german: "neunzehn Uhr fünfundvierzig" },
+    ],
+    []
+  );
+
   return (
     <main style={pageWrap}>
-      <section style={card}>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · The 24 Hour Clock and Dates</h1>
-        <p style={paragraph}>
-          In German, the 24-hour clock is used in formal contexts like timetables and schedules. It avoids
-          AM/PM confusion and makes time communication clear.
-        </p>
-        <a href={pdfLink} target="_blank" rel="noreferrer" style={{ fontWeight: 700 }}>
-          Open grammar notes PDF
-        </a>
+      {/* HERO */}
+      <section style={heroWrap}>
+        <img src={heroImage} alt="Clock and calendar" style={heroImageStyle} />
+        <div style={heroContent}>
+          <span style={badge}>A1 Grammar</span>
+          <h1 style={{ ...styles.title, margin: 0 }}>
+            24-Hour Clock & Dates
+          </h1>
+          <p style={paragraph}>
+            Learn how to tell time and say dates in German clearly and correctly.
+          </p>
+        </div>
       </section>
 
+      {/* CLOCK */}
       <section style={card}>
-        <h2 style={{ margin: 0 }}>1) The 24-Hour Clock (24-Stunden-System)</h2>
-        <ul style={listStyle}>
-          <li>00:00 — Mitternacht (null Uhr)</li>
-          <li>01:00 — ein Uhr</li>
-          <li>12:00 — Mittag</li>
-          <li>13:00 — dreizehn Uhr (1 PM)</li>
-          <li>20:00 — zwanzig Uhr (8 PM)</li>
-        </ul>
+        <h2>24-Hour Clock</h2>
         <p style={paragraph}>
-          Usually, say the hour + <strong>Uhr</strong>, then minutes.
+          German uses the 24-hour system. After 12:00, numbers continue.
         </p>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={tableCell}>Time</th>
-              <th style={tableCell}>German</th>
-            </tr>
-          </thead>
+
+        <div style={mutedBox}>
+          13:00 = 1 PM <br />
+          18:00 = 6 PM <br />
+          20:00 = 8 PM
+        </div>
+
+        <table style={{ width: "100%" }}>
           <tbody>
-            <tr>
-              <td style={tableCell}>08:00</td>
-              <td style={tableCell}>acht Uhr</td>
-            </tr>
-            <tr>
-              <td style={tableCell}>15:30</td>
-              <td style={tableCell}>fünfzehn Uhr dreißig</td>
-            </tr>
-            <tr>
-              <td style={tableCell}>19:45</td>
-              <td style={tableCell}>neunzehn Uhr fünfundvierzig</td>
-            </tr>
-            <tr>
-              <td style={tableCell}>14:20</td>
-              <td style={tableCell}>vierzehn Uhr zwanzig</td>
-            </tr>
+            {examples.map((row) => (
+              <tr key={row.time}>
+                <td style={tableCell}>{row.time}</td>
+                <td style={tableCell}>{row.german}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </section>
 
+      {/* HALF / QUARTER */}
       <section style={card}>
-        <h2 style={{ margin: 0 }}>2) Half / Quarter / vor / nach</h2>
+        <h2>halb / vor / nach</h2>
+
         <ul style={listStyle}>
-          <li>07:30 — sieben Uhr dreißig / halb acht</li>
-          <li>09:15 — neun Uhr fünfzehn / viertel nach neun</li>
-          <li>09:45 — neun Uhr fünfundvierzig / viertel vor zehn</li>
-          <li>01:05 — fünf nach eins</li>
-          <li>01:25 — fünf vor halb zwei</li>
-          <li>01:35 — fünf nach halb zwei</li>
-          <li>01:50 — zehn vor zwei</li>
+          <li>07:30 — halb acht</li>
+          <li>09:15 — viertel nach neun</li>
+          <li>09:45 — viertel vor zehn</li>
         </ul>
-        <p style={paragraph}>
-          <strong>Halb zwei</strong> means 1:30 (half to two), not 2:30.
-        </p>
+
+        <div style={mutedBox}>
+          halb acht = 7:30 (NOT 8:30)
+        </div>
       </section>
 
+      {/* DATES */}
       <section style={card}>
-        <h2 style={{ margin: 0 }}>3) Days and Months</h2>
-        <p style={paragraph}>
-          <strong>Wochentage:</strong> Montag, Dienstag, Mittwoch, Donnerstag, Freitag, Samstag, Sonntag.
-        </p>
-        <p style={paragraph}>
-          <strong>Monate:</strong> Januar, Februar, März, April, Mai, Juni, Juli, August, September, Oktober,
-          November, Dezember.
-        </p>
-      </section>
+        <h2>Dates</h2>
 
-      <section style={card}>
-        <h2 style={{ margin: 0 }}>4) Dates in German</h2>
         <p style={paragraph}>
-          Dates are written as <strong>day.month.year</strong> (for example: 05.03.2023).
+          Format: <strong>day.month.year</strong>
         </p>
-        <p style={paragraph}>
-          For ordinal numbers: from 1–19 add <strong>-te</strong>, from 20+ add <strong>-ste</strong>.
-        </p>
+
         <ul style={listStyle}>
-          <li>erste, zweite, dritte, vierte, fünfte ... neunzehnte</li>
-          <li>zwanzigste, einundzwanzigste ... einunddreißigste</li>
+          <li>05.03.2026</li>
+          <li>21.10.2026</li>
         </ul>
+
         <p style={paragraph}>
-          Examples: <em>Heute ist der dritte April.</em> / <em>Mein Geburtstag ist der fünfte Mai.</em>
+          Heute ist der dritte April.
         </p>
       </section>
 
+      {/* KNOWLEDGE TEST */}
       <section style={card}>
-        <h2 style={{ margin: 0 }}>Practice Sentences</h2>
+        <h2>Quick Test</h2>
+
+        <KnowledgeCheck
+          question="15:30 is?"
+          options={["fünfzehn Uhr dreißig", "fünf Uhr dreißig"]}
+          correctIndex={0}
+          explanation="15:30 = fünfzehn Uhr dreißig"
+        />
+
+        <KnowledgeCheck
+          question="halb acht means?"
+          options={["7:30", "8:30"]}
+          correctIndex={0}
+          explanation="halb acht = 7:30"
+        />
+      </section>
+
+      {/* WRITING */}
+      <section style={card}>
+        <h2>Mini Writing Task</h2>
+
         <ol style={listStyle}>
-          <li>Heute ist der erste Januar.</li>
-          <li>Mein Geburtstag ist der zehnte Februar.</li>
-          <li>Weihnachten ist der fünfundzwanzigste Dezember.</li>
-          <li>Der Nationalfeiertag ist der dritte Oktober.</li>
+          <li>Wie spät ist es?</li>
+          <li>Wann beginnt dein Unterricht?</li>
+          <li>Welches Datum haben wir heute?</li>
         </ol>
+
+        <button onClick={() => setShowAnswers(!showAnswers)} style={actionBtn}>
+          {showAnswers ? "Hide Answers" : "Show Answers"}
+        </button>
+
+        {showAnswers && (
+          <div style={mutedBox}>
+            Es ist zehn Uhr. <br />
+            Mein Unterricht beginnt um acht Uhr. <br />
+            Heute ist der zwölfte März.
+          </div>
+        )}
+      </section>
+
+      {/* MISTAKES */}
+      <section style={card}>
+        <h2>Common Mistakes</h2>
+
+        <ul style={listStyle}>
+          <li>halb zwei ≠ 2:30 (it is 1:30)</li>
+          <li>Use "der" in dates → der dritte April</li>
+        </ul>
       </section>
     </main>
   );
