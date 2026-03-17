@@ -25,6 +25,7 @@ const path = require("path");
 const crypto = require("crypto");
 const admin = require("firebase-admin");
 const { google } = require("googleapis");
+const { CURRICULUM_BY_LEVEL, normalizeLevel: normalizeCurriculumLevel } = require("../data/curriculumManifest");
 
 function requireEnv(name) {
   const v = process.env[name];
@@ -80,12 +81,18 @@ function parseAssignmentId(assignmentText) {
   return tokenMatches[tokenMatches.length - 1];
 }
 
+function getValidCanonicalIdsForLevel(level) {
+  return new Set((CURRICULUM_BY_LEVEL[level] || []).map((entry) => entry.canonicalAssignmentId));
+}
+
 function toCanonicalAssignmentId(level, assignmentId) {
-  const normalizedLevel = safeStr(level).toUpperCase();
+  const normalizedLevel = normalizeCurriculumLevel(level);
   const rawToken = safeStr(assignmentId).toUpperCase();
   if (!normalizedLevel || !rawToken) return "";
-  if (/^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/.test(rawToken)) return rawToken;
-  return `${normalizedLevel}-${rawToken}`;
+  const canonical = /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/.test(rawToken)
+    ? rawToken
+    : `${normalizedLevel}-${rawToken}`;
+  return getValidCanonicalIdsForLevel(normalizedLevel).has(canonical) ? canonical : "";
 }
 
 function parseIsoDate(dateText) {

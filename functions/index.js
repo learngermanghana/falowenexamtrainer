@@ -103,6 +103,8 @@ const getNewlyPresentCodes = ({ before = {}, after = {} } = {}) => {
   return Array.from(afterSet).filter((code) => !beforeSet.has(code));
 };
 
+const { CURRICULUM_BY_LEVEL, normalizeLevel: normalizeCurriculumLevel } = require("./data/curriculumManifest");
+
 const ASSIGNMENT_LEVEL_PREFIX = /^(A1|A2|B1|B2|C1|C2)-/i;
 
 const normalizeAssignmentToken = (value = "") =>
@@ -115,18 +117,18 @@ const normalizeAssignmentToken = (value = "") =>
     .replace(/^-|-$/g, "")
     .toUpperCase();
 
-const normalizeAssignmentLevel = (value = "") => {
-  const token = String(value || "").trim().toUpperCase();
-  return /^(A1|A2|B1|B2|C1|C2)$/.test(token) ? token : "";
-};
+const normalizeAssignmentLevel = (value = "") => normalizeCurriculumLevel(value);
+
+const getValidCanonicalIdsForLevel = (level) =>
+  new Set((CURRICULUM_BY_LEVEL[level] || []).map((entry) => entry.canonicalAssignmentId));
 
 const toCanonicalAssignmentId = ({ assignmentId, level }) => {
   const token = normalizeAssignmentToken(assignmentId);
-  if (!token) return "";
-  if (ASSIGNMENT_LEVEL_PREFIX.test(token)) return token;
   const normalizedLevel = normalizeAssignmentLevel(level);
-  if (!normalizedLevel) return token;
-  return `${normalizedLevel}-${token}`;
+  if (!token || !normalizedLevel) return "";
+
+  const canonical = ASSIGNMENT_LEVEL_PREFIX.test(token) ? token : `${normalizedLevel}-${token}`;
+  return getValidCanonicalIdsForLevel(normalizedLevel).has(canonical) ? canonical : "";
 };
 
 const resolveAssignmentCanonicalKey = ({ level, assignmentId } = {}) =>
