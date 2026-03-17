@@ -459,6 +459,18 @@ const AssignmentSubmissionPage = () => {
   const [resubmissionText, setResubmissionText] = useState("");
   const [resubmissionImprovement, setResubmissionImprovement] = useState("");
   const [resubmissionStatus, setResubmissionStatus] = useState({ loading: false, error: "", success: "" });
+
+  useEffect(() => {
+    if (status.error) {
+      triggerInteractionFeedback({ sound: "error" });
+    }
+  }, [status.error]);
+
+  useEffect(() => {
+    if (resubmissionStatus.error) {
+      triggerInteractionFeedback({ sound: "error" });
+    }
+  }, [resubmissionStatus.error]);
   const [answerKeyRegistry, setAnswerKeyRegistry] = useState(new Map());
 
   const isGerman = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("de");

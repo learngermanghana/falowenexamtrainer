@@ -8,6 +8,7 @@ import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchResults } from "../services/resultsService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
+import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -110,6 +111,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const trimmedQuestion = questionInput.trim();
   const isQuestionTooLong = questionInput.length > maxQuestionLength;
   const isSendDisabled = !trimmedQuestion || isReplyLoading || isQuestionTooLong;
+  const playOpenFeedback = useCallback(() => {
+    triggerInteractionFeedback({ sound: "open" });
+  }, []);
+
   const paymentReminder = useMemo(() => {
     const balanceDue = Number(studentProfile?.balanceDue);
     if (!Number.isFinite(balanceDue) || balanceDue <= 0) return null;
@@ -257,12 +262,16 @@ const StudyBuddyBar = ({ studentProfile }) => {
           idToken,
         });
         setQuickReply(response?.reply || "");
-        if (!response?.reply) {
+        if (response?.reply) {
+          triggerInteractionFeedback({ sound: "success" });
+        } else {
           setQuickReplyError(t("studyBuddy.qa.error"));
+          triggerInteractionFeedback({ sound: "error" });
         }
       } catch (error) {
         console.error("Study Buddy quick question failed", error);
         setQuickReplyError(error?.message || t("studyBuddy.qa.error"));
+        triggerInteractionFeedback({ sound: "error" });
       } finally {
         setIsReplyLoading(false);
       }
@@ -275,30 +284,45 @@ const StudyBuddyBar = ({ studentProfile }) => {
       {
         key: "course",
         label: t("studyBuddy.shortcuts.course"),
-        action: () => navigate("/campus/course"),
+        action: () => {
+          playOpenFeedback();
+          navigate("/campus/course");
+        },
       },
       {
         key: "submit",
         label: t("studyBuddy.shortcuts.submit"),
-        action: () => navigate("/campus/submit"),
+        action: () => {
+          playOpenFeedback();
+          navigate("/campus/submit");
+        },
       },
       {
         key: "ai",
         label: t("studyBuddy.shortcuts.ai"),
-        action: () => navigate("/campus/grammar"),
+        action: () => {
+          playOpenFeedback();
+          navigate("/campus/grammar");
+        },
       },
       {
         key: "study",
         label: t("studyBuddy.shortcuts.study"),
-        action: () => navigate("/exams/study"),
+        action: () => {
+          playOpenFeedback();
+          navigate("/exams/study");
+        },
       },
       {
         key: "exams",
         label: t("studyBuddy.shortcuts.exams"),
-        action: () => navigate("/exams/overview"),
+        action: () => {
+          playOpenFeedback();
+          navigate("/exams/overview");
+        },
       },
     ],
-    [navigate, t]
+    [navigate, playOpenFeedback, t]
   );
 
   useEffect(() => {
