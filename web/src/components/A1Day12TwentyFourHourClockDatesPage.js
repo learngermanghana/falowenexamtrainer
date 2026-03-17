@@ -142,6 +142,21 @@ const SelectInput = ({ value, onChange, options }) => (
   </select>
 );
 
+const HeaderImage = ({ src, alt }) => (
+  <img
+    src={src}
+    alt={alt}
+    loading="lazy"
+    style={{
+      width: "100%",
+      maxHeight: 220,
+      objectFit: "cover",
+      borderRadius: 14,
+      boxShadow: "0 10px 20px rgba(0,0,0,0.08)",
+    }}
+  />
+);
+
 const normalize = (text) =>
   String(text || "")
     .trim()
@@ -206,6 +221,7 @@ const A1TimeAndDatesGrammarPage = () => {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [showAnswerKey, setShowAnswerKey] = useState(false);
 
   const setAnswer = (key, value) =>
     setAnswers((prev) => ({ ...prev, [key]: value }));
@@ -241,6 +257,10 @@ const A1TimeAndDatesGrammarPage = () => {
         </button>
 
         <h1 style={{ marginBottom: 6 }}>German Time and Dates</h1>
+        <HeaderImage
+          src="https://images.unsplash.com/photo-1508962914676-134849a727f0?auto=format&fit=crop&w=1600&q=80"
+          alt="Classic clock face and calendar pages"
+        />
         <p style={{ marginTop: 0, lineHeight: 1.7 }}>
           You already learned the <b>12-hour clock</b>. In this lesson, you will now connect that
           knowledge to the <b>24-hour clock</b> and also learn how to say and write{" "}
@@ -431,6 +451,10 @@ const A1TimeAndDatesGrammarPage = () => {
         </Section>
 
         <Section title="Part 2: Dates in German">
+          <HeaderImage
+            src="https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=1600&q=80"
+            alt="Desk calendar with pen and study materials"
+          />
           <SubSection title="1. Introduction">
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               Knowing how to say and write dates in German is important for everyday communication.
@@ -564,6 +588,10 @@ const A1TimeAndDatesGrammarPage = () => {
         </Section>
 
         <Section title="Practice: Check your understanding">
+          <HeaderImage
+            src="https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&w=1600&q=80"
+            alt="Notebook with checklist and study setup"
+          />
           <SubSection title="A. Multiple choice">
             <p style={{ margin: 0 }}>
               <b>1. halb neun = ?</b>
@@ -618,7 +646,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.t4}
               onChange={(v) => setAnswer("t4", v)}
-              placeholder="Example: fünf nach eins"
+              placeholder="Type your answer"
             />
 
             <p style={{ margin: 0 }}>
@@ -627,7 +655,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.t5}
               onChange={(v) => setAnswer("t5", v)}
-              placeholder="Example: 1:25"
+              placeholder="Type your answer"
             />
 
             <p style={{ margin: 0 }}>
@@ -636,7 +664,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.d3}
               onChange={(v) => setAnswer("d3", v)}
-              placeholder="Example: dritte"
+              placeholder="Type your answer"
             />
 
             <p style={{ margin: 0 }}>
@@ -672,7 +700,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.d4}
               onChange={(v) => setAnswer("d4", v)}
-              placeholder="Example: 05.03.2023"
+              placeholder="Type your answer"
             />
 
             <p style={{ margin: 0 }}>
@@ -681,13 +709,16 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.d5}
               onChange={(v) => setAnswer("d5", v)}
-              placeholder="Example: Montag"
+              placeholder="Type your answer"
             />
           </SubSection>
 
           <button
             type="button"
-            onClick={() => setShowResults(true)}
+            onClick={() => {
+              setShowResults(true);
+              setShowAnswerKey(false);
+            }}
             style={{
               padding: "10px 14px",
               borderRadius: 10,
