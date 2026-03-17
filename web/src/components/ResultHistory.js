@@ -26,16 +26,7 @@ const toNumericScore = (value) => {
   return null;
 };
 
-const getAssignmentKey = (entry, fallback) => {
-  const fromExplicit =
-    entry.assignmentKey ||
-    entry.canonicalAssignmentKey ||
-    entry.assignmentId ||
-    entry.assignment_id ||
-    entry.key;
-  if (fromExplicit) return safeLower(fromExplicit);
-  return safeLower(entry.assignment) || fallback;
-};
+const getAssignmentKey = (entry) => safeLower(entry.assignmentId || entry.assignment_id);
 
 const TextBlock = ({ title, text, maxChars = 650 }) => {
   const { t } = useTranslation();
@@ -117,6 +108,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       return {
         key,
         assignment: entry.assignment || t("resultHistory.assignmentFallback"),
+        assignmentId: entry.assignmentId || entry.assignment_id || "",
         level: (entry.level || "").toUpperCase(),
         name: entry.name || "",
         studentcode: entry.studentcode || "",
@@ -139,7 +131,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     const attemptNumbers = new Map();
 
     chronological.forEach((entry) => {
-      const assignmentKey = getAssignmentKey(entry, entry.key);
+      const assignmentKey = getAssignmentKey(entry);
+      if (!assignmentKey) return;
       const aggregate = attemptsByAssignment.get(assignmentKey) || { total: 0, scores: [] };
       aggregate.total += 1;
       aggregate.scores.push(entry.numericScore);
@@ -162,12 +155,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     });
 
     const annotated = list.map((entry) => {
-      const assignmentKey = getAssignmentKey(entry, entry.key);
-      const summary = attemptSummaries.get(assignmentKey) || {
-        totalAttempts: 1,
-        bestScore: entry.numericScore,
-        passedOverall: typeof entry.numericScore === "number" ? entry.numericScore >= PASS_MARK : null,
-      };
+      const assignmentKey = getAssignmentKey(entry);
+      const summary = assignmentKey ? attemptSummaries.get(assignmentKey) : null;
       const attempt = attemptNumbers.get(entry.key) || 1;
       const attemptStatus =
         typeof entry.numericScore === "number"
@@ -179,9 +168,9 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       return {
         ...entry,
         attempt,
-        totalAttempts: summary.totalAttempts,
-        bestScore: summary.bestScore,
-        passedOverall: summary.passedOverall,
+        totalAttempts: summary?.totalAttempts || 1,
+        bestScore: typeof summary?.bestScore === "number" ? summary.bestScore : entry.numericScore,
+        passedOverall: typeof summary?.bestScore === "number" ? summary.bestScore >= PASS_MARK : typeof entry.numericScore === "number" ? entry.numericScore >= PASS_MARK : null,
         attemptStatus,
       };
     });
@@ -374,9 +363,15 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                 : t("resultHistory.bestScoreNeeded", { score: item.bestScore, mark: PASS_MARK })
               : null;
           const scoreDisplay =
-            typeof item.numericScore === "number"
-              ? item.numericScore
+            typeof item.bestScore === "number"
+              ? item.bestScore
               : item.score || item.numericScore || "–";
+
+          console.log({
+            assignmentId: item.assignmentId || item.assignment_id || null,
+            bestScore: item.bestScore,
+            attempts: item.totalAttempts,
+          });
 
           return (
             <article key={item.key} style={{ ...styles.resultCard, marginTop: 0 }}>

@@ -80,6 +80,14 @@ function parseAssignmentId(assignmentText) {
   return tokenMatches[tokenMatches.length - 1];
 }
 
+function toCanonicalAssignmentId(level, assignmentId) {
+  const normalizedLevel = safeStr(level).toUpperCase();
+  const rawToken = safeStr(assignmentId).toUpperCase();
+  if (!normalizedLevel || !rawToken) return "";
+  if (/^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/.test(rawToken)) return rawToken;
+  return `${normalizedLevel}-${rawToken}`;
+}
+
 function parseIsoDate(dateText) {
   const t = safeStr(dateText);
   // Accept already-ISO or "YYYY-MM-DD"
@@ -264,14 +272,27 @@ async function main() {
       continue;
     }
 
-    const assignmentId = parseAssignmentId(assignmentIdRaw) || parseAssignmentId(assignment);
+    const parsedId = parseAssignmentId(assignmentIdRaw) || parseAssignmentId(assignment);
+    const canonicalId = toCanonicalAssignmentId(level, parsedId);
+
+    console.log({
+      assignmentText: assignment,
+      parsedId,
+      canonicalId,
+      score,
+    });
+
+    if (!canonicalId) {
+      skipped++;
+      continue;
+    }
     const isoDate = parseIsoDate(date);
 
     const attempt = {
       studentCode,
       name,
       assignmentText: assignment,
-      assignmentId,          // the number you’ll use for next-assignment logic
+      assignmentId: canonicalId,
       score,                 // numeric
       comments,
       date,                  // keep original
@@ -289,7 +310,7 @@ async function main() {
     };
 
     const keyHash = hashAttemptKey(attempt);
-    const docId = `${studentCode}__${level}__${assignmentId || "na"}__${keyHash}`;
+    const docId = `${studentCode}__${safeStr(level).toUpperCase()}__${canonicalId}__${keyHash}`;
 
     const ref = db.collection(collectionName).doc(docId);
 
