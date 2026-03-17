@@ -1504,6 +1504,10 @@ app.post("/paystack/webhook", async (req, res) => {
       contractEndDate = endIsValid && existingEnd > proposedEnd ? existingEnd : proposedEnd;
     }
 
+    const queuedUpgradeLevel = String(studentData.upgradeToLevel || "").toUpperCase();
+    const hasQueuedUpgrade = Boolean(queuedUpgradeLevel);
+    const shouldApplyQueuedUpgrade = hasQueuedUpgrade && paymentStatus === "paid";
+
     const updates = {
       initialPaymentAmount: totalPaid,
       balanceDue,
@@ -1513,9 +1517,15 @@ app.post("/paystack/webhook", async (req, res) => {
       contractTermMonths: finalMonths,
       status: "Active",
       paystackReference: data?.reference || studentData.paystackReference || "",
-      // clear one-time level-up merge queue fields after payment processing
-      contractMergeMode: "",
-      upgradeCarryoverUntil: "",
+      level: shouldApplyQueuedUpgrade ? queuedUpgradeLevel : studentData.level,
+      className: shouldApplyQueuedUpgrade ? "" : studentData.className,
+      // clear one-time level-up queue fields only when fully paid.
+      contractMergeMode: shouldApplyQueuedUpgrade ? "" : studentData.contractMergeMode || "",
+      upgradeCarryoverUntil: shouldApplyQueuedUpgrade ? "" : studentData.upgradeCarryoverUntil || "",
+      upgradeFromLevel: shouldApplyQueuedUpgrade ? "" : studentData.upgradeFromLevel || "",
+      upgradeToLevel: shouldApplyQueuedUpgrade ? "" : studentData.upgradeToLevel || "",
+      upgradeQueuedAt: shouldApplyQueuedUpgrade ? "" : studentData.upgradeQueuedAt || "",
+      upgradeSnapshot: shouldApplyQueuedUpgrade ? admin.firestore.FieldValue.delete() : studentData.upgradeSnapshot || null,
       updated_at: admin.firestore.FieldValue.serverTimestamp(),
     };
 

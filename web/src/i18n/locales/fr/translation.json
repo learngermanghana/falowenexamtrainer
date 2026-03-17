@@ -1426,6 +1426,10 @@
       "button": "Passer à {{nextLevel}}",
       "upgrading": "Mise à niveau ...",
       "success": "Vous êtes maintenant au niveau {{level}}. Veuillez payer pour débloquer l'accès.",
+      "queued": "Le passage au niveau {{level}} est en attente. Nous mettrons à jour votre niveau après confirmation du paiement complet.",
+      "pending": "Le passage au niveau {{level}} est en attente de paiement.",
+      "cancel": "Annuler la mise à niveau en attente",
+      "cancelled": "La mise à niveau en attente a été annulée et votre profil précédent a été restauré.",
       "error": "Impossible de mettre à niveau le niveau.",
       "maxedOut": "Vous êtes déjà au niveau le plus élevé disponible.",
       "clearBalance": "Veuillez d'abord régler votre solde actuel."

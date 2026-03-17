@@ -133,9 +133,21 @@ const AccountSettings = () => {
     };
   }, [balanceDue, formatMoney, numberFormatter, studentProfile?.contractEnd, t]);
 
+  const queuedUpgradeLevel = String(studentProfile?.upgradeToLevel || "").toUpperCase();
+  const hasQueuedUpgrade = Boolean(queuedUpgradeLevel);
+
   const levelUpgrade = useMemo(() => {
     const currentLevel = String(studentProfile?.level || "").toUpperCase();
     const nextLevel = getNextLevel(currentLevel);
+
+    if (hasQueuedUpgrade) {
+      return {
+        currentLevel,
+        nextLevel: queuedUpgradeLevel,
+        canUpgrade: false,
+        reason: t("accountSettings.upgrade.pending", { level: queuedUpgradeLevel }),
+      };
+    }
 
     if (!nextLevel) {
       return {
@@ -165,10 +177,10 @@ const AccountSettings = () => {
       canUpgrade: true,
       reason: "",
     };
-  }, [balanceDue, studentProfile?.level, t]);
+  }, [balanceDue, hasQueuedUpgrade, queuedUpgradeLevel, studentProfile?.level, t]);
 
   const handleUpgradeToNextLevel = async () => {
-    if (!levelUpgrade?.canUpgrade || !levelUpgrade?.nextLevel) return;
+    if (hasQueuedUpgrade || !levelUpgrade?.canUpgrade || !levelUpgrade?.nextLevel) return;
 
     setIsUpgradingLevel(true);
     setStatus("");
@@ -176,22 +188,73 @@ const AccountSettings = () => {
     try {
       const nextLevel = levelUpgrade.nextLevel;
       const nextTuitionFee = levelUpgrade.nextTuitionFee || 0;
+      const nowIso = new Date().toISOString();
+      const carryoverUntil = studentProfile?.contractEnd || "";
 
       await saveStudentProfile({
-        level: nextLevel,
-        className: "",
-        paid: 0,
-        initialPaymentAmount: 0,
         paymentIntentAmount: nextTuitionFee,
         tuitionFee: nextTuitionFee,
         balanceDue: nextTuitionFee,
         paymentStatus: "pending",
-        contractTermMonths: null,
-        contractStart: "",
-        contractEnd: "",
+        upgradeFromLevel: levelUpgrade.currentLevel,
+        upgradeToLevel: nextLevel,
+        upgradeQueuedAt: nowIso,
+        contractMergeMode: carryoverUntil ? "append_after_active_contract" : "",
+        upgradeCarryoverUntil: carryoverUntil,
+        upgradeSnapshot: {
+          level: studentProfile?.level || "",
+          className: studentProfile?.className || "",
+          paid: studentProfile?.paid ?? null,
+          initialPaymentAmount: studentProfile?.initialPaymentAmount ?? null,
+          tuitionFee: studentProfile?.tuitionFee ?? null,
+          balanceDue: studentProfile?.balanceDue ?? null,
+          paymentStatus: studentProfile?.paymentStatus || "",
+          paymentIntentAmount: studentProfile?.paymentIntentAmount ?? null,
+          contractTermMonths: studentProfile?.contractTermMonths ?? null,
+          contractStart: studentProfile?.contractStart || "",
+          contractEnd: studentProfile?.contractEnd || "",
+          contractMergeMode: studentProfile?.contractMergeMode || "",
+          upgradeCarryoverUntil: studentProfile?.upgradeCarryoverUntil || "",
+        },
       });
 
-      setStatus(t("accountSettings.upgrade.success", { level: nextLevel }));
+      setStatus(t("accountSettings.upgrade.queued", { level: nextLevel }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t("accountSettings.upgrade.error");
+      setStatus(message);
+    } finally {
+      setIsUpgradingLevel(false);
+    }
+  };
+
+  const handleCancelQueuedUpgrade = async () => {
+    if (!hasQueuedUpgrade) return;
+
+    setIsUpgradingLevel(true);
+    setStatus("");
+
+    try {
+      const snapshot = studentProfile?.upgradeSnapshot || {};
+      await saveStudentProfile({
+        level: snapshot.level || studentProfile?.level || "",
+        className: snapshot.className || studentProfile?.className || "",
+        paid: snapshot.paid ?? studentProfile?.paid ?? null,
+        initialPaymentAmount: snapshot.initialPaymentAmount ?? studentProfile?.initialPaymentAmount ?? null,
+        tuitionFee: snapshot.tuitionFee ?? studentProfile?.tuitionFee ?? null,
+        balanceDue: snapshot.balanceDue ?? studentProfile?.balanceDue ?? null,
+        paymentStatus: snapshot.paymentStatus || studentProfile?.paymentStatus || "pending",
+        paymentIntentAmount: snapshot.paymentIntentAmount ?? studentProfile?.paymentIntentAmount ?? null,
+        contractTermMonths: snapshot.contractTermMonths ?? studentProfile?.contractTermMonths ?? null,
+        contractStart: snapshot.contractStart || studentProfile?.contractStart || "",
+        contractEnd: snapshot.contractEnd || studentProfile?.contractEnd || "",
+        contractMergeMode: snapshot.contractMergeMode || "",
+        upgradeCarryoverUntil: snapshot.upgradeCarryoverUntil || "",
+        upgradeSnapshot: null,
+        upgradeFromLevel: "",
+        upgradeToLevel: "",
+        upgradeQueuedAt: "",
+      });
+      setStatus(t("accountSettings.upgrade.cancelled"));
     } catch (error) {
       const message = error instanceof Error ? error.message : t("accountSettings.upgrade.error");
       setStatus(message);
@@ -317,6 +380,16 @@ const AccountSettings = () => {
             <button type="button" style={styles.primaryButton} onClick={handleUpgradeToNextLevel} disabled={!levelUpgrade.canUpgrade || isUpgradingLevel}>
               {isUpgradingLevel ? t("accountSettings.upgrade.upgrading") : t("accountSettings.upgrade.button", { nextLevel: levelUpgrade.nextLevel })}
             </button>
+            {hasQueuedUpgrade ? (
+              <button
+                type="button"
+                style={{ ...styles.secondaryButton, marginTop: 8 }}
+                onClick={handleCancelQueuedUpgrade}
+                disabled={isUpgradingLevel}
+              >
+                {t("accountSettings.upgrade.cancel")}
+              </button>
+            ) : null}
             {status ? <p style={{ ...styles.helperText, marginTop: 8 }}>{status}</p> : null}
             {levelUpgrade.reason ? <p style={{ ...styles.helperText, color: "#92400e" }}>{levelUpgrade.reason}</p> : null}
           </>
