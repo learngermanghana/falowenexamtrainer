@@ -879,7 +879,6 @@ const AssignmentSubmissionPage = () => {
       form.submissionText,
       getDraftDocId,
       getLockDocId,
-      preferredLevel,
       selectedAssignmentChapter,
       selectedAssignmentDay,
       selectedAssignmentId,
