@@ -203,6 +203,16 @@ const toChapterSortValue = (chapter) => {
   return parts.reduce((acc, part, index) => acc + part / 10 ** (index * 2), 0);
 };
 
+const parseDayFromTitle = (title) => {
+  const dayMatch = /^.*?\bday\s*(\d+)/i.exec(title || "");
+  return dayMatch?.[1] ? Number(dayMatch[1]) : null;
+};
+
+const parseChapterFromTitle = (title) => {
+  const chapterMatch = /chapter\s*([a-z0-9._-]+)/i.exec(title || "");
+  return chapterMatch?.[1] ? String(chapterMatch[1]).trim() : "";
+};
+
 
 const getMaxAssignmentDayForLevel = (level) => {
   const normalizedLevel = String(level || "").toUpperCase();
@@ -354,13 +364,20 @@ const AssignmentSubmissionPage = () => {
     return assignmentDays.map((day) => `Day ${day}`).join(", ");
   }, [assignmentDictionary, preferredLevel]);
 
-  const deriveChapterValue = useCallback(
+  const deriveAssignmentDay = useCallback(
     (title) => {
       const entry = assignmentDictionary.find((item) => item.label === title);
       if (typeof entry?.day !== "undefined") return entry.day;
+      return parseDayFromTitle(title);
+    },
+    [assignmentDictionary]
+  );
 
-      const dayMatch = /^day\s*(\d+)/i.exec(title || "");
-      return dayMatch?.[1] ? Number(dayMatch[1]) : null;
+  const deriveAssignmentChapter = useCallback(
+    (title) => {
+      const entry = assignmentDictionary.find((item) => item.label === title);
+      if (entry?.chapter) return String(entry.chapter).trim();
+      return parseChapterFromTitle(title);
     },
     [assignmentDictionary]
   );
@@ -386,7 +403,7 @@ const AssignmentSubmissionPage = () => {
         return;
       }
 
-      const dayNumber = deriveChapterValue(label);
+      const dayNumber = deriveAssignmentDay(label);
       const maxDayForLevel = getMaxAssignmentDayForLevel(preferredLevel);
       const blockedByDayZero = dayNumber === 0;
       const blockedByAssignmentWindow = Number.isFinite(dayNumber) && dayNumber > maxDayForLevel;
@@ -430,7 +447,7 @@ const AssignmentSubmissionPage = () => {
     return ["General submission", "Standard assignment"];
   }, [
     assignmentDictionary,
-    deriveChapterValue,
+    deriveAssignmentDay,
     preferredLevel,
     studentProfile?.assignmentTitle,
     studentProfile?.assignmentTitles,
@@ -438,7 +455,7 @@ const AssignmentSubmissionPage = () => {
   ]);
 
   const [form, setForm] = useState({
-    assignmentTitle: assignmentOptions[0],
+    assignmentTitle: "",
     submissionText: "",
     confirmed: false,
   });
@@ -502,7 +519,7 @@ const AssignmentSubmissionPage = () => {
     [isGerman]
   );
 
-  const lastAssignmentRef = useRef(assignmentOptions[0]);
+  const lastAssignmentRef = useRef("");
   const autosaveTimerRef = useRef(null);
   const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
 
@@ -553,6 +570,65 @@ const AssignmentSubmissionPage = () => {
     [assignmentDictionary, buildChapterKey, preferredLevel]
   );
 
+  const requestedAssignmentKey = useMemo(
+    () =>
+      location?.state?.assignmentKey ||
+      location?.state?.canonicalAssignmentKey ||
+      new URLSearchParams(location?.search || "").get("assignmentKey") ||
+      "",
+    [location?.search, location?.state]
+  );
+
+  const requestedAssignmentMatch = useMemo(() => {
+    if (!requestedAssignmentKey || !assignmentDictionary.length) return null;
+    const requestedNormalized = normalizeAssignmentIdentity(requestedAssignmentKey);
+    return (
+      assignmentDictionary.find(
+        (entry) => normalizeAssignmentIdentity(entry.assignmentKey || entry.canonicalAssignmentId || "") === requestedNormalized
+      ) || null
+    );
+  }, [assignmentDictionary, requestedAssignmentKey]);
+
+  const [assignmentSelectionUnlocked, setAssignmentSelectionUnlocked] = useState(false);
+  const isAssignmentContextLocked = Boolean(requestedAssignmentMatch && !assignmentSelectionUnlocked);
+
+  const selectedAssignmentEntry = useMemo(
+    () => assignmentDictionary.find((item) => item.label === form.assignmentTitle) || null,
+    [assignmentDictionary, form.assignmentTitle]
+  );
+
+  const selectedAssignmentDay = useMemo(
+    () => (form.assignmentTitle ? deriveAssignmentDay(form.assignmentTitle) : null),
+    [deriveAssignmentDay, form.assignmentTitle]
+  );
+
+  const selectedAssignmentChapter = useMemo(
+    () => (form.assignmentTitle ? deriveAssignmentChapter(form.assignmentTitle) : ""),
+    [deriveAssignmentChapter, form.assignmentTitle]
+  );
+
+  const selectedAssignmentId = useMemo(
+    () => (form.assignmentTitle ? buildAssignmentId(form.assignmentTitle) : null),
+    [buildAssignmentId, form.assignmentTitle]
+  );
+
+  const selectedAssignmentLevel = useMemo(() => {
+    const rawLevel = selectedAssignmentEntry?.level || preferredLevel;
+    return ALLOWED_LEVELS.includes(rawLevel) ? rawLevel : "GENERAL";
+  }, [preferredLevel, selectedAssignmentEntry?.level]);
+
+  const selectedCanonicalAssignmentKey = useMemo(
+    () =>
+      form.assignmentTitle
+        ? resolveAssignmentCanonicalKey({
+            level: selectedAssignmentLevel,
+            assignmentId: selectedAssignmentId,
+            assignmentTitle: form.assignmentTitle,
+          })
+        : "",
+    [form.assignmentTitle, selectedAssignmentId, selectedAssignmentLevel]
+  );
+
   const getLockDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
@@ -573,27 +649,20 @@ const AssignmentSubmissionPage = () => {
 
   const buildSubmissionPayload = useCallback(
     (statusLabel) => {
-      const assignmentLevel = assignmentDictionary.find((item) => item.label === form.assignmentTitle)?.level || preferredLevel;
-      const resolvedLevel = ALLOWED_LEVELS.includes(assignmentLevel) ? assignmentLevel : "GENERAL";
-      const resolvedAssignmentId = buildAssignmentId(form.assignmentTitle);
-      const canonicalAssignmentKey = resolveAssignmentCanonicalKey({
-        level: resolvedLevel,
-        assignmentId: resolvedAssignmentId,
-        assignmentTitle: form.assignmentTitle,
-      });
-      const answerKeySource = resolveAnswerKeySource(answerKeyRegistry, canonicalAssignmentKey);
+      const answerKeySource = resolveAnswerKeySource(answerKeyRegistry, selectedCanonicalAssignmentKey);
 
       return {
       title: form.assignmentTitle,
       assignmentTitle: form.assignmentTitle,
-      level: resolvedLevel,
-      chapter: deriveChapterValue(form.assignmentTitle),
-      assignmentId: resolvedAssignmentId,
-      assignmentKey: canonicalAssignmentKey,
-      canonicalAssignmentKey,
+      level: selectedAssignmentLevel,
+      day: selectedAssignmentDay,
+      chapter: selectedAssignmentChapter || "",
+      assignmentId: selectedAssignmentId,
+      assignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
+      canonicalAssignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
       answerKeySource: answerKeySource
         ? {
-            assignmentKey: answerKeySource.assignmentKey || canonicalAssignmentKey,
+            assignmentKey: answerKeySource.assignmentKey || selectedCanonicalAssignmentKey || selectedAssignmentId,
             answerUrl: answerKeySource.answer_url || answerKeySource.answerUrl || null,
             format: answerKeySource.format || null,
             version: answerKeySource.version || null,
@@ -621,12 +690,13 @@ const AssignmentSubmissionPage = () => {
     [
       answerKeyRegistry,
       buildChapterKey,
-      buildAssignmentId,
-      deriveChapterValue,
       form.assignmentTitle,
       form.submissionText,
-      assignmentDictionary,
-      preferredLevel,
+      selectedAssignmentChapter,
+      selectedAssignmentDay,
+      selectedAssignmentId,
+      selectedAssignmentLevel,
+      selectedCanonicalAssignmentKey,
       studentCode,
       studentScopeKey,
       studentProfile?.className,
@@ -687,10 +757,11 @@ const AssignmentSubmissionPage = () => {
           studentId: user?.uid || "",
           studentEmail: user?.email || "",
           studentCode,
-          level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
+          level: selectedAssignmentLevel,
           lockedAt: serverTimestamp(),
           assignmentTitle: form.assignmentTitle,
-          chapter: deriveChapterValue(form.assignmentTitle),
+          day: selectedAssignmentDay,
+          chapter: selectedAssignmentChapter || "",
           chapterKey: buildChapterKey(form.assignmentTitle),
         },
         { merge: true }
@@ -717,13 +788,15 @@ const AssignmentSubmissionPage = () => {
     [
       buildChapterKey,
       buildSubmissionPayload,
-      deriveChapterValue,
       draftsByAssignment,
       form.assignmentTitle,
       form.submissionText,
       getDraftDocId,
       getLockDocId,
       preferredLevel,
+      selectedAssignmentChapter,
+      selectedAssignmentDay,
+      selectedAssignmentLevel,
       studentCode,
       user?.email,
       user?.uid,
@@ -745,36 +818,39 @@ const AssignmentSubmissionPage = () => {
   }, []);
 
   useEffect(() => {
-    const requestedKey =
-      location?.state?.assignmentKey ||
-      location?.state?.canonicalAssignmentKey ||
-      new URLSearchParams(location?.search || "").get("assignmentKey") ||
-      "";
-    if (!requestedKey || !assignmentDictionary.length) return;
-
-    const requestedNormalized = normalizeAssignmentIdentity(requestedKey);
-    const match = assignmentDictionary.find(
-      (entry) => normalizeAssignmentIdentity(entry.assignmentKey || entry.canonicalAssignmentId || "") === requestedNormalized
-    );
-    if (!match) return;
-
-    setForm((prev) => ({ ...prev, assignmentTitle: match.label }));
-  }, [assignmentDictionary, location?.search, location?.state]);
+    setAssignmentSelectionUnlocked(false);
+  }, [requestedAssignmentKey]);
 
   useEffect(() => {
-    const defaultAssignment = assignmentOptions[0];
-    const currentAssignment = form.assignmentTitle;
-    const hasCurrentAssignment = currentAssignment && assignmentOptions.includes(currentAssignment);
+    if (!requestedAssignmentMatch?.label) return;
 
-    if (hasCurrentAssignment || !defaultAssignment) return;
+    setForm((prev) => {
+      if (prev.assignmentTitle === requestedAssignmentMatch.label) return prev;
+      const matchedDraft = draftsByAssignment[requestedAssignmentMatch.label];
+      return {
+        ...prev,
+        assignmentTitle: requestedAssignmentMatch.label,
+        submissionText: matchedDraft?.submissionText || prev.submissionText,
+        confirmed: false,
+      };
+    });
+  }, [draftsByAssignment, requestedAssignmentMatch]);
 
-    const defaultDraft = draftsByAssignment[defaultAssignment];
-    setForm((prev) => ({
-      ...prev,
-      assignmentTitle: defaultAssignment,
-      submissionText: defaultDraft?.submissionText || prev.submissionText,
-    }));
-  }, [assignmentOptions, draftsByAssignment, form.assignmentTitle]);
+  useEffect(() => {
+    if (form.assignmentTitle && assignmentOptions.includes(form.assignmentTitle)) return;
+    if (requestedAssignmentMatch?.label) return;
+    if (!assignmentOptions.length) return;
+
+    setForm((prev) => {
+      if (!prev.assignmentTitle) return prev;
+      return {
+        ...prev,
+        assignmentTitle: "",
+        submissionText: "",
+        confirmed: false,
+      };
+    });
+  }, [assignmentOptions, form.assignmentTitle, requestedAssignmentMatch]);
 
   useEffect(() => {
     const loadDraftsAndSubmissions = async () => {
@@ -947,10 +1023,6 @@ const AssignmentSubmissionPage = () => {
   );
 
   const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
-  const selectedAssignmentId = useMemo(
-    () => buildAssignmentId(form.assignmentTitle),
-    [buildAssignmentId, form.assignmentTitle]
-  );
 
   const isSameSelectedAssignment = useCallback(
     (entry) => {
@@ -1058,7 +1130,7 @@ const AssignmentSubmissionPage = () => {
       level: preferredLevel,
       assignmentId: buildAssignmentId(label),
       title: label,
-      assignmentDay: deriveChapterValue(label),
+      assignmentDay: deriveAssignmentDay(label),
       assignment: true,
     }));
 
@@ -1088,7 +1160,7 @@ const AssignmentSubmissionPage = () => {
       if (title) acc[title] = entry;
       return acc;
     }, {});
-  }, [assignmentOptions, buildAssignmentId, deriveChapterValue, draftsByAssignment, preferredLevel, recentSubmissions, studentCode]);
+  }, [assignmentOptions, buildAssignmentId, deriveAssignmentDay, draftsByAssignment, preferredLevel, recentSubmissions, studentCode]);
 
   const maxUnlockedDay = useMemo(() => {
     const availableDays = recentSubmissions
@@ -1103,7 +1175,7 @@ const AssignmentSubmissionPage = () => {
     return assignmentOptions.map((opt) => {
       const key = buildChapterKey(opt);
       const optionAssignmentId = buildAssignmentId(opt);
-      const dayNumber = deriveChapterValue(opt);
+      const dayNumber = deriveAssignmentDay(opt);
       const isDayZero = dayNumber === 0;
       const isNotYetAvailable =
         Number.isFinite(dayNumber) && Number.isFinite(maxUnlockedDay) && dayNumber > maxUnlockedDay;
@@ -1148,7 +1220,7 @@ const AssignmentSubmissionPage = () => {
     assignmentOptions,
     buildAssignmentId,
     buildChapterKey,
-    deriveChapterValue,
+    deriveAssignmentDay,
     draftsByAssignment,
     isGerman,
     lockedChapters,
@@ -1200,6 +1272,7 @@ const AssignmentSubmissionPage = () => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
 
     if (field === "assignmentTitle") {
+      setAssignmentSelectionUnlocked(true);
       const draft = draftsByAssignment[value];
       lastAssignmentRef.current = value;
       setForm((prev) => ({
@@ -1217,16 +1290,20 @@ const AssignmentSubmissionPage = () => {
     if (field === "confirmed") setStatus((prev) => ({ ...prev, error: "" }));
   };
 
-  const selectedDayNumber = useMemo(
-    () => deriveChapterValue(form.assignmentTitle),
-    [deriveChapterValue, form.assignmentTitle]
-  );
-  const isOrientationDay = selectedDayNumber === 0;
+  const hasSelectedAssignment = Boolean(form.assignmentTitle);
+  const selectedDayNumber = selectedAssignmentDay;
+  const isOrientationDay = hasSelectedAssignment && selectedDayNumber === 0;
   const selectedOptionMeta = useMemo(
     () => decoratedAssignmentOptions.find((option) => option.value === form.assignmentTitle) || null,
     [decoratedAssignmentOptions, form.assignmentTitle]
   );
   const selectedAssignmentEligibility = useMemo(() => {
+    if (!hasSelectedAssignment) {
+      return {
+        submittable: false,
+        reason: isGerman ? "Bitte Aufgabe auswählen" : "Select an assignment first",
+      };
+    }
     if (!isDayWithinSubmissionWindow(preferredLevel, selectedDayNumber)) {
       return {
         submittable: false,
@@ -1252,11 +1329,14 @@ const AssignmentSubmissionPage = () => {
       };
     }
     return { submittable: true, reason: isGerman ? "Bereit" : "Ready to submit" };
-  }, [isGerman, isSelectedLocked, preferredLevel, selectedDayNumber, selectedOptionMeta]);
+  }, [hasSelectedAssignment, isGerman, isSelectedLocked, preferredLevel, selectedDayNumber, selectedOptionMeta]);
   const assignmentInfo = useMemo(() => {
-    const base = form.assignmentTitle || assignmentOptions[0] || "Assignment";
-    return selectedDayNumber ? `${base} (Day ${selectedDayNumber})` : base;
-  }, [assignmentOptions, form.assignmentTitle, selectedDayNumber]);
+    const parts = [form.assignmentTitle || "Assignment"];
+    if (selectedDayNumber || selectedDayNumber === 0) parts.push(`Day ${selectedDayNumber}`);
+    if (selectedAssignmentChapter) parts.push(`Chapter ${selectedAssignmentChapter}`);
+    if (selectedCanonicalAssignmentKey) parts.push(selectedCanonicalAssignmentKey);
+    return parts.join(" • ");
+  }, [form.assignmentTitle, selectedAssignmentChapter, selectedCanonicalAssignmentKey, selectedDayNumber]);
 
   const hasMatchingRecentSubmission = useCallback(
     (submissionText, { includeResubmitted = true } = {}) => {
@@ -1439,14 +1519,15 @@ const AssignmentSubmissionPage = () => {
       const nowLocal = new Date();
 
       const payload = {
-        assignmentKey: buildAssignmentId(form.assignmentTitle),
-        canonicalAssignmentKey: buildAssignmentId(form.assignmentTitle),
+        assignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
+        canonicalAssignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
         title: form.assignmentTitle,
         assignmentTitle: form.assignmentTitle,
-        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
-        chapter: deriveChapterValue(form.assignmentTitle),
-        assignmentId: buildAssignmentId(form.assignmentTitle),
-        chapterKey: buildChapterKey(form.assignmentTitle),
+        level: selectedAssignmentLevel,
+        day: selectedAssignmentDay,
+        chapter: selectedAssignmentChapter || "",
+        assignmentId: selectedAssignmentId,
+        chapterKey: selectedChapterKey,
         studentId: user.uid,
         studentEmail: user?.email || "",
         studentCode,
@@ -1629,14 +1710,15 @@ const AssignmentSubmissionPage = () => {
 
     try {
       const payload = {
-        assignmentKey: buildAssignmentId(form.assignmentTitle),
-        canonicalAssignmentKey: buildAssignmentId(form.assignmentTitle),
+        assignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
+        canonicalAssignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
         title: form.assignmentTitle,
         assignmentTitle: form.assignmentTitle,
-        level: ALLOWED_LEVELS.includes(preferredLevel) ? preferredLevel : "GENERAL",
-        chapter: deriveChapterValue(form.assignmentTitle),
-        assignmentId: buildAssignmentId(form.assignmentTitle),
-        chapterKey: buildChapterKey(form.assignmentTitle),
+        level: selectedAssignmentLevel,
+        day: selectedAssignmentDay,
+        chapter: selectedAssignmentChapter || "",
+        assignmentId: selectedAssignmentId,
+        chapterKey: selectedChapterKey,
         studentId: user.uid,
         studentEmail: user?.email || "",
         studentCode,
@@ -1645,7 +1727,7 @@ const AssignmentSubmissionPage = () => {
         className: studentProfile?.className || "",
         submissionFingerprint: buildSubmissionFingerprint({
           assignmentTitle: form.assignmentTitle,
-          chapterKey: buildChapterKey(form.assignmentTitle),
+          chapterKey: selectedChapterKey,
           submissionText: trimmedResubmission,
         }),
         submissionText: trimmedResubmission,
@@ -1715,10 +1797,14 @@ const AssignmentSubmissionPage = () => {
             <div style={{ ...styles.field, margin: 0 }}>
               <span style={styles.label}>Assignment</span>
               <select
-                value={form.assignmentTitle || assignmentOptions[0]}
+                value={form.assignmentTitle}
                 onChange={handleChange("assignmentTitle")}
                 style={styles.select}
+                disabled={isAssignmentContextLocked}
               >
+                <option value="" disabled>
+                  Select an assignment
+                </option>
                 {decoratedAssignmentOptions.map((opt) => (
                   <option key={opt.value} value={opt.value} disabled={opt.disabled} title={opt.disabled ? uiText.orientationOnly : ""}>
                     {opt.label}
@@ -1726,7 +1812,20 @@ const AssignmentSubmissionPage = () => {
                 ))}
               </select>
 
-              {isSelectedLocked && !selectedAssignmentPassed ? (
+              {isAssignmentContextLocked && requestedAssignmentMatch ? (
+                <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
+                  <span style={styles.helperText}>
+                    Opened from course/workbook link. Assignment locked to <strong>{requestedAssignmentMatch.label}</strong> to prevent wrong-chapter submissions.
+                  </span>
+                  <button
+                    type="button"
+                    style={{ ...styles.secondaryButton, width: "fit-content", padding: "8px 12px" }}
+                    onClick={() => setAssignmentSelectionUnlocked(true)}
+                  >
+                    Choose a different assignment instead
+                  </button>
+                </div>
+              ) : isSelectedLocked && !selectedAssignmentPassed ? (
                 <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                   <span
                     style={{
@@ -1802,11 +1901,13 @@ const AssignmentSubmissionPage = () => {
                 maxLength={dynamicMaxSubmissionCharacters}
                 style={{ ...styles.textArea, minHeight: 200 }}
                 placeholder={
-                  isSelectedLocked
+                  !hasSelectedAssignment
+                    ? "Select an assignment first."
+                    : isSelectedLocked
                     ? "This assignment is locked. Your previous submission is shown below."
                     : "Type your answer here or paste it in."
                 }
-                disabled={isSelectedLocked}
+                disabled={isSelectedLocked || !hasSelectedAssignment}
               />
               <span style={styles.helperText}>
                 Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
@@ -1834,14 +1935,20 @@ const AssignmentSubmissionPage = () => {
               type="checkbox"
               checked={form.confirmed || confirmationLocked}
               onChange={handleChange("confirmed")}
-              disabled={confirmationLocked || status.loading || isSelectedLocked || isOrientationDay}
+              disabled={confirmationLocked || status.loading || isSelectedLocked || isOrientationDay || !hasSelectedAssignment}
             />
-            <span style={{ ...styles.label, margin: 0 }}>I confirm this is the correct assignment.</span>
+            <span style={{ ...styles.label, margin: 0 }}>
+              I confirm I am submitting {selectedAssignmentChapter ? `Chapter ${selectedAssignmentChapter}` : "this assignment"}
+              {selectedCanonicalAssignmentKey ? ` (${selectedCanonicalAssignmentKey})` : ""}.
+            </span>
           </label>
 
           <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 10, background: "#f9fafb" }}>
             <div style={{ fontWeight: 700, marginBottom: 6 }}>{isGerman ? "Einreichungsübersicht" : "Submission summary"}</div>
             <div style={styles.helperText}>Assignment: {form.assignmentTitle || "–"}</div>
+            <div style={styles.helperText}>Day: {hasSelectedAssignment && (selectedDayNumber || selectedDayNumber === 0) ? selectedDayNumber : "–"}</div>
+            <div style={styles.helperText}>Chapter: {selectedAssignmentChapter || "–"}</div>
+            <div style={styles.helperText}>Canonical ID: {selectedCanonicalAssignmentKey || selectedAssignmentId || "–"}</div>
             <div style={styles.helperText}>Class: {studentProfile?.className || "–"}</div>
             <div style={styles.helperText}>Level: {preferredLevel}</div>
             <div style={styles.helperText}>Student code: {studentCode || "–"}</div>
@@ -1852,7 +1959,7 @@ const AssignmentSubmissionPage = () => {
               type="button"
               style={styles.secondaryButton}
               onClick={handleSaveDraft}
-              disabled={status.loading || isSelectedLocked}
+              disabled={status.loading || isSelectedLocked || !hasSelectedAssignment}
             >
               {status.loading ? "Saving ..." : "Save draft"}
             </button>
@@ -1860,7 +1967,7 @@ const AssignmentSubmissionPage = () => {
             <button
               type="submit"
               style={styles.primaryButton}
-              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay || submissionCooldownRemainingMs > 0}
+              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay || submissionCooldownRemainingMs > 0 || !hasSelectedAssignment}
             >
               {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>
