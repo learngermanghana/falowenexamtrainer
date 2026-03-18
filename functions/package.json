@@ -10,6 +10,7 @@
     "serve": "firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log",
+    "set-temp-password": "node scripts/setTempPassword.js",
     "seed:announcements": "node scripts/seedAnnouncements.js",
     "migrate:assignment-keys": "node scripts/backfillAssignmentKeys.js",
     "upsert:answer-key": "node scripts/upsertAnswerKeyRegistryEntry.js",
