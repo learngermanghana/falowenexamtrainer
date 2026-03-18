@@ -45,6 +45,7 @@ import A1Day3GermanAlphabetReviewingWorkbookPage from "./components/A1Day3German
 import A1Day3SchreibenSprechenKapitel11WorkbookPage from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
 import A1Day3Kapitel12WorkbookPage from "./components/A1Day3Kapitel12WorkbookPage";
 import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3PronounsIntroducingYourselfWorkbookPage";
+import A1Day5IntroducingYourselfArticlesWorkbookPage from "./components/A1Day5IntroducingYourselfArticlesWorkbookPage";
 import A1Day12TwentyFourHourClockAndDatesWorkbookPage from "./components/A1Day12TwentyFourHourClockAndDatesWorkbookPage";
 import A1Day13RevisionNumbersTimePricesWorkbookPage from "./components/A1Day13RevisionNumbersTimePricesWorkbookPage";
 import A2Day2SmallTalkWorkbookEnhancedPage from "./components/A2Day2SmallTalkWorkbookEnhancedPage";
@@ -614,6 +615,10 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-day-3-pronouns-introducing-yourself-workbook"
             element={<A1Day3PronounsIntroducingYourselfWorkbookPage />}
+          />
+          <Route
+            path="/campus/course/a1-day-5-articles-adjectives-personal-information-workbook"
+            element={<A1Day5IntroducingYourselfArticlesWorkbookPage />}
           />
           <Route path="/campus/course/a2-day-2-small-talk-workbook" element={<A2Day2SmallTalkWorkbookEnhancedPage />} />
           <Route path="/campus/course/a2-day-2-personen-beschreiben-workbook" element={<A2Day2PersonenBeschreibenWorkbookPage />} />
