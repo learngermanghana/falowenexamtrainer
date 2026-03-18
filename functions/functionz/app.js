@@ -953,6 +953,9 @@ const presentationCoachPrompt = ({ level = "A1", answersDone = 0 }) => {
     `When completed answers are fewer than ${PRESENTATION_TURN_LIMIT}, use <question_de>.`,
     `When completed answers are ${PRESENTATION_TURN_LIMIT}, replace <question_de> with <abschluss_de> and include <praesentation_de>.`,
     "Do not output any external recording links in <abschluss_de> or any other tag.",
+    "Treat the learner's first message in a new session as the task/topic/question setup, NOT as Answer 1.",
+    "If that first message is long, includes bullet points, copied feedback blocks, or mixed languages, extract the core speaking prompt and still ask the first German follow-up question.",
+    "On the first learner turn, do not analyse it like a finished answer. Briefly acknowledge the topic, then ask the first question in German.",
     "For every turn also include <error_intel> with three bullets for article/case, verb position, tense slips. Each bullet: short rule + one corrected example.",
     "On final turn include <rubric>Grammar:X/5|Vocabulary:Y/5|Pronunciation readiness:Z/5|Structure:W/5</rubric>.",
     "On final turn include <script_short>, <script_medium>, and <script_long> with speaking-ready German scripts for about 45s, 90s, and 2min.",
@@ -982,6 +985,9 @@ function isLikelyPresentationSetupMessage(text = "") {
     "motivation",
     "vocabulary",
     "progress",
+    "topic selected:",
+    "please start the 6-step coaching flow",
+    "please start with easy german",
     "gliederung",
     "noch 5 frage",
     "noch 5 fragen",
@@ -2490,7 +2496,9 @@ app.post("/speaking/presentation-chat", async (req, res) => {
 
     const safeHistory = sanitizePresentationHistory(history);
     const answersDoneBeforeCurrent = countUserAnswers(safeHistory);
-    const currentMessageCountsAsAnswer = isCountablePresentationAnswer(trimmedMessage);
+    const priorLearnerTurnCount = safeHistory.filter((item) => item?.role === "user").length;
+    const isFirstLearnerTurn = priorLearnerTurnCount === 0;
+    const currentMessageCountsAsAnswer = !isFirstLearnerTurn && isCountablePresentationAnswer(trimmedMessage);
     const cappedAnswersDone = Math.min(
       answersDoneBeforeCurrent + (currentMessageCountsAsAnswer ? 1 : 0),
       PRESENTATION_TURN_LIMIT

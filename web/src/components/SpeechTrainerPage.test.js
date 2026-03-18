@@ -324,3 +324,28 @@ test("shows completion status instead of remaining questions when session is alr
 
   expect(screen.queryByText(/Noch\s+\d+\s+Frage\(n\)/i)).not.toBeInTheDocument();
 });
+
+test("keeps the first topic selection as setup instead of counting it as answer one", async () => {
+  requestPresentationCoachReply.mockResolvedValueOnce({
+    reply: "<question_de>Was ist dein erstes Hauptargument?</question_de>",
+    answersDone: 0,
+    completed: false,
+  });
+
+  render(<SpeechTrainerPage />);
+  await waitFor(() => expect(loadPresentationSessions).toHaveBeenCalled());
+
+  fireEvent.click(screen.getByRole("button", { name: /Job interview/i }));
+
+  await waitFor(() => {
+    expect(requestPresentationCoachReply).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("Topic selected: Job interview"),
+      })
+    );
+    expect(screen.getByText(/Noch 6 Frage\(n\)/i)).toBeInTheDocument();
+  });
+
+  expect(screen.queryByRole("button", { name: /Job interview/i })).not.toBeInTheDocument();
+  expect(screen.getByText("Was ist dein erstes Hauptargument?")).toBeInTheDocument();
+});
