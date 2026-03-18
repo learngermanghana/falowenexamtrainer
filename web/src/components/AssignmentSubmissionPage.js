@@ -86,20 +86,67 @@ const tokenizeSubmission = (value) =>
     .map((token) => token.trim())
     .filter(Boolean);
 
-const parseObjectiveAnswers = (value) => {
-  const text = String(value || "");
-  const matches = [...text.matchAll(/(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)/g)];
-  if (!matches.length) return null;
+const SECTION_HEADING_REGEX = /^teil\s*:?[\s-]*([a-z0-9._-]+)/i;
+const NUMBERED_LINE_REGEX = /^(\d+)\s*[).:-]?\s*(.+)$/;
+const SINGLE_OBJECTIVE_ANSWER_REGEX = /^(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)$/;
+const INLINE_OBJECTIVE_ANSWER_REGEX = /(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)(?=\s+\d+\s*[).:-]?\s*[a-zA-Z0-9]+|\s*$)/g;
 
+const normalizeInlineObjectiveSequence = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/\s+/g, " ");
+
+const analyzeObjectiveAnswers = (value) => {
+  const lines = String(value || "").split(/\r?\n/);
   const answersByQuestion = new Map();
-  matches.forEach((match) => {
-    const questionNumber = String(match[1] || "").trim();
-    const answer = String(match[2] || "").trim().toLowerCase();
-    if (questionNumber && answer) answersByQuestion.set(questionNumber, answer);
+  let currentSection = "default";
+  let hasNonObjectiveNumberedLines = false;
+
+  lines.forEach((line) => {
+    const trimmedLine = String(line || "").trim();
+    if (!trimmedLine) return;
+
+    const sectionMatch = SECTION_HEADING_REGEX.exec(trimmedLine);
+    if (sectionMatch?.[1]) {
+      currentSection = sectionMatch[1].toLowerCase();
+      return;
+    }
+
+    const singleMatch = SINGLE_OBJECTIVE_ANSWER_REGEX.exec(trimmedLine);
+    if (singleMatch) {
+      const questionNumber = String(singleMatch[1] || "").trim();
+      const answer = String(singleMatch[2] || "").trim().toLowerCase();
+      if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
+      return;
+    }
+
+    const numberedLineMatch = NUMBERED_LINE_REGEX.exec(trimmedLine);
+    if (!numberedLineMatch) return;
+
+    const inlineMatches = [...trimmedLine.matchAll(INLINE_OBJECTIVE_ANSWER_REGEX)];
+    if (inlineMatches.length) {
+      const normalizedLine = normalizeInlineObjectiveSequence(trimmedLine);
+      const normalizedMatches = normalizeInlineObjectiveSequence(inlineMatches.map((match) => match[0]).join(" "));
+      if (normalizedLine === normalizedMatches) {
+        inlineMatches.forEach((match) => {
+          const questionNumber = String(match[1] || "").trim();
+          const answer = String(match[2] || "").trim().toLowerCase();
+          if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
+        });
+        return;
+      }
+    }
+
+    hasNonObjectiveNumberedLines = true;
   });
 
-  return answersByQuestion.size ? answersByQuestion : null;
+  return {
+    answersByQuestion: answersByQuestion.size ? answersByQuestion : null,
+    hasNonObjectiveNumberedLines,
+  };
 };
+
+const parseObjectiveAnswers = (value) => analyzeObjectiveAnswers(value).answersByQuestion;
 
 const countCharacterChanges = (previousText, currentText) => {
   const previousNormalized = normalizeSubmissionText(previousText);
@@ -126,10 +173,17 @@ const buildResubmissionDiff = ({ previousSubmissionText, currentSubmissionText }
     };
   }
 
-  const previousObjective = parseObjectiveAnswers(previousSubmissionText);
-  const currentObjective = parseObjectiveAnswers(currentSubmissionText);
+  const previousObjectiveAnalysis = analyzeObjectiveAnswers(previousSubmissionText);
+  const currentObjectiveAnalysis = analyzeObjectiveAnswers(currentSubmissionText);
+  const previousObjective = previousObjectiveAnalysis.answersByQuestion;
+  const currentObjective = currentObjectiveAnalysis.answersByQuestion;
 
-  if (previousObjective && currentObjective) {
+  if (
+    previousObjective &&
+    currentObjective &&
+    !previousObjectiveAnalysis.hasNonObjectiveNumberedLines &&
+    !currentObjectiveAnalysis.hasNonObjectiveNumberedLines
+  ) {
     const overlappingQuestions = [...previousObjective.keys()].filter((question) => currentObjective.has(question));
     if (overlappingQuestions.length >= 3) {
       const changedAnswers = overlappingQuestions.filter(
@@ -2189,6 +2243,11 @@ const AssignmentSubmissionPage = () => {
       </div>
     </div>
   );
+};
+
+export const __TESTING__ = {
+  buildResubmissionDiff,
+  parseObjectiveAnswers,
 };
 
 export default AssignmentSubmissionPage;
