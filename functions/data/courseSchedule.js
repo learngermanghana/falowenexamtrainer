@@ -565,7 +565,7 @@ const courseSchedules = {
       schreiben_sprechen: {
         video: "https://youtu.be/_WdlEcKXuVg",
         youtube_link: "https://youtu.be/_WdlEcKXuVg",
-        workbook_link: "https://drive.google.com/file/d/1xellIzaxzoBTFOUdaCEHu_OiiuEnFeWT/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-6-family-and-hobbies-workbook",
         assignment: false,
       },
     },
