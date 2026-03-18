@@ -95,10 +95,11 @@ const normalizeInlineObjectiveSequence = (value) =>
     .trim()
     .replace(/\s+/g, " ");
 
-const parseObjectiveAnswers = (value) => {
+const analyzeObjectiveAnswers = (value) => {
   const lines = String(value || "").split(/\r?\n/);
   const answersByQuestion = new Map();
   let currentSection = "default";
+  let hasNonObjectiveNumberedLines = false;
 
   lines.forEach((line) => {
     const trimmedLine = String(line || "").trim();
@@ -119,17 +120,22 @@ const parseObjectiveAnswers = (value) => {
     }
 
     const inlineMatches = [...trimmedLine.matchAll(INLINE_OBJECTIVE_ANSWER_REGEX)];
-    if (!inlineMatches.length) return;
+    if (inlineMatches.length) {
+      const normalizedLine = normalizeInlineObjectiveSequence(trimmedLine);
+      const normalizedMatches = normalizeInlineObjectiveSequence(inlineMatches.map((match) => match[0]).join(" "));
+      if (normalizedLine === normalizedMatches) {
+        inlineMatches.forEach((match) => {
+          const questionNumber = String(match[1] || "").trim();
+          const answer = String(match[2] || "").trim().toLowerCase();
+          if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
+        });
+        return;
+      }
+    }
 
-    const normalizedLine = normalizeInlineObjectiveSequence(trimmedLine);
-    const normalizedMatches = normalizeInlineObjectiveSequence(inlineMatches.map((match) => match[0]).join(" "));
-    if (normalizedLine !== normalizedMatches) return;
-
-    inlineMatches.forEach((match) => {
-      const questionNumber = String(match[1] || "").trim();
-      const answer = String(match[2] || "").trim().toLowerCase();
-      if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
-    });
+    if (/^\d+\s*[).:-]?\s*\S+/.test(trimmedLine)) {
+      hasNonObjectiveNumberedLines = true;
+    }
   });
 
   return {
