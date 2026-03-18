@@ -539,7 +539,7 @@ const B2SelfLearningCourse = () => {
                   <button
                     type="button"
                     style={styles.secondaryButton}
-                    onClick={() => navigate("/exams/writing")}
+                    onClick={() => navigate("/campus/writing?tab=ideas")}
                   >
                     Open ideas + mark my letter
                   </button>
