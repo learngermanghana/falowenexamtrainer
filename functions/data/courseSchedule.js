@@ -182,7 +182,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Understanding Präteritum and Perfekt",
     video: "https://youtu.be/NxoQH-BY9Js",
     youtube_link: "https://youtu.be/NxoQH-BY9Js",
-    grammarbook_link: "https://drive.google.com/file/d/1kOb7c08Pkxf21OQE_xIGEaif7Xq7k-ty/view?usp=sharing",
+    grammarbook_link: "/campus/course/perfekt-urlaub-4-9-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1NzRxbGUe306Vq0mq9kKsc3y3HYqkMhuA/view?usp=sharing",
   },
   {

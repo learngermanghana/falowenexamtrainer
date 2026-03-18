@@ -59,6 +59,7 @@ import A2Day6TwoCasePrepositionsGrammarPage from "./components/A2Day6TwoCasePrep
 import A2Day7RelativeClausesWohnungGrammarPage from "./components/A2Day7RelativeClausesWohnungGrammarPage";
 import A2Day7WohnungSuchenWorkbookPage from "./components/A2Day7WohnungSuchenWorkbookPage";
 import A2Day8ImperativeGrammarPage from "./components/A2Day8ImperativeGrammarPage";
+import A2Day9PerfektGrammarPage from "./components/A2Day9PerfektGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
@@ -719,6 +720,10 @@ const AppShell = ({
           <Route
             path="/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes"
             element={<A2Day8ImperativeGrammarPage />}
+          />
+          <Route
+            path="/campus/course/perfekt-urlaub-4-9-grammar-notes"
+            element={<A2Day9PerfektGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
