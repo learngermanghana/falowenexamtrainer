@@ -182,14 +182,15 @@ const A2_SCHEDULE = [
     day: 9,
     topic: "Urlaub 4.9",
     chapter: "4.9",
-    goal: "Discuss vacation plans.",
+    goal: "Discuss vacation destinations, transport, accommodation, activities, and travel preparation with confidence.",
     assignment: true,
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    instruction:
+      "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "Understanding Präteritum and Perfekt",
     video: "https://youtu.be/NxoQH-BY9Js",
     youtube_link: "https://youtu.be/NxoQH-BY9Js",
     grammarbook_link: "/campus/course/perfekt-urlaub-4-9-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1NzRxbGUe306Vq0mq9kKsc3y3HYqkMhuA/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-9-urlaub-workbook",
   },
   {
     day: 10,
