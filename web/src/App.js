@@ -61,6 +61,7 @@ import A2Day7WohnungSuchenWorkbookPage from "./components/A2Day7WohnungSuchenWor
 import A2Day8ImperativeGrammarPage from "./components/A2Day8ImperativeGrammarPage";
 import A2Day9PerfektGrammarPage from "./components/A2Day9PerfektGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
+import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day25OnlineShoppingRightsRisksWorkbookPage from "./components/B1Day25OnlineShoppingRightsRisksWorkbookPage";
 import B1Day26ReiseproblemeUndLoesungenWorkbookPage from "./components/B1Day26ReiseproblemeUndLoesungenWorkbookPage";
@@ -623,6 +624,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-6-moebel-und-raeume-workbook" element={<A2Day6MoebelRaeumeWorkbookPage />} />
           <Route path="/campus/course/a2-day-7-eine-wohnung-suchen-workbook" element={<A2Day7WohnungSuchenWorkbookPage />} />
           <Route path="/campus/course/a2-day-8-rezepte-und-essen-workbook" element={<A2Day8RezepteUndEssenWorkbookPage />} />
+          <Route path="/campus/course/a2-day-9-urlaub-workbook" element={<A2Day9UrlaubWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route
             path="/campus/course/b1-day-25-online-einkaufen-rechte-und-risiken-workbook"
