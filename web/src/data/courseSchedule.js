@@ -555,15 +555,15 @@ const RAW_COURSE_SCHEDULES = {
     },
     {
       day: 5,
-      topic: "Articles, Adjectives and Personal Information",
+      topic: "Introducing Yourself and Articles",
       chapter: "1.2",
-      goal: "Build confidence with basic articles, adjective opposites, personal information, and W-questions.",
+      goal: "Consolidate your understanding of introductions, basic articles, adjectives, and W-questions.",
       instruction: "Open the in-app self-practice workbook and review the answer guide for self-check.",
       assignment: false,
       schreiben_sprechen: {
         video: "https://youtu.be/aQNXQlTJMBA",
         youtube_link: "https://youtu.be/aQNXQlTJMBA",
-        workbook_link: "/campus/course/a1-day-5-articles-adjectives-personal-information-workbook",
+        workbook_link: "/campus/course/a1-day-5-introducing-yourself-and-articles-workbook",
         assignment: false,
       },
     },

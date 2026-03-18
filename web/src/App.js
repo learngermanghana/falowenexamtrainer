@@ -617,7 +617,7 @@ const AppShell = ({
             element={<A1Day3PronounsIntroducingYourselfWorkbookPage />}
           />
           <Route
-            path="/campus/course/a1-day-5-articles-adjectives-personal-information-workbook"
+            path="/campus/course/a1-day-5-introducing-yourself-and-articles-workbook"
             element={<A1Day5IntroducingYourselfArticlesWorkbookPage />}
           />
           <Route path="/campus/course/a2-day-2-small-talk-workbook" element={<A2Day2SmallTalkWorkbookEnhancedPage />} />
