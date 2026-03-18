@@ -209,6 +209,37 @@ const buildStudentScopeKey = ({ userId, studentCode, studentEmail }) =>
     .filter(Boolean)
     .join("__") || "anonymous";
 
+const doesEntryMatchSelectedAssignment = ({
+  entry,
+  selectedAssignmentId,
+  selectedCanonicalAssignmentKey,
+  selectedChapterKey,
+  assignmentTitle,
+  buildChapterKey,
+}) => {
+  const normalizedSelectedKeys = [selectedCanonicalAssignmentKey, selectedAssignmentId]
+    .map((value) => normalizeAssignmentIdentity(value))
+    .filter(Boolean);
+
+  const normalizedEntryKeys = [
+    entry?.canonicalAssignmentKey,
+    entry?.assignmentKey,
+    entry?.assignmentId,
+    entry?.assignment_id,
+  ]
+    .map((value) => normalizeAssignmentIdentity(value))
+    .filter(Boolean);
+
+  if (normalizedSelectedKeys.length && normalizedEntryKeys.length) {
+    return normalizedEntryKeys.some((value) => normalizedSelectedKeys.includes(value));
+  }
+
+  const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
+  if (selectedChapterKey && entryChapterKey) return entryChapterKey === selectedChapterKey;
+
+  return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(assignmentTitle);
+};
+
 const buildSubmissionFingerprint = ({ assignmentTitle, chapterKey, submissionText }) =>
   `${normalizeIdPart(assignmentTitle)}::${normalizeIdPart(chapterKey)}::${normalizeIdPart(
     normalizeSubmissionText(submissionText)
@@ -827,6 +858,9 @@ const AssignmentSubmissionPage = () => {
         assignmentTitle: form.assignmentTitle,
         submissionText: trimmedText,
         createdAt: nowLocal,
+        assignmentId: selectedAssignmentId,
+        canonicalAssignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
+        chapterKey: currentChapterKey,
       });
 
       return { ok: true };
@@ -842,7 +876,9 @@ const AssignmentSubmissionPage = () => {
       preferredLevel,
       selectedAssignmentChapter,
       selectedAssignmentDay,
+      selectedAssignmentId,
       selectedAssignmentLevel,
+      selectedCanonicalAssignmentKey,
       studentCode,
       user?.email,
       user?.uid,
@@ -1071,18 +1107,16 @@ const AssignmentSubmissionPage = () => {
   const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
 
   const isSameSelectedAssignment = useCallback(
-    (entry) => {
-      const entryAssignmentId = entry?.assignmentId || entry?.assignment_id || entry?.assignmentKey || null;
-      if (selectedAssignmentId && entryAssignmentId) {
-        return normalizeAssignmentIdentity(entryAssignmentId) === normalizeAssignmentIdentity(selectedAssignmentId);
-      }
-
-      const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
-      if (selectedChapterKey && entryChapterKey) return entryChapterKey === selectedChapterKey;
-
-      return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(form.assignmentTitle);
-    },
-    [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedChapterKey]
+    (entry) =>
+      doesEntryMatchSelectedAssignment({
+        entry,
+        selectedAssignmentId,
+        selectedCanonicalAssignmentKey,
+        selectedChapterKey,
+        assignmentTitle: form.assignmentTitle,
+        buildChapterKey,
+      }),
+    [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedCanonicalAssignmentKey, selectedChapterKey]
   );
 
   const selectedResubmissionCount = useMemo(() => {
@@ -1156,11 +1190,9 @@ const AssignmentSubmissionPage = () => {
 
   // Preview for selected assignment:
   const selectedPreview = useMemo(() => {
-    if (preview && safeLower(preview.assignmentTitle) === safeLower(form.assignmentTitle)) return preview;
+    if (preview && isSameSelectedAssignment(preview)) return preview;
 
-    const match = recentSubmissions.find(
-      (s) => safeLower(s.assignmentTitle || s.title) === safeLower(form.assignmentTitle)
-    );
+    const match = recentSubmissions.find((entry) => isSameSelectedAssignment(entry));
 
     if (!match?.submissionText) return null;
 
@@ -1168,8 +1200,11 @@ const AssignmentSubmissionPage = () => {
       assignmentTitle: match.assignmentTitle || match.title || form.assignmentTitle,
       submissionText: match.submissionText,
       createdAt: match.createdAt || match.updatedAt || null,
+      assignmentId: match.assignmentId || match.assignment_id || null,
+      canonicalAssignmentKey: match.canonicalAssignmentKey || match.assignmentKey || null,
+      chapterKey: match.chapterKey || buildChapterKey(match.assignmentTitle || match.title || ""),
     };
-  }, [form.assignmentTitle, preview, recentSubmissions]);
+  }, [buildChapterKey, form.assignmentTitle, isSameSelectedAssignment, preview, recentSubmissions]);
 
   const mergedProgressByTitle = useMemo(() => {
     const curriculumEntries = assignmentOptions.map((label) => ({
