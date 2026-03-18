@@ -134,7 +134,7 @@ const getTimerMeta = (thread, now) => {
     isExpired,
     isWarning,
     remainingMs,
-    label: isExpired ? "Time ended" : `${formatCountdown(remainingMs)} left`,
+    label: isExpired ? "Time is up" : `${formatCountdown(remainingMs)} left`,
   };
 };
 
@@ -759,7 +759,7 @@ const ClassDiscussionPage = () => {
   const renderThread = (thread) => {
     const status = thread.status || "open";
     const timerMeta = getTimerMeta(thread, now);
-    const repliesLocked = status === "archived" || timerMeta.isExpired;
+    const repliesLocked = status === "archived";
 
 
     const statusBadgeStyle = {
@@ -933,13 +933,13 @@ const ClassDiscussionPage = () => {
                 style={{
                   ...styles.helperText,
                   margin: 0,
-                  background: "#fef2f2",
+                  background: "#fff7ed",
                   borderRadius: 10,
                   padding: 10,
-                  color: "#991b1b",
+                  color: "#9a3412",
                 }}
               >
-                Time is up. Reply box is now locked for this discussion.
+                Time is up. Students can still post replies to this discussion.
               </div>
             ) : null}
 
@@ -954,9 +954,11 @@ const ClassDiscussionPage = () => {
                     ...styles.helperText,
                     ...styles.discussionLongText,
                     margin: 0,
-                    background: "#f8fafc",
+                    background: "#fef2f2",
+                    border: "1px solid #fca5a5",
                     padding: 10,
                     borderRadius: 10,
+                    color: "#b91c1c",
                   }}
                 >
                   <strong>Instructions (English):</strong> {thread.instructions} — Refer to chapter "Tutorial" in the
@@ -1081,7 +1083,7 @@ const ClassDiscussionPage = () => {
             >
               {timerMeta.isTimed
                 ? timerMeta.isExpired
-                  ? "Timer finished. You can no longer send a reply to this post."
+                  ? "Timer finished. You can still send a reply to this post."
                   : `Time remaining to send: ${timerMeta.label}.`
                 : "No timer for this post — replies stay open."}
               {timerMeta.isWarning && !timerMeta.isExpired ? " Get ready to send your work in the next 3 minutes." : ""}
@@ -1275,7 +1277,7 @@ const ClassDiscussionPage = () => {
                   onChange={(e) => handleFormChange("timerDurationMinutes", clampTimerMinutes(e.target.value))}
                 />
                 <div style={{ ...styles.helperText, margin: 0 }}>
-                  0 = no timer. Set 1–20 to lock replies when time ends.
+                  0 = no timer. Set 1–20 to show a discussion timer; students can still post after time ends.
                 </div>
               </div>
             </div>
