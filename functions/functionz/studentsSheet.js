@@ -187,6 +187,10 @@ function collectMatchingRows({ studentCodes = [], uids = [], emails = [], target
   return Array.from(matches).sort((a, b) => a - b);
 }
 
+function resolvePaidValue(student = {}) {
+  return student.initialPaymentAmount ?? student.paidAmount ?? student.paid ?? "";
+}
+
 async function upsertStudentToSheet(student) {
   const sheetId = process.env.STUDENTS_SHEET_ID;
   const tabName = process.env.STUDENTS_SHEET_TAB || "students";
@@ -333,7 +337,7 @@ async function upsertStudentToSheet(student) {
     pushCell(colClassName, student.className || "");
     pushCell(colStatus, student.status || "");
     pushCell(colEnrollDate, enrollDateValue);
-    pushCell(colPaid, student.initialPaymentAmount ?? student.paidAmount ?? "");
+    pushCell(colPaid, resolvePaidValue(student));
     pushCell(colBalance, student.balanceDue ?? student.balance ?? "");
     pushCell(colPaymentStatus, student.paymentStatus || "");
     pushCell(colContractStart, student.contractStart || "");
@@ -384,7 +388,7 @@ async function upsertStudentToSheet(student) {
   if (colClassName !== null) row[colClassName] = student.className || "";
   if (colStatus !== null) row[colStatus] = student.status || "";
   if (colEnrollDate !== null) row[colEnrollDate] = enrollDateValue;
-  if (colPaid !== null) row[colPaid] = student.initialPaymentAmount ?? student.paidAmount ?? "";
+  if (colPaid !== null) row[colPaid] = resolvePaidValue(student);
   if (colBalance !== null) row[colBalance] = student.balanceDue ?? student.balance ?? "";
   if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
