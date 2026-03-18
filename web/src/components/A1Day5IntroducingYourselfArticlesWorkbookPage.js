@@ -121,60 +121,70 @@ const wWordQuestions = [
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wie",
     explanation: "Use „Wie“ to ask about a name.",
+    englishHint: "How are you called? / What is your name?",
   },
   {
     stem: "2. ___ ist das Buch?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wo",
     explanation: "Use „Wo“ to ask about a place.",
+    englishHint: "Where is the book?",
   },
   {
     stem: "3. ___ wohnt er?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wo",
     explanation: "Use „Wo“ for location.",
+    englishHint: "Where does he live?",
   },
   {
     stem: "4. ___ kommst du?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Woher",
     explanation: "Use „Woher“ for origin.",
+    englishHint: "Where do you come from?",
   },
   {
     stem: "5. ___ ist dein Lehrer?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wer",
     explanation: "Use „Wer“ for a person.",
+    englishHint: "Who is your teacher?",
   },
   {
     stem: "6. ___ geht es dir?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wie",
     explanation: "Use „Wie“ for condition.",
+    englishHint: "How are you?",
   },
   {
     stem: "7. ___ machst du am Wochenende?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Was",
     explanation: "Use „Was“ for an action or thing.",
+    englishHint: "What do you do at the weekend?",
   },
   {
     stem: "8. ___ ist das Auto?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wo",
     explanation: "Use „Wo“ for location.",
+    englishHint: "Where is the car?",
   },
   {
     stem: "9. ___ bist du?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wer",
     explanation: "Use „Wer“ to ask who a person is.",
+    englishHint: "Who are you?",
   },
   {
     stem: "10. ___ kommt sie?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Woher",
     explanation: "Use „Woher“ for origin.",
+    englishHint: "Where does she come from?",
   },
 ];
 
@@ -602,7 +612,7 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
             <div><strong>Wie</strong> – How</div>
             <div><strong>Was</strong> – What</div>
             <div><strong>Wo</strong> – Where</div>
-            <div><strong>Woher</strong> – From where</div>
+            <div><strong>Woher</strong> – Where ... from / from where</div>
           </div>
         </div>
 
@@ -610,6 +620,9 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           {wWordQuestions.map((question, index) => (
             <div key={question.stem} style={boxBase}>
               <strong style={{ fontSize: 16, lineHeight: 1.6 }}>{question.stem}</strong>
+              <div style={{ color: "#4b5563", lineHeight: 1.7 }}>
+                <strong>English hint:</strong> {question.englishHint}
+              </div>
 
               <div style={{ display: "grid", gap: 10 }}>
                 {question.options.map((option) => {
