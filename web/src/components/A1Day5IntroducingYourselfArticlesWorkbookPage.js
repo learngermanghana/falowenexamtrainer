@@ -103,16 +103,16 @@ const articleWords = [
 ];
 
 const adjectivePairs = [
-  ["groß", "klein"],
-  ["alt", "neu"],
-  ["lang", "kurz"],
-  ["schön", "hässlich"],
-  ["heiß", "kalt"],
-  ["schnell", "langsam"],
-  ["laut", "leise"],
-  ["teuer", "billig"],
-  ["glücklich", "traurig"],
-  ["sauber", "schmutzig"],
+  ["groß", "klein", "big / tall", "small / short"],
+  ["alt", "neu", "old", "new"],
+  ["lang", "kurz", "long", "short"],
+  ["schön", "hässlich", "beautiful", "ugly"],
+  ["heiß", "kalt", "hot", "cold"],
+  ["schnell", "langsam", "fast", "slow"],
+  ["laut", "leise", "loud", "quiet"],
+  ["teuer", "billig", "expensive", "cheap"],
+  ["glücklich", "traurig", "happy", "sad"],
+  ["sauber", "schmutzig", "clean", "dirty"],
 ];
 
 const wWordQuestions = [
@@ -121,73 +121,83 @@ const wWordQuestions = [
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wie",
     explanation: "Use „Wie“ to ask about a name.",
+    englishHint: "How are you called? / What is your name?",
   },
   {
     stem: "2. ___ ist das Buch?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wo",
     explanation: "Use „Wo“ to ask about a place.",
+    englishHint: "Where is the book?",
   },
   {
     stem: "3. ___ wohnt er?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wo",
     explanation: "Use „Wo“ for location.",
+    englishHint: "Where does he live?",
   },
   {
     stem: "4. ___ kommst du?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Woher",
     explanation: "Use „Woher“ for origin.",
+    englishHint: "Where do you come from?",
   },
   {
     stem: "5. ___ ist dein Lehrer?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wer",
     explanation: "Use „Wer“ for a person.",
+    englishHint: "Who is your teacher?",
   },
   {
     stem: "6. ___ geht es dir?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wie",
     explanation: "Use „Wie“ for condition.",
+    englishHint: "How are you?",
   },
   {
     stem: "7. ___ machst du am Wochenende?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Was",
     explanation: "Use „Was“ for an action or thing.",
+    englishHint: "What do you do at the weekend?",
   },
   {
     stem: "8. ___ ist das Auto?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wo",
     explanation: "Use „Wo“ for location.",
+    englishHint: "Where is the car?",
   },
   {
     stem: "9. ___ bist du?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Wer",
     explanation: "Use „Wer“ to ask who a person is.",
+    englishHint: "Who are you?",
   },
   {
     stem: "10. ___ kommt sie?",
     options: ["Wer", "Wie", "Was", "Wo", "Woher"],
     answer: "Woher",
     explanation: "Use „Woher“ for origin.",
+    englishHint: "Where does she come from?",
   },
 ];
 
 const personalInfoPrompts = [
-  { label: "Familienname", starter: "Mein Familienname ist ..." },
-  { label: "Vorname", starter: "Mein Vorname ist ..." },
-  { label: "Herkunft", starter: "Ich komme aus ..." },
-  { label: "Geburtsort", starter: "Ich bin in ... geboren." },
-  { label: "Adresse", starter: "Meine Adresse ist ..." },
-  { label: "Postleitzahl", starter: "Meine Postleitzahl ist ..." },
-  { label: "Familienstand", starter: "Ich bin ledig / verheiratet / geschieden / verwitwet." },
-  { label: "Kinder", starter: "Ich habe ... Kinder. / Ich habe keine Kinder." },
-  { label: "Alter", starter: "Ich bin ... Jahre alt." },
+  { label: "Familienname", english: "family name / surname", starter: "Mein Familienname ist ...", starterEnglish: "My family name is ..." },
+  { label: "Vorname", english: "first name", starter: "Mein Vorname ist ...", starterEnglish: "My first name is ..." },
+  { label: "Herkunft", english: "origin", starter: "Ich komme aus ...", starterEnglish: "I come from ..." },
+  { label: "Geburtsort", english: "place of birth", starter: "Ich bin in ... geboren.", starterEnglish: "I was born in ..." },
+  { label: "Adresse", english: "address", starter: "Meine Adresse ist ...", starterEnglish: "My address is ..." },
+  { label: "Postleitzahl", english: "postal code / ZIP code", starter: "Meine Postleitzahl ist ...", starterEnglish: "My postal code is ..." },
+  { label: "Familienstand", english: "marital status", starter: "Ich bin ledig / verheiratet / geschieden / verwitwet.", starterEnglish: "I am single / married / divorced / widowed." },
+  { label: "Kinder", english: "children", starter: "Ich habe ... Kinder. / Ich habe keine Kinder.", starterEnglish: "I have ... children. / I do not have any children." },
+  { label: "Alter", english: "age", starter: "Ich bin ... Jahre alt.", starterEnglish: "I am ... years old." },
 ];
 
 const SectionCard = ({ title, subtitle, children }) => (
@@ -422,9 +432,9 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
         <div style={boxBase}>
           <strong>Adjective pairs</strong>
           <div style={{ display: "grid", gap: 8 }}>
-            {adjectivePairs.map(([left, right]) => (
+            {adjectivePairs.map(([left, right, leftEnglish, rightEnglish]) => (
               <div key={`${left}-${right}`} style={{ padding: "6px 0" }}>
-                {left} – {right}
+                <strong>{left}</strong> ({leftEnglish}) – <strong>{right}</strong> ({rightEnglish})
               </div>
             ))}
           </div>
@@ -500,8 +510,9 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
                 background: "#fff",
               }}
             >
-              <strong>{index + 1}. {item.label}</strong>
+              <strong>{index + 1}. {item.label} <span style={{ color: "#6b7280", fontWeight: 500 }}>({item.english})</span></strong>
               <span style={{ lineHeight: 1.7 }}>{item.starter}</span>
+              <span style={{ lineHeight: 1.7, color: "#4b5563" }}>{item.starterEnglish}</span>
             </div>
           ))}
         </div>
@@ -601,7 +612,7 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
             <div><strong>Wie</strong> – How</div>
             <div><strong>Was</strong> – What</div>
             <div><strong>Wo</strong> – Where</div>
-            <div><strong>Woher</strong> – From where</div>
+            <div><strong>Woher</strong> – Where ... from / from where</div>
           </div>
         </div>
 
@@ -609,6 +620,9 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           {wWordQuestions.map((question, index) => (
             <div key={question.stem} style={boxBase}>
               <strong style={{ fontSize: 16, lineHeight: 1.6 }}>{question.stem}</strong>
+              <div style={{ color: "#4b5563", lineHeight: 1.7 }}>
+                <strong>English hint:</strong> {question.englishHint}
+              </div>
 
               <div style={{ display: "grid", gap: 10 }}>
                 {question.options.map((option) => {
