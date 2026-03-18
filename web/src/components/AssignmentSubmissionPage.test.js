@@ -179,11 +179,13 @@ Teil :4
       currentSubmissionText: currentSubmission,
     });
 
-    expect(diff).toEqual({
+    expect(diff).toMatchObject({
       mode: "objective",
       changedAnswers: 3,
       overlappingQuestions: 15,
     });
+    expect(diff.changedCharacters).toBeGreaterThan(0);
+    expect(diff.newWordsCount).toBeGreaterThan(0);
   });
 
   it("falls back to text mode when numbered responses contain full-sentence answers", () => {
@@ -204,6 +206,41 @@ Teil :4
 
     expect(diff.mode).toBe("text");
     expect(diff.changedCharacters).toBeGreaterThan(0);
+  });
+
+  it("counts repeated added words when short answers are expanded with fuller text", () => {
+    const previousSubmission = `Teil 2:
+1. B
+2. C
+3. A
+4. C
+5. B
+6. B
+7. A
+8. C
+9. C
+10. B`;
+
+    const currentSubmission = `Teil 2: chapter 9
+1. B Apfel und Karotten
+2. C Karotten
+3. A Weil er brot mag
+4. C
+5. B
+6. B
+7. B
+8. C
+9. C
+10. B`;
+
+    const diff = __TESTING__.buildResubmissionDiff({
+      previousSubmissionText: previousSubmission,
+      currentSubmissionText: currentSubmission,
+    });
+
+    expect(diff.mode).toBe("text");
+    expect(diff.changedCharacters).toBeGreaterThanOrEqual(40);
+    expect(diff.newWordsCount).toBeGreaterThanOrEqual(8);
   });
 
   it("stores the true chapter and canonical id in the submission payload", async () => {
