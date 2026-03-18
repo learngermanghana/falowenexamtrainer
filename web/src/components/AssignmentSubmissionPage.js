@@ -132,8 +132,13 @@ const parseObjectiveAnswers = (value) => {
     });
   });
 
-  return answersByQuestion.size ? answersByQuestion : null;
+  return {
+    answersByQuestion: answersByQuestion.size ? answersByQuestion : null,
+    hasNonObjectiveNumberedLines,
+  };
 };
+
+const parseObjectiveAnswers = (value) => analyzeObjectiveAnswers(value).answersByQuestion;
 
 const countCharacterChanges = (previousText, currentText) => {
   const previousNormalized = normalizeSubmissionText(previousText);
@@ -160,10 +165,17 @@ const buildResubmissionDiff = ({ previousSubmissionText, currentSubmissionText }
     };
   }
 
-  const previousObjective = parseObjectiveAnswers(previousSubmissionText);
-  const currentObjective = parseObjectiveAnswers(currentSubmissionText);
+  const previousObjectiveAnalysis = analyzeObjectiveAnswers(previousSubmissionText);
+  const currentObjectiveAnalysis = analyzeObjectiveAnswers(currentSubmissionText);
+  const previousObjective = previousObjectiveAnalysis.answersByQuestion;
+  const currentObjective = currentObjectiveAnalysis.answersByQuestion;
 
-  if (previousObjective && currentObjective) {
+  if (
+    previousObjective &&
+    currentObjective &&
+    !previousObjectiveAnalysis.hasNonObjectiveNumberedLines &&
+    !currentObjectiveAnalysis.hasNonObjectiveNumberedLines
+  ) {
     const overlappingQuestions = [...previousObjective.keys()].filter((question) => currentObjective.has(question));
     if (overlappingQuestions.length >= 3) {
       const changedAnswers = overlappingQuestions.filter(
