@@ -13,7 +13,7 @@ const args = process.argv.slice(2).reduce((acc, arg, index, arr) => {
 
 const usage = `
 Usage:
-  node scripts/setTempPassword.js --email patriciamensah12@gmail.com --temp-password "0541531472pa/"
+  node scripts/setTempPassword.js --email patriciamensah12@gmail.com --temp-password "0594483835pa/"
 
 Optional:
   --uid <firebase_uid>              Use UID instead of looking up by email
