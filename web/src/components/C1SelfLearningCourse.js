@@ -538,7 +538,7 @@ const C1SelfLearningCourse = () => {
                   <button
                     type="button"
                     style={styles.secondaryButton}
-                    onClick={() => navigate("/exams/writing")}
+                    onClick={() => navigate("/campus/writing?tab=ideas")}
                   >
                     Ideen öffnen + Text bewerten
                   </button>
