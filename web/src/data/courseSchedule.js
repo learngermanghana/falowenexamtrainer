@@ -173,8 +173,8 @@ const A2_SCHEDULE = [
     instruction:
       "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "Imperative (commands and instructions)",
-    video: "https://www.youtube.com/watch?v=IyMgjkY0LgU",
-    youtube_link: "https://www.youtube.com/watch?v=IyMgjkY0LgU",
+    video: "https://youtu.be/hxkk6dZSjNM",
+    youtube_link: "https://youtu.be/hxkk6dZSjNM",
     grammarbook_link: "/campus/course/imperativ-rezepte-und-essen-3-8-grammar-notes",
     workbook_link: "/campus/course/a2-day-8-rezepte-und-essen-workbook",
   },
