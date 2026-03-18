@@ -86,6 +86,22 @@ const tokenizeSubmission = (value) =>
     .map((token) => token.trim())
     .filter(Boolean);
 
+const countNewWordOccurrences = (previousText, currentText) => {
+  const previousWordCounts = tokenizeSubmission(previousText).reduce((counts, word) => {
+    counts.set(word, (counts.get(word) || 0) + 1);
+    return counts;
+  }, new Map());
+
+  return tokenizeSubmission(currentText).reduce((newWordCount, word) => {
+    const remainingCount = previousWordCounts.get(word) || 0;
+    if (remainingCount > 0) {
+      previousWordCounts.set(word, remainingCount - 1);
+      return newWordCount;
+    }
+    return newWordCount + 1;
+  }, 0);
+};
+
 const SECTION_HEADING_REGEX = /^teil\s*:?[\s-]*([a-z0-9._-]+)/i;
 const SINGLE_OBJECTIVE_ANSWER_REGEX = /^(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)$/;
 const INLINE_OBJECTIVE_ANSWER_REGEX = /(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)(?=\s+\d+\s*[).:-]?\s*[a-zA-Z0-9]+|\s*$)/g;
@@ -176,6 +192,9 @@ const buildResubmissionDiff = ({ previousSubmissionText, currentSubmissionText }
   const previousObjective = previousObjectiveAnalysis.answersByQuestion;
   const currentObjective = currentObjectiveAnalysis.answersByQuestion;
 
+  const changedCharacters = countCharacterChanges(previousSubmissionText, currentSubmissionText);
+  const newWordsCount = countNewWordOccurrences(previousSubmissionText, currentSubmissionText);
+
   if (
     previousObjective &&
     currentObjective &&
@@ -192,15 +211,11 @@ const buildResubmissionDiff = ({ previousSubmissionText, currentSubmissionText }
         mode: "objective",
         changedAnswers,
         overlappingQuestions: overlappingQuestions.length,
+        changedCharacters,
+        newWordsCount,
       };
     }
   }
-
-  const changedCharacters = countCharacterChanges(previousSubmissionText, currentSubmissionText);
-
-  const previousWords = new Set(tokenizeSubmission(previousNormalized));
-  const currentWords = new Set(tokenizeSubmission(currentNormalized));
-  const newWordsCount = [...currentWords].filter((word) => !previousWords.has(word)).length;
 
   return {
     mode: "text",
@@ -1724,11 +1739,15 @@ const AssignmentSubmissionPage = () => {
       currentSubmissionText: trimmedResubmission,
     });
 
+    const hasStrongTextEdits =
+      resubmissionDiff.changedCharacters >= MIN_RESUBMISSION_CHANGED_CHARACTERS &&
+      resubmissionDiff.newWordsCount >= MIN_RESUBMISSION_NEW_WORDS;
+
     if (selectedPreview?.submissionText && resubmissionDiff.mode === "objective") {
-      if (resubmissionDiff.changedAnswers < MIN_OBJECTIVE_CHANGED_ANSWERS) {
+      if (resubmissionDiff.changedAnswers < MIN_OBJECTIVE_CHANGED_ANSWERS && !hasStrongTextEdits) {
         setResubmissionStatus({
           loading: false,
-          error: `For short answer lists (for example: 1.a 2.b 3.c), change at least ${MIN_OBJECTIVE_CHANGED_ANSWERS} answers from your previous attempt before resubmitting.`,
+          error: `For short answer lists (for example: 1.a 2.b 3.c), change at least ${MIN_OBJECTIVE_CHANGED_ANSWERS} answers from your previous attempt before resubmitting, or expand your corrections with fuller text.`,
           success: "",
         });
         return;
@@ -1738,8 +1757,7 @@ const AssignmentSubmissionPage = () => {
     if (
       selectedPreview?.submissionText &&
       resubmissionDiff.mode === "text" &&
-      (resubmissionDiff.changedCharacters < MIN_RESUBMISSION_CHANGED_CHARACTERS ||
-        resubmissionDiff.newWordsCount < MIN_RESUBMISSION_NEW_WORDS)
+      !hasStrongTextEdits
     ) {
       setResubmissionStatus({
         loading: false,
@@ -2279,6 +2297,7 @@ const AssignmentSubmissionPage = () => {
 
 export const __TESTING__ = {
   buildResubmissionDiff,
+  countNewWordOccurrences,
   parseObjectiveAnswers,
 };
 
