@@ -6,6 +6,7 @@ import { fetchSelfLearningResources } from "../services/selfLearningResourcesSer
 import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/selfLearningProgressService";
 import { fetchVocabularyFromSheet } from "../services/vocabService";
 import { styles } from "../styles";
+import { describeGrammarFocusItem } from "../lib/grammarFocusNotes";
 
 const DEFAULT_SCORE_THRESHOLD = 80;
 const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
@@ -403,10 +404,19 @@ const C1SelfLearningCourse = () => {
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>
                       Grammatikfokus {entry.grammarFocus.group ? `(${entry.grammarFocus.group})` : ""}
                     </div>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {entry.grammarFocus.items.map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
+                    <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+                      {entry.grammarFocus.items.map((item) => {
+                        const grammarItem = describeGrammarFocusItem(item, "de");
+                        return (
+                          <li key={grammarItem.title}>
+                            <strong>{grammarItem.title}</strong>
+                            <div>{grammarItem.note}</div>
+                            <div style={{ fontStyle: "italic", color: "#374151", marginTop: 2 }}>
+                              {grammarItem.exampleLabel} {grammarItem.example}
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 ) : null}
