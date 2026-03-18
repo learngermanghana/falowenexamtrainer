@@ -1206,9 +1206,9 @@ const RAW_COURSE_SCHEDULES = {
       day: 21,
       topic: "Lebensformen heute – Familie, Wohnge 7.21",
       chapter: "7.21",
-      goal: "Lebensformen, Familie und Wohngemeinschaften beschreiben.",
-      instruction: "Nutze das neue Workbook für Sprechen (Group Practice), Schreiben, Lesen und Hören. Reiche Antworten im Abgabebereich ein.",
-      grammar_topic: "Lebensformen heute: Familie, Wohngemeinschaft, Singleleben und neue Lebensformen",
+      goal: "Discuss relationship values, online dating, city life, and job application vocabulary with confidence.",
+      instruction: "Open the workbook and complete all four parts. Use Teil 1 for group speaking practice, then submit your final answers for Schreiben, Lesen, and Hören in the assignment area.",
+      grammar_topic: "Beziehung und Werte: Kommunikation, Vertrauen, gemeinsame Interessen, Respekt und Zukunftspläne",
       assignment: true,
       lesen_hören: {
         video: "https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X",
