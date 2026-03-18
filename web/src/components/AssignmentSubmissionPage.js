@@ -86,20 +86,67 @@ const tokenizeSubmission = (value) =>
     .map((token) => token.trim())
     .filter(Boolean);
 
-const parseObjectiveAnswers = (value) => {
-  const text = String(value || "");
-  const matches = [...text.matchAll(/(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)/g)];
-  if (!matches.length) return null;
+const SECTION_HEADING_REGEX = /^teil\s*:?[\s-]*([a-z0-9._-]+)/i;
+const NUMBERED_LINE_REGEX = /^(\d+)\s*[).:-]?\s*(.+)$/;
+const SINGLE_OBJECTIVE_ANSWER_REGEX = /^(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)$/;
+const INLINE_OBJECTIVE_ANSWER_REGEX = /(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)(?=\s+\d+\s*[).:-]?\s*[a-zA-Z0-9]+|\s*$)/g;
 
+const normalizeInlineObjectiveSequence = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/\s+/g, " ");
+
+const analyzeObjectiveAnswers = (value) => {
+  const lines = String(value || "").split(/\r?\n/);
   const answersByQuestion = new Map();
-  matches.forEach((match) => {
-    const questionNumber = String(match[1] || "").trim();
-    const answer = String(match[2] || "").trim().toLowerCase();
-    if (questionNumber && answer) answersByQuestion.set(questionNumber, answer);
+  let currentSection = "default";
+  let hasNonObjectiveNumberedLines = false;
+
+  lines.forEach((line) => {
+    const trimmedLine = String(line || "").trim();
+    if (!trimmedLine) return;
+
+    const sectionMatch = SECTION_HEADING_REGEX.exec(trimmedLine);
+    if (sectionMatch?.[1]) {
+      currentSection = sectionMatch[1].toLowerCase();
+      return;
+    }
+
+    const singleMatch = SINGLE_OBJECTIVE_ANSWER_REGEX.exec(trimmedLine);
+    if (singleMatch) {
+      const questionNumber = String(singleMatch[1] || "").trim();
+      const answer = String(singleMatch[2] || "").trim().toLowerCase();
+      if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
+      return;
+    }
+
+    const numberedLineMatch = NUMBERED_LINE_REGEX.exec(trimmedLine);
+    if (!numberedLineMatch) return;
+
+    const inlineMatches = [...trimmedLine.matchAll(INLINE_OBJECTIVE_ANSWER_REGEX)];
+    if (inlineMatches.length) {
+      const normalizedLine = normalizeInlineObjectiveSequence(trimmedLine);
+      const normalizedMatches = normalizeInlineObjectiveSequence(inlineMatches.map((match) => match[0]).join(" "));
+      if (normalizedLine === normalizedMatches) {
+        inlineMatches.forEach((match) => {
+          const questionNumber = String(match[1] || "").trim();
+          const answer = String(match[2] || "").trim().toLowerCase();
+          if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
+        });
+        return;
+      }
+    }
+
+    hasNonObjectiveNumberedLines = true;
   });
 
-  return answersByQuestion.size ? answersByQuestion : null;
+  return {
+    answersByQuestion: answersByQuestion.size ? answersByQuestion : null,
+    hasNonObjectiveNumberedLines,
+  };
 };
+
+const getParsedObjectiveAnswers = (value) => analyzeObjectiveAnswers(value).answersByQuestion;
 
 const countCharacterChanges = (previousText, currentText) => {
   const previousNormalized = normalizeSubmissionText(previousText);
@@ -126,10 +173,17 @@ const buildResubmissionDiff = ({ previousSubmissionText, currentSubmissionText }
     };
   }
 
-  const previousObjective = parseObjectiveAnswers(previousSubmissionText);
-  const currentObjective = parseObjectiveAnswers(currentSubmissionText);
+  const previousObjectiveAnalysis = analyzeObjectiveAnswers(previousSubmissionText);
+  const currentObjectiveAnalysis = analyzeObjectiveAnswers(currentSubmissionText);
+  const previousObjective = previousObjectiveAnalysis.answersByQuestion;
+  const currentObjective = currentObjectiveAnalysis.answersByQuestion;
 
-  if (previousObjective && currentObjective) {
+  if (
+    previousObjective &&
+    currentObjective &&
+    !previousObjectiveAnalysis.hasNonObjectiveNumberedLines &&
+    !currentObjectiveAnalysis.hasNonObjectiveNumberedLines
+  ) {
     const overlappingQuestions = [...previousObjective.keys()].filter((question) => currentObjective.has(question));
     if (overlappingQuestions.length >= 3) {
       const changedAnswers = overlappingQuestions.filter(
@@ -162,6 +216,37 @@ const buildStudentScopeKey = ({ userId, studentCode, studentEmail }) =>
     .map((part) => normalizeIdPart(part || ""))
     .filter(Boolean)
     .join("__") || "anonymous";
+
+const doesEntryMatchSelectedAssignment = ({
+  entry,
+  selectedAssignmentId,
+  selectedCanonicalAssignmentKey,
+  selectedChapterKey,
+  assignmentTitle,
+  buildChapterKey,
+}) => {
+  const normalizedSelectedKeys = [selectedCanonicalAssignmentKey, selectedAssignmentId]
+    .map((value) => normalizeAssignmentIdentity(value))
+    .filter(Boolean);
+
+  const normalizedEntryKeys = [
+    entry?.canonicalAssignmentKey,
+    entry?.assignmentKey,
+    entry?.assignmentId,
+    entry?.assignment_id,
+  ]
+    .map((value) => normalizeAssignmentIdentity(value))
+    .filter(Boolean);
+
+  if (normalizedSelectedKeys.length && normalizedEntryKeys.length) {
+    return normalizedEntryKeys.some((value) => normalizedSelectedKeys.includes(value));
+  }
+
+  const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
+  if (selectedChapterKey && entryChapterKey) return entryChapterKey === selectedChapterKey;
+
+  return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(assignmentTitle);
+};
 
 const buildSubmissionFingerprint = ({ assignmentTitle, chapterKey, submissionText }) =>
   `${normalizeIdPart(assignmentTitle)}::${normalizeIdPart(chapterKey)}::${normalizeIdPart(
@@ -781,6 +866,9 @@ const AssignmentSubmissionPage = () => {
         assignmentTitle: form.assignmentTitle,
         submissionText: trimmedText,
         createdAt: nowLocal,
+        assignmentId: selectedAssignmentId,
+        canonicalAssignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
+        chapterKey: currentChapterKey,
       });
 
       return { ok: true };
@@ -796,7 +884,9 @@ const AssignmentSubmissionPage = () => {
       preferredLevel,
       selectedAssignmentChapter,
       selectedAssignmentDay,
+      selectedAssignmentId,
       selectedAssignmentLevel,
+      selectedCanonicalAssignmentKey,
       studentCode,
       user?.email,
       user?.uid,
@@ -1025,18 +1115,16 @@ const AssignmentSubmissionPage = () => {
   const isSelectedLocked = Boolean(selectedChapterKey && lockedChapters.has(selectedChapterKey));
 
   const isSameSelectedAssignment = useCallback(
-    (entry) => {
-      const entryAssignmentId = entry?.assignmentId || entry?.assignment_id || entry?.assignmentKey || null;
-      if (selectedAssignmentId && entryAssignmentId) {
-        return normalizeAssignmentIdentity(entryAssignmentId) === normalizeAssignmentIdentity(selectedAssignmentId);
-      }
-
-      const entryChapterKey = entry?.chapterKey || buildChapterKey(entry?.assignmentTitle || entry?.title || "");
-      if (selectedChapterKey && entryChapterKey) return entryChapterKey === selectedChapterKey;
-
-      return safeLower(entry?.assignmentTitle || entry?.title) === safeLower(form.assignmentTitle);
-    },
-    [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedChapterKey]
+    (entry) =>
+      doesEntryMatchSelectedAssignment({
+        entry,
+        selectedAssignmentId,
+        selectedCanonicalAssignmentKey,
+        selectedChapterKey,
+        assignmentTitle: form.assignmentTitle,
+        buildChapterKey,
+      }),
+    [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedCanonicalAssignmentKey, selectedChapterKey]
   );
 
   const selectedResubmissionCount = useMemo(() => {
@@ -1110,11 +1198,9 @@ const AssignmentSubmissionPage = () => {
 
   // Preview for selected assignment:
   const selectedPreview = useMemo(() => {
-    if (preview && safeLower(preview.assignmentTitle) === safeLower(form.assignmentTitle)) return preview;
+    if (preview && isSameSelectedAssignment(preview)) return preview;
 
-    const match = recentSubmissions.find(
-      (s) => safeLower(s.assignmentTitle || s.title) === safeLower(form.assignmentTitle)
-    );
+    const match = recentSubmissions.find((entry) => isSameSelectedAssignment(entry));
 
     if (!match?.submissionText) return null;
 
@@ -1122,8 +1208,11 @@ const AssignmentSubmissionPage = () => {
       assignmentTitle: match.assignmentTitle || match.title || form.assignmentTitle,
       submissionText: match.submissionText,
       createdAt: match.createdAt || match.updatedAt || null,
+      assignmentId: match.assignmentId || match.assignment_id || null,
+      canonicalAssignmentKey: match.canonicalAssignmentKey || match.assignmentKey || null,
+      chapterKey: match.chapterKey || buildChapterKey(match.assignmentTitle || match.title || ""),
     };
-  }, [form.assignmentTitle, preview, recentSubmissions]);
+  }, [buildChapterKey, form.assignmentTitle, isSameSelectedAssignment, preview, recentSubmissions]);
 
   const mergedProgressByTitle = useMemo(() => {
     const curriculumEntries = assignmentOptions.map((label) => ({
@@ -2189,6 +2278,12 @@ const AssignmentSubmissionPage = () => {
       </div>
     </div>
   );
+};
+
+export const __TESTING__ = {
+  buildResubmissionDiff,
+  parseObjectiveAnswers: getParsedObjectiveAnswers,
+  doesEntryMatchSelectedAssignment,
 };
 
 export default AssignmentSubmissionPage;
