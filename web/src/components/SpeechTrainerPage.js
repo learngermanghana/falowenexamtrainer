@@ -665,7 +665,7 @@ const SpeechTrainerPage = () => {
           </div>
         </div>
 
-        {!answersDone ? (
+        {!topic && !answersDone ? (
           <div style={{ ...styles.filterPanel, margin: 0, display: "grid", gap: 10 }}>
             <strong style={{ fontSize: 16 }}>{t("speechTrainer.initialCoachMessage.default")}</strong>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
