@@ -199,7 +199,7 @@ const hoerenQuestions = [
     options: ["A) Nein, ich schwimme keinen Meer.", "B) Nein, ich male keine Bild.", "C) Nein, ich spiele keinen Fußball.", "D) Nein, ich höre nicht keine Musik."],
   },
   {
-    stem: "4. Was bedeutet „ein bisschen"?",
+    stem: "4. Was bedeutet „ein bisschen“?",
     options: ["A) a lot", "B) a little", "C) never", "D) every day"],
   },
   {
