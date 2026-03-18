@@ -80,7 +80,7 @@ jest.mock("../firebase", () => ({
 }));
 
 import { addDoc } from "../firebase";
-import AssignmentSubmissionPage from "./AssignmentSubmissionPage";
+import AssignmentSubmissionPage, { __TESTING__ } from "./AssignmentSubmissionPage";
 
 const renderPage = (initialEntries = ["/"]) =>
   render(
@@ -122,6 +122,88 @@ describe("AssignmentSubmissionPage", () => {
     expect(screen.getByRole("combobox")).toBeDisabled();
     expect(screen.getByText(/Opened from course\/workbook link/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /choose a different assignment instead/i })).toBeInTheDocument();
+  });
+
+
+  it("compares objective answers by section and ignores free-text numbered responses", () => {
+    const previousSubmission = `Teil 2:
+1. B
+2. C
+3. A
+4. C
+5. B
+6. B
+7. A
+8. C
+9. C
+10. B
+
+Teil 3:
+1. A
+2. A
+3. D
+4. A
+5. C
+
+Teil :4
+1. Ich esse gerne brot
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const currentSubmission = `Teil 2: chapter 9
+1. B
+2. D
+3. A
+4. C
+5. B
+6. C
+7. B
+8. C
+9. C
+10. B
+
+Teil 3:
+1. A
+2. A
+3. D
+4. A
+5. C
+
+Teil :4
+1. Ich esse gerne brot
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const diff = __TESTING__.buildResubmissionDiff({
+      previousSubmissionText: previousSubmission,
+      currentSubmissionText: currentSubmission,
+    });
+
+    expect(diff).toEqual({
+      mode: "objective",
+      changedAnswers: 3,
+      overlappingQuestions: 15,
+    });
+  });
+
+  it("falls back to text mode when numbered responses contain full-sentence answers", () => {
+    const previousSubmission = `Teil :4
+1. Ich esse gerne brot
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const currentSubmission = `Teil :4
+1. Ich esse gerne brot und suppe
+2. Ich esse nicht gerne reis
+3. Ich esse gern brot zum frühstrück`;
+
+    const diff = __TESTING__.buildResubmissionDiff({
+      previousSubmissionText: previousSubmission,
+      currentSubmissionText: currentSubmission,
+    });
+
+    expect(diff.mode).toBe("text");
+    expect(diff.changedCharacters).toBeGreaterThan(0);
   });
 
   it("stores the true chapter and canonical id in the submission payload", async () => {
