@@ -87,7 +87,6 @@ const tokenizeSubmission = (value) =>
     .filter(Boolean);
 
 const SECTION_HEADING_REGEX = /^teil\s*:?[\s-]*([a-z0-9._-]+)/i;
-const NUMBERED_LINE_REGEX = /^(\d+)\s*[).:-]?\s*(.+)$/;
 const SINGLE_OBJECTIVE_ANSWER_REGEX = /^(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)$/;
 const INLINE_OBJECTIVE_ANSWER_REGEX = /(\d+)\s*[).:-]?\s*([a-zA-Z0-9]+)(?=\s+\d+\s*[).:-]?\s*[a-zA-Z0-9]+|\s*$)/g;
 
@@ -96,11 +95,10 @@ const normalizeInlineObjectiveSequence = (value) =>
     .trim()
     .replace(/\s+/g, " ");
 
-const analyzeObjectiveAnswers = (value) => {
+const parseObjectiveAnswers = (value) => {
   const lines = String(value || "").split(/\r?\n/);
   const answersByQuestion = new Map();
   let currentSection = "default";
-  let hasNonObjectiveNumberedLines = false;
 
   lines.forEach((line) => {
     const trimmedLine = String(line || "").trim();
@@ -120,24 +118,18 @@ const analyzeObjectiveAnswers = (value) => {
       return;
     }
 
-    const numberedLineMatch = NUMBERED_LINE_REGEX.exec(trimmedLine);
-    if (!numberedLineMatch) return;
-
     const inlineMatches = [...trimmedLine.matchAll(INLINE_OBJECTIVE_ANSWER_REGEX)];
-    if (inlineMatches.length) {
-      const normalizedLine = normalizeInlineObjectiveSequence(trimmedLine);
-      const normalizedMatches = normalizeInlineObjectiveSequence(inlineMatches.map((match) => match[0]).join(" "));
-      if (normalizedLine === normalizedMatches) {
-        inlineMatches.forEach((match) => {
-          const questionNumber = String(match[1] || "").trim();
-          const answer = String(match[2] || "").trim().toLowerCase();
-          if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
-        });
-        return;
-      }
-    }
+    if (!inlineMatches.length) return;
 
-    hasNonObjectiveNumberedLines = true;
+    const normalizedLine = normalizeInlineObjectiveSequence(trimmedLine);
+    const normalizedMatches = normalizeInlineObjectiveSequence(inlineMatches.map((match) => match[0]).join(" "));
+    if (normalizedLine !== normalizedMatches) return;
+
+    inlineMatches.forEach((match) => {
+      const questionNumber = String(match[1] || "").trim();
+      const answer = String(match[2] || "").trim().toLowerCase();
+      if (questionNumber && answer) answersByQuestion.set(`${currentSection}::${questionNumber}`, answer);
+    });
   });
 
   return {
@@ -146,7 +138,7 @@ const analyzeObjectiveAnswers = (value) => {
   };
 };
 
-const getParsedObjectiveAnswers = (value) => analyzeObjectiveAnswers(value).answersByQuestion;
+const parseObjectiveAnswers = (value) => analyzeObjectiveAnswers(value).answersByQuestion;
 
 const countCharacterChanges = (previousText, currentText) => {
   const previousNormalized = normalizeSubmissionText(previousText);
@@ -2282,8 +2274,7 @@ const AssignmentSubmissionPage = () => {
 
 export const __TESTING__ = {
   buildResubmissionDiff,
-  parseObjectiveAnswers: getParsedObjectiveAnswers,
-  doesEntryMatchSelectedAssignment,
+  parseObjectiveAnswers,
 };
 
 export default AssignmentSubmissionPage;
