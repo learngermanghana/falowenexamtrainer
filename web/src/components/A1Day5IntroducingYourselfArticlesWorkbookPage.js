@@ -150,12 +150,12 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           Back to Course
         </button>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 5 Workbook · Articles, Adjectives and Personal Information
+          A1 · Day 5 Workbook · Introducing Yourself and Articles
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.2 · Self-practice workbook</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Use this in-app workbook to review German articles, adjective opposites, personal information, and
-          W-questions.
+          Use this in-app workbook to review introductions, articles, adjectives, personal information, and German
+          question words.
         </p>
       </div>
 
