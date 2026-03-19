@@ -2,6 +2,62 @@ import React, { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
+const heroImageUrl =
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=80";
+
+const heroCardStyle = {
+  ...styles.card,
+  padding: 0,
+  overflow: "hidden",
+};
+
+const heroLayoutStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+  alignItems: "stretch",
+};
+
+const heroContentStyle = {
+  padding: 24,
+  display: "grid",
+  gap: 14,
+  background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 60%, #f8fafc 100%)",
+};
+
+const heroEyebrowStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  width: "fit-content",
+  padding: "6px 12px",
+  borderRadius: 999,
+  background: "#dbeafe",
+  color: "#1d4ed8",
+  fontWeight: 700,
+  fontSize: 13,
+};
+
+const heroImageStyle = {
+  width: "100%",
+  height: "100%",
+  minHeight: 260,
+  objectFit: "cover",
+};
+
+const heroHighlightsStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+  gap: 10,
+};
+
+const heroHighlightCardStyle = {
+  border: "1px solid #dbeafe",
+  borderRadius: 14,
+  padding: 12,
+  background: "rgba(255,255,255,0.85)",
+  display: "grid",
+  gap: 4,
+};
+
 /** =========================
  *  Helpers
  *  ========================= */
@@ -295,15 +351,39 @@ const A1LetterWritingQuestionBookPage = () => {
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Schreiben has two parts: Teil 1 (Formular) and Teil 2 (Brief). Start with Teil 1 practice in the app,
-          then move to formal and informal letters for submission.
-        </p>
+      <header style={heroCardStyle}>
+        <div style={heroLayoutStyle}>
+          <div style={heroContentStyle}>
+            <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
+              Back to Course
+            </button>
+            <span style={heroEyebrowStyle}>A1 Schreiben • Day 12.3</span>
+            <div style={{ display: "grid", gap: 10 }}>
+              <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First</h1>
+              <p style={{ ...styles.subtitle, margin: 0 }}>
+                Master both parts of A1 Schreiben with a clear path: practice forms first, then build confident
+                formal and informal letters for submission.
+              </p>
+            </div>
+            <div style={heroHighlightsStyle}>
+              {[
+                { label: "Teil 1", text: "Read short prompts and complete important form details accurately." },
+                { label: "Teil 2", text: "Use the right opening, word order, and closing in every letter." },
+                { label: "Goal", text: "Move from guided examples to ready-to-submit writing practice." },
+              ].map((item) => (
+                <div key={item.label} style={heroHighlightCardStyle}>
+                  <strong style={{ fontSize: 14 }}>{item.label}</strong>
+                  <span style={{ lineHeight: 1.5, color: "#334155" }}>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <img
+            src={heroImageUrl}
+            alt="Notebook, pen, and coffee for German letter-writing practice"
+            style={heroImageStyle}
+          />
+        </div>
       </header>
 
       <>
