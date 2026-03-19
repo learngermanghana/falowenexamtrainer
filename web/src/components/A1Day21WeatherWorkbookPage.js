@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
 const headerImage =
@@ -37,8 +36,6 @@ const highlight = {
 };
 
 const A1ReadingPage = () => {
-  const navigate = useNavigate();
-
   return (
     <div style={styles.pageWrap}>
       
@@ -203,9 +200,12 @@ const A1ReadingPage = () => {
       </section>
 
       {/* BUTTON */}
-      <button style={styles.button} onClick={() => navigate(-1)}>
-        ← Back
-      </button>
+      <a
+        href="https://www.falowen.app/campus/course/a1-day-21-weather-workbook"
+        style={{ ...styles.button, textDecoration: "none", display: "inline-flex", justifyContent: "center" }}
+      >
+        Submit Assignment
+      </a>
     </div>
   );
 };
