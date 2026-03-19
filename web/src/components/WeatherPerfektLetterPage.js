@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -51,7 +51,7 @@ const imgStyle = {
   borderRadius: 12,
   marginBottom: 12,
   objectFit: "cover",
-  maxHeight: 180, // cleaner UI
+  maxHeight: 180,
   border: "1px solid #e5e7eb",
   transition: "transform 220ms ease",
 };
@@ -65,12 +65,244 @@ const linkBtn = {
   gap: 8,
 };
 
+const quizQuestionStyle = {
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: 12,
+  background: "#fff",
+  display: "grid",
+  gap: 10,
+};
+
+const optionBtn = (selected, correct, showResult) => ({
+  width: "100%",
+  textAlign: "left",
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: showResult
+    ? selected === correct
+      ? "1px solid #16a34a"
+      : selected
+      ? "1px solid #dc2626"
+      : "1px solid #e5e7eb"
+    : selected
+    ? "1px solid #4f46e5"
+    : "1px solid #e5e7eb",
+  background: showResult
+    ? selected === correct
+      ? "#f0fdf4"
+      : selected
+      ? "#fef2f2"
+      : "#fff"
+    : selected
+    ? "#eef2ff"
+    : "#fff",
+  cursor: "pointer",
+  fontSize: 15,
+  lineHeight: 1.5,
+});
+
+const inputStyle = {
+  width: "100%",
+  padding: "12px 14px",
+  borderRadius: 12,
+  border: "1px solid #d1d5db",
+  fontSize: 15,
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+const normalize = (value) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ")
+    .replace(/[.?!,]/g, "");
+
+const quizData = [
+  {
+    id: 1,
+    type: "mcq",
+    question: 'Which word do we use for months? ("in August")',
+    options: ["am", "im", "um"],
+    correct: "im",
+    explanation: 'We use "im" with months: Im August.',
+  },
+  {
+    id: 2,
+    type: "mcq",
+    question: 'Which word do we use for days? ("on Monday")',
+    options: ["am", "im", "um"],
+    correct: "am",
+    explanation: 'We use "am" with days: Am Montag.',
+  },
+  {
+    id: 3,
+    type: "mcq",
+    question: 'Which word do we use for time? ("at 10 o’clock")',
+    options: ["um", "im", "am"],
+    correct: "um",
+    explanation: 'We use "um" for clock time: Um 10 Uhr.',
+  },
+  {
+    id: 4,
+    type: "mcq",
+    question: 'Choose the correct sentence:',
+    options: [
+      "Im Montag habe ich Deutsch.",
+      "Am Montag habe ich Deutsch.",
+      "Um Montag habe ich Deutsch.",
+    ],
+    correct: "Am Montag habe ich Deutsch.",
+    explanation: 'Days take "am".',
+  },
+  {
+    id: 5,
+    type: "mcq",
+    question: 'Choose the correct sentence:',
+    options: [
+      "Um August fahre ich nach Kumasi.",
+      "Im August fahre ich nach Kumasi.",
+      "Am August fahre ich nach Kumasi.",
+    ],
+    correct: "Im August fahre ich nach Kumasi.",
+    explanation: 'Months take "im".',
+  },
+  {
+    id: 6,
+    type: "mcq",
+    question: 'Choose the correct sentence:',
+    options: [
+      "Ich komme am 8 Uhr.",
+      "Ich komme im 8 Uhr.",
+      "Ich komme um 8 Uhr.",
+    ],
+    correct: "Ich komme um 8 Uhr.",
+    explanation: 'Clock time takes "um".',
+  },
+  {
+    id: 7,
+    type: "mcq",
+    question: 'What is the correct weather sentence?',
+    options: ["Es ist regnet.", "Es regnet.", "Es Regen."],
+    correct: "Es regnet.",
+    explanation: 'For weather, say: "Es regnet."',
+  },
+  {
+    id: 8,
+    type: "mcq",
+    question: 'Which one means: "The sun is shining"?',
+    options: ["Die Sonne scheint.", "Die Sonne ist kalt.", "Es schneit."],
+    correct: "Die Sonne scheint.",
+    explanation: '"Die Sonne scheint" = The sun is shining.',
+  },
+  {
+    id: 9,
+    type: "mcq",
+    question: 'Which one is a season?',
+    options: ["der Montag", "der Sommer", "der März"],
+    correct: "der Sommer",
+    explanation: '"der Sommer" is a season.',
+  },
+  {
+    id: 10,
+    type: "mcq",
+    question: 'Which sentence uses Perfekt correctly?',
+    options: [
+      "Ich habe gegangen.",
+      "Ich bin gegangen.",
+      "Ich bin gespielt.",
+    ],
+    correct: "Ich bin gegangen.",
+    explanation: '"gehen" uses "sein" in Perfekt.',
+  },
+  {
+    id: 11,
+    type: "mcq",
+    question: 'Which sentence uses Perfekt correctly?',
+    options: [
+      "Er hat gegessen.",
+      "Er ist gegessen.",
+      "Er hat gegangen.",
+    ],
+    correct: "Er hat gegessen.",
+    explanation: '"essen" normally uses "haben".',
+  },
+  {
+    id: 12,
+    type: "input",
+    question: 'Complete with one word: ___ Montag habe ich einen Termin.',
+    correctAnswers: ["am"],
+    explanation: 'Correct: "Am Montag ..."',
+  },
+  {
+    id: 13,
+    type: "input",
+    question: 'Complete with one word: ___ 10 Uhr komme ich.',
+    correctAnswers: ["um"],
+    explanation: 'Correct: "Um 10 Uhr ..."',
+  },
+  {
+    id: 14,
+    type: "input",
+    question: 'Complete with one word: ___ Juli haben wir Ferien.',
+    correctAnswers: ["im"],
+    explanation: 'Correct: "Im Juli ..."',
+  },
+  {
+    id: 15,
+    type: "input",
+    question: 'Write the missing auxiliary verb: Ich ___ gespielt.',
+    correctAnswers: ["habe"],
+    explanation: 'Correct: "Ich habe gespielt."',
+  },
+  {
+    id: 16,
+    type: "input",
+    question: 'Write the missing auxiliary verb: Wir ___ gefahren.',
+    correctAnswers: ["sind"],
+    explanation: 'Correct: "Wir sind gefahren."',
+  },
+];
+
 const WeatherPerfektLetterPage = () => {
   const navigate = useNavigate();
+  const [answers, setAnswers] = useState({});
+  const [showResults, setShowResults] = useState(false);
+
+  const score = useMemo(() => {
+    let total = quizData.length;
+    let correct = 0;
+
+    quizData.forEach((q) => {
+      const userAnswer = answers[q.id];
+
+      if (q.type === "mcq") {
+        if (userAnswer === q.correct) correct += 1;
+      } else {
+        const normalizedUser = normalize(userAnswer || "");
+        const ok = q.correctAnswers.some((ans) => normalize(ans) === normalizedUser);
+        if (ok) correct += 1;
+      }
+    });
+
+    return { correct, total };
+  }, [answers]);
+
+  const isCorrect = (q) => {
+    const userAnswer = answers[q.id];
+    if (q.type === "mcq") return userAnswer === q.correct;
+    const normalizedUser = normalize(userAnswer || "");
+    return q.correctAnswers.some((ans) => normalize(ans) === normalizedUser);
+  };
+
+  const resetQuiz = () => {
+    setAnswers({});
+    setShowResults(false);
+  };
 
   return (
     <div style={styles.page}>
-      {/* subtle animations (no extra libs) */}
       <style>{`
         .falowen-section { animation: falowenFadeUp 420ms ease both; }
         .falowen-section:nth-child(2) { animation-delay: 40ms; }
@@ -80,19 +312,33 @@ const WeatherPerfektLetterPage = () => {
         .falowen-section:nth-child(6) { animation-delay: 200ms; }
         .falowen-section:nth-child(7) { animation-delay: 240ms; }
         .falowen-section:nth-child(8) { animation-delay: 280ms; }
+        .falowen-section:nth-child(9) { animation-delay: 320ms; }
+
         @keyframes falowenFadeUp {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
+
         .hoverCard:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.08); }
         .hoverImg:hover { transform: scale(1.01); }
+
+        .quizGrid {
+          display: grid;
+          gap: 12px;
+        }
+
+        @media (max-width: 640px) {
+          .quizActions {
+            display: grid !important;
+            gap: 10px !important;
+          }
+        }
       `}</style>
 
       <button style={styles.secondaryButton} onClick={() => navigate(-1)}>
         ← Back
       </button>
 
-      {/* INTRO */}
       <section style={cardStyle} className="falowen-section hoverCard">
         <h1 style={{ margin: 0 }}>
           Chapter 13: Weather + Seasons + Dates/Time + Simple Letter Writing (A1)
@@ -112,7 +358,6 @@ const WeatherPerfektLetterPage = () => {
           <span style={chip}>weil = verb at end</span>
         </div>
 
-        {/* ✅ course link requested */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <a
             href="https://www.falowen.app/campus/course/weather-perfekt-letter-13"
@@ -123,12 +368,11 @@ const WeatherPerfektLetterPage = () => {
             Open this course lesson ↗
           </a>
           <span style={{ ...noteStyle, padding: "8px 10px", borderStyle: "solid" }}>
-            Tip: Read the lesson, then practice the questions + mini tasks below.
+            Tip: Read the lesson, then practice the light test below.
           </span>
         </div>
       </section>
 
-      {/* WEATHER */}
       <section style={cardStyle} className="falowen-section hoverCard">
         <h2 style={{ margin: 0 }}>1) Weather (A1)</h2>
 
@@ -147,7 +391,6 @@ const WeatherPerfektLetterPage = () => {
         </ul>
       </section>
 
-      {/* ✅ NEW: HOW TO ASK ABOUT WEATHER */}
       <section style={cardStyle} className="falowen-section hoverCard">
         <h2 style={{ margin: 0 }}>1.1) How to ask for the weather (A1)</h2>
 
@@ -181,7 +424,6 @@ const WeatherPerfektLetterPage = () => {
         </div>
       </section>
 
-      {/* SEASONS */}
       <section style={cardStyle} className="falowen-section hoverCard">
         <h2 style={{ margin: 0 }}>2) Seasons + Months</h2>
 
@@ -209,7 +451,6 @@ const WeatherPerfektLetterPage = () => {
         </div>
       </section>
 
-      {/* IM AM UM */}
       <section style={cardStyle} className="falowen-section hoverCard">
         <h2 style={{ margin: 0 }}>3) im / am / um</h2>
 
@@ -222,7 +463,6 @@ const WeatherPerfektLetterPage = () => {
         </div>
       </section>
 
-      {/* ✅ NEW: PERFECT NOTE (EXACT NOTE AS REQUESTED) */}
       <section style={cardStyle} className="falowen-section hoverCard">
         <h2 style={{ margin: 0 }}>3.1) A1 Grammar Notes: Perfekt (Past Tense)</h2>
 
@@ -276,7 +516,9 @@ const WeatherPerfektLetterPage = () => {
           </ul>
 
           <h4 style={{ marginBottom: 8 }}>4) Using "haben" in Perfekt</h4>
-          <p style={{ marginTop: 0 }}>Most verbs use <strong>haben</strong> as the auxiliary verb.</p>
+          <p style={{ marginTop: 0 }}>
+            Most verbs use <strong>haben</strong> as the auxiliary verb.
+          </p>
           <ul style={listStyle}>
             <li>Ich habe gespielt. (I played.)</li>
             <li>Er hat gegessen. (He ate.)</li>
@@ -297,35 +539,45 @@ const WeatherPerfektLetterPage = () => {
           </ul>
 
           <h4 style={{ marginBottom: 8 }}>6) More examples</h4>
-          <p style={{ marginBottom: 6 }}><strong>Regular verbs with "haben":</strong></p>
+          <p style={{ marginBottom: 6 }}>
+            <strong>Regular verbs with "haben":</strong>
+          </p>
           <ul style={listStyle}>
             <li>machen (to do/make) → Ich habe gemacht. (I did/made.)</li>
             <li>arbeiten (to work) → Du hast gearbeitet. (You worked.)</li>
           </ul>
 
-          <p style={{ marginBottom: 6 }}><strong>Irregular verbs with "haben":</strong></p>
+          <p style={{ marginBottom: 6 }}>
+            <strong>Irregular verbs with "haben":</strong>
+          </p>
           <ul style={listStyle}>
             <li>sehen (to see) → Er hat gesehen. (He saw.)</li>
             <li>schreiben (to write) → Wir haben geschrieben. (We wrote.)</li>
           </ul>
 
-          <p style={{ marginBottom: 6 }}><strong>Directional verbs with "sein":</strong></p>
+          <p style={{ marginBottom: 6 }}>
+            <strong>Directional verbs with "sein":</strong>
+          </p>
           <ul style={listStyle}>
             <li>kommen (to come) → Ihr seid gekommen. (You all came.)</li>
             <li>fahren (to drive/go) → Sie sind gefahren. (They drove/went.)</li>
           </ul>
 
-          <p style={{ marginBottom: 6 }}><strong>Separable verbs:</strong></p>
+          <p style={{ marginBottom: 6 }}>
+            <strong>Separable verbs:</strong>
+          </p>
           <ul style={listStyle}>
             <li>aufräumen (to tidy up) → Ich habe aufgeräumt. (I tidied up.)</li>
             <li>anrufen (to call) → Du hast angerufen. (You called.)</li>
           </ul>
         </div>
 
-        {/* small quick practice */}
         <div style={noteStyle}>
           <strong>Small quick practice (2 minutes):</strong>
-          <div>Make 6 Perfekt sentences (3 with <strong>haben</strong>, 3 with <strong>sein</strong>):</div>
+          <div>
+            Make 6 Perfekt sentences (3 with <strong>haben</strong>, 3 with{" "}
+            <strong>sein</strong>):
+          </div>
           <div style={{ marginTop: 8 }}>
             • spielen / lernen / aufräumen <br />
             • gehen / kommen / fahren
@@ -336,7 +588,6 @@ const WeatherPerfektLetterPage = () => {
         </div>
       </section>
 
-      {/* PRICE + REQUEST */}
       <section style={cardStyle} className="falowen-section hoverCard">
         <h2 style={{ margin: 0 }}>4) Asking for Price (A1)</h2>
 
@@ -363,6 +614,121 @@ const WeatherPerfektLetterPage = () => {
             <div>• Könnten Sie mir bitte Informationen geben?</div>
             <div>• Könnten Sie mir bitte sagen, wann der Kurs beginnt?</div>
           </div>
+        </div>
+      </section>
+
+      <section style={cardStyle} className="falowen-section hoverCard">
+        <h2 style={{ margin: 0 }}>5) Light Knowledge Test</h2>
+
+        <div style={noteStyle}>
+          This is a small practice check inside the grammar book. It is only for
+          quick understanding.
+        </div>
+
+        {showResults && (
+          <div
+            style={{
+              ...boxStyle,
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "space-between",
+              gap: 10,
+              alignItems: "center",
+            }}
+          >
+            <div>
+              <strong>Your score:</strong> {score.correct}/{score.total}
+            </div>
+            <div
+              style={{
+                fontWeight: 700,
+                color:
+                  score.correct >= Math.ceil(score.total * 0.7) ? "#166534" : "#991b1b",
+              }}
+            >
+              {score.correct >= Math.ceil(score.total * 0.7)
+                ? "Good understanding"
+                : "Review the notes again"}
+            </div>
+          </div>
+        )}
+
+        <div className="quizGrid">
+          {quizData.map((q, index) => (
+            <div key={q.id} style={quizQuestionStyle}>
+              <div style={{ fontWeight: 700, lineHeight: 1.55 }}>
+                {index + 1}. {q.question}
+              </div>
+
+              {q.type === "mcq" ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  {q.options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() =>
+                        setAnswers((prev) => ({
+                          ...prev,
+                          [q.id]: option,
+                        }))
+                      }
+                      style={optionBtn(answers[q.id] === option, q.correct, showResults)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  value={answers[q.id] || ""}
+                  onChange={(e) =>
+                    setAnswers((prev) => ({
+                      ...prev,
+                      [q.id]: e.target.value,
+                    }))
+                  }
+                  placeholder="Write your answer"
+                  style={inputStyle}
+                />
+              )}
+
+              {showResults && (
+                <div
+                  style={{
+                    borderRadius: 12,
+                    padding: 10,
+                    fontSize: 14,
+                    lineHeight: 1.65,
+                    background: isCorrect(q) ? "#f0fdf4" : "#fef2f2",
+                    border: isCorrect(q) ? "1px solid #bbf7d0" : "1px solid #fecaca",
+                    color: isCorrect(q) ? "#166534" : "#991b1b",
+                  }}
+                >
+                  <strong>{isCorrect(q) ? "Correct." : "Not correct."}</strong>{" "}
+                  {q.explanation}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="quizActions" style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+          <button
+            type="button"
+            style={styles.primaryButton}
+            onClick={() => setShowResults(true)}
+          >
+            Check answers
+          </button>
+
+          <button
+            type="button"
+            style={styles.secondaryButton}
+            onClick={resetQuiz}
+          >
+            Reset
+          </button>
         </div>
       </section>
     </div>
