@@ -43,58 +43,271 @@ const heroImageStyle = {
   objectFit: "cover",
 };
 
-const heroHighlightsStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-  gap: 10,
-};
-
-const heroHighlightCardStyle = {
+const cleanIntroBoxStyle = {
   border: "1px solid #dbeafe",
+  background: "#eff6ff",
   borderRadius: 14,
-  padding: 12,
-  background: "rgba(255,255,255,0.85)",
-  display: "grid",
-  gap: 4,
+  padding: 14,
+  lineHeight: 1.7,
+  color: "#1e3a8a",
 };
 
 const sectionCardStyle = {
   ...styles.card,
   display: "grid",
+  gap: 12,
+};
+
+const infoBoxStyle = {
+  border: "1px solid #e5e7eb",
+  borderRadius: 12,
+  padding: 14,
+  display: "grid",
+  gap: 10,
+  background: "#fff",
+};
+
+const notesBannerStyle = {
+  border: "1px solid #bfdbfe",
+  background: "linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)",
+  borderRadius: 16,
+  padding: 16,
+  display: "grid",
+  gap: 6,
+};
+
+const assignmentBannerStyle = {
+  border: "1px solid #fb923c",
+  background: "linear-gradient(135deg, #fff7ed 0%, #ffedd5 55%, #fed7aa 100%)",
+  borderRadius: 18,
+  padding: 18,
+  display: "grid",
+  gap: 10,
+  boxShadow: "0 10px 25px rgba(249, 115, 22, 0.08)",
+};
+
+const assignmentBannerTopStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  flexWrap: "wrap",
+};
+
+const assignmentBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 40,
+  height: 40,
+  borderRadius: 999,
+  background: "#ea580c",
+  color: "#fff",
+  fontSize: 20,
+  fontWeight: 800,
+  flexShrink: 0,
+};
+
+const assignmentBannerTitleWrapStyle = {
+  display: "grid",
+  gap: 2,
+};
+
+const assignmentBannerTitleStyle = {
+  margin: 0,
+  fontSize: 20,
+  fontWeight: 900,
+  color: "#9a3412",
+  lineHeight: 1.2,
+};
+
+const assignmentBannerSubtitleStyle = {
+  margin: 0,
+  color: "#b45309",
+  fontSize: 14,
+  fontWeight: 700,
+};
+
+const assignmentBannerTextStyle = {
+  color: "#7c2d12",
+  lineHeight: 1.7,
+  fontSize: 15,
+};
+
+const assignmentBannerActionRowStyle = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: 10,
+  alignItems: "center",
+};
+
+const assignmentMiniPillStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "8px 12px",
+  borderRadius: 999,
+  background: "rgba(255,255,255,0.72)",
+  border: "1px solid #fdba74",
+  color: "#9a3412",
+  fontSize: 13,
+  fontWeight: 700,
+};
+
+const assignmentCardStyle = {
+  border: "1px solid #fed7aa",
+  background: "#fffaf5",
+  borderRadius: 14,
+  padding: 14,
+  display: "grid",
   gap: 10,
 };
 
-const softBlueBoxStyle = {
+const scenarioTextStyle = {
+  lineHeight: 1.8,
+  fontSize: 16,
+  color: "#0f172a",
+};
+
+const formWrapStyle = {
+  border: "1px solid #cbd5e1",
+  borderRadius: 16,
+  overflow: "hidden",
+  background: "#fff",
+};
+
+const formHeaderStyle = {
+  padding: "14px 16px",
+  background: "#f8fafc",
+  borderBottom: "1px solid #e5e7eb",
+  display: "grid",
+  gap: 4,
+};
+
+const formTableStyle = {
+  display: "grid",
+  gap: 0,
+};
+
+const formRowStyle = {
+  display: "grid",
+  gridTemplateColumns: "minmax(120px, 180px) 1fr minmax(110px, 160px)",
+  borderBottom: "1px solid #e5e7eb",
+};
+
+const mobileFormRowStyle = {
+  display: "grid",
+  gridTemplateColumns: "1fr",
+  borderBottom: "1px solid #e5e7eb",
+};
+
+const formLabelStyle = {
+  padding: 12,
+  fontWeight: 800,
+  background: "#f8fafc",
+};
+
+const formPromptStyle = {
+  padding: 12,
+  lineHeight: 1.6,
+};
+
+const formAnswerStyle = {
+  padding: 12,
+  borderLeft: "1px solid #e5e7eb",
+  color: "#64748b",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  background: "#fcfcfd",
+  fontWeight: 700,
+};
+
+const mobileFormAnswerStyle = {
+  padding: 12,
+  color: "#64748b",
+  display: "flex",
+  alignItems: "center",
+  background: "#fcfcfd",
+  borderTop: "1px dashed #cbd5e1",
+  fontWeight: 700,
+};
+
+const answersGridStyle = {
+  display: "grid",
+  gap: 10,
+};
+
+const answerCardStyle = {
   border: "1px solid #bfdbfe",
   background: "#eff6ff",
   borderRadius: 12,
   padding: 12,
   display: "grid",
-  gap: 8,
+  gap: 4,
 };
 
-const softOrangeBoxStyle = {
-  border: "1px solid #fdba74",
-  background: "#fff7ed",
-  borderRadius: 12,
+const phraseSectionGridStyle = {
+  display: "grid",
+  gap: 12,
+};
+
+const phraseCategoryStyle = {
+  border: "1px solid #e5e7eb",
+  borderRadius: 14,
   padding: 12,
+  background: "#fff",
   display: "grid",
-  gap: 8,
-};
-
-const phraseGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
   gap: 10,
 };
 
-const phraseCardStyle = {
-  border: "1px solid #e5e7eb",
+const phraseCategoryTitleStyle = {
+  margin: 0,
+  fontSize: 16,
+  fontWeight: 800,
+  color: "#0f172a",
+};
+
+const mobilePhraseListStyle = {
+  display: "grid",
+  gap: 10,
+};
+
+const mobilePhraseCardStyle = {
+  border: "1px solid #dbeafe",
+  background: "#f8fbff",
   borderRadius: 12,
   padding: 12,
-  background: "#ffffff",
   display: "grid",
   gap: 6,
+};
+
+const mobilePhraseGermanStyle = {
+  fontWeight: 800,
+  color: "#1e3a8a",
+  lineHeight: 1.5,
+  fontSize: 15,
+};
+
+const mobilePhraseMeaningStyle = {
+  color: "#475569",
+  fontSize: 14,
+  lineHeight: 1.5,
+};
+
+const mobilePhraseExampleStyle = {
+  color: "#0f172a",
+  fontSize: 14,
+  lineHeight: 1.6,
+  paddingTop: 4,
+  borderTop: "1px dashed #cbd5e1",
+};
+
+const mobileTipStyle = {
+  border: "1px solid #fde68a",
+  background: "#fffbeb",
+  borderRadius: 12,
+  padding: 12,
+  lineHeight: 1.7,
+  color: "#92400e",
 };
 
 const noteStyle = {
@@ -113,91 +326,9 @@ const exampleBlockStyle = {
   gap: 8,
 };
 
-const teil1ScenarioGridStyle = {
+const simpleGridStyle = {
   display: "grid",
   gap: 10,
-};
-
-const teil1ScenarioCardStyle = {
-  display: "grid",
-  gridTemplateColumns: "40px 1fr",
-  gap: 10,
-  border: "1px solid #e5e7eb",
-  borderRadius: 12,
-  padding: 12,
-  background: "#fff",
-};
-
-const teil1ScenarioNumberStyle = {
-  width: 28,
-  height: 28,
-  borderRadius: 999,
-  background: "#dbeafe",
-  color: "#1d4ed8",
-  fontWeight: 800,
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginTop: 2,
-};
-
-const teil1FormCardStyle = {
-  border: "1px solid #e5e7eb",
-  borderRadius: 14,
-  padding: 14,
-  background: "#fff",
-  display: "grid",
-  gap: 14,
-};
-
-const teil1FormHeaderStyle = {
-  display: "grid",
-  gap: 4,
-};
-
-const teil1FormGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))",
-  gap: 12,
-};
-
-const teil1FieldCardStyle = {
-  border: "1px solid #e5e7eb",
-  borderRadius: 12,
-  padding: 12,
-  display: "grid",
-  gap: 8,
-  background: "#fff",
-};
-
-const teil1FieldLabelStyle = {
-  fontWeight: 800,
-  color: "#0f172a",
-};
-
-const teil1FieldValueStyle = {
-  color: "#334155",
-  lineHeight: 1.6,
-};
-
-const teil1AnswerBlankStyle = {
-  minHeight: 40,
-  border: "1px dashed #94a3b8",
-  borderRadius: 10,
-  display: "flex",
-  alignItems: "center",
-  padding: "8px 10px",
-  color: "#64748b",
-  background: "#f8fafc",
-};
-
-const teil1HintBoxStyle = {
-  border: "1px solid #fde68a",
-  background: "#fffbeb",
-  borderRadius: 12,
-  padding: 12,
-  display: "grid",
-  gap: 8,
 };
 
 const Section = ({ title, children }) => (
@@ -207,24 +338,12 @@ const Section = ({ title, children }) => (
   </section>
 );
 
-const InfoBox = ({ title, children, tone = "normal" }) => {
-  const boxStyle =
-    tone === "blue" ? softBlueBoxStyle : tone === "orange" ? softOrangeBoxStyle : {
-      border: "1px solid #e5e7eb",
-      borderRadius: 12,
-      padding: 12,
-      display: "grid",
-      gap: 8,
-      background: "#fff",
-    };
-
-  return (
-    <div style={boxStyle}>
-      {title && <div style={{ fontWeight: 900 }}>{title}</div>}
-      {children}
-    </div>
-  );
-};
+const InfoBox = ({ title, children }) => (
+  <div style={infoBoxStyle}>
+    {title && <div style={{ fontWeight: 900 }}>{title}</div>}
+    {children}
+  </div>
+);
 
 const BulletList = ({ items }) => (
   <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
@@ -244,50 +363,38 @@ const RuleParagraphs = ({ items }) => (
   </div>
 );
 
-const PhraseGrid = ({ items }) => (
-  <div style={phraseGridStyle}>
-    {items.map((item, index) => (
-      <div key={`${index}-${item.german}`} style={phraseCardStyle}>
-        <strong>{item.german}</strong>
-        <span style={{ color: "#475569" }}>{item.english}</span>
-        {item.example ? (
-          <span style={{ color: "#0f172a", lineHeight: 1.6 }}>
-            <strong>Example:</strong> {item.example}
-          </span>
-        ) : null}
-      </div>
-    ))}
-  </div>
-);
+const ResponsiveFormRow = ({ label, prompt, answerHint, isStatic = false }) => (
+  <>
+    <div className="desktop-form-row" style={formRowStyle}>
+      <div style={formLabelStyle}>{label}</div>
+      <div style={formPromptStyle}>{prompt}</div>
+      <div style={formAnswerStyle}>{isStatic ? "" : answerHint}</div>
+    </div>
 
-const Teil1FormField = ({ label, prompt, answerHint }) => (
-  <div style={teil1FieldCardStyle}>
-    <div style={teil1FieldLabelStyle}>{label}</div>
-    <div style={teil1FieldValueStyle}>{prompt}</div>
-    <div style={teil1AnswerBlankStyle}>{answerHint}</div>
-  </div>
+    <div className="mobile-form-row" style={mobileFormRowStyle}>
+      <div style={formLabelStyle}>{label}</div>
+      <div style={formPromptStyle}>{prompt}</div>
+      {!isStatic ? <div style={mobileFormAnswerStyle}>{answerHint}</div> : null}
+    </div>
+  </>
 );
 
 const A1LetterWritingQuestionBookPage = () => {
   const navigate = useNavigate();
 
-  const TEIL1_FORM_SAMPLE = useMemo(
-    () => [
-      "Ihre Bekannte Eva Kadavy verbringt mit ihrem Ehemann und zwei Söhnen (8 und 11 Jahre) Ferien in Seeheim.",
-      "Im Reisebüro reserviert sie für den kommenden Sonntag eine Rundfahrt am Bodensee.",
-      "Eva Kadavy kann nicht mit Kreditkarte bezahlen.",
-      "Ergänzen Sie für sie die fünf fehlenden Angaben im Anmeldeformular.",
-    ],
+  const TEIL1_SCENARIO_TEXT = useMemo(
+    () =>
+      "Ihre Bekannte Eva Kadavy verbringt mit ihrem Ehemann und zwei Söhnen (8 und 11 Jahre) Ferien in Seeheim. Im Reisebüro reserviert sie für den kommenden Sonntag eine Rundfahrt am Bodensee. Eva Kadavy kann nicht mit Kreditkarte bezahlen. Ergänzen Sie für sie die fünf fehlenden Angaben im Anmeldeformular.",
     []
   );
 
   const TEIL1_SOLUTIONS = useMemo(
     () => [
-      "(1) Anzahl der Personen: 4 / vier",
-      "(2) Davon Kinder: 2 / zwei",
-      "(3) PLZ, Urlaubsort: 78014 Seeheim",
-      "(4) Zahlungsweise: bar",
-      "(5) Reisetermin: Sonntag / nächsten Sonntag",
+      { label: "(1) Anzahl der Personen", value: "4 / vier" },
+      { label: "(2) Davon Kinder", value: "2 / zwei" },
+      { label: "(3) PLZ, Urlaubsort", value: "78014 Seeheim" },
+      { label: "(4) Zahlungsweise", value: "bar" },
+      { label: "(5) Reisetermin", value: "Sonntag / nächsten Sonntag" },
     ],
     []
   );
@@ -367,57 +474,77 @@ const A1LetterWritingQuestionBookPage = () => {
     []
   );
 
-  const FORMAL_PHRASES = useMemo(
+  const FORMAL_PHRASE_GROUPS = useMemo(
     () => [
       {
-        german: "Ich schreibe Ihnen, weil ich eine Anfrage stellen möchte.",
-        english: "I am writing to you because I would like to make an enquiry.",
-        example: "Ich schreibe Ihnen, weil ich eine Anfrage zu Ihrem Kurs stellen möchte.",
+        title: "1. Why you are writing",
+        items: [
+          {
+            german: "Ich schreibe Ihnen, weil ich eine Anfrage stellen möchte.",
+            english: "I am writing because I would like to make an enquiry.",
+            example: "Ich schreibe Ihnen, weil ich eine Anfrage zu Ihrem Kurs stellen möchte.",
+          },
+          {
+            german: "Ich hätte gern weitere Informationen.",
+            english: "I would like more information.",
+            example: "Ich hätte gern weitere Informationen über die Anmeldung.",
+          },
+        ],
       },
       {
-        german: "Ich möchte mich anmelden.",
-        english: "I would like to register.",
-        example: "Ich möchte mich für den Deutschkurs anmelden.",
+        title: "2. Asking for information",
+        items: [
+          {
+            german: "Könnten Sie mir bitte Informationen über ... geben?",
+            english: "Could you please give me information about ...?",
+            example: "Könnten Sie mir bitte Informationen über Ihre Kurse geben?",
+          },
+          {
+            german: "Könnten Sie mir bitte helfen?",
+            english: "Could you please help me?",
+            example: "Könnten Sie mir bitte bei der Anmeldung helfen?",
+          },
+        ],
       },
       {
-        german: "Ich möchte einen Termin absagen.",
-        english: "I would like to cancel an appointment.",
-        example: "Ich möchte den Termin für Montag absagen.",
+        title: "3. Asking about price",
+        items: [
+          {
+            german: "Wie viel kostet ...?",
+            english: "How much does ... cost?",
+            example: "Wie viel kostet der Deutschkurs?",
+          },
+          {
+            german: "Wie hoch ist die Gebühr?",
+            english: "How much is the fee?",
+            example: "Wie hoch ist die Anmeldegebühr?",
+          },
+          {
+            german: "Könnten Sie mir bitte den Preis mitteilen?",
+            english: "Could you please tell me the price?",
+            example: "Könnten Sie mir bitte den Preis mitteilen?",
+          },
+        ],
       },
       {
-        german: "Könnten Sie mir bitte Informationen über ... geben?",
-        english: "Could you please give me information about ...?",
-        example: "Könnten Sie mir bitte Informationen über Ihre Kurse geben?",
-      },
-      {
-        german: "Wie viel kostet ...?",
-        english: "How much does ... cost?",
-        example: "Wie viel kostet der Deutschkurs?",
-      },
-      {
-        german: "Wie hoch ist die Gebühr?",
-        english: "How much is the fee?",
-        example: "Wie hoch ist die Anmeldegebühr?",
-      },
-      {
-        german: "Könnten Sie mir bitte den Preis mitteilen?",
-        english: "Could you please tell me the price?",
-        example: "Könnten Sie mir bitte den Preis mitteilen?",
-      },
-      {
-        german: "Ich hätte gern weitere Informationen.",
-        english: "I would like more information.",
-        example: "Ich hätte gern weitere Informationen über die Anmeldung.",
-      },
-      {
-        german: "Bitte antworten Sie mir bald.",
-        english: "Please reply to me soon.",
-        example: "Bitte antworten Sie mir bald.",
-      },
-      {
-        german: "Könnten Sie mir bitte helfen?",
-        english: "Could you please help me?",
-        example: "Könnten Sie mir bitte bei der Anmeldung helfen?",
+        title: "4. Requests and appointments",
+        items: [
+          {
+            german: "Ich möchte mich anmelden.",
+            english: "I would like to register.",
+            example: "Ich möchte mich für den Deutschkurs anmelden.",
+          },
+          {
+            german: "Ich möchte einen Termin absagen.",
+            english: "I would like to cancel an appointment.",
+            example: "Ich möchte den Termin für Montag absagen.",
+          },
+          {
+            german: "Bitte antworten Sie mir bald.",
+            english: "Please reply to me soon.",
+            example: "Bitte antworten Sie mir bald.",
+          },
+        ],
       },
     ],
     []
@@ -425,56 +552,15 @@ const A1LetterWritingQuestionBookPage = () => {
 
   const INFORMAL_PHRASES = useMemo(
     () => [
-      {
-        german: "Ich gratuliere dir.",
-        english: "I congratulate you.",
-        example: "Ich gratuliere dir zum Geburtstag.",
-      },
-      {
-        german: "Herzlichen Glückwunsch zum Geburtstag!",
-        english: "Happy birthday / Congratulations on your birthday!",
-        example: "Herzlichen Glückwunsch zum Geburtstag, Anna!",
-      },
-      {
-        german: "Ich wünsche dir alles Gute.",
-        english: "I wish you all the best.",
-        example: "Ich wünsche dir alles Gute zum Geburtstag.",
-      },
-      {
-        german: "Machst du eine Feier?",
-        english: "Are you having a celebration?",
-        example: "Machst du am Samstag eine Feier?",
-      },
-      {
-        german: "Wo findet die Feier statt?",
-        english: "Where is the celebration taking place?",
-        example: "Wo findet die Feier statt?",
-      },
-      {
-        german: "Kann ich mit meiner Familie kommen?",
-        english: "Can I come with my family?",
-        example: "Kann ich mit meiner Familie kommen?",
-      },
-      {
-        german: "Ich komme in den Urlaub.",
-        english: "I am coming on holiday.",
-        example: "Ich schreibe dir, weil ich im Sommer in den Urlaub komme.",
-      },
-      {
-        german: "Ich fahre ans Meer.",
-        english: "I am going to the sea.",
-        example: "Im Juli fahre ich ans Meer.",
-      },
-      {
-        german: "Wir machen Ferien.",
-        english: "We are going on vacation.",
-        example: "Wir machen im August Ferien.",
-      },
-      {
-        german: "Ich freue mich auf deine Feier.",
-        english: "I am looking forward to your celebration.",
-        example: "Ich freue mich auf deine Feier.",
-      },
+      "Ich gratuliere dir zum Geburtstag.",
+      "Herzlichen Glückwunsch zum Geburtstag!",
+      "Ich wünsche dir alles Gute.",
+      "Machst du eine Feier?",
+      "Wo findet die Feier statt?",
+      "Kann ich mit meiner Familie kommen?",
+      "Ich freue mich auf deine Feier.",
+      "Ich komme mit meiner Familie.",
+      "Wir fahren mit dem Auto.",
     ],
     []
   );
@@ -487,10 +573,6 @@ const A1LetterWritingQuestionBookPage = () => {
       "Ich brauche Informationen. → Ich schreibe Ihnen, weil ich Informationen brauche.",
       "Ich mache Ferien in Berlin. → Ich schreibe dir, weil ich Ferien in Berlin mache.",
       "Ich will dich besuchen. → Ich schreibe dir, weil ich dich besuchen will.",
-      "Ich möchte den Termin absagen. → Ich schreibe Ihnen, weil ich den Termin absagen möchte.",
-      "Ich habe am Samstag Zeit. → Ich komme, weil ich am Samstag Zeit habe.",
-      "Ich lerne Deutsch. → Ich schreibe Ihnen, weil ich Deutsch lerne.",
-      "Ich möchte mit meiner Familie kommen. → Ich frage, ob ich mit meiner Familie kommen möchte. (better A1 sentence: Kann ich mit meiner Familie kommen?)",
     ],
     []
   );
@@ -573,47 +655,28 @@ const A1LetterWritingQuestionBookPage = () => {
     []
   );
 
-  const VOCAB_LIST = useMemo(
-    () => ({
-      separable: [
-        "abholen – to pick up",
-        "anmelden – to register",
-        "anmachen – to switch on",
-        "ausmachen – to switch off",
-        "ankommen – to arrive",
-        "abreisen – to depart",
-        "absagen – to cancel",
-        "zusagen – to accept",
-        "aufmachen – to open",
-        "zumachen – to close",
-        "einladen – to invite",
-        "gratulieren – to congratulate",
-      ],
-      key: [
-        "der Kurs – course",
-        "die Anmeldung – registration",
-        "die Gebühr – fee",
-        "das Formular – form",
-        "das Büro – office",
-        "der Urlaub – vacation",
-        "die Feier – celebration",
-        "die Informationen – information",
-        "die Zahlungsmethode – payment method",
-        "der Preis – price",
-      ],
-      occasions: [
-        "Alles Gute zum Geburtstag – Happy Birthday",
-        "Herzlichen Glückwunsch – Congratulations",
-        "der Geburtstag – birthday",
-        "die Feier – celebration",
-        "die Einladung – invitation",
-      ],
-    }),
-    []
-  );
-
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
+      <style>{`
+        .mobile-form-row {
+          display: none !important;
+        }
+
+        .desktop-form-row {
+          display: grid !important;
+        }
+
+        @media (max-width: 720px) {
+          .desktop-form-row {
+            display: none !important;
+          }
+
+          .mobile-form-row {
+            display: grid !important;
+          }
+        }
+      `}</style>
+
       <header style={heroCardStyle}>
         <div style={heroLayoutStyle}>
           <div style={heroContentStyle}>
@@ -626,28 +689,24 @@ const A1LetterWritingQuestionBookPage = () => {
 
             <span style={heroEyebrowStyle}>A1 Schreiben • Day 12.3</span>
 
-            <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "grid", gap: 8 }}>
               <h1 style={{ ...styles.title, marginBottom: 0 }}>
                 Letter Writing — Read First
               </h1>
-              <p style={{ ...styles.subtitle, margin: 0 }}>
+              <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
                 Learn how to write both formal and informal A1 letters step by step.
-                Read the structure first, learn useful phrases, understand the weil rule,
-                and then write your answer with confidence.
+                Read the structure first, learn useful phrases, understand the{" "}
+                <strong>weil</strong> rule, and then write your answer with confidence.
               </p>
             </div>
 
-            <div style={heroHighlightsStyle}>
-              {[
-                { label: "Teil 1", text: "Read short prompts and complete important form details." },
-                { label: "Teil 2", text: "Write correct formal and informal letters." },
-                { label: "Focus", text: "Openings, useful phrases, questions, and the weil rule." },
-              ].map((item) => (
-                <div key={item.label} style={heroHighlightCardStyle}>
-                  <strong style={{ fontSize: 14 }}>{item.label}</strong>
-                  <span style={{ lineHeight: 1.5, color: "#334155" }}>{item.text}</span>
-                </div>
-              ))}
+            <div style={cleanIntroBoxStyle}>
+              In the A1 Schreiben exam, there are two important parts. <strong>Teil 1</strong> is
+              form filling, where you read a short situation and complete missing information.
+              <strong> Teil 2</strong> is letter writing, where you write a short formal or informal
+              text. In this course, your main focus is <strong>Teil 2</strong>, so you must learn
+              the correct greeting, useful phrases, question forms, and the word order with{" "}
+              <strong>weil</strong>.
             </div>
           </div>
 
@@ -659,117 +718,84 @@ const A1LetterWritingQuestionBookPage = () => {
         </div>
       </header>
 
-      <Section title="How Schreiben works (A1 exam)">
-        <InfoBox title="Two parts you must know">
-          <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
-            <div>
-              <strong>Teil 1:</strong> Formular ausfüllen. You read a short situation and complete
-              missing details in a form.
-            </div>
-            <div>
-              <strong>Teil 2:</strong> Brief schreiben. You write a complete formal or informal letter.
-            </div>
+      <Section title="Notes">
+        <div style={notesBannerStyle}>
+          <strong style={{ fontSize: 18, color: "#1e3a8a" }}>Read these notes first</strong>
+          <div style={{ color: "#1e40af", lineHeight: 1.7 }}>
+            Learn the structure, useful phrases, and the <strong>weil</strong> rule before you move
+            to the assignments below.
           </div>
-        </InfoBox>
-
-        <InfoBox title="Important for this course" tone="blue">
-          <div style={{ lineHeight: 1.6 }}>
-            Teil 1 is here for practice, but your main writing focus is <strong>Teil 2</strong>.
-            This means you must understand greetings, useful phrases, correct questions,
-            and the <strong>weil</strong> word order.
-          </div>
-        </InfoBox>
+        </div>
       </Section>
 
       <Section title="Teil 1 Practice — Formular (Bodensee-Rundfahrt)">
         <InfoBox title="Practice scenario">
-          <div style={teil1ScenarioGridStyle}>
-            {TEIL1_FORM_SAMPLE.map((item, index) => (
-              <div key={item} style={teil1ScenarioCardStyle}>
-                <span style={teil1ScenarioNumberStyle}>{index + 1}</span>
-                <div style={{ lineHeight: 1.6 }}>{item}</div>
-              </div>
-            ))}
-          </div>
+          <div style={scenarioTextStyle}>{TEIL1_SCENARIO_TEXT}</div>
         </InfoBox>
 
         <InfoBox title="Fill this form like the exam">
-          <div style={teil1FormCardStyle}>
-            <div style={teil1FormHeaderStyle}>
+          <div style={formWrapStyle}>
+            <div style={formHeaderStyle}>
               <strong style={{ fontSize: 18 }}>Anmeldung zur Bodensee-Rundfahrt</strong>
-              <span style={{ color: "#475569", lineHeight: 1.5 }}>
-                Read the scenario and complete each missing detail.
+              <span style={{ color: "#475569", lineHeight: 1.6 }}>
+                Read the scenario and complete the missing information.
               </span>
             </div>
 
-            <div style={teil1FormGridStyle}>
-              <div style={teil1FieldCardStyle}>
-                <div style={teil1FieldLabelStyle}>Name</div>
-                <div style={teil1FieldValueStyle}>Kadavy, Eva (Beispiel)</div>
-              </div>
+            <div style={formTableStyle}>
+              <ResponsiveFormRow
+                label="Name"
+                prompt="Kadavy, Eva (Beispiel)"
+                isStatic
+              />
 
-              <Teil1FormField
+              <ResponsiveFormRow
                 label="Anzahl der Personen"
                 prompt="Write the total number of people travelling."
                 answerHint="(1) ________"
               />
-              <Teil1FormField
+
+              <ResponsiveFormRow
                 label="Davon Kinder"
                 prompt="How many of those travellers are children?"
                 answerHint="(2) ________"
               />
-              <Teil1FormField
+
+              <ResponsiveFormRow
                 label="Ferienadresse"
                 prompt="Hotel Schönblick, Burgstraße 34, 78014 ________"
                 answerHint="(3) ________"
               />
-              <Teil1FormField
+
+              <ResponsiveFormRow
                 label="Zahlungsweise"
                 prompt="Choose the correct payment method: ________ / Kreditkarte"
                 answerHint="(4) ________"
               />
-              <Teil1FormField
-                label="Reisetermin"
-                prompt="Enter the trip date or day mentioned in the task."
-                answerHint="(5) ________"
-              />
+
+              <div className="desktop-form-row" style={{ ...formRowStyle, borderBottom: "none" }}>
+                <div style={formLabelStyle}>Reisetermin</div>
+                <div style={formPromptStyle}>Enter the trip date or day mentioned in the task.</div>
+                <div style={formAnswerStyle}>(5) ________</div>
+              </div>
+
+              <div className="mobile-form-row" style={{ ...mobileFormRowStyle, borderBottom: "none" }}>
+                <div style={formLabelStyle}>Reisetermin</div>
+                <div style={formPromptStyle}>Enter the trip date or day mentioned in the task.</div>
+                <div style={mobileFormAnswerStyle}>(5) ________</div>
+              </div>
             </div>
           </div>
         </InfoBox>
 
         <InfoBox title="Antworten (check after your attempt)">
-          <div style={teil1ScenarioGridStyle}>
+          <div style={answersGridStyle}>
             {TEIL1_SOLUTIONS.map((item) => (
-              <div
-                key={item}
-                style={{
-                  ...teil1ScenarioCardStyle,
-                  gap: 6,
-                  borderColor: "#bfdbfe",
-                  background: "#eff6ff",
-                  gridTemplateColumns: "1fr",
-                }}
-              >
-                <strong style={{ color: "#1d4ed8" }}>{item.split(":")[0]}</strong>
-                <span style={{ lineHeight: 1.6, color: "#1e3a8a" }}>
-                  {item.split(":").slice(1).join(":").trim()}
-                </span>
+              <div key={item.label} style={answerCardStyle}>
+                <strong>{item.label}</strong>
+                <span>{item.value}</span>
               </div>
             ))}
-          </div>
-        </InfoBox>
-
-        <InfoBox title="How to think in Teil 1" tone="orange">
-          <div style={teil1HintBoxStyle}>
-            <strong>Quick method</strong>
-            <BulletList
-              items={[
-                "Count all people carefully.",
-                "Read the place name exactly.",
-                "If the text says no credit card, the answer is often ‘bar’.",
-                "Write the exact date or day from the text.",
-              ]}
-            />
           </div>
         </InfoBox>
       </Section>
@@ -780,16 +806,29 @@ const A1LetterWritingQuestionBookPage = () => {
         </InfoBox>
 
         <InfoBox title="Important formal phrases you can use">
-          <PhraseGrid items={FORMAL_PHRASES} />
-        </InfoBox>
+          <div style={phraseSectionGridStyle}>
+            <div style={mobileTipStyle}>
+              <strong>Tip:</strong> Learn the German phrase first. Then read the meaning. After that,
+              look at the example. This is easier for small phone screens.
+            </div>
 
-        <InfoBox title="How to ask in a formal letter" tone="blue">
-          <div style={{ display: "grid", gap: 8, lineHeight: 1.65 }}>
-            <div><strong>To make an enquiry:</strong> Ich schreibe Ihnen, weil ich eine Anfrage stellen möchte.</div>
-            <div><strong>To ask for information:</strong> Könnten Sie mir bitte Informationen über ... geben?</div>
-            <div><strong>To ask for the price:</strong> Wie viel kostet ...? / Wie hoch ist die Gebühr?</div>
-            <div><strong>To make a request:</strong> Könnten Sie mir bitte helfen? / Könnten Sie mir bitte ... mitteilen?</div>
-            <div><strong>To cancel an appointment:</strong> Ich möchte den Termin absagen.</div>
+            {FORMAL_PHRASE_GROUPS.map((group) => (
+              <div key={group.title} style={phraseCategoryStyle}>
+                <h3 style={phraseCategoryTitleStyle}>{group.title}</h3>
+
+                <div style={mobilePhraseListStyle}>
+                  {group.items.map((item) => (
+                    <div key={item.german} style={mobilePhraseCardStyle}>
+                      <div style={mobilePhraseGermanStyle}>{item.german}</div>
+                      <div style={mobilePhraseMeaningStyle}>{item.english}</div>
+                      <div style={mobilePhraseExampleStyle}>
+                        <strong>Example:</strong> {item.example}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </InfoBox>
 
@@ -805,18 +844,8 @@ const A1LetterWritingQuestionBookPage = () => {
           <RuleParagraphs items={INFORMAL_STRUCTURE} />
         </InfoBox>
 
-        <InfoBox title="Useful informal phrases you can use">
-          <PhraseGrid items={INFORMAL_PHRASES} />
-        </InfoBox>
-
-        <InfoBox title="Useful ideas for birthday, holiday, and celebration letters" tone="blue">
-          <div style={{ display: "grid", gap: 8, lineHeight: 1.65 }}>
-            <div><strong>Birthday:</strong> Herzlichen Glückwunsch zum Geburtstag! / Ich gratuliere dir.</div>
-            <div><strong>Celebration:</strong> Machst du eine Feier? / Wo findet die Feier statt?</div>
-            <div><strong>Holiday:</strong> Ich fahre in den Urlaub. / Wir machen Ferien.</div>
-            <div><strong>Visit:</strong> Ich möchte dich besuchen.</div>
-            <div><strong>Extra simple sentence:</strong> Ich komme mit meiner Familie. / Wir fahren mit dem Auto.</div>
-          </div>
+        <InfoBox title="Useful informal phrases">
+          <BulletList items={INFORMAL_PHRASES} />
         </InfoBox>
 
         <InfoBox title="Very short A1 sample (informal)">
@@ -827,138 +856,142 @@ const A1LetterWritingQuestionBookPage = () => {
       </Section>
 
       <Section title="How to use WEIL (Very Important)">
-        <InfoBox title="Simple rule" tone="orange">
+        <InfoBox title="Simple rule">
           <div style={{ display: "grid", gap: 8 }}>
             <div style={noteStyle}>
-              <strong>Weil = because.</strong> When you use <strong>weil</strong>, the verb moves to the end.
+              <strong>Weil = because.</strong> When you use <strong>weil</strong>, the verb moves to
+              the end.
             </div>
             <div style={noteStyle}>
-              In the original sentence, the verb is usually after the subject.
-              But after <strong>weil</strong>, that conjugated verb goes to the last position.
+              In the original sentence, the verb is usually after the subject. But after{" "}
+              <strong>weil</strong>, that conjugated verb goes to the last position.
             </div>
             <div style={noteStyle}>
-              If there is a modal verb like <strong>kann, möchte, will</strong>, the main verb stays before it,
-              and the modal verb goes to the end.
+              If there is a modal verb like <strong>kann, möchte, will</strong>, the main verb stays
+              before it, and the modal verb goes to the end.
             </div>
           </div>
         </InfoBox>
 
         <InfoBox title="Look carefully at the change">
-          <div style={exampleBlockStyle}>
-            <div><strong>Normal sentence:</strong> Ich komme nicht.</div>
-            <div><strong>With weil:</strong> Ich schreibe dir, weil ich nicht komme.</div>
-            <div><strong>What changed?</strong> The verb <strong>komme</strong> moved to the end.</div>
-          </div>
+          <div style={simpleGridStyle}>
+            <div style={exampleBlockStyle}>
+              <div><strong>Normal sentence:</strong> Ich komme nicht.</div>
+              <div><strong>With weil:</strong> Ich schreibe dir, weil ich nicht komme.</div>
+            </div>
 
-          <div style={exampleBlockStyle}>
-            <div><strong>Normal sentence:</strong> Ich kann nicht kommen.</div>
-            <div><strong>With weil:</strong> Ich schreibe dir, weil ich nicht kommen kann.</div>
-            <div><strong>What changed?</strong> The modal verb <strong>kann</strong> moved to the end.</div>
-          </div>
+            <div style={exampleBlockStyle}>
+              <div><strong>Normal sentence:</strong> Ich kann nicht kommen.</div>
+              <div><strong>With weil:</strong> Ich schreibe dir, weil ich nicht kommen kann.</div>
+            </div>
 
-          <div style={exampleBlockStyle}>
-            <div><strong>Normal sentence:</strong> Ich möchte eine Anfrage stellen.</div>
-            <div><strong>With weil:</strong> Ich schreibe Ihnen, weil ich eine Anfrage stellen möchte.</div>
-            <div><strong>What changed?</strong> The modal verb <strong>möchte</strong> moved to the end.</div>
+            <div style={exampleBlockStyle}>
+              <div><strong>Normal sentence:</strong> Ich möchte eine Anfrage stellen.</div>
+              <div><strong>With weil:</strong> Ich schreibe Ihnen, weil ich eine Anfrage stellen möchte.</div>
+            </div>
           </div>
         </InfoBox>
 
         <InfoBox title="More WEIL examples">
           <BulletList items={WEIL_EXAMPLES} />
         </InfoBox>
+      </Section>
 
-        <InfoBox title="Easy pattern for students" tone="blue">
-          <div style={{ lineHeight: 1.7 }}>
-            You can remember this easy pattern:
-            <br />
-            <strong>Ich schreibe Ihnen / dir, weil + subject + other words + verb at the end.</strong>
-            <br />
-            Example:
-            <br />
-            <strong>Ich schreibe Ihnen, weil ich Informationen brauche.</strong>
-            <br />
-            <strong>Ich schreibe dir, weil ich dich besuchen möchte.</strong>
+      <Section title="Assignments">
+        <div style={assignmentBannerStyle}>
+          <div style={assignmentBannerTopStyle}>
+            <div style={assignmentBadgeStyle}>✍️</div>
+
+            <div style={assignmentBannerTitleWrapStyle}>
+              <h3 style={assignmentBannerTitleStyle}>Your Task</h3>
+              <p style={assignmentBannerSubtitleStyle}>
+                Read the question • write the letter • submit it
+              </p>
+            </div>
           </div>
-        </InfoBox>
+
+          <div style={assignmentBannerTextStyle}>
+            You have finished the notes. Start the assignments below and submit your work when you
+            are ready.
+          </div>
+
+          <div style={assignmentBannerActionRowStyle}>
+            <span style={assignmentMiniPillStyle}>Informal birthday letter</span>
+            <span style={assignmentMiniPillStyle}>Formal school letter</span>
+
+            <button
+              type="button"
+              style={{ ...styles.primaryButton, width: "fit-content" }}
+              onClick={() => navigate("/campus/submit")}
+            >
+              Go to Submit Assignment
+            </button>
+          </div>
+        </div>
       </Section>
 
       <Section title="Assignment 1 — Informal Birthday Letter">
-        <InfoBox title="Instructions (Steps)">
-          <BulletList items={BIRTHDAY_STEPS} />
-        </InfoBox>
+        <div style={assignmentCardStyle}>
+          <InfoBox title="Instructions (Steps)">
+            <BulletList items={BIRTHDAY_STEPS} />
+          </InfoBox>
 
-        <InfoBox title="Sample Question">
-          <div style={{ marginBottom: 8 }}>
-            Ihr Freund / Ihre Freundin hat Geburtstag. Schreiben Sie an ihn / sie:
-          </div>
-          <BulletList items={BIRTHDAY_SAMPLE} />
-        </InfoBox>
+          <InfoBox title="Sample Question">
+            <div style={{ marginBottom: 8 }}>
+              Ihr Freund / Ihre Freundin hat Geburtstag. Schreiben Sie an ihn / sie:
+            </div>
+            <BulletList items={BIRTHDAY_SAMPLE} />
+          </InfoBox>
 
-        <InfoBox title="Important tip" tone="orange">
-          <div style={{ lineHeight: 1.6 }}>
-            Use simple sentences. It is okay to write short, correct A1 sentences.
-            Try to use one <strong>weil</strong> sentence correctly.
-          </div>
-        </InfoBox>
-
-        <InfoBox title="Write your letter in 3 parts">
-          <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
-            <div><strong>1) Introduction:</strong> Greeting + opening + reason for writing.</div>
-            <div><strong>2) Body:</strong> Birthday wishes + questions + one extra detail.</div>
-            <div><strong>3) Conclusion:</strong> Fixed ending + closing + your first name.</div>
-          </div>
-        </InfoBox>
+          <InfoBox title="Write your letter in 3 parts">
+            <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
+              <div><strong>1) Introduction:</strong> Greeting + opening + reason for writing.</div>
+              <div><strong>2) Body:</strong> Birthday wishes + questions + one extra detail.</div>
+              <div><strong>3) Conclusion:</strong> Fixed ending + closing + your first name.</div>
+            </div>
+          </InfoBox>
+        </div>
       </Section>
 
       <Section title="Assignment 2 — Formal Letter">
-        <InfoBox title="Instructions (Steps)">
-          <BulletList items={FORMAL_STEPS} />
-        </InfoBox>
+        <div style={assignmentCardStyle}>
+          <InfoBox title="Instructions (Steps)">
+            <BulletList items={FORMAL_STEPS} />
+          </InfoBox>
 
-        <InfoBox title="Sample Question">
-          <div style={{ marginBottom: 8 }}>
-            Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule:
-          </div>
-          <BulletList items={FORMAL_SAMPLE} />
-        </InfoBox>
+          <InfoBox title="Sample Question">
+            <div style={{ marginBottom: 8 }}>
+              Sie möchten einen Deutschkurs besuchen. Schreiben Sie an die Sprachschule:
+            </div>
+            <BulletList items={FORMAL_SAMPLE} />
+          </InfoBox>
 
-        <InfoBox title="Write your letter in 3 parts">
-          <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
-            <div><strong>1) Introduction:</strong> Formal greeting + reason for writing.</div>
-            <div><strong>2) Body:</strong> Ask for information, prices, dates, and payment.</div>
-            <div><strong>3) Conclusion:</strong> Fixed polite ending + formal closing + full name.</div>
-          </div>
-        </InfoBox>
-      </Section>
-
-      <Section title="Essential A1 Vocabulary List">
-        <InfoBox title="Useful Verbs">
-          <BulletList items={VOCAB_LIST.separable} />
-        </InfoBox>
-
-        <InfoBox title="Key Letter Vocabulary">
-          <BulletList items={VOCAB_LIST.key} />
-        </InfoBox>
-
-        <InfoBox title="Special Occasions">
-          <BulletList items={VOCAB_LIST.occasions} />
-        </InfoBox>
+          <InfoBox title="Write your letter in 3 parts">
+            <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
+              <div><strong>1) Introduction:</strong> Formal greeting + reason for writing.</div>
+              <div><strong>2) Body:</strong> Ask for information, prices, dates, and payment.</div>
+              <div><strong>3) Conclusion:</strong> Fixed polite ending + formal closing + full name.</div>
+            </div>
+          </InfoBox>
+        </div>
       </Section>
 
       <Section title="Next step">
-        <p style={{ margin: 0, lineHeight: 1.6 }}>
-          After reading the structure, the phrases, and the weil examples, go and submit your
-          formal or informal letter on the submission page.
-        </p>
-        <div>
-          <button
-            type="button"
-            style={{ ...styles.primaryButton, width: "fit-content" }}
-            onClick={() => navigate("/campus/submit")}
-          >
-            Go to Submit Assignment Page
-          </button>
-        </div>
+        <InfoBox title="Submit your work">
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            After reading the notes and completing the assignment, go to the submission page and
+            send your answer.
+          </p>
+          <div>
+            <button
+              type="button"
+              style={{ ...styles.primaryButton, width: "fit-content" }}
+              onClick={() => navigate("/campus/submit")}
+            >
+              Go to Submit Assignment Page
+            </button>
+          </div>
+        </InfoBox>
       </Section>
     </main>
   );
