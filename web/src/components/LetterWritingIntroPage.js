@@ -93,6 +93,15 @@ const RuleParagraphs = ({ items }) => (
   </div>
 );
 
+
+const Teil1FormField = ({ label, prompt, answerHint }) => (
+  <div style={teil1FieldCardStyle}>
+    <div style={teil1FieldLabelStyle}>{label}</div>
+    <div style={teil1FieldValueStyle}>{prompt}</div>
+    <div style={teil1AnswerBlankStyle}>{answerHint}</div>
+  </div>
+);
+
 /** =========================
  *  Page
  *  ========================= */
@@ -410,45 +419,76 @@ const A1LetterWritingQuestionBookPage = () => {
 
           <Section title="Teil 1 Practice — Formular (Bodensee-Rundfahrt)">
             <InfoBox title="Practice scenario">
-              <BulletList items={TEIL1_FORM_SAMPLE} />
+              <div style={teil1ScenarioGridStyle}>
+                {TEIL1_FORM_SAMPLE.map((item, index) => (
+                  <div key={item} style={teil1ScenarioCardStyle}>
+                    <span style={teil1ScenarioNumberStyle}>{index + 1}</span>
+                    <div style={{ lineHeight: 1.6 }}>{item}</div>
+                  </div>
+                ))}
+              </div>
             </InfoBox>
 
             <InfoBox title="Goethe sample (direct)">
               <div style={{ lineHeight: 1.6 }}>
-                You can also view a direct sample from the Goethe website here: {" "}
+                You can also view a direct sample from the Goethe website here:{" "}
                 <a href="https://bfu.goethe.de/a1_sd1/schreiben.php" target="_blank" rel="noreferrer">
                   https://bfu.goethe.de/a1_sd1/schreiben.php
                 </a>
               </div>
             </InfoBox>
 
-            <InfoBox title="Form snippet (what to fill)">
-              <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
-                <div>
-                  <strong>Anmeldung zur Bodensee-Rundfahrt</strong>
+            <InfoBox title="Fill this form like the exam">
+              <div style={teil1FormCardStyle}>
+                <div style={teil1FormHeaderStyle}>
+                  <strong style={{ fontSize: 18 }}>Anmeldung zur Bodensee-Rundfahrt</strong>
+                  <span style={{ color: "#475569", lineHeight: 1.5 }}>
+                    Read the scenario, then complete each missing detail exactly like you would in Teil 1 of the exam.
+                  </span>
                 </div>
-                <div>Name: Kadavy, Eva (Beispiel)</div>
-                <div>Anzahl der Personen: (1)</div>
-                <div>Davon Kinder: (2)</div>
-                <div>Ferienadresse: Hotel Schönblick, Burgstraße 34, 78014 (3)</div>
-                <div>Zahlungsweise: (4) / Kreditkarte</div>
-                <div>Reisetermin: (5)</div>
+
+                <div style={teil1FormGridStyle}>
+                  <div style={teil1FieldCardStyle}>
+                    <div style={teil1FieldLabelStyle}>Name</div>
+                    <div style={teil1FieldValueStyle}>Kadavy, Eva (Beispiel)</div>
+                  </div>
+
+                  <Teil1FormField label="Anzahl der Personen" prompt="Write the total number of people travelling." answerHint="(1) ________" />
+                  <Teil1FormField label="Davon Kinder" prompt="How many of those travellers are children?" answerHint="(2) ________" />
+                  <Teil1FormField
+                    label="Ferienadresse"
+                    prompt="Hotel Schönblick, Burgstraße 34, 78014 ________"
+                    answerHint="(3) ________"
+                  />
+                  <Teil1FormField label="Zahlungsweise" prompt="Choose the correct payment method: ________ / Kreditkarte" answerHint="(4) ________" />
+                  <Teil1FormField label="Reisetermin" prompt="Enter the trip date or day mentioned in the task." answerHint="(5) ________" />
+                </div>
               </div>
             </InfoBox>
 
             <InfoBox title="Antworten (erst nach dem Versuch prüfen)">
-              <BulletList items={TEIL1_SOLUTIONS} />
+              <div style={teil1ScenarioGridStyle}>
+                {TEIL1_SOLUTIONS.map((item) => (
+                  <div key={item} style={{ ...teil1ScenarioCardStyle, gap: 6, borderColor: "#bfdbfe", background: "#eff6ff" }}>
+                    <strong style={{ color: "#1d4ed8" }}>{item.split(":")[0]}</strong>
+                    <span style={{ lineHeight: 1.6, color: "#1e3a8a" }}>{item.split(":").slice(1).join(":").trim()}</span>
+                  </div>
+                ))}
+              </div>
             </InfoBox>
 
             <InfoBox title="How to think in Teil 1">
-              <BulletList
-                items={[
-                  "Count all people carefully (parents + children) before writing numbers.",
-                  "For place fields, combine PLZ + Urlaubsort exactly as given in the text.",
-                  "If the task says no credit card, select/pay with ‘bar’.",
-                  "For dates, use the exact day phrase from the prompt (e.g., nächsten Sonntag).",
-                ]}
-              />
+              <div style={teil1HintBoxStyle}>
+                <strong>Quick method</strong>
+                <BulletList
+                  items={[
+                    "Count all people carefully (parents + children) before writing numbers.",
+                    "For place fields, combine PLZ + Urlaubsort exactly as given in the text.",
+                    "If the task says no credit card, select/pay with ‘bar’.",
+                    "For dates, use the exact day phrase from the prompt (e.g., nächsten Sonntag).",
+                  ]}
+                />
+              </div>
             </InfoBox>
           </Section>
 
