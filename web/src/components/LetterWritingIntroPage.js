@@ -2,6 +2,154 @@ import React, { memo, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
+const heroImageUrl =
+  "https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1800&q=80";
+
+const heroCardStyle = {
+  ...styles.card,
+  padding: 0,
+  overflow: "hidden",
+};
+
+const heroLayoutStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+  alignItems: "stretch",
+};
+
+const heroContentStyle = {
+  padding: 24,
+  display: "grid",
+  gap: 14,
+  background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 60%, #f8fafc 100%)",
+};
+
+const heroEyebrowStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  width: "fit-content",
+  padding: "6px 12px",
+  borderRadius: 999,
+  background: "#dbeafe",
+  color: "#1d4ed8",
+  fontWeight: 700,
+  fontSize: 13,
+};
+
+const heroImageStyle = {
+  width: "100%",
+  height: "100%",
+  minHeight: 260,
+  objectFit: "cover",
+};
+
+const heroHighlightsStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+  gap: 10,
+};
+
+const heroHighlightCardStyle = {
+  border: "1px solid #dbeafe",
+  borderRadius: 14,
+  padding: 12,
+  background: "rgba(255,255,255,0.85)",
+  display: "grid",
+  gap: 4,
+};
+
+
+const teil1ScenarioGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: 10,
+};
+
+const teil1ScenarioCardStyle = {
+  border: "1px solid #e2e8f0",
+  borderRadius: 14,
+  padding: 14,
+  background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+  display: "grid",
+  gap: 8,
+};
+
+const teil1ScenarioNumberStyle = {
+  width: 28,
+  height: 28,
+  borderRadius: 999,
+  background: "#dbeafe",
+  color: "#1d4ed8",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: 800,
+  fontSize: 14,
+};
+
+const teil1FormCardStyle = {
+  border: "1px solid #cbd5e1",
+  borderRadius: 18,
+  padding: 18,
+  background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+  display: "grid",
+  gap: 14,
+  boxShadow: "0 12px 30px rgba(15, 23, 42, 0.06)",
+};
+
+const teil1FormHeaderStyle = {
+  display: "grid",
+  gap: 6,
+  paddingBottom: 12,
+  borderBottom: "1px solid #e2e8f0",
+};
+
+const teil1FormGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+  gap: 12,
+};
+
+const teil1FieldCardStyle = {
+  border: "1px solid #e2e8f0",
+  borderRadius: 14,
+  padding: 12,
+  background: "#ffffff",
+  display: "grid",
+  gap: 8,
+};
+
+const teil1FieldLabelStyle = {
+  fontWeight: 700,
+  color: "#0f172a",
+};
+
+const teil1FieldValueStyle = {
+  color: "#334155",
+  lineHeight: 1.6,
+};
+
+const teil1AnswerBlankStyle = {
+  minHeight: 44,
+  borderRadius: 12,
+  border: "1.5px dashed #60a5fa",
+  background: "#eff6ff",
+  display: "flex",
+  alignItems: "center",
+  padding: "0 12px",
+  fontWeight: 700,
+  color: "#1d4ed8",
+};
+
+const teil1HintBoxStyle = {
+  borderRadius: 14,
+  border: "1px solid #bfdbfe",
+  background: "#eff6ff",
+  padding: 14,
+  display: "grid",
+  gap: 8,
+};
+
 /** =========================
  *  Helpers
  *  ========================= */
@@ -34,6 +182,15 @@ const RuleParagraphs = ({ items }) => (
         <strong>{item.label}:</strong> {item.text}
       </p>
     ))}
+  </div>
+);
+
+
+const Teil1FormField = ({ label, prompt, answerHint }) => (
+  <div style={teil1FieldCardStyle}>
+    <div style={teil1FieldLabelStyle}>{label}</div>
+    <div style={teil1FieldValueStyle}>{prompt}</div>
+    <div style={teil1AnswerBlankStyle}>{answerHint}</div>
   </div>
 );
 
@@ -295,15 +452,39 @@ const A1LetterWritingQuestionBookPage = () => {
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          Schreiben has two parts: Teil 1 (Formular) and Teil 2 (Brief). Start with Teil 1 practice in the app,
-          then move to formal and informal letters for submission.
-        </p>
+      <header style={heroCardStyle}>
+        <div style={heroLayoutStyle}>
+          <div style={heroContentStyle}>
+            <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
+              Back to Course
+            </button>
+            <span style={heroEyebrowStyle}>A1 Schreiben • Day 12.3</span>
+            <div style={{ display: "grid", gap: 10 }}>
+              <h1 style={{ ...styles.title, marginBottom: 0 }}>Letter Writing — Read First</h1>
+              <p style={{ ...styles.subtitle, margin: 0 }}>
+                Master both parts of A1 Schreiben with a clear path: practice forms first, then build confident
+                formal and informal letters for submission.
+              </p>
+            </div>
+            <div style={heroHighlightsStyle}>
+              {[
+                { label: "Teil 1", text: "Read short prompts and complete important form details accurately." },
+                { label: "Teil 2", text: "Use the right opening, word order, and closing in every letter." },
+                { label: "Goal", text: "Move from guided examples to ready-to-submit writing practice." },
+              ].map((item) => (
+                <div key={item.label} style={heroHighlightCardStyle}>
+                  <strong style={{ fontSize: 14 }}>{item.label}</strong>
+                  <span style={{ lineHeight: 1.5, color: "#334155" }}>{item.text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <img
+            src={heroImageUrl}
+            alt="Notebook, pen, and coffee for German letter-writing practice"
+            style={heroImageStyle}
+          />
+        </div>
       </header>
 
       <>
@@ -330,45 +511,76 @@ const A1LetterWritingQuestionBookPage = () => {
 
           <Section title="Teil 1 Practice — Formular (Bodensee-Rundfahrt)">
             <InfoBox title="Practice scenario">
-              <BulletList items={TEIL1_FORM_SAMPLE} />
+              <div style={teil1ScenarioGridStyle}>
+                {TEIL1_FORM_SAMPLE.map((item, index) => (
+                  <div key={item} style={teil1ScenarioCardStyle}>
+                    <span style={teil1ScenarioNumberStyle}>{index + 1}</span>
+                    <div style={{ lineHeight: 1.6 }}>{item}</div>
+                  </div>
+                ))}
+              </div>
             </InfoBox>
 
             <InfoBox title="Goethe sample (direct)">
               <div style={{ lineHeight: 1.6 }}>
-                You can also view a direct sample from the Goethe website here: {" "}
+                You can also view a direct sample from the Goethe website here:{" "}
                 <a href="https://bfu.goethe.de/a1_sd1/schreiben.php" target="_blank" rel="noreferrer">
                   https://bfu.goethe.de/a1_sd1/schreiben.php
                 </a>
               </div>
             </InfoBox>
 
-            <InfoBox title="Form snippet (what to fill)">
-              <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
-                <div>
-                  <strong>Anmeldung zur Bodensee-Rundfahrt</strong>
+            <InfoBox title="Fill this form like the exam">
+              <div style={teil1FormCardStyle}>
+                <div style={teil1FormHeaderStyle}>
+                  <strong style={{ fontSize: 18 }}>Anmeldung zur Bodensee-Rundfahrt</strong>
+                  <span style={{ color: "#475569", lineHeight: 1.5 }}>
+                    Read the scenario, then complete each missing detail exactly like you would in Teil 1 of the exam.
+                  </span>
                 </div>
-                <div>Name: Kadavy, Eva (Beispiel)</div>
-                <div>Anzahl der Personen: (1)</div>
-                <div>Davon Kinder: (2)</div>
-                <div>Ferienadresse: Hotel Schönblick, Burgstraße 34, 78014 (3)</div>
-                <div>Zahlungsweise: (4) / Kreditkarte</div>
-                <div>Reisetermin: (5)</div>
+
+                <div style={teil1FormGridStyle}>
+                  <div style={teil1FieldCardStyle}>
+                    <div style={teil1FieldLabelStyle}>Name</div>
+                    <div style={teil1FieldValueStyle}>Kadavy, Eva (Beispiel)</div>
+                  </div>
+
+                  <Teil1FormField label="Anzahl der Personen" prompt="Write the total number of people travelling." answerHint="(1) ________" />
+                  <Teil1FormField label="Davon Kinder" prompt="How many of those travellers are children?" answerHint="(2) ________" />
+                  <Teil1FormField
+                    label="Ferienadresse"
+                    prompt="Hotel Schönblick, Burgstraße 34, 78014 ________"
+                    answerHint="(3) ________"
+                  />
+                  <Teil1FormField label="Zahlungsweise" prompt="Choose the correct payment method: ________ / Kreditkarte" answerHint="(4) ________" />
+                  <Teil1FormField label="Reisetermin" prompt="Enter the trip date or day mentioned in the task." answerHint="(5) ________" />
+                </div>
               </div>
             </InfoBox>
 
             <InfoBox title="Antworten (erst nach dem Versuch prüfen)">
-              <BulletList items={TEIL1_SOLUTIONS} />
+              <div style={teil1ScenarioGridStyle}>
+                {TEIL1_SOLUTIONS.map((item) => (
+                  <div key={item} style={{ ...teil1ScenarioCardStyle, gap: 6, borderColor: "#bfdbfe", background: "#eff6ff" }}>
+                    <strong style={{ color: "#1d4ed8" }}>{item.split(":")[0]}</strong>
+                    <span style={{ lineHeight: 1.6, color: "#1e3a8a" }}>{item.split(":").slice(1).join(":").trim()}</span>
+                  </div>
+                ))}
+              </div>
             </InfoBox>
 
             <InfoBox title="How to think in Teil 1">
-              <BulletList
-                items={[
-                  "Count all people carefully (parents + children) before writing numbers.",
-                  "For place fields, combine PLZ + Urlaubsort exactly as given in the text.",
-                  "If the task says no credit card, select/pay with ‘bar’.",
-                  "For dates, use the exact day phrase from the prompt (e.g., nächsten Sonntag).",
-                ]}
-              />
+              <div style={teil1HintBoxStyle}>
+                <strong>Quick method</strong>
+                <BulletList
+                  items={[
+                    "Count all people carefully (parents + children) before writing numbers.",
+                    "For place fields, combine PLZ + Urlaubsort exactly as given in the text.",
+                    "If the task says no credit card, select/pay with ‘bar’.",
+                    "For dates, use the exact day phrase from the prompt (e.g., nächsten Sonntag).",
+                  ]}
+                />
+              </div>
             </InfoBox>
           </Section>
 
