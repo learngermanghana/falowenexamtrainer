@@ -76,6 +76,7 @@ import A1Day16FoodAndDailyLifeWorkbookPage from "./components/A1Day16FoodAndDail
 import A1Day16FoodAndNegationKapitel10WorkbookPage from "./components/A1Day16FoodAndNegationKapitel10WorkbookPage";
 import A1Day17InstructionsDirectionsKapitel11WorkbookPage from "./components/A1Day17InstructionsDirectionsKapitel11WorkbookPage";
 import A1Day21WeatherWorkbookPage from "./components/A1Day21WeatherWorkbookPage";
+import A1Day22HealthBodyPartsWorkbookPage from "./components/A1Day22HealthBodyPartsWorkbookPage";
 import A1Day4NumbersForBeginnersWorkbookPage from "./components/A1Day4NumbersForBeginnersWorkbookPage";
 import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3AskingAboutPricesWorkbookPage";
 import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCasesWorkbookPage";
@@ -679,6 +680,7 @@ const AppShell = ({
             element={<A1Day17InstructionsDirectionsKapitel11WorkbookPage />}
           />
           <Route path="/campus/course/a1-day-21-weather-workbook" element={<A1Day21WeatherWorkbookPage />} />
+          <Route path="/campus/course/a1-day-22-health-and-body-parts-workbook" element={<A1Day22HealthBodyPartsWorkbookPage />} />
           <Route
             path="/campus/course/a1-day-4-numbers-for-beginners-workbook"
             element={<A1Day4NumbersForBeginnersWorkbookPage />}

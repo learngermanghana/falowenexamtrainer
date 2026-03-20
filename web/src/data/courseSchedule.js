@@ -849,7 +849,7 @@ const RAW_COURSE_SCHEDULES = {
         youtube_link: "https://youtu.be/gzfIs-anyOE",
         assignment: true,
         grammarbook_link: "/campus/course/health-and-body-parts-14-1",
-        workbook_link: "https://drive.google.com/file/d/1LkDUU7r78E_pzeFnHKw9vfD9QgUAAacu/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-22-health-and-body-parts-workbook",
       },
     },
     {
