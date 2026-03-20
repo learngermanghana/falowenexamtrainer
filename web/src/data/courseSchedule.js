@@ -830,8 +830,8 @@ const RAW_COURSE_SCHEDULES = {
       instruction: "Watch the video, review grammar, and complete your workbook.",
       grammar_topic: "Weather and simple connectors for letter writing",
       lesen_hören: {
-        video: "https://youtu.be/n9D5rh_Joz4",
-        youtube_link: "https://youtu.be/n9D5rh_Joz4",
+        video: "https://youtu.be/ijEY8XVrsZs",
+        youtube_link: "https://youtu.be/ijEY8XVrsZs",
         assignment: true,
         grammarbook_link: "https://www.falowen.app/campus/course/weather-perfekt-letter-13",
         workbook_link: "/campus/course/a1-day-21-weather-workbook",
