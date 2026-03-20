@@ -106,39 +106,6 @@ const lesenQuestions = [
   },
 ];
 
-const hoerenQuestions = [
-  {
-    stem: "Wo findet man Stellenanzeigen nicht?",
-    options: ["a) auf Webseiten", "b) in Zeitungen", "c) im Internet", "d) im Supermarkt"],
-  },
-  {
-    stem: "Was steht zu Beginn einer Bewerbung?",
-    options: ["a) Schule, Ausbildung, Kurse", "b) Name, Alter, Wohnort", "c) Berufserfahrung", "d) Interessen"],
-  },
-  {
-    stem: "Was gehört noch zu einer Bewerbung?",
-    options: ["a) Kopie des Reisepasses", "b) Brief der Eltern", "c) Absage der letzten Bewerbung", "d) Zeugnisse und Anschreiben"],
-  },
-  {
-    stem: "Was passiert bei einem Bewerbungsgespräch?",
-    options: [
-      "a) Man lernt den Arbeitgeber kennen.",
-      "b) Man muss eine Zeit lang zur Probe arbeiten.",
-      "c) Man lernt die Kollegen kennen.",
-      "d) Man bekommt Hilfe und Unterstützung bei der Arbeitssuche.",
-    ],
-  },
-  {
-    stem: "Was passiert, wenn man eine Absage bekommt?",
-    options: [
-      "a) Man muss eine Stellenanzeige schreiben.",
-      "b) Man muss eine neue Ausbildung machen.",
-      "c) Man kann sich bei der nächsten offenen Stelle bewerben.",
-      "d) Man bekommt ein Zeugnis für das Bewerbungsgespräch.",
-    ],
-  },
-];
-
 const card = {
   ...styles.card,
   display: "grid",
@@ -205,7 +172,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day21LebensformenHeuteWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -409,60 +375,10 @@ const B1Day21LebensformenHeuteWorkbookPage = () => {
           />
           <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Listen to the recommended video first. Then complete the answers in the assignment submission area. The
-            support transcript below is only for teacher mode and follow-up checking.
+            Listen to the recommended video first. Then complete the answers in the assignment submission area.
           </p>
           <p style={{ margin: 0 }}>
-            Please submit your final answers in the submission area, not directly on this page.
-          </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript guidance)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript support · Bewerbung</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Der erste Schritt bei der Jobsuche: eine passende Stellenanzeige finden. Sehr viele offene Stellen kann man
-                im Internet finden. Es gibt viele Webseiten, die diese Stellen sammeln. Dort kann man sich meistens direkt
-                bewerben. Viele dieser Seiten sind auch für bestimmte Gruppen: Studierende zum Beispiel oder für Leute,
-                die eine bestimmte Ausbildung haben, zum Beispiel Journalisten oder Handwerker. Stellenanzeigen findet man
-                aber auch in Zeitungen. Dort gibt es eigene Seiten mit Stellenanzeigen.
-              </p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Bei der Bewerbung gibt es einiges zu beachten. Zu Beginn stehen die wichtigsten Daten: Name, Alter,
-                Wohnort, Nationalität und oft auch ein Bewerbungsfoto. Darunter schreibt man die Ausbildung: Welche
-                Schulen hat man besucht, welche Berufsausbildung, welche Universität. Sehr wichtig sind auch die
-                Berufserfahrung oder die eigenen Interessen. Wer besondere Fähigkeiten hat, sollte die auch angeben: Zum
-                Beispiel, welche Sprachen man spricht, welche Kurse man schon besucht hat oder welche Computerkenntnisse
-                man hat. Zu dem Bewerbungsschreiben gehört neben dem Lebenslauf auch ein Anschreiben. Das spricht die Firma
-                direkt an, die einen neuen Arbeitnehmer sucht. Hier sollte stehen, warum man diese Stelle gerne hätte und
-                warum man sich dafür eignet. Außerdem gehören auch Zeugnisse dazu von Schulen oder Ausbildungen.
-              </p>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Wer Glück hat, bekommt dann eine Einladung zu einem Vorstellungsgespräch. Dort lernt man den Arbeitgeber
-                kennen, erfährt mehr über die Arbeit und kann sich selbst präsentieren. Wer eine Absage bekommt, versucht
-                es mit der nächsten offenen Stelle.
-              </p>
-            </div>
-          )}
-
-          <h3 style={sectionTitle}>Fragen</h3>
-          {hoerenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>
-                Frage {index + 1}: {question.stem}
-              </strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
-          <p style={{ margin: 0 }}>
-            Recommended video: <a href="https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X" target="_blank" rel="noreferrer">Goethe-standard Hören test (with answer review)</a>
+            Recommended video: <a href="https://www.falowen.app/campus/course/b1-day-21-lebensformen-heute-workbook" target="_blank" rel="noreferrer">B1 Day 21 Lebensformen heute workbook</a>
           </p>
 
           <iframe
