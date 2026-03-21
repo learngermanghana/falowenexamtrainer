@@ -308,7 +308,7 @@
     "submit": "Submit assignment",
     "todayTask": "Today's task",
     "metrics": {
-      "days": "Days completed: {{completed}}/{{total}}",
+      "assignmentsCompleted": "Assignments completed: {{completed}}/{{total}}",
       "assignments": "Assignments submitted: {{submitted}}/{{total}}",
       "streak": "Current streak: {{count}}",
       "lastActivity": "Last activity: {{date}}"

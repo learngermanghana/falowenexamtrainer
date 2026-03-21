@@ -1150,8 +1150,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   }, [assignmentsOnly, autoStatusMap, chapterFilter, schedule, searchTerm, selectedCourseLevel, skillFilter, unfinishedOnly]);
 
   const overview = useMemo(() => {
-    const totalDays = schedule.length;
-    const completedDays = schedule.filter((entry) => {
+    const assignmentEntries = schedule.filter((entry) => hasTutorMarkedWork(entry));
+    const completedAssignments = assignmentEntries.filter((entry) => {
       const statusInfo = getAutoStatusForEntry({
         progressByAssignmentId: autoStatusMap,
         entry,
@@ -1163,8 +1163,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     const mostRecentUpdate = 0;
 
     return {
-      totalDays,
-      daysCompleted: completedDays,
+      totalAssignments: assignmentEntries.length,
+      assignmentsCompleted: completedAssignments,
       lastActivity: mostRecentUpdate ? new Date(mostRecentUpdate).toLocaleDateString() : "—",
     };
   }, [autoStatusMap, schedule, selectedCourseLevel]);
@@ -1244,7 +1244,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
               <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
                 <div style={{ ...styles.card, marginBottom: 0 }}>
-                  {t("courseTab.metrics.days", { completed: overview.daysCompleted, total: overview.totalDays })}
+                  {t("courseTab.metrics.assignmentsCompleted", { completed: overview.assignmentsCompleted, total: overview.totalAssignments })}
                 </div>
                 <div style={{ ...styles.card, marginBottom: 0 }}>
                   {t("courseTab.metrics.lastActivity", { date: overview.lastActivity })}
