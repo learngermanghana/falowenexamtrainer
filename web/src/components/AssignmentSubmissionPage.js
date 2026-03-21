@@ -37,7 +37,7 @@ const MIN_RESUBMISSION_CHANGED_CHARACTERS = 40;
 const MIN_RESUBMISSION_NEW_WORDS = 8;
 const MIN_OBJECTIVE_CHANGED_ANSWERS = 3;
 const MAX_RESUBMISSION_TRIES = 2;
-const ACTION_COOLDOWN_MS = 60 * 1000;
+const ACTION_COOLDOWN_MS = 10 * 60 * 1000;
 const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
 const MAX_ASSIGNMENT_DAY_BY_LEVEL = { A1: 22, A2: 28, B1: 28 };
@@ -1365,8 +1365,10 @@ const AssignmentSubmissionPage = () => {
 
   const submissionCooldownLabel = useMemo(() => {
     if (!submissionCooldownRemainingMs) return "";
-    const secondsRemaining = Math.ceil(submissionCooldownRemainingMs / 1000);
-    return `${secondsRemaining}s`;
+    const totalSecondsRemaining = Math.ceil(submissionCooldownRemainingMs / 1000);
+    const minutesRemaining = Math.floor(totalSecondsRemaining / 60);
+    const secondsRemaining = totalSecondsRemaining % 60;
+    return minutesRemaining > 0 ? `${minutesRemaining}m ${secondsRemaining}s` : `${secondsRemaining}s`;
   }, [submissionCooldownRemainingMs]);
 
   const handleChange = (field) => (event) => {
