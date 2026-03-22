@@ -106,38 +106,6 @@ const lesenQuestions = [
   },
 ];
 
-const hoerenQuestions = [
-  {
-    stem: "Wo findet man Stellenanzeigen nicht?",
-    options: ["a) auf Webseiten", "b) in Zeitungen", "c) im Internet", "d) im Supermarkt"],
-  },
-  {
-    stem: "Was steht zu Beginn einer Bewerbung?",
-    options: ["a) Schule, Ausbildung, Kurse", "b) Name, Alter, Wohnort", "c) Berufserfahrung", "d) Interessen"],
-  },
-  {
-    stem: "Was gehört noch zu einer Bewerbung?",
-    options: ["a) Kopie des Reisepasses", "b) Brief der Eltern", "c) Absage der letzten Bewerbung", "d) Zeugnisse und Anschreiben"],
-  },
-  {
-    stem: "Was passiert bei einem Bewerbungsgespräch?",
-    options: [
-      "a) Man lernt den Arbeitgeber kennen.",
-      "b) Man muss eine Zeit lang zur Probe arbeiten.",
-      "c) Man lernt die Kollegen kennen.",
-      "d) Man bekommt Hilfe und Unterstützung bei der Arbeitssuche.",
-    ],
-  },
-  {
-    stem: "Was passiert, wenn man eine Absage bekommt?",
-    options: [
-      "a) Man muss eine Stellenanzeige schreiben.",
-      "b) Man muss eine neue Ausbildung machen.",
-      "c) Man kann sich bei der nächsten offenen Stelle bewerben.",
-      "d) Man bekommt ein Zeugnis für das Bewerbungsgespräch.",
-    ],
-  },
-];
 
 const card = {
   ...styles.card,
@@ -170,13 +138,6 @@ const tabImageStyle = {
   borderRadius: 10,
   maxHeight: 260,
   objectFit: "cover",
-};
-
-const videoPreviewStyle = {
-  width: "100%",
-  minHeight: 315,
-  border: 0,
-  borderRadius: 10,
 };
 
 function TabButton({ active, onClick, children }) {
@@ -449,29 +410,9 @@ const B1Day22BeziehungWichtigWorkbookPage = () => {
             </div>
           )}
 
-          <h3 style={sectionTitle}>Fragen</h3>
-          {hoerenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>
-                Frage {index + 1}: {question.stem}
-              </strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
           <p style={{ margin: 0 }}>
             Recommended video: <a href="https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X" target="_blank" rel="noreferrer">Goethe-standard Hören test (with answer review)</a>
           </p>
-
-          <iframe
-            style={videoPreviewStyle}
-            src="https://www.youtube.com/embed/iyydRu3oY4I"
-            title="Goethe-standard Hören test"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
 
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
