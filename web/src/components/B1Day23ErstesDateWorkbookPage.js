@@ -6,7 +6,6 @@ const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
 ];
 
 const speakingBranches = [
@@ -81,28 +80,6 @@ const lesenQuestions = [
   },
 ];
 
-const hoerenQuestions = [
-  {
-    stem: "Wo trifft sich das Paar beim ersten Date?",
-    options: ["a) Im Kino", "b) Im Café", "c) Im Park", "d) Im Restaurant"],
-  },
-  {
-    stem: "Warum ist der öffentliche Ort für beide angenehm?",
-    options: ["a) Weil es dort sehr leise ist", "b) Weil Sicherheit und eine entspannte Atmosphäre wichtig sind", "c) Weil sie dort Freunde treffen", "d) Weil es günstiger ist"],
-  },
-  {
-    stem: "Welches Gesprächsthema hilft beiden, sich besser kennenzulernen?",
-    options: ["a) Politik", "b) Hobbys und Reisen", "c) Prüfungsregeln", "d) Wohnungsverträge"],
-  },
-  {
-    stem: "Wie reagiert man am besten auf einen unangenehmen Moment?",
-    options: ["a) Sofort gehen", "b) Höflich bleiben und das Thema wechseln", "c) Das Handy benutzen", "d) Gar nichts sagen"],
-  },
-  {
-    stem: "Was passiert am Ende des Hörtexts?",
-    options: ["a) Beide verabreden ein zweites Treffen", "b) Das Date wird abgebrochen", "c) Es gibt einen Streit", "d) Niemand sagt Tschüss"],
-  },
-];
 
 const card = {
   ...styles.card,
@@ -163,12 +140,10 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day23ErstesDateWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
     lesen: false,
-    hoeren: false,
   });
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
@@ -254,8 +229,7 @@ const B1Day23ErstesDateWorkbookPage = () => {
           </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3,
-            and Teil 4.
+            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2 and Teil 3.
           </p>
 
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
@@ -365,60 +339,6 @@ const B1Day23ErstesDateWorkbookPage = () => {
         </div>
       )}
 
-      {activeTab === "hoeren" && (
-        <div style={card}>
-          <img
-            src="https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1600&q=80"
-            alt="Listening practice with headphones and notebook"
-            loading="lazy"
-            style={tabImageStyle}
-          />
-          <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Listen to the audio or recommended video first. Then complete your answers in the assignment submission area.
-            Please submit answers in the submission area, not directly on this page.
-          </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript guidance)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript support · Erstes Date</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Anna und Karim treffen sich zum ersten Mal in einem kleinen Café im Stadtzentrum. Beide sind etwas nervös,
-                aber auch neugierig. Sie sprechen zuerst über Hobbys, Arbeit und Reisen. Karim hört aufmerksam zu und stellt
-                viele Fragen. Anna findet das respektvoll und sympathisch. Als ein kurzes Missverständnis entsteht,
-                reagieren beide höflich und wechseln das Thema. Am Ende sagen beide, dass das Gespräch angenehm war, und
-                sie verabreden ein zweites Treffen für nächsten Samstag.
-              </p>
-            </div>
-          )}
-
-          <h3 style={sectionTitle}>Fragen</h3>
-          {hoerenQuestions.map((question, index) => (
-            <div key={question.stem} style={questionCardStyle}>
-              <strong>
-                Frage {index + 1}: {question.stem}
-              </strong>
-              {question.options.map((option) => (
-                <span key={option}>{option}</span>
-              ))}
-            </div>
-          ))}
-
-          <p style={{ margin: 0 }}>
-            Recommended video:{" "}
-            <a href="https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X" target="_blank" rel="noreferrer">
-              Goethe-standard Hören test (with answer review)
-            </a>
-          </p>
-
-          <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
-        </div>
-      )}
     </div>
   );
 };

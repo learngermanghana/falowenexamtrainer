@@ -1239,7 +1239,7 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Erstes Date – Typische Situationen 7.23",
       chapter: "7.23",
       goal: "Beschreibe typische Situationen beim ersten Date, vergleiche Optionen und begründe angemessenes Verhalten.",
-      instruction: "Open the workbook and complete all four parts. Use Teil 1 for group speaking practice, then submit your final answers for Schreiben, Lesen, and Hören in the assignment area.",
+      instruction: "Open the workbook and complete all three parts. Use Teil 1 for group speaking practice, then submit your final answers for Schreiben and Lesen in the assignment area.",
       grammar_topic: "Erstes Date: situative Kommunikation, Höflichkeit, Gesprächsführung und Eindruck",
       assignment: true,
       lesen_hören: {
