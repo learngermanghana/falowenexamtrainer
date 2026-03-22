@@ -1192,14 +1192,16 @@ const RAW_COURSE_SCHEDULES = {
       day: 20,
       topic: "Wie wird man …? (Ausbildung und Qu) 6.20",
       chapter: "6.20",
-      goal: "Über Ausbildung und Qualifikationen sprechen.",
-      instruction: "Schau das Video, wiederhole die Grammatik und mache die Aufgabe.",
+      goal: "Über Ausbildung, Qualifikationen und Karrierewege in verschiedenen Berufen strukturiert sprechen.",
+      instruction:
+        "Open the in-app workbook and complete all four parts. Use Teil 1 for group speaking practice, then submit your final answers for Schreiben and Lesen in the assignment area.",
+      grammar_topic: "Ausbildung und Qualifikationen: Bildungswege, Berufserfahrung, Chancen und Herausforderungen",
       assignment: true,
       lesen_hören: {
-        video: "",
-        youtube_link: "",
+        video: "https://youtu.be/fMCYUVNYc9U",
+        youtube_link: "https://youtu.be/fMCYUVNYc9U",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1kfFEDI3ufCCndSi-LhfMFYEdih58D5XQ/view?usp=sharing",
+        workbook_link: "/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook",
       },
     },
     {
