@@ -1253,14 +1253,16 @@ const RAW_COURSE_SCHEDULES = {
       day: 24,
       topic: "Konsum und Nachhaltigkeit 8.24",
       chapter: "8.24",
-      goal: "Nachhaltigen Konsum und Umweltschutz diskutieren.",
-      instruction: "Schau das Video, wiederhole die Grammatik und mache die Aufgabe.",
+      goal: "Beschreibe nachhaltige Konsumentscheidungen, bewerte Vor- und Nachteile und begründe persönliche Maßnahmen für umweltbewusstes Handeln.",
+      instruction:
+        "Open the in-app workbook and complete all four parts. Use Teil 1 for group speaking practice, then submit your final answers for Schreiben and Lesen in the assignment area. For Hören, use the linked YouTube video and self-check your results.",
+      grammar_topic: "Konsum und Nachhaltigkeit: Umweltschutz, bewusster Konsum, Verantwortung und Lösungsansätze",
       assignment: true,
       lesen_hören: {
-        video: "",
-        youtube_link: "",
+        video: "https://youtu.be/zzPpGxzvJCY",
+        youtube_link: "https://youtu.be/zzPpGxzvJCY",
         grammarbook_link: "",
-        workbook_link: "https://drive.google.com/file/d/1x8IM6xcjR2hv3jbnnNudjyxLWPiT0-VL/view?usp=sharing",
+        workbook_link: "/campus/course/b1-day-24-konsum-und-nachhaltigkeit-workbook",
       },
     },
     {
