@@ -42,6 +42,7 @@ const ABSOLUTE_MAX_SUBMISSION_CHARACTERS = 12000;
 const BASE_MAX_BY_LEVEL = { A1: 2500, A2: 3200, B1: 4200, B2: 5500, C1: 7000, C2: 8500 };
 const MAX_ASSIGNMENT_DAY_BY_LEVEL = { A1: 22, A2: 28, B1: 28 };
 const PASS_THRESHOLD_SCORE = 60;
+const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
 const formatDate = (timestamp) => {
   if (!timestamp) return "–";
@@ -620,6 +621,7 @@ const AssignmentSubmissionPage = () => {
   const lastAssignmentRef = useRef("");
   const autosaveTimerRef = useRef(null);
   const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
+  const submissionTextRef = useRef(null);
 
   const buildChapterKey = useCallback(
     (title) => {
@@ -1393,6 +1395,34 @@ const AssignmentSubmissionPage = () => {
     if (field === "confirmed") setStatus((prev) => ({ ...prev, error: "" }));
   };
 
+  const insertSubmissionCharacter = useCallback((character) => {
+    setForm((previousForm) => {
+      const currentValue = String(previousForm?.submissionText || "");
+      const inputElement = submissionTextRef.current;
+      const hasCursor = inputElement && typeof inputElement.selectionStart === "number";
+      if (!hasCursor) {
+        return { ...previousForm, submissionText: `${currentValue}${character}` };
+      }
+
+      const start = inputElement.selectionStart;
+      const end = inputElement.selectionEnd;
+      return {
+        ...previousForm,
+        submissionText: `${currentValue.slice(0, start)}${character}${currentValue.slice(end)}`,
+      };
+    });
+
+    window.requestAnimationFrame(() => {
+      const inputElement = submissionTextRef.current;
+      if (!inputElement) return;
+      const start = typeof inputElement.selectionStart === "number" ? inputElement.selectionStart : inputElement.value.length;
+      const end = typeof inputElement.selectionEnd === "number" ? inputElement.selectionEnd : inputElement.value.length;
+      const cursorPosition = Math.max(start, end) + character.length;
+      inputElement.focus();
+      inputElement.setSelectionRange(cursorPosition, cursorPosition);
+    });
+  }, []);
+
   const hasSelectedAssignment = Boolean(form.assignmentTitle);
   const selectedDayNumber = selectedAssignmentDay;
   const isOrientationDay = hasSelectedAssignment && selectedDayNumber === 0;
@@ -2002,6 +2032,7 @@ const AssignmentSubmissionPage = () => {
                 ) : null}
               </span>
               <textarea
+                ref={submissionTextRef}
                 value={form.submissionText}
                 onChange={handleChange("submissionText")}
                 maxLength={dynamicMaxSubmissionCharacters}
@@ -2015,6 +2046,20 @@ const AssignmentSubmissionPage = () => {
                 }
                 disabled={isSelectedLocked || !hasSelectedAssignment}
               />
+              <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
+                {GERMAN_SPECIAL_CHARACTERS.map((character) => (
+                  <button
+                    key={character}
+                    type="button"
+                    style={{ ...styles.chipButton, minWidth: 44, textAlign: "center" }}
+                    onClick={() => insertSubmissionCharacter(character)}
+                    disabled={isSelectedLocked || !hasSelectedAssignment}
+                  >
+                    {character}
+                  </button>
+                ))}
+              </div>
               <span style={styles.helperText}>
                 Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
               </span>

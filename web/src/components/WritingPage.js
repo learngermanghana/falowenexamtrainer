@@ -52,6 +52,7 @@ const IDEAS_COACHING_PROMPTS = [
   "Request a short explanation and one example sentence.",
   "End by summarizing the idea in your own words.",
 ];
+const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
 const IMPORTANT_PHRASE_COLORS = ["#1d4ed8", "#7c3aed", "#be123c", "#0f766e", "#b45309"];
 
@@ -399,6 +400,24 @@ const WordCountMeter = ({ count, range }) => {
   );
 };
 
+const SpecialCharacterRow = ({ onInsert, label = "Quick umlaut keys" }) => (
+  <div style={{ marginTop: 8 }}>
+    <div style={{ ...styles.helperText, margin: "0 0 6px 0" }}>{label}</div>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      {GERMAN_SPECIAL_CHARACTERS.map((character) => (
+        <button
+          key={character}
+          type="button"
+          style={{ ...styles.chipButton, minWidth: 44, textAlign: "center" }}
+          onClick={() => onInsert(character)}
+        >
+          {character}
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
 const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const {
     level,
@@ -491,6 +510,33 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   );
   const [timerRunning, setTimerRunning] = useState(false);
   const chatLogRef = useRef(null);
+  const markDraftRef = useRef(null);
+  const ideasPromptRef = useRef(null);
+  const ideasWorkspaceRef = useRef(null);
+
+  const insertSpecialCharacter = useCallback((setter, fieldRef, character) => {
+    setter((previousValue) => {
+      const currentValue = String(previousValue || "");
+      const inputElement = fieldRef?.current;
+      const hasCursor = inputElement && typeof inputElement.selectionStart === "number";
+
+      if (!hasCursor) return `${currentValue}${character}`;
+
+      const start = inputElement.selectionStart;
+      const end = inputElement.selectionEnd;
+      return `${currentValue.slice(0, start)}${character}${currentValue.slice(end)}`;
+    });
+
+    window.requestAnimationFrame(() => {
+      const inputElement = fieldRef?.current;
+      if (!inputElement) return;
+      const start = typeof inputElement.selectionStart === "number" ? inputElement.selectionStart : inputElement.value.length;
+      const end = typeof inputElement.selectionEnd === "number" ? inputElement.selectionEnd : inputElement.value.length;
+      const cursorPosition = Math.max(start, end) + character.length;
+      inputElement.focus();
+      inputElement.setSelectionRange(cursorPosition, cursorPosition);
+    });
+  }, []);
   const resetWritingWorkspace = useCallback(() => {
     setTypedAnswer("");
     setMarkFeedback("");
@@ -1658,6 +1704,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
 
             <label style={styles.label}>Your letter (single box)</label>
             <textarea
+              ref={markDraftRef}
               value={typedAnswer}
               onChange={(e) => {
                 setError("");
@@ -1666,6 +1713,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               placeholder="Paste your finished letter or essay here for marking..."
               style={styles.textArea}
               rows={9}
+            />
+            <SpecialCharacterRow
+              onInsert={(character) => insertSpecialCharacter(setTypedAnswer, markDraftRef, character)}
             />
             <p style={styles.helperText}>
               Words: {typedWordCount} · Characters: {typedAnswer.length}
@@ -1902,6 +1952,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <div style={{ marginTop: 12 }}>
             <label style={styles.label}>Your prompt (single box)</label>
             <textarea
+              ref={ideasPromptRef}
               style={styles.textareaSmall}
               value={ideaInput}
               onChange={(e) => {
@@ -1911,6 +1962,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               }}
               placeholder="Paste your exam question or the part you need help with."
               rows={3}
+            />
+            <SpecialCharacterRow
+              onInsert={(character) => insertSpecialCharacter(setIdeaInput, ideasPromptRef, character)}
             />
           </div>
           <div style={{ marginTop: 10 }}>
@@ -1977,6 +2031,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               <div>
                 <label style={styles.label}>Single draft workspace</label>
                 <textarea
+                  ref={ideasWorkspaceRef}
                   style={styles.textareaSmall}
                   value={ideaDraftWorkspace}
                   onChange={(event) => {
@@ -1985,6 +2040,12 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                     setIdeaSuccess("");
                   }}
                   placeholder="Your best evolving draft stays here. Keep refining it before sending to Mark my letter."
+                />
+                <SpecialCharacterRow
+                  label="Quick umlaut keys for this draft"
+                  onInsert={(character) =>
+                    insertSpecialCharacter(setIdeaDraftWorkspace, ideasWorkspaceRef, character)
+                  }
                 />
                 <div style={{ ...styles.helperText, marginTop: 4, marginBottom: 0 }}>{countWords(ideaDraftWorkspace)} words</div>
               </div>
