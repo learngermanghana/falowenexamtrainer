@@ -46,6 +46,13 @@ const exampleStyle = {
   background: "rgba(16,185,129,0.08)",
   border: "1px solid rgba(16,185,129,0.18)",
 };
+const heroImageStyle = {
+  width: "100%",
+  borderRadius: 16,
+  border: "1px solid rgba(0,0,0,0.08)",
+  objectFit: "cover",
+  maxHeight: 260,
+};
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -85,6 +92,12 @@ const A2Day9PerfektGrammarPage = () => {
 
         <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 18 }}>
           <h1 style={{ margin: 0 }}>A2 • 4.9 Urlaub</h1>
+          <img
+            src="/learning-space-hero.svg"
+            alt="Travel-themed hero illustration for the Urlaub grammar lesson"
+            style={heroImageStyle}
+            loading="lazy"
+          />
           <p style={{ margin: 0, opacity: 0.85 }}>
             Grammar focus: <strong>Perfekt</strong>
           </p>
