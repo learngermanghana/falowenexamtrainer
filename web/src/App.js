@@ -65,6 +65,7 @@ import A2Day9PerfektGrammarPage from "./components/A2Day9PerfektGrammarPage";
 import A2Day10PraeteritumGrammarPage from "./components/A2Day10PraeteritumGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
+import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
 import B1Day20WieWirdManWorkbookPage from "./components/B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day22BeziehungWichtigWorkbookPage from "./components/B1Day22BeziehungWichtigWorkbookPage";
@@ -641,6 +642,10 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-7-eine-wohnung-suchen-workbook" element={<A2Day7WohnungSuchenWorkbookPage />} />
           <Route path="/campus/course/a2-day-8-rezepte-und-essen-workbook" element={<A2Day8RezepteUndEssenWorkbookPage />} />
           <Route path="/campus/course/a2-day-9-urlaub-workbook" element={<A2Day9UrlaubWorkbookPage />} />
+          <Route
+            path="/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook"
+            element={<A2Day10TourismusTraditionelleFesteWorkbookPage />}
+          />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
