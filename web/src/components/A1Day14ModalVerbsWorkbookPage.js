@@ -461,7 +461,25 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </SectionCard>
 
-      <SectionCard title="6) Übung: Satzbildung mit Modalverben (Type + Check)">
+      <SectionCard title="6) Practice path (recommended order)">
+        <p style={{ margin: 0 }}>
+          To avoid confusion, complete the exercises in this order:
+          <strong> 6 → 7 → 8</strong>.
+        </p>
+        <ul style={listStyle}>
+          <li>
+            <strong>Step 1:</strong> Modal verbs only (Questions 1–5)
+          </li>
+          <li>
+            <strong>Step 2:</strong> Separable verbs without modal (Questions 6–10)
+          </li>
+          <li>
+            <strong>Step 3:</strong> Separable verbs with modal (Questions 11–15)
+          </li>
+        </ul>
+      </SectionCard>
+
+      <SectionCard title="7) Practice 1: Build sentences with modal verbs (Questions 1–5)">
         <p style={{ margin: 0 }}>
           Ordnen Sie die Wörter zu einem korrekten Satz. Tippen Sie den Satz und klicken Sie <strong>Check</strong>.
         </p>
@@ -482,7 +500,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </ol>
       </SectionCard>
 
-      <SectionCard title="7) Trennbare Verben (separable verbs)">
+      <SectionCard title="8) Practice 2: Separable verbs without modal (Questions 6–10)">
         <p style={{ margin: 0 }}>
           <strong>Without</strong> a modal: the prefix separates → Ich stehe um 6 Uhr <strong>auf</strong>.
         </p>
@@ -509,8 +527,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </ol>
       </SectionCard>
 
-      {/* NEW SECTION 8 */}
-      <SectionCard title="8) Extra practice: Separable verbs + Modal verbs">
+      <SectionCard title="9) Practice 3: Separable verbs + modal verbs (Questions 11–15)">
         <p style={{ margin: 0 }}>
           <strong>Word order reminder:</strong> Subject + modal (Position 2) + time + details + main verb (infinitive at the
           end)
