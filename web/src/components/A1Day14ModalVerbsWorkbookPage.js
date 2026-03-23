@@ -16,6 +16,15 @@ const listStyle = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 const primaryBtn = styles.primaryButton || styles.secondaryButton;
 const secondaryBtn = styles.secondaryButton || styles.primaryButton;
 
+function shuffleArray(items) {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 function normalizeGermanInput(text) {
   return (text || "")
     .trim()
@@ -66,22 +75,24 @@ function ExerciseItem({
   const [value, setValue] = useState("");
   const [checked, setChecked] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [shuffledWords, setShuffledWords] = useState(() => shuffleArray(words));
 
   const correct = useMemo(() => isCorrect(value, answer), [value, answer]);
 
   useEffect(() => {
     // Reset when parent requests it
+    setShuffledWords(shuffleArray(words));
     setValue("");
     setChecked(false);
     setShowAnswer(false);
     onMark?.(id, null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey]);
+  }, [resetKey, words]);
 
   return (
     <li style={{ marginBottom: 14 }}>
       <div style={{ display: "grid", gap: 10 }}>
-        <ChipRow items={words} />
+        <ChipRow items={shuffledWords} />
 
         <input
           value={value}
@@ -188,11 +199,11 @@ const sentenceBuilding = [
 ];
 
 const separableNoModal = [
-  { id: "s1", words: ["ichsteheum 6 Uhrauf"], answer: "Ich stehe um 6 Uhr auf." },
-  { id: "s2", words: ["ersiehtabendsfern"], answer: "Er sieht abends fern." },
-  { id: "s3", words: ["wirkaufenam Samstagein"], answer: "Wir kaufen am Samstag ein." },
-  { id: "s4", words: ["siebringteinen Kuchenmit"], answer: "Sie bringt einen Kuchen mit." },
-  { id: "s5", words: ["duwachstum 7 Uhrauf"], answer: "Du wachst um 7 Uhr auf." },
+  { id: "s1", words: ["um 6 Uhr", "ich", "stehe", "auf"], answer: "Ich stehe um 6 Uhr auf." },
+  { id: "s2", words: ["abends", "fern", "er", "sieht"], answer: "Er sieht abends fern." },
+  { id: "s3", words: ["kaufen", "ein", "wir", "am Samstag"], answer: "Wir kaufen am Samstag ein." },
+  { id: "s4", words: ["einen Kuchen", "mit", "sie", "bringt"], answer: "Sie bringt einen Kuchen mit." },
+  { id: "s5", words: ["wachst", "du", "um 7 Uhr", "auf"], answer: "Du wachst um 7 Uhr auf." },
 ];
 
 // NEW: separable verbs WITH modal verbs
