@@ -195,7 +195,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Präteritum",
     video: "https://youtu.be/XFxV3GSSm8E",
     youtube_link: "https://youtu.be/XFxV3GSSm8E",
-    grammarbook_link: "https://drive.google.com/file/d/1snFsDYBK8RrPRq2n3PtWvcIctSph-zvN/view?usp=sharing",
+    grammarbook_link: "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1vijZn-ryhT46cTzGmetuF0c4zys0yGlB/view?usp=sharing",
   },
   {
