@@ -197,13 +197,14 @@ const A2_SCHEDULE = [
     topic: "Tourismus und Traditionelle Feste 4.10",
     chapter: "4.10",
     assignment: true,
-    goal: "Learn about tourism and festivals.",
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    goal: "Discuss tourism and traditional festivals with clear arguments, cultural examples, and personal experiences.",
+    instruction:
+      "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "Präteritum",
     video: "https://youtu.be/XFxV3GSSm8E",
     youtube_link: "https://youtu.be/XFxV3GSSm8E",
     grammarbook_link: "/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1vijZn-ryhT46cTzGmetuF0c4zys0yGlB/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-10-tourismus-und-traditionelle-feste-workbook",
   },
   {
     day: 11,
