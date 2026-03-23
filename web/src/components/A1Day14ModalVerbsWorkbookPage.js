@@ -363,13 +363,17 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </div>
       </div>
 
-      <SectionCard title="1) Modal verbs — the basic rule">
+      <SectionCard title="1) Bridge from statement rule to modal verbs">
         <p style={{ margin: 0 }}>
-          In a normal main sentence, the <strong>modal verb</strong> is conjugated (Position 2),
-          and the <strong>main verb</strong> stays in the <strong>infinitive</strong> at the end.
+          Quick reminder from the previous practice: in a basic statement, we often build with
+          <strong> Subject + verb + time + details</strong>.
         </p>
         <p style={{ margin: 0 }}>
-          <strong>Pattern:</strong> Subject + modal + time + details + main verb (infinitive)
+          With modal verbs, we keep the same statement flow, but now the <strong>modal verb</strong> is
+          conjugated in Position 2 and the main verb moves to the end in the <strong>infinitive</strong>.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong>Pattern:</strong> Subject + modal + time + details + main verb (infinitive).
         </p>
         <p style={{ margin: 0 }}>
           <strong>Example:</strong> Ich möchte morgen nach Deutschland reisen.
