@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -53,6 +53,93 @@ const heroImageStyle = {
   objectFit: "cover",
   maxHeight: 260,
 };
+const quizQuestionStyle = {
+  border: "1px solid rgba(0,0,0,0.08)",
+  borderRadius: 12,
+  padding: 12,
+  background: "#fff",
+  display: "grid",
+  gap: 10,
+};
+const optionBtnStyle = (selected, correct, showResults) => ({
+  width: "100%",
+  textAlign: "left",
+  padding: "10px 12px",
+  borderRadius: 10,
+  border: showResults
+    ? selected === correct
+      ? "1px solid #16a34a"
+      : selected
+      ? "1px solid #dc2626"
+      : "1px solid rgba(0,0,0,0.1)"
+    : selected
+    ? "1px solid #4f46e5"
+    : "1px solid rgba(0,0,0,0.1)",
+  background: showResults
+    ? selected === correct
+      ? "#f0fdf4"
+      : selected
+      ? "#fef2f2"
+      : "#fff"
+    : selected
+    ? "#eef2ff"
+    : "#fff",
+  cursor: "pointer",
+  lineHeight: 1.5,
+});
+
+const quizData = [
+  {
+    id: 1,
+    question: "Which auxiliary is usually used with movement verbs like fahren?",
+    options: ["haben", "sein", "werden"],
+    correct: "sein",
+    explanation: "Many movement verbs (like fahren/gehen/kommen) use sein in Perfekt.",
+  },
+  {
+    id: 2,
+    question: "Choose the correct Perfekt sentence:",
+    options: ["Ich habe nach Berlin gefahren.", "Ich bin nach Berlin gefahren.", "Ich bin nach Berlin gefahrt."],
+    correct: "Ich bin nach Berlin gefahren.",
+    explanation: "Fahren uses sein, and the participle is gefahren.",
+  },
+  {
+    id: 3,
+    question: "Which sentence has correct word order in Perfekt?",
+    options: [
+      "Wir haben am Wochenende gearbeitet.",
+      "Wir gearbeitet haben am Wochenende.",
+      "Wir am Wochenende gearbeitet haben.",
+    ],
+    correct: "Wir haben am Wochenende gearbeitet.",
+    explanation: "In main clauses, the auxiliary comes second and participle goes to the end.",
+  },
+  {
+    id: 4,
+    question: "What is the correct Partizip II of lernen?",
+    options: ["gelern", "gelernt", "gelernen"],
+    correct: "gelernt",
+    explanation: "Regular verbs often follow ge + stem + t.",
+  },
+  {
+    id: 5,
+    question: "For separable verbs, where does ge usually go?",
+    options: ["Before the prefix", "Between prefix and stem", "After the participle"],
+    correct: "Between prefix and stem",
+    explanation: "Example: einladen → eingeladen.",
+  },
+  {
+    id: 6,
+    question: "Choose the sentence that correctly uses haben:",
+    options: [
+      "Sie hat ein Hotel gebucht.",
+      "Sie ist ein Hotel gebucht.",
+      "Sie hat ein Hotel gebuchen.",
+    ],
+    correct: "Sie hat ein Hotel gebucht.",
+    explanation: "Buchen forms Perfekt with haben and the participle is gebucht.",
+  },
+];
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -77,6 +164,18 @@ const InlineCode = ({ children }) => (
 
 const A2Day9PerfektGrammarPage = () => {
   const navigate = useNavigate();
+  const [answers, setAnswers] = useState({});
+  const [showResults, setShowResults] = useState(false);
+
+  const score = useMemo(() => {
+    const correct = quizData.reduce((count, q) => count + (answers[q.id] === q.correct ? 1 : 0), 0);
+    return { correct, total: quizData.length };
+  }, [answers]);
+
+  const resetQuiz = () => {
+    setAnswers({});
+    setShowResults(false);
+  };
 
   return (
     <div style={styles.pageWrap}>
@@ -273,6 +372,72 @@ const A2Day9PerfektGrammarPage = () => {
             <p style={{ margin: 0 }}>
               <Link to="/campus/course">Back to the course overview</Link>
             </p>
+          </SectionCard>
+
+          <SectionCard title="9) Knowledge test (Quick check)">
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Test your understanding before moving on. Aim for at least 4/6 to continue confidently.
+            </p>
+
+            {showResults && (
+              <div style={noteStyle}>
+                <strong>Your score:</strong> {score.correct}/{score.total}{" "}
+                {score.correct >= 4 ? "✅ Great work." : "⚠️ Review sections 3–7 and try again."}
+              </div>
+            )}
+
+            <div style={{ display: "grid", gap: 12 }}>
+              {quizData.map((q, index) => (
+                <div key={q.id} style={quizQuestionStyle}>
+                  <div style={{ fontWeight: 700, lineHeight: 1.55 }}>
+                    {index + 1}. {q.question}
+                  </div>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {q.options.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() =>
+                          setAnswers((prev) => ({
+                            ...prev,
+                            [q.id]: option,
+                          }))
+                        }
+                        style={optionBtnStyle(answers[q.id] === option, q.correct, showResults)}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+
+                  {showResults && (
+                    <div
+                      style={{
+                        borderRadius: 10,
+                        padding: 10,
+                        fontSize: 14,
+                        lineHeight: 1.65,
+                        background: answers[q.id] === q.correct ? "#f0fdf4" : "#fef2f2",
+                        border: answers[q.id] === q.correct ? "1px solid #bbf7d0" : "1px solid #fecaca",
+                        color: answers[q.id] === q.correct ? "#166534" : "#991b1b",
+                      }}
+                    >
+                      <strong>{answers[q.id] === q.correct ? "Correct." : "Not correct."}</strong>{" "}
+                      {q.explanation}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button type="button" style={styles.primaryButton} onClick={() => setShowResults(true)}>
+                Check answers
+              </button>
+              <button type="button" style={styles.secondaryButton} onClick={resetQuiz}>
+                Reset
+              </button>
+            </div>
           </SectionCard>
         </div>
       </div>
