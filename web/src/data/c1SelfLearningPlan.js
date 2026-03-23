@@ -1923,7 +1923,30 @@ const C1_PLAN_ENHANCEMENTS = {
   },
 };
 
-export const C1_SELF_LEARNING_PLAN = BASE_C1_SELF_LEARNING_PLAN.map((entry) => ({
-  ...entry,
-  ...(C1_PLAN_ENHANCEMENTS[entry.day] || {}),
-}));
+const C1_COMPLEX_SENTENCE_NOTE =
+  "Formuliere mindestens einen komplexen Satz mit Einbettung (z. B. obwohl/während/sodass), inkl. korrekter Verbendstellung im Nebensatz und präziser Zeichensetzung.";
+
+const withComplexSentenceFocus = (entry) => {
+  if (!entry?.speaking) return entry;
+  const notes = Array.isArray(entry.speaking.grammarNotes) ? entry.speaking.grammarNotes : [];
+  const hasComplexSentenceFocus = notes.some((note) =>
+    /complex sentence|subordinate clause|nebensatz|hauptsatz|einbettung/i.test(String(note))
+  );
+
+  if (hasComplexSentenceFocus) return entry;
+
+  return {
+    ...entry,
+    speaking: {
+      ...entry.speaking,
+      grammarNotes: [...notes, C1_COMPLEX_SENTENCE_NOTE],
+    },
+  };
+};
+
+export const C1_SELF_LEARNING_PLAN = BASE_C1_SELF_LEARNING_PLAN.map((entry) =>
+  withComplexSentenceFocus({
+    ...entry,
+    ...(C1_PLAN_ENHANCEMENTS[entry.day] || {}),
+  })
+);

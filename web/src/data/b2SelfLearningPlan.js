@@ -1941,7 +1941,30 @@ const B2_PLAN_ENHANCEMENTS = {
   },
 };
 
-export const B2_SELF_LEARNING_PLAN = BASE_B2_SELF_LEARNING_PLAN.map((entry) => ({
-  ...entry,
-  ...(B2_PLAN_ENHANCEMENTS[entry.day] || {}),
-}));
+const B2_COMPLEX_SENTENCE_NOTE =
+  "Build at least one complex sentence: main clause + subordinate clause (z. B. weil/obwohl/wenn), and place the conjugated verb at the end of the subordinate clause.";
+
+const withComplexSentenceFocus = (entry) => {
+  if (!entry?.speaking) return entry;
+  const notes = Array.isArray(entry.speaking.grammarNotes) ? entry.speaking.grammarNotes : [];
+  const hasComplexSentenceFocus = notes.some((note) =>
+    /complex sentence|subordinate clause|nebensatz|hauptsatz/i.test(String(note))
+  );
+
+  if (hasComplexSentenceFocus) return entry;
+
+  return {
+    ...entry,
+    speaking: {
+      ...entry.speaking,
+      grammarNotes: [...notes, B2_COMPLEX_SENTENCE_NOTE],
+    },
+  };
+};
+
+export const B2_SELF_LEARNING_PLAN = BASE_B2_SELF_LEARNING_PLAN.map((entry) =>
+  withComplexSentenceFocus({
+    ...entry,
+    ...(B2_PLAN_ENHANCEMENTS[entry.day] || {}),
+  })
+);
