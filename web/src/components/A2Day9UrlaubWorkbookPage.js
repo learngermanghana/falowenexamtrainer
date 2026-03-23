@@ -41,13 +41,6 @@ const calloutStyle = {
   background: "#f8fafc",
 };
 
-const videoPreviewStyle = {
-  width: "100%",
-  minHeight: 315,
-  border: 0,
-  borderRadius: 10,
-};
-
 const lesenQuestions = [
   {
     stem: "1. Was kann man in Bibliotheken machen?",
