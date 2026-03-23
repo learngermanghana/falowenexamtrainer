@@ -474,31 +474,20 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           Before practice, remember another useful A1 pattern:
           <strong> gehen + infinitive</strong> (to go do something).
         </p>
-        <p style={{ margin: 0 }}>
-          <strong>How it works:</strong> Conjugate <strong>gehen</strong> in Position 2, put time after it, and
-          keep the second verb in infinitive form near the end.
-        </p>
-        <p style={{ margin: 0 }}>
-          <strong>Pattern:</strong> Subject + gehen + time + details + infinitive.
-        </p>
         <ul style={listStyle}>
           <li>
-            Ich gehe <strong>morgen um 16:00 Uhr</strong> <strong>einkaufen</strong>. (I am going shopping tomorrow
-            at 4:00 PM.)
+            Ich gehe <strong>einkaufen</strong>. (I am going shopping.)
           </li>
           <li>
-            Wir gehen <strong>heute Abend um 19:00 Uhr</strong> <strong>essen</strong>. (We are going to eat
-            tonight at 7:00 PM.)
+            Wir gehen <strong>essen</strong>. (We are going to eat.)
           </li>
           <li>
-            Sie geht <strong>am Samstag um 10:00 Uhr</strong> <strong>schwimmen</strong>. (She goes swimming on
-            Saturday at 10:00 AM.)
+            Sie geht <strong>schwimmen</strong>. (She goes swimming.)
           </li>
         </ul>
         <p style={{ margin: 0, color: "#4b5563" }}>
-          Explanation: <strong>gehen</strong> behaves like the main conjugated verb, while the action verb
-          (<strong>einkaufen</strong>, <strong>essen</strong>, <strong>schwimmen</strong>) stays in infinitive
-          form.
+          With this structure, <strong>gehen</strong> is conjugated and the other verb stays in infinitive at
+          the end.
         </p>
         <p style={{ margin: 0 }}>
           To avoid confusion, complete the exercises in this order:
