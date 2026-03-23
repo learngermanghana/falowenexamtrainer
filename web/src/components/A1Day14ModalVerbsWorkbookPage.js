@@ -405,12 +405,24 @@ const A1Day14ModalVerbsWorkbookPage = () => {
 
       <SectionCard title="3) Example sentences">
         <ol style={listStyle}>
-          <li>Ich kann um 15 Uhr einchecken.</li>
-          <li>Wir müssen um 12 Uhr auschecken.</li>
-          <li>Du darfst nicht in diesem Zimmer rauchen.</li>
-          <li>Ich will ein Zimmer mit Blick aufs Meer.</li>
-          <li>Wir sollen unseren Reiseplan ändern.</li>
-          <li>Er mag Hotels. / Ich mag in Hotels übernachten.</li>
+          <li>
+            Ich <strong>kann</strong> um 15 Uhr <strong>einchecken</strong>.
+          </li>
+          <li>
+            Wir <strong>müssen</strong> um 12 Uhr <strong>auschecken</strong>.
+          </li>
+          <li>
+            Du <strong>darfst</strong> nicht in diesem Zimmer <strong>rauchen</strong>.
+          </li>
+          <li>
+            Ich <strong>will</strong> ein Zimmer mit Blick aufs Meer <strong>haben</strong>.
+          </li>
+          <li>
+            Wir <strong>sollen</strong> unseren Reiseplan <strong>ändern</strong>.
+          </li>
+          <li>
+            Er <strong>mag</strong> Hotels. / Ich <strong>mag</strong> in Hotels <strong>übernachten</strong>.
+          </li>
         </ol>
       </SectionCard>
 
@@ -476,13 +488,13 @@ const A1Day14ModalVerbsWorkbookPage = () => {
         </p>
         <ul style={listStyle}>
           <li>
-            Ich gehe <strong>einkaufen</strong>. (I am going shopping.)
+            Ich gehe am Montag <strong>einkaufen</strong>. (I am going shopping on Monday.)
           </li>
           <li>
-            Wir gehen <strong>essen</strong>. (We are going to eat.)
+            Wir gehen heute Abend <strong>essen</strong>. (We are going to eat this evening.)
           </li>
           <li>
-            Sie geht <strong>schwimmen</strong>. (She goes swimming.)
+            Sie geht morgen <strong>schwimmen</strong>. (She goes swimming tomorrow.)
           </li>
         </ul>
         <p style={{ margin: 0, color: "#4b5563" }}>
