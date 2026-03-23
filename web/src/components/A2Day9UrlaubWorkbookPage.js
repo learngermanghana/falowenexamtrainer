@@ -459,21 +459,6 @@ const A2Day9UrlaubWorkbookPage = () => {
             </div>
           )}
 
-          <h3 style={sectionTitle}>Recommended Video</h3>
-          <p style={{ margin: 0 }}>
-            Urlaub und Reisen auf Deutsch: {" "}
-            <a href="https://youtu.be/NxoQH-BY9Js" target="_blank" rel="noreferrer">
-              https://youtu.be/NxoQH-BY9Js
-            </a>
-          </p>
-          <iframe
-            title="Urlaub und Reisen auf Deutsch"
-            src="https://www.youtube.com/embed/NxoQH-BY9Js"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            style={videoPreviewStyle}
-          />
-
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
