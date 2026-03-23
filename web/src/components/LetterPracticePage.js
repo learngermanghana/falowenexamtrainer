@@ -78,6 +78,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [editableDraftById, setEditableDraftById] = useState({});
   const [hiddenDraftIds, setHiddenDraftIds] = useState([]);
   const [ideaDraftWorkspace, setIdeaDraftWorkspace] = useState("");
+  const [referenceInput, setReferenceInput] = useState("");
+  const [referenceNotes, setReferenceNotes] = useState([]);
   const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
   const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -116,6 +118,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const availableTabs = useMemo(
     () => {
       const baseTabs = [{ key: "mark", label: "Mark my letter" }];
+      baseTabs.push({ key: "references", label: "Reference" });
 
       if (canUseIdeasGenerator) {
         baseTabs.push({ key: "ideas", label: "Ideas generator" });
@@ -267,6 +270,12 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           setHiddenDraftIds([]);
         }
         if (typeof saved.ideaDraftWorkspace === "string") setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
+        if (typeof saved.referenceInput === "string") setReferenceInput(saved.referenceInput);
+        if (Array.isArray(saved.referenceNotes)) {
+          setReferenceNotes(saved.referenceNotes.filter((item) => typeof item === "string"));
+        } else {
+          setReferenceNotes([]);
+        }
         if (typeof saved.ideaSessionActive === "boolean") setIdeaSessionActive(saved.ideaSessionActive);
         if (typeof saved.ideaTurnCount === "number") setIdeaTurnCount(saved.ideaTurnCount);
       } catch (error) {
@@ -298,6 +307,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           editableDraftById,
           hiddenDraftIds,
           ideaDraftWorkspace,
+          referenceInput,
+          referenceNotes,
           ideaSessionActive,
           ideaTurnCount,
         },
@@ -315,6 +326,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     editableDraftById,
     hiddenDraftIds,
     ideaDraftWorkspace,
+    referenceInput,
+    referenceNotes,
     ideasProgressLoaded,
     ideasProgressMode,
     selectedDraftIds,
@@ -569,6 +582,27 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     setSelectedDraftIds([]);
     setIdeaSessionActive(false);
     setActiveTab("mark");
+  };
+
+  const addReferenceNote = () => {
+    const normalized = referenceInput.trim().replace(/\s+/g, " ");
+    if (!normalized) return;
+
+    const alreadyExists = referenceNotes.some((note) => note.toLowerCase() === normalized.toLowerCase());
+    if (alreadyExists) {
+      setIdeaSuccess("That note is already in your reference list.");
+      setIdeaError("");
+      return;
+    }
+
+    setReferenceNotes((prev) => [normalized, ...prev]);
+    setReferenceInput("");
+    setIdeaSuccess("Reference saved.");
+    setIdeaError("");
+  };
+
+  const removeReferenceNote = (noteToRemove) => {
+    setReferenceNotes((prev) => prev.filter((note) => note !== noteToRemove));
   };
 
   const startIdeasSession = () => {
@@ -1102,6 +1136,77 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     )}
                   </div>
                 )}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {activeTab === "references" && (
+        <section style={styles.card}>
+          <h3 style={{ ...styles.sectionTitle, marginTop: 0 }}>Reference</h3>
+          <p style={styles.helperText}>
+            Keep useful sentence starters and corrections here, then add them directly to your draft.
+          </p>
+          <div style={{ ...styles.infoBox, marginBottom: 12 }}>
+            <strong>Tip:</strong> Save short formal phrases you want to reuse in future letters.
+          </div>
+          <div style={{ display: "grid", gap: 6 }}>
+            <label style={styles.label}>New reference note</label>
+            <textarea
+              style={styles.textArea}
+              rows={4}
+              value={referenceInput}
+              placeholder="e.g., Ich möchte mich für die Verspätung entschuldigen."
+              onChange={(event) => {
+                setReferenceInput(event.target.value);
+                setIdeaError("");
+                setIdeaSuccess("");
+              }}
+            />
+          </div>
+          <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" style={styles.primaryButton} onClick={addReferenceNote}>
+              Save note
+            </button>
+          </div>
+          {ideaSuccess ? <div style={{ ...styles.successBox, marginTop: 8 }}>{ideaSuccess}</div> : null}
+
+          <div style={{ marginTop: 14 }}>
+            <h4 style={styles.resultHeading}>Saved references ({referenceNotes.length})</h4>
+            {referenceNotes.length === 0 ? (
+              <p style={styles.helperText}>No saved references yet.</p>
+            ) : (
+              <div style={{ display: "grid", gap: 10 }}>
+                {referenceNotes.map((note) => (
+                  <div
+                    key={note}
+                    style={{
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: 10,
+                      background: "#fff",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 10,
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{note}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={() => setLetterText((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
+                      >
+                        Add to letter
+                      </button>
+                      <button type="button" style={styles.dangerButton} onClick={() => removeReferenceNote(note)}>
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
