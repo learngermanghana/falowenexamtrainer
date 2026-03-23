@@ -646,6 +646,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     }
   }, [availableTabs, initialTab]);
   const progressMode = isExamMode ? "exam" : "course";
+  const alternateProgressMode = progressMode === "exam" ? "course" : "exam";
   useEffect(() => {
     if (isLevelLocked && profileLevel !== level) {
       setLevel(profileLevel);
@@ -745,7 +746,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
 
       setProgressLoaded(false);
       try {
-        const saved = await loadWritingProgress({ userId, studentCode, mode: progressMode });
+        const [saved, alternateSaved] = await Promise.all([
+          loadWritingProgress({ userId, studentCode, mode: progressMode }),
+          loadWritingProgress({ userId, studentCode, mode: alternateProgressMode }),
+        ]);
         if (!isMounted) return;
 
         if (!saved) {
@@ -781,11 +785,17 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           setEditableDraftById({});
         }
         if (typeof saved.ideaDraftWorkspace === "string") setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
-        if (Array.isArray(saved.referenceNotes)) {
-          setReferenceNotes(saved.referenceNotes.filter((item) => typeof item === "string"));
-        } else {
-          setReferenceNotes([]);
-        }
+        const currentModeNotes = Array.isArray(saved.referenceNotes)
+          ? saved.referenceNotes.filter((item) => typeof item === "string")
+          : [];
+        const alternateModeNotes = Array.isArray(alternateSaved?.referenceNotes)
+          ? alternateSaved.referenceNotes.filter((item) => typeof item === "string")
+          : [];
+        const mergedReferenceNotes = [...currentModeNotes, ...alternateModeNotes].filter(
+          (note, index, list) =>
+            list.findIndex((candidate) => candidate.toLowerCase() === note.toLowerCase()) === index
+        );
+        setReferenceNotes(mergedReferenceNotes);
         if (typeof saved.remainingSeconds === "number") {
           setRemainingSeconds(saved.remainingSeconds);
         }
@@ -816,13 +826,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     return () => {
       isMounted = false;
     };
-  }, [progressMode, resetWritingWorkspace, studentCode, userId]);
+  }, [alternateProgressMode, progressMode, resetWritingWorkspace, studentCode, userId]);
 
   useEffect(() => {
     if (!progressLoaded || (!userId && !studentCode)) return;
 
     const timeout = setTimeout(() => {
-      saveWritingProgress({
+      const progressPayload = {
         userId,
         studentCode,
         mode: progressMode,
@@ -847,8 +857,21 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           completionLog,
           errorBank,
         },
-      }).catch((err) => {
+      };
+
+      saveWritingProgress(progressPayload).catch((err) => {
         console.error("Failed to save writing progress", err);
+      });
+
+      saveWritingProgress({
+        userId,
+        studentCode,
+        mode: alternateProgressMode,
+        data: {
+          referenceNotes,
+        },
+      }).catch((err) => {
+        console.error("Failed to sync reference notes across writing modes", err);
       });
     }, 800);
 
@@ -867,6 +890,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     reflectionText,
     revisedDraftText,
     progressLoaded,
+    alternateProgressMode,
     progressMode,
     remainingSeconds,
     rubricBreakdown,
