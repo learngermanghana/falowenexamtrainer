@@ -188,11 +188,11 @@ const sentenceBuilding = [
 ];
 
 const separableNoModal = [
-  { id: "s1", words: ["stehe", "um 6 Uhr", "auf", "ich"], answer: "Ich stehe um 6 Uhr auf." },
-  { id: "s2", words: ["sieht", "abends", "fern", "er"], answer: "Er sieht abends fern." },
-  { id: "s3", words: ["kaufen", "am Samstag", "ein", "wir"], answer: "Wir kaufen am Samstag ein." },
-  { id: "s4", words: ["bringt", "einen Kuchen", "mit", "sie"], answer: "Sie bringt einen Kuchen mit." },
-  { id: "s5", words: ["wachst", "um 7 Uhr", "auf", "du"], answer: "Du wachst um 7 Uhr auf." },
+  { id: "s1", words: ["ichsteheum 6 Uhrauf"], answer: "Ich stehe um 6 Uhr auf." },
+  { id: "s2", words: ["ersiehtabendsfern"], answer: "Er sieht abends fern." },
+  { id: "s3", words: ["wirkaufenam Samstagein"], answer: "Wir kaufen am Samstag ein." },
+  { id: "s4", words: ["siebringteinen Kuchenmit"], answer: "Sie bringt einen Kuchen mit." },
+  { id: "s5", words: ["duwachstum 7 Uhrauf"], answer: "Du wachst um 7 Uhr auf." },
 ];
 
 // NEW: separable verbs WITH modal verbs
