@@ -459,6 +459,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [hiddenDraftIds, setHiddenDraftIds] = useState([]);
   const [editableDraftById, setEditableDraftById] = useState({});
   const [ideaDraftWorkspace, setIdeaDraftWorkspace] = useState("");
+  const [referenceInput, setReferenceInput] = useState("");
+  const [referenceNotes, setReferenceNotes] = useState([]);
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
@@ -513,6 +515,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const markDraftRef = useRef(null);
   const ideasPromptRef = useRef(null);
   const ideasWorkspaceRef = useRef(null);
+  const referencesRef = useRef(null);
 
   const insertSpecialCharacter = useCallback((setter, fieldRef, character) => {
     setter((previousValue) => {
@@ -557,6 +560,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setHiddenDraftIds([]);
     setEditableDraftById({});
     setIdeaDraftWorkspace("");
+    setReferenceInput("");
+    setReferenceNotes([]);
     setIdeaError("");
     setIdeaSuccess("");
     setTutorSaveState({ loading: false, success: "", error: "" });
@@ -606,6 +611,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [revealedFormAnswers, setRevealedFormAnswers] = useState({});
   const availableTabs = useMemo(() => {
     const tabs = [{ key: "mark", label: "Mark my letter" }];
+    tabs.push({ key: "references", label: "References (notes)" });
 
     if (canUseIdeasGenerator) {
       tabs.push({ key: "ideas", label: "Ideas helper" });
@@ -775,6 +781,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           setEditableDraftById({});
         }
         if (typeof saved.ideaDraftWorkspace === "string") setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
+        if (Array.isArray(saved.referenceNotes)) {
+          setReferenceNotes(saved.referenceNotes.filter((item) => typeof item === "string"));
+        } else {
+          setReferenceNotes([]);
+        }
         if (typeof saved.remainingSeconds === "number") {
           setRemainingSeconds(saved.remainingSeconds);
         }
@@ -828,6 +839,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           hiddenDraftIds,
           editableDraftById,
           ideaDraftWorkspace,
+          referenceNotes,
           remainingSeconds,
           timerRunning,
           rubricBreakdown,
@@ -848,6 +860,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     errorBank,
     editableDraftById,
     ideaDraftWorkspace,
+    referenceNotes,
     firstDraftSnapshot,
     ideaInput,
     markFeedback,
@@ -865,6 +878,26 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     userId,
     studentCode,
   ]);
+
+  const addReferenceNote = () => {
+    const normalized = referenceInput.trim().replace(/\s+/g, " ");
+    if (!normalized) return;
+    const alreadyExists = referenceNotes.some(
+      (note) => note.toLowerCase() === normalized.toLowerCase()
+    );
+    if (alreadyExists) {
+      setIdeaSuccess("That note is already saved in your references.");
+      return;
+    }
+    setReferenceNotes((prev) => [normalized, ...prev]);
+    setReferenceInput("");
+    setIdeaError("");
+    setIdeaSuccess("Reference note saved.");
+  };
+
+  const removeReferenceNote = (noteToRemove) => {
+    setReferenceNotes((prev) => prev.filter((note) => note !== noteToRemove));
+  };
 
   const handleExportDraft = () => {
     const trimmed = typedAnswer.trim();
@@ -2059,6 +2092,89 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 </div>
               )}
             </div>
+          </div>
+        </section>
+      )}
+
+      {activeTab === "references" && (
+        <section style={styles.card}>
+          <h3 style={styles.sectionTitle}>References (notes)</h3>
+          <p style={styles.helperText}>
+            Save important words and phrases here, then quickly reuse them while writing.
+          </p>
+          <div style={{ ...styles.infoBox, marginBottom: 12 }}>
+            <strong>Tip:</strong> Keep short sentence starters, formal phrases, and connector words you want to remember.
+          </div>
+          <label style={styles.label}>Add a note or phrase</label>
+          <textarea
+            ref={referencesRef}
+            style={styles.textareaSmall}
+            value={referenceInput}
+            rows={3}
+            placeholder="e.g., Ich möchte mich für die Verspätung entschuldigen."
+            onChange={(event) => {
+              setReferenceInput(event.target.value);
+              setIdeaError("");
+              setIdeaSuccess("");
+            }}
+          />
+          <SpecialCharacterRow
+            label="Quick umlaut keys for references"
+            onInsert={(character) =>
+              insertSpecialCharacter(setReferenceInput, referencesRef, character)
+            }
+          />
+          <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button type="button" style={styles.primaryButton} onClick={addReferenceNote}>
+              Save note
+            </button>
+          </div>
+          {ideaSuccess ? (
+            <div style={{ ...styles.successBox, marginTop: 8 }}>{ideaSuccess}</div>
+          ) : null}
+          <div style={{ marginTop: 14 }}>
+            <h4 style={styles.resultHeading}>Saved references ({referenceNotes.length})</h4>
+            {referenceNotes.length === 0 ? (
+              <p style={styles.helperText}>
+                No notes saved yet. Add your first phrase above — it will be saved to Firebase with your writing workspace.
+              </p>
+            ) : (
+              <div style={{ display: "grid", gap: 10 }}>
+                {referenceNotes.map((note) => (
+                  <div
+                    key={note}
+                    style={{
+                      border: "1px solid #e5e7eb",
+                      borderRadius: 10,
+                      padding: 10,
+                      background: "#fff",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: 10,
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{note}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        style={styles.secondaryButton}
+                        onClick={() => setTypedAnswer((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
+                      >
+                        Add to letter
+                      </button>
+                      <button
+                        type="button"
+                        style={styles.dangerButton}
+                        onClick={() => removeReferenceNote(note)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       )}
