@@ -381,6 +381,14 @@ const A1Day14ModalVerbsWorkbookPage = () => {
       </SectionCard>
 
       <SectionCard title="2) Modal verbs + meanings (Präsens)">
+        <p style={{ margin: 0 }}>
+          <strong>What is a modal verb?</strong> A modal verb is a <strong>supporting (helper) verb</strong>. It
+          adds meaning such as ability, permission, obligation, or desire, and it supports a second verb
+          (the main action) in infinitive form.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong>Helper pattern:</strong> Subject + modal verb + ... + main verb (infinitive at the end).
+        </p>
         <ul style={listStyle}>
           {modalVerbs.map((item) => (
             <li key={item.verb}>
@@ -462,6 +470,25 @@ const A1Day14ModalVerbsWorkbookPage = () => {
       </SectionCard>
 
       <SectionCard title="6) Practice path (recommended order)">
+        <p style={{ margin: 0 }}>
+          Before practice, remember another useful A1 pattern:
+          <strong> gehen + infinitive</strong> (to go do something).
+        </p>
+        <ul style={listStyle}>
+          <li>
+            Ich gehe <strong>einkaufen</strong>. (I am going shopping.)
+          </li>
+          <li>
+            Wir gehen <strong>essen</strong>. (We are going to eat.)
+          </li>
+          <li>
+            Sie geht <strong>schwimmen</strong>. (She goes swimming.)
+          </li>
+        </ul>
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          With this structure, <strong>gehen</strong> is conjugated and the other verb stays in infinitive at
+          the end.
+        </p>
         <p style={{ margin: 0 }}>
           To avoid confusion, complete the exercises in this order:
           <strong> 6 → 7 → 8</strong>.
