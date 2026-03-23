@@ -192,8 +192,8 @@ const A2Day9PerfektGrammarPage = () => {
         <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 18 }}>
           <h1 style={{ margin: 0 }}>A2 • 4.9 Urlaub</h1>
           <img
-            src="/learning-space-hero.svg"
-            alt="Travel-themed hero illustration for the Urlaub grammar lesson"
+            src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1800&q=80"
+            alt="Scenic travel landscape for the Urlaub grammar lesson"
             style={heroImageStyle}
             loading="lazy"
           />
