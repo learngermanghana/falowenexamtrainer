@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
@@ -17,6 +17,7 @@ import { formatCurrency } from "../lib/formatters";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 const MIN_INITIAL_PAYMENT = 2000;
+const normalizePhone = (value) => String(value || "").replace(/\s+/g, "").trim();
 const isFullName = (value) => {
   const cleaned = String(value || "").trim();
   if (!cleaned) return false;
@@ -84,6 +85,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [hasConsented, setHasConsented] = useState(false);
   const [showConsentDetails, setShowConsentDetails] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const fieldRefs = useRef({});
 
   const consentHighlights = t("signupPage.consent.highlights", { returnObjects: true });
 
@@ -129,6 +131,15 @@ const SignUpPage = ({ onLogin, onBack }) => {
 
   const setFieldError = (field, message) => {
     setFieldErrors((prev) => ({ ...prev, [field]: message }));
+  };
+
+  const focusField = (field) => {
+    const element = fieldRefs.current[field];
+    if (!element) return;
+    element.focus();
+    if (typeof element.scrollIntoView === "function") {
+      element.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   };
 
   const interpretSignupError = (error) => {
@@ -232,7 +243,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
     }
 
-    if (!phone.trim()) {
+    if (!normalizePhone(phone)) {
       validationIssues.phone = "Enter a contact phone number so we can reach you.";
     }
 
@@ -244,7 +255,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
     }
 
-    if (!emergencyContactPhone.trim()) {
+    if (!normalizePhone(emergencyContactPhone)) {
       validationIssues.emergencyContactPhone = "Add an emergency contact phone number. This is required for safety.";
     }
 
@@ -263,6 +274,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
     const validationMessages = Object.values(validationIssues);
     if (validationMessages.length) {
       setFieldErrors(validationIssues);
+      const firstInvalidField = Object.keys(validationIssues)[0];
+      if (firstInvalidField) {
+        focusField(firstInvalidField);
+      }
       const summaryMessage = `${validationMessages[0]} Fix the highlighted fields, then submit again.`;
       setAuthError(summaryMessage);
       showToast(summaryMessage, "error");
@@ -283,16 +298,16 @@ const SignUpPage = ({ onLogin, onBack }) => {
       // via the backend so we can validate amounts and attach clear metadata.
       const paystackLink = paystackLinkForLevel(selectedLevel);
 
-      await signup(email, password, {
-        name,
+      await signup(email.trim().toLowerCase(), password, {
+        name: name.trim(),
         level: selectedLevel,
         studentCode,
         className: selectedClass,
-        phone,
-        location,
-        address,
+        phone: normalizePhone(phone),
+        location: location.trim(),
+        address: address.trim(),
         learningMode,
-        emergencyContactPhone,
+        emergencyContactPhone: normalizePhone(emergencyContactPhone),
         program: "german",
         initialPaymentAmount: paidAmount,
         tuitionFee,
@@ -399,6 +414,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="text"
             required
+            autoComplete="name"
+            ref={(element) => {
+              fieldRefs.current.name = element;
+            }}
             value={name}
             onChange={(e) => {
               setName(e.target.value);
@@ -417,6 +436,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="email"
             required
+            autoComplete="email"
+            ref={(element) => {
+              fieldRefs.current.email = element;
+            }}
             value={email}
             onChange={(e) => {
               setEmail(e.target.value);
@@ -433,6 +456,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
             type="password"
             required
             minLength={8}
+            autoComplete="new-password"
+            ref={(element) => {
+              fieldRefs.current.password = element;
+            }}
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
@@ -451,6 +478,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
             type="password"
             required
             minLength={8}
+            autoComplete="new-password"
+            ref={(element) => {
+              fieldRefs.current.confirmPassword = element;
+            }}
             value={confirmPassword}
             onChange={(e) => {
               setConfirmPassword(e.target.value);
@@ -465,6 +496,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <label style={styles.label}>{t("signupPage.fields.currentLevel")}</label>
           <select
             required
+            ref={(element) => {
+              fieldRefs.current.selectedLevel = element;
+            }}
             value={selectedLevel}
             onChange={(event) => setSelectedLevel(event.target.value)}
             style={styles.select}
@@ -483,6 +517,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="tel"
             required
+            autoComplete="tel"
+            ref={(element) => {
+              fieldRefs.current.phone = element;
+            }}
             value={phone}
             onChange={(e) => {
               setPhone(e.target.value);
@@ -502,6 +540,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <label style={styles.label}>{t("signupPage.fields.address")}</label>
           <textarea
             required
+            autoComplete="street-address"
+            ref={(element) => {
+              fieldRefs.current.address = element;
+            }}
             value={address}
             onChange={(event) => {
               setAddress(event.target.value);
@@ -517,6 +559,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="text"
             required
+            autoComplete="address-level2"
+            ref={(element) => {
+              fieldRefs.current.location = element;
+            }}
             value={location}
             onChange={(e) => {
               setLocation(e.target.value);
@@ -530,6 +576,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <label style={styles.label}>{t("signupPage.fields.learningMode")}</label>
           <select
             required
+            ref={(element) => {
+              fieldRefs.current.learningMode = element;
+            }}
             value={learningMode}
             onChange={(event) => {
               setLearningMode(event.target.value);
@@ -549,6 +598,10 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <input
             type="tel"
             required
+            autoComplete="tel-national"
+            ref={(element) => {
+              fieldRefs.current.emergencyContactPhone = element;
+            }}
             value={emergencyContactPhone}
             onChange={(e) => {
               setEmergencyContactPhone(e.target.value);
@@ -571,6 +624,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             step="100"
             pattern="[0-9]*"
             inputMode="numeric"
+            ref={(element) => {
+              fieldRefs.current.initialPaymentAmount = element;
+            }}
             value={initialPaymentAmount}
             onChange={handleInitialPaymentChange}
             style={inputStyle}
@@ -603,6 +659,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
           <select
             id="class-selection"
             value={selectedClass}
+            ref={(element) => {
+              fieldRefs.current.selectedClass = element;
+            }}
             onChange={(event) => {
               setSelectedClass(event.target.value);
               clearFieldError("selectedClass");
@@ -627,6 +686,9 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <input
               type="checkbox"
               checked={hasConsented}
+              ref={(element) => {
+                fieldRefs.current.consent = element;
+              }}
               onChange={(event) => {
                 setHasConsented(event.target.checked);
                 clearFieldError("consent");
