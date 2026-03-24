@@ -109,6 +109,11 @@ const SpeakingExamIntroPage = () => {
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
+        <img
+          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80"
+          alt="Students practicing German speaking exam tasks together"
+          style={{ width: "100%", maxHeight: 260, objectFit: "cover", borderRadius: 12 }}
+        />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Day 15: Introduction to Speaking Exams</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Making formal requests with Sie-Imperativ and <strong>können</strong> (Goethe A1 – Sprechen Teil 3).
@@ -258,7 +263,33 @@ const SpeakingExamIntroPage = () => {
             <BulletList items={["Helfen Sie mir bitte.", "Warten Sie bitte.", "Öffnen Sie bitte die Flasche."]} />
           </Callout>
         </div>
-        <h3 style={{ margin: "12px 0 0" }}>6.5 Reacting to your partner’s request</h3>
+        <h3 style={{ margin: "12px 0 0" }}>6.5 Teil 3 verb trainer (answer with können)</h3>
+        <p style={{ margin: 0 }}>
+          In Teil 3, you can safely answer most cards with <strong>“Können Sie bitte …?”</strong> and these high-frequency
+          verbs:
+        </p>
+        <Table
+          headers={["Verb", "Teil 3 polite request with können"]}
+          rows={[
+            ["bringen", "Können Sie mir bitte Wasser bringen?"],
+            ["nehmen", "Können Sie bitte meinen Koffer nehmen?"],
+            ["kaufen", "Können Sie bitte Brot kaufen?"],
+            ["aufmachen", "Können Sie bitte das Fenster aufmachen?"],
+            ["anmachen", "Können Sie bitte das Licht anmachen?"],
+          ]}
+        />
+        <WarningCallout>
+          <strong>Teil 3 note: how to pass</strong>
+          <BulletList
+            items={[
+              "Use one complete polite sentence for every picture: Können Sie bitte + Verb am Ende?",
+              "Speak clearly and keep eye contact with your partner/examiner.",
+              "After your request, react politely to your partner (Ja, gern / Tut mir leid...).",
+              "If you are nervous, use the same safe pattern with a new noun. Correct structure is more important than fancy vocabulary.",
+            ]}
+          />
+        </WarningCallout>
+        <h3 style={{ margin: "12px 0 0" }}>6.6 Reacting to your partner’s request</h3>
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           <ExampleCard title="Positive reaction (accept)" items={["Ja, gern.", "Ja, natürlich.", "Kein Problem."]} />
           <ExampleCard
@@ -266,7 +297,7 @@ const SpeakingExamIntroPage = () => {
             items={["Tut mir leid, das geht leider nicht.", "Leider kann ich nicht.", "Es tut mir leid, ich habe keine Zeit."]}
           />
         </div>
-        <h3 style={{ margin: "12px 0 0" }}>6.6 Final checklist for students</h3>
+        <h3 style={{ margin: "12px 0 0" }}>6.7 Final checklist for students</h3>
         <BulletList
           items={[
             "Did I use Sie?",
