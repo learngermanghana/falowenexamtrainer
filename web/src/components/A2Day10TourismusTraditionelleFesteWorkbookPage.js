@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
@@ -82,6 +82,19 @@ const lesenQuestions = [
   },
 ];
 
+
+const speakingTimerOptions = [5, 10, 15].map((minutes) => ({
+  label: `${minutes} min`,
+  seconds: minutes * 60,
+}));
+
+const formatTimer = (seconds) => {
+  const safeSeconds = Math.max(0, seconds);
+  const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, "0");
+  const remaining = String(safeSeconds % 60).padStart(2, "0");
+  return `${minutes}:${remaining}`;
+};
+
 const hoerenQuestions = [
   {
     stem: "1. Wo findet das Oktoberfest statt?",
@@ -143,9 +156,53 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
     lesen: false,
     hoeren: false,
   });
+  const [timerDurationSeconds, setTimerDurationSeconds] = useState(speakingTimerOptions[0].seconds);
+  const [timerSecondsLeft, setTimerSecondsLeft] = useState(speakingTimerOptions[0].seconds);
+  const [timerRunning, setTimerRunning] = useState(false);
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
+  const timerProgress = useMemo(() => {
+    if (!timerDurationSeconds) return 0;
+    return (timerSecondsLeft / timerDurationSeconds) * 100;
+  }, [timerDurationSeconds, timerSecondsLeft]);
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
+
+  useEffect(() => {
+    if (!timerRunning || timerSecondsLeft <= 0) return undefined;
+
+    const intervalId = window.setInterval(() => {
+      setTimerSecondsLeft((prevSeconds) => {
+        if (prevSeconds <= 1) {
+          window.clearInterval(intervalId);
+          setTimerRunning(false);
+          return 0;
+        }
+        return prevSeconds - 1;
+      });
+    }, 1000);
+
+    return () => window.clearInterval(intervalId);
+  }, [timerRunning, timerSecondsLeft]);
+
+  const handleTimerOptionChange = (nextDurationSeconds) => {
+    setTimerDurationSeconds(nextDurationSeconds);
+    setTimerSecondsLeft(nextDurationSeconds);
+    setTimerRunning(false);
+  };
+
+  const startSpeakingTimer = () => {
+    if (timerSecondsLeft === 0) {
+      setTimerSecondsLeft(timerDurationSeconds);
+    }
+    setTimerRunning(true);
+  };
+
+  const pauseSpeakingTimer = () => setTimerRunning(false);
+
+  const resetSpeakingTimer = () => {
+    setTimerRunning(false);
+    setTimerSecondsLeft(timerDurationSeconds);
+  };
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -257,6 +314,56 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
               Open speaking self-practice
             </a>
+          </div>
+
+          <div style={{ ...questionCardStyle, background: "#f0f9ff", gap: 10 }}>
+            <strong>Teil 1 confidence timer (keep this page open)</strong>
+            <p style={{ margin: 0, lineHeight: 1.6 }}>
+              Start this timer, then open the speaking self-practice link in a new tab to continue your timed practice.
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {speakingTimerOptions.map((option) => (
+                <button
+                  key={option.seconds}
+                  type="button"
+                  style={{
+                    ...styles.secondaryButton,
+                    background: timerDurationSeconds === option.seconds ? "#dbeafe" : "#fff",
+                    borderColor: timerDurationSeconds === option.seconds ? "#2563eb" : "#d1d5db",
+                    color: timerDurationSeconds === option.seconds ? "#1d4ed8" : "#111827",
+                  }}
+                  onClick={() => handleTimerOptionChange(option.seconds)}
+                  disabled={timerRunning}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            <div aria-live="polite" style={{ fontSize: "2rem", fontWeight: 700 }}>{formatTimer(timerSecondsLeft)}</div>
+
+            <div style={{ width: "100%", height: 10, background: "#bfdbfe", borderRadius: 999, overflow: "hidden" }}>
+              <div
+                style={{
+                  width: `${timerProgress}%`,
+                  height: "100%",
+                  background: "linear-gradient(90deg,#2563eb,#7c3aed)",
+                  transition: "width 0.3s ease",
+                }}
+              />
+            </div>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <button type="button" style={styles.primaryButton} onClick={startSpeakingTimer} disabled={timerRunning}>
+                ▶ Start
+              </button>
+              <button type="button" style={styles.secondaryButton} onClick={pauseSpeakingTimer} disabled={!timerRunning}>
+                ⏸ Pause
+              </button>
+              <button type="button" style={styles.secondaryButton} onClick={resetSpeakingTimer}>
+                ↺ Reset
+              </button>
+            </div>
           </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
