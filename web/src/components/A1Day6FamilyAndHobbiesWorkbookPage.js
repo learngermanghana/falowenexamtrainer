@@ -84,17 +84,6 @@ const inputStyle = {
   fontSize: "1rem",
 };
 
-const textareaStyle = {
-  width: "100%",
-  minHeight: 160,
-  padding: "12px 14px",
-  borderRadius: 10,
-  border: "1px solid #d1d5db",
-  fontSize: "1rem",
-  lineHeight: 1.6,
-  resize: "vertical",
-};
-
 const optionButtonStyle = (selected, correct, submitted) => ({
   width: "100%",
   textAlign: "left",
@@ -472,7 +461,6 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
     hobbies: false,
   });
 
-  const [writingText, setWritingText] = useState("");
   const [showWritingModel, setShowWritingModel] = useState(false);
 
   const setPreparedFor = (tabKey) => (event) => {
@@ -532,16 +520,6 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           </div>
         </div>
 
-        <TypedGapPractice
-          title="Practice · Fill in the gap"
-          items={[
-            { id: "fa1", prompt: "Meine ______ heißt Maria.", answers: ["Mutter"] },
-            { id: "fa2", prompt: "Mein ______ heißt Peter.", answers: ["Vater"] },
-            { id: "fa3", prompt: "Ich habe einen ______.", answers: ["Bruder", "Sohn", "Cousin"] },
-            { id: "fa4", prompt: "Ich habe keine ______.", answers: ["Kinder"] },
-          ]}
-        />
-
         <QuizBlock title="Family self-check" questions={familyQuiz} />
         <PreparedCheckbox checked={prepared.family} onChange={setPreparedFor("family")} />
       </div>
@@ -582,13 +560,18 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
         </div>
 
         <div style={questionCardStyle}>
-          <strong>Your paragraph</strong>
-          <textarea
-            style={textareaStyle}
-            value={writingText}
-            onChange={(e) => setWritingText(e.target.value)}
-            placeholder="Example: Mein Name ist ..."
-          />
+          <strong>Where to write and submit</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            After reading the template, go to the group discussion page and write your 6–8 sentence paragraph there.
+          </p>
+          <div>
+            <button type="button" style={styles.primaryButton} onClick={() => navigate("/campus/discussion")}>
+              Open Group Discussion
+            </button>
+          </div>
+          <div style={{ color: "#374151", fontSize: "0.95rem" }}>
+            Page link: https://www.falowen.app/campus/discussion
+          </div>
         </div>
 
         <div style={questionCardStyle}>
@@ -624,15 +607,6 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           </div>
         </div>
 
-        <TypedGapPractice
-          title='Practice · Complete with "ein bisschen"'
-          items={[
-            { id: "la1", prompt: "Ich spreche ______ Deutsch.", answers: ["ein bisschen"] },
-            { id: "la2", prompt: "Ja, aber nur ______.", answers: ["ein bisschen"] },
-            { id: "la3", prompt: "Ich habe nur ______ Zeit.", answers: ["ein bisschen"] },
-          ]}
-        />
-
         <QuizBlock title="Languages self-check" questions={languageQuiz} />
         <PreparedCheckbox checked={prepared.languages} onChange={setPreparedFor("languages")} />
       </div>
@@ -645,15 +619,26 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           <div style={chipStyle}>Verb + Subject + Rest of sentence?</div>
         </div>
 
-        <TypedGapPractice
-          title="Practice · Turn the statement into a question"
-          items={[
-            { id: "qa1", prompt: "Du lernst Deutsch. → ______", answers: ["Lernst du Deutsch?"] },
-            { id: "qa2", prompt: "Er spielt Fußball. → ______", answers: ["Spielt er Fußball?"] },
-            { id: "qa3", prompt: "Sie liest ein Buch. → ______", answers: ["Liest sie ein Buch?"] },
-            { id: "qa4", prompt: "Ihr kommt aus Deutschland. → ______", answers: ["Kommt ihr aus Deutschland?"] },
-          ]}
-        />
+        <div style={questionCardStyle}>
+          <strong>How to form yes/no questions (Ja/Nein-Fragen)</strong>
+          <ol style={listStyle}>
+            <li>Start with the conjugated verb.</li>
+            <li>Put the subject directly after the verb.</li>
+            <li>Keep the rest of the sentence in the same order.</li>
+            <li>Add a question mark at the end.</li>
+          </ol>
+          <div style={answerCardStyle}>
+            <div style={{ lineHeight: 1.7 }}>
+              <strong>Statement:</strong> Du lernst Deutsch.
+              <br />
+              <strong>Question:</strong> Lernst du Deutsch?
+              <br />
+              <strong>Statement:</strong> Er spielt Fußball.
+              <br />
+              <strong>Question:</strong> Spielt er Fußball?
+            </div>
+          </div>
+        </div>
 
         <QuizBlock title="Yes/No questions self-check" questions={questionQuiz} />
         <PreparedCheckbox checked={prepared.questions} onChange={setPreparedFor("questions")} />
@@ -670,6 +655,26 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
                 {german} – {english}
               </div>
             ))}
+          </div>
+        </div>
+
+        <div style={questionCardStyle}>
+          <strong>Talking about hobbies with gern</strong>
+          <div style={{ lineHeight: 1.7 }}>
+            Use <strong>gern</strong> with a verb to say what you like doing.
+            <br />
+            <strong>Ich tanze gern.</strong> = I like dancing.
+          </div>
+          <div style={answerCardStyle}>
+            <div style={{ lineHeight: 1.7 }}>
+              <strong>Difference:</strong>
+              <br />
+              <strong>Mein Hobby ist Tanzen.</strong> → names your hobby as a noun phrase.
+              <br />
+              <strong>Ich tanze gern.</strong> → says you enjoy the activity (verb + gern).
+              <br />
+              Both are correct. The second one sounds more natural in everyday speech.
+            </div>
           </div>
         </div>
 
