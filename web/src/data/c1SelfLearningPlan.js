@@ -1926,6 +1926,43 @@ const C1_PLAN_ENHANCEMENTS = {
 const C1_COMPLEX_SENTENCE_NOTE =
   "Formuliere mindestens einen komplexen Satz mit Einbettung (z. B. obwohl/während/sodass), inkl. korrekter Verbendstellung im Nebensatz und präziser Zeichensetzung.";
 
+const OPINION_ESSAY_TEMPLATE = {
+  type: "opinion_essay",
+  formatLabel: "Goethe C1 · Diskussionsbeitrag (Meinungsaufsatz)",
+  contextPrefix: "Für das Internetforum Karriere & Beruf verfassen Sie einen Diskussionsbeitrag zu diesem Thema:",
+  points: [
+    "Erklären Sie, nach welchen Kriterien sich die Wahl des Studienfachs richten sollte.",
+    "Argumentieren Sie anhand eines Beispiels für ein Studienfach.",
+    "Nennen Sie Gründe, die gegen ein Studium sprechen könnten.",
+    "Erläutern Sie eine Alternative zum Studium.",
+  ],
+};
+
+const FORMAL_LETTER_TEMPLATE = {
+  type: "formal_letter",
+  formatLabel: "Goethe C1 · Formeller Brief (Beschwerde)",
+  timeHint: "Vorgeschlagene Arbeitszeit für nicht behinderte Prüfungsteilnehmende: 25 Minuten.",
+  contextPrefix:
+    "Während Ihres Urlaubs ist Ihre Firma in ein anderes Gebäude umgezogen. Bei Ihrer Rückkehr stellen Sie überrascht fest, dass Sie nicht mehr allein, sondern zusammen mit sechs Kolleginnen und Kollegen in einem Raum sitzen. Schreiben Sie eine Beschwerde an Ihre Vorgesetzte, Frau Grimm.",
+  points: [
+    "Eröffnen Sie Ihr Schreiben höflich, indem Sie Verständnis für Sachzwänge zeigen.",
+    "Nennen Sie Tätigkeiten, die durch den neuen Platz erschwert werden.",
+    "Beschreiben Sie Arbeitsbedingungen, die für Sie akzeptabel wären.",
+    "Machen Sie einen Kompromissvorschlag.",
+  ],
+};
+
+const WRITING_HEADER_IMAGES = [
+  "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1513258496099-48168024aec0?auto=format&fit=crop&w=1400&q=80",
+  "https://images.unsplash.com/photo-1456324504439-367cee3b3c32?auto=format&fit=crop&w=1400&q=80",
+];
+
 const withComplexSentenceFocus = (entry) => {
   if (!entry?.speaking) return entry;
   const notes = Array.isArray(entry.speaking.grammarNotes) ? entry.speaking.grammarNotes : [];
@@ -1944,9 +1981,45 @@ const withComplexSentenceFocus = (entry) => {
   };
 };
 
-export const C1_SELF_LEARNING_PLAN = BASE_C1_SELF_LEARNING_PLAN.map((entry) =>
-  withComplexSentenceFocus({
+const buildDailyWritingTask = (entry) => {
+  const useOpinionEssay = entry.day % 2 === 1;
+  const template = useOpinionEssay ? OPINION_ESSAY_TEMPLATE : FORMAL_LETTER_TEMPLATE;
+  const imageUrl = WRITING_HEADER_IMAGES[(entry.day - 1) % WRITING_HEADER_IMAGES.length];
+
+  const topicLine = useOpinionEssay
+    ? `${entry.topic} Welche Position vertreten Sie?`
+    : `Thema des Tages: ${entry.topic} Beschreiben Sie das Anliegen klar und lösungsorientiert.`;
+
+  const contextualizedPoints = template.points.map((point) =>
+    `${point} (Bezug zum Thema: ${entry.topic})`
+  );
+
+  return {
     ...entry,
-    ...(C1_PLAN_ENHANCEMENTS[entry.day] || {}),
-  })
+    writing: {
+      ...entry.writing,
+      type: template.type,
+      formatLabel: template.formatLabel,
+      headerImage: {
+        url: imageUrl,
+        alt: `C1 Schreiben Tag ${entry.day} — ${template.formatLabel}`,
+      },
+      examStyleTask: {
+        contextPrefix: template.contextPrefix,
+        topicLine,
+        timeHint: template.timeHint || "",
+        points: contextualizedPoints,
+      },
+      prompt: `Schreibe im Goethe-C1-Stil (${template.formatLabel}) zum Tagesthema: ${entry.topic}`,
+    },
+  };
+};
+
+export const C1_SELF_LEARNING_PLAN = BASE_C1_SELF_LEARNING_PLAN.map((entry) =>
+  buildDailyWritingTask(
+    withComplexSentenceFocus({
+      ...entry,
+      ...(C1_PLAN_ENHANCEMENTS[entry.day] || {}),
+    })
+  )
 );
