@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const tabs = [
@@ -292,11 +293,9 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
               Open speaking self-practice
             </a>
           </div>
+          <SpeakingPracticeTimerCard />
 
-          <p style={{ margin: 0, color: "#4b5563" }}>
-            Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3, and
-            Teil 4.
-          </p>
+          <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
