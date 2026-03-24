@@ -211,13 +211,14 @@ const A2_SCHEDULE = [
     topic: "Unterwegs: Verkehrsmittel vergleichen 4.11",
     chapter: "4.11",
     assignment: true,
-    goal: "Compare means of transportation.",
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    goal: "Compare transportation options, evaluate advantages and disadvantages, and explain choices for everyday and travel situations.",
+    instruction:
+      "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "Comparative forms (Komparativ & Superlativ)",
     video: "https://youtu.be/RkvfRiPCZI4",
     youtube_link: "https://youtu.be/RkvfRiPCZI4",
     grammarbook_link: "/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1c7ITea0iVbCaPO0piark9RnqJgZS-DOi/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-11-unterwegs-verkehrsmittel-vergleichen-workbook",
   },
   {
     day: 12,
