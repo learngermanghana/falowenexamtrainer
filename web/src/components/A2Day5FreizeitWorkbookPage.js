@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
 const tabs = [
@@ -197,7 +198,16 @@ const A2Day5FreizeitWorkbookPage = () => {
           </ul>
           <p style={{ margin: 0 }}><strong>Frage:</strong> Was machst du gern in deiner Freizeit?</p>
           <p style={{ margin: 0 }}><strong>Stichwörter:</strong> Freunde · Hobby · Wochenende · Sport</p>
-          <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is group practice only. Assignment submissions start from Teil 2.</p>
+          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+            <strong>Speaking self-practice confidence check</strong>
+            <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
+            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
+              Open speaking self-practice
+            </a>
+          </div>
+          <SpeakingPracticeTimerCard />
+
+          <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}

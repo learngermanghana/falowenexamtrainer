@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -273,6 +274,7 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
               Open speaking self-practice
             </a>
           </div>
+          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
