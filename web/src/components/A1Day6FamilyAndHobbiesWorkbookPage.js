@@ -1,14 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-
-const tabs = [
-  { key: "family", label: "Teil 1 · Familie" },
-  { key: "writing", label: "Teil 2 · Schreiben" },
-  { key: "languages", label: "Teil 3 · Sprachen" },
-  { key: "questions", label: "Teil 4 · Ja/Nein-Fragen" },
-  { key: "hobbies", label: "Teil 5 · Hobbys" },
-];
 
 const pageStyle = {
   ...styles.container,
@@ -321,24 +313,6 @@ function isOneOf(value, accepted) {
   return accepted.some((item) => normalize(item) === clean);
 }
 
-function TabButton({ active, onClick, children }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      style={{
-        ...styles.secondaryButton,
-        borderColor: active ? "#2563eb" : "#d1d5db",
-        background: active ? "#eff6ff" : "#fff",
-        color: active ? "#1d4ed8" : "#111827",
-        padding: "12px 16px",
-      }}
-    >
-      {children}
-    </button>
-  );
-}
-
 const PreparedCheckbox = ({ checked, onChange }) => (
   <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600, flexWrap: "wrap" }}>
     <input type="checkbox" checked={checked} onChange={onChange} />
@@ -486,9 +460,10 @@ function TypedGapPractice({ title, items }) {
   );
 }
 
+const heroImageUrl = "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80";
+
 const A1FamilyLanguagesQuestionsWorkbookPage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("family");
   const [prepared, setPrepared] = useState({
     family: false,
     writing: false,
@@ -499,8 +474,6 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
 
   const [writingText, setWritingText] = useState("");
   const [showWritingModel, setShowWritingModel] = useState(false);
-
-  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
 
   const setPreparedFor = (tabKey) => (event) => {
     setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
@@ -517,388 +490,202 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
           Back to Course
         </button>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1.1 Workbook · Family, Languages, Yes/No Questions and Hobbies
-        </h1>
+        <img
+          src={heroImageUrl}
+          alt="Students learning together"
+          style={{ width: "100%", height: 240, objectFit: "cover", borderRadius: 14 }}
+        />
+
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1.1 Workbook · Family, Languages, Yes/No Questions and Hobbies</h1>
 
         <p style={{ ...styles.subtitle, margin: 0, lineHeight: 1.7 }}>
-          Learn, practise, type your answers, and check yourself. This page helps you talk about your family, languages,
-          hobbies, and simple yes/no questions in German.
-        </p>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {tabs.map((tab) => (
-            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
-              {tab.label}
-            </TabButton>
-          ))}
-        </div>
-
-        <p style={{ margin: 0, color: "#4b5563" }}>
-          Section {activeIndex + 1} of {tabs.length}. Learn a little, do the task, then check your answers.
+          Everything is now on one page. Move section by section and mark each part when you finish it.
         </p>
       </div>
 
-      {activeTab === "family" && (
-        <div style={cardStyle}>
-          <h2 style={sectionTitle}>Teil 1 · Family Vocabulary</h2>
+      <div id="family" style={cardStyle}>
+        <h2 style={sectionTitle}>Teil 1 · Family Vocabulary</h2>
 
-          <div style={infoBoxStyle}>
-            <strong>Family Members</strong>
-            <div style={{ display: "grid", gap: 6 }}>
-              {familyMembers.map(([german, english]) => (
-                <div key={german}>
-                  {german} – {english}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={questionCardStyle}>
-            <strong>Sentence models</strong>
-            <div style={sentenceBoxStyle}>
-              Das ist meine Mutter.
-              <br />
-              Das ist mein Vater.
-              <br />
-              Ich habe einen Bruder.
-              <br />
-              Ich habe eine Schwester.
-              <br />
-              Ich habe keine Kinder.
-            </div>
-          </div>
-
-          <div style={infoBoxStyle}>
-            <strong>Speaking tip</strong>
-            <p style={{ margin: 0 }}>
-              Read your answers aloud two times. Then ask your partner the same questions.
-            </p>
-          </div>
-
-          <TypedGapPractice
-            title="Practice A · Fill in the gap"
-            items={[
-              { id: "fa1", prompt: "Meine ______ heißt Maria.", answers: ["Mutter"] },
-              { id: "fa2", prompt: "Mein ______ heißt Peter.", answers: ["Vater"] },
-              { id: "fa3", prompt: "Ich habe einen ______.", answers: ["Bruder", "Sohn", "Cousin"] },
-              { id: "fa4", prompt: "Ich habe keine ______.", answers: ["Kinder"] },
-            ]}
-          />
-
-          <div style={questionCardStyle}>
-            <strong>Practice B · Write true sentences about your family</strong>
-            <div style={sentenceBoxStyle}>
-              1. Meine Mutter heißt ...
-              <br />
-              2. Mein Vater heißt ...
-              <br />
-              3. Ich habe einen Bruder / eine Schwester / keine Geschwister.
-              <br />
-              4. Ich habe Kinder / keine Kinder.
-            </div>
-          </div>
-
-          <QuizBlock title="Family self-check" questions={familyQuiz} />
-
-          <PreparedCheckbox checked={prepared.family} onChange={setPreparedFor("family")} />
-        </div>
-      )}
-
-      {activeTab === "writing" && (
-        <div style={cardStyle}>
-          <h2 style={sectionTitle}>Teil 2 · Writing About Your Family</h2>
-
-          <div style={warningBoxStyle}>
-            <strong>Writing Template and Example</strong>
-            <ol style={listStyle}>
-              {writingTemplate.map(([english, german, example]) => (
-                <li key={english}>
-                  <div>{english}</div>
-                  <div>{german}</div>
-                  <div>
-                    <em>Example:</em> {example}
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-
-          <TypedGapPractice
-            title="Practice A · Complete the writing model"
-            items={[
-              { id: "wa1", prompt: "Mein Name ist ______.", answers: ["Anna", "Kojo", "Ama", "Peter", "Maria"] },
-              { id: "wa2", prompt: "Ich komme aus ______.", answers: ["Deutschland", "Ghana", "Spanien", "Italien"] },
-              { id: "wa3", prompt: "Ich bin ______ Jahre alt.", answers: ["20", "18", "22", "25"] },
-              { id: "wa4", prompt: "Mein Vater heißt ______.", answers: ["Peter", "Kofi", "Daniel"] },
-              { id: "wa5", prompt: "Meine Mutter heißt ______.", answers: ["Maria", "Ama", "Anna"] },
-            ]}
-          />
-
-          <div style={warningBoxStyle}>
-            <strong>Lesson plan · Write about your family</strong>
-            <div>1. Start with your name.</div>
-            <div>2. Write where you come from.</div>
-            <div>3. Write your age.</div>
-            <div>4. Write about your mother or father.</div>
-            <div>5. Write about brothers, sisters, or children.</div>
-            <div>6. Add one hobby.</div>
-            <div>7. Add the languages you speak.</div>
-          </div>
-
-          <div
-            style={{
-              border: "1px solid #bbf7d0",
-              borderRadius: 12,
-              background: "#f0fdf4",
-              padding: 14,
-              display: "grid",
-              gap: 8,
-            }}
-          >
-            <strong>Final writing task</strong>
-            <p style={{ margin: 0 }}>
-              Write 6–8 sentences about yourself and your family. Include your name, country, age, parents, children or no
-              children, one hobby, and the languages you speak.
-            </p>
-          </div>
-
-          <div style={questionCardStyle}>
-            <strong>Your paragraph</strong>
-            <textarea
-              style={textareaStyle}
-              value={writingText}
-              onChange={(e) => setWritingText(e.target.value)}
-              placeholder="Example: Mein Name ist ..."
-            />
-            <div style={{ color: "#4b5563" }}>
-              Tip: use short A1 sentences. One idea per sentence is enough.
-            </div>
-          </div>
-
-          <div style={questionCardStyle}>
-            <strong>Writing checklist</strong>
-            <div>☐ Name</div>
-            <div>☐ Country</div>
-            <div>☐ Age</div>
-            <div>☐ Mother or father</div>
-            <div>☐ Children / no children</div>
-            <div>☐ Hobby</div>
-            <div>☐ Languages</div>
-          </div>
-
-          <div style={questionCardStyle}>
-            <strong>Need help?</strong>
-            <button type="button" style={styles.secondaryButton} onClick={() => setShowWritingModel((prev) => !prev)}>
-              {showWritingModel ? "Hide model paragraph" : "Show model paragraph"}
-            </button>
-
-            {showWritingModel ? (
-              <div style={answerCardStyle}>
-                <p style={{ margin: 0, lineHeight: 1.7 }}>
-                  Mein Name ist Anna. Ich komme aus Deutschland. Ich bin 20 Jahre alt. Mein Vater heißt Peter. Meine Mutter
-                  heißt Maria. Ich bin ledig. Ich habe keine Kinder. Mein Hobby ist Lesen. Ich spreche Deutsch und Englisch.
-                </p>
+        <div style={infoBoxStyle}>
+          <strong>Family Members</strong>
+          <div style={{ display: "grid", gap: 6 }}>
+            {familyMembers.map(([german, english]) => (
+              <div key={german}>
+                {german} – {english}
               </div>
-            ) : null}
+            ))}
           </div>
-
-          <PreparedCheckbox checked={prepared.writing} onChange={setPreparedFor("writing")} />
         </div>
-      )}
 
-      {activeTab === "languages" && (
-        <div style={cardStyle}>
-          <h2 style={sectionTitle}>Teil 3 · Languages and “ein bisschen”</h2>
+        <div style={questionCardStyle}>
+          <strong>Sentence models</strong>
+          <div style={sentenceBoxStyle}>
+            Das ist meine Mutter.
+            <br />
+            Das ist mein Vater.
+            <br />
+            Ich habe einen Bruder.
+            <br />
+            Ich habe eine Schwester.
+            <br />
+            Ich habe keine Kinder.
+          </div>
+        </div>
 
-          <div style={infoBoxStyle}>
-            <strong>Language Names</strong>
-            <div style={{ display: "grid", gap: 6 }}>
-              {languageNames.map(([german, english]) => (
-                <div key={german}>
-                  {german} – {english}
+        <TypedGapPractice
+          title="Practice · Fill in the gap"
+          items={[
+            { id: "fa1", prompt: "Meine ______ heißt Maria.", answers: ["Mutter"] },
+            { id: "fa2", prompt: "Mein ______ heißt Peter.", answers: ["Vater"] },
+            { id: "fa3", prompt: "Ich habe einen ______.", answers: ["Bruder", "Sohn", "Cousin"] },
+            { id: "fa4", prompt: "Ich habe keine ______.", answers: ["Kinder"] },
+          ]}
+        />
+
+        <QuizBlock title="Family self-check" questions={familyQuiz} />
+        <PreparedCheckbox checked={prepared.family} onChange={setPreparedFor("family")} />
+      </div>
+
+      <div id="writing" style={cardStyle}>
+        <h2 style={sectionTitle}>Teil 2 · Writing About Your Family</h2>
+
+        <div style={warningBoxStyle}>
+          <strong>Writing template</strong>
+          <ol style={listStyle}>
+            {writingTemplate.map(([english, german, example]) => (
+              <li key={english}>
+                <div>{english}</div>
+                <div>{german}</div>
+                <div>
+                  <em>Example:</em> {example}
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={infoBoxStyle}>
-            <strong>How to use “ein bisschen”</strong>
-            <p style={{ margin: 0 }}>
-              “Ein bisschen” means “a little” or “a bit”. Use it when you do something only a little.
-            </p>
-            <ul style={listStyle}>
-              <li>Ich spreche ein bisschen Deutsch.</li>
-              <li>Ja, aber nur ein bisschen.</li>
-              <li>Ich habe nur ein bisschen Zeit.</li>
-              <li>Nur ein bisschen, bitte.</li>
-            </ul>
-          </div>
-
-          <TypedGapPractice
-            title='Practice A · Complete with "ein bisschen"'
-            items={[
-              { id: "la1", prompt: "Ich spreche ______ Deutsch.", answers: ["ein bisschen"] },
-              { id: "la2", prompt: "Ja, aber nur ______.", answers: ["ein bisschen"] },
-              { id: "la3", prompt: "Ich habe nur ______ Zeit.", answers: ["ein bisschen"] },
-            ]}
-          />
-
-          <div style={questionCardStyle}>
-            <strong>Practice B · Write true sentences</strong>
-            <div style={sentenceBoxStyle}>
-              Ich spreche ...
-              <br />
-              Ich spreche auch ...
-              <br />
-              Ich spreche ein bisschen ...
-            </div>
-          </div>
-
-          <QuizBlock title="Languages self-check" questions={languageQuiz} />
-
-          <PreparedCheckbox checked={prepared.languages} onChange={setPreparedFor("languages")} />
+              </li>
+            ))}
+          </ol>
         </div>
-      )}
 
-      {activeTab === "questions" && (
-        <div style={cardStyle}>
-          <h2 style={sectionTitle}>Teil 4 · Forming Yes or No Questions</h2>
-
-          <div style={infoBoxStyle}>
-            <strong>Basic Structure</strong>
-            <div style={chipStyle}>Verb + Subject + Rest of sentence?</div>
-            <div style={sentenceBoxStyle}>
-              Du liest ein Buch. → <strong>Liest du ein Buch?</strong>
-              <br />
-              Du lernst Deutsch. → <strong>Lernst du Deutsch?</strong>
-              <br />
-              Er spielt Fußball. → <strong>Spielt er Fußball?</strong>
-              <br />
-              Sie liest ein Buch. → <strong>Liest sie ein Buch?</strong>
-              <br />
-              Ihr kommt aus Deutschland. → <strong>Kommt ihr aus Deutschland?</strong>
-            </div>
-          </div>
-
-          <TypedGapPractice
-            title="Practice A · Turn the statement into a question"
-            items={[
-              { id: "qa1", prompt: "Du lernst Deutsch. → ______", answers: ["Lernst du Deutsch?"] },
-              { id: "qa2", prompt: "Er spielt Fußball. → ______", answers: ["Spielt er Fußball?"] },
-              { id: "qa3", prompt: "Sie liest ein Buch. → ______", answers: ["Liest sie ein Buch?"] },
-              { id: "qa4", prompt: "Ihr kommt aus Deutschland. → ______", answers: ["Kommt ihr aus Deutschland?"] },
-            ]}
-          />
-
-          <div style={questionCardStyle}>
-            <strong>Practice B · Answer the questions about yourself</strong>
-            <ol style={listStyle}>
-              <li>Sprichst du Deutsch?</li>
-              <li>Hast du Geschwister?</li>
-              <li>Hast du Kinder?</li>
-              <li>Kommst du aus Ghana?</li>
-            </ol>
-          </div>
-
-          <QuizBlock title="Yes/No questions self-check" questions={questionQuiz} />
-
-          <PreparedCheckbox checked={prepared.questions} onChange={setPreparedFor("questions")} />
+        <div
+          style={{
+            border: "1px solid #bbf7d0",
+            borderRadius: 12,
+            background: "#f0fdf4",
+            padding: 14,
+            display: "grid",
+            gap: 8,
+          }}
+        >
+          <strong>Final writing task</strong>
+          <p style={{ margin: 0 }}>
+            Write 6–8 sentences about yourself and your family. Include your name, country, age, family, one hobby, and
+            languages.
+          </p>
         </div>
-      )}
 
-      {activeTab === "hobbies" && (
-        <div style={cardStyle}>
-          <h2 style={sectionTitle}>Teil 5 · Hobbies</h2>
-
-          <div style={infoBoxStyle}>
-            <strong>Common Hobbies Vocabulary</strong>
-            <div style={{ display: "grid", gap: 6 }}>
-              {hobbies.map(([german, english]) => (
-                <div key={german}>
-                  {german} – {english}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={questionCardStyle}>
-            <strong>How to talk about hobbies</strong>
-            <div style={chipStyle}>Subject + verb + gern</div>
-            <div style={sentenceBoxStyle}>
-              Ich lese gern.
-              <br />
-              Er schwimmt gern.
-              <br />
-              Wir spielen gern Fußball.
-              <br />
-              Sie malt gern.
-              <br />
-              Wir hören gern Musik.
-            </div>
-          </div>
-
-          <TypedGapPractice
-            title="Practice A · Write the question"
-            items={[
-              { id: "ha1", prompt: "schwimmen + im Meer → ______", answers: ["Schwimmen Sie im Meer?"] },
-              { id: "ha2", prompt: "spielen + Fußball → ______", answers: ["Spielen Sie Fußball?"] },
-              { id: "ha3", prompt: "malen + ein Bild → ______", answers: ["Malen Sie ein Bild?"] },
-              { id: "ha4", prompt: "hören + Musik → ______", answers: ["Hören Sie Musik?"] },
-            ]}
+        <div style={questionCardStyle}>
+          <strong>Your paragraph</strong>
+          <textarea
+            style={textareaStyle}
+            value={writingText}
+            onChange={(e) => setWritingText(e.target.value)}
+            placeholder="Example: Mein Name ist ..."
           />
-
-          <div style={questionCardStyle}>
-            <strong>Now you try</strong>
-            <div style={sentenceBoxStyle}>
-              For each one, write:
-              <br />• the question
-              <br />• a yes answer
-              <br />• a no answer
-            </div>
-            <div>1. Schwimmen Sie im Meer?</div>
-            <div>2. Spielen Sie Fußball?</div>
-            <div>3. Malen Sie ein Bild?</div>
-            <div>4. Hören Sie Musik?</div>
-          </div>
-
-          <div style={answerCardStyle}>
-            <strong>Answer support</strong>
-            <div>
-              <strong>1. Schwimmen Sie im Meer?</strong>
-              <br />
-              Ja, ich schwimme im Meer.
-              <br />
-              Nein, ich schwimme nicht im Meer.
-            </div>
-            <div>
-              <strong>2. Spielen Sie Fußball?</strong>
-              <br />
-              Ja, ich spiele Fußball.
-              <br />
-              Nein, ich spiele keinen Fußball.
-            </div>
-            <div>
-              <strong>3. Malen Sie ein Bild?</strong>
-              <br />
-              Ja, ich male ein Bild.
-              <br />
-              Nein, ich male kein Bild.
-            </div>
-            <div>
-              <strong>4. Hören Sie Musik?</strong>
-              <br />
-              Ja, ich höre Musik.
-              <br />
-              Nein, ich höre keine Musik.
-            </div>
-          </div>
-
-          <QuizBlock title="Hobbies self-check" questions={hobbyQuiz} />
-
-          <PreparedCheckbox checked={prepared.hobbies} onChange={setPreparedFor("hobbies")} />
         </div>
-      )}
+
+        <div style={questionCardStyle}>
+          <strong>Need help?</strong>
+          <button type="button" style={styles.secondaryButton} onClick={() => setShowWritingModel((prev) => !prev)}>
+            {showWritingModel ? "Hide model paragraph" : "Show model paragraph"}
+          </button>
+
+          {showWritingModel ? (
+            <div style={answerCardStyle}>
+              <p style={{ margin: 0, lineHeight: 1.7 }}>
+                Mein Name ist Anna. Ich komme aus Deutschland. Ich bin 20 Jahre alt. Mein Vater heißt Peter. Meine Mutter
+                heißt Maria. Ich habe keine Kinder. Mein Hobby ist Lesen. Ich spreche Deutsch und Englisch.
+              </p>
+            </div>
+          ) : null}
+        </div>
+
+        <PreparedCheckbox checked={prepared.writing} onChange={setPreparedFor("writing")} />
+      </div>
+
+      <div id="languages" style={cardStyle}>
+        <h2 style={sectionTitle}>Teil 3 · Languages and “ein bisschen”</h2>
+
+        <div style={infoBoxStyle}>
+          <strong>Language Names</strong>
+          <div style={{ display: "grid", gap: 6 }}>
+            {languageNames.map(([german, english]) => (
+              <div key={german}>
+                {german} – {english}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <TypedGapPractice
+          title='Practice · Complete with "ein bisschen"'
+          items={[
+            { id: "la1", prompt: "Ich spreche ______ Deutsch.", answers: ["ein bisschen"] },
+            { id: "la2", prompt: "Ja, aber nur ______.", answers: ["ein bisschen"] },
+            { id: "la3", prompt: "Ich habe nur ______ Zeit.", answers: ["ein bisschen"] },
+          ]}
+        />
+
+        <QuizBlock title="Languages self-check" questions={languageQuiz} />
+        <PreparedCheckbox checked={prepared.languages} onChange={setPreparedFor("languages")} />
+      </div>
+
+      <div id="questions" style={cardStyle}>
+        <h2 style={sectionTitle}>Teil 4 · Forming Yes or No Questions</h2>
+
+        <div style={infoBoxStyle}>
+          <strong>Basic Structure</strong>
+          <div style={chipStyle}>Verb + Subject + Rest of sentence?</div>
+        </div>
+
+        <TypedGapPractice
+          title="Practice · Turn the statement into a question"
+          items={[
+            { id: "qa1", prompt: "Du lernst Deutsch. → ______", answers: ["Lernst du Deutsch?"] },
+            { id: "qa2", prompt: "Er spielt Fußball. → ______", answers: ["Spielt er Fußball?"] },
+            { id: "qa3", prompt: "Sie liest ein Buch. → ______", answers: ["Liest sie ein Buch?"] },
+            { id: "qa4", prompt: "Ihr kommt aus Deutschland. → ______", answers: ["Kommt ihr aus Deutschland?"] },
+          ]}
+        />
+
+        <QuizBlock title="Yes/No questions self-check" questions={questionQuiz} />
+        <PreparedCheckbox checked={prepared.questions} onChange={setPreparedFor("questions")} />
+      </div>
+
+      <div id="hobbies" style={cardStyle}>
+        <h2 style={sectionTitle}>Teil 5 · Hobbies</h2>
+
+        <div style={infoBoxStyle}>
+          <strong>Common Hobbies Vocabulary</strong>
+          <div style={{ display: "grid", gap: 6 }}>
+            {hobbies.map(([german, english]) => (
+              <div key={german}>
+                {german} – {english}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <TypedGapPractice
+          title="Practice · Write the question"
+          items={[
+            { id: "ha1", prompt: "schwimmen + im Meer → ______", answers: ["Schwimmen Sie im Meer?"] },
+            { id: "ha2", prompt: "spielen + Fußball → ______", answers: ["Spielen Sie Fußball?"] },
+            { id: "ha3", prompt: "malen + ein Bild → ______", answers: ["Malen Sie ein Bild?"] },
+            { id: "ha4", prompt: "hören + Musik → ______", answers: ["Hören Sie Musik?"] },
+          ]}
+        />
+
+        <QuizBlock title="Hobbies self-check" questions={hobbyQuiz} />
+        <PreparedCheckbox checked={prepared.hobbies} onChange={setPreparedFor("hobbies")} />
+      </div>
     </div>
   );
 };
