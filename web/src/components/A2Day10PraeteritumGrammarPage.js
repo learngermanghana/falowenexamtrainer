@@ -16,6 +16,13 @@ const exampleStyle = {
   background: "rgba(16,185,129,0.08)",
   border: "1px solid rgba(16,185,129,0.18)",
 };
+const heroImageStyle = {
+  width: "100%",
+  maxHeight: 260,
+  objectFit: "cover",
+  borderRadius: 12,
+  border: "1px solid rgba(148,163,184,0.35)",
+};
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -50,6 +57,15 @@ const A2Day10PraeteritumGrammarPage = () => {
 
         <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 18 }}>
           <h1 style={{ margin: 0 }}>A2 • 4.10 Tourismus und traditionelle Feste</h1>
+          <img
+            src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80"
+            alt="People celebrating at a traditional festival in a city square"
+            style={heroImageStyle}
+            loading="lazy"
+          />
+          <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.72 }}>
+            Header image source: Unsplash
+          </p>
           <p style={{ margin: 0, opacity: 0.85 }}>
             Grammar focus: <strong>Präteritum</strong>
           </p>
@@ -122,14 +138,66 @@ const A2Day10PraeteritumGrammarPage = () => {
             </ul>
           </SectionCard>
 
-          <SectionCard title="6) Mini self-check">
-            <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-              <li>Heute ich bin müde. → Gestern ich ____ müde.</li>
-              <li>Wir haben ein Fest. → Letztes Jahr wir ____ ein Fest.</li>
-              <li>Sie gehen nach Köln. → Am Wochenende sie ____ nach Köln.</li>
+          <SectionCard title="6) Extra high-frequency verbs with examples">
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Add these verbs to your active vocabulary. They appear often in travel stories and festival reports.
+            </p>
+            <div style={exampleStyle}>
+              <strong>Strong verbs</strong>
+              <ul style={listStyle}>
+                <li><InlineCode>finden → fand</InlineCode>: Wir <strong>fanden</strong> das Straßenfest sehr interessant.</li>
+                <li><InlineCode>nehmen → nahm</InlineCode>: Ich <strong>nahm</strong> am Umzug teil.</li>
+                <li><InlineCode>trinken → trank</InlineCode>: Er <strong>trank</strong> einen heißen Tee auf dem Markt.</li>
+                <li><InlineCode>essen → aß</InlineCode>: Wir <strong>aßen</strong> traditionelle Spezialitäten.</li>
+                <li><InlineCode>schreiben → schrieb</InlineCode>: Sie <strong>schrieb</strong> eine Postkarte aus Wien.</li>
+              </ul>
+            </div>
+            <div style={noteStyle}>
+              <strong>Regular verbs</strong>
+              <ul style={listStyle}>
+                <li><InlineCode>feiern → feierte</InlineCode>: Die Stadt <strong>feierte</strong> ein großes Kulturfest.</li>
+                <li><InlineCode>besuchen → besuchte</InlineCode>: Wir <strong>besuchten</strong> ein kleines Museum.</li>
+                <li><InlineCode>tanzen → tanzte</InlineCode>: Die Kinder <strong>tanzten</strong> auf dem Platz.</li>
+                <li><InlineCode>spielen → spielte</InlineCode>: Eine Band <strong>spielte</strong> bis Mitternacht.</li>
+                <li><InlineCode>kaufen → kaufte</InlineCode>: Ich <strong>kaufte</strong> ein Souvenir für meine Familie.</li>
+              </ul>
+            </div>
+          </SectionCard>
+
+          <SectionCard title="7) Knowledge test (Can you use Präteritum correctly?)">
+            <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+              <li>
+                Choose the correct form:
+                <br />
+                Letztes Wochenende ______ wir ein Stadtfest.
+                <br />
+                a) besuchen &nbsp; b) besuchten &nbsp; c) besucht
+              </li>
+              <li>
+                Fill in the blank:
+                <br />
+                Ich ______ (sein) sehr müde nach der Reise.
+              </li>
+              <li>
+                Fill in the blank:
+                <br />
+                Viele Gäste ______ (kommen) aus dem Ausland.
+              </li>
+              <li>
+                Rewrite in Präteritum:
+                <br />
+                Heute: „Wir trinken Apfelsaft.“
+                <br />
+                Gestern: „Wir ______ Apfelsaft.“
+              </li>
+              <li>
+                Build one complete sentence with <InlineCode>fahren → fuhr</InlineCode> and one travel place
+                (z. B. Berlin, München, Hamburg).
+              </li>
             </ol>
             <div style={noteStyle}>
-              Answers: <strong>war, hatten, gingen</strong>
+              Answers: <strong>1-b, 2-war, 3-kamen, 4-tranken</strong>. Sample for 5:{" "}
+              <strong>Letzten Sommer fuhr ich nach Hamburg.</strong>
             </div>
             <p style={{ margin: 0 }}>Continue with your workbook for 4.10, then move to chapter 4.11.</p>
           </SectionCard>
