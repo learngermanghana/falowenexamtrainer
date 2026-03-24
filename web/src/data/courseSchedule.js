@@ -213,10 +213,10 @@ const A2_SCHEDULE = [
     assignment: true,
     goal: "Compare means of transportation.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Prepositions in and nach",
+    grammar_topic: "Comparative forms (Komparativ & Superlativ)",
     video: "https://youtu.be/RkvfRiPCZI4",
     youtube_link: "https://youtu.be/RkvfRiPCZI4",
-    grammarbook_link: "https://drive.google.com/file/d/19I7oOHX8r4daxXmx38mNMaZO10AXHEFu/view?usp=sharing",
+    grammarbook_link: "/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1c7ITea0iVbCaPO0piark9RnqJgZS-DOi/view?usp=sharing",
   },
   {
