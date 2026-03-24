@@ -619,40 +619,79 @@ const C1SelfLearningCourse = () => {
 
               {getActiveTab(dayKey) === "writing" ? (
                 <div style={{ display: "grid", gap: 6 }}>
-                <strong>2) Schreibtraining</strong>
-                <p style={{ ...styles.helperText, margin: 0 }}>{entry.writing.prompt}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-                  <button
-                    type="button"
-                    style={styles.secondaryButton}
-                    onClick={() => navigate("/campus/writing?tab=ideas")}
-                  >
-                    Ideen öffnen + Text bewerten
-                  </button>
-                  {renderScoreField({
-                    label: "Punktzahl Schreiben",
-                    value: writingScoreValue,
-                    onChange: (value) =>
-                      updateDayState(dayKey, {
-                        writingScore: value,
-                        writingComplete: false,
-                        dayComplete: false,
-                      }),
-                  })}
-                  <button
-                    type="button"
-                    style={styles.primaryButton}
-                    disabled={!canCompleteWriting || dayState.writingComplete}
-                    onClick={() => updateDayState(dayKey, { writingComplete: true })}
-                  >
-                    {dayState.writingComplete ? "Schreiben abgeschlossen" : "Schreiben markieren"}
-                  </button>
-                  {!canCompleteWriting ? (
-                    <span style={{ ...styles.helperText, margin: 0 }}>
-                      Punktzahl muss {scoreThreshold}+ sein.
-                    </span>
+                  <strong>2) Schreibtraining</strong>
+                  {entry.writing?.headerImage?.url ? (
+                    <img
+                      src={entry.writing.headerImage.url}
+                      alt={entry.writing.headerImage.alt || `Schreiben Tag ${entry.day}`}
+                      style={{
+                        width: "100%",
+                        maxHeight: 180,
+                        objectFit: "cover",
+                        borderRadius: 10,
+                        border: "1px solid #e5e7eb",
+                      }}
+                      loading="lazy"
+                    />
                   ) : null}
-                </div>
+                  {entry.writing?.formatLabel ? (
+                    <p style={{ ...styles.helperText, margin: 0, fontWeight: 700 }}>{entry.writing.formatLabel}</p>
+                  ) : null}
+                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.writing.prompt}</p>
+                  {entry.writing?.examStyleTask ? (
+                    <div style={{ ...styles.card, margin: 0, border: "1px solid #e5e7eb", background: "#fff" }}>
+                      {entry.writing.examStyleTask.timeHint ? (
+                        <p style={{ ...styles.helperText, marginTop: 0 }}>
+                          <strong>{entry.writing.examStyleTask.timeHint}</strong>
+                        </p>
+                      ) : null}
+                      <p style={{ ...styles.helperText, marginTop: 0, marginBottom: 6 }}>
+                        {entry.writing.examStyleTask.contextPrefix}
+                      </p>
+                      <p style={{ ...styles.helperText, marginTop: 0, marginBottom: 6 }}>
+                        <strong>{entry.writing.examStyleTask.topicLine}</strong>
+                      </p>
+                      <ul style={{ margin: 0, paddingLeft: 18 }}>
+                        {entry.writing.examStyleTask.points?.map((point) => (
+                          <li key={point} style={styles.helperText}>
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
+                    <button
+                      type="button"
+                      style={styles.secondaryButton}
+                      onClick={() => navigate("/campus/writing?tab=ideas")}
+                    >
+                      Ideen öffnen + Text bewerten
+                    </button>
+                    {renderScoreField({
+                      label: "Punktzahl Schreiben",
+                      value: writingScoreValue,
+                      onChange: (value) =>
+                        updateDayState(dayKey, {
+                          writingScore: value,
+                          writingComplete: false,
+                          dayComplete: false,
+                        }),
+                    })}
+                    <button
+                      type="button"
+                      style={styles.primaryButton}
+                      disabled={!canCompleteWriting || dayState.writingComplete}
+                      onClick={() => updateDayState(dayKey, { writingComplete: true })}
+                    >
+                      {dayState.writingComplete ? "Schreiben abgeschlossen" : "Schreiben markieren"}
+                    </button>
+                    {!canCompleteWriting ? (
+                      <span style={{ ...styles.helperText, margin: 0 }}>
+                        Punktzahl muss {scoreThreshold}+ sein.
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               ) : null}
 
