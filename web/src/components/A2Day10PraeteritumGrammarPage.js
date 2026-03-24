@@ -23,6 +23,24 @@ const heroImageStyle = {
   borderRadius: 12,
   border: "1px solid rgba(148,163,184,0.35)",
 };
+const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  border: "1px solid rgba(148,163,184,0.45)",
+  borderRadius: 10,
+  overflow: "hidden",
+};
+const tableHeaderCellStyle = {
+  textAlign: "left",
+  padding: "10px 12px",
+  background: "rgba(59,130,246,0.1)",
+  borderBottom: "1px solid rgba(148,163,184,0.45)",
+  fontWeight: 700,
+};
+const tableCellStyle = {
+  padding: "10px 12px",
+  borderBottom: "1px solid rgba(148,163,184,0.25)",
+};
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -103,6 +121,66 @@ const A2Day10PraeteritumGrammarPage = () => {
               <li><InlineCode>du hattest</InlineCode> (you had)</li>
               <li><InlineCode>wir hatten</InlineCode> (we had)</li>
             </ul>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Quick conjugation overview (ich bis Sie) with 4 high-frequency verbs:
+            </p>
+            <div style={{ overflowX: "auto" }}>
+              <table style={tableStyle} aria-label="Präteritum conjugation table for key verbs">
+                <thead>
+                  <tr>
+                    <th style={tableHeaderCellStyle}>Pronomen</th>
+                    <th style={tableHeaderCellStyle}>sein</th>
+                    <th style={tableHeaderCellStyle}>haben</th>
+                    <th style={tableHeaderCellStyle}>reisen</th>
+                    <th style={tableHeaderCellStyle}>feiern</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={tableCellStyle}>ich</td>
+                    <td style={tableCellStyle}>war</td>
+                    <td style={tableCellStyle}>hatte</td>
+                    <td style={tableCellStyle}>reiste</td>
+                    <td style={tableCellStyle}>feierte</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>du</td>
+                    <td style={tableCellStyle}>warst</td>
+                    <td style={tableCellStyle}>hattest</td>
+                    <td style={tableCellStyle}>reistest</td>
+                    <td style={tableCellStyle}>feiertest</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>er/sie/es</td>
+                    <td style={tableCellStyle}>war</td>
+                    <td style={tableCellStyle}>hatte</td>
+                    <td style={tableCellStyle}>reiste</td>
+                    <td style={tableCellStyle}>feierte</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>wir</td>
+                    <td style={tableCellStyle}>waren</td>
+                    <td style={tableCellStyle}>hatten</td>
+                    <td style={tableCellStyle}>reisten</td>
+                    <td style={tableCellStyle}>feierten</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>ihr</td>
+                    <td style={tableCellStyle}>wart</td>
+                    <td style={tableCellStyle}>hattet</td>
+                    <td style={tableCellStyle}>reistet</td>
+                    <td style={tableCellStyle}>feiertet</td>
+                  </tr>
+                  <tr>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>sie/Sie</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>waren</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>hatten</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>reisten</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>feierten</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </SectionCard>
 
           <SectionCard title="3) Regular verbs in Präteritum">
