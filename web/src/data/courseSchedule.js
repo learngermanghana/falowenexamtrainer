@@ -222,16 +222,17 @@ const A2_SCHEDULE = [
   },
   {
     day: 12,
-    topic: "Mein Traumberuf (Übung) 5.12",
+    topic: "Mein Traumberuf (Exercise) 5.12",
     chapter: "5.12",
     assignment: true,
-    goal: "Learn how to talk about a dream job and future goals.",
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    goal: "Discuss dream jobs, required skills, and realistic career plans in German.",
+    instruction:
+      "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "Modalverben (möchten / wollen / können) + Nebensätze mit weil/dass",
     video: "https://youtu.be/w81bsmssGXQ",
     youtube_link: "https://youtu.be/w81bsmssGXQ",
     grammarbook_link: "/campus/course/mein-traumberuf-5-12-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/18u6FnHpd2nAh1Ev_2mVk5aV3GdVC6Add/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-12-mein-traumberuf-workbook",
   },
   {
     day: 13,
