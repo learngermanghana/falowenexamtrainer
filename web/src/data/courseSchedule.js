@@ -227,10 +227,10 @@ const A2_SCHEDULE = [
     assignment: true,
     goal: "Learn how to talk about a dream job and future goals.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Konjunktiv II",
+    grammar_topic: "Modalverben (möchten / wollen / können) + Nebensätze mit weil/dass",
     video: "https://youtu.be/w81bsmssGXQ",
     youtube_link: "https://youtu.be/w81bsmssGXQ",
-    grammarbook_link: "https://drive.google.com/file/d/1dyGB5q92EePy8q60eWWYA91LXnsWQFb1/view?usp=sharing",
+    grammarbook_link: "/campus/course/mein-traumberuf-5-12-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/18u6FnHpd2nAh1Ev_2mVk5aV3GdVC6Add/view?usp=sharing",
   },
   {
