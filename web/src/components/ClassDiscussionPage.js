@@ -944,6 +944,24 @@ const ClassDiscussionPage = () => {
             ) : null}
 
             <div style={{ display: "grid", gap: 6 }}>
+              {thread.instructions ? (
+                <div
+                  style={{
+                    ...styles.helperText,
+                    ...styles.discussionLongText,
+                    margin: 0,
+                    background: "#fef2f2",
+                    border: "1px solid #fca5a5",
+                    padding: 10,
+                    borderRadius: 10,
+                    color: "#b91c1c",
+                  }}
+                >
+                  <strong>Instructions (English):</strong> {thread.instructions} — Refer to chapter "Tutorial" in the
+                  course book.
+                </div>
+              ) : null}
+
               <div style={{ ...styles.helperText, ...styles.discussionLongText, margin: 0, fontSize: 14 }}>
                 <strong>Question:</strong> {thread.question}
               </div>
