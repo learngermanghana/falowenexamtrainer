@@ -57,6 +57,13 @@ const formatClock = (date) =>
   });
 
 const waveHeights = [8, 16, 24, 18, 26, 14, 20, 30, 22, 28, 16, 24, 14, 20, 12];
+const MIN_RECORDING_SECONDS = 3;
+const audioCaptureConstraints = {
+  echoCancellation: true,
+  noiseSuppression: true,
+  autoGainControl: true,
+  channelCount: 1,
+};
 
 const SpeakingPage = ({ mode = "exam" }) => {
   const { level: examLevel } = useExam();
@@ -317,7 +324,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
     setRecordingError("");
 
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: audioCaptureConstraints,
+      });
       streamRef.current = stream;
       const recorder = new MediaRecorder(stream);
       audioChunksRef.current = [];
@@ -327,6 +336,17 @@ const SpeakingPage = ({ mode = "exam" }) => {
       };
 
       recorder.onstop = async () => {
+        if (recordingSeconds < MIN_RECORDING_SECONDS) {
+          setRecordingError(`Please record for at least ${MIN_RECORDING_SECONDS} seconds so the AI can hear you clearly.`);
+          setRecordingSeconds(0);
+          setIsRecording(false);
+          if (streamRef.current) {
+            streamRef.current.getTracks().forEach((track) => track.stop());
+            streamRef.current = null;
+          }
+          return;
+        }
+
         if (recordingIntervalRef.current) {
           window.clearInterval(recordingIntervalRef.current);
           recordingIntervalRef.current = null;
@@ -558,6 +578,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
               {isRecording ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
             </button>
             {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              Listening tip: use a headset, reduce background noise, and speak for at least {MIN_RECORDING_SECONDS} seconds.
+            </p>
 
             <div style={{ ...styles.card, margin: 0, padding: 12, background: "#EEF2FF", border: "1px solid #C7D2FE" }}>
               <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>Quick practice topics</p>
