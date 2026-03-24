@@ -10,6 +10,12 @@ import { describeGrammarFocusItem } from "../lib/grammarFocusNotes";
 
 const DEFAULT_SCORE_THRESHOLD = 80;
 const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
+const COURSE_TABS = [
+  { id: "grammar", label: "Grammatik" },
+  { id: "speaking", label: "Sprechen" },
+  { id: "writing", label: "Schreiben" },
+  { id: "resources", label: "Ressourcen" },
+];
 
 const buildEmptyDayState = () => ({
   grammarCheckComplete: false,
@@ -44,6 +50,7 @@ const C1SelfLearningCourse = () => {
   const [resourcesLoaded, setResourcesLoaded] = useState(false);
   const [resourcesError, setResourcesError] = useState("");
   const [flashcardIndexByDay, setFlashcardIndexByDay] = useState({});
+  const [activeTabByDay, setActiveTabByDay] = useState({});
 
   const dayKeys = useMemo(
     () => C1_SELF_LEARNING_PLAN.map((entry) => `day-${entry.day}`),
@@ -212,6 +219,8 @@ const C1SelfLearningCourse = () => {
       return { ...prev, [dayKey]: updater(current) };
     });
   };
+
+  const getActiveTab = (dayKey) => activeTabByDay[dayKey] || "grammar";
 
   const renderScoreField = ({ label, value, onChange }) => (
     <label style={{ ...styles.field, maxWidth: 200 }}>
@@ -389,7 +398,7 @@ const C1SelfLearningCourse = () => {
                 <span style={styles.levelPill}>Tag {entry.day}</span>
                 <h3 style={{ margin: "6px 0" }}>{entry.title}</h3>
                 <p style={{ ...styles.helperText, margin: 0 }}>Thema: {entry.topic}</p>
-                {entry.learningObjectives?.length ? (
+                {getActiveTab(dayKey) === "grammar" && entry.learningObjectives?.length ? (
                   <div style={{ ...styles.helperText, marginTop: 8 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Lernziele</div>
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
@@ -399,7 +408,7 @@ const C1SelfLearningCourse = () => {
                     </ul>
                   </div>
                 ) : null}
-                {entry.grammarFocus?.items?.length ? (
+                {getActiveTab(dayKey) === "grammar" && entry.grammarFocus?.items?.length ? (
                   <div style={{ ...styles.helperText, marginTop: 8 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>
                       Grammatikfokus {entry.grammarFocus.group ? `(${entry.grammarFocus.group})` : ""}
@@ -420,7 +429,7 @@ const C1SelfLearningCourse = () => {
                     </ul>
                   </div>
                 ) : null}
-                {entry.brainMap?.length ? (
+                {getActiveTab(dayKey) === "grammar" && entry.brainMap?.length ? (
                   <div style={{ ...styles.helperText, marginTop: 8 }}>
                     <div style={{ fontWeight: 600, marginBottom: 4 }}>Gedankenkarte (Ideen)</div>
                     <ul style={{ margin: 0, paddingLeft: 18 }}>
@@ -434,8 +443,74 @@ const C1SelfLearningCourse = () => {
               {dayState.dayComplete ? <span style={styles.badge}>Tag abgeschlossen</span> : null}
             </div>
 
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {COURSE_TABS.map((tab) => {
+                const isActive = getActiveTab(dayKey) === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTabByDay((prev) => ({ ...prev, [dayKey]: tab.id }))}
+                    style={isActive ? styles.primaryButton : styles.secondaryButton}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+
             <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ display: "grid", gap: 6 }}>
+              {getActiveTab(dayKey) === "grammar" ? (
+                <div style={{ display: "grid", gap: 6 }}>
+                  <strong>Grammatiktraining</strong>
+                  {entry.grammarFocus?.items?.length ? (
+                    <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+                      {entry.grammarFocus.items.map((item) => {
+                        const grammarItem = describeGrammarFocusItem(item, "de");
+                        return (
+                          <li key={grammarItem.title}>
+                            <strong>{grammarItem.title}</strong>
+                            <div style={styles.helperText}>{grammarItem.note}</div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      Für diesen Tag sind noch keine Grammatikpunkte hinterlegt.
+                    </p>
+                  )}
+                  {entry.speaking.askGrammarPrompt ? (
+                    <>
+                      <p style={{ ...styles.helperText, margin: 0 }}>
+                        {entry.speaking.askGrammarPrompt}{" "}
+                        <button
+                          type="button"
+                          style={styles.linkButton}
+                          onClick={() => navigate("/campus/grammar")}
+                        >
+                          Grammatiktrainer öffnen
+                        </button>
+                      </p>
+                      <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <input
+                          type="checkbox"
+                          checked={dayState.grammarCheckComplete}
+                          onChange={(event) =>
+                            updateDayState(dayKey, {
+                              grammarCheckComplete: event.target.checked,
+                            })
+                          }
+                        />
+                        <span style={styles.label}>Ich habe eine Grammatikfrage gestellt</span>
+                      </label>
+                    </>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {getActiveTab(dayKey) === "speaking" ? (
+                <div style={{ display: "grid", gap: 6 }}>
                 {entry.speaking.askGrammarPrompt ? (
                   <span style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
                     Schritt 0: Grammatik-Check
@@ -539,9 +614,11 @@ const C1SelfLearningCourse = () => {
                     </span>
                   ) : null}
                 </div>
-              </div>
+                </div>
+              ) : null}
 
-              <div style={{ display: "grid", gap: 6 }}>
+              {getActiveTab(dayKey) === "writing" ? (
+                <div style={{ display: "grid", gap: 6 }}>
                 <strong>2) Schreibtraining</strong>
                 <p style={{ ...styles.helperText, margin: 0 }}>{entry.writing.prompt}</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
@@ -576,9 +653,10 @@ const C1SelfLearningCourse = () => {
                     </span>
                   ) : null}
                 </div>
-              </div>
+                </div>
+              ) : null}
 
-              {entry.activities ? (
+              {getActiveTab(dayKey) === "resources" && entry.activities ? (
                 <div style={{ display: "grid", gap: 6 }}>
                   <strong>2.5) Abwechslung & Aktivitäten</strong>
                   {entry.activities.quiz?.length ? (
@@ -606,7 +684,7 @@ const C1SelfLearningCourse = () => {
                 </div>
               ) : null}
 
-              {entry.reading ? (
+              {getActiveTab(dayKey) === "resources" && entry.reading ? (
                 <div style={{ display: "grid", gap: 6 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <strong>Leseaufgabe</strong>
@@ -645,7 +723,7 @@ const C1SelfLearningCourse = () => {
                 </div>
               ) : null}
 
-              {entry.listening ? (
+              {getActiveTab(dayKey) === "resources" && entry.listening ? (
                 <div style={{ display: "grid", gap: 6 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <strong>Hörverstehen</strong>
@@ -686,7 +764,8 @@ const C1SelfLearningCourse = () => {
                 </div>
               ) : null}
 
-              <div style={{ display: "grid", gap: 6 }}>
+              {getActiveTab(dayKey) === "resources" ? (
+                <div style={{ display: "grid", gap: 6 }}>
                 <strong>3) Wortschatzüberblick</strong>
                 <p style={{ ...styles.helperText, margin: 0 }}>
                   Lies die Liste kurz durch und bilde zu jedem Wort einen kurzen C1-Satz.
@@ -757,6 +836,7 @@ const C1SelfLearningCourse = () => {
                   <span style={styles.label}>Ich habe die Wortschatzliste geübt</span>
                 </label>
               </div>
+              ) : null}
             </div>
 
             {entry.weeklyReview ? (
