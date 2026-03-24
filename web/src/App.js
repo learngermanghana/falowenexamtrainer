@@ -63,6 +63,7 @@ import A2Day7WohnungSuchenWorkbookPage from "./components/A2Day7WohnungSuchenWor
 import A2Day8ImperativeGrammarPage from "./components/A2Day8ImperativeGrammarPage";
 import A2Day9PerfektGrammarPage from "./components/A2Day9PerfektGrammarPage";
 import A2Day10PraeteritumGrammarPage from "./components/A2Day10PraeteritumGrammarPage";
+import A2Day11ComparativeFormsGrammarPage from "./components/A2Day11ComparativeFormsGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
@@ -756,6 +757,10 @@ const AppShell = ({
           <Route
             path="/campus/course/praeteritum-tourismus-und-traditionelle-feste-4-10-grammar-notes"
             element={<A2Day10PraeteritumGrammarPage />}
+          />
+          <Route
+            path="/campus/course/unterwegs-verkehrsmittel-vergleichen-4-11-grammar-notes"
+            element={<A2Day11ComparativeFormsGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
