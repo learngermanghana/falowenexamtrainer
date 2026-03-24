@@ -703,8 +703,8 @@ const courseSchedules = {
         "Open Chat • Grammar • Exams, pick A1, and ask for Teil 3-style prompts to practice polite request structures.",
       grammar_topic: "Imperative",
       schreiben_sprechen: {
-        video: "https://youtu.be/o6Ve1NSg0A4",
-        youtube_link: "https://youtu.be/o6Ve1NSg0A4",
+        video: "https://youtu.be/o9nn_hSDzw8",
+        youtube_link: "https://youtu.be/o9nn_hSDzw8",
         workbook_link: "https://www.falowen.app/campus/course/speaking-exams-intro-4-7",
         assignment: false,
       },
