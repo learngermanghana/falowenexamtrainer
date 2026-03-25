@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -22,27 +22,6 @@ const heroImageStyle = {
   objectFit: "cover",
   borderRadius: 12,
   border: "1px solid rgba(15,23,42,0.08)",
-};
-const tableWrapStyle = {
-  overflowX: "auto",
-};
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  minWidth: 760,
-};
-const thStyle = {
-  textAlign: "left",
-  padding: "10px 12px",
-  borderBottom: "1px solid rgba(15,23,42,0.14)",
-  fontWeight: 700,
-  background: "rgba(15,23,42,0.04)",
-  whiteSpace: "nowrap",
-};
-const tdStyle = {
-  padding: "10px 12px",
-  borderBottom: "1px solid rgba(15,23,42,0.1)",
-  verticalAlign: "top",
 };
 
 const InlineCode = ({ children }) => (
@@ -68,6 +47,7 @@ const SectionCard = ({ title, children }) => (
 
 const A2Day11ComparativeFormsGrammarPage = () => {
   const navigate = useNavigate();
+  const [showQuizAnswers, setShowQuizAnswers] = useState(false);
 
   return (
     <div style={styles.pageWrap}>
@@ -101,7 +81,10 @@ const A2Day11ComparativeFormsGrammarPage = () => {
               <li><strong>Superlativ</strong> (attributive): <InlineCode>der/die/das ... -ste</InlineCode></li>
             </ul>
             <div style={noteStyle}>
-              Typical endings: <InlineCode>schnell → schneller → am schnellsten</InlineCode>
+              Typical endings: <InlineCode>schnell → schneller → am schnellsten</InlineCode>.<br />
+              If the adjective ends in <InlineCode>-d</InlineCode>, <InlineCode>-t</InlineCode>, <InlineCode>-s</InlineCode>,
+              <InlineCode>-ß</InlineCode>, <InlineCode>-sch</InlineCode>, or <InlineCode>-z</InlineCode>, the superlative often uses
+              <InlineCode>-esten</InlineCode> (e.g., <InlineCode>teuer → am teuersten</InlineCode>).
             </div>
           </SectionCard>
 
@@ -109,8 +92,13 @@ const A2Day11ComparativeFormsGrammarPage = () => {
             <div style={exampleStyle}>
               Das Fahrrad ist <strong>günstiger als</strong> das Auto.<br />
               Der Zug ist oft <strong>schneller als</strong> der Bus.<br />
-              Das Flugzeug ist <strong>am schnellsten</strong>.
+              Das Flugzeug ist <strong>am schnellsten</strong>.<br />
+              Die Straßenbahn ist in der Stadt oft <strong>zuverlässiger als</strong> der Bus.
             </div>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Speaking tip: compare <strong>Preis</strong>, <strong>Zeit</strong>, <strong>Komfort</strong>, and
+              <strong> Umweltfreundlichkeit</strong> in one short response.
+            </p>
           </SectionCard>
 
           <SectionCard title="3) Important irregular forms">
@@ -122,75 +110,7 @@ const A2Day11ComparativeFormsGrammarPage = () => {
             </ul>
           </SectionCard>
 
-          <SectionCard title="4) Irregular verbs in Präteritum (full pronouns)">
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Besides regular verbs, here are important <strong>irregular verbs</strong> in Präteritum so you can
-              practice all pronouns from <InlineCode>ich</InlineCode> to <InlineCode>sie/Sie</InlineCode>.
-            </p>
-            <div style={tableWrapStyle}>
-              <table style={tableStyle} aria-label="Irregular verbs in Präteritum with full pronouns">
-                <thead>
-                  <tr>
-                    <th style={thStyle}>Pronomen</th>
-                    <th style={thStyle}>fahren</th>
-                    <th style={thStyle}>gehen</th>
-                    <th style={thStyle}>sehen</th>
-                    <th style={thStyle}>nehmen</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td style={tdStyle}><strong>ich</strong></td>
-                    <td style={tdStyle}>fuhr</td>
-                    <td style={tdStyle}>ging</td>
-                    <td style={tdStyle}>sah</td>
-                    <td style={tdStyle}>nahm</td>
-                  </tr>
-                  <tr>
-                    <td style={tdStyle}><strong>du</strong></td>
-                    <td style={tdStyle}>fuhrst</td>
-                    <td style={tdStyle}>gingst</td>
-                    <td style={tdStyle}>sahst</td>
-                    <td style={tdStyle}>nahmst</td>
-                  </tr>
-                  <tr>
-                    <td style={tdStyle}><strong>er/sie/es</strong></td>
-                    <td style={tdStyle}>fuhr</td>
-                    <td style={tdStyle}>ging</td>
-                    <td style={tdStyle}>sah</td>
-                    <td style={tdStyle}>nahm</td>
-                  </tr>
-                  <tr>
-                    <td style={tdStyle}><strong>wir</strong></td>
-                    <td style={tdStyle}>fuhren</td>
-                    <td style={tdStyle}>gingen</td>
-                    <td style={tdStyle}>sahen</td>
-                    <td style={tdStyle}>nahmen</td>
-                  </tr>
-                  <tr>
-                    <td style={tdStyle}><strong>ihr</strong></td>
-                    <td style={tdStyle}>fuhrt</td>
-                    <td style={tdStyle}>gingt</td>
-                    <td style={tdStyle}>saht</td>
-                    <td style={tdStyle}>nahmt</td>
-                  </tr>
-                  <tr>
-                    <td style={tdStyle}><strong>sie/Sie</strong></td>
-                    <td style={tdStyle}>fuhren</td>
-                    <td style={tdStyle}>gingen</td>
-                    <td style={tdStyle}>sahen</td>
-                    <td style={tdStyle}>nahmen</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div style={noteStyle}>
-              Tip: Irregular Präteritum stems change (<InlineCode>fahr- → fuhr-</InlineCode>,
-              <InlineCode> seh- → sah-</InlineCode>). Memorize them as a block.
-            </div>
-          </SectionCard>
-
-          <SectionCard title="5) Sentence patterns for A2 speaking/writing">
+          <SectionCard title="4) Sentence patterns for A2 speaking/writing">
             <ul style={listStyle}>
               <li><InlineCode>X ist + Komparativ + als Y.</InlineCode></li>
               <li><InlineCode>Ich finde X + Komparativ, weil ...</InlineCode></li>
@@ -199,15 +119,25 @@ const A2Day11ComparativeFormsGrammarPage = () => {
             </ul>
           </SectionCard>
 
-          <SectionCard title="6) Mini self-check">
+          <SectionCard title="5) Practical quiz">
             <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
               <li>Der Bus ist (langsam) _______ als die U-Bahn.</li>
               <li>Von allen ist das Fahrrad (umweltfreundlich) am _______.</li>
               <li>Für lange Strecken ist der Zug (gut) _______ als das Auto.</li>
+              <li>Ich fahre lieber mit dem Zug, weil er _______ (bequem) als der Bus ist.</li>
             </ol>
-            <div style={noteStyle}>
-              Answers: <strong>langsamer, umweltfreundlichsten, besser</strong>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowQuizAnswers((prev) => !prev)}
+              style={{ ...styles.secondaryBtn, justifySelf: "start" }}
+            >
+              {showQuizAnswers ? "Hide answers" : "Show answers"}
+            </button>
+            {showQuizAnswers ? (
+              <div style={noteStyle}>
+                Answers: <strong>langsamer, umweltfreundlichsten, besser, bequemer</strong>
+              </div>
+            ) : null}
           </SectionCard>
         </div>
       </div>
