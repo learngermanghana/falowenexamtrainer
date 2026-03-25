@@ -241,10 +241,10 @@ const A2_SCHEDULE = [
     assignment: true,
     goal: "Prepare for a job interview.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Konjunktive II with modal verbs",
+    grammar_topic: "Modalverben im Präteritum (konnte, musste, wollte)",
     video: "https://youtu.be/urKBrX5VAYU",
     youtube_link: "https://youtu.be/urKBrX5VAYU",
-    grammarbook_link: "https://drive.google.com/file/d/1tv2tYzn9mIG57hwWr_ilxV1My7kt-RKQ/view?usp=sharing",
+    grammarbook_link: "/campus/course/modalverben-im-praeteritum-vorstellungsgespraech-5-13-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1sW2yKZptnYWPhS7ciYdi0hN5HV-ycsF0/view?usp=sharing",
   },
   {
