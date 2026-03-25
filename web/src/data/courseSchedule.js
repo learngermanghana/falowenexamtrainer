@@ -253,13 +253,14 @@ const A2_SCHEDULE = [
     topic: "Beruf und Karriere (Exercise) 5.14",
     chapter: "5.14",
     assignment: true,
-    goal: "Discuss jobs and careers.",
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    goal: "Discuss your current profession, your career path, and your future plans with confidence.",
+    instruction:
+      "Watch the recommended video, review the grammar notes, and complete the in-app workbook for Teil 1–3. Submit your final answers in the assignment area.",
     grammar_topic: "um ... zu (Infinitiv mit zu – purpose)",
     video: "https://youtu.be/IyBvx-yVT-0",
     youtube_link: "https://youtu.be/IyBvx-yVT-0",
     grammarbook_link: "/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1rlZoo49bYBRjt7mu3Ydktzgfdq4IyK2q/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-14-beruf-und-karriere-workbook",
   },
   {
     day: 15,
