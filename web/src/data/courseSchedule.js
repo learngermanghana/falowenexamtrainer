@@ -254,10 +254,10 @@ const A2_SCHEDULE = [
     assignment: true,
     goal: "Discuss jobs and careers.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Modal Verbs",
+    grammar_topic: "um ... zu (Infinitiv mit zu – purpose)",
     video: "https://youtu.be/IyBvx-yVT-0",
     youtube_link: "https://youtu.be/IyBvx-yVT-0",
-    grammarbook_link: "https://drive.google.com/file/d/13mVpVGfhY1NQn-BEb7xYUivnaZbhXJsK/view?usp=sharing",
+    grammarbook_link: "/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1rlZoo49bYBRjt7mu3Ydktzgfdq4IyK2q/view?usp=sharing",
   },
   {

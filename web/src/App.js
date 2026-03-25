@@ -66,6 +66,7 @@ import A2Day10PraeteritumGrammarPage from "./components/A2Day10PraeteritumGramma
 import A2Day11ComparativeFormsGrammarPage from "./components/A2Day11ComparativeFormsGrammarPage";
 import A2Day12MeinTraumberufGrammarPage from "./components/A2Day12MeinTraumberufGrammarPage";
 import A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage from "./components/A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage";
+import A2Day14BerufUndKarriereUmZuGrammarPage from "./components/A2Day14BerufUndKarriereUmZuGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
@@ -781,6 +782,10 @@ const AppShell = ({
           <Route
             path="/campus/course/modalverben-im-praeteritum-vorstellungsgespraech-5-13-grammar-notes"
             element={<A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage />}
+          />
+          <Route
+            path="/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes"
+            element={<A2Day14BerufUndKarriereUmZuGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
