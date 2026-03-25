@@ -102,6 +102,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
   const recordingIntervalRef = useRef(null);
+  const recordingSecondsRef = useRef(0);
   const audioRefs = useRef({});
   const messagesEndRef = useRef(null);
 
@@ -336,9 +337,15 @@ const SpeakingPage = ({ mode = "exam" }) => {
       };
 
       recorder.onstop = async () => {
-        if (recordingSeconds < MIN_RECORDING_SECONDS) {
+        const elapsedRecordingSeconds = recordingSecondsRef.current;
+        if (recordingIntervalRef.current) {
+          window.clearInterval(recordingIntervalRef.current);
+          recordingIntervalRef.current = null;
+        }
+        if (elapsedRecordingSeconds < MIN_RECORDING_SECONDS) {
           setRecordingError(`Please record for at least ${MIN_RECORDING_SECONDS} seconds so the AI can hear you clearly.`);
           setRecordingSeconds(0);
+          recordingSecondsRef.current = 0;
           setIsRecording(false);
           if (streamRef.current) {
             streamRef.current.getTracks().forEach((track) => track.stop());
@@ -347,13 +354,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
           return;
         }
 
-        if (recordingIntervalRef.current) {
-          window.clearInterval(recordingIntervalRef.current);
-          recordingIntervalRef.current = null;
-        }
         const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const url = URL.createObjectURL(blob);
-        const duration = recordingSeconds;
+        const duration = elapsedRecordingSeconds;
 
         setChatMessages((current) => [
           ...current,
@@ -367,6 +370,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
           },
         ]);
         setRecordingSeconds(0);
+        recordingSecondsRef.current = 0;
         setIsRecording(false);
         markPromptCompleted();
         setChatLoading(true);
@@ -423,9 +427,14 @@ const SpeakingPage = ({ mode = "exam" }) => {
       mediaRecorderRef.current = recorder;
       recorder.start();
       setRecordingSeconds(0);
+      recordingSecondsRef.current = 0;
       setIsRecording(true);
       recordingIntervalRef.current = window.setInterval(() => {
-        setRecordingSeconds((value) => value + 1);
+        setRecordingSeconds((value) => {
+          const nextValue = value + 1;
+          recordingSecondsRef.current = nextValue;
+          return nextValue;
+        });
       }, 1000);
     } catch (error) {
       setRecordingError(error?.message || "Microphone access was blocked.");
