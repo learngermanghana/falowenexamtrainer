@@ -239,13 +239,14 @@ const A2_SCHEDULE = [
     topic: "Ein Vorstellungsgespräch (Exercise) 5.13",
     chapter: "5.13",
     assignment: true,
-    goal: "Prepare for a job interview.",
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    goal: "Prepare for a job interview and present your profile with confidence.",
+    instruction:
+      "Watch the recommended video, review the grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "Modalverben im Präteritum (konnte, musste, wollte)",
     video: "https://youtu.be/urKBrX5VAYU",
     youtube_link: "https://youtu.be/urKBrX5VAYU",
     grammarbook_link: "/campus/course/modalverben-im-praeteritum-vorstellungsgespraech-5-13-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1sW2yKZptnYWPhS7ciYdi0hN5HV-ycsF0/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-13-vorstellungsgespraech-workbook",
   },
   {
     day: 14,
