@@ -16,6 +16,13 @@ const exampleStyle = {
   background: "rgba(16,185,129,0.08)",
   border: "1px solid rgba(16,185,129,0.18)",
 };
+const heroImageStyle = {
+  width: "100%",
+  maxHeight: 320,
+  objectFit: "cover",
+  borderRadius: 12,
+  border: "1px solid rgba(15,23,42,0.08)",
+};
 
 const InlineCode = ({ children }) => (
   <span
@@ -50,6 +57,12 @@ const A2Day11ComparativeFormsGrammarPage = () => {
 
         <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 18 }}>
           <h1 style={{ margin: 0 }}>A2 • 4.11 Unterwegs: Verkehrsmittel vergleichen</h1>
+          <img
+            src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=80"
+            alt="Different transport options in a city and airport setting"
+            style={heroImageStyle}
+            loading="lazy"
+          />
           <p style={{ margin: 0, opacity: 0.85 }}>
             Grammar focus: <strong>Komparativ &amp; Superlativ</strong>
           </p>

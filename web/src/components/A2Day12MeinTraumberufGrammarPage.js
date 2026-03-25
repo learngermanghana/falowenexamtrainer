@@ -43,10 +43,25 @@ const codeStyle = {
   padding: "2px 6px",
 };
 
+const heroImageStyle = {
+  width: "100%",
+  maxHeight: 340,
+  objectFit: "cover",
+  borderRadius: 14,
+  border: "1px solid #e5e7eb",
+  margin: "8px 0 14px",
+};
+
 const A2Day12MeinTraumberufGrammarPage = () => {
   return (
     <div style={pageStyle}>
       <h1 style={headingStyle}>A2 Grammar Notes: Mein Traumberuf (5.12)</h1>
+      <img
+        src="https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1600&q=80"
+        alt="Students and professionals discussing future career goals"
+        style={heroImageStyle}
+        loading="lazy"
+      />
       <p>
         In this lesson, focus on talking about your dream job with <strong>Modalverben</strong> and
         clear reasons/opinions with <strong>weil</strong> and <strong>dass</strong> clauses.
@@ -141,6 +156,28 @@ const A2Day12MeinTraumberufGrammarPage = () => {
             <em>Ich glaube, dass ...</em>
           </li>
         </ul>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={{ marginTop: 0 }}>5) Knowledge test</h2>
+        <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8 }}>
+          <li>
+            Complete: <em>Ich ____ Ärztin werden, weil ich Menschen helfen will.</em>
+          </li>
+          <li>
+            Complete: <em>Ich denke, dass mein Traumberuf sehr kreativ ____.</em>
+          </li>
+          <li>
+            Build one sentence with <strong>weil</strong> about your dream job.
+          </li>
+          <li>
+            Build one sentence with <strong>dass</strong> using <em>Ich glaube...</em>
+          </li>
+        </ol>
+        <p style={{ marginTop: 12, marginBottom: 0 }}>
+          Suggested answers: <strong>möchte, ist</strong> + your own correct <strong>weil</strong>/<strong>dass</strong>{" "}
+          sentences with the conjugated verb at the end of the subordinate clause.
+        </p>
       </section>
     </div>
   );
