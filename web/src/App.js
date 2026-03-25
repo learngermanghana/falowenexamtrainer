@@ -93,6 +93,7 @@ import A1Day4NumbersForBeginnersWorkbookPage from "./components/A1Day4NumbersFor
 import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3AskingAboutPricesWorkbookPage";
 import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCasesWorkbookPage";
 import A1Day1GreetingsGrammarPage from "./components/A1Day1GreetingsGrammarPage";
+import A1Day7PricesPreferencesGrammarPage from "./components/A1Day7PricesPreferencesGrammarPage";
 import A1Day10ObjectsColorsPossessiveArticlesWorkbookPage from "./components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
@@ -688,6 +689,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/weather-perfekt-letter-13" element={<WeatherPerfektLetterPage />} />
           <Route path="/campus/course/health-and-body-parts-14-1" element={<HealthBodyPartsPage />} />
+          <Route path="/campus/course/a1-day-7-asking-about-prices-and-preferences" element={<A1Day7PricesPreferencesGrammarPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
           <Route path="/campus/course/german-numbers-1-10-with-pronunciation" element={<GermanNumbersGrammarPage />} />
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />

@@ -580,7 +580,7 @@ const courseSchedules = {
       lesen_hören: {
         video: "https://youtu.be/Ioq0_bNJ1bE",
         youtube_link: "https://youtu.be/Ioq0_bNJ1bE",
-        grammarbook_link: "https://drive.google.com/file/d/1U7uNx3nhyAwOLXLNYZKZP2-Ie_LoL4hu/view?usp=sharing",
+        grammarbook_link: "/campus/course/a1-day-7-asking-about-prices-and-preferences",
         workbook_link: "https://drive.google.com/file/d/1W5GCdtp-NzSQWMz_ir7uQSKJc3F4LGPb/view?usp=sharing",
         assignment: true,
       },
