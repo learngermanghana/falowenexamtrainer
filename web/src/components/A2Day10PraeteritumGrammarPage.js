@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -42,6 +42,14 @@ const tableCellStyle = {
   borderBottom: "1px solid rgba(148,163,184,0.25)",
 };
 
+const quizAnswersStyle = {
+  marginTop: 10,
+  borderRadius: 10,
+  border: "1px solid rgba(148,163,184,0.35)",
+  padding: "10px 12px",
+  background: "rgba(15,23,42,0.03)",
+};
+
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -65,6 +73,7 @@ const InlineCode = ({ children }) => (
 
 const A2Day10PraeteritumGrammarPage = () => {
   const navigate = useNavigate();
+  const [showQuizAnswers, setShowQuizAnswers] = useState(false);
 
   return (
     <div style={styles.pageWrap}>
@@ -194,16 +203,72 @@ const A2Day10PraeteritumGrammarPage = () => {
             </div>
           </SectionCard>
 
-          <SectionCard title="4) Strong verbs (learn common forms)">
+          <SectionCard title="4) Irregular verbs in Präteritum (full pronouns)">
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              Strong verbs often change the vowel and do not use <InlineCode>-te</InlineCode>.
+              Besides regular verbs, these important irregular forms help you practice every pronoun from
+              <InlineCode> ich</InlineCode> to <InlineCode>sie/Sie</InlineCode>.
             </p>
-            <ul style={listStyle}>
-              <li><InlineCode>gehen → ging</InlineCode></li>
-              <li><InlineCode>kommen → kam</InlineCode></li>
-              <li><InlineCode>fahren → fuhr</InlineCode></li>
-              <li><InlineCode>sehen → sah</InlineCode></li>
-            </ul>
+            <div style={{ overflowX: "auto" }}>
+              <table style={tableStyle} aria-label="Irregular Präteritum verbs with full pronouns">
+                <thead>
+                  <tr>
+                    <th style={tableHeaderCellStyle}>Pronomen</th>
+                    <th style={tableHeaderCellStyle}>fahren</th>
+                    <th style={tableHeaderCellStyle}>gehen</th>
+                    <th style={tableHeaderCellStyle}>sehen</th>
+                    <th style={tableHeaderCellStyle}>nehmen</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={tableCellStyle}>ich</td>
+                    <td style={tableCellStyle}>fuhr</td>
+                    <td style={tableCellStyle}>ging</td>
+                    <td style={tableCellStyle}>sah</td>
+                    <td style={tableCellStyle}>nahm</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>du</td>
+                    <td style={tableCellStyle}>fuhrst</td>
+                    <td style={tableCellStyle}>gingst</td>
+                    <td style={tableCellStyle}>sahst</td>
+                    <td style={tableCellStyle}>nahmst</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>er/sie/es</td>
+                    <td style={tableCellStyle}>fuhr</td>
+                    <td style={tableCellStyle}>ging</td>
+                    <td style={tableCellStyle}>sah</td>
+                    <td style={tableCellStyle}>nahm</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>wir</td>
+                    <td style={tableCellStyle}>fuhren</td>
+                    <td style={tableCellStyle}>gingen</td>
+                    <td style={tableCellStyle}>sahen</td>
+                    <td style={tableCellStyle}>nahmen</td>
+                  </tr>
+                  <tr>
+                    <td style={tableCellStyle}>ihr</td>
+                    <td style={tableCellStyle}>fuhrt</td>
+                    <td style={tableCellStyle}>gingt</td>
+                    <td style={tableCellStyle}>saht</td>
+                    <td style={tableCellStyle}>nahmt</td>
+                  </tr>
+                  <tr>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>sie/Sie</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>fuhren</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>gingen</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>sahen</td>
+                    <td style={{ ...tableCellStyle, borderBottom: "none" }}>nahmen</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style={noteStyle}>
+              Tip: Irregular Präteritum stems change (e.g., <InlineCode>fahr- → fuhr-</InlineCode>,{" "}
+              <InlineCode>seh- → sah-</InlineCode>). Memorize the stem changes as a block.
+            </div>
           </SectionCard>
 
           <SectionCard title="5) Präteritum examples for this topic (Tourismus/Feste)">
@@ -273,9 +338,20 @@ const A2Day10PraeteritumGrammarPage = () => {
                 (z. B. Berlin, München, Hamburg).
               </li>
             </ol>
-            <div style={noteStyle}>
-              Answers: <strong>1-b, 2-war, 3-kamen, 4-tranken</strong>. Sample for 5:{" "}
-              <strong>Letzten Sommer fuhr ich nach Hamburg.</strong>
+            <div style={{ display: "grid", gap: 8 }}>
+              <button
+                type="button"
+                onClick={() => setShowQuizAnswers((prev) => !prev)}
+                style={{ ...styles.secondaryBtn, justifySelf: "start" }}
+              >
+                {showQuizAnswers ? "Hide answers" : "Show answers"}
+              </button>
+              {showQuizAnswers ? (
+                <div style={quizAnswersStyle}>
+                  Answers: <strong>1-b, 2-war, 3-kamen, 4-tranken</strong>. Sample for 5:{" "}
+                  <strong>Letzten Sommer fuhr ich nach Hamburg.</strong>
+                </div>
+              ) : null}
             </div>
             <p style={{ margin: 0 }}>Continue with your workbook for 4.10, then move to chapter 4.11.</p>
           </SectionCard>
