@@ -103,6 +103,8 @@ const ExampleCard = ({ title, items }) => (
 const DativeAdjectiveDeclensionPage = () => {
   const navigate = useNavigate();
   const [showAnswers, setShowAnswers] = useState(false);
+  const headerImageUrl =
+    "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1800&q=80";
 
   const practiceItems = [
     {
@@ -170,6 +172,12 @@ const DativeAdjectiveDeclensionPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
+        <img
+          src={headerImageUrl}
+          alt="Students studying German grammar together"
+          loading="lazy"
+          style={{ width: "100%", height: 220, objectFit: "cover", borderRadius: 12 }}
+        />
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
