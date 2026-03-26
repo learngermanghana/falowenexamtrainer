@@ -259,6 +259,54 @@ const DativeAdjectiveDeclensionPage = () => {
         />
       </Section>
 
+
+      <Section title="Step 3.5: Adjective Declension (Indefinite Articles: Nominative + Accusative)">
+        <p style={{ margin: 0 }}>
+          For now, focus only on <strong>indefinite articles</strong> with adjective endings in nominative and accusative.
+        </p>
+        <Callout>
+          <strong>Very simple trick</strong>
+          <BulletList
+            items={[
+              "ein (masculine nominative) → adjective ending -er: ein großer Hund",
+              "eine (feminine nominative/accusative) → adjective ending -e: eine rote Blume",
+              "ein (neuter nominative/accusative) → adjective ending -es: ein neues Auto",
+              "einen (masculine accusative) → adjective ending -en: einen kleinen Hund",
+              "keine (plural nominative/accusative) → adjective ending -en: keine alten Bücher",
+            ]}
+          />
+        </Callout>
+        <h3 style={{ margin: "12px 0 0" }}>Nominative (subject)</h3>
+        <Table
+          headers={["Gender", "Article", "Ending", "Example"]}
+          rows={[
+            ["Masculine", "ein", "-er", "ein großer Hund"],
+            ["Feminine", "eine", "-e", "eine rote Blume"],
+            ["Neuter", "ein", "-es", "ein kleines Auto"],
+            ["Plural", "keine", "-en", "keine neuen Bücher"],
+          ]}
+        />
+        <h3 style={{ margin: "12px 0 0" }}>Accusative (object)</h3>
+        <Table
+          headers={["Gender", "Article", "Ending", "Example"]}
+          rows={[
+            ["Masculine", "einen", "-en", "einen kleinen Hund"],
+            ["Feminine", "eine", "-e", "eine schöne Blume"],
+            ["Neuter", "ein", "-es", "ein grünes Auto"],
+            ["Plural", "keine", "-en", "keine alten Bücher"],
+          ]}
+        />
+        <h3 style={{ margin: "12px 0 0" }}>Mini adjective ending test (A1)</h3>
+        <BulletList
+          items={[
+            "Ich habe einen kleinen Hund.",
+            "Das ist ein neues Auto.",
+            "Sie ist eine schöne Frau.",
+            "Ich sehe eine rote Blume.",
+            "Er ist ein großer Mann.",
+          ]}
+        />
+      </Section>
       <Section title="Step 4: Dative Pronouns (Receiver Pronouns)">
         <p style={{ margin: 0 }}>
           In dative sentences, receiver pronouns are common. You will often see <strong>dir</strong> and
