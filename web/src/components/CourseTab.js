@@ -23,9 +23,13 @@ import { fetchResults } from "../services/resultsService";
 import {
   collection,
   db,
+  doc,
+  getDoc,
   getDocs,
   limit,
   orderBy,
+  serverTimestamp,
+  setDoc,
   query,
   where,
 } from "../firebase";
@@ -118,6 +122,12 @@ const extractLevelToken = (value) => {
 const normalizeLevel = (level) => extractLevelToken(level);
 const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
 const SYNTHETIC_ASSIGNMENT_ID_PATTERN = /(?:-DAY-\d+(?:-TASK-\d+)?)|(?:-TITLE-)/i;
+const PRACTICE_PROGRESS_COLLECTION = "practiceProgress";
+const A1_PRACTICAL_BADGE_CLUSTERS = [
+  { id: "foundation", label: "🧩 Foundation Speaker", days: [5, 6] },
+  { id: "exam-readiness", label: "🎯 Exam Readiness", days: [13, 14, 15] },
+  { id: "communication", label: "💬 Communication Builder", days: [19, 23, 24] },
+];
 
 const LEVEL_FALLBACK_RESOURCES = {
   A2: {
@@ -211,6 +221,7 @@ const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules(
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
+const getPracticeEntryKey = (entry) => `day-${entry?.day || "x"}-occ-${entry?.occurrence || 1}`;
 
 const renderInlineMarkdown = (text, keyPrefix) => {
   if (!text) return null;
@@ -853,6 +864,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const [activeSubTab, setActiveSubTab] = useState("courseBook");
   const [autoStatusMap, setAutoStatusMap] = useState({});
   const [missingAssignmentDiagnostics, setMissingAssignmentDiagnostics] = useState([]);
+  const [practiceProgress, setPracticeProgress] = useState({});
+  const [practiceProgressLoaded, setPracticeProgressLoaded] = useState(false);
 
   useEffect(() => {
     const normalizedDefault = resolvedDefaultLevel;
@@ -871,6 +884,71 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     }
   }, [hasManualSelection, levels, resolvedDefaultLevel, selectedCourseLevel]);
 
+  const studentCode = useMemo(
+    () => String(studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "anonymous").trim(),
+    [studentProfile]
+  );
+
+  useEffect(() => {
+    if (!selectedCourseLevel || authLoading || !studentProfile?.id || !db) {
+      setPracticeProgress({});
+      setPracticeProgressLoaded(false);
+      return;
+    }
+
+    let cancelled = false;
+    const practiceDocRef = doc(db, PRACTICE_PROGRESS_COLLECTION, `${studentProfile.id}_${selectedCourseLevel}`);
+
+    const hydratePracticeProgress = async () => {
+      setPracticeProgressLoaded(false);
+      try {
+        const snapshot = await getDoc(practiceDocRef);
+        if (cancelled) return;
+        const rawEntries = snapshot.exists() ? snapshot.data()?.entries : {};
+        setPracticeProgress(rawEntries && typeof rawEntries === "object" ? rawEntries : {});
+      } catch (error) {
+        if (cancelled) return;
+        console.warn("[CourseTab] Could not read practice progress from Firestore", error);
+        setPracticeProgress({});
+      } finally {
+        if (!cancelled) setPracticeProgressLoaded(true);
+      }
+    };
+
+    hydratePracticeProgress();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, db, selectedCourseLevel, studentProfile?.id]);
+
+  useEffect(() => {
+    if (!practiceProgressLoaded || !selectedCourseLevel || authLoading || !studentProfile?.id || !db) return;
+
+    const practiceDocRef = doc(db, PRACTICE_PROGRESS_COLLECTION, `${studentProfile.id}_${selectedCourseLevel}`);
+    setDoc(
+      practiceDocRef,
+      {
+        studentId: studentProfile.id,
+        level: selectedCourseLevel,
+        updatedBy: studentCode || null,
+        updatedAt: serverTimestamp(),
+        entries: practiceProgress,
+      },
+      { merge: true }
+    ).catch((error) => {
+      console.warn("[CourseTab] Could not save practice progress to Firestore", error);
+    });
+  }, [
+    authLoading,
+    db,
+    practiceProgress,
+    practiceProgressLoaded,
+    selectedCourseLevel,
+    studentCode,
+    studentProfile?.id,
+  ]);
+
   useEffect(() => {
     if (!selectedCourseLevel || authLoading || !studentProfile?.id || !db) {
       setAutoStatusMap({});
@@ -880,7 +958,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     const hydrateAutoStatuses = async () => {
       try {
         const studentId = studentProfile.id;
-        const studentCode = studentProfile.studentCode || studentProfile.studentcode || studentProfile.id || "";
+        const studentCodeValue = studentProfile.studentCode || studentProfile.studentcode || studentProfile.id || "";
         const [submissionSnapshot, draftSnapshot, resultsResponse] = await Promise.all([
           getDocs(
             query(collection(db, SUBMISSION_COLLECTION), where("studentId", "==", studentId), orderBy("createdAt", "desc"), limit(200))
@@ -888,7 +966,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           getDocs(
             query(collection(db, DRAFT_COLLECTION), where("studentId", "==", studentId), orderBy("updatedAt", "desc"), limit(200))
           ),
-          fetchResults({ studentCode, email: studentProfile.email }),
+          fetchResults({ studentCode: studentCodeValue, email: studentProfile.email }),
         ]);
 
         const seenByDay = {};
@@ -939,7 +1017,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           firestoreDrafts,
           firestoreSubmissions,
           sheetResults: strictLevelResults,
-          studentCode,
+          studentCode: studentCodeValue,
         });
 
         const byAssignmentId = mergedProgress.reduce((acc, row) => {
@@ -975,7 +1053,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           selectedCourseLevel
         );
 
-        const isTargetStudent = String(studentCode || "").trim() === "ComfortArmah295" && selectedCourseLevel === "A1";
+        const isTargetStudent = String(studentCodeValue || "").trim() === "ComfortArmah295" && selectedCourseLevel === "A1";
         if (isTargetStudent) {
           const targetDays = [4, 7, 8, 9, 11];
           const dayAssignmentDiagnostics = targetDays.map((day) => {
@@ -1169,6 +1247,37 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     };
   }, [autoStatusMap, schedule, selectedCourseLevel]);
 
+  const practicalEntries = useMemo(
+    () => schedule.filter((entry) => !isTutorMarkedEntry(entry) && !isMilestoneEntry(entry)),
+    [schedule]
+  );
+
+  const practicalProgressSummary = useMemo(() => {
+    const completed = practicalEntries.filter((entry) => Boolean(practiceProgress[getPracticeEntryKey(entry)]?.complete)).length;
+    return { total: practicalEntries.length, completed };
+  }, [practiceProgress, practicalEntries]);
+
+  const practicalClusterBadges = useMemo(() => {
+    if (selectedCourseLevel !== "A1") return [];
+    return A1_PRACTICAL_BADGE_CLUSTERS.filter((cluster) => (
+      cluster.days.every((day) => practicalEntries.some(
+        (entry) => Number(entry.day) === Number(day) && practiceProgress[getPracticeEntryKey(entry)]?.complete
+      ))
+    ));
+  }, [practiceProgress, practicalEntries, selectedCourseLevel]);
+
+  const updatePracticeProgress = (entry, updates = {}) => {
+    const entryKey = getPracticeEntryKey(entry);
+    setPracticeProgress((current) => {
+      const previous = current?.[entryKey] || {};
+      const next = { ...previous, ...updates };
+      if (!next.complete) {
+        return { ...current, [entryKey]: { complete: false, confidence: "" } };
+      }
+      return { ...current, [entryKey]: next };
+    });
+  };
+
   const chapterOptions = useMemo(() => {
     const set = new Set();
     schedule.forEach((entry) => {
@@ -1249,7 +1358,19 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 <div style={{ ...styles.card, marginBottom: 0 }}>
                   {t("courseTab.metrics.lastActivity", { date: overview.lastActivity })}
                 </div>
+                <div style={{ ...styles.card, marginBottom: 0 }}>
+                  Practical completed: {practicalProgressSummary.completed}/{practicalProgressSummary.total}
+                </div>
               </div>
+              {practicalClusterBadges.length ? (
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {practicalClusterBadges.map((badge) => (
+                    <span key={badge.id} style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}>
+                      {badge.label}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
 
               {isB2SelfLearning || isC1SelfLearning ? null : (
                 <>
@@ -1343,6 +1464,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const isTutorMarked = isTutorMarkedEntry(entry);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
                     const isPracticeOnlyEntry = !isTutorMarked;
+                    const practiceState = practiceProgress[getPracticeEntryKey(entry)] || { complete: false, confidence: "" };
                     const scoreBadge = getScoreBadgeForEntry({ statusInfo, progressByAssignmentId: autoStatusMap });
                     const shouldLogTargetedDiagnostic =
                       String(studentProfile?.studentCode || studentProfile?.studentcode || "").trim() === "ComfortArmah295" &&
@@ -1407,7 +1529,16 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 {scoreBadge.text}
                               </span>
                             ) : null}
-                            {isPracticeOnlyEntry ? <span style={styles.badge}>Practice only</span> : null}
+                            {isPracticeOnlyEntry ? (
+                              <>
+                                <span style={styles.badge}>Practice only</span>
+                                {practiceState.complete ? (
+                                  <span style={{ ...styles.badge, background: "#ecfdf5", color: "#166534", border: "1px solid #86efac" }}>
+                                    Self-marked complete
+                                  </span>
+                                ) : null}
+                              </>
+                            ) : null}
                             {isTutorMarked && statusInfo.missingAssignmentId ? (
                               <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 240 }}>
                                 Status will update soon.
@@ -1438,6 +1569,30 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                               >
                                 Submit this assignment
                               </button>
+                            ) : null}
+                            {isPracticeOnlyEntry ? (
+                              <label style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
+                                <span style={styles.helperText}>Self-mark completion</span>
+                                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(practiceState.complete)}
+                                    onChange={(e) => updatePracticeProgress(entry, { complete: e.target.checked })}
+                                  />
+                                  <span style={styles.helperText}>Completed</span>
+                                </span>
+                                <select
+                                  style={{ ...styles.select, minWidth: 170 }}
+                                  disabled={!practiceState.complete}
+                                  value={practiceState.confidence || ""}
+                                  onChange={(e) => updatePracticeProgress(entry, { complete: true, confidence: e.target.value })}
+                                >
+                                  <option value="">Confidence</option>
+                                  <option value="low">Low confidence</option>
+                                  <option value="medium">Medium confidence</option>
+                                  <option value="high">High confidence</option>
+                                </select>
+                              </label>
                             ) : null}
                           </div>
                         </div>

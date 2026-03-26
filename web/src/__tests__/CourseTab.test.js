@@ -1,8 +1,10 @@
 import React from "react";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 const mockGetDocs = jest.fn();
 const mockFetchResults = jest.fn();
+const mockGetDoc = jest.fn();
+const mockSetDoc = jest.fn();
 
 jest.mock("../firebase", () => ({
   db: {},
@@ -12,6 +14,10 @@ jest.mock("../firebase", () => ({
   orderBy: jest.fn(() => ({})),
   limit: jest.fn(() => ({})),
   getDocs: (...args) => mockGetDocs(...args),
+  doc: jest.fn(() => ({})),
+  getDoc: (...args) => mockGetDoc(...args),
+  setDoc: (...args) => mockSetDoc(...args),
+  serverTimestamp: jest.fn(() => "server-timestamp"),
 }));
 
 jest.mock("../context/AuthContext", () => ({
@@ -51,11 +57,39 @@ jest.mock("../data/courseSchedule", () => ({
         lesen_hören: { chapter: "2", assignment: true },
       },
       {
+        day: 5,
+        topic: "Introducing Yourself and Articles",
+        chapter: "1.2",
+        assignment: false,
+        schreiben_sprechen: { chapter: "1.2", assignment: false },
+      },
+      {
         day: 6,
         topic: "Family and Hobbies",
         chapter: "2.3",
         assignment: false,
         schreiben_sprechen: { chapter: "2.3", assignment: false },
+      },
+      {
+        day: 13,
+        topic: "Revision",
+        chapter: "3.5",
+        assignment: false,
+        schreiben_sprechen: { chapter: "3.5", assignment: false },
+      },
+      {
+        day: 14,
+        topic: "Modal Verbs",
+        chapter: "3.6",
+        assignment: false,
+        schreiben_sprechen: { chapter: "3.6", assignment: false },
+      },
+      {
+        day: 15,
+        topic: "Introduction to Speaking Exams",
+        chapter: "4.7",
+        assignment: false,
+        schreiben_sprechen: { chapter: "4.7", assignment: false },
       },
       {
         day: 7,
@@ -118,8 +152,14 @@ import CourseTab from "../components/CourseTab";
 
 describe("CourseTab", () => {
   beforeEach(() => {
+    window.localStorage.clear();
     mockGetDocs.mockResolvedValue({ docs: [] });
     mockFetchResults.mockResolvedValue({ results: [] });
+    mockGetDoc.mockResolvedValue({
+      exists: () => false,
+      data: () => ({}),
+    });
+    mockSetDoc.mockResolvedValue(undefined);
   });
 
   it("renders Passed for tutor-marked entries when merged progress status is passed even with a submission state", async () => {
@@ -171,6 +211,43 @@ describe("CourseTab", () => {
     expect(within(card).getByText("Practice only")).toBeInTheDocument();
     expect(within(card).queryByText("Submitted")).not.toBeInTheDocument();
     expect(within(card).queryByText("Not started")).not.toBeInTheDocument();
+  });
+
+  it("supports self-marked completion and confidence for practice-only entries", async () => {
+    render(<CourseTab defaultLevel="A1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Family and Hobbies")).toBeInTheDocument();
+    });
+
+    const card = screen.getByText("Family and Hobbies").closest("div");
+    const completionCheckbox = within(card).getByRole("checkbox");
+    fireEvent.click(completionCheckbox);
+
+    const confidenceSelect = within(card).getByRole("combobox");
+    fireEvent.change(confidenceSelect, { target: { value: "high" } });
+
+    expect(within(card).getByText("Self-marked complete")).toBeInTheDocument();
+    expect(screen.getByText("Practical completed: 1/5")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockSetDoc).toHaveBeenCalled();
+    });
+  });
+
+  it("awards practical cluster badges when required practice days are completed", async () => {
+    render(<CourseTab defaultLevel="A1" />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Introducing Yourself and Articles")).toBeInTheDocument();
+      expect(screen.getByText("Family and Hobbies")).toBeInTheDocument();
+    });
+
+    const day5Card = screen.getByText("Introducing Yourself and Articles").closest("div");
+    const day6Card = screen.getByText("Family and Hobbies").closest("div");
+    fireEvent.click(within(day5Card).getByRole("checkbox"));
+    fireEvent.click(within(day6Card).getByRole("checkbox"));
+
+    expect(screen.getByText("🧩 Foundation Speaker")).toBeInTheDocument();
   });
 
 
