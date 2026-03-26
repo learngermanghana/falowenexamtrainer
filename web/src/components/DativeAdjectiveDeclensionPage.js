@@ -100,6 +100,57 @@ const ExampleCard = ({ title, items }) => (
   </div>
 );
 
+const HighlightedNounPhrase = ({ article, adjective, noun }) => (
+  <span style={{ fontWeight: 600 }}>
+    <span
+      style={{
+        background: "#fde68a",
+        padding: "1px 5px",
+        borderRadius: 6,
+      }}
+    >
+      {article}
+    </span>{" "}
+    <span
+      style={{
+        background: "#bfdbfe",
+        padding: "1px 5px",
+        borderRadius: 6,
+      }}
+    >
+      {adjective}
+    </span>{" "}
+    <span
+      style={{
+        background: "#bbf7d0",
+        padding: "1px 5px",
+        borderRadius: 6,
+      }}
+    >
+      {noun}
+    </span>
+  </span>
+);
+
+const FullSentenceExamples = ({ examples }) => (
+  <div style={{ display: "grid", gap: 10 }}>
+    {examples.map((example) => (
+      <div
+        key={example.label}
+        style={{ border: "1px solid #e6e8ef", borderRadius: 10, padding: 12, display: "grid", gap: 6 }}
+      >
+        <strong>{example.label}</strong>
+        <div style={{ margin: 0 }}>
+          {example.before}{" "}
+          <HighlightedNounPhrase article={example.article} adjective={example.adjective} noun={example.noun} />
+          {example.after}
+        </div>
+        <div style={{ margin: 0, color: "#4b5563", fontSize: 14 }}>{example.translation}</div>
+      </div>
+    ))}
+  </div>
+);
+
 const DativeAdjectiveDeclensionPage = () => {
   const navigate = useNavigate();
   const [showAnswers, setShowAnswers] = useState(false);
@@ -203,6 +254,84 @@ const DativeAdjectiveDeclensionPage = () => {
     },
   ];
 
+  const nominativeSentenceExamples = [
+    {
+      label: "Nominative Masculine",
+      before: "Das ist",
+      article: "ein",
+      adjective: "großer",
+      noun: "Hund",
+      after: ".",
+      translation: "That is a big dog.",
+    },
+    {
+      label: "Nominative Feminine",
+      before: "Das ist",
+      article: "eine",
+      adjective: "rote",
+      noun: "Blume",
+      after: ".",
+      translation: "That is a red flower.",
+    },
+    {
+      label: "Nominative Neuter",
+      before: "Das ist",
+      article: "ein",
+      adjective: "kleines",
+      noun: "Auto",
+      after: ".",
+      translation: "That is a small car.",
+    },
+    {
+      label: "Nominative Plural",
+      before: "Das sind",
+      article: "keine",
+      adjective: "neuen",
+      noun: "Bücher",
+      after: ".",
+      translation: "Those are not new books.",
+    },
+  ];
+
+  const accusativeSentenceExamples = [
+    {
+      label: "Accusative Masculine",
+      before: "Ich sehe",
+      article: "einen",
+      adjective: "kleinen",
+      noun: "Hund",
+      after: ".",
+      translation: "I see a small dog.",
+    },
+    {
+      label: "Accusative Feminine",
+      before: "Ich kaufe",
+      article: "eine",
+      adjective: "schöne",
+      noun: "Blume",
+      after: ".",
+      translation: "I buy a beautiful flower.",
+    },
+    {
+      label: "Accusative Neuter",
+      before: "Wir haben",
+      article: "ein",
+      adjective: "grünes",
+      noun: "Auto",
+      after: ".",
+      translation: "We have a green car.",
+    },
+    {
+      label: "Accusative Plural",
+      before: "Er hat",
+      article: "keine",
+      adjective: "alten",
+      noun: "Bücher",
+      after: ".",
+      translation: "He has no old books.",
+    },
+  ];
+
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -264,6 +393,16 @@ const DativeAdjectiveDeclensionPage = () => {
             ["Plural", "keine", "-en", "keine neuen Bücher"],
           ]}
         />
+        <ExampleCard
+          title="Color guide for the noun phrase"
+          items={[
+            "Yellow = indefinite article (ein/eine/einen/keine)",
+            "Blue = adjective ending change",
+            "Green = noun",
+          ]}
+        />
+        <h3 style={{ margin: "12px 0 0" }}>Full sentence examples (Nominative)</h3>
+        <FullSentenceExamples examples={nominativeSentenceExamples} />
         <h3 style={{ margin: "12px 0 0" }}>Accusative (object)</h3>
         <Table
           headers={["Gender", "Article", "Ending", "Example"]}
@@ -274,6 +413,8 @@ const DativeAdjectiveDeclensionPage = () => {
             ["Plural", "keine", "-en", "keine alten Bücher"],
           ]}
         />
+        <h3 style={{ margin: "12px 0 0" }}>Full sentence examples (Accusative)</h3>
+        <FullSentenceExamples examples={accusativeSentenceExamples} />
         <h3 style={{ margin: "12px 0 0" }}>Mini adjective ending test (A1)</h3>
         <button
           type="button"
