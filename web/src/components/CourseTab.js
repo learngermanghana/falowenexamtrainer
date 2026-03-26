@@ -920,7 +920,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, db, selectedCourseLevel, studentProfile?.id]);
+  }, [authLoading, selectedCourseLevel, studentProfile?.id]);
 
   useEffect(() => {
     if (!practiceProgressLoaded || !selectedCourseLevel || authLoading || !studentProfile?.id || !db) return;
@@ -941,7 +941,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     });
   }, [
     authLoading,
-    db,
     practiceProgress,
     practiceProgressLoaded,
     selectedCourseLevel,
