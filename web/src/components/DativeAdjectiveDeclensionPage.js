@@ -103,6 +103,7 @@ const ExampleCard = ({ title, items }) => (
 const DativeAdjectiveDeclensionPage = () => {
   const navigate = useNavigate();
   const [showAnswers, setShowAnswers] = useState(false);
+  const [showAdjectiveAnswers, setShowAdjectiveAnswers] = useState(false);
   const headerImageUrl =
     "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1800&q=80";
 
@@ -169,6 +170,39 @@ const DativeAdjectiveDeclensionPage = () => {
     },
   ];
 
+  const adjectivePracticeItems = [
+    {
+      prompt: "Das ist ___ groß___ Hund.",
+      options: ["ein / -er", "einen / -en", "eine / -e"],
+      answer: "ein / -er",
+      reason: "Masculine nominative uses ein + -er → ein großer Hund.",
+    },
+    {
+      prompt: "Ich sehe ___ klein___ Hund.",
+      options: ["ein / -er", "einen / -en", "ein / -es"],
+      answer: "einen / -en",
+      reason: "Masculine accusative uses einen + -en → einen kleinen Hund.",
+    },
+    {
+      prompt: "Sie hat ___ rot___ Blume.",
+      options: ["eine / -e", "einen / -en", "ein / -es"],
+      answer: "eine / -e",
+      reason: "Feminine accusative uses eine + -e → eine rote Blume.",
+    },
+    {
+      prompt: "Das ist ___ neu___ Auto.",
+      options: ["ein / -es", "eine / -e", "einen / -en"],
+      answer: "ein / -es",
+      reason: "Neuter nominative uses ein + -es → ein neues Auto.",
+    },
+    {
+      prompt: "Wir kaufen ___ alt___ Bücher.",
+      options: ["keine / -en", "keine / -e", "ein / -es"],
+      answer: "keine / -en",
+      reason: "Plural with keine in nominative/accusative takes -en → keine alten Bücher.",
+    },
+  ];
+
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
@@ -190,80 +224,24 @@ const DativeAdjectiveDeclensionPage = () => {
         </p>
       </div>
 
-      <Section title="Grammar Note: Dative and Accusative Verbs">
+      <Section title="Step 1: Adjective Declension First (Indefinite Articles: Nominative + Accusative)">
         <p style={{ margin: 0 }}>
-          In German, the verb controls the case of the object. The verb tells you whether the next noun or pronoun
-          must be accusative or dative.
+          Start here first. For now, focus only on <strong>indefinite articles</strong> with adjective endings in
+          nominative and accusative.
         </p>
         <Callout>
-          <strong>Quick rule</strong>
+          <strong>Simple core rule</strong>
+          <p style={{ margin: 0 }}>
+            The ending in <strong>ein/eine/einen + adjective + noun</strong> is guided by:
+          </p>
           <BulletList
             items={[
-              "Accusative = direct object (what/who is directly affected).",
-              "Dative = receiving object (to/for whom something happens).",
-              "So after a dative verb, use a dative noun or dative pronoun.",
+              "the article pattern from der/die/das in that slot, and",
+              "whether your sentence is nominative (subject) or accusative (object).",
+              "We will learn dative adjective declension later.",
             ]}
           />
         </Callout>
-      </Section>
-
-      <Section title="Step 1: Accusative Verbs (Review)">
-        <p style={{ margin: 0 }}>You already have an idea about accusative verbs. Common ones are:</p>
-        <BulletList items={["haben", "sehen", "kaufen", "lieben", "brauchen"]} />
-        <Table
-          headers={["Verb", "Example", "Meaning"]}
-          rows={[
-            ["haben", "Ich habe einen Hund.", "I have a dog."],
-            ["sehen", "Ich sehe den Lehrer.", "I see the teacher."],
-            ["kaufen", "Wir kaufen einen Kaffee.", "We buy a coffee."],
-          ]}
-        />
-      </Section>
-
-      <Section title="Step 2: Dative Verbs (New)">
-        <p style={{ margin: 0 }}>These verbs often change the next noun/pronoun to dative:</p>
-        <BulletList
-          items={[
-            "schreiben (to write to)",
-            "gratulieren (to congratulate)",
-            "danken (to thank)",
-            "senden (to send to)",
-            "helfen (to help)",
-          ]}
-        />
-        <WarningCallout>
-          <strong>Important:</strong> If you use a dative verb, the receiving noun should be in dative form.
-        </WarningCallout>
-      </Section>
-
-      <Section title="Step 3: Dative Articles (Definite and Indefinite)">
-        <h3 style={{ margin: 0 }}>Definite Articles</h3>
-        <Table
-          headers={["Gender", "Nominative", "Dative", "Example"]}
-          rows={[
-            ["Masculine", "der", "dem", "Ich schreibe dem Mann."],
-            ["Feminine", "die", "der", "Ich danke der Frau."],
-            ["Neuter", "das", "dem", "Er sendet dem Kind eine Karte."],
-            ["Plural", "die", "den (+n noun)", "Wir gratulieren den Freunden."],
-          ]}
-        />
-        <h3 style={{ margin: "12px 0 0" }}>Indefinite Articles</h3>
-        <Table
-          headers={["Gender", "Nominative", "Dative", "Example"]}
-          rows={[
-            ["Masculine", "ein", "einem", "Ich schreibe einem Kollegen."],
-            ["Feminine", "eine", "einer", "Ich sende einer Freundin eine Mail."],
-            ["Neuter", "ein", "einem", "Sie dankt einem Kind."],
-            ["Plural", "keine", "keinen (+n noun)", "Wir helfen keinen Nachbarn heute."],
-          ]}
-        />
-      </Section>
-
-
-      <Section title="Step 3.5: Adjective Declension (Indefinite Articles: Nominative + Accusative)">
-        <p style={{ margin: 0 }}>
-          For now, focus only on <strong>indefinite articles</strong> with adjective endings in nominative and accusative.
-        </p>
         <Callout>
           <strong>Very simple trick</strong>
           <BulletList
@@ -297,17 +275,109 @@ const DativeAdjectiveDeclensionPage = () => {
           ]}
         />
         <h3 style={{ margin: "12px 0 0" }}>Mini adjective ending test (A1)</h3>
-        <BulletList
-          items={[
-            "Ich habe einen kleinen Hund.",
-            "Das ist ein neues Auto.",
-            "Sie ist eine schöne Frau.",
-            "Ich sehe eine rote Blume.",
-            "Er ist ein großer Mann.",
+        <button
+          type="button"
+          onClick={() => setShowAdjectiveAnswers((prev) => !prev)}
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+        >
+          {showAdjectiveAnswers ? "Hide answers" : "Show answers"}
+        </button>
+        <div style={{ display: "grid", gap: 10 }}>
+          {adjectivePracticeItems.map((item, index) => (
+            <div
+              key={item.prompt}
+              style={{ border: "1px solid #e6e8ef", borderRadius: 10, padding: 12, display: "grid", gap: 8 }}
+            >
+              <strong>
+                {index + 1}. {item.prompt}
+              </strong>
+              <div style={{ color: "#4b5563", fontSize: 14 }}>Options: {item.options.join(" / ")}</div>
+              {showAdjectiveAnswers ? (
+                <>
+                  <div style={{ fontSize: 14 }}>
+                    <strong>Answer:</strong> {item.answer}
+                  </div>
+                  <div style={{ color: "#4b5563", fontSize: 14 }}>
+                    <strong>Why:</strong> {item.reason}
+                  </div>
+                </>
+              ) : (
+                <div style={{ color: "#6b7280", fontSize: 14 }}>Answer is hidden. Try it first 👀</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Step 2: Dative and Accusative Verbs">
+        <p style={{ margin: 0 }}>
+          Now continue to verbs. In German, the verb controls the case of the object. The verb tells you whether the
+          next noun or pronoun must be accusative or dative.
+        </p>
+        <Callout>
+          <strong>Quick rule</strong>
+          <BulletList
+            items={[
+              "Accusative = direct object (what/who is directly affected).",
+              "Dative = receiving object (to/for whom something happens).",
+              "So after a dative verb, use a dative noun or dative pronoun.",
+            ]}
+          />
+        </Callout>
+      </Section>
+
+      <Section title="Step 3: Accusative Verbs (Review)">
+        <p style={{ margin: 0 }}>You already have an idea about accusative verbs. Common ones are:</p>
+        <BulletList items={["haben", "sehen", "kaufen", "lieben", "brauchen"]} />
+        <Table
+          headers={["Verb", "Example", "Meaning"]}
+          rows={[
+            ["haben", "Ich habe einen Hund.", "I have a dog."],
+            ["sehen", "Ich sehe den Lehrer.", "I see the teacher."],
+            ["kaufen", "Wir kaufen einen Kaffee.", "We buy a coffee."],
           ]}
         />
       </Section>
-      <Section title="Step 4: Dative Pronouns (Receiver Pronouns)">
+
+      <Section title="Step 4: Dative Verbs (New)">
+        <p style={{ margin: 0 }}>These verbs often change the next noun/pronoun to dative:</p>
+        <BulletList
+          items={[
+            "schreiben (to write to)",
+            "gratulieren (to congratulate)",
+            "danken (to thank)",
+            "senden (to send to)",
+            "helfen (to help)",
+          ]}
+        />
+        <WarningCallout>
+          <strong>Important:</strong> If you use a dative verb, the receiving noun should be in dative form.
+        </WarningCallout>
+      </Section>
+
+      <Section title="Step 5: Dative Articles (Definite and Indefinite)">
+        <h3 style={{ margin: 0 }}>Definite Articles</h3>
+        <Table
+          headers={["Gender", "Nominative", "Dative", "Example"]}
+          rows={[
+            ["Masculine", "der", "dem", "Ich schreibe dem Mann."],
+            ["Feminine", "die", "der", "Ich danke der Frau."],
+            ["Neuter", "das", "dem", "Er sendet dem Kind eine Karte."],
+            ["Plural", "die", "den (+n noun)", "Wir gratulieren den Freunden."],
+          ]}
+        />
+        <h3 style={{ margin: "12px 0 0" }}>Indefinite Articles</h3>
+        <Table
+          headers={["Gender", "Nominative", "Dative", "Example"]}
+          rows={[
+            ["Masculine", "ein", "einem", "Ich schreibe einem Kollegen."],
+            ["Feminine", "eine", "einer", "Ich sende einer Freundin eine Mail."],
+            ["Neuter", "ein", "einem", "Sie dankt einem Kind."],
+            ["Plural", "keine", "keinen (+n noun)", "Wir helfen keinen Nachbarn heute."],
+          ]}
+        />
+      </Section>
+      <Section title="Step 6: Dative Pronouns (Receiver Pronouns)">
         <p style={{ margin: 0 }}>
           In dative sentences, receiver pronouns are common. You will often see <strong>dir</strong> and
           <strong> ihnen</strong>.
@@ -326,7 +396,7 @@ const DativeAdjectiveDeclensionPage = () => {
         <Callout>At A2, we will learn more dative pronouns and two-object sentence patterns.</Callout>
       </Section>
 
-      <Section title="Step 5: Compare Both Verb Types">
+      <Section title="Step 7: Compare Both Verb Types">
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           <ExampleCard
             title="✅ Accusative Verb"
@@ -344,7 +414,7 @@ const DativeAdjectiveDeclensionPage = () => {
         </div>
       </Section>
 
-      <Section title="Step 6: Practice Book (Self-practice, no assignment)">
+      <Section title="Step 8: Knowledge Test — Dative & Accusative Verbs">
         <p style={{ margin: 0 }}>
           After reading the notes, try these 10 quick practice items in-app. This is <strong>not</strong> an assignment.
         </p>
