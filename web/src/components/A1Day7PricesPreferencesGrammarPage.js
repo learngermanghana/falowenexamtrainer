@@ -54,60 +54,83 @@ const lessonBlocks = {
   kostenCards: [
     {
       title: "Kostet (singular)",
-      lines: ["Use with one item.", "Wie viel kostet der Apfel?", "Der Apfel kostet 1 Euro."],
+      lines: [
+        "Use with one item. (Use when you ask about one thing.)",
+        "Wie viel kostet der Apfel? (How much does the apple cost?)",
+        "Der Apfel kostet 1 Euro. (The apple costs 1 euro.)",
+      ],
     },
     {
       title: "Kosten (plural)",
-      lines: ["Use with multiple items.", "Wie viel kosten die Äpfel?", "Die Äpfel kosten 3 Euro."],
+      lines: [
+        "Use with multiple items. (Use when you ask about more than one thing.)",
+        "Wie viel kosten die Äpfel? (How much do the apples cost?)",
+        "Die Äpfel kosten 3 Euro. (The apples cost 3 euros.)",
+      ],
     },
+  ],
+  kostenConjugation: [
+    { pronoun: "ich", english: "I", form: "koste", note: "Ich koste den Käse. (I taste the cheese.)" },
+    { pronoun: "du", english: "you (informal)", form: "kostest", note: "Du kostest die Suppe." },
+    { pronoun: "er/sie/es", english: "he/she/it", form: "kostet", note: "Er kostet / Sie kostet / Es kostet." },
+    { pronoun: "wir", english: "we", form: "kosten", note: "Wir kosten den Kuchen." },
+    { pronoun: "ihr", english: "you all (informal)", form: "kostet", note: "Ihr kostet den Saft." },
+    { pronoun: "sie/Sie", english: "they / you (formal)", form: "kosten", note: "Sie kosten." },
   ],
   pronouns: [
     {
       gender: "Masculine",
       article: "der",
       pronoun: "er",
-      example: "Der Apfel kostet 3 Euro. Er kostet 3 Euro.",
+      example: "Der Apfel kostet 3 Euro. Er kostet 3 Euro. (The apple costs 3 euros. It costs 3 euros.)",
     },
     {
       gender: "Feminine",
       article: "die",
       pronoun: "sie",
-      example: "Die Banane kostet 2 Euro. Sie kostet 2 Euro.",
+      example: "Die Banane kostet 2 Euro. Sie kostet 2 Euro. (The banana costs 2 euros. It costs 2 euros.)",
     },
     {
       gender: "Neuter",
       article: "das",
       pronoun: "es",
-      example: "Das Buch kostet 10 Euro. Es kostet 10 Euro.",
+      example: "Das Buch kostet 10 Euro. Es kostet 10 Euro. (The book costs 10 euros. It costs 10 euros.)",
     },
     {
       gender: "Plural",
       article: "die",
       pronoun: "sie",
-      example: "Die Äpfel kosten 3 Euro. Sie kosten 3 Euro.",
+      example: "Die Äpfel kosten 3 Euro. Sie kosten 3 Euro. (The apples cost 3 euros. They cost 3 euros.)",
     },
   ],
   gernLieber: [
     {
       title: "gern = like doing",
-      lines: ["Ich spiele gern Fußball.", "Er schwimmt gern."],
+      lines: [
+        "Ich spiele gern Fußball. (I like playing football/soccer.)",
+        "Er schwimmt gern. (He likes swimming.)",
+      ],
     },
     {
       title: "lieber = prefer",
       lines: [
-        "Ich spiele gern Fußball, aber ich spiele lieber Basketball.",
-        "Er schwimmt gern, aber er fährt lieber Fahrrad.",
+        "Ich spiele gern Fußball, aber ich spiele lieber Basketball. (I like playing football, but I prefer playing basketball.)",
+        "Er schwimmt gern, aber er fährt lieber Fahrrad. (He likes swimming, but he prefers cycling.)",
       ],
     },
   ],
   gernVsMogen: [
     {
       title: "mögen (verb) + noun",
-      lines: ["Ich mag Pizza.", "Er mag Hunde.", "Wir mögen den Film."],
+      lines: [
+        "Ich mag Pizza. (I like pizza.)",
+        "Er mag Hunde. (He likes dogs.)",
+        "Wir mögen den Film. (We like the movie.)",
+      ],
     },
     {
       title: "gern (adverb) + action",
-      lines: ["Ich lese gern.", "Er kocht gern.", "Sie tanzt gern."],
+      lines: ["Ich lese gern. (I like reading.)", "Er kocht gern. (He likes cooking.)", "Sie tanzt gern. (She likes dancing.)"],
     },
   ],
   practice: [
@@ -209,13 +232,31 @@ const A1Day7PricesPreferencesGrammarPage = () => {
 
         <div style={noteCardStyle}>
           <strong>How to answer</strong>
-          <div>Singular: Das kostet 5 Euro.</div>
-          <div>Plural: Die kosten 10 Euro.</div>
+          <div>Singular: Das kostet 5 Euro. (It costs 5 euros.)</div>
+          <div>Plural: Die kosten 10 Euro. (They cost 10 euros.)</div>
+        </div>
+
+        <div style={noteCardStyle}>
+          <strong>Conjugation of kosten (Präsens)</strong>
+          {lessonBlocks.kostenConjugation.map((row) => (
+            <div key={row.pronoun}>
+              <strong>{row.pronoun}</strong> ({row.english}) <strong>{row.form}</strong> — {row.note}
+            </div>
+          ))}
+          <div>
+            <strong>Why "kostet" vs. "kosten"?</strong> For the subject <strong>er/sie/es</strong> we use{" "}
+            <strong>kostet</strong>. For plural subjects like <strong>wir/sie (they)</strong>, we use <strong>kosten</strong>.
+          </div>
         </div>
       </section>
 
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>2) Pronouns with gender</h2>
+        <div style={noteCardStyle}>
+          To replace a noun with a pronoun, use <strong>er</strong>, <strong>sie</strong>, or <strong>es</strong> based on the
+          noun's grammatical gender: masculine (<strong>der → er</strong>), feminine (<strong>die → sie</strong>), neuter (
+          <strong>das → es</strong>). For plural nouns, use <strong>sie</strong>.
+        </div>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
             <thead>
@@ -256,6 +297,12 @@ const A1Day7PricesPreferencesGrammarPage = () => {
 
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>4) Gern vs. Mögen</h2>
+        <div style={noteCardStyle}>
+          <strong>Quick difference:</strong> <strong>Ich mag Fußball.</strong> means "I like football" (noun after{" "}
+          <strong>mögen</strong>). <strong>Ich spiele gern Fußball.</strong> means "I like to play football" (action verb +
+          <strong> gern</strong>). <strong>gern</strong> comes after the conjugated verb, while <strong>mögen</strong> is itself
+          the main verb.
+        </div>
         <div style={splitGridStyle}>
           {lessonBlocks.gernVsMogen.map((block) => (
             <div key={block.title} style={noteCardStyle}>
