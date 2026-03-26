@@ -70,12 +70,12 @@ const lessonBlocks = {
     },
   ],
   kostenConjugation: [
-    { pronoun: "ich", english: "I", form: "koste", note: "Ich koste den Käse. (I taste the cheese.)" },
-    { pronoun: "du", english: "you (informal)", form: "kostest", note: "Du kostest die Suppe." },
-    { pronoun: "er/sie/es", english: "he/she/it", form: "kostet", note: "Er kostet / Sie kostet / Es kostet." },
-    { pronoun: "wir", english: "we", form: "kosten", note: "Wir kosten den Kuchen." },
-    { pronoun: "ihr", english: "you all (informal)", form: "kostet", note: "Ihr kostet den Saft." },
-    { pronoun: "sie/Sie", english: "they / you (formal)", form: "kosten", note: "Sie kosten." },
+    { pronoun: "ich", form: "koste" },
+    { pronoun: "du", form: "kostest" },
+    { pronoun: "er/sie/es", form: "kostet" },
+    { pronoun: "wir", form: "kosten" },
+    { pronoun: "ihr", form: "kostet" },
+    { pronoun: "sie/Sie", form: "kosten" },
   ],
   pronouns: [
     {
@@ -240,13 +240,9 @@ const A1Day7PricesPreferencesGrammarPage = () => {
           <strong>Conjugation of kosten (Präsens)</strong>
           {lessonBlocks.kostenConjugation.map((row) => (
             <div key={row.pronoun}>
-              <strong>{row.pronoun}</strong> ({row.english}) <strong>{row.form}</strong> — {row.note}
+              <strong>{row.pronoun}</strong> <strong>{row.form}</strong>
             </div>
           ))}
-          <div>
-            <strong>Why "kostet" vs. "kosten"?</strong> For the subject <strong>er/sie/es</strong> we use{" "}
-            <strong>kostet</strong>. For plural subjects like <strong>wir/sie (they)</strong>, we use <strong>kosten</strong>.
-          </div>
         </div>
       </section>
 
