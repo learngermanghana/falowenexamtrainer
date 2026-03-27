@@ -58,9 +58,10 @@ const classCatalog = {
       { day: "Saturday", startTime: "08:00", endTime: "09:00" },
     ],
   },
-  "A2 Stuttgart Klasse": {
-    startDate: "2026-03-02",
-    endDate: "2026-05-04",
+  "A2 Freiburg Klasse": {
+    orientationDate: "2026-04-23",
+    startDate: "2026-04-24",
+    endDate: "2026-06-25",
     schedule: [
       { day: "Monday", startTime: "17:30", endTime: "19:00" },
       { day: "Tuesday", startTime: "17:30", endTime: "19:00" },
