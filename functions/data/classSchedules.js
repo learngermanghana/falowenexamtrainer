@@ -63,9 +63,9 @@ const classCatalog = {
     startDate: "2026-04-24",
     endDate: "2026-06-25",
     schedule: [
-      { day: "Monday", startTime: "17:30", endTime: "19:00" },
-      { day: "Tuesday", startTime: "17:30", endTime: "19:00" },
-      { day: "Wednesday", startTime: "17:30", endTime: "19:00" },
+      { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
+      { day: "Thursday", startTime: "11:00", endTime: "12:00" },
+      { day: "Friday", startTime: "11:00", endTime: "12:00" },
     ],
   },
   "B1 Stuttgart Klasse": {
