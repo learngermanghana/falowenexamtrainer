@@ -73,9 +73,10 @@ const classCatalogDictionary = {
     docUrl:
       "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-04-03&defaultWeekdays=Friday%2CSaturday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
-  "A2 Stuttgart Klasse": {
-    startDate: "2026-03-02",
-    endDate: "2026-05-04",
+  "A2 Freiburg Klasse": {
+    orientationDate: "2026-04-23",
+    startDate: "2026-04-24",
+    endDate: "2026-06-25",
     schedule: [
       { day: "Monday", startTime: "17:30", endTime: "19:00" },
       { day: "Tuesday", startTime: "17:30", endTime: "19:00" },
