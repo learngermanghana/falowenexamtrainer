@@ -475,7 +475,7 @@ const HealthBodyPartsPage = () => {
             <strong>Introduction:</strong> greet and state your reason in one short sentence.
           </p>
           <p style={{ margin: "0 0 6px" }}>
-            Example: <strong>Sehr geehrte Frau Keller, ich schreibe wegen des Termins.</strong>
+            Example: <strong>Sehr geehrte Frau Keller, ich schreibe Ihnen, weil ich den Termin absagen möchte.</strong>
           </p>
           <p style={{ margin: "0 0 6px" }}>
             <strong>Body:</strong> write 2–3 short points (5–6 words each if possible).
