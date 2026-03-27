@@ -1583,7 +1583,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         <div style={{ ...styles.helperCard, marginTop: 10 }}>
           <p style={{ ...styles.helperText, margin: 0 }}>
             {isTutorOnlyView
-              ? "This page is focused on tutor updates only to keep feedback easy to track."
+              ? "Tutor updates only."
               : (
                 <>
                   Start in <strong>Mark my letter</strong> for your main workflow. Use the other tabs only when you need
@@ -1608,15 +1608,17 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             </button>
           ))}
         </div>
-        <div style={{ marginTop: 12 }}>
-          <button
-            style={styles.dangerButton}
-            onClick={handleResetWorkspace}
-            type="button"
-          >
-            Reset writing workspace
-          </button>
-        </div>
+        {!isTutorOnlyView && (
+          <div style={{ marginTop: 12 }}>
+            <button
+              style={styles.dangerButton}
+              onClick={handleResetWorkspace}
+              type="button"
+            >
+              Reset writing workspace
+            </button>
+          </div>
+        )}
       </section>
 
       {activeTab === "practice" && canUsePracticeLetters && (
@@ -2276,19 +2278,12 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <div>
               <h3 style={{ ...styles.sectionTitle, marginBottom: 4 }}>Tutor Feedback</h3>
-              <p style={{ ...styles.helperText, margin: 0 }}>Track tutor updates and reply from one workspace.</p>
-            </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {["Falowen", "Exam Room", "Tutor Desk"].map((item) => (
-                <span key={item} style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 999, padding: "6px 10px", fontSize: 12, fontWeight: 700, color: "#1d4ed8" }}>
-                  {item}
-                </span>
-              ))}
+              <p style={{ ...styles.helperText, margin: 0 }}>View tutor updates and reply here.</p>
             </div>
           </div>
           <div style={{ ...styles.infoBox, marginTop: 12, display: "flex", gap: 10, alignItems: "flex-start" }}>
             <span style={{ fontSize: 18, lineHeight: 1 }}>ℹ️</span>
-            <div style={{ margin: 0 }}>This page is focused on tutor updates only. Select a submission to see detailed feedback and next steps.</div>
+            <div style={{ margin: 0 }}>Select a submission to see feedback and next steps.</div>
           </div>
           {!tutorReviewCloudEnabled ? (
             <div style={styles.errorBox}>
