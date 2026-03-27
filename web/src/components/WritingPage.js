@@ -2296,7 +2296,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             </div>
           ) : null}
           <div style={{ ...styles.helperCard, marginTop: 12 }}>
-            {tutorReviews.length ? (
+            {!tutorReviews.length ? (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                No feedback yet. To see feedback, go to the Writing tab and save a sample for your tutor to review.
+              </p>
+            ) : (
               <>
                 <label style={styles.label}>Choose submission</label>
                 <select
@@ -2310,57 +2314,57 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                     </option>
                   ))}
                 </select>
-              </>
-            ) : null}
-            {(() => {
-              const meta = getTutorStatusMeta(latestTutorReview?.reviewStatus);
-              return (
-                <div style={{ marginBottom: 10, border: `1px solid ${meta.soft}`, background: meta.soft, borderRadius: 12, padding: 12, display: "flex", gap: 10, alignItems: "center" }}>
-                  <div style={{ width: 30, height: 30, borderRadius: "50%", border: `2px solid ${meta.accent}`, color: meta.accent, fontWeight: 800, display: "grid", placeItems: "center" }}>{meta.icon}</div>
-                  <div style={{ fontWeight: 800, color: meta.accent }}>Status: {meta.label}</div>
-                </div>
-              );
-            })()}
-            {latestTutorReview?.reviewedAt ? (
-              <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
-                Reviewed: {new Date(latestTutorReview.reviewedAt).toLocaleString()}
-              </p>
-            ) : null}
-            {latestTutorReview?.tutorFeedback ? (
-              <pre
-                style={{
-                  ...styles.pre,
-                  background: "linear-gradient(120deg, #0f172a 0%, #1e293b 100%)",
-                  color: "#f8fafc",
-                  border: "1px solid #1e3a8a",
-                  fontSize: 16,
-                  padding: 20,
-                }}
-              >
-                {latestTutorReview.tutorFeedback}
-              </pre>
-            ) : (
-              <p style={{ ...styles.helperText, margin: 0 }}>
-                No tutor notes yet. Submit a copy from “Mark my letter” and check back here.
-              </p>
-            )}
-            {Array.isArray(latestTutorReview?.studentReplies) && latestTutorReview.studentReplies.length ? (
-              <div style={{ marginTop: 10 }}>
-                <div style={{ fontWeight: 700, marginBottom: 6 }}>Your replies</div>
-                <div style={{ display: "grid", gap: 8 }}>
-                  {latestTutorReview.studentReplies.map((reply, index) => (
-                    <div key={`${reply?.createdAt || "reply"}-${index}`} style={{ ...styles.infoBox, margin: 0 }}>
-                      <div style={{ ...styles.helperText, margin: "0 0 4px" }}>
-                        {reply?.createdAt ? new Date(reply.createdAt).toLocaleString() : "Just now"}
-                      </div>
-                      <div>{reply?.message || ""}</div>
+                {(() => {
+                  const meta = getTutorStatusMeta(latestTutorReview?.reviewStatus);
+                  return (
+                    <div style={{ marginBottom: 10, border: `1px solid ${meta.soft}`, background: meta.soft, borderRadius: 12, padding: 12, display: "flex", gap: 10, alignItems: "center" }}>
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", border: `2px solid ${meta.accent}`, color: meta.accent, fontWeight: 800, display: "grid", placeItems: "center" }}>{meta.icon}</div>
+                      <div style={{ fontWeight: 800, color: meta.accent }}>Status: {meta.label}</div>
                     </div>
-                  ))}
-                </div>
-              </div>
-            ) : null}
+                  );
+                })()}
+                {latestTutorReview?.reviewedAt ? (
+                  <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
+                    Reviewed: {new Date(latestTutorReview.reviewedAt).toLocaleString()}
+                  </p>
+                ) : null}
+                {latestTutorReview?.tutorFeedback ? (
+                  <pre
+                    style={{
+                      ...styles.pre,
+                      background: "linear-gradient(120deg, #0f172a 0%, #1e293b 100%)",
+                      color: "#f8fafc",
+                      border: "1px solid #1e3a8a",
+                      fontSize: 16,
+                      padding: 20,
+                    }}
+                  >
+                    {latestTutorReview.tutorFeedback}
+                  </pre>
+                ) : (
+                  <p style={{ ...styles.helperText, margin: 0 }}>
+                    No tutor notes yet. Submit a copy from “Mark my letter” and check back here.
+                  </p>
+                )}
+                {Array.isArray(latestTutorReview?.studentReplies) && latestTutorReview.studentReplies.length ? (
+                  <div style={{ marginTop: 10 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 6 }}>Your replies</div>
+                    <div style={{ display: "grid", gap: 8 }}>
+                      {latestTutorReview.studentReplies.map((reply, index) => (
+                        <div key={`${reply?.createdAt || "reply"}-${index}`} style={{ ...styles.infoBox, margin: 0 }}>
+                          <div style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                            {reply?.createdAt ? new Date(reply.createdAt).toLocaleString() : "Just now"}
+                          </div>
+                          <div>{reply?.message || ""}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </>
+            )}
           </div>
-          {tutorReviewCloudEnabled ? (
+          {tutorReviewCloudEnabled && tutorReviews.length ? (
             <div style={{ ...styles.helperCard, marginTop: 10 }}>
               <label style={styles.label}>Reply to tutor feedback</label>
               <textarea
@@ -2387,21 +2391,23 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
               {studentReplyState.success ? <p style={{ ...styles.helperText, color: "#166534" }}>{studentReplyState.success}</p> : null}
             </div>
           ) : null}
-          <div style={{ marginTop: 14, display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>
-            {[
-              { label: "Approved", value: tutorStatusStats.approved, accent: "#16a34a", soft: "#dcfce7", icon: "✓" },
-              { label: "Pending", value: tutorStatusStats.pending, accent: "#ca8a04", soft: "#fef9c3", icon: "◷" },
-              { label: "Needs Revision", value: tutorStatusStats.needsRevision, accent: "#f97316", soft: "#ffedd5", icon: "!" },
-            ].map((item) => (
-              <div key={item.label} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "flex", gap: 10, alignItems: "center", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.06)" }}>
-                <div style={{ width: 34, height: 34, borderRadius: 10, background: item.soft, color: item.accent, fontWeight: 900, display: "grid", placeItems: "center" }}>{item.icon}</div>
-                <div>
-                  <div style={{ fontSize: 28, lineHeight: 1, fontWeight: 800 }}>{item.value}</div>
-                  <div style={{ ...styles.helperText, margin: 0 }}>{item.label}</div>
+          {tutorReviews.length ? (
+            <div style={{ marginTop: 14, display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>
+              {[
+                { label: "Approved", value: tutorStatusStats.approved, accent: "#16a34a", soft: "#dcfce7", icon: "✓" },
+                { label: "Pending", value: tutorStatusStats.pending, accent: "#ca8a04", soft: "#fef9c3", icon: "◷" },
+                { label: "Needs Revision", value: tutorStatusStats.needsRevision, accent: "#f97316", soft: "#ffedd5", icon: "!" },
+              ].map((item) => (
+                <div key={item.label} style={{ border: "1px solid #e2e8f0", borderRadius: 12, padding: 12, display: "flex", gap: 10, alignItems: "center", boxShadow: "0 8px 20px rgba(15, 23, 42, 0.06)" }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 10, background: item.soft, color: item.accent, fontWeight: 900, display: "grid", placeItems: "center" }}>{item.icon}</div>
+                  <div>
+                    <div style={{ fontSize: 28, lineHeight: 1, fontWeight: 800 }}>{item.value}</div>
+                    <div style={{ ...styles.helperText, margin: 0 }}>{item.label}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : null}
         </section>
       )}
     </>
