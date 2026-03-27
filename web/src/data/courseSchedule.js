@@ -850,8 +850,8 @@ const RAW_COURSE_SCHEDULES = {
       instruction: "Watch the video, open the in-app Health notes, complete the workbook, and send your answers.",
       grammar_topic: "Health and Body Parts",
       lesen_hören: {
-        video: "https://youtu.be/gzfIs-anyOE",
-        youtube_link: "https://youtu.be/gzfIs-anyOE",
+        video: "https://youtu.be/hktvDESwX3k",
+        youtube_link: "https://youtu.be/hktvDESwX3k",
         assignment: true,
         grammarbook_link: "/campus/course/health-and-body-parts-14-1",
         workbook_link: "/campus/course/a1-day-22-health-and-body-parts-workbook",
