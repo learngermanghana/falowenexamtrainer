@@ -1,12 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { styles } from "../styles";
 
 const heroSrc =
   "https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&w=1400&q=80";
-
-const grammarBreakSrc =
-  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=80";
 
 const boxStyle = {
   background: "#f9fafb",
@@ -173,85 +170,114 @@ const cancellationLines = [
 ];
 
 const bodyPartsQuiz = [
-  "I have a stomachache. → Ich habe ________.",
-  "My head hurts. → Mein ________ tut mir weh.",
-  "ear → ________",
-  "nose → ________",
-  "hand → ________",
+  {
+    prompt: "I have a stomachache.",
+    options: ["Ich habe Bauchschmerzen.", "Mein Bauch tun mir weh.", "Ich bin Bauchschmerz."],
+    answer: "Ich habe Bauchschmerzen.",
+  },
+  {
+    prompt: "My head hurts.",
+    options: ["Mein Kopf tut mir weh.", "Ich habe Kopf.", "Meine Kopf tut weh."],
+    answer: "Mein Kopf tut mir weh.",
+  },
+  {
+    prompt: "ear",
+    options: ["die Ohr", "das Ohr", "der Ohr"],
+    answer: "das Ohr",
+  },
+  {
+    prompt: "nose",
+    options: ["die Nase", "der Nase", "das Nase"],
+    answer: "die Nase",
+  },
+  {
+    prompt: "hand",
+    options: ["das Hand", "die Hand", "der Hand"],
+    answer: "die Hand",
+  },
 ];
 
-const bodyPartsQuizAnswers = [
-  "Bauchschmerzen",
-  "Kopf",
-  "das Ohr",
-  "die Nase",
-  "die Hand",
+const doctorConsultationQuiz = [
+  {
+    prompt: 'Complete: "Was tut dir weh?" means...',
+    options: ["Where are you?", "What hurts?", "Who is sick?"],
+    answer: "What hurts?",
+  },
+  {
+    prompt: 'Choose the correct formal question: "Are you okay?"',
+    options: ["Geht es Ihnen gut?", "Geht es dir gut?", "Bist du krank?"],
+    answer: "Geht es Ihnen gut?",
+  },
+  {
+    prompt: 'Choose the best sentence for "My legs hurt."',
+    options: ["Mein Beine tut mir weh.", "Meine Beine tun mir weh.", "Meine Beine tut weh."],
+    answer: "Meine Beine tun mir weh.",
+  },
 ];
 
-const nominativeArticles = [
-  "Masculine: der / ein → der Hund, ein Hund",
-  "Feminine: die / eine → die Blume, eine Blume",
-  "Neuter: das / ein → das Auto, ein Auto",
-  "Plural: die / keine → die Bücher, keine Bücher",
+const letterTopics = [
+  "Invite a friend to your birthday.",
+  "Cancel an appointment with a teacher or doctor.",
+  "Write about your daily routine.",
+  "Plan a weekend with a classmate.",
+  "Thank someone for help.",
+  "Ask for information about a course.",
 ];
 
-const accusativeArticles = [
-  "Masculine: den / einen → den Hund, einen Hund",
-  "Feminine: die / eine → die Blume, eine Blume",
-  "Neuter: das / ein → das Auto, ein Auto",
-  "Plural: die / keine → die Bücher, keine Bücher",
+const shortSentencePatterns = [
+  "Ich habe Zeit heute.",
+  "Ich kaufe Brot morgen.",
+  "Ich esse gern Pizza.",
+  "Ich trinke viel Wasser.",
+  "Meine Hobbys sind Lesen.",
+  "Ich habe zwei Brüder.",
 ];
 
-const endingRules = [
-  "der → -er",
-  "die → -e",
-  "das → -es",
-  "den → -en",
-  "plural (die / keine) → -en",
+const wQuestionPatterns = [
+  "Wie heißt du?",
+  "Was kaufst du heute?",
+  "Wo wohnst du jetzt?",
+  "Wann kommst du nach Hause?",
 ];
 
-const nominativeExamples = [
-  "Masculine: ein + -er → ein großer Mann",
-  "Feminine: eine + -e → eine schöne Frau",
-  "Neuter: ein + -es → ein kleines Auto",
-  "Plural: keine + -en → keine kleinen Kinder",
+const modalVerbExamples = [
+  "Ich kann heute kommen.",
+  "Wir müssen Deutsch lernen.",
+  "Darf ich später anrufen?",
+  "Kannst du mir helfen?",
 ];
 
-const accusativeExamples = [
-  "Masculine: einen + -en → einen kleinen Hund",
-  "Feminine: eine + -e → eine rote Blume",
-  "Neuter: ein + -es → ein grünes Auto",
-  "Plural: keine + -en → keine alten Bücher",
+const weilExamples = [
+  "Ich bleibe zu Hause, weil ich krank bin.",
+  "Ich lerne Deutsch, weil ich in Deutschland arbeiten möchte.",
+  "Ich komme später, weil der Bus zu spät ist.",
 ];
 
-const correctedNominativeSentences = [
-  "Er ist ein großer Mann.",
-  "Sie ist eine schöne Frau.",
-  "Das ist ein neues Auto.",
-  "Das sind keine kleinen Kinder.",
-];
-
-const correctedAccusativeSentences = [
-  "Ich habe einen kleinen Hund.",
-  "Er sieht eine schöne Blume.",
-  "Wir kaufen ein gelbes Buch.",
-  "Du liest keine langen Texte.",
-];
-
-const adjectiveTest = [
-  "Ich habe einen ___ Hund. (klein)",
-  "Das ist ein ___ Auto. (neu)",
-  "Sie ist eine ___ Frau. (schön)",
-  "Ich sehe eine ___ Blume. (rot)",
-  "Er ist ein ___ Mann. (groß)",
-];
-
-const adjectiveAnswers = [
-  "einen kleinen Hund",
-  "ein neues Auto",
-  "eine schöne Frau",
-  "eine rote Blume",
-  "ein großer Mann",
+const letterWritingQuiz = [
+  {
+    prompt: 'Choose the best introduction for a formal letter.',
+    options: ["Hallo Anna!", "Sehr geehrte Frau Keller,", "Hey du,"],
+    answer: "Sehr geehrte Frau Keller,",
+  },
+  {
+    prompt: 'Choose the correct weil sentence.',
+    options: [
+      "Ich lerne, weil ich habe eine Prüfung.",
+      "Ich lerne, weil ich eine Prüfung habe.",
+      "Ich lerne weil habe ich eine Prüfung.",
+    ],
+    answer: "Ich lerne, weil ich eine Prüfung habe.",
+  },
+  {
+    prompt: 'Choose the correct modal verb question.',
+    options: ["Kannst du morgen kommen?", "Du kannst morgen kommen?", "Kommen kannst du morgen?"],
+    answer: "Kannst du morgen kommen?",
+  },
+  {
+    prompt: "Which sentence is short and clear (good for A1 writing)?",
+    options: ["Ich gehe jetzt nach Hause.", "Ich gehe jetzt nach Hause und danach werde ich vielleicht noch einkaufen gehen."],
+    answer: "Ich gehe jetzt nach Hause.",
+  },
 ];
 
 const summaryPoints = [
@@ -259,9 +285,55 @@ const summaryPoints = [
   "Mein Kopf tut mir weh. = My head hurts.",
   "Wie geht es dir? = How are you?",
   "Ich möchte den Termin absagen. = I would like to cancel the appointment.",
+  "Short A1 writing is better than long unclear sentences.",
+  "Use weil, modal verbs, and W-questions to improve letters.",
 ];
 
+const answerButtonStyle = (selected, correct) => ({
+  textAlign: "left",
+  borderRadius: 8,
+  border: `1px solid ${
+    selected ? (correct ? "#16a34a" : "#dc2626") : "#d1d5db"
+  }`,
+  background: selected ? (correct ? "#f0fdf4" : "#fef2f2") : "#fff",
+  padding: "8px 10px",
+  cursor: "pointer",
+});
+
+const MultipleChoiceQuestion = ({ item, index, answerMap, setAnswerMap }) => {
+  const selected = answerMap[index];
+
+  return (
+    <div style={{ ...boxStyle, background: "#fff" }}>
+      <p style={{ marginTop: 0, marginBottom: 8 }}>
+        <strong>{index + 1}.</strong> {item.prompt}
+      </p>
+      <div style={{ display: "grid", gap: 8 }}>
+        {item.options.map((option) => (
+          <button
+            key={option}
+            type="button"
+            style={answerButtonStyle(selected === option, option === item.answer)}
+            onClick={() => setAnswerMap((prev) => ({ ...prev, [index]: option }))}
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+      {selected && (
+        <p style={{ margin: "10px 0 0", color: selected === item.answer ? "#166534" : "#991b1b" }}>
+          {selected === item.answer ? "✅ Correct" : `❌ Correct answer: ${item.answer}`}
+        </p>
+      )}
+    </div>
+  );
+};
+
 const HealthBodyPartsPage = () => {
+  const [bodyPartAnswers, setBodyPartAnswers] = useState({});
+  const [doctorQuizAnswers, setDoctorQuizAnswers] = useState({});
+  const [letterQuizAnswers, setLetterQuizAnswers] = useState({});
+
   return (
     <main style={{ ...styles.container, display: "grid", gap: 18 }}>
       <header style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -289,8 +361,8 @@ const HealthBodyPartsPage = () => {
           <p style={mutedText}>
             Today you will learn how to talk about health problems, ask about
             someone’s health, and write a formal cancellation message. You will
-            also learn a simple A1 grammar topic: adjective endings with
-            indefinite articles (ein / eine / einen / kein / keine).
+            then build confidence for A1 letter writing with short structures,
+            weil, modal verbs, and W-questions.
           </p>
         </div>
 
@@ -340,13 +412,19 @@ const HealthBodyPartsPage = () => {
 
         <InfoBox title="Mini Practice: Body Parts">
           <p style={{ marginTop: 0, marginBottom: 8 }}>
-            Complete the answers:
+            Select the best answer:
           </p>
-          <NumberedList items={bodyPartsQuiz} marginBottom={10} />
-          <p style={{ margin: "0 0 4px" }}>
-            <strong>Answers</strong>
-          </p>
-          <NumberedList items={bodyPartsQuizAnswers} />
+          <div style={{ display: "grid", gap: 10 }}>
+            {bodyPartsQuiz.map((item, index) => (
+              <MultipleChoiceQuestion
+                key={`${item.prompt}-${index}`}
+                item={item}
+                index={index}
+                answerMap={bodyPartAnswers}
+                setAnswerMap={setBodyPartAnswers}
+              />
+            ))}
+          </div>
         </InfoBox>
       </Section>
 
@@ -368,101 +446,115 @@ const HealthBodyPartsPage = () => {
             ))}
           </div>
         </InfoBox>
+
+        <InfoBox title="Knowledge Test: Doctor Consultation in Clinic">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            Test your understanding by selecting the correct option:
+          </p>
+          <div style={{ display: "grid", gap: 10 }}>
+            {doctorConsultationQuiz.map((item, index) => (
+              <MultipleChoiceQuestion
+                key={`${item.prompt}-${index}`}
+                item={item}
+                index={index}
+                answerMap={doctorQuizAnswers}
+                setAnswerMap={setDoctorQuizAnswers}
+              />
+            ))}
+          </div>
+        </InfoBox>
       </Section>
 
-      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <TopicLabel>Grammar</TopicLabel>
+      <Section title="Part 4: Notes for Student Confidence in Letter Writing">
+        <InfoBox title="A1 Letter Topics You Can Get in Exams">
+          <BulletList items={letterTopics} />
+        </InfoBox>
 
-        <div style={{ display: "grid", gap: 6 }}>
-          <h2 style={{ margin: 0 }}>Grammar Break</h2>
-          <p style={mutedText}>
-            Now we move from health vocabulary to a new grammar topic:
-            adjective endings.
+        <InfoBox title="Simple Structure to Pass: Introduction + Body + Conclusion">
+          <p style={{ marginTop: 0, marginBottom: 6 }}>
+            <strong>Introduction:</strong> greet and state your reason in one short sentence.
           </p>
-        </div>
+          <p style={{ margin: "0 0 6px" }}>
+            Example: <strong>Sehr geehrte Frau Keller, ich schreibe wegen des Termins.</strong>
+          </p>
+          <p style={{ margin: "0 0 6px" }}>
+            <strong>Body:</strong> write 2–3 short points (5–6 words each if possible).
+          </p>
+          <p style={{ margin: "0 0 6px" }}>
+            Example: <strong>Ich bin krank. Ich kann nicht kommen.</strong>
+          </p>
+          <p style={{ margin: 0 }}>
+            <strong>Conclusion:</strong> polite closing + name. Example:{" "}
+            <strong>Mit freundlichen Grüßen, Ali.</strong>
+          </p>
+        </InfoBox>
 
-        <HeroImage
-          src={grammarBreakSrc}
-          alt="Study desk with notebook and laptop"
-          label="Grammar topic break"
-          height={200}
-        />
-      </section>
+        <InfoBox title="How to Build Confidence (and avoid translator mistakes)">
+          <BulletList
+            items={[
+              "Use words you understand, not long translated sentences.",
+              "Keep each sentence short and clear.",
+              "Use one idea per sentence.",
+              "Memorize 10 useful sentence patterns and reuse them.",
+              "Check verb position before submitting.",
+            ]}
+          />
+        </InfoBox>
 
-      <Section title="Part 4: Adjective Endings with ein, eine, einen, kein / keine">
-        <InfoBox title="How to Describe People and Things">
+        <InfoBox title="Useful Short Statements (A1)">
+          <BulletList items={shortSentencePatterns} />
+        </InfoBox>
+
+        <InfoBox title="W-Questions: wie, was, wo, wann">
+          <BulletList items={wQuestionPatterns} />
+        </InfoBox>
+
+        <InfoBox title="Modal Verbs (Statements + Questions)">
+          <BulletList items={modalVerbExamples} />
+        </InfoBox>
+
+        <InfoBox title="Using weil (because)">
+          <BulletList items={weilExamples} />
+        </InfoBox>
+
+        <InfoBox title="Knowledge Test: Improve Your Writing">
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            Select the correct answer to check your writing skills:
+          </p>
+          <div style={{ display: "grid", gap: 10 }}>
+            {letterWritingQuiz.map((item, index) => (
+              <MultipleChoiceQuestion
+                key={`${item.prompt}-${index}`}
+                item={item}
+                index={index}
+                answerMap={letterQuizAnswers}
+                setAnswerMap={setLetterQuizAnswers}
+              />
+            ))}
+          </div>
+        </InfoBox>
+      </Section>
+
+      <Section title="Part 5: Pass Strategy for Students">
+        <InfoBox title="Checklist Before You Submit Your Letter">
+          <NumberedList
+            items={[
+              "Did I write an introduction?",
+              "Did I answer all task points?",
+              "Did I use short clear sentences?",
+              "Did I use one weil sentence correctly?",
+              "Did I include one modal verb sentence or question?",
+              "Did I write a conclusion and my name?",
+            ]}
+          />
+        </InfoBox>
+
+        <InfoBox title="One Safe Exam Formula">
           <p style={{ marginTop: 0, marginBottom: 0, lineHeight: 1.7 }}>
-            Learn a simple way to choose adjective endings in nominative and
-            accusative with <strong>ein / eine / einen</strong> and{" "}
-            <strong>kein / keine</strong>.
+            Greeting + reason + 2 short details + one <strong>weil</strong>{" "}
+            sentence + polite closing. If you keep this structure, you can pass
+            with clear writing even at basic level.
           </p>
-        </InfoBox>
-
-        <InfoBox title="Step 1: Review the Articles">
-          <p style={{ marginTop: 0, marginBottom: 8 }}>
-            Nouns in German have gender and use different articles.
-          </p>
-
-          <p style={{ margin: "8px 0 4px" }}>
-            <strong>Nominative Case</strong> (subject = who / what does
-            something)
-          </p>
-          <BulletList items={nominativeArticles} marginBottom={12} />
-
-          <p style={{ margin: "0 0 4px" }}>
-            <strong>Accusative Case</strong> (object = who / what receives the
-            action)
-          </p>
-          <BulletList items={accusativeArticles} />
-        </InfoBox>
-
-        <InfoBox title="Step 2: How to Get the Adjective Ending">
-          <p style={{ marginTop: 0, marginBottom: 8 }}>
-            Simple trick: look at the article meaning behind the form and use
-            the matching ending.
-          </p>
-          <BulletList items={endingRules} />
-        </InfoBox>
-
-        <InfoBox title="Step 3: Combine Article + Adjective + Noun">
-          <p style={{ marginTop: 0, marginBottom: 8 }}>
-            Common adjectives: groß, klein, rot, blau, grün, schön, neu, alt.
-          </p>
-
-          <p style={{ margin: "10px 0 4px" }}>
-            <strong>Nominative Case</strong>
-          </p>
-          <BulletList items={nominativeExamples} marginBottom={12} />
-
-          <p style={{ margin: "0 0 4px" }}>
-            <strong>Accusative Case</strong>
-          </p>
-          <BulletList items={accusativeExamples} />
-        </InfoBox>
-
-        <InfoBox title="Example Sentences">
-          <p style={{ margin: "0 0 4px" }}>
-            <strong>Nominative:</strong>
-          </p>
-          <BulletList items={correctedNominativeSentences} marginBottom={12} />
-
-          <p style={{ margin: "0 0 4px" }}>
-            <strong>Accusative:</strong>
-          </p>
-          <BulletList items={correctedAccusativeSentences} />
-        </InfoBox>
-
-        <InfoBox title="Mini Adjective Ending Test (A1)">
-          <p style={{ marginTop: 0, marginBottom: 8 }}>
-            Complete with the correct adjective endings (groß, klein, rot,
-            schön, neu):
-          </p>
-          <NumberedList items={adjectiveTest} marginBottom={10} />
-
-          <p style={{ margin: "0 0 4px" }}>
-            <strong>Answers</strong>
-          </p>
-          <NumberedList items={adjectiveAnswers} />
         </InfoBox>
       </Section>
 
