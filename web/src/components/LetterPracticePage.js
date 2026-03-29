@@ -15,6 +15,7 @@ import {
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
 import { parseImportantPhraseLine } from "../lib/writingCoachFormatting";
+import WritingFeedbackCard from "./WritingFeedbackCard";
 
 const IDEAS_COACHING_PROMPTS = [
   "Start with the task and ask: What is unclear to me?",
@@ -1099,7 +1100,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               <div style={{ display: "grid", gap: 10 }}>
                 <div>
                   <h4 style={styles.sectionTitle}>AI feedback</h4>
-                  <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+                  <WritingFeedbackCard feedback={markFeedback} level={level} draft={letterText} />
                 </div>
 
                 {isCampusMode && (
@@ -1131,7 +1132,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     {improvedFeedback && (
                       <div>
                         <h5 style={{ ...styles.sectionTitle, margin: "4px 0" }}>AI feedback (improved draft)</h5>
-                        <pre style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{improvedFeedback}</pre>
+                        <WritingFeedbackCard feedback={improvedFeedback} level={level} draft={improvedLetterText || letterText} />
                       </div>
                     )}
                   </div>

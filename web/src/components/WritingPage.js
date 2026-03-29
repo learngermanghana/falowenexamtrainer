@@ -15,6 +15,7 @@ import {
   saveStudentReplyToTutorReview,
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import WritingFeedbackCard from "./WritingFeedbackCard";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -1874,7 +1875,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           {markFeedback && !improvedFeedback ? (
             <section style={styles.card}>
               <h3 style={styles.sectionTitle}>AI feedback</h3>
-              <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{markFeedback}</pre>
+              <WritingFeedbackCard feedback={markFeedback} level={level} draft={typedAnswer} />
               <FeedbackAnnotations feedback={markFeedback} />
             </section>
           ) : null}
@@ -1882,11 +1883,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           {improvedFeedback ? (
             <section style={styles.card}>
               <h3 style={styles.sectionTitle}>Updated AI feedback</h3>
-              <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap" }}>{improvedFeedback}</pre>
+              <WritingFeedbackCard feedback={improvedFeedback} level={level} draft={revisedDraftText || typedAnswer} />
               <FeedbackAnnotations feedback={improvedFeedback} />
               <details style={{ marginTop: 10 }}>
                 <summary style={{ cursor: "pointer", fontWeight: 700 }}>Previous AI feedback</summary>
-                <pre className="writing-feedback-pre" style={{ ...styles.pre, whiteSpace: "pre-wrap", marginTop: 10 }}>{markFeedback}</pre>
+                <WritingFeedbackCard feedback={markFeedback} level={level} draft={typedAnswer} />
               </details>
             </section>
           ) : null}
