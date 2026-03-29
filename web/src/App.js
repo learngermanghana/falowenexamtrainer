@@ -117,7 +117,6 @@ import MyExamFilePage from "./components/MyExamFilePage";
 import SeoLandingPage from "./components/SeoLandingPage";
 import OfflineBanner from "./components/OfflineBanner";
 import StudyBuddyBar from "./components/StudyBuddyBar";
-import SubscribeOnYouTubeButton from "./components/SubscribeOnYouTubeButton";
 import PlacementTestPage from "./components/PlacementTestPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
@@ -545,10 +544,6 @@ const AppShell = ({
           availableTabs={availableTabs}
           tabStructure={tabStructure}
         />
-      ) : null}
-
-      {(location.pathname === "/" || location.pathname.startsWith("/campus")) ? (
-        <SubscribeOnYouTubeButton floating />
       ) : null}
 
       <main className="layout-main" style={{ minWidth: 0 }}>
