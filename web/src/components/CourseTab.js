@@ -17,6 +17,7 @@ import B2SelfLearningCourse from "./B2SelfLearningCourse";
 import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
+import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress, toCourseTabStatus } from "../utils/assignmentProgress";
 import { fetchResults } from "../services/resultsService";
@@ -1347,6 +1348,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                   <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/submit")}>
                     {t("courseTab.submit")}
                   </button>
+                  <YouTubeSubscribeButton />
                 </div>
               </div>
 
