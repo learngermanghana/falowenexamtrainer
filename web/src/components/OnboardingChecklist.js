@@ -6,6 +6,7 @@ import { classCatalog } from "../data/classCatalog";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { loadPreferredClass } from "../services/classSelectionStorage";
 import { normalizeNotificationStatus } from "../utils/notificationStatus";
+import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 
 const STORAGE_KEY = "falowen_onboarding_v3";
 const DISMISS_HOURS = 24;
@@ -444,6 +445,7 @@ const OnboardingChecklist = ({
             className="onboarding-action-row"
             style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}
           >
+            <YouTubeSubscribeButton />
             <button type="button" style={styles.secondaryButton} onClick={handleRemindLater}>
               Remind me later
             </button>

@@ -13,6 +13,7 @@ import { fetchAnnouncements } from "../services/announcementService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
+import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 
 const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom }) => {
   const { t } = useTranslation();
@@ -170,6 +171,11 @@ const GeneralHome = ({
           window.open(ZOOM_DETAILS.url, "_blank", "noreferrer");
         }}
       />
+      <section style={{ ...styles.card, marginBottom: 0 }}>
+        <PrimaryActionBar align="start">
+          <YouTubeSubscribeButton />
+        </PrimaryActionBar>
+      </section>
 
       {paymentAlert ? (
         <section
