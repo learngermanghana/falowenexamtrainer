@@ -6,6 +6,7 @@ import { classCatalog } from "../data/classCatalog";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { loadPreferredClass } from "../services/classSelectionStorage";
 import { normalizeNotificationStatus } from "../utils/notificationStatus";
+import SubscribeOnYouTubeButton from "./SubscribeOnYouTubeButton";
 
 const STORAGE_KEY = "falowen_onboarding_v3";
 const DISMISS_HOURS = 24;
@@ -543,6 +544,7 @@ const OnboardingChecklist = ({
             ? "All set! Use “Save onboarding” above to lock in reminders and class setup."
             : "Complete each step to unlock “Save onboarding” above."}
         </p>
+        <SubscribeOnYouTubeButton />
       </div>
     </div>
   );
