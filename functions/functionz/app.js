@@ -1603,6 +1603,104 @@ const buildImprovedDraftContext = ({ latestDraftText, latestFeedback, revisedDra
   return parts.join("\n");
 };
 
+const parseJSONResponse = (raw = "", fallback = {}) => {
+  const text = String(raw || "").trim();
+  if (!text) return fallback;
+
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start < 0 || end <= start) return fallback;
+    try {
+      return JSON.parse(text.slice(start, end + 1));
+    } catch (innerErr) {
+      return fallback;
+    }
+  }
+};
+
+const getDominanceAlert = ({ distribution = {}, total = 0, level = "A1", promptType = "unknown" }) => {
+  if (!total) return null;
+  const entries = Object.entries(distribution);
+  if (!entries.length) return null;
+  const [score, count] = entries.sort((a, b) => Number(b[1]) - Number(a[1]))[0];
+  const ratio = count / total;
+  if (ratio < 0.6 || total < 20) return null;
+  return {
+    level,
+    promptType,
+    dominantScore: Number(score),
+    ratio: Number(ratio.toFixed(3)),
+    total,
+  };
+};
+
+const buildFallbackWritingInsights = ({ feedback = "", estimatedScore = 0 }) => ({
+  rubric: {
+    task: 0,
+    coherence: 0,
+    grammar: 0,
+    lexis: 0,
+    overall: Number(estimatedScore || 0),
+    maxScore: 25,
+    source: "heuristic",
+  },
+  corrections: [],
+  simplifiedFeedback: {
+    topFixes: [],
+    strengths: [],
+    nextAction: "Fix the top mistakes and submit one improved draft.",
+  },
+  feedbackBody: String(feedback || ""),
+});
+
+const deriveWritingInsights = async ({ feedback, draftText, level, firstDraft = "", promptType = "unknown" }) => {
+  const fallback = buildFallbackWritingInsights({ feedback, estimatedScore: 0 });
+  try {
+    const extractionPrompt = [
+      "You are a strict JSON formatter for writing feedback.",
+      "Return valid JSON only. No markdown, no commentary.",
+      "Schema:",
+      "{ rubric: { task:number, coherence:number, grammar:number, lexis:number, overall:number, maxScore:number }, corrections:[{wrong, correct, reason, category}], simplifiedFeedback:{topFixes:string[], strengths:string[], nextAction:string}, trend:{firstDraft:{task,coherence,grammar,lexis,overall}, improvedDraft:{task,coherence,grammar,lexis,overall}, changes:string[]}, promptType:string }",
+      "Categories must be one of: Grammar, Word order, Spelling, Register.",
+      "Use level-aware expectations.",
+      "If first draft is missing, set trend to null.",
+    ].join("\n");
+
+    const userPrompt = JSON.stringify({
+      level,
+      promptType,
+      firstDraft,
+      improvedDraft: draftText,
+      feedback,
+    });
+
+    const raw = await createChatCompletion(
+      [
+        { role: "system", content: extractionPrompt },
+        { role: "user", content: userPrompt },
+      ],
+      { temperature: 0.1, max_tokens: 500 }
+    );
+
+    const parsed = parseJSONResponse(raw, fallback);
+    return {
+      ...fallback,
+      ...parsed,
+      rubric: { ...fallback.rubric, ...(parsed?.rubric || {}), source: "backend" },
+      corrections: Array.isArray(parsed?.corrections) ? parsed.corrections : [],
+      simplifiedFeedback: { ...fallback.simplifiedFeedback, ...(parsed?.simplifiedFeedback || {}) },
+      trend: parsed?.trend || null,
+      promptType: parsed?.promptType || promptType,
+    };
+  } catch (error) {
+    console.warn("Failed to derive writing insights", error?.message || error);
+    return fallback;
+  }
+};
+
 const loadLatestCampusMarkContext = async ({ db, uid }) => {
   if (!db || !uid) return { latestDraftText: "", latestFeedback: "" };
 
@@ -1668,6 +1766,7 @@ app.post("/writing/mark", async (req, res) => {
       studentName = "Student",
       program,
       submissionContext,
+      promptType = "letter",
       previousText,
       previousFeedback,
     } = req.body || {};
@@ -1711,11 +1810,19 @@ app.post("/writing/mark", async (req, res) => {
     ];
 
     const feedback = await createChatCompletion(messages, { max_tokens: 750 });
+    const writingInsights = await deriveWritingInsights({
+      feedback,
+      draftText: trimmedText,
+      level,
+      firstDraft: submissionContext === "campus-improved" ? latestDraftText : "",
+      promptType,
+    });
 
     let submissionSaved = false;
     let submissionId = null;
 
     if (db) {
+      let scoreAlertTriggered = false;
       const docRef = await db.collection("writingSubmissions").add({
         uid: authedUser.uid || null,
         email: authedUser.email ? String(authedUser.email).toLowerCase() : null,
@@ -1723,13 +1830,51 @@ app.post("/writing/mark", async (req, res) => {
         level,
         program: program || null,
         submissionContext: submissionContext || null,
+        promptType: promptType || "letter",
         text: trimmedText,
         feedback,
+        rubric: writingInsights?.rubric || null,
+        corrections: writingInsights?.corrections || [],
         source: "mark-tab",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
       submissionSaved = true;
       submissionId = docRef.id;
+
+      const overallScore = Number(writingInsights?.rubric?.overall || 0);
+      const statsRef = db.collection("writingScoreStats").doc(`${String(level || "A1").toUpperCase()}_${String(promptType || "unknown").toLowerCase()}`);
+      await db.runTransaction(async (tx) => {
+        const snap = await tx.get(statsRef);
+        const current = snap.exists ? snap.data() || {} : {};
+        const distribution = { ...(current.distribution || {}) };
+        distribution[overallScore] = Number(distribution[overallScore] || 0) + 1;
+        const total = Number(current.total || 0) + 1;
+        const alert = getDominanceAlert({ distribution, total, level, promptType });
+        if (alert) {
+          scoreAlertTriggered = true;
+        }
+        tx.set(
+          statsRef,
+          {
+            level: String(level || "A1").toUpperCase(),
+            promptType: String(promptType || "unknown").toLowerCase(),
+            total,
+            distribution,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastAlert: alert
+              ? {
+                  ...alert,
+                  createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                }
+              : null,
+          },
+          { merge: true }
+        );
+      });
+      if (scoreAlertTriggered) {
+        incrementCounter("writing_score_alert", `${String(level || "A1").toUpperCase()}_${String(promptType || "unknown").toLowerCase()}`);
+      }
+
     }
 
     await auditAIRequest({
@@ -1745,7 +1890,15 @@ app.post("/writing/mark", async (req, res) => {
       },
     });
 
-    res.json({ feedback, submissionSaved, submissionId });
+    res.json({
+      feedback,
+      rubric: writingInsights?.rubric || null,
+      corrections: writingInsights?.corrections || [],
+      simplifiedFeedback: writingInsights?.simplifiedFeedback || null,
+      trend: writingInsights?.trend || null,
+      submissionSaved,
+      submissionId,
+    });
   } catch (err) {
     console.error("/writing/mark error", err);
     res.status(500).json({ error: err.message || "Failed to mark letter" });

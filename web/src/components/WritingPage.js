@@ -466,14 +466,18 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [markRubric, setMarkRubric] = useState(null);
+  const [markCorrections, setMarkCorrections] = useState([]);
+  const [markSimpleFeedback, setMarkSimpleFeedback] = useState(null);
+  const [feedbackTrend, setFeedbackTrend] = useState(null);
   const [firstDraftSnapshot, setFirstDraftSnapshot] = useState("");
   const [reflectionText, setReflectionText] = useState("");
   const [revisedDraftText, setRevisedDraftText] = useState("");
   const [workflowComplete, setWorkflowComplete] = useState(false);
   const [improvedFeedback, setImprovedFeedback] = useState("");
-  const [, setImprovedRubricBreakdown] = useState(() =>
-    buildRubricBreakdown("")
-  );
+  const [improvedRubric, setImprovedRubric] = useState(null);
+  const [improvedCorrections, setImprovedCorrections] = useState([]);
+  const [improvedSimpleFeedback, setImprovedSimpleFeedback] = useState(null);
   const [improvedLoading, setImprovedLoading] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
   const [tutorReviews, setTutorReviews] = useState([]);
@@ -544,12 +548,18 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const resetWritingWorkspace = useCallback(() => {
     setTypedAnswer("");
     setMarkFeedback("");
+    setMarkRubric(null);
+    setMarkCorrections([]);
+    setMarkSimpleFeedback(null);
+    setFeedbackTrend(null);
     setFirstDraftSnapshot("");
     setReflectionText("");
     setRevisedDraftText("");
     setWorkflowComplete(false);
     setImprovedFeedback("");
-    setImprovedRubricBreakdown(buildRubricBreakdown(""));
+    setImprovedRubric(null);
+    setImprovedCorrections([]);
+    setImprovedSimpleFeedback(null);
     setImprovedLoading(false);
     setIdeaInput("");
     setChatMessages([IDEA_COACH_INTRO]);
@@ -1126,6 +1136,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
 
     setLoading(true);
     setMarkFeedback("");
+    setMarkRubric(null);
+    setMarkCorrections([]);
+    setMarkSimpleFeedback(null);
+    setFeedbackTrend(null);
 
     try {
       const studentName = user?.displayName || user?.email || "Student";
@@ -1136,8 +1150,15 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         idToken,
         program: studentProfile?.program,
         submissionContext: isExamMode ? "exam-room" : "course",
+        promptType: derivePromptMeta(selectedLetter || {}).type || "letter",
       });
-      const breakdown = buildRubricBreakdown(data.feedback);
+      const breakdown = data?.rubric
+        ? [
+            { key: "task", label: "Task completion", score: Number(data.rubric.task || 0), explanation: "Backend rubric" },
+            { key: "coherence", label: "Coherence", score: Number(data.rubric.coherence || 0), explanation: "Backend rubric" },
+            { key: "grammar", label: "Grammar & accuracy", score: Number(data.rubric.grammar || 0), explanation: "Backend rubric" },
+          ]
+        : buildRubricBreakdown(data.feedback);
       const overallScore = breakdown.reduce((sum, item) => sum + (item.score || 0), 0);
       const enrichedResult = {
         id: Date.now(),
@@ -1152,9 +1173,15 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       setReflectionText("");
       setWorkflowComplete(false);
       setImprovedFeedback("");
-      setImprovedRubricBreakdown(buildRubricBreakdown(""));
+      setImprovedRubric(null);
+      setImprovedCorrections([]);
+      setImprovedSimpleFeedback(null);
       setRubricBreakdown(breakdown);
       setErrorBank(extractErrorBank(data.feedback));
+      setMarkRubric(data?.rubric || null);
+      setMarkCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
+      setMarkSimpleFeedback(data?.simplifiedFeedback || null);
+      setFeedbackTrend(data?.trend || null);
       setDraftHistory((prev) => [
         ...prev,
         {
@@ -1299,9 +1326,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         idToken,
         program: studentProfile?.program,
         submissionContext: isExamMode ? "exam-room-improved" : "course-improved",
+        promptType: derivePromptMeta(selectedLetter || {}).type || "letter",
       });
       setImprovedFeedback(data.feedback);
-      setImprovedRubricBreakdown(buildRubricBreakdown(data.feedback));
+      setImprovedRubric(data?.rubric || null);
+      setImprovedCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
+      setImprovedSimpleFeedback(data?.simplifiedFeedback || null);
+      setFeedbackTrend(data?.trend || null);
     } catch (err) {
       const msg =
         err?.response?.data?.error ||
@@ -1455,6 +1486,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     });
     setError("");
     setMarkFeedback("");
+    setMarkRubric(null);
+    setMarkCorrections([]);
+    setMarkSimpleFeedback(null);
+    setFeedbackTrend(null);
     setIdeaSuccess("Your workspace draft is now pasted into the “Mark my letter” tab.");
     setIdeaError("");
     setSelectedDraftIds([]);
@@ -1875,7 +1910,15 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           {markFeedback && !improvedFeedback ? (
             <section style={styles.card}>
               <h3 style={styles.sectionTitle}>AI feedback</h3>
-              <WritingFeedbackCard feedback={markFeedback} level={level} draft={typedAnswer} />
+              <WritingFeedbackCard
+                feedback={markFeedback}
+                level={level}
+                draft={typedAnswer}
+                rubric={markRubric}
+                corrections={markCorrections}
+                simplifiedFeedback={markSimpleFeedback}
+                trend={feedbackTrend}
+              />
               <FeedbackAnnotations feedback={markFeedback} />
             </section>
           ) : null}
@@ -1883,11 +1926,27 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           {improvedFeedback ? (
             <section style={styles.card}>
               <h3 style={styles.sectionTitle}>Updated AI feedback</h3>
-              <WritingFeedbackCard feedback={improvedFeedback} level={level} draft={revisedDraftText || typedAnswer} />
+              <WritingFeedbackCard
+                feedback={improvedFeedback}
+                level={level}
+                draft={revisedDraftText || typedAnswer}
+                rubric={improvedRubric}
+                corrections={improvedCorrections}
+                simplifiedFeedback={improvedSimpleFeedback}
+                trend={feedbackTrend}
+              />
               <FeedbackAnnotations feedback={improvedFeedback} />
               <details style={{ marginTop: 10 }}>
                 <summary style={{ cursor: "pointer", fontWeight: 700 }}>Previous AI feedback</summary>
-                <WritingFeedbackCard feedback={markFeedback} level={level} draft={typedAnswer} />
+                <WritingFeedbackCard
+                  feedback={markFeedback}
+                  level={level}
+                  draft={typedAnswer}
+                  rubric={markRubric}
+                  corrections={markCorrections}
+                  simplifiedFeedback={markSimpleFeedback}
+                  trend={feedbackTrend}
+                />
               </details>
             </section>
           ) : null}
