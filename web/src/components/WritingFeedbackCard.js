@@ -72,6 +72,26 @@ const LEVEL_STRICTNESS = {
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
+const extractScoreFromFeedback = (feedback = "", maxScore = 25) => {
+  const text = String(feedback || "");
+  const slashMatch = text.match(/score\s*:\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/i);
+  if (slashMatch) {
+    const parsedScore = Number(slashMatch[1]);
+    const parsedMax = Number(slashMatch[2]);
+    if (Number.isFinite(parsedScore) && Number.isFinite(parsedMax) && parsedMax > 0) {
+      const normalized = Math.round((parsedScore / parsedMax) * maxScore);
+      return clamp(normalized, 0, maxScore);
+    }
+  }
+  const plainMatch = text.match(/score\s*:\s*(\d+(?:\.\d+)?)/i);
+  if (!plainMatch) return null;
+  const value = Number(plainMatch[1]);
+  if (!Number.isFinite(value)) return null;
+  if (value <= maxScore) return clamp(Math.round(value), 0, maxScore);
+  if (value <= 100) return clamp(Math.round((value / 100) * maxScore), 0, maxScore);
+  return null;
+};
+
 const estimateScore = ({ feedback = "", draft = "", level = "A1" }) => {
   const corrections = parseCorrectionsFromText(feedback).length;
   const words = countWords(draft);
@@ -93,6 +113,47 @@ const stripMarkup = (text = "") =>
     .replace(/\[correct\]/gi, "✅ ")
     .replace(/\[\/correct\]/gi, "");
 
+const INLINE_TOKEN_REGEX = /(\[wrong\][\s\S]*?\[\/wrong\]|\[correct\][\s\S]*?\[\/correct\]|\*\*[^*]+\*\*)/gi;
+
+const renderFormattedLine = (line = "", index = 0) => {
+  const heading = line.match(/^#{1,6}\s+(.*)$/);
+  const content = heading ? heading[1] : line;
+  const tokens = content.split(INLINE_TOKEN_REGEX).filter(Boolean);
+
+  return (
+    <div
+      key={`line-${index}`}
+      style={{
+        fontWeight: heading ? 700 : 400,
+        marginTop: heading ? 8 : 0,
+      }}
+    >
+      {tokens.map((token, tokenIndex) => {
+        if (/^\[wrong\][\s\S]*\[\/wrong\]$/i.test(token)) {
+          const text = token.replace(/^\[wrong\]|\[\/wrong\]$/gi, "").trim();
+          return (
+            <strong key={`token-${index}-${tokenIndex}`} style={{ color: "#991b1b", background: "#fee2e2", padding: "0 4px", borderRadius: 4 }}>
+              ❌ Wrong: {text}
+            </strong>
+          );
+        }
+        if (/^\[correct\][\s\S]*\[\/correct\]$/i.test(token)) {
+          const text = token.replace(/^\[correct\]|\[\/correct\]$/gi, "").trim();
+          return (
+            <strong key={`token-${index}-${tokenIndex}`} style={{ color: "#166534", background: "#dcfce7", padding: "0 4px", borderRadius: 4 }}>
+              ✅ Correct: {text}
+            </strong>
+          );
+        }
+        if (/^\*\*[^*]+\*\*$/.test(token)) {
+          return <strong key={`token-${index}-${tokenIndex}`}>{token.slice(2, -2)}</strong>;
+        }
+        return <span key={`token-${index}-${tokenIndex}`}>{token}</span>;
+      })}
+    </div>
+  );
+};
+
 const normalizeCategory = (raw = "") => {
   const lower = String(raw || "").toLowerCase();
   if (lower.includes("order")) return "Word order";
@@ -108,7 +169,7 @@ const styles = {
   correctionCard: { border: "1px solid #d1d5db", borderRadius: 12, padding: 10, background: "#ffffff" },
   wrong: { color: "#7f1d1d", background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: 8, padding: "6px 8px" },
   correct: { color: "#14532d", background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 8px" },
-  pre: { whiteSpace: "pre-wrap", lineHeight: 1.5, margin: 0 },
+  pre: { whiteSpace: "pre-wrap", lineHeight: 1.6, margin: 0, display: "grid", gap: 4 },
 };
 
 const WritingFeedbackCard = ({
@@ -135,17 +196,24 @@ const WritingFeedbackCard = ({
   }, [corrections, feedback]);
 
   const resolvedRubric = useMemo(() => {
-    if (rubric && typeof rubric === "object") return rubric;
+    const extractedOverall = extractScoreFromFeedback(feedback, 25);
+    if (rubric && typeof rubric === "object") {
+      const rubricOverall = Number(rubric?.overall || 0);
+      return {
+        ...rubric,
+        overall: rubricOverall > 0 ? rubricOverall : (extractedOverall ?? fallbackEstimated),
+      };
+    }
     return {
       task: 0,
       coherence: 0,
       grammar: 0,
       lexis: 0,
-      overall: fallbackEstimated,
+      overall: extractedOverall ?? fallbackEstimated,
       maxScore: 25,
       source: "heuristic",
     };
-  }, [rubric, fallbackEstimated]);
+  }, [rubric, fallbackEstimated, feedback]);
 
   const readableFeedback = useMemo(() => stripMarkup(feedback), [feedback]);
   const fallbackSimple = useMemo(() => {
@@ -222,7 +290,9 @@ const WritingFeedbackCard = ({
             <div><strong>Next action</strong><div>{simple?.nextAction || "Revise and submit your improved draft."}</div></div>
           </div>
         ) : (
-          <pre style={styles.pre}>{readableFeedback}</pre>
+          <div style={styles.pre}>
+            {(readableFeedback || "").split("\n").map((line, idx) => renderFormattedLine(line, idx))}
+          </div>
         )}
       </div>
     </div>
