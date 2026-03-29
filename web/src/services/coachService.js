@@ -155,7 +155,7 @@ export const analyzeText = async ({ text, teil, level, targetLevel, userId, idTo
   return response.data;
 };
 
-export const markLetterWithAI = async ({ text, level, studentName, program, submissionContext, previousText, previousFeedback, idToken }) => {
+export const markLetterWithAI = async ({ text, level, studentName, program, submissionContext, promptType, previousText, previousFeedback, idToken }) => {
   const response = await axios.post(
     `${backendUrl}/writing/mark`,
     {
@@ -164,6 +164,7 @@ export const markLetterWithAI = async ({ text, level, studentName, program, subm
       studentName,
       program,
       submissionContext,
+      promptType,
       previousText,
       previousFeedback,
     },

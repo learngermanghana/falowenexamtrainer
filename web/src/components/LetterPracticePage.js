@@ -61,9 +61,16 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [activeTab, setActiveTab] = useState("mark");
   const [letterText, setLetterText] = useState("");
   const [markFeedback, setMarkFeedback] = useState("");
+  const [markRubric, setMarkRubric] = useState(null);
+  const [markCorrections, setMarkCorrections] = useState([]);
+  const [markSimpleFeedback, setMarkSimpleFeedback] = useState(null);
+  const [feedbackTrend, setFeedbackTrend] = useState(null);
   const [markSubmitStatus, setMarkSubmitStatus] = useState(null);
   const [improvedLetterText, setImprovedLetterText] = useState("");
   const [improvedFeedback, setImprovedFeedback] = useState("");
+  const [improvedRubric, setImprovedRubric] = useState(null);
+  const [improvedCorrections, setImprovedCorrections] = useState([]);
+  const [improvedSimpleFeedback, setImprovedSimpleFeedback] = useState(null);
   const [latestMarkedDraftText, setLatestMarkedDraftText] = useState("");
   const [latestMarkedFeedback, setLatestMarkedFeedback] = useState("");
   const [improvedLoading, setImprovedLoading] = useState(false);
@@ -165,6 +172,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     const prompt = formatLetterPrompt(selectedLetter);
     setLetterText((prev) => (prev.trim() ? prev : `${prompt}\n\n`));
     setMarkFeedback("");
+    setMarkRubric(null);
+    setMarkCorrections([]);
+    setMarkSimpleFeedback(null);
+    setFeedbackTrend(null);
     setActiveTab("mark");
   };
 
@@ -420,12 +431,20 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         idToken,
         program: studentProfile?.program,
         submissionContext: isCampusMode ? "campus-mark" : "exam-room",
+        promptType: selectedLetter?.tags?.[0] || "letter",
       });
 
       setMarkFeedback(data.feedback);
+      setMarkRubric(data?.rubric || null);
+      setMarkCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
+      setMarkSimpleFeedback(data?.simplifiedFeedback || null);
+      setFeedbackTrend(data?.trend || null);
       if (isCampusMode) {
         setImprovedLetterText(trimmed);
         setImprovedFeedback("");
+        setImprovedRubric(null);
+        setImprovedCorrections([]);
+        setImprovedSimpleFeedback(null);
         setCampusImproveTrials(0);
         setLatestMarkedDraftText(trimmed);
         setLatestMarkedFeedback(data.feedback || "");
@@ -484,11 +503,16 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         idToken,
         program: studentProfile?.program,
         submissionContext: "campus-improved",
+        promptType: selectedLetter?.tags?.[0] || "letter",
         previousText: latestMarkedDraftText || letterText,
         previousFeedback: latestMarkedFeedback || markFeedback,
       });
 
       setImprovedFeedback(data.feedback);
+      setImprovedRubric(data?.rubric || null);
+      setImprovedCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
+      setImprovedSimpleFeedback(data?.simplifiedFeedback || null);
+      setFeedbackTrend(data?.trend || null);
       setCampusImproveTrials((prev) => prev + 1);
       setLatestMarkedDraftText(trimmed);
       setLatestMarkedFeedback(data.feedback || "");
@@ -578,6 +602,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       return parts.join("\n\n");
     });
     setMarkFeedback("");
+    setMarkRubric(null);
+    setMarkCorrections([]);
+    setMarkSimpleFeedback(null);
+    setFeedbackTrend(null);
     setIdeaSuccess("Your workspace draft is now pasted into the “Mark my letter” tab.");
     setIdeaError("");
     setSelectedDraftIds([]);
@@ -1030,9 +1058,16 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                 onClick={() => {
                   setLetterText("");
                   setMarkFeedback("");
+                  setMarkRubric(null);
+                  setMarkCorrections([]);
+                  setMarkSimpleFeedback(null);
+                  setFeedbackTrend(null);
                   setMarkSubmitStatus(null);
                   setImprovedLetterText("");
                   setImprovedFeedback("");
+                  setImprovedRubric(null);
+                  setImprovedCorrections([]);
+                  setImprovedSimpleFeedback(null);
                   setCampusImproveTrials(0);
                   resetErrors();
                 }}
@@ -1100,7 +1135,15 @@ const LetterPracticePage = ({ mode = "exams" }) => {
               <div style={{ display: "grid", gap: 10 }}>
                 <div>
                   <h4 style={styles.sectionTitle}>AI feedback</h4>
-                  <WritingFeedbackCard feedback={markFeedback} level={level} draft={letterText} />
+                  <WritingFeedbackCard
+                    feedback={markFeedback}
+                    level={level}
+                    draft={letterText}
+                    rubric={markRubric}
+                    corrections={markCorrections}
+                    simplifiedFeedback={markSimpleFeedback}
+                    trend={feedbackTrend}
+                  />
                 </div>
 
                 {isCampusMode && (
@@ -1132,7 +1175,15 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     {improvedFeedback && (
                       <div>
                         <h5 style={{ ...styles.sectionTitle, margin: "4px 0" }}>AI feedback (improved draft)</h5>
-                        <WritingFeedbackCard feedback={improvedFeedback} level={level} draft={improvedLetterText || letterText} />
+                        <WritingFeedbackCard
+                          feedback={improvedFeedback}
+                          level={level}
+                          draft={improvedLetterText || letterText}
+                          rubric={improvedRubric}
+                          corrections={improvedCorrections}
+                          simplifiedFeedback={improvedSimpleFeedback}
+                          trend={feedbackTrend}
+                        />
                       </div>
                     )}
                   </div>
