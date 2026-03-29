@@ -6,7 +6,6 @@ import { updatePageMeta } from "../lib/pageMeta";
 import LeadCaptureModal from "./LeadCaptureModal";
 import { captureLead } from "../services/leadCaptureService";
 import { fetchStudentReviewsFromPublishedSheet } from "../services/studentReviewsService";
-import SubscribeOnYouTubeButton from "./SubscribeOnYouTubeButton";
 
 const FeatureCard = ({ icon, title, description }) => (
   <div
@@ -315,8 +314,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               >
                 {t("landing.cta.getApp")}
               </a>
-
-              <SubscribeOnYouTubeButton style={{ background: "#b91c1c", borderColor: "#991b1b" }} />
 
               <a
                 href="#how-it-works"
