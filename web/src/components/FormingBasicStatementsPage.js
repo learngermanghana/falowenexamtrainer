@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -109,51 +109,68 @@ const TableScroll = ({ caption, children }) => (
   </div>
 );
 
-const Choice = ({ children }) => (
-  <div
+const Choice = ({ children, isSelected, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
     style={{
-      border: "1px solid #d1d5db",
+      border: isSelected ? "2px solid #2563eb" : "1px solid #d1d5db",
       borderRadius: 12,
       padding: 12,
-      background: "#fff",
+      background: isSelected ? "#dbeafe" : "#fff",
       lineHeight: 1.6,
+      textAlign: "left",
+      cursor: "pointer",
+      font: "inherit",
+      width: "100%",
     }}
+    aria-pressed={isSelected}
   >
     {children}
-  </div>
+  </button>
 );
 
-const MCQCard = ({ number, question, options }) => (
-  <div
-    style={{
-      border: "1px solid #e5e7eb",
-      borderRadius: 16,
-      padding: 14,
-      background: "#fff",
-      display: "grid",
-      gap: 12,
-    }}
-  >
+const MCQCard = ({ number, question, options }) => {
+  const [selectedOption, setSelectedOption] = useState(null);
+
+  return (
     <div
       style={{
-        border: "1px solid #dbeafe",
-        borderRadius: 14,
+        border: "1px solid #e5e7eb",
+        borderRadius: 16,
         padding: 14,
-        background: "#eff6ff",
-        fontWeight: 800,
-        lineHeight: 1.6,
+        background: "#fff",
+        display: "grid",
+        gap: 12,
       }}
     >
-      {number}. {question}
-    </div>
+      <div
+        style={{
+          border: "1px solid #dbeafe",
+          borderRadius: 14,
+          padding: 14,
+          background: "#eff6ff",
+          fontWeight: 800,
+          lineHeight: 1.6,
+        }}
+      >
+        {number}. {question}
+      </div>
 
-    <div style={{ display: "grid", gap: 10 }}>
-      {options.map((option, index) => (
-        <Choice key={index}>{option}</Choice>
-      ))}
+      <div style={{ display: "grid", gap: 10 }}>
+        {options.map((option, index) => (
+          <Choice
+            key={index}
+            isSelected={selectedOption === index}
+            onClick={() => setSelectedOption(index)}
+          >
+            {option}
+          </Choice>
+        ))}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const MCQSection = ({ title, instruction, questions }) => (
   <section style={sectionStyle}>
@@ -350,14 +367,6 @@ const FormingBasicStatementsPage = () => {
           {
             question: "Gestern ich ___ in Kumasi.",
             options: ["A. bin", "B. war", "C. habe"],
-          },
-          {
-            question: "Wir ___ heute Unterricht.",
-            options: ["A. haben", "B. hatten", "C. sind"],
-          },
-          {
-            question: "Letzte Woche wir ___ keinen Unterricht.",
-            options: ["A. haben", "B. sind", "C. hatten"],
           },
         ]}
       />
@@ -808,44 +817,6 @@ const FormingBasicStatementsPage = () => {
         ]}
       />
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Final mixed practice</h2>
-        <div style={softBox}>
-          Choose the best answer.
-        </div>
-
-        <div style={{ display: "grid", gap: 14 }}>
-          <MCQCard
-            number={1}
-            question="Wo liegt Berlin?"
-            options={[
-              "A. Berlin liegt im Osten von Deutschland.",
-              "B. Berlin kommt aus Deutschland.",
-              "C. Berlin fährt nach Deutschland.",
-            ]}
-          />
-          <MCQCard
-            number={2}
-            question="___ kommst du?"
-            options={["A. Wo", "B. Woher", "C. Wohin"]}
-          />
-          <MCQCard
-            number={3}
-            question="Ich fliege ___ Deutschland."
-            options={["A. nach", "B. in die", "C. aus"]}
-          />
-          <MCQCard
-            number={4}
-            question="Du ___ nach Berlin. (fahren)"
-            options={["A. fährst", "B. fahre", "C. fährt"]}
-          />
-          <MCQCard
-            number={5}
-            question="___ spricht hier Deutsch."
-            options={["A. Mann", "B. man", "C. Männer"]}
-          />
-        </div>
-      </section>
     </main>
   );
 };
