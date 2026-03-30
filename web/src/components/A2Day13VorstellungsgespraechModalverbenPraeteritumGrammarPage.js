@@ -28,6 +28,18 @@ const tdStyle = {
   padding: "10px 12px",
   borderBottom: "1px solid rgba(148,163,184,0.25)",
 };
+const heroMediaStyle = {
+  width: "100%",
+  height: "clamp(180px, 30vw, 280px)",
+  objectFit: "cover",
+  borderRadius: 12,
+  border: "1px solid rgba(148,163,184,0.35)",
+};
+const creditStyle = {
+  margin: 0,
+  fontSize: 12,
+  opacity: 0.8,
+};
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -48,6 +60,18 @@ const A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage = () => {
 
         <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 18 }}>
           <h1 style={{ margin: 0 }}>A2 • 5.13 Ein Vorstellungsgespräch</h1>
+          <img
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80"
+            alt="Professionals discussing ideas in a job interview setting"
+            style={heroMediaStyle}
+            loading="lazy"
+          />
+          <p style={creditStyle}>
+            Hero image:{" "}
+            <a href="https://unsplash.com/photos/men-and-woman-sitting-beside-table-rX12B5uX7QM">
+              Unsplash
+            </a>
+          </p>
           <p style={{ margin: 0, opacity: 0.85 }}>
             Grammar focus: <strong>Modalverben im Präteritum</strong> for interview stories and past experience.
           </p>
