@@ -761,8 +761,8 @@ const RAW_COURSE_SCHEDULES = {
       grammar_topic: "Direction",
       instruction: "Complete Lesen & Hören; your tutor will mark it.",
       lesen_hören: {
-        video: "https://youtu.be/k2ZC3rXPe1k",
-        youtube_link: "https://youtu.be/k2ZC3rXPe1k",
+        video: "https://youtu.be/9wvr4iwGsIc",
+        youtube_link: "https://youtu.be/9wvr4iwGsIc",
         assignment: true,
         grammarbook_link: "https://www.falowen.app/campus/course/directions-imperative-11",
         workbook_link: "/campus/course/a1-day-17-instructions-and-directions-kapitel-11-workbook",
