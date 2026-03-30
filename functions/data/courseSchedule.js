@@ -257,10 +257,10 @@ const A2_SCHEDULE = [
     assignment: true,
     goal: "Talk about your favorite sport.",
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Reflexive Pronouns",
+    grammar_topic: "seit + Dativ + Präsens",
     video: "",
     youtube_link: "",
-    grammarbook_link: "https://drive.google.com/file/d/1dGZjcHhdN1xAdK2APL54RykGH7_msUyr/view?usp=sharing",
+    grammarbook_link: "/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1iiExhUj66r5p0SJZfV7PsmCWOyaF360s/view?usp=sharing",
   },
   {
