@@ -109,15 +109,21 @@ const TableScroll = ({ caption, children }) => (
   </div>
 );
 
-const Choice = ({ children, isSelected, onClick }) => (
+const Choice = ({ children, isSelected, isCorrect, isWrong, onClick }) => (
   <button
     type="button"
     onClick={onClick}
     style={{
-      border: isSelected ? "2px solid #2563eb" : "1px solid #d1d5db",
+      border: isCorrect
+        ? "2px solid #16a34a"
+        : isWrong
+          ? "2px solid #dc2626"
+          : isSelected
+            ? "2px solid #2563eb"
+            : "1px solid #d1d5db",
       borderRadius: 12,
       padding: 12,
-      background: isSelected ? "#dbeafe" : "#fff",
+      background: isCorrect ? "#dcfce7" : isWrong ? "#fee2e2" : isSelected ? "#dbeafe" : "#fff",
       lineHeight: 1.6,
       textAlign: "left",
       cursor: "pointer",
@@ -130,8 +136,10 @@ const Choice = ({ children, isSelected, onClick }) => (
   </button>
 );
 
-const MCQCard = ({ number, question, options }) => {
+const MCQCard = ({ number, question, options, correctIndex }) => {
   const [selectedOption, setSelectedOption] = useState(null);
+  const hasSelection = selectedOption !== null;
+  const isCorrect = hasSelection && selectedOption === correctIndex;
 
   return (
     <div
@@ -162,12 +170,29 @@ const MCQCard = ({ number, question, options }) => {
           <Choice
             key={index}
             isSelected={selectedOption === index}
+            isCorrect={hasSelection && index === correctIndex}
+            isWrong={hasSelection && selectedOption === index && selectedOption !== correctIndex}
             onClick={() => setSelectedOption(index)}
           >
             {option}
           </Choice>
         ))}
       </div>
+
+      {hasSelection ? (
+        <div
+          style={{
+            borderRadius: 12,
+            padding: "10px 12px",
+            fontWeight: 700,
+            background: isCorrect ? "#ecfdf5" : "#fff1f2",
+            border: isCorrect ? "1px solid #86efac" : "1px solid #fecaca",
+            color: isCorrect ? "#166534" : "#991b1b",
+          }}
+        >
+          {isCorrect ? "✅ Correct answer." : `❌ Wrong answer. Correct answer: ${options[correctIndex]}`}
+        </div>
+      ) : null}
     </div>
   );
 };
@@ -183,6 +208,7 @@ const MCQSection = ({ title, instruction, questions }) => (
           number={idx + 1}
           question={q.question}
           options={q.options}
+          correctIndex={q.correctIndex}
         />
       ))}
     </div>
@@ -363,10 +389,12 @@ const FormingBasicStatementsPage = () => {
           {
             question: "Ich ___ heute in Accra.",
             options: ["A. bin", "B. war", "C. hatte"],
+            correctIndex: 0,
           },
           {
             question: "Gestern ich ___ in Kumasi.",
             options: ["A. bin", "B. war", "C. habe"],
+            correctIndex: 1,
           },
         ]}
       />
@@ -435,6 +463,7 @@ const FormingBasicStatementsPage = () => {
               "B. Berlin liegt im Norden von Deutschland.",
               "C. Berlin liegt im Süden von Deutschland.",
             ],
+            correctIndex: 0,
           },
           {
             question: "Wo liegt Hamburg?",
@@ -443,6 +472,7 @@ const FormingBasicStatementsPage = () => {
               "B. Hamburg liegt im Norden von Deutschland.",
               "C. Hamburg liegt im Osten von Deutschland.",
             ],
+            correctIndex: 1,
           },
           {
             question: "What does 'Wo liegt München?' mean?",
@@ -451,6 +481,7 @@ const FormingBasicStatementsPage = () => {
               "B. Where is Munich located?",
               "C. Where is Munich going?",
             ],
+            correctIndex: 1,
           },
         ]}
       />
@@ -528,10 +559,12 @@ const FormingBasicStatementsPage = () => {
           {
             question: "___ kommst du?",
             options: ["A. Wo", "B. Woher", "C. Wohin"],
+            correctIndex: 1,
           },
           {
             question: "___ gehst du heute?",
             options: ["A. Wohin", "B. Woher", "C. Wo"],
+            correctIndex: 0,
           },
           {
             question: "What does 'Wo bist du?' mean?",
@@ -540,6 +573,7 @@ const FormingBasicStatementsPage = () => {
               "B. Where do you come from?",
               "C. Where are you going?",
             ],
+            correctIndex: 0,
           },
         ]}
       />
@@ -620,18 +654,22 @@ const FormingBasicStatementsPage = () => {
           {
             question: "Ich fliege ___ Deutschland.",
             options: ["A. nach", "B. in die", "C. aus"],
+            correctIndex: 0,
           },
           {
             question: "Wir reisen ___ Schweiz.",
             options: ["A. nach", "B. in die", "C. aus der"],
+            correctIndex: 1,
           },
           {
             question: "Er fährt ___ Iran.",
             options: ["A. in den", "B. nach", "C. aus dem"],
+            correctIndex: 0,
           },
           {
             question: "Sie fährt ___ Accra.",
             options: ["A. in die", "B. nach", "C. aus"],
+            correctIndex: 1,
           },
         ]}
       />
@@ -708,18 +746,22 @@ const FormingBasicStatementsPage = () => {
           {
             question: "Du ___ nach Berlin. (fahren)",
             options: ["A. fahre", "B. fährst", "C. fährt"],
+            correctIndex: 1,
           },
           {
             question: "Er ___ Deutsch. (sprechen)",
             options: ["A. sprichst", "B. sprechen", "C. spricht"],
+            correctIndex: 2,
           },
           {
             question: "Sie ___ Pizza. (essen)",
             options: ["A. isst", "B. essen", "C. esst"],
+            correctIndex: 0,
           },
           {
             question: "Du ___ den Bus. (nehmen)",
             options: ["A. nimmst", "B. nimmt", "C. nehme"],
+            correctIndex: 0,
           },
         ]}
       />
@@ -805,14 +847,17 @@ const FormingBasicStatementsPage = () => {
           {
             question: "___ spricht hier Deutsch.",
             options: ["A. Mann", "B. man", "C. Männer"],
+            correctIndex: 1,
           },
           {
             question: "Der ___ kommt aus Berlin.",
             options: ["A. man", "B. Mann", "C. spricht"],
+            correctIndex: 1,
           },
           {
             question: "In Deutschland spricht ___ Deutsch.",
             options: ["A. man", "B. Mann", "C. Männer"],
+            correctIndex: 0,
           },
         ]}
       />
