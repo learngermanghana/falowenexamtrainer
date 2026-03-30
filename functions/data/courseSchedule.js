@@ -744,8 +744,8 @@ const courseSchedules = {
       grammar_topic: "Direction",
       instruction: "Complete Lesen & Hören; your tutor will mark it.",
       lesen_hören: {
-        video: "https://youtu.be/k2ZC3rXPe1k",
-        youtube_link: "https://youtu.be/k2ZC3rXPe1k",
+        video: "https://youtu.be/9wvr4iwGsIc",
+        youtube_link: "https://youtu.be/9wvr4iwGsIc",
         assignment: true,
         grammarbook_link: "https://www.falowen.app/campus/course/directions-imperative-11",
         workbook_link: "https://drive.google.com/file/d/17FNSfHBxyga9sKxzicT_qkP7PA4vB5-A/view?usp=sharing",
