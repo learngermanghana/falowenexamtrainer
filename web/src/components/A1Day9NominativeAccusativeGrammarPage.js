@@ -72,6 +72,10 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           <li>
             With negation in plural, use <strong>keine</strong> (for example: <strong>keine Bücher</strong>).
           </li>
+          <li>
+            Quick English bridge: <strong>definite article</strong> means <strong>"the"</strong> (specific thing),
+            while <strong>indefinite article</strong> means <strong>"a / an"</strong> (one non-specific thing).
+          </li>
         </ul>
 
         <div style={tableWrapStyle}>
@@ -87,14 +91,14 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
             </thead>
             <tbody>
               <tr>
-                <td style={cellStyle}>Definite articles</td>
+                <td style={cellStyle}>Definite articles ("the")</td>
                 <td style={cellStyle}>der</td>
                 <td style={cellStyle}>die</td>
                 <td style={cellStyle}>das</td>
                 <td style={cellStyle}>die</td>
               </tr>
               <tr>
-                <td style={cellStyle}>Indefinite / negation</td>
+                <td style={cellStyle}>Indefinite / negation ("a / an" / "no")</td>
                 <td style={cellStyle}>ein</td>
                 <td style={cellStyle}>eine</td>
                 <td style={cellStyle}>ein</td>
@@ -110,6 +114,12 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           <li>Die Blume → Die Blumen | Ich kaufe die Blume. / Ich kaufe die Blumen.</li>
           <li>Ein Apfel → Keine Äpfel | Ich habe einen Apfel. / Ich habe keine Äpfel.</li>
         </ul>
+        <p style={{ margin: 0 }}>
+          Teaching note for next chapter: when students understand <strong>the</strong> vs{" "}
+          <strong>a / an</strong>, it becomes much easier to teach possessive determiners like{" "}
+          <strong>mein / meine</strong> ("my"), <strong>dein / deine</strong> ("your"), and{" "}
+          <strong>sein / seine</strong> ("his"), because they follow similar article patterns.
+        </p>
       </section>
 
       <section style={cardStyle}>
