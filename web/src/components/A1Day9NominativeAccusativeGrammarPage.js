@@ -125,20 +125,20 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
       <section style={cardStyle}>
         <h2 style={sectionTitleStyle}>2) The big idea: German cases are like a family of classes</h2>
         <p style={{ margin: 0 }}>
-          Think of German cases as <strong>four related classes</strong>: <strong>Nominativ</strong>,{" "}
-          <strong>Akkusativ</strong>, <strong>Dativ</strong>, and <strong>Genitiv</strong>. Each class has its own
-          article forms (der, die, das, den, dem, des ...).
+          In German, sentence parts change form based on their function. This is the <strong>case system</strong>.
+          Think of it as four related categories: <strong>Nominativ</strong>, <strong>Akkusativ</strong>,{" "}
+          <strong>Dativ</strong>, and <strong>Genitiv</strong>.
         </p>
         <ul style={listStyle}>
           <li>
-            Step 1: identify the sentence role first (subject, direct object, etc.), then choose the correct article.
+            At A1 level, focus first on <strong>Nominativ</strong> and <strong>Akkusativ</strong>. Dativ comes next.
+          </li>
+          <li>Cases can be determined by verbs, direction (wo/wohin), and prepositions.</li>
+          <li>
+            In this lesson, we focus only on <strong>verbs</strong> as the case signal.
           </li>
           <li>
-            Step 2: remember that article changes are normal in German: <strong>der</strong> can become{" "}
-            <strong>den</strong>, <strong>dem</strong>, or <strong>des</strong> depending on case.
-          </li>
-          <li>
-            For now, focus on <strong>Nominativ + Akkusativ</strong>. We will introduce Dativ and Genitiv gradually.
+            Step 1: identify sentence role (subject/direct object), then choose the matching article form.
           </li>
         </ul>
       </section>
@@ -150,6 +150,35 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           <strong>sein</strong> and <strong>werden</strong>, you often get a subject + description pattern (no direct
           object).
         </p>
+        <div style={tableWrapStyle}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={cellStyle}>Nominative articles</th>
+                <th style={cellStyle}>Masculine</th>
+                <th style={cellStyle}>Feminine</th>
+                <th style={cellStyle}>Neuter</th>
+                <th style={cellStyle}>Plural</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style={cellStyle}>Definite</td>
+                <td style={cellStyle}>der</td>
+                <td style={cellStyle}>die</td>
+                <td style={cellStyle}>das</td>
+                <td style={cellStyle}>die</td>
+              </tr>
+              <tr>
+                <td style={cellStyle}>Indefinite / negation</td>
+                <td style={cellStyle}>ein</td>
+                <td style={cellStyle}>eine</td>
+                <td style={cellStyle}>ein</td>
+                <td style={cellStyle}>keine</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <ul style={listStyle}>
           <li>Der Mann ist nett.</li>
           <li>Die Frau arbeitet.</li>
@@ -220,6 +249,11 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
             hören, lesen
           </li>
         </ul>
+        <p style={{ margin: 0 }}>
+          Examples: <strong>Ich habe einen Stift.</strong> (Stift = masculine), <strong>Sie hat ein Buch.</strong>{" "}
+          (Buch = neuter), <strong>Er kauft ein Auto.</strong> (Auto = neuter),{" "}
+          <strong>Wir kaufen eine Karte.</strong> (Karte = feminine).
+        </p>
         <p style={{ margin: 0 }}>
           Tip: first find the verb, then identify who does the action (subject = nominative) and who/what receives the
           action (direct object = accusative).
