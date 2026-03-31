@@ -42,6 +42,30 @@ const cellStyle = {
   verticalAlign: "top",
 };
 
+const subjectHighlightStyle = {
+  backgroundColor: "#dbeafe",
+  color: "#1d4ed8",
+  padding: "1px 6px",
+  borderRadius: 999,
+  fontWeight: 700,
+};
+
+const objectHighlightStyle = {
+  backgroundColor: "#fee2e2",
+  color: "#b91c1c",
+  padding: "1px 6px",
+  borderRadius: 999,
+  fontWeight: 700,
+};
+
+const verbHighlightStyle = {
+  backgroundColor: "#fef3c7",
+  color: "#92400e",
+  padding: "1px 6px",
+  borderRadius: 999,
+  fontWeight: 700,
+};
+
 const A1Day9NominativeAccusativeGrammarPage = () => {
   const navigate = useNavigate();
 
@@ -180,10 +204,51 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           </table>
         </div>
         <ul style={listStyle}>
-          <li>Der Mann ist nett.</li>
-          <li>Die Frau arbeitet.</li>
-          <li>Das Kind spielt.</li>
-          <li>Das ist ein Haus. / Er wird Lehrer.</li>
+          <li>
+            <span style={subjectHighlightStyle}>Der Mann</span> <span style={verbHighlightStyle}>ist</span> nett.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Die Frau</span> <span style={verbHighlightStyle}>arbeitet</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>spielt</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Das</span> <span style={verbHighlightStyle}>ist</span> ein Haus. /{" "}
+            <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>wird</span> Lehrer.
+          </li>
+        </ul>
+
+        <p style={{ margin: 0 }}>
+          More nominative examples (subject-focused): in nominative-only patterns, highlight the{" "}
+          <strong>subject</strong>.
+        </p>
+        <ul style={listStyle}>
+          <li>
+            <span style={subjectHighlightStyle}>Der Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Ein Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Die Lehrerin</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Eine Lehrerin</span> <span style={verbHighlightStyle}>ist</span>{" "}
+            freundlich.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Ein Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Die Kinder</span> <span style={verbHighlightStyle}>sind</span> ruhig.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Keine Kinder</span> <span style={verbHighlightStyle}>sind</span> laut.
+          </li>
         </ul>
         <p style={{ margin: 0 }}>
           Quick tip: if your sentence is mainly <strong>subject + verb + description</strong>, it is usually
@@ -197,7 +262,12 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           Use accusative for the <strong>direct object</strong> (the person or thing directly affected by the action).
         </p>
         <p style={{ margin: 0 }}>
-          First-time learner tip: accusative sentences are often <strong>subject + verb + noun (object)</strong>.
+          First-time learner tip: accusative sentences are often{" "}
+          <strong>
+            <span style={subjectHighlightStyle}>subject</span> + <span style={verbHighlightStyle}>verb</span> +{" "}
+            <span style={objectHighlightStyle}>noun (object)</span>
+          </strong>
+          .
         </p>
 
         <div style={tableWrapStyle}>
@@ -231,10 +301,49 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
         </div>
 
         <ul style={listStyle}>
-          <li>Ich habe den Hund.</li>
-          <li>Sie kauft die Blume.</li>
-          <li>Er isst das Brot.</li>
-          <li>Wir treffen die Freunde.</li>
+          <li>
+            <span style={subjectHighlightStyle}>Ich</span> <span style={verbHighlightStyle}>habe</span>{" "}
+            <span style={objectHighlightStyle}>den Hund</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Sie</span> <span style={verbHighlightStyle}>kauft</span>{" "}
+            <span style={objectHighlightStyle}>die Blume</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>isst</span>{" "}
+            <span style={objectHighlightStyle}>das Brot</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Wir</span> <span style={verbHighlightStyle}>treffen</span>{" "}
+            <span style={objectHighlightStyle}>die Freunde</span>.
+          </li>
+        </ul>
+
+        <p style={{ margin: 0 }}>
+          More accusative examples (definite + indefinite from masculine to plural). Watch how the{" "}
+          <strong>verb influences the object case</strong>:
+        </p>
+        <ul style={listStyle}>
+          <li>
+            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+            <span style={objectHighlightStyle}>den Lehrer</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>einen Lehrer</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+            <span style={objectHighlightStyle}>die Lehrerin</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>eine Lehrerin</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+            <span style={objectHighlightStyle}>das Kind</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>ein Kind</span>.
+          </li>
+          <li>
+            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+            <span style={objectHighlightStyle}>die Kinder</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>keine Kinder</span>.
+          </li>
         </ul>
       </section>
 
