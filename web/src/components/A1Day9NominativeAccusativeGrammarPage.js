@@ -82,6 +82,13 @@ const knowledgeQuestions = [
     options: ["der", "den", "dem"],
     correctAnswer: "den",
     feedback: "Correct: 'sehen' takes an accusative object, so masculine 'der Mann' becomes 'den Mann'.",
+    highlightedSentence: {
+      subject: "Ich",
+      verb: "sehe",
+      noun: "den Mann",
+      rest: "jeden Tag.",
+    },
+    englishTranslation: "I see the man every day.",
   },
   {
     id: "q2",
@@ -89,6 +96,13 @@ const knowledgeQuestions = [
     options: ["die", "den", "dem"],
     correctAnswer: "die",
     feedback: "Correct: the subject is nominative, and feminine nominative definite article is 'die'.",
+    highlightedSentence: {
+      subject: "Die Frau",
+      verb: "arbeitet",
+      noun: "Die Frau",
+      rest: "im Büro.",
+    },
+    englishTranslation: "The woman works in the office.",
   },
   {
     id: "q3",
@@ -96,6 +110,13 @@ const knowledgeQuestions = [
     options: ["das", "dem", "des"],
     correctAnswer: "das",
     feedback: "Correct: 'kaufen' takes accusative. Neuter article stays 'das' in accusative.",
+    highlightedSentence: {
+      subject: "Wir",
+      verb: "kaufen",
+      noun: "das Buch.",
+      rest: "",
+    },
+    englishTranslation: "We buy the book.",
   },
   {
     id: "q4",
@@ -103,6 +124,13 @@ const knowledgeQuestions = [
     options: ["der", "den", "dem"],
     correctAnswer: "den",
     feedback: "Correct: 'erklären' here takes a direct object in accusative ('den Schüler').",
+    highlightedSentence: {
+      subject: "Der Lehrer",
+      verb: "erklärt",
+      noun: "den Schüler",
+      rest: "die Aufgabe.",
+    },
+    englishTranslation: "The teacher explains the task to the student.",
   },
   {
     id: "q5",
@@ -110,6 +138,13 @@ const knowledgeQuestions = [
     options: ["das", "den", "dem"],
     correctAnswer: "das",
     feedback: "Correct: this is the subject (nominative), so we use 'das Kind'.",
+    highlightedSentence: {
+      subject: "Das Kind",
+      verb: "spielt",
+      noun: "Das Kind",
+      rest: "im Garten.",
+    },
+    englishTranslation: "The child plays in the garden.",
   },
   {
     id: "q6",
@@ -117,6 +152,13 @@ const knowledgeQuestions = [
     options: ["der", "den", "dem"],
     correctAnswer: "den",
     feedback: "Correct: 'brauchen' takes accusative, so masculine 'der Computer' becomes 'den Computer'.",
+    highlightedSentence: {
+      subject: "Wir",
+      verb: "brauchen",
+      noun: "den Computer",
+      rest: "für den Kurs.",
+    },
+    englishTranslation: "We need the computer for the course.",
   },
   {
     id: "q7",
@@ -124,6 +166,13 @@ const knowledgeQuestions = [
     options: ["die", "den", "dem"],
     correctAnswer: "die",
     feedback: "Correct: plural nominative uses 'die'.",
+    highlightedSentence: {
+      subject: "Die Bücher",
+      verb: "sind",
+      noun: "Die Bücher",
+      rest: "interessant.",
+    },
+    englishTranslation: "The books are interesting.",
   },
   {
     id: "q8",
@@ -131,6 +180,13 @@ const knowledgeQuestions = [
     options: ["die", "den", "dem"],
     correctAnswer: "die",
     feedback: "Correct: plural accusative also uses 'die'.",
+    highlightedSentence: {
+      subject: "Ich",
+      verb: "lese",
+      noun: "die Bücher",
+      rest: "jeden Abend.",
+    },
+    englishTranslation: "I read the books every evening.",
   },
 ];
 
@@ -507,6 +563,14 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
                 <h3 style={{ margin: 0, fontSize: "1rem" }}>
                   {index + 1}. {question.prompt}
                 </h3>
+                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
+                  <strong>German (idea):</strong> <strong>{question.highlightedSentence.subject}</strong>{" "}
+                  {question.highlightedSentence.verb} <strong>{question.highlightedSentence.noun}</strong>{" "}
+                  {question.highlightedSentence.rest}
+                </p>
+                <p style={{ margin: 0, fontSize: 14, color: "#374151" }}>
+                  <strong>English:</strong> {question.englishTranslation}
+                </p>
                 <div style={{ display: "grid", gap: 8 }}>
                   {question.options.map((option) => (
                     <button
