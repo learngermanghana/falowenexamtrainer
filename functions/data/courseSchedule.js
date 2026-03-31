@@ -612,7 +612,7 @@ const courseSchedules = {
       lesen_hören: {
         video: "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
         youtube_link: "https://youtu.be/Yi5ZA-XD-GY?si=nCX_pceEYgAL-FU0",
-        grammarbook_link: "https://drive.google.com/file/d/17y5fGW8nAbfeVgolV7tEW4BLiLXZDoO6/view?usp=sharing",
+        grammarbook_link: "/campus/course/a1-day-9-nominative-and-accusative-cases",
         workbook_link: "https://drive.google.com/file/d/1zjAqvQqNb7iKknuhJ79bUclimEaTg-mt/view?usp=sharing",
         assignment: true,
       },
