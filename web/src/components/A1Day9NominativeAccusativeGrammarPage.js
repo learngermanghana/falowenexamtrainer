@@ -8,6 +8,9 @@ const cardStyle = {
   gap: 12,
 };
 
+const heroImage =
+  "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80";
+
 const sectionTitleStyle = {
   margin: 0,
   fontSize: "1.1rem",
@@ -48,10 +51,17 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
           Back to Course
         </button>
+        <img
+          src={heroImage}
+          alt="Students studying German grammar together"
+          style={{ width: "100%", maxHeight: 260, objectFit: "cover", borderRadius: 12 }}
+        />
         <h1 style={{ ...styles.title, margin: 0 }}>A1 Day 9 • Nominative and Accusative Cases</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          In-app grammar notes for <strong>German plurals</strong> and the <strong>nominative / accusative</strong> cases.
+          In-app grammar notes for <strong>German plurals</strong> and the core idea of German{" "}
+          <strong>cases as a family system</strong> (Nominativ, Akkusativ, Dativ, Genitiv).
         </p>
+        <p style={{ margin: 0, fontSize: 12, color: "#6b7280" }}>Header image source: Unsplash</p>
       </header>
 
       <section style={cardStyle}>
@@ -103,22 +113,52 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
       </section>
 
       <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>2) Nominative case (Der Nominativ)</h2>
+        <h2 style={sectionTitleStyle}>2) The big idea: German cases are like a family of classes</h2>
         <p style={{ margin: 0 }}>
-          Use nominative for the <strong>subject</strong> (the person or thing doing the action).
+          Think of German cases as <strong>four related classes</strong>: <strong>Nominativ</strong>,{" "}
+          <strong>Akkusativ</strong>, <strong>Dativ</strong>, and <strong>Genitiv</strong>. Each class has its own
+          article forms (der, die, das, den, dem, des ...).
+        </p>
+        <ul style={listStyle}>
+          <li>
+            Step 1: identify the sentence role first (subject, direct object, etc.), then choose the correct article.
+          </li>
+          <li>
+            Step 2: remember that article changes are normal in German: <strong>der</strong> can become{" "}
+            <strong>den</strong>, <strong>dem</strong>, or <strong>des</strong> depending on case.
+          </li>
+          <li>
+            For now, focus on <strong>Nominativ + Akkusativ</strong>. We will introduce Dativ and Genitiv gradually.
+          </li>
+        </ul>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>3) Nominative case (Der Nominativ)</h2>
+        <p style={{ margin: 0 }}>
+          Use nominative for the <strong>subject</strong> (who/what does the action). A beginner tip: with{" "}
+          <strong>sein</strong> and <strong>werden</strong>, you often get a subject + description pattern (no direct
+          object).
         </p>
         <ul style={listStyle}>
           <li>Der Mann ist nett.</li>
           <li>Die Frau arbeitet.</li>
           <li>Das Kind spielt.</li>
-          <li>Das ist ein Haus.</li>
+          <li>Das ist ein Haus. / Er wird Lehrer.</li>
         </ul>
+        <p style={{ margin: 0 }}>
+          Quick tip: if your sentence is mainly <strong>subject + verb + description</strong>, it is usually
+          nominative-focused.
+        </p>
       </section>
 
       <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>3) Accusative case (Der Akkusativ)</h2>
+        <h2 style={sectionTitleStyle}>4) Accusative case (Der Akkusativ)</h2>
         <p style={{ margin: 0 }}>
           Use accusative for the <strong>direct object</strong> (the person or thing directly affected by the action).
+        </p>
+        <p style={{ margin: 0 }}>
+          First-time learner tip: accusative sentences are often <strong>subject + verb + noun (object)</strong>.
         </p>
 
         <div style={tableWrapStyle}>
@@ -160,10 +200,10 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
       </section>
 
       <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>4) Verbs that often signal nominative or accusative</h2>
+        <h2 style={sectionTitleStyle}>5) Helpful verb tips for beginners</h2>
         <ul style={listStyle}>
           <li>
-            <strong>Nominative focus:</strong> sein, werden
+            <strong>Nominative focus:</strong> sein, werden (often no direct object, but a description/complement)
           </li>
           <li>
             <strong>Accusative object verbs:</strong> haben, sehen, finden, kaufen, nehmen, brauchen, essen, trinken,
@@ -171,8 +211,16 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           </li>
         </ul>
         <p style={{ margin: 0 }}>
-          Tip: first find the verb, then identify who does the action (subject) and who/what receives the action
-          (direct object).
+          Tip: first find the verb, then identify who does the action (subject = nominative) and who/what receives the
+          action (direct object = accusative).
+        </p>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>6) What comes next</h2>
+        <p style={{ margin: 0 }}>
+          Great start. Keep practicing nominative and accusative first. Later, we add <strong>Dativ</strong> and{" "}
+          <strong>Genitiv</strong> so you can build more complete German sentences confidently.
         </p>
       </section>
     </main>
