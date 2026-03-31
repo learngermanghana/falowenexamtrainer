@@ -597,7 +597,7 @@ const courseSchedules = {
         video: "https://youtu.be/Y0N1xLBBh1g",
         youtube_link: "https://youtu.be/Y0N1xLBBh1g",
         grammarbook_link: "https://www.falowen.app/campus/course/forming-basic-statements-german-a1-day-8",
-        workbook_link: "https://drive.google.com/file/d/1woXksV9sTZ_8huXa8yf6QUQ8aUXPxVug/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-8-countries-and-languages-workbook",
         assignment: true,
       },
     },
