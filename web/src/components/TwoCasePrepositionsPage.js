@@ -150,7 +150,19 @@ const IMG_DIRECTIONS =
 const IMG_SIGNPOST =
   "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&fm=jpg&ixlib=rb-4.1.0&q=80&w=2400";
 
-const PREPOSITIONS = ["an", "auf", "hinter", "in", "neben", "über", "unter", "vor", "zwischen"];
+const PREPOSITION_OPTIONS = ["an", "auf", "hinter", "in", "neben", "über", "unter", "vor", "zwischen"];
+
+const PREPOSITIONS = [
+  "an = on / at (attached contact, side, edge)",
+  "auf = on top of",
+  "hinter = behind",
+  "in = in / into",
+  "neben = next to / beside",
+  "über = above / over",
+  "unter = under / below",
+  "vor = in front of / before",
+  "zwischen = between",
+];
 
 const examplePairs = [
   ["in", "Ich gehe in die Schule.", "Ich bin in der Schule."],
@@ -474,9 +486,59 @@ const TwoCasePrepositionsPage = () => {
             </tbody>
           </table>
         </div>
+        <p style={{ margin: 0, fontSize: 14, opacity: 0.9 }}>
+          <strong>About hängen:</strong> this verb appears in <strong>both columns</strong>.
+        </p>
+        <BulletList
+          items={[
+            "Akkusativ (Wohin?): Ich hänge das Bild an die Wand. → I hang/put the picture onto the wall (movement, change of place).",
+            "Dativ (Wo?): Das Bild hängt an der Wand. → The picture is hanging on the wall (position, no movement).",
+          ]}
+        />
       </Section>
 
-      <Section title="4) Important Difference: an vs auf">
+      <Section title="4) Article Overview">
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ ...tableStyle, minWidth: 520 }}>
+            <caption style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>
+              Articles for Akkusativ vs Dativ (quick reference)
+            </caption>
+            <thead>
+              <tr>
+                {["Case", "Masculine", "Feminine", "Neuter", "Plural"].map((header) => (
+                  <th key={header} scope="col" style={thStyle}>
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Accusative (def.)", "den", "die", "das", "die"],
+                ["Accusative (indef.)", "einen", "eine", "ein", "—"],
+                ["Dative (def.)", "dem", "der", "dem", "den (+n)"],
+                ["Dative (indef.)", "einem", "einer", "einem", "—"],
+              ].map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell, idx) =>
+                    idx === 0 ? (
+                      <th key={`${row[0]}-${cell}`} scope="row" style={{ ...tdStyle, textAlign: "left" }}>
+                        {cell}
+                      </th>
+                    ) : (
+                      <td key={`${row[0]}-${cell}`} style={tdStyle}>
+                        {cell}
+                      </td>
+                    )
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section title="5) Important Difference: an vs auf">
         <p style={{ margin: 0 }}>
           Students often confuse <strong>an</strong> and <strong>auf</strong> because both can mean{" "}
           <strong>on</strong> in English. But German uses them differently.
@@ -542,7 +604,7 @@ const TwoCasePrepositionsPage = () => {
         </div>
       </Section>
 
-      <Section title="5) Example Pairs">
+      <Section title="6) Example Pairs">
         <div style={{ display: "grid", gap: 10 }}>
           {examplePairs.map(([preposition, movement, position], index) => (
             <div
@@ -558,34 +620,6 @@ const TwoCasePrepositionsPage = () => {
               </p>
             </div>
           ))}
-        </div>
-      </Section>
-
-      <Section title="6) More examples: an vs auf">
-        <div style={{ display: "grid", gap: 10 }}>
-          <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
-            <strong>an</strong>
-            <BulletList
-              items={[
-                "Das Poster hängt an der Wand.",
-                "Ich hänge das Poster an die Wand.",
-                "Die Jacke hängt an der Tür.",
-                "Ich hänge die Jacke an die Tür.",
-              ]}
-            />
-          </div>
-
-          <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}>
-            <strong>auf</strong>
-            <BulletList
-              items={[
-                "Das Buch liegt auf dem Tisch.",
-                "Ich lege das Buch auf den Tisch.",
-                "Die Tasche steht auf dem Boden.",
-                "Ich stelle die Tasche auf den Boden.",
-              ]}
-            />
-          </div>
         </div>
       </Section>
 
@@ -690,48 +724,7 @@ const TwoCasePrepositionsPage = () => {
         subtitle="Articles and short forms"
       />
 
-      <Section title="8) Article Overview">
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ ...tableStyle, minWidth: 520 }}>
-            <caption style={{ textAlign: "left", padding: "8px 0", fontWeight: 700 }}>
-              Articles for Akkusativ vs Dativ (quick reference)
-            </caption>
-            <thead>
-              <tr>
-                {["Case", "Masculine", "Feminine", "Neuter", "Plural"].map((header) => (
-                  <th key={header} scope="col" style={thStyle}>
-                    {header}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {[
-                ["Accusative (def.)", "den", "die", "das", "die"],
-                ["Accusative (indef.)", "einen", "eine", "ein", "—"],
-                ["Dative (def.)", "dem", "der", "dem", "den (+n)"],
-                ["Dative (indef.)", "einem", "einer", "einem", "—"],
-              ].map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell, idx) =>
-                    idx === 0 ? (
-                      <th key={`${row[0]}-${cell}`} scope="row" style={{ ...tdStyle, textAlign: "left" }}>
-                        {cell}
-                      </th>
-                    ) : (
-                      <td key={`${row[0]}-${cell}`} style={tdStyle}>
-                        {cell}
-                      </td>
-                    )
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Section>
-
-      <Section title="9) Short Forms (Important!)">
+      <Section title="8) Short Forms (Important!)">
         <BulletList items={["im = in dem", "ins = in das", "am = an dem", "ans = an das"]} />
       </Section>
 
@@ -742,7 +735,7 @@ const TwoCasePrepositionsPage = () => {
         subtitle="Choose the correct articles and prepositions."
       />
 
-      <Section title="10) Quick Check: Choose the correct article (7 questions)">
+      <Section title="9) Quick Check: Choose the correct article (7 questions)">
         <p style={{ margin: 0 }}>Pick one answer for each sentence.</p>
         <p style={{ margin: 0, opacity: 0.85 }}>
           Answered: {answeredPractice}/{practiceQuiz.length}
@@ -837,9 +830,9 @@ const TwoCasePrepositionsPage = () => {
         subtitle="Use the scene and choose the correct preposition."
       />
 
-      <Section title="11) Visual Position Game (Interactive)">
+      <Section title="10) Visual Position Game (Interactive)">
         <p style={{ margin: 0 }}>
-          Choose the correct preposition: <strong>{PREPOSITIONS.join(" – ")}</strong>
+          Choose the correct preposition: <strong>{PREPOSITION_OPTIONS.join(" – ")}</strong>
         </p>
         <p style={{ margin: 0, opacity: 0.85 }}>
           Answered: {answeredVisual}/{visualGame.length}
@@ -889,7 +882,7 @@ const TwoCasePrepositionsPage = () => {
                       aria-label={`Choose preposition for question ${i + 1}`}
                     >
                       <option value="">— wählen —</option>
-                      {PREPOSITIONS.map((p) => (
+                      {PREPOSITION_OPTIONS.map((p) => (
                         <option key={p} value={p}>
                           {p}
                         </option>
