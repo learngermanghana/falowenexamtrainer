@@ -306,11 +306,11 @@ const FormingBasicStatementsPage = () => {
           <br />
           In the present:
           <br />
-          <strong>ich bin</strong>, <strong>ich habe</strong>
+          <strong>ich bin</strong> = I am, <strong>ich habe</strong> = I have
           <br />
           In the simple past:
           <br />
-          <strong>ich war</strong>, <strong>ich hatte</strong>
+          <strong>ich war</strong> = I was, <strong>ich hatte</strong> = I had
         </div>
 
         <TableScroll caption="Conjugation comparison">
@@ -321,6 +321,7 @@ const FormingBasicStatementsPage = () => {
               <th style={thStyle}>sein (Präteritum)</th>
               <th style={thStyle}>haben (Präsens)</th>
               <th style={thStyle}>haben (Präteritum)</th>
+              <th style={thStyle}>English</th>
             </tr>
           </thead>
           <tbody>
@@ -330,6 +331,7 @@ const FormingBasicStatementsPage = () => {
               <td style={tdStyle}>war</td>
               <td style={tdStyle}>habe</td>
               <td style={tdStyle}>hatte</td>
+              <td style={tdStyle}>I am / I was / I have / I had</td>
             </tr>
             <tr>
               <td style={tdStyle}>du</td>
@@ -337,6 +339,7 @@ const FormingBasicStatementsPage = () => {
               <td style={tdStyle}>warst</td>
               <td style={tdStyle}>hast</td>
               <td style={tdStyle}>hattest</td>
+              <td style={tdStyle}>you are / you were / you have / you had</td>
             </tr>
             <tr>
               <td style={tdStyle}>er / sie / es</td>
@@ -344,6 +347,7 @@ const FormingBasicStatementsPage = () => {
               <td style={tdStyle}>war</td>
               <td style={tdStyle}>hat</td>
               <td style={tdStyle}>hatte</td>
+              <td style={tdStyle}>he/she/it is / was / has / had</td>
             </tr>
             <tr>
               <td style={tdStyle}>wir</td>
@@ -351,6 +355,7 @@ const FormingBasicStatementsPage = () => {
               <td style={tdStyle}>waren</td>
               <td style={tdStyle}>haben</td>
               <td style={tdStyle}>hatten</td>
+              <td style={tdStyle}>we are / were / have / had</td>
             </tr>
             <tr>
               <td style={tdStyle}>ihr</td>
@@ -358,6 +363,7 @@ const FormingBasicStatementsPage = () => {
               <td style={tdStyle}>wart</td>
               <td style={tdStyle}>habt</td>
               <td style={tdStyle}>hattet</td>
+              <td style={tdStyle}>you all are / were / have / had</td>
             </tr>
             <tr>
               <td style={tdStyle}>sie / Sie</td>
@@ -365,6 +371,7 @@ const FormingBasicStatementsPage = () => {
               <td style={tdStyle}>waren</td>
               <td style={tdStyle}>haben</td>
               <td style={tdStyle}>hatten</td>
+              <td style={tdStyle}>they are / were / have / had; you are / were / have / had (formal)</td>
             </tr>
           </tbody>
         </TableScroll>
@@ -706,34 +713,34 @@ const FormingBasicStatementsPage = () => {
             <tr>
               <th style={thStyle}>Verb</th>
               <th style={thStyle}>ich</th>
-              <th style={thStyle}>du</th>
-              <th style={thStyle}>er / sie / es</th>
+              <th style={thStyle}><strong>du</strong></th>
+              <th style={thStyle}><strong>er / sie / es</strong></th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td style={tdStyle}>fahren</td>
               <td style={tdStyle}>fahre</td>
-              <td style={tdStyle}>fährst</td>
-              <td style={tdStyle}>fährt</td>
+              <td style={tdStyle}><strong>fährst</strong></td>
+              <td style={tdStyle}><strong>fährt</strong></td>
             </tr>
             <tr>
               <td style={tdStyle}>sprechen</td>
               <td style={tdStyle}>spreche</td>
-              <td style={tdStyle}>sprichst</td>
-              <td style={tdStyle}>spricht</td>
+              <td style={tdStyle}><strong>sprichst</strong></td>
+              <td style={tdStyle}><strong>spricht</strong></td>
             </tr>
             <tr>
               <td style={tdStyle}>essen</td>
               <td style={tdStyle}>esse</td>
-              <td style={tdStyle}>isst</td>
-              <td style={tdStyle}>isst</td>
+              <td style={tdStyle}><strong>isst</strong></td>
+              <td style={tdStyle}><strong>isst</strong></td>
             </tr>
             <tr>
               <td style={tdStyle}>nehmen</td>
               <td style={tdStyle}>nehme</td>
-              <td style={tdStyle}>nimmst</td>
-              <td style={tdStyle}>nimmt</td>
+              <td style={tdStyle}><strong>nimmst</strong></td>
+              <td style={tdStyle}><strong>nimmt</strong></td>
             </tr>
           </tbody>
         </TableScroll>
@@ -791,9 +798,9 @@ const FormingBasicStatementsPage = () => {
         <div style={softBox}>
           <strong>Difference:</strong>
           <br />
-          <strong>man</strong> = people in general
+          <strong>man</strong> = someone / people in general (pronoun)
           <br />
-          <strong>Mann</strong> = a man
+          <strong>Mann</strong> = a man (noun)
           <br />
           <br />
           Example:
