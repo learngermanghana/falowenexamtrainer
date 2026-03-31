@@ -96,6 +96,7 @@ import A1Chapter3AskingAboutPricesWorkbookPage from "./components/A1Chapter3Aski
 import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCasesWorkbookPage";
 import A1Day1GreetingsGrammarPage from "./components/A1Day1GreetingsGrammarPage";
 import A1Day7PricesPreferencesGrammarPage from "./components/A1Day7PricesPreferencesGrammarPage";
+import A1Day9NominativeAccusativeGrammarPage from "./components/A1Day9NominativeAccusativeGrammarPage";
 import A1Day10ObjectsColorsPossessiveArticlesWorkbookPage from "./components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage";
 import WritingPage from "./components/WritingPage";
 import VocabExamPage from "./components/VocabExamPage";
@@ -697,6 +698,7 @@ const AppShell = ({
           <Route path="/campus/course/health-and-body-parts-14-1" element={<HealthBodyPartsPage />} />
           <Route path="/campus/course/a1-day-7-asking-about-prices-and-preferences" element={<A1Day7PricesPreferencesGrammarPage />} />
           <Route path="/campus/course/forming-basic-statements-german-a1-day-8" element={<FormingBasicStatementsPage />} />
+          <Route path="/campus/course/a1-day-9-nominative-and-accusative-cases" element={<A1Day9NominativeAccusativeGrammarPage />} />
           <Route path="/campus/course/german-numbers-1-10-with-pronunciation" element={<GermanNumbersGrammarPage />} />
           <Route path="/campus/course/objects-and-colors-chapter-6" element={<ObjectsAndColorsPage />} />
           <Route path="/campus/course/the-12-hour-clock-system-in-german-chapter-7" element={<TwelveHourClockPage />} />
