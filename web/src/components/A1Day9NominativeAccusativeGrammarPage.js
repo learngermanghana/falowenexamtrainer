@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -66,8 +66,131 @@ const verbHighlightStyle = {
   fontWeight: 700,
 };
 
+const knowledgeQuestionStyle = {
+  display: "grid",
+  gap: 10,
+  padding: 14,
+  borderRadius: 12,
+  border: "1px solid #e5e7eb",
+  backgroundColor: "#fff",
+};
+
+const knowledgeQuestions = [
+  {
+    id: "q1",
+    prompt: "Ich sehe ____ Mann jeden Tag.",
+    options: ["der", "den", "dem"],
+    correctAnswer: "den",
+    feedback: "Correct: 'sehen' takes an accusative object, so masculine 'der Mann' becomes 'den Mann'.",
+  },
+  {
+    id: "q2",
+    prompt: "____ Frau arbeitet im Büro.",
+    options: ["die", "den", "dem"],
+    correctAnswer: "die",
+    feedback: "Correct: the subject is nominative, and feminine nominative definite article is 'die'.",
+  },
+  {
+    id: "q3",
+    prompt: "Wir kaufen ____ Buch.",
+    options: ["das", "dem", "des"],
+    correctAnswer: "das",
+    feedback: "Correct: 'kaufen' takes accusative. Neuter article stays 'das' in accusative.",
+  },
+  {
+    id: "q4",
+    prompt: "Der Lehrer erklärt ____ Schüler die Aufgabe.",
+    options: ["der", "den", "dem"],
+    correctAnswer: "den",
+    feedback: "Correct: 'erklären' here takes a direct object in accusative ('den Schüler').",
+  },
+  {
+    id: "q5",
+    prompt: "____ Kind spielt im Garten.",
+    options: ["das", "den", "dem"],
+    correctAnswer: "das",
+    feedback: "Correct: this is the subject (nominative), so we use 'das Kind'.",
+  },
+  {
+    id: "q6",
+    prompt: "Wir brauchen ____ Computer für den Kurs.",
+    options: ["der", "den", "dem"],
+    correctAnswer: "den",
+    feedback: "Correct: 'brauchen' takes accusative, so masculine 'der Computer' becomes 'den Computer'.",
+  },
+  {
+    id: "q7",
+    prompt: "____ Bücher sind interessant.",
+    options: ["die", "den", "dem"],
+    correctAnswer: "die",
+    feedback: "Correct: plural nominative uses 'die'.",
+  },
+  {
+    id: "q8",
+    prompt: "Ich lese ____ Bücher jeden Abend.",
+    options: ["die", "den", "dem"],
+    correctAnswer: "die",
+    feedback: "Correct: plural accusative also uses 'die'.",
+  },
+];
+
 const A1Day9NominativeAccusativeGrammarPage = () => {
   const navigate = useNavigate();
+  const [knowledgeAnswers, setKnowledgeAnswers] = useState({});
+
+  const handleKnowledgeAnswerSelect = (questionId, answer) => {
+    setKnowledgeAnswers((previousAnswers) => ({
+      ...previousAnswers,
+      [questionId]: answer,
+    }));
+  };
+
+  const getKnowledgeOptionStyle = (question, option) => {
+    const selectedAnswer = knowledgeAnswers[question.id];
+    const isSelected = selectedAnswer === option;
+    const isCorrect = option === question.correctAnswer;
+
+    if (!selectedAnswer) {
+      return {
+        ...styles.secondaryButton,
+        width: "100%",
+        justifyContent: "flex-start",
+        textAlign: "left",
+      };
+    }
+
+    if (isCorrect) {
+      return {
+        ...styles.secondaryButton,
+        width: "100%",
+        justifyContent: "flex-start",
+        textAlign: "left",
+        border: "1px solid #10b981",
+        backgroundColor: "#ecfdf5",
+        color: "#065f46",
+      };
+    }
+
+    if (isSelected) {
+      return {
+        ...styles.secondaryButton,
+        width: "100%",
+        justifyContent: "flex-start",
+        textAlign: "left",
+        border: "1px solid #ef4444",
+        backgroundColor: "#fef2f2",
+        color: "#991b1b",
+      };
+    }
+
+    return {
+      ...styles.secondaryButton,
+      width: "100%",
+      justifyContent: "flex-start",
+      textAlign: "left",
+      opacity: 0.7,
+    };
+  };
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -370,7 +493,55 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
       </section>
 
       <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>6) What comes next</h2>
+        <h2 style={sectionTitleStyle}>6) Knowledge test (instant feedback)</h2>
+        <p style={{ margin: 0 }}>
+          Click one option for each sentence and you will immediately see whether your answer is correct.
+        </p>
+        <div style={{ display: "grid", gap: 12 }}>
+          {knowledgeQuestions.map((question, index) => {
+            const selectedAnswer = knowledgeAnswers[question.id];
+            const isCorrect = selectedAnswer === question.correctAnswer;
+
+            return (
+              <article key={question.id} style={knowledgeQuestionStyle}>
+                <h3 style={{ margin: 0, fontSize: "1rem" }}>
+                  {index + 1}. {question.prompt}
+                </h3>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {question.options.map((option) => (
+                    <button
+                      key={option}
+                      type="button"
+                      style={getKnowledgeOptionStyle(question, option)}
+                      onClick={() => handleKnowledgeAnswerSelect(question.id, option)}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+                {selectedAnswer ? (
+                  <p
+                    style={{
+                      margin: 0,
+                      padding: "10px 12px",
+                      borderRadius: 10,
+                      fontWeight: 600,
+                      border: isCorrect ? "1px solid #10b981" : "1px solid #ef4444",
+                      backgroundColor: isCorrect ? "#ecfdf5" : "#fef2f2",
+                      color: isCorrect ? "#065f46" : "#991b1b",
+                    }}
+                  >
+                    {isCorrect ? "✅ Correct!" : "❌ Not quite."} {question.feedback}
+                  </p>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>7) What comes next</h2>
         <p style={{ margin: 0 }}>
           Great start. Keep practicing nominative and accusative first. Later, we add <strong>Dativ</strong> and{" "}
           <strong>Genitiv</strong> so you can build more complete German sentences confidently.
