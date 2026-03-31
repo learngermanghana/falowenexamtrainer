@@ -120,17 +120,17 @@ const knowledgeQuestions = [
   },
   {
     id: "q4",
-    prompt: "Der Lehrer erklärt ____ Schüler die Aufgabe.",
+    prompt: "Der Lehrer sieht ____ Schüler.",
     options: ["der", "den", "dem"],
     correctAnswer: "den",
-    feedback: "Correct: 'erklären' here takes a direct object in accusative ('den Schüler').",
+    feedback: "Correct: 'sehen' takes an accusative object, so we use 'den Schüler'.",
     highlightedSentence: {
       subject: "Der Lehrer",
-      verb: "erklärt",
+      verb: "sieht",
       noun: "den Schüler",
-      rest: "die Aufgabe.",
+      rest: "",
     },
-    englishTranslation: "The teacher explains the task to the student.",
+    englishTranslation: "The teacher sees the student.",
   },
   {
     id: "q5",
@@ -148,7 +148,7 @@ const knowledgeQuestions = [
   },
   {
     id: "q6",
-    prompt: "Wir brauchen ____ Computer für den Kurs.",
+    prompt: "Wir brauchen ____ Computer.",
     options: ["der", "den", "dem"],
     correctAnswer: "den",
     feedback: "Correct: 'brauchen' takes accusative, so masculine 'der Computer' becomes 'den Computer'.",
@@ -156,9 +156,9 @@ const knowledgeQuestions = [
       subject: "Wir",
       verb: "brauchen",
       noun: "den Computer",
-      rest: "für den Kurs.",
+      rest: "",
     },
-    englishTranslation: "We need the computer for the course.",
+    englishTranslation: "We need the computer.",
   },
   {
     id: "q7",
@@ -271,6 +271,10 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
         <h2 style={sectionTitleStyle}>1) German plurals (quick guide)</h2>
         <ul style={listStyle}>
           <li>German nouns can have different plural endings, so plural forms should be learned with each noun.</li>
+          <li>
+            Common plural endings include <strong>-e</strong>, <strong>-er</strong>, <strong>-en / -n</strong>,{" "}
+            <strong>-s</strong>, and sometimes <strong>no ending</strong>.
+          </li>
           <li>Plural nouns do not have grammatical gender, and the definite article is always <strong>die</strong>.</li>
           <li>
             With negation in plural, use <strong>keine</strong> (for example: <strong>keine Bücher</strong>).
@@ -563,11 +567,6 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
                 <h3 style={{ margin: 0, fontSize: "1rem" }}>
                   {index + 1}. {question.prompt}
                 </h3>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5 }}>
-                  <strong>German (idea):</strong> <strong>{question.highlightedSentence.subject}</strong>{" "}
-                  {question.highlightedSentence.verb} <strong>{question.highlightedSentence.noun}</strong>{" "}
-                  {question.highlightedSentence.rest}
-                </p>
                 <p style={{ margin: 0, fontSize: 14, color: "#374151" }}>
                   <strong>English:</strong> {question.englishTranslation}
                 </p>
