@@ -172,6 +172,24 @@ const examplePairs = [
   ["zwischen", "Ich stelle den Stuhl zwischen die Tische.", "Der Stuhl steht zwischen den Tischen."],
 ];
 
+const boldPrepositionInSentence = (sentence, preposition) => {
+  const marker = ` ${preposition} `;
+  const startIndex = sentence.indexOf(marker);
+
+  if (startIndex === -1) return sentence;
+
+  const prepositionStart = startIndex + 1;
+  const prepositionEnd = prepositionStart + preposition.length;
+
+  return (
+    <>
+      {sentence.slice(0, prepositionStart)}
+      <strong>{sentence.slice(prepositionStart, prepositionEnd)}</strong>
+      {sentence.slice(prepositionEnd)}
+    </>
+  );
+};
+
 const visualGame = [
   {
     label: "Cat + table",
@@ -613,10 +631,12 @@ const TwoCasePrepositionsPage = () => {
             >
               <strong>🔹 {preposition}</strong>
               <p style={{ margin: "8px 0 0" }}>
-                {movement} <span style={{ opacity: 0.8 }}>(Wohin?)</span>
+                {boldPrepositionInSentence(movement, preposition)}{" "}
+                <span style={{ opacity: 0.8 }}>(Wohin?)</span>
               </p>
               <p style={{ margin: "6px 0 0" }}>
-                {position} <span style={{ opacity: 0.8 }}>(Wo?)</span>
+                {boldPrepositionInSentence(position, preposition)}{" "}
+                <span style={{ opacity: 0.8 }}>(Wo?)</span>
               </p>
             </div>
           ))}
