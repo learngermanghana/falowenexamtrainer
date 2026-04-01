@@ -257,8 +257,8 @@ const A2_SCHEDULE = [
     instruction:
       "Watch the recommended video, review the grammar notes, and complete the in-app workbook for Teil 1–3. Submit your final answers in the assignment area.",
     grammar_topic: "um ... zu (Infinitiv mit zu – purpose)",
-    video: "https://youtu.be/IyBvx-yVT-0",
-    youtube_link: "https://youtu.be/IyBvx-yVT-0",
+    video: "https://youtu.be/_YlapM9rQq4",
+    youtube_link: "https://youtu.be/_YlapM9rQq4",
     grammarbook_link: "/campus/course/beruf-und-karriere-5-14-um-zu-grammar-notes",
     workbook_link: "/campus/course/a2-day-14-beruf-und-karriere-workbook",
   },
