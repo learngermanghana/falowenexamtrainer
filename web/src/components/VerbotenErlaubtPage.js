@@ -616,6 +616,20 @@ const GoetheA1SpeakingConfidenceLabPage = () => {
           />
         </Callout>
 
+        <Callout>
+          <strong>Full conjugation of <em>dürfen</em> (Präsens)</strong>
+          <BulletList
+            items={[
+              "ich darf",
+              "du darfst",
+              "er / sie / es darf",
+              "wir dürfen",
+              "ihr dürft",
+              "sie / Sie dürfen",
+            ]}
+          />
+        </Callout>
+
         <h3 style={{ margin: "8px 0 0" }}>The easiest A1 sentences</h3>
         <BulletList
           items={[
