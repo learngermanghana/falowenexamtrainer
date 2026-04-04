@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -80,10 +80,47 @@ const badgeStyle = {
   fontWeight: 700,
 };
 
+const knowledgeQuestions = [
+  {
+    id: "q1",
+    prompt: "You meet your teacher for the first time in the morning. Which greeting is best?",
+    options: ["Hallo!", "Guten Morgen, Frau Becker.", "Tschüss!"],
+    answer: "Guten Morgen, Frau Becker.",
+  },
+  {
+    id: "q2",
+    prompt: "Choose the correct formal question:",
+    options: ["Wie geht es Ihnen?", "Wie geht es dir?", "Wie geht's du?"],
+    answer: "Wie geht es Ihnen?",
+  },
+  {
+    id: "q3",
+    prompt: "Your friend says: 'Wie geht's?' Which answer is correct?",
+    options: ["Mir geht es gut, danke.", "Auf Wiedersehen.", "Herr Müller."],
+    answer: "Mir geht es gut, danke.",
+  },
+  {
+    id: "q4",
+    prompt: "Which goodbye fits a formal situation?",
+    options: ["Tschüss, Anna!", "Auf Wiedersehen, Herr Wagner.", "Bis später, Tom!"],
+    answer: "Auf Wiedersehen, Herr Wagner.",
+  },
+];
+
 const A1Day1GreetingsGrammarPage = () => {
   const navigate = useNavigate();
+  const [knowledgeAnswers, setKnowledgeAnswers] = useState({});
   const isMobile =
     typeof window !== "undefined" ? window.innerWidth < 640 : false;
+  const knowledgeScore = useMemo(
+    () =>
+      knowledgeQuestions.reduce(
+        (score, question) =>
+          score + (knowledgeAnswers[question.id] === question.answer ? 1 : 0),
+        0
+      ),
+    [knowledgeAnswers]
+  );
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -456,6 +493,69 @@ const A1Day1GreetingsGrammarPage = () => {
             Student B: <strong>Mir geht es gut, danke. Und Ihnen?</strong>
           </div>
         </div>
+      </section>
+
+      <section style={cardStyle}>
+        <h2 style={sectionTitleStyle}>7. Knowledge test (instant feedback)</h2>
+        <p style={{ margin: 0 }}>
+          Click one answer for each question and check immediately if it is correct.
+          Score: {knowledgeScore}/{knowledgeQuestions.length}
+        </p>
+
+        {knowledgeQuestions.map((question, index) => {
+          const selectedAnswer = knowledgeAnswers[question.id];
+          const hasAnswered = Boolean(selectedAnswer);
+          const isCorrect = selectedAnswer === question.answer;
+
+          return (
+            <article
+              key={question.id}
+              style={{
+                ...infoCardStyle,
+                display: "grid",
+                gap: 10,
+                borderColor: hasAnswered ? (isCorrect ? "#86efac" : "#fca5a5") : "#e2e8f0",
+                background: hasAnswered ? (isCorrect ? "#f0fdf4" : "#fff1f2") : "#f8fafc",
+              }}
+            >
+              <strong style={{ fontSize: 15 }}>
+                {index + 1}. {question.prompt}
+              </strong>
+              <div style={{ display: "grid", gap: 8 }}>
+                {question.options.map((option) => (
+                  <label
+                    key={option}
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      alignItems: "center",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <input
+                      type="radio"
+                      name={question.id}
+                      value={option}
+                      checked={selectedAnswer === option}
+                      onChange={() =>
+                        setKnowledgeAnswers((prev) => ({ ...prev, [question.id]: option }))
+                      }
+                    />
+                    <span>{option}</span>
+                  </label>
+                ))}
+              </div>
+
+              {hasAnswered ? (
+                <div style={{ fontWeight: 600, color: isCorrect ? "#15803d" : "#b91c1c" }}>
+                  {isCorrect
+                    ? "✅ Correct!"
+                    : `❌ Wrong. Correct answer: ${question.answer}`}
+                </div>
+              ) : null}
+            </article>
+          );
+        })}
       </section>
     </main>
   );
