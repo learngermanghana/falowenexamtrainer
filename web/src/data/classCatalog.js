@@ -63,15 +63,15 @@ const classCatalogDictionary = {
     docId: "1YICRJEY4i0dJOZd6NdYOb3pAuKsQC091",
   },
   "A1 Leipzig Klasse": {
-    startDate: "2026-04-03",
-    orientationDate: "2026-04-03",
+    startDate: "2026-04-04",
+    orientationDate: "2026-04-04",
     endDate: "2026-05-29",
     schedule: [
       { day: "Friday", startTime: "18:00", endTime: "19:00" },
       { day: "Saturday", startTime: "08:00", endTime: "09:00" },
     ],
     docUrl:
-      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-04-03&defaultWeekdays=Friday%2CSaturday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
+      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-04-04&defaultWeekdays=Thursday%2CFriday%2CSaturday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "A2 Freiburg Klasse": {
     orientationDate: "2026-04-23",
