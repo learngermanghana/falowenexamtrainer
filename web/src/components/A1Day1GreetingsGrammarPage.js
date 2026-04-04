@@ -89,57 +89,21 @@ const knowledgeQuestions = [
   },
   {
     id: "q2",
-    prompt: "You are greeting a classmate in the afternoon. Which option is informal?",
-    options: ["Hallo!", "Guten Tag, Herr Koch.", "Guten Abend, Frau Koch."],
-    answer: "Hallo!",
-  },
-  {
-    id: "q3",
-    prompt: "Which title is correct for a man in a formal situation?",
-    options: ["Herr Müller", "Frau Müller", "Hallo Müller"],
-    answer: "Herr Müller",
-  },
-  {
-    id: "q4",
-    prompt: "You do not know the person's name. Which polite start is correct?",
-    options: ["Entschuldigen Sie, bitte...", "Hey du!", "Wie geht es du?"],
-    answer: "Entschuldigen Sie, bitte...",
-  },
-  {
-    id: "q5",
-    prompt: "Which goodbye fits a formal situation?",
-    options: ["Tschüss, Anna!", "Auf Wiedersehen, Herr Wagner.", "Bis später, Tom!"],
-    answer: "Auf Wiedersehen, Herr Wagner.",
-  },
-  {
-    id: "q6",
-    prompt: "Which phrase means 'see you later'?",
-    options: ["Gute Nacht", "Bis später", "Auf Wiedersehen"],
-    answer: "Bis später",
-  },
-  {
-    id: "q7",
     prompt: "Choose the correct formal question:",
     options: ["Wie geht es Ihnen?", "Wie geht es dir?", "Wie geht's du?"],
     answer: "Wie geht es Ihnen?",
   },
   {
-    id: "q8",
-    prompt: "Choose the correct informal question:",
-    options: ["Wie geht es Ihnen?", "Wie geht es dir?", "Wie geht Ihnen?"],
-    answer: "Wie geht es dir?",
-  },
-  {
-    id: "q9",
+    id: "q3",
     prompt: "Your friend says: 'Wie geht's?' Which answer is correct?",
     options: ["Mir geht es gut, danke.", "Auf Wiedersehen.", "Herr Müller."],
     answer: "Mir geht es gut, danke.",
   },
   {
-    id: "q10",
-    prompt: "Choose the best follow-up for a formal conversation:",
-    options: ["Und dir?", "Und Ihnen?", "Bis später?"],
-    answer: "Und Ihnen?",
+    id: "q4",
+    prompt: "Which goodbye fits a formal situation?",
+    options: ["Tschüss, Anna!", "Auf Wiedersehen, Herr Wagner.", "Bis später, Tom!"],
+    answer: "Auf Wiedersehen, Herr Wagner.",
   },
 ];
 
