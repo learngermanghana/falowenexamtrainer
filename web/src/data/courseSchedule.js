@@ -481,8 +481,8 @@ const RAW_COURSE_SCHEDULES = {
       grammar_topic: "Formal and Informal Greetings",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/NmaHd9xsGvw",
-        youtube_link: "https://youtu.be/NmaHd9xsGvw",
+        video: "https://youtu.be/agLMhFFu65I",
+        youtube_link: "https://youtu.be/agLMhFFu65I",
         grammarbook_link: "/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1",
         workbook_link: "/campus/course/a1-day-1-greetings-workbook",
         assignment: true,
