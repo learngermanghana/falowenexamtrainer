@@ -105,6 +105,42 @@ const knowledgeQuestions = [
     options: ["Tschüss, Anna!", "Auf Wiedersehen, Herr Wagner.", "Bis später, Tom!"],
     answer: "Auf Wiedersehen, Herr Wagner.",
   },
+  {
+    id: "q5",
+    prompt: "You see your classmate in the afternoon. Which greeting is best?",
+    options: ["Guten Abend, Frau Weber.", "Hallo, Mia!", "Auf Wiedersehen!"],
+    answer: "Hallo, Mia!",
+  },
+  {
+    id: "q6",
+    prompt: "Choose the correct formal title + name:",
+    options: ["Frau Lukas", "Herr Schneider", "Herr Anna"],
+    answer: "Herr Schneider",
+  },
+  {
+    id: "q7",
+    prompt: "Which sentence means “How are you?” in a formal situation?",
+    options: ["Wie geht es Ihnen?", "Wie geht es dir?", "Und dir?"],
+    answer: "Wie geht es Ihnen?",
+  },
+  {
+    id: "q8",
+    prompt: "Which response is best for “Wie geht's?”",
+    options: ["Mir geht es gut, danke.", "Guten Morgen, Frau Klein.", "Bis später!"],
+    answer: "Mir geht es gut, danke.",
+  },
+  {
+    id: "q9",
+    prompt: "Choose the correct way to say “And you?” to a friend:",
+    options: ["Und Ihnen?", "Und dir?", "Auf Wiedersehen?"],
+    answer: "Und dir?",
+  },
+  {
+    id: "q10",
+    prompt: "It is late at night and your family is going to sleep. What do you say?",
+    options: ["Gute Nacht.", "Guten Tag.", "Bis später."],
+    answer: "Gute Nacht.",
+  },
 ];
 
 const A1Day1GreetingsGrammarPage = () => {
