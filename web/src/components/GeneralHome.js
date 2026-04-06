@@ -283,48 +283,6 @@ const GeneralHome = ({
         ) : null}
       </section>
 
-      <section
-        style={{
-          ...styles.card,
-          backgroundImage:
-            "linear-gradient(110deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)), url('/learning-space-hero.svg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      >
-        <SectionHeader
-          eyebrow={t("generalHome.learningSpace.eyebrow")}
-          title={t("generalHome.learningSpace.title")}
-          subtitle={t("generalHome.learningSpace.subtitle")}
-        />
-      </section>
-
-      <section style={{ ...styles.card, padding: 0, overflow: "hidden" }}>
-        <button
-          type="button"
-          onClick={() => {
-            playOpenFeedback();
-            navigate("/campus/discussion");
-          }}
-          style={{
-            border: "none",
-            padding: 0,
-            margin: 0,
-            display: "block",
-            width: "100%",
-            background: "transparent",
-            cursor: "pointer",
-          }}
-          aria-label="Open group discussion"
-        >
-          <img
-            src="/learning-space-hero.svg"
-            alt="Open group discussion"
-            style={{ display: "block", width: "100%", height: "auto" }}
-          />
-        </button>
-      </section>
-
       <div style={styles.gridTwo}>
         <section
           style={{
