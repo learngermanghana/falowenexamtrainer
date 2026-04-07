@@ -821,8 +821,8 @@ const RAW_COURSE_SCHEDULES = {
         "For your first letter, open Letter Writing 12.3 and complete the drag-and-drop template first (fill the missing parts of the letter). Then copy the full letter by yourself and submit it using your normal assignment flow.",
       grammar_topic: "Formal and Informal Letter",
       schreiben_sprechen: {
-        video: "https://youtu.be/2iJQFYGUqRE",
-        youtube_link: "https://youtu.be/2iJQFYGUqRE",
+        video: "https://youtu.be/JtgoO2fmOpU",
+        youtube_link: "https://youtu.be/JtgoO2fmOpU",
         workbook_link: "https://www.falowen.app/campus/course/letter-writing-intro-german-a1-day-12-3",
         assignment: true,
       },
