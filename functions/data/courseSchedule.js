@@ -273,7 +273,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Verbs and Adjectives with Prepositions",
     video: "https://youtu.be/r4se8KuS8cA",
     youtube_link: "https://youtu.be/r4se8KuS8cA",
-    grammarbook_link: "https://drive.google.com/file/d/1BiAyDazBR3lTplP7D2yjaYmEm2btUT1D/view?usp=sharing",
+    grammarbook_link: "/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1G_sRFKG9Qt5nc0Zyfnax-0WXSMmbWB70/view?usp=sharing",
   },
   {
