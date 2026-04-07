@@ -264,16 +264,17 @@ const A2_SCHEDULE = [
   },
   {
     day: 15,
-    topic: "Mein Lieblingssport 6.15",
+    topic: "Mein Lieblingssport (Exercise) 6.15",
     chapter: "6.15",
     assignment: true,
-    goal: "Talk about your favorite sport.",
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    goal: "Describe your favorite sport, training habits, and health benefits with clear A2-level communication.",
+    instruction:
+      "Watch the recommended listening/video material, review grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "seit + Dativ + Präsens",
-    video: "",
-    youtube_link: "",
+    video: "https://drive.google.com/file/d/14LiB4PoqdHlzzmJyJQHJ7n--v6iVddVh/view?usp=sharing",
+    youtube_link: "https://drive.google.com/file/d/14LiB4PoqdHlzzmJyJQHJ7n--v6iVddVh/view?usp=sharing",
     grammarbook_link: "/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1iiExhUj66r5p0SJZfV7PsmCWOyaF360s/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-15-mein-lieblingssport-workbook",
   },
   {
     day: 16,
