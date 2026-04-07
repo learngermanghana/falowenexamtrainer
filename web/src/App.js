@@ -68,6 +68,7 @@ import A2Day12MeinTraumberufGrammarPage from "./components/A2Day12MeinTraumberuf
 import A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage from "./components/A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage";
 import A2Day14BerufUndKarriereUmZuGrammarPage from "./components/A2Day14BerufUndKarriereUmZuGrammarPage";
 import A2Day15MeinLieblingssportSeitDativGrammarPage from "./components/A2Day15MeinLieblingssportSeitDativGrammarPage";
+import A2Day16WohlbefindenReflexiveVerbenGrammarPage from "./components/A2Day16WohlbefindenReflexiveVerbenGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
@@ -812,6 +813,10 @@ const AppShell = ({
           <Route
             path="/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes"
             element={<A2Day15MeinLieblingssportSeitDativGrammarPage />}
+          />
+          <Route
+            path="/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes"
+            element={<A2Day16WohlbefindenReflexiveVerbenGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
