@@ -627,8 +627,7 @@ const A1LetterWritingQuestionBookPage = () => {
     () => [
       "Warum schreiben Sie?",
       "Gratulieren Sie ihm / ihr.",
-      "Fragen Sie, ob er / sie eine Feier plant.",
-      "Fragen Sie, ob Sie mit Ihrer Familie kommen können.",
+      "Fragen Sie, ob er / sie eine Feier plant und ob Sie mit Ihrer Familie kommen können.",
     ],
     []
   );
@@ -649,8 +648,7 @@ const A1LetterWritingQuestionBookPage = () => {
     () => [
       "Warum schreiben Sie?",
       "Bitten Sie um Informationen über Kurse.",
-      "Fragen Sie nach Kursterminen.",
-      "Fragen Sie nach Preisen und Zahlungsmethoden.",
+      "Fragen Sie nach Kursterminen, Preisen und Zahlungsmethoden.",
     ],
     []
   );
