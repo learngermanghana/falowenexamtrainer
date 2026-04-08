@@ -311,7 +311,7 @@ const A1TimeAndDatesGrammarPage = () => {
               headers={["Time", "German"]}
               rows={[
                 ["00:00", "Mitternacht / null Uhr"],
-                ["01:00", "ein Uhr"],
+                ["01:00", "eins Uhr"],
                 ["08:00", "acht Uhr"],
                 ["12:00", "Mittag / zwölf Uhr"],
                 ["13:00", "dreizehn Uhr"],
