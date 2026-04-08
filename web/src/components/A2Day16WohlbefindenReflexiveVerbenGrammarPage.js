@@ -152,6 +152,12 @@ const A2Day16WohlbefindenReflexiveVerbenGrammarPage = () => {
               <li>
                 <strong>Ich wasche mir die Hände.</strong> (Dativ reflexive pronoun + extra object in Akkusativ)
               </li>
+              <li>
+                <strong>Du merkst dir den Termin.</strong> (Dativ reflexive pronoun + Akkusativ object)
+              </li>
+              <li>
+                <strong>Wir machen uns einen Tee.</strong> (Dativ reflexive pronoun + Akkusativ object)
+              </li>
             </ul>
             <p style={{ margin: 0 }}>
               Quick comparison: <strong>mich</strong> is accusative, <strong>mir</strong> is dative.
@@ -163,18 +169,23 @@ const A2Day16WohlbefindenReflexiveVerbenGrammarPage = () => {
               <li>
                 <strong>sich entspannen</strong> → Ich entspanne <strong>mich</strong> nach der Arbeit.
               </li>
+              <li>→ Nach dem Kurs entspannen wir <strong>uns</strong> im Park.</li>
               <li>
                 <strong>sich erholen</strong> → Wir erholen <strong>uns</strong> am See.
               </li>
+              <li>→ Er erholt <strong>sich</strong> am Wochenende zu Hause.</li>
               <li>
                 <strong>sich ausruhen</strong> → Du ruhst <strong>dich</strong> heute aus.
               </li>
+              <li>→ Ich ruhe <strong>mich</strong> nach dem Sport aus.</li>
               <li>
                 <strong>sich wohlfühlen</strong> → Sie fühlt <strong>sich</strong> zu Hause wohl.
               </li>
+              <li>→ Fühlt ihr <strong>euch</strong> in der neuen Wohnung wohl?</li>
               <li>
                 <strong>sich konzentrieren (auf + Akk.)</strong> → Ich konzentriere <strong>mich</strong> auf meine Atmung.
               </li>
+              <li>→ Bitte konzentriert <strong>euch</strong> auf die Übung.</li>
             </ul>
           </SectionCard>
 

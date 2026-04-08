@@ -166,6 +166,15 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
           </p>
 
           <h3 style={sectionTitle}>Zentrales Thema: „Wohlbefinden, Entspannung &amp; Gesundheit“</h3>
+          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+            <strong>💬 Frage des Tages</strong>
+            <p style={{ margin: 0, lineHeight: 1.6 }}>
+              Was machen Sie für Ihr Wohlbefinden, Ihre Entspannung und Ihre Gesundheit?
+            </p>
+            <p style={{ margin: 0 }}>
+              <strong>Vier Schlüsselwörter:</strong> Sport · Schlaf · gesunde Ernährung · Freizeit
+            </p>
+          </div>
           <ol style={listSpacing}>
             <li>
               <strong>Körperliches Wohlbefinden (Physical Well-being)</strong>
