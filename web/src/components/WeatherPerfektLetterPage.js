@@ -341,7 +341,7 @@ const WeatherPerfektLetterPage = () => {
 
       <section style={cardStyle} className="falowen-section hoverCard">
         <h1 style={{ margin: 0 }}>
-          Chapter 13: Weather + Seasons + Dates/Time + Simple Letter Writing (A1)
+          Day 21 · Chapter 13: Weather + Seasons + Dates/Time + Simple Letter Writing (A1)
         </h1>
 
         <p style={{ margin: 0, lineHeight: 1.65 }}>
@@ -392,9 +392,9 @@ const WeatherPerfektLetterPage = () => {
       </section>
 
       <section style={cardStyle} className="falowen-section hoverCard">
-        <h2 style={{ margin: 0 }}>1.1) How to ask for the weather (A1)</h2>
+        <h2 style={{ margin: 0, fontSize: 30 }}>1.1) How to ask for the weather (A1)</h2>
 
-        <div style={noteStyle}>
+        <div style={{ ...noteStyle, fontSize: 16 }}>
           <strong>Simple questions:</strong>
           <div>• Wie ist das Wetter? (How is the weather?)</div>
           <div>• Wie ist das Wetter heute? (How is the weather today?)</div>
@@ -437,10 +437,10 @@ const WeatherPerfektLetterPage = () => {
         <div style={boxStyle}>
           <strong>Seasons:</strong>
           <ul style={listStyle}>
-            <li>der Frühling</li>
-            <li>der Sommer</li>
-            <li>der Herbst</li>
-            <li>der Winter</li>
+            <li>der Frühling (spring)</li>
+            <li>der Sommer (summer)</li>
+            <li>der Herbst (autumn / fall)</li>
+            <li>der Winter (winter)</li>
           </ul>
 
           <strong>Months:</strong>
@@ -472,6 +472,21 @@ const WeatherPerfektLetterPage = () => {
         </div>
 
         <div style={boxStyle}>
+          <h3 style={{ marginTop: 0 }}>Präteritum vs. Perfekt (quick idea)</h3>
+          <p style={{ marginTop: 0 }}>
+            In A1, we focus on <strong>Perfekt</strong> because it is the most common
+            past tense in spoken German. <strong>Präteritum</strong> is also past tense,
+            but you will often see it in books, stories, and with some common verbs.
+          </p>
+          <ul style={listStyle}>
+            <li>
+              <strong>Präteritum:</strong> Ich aß. (I ate.)
+            </li>
+            <li>
+              <strong>Perfekt:</strong> Ich habe gegessen. (I have eaten / I ate.)
+            </li>
+          </ul>
+
           <h3 style={{ marginTop: 0 }}>Statements using "haben" and "sein"</h3>
 
           <h4 style={{ marginBottom: 8 }}>1) Overview of Perfekt</h4>

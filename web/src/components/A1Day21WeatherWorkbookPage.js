@@ -196,6 +196,18 @@ const A1ReadingPage = () => {
             <li>Warum können Sie nicht kommen? (Wetter-Grund)</li>
             <li>Was schlagen Sie vor?</li>
           </ul>
+
+          <p style={{ marginBottom: 6 }}>
+            <strong>Introduction tip (Termin absagen):</strong>{" "}
+            Ich schreibe Ihnen, weil ich den Termin absagen möchte.
+          </p>
+          <p style={{ marginBottom: 6 }}>
+            <strong>Request tip:</strong> Könnten wir einen anderen Termin vereinbaren?
+          </p>
+          <p style={{ marginBottom: 0 }}>
+            <strong>Body tip:</strong> Schreiben Sie im Hauptteil über das Wetter
+            (z. B. starker Regen, Sturm oder Schnee) als Grund.
+          </p>
         </div>
       </section>
 
