@@ -198,11 +198,11 @@ const A1ReadingPage = () => {
           </ul>
 
           <p style={{ marginBottom: 6 }}>
-            <strong>Introduction tip (Termin absagen):</strong>{" "}
-            Ich schreibe Ihnen, weil ich den Termin absagen möchte.
+            <strong>Introduction tip (canceling an exam appointment):</strong>{" "}
+            Always use this reason when canceling an exam appointment: Ich schreibe Ihnen, weil ich den Termin absagen möchte.
           </p>
           <p style={{ marginBottom: 6 }}>
-            <strong>Request tip:</strong> Könnten wir einen anderen Termin vereinbaren?
+            <strong>Request tip (English):</strong> Use this request: Könnten wir einen anderen Termin vereinbaren?
           </p>
           <p style={{ marginBottom: 0 }}>
             <strong>Body tip:</strong> Schreiben Sie im Hauptteil über das Wetter
