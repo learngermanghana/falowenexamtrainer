@@ -17,6 +17,16 @@ const heroImageStyle = {
   borderRadius: 12,
   border: "1px solid rgba(148,163,184,0.35)",
 };
+const compareTableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+};
+const compareCellStyle = {
+  textAlign: "left",
+  padding: "8px 10px",
+  borderBottom: "1px solid rgba(148,163,184,0.35)",
+  verticalAlign: "top",
+};
 
 const SectionCard = ({ title, children }) => (
   <section style={cardStyle} aria-label={title}>
@@ -63,16 +73,89 @@ const A2Day16WohlbefindenReflexiveVerbenGrammarPage = () => {
             </div>
           </SectionCard>
 
-          <SectionCard title="2) Reflexive pronouns (A2)">
+          <SectionCard title="2) Reflexive pronouns: accusative and dative (A2)">
+            <p style={{ margin: 0 }}>
+              In A2, you mostly see reflexive pronouns in the <strong>accusative</strong>. But with some verbs or
+              sentence structures, you also need the <strong>dative</strong> form.
+            </p>
+            <div style={{ overflowX: "auto" }}>
+              <table style={compareTableStyle}>
+                <thead>
+                  <tr>
+                    <th style={compareCellStyle}>Person</th>
+                    <th style={compareCellStyle}>Akkusativ</th>
+                    <th style={compareCellStyle}>Dativ</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={compareCellStyle}>ich</td>
+                    <td style={compareCellStyle}>
+                      <strong>mich</strong>
+                    </td>
+                    <td style={compareCellStyle}>
+                      <strong>mir</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={compareCellStyle}>du</td>
+                    <td style={compareCellStyle}>
+                      <strong>dich</strong>
+                    </td>
+                    <td style={compareCellStyle}>
+                      <strong>dir</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={compareCellStyle}>er/sie/es</td>
+                    <td style={compareCellStyle}>
+                      <strong>sich</strong>
+                    </td>
+                    <td style={compareCellStyle}>
+                      <strong>sich</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={compareCellStyle}>wir</td>
+                    <td style={compareCellStyle}>
+                      <strong>uns</strong>
+                    </td>
+                    <td style={compareCellStyle}>
+                      <strong>uns</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={compareCellStyle}>ihr</td>
+                    <td style={compareCellStyle}>
+                      <strong>euch</strong>
+                    </td>
+                    <td style={compareCellStyle}>
+                      <strong>euch</strong>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={compareCellStyle}>sie/Sie</td>
+                    <td style={compareCellStyle}>
+                      <strong>sich</strong>
+                    </td>
+                    <td style={compareCellStyle}>
+                      <strong>sich</strong>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <ul style={listStyle}>
-              <li>ich → <strong>mich</strong></li>
-              <li>du → <strong>dich</strong></li>
-              <li>er/sie/es → <strong>sich</strong></li>
-              <li>wir → <strong>uns</strong></li>
-              <li>ihr → <strong>euch</strong></li>
-              <li>sie/Sie → <strong>sich</strong></li>
+              <li>
+                <strong>Ich entspanne mich.</strong> (Akkusativ: no extra object)
+              </li>
+              <li>
+                <strong>Ich wasche mir die Hände.</strong> (Dativ reflexive pronoun + extra object in Akkusativ)
+              </li>
             </ul>
-            <p style={{ margin: 0 }}>These are the most common accusative reflexive pronouns for A2.</p>
+            <p style={{ margin: 0 }}>
+              Quick comparison: <strong>mich</strong> is accusative, <strong>mir</strong> is dative.
+            </p>
           </SectionCard>
 
           <SectionCard title="3) Common reflexive verbs for wellbeing">

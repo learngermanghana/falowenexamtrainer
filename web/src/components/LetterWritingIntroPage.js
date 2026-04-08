@@ -728,6 +728,24 @@ const A1LetterWritingQuestionBookPage = () => {
         </div>
       </Section>
 
+      <Section title="Watch first (A1 Day 20 • Introduction to Letter Writing 12.3)">
+        <InfoBox title="Video ansehen">
+          <div style={{ display: "grid", gap: 10 }}>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Before writing, watch this explanation video for chapter <strong>12.3</strong>:
+            </p>
+            <a
+              href="https://youtu.be/JtgoO2fmOpU"
+              target="_blank"
+              rel="noreferrer"
+              style={{ ...styles.secondaryButton, width: "fit-content", textDecoration: "none" }}
+            >
+              ▶ Video öffnen
+            </a>
+          </div>
+        </InfoBox>
+      </Section>
+
       <Section title="Teil 1 Practice — Formular (Bodensee-Rundfahrt)">
         <InfoBox title="Practice scenario">
           <div style={scenarioTextStyle}>{TEIL1_SCENARIO_TEXT}</div>
