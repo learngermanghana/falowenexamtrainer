@@ -111,6 +111,8 @@ const paragraph = {
   margin: 0,
   lineHeight: 1.65,
 };
+const prefixMarkStyle = { color: "#1d4ed8", fontWeight: 700 };
+const stemMarkStyle = { color: "#b45309", fontWeight: 700 };
 
 const Section = ({ title, subtitle, children }) => (
   <section style={card}>
@@ -1070,22 +1072,74 @@ export const WeekTimeSeparableGrammarBook = () => {
           <div style={{ display: "grid", gap: 8 }}>
             <div>A separable verb has two parts:</div>
             <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
-              <li>prefix</li>
-              <li>main verb</li>
+              <li>
+                <span style={prefixMarkStyle}>prefix</span>
+              </li>
+              <li>
+                <span style={stemMarkStyle}>main verb (stem)</span>
+              </li>
             </ul>
             <div>
-              Example: <strong>aufstehen</strong> = to get up
+              Example:{" "}
+              <strong>
+                <span style={prefixMarkStyle}>auf</span>
+                <span style={stemMarkStyle}>stehen</span>
+              </strong>{" "}
+              = to get up
             </div>
+          </div>
+        </Callout>
+
+        <Callout title="Common separable prefixes (A1 starter list)">
+          <div style={{ display: "grid", gap: 8 }}>
+            <div>Learn these first because you meet them often in daily routine verbs:</div>
+            <ChipRow items={["ab-", "an-", "auf-", "aus-", "ein-", "fern-", "mit-", "vor-", "zu-"]} />
           </div>
         </Callout>
 
         <Table
           headers={["Infinitive", "Meaning", "Sentence"]}
           rows={[
-            ["aufstehen", "to get up", "Ich stehe um sechs Uhr auf."],
-            ["einkaufen", "to shop", "Wir kaufen am Samstag ein."],
-            ["anrufen", "to call", "Ich rufe meine Mutter an."],
-            ["fernsehen", "to watch TV", "Er sieht am Abend fern."],
+            [
+              <>
+                <span style={prefixMarkStyle}>auf</span>
+                <span style={stemMarkStyle}>stehen</span>
+              </>,
+              "to get up",
+              <>
+                Ich stehe um sechs Uhr <span style={prefixMarkStyle}>auf</span>.
+              </>,
+            ],
+            [
+              <>
+                <span style={prefixMarkStyle}>ein</span>
+                <span style={stemMarkStyle}>kaufen</span>
+              </>,
+              "to shop",
+              <>
+                Wir kaufen am Samstag <span style={prefixMarkStyle}>ein</span>.
+              </>,
+            ],
+            [
+              <>
+                <span style={prefixMarkStyle}>an</span>
+                <span style={stemMarkStyle}>rufen</span>
+              </>,
+              "to call",
+              <>
+                Ich rufe meine Mutter <span style={prefixMarkStyle}>an</span>.
+              </>,
+            ],
+            [
+              <>
+                <span style={prefixMarkStyle}>fern</span>
+                <span style={stemMarkStyle}>sehen</span>
+              </>,
+              "to watch TV",
+              <>
+                Er sieht am Abend <span style={prefixMarkStyle}>fern</span>.
+              </>,
+            ],
           ]}
         />
 
@@ -1105,10 +1159,42 @@ export const WeekTimeSeparableGrammarBook = () => {
           <Table
             headers={["Infinitive", "Simple sentence"]}
             rows={[
-              ["aufstehen", "Ich stehe früh auf."],
-              ["anrufen", "Du rufst deine Freundin an."],
-              ["einkaufen", "Wir kaufen heute ein."],
-              ["fernsehen", "Sie sehen am Abend fern."],
+              [
+                <>
+                  <span style={prefixMarkStyle}>auf</span>
+                  <span style={stemMarkStyle}>stehen</span>
+                </>,
+                <>
+                  Ich stehe früh <span style={prefixMarkStyle}>auf</span>.
+                </>,
+              ],
+              [
+                <>
+                  <span style={prefixMarkStyle}>an</span>
+                  <span style={stemMarkStyle}>rufen</span>
+                </>,
+                <>
+                  Du rufst deine Freundin <span style={prefixMarkStyle}>an</span>.
+                </>,
+              ],
+              [
+                <>
+                  <span style={prefixMarkStyle}>ein</span>
+                  <span style={stemMarkStyle}>kaufen</span>
+                </>,
+                <>
+                  Wir kaufen heute <span style={prefixMarkStyle}>ein</span>.
+                </>,
+              ],
+              [
+                <>
+                  <span style={prefixMarkStyle}>fern</span>
+                  <span style={stemMarkStyle}>sehen</span>
+                </>,
+                <>
+                  Sie sehen am Abend <span style={prefixMarkStyle}>fern</span>.
+                </>,
+              ],
             ]}
           />
         </Callout>
