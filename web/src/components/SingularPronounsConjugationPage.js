@@ -82,59 +82,38 @@ const optionButtonBaseStyle = {
 
 const pronouns = [
   ["ich", "I"],
-  ["du", "you (informal, one person)"],
+  ["du", "you"],
   ["er", "he"],
   ["sie", "she"],
   ["es", "it"],
-  ["wir", "we"],
-  ["ihr", "you (informal plural)"],
-  ["sie", "they"],
-  ["Sie", "you (formal)"],
 ];
 
 const conjugationRows = [
-  ["ich", "heiße", "wohne", "arbeite", "komme"],
-  ["du", "heißt", "wohnst", "arbeitest", "kommst"],
-  ["er/sie/es", "heißt", "wohnt", "arbeitet", "kommt"],
-  ["wir", "heißen", "wohnen", "arbeiten", "kommen"],
-  ["ihr", "heißt", "wohnt", "arbeitet", "kommt"],
-  ["sie/Sie", "heißen", "wohnen", "arbeiten", "kommen"],
+  ["ich", "heiße", "wohne", "komme", "arbeite"],
+  ["du", "heißt", "wohnst", "kommst", "arbeitest"],
+  ["er", "heißt", "wohnt", "kommt", "arbeitet"],
+  ["sie", "heißt", "wohnt", "kommt", "arbeitet"],
+  ["es", "heißt", "wohnt", "kommt", "arbeitet"],
 ];
 
 const knowledgeCheckQuestions = [
   {
     id: "k1",
-    question: '1. Which sentence is correct for "you live in Berlin" (informal, one person)?',
-    options: ["A) Du wohnt in Berlin.", "B) Du wohnen in Berlin.", "C) Du wohnst in Berlin."],
-    answer: "C) Du wohnst in Berlin.",
+    question: "1. Which sentence is correct?",
+    options: ["A) Ich heißt Kojo.", "B) Ich heiße Kojo.", "C) Ich heißen Kojo."],
+    answer: "B) Ich heiße Kojo.",
   },
   {
     id: "k2",
-    question: '2. Complete: Ich ___ aus Ghana.',
-    options: ["A) komme", "B) kommst", "C) kommt"],
-    answer: "A) komme",
+    question: "2. Complete: Du ___ in Accra.",
+    options: ["A) wohnst", "B) wohnt", "C) wohnen"],
+    answer: "A) wohnst",
   },
   {
     id: "k3",
-    question: '3. Why do we write "du heißt" and not "du heißst"?',
-    options: [
-      "A) Because du never takes an ending.",
-      "B) Because the stem already ends in ß, so we do not add another s before -t.",
-      "C) Because heißen is irregular in all forms.",
-    ],
-    answer: "B) Because the stem already ends in ß, so we do not add another s before -t.",
-  },
-  {
-    id: "k4",
-    question: '4. Choose the correct sentence for "they work in Hamburg."',
-    options: ["A) Sie arbeitet in Hamburg.", "B) Sie arbeiten in Hamburg.", "C) Sie arbeitest in Hamburg."],
-    answer: "B) Sie arbeiten in Hamburg.",
-  },
-  {
-    id: "k5",
-    question: '5. Complete: Wir ___ in Köln.',
-    options: ["A) wohne", "B) wohnt", "C) wohnen"],
-    answer: "C) wohnen",
+    question: "3. Complete: Er ___ aus Deutschland.",
+    options: ["A) kommen", "B) kommst", "C) kommt"],
+    answer: "C) kommt",
   },
 ];
 
@@ -183,7 +162,7 @@ const KnowledgeCheck = ({ questions }) => {
     <section style={sectionStyle}>
       <h2 style={{ margin: 0 }}>Knowledge Check</h2>
       <p style={{ margin: 0 }}>
-        Answer the questions to check your understanding of personal pronouns and verb conjugation.
+        Answer these short questions to check your understanding.
       </p>
 
       <div style={{ display: "grid", gap: 12 }}>
@@ -221,10 +200,10 @@ const KnowledgeCheck = ({ questions }) => {
               {selected ? (
                 <div style={selected === item.answer ? successBoxStyle : warningBoxStyle}>
                   {selected === item.answer ? (
-                    <p style={{ margin: 0 }}>✅ Correct. Well done.</p>
+                    <p style={{ margin: 0 }}>✅ Correct.</p>
                   ) : (
                     <>
-                      <p style={{ margin: 0 }}>❌ Not quite.</p>
+                      <p style={{ margin: 0 }}>❌ Not correct.</p>
                       <p style={{ margin: 0 }}>
                         Correct answer: <strong>{item.answer}</strong>
                       </p>
@@ -238,14 +217,14 @@ const KnowledgeCheck = ({ questions }) => {
       </div>
 
       <div style={tipBoxStyle}>
-        <strong>Your progress</strong>
+        <strong>Your score</strong>
         <p style={{ margin: 0 }}>
-          Score: <strong>{score}</strong> / {questions.length}
+          {score} / {questions.length}
         </p>
         <p style={{ margin: 0 }}>
           {allAnswered
-            ? "Great work. You can change any answer to practice again."
-            : "Pick one answer for each question to get your full score."}
+            ? "Good job. You can change your answers and try again."
+            : "Answer all questions to see your full score."}
         </p>
       </div>
     </section>
@@ -258,26 +237,38 @@ const SingularPronounsConjugationPage = () => {
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
+        <button
+          style={{ ...styles.secondaryButton, width: "fit-content" }}
+          onClick={() => navigate("/campus/course")}
+        >
           Back to Course
         </button>
 
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 2 · Kapitel 1.1 Grammar Notes</h1>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>
+          A1 · Day 2 · Kapitel 1.1 Grammar Notes
+        </h1>
 
-        <p style={{ ...styles.subtitle, margin: 0 }}>Personal Pronouns + Verb Conjugation (Präsens)</p>
+        <p style={{ ...styles.subtitle, margin: 0 }}>
+          Personal Pronouns + Verb Conjugation (Präsens)
+        </p>
 
         <img
           src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1400&q=80"
-          alt="A German learner studying grammar notes in a notebook"
+          alt="A learner studying German grammar notes"
           style={imageStyle}
         />
 
-        <p style={captionStyle}>Focus verbs for today: heißen, wohnen, arbeiten, kommen.</p>
+        <p style={captionStyle}>
+          Focus verbs for today: heißen, wohnen, kommen, arbeiten.
+        </p>
       </header>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>1) Personal Pronouns (Nominativ)</h2>
-        <p style={{ margin: 0 }}>These pronouns are the subject of the sentence (who does the action).</p>
+        <h2 style={{ margin: 0 }}>1) Personal Pronouns</h2>
+        <p style={{ margin: 0 }}>
+          Personal pronouns show who does the action in the sentence.
+        </p>
+
         <ul style={listStyle}>
           {pronouns.map(([word, meaning]) => (
             <li key={`${word}-${meaning}`}>
@@ -288,8 +279,10 @@ const SingularPronounsConjugationPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>2) Verb Conjugation in the Present Tense</h2>
-        <p style={{ margin: 0 }}>The verb ending changes based on the pronoun.</p>
+        <h2 style={{ margin: 0 }}>2) Verb Conjugation</h2>
+        <p style={{ margin: 0 }}>
+          The verb changes to match the pronoun.
+        </p>
 
         <div style={{ overflowX: "auto" }}>
           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 700 }}>
@@ -298,8 +291,8 @@ const SingularPronounsConjugationPage = () => {
                 <th style={tableCellStyle}>Pronoun</th>
                 <th style={tableCellStyle}>heißen</th>
                 <th style={tableCellStyle}>wohnen</th>
-                <th style={tableCellStyle}>arbeiten</th>
                 <th style={tableCellStyle}>kommen</th>
+                <th style={tableCellStyle}>arbeiten</th>
               </tr>
             </thead>
             <tbody>
@@ -315,21 +308,32 @@ const SingularPronounsConjugationPage = () => {
             </tbody>
           </table>
         </div>
+
+        <div style={tipBoxStyle}>
+          <strong>Quick pattern</strong>
+          <p style={{ margin: 0 }}>
+            <strong>ich</strong> → <strong>-e</strong>
+          </p>
+          <p style={{ margin: 0 }}>
+            <strong>du</strong> → <strong>-st</strong>
+          </p>
+          <p style={{ margin: 0 }}>
+            <strong>er / sie / es</strong> → <strong>-t</strong>
+          </p>
+        </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>3) Why is it “du heißt” (not “du heißst”)?</h2>
+        <h2 style={{ margin: 0 }}>3) Important Note</h2>
         <div style={tipBoxStyle}>
           <p style={{ margin: 0 }}>
-            The verb <strong>heißen</strong> has the stem <strong>heiß-</strong>.
+            <strong>heißen</strong> becomes <strong>du heißt</strong>.
           </p>
           <p style={{ margin: 0 }}>
-            In the <strong>du</strong> form, many verbs take <strong>-st</strong>. If we added full <strong>-st</strong> here,
-            we would get a difficult cluster (<strong>heißst</strong>). In standard spelling, German writes this as
-            <strong> heißt</strong>.
+            We do <strong>not</strong> write <strong>du heißst</strong>.
           </p>
           <p style={{ margin: 0 }}>
-            So: <strong>du heißt</strong> is correct.
+            Correct form: <strong>du heißt</strong>
           </p>
         </div>
       </section>
@@ -338,19 +342,19 @@ const SingularPronounsConjugationPage = () => {
         <h2 style={{ margin: 0 }}>4) Model Sentences</h2>
         <ul style={listStyle}>
           <li>
-            <strong>Ich heiße</strong> Amina.
+            <strong>Ich heiße</strong> Kojo.
           </li>
           <li>
-            <strong>Du wohnst</strong> in Berlin.
+            <strong>Du wohnst</strong> in Accra.
           </li>
           <li>
-            <strong>Er arbeitet</strong> heute.
+            <strong>Er kommt</strong> aus Deutschland.
           </li>
           <li>
-            <strong>Wir kommen</strong> aus Ghana.
+            <strong>Sie arbeitet</strong> in einer Bank.
           </li>
           <li>
-            <strong>Sie (formal) arbeiten</strong> in Köln.
+            <strong>Es heißt</strong> Falowen.
           </li>
         </ul>
       </section>
