@@ -296,10 +296,10 @@ const A2_SCHEDULE = [
     goal: "Practice calling the bank.",
     assignment: true,
     instruction: "Watch the video, review grammar, and complete your workbook.",
-    grammar_topic: "Notes on Opening a Bank Account in Germany",
+    grammar_topic: "Höfliche Fragen und Bitten",
     video: "https://youtu.be/ahIUVAbsuxU",
     youtube_link: "https://youtu.be/ahIUVAbsuxU",
-    grammarbook_link: "https://drive.google.com/file/d/1qNHtY8MYOXjtBxf6wHi6T_P_X1DGFtPm/view?usp=sharing",
+    grammarbook_link: "/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1GD7cCPU8ZFykcwsFQZuQMi2fiNrvrCPg/view?usp=sharing",
   },
   {
