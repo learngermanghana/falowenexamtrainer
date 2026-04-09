@@ -293,19 +293,19 @@ const A2_SCHEDULE = [
   {
     day: 17,
     topic: "In die Apotheke gehen 6.17",
-    chapter: "11",
-    goal: "Understand instructions and requests in German using the Imperative rule.",
+    chapter: "6.17",
+    goal: "Use modal verbs and question forms to communicate clearly at the pharmacy.",
     assignment: true,
     instruction:
       "Complete Lesen & Hören; your tutor will mark it. Open the speaking exams practice link and try it for self-practice only. Read the exam guide: https://blog.falowen.app/blog/a1-speaking-exam-guide/. Practice speaking exams: https://www.falowen.app/exams.",
     instructionLink: {
-      label: "Open Chapter 11 guide: Directions + Imperative",
-      to: "/campus/course/directions-imperative-11",
+      label: "Open grammar notes: Modalverben + Fragen",
+      to: "/campus/course/modal-verbs-day-14-3-6",
     },
-    grammar_topic: "Imperative (instructions and requests)",
+    grammar_topic: "Modalverben: sollen / können / müssen + W-Fragen / Ja-Nein-Fragen",
     video: "https://youtu.be/PtrlVtdhPVw",
     youtube_link: "https://youtu.be/PtrlVtdhPVw",
-    grammarbook_link: "https://drive.google.com/file/d/1O040UoSuBdy4llTK7MbGIsib63uNNcrV/view?usp=sharing",
+    grammarbook_link: "/campus/course/modal-verbs-day-14-3-6",
     workbook_link: "https://drive.google.com/file/d/1vsdVR_ubbu5gbXnm70vZS5xGFivjBYoA/view?usp=sharing",
   },
   {
