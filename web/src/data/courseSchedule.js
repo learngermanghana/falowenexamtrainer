@@ -292,21 +292,17 @@ const A2_SCHEDULE = [
   },
   {
     day: 17,
-    topic: "In die Apotheke gehen 6.17",
+    topic: "In die Apotheke gehen 6.17 (Exercise)",
     chapter: "6.17",
-    goal: "Use modal verbs and question forms to communicate clearly at the pharmacy.",
+    goal: "Discuss pharmacy vocabulary, symptoms, medications, and pharmacy dialogues with clear A2-level speaking, writing, reading, and listening.",
     assignment: true,
     instruction:
-      "Complete Lesen & Hören; your tutor will mark it. Open the speaking exams practice link and try it for self-practice only. Read the exam guide: https://blog.falowen.app/blog/a1-speaking-exam-guide/. Practice speaking exams: https://www.falowen.app/exams.",
-    instructionLink: {
-      label: "Open grammar notes: Modalverben + Fragen",
-      to: "/campus/course/modal-verbs-day-14-3-6",
-    },
-    grammar_topic: "Modalverben: sollen / können / müssen + W-Fragen / Ja-Nein-Fragen",
+      "Watch the recommended material, review grammar notes, and complete all four workbook parts in-app. Submit final answers in the assignment submission area.",
+    grammar_topic: "Modalverben + W-Fragen/Ja-Nein-Fragen in der Apotheke",
     video: "https://youtu.be/PtrlVtdhPVw",
     youtube_link: "https://youtu.be/PtrlVtdhPVw",
     grammarbook_link: "/campus/course/modal-verbs-day-14-3-6",
-    workbook_link: "https://drive.google.com/file/d/1vsdVR_ubbu5gbXnm70vZS5xGFivjBYoA/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook",
   },
   {
     day: 18,
