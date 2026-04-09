@@ -283,6 +283,16 @@ const SingularPronounsConjugationPage = () => {
         <p style={{ margin: 0 }}>
           The verb changes to match the pronoun.
         </p>
+        <p style={{ margin: 0 }}>
+          This is very important because one word like <strong>sie</strong> can mean
+          <strong> she</strong>, <strong>they</strong>, or formal <strong>you</strong>.
+          If you only see <strong>sie</strong>, you cannot know the meaning by pronoun
+          alone. The verb ending helps you understand who it is.
+        </p>
+        <p style={{ margin: 0 }}>
+          In this lesson, we focus on singular personal pronouns, especially{" "}
+          <strong>ich</strong>, <strong>du</strong>, and <strong>er / sie / es</strong>.
+        </p>
 
         <div style={{ overflowX: "auto" }}>
           <table style={{ borderCollapse: "collapse", width: "100%", minWidth: 700 }}>
@@ -314,6 +324,7 @@ const SingularPronounsConjugationPage = () => {
           <p style={{ margin: 0 }}>
             <strong>ich</strong> → <strong>-e</strong>
           </p>
+          <p style={{ margin: 0 }}>So we use forms like <strong>ich komme</strong> (not <strong>ich kommen</strong>).</p>
           <p style={{ margin: 0 }}>
             <strong>du</strong> → <strong>-st</strong>
           </p>
