@@ -292,21 +292,21 @@ const A2_SCHEDULE = [
   },
   {
     day: 17,
-    topic: "In die Apotheke gehen 6.17",
+    topic: "In die Apotheke gehen 6.17 (Group Practice)",
     chapter: "11",
-    goal: "Understand instructions and requests in German using the Imperative rule.",
+    goal: "Discuss pharmacy situations confidently: symptoms, medications, advice, and pharmacy rules in German.",
     assignment: true,
     instruction:
-      "Complete Lesen & Hören; your tutor will mark it. Open the speaking exams practice link and try it for self-practice only. Read the exam guide: https://blog.falowen.app/blog/a1-speaking-exam-guide/. Practice speaking exams: https://www.falowen.app/exams.",
+      "Use the in-app workbook for all four parts (Sprechen, Schreiben, Lesen, Hören). First watch the recommended video/timer guidance, then complete each section and submit final answers in the assignment area.",
     instructionLink: {
       label: "Open Chapter 11 guide: Directions + Imperative",
       to: "/campus/course/directions-imperative-11",
     },
-    grammar_topic: "Imperative (instructions and requests)",
+    grammar_topic: "Apotheke communication: Symptome, Medikamente, höfliche Beratungssprache",
     video: "https://youtu.be/PtrlVtdhPVw",
     youtube_link: "https://youtu.be/PtrlVtdhPVw",
     grammarbook_link: "https://drive.google.com/file/d/1O040UoSuBdy4llTK7MbGIsib63uNNcrV/view?usp=sharing",
-    workbook_link: "https://drive.google.com/file/d/1vsdVR_ubbu5gbXnm70vZS5xGFivjBYoA/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-17-in-die-apotheke-gehen-workbook",
   },
   {
     day: 18,
