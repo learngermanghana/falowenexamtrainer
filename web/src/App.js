@@ -28,7 +28,7 @@ import TwelveHourClockPage from "./components/TwelveHourClockPage";
 import A1Day12TwentyFourHourClockDatesPage from "./components/A1Day12TwentyFourHourClockDatesPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
 import GermanAlphabetGrammarNotesPage from "./components/GermanAlphabetGrammarNotesPage";
-import PersonenBeschreibenGrammarPage from "./components/PersonenBeschreibenGrammarPage";
+import A1Day3Kapitel12GrammarNotesPage from "./components/A1Day3Kapitel12GrammarNotesPage";
 import ComparingThingsAndPeopleGrammarPage from "./components/ComparingThingsAndPeopleGrammarPage";
 import WoTreffenUnsGrammarPage from "./components/WoTreffenUnsGrammarPage";
 import VerbotenErlaubtPage from "./components/VerbotenErlaubtPage";
@@ -771,7 +771,7 @@ const AppShell = ({
           />
           <Route
             path="/campus/course/personen-beschreiben-1-2-grammar-notes"
-            element={<PersonenBeschreibenGrammarPage />}
+            element={<A1Day3Kapitel12GrammarNotesPage />}
           />
           <Route
             path="/campus/course/dinge-und-personen-vergleichen-1-3-grammar-notes"

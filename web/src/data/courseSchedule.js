@@ -497,8 +497,8 @@ const RAW_COURSE_SCHEDULES = {
       lesen_hören: [
         {
           chapter: "0.2",
-          video: "https://youtu.be/S7n6TlAQRLQ",
-          youtube_link: "https://youtu.be/S7n6TlAQRLQ",
+          video: "https://youtu.be/uhFgKp4WVEc",
+          youtube_link: "https://youtu.be/uhFgKp4WVEc",
           grammarbook_link: "https://www.falowen.app/campus/course/german-alphabet-grammar-notes-day-2",
           assignment: true,
           workbook_link: "/campus/course/a1-day-2-german-alphabet-reviewing-workbook",
@@ -534,7 +534,7 @@ const RAW_COURSE_SCHEDULES = {
           chapter: "1.2",
           video: "https://youtu.be/9CqtP3J5UGo",
           youtube_link: "https://youtu.be/9CqtP3J5UGo",
-          grammarbook_link: "/campus/course/singular-pronouns-verb-conjugation-day-2",
+          grammarbook_link: "/campus/course/personen-beschreiben-1-2-grammar-notes",
           workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
           assignment: true,
         },
