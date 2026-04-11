@@ -575,6 +575,7 @@ const AssignmentSubmissionPage = () => {
   const [resubmissionText, setResubmissionText] = useState("");
   const [resubmissionImprovement, setResubmissionImprovement] = useState("");
   const [resubmissionStatus, setResubmissionStatus] = useState({ loading: false, error: "", success: "" });
+  const [showResubmissionRequestBox, setShowResubmissionRequestBox] = useState(false);
 
   useEffect(() => {
     if (status.error) {
@@ -587,6 +588,12 @@ const AssignmentSubmissionPage = () => {
       triggerInteractionFeedback({ sound: "error" });
     }
   }, [resubmissionStatus.error]);
+
+  useEffect(() => {
+    if (resubmissionStatus.error || resubmissionStatus.success) {
+      setShowResubmissionRequestBox(true);
+    }
+  }, [resubmissionStatus.error, resubmissionStatus.success]);
   const [answerKeyRegistry, setAnswerKeyRegistry] = useState(new Map());
 
   const isGerman = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("de");
@@ -2184,6 +2191,20 @@ const AssignmentSubmissionPage = () => {
           <span style={styles.badge}>{isSelectedLocked && !selectedAssignmentPassed ? "Available" : "Not available"}</span>
         </div>
 
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, width: "100%", justifyContent: "center" }}
+          onClick={() => setShowResubmissionRequestBox((prev) => !prev)}
+        >
+          {showResubmissionRequestBox ? "Hide resubmission request box" : "Request for resubmission"}
+        </button>
+
+        <p style={{ ...styles.helperText, margin: 0, color: "#92400e" }}>
+          Note: resubmission is only for failed assignments. If your assignment is already passed, it will not be marked again.
+        </p>
+
+        {showResubmissionRequestBox ? (
+          <>
         <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
           <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 8, background: !isSelectedLocked ? "#ecfdf5" : "#f9fafb" }}>
             <strong>{isGerman ? "Noch nicht eingereicht" : "Not submitted yet"}</strong>
@@ -2280,6 +2301,8 @@ const AssignmentSubmissionPage = () => {
                 </>}
           </p>
         )}
+          </>
+        ) : null}
       </div>
 
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
