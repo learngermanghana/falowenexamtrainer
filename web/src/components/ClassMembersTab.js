@@ -9,12 +9,19 @@ const ClassMembersTab = () => {
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [membersError, setMembersError] = useState("");
   const [biographyDraft, setBiographyDraft] = useState("");
+  const [isBiographyDirty, setIsBiographyDirty] = useState(false);
   const [saveStatus, setSaveStatus] = useState("");
   const [isSavingBio, setIsSavingBio] = useState(false);
 
   useEffect(() => {
-    setBiographyDraft(studentProfile?.biography || "");
-  }, [studentProfile?.biography]);
+    if (!isBiographyDirty) {
+      setBiographyDraft(studentProfile?.biography || "");
+    }
+  }, [isBiographyDirty, studentProfile?.biography]);
+
+  useEffect(() => {
+    setIsBiographyDirty(false);
+  }, [studentProfile?.id]);
 
   const loadMembers = useCallback(async () => {
     if (!isFirebaseConfigured || !db) {
@@ -72,9 +79,12 @@ const ClassMembersTab = () => {
     event.preventDefault();
     setIsSavingBio(true);
     setSaveStatus("");
+    const nextBiography = biographyDraft.trim();
 
-    saveStudentProfile({ biography: biographyDraft.trim() })
+    saveStudentProfile({ biography: nextBiography })
       .then(async () => {
+        setBiographyDraft(nextBiography);
+        setIsBiographyDirty(false);
         setSaveStatus("Biography saved to Firebase. Your classmates will see the latest update.");
         await loadMembers();
       })
@@ -97,7 +107,10 @@ const ClassMembersTab = () => {
             id="class-biography"
             style={styles.textArea}
             value={biographyDraft}
-            onChange={(event) => setBiographyDraft(event.target.value)}
+            onChange={(event) => {
+              setBiographyDraft(event.target.value);
+              setIsBiographyDirty(true);
+            }}
             placeholder="Share a short intro, your learning goals, and what topics you enjoy."
           />
           <div style={{ display: "flex", justifyContent: "flex-end" }}>
