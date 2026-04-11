@@ -306,16 +306,17 @@ const A2_SCHEDULE = [
   },
   {
     day: 18,
-    topic: "Die Bank anrufen 7.18",
+    topic: "Die Bank anrufen 7.18 (Group Practice)",
     chapter: "7.18",
-    goal: "Practice calling the bank.",
+    goal: "Discuss bank-call situations confidently, including account opening, key questions, and next steps.",
     assignment: true,
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    instruction:
+      "Complete all four workbook parts in-app (Sprechen, Schreiben, Lesen, Hören). Submit final answers in the assignment submission area.",
     grammar_topic: "Höfliche Fragen und Bitten",
-    video: "https://youtu.be/ahIUVAbsuxU",
-    youtube_link: "https://youtu.be/ahIUVAbsuxU",
+    video: "https://drive.google.com/file/d/16SL5aRG9nQnQiu6_YwxDi5qd0bUzNlTM/view?usp=sharing",
+    youtube_link: "https://drive.google.com/file/d/16SL5aRG9nQnQiu6_YwxDi5qd0bUzNlTM/view?usp=sharing",
     grammarbook_link: "/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1GD7cCPU8ZFykcwsFQZuQMi2fiNrvrCPg/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-18-die-bank-anrufen-workbook",
   },
   {
     day: 19,
