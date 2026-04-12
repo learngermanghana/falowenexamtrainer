@@ -231,6 +231,27 @@ const buildStudentScopeKey = ({ userId, studentCode, studentEmail }) =>
     .filter(Boolean)
     .join("__") || "anonymous";
 
+const resolvePreferredStudentName = ({ studentProfile, userDisplayName, userEmail }) => {
+  const profileNameCandidates = [
+    studentProfile?.name,
+    studentProfile?.fullName,
+    studentProfile?.displayName,
+    [studentProfile?.firstName, studentProfile?.lastName].filter(Boolean).join(" "),
+    studentProfile?.firstName,
+  ];
+
+  const profileName = profileNameCandidates.map((value) => String(value || "").trim()).find(Boolean);
+  if (profileName) return profileName;
+
+  const authName = String(userDisplayName || "").trim();
+  if (authName) return authName;
+
+  const emailLocalPart = String(userEmail || "").split("@")[0]?.trim();
+  if (emailLocalPart) return emailLocalPart;
+
+  return "";
+};
+
 const doesEntryMatchSelectedAssignment = ({
   entry,
   selectedAssignmentId,
@@ -354,6 +375,15 @@ const AssignmentSubmissionPage = () => {
   const studentCode = useMemo(
     () => studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "",
     [studentProfile?.id, studentProfile?.studentCode, studentProfile?.studentcode]
+  );
+  const studentName = useMemo(
+    () =>
+      resolvePreferredStudentName({
+        studentProfile,
+        userDisplayName: user?.displayName,
+        userEmail: user?.email,
+      }),
+    [studentProfile, user?.displayName, user?.email]
   );
 
   const studentScopeKey = useMemo(
@@ -780,7 +810,7 @@ const AssignmentSubmissionPage = () => {
         chapterKey: buildChapterKey(form.assignmentTitle),
         submissionText: form.submissionText,
       }),
-      studentName: studentProfile?.name || "",
+      studentName,
       className: studentProfile?.className || "",
       status: statusLabel,
       createdAt: serverTimestamp(),
@@ -800,7 +830,7 @@ const AssignmentSubmissionPage = () => {
       studentCode,
       studentScopeKey,
       studentProfile?.className,
-      studentProfile?.name,
+      studentName,
       user?.email,
       user?.uid,
     ]
@@ -1665,7 +1695,7 @@ const AssignmentSubmissionPage = () => {
         studentEmail: user?.email || "",
         studentCode,
         studentScopeKey,
-        studentName: studentProfile?.name || "",
+        studentName,
         className: studentProfile?.className || "",
         status: "resubmission_draft",
         resubmissionText: trimmedResubmission,
@@ -1859,7 +1889,7 @@ const AssignmentSubmissionPage = () => {
         studentEmail: user?.email || "",
         studentCode,
         studentScopeKey,
-        studentName: studentProfile?.name || "",
+        studentName,
         className: studentProfile?.className || "",
         submissionFingerprint: buildSubmissionFingerprint({
           assignmentTitle: form.assignmentTitle,
@@ -2346,6 +2376,7 @@ export const __TESTING__ = {
   buildResubmissionDiff,
   countNewWordOccurrences,
   parseObjectiveAnswers,
+  resolvePreferredStudentName,
 };
 
 export default AssignmentSubmissionPage;

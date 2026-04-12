@@ -454,6 +454,7 @@ export const AuthProvider = ({ children }) => {
       const payload = {
         uid: credential.user.uid,
         name: profile.name || profile.firstName || "",
+        fullName: profile.name || profile.firstName || "",
         email: normalizedEmail,
         role: "student",
         studentCode: studentId,
@@ -640,11 +641,20 @@ export const AuthProvider = ({ children }) => {
     }
 
     const studentRef = doc(db, "students", existingProfile.id);
+    const resolvedName =
+      String(
+        existingProfile.name ||
+        existingProfile.fullName ||
+        existingProfile.displayName ||
+        credential.user?.displayName ||
+        ""
+      ).trim();
     await setDoc(
       studentRef,
       {
         uid: credential.user.uid,
         email,
+        name: resolvedName || existingProfile.name || "",
         role: existingProfile.role || "student",
         updated_at: serverTimestamp(),
       },
@@ -653,7 +663,7 @@ export const AuthProvider = ({ children }) => {
 
     const token = await credential.user.getIdToken();
     setIdToken(token);
-    const mergedProfile = { ...existingProfile, uid: credential.user.uid, email };
+    const mergedProfile = { ...existingProfile, uid: credential.user.uid, email, name: resolvedName || existingProfile.name || "" };
     setStudentProfile(mergedProfile);
     setMessagingToken(getMessagingTokenFromProfile(mergedProfile, deviceId));
     await logLoginSession({
