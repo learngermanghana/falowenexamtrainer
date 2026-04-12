@@ -274,4 +274,34 @@ Teil :4
     expect(payload.assignmentKey).toBe("A1-1.1");
     expect(payload.canonicalAssignmentKey).toBe("A1-1.1");
   });
+
+  it("falls back to auth display name when student profile name is missing", () => {
+    const name = __TESTING__.resolvePreferredStudentName({
+      studentProfile: {},
+      userDisplayName: "Moreen Display",
+      userEmail: "coffiemoreen@gmail.com",
+    });
+
+    expect(name).toBe("Moreen Display");
+  });
+
+  it("falls back to email local-part when both profile and auth names are missing", () => {
+    const name = __TESTING__.resolvePreferredStudentName({
+      studentProfile: {},
+      userDisplayName: "",
+      userEmail: "coffiemoreen@gmail.com",
+    });
+
+    expect(name).toBe("coffiemoreen");
+  });
+
+  it("uses legacy fullName when name is not present on student profile", () => {
+    const name = __TESTING__.resolvePreferredStudentName({
+      studentProfile: { fullName: "Ada Lovelace" },
+      userDisplayName: "",
+      userEmail: "coffiemoreen@gmail.com",
+    });
+
+    expect(name).toBe("Ada Lovelace");
+  });
 });
