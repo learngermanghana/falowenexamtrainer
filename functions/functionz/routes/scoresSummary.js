@@ -711,14 +711,32 @@ const scoresSummaryHandler = async (req, res) => {
 
     const jumpedAssignments = missedAssignments;
 
-    const failedAssignments = lessonStatusByDay
-      .filter((l) => l.hasFailed)
-      .map((l) => ({
-        label: l.label,
-        identifiers: l.identifiers,
-        dayNumber: l.dayNumber,
-        goal: l.goal,
-      }));
+    const identifierToLesson = new Map();
+    lessonStatusByDay.forEach((lesson) => {
+      (lesson.identifiers || []).forEach((identifier) => {
+        if (!identifierToLesson.has(identifier)) {
+          identifierToLesson.set(identifier, lesson);
+        }
+      });
+    });
+
+    const failedAssignments = Array.from(failed)
+      .map((identifier) => {
+        const lesson = identifierToLesson.get(identifier);
+        const fallbackLabel = labelByIdentifier.get(identifier) || `Assignment ${getIdentifierLabel(identifier)}`;
+        const resolvedLabel = ensureTitleHasIdentifier(fallbackLabel, [identifier]);
+        return {
+          label: resolvedLabel,
+          identifiers: [identifier],
+          dayNumber: lesson?.dayNumber || null,
+          goal: lesson?.goal || "",
+        };
+      })
+      .sort((a, b) => {
+        const dayDiff = Number(a.dayNumber || 0) - Number(b.dayNumber || 0);
+        if (dayDiff !== 0) return dayDiff;
+        return String(a.identifiers?.[0] || "").localeCompare(String(b.identifiers?.[0] || ""));
+      });
 
     const recommendationBlocked = failedAssignments.length > 0;
 

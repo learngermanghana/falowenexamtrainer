@@ -1179,7 +1179,7 @@ const AssignmentSubmissionPage = () => {
     }, 0);
   }, [isSameSelectedAssignment, recentSubmissions]);
 
-  const selectedAssignmentPassed = useMemo(() => {
+  const selectedAssignmentPassedFromSubmission = useMemo(() => {
     return recentSubmissions.some((entry) => {
       if (!isSameSelectedAssignment(entry)) return false;
 
@@ -1361,6 +1361,18 @@ const AssignmentSubmissionPage = () => {
     recentSubmissions,
     mergedProgressByTitle,
   ]);
+
+  const selectedAssignmentPassedFromProgress = useMemo(() => {
+    if (!form.assignmentTitle) return false;
+    const progress = mergedProgressByTitle[form.assignmentTitle];
+    if (!progress) return false;
+    if (progress.status === "passed") return true;
+
+    const score = toNumericScore(progress.score ?? progress.finalScore ?? progress.mark ?? progress.grade);
+    return typeof score === "number" && score >= PASS_THRESHOLD_SCORE;
+  }, [form.assignmentTitle, mergedProgressByTitle]);
+
+  const selectedAssignmentPassed = selectedAssignmentPassedFromSubmission || selectedAssignmentPassedFromProgress;
 
 
   const dynamicMaxSubmissionCharacters = useMemo(() => {
