@@ -232,7 +232,7 @@ function App() {
   const allowedSections = useMemo(
     () => ({
       submit: true,
-      course: isEnrolled,
+      course: true,
       examFile: isEnrolled || isStaff,
       attendance: isEnrolled || isStaff,
       results: isEnrolled || isStaff,
