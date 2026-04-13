@@ -94,4 +94,53 @@ describe('upsertStudentToSheet paid field sync', () => {
       ])
     );
   });
+
+  it('clamps Balance to derived remaining tuition when explicit balance is stale', async () => {
+    mockValuesGet
+      .mockResolvedValueOnce({
+        data: {
+          values: [[
+            'Name',
+            'Phone',
+            'Location',
+            'Level',
+            'Paid',
+            'Balance',
+            'ContractStart',
+            'ContractEnd',
+            'StudentCode',
+            'Email',
+          ]],
+        },
+      })
+      .mockResolvedValueOnce({ data: { values: [['Ernestina021']] } })
+      .mockResolvedValueOnce({ data: { values: [['eaddo2017@gmail.com']] } });
+
+    const { upsertStudentToSheet } = require('../studentsSheet');
+
+    const result = await upsertStudentToSheet({
+      name: 'Ernestina Addo',
+      phone: '537547709',
+      location: 'Accra',
+      level: 'B1',
+      tuitionFee: 3000,
+      paid: 3000,
+      balance: 3000,
+      contractStart: '2025-12-28T21:43:26.427Z',
+      contractEnd: '2026-06-28T21:43:26.427Z',
+      studentCode: 'Ernestina021',
+      email: 'eaddo2017@gmail.com',
+    });
+
+    expect(result).toEqual({ action: 'updated', row: 2 });
+    expect(mockBatchUpdate).toHaveBeenCalledTimes(1);
+
+    const batchArgs = mockBatchUpdate.mock.calls[0][0];
+    expect(batchArgs.requestBody.data).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ range: 'students!E2', values: [[3000]] }),
+        expect.objectContaining({ range: 'students!F2', values: [[0]] }),
+      ])
+    );
+  });
 });
