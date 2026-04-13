@@ -191,6 +191,23 @@ function resolvePaidValue(student = {}) {
   return student.initialPaymentAmount ?? student.paidAmount ?? student.paid ?? "";
 }
 
+function resolveBalanceValue(student = {}) {
+  const explicitBalance = student.balanceDue ?? student.balance;
+  const explicitNumeric = Number(explicitBalance);
+  const hasExplicitBalance = explicitBalance !== null && explicitBalance !== undefined && `${explicitBalance}` !== "";
+
+  const tuitionNumeric = Number(student.tuitionFee);
+  const paidNumeric = Number(resolvePaidValue(student));
+  const hasDerivedInputs = Number.isFinite(tuitionNumeric) && Number.isFinite(paidNumeric);
+
+  if (!hasExplicitBalance && !hasDerivedInputs) return "";
+  if (!hasExplicitBalance) return Math.max(tuitionNumeric - paidNumeric, 0);
+  if (!hasDerivedInputs) return explicitBalance;
+  if (!Number.isFinite(explicitNumeric)) return Math.max(tuitionNumeric - paidNumeric, 0);
+
+  return Math.min(Math.max(explicitNumeric, 0), Math.max(tuitionNumeric - paidNumeric, 0));
+}
+
 async function upsertStudentToSheet(student) {
   const sheetId = process.env.STUDENTS_SHEET_ID;
   const tabName = process.env.STUDENTS_SHEET_TAB || "students";
@@ -338,7 +355,7 @@ async function upsertStudentToSheet(student) {
     pushCell(colStatus, student.status || "");
     pushCell(colEnrollDate, enrollDateValue);
     pushCell(colPaid, resolvePaidValue(student));
-    pushCell(colBalance, student.balanceDue ?? student.balance ?? "");
+    pushCell(colBalance, resolveBalanceValue(student));
     pushCell(colPaymentStatus, student.paymentStatus || "");
     pushCell(colContractStart, student.contractStart || "");
     pushCell(colContractEnd, student.contractEnd || "");
@@ -389,7 +406,7 @@ async function upsertStudentToSheet(student) {
   if (colStatus !== null) row[colStatus] = student.status || "";
   if (colEnrollDate !== null) row[colEnrollDate] = enrollDateValue;
   if (colPaid !== null) row[colPaid] = resolvePaidValue(student);
-  if (colBalance !== null) row[colBalance] = student.balanceDue ?? student.balance ?? "";
+  if (colBalance !== null) row[colBalance] = resolveBalanceValue(student);
   if (colPaymentStatus !== null) row[colPaymentStatus] = student.paymentStatus || "";
   if (colContractStart !== null) row[colContractStart] = student.contractStart || "";
   if (colContractEnd !== null) row[colContractEnd] = student.contractEnd || "";
