@@ -862,14 +862,14 @@ const RAW_COURSE_SCHEDULES = {
       chapter: "14.2",
       goal: "Understand how accusative and dative verbs affect nouns and pronouns",
       instruction:
-        "This chapter has no assignment. Read the lesson notes first, then complete the in-app practice book for self-practice.",
+        "This chapter has no assignment. Read the grammar lesson notes and use the in-app checks for self-practice.",
       grammar_topic: "Dative and Accusative Verbs",
       lesen_hören: {
         video: "https://youtu.be/J98JJU2v4Uw",
         youtube_link: "https://youtu.be/J98JJU2v4Uw",
         assignment: false,
         grammarbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
-        workbook_link: "https://www.falowen.app/campus/course/dative-and-accusative-verbs-14-2",
+        workbook_link: null,
       },
     },
     {

@@ -132,6 +132,14 @@ const HighlightedNounPhrase = ({ article, adjective, noun }) => (
   </span>
 );
 
+const DefiniteArticleOrigin = ({ article, ending }) => (
+  <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontWeight: 600 }}>
+    <span style={{ background: "#fecaca", padding: "1px 5px", borderRadius: 6 }}>{article}</span>
+    <span>→</span>
+    <span style={{ background: "#dbeafe", padding: "1px 5px", borderRadius: 6 }}>{ending}</span>
+  </span>
+);
+
 const FullSentenceExamples = ({ examples }) => (
   <div style={{ display: "grid", gap: 10 }}>
     {examples.map((example) => (
@@ -155,6 +163,8 @@ const DativeAdjectiveDeclensionPage = () => {
   const navigate = useNavigate();
   const [showAnswers, setShowAnswers] = useState(false);
   const [showAdjectiveAnswers, setShowAdjectiveAnswers] = useState(false);
+  const [selectedAdjectiveAnswers, setSelectedAdjectiveAnswers] = useState({});
+  const [selectedKnowledgeAnswers, setSelectedKnowledgeAnswers] = useState({});
   const headerImageUrl =
     "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1800&q=80";
 
@@ -354,6 +364,16 @@ const DativeAdjectiveDeclensionPage = () => {
       </div>
 
       <Section title="Step 1: Adjective Declension First (Indefinite Articles: Nominative + Accusative)">
+        <Callout>
+          <strong>Learning objectives</strong>
+          <BulletList
+            items={[
+              "See where adjective endings (-er/-e/-es/-en) come from.",
+              "Connect indefinite forms (ein/eine/einen/keine) to definite article pattern (der/die/das/den).",
+              "Practice with quick clickable mini test items.",
+            ]}
+          />
+        </Callout>
         <p style={{ margin: 0 }}>
           Start here first. For now, focus only on <strong>indefinite articles</strong> with adjective endings in
           nominative and accusative.
@@ -385,14 +405,23 @@ const DativeAdjectiveDeclensionPage = () => {
         </Callout>
         <h3 style={{ margin: "12px 0 0" }}>Nominative (subject)</h3>
         <Table
-          headers={["Gender", "Article", "Ending", "Example"]}
+          headers={["Gender", "Indefinite Article", "Definite Source (colored)", "Ending", "Example"]}
           rows={[
-            ["Masculine", "ein", "-er", "ein großer Hund"],
-            ["Feminine", "eine", "-e", "eine rote Blume"],
-            ["Neuter", "ein", "-es", "ein kleines Auto"],
-            ["Plural", "keine", "-en", "keine neuen Bücher"],
+            ["Masculine", "ein", "der → -er", "-er", "ein großer Hund"],
+            ["Feminine", "eine", "die → -e", "-e", "eine rote Blume"],
+            ["Neuter", "ein", "das → -es", "-es", "ein kleines Auto"],
+            ["Plural", "keine", "die → -en", "-en", "keine neuen Bücher"],
           ]}
         />
+        <div style={{ display: "grid", gap: 8 }}>
+          <p style={{ margin: 0, fontSize: 14, color: "#4b5563" }}>Color key for “where the ending comes from”:</p>
+          <div style={{ display: "grid", gap: 6, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+            <DefiniteArticleOrigin article="der" ending="-er" />
+            <DefiniteArticleOrigin article="die" ending="-e" />
+            <DefiniteArticleOrigin article="das" ending="-es" />
+            <DefiniteArticleOrigin article="die (plural)" ending="-en" />
+          </div>
+        </div>
         <ExampleCard
           title="Color guide for the noun phrase"
           items={[
@@ -405,14 +434,20 @@ const DativeAdjectiveDeclensionPage = () => {
         <FullSentenceExamples examples={nominativeSentenceExamples} />
         <h3 style={{ margin: "12px 0 0" }}>Accusative (object)</h3>
         <Table
-          headers={["Gender", "Article", "Ending", "Example"]}
+          headers={["Gender", "Indefinite Article", "Definite Source (colored)", "Ending", "Example"]}
           rows={[
-            ["Masculine", "einen", "-en", "einen kleinen Hund"],
-            ["Feminine", "eine", "-e", "eine schöne Blume"],
-            ["Neuter", "ein", "-es", "ein grünes Auto"],
-            ["Plural", "keine", "-en", "keine alten Bücher"],
+            ["Masculine", "einen", "den → -en", "-en", "einen kleinen Hund"],
+            ["Feminine", "eine", "die → -e", "-e", "eine schöne Blume"],
+            ["Neuter", "ein", "das → -es", "-es", "ein grünes Auto"],
+            ["Plural", "keine", "die → -en", "-en", "keine alten Bücher"],
           ]}
         />
+        <div style={{ display: "grid", gap: 6, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+          <DefiniteArticleOrigin article="den" ending="-en" />
+          <DefiniteArticleOrigin article="die" ending="-e" />
+          <DefiniteArticleOrigin article="das" ending="-es" />
+          <DefiniteArticleOrigin article="die (plural)" ending="-en" />
+        </div>
         <h3 style={{ margin: "12px 0 0" }}>Full sentence examples (Accusative)</h3>
         <FullSentenceExamples examples={accusativeSentenceExamples} />
         <h3 style={{ margin: "12px 0 0" }}>Mini adjective ending test (A1)</h3>
@@ -432,7 +467,26 @@ const DativeAdjectiveDeclensionPage = () => {
               <strong>
                 {index + 1}. {item.prompt}
               </strong>
-              <div style={{ color: "#4b5563", fontSize: 14 }}>Options: {item.options.join(" / ")}</div>
+              <div style={{ color: "#4b5563", fontSize: 14 }}>Options (click one):</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {item.options.map((option) => {
+                  const isSelected = selectedAdjectiveAnswers[index] === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setSelectedAdjectiveAnswers((prev) => ({ ...prev, [index]: option }))}
+                      style={{
+                        ...styles.secondaryButton,
+                        background: isSelected ? "#e0f2fe" : styles.secondaryButton?.background,
+                        borderColor: isSelected ? "#0ea5e9" : styles.secondaryButton?.borderColor,
+                      }}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
               {showAdjectiveAnswers ? (
                 <>
                   <div style={{ fontSize: 14 }}>
@@ -556,6 +610,12 @@ const DativeAdjectiveDeclensionPage = () => {
       </Section>
 
       <Section title="Step 8: Knowledge Test — Dative & Accusative Verbs">
+        <Callout>
+          <strong>Objective</strong>
+          <p style={{ margin: 0 }}>
+            Identify if the verb needs an accusative or dative form and choose the matching article/pronoun.
+          </p>
+        </Callout>
         <p style={{ margin: 0 }}>
           After reading the notes, try these 10 quick practice items in-app. This is <strong>not</strong> an assignment.
         </p>
@@ -575,7 +635,26 @@ const DativeAdjectiveDeclensionPage = () => {
               <strong>
                 {index + 1}. {item.prompt}
               </strong>
-              <div style={{ color: "#4b5563", fontSize: 14 }}>Options: {item.options.join(" / ")}</div>
+              <div style={{ color: "#4b5563", fontSize: 14 }}>Options (click one):</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {item.options.map((option) => {
+                  const isSelected = selectedKnowledgeAnswers[index] === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setSelectedKnowledgeAnswers((prev) => ({ ...prev, [index]: option }))}
+                      style={{
+                        ...styles.secondaryButton,
+                        background: isSelected ? "#e0f2fe" : styles.secondaryButton?.background,
+                        borderColor: isSelected ? "#0ea5e9" : styles.secondaryButton?.borderColor,
+                      }}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
+              </div>
               {showAnswers ? (
                 <>
                   <div style={{ fontSize: 14 }}>
