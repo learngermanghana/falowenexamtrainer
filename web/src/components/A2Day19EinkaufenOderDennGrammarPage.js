@@ -46,7 +46,7 @@ const A2Day19EinkaufenOderDennGrammarPage = () => {
           />
           <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.72 }}>Header image source: Unsplash</p>
           <p style={{ margin: 0, opacity: 0.9 }}>
-            Grammar focus: <strong>Konjunktion: oder / denn</strong>
+            Grammar focus: <strong>Konjunktion: oder / und</strong>
           </p>
         </header>
 
@@ -66,33 +66,34 @@ const A2Day19EinkaufenOderDennGrammarPage = () => {
             <p style={{ margin: 0 }}>Word order stays normal in both parts.</p>
           </SectionCard>
 
-          <SectionCard title="2) Konjunktion ‘denn’ (reason)">
+          <SectionCard title="2) Konjunktion ‘und’ (addition)">
             <p style={{ margin: 0 }}>
-              Use <strong>denn</strong> to give a reason. It connects two main clauses, and the second clause keeps
-              normal main-clause word order.
+              Use <strong>und</strong> to add information. It connects words, phrases, or clauses with equal
+              importance.
             </p>
             <div style={noteStyle}>
-              <strong>Pattern:</strong> Main clause, <strong>denn</strong> + subject + verb + ...
+              <strong>Pattern:</strong> A <strong>und</strong> B
               <ul style={listStyle}>
-                <li>Ich kaufe im Supermarkt ein, <strong>denn</strong> er ist günstig.</li>
-                <li>Wir gehen zum Markt, <strong>denn</strong> das Gemüse ist frisch.</li>
-                <li>Ich nehme die Tasche mit, <strong>denn</strong> ich kaufe viel ein.</li>
+                <li>Ich kaufe Brot <strong>und</strong> Reis.</li>
+                <li>Wir gehen zum Markt <strong>und</strong> kaufen Gemüse.</li>
+                <li>Ich nehme die Tasche mit <strong>und</strong> kaufe viel ein.</li>
               </ul>
             </div>
+            <p style={{ margin: 0 }}>Word order stays normal on both sides of the conjunction.</p>
           </SectionCard>
 
-          <SectionCard title="3) Schnellvergleich: oder vs. denn">
+          <SectionCard title="3) Schnellvergleich: oder vs. und">
             <ul style={listStyle}>
               <li>
                 <strong>oder</strong> = choice/alternative (A oder B)
               </li>
               <li>
-                <strong>denn</strong> = reason/explanation (because)
+                <strong>und</strong> = addition/combination (A und B)
               </li>
             </ul>
             <p style={{ margin: 0 }}>
               Example pair: Gehen wir zum Markt <strong>oder</strong> in den Supermarkt? / Ich gehe zum Markt,
-              <strong> denn</strong> dort ist es billiger.
+              <strong> und</strong> ich kaufe Obst.
             </p>
           </SectionCard>
 
@@ -101,23 +102,23 @@ const A2Day19EinkaufenOderDennGrammarPage = () => {
               A: Kaufen wir heute im Einkaufszentrum <strong>oder</strong> online?
             </p>
             <p style={{ margin: 0 }}>
-              B: Im Einkaufszentrum, <strong>denn</strong> ich möchte die Schuhe anprobieren.
+              B: Im Einkaufszentrum <strong>und</strong> später auch online.
             </p>
             <p style={{ margin: 0 }}>
               A: Super, nehmen wir den Bus <strong>oder</strong> das Taxi?
             </p>
             <p style={{ margin: 0 }}>
-              B: Den Bus, <strong>denn</strong> er ist günstiger.
+              B: Den Bus <strong>und</strong> dann gehen wir zu Fuß.
             </p>
           </SectionCard>
 
           <SectionCard title="5) Knowledge test">
             <ol style={{ margin: 0, paddingLeft: 22, display: "grid", gap: 8 }}>
-              <li>Gehen wir in die Mall ___ auf den Markt? (oder / denn)</li>
-              <li>Ich kaufe dort ein, ___ die Preise sind gut. (oder / denn)</li>
-              <li>Wähl die richtige Form: Ich bleibe hier, denn ich ___ noch Brot. (brauche / braucht)</li>
-              <li>Wir fahren mit dem Bus, denn er ___ billig. (ist / sind)</li>
-              <li>Choose the better sentence for a reason: A) Ich kaufe Milch oder sie ist günstig. B) Ich kaufe Milch, denn sie ist günstig.</li>
+              <li>Gehen wir in die Mall ___ auf den Markt? (oder / und)</li>
+              <li>Ich kaufe Brot ___ Käse. (oder / und)</li>
+              <li>Wähl die richtige Form: Ich bleibe hier und ich ___ noch Brot. (brauche / braucht)</li>
+              <li>Wir fahren mit dem Bus und er ___ billig. (ist / sind)</li>
+              <li>Choose the better sentence for addition: A) Ich kaufe Milch und Eier. B) Ich kaufe Milch oder Eier.</li>
             </ol>
 
             <button type="button" onClick={() => setShowAnswers((prev) => !prev)} style={styles.secondaryBtn}>
@@ -129,10 +130,10 @@ const A2Day19EinkaufenOderDennGrammarPage = () => {
                 <strong>Answers:</strong>
                 <ol style={{ margin: "8px 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
                   <li>oder</li>
-                  <li>denn</li>
+                  <li>und</li>
                   <li>brauche</li>
                   <li>ist</li>
-                  <li>B</li>
+                  <li>A</li>
                 </ol>
               </div>
             ) : null}
