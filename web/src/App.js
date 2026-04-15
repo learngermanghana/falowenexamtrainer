@@ -70,6 +70,7 @@ import A2Day14BerufUndKarriereUmZuGrammarPage from "./components/A2Day14BerufUnd
 import A2Day15MeinLieblingssportSeitDativGrammarPage from "./components/A2Day15MeinLieblingssportSeitDativGrammarPage";
 import A2Day16WohlbefindenReflexiveVerbenGrammarPage from "./components/A2Day16WohlbefindenReflexiveVerbenGrammarPage";
 import A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage from "./components/A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage";
+import A2Day19EinkaufenOderDennGrammarPage from "./components/A2Day19EinkaufenOderDennGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
@@ -834,6 +835,10 @@ const AppShell = ({
           <Route
             path="/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes"
             element={<A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage />}
+          />
+          <Route
+            path="/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes"
+            element={<A2Day19EinkaufenOderDennGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
