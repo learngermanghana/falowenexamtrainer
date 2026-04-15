@@ -327,7 +327,7 @@ const A2_SCHEDULE = [
     instruction: "Watch the video, review grammar, and complete your workbook.",
     video: "https://youtu.be/TOTK1yohCTg",
     youtube_link: "https://youtu.be/TOTK1yohCTg",
-    grammarbook_link: "https://drive.google.com/file/d/1Qt9oxn-74t8dFdsk-NjSc0G5OT7MQ-qq/view?usp=sharing",
+    grammarbook_link: "/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1CEFn14eYeomtf6CpZJhyW00CA2f_6VRc/view?usp=sharing",
   },
   {
