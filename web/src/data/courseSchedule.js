@@ -322,13 +322,15 @@ const A2_SCHEDULE = [
     day: 19,
     topic: "Einkaufen? Wo und wie? (Exercise) 7.19",
     chapter: "7.19",
-    goal: "Shop and ask about locations.",
+    goal: "Discuss shopping habits, payment choices, and sustainable consumption with practical A2 communication.",
     assignment: true,
-    instruction: "Watch the video, review grammar, and complete your workbook.",
+    instruction:
+      "Complete all four workbook parts in-app (Sprechen, Schreiben, Lesen, Hören). Submit final answers in the assignment submission area.",
+    grammar_topic: "Oder vs. denn",
     video: "https://youtu.be/TOTK1yohCTg",
     youtube_link: "https://youtu.be/TOTK1yohCTg",
     grammarbook_link: "/campus/course/einkaufen-wo-und-wie-7-19-oder-denn-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1CEFn14eYeomtf6CpZJhyW00CA2f_6VRc/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook",
   },
   {
     day: 20,
