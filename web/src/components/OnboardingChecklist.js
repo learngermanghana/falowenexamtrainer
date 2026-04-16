@@ -135,6 +135,7 @@ const OnboardingChecklist = ({
       notificationsSkipped: Boolean(persisted.notificationsSkipped),
       dismissedUntil: persisted.dismissedUntil || 0,
       guidedMode: Boolean(persisted.guidedMode),
+      completedLocally: Boolean(persisted.completedLocally),
     };
   });
 
@@ -207,7 +208,7 @@ const OnboardingChecklist = ({
 
   const notificationsStepComplete = notificationsGranted || state.notificationsSkipped;
 
-  const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted) || localCompletion;
+  const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted) || localCompletion || state.completedLocally;
 
   const progress = useMemo(() => {
     const steps = [levelStepComplete, classStepComplete, calendarDownloaded, notificationsStepComplete];
@@ -339,8 +340,18 @@ const OnboardingChecklist = ({
       await onSaveOnboarding();
       showToast("Onboarding saved. You're all set!", "success");
       setLocalCompletion(true);
+      setState((prev) => ({ ...prev, completedLocally: true }));
     } catch (error) {
       console.error("Failed to save onboarding", error);
+      const reason = String(error?.message || "");
+      const canFallbackToLocal =
+        reason.includes("No student profile found") || reason.includes("Firebase is not configured");
+      if (canFallbackToLocal) {
+        setState((prev) => ({ ...prev, completedLocally: true }));
+        setLocalCompletion(true);
+        showToast("Onboarding saved locally on this device.", "info");
+        return;
+      }
       setSaveError("Could not save onboarding status. Please try again.");
     } finally {
       setSavingOnboarding(false);
