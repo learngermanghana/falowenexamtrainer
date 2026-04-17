@@ -265,7 +265,7 @@ const A2_SCHEDULE = [
   },
   {
     day: 16,
-    topic: "Wohlbefinden und Entspannung 6.16",
+    topic: "Day 16: Hobbys und Interessen • Chapter",
     chapter: "6.16",
     goal: "Express well-being and relaxation.",
     assignment: true,

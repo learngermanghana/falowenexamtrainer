@@ -278,7 +278,7 @@ const A2_SCHEDULE = [
   },
   {
     day: 16,
-    topic: "Wohlbefinden und Entspannung 6.16 (Group Practice)",
+    topic: "Day 16: Hobbys und Interessen • Chapter",
     chapter: "6.16",
     goal: "Discuss well-being, relaxation, health, symptoms, and doctor communication with clear A2-level speaking and writing.",
     assignment: true,
