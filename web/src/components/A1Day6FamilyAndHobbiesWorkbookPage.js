@@ -267,24 +267,24 @@ const hobbyQuiz = [
   },
   {
     id: "h2",
-    stem: "2. Which answer is correct?",
-    correct: "A",
+    stem: "2. Which sentence correctly uses gern?",
+    correct: "D",
     options: {
-      A: "Ja, ich spiele Fußball.",
-      B: "Ja, ich spiele keinen Fußball.",
-      C: "Nein, ich spiele Fußball.",
-      D: "Ja, ich Fußball spiele.",
+      A: "Ich gern spiele Fußball.",
+      B: "Ich spiele Fußball gerne.",
+      C: "Mein Hobby gern ist Fußball spielen.",
+      D: "Ich spiele gern Fußball.",
     },
   },
   {
     id: "h3",
-    stem: "3. Which negative answer is correct?",
-    correct: "C",
+    stem: "3. What does this sentence mean: Ich höre gern Musik.",
+    correct: "A",
     options: {
-      A: "Nein, ich höre nicht keine Musik.",
-      B: "Nein, ich male keine Bild.",
-      C: "Nein, ich spiele keinen Fußball.",
-      D: "Nein, ich schwimme keinen Meer.",
+      A: "I like listening to music.",
+      B: "I do not listen to music.",
+      C: "My hobby is music.",
+      D: "I listen to German music only.",
     },
   },
 ];
@@ -621,6 +621,11 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
 
         <div style={questionCardStyle}>
           <strong>How to form yes/no questions (Ja/Nein-Fragen)</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            A <strong>Ja/Nein-Frage</strong> asks for <strong>yes</strong> or <strong>no</strong>, so the conjugated verb comes
+            first. A <strong>W-Frage</strong> asks for information (who, what, where, when, why), so it starts with a
+            question word like <strong>Wer</strong>, <strong>Was</strong>, or <strong>Wo</strong>, then the verb is second.
+          </p>
           <ol style={listStyle}>
             <li>Start with the conjugated verb.</li>
             <li>Put the subject directly after the verb.</li>
@@ -636,6 +641,8 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
               <strong>Statement:</strong> Er spielt Fußball.
               <br />
               <strong>Question:</strong> Spielt er Fußball?
+              <br />
+              <strong>W-question example:</strong> Wo wohnst du?
             </div>
           </div>
         </div>
@@ -664,6 +671,14 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
             Use <strong>gern</strong> with a verb to say what you like doing.
             <br />
             <strong>Ich tanze gern.</strong> = I like dancing.
+            <br />
+            More examples:
+            <br />
+            <strong>Ich lese gern.</strong> (I like reading.)
+            <br />
+            <strong>Wir schwimmen gern.</strong> (We like swimming.)
+            <br />
+            <strong>Er kocht gern.</strong> (He likes cooking.)
           </div>
           <div style={answerCardStyle}>
             <div style={{ lineHeight: 1.7 }}>
