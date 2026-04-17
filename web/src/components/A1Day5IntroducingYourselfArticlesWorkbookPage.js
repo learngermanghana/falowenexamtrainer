@@ -536,6 +536,8 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
         <div style={infoBoxStyle}>
           <strong>Quick note: W-questions</strong>
           <div style={{ lineHeight: 1.8 }}>
+            <div>Use W-words to ask for more information.</div>
+            <div><strong>Rule:</strong> W-word + verb + subject</div>
             <div><strong>Wie</strong> = how</div>
             <div><strong>Woher</strong> = from where</div>
             <div><strong>Wo</strong> = where</div>
