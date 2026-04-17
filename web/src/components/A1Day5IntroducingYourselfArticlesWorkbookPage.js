@@ -533,6 +533,15 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
         title="Teil 4 · Mini Dialogue"
         subtitle="Complete the short conversation."
       >
+        <div style={infoBoxStyle}>
+          <strong>Quick note: W-questions</strong>
+          <div style={{ lineHeight: 1.8 }}>
+            <div><strong>Wie</strong> = how</div>
+            <div><strong>Woher</strong> = from where</div>
+            <div><strong>Wo</strong> = where</div>
+          </div>
+        </div>
+
         <div style={{ display: "grid", gap: 12 }}>
           <div style={boxBase}>
             <strong>A: Wie heißt du?</strong>
@@ -584,6 +593,16 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
               placeholder="Ich bin ... Jahre alt."
               style={inputStyle}
             />
+          </div>
+        </div>
+
+        <div style={warningBoxStyle}>
+          <strong>A1 statement rule</strong>
+          <div style={{ lineHeight: 1.8 }}>
+            <div>Subject first.</div>
+            <div>Verb in position 2.</div>
+            <div>Time then place.</div>
+            <div>Capital letter first.</div>
           </div>
         </div>
 
