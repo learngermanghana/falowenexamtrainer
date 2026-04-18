@@ -48,6 +48,10 @@ const A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGramm
           <p style={{ margin: 0, opacity: 0.9 }}>
             Grammar focus: <strong>Höfliche Bitten und Begründungen</strong>
           </p>
+          <p style={{ margin: 0, opacity: 0.8 }}>
+            English support: This page explains how to make <strong>polite complaints</strong> in German and how to
+            give clear <strong>reasons</strong> for your request.
+          </p>
         </header>
 
         <div style={{ display: "grid", gap: 14 }}>
@@ -56,6 +60,11 @@ const A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGramm
               Bei einer Reklamation bleiben Sie ruhig, präzise und höflich. Nutzen Sie <strong>Sie-Form</strong>,
               Konjunktiv-II-Strukturen und <strong>bitte</strong>, um professionell zu klingen.
             </p>
+            <p style={{ margin: 0, lineHeight: 1.7, opacity: 0.9 }}>
+              <strong>English:</strong> In a complaint, stay calm, precise, and polite. Use the formal{" "}
+              <strong>Sie</strong> form, <strong>Konjunktiv II</strong> (for polite requests like <em>könnten</em>{" "}
+              and <em>wäre</em>), and <strong>bitte</strong> to sound professional.
+            </p>
             <div style={noteStyle}>
               <strong>Nützliche Satzanfänge:</strong>
               <ul style={listStyle}>
@@ -63,11 +72,19 @@ const A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGramm
                 <li>Könnten Sie bitte prüfen, was passiert ist?</li>
                 <li>Ich würde gern eine Lösung finden.</li>
               </ul>
+              <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>
+                <strong>English:</strong> Useful openings: “Excuse me, I have a problem with …”, “Could you please
+                check what happened?”, “I would like to find a solution.”
+              </p>
             </div>
           </SectionCard>
 
           <SectionCard title="2) Begründungen geben: weil / da / denn">
             <p style={{ margin: 0 }}>Begründungen helfen, Ihre Reklamation klar und nachvollziehbar zu machen.</p>
+            <p style={{ margin: 0, opacity: 0.9 }}>
+              <strong>English:</strong> Reasons make your complaint clear and logical. The key grammar difference is
+              word order.
+            </p>
             <ul style={listStyle}>
               <li>
                 <strong>weil</strong>: Nebensatz, Verb am Ende. <em>Ich reklamiere, weil der Artikel defekt ist.</em>
@@ -79,6 +96,11 @@ const A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGramm
                 <strong>denn</strong>: Hauptsatz, Verb auf Position 2. <em>Ich brauche Hilfe, denn das Gerät funktioniert nicht.</em>
               </li>
             </ul>
+            <p style={{ margin: 0, lineHeight: 1.7, opacity: 0.9 }}>
+              <strong>English grammar note:</strong> <em>weil</em> and <em>da</em> start a subordinate clause, so the
+              conjugated verb goes to the end. <em>denn</em> connects two main clauses, so normal main-clause word
+              order stays the same (verb in second position).
+            </p>
           </SectionCard>
 
           <SectionCard title="3) Typische Reklamationssituationen (A2)">
@@ -88,10 +110,18 @@ const A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGramm
               <li>Auf der Rechnung steht ein falscher Betrag.</li>
               <li>Eine Dienstleistung entspricht nicht der Beschreibung.</li>
             </ul>
+            <p style={{ margin: 0, opacity: 0.9 }}>
+              <strong>English:</strong> Typical situations: damaged/incomplete product, late or missing delivery,
+              wrong amount on the bill, or service not matching the description.
+            </p>
           </SectionCard>
 
           <SectionCard title="4) Knowledge: Redemittel für Lösungsvorschläge">
             <p style={{ margin: 0 }}>Kombinieren Sie Problem + Begründung + Wunsch nach Lösung:</p>
+            <p style={{ margin: 0, opacity: 0.9 }}>
+              <strong>English:</strong> Build a strong complaint with this structure:{" "}
+              <em>problem + reason + preferred solution</em>.
+            </p>
             <ul style={listStyle}>
               <li>Ich möchte den Artikel umtauschen, weil er defekt ist.</li>
               <li>Könnten Sie mir bitte den korrekten Betrag zurückerstatten?</li>
@@ -107,6 +137,9 @@ const A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGramm
               <li>Wir brauchen eine Lösung, ___ die Lieferung zu spät gekommen ist. (denn / weil)</li>
               <li>Wählen Sie den höflicheren Satz: A) Das ist falsch. Machen Sie das neu. B) Könnten Sie das bitte prüfen?</li>
             </ol>
+            <p style={{ margin: 0, opacity: 0.9 }}>
+              <strong>English task:</strong> Fill in <em>weil / da / denn</em> and choose the more polite sentence.
+            </p>
 
             <button type="button" onClick={() => setShowAnswers((prev) => !prev)} style={styles.secondaryBtn}>
               {showAnswers ? "Hide answers" : "Show answers"}
