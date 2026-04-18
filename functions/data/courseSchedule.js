@@ -335,7 +335,7 @@ const A2_SCHEDULE = [
     instruction: "Watch the video, review grammar, and complete your workbook.",
     video: "",
     youtube_link: "",
-    grammarbook_link: "https://drive.google.com/file/d/1FcCg7orEizna4rAkX3_FCyd3lh_Bb3IT/view?usp=sharing",
+    grammarbook_link: "/campus/course/ein-wochenende-planen-8-21-wenn-ob-falls-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1mMtZza34QoJO_lfUiEX3kwTa-vsTN_RK/view?usp=sharing",
   },
   {
