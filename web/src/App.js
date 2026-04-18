@@ -84,6 +84,7 @@ import A2Day16WohlbefindenUndEntspannungWorkbookPage from "./components/A2Day16W
 import A2Day17InDieApothekeGehenWorkbookPage from "./components/A2Day17InDieApothekeGehenWorkbookPage";
 import A2Day18DieBankAnrufenWorkbookPage from "./components/A2Day18DieBankAnrufenWorkbookPage";
 import A2Day19EinkaufenWoUndWieWorkbookPage from "./components/A2Day19EinkaufenWoUndWieWorkbookPage";
+import A2Day20TypischeReklamationssituationenWorkbookPage from "./components/A2Day20TypischeReklamationssituationenWorkbookPage";
 import B1Day20WieWirdManWorkbookPage from "./components/B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day22BeziehungWichtigWorkbookPage from "./components/B1Day22BeziehungWichtigWorkbookPage";
@@ -697,6 +698,7 @@ const AppShell = ({
           />
           <Route path="/campus/course/a2-day-18-die-bank-anrufen-workbook" element={<A2Day18DieBankAnrufenWorkbookPage />} />
           <Route path="/campus/course/a2-day-19-einkaufen-wo-und-wie-workbook" element={<A2Day19EinkaufenWoUndWieWorkbookPage />} />
+          <Route path="/campus/course/a2-day-20-typische-reklamationssituationen-workbook" element={<A2Day20TypischeReklamationssituationenWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
