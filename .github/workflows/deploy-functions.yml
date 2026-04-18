@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
           cache-dependency-path: functions/package-lock.json
 
@@ -43,4 +43,4 @@ jobs:
         run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp-key.json" >> $GITHUB_ENV
 
       - name: Deploy Firebase Functions
-        run: firebase deploy --only functions --project falowen-examiner-trainer --force
+        run: firebase deploy --only functions --project falowen-examiner-trainer --force --debug
