@@ -354,7 +354,7 @@ const A2_SCHEDULE = [
     video: "",
     youtube_link: "",
     grammarbook_link: "/campus/course/ein-wochenende-planen-8-21-wenn-ob-falls-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1mMtZza34QoJO_lfUiEX3kwTa-vsTN_RK/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-21-ein-wochenende-planen-workbook",
   },
   {
     day: 22,
