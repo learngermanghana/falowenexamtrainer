@@ -36,11 +36,15 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Write service account key
-        run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}' > $HOME/gcp-key.json
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_FALOWEN }}'
 
-      - name: Set Google credentials
-        run: echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcp-key.json" >> $GITHUB_ENV
+      - name: Export Google Cloud project env
+        run: |
+          echo "GOOGLE_CLOUD_PROJECT=falowen-examiner-trainer" >> $GITHUB_ENV
+          echo "GCLOUD_PROJECT=falowen-examiner-trainer" >> $GITHUB_ENV
 
       - name: Deploy Firebase Functions
         run: firebase deploy --only functions --project falowen-examiner-trainer --force --debug
