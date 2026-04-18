@@ -342,7 +342,7 @@ const A2_SCHEDULE = [
     video: "https://youtu.be/utAO9hvGF18",
     youtube_link: "https://youtu.be/utAO9hvGF18",
     grammarbook_link: "/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1_GTumT1II0E1PRoh6hMDwWsTPEInGeed/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-20-typische-reklamationssituationen-workbook",
   },
   {
     day: 21,
