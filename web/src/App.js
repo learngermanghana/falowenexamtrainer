@@ -72,6 +72,7 @@ import A2Day16WohlbefindenReflexiveVerbenGrammarPage from "./components/A2Day16W
 import A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage from "./components/A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage";
 import A2Day19EinkaufenOderDennGrammarPage from "./components/A2Day19EinkaufenOderDennGrammarPage";
 import A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage from "./components/A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage";
+import A2Day21EinWochenendePlanenWennObFallsGrammarPage from "./components/A2Day21EinWochenendePlanenWennObFallsGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
@@ -848,6 +849,10 @@ const AppShell = ({
           <Route
             path="/campus/course/typische-reklamationssituationen-7-20-hoefliche-bitten-und-begruendungen-grammar-notes"
             element={<A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage />}
+          />
+          <Route
+            path="/campus/course/ein-wochenende-planen-8-21-wenn-ob-falls-grammar-notes"
+            element={<A2Day21EinWochenendePlanenWennObFallsGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
