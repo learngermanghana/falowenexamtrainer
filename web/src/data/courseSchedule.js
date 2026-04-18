@@ -278,16 +278,16 @@ const A2_SCHEDULE = [
   },
   {
     day: 16,
-    topic: "Wohlbefinden und Entspannung 6.16 (Group Practice)",
+    topic: "Wohlbefinden und Entspannung 6.16",
     chapter: "6.16",
     goal: "Discuss well-being, relaxation, health, symptoms, and doctor communication with clear A2-level speaking and writing.",
     assignment: true,
     instruction:
       "Watch the recommended material, review grammar notes, and complete all four workbook parts in-app. Submit final answers in the assignment submission area.",
-    grammar_topic: "Verbs and Adjectives with Prepositions",
+    grammar_topic: "Modalverben (können, müssen, sollen, dürfen)",
     video: "https://youtu.be/r4se8KuS8cA",
     youtube_link: "https://youtu.be/r4se8KuS8cA",
-    grammarbook_link: "/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes",
+    grammarbook_link: "/campus/course/wohlbefinden-und-entspannung-6-16-modalverben-grammar-notes",
     workbook_link: "/campus/course/a2-day-16-wohlbefinden-und-entspannung-workbook",
   },
   {

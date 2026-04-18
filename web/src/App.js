@@ -68,7 +68,7 @@ import A2Day12MeinTraumberufGrammarPage from "./components/A2Day12MeinTraumberuf
 import A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage from "./components/A2Day13VorstellungsgespraechModalverbenPraeteritumGrammarPage";
 import A2Day14BerufUndKarriereUmZuGrammarPage from "./components/A2Day14BerufUndKarriereUmZuGrammarPage";
 import A2Day15MeinLieblingssportSeitDativGrammarPage from "./components/A2Day15MeinLieblingssportSeitDativGrammarPage";
-import A2Day16WohlbefindenReflexiveVerbenGrammarPage from "./components/A2Day16WohlbefindenReflexiveVerbenGrammarPage";
+import A2Day16WohlbefindenModalverbenGrammarPage from "./components/A2Day16WohlbefindenReflexiveVerbenGrammarPage";
 import A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage from "./components/A2Day18DieBankAnrufenHoeflicheFragenBittenGrammarPage";
 import A2Day19EinkaufenOderDennGrammarPage from "./components/A2Day19EinkaufenOderDennGrammarPage";
 import A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage from "./components/A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage";
@@ -832,8 +832,8 @@ const AppShell = ({
             element={<A2Day15MeinLieblingssportSeitDativGrammarPage />}
           />
           <Route
-            path="/campus/course/wohlbefinden-und-entspannung-6-16-reflexive-verben-grammar-notes"
-            element={<A2Day16WohlbefindenReflexiveVerbenGrammarPage />}
+            path="/campus/course/wohlbefinden-und-entspannung-6-16-modalverben-grammar-notes"
+            element={<A2Day16WohlbefindenModalverbenGrammarPage />}
           />
           <Route
             path="/campus/course/die-bank-anrufen-7-18-hoefliche-fragen-und-bitten-grammar-notes"
