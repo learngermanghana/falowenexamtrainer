@@ -578,8 +578,8 @@ const courseSchedules = {
       grammar_topic: "Fragen nach dem Preis; gern/lieber/mögen (Talking about price and preferences)",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/Ioq0_bNJ1bE",
-        youtube_link: "https://youtu.be/Ioq0_bNJ1bE",
+        video: "https://youtu.be/66RzSpK7X9c",
+        youtube_link: "https://youtu.be/66RzSpK7X9c",
         grammarbook_link: "/campus/course/a1-day-7-asking-about-prices-and-preferences",
         workbook_link: "https://drive.google.com/file/d/1W5GCdtp-NzSQWMz_ir7uQSKJc3F4LGPb/view?usp=sharing",
         assignment: true,
