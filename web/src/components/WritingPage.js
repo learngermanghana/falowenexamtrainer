@@ -512,6 +512,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     () => visibleWritingTasks.find((item) => item.id === selectedLetterId),
     [selectedLetterId, visibleWritingTasks]
   );
+  const pinnedIdeaQuestion = useMemo(() => {
+    const firstUserMessage = chatMessages.find((message) => message.role === "user");
+    return firstUserMessage?.content || "";
+  }, [chatMessages]);
   const [remainingSeconds, setRemainingSeconds] = useState(
     (selectedLetter?.durationMinutes || 0) * 60
   );
@@ -1995,6 +1999,9 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <p style={styles.helperText}>
             Paste your task and chat in a single field. Herr Felix replies step by step with the updated coaching prompt.
           </p>
+          <p style={styles.helperText}>
+            Your first pasted question stays pinned here so you can reference it while writing. Keep checking the task bullet points too.
+          </p>
           <div style={styles.infoBox}>
             <strong>Use the coach to learn from your ideas:</strong>
             <ul style={styles.promptList}>
@@ -2067,6 +2074,23 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
             >
               New AI reply below ↓
             </button>
+          ) : null}
+          {pinnedIdeaQuestion ? (
+            <div
+              style={{
+                position: "sticky",
+                top: 8,
+                zIndex: 3,
+                marginTop: 12,
+                border: "1px solid #bfdbfe",
+                borderRadius: 12,
+                background: "#eff6ff",
+                padding: 10,
+              }}
+            >
+              <div style={{ fontWeight: 700, marginBottom: 6, color: "#1d4ed8" }}>📌 Pinned question</div>
+              <div style={{ whiteSpace: "pre-wrap", fontSize: 14, lineHeight: 1.5 }}>{pinnedIdeaQuestion}</div>
+            </div>
           ) : null}
           <div style={{ marginTop: 12 }}>
             <label style={styles.label}>Your prompt (single box)</label>
