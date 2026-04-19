@@ -23,7 +23,7 @@ export const buildAssignmentMetadataByLevel = (manifestByLevel = CURRICULUM_BY_L
       const canonical = toCanonicalId({ level, value: entry.assignment_id || entry.canonicalAssignmentId || entry.chapter });
       if (!canonical) return;
 
-      lookup[canonical] = {
+      const nextMetadata = {
         assignment: Boolean(entry.assignment),
         progressionEligible: Boolean(entry.progressionEligible),
         assignmentDay: Number(entry.assignmentDay || 0) || null,
@@ -32,6 +32,22 @@ export const buildAssignmentMetadataByLevel = (manifestByLevel = CURRICULUM_BY_L
         goal: String(entry.goal || "").trim(),
         mode: String(entry.mode || entry.type || "").trim(),
       };
+
+      const previous = lookup[canonical];
+      if (!previous) {
+        lookup[canonical] = nextMetadata;
+        return;
+      }
+
+      // Some chapters appear more than once (e.g. reading assignment + later speaking practice).
+      // Keep assignment/progression entries as the primary metadata used in progress dashboards.
+      const shouldReplace =
+        (!previous.assignment && nextMetadata.assignment) ||
+        (!previous.progressionEligible && nextMetadata.progressionEligible);
+
+      if (shouldReplace) {
+        lookup[canonical] = nextMetadata;
+      }
     });
 
     byLevel[level] = lookup;

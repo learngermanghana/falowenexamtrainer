@@ -9,6 +9,17 @@ describe("course schedule assignment metadata", () => {
     expect(chapterTwo).toMatchObject({ assignment: true, assignmentDay: 4, progressionEligible: true });
   });
 
+  test("prefers assignment metadata when a chapter also has self-practice entries", () => {
+    const chapterOnePointTwo = getCourseScheduleAssignmentMetadata({ level: "A1", assignmentId: "A1-1.2" });
+
+    expect(chapterOnePointTwo).toMatchObject({
+      assignment: true,
+      progressionEligible: true,
+      assignmentDay: 3,
+      topic: "Introducing Yourself",
+    });
+  });
+
   test("keeps practical-only entries visible but not progression-eligible", () => {
     const practical = getCourseScheduleAssignmentMetadata({ level: "A1", assignmentId: "A1-5.9" });
 
