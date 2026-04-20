@@ -1,6 +1,13 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+
+const tabs = [
+  { key: "sprechen", label: "Teil 1 · Sprechen" },
+  { key: "schreiben", label: "Teil 2 · Schreiben" },
+  { key: "lesen", label: "Teil 3 · Lesen" },
+  { key: "hoeren", label: "Teil 4 · Hören" },
+];
 
 const cardStyle = {
   ...styles.card,
@@ -127,8 +134,27 @@ const hoerenBlocks = [
   },
 ];
 
+function TabButton({ active, onClick, children }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        ...styles.secondaryButton,
+        borderColor: active ? "#2563eb" : "#d1d5db",
+        background: active ? "#eff6ff" : "#fff",
+        color: active ? "#1d4ed8" : "#111827",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("sprechen");
+
+  const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -140,115 +166,136 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
         <h1 style={{ ...styles.title, margin: 0 }}>A2 · Day 20 Workbook · Typische Reklamationssituationen üben</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 7.20</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Complete each Teil below and submit your final answers in the submission area (not on this page).
+          4-part workbook: Sprechen, Schreiben, Lesen und Hören. Complete each Teil and submit your final answers in the
+          submission area (not on this page).
+        </p>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {tabs.map((tab) => (
+            <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
+              {tab.label}
+            </TabButton>
+          ))}
+        </div>
+
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          Tab {activeIndex + 1} of {tabs.length}
         </p>
       </div>
 
-      <section style={sectionStyle}>
-        <img
-          src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1600&q=80"
-          alt="Customer discussing a complaint with store service staff at a counter"
-          loading="lazy"
-          style={imageStyle}
-        />
+      {activeTab === "sprechen" && (
+        <section style={sectionStyle}>
+          <img
+            src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1600&q=80"
+            alt="Customer discussing a complaint with store service staff at a counter"
+            loading="lazy"
+            style={imageStyle}
+          />
 
-        <h2 style={{ margin: 0 }}>Teil 1 · Sprechen (Group Practice)</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          In this chapter, we&apos;ll engage in group exercises discussing complaints in everyday situations.
-        </p>
-
-        <div style={infoBoxStyle}>
-          <strong>Zentrales Thema: Reklamieren (Making a Complaint)</strong>
-          <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-            <li>
-              <strong>Gründe für die Reklamation</strong>: falsche Lieferung, defektes Produkt, falsche Größe/Farbe,
-              verspätete Lieferung, schlechter Service.
-            </li>
-            <li>
-              <strong>Nützliche Sätze</strong>: „Ich möchte mich beschweren.", „Das Produkt ist kaputt.", „Ich möchte mein
-              Geld zurück.", „Könnten Sie das bitte umtauschen?"
-            </li>
-            <li>
-              <strong>Wichtige Unterlagen</strong>: Quittung/Rechnung, Lieferschein, Bestellnummer, Garantieschein.
-            </li>
-            <li>
-              <strong>Mögliche Lösungen</strong>: Umtausch, Reparatur, Erstattung, Gutschein, Preisnachlass.
-            </li>
-            <li>
-              <strong>Reaktion und Service</strong>: Kundendienst kontaktieren, Entschuldigung, klare Anleitung, Bestätigung.
-            </li>
-            <li>
-              <strong>Eigene Erfahrungen</strong>: Hast du schon einmal etwas reklamiert? Was ist passiert?
-            </li>
-          </ol>
-        </div>
-
-        <div style={questionBoxStyle}>
-          <strong>📝 Beispielantwort</strong>
+          <h2 style={{ margin: 0 }}>Teil 1 · Sprechen (Group Practice)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            „Ich habe einmal online Schuhe bestellt, aber sie waren zu klein. Ich habe den Kundenservice kontaktiert und
-            sie haben mir schnell eine neue Größe geschickt. Das war ein guter Service."
+            In this chapter, we&apos;ll engage in group exercises discussing complaints in everyday situations.
           </p>
-          <p style={{ margin: 0 }}>
-            <strong>Impulsfrage:</strong> Hast du schon einmal etwas reklamieren müssen? Erzähle davon.
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>Keywords:</strong> Produkt, Problem, Umtausch, Kundendienst.
-          </p>
-        </div>
-      </section>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 2 · Schreiben (Formeller Brief)</h2>
-        <div style={infoBoxStyle}>
+          <div style={infoBoxStyle}>
+            <strong>Zentrales Thema: Reklamieren (Making a Complaint)</strong>
+            <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+              <li>
+                <strong>Gründe für die Reklamation</strong>: falsche Lieferung, defektes Produkt, falsche Größe/Farbe,
+                verspätete Lieferung, schlechter Service.
+              </li>
+              <li>
+                <strong>Nützliche Sätze</strong>: „Ich möchte mich beschweren.", „Das Produkt ist kaputt.", „Ich möchte mein
+                Geld zurück.", „Könnten Sie das bitte umtauschen?"
+              </li>
+              <li>
+                <strong>Wichtige Unterlagen</strong>: Quittung/Rechnung, Lieferschein, Bestellnummer, Garantieschein.
+              </li>
+              <li>
+                <strong>Mögliche Lösungen</strong>: Umtausch, Reparatur, Erstattung, Gutschein, Preisnachlass.
+              </li>
+              <li>
+                <strong>Reaktion und Service</strong>: Kundendienst kontaktieren, Entschuldigung, klare Anleitung, Bestätigung.
+              </li>
+              <li>
+                <strong>Eigene Erfahrungen</strong>: Hast du schon einmal etwas reklamiert? Was ist passiert?
+              </li>
+            </ol>
+          </div>
+
+          <div style={questionBoxStyle}>
+            <strong>📝 Beispielantwort</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Ich habe einmal online Schuhe bestellt, aber sie waren zu klein. Ich habe den Kundenservice kontaktiert und
+              sie haben mir schnell eine neue Größe geschickt. Das war ein guter Service."
+            </p>
+            <p style={{ margin: 0 }}>
+              <strong>Impulsfrage:</strong> Hast du schon einmal etwas reklamieren müssen? Erzähle davon.
+            </p>
+            <p style={{ margin: 0 }}>
+              <strong>Keywords:</strong> Produkt, Problem, Umtausch, Kundendienst.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {activeTab === "schreiben" && (
+        <section style={sectionStyle}>
+          <h2 style={{ margin: 0 }}>Teil 2 · Schreiben (Formeller Brief)</h2>
+          <div style={infoBoxStyle}>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              <strong>Aufgabe:</strong> Schreiben Sie einen formellen Brief an einen Supermarkt (z. B. „CityMall"), weil ein
+              Produkt defekt oder nicht in Ordnung ist.
+            </p>
+            <p style={{ margin: 0 }}><strong>Berücksichtigen Sie:</strong></p>
+            <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+              <li>Warum schreiben Sie den Brief?</li>
+              <li>Was ist genau das Problem mit dem Produkt?</li>
+              <li>Welche Lösung erwarten Sie: Umtausch, Reparatur oder Geld zurück?</li>
+            </ol>
+          </div>
+        </section>
+      )}
+
+      {activeTab === "lesen" && (
+        <section style={sectionStyle}>
+          <h2 style={{ margin: 0 }}>Teil 3 · Lesen (Exercise)</h2>
+          {lesenQuestions.map((question) => (
+            <div key={question.title} style={questionBoxStyle}>
+              <strong>{question.title}</strong>
+              <p style={{ margin: 0, lineHeight: 1.7 }}>{question.prompt}</p>
+              <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+                {question.options.map((option) => (
+                  <li key={`${question.title}-${option}`}>{option}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {activeTab === "hoeren" && (
+        <section style={sectionStyle}>
+          <h2 style={{ margin: 0 }}>Teil 4 · Hören (Exercise)</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            <strong>Aufgabe:</strong> Schreiben Sie einen formellen Brief an einen Supermarkt (z. B. „CityMall"), weil ein
-            Produkt defekt oder nicht in Ordnung ist.
+            Note: The audio has been uploaded among the files in this chapter. You can also open each link in your browser.
           </p>
-          <p style={{ margin: 0 }}><strong>Berücksichtigen Sie:</strong></p>
-          <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-            <li>Warum schreiben Sie den Brief?</li>
-            <li>Was ist genau das Problem mit dem Produkt?</li>
-            <li>Welche Lösung erwarten Sie: Umtausch, Reparatur oder Geld zurück?</li>
-          </ol>
-        </div>
-      </section>
 
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 3 · Lesen (Exercise)</h2>
-        {lesenQuestions.map((question) => (
-          <div key={question.title} style={questionBoxStyle}>
-            <strong>{question.title}</strong>
-            <p style={{ margin: 0, lineHeight: 1.7 }}>{question.prompt}</p>
-            <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              {question.options.map((option) => (
-                <li key={`${question.title}-${option}`}>{option}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>Teil 5 · Hören (Exercise)</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Note: The audio has been uploaded among the files in this chapter. You can also open each link in your browser.
-        </p>
-
-        {hoerenBlocks.map((block) => (
-          <div key={block.title} style={questionBoxStyle}>
-            <strong>{block.title}</strong>
-            <a href={block.audioLink} target="_blank" rel="noreferrer">
-              Open Audio
-            </a>
-            <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              {block.questions.map((question) => (
-                <li key={`${block.title}-${question}`}>{question}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </section>
+          {hoerenBlocks.map((block) => (
+            <div key={block.title} style={questionBoxStyle}>
+              <strong>{block.title}</strong>
+              <a href={block.audioLink} target="_blank" rel="noreferrer">
+                Open Audio
+              </a>
+              <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+                {block.questions.map((question) => (
+                  <li key={`${block.title}-${question}`}>{question}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </section>
+      )}
 
       <section
         style={{
