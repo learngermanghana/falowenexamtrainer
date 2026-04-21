@@ -104,32 +104,96 @@ const hoerenBlocks = [
     title: "Hören 1 · Bewerbung (Job Application)",
     audioLink: "https://drive.google.com/file/d/1BWtDeohvS8Qekv0ZLsexBxqNqFhlwtf3/view?usp=sharing",
     questions: [
-      "1) Was sind wichtige Informationen, die in einem Lebenslauf enthalten sein sollten? (b)",
-      "2) Wie bereitet man sich auf ein Vorstellungsgespräch vor? (b)",
+      {
+        prompt: "1) Was sind wichtige Informationen, die in einem Lebenslauf enthalten sein sollten?",
+        options: [
+          "a) Die Hobbys des Bewerbers",
+          "b) Die beruflichen Qualifikationen und Erfahrungen",
+          "c) Die Gehaltsvorstellungen",
+          "d) Der Familienstand",
+        ],
+      },
+      {
+        prompt: "2) Wie bereitet man sich auf ein Vorstellungsgespräch vor?",
+        options: [
+          "a) Man übt das Vorstellungsgespräch mit Freunden",
+          "b) Man informiert sich über die Firma",
+          "c) Man kauft neue Kleidung",
+          "d) Man lernt den Arbeitsweg",
+        ],
+      },
     ],
   },
   {
     title: "Hören 2 · Berufswahl (Career Choice)",
     audioLink: "https://drive.google.com/file/d/1j7PWbKGDh27l0F0A68DNu6swUJYAPRJR/view?usp=sharing",
     questions: [
-      "3) Welche Faktoren sind bei der Wahl eines Berufs wichtig? (a, b)",
-      "4) Was sind die Vorteile eines Praktikums? (a, b, d)",
+      {
+        prompt: "3) Welche Faktoren sind bei der Wahl eines Berufs wichtig?",
+        options: [
+          "a) Die Bezahlung",
+          "b) Die Arbeitszeiten",
+          "c) Die Entfernung zur Arbeit",
+          "d) Die Berufserfahrung der Eltern",
+        ],
+      },
+      {
+        prompt: "4) Was sind die Vorteile eines Praktikums?",
+        options: [
+          "a) Man sammelt praktische Erfahrungen",
+          "b) Man knüpft Kontakte",
+          "c) Man verdient viel Geld",
+          "d) Man lernt verschiedene Berufe kennen",
+        ],
+      },
     ],
   },
   {
     title: "Hören 3 · Frauensachen (Women's Issues)",
     audioLink: "https://drive.google.com/file/d/1EZh08j4vFH4VPfcNPDSv4pWruD9ISg56/view?usp=sharing",
     questions: [
-      "5) Welche Herausforderungen haben Frauen heute im Berufsleben? (a, c)",
-      "6) Welche Maßnahmen könnten Frauen im Beruf unterstützen? (a, b, c)",
+      {
+        prompt: "5) Welche Herausforderungen haben Frauen heute im Berufsleben?",
+        options: [
+          "a) Geringere Aufstiegschancen",
+          "b) Höhere Gehälter als Männer",
+          "c) Schwierigkeit, Beruf und Familie zu vereinbaren",
+          "d) Bevorzugte Einstellungen",
+        ],
+      },
+      {
+        prompt: "6) Welche Maßnahmen könnten Frauen im Beruf unterstützen?",
+        options: [
+          "a) Flexible Arbeitszeiten",
+          "b) Frauenquote",
+          "c) Transparente Gehaltsstrukturen",
+          "d) Strengere Auswahlverfahren",
+        ],
+      },
     ],
   },
   {
     title: "Hören 4 · Damals (Back Then)",
     audioLink: "https://drive.google.com/file/d/1OfbZTKr9ePe5OqV9GNgE7D3tfoMAPOAD/view?usp=sharing",
     questions: [
-      "7) Wie war das Leben vor 50 Jahren im Vergleich zu heute? (a, c)",
-      "8) Welche waren einige der früheren Herausforderungen in Verbindung mit Technologie? (b)",
+      {
+        prompt: "7) Wie war das Leben vor 50 Jahren im Vergleich zu heute?",
+        options: [
+          "a) Es gab weniger technische Geräte im Haushalt",
+          "b) Die Menschen reisten häufiger",
+          "c) Es gab weniger Freizeitangebote",
+          "d) Die Arbeitszeiten waren kürzer",
+        ],
+      },
+      {
+        prompt: "8) Welche waren einige der früheren Herausforderungen in Verbindung mit Technologie?",
+        options: [
+          "a) Sie hatten viele Computer.",
+          "b) Sie arbeiteten mehr und hatten weniger Freizeit.",
+          "c) Es gab so viele Autos.",
+          "d) Sie hatten nicht genug Hausaufgaben zu erledigen.",
+        ],
+      },
     ],
   },
 ];
@@ -287,11 +351,16 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
               <a href={block.audioLink} target="_blank" rel="noreferrer">
                 Open Audio
               </a>
-              <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-                {block.questions.map((question) => (
-                  <li key={`${block.title}-${question}`}>{question}</li>
-                ))}
-              </ul>
+              {block.questions.map((question) => (
+                <div key={`${block.title}-${question.prompt}`} style={{ display: "grid", gap: 6 }}>
+                  <p style={{ margin: 0, lineHeight: 1.7 }}>{question.prompt}</p>
+                  <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+                    {question.options.map((option) => (
+                      <li key={`${block.title}-${question.prompt}-${option}`}>{option}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           ))}
         </section>
