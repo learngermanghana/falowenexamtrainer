@@ -137,6 +137,32 @@ To deploy them:
    firebase functions:log --only api
    ```
 
+### Avoid function conflicts when multiple repos deploy to the same Firebase project
+If another repository deploys to the same Firebase project, use a unique
+Functions `codebase` name in each repository's `firebase.json`. This repository
+uses:
+
+```json
+{
+  "functions": {
+    "source": "functions",
+    "codebase": "falowenexamtrainer"
+  }
+}
+```
+
+Then deploy with an explicit project ID from each repository:
+
+```
+firebase deploy --project <your-project-id> --only functions
+```
+
+Important: `codebase` prevents one repo's deploy from deleting functions owned
+by another repo, but it does **not** allow two repos to own the same function
+name. If both repos export a function with the same deployed name (for example
+`api`), the most recent deploy will still overwrite that function. To avoid
+that, rename function exports so each repo uses distinct names/prefixes.
+
 ### Point Paystack to the webhook
 After deploying, configure the webhook URL in your Paystack dashboard to point
 to the HTTPS endpoint (replace `<project>` with your Firebase project ID):
