@@ -76,7 +76,7 @@ const classCatalogDictionary = {
   "A2 Freiburg Klasse": {
     orientationDate: "2026-05-07",
     startDate: "2026-05-08",
-    endDate: "2026-07-10",
+    endDate: "2026-06-25",
     schedule: [
       { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
       { day: "Thursday", startTime: "11:00", endTime: "12:00" },
