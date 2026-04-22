@@ -59,8 +59,8 @@ const classCatalog = {
     ],
   },
   "A2 Freiburg Klasse": {
-    orientationDate: "2026-04-23",
-    startDate: "2026-04-24",
+    orientationDate: "2026-05-07",
+    startDate: "2026-05-08",
     endDate: "2026-06-25",
     schedule: [
       { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
