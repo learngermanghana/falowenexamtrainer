@@ -366,7 +366,7 @@ const A2_SCHEDULE = [
     video: "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
     youtube_link: "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
     grammarbook_link: "/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1mg_2ytNAYF00_j-TFQelajAxgQpmgrhW/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-22-die-woche-planung-workbook",
   },
   {
     day: 23,
