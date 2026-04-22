@@ -7,23 +7,37 @@ const cardStyle = {
   padding: 20,
   boxShadow: "0 6px 18px rgba(15, 23, 42, 0.06)",
 };
+const heroImageStyle = {
+  width: "100%",
+  maxHeight: 300,
+  objectFit: "cover",
+  borderRadius: 12,
+  border: "1px solid rgba(148,163,184,0.35)",
+};
 
 const A2Day22DieWochePlanungGrammarPage = () => {
   return (
     <main style={{ maxWidth: 980, margin: "0 auto", padding: "24px 16px 64px", color: "#0f172a" }}>
-      <header style={{ marginBottom: 18 }}>
+      <header style={{ ...cardStyle, marginBottom: 18, display: "grid", gap: 10 }}>
         <h1 style={{ marginBottom: 8 }}>A2 · Day 22 Grammar Notes · Die Woche Planung (8.22)</h1>
+        <img
+          src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1400&q=80"
+          alt="Weekly planner and calendar used for schedule planning"
+          style={heroImageStyle}
+          loading="lazy"
+        />
+        <p style={{ margin: 0, fontSize: "0.85rem", opacity: 0.72 }}>Header image source: Unsplash</p>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Fokus: <strong>Präsens für die Zukunft</strong>, <strong>Zeitangaben</strong> und <strong>Modalverben für
-          Verfügbarkeit</strong>.
+          Focus: <strong>present tense for future meaning</strong>, <strong>time phrases</strong>, and{" "}
+          <strong>modal verbs for availability</strong>.
         </p>
       </header>
 
       <section style={{ ...cardStyle, marginBottom: 16 }}>
-        <h2 style={{ marginTop: 0 }}>1) Präsens für die Zukunft</h2>
+        <h2 style={{ marginTop: 0 }}>1) Present tense for future meaning</h2>
         <p style={{ lineHeight: 1.7 }}>
-          Im Deutschen benutzt man sehr oft das <strong>Präsens</strong>, wenn man über die Zukunft spricht. Das geht
-          besonders gut mit einem klaren Zeitwort.
+          In German, you often use the <strong>present tense</strong> to talk about future plans. This sounds natural
+          when a clear time phrase is included.
         </p>
         <ul style={{ lineHeight: 1.8, marginBottom: 0 }}>
           <li>Ich <strong>arbeite</strong> morgen im Homeoffice.</li>
@@ -34,15 +48,21 @@ const A2Day22DieWochePlanungGrammarPage = () => {
 
       <section style={{ ...cardStyle, marginBottom: 16 }}>
         <h2 style={{ marginTop: 0 }}>2) Time phrases (Zeitangaben)</h2>
-        <p style={{ lineHeight: 1.7 }}>Mit Zeitangaben wird klar, wann etwas passiert.</p>
+        <p style={{ lineHeight: 1.7 }}>
+          Time phrases make the schedule precise. They answer <em>when</em> something happens and help avoid
+          confusion.
+        </p>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
           {[
             "heute",
             "morgen",
             "übermorgen",
+            "nächsten Montag",
             "am Montag",
+            "am Dienstagabend",
             "am Wochenende",
             "nächste Woche",
+            "in einer Stunde",
             "in zwei Tagen",
             "später",
           ].map((phrase) => (
@@ -51,16 +71,37 @@ const A2Day22DieWochePlanungGrammarPage = () => {
             </div>
           ))}
         </div>
-        <p style={{ marginTop: 12, marginBottom: 0, lineHeight: 1.7 }}>
-          Beispiel: <strong>Am Wochenende</strong> besuche ich meine Freunde und <strong>nächste Woche</strong> lerne
-          ich für die Prüfung.
-        </p>
+        <div style={{ marginTop: 12, display: "grid", gap: 8 }}>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            More examples in German:
+          </p>
+          <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.8 }}>
+            <li>
+              <strong>Heute</strong> lerne ich nur 30 Minuten.
+            </li>
+            <li>
+              <strong>Morgen früh</strong> fahre ich ins Büro.
+            </li>
+            <li>
+              <strong>Übermorgen</strong> treffen wir unsere Lehrerin online.
+            </li>
+            <li>
+              <strong>Am Dienstagabend</strong> macht er einen Deutschkurs.
+            </li>
+            <li>
+              <strong>Nächste Woche</strong> schreiben wir einen kleinen Test.
+            </li>
+            <li>
+              <strong>In zwei Tagen</strong> kann ich dir Bescheid geben.
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section style={{ ...cardStyle, marginBottom: 16 }}>
         <h2 style={{ marginTop: 0 }}>3) Modal verbs for availability</h2>
         <p style={{ lineHeight: 1.7 }}>
-          Modalverben helfen dir zu sagen, ob du Zeit hast oder nicht.
+          Modal verbs help you say whether you are available, busy, or making a plan.
         </p>
         <ul style={{ lineHeight: 1.8 }}>
           <li>
@@ -82,10 +123,10 @@ const A2Day22DieWochePlanungGrammarPage = () => {
       <section style={cardStyle}>
         <h2 style={{ marginTop: 0 }}>Knowledge (after the notes)</h2>
         <ol style={{ lineHeight: 1.8, marginBottom: 0 }}>
-          <li>Für Zukunft ist Präsens + Zeitangabe im Alltag am natürlichsten.</li>
-          <li>Setze Zeitangaben oft an Position 1: „Morgen arbeite ich länger.“</li>
-          <li>Bei Modalverben steht das zweite Verb am Ende: „Ich kann morgen kommen.“</li>
-          <li>Für Planungssprache sind „können“, „müssen“ und „wollen“ besonders wichtig.</li>
+          <li>For future plans, present tense + a time phrase is usually the most natural choice.</li>
+          <li>Time phrases are often in position 1: „Morgen arbeite ich länger.“</li>
+          <li>With modal verbs, the second verb goes to the end: „Ich kann morgen kommen.“</li>
+          <li>For planning language, „können“, „müssen“, and „wollen“ are especially useful.</li>
         </ol>
       </section>
     </main>
