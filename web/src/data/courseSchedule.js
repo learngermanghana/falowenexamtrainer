@@ -365,7 +365,7 @@ const A2_SCHEDULE = [
     instruction: "Watch the video, review grammar, and complete your workbook.",
     video: "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
     youtube_link: "https://youtu.be/rBuEEFfee1c?si=YJpKuM0St2gWN67H",
-    grammarbook_link: "https://drive.google.com/file/d/1AvLYxZKq1Ae6_4ACJ20il1LqCOv2jQbb/view?usp=sharing",
+    grammarbook_link: "/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1mg_2ytNAYF00_j-TFQelajAxgQpmgrhW/view?usp=sharing",
   },
   {
