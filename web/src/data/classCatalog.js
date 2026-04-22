@@ -74,15 +74,16 @@ const classCatalogDictionary = {
       "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-04-04&defaultWeekdays=Thursday%2CFriday%2CSaturday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "A2 Freiburg Klasse": {
-    orientationDate: "2026-04-23",
-    startDate: "2026-04-24",
+    orientationDate: "2026-05-07",
+    startDate: "2026-05-08",
     endDate: "2026-06-25",
     schedule: [
       { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
       { day: "Thursday", startTime: "11:00", endTime: "12:00" },
       { day: "Friday", startTime: "11:00", endTime: "12:00" },
     ],
-    docId: "1rzxoGqNSphKCyYLYA_3nYTnLcbjQ0QDz",
+    docUrl:
+      "https://admin.falowen.app/course-schedule/public?level=A2&startDate=2026-05-08&defaultWeekdays=Wednesday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "B1 Stuttgart Klasse": {
     startDate: "2026-03-12",
