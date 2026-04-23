@@ -330,9 +330,16 @@ const OnboardingChecklist = ({
   };
 
   const handleBringBack = () => setState((prev) => ({ ...prev, dismissedUntil: 0 }));
+  const canSaveOnboarding = Boolean(onSaveOnboarding && studentProfile?.id);
+  const saveBlocked = nextStepKey === "save" && !canSaveOnboarding;
 
   const handleSaveOnboarding = async () => {
-    if (!allFinished || !onSaveOnboarding) return;
+    if (!allFinished || !onSaveOnboarding) {
+      if (!onSaveOnboarding) {
+        setSaveError("No student profile found. Please log out and sign back in.");
+      }
+      return;
+    }
 
     setSaveError("");
     setSavingOnboarding(true);
@@ -460,11 +467,21 @@ const OnboardingChecklist = ({
             <button type="button" style={styles.secondaryButton} onClick={handleRemindLater}>
               Remind me later
             </button>
-            <button type="button" style={styles.primaryButton} onClick={handleContinue} disabled={savingOnboarding}>
+            <button
+              type="button"
+              style={styles.primaryButton}
+              onClick={handleContinue}
+              disabled={savingOnboarding || saveBlocked}
+            >
               {savingOnboarding ? "Saving..." : primaryCTA}
             </button>
           </div>
 
+          {saveBlocked ? (
+            <span style={{ ...styles.helperText, color: "#b91c1c" }}>
+              Student profile missing. Please log out and sign back in to save onboarding.
+            </span>
+          ) : null}
           {saveError ? <span style={{ ...styles.helperText, color: "#b91c1c" }}>{saveError}</span> : null}
         </div>
       </div>
