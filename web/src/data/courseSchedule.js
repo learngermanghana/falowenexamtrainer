@@ -612,8 +612,8 @@ const RAW_COURSE_SCHEDULES = {
       grammar_topic: "schon mal, noch nie; irregular verbs; man vs Mann",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/Y0N1xLBBh1g",
-        youtube_link: "https://youtu.be/Y0N1xLBBh1g",
+        video: "https://youtu.be/p3xFdekEZPg",
+        youtube_link: "https://youtu.be/p3xFdekEZPg",
         grammarbook_link: "https://www.falowen.app/campus/course/forming-basic-statements-german-a1-day-8",
         workbook_link: "/campus/course/a1-day-8-countries-and-languages-workbook",
         assignment: true,
