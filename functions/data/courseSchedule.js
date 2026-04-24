@@ -360,7 +360,7 @@ const A2_SCHEDULE = [
     video: "https://youtu.be/c4TpUe3teBE",
     youtube_link: "https://youtu.be/c4TpUe3teBE",
     grammarbook_link: "/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes",
-    workbook_link: "https://drive.google.com/file/d/1Ialg19GIE_KKHiLBDMm1aHbrzfNdb7L_/view?usp=sharing",
+    workbook_link: "/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook",
   },
   {
     day: 24,
