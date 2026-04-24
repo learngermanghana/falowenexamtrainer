@@ -74,6 +74,7 @@ import A2Day19EinkaufenOderDennGrammarPage from "./components/A2Day19EinkaufenOd
 import A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage from "./components/A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGrammarPage";
 import A2Day21EinWochenendePlanenWennObFallsGrammarPage from "./components/A2Day21EinWochenendePlanenWennObFallsGrammarPage";
 import A2Day22DieWochePlanungGrammarPage from "./components/A2Day22DieWochePlanungGrammarPage";
+import A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage from "./components/A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
@@ -862,6 +863,10 @@ const AppShell = ({
           <Route
             path="/campus/course/die-woche-planung-8-22-praesens-future-time-phrases-modalverben-grammar-notes"
             element={<A2Day22DieWochePlanungGrammarPage />}
+          />
+          <Route
+            path="/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes"
+            element={<A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage />}
           />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />

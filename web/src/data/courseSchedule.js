@@ -377,7 +377,7 @@ const A2_SCHEDULE = [
     instruction: "Watch the video, review grammar, and complete your workbook.",
     video: "https://youtu.be/c4TpUe3teBE",
     youtube_link: "https://youtu.be/c4TpUe3teBE",
-    grammarbook_link: "https://drive.google.com/file/d/1XbWKmc5P7ZAR-OqFce744xqCe7PQguXo/view?usp=sharing",
+    grammarbook_link: "/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes",
     workbook_link: "https://drive.google.com/file/d/1Ialg19GIE_KKHiLBDMm1aHbrzfNdb7L_/view?usp=sharing",
   },
   {
