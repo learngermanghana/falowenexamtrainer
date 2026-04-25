@@ -11,6 +11,7 @@ import { describeGrammarFocusItem } from "../lib/grammarFocusNotes";
 const DEFAULT_SCORE_THRESHOLD = 80;
 const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
 const COURSE_TABS = [
+  { id: "overview", label: "Überblick" },
   { id: "grammar", label: "Grammatik" },
   { id: "speaking", label: "Sprechen" },
   { id: "writing", label: "Schreiben" },
@@ -220,7 +221,7 @@ const C1SelfLearningCourse = () => {
     });
   };
 
-  const getActiveTab = (dayKey) => activeTabByDay[dayKey] || "grammar";
+  const getActiveTab = (dayKey) => activeTabByDay[dayKey] || "overview";
 
   const renderScoreField = ({ label, value, onChange }) => (
     <label style={{ ...styles.field, maxWidth: 200 }}>
@@ -398,47 +399,6 @@ const C1SelfLearningCourse = () => {
                 <span style={styles.levelPill}>Tag {entry.day}</span>
                 <h3 style={{ margin: "6px 0" }}>{entry.title}</h3>
                 <p style={{ ...styles.helperText, margin: 0 }}>Thema: {entry.topic}</p>
-                {getActiveTab(dayKey) === "grammar" && entry.learningObjectives?.length ? (
-                  <div style={{ ...styles.helperText, marginTop: 8 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Lernziele</div>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {entry.learningObjectives.map((objective) => (
-                        <li key={objective}>{objective}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-                {getActiveTab(dayKey) === "grammar" && entry.grammarFocus?.items?.length ? (
-                  <div style={{ ...styles.helperText, marginTop: 8 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                      Grammatikfokus {entry.grammarFocus.group ? `(${entry.grammarFocus.group})` : ""}
-                    </div>
-                    <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
-                      {entry.grammarFocus.items.map((item) => {
-                        const grammarItem = describeGrammarFocusItem(item, "de");
-                        return (
-                          <li key={grammarItem.title}>
-                            <strong>{grammarItem.title}</strong>
-                            <div>{grammarItem.note}</div>
-                            <div style={{ fontStyle: "italic", color: "#374151", marginTop: 2 }}>
-                              {grammarItem.exampleLabel} {grammarItem.example}
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                ) : null}
-                {getActiveTab(dayKey) === "grammar" && entry.brainMap?.length ? (
-                  <div style={{ ...styles.helperText, marginTop: 8 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Gedankenkarte (Ideen)</div>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {entry.brainMap.map((idea) => (
-                        <li key={idea}>{idea}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
               </div>
               {dayState.dayComplete ? <span style={styles.badge}>Tag abgeschlossen</span> : null}
             </div>
@@ -460,6 +420,57 @@ const C1SelfLearningCourse = () => {
             </div>
 
             <div style={{ display: "grid", gap: 12 }}>
+              {getActiveTab(dayKey) === "overview" ? (
+                <div style={{ display: "grid", gap: 8 }}>
+                  {entry.learningObjectives?.length ? (
+                    <div style={{ ...styles.helperText, marginTop: 0 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 4 }}>Lernziele</div>
+                      <ul style={{ margin: 0, paddingLeft: 18 }}>
+                        {entry.learningObjectives.map((objective) => (
+                          <li key={objective}>{objective}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                  {entry.grammarFocus?.items?.length ? (
+                    <div style={{ ...styles.helperText, marginTop: 0 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                        Grammatikfokus {entry.grammarFocus.group ? `(${entry.grammarFocus.group})` : ""}
+                      </div>
+                      <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
+                        {entry.grammarFocus.items.map((item) => {
+                          const grammarItem = describeGrammarFocusItem(item, "de");
+                          return (
+                            <li key={grammarItem.title}>
+                              <strong>{grammarItem.title}</strong>
+                              <div>{grammarItem.note}</div>
+                              <div style={{ fontStyle: "italic", color: "#374151", marginTop: 2 }}>
+                                {grammarItem.exampleLabel} {grammarItem.example}
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ) : null}
+                  {entry.brainMap?.length ? (
+                    <div style={{ ...styles.helperText, marginTop: 0 }}>
+                      <div style={{ fontWeight: 600, marginBottom: 4 }}>Gedankenkarte (Ideen)</div>
+                      <ul style={{ margin: 0, paddingLeft: 18 }}>
+                        {entry.brainMap.map((idea) => (
+                          <li key={idea}>{idea}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                  {!entry.learningObjectives?.length && !entry.grammarFocus?.items?.length && !entry.brainMap?.length ? (
+                    <p style={{ ...styles.helperText, margin: 0 }}>
+                      Für diesen Tag sind noch keine Überblicksinhalte hinterlegt.
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
               {getActiveTab(dayKey) === "grammar" ? (
                 <div style={{ display: "grid", gap: 6 }}>
                   <strong>Grammatiktraining</strong>
