@@ -7,6 +7,7 @@ import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/
 import { fetchVocabularyFromSheet } from "../services/vocabService";
 import { styles } from "../styles";
 import { describeGrammarFocusItem } from "../lib/grammarFocusNotes";
+import { DayTabs, OverviewPanel, ResourcePanel, WeeklyReviewPanel } from "./SelfLearningSharedComponents";
 
 const DEFAULT_SCORE_THRESHOLD = 80;
 const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
@@ -16,6 +17,7 @@ const COURSE_TABS = [
   { id: "speaking", label: "Sprechen" },
   { id: "writing", label: "Schreiben" },
   { id: "resources", label: "Ressourcen" },
+  { id: "review", label: "Review" },
 ];
 
 const buildEmptyDayState = () => ({
@@ -26,6 +28,7 @@ const buildEmptyDayState = () => ({
   writingComplete: false,
   skimmingComplete: false,
   dayComplete: false,
+  selectedTab: "overview",
 });
 
 const normalizeScore = (value) => {
@@ -51,7 +54,6 @@ const C1SelfLearningCourse = () => {
   const [resourcesLoaded, setResourcesLoaded] = useState(false);
   const [resourcesError, setResourcesError] = useState("");
   const [flashcardIndexByDay, setFlashcardIndexByDay] = useState({});
-  const [activeTabByDay, setActiveTabByDay] = useState({});
 
   const dayKeys = useMemo(
     () => C1_SELF_LEARNING_PLAN.map((entry) => `day-${entry.day}`),
@@ -221,7 +223,7 @@ const C1SelfLearningCourse = () => {
     });
   };
 
-  const getActiveTab = (dayKey) => activeTabByDay[dayKey] || "overview";
+  const getActiveTab = (dayState) => dayState?.selectedTab || "overview";
 
   const renderScoreField = ({ label, value, onChange }) => (
     <label style={{ ...styles.field, maxWidth: 200 }}>
@@ -237,6 +239,40 @@ const C1SelfLearningCourse = () => {
       />
     </label>
   );
+
+  const sharedLabels = {
+    overview: {
+      learningObjectives: "Lernziele",
+      grammarFocus: "Grammatikfokus",
+      brainMap: "Gedankenkarte (Ideen)",
+      emptyOverview: "Für diesen Tag sind noch keine Überblicksinhalte hinterlegt.",
+    },
+    resources: {
+      activitiesTitle: "2.5) Abwechslung & Aktivitäten",
+      quizTitle: "Mini-Quiz",
+      discussionLabel: "Diskussionsimpuls:",
+      reflectionLabel: "Reflexion:",
+      readingTitle: "Leseaufgabe",
+      listeningTitle: "Hörverstehen",
+      optionalBadge: "Optional",
+      openReading: "Quelle öffnen",
+      openListening: "Quelle öffnen",
+      sourcePrefix: "Quelle:",
+      skimmingTitle: "3) Wortschatzüberblick",
+      skimmingHelper: "Lies die Liste kurz durch und bilde zu jedem Wort einen kurzen C1-Satz.",
+      loadingVocab: "Wortschatz aus dem Sheet wird geladen ...",
+      flashcardTitle: "Flashcard-Übung",
+      prevCard: "Zurück",
+      nextCard: "Weiter",
+      randomCard: "Zufallskarte",
+      skimmingCompleteLabel: "Ich habe die Wortschatzliste geübt",
+    },
+    review: {
+      reviewTitle: "Wöchentliche Wiederholung & Reflexion",
+      practiceLabel: "Übung:",
+      emptyReview: "Für diesen Tag gibt es noch keine Wochenreflexion.",
+    },
+  };
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -403,75 +439,24 @@ const C1SelfLearningCourse = () => {
               {dayState.dayComplete ? <span style={styles.badge}>Tag abgeschlossen</span> : null}
             </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-              {COURSE_TABS.map((tab) => {
-                const isActive = getActiveTab(dayKey) === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTabByDay((prev) => ({ ...prev, [dayKey]: tab.id }))}
-                    style={isActive ? styles.primaryButton : styles.secondaryButton}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
+            <DayTabs
+              dayKey={dayKey}
+              activeTab={getActiveTab(dayState)}
+              onChange={(tabId) => updateDayState(dayKey, { selectedTab: tabId })}
+              tablistLabel={`Tag ${entry.day} Tabs`}
+              tabs={COURSE_TABS.map((tab) =>
+                tab.id === "review" && entry.weeklyReview
+                  ? { ...tab, badge: `${entry.weeklyReview.reflectionQuestions?.length || 1}` }
+                  : tab
+              )}
+            />
 
             <div style={{ display: "grid", gap: 12 }}>
-              {getActiveTab(dayKey) === "overview" ? (
-                <div style={{ display: "grid", gap: 8 }}>
-                  {entry.learningObjectives?.length ? (
-                    <div style={{ ...styles.helperText, marginTop: 0 }}>
-                      <div style={{ fontWeight: 600, marginBottom: 4 }}>Lernziele</div>
-                      <ul style={{ margin: 0, paddingLeft: 18 }}>
-                        {entry.learningObjectives.map((objective) => (
-                          <li key={objective}>{objective}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                  {entry.grammarFocus?.items?.length ? (
-                    <div style={{ ...styles.helperText, marginTop: 0 }}>
-                      <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                        Grammatikfokus {entry.grammarFocus.group ? `(${entry.grammarFocus.group})` : ""}
-                      </div>
-                      <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
-                        {entry.grammarFocus.items.map((item) => {
-                          const grammarItem = describeGrammarFocusItem(item, "de");
-                          return (
-                            <li key={grammarItem.title}>
-                              <strong>{grammarItem.title}</strong>
-                              <div>{grammarItem.note}</div>
-                              <div style={{ fontStyle: "italic", color: "#374151", marginTop: 2 }}>
-                                {grammarItem.exampleLabel} {grammarItem.example}
-                              </div>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  ) : null}
-                  {entry.brainMap?.length ? (
-                    <div style={{ ...styles.helperText, marginTop: 0 }}>
-                      <div style={{ fontWeight: 600, marginBottom: 4 }}>Gedankenkarte (Ideen)</div>
-                      <ul style={{ margin: 0, paddingLeft: 18 }}>
-                        {entry.brainMap.map((idea) => (
-                          <li key={idea}>{idea}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                  {!entry.learningObjectives?.length && !entry.grammarFocus?.items?.length && !entry.brainMap?.length ? (
-                    <p style={{ ...styles.helperText, margin: 0 }}>
-                      Für diesen Tag sind noch keine Überblicksinhalte hinterlegt.
-                    </p>
-                  ) : null}
-                </div>
+              {getActiveTab(dayState) === "overview" ? (
+                <OverviewPanel dayKey={dayKey} entry={entry} grammarLanguage="de" labels={sharedLabels.overview} />
               ) : null}
 
-              {getActiveTab(dayKey) === "grammar" ? (
+              {getActiveTab(dayState) === "grammar" ? (
                 <div style={{ display: "grid", gap: 6 }}>
                   <strong>Grammatiktraining</strong>
                   {entry.grammarFocus?.items?.length ? (
@@ -520,7 +505,7 @@ const C1SelfLearningCourse = () => {
                 </div>
               ) : null}
 
-              {getActiveTab(dayKey) === "speaking" ? (
+              {getActiveTab(dayState) === "speaking" ? (
                 <div style={{ display: "grid", gap: 6 }}>
                 {entry.speaking.askGrammarPrompt ? (
                   <span style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
@@ -628,7 +613,7 @@ const C1SelfLearningCourse = () => {
                 </div>
               ) : null}
 
-              {getActiveTab(dayKey) === "writing" ? (
+              {getActiveTab(dayState) === "writing" ? (
                 <div style={{ display: "grid", gap: 6 }}>
                   <strong>2) Schreibtraining</strong>
                   {entry.writing?.headerImage?.url ? (
@@ -706,211 +691,38 @@ const C1SelfLearningCourse = () => {
                 </div>
               ) : null}
 
-              {getActiveTab(dayKey) === "resources" && entry.activities ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                  <strong>2.5) Abwechslung & Aktivitäten</strong>
-                  {entry.activities.quiz?.length ? (
-                    <>
-                      <div style={{ ...styles.helperText, fontWeight: 600 }}>Mini-Quiz</div>
-                      <ul style={{ margin: 0, paddingLeft: 18 }}>
-                        {entry.activities.quiz.map((question) => (
-                          <li key={question} style={styles.helperText}>
-                            {question}
-                          </li>
-                        ))}
-                      </ul>
-                    </>
-                  ) : null}
-                  {entry.activities.discussionPrompt ? (
-                    <p style={{ ...styles.helperText, margin: 0 }}>
-                      <strong>Diskussionsimpuls:</strong> {entry.activities.discussionPrompt}
-                    </p>
-                  ) : null}
-                  {entry.activities.reflectionPrompt ? (
-                    <p style={{ ...styles.helperText, margin: 0 }}>
-                      <strong>Reflexion:</strong> {entry.activities.reflectionPrompt}
-                    </p>
-                  ) : null}
-                </div>
+              {getActiveTab(dayState) === "resources" ? (
+                <ResourcePanel
+                  dayKey={dayKey}
+                  entry={entry}
+                  readingResource={readingResource}
+                  listeningResource={listeningResource}
+                  sheetVocabLoaded={sheetVocabLoaded}
+                  skimmingWords={skimmingWords}
+                  flashcardIndex={flashcardIndex}
+                  dayState={dayState}
+                  onPrevCard={() =>
+                    updateFlashcardIndex(dayKey, (current) => (current === 0 ? skimmingWords.length - 1 : current - 1))
+                  }
+                  onNextCard={() =>
+                    updateFlashcardIndex(dayKey, (current) => (current + 1) % skimmingWords.length)
+                  }
+                  onRandomCard={() =>
+                    updateFlashcardIndex(dayKey, () => Math.floor(Math.random() * skimmingWords.length))
+                  }
+                  onToggleSkimming={(checked) =>
+                    updateDayState(dayKey, {
+                      skimmingComplete: checked,
+                      dayComplete: checked ? dayState.dayComplete : false,
+                    })
+                  }
+                  labels={sharedLabels.resources}
+                />
               ) : null}
-
-              {getActiveTab(dayKey) === "resources" && entry.reading ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <strong>Leseaufgabe</strong>
-                    {entry.reading.optional ? (
-                      <span style={{ ...styles.badge, background: "#ecfeff", color: "#0e7490" }}>
-                        Optional
-                      </span>
-                    ) : null}
-                  </div>
-                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
-                    {readingResource?.title || entry.reading.title}
-                  </p>
-                  {readingResource?.description ? (
-                    <p style={{ ...styles.helperText, margin: 0 }}>{readingResource.description}</p>
-                  ) : null}
-                  {entry.reading.text ? <p style={{ ...styles.helperText, margin: 0 }}>{entry.reading.text}</p> : null}
-                  {readingResource?.url ? (
-                    <a href={readingResource.url} target="_blank" rel="noreferrer" style={styles.linkButton}>
-                      Quelle öffnen
-                    </a>
-                  ) : null}
-                  {entry.reading.tasks?.length ? (
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {entry.reading.tasks.map((task) => (
-                        <li key={task} style={styles.helperText}>
-                          {task}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  {readingResource?.source || entry.reading.source ? (
-                    <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
-                      Quelle: {readingResource?.source || entry.reading.source}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {getActiveTab(dayKey) === "resources" && entry.listening ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <strong>Hörverstehen</strong>
-                    {entry.listening.optional ? (
-                      <span style={{ ...styles.badge, background: "#ecfeff", color: "#0e7490" }}>
-                        Optional
-                      </span>
-                    ) : null}
-                  </div>
-                  <p style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
-                    {listeningResource?.title || entry.listening.title}
-                  </p>
-                  {listeningResource?.description ? (
-                    <p style={{ ...styles.helperText, margin: 0 }}>{listeningResource.description}</p>
-                  ) : null}
-                  {entry.listening.prompt ? (
-                    <p style={{ ...styles.helperText, margin: 0 }}>{entry.listening.prompt}</p>
-                  ) : null}
-                  {listeningResource?.url ? (
-                    <a href={listeningResource.url} target="_blank" rel="noreferrer" style={styles.linkButton}>
-                      Quelle öffnen
-                    </a>
-                  ) : null}
-                  {entry.listening.tasks?.length ? (
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {entry.listening.tasks.map((task) => (
-                        <li key={task} style={styles.helperText}>
-                          {task}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                  {listeningResource?.source || entry.listening.source ? (
-                    <p style={{ ...styles.helperText, margin: 0, color: "#6b7280" }}>
-                      Quelle: {listeningResource?.source || entry.listening.source}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-
-              {getActiveTab(dayKey) === "resources" ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                <strong>3) Wortschatzüberblick</strong>
-                <p style={{ ...styles.helperText, margin: 0 }}>
-                  Lies die Liste kurz durch und bilde zu jedem Wort einen kurzen C1-Satz.
-                </p>
-                {!sheetVocabLoaded ? (
-                  <p style={{ ...styles.helperText, margin: 0 }}>Wortschatz aus dem Sheet wird geladen ...</p>
-                ) : null}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                  {skimmingWords.map((word) => (
-                    <span key={word} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>
-                      {word}
-                    </span>
-                  ))}
-                </div>
-                {skimmingWords.length ? (
-                  <div style={{ ...styles.card, padding: 12 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 6 }}>Flashcard-Übung</div>
-                    <div style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>
-                      {skimmingWords[flashcardIndex]}
-                    </div>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        style={styles.secondaryButton}
-                        onClick={() =>
-                          updateFlashcardIndex(dayKey, (current) =>
-                            current === 0 ? skimmingWords.length - 1 : current - 1
-                          )
-                        }
-                      >
-                        Zurück
-                      </button>
-                      <button
-                        type="button"
-                        style={styles.secondaryButton}
-                        onClick={() =>
-                          updateFlashcardIndex(dayKey, (current) => (current + 1) % skimmingWords.length)
-                        }
-                      >
-                        Weiter
-                      </button>
-                      <button
-                        type="button"
-                        style={styles.linkButton}
-                        onClick={() =>
-                          updateFlashcardIndex(dayKey, () => Math.floor(Math.random() * skimmingWords.length))
-                        }
-                      >
-                        Zufallskarte
-                      </button>
-                    </div>
-                    <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                      Formuliere einen Satz mit dem Wort und erweitere ihn um ein Beispiel.
-                    </p>
-                  </div>
-                ) : null}
-                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <input
-                    type="checkbox"
-                    checked={dayState.skimmingComplete}
-                    onChange={(event) =>
-                      updateDayState(dayKey, {
-                        skimmingComplete: event.target.checked,
-                        dayComplete: event.target.checked ? dayState.dayComplete : false,
-                      })
-                    }
-                  />
-                  <span style={styles.label}>Ich habe die Wortschatzliste geübt</span>
-                </label>
-              </div>
+              {getActiveTab(dayState) === "review" ? (
+                <WeeklyReviewPanel dayKey={dayKey} weeklyReview={entry.weeklyReview} labels={sharedLabels.review} />
               ) : null}
             </div>
-
-            {entry.weeklyReview ? (
-              <div style={{ display: "grid", gap: 6 }}>
-                <strong>Wöchentliche Wiederholung & Reflexion</strong>
-                {entry.weeklyReview.summary ? (
-                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.weeklyReview.summary}</p>
-                ) : null}
-                {entry.weeklyReview.reflectionQuestions?.length ? (
-                  <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {entry.weeklyReview.reflectionQuestions.map((question) => (
-                      <li key={question} style={styles.helperText}>
-                        {question}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-                {entry.weeklyReview.practicePrompt ? (
-                  <p style={{ ...styles.helperText, margin: 0 }}>
-                    <strong>Übung:</strong> {entry.weeklyReview.practicePrompt}
-                  </p>
-                ) : null}
-              </div>
-            ) : null}
 
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
               <span style={{ ...styles.helperText, margin: 0 }}>
