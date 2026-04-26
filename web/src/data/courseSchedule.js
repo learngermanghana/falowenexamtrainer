@@ -306,7 +306,7 @@ const A2_SCHEDULE = [
   },
   {
     day: 18,
-    topic: "Die Bank anrufen 7.18 (Group Practice)",
+    topic: "Die Bank anrufen 7.18",
     chapter: "7.18",
     goal: "Discuss bank-call situations confidently, including account opening, key questions, and next steps.",
     assignment: true,
