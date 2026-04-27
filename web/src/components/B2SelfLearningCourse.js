@@ -507,11 +507,6 @@ const B2SelfLearningCourse = () => {
 
               {getActiveTab(dayState) === "speaking" ? (
                 <div style={{ display: "grid", gap: 6 }}>
-                {entry.speaking.askGrammarPrompt ? (
-                  <span style={{ ...styles.helperText, margin: 0, fontWeight: 600 }}>
-                    Step 0: Grammar check
-                  </span>
-                ) : null}
                 <strong>1) Speaking recorder</strong>
                 {entry.speaking.concept ? (
                   <p style={{ ...styles.helperText, margin: 0 }}>{entry.speaking.concept}</p>
@@ -540,42 +535,6 @@ const B2SelfLearningCourse = () => {
                       ))}
                     </div>
                   </div>
-                ) : null}
-                {entry.speaking.grammarNotes?.length ? (
-                  <div style={{ ...styles.helperText, margin: 0 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Grammar focus</div>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {entry.speaking.grammarNotes.map((note) => (
-                        <li key={note}>{note}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-                {entry.speaking.askGrammarPrompt ? (
-                  <>
-                    <p style={{ ...styles.helperText, margin: 0 }}>
-                      {entry.speaking.askGrammarPrompt}{" "}
-                      <button
-                        type="button"
-                        style={styles.linkButton}
-                        onClick={() => navigate("/campus/grammar")}
-                      >
-                        Ask the grammar coach
-                      </button>
-                    </p>
-                    <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <input
-                        type="checkbox"
-                        checked={dayState.grammarCheckComplete}
-                        onChange={(event) =>
-                          updateDayState(dayKey, {
-                            grammarCheckComplete: event.target.checked,
-                          })
-                        }
-                      />
-                      <span style={styles.label}>I asked a grammar question</span>
-                    </label>
-                  </>
                 ) : null}
                 <p style={{ ...styles.helperText, margin: 0 }}>{entry.speaking.prompt}</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
