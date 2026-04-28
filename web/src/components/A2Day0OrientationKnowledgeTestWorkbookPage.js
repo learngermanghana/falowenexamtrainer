@@ -450,7 +450,8 @@ const A2Day0OrientationKnowledgeTestWorkbookPage = () => {
         </p>
 
         <p style={{ margin: 0 }}>
-          To submit your work, go to the <strong>Submit</strong> tab, select the correct day, and upload or enter your answers.
+          To submit your work, go to the <strong>Submit</strong> tab, select the correct day, type your answers, and submit.
+          You can also save a draft if you are not ready to submit yet.
         </p>
 
         <p style={{ margin: 0 }}>
