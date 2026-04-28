@@ -60,13 +60,9 @@ const A2_SCHEDULE = [
     day: 0,
     topic: "Tutorial",
     chapter: "Tutorial",
-    goal: "Understand the full A2 course structure, complete the Day 0 starter workbook, and begin exam-focused preparation from day one.",
+    goal: "Open the Day 0 workbook tutorial before Day 1, then complete your starter knowledge check.",
     instruction:
-      "Start here before Day 1. The A2 course has 28 chapters, and each day includes a recorded lesson video (lecture, grammar, and workbook guidance). The workbook has four parts: Teil 1 (Sprechen) for group speaking practice that students must prepare before class, Teil 2 (Schreiben) with one letter task, Teil 3 (Lesen) with 7 questions, and Teil 4 (Hören) with 5 questions. Teile 2-4 are scored together out of 100%. Treat each day seriously because the course is designed to prepare students for the Goethe exam from the beginning. Complete the Day 0 starter workbook and self-check your basics with multiple-choice tasks on sentence formation, weil/deshalb, letter introduction, statement word order, verb conjugation, W-questions, Ja/Nein questions, and time expressions.",
-    instructionLink: {
-      label: "Read A2 Day 0 structure and starter workbook",
-      to: "/campus/course/course-structure",
-    },
+      "Start here before Day 1. Open the Day 0 workbook first to follow the tutorial and course workflow. Then complete the starter multiple-choice check (sentence formation, weil/deshalb, letter intro, statement order, verb conjugation, W-questions, Ja/Nein questions, and time expressions).",
     tutorial_video_url: DAY0_TUTORIAL_VIDEO_URL_A1,
     grammar_topic: null,
     assignment: false,
@@ -460,11 +456,8 @@ const RAW_COURSE_SCHEDULES = {
       topic: "Tutorial",
       chapter: "Tutorial",
       goal: "Watch the Day 0 tutorial video to see how the course is organised.",
-      instruction: "Start here to learn how the course is structured and what to expect, then watch the tutorial video.",
-      instructionLink: {
-        label: "Read how the course is structured",
-        to: "/campus/course/course-structure",
-      },
+      instruction:
+        "Start here before Day 1. Open the Day 0 workbook first for the tutorial and complete the starter check.",
       tutorial_video_url: DAY0_TUTORIAL_VIDEO_URL_A1,
       grammar_topic: null,
       assignment: false,
@@ -905,13 +898,9 @@ const RAW_COURSE_SCHEDULES = {
       day: 0,
       topic: "Tutorial",
       chapter: "Tutorial",
-      goal: "Understand the B1 course structure, complete the Day 0 foundation workbook, and align your study habits with Goethe exam expectations.",
+      goal: "Open the Day 0 workbook tutorial before Day 1, then complete your B1 foundation check.",
       instruction:
-        "Begin here before Day 1. B1 follows a structured daily workflow with recorded lesson videos, grammar focus, and workbook training. Your workbook is organised into four parts: Teil 1 (Sprechen) for prepared group speaking in class, Teil 2 (Schreiben) for letter-writing practice, Teil 3 (Lesen) with reading questions, and Teil 4 (Hören) with listening questions. Keep a serious daily routine because B1 is also exam-oriented from the first day. Complete the Day 0 multiple-choice foundation workbook to review sentence structure, connectors (weil/deshalb), letter openings, statement rules, verb conjugation, W-questions, Ja/Nein questions, and time expressions.",
-      instructionLink: {
-        label: "Read B1 Day 0 structure and foundation workbook",
-        to: "/campus/course/course-structure",
-      },
+        "Start here before Day 1. Open the Day 0 workbook first to review the B1 workflow and exam focus. Then complete the foundation multiple-choice check.",
       tutorial_video_url: DAY0_TUTORIAL_VIDEO_URL_A1,
       grammar_topic: null,
       assignment: false,
