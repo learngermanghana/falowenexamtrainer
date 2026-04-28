@@ -1962,9 +1962,31 @@ const withComplexSentenceFocus = (entry) => {
   };
 };
 
-export const B2_SELF_LEARNING_PLAN = BASE_B2_SELF_LEARNING_PLAN.map((entry) =>
-  withComplexSentenceFocus({
+const withWeeklyReviewUnifiedTask = (entry) => {
+  if (!entry?.weeklyReview) return entry;
+
+  const reviewFocus = `Tag ${entry.day}: ${entry.title}. Thema: ${entry.topic}`;
+
+  return {
     ...entry,
-    ...(B2_PLAN_ENHANCEMENTS[entry.day] || {}),
-  })
+    speaking: {
+      ...entry.speaking,
+      concept:
+        "Präsentiere eine zusammenhängende Wochenreflexion zum Review-Thema und begründe deine wichtigsten Erkenntnisse.",
+      prompt: `Sprich 2 Minuten (Goethe-B2-Stil): ${reviewFocus} Fasse die Woche zusammen, ordne eine Reiseerfahrung ein und nenne konkrete Lernziele für die nächste Woche.`,
+    },
+    writing: {
+      ...entry.writing,
+      prompt: `Schreibe im Goethe-B2-Stil einen zusammenhängenden Wochenrückblick zum selben Fokus wie beim Sprechen: ${reviewFocus} Beschreibe zentrale Erkenntnisse, ordne eine Reiseerfahrung ein und formuliere klare nächste Schritte.`,
+    },
+  };
+};
+
+export const B2_SELF_LEARNING_PLAN = BASE_B2_SELF_LEARNING_PLAN.map((entry) =>
+  withWeeklyReviewUnifiedTask(
+    withComplexSentenceFocus({
+      ...entry,
+      ...(B2_PLAN_ENHANCEMENTS[entry.day] || {}),
+    })
+  )
 );
