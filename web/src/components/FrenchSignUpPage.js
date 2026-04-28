@@ -12,16 +12,17 @@ import PasswordGuidance from "./PasswordGuidance";
 import TuitionStatusCard from "./TuitionStatusCard";
 import { formatCurrency } from "../lib/formatters";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import {
+  isFullName,
+  isLikelyPhoneNumber,
+  normalizeEmail,
+  normalizePersonName,
+  normalizePhone,
+  normalizeWhitespace,
+} from "../lib/signupDataQuality";
 
 const MIN_INITIAL_PAYMENT = 2000;
 const FRENCH_LEVELS = ["A1"];
-
-const isFullName = (value) => {
-  const cleaned = String(value || "").trim();
-  if (!cleaned) return false;
-  const parts = cleaned.split(/\s+/).filter(Boolean);
-  return parts.length >= 2 && parts.every((part) => part.length >= 2);
-};
 
 const formatClassLabel = (className) => {
   const details = frenchClassCatalog[className];
@@ -146,25 +147,31 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
     setFieldErrors({});
 
     const numericInitialPayment = Number(initialPaymentAmount);
+    const cleanedName = normalizePersonName(name);
+    const cleanedEmail = normalizeEmail(email);
+    const cleanedPhone = normalizePhone(phone);
+    const cleanedAddress = normalizeWhitespace(address);
+    const cleanedLocation = normalizeWhitespace(location);
+    const cleanedEmergencyPhone = normalizePhone(emergencyContactPhone);
     const validationIssues = {};
 
     if (!isFullName(name)) {
       validationIssues.name = "Use your full name (first and last) so we can prepare your French profile.";
     }
 
-    if (!email.trim() || !email.includes("@")) {
+    if (!cleanedEmail || !cleanedEmail.includes("@")) {
       validationIssues.email = "Enter a valid email address so we can send your class links.";
     }
 
-    if (!phone.trim()) {
-      validationIssues.phone = "Add a contact phone number so we can reach you.";
+    if (!isLikelyPhoneNumber(cleanedPhone)) {
+      validationIssues.phone = "Add a valid contact phone number (7–15 digits) so we can reach you.";
     }
 
-    if (!address.trim()) {
+    if (!cleanedAddress) {
       validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
     }
 
-    if (!location.trim()) {
+    if (!cleanedLocation) {
       validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
     }
 
@@ -172,8 +179,9 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
       validationIssues.learningMode = "Choose how you plan to learn so we can match you to the right experience.";
     }
 
-    if (!emergencyContactPhone.trim()) {
-      validationIssues.emergencyContactPhone = "Add an emergency contact phone number. This is required for safety.";
+    if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
+      validationIssues.emergencyContactPhone =
+        "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
     }
 
     if (!selectedClass) {
@@ -226,20 +234,20 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
     try {
       const level = selectedLevel;
       const tuitionFee = tuitionSummary.tuitionFee;
-      const studentCode = generateStudentCode({ name });
+      const studentCode = generateStudentCode({ name: cleanedName });
       const paystackLink = tuitionSummary.paystackLink;
       const intendedPaymentAmount = Math.max(Number(numericInitialPayment) || 0, 0);
 
-      await signup(email, password, {
-        name,
+      await signup(cleanedEmail, password, {
+        name: cleanedName,
         level,
         studentCode,
         className: selectedClass,
-        phone,
-        location,
+        phone: cleanedPhone,
+        location: cleanedLocation,
         learningMode,
-        address,
-        emergencyContactPhone,
+        address: cleanedAddress,
+        emergencyContactPhone: cleanedEmergencyPhone,
         program: "french",
         initialPaymentAmount: 0,
         tuitionFee,
@@ -253,7 +261,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
         contractTermMonths: 6,
       });
 
-      rememberStudentCodeForEmail(email, studentCode);
+      rememberStudentCodeForEmail(cleanedEmail, studentCode);
       const successMessage =
         `Welcome to French A1! Your student code is ${studentCode}. ` +
         "We will send your class start date and live links by email. " +
