@@ -418,7 +418,8 @@ const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
         </p>
 
         <p style={{ margin: 0 }}>
-          To submit your work, go to the <strong>Submit</strong> tab, select the correct day, and upload or enter your answers.
+          To submit your work, go to the <strong>Submit</strong> tab, select the correct day, type your answers, and submit.
+          You can also save a draft if you are not ready to submit yet.
         </p>
 
         <p style={{ margin: 0 }}>
@@ -560,6 +561,15 @@ const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
           Remember: A1 is not only about attending class. It is about building a strong foundation.
           Watch Video ansehen, study the grammar, complete the workbook, submit your required Lesen and Hören tasks,
           check your corrections, check in for attendance, and ask questions when you need help.
+        </p>
+
+        <p style={{ margin: 0 }}>
+          Important: Completing the A1 course alone is not enough to write the Goethe A1 exam confidently.
+          After you finish the course, go to the{" "}
+          <a href="https://www.falowen.app/exams" target="_blank" rel="noreferrer">
+            Exam Room
+          </a>{" "}
+          and solve past questions for about <strong>2 weeks</strong> before you write the exam.
         </p>
 
         <p style={{ margin: 0 }}>
