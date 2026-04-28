@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
+const day0HeroImage =
+  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80";
+
 const SectionCard = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 10 }}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -361,6 +364,12 @@ const B1Day0OrientationKnowledgeTestWorkbookPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Start here before Day 1. This guide helps A2 students understand what changes at B1 and how to prepare for stronger independent communication.
         </p>
+
+        <img
+          src={day0HeroImage}
+          alt="B1 Day 0 workbook hero"
+          style={{ width: "100%", maxHeight: 240, objectFit: "cover", borderRadius: 12 }}
+        />
       </div>
 
       <SectionCard title="Day 0 Orientation">
