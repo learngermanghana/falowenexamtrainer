@@ -1981,7 +1981,51 @@ const withComplexSentenceFocus = (entry) => {
   };
 };
 
+const withWeeklyReviewUnifiedTask = (entry) => {
+  if (!entry?.weeklyReview) return entry;
+
+  const reviewFocus = `Tag ${entry.day}: ${entry.title}. Thema: ${entry.topic}`;
+
+  return {
+    ...entry,
+    speaking: {
+      ...entry.speaking,
+      concept:
+        "Erstelle eine klare Wochenreflexion mit einem durchgehenden Schwerpunkt und präziser Einordnung deiner Reiseerfahrungen.",
+      prompt: `Sprich 2 Minuten (Goethe-C1-Stil): ${reviewFocus} Verbinde Wochenrückblick und Reiseeinordnung in einer strukturierten Darstellung und leite konkrete Lernprioritäten ab.`,
+    },
+  };
+};
+
 const buildDailyWritingTask = (entry) => {
+  if (entry.weeklyReview) {
+    return {
+      ...entry,
+      writing: {
+        ...entry.writing,
+        type: "opinion_essay",
+        formatLabel: "Goethe C1 · Diskussionsbeitrag (Meinungsaufsatz)",
+        headerImage: {
+          url: WRITING_HEADER_IMAGES[(entry.day - 1) % WRITING_HEADER_IMAGES.length],
+          alt: `C1 Schreiben Tag ${entry.day} — Wochenreview`,
+        },
+        examStyleTask: {
+          contextPrefix:
+            "Für das Internetforum Karriere & Beruf verfassen Sie einen Diskussionsbeitrag zu diesem Thema:",
+          topicLine: `${entry.topic} Welche Position vertreten Sie?`,
+          timeHint: "",
+          points: [
+            "Ordnen Sie eine konkrete Reiseerfahrung ein und begründen Sie deren Bedeutung für Ihre Lernwoche.",
+            "Reflektieren Sie die wichtigsten Fortschritte und Schwierigkeiten aus dieser Woche.",
+            "Nennen Sie zwei sprachliche Schwerpunkte, die Sie gezielt wiederholen möchten.",
+            "Formulieren Sie einen klaren Aktionsplan für die nächste Woche.",
+          ],
+        },
+        prompt: `Schreibe im Goethe-C1-Stil (Goethe C1 · Diskussionsbeitrag (Meinungsaufsatz)) zum einheitlichen Review-Fokus: Tag ${entry.day} – ${entry.title} (${entry.topic}).`,
+      },
+    };
+  }
+
   const useOpinionEssay = entry.day % 2 === 1;
   const template = useOpinionEssay ? OPINION_ESSAY_TEMPLATE : FORMAL_LETTER_TEMPLATE;
   const imageUrl = WRITING_HEADER_IMAGES[(entry.day - 1) % WRITING_HEADER_IMAGES.length];
@@ -2017,9 +2061,11 @@ const buildDailyWritingTask = (entry) => {
 
 export const C1_SELF_LEARNING_PLAN = BASE_C1_SELF_LEARNING_PLAN.map((entry) =>
   buildDailyWritingTask(
-    withComplexSentenceFocus({
-      ...entry,
-      ...(C1_PLAN_ENHANCEMENTS[entry.day] || {}),
-    })
+    withWeeklyReviewUnifiedTask(
+      withComplexSentenceFocus({
+        ...entry,
+        ...(C1_PLAN_ENHANCEMENTS[entry.day] || {}),
+      })
+    )
   )
 );
