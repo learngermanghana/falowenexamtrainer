@@ -392,7 +392,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Travel planning vocabulary and practical communication for holiday organization",
     video: "https://youtu.be/iPScKV6JWaA",
     youtube_link: "https://youtu.be/iPScKV6JWaA",
-    grammarbook_link: "https://drive.google.com/file/d/1tFXs-DNKvt97Q4dsyXsYvKVQvT5Qqt0y/view?usp=sharing",
+    grammarbook_link: "/campus/course/einen-urlaub-planen-9-24-final-a2-grammar-notes",
     workbook_link: "/campus/course/a2-day-24-einen-urlaub-planen-workbook",
   },
   {

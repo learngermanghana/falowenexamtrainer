@@ -78,6 +78,7 @@ import A2Day20TypischeReklamationssituationenHoeflicheBittenUndBegruendungenGram
 import A2Day21EinWochenendePlanenWennObFallsGrammarPage from "./components/A2Day21EinWochenendePlanenWennObFallsGrammarPage";
 import A2Day22DieWochePlanungGrammarPage from "./components/A2Day22DieWochePlanungGrammarPage";
 import A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage from "./components/A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage";
+import A2Day24EinenUrlaubPlanenGrammarPage from "./components/A2Day24EinenUrlaubPlanenGrammarPage";
 import A2Day8RezepteUndEssenWorkbookPage from "./components/A2Day8RezepteUndEssenWorkbookPage";
 import A2Day9UrlaubWorkbookPage from "./components/A2Day9UrlaubWorkbookPage";
 import A2Day10TourismusTraditionelleFesteWorkbookPage from "./components/A2Day10TourismusTraditionelleFesteWorkbookPage";
@@ -874,6 +875,10 @@ const AppShell = ({
           <Route
             path="/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes"
             element={<A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage />}
+          />
+          <Route
+            path="/campus/course/einen-urlaub-planen-9-24-final-a2-grammar-notes"
+            element={<A2Day24EinenUrlaubPlanenGrammarPage />}
           />
           <Route path="/campus/course/a1-day-0-orientation-and-knowledge-test-workbook" element={<A1Day0OrientationKnowledgeTestWorkbookPage />} />
           <Route path="/campus/course/a2-day-0-orientation-and-knowledge-test-workbook" element={<A2Day0OrientationKnowledgeTestWorkbookPage />} />
