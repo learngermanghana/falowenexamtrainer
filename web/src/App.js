@@ -18,6 +18,9 @@ import LetterPracticePage from "./components/LetterPracticePage";
 import DativeAdjectiveDeclensionPage from "./components/DativeAdjectiveDeclensionPage";
 import SpeakingExamIntroPage from "./components/SpeakingExamIntroPage";
 import CourseStructurePage from "./components/CourseStructurePage";
+import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
+import A2Day0OrientationKnowledgeTestWorkbookPage from "./components/A2Day0OrientationKnowledgeTestWorkbookPage";
+import B1Day0OrientationKnowledgeTestWorkbookPage from "./components/B1Day0OrientationKnowledgeTestWorkbookPage";
 import CourseResourceViewerPage from "./components/CourseResourceViewerPage";
 import FullClassCalendarPage from "./components/FullClassCalendarPage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
@@ -872,6 +875,9 @@ const AppShell = ({
             path="/campus/course/wie-kommst-du-zur-schule-zur-arbeit-9-23-praepositionen-mit-verkehrsmitteln-grammar-notes"
             element={<A2Day23WieKommstDuZurSchuleOderZurArbeitGrammarPage />}
           />
+          <Route path="/campus/course/a1-day-0-orientation-and-knowledge-test-workbook" element={<A1Day0OrientationKnowledgeTestWorkbookPage />} />
+          <Route path="/campus/course/a2-day-0-orientation-and-knowledge-test-workbook" element={<A2Day0OrientationKnowledgeTestWorkbookPage />} />
+          <Route path="/campus/course/b1-day-0-orientation-and-knowledge-test-workbook" element={<B1Day0OrientationKnowledgeTestWorkbookPage />} />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
           <Route path="/campus/course/full-class-calendar/:className" element={<FullClassCalendarPage />} />

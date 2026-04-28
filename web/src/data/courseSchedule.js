@@ -73,7 +73,7 @@ const A2_SCHEDULE = [
     video: DAY0_TUTORIAL_VIDEO_URL_A1,
     youtube_link: DAY0_TUTORIAL_VIDEO_URL_A1,
     grammarbook_link: null,
-    workbook_link: null,
+    workbook_link: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
   },
   {
     day: 1,
@@ -472,7 +472,7 @@ const RAW_COURSE_SCHEDULES = {
         video: DAY0_TUTORIAL_VIDEO_URL_A1,
         youtube_link: DAY0_TUTORIAL_VIDEO_URL_A1,
         grammarbook_link: null,
-        workbook_link: null,
+        workbook_link: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
         assignment: false,
       },
     },
@@ -919,7 +919,7 @@ const RAW_COURSE_SCHEDULES = {
         video: DAY0_TUTORIAL_VIDEO_URL_A1,
         youtube_link: DAY0_TUTORIAL_VIDEO_URL_A1,
         grammarbook_link: null,
-        workbook_link: null,
+        workbook_link: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
       },
     },
     {
