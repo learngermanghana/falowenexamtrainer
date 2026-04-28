@@ -383,8 +383,8 @@ const A2_SCHEDULE = [
   },
   {
     day: 24,
-    topic: "Einen Urlaub planen 9.24 (Sprechen) (Group Practice)",
-    chapter: "9.24",
+    topic: "Einen Urlaub planen 9.24",
+    chapter: "Einen Urlaub planen 9.24",
     goal: "Plan a vacation by discussing destination, budget, transport, accommodation, activities, and preparation.",
     assignment: true,
     instruction:
