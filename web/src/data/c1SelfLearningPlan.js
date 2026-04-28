@@ -2081,6 +2081,7 @@ const buildDailyWritingTask = (entry) => {
   }
 
   const useOpinionEssay = entry.day % 2 === 1;
+  const isTag9Konsum = entry.day === 9;
   const template = useOpinionEssay ? OPINION_ESSAY_TEMPLATE : FORMAL_LETTER_TEMPLATE;
   const imageUrl = WRITING_HEADER_IMAGES[(entry.day - 1) % WRITING_HEADER_IMAGES.length];
 
@@ -2089,9 +2090,33 @@ const buildDailyWritingTask = (entry) => {
     : `Thema des Tages: ${entry.topic} Beschreiben Sie das Anliegen klar und lösungsorientiert.`;
 
   const basePoints = useOpinionEssay ? getOpinionEssayPointsForTopic(entry.topic) : template.points;
-  const contextualizedPoints = basePoints.map((point) =>
-    `${point} (Bezug zum Thema: ${entry.topic})`
-  );
+  const contextualizedPoints =
+    useOpinionEssay && isTag9Konsum
+      ? basePoints
+      : basePoints.map((point) => `${point} (Bezug zum Thema: ${entry.topic})`);
+
+  const contextPrefix =
+    useOpinionEssay && isTag9Konsum
+      ? "Für das Internetforum „Gesellschaft & Konsum“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:"
+      : template.contextPrefix;
+
+  const prompt =
+    useOpinionEssay && isTag9Konsum
+      ? `Schreibe im Goethe-C1-Stil einen Diskussionsbeitrag zum Tagesthema:
+
+Kaufverhalten, Werbung und bewusster Konsum
+
+Für das Internetforum „Gesellschaft & Konsum“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:
+
+Kaufverhalten, Werbung und bewusster Konsum – welche Position vertreten Sie?
+
+Gehen Sie dabei auf folgende Punkte ein:
+
+Beschreiben Sie, welche Faktoren Ihr Kaufverhalten am stärksten beeinflussen.
+Analysieren Sie anhand eines konkreten Beispiels, wie Werbung Kaufentscheidungen steuert.
+Nennen Sie Nachteile von unbewusstem Konsum für Gesellschaft oder Umwelt.
+Schlagen Sie Maßnahmen für einen bewussteren und verantwortungsvolleren Konsum vor.`
+      : `Schreibe im Goethe-C1-Stil (${template.formatLabel}) zum Tagesthema: ${entry.topic}`;
 
   return {
     ...entry,
@@ -2104,12 +2129,12 @@ const buildDailyWritingTask = (entry) => {
         alt: `C1 Schreiben Tag ${entry.day} — ${template.formatLabel}`,
       },
       examStyleTask: {
-        contextPrefix: template.contextPrefix,
+        contextPrefix,
         topicLine,
         timeHint: template.timeHint || "",
         points: contextualizedPoints,
       },
-      prompt: `Schreibe im Goethe-C1-Stil (${template.formatLabel}) zum Tagesthema: ${entry.topic}`,
+      prompt,
     },
   };
 };
