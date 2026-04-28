@@ -1930,12 +1930,66 @@ const OPINION_ESSAY_TEMPLATE = {
   type: "opinion_essay",
   formatLabel: "Goethe C1 · Diskussionsbeitrag (Meinungsaufsatz)",
   contextPrefix: "Für das Internetforum Karriere & Beruf verfassen Sie einen Diskussionsbeitrag zu diesem Thema:",
-  points: [
-    "Erklären Sie, nach welchen Kriterien sich die Wahl des Studienfachs richten sollte.",
-    "Argumentieren Sie anhand eines Beispiels für ein Studienfach.",
-    "Nennen Sie Gründe, die gegen ein Studium sprechen könnten.",
-    "Erläutern Sie eine Alternative zum Studium.",
-  ],
+  points: [],
+};
+
+const OPINION_ESSAY_ROUTES = [
+  {
+    name: "Konsum und Werbung",
+    matches: [/kaufverhalten|werbung|konsum|nachhaltig|ressourcen/i],
+    points: [
+      "Beschreiben Sie, welche Faktoren Ihr Kaufverhalten am stärksten beeinflussen.",
+      "Analysieren Sie anhand eines konkreten Beispiels, wie Werbung Entscheidungen steuert.",
+      "Nennen Sie Nachteile von unbewusstem Konsum für Gesellschaft oder Umwelt.",
+      "Schlagen Sie Maßnahmen für einen bewussteren und verantwortungsvolleren Konsum vor.",
+    ],
+  },
+  {
+    name: "Studium und Ausbildung",
+    matches: [/studium|studienfach|ausbildung|weiterbildung|hochschule/i],
+    points: [
+      "Erklären Sie, nach welchen Kriterien sich die Wahl des Studienfachs oder der Ausbildung richten sollte.",
+      "Argumentieren Sie anhand eines konkreten Beispiels für einen Bildungsweg.",
+      "Nennen Sie Gründe, die gegen ein Studium sprechen könnten.",
+      "Erläutern Sie eine realistische Alternative zum Studium.",
+    ],
+  },
+  {
+    name: "Arbeit und Karriere",
+    matches: [/arbeit|beruf|karriere|arbeitsmarkt|unternehmen/i],
+    points: [
+      "Skizzieren Sie, welche Anforderungen der heutige Arbeitsmarkt an Bewerbende stellt.",
+      "Begründen Sie Ihre Position mit einem Beispiel aus einem Berufsfeld.",
+      "Nennen Sie ein Gegenargument zu Ihrer Position und wägen Sie es ab.",
+      "Formulieren Sie eine Empfehlung für Berufseinsteigerinnen und -einsteiger.",
+    ],
+  },
+  {
+    name: "Medien und Digitalisierung",
+    matches: [/medien|digital|internet|soziale netzwerke|ki|technologie/i],
+    points: [
+      "Ordnen Sie Chancen und Risiken der digitalen Entwicklung für den Alltag ein.",
+      "Belegen Sie Ihre Position mit einem konkreten Medien- oder Technikbeispiel.",
+      "Diskutieren Sie ein Gegenargument, das häufig in der öffentlichen Debatte genannt wird.",
+      "Entwickeln Sie einen Vorschlag für einen verantwortungsvollen Umgang mit digitalen Angeboten.",
+    ],
+  },
+];
+
+const getOpinionEssayPointsForTopic = (topic) => {
+  const normalizedTopic = String(topic || "");
+  const matchingRoute = OPINION_ESSAY_ROUTES.find((route) =>
+    route.matches.some((pattern) => pattern.test(normalizedTopic))
+  );
+
+  if (matchingRoute) return matchingRoute.points;
+
+  return [
+    "Ordnen Sie die wichtigsten Aspekte des Themas ein und benennen Sie Ihre Position klar.",
+    "Begründen Sie Ihre Position anhand eines konkreten Beispiels aus Alltag, Studium oder Beruf.",
+    "Stellen Sie ein mögliches Gegenargument dar und setzen Sie sich damit differenziert auseinander.",
+    "Formulieren Sie zum Schluss eine realistische Empfehlung oder einen Lösungsansatz.",
+  ];
 };
 
 const FORMAL_LETTER_TEMPLATE = {
@@ -2034,7 +2088,8 @@ const buildDailyWritingTask = (entry) => {
     ? `${entry.topic} Welche Position vertreten Sie?`
     : `Thema des Tages: ${entry.topic} Beschreiben Sie das Anliegen klar und lösungsorientiert.`;
 
-  const contextualizedPoints = template.points.map((point) =>
+  const basePoints = useOpinionEssay ? getOpinionEssayPointsForTopic(entry.topic) : template.points;
+  const contextualizedPoints = basePoints.map((point) =>
     `${point} (Bezug zum Thema: ${entry.topic})`
   );
 
