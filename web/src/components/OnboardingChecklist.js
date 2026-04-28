@@ -3,6 +3,7 @@ import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useToast } from "../context/ToastContext";
 import { classCatalog } from "../data/classCatalog";
+import { courseSchedules } from "../data/courseSchedule";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { loadPreferredClass } from "../services/classSelectionStorage";
 import { normalizeNotificationStatus } from "../utils/notificationStatus";
@@ -12,6 +13,28 @@ const STORAGE_KEY = "falowen_onboarding_v3";
 const DISMISS_HOURS = 24;
 
 const normalizeLevel = (level) => (level || "").toUpperCase().trim();
+
+const getDay0WorkbookLinkForLevel = (level) => {
+  const normalizedLevel = normalizeLevel(level);
+  if (!["A1", "A2", "B1"].includes(normalizedLevel)) return null;
+
+  const levelSchedule = courseSchedules?.[normalizedLevel];
+  if (!Array.isArray(levelSchedule)) return null;
+
+  const day0Lesson = levelSchedule.find((lesson) => Number(lesson?.day) === 0);
+  if (!day0Lesson || typeof day0Lesson !== "object") return null;
+
+  const lesenHoeren = day0Lesson.lesen_hören;
+  if (Array.isArray(lesenHoeren)) {
+    const lessonWithWorkbook = lesenHoeren.find((entry) => entry?.workbook_link);
+    if (lessonWithWorkbook?.workbook_link) return lessonWithWorkbook.workbook_link;
+  } else if (lesenHoeren?.workbook_link) {
+    return lesenHoeren.workbook_link;
+  }
+
+  if (day0Lesson.workbook_link) return day0Lesson.workbook_link;
+  return null;
+};
 
 const loadState = () => {
   if (typeof window === "undefined") return {};
@@ -125,7 +148,7 @@ const OnboardingChecklist = ({
   studentProfile,
   onSaveOnboarding,
 }) => {
-  const { levelConfirmed } = useExam();
+  const { level, levelConfirmed } = useExam();
   const { showToast } = useToast();
 
   const [state, setState] = useState(() => {
@@ -140,7 +163,10 @@ const OnboardingChecklist = ({
   });
 
   const profileLevel = useMemo(() => normalizeLevel(studentProfile?.level), [studentProfile?.level]);
+  const preferredLevel = useMemo(() => normalizeLevel(level), [level]);
+  const effectiveLevel = profileLevel || preferredLevel;
   const profileClassName = useMemo(() => (studentProfile?.className || "").trim(), [studentProfile?.className]);
+  const day0WorkbookLink = useMemo(() => getDay0WorkbookLinkForLevel(effectiveLevel), [effectiveLevel]);
 
   const [selectedClass, setSelectedClass] = useState(() => loadPreferredClass() || "");
 
@@ -392,6 +418,11 @@ const OnboardingChecklist = ({
 
   const toggleGuidedMode = () => setState((prev) => ({ ...prev, guidedMode: !prev.guidedMode }));
 
+  const handleOpenDay0Workbook = () => {
+    if (!day0WorkbookLink || typeof window === "undefined") return;
+    window.open(day0WorkbookLink, "_blank", "noopener,noreferrer");
+  };
+
   if (onboardingCompleted) return null;
 
   if (shouldHideForNow) {
@@ -502,6 +533,18 @@ const OnboardingChecklist = ({
           disableSecondaryWhenComplete={false}
           footnote={currentClass ? `Detected from profile/storage: ${currentClass}` : "Not saved yet."}
         />
+
+        {day0WorkbookLink ? (
+          <Step
+            title={`Day 0 tutorial workbook (${effectiveLevel})`}
+            description="Open Day 0 to read how this course level is structured before starting Day 1."
+            actionLabel="Open Day 0 workbook"
+            onAction={handleOpenDay0Workbook}
+            complete={false}
+            accent="#dbeafe"
+            footnote="Recommended for all new signups."
+          />
+        ) : null}
 
         <Step
           stepRef={calendarRef}
