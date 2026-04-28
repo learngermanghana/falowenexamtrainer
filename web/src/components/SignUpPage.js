@@ -15,15 +15,16 @@ import { useToast } from "../context/ToastContext";
 import PasswordGuidance from "./PasswordGuidance";
 import { formatCurrency } from "../lib/formatters";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import {
+  isFullName,
+  isLikelyPhoneNumber,
+  normalizeEmail,
+  normalizePersonName,
+  normalizePhone,
+  normalizeWhitespace,
+} from "../lib/signupDataQuality";
 
 const MIN_INITIAL_PAYMENT = 2000;
-const normalizePhone = (value) => String(value || "").replace(/\s+/g, "").trim();
-const isFullName = (value) => {
-  const cleaned = String(value || "").trim();
-  if (!cleaned) return false;
-  const parts = cleaned.split(/\s+/).filter(Boolean);
-  return parts.length >= 2 && parts.every((part) => part.length >= 2);
-};
 
 const formatClassLabel = (className) => {
   const details = classCatalog[className];
@@ -215,6 +216,12 @@ const SignUpPage = ({ onLogin, onBack }) => {
     setFieldErrors({});
 
     const numericInitialPayment = Number(initialPaymentAmount);
+    const cleanedName = normalizePersonName(name);
+    const cleanedEmail = normalizeEmail(email);
+    const cleanedPhone = normalizePhone(phone);
+    const cleanedAddress = normalizeWhitespace(address);
+    const cleanedLocation = normalizeWhitespace(location);
+    const cleanedEmergencyPhone = normalizePhone(emergencyContactPhone);
 
     const validationIssues = {};
 
@@ -243,20 +250,21 @@ const SignUpPage = ({ onLogin, onBack }) => {
       validationIssues.selectedClass = "Pick a class to reserve your seat. If unsure, choose the closest option for now.";
     }
 
-    if (!normalizePhone(phone)) {
-      validationIssues.phone = "Enter a contact phone number so we can reach you.";
+    if (!isLikelyPhoneNumber(cleanedPhone)) {
+      validationIssues.phone = "Enter a valid contact phone number (7–15 digits) so we can reach you.";
     }
 
-    if (!address.trim()) {
+    if (!cleanedAddress) {
       validationIssues.address = "Add your address so we can keep accurate records for your enrollment.";
     }
 
-    if (!location.trim()) {
+    if (!cleanedLocation) {
       validationIssues.location = "Add your current location so we can keep accurate enrollment records.";
     }
 
-    if (!normalizePhone(emergencyContactPhone)) {
-      validationIssues.emergencyContactPhone = "Add an emergency contact phone number. This is required for safety.";
+    if (!isLikelyPhoneNumber(cleanedEmergencyPhone)) {
+      validationIssues.emergencyContactPhone =
+        "Add a valid emergency contact phone number (7–15 digits). This is required for safety.";
     }
 
     if (!learningMode) {
@@ -293,21 +301,21 @@ const SignUpPage = ({ onLogin, onBack }) => {
       const paidAmount = 0;
       const balanceDue = Math.max(Number(tuitionFee) || 0, 0);
       const paymentStatus = "pending";
-      const studentCode = generateStudentCode({ name });
+      const studentCode = generateStudentCode({ name: cleanedName });
       // Store the base Paystack link, but create the actual checkout URL on-demand
       // via the backend so we can validate amounts and attach clear metadata.
       const paystackLink = paystackLinkForLevel(selectedLevel);
 
-      await signup(email.trim().toLowerCase(), password, {
-        name: name.trim(),
+      await signup(cleanedEmail, password, {
+        name: cleanedName,
         level: selectedLevel,
         studentCode,
         className: selectedClass,
-        phone: normalizePhone(phone),
-        location: location.trim(),
-        address: address.trim(),
+        phone: cleanedPhone,
+        location: cleanedLocation,
+        address: cleanedAddress,
         learningMode,
-        emergencyContactPhone: normalizePhone(emergencyContactPhone),
+        emergencyContactPhone: cleanedEmergencyPhone,
         program: "german",
         initialPaymentAmount: paidAmount,
         tuitionFee,
@@ -322,7 +330,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
       });
       savePreferredLevel(selectedLevel);
       savePreferredClass(selectedClass);
-      rememberStudentCodeForEmail(email, studentCode);
+      rememberStudentCodeForEmail(cleanedEmail, studentCode);
       const balanceText = balanceDue > 0 ? ` Balance due: ${formatMoney(balanceDue)}.` : "";
       const amountCopy = intendedPaymentAmount
         ? `You chose to pay ${formatMoney(intendedPaymentAmount)} now.`
