@@ -384,11 +384,20 @@ const WeatherPerfektLetterPage = () => {
         />
 
         <ul style={listStyle}>
-          <li>Es regnet.</li>
-          <li>Es schneit.</li>
-          <li>Es ist kalt / warm / windig.</li>
-          <li>Die Sonne scheint.</li>
+          <li>Es regnet. (It is raining.)</li>
+          <li>Es schneit. (It is snowing.)</li>
+          <li>Es ist kalt / warm / windig. (It is cold / warm / windy.)</li>
+          <li>Die Sonne scheint. (The sun is shining.)</li>
         </ul>
+
+        <div style={noteStyle}>
+          <strong>Important:</strong> For weather with a verb, use only <strong>es + verb</strong>.
+          <div>✅ Es regnet. / Es schneit.</div>
+          <div>❌ Es ist regnet. / Es ist schneit.</div>
+          <div style={{ marginTop: 8 }}>
+            Use <strong>Es ist ...</strong> only with adjectives: <em>Es ist kalt/warm/windig.</em>
+          </div>
+        </div>
       </section>
 
       <section style={cardStyle} className="falowen-section hoverCard">
@@ -472,19 +481,22 @@ const WeatherPerfektLetterPage = () => {
         </div>
 
         <div style={boxStyle}>
-          <h3 style={{ marginTop: 0 }}>Präteritum vs. Perfekt (quick idea)</h3>
+          <h3 style={{ marginTop: 0 }}>Präteritum vs. Perfekt (quick idea in simple English first)</h3>
           <p style={{ marginTop: 0 }}>
             In A1, we focus on <strong>Perfekt</strong> because it is the most common
             past tense in spoken German. <strong>Präteritum</strong> is also past tense,
-            but you will often see it in books, stories, and with some common verbs.
+            but you will often see it in books, stories, news, and with common verbs
+            like <em>sein</em> and <em>haben</em>.
           </p>
           <ul style={listStyle}>
-            <li>
-              <strong>Präteritum:</strong> Ich aß. (I ate.)
-            </li>
-            <li>
-              <strong>Perfekt:</strong> Ich habe gegessen. (I have eaten / I ate.)
-            </li>
+            <li><strong>Perfekt</strong> = most common in speaking.</li>
+            <li><strong>Präteritum</strong> = common in writing and narration.</li>
+          </ul>
+          <ul style={listStyle}>
+            <li><strong>Präteritum:</strong> Ich aß. (I ate.)</li>
+            <li><strong>Perfekt:</strong> Ich habe gegessen. (I have eaten / I ate.)</li>
+            <li><strong>Präteritum:</strong> Ich war müde. (I was tired.)</li>
+            <li><strong>Perfekt:</strong> Ich bin müde gewesen. (I was tired.)</li>
           </ul>
 
           <h3 style={{ marginTop: 0 }}>Statements using "haben" and "sein"</h3>
@@ -604,7 +616,7 @@ const WeatherPerfektLetterPage = () => {
       </section>
 
       <section style={cardStyle} className="falowen-section hoverCard">
-        <h2 style={{ margin: 0 }}>4) Asking for Price (A1)</h2>
+        <h2 style={{ margin: 0 }}>4) Asking for Price (A1) — Important for Letter Writing</h2>
 
         <img
           src="https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=1600&q=70"
@@ -627,7 +639,7 @@ const WeatherPerfektLetterPage = () => {
           <div style={{ marginTop: 10 }}>
             <strong>Polite request:</strong>
             <div>• Könnten Sie mir bitte Informationen geben?</div>
-            <div>• Könnten Sie mir bitte sagen, wann der Kurs beginnt?</div>
+            <div>• Wann fängt der Kurs an?</div>
           </div>
         </div>
       </section>
