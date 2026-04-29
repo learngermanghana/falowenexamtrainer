@@ -60,8 +60,46 @@ export default function A2Day25TagesablaufWorkbookPage() {
 
     {activeTab === "sprechen" && <div style={card}><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80" alt="Students discussing their day in class" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
       <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>Discuss your daily routine in small groups. Compare schedules, typical activities, and time expressions.</p>
-      <ul style={listSpacing}><li>Wann stehst du auf und wann gehst du schlafen?</li><li>Was machst du am Morgen, Nachmittag und Abend?</li><li>Was ist unter der Woche anders als am Wochenende?</li></ul>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
+      <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Instructions</h3>
+      <ol style={listSpacing}>
+        <li><strong>Central Topic:</strong> Write <strong>„Tagesablauf“</strong> in the center of your brain map.</li>
+        <li><strong>Main Branches:</strong> Create six main branches:
+          <ul style={listSpacing}>
+            <li>Morgenroutine (Morning Routine)</li>
+            <li>Arbeit/Schule (Work/School)</li>
+            <li>Mittagspause (Lunch Break)</li>
+            <li>Nachmittag (Afternoon)</li>
+            <li>Abendroutine (Evening Routine)</li>
+            <li>Freizeit und Hobbys (Free Time and Hobbies)</li>
+          </ul>
+        </li>
+        <li><strong>Sub-Branches:</strong> Expand each branch with examples and phrases.</li>
+      </ol>
+      <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Example Brain Map</h3>
+      <ol style={listSpacing}>
+        <li><strong>Morgenroutine (Morning Routine)</strong>
+          <ul style={listSpacing}><li>Aufstehen (getting up)</li><li>Zähne putzen (brushing teeth)</li><li>Duschen (showering)</li><li>Frühstücken (having breakfast)</li><li>Anziehen (getting dressed)</li><li>Zur Arbeit oder zur Schule gehen (going to work or school)</li></ul>
+        </li>
+        <li><strong>Arbeit/Schule (Work/School)</strong>
+          <ul style={listSpacing}><li>Arbeiten (working)</li><li>E-Mails schreiben (writing emails)</li><li>An Meetings teilnehmen (attending meetings)</li><li>Unterricht haben (having lessons)</li><li>Hausaufgaben machen (doing homework)</li><li>Pause machen (taking a break)</li></ul>
+        </li>
+        <li><strong>Mittagspause (Lunch Break)</strong>
+          <ul style={listSpacing}><li>Mittagessen essen (eating lunch)</li><li>Mit Kollegen oder Freunden sprechen (talking with colleagues or friends)</li><li>Einkaufen gehen (going shopping)</li><li>Spazieren gehen (taking a walk)</li></ul>
+        </li>
+        <li><strong>Nachmittag (Afternoon)</strong>
+          <ul style={listSpacing}><li>Weiterarbeiten (continuing work)</li><li>Sport treiben (doing sports)</li><li>Termine haben (having appointments)</li><li>Kaffee trinken (having coffee)</li></ul>
+        </li>
+        <li><strong>Abendroutine (Evening Routine)</strong>
+          <ul style={listSpacing}><li>Abendessen kochen (cooking dinner)</li><li>Nachrichten schauen (watching the news)</li><li>Entspannen (relaxing)</li><li>Duschen oder baden (taking a shower or bath)</li><li>Ins Bett gehen (going to bed)</li></ul>
+        </li>
+        <li><strong>Freizeit und Hobbys (Free Time and Hobbies)</strong>
+          <ul style={listSpacing}><li>Bücher lesen (reading books)</li><li>Musik hören (listening to music)</li><li>Filme oder Serien schauen (watching movies or series)</li><li>Spazieren gehen (going for a walk)</li><li>Freunde treffen (meeting friends)</li><li>Ein Instrument spielen (playing an instrument)</li></ul>
+        </li>
+      </ol>
+      <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Topic for Discussion</h3>
+      <p style={{ margin: 0 }}>Wie sieht dein Tagesablauf aus?</p>
+      <p style={{ margin: 0 }}><strong>Keywords:</strong> aufstehen, arbeiten/lernen, essen, Freizeit</p>
       <div style={calloutStyle}><strong>Speaking self-practice confidence check</strong><p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p><a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">Open speaking self-practice</a></div>
       <SpeakingPracticeTimerCard />
       <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
