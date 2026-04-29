@@ -658,8 +658,8 @@ const RAW_COURSE_SCHEDULES = {
       instruction: "Watch the video, review grammar, and complete your workbook.",
       assignment: true,
       lesen_hören: {
-        video: "https://youtu.be/DklpySXqAmg",
-        youtube_link: "https://youtu.be/DklpySXqAmg",
+        video: "https://youtu.be/uyvXoCoqjiE?si=c5rS9yew_-Sm0eLZ",
+        youtube_link: "https://youtu.be/uyvXoCoqjiE?si=c5rS9yew_-Sm0eLZ",
         grammarbook_link: "https://www.falowen.app/campus/course/the-12-hour-clock-system-in-german-chapter-7",
         workbook_link: "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
         assignment: true,
