@@ -99,6 +99,7 @@ import A2Day24EinenUrlaubPlanenWorkbookPage from "./components/A2Day24EinenUrlau
 import A2Day25TagesablaufWorkbookPage from "./components/A2Day25TagesablaufWorkbookPage";
 import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./components/A2Day26GefuehleInVerschiedenenSituationenWorkbookPage";
 import A2Day27DigitaleKommunikationWorkbookPage from "./components/A2Day27DigitaleKommunikationWorkbookPage";
+import A2Day28UeberDieZukunftSprechenWorkbookPage from "./components/A2Day28UeberDieZukunftSprechenWorkbookPage";
 import B1Day20WieWirdManWorkbookPage from "./components/B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day22BeziehungWichtigWorkbookPage from "./components/B1Day22BeziehungWichtigWorkbookPage";
@@ -720,6 +721,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-25-tagesablauf-workbook" element={<A2Day25TagesablaufWorkbookPage />} />
           <Route path="/campus/course/a2-day-26-gefuehle-in-verschiedenen-situationen-workbook" element={<A2Day26GefuehleInVerschiedenenSituationenWorkbookPage />} />
           <Route path="/campus/course/a2-day-27-digitale-kommunikation-workbook" element={<A2Day27DigitaleKommunikationWorkbookPage />} />
+          <Route path="/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook" element={<A2Day28UeberDieZukunftSprechenWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
