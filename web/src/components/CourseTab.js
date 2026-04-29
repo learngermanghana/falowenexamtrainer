@@ -1492,8 +1492,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
 
                     return (
                       <div key={`day-${entry.day}-occurrence-${entry.occurrence || 1}`} style={{ ...styles.card, marginBottom: 0, display: "grid", gap: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                          <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flexWrap: "wrap" }}>
+                          <div style={{ flex: "1 1 260px", minWidth: 0 }}>
                             <span style={styles.levelPill}>Day {entry.day}</span>
                             <h3 style={{ margin: "6px 0 4px 0" }}>{entry.topic}</h3>
                             {entry.chapter ? (
@@ -1501,7 +1501,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             ) : null}
                           </div>
 
-                          <div style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
+                          <div style={{ display: "grid", gap: 6, justifyItems: "flex-end", flex: "0 1 260px", width: "100%", maxWidth: 260 }}>
                             {showAssignmentTypeBadge && isTutorMarked ? (
                               <span
                                 style={{
