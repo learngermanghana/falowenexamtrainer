@@ -96,6 +96,7 @@ import A2Day21EinWochenendePlanenWorkbookPage from "./components/A2Day21EinWoche
 import A2Day22DieWochePlanungWorkbookPage from "./components/A2Day22DieWochePlanungWorkbookPage";
 import A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage from "./components/A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage";
 import A2Day24EinenUrlaubPlanenWorkbookPage from "./components/A2Day24EinenUrlaubPlanenWorkbookPage";
+import A2Day25TagesablaufWorkbookPage from "./components/A2Day25TagesablaufWorkbookPage";
 import B1Day20WieWirdManWorkbookPage from "./components/B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day22BeziehungWichtigWorkbookPage from "./components/B1Day22BeziehungWichtigWorkbookPage";
@@ -714,6 +715,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-22-die-woche-planung-workbook" element={<A2Day22DieWochePlanungWorkbookPage />} />
           <Route path="/campus/course/a2-day-23-wie-kommst-du-zur-schule-oder-zur-arbeit-workbook" element={<A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage />} />
           <Route path="/campus/course/a2-day-24-einen-urlaub-planen-workbook" element={<A2Day24EinenUrlaubPlanenWorkbookPage />} />
+          <Route path="/campus/course/a2-day-25-tagesablauf-workbook" element={<A2Day25TagesablaufWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
