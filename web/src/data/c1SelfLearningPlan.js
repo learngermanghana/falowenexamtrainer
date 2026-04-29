@@ -2082,22 +2082,25 @@ const buildDailyWritingTask = (entry) => {
 
   const useOpinionEssay = entry.day % 2 === 1;
   const isTag9Konsum = entry.day === 9;
-  const template = useOpinionEssay ? OPINION_ESSAY_TEMPLATE : FORMAL_LETTER_TEMPLATE;
+  const isTag10MigrationIntegration = entry.day === 10;
+  const template = useOpinionEssay || isTag10MigrationIntegration ? OPINION_ESSAY_TEMPLATE : FORMAL_LETTER_TEMPLATE;
   const imageUrl = WRITING_HEADER_IMAGES[(entry.day - 1) % WRITING_HEADER_IMAGES.length];
 
-  const topicLine = useOpinionEssay
+  const topicLine = useOpinionEssay || isTag10MigrationIntegration
     ? `${entry.topic} Welche Position vertreten Sie?`
     : `Thema des Tages: ${entry.topic} Beschreiben Sie das Anliegen klar und lösungsorientiert.`;
 
-  const basePoints = useOpinionEssay ? getOpinionEssayPointsForTopic(entry.topic) : template.points;
+  const basePoints = useOpinionEssay || isTag10MigrationIntegration ? getOpinionEssayPointsForTopic(entry.topic) : template.points;
   const contextualizedPoints =
-    useOpinionEssay && isTag9Konsum
+    (useOpinionEssay && isTag9Konsum) || isTag10MigrationIntegration
       ? basePoints
       : basePoints.map((point) => `${point} (Bezug zum Thema: ${entry.topic})`);
 
   const contextPrefix =
     useOpinionEssay && isTag9Konsum
       ? "Für das Internetforum „Gesellschaft & Konsum“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:"
+      : isTag10MigrationIntegration
+      ? "Für das Internetforum „Gesellschaft heute“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:"
       : template.contextPrefix;
 
   const prompt =
@@ -2116,6 +2119,21 @@ Beschreiben Sie, welche Faktoren Ihr Kaufverhalten am stärksten beeinflussen.
 Analysieren Sie anhand eines konkreten Beispiels, wie Werbung Kaufentscheidungen steuert.
 Nennen Sie Nachteile von unbewusstem Konsum für Gesellschaft oder Umwelt.
 Schlagen Sie Maßnahmen für einen bewussteren und verantwortungsvolleren Konsum vor.`
+      : isTag10MigrationIntegration
+      ? `Schreibe im Goethe-C1-Stil einen Diskussionsbeitrag zum Tagesthema:
+
+Migration und Integration
+
+Für das Internetforum „Gesellschaft heute“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:
+
+Migration und Integration – welche Maßnahmen fördern ein gutes Zusammenleben?
+
+Gehen Sie dabei auf folgende Punkte ein:
+
+Beschreiben Sie, welche Schwierigkeiten Menschen mit Migrationshintergrund bei der Integration häufig haben.
+Erläutern Sie, welche Rolle Sprache, Bildung und Arbeit für eine gelungene Integration spielen.
+Nennen Sie Probleme, die entstehen können, wenn Integration nicht gut gelingt.
+Schlagen Sie konkrete Maßnahmen vor, die den gesellschaftlichen Zusammenhalt stärken könnten.`
       : `Schreibe im Goethe-C1-Stil (${template.formatLabel}) zum Tagesthema: ${entry.topic}`;
 
   return {
