@@ -1464,7 +1464,7 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
       lesen_hören: {
         video: "",
         youtube_link: "",
-        grammarbook_link: "",
+        grammarbook_link: "/campus/course/c1-day-10-migration-und-integration-grammar-notes",
         workbook_link: "",
       },
     },
