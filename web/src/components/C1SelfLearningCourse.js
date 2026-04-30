@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { C1_SELF_LEARNING_PLAN } from "../data/c1SelfLearningPlan";
+const C1_SELF_LEARNING_PLAN = [];
 import { fetchSelfLearningResources } from "../services/selfLearningResourcesService";
 import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/selfLearningProgressService";
 import { fetchVocabularyFromSheet } from "../services/vocabService";

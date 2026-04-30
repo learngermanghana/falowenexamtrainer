@@ -1,10 +1,4 @@
-import b2Resources from "../data/selfLearningResources/b2Resources.json";
-import c1Resources from "../data/selfLearningResources/c1Resources.json";
-
-const RESOURCE_MAP = {
-  B2: b2Resources,
-  C1: c1Resources,
-};
+const RESOURCE_MAP = {};
 
 export const fetchSelfLearningResources = async (level) => {
   const resources = RESOURCE_MAP[level];
