@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { C1_SELF_LEARNING_PLAN } from "../data/c1SelfLearningPlan";
 import { fetchSelfLearningResources } from "../services/selfLearningResourcesService";
@@ -38,6 +38,7 @@ const normalizeScore = (value) => {
 
 const C1SelfLearningCourse = () => {
   const navigate = useNavigate();
+  const { dayId } = useParams();
   const { user, studentProfile } = useAuth();
   const userId = user?.uid || "";
   const studentCode = studentProfile?.id || "";
@@ -59,6 +60,11 @@ const C1SelfLearningCourse = () => {
     () => C1_SELF_LEARNING_PLAN.map((entry) => `day-${entry.day}`),
     []
   );
+  const selectedDayNumber = dayId ? Number(dayId) : null;
+  const hasDayRoute = Number.isInteger(selectedDayNumber) && selectedDayNumber > 0;
+  const visiblePlanEntries = hasDayRoute
+    ? C1_SELF_LEARNING_PLAN.filter((entry) => entry.day === selectedDayNumber)
+    : C1_SELF_LEARNING_PLAN;
 
   useEffect(() => {
     let isMounted = true;
@@ -413,7 +419,34 @@ const C1SelfLearningCourse = () => {
         ) : null}
       </div>
 
-      {C1_SELF_LEARNING_PLAN.map((entry, index) => {
+      <div style={styles.card}>
+        <strong style={{ display: "block", marginBottom: 8 }}>C1 Tagesseiten (eigene URL je Tag)</strong>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/c1-self-learning")}>
+            Alle Tage
+          </button>
+          {C1_SELF_LEARNING_PLAN.map((entry) => (
+            <button
+              key={`jump-day-${entry.day}`}
+              type="button"
+              style={styles.secondaryButton}
+              onClick={() => navigate(`/campus/course/c1-self-learning/day-${entry.day}`)}
+            >
+              Tag {entry.day}
+            </button>
+          ))}
+          <button
+            type="button"
+            style={styles.secondaryButton}
+            onClick={() => navigate("/campus/course/c1-day-1-willkommen-selbstlernstart")}
+          >
+            Tag 1 Workbook (neu)
+          </button>
+        </div>
+      </div>
+
+      {visiblePlanEntries.map((entry) => {
+        const planIndex = C1_SELF_LEARNING_PLAN.findIndex((planEntry) => planEntry.day === entry.day);
         const dayKey = `day-${entry.day}`;
         const dayState = progressByDay[dayKey] || buildEmptyDayState();
         const speakingScoreValue = dayState.speakingScore;
@@ -423,7 +456,7 @@ const C1SelfLearningCourse = () => {
         const canCompleteSpeaking = !requireScoreThreshold || (speakingScore !== null && speakingScore >= scoreThreshold);
         const canCompleteWriting = !requireScoreThreshold || (writingScore !== null && writingScore >= scoreThreshold);
         const canCompleteDay = dayState.speakingComplete && dayState.writingComplete && dayState.skimmingComplete;
-        const skimmingWords = getSkimmingWords(entry, index);
+        const skimmingWords = getSkimmingWords(entry, planIndex >= 0 ? planIndex : 0);
         const readingResource = getResourceEntry("reading", entry.reading?.resourceId);
         const listeningResource = getResourceEntry("listening", entry.listening?.resourceId);
         const flashcardIndex = getFlashcardIndex(dayKey, skimmingWords.length);
@@ -701,6 +734,14 @@ const C1SelfLearningCourse = () => {
           </div>
         );
       })}
+
+      {hasDayRoute && !visiblePlanEntries.length ? (
+        <div style={styles.card}>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            Diese Tagesseite existiert nicht. Nutze z. B. <code>/campus/course/c1-self-learning/day-1</code>.
+          </p>
+        </div>
+      ) : null}
 
       {dayKeys.length === 0 ? (
         <div style={styles.card}>
