@@ -139,7 +139,7 @@ import HorenPage from "./components/HorenPage";
 import LesenPage from "./components/LesenPage";
 import StudyCalendarPage from "./components/StudyCalendarPage";
 import C1SelfLearningCourse from "./components/C1SelfLearningCourse";
-import C1Day1WillkommenSelbstlernstartPage from "./components/C1Day1WillkommenSelbstlernstartPage";
+import C1Day1WillkommenSelbstlernstartWorkbookPage from "./components/C1Day1WillkommenSelbstlernstartWorkbookPage";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
@@ -726,7 +726,7 @@ const AppShell = ({
           <Route path="/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook" element={<A2Day28UeberDieZukunftSprechenWorkbookPage />} />
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
-          <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart" element={<C1Day1WillkommenSelbstlernstartPage />} />
+          <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart-workbook" element={<C1Day1WillkommenSelbstlernstartWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />

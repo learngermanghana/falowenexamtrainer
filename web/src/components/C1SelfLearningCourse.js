@@ -438,7 +438,7 @@ const C1SelfLearningCourse = () => {
           <button
             type="button"
             style={styles.secondaryButton}
-            onClick={() => navigate("/campus/course/c1-day-1-willkommen-selbstlernstart")}
+            onClick={() => navigate("/campus/course/c1-day-1-willkommen-selbstlernstart-workbook")}
           >
             Tag 1 Workbook (neu)
           </button>
