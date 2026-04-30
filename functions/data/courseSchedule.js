@@ -1,4 +1,5 @@
 const DAY0_TUTORIAL_VIDEO_URL_A1 = "https://youtu.be/a1-day0-tutorial";
+const { getCurriculumEntriesForLevel } = require("./curriculumManifest");
 
 const COMPLETION_CONTACT_EMAIL = "info@falowen.app";
 const COMPLETION_ACTIONS = [
@@ -435,6 +436,25 @@ const A2_SCHEDULE = [
     workbook_link: null,
   },
 ].map(buildA2Lesson);
+
+const buildDictionaryBackedSchedule = (level) =>
+  getCurriculumEntriesForLevel(level).map((entry) => ({
+    day: Number(entry.assignmentDay || 0),
+    topic: entry.topic || entry.de || `${level} ${entry.chapter}`,
+    chapter: entry.chapter || null,
+    goal: `Arbeite am ${level}-Thema ${entry.chapter}: ${entry.topic || entry.de || ""}.`,
+    instruction: "Schau das Video, wiederhole die Grammatik und bearbeite dein Arbeitsbuch.",
+    grammar_topic: entry.grammar_topic || null,
+    assignment: entry.assignment === true,
+    lesen_hören: {
+      chapter: entry.chapter || null,
+      assignment: entry.assignment === true,
+      video: "",
+      youtube_link: "",
+      grammarbook_link: entry.schreiben_sprechen?.grammar_link || "",
+      workbook_link: entry.schreiben_sprechen?.workbook_link || "",
+    },
+  }));
 
 const courseSchedules = {
   A1: [
@@ -1768,6 +1788,7 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
       },
     },
   ],
+  C1: buildDictionaryBackedSchedule("C1"),
 };
 
 
