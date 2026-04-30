@@ -7,7 +7,9 @@
     "test": "npm run test:backend",
     "test:backend": "npx --yes jest --config jest.config.js",
     "test:ci": "npm run test:integration",
-    "test:integration": "firebase emulators:exec --project demo-test --only auth,firestore \"npm run test:backend -- --runInBand\""
+    "test:integration": "firebase emulators:exec --project demo-test --only auth,firestore \"npm run test:backend -- --runInBand\"",
+    "sync:curriculum": "node scripts/syncCurriculumManifest.js",
+    "check:curriculum-sync": "node scripts/checkCurriculumManifestSync.js"
   },
   "keywords": [],
   "author": "",
