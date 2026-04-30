@@ -359,6 +359,12 @@ const toNumericScore = (value) => {
   return null;
 };
 
+const normalizePreferredLevel = (rawLevel) => {
+  const token = String(rawLevel || "").toUpperCase();
+  const directMatch = token.match(/\b(A1|A2|B1|B2|C1|C2)\b/);
+  return directMatch ? directMatch[1] : "A1";
+};
+
 const AssignmentSubmissionPage = () => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
@@ -368,7 +374,7 @@ const AssignmentSubmissionPage = () => {
   const [openedFeedbackId, setOpenedFeedbackId] = useState(null);
 
   const preferredLevel = useMemo(
-    () => (studentProfile?.level || "A1").toUpperCase(),
+    () => normalizePreferredLevel(studentProfile?.level),
     [studentProfile?.level]
   );
 
