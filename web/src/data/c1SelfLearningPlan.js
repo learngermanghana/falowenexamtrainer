@@ -21,6 +21,12 @@ const BASE_C1_SELF_LEARNING_PLAN = [
     day: 1,
     title: "Willkommen + Selbstlernstart",
     topic: "Stell dich vor und erkläre, warum du Deutsch auf C1 lernst.",
+    goal: "Present your C1 learning motivation with precise language and a realistic self-study plan.",
+    instruction: "Complete all four workbook parts in order. Read the linked article(s) before answering Teil 3 and use teacher mode strategically in Teil 4.",
+    grammar_topic: "Konnektoren für Begründung und Ziel (weil, da, damit, um ... zu) + präzise Satzverknüpfung auf C1-Niveau",
+    video: "https://www.youtube.com/watch?v=8xH7lFj6xRw",
+    youtube_link: "https://www.youtube.com/watch?v=8xH7lFj6xRw",
+    workbook_link: "/campus/course/c1-day-1-willkommen-selbstlernstart-workbook",
     brainMap: [
       "Ich heiße ... und komme aus ...",
       "Ich lerne Deutsch, weil ...",
