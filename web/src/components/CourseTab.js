@@ -13,8 +13,6 @@ import {
   getCurriculumEntriesByDayForLevel,
 } from "../data/germanAssignmentCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
-import B2SelfLearningCourse from "./B2SelfLearningCourse";
-import C1SelfLearningCourse from "./C1SelfLearningCourse";
 import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
@@ -1136,8 +1134,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     () => resolvedDerivedLevels.has(selectedCourseLevel),
     [resolvedDerivedLevels, selectedCourseLevel]
   );
-  const isB2SelfLearning = selectedCourseLevel === "B2";
-  const isC1SelfLearning = selectedCourseLevel === "C1";
 
   const unresolvedTutorScheduleEntries = useMemo(
     () => collectUnresolvedTutorAssignmentDiagnostics(schedule, selectedCourseLevel),
@@ -1373,72 +1369,65 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                 </div>
               ) : null}
 
-              {isB2SelfLearning || isC1SelfLearning ? null : (
-                <>
-                  <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-                    <label style={{ display: "grid", gap: 6 }}>
-                      <span style={styles.helperText}>{t("courseTab.searchLabel")}</span>
-                      <input
-                        style={{ ...styles.input, width: "100%" }}
-                        placeholder={t("courseTab.searchPlaceholder")}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                      />
-                    </label>
+              <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+                <label style={{ display: "grid", gap: 6 }}>
+                  <span style={styles.helperText}>{t("courseTab.searchLabel")}</span>
+                  <input
+                    style={{ ...styles.input, width: "100%" }}
+                    placeholder={t("courseTab.searchPlaceholder")}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </label>
 
-                    <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
-                      <span style={styles.helperText}>{t("courseTab.assignmentsOnly")}</span>
-                    </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <input type="checkbox" checked={assignmentsOnly} onChange={(e) => setAssignmentsOnly(e.target.checked)} />
+                  <span style={styles.helperText}>{t("courseTab.assignmentsOnly")}</span>
+                </label>
 
-                    <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <input type="checkbox" checked={unfinishedOnly} onChange={(e) => setUnfinishedOnly(e.target.checked)} />
-                      <span style={styles.helperText}>{t("courseTab.unfinishedOnly")}</span>
-                    </label>
+                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <input type="checkbox" checked={unfinishedOnly} onChange={(e) => setUnfinishedOnly(e.target.checked)} />
+                  <span style={styles.helperText}>{t("courseTab.unfinishedOnly")}</span>
+                </label>
 
-                    <label style={{ display: "grid", gap: 6 }}>
-                      <span style={styles.helperText}>{t("courseTab.filterBySkill")}</span>
-                      <select style={styles.select} value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)}>
-                        <option value="all">{t("courseTab.all")}</option>
-                        <option value="lesen">Reading</option>
-                        <option value="hören">Listening</option>
-                        <option value="schreiben">Writing</option>
-                        <option value="sprechen">Speaking</option>
-                      </select>
-                    </label>
+                <label style={{ display: "grid", gap: 6 }}>
+                  <span style={styles.helperText}>{t("courseTab.filterBySkill")}</span>
+                  <select style={styles.select} value={skillFilter} onChange={(e) => setSkillFilter(e.target.value)}>
+                    <option value="all">{t("courseTab.all")}</option>
+                    <option value="lesen">Reading</option>
+                    <option value="hören">Listening</option>
+                    <option value="schreiben">Writing</option>
+                    <option value="sprechen">Speaking</option>
+                  </select>
+                </label>
 
-                    <label style={{ display: "grid", gap: 6 }}>
-                      <span style={styles.helperText}>{t("courseTab.filterByChapter")}</span>
-                      <select style={styles.select} value={chapterFilter} onChange={(e) => setChapterFilter(e.target.value)}>
-                        <option value="all">{t("courseTab.all")}</option>
-                        {chapterOptions.map((chapter) => (
-                          <option key={chapter} value={chapter}>
-                            {chapter}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  </div>
+                <label style={{ display: "grid", gap: 6 }}>
+                  <span style={styles.helperText}>{t("courseTab.filterByChapter")}</span>
+                  <select style={styles.select} value={chapterFilter} onChange={(e) => setChapterFilter(e.target.value)}>
+                    <option value="all">{t("courseTab.all")}</option>
+                    {chapterOptions.map((chapter) => (
+                      <option key={chapter} value={chapter}>
+                        {chapter}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
 
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 1")}>{t("courseTab.jump.week1")}</button>
-                    <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 8")}>{t("courseTab.jump.week2")}</button>
-                    <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Revision")}>{t("courseTab.jump.revision")}</button>
-                    <button type="button" style={styles.secondaryButton} onClick={() => setAssignmentsOnly(true)}>{t("courseTab.jump.assignmentDue")}</button>
-                  </div>
-                </>
-              )}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 1")}>{t("courseTab.jump.week1")}</button>
+                <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Day 8")}>{t("courseTab.jump.week2")}</button>
+                <button type="button" style={styles.secondaryButton} onClick={() => setSearchTerm("Revision")}>{t("courseTab.jump.revision")}</button>
+                <button type="button" style={styles.secondaryButton} onClick={() => setAssignmentsOnly(true)}>{t("courseTab.jump.assignmentDue")}</button>
+              </div>
             </div>
 
-            {isB2SelfLearning || isC1SelfLearning ? (
-              isB2SelfLearning ? <B2SelfLearningCourse /> : <C1SelfLearningCourse />
-            ) : (
-              <>
-                <p style={styles.helperText}>
-                  {isDerivedLevel
-                    ? "This level uses the class schedule because the course book dictionary does not yet include it."
-                    : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
-                </p>
+            <>
+              <p style={styles.helperText}>
+                {isDerivedLevel
+                  ? "This level uses the class schedule because the course book dictionary does not yet include it."
+                  : "Pulling content from the course dictionary. Select a level to see its full day-by-day plan. Use search or the assignment filter to jump straight to what you need."}
+              </p>
 
                 <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))" }}>
                   {filteredSchedule.map((entry) => {
@@ -1703,8 +1692,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     </div>
                   ) : null}
                 </div>
-              </>
-            )}
+            </>
           </>
         ) : null}
       </div>
