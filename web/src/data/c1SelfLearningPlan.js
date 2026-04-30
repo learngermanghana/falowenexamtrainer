@@ -2126,14 +2126,14 @@ Migration und Integration
 
 Für das Internetforum „Gesellschaft heute“ verfassen Sie einen Diskussionsbeitrag zu diesem Thema:
 
-Migration und Integration – welche Maßnahmen fördern ein gutes Zusammenleben?
+Ankommen, Teilhabe und gesellschaftlicher Zusammenhalt. Welche Position vertreten Sie?
 
 Gehen Sie dabei auf folgende Punkte ein:
 
-Beschreiben Sie, welche Schwierigkeiten Menschen mit Migrationshintergrund bei der Integration häufig haben.
-Erläutern Sie, welche Rolle Sprache, Bildung und Arbeit für eine gelungene Integration spielen.
-Nennen Sie Probleme, die entstehen können, wenn Integration nicht gut gelingt.
-Schlagen Sie konkrete Maßnahmen vor, die den gesellschaftlichen Zusammenhalt stärken könnten.`
+Ordnen Sie die wichtigsten Aspekte des Themas ein und benennen Sie Ihre Position klar.
+Begründen Sie Ihre Position anhand eines konkreten Beispiels aus Alltag, Studium oder Beruf.
+Stellen Sie ein mögliches Gegenargument dar und setzen Sie sich damit differenziert auseinander.
+Formulieren Sie zum Schluss eine realistische Empfehlung oder einen Lösungsansatz.`
       : `Schreibe im Goethe-C1-Stil (${template.formatLabel}) zum Tagesthema: ${entry.topic}`;
 
   return {
