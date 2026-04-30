@@ -535,6 +535,18 @@ const C1SelfLearningCourse = () => {
                       </label>
                     </>
                   ) : null}
+                  {entry.grammarbook_link ? (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button type="button" style={styles.secondaryButton} onClick={() => navigate(entry.grammarbook_link)}>
+                        In-App Grammatiknotizen öffnen
+                      </button>
+                      {entry.knowledge_test_link ? (
+                        <button type="button" style={styles.secondaryButton} onClick={() => navigate(entry.knowledge_test_link)}>
+                          Knowledge test öffnen
+                        </button>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 

@@ -421,6 +421,8 @@ const BASE_C1_SELF_LEARNING_PLAN = [
   {
     day: 10,
     title: "Migration und Integration",
+    grammarbook_link: "/campus/course/c1-day-10-migration-und-integration-grammar-notes",
+    knowledge_test_link: "/campus/course/c1-day-10-migration-und-integration-grammar-notes#knowledge-test",
     topic: "Ankommen, Teilhabe und gesellschaftlicher Zusammenhalt.",
     brainMap: [
       "Integration braucht Sprache.",
