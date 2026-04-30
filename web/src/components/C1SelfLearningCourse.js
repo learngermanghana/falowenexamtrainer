@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-const C1_SELF_LEARNING_PLAN = [];
 import { fetchSelfLearningResources } from "../services/selfLearningResourcesService";
 import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/selfLearningProgressService";
 import { fetchVocabularyFromSheet } from "../services/vocabService";
@@ -9,6 +8,7 @@ import { styles } from "../styles";
 import { describeGrammarFocusItem } from "../lib/grammarFocusNotes";
 import { DayTabs, OverviewPanel, ResourcePanel, WeeklyReviewPanel } from "./SelfLearningSharedComponents";
 
+const C1_SELF_LEARNING_PLAN = [];
 const DEFAULT_SCORE_THRESHOLD = 80;
 const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
 const COURSE_TABS = [
