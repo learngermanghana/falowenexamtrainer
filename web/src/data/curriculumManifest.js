@@ -150,17 +150,28 @@ const C1_ENTRIES = [
   ["6.1", "Nachhaltiger Konsum", "Genitiv- und Vergleichsstrukturen"],
   ["6.2", "Digitalisierung und Verwaltung", "Formelle Empfehlungssprache"],
   ["6.3", "Review und Transfer", "Zusammenfassung und Schlussfolgerung"],
-].map(([chapter, de, grammar_topic], index) => ({
-  level: "C1",
-  assignmentDay: index + 1,
-  chapter,
-  mode: "Lesen & Hören",
-  assignment: true,
-  de,
-  topic: de,
-  grammar_topic,
-  schreiben_sprechen: { grammar_link: null, workbook_link: null },
-}));
+].map(([chapter, de, grammar_topic], index) => {
+  const assignmentDay = index + 1;
+  const schreibenSprechen =
+    assignmentDay === 11
+      ? {
+          grammar_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
+          workbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
+        }
+      : { grammar_link: null, workbook_link: null };
+
+  return {
+    level: "C1",
+    assignmentDay,
+    chapter,
+    mode: "Lesen & Hören",
+    assignment: true,
+    de,
+    topic: de,
+    grammar_topic,
+    schreiben_sprechen: schreibenSprechen,
+  };
+});
 
 const CURRICULUM_ENTRIES = [...A1_CURRICULUM_ENTRIES, ...A2_ENTRIES, ...B1_ENTRIES, ...B2_ENTRIES, ...C1_ENTRIES].map(withCanonicalIdentity);
 
