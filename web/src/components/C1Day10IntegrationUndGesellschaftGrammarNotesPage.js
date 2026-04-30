@@ -76,7 +76,7 @@ const C1Day10IntegrationUndGesellschaftGrammarNotesPage = () => {
       </section>
 
       <section style={cardStyle}>
-        <h2 style={{ margin: 0 }}>Häufige Signalsignale und Verben</h2>
+        <h2 style={{ margin: 0 }}>Häufige Signalwörter und Verben</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>sagen, erklären, berichten, behaupten, betonen, fordern, kritisieren, hinweisen auf, schreiben, mitteilen, angeben · plus Marker wie <em>laut</em>, <em>zufolge</em>, <em>wie X betont</em>.</p>
       </section>
 
