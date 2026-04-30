@@ -1,4 +1,4 @@
-import { courseSchedules } from "./courseSchedule";
+import { CURRICULUM_BY_LEVEL } from "./curriculumManifest";
 
 const normalizeSessions = (value) => {
   if (!value) return [];
@@ -6,53 +6,53 @@ const normalizeSessions = (value) => {
   return [value];
 };
 
-const pickSuggestedLink = (session) => {
-  if (!session) return null;
+const pickSuggestedLink = (entry) => {
+  if (!entry) return null;
 
-  const lesenHören = normalizeSessions(session.lesen_hören);
+  const lesenHören = normalizeSessions(entry.lesen_hören);
   const lesenHörenWorkbook = lesenHören.find((item) => item?.workbook_link)?.workbook_link;
   const lesenHörenVideo = lesenHören.find((item) => item?.youtube_link)?.youtube_link;
 
-  const schreibenSprechen = normalizeSessions(session.schreiben_sprechen);
+  const schreibenSprechen = normalizeSessions(entry.schreiben_sprechen);
   const schreibenSprechenWorkbook = schreibenSprechen.find((item) => item?.workbook_link)?.workbook_link;
 
   return (
-    lesenHörenWorkbook || schreibenSprechenWorkbook || lesenHörenVideo || session.tutorial_video_url || null
+    schreibenSprechenWorkbook ||
+    lesenHörenWorkbook ||
+    lesenHörenVideo ||
+    entry.tutorial_video_url ||
+    null
   );
 };
 
-const formatChapterLabel = (session) => {
-  if (!session) return null;
-  if (session.chapter) return `Kapitel ${session.chapter}`;
-  return session.topic || null;
+const formatChapterLabel = (entry) => {
+  if (!entry) return null;
+  if (entry.chapter) return `Kapitel ${entry.chapter}`;
+  return entry.topic || null;
 };
 
-export const buildQuestionDictionaryFromSchedule = (schedules = courseSchedules) => {
+export const buildQuestionDictionaryFromCurriculum = (curriculumByLevel = CURRICULUM_BY_LEVEL) => {
   const entries = [];
 
-  Object.entries(schedules || {}).forEach(([level, sessions]) => {
-    (sessions || []).forEach((session) => {
-      const baseId = `${level}-tag${session.day ?? "x"}-${
-        session.chapter || session.topic || "frage"
-      }`
+  Object.entries(curriculumByLevel || {}).forEach(([level, levelEntries]) => {
+    (levelEntries || []).forEach((entry, index) => {
+      const chapterLabel = formatChapterLabel(entry);
+      const topicTitle = entry.topic || chapterLabel || "Diskussion";
+      const id = `${entry.assignment_id || `${level}-${entry.chapter || index}`}-${entry.mode || "default"}`
         .replace(/\s+/g, "-")
         .toLowerCase();
 
-      const chapterLabel = formatChapterLabel(session);
-      const topicTitle = session.topic || chapterLabel || "Diskussion";
-      const instructions =
-        (typeof session.instruction === "string" && session.instruction.trim()) ||
-        (chapterLabel ? `Beziehe dich auf ${chapterLabel} im Kursbuch.` : "Nutze die Kursnotizen.");
-
       entries.push({
-        id: baseId,
+        id,
         level,
         title: chapterLabel ? `${topicTitle} (${chapterLabel})` : topicTitle,
-        question: session.goal
-          ? `Diskutiere zum Kursthema: ${session.goal}`
+        question: entry.goal
+          ? `Diskutiere zum Kursthema: ${entry.goal}`
           : `Starte eine Diskussion zu ${topicTitle}.`,
-        instructions,
-        suggestedLink: pickSuggestedLink(session),
+        instructions:
+          (typeof entry.instruction === "string" && entry.instruction.trim()) ||
+          (chapterLabel ? `Beziehe dich auf ${chapterLabel} im Kursbuch.` : "Nutze die Kursnotizen."),
+        suggestedLink: pickSuggestedLink(entry),
       });
     });
   });
@@ -60,4 +60,4 @@ export const buildQuestionDictionaryFromSchedule = (schedules = courseSchedules)
   return entries;
 };
 
-export const questionDictionary = buildQuestionDictionaryFromSchedule();
+export const questionDictionary = buildQuestionDictionaryFromCurriculum();
