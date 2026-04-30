@@ -16,7 +16,7 @@ const normalizeLevel = (level) => (level || "").toUpperCase().trim();
 
 const getDay0WorkbookLinkForLevel = (level) => {
   const normalizedLevel = normalizeLevel(level);
-  if (!["A1", "A2", "B1"].includes(normalizedLevel)) return null;
+  if (!["A1", "A2", "B1", "B2", "C1"].includes(normalizedLevel)) return null;
 
   const levelSchedule = courseSchedules?.[normalizedLevel];
   if (!Array.isArray(levelSchedule)) return null;

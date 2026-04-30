@@ -2032,7 +2032,7 @@ const normalizeCourseSchedules = (schedules) =>
           const levelSpecificInstruction =
             level === "A2" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
               ? DEFAULT_INSTRUCTION_EN
-              : level === "B1" && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
+              : ["B1", "B2", "C1"].includes(level) && entryWithAssignmentId.day >= 1 && entryWithAssignmentId.day <= 28
                 ? DEFAULT_INSTRUCTION_DE
                 : baseInstruction;
           const hasNote = levelSpecificInstruction && levelSpecificInstruction.includes(SELF_PRACTICE_NOTE);
