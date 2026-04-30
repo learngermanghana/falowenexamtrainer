@@ -14,6 +14,7 @@ const card = { ...styles.card, display: "grid", gap: 12 };
 const sectionTitle = { margin: 0, fontSize: "1.1rem" };
 const listSpacing = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 const questionCardStyle = { border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#fff", display: "grid", gap: 6 };
+const HERO_IMAGE = "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1600&q=80";
 
 function TabButton({ active, onClick, children }) {
   return (
@@ -42,6 +43,7 @@ const C1Day10IntegrationUndGesellschaftWorkbookPage = () => {
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
         <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>Back to Course</button>
+        <img src={HERO_IMAGE} alt="People from different backgrounds meeting in an urban public space" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>C1 · Day 10 Workbook · Integration und Gesellschaft</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter: 2.5</p>
         <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: speaking, writing, reading and listening practice for self-learning.</p>
