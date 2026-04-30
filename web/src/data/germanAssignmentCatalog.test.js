@@ -105,8 +105,8 @@ describe("progression sequence", () => {
     expect(a1Progression).not.toContain("A1-5.9");
   });
 
-  test("A1/A2/B1 progression comes from the same curriculum manifest shape", () => {
-    ["A1", "A2", "B1"].forEach((level) => {
+  test("A1/A2/B1/B2/C1 progression comes from the same curriculum manifest shape", () => {
+    ["A1", "A2", "B1", "B2", "C1"].forEach((level) => {
       const entries = getCurriculumEntriesForLevel(level);
       expect(entries.length).toBeGreaterThan(0);
       entries.forEach((entry) => {
