@@ -387,12 +387,7 @@ const LessonList = ({ title, lessons, t }) => {
 };
 
 const getAllowedCourseLevels = (levels, defaultLevel) => {
-  const normalizedDefault = normalizeLevel(defaultLevel);
-  const maxIndex = LEVEL_ORDER.indexOf(normalizedDefault);
-  if (!normalizedDefault || maxIndex === -1) return levels;
-
-  const allowed = new Set(LEVEL_ORDER.slice(0, maxIndex + 1));
-  return levels.filter((level) => allowed.has(level));
+  return levels;
 };
 
 export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
