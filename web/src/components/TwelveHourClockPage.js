@@ -802,67 +802,6 @@ export const WeekTimeSeparableGrammarBook = () => {
         ]}
       />
 
-      <ProgressBar
-        checkedCount={checkedCount}
-        total={totalQuestions}
-        correctCount={correctCount}
-      />
-
-      <Section
-        title="1) Lesson goals"
-        subtitle="Before you begin, know what this lesson will help you do."
-      >
-        <Callout title="Today you will learn how to..." variant="success">
-          <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
-            <li>say the days of the week in German</li>
-            <li>tell time with full hours, halb, and Viertel</li>
-            <li>use simple separable verbs in present-tense sentences</li>
-            <li>build short sentences about your week and daily routine</li>
-          </ul>
-        </Callout>
-
-        <Callout title="Model sentence">
-          <div style={{ display: "grid", gap: 8 }}>
-            <div>
-              <strong>Am Montag</strong> stehe ich <strong>um halb sieben</strong>{" "}
-              <strong>auf</strong>.
-            </div>
-            <div style={{ opacity: 0.9 }}>
-              Quick statement rule: <strong>Subject + verb + time + other details</strong>.
-              If you start with time, use <strong>Time + verb + subject + other details</strong>.
-            </div>
-            <div style={{ opacity: 0.9 }}>
-              This one sentence already shows the 3 main lesson topics: day, time, and a
-              separable verb.
-            </div>
-          </div>
-        </Callout>
-      </Section>
-
-      <Section
-        title="2) Main theme: Meine Woche und mein Tagesablauf"
-        subtitle="These grammar topics are easier to remember when they are connected to real life."
-      >
-        <TopicBanner
-          image={topicImageRoutine}
-          eyebrow="THEME"
-          title="One story, not three separate grammar topics"
-          text="We will keep coming back to a student's week: what day it is, what time something happens, and what action the student does."
-        />
-
-        <Table
-          headers={["German", "English"]}
-          rows={[
-            ["Am Montag stehe ich um sechs Uhr auf.", "On Monday I get up at six o’clock."],
-            [
-              "Am Dienstag rufe ich meine Freundin um Viertel nach acht an.",
-              "On Tuesday I call my friend at quarter past eight.",
-            ],
-            ["Am Freitag kaufen wir um vier Uhr ein.", "On Friday we shop at four o’clock."],
-          ]}
-        />
-      </Section>
-
       <Section
         title="3) Days of the week"
         subtitle="Days of the week are nouns in German, so they begin with a capital letter."
