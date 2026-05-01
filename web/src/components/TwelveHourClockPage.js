@@ -780,11 +780,6 @@ export const WeekTimeSeparableGrammarBook = () => {
     ...Object.values(sectionScores.mixed),
   ];
 
-  const totalQuestions =
-    daysPractice.length + timePractice.length + verbPractice.length + mixedPractice.length;
-  const checkedCount = allResults.filter((v) => v !== null).length;
-  const correctCount = allResults.filter(Boolean).length;
-
   return (
     <main style={pageWrap}>
       <QuickBack navigate={navigate} />
