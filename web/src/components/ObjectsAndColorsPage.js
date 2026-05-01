@@ -513,21 +513,26 @@ const ObjectsAndColorsPage = () => {
       </Section>
 
       <Section title="Quick Guide: ihr / Ihr">
+        <p style={{ margin: 0 }}>
+          <strong>Rule of thumb:</strong> if <strong>ihr/Ihr</strong> comes before a <strong>noun</strong>, it is a
+          possessive word (her/their/your formal). If <strong>ihr</strong> comes with a <strong>verb</strong>, it is
+          usually the pronoun <strong>"you all"</strong>.
+        </p>
         <ul style={{ margin: 0, paddingLeft: 20 }}>
           <li>
-            <strong>Ihr/Ihre</strong> (capitalized) = formal possession.
+            <strong>Ihr/Ihre + noun</strong> (capitalized) = <strong>your</strong> (formal possession).
             <br />
-            Das ist Ihr Buch.
+            Das ist Ihr Buch. (That is your book.)
           </li>
           <li>
-            <strong>ihr/ihre</strong> (lowercase) = her / their possession.
+            <strong>ihr/ihre + noun</strong> (lowercase) = <strong>her</strong> or <strong>their</strong> possession.
             <br />
-            (sie) Ihr Bruder heißt Tom.
+            Ihr Bruder heißt Tom. (Her/Their brother is named Tom.) / Ihre Bücher sind neu. (Her/Their books are new.)
           </li>
           <li>
-            <strong>ihr</strong> (lowercase pronoun) = you all (plural informal).
+            <strong>ihr + verb</strong> (lowercase pronoun) = <strong>you all</strong> (plural informal).
             <br />
-            Wo wohnt ihr?
+            Wo wohnt ihr? (Where do you all live?)
           </li>
         </ul>
       </Section>
