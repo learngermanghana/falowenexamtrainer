@@ -681,7 +681,7 @@ const RAW_COURSE_SCHEDULES = {
         video: "https://youtu.be/uyvXoCoqjiE?si=c5rS9yew_-Sm0eLZ",
         youtube_link: "https://youtu.be/uyvXoCoqjiE?si=c5rS9yew_-Sm0eLZ",
         grammarbook_link: "https://www.falowen.app/campus/course/the-12-hour-clock-system-in-german-chapter-7",
-        workbook_link: "https://drive.google.com/file/d/1QyDdRae_1qv_umRb15dCJZTPdXi7zPWd/view?usp=sharing",
+        workbook_link: "/campus/course/a1-day-11-understanding-time-workbook",
         assignment: true,
       },
     },
