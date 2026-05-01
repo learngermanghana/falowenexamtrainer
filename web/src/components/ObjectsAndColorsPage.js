@@ -522,17 +522,17 @@ const ObjectsAndColorsPage = () => {
           <li>
             <strong>Ihr/Ihre + noun</strong> (capitalized) = <strong>your</strong> (formal possession).
             <br />
-            Das ist Ihr Buch.
+            Das ist Ihr Buch. (That is your book.)
           </li>
           <li>
             <strong>ihr/ihre + noun</strong> (lowercase) = <strong>her</strong> or <strong>their</strong> possession.
             <br />
-            Ihr Bruder heißt Tom. / Ihre Bücher sind neu.
+            Ihr Bruder heißt Tom. (Her/Their brother is named Tom.) / Ihre Bücher sind neu. (Her/Their books are new.)
           </li>
           <li>
             <strong>ihr + verb</strong> (lowercase pronoun) = <strong>you all</strong> (plural informal).
             <br />
-            Wo wohnt ihr?
+            Wo wohnt ihr? (Where do you all live?)
           </li>
         </ul>
       </Section>
