@@ -122,6 +122,7 @@ import A1Chapter5GermanCasesWorkbookPage from "./components/A1Chapter5GermanCase
 import A1Day1GreetingsGrammarPage from "./components/A1Day1GreetingsGrammarPage";
 import A1Day7PricesPreferencesGrammarPage from "./components/A1Day7PricesPreferencesGrammarPage";
 import A1Day9NominativeAccusativeGrammarPage from "./components/A1Day9NominativeAccusativeGrammarPage";
+import A1Day11UnderstandingTimeWorkbookPage from "./components/A1Day11UnderstandingTimeWorkbookPage";
 import A1Day10ObjectsColorsPossessiveArticlesWorkbookPage from "./components/A1Day10ObjectsColorsPossessiveArticlesWorkbookPage";
 import A1Day8CountriesAndLanguagesWorkbookPage from "./components/A1Day8CountriesAndLanguagesWorkbookPage";
 import WritingPage from "./components/WritingPage";
@@ -805,6 +806,10 @@ const AppShell = ({
           <Route
             path="/campus/course/a1-day-10-objects-colors-possessive-articles-workbook"
             element={<A1Day10ObjectsColorsPossessiveArticlesWorkbookPage />}
+          />
+          <Route
+            path="/campus/course/a1-day-11-understanding-time-workbook"
+            element={<A1Day11UnderstandingTimeWorkbookPage />}
           />
           <Route
             path="/campus/course/basic-greetings-goodbyes-and-how-you-are-day-1"
