@@ -773,13 +773,6 @@ export const WeekTimeSeparableGrammarBook = () => {
     []
   );
 
-  const allResults = [
-    ...Object.values(sectionScores.days),
-    ...Object.values(sectionScores.time),
-    ...Object.values(sectionScores.verbs),
-    ...Object.values(sectionScores.mixed),
-  ];
-
   return (
     <main style={pageWrap}>
       <QuickBack navigate={navigate} />
