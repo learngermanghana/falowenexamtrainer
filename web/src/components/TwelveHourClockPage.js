@@ -615,7 +615,7 @@ const EmbeddedPracticeBlock = ({
 export const WeekTimeSeparableGrammarBook = () => {
   const navigate = useNavigate();
 
-  const [sectionScores, setSectionScores] = useState({
+  const [, setSectionScores] = useState({
     days: {},
     time: {},
     verbs: {},
