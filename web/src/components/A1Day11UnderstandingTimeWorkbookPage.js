@@ -44,7 +44,7 @@ const teil1Questions = [
   { stem: "10. Was macht Peter am Sonntag?", options: ["a) Er spielt im Park.", "b) Er ruht sich aus.", "c) Er geht ins Kino."] },
 ];
 
-const teil2Questions = [
+const teil2Text1Questions = [
   { stem: "1. Wann steht Maria auf?", options: ["a) Um sechs Uhr", "b) Um sieben Uhr", "c) Um acht Uhr"] },
   { stem: "2. Wann frühstückt Maria?", options: ["a) Um sieben Uhr", "b) Um acht Uhr", "c) Um neun Uhr"] },
   { stem: "3. Wann kommt Maria nach Hause?", options: ["a) Um fünf Uhr", "b) Um sechs Uhr", "c) Um sieben Uhr"] },
@@ -53,6 +53,9 @@ const teil2Questions = [
     stem: "5. Was macht Maria nach dem Frühstück?",
     options: ["a) Sie geht zur Arbeit.", "b) Sie geht spazieren.", "c) Sie geht einkaufen."],
   },
+];
+
+const teil2Text2Questions = [
   { stem: "6. Um wie viel Uhr hat Paul Deutschunterricht?", options: ["a) Um acht Uhr", "b) Um neun Uhr", "c) Um zehn Uhr"] },
   {
     stem: "7. Was macht Paul nach dem Unterricht?",
@@ -122,23 +125,38 @@ const A1Day11UnderstandingTimeWorkbookPage = () => {
       <div style={card}>
         <h2 style={sectionTitle}>Teil 2 (Hören): Listening Questions</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Hören Sie die Texte und beantworten Sie die Fragen. Nutzen Sie die Audio-Links und schreiben Sie die
-          Antworten in Ihr Buch.
+          Hören Sie die Texte und beantworten Sie die Fragen. Nutzen Sie für jeden Text den passenden Audio-Link.
         </p>
+
+        <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Text 1: 12-Hour Clock</h3>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Audio 1 (Maria):{" "}
+          Audio-Link: {" "}
           <a href="https://drive.google.com/file/d/1RZJsjFSwLVDPMMYboyqYcS2kovRtlKtt/view?usp=sharing" target="_blank" rel="noreferrer">
             Open Audio 1
           </a>
         </p>
+        {teil2Text1Questions.map((question) => (
+          <div key={question.stem} style={questionBlock}>
+            <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
+            {question.options.map((option) => (
+              <p key={option} style={optionLine}>{option}</p>
+            ))}
+          </div>
+        ))}
+
+        <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Text 2: Prepositions of Time</h3>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Audio 2 (Paul):{" "}
+          "Paul hat jeden Morgen um neun Uhr Deutschunterricht. Nach dem Unterricht geht er in die Bibliothek und
+          lernt dort bis zwei Uhr nachmittags. Nachmittags um drei Uhr geht er nach Hause und macht seine
+          Hausaufgaben. Abends um sieben Uhr isst er zu Abend und entspannt sich."
+        </p>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          Audio-Link: {" "}
           <a href="https://drive.google.com/file/d/1EQm1zg_8_8VWx0f28klS8XBe738--Iuw/view?usp=sharing" target="_blank" rel="noreferrer">
             Open Audio 2
           </a>
         </p>
-
-        {teil2Questions.map((question) => (
+        {teil2Text2Questions.map((question) => (
           <div key={question.stem} style={questionBlock}>
             <p style={{ margin: 0, fontWeight: 700 }}>{question.stem}</p>
             {question.options.map((option) => (
