@@ -144,6 +144,8 @@ import C1Day10IntegrationUndGesellschaftGrammarNotesPage from "./components/C1Da
 import C1Day10IntegrationUndGesellschaftWorkbookPage from "./components/C1Day10IntegrationUndGesellschaftWorkbookPage";
 import C1Day11EngagementUndEhrenamtGrammarNotesPage from "./components/C1Day11EngagementUndEhrenamtGrammarNotesPage";
 import C1Day11EngagementUndEhrenamtWorkbookPage from "./components/C1Day11EngagementUndEhrenamtWorkbookPage";
+import C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage from "./components/C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage";
+import C1Day12FreizeitUndKulturWorkbookPage from "./components/C1Day12FreizeitUndKulturWorkbookPage";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
@@ -736,6 +738,8 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-workbook" element={<C1Day10IntegrationUndGesellschaftWorkbookPage />} />
           <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes" element={<C1Day11EngagementUndEhrenamtGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-workbook" element={<C1Day11EngagementUndEhrenamtWorkbookPage />} />
+          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-erweiterte-vergleichsformen-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-workbook" element={<C1Day12FreizeitUndKulturWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
