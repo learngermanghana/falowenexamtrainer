@@ -311,7 +311,7 @@ const A1TimeAndDatesGrammarPage = () => {
               headers={["Time", "German"]}
               rows={[
                 ["00:00", "Mitternacht / null Uhr"],
-                ["01:00", "eins Uhr"],
+                ["01:00", "ein Uhr"],
                 ["08:00", "acht Uhr"],
                 ["12:00", "Mittag / zwölf Uhr"],
                 ["13:00", "dreizehn Uhr"],
@@ -346,7 +346,7 @@ const A1TimeAndDatesGrammarPage = () => {
 
             <NoteBox>
               Important: a time is <b>not always :30</b>.<br />
-              Say the exact minute number, e.g. <b>eins Uhr achtzehn</b> (1:18).
+              Say the exact minute number, e.g. <b>ein Uhr achtzehn</b> (1:18).
             </NoteBox>
           </SubSection>
 
@@ -354,7 +354,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <Table
               headers={["Time", "Formal", "Natural spoken option"]}
               rows={[
-                ["01:18", "eins Uhr achtzehn", "achtzehn nach eins"],
+                ["01:18", "ein Uhr achtzehn", "achtzehn nach eins"],
                 ["02:35", "zwei Uhr fünfunddreißig", "fünf nach halb drei"],
                 ["06:48", "sechs Uhr achtundvierzig", "zwölf vor sieben"],
               ]}
@@ -362,7 +362,7 @@ const A1TimeAndDatesGrammarPage = () => {
 
             <MistakeBox>
               Do not force every time into <b>halb</b>. For <b>1:18</b>, do not say <b>halb zwei</b>.
-              Say <b>eins Uhr achtzehn</b> or <b>achtzehn nach eins</b>.
+              Say <b>ein Uhr achtzehn</b> or <b>achtzehn nach eins</b>.
             </MistakeBox>
           </SubSection>
 
@@ -672,7 +672,7 @@ const A1TimeAndDatesGrammarPage = () => {
             <FillInput
               value={answers.t6}
               onChange={(v) => setAnswer("t6", v)}
-              placeholder="Example: eins Uhr achtzehn"
+              placeholder="Example: ein Uhr achtzehn"
             />
 
             <p style={{ margin: 0 }}>
@@ -741,7 +741,7 @@ const A1TimeAndDatesGrammarPage = () => {
               <div>6. {results.checks.d1 ? "✅" : "❌"} der fünfte Mai = 5 May</div>
               <div>7. {results.checks.d2 ? "✅" : "❌"} 25th December = der fünfundzwanzigste Dezember</div>
               <div>8. {results.checks.d3 ? "✅" : "❌"} 3rd = dritte / der dritte</div>
-              <div>9. {results.checks.t6 ? "✅" : "❌"} 01:18 = eins Uhr achtzehn / achtzehn nach eins</div>
+              <div>9. {results.checks.t6 ? "✅" : "❌"} 01:18 = ein Uhr achtzehn / achtzehn nach eins</div>
               <div>10. {results.checks.t7 ? "✅" : "❌"} 02:35 = zwei Uhr fünfunddreißig / fünf nach halb drei</div>
               <div>11. {results.checks.t8 ? "✅" : "❌"} 06:48 = sechs Uhr achtundvierzig / zwölf vor sieben</div>
               <div>12. {results.checks.d4 ? "✅" : "❌"} 5th March 2023 = 05.03.2023</div>
