@@ -454,8 +454,88 @@ const A2_SCHEDULE = [
   },
 ].map(buildA2Lesson);
 
+const B2_COURSE_DICTIONARY = getCurriculumEntriesForLevel("B2");
+
+const c1Schedule = [
+  { day: 1, topic: "Ziele und Lernweg", chapter: "1.1", goal: "", instruction: "", assignment: true },
+  { day: 2, topic: "Kultur und Identität", chapter: "1.2", goal: "", instruction: "", assignment: true },
+  { day: 3, topic: "Medien und Informationskompetenz", chapter: "1.3", goal: "", instruction: "", assignment: true },
+  { day: 4, topic: "Beziehungen und Teamarbeit", chapter: "1.4", goal: "", instruction: "", assignment: true },
+  { day: 5, topic: "Berufliche Entwicklung", chapter: "1.5", goal: "", instruction: "", assignment: true },
+  { day: 6, topic: "Gesundheit und Lebensstil", chapter: "2.1", goal: "", instruction: "", assignment: true },
+  { day: 7, topic: "Reisen und Nachhaltigkeit", chapter: "2.2", goal: "", instruction: "", assignment: true },
+  { day: 8, topic: "Wohnen und Stadtentwicklung", chapter: "2.3", goal: "", instruction: "", assignment: true },
+  { day: 9, topic: "Konsum und Werbung", chapter: "2.4", goal: "", instruction: "", assignment: true },
+  { day: 10, topic: "Integration und Gesellschaft", chapter: "2.5", goal: "", instruction: "", assignment: true },
+  { day: 11, topic: "Engagement und Ehrenamt", chapter: "3.1", goal: "", instruction: "", assignment: true },
+  { day: 12, topic: "Freizeit und Kultur", chapter: "3.2", goal: "", instruction: "", assignment: true },
+  { day: 13, topic: "Mehrsprachigkeit", chapter: "3.3", goal: "", instruction: "", assignment: true },
+  { day: 14, topic: "Innovation und Zukunft", chapter: "3.4", goal: "", instruction: "", assignment: true },
+  { day: 15, topic: "Bildung und lebenslanges Lernen", chapter: "3.5", goal: "", instruction: "", assignment: true },
+  { day: 16, topic: "Technologie im Alltag", chapter: "4.1", goal: "", instruction: "", assignment: true },
+  { day: 17, topic: "Umwelt und Verantwortung", chapter: "4.2", goal: "", instruction: "", assignment: true },
+  { day: 18, topic: "Gesellschaft und Zusammenhalt", chapter: "4.3", goal: "", instruction: "", assignment: true },
+  { day: 19, topic: "Arbeit der Zukunft", chapter: "4.4", goal: "", instruction: "", assignment: true },
+  { day: 20, topic: "Digitale Gesundheit", chapter: "4.5", goal: "", instruction: "", assignment: true },
+  { day: 21, topic: "Migration und Teilhabe", chapter: "5.1", goal: "", instruction: "", assignment: true },
+  { day: 22, topic: "Politik und Mitbestimmung", chapter: "5.2", goal: "", instruction: "", assignment: true },
+  { day: 23, topic: "Freizeit und Work-Life-Balance", chapter: "5.3", goal: "", instruction: "", assignment: true },
+  { day: 24, topic: "Mobilität und Infrastruktur", chapter: "5.4", goal: "", instruction: "", assignment: true },
+  { day: 25, topic: "Wissenschaft und Forschung", chapter: "5.5", goal: "", instruction: "", assignment: true },
+  { day: 26, topic: "Nachhaltiger Konsum", chapter: "6.1", goal: "", instruction: "", assignment: true },
+  { day: 27, topic: "Digitalisierung und Verwaltung", chapter: "6.2", goal: "", instruction: "", assignment: true },
+  { day: 28, topic: "Review und Transfer", chapter: "6.3", goal: "", instruction: "", assignment: true },
+];
+
+const resolveC1LessonLinks = (assignmentDay) =>
+  assignmentDay === 1
+    ? {
+        grammarbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-grammar-notes",
+        workbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-workbook",
+      }
+    : assignmentDay === 10
+      ? {
+          grammarbook_link: "/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes",
+          workbook_link: "/campus/course/c1-day-10-integration-und-gesellschaft-workbook",
+        }
+      : assignmentDay === 11
+        ? {
+            grammarbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
+            workbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
+          }
+        : {};
+
+const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
+  const assignmentDay = Number(entry.day || 0);
+
+  return {
+    assignment_id: `C1-${entry.chapter}`,
+    assignmentDay,
+    day: assignmentDay,
+    chapter: entry.chapter,
+    topic: entry.topic,
+    goal: entry.goal,
+    instruction: entry.instruction,
+    grammar_topic: null,
+    assignment: entry.assignment === true,
+    video: "",
+    youtube_link: "",
+    ...resolveC1LessonLinks(assignmentDay),
+  };
+});
+
+const COURSE_BOOK_DICTIONARY = {
+  B2: B2_COURSE_DICTIONARY,
+  C1: C1_COURSE_DICTIONARY,
+};
+
+const getCourseBookDictionaryEntries = (level) => {
+  const normalizedLevel = String(level || "").toUpperCase();
+  return COURSE_BOOK_DICTIONARY[normalizedLevel] || getCurriculumEntriesForLevel(normalizedLevel);
+};
+
 const buildDictionaryBackedSchedule = (level) =>
-  getCurriculumEntriesForLevel(level).map((entry) => ({
+  getCourseBookDictionaryEntries(level).map((entry) => ({
     day: Number(entry.assignmentDay || 0),
     topic: entry.topic || entry.de || `${level} ${entry.chapter}`,
     chapter: entry.chapter || null,
@@ -468,8 +548,8 @@ const buildDictionaryBackedSchedule = (level) =>
       assignment: entry.assignment === true,
       video: "",
       youtube_link: "",
-      grammarbook_link: entry.schreiben_sprechen?.grammar_link || "",
-      workbook_link: entry.schreiben_sprechen?.workbook_link || "",
+      grammarbook_link: entry.grammarbook_link || entry.schreiben_sprechen?.grammar_link || "",
+      workbook_link: entry.workbook_link || entry.schreiben_sprechen?.workbook_link || "",
     },
   }));
 
@@ -2077,5 +2157,8 @@ const normalizeCourseSchedules = (schedules) =>
       ];
     })
   );
+
+export const COURSE_BOOK_DICTIONARY_BY_LEVEL = COURSE_BOOK_DICTIONARY;
+export const C1_COURSE_DICTIONARY_BY_LEVEL = C1_COURSE_DICTIONARY;
 
 export const courseSchedules = normalizeCourseSchedules(RAW_COURSE_SCHEDULES);
