@@ -42,7 +42,7 @@ const classCatalog = {
     ],
   },
   "A1 Koln Klasse": {
-    startDate: "2026-04-28",
+    startDate: "2026-05-06",
     endDate: "2026-06-10",
     schedule: [
       { day: "Monday", startTime: "11:00", endTime: "12:00" },
