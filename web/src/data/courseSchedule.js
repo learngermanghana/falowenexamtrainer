@@ -704,7 +704,12 @@ const resolveC1LessonLinks = (assignmentDay) =>
               grammarbook_link: "/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes",
               workbook_link: "/campus/course/c1-day-12-freizeit-und-kultur-workbook",
             }
-          : {};
+          : assignmentDay === 13
+            ? {
+                grammarbook_link: "/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes",
+                workbook_link: "/campus/course/c1-day-13-mehrsprachigkeit-workbook",
+              }
+            : {};
 
 const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
   const assignmentDay = Number(entry.day || 0);
