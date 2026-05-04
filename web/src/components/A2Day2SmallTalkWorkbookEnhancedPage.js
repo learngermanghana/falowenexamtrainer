@@ -36,6 +36,12 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const phraseGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
+
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -212,20 +218,61 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
             </li>
           </ul>
 
-          <h3 style={sectionTitle}>Mini Präsentation (A2)</h3>
-          <ul style={listSpacing}>
-            <li>
-              <strong>Einleitung:</strong> „Heute spreche ich über das Thema Small Talk.“ • „Small Talk ist eine gute Möglichkeit,
-              um neue Leute kennenzulernen.“ • „Ich finde, dass Small Talk wichtig im Alltag ist.“
-            </li>
-            <li>
-              <strong>Hauptteil:</strong> „Ein gutes Thema für Small Talk ist die Arbeit, weil ...“ • „Man kann auch über das Wetter
-              oder Hobbys sprechen, zum Beispiel ...“ • „Ein Vorteil von Small Talk ist, dass ...“
-            </li>
-            <li>
-              <strong>Schluss:</strong> „Zusammenfassend kann man sagen, dass Small Talk einfach und nützlich ist.“
-            </li>
-          </ul>
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese Struktur für starke Sprechpunkte:{" "}
+            <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+          </p>
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>1) Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>„Heute spreche ich über das Thema Small Talk.“</li>
+                <li>„In meiner kurzen Präsentation geht es um Gespräche im Alltag.“</li>
+                <li>„Ich finde Small Talk wichtig, weil man schnell Kontakt machen kann.“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>2) Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li>
+                  <strong>Zuerst</strong>, <strong>dann</strong>, <strong>danach</strong>, <strong>am Ende</strong>
+                </li>
+                <li>
+                  <strong>Außerdem</strong>, <strong>auch</strong>, <strong>deshalb</strong>
+                </li>
+                <li>
+                  <strong>Aber</strong>, <strong>trotzdem</strong>, <strong>zum Beispiel</strong>
+                </li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>3) Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>„Ich denke, dass …“</li>
+                <li>„Meiner Meinung nach ist …“</li>
+                <li>„Für mich ist … wichtig, weil …“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>4) Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>„Zusammenfassend kann man sagen, dass …“</li>
+                <li>„Zum Schluss möchte ich betonen, dass …“</li>
+                <li>„Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute spreche ich über Small Talk im Alltag. <strong>Zuerst</strong> begrüße ich die Person und frage: ‚Wie geht es
+              dir?‘ <strong>Dann</strong> spreche ich über einfache Themen wie Arbeit, Hobbys oder das Wetter.{" "}
+              <strong>Zum Beispiel</strong> sage ich: ‚Ich spiele gern Fußball. Und du?‘ <strong>Meiner Meinung nach</strong> ist
+              Small Talk wichtig, weil man neue Leute besser kennenlernen kann. <strong>Zusammenfassend</strong> ist Small Talk
+              einfach, freundlich und sehr nützlich.“
+            </p>
+          </div>
 
           <h3 style={sectionTitle}>Diskussionsfragen (A2)</h3>
           <p style={{ margin: 0 }}>Kannst du dich vorstellen? Erzähl uns etwas über dich:</p>
