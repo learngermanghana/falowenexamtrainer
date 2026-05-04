@@ -168,7 +168,12 @@ const C1_ENTRIES = [
               grammar_link: "/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes",
               workbook_link: "/campus/course/c1-day-12-freizeit-und-kultur-workbook",
             }
-          : { grammar_link: null, workbook_link: null };
+          : assignmentDay === 13
+            ? {
+                grammar_link: "/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes",
+                workbook_link: "/campus/course/c1-day-13-mehrsprachigkeit-workbook",
+              }
+            : { grammar_link: null, workbook_link: null };
 
   return {
     level: "C1",

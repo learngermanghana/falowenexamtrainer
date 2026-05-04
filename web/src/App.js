@@ -147,6 +147,8 @@ import C1Day11EngagementUndEhrenamtGrammarNotesPage from "./components/C1Day11En
 import C1Day11EngagementUndEhrenamtWorkbookPage from "./components/C1Day11EngagementUndEhrenamtWorkbookPage";
 import C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage from "./components/C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage";
 import C1Day12FreizeitUndKulturWorkbookPage from "./components/C1Day12FreizeitUndKulturWorkbookPage";
+import C1Day13MehrsprachigkeitGrammarNotesPage from "./components/C1Day13MehrsprachigkeitGrammarNotesPage";
+import C1Day13MehrsprachigkeitWorkbookPage from "./components/C1Day13MehrsprachigkeitWorkbookPage";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
@@ -742,6 +744,8 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-erweiterte-vergleichsformen-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-workbook" element={<C1Day12FreizeitUndKulturWorkbookPage />} />
+          <Route path="/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes" element={<C1Day13MehrsprachigkeitGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-13-mehrsprachigkeit-workbook" element={<C1Day13MehrsprachigkeitWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
