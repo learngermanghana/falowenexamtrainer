@@ -699,7 +699,12 @@ const resolveC1LessonLinks = (assignmentDay) =>
             grammarbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
             workbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
           }
-        : {};
+        : assignmentDay === 12
+          ? {
+              grammarbook_link: "/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes",
+              workbook_link: "/campus/course/c1-day-12-freizeit-und-kultur-workbook",
+            }
+          : {};
 
 const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
   const assignmentDay = Number(entry.day || 0);
