@@ -153,12 +153,22 @@ const C1_ENTRIES = [
 ].map(([chapter, de, grammar_topic], index) => {
   const assignmentDay = index + 1;
   const schreibenSprechen =
-    assignmentDay === 11
+    assignmentDay === 10
       ? {
-          grammar_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
-          workbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
+          grammar_link: "/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes",
+          workbook_link: "/campus/course/c1-day-10-integration-und-gesellschaft-workbook",
         }
-      : { grammar_link: null, workbook_link: null };
+      : assignmentDay === 11
+        ? {
+            grammar_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes",
+            workbook_link: "/campus/course/c1-day-11-engagement-und-ehrenamt-workbook",
+          }
+        : assignmentDay === 12
+          ? {
+              grammar_link: "/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes",
+              workbook_link: "/campus/course/c1-day-12-freizeit-und-kultur-workbook",
+            }
+          : { grammar_link: null, workbook_link: null };
 
   return {
     level: "C1",

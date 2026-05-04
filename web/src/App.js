@@ -740,6 +740,7 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes" element={<C1Day11EngagementUndEhrenamtGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-workbook" element={<C1Day11EngagementUndEhrenamtWorkbookPage />} />
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-erweiterte-vergleichsformen-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-12-freizeit-und-kultur-grammar-notes" element={<C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-workbook" element={<C1Day12FreizeitUndKulturWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
