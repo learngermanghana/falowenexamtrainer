@@ -16,7 +16,6 @@ const listSpacing = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 const C1Day13MehrsprachigkeitWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
 
   return (
