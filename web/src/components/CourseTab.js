@@ -3,11 +3,10 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
-import { courseSchedules } from "../data/courseSchedule";
+import { courseSchedules, getCourseScheduleDictionaryEntry } from "../data/courseSchedule";
 import { courseSchedulesByName } from "../data/courseSchedules";
 import { classCatalog } from "../data/classCatalog";
 import {
-  getAssignmentDictionaryEntry,
   getAssignmentDisplayTitle,
   getAssignmentDisplayType,
   getCurriculumEntriesByDayForLevel,
@@ -155,7 +154,7 @@ const buildLevelSchedules = () => {
       let usedFallbackResource = false;
 
       const lessonList = sessions.map((session, index) => {
-        const dictionaryEntry = getAssignmentDictionaryEntry({
+        const dictionaryEntry = getCourseScheduleDictionaryEntry({
           level,
           assignmentId: session.assignmentId,
           chapter: session.chapter,
@@ -193,7 +192,7 @@ const buildLevelSchedules = () => {
         topic:
           primarySession.title ||
           getAssignmentDisplayTitle(
-            getAssignmentDictionaryEntry({
+            getCourseScheduleDictionaryEntry({
               level,
               assignmentId: primarySession.assignmentId,
               chapter: primarySession.chapter,
@@ -402,13 +401,13 @@ const getEntryAssignmentId = (entry, level, occurrence = 1) => {
   const normalizedLevel = normalizeLevel(level);
 
   const entryDictionaryMatch =
-    getAssignmentDictionaryEntry({
+    getCourseScheduleDictionaryEntry({
       level: normalizedLevel,
       assignmentId: entry.assignmentId || entry.assignment_id,
       chapter: entry.chapter,
       assignmentDay: entry.day,
     }) ||
-    getAssignmentDictionaryEntry({
+    getCourseScheduleDictionaryEntry({
       level: normalizedLevel,
       chapter: entry.chapter,
       assignmentDay: entry.day,
@@ -429,7 +428,7 @@ const getEntryAssignmentId = (entry, level, occurrence = 1) => {
     (lesson) => lesson?.assignment
   );
   for (const lesson of lessonCandidates) {
-    const dictionaryMatch = getAssignmentDictionaryEntry({
+    const dictionaryMatch = getCourseScheduleDictionaryEntry({
       level: normalizedLevel,
       assignmentId: lesson.assignmentId || lesson.assignment_id || entry.assignmentId || entry.assignment_id,
       chapter: lesson.chapter || entry.chapter,
@@ -459,7 +458,7 @@ const getRequiredAssignmentIdsForEntry = (entry, level) => {
 
   const lessonAssignmentIds = lessonCandidates
     .map((lesson) => {
-      const dictionaryMatch = getAssignmentDictionaryEntry({
+      const dictionaryMatch = getCourseScheduleDictionaryEntry({
         level: normalizedLevel,
         assignmentId: lesson.assignmentId || lesson.assignment_id || entry?.assignmentId || entry?.assignment_id,
         chapter: lesson.chapter || entry?.chapter,

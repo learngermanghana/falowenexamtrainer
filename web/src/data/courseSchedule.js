@@ -2356,5 +2356,6 @@ const normalizeCourseSchedules = (schedules) =>
 
 export const COURSE_BOOK_DICTIONARY_BY_LEVEL = COURSE_BOOK_DICTIONARY;
 export const C1_COURSE_DICTIONARY_BY_LEVEL = C1_COURSE_DICTIONARY;
+export const getCourseScheduleDictionaryEntry = (params = {}) => getAssignmentDictionaryEntry(params);
 
 export const courseSchedules = normalizeCourseSchedules(RAW_COURSE_SCHEDULES);
