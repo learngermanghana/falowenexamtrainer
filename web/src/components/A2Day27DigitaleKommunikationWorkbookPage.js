@@ -21,6 +21,7 @@ const questionCardStyle = {
   display: "grid",
   gap: 6,
 };
+const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
 const videoPreviewStyle = { width: "100%", minHeight: 315, border: 0, borderRadius: 10 };
 
 const lesenQuestions = [
@@ -74,6 +75,51 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
         <p style={{ margin: 0, lineHeight: 1.7 }}>Zentrales Thema: <strong>Digitale Kommunikation im Alltag</strong>.</p>
         <ul style={listSpacing}><li><strong>Kommunikationsmittel:</strong> E-Mail, Telefonieren, Chatten, soziale Netzwerke, Online-Meetings.</li><li><strong>Soziale Medien:</strong> Plattformen, Aktivitäten, Zeitvertreib, Gefahren.</li><li><strong>Vorteile/Nachteile:</strong> schnell/einfach vs. Ablenkung/zu viel Zeit.</li><li><strong>Sicherheit:</strong> starke Passwörter, Datenschutz, 2FA, Updates.</li><li><strong>Alltag/Beruf:</strong> privat, beruflich, Schule/Uni, Herausforderungen.</li></ul>
+        <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>Wenn du antwortest, sprich in 4 klaren Schritten. So klingt dein Beitrag strukturiert und sicher:</p>
+        <ol style={listSpacing}>
+          <li><strong>Einleitung:</strong> Nenne kurz das Thema und deine Hauptidee.</li>
+          <li><strong>Hauptteil mit Verbindungswörtern:</strong> Erkläre 2–3 Punkte und verbinde sie logisch.</li>
+          <li><strong>Beispiel:</strong> Gib ein konkretes Beispiel aus deinem Alltag.</li>
+          <li><strong>Schluss:</strong> Fasse zusammen oder gib eine kurze Empfehlung.</li>
+        </ol>
+        <div style={phraseGridStyle}>
+          <div style={questionCardStyle}>
+            <strong>Gute Einleitungen</strong>
+            <span>„Ich möchte kurz über digitale Kommunikation sprechen.“</span>
+            <span>„Für mich ist das Thema wichtig, weil …“</span>
+            <span>„Im Alltag nutze ich vor allem …“</span>
+          </div>
+          <div style={questionCardStyle}>
+            <strong>Verbindungswörter / Connectors</strong>
+            <span>zuerst, dann, danach</span>
+            <span>außerdem, auch, zusätzlich</span>
+            <span>aber, trotzdem, deshalb</span>
+          </div>
+          <div style={questionCardStyle}>
+            <strong>Eigene Meinung ausdrücken</strong>
+            <span>„Ich finde, dass …“</span>
+            <span>„Meiner Meinung nach …“</span>
+            <span>„Ich denke, digitale Medien sind …, weil …“</span>
+          </div>
+          <div style={questionCardStyle}>
+            <strong>Gute Schlüsse</strong>
+            <span>„Zusammenfassend kann ich sagen, dass …“</span>
+            <span>„Am Ende ist für mich wichtig, dass …“</span>
+            <span>„Deshalb versuche ich, bewusst online zu kommunizieren.“</span>
+          </div>
+        </div>
+        <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+          <strong>Kurzbeispiel (ca. 30–45 Sekunden)</strong>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Ich möchte kurz über digitale Kommunikation in meinem Alltag sprechen. Ich benutze am meisten WhatsApp und E-Mail.
+            Zuerst schreibe ich meinen Freunden über das Handy, weil es schnell und praktisch ist. Außerdem nutze ich E-Mails
+            für die Arbeit, denn dort kann ich Informationen besser organisieren. Ein Beispiel: Letzte Woche habe ich mit meinem
+            Team ein Online-Meeting gemacht, und danach haben wir alles per Chat geklärt. Meiner Meinung nach sind digitale Medien
+            sehr hilfreich, aber man muss auch Pausen machen. Zusammenfassend ist digitale Kommunikation für mich wichtig, wenn
+            ich sie bewusst nutze.
+          </p>
+        </div>
         <h3 style={sectionTitle}>Diskussionsfrage</h3>
         <p style={{ margin: 0 }}>Welche digitalen Kommunikationsmittel benutzt du am meisten? Warum? Wie oft? Handy oder Computer?</p>
         <div style={{ ...questionCardStyle, background: "#f8fafc" }}><strong>Speaking self-practice confidence check</strong><p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p><a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">Open speaking self-practice</a></div>
