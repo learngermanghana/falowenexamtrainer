@@ -52,16 +52,16 @@ const classCatalogDictionary = {
       "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-03-09&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "A1 Koln Klasse": {
-    startDate: "2026-05-06",
-    orientationDate: "2026-05-06",
+    startDate: "2026-05-12",
+    orientationDate: "2026-05-12",
     endDate: "2026-06-10",
     schedule: [
-      { day: "Monday", startTime: "11:00", endTime: "12:00" },
-      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
-      { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
+      { day: "Monday", startTime: "18:00", endTime: "19:00" },
+      { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
+      { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
     docUrl:
-      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-05-06&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
+      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-05-12&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "A1 Leipzig Klasse": {
     startDate: "2026-04-04",
