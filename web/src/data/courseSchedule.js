@@ -438,6 +438,7 @@ const A2_SCHEDULE = [
     grammar_topic: "Futur I (werden + Infinitiv), möchten/wollen, and sentence starters for future plans",
     video: "https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
     youtube_link: "https://youtu.be/Teuu287XY_M?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5",
+    grammarbook_link: "/campus/course/ueber-die-zukunft-sprechen-10-28-final-a2-grammar-notes",
     workbook_link: "/campus/course/a2-day-28-ueber-die-zukunft-sprechen-workbook",
   },
   {

@@ -100,6 +100,7 @@ import A2Day25TagesablaufWorkbookPage from "./components/A2Day25TagesablaufWorkb
 import A2Day26GefuehleInVerschiedenenSituationenWorkbookPage from "./components/A2Day26GefuehleInVerschiedenenSituationenWorkbookPage";
 import A2Day27DigitaleKommunikationWorkbookPage from "./components/A2Day27DigitaleKommunikationWorkbookPage";
 import A2Day28UeberDieZukunftSprechenWorkbookPage from "./components/A2Day28UeberDieZukunftSprechenWorkbookPage";
+import A2Day28UeberDieZukunftSprechenGrammarPage from "./components/A2Day28UeberDieZukunftSprechenGrammarPage";
 import B1Day20WieWirdManWorkbookPage from "./components/B1Day20WieWirdManWorkbookPage";
 import B1Day21LebensformenHeuteWorkbookPage from "./components/B1Day21LebensformenHeuteWorkbookPage";
 import B1Day22BeziehungWichtigWorkbookPage from "./components/B1Day22BeziehungWichtigWorkbookPage";
@@ -915,6 +916,10 @@ const AppShell = ({
           <Route
             path="/campus/course/einen-urlaub-planen-9-24-final-a2-grammar-notes"
             element={<A2Day24EinenUrlaubPlanenGrammarPage />}
+          />
+          <Route
+            path="/campus/course/ueber-die-zukunft-sprechen-10-28-final-a2-grammar-notes"
+            element={<A2Day28UeberDieZukunftSprechenGrammarPage />}
           />
           <Route path="/campus/course/a1-day-0-orientation-and-knowledge-test-workbook" element={<A1Day0OrientationKnowledgeTestWorkbookPage />} />
           <Route path="/campus/course/a2-day-0-orientation-and-knowledge-test-workbook" element={<A2Day0OrientationKnowledgeTestWorkbookPage />} />
