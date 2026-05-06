@@ -153,6 +153,9 @@ const FullSentenceExamples = ({ examples }) => (
           <HighlightedNounPhrase article={example.article} adjective={example.adjective} noun={example.noun} />
           {example.after}
         </div>
+        <div style={{ margin: 0, fontSize: 13, color: "#2563eb" }}>
+          Base adjective: <strong>{example.baseAdjective}</strong> → declined: <strong>{example.adjective}</strong>
+        </div>
         <div style={{ margin: 0, color: "#4b5563", fontSize: 14 }}>{example.translation}</div>
       </div>
     ))}
@@ -270,6 +273,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Das ist",
       article: "ein",
       adjective: "großer",
+      baseAdjective: "groß",
       noun: "Hund",
       after: ".",
       translation: "That is a big dog.",
@@ -279,6 +283,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Das ist",
       article: "eine",
       adjective: "rote",
+      baseAdjective: "rot",
       noun: "Blume",
       after: ".",
       translation: "That is a red flower.",
@@ -288,6 +293,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Das ist",
       article: "ein",
       adjective: "kleines",
+      baseAdjective: "klein",
       noun: "Auto",
       after: ".",
       translation: "That is a small car.",
@@ -297,6 +303,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Das sind",
       article: "keine",
       adjective: "neuen",
+      baseAdjective: "neu",
       noun: "Bücher",
       after: ".",
       translation: "Those are not new books.",
@@ -309,6 +316,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Ich sehe",
       article: "einen",
       adjective: "kleinen",
+      baseAdjective: "klein",
       noun: "Hund",
       after: ".",
       translation: "I see a small dog.",
@@ -318,6 +326,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Ich kaufe",
       article: "eine",
       adjective: "schöne",
+      baseAdjective: "schön",
       noun: "Blume",
       after: ".",
       translation: "I buy a beautiful flower.",
@@ -327,6 +336,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Wir haben",
       article: "ein",
       adjective: "grünes",
+      baseAdjective: "grün",
       noun: "Auto",
       after: ".",
       translation: "We have a green car.",
@@ -336,6 +346,7 @@ const DativeAdjectiveDeclensionPage = () => {
       before: "Er hat",
       article: "keine",
       adjective: "alten",
+      baseAdjective: "alt",
       noun: "Bücher",
       after: ".",
       translation: "He has no old books.",
@@ -553,22 +564,22 @@ const DativeAdjectiveDeclensionPage = () => {
       <Section title="Step 5: Dative Articles (Definite and Indefinite)">
         <h3 style={{ margin: 0 }}>Definite Articles</h3>
         <Table
-          headers={["Gender", "Nominative", "Dative", "Example"]}
+          headers={["Gender", "Nominative", "Dative", "Example", "English"]}
           rows={[
-            ["Masculine", "der", "dem", "Ich schreibe dem Mann."],
-            ["Feminine", "die", "der", "Ich danke der Frau."],
-            ["Neuter", "das", "dem", "Er sendet dem Kind eine Karte."],
-            ["Plural", "die", "den (+n noun)", "Wir gratulieren den Freunden."],
+            ["Masculine", "der", "dem", "Ich schreibe dem Mann.", "I write to the man."],
+            ["Feminine", "die", "der", "Ich danke der Frau.", "I thank the woman."],
+            ["Neuter", "das", "dem", "Er sendet dem Kind eine Karte.", "He sends the child a card."],
+            ["Plural", "die", "den (+n noun)", "Wir gratulieren den Freunden.", "We congratulate the friends."],
           ]}
         />
         <h3 style={{ margin: "12px 0 0" }}>Indefinite Articles</h3>
         <Table
-          headers={["Gender", "Nominative", "Dative", "Example"]}
+          headers={["Gender", "Nominative", "Dative", "Example", "English"]}
           rows={[
-            ["Masculine", "ein", "einem", "Ich schreibe einem Kollegen."],
-            ["Feminine", "eine", "einer", "Ich sende einer Freundin eine Mail."],
-            ["Neuter", "ein", "einem", "Sie dankt einem Kind."],
-            ["Plural", "keine", "keinen (+n noun)", "Wir helfen keinen Nachbarn heute."],
+            ["Masculine", "ein", "einem", "Ich schreibe einem Kollegen.", "I write to a colleague."],
+            ["Feminine", "eine", "einer", "Ich sende einer Freundin eine Mail.", "I send an email to a friend."],
+            ["Neuter", "ein", "einem", "Sie dankt einem Kind.", "She thanks a child."],
+            ["Plural", "keine", "keinen (+n noun)", "Wir helfen keinen Nachbarn heute.", "We are not helping any neighbors today."],
           ]}
         />
       </Section>
