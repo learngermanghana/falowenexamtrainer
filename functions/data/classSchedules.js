@@ -42,12 +42,12 @@ const classCatalog = {
     ],
   },
   "A1 Koln Klasse": {
-    startDate: "2026-05-06",
+    startDate: "2026-05-12",
     endDate: "2026-06-10",
     schedule: [
-      { day: "Monday", startTime: "11:00", endTime: "12:00" },
-      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
-      { day: "Wednesday", startTime: "14:00", endTime: "15:00" },
+      { day: "Monday", startTime: "18:00", endTime: "19:00" },
+      { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
+      { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
   },
   "A1 Leipzig Klasse": {
