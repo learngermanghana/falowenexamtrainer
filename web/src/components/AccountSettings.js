@@ -32,7 +32,7 @@ const AccountSettings = () => {
   const paymentsEnabled = isPaymentsEnabled();
   const [status, setStatus] = useState("");
   const [isUpgradingLevel, setIsUpgradingLevel] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("studentData");
 
   const billingSummary = useMemo(() => {
     const paid = Math.max(Number(studentProfile?.paid ?? studentProfile?.initialPaymentAmount ?? 0) || 0, 0);
@@ -279,7 +279,6 @@ const AccountSettings = () => {
     <div style={{ display: "grid", gap: 12 }}>
       <div style={styles.tabList}>
         {[
-          { key: "overview", label: t("accountSettings.tabs.overview") },
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
           { key: "billing", label: t("accountSettings.tabs.billing") },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
@@ -295,14 +294,6 @@ const AccountSettings = () => {
         ))}
       </div>
 
-      {activeTab === "overview" ? (
-      <section style={styles.card}>
-        <h2 style={styles.sectionTitle}>{t("accountSettings.overview.title")}</h2>
-        <p style={styles.helperText}>{t("accountSettings.overview.subtitle")}</p>
-        <p style={styles.helperText}>{t("accountSettings.overview.renewal", { date: subscription.renewalDate })}</p>
-      </section>
-      ) : null}
-
       {activeTab === "studentData" ? (
       <section style={styles.card}>
         <h2 style={styles.sectionTitle}>{t("accountSettings.studentData.title")}</h2>
@@ -315,6 +306,9 @@ const AccountSettings = () => {
           <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.className")}</span><strong>{studentProfile?.className || "–"}</strong></div>
           <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.level")}</span><strong>{studentProfile?.level || "–"}</strong></div>
           <div style={styles.metaRow}><span>{t("accountSettings.studentData.fields.location")}</span><strong>{studentProfile?.emailLocation || studentProfile?.location || studentProfile?.country || "–"}</strong></div>
+          <div style={styles.metaRow}><span>Contract start</span><strong>{formatDate(studentProfile?.contractStart)}</strong></div>
+          <div style={styles.metaRow}><span>Contract end</span><strong>{formatDate(studentProfile?.contractEnd)}</strong></div>
+          <div style={styles.metaRow}><span>{t("accountSettings.billing.nextRenewal")}</span><strong>{subscription.renewalDate}</strong></div>
         </div>
 
         <h3 style={{ marginTop: 0 }}>{t("accountSettings.profile.title")}</h3>
