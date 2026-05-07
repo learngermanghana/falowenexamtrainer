@@ -477,6 +477,35 @@ const A2Day0OrientationKnowledgeTestWorkbookPage = () => {
         </p>
 
         <p style={{ margin: 0 }}>
+          For writing practice, you can also use the <strong>Writing</strong> tab:
+        </p>
+
+        <p style={{ margin: 0 }}>
+          <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
+            Open Writing tab
+          </a>
+        </p>
+
+        <p style={{ margin: 0 }}>
+          <strong>Mark My Letter</strong> is designed to mark your letter before you submit it to your tutor.
+          It helps you spot mistakes, improve your writing, and fix basic errors before final submission.
+        </p>
+
+        <p style={{ margin: 0 }}>
+          Important: <strong>Mark My Letter is not your final submission</strong>. You still need to submit your final work in the Submit tab.
+        </p>
+
+        <p style={{ margin: 0 }}>
+          You can use <strong>Ref</strong> in Mark My Letter to save notes and useful phrases.
+          The <strong>Ideas Generator</strong> helps you build points for your letter and learn more about the topic.
+        </p>
+
+        <p style={{ margin: 0 }}>
+          <strong>Tutor Feedback</strong> is useful when you have questions.
+          You can save a copy for your tutor to review and discuss with you.
+        </p>
+
+        <p style={{ margin: 0 }}>
           To check your marked work and scores, go to:
         </p>
 
