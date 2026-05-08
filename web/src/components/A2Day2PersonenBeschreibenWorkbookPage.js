@@ -36,6 +36,11 @@ const questionCardStyle = {
   display: "grid",
   gap: 6,
 };
+const phraseGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
 
 const videoPreviewStyle = {
   width: "100%",
@@ -256,20 +261,68 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
             </li>
           </ol>
 
-          <h3 style={sectionTitle}>Sprachliche Hilfen (Language Support)</h3>
-          <ul style={listSpacing}>
-            <li>
-              <strong>Einleitung:</strong> „Ich möchte dir eine Person beschreiben, die ...“ / „Diese Person ist sehr wichtig für
-              mich, weil ...“
-            </li>
-            <li>
-              <strong>Hauptteil:</strong> „Außerdem hat sie ...“ / „Zum Beispiel trägt er oft ...“ / „Er ist genauso freundlich wie
-              meine Mutter.“ / „Sie ist größer als ich.“
-            </li>
-            <li>
-              <strong>Schluss:</strong> „Zusammenfassend kann man sagen, dass diese Person wirklich besonders ist.“
-            </li>
-          </ul>
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+          </p>
+
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>1) Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>„Heute beschreibe ich eine Person aus meinem Alltag.“</li>
+                <li>„Ich möchte über eine Person sprechen, die ich sehr gut kenne.“</li>
+                <li>„In meiner kurzen Präsentation geht es um meinen Freund / meine Freundin.“</li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>2) Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li>
+                  <strong>und</strong>, <strong>oder</strong>, <strong>auch</strong>
+                </li>
+                <li>
+                  <strong>weil</strong>, <strong>deshalb</strong>
+                </li>
+                <li>
+                  <strong>zuerst</strong>, <strong>dann</strong>, <strong>am Ende</strong>
+                </li>
+                <li>
+                  <strong>zum Beispiel</strong>, <strong>außerdem</strong>
+                </li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>3) Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>„Ich finde, dass sie sehr freundlich ist.“</li>
+                <li>„Meiner Meinung nach ist er sehr hilfsbereit.“</li>
+                <li>„Für mich ist diese Person wichtig, weil sie immer zuhört.“</li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>4) Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>„Zusammenfassend kann ich sagen, dass sie eine tolle Person ist.“</li>
+                <li>„Am Ende möchte ich sagen: Ich lerne viel von ihm.“</li>
+                <li>„Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute beschreibe ich meinen Kollegen Amir. Er ist 28 Jahre alt und kommt aus Marokko. Er ist groß und hat kurze,
+              schwarze Haare, und er trägt oft ein Hemd oder einen Pullover. Er ist sehr ruhig, aber auch lustig, deshalb
+              arbeiten viele Leute gern mit ihm. Zum Beispiel hilft er mir, wenn ich Fragen habe. Ich finde, dass Amir sehr
+              freundlich ist, weil er immer respektvoll spricht. Zusammenfassend kann ich sagen, dass er ein sehr guter Kollege
+              und Freund ist.“
+            </p>
+          </div>
 
           <h3 style={sectionTitle}>Diskussionsfrage</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
