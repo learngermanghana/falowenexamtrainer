@@ -173,7 +173,12 @@ const C1_ENTRIES = [
                 grammar_link: "/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes",
                 workbook_link: "/campus/course/c1-day-13-mehrsprachigkeit-workbook",
               }
-            : { grammar_link: null, workbook_link: null };
+            : assignmentDay === 14
+              ? {
+                  grammar_link: "/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes",
+                  workbook_link: "/campus/course/c1-day-14-innovation-und-zukunft-workbook",
+                }
+              : { grammar_link: null, workbook_link: null };
 
   return {
     level: "C1",

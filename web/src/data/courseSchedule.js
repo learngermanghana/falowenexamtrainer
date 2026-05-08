@@ -710,7 +710,12 @@ const resolveC1LessonLinks = (assignmentDay) =>
                 grammarbook_link: "/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes",
                 workbook_link: "/campus/course/c1-day-13-mehrsprachigkeit-workbook",
               }
-            : {};
+            : assignmentDay === 14
+              ? {
+                  grammarbook_link: "/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes",
+                  workbook_link: "/campus/course/c1-day-14-innovation-und-zukunft-workbook",
+                }
+              : {};
 
 const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
   const assignmentDay = Number(entry.day || 0);
