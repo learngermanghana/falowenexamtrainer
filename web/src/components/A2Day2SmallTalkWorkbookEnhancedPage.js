@@ -223,6 +223,11 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
             Nutze diese Struktur für starke Sprechpunkte:{" "}
             <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
           </p>
+          <p style={{ margin: 0, lineHeight: 1.7, color: "#374151" }}>
+            <strong>Wichtig für Day 2:</strong> Heute bleiben wir bewusst bei einfachen Verbindungswörtern. Nutze zuerst{" "}
+            <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>. Das reicht für eine starke
+            A2-Leistung.
+          </p>
           <div style={phraseGridStyle}>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
               <strong>1) Gute Einleitungen</strong>
@@ -239,18 +244,18 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
                   <strong>Zuerst</strong>, <strong>dann</strong>, <strong>danach</strong>, <strong>am Ende</strong>
                 </li>
                 <li>
-                  <strong>Außerdem</strong>, <strong>auch</strong>, <strong>deshalb</strong>
+                  <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>
                 </li>
                 <li>
-                  <strong>Aber</strong>, <strong>trotzdem</strong>, <strong>zum Beispiel</strong>
+                  <strong>aber</strong>, <strong>zum Beispiel</strong>
                 </li>
               </ul>
             </div>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
               <strong>3) Eigene Meinung ausdrücken</strong>
               <ul style={listSpacing}>
-                <li>„Ich denke, dass …“</li>
-                <li>„Meiner Meinung nach ist …“</li>
+                <li>„Ich denke: …“</li>
+                <li>„Ich finde … gut/wichtig.“</li>
                 <li>„Für mich ist … wichtig, weil …“</li>
               </ul>
             </div>
@@ -268,8 +273,8 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über Small Talk im Alltag. <strong>Zuerst</strong> begrüße ich die Person und frage: ‚Wie geht es
               dir?‘ <strong>Dann</strong> spreche ich über einfache Themen wie Arbeit, Hobbys oder das Wetter.{" "}
-              <strong>Zum Beispiel</strong> sage ich: ‚Ich spiele gern Fußball. Und du?‘ <strong>Meiner Meinung nach</strong> ist
-              Small Talk wichtig, weil man neue Leute besser kennenlernen kann. <strong>Zusammenfassend</strong> ist Small Talk
+              <strong>Zum Beispiel</strong> sage ich: ‚Ich spiele gern Fußball, <strong>und</strong> du?‘ <strong>Ich finde</strong> Small
+              Talk wichtig, <strong>weil</strong> man neue Leute besser kennenlernen kann. <strong>Deshalb</strong> ist Small Talk
               einfach, freundlich und sehr nützlich.“
             </p>
           </div>
