@@ -216,6 +216,17 @@ const A2StarterConjunctionsPage = () => {
           <span style={chip}>A2 tip: keep sentences short</span>
           <span style={chip}>Pronunciation: speak slowly and clearly</span>
         </div>
+        <div style={{ ...noteStyle, marginTop: 4 }}>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            <strong>Day 1 reminder (A1 → A2):</strong> This first lesson is very important. If you can connect ideas with
+            simple words, your speaking sounds clearer and more natural from the beginning.
+          </p>
+          <ul style={{ margin: "8px 0 0", paddingLeft: 20, lineHeight: 1.7 }}>
+            <li>Start with short sentences: one idea per sentence.</li>
+            <li>Use one connector correctly (for example: <strong>weil</strong>) before adding more.</li>
+            <li>Practice 5 minutes daily: greeting + one reason sentence + one follow-up question.</li>
+          </ul>
+        </div>
       </div>
 
       {/* Picture */}
