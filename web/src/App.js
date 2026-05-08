@@ -150,6 +150,8 @@ import C1Day12FreizeitUndKulturErweiterteVergleichsformenGrammarNotesPage from "
 import C1Day12FreizeitUndKulturWorkbookPage from "./components/C1Day12FreizeitUndKulturWorkbookPage";
 import C1Day13MehrsprachigkeitGrammarNotesPage from "./components/C1Day13MehrsprachigkeitGrammarNotesPage";
 import C1Day13MehrsprachigkeitWorkbookPage from "./components/C1Day13MehrsprachigkeitWorkbookPage";
+import C1Day14InnovationUndZukunftGrammarNotesPage from "./components/C1Day14InnovationUndZukunftGrammarNotesPage";
+import C1Day14InnovationUndZukunftWorkbookPage from "./components/C1Day14InnovationUndZukunftWorkbookPage";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
@@ -747,6 +749,8 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-12-freizeit-und-kultur-workbook" element={<C1Day12FreizeitUndKulturWorkbookPage />} />
           <Route path="/campus/course/c1-day-13-mehrsprachigkeit-grammar-notes" element={<C1Day13MehrsprachigkeitGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-13-mehrsprachigkeit-workbook" element={<C1Day13MehrsprachigkeitWorkbookPage />} />
+          <Route path="/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes" element={<C1Day14InnovationUndZukunftGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-14-innovation-und-zukunft-workbook" element={<C1Day14InnovationUndZukunftWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />
