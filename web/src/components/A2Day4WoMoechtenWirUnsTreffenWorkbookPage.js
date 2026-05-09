@@ -37,6 +37,12 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const phraseGrid = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
+
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -265,6 +271,67 @@ const A2Day4WoMoechtenWirUnsTreffenWorkbookPage = () => {
           <p style={{ margin: 0 }}>
             <strong>Wo und wie verbringst du am liebsten Zeit mit deinen Freunden?</strong>
           </p>
+
+          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+            <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Sprechen wie bei einer Mini-Präsentation</h3>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Nutze eine klare Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+            </p>
+            <ol style={listSpacing}>
+              <li>
+                <strong>Einleitung:</strong> Thema nennen und kurz sagen, worüber du sprichst.
+              </li>
+              <li>
+                <strong>Hauptteil:</strong> Wo trefft ihr euch, was macht ihr dort und warum? Nutze einfache Connectoren wie{" "}
+                <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.
+              </li>
+              <li>
+                <strong>Beispiel:</strong> Beschreibe ein konkretes Treffen (z. B. letztes Wochenende).
+              </li>
+              <li>
+                <strong>Schluss:</strong> Sage deine Meinung und mache einen kurzen Abschluss.
+              </li>
+            </ol>
+          </div>
+
+          <div style={phraseGrid}>
+            <div style={questionCardStyle}>
+              <strong>Gute Einleitungen</strong>
+              <span>Ich möchte über unsere Treffpunkte sprechen.</span>
+              <span>Heute spreche ich über Freizeit mit Freunden.</span>
+              <span>Für mich ist das Thema „Treffen“ sehr wichtig.</span>
+            </div>
+            <div style={questionCardStyle}>
+              <strong>Verbindungswörter / Connectors</strong>
+              <span>und / oder</span>
+              <span>weil ...</span>
+              <span>deshalb ...</span>
+              <span>zuerst ... dann ...</span>
+            </div>
+            <div style={questionCardStyle}>
+              <strong>Eigene Meinung ausdrücken</strong>
+              <span>Ich finde, ein Park ist am besten.</span>
+              <span>Meiner Meinung nach ist ein Café praktischer.</span>
+              <span>Ich mag Treffen am Abend, weil alle Zeit haben.</span>
+            </div>
+            <div style={questionCardStyle}>
+              <strong>Gute Schlüsse</strong>
+              <span>Zum Schluss kann ich sagen: Wir treffen uns am liebsten im Park.</span>
+              <span>Deshalb finde ich diesen Treffpunkt ideal.</span>
+              <span>Vielen Dank fürs Zuhören.</span>
+            </div>
+          </div>
+
+          <div style={{ ...questionCardStyle, background: "#fefce8" }}>
+            <strong>Kurzmodell (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Ich möchte über Treffpunkte mit meinen Freunden sprechen. Wir treffen uns oft im Park oder im Café. Im Park
+              können wir spazieren gehen und reden, und im Café trinken wir Kaffee. Ich mag den Park besonders, weil er
+              ruhig ist. Letztes Wochenende waren wir im Park und haben ein kleines Picknick gemacht. Es war sonnig,
+              deshalb sind wir lange geblieben. Zum Schluss kann ich sagen: Für mich ist der Ort wichtig, aber die
+              Aktivität mit Freunden ist noch wichtiger.
+            </p>
+          </div>
 
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Speaking self-practice confidence check</strong>
