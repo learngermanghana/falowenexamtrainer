@@ -36,6 +36,11 @@ const questionCardStyle = {
   display: "grid",
   gap: 6,
 };
+const phraseGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
 
 const videoPreviewStyle = {
   width: "100%",
@@ -255,6 +260,62 @@ const A2Day3ComparisonsWorkbookPage = () => {
             Kannst du zwei Dinge oder Personen vergleichen? Was sind die Unterschiede und Gemeinsamkeiten?
             (größer/kleiner, schneller/langsamer, teurer/billiger, besser/schlechter)
           </p>
+
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese Struktur, damit dein Beitrag klar und logisch ist:{" "}
+            <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+          </p>
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>1) Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>„Heute vergleiche ich … und …“</li>
+                <li>„In meiner kurzen Präsentation geht es um …“</li>
+                <li>„Ich möchte zeigen, was besser passt: … oder …“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>2) Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li>
+                  <strong>und</strong>, <strong>oder</strong>, <strong>aber</strong>
+                </li>
+                <li>
+                  <strong>weil</strong>, <strong>deshalb</strong>
+                </li>
+                <li>
+                  <strong>zuerst</strong>, <strong>dann</strong>, <strong>am Ende</strong>
+                </li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>3) Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>„Ich finde … besser als …“</li>
+                <li>„Meiner Meinung nach ist … praktischer.“</li>
+                <li>„Für mich ist … wichtig, weil …“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>4) Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>„Zusammenfassend kann ich sagen, dass …“</li>
+                <li>„Am Ende finde ich … besser, weil …“</li>
+                <li>„Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute vergleiche ich Berlin und München. <strong>Zuerst</strong> finde ich Berlin interessanter,{" "}
+              <strong>weil</strong> die Stadt größer ist und es viele Museen gibt. München ist kleiner, <strong>aber</strong>{" "}
+              sehr sauber und ruhig. <strong>Außerdem</strong> ist München oft teurer, <strong>deshalb</strong> ist Berlin
+              für Studenten manchmal besser. <strong>Zum Beispiel</strong> sind viele Aktivitäten in Berlin günstiger.{" "}
+              <strong>Am Ende</strong> kann ich sagen: Beide Städte sind schön, <strong>aber</strong> ich mag Berlin lieber.“
+            </p>
+          </div>
 
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Speaking self-practice confidence check</strong>
