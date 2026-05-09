@@ -221,7 +221,7 @@ const C1_CURRICULUM_ENTRIES = [
   }),
 ];
 
-const CURRICULUM_ENTRIES = [...A1_CURRICULUM_ENTRIES, ...A2_ENTRIES, ...B1_ENTRIES, ...B2_CURRICULUM_ENTRIES, ...C1_CURRICULUM_ENTRIES].map(withCanonicalIdentity);
+const CURRICULUM_ENTRIES = [...A1_CURRICULUM_ENTRIES, ...A2_ENTRIES, ...B1_ENTRIES, ...B2_ENTRIES, ...C1_CURRICULUM_ENTRIES].map(withCanonicalIdentity);
 
 const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
   if (!acc[entry.level]) acc[entry.level] = [];
