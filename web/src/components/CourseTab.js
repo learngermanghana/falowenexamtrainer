@@ -107,7 +107,11 @@ const hasTutorMarkedWork = (entry) => {
     toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
   );
 };
-const isTutorMarkedEntry = (entry) => hasTutorMarkedWork(entry);
+const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
+const isTutorMarkedEntry = (entry, level) => {
+  if (SELF_LEARNING_ONLY_LEVELS.has(normalizeLevel(level))) return false;
+  return hasTutorMarkedWork(entry);
+};
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 
@@ -1449,7 +1453,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const status = milestoneEntry ? "milestoneComplete" : statusInfo.finalStatus || statusInfo.status;
                     const entryAssignmentKey = statusInfo.assignmentId || getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
-                    const isTutorMarked = isTutorMarkedEntry(entry);
+                    const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
                     const isPracticeOnlyEntry = !isTutorMarked;
                     const practiceState = practiceProgress[getPracticeEntryKey(entry)] || { complete: false, confidence: "" };
