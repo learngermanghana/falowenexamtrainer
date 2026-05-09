@@ -118,7 +118,13 @@ const B2_ENTRIES = [
   de,
   topic: de,
   grammar_topic,
-  schreiben_sprechen: { grammar_link: null, workbook_link: null },
+  schreiben_sprechen:
+    index === 0
+      ? {
+          grammar_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes",
+          workbook_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook",
+        }
+      : { grammar_link: null, workbook_link: null },
 }));
 
 const C1_ENTRIES = [
