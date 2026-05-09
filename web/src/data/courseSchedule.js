@@ -688,7 +688,7 @@ const resolveC1LessonLinks = (assignmentDay) =>
   assignmentDay === 1
     ? {
         grammarbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-grammar-notes",
-        workbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-workbook",
+        workbook_link: "/campus/course/c1-day-0-progression-workbook",
       }
     : assignmentDay === 10
       ? {
@@ -1692,7 +1692,7 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
         video: DAY0_TUTORIAL_VIDEO_URL_A1,
         youtube_link: DAY0_TUTORIAL_VIDEO_URL_A1,
         grammarbook_link: null,
-        workbook_link: null,
+        workbook_link: "/campus/course/b2-day-0-self-learning-orientation-workbook",
       },
     },
     {
