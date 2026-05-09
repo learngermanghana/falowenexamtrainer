@@ -156,7 +156,23 @@ const C1_ENTRIES = [
   ["6.1", "Nachhaltiger Konsum", "Genitiv- und Vergleichsstrukturen"],
   ["6.2", "Digitalisierung und Verwaltung", "Formelle Empfehlungssprache"],
   ["6.3", "Review und Transfer", "Zusammenfassung und Schlussfolgerung"],
-].map(([chapter, de, grammar_topic], index) => {
+];
+
+const C1_CURRICULUM_ENTRIES = [
+  {
+    level: "C1",
+    assignmentDay: 0,
+    chapter: "Tutorial",
+    mode: "Lesen & Hören",
+    assignment: false,
+    de: "Tutorial",
+    topic: "Tutorial",
+    schreiben_sprechen: {
+      grammar_link: null,
+      workbook_link: "/campus/course/c1-day-0-progression-workbook",
+    },
+  },
+  ...C1_ENTRIES.map(([chapter, de, grammar_topic], index) => {
   const assignmentDay = index + 1;
   const schreibenSprechen =
     assignmentDay === 10
@@ -191,20 +207,21 @@ const C1_ENTRIES = [
                   }
                 : { grammar_link: null, workbook_link: null };
 
-  return {
-    level: "C1",
-    assignmentDay,
-    chapter,
-    mode: "Lesen & Hören",
-    assignment: true,
-    de,
-    topic: de,
-    grammar_topic,
-    schreiben_sprechen: schreibenSprechen,
-  };
-});
+    return {
+      level: "C1",
+      assignmentDay,
+      chapter,
+      mode: "Lesen & Hören",
+      assignment: true,
+      de,
+      topic: de,
+      grammar_topic,
+      schreiben_sprechen: schreibenSprechen,
+    };
+  }),
+];
 
-const CURRICULUM_ENTRIES = [...A1_CURRICULUM_ENTRIES, ...A2_ENTRIES, ...B1_ENTRIES, ...B2_ENTRIES, ...C1_ENTRIES].map(withCanonicalIdentity);
+const CURRICULUM_ENTRIES = [...A1_CURRICULUM_ENTRIES, ...A2_ENTRIES, ...B1_ENTRIES, ...B2_ENTRIES, ...C1_CURRICULUM_ENTRIES].map(withCanonicalIdentity);
 
 const CURRICULUM_BY_LEVEL = CURRICULUM_ENTRIES.reduce((acc, entry) => {
   if (!acc[entry.level]) acc[entry.level] = [];

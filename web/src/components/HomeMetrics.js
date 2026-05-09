@@ -124,6 +124,24 @@ const buildDictionaryGoal = (entry = {}, level = "") => {
   return scheduleEntries.find((scheduleEntry) => scheduleEntry?.goal)?.goal || entry?.goal || "";
 };
 
+const detectLevelKey = (studentProfile = {}) => {
+  const candidates = [
+    studentProfile?.level,
+    studentProfile?.course,
+    studentProfile?.classLevel,
+    studentProfile?.className,
+  ]
+    .map((value) => String(value || "").toUpperCase())
+    .filter(Boolean);
+
+  for (const candidate of candidates) {
+    const match = candidate.match(/\b(A1|A2|B1|B2|C1|C2)\b/);
+    if (match?.[1]) return match[1];
+  }
+
+  return "";
+};
+
 const HomeMetrics = ({ studentProfile }) => {
   const { t } = useTranslation();
   const { idToken, user } = useAuth();
@@ -142,7 +160,14 @@ const HomeMetrics = ({ studentProfile }) => {
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const levelKey = detectLevelKey(studentProfile);
   const shouldShowHomeMetrics = ["A1", "A2", "B1"].includes(levelKey);
-  const day0WorkbookLink = getDay0WorkbookLinkForLevel(levelKey);
+  const day0WorkbookByLevel = {
+    A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
+    A2: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
+    B1: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
+    B2: "/campus/course/b2-day-0-self-learning-orientation-workbook",
+    C1: "/campus/course/c1-day-0-progression-workbook",
+  };
+  const day0WorkbookLink = day0WorkbookByLevel[levelKey] || null;
 
   const isMountedRef = useRef(true);
   const lastRefreshAtRef = useRef(0);
@@ -374,8 +399,8 @@ const HomeMetrics = ({ studentProfile }) => {
       {day0WorkbookLink ? (
         <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
           <SectionHeader
-            eyebrow={t("homeMetrics.day0.eyebrow")}
-            title={t("homeMetrics.day0.title")}
+            eyebrow="Start here"
+            title="Day 0 Orientation Workbook"
             actions={
               <PrimaryActionBar align="flex-end">
                 <button
@@ -383,20 +408,20 @@ const HomeMetrics = ({ studentProfile }) => {
                   onClick={() => navigate(day0WorkbookLink)}
                   style={styles.primaryButton}
                 >
-                  {t("homeMetrics.day0.cta", { level: levelKey || t("homeMetrics.leaderboard.levelFallback") })}
+                  Open Day 0
                 </button>
               </PrimaryActionBar>
             }
           />
           <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-            {t("homeMetrics.day0.helper")}
+            New here? Learn how to use Falowen first, then continue with your class work.
           </p>
         </div>
       ) : null}
 
       {!shouldShowHomeMetrics ? (
         <p style={{ ...styles.helperText, margin: 0 }}>
-          {t("homeMetrics.day0.noMetricsHelper")}
+          Home metrics are currently available for A1, A2, and B1. B2 and C1 students should start with Day 0 above.
         </p>
       ) : null}
 
