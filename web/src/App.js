@@ -261,6 +261,8 @@ function App() {
   const role = useMemo(() => (studentProfile?.role || "student").toLowerCase(), [studentProfile?.role]);
   const isStaff = role === "admin" || role === "tutor" || studentProfile?.isTutor === true;
   const isEnrolled = isStaff || Boolean(studentProfile?.className || studentProfile?.level);
+  const levelToken = String(studentProfile?.level || "").toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/)?.[1] || "";
+  const isSelfLearningTrack = !isStaff && ["B2", "C1"].includes(levelToken);
   const tabStructure = useMemo(
     () => getTabStructure(studentProfile?.program, t),
     [studentProfile?.program, t]
@@ -268,19 +270,19 @@ function App() {
 
   const allowedSections = useMemo(
     () => ({
-      submit: true,
+      submit: !isSelfLearningTrack,
       course: true,
-      examFile: isEnrolled || isStaff,
-      attendance: isEnrolled || isStaff,
+      examFile: (isEnrolled || isStaff) && !isSelfLearningTrack,
+      attendance: (isEnrolled || isStaff) && !isSelfLearningTrack,
       results: isEnrolled || isStaff,
       grammar: true,
       writing: true,
       speech: true,
       vocab: true,
-      discussion: isEnrolled || isStaff,
+      discussion: (isEnrolled || isStaff) && !isSelfLearningTrack,
       account: true,
     }),
-    [isEnrolled, isStaff]
+    [isEnrolled, isSelfLearningTrack, isStaff]
   );
 
   const tabStorageKey = user?.uid ? `falowen:last-tab:${user.uid}` : null;
