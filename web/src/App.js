@@ -21,6 +21,8 @@ import CourseStructurePage from "./components/CourseStructurePage";
 import A1Day0OrientationKnowledgeTestWorkbookPage from "./components/A1Day0OrientationKnowledgeTestWorkbookPage";
 import A2Day0OrientationKnowledgeTestWorkbookPage from "./components/A2Day0OrientationKnowledgeTestWorkbookPage";
 import B1Day0OrientationKnowledgeTestWorkbookPage from "./components/B1Day0OrientationKnowledgeTestWorkbookPage";
+import B2Day0SelfLearningOrientationWorkbookPage from "./components/B2Day0SelfLearningOrientationWorkbookPage";
+import C1Day0ProgressionWorkbookPage from "./components/C1Day0ProgressionWorkbookPage";
 import CourseResourceViewerPage from "./components/CourseResourceViewerPage";
 import FullClassCalendarPage from "./components/FullClassCalendarPage";
 import ConjunctionNotesPage from "./components/ConjunctionNotesPage";
@@ -932,6 +934,8 @@ const AppShell = ({
           <Route path="/campus/course/a1-day-0-orientation-and-knowledge-test-workbook" element={<A1Day0OrientationKnowledgeTestWorkbookPage />} />
           <Route path="/campus/course/a2-day-0-orientation-and-knowledge-test-workbook" element={<A2Day0OrientationKnowledgeTestWorkbookPage />} />
           <Route path="/campus/course/b1-day-0-orientation-and-knowledge-test-workbook" element={<B1Day0OrientationKnowledgeTestWorkbookPage />} />
+          <Route path="/campus/course/b2-day-0-self-learning-orientation-workbook" element={<B2Day0SelfLearningOrientationWorkbookPage />} />
+          <Route path="/campus/course/c1-day-0-progression-workbook" element={<C1Day0ProgressionWorkbookPage />} />
           <Route path="/campus/course/course-structure" element={<CourseStructurePage />} />
           <Route path="/campus/course/resource-viewer" element={<CourseResourceViewerPage />} />
           <Route path="/campus/course/full-class-calendar/:className" element={<FullClassCalendarPage />} />
