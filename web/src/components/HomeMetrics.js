@@ -140,6 +140,7 @@ const HomeMetrics = ({ studentProfile }) => {
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
+  const shouldShowHomeMetrics = ["A1", "A2", "B1"].includes(levelKey);
 
   const isMountedRef = useRef(true);
   const lastRefreshAtRef = useRef(0);
@@ -366,6 +367,7 @@ const HomeMetrics = ({ studentProfile }) => {
 
   const missedHelperText = useMemo(() => t("homeMetrics.missed.helper", { defaultValue: "Assignments you jumped or skipped earlier in the schedule." }), [t]);
 
+  if (!shouldShowHomeMetrics) return null;
 
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
