@@ -156,6 +156,8 @@ import C1Day14InnovationUndZukunftGrammarNotesPage from "./components/C1Day14Inn
 import C1Day14InnovationUndZukunftWorkbookPage from "./components/C1Day14InnovationUndZukunftWorkbookPage";
 import C1Day15BildungUndLebenslangesLernenGrammarNotesPage from "./components/C1Day15BildungUndLebenslangesLernenGrammarNotesPage";
 import C1Day15BildungUndLebenslangesLernenWorkbookPage from "./components/C1Day15BildungUndLebenslangesLernenWorkbookPage";
+import B2Day1PersoenlicheIdentitaetGrammarNotesPage from "./components/B2Day1PersoenlicheIdentitaetGrammarNotesPage";
+import B2Day1PersoenlicheIdentitaetWorkbookPage from "./components/B2Day1PersoenlicheIdentitaetWorkbookPage";
 import NotificationBell from "./components/NotificationBell";
 import SetupCheckpoint from "./components/SetupCheckpoint";
 import PaymentComplete from "./components/PaymentComplete";
@@ -745,7 +747,9 @@ const AppShell = ({
           <Route path="/campus/course/c1-self-learning" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-self-learning/day-:dayId" element={<C1SelfLearningCourse />} />
           <Route path="/campus/course/c1-day-1-willkommen-selbstlernstart-workbook" element={<C1Day1WillkommenSelbstlernstartWorkbookPage />} />
-          <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
+          <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes" element={<B2Day1PersoenlicheIdentitaetGrammarNotesPage />} />
+          <Route path="/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook" element={<B2Day1PersoenlicheIdentitaetWorkbookPage />} />
+                    <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-10-migration-und-integration-grammar-notes" element={<C1Day10IntegrationUndGesellschaftGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-10-integration-und-gesellschaft-workbook" element={<C1Day10IntegrationUndGesellschaftWorkbookPage />} />
           <Route path="/campus/course/c1-day-11-engagement-und-ehrenamt-grammar-notes" element={<C1Day11EngagementUndEhrenamtGrammarNotesPage />} />

@@ -455,7 +455,18 @@ const A2_SCHEDULE = [
   },
 ].map(buildA2Lesson);
 
-const B2_COURSE_DICTIONARY = getCurriculumEntriesForLevel("B2");
+const resolveB2LessonLinks = (assignmentDay) =>
+  assignmentDay === 1
+    ? {
+        grammarbook_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes",
+        workbook_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook",
+      }
+    : {};
+
+const B2_COURSE_DICTIONARY = getCurriculumEntriesForLevel("B2").map((entry) => ({
+  ...entry,
+  ...resolveB2LessonLinks(Number(entry.assignmentDay || entry.day || 0)),
+}));
 
 const c1Schedule = [
   {
