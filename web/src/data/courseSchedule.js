@@ -455,7 +455,24 @@ const A2_SCHEDULE = [
   },
 ].map(buildA2Lesson);
 
-const B2_COURSE_DICTIONARY = getCurriculumEntriesForLevel("B2");
+const B2_COURSE_DICTIONARY = [
+  {
+    assignment_id: "B2-Tutorial",
+    assignmentDay: 0,
+    day: 0,
+    chapter: "Tutorial",
+    topic: "Tutorial",
+    goal: "Watch the Day 0 tutorial video to see how the course is organised.",
+    instruction: "Start here to learn how the course is structured and what to expect, then watch the tutorial video.",
+    grammar_topic: null,
+    assignment: false,
+    video: DAY0_TUTORIAL_VIDEO_URL_A1,
+    youtube_link: DAY0_TUTORIAL_VIDEO_URL_A1,
+    grammarbook_link: null,
+    workbook_link: "/campus/course/b2-day-0-self-learning-orientation-workbook",
+  },
+  ...getCurriculumEntriesForLevel("B2"),
+];
 
 const c1Schedule = [
   {
@@ -688,7 +705,7 @@ const resolveC1LessonLinks = (assignmentDay) =>
   assignmentDay === 1
     ? {
         grammarbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-grammar-notes",
-        workbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-workbook",
+        workbook_link: "/campus/course/c1-day-0-progression-workbook",
       }
     : assignmentDay === 10
       ? {
@@ -1692,7 +1709,7 @@ Wir wünschen dir weiterhin viel Erfolg auf deinem Sprachlernweg!`,
         video: DAY0_TUTORIAL_VIDEO_URL_A1,
         youtube_link: DAY0_TUTORIAL_VIDEO_URL_A1,
         grammarbook_link: null,
-        workbook_link: null,
+        workbook_link: "/campus/course/b2-day-0-self-learning-orientation-workbook",
       },
     },
     {
