@@ -715,7 +715,12 @@ const resolveC1LessonLinks = (assignmentDay) =>
                   grammarbook_link: "/campus/course/c1-day-14-innovation-und-zukunft-grammar-notes",
                   workbook_link: "/campus/course/c1-day-14-innovation-und-zukunft-workbook",
                 }
-              : {};
+              : assignmentDay === 15
+                ? {
+                    grammarbook_link: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes",
+                    workbook_link: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook",
+                  }
+                : {};
 
 const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
   const assignmentDay = Number(entry.day || 0);
