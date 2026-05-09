@@ -124,24 +124,6 @@ const buildDictionaryGoal = (entry = {}, level = "") => {
   return scheduleEntries.find((scheduleEntry) => scheduleEntry?.goal)?.goal || entry?.goal || "";
 };
 
-const detectLevelKey = (studentProfile = {}) => {
-  const candidates = [
-    studentProfile?.level,
-    studentProfile?.course,
-    studentProfile?.classLevel,
-    studentProfile?.className,
-  ]
-    .map((value) => String(value || "").toUpperCase())
-    .filter(Boolean);
-
-  for (const candidate of candidates) {
-    const match = candidate.match(/\b(A1|A2|B1|B2|C1|C2)\b/);
-    if (match?.[1]) return match[1];
-  }
-
-  return "";
-};
-
 const HomeMetrics = ({ studentProfile }) => {
   const { t } = useTranslation();
   const { idToken, user } = useAuth();
