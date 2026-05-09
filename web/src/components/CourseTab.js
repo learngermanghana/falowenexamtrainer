@@ -1268,6 +1268,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     });
   };
 
+  const isSelfLearningLevel = ["B2", "C1"].includes(String(selectedCourseLevel || "").toUpperCase());
+
   const chapterOptions = useMemo(() => {
     const set = new Set();
     schedule.forEach((entry) => {
@@ -1287,16 +1289,18 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
           >
             {t("courseTab.nav.courseBook")}
           </button>
-          <button
-            type="button"
-            style={activeSubTab === "classMembers" ? styles.navButtonActive : styles.navButton}
-            onClick={() => setActiveSubTab("classMembers")}
-          >
-            {t("courseTab.nav.classMembers")}
-          </button>
+          {!isSelfLearningLevel ? (
+            <button
+              type="button"
+              style={activeSubTab === "classMembers" ? styles.navButtonActive : styles.navButton}
+              onClick={() => setActiveSubTab("classMembers")}
+            >
+              {t("courseTab.nav.classMembers")}
+            </button>
+          ) : null}
         </div>
 
-        {activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
+        {!isSelfLearningLevel && activeSubTab === "classMembers" ? <ClassMembersTab /> : null}
 
         {activeSubTab === "courseBook" ? (
           <>
@@ -1518,7 +1522,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                 <span style={styles.badge}>Practice only</span>
                                 {practiceState.complete ? (
                                   <span style={{ ...styles.badge, background: "#ecfdf5", color: "#166534", border: "1px solid #86efac" }}>
-                                    Self-marked complete
+                                    Self-marked{practiceState.confidence ? ` (${practiceState.confidence} confidence)` : " complete"}
                                   </span>
                                 ) : null}
                               </>

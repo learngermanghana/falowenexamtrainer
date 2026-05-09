@@ -109,34 +109,23 @@ const B2_ENTRIES = [
   ["6.1", "Kreatives Schreiben und Projekte", "Textkohäsion"],
   ["6.2", "Prüfungstraining und Wiederholung", "Prüfungsstrategien"],
   ["6.3", "Abschlusspräsentation und Feedback", "Präsentationssprache"],
-];
-
-const B2_CURRICULUM_ENTRIES = [
-  {
-    level: "B2",
-    assignmentDay: 0,
-    chapter: "Tutorial",
-    mode: "Lesen & Hören",
-    assignment: false,
-    de: "Tutorial",
-    topic: "Tutorial",
-    schreiben_sprechen: {
-      grammar_link: null,
-      workbook_link: "/campus/course/b2-day-0-self-learning-orientation-workbook",
-    },
-  },
-  ...B2_ENTRIES.map(([chapter, de, grammar_topic], index) => ({
-    level: "B2",
-    assignmentDay: index + 1,
-    chapter,
-    mode: "Lesen & Hören",
-    assignment: true,
-    de,
-    topic: de,
-    grammar_topic,
-    schreiben_sprechen: { grammar_link: null, workbook_link: null },
-  })),
-];
+].map(([chapter, de, grammar_topic], index) => ({
+  level: "B2",
+  assignmentDay: index + 1,
+  chapter,
+  mode: "Lesen & Hören",
+  assignment: true,
+  de,
+  topic: de,
+  grammar_topic,
+  schreiben_sprechen:
+    index === 0
+      ? {
+          grammar_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes",
+          workbook_link: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook",
+        }
+      : { grammar_link: null, workbook_link: null },
+}));
 
 const C1_ENTRIES = [
   ["1.1", "Ziele und Lernweg", "Komplexe Haupt- und Nebensatzverbindungen"],
