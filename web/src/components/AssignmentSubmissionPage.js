@@ -632,7 +632,7 @@ const AssignmentSubmissionPage = () => {
         ? {
             pageTitle: "Aufgabe einreichen",
             pageHelper:
-              "Lade deine Lösung als Text hoch. Klasse, Niveau, Schülercode und E-Mail werden automatisch ergänzt.",
+              "Schreibe deine Lösung unten als Text. Klasse, Niveau, Schülercode und E-Mail werden automatisch ergänzt, um Fehler zu vermeiden. Scrolle nach unten und tippe deine Antworten direkt ein — du lädst keine Datei hoch.",
             orientationOnly: "Nur Orientierungstag",
             statusSubmittable: "Diese Aufgabe ist einreichbar",
             statusNotSubmittable: "Diese Aufgabe ist nicht einreichbar",
@@ -643,7 +643,7 @@ const AssignmentSubmissionPage = () => {
         : {
             pageTitle: "Submit Assignment",
             pageHelper:
-              "Upload your solution as text. Your class, level, student code, and email are auto-filled to avoid mistakes.",
+              "Write your solution below as text. Your class, level, student code, and email are auto-filled to avoid mistakes. Scroll down and type your answers directly — you do not upload a file.",
             orientationOnly: "Orientation only",
             statusSubmittable: "This assignment is submittable",
             statusNotSubmittable: "This assignment is not submittable",
