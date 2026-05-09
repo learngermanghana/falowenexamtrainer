@@ -161,13 +161,13 @@ const TicketRow = ({ label, time, place }) => (
 /* ----------------------------- Content data ---------------------------- */
 
 const modalVerbs = [
-  { verb: "können", meaning: "can / to be able to", forms: "ich kann · du kannst · er/sie/es kann" },
-  { verb: "müssen", meaning: "must / to have to", forms: "ich muss · du musst · er/sie/es muss" },
-  { verb: "dürfen", meaning: "may / to be allowed to", forms: "ich darf · du darfst · er/sie/es darf" },
-  { verb: "wollen", meaning: "to want to (strong)", forms: "ich will · du willst · er/sie/es will" },
-  { verb: "sollen", meaning: "should / to be supposed to", forms: "ich soll · du sollst · er/sie/es soll" },
-  { verb: "mögen", meaning: "to like", forms: "ich mag · du magst · er/sie/es mag" },
-  { verb: "möchten", meaning: "would like (polite)", forms: "ich möchte · du möchtest · er/sie/es möchte" },
+  { verb: "können", meaning: "can / to be able to", forms: "ich kann · du kannst · er/sie/es kann · wir können · ihr könnt · sie/Sie können" },
+  { verb: "müssen", meaning: "must / to have to", forms: "ich muss · du musst · er/sie/es muss · wir müssen · ihr müsst · sie/Sie müssen" },
+  { verb: "dürfen", meaning: "may / to be allowed to", forms: "ich darf · du darfst · er/sie/es darf · wir dürfen · ihr dürft · sie/Sie dürfen" },
+  { verb: "wollen", meaning: "to want to (strong)", forms: "ich will · du willst · er/sie/es will · wir wollen · ihr wollt · sie/Sie wollen" },
+  { verb: "sollen", meaning: "should / to be supposed to", forms: "ich soll · du sollst · er/sie/es soll · wir sollen · ihr sollt · sie/Sie sollen" },
+  { verb: "mögen", meaning: "to like", forms: "ich mag · du magst · er/sie/es mag · wir mögen · ihr mögt · sie/Sie mögen" },
+  { verb: "möchten", meaning: "would like (polite)", forms: "ich möchte · du möchtest · er/sie/es möchte · wir möchten · ihr möchtet · sie/Sie möchten" },
 ];
 
 const sentenceBuilding = [
@@ -476,6 +476,30 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           </div>
         </div>
 
+
+        <div
+          style={{
+            marginTop: 10,
+            padding: 12,
+            borderRadius: 12,
+            border: "1px solid #e5e7eb",
+            background: "#f9fafb",
+          }}
+        >
+          <strong>Gleis in real stations:</strong> At large German stations (for example Berlin Hbf or Frankfurt (Main) Hbf),
+          you can see more than 15 Gleise (platform tracks). That means your connection can change to a
+          different Gleis very quickly.
+          <ul style={{ ...listStyle, marginTop: 8 }}>
+            <li>Always check the departure board again after arrival.</li>
+            <li>Compare train number (ICE/IC/RE + number), destination, and <strong>Gleis</strong>.</li>
+            <li>When transfer time is short (sometimes only 5 minutes), walk directly to the next Gleis.</li>
+            <li>Some trips require multiple train changes on different Gleise, so plan your route in order.</li>
+          </ul>
+          <div style={{ color: "#4b5563" }}>
+            Example: <em>Wir kommen auf Gleis 7 an und fahren 5 Minuten später von Gleis 12 ab.</em>
+          </div>
+        </div>
+
         <div
           style={{
             marginTop: 10,
@@ -620,6 +644,33 @@ const A1Day14ModalVerbsWorkbookPage = () => {
           ))}
         </ol>
       </SectionCard>
+
+      <SectionCard title="10) Prefix practice: common separable prefixes">
+        <p style={{ margin: 0 }}>
+          Common <strong>trennbare Präfixe</strong> (separable prefixes) in A1/A2: <strong>ab-, an-, auf-, aus-,
+          ein-, fern-, mit-, nach-, vor-, weg-, zu-, zurück-</strong>.
+        </p>
+        <ul style={listStyle}>
+          <li><strong>abfahren</strong> (to depart) → Der Zug fährt um 10:12 Uhr <strong>ab</strong>.</li>
+          <li><strong>ankommen</strong> (to arrive) → Der Zug kommt um 13:48 Uhr <strong>an</strong>.</li>
+          <li><strong>einsteigen</strong> (to get in) → Wir steigen auf Gleis 5 <strong>ein</strong>.</li>
+          <li><strong>aussteigen</strong> (to get out) → Sie steigt in Hannover <strong>aus</strong>.</li>
+          <li><strong>mitbringen</strong> (to bring along) → Ich bringe meinen Pass <strong>mit</strong>.</li>
+        </ul>
+      </SectionCard>
+
+      <SectionCard title="11) Learning checklist (self-check)">
+        <ul style={listStyle}>
+          <li>☐ I can explain what a modal verb does in one sentence.</li>
+          <li>☐ I can conjugate all 7 modal verbs for all pronouns (ich, du, er/sie/es, wir, ihr, sie/Sie).</li>
+          <li>☐ I can build correct sentences with: Subject + modal + ... + infinitive at the end.</li>
+          <li>☐ I know ticket words: <strong>Ab</strong>, <strong>An</strong>, <strong>Halt</strong>, <strong>Gleis</strong>, <strong>Umst.</strong></li>
+          <li>☐ I can read a connection with multiple Gleise and a short transfer time (for example 5 minutes).</li>
+          <li>☐ I can use separable verbs both without modal (<em>Ich stehe auf</em>) and with modal (<em>Ich muss aufstehen</em>).</li>
+          <li>☐ I completed questions 1–15 and reached at least 80% correct.</li>
+        </ul>
+      </SectionCard>
+
     </div>
   );
 };
