@@ -56,22 +56,29 @@ const endingSpan = (color, bg) => ({
   fontWeight: 700,
 });
 
+const definiteArticleRows = [
+  ["Masculine", "der", "den"],
+  ["Feminine", "die", "die"],
+  ["Neuter", "das", "das"],
+  ["Plural", "die", "die"],
+];
+
 const formRows = [
-  ["Masculine nominative", "ein", "freundlicher", "Mann"],
-  ["Feminine nominative", "eine", "nette", "Frau"],
-  ["Neuter nominative", "ein", "kleines", "Kind"],
-  ["Masculine accusative", "einen", "großen", "Mann"],
-  ["Feminine accusative", "eine", "schöne", "Jacke"],
-  ["Neuter accusative", "ein", "rotes", "Auto"],
+  ["Masculine nominative", "ein", "kleiner", "Mann"],
+  ["Feminine nominative", "eine", "kleine", "Frau"],
+  ["Neuter nominative", "ein", "kleines", "Haus"],
+  ["Masculine accusative", "einen", "kleinen", "Mann"],
+  ["Feminine accusative", "eine", "kleine", "Frau"],
+  ["Neuter accusative", "ein", "kleines", "Haus"],
 ];
 
 const sentenceRows = [
-  ["Das ist ein freundlicher Mann.", "That is a friendly man."],
-  ["Sie ist eine nette Frau.", "She is a nice woman."],
-  ["Das ist ein kleines Kind.", "That is a small child."],
-  ["Ich sehe einen großen Mann.", "I see a tall man."],
-  ["Sie hat eine schöne Jacke.", "She has a beautiful jacket."],
-  ["Er kauft ein rotes Auto.", "He buys a red car."],
+  ["Das ist ein kleiner Mann.", "That is a short/small man."],
+  ["Sie ist eine kleine Frau.", "She is a short/small woman."],
+  ["Das ist ein kleines Haus.", "That is a small house."],
+  ["Ich sehe einen kleinen Mann.", "I see a short/small man."],
+  ["Sie besucht eine kleine Frau.", "She visits a short/small woman."],
+  ["Er kauft ein kleines Haus.", "He buys a small house."],
 ];
 
 const A2Day2GrammarNotesPage = () => {
@@ -112,13 +119,97 @@ const A2Day2GrammarNotesPage = () => {
             We only focus on <strong>nominative</strong> and <strong>accusative</strong>.
           </p>
           <p style={{ margin: "8px 0 0 0" }}>
-            Do not worry about other forms now. This is only your second day in A2, so you should first learn the basic patterns.
+            Do not worry about other forms now. This is only your second day in A2, so you
+            should first learn the basic patterns.
           </p>
         </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>2) The pattern</h2>
+        <h2 style={{ margin: 0 }}>2) The simple idea</h2>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}>
+            The adjective ending comes from the <strong>definite article pattern</strong>.
+          </p>
+          <p style={{ margin: "8px 0 0 0" }}>
+            So first, we look at the definite article. Then we use that ending on the adjective.
+          </p>
+          <p style={{ margin: "8px 0 0 0" }}>
+            Example:
+          </p>
+          <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
+            <li>
+              <em>der</em> → <em>ein klein<strong>er</strong> Mann</em>
+            </li>
+            <li>
+              <em>die</em> → <em>eine klein<strong>e</strong> Frau</em>
+            </li>
+            <li>
+              <em>das</em> → <em>ein klein<strong>es</strong> Haus</em>
+            </li>
+            <li>
+              <em>den</em> → <em>einen klein<strong>en</strong> Mann</em>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>3) Definite articles in nominative and accusative</h2>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}>
+            These definite articles help us choose the adjective ending.
+          </p>
+          <p style={{ margin: "8px 0 0 0" }}>
+            We are not learning definite article phrases fully today. We only use them as a
+            guide for the adjective endings.
+          </p>
+        </div>
+
+        <div style={{ overflowX: "auto" }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thTdStyle}>Gender</th>
+                <th style={thTdStyle}>Nominative</th>
+                <th style={thTdStyle}>Accusative</th>
+              </tr>
+            </thead>
+            <tbody>
+              {definiteArticleRows.map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell) => (
+                    <td key={cell} style={thTdStyle}>
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}>
+            <strong>Important for today:</strong>
+          </p>
+          <p style={{ margin: "6px 0 0 0" }}>
+            <strong>der → -er</strong>
+          </p>
+          <p style={{ margin: "6px 0 0 0" }}>
+            <strong>die → -e</strong>
+          </p>
+          <p style={{ margin: "6px 0 0 0" }}>
+            <strong>das → -es</strong>
+          </p>
+          <p style={{ margin: "6px 0 0 0" }}>
+            <strong>den → -en</strong>
+          </p>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>4) The pattern</h2>
         <div style={noteStyle}>
           <p style={{ margin: 0 }}>The pattern is:</p>
           <p style={{ margin: "8px 0 0 0", fontWeight: 700 }}>
@@ -126,30 +217,30 @@ const A2Day2GrammarNotesPage = () => {
           </p>
           <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
             <li>
-              <em>ein freundlicher Mann</em>
+              <em>ein kleiner Mann</em>
             </li>
             <li>
-              <em>eine nette Frau</em>
+              <em>eine kleine Frau</em>
             </li>
             <li>
-              <em>ein kleines Kind</em>
+              <em>ein kleines Haus</em>
             </li>
             <li>
-              <em>einen großen Mann</em>
+              <em>einen kleinen Mann</em>
             </li>
           </ul>
         </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>3) The endings for today</h2>
+        <h2 style={{ margin: 0 }}>5) The endings for today</h2>
         <div style={endingBoxWrapStyle}>
           <div style={endingCardStyle("#eff6ff", "#93c5fd")}>
             <div style={{ fontSize: 22, fontWeight: 800, color: "#1d4ed8" }}>-er</div>
             <div><strong>Masculine nominative</strong></div>
             <div>
               <em>
-                ein freundlich
+                ein klein
                 <span style={endingSpan("#1d4ed8", "#dbeafe")}>er</span> Mann
               </em>
             </div>
@@ -160,7 +251,7 @@ const A2Day2GrammarNotesPage = () => {
             <div><strong>Feminine</strong></div>
             <div>
               <em>
-                eine nett
+                eine klein
                 <span style={endingSpan("#15803d", "#dcfce7")}>e</span> Frau
               </em>
             </div>
@@ -172,7 +263,7 @@ const A2Day2GrammarNotesPage = () => {
             <div>
               <em>
                 ein klein
-                <span style={endingSpan("#c2410c", "#ffedd5")}>es</span> Kind
+                <span style={endingSpan("#c2410c", "#ffedd5")}>es</span> Haus
               </em>
             </div>
           </div>
@@ -182,7 +273,7 @@ const A2Day2GrammarNotesPage = () => {
             <div><strong>Masculine accusative</strong></div>
             <div>
               <em>
-                einen groß
+                einen klein
                 <span style={endingSpan("#7c3aed", "#ede9fe")}>en</span> Mann
               </em>
             </div>
@@ -198,7 +289,7 @@ const A2Day2GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>4) Forms to learn now</h2>
+        <h2 style={{ margin: 0 }}>6) Forms to learn now</h2>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
             <thead>
@@ -225,41 +316,41 @@ const A2Day2GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>5) Learn these chunks</h2>
+        <h2 style={{ margin: 0 }}>7) Learn these chunks</h2>
         <div style={noteStyle}>
           <p style={{ margin: 0 }}>
             <strong>Learn these as full chunks:</strong>
           </p>
           <p style={{ margin: "6px 0 0 0" }}>
-            <strong>ein freundlicher Mann</strong>
+            <strong>ein kleiner Mann</strong>
           </p>
           <p style={{ margin: "6px 0 0 0" }}>
-            <strong>eine nette Frau</strong>
+            <strong>eine kleine Frau</strong>
           </p>
           <p style={{ margin: "6px 0 0 0" }}>
-            <strong>ein kleines Kind</strong>
+            <strong>ein kleines Haus</strong>
           </p>
           <p style={{ margin: "6px 0 0 0" }}>
-            <strong>einen großen Mann</strong>
+            <strong>einen kleinen Mann</strong>
           </p>
         </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>6) Easy rule summary</h2>
+        <h2 style={{ margin: 0 }}>8) Easy rule summary</h2>
         <div style={noteStyle}>
           <p style={{ margin: 0 }}>
             <strong>Nominative:</strong>
           </p>
           <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
             <li>
-              <em>ein freundlich<strong>er</strong> Mann</em>
+              <em>ein klein<strong>er</strong> Mann</em>
             </li>
             <li>
-              <em>eine nett<strong>e</strong> Frau</em>
+              <em>eine klein<strong>e</strong> Frau</em>
             </li>
             <li>
-              <em>ein klein<strong>es</strong> Kind</em>
+              <em>ein klein<strong>es</strong> Haus</em>
             </li>
           </ul>
 
@@ -268,20 +359,20 @@ const A2Day2GrammarNotesPage = () => {
           </p>
           <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
             <li>
-              <em>einen groß<strong>en</strong> Mann</em>
+              <em>einen klein<strong>en</strong> Mann</em>
             </li>
             <li>
-              <em>eine schön<strong>e</strong> Jacke</em>
+              <em>eine klein<strong>e</strong> Frau</em>
             </li>
             <li>
-              <em>ein rot<strong>es</strong> Auto</em>
+              <em>ein klein<strong>es</strong> Haus</em>
             </li>
           </ul>
         </div>
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>7) Example sentences</h2>
+        <h2 style={{ margin: 0 }}>9) Example sentences</h2>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
             <thead>
@@ -306,7 +397,7 @@ const A2Day2GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>8) Practice: 10 questions</h2>
+        <h2 style={{ margin: 0 }}>10) Practice: 10 questions</h2>
         <div style={quizStyle}>
           <p style={{ margin: 0 }}>
             <strong>Choose the correct adjective ending.</strong>
@@ -319,34 +410,34 @@ const A2Day2GrammarNotesPage = () => {
           </p>
 
           <p style={{ margin: 0 }}>
-            <strong>1.</strong> Das ist ein _____ Mann. (freundlich)
+            <strong>1.</strong> Das ist ein _____ Mann. (klein)
           </p>
           <p style={{ margin: 0 }}>
-            <strong>2.</strong> Sie ist eine _____ Frau. (nett)
+            <strong>2.</strong> Sie ist eine _____ Frau. (klein)
           </p>
           <p style={{ margin: 0 }}>
-            <strong>3.</strong> Das ist ein _____ Kind. (klein)
+            <strong>3.</strong> Das ist ein _____ Haus. (klein)
           </p>
           <p style={{ margin: 0 }}>
-            <strong>4.</strong> Ich sehe einen _____ Mann. (groß)
+            <strong>4.</strong> Ich sehe einen _____ Mann. (klein)
           </p>
           <p style={{ margin: 0 }}>
-            <strong>5.</strong> Sie kauft eine _____ Jacke. (schön)
+            <strong>5.</strong> Sie besucht eine _____ Frau. (klein)
           </p>
           <p style={{ margin: 0 }}>
-            <strong>6.</strong> Er hat ein _____ Auto. (rot)
+            <strong>6.</strong> Er kauft ein _____ Haus. (klein)
           </p>
           <p style={{ margin: 0 }}>
             <strong>7.</strong> Das ist ein _____ Lehrer. (jung)
           </p>
           <p style={{ margin: 0 }}>
-            <strong>8.</strong> Ich habe einen _____ Hund. (klein)
+            <strong>8.</strong> Ich habe einen _____ Hund. (alt)
           </p>
           <p style={{ margin: 0 }}>
             <strong>9.</strong> Sie braucht eine _____ Tasche. (neu)
           </p>
           <p style={{ margin: 0 }}>
-            <strong>10.</strong> Er kauft ein _____ Handy. (modern)
+            <strong>10.</strong> Er kauft ein _____ Auto. (modern)
           </p>
 
           <div
@@ -362,14 +453,14 @@ const A2Day2GrammarNotesPage = () => {
             <p style={{ margin: 0 }}>
               <strong>Answers:</strong>
             </p>
-            <p style={{ margin: "6px 0 0 0" }}>1) <strong>freundlicher</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>2) <strong>nette</strong></p>
+            <p style={{ margin: "6px 0 0 0" }}>1) <strong>kleiner</strong></p>
+            <p style={{ margin: "6px 0 0 0" }}>2) <strong>kleine</strong></p>
             <p style={{ margin: "6px 0 0 0" }}>3) <strong>kleines</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>4) <strong>großen</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>5) <strong>schöne</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>6) <strong>rotes</strong></p>
+            <p style={{ margin: "6px 0 0 0" }}>4) <strong>kleinen</strong></p>
+            <p style={{ margin: "6px 0 0 0" }}>5) <strong>kleine</strong></p>
+            <p style={{ margin: "6px 0 0 0" }}>6) <strong>kleines</strong></p>
             <p style={{ margin: "6px 0 0 0" }}>7) <strong>junger</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>8) <strong>kleinen</strong></p>
+            <p style={{ margin: "6px 0 0 0" }}>8) <strong>alten</strong></p>
             <p style={{ margin: "6px 0 0 0" }}>9) <strong>neue</strong></p>
             <p style={{ margin: "6px 0 0 0" }}>10) <strong>modernes</strong></p>
           </div>
@@ -377,20 +468,20 @@ const A2Day2GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>9) Common mistakes</h2>
+        <h2 style={{ margin: 0 }}>11) Common mistakes</h2>
         <div style={noteStyle}>
           <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
             <li>
-              ❌ <em>ein freundlich Mann</em> → ✅ <em>ein freundlicher Mann</em>
+              ❌ <em>ein kleiner Haus</em> → ✅ <em>ein kleines Haus</em>
             </li>
             <li>
-              ❌ <em>einen großer Mann</em> → ✅ <em>einen großen Mann</em>
+              ❌ <em>einen kleiner Mann</em> → ✅ <em>einen kleinen Mann</em>
             </li>
             <li>
-              ❌ <em>eine schön Jacke</em> → ✅ <em>eine schöne Jacke</em>
+              ❌ <em>eine klein Haus</em> → ✅ <em>eine kleine Frau</em>
             </li>
             <li>
-              ❌ <em>ein rot Auto</em> → ✅ <em>ein rotes Auto</em>
+              ❌ <em>ein modern Auto</em> → ✅ <em>ein modernes Auto</em>
             </li>
           </ul>
         </div>
