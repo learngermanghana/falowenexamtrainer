@@ -89,7 +89,7 @@ const A2_SCHEDULE = [
     goal: "Describe people and their appearance.",
     assignment: true,
     instruction: "Watch the video, review grammar, and complete the in-app workbook for all four parts.",
-    grammar_topic: "Subordinate Clauses (Nebensätze) with dass and weil",
+    grammar_topic: "Aussehen und Charakter beschreiben mit Adjektiven",
     video: "https://youtu.be/3_X7pyFA5A4",
     youtube_link: "https://youtu.be/3_X7pyFA5A4",
     grammarbook_link: "/campus/course/personen-beschreiben-1-2-grammar-notes",
