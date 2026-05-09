@@ -731,7 +731,12 @@ const resolveC1LessonLinks = (assignmentDay) =>
                     grammarbook_link: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes",
                     workbook_link: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook",
                   }
-                : {};
+                : assignmentDay === 16
+                  ? {
+                      grammarbook_link: "/campus/course/c1-day-16-technologie-im-alltag-grammar-notes",
+                      workbook_link: "/campus/course/c1-day-16-technologie-im-alltag-workbook",
+                    }
+                  : {};
 
 const C1_COURSE_DICTIONARY = c1Schedule.map((entry) => {
   const assignmentDay = Number(entry.day || 0);
