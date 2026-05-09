@@ -105,7 +105,7 @@ const questions = [
     question: "Which confidence levels are available on the course page?",
     options: [
       "Low confidence, Medium confidence, High confidence",
-      "Weak, Better, Best",
+      "Beginner, Intermediate, Advanced",
       "Poor, Nice, Excellent",
     ],
     answer: "A",

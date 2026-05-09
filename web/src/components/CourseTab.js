@@ -107,7 +107,11 @@ const hasTutorMarkedWork = (entry) => {
     toLessonArray(entry?.schreiben_sprechen).some((lesson) => lesson?.assignment)
   );
 };
-const isTutorMarkedEntry = (entry) => hasTutorMarkedWork(entry);
+const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
+const isTutorMarkedEntry = (entry, level) => {
+  if (SELF_LEARNING_ONLY_LEVELS.has(normalizeLevel(level))) return false;
+  return hasTutorMarkedWork(entry);
+};
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 
@@ -1449,7 +1453,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                     const status = milestoneEntry ? "milestoneComplete" : statusInfo.finalStatus || statusInfo.status;
                     const entryAssignmentKey = statusInfo.assignmentId || getEntryAssignmentKey(entry, selectedCourseLevel, entry.occurrence);
                     const statusMeta = ASSIGNMENT_STATUSES[status] || ASSIGNMENT_STATUSES.notStarted;
-                    const isTutorMarked = isTutorMarkedEntry(entry);
+                    const isTutorMarked = isTutorMarkedEntry(entry, selectedCourseLevel);
                     const showAssignmentTypeBadge = selectedCourseLevel === "A1";
                     const isPracticeOnlyEntry = !isTutorMarked;
                     const practiceState = practiceProgress[getPracticeEntryKey(entry)] || { complete: false, confidence: "" };
@@ -1519,13 +1523,18 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             ) : null}
                             {isPracticeOnlyEntry ? (
                               <>
-                                <span style={styles.badge}>Practice only</span>
+                                <span style={styles.badge}>Self-learning</span>
                                 {practiceState.complete ? (
                                   <span style={{ ...styles.badge, background: "#ecfdf5", color: "#166534", border: "1px solid #86efac" }}>
-                                    Self-marked{practiceState.confidence ? ` (${practiceState.confidence} confidence)` : " complete"}
+                                    Self-marked complete{practiceState.confidence ? ` • ${practiceState.confidence.charAt(0).toUpperCase()}${practiceState.confidence.slice(1)} confidence` : ""}
                                   </span>
                                 ) : null}
                               </>
+                            ) : null}
+                            {isPracticeOnlyEntry && SELF_LEARNING_ONLY_LEVELS.has(normalizeLevel(selectedCourseLevel)) ? (
+                              <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 260 }}>
+                                This level is self-learning: no assignment submission required.
+                              </span>
                             ) : null}
                             {isTutorMarked && statusInfo.missingAssignmentId ? (
                               <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 240 }}>
@@ -1565,7 +1574,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                   <input
                                     type="checkbox"
                                     checked={Boolean(practiceState.complete)}
-                                    onChange={(e) => updatePracticeProgress(entry, { complete: e.target.checked })}
+                                    onChange={(e) => updatePracticeProgress(entry, { complete: e.target.checked, confidence: e.target.checked ? (practiceState.confidence || "medium") : "" })}
                                   />
                                   <span style={styles.helperText}>Completed</span>
                                 </span>
