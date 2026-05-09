@@ -265,6 +265,21 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
           </p>
+          <ol style={listSpacing}>
+            <li>
+              <strong>Einleitung:</strong> Stelle kurz die Person vor (Name, Alter, Beziehung zu dir).
+            </li>
+            <li>
+              <strong>Hauptteil mit Verbindungswörtern:</strong> Beschreibe Aussehen, Charakter und Kleidung mit einfachen
+              Konnektoren.
+            </li>
+            <li>
+              <strong>Beispiel:</strong> Nenne eine konkrete Situation aus dem Alltag.
+            </li>
+            <li>
+              <strong>Schluss:</strong> Sage deine Meinung in 1–2 Sätzen und beende klar.
+            </li>
+          </ol>
 
           <div style={phraseGridStyle}>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
@@ -286,7 +301,7 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
                   <strong>weil</strong>, <strong>deshalb</strong>
                 </li>
                 <li>
-                  <strong>zuerst</strong>, <strong>dann</strong>, <strong>am Ende</strong>
+                  <strong>zuerst</strong>, <strong>dann</strong>, <strong>danach</strong>, <strong>am Ende</strong>
                 </li>
                 <li>
                   <strong>zum Beispiel</strong>, <strong>außerdem</strong>
@@ -316,11 +331,12 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Heute beschreibe ich meinen Kollegen Amir. Er ist 28 Jahre alt und kommt aus Marokko. Er ist groß und hat kurze,
-              schwarze Haare, und er trägt oft ein Hemd oder einen Pullover. Er ist sehr ruhig, aber auch lustig, deshalb
-              arbeiten viele Leute gern mit ihm. Zum Beispiel hilft er mir, wenn ich Fragen habe. Ich finde, dass Amir sehr
-              freundlich ist, weil er immer respektvoll spricht. Zusammenfassend kann ich sagen, dass er ein sehr guter Kollege
-              und Freund ist.“
+              „Heute beschreibe ich meine Freundin Sara. Sie ist 26 Jahre alt und kommt aus Spanien. <strong>Zuerst</strong>
+              möchte ich ihr Aussehen beschreiben: Sie hat lange, braune Haare und grüne Augen, <strong>und</strong> sie trägt
+              oft Jeans <strong>oder</strong> ein Kleid. Sie ist sehr freundlich, <strong>deshalb</strong> spricht jeder gern
+              mit ihr. <strong>Zum Beispiel</strong> hilft sie mir, wenn ich im Büro Stress habe. Ich finde sie toll,
+              <strong>weil</strong> sie immer positiv bleibt. <strong>Am Ende</strong> kann ich sagen: Sara ist eine sehr
+              wichtige Person in meinem Leben.“
             </p>
           </div>
 
