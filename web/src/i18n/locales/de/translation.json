@@ -1138,6 +1138,13 @@
         "totalScore": "Total score",
         "expectedPoints": "Expected points"
       }
+    },
+    "day0": {
+      "eyebrow": "Start here",
+      "title": "Day 0 Orientation Workbook",
+      "cta": "Open {{level}} Day 0",
+      "helper": "New here? Learn how to use Falowen first, then continue with your class work.",
+      "noMetricsHelper": "Home metrics are currently available for A1, A2, and B1. B2 and C1 students should start with Day 0 above."
     }
   },
   "personalization": {
