@@ -7,6 +7,7 @@ import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { PillBadge, PrimaryActionBar, SectionHeader, StatCard } from "./ui";
+import { detectLevelKey, getDay0WorkbookLinkForLevel } from "../lib/day0Workbook";
 
 const labelOf = (entry) => {
   if (!entry) return "";
@@ -139,8 +140,9 @@ const HomeMetrics = ({ studentProfile }) => {
   const className = studentProfile?.className || "";
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
-  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
+  const levelKey = detectLevelKey(studentProfile);
   const shouldShowHomeMetrics = ["A1", "A2", "B1"].includes(levelKey);
+  const day0WorkbookLink = getDay0WorkbookLinkForLevel(levelKey);
 
   const isMountedRef = useRef(true);
   const lastRefreshAtRef = useRef(0);
@@ -367,10 +369,39 @@ const HomeMetrics = ({ studentProfile }) => {
 
   const missedHelperText = useMemo(() => t("homeMetrics.missed.helper", { defaultValue: "Assignments you jumped or skipped earlier in the schedule." }), [t]);
 
-  if (!shouldShowHomeMetrics) return null;
-
   return (
     <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+      {day0WorkbookLink ? (
+        <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #bfdbfe", background: "#eff6ff" }}>
+          <SectionHeader
+            eyebrow={t("homeMetrics.day0.eyebrow")}
+            title={t("homeMetrics.day0.title")}
+            actions={
+              <PrimaryActionBar align="flex-end">
+                <button
+                  type="button"
+                  onClick={() => navigate(day0WorkbookLink)}
+                  style={styles.primaryButton}
+                >
+                  {t("homeMetrics.day0.cta", { level: levelKey || t("homeMetrics.leaderboard.levelFallback") })}
+                </button>
+              </PrimaryActionBar>
+            }
+          />
+          <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
+            {t("homeMetrics.day0.helper")}
+          </p>
+        </div>
+      ) : null}
+
+      {!shouldShowHomeMetrics ? (
+        <p style={{ ...styles.helperText, margin: 0 }}>
+          {t("homeMetrics.day0.noMetricsHelper")}
+        </p>
+      ) : null}
+
+      {shouldShowHomeMetrics ? (
+        <>
       {isCourseCompleter ? (
         <div style={{ ...styles.card, marginBottom: 0, border: "1px solid #fdba74", background: "#fff7ed" }}>
           <SectionHeader
@@ -580,6 +611,8 @@ const HomeMetrics = ({ studentProfile }) => {
             </>
           ) : null}
         </div>
+      ) : null}
+        </>
       ) : null}
     </section>
   );
