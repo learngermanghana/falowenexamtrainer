@@ -19,6 +19,13 @@ const infoBox = {
   gap: 6,
 };
 
+const yearPartColor = {
+  thousandPart: "#2563eb",
+  hundertPart: "#7c3aed",
+  restPart: "#ea580c",
+  post2000Part: "#059669",
+};
+
 const tipBox = {
   border: "1px solid #fde68a",
   background: "#fffbeb",
@@ -466,16 +473,16 @@ export default function A1RevisionOriginalContentPage() {
           </p>
 
           <div style={infoBox}>
-            <div>1100: elfhundert</div>
-            <div>1234: zwölfhundertvierunddreißig</div>
-            <div>1356: dreizehnhundertsechsundfünfzig</div>
-            <div>1365: dreizehnhundertfünfundsechzig</div>
-            <div>1453: vierzehnhundertdreiundfünfzig</div>
-            <div>1544: fünfzehnhundertvierundvierzig</div>
-            <div>1644: sechzehnhundertvierundvierzig</div>
-            <div>1744: siebzehnhundertvierundvierzig</div>
-            <div>1844: achtzehnhundertvierundvierzig</div>
-            <div>1944: neunzehnhundertvierundvierzig</div>
+            <div>1100: <span style={{ color: yearPartColor.thousandPart }}>elf</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span></div>
+            <div>1234: <span style={{ color: yearPartColor.thousandPart }}>zwölf</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierunddreißig</span></div>
+            <div>1356: <span style={{ color: yearPartColor.thousandPart }}>dreizehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>sechsundfünfzig</span></div>
+            <div>1365: <span style={{ color: yearPartColor.thousandPart }}>dreizehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>fünfundsechzig</span></div>
+            <div>1453: <span style={{ color: yearPartColor.thousandPart }}>vierzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>dreiundfünfzig</span></div>
+            <div>1544: <span style={{ color: yearPartColor.thousandPart }}>fünfzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
+            <div>1644: <span style={{ color: yearPartColor.thousandPart }}>sechzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
+            <div>1744: <span style={{ color: yearPartColor.thousandPart }}>siebzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
+            <div>1844: <span style={{ color: yearPartColor.thousandPart }}>achtzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
+            <div>1944: <span style={{ color: yearPartColor.thousandPart }}>neunzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
           </div>
 
           <div style={tipBox}>
@@ -487,10 +494,10 @@ export default function A1RevisionOriginalContentPage() {
 
           <div style={infoBox}>
             <div><strong>For years beyond 1999, you say the number directly:</strong></div>
-            <div>2000: zweitausend</div>
-            <div>2010: zweitausendzehn</div>
-            <div>2025: zweitausendfünfundzwanzig</div>
-            <div>2030: zweitausenddreißig</div>
+            <div>2000: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span></div>
+            <div>2010: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>zehn</span></div>
+            <div>2025: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>fünfundzwanzig</span></div>
+            <div>2030: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>dreißig</span></div>
           </div>
         </section>
 
@@ -625,6 +632,11 @@ export default function A1RevisionOriginalContentPage() {
           <div style={infoBox}>
             <div><strong>Days of the Week in German</strong></div>
             <div>Montag · Dienstag · Mittwoch · Donnerstag · Freitag · Samstag · Sonntag</div>
+          </div>
+
+          <div style={infoBox}>
+            <div><strong>Pronouns to Pick From</strong></div>
+            <div>ich · du · er · sie · es · wir · ihr · sie/Sie</div>
           </div>
 
           <div style={tipBox}>
