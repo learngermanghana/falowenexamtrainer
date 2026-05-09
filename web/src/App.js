@@ -156,6 +156,8 @@ import C1Day14InnovationUndZukunftGrammarNotesPage from "./components/C1Day14Inn
 import C1Day14InnovationUndZukunftWorkbookPage from "./components/C1Day14InnovationUndZukunftWorkbookPage";
 import C1Day15BildungUndLebenslangesLernenGrammarNotesPage from "./components/C1Day15BildungUndLebenslangesLernenGrammarNotesPage";
 import C1Day15BildungUndLebenslangesLernenWorkbookPage from "./components/C1Day15BildungUndLebenslangesLernenWorkbookPage";
+import C1Day16TechnologieImAlltagGrammarNotesPage from "./components/C1Day16TechnologieImAlltagGrammarNotesPage";
+import C1Day16TechnologieImAlltagWorkbookPage from "./components/C1Day16TechnologieImAlltagWorkbookPage";
 import B2Day1PersoenlicheIdentitaetGrammarNotesPage from "./components/B2Day1PersoenlicheIdentitaetGrammarNotesPage";
 import B2Day1PersoenlicheIdentitaetWorkbookPage from "./components/B2Day1PersoenlicheIdentitaetWorkbookPage";
 import NotificationBell from "./components/NotificationBell";
@@ -763,6 +765,8 @@ const AppShell = ({
           <Route path="/campus/course/c1-day-14-innovation-und-zukunft-workbook" element={<C1Day14InnovationUndZukunftWorkbookPage />} />
           <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes" element={<C1Day15BildungUndLebenslangesLernenGrammarNotesPage />} />
           <Route path="/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook" element={<C1Day15BildungUndLebenslangesLernenWorkbookPage />} />
+          <Route path="/campus/course/c1-day-16-technologie-im-alltag-grammar-notes" element={<C1Day16TechnologieImAlltagGrammarNotesPage />} />
+          <Route path="/campus/course/c1-day-16-technologie-im-alltag-workbook" element={<C1Day16TechnologieImAlltagWorkbookPage />} />
           <Route path="/campus/course/b1-day-20-wie-wird-man-ausbildung-und-qualifikationen-workbook" element={<B1Day20WieWirdManWorkbookPage />} />
           <Route path="/campus/course/b1-day-21-lebensformen-heute-workbook" element={<B1Day21LebensformenHeuteWorkbookPage />} />
           <Route path="/campus/course/b1-day-22-was-ist-dir-in-einer-beziehung-wichtig-workbook" element={<B1Day22BeziehungWichtigWorkbookPage />} />

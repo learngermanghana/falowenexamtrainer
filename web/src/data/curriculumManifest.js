@@ -205,7 +205,12 @@ const C1_CURRICULUM_ENTRIES = [
                     grammar_link: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-grammar-notes",
                     workbook_link: "/campus/course/c1-day-15-bildung-und-lebenslanges-lernen-workbook",
                   }
-                : { grammar_link: null, workbook_link: null };
+                : assignmentDay === 16
+                  ? {
+                      grammar_link: "/campus/course/c1-day-16-technologie-im-alltag-grammar-notes",
+                      workbook_link: "/campus/course/c1-day-16-technologie-im-alltag-workbook",
+                    }
+                  : { grammar_link: null, workbook_link: null };
 
     return {
       level: "C1",
