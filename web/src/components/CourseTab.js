@@ -1523,13 +1523,18 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             ) : null}
                             {isPracticeOnlyEntry ? (
                               <>
-                                <span style={styles.badge}>Practice only</span>
+                                <span style={styles.badge}>Self-learning</span>
                                 {practiceState.complete ? (
                                   <span style={{ ...styles.badge, background: "#ecfdf5", color: "#166534", border: "1px solid #86efac" }}>
-                                    Self-marked{practiceState.confidence ? ` (${practiceState.confidence} confidence)` : " complete"}
+                                    Self-marked complete{practiceState.confidence ? ` • ${practiceState.confidence.charAt(0).toUpperCase()}${practiceState.confidence.slice(1)} confidence` : ""}
                                   </span>
                                 ) : null}
                               </>
+                            ) : null}
+                            {isPracticeOnlyEntry && SELF_LEARNING_ONLY_LEVELS.has(normalizeLevel(selectedCourseLevel)) ? (
+                              <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 260 }}>
+                                This level is self-learning: no assignment submission required.
+                              </span>
                             ) : null}
                             {isTutorMarked && statusInfo.missingAssignmentId ? (
                               <span style={{ ...styles.helperText, margin: 0, textAlign: "right", maxWidth: 240 }}>
@@ -1569,7 +1574,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                                   <input
                                     type="checkbox"
                                     checked={Boolean(practiceState.complete)}
-                                    onChange={(e) => updatePracticeProgress(entry, { complete: e.target.checked })}
+                                    onChange={(e) => updatePracticeProgress(entry, { complete: e.target.checked, confidence: e.target.checked ? (practiceState.confidence || "medium") : "" })}
                                   />
                                   <span style={styles.helperText}>Completed</span>
                                 </span>
