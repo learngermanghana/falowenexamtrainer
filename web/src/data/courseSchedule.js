@@ -91,7 +91,7 @@ const A2_SCHEDULE = [
     goal: "Describe a person’s appearance, personality, relationships, and background in German.",
     assignment: true,
     instruction: "Watch the video, review grammar, and complete the in-app workbook for all four parts.",
-    grammar_topic: "Subordinate Clauses (Nebensätze) with dass and weil",
+    grammar_topic: "Aussehen und Charakter beschreiben mit Adjektiven",
     video: "https://youtu.be/Tor-mPRS3j4",
     youtube_link: "https://youtu.be/Tor-mPRS3j4",
     grammarbook_link: "/campus/course/personen-beschreiben-1-2-grammar-notes",
