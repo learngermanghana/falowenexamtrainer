@@ -7,7 +7,7 @@ import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import { PillBadge, PrimaryActionBar, SectionHeader, StatCard } from "./ui";
-import { detectLevelKey, getDay0WorkbookLinkForLevel } from "../lib/day0Workbook";
+import { detectLevelKey } from "../lib/day0Workbook";
 
 const labelOf = (entry) => {
   if (!entry) return "";
