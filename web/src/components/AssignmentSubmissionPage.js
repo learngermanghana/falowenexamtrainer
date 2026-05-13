@@ -1637,11 +1637,11 @@ const AssignmentSubmissionPage = () => {
       setStatus({
         loading: false,
         error: "",
-        success: `Great effort! Your submission is saved. Your result will appear in the Results tab, and we will also send it by email. You have ${remainingPercentCopy}% remaining — keep going.`,
+        success: `Great effort! Your submission is saved. Your result will be sent to your email and added to the Results tab. You have ${remainingPercentCopy}% remaining — keep going.`,
       });
       triggerInteractionFeedback({
         sound: "success",
-        toastMessage: `Submission saved. Check Results tab for updates. ${remainingPercentCopy}% remaining.`,
+        toastMessage: `Submission saved. Results will be emailed and posted in Results. ${remainingPercentCopy}% remaining.`,
         toastVariant: "success",
         showToast,
         notificationTitle: "Assignment submitted",
@@ -1942,12 +1942,10 @@ const AssignmentSubmissionPage = () => {
 
       await addDoc(collection(db, SUBMISSION_COLLECTION), payload);
 
-      const totalAttemptsUsed = Math.min(3, selectedResubmissionCount + 2);
-      const attemptsLeft = Math.max(0, 3 - totalAttemptsUsed);
       setResubmissionStatus({
         loading: false,
         error: "",
-        success: `Resubmission sent successfully. Attempts used: ${totalAttemptsUsed}/3 (${attemptsLeft} left). If your score is below ${PASS_THRESHOLD_SCORE}%, read your teacher comments, apply the fixes, then scroll down and resubmit.`,
+        success: `Resubmission sent successfully. Attempts used: ${selectedResubmissionCount + 2}/3. Read your teacher comments and apply fixes before your next attempt if needed.`,
       });
       triggerInteractionFeedback({
         sound: "success",
