@@ -1381,16 +1381,16 @@ const AssignmentSubmissionPage = () => {
   const selectedAssignmentPassed = selectedAssignmentPassedFromSubmission || selectedAssignmentPassedFromProgress;
 
   const assignmentProgressSnapshot = useMemo(() => {
-    const total = normalizedAssignmentOptions.length;
+    const total = decoratedAssignmentOptions.length;
     if (!total) return { submittedCount: 0, remainingPercent: 100 };
 
-    const submittedCount = normalizedAssignmentOptions.reduce(
+    const submittedCount = decoratedAssignmentOptions.reduce(
       (count, option) => (option.submitted ? count + 1 : count),
       0
     );
     const remainingPercent = Math.max(0, Math.round(((total - submittedCount) / total) * 100));
     return { submittedCount, remainingPercent };
-  }, [normalizedAssignmentOptions]);
+  }, [decoratedAssignmentOptions]);
 
 
   const dynamicMaxSubmissionCharacters = useMemo(() => {
