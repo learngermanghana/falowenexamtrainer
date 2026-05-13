@@ -168,6 +168,7 @@ import SeoLandingPage from "./components/SeoLandingPage";
 import OfflineBanner from "./components/OfflineBanner";
 import StudyBuddyBar from "./components/StudyBuddyBar";
 import PlacementTestPage from "./components/PlacementTestPage";
+import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
@@ -380,6 +381,10 @@ function App() {
 
   if (location.pathname === "/placement-test") {
     return <PlacementTestPage />;
+  }
+
+  if (location.pathname === "/learn-german-ghana/falowen-guide") {
+    return <PublicStudentGuidePage />;
   }
 
 
