@@ -1380,6 +1380,18 @@ const AssignmentSubmissionPage = () => {
 
   const selectedAssignmentPassed = selectedAssignmentPassedFromSubmission || selectedAssignmentPassedFromProgress;
 
+  const assignmentProgressSnapshot = useMemo(() => {
+    const total = normalizedAssignmentOptions.length;
+    if (!total) return { submittedCount: 0, remainingPercent: 100 };
+
+    const submittedCount = normalizedAssignmentOptions.reduce(
+      (count, option) => (option.submitted ? count + 1 : count),
+      0
+    );
+    const remainingPercent = Math.max(0, Math.round(((total - submittedCount) / total) * 100));
+    return { submittedCount, remainingPercent };
+  }, [normalizedAssignmentOptions]);
+
 
   const dynamicMaxSubmissionCharacters = useMemo(() => {
     const baseLimit = getBaseMaxByLevel(preferredLevel);
@@ -1621,14 +1633,19 @@ const AssignmentSubmissionPage = () => {
         return;
       }
 
-      setStatus({ loading: false, error: "", success: "Thanks! Your submission has been saved." });
+      const remainingPercentCopy = assignmentProgressSnapshot.remainingPercent;
+      setStatus({
+        loading: false,
+        error: "",
+        success: `Great effort! Your submission is saved. Your result will appear in the Results tab, and we will also send it by email. You have ${remainingPercentCopy}% remaining — keep going.`,
+      });
       triggerInteractionFeedback({
         sound: "success",
-        toastMessage: "Submission saved successfully.",
+        toastMessage: `Submission saved. Check Results tab for updates. ${remainingPercentCopy}% remaining.`,
         toastVariant: "success",
         showToast,
         notificationTitle: "Assignment submitted",
-        notificationBody: "Great work — your submission is now saved.",
+        notificationBody: "Great effort — your result will be emailed and shown in Results.",
         notificationTag: "submission-success",
         vibratePattern: [70, 40, 100],
       });
@@ -1925,10 +1942,16 @@ const AssignmentSubmissionPage = () => {
 
       await addDoc(collection(db, SUBMISSION_COLLECTION), payload);
 
-      setResubmissionStatus({ loading: false, error: "", success: "Resubmission sent successfully." });
+      const totalAttemptsUsed = Math.min(3, selectedResubmissionCount + 2);
+      const attemptsLeft = Math.max(0, 3 - totalAttemptsUsed);
+      setResubmissionStatus({
+        loading: false,
+        error: "",
+        success: `Resubmission sent successfully. Attempts used: ${totalAttemptsUsed}/3 (${attemptsLeft} left). If your score is below ${PASS_THRESHOLD_SCORE}%, read your teacher comments, apply the fixes, then scroll down and resubmit.`,
+      });
       triggerInteractionFeedback({
         sound: "success",
-        toastMessage: "Resubmission sent successfully.",
+        toastMessage: "Resubmission sent. Check Results and email for marking updates.",
         toastVariant: "success",
         showToast,
         notificationTitle: "Resubmission received",
@@ -2257,6 +2280,9 @@ const AssignmentSubmissionPage = () => {
             </p>
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
               First submission is #1. The school can mark only two resubmissions (#2 and #3). If one work reaches 3 total submissions, a late mark of {PASS_THRESHOLD_SCORE} is given.
+            </p>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              If your score is below {PASS_THRESHOLD_SCORE}%, read the tutor comments, apply every fix, then scroll down and submit your improved version.
             </p>
 
             <label style={{ ...styles.field, margin: 0 }}>
