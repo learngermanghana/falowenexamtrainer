@@ -156,13 +156,13 @@ const SpeakingExamIntroPage = () => {
           <strong>Basic rule:</strong> Verb + Sie + bitte
         </Callout>
         <Table
-          headers={["Infinitiv", "Sie-Imperativ"]}
+          headers={["Infinitiv", "Sie-Imperativ", "English translation"]}
           rows={[
-            ["kommen", "Kommen Sie bitte."],
-            ["warten", "Warten Sie bitte."],
-            ["hören", "Hören Sie bitte zu."],
-            ["schreiben", "Schreiben Sie bitte."],
-            ["erklären", "Erklären Sie bitte."],
+            ["kommen", "Kommen Sie bitte.", "Please come."],
+            ["warten", "Warten Sie bitte.", "Please wait."],
+            ["hören", "Hören Sie bitte zu.", "Please listen."],
+            ["schreiben", "Schreiben Sie bitte.", "Please write."],
+            ["erklären", "Erklären Sie bitte.", "Please explain."],
           ]}
         />
       </Section>
@@ -176,11 +176,11 @@ const SpeakingExamIntroPage = () => {
         </Callout>
         <BulletList
           items={[
-            "Können Sie mir bitte helfen?",
-            "Können Sie das bitte wiederholen?",
-            "Können Sie mir bitte sagen, wo der Bahnhof ist?",
-            "Können Sie bitte langsamer sprechen?",
-            "Können Sie mir bitte das Formular geben?",
+            "Können Sie mir bitte helfen? (Can you please help me?)",
+            "Können Sie das bitte wiederholen? (Can you please repeat that?)",
+            "Können Sie mir bitte sagen, wo der Bahnhof ist? (Can you please tell me where the train station is?)",
+            "Können Sie bitte langsamer sprechen? (Can you please speak more slowly?)",
+            "Können Sie mir bitte das Formular geben? (Can you please give me the form?)",
           ]}
         />
       </Section>
@@ -256,11 +256,23 @@ const SpeakingExamIntroPage = () => {
         <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           <Callout>
             <strong>Option A (Recommended – very polite)</strong>
-            <BulletList items={["Können Sie mir bitte helfen?", "Können Sie bitte warten?", "Können Sie bitte die Flasche öffnen?"]} />
+            <BulletList
+              items={[
+                "Können Sie mir bitte helfen? (Can you please help me?)",
+                "Können Sie bitte warten? (Can you please wait?)",
+                "Können Sie bitte die Flasche öffnen? (Can you please open the bottle?)",
+              ]}
+            />
           </Callout>
           <Callout>
             <strong>Option B (Formal command – Sie-Imperativ)</strong>
-            <BulletList items={["Helfen Sie mir bitte.", "Warten Sie bitte.", "Öffnen Sie bitte die Flasche."]} />
+            <BulletList
+              items={[
+                "Helfen Sie mir bitte. (Please help me.)",
+                "Warten Sie bitte. (Please wait.)",
+                "Öffnen Sie bitte die Flasche. (Please open the bottle.)",
+              ]}
+            />
           </Callout>
         </div>
         <h3 style={{ margin: "12px 0 0" }}>6.5 Teil 3 verb trainer (answer with können)</h3>
@@ -269,13 +281,13 @@ const SpeakingExamIntroPage = () => {
           verbs:
         </p>
         <Table
-          headers={["Verb", "Teil 3 polite request with können"]}
+          headers={["Verb", "Teil 3 polite request with können", "English translation"]}
           rows={[
-            ["bringen", "Können Sie mir bitte Wasser bringen?"],
-            ["nehmen", "Können Sie bitte meinen Koffer nehmen?"],
-            ["kaufen", "Können Sie bitte Brot kaufen?"],
-            ["aufmachen", "Können Sie bitte das Fenster aufmachen?"],
-            ["anmachen", "Können Sie bitte das Licht anmachen?"],
+            ["bringen", "Können Sie mir bitte Wasser bringen?", "Can you please bring me water?"],
+            ["nehmen", "Können Sie bitte meinen Koffer nehmen?", "Can you please take my suitcase?"],
+            ["kaufen", "Können Sie bitte Brot kaufen?", "Can you please buy bread?"],
+            ["aufmachen", "Können Sie bitte das Fenster aufmachen?", "Can you please open the window?"],
+            ["anmachen", "Können Sie bitte das Licht anmachen?", "Can you please turn on the light?"],
           ]}
         />
         <WarningCallout>
