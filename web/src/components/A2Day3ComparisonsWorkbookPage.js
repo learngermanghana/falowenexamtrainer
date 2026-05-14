@@ -179,24 +179,24 @@ const A2Day3ComparisonsWorkbookPage = () => {
             loading="lazy"
             style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
           />
-          <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
+          <h2 style={sectionTitle}>Teil 1 (Sprechen / Speaking) · Group Practice</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Zentrales Thema: <strong>Dinge und Personen vergleichen</strong>.
+            Zentrales Thema: <strong>Dinge und Personen vergleichen</strong> (Main topic: <strong>comparing things and people</strong>).
           </p>
 
-          <h3 style={sectionTitle}>1) Wichtige Strukturen</h3>
+          <h3 style={sectionTitle}>1) Wichtige Strukturen (Important structures)</h3>
           <ul style={listSpacing}>
-            <li>Komparativ (+ als): „größer als“, „schneller als“</li>
-            <li>Superlativ (+ am/der, die, das -ste): „am schönsten“, „der schnellste“</li>
-            <li>Genauso ... wie: „genauso groß wie“</li>
-            <li>Nicht so ... wie: „nicht so teuer wie“</li>
+            <li>Komparativ (+ als): „größer als“, „schneller als“ (comparative: bigger/faster than)</li>
+            <li>Superlativ (+ am/der, die, das -ste): „am schönsten“, „der schnellste“ (superlative: the most beautiful / the fastest)</li>
+            <li>Genauso ... wie: „genauso groß wie“ (just as ... as)</li>
+            <li>Nicht so ... wie: „nicht so teuer wie“ (not as ... as)</li>
           </ul>
 
-          <h3 style={sectionTitle}>2) Vergleichsadjektive</h3>
+          <h3 style={sectionTitle}>2) Vergleichsadjektive (Comparison adjectives)</h3>
           <ul style={listSpacing}>
-            <li>Bedeutung: Zum Vergleichen von zwei Dingen, Handlungen oder Zuständen.</li>
-            <li>Bildung: Adjektiv + -er (z. B. schnell → schneller).</li>
-            <li>Bei manchen Adjektiven: mehr oder weniger (z. B. mehr interessant).</li>
+            <li>Bedeutung: Zum Vergleichen von zwei Dingen, Handlungen oder Zuständen. (Use: compare two things, actions, or states.)</li>
+            <li>Bildung: Adjektiv + -er (z. B. schnell → schneller). (Form: adjective + -er.)</li>
+            <li>Bei manchen Adjektiven: mehr oder weniger (z. B. mehr interessant). (With some adjectives: more/less.)</li>
           </ul>
 
           <h3 style={sectionTitle}>3) Vergleichsformen</h3>

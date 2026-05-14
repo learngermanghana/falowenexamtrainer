@@ -235,6 +235,9 @@ const ComparingThingsAndPeopleGrammarPage = () => {
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Positive, Comparative, and Superlative in German
         </p>
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          English support: Comparing things and people (positive, comparative, superlative).
+        </p>
       </header>
 
       <section style={imageWrapperStyle}>
