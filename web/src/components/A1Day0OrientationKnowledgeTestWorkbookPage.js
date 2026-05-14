@@ -122,83 +122,6 @@ const questions = [
     explanation:
       "A1 is the foundation. If students ignore the basics, later levels become more difficult.",
   },
-  {
-    question: "Choose the correct greeting.",
-    options: ["Guten Morgen", "Morgen gut", "Gut Morgen"],
-    answer: "A",
-    explanation:
-      "The correct greeting is: Guten Morgen.",
-  },
-  {
-    question: "Choose the correct sentence for introducing yourself.",
-    options: ["Ich heiße Ama.", "Ich Ama heiße.", "Heiße ich Ama."],
-    answer: "A",
-    explanation:
-      "The correct sentence is: Ich heiße Ama.",
-  },
-  {
-    question: "Choose the correct sentence for saying where you live.",
-    options: ["Ich wohne in Accra.", "Ich in Accra wohne.", "Wohne ich in Accra."],
-    answer: "A",
-    explanation:
-      "The correct sentence is: Ich wohne in Accra.",
-  },
-  {
-    question: "Choose the correct question.",
-    options: ["Wie heißt du?", "Wie du heißt?", "Du heißt wie?"],
-    answer: "A",
-    explanation:
-      "The correct question is: Wie heißt du?",
-  },
-  {
-    question: "Choose the correct yes/no question.",
-    options: ["Kommst du aus Ghana?", "Du kommst aus Ghana?", "Aus Ghana du kommst?"],
-    answer: "A",
-    explanation:
-      "In a yes/no question, the verb usually comes first: Kommst du aus Ghana?",
-  },
-  {
-    question: "Choose the correct verb conjugation.",
-    options: ["Ich bin Student.", "Ich ist Student.", "Ich bist Student."],
-    answer: "A",
-    explanation:
-      "With 'ich', the correct form of sein is: ich bin.",
-  },
-  {
-    question: "Choose the correct sentence with 'haben'.",
-    options: ["Ich habe ein Buch.", "Ich hat ein Buch.", "Ich haben ein Buch."],
-    answer: "A",
-    explanation:
-      "With 'ich', the correct form is: ich habe.",
-  },
-  {
-    question: "Choose the correct article.",
-    options: ["der Mann", "die Mann", "das Mann"],
-    answer: "A",
-    explanation:
-      "The correct article is: der Mann.",
-  },
-  {
-    question: "Choose the correct article.",
-    options: ["die Frau", "der Frau", "das Frau"],
-    answer: "A",
-    explanation:
-      "The correct article is: die Frau.",
-  },
-  {
-    question: "Choose the correct article.",
-    options: ["das Kind", "der Kind", "die Kind"],
-    answer: "A",
-    explanation:
-      "The correct article is: das Kind.",
-  },
-  {
-    question: "Choose the correct simple sentence.",
-    options: ["Ich lerne Deutsch.", "Ich Deutsch lerne.", "Lerne Deutsch ich."],
-    answer: "A",
-    explanation:
-      "In a simple German statement, the conjugated verb is usually in position 2: Ich lerne Deutsch.",
-  },
 ];
 
 const getResultMessage = (score, total) => {
@@ -212,7 +135,7 @@ const getResultMessage = (score, total) => {
     return `Good attempt. You scored ${percent}%. Review the corrections carefully before Day 1.`;
   }
 
-  return `You scored ${percent}%. You need revision before Day 1. Focus on greetings, introductions, simple questions, articles, verbs, and basic sentence structure.`;
+  return `You scored ${percent}%. You need revision before Day 1. Focus on the course orientation points, daily routine, attendance, and submission process.`;
 };
 
 const QuestionCard = ({ item, index, selected, onSelect }) => {
@@ -427,6 +350,22 @@ const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
             Submit your assignment
           </a>
         </p>
+
+
+        <p style={{ margin: 0 }}>
+          <strong>Pass mark rule:</strong> Every assignment requires at least <strong>60%</strong> to pass.
+          If a submitted assignment scores below 60%, it is a fail and must be resubmitted.
+        </p>
+
+        <p style={{ margin: 0 }}>
+          If you submit the same assignment more than 3 times and still do not pass,
+          a flat mark of <strong>60%</strong> will be awarded for that assignment.
+        </p>
+
+        <p style={{ margin: 0 }}>
+          Students receive their course certificate only after all required assignments are completed
+          with a pass mark of at least 60%.
+        </p>
       </SectionCard>
 
       <SectionCard title="How to use Falowen during the A1 course">
@@ -504,13 +443,6 @@ const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
           <li>Lesen, Hören, Schreiben, and Sprechen structure</li>
           <li>Assignment submission rules</li>
           <li>Class attendance check-in</li>
-          <li>Greetings</li>
-          <li>Self-introduction</li>
-          <li>Simple questions</li>
-          <li>Yes/no questions</li>
-          <li>Basic verb forms</li>
-          <li>Simple articles: der, die, das</li>
-          <li>Basic German sentence order</li>
         </ul>
       </SectionCard>
 
