@@ -2088,7 +2088,7 @@ const AssignmentSubmissionPage = () => {
                 {selectedAssignmentEligibility.submittable ? uiText.statusSubmittable : uiText.statusNotSubmittable}
               </div>
               <div style={styles.helperText}>
-                {uiText.reasonLabel}: {selectedAssignmentEligibility.reason}
+                {uiText.reasonLabel}: {!hasSelectedAssignment ? "Scroll up to select assignment number." : selectedAssignmentEligibility.reason}
               </div>
             </div>
             <label style={{ ...styles.field, margin: 0 }}>

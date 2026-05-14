@@ -32,6 +32,23 @@ const toEmbeddableUrl = (resourceUrl) => {
   }
 };
 
+const inferAssignmentKeyFromWorkbookUrl = (resourceUrl) => {
+  if (!resourceUrl) return "";
+  const normalizedUrl = String(resourceUrl).toLowerCase();
+  const levelDayMatch = normalizedUrl.match(/\/([abc]\d)-day-(\d+)-/i);
+  if (!levelDayMatch) return "";
+  const level = levelDayMatch[1].toUpperCase();
+  const day = Number(levelDayMatch[2]);
+  if (!Number.isFinite(day)) return "";
+
+  const chapterMatch = normalizedUrl.match(/(?:kapitel|chapter)-(\d+)-(\d+)/i);
+  if (chapterMatch) {
+    return `${level}-${Number(chapterMatch[1])}.${Number(chapterMatch[2])}`;
+  }
+
+  return `${level}-DAY-${day}`;
+};
+
 const CourseResourceViewerPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -43,11 +60,15 @@ const CourseResourceViewerPage = () => {
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const resourceUrl = query.get("url") || "";
   const label = query.get("label") || "Course resource";
+  const inferredAssignmentKey = useMemo(() => inferAssignmentKeyFromWorkbookUrl(resourceUrl), [resourceUrl]);
   const embedUrl = useMemo(() => toEmbeddableUrl(resourceUrl), [resourceUrl]);
   const zoomStorageKey = `${ZOOM_STORAGE_PREFIX}:${resourceUrl || "default"}`;
+  const submitPath = inferredAssignmentKey
+    ? `/campus/submit?assignmentKey=${encodeURIComponent(inferredAssignmentKey)}&assignmentId=${encodeURIComponent(inferredAssignmentKey)}`
+    : "/campus/submit";
   const campusQuickTabs = [
     { key: "course", label: "My Course", path: "/campus/course" },
-    { key: "submit", label: "Submit", path: "/campus/submit" },
+    { key: "submit", label: "Submit", path: submitPath },
     { key: "examFile", label: "My Exam File", path: "/campus/examFile" },
     { key: "results", label: "Results", path: "/campus/results" },
     { key: "discussion", label: "Discussion", path: "/campus/discussion" },
