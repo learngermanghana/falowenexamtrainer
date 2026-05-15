@@ -7,7 +7,7 @@ const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
-  { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "hoeren", label: "Teil 4 · Lesen" },
 ];
 
 const card = { ...styles.card, display: "grid", gap: 12 };
@@ -15,13 +15,21 @@ const sectionTitle = { margin: 0, fontSize: "1.1rem" };
 const listSpacing = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 const questionCardStyle = { border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#fff", display: "grid", gap: 6 };
 const calloutStyle = { ...questionCardStyle, background: "#f8fafc" };
-const videoPreviewStyle = { width: "100%", minHeight: 315, border: 0, borderRadius: 10 };
 
 const lesenQuestions = [
-  { stem: "Wann steht Karim normalerweise auf?", options: ["A) Um 5:30 Uhr", "B) Um 6:30 Uhr", "C) Um 7:30 Uhr", "D) Um 8:30 Uhr"] },
-  { stem: "Was macht er vor der Arbeit?", options: ["A) Er geht joggen", "B) Er trinkt Kaffee", "C) Er liest Zeitung", "D) Er fährt Fahrrad"] },
-  { stem: "Wie fährt Karim zur Arbeit?", options: ["A) Mit dem Zug", "B) Mit dem Fahrrad", "C) Mit dem Auto", "D) Zu Fuß"] },
-  { stem: "Was macht er in der Mittagspause?", options: ["A) Er kocht", "B) Er telefoniert", "C) Er isst mit Kolleginnen und Kollegen", "D) Er schläft"] },
+  { stem: "Wann steht Anna auf?", options: ["a) kurz vor 7 Uhr", "b) nie vor 7 Uhr", "c) immer nach 7 Uhr", "d) kurz nach 7 Uhr"] },
+  { stem: "Was isst Anna zum Frühstück?", options: ["a) Cornflakes und Toast mit Butter", "b) nichts", "c) Brot mit Käse oder Wurst", "d) Müsli oder Toast mit Marmelade"] },
+  { stem: "Was macht sie nicht morgens, bevor sie zur Schule geht?", options: ["a) zur Toilette gehen", "b) Hausaufgaben", "c) das Bett machen", "d) duschen"] },
+  { stem: "Wann kommt sie nach Hause?", options: ["a) am Nachmittag", "b) nachdem sie die Hausaufgaben gemacht hat", "c) nach dem Abendessen", "d) kurz vor dem Abendessen"] },
+  { stem: "Was macht sie nach den Hausaufgaben?", options: ["a) schlafen", "b) Freunde treffen", "c) Sport", "d) lernen"] },
+];
+
+const teil4Questions = [
+  { stem: "Welches Reiseziel wählt Familie Meyer in diesem Jahr?", options: ["a) Österreich", "b) Deutschland", "c) die Schweiz", "d) Italien"] },
+  { stem: "Womit fährt Familie Meyer in den Urlaub?", options: ["a) mit dem Taxi", "b) mit dem Bus", "c) mit dem Auto", "d) mit dem Zug"] },
+  { stem: "Wo steigen Herr und Frau Meyer aus dem Zug?", options: ["a) an einem kleinen Bahnhof", "b) an einem großen Hotel", "c) am Flughafen", "d) an einer kleinen Raststätte"] },
+  { stem: "Was erhalten sie an der Rezeption des Hotels?", options: ["a) einen schönen Blumenstrauß", "b) eine Fahrkarte", "c) einen Brief", "d) einen Zimmerschlüssel"] },
+  { stem: "Warum ist Herr Meyer unzufrieden?", options: ["a) es gibt kein freies Zimmer", "b) das Zimmer ist zu klein", "c) das Zimmer ist zu groß", "d) das Hotel ist zu klein"] },
 ];
 
 function TabButton({ active, onClick, children }) {
@@ -42,8 +50,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 export default function A2Day25TagesablaufWorkbookPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
-  const [showTranscript, setShowTranscript] = useState(false);
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
 
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
@@ -116,18 +122,21 @@ export default function A2Day25TagesablaufWorkbookPage() {
 
     {activeTab === "lesen" && <div style={card}><img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1600&q=80" alt="Reading comprehension exercise on a desk" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
       <h2 style={sectionTitle}>Teil 3 · Lesen</h2><p style={{ margin: 0 }}>Lies den Text und beantworte die Fragen im Submission-Bereich.</p>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>Karim steht normalerweise um 6:30 Uhr auf. Zuerst trinkt er einen Kaffee und frühstückt. Um 7:30 Uhr fährt er mit dem Zug zur Arbeit. In der Mittagspause isst er mit seinen Kolleginnen und Kollegen. Nach der Arbeit geht er oft einkaufen und kocht am Abend zu Hause. Gegen 22:30 Uhr geht er schlafen.</p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>Ich bin Anna, 16 Jahre alt und Schülerin. Morgens stehe ich kurz vor 7 Uhr auf. Aufwachen kann ich nicht von allein. Ein Wecker klingelt mich aus dem Schlaf. Ich stehe auf und muss als Erstes meistens auf die Toilette gehen. Danach wasche ich mir das Gesicht und dusche – zuerst ganz warm und am Schluss mit kaltem Wasser. So werde ich richtig wach. Zähne putzen muss auch sein, anschließend ziehe ich mich an. Meine Kleider habe ich mir schon am Abend davor zurechtgelegt, damit ich morgens keine Zeit verliere. So kann ich ein bisschen später aufstehen.</p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>Das Frühstück lasse ich nie aus, weil ich am Morgen Hunger habe. Meistens esse ich Müsli oder Toast mit Marmelade. Dazu trinke ich Tee oder Kaffee. Bevor ich in die Schule gehe, muss ich noch mein Bett machen. Das dauert aber selten länger als eine oder zwei Minuten. Dann renne ich schon los, um meinen Schulbus zu erreichen.</p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>Nach der Schule esse ich zu Mittag und komme am Nachmittag nach Hause. Dann muss ich meistens noch Hausaufgaben machen. Vor dem Abendessen habe ich noch Zeit, um zu spielen oder Freunde zu treffen. Dann essen wir gemeinsam zu Abend. Bevor ich ins Bett gehe, schaue ich ein bisschen fern. Danach gehe ich schlafen und schlafe von 22 Uhr bis morgens um 7.</p>
       {lesenQuestions.map((q, i) => <div key={q.stem} style={questionCardStyle}><strong>{i + 1}. {q.stem}</strong>{q.options.map((opt) => <span key={opt}>{opt}</span>)}</div>)}
       <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
     </div>}
 
-    {activeTab === "hoeren" && <div style={card}><img src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=1600&q=80" alt="Student listening to a lesson with headphones" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
-      <h2 style={sectionTitle}>Teil 4 · Hören</h2>
-      <label style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><input type="checkbox" checked={teacherMode} onChange={(e) => setTeacherMode(e.target.checked)} />Teacher mode</label>
-      <iframe title="Tagesablauf listening video" src="https://www.youtube.com/embed/NxoQH-BY9Js" style={videoPreviewStyle} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
-      <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => setShowTranscript((prev) => !prev)}>{showTranscript ? "Hide transcript" : "Reveal transcript"}</button>
-      {(teacherMode || showTranscript) && <div style={calloutStyle}><strong>Transcript</strong><p style={{ margin: 0 }}>Hallo! Ich heiße Nina. Ich stehe um sieben Uhr auf ... (teacher can guide learners to summarize key routine steps and time expressions).</p></div>}
-      <p style={{ margin: 0, color: "#4b5563" }}>Listen first, take notes, and submit final answers in the submission area.</p>
+    {activeTab === "hoeren" && <div style={card}><img src="https://images.unsplash.com/photo-1464863979621-258859e62245?auto=format&fit=crop&w=1600&q=80" alt="Reading travel text in a workbook" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
+      <h2 style={sectionTitle}>Teil 4 · Lesen</h2>
+      <p style={{ margin: 0 }}>Lies den Text und beantworte die Fragen im Submission-Bereich.</p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>Herr und Frau Meyer fahren oft in die Berge. Berge gibt es in Deutschland, Österreich, Italien und der Schweiz. Ihr Reiseziel ist in diesem Jahr die Schweiz. Dort kann man viel wandern. In einem Berghotel haben sie ein Zimmer gebucht.</p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>&quot;Wie wollen wir hinfahren? Mit dem Auto oder mit dem Zug&quot;, fragt Herr Meyer seine Frau. &quot;Ein Flugzeug kommt ja nicht in Frage. Dort ist kein Flughafen.&quot; &quot;Mit dem Auto ist es sehr bequem&quot;, antwortet Frau Meyer. &quot;Aber es gibt auf der Autobahn sicher einen langen Stau. Dann wird die Anreise sehr anstrengend. Ich denke, wir sollten den Zug nehmen.&quot;</p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>Eine Woche später steigen Herr und Frau Meyer an einem kleinen Bahnhof in der Schweiz aus dem Zug. Ein Taxi wartet bereits und bringt das Ehepaar zum Berghotel. An der Rezeption werden ihnen die Zimmerschlüssel überreicht. Ein Bediensteter zeigt dem Ehepaar Meyer ihr Zimmer. Darin befindet sich ein Doppelbett und ein Schrank.</p>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>Herr Meyer ist unzufrieden mit dem Hotelzimmer. Es ist viel zu klein. &quot;Wir haben ein großes Zimmer gebucht. Dieser Raum gefällt uns nicht. Wir möchten ein anderes Zimmer haben.&quot; Durch seine Beschwerde erhält das Ehepaar sofort ein anderes Zimmer. Herr und Frau Meyer freuen sich. Sie haben ein großes Zimmer mit einem schönen Ausblick auf die schneebedeckten Berge.</p>
+      {teil4Questions.map((q, i) => <div key={q.stem} style={questionCardStyle}><strong>{i + 1}. {q.stem}</strong>{q.options.map((opt) => <span key={opt}>{opt}</span>)}</div>)}
       <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
     </div>}
   </div>;
