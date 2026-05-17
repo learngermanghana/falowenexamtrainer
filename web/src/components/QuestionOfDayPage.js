@@ -216,6 +216,124 @@ const getTaskTitle = (dailyTask, level) => {
   return `${level} Exam Warm-up - Sprechen`;
 };
 
+const REVIEW_STATUS_LABELS = {
+  pending: "Waiting for tutor",
+  approved: "Approved",
+  needs_improvement: "Needs correction",
+  redo_required: "Redo required",
+};
+
+const getReviewTimestampMs = (review) => {
+  const reviewedAtMs = Date.parse(review?.reviewedAt || "");
+  if (Number.isFinite(reviewedAtMs)) return reviewedAtMs;
+  if (typeof review?.createdAtMs === "number" && Number.isFinite(review.createdAtMs)) return review.createdAtMs;
+  const createdAtMs = Date.parse(review?.createdAt || "");
+  if (Number.isFinite(createdAtMs)) return createdAtMs;
+  return 0;
+};
+
+const formatDate = (value) => {
+  const timestamp = Date.parse(value || "");
+  if (!Number.isFinite(timestamp)) return "—";
+  return new Date(timestamp).toLocaleString();
+};
+
+const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
+  const [filter, setFilter] = useState("all");
+  const sortedReviews = useMemo(
+    () => [...reviews].sort((a, b) => getReviewTimestampMs(b) - getReviewTimestampMs(a)),
+    [reviews]
+  );
+  const commentedCount = sortedReviews.filter((review) => review?.tutorFeedback?.trim()).length;
+  const waitingCount = sortedReviews.filter((review) => !review?.tutorFeedback?.trim()).length;
+  const latestTutorResponse = sortedReviews.find((review) => review?.tutorFeedback?.trim());
+
+  const filteredReviews = useMemo(() => {
+    if (filter === "commented") return sortedReviews.filter((review) => review?.tutorFeedback?.trim());
+    if (filter === "waiting") return sortedReviews.filter((review) => !review?.tutorFeedback?.trim());
+    if (filter === "needs_correction") return sortedReviews.filter((review) => review?.reviewStatus === "needs_improvement");
+    if (filter === "approved") return sortedReviews.filter((review) => review?.reviewStatus === "approved");
+    return sortedReviews;
+  }, [filter, sortedReviews]);
+
+  const filters = [
+    { key: "all", label: "All" },
+    { key: "commented", label: "Commented" },
+    { key: "waiting", label: "Waiting" },
+    { key: "needs_correction", label: "Needs correction" },
+    { key: "approved", label: "Approved" },
+  ];
+
+  return (
+    <div style={{ ...styles.card, marginTop: 12, background: "#ffffff", border: "2px solid #e5e7eb" }}>
+      <h3 style={{ marginTop: 0 }}>Tutor Feedback History</h3>
+      {errorMessage ? (
+        <p style={{ marginBottom: 0, color: "#b91c1c" }}>Tutor feedback could not load right now. Please try again later.</p>
+      ) : (
+        <>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 10 }}>
+            <span style={{ background: "#f3f4f6", padding: "6px 10px", borderRadius: 999 }}>Total: {sortedReviews.length}</span>
+            <span style={{ background: "#fef3c7", padding: "6px 10px", borderRadius: 999 }}>Waiting: {waitingCount}</span>
+            <span style={{ background: "#dcfce7", padding: "6px 10px", borderRadius: 999 }}>Commented: {commentedCount}</span>
+          </div>
+
+          {latestTutorResponse ? (
+            <div style={{ background: "#ecfeff", border: "2px solid #86efac", borderRadius: 12, padding: 14, marginBottom: 12 }}>
+              <p style={{ margin: "0 0 6px" }}><strong>Latest tutor response</strong></p>
+              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6 }}>{latestTutorResponse.tutorFeedback}</p>
+            </div>
+          ) : null}
+
+          {sortedReviews.length === 0 ? (
+            <p style={{ marginBottom: 0 }}>
+              No tutor feedback yet. Submit a Schreiben task first. After your tutor marks it, your feedback will appear here.
+            </p>
+          ) : (
+            <>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                {filters.map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    style={filter === item.key ? styles.navButtonActive : styles.secondaryButton}
+                    onClick={() => setFilter(item.key)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+              <div style={{ display: "grid", gap: 10 }}>
+                {filteredReviews.map((review, index) => (
+                  <div key={`${review?.promptTitle || "review"}-${review?.createdAt || index}`} style={{ border: "1px solid #d1d5db", borderRadius: 10, padding: 12 }}>
+                    <p style={{ margin: "0 0 4px" }}><strong>{review?.promptTitle || "Writing task"}</strong></p>
+                    <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                      Level: {review?.level || "—"} • Source: {review?.source || "—"}
+                    </p>
+                    <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                      Status: {REVIEW_STATUS_LABELS[review?.reviewStatus] || "Waiting for tutor"}
+                    </p>
+                    <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                      Submitted: {formatDate(review?.createdAt)}
+                    </p>
+                    <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
+                      Reviewed: {review?.reviewedAt ? formatDate(review?.reviewedAt) : "—"}
+                    </p>
+                    {review?.tutorFeedback?.trim() ? (
+                      <p style={{ margin: 0 }}>{review.tutorFeedback}</p>
+                    ) : (
+                      <p style={{ margin: 0 }}>No tutor comment yet. Your work is saved. Please wait for your tutor to mark it.</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
 const QuestionOfDayPage = () => {
   const { level } = useExam();
   const { user, studentProfile } = useAuth();
@@ -228,6 +346,7 @@ const QuestionOfDayPage = () => {
     PRE_SUBMISSION_CHECKLIST.reduce((acc, label) => ({ ...acc, [label]: false }), {})
   );
   const [tutorReviews, setTutorReviews] = useState([]);
+  const [tutorReviewsError, setTutorReviewsError] = useState("");
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   useEffect(() => {
@@ -241,8 +360,14 @@ const QuestionOfDayPage = () => {
   useEffect(() => {
     const unsubscribe = subscribeTutorReviewsForStudent(
       { userId: user?.uid, studentCode: studentProfile?.studentCode || studentProfile?.studentcode },
-      (reviews) => setTutorReviews(Array.isArray(reviews) ? reviews : []),
-      () => setTutorReviews([])
+      (reviews) => {
+        setTutorReviews(Array.isArray(reviews) ? reviews : []);
+        setTutorReviewsError("");
+      },
+      () => {
+        setTutorReviews([]);
+        setTutorReviewsError("load_error");
+      }
     );
     return () => unsubscribe?.();
   }, [user?.uid, studentProfile?.studentCode, studentProfile?.studentcode]);
@@ -641,18 +766,7 @@ const QuestionOfDayPage = () => {
       ) : null}
 
 
-      <div style={{ ...styles.card, marginTop: 12, background: "#ffffff", border: "2px solid #e5e7eb" }}>
-        <h3 style={{ marginTop: 0 }}>Tutor Feedback</h3>
-        {tutorReviews.length === 0 ? (
-          <p style={{ marginBottom: 0 }}>No tutor feedback yet.</p>
-        ) : tutorReviews[0]?.tutorFeedback ? (
-          <div style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: 10, padding: 14, fontSize: 18, lineHeight: 1.6 }}>
-            {tutorReviews[0].tutorFeedback}
-          </div>
-        ) : (
-          <p style={{ marginBottom: 0 }}>No tutor comment yet. Your work is saved. Please wait for your tutor to mark it.</p>
-        )}
-      </div>
+      <TutorFeedbackHistory reviews={tutorReviews} errorMessage={tutorReviewsError} />
     </section>
   );
 };
