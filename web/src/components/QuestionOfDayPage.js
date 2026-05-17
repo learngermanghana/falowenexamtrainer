@@ -1,8 +1,18 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useExam } from "../context/ExamContext";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
 import { speakingSheetQuestions } from "../data/speakingSheet";
 import { styles } from "../styles";
+
+const STORAGE_KEY = "falowen_exam_warmup_progress";
+const LEGACY_STORAGE_KEY = "falowen_question_of_day_progress";
+
+const GOETHE_PRACTICE_BASE = {
+  A1: "https://www.goethe.de/de/spr/kup/prf/prf/gza1/ueb.html",
+  A2: "https://www.goethe.de/de/spr/kup/prf/prf/gza2/ueb.html",
+  B1: "https://www.goethe.de/de/spr/kup/prf/prf/gzb1/ueb.html",
+  B2: "https://www.goethe.de/de/spr/kup/prf/prf/gzb2/ueb.html",
+};
 
 const getDaySeed = () => {
   const now = new Date();
@@ -26,88 +36,121 @@ const pickBatchByDay = (items, count, salt = 0) => {
   return Array.from({ length: Math.min(count, items.length) }, (_, offset) => items[(start + offset) % items.length]);
 };
 
+const getProgressKey = (level) => `${getDaySeed()}-${level}`;
 
-const STORAGE_KEY = "falowen_question_of_day_progress";
+const readWarmupProgress = (level) => {
+  try {
+    const key = getProgressKey(level);
+    const currentStore = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+    const legacyStore = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) || "{}");
+    return Boolean(currentStore[key] || legacyStore[key]);
+  } catch {
+    return false;
+  }
+};
 
-const GOETHE_PRACTICE_BASE = {
-  A1: "https://www.goethe.de/de/spr/kup/prf/prf/gza1/ueb.html",
-  A2: "https://www.goethe.de/de/spr/kup/prf/prf/gza2/ueb.html",
-  B1: "https://www.goethe.de/de/spr/kup/prf/prf/gzb1/ueb.html",
-  B2: "https://www.goethe.de/de/spr/kup/prf/prf/gzb2/ueb.html",
+const buildSpeakingLabel = (item) => {
+  if (!item) return "";
+  const parts = [item.teilLabel, item.topicPrompt || item.keywordSubtopic]
+    .filter(Boolean)
+    .map((part) => String(part).trim())
+    .filter(Boolean);
+  return parts.length ? `${parts.join(" • ")}: ${item.text}` : item.text;
 };
 
 const QuestionOfDayPage = () => {
   const { level } = useExam();
   const [copyStatus, setCopyStatus] = useState("");
-  const [submitted, setSubmitted] = useState(() => {
-    try {
-      const store = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      return Boolean(store[`${getDaySeed()}-${level}`]);
-    } catch {
-      return false;
-    }
-  });
+  const [practised, setPractised] = useState(() => readWarmupProgress(level));
 
-  const todayLabel = useMemo(() => new Date().toLocaleDateString(undefined, { weekday: "long", year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }), []);
+  useEffect(() => {
+    setPractised(readWarmupProgress(level));
+    setCopyStatus("");
+  }, [level]);
+
+  const todayLabel = useMemo(
+    () =>
+      new Date().toLocaleDateString(undefined, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        timeZone: "UTC",
+      }),
+    []
+  );
 
   const dailyTask = useMemo(() => {
     const levelWriting = Array.isArray(WRITING_PROMPTS[level]) ? WRITING_PROMPTS[level] : [];
     const levelSpeaking = speakingSheetQuestions.filter((item) => item.level === level);
-
-    if (level === "A1") {
-      const teilOneTwo = levelSpeaking.filter((item) => item.teilId === "teil-1" || item.teilId === "teil-2");
-      const teilThree = levelSpeaking.filter((item) => item.teilId === "teil-3");
-      const speakingPool = teilOneTwo.length >= 5 ? teilOneTwo : levelSpeaking;
-      return {
-        type: "speaking",
-        title: "A1 Speaking Challenge",
-        intro: "Today's A1 task: record these 5 prompts on your phone and send to your tutor.",
-        tasks: pickBatchByDay(speakingPool, 5, 11).map((item) => `${item.teilLabel}: ${item.text}`),
-        bonus: pickByDay(teilThree, 3),
-      };
-    }
-
     const shareWritingToday = getDaySeed() % 2 === 0;
+
     if (shareWritingToday && levelWriting.length > 0) {
       return {
         type: "writing",
-        title: `${level} Letter of the Day`,
+        title: `${level} Schreiben warm-up`,
         prompt: pickByDay(levelWriting, 1),
       };
     }
 
-    return {
-      type: "speaking",
-      title: `${level} Speaking Task of the Day`,
-      prompt: pickByDay(levelSpeaking, 2),
-    };
+    if (levelSpeaking.length > 0) {
+      const a1SpeakingPool = levelSpeaking.filter((item) => item.teilId === "teil-1" || item.teilId === "teil-2");
+      const speakingPool = level === "A1" && a1SpeakingPool.length > 0 ? a1SpeakingPool : levelSpeaking;
+      const prompts = level === "A1" ? pickBatchByDay(speakingPool, 2, 11) : [pickByDay(speakingPool, 2)].filter(Boolean);
+
+      return {
+        type: "speaking",
+        title: `${level} Sprechen warm-up`,
+        prompts,
+      };
+    }
+
+    if (levelWriting.length > 0) {
+      return {
+        type: "writing",
+        title: `${level} Schreiben warm-up`,
+        prompt: pickByDay(levelWriting, 1),
+      };
+    }
+
+    return null;
   }, [level]);
 
   const resourceBase = GOETHE_PRACTICE_BASE[level] || GOETHE_PRACTICE_BASE.B1;
 
   const shareText = useMemo(() => {
     if (!dailyTask) return "";
+
     if (dailyTask.type === "writing" && dailyTask.prompt) {
-      return `${level} Question of the Day (${todayLabel}): Schreiben\nThema: ${dailyTask.prompt.Thema}`;
+      const points = Array.isArray(dailyTask.prompt.Punkte)
+        ? dailyTask.prompt.Punkte.map((point) => `- ${point}`).join("\n")
+        : "";
+
+      return `${level} Exam Warm-up (${todayLabel})\nSchreiben\nThema: ${dailyTask.prompt.Thema}\nWrite only 3–5 sentences.\n${points}`.trim();
     }
-    if (dailyTask.type === "speaking" && Array.isArray(dailyTask.tasks)) {
-      return `${level} Question of the Day (${todayLabel}): A1 speaking mini set\n${dailyTask.tasks.join("\n")}`;
+
+    if (dailyTask.type === "speaking" && Array.isArray(dailyTask.prompts)) {
+      return `${level} Exam Warm-up (${todayLabel})\nSprechen\nPrepare 3 keywords and practise for 1 minute.\n${dailyTask.prompts
+        .map((item) => `- ${buildSpeakingLabel(item)}`)
+        .join("\n")}`;
     }
-    if (dailyTask.prompt) {
-      return `${level} Question of the Day (${todayLabel}): Sprechen\n${dailyTask.prompt.teilLabel}: ${dailyTask.prompt.text}`;
-    }
+
     return "";
   }, [dailyTask, level, todayLabel]);
 
-  const markSubmitted = () => {
+  const markPractised = () => {
     try {
-      const key = `${getDaySeed()}-${level}`;
+      const key = getProgressKey(level);
       const store = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      store[key] = true;
+      store[key] = {
+        level,
+        practisedAt: new Date().toISOString(),
+        taskType: dailyTask?.type || "warm-up",
+      };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-      setSubmitted(true);
+      setPractised(true);
     } catch {
-      setSubmitted(true);
+      setPractised(true);
     }
   };
 
@@ -119,23 +162,54 @@ const QuestionOfDayPage = () => {
 
   return (
     <section style={{ ...styles.card, marginTop: 0 }}>
-      <p style={{ ...styles.helperText, marginTop: 0 }}>Exams • Question of the day</p>
-      <h2 style={{ marginTop: 0 }}>{dailyTask?.title || "Question of the Day"}</h2>
-      <p style={{ marginTop: 0 }}><strong>One task is shared each day for your selected exam level.</strong></p>
+      <p style={{ ...styles.helperText, marginTop: 0 }}>Exams • Exam Warm-up</p>
+      <h2 style={{ marginTop: 0 }}>Exam Warm-up</h2>
+      <div
+        style={{
+          ...styles.card,
+          margin: "0 0 12px",
+          background: "#fff7ed",
+          border: "1px solid #fed7aa",
+        }}
+      >
+        <p style={{ margin: 0 }}>
+          <strong>Main Course first.</strong> This is only a short exam warm-up after your course work. Use 3–5 minutes only.
+        </p>
+        <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+          Do not replace your workbook assignment with this task. Full exam practice still belongs in the Schreiben and Sprechen tabs.
+        </p>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gap: 8,
+          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+          marginBottom: 12,
+        }}
+      >
+        <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Today’s course work</p>
+          <strong>Complete first</strong>
+        </div>
+        <div style={{ ...styles.card, margin: 0, background: practised ? "#ecfdf5" : "#f8fafc" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Exam Warm-up</p>
+          <strong>{practised ? "Warm-up done today" : "Available after course work"}</strong>
+        </div>
+        <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Time limit</p>
+          <strong>3–5 minutes</strong>
+        </div>
+      </div>
+
       <p style={styles.helperText}>Task date (UTC): {todayLabel}</p>
       <p style={styles.helperText}>
-        This page gives one daily exam task so tutors do not need to manually send questions to students.
+        The warm-up uses the existing Schreiben and Sprechen question dictionaries. No new question bank is created here.
       </p>
-      <p>
-        For Hören and Lesen practice, use the links below. If you have registered for the exam, follow all instructions your tutor gives you.
-      </p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        <a href={resourceBase} target="_blank" rel="noreferrer noopener" style={{ ...styles.primaryButton, textDecoration: "none" }}>Open Reading links</a>
-        <a href={`${resourceBase}#section-3`} target="_blank" rel="noreferrer noopener" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open Listening links</a>
-      </div>
 
       {dailyTask?.type === "writing" && dailyTask?.prompt ? (
         <div style={{ ...styles.card, margin: "12px 0", background: "#f8fafc" }}>
+          <p style={{ ...styles.helperText, marginTop: 0 }}>Today’s short task</p>
           <h3 style={{ marginTop: 0 }}>Schreiben</h3>
           <p><strong>Thema:</strong> {dailyTask.prompt.Thema}</p>
           <ul>
@@ -143,34 +217,46 @@ const QuestionOfDayPage = () => {
               <li key={point}>{point}</li>
             ))}
           </ul>
+          <p style={{ marginBottom: 0 }}>
+            Write only <strong>3–5 sentences</strong>. This is a warm-up, not your full course assignment.
+          </p>
         </div>
       ) : null}
 
-      {dailyTask?.type === "speaking" && Array.isArray(dailyTask?.tasks) ? (
+      {dailyTask?.type === "speaking" && Array.isArray(dailyTask?.prompts) ? (
         <div style={{ ...styles.card, margin: "12px 0", background: "#f8fafc" }}>
+          <p style={{ ...styles.helperText, marginTop: 0 }}>Today’s short task</p>
           <h3 style={{ marginTop: 0 }}>Sprechen</h3>
-          <p>{dailyTask.intro}</p>
           <ol>
-            {dailyTask.tasks.map((item) => (
-              <li key={item}>{item}</li>
+            {dailyTask.prompts.map((item) => (
+              <li key={item.id || buildSpeakingLabel(item)}>{buildSpeakingLabel(item)}</li>
             ))}
           </ol>
-          {dailyTask.bonus ? <p><strong>Bonus (Teil 3):</strong> {dailyTask.bonus.text}</p> : null}
+          <p style={{ marginBottom: 0 }}>
+            Prepare <strong>3 keywords</strong>, then practise speaking for <strong>1 minute</strong>. Do not spend your full study time here.
+          </p>
         </div>
       ) : null}
 
-      {dailyTask?.type === "speaking" && dailyTask?.prompt ? (
-        <div style={{ ...styles.card, margin: "12px 0", background: "#f8fafc" }}>
-          <h3 style={{ marginTop: 0 }}>Sprechen</h3>
-          <p><strong>{dailyTask.prompt.teilLabel}:</strong> {dailyTask.prompt.text}</p>
-          <p style={{ marginBottom: 0 }}>Record your answer on your phone and share with your tutor.</p>
+      {!dailyTask ? (
+        <div style={{ ...styles.card, margin: "12px 0", background: "#fef2f2" }}>
+          <h3 style={{ marginTop: 0 }}>No warm-up found</h3>
+          <p style={{ marginBottom: 0 }}>No Schreiben or Sprechen question is available for {level} yet.</p>
         </div>
       ) : null}
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <button type="button" style={styles.navButton} onClick={copyToClipboard}>Copy task</button>
-        <button type="button" style={submitted ? styles.navButtonActive : styles.primaryButton} onClick={markSubmitted}>
-          {submitted ? "Submitted today" : "Mark as submitted"}
+      <p style={styles.helperText}>
+        Optional extra practice: use the Goethe links only after your main course task is complete.
+      </p>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+        <a href={resourceBase} target="_blank" rel="noreferrer noopener" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Optional Reading practice</a>
+        <a href={`${resourceBase}#section-3`} target="_blank" rel="noreferrer noopener" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Optional Listening practice</a>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={styles.navButton} onClick={copyToClipboard}>Copy warm-up</button>
+        <button type="button" style={practised ? styles.navButtonActive : styles.primaryButton} onClick={markPractised}>
+          {practised ? "Warm-up done today" : "I practised this"}
         </button>
         {copyStatus ? <span style={styles.helperText}>{copyStatus}</span> : null}
       </div>
