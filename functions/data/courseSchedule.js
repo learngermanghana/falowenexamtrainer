@@ -84,9 +84,9 @@ const A2_SCHEDULE = [
   },
   {
     day: 2,
-    topic: "Personen Beschreiben 1.2 (Exercise)",
+    topic: "Personen beschreiben 1.2 (Exercise)",
     chapter: "1.2",
-    goal: "Describe people and their appearance.",
+    goal: "Describe a person’s appearance, personality, relationships, and background in German.",
     assignment: true,
     instruction: "Watch the video, review grammar, and complete the in-app workbook for all four parts.",
     grammar_topic: "Aussehen und Charakter beschreiben mit Adjektiven",
