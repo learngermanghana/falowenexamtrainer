@@ -15,15 +15,6 @@ const RUBRIC_LABELS = {
   lexis: "Lexis",
 };
 
-const WORD_RANGE_BY_LEVEL = {
-  A1: { min: 25, max: 45 },
-  A2: { min: 35, max: 65 },
-  B1: { min: 80, max: 140 },
-  B2: { min: 140, max: 220 },
-  C1: { min: 180, max: 280 },
-};
-
-
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const countWords = (value = "") => (String(value || "").trim().match(/\S+/g) || []).length;
 
