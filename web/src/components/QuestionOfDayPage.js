@@ -6,6 +6,7 @@ import { speakingSheetQuestions } from "../data/speakingSheet";
 import {
   isTutorReviewCloudEnabled,
   saveExamLetterForTutorReview,
+  subscribeTutorReviewsForStudent,
 } from "../services/tutorReviewService";
 import { styles } from "../styles";
 
@@ -20,23 +21,52 @@ const GOETHE_PRACTICE_BASE = {
   B2: "https://www.goethe.de/de/spr/kup/prf/prf/gzb2/ueb.html",
 };
 
+const WRITING_GUIDE_BY_LEVEL = {
+  A1: {
+    minutes: "15 minutes",
+    instruction:
+      "Schreiben Sie zu jedem Punkt ein bis zwei Sätze in das Eingabetextfeld (ca. 30 Wörter). Schreiben Sie auch eine Anrede und einen Gruß.",
+    details: "A1 Schreiben: ca. 30 Wörter, Anrede und Gruß sind Pflicht.",
+  },
+  A2: {
+    minutes: "15 minutes",
+    instruction: "Write a short message/email. Answer every point. Add a greeting and a closing.",
+    details: "A2 Schreiben: short message/email, answer every point, greeting and closing required.",
+  },
+  B1: {
+    minutes: "20 minutes",
+    instruction: "Write an email/letter. Answer all points and include a reason or example.",
+    details: "B1 Schreiben: email/letter, answer all points, give reason/example.",
+  },
+  B2: {
+    minutes: "25 minutes",
+    instruction: "Write a structured opinion text with arguments, examples, and a conclusion.",
+    details: "B2 Schreiben: structured opinion text, arguments, examples, conclusion.",
+  },
+  C1: {
+    minutes: "30 minutes",
+    instruction: "Write an advanced argumentative text with balanced arguments and a clear conclusion.",
+    details: "C1 Schreiben: advanced argumentative text, balanced argument, clear conclusion.",
+  },
+};
+
 const SPEAKING_GUIDE_BY_LEVEL = {
   A1: [
     {
       teil: "Teil 1",
-      rule: "Introduce yourself with short personal information.",
+      rule: "Teil 1: introduce yourself.",
       doThis: "Say your name, age, country, languages, job/school, family or hobby.",
       expect: "The examiner may ask you to spell something or give a number. Speak slowly and clearly.",
     },
     {
       teil: "Teil 2",
-      rule: "Ask and answer one simple question from the card.",
+      rule: "Teil 2: ask/answer simple questions.",
       doThis: "Use the topic and keyword to make a question, then answer your partner's question briefly.",
       expect: "A short correct question is enough. Focus on word order and clear pronunciation.",
     },
     {
       teil: "Teil 3",
-      rule: "Make or answer a simple request.",
+      rule: "Teil 3: requests.",
       doThis: "Ask politely for something, or respond with yes/no and a short reason.",
       expect: "Use polite phrases like Bitte, Können Sie bitte ...? or Ja, gern.",
     },
@@ -44,19 +74,19 @@ const SPEAKING_GUIDE_BY_LEVEL = {
   A2: [
     {
       teil: "Teil 1",
-      rule: "Introduce yourself and answer personal follow-up questions.",
+      rule: "Teil 1: intro/follow-up.",
       doThis: "Give short answers about yourself, your daily life, school, work, family, hobbies, or plans.",
       expect: "The examiner wants simple but complete answers, not long speeches.",
     },
     {
       teil: "Teil 2",
-      rule: "Speak about a familiar topic and exchange information.",
+      rule: "Teil 2: exchange info.",
       doThis: "Answer the prompt, ask one simple question, and react to your partner.",
       expect: "Use everyday vocabulary and give one small reason or example.",
     },
     {
       teil: "Teil 3",
-      rule: "Plan something together with your partner.",
+      rule: "Teil 3: plan together.",
       doThis: "Suggest time, place, activity, and one detail. Agree or disagree politely.",
       expect: "Show interaction: make suggestions, ask questions, and come to a simple decision.",
     },
@@ -64,19 +94,19 @@ const SPEAKING_GUIDE_BY_LEVEL = {
   B1: [
     {
       teil: "Teil 1",
-      rule: "Plan something together.",
+      rule: "Teil 1: plan together.",
       doThis: "Make suggestions, react to your partner, ask questions, agree, disagree, and decide together.",
       expect: "The examiner checks interaction, not memorised speech. Keep the conversation moving.",
     },
     {
       teil: "Teil 2",
-      rule: "Give a short presentation on a topic.",
+      rule: "Teil 2: presentation.",
       doThis: "Use a clear structure: introduction, experience/example, opinion, situation in your country, conclusion.",
       expect: "Speak in connected sentences and give reasons. Do not only list words.",
     },
     {
       teil: "Teil 3",
-      rule: "Ask and answer questions about the presentation.",
+      rule: "Teil 3: questions.",
       doThis: "Ask your partner one relevant question and answer the examiner/partner clearly.",
       expect: "Show that you understood the topic and can react naturally.",
     },
@@ -84,13 +114,13 @@ const SPEAKING_GUIDE_BY_LEVEL = {
   B2: [
     {
       teil: "Teil 1",
-      rule: "Give a structured talk or presentation.",
+      rule: "Teil 1: presentation.",
       doThis: "State the topic, compare options, give advantages/disadvantages, examples, and your opinion.",
       expect: "Use clear structure and connectors. Give reasons, not only short answers.",
     },
     {
       teil: "Teil 2",
-      rule: "Discuss a topic with your partner.",
+      rule: "Teil 2: discussion.",
       doThis: "React to the other opinion, agree or disagree politely, justify your view, and suggest a solution.",
       expect: "The examiner checks interaction, argument quality, vocabulary, and fluency.",
     },
@@ -98,13 +128,13 @@ const SPEAKING_GUIDE_BY_LEVEL = {
   C1: [
     {
       teil: "Teil 1",
-      rule: "Present a topic with a clear argument.",
+      rule: "Teil 1: advanced presentation.",
       doThis: "Explain the issue, compare viewpoints, support your argument, and conclude clearly.",
       expect: "Use advanced connectors and precise vocabulary. Avoid memorised, empty sentences.",
     },
     {
       teil: "Teil 2",
-      rule: "Discuss, defend, and react to another viewpoint.",
+      rule: "Teil 2: discussion/defence.",
       doThis: "Listen, respond directly, challenge politely, justify your opinion, and propose a balanced solution.",
       expect: "The examiner checks fluency, flexibility, argumentation, and interaction.",
     },
@@ -184,6 +214,7 @@ const QuestionOfDayPage = () => {
   const [practised, setPractised] = useState(() => readWarmupProgress(level));
   const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(level));
   const [submitState, setSubmitState] = useState({ loading: false, success: "", error: "" });
+  const [tutorReviews, setTutorReviews] = useState([]);
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   useEffect(() => {
@@ -192,6 +223,15 @@ const QuestionOfDayPage = () => {
     setCopyStatus("");
     setSubmitState({ loading: false, success: "", error: "" });
   }, [level]);
+
+  useEffect(() => {
+    const unsubscribe = subscribeTutorReviewsForStudent(
+      { userId: user?.uid, studentCode: studentProfile?.studentCode || studentProfile?.studentcode },
+      (reviews) => setTutorReviews(Array.isArray(reviews) ? reviews : []),
+      () => setTutorReviews([])
+    );
+    return () => unsubscribe?.();
+  }, [user?.uid, studentProfile?.studentCode, studentProfile?.studentcode]);
 
   const todayLabel = useMemo(
     () =>
@@ -252,7 +292,7 @@ const QuestionOfDayPage = () => {
         ? dailyTask.prompt.Punkte.map((point) => `- ${point}`).join("\n")
         : "";
 
-      return `${level} Exam Warm-up (${todayLabel})\nSchreiben\nThema: ${dailyTask.prompt.Thema}\nWrite only 3–5 sentences.\n${points}`.trim();
+      return `${level} Exam Warm-up (${todayLabel})\nSchreiben\nThema: ${dailyTask.prompt.Thema}\n${(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}\n${points}`.trim();
     }
 
     if (dailyTask.type === "speaking" && Array.isArray(dailyTask.prompts)) {
@@ -275,6 +315,7 @@ const QuestionOfDayPage = () => {
         submittedToTutor,
         reviewId,
         sentOnWhatsapp,
+        taskStatus: "done",
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(progressStore));
 
@@ -368,7 +409,7 @@ const QuestionOfDayPage = () => {
       saveWarmupLocally({ submittedToTutor: true, reviewId: result?.id || "" });
       setSubmitState({
         loading: false,
-        success: "Sent to tutor. When your tutor marks it, open Writing → Tutor feedback to see the comment.",
+        success: "Saved to tutor review queue. Your tutor can mark it now. You will see the response in Tutor Feedback.",
         error: "",
       });
     } catch (error) {
@@ -392,22 +433,6 @@ const QuestionOfDayPage = () => {
       <h2 style={{ marginTop: 0 }}>Exam Warm-up</h2>
       <div
         style={{
-          ...styles.card,
-          margin: "0 0 12px",
-          background: "#fff7ed",
-          border: "1px solid #fed7aa",
-        }}
-      >
-        <p style={{ margin: 0 }}>
-          <strong>Main Course first.</strong> This is only a short exam warm-up after your course work. Use 3–5 minutes only.
-        </p>
-        <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-          Do not replace your workbook assignment with this task. Full exam practice still belongs in the Schreiben and Sprechen tabs.
-        </p>
-      </div>
-
-      <div
-        style={{
           display: "grid",
           gap: 8,
           gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
@@ -416,15 +441,15 @@ const QuestionOfDayPage = () => {
       >
         <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
           <p style={{ ...styles.helperText, margin: 0 }}>Today’s course work</p>
-          <strong>Complete first</strong>
+          <strong>Course work</strong>
         </div>
         <div style={{ ...styles.card, margin: 0, background: practised ? "#ecfdf5" : "#f8fafc" }}>
           <p style={{ ...styles.helperText, margin: 0 }}>Exam Warm-up</p>
-          <strong>{practised ? "Warm-up done today" : "Available after course work"}</strong>
+          <strong>{practised ? "Warm-up done today" : "Ready now"}</strong>
         </div>
         <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
           <p style={{ ...styles.helperText, margin: 0 }}>Time limit</p>
-          <strong>3–5 minutes</strong>
+          <strong>Level-based timing</strong>
         </div>
       </div>
 
@@ -444,7 +469,7 @@ const QuestionOfDayPage = () => {
             ))}
           </ul>
           <p style={{ marginBottom: 0 }}>
-            Write only <strong>3–5 sentences</strong>. This is a warm-up, not your full course assignment.
+            <strong>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</strong>
           </p>
         </div>
       ) : null}
@@ -460,7 +485,7 @@ const QuestionOfDayPage = () => {
               ))}
             </ol>
             <p style={{ marginBottom: 0 }}>
-              Do not type this answer. <strong>Record a WhatsApp voice note</strong> and send it to your tutor.
+              <strong>Do not type your answer. Record a WhatsApp voice note and send it to your tutor.</strong>
             </p>
           </div>
 
@@ -497,6 +522,16 @@ const QuestionOfDayPage = () => {
         </>
       ) : null}
 
+
+      {dailyTask?.type === "writing" ? (
+        <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "1px solid #c7d2fe" }}>
+          <h3 style={{ marginTop: 0 }}>Goethe Schreiben rules for {level}</h3>
+          <p style={{ margin: "0 0 6px" }}><strong>Time:</strong> {(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).minutes}</p>
+          <p style={{ margin: "0 0 6px" }}>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).details}</p>
+          <p style={{ margin: 0 }}>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</p>
+        </div>
+      ) : null}
+
       {!dailyTask ? (
         <div style={{ ...styles.card, margin: "12px 0", background: "#fef2f2" }}>
           <h3 style={{ marginTop: 0 }}>No warm-up found</h3>
@@ -508,13 +543,13 @@ const QuestionOfDayPage = () => {
         <div style={{ ...styles.card, margin: "12px 0", background: "#ffffff", border: "2px solid #bfdbfe" }}>
           <label style={{ ...styles.label, fontSize: 16 }}>Your Schreiben answer box</label>
           <p style={{ ...styles.helperText, margin: "4px 0 8px" }}>
-            Write your short answer here. Your tutor can mark this from the admin review queue.
+            Write your answer here and send it to tutor review when ready.
           </p>
           <textarea
             value={warmupAnswer}
             onChange={handleAnswerChange}
             rows={7}
-            placeholder="Write 3–5 sentences here..."
+            placeholder="Write your Goethe-style answer here..."
             style={{ ...styles.textArea, minHeight: 150 }}
           />
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
@@ -536,6 +571,21 @@ const QuestionOfDayPage = () => {
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
         <a href={resourceBase} target="_blank" rel="noreferrer noopener" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Optional Reading practice</a>
         <a href={`${resourceBase}#section-3`} target="_blank" rel="noreferrer noopener" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Optional Listening practice</a>
+      </div>
+
+
+
+      <div style={{ ...styles.card, marginTop: 12, background: "#ffffff", border: "2px solid #e5e7eb" }}>
+        <h3 style={{ marginTop: 0 }}>Tutor Feedback</h3>
+        {tutorReviews.length === 0 ? (
+          <p style={{ marginBottom: 0 }}>No tutor feedback yet.</p>
+        ) : tutorReviews[0]?.tutorFeedback ? (
+          <div style={{ background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: 10, padding: 14, fontSize: 18, lineHeight: 1.6 }}>
+            {tutorReviews[0].tutorFeedback}
+          </div>
+        ) : (
+          <p style={{ marginBottom: 0 }}>No tutor comment yet. Your work is saved. Please wait for your tutor to mark it.</p>
+        )}
       </div>
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
