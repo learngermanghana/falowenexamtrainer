@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useExam } from "../context/ExamContext";
+import { useAuth } from "../context/AuthContext";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
 import { speakingSheetQuestions } from "../data/speakingSheet";
+import {
+  isTutorReviewCloudEnabled,
+  saveExamLetterForTutorReview,
+} from "../services/tutorReviewService";
 import { styles } from "../styles";
 
 const STORAGE_KEY = "falowen_exam_warmup_progress";
+const ANSWER_STORAGE_KEY = "falowen_exam_warmup_answers";
 const LEGACY_STORAGE_KEY = "falowen_question_of_day_progress";
 
 const GOETHE_PRACTICE_BASE = {
@@ -38,15 +44,29 @@ const pickBatchByDay = (items, count, salt = 0) => {
 
 const getProgressKey = (level) => `${getDaySeed()}-${level}`;
 
+const readJsonStore = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "{}");
+  } catch {
+    return {};
+  }
+};
+
 const readWarmupProgress = (level) => {
   try {
     const key = getProgressKey(level);
-    const currentStore = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-    const legacyStore = JSON.parse(localStorage.getItem(LEGACY_STORAGE_KEY) || "{}");
+    const currentStore = readJsonStore(STORAGE_KEY);
+    const legacyStore = readJsonStore(LEGACY_STORAGE_KEY);
     return Boolean(currentStore[key] || legacyStore[key]);
   } catch {
     return false;
   }
+};
+
+const readWarmupAnswer = (level) => {
+  const key = getProgressKey(level);
+  const answerStore = readJsonStore(ANSWER_STORAGE_KEY);
+  return answerStore[key]?.answer || "";
 };
 
 const buildSpeakingLabel = (item) => {
@@ -58,14 +78,28 @@ const buildSpeakingLabel = (item) => {
   return parts.length ? `${parts.join(" • ")}: ${item.text}` : item.text;
 };
 
+const getTaskTitle = (dailyTask, level) => {
+  if (!dailyTask) return `${level} Exam Warm-up`;
+  if (dailyTask.type === "writing") {
+    return `${level} Exam Warm-up - Schreiben - ${dailyTask.prompt?.Thema || "Writing"}`;
+  }
+  return `${level} Exam Warm-up - Sprechen`;
+};
+
 const QuestionOfDayPage = () => {
   const { level } = useExam();
+  const { user, studentProfile } = useAuth();
   const [copyStatus, setCopyStatus] = useState("");
   const [practised, setPractised] = useState(() => readWarmupProgress(level));
+  const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(level));
+  const [submitState, setSubmitState] = useState({ loading: false, success: "", error: "" });
+  const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   useEffect(() => {
     setPractised(readWarmupProgress(level));
+    setWarmupAnswer(readWarmupAnswer(level));
     setCopyStatus("");
+    setSubmitState({ loading: false, success: "", error: "" });
   }, [level]);
 
   const todayLabel = useMemo(
@@ -138,19 +172,102 @@ const QuestionOfDayPage = () => {
     return "";
   }, [dailyTask, level, todayLabel]);
 
-  const markPractised = () => {
+  const saveWarmupLocally = ({ submittedToTutor = false, reviewId = "" } = {}) => {
     try {
       const key = getProgressKey(level);
-      const store = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-      store[key] = {
+      const progressStore = readJsonStore(STORAGE_KEY);
+      progressStore[key] = {
         level,
         practisedAt: new Date().toISOString(),
         taskType: dailyTask?.type || "warm-up",
+        submittedToTutor,
+        reviewId,
       };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progressStore));
+
+      const answerStore = readJsonStore(ANSWER_STORAGE_KEY);
+      answerStore[key] = {
+        level,
+        answer: warmupAnswer,
+        taskTitle: getTaskTitle(dailyTask, level),
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(ANSWER_STORAGE_KEY, JSON.stringify(answerStore));
       setPractised(true);
     } catch {
       setPractised(true);
+    }
+  };
+
+  const markPractised = () => {
+    saveWarmupLocally();
+  };
+
+  const handleAnswerChange = (event) => {
+    const nextAnswer = event.target.value;
+    setWarmupAnswer(nextAnswer);
+    setSubmitState({ loading: false, success: "", error: "" });
+
+    try {
+      const key = getProgressKey(level);
+      const answerStore = readJsonStore(ANSWER_STORAGE_KEY);
+      answerStore[key] = {
+        level,
+        answer: nextAnswer,
+        taskTitle: getTaskTitle(dailyTask, level),
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(ANSWER_STORAGE_KEY, JSON.stringify(answerStore));
+    } catch {
+      // Local saving is helpful but not required.
+    }
+  };
+
+  const submitWarmupToTutor = async () => {
+    const trimmedAnswer = warmupAnswer.trim();
+
+    if (!dailyTask) {
+      setSubmitState({ loading: false, success: "", error: "No warm-up task is available to submit." });
+      return;
+    }
+
+    if (!trimmedAnswer) {
+      setSubmitState({ loading: false, success: "", error: "Type your answer in the box before sending to your tutor." });
+      return;
+    }
+
+    if (!tutorReviewCloudEnabled) {
+      setSubmitState({ loading: false, success: "", error: "Tutor feedback is not connected in this environment yet." });
+      return;
+    }
+
+    setSubmitState({ loading: true, success: "", error: "" });
+
+    try {
+      const result = await saveExamLetterForTutorReview({
+        user,
+        studentProfile,
+        level,
+        promptId: `exam-warmup-${getProgressKey(level)}`,
+        promptTitle: getTaskTitle(dailyTask, level),
+        draft: trimmedAnswer,
+        aiFeedback: "",
+        revisedDraft: trimmedAnswer,
+        reflection: `Submitted from Exam Warm-up. Task:\n${shareText}`,
+        source: "exam-warm-up",
+      });
+      saveWarmupLocally({ submittedToTutor: true, reviewId: result?.id || "" });
+      setSubmitState({
+        loading: false,
+        success: "Sent to tutor. When your tutor marks it, open Writing → Tutor feedback to see the comment.",
+        error: "",
+      });
+    } catch (error) {
+      setSubmitState({
+        loading: false,
+        success: "",
+        error: error?.message || "Could not send the warm-up to tutor right now.",
+      });
     }
   };
 
@@ -245,6 +362,30 @@ const QuestionOfDayPage = () => {
         </div>
       ) : null}
 
+      <div style={{ ...styles.card, margin: "12px 0", background: "#ffffff", border: "2px solid #bfdbfe" }}>
+        <label style={{ ...styles.label, fontSize: 16 }}>Your answer box</label>
+        <p style={{ ...styles.helperText, margin: "4px 0 8px" }}>
+          Write your short answer here. For Sprechen, type your 3 keywords or short outline. Your tutor can mark this from the admin review queue.
+        </p>
+        <textarea
+          value={warmupAnswer}
+          onChange={handleAnswerChange}
+          rows={7}
+          placeholder={dailyTask?.type === "speaking" ? "Example: 1) Familie 2) Arbeit 3) Wochenende" : "Write 3–5 sentences here..."}
+          style={{ ...styles.textArea, minHeight: 150 }}
+        />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
+          <button type="button" style={styles.primaryButton} onClick={submitWarmupToTutor} disabled={submitState.loading}>
+            {submitState.loading ? "Sending..." : "Send to tutor"}
+          </button>
+          <button type="button" style={practised ? styles.navButtonActive : styles.secondaryButton} onClick={markPractised}>
+            {practised ? "Warm-up done today" : "I practised this"}
+          </button>
+        </div>
+        {submitState.error ? <p style={{ ...styles.helperText, color: "#b91c1c", marginBottom: 0 }}>{submitState.error}</p> : null}
+        {submitState.success ? <p style={{ ...styles.helperText, color: "#166534", marginBottom: 0 }}>{submitState.success}</p> : null}
+      </div>
+
       <p style={styles.helperText}>
         Optional extra practice: use the Goethe links only after your main course task is complete.
       </p>
@@ -255,9 +396,6 @@ const QuestionOfDayPage = () => {
 
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
         <button type="button" style={styles.navButton} onClick={copyToClipboard}>Copy warm-up</button>
-        <button type="button" style={practised ? styles.navButtonActive : styles.primaryButton} onClick={markPractised}>
-          {practised ? "Warm-up done today" : "I practised this"}
-        </button>
         {copyStatus ? <span style={styles.helperText}>{copyStatus}</span> : null}
       </div>
     </section>
