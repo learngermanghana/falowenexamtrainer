@@ -142,6 +142,7 @@ import ExamResources from "./components/ExamResources";
 import HorenPage from "./components/HorenPage";
 import LesenPage from "./components/LesenPage";
 import StudyCalendarPage from "./components/StudyCalendarPage";
+import QuestionOfDayPage from "./components/QuestionOfDayPage";
 import C1SelfLearningCourse from "./components/C1SelfLearningCourse";
 import C1Day1WillkommenSelbstlernstartWorkbookPage from "./components/C1Day1WillkommenSelbstlernstartWorkbookPage";
 import C1Day10IntegrationUndGesellschaftGrammarNotesPage from "./components/C1Day10IntegrationUndGesellschaftGrammarNotesPage";
@@ -1187,11 +1188,10 @@ const ExamArea = ({ onBack }) => {
   const examSection = useMemo(() => {
     if (
       [
-        "tutor",
+        "question",
         "speaking",
         "writing",
         "resources",
-        "study",
         "file",
         "vocab",
         "horen",
@@ -1200,7 +1200,7 @@ const ExamArea = ({ onBack }) => {
     ) {
       return section;
     }
-    return "tutor";
+    return "question";
   }, [section]);
 
   useEffect(() => {
@@ -1237,20 +1237,19 @@ const ExamArea = ({ onBack }) => {
   }, [level, profileExamLevel, setLevel]);
 
   const tabs = [
-    { key: "tutor", label: t("appNav.examTabs.tutor") },
+    { key: "question", label: t("appNav.examTabs.question") },
     { key: "lesen", label: t("appNav.examTabs.lesen") },
     { key: "speaking", label: t("appNav.examTabs.speaking") },
     { key: "writing", label: t("appNav.examTabs.writing") },
     { key: "vocab", label: t("appNav.examTabs.vocab") },
     { key: "horen", label: t("appNav.examTabs.horen") },
     { key: "resources", label: t("appNav.examTabs.resources") },
-    { key: "study", label: t("appNav.examTabs.study") },
     { key: "file", label: t("appNav.examTabs.file") },
   ];
 
   const examHeroConfig = {
-    tutor: {
-      label: t("appNav.examTabs.tutor"),
+    question: {
+      label: t("appNav.examTabs.question"),
       image: "https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
     },
     lesen: {
@@ -1276,10 +1275,6 @@ const ExamArea = ({ onBack }) => {
     resources: {
       label: t("appNav.examTabs.resources"),
       image: "https://images.pexels.com/photos/159866/books-book-pages-read-literature-159866.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
-    },
-    study: {
-      label: t("appNav.examTabs.study"),
-      image: "https://images.pexels.com/photos/8197543/pexels-photo-8197543.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=1200&w=2000",
     },
     file: {
       label: t("appNav.examTabs.file"),
@@ -1365,14 +1360,13 @@ const ExamArea = ({ onBack }) => {
         ) : null}
       </div>
 
-      {examSection === "tutor" ? <WritingPage mode="exam" initialTab="tutor" /> : null}
+      {examSection === "question" ? <QuestionOfDayPage /> : null}
       {examSection === "speaking" ? <SpeakingPage /> : null}
       {examSection === "writing" ? <WritingPage mode="exam" /> : null}
       {examSection === "vocab" ? <VocabExamPage /> : null}
       {examSection === "horen" ? <HorenPage /> : null}
       {examSection === "lesen" ? <LesenPage /> : null}
       {examSection === "resources" ? <ExamResources /> : null}
-      {examSection === "study" ? <StudyCalendarPage /> : null}
       {examSection === "file" ? <MyExamFilePage /> : null}
     </>
   );

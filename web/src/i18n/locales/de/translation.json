@@ -62,14 +62,13 @@
     },
     "examTabs": {
       "overview": "Überblick",
-      "tutor": "Tutor-Feedback",
+      "question": "Frage des Tages",
       "speaking": "Sprechen",
       "writing": "Schreiben",
       "vocab": "Vokabeln",
       "horen": "Hören",
       "lesen": "Lesen",
       "resources": "Ressourcen",
-      "study": "Lernkalender",
       "file": "Meine Prüfungsmappe"
     },
     "campusTabs": {
@@ -91,7 +90,6 @@
       "course": "Kursbuch",
       "submit": "Aufgabe senden",
       "ai": "Falowen A.I",
-      "study": "Lernkalender",
       "exams": "Prüfungsraum"
     },
     "actions": {
