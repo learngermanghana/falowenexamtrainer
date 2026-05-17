@@ -92,9 +92,9 @@ const extractScoreFromFeedback = (feedback = "", maxScore = 25) => {
   return null;
 };
 
-const estimateScore = ({ feedback = "", draft = "", level = "A1" }) => {
+const estimateScore = ({ feedback = "", wordCount = 0, level = "A1" }) => {
   const corrections = parseCorrectionsFromText(feedback).length;
-  const words = countWords(draft);
+  const words = wordCount;
   const target = WORD_RANGE_BY_LEVEL[level] || WORD_RANGE_BY_LEVEL.A1;
   const strictness = LEVEL_STRICTNESS[level] || 1;
   const ratioToMax = words / target.max;
@@ -182,7 +182,8 @@ const WritingFeedbackCard = ({
   trend = null,
 }) => {
   const [showSimple, setShowSimple] = useState(["A1", "A2"].includes(level));
-  const fallbackEstimated = useMemo(() => estimateScore({ feedback, draft, level }), [feedback, draft, level]);
+  const draftWordCount = useMemo(() => countWords(draft), [draft]);
+  const fallbackEstimated = useMemo(() => estimateScore({ feedback, wordCount: draftWordCount, level }), [feedback, draftWordCount, level]);
   const mappedCorrections = useMemo(() => {
     if (Array.isArray(corrections) && corrections.length) {
       return corrections.map((item) => ({
