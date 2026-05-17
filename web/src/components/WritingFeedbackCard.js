@@ -23,13 +23,6 @@ const WORD_RANGE_BY_LEVEL = {
   C1: { min: 180, max: 280 },
 };
 
-const LEVEL_STRICTNESS = {
-  A1: 0.8,
-  A2: 0.9,
-  B1: 1,
-  B2: 1.1,
-  C1: 1.2,
-};
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const countWords = (value = "") => (String(value || "").trim().match(/\S+/g) || []).length;
@@ -81,20 +74,6 @@ const extractScoreFromFeedback = (feedback = "", maxScore = 25) => {
   return null;
 };
 
-const estimateScore = ({ feedback = "", wordCount = 0, level = "A1" }) => {
-  const corrections = parseCorrectionsFromText(feedback).length;
-  const words = wordCount;
-  const target = WORD_RANGE_BY_LEVEL[level] || WORD_RANGE_BY_LEVEL.A1;
-  const strictness = LEVEL_STRICTNESS[level] || 1;
-  const ratioToMax = words / target.max;
-  const wordQuality = ratioToMax < 0.45 ? 2 : ratioToMax < 0.75 ? 3.2 : ratioToMax <= 1.2 ? 4.6 : 3.8;
-  const correctionPenalty = corrections * strictness * 0.55;
-  const positiveHints = ["clear", "good", "strong", "well", "excellent", "accurate"];
-  const lower = String(feedback || "").toLowerCase();
-  const positiveBoost = positiveHints.reduce((sum, hint) => sum + (lower.includes(hint) ? 0.2 : 0), 0);
-  return clamp(Math.round((wordQuality + 3.8 + positiveBoost - correctionPenalty) * 2.5), 0, 25);
-};
-
 const toSimpleFeedback = (raw = "", mappedCorrections = [], simplifiedFeedback = null) => {
   const clean = stripMarkdownSections(raw);
   const sentencePool = clean.split(/\n+/).map((line) => line.trim()).filter(Boolean);
@@ -136,14 +115,11 @@ const styles = {
 const WritingFeedbackCard = ({
   feedback = "",
   level = "A1",
-  draft = "",
   rubric = null,
   corrections = null,
   simplifiedFeedback = null,
 }) => {
   const [copyState, setCopyState] = useState("");
-  const [showRawFeedback, setShowRawFeedback] = useState(false);
-  const draftWordCount = useMemo(() => countWords(draft), [draft]);
   const mappedCorrections = useMemo(() => {
     if (Array.isArray(corrections) && corrections.length) {
       return corrections
@@ -166,7 +142,6 @@ const WritingFeedbackCard = ({
   }, [rubric, feedback]);
 
   const simple = useMemo(() => toSimpleFeedback(feedback, mappedCorrections, simplifiedFeedback), [feedback, mappedCorrections, simplifiedFeedback]);
-  const cleanRaw = useMemo(() => stripMarkdownSections(feedback), [feedback]);
 
   const handleCopy = async () => {
     const text = [
@@ -246,12 +221,6 @@ const WritingFeedbackCard = ({
         <div style={{ marginTop: 8, fontSize: 12, color: "#475569" }}>Level focus ({level}): {CEFR_EXPECTATIONS[level] || CEFR_EXPECTATIONS.A1}</div>
       </div>
 
-      <div style={styles.card}>
-        <button type="button" onClick={() => setShowRawFeedback((prev) => !prev)}>
-          {showRawFeedback ? "Hide full AI feedback" : "Show full AI feedback"}
-        </button>
-        {showRawFeedback ? <pre style={{ marginTop: 10, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{cleanRaw}</pre> : null}
-      </div>
     </div>
   );
 };
