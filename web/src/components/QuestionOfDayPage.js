@@ -13,7 +13,7 @@ import { styles } from "../styles";
 const STORAGE_KEY = "falowen_exam_warmup_progress";
 const ANSWER_STORAGE_KEY = "falowen_exam_warmup_answers";
 const LEGACY_STORAGE_KEY = "falowen_question_of_day_progress";
-
+const MIN_WRITING_WORDS = 30;
 
 const WRITING_GUIDE_BY_LEVEL = {
   A1: {
@@ -207,6 +207,7 @@ const QuestionOfDayPage = () => {
   const [practised, setPractised] = useState(() => readWarmupProgress(level));
   const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(level));
   const [submitState, setSubmitState] = useState({ loading: false, success: "", error: "" });
+  const [tutorComment, setTutorComment] = useState("");
   const [tutorReviews, setTutorReviews] = useState([]);
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
@@ -335,6 +336,12 @@ const QuestionOfDayPage = () => {
     }
   };
 
+  const countWords = (text) =>
+    text
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+
   const handleAnswerChange = (event) => {
     const nextAnswer = event.target.value;
     setWarmupAnswer(nextAnswer);
@@ -377,6 +384,16 @@ const QuestionOfDayPage = () => {
       return;
     }
 
+    const wordCount = countWords(trimmedAnswer);
+    if (wordCount < MIN_WRITING_WORDS) {
+      setSubmitState({
+        loading: false,
+        success: "",
+        error: `Please write at least ${MIN_WRITING_WORDS} words before sending. You currently have ${wordCount}.`,
+      });
+      return;
+    }
+
     if (!tutorReviewCloudEnabled) {
       setSubmitState({ loading: false, success: "", error: "Tutor feedback is not connected in this environment yet." });
       return;
@@ -400,14 +417,14 @@ const QuestionOfDayPage = () => {
       saveWarmupLocally({ submittedToTutor: true, reviewId: result?.id || "" });
       setSubmitState({
         loading: false,
-        success: "Saved to tutor review queue. Your tutor can mark it now. You will see the response in Tutor Feedback.",
+        success: "Work submitted to tutor. You will receive a response soon. Saved to tutor review queue. Your tutor can mark it now. You will see the response in Tutor Feedback.",
         error: "",
       });
     } catch (error) {
       setSubmitState({
         loading: false,
         success: "",
-        error: error?.message || "Could not send the warm-up to tutor right now.",
+        error: error?.message || "Could not submit to tutor right now. Please try again in a moment.",
       });
     }
   };
@@ -415,19 +432,17 @@ const QuestionOfDayPage = () => {
   return (
     <section style={{ ...styles.card, marginTop: 0 }}>
       <h2 style={{ marginTop: 0 }}>Exam Warm-up</h2>
-      <p style={styles.helperText}>
-        This page is for learners who are done with the course and are preparing for exams. One question is shared each day.
-      </p>
-      <p style={styles.helperText}>
-        For Schreiben: save your response, then check tutor feedback in the Tutor Feedback section.
-      </p>
-      <p style={styles.helperText}>
-        For Sprechen: record your voice and send it to your tutor on WhatsApp.
-      </p>
+      <div style={{ ...styles.card, margin: "10px 0", background: "#f8fafc", border: "1px solid #dbeafe" }}>
+        <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.6 }}>
+          <li>This page is for learners who are done with the course and are preparing for exams. One question is shared each day.</li>
+          <li>For Schreiben: save your response, then check tutor feedback in the Tutor Feedback section.</li>
+          <li>For Sprechen: record your voice and send it to your tutor on WhatsApp.</li>
+        </ul>
+      </div>
 
       {dailyTask?.type === "writing" && dailyTask?.prompt ? (
         <div style={{ ...styles.card, margin: "12px 0", background: "#f8fafc" }}>
-          <p style={{ ...styles.helperText, marginTop: 0 }}>Today’s short task</p>
+          <p style={{ ...styles.helperText, marginTop: 0 }}>Work submitted to tutor</p>
           <h3 style={{ marginTop: 0 }}>Schreiben</h3>
           <p><strong>Thema:</strong> {dailyTask.prompt.Thema}</p>
           <ul>
@@ -444,7 +459,7 @@ const QuestionOfDayPage = () => {
       {dailyTask?.type === "speaking" && Array.isArray(dailyTask?.prompts) ? (
         <>
           <div style={{ ...styles.card, margin: "12px 0", background: "#f8fafc" }}>
-            <p style={{ ...styles.helperText, marginTop: 0 }}>Today’s short task</p>
+            <p style={{ ...styles.helperText, marginTop: 0 }}>Work submitted to tutor</p>
             <h3 style={{ marginTop: 0 }}>Sprechen</h3>
             <ol>
               {dailyTask.prompts.map((item) => (
@@ -519,12 +534,20 @@ const QuestionOfDayPage = () => {
             placeholder="Write your Goethe-style answer here..."
             style={{ ...styles.textArea, minHeight: 150 }}
           />
+          <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+            Minimum {MIN_WRITING_WORDS} words. Current: {countWords(warmupAnswer)} words.
+          </p>
+          <label style={{ ...styles.label, marginTop: 12 }}>Comment for tutor (optional)</label>
+          <textarea
+            value={tutorComment}
+            onChange={(event) => setTutorComment(event.target.value)}
+            rows={3}
+            placeholder="Add any note or question for your tutor..."
+            style={{ ...styles.textArea, minHeight: 90 }}
+          />
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
             <button type="button" style={styles.primaryButton} onClick={submitWarmupToTutor} disabled={submitState.loading}>
               {submitState.loading ? "Sending..." : "Send Schreiben to tutor"}
-            </button>
-            <button type="button" style={practised ? styles.navButtonActive : styles.secondaryButton} onClick={markPractised}>
-              {practised ? "Warm-up marked as done" : "Mark warm-up as done"}
             </button>
           </div>
           {submitState.error ? <p style={{ ...styles.helperText, color: "#b91c1c", marginBottom: 0 }}>{submitState.error}</p> : null}

@@ -291,21 +291,19 @@ const FEEDBACK_HIGHLIGHT_KEYWORDS = {
   error: ["error", "incorrect", "wrong", "fix", "grammar", "spelling", "missing", "unclear", "needs"],
 };
 
-const classifyFeedbackSentence = (sentence = "") => {
-  const lower = sentence.toLowerCase();
-  if (FEEDBACK_HIGHLIGHT_KEYWORDS.error.some((keyword) => lower.includes(keyword))) {
-    return "error";
-  }
-  if (FEEDBACK_HIGHLIGHT_KEYWORDS.strong.some((keyword) => lower.includes(keyword))) {
-    return "strong";
-  }
-  return "neutral";
-};
-
 const FeedbackAnnotations = ({ feedback = "" }) => {
   const [copyState, setCopyState] = useState("");
   const annotatedSentences = useMemo(
-    () => splitSentences(feedback).map((sentence) => ({ sentence, tone: classifyFeedbackSentence(sentence) })),
+    () =>
+      splitSentences(feedback).map((sentence) => {
+        const lower = sentence.toLowerCase();
+        const tone = FEEDBACK_HIGHLIGHT_KEYWORDS.error.some((keyword) => lower.includes(keyword))
+          ? "error"
+          : FEEDBACK_HIGHLIGHT_KEYWORDS.strong.some((keyword) => lower.includes(keyword))
+            ? "strong"
+            : "neutral";
+        return { sentence, tone };
+      }),
     [feedback]
   );
 
