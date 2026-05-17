@@ -14,12 +14,6 @@ const STORAGE_KEY = "falowen_exam_warmup_progress";
 const ANSWER_STORAGE_KEY = "falowen_exam_warmup_answers";
 const LEGACY_STORAGE_KEY = "falowen_question_of_day_progress";
 
-const GOETHE_PRACTICE_BASE = {
-  A1: "https://www.goethe.de/de/spr/kup/prf/prf/gza1/ueb.html",
-  A2: "https://www.goethe.de/de/spr/kup/prf/prf/gza2/ueb.html",
-  B1: "https://www.goethe.de/de/spr/kup/prf/prf/gzb1/ueb.html",
-  B2: "https://www.goethe.de/de/spr/kup/prf/prf/gzb2/ueb.html",
-};
 
 const WRITING_GUIDE_BY_LEVEL = {
   A1: {
@@ -210,7 +204,6 @@ const getTaskTitle = (dailyTask, level) => {
 const QuestionOfDayPage = () => {
   const { level } = useExam();
   const { user, studentProfile } = useAuth();
-  const [copyStatus, setCopyStatus] = useState("");
   const [practised, setPractised] = useState(() => readWarmupProgress(level));
   const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(level));
   const [submitState, setSubmitState] = useState({ loading: false, success: "", error: "" });
@@ -220,7 +213,6 @@ const QuestionOfDayPage = () => {
   useEffect(() => {
     setPractised(readWarmupProgress(level));
     setWarmupAnswer(readWarmupAnswer(level));
-    setCopyStatus("");
     setSubmitState({ loading: false, success: "", error: "" });
   }, [level]);
 
@@ -282,7 +274,6 @@ const QuestionOfDayPage = () => {
   }, [level]);
 
   const speakingRules = SPEAKING_GUIDE_BY_LEVEL[level] || SPEAKING_GUIDE_BY_LEVEL.B1;
-  const resourceBase = GOETHE_PRACTICE_BASE[level] || GOETHE_PRACTICE_BASE.B1;
 
   const shareText = useMemo(() => {
     if (!dailyTask) return "";
@@ -421,41 +412,17 @@ const QuestionOfDayPage = () => {
     }
   };
 
-  const copyToClipboard = async () => {
-    if (!navigator?.clipboard?.writeText || !shareText) return;
-    await navigator.clipboard.writeText(shareText);
-    setCopyStatus("Copied");
-  };
-
   return (
     <section style={{ ...styles.card, marginTop: 0 }}>
-      <p style={{ ...styles.helperText, marginTop: 0 }}>Exams • Exam Warm-up</p>
       <h2 style={{ marginTop: 0 }}>Exam Warm-up</h2>
-      <div
-        style={{
-          display: "grid",
-          gap: 8,
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          marginBottom: 12,
-        }}
-      >
-        <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Today’s course work</p>
-          <strong>Course work</strong>
-        </div>
-        <div style={{ ...styles.card, margin: 0, background: practised ? "#ecfdf5" : "#f8fafc" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Exam Warm-up</p>
-          <strong>{practised ? "Warm-up done today" : "Ready now"}</strong>
-        </div>
-        <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>Time limit</p>
-          <strong>Level-based timing</strong>
-        </div>
-      </div>
-
-      <p style={styles.helperText}>Task date (UTC): {todayLabel}</p>
       <p style={styles.helperText}>
-        The warm-up uses the existing Schreiben and Sprechen question dictionaries. No new question bank is created here.
+        This page is for learners who are done with the course and are preparing for exams. One question is shared each day.
+      </p>
+      <p style={styles.helperText}>
+        For Schreiben: save your response, then check tutor feedback in the Tutor Feedback section.
+      </p>
+      <p style={styles.helperText}>
+        For Sprechen: record your voice and send it to your tutor on WhatsApp.
       </p>
 
       {dailyTask?.type === "writing" && dailyTask?.prompt ? (
@@ -557,22 +524,13 @@ const QuestionOfDayPage = () => {
               {submitState.loading ? "Sending..." : "Send Schreiben to tutor"}
             </button>
             <button type="button" style={practised ? styles.navButtonActive : styles.secondaryButton} onClick={markPractised}>
-              {practised ? "Warm-up done today" : "I practised this"}
+              {practised ? "Warm-up marked as done" : "Mark warm-up as done"}
             </button>
           </div>
           {submitState.error ? <p style={{ ...styles.helperText, color: "#b91c1c", marginBottom: 0 }}>{submitState.error}</p> : null}
           {submitState.success ? <p style={{ ...styles.helperText, color: "#166534", marginBottom: 0 }}>{submitState.success}</p> : null}
         </div>
       ) : null}
-
-      <p style={styles.helperText}>
-        Optional extra practice: use the Goethe links only after your main course task is complete.
-      </p>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        <a href={resourceBase} target="_blank" rel="noreferrer noopener" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Optional Reading practice</a>
-        <a href={`${resourceBase}#section-3`} target="_blank" rel="noreferrer noopener" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Optional Listening practice</a>
-      </div>
-
 
 
       <div style={{ ...styles.card, marginTop: 12, background: "#ffffff", border: "2px solid #e5e7eb" }}>
@@ -586,11 +544,6 @@ const QuestionOfDayPage = () => {
         ) : (
           <p style={{ marginBottom: 0 }}>No tutor comment yet. Your work is saved. Please wait for your tutor to mark it.</p>
         )}
-      </div>
-
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-        <button type="button" style={styles.navButton} onClick={copyToClipboard}>Copy warm-up</button>
-        {copyStatus ? <span style={styles.helperText}>{copyStatus}</span> : null}
       </div>
     </section>
   );
