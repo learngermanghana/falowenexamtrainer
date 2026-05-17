@@ -182,14 +182,18 @@ const readJsonStore = (key) => {
   }
 };
 
-const readWarmupProgress = (level) => {
+const readWarmupStatus = (level) => {
   try {
     const key = getProgressKey(level);
     const currentStore = readJsonStore(STORAGE_KEY);
     const legacyStore = readJsonStore(LEGACY_STORAGE_KEY);
-    return Boolean(currentStore[key] || legacyStore[key]);
+    const entry = currentStore[key] || legacyStore[key] || null;
+    return {
+      practised: Boolean(entry),
+      submittedToTutor: Boolean(entry?.submittedToTutor),
+    };
   } catch {
-    return false;
+    return { practised: false, submittedToTutor: false };
   }
 };
 
@@ -337,7 +341,8 @@ const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
 const QuestionOfDayPage = () => {
   const { level } = useExam();
   const { user, studentProfile } = useAuth();
-  const [practised, setPractised] = useState(() => readWarmupProgress(level));
+  const [practised, setPractised] = useState(() => readWarmupStatus(level).practised);
+  const [submittedToTutor, setSubmittedToTutor] = useState(() => readWarmupStatus(level).submittedToTutor);
   const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(level));
   const [submitState, setSubmitState] = useState({ loading: false, success: "", error: "" });
   const [tutorComment, setTutorComment] = useState("");
@@ -350,7 +355,9 @@ const QuestionOfDayPage = () => {
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   useEffect(() => {
-    setPractised(readWarmupProgress(level));
+    const warmupStatus = readWarmupStatus(level);
+    setPractised(warmupStatus.practised);
+    setSubmittedToTutor(warmupStatus.submittedToTutor);
     setWarmupAnswer(readWarmupAnswer(level));
     setSubmitState({ loading: false, success: "", error: "" });
     setLetterType("");
@@ -466,13 +473,15 @@ const QuestionOfDayPage = () => {
       };
       localStorage.setItem(ANSWER_STORAGE_KEY, JSON.stringify(answerStore));
       setPractised(true);
+      setSubmittedToTutor(Boolean(submittedToTutor));
     } catch {
       setPractised(true);
+      setSubmittedToTutor(Boolean(submittedToTutor));
     }
   };
 
   const markPractised = () => {
-    saveWarmupLocally({ sentOnWhatsapp: dailyTask?.type === "speaking" });
+    saveWarmupLocally({ sentOnWhatsapp: dailyTask?.type === "speaking", submittedToTutor: false });
     if (dailyTask?.type === "speaking") {
       setSubmitState({
         loading: false,
@@ -599,6 +608,24 @@ const QuestionOfDayPage = () => {
     }
   };
 
+  const showSubmissionBanner = dailyTask?.type === "writing" && submittedToTutor;
+  const questionPanelStyle = {
+    ...styles.card,
+    margin: "12px 0",
+    background: "#f8fafc",
+    display: "grid",
+    gap: 12,
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+  };
+  const writingWorkspaceStyle = {
+    ...styles.card,
+    margin: "12px 0",
+    background: "#ffffff",
+    border: "2px solid #bfdbfe",
+    display: "grid",
+    gap: 12,
+  };
+
   return (
     <section style={{ ...styles.card, marginTop: 0 }}>
       <h2 style={{ marginTop: 0 }}>Exam Warm-up</h2>
@@ -610,6 +637,7 @@ const QuestionOfDayPage = () => {
         </ul>
       </div>
 
+      {showSubmissionBanner ? (
       <div style={{ ...styles.card, margin: "10px 0", background: "#fff7ed", border: "2px solid #fb923c" }}>
         <p style={{ margin: 0, fontSize: 20, fontWeight: 800, lineHeight: 1.4 }}>
           ✅ Work submitted to tutor. Scroll down to <strong>Tutor Feedback</strong> below.
@@ -617,11 +645,13 @@ const QuestionOfDayPage = () => {
         <p style={{ margin: "8px 0 0", fontSize: 16, fontWeight: 600 }}>
           Feedback usually appears within 24 hours. You can also go to the <strong>Writing</strong> tab and click <strong>Tutor Feedback</strong>.
         </p>
-      </div>
+            </div>
+      ) : null}
 
       {dailyTask?.type === "writing" && dailyTask?.prompt ? (
-        <div style={{ ...styles.card, margin: "12px 0", background: "#f8fafc" }}>
-          <p style={{ ...styles.helperText, marginTop: 0 }}>Work submitted to tutor</p>
+        <div style={questionPanelStyle}>
+          <div>
+            <p style={{ ...styles.helperText, marginTop: 0 }}>Question for the day</p>
           <h3 style={{ marginTop: 0 }}>Schreiben</h3>
           <p><strong>Thema:</strong> {dailyTask.prompt.Thema}</p>
           <ul>
@@ -630,15 +660,25 @@ const QuestionOfDayPage = () => {
             ))}
           </ul>
           <p style={{ marginBottom: 0 }}>
-            <strong>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</strong>
-          </p>
+              <strong>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</strong>
+            </p>
+          </div>
+          <div style={{ background: "#ffffff", border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+            <p style={{ ...styles.helperText, marginTop: 0 }}>Work submitted to tutor</p>
+            <p style={{ margin: 0, lineHeight: 1.6 }}>
+              {submittedToTutor
+                ? "✅ Submitted. Scroll down to Tutor Feedback. Feedback usually appears within 24 hours."
+                : "Not submitted yet. Send your Schreiben below to receive tutor feedback."}
+            </p>
+          </div>
         </div>
       ) : null}
 
       {dailyTask?.type === "speaking" && Array.isArray(dailyTask?.prompts) ? (
         <>
-          <div style={{ ...styles.card, margin: "12px 0", background: "#f8fafc" }}>
-            <p style={{ ...styles.helperText, marginTop: 0 }}>Work submitted to tutor</p>
+          <div style={questionPanelStyle}>
+            <div>
+            <p style={{ ...styles.helperText, marginTop: 0 }}>Question for the day</p>
             <h3 style={{ marginTop: 0 }}>Sprechen</h3>
             <ol>
               {dailyTask.prompts.map((item) => (
@@ -648,6 +688,7 @@ const QuestionOfDayPage = () => {
             <p style={{ marginBottom: 0 }}>
               <strong>Do not type your answer. Record a WhatsApp voice note and send it to your tutor.</strong>
             </p>
+            </div>
           </div>
 
           <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "2px solid #c7d2fe" }}>
@@ -666,7 +707,7 @@ const QuestionOfDayPage = () => {
             </div>
           </div>
 
-          <div style={{ ...styles.card, margin: "12px 0", background: "#ffffff", border: "2px solid #bfdbfe" }}>
+          <div style={writingWorkspaceStyle}>
             <h3 style={{ marginTop: 0 }}>Record and send on WhatsApp</h3>
             <ol style={{ marginTop: 0 }}>
               <li>Open WhatsApp.</li>
@@ -701,7 +742,7 @@ const QuestionOfDayPage = () => {
       ) : null}
 
       {dailyTask?.type === "writing" ? (
-        <div style={{ ...styles.card, margin: "12px 0", background: "#ffffff", border: "2px solid #bfdbfe" }}>
+        <div style={writingWorkspaceStyle}>
           <label style={{ ...styles.label, fontSize: 16 }}>Your Schreiben answer box</label>
           <p style={{ ...styles.helperText, margin: "4px 0 8px" }}>
             Write your answer here and send it to tutor review when ready.
