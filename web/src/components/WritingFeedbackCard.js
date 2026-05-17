@@ -46,22 +46,18 @@ const extractScoreFromFeedback = (feedback = "", maxScore = 25) => {
   return null;
 };
 
-const parseCorrectionsFromText = (feedback = "") => {
-  const text = String(feedback || "");
-  const regex = /\[wrong\]([\s\S]*?)\[\/wrong\]\s*→\s*\[correct\]([\s\S]*?)\[\/correct\](?:\s*—\s*Reason:\s*([\s\S]*?))?(?=(?:\n\s*\d+\.|\n\s*[-*]\s|\n\s*\[wrong\]|$))/gi;
-  const out = [];
-  let match = regex.exec(text);
-  while (match) {
-    const wrong = cleanTags(match[1]);
-    const correct = cleanTags(match[2]);
-    const reason = cleanTags(match[3] || "");
-    const longParagraph = countWords(wrong) > 18 || countWords(correct) > 18 || countWords(reason) > 20;
-    if (wrong && correct && !longParagraph) {
-      out.push({ wrong, correct, reason: reason || "Use the corrected form for accuracy." });
-    }
-    match = regex.exec(text);
-  }
-  return out;
+const estimateScore = ({ feedback = "", wordCount = 0, level = "A1" }) => {
+  const corrections = parseCorrectionsFromText(feedback).length;
+  const words = wordCount;
+  const target = WORD_RANGE_BY_LEVEL[level] || WORD_RANGE_BY_LEVEL.A1;
+  const strictness = LEVEL_STRICTNESS[level] || 1;
+  const ratioToMax = words / target.max;
+  const wordQuality = ratioToMax < 0.45 ? 2 : ratioToMax < 0.75 ? 3.2 : ratioToMax <= 1.2 ? 4.6 : 3.8;
+  const correctionPenalty = corrections * strictness * 0.55;
+  const positiveHints = ["clear", "good", "strong", "well", "excellent", "accurate"];
+  const lower = String(feedback || "").toLowerCase();
+  const positiveBoost = positiveHints.reduce((sum, hint) => sum + (lower.includes(hint) ? 0.2 : 0), 0);
+  return clamp(Math.round((wordQuality + 3.8 + positiveBoost - correctionPenalty) * 2.5), 0, 25);
 };
 
 const toSimpleFeedback = (raw = "", mappedCorrections = [], simplifiedFeedback = null) => {
@@ -102,10 +98,18 @@ const styles = {
   correct: { color: "#14532d", background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 8px" },
 };
 
-const WritingFeedbackCard = ({ feedback = "", level = "A1", draft = "", rubric = null, corrections = null, simplifiedFeedback = null }) => {
-  const [showRawFeedback, setShowRawFeedback] = useState(false);
-  const [copyState, setCopyState] = useState("");
-
+const WritingFeedbackCard = ({
+  feedback = "",
+  level = "A1",
+  draft = "",
+  rubric = null,
+  corrections = null,
+  simplifiedFeedback = null,
+  trend = null,
+}) => {
+  const [showSimple, setShowSimple] = useState(["A1", "A2"].includes(level));
+  const draftWordCount = useMemo(() => countWords(draft), [draft]);
+  const fallbackEstimated = useMemo(() => estimateScore({ feedback, wordCount: draftWordCount, level }), [feedback, draftWordCount, level]);
   const mappedCorrections = useMemo(() => {
     if (Array.isArray(corrections) && corrections.length) {
       return corrections
