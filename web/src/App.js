@@ -33,7 +33,6 @@ import TwelveHourClockPage from "./components/TwelveHourClockPage";
 import A1Day12TwentyFourHourClockDatesPage from "./components/A1Day12TwentyFourHourClockDatesPage";
 import SingularPronounsConjugationPage from "./components/SingularPronounsConjugationPage";
 import GermanAlphabetGrammarNotesPage from "./components/GermanAlphabetGrammarNotesPage";
-import A1Day3Kapitel12GrammarNotesPage from "./components/A1Day3Kapitel12GrammarNotesPage";
 import A2Day2Kapitel12GrammarNotesPage from "./components/A2Day2Kapitel12GrammarNotesPage";
 import ComparingThingsAndPeopleGrammarPage from "./components/ComparingThingsAndPeopleGrammarPage";
 import WoTreffenUnsGrammarPage from "./components/WoTreffenUnsGrammarPage";
