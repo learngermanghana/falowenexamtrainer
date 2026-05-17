@@ -106,7 +106,6 @@ export const loadDraftForStudent = ({ email, studentCode, level, lessonKey }) =>
 };
 
 export const saveDraftForStudent = ({
-  email,
   studentCode,
   level,
   lessonKey,
