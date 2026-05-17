@@ -140,13 +140,10 @@ const WritingFeedbackCard = ({
   rubric = null,
   corrections = null,
   simplifiedFeedback = null,
-  trend = null,
 }) => {
-  const [showSimple, setShowSimple] = useState(["A1", "A2"].includes(level));
   const [copyState, setCopyState] = useState("");
   const [showRawFeedback, setShowRawFeedback] = useState(false);
   const draftWordCount = useMemo(() => countWords(draft), [draft]);
-  const fallbackEstimated = useMemo(() => estimateScore({ feedback, wordCount: draftWordCount, level }), [feedback, draftWordCount, level]);
   const mappedCorrections = useMemo(() => {
     if (Array.isArray(corrections) && corrections.length) {
       return corrections
