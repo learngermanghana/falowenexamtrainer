@@ -318,7 +318,8 @@ export const persistPushNotification = async ({ studentId, payload, notification
   const normalized = notification || buildPushNotification(payload);
   if (!normalized) return null;
 
-  const { id, data, ...rest } = normalized;
+  const { data, ...rest } = normalized;
+  delete rest.id;
   const payloadToWrite = {
     ...rest,
     data: data || payload?.data || {},
