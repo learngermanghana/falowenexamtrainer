@@ -587,7 +587,7 @@ const QuestionOfDayPage = () => {
       saveWarmupLocally({ submittedToTutor: true, reviewId: result?.id || "" });
       setSubmitState({
         loading: false,
-        success: "Work submitted to tutor. You will receive a response soon. Saved to tutor review queue. Your tutor can mark it now. You will see the response in Tutor Feedback.",
+        success: "Work submitted to tutor and saved in the tutor review queue. Scroll down to Tutor Feedback on this page to see updates. Feedback usually appears within 24 hours. You can also open the Writing tab and click Tutor Feedback.",
         error: "",
       });
     } catch (error) {
@@ -605,9 +605,18 @@ const QuestionOfDayPage = () => {
       <div style={{ ...styles.card, margin: "10px 0", background: "#f8fafc", border: "1px solid #dbeafe" }}>
         <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.6 }}>
           <li>This page is for learners who are done with the course and are preparing for exams. One question is shared each day.</li>
-          <li>For Schreiben: save your response, then check tutor feedback in the Tutor Feedback section.</li>
+          <li>For Schreiben: save your response, then scroll down to Tutor Feedback.</li>
           <li>For Sprechen: record your voice and send it to your tutor on WhatsApp.</li>
         </ul>
+      </div>
+
+      <div style={{ ...styles.card, margin: "10px 0", background: "#fff7ed", border: "2px solid #fb923c" }}>
+        <p style={{ margin: 0, fontSize: 20, fontWeight: 800, lineHeight: 1.4 }}>
+          ✅ Work submitted to tutor. Scroll down to <strong>Tutor Feedback</strong> below.
+        </p>
+        <p style={{ margin: "8px 0 0", fontSize: 16, fontWeight: 600 }}>
+          Feedback usually appears within 24 hours. You can also go to the <strong>Writing</strong> tab and click <strong>Tutor Feedback</strong>.
+        </p>
       </div>
 
       {dailyTask?.type === "writing" && dailyTask?.prompt ? (
