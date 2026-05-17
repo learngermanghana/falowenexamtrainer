@@ -1125,8 +1125,8 @@ const AssignmentSubmissionPage = () => {
       setStatus((prev) => ({ ...prev, error: "", success: "" }));
       setCopyStatus("");
       setAutosaveStatus((prev) => ({ ...prev, state: "idle" }));
-      setResubmissionText(draft?.resubmissionText || "");
-      setResubmissionImprovement(draft?.resubmissionImprovement || "");
+      setResubmissionText("");
+      setResubmissionImprovement("");
       setResubmissionStatus({ loading: false, error: "", success: "" });
     } else if (!form.submissionText && draft?.submissionText) {
       setForm((prev) => ({
@@ -1136,13 +1136,6 @@ const AssignmentSubmissionPage = () => {
       }));
     }
 
-    if (!assignmentChanged && !resubmissionText && draft?.resubmissionText) {
-      setResubmissionText(draft.resubmissionText);
-    }
-
-    if (!assignmentChanged && !resubmissionImprovement && draft?.resubmissionImprovement) {
-      setResubmissionImprovement(draft.resubmissionImprovement);
-    }
   }, [
     draftsByAssignment,
     form.assignmentTitle,
