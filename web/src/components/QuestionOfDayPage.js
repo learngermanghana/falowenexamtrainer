@@ -14,6 +14,21 @@ const STORAGE_KEY = "falowen_exam_warmup_progress";
 const ANSWER_STORAGE_KEY = "falowen_exam_warmup_answers";
 const LEGACY_STORAGE_KEY = "falowen_question_of_day_progress";
 const MIN_WRITING_WORDS = 30;
+const CHECKLIST_ERROR_PREFIX = "Before submitting, tick all checklist items.";
+const LETTER_TYPE_OPTIONS = [
+  { value: "formal", label: "Formal letter/email" },
+  { value: "informal", label: "Informal letter/email" },
+];
+const PRE_SUBMISSION_CHECKLIST = [
+  "I understood the question before writing.",
+  "I added a short introduction/opening sentence.",
+  "I selected the correct letter type: formal or informal.",
+  "I added a conclusion, closing, or Gruß.",
+  "I answered every point in the task.",
+  "I asked a W-question or a yes/no question where needed.",
+  "I used weil correctly with the conjugated verb at the end.",
+  "I made a polite request using Könnten / Können Sie bitte ...?",
+];
 
 const WRITING_GUIDE_BY_LEVEL = {
   A1: {
@@ -208,6 +223,10 @@ const QuestionOfDayPage = () => {
   const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(level));
   const [submitState, setSubmitState] = useState({ loading: false, success: "", error: "" });
   const [tutorComment, setTutorComment] = useState("");
+  const [letterType, setLetterType] = useState("");
+  const [checklistState, setChecklistState] = useState(() =>
+    PRE_SUBMISSION_CHECKLIST.reduce((acc, label) => ({ ...acc, [label]: false }), {})
+  );
   const [tutorReviews, setTutorReviews] = useState([]);
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
@@ -215,6 +234,8 @@ const QuestionOfDayPage = () => {
     setPractised(readWarmupProgress(level));
     setWarmupAnswer(readWarmupAnswer(level));
     setSubmitState({ loading: false, success: "", error: "" });
+    setLetterType("");
+    setChecklistState(PRE_SUBMISSION_CHECKLIST.reduce((acc, label) => ({ ...acc, [label]: false }), {}));
   }, [level]);
 
   useEffect(() => {
@@ -394,12 +415,36 @@ const QuestionOfDayPage = () => {
       return;
     }
 
+    const missingChecklistItems = [];
+    if (!letterType) {
+      missingChecklistItems.push("Letter type: formal or informal");
+    }
+    PRE_SUBMISSION_CHECKLIST.forEach((label) => {
+      if (!checklistState[label]) missingChecklistItems.push(label);
+    });
+    if (missingChecklistItems.length > 0) {
+      const topMissing = missingChecklistItems.slice(0, 3).join(" | ");
+      setSubmitState({
+        loading: false,
+        success: "",
+        error: `${CHECKLIST_ERROR_PREFIX} Missing: ${topMissing}`,
+      });
+      return;
+    }
+
     if (!tutorReviewCloudEnabled) {
       setSubmitState({ loading: false, success: "", error: "Tutor feedback is not connected in this environment yet." });
       return;
     }
 
     setSubmitState({ loading: true, success: "", error: "" });
+
+    const checklistReflection = [
+      "Student pre-submission checklist:",
+      `Letter type: ${letterType}`,
+      ...PRE_SUBMISSION_CHECKLIST.map((label) => `- ${label}: ${checklistState[label] ? "Yes" : "No"}`),
+    ];
+    if (tutorComment.trim()) checklistReflection.push("", `Tutor note: ${tutorComment.trim()}`);
 
     try {
       const result = await saveExamLetterForTutorReview({
@@ -411,7 +456,7 @@ const QuestionOfDayPage = () => {
         draft: trimmedAnswer,
         aiFeedback: "",
         revisedDraft: trimmedAnswer,
-        reflection: `Submitted from Exam Warm-up. Task:\n${shareText}`,
+        reflection: `Submitted from Exam Warm-up. Task:\n${shareText}\n\n${checklistReflection.join("\n")}`,
         source: "exam-warm-up",
       });
       saveWarmupLocally({ submittedToTutor: true, reviewId: result?.id || "" });
@@ -545,6 +590,46 @@ const QuestionOfDayPage = () => {
             placeholder="Add any note or question for your tutor..."
             style={{ ...styles.textArea, minHeight: 90 }}
           />
+          <div style={{ marginTop: 12, padding: 12, border: "1px solid #d1d5db", borderRadius: 10, background: "#f9fafb" }}>
+            <h4 style={{ margin: "0 0 6px" }}>Before you submit</h4>
+            <p style={{ ...styles.helperText, margin: "0 0 10px" }}>
+              Tick every box. If one box is not ticked, submission will not go through.
+            </p>
+            <div style={{ marginBottom: 10 }}>
+              <p style={{ margin: "0 0 6px" }}><strong>Letter type (required)</strong></p>
+              {LETTER_TYPE_OPTIONS.map((option) => (
+                <label key={option.value} style={{ display: "block", marginBottom: 6 }}>
+                  <input
+                    type="radio"
+                    name="letterType"
+                    value={option.value}
+                    checked={letterType === option.value}
+                    onChange={(event) => {
+                      setLetterType(event.target.value);
+                      setSubmitState({ loading: false, success: "", error: "" });
+                    }}
+                  />{" "}
+                  {option.label}
+                </label>
+              ))}
+            </div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {PRE_SUBMISSION_CHECKLIST.map((label) => (
+                <label key={label} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(checklistState[label])}
+                    onChange={(event) => {
+                      setChecklistState((prev) => ({ ...prev, [label]: event.target.checked }));
+                      setSubmitState({ loading: false, success: "", error: "" });
+                    }}
+                    style={{ marginTop: 2 }}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
             <button type="button" style={styles.primaryButton} onClick={submitWarmupToTutor} disabled={submitState.loading}>
               {submitState.loading ? "Sending..." : "Send Schreiben to tutor"}

@@ -15,6 +15,22 @@ const RUBRIC_LABELS = {
   lexis: "Lexis",
 };
 
+const WORD_RANGE_BY_LEVEL = {
+  A1: { min: 25, max: 45 },
+  A2: { min: 35, max: 65 },
+  B1: { min: 80, max: 140 },
+  B2: { min: 140, max: 220 },
+  C1: { min: 180, max: 280 },
+};
+
+const LEVEL_STRICTNESS = {
+  A1: 0.8,
+  A2: 0.9,
+  B1: 1,
+  B2: 1.1,
+  C1: 1.2,
+};
+
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const countWords = (value = "") => (String(value || "").trim().match(/\S+/g) || []).length;
 
@@ -32,6 +48,25 @@ const stripMarkdownSections = (text = "") =>
     .replace(/^\s*#{1,6}\s*(Grammar|Good|Needs Improvement)\s*:?\s*$/gim, "")
     .replace(/\*\*/g, "")
     .trim();
+
+const parseCorrectionsFromText = (feedback = "") => {
+  const text = cleanTags(feedback);
+  const correctionLines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => /→|->/.test(line))
+    .slice(0, 8);
+
+  return correctionLines.map((line) => {
+    const [wrong, rightAndReason] = line.split(/→|->/);
+    const [correct, reason] = String(rightAndReason || "").split(/\s+[–-]\s+/);
+    return {
+      wrong: (wrong || "").trim(),
+      correct: (correct || "").trim(),
+      reason: (reason || "Use the corrected form for accuracy.").trim(),
+    };
+  }).filter((item) => item.wrong && item.correct);
+};
 
 const extractScoreFromFeedback = (feedback = "", maxScore = 25) => {
   const text = String(feedback || "");
@@ -108,6 +143,8 @@ const WritingFeedbackCard = ({
   trend = null,
 }) => {
   const [showSimple, setShowSimple] = useState(["A1", "A2"].includes(level));
+  const [copyState, setCopyState] = useState("");
+  const [showRawFeedback, setShowRawFeedback] = useState(false);
   const draftWordCount = useMemo(() => countWords(draft), [draft]);
   const fallbackEstimated = useMemo(() => estimateScore({ feedback, wordCount: draftWordCount, level }), [feedback, draftWordCount, level]);
   const mappedCorrections = useMemo(() => {
