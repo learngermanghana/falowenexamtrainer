@@ -9,86 +9,40 @@ const CEFR_EXPECTATIONS = {
 };
 
 const RUBRIC_LABELS = {
-  task: "Task completion",
+  task: "Task",
   coherence: "Coherence",
   grammar: "Grammar",
   lexis: "Lexis",
-  overall: "Overall",
-};
-
-const CORRECTION_ICONS = {
-  grammar: "🧩",
-  "word order": "↔️",
-  spelling: "🔤",
-  register: "🗣️",
-};
-
-const parseCorrectionsFromText = (feedback = "") => {
-  const text = String(feedback || "");
-  if (!text.includes("[wrong]") || !text.includes("[correct]")) return [];
-
-  const regex = /\[wrong\]([\s\S]*?)\[\/wrong\]\s*→\s*\[correct\]([\s\S]*?)\[\/correct\](?:\s*—\s*Reason:\s*([\s\S]*?))?(?=(?:\n\s*\d+\.|\n\s*[-*]\s|\n\s*\[wrong\]|$))/gi;
-  const items = [];
-  let match = regex.exec(text);
-  while (match) {
-    items.push({
-      wrong: (match[1] || "").trim().replace(/^"|"$/g, ""),
-      correct: (match[2] || "").trim().replace(/^"|"$/g, ""),
-      reason: (match[3] || "").trim(),
-      category: "Grammar",
-    });
-    match = regex.exec(text);
-  }
-  return items;
-};
-
-const splitSentences = (text = "") => {
-  const normalized = String(text || "").replace(/\s+/g, " ").trim();
-  if (!normalized) return [];
-  return normalized.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
-};
-
-const countWords = (value = "") => {
-  const trimmed = String(value || "").trim();
-  if (!trimmed) return 0;
-  return trimmed.split(/\s+/).length;
-};
-
-const WORD_RANGE_BY_LEVEL = {
-  A1: { min: 20, max: 50 },
-  A2: { min: 50, max: 80 },
-  B1: { min: 80, max: 120 },
-  B2: { min: 120, max: 180 },
-  C1: { min: 180, max: 220 },
-};
-
-const LEVEL_STRICTNESS = {
-  A1: 0.55,
-  A2: 0.7,
-  B1: 0.9,
-  B2: 1.05,
-  C1: 1.2,
 };
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const countWords = (value = "") => (String(value || "").trim().match(/\S+/g) || []).length;
+
+const cleanTags = (text = "") =>
+  String(text || "")
+    .replace(/\[\/?wrong\]/gi, "")
+    .replace(/\[\/?correct\]/gi, "")
+    .replace(/\r/g, "")
+    .trim();
+
+const stripMarkdownSections = (text = "") =>
+  cleanTags(text)
+    .replace(/\*\*(Grammar|Good|Needs Improvement)\s*:\s*\*\*/gi, "")
+    .replace(/^\s*#{1,6}\s*Strengths and Weaknesses\s*$/gim, "")
+    .replace(/^\s*#{1,6}\s*(Grammar|Good|Needs Improvement)\s*:?\s*$/gim, "")
+    .replace(/\*\*/g, "")
+    .trim();
 
 const extractScoreFromFeedback = (feedback = "", maxScore = 25) => {
   const text = String(feedback || "");
   const slashMatch = text.match(/score\s*:\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/i);
   if (slashMatch) {
-    const parsedScore = Number(slashMatch[1]);
-    const parsedMax = Number(slashMatch[2]);
-    if (Number.isFinite(parsedScore) && Number.isFinite(parsedMax) && parsedMax > 0) {
-      const normalized = Math.round((parsedScore / parsedMax) * maxScore);
-      return clamp(normalized, 0, maxScore);
+    const score = Number(slashMatch[1]);
+    const max = Number(slashMatch[2]);
+    if (Number.isFinite(score) && Number.isFinite(max) && max > 0) {
+      return clamp(Math.round((score / max) * maxScore), 0, maxScore);
     }
   }
-  const plainMatch = text.match(/score\s*:\s*(\d+(?:\.\d+)?)/i);
-  if (!plainMatch) return null;
-  const value = Number(plainMatch[1]);
-  if (!Number.isFinite(value)) return null;
-  if (value <= maxScore) return clamp(Math.round(value), 0, maxScore);
-  if (value <= 100) return clamp(Math.round((value / 100) * maxScore), 0, maxScore);
   return null;
 };
 
@@ -106,70 +60,42 @@ const estimateScore = ({ feedback = "", wordCount = 0, level = "A1" }) => {
   return clamp(Math.round((wordQuality + 3.8 + positiveBoost - correctionPenalty) * 2.5), 0, 25);
 };
 
-const stripMarkup = (text = "") =>
-  String(text || "")
-    .replace(/\[wrong\]/gi, "❌ ")
-    .replace(/\[\/wrong\]/gi, "")
-    .replace(/\[correct\]/gi, "✅ ")
-    .replace(/\[\/correct\]/gi, "");
+const toSimpleFeedback = (raw = "", mappedCorrections = [], simplifiedFeedback = null) => {
+  const clean = stripMarkdownSections(raw);
+  const sentencePool = clean.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  const strengthsFromSimple = (simplifiedFeedback?.strengths || []).map(stripMarkdownSections).filter(Boolean);
+  const fixesFromSimple = (simplifiedFeedback?.topFixes || []).map(stripMarkdownSections).filter(Boolean);
 
-const INLINE_TOKEN_REGEX = /(\[wrong\][\s\S]*?\[\/wrong\]|\[correct\][\s\S]*?\[\/correct\]|\*\*[^*]+\*\*)/gi;
+  const strengths = strengthsFromSimple.length
+    ? strengthsFromSimple.slice(0, 2)
+    : sentencePool.filter((line) => /good|clear|strong|well|accurate|effective/i.test(line)).slice(0, 2);
 
-const renderFormattedLine = (line = "", index = 0) => {
-  const heading = line.match(/^#{1,6}\s+(.*)$/);
-  const content = heading ? heading[1] : line;
-  const tokens = content.split(INLINE_TOKEN_REGEX).filter(Boolean);
+  const corrections = mappedCorrections.length
+    ? mappedCorrections.slice(0, 4)
+    : fixesFromSimple.slice(0, 4).map((line) => {
+      const [wrong, correct] = line.split(/→|->/).map((part) => (part || "").trim());
+      return {
+        wrong: wrong || "Review this phrase",
+        correct: correct || "Use the correct form",
+        reason: "Keep this sentence clear and correct.",
+      };
+    });
 
-  return (
-    <div
-      key={`line-${index}`}
-      style={{
-        fontWeight: heading ? 700 : 400,
-        marginTop: heading ? 8 : 0,
-      }}
-    >
-      {tokens.map((token, tokenIndex) => {
-        if (/^\[wrong\][\s\S]*\[\/wrong\]$/i.test(token)) {
-          const text = token.replace(/^\[wrong\]|\[\/wrong\]$/gi, "").trim();
-          return (
-            <strong key={`token-${index}-${tokenIndex}`} style={{ color: "#991b1b", background: "#fee2e2", padding: "0 4px", borderRadius: 4 }}>
-              ❌ Wrong: {text}
-            </strong>
-          );
-        }
-        if (/^\[correct\][\s\S]*\[\/correct\]$/i.test(token)) {
-          const text = token.replace(/^\[correct\]|\[\/correct\]$/gi, "").trim();
-          return (
-            <strong key={`token-${index}-${tokenIndex}`} style={{ color: "#166534", background: "#dcfce7", padding: "0 4px", borderRadius: 4 }}>
-              ✅ Correct: {text}
-            </strong>
-          );
-        }
-        if (/^\*\*[^*]+\*\*$/.test(token)) {
-          return <strong key={`token-${index}-${tokenIndex}`}>{token.slice(2, -2)}</strong>;
-        }
-        return <span key={`token-${index}-${tokenIndex}`}>{token}</span>;
-      })}
-    </div>
-  );
-};
+  const nextAction = stripMarkdownSections(simplifiedFeedback?.nextAction || "Rewrite 2 sentences using the corrections above.");
 
-const normalizeCategory = (raw = "") => {
-  const lower = String(raw || "").toLowerCase();
-  if (lower.includes("order")) return "Word order";
-  if (lower.includes("spell")) return "Spelling";
-  if (lower.includes("register") || lower.includes("tone")) return "Register";
-  return "Grammar";
+  return {
+    strengths: strengths.length ? strengths : ["You answered the task and your message is understandable."],
+    corrections,
+    nextAction,
+  };
 };
 
 const styles = {
   wrap: { display: "grid", gap: 12 },
   card: { border: "1px solid #cbd5e1", background: "#f8fafc", borderRadius: 12, padding: 12 },
-  chip: { fontSize: 12, fontWeight: 700, padding: "3px 8px", borderRadius: 999, border: "1px solid #94a3b8" },
   correctionCard: { border: "1px solid #d1d5db", borderRadius: 12, padding: 10, background: "#ffffff" },
   wrong: { color: "#7f1d1d", background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: 8, padding: "6px 8px" },
   correct: { color: "#14532d", background: "#dcfce7", border: "1px solid #86efac", borderRadius: 8, padding: "6px 8px" },
-  pre: { whiteSpace: "pre-wrap", lineHeight: 1.6, margin: 0, display: "grid", gap: 4 },
 };
 
 const WritingFeedbackCard = ({
@@ -186,115 +112,111 @@ const WritingFeedbackCard = ({
   const fallbackEstimated = useMemo(() => estimateScore({ feedback, wordCount: draftWordCount, level }), [feedback, draftWordCount, level]);
   const mappedCorrections = useMemo(() => {
     if (Array.isArray(corrections) && corrections.length) {
-      return corrections.map((item) => ({
-        wrong: String(item?.wrong || "").trim(),
-        correct: String(item?.correct || "").trim(),
-        reason: String(item?.reason || "").trim(),
-        category: normalizeCategory(item?.category),
-      }));
+      return corrections
+        .map((item) => ({
+          wrong: cleanTags(item?.wrong || ""),
+          correct: cleanTags(item?.correct || ""),
+          reason: cleanTags(item?.reason || "") || "Use the corrected form for accuracy.",
+        }))
+        .filter((item) => item.wrong && item.correct)
+        .filter((item) => countWords(item.wrong) <= 18 && countWords(item.correct) <= 18 && countWords(item.reason) <= 20)
+        .slice(0, 4);
     }
-    return parseCorrectionsFromText(feedback);
+    return parseCorrectionsFromText(feedback).slice(0, 4);
   }, [corrections, feedback]);
 
-  const resolvedRubric = useMemo(() => {
-    const extractedOverall = extractScoreFromFeedback(feedback, 25);
-    if (rubric && typeof rubric === "object") {
-      const rubricOverall = Number(rubric?.overall || 0);
-      return {
-        ...rubric,
-        overall: rubricOverall > 0 ? rubricOverall : (extractedOverall ?? fallbackEstimated),
-      };
+  const overall = useMemo(() => {
+    const fromRubric = Number(rubric?.overall || 0);
+    if (fromRubric > 0) return fromRubric;
+    return extractScoreFromFeedback(feedback, 25) ?? 0;
+  }, [rubric, feedback]);
+
+  const simple = useMemo(() => toSimpleFeedback(feedback, mappedCorrections, simplifiedFeedback), [feedback, mappedCorrections, simplifiedFeedback]);
+  const cleanRaw = useMemo(() => stripMarkdownSections(feedback), [feedback]);
+
+  const handleCopy = async () => {
+    const text = [
+      `AI Feedback`,
+      `Score: ${overall}/25`,
+      "",
+      "What you did well",
+      ...simple.strengths.slice(0, 2).map((s) => `- ${s}`),
+      "",
+      "Fix these mistakes",
+      ...simple.corrections.slice(0, 4).flatMap((c) => [`- ❌ Needs fix: ${c.wrong}`, `  ✅ Better: ${c.correct}`, `  Why: ${c.reason}`]),
+      "",
+      "Next action",
+      `- ${simple.nextAction}`,
+    ].join("\n");
+
+    if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+      setCopyState("Copy is unavailable in this browser.");
+      return;
     }
-    return {
-      task: 0,
-      coherence: 0,
-      grammar: 0,
-      lexis: 0,
-      overall: extractedOverall ?? fallbackEstimated,
-      maxScore: 25,
-      source: "heuristic",
-    };
-  }, [rubric, fallbackEstimated, feedback]);
-
-  const readableFeedback = useMemo(() => stripMarkup(feedback), [feedback]);
-  const fallbackSimple = useMemo(() => {
-    const sentences = splitSentences(readableFeedback);
-    return {
-      topFixes: mappedCorrections.slice(0, 3).map((item) => `${item.wrong} → ${item.correct}`),
-      strengths: sentences.filter((line) => /good|clear|strong|excellent|well/i.test(line)).slice(0, 2),
-      nextAction: sentences.find((line) => /next improvement task|next action|focus on|improve/i.test(line)) || "Fix the top 3 errors, then rewrite one paragraph.",
-    };
-  }, [mappedCorrections, readableFeedback]);
-
-  const simple = simplifiedFeedback || fallbackSimple;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopyState("Clean feedback copied.");
+      window.setTimeout(() => setCopyState(""), 2000);
+    } catch (e) {
+      setCopyState("Could not copy feedback right now.");
+    }
+  };
 
   return (
     <div style={styles.wrap}>
       <div style={styles.card}>
-        <div style={{ fontWeight: 700 }}>What this level expects ({level})</div>
-        <div style={{ marginTop: 4, fontSize: 13 }}>{CEFR_EXPECTATIONS[level] || CEFR_EXPECTATIONS.A1}</div>
+        <strong>AI Feedback</strong>
+        <div style={{ marginTop: 4, fontWeight: 700 }}>Score: {overall}/25</div>
       </div>
 
       <div style={styles.card}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
-          <strong>Score rubric ({resolvedRubric.overall || 0}/{resolvedRubric.maxScore || 25})</strong>
-          {resolvedRubric.source === "heuristic" ? <span style={styles.chip}>Fallback estimate</span> : <span style={styles.chip}>Backend rubric</span>}
-        </div>
-        <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
-          {Object.entries(RUBRIC_LABELS).map(([key, label]) => (
-            <div key={key} style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
-              <span>{label}</span>
-              <strong>{Number(resolvedRubric[key] || 0)}</strong>
+        <strong>What you did well</strong>
+        <ul style={{ margin: "8px 0 0 18px" }}>
+          {simple.strengths.slice(0, 2).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
+        </ul>
+      </div>
+
+      <div style={styles.card}>
+        <strong>Fix these mistakes</strong>
+        <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+          {simple.corrections.slice(0, 4).map((item, index) => (
+            <div key={`${item.wrong}-${index}`} style={styles.correctionCard}>
+              <div style={styles.wrong}><strong>❌ Needs fix:</strong> {item.wrong}</div>
+              <div style={{ height: 6 }} />
+              <div style={styles.correct}><strong>✅ Better:</strong> {item.correct}</div>
+              <div style={{ marginTop: 6, fontSize: 14 }}><strong>Why:</strong> {item.reason}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {trend?.firstDraft ? (
-        <div style={styles.card}>
-          <strong>First draft vs improved draft</strong>
-          <div style={{ marginTop: 6 }}>Score delta: {trend.firstDraft.overall} → {trend.improvedDraft?.overall || 0} ({trend.delta >= 0 ? "+" : ""}{trend.delta})</div>
-          <div style={{ marginTop: 8, display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {(trend?.changes || []).map((chip) => <span key={chip} style={styles.chip}>{chip}</span>)}
-          </div>
-        </div>
-      ) : null}
-
-      {mappedCorrections.length ? (
-        <div style={{ display: "grid", gap: 8 }}>
-          <strong>Corrections (❌ Needs fix / ✅ Better)</strong>
-          {mappedCorrections.map((item, index) => {
-            const category = item.category || "Grammar";
-            const icon = CORRECTION_ICONS[category.toLowerCase()] || "🧩";
-            return (
-              <div key={`${item.wrong}-${index}`} style={styles.correctionCard}>
-                <div style={{ marginBottom: 6, fontWeight: 700 }}>{icon} {category}</div>
-                <div style={styles.wrong}><strong>❌ Needs fix:</strong> {item.wrong}</div>
-                <div style={{ height: 6 }} />
-                <div style={styles.correct}><strong>✅ Better:</strong> {item.correct}</div>
-                {item.reason ? <div style={{ marginTop: 6, fontSize: 14 }}><strong>Why:</strong> {item.reason}</div> : null}
-              </div>
-            );
-          })}
-        </div>
-      ) : null}
+      <div style={styles.card}>
+        <strong>Next action</strong>
+        <div style={{ marginTop: 6 }}>- {simple.nextAction}</div>
+      </div>
 
       <div style={styles.card}>
-        <label style={{ display: "flex", gap: 8, alignItems: "center", fontWeight: 700 }}>
-          <input type="checkbox" checked={showSimple} onChange={() => setShowSimple((prev) => !prev)} />
-          Show simplified feedback
-        </label>
-        {showSimple ? (
-          <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
-            <div><strong>Top 3 fixes</strong><ul>{(simple?.topFixes || []).slice(0, 3).map((item, idx) => <li key={`${item}-${idx}`}>{item}</li>)}</ul></div>
-            <div><strong>Best 2 strengths</strong><ul>{(simple?.strengths || []).slice(0, 2).map((item, idx) => <li key={`${item}-${idx}`}>{item}</li>)}</ul></div>
-            <div><strong>Next action</strong><div>{simple?.nextAction || "Revise and submit your improved draft."}</div></div>
-          </div>
-        ) : (
-          <div style={styles.pre}>
-            {(readableFeedback || "").split("\n").map((line, idx) => renderFormattedLine(line, idx))}
-          </div>
-        )}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+          <strong>Compact score rubric</strong>
+          <button type="button" onClick={handleCopy}>Copy feedback</button>
+        </div>
+        {copyState ? <div style={{ marginTop: 6, fontSize: 13 }}>{copyState}</div> : null}
+        <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 8, fontSize: 13 }}>
+          {Object.entries(RUBRIC_LABELS).map(([key, label]) => (
+            <div key={key} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 8px" }}>
+              <div>{label}</div>
+              <strong>{Number(rubric?.[key] || 0)}</strong>
+            </div>
+          ))}
+        </div>
+        <div style={{ marginTop: 8, fontSize: 12, color: "#475569" }}>Level focus ({level}): {CEFR_EXPECTATIONS[level] || CEFR_EXPECTATIONS.A1}</div>
+      </div>
+
+      <div style={styles.card}>
+        <button type="button" onClick={() => setShowRawFeedback((prev) => !prev)}>
+          {showRawFeedback ? "Hide full AI feedback" : "Show full AI feedback"}
+        </button>
+        {showRawFeedback ? <pre style={{ marginTop: 10, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{cleanRaw}</pre> : null}
       </div>
     </div>
   );

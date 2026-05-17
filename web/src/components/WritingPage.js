@@ -1921,7 +1921,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 simplifiedFeedback={markSimpleFeedback}
                 trend={feedbackTrend}
               />
-              <FeedbackAnnotations feedback={markFeedback} />
             </section>
           ) : null}
 
@@ -1937,7 +1936,6 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 simplifiedFeedback={improvedSimpleFeedback}
                 trend={feedbackTrend}
               />
-              <FeedbackAnnotations feedback={improvedFeedback} />
               <details style={{ marginTop: 10 }}>
                 <summary style={{ cursor: "pointer", fontWeight: 700 }}>Previous AI feedback</summary>
                 <WritingFeedbackCard
