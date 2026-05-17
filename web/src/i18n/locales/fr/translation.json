@@ -62,14 +62,13 @@
     },
     "examTabs": {
       "overview": "Aperçu",
-      "tutor": "Retours du tuteur",
+      "question": "Question du jour",
       "speaking": "Oral",
       "writing": "Écriture",
       "vocab": "Vocabulaire",
       "horen": "Écoute",
       "lesen": "Lecture",
       "resources": "Ressources",
-      "study": "Calendrier d’étude",
       "file": "Mon dossier d’examen"
     },
     "campusTabs": {
@@ -91,7 +90,6 @@
       "course": "Cours",
       "submit": "Envoyer un devoir",
       "ai": "Falowen A.I",
-      "study": "Calendrier d’étude",
       "exams": "Salle d’examens"
     },
     "actions": {
@@ -1443,6 +1441,7 @@
     },
     "tabs": {
       "overview": "Aperçu",
+      "question": "Question du jour",
       "studentData": "Données étudiant",
       "billing": "Facturation",
       "upgrade": "Niveau suivant"

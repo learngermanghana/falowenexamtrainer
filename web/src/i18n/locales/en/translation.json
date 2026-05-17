@@ -62,14 +62,13 @@
     },
     "examTabs": {
       "overview": "Overview",
-      "tutor": "Tutor feedback",
+      "question": "Question of the day",
       "speaking": "Speaking",
       "writing": "Writing",
       "vocab": "Vocab",
       "horen": "Listening",
       "lesen": "Reading",
       "resources": "Resources",
-      "study": "Study calendar",
       "file": "My Exam File"
     },
     "campusTabs": {
@@ -91,7 +90,6 @@
       "course": "Course book",
       "submit": "Submit work",
       "ai": "Falowen A.I",
-      "study": "Study calendar",
       "exams": "Exams room"
     },
     "actions": {
@@ -1554,6 +1552,7 @@
     },
     "tabs": {
       "overview": "Overview",
+      "question": "Question of the day",
       "studentData": "Student data",
       "billing": "Billing",
       "upgrade": "Upgrade"
