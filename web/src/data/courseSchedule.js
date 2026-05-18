@@ -870,7 +870,7 @@ const RAW_COURSE_SCHEDULES = {
           chapter: "1.2",
           video: "https://youtu.be/9CqtP3J5UGo",
           youtube_link: "https://youtu.be/9CqtP3J5UGo",
-          grammarbook_link: "/campus/course/personen-beschreiben-1-2-grammar-notes",
+          grammarbook_link: "/campus/course/a1-day-3-kapitel-1-2-grammar-notes",
           workbook_link: "/campus/course/a1-day-3-pronouns-introducing-yourself-workbook",
           assignment: true,
         },

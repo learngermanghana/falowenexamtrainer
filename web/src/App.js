@@ -49,6 +49,7 @@ import A1Day2Kapitel11WorkbookPage from "./components/A1Day2Kapitel11WorkbookPag
 import A1Day3GermanAlphabetReviewingWorkbookPage from "./components/A1Day3GermanAlphabetReviewingWorkbookPage";
 import A1Day3SchreibenSprechenKapitel11WorkbookPage from "./components/A1Day3SchreibenSprechenKapitel11WorkbookPage";
 import A1Day3Kapitel12WorkbookPage from "./components/A1Day3Kapitel12WorkbookPage";
+import A1Day3Kapitel12GrammarNotesPage from "./components/A1Day3Kapitel12GrammarNotesPage";
 import A1Day3PronounsIntroducingYourselfWorkbookPage from "./components/A1Day3PronounsIntroducingYourselfWorkbookPage";
 import A1Day5IntroducingYourselfArticlesWorkbookPage from "./components/A1Day5IntroducingYourselfArticlesWorkbookPage";
 import A1Day6FamilyAndHobbiesWorkbookPage from "./components/A1Day6FamilyAndHobbiesWorkbookPage";
@@ -854,6 +855,10 @@ const AppShell = ({
           <Route
             path="/campus/course/singular-pronouns-verb-conjugation-day-2"
             element={<SingularPronounsConjugationPage />}
+          />
+          <Route
+            path="/campus/course/a1-day-3-kapitel-1-2-grammar-notes"
+            element={<A1Day3Kapitel12GrammarNotesPage />}
           />
           <Route
             path="/campus/course/personen-beschreiben-1-2-grammar-notes"
