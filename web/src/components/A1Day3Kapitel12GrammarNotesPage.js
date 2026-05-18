@@ -176,7 +176,7 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>3) Important A1 notes</h2>
+        <h2 style={{ margin: 0 }}>3) Real A1-friendly notes (with English)</h2>
         <div style={noteStyle}>
           <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
             <li>
@@ -184,11 +184,16 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
               <em> Sie</em> = formal you.
             </li>
             <li>
-              <strong>Sie</strong> is always capitalized.
+              <strong>Sie</strong> is always capitalized because it means formal <em>you</em>.
             </li>
             <li>
-              Verb endings change with each pronoun: <em>ich lerne</em>, <em>du lernst</em>,
-              <em> wir lernen</em>.
+              <strong>ihr</strong> means <em>you guys</em> in English (informal plural), and it usually
+              takes the verb ending <strong>-t</strong>: <em>ihr lernt</em>, <em>ihr macht</em>,
+              <em> ihr kommt</em>.
+            </li>
+            <li>
+              Easy memory tip: <strong>du = -st</strong>, <strong>er/sie/es = -t</strong>,
+              <strong> wir/sie/Sie = -en</strong>, <strong>ihr = -t</strong>.
             </li>
           </ul>
         </div>
