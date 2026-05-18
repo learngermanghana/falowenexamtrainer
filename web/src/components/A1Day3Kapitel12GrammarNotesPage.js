@@ -200,67 +200,7 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
       </section>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>4) Verb endings for all pronouns (English translation)</h2>
-        <div style={{ overflowX: "auto" }}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={thTdStyle}>Pronoun</th>
-                <th style={thTdStyle}>English</th>
-                <th style={thTdStyle}>Ending</th>
-                <th style={thTdStyle}>Example with "lernen"</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={thTdStyle}>ich</td>
-                <td style={thTdStyle}>I</td>
-                <td style={thTdStyle}>-e</td>
-                <td style={thTdStyle}>ich lerne</td>
-              </tr>
-              <tr>
-                <td style={thTdStyle}>du</td>
-                <td style={thTdStyle}>you (one person, informal)</td>
-                <td style={thTdStyle}>-st</td>
-                <td style={thTdStyle}>du lernst</td>
-              </tr>
-              <tr>
-                <td style={thTdStyle}>er / sie / es</td>
-                <td style={thTdStyle}>he / she / it</td>
-                <td style={thTdStyle}>-t</td>
-                <td style={thTdStyle}>er lernt / sie lernt / es lernt</td>
-              </tr>
-              <tr>
-                <td style={thTdStyle}>wir</td>
-                <td style={thTdStyle}>we</td>
-                <td style={thTdStyle}>-en</td>
-                <td style={thTdStyle}>wir lernen</td>
-              </tr>
-              <tr>
-                <td style={thTdStyle}>ihr</td>
-                <td style={thTdStyle}>you guys (informal plural)</td>
-                <td style={thTdStyle}>-t</td>
-                <td style={thTdStyle}>ihr lernt</td>
-              </tr>
-              <tr>
-                <td style={thTdStyle}>sie</td>
-                <td style={thTdStyle}>they</td>
-                <td style={thTdStyle}>-en</td>
-                <td style={thTdStyle}>sie lernen</td>
-              </tr>
-              <tr>
-                <td style={thTdStyle}>Sie</td>
-                <td style={thTdStyle}>you (formal)</td>
-                <td style={thTdStyle}>-en</td>
-                <td style={thTdStyle}>Sie lernen</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>5) Knowledge test: Verb conjugation (8 questions)</h2>
+        <h2 style={{ margin: 0 }}>4) Knowledge test: Verb conjugation (8 questions)</h2>
         <p style={{ margin: 0 }}>
           Choose the correct verb form for each sentence using the correct personal pronoun.
         </p>
