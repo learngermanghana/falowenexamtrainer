@@ -44,10 +44,10 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
         </button>
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 3 · Personal Pronouns · Grammar Notes
+          A1 · Day 3 · Kapitel 1.2 · Personal Pronouns + Introducing Yourself · Grammar Notes
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          The right A1 notes for all basic German personal pronouns.
+          Day 3 focus: Personal Pronouns and Verb Conjugation + Introducing Yourself (Kapitel 1.2).
         </p>
       </header>
 
@@ -109,6 +109,16 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
           </ul>
         </div>
       </section>
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>4) Introducing yourself (Kapitel 1.2)</h2>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}><strong>Useful patterns:</strong> Ich heiße ..., Ich bin ..., Ich komme aus ..., Ich wohne in ... .</p>
+          <p style={{ margin: "8px 0 0 0" }}>
+            Example: <em>Hallo! Ich heiße Ama. Ich bin Studentin. Ich komme aus Ghana und ich wohne in Berlin.</em>
+          </p>
+        </div>
+      </section>
+
     </main>
   );
 };
