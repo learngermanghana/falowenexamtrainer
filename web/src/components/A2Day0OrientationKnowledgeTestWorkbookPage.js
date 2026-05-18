@@ -102,6 +102,17 @@ const questions = [
       "The course is designed to build Goethe exam readiness from the beginning.",
   },
   {
+    question: "Which set of points belongs to the informal invitation writing focus in this workbook?",
+    options: [
+      "Basic informal letter structure, giving a reason for writing, writing simple invitations, asking for a reply, and using informal greetings and closings",
+      "Only advanced business vocabulary and legal writing",
+      "Only grammar drills without any writing structure",
+    ],
+    answer: "A",
+    explanation:
+      "The writing focus includes informal letter structure, reason for writing, simple invitations, asking for a reply, and informal greetings/closings.",
+  },
+  {
     question: "Choose the correct sentence with 'weil'.",
     options: [
       "Ich lerne Deutsch, weil ich in Deutschland arbeiten möchte.",
