@@ -610,6 +610,10 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
               })}
             </div>
 
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              <strong>Example:</strong> {question.response}
+            </p>
+
             {checkedAnswers ? (
               <p style={{ margin: 0, lineHeight: 1.7 }}>
                 <strong>Correct answer:</strong> {question.correct}
