@@ -134,6 +134,127 @@ const questions = [
     explanation:
       "After 'deshalb', the conjugated verb comes in position 2: deshalb bleibe ich...",
   },
+  {
+    question: "Which sentence is a correct yes/no question?",
+    options: [
+      "Du kommst heute?",
+      "Kommst du heute?",
+      "Du heute kommst?",
+    ],
+    answer: "B",
+    explanation:
+      "In a yes/no question, the conjugated verb comes first: Kommst du heute?",
+  },
+  {
+    question: "Choose the correct W-question.",
+    options: [
+      "Wo du wohnst?",
+      "Wo wohnst du?",
+      "Wo du bist wohnst?",
+    ],
+    answer: "B",
+    explanation:
+      "In a W-question, the question word comes first and the verb comes second: Wo wohnst du?",
+  },
+  {
+    question: "Which sentence uses a time expression correctly?",
+    options: [
+      "Am Montag ich lerne Deutsch.",
+      "Ich lerne am Montag Deutsch.",
+      "Ich am Montag lerne Deutsch.",
+    ],
+    answer: "B",
+    explanation:
+      "This sentence places the time expression naturally in the middle field: Ich lerne am Montag Deutsch.",
+  },
+  {
+    question: "Which sentence follows the basic statement rule (verb in position 2)?",
+    options: [
+      "Ich jeden Tag lerne Deutsch.",
+      "Ich lerne jeden Tag Deutsch.",
+      "Ich Deutsch jeden Tag lerne.",
+    ],
+    answer: "B",
+    explanation:
+      "In a normal statement, the conjugated verb is in position 2: Ich lerne ...",
+  },
+  {
+    question: "Choose the correctly conjugated sentence.",
+    options: [
+      "Er lernen Deutsch.",
+      "Er lernt Deutsch.",
+      "Er lernst Deutsch.",
+    ],
+    answer: "B",
+    explanation:
+      "For 'er/sie/es', the verb ending is usually -t: er lernt.",
+  },
+  {
+    question: "Which sentence is a correct basic statement about routine?",
+    options: [
+      "Ich stehe um 7 Uhr auf.",
+      "Ich um 7 Uhr auf stehe.",
+      "Um 7 Uhr ich auf stehe.",
+    ],
+    answer: "A",
+    explanation:
+      "This is a correct A2-level basic statement with a time expression and separable verb.",
+  },
+  {
+    question: "Which sentence is a correct yes/no question with a time expression?",
+    options: [
+      "Hast du heute Zeit?",
+      "Du hast heute Zeit?",
+      "Heute du hast Zeit?",
+    ],
+    answer: "A",
+    explanation:
+      "Yes/no questions start with the verb: Hast du heute Zeit?",
+  },
+  {
+    question: "Which option is a suitable informal greeting?",
+    options: [
+      "Sehr geehrte Damen und Herren,",
+      "Hallo Anna,",
+      "Mit freundlichen Grüßen",
+    ],
+    answer: "B",
+    explanation:
+      "'Hallo Anna,' is a typical informal greeting for friends.",
+  },
+  {
+    question: "Which option is a suitable informal closing?",
+    options: [
+      "Liebe Grüße",
+      "Hochachtungsvoll",
+      "Sehr geehrte Frau Meier",
+    ],
+    answer: "A",
+    explanation:
+      "'Liebe Grüße' is a common informal closing.",
+  },
+  {
+    question: "Which sentence gives a reason for writing in an informal message?",
+    options: [
+      "Ich schreibe dir, weil ich dich zu meiner Party einladen möchte.",
+      "Ich schreibe dir, weil ich möchte dich zu meiner Party einladen.",
+      "Ich schreibe dir, weil ich dich möchte zu meiner Party einladen.",
+    ],
+    answer: "A",
+    explanation:
+      "This sentence is correct and clearly gives the reason for writing.",
+  },
+  {
+    question: "Which sentence asks for a reply politely in an informal invitation?",
+    options: [
+      "Bitte antworte mir bald.",
+      "Antwort mir bald bitte.",
+      "Bitte du antwortest mir bald.",
+    ],
+    answer: "A",
+    explanation:
+      "'Bitte antworte mir bald.' is a clear and correct A2-level request for a reply.",
+  },
 ];
 
 const getResultMessage = (score, total) => {
