@@ -107,54 +107,63 @@ const wWordQuestions = [
     stem: "1. ___ ist das?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Was",
+    response: "Was ist das? – Das ist ein Ball.",
   },
   {
     id: 2,
     stem: "2. ___ ist Martin?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wo",
+    response: "Wo ist Martin? – Martin ist in Ghana.",
   },
   {
     id: 3,
     stem: "3. ___ ist der Ball?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wie",
+    response: "Wie ist der Ball? – Der Ball ist klein.",
   },
   {
     id: 4,
     stem: "4. ___ ist das?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wer",
+    response: "Wer ist das? – Das ist Martin.",
   },
   {
     id: 5,
     stem: "5. ___ spielt mit dem Ball?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wer",
+    response: "Wer spielt mit dem Ball? – Martin spielt mit dem Ball.",
   },
   {
     id: 6,
     stem: "6. ___ heißt du?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wie",
+    response: "Wie heißt du? – Ich heiße Felix.",
   },
   {
     id: 7,
     stem: "7. ___ wohnt deine Mutter?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wo",
+    response: "Wo wohnt deine Mutter? – Meine Mutter wohnt in Berlin.",
   },
   {
     id: 8,
     stem: "8. ___ ist dein Job?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Was",
+    response: "Was ist dein Job? – Ich bin Lehrer.",
   },
   {
     id: 9,
     stem: "9. ___ heißt deine Mutter?",
     options: ["Was", "Wer", "Wie", "Wo"],
     correct: "Wie",
+    response: "Wie heißt deine Mutter? – Sie heißt Anna.",
   },
 ];
 
@@ -604,6 +613,8 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
             {checkedAnswers ? (
               <p style={{ margin: 0, lineHeight: 1.7 }}>
                 <strong>Correct answer:</strong> {question.correct}
+                <br />
+                <strong>Example answer:</strong> {question.response}
               </p>
             ) : null}
           </div>
