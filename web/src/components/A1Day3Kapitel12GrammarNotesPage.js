@@ -128,10 +128,10 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
         </button>
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A1 · Day 3 · Personal Pronouns · Grammar Notes
+          A1 · Day 3 · Kapitel 1.2 · Personal Pronouns + Introducing Yourself · Grammar Notes
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          The right A1 notes for all basic German personal pronouns.
+          Day 3 focus: Personal Pronouns and Verb Conjugation + Introducing Yourself (Kapitel 1.2).
         </p>
       </header>
 
@@ -198,67 +198,16 @@ const A1Day3Kapitel12GrammarNotesPage = () => {
           </ul>
         </div>
       </section>
-
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>4) Knowledge test: Verb conjugation (8 questions)</h2>
-        <p style={{ margin: 0 }}>
-          Choose the correct verb form for each sentence using the correct personal pronoun.
-        </p>
-
-        {quizQuestions.map((item, questionIndex) => {
-          const selected = selectedAnswers[questionIndex];
-          return (
-            <div key={item.question} style={quizCardStyle}>
-              <strong>
-                Question {questionIndex + 1}: {item.question}
-              </strong>
-              <div style={{ display: "grid", gap: 8 }}>
-                {item.options.map((option) => {
-                  const isChosen = selected === option;
-                  const isCorrect = submitted && option === item.answer;
-                  const isWrongChoice = submitted && isChosen && option !== item.answer;
-
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => handleSelectAnswer(questionIndex, option)}
-                      style={{
-                        ...optionButtonStyle,
-                        borderColor: isCorrect ? "#16a34a" : isWrongChoice ? "#dc2626" : "#cbd5e1",
-                        background: isCorrect ? "#dcfce7" : isWrongChoice ? "#fee2e2" : "#f8fafc",
-                        fontWeight: isChosen ? 700 : 400,
-                      }}
-                    >
-                      {option}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })}
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button type="button" style={styles.button} onClick={handleSubmit}>
-            Submit answers
-          </button>
-          <button type="button" style={styles.secondaryButton} onClick={handleReset}>
-            Reset quiz
-          </button>
+        <h2 style={{ margin: 0 }}>4) Introducing yourself (Kapitel 1.2)</h2>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}><strong>Useful patterns:</strong> Ich heiße ..., Ich bin ..., Ich komme aus ..., Ich wohne in ... .</p>
+          <p style={{ margin: "8px 0 0 0" }}>
+            Example: <em>Hallo! Ich heiße Ama. Ich bin Studentin. Ich komme aus Ghana und ich wohne in Berlin.</em>
+          </p>
         </div>
-
-        {submitted ? (
-          <div style={noteStyle}>
-            <strong>
-              Your score: {score} / {quizQuestions.length}
-            </strong>
-            <p style={{ margin: "8px 0 0 0" }}>
-              Review the highlighted answers and try again to improve your conjugation accuracy.
-            </p>
-          </div>
-        ) : null}
       </section>
+
     </main>
   );
 };
