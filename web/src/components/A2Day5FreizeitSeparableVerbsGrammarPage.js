@@ -39,6 +39,20 @@ const A2Day5FreizeitSeparableVerbsGrammarPage = () => {
     { infinitive: "mitkommen", stem: "kommen", prefix: "mit", meaning: "to come along" },
   ];
 
+  const importantPrefixes = [
+    { prefix: "ab", hint: "abfahren, abholen" },
+    { prefix: "an", hint: "anrufen, anfangen" },
+    { prefix: "auf", hint: "aufstehen, aufräumen" },
+    { prefix: "aus", hint: "ausgehen, ausruhen" },
+    { prefix: "ein", hint: "einkaufen, einladen" },
+    { prefix: "fern", hint: "fernsehen" },
+    { prefix: "mit", hint: "mitkommen, mitbringen" },
+    { prefix: "nach", hint: "nachfragen, nachdenken" },
+    { prefix: "vor", hint: "vorstellen, vorbereiten" },
+    { prefix: "weg", hint: "weggehen, wegfahren" },
+    { prefix: "zu", hint: "zumachen, zuhören" },
+  ];
+
   const examples = [
     "Ich stehe am Wochenende spät auf.",
     "Am Abend sehe ich oft fern.",
@@ -130,15 +144,51 @@ const A2Day5FreizeitSeparableVerbsGrammarPage = () => {
             </ul>
           </SectionCard>
 
-          <SectionCard title="4) Important reminder: modal verbs">
+          <SectionCard title="4) Prefixes you must know (student checklist)">
+            <p style={{ margin: 0 }}>
+              Learn these common separable prefixes first. They appear very often in A1/A2 speaking and writing.
+            </p>
+            <ul style={{ margin: 0, paddingLeft: 20 }}>
+              {importantPrefixes.map((item) => (
+                <li key={item.prefix}>
+                  <InlineCode>{item.prefix}</InlineCode> → {item.hint}
+                </li>
+              ))}
+            </ul>
+          </SectionCard>
+
+          <SectionCard title="5) Important reminder: modal verbs">
             <p style={{ margin: 0 }}>
               With modal verbs ({" "}
               <InlineCode>können, wollen, müssen</InlineCode>), the separable verb stays together in infinitive
               form at the end.
             </p>
             <p style={{ margin: 0 }}>
+              Compare the structure:
+              {" "}<InlineCode>Ich stehe um 7 Uhr auf.</InlineCode>
+              {" "}(no modal, prefix split)
+              {" "}vs.{" "}
+              <InlineCode>Ich muss um 7 Uhr aufstehen.</InlineCode>
+              {" "}(with modal, infinitive together).
+            </p>
+            <p style={{ margin: 0 }}>
               Example: <InlineCode>Ich will heute Abend fernsehen.</InlineCode>
             </p>
+            <p style={{ margin: 0 }}>
+              More examples: <InlineCode>Wir können heute nicht ausgehen.</InlineCode>,{" "}
+              <InlineCode>Er muss seine Mutter anrufen.</InlineCode>,{" "}
+              <InlineCode>Sie will am Samstag einkaufen.</InlineCode>
+            </p>
+          </SectionCard>
+
+          <SectionCard title="6) Knowledge test (quick self-check)">
+            <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 8 }}>
+              <li>Build one sentence with <InlineCode>aufstehen</InlineCode> without a modal.</li>
+              <li>Build one sentence with <InlineCode>aufstehen</InlineCode> with <InlineCode>müssen</InlineCode>.</li>
+              <li>Correct this: <InlineCode>Ich will stehe heute früh auf.</InlineCode></li>
+              <li>Choose the right sentence: <InlineCode>Wir gehen heute aus.</InlineCode> or <InlineCode>Wir aus gehen heute.</InlineCode></li>
+              <li>Write one Freizeit sentence with <InlineCode>fernsehen</InlineCode> and one with <InlineCode>mitkommen</InlineCode>.</li>
+            </ol>
           </SectionCard>
         </div>
       </div>
