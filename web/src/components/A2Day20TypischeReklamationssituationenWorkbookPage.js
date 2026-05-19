@@ -46,10 +46,32 @@ const questionBoxStyle = {
   gap: 8,
 };
 
+const miniPresentationCards = [
+  {
+    title: "Gute Einleitungen",
+    phrases: ["Ich möchte kurz über … sprechen.", "Heute geht es um …", "Meiner Meinung nach ist das Thema wichtig, weil …"],
+  },
+  {
+    title: "Verbindungswörter / Connectors",
+    phrases: ["und", "oder", "weil", "deshalb"],
+  },
+  {
+    title: "Eigene Meinung ausdrücken",
+    phrases: ["Ich finde, dass …", "Ich denke, dass …", "Für mich ist wichtig, dass …"],
+  },
+  {
+    title: "Gute Schlüsse",
+    phrases: ["Zum Schluss kann ich sagen, dass …", "Deshalb finde ich …", "Danke fürs Zuhören."],
+  },
+];
+
 const lesenQuestions = [
   {
     title: "1) Bewerbung (Job Application)",
-    prompt: "Was sind wichtige Punkte, die man in einem Bewerbungsschreiben erwähnen sollte? (One answer is correct)",
+    prompt:
+      "Was sind wichtige Punkte, die man in einem Bewerbungsschreiben erwähnen sollte? Warum sind sie wichtig? (One answer is correct)",
+    explanation:
+      "In einem Bewerbungsschreiben sollte man seine Qualifikationen und Erfahrungen erwähnen, weil sie die Eignung für die Stelle zeigen. Zusätzlich ist es wichtig, seine Motivation für die Bewerbung darzulegen und persönliche Stärken zu nennen.",
     options: [
       "a) Man sollte seine Hobbys erwähnen, weil sie zeigen, dass man vielseitig interessiert ist.",
       "b) Man sollte seine Gehaltsvorstellungen erwähnen, weil das zeigt, dass man weiß, was man wert ist.",
@@ -59,7 +81,9 @@ const lesenQuestions = [
   },
   {
     title: "2) Vorstellungsgespräch",
-    prompt: "Wie bereitet man sich auf ein Vorstellungsgespräch vor? (Two answers are correct)",
+    prompt: "Wie bereitet man sich auf ein Vorstellungsgespräch vor? Welche Tipps findest du besonders nützlich? (Two answers are correct)",
+    explanation:
+      "Man sollte die Firma gründlich recherchieren und häufige Fragen üben. Auch ein passendes Outfit und eine gute Planung des Arbeitswegs helfen, sicher und pünktlich zu sein.",
     options: [
       "a) Man sollte die Firma recherchieren, um gut informiert zu sein.",
       "b) Man sollte den Arbeitsweg üben, um pünktlich zu sein.",
@@ -69,7 +93,10 @@ const lesenQuestions = [
   },
   {
     title: "3) Berufswahl",
-    prompt: "Welche Faktoren sollte man bei der Wahl eines Berufs berücksichtigen? (Two answers are correct)",
+    prompt:
+      "Welche Faktoren sollte man bei der Wahl eines Berufs berücksichtigen? Warum sind diese Faktoren wichtig? (Two answers are correct)",
+    explanation:
+      "Wichtige Faktoren sind zum Beispiel die Bezahlung und die Arbeitszeiten. Diese Punkte beeinflussen finanzielle Sicherheit, Work-Life-Balance und die langfristige Zufriedenheit im Beruf.",
     options: [
       "a) Die Bezahlung, weil man finanziell abgesichert sein möchte.",
       "b) Die Arbeitszeiten, weil man eine gute Work-Life-Balance haben möchte.",
@@ -79,7 +106,10 @@ const lesenQuestions = [
   },
   {
     title: "4) Frauensachen (Women's Issues)",
-    prompt: "Welche Herausforderungen haben Frauen heute im Berufsleben? (Three answers are correct)",
+    prompt:
+      "Welche Herausforderungen haben Frauen heute im Berufsleben? Nenne konkrete Beispiele und mögliche Lösungen. (Three answers are correct)",
+    explanation:
+      "Typische Herausforderungen sind geringere Aufstiegschancen, niedrigere Gehälter und die Vereinbarkeit von Beruf und Familie. Lösungen können Frauenquoten, transparente Gehaltsstrukturen und flexible Arbeitszeiten sein.",
     options: [
       "a) Frauen haben oft geringere Aufstiegschancen. Eine Lösung wäre eine Frauenquote.",
       "b) Frauen verdienen häufig weniger als Männer. Transparente Gehaltsstrukturen könnten helfen.",
@@ -89,7 +119,9 @@ const lesenQuestions = [
   },
   {
     title: "5) Damals (Back Then)",
-    prompt: "Wie war das Leben vor 50 Jahren im Vergleich zu heute? (Three answers are correct)",
+    prompt: "Wie war das Leben vor 50 Jahren im Vergleich zu heute? Nenne mindestens drei Unterschiede. (Three answers are correct)",
+    explanation:
+      "Früher gab es weniger technische Geräte, die Menschen waren oft weniger mobil und die Arbeitszeiten waren häufig länger und härter als heute.",
     options: [
       "a) Es gab weniger technische Geräte im Haushalt.",
       "b) Die Menschen waren weniger mobil und reisten seltener.",
@@ -287,11 +319,45 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
             </ol>
           </div>
 
+          <div style={infoBoxStyle}>
+            <strong>Sprechen wie bei einer Mini-Präsentation</strong>
+            <ol style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+              <li>
+                <strong>Einleitung:</strong> Sage kurz, worum es geht.
+              </li>
+              <li>
+                <strong>Hauptteil mit Verbindungswörtern:</strong> Nutze einfache Wörter wie <strong>und</strong>,{" "}
+                <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.
+              </li>
+              <li>
+                <strong>Beispiel:</strong> Gib eine kurze Situation aus dem Alltag.
+              </li>
+              <li>
+                <strong>Schluss:</strong> Sage deine Meinung oder eine klare Zusammenfassung.
+              </li>
+            </ol>
+          </div>
+
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            {miniPresentationCards.map((card) => (
+              <div key={card.title} style={questionBoxStyle}>
+                <strong>{card.title}</strong>
+                <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+                  {card.phrases.map((phrase) => (
+                    <li key={`${card.title}-${phrase}`}>{phrase}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
           <div style={questionBoxStyle}>
-            <strong>📝 Beispielantwort</strong>
+            <strong>📝 Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              „Ich habe einmal online Schuhe bestellt, aber sie waren zu klein. Ich habe den Kundenservice kontaktiert und
-              sie haben mir schnell eine neue Größe geschickt. Das war ein guter Service."
+              „Ich möchte kurz über eine Reklamation sprechen. Letzten Monat habe ich einen Wasserkocher gekauft, aber er war
+              nach zwei Tagen kaputt. Ich bin in das Geschäft gegangen und habe die Quittung gezeigt, weil das wichtig war.
+              Die Mitarbeiterin war freundlich und hat mir sofort einen neuen Wasserkocher gegeben. Deshalb war ich am Ende
+              zufrieden. Zum Schluss kann ich sagen: Guter Service ist sehr wichtig."
             </p>
             <p style={{ margin: 0 }}>
               <strong>Impulsfrage:</strong> Hast du schon einmal etwas reklamieren müssen? Erzähle davon.
@@ -328,6 +394,7 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
             <div key={question.title} style={questionBoxStyle}>
               <strong>{question.title}</strong>
               <p style={{ margin: 0, lineHeight: 1.7 }}>{question.prompt}</p>
+              <p style={{ margin: 0, lineHeight: 1.7, color: "#374151" }}>{question.explanation}</p>
               <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
                 {question.options.map((option) => (
                   <li key={`${question.title}-${option}`}>{option}</li>
