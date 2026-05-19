@@ -36,6 +36,15 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const phraseCardStyle = {
+  border: "1px solid #dbeafe",
+  background: "#f8fbff",
+  borderRadius: 10,
+  padding: 12,
+  display: "grid",
+  gap: 8,
+};
+
 const lesenQuestions = [
   {
     stem: "1. Wo findet man Wohnungsanzeigen?",
@@ -257,6 +266,75 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
             <li>Haus oder Wohnung</li>
             <li>Nachbarn</li>
           </ul>
+
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze eine klare Struktur, damit dein Beitrag verständlich und stark klingt.
+          </p>
+          <ol style={listSpacing}>
+            <li>
+              <strong>Einleitung:</strong> Sag kurz, worüber du sprichst.
+            </li>
+            <li>
+              <strong>Hauptteil mit Verbindungswörtern:</strong> Verbinde deine Ideen mit einfachen Konnektoren wie{" "}
+              <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>.
+            </li>
+            <li>
+              <strong>Beispiel:</strong> Gib ein konkretes Beispiel aus deinem Alltag.
+            </li>
+            <li>
+              <strong>Schluss:</strong> Fasse deine Meinung in 1–2 Sätzen zusammen.
+            </li>
+          </ol>
+
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            <div style={phraseCardStyle}>
+              <strong>Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>Ich möchte kurz über meine Wohnungssuche sprechen.</li>
+                <li>Heute spreche ich über eine Wohnung, die ich suche.</li>
+                <li>Für mich ist dieses Thema wichtig, weil ...</li>
+              </ul>
+            </div>
+
+            <div style={phraseCardStyle}>
+              <strong>Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li>und: Ich suche eine Wohnung und ich brauche einen Balkon.</li>
+                <li>oder: Ich kann im Zentrum oder am Stadtrand wohnen.</li>
+                <li>weil: Ich möchte eine ruhige Wohnung, weil ich von zu Hause arbeite.</li>
+                <li>deshalb: Die Miete ist günstig, deshalb finde ich die Wohnung interessant.</li>
+              </ul>
+            </div>
+
+            <div style={phraseCardStyle}>
+              <strong>Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>Ich finde, dass die Lage sehr wichtig ist.</li>
+                <li>Meiner Meinung nach ist ein Balkon praktisch.</li>
+                <li>Für mich ist die Warmmiete wichtiger als die Wohnungsgröße.</li>
+              </ul>
+            </div>
+
+            <div style={phraseCardStyle}>
+              <strong>Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>Zusammenfassend suche ich eine Wohnung, die ruhig und hell ist.</li>
+                <li>Am Ende kann ich sagen: Die Lage und der Preis sind für mich am wichtigsten.</li>
+                <li>Deshalb möchte ich diese Wohnung gerne besichtigen.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style={questionCardStyle}>
+            <strong>Kurzes Modell (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Ich möchte kurz über meine Wohnungssuche sprechen. Ich suche eine Zwei-Zimmer-Wohnung, die nicht zu teuer
+              ist. Die Lage ist für mich wichtig, weil ich schnell zur Arbeit kommen möchte. Ich brauche auch eine
+              Küche und am besten einen kleinen Balkon. Die Wohnung kann im Zentrum oder in einer ruhigen Gegend sein.
+              Zusammenfassend sind für mich Preis, Lage und eine gute Verbindung mit Bus oder Bahn am wichtigsten.
+            </p>
+          </div>
 
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Speaking self-practice confidence check</strong>
