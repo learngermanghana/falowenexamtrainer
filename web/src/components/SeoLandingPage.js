@@ -276,17 +276,14 @@ const SeoLandingPage = ({ onSignUp, onLogin }) => {
 
         <SectionCard style={{ background: "#eff6ff", border: "1px solid #bfdbfe" }}>
           <div style={{ display: "grid", gap: 8 }}>
-            <h2 style={{ ...styles.sectionTitle, marginBottom: 0 }}>Explore assessments, tools, and the blog</h2>
+            <h2 style={{ ...styles.sectionTitle, marginBottom: 0 }}>Explore assessment and the blog</h2>
             <p style={{ margin: 0, fontSize: 13, color: "#334155", lineHeight: 1.7 }}>
-              Move between our placement assessment, exam practice tools, and latest blog articles to build a complete
+              Move between our placement assessment and latest blog articles to build a complete
               study flow.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
               <a href="/placement-test" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
                 Take placement assessment
-              </a>
-              <a href="/exams/overview" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-                Open exam tools
               </a>
               <a
                 href="https://blog.falowen.app"
