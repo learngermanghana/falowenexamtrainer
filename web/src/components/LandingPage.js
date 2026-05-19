@@ -493,16 +493,13 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
         </section>
 
         <section style={{ ...styles.card, display: "grid", gap: 10, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-          <h2 style={{ ...styles.sectionTitle, marginBottom: 0 }}>Continue with assessments, tools, and blog guides</h2>
+          <h2 style={{ ...styles.sectionTitle, marginBottom: 0 }}>Continue with assessment and blog guides</h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Use these internal links to move from assessment to practice tools and then to deeper reading on our blog.
+            Use these internal links to move from assessment to deeper reading on our blog.
           </p>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <a href="/placement-test" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
               Placement assessment
-            </a>
-            <a href="/exams/overview" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-              Exam practice tools
             </a>
             <a href="https://blog.falowen.app" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
               Blog articles
