@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -17,25 +17,6 @@ const thTdStyle = {
   verticalAlign: "top",
 };
 
-const quizCardStyle = {
-  border: "1px solid #d1d5db",
-  borderRadius: 12,
-  padding: 12,
-  display: "grid",
-  gap: 10,
-  background: "#fff",
-};
-
-const optionButtonStyle = {
-  width: "100%",
-  textAlign: "left",
-  border: "1px solid #cbd5e1",
-  borderRadius: 10,
-  padding: "8px 10px",
-  background: "#f8fafc",
-  cursor: "pointer",
-};
-
 const pronounRows = [
   ["ich", "I", "Ich lerne Deutsch."],
   ["du", "you (informal, one person)", "Du lernst Deutsch."],
@@ -48,73 +29,8 @@ const pronounRows = [
   ["Sie", "you (formal)", "Sie lernen Deutsch."],
 ];
 
-const quizQuestions = [
-  {
-    question: "Ich ___ Deutsch.",
-    options: ["lerne", "lernst", "lernt"],
-    answer: "lerne",
-  },
-  {
-    question: "Du ___ heute im Kurs.",
-    options: ["lernen", "lernst", "lernt"],
-    answer: "lernst",
-  },
-  {
-    question: "Er ___ in Berlin.",
-    options: ["wohnen", "wohnst", "wohnt"],
-    answer: "wohnt",
-  },
-  {
-    question: "Wir ___ jeden Tag.",
-    options: ["arbeiten", "arbeitest", "arbeitet"],
-    answer: "arbeiten",
-  },
-  {
-    question: "Ihr ___ sehr gut Deutsch.",
-    options: ["sprecht", "sprechen", "sprichst"],
-    answer: "sprecht",
-  },
-  {
-    question: "Sie (formal) ___ aus Accra?",
-    options: ["kommst", "kommen", "kommt"],
-    answer: "kommen",
-  },
-  {
-    question: "Sie (they) ___ Fußball.",
-    options: ["spielt", "spielen", "spielst"],
-    answer: "spielen",
-  },
-  {
-    question: "Es ___ kalt heute.",
-    options: ["sein", "bist", "ist"],
-    answer: "ist",
-  },
-];
-
 const A1Day3Kapitel12GrammarNotesPage = () => {
   const navigate = useNavigate();
-  const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [submitted, setSubmitted] = useState(false);
-
-  const score = useMemo(() => {
-    return quizQuestions.reduce((total, current, index) => {
-      const selected = selectedAnswers[index];
-      return selected === current.answer ? total + 1 : total;
-    }, 0);
-  }, [selectedAnswers]);
-
-  const handleSelectAnswer = (questionIndex, option) => {
-    setSelectedAnswers((prev) => ({ ...prev, [questionIndex]: option }));
-  };
-
-  const handleSubmit = () => {
-    setSubmitted(true);
-  };
-
-  const handleReset = () => {
-    setSelectedAnswers({});
-    setSubmitted(false);
-  };
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
