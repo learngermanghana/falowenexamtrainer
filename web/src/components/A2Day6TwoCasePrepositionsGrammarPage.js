@@ -81,17 +81,30 @@ const A2Day6TwoCasePrepositionsGrammarPage = () => {
             </p>
           </SectionCard>
 
-          <SectionCard title="3) A2 examples in Möbel und Räume context">
+          <SectionCard title="3) Real room examples: no movement vs. movement">
+            <p style={{ margin: 0 }}>
+              The <strong>same preposition</strong> changes the case depending on meaning:
+            </p>
             <ul style={{ margin: 0, paddingLeft: 20 }}>
               <li>
-                <strong>Wo?</strong> Der Tisch steht <strong>im</strong> Wohnzimmer. / Die Lampe hängt <strong>an der</strong> Wand.
+                <strong>in</strong>: Die Kommode steht <strong>im</strong> Flur. (no movement, dative) →
+                Ich stelle die Kommode <strong>in den</strong> Flur. (movement, accusative)
               </li>
               <li>
-                <strong>Wohin?</strong> Ich stelle den Stuhl <strong>in das</strong> Wohnzimmer. / Ich hänge das Bild <strong>an die</strong>{" "}
-                Wand.
+                <strong>an</strong>: Das Poster hängt <strong>an der</strong> Wand. (no movement, dative) →
+                Ich hänge das Poster <strong>an die</strong> Wand. (movement, accusative)
               </li>
               <li>
-                Das Bett steht <strong>neben dem</strong> Schrank, aber ich schiebe das Bett <strong>neben den</strong> Schrank.
+                <strong>auf</strong>: Die Bücher liegen <strong>auf dem</strong> Tisch. (no movement, dative) →
+                Ich lege die Bücher <strong>auf den</strong> Tisch. (movement, accusative)
+              </li>
+              <li>
+                <strong>unter</strong>: Der Teppich liegt <strong>unter dem</strong> Bett. (no movement, dative) →
+                Ich schiebe den Teppich <strong>unter das</strong> Bett. (movement, accusative)
+              </li>
+              <li>
+                <strong>zwischen</strong>: Der Sessel steht <strong>zwischen dem</strong> Sofa und der Lampe. (no movement, dative) →
+                Ich stelle den Sessel <strong>zwischen das</strong> Sofa und die Lampe. (movement, accusative)
               </li>
             </ul>
           </SectionCard>
