@@ -44,6 +44,12 @@ const videoPreviewStyle = {
   borderRadius: 10,
 };
 
+const phraseGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
+
 const lesenQuestions = [
   {
     stem: "Warum bin ich in die Stadt gezogen?",
@@ -311,6 +317,65 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
             <strong>Zimmer · Möbel · Wo? · Wohin?</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               <strong>Wie sieht dein Zimmer aus und was möchtest du darin verändern?</strong>
+            </p>
+          </div>
+
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+          </p>
+
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>1) Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>„Heute spreche ich über mein Zimmer.“</li>
+                <li>„Ich möchte meine Wohnung kurz vorstellen.“</li>
+                <li>„In meiner Präsentation geht es um Möbel und Räume.“</li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>2) Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li>
+                  <strong>und</strong>, <strong>oder</strong>
+                </li>
+                <li>
+                  <strong>weil</strong>, <strong>deshalb</strong>
+                </li>
+                <li>
+                  <strong>dann</strong>, <strong>danach</strong>, <strong>zum Schluss</strong>
+                </li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>3) Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>„Ich finde mein Wohnzimmer sehr gemütlich.“</li>
+                <li>„Meiner Meinung nach ist ein großer Tisch wichtig.“</li>
+                <li>„Ich mag mein Zimmer, weil es hell ist.“</li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>4) Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>„Zusammenfassend ist mein Zimmer klein, aber praktisch.“</li>
+                <li>„Zum Schluss möchte ich sagen: Ich fühle mich zu Hause sehr wohl.“</li>
+                <li>„Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Kurzes Modell (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute spreche ich über mein Wohnzimmer. Das Wohnzimmer ist nicht groß, aber sehr gemütlich. Es gibt ein
+              Sofa und einen Tisch, und die Lampe steht neben dem Sofa. Ich mag den Raum, <strong>weil</strong> er hell ist.
+              Ich möchte noch ein Regal kaufen, <strong>deshalb</strong> habe ich mehr Platz für Bücher. <strong>Zum Schluss</strong>{" "}
+              kann ich sagen: Mein Wohnzimmer ist praktisch und modern.“
             </p>
           </div>
 
