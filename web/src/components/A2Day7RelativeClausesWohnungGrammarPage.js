@@ -494,6 +494,7 @@ const A2Day7RelativeClausesWohnungGrammarPage = () => {
                     <th style={thTdStyle}>Noun</th>
                     <th style={thTdStyle}>Relative pronoun</th>
                     <th style={thTdStyle}>Example</th>
+                    <th style={thTdStyle}>English translation</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -505,6 +506,7 @@ const A2Day7RelativeClausesWohnungGrammarPage = () => {
                     <td style={thTdStyle}>
                       Der Makler, <strong>der</strong> sehr freundlich ist, kommt um 16 Uhr.
                     </td>
+                    <td style={thTdStyle}>The real estate agent, who is very friendly, is coming at 4 p.m.</td>
                   </tr>
                   <tr>
                     <td style={thTdStyle}>feminine</td>
@@ -514,6 +516,7 @@ const A2Day7RelativeClausesWohnungGrammarPage = () => {
                     <td style={thTdStyle}>
                       Die Wohnung, <strong>die</strong> wir suchen, ist im Zentrum.
                     </td>
+                    <td style={thTdStyle}>The apartment that we are looking for is in the city center.</td>
                   </tr>
                   <tr>
                     <td style={thTdStyle}>neuter</td>
@@ -523,6 +526,7 @@ const A2Day7RelativeClausesWohnungGrammarPage = () => {
                     <td style={thTdStyle}>
                       Das Zimmer, <strong>das</strong> sehr hell ist, gefällt mir.
                     </td>
+                    <td style={thTdStyle}>I like the room that is very bright.</td>
                   </tr>
                   <tr>
                     <td style={thTdStyle}>plural</td>
@@ -532,6 +536,7 @@ const A2Day7RelativeClausesWohnungGrammarPage = () => {
                     <td style={thTdStyle}>
                       Die Leute, <strong>die</strong> dort wohnen, sind nett.
                     </td>
+                    <td style={thTdStyle}>The people who live there are nice.</td>
                   </tr>
                 </tbody>
               </table>
