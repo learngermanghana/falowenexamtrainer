@@ -27,6 +27,7 @@ const questionCardStyle = {
   display: "grid",
   gap: 6,
 };
+const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
 
 const lesenQuestions = [
   {
@@ -196,6 +197,53 @@ const A2Day5FreizeitWorkbookPage = () => {
             <li><strong>Gesellschaft und Freunde:</strong> Freunde treffen, mit der Familie Zeit verbringen, Grillen, Ausgehen</li>
             <li><strong>Entspannung und Ruhe:</strong> Lesen, Musik hören, Spazieren gehen, Schlafen/Nickerchen, Yoga/Meditation</li>
           </ul>
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese klare Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+          </p>
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>1) Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>„Heute spreche ich über meine Freizeit.“</li>
+                <li>„Ich möchte kurz erzählen, was ich am Wochenende mache.“</li>
+                <li>„In meinem Beitrag geht es um meine Hobbys.“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>2) Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li><strong>und</strong>, <strong>oder</strong></li>
+                <li><strong>weil</strong>, <strong>deshalb</strong></li>
+                <li><strong>zuerst</strong>, <strong>dann</strong>, <strong>am Ende</strong></li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>3) Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>„Ich finde, ...“</li>
+                <li>„Meiner Meinung nach ist ...“</li>
+                <li>„Für mich ist ... wichtig, weil ...“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>4) Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>„Zum Schluss kann ich sagen, dass ...“</li>
+                <li>„Zusammenfassend ist Freizeit für mich wichtig.“</li>
+                <li>„Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Beispiel (30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute spreche ich über meine Freizeit am Wochenende. <strong>Zuerst</strong> mache ich Sport, <strong>weil</strong>{" "}
+              ich fit bleiben möchte. <strong>Dann</strong> treffe ich Freunde im Park, <strong>und</strong> wir spielen oft
+              Fußball <strong>oder</strong> gehen spazieren. Am Abend höre ich Musik, <strong>deshalb</strong> bin ich entspannt.
+              <strong> Zum Schluss</strong> kann ich sagen: Freizeit mit Bewegung und Freunden ist für mich perfekt.“
+            </p>
+          </div>
           <p style={{ margin: 0 }}><strong>Frage:</strong> Was machst du gern in deiner Freizeit?</p>
           <p style={{ margin: 0 }}><strong>Stichwörter:</strong> Freunde · Hobby · Wochenende · Sport</p>
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
