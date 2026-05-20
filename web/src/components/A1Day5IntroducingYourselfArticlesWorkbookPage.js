@@ -90,16 +90,30 @@ const heroImage =
   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1400&q=80";
 
 const articleWords = [
-  { noun: "Tisch", article: "der", english: "table" },
-  { noun: "Auto", article: "das", english: "car" },
-  { noun: "Lampe", article: "die", english: "lamp" },
-  { noun: "Apfel", article: "der", english: "apple" },
-  { noun: "Buch", article: "das", english: "book" },
-  { noun: "Katze", article: "die", english: "cat" },
-  { noun: "Stuhl", article: "der", english: "chair" },
-  { noun: "Haus", article: "das", english: "house" },
-  { noun: "Blume", article: "die", english: "flower" },
-  { noun: "Hund", article: "der", english: "dog" },
+  { noun: "Tisch", article: "der", english: "table", gender: "masculine" },
+  { noun: "Auto", article: "das", english: "car", gender: "neuter" },
+  { noun: "Lampe", article: "die", english: "lamp", gender: "feminine" },
+  { noun: "Apfel", article: "der", english: "apple", gender: "masculine" },
+  { noun: "Buch", article: "das", english: "book", gender: "neuter" },
+  { noun: "Katze", article: "die", english: "cat", gender: "feminine" },
+  { noun: "Stuhl", article: "der", english: "chair", gender: "masculine" },
+  { noun: "Haus", article: "das", english: "house", gender: "neuter" },
+  { noun: "Blume", article: "die", english: "flower", gender: "feminine" },
+  { noun: "Hund", article: "der", english: "dog", gender: "masculine" },
+];
+
+const sentenceReorderPhrases = [
+  "heisse, ich, Anna (Statement)",
+  "kommen, woher, Sie (Question)",
+  "bin, ich, Jahre alt, 25 (Statement)",
+  "aus, komme, ich, Deutschland (Statement)",
+  "ist, mein, Telefonnummer, 123456789 (Statement)",
+  "Entschuldigung, heißen, Sie, wie (Question)",
+  "wie, dir, es, geht (Question)",
+  "wie, Ihnen, es, geht (Question)",
+  "mir, gut, es, geht (Statement)",
+  "geht, mir, gut, es (Statement)",
+  "du, wohnst, wo (Question)",
 ];
 
 const adjectivePairs = [
@@ -246,12 +260,7 @@ const MobileSectionLabel = ({ children }) => (
 const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
   const navigate = useNavigate();
 
-  const [articleInputs, setArticleInputs] = useState(() =>
-    articleWords.reduce((acc, item) => {
-      acc[item.noun] = "";
-      return acc;
-    }, {})
-  );
+  const [articlePractice, setArticlePractice] = useState("");
 
   const [wWordSelections, setWWordSelections] = useState(() =>
     wWordQuestions.reduce((acc, _, index) => {
@@ -260,26 +269,16 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
     }, {})
   );
 
-  const [adjectiveSentences, setAdjectiveSentences] = useState({
-    one: "",
-    two: "",
-    three: "",
-  });
+  const [adjectivePractice, setAdjectivePractice] = useState("");
 
-  const [dialogueAnswers, setDialogueAnswers] = useState({
-    name: "",
-    country: "",
-    city: "",
-    age: "",
-  });
+  const [dialoguePractice, setDialoguePractice] = useState("");
+  const [sentenceReorderAnswer, setSentenceReorderAnswer] = useState("");
 
   const [aboutMe, setAboutMe] = useState("");
 
   const articleScore = useMemo(() => {
-    return articleWords.filter(
-      (item) => articleInputs[item.noun]?.trim().toLowerCase() === item.article
-    ).length;
-  }, [articleInputs]);
+    return articleWords.filter((item) => articlePractice.toLowerCase().includes(`${item.article} ${item.noun}`.toLowerCase())).length;
+  }, [articlePractice]);
 
   const wWordScore = useMemo(() => {
     return wWordQuestions.filter(
@@ -289,17 +288,14 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
 
   const completedSections = useMemo(() => {
     let count = 0;
-    if (Object.values(articleInputs).some(Boolean)) count += 1;
-    if (Object.values(adjectiveSentences).some(Boolean)) count += 1;
-    if (Object.values(dialogueAnswers).some(Boolean)) count += 1;
+    if (articlePractice.trim()) count += 1;
+    if (adjectivePractice.trim()) count += 1;
+    if (dialoguePractice.trim()) count += 1;
     if (Object.values(wWordSelections).some(Boolean)) count += 1;
     if (aboutMe.trim()) count += 1;
+    if (sentenceReorderAnswer.trim()) count += 1;
     return count;
-  }, [articleInputs, adjectiveSentences, dialogueAnswers, wWordSelections, aboutMe]);
-
-  const handleArticleChange = (noun, value) => {
-    setArticleInputs((prev) => ({ ...prev, [noun]: value }));
-  };
+  }, [articlePractice, adjectivePractice, dialoguePractice, wWordSelections, aboutMe, sentenceReorderAnswer]);
 
   const handleWWordChange = (index, value) => {
     setWWordSelections((prev) => ({ ...prev, [index]: value }));
@@ -341,7 +337,7 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           <div style={infoBoxStyle}>
             <strong>Progress</strong>
             <div style={{ lineHeight: 1.7 }}>
-              <div>Completed sections: {completedSections}/5</div>
+              <div>Completed sections: {completedSections}/6</div>
               <div>Articles: {articleScore}/{articleWords.length}</div>
               <div>W-words: {wWordScore}/{wWordQuestions.length}</div>
             </div>
@@ -383,41 +379,15 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
 
         <div style={boxBase}>
           <strong>Write the correct article</strong>
-          <p style={{ margin: 0, lineHeight: 1.7, color: "#4b5563" }}>
-            Type der, die, or das.
-          </p>
+          <p style={{ margin: 0, lineHeight: 1.7, color: "#4b5563" }}>Type der, die, or das. Then add if each noun is masculine, feminine, or neuter.</p>
 
-          <div style={{ display: "grid", gap: 12 }}>
-            {articleWords.map((item) => (
-              <div
-                key={item.noun}
-                style={{
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 12,
-                  padding: 12,
-                  display: "grid",
-                  gap: 8,
-                }}
-              >
-                <strong style={{ fontSize: 16 }}>
-                  {item.noun} <span style={{ color: "#6b7280", fontWeight: 500 }}>({item.english})</span>
-                </strong>
-                <input
-                  type="text"
-                  value={articleInputs[item.noun]}
-                  onChange={(e) => handleArticleChange(item.noun, e.target.value)}
-                  placeholder="der / die / das"
-                  style={inputStyle}
-                />
-              </div>
-            ))}
-          </div>
+          <textarea value={articlePractice} onChange={(e) => setArticlePractice(e.target.value)} placeholder="Example:\nder Tisch - masculine\ndas Auto - neuter\ndie Lampe - feminine" style={textareaStyle} />
 
           <RevealAnswer buttonLabel="Show article answers">
             <div style={{ display: "grid", gap: 8, lineHeight: 1.7 }}>
               {articleWords.map((item) => (
                 <div key={item.noun}>
-                  <strong>{item.article}</strong> {item.noun}
+                  <strong>{item.article}</strong> {item.noun} - {item.gender}
                 </div>
               ))}
             </div>
@@ -452,44 +422,7 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
         <div style={boxBase}>
           <strong>Write your own sentences</strong>
 
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Sentence 1 with <strong>groß</strong></span>
-            <input
-              type="text"
-              value={adjectiveSentences.one}
-              onChange={(e) =>
-                setAdjectiveSentences((prev) => ({ ...prev, one: e.target.value }))
-              }
-              placeholder="Der Hund ist groß."
-              style={inputStyle}
-            />
-          </label>
-
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Sentence 2 with <strong>klein</strong></span>
-            <input
-              type="text"
-              value={adjectiveSentences.two}
-              onChange={(e) =>
-                setAdjectiveSentences((prev) => ({ ...prev, two: e.target.value }))
-              }
-              placeholder="Die Katze ist klein."
-              style={inputStyle}
-            />
-          </label>
-
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Sentence 3 with <strong>neu</strong> or <strong>schön</strong></span>
-            <input
-              type="text"
-              value={adjectiveSentences.three}
-              onChange={(e) =>
-                setAdjectiveSentences((prev) => ({ ...prev, three: e.target.value }))
-              }
-              placeholder="Das Buch ist neu."
-              style={inputStyle}
-            />
-          </label>
+          <textarea value={adjectivePractice} onChange={(e) => setAdjectivePractice(e.target.value)} placeholder="Write 3-5 adjective sentences here..." style={textareaStyle} />
         </div>
       </SectionCard>
 
@@ -544,59 +477,7 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
           </div>
         </div>
 
-        <div style={{ display: "grid", gap: 12 }}>
-          <div style={boxBase}>
-            <strong>A: Wie heißt du?</strong>
-            <input
-              type="text"
-              value={dialogueAnswers.name}
-              onChange={(e) =>
-                setDialogueAnswers((prev) => ({ ...prev, name: e.target.value }))
-              }
-              placeholder="Ich heiße ..."
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={boxBase}>
-            <strong>A: Woher kommst du?</strong>
-            <input
-              type="text"
-              value={dialogueAnswers.country}
-              onChange={(e) =>
-                setDialogueAnswers((prev) => ({ ...prev, country: e.target.value }))
-              }
-              placeholder="Ich komme aus ..."
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={boxBase}>
-            <strong>A: Wo wohnst du?</strong>
-            <input
-              type="text"
-              value={dialogueAnswers.city}
-              onChange={(e) =>
-                setDialogueAnswers((prev) => ({ ...prev, city: e.target.value }))
-              }
-              placeholder="Ich wohne in ..."
-              style={inputStyle}
-            />
-          </div>
-
-          <div style={boxBase}>
-            <strong>A: Wie alt bist du?</strong>
-            <input
-              type="text"
-              value={dialogueAnswers.age}
-              onChange={(e) =>
-                setDialogueAnswers((prev) => ({ ...prev, age: e.target.value }))
-              }
-              placeholder="Ich bin ... Jahre alt."
-              style={inputStyle}
-            />
-          </div>
-        </div>
+        <textarea value={dialoguePractice} onChange={(e) => setDialoguePractice(e.target.value)} placeholder="Write the full mini dialogue here..." style={textareaStyle} />
 
         <div style={warningBoxStyle}>
           <strong>A1 statement rule</strong>
@@ -618,6 +499,38 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
             <div><strong>B:</strong> Ich wohne in Accra.</div>
             <div><strong>A:</strong> Wie alt bist du?</div>
             <div><strong>B:</strong> Ich bin 24 Jahre alt.</div>
+          </div>
+        </RevealAnswer>
+      </SectionCard>
+
+      <SectionCard title="Teil 6 · Scrambled Sentences" subtitle="Rearrange the words to form correct German sentences and mark each as statement or question.">
+        <div style={infoBoxStyle}>
+          <strong>Instructions</strong>
+          <div style={{ lineHeight: 1.8 }}>
+            <div>1. Statements: Subject + Verb + Other elements (Ich heiße Anna.)</div>
+            <div>2. W-questions: W-word + Verb + Pronoun (Woher kommen Sie?)</div>
+          </div>
+        </div>
+        <div style={boxBase}>
+          <strong>Rearrange these phrases</strong>
+          <div style={{ lineHeight: 1.8 }}>
+            {sentenceReorderPhrases.map((phrase, index) => <div key={phrase}>{index + 1}. {phrase}</div>)}
+          </div>
+        </div>
+        <textarea value={sentenceReorderAnswer} onChange={(e) => setSentenceReorderAnswer(e.target.value)} placeholder="Write all corrected sentences here..." style={textareaStyle} />
+        <RevealAnswer buttonLabel="Show scrambled sentence answers">
+          <div style={{ lineHeight: 1.8 }}>
+            <div>1. Ich heiße Anna. (Statement)</div>
+            <div>2. Woher kommen Sie? (Question)</div>
+            <div>3. Ich bin 25 Jahre alt. (Statement)</div>
+            <div>4. Ich komme aus Deutschland. (Statement)</div>
+            <div>5. Meine Telefonnummer ist 123456789. (Statement)</div>
+            <div>6. Entschuldigung, wie heißen Sie? (Question)</div>
+            <div>7. Wie geht es dir? (Question)</div>
+            <div>8. Wie geht es Ihnen? (Question)</div>
+            <div>9. Es geht mir gut. (Statement)</div>
+            <div>10. Mir geht es gut. (Statement)</div>
+            <div>11. Wo wohnst du? (Question)</div>
           </div>
         </RevealAnswer>
       </SectionCard>
