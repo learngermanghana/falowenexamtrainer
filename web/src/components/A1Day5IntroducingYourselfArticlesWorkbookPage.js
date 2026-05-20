@@ -558,7 +558,13 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
                 <strong>English hint:</strong> {question.englishHint}
               </div>
 
-              <div style={{ display: "grid", gap: 10 }}>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 10,
+                }}
+              >
                 {question.options.map((option) => {
                   const selected = wWordSelections[index] === option;
 
@@ -566,14 +572,13 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
                     <label
                       key={option}
                       style={{
-                        display: "flex",
+                        display: "inline-flex",
                         alignItems: "center",
-                        gap: 12,
+                        gap: 10,
                         border: "1px solid #e5e7eb",
-                        borderRadius: 12,
-                        padding: 12,
-                        background: selected ? "#f9fafb" : "#fff",
-                        minHeight: 52,
+                        borderRadius: 999,
+                        padding: "10px 14px",
+                        background: selected ? "#eff6ff" : "#fff",
                         cursor: "pointer",
                       }}
                     >
@@ -583,7 +588,7 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
                         value={option}
                         checked={selected}
                         onChange={() => handleWWordChange(index, option)}
-                        style={{ transform: "scale(1.2)" }}
+                        style={{ transform: "scale(1.1)" }}
                       />
                       <span style={{ fontSize: 15 }}>{option}</span>
                     </label>
