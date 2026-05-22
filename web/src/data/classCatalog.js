@@ -31,14 +31,16 @@ const classCatalogDictionary = {
     docId: "1H87C3y6Xj09PY-giD1N73Mv8qbzCb8zk",
   },
   "A1 Hamburg Klasse": {
-    startDate: "2026-01-30",
-    endDate: "2026-03-27",
+    startDate: "2026-06-09",
+    orientationDate: "2026-06-09",
+    endDate: "2026-08-04",
     schedule: [
-      { day: "Thursday", startTime: "18:00", endTime: "19:00" },
-      { day: "Friday", startTime: "18:00", endTime: "19:00" },
-      { day: "Saturday", startTime: "8:00", endTime: "9:00" },
+      { day: "Monday", startTime: "18:00", endTime: "19:00" },
+      { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
+      { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
     ],
-    docId: "1eYBFqrJdlTtCdV9ZPg2gc-a0zZxCiXJS",
+    docUrl:
+      "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-06-09&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "A1 Dortmund Klasse": {
     startDate: "2026-03-09",
