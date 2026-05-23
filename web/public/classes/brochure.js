@@ -2,6 +2,151 @@ const DAY_INDEX = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4,
 let brochureData = null;
 let selectedClassId = null;
 
+const COURSE_TITLES_BY_LEVEL = {
+  A1: {
+    1: "Greetings and Asking About Well-being",
+    2: "German Alphabet + Personal Pronouns and Verb Conjugation",
+    3: "Pronouns and Identity Expressions in German + Introducing Yourself",
+    4: "Numbers and Addresses",
+    5: "Introducing Yourself and Articles",
+    6: "Family and Hobbies",
+    7: "Asking About Prices and Preferences",
+    8: "Countries and Languages",
+    9: "Nominative and Accusative Cases",
+    10: "Objects, Colors and Possessive Articles + Asking for and Giving Directions",
+    11: "Understanding Time",
+    12: "The 24 Hour Clock and Dates",
+    13: "Revision: Numbers, Time and Prices",
+    14: "Modal Verbs",
+    15: "Imperatives",
+    16: "Food and Negation + Food and Daily Life",
+    17: "Instructions and Directions",
+    18: "Two-way Prepositions + Directions and Movement",
+    19: "Goethe A1 Speaking Practice",
+    20: "Introduction to Letter Writing",
+    21: "Weather + Weather Speaking Practice",
+    22: "Health and Body Parts + Health Speaking Practice",
+    23: "Dative and Accusative Verbs",
+    24: "Schreiben & Sprechen",
+  },
+  A2: {
+    1: "Small Talk",
+    2: "Personen beschreiben",
+    3: "Dinge und Personen vergleichen",
+    4: "Wo möchten wir uns treffen?",
+    5: "Was machst du in deiner Freizeit?",
+    6: "Möbel und Räume kennenlernen",
+    7: "Eine Wohnung suchen",
+    8: "Rezepte und Essen",
+    9: "Urlaub",
+    10: "Tourismus und traditionelle Feste",
+    11: "Unterwegs: Verkehrsmittel vergleichen",
+    12: "Mein Traumberuf",
+    13: "Ein Vorstellungsgespräch",
+    14: "Beruf und Karriere",
+    15: "Mein Lieblingssport",
+    16: "Hobbys und Interessen",
+    17: "Einladung und Vorschläge",
+    18: "Die Bank anrufen",
+    19: "Einkaufen? Wo und wie?",
+    20: "Feste und Traditionen",
+    21: "In der Stadt orientieren",
+    22: "Wie war dein Wochenende?",
+    23: "Wie kommst du zur Schule oder zur Arbeit?",
+    24: "Einen Urlaub planen",
+    25: "Tagesablauf",
+    26: "Gefühle beschreiben",
+    27: "Digitale Kommunikation",
+    28: "Über die Zukunft sprechen",
+  },
+  B1: {
+    1: "Der Besichtigungstermin",
+    2: "Leben in der Stadt oder auf dem Land",
+    3: "Fast Food vs Hausmannskost",
+    4: "Alles für die Gesundheit",
+    5: "Work-Life-Balance im modernen Arbeitsumfeld",
+    6: "Digitale Auszeit und Selbstfürsorge",
+    7: "Teamspiele und kooperative Aktivitäten",
+    8: "Abenteuer in der Natur",
+    9: "Eine Filmkritik schreiben",
+    10: "Traditionelles vs digitales Lernen",
+    11: "Medien und Arbeiten im Homeoffice",
+    12: "Prüfungsangst und Stressbewältigung",
+    13: "Wie lernt man am besten?",
+    14: "Wege zum Wunschberuf",
+    15: "Das Vorstellungsgespräch",
+    16: "Wie wird man …? Ausbildung und Qualifikation",
+    17: "Lebensformen heute – Familie und Wohngemeinschaft",
+    18: "Was ist dir in einer Beziehung wichtig?",
+    19: "Erstes Date – typische Situationen",
+    20: "Konsum und Nachhaltigkeit",
+    21: "Online einkaufen – Rechte und Risiken",
+    22: "Reiseprobleme und Lösungen",
+    23: "Umweltfreundlich im Alltag",
+    24: "Klimafreundlich leben",
+  },
+  B2: {
+    1: "Persönliche Identität und Selbstverständnis",
+    2: "Beziehungen und Kommunikation",
+    3: "Öffentliches vs. privates Leben",
+    4: "Beruf und Karriere",
+    5: "Bildung und Lernen",
+    6: "Migration und Integration",
+    7: "Gesellschaftliche Vielfalt",
+    8: "Politik und Engagement",
+    9: "Technologie und Digitalisierung",
+    10: "Umwelt und Nachhaltigkeit",
+    11: "Gesundheit und Wohlbefinden",
+    12: "Konsum und Medien",
+    13: "Reisen und Mobilität",
+    14: "Wohnen und Zusammenleben",
+    15: "Kunst und Kultur",
+    16: "Wissenschaft und Forschung",
+    17: "Feste und Traditionen",
+    18: "Freizeit und Hobbys",
+    19: "Ernährung und Esskultur",
+    20: "Mode und Lebensstil",
+    21: "Werte und Normen",
+    22: "Sprache und Kommunikation",
+    23: "Innovation und Zukunft",
+    24: "Gesellschaftliche Herausforderungen",
+    25: "Globalisierung und internationale Beziehungen",
+    26: "Kreatives Schreiben und Projekte",
+    27: "Prüfungstraining und Wiederholung",
+    28: "Abschlusspräsentation und Feedback",
+  },
+  C1: {
+    1: "Ziele und Lernweg",
+    2: "Kultur und Identität",
+    3: "Medien und Informationskompetenz",
+    4: "Beziehungen und Teamarbeit",
+    5: "Berufliche Entwicklung",
+    6: "Gesundheit und Lebensstil",
+    7: "Reisen und Nachhaltigkeit",
+    8: "Wohnen und Stadtentwicklung",
+    9: "Konsum und Werbung",
+    10: "Integration und Gesellschaft",
+    11: "Engagement und Ehrenamt",
+    12: "Freizeit und Kultur",
+    13: "Mehrsprachigkeit",
+    14: "Innovation und Zukunft",
+    15: "Bildung und lebenslanges Lernen",
+    16: "Technologie im Alltag",
+    17: "Umwelt und Verantwortung",
+    18: "Gesellschaft und Zusammenhalt",
+    19: "Arbeit der Zukunft",
+    20: "Digitale Gesundheit",
+    21: "Migration und Teilhabe",
+    22: "Politik und Mitbestimmung",
+    23: "Freizeit und Work-Life-Balance",
+    24: "Mobilität und Infrastruktur",
+    25: "Wissenschaft und Forschung",
+    26: "Nachhaltiger Konsum",
+    27: "Digitalisierung und Verwaltung",
+    28: "Review und Transfer",
+  },
+};
+
 const formatMoney = (amount) => `GHS ${Number(amount || 0).toLocaleString("en-GH")}`;
 const formatDate = (iso) => {
   if (!iso) return "Always open";
@@ -72,6 +217,16 @@ function getCourseList() {
   return upcoming.length ? upcoming : brochureData.classes;
 }
 
+function getCurriculumTitle(level, lessonDay) {
+  return COURSE_TITLES_BY_LEVEL[level]?.[lessonDay] || "";
+}
+
+function getSessionLabel(course, sessionIndex) {
+  if (sessionIndex === 0 && course.orientationDate) return "Orientation";
+  const lessonDay = course.orientationDate ? sessionIndex : sessionIndex + 1;
+  return getCurriculumTitle(course.level, lessonDay) || `Lesson ${lessonDay}`;
+}
+
 function generateSchedule(course) {
   if (!course.startDate || !course.meetingDays?.length || !course.totalSessions) return [];
   const output = [];
@@ -88,7 +243,7 @@ function generateSchedule(course) {
         day: slot.day,
         startTime: slot.startTime,
         endTime: slot.endTime,
-        label: index === 0 && course.orientationDate ? "Orientation" : index === 1 && course.orientationDate ? "Lesson 1" : `Lesson ${course.orientationDate ? index : index + 1}`,
+        label: getSessionLabel(course, index),
       });
     });
     cursor = addDays(cursor, 1);
@@ -116,6 +271,15 @@ function renderTabs(courseList) {
     button.onclick = () => selectCourse(course);
     tabs.appendChild(button);
   });
+}
+
+function updateHeroText() {
+  const heroTitle = document.querySelector(".hero h1");
+  const heroText = document.querySelector(".hero p");
+  if (heroTitle) heroTitle.textContent = "Welcome to our German learning community.";
+  if (heroText) {
+    heroText.textContent = "You are welcome to join Falowen, where we have helped many students in Ghana and beyond build German step by step, prepare for exams, and stay consistent with live classes, recordings, assignments, and app support.";
+  }
 }
 
 function updateMeta(course, shareUrl) {
@@ -166,10 +330,7 @@ function ensureClassLayout() {
     if (node) body.appendChild(node);
   });
 
-  if (paymentCard) {
-    paymentCard.querySelectorAll(".button").forEach((button) => button.parentElement?.classList.add("payment-buttons"));
-    body.appendChild(paymentCard);
-  }
+  if (paymentCard) body.appendChild(paymentCard);
 
   mainClassCard.innerHTML = "";
   mainClassCard.appendChild(blueHeader);
@@ -244,6 +405,7 @@ function render() {
   const balance = Math.max((course.tuitionGhs || 0) - firstPayment, 0);
   const shareUrl = getClassShareUrl(course);
 
+  updateHeroText();
   renderTabs(sourceList);
   updateMeta(course, shareUrl);
   hideClassInformationBox();
@@ -275,12 +437,12 @@ function render() {
   document.getElementById("classTitle").textContent = course.title;
   document.getElementById("classFormat").textContent = course.format;
   document.getElementById("stats").innerHTML = [
-    ["Total fee", formatMoney(course.tuitionGhs)],
-    ["First payment", formatMoney(firstPayment)],
-    ["Balance after first payment", formatMoney(balance)],
+    ["Pay full course fee", formatMoney(course.tuitionGhs)],
+    ["Or start with installment", `${formatMoney(firstPayment)} first payment`],
+    ["Balance after installment", `${formatMoney(balance)} after 1 month`],
   ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join("");
   document.getElementById("highlights").innerHTML = (course.highlights || []).map((item) => `<li>${item}</li>`).join("");
-  document.getElementById("paymentSummary").textContent = `${course.title}: pay ${formatMoney(course.tuitionGhs)} in full or reserve your seat with ${formatMoney(firstPayment)}. Remaining balance: ${formatMoney(balance)} due one month after the first payment.`;
+  document.getElementById("paymentSummary").textContent = `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due one month after the first payment.`;
   document.getElementById("payLink").href = paymentLink;
   document.getElementById("payHero").href = paymentLink;
   const shareLink = document.getElementById("shareLink");
@@ -293,7 +455,7 @@ function render() {
     ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>${course.location}</td></tr>`).join("")
     : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`;
 
-  const copy = `${course.title}\nFee: ${formatMoney(course.tuitionGhs)}\nFirst payment: ${formatMoney(firstPayment)}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nPayment link: ${paymentLink}`;
+  const copy = `${course.title}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after 1 month\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nPayment link: ${paymentLink}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
