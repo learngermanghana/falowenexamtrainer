@@ -25,6 +25,9 @@
     "typescript": "4.9.5"
   },
   "scripts": {
+    "sync:classes": "node scripts/sync-class-brochure-data.mjs",
+    "prestart": "npm run sync:classes",
+    "prebuild": "npm run sync:classes",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
