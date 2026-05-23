@@ -28,12 +28,21 @@
     return `/signup/?class=${encodeURIComponent(slug)}&className=${encodeURIComponent(className)}`;
   }
 
+  function getFeeParts() {
+    const rows = Array.from(document.querySelectorAll("#stats .stat"));
+    return {
+      full: rows[0]?.querySelector("b")?.textContent?.trim() || "GHS 2,800",
+      first: (rows[1]?.querySelector("b")?.textContent || "GHS 2,000").replace(/\s*first payment/i, "").trim(),
+      balance: (rows[2]?.querySelector("b")?.textContent || "GHS 800").replace(/\s*after 1 month/i, "").trim(),
+    };
+  }
+
   function injectLiteStyles() {
     if (document.getElementById("brochureLiteStyles")) return;
     const style = document.createElement("style");
     style.id = "brochureLiteStyles";
     style.textContent = `
-      .page { max-width: 820px; }
+      .page { max-width: 1040px; }
       .hero { gap: 8px; padding: 14px 16px; }
       .hero h1 { font-size: clamp(24px, 7vw, 34px); letter-spacing: -0.035em; }
       .hero p { font-size: 14px; line-height: 1.55; }
@@ -47,12 +56,21 @@
       .class-tabs { padding-bottom: 4px; }
       .class-tab { padding: 8px 11px; font-size: 13px; }
       .notice { font-size: 14px; }
+      .toc-card { margin-top: 12px; display: grid; gap: 10px; }
+      .toc-card h2 { font-size: 17px; margin: 0; }
+      .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
+      .toc-links a { border: 1px solid #bfdbfe; background: #ffffff; color: #1d4ed8; border-radius: 999px; padding: 8px 10px; font-size: 13px; font-weight: 800; text-decoration: none; }
       #stats { padding: 14px; gap: 10px; }
       .stat { align-items: flex-start; }
       .stat b { font-size: 16px; }
-      .class-mode-card, .who-for-card, .after-signup-card { padding: 12px; gap: 6px; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 14px; display: grid; }
-      .class-mode-card h3, .who-for-card h3, .after-signup-card h3 { font-size: 15px; margin: 0; }
-      .class-mode-card p, .who-for-card p, .after-signup-card p { margin: 0; color: #334155; font-size: 14px; line-height: 1.55; }
+      .payment-guidance-card, .class-mode-card, .who-for-card, .after-signup-card { padding: 12px; gap: 6px; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 14px; display: grid; }
+      .payment-guidance-card { background: #f8fafc; border-color: #e2e8f0; }
+      .payment-guidance-card h3, .class-mode-card h3, .who-for-card h3, .after-signup-card h3 { font-size: 15px; margin: 0; }
+      .payment-guidance-card p, .class-mode-card p, .who-for-card p, .after-signup-card p { margin: 0; color: #334155; font-size: 14px; line-height: 1.55; }
+      .payment-option-grid { display: grid; gap: 10px; }
+      .payment-option { padding: 12px; border-radius: 12px; background: #ffffff; border: 1px solid #e2e8f0; }
+      .payment-option.recommended { border-color: #1455f5; background: #eff6ff; }
+      .payment-option strong { display: block; color: #111827; margin-bottom: 4px; }
       .after-signup-card ol { margin: 0; padding-left: 19px; color: #334155; font-size: 14px; line-height: 1.55; }
       .after-signup-card li { margin: 4px 0; }
       .main-signup-cta, .class-schedule-cta { width: 100%; font-size: 17px; min-height: 50px; }
@@ -68,6 +86,17 @@
       .agreement-card h2 { font-size: 20px; }
       .agreement-toggle { padding: 12px 14px; }
       .footer { display: none; }
+      @media (min-width: 900px) {
+        .class-main-card .class-body { grid-template-columns: 1.05fr .95fr; align-items: start; }
+        #classTitle { grid-column: 1 / -1; }
+        #stats { grid-column: 1; }
+        #paymentGuidanceCard { grid-column: 2; grid-row: 2 / span 2; }
+        #mainSignupCta, #classScheduleCta { grid-column: 1; }
+        #classModeCard { grid-column: 1; }
+        #afterSignupCard, #whoForCard { grid-column: 1 / -1; }
+        .payment-option-grid { grid-template-columns: 1fr 1fr; }
+        .page > .card, .page > .grid, .page > section { max-width: none; }
+      }
       @media (max-width: 520px) {
         .page { padding: 8px 8px 28px; }
         .hero { padding: 14px; }
@@ -116,6 +145,37 @@
     }
   }
 
+  function addTableOfContents() {
+    const hero = document.querySelector(".hero");
+    if (!hero || document.getElementById("brochureToc")) return;
+    const toc = document.createElement("section");
+    toc.id = "brochureToc";
+    toc.className = "card toc-card";
+    toc.innerHTML = `
+      <h2>On this page</h2>
+      <div class="toc-links">
+        <a href="#class-summary">Class & fees</a>
+        <a href="#meeting-times-section">Meeting times</a>
+        <a href="#class-schedule-section">Class schedule</a>
+        <a href="#payment-agreement-section">Payment agreement</a>
+      </div>
+    `;
+    hero.insertAdjacentElement("afterend", toc);
+  }
+
+  function tagSections() {
+    const mainCard = document.querySelector(".class-main-card");
+    if (mainCard) mainCard.id = "class-summary";
+    const meetingRows = document.getElementById("meetingRows");
+    const meetingCard = meetingRows?.closest(".card");
+    if (meetingCard) meetingCard.id = "meeting-times-section";
+    const scheduleList = document.getElementById("scheduleList");
+    const scheduleCard = scheduleList?.closest(".card") || document.querySelector(".schedule-simple-card");
+    if (scheduleCard) scheduleCard.id = "class-schedule-section";
+    const agreement = document.getElementById("agreementCard");
+    if (agreement) agreement.id = "payment-agreement-section";
+  }
+
   function addMainSignupButton() {
     const stats = document.getElementById("stats");
     if (!stats) return;
@@ -128,6 +188,38 @@
       stats.insertAdjacentElement("afterend", cta);
     }
     cta.href = getSignupUrl();
+  }
+
+  function improvePaymentMessaging() {
+    const stats = document.getElementById("stats");
+    if (!stats) return;
+    const { full, first, balance } = getFeeParts();
+    stats.innerHTML = `
+      <div class="stat"><span>Recommended full payment</span><b>${full}</b></div>
+      <div class="stat"><span>Access with full payment</span><b>6 months</b></div>
+      <div class="stat"><span>Installment starter</span><b>${first}</b></div>
+    `;
+
+    let card = document.getElementById("paymentGuidanceCard");
+    if (!card) {
+      card = document.createElement("div");
+      card.id = "paymentGuidanceCard";
+      card.className = "payment-guidance-card";
+      stats.insertAdjacentElement("afterend", card);
+    }
+    card.innerHTML = `
+      <h3>Payment options</h3>
+      <div class="payment-option-grid">
+        <div class="payment-option recommended">
+          <strong>Best option: Pay full ${full}</strong>
+          <p>You get 6 months Falowen access. This helps if your class ends but you still need time to prepare for exams or revise before your exam date.</p>
+        </div>
+        <div class="payment-option">
+          <strong>Installment: Start with ${first}</strong>
+          <p>This gives only 1 month access. The balance of ${balance} must be paid after one month, otherwise access and the contract can be terminated.</p>
+        </div>
+      </div>
+    `;
   }
 
   function addClassScheduleButton() {
@@ -173,7 +265,7 @@
       <ol>
         <li>Create your Falowen account.</li>
         <li>Choose this class under Upcoming Classes.</li>
-        <li>Make full payment or start with installment.</li>
+        <li>Pay the full fee for 6 months access, or start with installment for 1 month access.</li>
         <li>Join in person, online, or use recordings.</li>
       </ol>
     `;
@@ -221,9 +313,28 @@
     card.dataset.simpleSchedule = "true";
   }
 
+  function updateAgreementTerms() {
+    const list = document.getElementById("agreementList");
+    if (!list || list.dataset.paymentUpdated === "true") return;
+    const { full, first, balance } = getFeeParts();
+    const items = Array.from(list.querySelectorAll("li"));
+    if (items[0]) {
+      items[0].innerHTML = `<strong>Payment Amount:</strong> The full course fee is ${full}. Full payment is recommended because it gives the student 6 months access to Falowen, including access after the live class ends.`;
+    }
+    if (items[1]) {
+      items[1].innerHTML = `<strong>Payment Schedule:</strong> The student may pay the full fee of ${full}, or start with ${first}. The ${first} installment gives only 1 month access. The remaining balance of ${balance} must be paid after one month; otherwise access may be revoked and the contract may be terminated.`;
+    }
+    if (items[3]) {
+      items[3].innerHTML = `<strong>Class Duration & Contract Term:</strong> Full payment gives a 6-month Falowen access period from enrollment. This access continues after the scheduled class ends, helping students revise and prepare when their exam date is later than the class end date.`;
+    }
+    list.dataset.paymentUpdated = "true";
+  }
+
   function enhanceAgreement() {
     const card = document.getElementById("agreementCard");
-    if (!card || card.dataset.collapsible === "true") return;
+    if (!card) return;
+    updateAgreementTerms();
+    if (card.dataset.collapsible === "true") return;
 
     const intro = document.getElementById("agreementIntro");
     const list = document.getElementById("agreementList");
@@ -257,13 +368,17 @@
   function runEnhancements() {
     injectLiteStyles();
     enhanceHero();
+    addTableOfContents();
+    tagSections();
     simplifyClassInfo();
+    improvePaymentMessaging();
     addMainSignupButton();
     addClassScheduleButton();
     addHybridModeCard();
     addAfterSignupCard();
     enhanceWhoFor();
     simplifyScheduleCard();
+    tagSections();
     enhanceAgreement();
     applySignupLinks();
   }
