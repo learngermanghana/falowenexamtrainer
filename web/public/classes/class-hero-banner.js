@@ -1,4 +1,6 @@
 (function () {
+  const HERO_IMAGE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1800&q=80";
+
   function injectStyles() {
     if (document.getElementById("classHeroBannerStyles")) return;
     const style = document.createElement("style");
@@ -14,9 +16,8 @@
         padding: 24px;
         border: 1px solid rgba(191, 219, 254, .9);
         background:
-          radial-gradient(circle at 10% 10%, rgba(255,255,255,.85), transparent 28%),
-          radial-gradient(circle at 90% 0%, rgba(96,165,250,.32), transparent 34%),
-          linear-gradient(135deg, #0f3faa 0%, #1455f5 48%, #082f72 100%);
+          linear-gradient(90deg, rgba(8, 47, 114, .92) 0%, rgba(20, 85, 245, .84) 48%, rgba(8, 47, 114, .88) 100%),
+          url("${HERO_IMAGE}") center / cover no-repeat;
         color: #ffffff;
       }
 
@@ -28,7 +29,15 @@
           linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
           linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
         background-size: 28px 28px;
-        mask-image: linear-gradient(90deg, rgba(0,0,0,.2), rgba(0,0,0,.9));
+        mask-image: linear-gradient(90deg, rgba(0,0,0,.18), rgba(0,0,0,.75));
+        pointer-events: none;
+      }
+
+      .hero.class-hero-banner::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 12% 14%, rgba(255,255,255,.22), transparent 28%);
         pointer-events: none;
       }
 
@@ -216,6 +225,9 @@
           padding: 18px;
           gap: 14px;
           border-radius: 24px;
+          background:
+            linear-gradient(180deg, rgba(8, 47, 114, .93), rgba(20, 85, 245, .84)),
+            url("${HERO_IMAGE}") center / cover no-repeat;
         }
         .hero-visual-card {
           min-height: auto;
