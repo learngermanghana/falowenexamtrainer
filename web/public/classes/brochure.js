@@ -132,6 +132,14 @@ function updateMeta(course, shareUrl) {
   if (canonical) canonical.setAttribute("href", shareUrl);
 }
 
+function hideClassInformationBox() {
+  const copyText = document.getElementById("copyText");
+  const copyButton = copyText?.parentElement?.querySelector("button");
+  const classInfoCard = copyText?.closest(".card");
+  if (classInfoCard) classInfoCard.style.display = "none";
+  if (copyButton) copyButton.style.display = "none";
+}
+
 function render() {
   const courses = getUpcomingClasses();
   const sourceList = getCourseList();
@@ -151,11 +159,12 @@ function render() {
 
   renderTabs(sourceList);
   updateMeta(course, shareUrl);
+  hideClassInformationBox();
   document.getElementById("selectionNotice").textContent = requestedCourse
-    ? `Shareable route for ${course.title}. Use this URL when sending the class brochure to a student: ${shareUrl}`
+    ? `${course.title}: fee, meeting times, schedule and payment link are below.`
     : courses.length
-      ? `Auto-selected nearest upcoming class: ${courses[0].title} starting ${formatDate(courses[0].startDate)}. You can switch to another class above.`
-      : "No dated upcoming live class was found, so the brochure is showing available classes.";
+      ? `Next available class: ${courses[0].title} starts ${formatDate(courses[0].startDate)}. Select another class above if needed.`
+      : "Available class options are shown below.";
 
   document.getElementById("classPills").innerHTML = [
     `${course.language} ${course.level}`,
@@ -165,29 +174,31 @@ function render() {
   document.getElementById("classTitle").textContent = course.title;
   document.getElementById("classFormat").textContent = course.format;
   document.getElementById("stats").innerHTML = [
-    ["Tuition", formatMoney(course.tuitionGhs)],
+    ["Total fee", formatMoney(course.tuitionGhs)],
     ["First payment", formatMoney(firstPayment)],
-    ["Balance", formatMoney(balance)],
+    ["Balance after first payment", formatMoney(balance)],
   ].map(([label, value]) => `<div class="stat"><span class="muted">${label}</span><b>${value}</b></div>`).join("");
   document.getElementById("highlights").innerHTML = (course.highlights || []).map((item) => `<li>${item}</li>`).join("");
-  document.getElementById("paymentSummary").textContent = `${course.title}: pay in full or reserve your seat from ${formatMoney(firstPayment)}. Tuition: ${formatMoney(course.tuitionGhs)}.`;
+  document.getElementById("paymentSummary").textContent = `${course.title}: reserve your seat from ${formatMoney(firstPayment)}. Total fee: ${formatMoney(course.tuitionGhs)}.`;
   document.getElementById("payLink").href = paymentLink;
   document.getElementById("payHero").href = paymentLink;
-  document.getElementById("shareLink").href = shareUrl;
+  const shareLink = document.getElementById("shareLink");
+  if (shareLink) shareLink.href = shareUrl;
   document.getElementById("scheduleLink").href = course.scheduleUrl || shareUrl;
   document.getElementById("scheduleLink").style.display = course.scheduleUrl ? "inline-flex" : "none";
-  document.getElementById("whatsappLink").href = `${brochureData.support.whatsapp}?text=${encodeURIComponent(`Hello, I want to enquire about ${course.title} starting ${formatDate(course.startDate)}. ${shareUrl}`)}`;
+  document.getElementById("whatsappLink").href = `${brochureData.support.whatsapp}?text=${encodeURIComponent(`Hello, I want to enquire about ${course.title} starting ${formatDate(course.startDate)}.`)}`;
 
   document.getElementById("meetingRows").innerHTML = course.meetingDays?.length
     ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>${course.location}</td></tr>`).join("")
     : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`;
 
-  const copy = `${course.title}\nStart date: ${formatDate(course.startDate)}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nTuition: ${formatMoney(course.tuitionGhs)}\nFirst payment to reserve seat: ${formatMoney(firstPayment)}\nPayment link: ${paymentLink}\nClass brochure: ${shareUrl}`;
-  document.getElementById("copyText").textContent = copy;
+  const copy = `${course.title}\nFee: ${formatMoney(course.tuitionGhs)}\nFirst payment: ${formatMoney(firstPayment)}\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nPayment link: ${paymentLink}`;
+  const copyText = document.getElementById("copyText");
+  if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
 
   document.getElementById("scheduleHint").textContent = schedule.length
-    ? `Generated from ${course.startDate}, ${course.meetingDays.map((slot) => slot.day).join(", ")}, ${course.totalSessions} sessions.`
+    ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}.`
     : "This track is self-learning, so there is no fixed live class schedule.";
   document.getElementById("scheduleList").innerHTML = schedule.length
     ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><b>${item.label}</b><br>${formatDate(item.date)} · ${item.day} · ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div>`).join("")
