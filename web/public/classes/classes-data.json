@@ -1,0 +1,146 @@
+{
+  "brand": "Falowen Classes",
+  "timezone": "Africa/Accra",
+  "support": {
+    "email": "info@falowen.app",
+    "whatsapp": "https://wa.me/233241113054"
+  },
+  "payment": {
+    "redirectUrl": "https://www.falowen.app/payment-complete",
+    "minimumInstallmentGhs": 2000,
+    "paystackBaseLinks": {
+      "A1": "https://paystack.shop/pay/yzz468-lbj",
+      "A2": "https://paystack.shop/pay/1navy7uihs",
+      "B1": "https://paystack.shop/pay/1navy7uihs",
+      "B2": "https://paystack.shop/pay/1navy7uihs",
+      "C1": "https://paystack.shop/pay/1navy7uihs"
+    }
+  },
+  "classes": [
+    {
+      "id": "a1-hamburg-klasse-2026-06-09",
+      "slug": "a1-hamburg-klasse",
+      "title": "A1 Hamburg Klasse",
+      "language": "German",
+      "level": "A1",
+      "city": "Hamburg",
+      "location": "Hybrid: Awoshie, Ghana or online",
+      "format": "Live hybrid class with recordings and Falowen app access",
+      "startDate": "2026-06-09",
+      "orientationDate": "2026-06-09",
+      "endDate": "2026-08-04",
+      "totalSessions": 24,
+      "tuitionGhs": 2800,
+      "meetingDays": [
+        { "day": "Monday", "startTime": "18:00", "endTime": "19:00" },
+        { "day": "Tuesday", "startTime": "18:00", "endTime": "19:00" },
+        { "day": "Wednesday", "startTime": "18:00", "endTime": "19:00" }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-06-09&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
+      "highlights": [
+        "A1 beginner German foundation",
+        "Live class plus assignment support",
+        "Falowen app access for practice, results, attendance, and resources",
+        "Good for students preparing for Goethe A1 pathway"
+      ]
+    },
+    {
+      "id": "a2-freiburg-klasse-2026-05-08",
+      "slug": "a2-freiburg-klasse",
+      "title": "A2 Freiburg Klasse",
+      "language": "German",
+      "level": "A2",
+      "city": "Freiburg",
+      "location": "Hybrid: Awoshie, Ghana or online",
+      "format": "Live hybrid class with recordings and Falowen app access",
+      "startDate": "2026-05-08",
+      "orientationDate": "2026-05-07",
+      "endDate": "2026-06-25",
+      "totalSessions": 28,
+      "tuitionGhs": 3000,
+      "meetingDays": [
+        { "day": "Wednesday", "startTime": "11:00", "endTime": "12:00" },
+        { "day": "Thursday", "startTime": "11:00", "endTime": "12:00" },
+        { "day": "Friday", "startTime": "11:00", "endTime": "12:00" }
+      ],
+      "scheduleUrl": "https://admin.falowen.app/course-schedule/public?level=A2&startDate=2026-05-08&defaultWeekdays=Wednesday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
+      "highlights": [
+        "A2 grammar and workbook structure",
+        "Speaking, writing, listening, and reading practice",
+        "Useful for students continuing after A1",
+        "Includes Falowen app learning support"
+      ]
+    },
+    {
+      "id": "b1-stuttgart-klasse-2026-03-12",
+      "slug": "b1-stuttgart-klasse",
+      "title": "B1 Stuttgart Klasse",
+      "language": "German",
+      "level": "B1",
+      "city": "Stuttgart",
+      "location": "Hybrid: Awoshie, Ghana or online",
+      "format": "Live hybrid class with recordings and Falowen app access",
+      "startDate": "2026-03-12",
+      "endDate": "2026-06-12",
+      "totalSessions": 28,
+      "tuitionGhs": 3000,
+      "meetingDays": [
+        { "day": "Thursday", "startTime": "19:30", "endTime": "21:00" },
+        { "day": "Friday", "startTime": "19:30", "endTime": "21:00" }
+      ],
+      "scheduleUrl": "https://drive.google.com/file/d/1QcKorNLQtveE-NYbZajDlAijrWhgknwp/view?usp=sharing",
+      "highlights": [
+        "B1 exam-focused learning path",
+        "Grammar plus workbook structure",
+        "Longer live sessions for deeper exam practice",
+        "Includes Falowen app support and tutor guidance"
+      ]
+    },
+    {
+      "id": "b2-self-learning",
+      "slug": "b2-self-learning",
+      "title": "B2 Self-Learning",
+      "language": "German",
+      "level": "B2",
+      "city": "Online",
+      "location": "Online",
+      "format": "Self-learning with AI assistant and tutor support by email",
+      "availability": "always",
+      "startDate": "",
+      "endDate": "",
+      "totalSessions": 0,
+      "tuitionGhs": 3000,
+      "meetingDays": [],
+      "scheduleUrl": "https://drive.google.com/file/d/1gn6vYBbRyHSvKgqvpj5rr8OfUOYRL09W/view?usp=sharing",
+      "highlights": [
+        "Flexible B2 self-learning track",
+        "AI support for grammar, writing, speaking, and vocabulary",
+        "Tutor support by email when needed",
+        "Structured course plan inside Falowen"
+      ]
+    },
+    {
+      "id": "c1-self-learning",
+      "slug": "c1-self-learning",
+      "title": "C1 Self-Learning",
+      "language": "German",
+      "level": "C1",
+      "city": "Online",
+      "location": "Online",
+      "format": "Self-learning with AI assistant and tutor support by email",
+      "availability": "always",
+      "startDate": "",
+      "endDate": "",
+      "totalSessions": 0,
+      "tuitionGhs": 3000,
+      "meetingDays": [],
+      "scheduleUrl": "",
+      "highlights": [
+        "Advanced German self-learning track",
+        "AI-supported independent practice",
+        "Tutor support by email when needed",
+        "Suitable for learners moving beyond B2"
+      ]
+    }
+  ]
+}
