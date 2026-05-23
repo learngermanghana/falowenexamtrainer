@@ -23,6 +23,52 @@
         }
       })();
     </script>
+    <script>
+      (function () {
+        function shouldOpenSignup() {
+          try {
+            return sessionStorage.getItem("falowen:auto-open-signup") === "1";
+          } catch (error) {
+            return false;
+          }
+        }
+
+        function clearSignupFlag() {
+          try {
+            sessionStorage.removeItem("falowen:auto-open-signup");
+          } catch (error) {}
+        }
+
+        function tryOpenSignup() {
+          if (!shouldOpenSignup()) return true;
+
+          var buttons = Array.prototype.slice.call(document.querySelectorAll("button"));
+          var signupButton = buttons.find(function (button) {
+            var text = (button.textContent || "").toLowerCase();
+            return text.includes("join") || text.includes("sign up") || text.includes("get started");
+          });
+
+          if (signupButton) {
+            clearSignupFlag();
+            signupButton.click();
+            return true;
+          }
+
+          return false;
+        }
+
+        window.addEventListener("load", function () {
+          if (tryOpenSignup()) return;
+
+          var observer = new MutationObserver(function () {
+            if (tryOpenSignup()) observer.disconnect();
+          });
+
+          observer.observe(document.body, { childList: true, subtree: true });
+          setTimeout(function () { observer.disconnect(); }, 8000);
+        });
+      })();
+    </script>
     <script
       async
       src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8991390842894141"
