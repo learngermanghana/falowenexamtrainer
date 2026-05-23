@@ -58,8 +58,8 @@
       .notice { font-size: 14px; }
       .toc-card { margin-top: 12px; display: grid; gap: 10px; }
       .toc-card h2 { font-size: 17px; margin: 0; }
-      .toc-links { display: flex; flex-wrap: wrap; gap: 8px; }
-      .toc-links a { border: 1px solid #bfdbfe; background: #ffffff; color: #1d4ed8; border-radius: 999px; padding: 8px 10px; font-size: 13px; font-weight: 800; text-decoration: none; }
+      .toc-links { display: grid; gap: 8px; }
+      .toc-links a { display: block; border: 1px solid #bfdbfe; background: #ffffff; color: #1d4ed8; border-radius: 12px; padding: 11px 12px; font-size: 14px; font-weight: 800; text-decoration: none; }
       #stats { padding: 14px; gap: 10px; }
       .stat { align-items: flex-start; }
       .stat b { font-size: 16px; }
