@@ -171,7 +171,6 @@ import OfflineBanner from "./components/OfflineBanner";
 import StudyBuddyBar from "./components/StudyBuddyBar";
 import PlacementTestPage from "./components/PlacementTestPage";
 import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
-import PublicUpcomingClassesPage from "./components/PublicUpcomingClassesPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
@@ -390,9 +389,6 @@ function App() {
     return <PublicStudentGuidePage />;
   }
 
-  if (location.pathname === "/learn-german-ghana/upcoming-classes") {
-    return <PublicUpcomingClassesPage />;
-  }
 
   if (!user) {
     if (authMode === "signup") {
@@ -624,7 +620,6 @@ const AppShell = ({
             }
           />
           <Route path="/placement-test" element={<PlacementTestPage />} />
-          <Route path="/learn-german-ghana/upcoming-classes" element={<PublicUpcomingClassesPage />} />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
           <Route
