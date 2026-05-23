@@ -84,8 +84,8 @@ const data = {
   },
   classDefaults: {
     language: "German",
-    location: "Hybrid: Awoshie, Ghana or online",
-    format: "Live hybrid class with recordings and Falowen app access",
+    location: "Ghana, Accra - Awoshie",
+    format: "Live hybrid class in Ghana, Accra - Awoshie with online access, recordings, and Falowen app support",
     selfLearningFormat: "Self-learning with AI assistant and tutor support by email",
     selfLearningLocation: "Online",
     scheduleBaseUrl: "https://admin.falowen.app/course-schedule/public",
