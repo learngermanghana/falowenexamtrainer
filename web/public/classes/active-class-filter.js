@@ -89,7 +89,7 @@
       const nextUrl = `/classes/${activeClasses[0].slug}/`;
       window.history.replaceState(null, "", nextUrl);
       select.dispatchEvent(new Event("change", { bubbles: true }));
-      if (status) status.textContent = "The old class link is closed, so we selected the next available class.";
+      if (status) status.textContent = "";
     }
 
     return true;
