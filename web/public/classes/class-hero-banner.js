@@ -36,13 +36,17 @@
       .hero.class-hero-banner .eyebrow {
         display: inline-flex;
         width: fit-content;
-        padding: 7px 11px;
+        max-width: 100%;
+        padding: 8px 13px;
         border-radius: 999px;
-        background: rgba(255,255,255,.16);
-        border: 1px solid rgba(255,255,255,.22);
-        color: #dbeafe;
-        font-weight: 900;
-        letter-spacing: .08em;
+        background: rgba(255,255,255,.96);
+        border: 1px solid rgba(255,255,255,.9);
+        color: #1455f5;
+        font-size: 12px;
+        font-weight: 950;
+        letter-spacing: .09em;
+        text-shadow: none;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .14);
       }
 
       .hero.class-hero-banner h1 {
