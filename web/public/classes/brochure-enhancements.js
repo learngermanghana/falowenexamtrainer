@@ -29,11 +29,13 @@
       #stats { padding: 14px; gap: 10px; }
       .stat { align-items: flex-start; }
       .stat b { font-size: 16px; }
-      .who-for-card { padding: 12px; gap: 6px; }
-      .who-for-card h3 { font-size: 15px; }
-      .who-for-card p { margin: 0; color: #334155; font-size: 14px; }
-      .main-signup-cta { width: 100%; font-size: 17px; min-height: 50px; }
+      .class-mode-card, .who-for-card { padding: 12px; gap: 6px; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 14px; display: grid; }
+      .class-mode-card h3, .who-for-card h3 { font-size: 15px; margin: 0; }
+      .class-mode-card p, .who-for-card p { margin: 0; color: #334155; font-size: 14px; line-height: 1.55; }
+      .main-signup-cta, .class-schedule-cta { width: 100%; font-size: 17px; min-height: 50px; }
+      .class-schedule-cta { background: #ffffff; border-color: #bfdbfe; color: #1d4ed8; }
       th, td { padding: 10px 6px; font-size: 14px; }
+      .meeting-card-title { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
       .session-row { grid-template-columns: 46px 1fr; gap: 10px; padding: 12px; }
       .session-num { width: 40px; height: 40px; font-size: 13px; }
       .session-title { font-size: 15px; margin-bottom: 4px; }
@@ -95,6 +97,35 @@
     stats.insertAdjacentElement("afterend", cta);
   }
 
+  function addClassScheduleButton() {
+    const signup = document.getElementById("mainSignupCta");
+    const hiddenScheduleLink = document.getElementById("scheduleLink");
+    if (!signup || !hiddenScheduleLink || document.getElementById("classScheduleCta")) return;
+
+    const href = hiddenScheduleLink.getAttribute("href");
+    if (!href || href === "#") return;
+
+    const cta = document.createElement("a");
+    cta.id = "classScheduleCta";
+    cta.className = "button class-schedule-cta";
+    cta.href = href;
+    cta.target = "_blank";
+    cta.rel = "noreferrer";
+    cta.textContent = "Open class schedule";
+    signup.insertAdjacentElement("afterend", cta);
+  }
+
+  function addHybridModeCard() {
+    const scheduleCta = document.getElementById("classScheduleCta") || document.getElementById("mainSignupCta");
+    if (!scheduleCta || document.getElementById("classModeCard")) return;
+
+    const card = document.createElement("div");
+    card.id = "classModeCard";
+    card.className = "class-mode-card";
+    card.innerHTML = "<h3>Class mode</h3><p>This class is hybrid. You can join in person, join online, or follow the recorded lessons when needed.</p>";
+    scheduleCta.insertAdjacentElement("afterend", card);
+  }
+
   function simplifyClassInfo() {
     const highlights = document.getElementById("highlights")?.closest(".stack");
     if (highlights) highlights.style.display = "none";
@@ -103,8 +134,8 @@
   }
 
   function enhanceWhoFor() {
-    const signup = document.getElementById("mainSignupCta");
-    if (!signup) return;
+    const anchor = document.getElementById("classModeCard") || document.getElementById("mainSignupCta");
+    if (!anchor) return;
 
     let card = document.getElementById("whoForCard");
     const level = getLevelFromPage();
@@ -114,7 +145,7 @@
       card = document.createElement("div");
       card.id = "whoForCard";
       card.className = "who-for-card";
-      signup.insertAdjacentElement("afterend", card);
+      anchor.insertAdjacentElement("afterend", card);
     }
 
     card.innerHTML = `<h3>Who this class is for</h3><p>${text}</p>`;
@@ -186,6 +217,8 @@
     enhanceHero();
     simplifyClassInfo();
     addMainSignupButton();
+    addClassScheduleButton();
+    addHybridModeCard();
     enhanceWhoFor();
     enhanceAgreement();
     simplifySchedule();
