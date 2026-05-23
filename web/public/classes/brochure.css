@@ -47,6 +47,24 @@ h2 { margin: 0; font-size: 22px; letter-spacing: -.02em; }
 h3 { margin: 0; font-size: 18px; }
 p { line-height: 1.65; }
 .hero p { margin: 0; max-width: 900px; color: #334155; font-size: 16px; }
+.hero-trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+.hero-trust span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #bfdbfe;
+  background: #ffffff;
+  color: #1e3a8a;
+  border-radius: 999px;
+  padding: 8px 11px;
+  font-size: 13px;
+  font-weight: 800;
+}
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .button {
   display: inline-flex;
@@ -136,6 +154,17 @@ p { line-height: 1.65; }
 .stat:nth-child(2) b { color: var(--brand); }
 ul { padding-left: 18px; margin: 0; }
 li { margin: 8px 0; }
+.who-for-card {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  border-radius: 14px;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+.who-for-card h3 { color: #0f172a; }
+.who-for-card ul { color: #334155; }
+.who-for-card li::marker { color: var(--brand); }
 #payment.card {
   border-top: 1px solid var(--line);
   border-left: 0;
@@ -178,9 +207,21 @@ td { font-size: 16px; }
 .session-title { font-size: 19px; font-weight: 500; margin-bottom: 8px; }
 .session-meta { color: #334155; font-size: 16px; }
 .copy-box { display: none; }
-.agreement-card { display: grid; gap: 16px; }
+.agreement-card { display: grid; gap: 14px; }
 .agreement-card h2 { font-size: 24px; }
 .agreement-intro { color: #334155; margin: 0; }
+.agreement-toggle {
+  width: 100%;
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-radius: 14px;
+  padding: 14px 16px;
+  font-weight: 900;
+  text-align: left;
+  cursor: pointer;
+}
+.agreement-content[hidden] { display: none; }
 .agreement-list { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
 .agreement-list li {
   margin: 0;
@@ -233,4 +274,5 @@ td { font-size: 16px; }
   .page { max-width: none; padding: 0; }
   .hero, .card { box-shadow: none; break-inside: avoid; }
   .hide-print, .class-tabs { display: none !important; }
+  .agreement-content[hidden] { display: block; }
 }
