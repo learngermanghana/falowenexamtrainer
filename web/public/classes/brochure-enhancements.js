@@ -36,19 +36,26 @@
 
   function enhanceHero() {
     const hero = document.querySelector(".hero");
-    if (!hero || hero.dataset.enhanced === "true") return;
+    if (!hero) return;
     const title = hero.querySelector("h1");
     const text = hero.querySelector("p");
+    const actions = hero.querySelector(".hero-actions");
+
     if (title) title.textContent = "Welcome to Falowen German Community";
-    if (text) {
+    if (text && hero.dataset.heroTextReady !== "true") {
       text.textContent =
         "You are welcome to join a supportive German learning community that has helped many students in Ghana and beyond start, continue, and prepare for their German language journey with confidence.";
       const trust = document.createElement("div");
       trust.className = "hero-trust";
       trust.innerHTML = "<span>✅ Live class</span><span>🎥 Recordings</span><span>📱 Falowen app support</span>";
       text.insertAdjacentElement("afterend", trust);
+      hero.dataset.heroTextReady = "true";
     }
-    hero.dataset.enhanced = "true";
+
+    if (actions && actions.dataset.signupOnly !== "true") {
+      actions.innerHTML = '<a class="button primary" href="/signup/">Sign up</a>';
+      actions.dataset.signupOnly = "true";
+    }
   }
 
   function enhanceWhoFor() {
