@@ -7,6 +7,27 @@
     C1: "Best for advanced learners preparing for work, study, or professional communication.",
   };
 
+  function slugify(value) {
+    return String(value || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
+
+  function getCurrentClassName() {
+    const title = document.getElementById("classTitle")?.textContent || "";
+    return title && !/loading|could not/i.test(title) ? title.trim() : "";
+  }
+
+  function getSignupUrl() {
+    const className = getCurrentClassName();
+    if (!className) return "/signup/";
+    const slug = slugify(className);
+    return `/signup/?class=${encodeURIComponent(slug)}&className=${encodeURIComponent(className)}`;
+  }
+
   function injectLiteStyles() {
     if (document.getElementById("brochureLiteStyles")) return;
     const style = document.createElement("style");
@@ -29,18 +50,20 @@
       #stats { padding: 14px; gap: 10px; }
       .stat { align-items: flex-start; }
       .stat b { font-size: 16px; }
-      .class-mode-card, .who-for-card { padding: 12px; gap: 6px; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 14px; display: grid; }
-      .class-mode-card h3, .who-for-card h3 { font-size: 15px; margin: 0; }
-      .class-mode-card p, .who-for-card p { margin: 0; color: #334155; font-size: 14px; line-height: 1.55; }
+      .class-mode-card, .who-for-card, .after-signup-card { padding: 12px; gap: 6px; border: 1px solid #bfdbfe; background: #eff6ff; border-radius: 14px; display: grid; }
+      .class-mode-card h3, .who-for-card h3, .after-signup-card h3 { font-size: 15px; margin: 0; }
+      .class-mode-card p, .who-for-card p, .after-signup-card p { margin: 0; color: #334155; font-size: 14px; line-height: 1.55; }
+      .after-signup-card ol { margin: 0; padding-left: 19px; color: #334155; font-size: 14px; line-height: 1.55; }
+      .after-signup-card li { margin: 4px 0; }
       .main-signup-cta, .class-schedule-cta { width: 100%; font-size: 17px; min-height: 50px; }
       .class-schedule-cta { background: #ffffff; border-color: #bfdbfe; color: #1d4ed8; }
       th, td { padding: 10px 6px; font-size: 14px; }
       .meeting-card-title { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-      .session-row { grid-template-columns: 46px 1fr; gap: 10px; padding: 12px; }
-      .session-num { width: 40px; height: 40px; font-size: 13px; }
-      .session-title { font-size: 15px; margin-bottom: 4px; }
-      .session-meta { font-size: 13px; }
-      .schedule-preview-button { margin-top: 8px; width: 100%; }
+      .schedule-simple-card { display: grid; gap: 10px; }
+      .schedule-simple-card p { margin: 0; color: #334155; font-size: 14px; line-height: 1.55; }
+      #scheduleList { display: none !important; }
+      .session-row { display: none !important; }
+      .schedule-preview-button { display: none !important; }
       .agreement-card { gap: 10px; }
       .agreement-card h2 { font-size: 20px; }
       .agreement-toggle { padding: 12px 14px; }
@@ -63,6 +86,13 @@
     return match ? match[1].toUpperCase() : "A1";
   }
 
+  function applySignupLinks() {
+    const href = getSignupUrl();
+    document.querySelectorAll("a[href^='/signup']").forEach((link) => {
+      link.href = href;
+    });
+  }
+
   function enhanceHero() {
     const hero = document.querySelector(".hero");
     if (!hero) return;
@@ -81,38 +111,44 @@
     }
 
     if (actions && actions.dataset.signupOnly !== "true") {
-      actions.innerHTML = '<a class="button primary" href="/signup/">Sign up</a>';
+      actions.innerHTML = `<a class="button primary" href="${getSignupUrl()}">Sign up</a>`;
       actions.dataset.signupOnly = "true";
     }
   }
 
   function addMainSignupButton() {
     const stats = document.getElementById("stats");
-    if (!stats || document.getElementById("mainSignupCta")) return;
-    const cta = document.createElement("a");
-    cta.id = "mainSignupCta";
-    cta.className = "button primary main-signup-cta";
-    cta.href = "/signup/";
-    cta.textContent = "Sign up and choose this class";
-    stats.insertAdjacentElement("afterend", cta);
+    if (!stats) return;
+    let cta = document.getElementById("mainSignupCta");
+    if (!cta) {
+      cta = document.createElement("a");
+      cta.id = "mainSignupCta";
+      cta.className = "button primary main-signup-cta";
+      cta.textContent = "Sign up and choose this class";
+      stats.insertAdjacentElement("afterend", cta);
+    }
+    cta.href = getSignupUrl();
   }
 
   function addClassScheduleButton() {
     const signup = document.getElementById("mainSignupCta");
     const hiddenScheduleLink = document.getElementById("scheduleLink");
-    if (!signup || !hiddenScheduleLink || document.getElementById("classScheduleCta")) return;
+    if (!signup || !hiddenScheduleLink) return;
 
     const href = hiddenScheduleLink.getAttribute("href");
     if (!href || href === "#") return;
 
-    const cta = document.createElement("a");
-    cta.id = "classScheduleCta";
-    cta.className = "button class-schedule-cta";
+    let cta = document.getElementById("classScheduleCta");
+    if (!cta) {
+      cta = document.createElement("a");
+      cta.id = "classScheduleCta";
+      cta.className = "button class-schedule-cta";
+      cta.target = "_blank";
+      cta.rel = "noreferrer";
+      cta.textContent = "Open class schedule";
+      signup.insertAdjacentElement("afterend", cta);
+    }
     cta.href = href;
-    cta.target = "_blank";
-    cta.rel = "noreferrer";
-    cta.textContent = "Open class schedule";
-    signup.insertAdjacentElement("afterend", cta);
   }
 
   function addHybridModeCard() {
@@ -126,6 +162,24 @@
     scheduleCta.insertAdjacentElement("afterend", card);
   }
 
+  function addAfterSignupCard() {
+    const anchor = document.getElementById("classModeCard") || document.getElementById("classScheduleCta") || document.getElementById("mainSignupCta");
+    if (!anchor || document.getElementById("afterSignupCard")) return;
+    const card = document.createElement("div");
+    card.id = "afterSignupCard";
+    card.className = "after-signup-card";
+    card.innerHTML = `
+      <h3>After signup</h3>
+      <ol>
+        <li>Create your Falowen account.</li>
+        <li>Choose this class under Upcoming Classes.</li>
+        <li>Make full payment or start with installment.</li>
+        <li>Join in person, online, or use recordings.</li>
+      </ol>
+    `;
+    anchor.insertAdjacentElement("afterend", card);
+  }
+
   function simplifyClassInfo() {
     const highlights = document.getElementById("highlights")?.closest(".stack");
     if (highlights) highlights.style.display = "none";
@@ -134,7 +188,7 @@
   }
 
   function enhanceWhoFor() {
-    const anchor = document.getElementById("classModeCard") || document.getElementById("mainSignupCta");
+    const anchor = document.getElementById("afterSignupCard") || document.getElementById("classModeCard") || document.getElementById("mainSignupCta");
     if (!anchor) return;
 
     let card = document.getElementById("whoForCard");
@@ -149,6 +203,22 @@
     }
 
     card.innerHTML = `<h3>Who this class is for</h3><p>${text}</p>`;
+  }
+
+  function simplifyScheduleCard() {
+    const scheduleList = document.getElementById("scheduleList");
+    const card = scheduleList?.closest(".card");
+    const hiddenScheduleLink = document.getElementById("scheduleLink");
+    if (!card || !hiddenScheduleLink || card.dataset.simpleSchedule === "true") return;
+
+    const href = hiddenScheduleLink.getAttribute("href") || "#";
+    card.classList.add("schedule-simple-card");
+    card.innerHTML = `
+      <h2>Class schedule</h2>
+      <p>Open the full class schedule to see all lessons, dates, topics, start date, end date, and meeting times.</p>
+      <a class="button class-schedule-cta" href="${href}" target="_blank" rel="noreferrer">Open class schedule</a>
+    `;
+    card.dataset.simpleSchedule = "true";
   }
 
   function enhanceAgreement() {
@@ -184,34 +254,6 @@
     card.dataset.collapsible = "true";
   }
 
-  function simplifySchedule() {
-    const scheduleList = document.getElementById("scheduleList");
-    if (!scheduleList) return;
-    const rows = Array.from(scheduleList.querySelectorAll(".session-row"));
-    if (rows.length <= 6) return;
-
-    const expanded = scheduleList.dataset.expanded === "true";
-    rows.forEach((row, index) => {
-      row.hidden = !expanded && index >= 6;
-    });
-
-    let button = document.getElementById("schedulePreviewButton");
-    if (!button) {
-      button = document.createElement("button");
-      button.id = "schedulePreviewButton";
-      button.type = "button";
-      button.className = "button schedule-preview-button";
-      scheduleList.insertAdjacentElement("afterend", button);
-      button.addEventListener("click", () => {
-        const nextExpanded = scheduleList.dataset.expanded !== "true";
-        scheduleList.dataset.expanded = String(nextExpanded);
-        simplifySchedule();
-      });
-    }
-
-    button.textContent = expanded ? "Show less schedule" : `Show all ${rows.length} sessions`;
-  }
-
   function runEnhancements() {
     injectLiteStyles();
     enhanceHero();
@@ -219,9 +261,11 @@
     addMainSignupButton();
     addClassScheduleButton();
     addHybridModeCard();
+    addAfterSignupCard();
     enhanceWhoFor();
+    simplifyScheduleCard();
     enhanceAgreement();
-    simplifySchedule();
+    applySignupLinks();
   }
 
   window.addEventListener("load", runEnhancements);
