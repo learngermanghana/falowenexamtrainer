@@ -484,11 +484,6 @@ const A1LetterWritingQuestionBookPage = () => {
             english: "I am writing because I would like to make an enquiry.",
             example: "Ich schreibe Ihnen, weil ich eine Anfrage zu Ihrem Kurs stellen möchte.",
           },
-          {
-            german: "Ich hätte gern weitere Informationen.",
-            english: "I would like more information.",
-            example: "Ich hätte gern weitere Informationen über die Anmeldung.",
-          },
         ],
       },
       {
@@ -498,11 +493,6 @@ const A1LetterWritingQuestionBookPage = () => {
             german: "Könnten Sie mir bitte Informationen über ... geben?",
             english: "Could you please give me information about ...?",
             example: "Könnten Sie mir bitte Informationen über Ihre Kurse geben?",
-          },
-          {
-            german: "Könnten Sie mir bitte helfen?",
-            english: "Could you please help me?",
-            example: "Könnten Sie mir bitte bei der Anmeldung helfen?",
           },
         ],
       },
@@ -515,14 +505,9 @@ const A1LetterWritingQuestionBookPage = () => {
             example: "Wie viel kostet der Deutschkurs?",
           },
           {
-            german: "Wie hoch ist die Gebühr?",
-            english: "How much is the fee?",
-            example: "Wie hoch ist die Anmeldegebühr?",
-          },
-          {
-            german: "Könnten Sie mir bitte den Preis mitteilen?",
-            english: "Could you please tell me the price?",
-            example: "Könnten Sie mir bitte den Preis mitteilen?",
+            german: "Wie kann ich bezahlen?",
+            english: "How can I pay?",
+            example: "Wie kann ich bezahlen?",
           },
         ],
       },
@@ -539,11 +524,6 @@ const A1LetterWritingQuestionBookPage = () => {
             english: "I would like to cancel an appointment.",
             example: "Ich möchte den Termin für Montag absagen.",
           },
-          {
-            german: "Bitte antworten Sie mir bald.",
-            english: "Please reply to me soon.",
-            example: "Bitte antworten Sie mir bald.",
-          },
         ],
       },
     ],
@@ -552,15 +532,15 @@ const A1LetterWritingQuestionBookPage = () => {
 
   const INFORMAL_PHRASES = useMemo(
     () => [
-      "Ich gratuliere dir zum Geburtstag.",
-      "Herzlichen Glückwunsch zum Geburtstag!",
-      "Ich wünsche dir alles Gute.",
-      "Machst du eine Feier?",
-      "Wo findet die Feier statt?",
-      "Kann ich mit meiner Familie kommen?",
-      "Ich freue mich auf deine Feier.",
-      "Ich komme mit meiner Familie.",
-      "Wir fahren mit dem Auto.",
+      "Ich gratuliere dir zum Geburtstag. (I congratulate you on your birthday.)",
+      "Herzlichen Glückwunsch zum Geburtstag! (Happy birthday!)",
+      "Ich wünsche dir alles Gute. (I wish you all the best.)",
+      "Machst du eine Feier? (Are you having a celebration?)",
+      "Wo findet die Feier statt? (Where does the celebration take place?)",
+      "Kann ich mit meiner Familie kommen? (Can I come with my family?)",
+      "Ich freue mich auf deine Feier. (I am looking forward to your celebration.)",
+      "Ich komme mit meiner Familie. (I am coming with my family.)",
+      "Wir fahren mit dem Auto. (We are driving by car.)",
     ],
     []
   );
