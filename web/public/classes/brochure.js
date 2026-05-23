@@ -120,7 +120,7 @@ function renderTabs(courseList) {
 
 function updateMeta(course, shareUrl) {
   const title = `${course.title} | Falowen Classes`;
-  const description = `${course.title} starts ${formatDate(course.startDate)}. View meeting times, generated schedule, tuition, and payment link.`;
+  const description = `${course.title} starts ${formatDate(course.startDate)}. View fee, meeting times, generated schedule, payment link, and payment agreement.`;
   document.title = title;
   const metaDescription = document.querySelector('meta[name="description"]');
   if (metaDescription) metaDescription.setAttribute("content", description);
@@ -138,6 +138,93 @@ function hideClassInformationBox() {
   const classInfoCard = copyText?.closest(".card");
   if (classInfoCard) classInfoCard.style.display = "none";
   if (copyButton) copyButton.style.display = "none";
+}
+
+function ensureClassLayout() {
+  const mainClassCard = document.getElementById("classTitle")?.closest(".card");
+  const paymentCard = document.getElementById("payment");
+  const classPills = document.getElementById("classPills");
+  const title = document.getElementById("classTitle");
+  const format = document.getElementById("classFormat");
+  const stats = document.getElementById("stats");
+  const highlights = document.getElementById("highlights")?.closest(".stack");
+
+  if (!mainClassCard || mainClassCard.dataset.layoutReady === "true") return;
+  mainClassCard.classList.add("class-main-card");
+
+  const blueHeader = document.createElement("div");
+  blueHeader.className = "class-blue-header";
+  blueHeader.innerHTML = `
+    <div class="class-blue-title" id="blueClassTitle">German A1</div>
+    <div class="class-blue-meta" id="blueClassMeta"></div>
+  `;
+
+  const body = document.createElement("div");
+  body.className = "class-body";
+
+  [classPills, title, format, stats, highlights].forEach((node) => {
+    if (node) body.appendChild(node);
+  });
+
+  if (paymentCard) {
+    paymentCard.querySelectorAll(".button").forEach((button) => button.parentElement?.classList.add("payment-buttons"));
+    body.appendChild(paymentCard);
+  }
+
+  mainClassCard.innerHTML = "";
+  mainClassCard.appendChild(blueHeader);
+  mainClassCard.appendChild(body);
+  mainClassCard.dataset.layoutReady = "true";
+}
+
+function ensurePaymentButtons() {
+  const payment = document.getElementById("payment");
+  if (!payment || payment.dataset.buttonsReady === "true") return;
+  const links = ["payLink", "scheduleLink", "whatsappLink"].map((id) => document.getElementById(id)).filter(Boolean);
+  const wrap = document.createElement("div");
+  wrap.className = "payment-buttons";
+  links.forEach((link) => wrap.appendChild(link));
+  payment.appendChild(wrap);
+  payment.dataset.buttonsReady = "true";
+}
+
+function ensureAgreementCard() {
+  if (document.getElementById("agreementCard")) return;
+  const scheduleCard = document.getElementById("scheduleList")?.closest(".card");
+  const agreement = document.createElement("section");
+  agreement.className = "card agreement-card";
+  agreement.id = "agreementCard";
+  agreement.style.marginTop = "16px";
+  agreement.innerHTML = `
+    <h2>Payment Agreement</h2>
+    <p class="agreement-intro" id="agreementIntro"></p>
+    <ul class="agreement-list" id="agreementList"></ul>
+  `;
+  scheduleCard?.insertAdjacentElement("afterend", agreement);
+}
+
+function renderAgreement(course, firstPayment, balance) {
+  ensureAgreementCard();
+  const today = formatDate(new Date().toISOString().slice(0, 10));
+  const intro = document.getElementById("agreementIntro");
+  const list = document.getElementById("agreementList");
+  if (!intro || !list) return;
+
+  intro.textContent = `This Payment Agreement is entered into on ${today} for ${course.title} students of Learn Language Education Academy and Felix Asadu (“Teacher”).`;
+  const terms = [
+    `<strong>Payment Amount:</strong> The student agrees to pay a total of ${formatMoney(course.tuitionGhs)}. The fee is the same regardless of learning mode: online, in person, self-learning, or recorded lectures.`,
+    `<strong>Payment Schedule:</strong> Payment may be made in full or in two installments. The first installment is ${formatMoney(firstPayment)}, and the remaining balance of ${formatMoney(balance)} is due one month after the first payment. Minimum first installment is ${formatMoney(firstPayment)}.`,
+    `<strong>Learning Mode & Attendance Rights:</strong> For each scheduled class session, the student may join in person, online, or via recorded lecture, and is responsible for choosing and attending in their preferred way each time.`,
+    `<strong>Class Duration & Contract Term:</strong> This class runs from ${formatDate(course.startDate)} to ${formatDate(course.endDate)}. The service provides a 6-month contract period from enrollment, during which the student has access to Falowen, even after the scheduled class sessions end.`,
+    `<strong>Post-Contract Access:</strong> After 6 months, continued access requires either an extension at GHS 1,000 per month or enrollment in a new class at the then-current fee.`,
+    `<strong>Attendance:</strong> Attendance is recorded for each session in My Results & Resources.`,
+    `<strong>Certification:</strong> Certificates are issued upon successful completion and assignment submission. This is a Certificate of Completion, not a Goethe-Institut certificate. Where official language certification is required, the student must sit the exam at Goethe-Institut or another recognized provider.`,
+    `<strong>Late Payments:</strong> Late payment may lead to revoked access to learning platforms. No refund will be made.`,
+    `<strong>Refunds:</strong> Once payment is confirmed and access is granted, no refunds will be provided except where required by law.`,
+    `<strong>How to Pay:</strong> Pay inside your Falowen account after choosing a class under Upcoming Classes, or use the payment button on this page. If you have payment issues, contact info@falowen.app or use WhatsApp support on this page.`,
+    `<strong>Class Level & Start Date:</strong> Level, dates, and fees are shown on this page and may vary by cohort. Confirm your class details before paying. By making any payment, you acknowledge and agree to these terms.`,
+  ];
+  list.innerHTML = terms.map((term) => `<li>${term}</li>`).join("");
 }
 
 function render() {
@@ -160,26 +247,40 @@ function render() {
   renderTabs(sourceList);
   updateMeta(course, shareUrl);
   hideClassInformationBox();
-  document.getElementById("selectionNotice").textContent = requestedCourse
-    ? `${course.title}: fee, meeting times, schedule and payment link are below.`
-    : courses.length
-      ? `Next available class: ${courses[0].title} starts ${formatDate(courses[0].startDate)}. Select another class above if needed.`
-      : "Available class options are shown below.";
+  ensurePaymentButtons();
+  ensureClassLayout();
+  renderAgreement(course, firstPayment, balance);
+
+  document.getElementById("selectionNotice").innerHTML = courses.length
+    ? `<span>Next available class:</span><br><strong>${courses[0].title} starts ${formatDate(courses[0].startDate)}</strong>`
+    : "Available class options are shown below.";
+
+  const blueTitle = document.getElementById("blueClassTitle");
+  if (blueTitle) blueTitle.textContent = `${course.language} ${course.level}`;
+  const blueMeta = document.getElementById("blueClassMeta");
+  if (blueMeta) {
+    blueMeta.innerHTML = [
+      `📍 ${course.city}`,
+      `📅 Starts ${formatDate(course.startDate)}`,
+      course.endDate ? `🏁 Ends ${formatDate(course.endDate)}` : "",
+    ].filter(Boolean).map((item) => `<span>${item}</span>`).join("");
+  }
 
   document.getElementById("classPills").innerHTML = [
     `${course.language} ${course.level}`,
     course.city,
     course.availability === "always" ? "Always open" : `Starts ${formatDate(course.startDate)}`,
-  ].map((text) => `<span class="pill">${text}</span>`).join("");
+    course.endDate ? `Ends ${formatDate(course.endDate)}` : "",
+  ].filter(Boolean).map((text) => `<span class="pill">${text}</span>`).join("");
   document.getElementById("classTitle").textContent = course.title;
   document.getElementById("classFormat").textContent = course.format;
   document.getElementById("stats").innerHTML = [
     ["Total fee", formatMoney(course.tuitionGhs)],
     ["First payment", formatMoney(firstPayment)],
     ["Balance after first payment", formatMoney(balance)],
-  ].map(([label, value]) => `<div class="stat"><span class="muted">${label}</span><b>${value}</b></div>`).join("");
+  ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join("");
   document.getElementById("highlights").innerHTML = (course.highlights || []).map((item) => `<li>${item}</li>`).join("");
-  document.getElementById("paymentSummary").textContent = `${course.title}: reserve your seat from ${formatMoney(firstPayment)}. Total fee: ${formatMoney(course.tuitionGhs)}.`;
+  document.getElementById("paymentSummary").textContent = `${course.title}: pay ${formatMoney(course.tuitionGhs)} in full or reserve your seat with ${formatMoney(firstPayment)}. Remaining balance: ${formatMoney(balance)} due one month after the first payment.`;
   document.getElementById("payLink").href = paymentLink;
   document.getElementById("payHero").href = paymentLink;
   const shareLink = document.getElementById("shareLink");
@@ -198,11 +299,11 @@ function render() {
   window.currentBrochureText = copy;
 
   document.getElementById("scheduleHint").textContent = schedule.length
-    ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}.`
+    ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}`
     : "This track is self-learning, so there is no fixed live class schedule.";
   document.getElementById("scheduleList").innerHTML = schedule.length
-    ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><b>${item.label}</b><br>${formatDate(item.date)} · ${item.day} · ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div>`).join("")
-    : `<div class="session-row"><div class="session-num">∞</div><div><b>Self-learning</b><br>Start anytime after registration and payment confirmation.</div></div>`;
+    ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><div class="session-title">${item.label}</div><div class="session-meta">${formatDate(item.date)} · ${item.day} · 🕒 ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div></div>`).join("")
+    : `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`;
 }
 
 async function copyBrochureText() {
