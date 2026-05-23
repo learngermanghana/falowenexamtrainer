@@ -161,6 +161,18 @@ const formatTime = (time) => {
 };
 const addDays = (date, days) => new Date(date.getTime() + days * 86400000);
 const toIso = (date) => date.toISOString().slice(0, 10);
+const setText = (id, text) => {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+};
+const setHtml = (id, html) => {
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = html;
+};
+const setHref = (id, href) => {
+  const el = document.getElementById(id);
+  if (el && href) el.href = href;
+};
 
 const normalizeClassSlug = (value = "") =>
   String(value)
@@ -262,6 +274,7 @@ function selectCourse(course) {
 
 function renderTabs(courseList) {
   const tabs = document.getElementById("classTabs");
+  if (!tabs) return;
   tabs.innerHTML = "";
   courseList.forEach((course) => {
     const button = document.createElement("button");
@@ -284,7 +297,7 @@ function updateHeroText() {
 
 function updateMeta(course, shareUrl) {
   const title = `${course.title} | Falowen Classes`;
-  const description = `${course.title} starts ${formatDate(course.startDate)}. View fee, meeting times, generated schedule, payment link, and payment agreement.`;
+  const description = `${course.title} starts ${formatDate(course.startDate)}. View fee, meeting times, generated schedule, class schedule link, and payment agreement.`;
   document.title = title;
   const metaDescription = document.querySelector('meta[name="description"]');
   if (metaDescription) metaDescription.setAttribute("content", description);
@@ -382,7 +395,7 @@ function renderAgreement(course, firstPayment, balance) {
     `<strong>Certification:</strong> Certificates are issued upon successful completion and assignment submission. This is a Certificate of Completion, not a Goethe-Institut certificate. Where official language certification is required, the student must sit the exam at Goethe-Institut or another recognized provider.`,
     `<strong>Late Payments:</strong> Late payment may lead to revoked access to learning platforms. No refund will be made.`,
     `<strong>Refunds:</strong> Once payment is confirmed and access is granted, no refunds will be provided except where required by law.`,
-    `<strong>How to Pay:</strong> Pay inside your Falowen account after choosing a class under Upcoming Classes, or use the payment button on this page. If you have payment issues, contact info@falowen.app or use WhatsApp support on this page.`,
+    `<strong>How to Pay:</strong> Pay inside your Falowen account after choosing a class under Upcoming Classes. If you have payment issues, contact info@falowen.app or use WhatsApp support.`,
     `<strong>Class Level & Start Date:</strong> Level, dates, and fees are shown on this page and may vary by cohort. Confirm your class details before paying. By making any payment, you acknowledge and agree to these terms.`,
   ];
   list.innerHTML = terms.map((term) => `<li>${term}</li>`).join("");
@@ -399,11 +412,14 @@ function render() {
   if (!selectedClassId) selectedClassId = sourceList[0]?.id;
 
   const course = brochureData.classes.find((item) => item.id === selectedClassId) || sourceList[0];
+  if (!course) return;
+
   const schedule = generateSchedule(course);
   const paymentLink = buildPaystackLink(course);
   const firstPayment = Math.min(course.tuitionGhs || 0, brochureData.payment.minimumInstallmentGhs);
   const balance = Math.max((course.tuitionGhs || 0) - firstPayment, 0);
   const shareUrl = getClassShareUrl(course);
+  const classScheduleUrl = course.scheduleUrl || course.docUrl || shareUrl;
 
   updateHeroText();
   renderTabs(sourceList);
@@ -413,59 +429,55 @@ function render() {
   ensureClassLayout();
   renderAgreement(course, firstPayment, balance);
 
-  document.getElementById("selectionNotice").innerHTML = courses.length
+  setHtml("selectionNotice", courses.length
     ? `<span>Next available class:</span><br><strong>${courses[0].title} starts ${formatDate(courses[0].startDate)}</strong>`
-    : "Available class options are shown below.";
+    : "Available class options are shown below.");
 
-  const blueTitle = document.getElementById("blueClassTitle");
-  if (blueTitle) blueTitle.textContent = `${course.language} ${course.level}`;
-  const blueMeta = document.getElementById("blueClassMeta");
-  if (blueMeta) {
-    blueMeta.innerHTML = [
-      `📍 ${course.city}`,
-      `📅 Starts ${formatDate(course.startDate)}`,
-      course.endDate ? `🏁 Ends ${formatDate(course.endDate)}` : "",
-    ].filter(Boolean).map((item) => `<span>${item}</span>`).join("");
-  }
+  setText("blueClassTitle", `${course.language} ${course.level}`);
+  setHtml("blueClassMeta", [
+    `📍 ${course.city}`,
+    `📅 Starts ${formatDate(course.startDate)}`,
+    course.endDate ? `🏁 Ends ${formatDate(course.endDate)}` : "",
+  ].filter(Boolean).map((item) => `<span>${item}</span>`).join(""));
 
-  document.getElementById("classPills").innerHTML = [
+  setHtml("classPills", [
     `${course.language} ${course.level}`,
     course.city,
     course.availability === "always" ? "Always open" : `Starts ${formatDate(course.startDate)}`,
     course.endDate ? `Ends ${formatDate(course.endDate)}` : "",
-  ].filter(Boolean).map((text) => `<span class="pill">${text}</span>`).join("");
-  document.getElementById("classTitle").textContent = course.title;
-  document.getElementById("classFormat").textContent = course.format;
-  document.getElementById("stats").innerHTML = [
-    ["Pay full course fee", formatMoney(course.tuitionGhs)],
-    ["Or start with installment", `${formatMoney(firstPayment)} first payment`],
+  ].filter(Boolean).map((text) => `<span class="pill">${text}</span>`).join(""));
+  setText("classTitle", course.title);
+  setText("classFormat", course.format);
+  setHtml("stats", [
+    ["Full course fee", formatMoney(course.tuitionGhs)],
+    ["Installment option", `${formatMoney(firstPayment)} first payment`],
     ["Balance after installment", `${formatMoney(balance)} after 1 month`],
-  ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join("");
-  document.getElementById("highlights").innerHTML = (course.highlights || []).map((item) => `<li>${item}</li>`).join("");
-  document.getElementById("paymentSummary").textContent = `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due one month after the first payment.`;
-  document.getElementById("payLink").href = paymentLink;
-  document.getElementById("payHero").href = paymentLink;
-  const shareLink = document.getElementById("shareLink");
-  if (shareLink) shareLink.href = shareUrl;
-  document.getElementById("scheduleLink").href = course.scheduleUrl || shareUrl;
-  document.getElementById("scheduleLink").style.display = course.scheduleUrl ? "inline-flex" : "none";
-  document.getElementById("whatsappLink").href = `${brochureData.support.whatsapp}?text=${encodeURIComponent(`Hello, I want to enquire about ${course.title} starting ${formatDate(course.startDate)}.`)}`;
+  ].map(([label, value]) => `<div class="stat"><span>${label}</span><b>${value}</b></div>`).join(""));
+  setHtml("highlights", (course.highlights || []).map((item) => `<li>${item}</li>`).join(""));
+  setText("paymentSummary", `${course.title}: you can pay the full fee of ${formatMoney(course.tuitionGhs)} or start with an installment of ${formatMoney(firstPayment)}. The balance of ${formatMoney(balance)} is due one month after the first payment.`);
+  setHref("payLink", paymentLink);
+  setHref("payHero", "/signup/");
+  setHref("shareLink", shareUrl);
+  setHref("scheduleLink", classScheduleUrl);
+  const scheduleLink = document.getElementById("scheduleLink");
+  if (scheduleLink) scheduleLink.style.display = classScheduleUrl ? "inline-flex" : "none";
+  setHref("whatsappLink", `${brochureData.support.whatsapp}?text=${encodeURIComponent(`Hello, I want to enquire about ${course.title} starting ${formatDate(course.startDate)}.`)}`);
 
-  document.getElementById("meetingRows").innerHTML = course.meetingDays?.length
-    ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>${course.location}</td></tr>`).join("")
-    : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`;
+  setHtml("meetingRows", course.meetingDays?.length
+    ? course.meetingDays.map((slot) => `<tr><td>${slot.day}</td><td>${formatTime(slot.startTime)} – ${formatTime(slot.endTime)}</td><td>Hybrid: in person or online</td></tr>`).join("")
+    : `<tr><td colspan="3">Self-learning / no fixed live meeting days.</td></tr>`);
 
-  const copy = `${course.title}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after 1 month\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nPayment link: ${paymentLink}`;
+  const copy = `${course.title}\nFull fee: ${formatMoney(course.tuitionGhs)}\nInstallment option: ${formatMoney(firstPayment)} first payment, balance ${formatMoney(balance)} after 1 month\nMeeting times: ${course.meetingDays?.length ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ") : "Self-learning"}\nClass schedule: ${classScheduleUrl}`;
   const copyText = document.getElementById("copyText");
   if (copyText) copyText.textContent = copy;
   window.currentBrochureText = copy;
 
-  document.getElementById("scheduleHint").textContent = schedule.length
+  setText("scheduleHint", schedule.length
     ? `${course.totalSessions} sessions generated from ${formatDate(course.startDate)}`
-    : "This track is self-learning, so there is no fixed live class schedule.";
-  document.getElementById("scheduleList").innerHTML = schedule.length
+    : "This track is self-learning, so there is no fixed live class schedule.");
+  setHtml("scheduleList", schedule.length
     ? schedule.map((item) => `<div class="session-row"><div class="session-num">#${item.number}</div><div><div class="session-title">${item.label}</div><div class="session-meta">${formatDate(item.date)} · ${item.day} · 🕒 ${formatTime(item.startTime)} – ${formatTime(item.endTime)}</div></div></div>`).join("")
-    : `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`;
+    : `<div class="session-row"><div class="session-num">∞</div><div><div class="session-title">Self-learning</div><div class="session-meta">Start anytime after registration and payment confirmation.</div></div></div>`);
 }
 
 async function copyBrochureText() {
@@ -486,6 +498,7 @@ fetch("/classes/classes-data.json")
     render();
   })
   .catch((error) => {
-    document.getElementById("classTitle").textContent = "Could not load class brochure";
-    document.getElementById("classFormat").textContent = error.message || "Please try again later.";
+    console.error("Could not load class brochure", error);
+    setText("classTitle", "Class details are loading");
+    setText("classFormat", "Please refresh the page if details do not appear.");
   });
