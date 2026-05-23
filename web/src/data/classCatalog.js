@@ -35,9 +35,9 @@ const classCatalogDictionary = {
     orientationDate: "2026-06-09",
     endDate: "2026-08-04",
     schedule: [
-      { day: "Monday", startTime: "18:00", endTime: "19:00" },
-      { day: "Tuesday", startTime: "18:00", endTime: "19:00" },
-      { day: "Wednesday", startTime: "18:00", endTime: "19:00" },
+      { day: "Monday", startTime: "11:00", endTime: "12:00" },
+      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
+      { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
     ],
     docUrl:
       "https://admin.falowen.app/course-schedule/public?level=A1&startDate=2026-06-09&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
