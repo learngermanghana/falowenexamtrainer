@@ -22,10 +22,7 @@
       .class-blue-header { padding: 20px; }
       .class-blue-title { font-size: clamp(30px, 8vw, 38px); margin-bottom: 10px; }
       .class-body { padding: 18px; gap: 14px; }
-      #classFormat { display: none; }
-      #classPills { display: none; }
-      #highlights { display: none; }
-      #highlights.closest-hidden { display: none; }
+      #classFormat, #classPills, #highlights, #payment { display: none !important; }
       .class-tabs { padding-bottom: 4px; }
       .class-tab { padding: 8px 11px; font-size: 13px; }
       .notice { font-size: 14px; }
@@ -35,11 +32,7 @@
       .who-for-card { padding: 12px; gap: 6px; }
       .who-for-card h3 { font-size: 15px; }
       .who-for-card p { margin: 0; color: #334155; font-size: 14px; }
-      #payment.card { padding-top: 14px; }
-      #payment h2 { font-size: 19px; }
-      #paymentSummary { font-size: 14px; line-height: 1.55; }
-      .payment-buttons { gap: 8px; }
-      .payment-buttons .button { min-height: 44px; font-size: 15px !important; }
+      .main-signup-cta { width: 100%; font-size: 17px; min-height: 50px; }
       th, td { padding: 10px 6px; font-size: 14px; }
       .session-row { grid-template-columns: 46px 1fr; gap: 10px; padding: 12px; }
       .session-num { width: 40px; height: 40px; font-size: 13px; }
@@ -91,15 +84,27 @@
     }
   }
 
+  function addMainSignupButton() {
+    const stats = document.getElementById("stats");
+    if (!stats || document.getElementById("mainSignupCta")) return;
+    const cta = document.createElement("a");
+    cta.id = "mainSignupCta";
+    cta.className = "button primary main-signup-cta";
+    cta.href = "/signup/";
+    cta.textContent = "Sign up and choose this class";
+    stats.insertAdjacentElement("afterend", cta);
+  }
+
   function simplifyClassInfo() {
     const highlights = document.getElementById("highlights")?.closest(".stack");
     if (highlights) highlights.style.display = "none";
+    const payment = document.getElementById("payment");
+    if (payment) payment.style.display = "none";
   }
 
   function enhanceWhoFor() {
-    const body = document.querySelector(".class-body");
-    const payment = document.getElementById("payment");
-    if (!body || !payment) return;
+    const signup = document.getElementById("mainSignupCta");
+    if (!signup) return;
 
     let card = document.getElementById("whoForCard");
     const level = getLevelFromPage();
@@ -109,7 +114,7 @@
       card = document.createElement("div");
       card.id = "whoForCard";
       card.className = "who-for-card";
-      payment.insertAdjacentElement("beforebegin", card);
+      signup.insertAdjacentElement("afterend", card);
     }
 
     card.innerHTML = `<h3>Who this class is for</h3><p>${text}</p>`;
@@ -154,7 +159,7 @@
     const rows = Array.from(scheduleList.querySelectorAll(".session-row"));
     if (rows.length <= 6) return;
 
-    let expanded = scheduleList.dataset.expanded === "true";
+    const expanded = scheduleList.dataset.expanded === "true";
     rows.forEach((row, index) => {
       row.hidden = !expanded && index >= 6;
     });
@@ -180,6 +185,7 @@
     injectLiteStyles();
     enhanceHero();
     simplifyClassInfo();
+    addMainSignupButton();
     enhanceWhoFor();
     enhanceAgreement();
     simplifySchedule();
