@@ -3,7 +3,7 @@
   const LAST_LEAD_KEY = "falowen:last-class-lead";
   const LEAD_GATE_KEY = "falowen:class-lead-captured";
   const ENDPOINT_KEY = "falowen:class-leads-endpoint";
-  const DEFAULT_APPS_SCRIPT_ENDPOINT = "";
+  const DEFAULT_APPS_SCRIPT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzrUe3IC5w24Rmf_Ed-8HmdKzV3mn0BQyg2qsaveOSQOYunQj89MM23mgDhjGbsMa2gSA/exec";
 
   function slugify(value) {
     return String(value || "")
