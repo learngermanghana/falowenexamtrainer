@@ -1,4 +1,6 @@
 (function () {
+  var cachedClassData = null;
+
   function cleanSlug(value) {
     return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
   }
@@ -175,12 +177,74 @@
     if (anchor) anchor.insertAdjacentElement("afterend", card);
   }
 
+  function getCurrentCourse(data) {
+    if (!data || !Array.isArray(data.classes)) return null;
+    var titleEl = document.getElementById("classTitle");
+    var title = titleEl ? titleEl.textContent.trim() : "";
+    var slug = selectedSlug();
+    return data.classes.find(function (course) {
+      return course.slug === slug || course.id === slug || course.title === title;
+    }) || null;
+  }
+
+  function syncFeesForCurrentClass(data) {
+    if (!isDetailPage()) return;
+    var source = data || cachedClassData;
+    var course = getCurrentCourse(source);
+    if (!course || !course.tuitionGhs) return;
+
+    var full = Number(course.tuitionGhs || 0);
+    var minimum = Number(source && source.payment && source.payment.minimumInstallmentGhs ? source.payment.minimumInstallmentGhs : 2000);
+    var first = Math.min(full, minimum);
+    var balance = Math.max(full - first, 0);
+    var fullText = formatMoney(full);
+    var firstText = formatMoney(first);
+    var balanceText = formatMoney(balance);
+
+    var stats = document.getElementById("stats");
+    if (stats) {
+      stats.innerHTML = "<div class='stat'><span>Recommended full payment</span><b>" + fullText + "</b></div><div class='stat'><span>Access with full payment</span><b>6 months</b></div><div class='stat'><span>Installment starter</span><b>" + firstText + "</b></div>";
+    }
+
+    var paymentCard = document.getElementById("paymentGuidanceCard");
+    if (paymentCard) {
+      paymentCard.innerHTML = "<h3>Payment options</h3><div class='payment-option-grid'><div class='payment-option recommended'><strong>Best option: Pay full " + fullText + "</strong><p>You get 6 months Falowen access. This helps if your class ends but you still need time to prepare for exams or revise before your exam date.</p></div><div class='payment-option'><strong>Installment: Start with " + firstText + "</strong><p>This gives only 1 month access. The balance of " + balanceText + " must be paid after one month, otherwise access and the contract can be terminated.</p></div></div>";
+    }
+
+    var agreementList = document.getElementById("agreementList");
+    if (agreementList) {
+      var items = Array.from(agreementList.querySelectorAll("li"));
+      if (items[0]) items[0].innerHTML = "<strong>Payment Amount:</strong> The full course fee is " + fullText + ". Full payment is recommended because it gives the student 6 months access to Falowen, including access after the live class ends.";
+      if (items[1]) items[1].innerHTML = "<strong>Payment Schedule:</strong> The student may pay the full fee of " + fullText + ", or start with " + firstText + ". The " + firstText + " installment gives only 1 month access. The remaining balance of " + balanceText + " must be paid after one month; otherwise access may be revoked and the contract may be terminated.";
+      if (items[3]) items[3].innerHTML = "<strong>Class Duration & Contract Term:</strong> Full payment gives a 6-month Falowen access period from enrollment. This access continues after the scheduled class ends, helping students revise and prepare when their exam date is later than the class end date.";
+    }
+  }
+
   function loadOtherClasses() {
     if (!isDetailPage()) return;
     fetch("/classes/classes-data.json")
       .then(function (response) { return response.json(); })
-      .then(renderOtherClasses)
+      .then(function (data) {
+        cachedClassData = data;
+        renderOtherClasses(data);
+        syncFeesForCurrentClass(data);
+      })
       .catch(function () {});
+  }
+
+  function watchClassSwitches() {
+    if (!isDetailPage() || window.__falowenWatchingClassSwitches) return;
+    window.__falowenWatchingClassSwitches = true;
+    var lastTitle = "";
+    window.setInterval(function () {
+      var titleEl = document.getElementById("classTitle");
+      var title = titleEl ? titleEl.textContent.trim() : "";
+      if (title && title !== lastTitle) {
+        lastTitle = title;
+        window.setTimeout(function () { syncFeesForCurrentClass(cachedClassData); }, 80);
+        window.setTimeout(function () { syncFeesForCurrentClass(cachedClassData); }, 450);
+      }
+    }, 350);
   }
 
   function ensureReviewsAndFooter() {
@@ -189,9 +253,7 @@
     if (!page) return;
 
     var reviews = document.getElementById("studentReviewsCard");
-    if (reviews) {
-      reviews.style.display = "grid";
-    }
+    if (reviews) reviews.style.display = "grid";
 
     var footer = document.getElementById("classBrochureFooter");
     if (!footer) {
@@ -211,6 +273,8 @@
     improveLeadFormText();
     updateDetailButtons();
     loadOtherClasses();
+    watchClassSwitches();
+    syncFeesForCurrentClass(cachedClassData);
     ensureReviewsAndFooter();
   }
 
