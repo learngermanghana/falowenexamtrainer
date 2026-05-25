@@ -89,6 +89,16 @@
       ]
     },
     {
+      "level": "A1",
+      "city": "Munich",
+      "startDate": "2026-06-12",
+      "meetingDays": [
+        { "day": "Thursday", "startTime": "18:00" },
+        { "day": "Friday", "startTime": "18:00" },
+        { "day": "Saturday", "startTime": "08:00" }
+      ]
+    },
+    {
       "level": "A2",
       "city": "Freiburg",
       "startDate": "2026-05-08",
