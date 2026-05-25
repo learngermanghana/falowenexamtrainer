@@ -1,304 +1,106 @@
 (function () {
-  const HERO_IMAGE = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1800&q=80";
+  function cleanSlug(value) {
+    return String(value || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
 
-  function injectStyles() {
-    if (document.getElementById("classHeroBannerStyles")) return;
-    const style = document.createElement("style");
-    style.id = "classHeroBannerStyles";
-    style.textContent = `
-      .hero.class-hero-banner {
-        position: relative;
-        overflow: hidden;
-        display: grid;
-        grid-template-columns: minmax(0, 1.05fr) minmax(260px, .75fr);
-        gap: 18px;
-        align-items: stretch;
-        padding: 24px;
-        border: 1px solid rgba(191, 219, 254, .9);
-        background:
-          linear-gradient(90deg, rgba(8, 47, 114, .92) 0%, rgba(20, 85, 245, .84) 48%, rgba(8, 47, 114, .88) 100%),
-          url("${HERO_IMAGE}") center / cover no-repeat;
-        color: #ffffff;
-      }
+  function isFormPage() {
+    var path = window.location.pathname.replace(/\/+$/, "") || "/";
+    return path === "/classes" || path === "/classes/index.html";
+  }
 
-      .hero.class-hero-banner::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image:
-          linear-gradient(rgba(255,255,255,.08) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,.08) 1px, transparent 1px);
-        background-size: 28px 28px;
-        mask-image: linear-gradient(90deg, rgba(0,0,0,.18), rgba(0,0,0,.75));
-        pointer-events: none;
-      }
+  function isDetailPage() {
+    return /^\/classes\/[^/]+\/?$/.test(window.location.pathname);
+  }
 
-      .hero.class-hero-banner::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at 12% 14%, rgba(255,255,255,.22), transparent 28%);
-        pointer-events: none;
-      }
+  function selectedSlug() {
+    var url = new URL(window.location.href);
+    var fromQuery = url.searchParams.get("class") || url.searchParams.get("level") || url.searchParams.get("slug");
+    if (fromQuery) return cleanSlug(fromQuery);
+    var match = window.location.pathname.match(/^\/classes\/([^/]+)\/?$/);
+    return match ? match[1] : "";
+  }
 
-      .hero.class-hero-banner > * { position: relative; z-index: 1; }
-      .hero.class-hero-banner .eyebrow {
-        display: inline-flex;
-        width: fit-content;
-        max-width: 100%;
-        padding: 8px 13px;
-        border-radius: 999px;
-        background: rgba(255,255,255,.96);
-        border: 1px solid rgba(255,255,255,.9);
-        color: #1455f5;
-        font-size: 12px;
-        font-weight: 950;
-        letter-spacing: .09em;
-        text-shadow: none;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, .14);
-      }
+  function formUrl(slug) {
+    return slug ? "/classes/?class=" + encodeURIComponent(slug) : "/classes/";
+  }
 
-      .hero.class-hero-banner h1 {
-        max-width: 720px;
-        margin: 2px 0 0;
-        color: #ffffff;
-        font-size: clamp(30px, 7vw, 58px);
-        line-height: .96;
-        letter-spacing: -0.06em;
-      }
+  function detailsUrl(slug) {
+    return slug ? "/classes/" + slug + "/" : "/classes/";
+  }
 
-      .hero.class-hero-banner p {
-        max-width: 640px;
-        color: #e0f2fe;
-        font-size: clamp(15px, 2.5vw, 18px);
-        line-height: 1.65;
-      }
-
-      .hero.class-hero-banner .hero-trust {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-      }
-
-      .hero.class-hero-banner .hero-trust span {
-        background: rgba(255,255,255,.14);
-        border: 1px solid rgba(255,255,255,.22);
-        color: #ffffff;
-        box-shadow: none;
-      }
-
-      .hero.class-hero-banner .hero-actions {
-        margin-top: 4px;
-      }
-
-      .hero.class-hero-banner .hero-actions .button.primary {
-        background: #ffffff;
-        color: #1455f5;
-        border-color: #ffffff;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, .22);
-      }
-
-      .hero-banner-copy {
-        display: grid;
-        gap: 12px;
-        align-content: center;
-      }
-
-      .hero-visual-card {
-        align-self: stretch;
-        min-height: 280px;
-        border-radius: 28px;
-        background:
-          linear-gradient(180deg, rgba(255,255,255,.97), rgba(239,246,255,.94));
-        color: #0f172a;
-        padding: 18px;
-        display: grid;
-        gap: 14px;
-        box-shadow: 0 24px 60px rgba(15, 23, 42, .24);
-        border: 1px solid rgba(255,255,255,.7);
-      }
-
-      .hero-visual-top {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .hero-avatar-stack {
-        display: flex;
-      }
-
-      .hero-avatar {
-        width: 42px;
-        height: 42px;
-        border-radius: 999px;
-        display: grid;
-        place-items: center;
-        background: #dbeafe;
-        border: 2px solid #ffffff;
-        margin-left: -8px;
-        font-weight: 900;
-      }
-
-      .hero-avatar:first-child { margin-left: 0; background: #fef3c7; }
-      .hero-avatar:nth-child(2) { background: #dcfce7; }
-      .hero-avatar:nth-child(3) { background: #fee2e2; }
-
-      .hero-visual-title {
-        display: grid;
-        gap: 2px;
-      }
-
-      .hero-visual-title strong { font-size: 15px; }
-      .hero-visual-title span { color: #64748b; font-size: 12px; font-weight: 800; }
-
-      .hero-course-card {
-        border-radius: 22px;
-        padding: 16px;
-        background: linear-gradient(135deg, #eff6ff, #ffffff);
-        border: 1px solid #bfdbfe;
-        display: grid;
-        gap: 10px;
-      }
-
-      .hero-course-card h3 {
-        margin: 0;
-        font-size: 24px;
-        line-height: 1;
-        letter-spacing: -0.04em;
-        color: #0f172a;
-      }
-
-      .hero-course-card p {
-        margin: 0;
-        color: #475569 !important;
-        font-size: 13px !important;
-        line-height: 1.5 !important;
-      }
-
-      .hero-mini-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px;
-      }
-
-      .hero-mini-stat {
-        border-radius: 16px;
-        padding: 12px;
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-      }
-
-      .hero-mini-stat span {
-        display: block;
-        color: #64748b;
-        font-size: 11px;
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-      }
-
-      .hero-mini-stat strong {
-        display: block;
-        margin-top: 3px;
-        color: #0f172a;
-        font-size: 15px;
-      }
-
-      .hero-progress {
-        height: 9px;
-        border-radius: 999px;
-        overflow: hidden;
-        background: #dbeafe;
-      }
-
-      .hero-progress div {
-        width: 72%;
-        height: 100%;
-        border-radius: 999px;
-        background: linear-gradient(90deg, #1455f5, #22c55e);
-      }
-
-      @media (max-width: 760px) {
-        .hero.class-hero-banner {
-          grid-template-columns: 1fr;
-          padding: 18px;
-          gap: 14px;
-          border-radius: 24px;
-          background:
-            linear-gradient(180deg, rgba(8, 47, 114, .93), rgba(20, 85, 245, .84)),
-            url("${HERO_IMAGE}") center / cover no-repeat;
-        }
-        .hero-visual-card {
-          min-height: auto;
-          padding: 14px;
-          border-radius: 22px;
-        }
-        .hero-course-card h3 { font-size: 21px; }
-      }
-    `;
+  function addStyles() {
+    if (document.getElementById("simpleClassFlowStyles")) return;
+    var style = document.createElement("style");
+    style.id = "simpleClassFlowStyles";
+    style.textContent = "body.simple-classes-form .page>section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form .page>.grid,body.simple-classes-form .page>.card:not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form #brochureToc,body.simple-classes-form #class-summary,body.simple-classes-form #meeting-times-section,body.simple-classes-form #class-schedule-section,body.simple-classes-form #payment-agreement-section,body.simple-classes-form .hero-actions,body.simple-classes-form .footer{display:none!important}body.simple-classes-form .hero{padding:14px 16px!important;gap:8px!important;border-radius:18px!important}body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)!important}body.simple-classes-form .hero p{font-size:14px!important;line-height:1.5!important}.hero{padding-top:14px!important;padding-bottom:14px!important}.hero-visual-card{min-height:auto!important}.simple-register-note{margin-top:10px;color:#334155;font-size:14px;line-height:1.55}";
     document.head.appendChild(style);
   }
 
-  function enhanceHero() {
-    const hero = document.querySelector(".hero");
-    if (!hero || hero.dataset.heroBannerReady === "true") return;
-
-    injectStyles();
-    hero.classList.add("class-hero-banner");
-
-    const existingChildren = Array.from(hero.children);
-    const copy = document.createElement("div");
-    copy.className = "hero-banner-copy";
-    existingChildren.forEach((child) => copy.appendChild(child));
-
-    const title = copy.querySelector("h1");
-    const text = copy.querySelector("p");
-    const eyebrow = copy.querySelector(".eyebrow");
-    const trust = copy.querySelector(".hero-trust");
-
-    if (eyebrow) eyebrow.textContent = "Falowen German Classes";
-    if (title) title.textContent = "Start your German journey with confidence.";
-    if (text) {
-      text.textContent = "Join a supportive learning community for A1 to C1 German. Learn in person, online, or with recordings while keeping your Falowen access for revision and exam preparation.";
-    }
-    if (trust) {
-      trust.innerHTML = "<span>Hybrid classes</span><span>6 months access</span><span>Exam preparation</span>";
-    }
-
-    const visual = document.createElement("aside");
-    visual.className = "hero-visual-card";
-    visual.innerHTML = `
-      <div class="hero-visual-top">
-        <div class="hero-avatar-stack" aria-hidden="true">
-          <div class="hero-avatar">A1</div>
-          <div class="hero-avatar">B1</div>
-          <div class="hero-avatar">C1</div>
-        </div>
-        <div class="hero-visual-title">
-          <strong>Learn Language Education Academy</strong>
-          <span>German learning community</span>
-        </div>
-      </div>
-      <div class="hero-course-card">
-        <h3>Upcoming German Class</h3>
-        <p>Choose your class, view meeting times, check the schedule, and sign up directly through Falowen.</p>
-        <div class="hero-progress"><div></div></div>
-      </div>
-      <div class="hero-mini-grid">
-        <div class="hero-mini-stat"><span>Mode</span><strong>Online + in person</strong></div>
-        <div class="hero-mini-stat"><span>Access</span><strong>6 months</strong></div>
-        <div class="hero-mini-stat"><span>Levels</span><strong>A1–C1</strong></div>
-        <div class="hero-mini-stat"><span>Support</span><strong>App + tutor</strong></div>
-      </div>
-    `;
-
-    hero.innerHTML = "";
-    hero.appendChild(copy);
-    hero.appendChild(visual);
-    hero.dataset.heroBannerReady = "true";
+  function updateHeroForForm() {
+    if (!isFormPage()) return;
+    document.body.classList.add("simple-classes-form");
+    var eyebrow = document.querySelector(".hero .eyebrow");
+    var title = document.querySelector(".hero h1");
+    var text = document.querySelector(".hero p");
+    if (eyebrow) eyebrow.textContent = "FALOWEN GERMAN CLASSES";
+    if (title) title.textContent = "Register your interest in a German class";
+    if (text) text.textContent = "Fill your name, email, phone number, and the class or level you want. We will save it to the lead sheet and then open the selected class information page.";
   }
 
-  window.addEventListener("load", enhanceHero);
-  [100, 500, 1200].forEach((delay) => setTimeout(enhanceHero, delay));
+  function improveLeadFormText() {
+    if (!isFormPage()) return;
+    var h2 = document.querySelector("#leadCaptureCard h2");
+    var p = document.querySelector("#leadCaptureCard p");
+    var button = document.querySelector("#leadCaptureForm button[type='submit']");
+    var skip = document.getElementById("skipLeadGate");
+    if (h2) h2.textContent = "Fill the form to continue";
+    if (p) p.textContent = "No payment question here. We only collect your contact details and selected class for follow-up.";
+    if (button) button.textContent = "Save and show class information";
+    if (skip) skip.style.display = "none";
+  }
+
+  function redirectAfterLeadSubmit() {
+    document.addEventListener("submit", function (event) {
+      var form = event.target;
+      if (!form || form.id !== "leadCaptureForm" || !isFormPage()) return;
+      var select = form.querySelector("#leadClass");
+      var slug = select && select.value ? select.value : selectedSlug();
+      var status = document.getElementById("leadStatus");
+      if (status) status.textContent = "Saved. Opening selected class information...";
+      window.setTimeout(function () {
+        window.location.assign(detailsUrl(slug));
+      }, 900);
+    }, true);
+  }
+
+  function updateDetailButtons() {
+    if (!isDetailPage()) return;
+    document.body.classList.remove("lead-gate-active", "simple-classes-form");
+    var leadCard = document.getElementById("leadCaptureCard");
+    if (leadCard) leadCard.remove();
+    var slug = selectedSlug();
+    document.querySelectorAll("a[href^='/signup'],a[href^='/classes/?class']").forEach(function (link) {
+      link.href = formUrl(slug);
+      link.textContent = "Register Now";
+      link.removeAttribute("target");
+      link.removeAttribute("rel");
+    });
+    var cta = document.getElementById("mainSignupCta");
+    if (cta) {
+      cta.href = formUrl(slug);
+      cta.textContent = "Register Now";
+    }
+  }
+
+  function run() {
+    addStyles();
+    updateHeroForForm();
+    improveLeadFormText();
+    updateDetailButtons();
+  }
+
+  redirectAfterLeadSubmit();
+  run();
+  window.addEventListener("load", run);
+  [100, 350, 800, 1500, 2500].forEach(function (delay) { window.setTimeout(run, delay); });
 })();
