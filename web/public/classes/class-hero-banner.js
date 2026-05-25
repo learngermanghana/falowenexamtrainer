@@ -28,11 +28,38 @@
     return slug ? "/classes/" + slug + "/" : "/classes/";
   }
 
+  function formatDate(iso) {
+    if (!iso) return "Always open";
+    return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(iso + "T00:00:00Z"));
+  }
+
+  function formatMoney(amount) {
+    if (!amount) return "Fee on request";
+    return "GHS " + Number(amount || 0).toLocaleString("en-GH");
+  }
+
+  function classTime(course) {
+    if (!course.meetingDays || !course.meetingDays.length) return "Self-learning";
+    return course.meetingDays.map(function (slot) {
+      return slot.day + " " + (slot.startTime || "");
+    }).join(", ");
+  }
+
+  function isOpenClass(course) {
+    if (!course) return false;
+    if (course.availability === "always") return true;
+    if (!course.startDate) return false;
+    var today = new Date();
+    today.setHours(0, 0, 0, 0);
+    var start = new Date(course.startDate + "T00:00:00");
+    return start >= today;
+  }
+
   function addStyles() {
     if (document.getElementById("simpleClassFlowStyles")) return;
     var style = document.createElement("style");
     style.id = "simpleClassFlowStyles";
-    style.textContent = "body.simple-classes-form .page>section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form .page>.grid,body.simple-classes-form .page>.card:not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form #brochureToc,body.simple-classes-form #class-summary,body.simple-classes-form #meeting-times-section,body.simple-classes-form #class-schedule-section,body.simple-classes-form #payment-agreement-section,body.simple-classes-form .hero-actions,body.simple-classes-form .footer{display:none!important}body.simple-classes-form .hero{padding:14px 16px!important;gap:8px!important;border-radius:18px!important}body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)!important}body.simple-classes-form .hero p{font-size:14px!important;line-height:1.5!important}.hero{padding-top:14px!important;padding-bottom:14px!important}.hero-visual-card{min-height:auto!important}.simple-register-note{margin-top:10px;color:#334155;font-size:14px;line-height:1.55}";
+    style.textContent = "body.simple-classes-form .page>section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form .page>.grid,body.simple-classes-form .page>.card:not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form #brochureToc,body.simple-classes-form #class-summary,body.simple-classes-form #meeting-times-section,body.simple-classes-form #class-schedule-section,body.simple-classes-form #payment-agreement-section,body.simple-classes-form .hero-actions,body.simple-classes-form .footer{display:none!important}body.simple-classes-form .hero{padding:14px 16px!important;gap:8px!important;border-radius:18px!important}body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)!important}body.simple-classes-form .hero p{font-size:14px!important;line-height:1.5!important}.hero{padding-top:14px!important;padding-bottom:14px!important}.hero-visual-card{min-height:auto!important}.other-classes-card{margin-top:16px;display:grid;gap:12px}.other-classes-card h2{margin:0;font-size:20px}.other-classes-card p{margin:0;color:#475569;font-size:14px;line-height:1.55}.other-classes-grid{display:grid;gap:10px}.other-class-item{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:12px;display:grid;gap:8px}.other-class-item strong{color:#0f172a;font-size:15px}.other-class-meta{color:#475569;font-size:13px;line-height:1.45}.other-class-actions{display:grid;grid-template-columns:1fr;gap:8px}.other-class-actions a{min-height:40px;border-radius:12px;padding:10px 12px;font-size:13px}@media(min-width:760px){.other-classes-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.other-class-actions{grid-template-columns:1fr 1fr}}";
     document.head.appendChild(style);
   }
 
@@ -92,11 +119,46 @@
     }
   }
 
+  function renderOtherClasses(data) {
+    if (!isDetailPage() || document.getElementById("otherAvailableClasses")) return;
+    var currentSlug = selectedSlug();
+    var courses = (data.classes || [])
+      .filter(isOpenClass)
+      .filter(function (course) { return course.slug !== currentSlug && course.id !== currentSlug; })
+      .slice(0, 6);
+    if (!courses.length) return;
+
+    var card = document.createElement("section");
+    card.id = "otherAvailableClasses";
+    card.className = "card other-classes-card";
+    card.innerHTML = "<div><h2>Other available classes</h2><p>Students can also check these classes before registering.</p></div><div class='other-classes-grid'>" +
+      courses.map(function (course) {
+        var slug = course.slug || cleanSlug(course.title);
+        return "<article class='other-class-item'><strong>" + course.title + "</strong><div class='other-class-meta'>" +
+          "Starts: " + formatDate(course.startDate) + "<br>" +
+          "Time: " + classTime(course) + "<br>" +
+          "Fee: " + formatMoney(course.tuitionGhs) +
+          "</div><div class='other-class-actions'><a class='button' href='" + detailsUrl(slug) + "'>View details</a><a class='button primary' href='" + formUrl(slug) + "'>Register</a></div></article>";
+      }).join("") + "</div>";
+
+    var anchor = document.getElementById("class-summary") || document.querySelector(".class-main-card") || document.querySelector(".hero");
+    if (anchor) anchor.insertAdjacentElement("afterend", card);
+  }
+
+  function loadOtherClasses() {
+    if (!isDetailPage()) return;
+    fetch("/classes/classes-data.json")
+      .then(function (response) { return response.json(); })
+      .then(renderOtherClasses)
+      .catch(function () {});
+  }
+
   function run() {
     addStyles();
     updateHeroForForm();
     improveLeadFormText();
     updateDetailButtons();
+    loadOtherClasses();
   }
 
   redirectAfterLeadSubmit();
