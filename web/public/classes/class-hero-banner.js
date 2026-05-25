@@ -12,6 +12,10 @@
     return /^\/classes\/[^/]+\/?$/.test(window.location.pathname);
   }
 
+  function isClassArea() {
+    return isFormPage() || isDetailPage();
+  }
+
   function selectedSlug() {
     var url = new URL(window.location.href);
     var fromQuery = url.searchParams.get("class") || url.searchParams.get("level") || url.searchParams.get("slug");
@@ -80,13 +84,14 @@
     if (document.getElementById("simpleClassFlowStyles")) return;
     var style = document.createElement("style");
     style.id = "simpleClassFlowStyles";
-    style.textContent = "body.simple-classes-form .page>section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form .page>.grid,body.simple-classes-form .page>.card:not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form #brochureToc,body.simple-classes-form #class-summary,body.simple-classes-form #meeting-times-section,body.simple-classes-form #class-schedule-section,body.simple-classes-form #payment-agreement-section,body.simple-classes-form .hero-actions,body.simple-classes-form .footer{display:none!important}body.simple-classes-form .lead-small-actions{display:none!important}body.simple-classes-form .hero{padding:14px 16px!important;gap:8px!important;border-radius:18px!important}body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)!important}body.simple-classes-form .hero p{font-size:14px!important;line-height:1.5!important}.hero{padding-top:14px!important;padding-bottom:14px!important}.hero-visual-card{min-height:auto!important}.other-classes-card{margin-top:16px;display:grid;gap:12px}.other-classes-card h2{margin:0;font-size:20px}.other-classes-card p{margin:0;color:#475569;font-size:14px;line-height:1.55}.other-classes-grid{display:grid;gap:10px}.other-class-item{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:12px;display:grid;gap:8px}.other-class-item strong{color:#0f172a;font-size:15px}.other-class-meta{color:#475569;font-size:13px;line-height:1.45}.other-class-actions{display:grid;grid-template-columns:1fr;gap:8px}.other-class-actions a{min-height:40px;border-radius:12px;padding:10px 12px;font-size:13px}@media(min-width:760px){.other-classes-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.other-class-actions{grid-template-columns:1fr 1fr}}";
+    style.textContent = "body.simple-classes-form .page>section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form .page>.grid,body.simple-classes-form .page>.card:not(.lead-capture-card):not(#studentReviewsCard),body.simple-classes-form #brochureToc,body.simple-classes-form #class-summary,body.simple-classes-form #meeting-times-section,body.simple-classes-form #class-schedule-section,body.simple-classes-form #payment-agreement-section,body.simple-classes-form .hero-actions,body.simple-classes-form .footer{display:none!important}body.simple-classes-form .lead-small-actions{display:none!important}body.simple-classes-form .hero{padding:14px 16px!important;gap:8px!important;border-radius:18px!important}body.simple-classes-form .hero h1{font-size:clamp(25px,8vw,36px)!important}body.simple-classes-form .hero p{font-size:14px!important;line-height:1.5!important}.hero{padding-top:14px!important;padding-bottom:14px!important}.hero-visual-card{min-height:auto!important}#studentReviewsCard{display:grid!important}#classBrochureFooter{display:grid!important}.brochure-footer{display:grid!important}.other-classes-card{margin-top:16px;display:grid;gap:12px}.other-classes-card h2{margin:0;font-size:20px}.other-classes-card p{margin:0;color:#475569;font-size:14px;line-height:1.55}.other-classes-grid{display:grid;gap:10px}.other-class-item{border:1px solid #e2e8f0;background:#f8fafc;border-radius:14px;padding:12px;display:grid;gap:8px}.other-class-item strong{color:#0f172a;font-size:15px}.other-class-meta{color:#475569;font-size:13px;line-height:1.45}.other-class-actions{display:grid;grid-template-columns:1fr;gap:8px}.other-class-actions a{min-height:40px;border-radius:12px;padding:10px 12px;font-size:13px}@media(min-width:760px){.other-classes-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.other-class-actions{grid-template-columns:1fr 1fr}}";
     document.head.appendChild(style);
   }
 
   function updateHeroForForm() {
     if (!isFormPage()) return;
     document.body.classList.add("simple-classes-form");
+    document.body.classList.remove("lead-gate-active");
     var eyebrow = document.querySelector(".hero .eyebrow");
     var title = document.querySelector(".hero h1");
     var text = document.querySelector(".hero p");
@@ -178,6 +183,27 @@
       .catch(function () {});
   }
 
+  function ensureReviewsAndFooter() {
+    if (!isClassArea()) return;
+    var page = document.querySelector(".page");
+    if (!page) return;
+
+    var reviews = document.getElementById("studentReviewsCard");
+    if (reviews) {
+      reviews.style.display = "grid";
+    }
+
+    var footer = document.getElementById("classBrochureFooter");
+    if (!footer) {
+      footer = document.createElement("footer");
+      footer.id = "classBrochureFooter";
+      footer.className = "brochure-footer";
+      footer.innerHTML = "<div><h2>Learn Language Education Academy</h2><p>Learn German with structured classes, tutor support, Falowen app practice, and clear class schedules.</p></div><nav class='brochure-footer-links' aria-label='Learn Language Education Academy links'><a href='https://www.learngermanghana.com/tutors' target='_blank' rel='noreferrer'>Tutors</a><a href='https://www.learngermanghana.com/blog' target='_blank' rel='noreferrer'>Blog</a><a href='https://www.learngermanghana.com/about' target='_blank' rel='noreferrer'>About us</a><a href='https://www.google.com/maps/search/?api=1&query=Learn%20Language%20Education%20Academy%20Awoshie%20Accra' target='_blank' rel='noreferrer'>Find us on Google Maps</a></nav>";
+      page.appendChild(footer);
+    }
+    footer.style.display = "grid";
+  }
+
   function run() {
     protectLeadLandingUrl();
     addStyles();
@@ -185,11 +211,12 @@
     improveLeadFormText();
     updateDetailButtons();
     loadOtherClasses();
+    ensureReviewsAndFooter();
   }
 
   protectLeadLandingUrl();
   redirectAfterLeadSubmit();
   run();
   window.addEventListener("load", run);
-  [100, 350, 800, 1500, 2500].forEach(function (delay) { window.setTimeout(run, delay); });
+  [100, 350, 800, 1500, 2500, 4000].forEach(function (delay) { window.setTimeout(run, delay); });
 })();
