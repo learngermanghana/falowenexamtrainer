@@ -1,7 +1,6 @@
 (function () {
   const STORAGE_KEY = "falowen:class-leads";
   const LAST_LEAD_KEY = "falowen:last-class-lead";
-  const LEAD_GATE_KEY = "falowen:class-lead-captured";
   const ENDPOINT_KEY = "falowen:class-leads-endpoint";
   const DEFAULT_APPS_SCRIPT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzrUe3IC5w24Rmf_Ed-8HmdKzV3mn0BQyg2qsaveOSQOYunQj89MM23mgDhjGbsMa2gSA/exec";
 
@@ -14,6 +13,15 @@
       .replace(/^-|-$/g, "");
   }
 
+  function isLeadLandingPage() {
+    const path = window.location.pathname.replace(/\/+$/, "") || "/";
+    return path === "/classes" || path === "/classes/index.html";
+  }
+
+  function isExactClassPage() {
+    return /^\/classes\/[^/]+\/?$/.test(window.location.pathname);
+  }
+
   function safeJsonParse(value, fallback) {
     try {
       return JSON.parse(value);
@@ -24,7 +32,7 @@
 
   function getRequestedSlug() {
     const url = new URL(window.location.href);
-    const querySlug = url.searchParams.get("class") || url.searchParams.get("slug");
+    const querySlug = url.searchParams.get("class") || url.searchParams.get("slug") || url.searchParams.get("level");
     if (querySlug) return slugify(querySlug);
     const match = window.location.pathname.match(/^\/classes\/([^/]+)\/?$/);
     return match ? slugify(match[1]) : "";
@@ -62,7 +70,6 @@
     filtered.unshift(lead);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered.slice(0, 50)));
     localStorage.setItem(LAST_LEAD_KEY, JSON.stringify(lead));
-    localStorage.setItem(LEAD_GATE_KEY, "1");
     localStorage.setItem("exam-coach-class", lead.className);
     localStorage.setItem("falowen:class-lead-id", lead.id);
   }
@@ -72,11 +79,8 @@
   }
 
   function shouldGate() {
-    const lead = getLastLead();
-    const requestedSlug = getRequestedSlug();
-    if (!lead) return true;
-    if (!requestedSlug) return false;
-    return slugify(lead.classSlug || lead.className) !== requestedSlug;
+    if (isExactClassPage()) return false;
+    return isLeadLandingPage();
   }
 
   function injectStyles() {
@@ -84,10 +88,10 @@
     const style = document.createElement("style");
     style.id = "classLeadStyles";
     style.textContent = `
-      body.lead-gate-active .page > section:not(.hero):not(.lead-capture-card),
-      body.lead-gate-active .page > .card:not(.lead-capture-card),
-      body.lead-gate-active .page > footer,
-      body.lead-gate-active .footer,
+      body.lead-gate-active .page > section:not(.hero):not(.lead-capture-card):not(#studentReviewsCard),
+      body.lead-gate-active .page > .card:not(.lead-capture-card):not(#studentReviewsCard),
+      body.lead-gate-active .page > .grid,
+      body.lead-gate-active .page > p.footer,
       body.lead-gate-active .hero-actions { display: none !important; }
       .lead-capture-card { margin-top: 14px; display: grid; gap: 14px; border-color: #bfdbfe; background: linear-gradient(180deg, #ffffff, #eff6ff); }
       .lead-capture-card h2 { margin: 0; font-size: clamp(23px, 7vw, 34px); letter-spacing: -0.035em; }
@@ -101,8 +105,6 @@
       .lead-help { color: #64748b; font-size: 12px; line-height: 1.45; }
       .lead-submit { width: 100%; min-height: 50px; }
       .lead-status { min-height: 20px; color: #1d4ed8; font-weight: 800; font-size: 13px; }
-      .lead-small-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-      .lead-small-actions button { border: 0; background: transparent; color: #1d4ed8; font-weight: 800; padding: 0; cursor: pointer; }
       @media (min-width: 760px) {
         .lead-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .lead-field.full { grid-column: 1 / -1; }
@@ -129,6 +131,7 @@
   }
 
   function renderLeadCard(data) {
+    if (!isLeadLandingPage()) return;
     if (document.getElementById("leadCaptureCard")) return;
     const hero = document.querySelector(".hero");
     if (!hero) return;
@@ -142,13 +145,13 @@
     card.className = "card lead-capture-card";
     card.innerHTML = `
       <div>
-        <h2>Welcome. Which class are you interested in?</h2>
-        <p>Please leave your details and choose a class. We will show the class information and keep your enquiry so we can remind you before the class begins.</p>
+        <h2>Fill the form to continue</h2>
+        <p>No payment question here. We only collect your contact details and selected class for follow-up.</p>
       </div>
       <form class="lead-capture-form" id="leadCaptureForm">
         <div class="lead-form-grid">
           <div class="lead-field">
-            <label for="leadName">Your name</label>
+            <label for="leadName">Full name</label>
             <input id="leadName" name="name" autocomplete="name" required placeholder="Enter your full name" />
           </div>
           <div class="lead-field">
@@ -160,18 +163,15 @@
             <input id="leadEmail" name="email" type="email" autocomplete="email" required placeholder="name@email.com" />
           </div>
           <div class="lead-field">
-            <label for="leadClass">Choose class</label>
+            <label for="leadClass">Class / level you want</label>
             <select id="leadClass" name="classSlug" required>
               ${classes.map((course) => `<option value="${course.slug}" ${course.id === selected?.id ? "selected" : ""}>${getClassSummary(course)}</option>`).join("")}
             </select>
           </div>
         </div>
-        <p class="lead-help">Your details are saved as a class enquiry lead. We use them only to follow up about the class you selected.</p>
-        <button class="button primary lead-submit" type="submit">Save and view class details</button>
+        <p class="lead-help">Your details sync to the Falowen lead sheet. After saving, we will open the class page you selected.</p>
+        <button class="button primary lead-submit" type="submit">Save and show class information</button>
         <div class="lead-status" id="leadStatus"></div>
-        <div class="lead-small-actions">
-          <button type="button" id="skipLeadGate">I already submitted, show class details</button>
-        </div>
       </form>
     `;
     hero.insertAdjacentElement("afterend", card);
@@ -183,28 +183,12 @@
     }
 
     const select = card.querySelector("#leadClass");
-    select.addEventListener("change", () => {
-      const course = classes.find((item) => item.slug === select.value);
-      if (!course) return;
-      window.history.replaceState(null, "", `/classes/${course.slug}/`);
-      try {
-        const tabs = Array.from(document.querySelectorAll(".class-tab"));
-        const match = tabs.find((button) => slugify(button.textContent) === course.slug);
-        if (match) match.click();
-      } catch (error) {}
-    });
-
-    card.querySelector("#skipLeadGate").addEventListener("click", () => {
-      localStorage.setItem(LEAD_GATE_KEY, "1");
-      document.body.classList.remove("lead-gate-active");
-    });
 
     card.querySelector("#leadCaptureForm").addEventListener("submit", (event) => {
       event.preventDefault();
       const course = classes.find((item) => item.slug === select.value) || selected || classes[0];
       const lead = buildLead(card, course);
       saveStoredLead(lead);
-      document.body.classList.remove("lead-gate-active");
       updateSignupLinksWithLead(lead);
       submitLead(data, lead);
     });
@@ -214,7 +198,7 @@
     return {
       id: `lead_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       createdAt: new Date().toISOString(),
-      source: "classes-brochure",
+      source: "classes-lead-landing",
       status: "new_lead",
       name: card.querySelector("#leadName").value.trim(),
       phone: card.querySelector("#leadPhone").value.trim(),
@@ -229,7 +213,7 @@
         ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
         : "Self-learning",
       scheduleUrl: course.scheduleUrl || course.docUrl || "",
-      paymentStatus: "unknown",
+      paymentStatus: "not_requested",
       paidAt: "",
       followUpCount: 0,
       nextFollowUpAt: "",
@@ -237,8 +221,8 @@
   }
 
   function updateSignupLinksWithLead(lead) {
-    const signupUrl = `/signup/?class=${encodeURIComponent(lead.classSlug)}&className=${encodeURIComponent(lead.className)}&leadId=${encodeURIComponent(lead.id)}`;
-    document.querySelectorAll("a[href^='/signup']").forEach((link) => {
+    const signupUrl = `/classes/?class=${encodeURIComponent(lead.classSlug)}&leadId=${encodeURIComponent(lead.id)}`;
+    document.querySelectorAll("a[href^='/signup'], a[href^='/classes/?class']").forEach((link) => {
       link.href = signupUrl;
     });
   }
@@ -246,29 +230,30 @@
   function submitLead(data, lead) {
     const status = document.getElementById("leadStatus");
     const endpoint = getLeadEndpoint(data);
+    const classUrl = `/classes/${encodeURIComponent(lead.classSlug)}/`;
+    const openClass = () => window.location.assign(classUrl);
+
+    if (status) status.textContent = "Saving enquiry and opening class information...";
+
     if (!endpoint) {
-      if (status) status.textContent = "Saved. App Script sync will start after the endpoint is added.";
+      window.setTimeout(openClass, 350);
       return;
     }
 
-    if (status) status.textContent = "Saving enquiry...";
     fetch(endpoint, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ action: "saveLead", lead }),
     })
-      .then(() => {
-        if (status) status.textContent = "Saved. Class details are ready below.";
-      })
-      .catch(() => {
-        if (status) status.textContent = "Saved on this device. Sync will retry when configured.";
-      });
+      .catch(() => {})
+      .finally(() => window.setTimeout(openClass, 350));
   }
 
   function init() {
     injectStyles();
     if (shouldGate()) document.body.classList.add("lead-gate-active");
+    if (isExactClassPage()) document.body.classList.remove("lead-gate-active");
 
     fetch("/classes/classes-data.json")
       .then((response) => response.json())
