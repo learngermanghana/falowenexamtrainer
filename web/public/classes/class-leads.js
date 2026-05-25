@@ -2,6 +2,7 @@
   const STORAGE_KEY = "falowen:class-leads";
   const LAST_LEAD_KEY = "falowen:last-class-lead";
   const ENDPOINT_KEY = "falowen:class-leads-endpoint";
+  const CTA_VARIANT_KEY = "falowen:class-lead-cta-variant";
   const DEFAULT_APPS_SCRIPT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzrUe3IC5w24Rmf_Ed-8HmdKzV3mn0BQyg2qsaveOSQOYunQj89MM23mgDhjGbsMa2gSA/exec";
 
   function slugify(value) {
@@ -62,6 +63,15 @@
 
   function loadStoredLeads() {
     return safeJsonParse(localStorage.getItem(STORAGE_KEY) || "[]", []);
+  }
+
+  function getLeadCtaCopy() {
+    const variants = ["Unlock class schedule", "See fees & timetable", "Continue to class details"];
+    const stored = Number(localStorage.getItem(CTA_VARIANT_KEY));
+    if (Number.isInteger(stored) && stored >= 0 && stored < variants.length) return variants[stored];
+    const chosen = Math.floor(Math.random() * variants.length);
+    localStorage.setItem(CTA_VARIANT_KEY, String(chosen));
+    return variants[chosen];
   }
 
   function saveStoredLead(lead) {
@@ -181,7 +191,7 @@
           <span>I agree to be contacted by Falowen via WhatsApp, phone, or email about this class enquiry. Read our <a href="/privacy" target="_blank" rel="noreferrer">privacy policy</a>.</span>
         </label>
         <p class="lead-help">Your details sync to the Falowen lead sheet. After saving, we will open the class page you selected.</p>
-        <button class="button primary lead-submit" type="submit">Save and show class information</button>
+        <button class="button primary lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
         <div class="lead-status" id="leadStatus"></div>
       </form>
     `;
@@ -280,7 +290,12 @@
     const status = document.getElementById("leadStatus");
     const endpoint = getLeadEndpoint(data);
     const classUrl = `/classes/${encodeURIComponent(lead.classSlug)}/`;
-    const openClass = () => window.location.assign(classUrl);
+    let opened = false;
+    const openClass = () => {
+      if (opened) return;
+      opened = true;
+      window.location.assign(classUrl);
+    };
 
     if (status) status.textContent = "Saving enquiry and opening class information...";
 
@@ -289,14 +304,17 @@
       return;
     }
 
-    fetch(endpoint, {
+    const submission = fetch(endpoint, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ action: "saveLead", lead }),
-    })
-      .catch(() => {})
-      .finally(() => window.setTimeout(openClass, 350));
+    }).catch(() => {});
+
+    Promise.race([
+      submission,
+      new Promise((resolve) => window.setTimeout(resolve, 1600)),
+    ]).finally(() => window.setTimeout(openClass, 200));
   }
 
   function init() {
