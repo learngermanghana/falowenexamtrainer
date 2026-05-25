@@ -28,6 +28,27 @@
     return slug ? "/classes/" + slug + "/" : "/classes/";
   }
 
+  function protectLeadLandingUrl() {
+    if (window.__falowenProtectClassesLeadLanding) return;
+    window.__falowenProtectClassesLeadLanding = true;
+    var originalReplaceState = history.replaceState.bind(history);
+    var originalPushState = history.pushState.bind(history);
+
+    function shouldBlockUrl(url) {
+      return isFormPage() && typeof url === "string" && /^\/classes\/[^/]+\/?$/.test(url);
+    }
+
+    history.replaceState = function (state, title, url) {
+      if (shouldBlockUrl(url)) return undefined;
+      return originalReplaceState(state, title, url);
+    };
+
+    history.pushState = function (state, title, url) {
+      if (shouldBlockUrl(url)) return undefined;
+      return originalPushState(state, title, url);
+    };
+  }
+
   function formatDate(iso) {
     if (!iso) return "Always open";
     return new Intl.DateTimeFormat("en-GB", { dateStyle: "medium", timeZone: "UTC" }).format(new Date(iso + "T00:00:00Z"));
@@ -154,6 +175,7 @@
   }
 
   function run() {
+    protectLeadLandingUrl();
     addStyles();
     updateHeroForForm();
     improveLeadFormText();
@@ -161,6 +183,7 @@
     loadOtherClasses();
   }
 
+  protectLeadLandingUrl();
   redirectAfterLeadSubmit();
   run();
   window.addEventListener("load", run);
