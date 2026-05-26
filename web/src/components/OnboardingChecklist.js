@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useExam } from "../context/ExamContext";
 import { useToast } from "../context/ToastContext";
@@ -6,12 +7,10 @@ import { classCatalog } from "../data/classCatalog";
 import { downloadClassCalendar } from "../services/classCalendar";
 import { loadPreferredClass } from "../services/classSelectionStorage";
 import { normalizeNotificationStatus } from "../utils/notificationStatus";
-import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { getDay0WorkbookLinkForLevel, normalizeLevel } from "../lib/day0Workbook";
 
-const STORAGE_KEY = "falowen_onboarding_v3";
+const STORAGE_KEY = "falowen_onboarding_v4";
 const DISMISS_HOURS = 24;
-
 
 const loadState = () => {
   if (typeof window === "undefined") return {};
@@ -33,89 +32,74 @@ const persistState = (value) => {
   }
 };
 
-const Step = ({
+const statusBadgeStyle = (complete, active = false) => ({
+  ...styles.badge,
+  background: complete ? "#dcfce7" : active ? "#dbeafe" : "#f3f4f6",
+  color: complete ? "#166534" : active ? "#1e40af" : "#374151",
+  border: `1px solid ${complete ? "#86efac" : active ? "#93c5fd" : "#e5e7eb"}`,
+});
+
+const OnboardingActionCard = ({
+  number,
   title,
   description,
+  complete,
+  active,
   actionLabel,
   onAction,
-  complete,
-  accent = "#e5e7eb",
-  highlight = false,
-  secondaryActionLabel,
-  onSecondaryAction,
-  disableSecondaryWhenComplete = true,
-  footnote,
-  stepRef,
-}) => {
-  const borderColor = complete ? "#10b981" : highlight ? "#0ea5e9" : accent;
-  const background = complete ? "#ecfdf3" : highlight ? "#ecfeff" : "#ffffff";
-
-  return (
-    <div
-      ref={stepRef}
-      style={{
-        ...styles.uploadCard,
-        display: "grid",
-        gap: 6,
-        alignItems: "start",
-        borderColor,
-        background,
-        boxShadow: highlight ? "0 0 0 3px rgba(14,165,233,0.12)" : "none",
-      }}
-    >
-      <div
-        className="onboarding-step-header"
-        style={{ display: "flex", justifyContent: "space-between", gap: 8 }}
-      >
-        <div>
-          <div style={{ fontWeight: 800, color: "#111827" }}>{title}</div>
-          <p style={{ ...styles.helperText, margin: "4px 0 0 0" }}>{description}</p>
-          {footnote ? (
-            <p style={{ ...styles.helperText, margin: "6px 0 0 0", color: "#0f172a" }}>{footnote}</p>
-          ) : null}
-        </div>
-
+  secondaryLabel,
+  onSecondary,
+  helper,
+}) => (
+  <section
+    style={{
+      ...styles.uploadCard,
+      display: "grid",
+      gap: 10,
+      borderColor: complete ? "#86efac" : active ? "#2563eb" : "#e5e7eb",
+      background: complete ? "#f0fdf4" : active ? "#eff6ff" : "#fff",
+      boxShadow: active ? "0 14px 30px rgba(37, 99, 235, 0.16)" : "none",
+    }}
+  >
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "flex-start" }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
         <span
           style={{
-            ...styles.badge,
-            background: complete ? "#d1fae5" : highlight ? "#bae6fd" : accent,
-            color: complete ? "#065f46" : "#0f172a",
-            whiteSpace: "nowrap",
-            alignSelf: "start",
+            width: 30,
+            height: 30,
+            borderRadius: "50%",
+            background: complete ? "#16a34a" : active ? "#2563eb" : "#e5e7eb",
+            color: complete || active ? "#fff" : "#374151",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: 900,
+            flex: "0 0 auto",
           }}
         >
-          {complete ? "Done" : highlight ? "Next" : "Open"}
+          {complete ? "✓" : number}
         </span>
-      </div>
-
-      {(onAction || onSecondaryAction) ? (
-        <div className="onboarding-action-row" style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
-          {onAction ? (
-            <button
-              style={complete ? styles.secondaryButton : styles.primaryButton}
-              onClick={onAction}
-              disabled={complete}
-              type="button"
-            >
-              {complete ? "Completed" : actionLabel}
-            </button>
-          ) : null}
-
-          {onSecondaryAction ? (
-            <button
-              style={{ ...styles.secondaryButton, padding: "10px 12px" }}
-              onClick={onSecondaryAction}
-              type="button"
-              disabled={disableSecondaryWhenComplete ? complete : false}
-            >
-              {secondaryActionLabel}
-            </button>
-          ) : null}
+        <div>
+          <h3 style={{ margin: 0, fontSize: 17 }}>{title}</h3>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>{description}</p>
+          {helper ? <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#0f172a" }}>{helper}</p> : null}
         </div>
+      </div>
+      <span style={statusBadgeStyle(complete, active)}>{complete ? "Done" : active ? "Do now" : "Next"}</span>
+    </div>
+
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <button type="button" style={active ? styles.primaryButton : styles.secondaryButton} onClick={onAction}>
+        {complete ? `Open again` : actionLabel}
+      </button>
+      {secondaryLabel && onSecondary ? (
+        <button type="button" style={styles.secondaryButton} onClick={onSecondary}>
+          {secondaryLabel}
+        </button>
       ) : null}
     </div>
-  );
-};
+  </section>
+);
 
 const OnboardingChecklist = ({
   notificationStatus,
@@ -125,64 +109,49 @@ const OnboardingChecklist = ({
   studentProfile,
   onSaveOnboarding,
 }) => {
-  const { level, levelConfirmed } = useExam();
+  const { level } = useExam();
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
   const [state, setState] = useState(() => {
     const persisted = loadState();
     return {
-      calendarDownloadedByClass: persisted.calendarDownloadedByClass || {},
+      day0OpenedByLevel: persisted.day0OpenedByLevel || {},
+      scheduleCheckedByClass: persisted.scheduleCheckedByClass || {},
       notificationsSkipped: Boolean(persisted.notificationsSkipped),
       dismissedUntil: persisted.dismissedUntil || 0,
-      guidedMode: Boolean(persisted.guidedMode),
       completedLocally: Boolean(persisted.completedLocally),
     };
   });
 
-  const profileLevel = useMemo(() => normalizeLevel(studentProfile?.level), [studentProfile?.level]);
-  const preferredLevel = useMemo(() => normalizeLevel(level), [level]);
-  const effectiveLevel = profileLevel || preferredLevel;
-  const profileClassName = useMemo(() => (studentProfile?.className || "").trim(), [studentProfile?.className]);
-  const day0WorkbookLink = useMemo(() => getDay0WorkbookLinkForLevel(effectiveLevel), [effectiveLevel]);
-
   const [selectedClass, setSelectedClass] = useState(() => loadPreferredClass() || "");
-
   const [savingOnboarding, setSavingOnboarding] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [localCompletion, setLocalCompletion] = useState(false);
 
-  const levelRef = useRef(null);
-  const classRef = useRef(null);
-  const calendarRef = useRef(null);
-  const notifRef = useRef(null);
-  const completionRef = useRef({
-    level: levelConfirmed,
-    class: false,
-    calendar: false,
-    notifications: false,
-  });
-  const hasMountedRef = useRef(false);
-
   useEffect(() => persistState(state), [state]);
 
-  // ✅ Auto-detect class from student profile if no class is stored yet.
+  const profileLevel = useMemo(() => normalizeLevel(studentProfile?.level), [studentProfile?.level]);
+  const preferredLevel = useMemo(() => normalizeLevel(level), [level]);
+  const effectiveLevel = profileLevel || preferredLevel;
+  const day0WorkbookLink = useMemo(() => getDay0WorkbookLinkForLevel(effectiveLevel), [effectiveLevel]);
+  const profileClassName = useMemo(() => (studentProfile?.className || "").trim(), [studentProfile?.className]);
+  const fallbackClass = useMemo(() => Object.keys(classCatalog)?.[0] || "", []);
+  const currentClass = (selectedClass || profileClassName || fallbackClass).trim();
+
   useEffect(() => {
-    if (!profileClassName) return;
-    if (selectedClass) return;
+    if (!profileClassName || selectedClass) return;
     setSelectedClass(profileClassName);
   }, [profileClassName, selectedClass]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
-
     const syncPreferredClass = (event) => {
       if (event?.key && event.key !== "exam-coach-class") return;
       setSelectedClass(loadPreferredClass() || "");
     };
-
     window.addEventListener("storage", syncPreferredClass);
     window.addEventListener("class-selection-changed", syncPreferredClass);
-
     return () => {
       window.removeEventListener("storage", syncPreferredClass);
       window.removeEventListener("class-selection-changed", syncPreferredClass);
@@ -196,134 +165,105 @@ const OnboardingChecklist = ({
   const notificationsGranted = normalizedNotificationStatus === "granted";
   const notificationsDenied = normalizedNotificationStatus === "blocked";
   const notificationsUnknown = normalizedNotificationStatus === "idle";
-
-  // ✅ Auto-detect level/class and mark done instantly.
-  const levelStepComplete = Boolean(levelConfirmed || profileLevel);
-  const classStepComplete = Boolean((selectedClass || profileClassName).trim());
-
-  const fallbackClass = useMemo(() => Object.keys(classCatalog)?.[0] || "", []);
-  const currentClass = (selectedClass || profileClassName || fallbackClass).trim();
-
-  const calendarDownloaded = useMemo(() => {
-    if (!currentClass) return false;
-    return Boolean(state.calendarDownloadedByClass?.[currentClass]);
-  }, [currentClass, state.calendarDownloadedByClass]);
-
   const notificationsStepComplete = notificationsGranted || state.notificationsSkipped;
 
+  const levelReady = Boolean(effectiveLevel);
+  const classReady = Boolean((selectedClass || profileClassName).trim());
+  const day0Complete = Boolean(effectiveLevel && state.day0OpenedByLevel?.[effectiveLevel]);
+  const scheduleChecked = Boolean(currentClass && state.scheduleCheckedByClass?.[currentClass]);
   const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted) || localCompletion || state.completedLocally;
 
+  const requiredSteps = useMemo(() => {
+    const steps = [
+      { key: "day0", complete: day0Complete },
+      { key: "schedule", complete: classReady && scheduleChecked },
+      { key: "notifications", complete: notificationsStepComplete },
+    ];
+    if (!levelReady) steps.unshift({ key: "level", complete: false });
+    if (!classReady) steps.unshift({ key: "class", complete: false });
+    return steps;
+  }, [classReady, day0Complete, levelReady, notificationsStepComplete, scheduleChecked]);
+
   const progress = useMemo(() => {
-    const steps = [levelStepComplete, classStepComplete, calendarDownloaded, notificationsStepComplete];
-    const done = steps.filter(Boolean).length;
-    return { done, total: steps.length };
-  }, [calendarDownloaded, classStepComplete, levelStepComplete, notificationsStepComplete]);
+    const done = requiredSteps.filter((step) => step.complete).length;
+    return { done, total: requiredSteps.length };
+  }, [requiredSteps]);
 
   const allFinished = progress.done === progress.total;
 
   const nextStepKey = useMemo(() => {
-    if (!levelStepComplete) return "level";
-    if (!classStepComplete) return "class";
-    if (!calendarDownloaded) return "calendar";
+    if (!levelReady) return "level";
+    if (!classReady) return "class";
+    if (!day0Complete) return "day0";
+    if (!scheduleChecked) return "schedule";
     if (!notificationsStepComplete) return "notifications";
     return "save";
-  }, [calendarDownloaded, classStepComplete, levelStepComplete, notificationsStepComplete]);
-
-  useEffect(() => {
-    if (!hasMountedRef.current) {
-      completionRef.current = {
-        level: levelStepComplete,
-        class: classStepComplete,
-        calendar: calendarDownloaded,
-        notifications: notificationsStepComplete,
-      };
-      hasMountedRef.current = true;
-      return;
-    }
-
-    const previous = completionRef.current;
-
-    if (!previous.level && levelStepComplete) {
-      showToast("Level saved.", "success");
-    }
-    if (!previous.class && classStepComplete) {
-      showToast("Class confirmed.", "success");
-    }
-    if (!previous.calendar && calendarDownloaded) {
-      showToast("Calendar downloaded.", "success");
-    }
-    if (!previous.notifications && notificationsStepComplete) {
-      showToast(state.notificationsSkipped ? "Notifications skipped for now." : "Notifications enabled.", "success");
-    }
-
-    completionRef.current = {
-      level: levelStepComplete,
-      class: classStepComplete,
-      calendar: calendarDownloaded,
-      notifications: notificationsStepComplete,
-    };
-  }, [
-    calendarDownloaded,
-    classStepComplete,
-    levelStepComplete,
-    notificationsStepComplete,
-    showToast,
-    state.notificationsSkipped,
-  ]);
-
-  // Auto-scroll to next step in guided mode
-  useEffect(() => {
-    if (!state.guidedMode) return;
-    const map = {
-      level: levelRef,
-      class: classRef,
-      calendar: calendarRef,
-      notifications: notifRef,
-    };
-    const ref = map[nextStepKey]?.current;
-    if (!ref) return;
-    const id = setTimeout(() => {
-      try {
-        ref.scrollIntoView({ behavior: "smooth", block: "center" });
-      } catch (_e) {}
-    }, 150);
-    return () => clearTimeout(id);
-  }, [nextStepKey, state.guidedMode]);
+  }, [classReady, day0Complete, levelReady, notificationsStepComplete, scheduleChecked]);
 
   const shouldHideForNow =
     typeof window !== "undefined" && state.dismissedUntil && Date.now() < Number(state.dismissedUntil);
 
+  const updateState = (updater) => setState((prev) => ({ ...prev, ...updater(prev) }));
+
+  const markDay0Opened = () => {
+    if (!effectiveLevel) {
+      onSelectLevel?.();
+      return;
+    }
+    updateState((prev) => ({
+      day0OpenedByLevel: {
+        ...(prev.day0OpenedByLevel || {}),
+        [effectiveLevel]: true,
+      },
+    }));
+    showToast("Day 0 opened. Complete it before your first class.", "success");
+    if (day0WorkbookLink) navigate(day0WorkbookLink);
+  };
+
+  const markScheduleChecked = () => {
+    if (!classReady) {
+      onConfirmClass?.();
+      return;
+    }
+    updateState((prev) => ({
+      scheduleCheckedByClass: {
+        ...(prev.scheduleCheckedByClass || {}),
+        [currentClass]: true,
+      },
+    }));
+    showToast("Class schedule checked.", "success");
+    onConfirmClass?.();
+  };
+
   const handleDownloadCalendar = () => {
     if (!currentClass) return;
-    setState((prev) => ({
-      ...prev,
-      calendarDownloadedByClass: {
-        ...(prev.calendarDownloadedByClass || {}),
+    updateState((prev) => ({
+      scheduleCheckedByClass: {
+        ...(prev.scheduleCheckedByClass || {}),
         [currentClass]: true,
       },
     }));
     downloadClassCalendar(currentClass);
   };
 
-  const handleSkipNotifications = () => setState((prev) => ({ ...prev, notificationsSkipped: true }));
+  const handleSkipNotifications = () => {
+    setState((prev) => ({ ...prev, notificationsSkipped: true }));
+    showToast("Notifications skipped for now. You can enable them later.", "info");
+  };
 
   const handleEnableNotifications = async () => {
     try {
       const token = await onEnableNotifications?.();
       if (token) {
         setState((prev) => ({ ...prev, notificationsSkipped: false }));
+        showToast("Notifications enabled.", "success");
         return;
       }
-
       const permission = typeof Notification !== "undefined" ? Notification.permission : "default";
-      if (permission !== "granted") {
-        setState((prev) => ({ ...prev, notificationsSkipped: true }));
-        showToast("Push could not be enabled right now. Skipped for now — you can enable it later.", "info");
-      }
+      if (permission !== "granted") handleSkipNotifications();
     } catch (error) {
       console.error("Failed to enable notifications from onboarding", error);
-      setState((prev) => ({ ...prev, notificationsSkipped: true }));
-      showToast("Push setup failed on this device. Skipped for now.", "warning");
+      handleSkipNotifications();
     }
   };
 
@@ -335,69 +275,32 @@ const OnboardingChecklist = ({
   const handleBringBack = () => setState((prev) => ({ ...prev, dismissedUntil: 0 }));
 
   const handleSaveOnboarding = async () => {
-    if (!allFinished || !onSaveOnboarding) return;
-
+    if (!allFinished) return;
     setSaveError("");
     setSavingOnboarding(true);
     try {
-      await onSaveOnboarding();
-      showToast("Onboarding saved. You're all set!", "success");
+      if (onSaveOnboarding) await onSaveOnboarding();
+      showToast("Setup saved. You are ready for class.", "success");
       setLocalCompletion(true);
       setState((prev) => ({ ...prev, completedLocally: true }));
     } catch (error) {
       console.error("Failed to save onboarding", error);
-      const reason = String(error?.message || "");
-      const canFallbackToLocal =
-        reason.includes("No student profile found") || reason.includes("Firebase is not configured");
-      if (canFallbackToLocal) {
-        setState((prev) => ({ ...prev, completedLocally: true }));
-        setLocalCompletion(true);
-        showToast("Onboarding saved locally on this device.", "info");
-        return;
-      }
-      setSaveError("Could not save onboarding status. Please try again.");
+      setSaveError("Could not save setup status. Please try again.");
     } finally {
       setSavingOnboarding(false);
     }
   };
 
-  const handleContinue = async () => {
-    setSaveError("");
-    try {
-      if (nextStepKey === "level") {
-        onSelectLevel?.();
-        return;
-      }
-      if (nextStepKey === "class") {
-        onConfirmClass?.();
-        return;
-      }
-      if (nextStepKey === "calendar") {
-        handleDownloadCalendar();
-        return;
-      }
-      if (nextStepKey === "notifications") {
-        if (notificationsDenied) {
-          handleSkipNotifications();
-          return;
-        }
-        await handleEnableNotifications();
-        return;
-      }
-      if (nextStepKey === "save") {
-        await handleSaveOnboarding();
-      }
-    } catch (e) {
-      console.error("Onboarding continue failed", e);
-      setSaveError("Something went wrong. Please try again.");
+  const handlePrimaryContinue = async () => {
+    if (nextStepKey === "level") return onSelectLevel?.();
+    if (nextStepKey === "class") return onConfirmClass?.();
+    if (nextStepKey === "day0") return markDay0Opened();
+    if (nextStepKey === "schedule") return markScheduleChecked();
+    if (nextStepKey === "notifications") {
+      if (notificationsDenied) return handleSkipNotifications();
+      return handleEnableNotifications();
     }
-  };
-
-  const toggleGuidedMode = () => setState((prev) => ({ ...prev, guidedMode: !prev.guidedMode }));
-
-  const handleOpenDay0Workbook = () => {
-    if (!day0WorkbookLink || typeof window === "undefined") return;
-    window.open(day0WorkbookLink, "_blank", "noopener,noreferrer");
+    return handleSaveOnboarding();
   };
 
   if (onboardingCompleted) return null;
@@ -406,178 +309,141 @@ const OnboardingChecklist = ({
     return (
       <div style={{ ...styles.card, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
         <div>
-          <div style={{ fontWeight: 800 }}>Onboarding hidden</div>
-          <div style={styles.helperText}>You chose “remind me later”. You can bring it back anytime.</div>
+          <div style={{ fontWeight: 800 }}>Setup hidden for now</div>
+          <div style={styles.helperText}>You chose “remind me later”. Bring it back before your first class.</div>
         </div>
         <button style={styles.secondaryButton} onClick={handleBringBack} type="button">
-          Show onboarding
+          Show setup
         </button>
       </div>
     );
   }
 
   const primaryCTA =
-    nextStepKey === "save"
-      ? "Save onboarding"
-      : nextStepKey === "notifications" && notificationsDenied
-      ? "Skip notifications"
-      : "Continue";
+    nextStepKey === "level"
+      ? "Set my level"
+      : nextStepKey === "class"
+      ? "Confirm my class"
+      : nextStepKey === "day0"
+      ? "Start Day 0 Orientation"
+      : nextStepKey === "schedule"
+      ? "Check class schedule"
+      : nextStepKey === "notifications"
+      ? notificationsDenied
+        ? "Skip notifications"
+        : "Turn on notifications"
+      : "Save and finish setup";
 
   return (
-    <div style={{ ...styles.card, display: "grid", gap: 12 }}>
-      <div
-        className="onboarding-step-header"
-        style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}
-      >
-        <div>
-          <p style={{ ...styles.badge, background: "#e0f2fe", color: "#075985" }}>Onboarding</p>
-          <h2 style={{ ...styles.sectionTitle, marginTop: 6, marginBottom: 4 }}>Finish setup in 60 seconds</h2>
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            We auto-detect your saved level/class. Use “Continue” to complete anything missing.
-          </p>
+    <section
+      style={{
+        ...styles.card,
+        display: "grid",
+        gap: 14,
+        border: "2px solid #2563eb",
+        background: "linear-gradient(135deg, #eff6ff, #ffffff)",
+      }}
+    >
+      <div style={{ display: "grid", gap: 12 }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+          <div>
+            <p style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>Start here after signup</p>
+            <h2 style={{ ...styles.sectionTitle, marginTop: 6, marginBottom: 4 }}>
+              Complete these 3 steps before your first class
+            </h2>
+            <p style={{ ...styles.helperText, margin: 0 }}>
+              We made this shorter so you do not miss the important part: Day 0 Orientation.
+            </p>
+          </div>
 
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
-            <span style={styles.badge}>Level: {profileLevel || "(not set)"}</span>
-            <span style={styles.badge}>Class: {currentClass || "(not set)"}</span>
-            <button type="button" onClick={toggleGuidedMode} style={{ ...styles.secondaryButton, padding: "6px 10px" }}>
-              {state.guidedMode ? "Guided: ON" : "Guided: OFF"}
-            </button>
+          <div style={{ display: "grid", justifyItems: "end", gap: 8 }}>
+            <span style={{ ...styles.helperText, fontWeight: 900 }}>
+              Progress: {progress.done}/{progress.total}
+            </span>
+            <div style={{ width: 220, height: 12, borderRadius: 999, background: "#dbeafe", overflow: "hidden" }}>
+              <div
+                style={{
+                  height: "100%",
+                  width: `${Math.round((progress.done / Math.max(1, progress.total)) * 100)}%`,
+                  background: allFinished ? "#16a34a" : "#2563eb",
+                }}
+              />
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              <button type="button" style={styles.secondaryButton} onClick={handleRemindLater}>
+                Remind me later
+              </button>
+              <button type="button" style={styles.primaryButton} onClick={handlePrimaryContinue} disabled={savingOnboarding}>
+                {savingOnboarding ? "Saving..." : primaryCTA}
+              </button>
+            </div>
+            {saveError ? <span style={{ ...styles.helperText, color: "#b91c1c" }}>{saveError}</span> : null}
           </div>
         </div>
 
-        <div style={{ display: "grid", justifyItems: "end", gap: 8 }}>
-          <span style={{ ...styles.helperText, fontWeight: 800 }}>
-            Progress: {progress.done}/{progress.total}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <span style={statusBadgeStyle(levelReady)}>Level: {effectiveLevel || "not set"}</span>
+          <span style={statusBadgeStyle(classReady)}>Class: {classReady ? currentClass : "not set"}</span>
+          <span style={statusBadgeStyle(notificationsStepComplete)}>
+            Notifications: {notificationsGranted ? "on" : state.notificationsSkipped ? "skipped" : "not set"}
           </span>
-
-          <div style={{ width: 190, height: 10, borderRadius: 999, background: "#e5e7eb", overflow: "hidden" }}>
-            <div
-              style={{
-                height: "100%",
-                width: `${Math.round((progress.done / Math.max(1, progress.total)) * 100)}%`,
-                background: allFinished ? "#10b981" : "#0ea5e9",
-              }}
-            />
-          </div>
-
-          <div
-            className="onboarding-action-row"
-            style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}
-          >
-            <YouTubeSubscribeButton />
-            <button type="button" style={styles.secondaryButton} onClick={handleRemindLater}>
-              Remind me later
-            </button>
-            <button type="button" style={styles.primaryButton} onClick={handleContinue} disabled={savingOnboarding}>
-              {savingOnboarding ? "Saving..." : primaryCTA}
-            </button>
-          </div>
-
-          {saveError ? <span style={{ ...styles.helperText, color: "#b91c1c" }}>{saveError}</span> : null}
         </div>
       </div>
 
-      <div
-        className="onboarding-grid"
-        style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}
-      >
-        <Step
-          stepRef={levelRef}
-          title="Choose your level"
-          description="Set your CEFR level so tasks match your ability."
-          actionLabel="Set level"
-          onAction={onSelectLevel}
-          complete={levelStepComplete}
-          accent="#e5e7eb"
-          highlight={nextStepKey === "level" && state.guidedMode}
-          secondaryActionLabel={levelStepComplete ? "Change level" : null}
-          onSecondaryAction={levelStepComplete ? onSelectLevel : null}
-          disableSecondaryWhenComplete={false}
-          footnote={profileLevel ? `Detected from profile: ${profileLevel}` : "Not saved yet."}
+      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))" }}>
+        <OnboardingActionCard
+          number="1"
+          title={`Day 0 Orientation${effectiveLevel ? ` (${effectiveLevel})` : ""}`}
+          description="This is the most important step. It explains how the course works, assignments, attendance, tutor feedback, and what to do before Day 1."
+          complete={day0Complete}
+          active={nextStepKey === "day0"}
+          actionLabel="Start Day 0 Orientation"
+          onAction={markDay0Opened}
+          helper={day0WorkbookLink ? "Opens the correct Day 0 page for your level." : "Set your level first so we can open the correct Day 0 page."}
         />
 
-        <Step
-          stepRef={classRef}
-          title="Your class"
-          description="This is your class. Scroll down to download the calendar, then click Continue."
-          actionLabel="Open class"
-          onAction={onConfirmClass}
-          complete={classStepComplete}
-          accent="#f3e8ff"
-          highlight={nextStepKey === "class" && state.guidedMode}
-          secondaryActionLabel={classStepComplete ? "Change class" : null}
-          onSecondaryAction={classStepComplete ? onConfirmClass : null}
-          disableSecondaryWhenComplete={false}
-          footnote={currentClass ? `Detected from profile/storage: ${currentClass}` : "Not saved yet."}
+        <OnboardingActionCard
+          number="2"
+          title="Check your class schedule"
+          description="Know your class name and where to see class days before orientation starts."
+          complete={classReady && scheduleChecked}
+          active={nextStepKey === "class" || nextStepKey === "schedule"}
+          actionLabel={classReady ? "Open schedule" : "Confirm class"}
+          onAction={markScheduleChecked}
+          secondaryLabel={classReady ? "Download calendar" : null}
+          onSecondary={classReady ? handleDownloadCalendar : null}
+          helper={classReady ? `Detected class: ${currentClass}` : "Your class is not set yet."}
         />
 
-        {day0WorkbookLink ? (
-          <Step
-            title={`Day 0 tutorial workbook (${effectiveLevel})`}
-            description="Open Day 0 to read how this course level is structured before starting Day 1."
-            actionLabel="Open Day 0 workbook"
-            onAction={handleOpenDay0Workbook}
-            complete={false}
-            accent="#dbeafe"
-            footnote="Recommended for all new signups."
-          />
-        ) : null}
-
-        <Step
-          stepRef={calendarRef}
-          title="Download the calendar"
-          description="Save scheduled sessions to your calendar (ICS file). Breaks or cancellations may not be reflected."
-          actionLabel={currentClass ? `${currentClass} calendar` : "Get calendar"}
-          onAction={handleDownloadCalendar}
-          complete={calendarDownloaded}
-          accent="#fef3c7"
-          highlight={nextStepKey === "calendar" && state.guidedMode}
-          footnote={currentClass ? "If you change class later, download the new class calendar too." : null}
-        />
-
-        <Step
-          stepRef={notifRef}
-          title="Push notifications (optional)"
-          description="Enable reminders for study sessions and new tasks whenever you want."
-          actionLabel={notificationsDenied ? "Notifications blocked" : "Allow push"}
-          onAction={notificationsDenied ? null : handleEnableNotifications}
+        <OnboardingActionCard
+          number="3"
+          title="Turn on important notifications"
+          description="Get class reminders, tutor feedback, and important updates. You may skip if this device blocks notifications."
           complete={notificationsStepComplete}
-          accent="#e0f2fe"
-          highlight={nextStepKey === "notifications" && state.guidedMode}
-          secondaryActionLabel={notificationsGranted ? null : "Skip for now"}
-          onSecondaryAction={notificationsGranted ? null : handleSkipNotifications}
-          disableSecondaryWhenComplete={true}
-          footnote={
+          active={nextStepKey === "notifications"}
+          actionLabel={notificationsDenied ? "Notifications blocked" : "Allow notifications"}
+          onAction={notificationsDenied ? handleSkipNotifications : handleEnableNotifications}
+          secondaryLabel={notificationsGranted ? null : "Skip for now"}
+          onSecondary={notificationsGranted ? null : handleSkipNotifications}
+          helper={
             notificationsDenied
               ? "Your browser blocked notifications. You can enable them later in browser settings."
               : notificationsUnknown
-              ? "If you don’t see a popup, check the address bar for the bell/lock icon."
-              : state.notificationsSkipped
-              ? "Skipped — enable later in Settings."
+              ? "If no popup appears, check the lock/bell icon in your browser bar."
               : null
           }
         />
       </div>
 
-      <div
-        className="onboarding-footer"
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 12,
-          flexWrap: "wrap",
-          paddingTop: 4,
-          borderTop: "1px solid #e5e7eb",
-        }}
-      >
+      <div style={{ borderTop: "1px solid #bfdbfe", paddingTop: 10, display: "grid", gap: 6 }}>
+        <strong>{allFinished ? "Ready for class." : "Do Step 1 first: Day 0 Orientation."}</strong>
         <p style={{ ...styles.helperText, margin: 0 }}>
           {allFinished
-            ? "All set! Use “Save onboarding” above to lock in reminders and class setup."
-            : "Complete each step to unlock “Save onboarding” above."}
+            ? "Click Save and finish setup so this onboarding card disappears."
+            : "Students often skip long onboarding, so this setup now focuses only on the actions that matter before the first class."}
         </p>
       </div>
-    </div>
+    </section>
   );
 };
 
