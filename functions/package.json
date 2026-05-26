@@ -1,7 +1,7 @@
 {
   "name": "language-academy-functions",
   "private": true,
-  "main": "index.js",
+  "main": "index.notifications.js",
   "engines": {
     "node": "22"
   },
