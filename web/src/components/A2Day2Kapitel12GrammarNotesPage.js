@@ -33,55 +33,18 @@ const quizStyle = {
   gap: 10,
 };
 
-const endingBoxWrapStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-  gap: 10,
-};
-
-const endingCardStyle = (bg, border) => ({
-  background: bg,
-  border: `1px solid ${border}`,
-  borderRadius: 12,
-  padding: 12,
-  display: "grid",
-  gap: 6,
-});
-
-const endingSpan = (color, bg) => ({
-  color,
-  background: bg,
-  padding: "1px 6px",
-  borderRadius: 6,
-  fontWeight: 700,
-});
-
-const definiteArticleRows = [
-  ["Nominative", "der", "die", "das", "die"],
-  ["Accusative", "den", "die", "das", "die"],
+const nominativeRows = [
+  ["Masculine", "ein", "der → -er", "-er", "ein großer Hund"],
+  ["Feminine", "eine", "die → -e", "-e", "eine rote Blume"],
+  ["Neuter", "ein", "das → -es", "-es", "ein kleines Auto"],
+  ["Plural", "keine", "die → -en", "-en", "keine neuen Bücher"],
 ];
 
-const endingPatternRows = [
-  ["Nominative", "-er", "-e", "-es", "-e"],
-  ["Accusative", "-en", "-e", "-es", "-e"],
-];
-
-const indefiniteExampleRows = [
-  ["Masculine nominative", "ein", "kleiner", "Mann"],
-  ["Feminine nominative", "eine", "kleine", "Frau"],
-  ["Neuter nominative", "ein", "kleines", "Haus"],
-  ["Masculine accusative", "einen", "kleinen", "Mann"],
-  ["Feminine accusative", "eine", "kleine", "Frau"],
-  ["Neuter accusative", "ein", "kleines", "Haus"],
-];
-
-const sentenceRows = [
-  ["Das ist ein kleiner Mann.", "That is a small man."],
-  ["Sie ist eine kleine Frau.", "She is a small woman."],
-  ["Das ist ein kleines Haus.", "That is a small house."],
-  ["Ich sehe einen kleinen Mann.", "I see a small man."],
-  ["Sie besucht eine kleine Frau.", "She visits a small woman."],
-  ["Er kauft ein kleines Haus.", "He buys a small house."],
+const accusativeRows = [
+  ["Masculine", "einen", "den → -en", "-en", "einen kleinen Hund"],
+  ["Feminine", "eine", "die → -e", "-e", "eine schöne Blume"],
+  ["Neuter", "ein", "das → -es", "-es", "ein grünes Auto"],
+  ["Plural", "keine", "die → -en", "-en", "keine alten Bücher"],
 ];
 
 const A2Day2GrammarNotesPage = () => {
@@ -99,415 +62,177 @@ const A2Day2GrammarNotesPage = () => {
         </button>
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
-          A2 · Day 2 · Adjective Declension · Grammar Notes
+          Step 1: Adjective Declension First (Indefinite Articles: Nominative + Accusative)
         </h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          Indefinite article + adjective + noun in nominative and accusative
+          Start here first. For now, focus only on indefinite articles with adjective endings in nominative and accusative.
         </p>
-
-        <img
-          src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=1600&q=80"
-          alt="Portrait of a smiling person"
-          style={{ width: "100%", borderRadius: 12, maxHeight: 320, objectFit: "cover" }}
-        />
       </header>
 
       <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>1) What are we learning today?</h2>
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>
-            Today we only learn <strong>indefinite article + adjective + noun</strong>.
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            We only focus on <strong>nominative</strong> and <strong>accusative</strong>.
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            This is only your second day in A2, so we keep it simple and learn the
-            basic pattern first.
-          </p>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>2) The definite article pattern</h2>
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>
-            First, learn the definite article pattern.
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            We use this pattern to choose the adjective ending.
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            Today, we are not learning full definite article phrases yet. We only use
-            this table as a guide.
-          </p>
-        </div>
-
-        <div style={{ overflowX: "auto" }}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={thTdStyle}>Case</th>
-                <th style={thTdStyle}>Masculine</th>
-                <th style={thTdStyle}>Feminine</th>
-                <th style={thTdStyle}>Neuter</th>
-                <th style={thTdStyle}>Plural</th>
-              </tr>
-            </thead>
-            <tbody>
-              {definiteArticleRows.map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell) => (
-                    <td key={cell} style={thTdStyle}>
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>3) The adjective endings come from this pattern</h2>
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>
-            The adjective ending comes from the definite article pattern.
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            <strong>Nominative:</strong> der, die, das, die → <strong>-er, -e, -es, -e</strong>
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            <strong>Accusative:</strong> den, die, das, die → <strong>-en, -e, -es, -e</strong>
-          </p>
-        </div>
-
-        <div style={{ overflowX: "auto" }}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={thTdStyle}>Case</th>
-                <th style={thTdStyle}>Masculine</th>
-                <th style={thTdStyle}>Feminine</th>
-                <th style={thTdStyle}>Neuter</th>
-                <th style={thTdStyle}>Plural</th>
-              </tr>
-            </thead>
-            <tbody>
-              {endingPatternRows.map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell) => (
-                    <td key={cell} style={thTdStyle}>
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>So the rule is:</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>der → -er</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>die → -e</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>das → -es</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>den → -en</strong>
-          </p>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>4) The pattern we use today</h2>
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>The pattern is:</p>
-          <p style={{ margin: "8px 0 0 0", fontWeight: 700 }}>
-            article + adjective + noun
-          </p>
-          <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
-            <li>
-              <em>ein kleiner Mann</em>
-            </li>
-            <li>
-              <em>eine kleine Frau</em>
-            </li>
-            <li>
-              <em>ein kleines Haus</em>
-            </li>
-            <li>
-              <em>einen kleinen Mann</em>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>5) The endings for today</h2>
-        <div style={endingBoxWrapStyle}>
-          <div style={endingCardStyle("#eff6ff", "#93c5fd")}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#1d4ed8" }}>-er</div>
-            <div><strong>Masculine nominative</strong></div>
-            <div>
-              <em>
-                ein klein
-                <span style={endingSpan("#1d4ed8", "#dbeafe")}>er</span> Mann
-              </em>
-            </div>
-          </div>
-
-          <div style={endingCardStyle("#f0fdf4", "#86efac")}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#15803d" }}>-e</div>
-            <div><strong>Feminine</strong></div>
-            <div>
-              <em>
-                eine klein
-                <span style={endingSpan("#15803d", "#dcfce7")}>e</span> Frau
-              </em>
-            </div>
-          </div>
-
-          <div style={endingCardStyle("#fff7ed", "#fdba74")}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#c2410c" }}>-es</div>
-            <div><strong>Neuter</strong></div>
-            <div>
-              <em>
-                ein klein
-                <span style={endingSpan("#c2410c", "#ffedd5")}>es</span> Haus
-              </em>
-            </div>
-          </div>
-
-          <div style={endingCardStyle("#faf5ff", "#c4b5fd")}>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#7c3aed" }}>-en</div>
-            <div><strong>Masculine accusative</strong></div>
-            <div>
-              <em>
-                einen klein
-                <span style={endingSpan("#7c3aed", "#ede9fe")}>en</span> Mann
-              </em>
-            </div>
-          </div>
-        </div>
-
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>
-            For Day 2, remember these endings:
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            <strong>Nominative:</strong> -er, -e, -es, -e
-          </p>
-          <p style={{ margin: "8px 0 0 0" }}>
-            <strong>Accusative:</strong> -en, -e, -es, -e
-          </p>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>6) Indefinite article + adjective + noun</h2>
-        <div style={{ overflowX: "auto" }}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={thTdStyle}>Use</th>
-                <th style={thTdStyle}>Article</th>
-                <th style={thTdStyle}>Adjective</th>
-                <th style={thTdStyle}>Noun</th>
-              </tr>
-            </thead>
-            <tbody>
-              {indefiniteExampleRows.map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell) => (
-                    <td key={cell} style={thTdStyle}>
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>7) Learn these chunks</h2>
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>Learn these as full chunks:</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>ein kleiner Mann</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>eine kleine Frau</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>ein kleines Haus</strong>
-          </p>
-          <p style={{ margin: "6px 0 0 0" }}>
-            <strong>einen kleinen Mann</strong>
-          </p>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>8) Easy rule summary</h2>
-        <div style={noteStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>Nominative:</strong>
-          </p>
-          <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
-            <li>
-              <em>ein klein<strong>er</strong> Mann</em>
-            </li>
-            <li>
-              <em>eine klein<strong>e</strong> Frau</em>
-            </li>
-            <li>
-              <em>ein klein<strong>es</strong> Haus</em>
-            </li>
-          </ul>
-
-          <p style={{ margin: "10px 0 0 0" }}>
-            <strong>Accusative:</strong>
-          </p>
-          <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
-            <li>
-              <em>einen klein<strong>en</strong> Mann</em>
-            </li>
-            <li>
-              <em>eine klein<strong>e</strong> Frau</em>
-            </li>
-            <li>
-              <em>ein klein<strong>es</strong> Haus</em>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>9) Example sentences</h2>
-        <div style={{ overflowX: "auto" }}>
-          <table style={tableStyle}>
-            <thead>
-              <tr>
-                <th style={thTdStyle}>German</th>
-                <th style={thTdStyle}>English</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sentenceRows.map((row) => (
-                <tr key={row[0]}>
-                  {row.map((cell) => (
-                    <td key={cell} style={thTdStyle}>
-                      {cell}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>10) Practice: 10 questions</h2>
-        <div style={quizStyle}>
-          <p style={{ margin: 0 }}>
-            <strong>Choose the correct adjective ending.</strong>
-          </p>
-          <p style={{ margin: 0, color: "#475569" }}>
-            Look at the article first. Then complete the adjective.
-          </p>
-          <p style={{ margin: 0, color: "#475569" }}>
-            <strong>Tip:</strong> ein = masculine/neuter, eine = feminine, einen = masculine accusative.
-          </p>
-
-          <p style={{ margin: 0 }}>
-            <strong>1.</strong> Das ist ein _____ Mann. (klein)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>2.</strong> Sie ist eine _____ Frau. (klein)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>3.</strong> Das ist ein _____ Haus. (klein)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>4.</strong> Ich sehe einen _____ Mann. (klein)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>5.</strong> Sie besucht eine _____ Frau. (klein)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>6.</strong> Er kauft ein _____ Haus. (klein)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>7.</strong> Das ist ein _____ Lehrer. (jung)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>8.</strong> Ich habe einen _____ Hund. (alt)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>9.</strong> Sie braucht eine _____ Tasche. (neu)
-          </p>
-          <p style={{ margin: 0 }}>
-            <strong>10.</strong> Er kauft ein _____ Auto. (modern)
-          </p>
-
-          <div
-            style={{
-              marginTop: 8,
-              background: "#ffffff",
-              border: "1px dashed #94a3b8",
-              borderRadius: 10,
-              padding: 10,
-              color: "#475569",
-            }}
-          >
-            <p style={{ margin: 0 }}>
-              <strong>Answers:</strong>
-            </p>
-            <p style={{ margin: "6px 0 0 0" }}>1) <strong>kleiner</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>2) <strong>kleine</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>3) <strong>kleines</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>4) <strong>kleinen</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>5) <strong>kleine</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>6) <strong>kleines</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>7) <strong>junger</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>8) <strong>alten</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>9) <strong>neue</strong></p>
-            <p style={{ margin: "6px 0 0 0" }}>10) <strong>modernes</strong></p>
-          </div>
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2 style={{ margin: 0 }}>11) Common mistakes</h2>
+        <h2 style={{ margin: 0 }}>Learning objectives</h2>
         <div style={noteStyle}>
           <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
-            <li>
-              ❌ <em>ein kleiner Haus</em> → ✅ <em>ein kleines Haus</em>
-            </li>
-            <li>
-              ❌ <em>einen kleiner Mann</em> → ✅ <em>einen kleinen Mann</em>
-            </li>
-            <li>
-              ❌ <em>eine kleines Frau</em> → ✅ <em>eine kleine Frau</em>
-            </li>
-            <li>
-              ❌ <em>ein modern Auto</em> → ✅ <em>ein modernes Auto</em>
-            </li>
+            <li>See where adjective endings (-er/-e/-es/-en) come from.</li>
+            <li>Connect indefinite forms (ein/eine/einen/keine) to definite article pattern (der/die/das/den).</li>
+            <li>Practice with quick clickable mini test items.</li>
           </ul>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Simple core rule</h2>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}>
+            The ending in <strong>ein/eine/einen + adjective + noun</strong> is guided by:
+          </p>
+          <ul style={{ margin: "8px 0 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
+            <li>the article pattern from <strong>der/die/das</strong> in that slot, and</li>
+            <li>whether your sentence is <strong>nominative</strong> (subject) or <strong>accusative</strong> (object).</li>
+          </ul>
+          <p style={{ margin: "8px 0 0 0" }}>We will learn dative adjective declension later.</p>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Very simple trick</h2>
+        <div style={noteStyle}>
+          <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+            <li>ein (masculine nominative) → adjective ending -er: <em>ein großer Hund</em></li>
+            <li>eine (feminine nominative/accusative) → adjective ending -e: <em>eine rote Blume</em></li>
+            <li>ein (neuter nominative/accusative) → adjective ending -es: <em>ein neues Auto</em></li>
+            <li>einen (masculine accusative) → adjective ending -en: <em>einen kleinen Hund</em></li>
+            <li>keine (plural nominative/accusative) → adjective ending -en: <em>keine alten Bücher</em></li>
+          </ul>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Nominative table</h2>
+        <div style={{ overflowX: "auto" }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thTdStyle}>Gender</th>
+                <th style={thTdStyle}>Article</th>
+                <th style={thTdStyle}>Definite pattern</th>
+                <th style={thTdStyle}>Ending</th>
+                <th style={thTdStyle}>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              {nominativeRows.map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell) => (
+                    <td key={cell} style={thTdStyle}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}><strong>Color key:</strong></p>
+          <p style={{ margin: "6px 0 0 0" }}>der → -er</p>
+          <p style={{ margin: "6px 0 0 0" }}>die → -e</p>
+          <p style={{ margin: "6px 0 0 0" }}>das → -es</p>
+          <p style={{ margin: "6px 0 0 0" }}>die plural → -en</p>
+          <p style={{ margin: "10px 0 0 0" }}><strong>Color guide:</strong> Yellow = indefinite article · Blue = adjective ending change · Green = noun</p>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Full sentence examples (Nominative)</h2>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}><strong>Nominative Masculine:</strong> Das ist ein großer Hund.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: groß → declined: großer</p>
+          <p style={{ margin: "6px 0 0 0" }}>That is a big dog.</p>
+
+          <p style={{ margin: "10px 0 0 0" }}><strong>Nominative Feminine:</strong> Das ist eine rote Blume.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: rot → declined: rote</p>
+          <p style={{ margin: "6px 0 0 0" }}>That is a red flower.</p>
+
+          <p style={{ margin: "10px 0 0 0" }}><strong>Nominative Neuter:</strong> Das ist ein kleines Auto.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: klein → declined: kleines</p>
+          <p style={{ margin: "6px 0 0 0" }}>That is a small car.</p>
+
+          <p style={{ margin: "10px 0 0 0" }}><strong>Nominative Plural:</strong> Das sind keine neuen Bücher.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: neu → declined: neuen</p>
+          <p style={{ margin: "6px 0 0 0" }}>Those are not new books.</p>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Accusative table</h2>
+        <div style={{ overflowX: "auto" }}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thTdStyle}>Gender</th>
+                <th style={thTdStyle}>Article</th>
+                <th style={thTdStyle}>Definite pattern</th>
+                <th style={thTdStyle}>Ending</th>
+                <th style={thTdStyle}>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              {accusativeRows.map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell) => (
+                    <td key={cell} style={thTdStyle}>{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}><strong>Color key:</strong></p>
+          <p style={{ margin: "6px 0 0 0" }}>den → -en</p>
+          <p style={{ margin: "6px 0 0 0" }}>die → -e</p>
+          <p style={{ margin: "6px 0 0 0" }}>das → -es</p>
+          <p style={{ margin: "6px 0 0 0" }}>die plural → -en</p>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Full sentence examples (Accusative)</h2>
+        <div style={noteStyle}>
+          <p style={{ margin: 0 }}><strong>Accusative Masculine:</strong> Ich sehe einen kleinen Hund.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: klein → declined: kleinen</p>
+          <p style={{ margin: "6px 0 0 0" }}>I see a small dog.</p>
+
+          <p style={{ margin: "10px 0 0 0" }}><strong>Accusative Feminine:</strong> Ich kaufe eine schöne Blume.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: schön → declined: schöne</p>
+          <p style={{ margin: "6px 0 0 0" }}>I buy a beautiful flower.</p>
+
+          <p style={{ margin: "10px 0 0 0" }}><strong>Accusative Neuter:</strong> Wir haben ein grünes Auto.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: grün → declined: grünes</p>
+          <p style={{ margin: "6px 0 0 0" }}>We have a green car.</p>
+
+          <p style={{ margin: "10px 0 0 0" }}><strong>Accusative Plural:</strong> Er hat keine alten Bücher.</p>
+          <p style={{ margin: "6px 0 0 0" }}>Base adjective: alt → declined: alten</p>
+          <p style={{ margin: "6px 0 0 0" }}>He has no old books.</p>
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2 style={{ margin: 0 }}>Mini adjective ending test (A1)</h2>
+        <div style={quizStyle}>
+          <p style={{ margin: 0 }}><strong>1.</strong> Das ist ___ groß___ Hund.</p>
+          <p style={{ margin: 0 }}><strong>Correct answer:</strong> ein großer Hund</p>
+
+          <p style={{ margin: "8px 0 0 0" }}><strong>2.</strong> Ich sehe ___ klein___ Hund.</p>
+          <p style={{ margin: 0 }}><strong>Correct answer:</strong> einen kleinen Hund</p>
+
+          <p style={{ margin: "8px 0 0 0" }}><strong>3.</strong> Sie hat ___ rot___ Blume.</p>
+          <p style={{ margin: 0 }}><strong>Correct answer:</strong> eine rote Blume</p>
+
+          <p style={{ margin: "8px 0 0 0" }}><strong>4.</strong> Das ist ___ neu___ Auto.</p>
+          <p style={{ margin: 0 }}><strong>Correct answer:</strong> ein neues Auto</p>
+
+          <p style={{ margin: "8px 0 0 0" }}><strong>5.</strong> Wir kaufen ___ alt___ Bücher.</p>
+          <p style={{ margin: 0 }}><strong>Correct answer:</strong> keine alten Bücher</p>
         </div>
       </section>
     </main>
