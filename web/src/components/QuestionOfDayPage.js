@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { WRITING_PROMPTS } from "../data/writingExamPrompts";
-import { speakingSheetQuestions } from "../data/speakingSheet";
+import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import {
   isTutorReviewCloudEnabled,
   saveExamLetterForTutorReview,
@@ -393,7 +393,7 @@ const QuestionOfDayPage = () => {
 
   const dailyTask = useMemo(() => {
     const levelWriting = Array.isArray(WRITING_PROMPTS[level]) ? WRITING_PROMPTS[level] : [];
-    const levelSpeaking = speakingSheetQuestions.filter((item) => item.level === level);
+    const levelSpeaking = speakingQuestionDictionary.filter((item) => item.level === level);
     const shareWritingToday = getDaySeed() % 2 === 0;
 
     if (shareWritingToday && levelWriting.length > 0) {
