@@ -213,50 +213,50 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
               <strong>Äußeres Erscheinungsbild (Physical Appearance)</strong>
               <ul style={listSpacing}>
                 <li>Körpergröße: groß, klein, mittelgroß (tall, short, average height)</li>
-                <li>Haarfarbe und Frisur: blond, braun, schwarz, rot; lang, kurz, lockig, glatt</li>
-                <li>Augenfarbe: blau, grün, braun, grau</li>
-                <li>Besondere Merkmale: Brille, Bart, Sommersprossen, Tätowierungen, Piercings</li>
-                <li>Adjektive: schlank, kräftig, attraktiv, sportlich</li>
+                <li>Haarfarbe und Frisur: blond, braun, schwarz, rot; lang, kurz, lockig, glatt (hair color and hairstyle: blonde, brown, black, red; long, short, curly, straight)</li>
+                <li>Augenfarbe: blau, grün, braun, grau (eye color: blue, green, brown, gray)</li>
+                <li>Besondere Merkmale: Brille, Bart, Sommersprossen, Tätowierungen, Piercings (special features: glasses, beard, freckles, tattoos, piercings)</li>
+                <li>Adjektive: schlank, kräftig, attraktiv, sportlich (adjectives: slim, strong, attractive, athletic)</li>
               </ul>
             </li>
             <li>
               <strong>Kleidung (Clothing)</strong>
               <ul style={listSpacing}>
-                <li>Alltag: T-Shirt, Jeans, Pullover</li>
-                <li>Formal: Anzug, Kleid, Rock, Bluse</li>
-                <li>Farben: rot, blau, grün, schwarz, weiß</li>
-                <li>Adjektive: modisch, lässig, elegant, ordentlich</li>
+                <li>Alltag: T-Shirt, Jeans, Pullover (everyday: T-shirt, jeans, sweater)</li>
+                <li>Formal: Anzug, Kleid, Rock, Bluse (formal: suit, dress, skirt, blouse)</li>
+                <li>Farben: rot, blau, grün, schwarz, weiß (colors: red, blue, green, black, white)</li>
+                <li>Adjektive: modisch, lässig, elegant, ordentlich (adjectives: fashionable, casual, elegant, tidy)</li>
               </ul>
             </li>
             <li>
               <strong>Charakter und Persönlichkeit (Character and Personality)</strong>
               <ul style={listSpacing}>
-                <li>Positive Eigenschaften: freundlich, lustig, kreativ, offen, pünktlich, ehrlich, hilfsbereit, geduldig, optimistisch</li>
-                <li>Negative Eigenschaften: unfreundlich, unpünktlich, launisch, stur, pessimistisch, unordentlich</li>
+                <li>Positive Eigenschaften: freundlich, lustig, kreativ, offen, pünktlich, ehrlich, hilfsbereit, geduldig, optimistisch (positive traits: friendly, funny, creative, open-minded, punctual, honest, helpful, patient, optimistic)</li>
+                <li>Negative Eigenschaften: unfreundlich, unpünktlich, launisch, stur, pessimistisch, unordentlich (negative traits: unfriendly, unpunctual, moody, stubborn, pessimistic, messy)</li>
               </ul>
             </li>
             <li>
               <strong>Alter und Herkunft (Age and Origin)</strong>
               <ul style={listSpacing}>
-                <li>Alter: jung, mittelalt, alt; „Er ist 20 Jahre alt.“</li>
-                <li>Herkunft: Land (Deutschland, Ghana, Frankreich), Stadt (Berlin, Accra, Paris)</li>
+                <li>Alter: jung, mittelalt, alt; „Er ist 20 Jahre alt.“ (age: young, middle-aged, old; “He is 20 years old.”)</li>
+                <li>Herkunft: Land (Deutschland, Ghana, Frankreich), Stadt (Berlin, Accra, Paris) (origin: country (Germany, Ghana, France), city (Berlin, Accra, Paris))</li>
               </ul>
             </li>
             <li>
               <strong>Hobbys und Interessen (Hobbies and Interests)</strong>
               <ul style={listSpacing}>
-                <li>Sport: Fußball, Tennis, Laufen</li>
-                <li>Kunst: Malen, Musik, Tanzen</li>
-                <li>Bücher lesen, reisen</li>
-                <li>Adjektive: aktiv, kreativ, musikalisch, sportlich</li>
+                <li>Sport: Fußball, Tennis, Laufen (sports: football/soccer, tennis, running)</li>
+                <li>Kunst: Malen, Musik, Tanzen (arts: painting, music, dancing)</li>
+                <li>Bücher lesen, reisen (reading books, traveling)</li>
+                <li>Adjektive: aktiv, kreativ, musikalisch, sportlich (adjectives: active, creative, musical, athletic)</li>
               </ul>
             </li>
             <li>
               <strong>Beziehungen (Relationships)</strong>
               <ul style={listSpacing}>
-                <li>Familie: verheiratet, ledig, geschieden; Mutter, Vater, Bruder, Schwester</li>
-                <li>Freundeskreis: „Sie ist eine gute Freundin.“ / „Wir kennen uns seit zwei Jahren.“</li>
-                <li>Adjektive: zuverlässig, humorvoll, gesellig, respektvoll</li>
+                <li>Familie: verheiratet, ledig, geschieden; Mutter, Vater, Bruder, Schwester (family: married, single, divorced; mother, father, brother, sister)</li>
+                <li>Freundeskreis: „Sie ist eine gute Freundin.“ / „Wir kennen uns seit zwei Jahren.“ (friends: “She is a good friend.” / “We have known each other for two years.”)</li>
+                <li>Adjektive: zuverlässig, humorvoll, gesellig, respektvoll (adjectives: reliable, humorous, sociable, respectful)</li>
               </ul>
             </li>
           </ol>
