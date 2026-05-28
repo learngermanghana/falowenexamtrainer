@@ -43,6 +43,12 @@ const videoPreviewStyle = {
   borderRadius: 10,
 };
 
+const phraseGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+};
+
 const lesenQuestions = [
   {
     stem: "1. Was ist ein typisches deutsches Frühstück?",
@@ -266,6 +272,56 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             <li>Restaurant</li>
             <li>Mahlzeit</li>
           </ul>
+
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese Struktur für einen klaren Beitrag: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+          </p>
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>1) Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>„Heute spreche ich über …“</li>
+                <li>„In meiner Präsentation geht es um …“</li>
+                <li>„Ich möchte kurz etwas zu … sagen.“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>2) Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li><strong>zuerst</strong>, <strong>dann</strong>, <strong>am Ende</strong></li>
+                <li><strong>und</strong>, <strong>oder</strong>, <strong>auch</strong></li>
+                <li><strong>weil</strong>, <strong>deshalb</strong></li>
+                <li><strong>zum Beispiel</strong>, <strong>außerdem</strong></li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>3) Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>„Ich finde, dass …“</li>
+                <li>„Meiner Meinung nach …“</li>
+                <li>„Für mich ist … wichtig, weil …“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>4) Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>„Zusammenfassend kann ich sagen, dass …“</li>
+                <li>„Zum Schluss möchte ich sagen, dass …“</li>
+                <li>„Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Beispiel (30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute spreche ich über mein Lieblingsessen. <strong>Zuerst</strong> koche ich oft Nudeln mit Gemüse, <strong>weil</strong> es schnell
+              geht. <strong>Dann</strong> mache ich eine Soße mit Tomaten und Gewürzen, <strong>und</strong> ich schneide Zucchini. <strong>Zum Beispiel</strong> esse ich
+              dieses Gericht am Abend mit meiner Familie. <strong>Meiner Meinung nach</strong> ist es lecker und gesund, <strong>deshalb</strong> koche ich
+              es regelmäßig. <strong>Zum Schluss</strong> kann ich sagen: Einfaches Essen kann sehr gut sein.“
+            </p>
+          </div>
 
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Speaking self-practice confidence check</strong>
