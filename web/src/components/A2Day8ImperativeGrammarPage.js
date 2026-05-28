@@ -110,28 +110,39 @@ const A2Day8ImperativeGrammarPage = () => {
             </ul>
           </SectionCard>
 
-          <SectionCard title="2) Main imperative forms">
+          <SectionCard title="2) How to build the imperative (du, ihr, Sie)">
+            <p style={{ margin: 0 }}>
+              Start with the verb and then choose the correct form for the person you are speaking to.
+            </p>
             <ul style={listStyle}>
               <li>
-                <strong>du</strong>: usually verb stem only →{" "}
-                <InlineCode>Schneid die Tomaten.</InlineCode>
+                <strong>du</strong> (one person, informal): take the <strong>du</strong>-form in Präsens and
+                remove the ending <InlineCode>-st</InlineCode>.{" "}
+                <InlineCode>du schneidest → Schneid(e)!</InlineCode>
               </li>
               <li>
-                <strong>ihr</strong>: same as present tense with <InlineCode>ihr</InlineCode> →{" "}
-                <InlineCode>Schneidet die Tomaten.</InlineCode>
+                <strong>ihr</strong> (more than one person, informal): use the same verb as the present tense{" "}
+                <strong>ihr</strong>-form. <InlineCode>ihr schneidet → Schneidet!</InlineCode>
               </li>
               <li>
-                <strong>Sie</strong>: infinitive + <InlineCode>Sie</InlineCode> →{" "}
-                <InlineCode>Schneiden Sie die Tomaten.</InlineCode>
+                <strong>Sie</strong> (formal): infinitive + <InlineCode>Sie</InlineCode>.{" "}
+                <InlineCode>schneiden → Schneiden Sie!</InlineCode>
               </li>
             </ul>
           </SectionCard>
 
-          <SectionCard title="3) Important rule for the du-form">
+          <SectionCard title="3) du-form: step by step">
             <p style={{ margin: 0 }}>
-              The <strong>du</strong>-imperative is usually made with the verb stem. Often the final{" "}
-              <InlineCode>-e</InlineCode> is dropped in everyday German.
+              For most regular verbs, build the <strong>du</strong>-imperative like this:
             </p>
+            <ol style={listStyle}>
+              <li>Take the infinitive: <InlineCode>machen</InlineCode></li>
+              <li>Find the stem: <InlineCode>mach-</InlineCode></li>
+              <li>
+                Use the stem as command: <InlineCode>Mach!</InlineCode> (optional{" "}
+                <InlineCode>-e</InlineCode> in some cases: <InlineCode>Mache!</InlineCode>)
+              </li>
+            </ol>
             <ul style={listStyle}>
               <li>
                 <InlineCode>machen → Mach!</InlineCode>
@@ -145,45 +156,49 @@ const A2Day8ImperativeGrammarPage = () => {
             </ul>
           </SectionCard>
 
-          <SectionCard title="4) Common irregular verbs">
+          <SectionCard title="4) Common irregular verbs and stem changes">
             <p style={{ margin: 0 }}>
-              Some verbs change in the <strong>du</strong>-imperative.
+              Some verbs change in the <strong>du</strong>-imperative. A good trick: look at the{" "}
+              <strong>du</strong>-form first, then remove <InlineCode>-st</InlineCode>.
             </p>
             <ul style={listStyle}>
               <li>
-                <InlineCode>nehmen → Nimm!</InlineCode>
+                <InlineCode>du nimmst → Nimm!</InlineCode>
               </li>
               <li>
-                <InlineCode>geben → Gib!</InlineCode>
+                <InlineCode>du gibst → Gib!</InlineCode>
               </li>
               <li>
-                <InlineCode>essen → Iss!</InlineCode>
+                <InlineCode>du isst → Iss!</InlineCode>
               </li>
               <li>
-                <InlineCode>lesen → Lies!</InlineCode>
+                <InlineCode>du liest → Lies!</InlineCode>
               </li>
               <li>
-                <InlineCode>sehen → Sieh!</InlineCode>
+                <InlineCode>du siehst → Sieh!</InlineCode>
               </li>
             </ul>
           </SectionCard>
 
-          <SectionCard title="5) Imperative in recipes">
+          <SectionCard title="5) Practical examples (kitchen + daily life)">
             <ol style={listStyle}>
               <li>
-                <strong>du</strong>: Wasch das Gemüse.
+                <strong>du</strong>: Wasch das Gemüse und schneid die Zwiebel klein.
               </li>
               <li>
-                <strong>du</strong>: Schneide die Zwiebel klein.
+                <strong>du</strong>: Nimm eine Pfanne und gib etwas Öl dazu.
               </li>
               <li>
-                <strong>ihr</strong>: Erhitzt das Öl in der Pfanne.
+                <strong>ihr</strong>: Wascht die Tomaten und schneidet sie in Stücke.
               </li>
               <li>
-                <strong>Sie</strong>: Geben Sie Salz und Pfeffer dazu.
+                <strong>ihr</strong>: Esst langsam und trinkt genug Wasser.
               </li>
               <li>
-                <strong>du</strong>: Serviere das Essen warm.
+                <strong>Sie</strong>: Schneiden Sie das Brot bitte in dünne Scheiben.
+              </li>
+              <li>
+                <strong>Sie</strong>: Nehmen Sie Salz und geben Sie es in die Suppe.
               </li>
             </ol>
             <p style={{ margin: 0, opacity: 0.8 }}>
