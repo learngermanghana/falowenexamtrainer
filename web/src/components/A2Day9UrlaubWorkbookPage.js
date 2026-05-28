@@ -189,6 +189,68 @@ const A2Day9UrlaubWorkbookPage = () => {
             idea map below to organize vocabulary, compare options, and prepare for speaking in class.
           </p>
 
+          <div style={calloutStyle}>
+            <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Sprechen wie bei einer Mini-Präsentation</h3>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Sprich in 4 klaren Schritten: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+            </p>
+            <ol style={listSpacing}>
+              <li>
+                <strong>Einleitung:</strong> Sage kurz, worüber du sprichst.
+              </li>
+              <li>
+                <strong>Hauptteil:</strong> Nenne dein Reiseziel, Verkehrsmittel, Unterkunft und Aktivitäten. Verbinde
+                die Sätze mit einfachen Wörtern wie <em>und, oder, weil, deshalb</em>.
+              </li>
+              <li>
+                <strong>Beispiel:</strong> Gib ein konkretes Beispiel aus einem Urlaub oder deinem Plan.
+              </li>
+              <li>
+                <strong>Schluss:</strong> Beende deinen Beitrag mit einem klaren letzten Satz.
+              </li>
+            </ol>
+          </div>
+
+          <h3 style={sectionTitle}>Phrase-Bank für Teil 1</h3>
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+            <div style={questionCardStyle}>
+              <strong>Gute Einleitungen</strong>
+              <span>Heute spreche ich über meinen Urlaub.</span>
+              <span>Ich möchte kurz von meinem Reiseziel erzählen.</span>
+              <span>Ich erzähle, wohin ich reisen möchte.</span>
+            </div>
+            <div style={questionCardStyle}>
+              <strong>Verbindungswörter / Connectors</strong>
+              <span>und</span>
+              <span>oder</span>
+              <span>weil</span>
+              <span>deshalb</span>
+            </div>
+            <div style={questionCardStyle}>
+              <strong>Eigene Meinung ausdrücken</strong>
+              <span>Ich finde ... sehr interessant.</span>
+              <span>Meiner Meinung nach ist ... besser.</span>
+              <span>Ich mag ... , weil ...</span>
+            </div>
+            <div style={questionCardStyle}>
+              <strong>Gute Schlüsse</strong>
+              <span>Zum Schluss kann ich sagen: Das ist mein Traumurlaub.</span>
+              <span>Deshalb möchte ich diese Reise machen.</span>
+              <span>Danke fürs Zuhören.</span>
+            </div>
+          </div>
+
+          <div style={calloutStyle}>
+            <strong>Kurzes Modell (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Heute spreche ich über meinen Traumurlaub. Ich möchte nach Spanien reisen und ich fahre mit dem Flugzeug.
+              Dort möchte ich in einem kleinen Hotel am Strand wohnen. Ich mache eine Stadtbesichtigung oder ich gehe
+              schwimmen. Ich mag Spanien, weil das Wetter warm ist und das Essen sehr gut ist. Letztes Jahr war ich in
+              Valencia, deshalb möchte ich wieder dorthin fahren. Zum Schluss kann ich sagen: Das ist für mich der
+              perfekte Urlaub.
+            </p>
+          </div>
+
           <h3 style={sectionTitle}>1. Reiseziele (Travel Destinations)</h3>
           <ul style={listSpacing}>
             <li>
