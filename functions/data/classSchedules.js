@@ -78,11 +78,12 @@ const classCatalog = {
     ],
   },
   "B1 Stuttgart Klasse": {
-    startDate: "2026-03-12",
-    endDate: "2026-06-12",
+    orientationDate: "2026-07-02",
+    startDate: "2026-07-03",
+    endDate: "2026-10-08",
     schedule: [
-      { day: "Thursday", startTime: "19:30", endTime: "21:00" },
-      { day: "Friday", startTime: "19:30", endTime: "21:00" },
+      { day: "Thursday", startTime: "19:30", endTime: "20:30" },
+      { day: "Friday", startTime: "19:30", endTime: "20:30" },
     ],
   },
 };
