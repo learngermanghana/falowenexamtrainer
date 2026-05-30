@@ -82,8 +82,8 @@ const classCatalog = {
     startDate: "2026-07-03",
     endDate: "2026-10-08",
     schedule: [
-      { day: "Thursday", startTime: "19:00", endTime: "20:30" },
-      { day: "Friday", startTime: "19:00", endTime: "20:30" },
+      { day: "Thursday", startTime: "19:30", endTime: "20:30" },
+      { day: "Friday", startTime: "19:30", endTime: "20:30" },
     ],
   },
 };

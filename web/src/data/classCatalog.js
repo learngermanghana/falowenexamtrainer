@@ -104,8 +104,8 @@ const classCatalogDictionary = {
     startDate: "2026-07-03",
     endDate: "2026-10-08",
     schedule: [
-      { day: "Thursday", startTime: "19:00", endTime: "20:30" },
-      { day: "Friday", startTime: "19:00", endTime: "20:30" },
+      { day: "Thursday", startTime: "19:30", endTime: "20:30" },
+      { day: "Friday", startTime: "19:30", endTime: "20:30" },
     ],
     docUrl:
       "https://admin.falowen.app/course-schedule/public?level=B1&startDate=2026-07-03&defaultWeekdays=Thursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
