@@ -100,13 +100,15 @@ const classCatalogDictionary = {
       "https://admin.falowen.app/course-schedule/public?level=A2&startDate=2026-05-08&defaultWeekdays=Wednesday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "B1 Stuttgart Klasse": {
-    startDate: "2026-03-12",
-    endDate: "2026-06-12",
+    orientationDate: "2026-07-02",
+    startDate: "2026-07-03",
+    endDate: "2026-10-08",
     schedule: [
-      { day: "Thursday", startTime: "19:30", endTime: "21:00" },
-      { day: "Friday", startTime: "19:30", endTime: "21:00" },
+      { day: "Thursday", startTime: "19:00", endTime: "20:30" },
+      { day: "Friday", startTime: "19:00", endTime: "20:30" },
     ],
-    docId: "1QcKorNLQtveE-NYbZajDlAijrWhgknwp",
+    docUrl:
+      "https://admin.falowen.app/course-schedule/public?level=B1&startDate=2026-07-03&defaultWeekdays=Thursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
   "B2 Munich Klasse": {
     isSelfLearning: true,
