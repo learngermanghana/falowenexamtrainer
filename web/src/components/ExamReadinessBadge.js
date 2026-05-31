@@ -20,6 +20,12 @@ const emptyReadinessState = {
   totalAssignments: null,
 };
 
+const CERTIFICATE_REQUIRED_ASSIGNMENTS = {
+  A1: 19,
+  A2: 28,
+  B1: 28,
+};
+
 const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
 
 const cleanDayValue = (value) => {
@@ -117,6 +123,64 @@ const buildNextLessonTarget = ({ state, fallbackLevel }) => {
 
   return null;
 };
+
+const buildCertificateProgress = ({ completedAssignments, totalAssignments, level }) => {
+  const completed = Array.isArray(completedAssignments) ? completedAssignments.length : 0;
+  const explicitTotal = Number(totalAssignments);
+  const fallbackTotal = CERTIFICATE_REQUIRED_ASSIGNMENTS[normalizeLevel(level)] || null;
+  const total = Number.isFinite(explicitTotal) && explicitTotal > 0 ? explicitTotal : fallbackTotal;
+
+  if (!total) {
+    return {
+      completed,
+      total: null,
+      remaining: null,
+      percent: 0,
+      complete: false,
+      title: `Certificate progress: ${completed} passed assignments`,
+      detail: "Set the required assignment count for this level to show certificate progress.",
+    };
+  }
+
+  const cappedCompleted = Math.min(completed, total);
+  const remaining = Math.max(total - completed, 0);
+  const percent = Math.round((cappedCompleted / total) * 100);
+  const complete = remaining === 0;
+
+  return {
+    completed,
+    total,
+    remaining,
+    percent,
+    complete,
+    title: `Certificate progress: ${cappedCompleted}/${total} passed`,
+    detail: complete
+      ? "Assignment requirement complete. Final certificate approval may still depend on school checks."
+      : `You need ${remaining} more passed assignment${remaining === 1 ? "" : "s"} to meet the certificate assignment requirement.`,
+  };
+};
+
+const ProgressBar = ({ value }) => (
+  <div
+    aria-hidden="true"
+    style={{
+      height: 8,
+      borderRadius: 999,
+      background: "rgba(255,255,255,0.7)",
+      border: "1px solid rgba(17,24,39,0.08)",
+      overflow: "hidden",
+    }}
+  >
+    <div
+      style={{
+        width: `${Math.max(0, Math.min(100, value || 0))}%`,
+        height: "100%",
+        borderRadius: 999,
+        background: "#16a34a",
+      }}
+    />
+  </div>
+);
 
 const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", refreshToken = 0 }) => {
   const navigate = useNavigate();
@@ -220,6 +284,16 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
     [levelKey, state]
   );
 
+  const certificateProgress = useMemo(
+    () =>
+      buildCertificateProgress({
+        completedAssignments: state.completedAssignments,
+        totalAssignments: state.totalAssignments,
+        level: levelKey,
+      }),
+    [levelKey, state.completedAssignments, state.totalAssignments]
+  );
+
   const openNextLesson = () => {
     if (!nextLessonTarget) return;
 
@@ -242,7 +316,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
   const title = `${t("examReadiness.title")}: ${readiness.scoreLabel || ""} ${readiness.text}\n${t("examReadiness.attendanceTitle")}: ${state.attendanceSessions} ${t(
     "examReadiness.sessions"
-  )}\n${t("examReadiness.markedIdentifiers")}: ${assignmentsLabel}`;
+  )}\n${t("examReadiness.markedIdentifiers")}: ${assignmentsLabel}\n${certificateProgress.title}`;
 
   const statusText = `${readiness.scoreLabel ? `${readiness.scoreLabel} · ` : ""}${
     readiness.statusLabel || t("examReadiness.statusFallback", "Status")
@@ -311,7 +385,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
           flexWrap: "wrap",
         }}
       >
-        <div style={{ minWidth: 240 }}>
+        <div style={{ minWidth: 240, flex: "1 1 320px" }}>
           <p style={{ ...styles.helperText, margin: 0 }}>{t("examReadiness.title")}</p>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
@@ -338,6 +412,26 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
           </div>
 
           <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{readiness.detail}</p>
+          <div
+            style={{
+              border: "1px solid rgba(17,24,39,0.08)",
+              borderRadius: 12,
+              padding: 10,
+              background: certificateProgress.complete ? "rgba(220,252,231,0.75)" : "rgba(255,255,255,0.55)",
+              display: "grid",
+              gap: 6,
+              marginTop: 10,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <strong style={{ color: "#111827" }}>{certificateProgress.title}</strong>
+              {certificateProgress.total ? (
+                <span style={styles.badge}>{certificateProgress.percent}%</span>
+              ) : null}
+            </div>
+            {certificateProgress.total ? <ProgressBar value={certificateProgress.percent} /> : null}
+            <p style={{ ...styles.helperText, margin: 0 }}>{certificateProgress.detail}</p>
+          </div>
           {nextLessonTarget ? (
             <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
               Next lesson: <b>{nextLessonTarget.label}</b>
@@ -369,6 +463,9 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         </span>
         <span style={styles.badge}>
           {t("examReadiness.markedIdentifiers")}: {assignmentsLabel}
+        </span>
+        <span style={styles.badge}>
+          Certificate: {certificateProgress.total ? `${Math.min(certificateProgress.completed, certificateProgress.total)}/${certificateProgress.total}` : `${certificateProgress.completed} passed`}
         </span>
         {nextLessonTarget ? <span style={styles.badge}>Next: {nextLessonTarget.level} Day {nextLessonTarget.day}</span> : null}
 
