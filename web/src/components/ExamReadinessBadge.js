@@ -8,18 +8,23 @@ import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { isFirebaseConfigured } from "../firebase";
 import { computeExamReadiness } from "../lib/examReadiness";
 
+const emptyReadinessState = {
+  loading: false,
+  error: "",
+  attendanceSessions: 0,
+  completedAssignments: [],
+  failedAssignments: [],
+  missedAssignments: [],
+  retriesThisWeek: 0,
+  totalAssignments: null,
+};
+
 const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", refreshToken = 0 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { idToken, user } = useAuth();
 
-  const [state, setState] = useState({
-    loading: false,
-    error: "",
-    attendanceSessions: 0,
-    completedAssignments: [],
-    totalAssignments: null,
-  });
+  const [state, setState] = useState(emptyReadinessState);
 
   const className = studentProfile?.className || "";
   const studentCode = studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
@@ -33,11 +38,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
   const loadReadiness = useCallback(async () => {
     if (!className || !studentCode) {
       setState({
-        loading: false,
+        ...emptyReadinessState,
         error: t("examReadiness.errorMissingProfile"),
-        attendanceSessions: 0,
-        completedAssignments: [],
-        totalAssignments: null,
       });
       return;
     }
@@ -46,11 +48,8 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
     // if (!isFirebaseConfigured()) { ... }
     if (!isFirebaseConfigured) {
       setState({
-        loading: false,
+        ...emptyReadinessState,
         error: t("examReadiness.errorFirebase"),
-        attendanceSessions: 0,
-        completedAssignments: [],
-        totalAssignments: null,
       });
       return;
     }
@@ -63,23 +62,27 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         fetchScoreSummary({ idToken, studentCode }),
       ]);
 
-      const completedAssignments = score?.student?.completedAssignments || [];
-      const totalAssignments = score?.student?.totalAssignments ?? null;
+      const student = score?.student || {};
+      const completedAssignments = student.completedAssignments || [];
+      const failedAssignments = student.failedAssignments || [];
+      const missedAssignments = student.jumpedAssignments || student.missedAssignments || [];
+      const retriesThisWeek = student.retriesThisWeek || 0;
+      const totalAssignments = student.totalAssignments ?? null;
 
       setState({
         loading: false,
         error: "",
         attendanceSessions: attendance?.sessions || 0,
         completedAssignments,
+        failedAssignments,
+        missedAssignments,
+        retriesThisWeek,
         totalAssignments,
       });
     } catch (_e) {
       setState({
-        loading: false,
+        ...emptyReadinessState,
         error: t("examReadiness.errorLoad"),
-        attendanceSessions: 0,
-        completedAssignments: [],
-        totalAssignments: null,
       });
     }
   }, [className, idToken, levelKey, studentCode, t, user?.uid]);
@@ -93,19 +96,35 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
       computeExamReadiness({
         attendanceSessions: state.attendanceSessions,
         completedAssignments: state.completedAssignments,
+        failedAssignments: state.failedAssignments,
+        missedAssignments: state.missedAssignments,
+        retriesThisWeek: state.retriesThisWeek,
         totalAssignments: state.totalAssignments,
+        examFileActivity: 100,
         t,
       }),
-    [state.attendanceSessions, state.completedAssignments, state.totalAssignments, t]
+    [
+      state.attendanceSessions,
+      state.completedAssignments,
+      state.failedAssignments,
+      state.missedAssignments,
+      state.retriesThisWeek,
+      state.totalAssignments,
+      t,
+    ]
   );
 
   const assignmentsLabel = state.totalAssignments
     ? `${state.completedAssignments.length}/${state.totalAssignments}`
     : `${state.completedAssignments.length}`;
 
-  const title = `${t("examReadiness.title")}: ${readiness.text}\n${t("examReadiness.attendanceTitle")}: ${state.attendanceSessions} ${t(
+  const title = `${t("examReadiness.title")}: ${readiness.scoreLabel || ""} ${readiness.text}\n${t("examReadiness.attendanceTitle")}: ${state.attendanceSessions} ${t(
     "examReadiness.sessions"
   )}\n${t("examReadiness.markedIdentifiers")}: ${assignmentsLabel}`;
+
+  const statusText = `${readiness.scoreLabel ? `${readiness.scoreLabel} · ` : ""}${
+    readiness.statusLabel || t("examReadiness.statusFallback", "Status")
+  }`;
 
   // ✅ Compact button (for hero row)
   if (variant === "button") {
@@ -149,7 +168,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
                   whiteSpace: "nowrap",
                 }}
               >
-                {t("examReadiness.examStatusLabel", "Exams")}: {readiness.statusLabel || t("examReadiness.statusFallback", "Status")}
+                {t("examReadiness.examStatusLabel", "Exams")}: {statusText}
               </span>
             </>
           ) : null}
@@ -175,7 +194,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
           <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
             <h3 style={{ ...styles.sectionTitle, margin: 0 }}>
-              {readiness.icon} {readiness.text}
+              {readiness.icon} {readiness.scoreLabel ? `${readiness.scoreLabel} · ` : ""}{readiness.text}
             </h3>
 
             {/* status pill */}
@@ -211,6 +230,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
       </div>
 
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <span style={styles.badge}>{t("examReadiness.scoreLabel", "Score")}: {readiness.scoreLabel}</span>
         <span style={styles.badge}>
           {t("examReadiness.attendanceTitle")}: {state.attendanceSessions} {t("examReadiness.sessions")}
         </span>
