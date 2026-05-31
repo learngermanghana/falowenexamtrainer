@@ -4,56 +4,60 @@ const fallbackTranslate = (key, optionsOrFallback) => {
   return key;
 };
 
-export const computeExamReadiness = ({
-  attendanceSessions,
-  completedAssignments,
-  totalAssignments,
-  t = fallbackTranslate,
-}) => {
-  const completed = completedAssignments || [];
-  const completedCount = completed.length;
-  const plannedTotal = Number.isFinite(Number(totalAssignments)) ? Number(totalAssignments) : null;
+export const READINESS_WEIGHTS = {
+  completion: 30,
+  performance: 35,
+  attendance: 20,
+  improvement: 10,
+  examFile: 5,
+};
 
-  const normalizedScores = completed
-    .map((entry) => Number(entry.score))
-    .filter((value) => Number.isFinite(value));
+const clampScore = (value) => {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 0;
+  return Math.max(0, Math.min(100, Math.round(numeric)));
+};
 
-  const averageScore =
-    normalizedScores.length > 0
-      ? Math.round(normalizedScores.reduce((sum, value) => sum + value, 0) / normalizedScores.length)
-      : null;
+const toNumericScore = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
 
-  const passCount = normalizedScores.filter((value) => value >= 70).length;
-  const passRate = normalizedScores.length ? Math.round((passCount / normalizedScores.length) * 100) : null;
+  const cleaned = String(value).trim().replace(",", ".");
+  const match = cleaned.match(/(\d+(?:\.\d+)?)/);
+  if (!match) return null;
 
-  const completionRate = plannedTotal ? Math.round((completedCount / plannedTotal) * 100) : null;
-  const readyTarget = plannedTotal ? Math.ceil(plannedTotal * 0.7) : 5;
-  const almostTarget = plannedTotal ? Math.max(3, Math.ceil(plannedTotal * 0.5)) : 3;
-  const evidenceTarget = plannedTotal ? Math.max(3, Math.ceil(plannedTotal * 0.3)) : 3;
-  const completionDetail = plannedTotal
-    ? `${completedCount}/${plannedTotal} assignments (${completionRate ?? 0}%)`
-    : `${completedCount} assignments`;
+  const parsed = Number(match[1]);
+  return Number.isFinite(parsed) ? parsed : null;
+};
 
-  // ✅ READY (green)
-  if (
-    completedCount >= readyTarget &&
-    normalizedScores.length >= readyTarget &&
-    averageScore !== null &&
-    averageScore >= 75 &&
-    passRate !== null &&
-    passRate >= 70 &&
-    attendanceSessions >= 5
-  ) {
+const scoreFromAssignment = (entry = {}) =>
+  toNumericScore(
+    entry.bestScore ??
+      entry.score ??
+      entry.finalScore ??
+      entry.highestScore ??
+      entry.points ??
+      entry.mark
+  );
+
+const buildStatus = (score, t) => {
+  if (score >= 90) {
+    return {
+      icon: "🌟",
+      tone: "#dcfce7",
+      text: t("examReadiness.states.strong.text", "Strongly ready"),
+      statusLabel: t("examReadiness.states.strong.statusLabel", "Strongly Ready"),
+      statusPillBg: "#dcfce7",
+      statusPillBorder: "#86efac",
+      statusPillText: "#166534",
+    };
+  }
+
+  if (score >= 75) {
     return {
       icon: "✅",
       tone: "#dcfce7",
-      text: t("examReadiness.states.ready.text", "Ready for exam window"),
-      detail: t("examReadiness.states.ready.detail", {
-        averageScore,
-        passRate: passRate ?? 0,
-        completionDetail,
-        defaultValue: `Consistent scores (${averageScore}/100 avg, ${passRate ?? 0}% pass) with ${completionDetail} and solid attendance.`,
-      }),
+      text: t("examReadiness.states.ready.text", "Ready"),
       statusLabel: t("examReadiness.states.ready.statusLabel", "Ready"),
       statusPillBg: "#dcfce7",
       statusPillBorder: "#86efac",
@@ -61,30 +65,11 @@ export const computeExamReadiness = ({
     };
   }
 
-  // ⚠️ ALMOST (yellow)
-  if (
-    completedCount >= almostTarget &&
-    normalizedScores.length >= evidenceTarget &&
-    averageScore !== null &&
-    averageScore >= 60 &&
-    passRate !== null &&
-    passRate >= 50 &&
-    attendanceSessions >= 3
-  ) {
+  if (score >= 60) {
     return {
       icon: "⚠️",
       tone: "#fef3c7",
-      text: t("examReadiness.states.almost.text", "Build a stronger buffer"),
-      detail: plannedTotal
-        ? t("examReadiness.states.almost.detailWithTotal", {
-            readyTarget,
-            plannedTotal,
-            defaultValue: `Keep aiming for 75+/100 on recent work and reach ${readyTarget}/${plannedTotal} assignments for a green check.`,
-          })
-        : t(
-            "examReadiness.states.almost.detail",
-            "Keep aiming for 75+/100 on recent work and finish at least 5 marked identifiers for a green check."
-          ),
+      text: t("examReadiness.states.almost.text", "Almost ready"),
       statusLabel: t("examReadiness.states.almost.statusLabel", "Almost Ready"),
       statusPillBg: "#fef3c7",
       statusPillBorder: "#fcd34d",
@@ -92,22 +77,171 @@ export const computeExamReadiness = ({
     };
   }
 
-  // ❌ NOT READY (red)
+  if (score >= 40) {
+    return {
+      icon: "📚",
+      tone: "#fffbeb",
+      text: t("examReadiness.states.building.text", "Building"),
+      statusLabel: t("examReadiness.states.building.statusLabel", "Building"),
+      statusPillBg: "#fffbeb",
+      statusPillBorder: "#fde68a",
+      statusPillText: "#92400e",
+    };
+  }
+
   return {
     icon: "❌",
     tone: "#fee2e2",
     text: t("examReadiness.states.notReady.text", "Not ready yet"),
-    detail: plannedTotal
-      ? t("examReadiness.states.notReady.detailWithTotal", {
-          almostTarget,
-          plannedTotal,
-          evidenceTarget,
-          defaultValue: `Complete at least ${almostTarget}/${plannedTotal} assignments with scores and ${evidenceTarget} scored items to unlock readiness tracking.`,
-        })
-      : t("examReadiness.states.notReady.detail", "Submit more assignments with scores to unlock readiness tracking."),
-    statusLabel: t("examReadiness.states.notReady.statusLabel", "Not ready"),
+    statusLabel: t("examReadiness.states.notReady.statusLabel", "Not Ready"),
     statusPillBg: "#fee2e2",
     statusPillBorder: "#fca5a5",
     statusPillText: "#991b1b",
+  };
+};
+
+const buildTargetAttendanceSessions = ({ expectedAttendanceSessions, totalAssignments }) => {
+  const explicitTarget = Number(expectedAttendanceSessions);
+  if (Number.isFinite(explicitTarget) && explicitTarget > 0) return explicitTarget;
+
+  const plannedTotal = Number(totalAssignments);
+  if (Number.isFinite(plannedTotal) && plannedTotal > 0) {
+    return Math.max(5, Math.ceil(plannedTotal * 0.7));
+  }
+
+  return 5;
+};
+
+const weightedContribution = (score, weight) => (clampScore(score) * weight) / 100;
+
+export const computeExamReadiness = ({
+  attendanceSessions = null,
+  completedAssignments,
+  failedAssignments,
+  missedAssignments,
+  retriesThisWeek = 0,
+  totalAssignments,
+  expectedAttendanceSessions,
+  examFileActivity = 100,
+  t = fallbackTranslate,
+} = {}) => {
+  const completed = Array.isArray(completedAssignments) ? completedAssignments : [];
+  const failed = Array.isArray(failedAssignments) ? failedAssignments : [];
+  const missed = Array.isArray(missedAssignments) ? missedAssignments : [];
+  const completedCount = completed.length;
+  const plannedTotal = Number.isFinite(Number(totalAssignments)) ? Number(totalAssignments) : null;
+
+  const normalizedScores = completed
+    .map(scoreFromAssignment)
+    .filter((value) => Number.isFinite(value));
+
+  const averageScore =
+    normalizedScores.length > 0
+      ? Math.round(normalizedScores.reduce((sum, value) => sum + value, 0) / normalizedScores.length)
+      : 0;
+
+  const completionScore = plannedTotal ? clampScore((completedCount / plannedTotal) * 100) : clampScore(completedCount >= 5 ? 100 : (completedCount / 5) * 100);
+  const performanceScore = normalizedScores.length ? clampScore(averageScore) : 0;
+
+  const attendanceTarget = buildTargetAttendanceSessions({ expectedAttendanceSessions, totalAssignments: plannedTotal });
+  const hasAttendanceEvidence = attendanceSessions !== null && attendanceSessions !== undefined;
+  const attendanceScore = hasAttendanceEvidence
+    ? clampScore((Number(attendanceSessions || 0) / attendanceTarget) * 100)
+    : 100;
+
+  const weakTaskCount = failed.length + missed.length;
+  const retryCount = Number(retriesThisWeek || 0);
+  const improvementScore = weakTaskCount === 0 ? 100 : clampScore((retryCount / weakTaskCount) * 100);
+  const examFileScore = clampScore(examFileActivity);
+
+  const score = clampScore(
+    weightedContribution(completionScore, READINESS_WEIGHTS.completion) +
+      weightedContribution(performanceScore, READINESS_WEIGHTS.performance) +
+      weightedContribution(attendanceScore, READINESS_WEIGHTS.attendance) +
+      weightedContribution(improvementScore, READINESS_WEIGHTS.improvement) +
+      weightedContribution(examFileScore, READINESS_WEIGHTS.examFile)
+  );
+
+  const status = buildStatus(score, t);
+  const completionDetail = plannedTotal
+    ? `${completedCount}/${plannedTotal} assignments`
+    : `${completedCount} assignments`;
+  const attendanceDetail = hasAttendanceEvidence
+    ? `${Number(attendanceSessions || 0)}/${attendanceTarget} sessions`
+    : t("examReadiness.attendanceNotAvailable", "attendance not loaded here");
+
+  const breakdown = [
+    {
+      key: "completion",
+      label: t("examReadiness.breakdown.completion", "Assignment completion"),
+      score: completionScore,
+      weight: READINESS_WEIGHTS.completion,
+      detail: completionDetail,
+    },
+    {
+      key: "performance",
+      label: t("examReadiness.breakdown.performance", "Assignment performance"),
+      score: performanceScore,
+      weight: READINESS_WEIGHTS.performance,
+      detail: normalizedScores.length
+        ? t("examReadiness.breakdown.performanceDetail", {
+            averageScore,
+            count: normalizedScores.length,
+            defaultValue: `${averageScore}/100 average from ${normalizedScores.length} scored tasks`,
+          })
+        : t("examReadiness.breakdown.noScores", "No scored tasks yet"),
+    },
+    {
+      key: "attendance",
+      label: t("examReadiness.breakdown.attendance", "Attendance"),
+      score: attendanceScore,
+      weight: READINESS_WEIGHTS.attendance,
+      detail: attendanceDetail,
+    },
+    {
+      key: "improvement",
+      label: t("examReadiness.breakdown.improvement", "Redo / weak-task effort"),
+      score: improvementScore,
+      weight: READINESS_WEIGHTS.improvement,
+      detail:
+        weakTaskCount === 0
+          ? t("examReadiness.breakdown.noWeakTasks", "No failed or missed tasks blocking progress")
+          : t("examReadiness.breakdown.weakTasks", {
+              weakTaskCount,
+              retryCount,
+              defaultValue: `${retryCount} recent retries for ${weakTaskCount} failed/missed tasks`,
+            }),
+    },
+    {
+      key: "examFile",
+      label: t("examReadiness.breakdown.examFile", "Exam File activity"),
+      score: examFileScore,
+      weight: READINESS_WEIGHTS.examFile,
+      detail: t("examReadiness.breakdown.examFileDetail", "Exam readiness file is available for this student"),
+    },
+  ];
+
+  return {
+    ...status,
+    score,
+    scoreLabel: `${score}%`,
+    detail: t("examReadiness.scoreDetail", {
+      score,
+      completionDetail,
+      averageScore,
+      attendanceDetail,
+      defaultValue: `Falowen readiness score is ${score}%, based on ${completionDetail}, ${averageScore}/100 average score, ${attendanceDetail}, redo effort, and Exam File activity.`,
+    }),
+    breakdown,
+    averageScore,
+    completionScore,
+    performanceScore,
+    attendanceScore,
+    improvementScore,
+    examFileScore,
+    completedCount,
+    totalAssignments: plannedTotal,
+    attendanceTarget,
+    weakTaskCount,
   };
 };
