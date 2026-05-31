@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from "re
 import { useTranslation } from "react-i18next";
 import { ALLOWED_LEVELS, ExamProvider, useExam } from "./context/ExamContext";
 import CourseTab from "./components/CourseTab";
+import CourseLessonPage from "./components/CourseLessonPage";
 import AuthGate from "./components/AuthGate";
 import SignUpPage from "./components/SignUpPage";
 import LandingPage from "./components/LandingPage";
@@ -636,6 +637,7 @@ const AppShell = ({
               />
             }
           />
+          <Route path="/campus/course/lesson/:level/:day" element={<CourseLessonPage />} />
           <Route path="/campus/course/speaking-exams-intro-4-7" element={<SpeakingExamIntroPage />} />
           <Route
             path="/campus/course/dative-and-accusative-verbs-14-2"

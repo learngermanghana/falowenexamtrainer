@@ -225,104 +225,6 @@ const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value]
 const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
 const getPracticeEntryKey = (entry) => `day-${entry?.day || "x"}-occ-${entry?.occurrence || 1}`;
 
-const renderInlineMarkdown = (text, keyPrefix) => {
-  if (!text) return null;
-
-  const tokenRegex = /(\*\*([^*]+)\*\*)|(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\))|(https?:\/\/[^\s]+)/g;
-  const nodes = [];
-  let lastIndex = 0;
-  let match;
-
-  while ((match = tokenRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      nodes.push(<React.Fragment key={`${keyPrefix}-txt-${lastIndex}`}>{text.slice(lastIndex, match.index)}</React.Fragment>);
-    }
-
-    if (match[2]) {
-      nodes.push(<strong key={`${keyPrefix}-bold-${match.index}`}>{match[2]}</strong>);
-    } else if (match[4] && match[5]) {
-      nodes.push(
-        <a key={`${keyPrefix}-mdlink-${match.index}`} href={match[5]} target="_blank" rel="noreferrer">
-          {match[4]}
-        </a>
-      );
-    } else if (match[6]) {
-      nodes.push(
-        <a key={`${keyPrefix}-link-${match.index}`} href={match[6]} target="_blank" rel="noreferrer">
-          {match[6]}
-        </a>
-      );
-    }
-
-    lastIndex = tokenRegex.lastIndex;
-  }
-
-  if (lastIndex < text.length) {
-    nodes.push(<React.Fragment key={`${keyPrefix}-txt-end`}>{text.slice(lastIndex)}</React.Fragment>);
-  }
-
-  return nodes;
-};
-
-const renderInstructionBlocks = (instruction = "") => {
-  const lines = String(instruction)
-    .split(/\n/)
-    .map((line) => line.trimEnd());
-
-  const blocks = [];
-  let paragraphLines = [];
-  let listItems = [];
-  let listType = null;
-
-  const flushParagraph = () => {
-    if (!paragraphLines.length) return;
-    blocks.push({ type: "paragraph", lines: paragraphLines });
-    paragraphLines = [];
-  };
-
-  const flushList = () => {
-    if (!listItems.length) return;
-    blocks.push({ type: listType, items: listItems });
-    listItems = [];
-    listType = null;
-  };
-
-  lines.forEach((line) => {
-    const ordered = line.match(/^\d+\.\s+(.*)$/);
-    const unordered = line.match(/^[-*]\s+(.*)$/);
-
-    if (!line.trim()) {
-      flushParagraph();
-      flushList();
-      return;
-    }
-
-    if (ordered) {
-      flushParagraph();
-      if (listType && listType !== "ordered") flushList();
-      listType = "ordered";
-      listItems.push(ordered[1]);
-      return;
-    }
-
-    if (unordered) {
-      flushParagraph();
-      if (listType && listType !== "unordered") flushList();
-      listType = "unordered";
-      listItems.push(unordered[1]);
-      return;
-    }
-
-    flushList();
-    paragraphLines.push(line);
-  });
-
-  flushParagraph();
-  flushList();
-
-  return blocks;
-};
-
 const getLessonKey = (lesson) =>
   [
     lesson.chapter || lesson.title || "",
@@ -368,7 +270,7 @@ const LessonList = ({ title, lessons, t }) => {
               {lesson.assignment ? <span style={styles.badge}>{t("courseTab.assignment")}</span> : null}
             </div>
 
-            <details open>
+            <details>
               <summary style={{ cursor: "pointer", fontWeight: 700 }}>{t("courseTab.resources")}</summary>
               <ul style={{ ...styles.checklist, margin: "6px 0 0 0" }}>
                 {lesson.video || lesson.youtube_link ? (
@@ -1543,6 +1445,24 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             ) : null}
                             {isDerivedLevel ? <span style={styles.levelPill}>{t("courseTab.fromClassSchedule")}</span> : null}
                             {entry.grammar_topic ? <span style={styles.levelPill}>{entry.grammar_topic}</span> : null}
+                            <button
+                              type="button"
+                              style={styles.primaryButton}
+                              onClick={() =>
+                                navigate(`/campus/course/lesson/${selectedCourseLevel}/${entry.day}`, {
+                                  state: {
+                                    level: selectedCourseLevel,
+                                    day: entry.day,
+                                    entry,
+                                    assignmentKey: entryAssignmentKey,
+                                    status,
+                                    scoreText: scoreBadge?.text || "",
+                                  },
+                                })
+                              }
+                            >
+                              Open Lesson
+                            </button>
                             {isTutorMarked ? (
                               <button
                                 type="button"
@@ -1595,99 +1515,24 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                         </div>
 
                         {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-                        {entry.instruction ? (
-                          <div style={{ display: "grid", gap: 6 }}>
-                            <span style={styles.badge}>📝 {t("courseTab.instructionLabel")}</span>
-                            <div style={{ ...styles.helperText, margin: 0, display: "grid", gap: 8 }}>
-                              {renderInstructionBlocks(entry.instruction).map((block, index) => {
-                                if (block.type === "ordered") {
-                                  return (
-                                    <ol key={`ins-ol-${index}`} style={{ margin: 0, paddingLeft: 20 }}>
-                                      {block.items.map((item, itemIndex) => (
-                                        <li key={`ins-ol-item-${itemIndex}`}>{renderInlineMarkdown(item, `ins-ol-${index}-${itemIndex}`)}</li>
-                                      ))}
-                                    </ol>
-                                  );
-                                }
-                                if (block.type === "unordered") {
-                                  return (
-                                    <ul key={`ins-ul-${index}`} style={{ margin: 0, paddingLeft: 20 }}>
-                                      {block.items.map((item, itemIndex) => (
-                                        <li key={`ins-ul-item-${itemIndex}`}>{renderInlineMarkdown(item, `ins-ul-${index}-${itemIndex}`)}</li>
-                                      ))}
-                                    </ul>
-                                  );
-                                }
 
-                                return (
-                                  <p key={`ins-p-${index}`} style={{ margin: 0 }}>
-                                    {block.lines.map((line, lineIndex) => (
-                                      <React.Fragment key={`ins-p-line-${index}-${lineIndex}`}>
-                                        {lineIndex ? <br /> : null}
-                                        {renderInlineMarkdown(line, `ins-p-${index}-${lineIndex}`)}
-                                      </React.Fragment>
-                                    ))}
-                                  </p>
-                                );
-                              })}
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          {lesenHorenList.length || entry.video || entry.youtube_link || entry.tutorial_video_url ? (
+                            <span style={styles.badge}>Lesen & Hören</span>
+                          ) : null}
+                          {schreibenSprechenList.length || entry.schreiben || entry.sprechen ? (
+                            <span style={styles.badge}>Schreiben & Sprechen</span>
+                          ) : null}
+                        </div>
+
+                        {(lesenHorenList.length || schreibenSprechenList.length) ? (
+                          <details>
+                            <summary style={{ cursor: "pointer", fontWeight: 700 }}>Preview lesson resources</summary>
+                            <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
+                              <LessonList title="Lesen & Hören" lessons={lesenHorenList} t={t} />
+                              <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} t={t} />
                             </div>
-                            {entry.completion ? (
-                              <p style={{ ...styles.helperText, margin: 0 }}>
-                                {entry.completion.messageKey
-                                  ? t(entry.completion.messageKey, {
-                                      level: entry.completion.level,
-                                      nextLevel: entry.completion.nextLevel,
-                                      defaultValue: entry.completion.message,
-                                    })
-                                  : entry.completion.message}
-                              </p>
-                            ) : null}
-                            {Array.isArray(entry.completion?.actions) && entry.completion.actions.length ? (
-                              <div style={{ display: "grid", gap: 4 }}>
-                                {entry.completion.actions.map((action) => (
-                                  <a
-                                    key={`${entry.day}-${action.href}`}
-                                    href={action.href}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
-                                  >
-                                    {action.labelKey ? t(action.labelKey, { defaultValue: action.label }) : action.label}
-                                  </a>
-                                ))}
-                              </div>
-                            ) : null}
-                            {entry.instructionLink ? (
-                              <a
-                                href={entry.instructionLink.to}
-                                style={{ fontSize: 13, fontWeight: 700, color: "#2563eb", textDecoration: "none" }}
-                              >
-                                {entry.instructionLink.label || RESOURCE_ACTION_LABELS.guideOpenInApp}
-                              </a>
-                            ) : null}
-                          </div>
-                        ) : null}
-
-                        <LessonList title="Lesen & Hören" lessons={lesenHorenList} t={t} />
-                        <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} t={t} />
-
-                        {entry.schreiben ? (
-                          <div style={{ display: "grid", gap: 6 }}>
-                            <h4 style={{ margin: 0 }}>Schreiben</h4>
-                            <p style={{ margin: 0 }}>{entry.schreiben}</p>
-                          </div>
-                        ) : null}
-                        {entry.sprechen ? (
-                          <div style={{ display: "grid", gap: 6 }}>
-                            <h4 style={{ margin: 0 }}>Sprechen</h4>
-                            <p style={{ margin: 0 }}>{entry.sprechen}</p>
-                          </div>
-                        ) : null}
-                        {entry.zusatzmaterial ? (
-                          <div style={{ display: "grid", gap: 6 }}>
-                            <h4 style={{ margin: 0 }}>Zusatzmaterial</h4>
-                            <p style={{ margin: 0 }}>{entry.zusatzmaterial}</p>
-                          </div>
+                          </details>
                         ) : null}
                       </div>
                     );
