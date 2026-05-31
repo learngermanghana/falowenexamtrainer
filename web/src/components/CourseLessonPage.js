@@ -1,7 +1,8 @@
 import React, { useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
-import { courseSchedules } from "../data/courseSchedule";
+import { courseSchedules, getCourseScheduleDictionaryEntry } from "../data/courseSchedule";
+import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
@@ -9,6 +10,100 @@ const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value]
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 
 const isInternalLink = (url = "") => String(url || "").startsWith("/");
+
+const resolveLessonAssignmentKey = ({ lesson = {}, entry = {}, level = "" }) => {
+  const normalizedLevel = normalizeLevel(level);
+  const dictionaryMatch = getCourseScheduleDictionaryEntry({
+    level: normalizedLevel,
+    assignmentId: lesson.assignmentId || lesson.assignment_id || entry.assignmentId || entry.assignment_id,
+    chapter: lesson.chapter || entry.chapter,
+    mode: lesson.type || lesson.mode,
+    assignmentDay: entry.day,
+  });
+
+  if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
+
+  return (
+    resolveAssignmentCanonicalKey({
+      level: normalizedLevel,
+      assignmentId: lesson.assignmentId || lesson.assignment_id || lesson.chapter || entry.assignmentId || entry.assignment_id,
+      assignmentTitle: lesson.title || lesson.topic || lesson.chapter || entry.topic || `Day ${entry.day}`,
+    }) || ""
+  );
+};
+
+const resolveEntryAssignmentKey = ({ entry = {}, level = "", fallbackAssignmentKey = "" }) => {
+  const normalizedLevel = normalizeLevel(level);
+  const dictionaryMatch = getCourseScheduleDictionaryEntry({
+    level: normalizedLevel,
+    assignmentId: entry.assignmentId || entry.assignment_id || fallbackAssignmentKey,
+    chapter: entry.chapter,
+    assignmentDay: entry.day,
+  });
+
+  if (dictionaryMatch?.assignment_id) return dictionaryMatch.assignment_id;
+
+  return (
+    resolveAssignmentCanonicalKey({
+      level: normalizedLevel,
+      assignmentId: entry.assignmentId || entry.assignment_id || fallbackAssignmentKey || entry.chapter,
+      assignmentTitle: entry.topic || entry.chapter || `Day ${entry.day}`,
+    }) || fallbackAssignmentKey || ""
+  );
+};
+
+const buildLessonAssignmentTargets = ({ entry = {}, level = "", fallbackAssignmentKey = "" }) => {
+  if (!entry) return [];
+
+  const rawTargets = [
+    ...toLessonArray(entry.lesen_hören).map((lesson) => ({ lesson, groupTitle: "Lesen & Hören" })),
+    ...toLessonArray(entry.schreiben_sprechen).map((lesson) => ({ lesson, groupTitle: "Schreiben & Sprechen" })),
+  ]
+    .filter(({ lesson }) => lesson?.assignment)
+    .map(({ lesson, groupTitle }) => {
+      const assignmentKey = resolveLessonAssignmentKey({ lesson, entry, level });
+      const chapter = lesson.chapter || entry.chapter || "";
+      return {
+        source: "lesson",
+        assignmentKey,
+        chapter,
+        day: entry.day,
+        label: chapter ? `${groupTitle} · Kapitel ${chapter}` : groupTitle,
+        title: lesson.title || lesson.topic || entry.topic || "Assignment",
+        lesson,
+      };
+    })
+    .filter((target) => target.assignmentKey);
+
+  const seen = new Set();
+  const uniqueTargets = rawTargets.filter((target) => {
+    const key = `${target.assignmentKey}::${target.label}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  if (uniqueTargets.length) return uniqueTargets;
+
+  if (entry.assignment || entry.assignmentId || entry.assignment_id || fallbackAssignmentKey) {
+    const assignmentKey = resolveEntryAssignmentKey({ entry, level, fallbackAssignmentKey });
+    if (assignmentKey) {
+      return [
+        {
+          source: "entry",
+          assignmentKey,
+          chapter: entry.chapter || "",
+          day: entry.day,
+          label: entry.topic || `Day ${entry.day}`,
+          title: entry.topic || "Assignment",
+          lesson: null,
+        },
+      ];
+    }
+  }
+
+  return [];
+};
 
 const renderInlineMarkdown = (text, keyPrefix) => {
   if (!text) return null;
@@ -122,7 +217,7 @@ const ResourceAnchor = ({ label, url }) => {
   );
 };
 
-const LessonResourceList = ({ title, lessons }) => {
+const LessonResourceList = ({ title, lessons, entry, level, onSubmitAssignment }) => {
   const rows = toLessonArray(lessons).filter(Boolean);
   if (!rows.length) return null;
 
@@ -130,31 +225,55 @@ const LessonResourceList = ({ title, lessons }) => {
     <section style={{ display: "grid", gap: 10 }}>
       <h2 style={{ margin: 0, fontSize: 20 }}>{title}</h2>
       <div style={{ display: "grid", gap: 10 }}>
-        {rows.map((lesson, index) => (
-          <article
-            key={`${title}-${lesson.chapter || lesson.title || index}-${index}`}
-            style={{
-              padding: 14,
-              border: "1px solid #e5e7eb",
-              borderRadius: 12,
-              background: "#f9fafb",
-              display: "grid",
-              gap: 8,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-              <strong>{lesson.chapter ? `Kapitel ${lesson.chapter}` : lesson.title || "Resource"}</strong>
-              {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
-            </div>
-            {lesson.title && lesson.chapter ? <p style={{ ...styles.helperText, margin: 0 }}>{lesson.title}</p> : null}
-            {lesson.note ? <p style={{ margin: 0 }}>{lesson.note}</p> : null}
-            <ul style={{ ...styles.checklist, margin: 0 }}>
-              <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={lesson.video || lesson.youtube_link} />
-              <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
-              <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
-            </ul>
-          </article>
-        ))}
+        {rows.map((lesson, index) => {
+          const assignmentKey = lesson.assignment ? resolveLessonAssignmentKey({ lesson, entry, level }) : "";
+          const target = assignmentKey
+            ? {
+                source: "lesson",
+                assignmentKey,
+                chapter: lesson.chapter || entry?.chapter || "",
+                day: entry?.day,
+                label: lesson.chapter ? `${title} · Kapitel ${lesson.chapter}` : title,
+                title: lesson.title || lesson.topic || entry?.topic || "Assignment",
+                lesson,
+              }
+            : null;
+
+          return (
+            <article
+              key={`${title}-${lesson.chapter || lesson.title || index}-${index}`}
+              style={{
+                padding: 14,
+                border: "1px solid #e5e7eb",
+                borderRadius: 12,
+                background: "#f9fafb",
+                display: "grid",
+                gap: 8,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+                <strong>{lesson.chapter ? `Kapitel ${lesson.chapter}` : lesson.title || "Resource"}</strong>
+                {lesson.assignment ? <span style={styles.badge}>Assignment</span> : null}
+              </div>
+              {lesson.title && lesson.chapter ? <p style={{ ...styles.helperText, margin: 0 }}>{lesson.title}</p> : null}
+              {lesson.note ? <p style={{ margin: 0 }}>{lesson.note}</p> : null}
+              <ul style={{ ...styles.checklist, margin: 0 }}>
+                <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={lesson.video || lesson.youtube_link} />
+                <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
+                <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
+              </ul>
+              {target ? (
+                <button
+                  type="button"
+                  style={{ ...styles.primaryButton, justifySelf: "start" }}
+                  onClick={() => onSubmitAssignment(target)}
+                >
+                  Submit {lesson.chapter ? `Kapitel ${lesson.chapter}` : "this"} assignment
+                </button>
+              ) : null}
+            </article>
+          );
+        })}
       </div>
     </section>
   );
@@ -231,18 +350,26 @@ const CourseLessonPage = () => {
   const assignmentKey = location.state?.assignmentKey || entry?.assignmentId || entry?.assignment_id || "";
   const status = location.state?.status || entry?.completion?.nonActionableStatus || "notStarted";
   const scoreText = location.state?.scoreText || "";
+  const assignmentTargets = useMemo(
+    () => buildLessonAssignmentTargets({ entry, level, fallbackAssignmentKey: assignmentKey }),
+    [assignmentKey, entry, level]
+  );
+  const lessonAssignmentCount = assignmentTargets.filter((target) => target.source === "lesson").length;
 
-  const handleSubmitAssignment = () => {
-    if (!assignmentKey) return;
+  const handleSubmitAssignment = (target = assignmentTargets[0]) => {
+    const selectedAssignmentKey = target?.assignmentKey || assignmentKey;
+    if (!selectedAssignmentKey) return;
 
-    navigate(`/campus/submit?assignmentKey=${encodeURIComponent(assignmentKey)}&assignmentId=${encodeURIComponent(assignmentKey)}`, {
+    navigate(`/campus/submit?assignmentKey=${encodeURIComponent(selectedAssignmentKey)}&assignmentId=${encodeURIComponent(selectedAssignmentKey)}`, {
       state: {
-        assignmentKey,
-        assignmentId: assignmentKey || entry?.assignmentId || null,
-        canonicalAssignmentId: assignmentKey || entry?.assignmentId || null,
-        day: entry?.day || day,
+        assignmentKey: selectedAssignmentKey,
+        assignmentId: selectedAssignmentKey,
+        canonicalAssignmentId: selectedAssignmentKey,
+        day: target?.day || entry?.day || day,
         occurrence: entry?.occurrence,
         level,
+        chapter: target?.chapter || entry?.chapter || "",
+        assignmentTitle: target?.title || entry?.topic || "Assignment",
       },
     });
   };
@@ -274,13 +401,18 @@ const CourseLessonPage = () => {
             <span style={styles.levelPill}>Day {entry.day ?? day}</span>
             {status ? <span style={styles.badge}>Status: {status}</span> : null}
             {scoreText ? <span style={styles.badge}>{scoreText}</span> : null}
+            {lessonAssignmentCount > 1 ? <span style={styles.badge}>{lessonAssignmentCount} assignments</span> : null}
           </div>
           <h1 style={{ margin: 0 }}>{entry.topic || `Day ${entry.day ?? day}`}</h1>
           {entry.chapter ? <p style={{ ...styles.helperText, margin: 0 }}>Chapter: {entry.chapter}</p> : null}
           {entry.grammar_topic ? <p style={{ ...styles.helperText, margin: 0 }}>Grammar topic: {entry.grammar_topic}</p> : null}
           {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
-          {assignmentKey ? (
-            <button type="button" style={{ ...styles.primaryButton, justifySelf: "start" }} onClick={handleSubmitAssignment}>
+          {lessonAssignmentCount > 1 ? (
+            <div style={{ ...styles.helperText, margin: 0 }}>
+              This lesson has {lessonAssignmentCount} marked assignments. Submit each assignment from its own resource card below.
+            </div>
+          ) : lessonAssignmentCount === 0 && assignmentTargets[0] ? (
+            <button type="button" style={{ ...styles.primaryButton, justifySelf: "start" }} onClick={() => handleSubmitAssignment(assignmentTargets[0])}>
               Submit this assignment
             </button>
           ) : null}
@@ -288,8 +420,8 @@ const CourseLessonPage = () => {
 
         <InstructionSection instruction={entry.instruction} />
 
-        <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} />
-        <LessonResourceList title="Schreiben & Sprechen" lessons={entry.schreiben_sprechen} />
+        <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} entry={entry} level={level} onSubmitAssignment={handleSubmitAssignment} />
+        <LessonResourceList title="Schreiben & Sprechen" lessons={entry.schreiben_sprechen} entry={entry} level={level} onSubmitAssignment={handleSubmitAssignment} />
 
         <ul style={{ ...styles.checklist, margin: 0 }}>
           <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={entry.video || entry.youtube_link || entry.tutorial_video_url} />
