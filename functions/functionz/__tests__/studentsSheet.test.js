@@ -20,7 +20,7 @@ jest.mock('googleapis', () => ({
       },
     })),
   },
-}));
+}), { virtual: true });
 
 describe('upsertStudentToSheet paid field sync', () => {
   beforeEach(() => {
