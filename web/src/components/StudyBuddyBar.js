@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -9,10 +9,12 @@ import { fetchResults } from "../services/resultsService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
+import "./StudyBuddyBar.css";
 
 const PASS_MARK = 60;
 const ATTENDANCE_TARGET = 80;
 const EXAM_SIMULATION_WINDOW_DAYS = 45;
+const COLLAPSED_PLAN_LIMIT = 2;
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -41,8 +43,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const navigate = useNavigate();
   const { idToken, user } = useAuth();
   const locale = i18n.language;
+  const quickQuestionInputRef = useRef(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDismissed, setIsDismissed] = useState(true);
+  const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(() => {
     try {
       return localStorage.getItem("studyBuddyHighContrast") === "true";
@@ -355,6 +359,8 @@ const StudyBuddyBar = ({ studentProfile }) => {
 
   const completedPlanCount = weeklyPlanItems.filter((item) => completedPlanItems[item.id]).length;
   const pendingPlanCount = Math.max(weeklyPlanItems.length - completedPlanCount, 0);
+  const visibleWeeklyPlanItems = isPlanExpanded ? weeklyPlanItems : weeklyPlanItems.slice(0, COLLAPSED_PLAN_LIMIT);
+  const hiddenPlanCount = Math.max(weeklyPlanItems.length - visibleWeeklyPlanItems.length, 0);
   const planNudge =
     pendingPlanCount === 0
       ? t("studyBuddy.weeklyPlan.nudges.allDone")
@@ -426,8 +432,28 @@ const StudyBuddyBar = ({ studentProfile }) => {
     [className, idToken, resolvedLevel, studentCode, studentEmail, t, user?.uid]
   );
 
+  const focusQuickQuestion = useCallback(() => {
+    setIsCollapsed(false);
+    triggerInteractionFeedback({ sound: "open" });
+    window.setTimeout(() => {
+      const input = quickQuestionInputRef.current;
+      if (!input) return;
+      input.scrollIntoView({ behavior: "smooth", block: "center" });
+      try {
+        input.focus({ preventScroll: true });
+      } catch (error) {
+        input.focus();
+      }
+    }, 80);
+  }, []);
+
   const quickLinks = useMemo(
     () => [
+      {
+        key: "ask",
+        label: t("studyBuddy.qa.jumpButton", { defaultValue: "Ask AI" }),
+        action: focusQuickQuestion,
+      },
       {
         key: "course",
         label: t("studyBuddy.shortcuts.course"),
@@ -469,7 +495,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         },
       },
     ],
-    [navigate, playOpenFeedback, t]
+    [focusQuickQuestion, navigate, playOpenFeedback, t]
   );
 
   useEffect(() => {
@@ -561,44 +587,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
             </div>
           </div>
 
-          <div className="study-buddy-plan">
-            <div className="study-buddy-plan-header">
-              <div>
-                <p className="study-buddy-qa-title">{t("studyBuddy.weeklyPlan.title")}</p>
-                <p className="study-buddy-plan-progress">{t("studyBuddy.weeklyPlan.description")}</p>
-              </div>
-              <p className="study-buddy-plan-progress">
-                {t("studyBuddy.weeklyPlan.progress", {
-                  done: numberFormatter.format(completedPlanCount),
-                  total: numberFormatter.format(weeklyPlanItems.length),
-                })}
-              </p>
-            </div>
-            <ul className="study-buddy-plan-list">
-              {weeklyPlanItems.map((item) => {
-                const isComplete = Boolean(completedPlanItems[item.id]);
-                return (
-                  <li key={item.id} className="study-buddy-plan-item">
-                    <button
-                      type="button"
-                      className={`study-buddy-plan-check${isComplete ? " is-complete" : ""}`}
-                      aria-pressed={isComplete}
-                      onClick={() => togglePlanItem(item.id)}
-                    >
-                      {isComplete ? "✓" : "+"}
-                    </button>
-                    <div>
-                      <p className="study-buddy-plan-item-title">{item.title}</p>
-                      <p className="study-buddy-plan-item-helper">{item.helper}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            <p className="study-buddy-plan-nudge">{planNudge}</p>
-          </div>
-
-          <div className="study-buddy-qa">
+          <div className="study-buddy-qa study-buddy-qa-priority">
             <p className="study-buddy-qa-title">{t("studyBuddy.qa.title")}</p>
             <form
               className="study-buddy-qa-form"
@@ -608,6 +597,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
               }}
             >
               <input
+                ref={quickQuestionInputRef}
                 className="study-buddy-qa-input"
                 type="text"
                 value={questionInput}
@@ -644,6 +634,62 @@ const StudyBuddyBar = ({ studentProfile }) => {
             ) : null}
           </div>
 
+          <div className="study-buddy-plan">
+            <div className="study-buddy-plan-header">
+              <div>
+                <p className="study-buddy-qa-title">{t("studyBuddy.weeklyPlan.title")}</p>
+                <p className="study-buddy-plan-progress">{t("studyBuddy.weeklyPlan.description")}</p>
+              </div>
+              <p className="study-buddy-plan-progress">
+                {t("studyBuddy.weeklyPlan.progress", {
+                  done: numberFormatter.format(completedPlanCount),
+                  total: numberFormatter.format(weeklyPlanItems.length),
+                })}
+              </p>
+            </div>
+            <ul className="study-buddy-plan-list">
+              {visibleWeeklyPlanItems.map((item) => {
+                const isComplete = Boolean(completedPlanItems[item.id]);
+                return (
+                  <li key={item.id} className="study-buddy-plan-item">
+                    <button
+                      type="button"
+                      className={`study-buddy-plan-check${isComplete ? " is-complete" : ""}`}
+                      aria-pressed={isComplete}
+                      onClick={() => togglePlanItem(item.id)}
+                    >
+                      {isComplete ? "✓" : "+"}
+                    </button>
+                    <div>
+                      <p className="study-buddy-plan-item-title">{item.title}</p>
+                      <p className="study-buddy-plan-item-helper">{item.helper}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            {hiddenPlanCount > 0 ? (
+              <button
+                type="button"
+                className="study-buddy-plan-more"
+                onClick={() => setIsPlanExpanded(true)}
+              >
+                {t("studyBuddy.weeklyPlan.showAll", {
+                  count: numberFormatter.format(hiddenPlanCount),
+                  defaultValue: `View ${numberFormatter.format(hiddenPlanCount)} more tasks`,
+                })}
+              </button>
+            ) : isPlanExpanded && weeklyPlanItems.length > COLLAPSED_PLAN_LIMIT ? (
+              <button
+                type="button"
+                className="study-buddy-plan-more"
+                onClick={() => setIsPlanExpanded(false)}
+              >
+                {t("studyBuddy.weeklyPlan.showLess", { defaultValue: "Show fewer tasks" })}
+              </button>
+            ) : null}
+            <p className="study-buddy-plan-nudge">{planNudge}</p>
+          </div>
         </div>
         {!isCollapsed ? (
           <button
