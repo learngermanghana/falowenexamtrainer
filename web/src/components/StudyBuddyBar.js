@@ -10,9 +10,30 @@ import { fetchScoreSummary } from "../services/scoreSummaryService";
 import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
+const PASS_MARK = 60;
+const ATTENDANCE_TARGET = 80;
+const EXAM_SIMULATION_WINDOW_DAYS = 45;
+
 const toNumber = (value) => {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
+};
+
+const getWeekStartKey = () => {
+  const current = new Date();
+  const mondayOffset = (current.getDay() + 6) % 7;
+  current.setHours(0, 0, 0, 0);
+  current.setDate(current.getDate() - mondayOffset);
+  return current.toISOString().slice(0, 10);
+};
+
+const readStoredPlanState = (storageKey) => {
+  try {
+    const stored = localStorage.getItem(storageKey);
+    return stored ? JSON.parse(stored) || {} : {};
+  } catch (error) {
+    return {};
+  }
 };
 
 const StudyBuddyBar = ({ studentProfile }) => {
@@ -34,6 +55,12 @@ const StudyBuddyBar = ({ studentProfile }) => {
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const studentEmail = studentProfile?.email || "";
   const className = studentProfile?.className || "";
+  const weekStartKey = useMemo(() => getWeekStartKey(), []);
+  const planStorageKey = useMemo(() => {
+    const studentIdentity = studentCode || studentEmail || user?.uid || "guest";
+    return `studyBuddyWeeklyPlan:${studentIdentity}:${weekStartKey}`;
+  }, [studentCode, studentEmail, user?.uid, weekStartKey]);
+  const [completedPlanItems, setCompletedPlanItems] = useState(() => readStoredPlanState(planStorageKey));
   const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim();
   const resolvedLevel = useMemo(() => {
     if (!levelKey) return "";
@@ -114,6 +141,19 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const playOpenFeedback = useCallback(() => {
     triggerInteractionFeedback({ sound: "open" });
   }, []);
+
+  const examDaysLeft = useMemo(() => {
+    const examDateMs = toDateMs(
+      studentProfile?.examDate ||
+        studentProfile?.nextExamDate ||
+        studentProfile?.examDateIso ||
+        studentProfile?.exam?.date ||
+        studentProfile?.exam?.startDate
+    );
+    if (!Number.isFinite(examDateMs)) return null;
+    const dayMs = 1000 * 60 * 60 * 24;
+    return Math.max(0, Math.ceil((examDateMs - Date.now()) / dayMs));
+  }, [studentProfile]);
 
   const paymentReminder = useMemo(() => {
     const balanceDue = Number(studentProfile?.balanceDue);
@@ -211,14 +251,26 @@ const StudyBuddyBar = ({ studentProfile }) => {
     };
   }, [className, idToken, resolvedLevel, studentCode, studentEmail]);
 
+  useEffect(() => {
+    setCompletedPlanItems(readStoredPlanState(planStorageKey));
+  }, [planStorageKey]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(planStorageKey, JSON.stringify(completedPlanItems));
+    } catch (error) {
+      // Ignore storage errors (privacy mode, etc.)
+    }
+  }, [completedPlanItems, planStorageKey]);
+
   const suggestions = useMemo(() => {
     const tips = [];
 
-    if (latestScore !== null && latestScore < 60) {
+    if (latestScore !== null && latestScore < PASS_MARK) {
       tips.push(t("studyBuddy.suggestions.lowScore"));
     }
 
-    if (attendanceRate !== null && attendanceRate < 80) {
+    if (attendanceRate !== null && attendanceRate < ATTENDANCE_TARGET) {
       tips.push(t("studyBuddy.suggestions.lowAttendance"));
     }
 
@@ -239,6 +291,101 @@ const StudyBuddyBar = ({ studentProfile }) => {
   }, [attendanceRate, latestScore, paymentReminder, recommendedAssignment, t]);
 
   const primarySuggestion = suggestions[0];
+  const latestAssignmentLabel =
+    latestResult?.assignment ||
+    latestResult?.assignmentTitle ||
+    latestResult?.assignmentName ||
+    latestResult?.assignment_id ||
+    latestResult?.assignmentId ||
+    recommendedAssignment ||
+    t("studyBuddy.metrics.latestResult");
+
+  const weeklyPlanItems = useMemo(() => {
+    const items = [];
+    const addItem = (id, title, helper) => {
+      if (!items.some((item) => item.id === id)) {
+        items.push({ id, title, helper });
+      }
+    };
+
+    if (latestScore !== null && latestScore < PASS_MARK) {
+      addItem(
+        "redoFailed",
+        t("studyBuddy.weeklyPlan.items.redoFailed", { assignment: latestAssignmentLabel }),
+        t("studyBuddy.weeklyPlan.helpers.redoFailed")
+      );
+    }
+
+    if (attendanceRate !== null && attendanceRate < ATTENDANCE_TARGET) {
+      addItem(
+        "attendanceReset",
+        t("studyBuddy.weeklyPlan.items.attendanceReset"),
+        t("studyBuddy.weeklyPlan.helpers.attendanceReset")
+      );
+    }
+
+    addItem(
+      "grammarRepair",
+      t("studyBuddy.weeklyPlan.items.grammarRepair"),
+      t("studyBuddy.weeklyPlan.helpers.grammarRepair")
+    );
+    addItem(
+      "writingPractice",
+      t("studyBuddy.weeklyPlan.items.writingPractice"),
+      t("studyBuddy.weeklyPlan.helpers.writingPractice")
+    );
+    addItem(
+      "vocabRecall",
+      t("studyBuddy.weeklyPlan.items.vocabRecall"),
+      t("studyBuddy.weeklyPlan.helpers.vocabRecall")
+    );
+
+    if (examDaysLeft !== null && examDaysLeft <= EXAM_SIMULATION_WINDOW_DAYS) {
+      addItem(
+        "examSimulation",
+        t("studyBuddy.weeklyPlan.items.examSimulation"),
+        t("studyBuddy.weeklyPlan.helpers.examSimulation", {
+          days: numberFormatter.format(examDaysLeft),
+        })
+      );
+    }
+
+    return items;
+  }, [attendanceRate, examDaysLeft, latestAssignmentLabel, latestScore, numberFormatter, t]);
+
+  const completedPlanCount = weeklyPlanItems.filter((item) => completedPlanItems[item.id]).length;
+  const pendingPlanCount = Math.max(weeklyPlanItems.length - completedPlanCount, 0);
+  const planNudge =
+    pendingPlanCount === 0
+      ? t("studyBuddy.weeklyPlan.nudges.allDone")
+      : pendingPlanCount === 1
+      ? t("studyBuddy.weeklyPlan.nudges.oneLeft")
+      : t("studyBuddy.weeklyPlan.nudges.pending", {
+          count: numberFormatter.format(pendingPlanCount),
+        });
+
+  const togglePlanItem = useCallback(
+    (itemId) => {
+      const completed = !completedPlanItems[itemId];
+      setCompletedPlanItems((previous) => ({
+        ...previous,
+        [itemId]: completed,
+      }));
+      triggerInteractionFeedback({ sound: completed ? "success" : "open" });
+      logStudyBuddyUsage({
+        event: "weekly_plan_toggle",
+        studentCode,
+        studentEmail,
+        className,
+        userId: user?.uid || null,
+        itemId,
+        completed,
+        weekStart: weekStartKey,
+      }).catch(() => {});
+    },
+    [className, completedPlanItems, studentCode, studentEmail, user?.uid, weekStartKey]
+  );
+
   const submitQuickQuestion = useCallback(
     async (question) => {
       const trimmed = question.trim();
@@ -412,6 +559,43 @@ const StudyBuddyBar = ({ studentProfile }) => {
               <p className="study-buddy-label">{t("studyBuddy.insights.attendance")}</p>
               <div className="study-buddy-value">{attendanceLabel}</div>
             </div>
+          </div>
+
+          <div className="study-buddy-plan">
+            <div className="study-buddy-plan-header">
+              <div>
+                <p className="study-buddy-qa-title">{t("studyBuddy.weeklyPlan.title")}</p>
+                <p className="study-buddy-plan-progress">{t("studyBuddy.weeklyPlan.description")}</p>
+              </div>
+              <p className="study-buddy-plan-progress">
+                {t("studyBuddy.weeklyPlan.progress", {
+                  done: numberFormatter.format(completedPlanCount),
+                  total: numberFormatter.format(weeklyPlanItems.length),
+                })}
+              </p>
+            </div>
+            <ul className="study-buddy-plan-list">
+              {weeklyPlanItems.map((item) => {
+                const isComplete = Boolean(completedPlanItems[item.id]);
+                return (
+                  <li key={item.id} className="study-buddy-plan-item">
+                    <button
+                      type="button"
+                      className={`study-buddy-plan-check${isComplete ? " is-complete" : ""}`}
+                      aria-pressed={isComplete}
+                      onClick={() => togglePlanItem(item.id)}
+                    >
+                      {isComplete ? "✓" : "+"}
+                    </button>
+                    <div>
+                      <p className="study-buddy-plan-item-title">{item.title}</p>
+                      <p className="study-buddy-plan-item-helper">{item.helper}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+            <p className="study-buddy-plan-nudge">{planNudge}</p>
           </div>
 
           <div className="study-buddy-qa">
