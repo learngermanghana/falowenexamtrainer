@@ -15,8 +15,107 @@ const emptyReadinessState = {
   completedAssignments: [],
   failedAssignments: [],
   missedAssignments: [],
+  nextRecommendation: null,
   retriesThisWeek: 0,
   totalAssignments: null,
+};
+
+const normalizeLevel = (value = "") => String(value || "").trim().toUpperCase();
+
+const cleanDayValue = (value) => {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+
+  const directMatch = raw.match(/(?:day|chapter|kapitel)\s*[-_:]?\s*(\d+(?:\.\d+)?)/i);
+  if (directMatch?.[1]) return directMatch[1];
+
+  const numericOnly = raw.match(/^(\d+(?:\.\d+)?)$/);
+  if (numericOnly?.[1]) return numericOnly[1];
+
+  return raw;
+};
+
+const getCandidateText = (candidate = {}) =>
+  [
+    candidate.identifier,
+    candidate.assignmentId,
+    candidate.assignment_id,
+    candidate.assignmentKey,
+    candidate.canonicalAssignmentId,
+    candidate.label,
+    candidate.title,
+    candidate.topic,
+    candidate.assignment,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+const extractLessonDay = (candidate = {}) => {
+  const directDay =
+    candidate.day ??
+    candidate.assignmentDay ??
+    candidate.lessonDay ??
+    candidate.chapterNumber ??
+    candidate.number;
+  const cleanedDirect = cleanDayValue(directDay);
+  if (cleanedDirect) return cleanedDirect;
+
+  const text = getCandidateText(candidate);
+  const patterns = [
+    /\bday\s*[-_:]?\s*(\d+(?:\.\d+)?)/i,
+    /\bchapter\s*[-_:]?\s*(\d+(?:\.\d+)?)/i,
+    /\bkapitel\s*[-_:]?\s*(\d+(?:\.\d+)?)/i,
+    /\b[A-C][12]\s*[-_ ]?(?:day|chapter)?\s*[-_ ]?(\d+(?:\.\d+)?)/i,
+    /(?:^|[-_\s])(\d+(?:\.\d+)?)(?:[-_\s]|$)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+
+  return "";
+};
+
+const extractLessonLevel = (candidate = {}, fallbackLevel = "") => {
+  const directLevel = normalizeLevel(candidate.level || candidate.course || candidate.courseLevel);
+  if (directLevel) return directLevel;
+
+  const text = getCandidateText(candidate);
+  const match = text.match(/\b(A1|A2|B1|B2|C1)\b/i);
+  return normalizeLevel(match?.[1] || fallbackLevel);
+};
+
+const getAssignmentKey = (candidate = {}) =>
+  candidate.assignmentKey ||
+  candidate.assignmentId ||
+  candidate.assignment_id ||
+  candidate.canonicalAssignmentId ||
+  candidate.identifier ||
+  "";
+
+const buildNextLessonTarget = ({ state, fallbackLevel }) => {
+  const candidates = [
+    state.nextRecommendation,
+    ...(state.missedAssignments || []),
+    ...(state.failedAssignments || []),
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const level = extractLessonLevel(candidate, fallbackLevel);
+    const day = extractLessonDay(candidate);
+    if (!level || !day) continue;
+
+    return {
+      level,
+      day,
+      assignmentKey: getAssignmentKey(candidate),
+      label: candidate.label || candidate.title || candidate.topic || candidate.identifier || `Day ${day}`,
+      candidate,
+    };
+  }
+
+  return null;
 };
 
 const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", refreshToken = 0 }) => {
@@ -28,7 +127,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
 
   const className = studentProfile?.className || "";
   const studentCode = studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
-  const levelKey = String(studentProfile?.level || studentProfile?.course || "").trim().toUpperCase();
+  const levelKey = normalizeLevel(studentProfile?.level || studentProfile?.course || "");
 
   const handleOpenExamFile = () => {
     if (typeof onOpenExamFile === "function") return onOpenExamFile();
@@ -66,6 +165,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
       const completedAssignments = student.completedAssignments || [];
       const failedAssignments = student.failedAssignments || [];
       const missedAssignments = student.jumpedAssignments || student.missedAssignments || [];
+      const nextRecommendation = student.nextRecommendation || null;
       const retriesThisWeek = student.retriesThisWeek || 0;
       const totalAssignments = student.totalAssignments ?? null;
 
@@ -76,6 +176,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         completedAssignments,
         failedAssignments,
         missedAssignments,
+        nextRecommendation,
         retriesThisWeek,
         totalAssignments,
       });
@@ -113,6 +214,27 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
       t,
     ]
   );
+
+  const nextLessonTarget = useMemo(
+    () => buildNextLessonTarget({ state, fallbackLevel: levelKey }),
+    [levelKey, state]
+  );
+
+  const openNextLesson = () => {
+    if (!nextLessonTarget) return;
+
+    const assignmentKey = nextLessonTarget.assignmentKey || "";
+    navigate(`/campus/course/lesson/${nextLessonTarget.level}/${nextLessonTarget.day}`, {
+      state: {
+        level: nextLessonTarget.level,
+        day: nextLessonTarget.day,
+        assignmentKey,
+        assignmentId: assignmentKey || null,
+        canonicalAssignmentId: assignmentKey || null,
+        scoreText: "",
+      },
+    });
+  };
 
   const assignmentsLabel = state.totalAssignments
     ? `${state.completedAssignments.length}/${state.totalAssignments}`
@@ -216,6 +338,11 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
           </div>
 
           <p style={{ ...styles.helperText, margin: "6px 0 0" }}>{readiness.detail}</p>
+          {nextLessonTarget ? (
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              Next lesson: <b>{nextLessonTarget.label}</b>
+            </p>
+          ) : null}
         </div>
 
         <div style={{ display: "grid", gap: 6, justifyItems: "end" }}>
@@ -223,7 +350,13 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
             {t("examReadiness.refresh")}
           </button>
 
-          <button type="button" style={styles.primaryButton} onClick={handleOpenExamFile}>
+          {nextLessonTarget ? (
+            <button type="button" style={styles.primaryButton} onClick={openNextLesson} disabled={state.loading}>
+              Open Next Lesson
+            </button>
+          ) : null}
+
+          <button type="button" style={nextLessonTarget ? styles.secondaryButton : styles.primaryButton} onClick={handleOpenExamFile}>
             {t("examReadiness.openExamFile")}
           </button>
         </div>
@@ -237,6 +370,7 @@ const ExamReadinessBadge = ({ studentProfile, onOpenExamFile, variant = "card", 
         <span style={styles.badge}>
           {t("examReadiness.markedIdentifiers")}: {assignmentsLabel}
         </span>
+        {nextLessonTarget ? <span style={styles.badge}>Next: {nextLessonTarget.level} Day {nextLessonTarget.day}</span> : null}
 
         {state.error ? (
           <span style={{ ...styles.badge, background: "#fef2f2", borderColor: "#fecdd3" }}>{state.error}</span>
