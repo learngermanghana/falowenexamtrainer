@@ -275,6 +275,49 @@ const groupSpeakingPrompts = (prompts = []) =>
     };
   }, {});
 
+const feedbackBoxStyle = {
+  marginTop: 10,
+  padding: 12,
+  borderRadius: 12,
+  border: "2px solid #22c55e",
+  background: "#dcfce7",
+  color: "#14532d",
+  display: "grid",
+  gap: 6,
+};
+
+const waitingBoxStyle = {
+  marginTop: 10,
+  padding: 12,
+  borderRadius: 12,
+  border: "1px dashed #f59e0b",
+  background: "#fffbeb",
+  color: "#92400e",
+};
+
+const TutorCommentBox = ({ comment }) => {
+  const cleanComment = String(comment || "").trim();
+
+  if (!cleanComment) {
+    return (
+      <div style={waitingBoxStyle}>
+        <strong>⏳ Waiting for tutor comment</strong>
+        <p style={{ margin: "6px 0 0" }}>Your work is saved. Please wait for your tutor to mark it.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={feedbackBoxStyle}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 900 }}>
+        <span>✅</span>
+        <span>Tutor comment</span>
+      </div>
+      <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, fontWeight: 700, whiteSpace: "pre-wrap" }}>{cleanComment}</p>
+    </div>
+  );
+};
+
 const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
   const [filter, setFilter] = useState("all");
   const sortedReviews = useMemo(
@@ -315,9 +358,14 @@ const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
           </div>
 
           {latestTutorResponse ? (
-            <div style={{ background: "#ecfeff", border: "2px solid #86efac", borderRadius: 12, padding: 14, marginBottom: 12 }}>
-              <p style={{ margin: "0 0 6px" }}><strong>Latest tutor response</strong></p>
-              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6 }}>{latestTutorResponse.tutorFeedback}</p>
+            <div style={{ ...feedbackBoxStyle, marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 900 }}>
+                <span>✅</span>
+                <span>Latest tutor response</span>
+              </div>
+              <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6, fontWeight: 800, whiteSpace: "pre-wrap" }}>
+                {latestTutorResponse.tutorFeedback}
+              </p>
             </div>
           ) : null}
 
@@ -340,28 +388,35 @@ const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
                 ))}
               </div>
               <div style={{ display: "grid", gap: 10 }}>
-                {filteredReviews.map((review, index) => (
-                  <div key={`${review?.promptTitle || "review"}-${review?.createdAt || index}`} style={{ border: "1px solid #d1d5db", borderRadius: 10, padding: 12 }}>
-                    <p style={{ margin: "0 0 4px" }}><strong>{review?.promptTitle || "Writing task"}</strong></p>
-                    <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
-                      Level: {review?.level || "—"} • Source: {review?.source || "—"}
-                    </p>
-                    <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
-                      Status: {REVIEW_STATUS_LABELS[review?.reviewStatus] || "Waiting for tutor"}
-                    </p>
-                    <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
-                      Submitted: {formatDate(review?.createdAt)}
-                    </p>
-                    <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
-                      Reviewed: {review?.reviewedAt ? formatDate(review?.reviewedAt) : "—"}
-                    </p>
-                    {review?.tutorFeedback?.trim() ? (
-                      <p style={{ margin: 0 }}>{review.tutorFeedback}</p>
-                    ) : (
-                      <p style={{ margin: 0 }}>No tutor comment yet. Your work is saved. Please wait for your tutor to mark it.</p>
-                    )}
-                  </div>
-                ))}
+                {filteredReviews.map((review, index) => {
+                  const hasTutorComment = Boolean(review?.tutorFeedback?.trim());
+                  return (
+                    <div
+                      key={`${review?.promptTitle || "review"}-${review?.createdAt || index}`}
+                      style={{
+                        border: hasTutorComment ? "2px solid #bbf7d0" : "1px solid #d1d5db",
+                        borderRadius: 10,
+                        padding: 12,
+                        background: hasTutorComment ? "#f0fdf4" : "#ffffff",
+                      }}
+                    >
+                      <p style={{ margin: "0 0 4px" }}><strong>{review?.promptTitle || "Writing task"}</strong></p>
+                      <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                        Level: {review?.level || "—"} • Source: {review?.source || "—"}
+                      </p>
+                      <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                        Status: {REVIEW_STATUS_LABELS[review?.reviewStatus] || "Waiting for tutor"}
+                      </p>
+                      <p style={{ ...styles.helperText, margin: "0 0 4px" }}>
+                        Submitted: {formatDate(review?.createdAt)}
+                      </p>
+                      <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
+                        Reviewed: {review?.reviewedAt ? formatDate(review?.reviewedAt) : "—"}
+                      </p>
+                      <TutorCommentBox comment={review?.tutorFeedback} />
+                    </div>
+                  );
+                })}
               </div>
             </>
           )}
