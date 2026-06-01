@@ -159,7 +159,8 @@ const placementTest = {
           options: [
             "Einerseits ist Online-Lernen flexibel, andererseits fehlt manchmal der direkte Austausch.",
             "Online gut, Schule auch gut.",
-            "Ich mag Online, weil ja."],
+            "Ich mag Online, weil ja.",
+          ],
           correct: "Einerseits ist Online-Lernen flexibel, andererseits fehlt manchmal der direkte Austausch.",
         },
         {
@@ -250,6 +251,14 @@ const trackPlacementEvent = (event, payload = {}) => {
   }
 };
 
+const getSectionAnsweredCount = (section, answers) =>
+  section.questions.filter((question) => Boolean(answers[question.id])).length;
+
+const isSectionComplete = (section, answers) => getSectionAnsweredCount(section, answers) === section.questions.length;
+
+const isSectionUnlocked = (sections, sectionIndex, answers) =>
+  sectionIndex === 0 || sections.slice(0, sectionIndex).every((section) => isSectionComplete(section, answers));
+
 const LevelScoreCard = ({ level, stat }) => {
   const correct = stat?.correct || 0;
   const total = stat?.total || 0;
@@ -264,6 +273,28 @@ const LevelScoreCard = ({ level, stat }) => {
   );
 };
 
+const ProgressBar = ({ value }) => (
+  <div
+    aria-hidden="true"
+    style={{
+      height: 10,
+      borderRadius: 999,
+      background: "#e5e7eb",
+      overflow: "hidden",
+    }}
+  >
+    <div
+      style={{
+        width: `${Math.max(0, Math.min(100, value || 0))}%`,
+        height: "100%",
+        background: "#2563eb",
+        borderRadius: 999,
+        transition: "width 180ms ease",
+      }}
+    />
+  </div>
+);
+
 const PlacementTestPage = () => {
   const { t, i18n } = useTranslation();
   const placementQuestions = useMemo(() => flattenPlacementQuestions(placementTest.sections), []);
@@ -274,6 +305,7 @@ const PlacementTestPage = () => {
       startedAt: saved?.startedAt || null,
       completedAt: saved?.completedAt || null,
       reviewUnlocked: Boolean(saved?.reviewUnlocked),
+      activeSectionIndex: Number.isFinite(Number(saved?.activeSectionIndex)) ? Number(saved.activeSectionIndex) : 0,
     };
   }, []);
 
@@ -281,11 +313,18 @@ const PlacementTestPage = () => {
   const [startedAt, setStartedAt] = useState(initialProgress.startedAt);
   const [completedAt, setCompletedAt] = useState(initialProgress.completedAt);
   const [reviewUnlocked, setReviewUnlocked] = useState(initialProgress.reviewUnlocked);
+  const [activeSectionIndex, setActiveSectionIndex] = useState(
+    Math.min(Math.max(initialProgress.activeSectionIndex, 0), placementTest.sections.length - 1)
+  );
   const startTrackedRef = useRef(Boolean(initialProgress.startedAt));
   const completionTrackedRef = useRef(Boolean(initialProgress.completedAt));
 
+  const activeSection = placementTest.sections[activeSectionIndex] || placementTest.sections[0];
+  const activeSectionAnsweredCount = getSectionAnsweredCount(activeSection, placementAnswers);
+  const activeSectionComplete = isSectionComplete(activeSection, placementAnswers);
   const placementAnsweredCount = Object.keys(placementAnswers).length;
   const placementComplete = placementAnsweredCount === placementQuestions.length && placementQuestions.length > 0;
+  const placementProgressPercent = Math.round((placementAnsweredCount / placementQuestions.length) * 100);
   const levelStats = useMemo(() => buildLevelStats(placementTest.sections, placementAnswers), [placementAnswers]);
   const totalCorrect = Object.values(levelStats).reduce((sum, stat) => sum + (stat.correct || 0), 0);
   const totalQuestions = placementQuestions.length;
@@ -325,8 +364,8 @@ const PlacementTestPage = () => {
   }, [i18n.language, t]);
 
   useEffect(() => {
-    savePlacementProgress({ answers: placementAnswers, startedAt, completedAt, reviewUnlocked });
-  }, [placementAnswers, startedAt, completedAt, reviewUnlocked]);
+    savePlacementProgress({ answers: placementAnswers, startedAt, completedAt, reviewUnlocked, activeSectionIndex });
+  }, [placementAnswers, startedAt, completedAt, reviewUnlocked, activeSectionIndex]);
 
   useEffect(() => {
     if (placementAnsweredCount > 0 && !startTrackedRef.current) {
@@ -366,15 +405,22 @@ const PlacementTestPage = () => {
     setStartedAt(null);
     setCompletedAt(null);
     setReviewUnlocked(false);
+    setActiveSectionIndex(0);
     startTrackedRef.current = false;
     completionTrackedRef.current = false;
-    savePlacementProgress({ answers: {}, startedAt: null, completedAt: null, reviewUnlocked: false });
+    savePlacementProgress({ answers: {}, startedAt: null, completedAt: null, reviewUnlocked: false, activeSectionIndex: 0 });
   };
 
-  const renderPlacementOptionButton = (question, option) => {
+  const goToNextSection = () => {
+    if (!activeSectionComplete) return;
+    setActiveSectionIndex((current) => Math.min(current + 1, placementTest.sections.length - 1));
+  };
+
+  const renderPlacementOptionButton = (question, option, optionIndex) => {
     const selected = placementAnswers[question.id] === option;
     const isCorrect = canRevealAnswerKey && option === question.correct;
     const isIncorrect = canRevealAnswerKey && selected && option !== question.correct;
+    const optionLetter = String.fromCharCode(65 + optionIndex);
 
     return (
       <button
@@ -402,9 +448,15 @@ const PlacementTestPage = () => {
             : {}),
           textAlign: "left",
           outlineOffset: 2,
+          padding: "12px 14px",
+          borderRadius: 12,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 10,
         }}
       >
-        {option}
+        <strong>{optionLetter}.</strong>
+        <span>{option}</span>
       </button>
     );
   };
@@ -432,98 +484,166 @@ const PlacementTestPage = () => {
         </div>
       </section>
 
-      <section style={{ ...styles.card, display: "grid", gap: 10, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <h2 style={{ margin: 0, fontSize: 20 }}>How this test works</h2>
-        <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.6 }}>
-          <li>Start with simple A1 questions.</li>
-          <li>Continue to A2, B1, and B2 questions.</li>
-          <li>Your suggested level is based on how far you perform strongly.</li>
-          <li>No student data is collected here. After the result, choose a class and submit your details on the classes page.</li>
-        </ul>
+      <section style={{ ...styles.card, display: "grid", gap: 12, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+          <div>
+            <h2 style={{ margin: 0, fontSize: 20 }}>Step-by-step level check</h2>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+              Only one numbered level appears at a time, so the test feels short and easy to follow.
+            </p>
+          </div>
+          <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>
+            {placementAnsweredCount}/{placementQuestions.length} answered
+          </span>
+        </div>
+        <ProgressBar value={placementProgressPercent} />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {placementTest.sections.map((section, index) => {
+            const unlocked = isSectionUnlocked(placementTest.sections, index, placementAnswers);
+            const complete = isSectionComplete(section, placementAnswers);
+            const active = activeSectionIndex === index;
+            return (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() => unlocked && setActiveSectionIndex(index)}
+                disabled={!unlocked}
+                style={{
+                  ...(active ? styles.primaryButton : styles.secondaryButton),
+                  opacity: unlocked ? 1 : 0.55,
+                  padding: "8px 12px",
+                }}
+              >
+                {complete ? "✅ " : ""}{index + 1}. {section.level}
+              </button>
+            );
+          })}
+        </div>
       </section>
 
       <section style={{ ...styles.card, display: "grid", gap: 16 }}>
-        {placementTest.sections.map((section) => (
-          <div key={section.id} style={{ display: "grid", gap: 12 }}>
-            <div>
-              <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>{section.level}</span>
-              <h3 style={{ margin: "8px 0 4px", fontSize: 18 }}>{section.title}</h3>
-              <p style={{ ...styles.helperText, margin: 0 }}>{section.description}</p>
-            </div>
-            {Array.isArray(section.passage) && section.passage.length ? (
-              <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 6 }}>
-                {section.passage.map((paragraph) => (
-                  <p key={paragraph} style={{ margin: 0, color: "#374151", lineHeight: 1.6 }}>
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            ) : null}
-            <div style={{ display: "grid", gap: 12 }}>
-              {section.questions.map((question) => (
-                <div key={question.id} style={{ display: "grid", gap: 8 }}>
-                  <p style={{ margin: 0, fontWeight: 700 }}>
-                    {question.number}. {question.text}
-                  </p>
-                  <div role="radiogroup" aria-label={`Question ${question.number}`} style={{ display: "grid", gap: 8 }}>
-                    {question.options.map((option) => renderPlacementOptionButton(question, option))}
-                  </div>
-                </div>
+        <div style={{ display: "grid", gap: 12 }}>
+          <div>
+            <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>
+              Step {activeSectionIndex + 1} of {placementTest.sections.length} · {activeSection.level}
+            </span>
+            <h3 style={{ margin: "8px 0 4px", fontSize: 22 }}>
+              {activeSectionIndex + 1}. {activeSection.title}
+            </h3>
+            <p style={{ ...styles.helperText, margin: 0 }}>{activeSection.description}</p>
+            <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+              Answered in this section: {activeSectionAnsweredCount}/{activeSection.questions.length}
+            </p>
+          </div>
+
+          {Array.isArray(activeSection.passage) && activeSection.passage.length ? (
+            <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 6 }}>
+              <strong>Short reading text</strong>
+              {activeSection.passage.map((paragraph) => (
+                <p key={paragraph} style={{ margin: 0, color: "#374151", lineHeight: 1.6 }}>
+                  {paragraph}
+                </p>
               ))}
             </div>
-          </div>
-        ))}
+          ) : null}
 
-        <div style={{ display: "grid", gap: 8 }}>
-          <div style={{ fontSize: 14, color: "#4b5563" }}>
-            Answered: {placementAnsweredCount}/{placementQuestions.length}
+          <div style={{ display: "grid", gap: 14 }}>
+            {activeSection.questions.map((question, questionIndex) => (
+              <div
+                key={question.id}
+                style={{
+                  display: "grid",
+                  gap: 8,
+                  padding: 12,
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 14,
+                  background: "#ffffff",
+                }}
+              >
+                <p style={{ ...styles.helperText, margin: 0, fontWeight: 800 }}>
+                  Question {questionIndex + 1} of {activeSection.questions.length} · Overall no. {question.number}
+                </p>
+                <p style={{ margin: 0, fontWeight: 800 }}>
+                  {questionIndex + 1}. {question.text}
+                </p>
+                <div role="radiogroup" aria-label={`Question ${question.number}`} style={{ display: "grid", gap: 8 }}>
+                  {question.options.map((option, optionIndex) => renderPlacementOptionButton(question, option, optionIndex))}
+                </div>
+              </div>
+            ))}
           </div>
-          {placementComplete ? (
-            <div style={{ display: "grid", gap: 12 }}>
-              <div style={{ ...styles.focusNotice, margin: 0 }}>
-                Suggested level: <strong>{placementLevel}</strong> · Score: {totalCorrect}/{totalQuestions}
-              </div>
-              <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
-                {placementTest.sections.map((section) => (
-                  <LevelScoreCard key={`score-${section.level}`} level={section.level} stat={levelStats[section.level]} />
-                ))}
-              </div>
-              <div style={{ color: "#374151", fontSize: 14 }}>{getLevelFeedback(placementLevel)}</div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a href={CLASS_BROCHURE_URL} style={{ ...styles.buttonPrimary, textDecoration: "none", display: "inline-block" }}>
-                  Choose a {placementLevel} class
-                </a>
-                <a href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-                  Ask on WhatsApp
-                </a>
-              </div>
-              {canRevealAnswerKey ? (
-                <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
-                  <h4 style={{ marginTop: 0 }}>Answer key</h4>
-                  <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
-                    {placementQuestions.map((question) => (
-                      <li key={`key-${question.id}`}>
-                        <strong>{question.number}.</strong> {question.correct}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              ) : (
-                <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 10 }}>
-                  <div style={{ color: "#4b5563", fontSize: 14 }}>
-                    Review the questions first. You can unlock the answer key after you finish.
-                  </div>
-                  <button type="button" style={styles.buttonSecondary} onClick={handleUnlockAnswerReview}>
-                    Show answer key
-                  </button>
-                </div>
-              )}
-            </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <button
+            type="button"
+            style={styles.secondaryButton}
+            onClick={() => setActiveSectionIndex((current) => Math.max(current - 1, 0))}
+            disabled={activeSectionIndex === 0}
+          >
+            ← Previous level
+          </button>
+
+          {activeSectionIndex < placementTest.sections.length - 1 ? (
+            <button type="button" style={styles.primaryButton} onClick={goToNextSection} disabled={!activeSectionComplete}>
+              Continue to {activeSectionIndex + 2}. {placementTest.sections[activeSectionIndex + 1]?.level} →
+            </button>
           ) : (
-            <div style={{ color: "#6b7280", fontSize: 14 }}>Finish all questions to see your suggested level.</div>
+            <span style={{ ...styles.badge, background: placementComplete ? "#dcfce7" : "#fef3c7" }}>
+              {placementComplete ? "Ready to view result" : "Finish B2 questions to view result"}
+            </span>
           )}
         </div>
+
+        {!activeSectionComplete ? (
+          <div style={{ color: "#6b7280", fontSize: 14 }}>
+            Finish this short numbered section before moving to the next level.
+          </div>
+        ) : null}
       </section>
+
+      {placementComplete ? (
+        <section style={{ ...styles.card, display: "grid", gap: 12, border: "1px solid #bbf7d0", background: "#f0fdf4" }}>
+          <div style={{ ...styles.focusNotice, margin: 0 }}>
+            Suggested level: <strong>{placementLevel}</strong> · Score: {totalCorrect}/{totalQuestions}
+          </div>
+          <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
+            {placementTest.sections.map((section) => (
+              <LevelScoreCard key={`score-${section.level}`} level={section.level} stat={levelStats[section.level]} />
+            ))}
+          </div>
+          <div style={{ color: "#374151", fontSize: 14 }}>{getLevelFeedback(placementLevel)}</div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <a href={CLASS_BROCHURE_URL} style={{ ...styles.buttonPrimary, textDecoration: "none", display: "inline-block" }}>
+              Choose a {placementLevel} class
+            </a>
+            <a href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+              Ask on WhatsApp
+            </a>
+          </div>
+          {canRevealAnswerKey ? (
+            <details style={{ ...styles.card, margin: 0, background: "#ffffff" }}>
+              <summary style={{ cursor: "pointer", fontWeight: 800 }}>Answer key</summary>
+              <ol style={{ margin: "10px 0 0", paddingLeft: 18, display: "grid", gap: 6 }}>
+                {placementQuestions.map((question) => (
+                  <li key={`key-${question.id}`}>
+                    <strong>{question.number}.</strong> {question.correct}
+                  </li>
+                ))}
+              </ol>
+            </details>
+          ) : (
+            <div style={{ ...styles.card, margin: 0, background: "#ffffff", display: "grid", gap: 10 }}>
+              <div style={{ color: "#4b5563", fontSize: 14 }}>
+                Review the questions first. You can unlock the answer key after you finish.
+              </div>
+              <button type="button" style={styles.buttonSecondary} onClick={handleUnlockAnswerReview}>
+                Show answer key
+              </button>
+            </div>
+          )}
+        </section>
+      ) : null}
     </main>
   );
 };
