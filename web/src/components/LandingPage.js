@@ -9,6 +9,8 @@ import { fetchStudentReviewsFromPublishedSheet } from "../services/studentReview
 import { classCatalog } from "../data/classCatalog";
 
 const CLASS_BROCHURE_URL = "/classes/";
+const PLACEMENT_TEST_URL = "/placement-test";
+const REVIEW_SLIDE_MS = 4500;
 const DEFAULT_STUDENT_REVIEWS_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5Nm-MLJkw3TeOht5ROELvFumVS9X8-ke_npLoOuF3W-zrF0v9xjk_Upzv4umQCocD5xtFaMRJQh6Z/pubhtml";
 
@@ -152,6 +154,7 @@ const ReviewCard = ({ stars = 5, name, country, level, text, starLabel }) => (
       display: "grid",
       gap: 8,
       boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
+      minHeight: 132,
     }}
   >
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
@@ -167,6 +170,36 @@ const ReviewCard = ({ stars = 5, name, country, level, text, starLabel }) => (
 
     <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{truncateText(text, 150)}</p>
   </div>
+);
+
+const PlacementPromptCard = () => (
+  <section
+    style={{
+      ...styles.card,
+      display: "grid",
+      gap: 16,
+      border: "1px solid #fde68a",
+      background: "linear-gradient(135deg, #fffbeb, #ffffff 60%, #eff6ff)",
+    }}
+  >
+    <div style={{ display: "grid", gap: 8 }}>
+      <p style={{ ...styles.badge, width: "fit-content", background: "#fef3c7", color: "#92400e", margin: 0 }}>
+        Free level check
+      </p>
+      <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Don’t know your level yet?</h2>
+      <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
+        Try our free placement test first. After you finish, use your suggested level to choose the right class from the Falowen class brochure.
+      </p>
+    </div>
+    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+      <a href={PLACEMENT_TEST_URL} style={{ ...styles.primaryButton, textDecoration: "none" }}>
+        Take free placement test
+      </a>
+      <a href={CLASS_BROCHURE_URL} style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+        Choose a class
+      </a>
+    </div>
+  </section>
 );
 
 const formatDateLabel = (dateIso) => {
@@ -261,6 +294,9 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     cta: "",
     nextUrl: "",
   });
+  const [sheetReviews, setSheetReviews] = useState([]);
+  const [activeReviewIndex, setActiveReviewIndex] = useState(0);
+
   const leadCaptureTitle = useMemo(() => {
     if (leadCaptureConfig.cta === "Placement test") {
       return "Before you start the placement test";
@@ -270,12 +306,14 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     }
     return "Get started";
   }, [leadCaptureConfig.cta]);
+
   const leadCaptureSubtitle = useMemo(() => {
     if (leadCaptureConfig.cta === "Placement test") {
       return "Share your details so we can guide you after your results.";
     }
     return "Share a few details and our team will follow up with the best next step.";
   }, [leadCaptureConfig.cta]);
+
   const programOptions = useMemo(
     () => ({
       german: t("landing.programs.german", { returnObjects: true }),
@@ -302,13 +340,9 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     language: selectedProgram.shortLabel,
   });
   const reviewItems = t("landing.reviews.items", { returnObjects: true });
-  const [sheetReview, setSheetReview] = useState(null);
-  const featuredReview = useMemo(() => {
-    if (sheetReview) return sheetReview;
-    const fallbackItems = Array.isArray(reviewItems) ? reviewItems : [];
-    if (!fallbackItems.length) return null;
-    return shuffleArray(fallbackItems)[0] || null;
-  }, [reviewItems, sheetReview]);
+  const fallbackReviews = useMemo(() => (Array.isArray(reviewItems) ? shuffleArray(reviewItems) : []), [reviewItems]);
+  const visibleReviews = sheetReviews.length ? sheetReviews : fallbackReviews;
+  const featuredReview = visibleReviews.length ? visibleReviews[activeReviewIndex % visibleReviews.length] : null;
   const howItWorksBenefits = t("landing.howItWorks.benefits", { returnObjects: true });
   const whyStayPoints = t("landing.footer.stayPoints", { returnObjects: true });
   const upcomingClassCards = useMemo(() => getUpcomingClassCards(), []);
@@ -318,7 +352,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     const sheetUrl = process.env.REACT_APP_STUDENT_REVIEWS_SHEET_CSV_URL || DEFAULT_STUDENT_REVIEWS_SHEET_URL;
 
     if (!sheetUrl) {
-      setSheetReview(null);
+      setSheetReviews([]);
       return undefined;
     }
 
@@ -326,16 +360,12 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
       try {
         const rows = await fetchStudentReviewsFromPublishedSheet(sheetUrl);
         if (!mounted) return;
-        if (!rows.length) {
-          setSheetReview(null);
-          return;
-        }
-        const randomReview = rows[Math.floor(Math.random() * rows.length)] || null;
-        setSheetReview(randomReview);
+        setSheetReviews(Array.isArray(rows) ? rows : []);
+        setActiveReviewIndex(0);
       } catch (error) {
         console.error("Failed to load student reviews", error);
         if (!mounted) return;
-        setSheetReview(null);
+        setSheetReviews([]);
       }
     };
 
@@ -345,6 +375,14 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (visibleReviews.length <= 1) return undefined;
+    const intervalId = window.setInterval(() => {
+      setActiveReviewIndex((current) => (current + 1) % visibleReviews.length);
+    }, REVIEW_SLIDE_MS);
+    return () => window.clearInterval(intervalId);
+  }, [visibleReviews.length]);
 
   useEffect(() => {
     const title = t("landing.meta.title");
@@ -421,7 +459,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
       }}
     >
       <div style={{ display: "grid", gap: 16, margin: "0 auto", maxWidth: 1100 }}>
-        {/* Hero */}
         <header
           style={{
             ...styles.card,
@@ -455,6 +492,9 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
                   {t("landing.cta.join", { language: selectedProgram.shortLabel })}
                 </button>
+                <a href={PLACEMENT_TEST_URL} style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+                  Free placement test
+                </a>
                 <button type="button" style={styles.secondaryButton} onClick={onLogin}>
                   {t("landing.cta.login")}
                 </button>
@@ -510,6 +550,8 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             ))}
           </div>
         </section>
+
+        <PlacementPromptCard />
 
         <section
           style={{
@@ -589,7 +631,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </section>
 
-        {/* How it works */}
         <section
           id="how-it-works"
           style={{
@@ -638,14 +679,12 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </section>
 
-        {/* Features */}
         <section style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           {features.map((item) => (
             <FeatureCard key={item.title} icon={item.icon} title={item.title} description={item.description} />
           ))}
         </section>
 
-        {/* Student Reviews */}
         <section style={{ ...styles.card, display: "grid", gap: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "end", gap: 12, flexWrap: "wrap" }}>
             <div>
@@ -657,7 +696,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "minmax(240px, 560px)" }}>
             {featuredReview ? (
               <ReviewCard
-                key={`${featuredReview.name}-${featuredReview.country}-${featuredReview.level}`}
+                key={`${featuredReview.id || featuredReview.name}-${activeReviewIndex}`}
                 name={featuredReview.name}
                 country={featuredReview.country}
                 level={featuredReview.level}
@@ -666,10 +705,30 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 starLabel={t("landing.reviews.starRating", { count: featuredReview.stars })}
               />
             ) : null}
+            {visibleReviews.length > 1 ? (
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }} aria-label="Review slider indicators">
+                {visibleReviews.slice(0, 6).map((review, index) => (
+                  <button
+                    key={review.id || `${review.name}-${index}`}
+                    type="button"
+                    aria-label={`Show review ${index + 1}`}
+                    onClick={() => setActiveReviewIndex(index)}
+                    style={{
+                      width: activeReviewIndex % visibleReviews.length === index ? 22 : 8,
+                      height: 8,
+                      borderRadius: 999,
+                      border: "none",
+                      background: activeReviewIndex % visibleReviews.length === index ? "#2563eb" : "#d1d5db",
+                      cursor: "pointer",
+                      padding: 0,
+                    }}
+                  />
+                ))}
+              </div>
+            ) : null}
           </div>
         </section>
 
-        {/* Dark CTA */}
         <section style={{ ...styles.card, background: "#111827", color: "#e5e7eb" }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div style={{ flex: 2, minWidth: 260 }}>
@@ -692,6 +751,13 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                     style={{ ...styles.primaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}
                   >
                     View upcoming classes
+                  </a>
+
+                  <a
+                    href={PLACEMENT_TEST_URL}
+                    style={{ ...styles.secondaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}
+                  >
+                    Take placement test
                   </a>
 
                   <button
@@ -767,7 +833,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </section>
 
-        {/* Footer Links */}
         <footer
           style={{
             ...styles.card,
