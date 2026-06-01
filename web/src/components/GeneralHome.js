@@ -222,6 +222,7 @@ const GeneralHome = ({
   const [announcementIndex, setAnnouncementIndex] = useState(0);
   const levelKey = detectLevelKey(studentProfile);
   const day0WorkbookLink = day0WorkbookByLevel[levelKey] || "/campus/account";
+  const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted);
 
   const openCampus = useCallback(() => {
     playOpenFeedback();
@@ -310,6 +311,54 @@ const GeneralHome = ({
     return () => clearInterval(interval);
   }, [announcements]);
 
+  if (!onboardingCompleted) {
+    return (
+      <div style={{ display: "grid", gap: 16 }}>
+        <section
+          style={{
+            ...styles.card,
+            display: "grid",
+            gap: 10,
+            background: "linear-gradient(135deg, #1d4ed8, #1e3a8a)",
+            color: "#ffffff",
+            border: "none",
+            boxShadow: "0 18px 36px rgba(37,99,235,0.22)",
+          }}
+        >
+          <p style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af", margin: 0 }}>
+            First-time setup
+          </p>
+          <h2 style={{ margin: 0, fontSize: 28 }}>Complete onboarding before opening your dashboard</h2>
+          <p style={{ margin: 0, color: "#dbeafe", lineHeight: 1.6 }}>
+            This page shows only the important setup steps. When you finish and save, Falowen will unlock the normal home dashboard with your next step, metrics, Campus, Exams Room, and class links.
+          </p>
+        </section>
+
+        <OnboardingChecklist
+          notificationStatus={notificationStatus}
+          onEnableNotifications={onEnableNotifications}
+          onSelectLevel={handleSelectLevel}
+          onConfirmClass={handleConfirmClass}
+          studentProfile={studentProfile}
+          onSaveOnboarding={onSaveOnboarding}
+        />
+
+        <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+          <SectionHeader
+            eyebrow="Class access"
+            title="Check your Zoom and calendar here"
+            subtitle="Use this during onboarding only. After setup, it will move into the dashboard under Live class access & calendar."
+          />
+          <ClassCalendarCard
+            id={classCalendarId}
+            initialClassName={preferredClass}
+            program={studentProfile?.program}
+          />
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <WelcomeHero
@@ -359,15 +408,6 @@ const GeneralHome = ({
       />
 
       <HomeMetrics studentProfile={studentProfile} />
-
-      <OnboardingChecklist
-        notificationStatus={notificationStatus}
-        onEnableNotifications={onEnableNotifications}
-        onSelectLevel={handleSelectLevel}
-        onConfirmClass={handleConfirmClass}
-        studentProfile={studentProfile}
-        onSaveOnboarding={onSaveOnboarding}
-      />
 
       <NavigationGuide />
 
