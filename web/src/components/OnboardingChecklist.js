@@ -100,6 +100,35 @@ const OnboardingActionCard = ({
   </section>
 );
 
+const SetupCompleteCelebration = ({ onOpenDashboard, saving, error }) => (
+  <section
+    style={{
+      ...styles.card,
+      display: "grid",
+      gap: 14,
+      border: "2px solid #22c55e",
+      background: "linear-gradient(135deg, #f0fdf4, #ffffff)",
+      textAlign: "center",
+      justifyItems: "center",
+    }}
+  >
+    <div style={{ fontSize: 42 }} aria-hidden>
+      🎉
+    </div>
+    <p style={{ ...styles.badge, width: "fit-content", background: "#dcfce7", color: "#166534", margin: 0 }}>
+      Setup complete
+    </p>
+    <h2 style={{ ...styles.sectionTitle, margin: 0 }}>You are ready to start learning</h2>
+    <p style={{ ...styles.helperText, maxWidth: 620, margin: 0, lineHeight: 1.6 }}>
+      Day 0, live class access, and notifications are done. Save this setup now and Falowen will open your normal dashboard with your next learning step.
+    </p>
+    <button type="button" style={styles.primaryButton} onClick={onOpenDashboard} disabled={saving}>
+      {saving ? "Saving..." : "Save and open my dashboard"}
+    </button>
+    {error ? <span style={{ ...styles.helperText, color: "#b91c1c" }}>{error}</span> : null}
+  </section>
+);
+
 const OnboardingChecklist = ({
   notificationStatus,
   onEnableNotifications,
@@ -125,7 +154,7 @@ const OnboardingChecklist = ({
   const [selectedClass, setSelectedClass] = useState(() => loadPreferredClass() || "");
   const [savingOnboarding, setSavingOnboarding] = useState(false);
   const [saveError, setSaveError] = useState("");
-  const [localCompletion, setLocalCompletion] = useState(false);
+  const [showCompletionCelebration, setShowCompletionCelebration] = useState(false);
 
   useEffect(() => persistState(state), [state]);
 
@@ -167,7 +196,7 @@ const OnboardingChecklist = ({
 
   const day0Complete = Boolean(effectiveLevel && state.day0OpenedByLevel?.[effectiveLevel]);
   const liveClassAccessChecked = Boolean(state.scheduleCheckedByClass?.[scheduleKey]);
-  const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted) || localCompletion || state.completedLocally;
+  const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted) || state.completedLocally;
 
   const requiredSteps = useMemo(
     () => [
@@ -206,7 +235,7 @@ const OnboardingChecklist = ({
         [effectiveLevel]: true,
       },
     }));
-    showToast("Day 0 opened. Complete it before your first class.", "success");
+    showToast("Day 0 opened. Come back home when you finish to continue setup.", "success");
     if (day0WorkbookLink) navigate(day0WorkbookLink);
   };
 
@@ -217,8 +246,12 @@ const OnboardingChecklist = ({
         [scheduleKey]: true,
       },
     }));
-    showToast("Live class access checked.", "success");
+    showToast("Live class access opened. Check your Zoom and calendar details below.", "success");
     onConfirmClass?.();
+    setTimeout(() => {
+      const calendar = document.getElementById("class-calendar-card");
+      if (calendar) calendar.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
   };
 
   const handleDownloadCalendar = () => {
@@ -263,7 +296,6 @@ const OnboardingChecklist = ({
     try {
       if (onSaveOnboarding) await onSaveOnboarding();
       showToast("Setup saved. Opening your dashboard.", "success");
-      setLocalCompletion(true);
       setState((prev) => ({ ...prev, completedLocally: true }));
       navigate("/");
     } catch (error) {
@@ -281,10 +313,14 @@ const OnboardingChecklist = ({
       if (notificationsDenied) return handleSkipNotifications();
       return handleEnableNotifications();
     }
-    return handleSaveOnboarding();
+    setShowCompletionCelebration(true);
   };
 
   if (onboardingCompleted) return null;
+
+  if (showCompletionCelebration) {
+    return <SetupCompleteCelebration onOpenDashboard={handleSaveOnboarding} saving={savingOnboarding} error={saveError} />;
+  }
 
   const primaryCTA =
     nextStepKey === "day0"
@@ -295,7 +331,7 @@ const OnboardingChecklist = ({
       ? notificationsDenied
         ? "Skip notifications"
         : "Turn on notifications"
-      : "Save and open dashboard";
+      : "Review setup complete";
 
   return (
     <section
@@ -403,7 +439,7 @@ const OnboardingChecklist = ({
         <strong>{allFinished ? "Ready for class." : "Do Step 1 first: Day 0 Orientation."}</strong>
         <p style={{ ...styles.helperText, margin: 0 }}>
           {allFinished
-            ? "Click Save and open dashboard. Falowen will then show the normal home dashboard."
+            ? "Click Review setup complete to see the final confirmation screen."
             : "Students often skip long onboarding, so this setup now focuses only on the actions that matter before the first class."}
         </p>
       </div>
