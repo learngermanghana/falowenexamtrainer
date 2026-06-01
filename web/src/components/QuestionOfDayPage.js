@@ -15,10 +15,13 @@ const ANSWER_STORAGE_KEY = "falowen_exam_warmup_answers";
 const LEGACY_STORAGE_KEY = "falowen_question_of_day_progress";
 const MIN_WRITING_WORDS = 30;
 const CHECKLIST_ERROR_PREFIX = "Before submitting, tick all checklist items.";
+const A1_DAILY_SPEAKING_COUNT_PER_PART = 5;
+
 const LETTER_TYPE_OPTIONS = [
   { value: "formal", label: "Formal letter/email" },
   { value: "informal", label: "Informal letter/email" },
 ];
+
 const PRE_SUBMISSION_CHECKLIST = [
   "I understood the question before writing.",
   "I added a short introduction/opening sentence.",
@@ -150,6 +153,13 @@ const SPEAKING_GUIDE_BY_LEVEL = {
   ],
 };
 
+const REVIEW_STATUS_LABELS = {
+  pending: "Waiting for tutor",
+  approved: "Approved",
+  needs_improvement: "Needs correction",
+  redo_required: "Redo required",
+};
+
 const getDaySeed = () => {
   const now = new Date();
   const utcMidnight = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
@@ -170,6 +180,21 @@ const pickBatchByDay = (items, count, salt = 0) => {
   if (!Array.isArray(items) || items.length === 0 || count <= 0) return [];
   const start = pickIndexByDay(items.length, salt);
   return Array.from({ length: Math.min(count, items.length) }, (_, offset) => items[(start + offset) % items.length]);
+};
+
+const buildA1SpeakingPrompts = (levelSpeaking) => {
+  const teil2 = levelSpeaking.filter((item) => item.teilId === "teil-2");
+  const teil3 = levelSpeaking.filter((item) => item.teilId === "teil-3");
+
+  const prompts = [
+    ...pickBatchByDay(teil2, A1_DAILY_SPEAKING_COUNT_PER_PART, 11),
+    ...pickBatchByDay(teil3, A1_DAILY_SPEAKING_COUNT_PER_PART, 19),
+  ];
+
+  if (prompts.length >= A1_DAILY_SPEAKING_COUNT_PER_PART) return prompts;
+
+  const fallbackPool = levelSpeaking.filter((item) => item.teilId === "teil-2" || item.teilId === "teil-3");
+  return pickBatchByDay(fallbackPool.length ? fallbackPool : levelSpeaking, A1_DAILY_SPEAKING_COUNT_PER_PART, 11);
 };
 
 const getProgressKey = (level) => `${getDaySeed()}-${level}`;
@@ -220,13 +245,6 @@ const getTaskTitle = (dailyTask, level) => {
   return `${level} Exam Warm-up - Sprechen`;
 };
 
-const REVIEW_STATUS_LABELS = {
-  pending: "Waiting for tutor",
-  approved: "Approved",
-  needs_improvement: "Needs correction",
-  redo_required: "Redo required",
-};
-
 const getReviewTimestampMs = (review) => {
   const reviewedAtMs = Date.parse(review?.reviewedAt || "");
   if (Number.isFinite(reviewedAtMs)) return reviewedAtMs;
@@ -241,6 +259,21 @@ const formatDate = (value) => {
   if (!Number.isFinite(timestamp)) return "—";
   return new Date(timestamp).toLocaleString();
 };
+
+const countWords = (text) =>
+  text
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+
+const groupSpeakingPrompts = (prompts = []) =>
+  prompts.reduce((groups, prompt) => {
+    const key = prompt?.teilLabel || "Sprechen";
+    return {
+      ...groups,
+      [key]: [...(groups[key] || []), prompt],
+    };
+  }, {});
 
 const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
   const [filter, setFilter] = useState("all");
@@ -341,9 +374,10 @@ const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
 const QuestionOfDayPage = () => {
   const { level } = useExam();
   const { user, studentProfile } = useAuth();
-  const [practised, setPractised] = useState(() => readWarmupStatus(level).practised);
-  const [submittedToTutor, setSubmittedToTutor] = useState(() => readWarmupStatus(level).submittedToTutor);
-  const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(level));
+  const activeLevel = String(level || "A1").toUpperCase();
+  const [practised, setPractised] = useState(() => readWarmupStatus(activeLevel).practised);
+  const [submittedToTutor, setSubmittedToTutor] = useState(() => readWarmupStatus(activeLevel).submittedToTutor);
+  const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(activeLevel));
   const [submitState, setSubmitState] = useState({ loading: false, success: "", error: "" });
   const [tutorComment, setTutorComment] = useState("");
   const [letterType, setLetterType] = useState("");
@@ -355,14 +389,14 @@ const QuestionOfDayPage = () => {
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   useEffect(() => {
-    const warmupStatus = readWarmupStatus(level);
+    const warmupStatus = readWarmupStatus(activeLevel);
     setPractised(warmupStatus.practised);
     setSubmittedToTutor(warmupStatus.submittedToTutor);
-    setWarmupAnswer(readWarmupAnswer(level));
+    setWarmupAnswer(readWarmupAnswer(activeLevel));
     setSubmitState({ loading: false, success: "", error: "" });
     setLetterType("");
     setChecklistState(PRE_SUBMISSION_CHECKLIST.reduce((acc, label) => ({ ...acc, [label]: false }), {}));
-  }, [level]);
+  }, [activeLevel]);
 
   useEffect(() => {
     const unsubscribe = subscribeTutorReviewsForStudent(
@@ -392,26 +426,27 @@ const QuestionOfDayPage = () => {
   );
 
   const dailyTask = useMemo(() => {
-    const levelWriting = Array.isArray(WRITING_PROMPTS[level]) ? WRITING_PROMPTS[level] : [];
-    const levelSpeaking = speakingQuestionDictionary.filter((item) => item.level === level);
+    const levelWriting = Array.isArray(WRITING_PROMPTS[activeLevel]) ? WRITING_PROMPTS[activeLevel] : [];
+    const levelSpeaking = speakingQuestionDictionary.filter((item) => item.level === activeLevel);
     const shareWritingToday = getDaySeed() % 2 === 0;
 
     if (shareWritingToday && levelWriting.length > 0) {
       return {
         type: "writing",
-        title: `${level} Schreiben warm-up`,
+        title: `${activeLevel} Schreiben warm-up`,
         prompt: pickByDay(levelWriting, 1),
       };
     }
 
     if (levelSpeaking.length > 0) {
-      const a1SpeakingPool = levelSpeaking.filter((item) => item.teilId === "teil-1" || item.teilId === "teil-2");
-      const speakingPool = level === "A1" && a1SpeakingPool.length > 0 ? a1SpeakingPool : levelSpeaking;
-      const prompts = level === "A1" ? pickBatchByDay(speakingPool, 2, 11) : [pickByDay(speakingPool, 2)].filter(Boolean);
-
+      const prompts = activeLevel === "A1" ? buildA1SpeakingPrompts(levelSpeaking) : [pickByDay(levelSpeaking, 2)].filter(Boolean);
       return {
         type: "speaking",
-        title: `${level} Sprechen warm-up`,
+        title: `${activeLevel} Sprechen warm-up`,
+        promptSummary:
+          activeLevel === "A1"
+            ? `A1 Sprechen: practise ${A1_DAILY_SPEAKING_COUNT_PER_PART} Teil 2 question cards and ${A1_DAILY_SPEAKING_COUNT_PER_PART} Teil 3 request cards today.`
+            : "One speaking prompt for today.",
         prompts,
       };
     }
@@ -419,15 +454,16 @@ const QuestionOfDayPage = () => {
     if (levelWriting.length > 0) {
       return {
         type: "writing",
-        title: `${level} Schreiben warm-up`,
+        title: `${activeLevel} Schreiben warm-up`,
         prompt: pickByDay(levelWriting, 1),
       };
     }
 
     return null;
-  }, [level]);
+  }, [activeLevel]);
 
-  const speakingRules = SPEAKING_GUIDE_BY_LEVEL[level] || SPEAKING_GUIDE_BY_LEVEL.B1;
+  const speakingRules = SPEAKING_GUIDE_BY_LEVEL[activeLevel] || SPEAKING_GUIDE_BY_LEVEL.B1;
+  const speakingPromptGroups = useMemo(() => groupSpeakingPrompts(dailyTask?.prompts || []), [dailyTask?.prompts]);
 
   const shareText = useMemo(() => {
     if (!dailyTask) return "";
@@ -437,24 +473,24 @@ const QuestionOfDayPage = () => {
         ? dailyTask.prompt.Punkte.map((point) => `- ${point}`).join("\n")
         : "";
 
-      return `${level} Exam Warm-up (${todayLabel})\nSchreiben\nThema: ${dailyTask.prompt.Thema}\n${(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}\n${points}`.trim();
+      return `${activeLevel} Exam Warm-up (${todayLabel})\nSchreiben\nThema: ${dailyTask.prompt.Thema}\n${(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).instruction}\n${points}`.trim();
     }
 
     if (dailyTask.type === "speaking" && Array.isArray(dailyTask.prompts)) {
-      return `${level} Exam Warm-up (${todayLabel})\nSprechen\nRecord your answer as a WhatsApp voice note and send it to your tutor.\n${dailyTask.prompts
+      return `${activeLevel} Exam Warm-up (${todayLabel})\nSprechen\nRecord your answer as a WhatsApp voice note and send it to your tutor.\n${dailyTask.prompts
         .map((item) => `- ${buildSpeakingLabel(item)}`)
         .join("\n")}`;
     }
 
     return "";
-  }, [dailyTask, level, todayLabel]);
+  }, [dailyTask, activeLevel, todayLabel]);
 
   const saveWarmupLocally = ({ submittedToTutor = false, reviewId = "", sentOnWhatsapp = false } = {}) => {
     try {
-      const key = getProgressKey(level);
+      const key = getProgressKey(activeLevel);
       const progressStore = readJsonStore(STORAGE_KEY);
       progressStore[key] = {
-        level,
+        level: activeLevel,
         practisedAt: new Date().toISOString(),
         taskType: dailyTask?.type || "warm-up",
         submittedToTutor,
@@ -466,9 +502,9 @@ const QuestionOfDayPage = () => {
 
       const answerStore = readJsonStore(ANSWER_STORAGE_KEY);
       answerStore[key] = {
-        level,
+        level: activeLevel,
         answer: warmupAnswer,
-        taskTitle: getTaskTitle(dailyTask, level),
+        taskTitle: getTaskTitle(dailyTask, activeLevel),
         updatedAt: new Date().toISOString(),
       };
       localStorage.setItem(ANSWER_STORAGE_KEY, JSON.stringify(answerStore));
@@ -491,24 +527,18 @@ const QuestionOfDayPage = () => {
     }
   };
 
-  const countWords = (text) =>
-    text
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean).length;
-
   const handleAnswerChange = (event) => {
     const nextAnswer = event.target.value;
     setWarmupAnswer(nextAnswer);
     setSubmitState({ loading: false, success: "", error: "" });
 
     try {
-      const key = getProgressKey(level);
+      const key = getProgressKey(activeLevel);
       const answerStore = readJsonStore(ANSWER_STORAGE_KEY);
       answerStore[key] = {
-        level,
+        level: activeLevel,
         answer: nextAnswer,
-        taskTitle: getTaskTitle(dailyTask, level),
+        taskTitle: getTaskTitle(dailyTask, activeLevel),
         updatedAt: new Date().toISOString(),
       };
       localStorage.setItem(ANSWER_STORAGE_KEY, JSON.stringify(answerStore));
@@ -550,9 +580,7 @@ const QuestionOfDayPage = () => {
     }
 
     const missingChecklistItems = [];
-    if (!letterType) {
-      missingChecklistItems.push("Letter type: formal or informal");
-    }
+    if (!letterType) missingChecklistItems.push("Letter type: formal or informal");
     PRE_SUBMISSION_CHECKLIST.forEach((label) => {
       if (!checklistState[label]) missingChecklistItems.push(label);
     });
@@ -584,9 +612,9 @@ const QuestionOfDayPage = () => {
       const result = await saveExamLetterForTutorReview({
         user,
         studentProfile,
-        level,
-        promptId: `exam-warmup-${getProgressKey(level)}`,
-        promptTitle: getTaskTitle(dailyTask, level),
+        level: activeLevel,
+        promptId: `exam-warmup-${getProgressKey(activeLevel)}`,
+        promptTitle: getTaskTitle(dailyTask, activeLevel),
         draft: trimmedAnswer,
         aiFeedback: "",
         revisedDraft: trimmedAnswer,
@@ -631,36 +659,38 @@ const QuestionOfDayPage = () => {
       <h2 style={{ marginTop: 0 }}>Exam Warm-up</h2>
       <div style={{ ...styles.card, margin: "10px 0", background: "#f8fafc", border: "1px solid #dbeafe" }}>
         <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.6 }}>
-          <li>This page is for learners who are done with the course and are preparing for exams. One question is shared each day.</li>
+          <li>This page is for learners who are done with the course and are preparing for exams.</li>
+          <li>A2 and above receive one speaking question per speaking day.</li>
+          <li>A1 speaking receives a short set: 5 Teil 2 cards and 5 Teil 3 request cards.</li>
           <li>For Schreiben: save your response, then scroll down to Tutor Feedback.</li>
           <li>For Sprechen: record your voice and send it to your tutor on WhatsApp.</li>
         </ul>
       </div>
 
       {showSubmissionBanner ? (
-      <div style={{ ...styles.card, margin: "10px 0", background: "#fff7ed", border: "2px solid #fb923c" }}>
-        <p style={{ margin: 0, fontSize: 20, fontWeight: 800, lineHeight: 1.4 }}>
-          ✅ Work submitted to tutor. Scroll down to <strong>Tutor Feedback</strong> below.
-        </p>
-        <p style={{ margin: "8px 0 0", fontSize: 16, fontWeight: 600 }}>
-          Feedback usually appears within 24 hours. You can also go to the <strong>Writing</strong> tab and click <strong>Tutor Feedback</strong>.
-        </p>
-            </div>
+        <div style={{ ...styles.card, margin: "10px 0", background: "#fff7ed", border: "2px solid #fb923c" }}>
+          <p style={{ margin: 0, fontSize: 20, fontWeight: 800, lineHeight: 1.4 }}>
+            ✅ Work submitted to tutor. Scroll down to <strong>Tutor Feedback</strong> below.
+          </p>
+          <p style={{ margin: "8px 0 0", fontSize: 16, fontWeight: 600 }}>
+            Feedback usually appears within 24 hours. You can also go to the <strong>Writing</strong> tab and click <strong>Tutor Feedback</strong>.
+          </p>
+        </div>
       ) : null}
 
       {dailyTask?.type === "writing" && dailyTask?.prompt ? (
         <div style={questionPanelStyle}>
           <div>
             <p style={{ ...styles.helperText, marginTop: 0 }}>Question for the day</p>
-          <h3 style={{ marginTop: 0 }}>Schreiben</h3>
-          <p><strong>Thema:</strong> {dailyTask.prompt.Thema}</p>
-          <ul>
-            {dailyTask.prompt.Punkte?.map((point) => (
-              <li key={point}>{point}</li>
-            ))}
-          </ul>
-          <p style={{ marginBottom: 0 }}>
-              <strong>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</strong>
+            <h3 style={{ marginTop: 0 }}>Schreiben</h3>
+            <p><strong>Thema:</strong> {dailyTask.prompt.Thema}</p>
+            <ul>
+              {dailyTask.prompt.Punkte?.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+            <p style={{ marginBottom: 0 }}>
+              <strong>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</strong>
             </p>
           </div>
           <div style={{ background: "#ffffff", border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
@@ -678,21 +708,27 @@ const QuestionOfDayPage = () => {
         <>
           <div style={questionPanelStyle}>
             <div>
-            <p style={{ ...styles.helperText, marginTop: 0 }}>Question for the day</p>
-            <h3 style={{ marginTop: 0 }}>Sprechen</h3>
-            <ol>
-              {dailyTask.prompts.map((item) => (
-                <li key={item.id || buildSpeakingLabel(item)}>{buildSpeakingLabel(item)}</li>
+              <p style={{ ...styles.helperText, marginTop: 0 }}>Question set for the day</p>
+              <h3 style={{ marginTop: 0 }}>Sprechen</h3>
+              {dailyTask.promptSummary ? <p style={{ ...styles.helperText, marginTop: 0 }}>{dailyTask.promptSummary}</p> : null}
+              {Object.entries(speakingPromptGroups).map(([teilLabel, prompts]) => (
+                <div key={teilLabel} style={{ marginTop: 10 }}>
+                  <h4 style={{ margin: "0 0 6px" }}>{teilLabel}</h4>
+                  <ol style={{ marginTop: 0 }}>
+                    {prompts.map((item) => (
+                      <li key={item.id || buildSpeakingLabel(item)}>{buildSpeakingLabel(item)}</li>
+                    ))}
+                  </ol>
+                </div>
               ))}
-            </ol>
-            <p style={{ marginBottom: 0 }}>
-              <strong>Do not type your answer. Record a WhatsApp voice note and send it to your tutor.</strong>
-            </p>
+              <p style={{ marginBottom: 0 }}>
+                <strong>Do not type your answer. Record a WhatsApp voice note and send it to your tutor.</strong>
+              </p>
             </div>
           </div>
 
           <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "2px solid #c7d2fe" }}>
-            <h3 style={{ marginTop: 0 }}>Goethe Sprechen rules for {level}</h3>
+            <h3 style={{ marginTop: 0 }}>Goethe Sprechen rules for {activeLevel}</h3>
             <p style={{ ...styles.helperText, marginTop: 0 }}>
               Before recording, check what each Teil expects. Keep the voice note short and clear.
             </p>
@@ -724,20 +760,19 @@ const QuestionOfDayPage = () => {
         </>
       ) : null}
 
-
       {dailyTask?.type === "writing" ? (
         <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "1px solid #c7d2fe" }}>
-          <h3 style={{ marginTop: 0 }}>Goethe Schreiben rules for {level}</h3>
-          <p style={{ margin: "0 0 6px" }}><strong>Time:</strong> {(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).minutes}</p>
-          <p style={{ margin: "0 0 6px" }}>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).details}</p>
-          <p style={{ margin: 0 }}>{(WRITING_GUIDE_BY_LEVEL[level] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</p>
+          <h3 style={{ marginTop: 0 }}>Goethe Schreiben rules for {activeLevel}</h3>
+          <p style={{ margin: "0 0 6px" }}><strong>Time:</strong> {(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).minutes}</p>
+          <p style={{ margin: "0 0 6px" }}>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).details}</p>
+          <p style={{ margin: 0 }}>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</p>
         </div>
       ) : null}
 
       {!dailyTask ? (
         <div style={{ ...styles.card, margin: "12px 0", background: "#fef2f2" }}>
           <h3 style={{ marginTop: 0 }}>No warm-up found</h3>
-          <p style={{ marginBottom: 0 }}>No Schreiben or Sprechen question is available for {level} yet.</p>
+          <p style={{ marginBottom: 0 }}>No Schreiben or Sprechen question is available for {activeLevel} yet.</p>
         </div>
       ) : null}
 
@@ -814,7 +849,6 @@ const QuestionOfDayPage = () => {
           {submitState.success ? <p style={{ ...styles.helperText, color: "#166534", marginBottom: 0 }}>{submitState.success}</p> : null}
         </div>
       ) : null}
-
 
       <TutorFeedbackHistory reviews={tutorReviews} errorMessage={tutorReviewsError} />
     </section>
