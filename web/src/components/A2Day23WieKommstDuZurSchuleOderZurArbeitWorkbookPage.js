@@ -26,6 +26,8 @@ const listStyle = {
   lineHeight: 1.7,
 };
 
+const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
+
 const questionCardStyle = {
   border: "1px solid #e5e7eb",
   borderRadius: 10,
@@ -142,6 +144,62 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
             </li>
           </ol>
 
+
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+            So wird aus kurzen Wörtern eine klare Antwort mit guten Sätzen.
+          </p>
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Schnelle Struktur für 30–45 Sekunden</strong>
+            <ol style={listStyle}>
+              <li><strong>Einleitung:</strong> Thema nennen und einen ersten Satz sagen.</li>
+              <li><strong>Hauptteil:</strong> zwei oder drei Punkte mit einfachen Connectors verbinden.</li>
+              <li><strong>Beispiel:</strong> ein kurzes Beispiel aus deinem Leben geben.</li>
+              <li><strong>Schluss:</strong> deine Meinung kurz zusammenfassen.</li>
+            </ol>
+          </div>
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Gute Einleitungen</strong>
+              <ul style={listStyle}>
+                <li>„Heute spreche ich über …“</li>
+                <li>„Ich möchte kurz etwas über … sagen.“</li>
+                <li>„Mein Thema ist …“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Verbindungswörter / Connectors</strong>
+              <ul style={listStyle}>
+                <li><strong>und</strong> · „Ich lerne Deutsch und ich übe jeden Tag.“</li>
+                <li><strong>oder</strong> · „Ich mache Sport oder ich treffe Freunde.“</li>
+                <li><strong>weil</strong> · „Das ist gut, weil es einfach ist.“</li>
+                <li><strong>deshalb</strong> · „Ich habe wenig Zeit, deshalb plane ich gut.“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Eigene Meinung ausdrücken</strong>
+              <ul style={listStyle}>
+                <li>„Ich finde … gut, weil …“</li>
+                <li>„Für mich ist … wichtig.“</li>
+                <li>„Meiner Meinung nach ist … praktisch.“</li>
+              </ul>
+            </div>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Gute Schlüsse</strong>
+              <ul style={listStyle}>
+                <li>„Zum Schluss kann ich sagen: …“</li>
+                <li>„Deshalb finde ich … gut.“</li>
+                <li>„Das ist meine Meinung. Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute spreche ich darüber, wie ich zur Arbeit oder zur Schule komme. Ich fahre meistens mit dem Bus, weil es günstig ist. Manchmal gehe ich zu Fuß, wenn das Wetter gut ist. Mit dem Auto ist es bequem, aber es gibt oft Stau und Parkplätze sind teuer. Zum Beispiel nehme ich morgens den Bus und am Abend gehe ich ein Stück zu Fuß. Zum Schluss finde ich: Der Bus ist für mich praktisch und einfach.“
+            </p>
+          </div>
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Sprechen prompt</strong>
             <p style={{ margin: 0 }}>
