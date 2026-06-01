@@ -14,8 +14,17 @@ import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import { PillBadge, PrimaryActionBar, SectionHeader } from "./ui";
 import { formatCurrency } from "../lib/formatters";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
+import { detectLevelKey } from "../lib/day0Workbook";
 
-const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom }) => {
+const day0WorkbookByLevel = {
+  A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
+  A2: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
+  B1: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
+  B2: "/campus/course/b2-day-0-self-learning-orientation-workbook",
+  C1: "/campus/course/c1-day-0-progression-workbook",
+};
+
+const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
@@ -40,7 +49,13 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom }) => {
       </p>
 
       <PrimaryActionBar align="start">
-        <PillBadge tone="success">{t("generalHome.welcome.streakBadge")}</PillBadge>
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d", borderColor: "#bbf7d0" }}
+          onClick={onContinueLearning}
+        >
+          Continue learning
+        </button>
 
         <button
           type="button"
@@ -50,7 +65,6 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom }) => {
           {t("generalHome.welcome.joinZoom")}
         </button>
 
-        {/* ✅ Compact: sits beside Zoom */}
         <ExamReadinessBadge
           variant="button"
           studentProfile={studentProfile}
@@ -60,6 +74,127 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom }) => {
     </section>
   );
 };
+
+const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoinZoom, onOpenExamFile }) => {
+  const levelKey = detectLevelKey(studentProfile);
+  const className = studentProfile?.className || "your class";
+  const hasDay0 = Boolean(day0WorkbookByLevel[levelKey]);
+
+  return (
+    <section
+      style={{
+        ...styles.card,
+        display: "grid",
+        gap: 12,
+        border: "1px solid #bfdbfe",
+        background: "linear-gradient(135deg, #eff6ff, #ffffff 62%, #f0fdf4)",
+      }}
+    >
+      <SectionHeader
+        eyebrow="Your next step"
+        title={levelKey ? `Continue ${levelKey} learning` : "Continue your learning setup"}
+        subtitle={
+          levelKey
+            ? `You are in ${className}. Start with the next learning action, then check class links or your exam file when needed.`
+            : "Set your level and class so Falowen can guide your lessons, scores, class links, and exam preparation."
+        }
+        actions={
+          <PrimaryActionBar align="flex-end" wrap>
+            {levelKey ? <PillBadge tone="info">Level {levelKey}</PillBadge> : null}
+            {studentProfile?.className ? <PillBadge>{studentProfile.className}</PillBadge> : null}
+          </PrimaryActionBar>
+        }
+      />
+
+      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+        <div style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+          <strong>📘 Course work</strong>
+          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
+            Open your Course Book, assignments, grammar help, and scores.
+          </p>
+          <button type="button" style={styles.primaryButton} onClick={onContinueLearning}>
+            Continue learning
+          </button>
+        </div>
+
+        <div style={{ border: "1px solid #bbf7d0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+          <strong>🧭 New here?</strong>
+          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
+            {hasDay0 ? "Open Day 0 first to understand how Falowen works." : "Check your account setup before continuing."}
+          </p>
+          <button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>
+            {hasDay0 ? "Open Day 0" : "Open account"}
+          </button>
+        </div>
+
+        <div style={{ border: "1px solid #fde68a", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+          <strong>🎯 Exam direction</strong>
+          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
+            Use Exam File when you want readiness, certificate progress, and exam preparation tasks.
+          </p>
+          <PrimaryActionBar align="start" wrap>
+            <button type="button" style={styles.secondaryButton} onClick={onOpenExamFile}>
+              Exam File
+            </button>
+            <button type="button" style={styles.secondaryButton} onClick={onJoinZoom}>
+              Join Zoom
+            </button>
+          </PrimaryActionBar>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const AnnouncementSection = ({ announcements, announcementStatus, announcementIndex, t }) => (
+  <section style={{ ...styles.card, display: "grid", gap: 12 }}>
+    <SectionHeader
+      eyebrow={t("generalHome.announcements.eyebrow")}
+      title={t("generalHome.announcements.title")}
+      subtitle={t("generalHome.announcements.subtitle")}
+    />
+    {announcementStatus === "loading" ? (
+      <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.loading")}</p>
+    ) : null}
+    {announcementStatus === "error" ? (
+      <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.error")}</p>
+    ) : null}
+    {announcementStatus === "success" && announcements.length === 0 ? (
+      <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.empty")}</p>
+    ) : null}
+    {announcementStatus === "success" && announcements.length > 0 ? (
+      <div className="announcement-slider" aria-label={t("generalHome.announcements.ariaLabel")} aria-live="polite">
+        <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
+          {(() => {
+            const announcement = announcements[announcementIndex] || {};
+            return (
+              <>
+                <div className="announcement-message">
+                  <span className="announcement-ticker-title">{announcement.title}</span>
+                </div>
+                {announcement.linkUrl ? (
+                  <a
+                    href={announcement.linkUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="announcement-ticker-link"
+                  >
+                    {announcement.linkLabel || t("generalHome.announcements.openUpdate")}
+                  </a>
+                ) : null}
+              </>
+            );
+          })()}
+        </div>
+        {announcements.length > 1 ? (
+          <div className="announcement-slide-count" aria-hidden="true">
+            {announcementIndex + 1} / {announcements.length}
+          </div>
+        ) : null}
+      </div>
+    ) : null}
+  </section>
+);
 
 const GeneralHome = ({
   onSelectArea,
@@ -85,6 +220,24 @@ const GeneralHome = ({
   const [announcements, setAnnouncements] = useState([]);
   const [announcementStatus, setAnnouncementStatus] = useState("idle");
   const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const levelKey = detectLevelKey(studentProfile);
+  const day0WorkbookLink = day0WorkbookByLevel[levelKey] || "/campus/account";
+
+  const openCampus = useCallback(() => {
+    playOpenFeedback();
+    onSelectArea("campus");
+  }, [onSelectArea, playOpenFeedback]);
+
+  const openExamFile = useCallback(() => {
+    playOpenFeedback();
+    navigate("/campus/examFile");
+  }, [navigate, playOpenFeedback]);
+
+  const joinZoom = useCallback(() => {
+    playOpenFeedback();
+    window.open(ZOOM_DETAILS.url, "_blank", "noreferrer");
+  }, [playOpenFeedback]);
+
   const paymentAlert = useMemo(() => {
     const balanceDue = Math.max(Number(studentProfile?.balanceDue) || 0, 0);
     if (balanceDue <= 0) return null;
@@ -114,7 +267,6 @@ const GeneralHome = ({
       calendarSection.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
-
     navigate("/");
   };
 
@@ -162,20 +314,10 @@ const GeneralHome = ({
     <div style={{ display: "grid", gap: 16 }}>
       <WelcomeHero
         studentProfile={studentProfile}
-        onOpenExamFile={() => {
-          playOpenFeedback();
-          navigate("/campus/examFile");
-        }}
-        onJoinZoom={() => {
-          playOpenFeedback();
-          window.open(ZOOM_DETAILS.url, "_blank", "noreferrer");
-        }}
+        onOpenExamFile={openExamFile}
+        onJoinZoom={joinZoom}
+        onContinueLearning={openCampus}
       />
-      <section style={{ ...styles.card, marginBottom: 0 }}>
-        <PrimaryActionBar align="start">
-          <YouTubeSubscribeButton />
-        </PrimaryActionBar>
-      </section>
 
       {paymentAlert ? (
         <section
@@ -205,13 +347,16 @@ const GeneralHome = ({
         </section>
       ) : null}
 
-      {/* ❌ Remove the big readiness card from the home page */}
-      {/* 
-      <ExamReadinessBadge
+      <NextActionCard
         studentProfile={studentProfile}
-        onOpenExamFile={() => navigate("/campus/examFile")}
+        onContinueLearning={openCampus}
+        onOpenDay0={() => {
+          playOpenFeedback();
+          navigate(day0WorkbookLink);
+        }}
+        onJoinZoom={joinZoom}
+        onOpenExamFile={openExamFile}
       />
-      */}
 
       <HomeMetrics studentProfile={studentProfile} />
 
@@ -226,81 +371,24 @@ const GeneralHome = ({
 
       <NavigationGuide />
 
-      <section style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <SectionHeader
-          eyebrow={t("generalHome.announcements.eyebrow")}
-          title={t("generalHome.announcements.title")}
-          subtitle={t("generalHome.announcements.subtitle")}
-        />
-        {announcementStatus === "loading" ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>{t("generalHome.announcements.loading")}</p>
-        ) : null}
-        {announcementStatus === "error" ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {t("generalHome.announcements.error")}
-          </p>
-        ) : null}
-        {announcementStatus === "success" && announcements.length === 0 ? (
-          <p style={{ ...styles.helperText, margin: 0 }}>
-            {t("generalHome.announcements.empty")}
-          </p>
-        ) : null}
-        {announcementStatus === "success" && announcements.length > 0 ? (
-          <div
-            className="announcement-slider"
-            aria-label={t("generalHome.announcements.ariaLabel")}
-            aria-live="polite"
-          >
-            <div className="announcement-slide" key={announcements[announcementIndex]?.id}>
-              {(() => {
-                const announcement = announcements[announcementIndex] || {};
-
-                return (
-                  <>
-                    <div className="announcement-message">
-                      <span className="announcement-ticker-title">{announcement.title}</span>
-                    </div>
-                    {announcement.linkUrl ? (
-                      <a
-                        href={announcement.linkUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="announcement-ticker-link"
-                      >
-                        {announcement.linkLabel || t("generalHome.announcements.openUpdate")}
-                      </a>
-                    ) : null}
-                  </>
-                );
-              })()}
-            </div>
-            {announcements.length > 1 ? (
-              <div className="announcement-slide-count" aria-hidden="true">
-                {announcementIndex + 1} / {announcements.length}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </section>
-
       <div style={styles.gridTwo}>
         <section
           style={{
             ...styles.card,
             display: "grid",
             gap: 10,
-            background:
-              "linear-gradient(130deg, rgba(238, 242, 255, 0.9), rgba(255, 255, 255, 0.96))",
+            background: "linear-gradient(130deg, rgba(238, 242, 255, 0.9), rgba(255, 255, 255, 0.96))",
             borderColor: "#c7d2fe",
           }}
         >
           <SectionHeader
             eyebrow={t("generalHome.campus.eyebrow")}
             title={t("generalHome.campus.title")}
+            subtitle="Course book, assignments, scores, grammar help, and class work."
             actions={
               <PrimaryActionBar align="flex-end">
-                <PillBadge tone="success">{t("generalHome.campus.badgePrimary")}</PillBadge>
-                <PillBadge>{t("generalHome.campus.badgeSecondary")}</PillBadge>
+                <PillBadge tone="success">Course work</PillBadge>
+                <PillBadge>Daily work</PillBadge>
               </PrimaryActionBar>
             }
           />
@@ -309,18 +397,9 @@ const GeneralHome = ({
             <li>{t("generalHome.campus.points.1")}</li>
             <li>{t("generalHome.campus.points.2")}</li>
           </ul>
-          <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            {t("generalHome.campus.helper")}
-          </p>
           <PrimaryActionBar align="start">
-            <button
-              style={styles.primaryButton}
-              onClick={() => {
-                playOpenFeedback();
-                onSelectArea("campus");
-              }}
-            >
-              {t("generalHome.campus.cta")}
+            <button style={styles.primaryButton} onClick={openCampus}>
+              Enter Campus
             </button>
           </PrimaryActionBar>
         </section>
@@ -330,17 +409,17 @@ const GeneralHome = ({
             ...styles.card,
             display: "grid",
             gap: 10,
-            background:
-              "linear-gradient(130deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.97))",
+            background: "linear-gradient(130deg, rgba(239, 246, 255, 0.95), rgba(255, 255, 255, 0.97))",
             borderColor: "#bfdbfe",
           }}
         >
           <SectionHeader
             eyebrow={t("generalHome.exams.eyebrow")}
             title={t("generalHome.exams.title")}
+            subtitle="Speaking, Schreiben, exam readiness, and preparation resources."
             actions={
               <PrimaryActionBar align="flex-end">
-                <PillBadge tone="info">{t("generalHome.exams.badge")}</PillBadge>
+                <PillBadge tone="info">Exam mode</PillBadge>
               </PrimaryActionBar>
             }
           />
@@ -349,9 +428,6 @@ const GeneralHome = ({
             <li>{t("generalHome.exams.points.1")}</li>
             <li>{t("generalHome.exams.points.2")}</li>
           </ul>
-          <p style={{ ...styles.helperText, marginBottom: 6 }}>
-            {t("generalHome.exams.helper")}
-          </p>
           <PrimaryActionBar align="start">
             <button
               style={styles.secondaryButton}
@@ -360,7 +436,7 @@ const GeneralHome = ({
                 onSelectArea("exams");
               }}
             >
-              {t("generalHome.exams.cta")}
+              Open Exams Room
             </button>
           </PrimaryActionBar>
         </section>
@@ -369,11 +445,11 @@ const GeneralHome = ({
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <details style={{ ...styles.card, background: "#f8fafc" }}>
           <summary style={{ ...styles.sectionTitle, cursor: "pointer", margin: 0 }}>
-            {t("generalHome.more.summary")}
+            ▶ Live class access & calendar
           </summary>
           <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              {t("generalHome.more.helper")}
+              Zoom meeting, class dates, calendar download, and next live class details.
             </p>
             <ClassCalendarCard
               id={classCalendarId}
@@ -384,6 +460,18 @@ const GeneralHome = ({
         </details>
       </section>
 
+      <AnnouncementSection
+        announcements={announcements}
+        announcementStatus={announcementStatus}
+        announcementIndex={announcementIndex}
+        t={t}
+      />
+
+      <section style={{ ...styles.card, marginBottom: 0 }}>
+        <PrimaryActionBar align="start">
+          <YouTubeSubscribeButton />
+        </PrimaryActionBar>
+      </section>
     </div>
   );
 };
