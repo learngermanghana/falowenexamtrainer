@@ -14,6 +14,8 @@ const REVIEW_SLIDE_MS = 4500;
 const DEFAULT_STUDENT_REVIEWS_SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5Nm-MLJkw3TeOht5ROELvFumVS9X8-ke_npLoOuF3W-zrF0v9xjk_Upzv4umQCocD5xtFaMRJQh6Z/pubhtml";
 
+const asArray = (value) => (Array.isArray(value) ? value : []);
+
 const truncateText = (text = "", maxLength = 150) => {
   const clean = String(text || "").replace(/\s+/g, " ").trim();
   if (clean.length <= maxLength) return clean;
@@ -91,6 +93,55 @@ const HeroVisual = () => (
     </div>
   </div>
 );
+
+const SignupJourneyVisual = () => {
+  const steps = [
+    { icon: "🧭", title: "Check your level", text: "Use the free placement test if you are not sure." },
+    { icon: "🏫", title: "Choose your class", text: "Pick a cohort from the class brochure." },
+    { icon: "📱", title: "Start learning", text: "Use Course Book, live class links, and assignments." },
+    { icon: "✅", title: "Get feedback", text: "Tutor comments and progress tracking guide you." },
+  ];
+
+  return (
+    <div
+      style={{
+        marginTop: 16,
+        border: "1px solid #bfdbfe",
+        borderRadius: 18,
+        padding: 14,
+        background: "linear-gradient(135deg, #eff6ff, #ffffff)",
+        display: "grid",
+        gap: 10,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+        <strong style={{ color: "#111827" }}>Your Falowen path</strong>
+        <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>Simple journey</span>
+      </div>
+      <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
+        {steps.map((step, index) => (
+          <div
+            key={step.title}
+            style={{
+              border: "1px solid #e5e7eb",
+              borderRadius: 14,
+              padding: 10,
+              background: "#ffffff",
+              display: "grid",
+              gap: 6,
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span aria-hidden>{step.icon}</span>
+              <strong style={{ fontSize: 13 }}>{index + 1}. {step.title}</strong>
+            </div>
+            <p style={{ ...styles.helperText, margin: 0, fontSize: 13 }}>{step.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 const ResourceLink = ({ label, href }) => (
   <a
@@ -298,19 +349,13 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   const [activeReviewIndex, setActiveReviewIndex] = useState(0);
 
   const leadCaptureTitle = useMemo(() => {
-    if (leadCaptureConfig.cta === "Placement test") {
-      return "Before you start the placement test";
-    }
-    if (leadCaptureConfig.cta === "Talk to us") {
-      return "Talk to us";
-    }
+    if (leadCaptureConfig.cta === "Placement test") return "Before you start the placement test";
+    if (leadCaptureConfig.cta === "Talk to us") return "Talk to us";
     return "Get started";
   }, [leadCaptureConfig.cta]);
 
   const leadCaptureSubtitle = useMemo(() => {
-    if (leadCaptureConfig.cta === "Placement test") {
-      return "Share your details so we can guide you after your results.";
-    }
+    if (leadCaptureConfig.cta === "Placement test") return "Share your details so we can guide you after your results.";
     return "Share a few details and our team will follow up with the best next step.";
   }, [leadCaptureConfig.cta]);
 
@@ -321,6 +366,8 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     }),
     [t]
   );
+  const resolvedProgram = programOptions[program] ? program : "german";
+  const selectedProgram = programOptions[resolvedProgram] || { shortLabel: "German" };
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
   const interfaceLanguageOptions = useMemo(
     () => [
@@ -330,33 +377,24 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     ],
     [t]
   );
-  const resolvedProgram = programOptions[program] ? program : "german";
-  const selectedProgram = programOptions[resolvedProgram];
-  const features = t("landing.features", { returnObjects: true });
-  const quickLinks = t("landing.quickLinks", { returnObjects: true });
-  const socialLinks = t("landing.socialLinks", { returnObjects: true });
-  const signupSteps = t("landing.howItWorks.steps", {
-    returnObjects: true,
-    language: selectedProgram.shortLabel,
-  });
-  const reviewItems = t("landing.reviews.items", { returnObjects: true });
-  const fallbackReviews = useMemo(() => (Array.isArray(reviewItems) ? shuffleArray(reviewItems) : []), [reviewItems]);
+
+  const features = asArray(t("landing.features", { returnObjects: true }));
+  const quickLinks = asArray(t("landing.quickLinks", { returnObjects: true }));
+  const socialLinks = asArray(t("landing.socialLinks", { returnObjects: true }));
+  const signupSteps = asArray(t("landing.howItWorks.steps", { returnObjects: true, language: selectedProgram.shortLabel }));
+  const reviewItems = asArray(t("landing.reviews.items", { returnObjects: true }));
+  const fallbackReviews = useMemo(() => shuffleArray(reviewItems), [reviewItems]);
   const visibleReviews = sheetReviews.length ? sheetReviews : fallbackReviews;
   const featuredReview = visibleReviews.length ? visibleReviews[activeReviewIndex % visibleReviews.length] : null;
-  const howItWorksBenefits = t("landing.howItWorks.benefits", { returnObjects: true });
-  const whyStayPoints = t("landing.footer.stayPoints", { returnObjects: true });
+  const howItWorksBenefits = asArray(t("landing.howItWorks.benefits", { returnObjects: true }));
+  const whyStayPoints = asArray(t("landing.footer.stayPoints", { returnObjects: true }));
   const upcomingClassCards = useMemo(() => getUpcomingClassCards(), []);
 
   useEffect(() => {
     let mounted = true;
     const sheetUrl = process.env.REACT_APP_STUDENT_REVIEWS_SHEET_CSV_URL || DEFAULT_STUDENT_REVIEWS_SHEET_URL;
 
-    if (!sheetUrl) {
-      setSheetReviews([]);
-      return undefined;
-    }
-
-    const loadSheetReview = async () => {
+    const loadSheetReviews = async () => {
       try {
         const rows = await fetchStudentReviewsFromPublishedSheet(sheetUrl);
         if (!mounted) return;
@@ -369,8 +407,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
       }
     };
 
-    loadSheetReview();
-
+    loadSheetReviews();
     return () => {
       mounted = false;
     };
@@ -388,32 +425,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     const title = t("landing.meta.title");
     const description = t("landing.meta.description");
 
-    const organizationSchema = {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: "Falowen",
-      url: "https://www.falowen.app/",
-      logo: "https://www.falowen.app/logo512.png",
-      sameAs: [
-        "https://www.instagram.com/lleaghana",
-        "https://www.youtube.com/@LLEAGhana",
-        "https://web.facebook.com/lleaghana",
-      ],
-    };
-
-    const serviceSchema = {
-      "@context": "https://schema.org",
-      "@type": "Service",
-      name: "Falowen language learning tools and upcoming classes",
-      serviceType: "Online language learning, live classes, and exam practice",
-      provider: {
-        "@type": "Organization",
-        name: "Falowen",
-      },
-      areaServed: ["Ghana", "Nigeria"],
-      url: "https://www.falowen.app/",
-    };
-
     updatePageMeta({
       title,
       description,
@@ -421,15 +432,38 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
       canonicalPath: "/",
       ogType: "website",
       structuredData: [
-        { id: "organization", schema: organizationSchema },
-        { id: "service", schema: serviceSchema },
+        {
+          id: "organization",
+          schema: {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Falowen",
+            url: "https://www.falowen.app/",
+            logo: "https://www.falowen.app/logo512.png",
+            sameAs: [
+              "https://www.instagram.com/lleaghana",
+              "https://www.youtube.com/@LLEAGhana",
+              "https://web.facebook.com/lleaghana",
+            ],
+          },
+        },
+        {
+          id: "service",
+          schema: {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            name: "Falowen language learning tools and upcoming classes",
+            serviceType: "Online language learning, live classes, and exam practice",
+            provider: { "@type": "Organization", name: "Falowen" },
+            areaServed: ["Ghana", "Nigeria"],
+            url: "https://www.falowen.app/",
+          },
+        },
       ],
     });
   }, [i18n.language, t]);
 
-  const handleProgramSelect = (nextProgram) => {
-    onProgramSelect?.(nextProgram);
-  };
+  const handleProgramSelect = (nextProgram) => onProgramSelect?.(nextProgram);
 
   const handleInterfaceLanguageChange = (language) => {
     i18n.changeLanguage(language);
@@ -441,14 +475,8 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
   };
 
   const handleLeadSubmit = (payload) => {
-    captureLead({
-      ...payload,
-      source: "landing_page",
-      cta: leadCaptureConfig.cta,
-    });
-    if (leadCaptureConfig.nextUrl) {
-      window.location.href = leadCaptureConfig.nextUrl;
-    }
+    captureLead({ ...payload, source: "landing_page", cta: leadCaptureConfig.cta });
+    if (leadCaptureConfig.nextUrl) window.location.href = leadCaptureConfig.nextUrl;
   };
 
   return (
@@ -473,20 +501,10 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               <p style={{ ...styles.badge, alignSelf: "flex-start", background: "#c7d2fe", color: "#1e3a8a" }}>
                 {t("landing.badge")}
               </p>
-
-              <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-                {t("landing.heroTitle")}
-              </h1>
-
-              <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0, lineHeight: 1.6 }}>
-                {t("landing.heroSubtitle")}
-              </p>
-
+              <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>{t("landing.heroTitle")}</h1>
+              <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0, lineHeight: 1.6 }}>{t("landing.heroSubtitle")}</p>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a
-                  href={CLASS_BROCHURE_URL}
-                  style={{ ...styles.primaryButton, textDecoration: "none", background: "#fbbf24", color: "#111827" }}
-                >
+                <a href={CLASS_BROCHURE_URL} style={{ ...styles.primaryButton, textDecoration: "none", background: "#fbbf24", color: "#111827" }}>
                   View upcoming classes
                 </a>
                 <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
@@ -498,17 +516,11 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                 <button type="button" style={styles.secondaryButton} onClick={onLogin}>
                   {t("landing.cta.login")}
                 </button>
-                <a
-                  href="https://play.google.com/store/apps/details?id=com.falowen.app"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ ...styles.secondaryButton, textDecoration: "none" }}
-                >
+                <a href="https://play.google.com/store/apps/details?id=com.falowen.app" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
                   {t("landing.cta.getApp")}
                 </a>
               </div>
             </div>
-
             <HeroVisual />
           </div>
         </header>
@@ -525,9 +537,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
         >
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "end" }}>
             <div style={{ display: "grid", gap: 6, maxWidth: 680 }}>
-              <p style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af", margin: 0 }}>
-                Upcoming classes
-              </p>
+              <p style={{ ...styles.badge, width: "fit-content", background: "#dbeafe", color: "#1e40af", margin: 0 }}>Upcoming classes</p>
               <h2 style={{ ...styles.sectionTitle, margin: 0 }}>Join the next Falowen German class</h2>
               <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
                 Send students one clean brochure with the start date, meeting times, generated schedule, and payment link.
@@ -538,15 +548,9 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               Open class brochure
             </a>
           </div>
-
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
             {upcomingClassCards.map((item) => (
-              <UpcomingClassCard
-                key={item.className}
-                className={item.className}
-                details={item.details}
-                level={item.level}
-              />
+              <UpcomingClassCard key={item.className} className={item.className} details={item.details} level={item.level} />
             ))}
           </div>
         </section>
@@ -567,61 +571,21 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.languageChooser.subtitle")}</p>
             <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.languageChooser.interfaceNote")}</p>
           </div>
-
           <div style={{ display: "grid", gap: 10 }}>
-            <div
-              style={{ display: "flex", gap: 10, flexWrap: "wrap" }}
-              role="group"
-              aria-label={t("landing.languageChooser.ariaLabel")}
-            >
-              <button
-                type="button"
-                onClick={() => handleProgramSelect("german")}
-                aria-pressed={resolvedProgram === "german"}
-                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.german.shortLabel })}
-                style={{
-                  ...(resolvedProgram === "german" ? styles.primaryButton : styles.secondaryButton),
-                  padding: "10px 14px",
-                }}
-              >
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }} role="group" aria-label={t("landing.languageChooser.ariaLabel")}>
+              <button type="button" onClick={() => handleProgramSelect("german")} aria-pressed={resolvedProgram === "german"} style={{ ...(resolvedProgram === "german" ? styles.primaryButton : styles.secondaryButton), padding: "10px 14px" }}>
                 {t("landing.languageChooser.studyGerman")}
               </button>
-              <button
-                type="button"
-                onClick={() => handleProgramSelect("french")}
-                aria-pressed={resolvedProgram === "french"}
-                aria-label={t("landing.languageChooser.optionAria", { language: programOptions.french.shortLabel })}
-                style={{
-                  ...(resolvedProgram === "french" ? styles.primaryButton : styles.secondaryButton),
-                  padding: "10px 14px",
-                }}
-              >
+              <button type="button" onClick={() => handleProgramSelect("french")} aria-pressed={resolvedProgram === "french"} style={{ ...(resolvedProgram === "french" ? styles.primaryButton : styles.secondaryButton), padding: "10px 14px" }}>
                 {t("landing.languageChooser.studyFrench")}
               </button>
             </div>
-            <div style={{ ...styles.helperText, margin: 0 }}>
-              {t("landing.languageChooser.current", { language: selectedProgram.shortLabel })}
-            </div>
-
+            <div style={{ ...styles.helperText, margin: 0 }}>{t("landing.languageChooser.current", { language: selectedProgram.shortLabel })}</div>
             <div style={{ display: "grid", gap: 6 }}>
               <div style={{ fontWeight: 700 }}>{t("interfaceLanguage.label")}</div>
-              <div
-                style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
-                role="group"
-                aria-label={t("interfaceLanguage.ariaLabel")}
-              >
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }} role="group" aria-label={t("interfaceLanguage.ariaLabel")}>
                 {interfaceLanguageOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => handleInterfaceLanguageChange(option.value)}
-                    aria-pressed={resolvedInterfaceLanguage === option.value}
-                    aria-label={t("interfaceLanguage.optionAria", { language: option.label })}
-                    style={{
-                      ...(resolvedInterfaceLanguage === option.value ? styles.primaryButton : styles.secondaryButton),
-                      padding: "8px 12px",
-                    }}
-                  >
+                  <button key={option.value} type="button" onClick={() => handleInterfaceLanguageChange(option.value)} aria-pressed={resolvedInterfaceLanguage === option.value} style={{ ...(resolvedInterfaceLanguage === option.value ? styles.primaryButton : styles.secondaryButton), padding: "8px 12px" }}>
                     {option.label}
                   </button>
                 ))}
@@ -644,15 +608,11 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           <div style={{ display: "grid", gap: 8 }}>
             <h2 style={styles.sectionTitle}>{t("landing.howItWorks.title")}</h2>
             <p style={{ ...styles.helperText, marginBottom: 0 }}>{t("landing.howItWorks.subtitle")}</p>
-
             <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
               {howItWorksBenefits.map((benefit) => (
-                <div key={benefit} style={{ ...styles.helperText, margin: 0 }}>
-                  {benefit}
-                </div>
+                <div key={benefit} style={{ ...styles.helperText, margin: 0 }}>{benefit}</div>
               ))}
             </div>
-
             <button
               type="button"
               onClick={() => onSignUp(resolvedProgram)}
@@ -670,8 +630,8 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             >
               {t("landing.howItWorks.cta", { language: selectedProgram.shortLabel })}
             </button>
+            <SignupJourneyVisual />
           </div>
-
           <div style={{ display: "grid", gap: 10 }}>
             {signupSteps.map((step, idx) => (
               <StepCard key={step.title} index={idx + 1} title={step.title} description={step.description} />
@@ -692,7 +652,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               <p style={{ ...styles.helperText, margin: 0 }}>{t("landing.reviews.subtitle")}</p>
             </div>
           </div>
-
           <div style={{ display: "grid", gap: 12, gridTemplateColumns: "minmax(240px, 560px)" }}>
             {featuredReview ? (
               <ReviewCard
@@ -733,41 +692,18 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <div style={{ flex: 2, minWidth: 260 }}>
               <h2 style={{ ...styles.sectionTitle, color: "#fff" }}>{t("landing.darkCta.title")}</h2>
-              <p style={{ ...styles.helperText, color: "#d1d5db", lineHeight: 1.65 }}>
-                {t("landing.darkCta.subtitle")}
-              </p>
+              <p style={{ ...styles.helperText, color: "#d1d5db", lineHeight: 1.65 }}>{t("landing.darkCta.subtitle")}</p>
             </div>
-
             <div style={{ display: "grid", gap: 10, flex: 1, minWidth: 240 }}>
               <div style={{ ...styles.uploadCard, background: "#0f172a", borderColor: "#1f2937" }}>
                 <h3 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 6 }}>{t("landing.darkCta.ctaTitle")}</h3>
-                <p style={{ ...styles.helperText, color: "#d1d5db", marginBottom: 10 }}>
-                  {t("landing.darkCta.ctaSubtitle")}
-                </p>
-
+                <p style={{ ...styles.helperText, color: "#d1d5db", marginBottom: 10 }}>{t("landing.darkCta.ctaSubtitle")}</p>
                 <div style={{ display: "grid", gap: 8 }}>
-                  <a
-                    href={CLASS_BROCHURE_URL}
-                    style={{ ...styles.primaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}
-                  >
-                    View upcoming classes
-                  </a>
-
-                  <a
-                    href={PLACEMENT_TEST_URL}
-                    style={{ ...styles.secondaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}
-                  >
-                    Take placement test
-                  </a>
-
-                  <button
-                    type="button"
-                    style={{ ...styles.secondaryButton, padding: "10px 14px" }}
-                    onClick={() => onSignUp(resolvedProgram)}
-                  >
+                  <a href={CLASS_BROCHURE_URL} style={{ ...styles.primaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}>View upcoming classes</a>
+                  <a href={PLACEMENT_TEST_URL} style={{ ...styles.secondaryButton, padding: "10px 14px", textDecoration: "none", textAlign: "center" }}>Take placement test</a>
+                  <button type="button" style={{ ...styles.secondaryButton, padding: "10px 14px" }} onClick={() => onSignUp(resolvedProgram)}>
                     {t("landing.darkCta.ctaJoin", { language: selectedProgram.shortLabel })}
                   </button>
-
                   <button
                     type="button"
                     onClick={onLogin}
@@ -786,45 +722,21 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
                   </button>
                 </div>
               </div>
-
               <div style={{ ...styles.uploadCard, background: "#0f172a", borderColor: "#1f2937" }}>
                 <h4 style={{ ...styles.sectionTitle, color: "#fff", marginBottom: 8 }}>{t("landing.darkCta.contactTitle")}</h4>
                 <ul style={{ ...styles.checklist, margin: 0, color: "#d1d5db", lineHeight: 1.6 }}>
                   <li>
-                    <button
-                      type="button"
-                      onClick={() => openLeadCapture("Talk to us")}
-                      style={{
-                        ...styles.secondaryButton,
-                        padding: "6px 10px",
-                        fontSize: 12,
-                        color: "#e2e8f0",
-                        borderColor: "#64748b",
-                        background: "transparent",
-                      }}
-                    >
+                    <button type="button" onClick={() => openLeadCapture("Talk to us")} style={{ ...styles.secondaryButton, padding: "6px 10px", fontSize: 12, color: "#e2e8f0", borderColor: "#64748b", background: "transparent" }}>
                       Talk to us
                     </button>
                   </li>
                   <li>
                     {t("landing.darkCta.contactPhone")}
-                    <a
-                      style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }}
-                      href="https://wa.me/233205706589"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      +233 20 570 6589
-                    </a>
+                    <a style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }} href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer">+233 20 570 6589</a>
                   </li>
                   <li>
                     {t("landing.darkCta.contactEmail")}
-                    <a
-                      style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }}
-                      href="mailto:info@falowen.app"
-                    >
-                      info@falowen.app
-                    </a>
+                    <a style={{ color: "#a5b4fc", marginLeft: 6, textDecoration: "none", fontWeight: 700 }} href="mailto:info@falowen.app">info@falowen.app</a>
                   </li>
                   <li>{t("landing.darkCta.contactChat")}</li>
                 </ul>
@@ -833,38 +745,23 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
           </div>
         </section>
 
-        <footer
-          style={{
-            ...styles.card,
-            display: "grid",
-            gap: 14,
-            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          }}
-        >
+        <footer style={{ ...styles.card, display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
           <div>
             <h3 style={styles.sectionTitle}>{t("landing.footer.quickLinksTitle")}</h3>
             <div style={{ display: "grid", gap: 8 }}>
-              {quickLinks.map((l) => (
-                <ResourceLink key={l.label} label={l.label} href={l.href} />
-              ))}
+              {quickLinks.map((l) => <ResourceLink key={l.label} label={l.label} href={l.href} />)}
             </div>
           </div>
-
           <div>
             <h3 style={styles.sectionTitle}>{t("landing.footer.followTitle")}</h3>
             <div style={{ display: "grid", gap: 8 }}>
-              {socialLinks.map((l) => (
-                <ResourceLink key={l.label} label={l.label} href={l.href} />
-              ))}
+              {socialLinks.map((l) => <ResourceLink key={l.label} label={l.label} href={l.href} />)}
             </div>
           </div>
-
           <div>
             <h3 style={styles.sectionTitle}>{t("landing.footer.stayTitle")}</h3>
             <ul style={{ ...styles.checklist, margin: 0, lineHeight: 1.6 }}>
-              {whyStayPoints.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
+              {whyStayPoints.map((point) => <li key={point}>{point}</li>)}
             </ul>
           </div>
         </footer>
