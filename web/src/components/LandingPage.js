@@ -250,11 +250,9 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
     if (!fallbackItems.length) return null;
     return shuffleArray(fallbackItems)[0] || null;
   }, [reviewItems, sheetReview]);
-  const heroBadges = t("landing.heroBadges", { returnObjects: true });
   const howItWorksBenefits = t("landing.howItWorks.benefits", { returnObjects: true });
   const whyStayPoints = t("landing.footer.stayPoints", { returnObjects: true });
   const upcomingClassCards = useMemo(() => getUpcomingClassCards(), []);
-
 
   useEffect(() => {
     let mounted = true;
@@ -408,14 +406,6 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
               >
                 {t("landing.cta.getApp")}
               </a>
-            </div>
-
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 4 }}>
-              {heroBadges.map((badge) => (
-                <span key={badge} style={styles.badge}>
-                  {badge}
-                </span>
-              ))}
             </div>
           </div>
         </header>
