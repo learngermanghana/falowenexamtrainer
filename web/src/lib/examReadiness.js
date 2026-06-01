@@ -147,7 +147,7 @@ export const computeExamReadiness = ({
   const hasAttendanceEvidence = attendanceSessions !== null && attendanceSessions !== undefined;
   const attendanceScore = hasAttendanceEvidence
     ? clampScore((Number(attendanceSessions || 0) / attendanceTarget) * 100)
-    : 100;
+    : 0;
 
   const weakTaskCount = failed.length + missed.length;
   const retryCount = Number(retriesThisWeek || 0);
@@ -168,7 +168,7 @@ export const computeExamReadiness = ({
     : `${completedCount} assignments`;
   const attendanceDetail = hasAttendanceEvidence
     ? `${Number(attendanceSessions || 0)}/${attendanceTarget} sessions`
-    : t("examReadiness.attendanceNotAvailable", "attendance not loaded here");
+    : t("examReadiness.attendanceNotAvailable", "attendance not loaded yet");
 
   const breakdown = [
     {
