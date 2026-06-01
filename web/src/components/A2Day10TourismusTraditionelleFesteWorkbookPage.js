@@ -36,6 +36,24 @@ const questionCardStyle = {
   gap: 6,
 };
 
+const tabImageStyle = {
+  width: "100%",
+  borderRadius: 10,
+  maxHeight: 260,
+  objectFit: "cover",
+};
+
+const heroImageStyle = {
+  ...tabImageStyle,
+  maxHeight: 320,
+};
+
+const phraseGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: 12,
+};
+
 const videoPreviewStyle = {
   width: "100%",
   minHeight: 315,
@@ -216,6 +234,13 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
           4-part workbook: group speaking, writing, reading, and listening practice focused on tourism and traditional festivals.
         </p>
 
+        <img
+          src="https://images.unsplash.com/photo-1539650116574-75c0c6d73b49?auto=format&fit=crop&w=1600&q=80"
+          alt="Festive city square with visitors and traditional decorations"
+          loading="lazy"
+          style={heroImageStyle}
+        />
+
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {tabs.map((tab) => (
             <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>
@@ -235,7 +260,7 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1539650116574-75c0c6d73b49?auto=format&fit=crop&w=1600&q=80"
             alt="Festive city square with visitors and traditional decorations"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
           <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}>In this chapter, we&apos;ll engage in group exercises discussing these topics.</p>
@@ -298,6 +323,78 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             <li>Welche Feste gibt es in meinem Heimatland?</li>
             <li>Reist man lieber in Gruppen oder allein?</li>
           </ul>
+
+          <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Nutze diese einfache Struktur für starke Antworten: <strong>Einleitung → Hauptteil mit Verbindungswörtern →
+            Beispiel → Schluss</strong>. Sprich langsam und benutze kurze Sätze.
+          </p>
+
+          <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+            <strong>Mini-Struktur</strong>
+            <ol style={listSpacing}>
+              <li><strong>Einleitung:</strong> Sag das Thema und dein Fest oder deinen Ort.</li>
+              <li>
+                <strong>Hauptteil:</strong> Nenne zwei bis drei Punkte mit <strong>und</strong>, <strong>oder</strong>, {" "}
+                <strong>weil</strong> und <strong>deshalb</strong>.
+              </li>
+              <li><strong>Beispiel:</strong> Gib ein persönliches Beispiel aus deinem Land oder deiner Reise.</li>
+              <li><strong>Schluss:</strong> Sag kurz deine Meinung und bedanke dich.</li>
+            </ol>
+          </div>
+
+          <div style={phraseGridStyle}>
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Gute Einleitungen</strong>
+              <ul style={listSpacing}>
+                <li>„Heute spreche ich über …“</li>
+                <li>„Mein Thema ist …“</li>
+                <li>„Ich möchte über ein Fest in meinem Land sprechen.“</li>
+                <li>„Ich finde Tourismus interessant, weil …“</li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Verbindungswörter / Connectors</strong>
+              <ul style={listSpacing}>
+                <li><strong>und</strong>: „Es gibt Musik und gutes Essen.“</li>
+                <li><strong>oder</strong>: „Man kann tanzen oder spazieren gehen.“</li>
+                <li><strong>weil</strong>: „Viele Touristen kommen, weil das Fest bekannt ist.“</li>
+                <li><strong>deshalb</strong>: „Es ist sehr beliebt. Deshalb kommen viele Besucher.“</li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Eigene Meinung ausdrücken</strong>
+              <ul style={listSpacing}>
+                <li>„Ich finde … schön/interessant/wichtig.“</li>
+                <li>„Meiner Meinung nach ist … gut.“</li>
+                <li>„Für mich ist … wichtig, weil …“</li>
+                <li>„Ich mag …, weil …“</li>
+              </ul>
+            </div>
+
+            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+              <strong>Gute Schlüsse</strong>
+              <ul style={listSpacing}>
+                <li>„Zum Schluss möchte ich sagen: …“</li>
+                <li>„Zusammenfassend finde ich …“</li>
+                <li>„Dieses Fest ist wichtig, weil …“</li>
+                <li>„Danke fürs Zuhören.“</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style={{ ...questionCardStyle, background: "#fff7ed" }}>
+            <strong>Beispielantwort (30–45 Sekunden)</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              „Heute spreche ich über Weihnachten in Deutschland. Viele Touristen besuchen Weihnachtsmärkte, weil die Atmosphäre
+              schön ist. Es gibt Lichter, Musik und viele kleine Stände. Man kann Geschenke kaufen oder etwas Warmes trinken.
+              Ich finde dieses Fest sehr gemütlich, weil Familie und Freunde zusammenkommen. In meinem Land gibt es auch schöne
+              Feste, und die Menschen feiern oft mit Essen und Musik. Zum Schluss möchte ich sagen: Traditionelle Feste sind
+              wichtig, weil sie Kultur zeigen. Danke fürs Zuhören.“
+            </p>
+          </div>
 
           <h3 style={sectionTitle}>Group Discussion</h3>
           <p style={{ margin: 0 }}>Welche Feste gibt es in deinem Land und welche Orte besuchen Touristen gern?</p>
@@ -378,7 +475,7 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=1600&q=80"
             alt="Learner writing an invitation letter for a festival"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
           <h2 style={sectionTitle}>Teil 2 (Schreiben) · Assignment</h2>
           <p style={{ margin: 0, lineHeight: 1.7 }}><strong>Informelle Brief Aufgabe:</strong></p>
@@ -417,7 +514,7 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?auto=format&fit=crop&w=1600&q=80"
             alt="Open constitution book and notes for reading comprehension"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
           <h2 style={sectionTitle}>Teil 3 (Lesen)</h2>
           <p style={{ margin: 0 }}>
@@ -495,7 +592,7 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             src="https://images.unsplash.com/photo-1485579149621-3123dd979885?auto=format&fit=crop&w=1600&q=80"
             alt="Traditional Oktoberfest scene for listening exercise"
             loading="lazy"
-            style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }}
+            style={tabImageStyle}
           />
           <h2 style={sectionTitle}>Teil 4 (Hören) · Exercise</h2>
           <p style={{ margin: 0 }}>
