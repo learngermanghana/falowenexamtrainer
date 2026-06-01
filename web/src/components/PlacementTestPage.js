@@ -2,185 +2,171 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { updatePageMeta } from "../lib/pageMeta";
-import { leadLevelOptions, leadModeOptions, leadStartOptions } from "../lib/leadCapture";
-import { captureLead, getLatestLead } from "../services/leadCaptureService";
 
-const PLACEMENT_STORAGE_KEY = "falowen.placementTest.progress.v1";
+const PLACEMENT_STORAGE_KEY = "falowen.placementTest.progress.v2";
 const ANSWER_REVIEW_DELAY_MS = 30 * 60 * 1000;
+const CLASS_BROCHURE_URL = "/classes/";
 
 const placementTest = {
-  title: "Placement check (paraphrased exam-style tasks)",
+  title: "Free German placement test",
   subtitle:
-    "Not sure about your level yet? Answer the questions below. Once you finish, you will see the answer key and a suggested level.",
+    "Not sure about your level yet? Start from A1 basics and continue through A2, B1, and B2 tasks. When you finish, Falowen will suggest the best class level for you.",
   sections: [
     {
-      id: "ticket",
-      title: "Kurztext: 29-Euro-Ticket",
-      weight: 1,
+      id: "a1-basics",
+      level: "A1",
+      title: "A1 basics: greetings, numbers and simple grammar",
+      description: "These questions check if you can handle beginner German structures.",
+      questions: [
+        {
+          id: "a1-1",
+          text: "Which sentence is correct?",
+          options: ["Ich heißen Ama.", "Ich heiße Ama.", "Ich heißt Ama."],
+          correct: "Ich heiße Ama.",
+        },
+        {
+          id: "a1-2",
+          text: "Choose the correct answer: Wie alt bist du?",
+          options: ["Ich bin 20 Jahre alt.", "Ich habe 20 Jahre.", "Ich ist 20 Jahre alt."],
+          correct: "Ich bin 20 Jahre alt.",
+        },
+        {
+          id: "a1-3",
+          text: "Which article is correct? ___ Tisch ist neu.",
+          options: ["Der", "Die", "Das"],
+          correct: "Der",
+        },
+        {
+          id: "a1-4",
+          text: "Which sentence uses the verb in the correct position?",
+          options: ["Ich gern lerne Deutsch.", "Ich lerne gern Deutsch.", "Ich Deutsch gern lerne."],
+          correct: "Ich lerne gern Deutsch.",
+        },
+        {
+          id: "a1-5",
+          text: "What is the correct question?",
+          options: ["Woher du kommst?", "Woher kommst du?", "Woher du kommen?"],
+          correct: "Woher kommst du?",
+        },
+      ],
+    },
+    {
+      id: "a2-everyday",
+      level: "A2",
+      title: "A2: everyday situations and Perfekt",
+      description: "These questions check if you can understand simple everyday situations and past events.",
       passage: [
-        "Mit dem neuen 29-Euro-Ticket können Fahrgäste mit Bussen, Straßenbahnen und Regionalzügen in ganz Deutschland fahren.",
-        "Das Ticket gilt von Anfang Oktober bis Ende Dezember. Es ist für beliebig viele Fahrten im Nahverkehr gültig.",
+        "Mara war am Samstag in der Stadt. Zuerst hat sie im Supermarkt eingekauft. Danach ist sie mit ihrer Freundin ins Café gegangen. Am Abend hat sie zu Hause gekocht.",
       ],
       questions: [
         {
-          id: "pt1",
-          number: 1,
-          text: "Wo dürfen Sie mit dem Ticket unterwegs sein?",
-          options: ["In Deutschland und im Ausland.", "Nur in Deutschland.", "Nur in der näheren Umgebung."],
-          correct: "Nur in Deutschland.",
+          id: "a2-1",
+          text: "Was hat Mara zuerst gemacht?",
+          options: ["Sie ist ins Café gegangen.", "Sie hat eingekauft.", "Sie hat gekocht."],
+          correct: "Sie hat eingekauft.",
         },
         {
-          id: "pt2",
-          number: 2,
-          text: "Bis wann gilt das Ticket?",
-          options: ["Bis Mitte November.", "Bis Mitte Dezember.", "Bis Ende Dezember."],
-          correct: "Bis Ende Dezember.",
+          id: "a2-2",
+          text: "Choose the correct Perfekt sentence.",
+          options: ["Ich habe gestern gelernt.", "Ich bin gestern gelernt.", "Ich habe gestern lernen."],
+          correct: "Ich habe gestern gelernt.",
         },
         {
-          id: "pt3",
-          number: 3,
-          text: "Die 29 Euro zahlt man für …",
+          id: "a2-3",
+          text: "Which sentence is polite?",
+          options: ["Gib mir Wasser!", "Könnten Sie mir bitte Wasser geben?", "Du Wasser geben."],
+          correct: "Könnten Sie mir bitte Wasser geben?",
+        },
+        {
+          id: "a2-4",
+          text: "Complete: Ich gehe zum Arzt, ___ ich krank bin.",
+          options: ["weil", "aber", "oder"],
+          correct: "weil",
+        },
+      ],
+    },
+    {
+      id: "b1-reading-opinion",
+      level: "B1",
+      title: "B1: reading opinions and sentence connection",
+      description: "These questions check if you can understand opinions and connect ideas clearly.",
+      passage: [
+        "Viele Jugendliche benutzen ihr Handy auch in der Schule. Einige Lehrer finden das problematisch, weil die Schüler sich nicht konzentrieren. Andere sagen, dass Handys beim Lernen helfen können, wenn man sie richtig benutzt.",
+      ],
+      questions: [
+        {
+          id: "b1-1",
+          text: "Why do some teachers think phones are problematic?",
+          options: ["Because students may not concentrate.", "Because phones are too expensive.", "Because schools have no internet."],
+          correct: "Because students may not concentrate.",
+        },
+        {
+          id: "b1-2",
+          text: "Which sentence is correct?",
           options: [
-            "eine einfache Hin- und Rückfahrt.",
-            "eine Fahrt in der zweiten Klasse.",
-            "beliebig viele Fahrten an einem Tag.",
+            "Ich denke, dass Deutsch wichtig ist.",
+            "Ich denke, dass Deutsch ist wichtig.",
+            "Ich denke, Deutsch dass wichtig ist.",
           ],
-          correct: "beliebig viele Fahrten an einem Tag.",
+          correct: "Ich denke, dass Deutsch wichtig ist.",
+        },
+        {
+          id: "b1-3",
+          text: "Choose the best connector: Ich möchte in Deutschland arbeiten, ___ lerne ich jeden Tag Deutsch.",
+          options: ["deshalb", "trotzdem", "obwohl"],
+          correct: "deshalb",
+        },
+        {
+          id: "b1-4",
+          text: "Which sentence gives an opinion with a reason?",
+          options: [
+            "Ich finde Online-Unterricht praktisch, weil man von zu Hause lernen kann.",
+            "Online-Unterricht und zu Hause.",
+            "Ich finde Online-Unterricht, aber lernen.",
+          ],
+          correct: "Ich finde Online-Unterricht praktisch, weil man von zu Hause lernen kann.",
         },
       ],
     },
     {
-      id: "store",
-      title: "Kaufhaus-Übersicht",
-      weight: 1,
+      id: "b2-advanced",
+      level: "B2",
+      title: "B2: argumentation and advanced vocabulary",
+      description: "These questions check if you can follow more abstract ideas and choose precise language.",
       passage: [
-        "3. Stock: Smartphones, TV, Computer, Drucker, Spiele, Sport- und Arbeitskleidung.",
-        "2. Stock: Herrenmode, Wäsche, Möbel für Wohnzimmer/Bad/Küche, Teppiche, Lampen, Deko.",
-        "1. Stock: Damen- und Kindermode, Schuhe, Haushaltswaren, Töpfe und Pfannen.",
-        "EG: Information, Uhren, Schmuck, Parfüm, Kosmetik, Schreibwaren, Karten, Souvenirs.",
-        "UG: Bäckerei, Supermarkt, Reinigungsmittel, Fotoservice, Zeitungen, Reisebüro, Geldautomat.",
+        "Digitale Lernangebote eröffnen vielen Menschen neue Chancen, weil sie unabhängig von Ort und Zeit genutzt werden können. Trotzdem ersetzen sie nicht immer den persönlichen Kontakt, der besonders beim Sprachenlernen wichtig bleibt.",
       ],
       questions: [
         {
-          id: "pt7",
-          number: 7,
-          text: "Sie möchten Urlaubsfotos ausdrucken lassen. Wohin gehen Sie?",
-          options: ["3. Stock", "UG", "anderer Stock"],
-          correct: "UG",
+          id: "b2-1",
+          text: "What is the main idea of the text?",
+          options: [
+            "Digital learning creates flexibility but does not always replace personal contact.",
+            "Digital learning is always better than classroom learning.",
+            "Language learning is impossible online.",
+          ],
+          correct: "Digital learning creates flexibility but does not always replace personal contact.",
         },
         {
-          id: "pt8",
-          number: 8,
-          text: "Sie suchen eine Hose zum Joggen. Wohin gehen Sie?",
-          options: ["3. Stock", "2. Stock", "anderer Stock"],
-          correct: "3. Stock",
-        },
-      ],
-    },
-    {
-      id: "ads",
-      title: "Welche Anzeige passt?",
-      weight: 1.2,
-      passage: [
-        "A: Schweizer Autoren – leicht gelesen. Vereinfachte Literaturtexte für Deutschlernende.",
-        "B: Deutsch-Training online. Zehn kostenlose Lektionen, Grammatik-Erklärungen, alle Übungen im Internet.",
-        "C: Deutsch erLesen. Monatsmagazin mit aktuellen Artikeln aus der deutschen Presse für Leser im In- und Ausland.",
-        "D: Verlag sucht Lektorin/Lektor für neue Romane und Gedichtbände.",
-      ],
-      questions: [
-        {
-          id: "pt11",
-          number: 11,
-          text: "Mirjeta hat keine Zeit für einen Kurs, möchte sich aber regelmäßig über Neuigkeiten aus Deutschland informieren.",
-          options: ["A", "B", "C", "D"],
-          correct: "C",
-        },
-      ],
-    },
-    {
-      id: "phones",
-      title: "Meinungen zu Handyverboten in der Schule",
-      weight: 1.2,
-      passage: [
-        "Corinne (37): Handys sind oft nur zum Angeben. In der Schule sollten Kinder sich auf den Unterricht konzentrieren.",
-        "Rüdiger (47): Ich musste lange auf meine Tochter warten, weil sie ihr Handy nicht einschalten durfte. Das geht so nicht.",
-        "Max (15): Wir gehen zur Schule, um zu lernen. Aber wenn man Handys verbietet, lernt man keinen vernünftigen Umgang.",
-      ],
-      questions: [
-        {
-          id: "pt12",
-          number: 12,
-          text: "Corinne ist für ein Handyverbot.",
-          options: ["Ja", "Nein"],
-          correct: "Ja",
-        },
-        {
-          id: "pt13",
-          number: 13,
-          text: "Rüdiger ist für ein Handyverbot.",
-          options: ["Ja", "Nein"],
-          correct: "Nein",
-        },
-        {
-          id: "pt14",
-          number: 14,
-          text: "Max ist für ein Handyverbot.",
-          options: ["Ja", "Nein"],
-          correct: "Nein",
-        },
-      ],
-    },
-    {
-      id: "murten",
-      title: "Zeitreise per Velo",
-      weight: 1.4,
-      passage: [
-        "Mit der Radtour „Zeitreise per Velo“ entdecken Besucherinnen und Besucher Murten aktiv.",
-        "Treffpunkt ist der Bahnhof. Wer möchte, bringt das eigene Fahrrad mit oder leiht eines dort aus.",
-        "Für alle, die es entspannter mögen, gibt es auch E-Bikes zum Mieten.",
-      ],
-      questions: [
-        {
-          id: "pt15",
-          number: 15,
-          text: "Für die Rundfahrt …",
-          options: ["braucht man ein eigenes Velo.", "muss man nicht sportlich sein.", "sollte man mit der Bahn anreisen."],
-          correct: "muss man nicht sportlich sein.",
-        },
-      ],
-    },
-    {
-      id: "digital",
-      title: "Digitales Lernen",
-      weight: 1.8,
-      passage: [
-        "DIGITALES LERNEN – UNABHÄNGIG VON ZEIT UND ORT",
-        "Alles online: Internetfähige Geräte werden beim E-Learning eingesetzt. In der Praxis (21) das,",
-        "dass Teilnehmende von zu Hause oder unterwegs lernen können.",
-        "Online-Lernen (22) immer mehr Möglichkeiten und Freiheiten.",
-        "Grundkenntnisse sind (23), doch auch Einsteiger werden zu Kursbeginn von Tutor*innen begleitet.",
-      ],
-      questions: [
-        {
-          id: "pt21",
-          number: 21,
-          text: "In der Praxis (21) das,",
-          options: ["verheißt", "bedeutet", "befindet", "vermittelt"],
-          correct: "bedeutet",
-        },
-        {
-          id: "pt22",
-          number: 22,
-          text: "Online-Lernen (22) immer mehr Möglichkeiten und Freiheiten.",
-          options: ["macht auf", "öffnet", "eröffnet", "beginnt"],
+          id: "b2-2",
+          text: "Choose the best word: Online-Lernen ___ vielen Menschen neue Möglichkeiten.",
+          options: ["eröffnet", "beginnt", "befindet", "verpasst"],
           correct: "eröffnet",
         },
         {
-          id: "pt23",
-          number: 23,
-          text: "Grundkenntnisse sind (23),",
-          options: ["im Vorteil", "von Vorteil", "eine Bedeutung", "von Sinnen"],
-          correct: "von Vorteil",
+          id: "b2-3",
+          text: "Which sentence is more B2-like?",
+          options: [
+            "Einerseits ist Online-Lernen flexibel, andererseits fehlt manchmal der direkte Austausch.",
+            "Online gut, Schule auch gut.",
+            "Ich mag Online, weil ja."],
+          correct: "Einerseits ist Online-Lernen flexibel, andererseits fehlt manchmal der direkte Austausch.",
+        },
+        {
+          id: "b2-4",
+          text: "Choose the correct meaning of trotzdem in this context.",
+          options: ["nevertheless", "because", "before"],
+          correct: "nevertheless",
         },
       ],
     },
@@ -194,23 +180,46 @@ const flattenPlacementQuestions = (sections) => {
       ...question,
       number: runningNumber++,
       sectionId: section.id,
-      weight: section.weight || 1,
+      level: section.level,
     }))
   );
 };
 
-const getPlacementLevel = (weightedRatio) => {
-  if (weightedRatio >= 0.9) return "C1";
-  if (weightedRatio >= 0.76) return "B2";
-  if (weightedRatio >= 0.6) return "B1";
-  if (weightedRatio >= 0.42) return "A2";
-  return "A1";
+const buildLevelStats = (sections, answers) =>
+  sections.reduce((acc, section) => {
+    const correctCount = section.questions.filter((question) => answers[question.id] === question.correct).length;
+    const total = section.questions.length;
+    return {
+      ...acc,
+      [section.level]: {
+        correct: correctCount,
+        total,
+        ratio: total ? correctCount / total : 0,
+      },
+    };
+  }, {});
+
+const getPlacementLevel = (levelStats) => {
+  const a1 = levelStats.A1?.ratio || 0;
+  const a2 = levelStats.A2?.ratio || 0;
+  const b1 = levelStats.B1?.ratio || 0;
+  const b2 = levelStats.B2?.ratio || 0;
+
+  if (a1 < 0.6) return "A1";
+  if (a2 < 0.55) return "A1";
+  if (b1 < 0.55) return "A2";
+  if (b2 < 0.55) return "B1";
+  return "B2";
 };
 
-const getPlacementRecommendationRoute = (level) => {
-  if (["B2", "C1"].includes(level)) return "/exams/overview";
-  if (level === "B1") return "/campus/course";
-  return "/signup";
+const getLevelFeedback = (level) => {
+  const feedback = {
+    A1: "Start with A1. Build greetings, basic sentences, articles, numbers, questions, and daily vocabulary.",
+    A2: "A2 is a good fit. You already understand some basics, but you should strengthen everyday conversations, Perfekt, cases, and short messages.",
+    B1: "B1 is a good fit. You can handle basic and A2 tasks, so focus on opinions, reasons, longer texts, letters, and speaking structure.",
+    B2: "B2 is a good fit. You can handle stronger grammar and abstract texts. Focus on argumentation, advanced vocabulary, and exam-style writing/speaking.",
+  };
+  return feedback[level] || feedback.A1;
 };
 
 const getPlacementProgress = () => {
@@ -241,92 +250,51 @@ const trackPlacementEvent = (event, payload = {}) => {
   }
 };
 
+const LevelScoreCard = ({ level, stat }) => {
+  const correct = stat?.correct || 0;
+  const total = stat?.total || 0;
+  const percent = total ? Math.round((correct / total) * 100) : 0;
+  return (
+    <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 10, background: "#ffffff" }}>
+      <strong>{level}</strong>
+      <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+        {correct}/{total} correct · {percent}%
+      </p>
+    </div>
+  );
+};
+
 const PlacementTestPage = () => {
   const { t, i18n } = useTranslation();
   const placementQuestions = useMemo(() => flattenPlacementQuestions(placementTest.sections), []);
   const initialProgress = useMemo(() => {
     const saved = getPlacementProgress();
-    const latestLead = getLatestLead();
-    const leadContact = latestLead
-      ? {
-          name: latestLead.name || "",
-          phone: latestLead.phone || "",
-          email: latestLead.email || "",
-          levelInterest: latestLead.levelInterest || "",
-          preferredMode: latestLead.preferredMode || "",
-          startTimeline: latestLead.startTimeline || "",
-          submittedAt: latestLead.capturedAt || null,
-        }
-      : null;
     return {
       answers: saved?.answers || {},
       startedAt: saved?.startedAt || null,
       completedAt: saved?.completedAt || null,
       reviewUnlocked: Boolean(saved?.reviewUnlocked),
-      contact: {
-        name: saved?.contact?.name || leadContact?.name || "",
-        phone: saved?.contact?.phone || leadContact?.phone || "",
-        email: saved?.contact?.email || leadContact?.email || "",
-        levelInterest: saved?.contact?.levelInterest || leadContact?.levelInterest || "",
-        preferredMode: saved?.contact?.preferredMode || leadContact?.preferredMode || "",
-        startTimeline: saved?.contact?.startTimeline || leadContact?.startTimeline || "",
-        submittedAt: saved?.contact?.submittedAt || leadContact?.submittedAt || null,
-      },
     };
   }, []);
+
   const [placementAnswers, setPlacementAnswers] = useState(initialProgress.answers);
   const [startedAt, setStartedAt] = useState(initialProgress.startedAt);
   const [completedAt, setCompletedAt] = useState(initialProgress.completedAt);
   const [reviewUnlocked, setReviewUnlocked] = useState(initialProgress.reviewUnlocked);
-  const [contactName, setContactName] = useState(initialProgress.contact.name);
-  const [contactPhone, setContactPhone] = useState(initialProgress.contact.phone);
-  const [contactEmail, setContactEmail] = useState(initialProgress.contact.email);
-  const [contactLevelInterest, setContactLevelInterest] = useState(initialProgress.contact.levelInterest);
-  const [contactPreferredMode, setContactPreferredMode] = useState(initialProgress.contact.preferredMode);
-  const [contactStartTimeline, setContactStartTimeline] = useState(initialProgress.contact.startTimeline);
-  const [contactSubmittedAt, setContactSubmittedAt] = useState(initialProgress.contact.submittedAt);
   const startTrackedRef = useRef(Boolean(initialProgress.startedAt));
   const completionTrackedRef = useRef(Boolean(initialProgress.completedAt));
-  const contactTrackedRef = useRef(Boolean(initialProgress.contact.submittedAt));
 
   const placementAnsweredCount = Object.keys(placementAnswers).length;
-  const placementComplete =
-    placementAnsweredCount === placementQuestions.length && placementQuestions.length > 0;
-  const weightedTotal = placementQuestions.reduce((sum, question) => sum + question.weight, 0);
-  const weightedScore = placementQuestions.reduce(
-    (sum, question) =>
-      placementAnswers[question.id] === question.correct ? sum + question.weight : sum,
-    0
-  );
-  const weightedRatio = weightedTotal > 0 ? weightedScore / weightedTotal : 0;
-  const placementLevel = getPlacementLevel(weightedRatio);
+  const placementComplete = placementAnsweredCount === placementQuestions.length && placementQuestions.length > 0;
+  const levelStats = useMemo(() => buildLevelStats(placementTest.sections, placementAnswers), [placementAnswers]);
+  const totalCorrect = Object.values(levelStats).reduce((sum, stat) => sum + (stat.correct || 0), 0);
+  const totalQuestions = placementQuestions.length;
+  const placementLevel = getPlacementLevel(levelStats);
   const canRevealAnswerKey = reviewUnlocked || (completedAt && Date.now() - completedAt >= ANSWER_REVIEW_DELAY_MS);
-  const placementRecommendationRoute = getPlacementRecommendationRoute(placementLevel);
 
   useEffect(() => {
     const pageTitle = t("placementPage.meta.title", { defaultValue: placementTest.title });
     const pageDescription = t("placementPage.meta.description", { defaultValue: placementTest.subtitle });
-
-    const articleSchema = {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      headline: pageTitle,
-      description: pageDescription,
-      author: {
-        "@type": "Organization",
-        name: "Falowen",
-      },
-      publisher: {
-        "@type": "Organization",
-        name: "Falowen",
-        logo: {
-          "@type": "ImageObject",
-          url: "https://www.falowen.app/logo512.png",
-        },
-      },
-      mainEntityOfPage: "https://www.falowen.app/placement-test",
-      dateModified: new Date().toISOString(),
-    };
 
     updatePageMeta({
       title: pageTitle,
@@ -334,39 +302,31 @@ const PlacementTestPage = () => {
       lang: i18n.language,
       canonicalPath: "/placement-test",
       ogType: "article",
-      structuredData: [{ id: "article", schema: articleSchema }],
+      structuredData: [
+        {
+          id: "article",
+          schema: {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: pageTitle,
+            description: pageDescription,
+            author: { "@type": "Organization", name: "Falowen" },
+            publisher: {
+              "@type": "Organization",
+              name: "Falowen",
+              logo: { "@type": "ImageObject", url: "https://www.falowen.app/logo512.png" },
+            },
+            mainEntityOfPage: "https://www.falowen.app/placement-test",
+            dateModified: new Date().toISOString(),
+          },
+        },
+      ],
     });
   }, [i18n.language, t]);
 
   useEffect(() => {
-    savePlacementProgress({
-      answers: placementAnswers,
-      startedAt,
-      completedAt,
-      reviewUnlocked,
-      contact: {
-        name: contactName,
-        phone: contactPhone,
-        email: contactEmail,
-        levelInterest: contactLevelInterest,
-        preferredMode: contactPreferredMode,
-        startTimeline: contactStartTimeline,
-        submittedAt: contactSubmittedAt,
-      },
-    });
-  }, [
-    placementAnswers,
-    startedAt,
-    completedAt,
-    reviewUnlocked,
-    contactName,
-    contactPhone,
-    contactEmail,
-    contactLevelInterest,
-    contactPreferredMode,
-    contactStartTimeline,
-    contactSubmittedAt,
-  ]);
+    savePlacementProgress({ answers: placementAnswers, startedAt, completedAt, reviewUnlocked });
+  }, [placementAnswers, startedAt, completedAt, reviewUnlocked]);
 
   useEffect(() => {
     if (placementAnsweredCount > 0 && !startTrackedRef.current) {
@@ -383,63 +343,17 @@ const PlacementTestPage = () => {
       completionTrackedRef.current = true;
       setCompletedAt(completionTime);
       trackPlacementEvent("complete", {
-        score: Number(weightedScore.toFixed(2)),
-        totalWeight: Number(weightedTotal.toFixed(2)),
-        ratio: Number(weightedRatio.toFixed(4)),
+        correct: totalCorrect,
+        total: totalQuestions,
+        level: placementLevel,
       });
       trackPlacementEvent("level_assigned", { level: placementLevel });
     }
-  }, [placementComplete, placementLevel, weightedRatio, weightedScore, weightedTotal]);
+  }, [placementComplete, placementLevel, totalCorrect, totalQuestions]);
 
   const handlePlacementAnswer = (questionId, option) => {
     setPlacementAnswers((prev) => ({ ...prev, [questionId]: option }));
     trackPlacementEvent("answer", { questionId, selectedOption: option });
-  };
-
-  const handleContactSubmit = (event) => {
-    event.preventDefault();
-    const trimmedName = contactName.trim();
-    const trimmedPhone = contactPhone.trim();
-    const trimmedEmail = contactEmail.trim();
-
-    if (
-      !trimmedName ||
-      !trimmedPhone ||
-      !trimmedEmail ||
-      !contactLevelInterest ||
-      !contactPreferredMode ||
-      !contactStartTimeline
-    ) {
-      return;
-    }
-
-    setContactName(trimmedName);
-    setContactPhone(trimmedPhone);
-    setContactEmail(trimmedEmail);
-    const leadEntry = captureLead({
-      name: trimmedName,
-      phone: trimmedPhone,
-      email: trimmedEmail,
-      levelInterest: contactLevelInterest,
-      preferredMode: contactPreferredMode,
-      startTimeline: contactStartTimeline,
-      source: "placement_test",
-      cta: "Placement test form",
-    });
-    const submittedAt = leadEntry?.capturedAt || Date.now();
-    setContactSubmittedAt(submittedAt);
-    if (!contactTrackedRef.current) {
-      contactTrackedRef.current = true;
-    }
-    trackPlacementEvent("lead_capture", {
-      name: trimmedName,
-      phone: trimmedPhone,
-      email: trimmedEmail,
-      levelInterest: contactLevelInterest,
-      preferredMode: contactPreferredMode,
-      startTimeline: contactStartTimeline,
-      submittedAt,
-    });
   };
 
   const handleUnlockAnswerReview = () => {
@@ -447,7 +361,15 @@ const PlacementTestPage = () => {
     trackPlacementEvent("review_unlock", {});
   };
 
-  const getLevelFeedback = (level) => t(`placementPage.feedback.${level}`, { defaultValue: "" });
+  const handleReset = () => {
+    setPlacementAnswers({});
+    setStartedAt(null);
+    setCompletedAt(null);
+    setReviewUnlocked(false);
+    startTrackedRef.current = false;
+    completionTrackedRef.current = false;
+    savePlacementProgress({ answers: {}, startedAt: null, completedAt: null, reviewUnlocked: false });
+  };
 
   const renderPlacementOptionButton = (question, option) => {
     const selected = placementAnswers[question.id] === option;
@@ -491,189 +413,93 @@ const PlacementTestPage = () => {
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <section style={{ ...styles.card, display: "grid", gap: 12 }}>
         <div style={{ display: "grid", gap: 6 }}>
-          <p style={{ ...styles.helperText, margin: 0 }}>{t("placementPage.badge")}</p>
-          <h1 style={{ ...styles.sectionTitle, margin: 0 }}>{t("placementPage.title", { defaultValue: placementTest.title })}</h1>
-          <p style={{ ...styles.helperText, margin: 0 }}>{t("placementPage.subtitle", { defaultValue: placementTest.subtitle })}</p>
+          <p style={{ ...styles.helperText, margin: 0 }}>Free placement test</p>
+          <h1 style={{ ...styles.sectionTitle, margin: 0 }}>{placementTest.title}</h1>
+          <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{placementTest.subtitle}</p>
         </div>
-        <div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
           <a href="/" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-            {t("placementPage.backHome")}
+            Back home
           </a>
+          <a href={CLASS_BROCHURE_URL} style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+            View classes
+          </a>
+          {placementAnsweredCount ? (
+            <button type="button" style={styles.secondaryButton} onClick={handleReset}>
+              Start again
+            </button>
+          ) : null}
         </div>
       </section>
 
       <section style={{ ...styles.card, display: "grid", gap: 10, background: "#eff6ff", border: "1px solid #bfdbfe" }}>
-        <h2 style={{ margin: 0, fontSize: 20 }}>Next steps after this assessment</h2>
-        <p style={{ margin: 0, color: "#4b5563", fontSize: 14 }}>
-          Move from this assessment to practice tools, then reinforce with study guides from the Falowen blog.
-        </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <a href="/exams/overview" style={{ ...styles.secondaryButton, textDecoration: "none" }}>Open exam tools</a>
-          <a href="/learn-german-ghana" style={{ ...styles.secondaryButton, textDecoration: "none" }}>View learning service</a>
-          <a href="https://blog.falowen.app" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
-            Read blog guides
-          </a>
-        </div>
+        <h2 style={{ margin: 0, fontSize: 20 }}>How this test works</h2>
+        <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.6 }}>
+          <li>Start with simple A1 questions.</li>
+          <li>Continue to A2, B1, and B2 questions.</li>
+          <li>Your suggested level is based on how far you perform strongly.</li>
+          <li>No student data is collected here. After the result, choose a class and submit your details on the classes page.</li>
+        </ul>
       </section>
 
       <section style={{ ...styles.card, display: "grid", gap: 16 }}>
-        <div style={{ display: "grid", gap: 16 }}>
-          <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 12 }}>
+        {placementTest.sections.map((section) => (
+          <div key={section.id} style={{ display: "grid", gap: 12 }}>
             <div>
-              <h3 style={{ margin: 0 }}>{t("placementPage.leadHeading", { defaultValue: "Tell us about you" })}</h3>
-              <p style={{ margin: "6px 0 0", color: "#4b5563", fontSize: 14 }}>
-                {t("placementPage.leadSubtitle", { defaultValue: "Share your details so we can follow up with the right next step." })}
-              </p>
+              <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>{section.level}</span>
+              <h3 style={{ margin: "8px 0 4px", fontSize: 18 }}>{section.title}</h3>
+              <p style={{ ...styles.helperText, margin: 0 }}>{section.description}</p>
             </div>
-            <form onSubmit={handleContactSubmit} style={{ display: "grid", gap: 10 }}>
-              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-                <span>{t("placementPage.leadNameLabel", { defaultValue: "Full name" })}</span>
-                <input
-                  type="text"
-                  value={contactName}
-                  onChange={(event) => setContactName(event.target.value)}
-                  placeholder={t("placementPage.leadNamePlaceholder", { defaultValue: "e.g. Alex Schmidt" })}
-                  autoComplete="name"
-                  required
-                  style={{ ...styles.input, borderColor: "#d1d5db" }}
-                />
-              </label>
-              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-                <span>{t("placementPage.leadPhoneLabel", { defaultValue: "Phone number" })}</span>
-                <input
-                  type="tel"
-                  value={contactPhone}
-                  onChange={(event) => setContactPhone(event.target.value)}
-                  placeholder={t("placementPage.leadPhonePlaceholder", { defaultValue: "+233 20 123 4567" })}
-                  autoComplete="tel"
-                  required
-                  style={{ ...styles.input, borderColor: "#d1d5db" }}
-                />
-              </label>
-              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-                <span>{t("placementPage.leadEmailLabel", { defaultValue: "Email address" })}</span>
-                <input
-                  type="email"
-                  value={contactEmail}
-                  onChange={(event) => setContactEmail(event.target.value)}
-                  placeholder={t("placementPage.leadEmailPlaceholder", { defaultValue: "you@example.com" })}
-                  autoComplete="email"
-                  required
-                  style={{ ...styles.input, borderColor: "#d1d5db" }}
-                />
-              </label>
-              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-                <span>{t("placementPage.leadLevelLabel", { defaultValue: "Level of interest" })}</span>
-                <select
-                  value={contactLevelInterest}
-                  onChange={(event) => setContactLevelInterest(event.target.value)}
-                  required
-                  style={{ ...styles.input, borderColor: "#d1d5db" }}
-                >
-                  <option value="">{t("placementPage.leadLevelPlaceholder", { defaultValue: "Select a level" })}</option>
-                  {leadLevelOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-                <span>{t("placementPage.leadModeLabel", { defaultValue: "Preferred mode" })}</span>
-                <select
-                  value={contactPreferredMode}
-                  onChange={(event) => setContactPreferredMode(event.target.value)}
-                  required
-                  style={{ ...styles.input, borderColor: "#d1d5db" }}
-                >
-                  <option value="">{t("placementPage.leadModePlaceholder", { defaultValue: "Select a mode" })}</option>
-                  {leadModeOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label style={{ display: "grid", gap: 6, fontSize: 14 }}>
-                <span>{t("placementPage.leadStartLabel", { defaultValue: "Preferred start" })}</span>
-                <select
-                  value={contactStartTimeline}
-                  onChange={(event) => setContactStartTimeline(event.target.value)}
-                  required
-                  style={{ ...styles.input, borderColor: "#d1d5db" }}
-                >
-                  <option value="">
-                    {t("placementPage.leadStartPlaceholder", { defaultValue: "Select a timeframe" })}
-                  </option>
-                  {leadStartOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                <button type="submit" style={styles.buttonPrimary}>
-                  {t("placementPage.leadSubmit", { defaultValue: "Save info" })}
-                </button>
-                {contactSubmittedAt ? (
-                  <span style={{ fontSize: 13, color: "#16a34a" }}>
-                    {t("placementPage.leadSaved", { defaultValue: "Saved — thanks!" })}
-                  </span>
-                ) : null}
-              </div>
-            </form>
-          </div>
-          {placementTest.sections.map((section) => (
-            <div key={section.id} style={{ display: "grid", gap: 12 }}>
-              <h3 style={{ margin: 0, fontSize: 18 }}>{section.title}</h3>
-              <div style={{ display: "grid", gap: 6, color: "#374151", fontSize: 14 }}>
-                {section.passage.map((line, idx) => (
-                  <p key={`${section.id}-line-${idx}`} style={{ margin: 0 }}>
-                    {line}
+            {Array.isArray(section.passage) && section.passage.length ? (
+              <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 6 }}>
+                {section.passage.map((paragraph) => (
+                  <p key={paragraph} style={{ margin: 0, color: "#374151", lineHeight: 1.6 }}>
+                    {paragraph}
                   </p>
                 ))}
               </div>
-              <div style={{ display: "grid", gap: 12 }}>
-                {section.questions.map((question) => (
-                  <fieldset key={question.id} style={{ display: "grid", gap: 8, border: "none", margin: 0, padding: 0 }}>
-                    <legend style={{ fontWeight: 600, padding: 0 }}>
-                      {question.number}. {question.text}
-                    </legend>
-                    <div role="radiogroup" aria-label={`${question.number}. ${question.text}`} style={{ display: "grid", gap: 8 }}>
-                      {question.options.map((option) => renderPlacementOptionButton(question, option))}
-                    </div>
-                  </fieldset>
-                ))}
-              </div>
+            ) : null}
+            <div style={{ display: "grid", gap: 12 }}>
+              {section.questions.map((question) => (
+                <div key={question.id} style={{ display: "grid", gap: 8 }}>
+                  <p style={{ margin: 0, fontWeight: 700 }}>
+                    {question.number}. {question.text}
+                  </p>
+                  <div role="radiogroup" aria-label={`Question ${question.number}`} style={{ display: "grid", gap: 8 }}>
+                    {question.options.map((option) => renderPlacementOptionButton(question, option))}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+
         <div style={{ display: "grid", gap: 8 }}>
           <div style={{ fontSize: 14, color: "#4b5563" }}>
-            {t("placementPage.answeredStatus", {
-              answered: placementAnsweredCount,
-              total: placementQuestions.length,
-            })}
+            Answered: {placementAnsweredCount}/{placementQuestions.length}
           </div>
           {placementComplete ? (
-            <div style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "grid", gap: 12 }}>
               <div style={{ ...styles.focusNotice, margin: 0 }}>
-                {t("placementPage.resultSummary", {
-                  score: weightedScore.toFixed(1),
-                  total: weightedTotal.toFixed(1),
-                  level: placementLevel,
-                })}
+                Suggested level: <strong>{placementLevel}</strong> · Score: {totalCorrect}/{totalQuestions}
+              </div>
+              <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}>
+                {placementTest.sections.map((section) => (
+                  <LevelScoreCard key={`score-${section.level}`} level={section.level} stat={levelStats[section.level]} />
+                ))}
               </div>
               <div style={{ color: "#374151", fontSize: 14 }}>{getLevelFeedback(placementLevel)}</div>
-              <div>
-                <a href={placementRecommendationRoute} style={{ ...styles.buttonPrimary, textDecoration: "none", display: "inline-block" }}>
-                  {t("placementPage.levelCta", { level: placementLevel })}
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <a href={CLASS_BROCHURE_URL} style={{ ...styles.buttonPrimary, textDecoration: "none", display: "inline-block" }}>
+                  Choose a {placementLevel} class
+                </a>
+                <a href="https://wa.me/233205706589" target="_blank" rel="noopener noreferrer" style={{ ...styles.secondaryButton, textDecoration: "none" }}>
+                  Ask on WhatsApp
                 </a>
               </div>
               {canRevealAnswerKey ? (
                 <div style={{ ...styles.card, margin: 0, background: "#f8fafc" }}>
-                  <h4 style={{ marginTop: 0 }}>{t("placementPage.answerKeyTitle")}</h4>
+                  <h4 style={{ marginTop: 0 }}>Answer key</h4>
                   <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
                     {placementQuestions.map((question) => (
                       <li key={`key-${question.id}`}>
@@ -684,15 +510,17 @@ const PlacementTestPage = () => {
                 </div>
               ) : (
                 <div style={{ ...styles.card, margin: 0, background: "#f8fafc", display: "grid", gap: 10 }}>
-                  <div style={{ color: "#4b5563", fontSize: 14 }}>{t("placementPage.answerReviewLocked")}</div>
+                  <div style={{ color: "#4b5563", fontSize: 14 }}>
+                    Review the questions first. You can unlock the answer key after you finish.
+                  </div>
                   <button type="button" style={styles.buttonSecondary} onClick={handleUnlockAnswerReview}>
-                    {t("placementPage.unlockAnswerReview")}
+                    Show answer key
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <div style={{ color: "#6b7280", fontSize: 14 }}>{t("placementPage.finishPrompt")}</div>
+            <div style={{ color: "#6b7280", fontSize: 14 }}>Finish all questions to see your suggested level.</div>
           )}
         </div>
       </section>
