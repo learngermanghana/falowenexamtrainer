@@ -16,6 +16,8 @@ const listSpacing = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 const questionCardStyle = { border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#fff", display: "grid", gap: 6 };
 const calloutStyle = { ...questionCardStyle, background: "#f8fafc" };
 
+const phraseGridStyle = { display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" };
+
 const lesenQuestions = [
   { stem: "Wann steht Anna auf?", options: ["a) kurz vor 7 Uhr", "b) nie vor 7 Uhr", "c) immer nach 7 Uhr", "d) kurz nach 7 Uhr"] },
   { stem: "Was isst Anna zum Frühstück?", options: ["a) Cornflakes und Toast mit Butter", "b) nichts", "c) Brot mit Käse oder Wurst", "d) Müsli oder Toast mit Marmelade"] },
@@ -106,6 +108,62 @@ export default function A2Day25TagesablaufWorkbookPage() {
       <h3 style={{ ...sectionTitle, fontSize: "1rem" }}>Topic for Discussion</h3>
       <p style={{ margin: 0 }}>Wie sieht dein Tagesablauf aus?</p>
       <p style={{ margin: 0 }}><strong>Keywords:</strong> aufstehen, arbeiten/lernen, essen, Freizeit</p>
+
+      <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
+      <p style={{ margin: 0, lineHeight: 1.7 }}>
+        Nutze diese einfache Struktur: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+        So wird aus kurzen Wörtern eine klare Antwort mit guten Sätzen.
+      </p>
+      <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+        <strong>Schnelle Struktur für 30–45 Sekunden</strong>
+        <ol style={listSpacing}>
+          <li><strong>Einleitung:</strong> Thema nennen und einen ersten Satz sagen.</li>
+          <li><strong>Hauptteil:</strong> zwei oder drei Punkte mit einfachen Connectors verbinden.</li>
+          <li><strong>Beispiel:</strong> ein kurzes Beispiel aus deinem Leben geben.</li>
+          <li><strong>Schluss:</strong> deine Meinung kurz zusammenfassen.</li>
+        </ol>
+      </div>
+      <div style={phraseGridStyle}>
+        <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+          <strong>Gute Einleitungen</strong>
+          <ul style={listSpacing}>
+            <li>„Heute spreche ich über …“</li>
+            <li>„Ich möchte kurz etwas über … sagen.“</li>
+            <li>„Mein Thema ist …“</li>
+          </ul>
+        </div>
+        <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+          <strong>Verbindungswörter / Connectors</strong>
+          <ul style={listSpacing}>
+            <li><strong>und</strong> · „Ich lerne Deutsch und ich übe jeden Tag.“</li>
+            <li><strong>oder</strong> · „Ich mache Sport oder ich treffe Freunde.“</li>
+            <li><strong>weil</strong> · „Das ist gut, weil es einfach ist.“</li>
+            <li><strong>deshalb</strong> · „Ich habe wenig Zeit, deshalb plane ich gut.“</li>
+          </ul>
+        </div>
+        <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+          <strong>Eigene Meinung ausdrücken</strong>
+          <ul style={listSpacing}>
+            <li>„Ich finde … gut, weil …“</li>
+            <li>„Für mich ist … wichtig.“</li>
+            <li>„Meiner Meinung nach ist … praktisch.“</li>
+          </ul>
+        </div>
+        <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+          <strong>Gute Schlüsse</strong>
+          <ul style={listSpacing}>
+            <li>„Zum Schluss kann ich sagen: …“</li>
+            <li>„Deshalb finde ich … gut.“</li>
+            <li>„Das ist meine Meinung. Danke fürs Zuhören.“</li>
+          </ul>
+        </div>
+      </div>
+      <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
+        <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
+        <p style={{ margin: 0, lineHeight: 1.7 }}>
+          „Heute spreche ich über meinen Tagesablauf. Zuerst stehe ich um sieben Uhr auf und frühstücke. Dann gehe ich zur Arbeit oder zum Deutschkurs, weil ich lernen und arbeiten muss. Am Nachmittag mache ich Hausaufgaben und kaufe ein. Am Abend koche ich, sehe eine Serie oder telefoniere mit meiner Familie. Zum Schluss finde ich: Ein klarer Tagesablauf hilft mir, weil ich weniger Stress habe.“
+        </p>
+      </div>
       <div style={calloutStyle}><strong>Speaking self-practice confidence check</strong><p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p><a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">Open speaking self-practice</a></div>
       <SpeakingPracticeTimerCard />
       <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
