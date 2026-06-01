@@ -375,6 +375,7 @@ const QuestionOfDayPage = () => {
   const { level } = useExam();
   const { user, studentProfile } = useAuth();
   const activeLevel = String(level || "A1").toUpperCase();
+  const [activeTab, setActiveTab] = useState("questions");
   const [practised, setPractised] = useState(() => readWarmupStatus(activeLevel).practised);
   const [submittedToTutor, setSubmittedToTutor] = useState(() => readWarmupStatus(activeLevel).submittedToTutor);
   const [warmupAnswer, setWarmupAnswer] = useState(() => readWarmupAnswer(activeLevel));
@@ -395,6 +396,7 @@ const QuestionOfDayPage = () => {
     setWarmupAnswer(readWarmupAnswer(activeLevel));
     setSubmitState({ loading: false, success: "", error: "" });
     setLetterType("");
+    setActiveTab("questions");
     setChecklistState(PRE_SUBMISSION_CHECKLIST.reduce((acc, label) => ({ ...acc, [label]: false }), {}));
   }, [activeLevel]);
 
@@ -624,9 +626,10 @@ const QuestionOfDayPage = () => {
       saveWarmupLocally({ submittedToTutor: true, reviewId: result?.id || "" });
       setSubmitState({
         loading: false,
-        success: "Work submitted to tutor and saved in the tutor review queue. Scroll down to Tutor Feedback on this page to see updates. Feedback usually appears within 24 hours. You can also open the Writing tab and click Tutor Feedback.",
+        success: "Work submitted to tutor and saved in the tutor review queue. Open Teacher Feedback to see updates. Feedback usually appears within 24 hours. You can also open the Writing tab and click Tutor Feedback.",
         error: "",
       });
+      setActiveTab("feedback");
     } catch (error) {
       setSubmitState({
         loading: false,
@@ -653,6 +656,11 @@ const QuestionOfDayPage = () => {
     display: "grid",
     gap: 12,
   };
+  const tabs = [
+    { key: "questions", label: "Questions" },
+    { key: "submit", label: dailyTask?.type === "writing" ? "Submit" : "Record" },
+    { key: "feedback", label: "Teacher Feedback" },
+  ];
 
   return (
     <section style={{ ...styles.card, marginTop: 0 }}>
@@ -662,15 +670,27 @@ const QuestionOfDayPage = () => {
           <li>This page is for learners who are done with the course and are preparing for exams.</li>
           <li>A2 and above receive one speaking question per speaking day.</li>
           <li>A1 speaking receives a short set: 5 Teil 2 cards and 5 Teil 3 request cards.</li>
-          <li>For Schreiben: save your response, then scroll down to Tutor Feedback.</li>
-          <li>For Sprechen: record your voice and send it to your tutor on WhatsApp.</li>
+          <li>Use the tabs below: check the question first, record or submit, then view teacher feedback.</li>
         </ul>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", margin: "10px 0" }}>
+        {tabs.map((tab) => (
+          <button
+            key={tab.key}
+            type="button"
+            style={activeTab === tab.key ? styles.navButtonActive : styles.secondaryButton}
+            onClick={() => setActiveTab(tab.key)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {showSubmissionBanner ? (
         <div style={{ ...styles.card, margin: "10px 0", background: "#fff7ed", border: "2px solid #fb923c" }}>
           <p style={{ margin: 0, fontSize: 20, fontWeight: 800, lineHeight: 1.4 }}>
-            ✅ Work submitted to tutor. Scroll down to <strong>Tutor Feedback</strong> below.
+            ✅ Work submitted to tutor. Open <strong>Teacher Feedback</strong> to see updates.
           </p>
           <p style={{ margin: "8px 0 0", fontSize: 16, fontWeight: 600 }}>
             Feedback usually appears within 24 hours. You can also go to the <strong>Writing</strong> tab and click <strong>Tutor Feedback</strong>.
@@ -678,179 +698,188 @@ const QuestionOfDayPage = () => {
         </div>
       ) : null}
 
-      {dailyTask?.type === "writing" && dailyTask?.prompt ? (
-        <div style={questionPanelStyle}>
-          <div>
-            <p style={{ ...styles.helperText, marginTop: 0 }}>Question for the day</p>
-            <h3 style={{ marginTop: 0 }}>Schreiben</h3>
-            <p><strong>Thema:</strong> {dailyTask.prompt.Thema}</p>
-            <ul>
-              {dailyTask.prompt.Punkte?.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-            <p style={{ marginBottom: 0 }}>
-              <strong>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</strong>
-            </p>
-          </div>
-          <div style={{ background: "#ffffff", border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
-            <p style={{ ...styles.helperText, marginTop: 0 }}>Work submitted to tutor</p>
-            <p style={{ margin: 0, lineHeight: 1.6 }}>
-              {submittedToTutor
-                ? "✅ Submitted. Scroll down to Tutor Feedback. Feedback usually appears within 24 hours."
-                : "Not submitted yet. Send your Schreiben below to receive tutor feedback."}
-            </p>
-          </div>
-        </div>
-      ) : null}
-
-      {dailyTask?.type === "speaking" && Array.isArray(dailyTask?.prompts) ? (
+      {activeTab === "questions" ? (
         <>
-          <div style={questionPanelStyle}>
-            <div>
-              <p style={{ ...styles.helperText, marginTop: 0 }}>Question set for the day</p>
-              <h3 style={{ marginTop: 0 }}>Sprechen</h3>
-              {dailyTask.promptSummary ? <p style={{ ...styles.helperText, marginTop: 0 }}>{dailyTask.promptSummary}</p> : null}
-              {Object.entries(speakingPromptGroups).map(([teilLabel, prompts]) => (
-                <div key={teilLabel} style={{ marginTop: 10 }}>
-                  <h4 style={{ margin: "0 0 6px" }}>{teilLabel}</h4>
-                  <ol style={{ marginTop: 0 }}>
-                    {prompts.map((item) => (
-                      <li key={item.id || buildSpeakingLabel(item)}>{buildSpeakingLabel(item)}</li>
+          {dailyTask?.type === "writing" && dailyTask?.prompt ? (
+            <>
+              <div style={questionPanelStyle}>
+                <div>
+                  <p style={{ ...styles.helperText, marginTop: 0 }}>Question for the day</p>
+                  <h3 style={{ marginTop: 0 }}>Schreiben</h3>
+                  <p><strong>Thema:</strong> {dailyTask.prompt.Thema}</p>
+                  <ul>
+                    {dailyTask.prompt.Punkte?.map((point) => (
+                      <li key={point}>{point}</li>
                     ))}
-                  </ol>
+                  </ul>
+                  <p style={{ marginBottom: 0 }}>
+                    <strong>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</strong>
+                  </p>
                 </div>
-              ))}
-              <p style={{ marginBottom: 0 }}>
-                <strong>Do not type your answer. Record a WhatsApp voice note and send it to your tutor.</strong>
-              </p>
-            </div>
-          </div>
-
-          <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "2px solid #c7d2fe" }}>
-            <h3 style={{ marginTop: 0 }}>Goethe Sprechen rules for {activeLevel}</h3>
-            <p style={{ ...styles.helperText, marginTop: 0 }}>
-              Before recording, check what each Teil expects. Keep the voice note short and clear.
-            </p>
-            <div style={{ display: "grid", gap: 10 }}>
-              {speakingRules.map((rule) => (
-                <div key={rule.teil} style={{ background: "#ffffff", border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
-                  <strong>{rule.teil}: {rule.rule}</strong>
-                  <p style={{ margin: "6px 0 4px" }}><strong>Do this:</strong> {rule.doThis}</p>
-                  <p style={{ ...styles.helperText, margin: 0 }}><strong>Expect:</strong> {rule.expect}</p>
+                <div style={{ background: "#ffffff", border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+                  <p style={{ ...styles.helperText, marginTop: 0 }}>Next step</p>
+                  <p style={{ margin: 0, lineHeight: 1.6 }}>
+                    Read the task carefully, then open the Submit tab to type your answer and send it for review.
+                  </p>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+              <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "1px solid #c7d2fe" }}>
+                <h3 style={{ marginTop: 0 }}>Goethe Schreiben rules for {activeLevel}</h3>
+                <p style={{ margin: "0 0 6px" }}><strong>Time:</strong> {(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).minutes}</p>
+                <p style={{ margin: "0 0 6px" }}>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).details}</p>
+                <p style={{ margin: 0 }}>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</p>
+              </div>
+            </>
+          ) : null}
 
-          <div style={writingWorkspaceStyle}>
-            <h3 style={{ marginTop: 0 }}>Record and send on WhatsApp</h3>
-            <ol style={{ marginTop: 0 }}>
-              <li>Open WhatsApp.</li>
-              <li>Record your voice note for today’s task.</li>
-              <li>Send it directly to your tutor.</li>
-              <li>Come back here and tap the button below.</li>
-            </ol>
-            <button type="button" style={practised ? styles.navButtonActive : styles.primaryButton} onClick={markPractised}>
-              {practised ? "Recording sent today" : "I recorded and sent to tutor"}
-            </button>
-            {submitState.error ? <p style={{ ...styles.helperText, color: "#b91c1c", marginBottom: 0 }}>{submitState.error}</p> : null}
-            {submitState.success ? <p style={{ ...styles.helperText, color: "#166534", marginBottom: 0 }}>{submitState.success}</p> : null}
-          </div>
+          {dailyTask?.type === "speaking" && Array.isArray(dailyTask?.prompts) ? (
+            <>
+              <div style={questionPanelStyle}>
+                <div>
+                  <p style={{ ...styles.helperText, marginTop: 0 }}>Question set for the day</p>
+                  <h3 style={{ marginTop: 0 }}>Sprechen</h3>
+                  {dailyTask.promptSummary ? <p style={{ ...styles.helperText, marginTop: 0 }}>{dailyTask.promptSummary}</p> : null}
+                  {Object.entries(speakingPromptGroups).map(([teilLabel, prompts]) => (
+                    <div key={teilLabel} style={{ marginTop: 10 }}>
+                      <h4 style={{ margin: "0 0 6px" }}>{teilLabel}</h4>
+                      <ol style={{ marginTop: 0 }}>
+                        {prompts.map((item) => (
+                          <li key={item.id || buildSpeakingLabel(item)}>{buildSpeakingLabel(item)}</li>
+                        ))}
+                      </ol>
+                    </div>
+                  ))}
+                  <p style={{ marginBottom: 0 }}>
+                    <strong>Do not type your answer. Open the Record tab when you are ready.</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "2px solid #c7d2fe" }}>
+                <h3 style={{ marginTop: 0 }}>Goethe Sprechen rules for {activeLevel}</h3>
+                <p style={{ ...styles.helperText, marginTop: 0 }}>
+                  Before recording, check what each Teil expects. Keep the voice note short and clear.
+                </p>
+                <div style={{ display: "grid", gap: 10 }}>
+                  {speakingRules.map((rule) => (
+                    <div key={rule.teil} style={{ background: "#ffffff", border: "1px solid #dbeafe", borderRadius: 12, padding: 12 }}>
+                      <strong>{rule.teil}: {rule.rule}</strong>
+                      <p style={{ margin: "6px 0 4px" }}><strong>Do this:</strong> {rule.doThis}</p>
+                      <p style={{ ...styles.helperText, margin: 0 }}><strong>Expect:</strong> {rule.expect}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : null}
+
+          {!dailyTask ? (
+            <div style={{ ...styles.card, margin: "12px 0", background: "#fef2f2" }}>
+              <h3 style={{ marginTop: 0 }}>No warm-up found</h3>
+              <p style={{ marginBottom: 0 }}>No Schreiben or Sprechen question is available for {activeLevel} yet.</p>
+            </div>
+          ) : null}
         </>
       ) : null}
 
-      {dailyTask?.type === "writing" ? (
-        <div style={{ ...styles.card, margin: "12px 0", background: "#eef2ff", border: "1px solid #c7d2fe" }}>
-          <h3 style={{ marginTop: 0 }}>Goethe Schreiben rules for {activeLevel}</h3>
-          <p style={{ margin: "0 0 6px" }}><strong>Time:</strong> {(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).minutes}</p>
-          <p style={{ margin: "0 0 6px" }}>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).details}</p>
-          <p style={{ margin: 0 }}>{(WRITING_GUIDE_BY_LEVEL[activeLevel] || WRITING_GUIDE_BY_LEVEL.B1).instruction}</p>
-        </div>
-      ) : null}
-
-      {!dailyTask ? (
-        <div style={{ ...styles.card, margin: "12px 0", background: "#fef2f2" }}>
-          <h3 style={{ marginTop: 0 }}>No warm-up found</h3>
-          <p style={{ marginBottom: 0 }}>No Schreiben or Sprechen question is available for {activeLevel} yet.</p>
-        </div>
-      ) : null}
-
-      {dailyTask?.type === "writing" ? (
-        <div style={writingWorkspaceStyle}>
-          <label style={{ ...styles.label, fontSize: 16 }}>Your Schreiben answer box</label>
-          <p style={{ ...styles.helperText, margin: "4px 0 8px" }}>
-            Write your answer here and send it to tutor review when ready.
-          </p>
-          <textarea
-            value={warmupAnswer}
-            onChange={handleAnswerChange}
-            rows={7}
-            placeholder="Write your Goethe-style answer here..."
-            style={{ ...styles.textArea, minHeight: 150 }}
-          />
-          <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
-            Minimum {MIN_WRITING_WORDS} words. Current: {countWords(warmupAnswer)} words.
-          </p>
-          <label style={{ ...styles.label, marginTop: 12 }}>Comment for tutor (optional)</label>
-          <textarea
-            value={tutorComment}
-            onChange={(event) => setTutorComment(event.target.value)}
-            rows={3}
-            placeholder="Add any note or question for your tutor..."
-            style={{ ...styles.textArea, minHeight: 90 }}
-          />
-          <div style={{ marginTop: 12, padding: 12, border: "1px solid #d1d5db", borderRadius: 10, background: "#f9fafb" }}>
-            <h4 style={{ margin: "0 0 6px" }}>Before you submit</h4>
-            <p style={{ ...styles.helperText, margin: "0 0 10px" }}>
-              Tick every box. If one box is not ticked, submission will not go through.
-            </p>
-            <div style={{ marginBottom: 10 }}>
-              <p style={{ margin: "0 0 6px" }}><strong>Letter type (required)</strong></p>
-              {LETTER_TYPE_OPTIONS.map((option) => (
-                <label key={option.value} style={{ display: "block", marginBottom: 6 }}>
-                  <input
-                    type="radio"
-                    name="letterType"
-                    value={option.value}
-                    checked={letterType === option.value}
-                    onChange={(event) => {
-                      setLetterType(event.target.value);
-                      setSubmitState({ loading: false, success: "", error: "" });
-                    }}
-                  />{" "}
-                  {option.label}
-                </label>
-              ))}
+      {activeTab === "submit" ? (
+        <>
+          {dailyTask?.type === "speaking" ? (
+            <div style={writingWorkspaceStyle}>
+              <h3 style={{ marginTop: 0 }}>Record and send on WhatsApp</h3>
+              <ol style={{ marginTop: 0 }}>
+                <li>Open WhatsApp.</li>
+                <li>Record your voice note for today’s task.</li>
+                <li>Send it directly to your tutor.</li>
+                <li>Come back here and tap the button below.</li>
+              </ol>
+              <button type="button" style={practised ? styles.navButtonActive : styles.primaryButton} onClick={markPractised}>
+                {practised ? "Recording sent today" : "I recorded and sent to tutor"}
+              </button>
+              {submitState.error ? <p style={{ ...styles.helperText, color: "#b91c1c", marginBottom: 0 }}>{submitState.error}</p> : null}
+              {submitState.success ? <p style={{ ...styles.helperText, color: "#166534", marginBottom: 0 }}>{submitState.success}</p> : null}
             </div>
-            <div style={{ display: "grid", gap: 6 }}>
-              {PRE_SUBMISSION_CHECKLIST.map((label) => (
-                <label key={label} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                  <input
-                    type="checkbox"
-                    checked={Boolean(checklistState[label])}
-                    onChange={(event) => {
-                      setChecklistState((prev) => ({ ...prev, [label]: event.target.checked }));
-                      setSubmitState({ loading: false, success: "", error: "" });
-                    }}
-                    style={{ marginTop: 2 }}
-                  />
-                  <span>{label}</span>
-                </label>
-              ))}
+          ) : null}
+
+          {dailyTask?.type === "writing" ? (
+            <div style={writingWorkspaceStyle}>
+              <label style={{ ...styles.label, fontSize: 16 }}>Your Schreiben answer box</label>
+              <p style={{ ...styles.helperText, margin: "4px 0 8px" }}>
+                Write your answer here and send it to tutor review when ready.
+              </p>
+              <textarea
+                value={warmupAnswer}
+                onChange={handleAnswerChange}
+                rows={7}
+                placeholder="Write your Goethe-style answer here..."
+                style={{ ...styles.textArea, minHeight: 150 }}
+              />
+              <p style={{ ...styles.helperText, margin: "6px 0 0" }}>
+                Minimum {MIN_WRITING_WORDS} words. Current: {countWords(warmupAnswer)} words.
+              </p>
+              <label style={{ ...styles.label, marginTop: 12 }}>Comment for tutor (optional)</label>
+              <textarea
+                value={tutorComment}
+                onChange={(event) => setTutorComment(event.target.value)}
+                rows={3}
+                placeholder="Add any note or question for your tutor..."
+                style={{ ...styles.textArea, minHeight: 90 }}
+              />
+              <div style={{ marginTop: 12, padding: 12, border: "1px solid #d1d5db", borderRadius: 10, background: "#f9fafb" }}>
+                <h4 style={{ margin: "0 0 6px" }}>Before you submit</h4>
+                <p style={{ ...styles.helperText, margin: "0 0 10px" }}>
+                  Tick every box. If one box is not ticked, submission will not go through.
+                </p>
+                <div style={{ marginBottom: 10 }}>
+                  <p style={{ margin: "0 0 6px" }}><strong>Letter type (required)</strong></p>
+                  {LETTER_TYPE_OPTIONS.map((option) => (
+                    <label key={option.value} style={{ display: "block", marginBottom: 6 }}>
+                      <input
+                        type="radio"
+                        name="letterType"
+                        value={option.value}
+                        checked={letterType === option.value}
+                        onChange={(event) => {
+                          setLetterType(event.target.value);
+                          setSubmitState({ loading: false, success: "", error: "" });
+                        }}
+                      />{" "}
+                      {option.label}
+                    </label>
+                  ))}
+                </div>
+                <div style={{ display: "grid", gap: 6 }}>
+                  {PRE_SUBMISSION_CHECKLIST.map((label) => (
+                    <label key={label} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(checklistState[label])}
+                        onChange={(event) => {
+                          setChecklistState((prev) => ({ ...prev, [label]: event.target.checked }));
+                          setSubmitState({ loading: false, success: "", error: "" });
+                        }}
+                        style={{ marginTop: 2 }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
+                <button type="button" style={styles.primaryButton} onClick={submitWarmupToTutor} disabled={submitState.loading}>
+                  {submitState.loading ? "Sending..." : "Send Schreiben to tutor"}
+                </button>
+              </div>
+              {submitState.error ? <p style={{ ...styles.helperText, color: "#b91c1c", marginBottom: 0 }}>{submitState.error}</p> : null}
+              {submitState.success ? <p style={{ ...styles.helperText, color: "#166534", marginBottom: 0 }}>{submitState.success}</p> : null}
             </div>
-          </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginTop: 10 }}>
-            <button type="button" style={styles.primaryButton} onClick={submitWarmupToTutor} disabled={submitState.loading}>
-              {submitState.loading ? "Sending..." : "Send Schreiben to tutor"}
-            </button>
-          </div>
-          {submitState.error ? <p style={{ ...styles.helperText, color: "#b91c1c", marginBottom: 0 }}>{submitState.error}</p> : null}
-          {submitState.success ? <p style={{ ...styles.helperText, color: "#166534", marginBottom: 0 }}>{submitState.success}</p> : null}
-        </div>
+          ) : null}
+        </>
       ) : null}
 
-      <TutorFeedbackHistory reviews={tutorReviews} errorMessage={tutorReviewsError} />
+      {activeTab === "feedback" ? (
+        <TutorFeedbackHistory reviews={tutorReviews} errorMessage={tutorReviewsError} />
+      ) : null}
     </section>
   );
 };
