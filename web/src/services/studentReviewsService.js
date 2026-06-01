@@ -106,10 +106,10 @@ export const fetchStudentReviewsFromPublishedSheet = async (sheetCsvUrl) => {
 
   const headerRow = rows[0];
   const idx = {
-    name: findIndexByHeader(headerRow, ["name", "student", "student name"]),
+    name: findIndexByHeader(headerRow, ["name", "student", "student name", "student_name", "studentname"]),
     country: findIndexByHeader(headerRow, ["country", "location"]),
     level: findIndexByHeader(headerRow, ["level", "cefr", "class"]),
-    text: findIndexByHeader(headerRow, ["text", "comment", "comments", "review", "testimonial", "feedback"]),
+    text: findIndexByHeader(headerRow, ["text", "review text", "review_text", "reviewtext", "comment", "comments", "review", "testimonial", "feedback"]),
     stars: findIndexByHeader(headerRow, ["stars", "rating", "score"]),
   };
 
@@ -127,4 +127,3 @@ export const fetchStudentReviewsFromPublishedSheet = async (sheetCsvUrl) => {
     }))
     .filter((review) => review.text);
 };
-
