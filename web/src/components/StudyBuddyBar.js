@@ -58,6 +58,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const studentEmail = studentProfile?.email || "";
+  const studentName = studentProfile?.name || studentProfile?.fullName || studentProfile?.displayName || "";
   const className = studentProfile?.className || "";
   const weekStartKey = useMemo(() => getWeekStartKey(), []);
   const planStorageKey = useMemo(() => {
@@ -79,6 +80,23 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [recommendedAssignment, setRecommendedAssignment] = useState("");
   const [leaderboardPosition, setLeaderboardPosition] = useState(null);
   const [leaderboardLevel, setLeaderboardLevel] = useState("");
+
+  const trackStudyBuddyEvent = useCallback(
+    (event, metadata = {}) =>
+      logStudyBuddyUsage({
+        event,
+        studentCode,
+        studentEmail,
+        studentName,
+        className,
+        userId: user?.uid || null,
+        level: resolvedLevel,
+        weekStart: weekStartKey,
+        metadata,
+        ...metadata,
+      }).catch(() => {}),
+    [className, resolvedLevel, studentCode, studentEmail, studentName, user?.uid, weekStartKey]
+  );
 
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale]);
   const formatTimeUnit = useCallback(
@@ -382,14 +400,16 @@ const StudyBuddyBar = ({ studentProfile }) => {
         event: "weekly_plan_toggle",
         studentCode,
         studentEmail,
+        studentName,
         className,
         userId: user?.uid || null,
+        level: resolvedLevel,
         itemId,
         completed,
         weekStart: weekStartKey,
       }).catch(() => {});
     },
-    [className, completedPlanItems, studentCode, studentEmail, user?.uid, weekStartKey]
+    [className, completedPlanItems, resolvedLevel, studentCode, studentEmail, studentName, user?.uid, weekStartKey]
   );
 
   const submitQuickQuestion = useCallback(
@@ -405,8 +425,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
           event: "quick_question",
           studentCode,
           studentEmail,
+          studentName,
           className,
           userId: user?.uid || null,
+          level: resolvedLevel,
           questionLength: trimmed.length,
         });
         const response = await requestStudyBuddyReply({
@@ -416,6 +438,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         });
         setQuickReply(response?.reply || "");
         if (response?.reply) {
+          trackStudyBuddyEvent("quick_question_reply", { questionLength: trimmed.length, replyLength: response.reply.length });
           triggerInteractionFeedback({ sound: "success" });
         } else {
           setQuickReplyError(t("studyBuddy.qa.error"));
@@ -429,11 +452,12 @@ const StudyBuddyBar = ({ studentProfile }) => {
         setIsReplyLoading(false);
       }
     },
-    [className, idToken, resolvedLevel, studentCode, studentEmail, t, user?.uid]
+    [className, idToken, resolvedLevel, studentCode, studentEmail, studentName, t, trackStudyBuddyEvent, user?.uid]
   );
 
   const focusQuickQuestion = useCallback(() => {
     setIsCollapsed(false);
+    trackStudyBuddyEvent("shortcut_click", { shortcutKey: "ask", shortcutLabel: t("studyBuddy.qa.jumpButton", { defaultValue: "Ask AI" }) });
     triggerInteractionFeedback({ sound: "open" });
     window.setTimeout(() => {
       const input = quickQuestionInputRef.current;
@@ -445,7 +469,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         input.focus();
       }
     }, 80);
-  }, []);
+  }, [t, trackStudyBuddyEvent]);
 
   const quickLinks = useMemo(
     () => [
@@ -459,6 +483,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         label: t("studyBuddy.shortcuts.course"),
         action: () => {
           playOpenFeedback();
+          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "course", shortcutLabel: t("studyBuddy.shortcuts.course"), destination: "/campus/course" });
           navigate("/campus/course");
         },
       },
@@ -467,6 +492,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         label: t("studyBuddy.shortcuts.submit"),
         action: () => {
           playOpenFeedback();
+          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "submit", shortcutLabel: t("studyBuddy.shortcuts.submit"), destination: "/campus/submit" });
           navigate("/campus/submit");
         },
       },
@@ -475,6 +501,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         label: t("studyBuddy.shortcuts.ai"),
         action: () => {
           playOpenFeedback();
+          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "ai", shortcutLabel: t("studyBuddy.shortcuts.ai"), destination: "/campus/grammar" });
           navigate("/campus/grammar");
         },
       },
@@ -483,6 +510,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         label: t("studyBuddy.shortcuts.study"),
         action: () => {
           playOpenFeedback();
+          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "study", shortcutLabel: t("studyBuddy.shortcuts.study"), destination: "/exams/study" });
           navigate("/exams/study");
         },
       },
@@ -491,11 +519,12 @@ const StudyBuddyBar = ({ studentProfile }) => {
         label: t("studyBuddy.shortcuts.exams"),
         action: () => {
           playOpenFeedback();
+          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "exams", shortcutLabel: t("studyBuddy.shortcuts.exams"), destination: "/exams/overview" });
           navigate("/exams/overview");
         },
       },
     ],
-    [focusQuickQuestion, navigate, playOpenFeedback, t]
+    [focusQuickQuestion, navigate, playOpenFeedback, t, trackStudyBuddyEvent]
   );
 
   useEffect(() => {
@@ -511,7 +540,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
       <button
         className={`study-buddy-reopen${isHighContrast ? " is-high-contrast" : ""}`}
         type="button"
-        onClick={() => setIsDismissed(false)}
+        onClick={() => {
+          setIsDismissed(false);
+          trackStudyBuddyEvent("reopen");
+        }}
         aria-label={t("studyBuddy.actions.reopenAria")}
       >
         {t("studyBuddy.actions.reopen")}
@@ -536,7 +568,11 @@ const StudyBuddyBar = ({ studentProfile }) => {
             <button
               className="study-buddy-toggle"
               type="button"
-              onClick={() => setIsCollapsed((prev) => !prev)}
+              onClick={() => {
+                const nextCollapsed = !isCollapsed;
+                setIsCollapsed(nextCollapsed);
+                trackStudyBuddyEvent(nextCollapsed ? "collapse" : "expand");
+              }}
               aria-expanded={!isCollapsed}
               aria-controls={contentId}
             >
@@ -545,7 +581,13 @@ const StudyBuddyBar = ({ studentProfile }) => {
             <button
               className="study-buddy-toggle"
               type="button"
-              onClick={() => setIsHighContrast((prev) => !prev)}
+              onClick={() => {
+                setIsHighContrast((prev) => {
+                  const next = !prev;
+                  trackStudyBuddyEvent("high_contrast_toggle", { enabled: next });
+                  return next;
+                });
+              }}
               aria-pressed={isHighContrast}
             >
               {isHighContrast ? t("studyBuddy.actions.contrastOff") : t("studyBuddy.actions.contrastOn")}
@@ -556,6 +598,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
               onClick={() => {
                 setIsDismissed(true);
                 setIsCollapsed(true);
+                trackStudyBuddyEvent("dismiss");
               }}
             >
               {t("studyBuddy.actions.dismiss")}
@@ -672,7 +715,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
               <button
                 type="button"
                 className="study-buddy-plan-more"
-                onClick={() => setIsPlanExpanded(true)}
+                onClick={() => {
+                  setIsPlanExpanded(true);
+                  trackStudyBuddyEvent("weekly_plan_expand", { hiddenPlanCount });
+                }}
               >
                 {t("studyBuddy.weeklyPlan.showAll", {
                   count: numberFormatter.format(hiddenPlanCount),
@@ -683,7 +729,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
               <button
                 type="button"
                 className="study-buddy-plan-more"
-                onClick={() => setIsPlanExpanded(false)}
+                onClick={() => {
+                  setIsPlanExpanded(false);
+                  trackStudyBuddyEvent("weekly_plan_collapse");
+                }}
               >
                 {t("studyBuddy.weeklyPlan.showLess", { defaultValue: "Show fewer tasks" })}
               </button>
@@ -695,7 +744,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
           <button
             type="button"
             className="study-buddy-mobile-close"
-            onClick={() => setIsCollapsed(true)}
+            onClick={() => {
+              setIsCollapsed(true);
+              trackStudyBuddyEvent("collapse", { source: "mobile_close" });
+            }}
             aria-label={t("studyBuddy.actions.collapse")}
           >
             {t("studyBuddy.actions.collapse")}
