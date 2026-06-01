@@ -99,6 +99,18 @@ const classCatalogDictionary = {
     docUrl:
       "https://admin.falowen.app/course-schedule/public?level=A2&startDate=2026-05-08&defaultWeekdays=Wednesday%2CThursday%2CFriday&holidayDates=&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
   },
+  "A2 Munich Klasse": {
+    orientationDate: "2026-08-04",
+    startDate: "2026-08-04",
+    endDate: "2026-10-12",
+    schedule: [
+      { day: "Monday", startTime: "11:00", endTime: "12:00" },
+      { day: "Tuesday", startTime: "11:00", endTime: "12:00" },
+      { day: "Wednesday", startTime: "11:00", endTime: "12:00" },
+    ],
+    docUrl:
+      "https://admin.falowen.app/course-schedule/public?level=A2&startDate=2026-08-04&defaultWeekdays=Monday%2CTuesday%2CWednesday&holidayDates=2026-09-21&useAdvancedWeekdays=false&weekDaysMap=%7B%7D",
+  },
   "B1 Stuttgart Klasse": {
     orientationDate: "2026-07-02",
     startDate: "2026-07-03",
