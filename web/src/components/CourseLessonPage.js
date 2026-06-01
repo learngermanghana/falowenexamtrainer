@@ -11,6 +11,8 @@ const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 
 const isInternalLink = (url = "") => String(url || "").startsWith("/");
 
+const hasValue = (value) => Boolean(String(value || "").trim());
+
 const resolveLessonAssignmentKey = ({ lesson = {}, entry = {}, level = "" }) => {
   const normalizedLevel = normalizeLevel(level);
   const dictionaryMatch = getCourseScheduleDictionaryEntry({
@@ -103,6 +105,47 @@ const buildLessonAssignmentTargets = ({ entry = {}, level = "", fallbackAssignme
   }
 
   return [];
+};
+
+const getAllLessonResources = (entry = {}) => [
+  ...toLessonArray(entry.lesen_hören),
+  ...toLessonArray(entry.schreiben_sprechen),
+  entry,
+].filter(Boolean);
+
+const summarizeInstruction = (instruction = "") => {
+  const clean = String(instruction || "").replace(/\s+/g, " ").trim();
+  if (!clean) return "";
+  return clean.length > 170 ? `${clean.slice(0, 167).trim()}…` : clean;
+};
+
+const buildLessonTaskItems = ({ entry = {}, assignmentTargets = [] }) => {
+  const resources = getAllLessonResources(entry);
+  const hasVideo = resources.some((item) => hasValue(item.video || item.youtube_link || item.tutorial_video_url));
+  const hasGrammar = resources.some((item) => hasValue(item.grammarbook_link));
+  const hasWorkbook = resources.some((item) => hasValue(item.workbook_link));
+  const hasSchreiben = hasValue(entry.schreiben);
+  const hasSprechen = hasValue(entry.sprechen);
+  const instructionSummary = summarizeInstruction(entry.instruction);
+
+  const items = [];
+  if (hasVideo) items.push("Watch the lesson video.");
+  if (hasGrammar) items.push("Read the grammar notes.");
+  if (hasWorkbook) items.push("Complete the workbook practice.");
+  if (hasSchreiben) items.push("Complete the Schreiben practice.");
+  if (hasSprechen) items.push("Practise the Sprechen task.");
+
+  if (assignmentTargets.length > 1) {
+    items.push(`Submit all ${assignmentTargets.length} marked assignments from their own resource cards.`);
+  } else if (assignmentTargets.length === 1) {
+    const chapter = assignmentTargets[0]?.chapter ? ` ${assignmentTargets[0].chapter}` : "";
+    items.push(`Submit the marked assignment${chapter ? ` for Kapitel${chapter}` : ""}.`);
+  }
+
+  if (instructionSummary) items.push(`Special instruction: ${instructionSummary}`);
+
+  if (!items.length && entry.goal) items.push(entry.goal);
+  return items;
 };
 
 const renderInlineMarkdown = (text, keyPrefix) => {
@@ -214,6 +257,34 @@ const ResourceAnchor = ({ label, url }) => {
         {label}
       </a>
     </li>
+  );
+};
+
+const LessonTaskSummary = ({ entry, assignmentTargets }) => {
+  const items = buildLessonTaskItems({ entry, assignmentTargets });
+  if (!items.length) return null;
+
+  return (
+    <section
+      style={{
+        border: "1px solid #bfdbfe",
+        background: "#eff6ff",
+        borderRadius: 14,
+        padding: 14,
+        display: "grid",
+        gap: 8,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+        <h2 style={{ margin: 0, fontSize: 20 }}>Today’s task</h2>
+        <span style={{ ...styles.badge, background: "#dbeafe", borderColor: "#93c5fd" }}>Auto summary</span>
+      </div>
+      <ul style={{ margin: 0, paddingLeft: 22, lineHeight: 1.7 }}>
+        {items.map((item, index) => (
+          <li key={`lesson-task-${index}`}>{item}</li>
+        ))}
+      </ul>
+    </section>
   );
 };
 
@@ -378,7 +449,7 @@ const CourseLessonPage = () => {
     return (
       <div style={{ ...styles.container, display: "grid", gap: 16 }}>
         <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>
-          ← Back to Course Book
+          ← Course Book
         </button>
         <div style={styles.card}>
           <h1 style={{ marginTop: 0 }}>Lesson not found</h1>
@@ -391,7 +462,7 @@ const CourseLessonPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>
-        ← Back to Course Book
+        ← Course Book
       </button>
 
       <article style={{ ...styles.card, display: "grid", gap: 18 }}>
@@ -418,6 +489,7 @@ const CourseLessonPage = () => {
           ) : null}
         </header>
 
+        <LessonTaskSummary entry={entry} assignmentTargets={assignmentTargets} />
         <InstructionSection instruction={entry.instruction} />
 
         <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} entry={entry} level={level} onSubmitAssignment={handleSubmitAssignment} />
