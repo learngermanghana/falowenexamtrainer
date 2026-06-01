@@ -9,6 +9,14 @@ import { fetchStudentReviewsFromPublishedSheet } from "../services/studentReview
 import { classCatalog } from "../data/classCatalog";
 
 const CLASS_BROCHURE_URL = "/classes/";
+const DEFAULT_STUDENT_REVIEWS_SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ5Nm-MLJkw3TeOht5ROELvFumVS9X8-ke_npLoOuF3W-zrF0v9xjk_Upzv4umQCocD5xtFaMRJQh6Z/pubhtml";
+
+const truncateText = (text = "", maxLength = 150) => {
+  const clean = String(text || "").replace(/\s+/g, " ").trim();
+  if (clean.length <= maxLength) return clean;
+  return `${clean.slice(0, maxLength - 1).trim()}…`;
+};
 
 const FeatureCard = ({ icon, title, description }) => (
   <div
@@ -28,6 +36,57 @@ const FeatureCard = ({ icon, title, description }) => (
       <h3 style={{ ...styles.sectionTitle, margin: 0 }}>{title}</h3>
     </div>
     <p style={{ ...styles.helperText, margin: 0 }}>{description}</p>
+  </div>
+);
+
+const HeroVisual = () => (
+  <div
+    aria-label="Falowen student dashboard preview"
+    style={{
+      background: "rgba(255,255,255,0.12)",
+      border: "1px solid rgba(255,255,255,0.2)",
+      borderRadius: 22,
+      padding: 16,
+      minHeight: 230,
+      display: "grid",
+      alignContent: "center",
+      gap: 12,
+      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25)",
+    }}
+  >
+    <div
+      style={{
+        background: "#ffffff",
+        color: "#111827",
+        borderRadius: 18,
+        padding: 14,
+        display: "grid",
+        gap: 10,
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
+        <div>
+          <p style={{ ...styles.helperText, margin: 0 }}>Today in Falowen</p>
+          <strong style={{ fontSize: 18 }}>A1 German practice</strong>
+        </div>
+        <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Live</span>
+      </div>
+
+      <div style={{ display: "grid", gap: 8 }}>
+        <div style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 10, background: "#eff6ff" }}>
+          <strong>📘 Course lesson</strong>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Watch, practise, and submit your workbook task.</p>
+        </div>
+        <div style={{ border: "1px solid #fef3c7", borderRadius: 14, padding: 10, background: "#fffbeb" }}>
+          <strong>🗣️ Exam warm-up</strong>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Short speaking and writing tasks with tutor feedback.</p>
+        </div>
+        <div style={{ border: "1px solid #dcfce7", borderRadius: 14, padding: 10, background: "#f0fdf4" }}>
+          <strong>✅ Progress tracking</strong>
+          <p style={{ ...styles.helperText, margin: "4px 0 0" }}>Scores, attendance, and exam readiness in one place.</p>
+        </div>
+      </div>
+    </div>
   </div>
 );
 
@@ -98,7 +157,7 @@ const ReviewCard = ({ stars = 5, name, country, level, text, starLabel }) => (
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10 }}>
       <div style={{ fontWeight: 900, color: "#111827" }}>{name}</div>
       <div style={{ fontSize: 13, color: "#111827", opacity: 0.85 }}>
-        {country} · {level}
+        {[country, level].filter(Boolean).join(" · ")}
       </div>
     </div>
 
@@ -106,7 +165,7 @@ const ReviewCard = ({ stars = 5, name, country, level, text, starLabel }) => (
       {"★★★★★☆☆☆☆☆".slice(5 - stars, 10 - stars)}
     </div>
 
-    <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{text}</p>
+    <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>{truncateText(text, 150)}</p>
   </div>
 );
 
@@ -256,7 +315,7 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
 
   useEffect(() => {
     let mounted = true;
-    const sheetUrl = process.env.REACT_APP_STUDENT_REVIEWS_SHEET_CSV_URL || "";
+    const sheetUrl = process.env.REACT_APP_STUDENT_REVIEWS_SHEET_CSV_URL || DEFAULT_STUDENT_REVIEWS_SHEET_URL;
 
     if (!sheetUrl) {
       setSheetReview(null);
@@ -372,41 +431,45 @@ const LandingPage = ({ onSignUp, onLogin, program, onProgramSelect }) => {
             boxShadow: "0 18px 36px rgba(37, 99, 235, 0.28)",
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <p style={{ ...styles.badge, alignSelf: "flex-start", background: "#c7d2fe", color: "#1e3a8a" }}>
-              {t("landing.badge")}
-            </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20, alignItems: "center" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <p style={{ ...styles.badge, alignSelf: "flex-start", background: "#c7d2fe", color: "#1e3a8a" }}>
+                {t("landing.badge")}
+              </p>
 
-            <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
-              {t("landing.heroTitle")}
-            </h1>
+              <h1 style={{ ...styles.title, fontSize: 32, color: "#ffffff", margin: 0 }}>
+                {t("landing.heroTitle")}
+              </h1>
 
-            <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0, lineHeight: 1.6 }}>
-              {t("landing.heroSubtitle")}
-            </p>
+              <p style={{ ...styles.helperText, color: "#e0e7ff", margin: 0, lineHeight: 1.6 }}>
+                {t("landing.heroSubtitle")}
+              </p>
 
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <a
-                href={CLASS_BROCHURE_URL}
-                style={{ ...styles.primaryButton, textDecoration: "none", background: "#fbbf24", color: "#111827" }}
-              >
-                View upcoming classes
-              </a>
-              <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
-                {t("landing.cta.join", { language: selectedProgram.shortLabel })}
-              </button>
-              <button type="button" style={styles.secondaryButton} onClick={onLogin}>
-                {t("landing.cta.login")}
-              </button>
-              <a
-                href="https://play.google.com/store/apps/details?id=com.falowen.app"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ ...styles.secondaryButton, textDecoration: "none" }}
-              >
-                {t("landing.cta.getApp")}
-              </a>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                <a
+                  href={CLASS_BROCHURE_URL}
+                  style={{ ...styles.primaryButton, textDecoration: "none", background: "#fbbf24", color: "#111827" }}
+                >
+                  View upcoming classes
+                </a>
+                <button type="button" style={styles.primaryButton} onClick={() => onSignUp(resolvedProgram)}>
+                  {t("landing.cta.join", { language: selectedProgram.shortLabel })}
+                </button>
+                <button type="button" style={styles.secondaryButton} onClick={onLogin}>
+                  {t("landing.cta.login")}
+                </button>
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.falowen.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ ...styles.secondaryButton, textDecoration: "none" }}
+                >
+                  {t("landing.cta.getApp")}
+                </a>
+              </div>
             </div>
+
+            <HeroVisual />
           </div>
         </header>
 
