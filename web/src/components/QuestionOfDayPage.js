@@ -295,8 +295,117 @@ const waitingBoxStyle = {
   color: "#92400e",
 };
 
-const TutorCommentBox = ({ comment }) => {
+const getPhraseMistakes = (phraseMistakes) => (Array.isArray(phraseMistakes) ? phraseMistakes.filter(Boolean) : []);
+
+const getReviewDraftCandidates = (review) =>
+  [review?.draft, review?.studentDraft, review?.revisedDraft]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .filter((value, index, list) => list.indexOf(value) === index);
+
+const getDraftCandidates = (draftText) => {
+  const values = Array.isArray(draftText) ? draftText : [draftText];
+  return values
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .filter((value, index, list) => list.indexOf(value) === index);
+};
+
+const isValidOffsetRange = (draft, startOffset, endOffset) =>
+  Number.isInteger(startOffset) &&
+  Number.isInteger(endOffset) &&
+  startOffset >= 0 &&
+  endOffset > startOffset &&
+  endOffset <= draft.length;
+
+const findMistakeHighlight = (mistake, draftText) => {
+  const draftCandidates = getDraftCandidates(draftText);
+  const startOffset = Number(mistake?.startOffset);
+  const endOffset = Number(mistake?.endOffset);
+  const phrase = String(mistake?.phrase || "").trim();
+
+  for (const draft of draftCandidates) {
+    if (isValidOffsetRange(draft, startOffset, endOffset)) {
+      return { draft, start: startOffset, end: endOffset };
+    }
+  }
+
+  if (!phrase) return null;
+
+  for (const draft of draftCandidates) {
+    const phraseIndex = draft.indexOf(phrase);
+    if (phraseIndex >= 0) {
+      return { draft, start: phraseIndex, end: phraseIndex + phrase.length };
+    }
+  }
+
+  return null;
+};
+
+const severityBadgeStyles = {
+  minor: { background: "#dbeafe", color: "#1e40af", border: "1px solid #bfdbfe" },
+  important: { background: "#fef3c7", color: "#92400e", border: "1px solid #fcd34d" },
+  serious: { background: "#fee2e2", color: "#991b1b", border: "1px solid #fecaca" },
+};
+
+const PhraseMistakeHighlight = ({ mistake, draftText }) => {
+  const highlight = findMistakeHighlight(mistake, draftText);
+
+  if (!highlight) return null;
+
+  return (
+    <div style={{ marginTop: 8, padding: 10, borderRadius: 10, background: "#ffffff", border: "1px solid #fecaca" }}>
+      <p style={{ margin: "0 0 6px", fontWeight: 800 }}>Your draft with this mistake highlighted:</p>
+      <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+        {highlight.draft.slice(0, highlight.start)}
+        <mark style={{ background: "#fecaca", color: "#7f1d1d", padding: "2px 3px", borderRadius: 4 }}>
+          {highlight.draft.slice(highlight.start, highlight.end)}
+        </mark>
+        {highlight.draft.slice(highlight.end)}
+      </p>
+    </div>
+  );
+};
+
+const PhraseMistakesPanel = ({ phraseMistakes, draftText }) => {
+  const mistakes = getPhraseMistakes(phraseMistakes);
+
+  if (mistakes.length === 0) return null;
+
+  return (
+    <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #86efac", display: "grid", gap: 10 }}>
+      <h4 style={{ margin: 0, color: "#14532d" }}>Your highlighted mistakes</h4>
+      {mistakes.map((mistake, index) => {
+        const severity = String(mistake?.severity || "").trim().toLowerCase();
+        const severityLabel = severity || "—";
+        const severityStyle = severityBadgeStyles[severity] || { background: "#f3f4f6", color: "#374151", border: "1px solid #d1d5db" };
+
+        return (
+          <div
+            key={`${mistake?.phrase || "mistake"}-${index}`}
+            style={{ padding: 12, borderRadius: 12, background: "#f8fafc", border: "1px solid #bbf7d0", color: "#111827" }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+              <strong>Mistake {index + 1}</strong>
+              <span style={{ ...severityStyle, borderRadius: 999, padding: "3px 9px", fontSize: 12, fontWeight: 900 }}>
+                {severityLabel}
+              </span>
+            </div>
+            <p style={{ margin: "0 0 6px" }}><strong>What you wrote:</strong> {mistake?.phrase || "—"}</p>
+            <p style={{ margin: "0 0 6px" }}><strong>Better version:</strong> {mistake?.correction || "—"}</p>
+            <p style={{ margin: "0 0 6px" }}><strong>Mistake type:</strong> {mistake?.mistakeType || "—"}</p>
+            <p style={{ margin: 0 }}><strong>Why this is wrong:</strong> {mistake?.explanation || "—"}</p>
+            <PhraseMistakeHighlight mistake={mistake} draftText={draftText} />
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const TutorCommentBox = ({ comment, phraseMistakes, draftText }) => {
   const cleanComment = String(comment || "").trim();
+  const mistakes = getPhraseMistakes(phraseMistakes);
 
   if (!cleanComment) {
     return (
@@ -314,6 +423,7 @@ const TutorCommentBox = ({ comment }) => {
         <span>Tutor comment</span>
       </div>
       <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, fontWeight: 700, whiteSpace: "pre-wrap" }}>{cleanComment}</p>
+      {mistakes.length > 0 ? <PhraseMistakesPanel phraseMistakes={mistakes} draftText={draftText} /> : null}
     </div>
   );
 };
@@ -366,6 +476,12 @@ const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
               <p style={{ margin: 0, fontSize: 17, lineHeight: 1.6, fontWeight: 800, whiteSpace: "pre-wrap" }}>
                 {latestTutorResponse.tutorFeedback}
               </p>
+              {getPhraseMistakes(latestTutorResponse.phraseMistakes).length > 0 ? (
+                <PhraseMistakesPanel
+                  phraseMistakes={latestTutorResponse.phraseMistakes}
+                  draftText={getReviewDraftCandidates(latestTutorResponse)}
+                />
+              ) : null}
             </div>
           ) : null}
 
@@ -413,7 +529,11 @@ const TutorFeedbackHistory = ({ reviews, errorMessage }) => {
                       <p style={{ ...styles.helperText, margin: "0 0 8px" }}>
                         Reviewed: {review?.reviewedAt ? formatDate(review?.reviewedAt) : "—"}
                       </p>
-                      <TutorCommentBox comment={review?.tutorFeedback} />
+                      <TutorCommentBox
+                        comment={review?.tutorFeedback}
+                        phraseMistakes={review?.phraseMistakes}
+                        draftText={getReviewDraftCandidates(review)}
+                      />
                     </div>
                   );
                 })}
