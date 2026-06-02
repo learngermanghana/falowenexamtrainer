@@ -1,677 +1,353 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { fetchSelfLearningResources } from "../services/selfLearningResourcesService";
-import { loadSelfLearningProgress, saveSelfLearningProgress } from "../services/selfLearningProgressService";
-import { fetchVocabularyFromSheet } from "../services/vocabService";
+import { useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
-import { describeGrammarFocusItem } from "../lib/grammarFocusNotes";
-import { DayTabs, OverviewPanel, ResourcePanel, WeeklyReviewPanel } from "./SelfLearningSharedComponents";
 
-const B2_SELF_LEARNING_PLAN = [];
-const DEFAULT_SCORE_THRESHOLD = 80;
-const DEFAULT_SKIMMING_CHUNK_SIZE = 8;
-const COURSE_TABS = [
-  { id: "overview", label: "Overview" },
-  { id: "grammar", label: "Grammar" },
-  { id: "speaking", label: "Speaking" },
-  { id: "writing", label: "Writing" },
-  { id: "resources", label: "Resources" },
-  { id: "review", label: "Review" },
+const SCORE_THRESHOLD = 75;
+
+const B2_SELF_LEARNING_PLAN = [
+  {
+    day: 1,
+    title: "Persönliche Identität und Selbstverständnis",
+    topic: "Über sich selbst, Werte und persönliche Entwicklung sprechen",
+    grammar: "Adjektivdeklination und klare Satzverbindungen",
+    lesson: [
+      "Du lernst, dich differenzierter vorzustellen und dein Selbstverständnis zu erklären.",
+      "Du sammelst persönliche Beispiele, bevor du mit AI sprichst oder schreibst.",
+      "Du nutzt AI-Feedback, um Ausdruck, Struktur und Grammatik zu verbessern.",
+    ],
+    speakingTask: "Sprich 2–3 Minuten: Wer bist du heute und welche Erfahrungen haben dich geprägt?",
+    writingTask: "Schreibe 180–220 Wörter: Wer bin ich online – wer bin ich offline?",
+    readingTask: "Lies einen kurzen Text über digitale Identität und markiere 6 Adjektiv-Nomen-Verbindungen.",
+    listeningTask: "Höre ein Interview über Selbstbild und Fremdbild. Notiere 3 Hauptaussagen, 2 Beispiele und 1 eigene Reaktion.",
+    workbookLink: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-workbook",
+    grammarLink: "/campus/course/b2-day-1-persoenliche-identitaet-und-selbstverstaendnis-grammar-notes",
+    keywords: ["Identität", "Selbstbild", "Erfahrung", "authentisch", "soziale Medien", "Entwicklung"],
+  },
+  {
+    day: 2,
+    title: "Alltag und Zeitmanagement",
+    topic: "Routinen, Prioritäten und Produktivität beschreiben",
+    grammar: "Temporale Konnektoren und Nebensätze",
+    speakingTask: "Erkläre, wie du deinen Alltag organisierst und was du verbessern möchtest.",
+    writingTask: "Schreibe einen Beitrag über gutes Zeitmanagement im Lernalltag.",
+    readingTask: "Finde Tipps, Beispiele und Warnungen in einem Text über Produktivität.",
+    listeningTask: "Notiere Zeitangaben und Empfehlungen aus einem kurzen Beitrag.",
+    keywords: ["Priorität", "Routine", "Planung", "Ablenkung", "Ziel", "Gewohnheit"],
+  },
+  {
+    day: 3,
+    title: "Arbeit und Beruf",
+    topic: "Berufliche Erfahrungen, Erwartungen und Zusammenarbeit",
+    grammar: "Konjunktiv II für höfliche Vorschläge",
+    speakingTask: "Beschreibe eine berufliche Herausforderung und wie du damit umgehen würdest.",
+    writingTask: "Schreibe eine formelle E-Mail über ein berufliches Anliegen.",
+    readingTask: "Arbeite Anforderungen und Soft Skills aus einer Stellenanzeige heraus.",
+    listeningTask: "Fasse ein Gespräch über Arbeitsplatzkultur zusammen.",
+    keywords: ["Beruf", "Erfahrung", "Team", "Vorschlag", "Kommunikation", "Verantwortung"],
+  },
+  {
+    day: 4,
+    title: "Bildung und Lernen",
+    topic: "Lernstrategien, Prüfungen und Weiterbildung",
+    grammar: "Finalsätze mit damit / um ... zu",
+    speakingTask: "Erkläre, welche Lernstrategie für dich funktioniert und warum.",
+    writingTask: "Schreibe eine Erörterung über Online-Lernen und Präsenzunterricht.",
+    readingTask: "Markiere Hauptargumente in einem Text über Weiterbildung.",
+    listeningTask: "Notiere Tipps aus einem Lernpodcast und bewerte sie.",
+    keywords: ["Lernstrategie", "Weiterbildung", "Prüfung", "Motivation", "Fortschritt", "Methode"],
+  },
+  {
+    day: 5,
+    title: "Gesundheit und Wohlbefinden",
+    topic: "Stress, Balance und gesunde Gewohnheiten",
+    grammar: "Kausale Verbindungen mit weil, da, deshalb, daher",
+    speakingTask: "Beschreibe, wie Stress entsteht und was dagegen hilft.",
+    writingTask: "Schreibe einen Forumsbeitrag über gesunde Routinen.",
+    readingTask: "Finde Ursachen, Folgen und Lösungen in einem Gesundheitstext.",
+    listeningTask: "Notiere Empfehlungen aus einem Beitrag über Wohlbefinden.",
+    keywords: ["Stress", "Balance", "Gewohnheit", "Gesundheit", "Erholung", "Belastung"],
+  },
+  {
+    day: 6,
+    title: "Medien und digitale Kommunikation",
+    topic: "Soziale Medien, Datenschutz und Online-Verhalten",
+    grammar: "Indirekte Fragen und Meinungsformeln",
+    speakingTask: "Diskutiere Vor- und Nachteile sozialer Medien.",
+    writingTask: "Schreibe einen Meinungsbeitrag über Datenschutz im Alltag.",
+    readingTask: "Unterscheide Fakten und Meinungen in einem Medientext.",
+    listeningTask: "Fasse eine Diskussion über Online-Kommunikation zusammen.",
+    keywords: ["Datenschutz", "Medien", "Kommunikation", "Privatsphäre", "Information", "Nutzung"],
+  },
+  {
+    day: 7,
+    title: "Umwelt und Nachhaltigkeit",
+    topic: "Klimaschutz, Konsum und Alltagshandeln",
+    grammar: "Passiv und sachliche Beschreibung",
+    speakingTask: "Erkläre, welche Umweltmaßnahme im Alltag realistisch ist.",
+    writingTask: "Schreibe eine Erörterung über nachhaltigen Konsum.",
+    readingTask: "Finde Maßnahmen und Kritikpunkte in einem Umwelttext.",
+    listeningTask: "Notiere Zahlen, Beispiele und Lösungen aus einem Beitrag.",
+    keywords: ["Umwelt", "Nachhaltigkeit", "Konsum", "Maßnahme", "Verantwortung", "Klimaschutz"],
+  },
+  {
+    day: 8,
+    title: "Reisen und Mobilität",
+    topic: "Transport, Urlaub und nachhaltige Entscheidungen",
+    grammar: "Vergleichsformen und abwägende Argumentation",
+    speakingTask: "Vergleiche zwei Verkehrsmittel und begründe deine Wahl.",
+    writingTask: "Schreibe einen formellen Brief wegen eines Reiseproblems.",
+    readingTask: "Analysiere einen Text über moderne Mobilität.",
+    listeningTask: "Fasse Hinweise aus einer Reiseinformation zusammen.",
+    keywords: ["Mobilität", "Reise", "Verkehr", "Vergleich", "Verspätung", "Entscheidung"],
+  },
+  {
+    day: 9,
+    title: "Wohnen und Nachbarschaft",
+    topic: "Wohnformen, Mietprobleme und Zusammenleben",
+    grammar: "Relativsätze und genaue Beschreibungen",
+    speakingTask: "Beschreibe deine ideale Wohnsituation und begründe sie.",
+    writingTask: "Schreibe eine Beschwerde oder Anfrage zum Thema Wohnen.",
+    readingTask: "Finde Details und Meinungen in einer Wohnungsanzeige oder einem Artikel.",
+    listeningTask: "Notiere Problem, Lösung und nächste Schritte aus einem Gespräch.",
+    keywords: ["Wohnung", "Nachbarschaft", "Miete", "Lage", "Zusammenleben", "Beschwerde"],
+  },
+  {
+    day: 10,
+    title: "Konsum und Geld",
+    topic: "Kaufentscheidungen, Budget und Werbung",
+    grammar: "Konzessive Verbindungen mit obwohl / trotzdem",
+    speakingTask: "Bewerte, wie Werbung Kaufentscheidungen beeinflusst.",
+    writingTask: "Schreibe einen Beitrag über bewussten Umgang mit Geld.",
+    readingTask: "Finde Argumente in einem Text über Konsumverhalten.",
+    listeningTask: "Fasse ein Gespräch über Sparen und Ausgaben zusammen.",
+    keywords: ["Konsum", "Budget", "Werbung", "Preis", "Qualität", "Entscheidung"],
+  },
+  {
+    day: 11,
+    title: "Gesellschaft und Integration",
+    topic: "Sprache, Teilhabe und Zusammenleben",
+    grammar: "Argumentationsstruktur mit einerseits / andererseits",
+    speakingTask: "Erkläre, warum Sprache für gesellschaftliche Teilhabe wichtig ist.",
+    writingTask: "Schreibe eine Erörterung über Integration und Alltag.",
+    readingTask: "Notiere Position, Beispiele und Fazit aus einem Gesellschaftstext.",
+    listeningTask: "Fasse verschiedene Meinungen aus einer Diskussion zusammen.",
+    keywords: ["Integration", "Sprache", "Teilhabe", "Gesellschaft", "Respekt", "Vielfalt"],
+  },
+  {
+    day: 12,
+    title: "Kultur und Freizeit",
+    topic: "Hobbys, kulturelle Angebote und persönliche Interessen",
+    grammar: "Adjektive, Präpositionen und Bewertungen",
+    speakingTask: "Stelle ein kulturelles Angebot vor und bewerte es.",
+    writingTask: "Schreibe eine Rezension oder Empfehlung.",
+    readingTask: "Finde Bewertungen und Begründungen in einem Kulturtext.",
+    listeningTask: "Notiere Eindrücke aus einem Beitrag über Freizeit.",
+    keywords: ["Kultur", "Freizeit", "Empfehlung", "Interesse", "Bewertung", "Angebot"],
+  },
 ];
 
-const buildEmptyDayState = () => ({
-  grammarCheckComplete: false,
+const tabs = [
+  { id: "lesson", label: "Lernen" },
+  { id: "practice", label: "AI Practice" },
+  { id: "selfMark", label: "Self-marking" },
+  { id: "vocab", label: "Wortschatz" },
+];
+
+const emptyDayState = () => ({
+  tab: "lesson",
+  lessonReady: false,
   speakingScore: "",
-  speakingComplete: false,
   writingScore: "",
-  writingComplete: false,
-  skimmingComplete: false,
-  dayComplete: false,
-  selectedTab: "overview",
+  readingScore: "",
+  listeningScore: "",
+  improvedAfterFeedback: false,
+  completed: false,
 });
 
-const normalizeScore = (value) => {
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? null : parsed;
+const card = { ...styles.card, display: "grid", gap: 12 };
+const miniCard = { border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#fff" };
+const skillRows = ["speakingScore", "writingScore", "readingScore", "listeningScore"];
+
+const numberOrNull = (value) => {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
 };
 
-const B2SelfLearningCourse = () => {
+const skillLabels = {
+  speakingScore: "Sprechen",
+  writingScore: "Schreiben",
+  readingScore: "Lesen",
+  listeningScore: "Hören",
+};
+
+const skillRoutes = {
+  speakingScore: "/campus/speech",
+  writingScore: "/campus/writing",
+  readingScore: "/exams/lesen",
+  listeningScore: "/exams/horen",
+};
+
+export default function B2SelfLearningCourse() {
   const navigate = useNavigate();
-  const { user, studentProfile } = useAuth();
-  const userId = user?.uid || "";
-  const studentCode = studentProfile?.id || "";
-
-  const [progressByDay, setProgressByDay] = useState({});
-  const [progressLoaded, setProgressLoaded] = useState(false);
-  const [sheetVocabWords, setSheetVocabWords] = useState([]);
-  const [sheetVocabLoaded, setSheetVocabLoaded] = useState(false);
-  const [sheetVocabError, setSheetVocabError] = useState("");
-  const [scoreThreshold, setScoreThreshold] = useState(DEFAULT_SCORE_THRESHOLD);
-  const [requireScoreThreshold, setRequireScoreThreshold] = useState(true);
-  const [vocabChunkSize, setVocabChunkSize] = useState(DEFAULT_SKIMMING_CHUNK_SIZE);
-  const [resources, setResources] = useState(null);
-  const [resourcesLoaded, setResourcesLoaded] = useState(false);
-  const [resourcesError, setResourcesError] = useState("");
-  const [flashcardIndexByDay, setFlashcardIndexByDay] = useState({});
-
-  const dayKeys = useMemo(
-    () => B2_SELF_LEARNING_PLAN.map((entry) => `day-${entry.day}`),
-    []
-  );
+  const { dayId } = useParams();
+  const [progress, setProgress] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("falowen:b2:self-learning:v1") || "{}");
+    } catch (error) {
+      return {};
+    }
+  });
 
   useEffect(() => {
-    let isMounted = true;
+    localStorage.setItem("falowen:b2:self-learning:v1", JSON.stringify(progress));
+  }, [progress]);
 
-    const loadSheetVocab = async () => {
-      setSheetVocabLoaded(false);
-      setSheetVocabError("");
-      try {
-        const vocab = await fetchVocabularyFromSheet();
-        if (!isMounted) return;
-        const words = vocab
-          .filter((entry) => ["B2", "ALL"].includes(entry.level))
-          .map((entry) => entry.german)
-          .filter(Boolean);
-        setSheetVocabWords(Array.from(new Set(words)));
-      } catch (err) {
-        console.error("Failed to load B2 vocab sheet", err);
-        if (!isMounted) return;
-        setSheetVocabWords([]);
-        setSheetVocabError(err?.message || "Failed to load B2 vocabulary from the sheet.");
-      } finally {
-        if (isMounted) setSheetVocabLoaded(true);
-      }
-    };
+  const selectedDay = Number(dayId || 1);
+  const visiblePlan = useMemo(() => {
+    if (Number.isInteger(selectedDay) && selectedDay > 0) {
+      return B2_SELF_LEARNING_PLAN.filter((entry) => entry.day === selectedDay);
+    }
+    return B2_SELF_LEARNING_PLAN;
+  }, [selectedDay]);
 
-    loadSheetVocab();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadResources = async () => {
-      setResourcesLoaded(false);
-      setResourcesError("");
-      try {
-        const data = await fetchSelfLearningResources("B2");
-        if (!isMounted) return;
-        setResources(data);
-      } catch (err) {
-        console.error("Failed to load B2 resources", err);
-        if (!isMounted) return;
-        setResources(null);
-        setResourcesError(err?.message || "Failed to load B2 resources.");
-      } finally {
-        if (isMounted) setResourcesLoaded(true);
-      }
-    };
-
-    loadResources();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadProgress = async () => {
-      if (!userId && !studentCode) {
-        setProgressLoaded(true);
-        return;
-      }
-
-      setProgressLoaded(false);
-      try {
-        const saved = await loadSelfLearningProgress({ userId, studentCode, level: "B2" });
-        if (!isMounted) return;
-        if (saved?.progressByDay) {
-          setProgressByDay(saved.progressByDay);
-        }
-      } catch (err) {
-        console.error("Failed to load B2 self-learning progress", err);
-      } finally {
-        if (isMounted) setProgressLoaded(true);
-      }
-    };
-
-    loadProgress();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [studentCode, userId]);
-
-  useEffect(() => {
-    if (!progressLoaded || (!userId && !studentCode)) return;
-
-    const timeout = setTimeout(() => {
-      saveSelfLearningProgress({
-        userId,
-        studentCode,
-        level: "B2",
-        data: { progressByDay },
-      }).catch((err) => {
-        console.error("Failed to save B2 self-learning progress", err);
-      });
-    }, 800);
-
-    return () => clearTimeout(timeout);
-  }, [progressByDay, progressLoaded, studentCode, userId]);
-
-  const updateDayState = (dayKey, updates) => {
-    setProgressByDay((prev) => {
-      const current = prev[dayKey] || buildEmptyDayState();
-      return {
-        ...prev,
-        [dayKey]: {
-          ...current,
-          ...updates,
-        },
-      };
-    });
+  const updateDay = (day, updates) => {
+    const key = `day-${day}`;
+    setProgress((previous) => ({
+      ...previous,
+      [key]: { ...emptyDayState(), ...(previous[key] || {}), ...updates },
+    }));
   };
 
-  const skimmingWordsByDay = useMemo(() => {
-    if (!sheetVocabWords.length) return {};
-    const chunkSize = Math.max(1, vocabChunkSize);
-    return B2_SELF_LEARNING_PLAN.reduce((acc, entry, index) => {
-      const start = index * chunkSize;
-      const chunk = sheetVocabWords.slice(start, start + chunkSize);
-      acc[`day-${entry.day}`] = chunk;
-      return acc;
-    }, {});
-  }, [sheetVocabWords, vocabChunkSize]);
-
-  const getSkimmingWords = (entry, index) => {
-    const fallbackWords = entry.skimmingWords || [];
-    if (!sheetVocabWords.length) return fallbackWords;
-
-    const dayKey = `day-${entry.day}`;
-    const chunkSize = Math.max(1, vocabChunkSize);
-    const chunk =
-      skimmingWordsByDay[dayKey] || sheetVocabWords.slice(index * chunkSize, (index + 1) * chunkSize);
-
-    if (!chunk.length) return fallbackWords;
-    if (chunk.length >= chunkSize) return chunk;
-
-    const merged = [...chunk, ...fallbackWords.filter((word) => !chunk.includes(word))];
-    return merged.slice(0, chunkSize);
-  };
-
-  const getResourceEntry = (collection, resourceId) => {
-    if (!resourceId || !resources?.[collection]) return null;
-    return resources[collection][resourceId] || null;
-  };
-
-  const getFlashcardIndex = (dayKey, length) => {
-    if (!length) return 0;
-    const current = flashcardIndexByDay[dayKey] ?? 0;
-    return current % length;
-  };
-
-  const updateFlashcardIndex = (dayKey, updater) => {
-    setFlashcardIndexByDay((prev) => {
-      const current = prev[dayKey] ?? 0;
-      return { ...prev, [dayKey]: updater(current) };
-    });
-  };
-
-  const getActiveTab = (dayState) => dayState?.selectedTab || "overview";
-
-  const renderScoreField = ({ dayKey, label, value, onChange }) => (
-    <label style={{ ...styles.field, maxWidth: 200 }}>
-      <span style={styles.label}>{label}</span>
-      <input
-        type="number"
-        min={0}
-        max={100}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        style={styles.input}
-        placeholder="0-100"
-      />
-    </label>
-  );
-
-  const sharedLabels = {
-    overview: {
-      learningObjectives: "Learning objectives",
-      grammarFocus: "Grammar focus",
-      brainMap: "Brain map (Ideen)",
-      emptyOverview: "No overview details available for this day yet.",
-    },
-    resources: {
-      activitiesTitle: "2.5) Varied activities",
-      quizTitle: "Mini-quiz",
-      discussionLabel: "Discussion prompt:",
-      reflectionLabel: "Reflection:",
-      readingTitle: "Reading task",
-      listeningTitle: "Listening task",
-      optionalBadge: "Optional",
-      openReading: "Open reading source",
-      openListening: "Open listening source",
-      sourcePrefix: "Source:",
-      skimmingTitle: "3) Skimming words",
-      skimmingHelper: "Read the list quickly, then say each word in a short B2 sentence.",
-      loadingVocab: "Loading vocabulary from the sheet...",
-      flashcardTitle: "Flashcard practice",
-      prevCard: "Previous",
-      nextCard: "Next",
-      randomCard: "Random card",
-      skimmingCompleteLabel: "I practiced the skimming words",
-    },
-    review: {
-      reviewTitle: "Weekly review & reflection",
-      practiceLabel: "Practice prompt:",
-      emptyReview: "No weekly review for this day yet.",
-    },
-  };
+  const completedCount = B2_SELF_LEARNING_PLAN.filter((entry) => progress[`day-${entry.day}`]?.completed).length;
 
   return (
-    <div style={{ display: "grid", gap: 16 }}>
-      <div style={styles.card}>
-        <h3 style={{ ...styles.sectionTitle, marginBottom: 6 }}>B2 self-learning flow (no tutor)</h3>
-        <p style={{ ...styles.helperText, marginTop: 0 }}>
-          Each day has core steps: speaking recording, writing practice, and skimming words. Curated reading and
-          listening tasks add authentic sources with comprehension tasks. Save your scores and only mark a step
-          complete when the AI score is at least {scoreThreshold}. Writing prompts follow Goethe-B2 formats
-          (Meinungsaufsatz or formeller Brief) and mirror the speaking topic and grammar focus. Use the brain map
-          to collect quick ideas before you start.
+    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+      <div style={card}>
+        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>Back to Course</button>
+        <span style={styles.levelPill}>B2 Self-learning</span>
+        <h1 style={{ ...styles.title, marginBottom: 0 }}>B2 Selbstlernkurs · AI Practice & Self-marking</h1>
+        <p style={{ ...styles.subtitle, margin: 0 }}>
+          Kein Tutor-Upload. Du lernst zuerst, übst mit Falowen AI, liest Feedback, verbesserst deine Antwort und markierst dich selbst.
         </p>
-        <p style={{ ...styles.helperText, marginTop: 0 }}>
-          Skimming words are loaded from the vocab Google Sheet when available; otherwise the built-in list is
-          shown.
-        </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
-          <label style={{ ...styles.field, maxWidth: 220 }}>
-            <span style={styles.label}>Vocabulary chunk size</span>
-            <select
-              value={vocabChunkSize}
-              onChange={(event) => setVocabChunkSize(Number(event.target.value))}
-              style={styles.input}
-            >
-              {[6, 8, 10, 12].map((size) => (
-                <option key={size} value={size}>
-                  {size} words
-                </option>
-              ))}
-            </select>
-          </label>
-          <label style={{ ...styles.field, maxWidth: 220 }}>
-            <span style={styles.label}>Score threshold</span>
-            <input
-              type="number"
-              min={0}
-              max={100}
-              value={scoreThreshold}
-              onChange={(event) => setScoreThreshold(Number(event.target.value) || 0)}
-              style={styles.input}
-              placeholder="0-100"
-            />
-          </label>
-          <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <input
-              type="checkbox"
-              checked={requireScoreThreshold}
-              onChange={(event) => setRequireScoreThreshold(event.target.checked)}
-            />
-            <span style={styles.label}>Require threshold to mark steps complete</span>
-          </label>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+          <div style={miniCard}><strong>1. Lernen</strong><br />Topic, useful phrases and grammar.</div>
+          <div style={miniCard}><strong>2. Practice</strong><br />Use Falowen AI.</div>
+          <div style={miniCard}><strong>3. Improve</strong><br />Revise after feedback.</div>
+          <div style={miniCard}><strong>4. Self-mark</strong><br />Enter score and mark complete.</div>
         </div>
-        {!resourcesLoaded ? (
-          <p style={{ ...styles.helperText, marginTop: 8 }}>Loading curated resources...</p>
-        ) : null}
-        {resourcesError ? (
-          <p style={{ ...styles.helperText, marginTop: 8, color: "#b91c1c" }}>
-            Curated resources unavailable: {resourcesError}
-          </p>
-        ) : null}
-        {resources ? (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
-            {resources.sampleAnswers?.speaking ? (
-              <details style={{ ...styles.card, padding: 12 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
-                  {resources.sampleAnswers.speaking.title}
-                </summary>
-                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                  {resources.sampleAnswers.speaking.text}
-                </p>
-              </details>
-            ) : null}
-            {resources.sampleAnswers?.writing ? (
-              <details style={{ ...styles.card, padding: 12 }}>
-                <summary style={{ cursor: "pointer", fontWeight: 600 }}>
-                  {resources.sampleAnswers.writing.title}
-                </summary>
-                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
-                  {resources.sampleAnswers.writing.text}
-                </p>
-              </details>
-            ) : null}
-            {resources.sampleRecordings?.length ? (
-              <div style={{ ...styles.card, padding: 12 }}>
-                <div style={{ fontWeight: 600, marginBottom: 6 }}>Sample recordings</div>
-                <ul style={{ margin: 0, paddingLeft: 18 }}>
-                  {resources.sampleRecordings.map((recording) => (
-                    <li key={recording.url} style={styles.helperText}>
-                      <a href={recording.url} target="_blank" rel="noreferrer">
-                        {recording.title}
-                      </a>{" "}
-                      <span style={{ color: "#6b7280" }}>({recording.source})</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-            {(resources.rubrics?.speaking || resources.rubrics?.writing) ? (
-              <div style={{ ...styles.card, padding: 12 }}>
-                <div style={{ fontWeight: 600, marginBottom: 6 }}>Self-assessment rubrics</div>
-                {resources.rubrics?.speaking ? (
-                  <>
-                    <div style={{ ...styles.helperText, fontWeight: 600, margin: "6px 0" }}>Speaking</div>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {resources.rubrics.speaking.map((item) => (
-                        <li key={item} style={styles.helperText}>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                ) : null}
-                {resources.rubrics?.writing ? (
-                  <>
-                    <div style={{ ...styles.helperText, fontWeight: 600, margin: "6px 0" }}>Writing</div>
-                    <ul style={{ margin: 0, paddingLeft: 18 }}>
-                      {resources.rubrics.writing.map((item) => (
-                        <li key={item} style={styles.helperText}>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </>
-                ) : null}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-        {sheetVocabError ? (
-          <p style={{ ...styles.helperText, marginTop: 0, color: "#b91c1c" }}>
-            Vocabulary sheet unavailable: {sheetVocabError}
-          </p>
-        ) : null}
-        {!userId && !studentCode ? (
-          <p style={{ ...styles.helperText, color: "#b45309", marginBottom: 0 }}>
-            Sign in to save your progress across devices.
-          </p>
-        ) : null}
+        <p style={{ margin: 0, color: "#4b5563" }}>
+          Fortschritt: {completedCount}/{B2_SELF_LEARNING_PLAN.length} Tage abgeschlossen. Empfohlene AI-Schwelle: {SCORE_THRESHOLD}/100.
+        </p>
       </div>
 
-      {B2_SELF_LEARNING_PLAN.map((entry, index) => {
-        const dayKey = `day-${entry.day}`;
-        const dayState = progressByDay[dayKey] || buildEmptyDayState();
-        const speakingScoreValue = dayState.speakingScore;
-        const writingScoreValue = dayState.writingScore;
-        const speakingScore = normalizeScore(speakingScoreValue);
-        const writingScore = normalizeScore(writingScoreValue);
-        const canCompleteSpeaking = !requireScoreThreshold || (speakingScore !== null && speakingScore >= scoreThreshold);
-        const canCompleteWriting = !requireScoreThreshold || (writingScore !== null && writingScore >= scoreThreshold);
-        const canCompleteDay = dayState.speakingComplete && dayState.writingComplete && dayState.skimmingComplete;
-        const skimmingWords = getSkimmingWords(entry, index);
-        const readingResource = getResourceEntry("reading", entry.reading?.resourceId);
-        const listeningResource = getResourceEntry("listening", entry.listening?.resourceId);
-        const flashcardIndex = getFlashcardIndex(dayKey, skimmingWords.length);
+      <div style={card}>
+        <strong>B2 Tagesseiten</strong>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/course/b2-self-learning")}>Alle Tage</button>
+          {B2_SELF_LEARNING_PLAN.map((entry) => (
+            <button key={entry.day} type="button" style={styles.secondaryButton} onClick={() => navigate(`/campus/course/b2-self-learning/day-${entry.day}`)}>
+              Tag {entry.day}{progress[`day-${entry.day}`]?.completed ? " ✓" : ""}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {visiblePlan.map((entry) => {
+        const key = `day-${entry.day}`;
+        const dayState = { ...emptyDayState(), ...(progress[key] || {}) };
+        const allScores = skillRows.map((row) => numberOrNull(dayState[row])).filter((score) => score !== null);
+        const averageScore = allScores.length ? Math.round(allScores.reduce((sum, score) => sum + score, 0) / allScores.length) : null;
+        const canComplete = dayState.lessonReady && dayState.improvedAfterFeedback && allScores.length >= 2;
 
         return (
-          <div key={dayKey} style={{ ...styles.card, display: "grid", gap: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+          <div key={entry.day} style={card}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
               <div>
-                <span style={styles.levelPill}>Day {entry.day}</span>
-                <h3 style={{ margin: "6px 0" }}>{entry.title}</h3>
-                <p style={{ ...styles.helperText, margin: 0 }}>Topic: {entry.topic}</p>
+                <span style={styles.levelPill}>Tag {entry.day}</span>
+                <h2 style={{ margin: "6px 0" }}>{entry.title}</h2>
+                <p style={{ margin: 0, color: "#4b5563" }}>{entry.topic}</p>
               </div>
-              {dayState.dayComplete ? <span style={styles.badge}>Day complete</span> : null}
+              {dayState.completed ? <span style={styles.badge}>Self-marked complete</span> : null}
             </div>
 
-            <DayTabs
-              dayKey={dayKey}
-              activeTab={getActiveTab(dayState)}
-              onChange={(tabId) => updateDayState(dayKey, { selectedTab: tabId })}
-              tablistLabel={`Day ${entry.day} tabs`}
-              tabs={COURSE_TABS.map((tab) =>
-                tab.id === "review" && entry.weeklyReview
-                  ? { ...tab, badge: `${entry.weeklyReview.reflectionQuestions?.length || 1}` }
-                  : tab
-              )}
-            />
+            <div role="tablist" aria-label={`B2 Tag ${entry.day}`} style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {tabs.map((tab) => (
+                <button key={tab.id} type="button" style={dayState.tab === tab.id ? styles.primaryButton : styles.secondaryButton} onClick={() => updateDay(entry.day, { tab: tab.id })}>{tab.label}</button>
+              ))}
+            </div>
 
-            <div style={{ display: "grid", gap: 12 }}>
-              {getActiveTab(dayState) === "overview" ? (
-                <OverviewPanel dayKey={dayKey} entry={entry} grammarLanguage="en" labels={sharedLabels.overview} />
-              ) : null}
-
-              {getActiveTab(dayState) === "grammar" ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                  <strong>Grammar practice</strong>
-                  {entry.grammarFocus?.items?.length ? (
-                    <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
-                      {entry.grammarFocus.items.map((item) => {
-                        const grammarItem = describeGrammarFocusItem(item, "en");
-                        return (
-                          <li key={grammarItem.title}>
-                            <strong>{grammarItem.title}</strong>
-                            <div style={styles.helperText}>{grammarItem.note}</div>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <p style={{ ...styles.helperText, margin: 0 }}>
-                      No dedicated grammar items for this day yet.
-                    </p>
-                  )}
-                  {entry.speaking.askGrammarPrompt ? (
-                    <>
-                      <p style={{ ...styles.helperText, margin: 0 }}>
-                        {entry.speaking.askGrammarPrompt}{" "}
-                        <button
-                          type="button"
-                          style={styles.linkButton}
-                          onClick={() => navigate("/campus/grammar")}
-                        >
-                          Ask the grammar coach
-                        </button>
-                      </p>
-                      <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <input
-                          type="checkbox"
-                          checked={dayState.grammarCheckComplete}
-                          onChange={(event) =>
-                            updateDayState(dayKey, {
-                              grammarCheckComplete: event.target.checked,
-                            })
-                          }
-                        />
-                        <span style={styles.label}>I asked a grammar question</span>
-                      </label>
-                    </>
-                  ) : null}
+            {dayState.tab === "lesson" ? (
+              <section style={{ display: "grid", gap: 10 }}>
+                <h3 style={{ margin: 0 }}>1) Lerne zuerst</h3>
+                <p style={{ margin: 0 }}><strong>Grammatik/Strategie:</strong> {entry.grammar}</p>
+                <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+                  {(entry.lesson || ["Sammle Ideen und Beispiele.", "Plane Einleitung, 2–3 Hauptpunkte und Schluss.", "Achte auf klare Satzverbindungen."]).map((item) => <li key={item}>{item}</li>)}
+                </ul>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {entry.grammarLink ? <button type="button" style={styles.secondaryButton} onClick={() => navigate(entry.grammarLink)}>Grammatiknotizen öffnen</button> : null}
+                  {entry.workbookLink ? <button type="button" style={styles.secondaryButton} onClick={() => navigate(entry.workbookLink)}>Workbook öffnen</button> : null}
+                  <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/grammar")}>Falowen Grammar AI öffnen</button>
                 </div>
-              ) : null}
+                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <input type="checkbox" checked={dayState.lessonReady} onChange={(event) => updateDay(entry.day, { lessonReady: event.target.checked })} />
+                  <span style={styles.label}>Ich habe das Thema verstanden und meine Ideen vorbereitet.</span>
+                </label>
+              </section>
+            ) : null}
 
-              {getActiveTab(dayState) === "speaking" ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                <strong>1) Speaking recorder</strong>
-                {entry.speaking.concept ? (
-                  <p style={{ ...styles.helperText, margin: 0 }}>{entry.speaking.concept}</p>
-                ) : null}
-                {entry.speaking.outline?.length ? (
-                  <div style={{ ...styles.helperText, margin: 0 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Outline</div>
-                    <ol style={{ margin: 0, paddingLeft: 18 }}>
-                      {entry.speaking.outline.map((step) => (
-                        <li key={step}>{step}</li>
-                      ))}
-                    </ol>
+            {dayState.tab === "practice" ? (
+              <section style={{ display: "grid", gap: 10 }}>
+                <h3 style={{ margin: 0 }}>2) Practice with Falowen AI</h3>
+                {[
+                  ["Sprechen", entry.speakingTask, "/campus/speech"],
+                  ["Schreiben", entry.writingTask, "/campus/writing"],
+                  ["Lesen", entry.readingTask, "/exams/lesen"],
+                  ["Hören", entry.listeningTask, "/exams/horen"],
+                ].map(([label, task, route]) => (
+                  <div key={label} style={miniCard}>
+                    <strong>{label}</strong>
+                    <p style={{ margin: "4px 0 8px", color: "#4b5563" }}>{task}</p>
+                    <button type="button" style={styles.linkButton} onClick={() => navigate(route)}>{label} AI öffnen</button>
                   </div>
-                ) : null}
-                {entry.speaking.starters?.length ? (
-                  <div style={{ ...styles.helperText, margin: 0 }}>
-                    <div style={{ fontWeight: 600, marginBottom: 4 }}>Starter phrases</div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                      {entry.speaking.starters.map((starter) => (
-                        <span
-                          key={starter}
-                          style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}
-                        >
-                          {starter}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-                <p style={{ ...styles.helperText, margin: 0 }}>{entry.speaking.prompt}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-                  <button
-                    type="button"
-                    style={styles.secondaryButton}
-                    onClick={() => navigate("/exams/speaking")}
-                  >
-                    Open recorder
-                  </button>
-                  {renderScoreField({
-                    dayKey,
-                    label: "Speaking score",
-                    value: speakingScoreValue,
-                    onChange: (value) =>
-                      updateDayState(dayKey, {
-                        speakingScore: value,
-                        speakingComplete: false,
-                        dayComplete: false,
-                      }),
-                  })}
-                  <button
-                    type="button"
-                    style={styles.primaryButton}
-                    disabled={!canCompleteSpeaking || dayState.speakingComplete}
-                    onClick={() => updateDayState(dayKey, { speakingComplete: true })}
-                  >
-                    {dayState.speakingComplete ? "Speaking completed" : "Mark speaking finished"}
-                  </button>
-                  {!canCompleteSpeaking ? (
-                    <span style={{ ...styles.helperText, margin: 0 }}>
-                      Score must be {scoreThreshold}+ to finish.
-                    </span>
-                  ) : null}
-                </div>
-                </div>
-              ) : null}
+                ))}
+              </section>
+            ) : null}
 
-              {getActiveTab(dayState) === "writing" ? (
-                <div style={{ display: "grid", gap: 6 }}>
-                <strong>2) Writing practice</strong>
-                <p style={{ ...styles.helperText, margin: 0 }}>{entry.writing.prompt}</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-                  <button
-                    type="button"
-                    style={styles.secondaryButton}
-                    onClick={() => navigate("/campus/writing?tab=ideas")}
-                  >
-                    Open ideas + mark my letter
-                  </button>
-                  {renderScoreField({
-                    dayKey,
-                    label: "Writing score",
-                    value: writingScoreValue,
-                    onChange: (value) =>
-                      updateDayState(dayKey, {
-                        writingScore: value,
-                        writingComplete: false,
-                        dayComplete: false,
-                      }),
-                  })}
-                  <button
-                    type="button"
-                    style={styles.primaryButton}
-                    disabled={!canCompleteWriting || dayState.writingComplete}
-                    onClick={() => updateDayState(dayKey, { writingComplete: true })}
-                  >
-                    {dayState.writingComplete ? "Writing completed" : "Mark writing finished"}
-                  </button>
-                  {!canCompleteWriting ? (
-                    <span style={{ ...styles.helperText, margin: 0 }}>
-                      Score must be {scoreThreshold}+ to finish.
-                    </span>
-                  ) : null}
+            {dayState.tab === "selfMark" ? (
+              <section style={{ display: "grid", gap: 10 }}>
+                <h3 style={{ margin: 0 }}>3) Self-marking</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
+                  {skillRows.map((row) => (
+                    <label key={row} style={{ ...styles.field, margin: 0 }}>
+                      <span style={styles.label}>{skillLabels[row]} score</span>
+                      <input type="number" min="0" max="100" value={dayState[row]} onChange={(event) => updateDay(entry.day, { [row]: event.target.value })} style={styles.input} placeholder="0-100" />
+                    </label>
+                  ))}
                 </div>
+                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <input type="checkbox" checked={dayState.improvedAfterFeedback} onChange={(event) => updateDay(entry.day, { improvedAfterFeedback: event.target.checked })} />
+                  <span style={styles.label}>Ich habe AI-Feedback gelesen und mindestens eine Verbesserung gemacht.</span>
+                </label>
+                <div style={{ ...miniCard, background: "#f8fafc" }}>
+                  <strong>Self-mark result:</strong> {averageScore === null ? "Noch kein Score" : `${averageScore}/100 average`}<br />
+                  <span style={{ color: canComplete ? "#047857" : "#92400e" }}>{canComplete ? "Bereit zum Abschließen." : "Übe mindestens 2 Skills mit AI und verbessere nach Feedback."}</span>
                 </div>
-              ) : null}
+                <button type="button" style={canComplete ? styles.primaryButton : styles.secondaryButton} disabled={!canComplete} onClick={() => updateDay(entry.day, { completed: true })}>Mark day complete</button>
+              </section>
+            ) : null}
 
-              {getActiveTab(dayState) === "resources" ? (
-                <ResourcePanel
-                  dayKey={dayKey}
-                  entry={entry}
-                  readingResource={readingResource}
-                  listeningResource={listeningResource}
-                  sheetVocabLoaded={sheetVocabLoaded}
-                  skimmingWords={skimmingWords}
-                  flashcardIndex={flashcardIndex}
-                  dayState={dayState}
-                  onPrevCard={() =>
-                    updateFlashcardIndex(dayKey, (current) => (current === 0 ? skimmingWords.length - 1 : current - 1))
-                  }
-                  onNextCard={() =>
-                    updateFlashcardIndex(dayKey, (current) => (current + 1) % skimmingWords.length)
-                  }
-                  onRandomCard={() =>
-                    updateFlashcardIndex(dayKey, () => Math.floor(Math.random() * skimmingWords.length))
-                  }
-                  onToggleSkimming={(checked) =>
-                    updateDayState(dayKey, {
-                      skimmingComplete: checked,
-                      dayComplete: checked ? dayState.dayComplete : false,
-                    })
-                  }
-                  labels={sharedLabels.resources}
-                />
-              ) : null}
-              {getActiveTab(dayState) === "review" ? (
-                <WeeklyReviewPanel dayKey={dayKey} weeklyReview={entry.weeklyReview} labels={sharedLabels.review} />
-              ) : null}
-            </div>
-
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-              <span style={{ ...styles.helperText, margin: 0 }}>
-                Step status: {dayState.speakingComplete ? "Speaking ✅" : "Speaking ⏳"} ·{" "}
-                {dayState.writingComplete ? "Writing ✅" : "Writing ⏳"} ·{" "}
-                {dayState.skimmingComplete ? "Skimming ✅" : "Skimming ⏳"}
-              </span>
-              <button
-                type="button"
-                style={styles.primaryButton}
-                disabled={!canCompleteDay || dayState.dayComplete}
-                onClick={() => updateDayState(dayKey, { dayComplete: true })}
-              >
-                {dayState.dayComplete ? "Day complete" : "Mark day complete"}
-              </button>
-            </div>
+            {dayState.tab === "vocab" ? (
+              <section style={{ display: "grid", gap: 10 }}>
+                <h3 style={{ margin: 0 }}>4) Wortschatz für diesen Tag</h3>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                  {entry.keywords.map((word) => <span key={word} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{word}</span>)}
+                </div>
+                <p style={{ margin: 0, color: "#4b5563" }}>Bilde mit jedem Wort einen B2-Satz und lasse Falowen AI deine Sätze natürlicher machen.</p>
+              </section>
+            ) : null}
           </div>
         );
       })}
-
-      {dayKeys.length === 0 ? (
-        <div style={styles.card}>
-          <p style={{ ...styles.helperText, margin: 0 }}>No self-learning days are configured yet.</p>
-        </div>
-      ) : null}
     </div>
   );
-};
-
-export default B2SelfLearningCourse;
+}
