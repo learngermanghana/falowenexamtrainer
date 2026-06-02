@@ -1,4 +1,4 @@
-import { makeLesson } from "../buildSelfLearningLesson";
+import { buildWeltReadingSearchUrl, makeLesson } from "../buildSelfLearningLesson";
 
 const b2Day1PersoenlicheIdentitaet = makeLesson({
   level: "B2",
@@ -90,9 +90,9 @@ const b2Day1PersoenlicheIdentitaet = makeLesson({
     listening: "Höre einen kurzen Beitrag über Identität, Persönlichkeit oder soziale Medien. Fasse ihn in 4 Sätzen zusammen.",
   },
   readingResource: {
-    title: "Welt.de Suche: Identität, soziale Medien, Selbstbild",
-    description: "Open the search and choose one article about identity, social media or self-image. Focus on the main idea and useful vocabulary.",
-    url: "https://www.welt.de/suche?q=Identit%C3%A4t%20soziale%20Medien%20Selbstbild",
+    title: "WELT article search: Identität, soziale Medien, Selbstbild",
+    description: "Open this stable site search and choose one article about identity, social media or self-image. Focus on the main idea and useful vocabulary.",
+    url: buildWeltReadingSearchUrl("Identität soziale Medien Selbstbild"),
     tasks: [
       "Write the title of the article you chose.",
       "Write the main idea in one German sentence.",
