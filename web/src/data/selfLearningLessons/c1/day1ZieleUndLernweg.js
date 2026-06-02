@@ -1,4 +1,4 @@
-import { makeLesson } from "../buildSelfLearningLesson";
+import { buildWeltReadingSearchUrl, makeLesson } from "../buildSelfLearningLesson";
 
 const c1Day1ZieleUndLernweg = makeLesson({
   level: "C1",
@@ -83,9 +83,9 @@ const c1Day1ZieleUndLernweg = makeLesson({
     listening: "Höre einen kurzen Beitrag über Lernen oder Bildung. Fasse ihn in 4 Sätzen zusammen und notiere 3 Redemittel.",
   },
   readingResource: {
-    title: "Welt.de Suche: Lernen, Bildung, Selbstorganisation",
-    description: "Open the search and choose one article about learning, education or self-organisation. Do not try to understand every word; focus on the main idea.",
-    url: "https://www.welt.de/suche?q=Lernen%20Bildung%20Selbstorganisation",
+    title: "WELT article search: Lernen, Bildung, Selbstorganisation",
+    description: "Open this stable site search and choose one article about learning, education or self-organisation. Do not try to understand every word; focus on the main idea.",
+    url: buildWeltReadingSearchUrl("Lernen Bildung Selbstorganisation"),
     tasks: [
       "Write the title of the article you chose.",
       "Write the main idea in one German sentence.",
