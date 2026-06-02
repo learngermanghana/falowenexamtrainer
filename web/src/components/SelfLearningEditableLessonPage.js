@@ -40,7 +40,7 @@ const NoteBox = ({ children }) => (
   </div>
 );
 
-const SkillCard = ({ title, task, route, onOpen }) => (
+const PracticeBox = ({ title, children }) => (
   <div
     style={{
       border: "1px solid #e5e7eb",
@@ -52,13 +52,40 @@ const SkillCard = ({ title, task, route, onOpen }) => (
     }}
   >
     <strong>{title}</strong>
+    {children}
+  </div>
+);
+
+const ExternalResourceCard = ({ title, resource }) => {
+  if (!resource) return null;
+
+  return (
+    <PracticeBox title={title}>
+      <p style={{ margin: 0, fontWeight: 600 }}>{resource.title}</p>
+      {resource.description ? <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{resource.description}</p> : null}
+      {resource.url ? (
+        <a href={resource.url} target="_blank" rel="noreferrer" style={{ ...styles.linkButton, justifySelf: "start" }}>
+          Open resource
+        </a>
+      ) : null}
+      {resource.tasks?.length ? (
+        <ul style={listStyle}>
+          {resource.tasks.map((task) => <li key={task}>{task}</li>)}
+        </ul>
+      ) : null}
+    </PracticeBox>
+  );
+};
+
+const SkillCard = ({ title, task, route, onOpen }) => (
+  <PracticeBox title={title}>
     <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{task}</p>
     {route ? (
       <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => onOpen(route)}>
         Open {title} AI
       </button>
     ) : null}
-  </div>
+  </PracticeBox>
 );
 
 const scoreFields = [
@@ -83,6 +110,15 @@ const buildInitialProgress = () => ({
   listeningScore: "",
   completed: false,
 });
+
+const renderList = (items = []) => {
+  if (!items.length) return null;
+  return (
+    <ul style={listStyle}>
+      {items.map((item) => <li key={item}>{item}</li>)}
+    </ul>
+  );
+};
 
 export default function SelfLearningEditableLessonPage({ lesson }) {
   const navigate = useNavigate();
@@ -138,42 +174,78 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
       </header>
 
       <Section title="1) Ziele für heute">
-        <ul style={listStyle}>
-          {(lesson.objectives || []).map((objective) => <li key={objective}>{objective}</li>)}
-        </ul>
+        {renderList(lesson.objectives || [])}
       </Section>
 
       <Section title="2) Thema verstehen">
         {(lesson.explanation || []).map((paragraph) => (
           <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>
         ))}
-        {lesson.grammarFocus ? <NoteBox><strong>Grammatik/Strategie:</strong> {lesson.grammarFocus}</NoteBox> : null}
-        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input type="checkbox" checked={progress.understood} onChange={(event) => updateProgress({ understood: event.target.checked })} />
-          <span style={styles.label}>I understand the topic and prepared my ideas.</span>
-        </label>
+        {lesson.topicQuestions?.length ? (
+          <PracticeBox title="Think before you answer">
+            {renderList(lesson.topicQuestions)}
+          </PracticeBox>
+        ) : null}
       </Section>
 
-      <Section title="3) Useful phrases">
-        <ul style={listStyle}>
-          {(lesson.phrases || []).map((phrase) => <li key={phrase}>{phrase}</li>)}
-        </ul>
+      <Section title="3) Grammatik und Sprache">
+        {lesson.grammarFocus ? <NoteBox><strong>Fokus:</strong> {lesson.grammarFocus}</NoteBox> : null}
+        {lesson.grammarLesson?.rules?.length ? (
+          <PracticeBox title="Rules">
+            {renderList(lesson.grammarLesson.rules)}
+          </PracticeBox>
+        ) : null}
+        {lesson.grammarLesson?.examples?.length ? (
+          <PracticeBox title="Examples">
+            {renderList(lesson.grammarLesson.examples)}
+          </PracticeBox>
+        ) : null}
+        {lesson.grammarLesson?.miniExercise ? (
+          <PracticeBox title="Mini exercise">
+            <p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p>
+          </PracticeBox>
+        ) : null}
       </Section>
 
-      <Section title="4) Practice with Falowen AI">
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-          <SkillCard title="Speech" task={lesson.tasks?.speaking} route="/campus/speech" onOpen={navigate} />
-          <SkillCard title="Writing" task={lesson.tasks?.writing} route="/campus/writing" onOpen={navigate} />
-          <SkillCard title="Reading" task={lesson.tasks?.reading} route="/exams/lesen" onOpen={navigate} />
-          <SkillCard title="Listening" task={lesson.tasks?.listening} route="/exams/horen" onOpen={navigate} />
-        </div>
-        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <input type="checkbox" checked={progress.practisedWithAi} onChange={(event) => updateProgress({ practisedWithAi: event.target.checked })} />
-          <span style={styles.label}>I practised at least two parts with Falowen AI.</span>
-        </label>
+      <Section title="4) Speaking builder">
+        {lesson.speakingBuilder?.plan?.length ? (
+          <PracticeBox title="Speaking plan">
+            {renderList(lesson.speakingBuilder.plan)}
+          </PracticeBox>
+        ) : null}
+        {lesson.speakingBuilder?.starters?.length ? (
+          <PracticeBox title="Sentence starters">
+            {renderList(lesson.speakingBuilder.starters)}
+          </PracticeBox>
+        ) : null}
+        <SkillCard title="Speech" task={lesson.tasks?.speaking} route="/campus/speech" onOpen={navigate} />
       </Section>
 
-      <Section title="5) Vocabulary builder">
+      <Section title="5) Writing builder">
+        {lesson.writingBuilder?.structure?.length ? (
+          <PracticeBox title="Writing structure">
+            {renderList(lesson.writingBuilder.structure)}
+          </PracticeBox>
+        ) : null}
+        {lesson.writingBuilder?.usefulLines?.length ? (
+          <PracticeBox title="Useful lines">
+            {renderList(lesson.writingBuilder.usefulLines)}
+          </PracticeBox>
+        ) : null}
+        <SkillCard title="Writing" task={lesson.tasks?.writing} route="/campus/writing" onOpen={navigate} />
+      </Section>
+
+      <Section title="6) Lesen practice">
+        <ExternalResourceCard title="Recommended reading" resource={lesson.readingResource} />
+        <SkillCard title="Reading" task={lesson.tasks?.reading} route="/exams/lesen" onOpen={navigate} />
+      </Section>
+
+      <Section title="7) Hören practice">
+        <ExternalResourceCard title="Recommended listening" resource={lesson.listeningResource} />
+        <SkillCard title="Listening" task={lesson.tasks?.listening} route="/exams/horen" onOpen={navigate} />
+      </Section>
+
+      <Section title="8) Vocabulary builder">
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {(lesson.vocabulary || []).map((word) => (
             <span key={word} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{word}</span>
@@ -184,7 +256,22 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
         </p>
       </Section>
 
-      <Section title="6) Self-marking">
+      <Section title="9) AI practice checklist">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+          <SkillCard title="Speech" task={lesson.tasks?.speaking} route="/campus/speech" onOpen={navigate} />
+          <SkillCard title="Writing" task={lesson.tasks?.writing} route="/campus/writing" onOpen={navigate} />
+        </div>
+        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <input type="checkbox" checked={progress.understood} onChange={(event) => updateProgress({ understood: event.target.checked })} />
+          <span style={styles.label}>I understand the topic and prepared my ideas.</span>
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <input type="checkbox" checked={progress.practisedWithAi} onChange={(event) => updateProgress({ practisedWithAi: event.target.checked })} />
+          <span style={styles.label}>I practised at least two parts with Falowen AI.</span>
+        </label>
+      </Section>
+
+      <Section title="10) Self-marking">
         <p style={{ margin: 0, color: "#4b5563" }}>
           Enter your AI scores. You can mark the day complete after you have practised with AI and improved after feedback.
         </p>
