@@ -21,7 +21,7 @@ const listStyle = {
   margin: 0,
   paddingLeft: 18,
   display: "grid",
-  gap: 6,
+  gap: 12,
 };
 
 const tableWrapStyle = {
@@ -66,6 +66,17 @@ const verbHighlightStyle = {
   fontWeight: 700,
 };
 
+const exampleMetaStyle = {
+  marginTop: 6,
+  padding: "8px 10px",
+  borderRadius: 10,
+  backgroundColor: "#f9fafb",
+  border: "1px solid #e5e7eb",
+  color: "#374151",
+  fontSize: 13,
+  lineHeight: 1.5,
+};
+
 const knowledgeQuestionStyle = {
   display: "grid",
   gap: 10,
@@ -74,6 +85,277 @@ const knowledgeQuestionStyle = {
   border: "1px solid #e5e7eb",
   backgroundColor: "#fff",
 };
+
+const SentenceDetails = ({ english, gender, note }) => (
+  <div style={exampleMetaStyle}>
+    <div>
+      <strong>English:</strong> {english}
+    </div>
+    <div>
+      <strong>Gender / number:</strong> {gender}
+    </div>
+    <div>
+      <strong>Why this article?</strong> {note}
+    </div>
+  </div>
+);
+
+const ExampleList = ({ examples }) => (
+  <ul style={listStyle}>
+    {examples.map((example) => (
+      <li key={example.id}>
+        <div>{example.sentence}</div>
+        <SentenceDetails english={example.english} gender={example.gender} note={example.note} />
+      </li>
+    ))}
+  </ul>
+);
+
+const nominativeCoreExamples = [
+  {
+    id: "nom-core-1",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Der Mann</span> <span style={verbHighlightStyle}>ist</span> nett.
+      </>
+    ),
+    english: "The man is nice.",
+    gender: "Mann = masculine singular",
+    note: "Mann is the subject of the sentence, so nominative masculine uses der.",
+  },
+  {
+    id: "nom-core-2",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Die Frau</span> <span style={verbHighlightStyle}>arbeitet</span>.
+      </>
+    ),
+    english: "The woman works.",
+    gender: "Frau = feminine singular",
+    note: "Frau is the subject, so nominative feminine uses die.",
+  },
+  {
+    id: "nom-core-3",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>spielt</span>.
+      </>
+    ),
+    english: "The child plays.",
+    gender: "Kind = neuter singular",
+    note: "Kind is the subject, so nominative neuter uses das.",
+  },
+  {
+    id: "nom-core-4",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Das</span> <span style={verbHighlightStyle}>ist</span> ein Haus. /{" "}
+        <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>wird</span> Lehrer.
+      </>
+    ),
+    english: "That is a house. / He becomes a teacher.",
+    gender: "Haus = neuter singular; Lehrer = masculine singular profession",
+    note:
+      "With sein and werden, the noun after the verb describes the subject. It stays nominative, so ein Haus and Lehrer are used as descriptions/complements.",
+  },
+];
+
+const nominativeMoreExamples = [
+  {
+    id: "nom-more-1",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Der Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+      </>
+    ),
+    english: "The teacher is friendly.",
+    gender: "Lehrer = masculine singular",
+    note: "The teacher is the subject. Definite masculine nominative uses der.",
+  },
+  {
+    id: "nom-more-2",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Ein Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+      </>
+    ),
+    english: "A teacher is friendly.",
+    gender: "Lehrer = masculine singular",
+    note: "The teacher is not a specific teacher here, so indefinite masculine nominative uses ein.",
+  },
+  {
+    id: "nom-more-3",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Die Lehrerin</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+      </>
+    ),
+    english: "The female teacher is friendly.",
+    gender: "Lehrerin = feminine singular",
+    note: "The subject is feminine and specific, so nominative feminine uses die.",
+  },
+  {
+    id: "nom-more-4",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Eine Lehrerin</span> <span style={verbHighlightStyle}>ist</span> freundlich.
+      </>
+    ),
+    english: "A female teacher is friendly.",
+    gender: "Lehrerin = feminine singular",
+    note: "The subject is feminine but not specific, so indefinite nominative feminine uses eine.",
+  },
+  {
+    id: "nom-more-5",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
+      </>
+    ),
+    english: "The child is quiet.",
+    gender: "Kind = neuter singular",
+    note: "The subject is neuter and specific, so nominative neuter uses das.",
+  },
+  {
+    id: "nom-more-6",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Ein Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
+      </>
+    ),
+    english: "A child is quiet.",
+    gender: "Kind = neuter singular",
+    note: "The subject is neuter but not specific, so indefinite nominative neuter uses ein.",
+  },
+  {
+    id: "nom-more-7",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Die Kinder</span> <span style={verbHighlightStyle}>sind</span> ruhig.
+      </>
+    ),
+    english: "The children are quiet.",
+    gender: "Kinder = plural",
+    note: "Plural nouns use die as the definite article in nominative.",
+  },
+  {
+    id: "nom-more-8",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Keine Kinder</span> <span style={verbHighlightStyle}>sind</span> laut.
+      </>
+    ),
+    english: "No children are loud.",
+    gender: "Kinder = plural",
+    note: "For plural negation, German uses keine.",
+  },
+];
+
+const accusativeCoreExamples = [
+  {
+    id: "acc-core-1",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Ich</span> <span style={verbHighlightStyle}>habe</span>{" "}
+        <span style={objectHighlightStyle}>den Hund</span>.
+      </>
+    ),
+    english: "I have the dog.",
+    gender: "Hund = masculine singular",
+    note: "Hund is the direct object after haben. Masculine definite article changes from der to den in accusative.",
+  },
+  {
+    id: "acc-core-2",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Sie</span> <span style={verbHighlightStyle}>kauft</span>{" "}
+        <span style={objectHighlightStyle}>die Blume</span>.
+      </>
+    ),
+    english: "She buys the flower.",
+    gender: "Blume = feminine singular",
+    note: "Blume is the direct object, but feminine definite article stays die in accusative.",
+  },
+  {
+    id: "acc-core-3",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>isst</span>{" "}
+        <span style={objectHighlightStyle}>das Brot</span>.
+      </>
+    ),
+    english: "He eats the bread.",
+    gender: "Brot = neuter singular",
+    note: "Brot is the direct object, but neuter definite article stays das in accusative.",
+  },
+  {
+    id: "acc-core-4",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Wir</span> <span style={verbHighlightStyle}>treffen</span>{" "}
+        <span style={objectHighlightStyle}>die Freunde</span>.
+      </>
+    ),
+    english: "We meet the friends.",
+    gender: "Freunde = plural",
+    note: "Freunde is plural and the direct object. Definite plural article stays die in accusative.",
+  },
+];
+
+const accusativeMoreExamples = [
+  {
+    id: "acc-more-1",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+        <span style={objectHighlightStyle}>den Lehrer</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+        <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>einen Lehrer</span>.
+      </>
+    ),
+    english: "The student sees the teacher. / The student sees a teacher.",
+    gender: "Lehrer = masculine singular",
+    note: "Lehrer is the direct object after sehen. Definite der changes to den; indefinite ein changes to einen.",
+  },
+  {
+    id: "acc-more-2",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+        <span style={objectHighlightStyle}>die Lehrerin</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+        <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>eine Lehrerin</span>.
+      </>
+    ),
+    english: "The student sees the female teacher. / The student sees a female teacher.",
+    gender: "Lehrerin = feminine singular",
+    note: "Lehrerin is the direct object, but feminine articles stay die / eine in accusative.",
+  },
+  {
+    id: "acc-more-3",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+        <span style={objectHighlightStyle}>das Kind</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+        <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>ein Kind</span>.
+      </>
+    ),
+    english: "The student sees the child. / The student sees a child.",
+    gender: "Kind = neuter singular",
+    note: "Kind is the direct object, but neuter articles stay das / ein in accusative.",
+  },
+  {
+    id: "acc-more-4",
+    sentence: (
+      <>
+        <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
+        <span style={objectHighlightStyle}>die Kinder</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
+        <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>keine Kinder</span>.
+      </>
+    ),
+    english: "The student sees the children. / The student sees no children.",
+    gender: "Kinder = plural",
+    note: "Plural definite article stays die in accusative. For plural negation, German uses keine.",
+  },
+];
 
 const knowledgeQuestions = [
   {
@@ -268,7 +550,7 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
       </header>
 
       <section style={cardStyle}>
-        <h2 style={sectionTitleStyle}>1) German plurals (quick guide)</h2>
+        <h2 style={sectionTitleStyle}>1) German plurals and articles (quick guide)</h2>
         <ul style={listStyle}>
           <li>German nouns can have different plural endings, so plural forms should be learned with each noun.</li>
           <li>
@@ -278,10 +560,6 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           <li>Plural nouns do not have grammatical gender, and the definite article is always <strong>die</strong>.</li>
           <li>
             With negation in plural, use <strong>keine</strong> (for example: <strong>keine Bücher</strong>).
-          </li>
-          <li>
-            Quick English bridge: <strong>definite article</strong> means <strong>"the"</strong> (specific thing),
-            while <strong>indefinite article</strong> means <strong>"a / an"</strong> (one non-specific thing).
           </li>
         </ul>
 
@@ -314,6 +592,18 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
             </tbody>
           </table>
         </div>
+
+        <p style={{ margin: 0 }}>
+          <strong>English explanation:</strong> A <strong>definite article</strong> means <strong>"the"</strong>. It points
+          to a specific person or thing that the speaker and listener can identify. An <strong>indefinite article</strong>{" "}
+          means <strong>"a / an"</strong>. It talks about one person or thing, but not a specific one. For plural
+          negation, English says <strong>"no"</strong>, and German uses <strong>keine</strong>.
+        </p>
+        <p style={{ margin: 0 }}>
+          German articles also show the noun’s <strong>gender or number</strong>: masculine, feminine, neuter, or
+          plural. That is why learners should learn nouns with their article: <strong>der Mann</strong>,{" "}
+          <strong>die Frau</strong>, <strong>das Kind</strong>.
+        </p>
 
         <ul style={listStyle}>
           <li>Der Hund → Die Hunde | Ich sehe den Hund. / Ich sehe die Hunde.</li>
@@ -386,53 +676,13 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
             </tbody>
           </table>
         </div>
-        <ul style={listStyle}>
-          <li>
-            <span style={subjectHighlightStyle}>Der Mann</span> <span style={verbHighlightStyle}>ist</span> nett.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Die Frau</span> <span style={verbHighlightStyle}>arbeitet</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>spielt</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Das</span> <span style={verbHighlightStyle}>ist</span> ein Haus. /{" "}
-            <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>wird</span> Lehrer.
-          </li>
-        </ul>
+        <ExampleList examples={nominativeCoreExamples} />
 
         <p style={{ margin: 0 }}>
           More nominative examples (subject-focused): in nominative-only patterns, highlight the{" "}
           <strong>subject</strong>.
         </p>
-        <ul style={listStyle}>
-          <li>
-            <span style={subjectHighlightStyle}>Der Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Ein Lehrer</span> <span style={verbHighlightStyle}>ist</span> freundlich.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Die Lehrerin</span> <span style={verbHighlightStyle}>ist</span> freundlich.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Eine Lehrerin</span> <span style={verbHighlightStyle}>ist</span>{" "}
-            freundlich.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Das Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Ein Kind</span> <span style={verbHighlightStyle}>ist</span> ruhig.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Die Kinder</span> <span style={verbHighlightStyle}>sind</span> ruhig.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Keine Kinder</span> <span style={verbHighlightStyle}>sind</span> laut.
-          </li>
-        </ul>
+        <ExampleList examples={nominativeMoreExamples} />
       </section>
 
       <section style={cardStyle}>
@@ -479,51 +729,13 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
           </table>
         </div>
 
-        <ul style={listStyle}>
-          <li>
-            <span style={subjectHighlightStyle}>Ich</span> <span style={verbHighlightStyle}>habe</span>{" "}
-            <span style={objectHighlightStyle}>den Hund</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Sie</span> <span style={verbHighlightStyle}>kauft</span>{" "}
-            <span style={objectHighlightStyle}>die Blume</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Er</span> <span style={verbHighlightStyle}>isst</span>{" "}
-            <span style={objectHighlightStyle}>das Brot</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Wir</span> <span style={verbHighlightStyle}>treffen</span>{" "}
-            <span style={objectHighlightStyle}>die Freunde</span>.
-          </li>
-        </ul>
+        <ExampleList examples={accusativeCoreExamples} />
 
         <p style={{ margin: 0 }}>
           More accusative examples (definite + indefinite from masculine to plural). Watch how the{" "}
           <strong>verb influences the object case</strong>:
         </p>
-        <ul style={listStyle}>
-          <li>
-            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
-            <span style={objectHighlightStyle}>den Lehrer</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
-            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>einen Lehrer</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
-            <span style={objectHighlightStyle}>die Lehrerin</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
-            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>eine Lehrerin</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
-            <span style={objectHighlightStyle}>das Kind</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
-            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>ein Kind</span>.
-          </li>
-          <li>
-            <span style={subjectHighlightStyle}>Der Student</span> <span style={verbHighlightStyle}>sieht</span>{" "}
-            <span style={objectHighlightStyle}>die Kinder</span>. / <span style={subjectHighlightStyle}>Der Student</span>{" "}
-            <span style={verbHighlightStyle}>sieht</span> <span style={objectHighlightStyle}>keine Kinder</span>.
-          </li>
-        </ul>
+        <ExampleList examples={accusativeMoreExamples} />
       </section>
 
       <section style={cardStyle}>
