@@ -1,5 +1,4 @@
 import React from "react";
-import { styles } from "../../styles";
 import SpeakingPage from "../SpeakingPage";
 import WritingPage from "../WritingPage";
 
@@ -27,4 +26,10 @@ export function EmbeddedPracticeNote({ children }) {
   );
 }
 
-export default { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel, EmbeddedPracticeNote };
+const EmbeddedPracticePanels = {
+  EmbeddedSpeechPracticePanel,
+  EmbeddedWritingPracticePanel,
+  EmbeddedPracticeNote,
+};
+
+export default EmbeddedPracticePanels;
