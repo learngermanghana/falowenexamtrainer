@@ -433,10 +433,6 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
             <span style={subjectHighlightStyle}>Keine Kinder</span> <span style={verbHighlightStyle}>sind</span> laut.
           </li>
         </ul>
-        <p style={{ margin: 0 }}>
-          Quick tip: if your sentence is mainly <strong>subject + verb + description</strong>, it is usually
-          z-focused.
-        </p>
       </section>
 
       <section style={cardStyle}>
