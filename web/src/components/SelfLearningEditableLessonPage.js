@@ -17,9 +17,9 @@ const tabBarStyle = {
   position: "sticky",
   top: 0,
   zIndex: 5,
-  display: "flex",
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
   gap: 8,
-  flexWrap: "wrap",
   padding: "10px 0",
   background: "#f3f4f6",
 };
@@ -36,12 +36,10 @@ const listStyle = {
 };
 
 const tabs = [
-  { id: "overview", label: "Overview" },
-  { id: "grammar", label: "Grammar" },
-  { id: "speaking", label: "Speaking" },
-  { id: "writing", label: "Writing" },
-  { id: "lesenHoren", label: "Lesen & Hören" },
-  { id: "selfMark", label: "AI & Self-mark" },
+  { id: "learn", label: "1. Learn" },
+  { id: "speak", label: "2. Speak" },
+  { id: "write", label: "3. Write" },
+  { id: "finish", label: "4. Finish" },
 ];
 
 const Section = ({ title, children }) => (
@@ -183,7 +181,7 @@ const inferWritingType = (lesson) => {
 
 export default function SelfLearningEditableLessonPage({ lesson }) {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("learn");
   const storageKey = `falowen:self-learning:lesson:${lesson.level}:${lesson.day}`;
   const [progress, setProgress] = useState(() => {
     try {
@@ -256,7 +254,7 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
             <p style={{ margin: 0, fontSize: "1.05rem", lineHeight: 1.6, color: "#e5e7eb" }}>{lesson.topic}</p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
-            <StatCard label="Speaking topic" value={lesson.speakingTaskType || "Guided talk"} />
+            <StatCard label="Speaking task" value={lesson.speakingTaskType || "Guided talk"} />
             <StatCard label="Writing type" value={writingType} />
             <StatCard label="Progress" value={progress.completed ? "Completed" : "In progress"} />
           </div>
@@ -276,7 +274,7 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
         ))}
       </div>
 
-      {activeTab === "overview" ? (
+      {activeTab === "learn" ? (
         <>
           <Section title="Daily mission">
             <NoteBox>
@@ -294,17 +292,38 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
             </div>
           </Section>
 
-          <Section title="Ziele für heute">
+          <Section title="Ziele und Thema">
             {renderList(lesson.objectives || [])}
-          </Section>
-
-          <Section title="Thema verstehen">
             {(lesson.explanation || []).map((paragraph) => (
               <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>
             ))}
             {lesson.topicQuestions?.length ? (
               <PracticeBox title="Think before you answer">
                 {renderList(lesson.topicQuestions)}
+              </PracticeBox>
+            ) : null}
+          </Section>
+
+          <Section title="Grammatik, Sprache und Redemittel">
+            {lesson.grammarFocus ? <NoteBox><strong>Fokus:</strong> {lesson.grammarFocus}</NoteBox> : null}
+            {lesson.grammarLesson?.rules?.length ? (
+              <PracticeBox title="Rules">
+                {renderList(lesson.grammarLesson.rules)}
+              </PracticeBox>
+            ) : null}
+            {lesson.grammarLesson?.examples?.length ? (
+              <PracticeBox title="Examples">
+                {renderList(lesson.grammarLesson.examples)}
+              </PracticeBox>
+            ) : null}
+            {lesson.grammarLesson?.miniExercise ? (
+              <PracticeBox title="Mini exercise">
+                <p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p>
+              </PracticeBox>
+            ) : null}
+            {lesson.phrases?.length ? (
+              <PracticeBox title="Useful phrases">
+                {renderList(lesson.phrases)}
               </PracticeBox>
             ) : null}
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -315,33 +334,7 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
         </>
       ) : null}
 
-      {activeTab === "grammar" ? (
-        <Section title="Grammatik und Sprache">
-          {lesson.grammarFocus ? <NoteBox><strong>Fokus:</strong> {lesson.grammarFocus}</NoteBox> : null}
-          {lesson.grammarLesson?.rules?.length ? (
-            <PracticeBox title="Rules">
-              {renderList(lesson.grammarLesson.rules)}
-            </PracticeBox>
-          ) : null}
-          {lesson.grammarLesson?.examples?.length ? (
-            <PracticeBox title="Examples">
-              {renderList(lesson.grammarLesson.examples)}
-            </PracticeBox>
-          ) : null}
-          {lesson.grammarLesson?.miniExercise ? (
-            <PracticeBox title="Mini exercise">
-              <p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p>
-            </PracticeBox>
-          ) : null}
-          {lesson.phrases?.length ? (
-            <PracticeBox title="Useful phrases">
-              {renderList(lesson.phrases)}
-            </PracticeBox>
-          ) : null}
-        </Section>
-      ) : null}
-
-      {activeTab === "speaking" ? (
+      {activeTab === "speak" ? (
         <Section title="Speaking builder">
           <PracticeBox title="Sprechen topic">
             <p style={{ margin: 0, lineHeight: 1.6 }}>{speakingTopic}</p>
@@ -360,7 +353,7 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
         </Section>
       ) : null}
 
-      {activeTab === "writing" ? (
+      {activeTab === "write" ? (
         <Section title="Writing builder">
           <PracticeBox title="Writing topic">
             <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
@@ -380,31 +373,26 @@ export default function SelfLearningEditableLessonPage({ lesson }) {
         </Section>
       ) : null}
 
-      {activeTab === "lesenHoren" ? (
+      {activeTab === "finish" ? (
         <>
-          <Section title="Lesen practice">
-            <ExternalResourceCard title="Recommended reading" resource={lesson.readingResource} />
-            <SkillCard title="Reading" task={lesson.tasks?.reading} route="/exams/lesen" onOpen={navigate} />
-          </Section>
-          <Section title="Hören practice">
-            <ExternalResourceCard title="Recommended listening" resource={lesson.listeningResource} />
-            <SkillCard title="Listening" task={lesson.tasks?.listening} route="/exams/horen" onOpen={navigate} />
-          </Section>
-          <Section title="Vocabulary builder">
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {(lesson.vocabulary || []).map((word) => (
-                <span key={word} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{word}</span>
-              ))}
+          <Section title="Lesen, Hören und Wortschatz">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 10 }}>
+              <ExternalResourceCard title="Recommended reading" resource={lesson.readingResource} />
+              <ExternalResourceCard title="Recommended listening" resource={lesson.listeningResource} />
             </div>
-            <p style={{ margin: 0, color: "#4b5563" }}>
-              Make one strong sentence with each word, then ask Falowen AI to improve the sentences to {lesson.level} level.
-            </p>
+            <div style={{ display: "grid", gap: 8 }}>
+              <strong>Vocabulary builder</strong>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {(lesson.vocabulary || []).map((word) => (
+                  <span key={word} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{word}</span>
+                ))}
+              </div>
+              <p style={{ margin: 0, color: "#4b5563" }}>
+                Make one strong sentence with each word, then ask Falowen AI to improve the sentences to {lesson.level} level.
+              </p>
+            </div>
           </Section>
-        </>
-      ) : null}
 
-      {activeTab === "selfMark" ? (
-        <>
           <Section title="AI practice checklist">
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
               <SkillCard title="Speech" task={lesson.tasks?.speaking} route="/campus/speech" onOpen={navigate} />
