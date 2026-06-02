@@ -80,16 +80,15 @@ const CourseLessonPage = () => {
   const params = useParams();
   const level = normalizeLevel(location.state?.level || params.level);
   const day = location.state?.day ?? params.day;
+  const entry = useMemo(() => {
+    if (location.state?.entry) return location.state.entry;
+    return (courseSchedules[level] || []).find((lesson) => String(lesson.day) === String(day)) || null;
+  }, [day, level, location.state]);
 
   const SelfLearningComponent = getSelfLearningLessonComponent(level, day);
   if (SelfLearningComponent) {
     return <SelfLearningComponent />;
   }
-
-  const entry = useMemo(() => {
-    if (location.state?.entry) return location.state.entry;
-    return (courseSchedules[level] || []).find((lesson) => String(lesson.day) === String(day)) || null;
-  }, [day, level, location.state]);
 
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
   const assignmentKey = location.state?.assignmentKey || entry?.assignmentId || entry?.assignment_id || `${level}-DAY-${day}`;
