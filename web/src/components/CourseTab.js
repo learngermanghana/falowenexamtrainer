@@ -16,6 +16,7 @@ import ClassMembersTab from "./ClassMembersTab";
 import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
+import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
 import { mergeAssignmentProgress, toCourseTabStatus } from "../utils/assignmentProgress";
 import { fetchResults } from "../services/resultsService";
 import {
@@ -115,14 +116,7 @@ const isTutorMarkedEntry = (entry, level) => {
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 
-const extractLevelToken = (value) => {
-  if (!value) return "";
-  const match = String(value).toUpperCase().match(/\b(A1|A2|B1|B2|C1|C2)\b/);
-  return match ? match[1] : "";
-};
-
-const normalizeLevel = (level) => extractLevelToken(level);
-const LEVEL_ORDER = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const normalizeLevel = (level) => normalizeCourseLevel(level);
 const SYNTHETIC_ASSIGNMENT_ID_PATTERN = /(?:-DAY-\d+(?:-TASK-\d+)?)|(?:-TITLE-)/i;
 const PRACTICE_PROGRESS_COLLECTION = "practiceProgress";
 const A1_PRACTICAL_BADGE_CLUSTERS = [
@@ -291,9 +285,6 @@ const LessonList = ({ title, lessons, t }) => {
   );
 };
 
-const getAllowedCourseLevels = (levels, defaultLevel) => {
-  return levels;
-};
 
 export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
   resolveAssignmentCanonicalKey({
@@ -724,7 +715,8 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { studentProfile, loading: authLoading } = useAuth();
-  const resolvedDefaultLevel = normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
+  const resolvedStudentLevel = normalizeLevel(studentProfile?.level) || normalizeLevel(studentProfile?.className);
+  const resolvedDefaultLevel = resolvedStudentLevel || normalizeLevel(defaultLevel) || normalizeLevel(defaultClassName);
   const isFrenchProgram = program === "french";
   const { schedules, resolvedDerivedLevels } = useMemo(() => {
     if (isFrenchProgram) {
@@ -737,7 +729,7 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
     const baseLevels = Object.keys(schedules);
     const normalizedDefault = resolvedDefaultLevel;
     const merged = normalizedDefault && !baseLevels.includes(normalizedDefault) ? [...baseLevels, normalizedDefault] : baseLevels;
-    const allowedLevels = getAllowedCourseLevels(merged, normalizedDefault);
+    const allowedLevels = getAccessibleLevels(normalizedDefault, merged);
     return allowedLevels.sort((a, b) => {
       const aIndex = LEVEL_ORDER.indexOf(a);
       const bIndex = LEVEL_ORDER.indexOf(b);
@@ -1245,7 +1237,12 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                       </option>
                     ))}
                   </select>
-                  <button type="button" style={styles.secondaryButton} onClick={() => navigate("/campus/submit")}>
+                  <span style={styles.helperText}>You can review your current level and previous levels.</span>
+                  <button
+                    type="button"
+                    style={styles.secondaryButton}
+                    onClick={() => navigate("/campus/submit", { state: { level: selectedCourseLevel } })}
+                  >
                     {t("courseTab.submit")}
                   </button>
                   <YouTubeSubscribeButton />
