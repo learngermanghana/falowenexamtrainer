@@ -435,7 +435,7 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
         </ul>
         <p style={{ margin: 0 }}>
           Quick tip: if your sentence is mainly <strong>subject + verb + description</strong>, it is usually
-          nominative-focused.
+          z-focused.
         </p>
       </section>
 
