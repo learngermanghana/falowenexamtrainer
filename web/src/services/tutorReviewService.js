@@ -16,6 +16,66 @@ import {
 
 const COLLECTION_NAME = "examTutorReviewQueue";
 
+const MISTAKE_TYPE_OPTIONS = new Set([
+  "Verb conjugation",
+  "Word order",
+  "Article / gender",
+  "Spelling",
+  "Formal / informal",
+  "Missing task point",
+  "Other",
+]);
+
+const SEVERITY_OPTIONS = new Set(["minor", "important", "serious"]);
+
+const makePhraseMistakeId = () => `pm_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+const toFiniteOffset = (value, fallback = 0) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) && numberValue >= 0 ? Math.floor(numberValue) : fallback;
+};
+
+const toIsoString = (value) => {
+  if (typeof value === "string") {
+    const parsed = Date.parse(value);
+    if (Number.isFinite(parsed)) return new Date(parsed).toISOString();
+  }
+
+  return new Date().toISOString();
+};
+
+export const normalizePhraseMistakesForSave = (phraseMistakes = []) => {
+  if (!Array.isArray(phraseMistakes)) return [];
+
+  return phraseMistakes
+    .map((mistake = {}) => {
+      const phrase = String(mistake.phrase || "").trim();
+      const correction = String(mistake.correction || "").trim();
+      const explanation = String(mistake.explanation || "").trim();
+
+      if (!phrase || !correction || !explanation) return null;
+
+      const startOffset = toFiniteOffset(mistake.startOffset);
+      const endOffset = toFiniteOffset(mistake.endOffset, startOffset + phrase.length);
+      const mistakeType = MISTAKE_TYPE_OPTIONS.has(mistake.mistakeType) ? mistake.mistakeType : "Other";
+      const severity = SEVERITY_OPTIONS.has(mistake.severity) ? mistake.severity : "important";
+
+      return {
+        id: String(mistake.id || "").trim() || makePhraseMistakeId(),
+        source: "studentDraft",
+        phrase,
+        startOffset,
+        endOffset: endOffset > startOffset ? endOffset : startOffset + phrase.length,
+        mistakeType,
+        correction,
+        explanation,
+        severity,
+        createdAt: toIsoString(mistake.createdAt),
+      };
+    })
+    .filter(Boolean);
+};
+
 const toMillis = (value) => {
   if (!value) return 0;
   if (typeof value?.toMillis === "function") return value.toMillis();
@@ -179,7 +239,35 @@ export const subscribeTutorReviewsForStudent = ({ userId, studentCode } = {}, on
     }
   );
 };
-export const saveTutorReviewResponse = async ({ reviewId, reviewStatus, tutorFeedback = "" } = {}) => {
+export const subscribeTutorReviewQueue = (onChange, onError) => {
+  if (!isFirebaseConfigured || !db) {
+    if (typeof onChange === "function") onChange([]);
+    return () => {};
+  }
+
+  const reviewQuery = query(collection(db, COLLECTION_NAME), orderBy("createdAt", "desc"));
+
+  return onSnapshot(
+    reviewQuery,
+    (snapshot) => {
+      const reviews = snapshot.docs.map((docSnap) =>
+        normalizeReviewTimestamps({ id: docSnap.id, ...docSnap.data() })
+      );
+
+      if (typeof onChange === "function") onChange(reviews);
+    },
+    (error) => {
+      if (typeof onError === "function") onError(error);
+    }
+  );
+};
+
+export const saveTutorReviewResponse = async ({
+  reviewId,
+  reviewStatus,
+  tutorFeedback = "",
+  phraseMistakes = [],
+} = {}) => {
   if (!reviewId) {
     throw new Error("Missing reviewId for tutor response.");
   }
@@ -188,9 +276,24 @@ export const saveTutorReviewResponse = async ({ reviewId, reviewStatus, tutorFee
     throw new Error("Tutor responses require Firebase/Firestore configuration.");
   }
 
+  const normalizedPhraseMistakes = normalizePhraseMistakesForSave(phraseMistakes);
+  const responseCreatedAt = new Date().toISOString();
+  const tutorResponse = {
+    reviewStatus,
+    tutorFeedback,
+    phraseMistakes: normalizedPhraseMistakes,
+    createdAt: responseCreatedAt,
+  };
+
   await updateDoc(doc(db, COLLECTION_NAME, reviewId), {
     reviewStatus,
     tutorFeedback,
+    phraseMistakes: normalizedPhraseMistakes,
+    tutorResponses: arrayUnion(tutorResponse),
+    reviewHistory: arrayUnion({
+      ...tutorResponse,
+      event: "tutorReviewResponse",
+    }),
     reviewedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });

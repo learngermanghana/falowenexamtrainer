@@ -172,6 +172,7 @@ import OfflineBanner from "./components/OfflineBanner";
 import StudyBuddyBar from "./components/StudyBuddyBar";
 import PlacementTestPage from "./components/PlacementTestPage";
 import PublicStudentGuidePage from "./components/PublicStudentGuidePage";
+import TutorMarkingPage from "./pages/TutorMarkingPage";
 import { buildPushNotification, persistPushNotification } from "./services/notificationService";
 import { toDateMs } from "./lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "./lib/paymentStatus";
@@ -289,6 +290,7 @@ function App() {
       vocab: true,
       discussion: (isEnrolled || isStaff) && !isSelfLearningTrack,
       account: true,
+      "tutor-marking": isStaff,
     }),
     [isEnrolled, isSelfLearningTrack, isStaff]
   );
@@ -621,6 +623,7 @@ const AppShell = ({
             }
           />
           <Route path="/placement-test" element={<PlacementTestPage />} />
+          <Route path="/tutor-marking" element={<Navigate to="/campus/tutor-marking" replace />} />
 
           <Route path="/campus" element={<Navigate to={`/campus/${defaultCampusSection}`} replace />} />
           <Route
@@ -1054,10 +1057,11 @@ const CampusArea = ({
   const { section } = useParams();
   const navigate = useNavigate();
 
-  const resolvedSection = useMemo(() => getPreferredSection(allowedSections, section || defaultSection), [
+  const resolvedSection = useMemo(() => getPreferredSection(allowedSections, section || defaultSection, tabStructure), [
     allowedSections,
     defaultSection,
     section,
+    tabStructure,
   ]);
 
   const activeMainTabConfig = useMemo(
@@ -1178,6 +1182,7 @@ const CampusArea = ({
       {resolvedSection === "results" && allowedSections.results ? <StudentResultsPage /> : null}
       {resolvedSection === "discussion" && allowedSections.discussion ? <ClassDiscussionPage /> : null}
       {resolvedSection === "account" && allowedSections.account ? <AccountSettings /> : null}
+      {resolvedSection === "tutor-marking" && allowedSections["tutor-marking"] ? <TutorMarkingPage /> : null}
     </>
   );
 };
