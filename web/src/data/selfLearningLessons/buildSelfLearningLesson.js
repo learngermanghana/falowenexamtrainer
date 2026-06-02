@@ -12,6 +12,14 @@ export const defaultListeningTasks = [
   "Summarise the audio in 4 sentences.",
 ];
 
+export const buildSiteSearchUrl = (site, query) => {
+  const safeSite = String(site || "").trim();
+  const safeQuery = String(query || "").trim();
+  return `https://www.google.com/search?q=${encodeURIComponent(`site:${safeSite} ${safeQuery}`)}`;
+};
+
+export const buildWeltReadingSearchUrl = (query) => buildSiteSearchUrl("welt.de", query);
+
 export const makeLesson = ({
   level,
   day,
@@ -179,9 +187,9 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
       listening: `Höre einen Beitrag zum Thema ${title} und fasse ihn zusammen.`,
     },
     readingResource: {
-      title: `Welt.de Suche: ${title}`,
-      description: "Open Welt.de search and choose one current article connected to today’s topic.",
-      url: `https://www.welt.de/suche?q=${encodeURIComponent(title)}`,
+      title: `WELT article search: ${title}`,
+      description: "Open this stable site search and choose one current WELT article connected to today’s topic.",
+      url: buildWeltReadingSearchUrl(title),
       tasks: defaultReadingTasks,
     },
     listeningResource: {
