@@ -1,12 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../../styles";
 import { EmbeddedPracticeNote, EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./EmbeddedPracticePanels";
 
 const DEFAULT_HERO = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80";
 const tabs = [["learn", "1. Learn"], ["speak", "2. Speak"], ["write", "3. Write"], ["finish", "4. Finish"]];
-const scoreFields = [["speakingScore", "Sprechen"], ["writingScore", "Schreiben"], ["readingScore", "Lesen"], ["listeningScore", "Hören"]];
-
 const card = { ...styles.card, display: "grid", gap: 14, border: "1px solid #e5e7eb", boxShadow: "0 10px 24px rgba(15,23,42,.06)" };
 const listStyle = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 
@@ -14,7 +12,6 @@ const Box = ({ title, children }) => <section style={card}><h2 style={{ margin: 
 const PracticeBox = ({ title, children }) => <div style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 14, background: "#fff", display: "grid", gap: 8 }}><strong>{title}</strong>{children}</div>;
 const Note = ({ children, good }) => <div style={{ padding: 12, borderRadius: 12, border: `1px solid ${good ? "#bbf7d0" : "#bfdbfe"}`, background: good ? "#f0fdf4" : "#eff6ff", lineHeight: 1.7 }}>{children}</div>;
 const renderList = (items = []) => items.length ? <ul style={listStyle}>{items.map((item) => <li key={item}>{item}</li>)}</ul> : null;
-const num = (value) => { const n = Number(value); return Number.isFinite(n) ? n : null; };
 
 function writingTypeOf(lesson) {
   if (lesson.writingTaskType) return lesson.writingTaskType;
@@ -39,14 +36,11 @@ export default function SelfLearningTabbedLessonPage({ lesson }) {
   const [tab, setTab] = useState("learn");
   const storageKey = `falowen:self-learning:lesson:${lesson.level}:${lesson.day}`;
   const [progress, setProgress] = useState(() => {
-    try { return { understood: false, practisedWithAi: false, improvedAfterFeedback: false, speakingScore: "", writingScore: "", readingScore: "", listeningScore: "", completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; }
-    catch { return { understood: false, practisedWithAi: false, improvedAfterFeedback: false, speakingScore: "", writingScore: "", readingScore: "", listeningScore: "", completed: false }; }
+    try { return { understood: false, completed: false, ...JSON.parse(localStorage.getItem(storageKey) || "{}") }; }
+    catch { return { understood: false, completed: false }; }
   });
   useEffect(() => localStorage.setItem(storageKey, JSON.stringify(progress)), [progress, storageKey]);
   const setP = (updates) => setProgress((old) => ({ ...old, ...updates }));
-  const scores = scoreFields.map(([key]) => num(progress[key])).filter((value) => value !== null);
-  const average = scores.length ? Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length) : null;
-  const canComplete = progress.understood && progress.practisedWithAi && progress.improvedAfterFeedback && scores.length >= 2;
   const writingType = writingTypeOf(lesson);
   const speakingTopic = lesson.speakingTopic || lesson.tasks?.speaking || `Sprich über: ${lesson.topic}`;
   const writingTopic = lesson.writingTopic || lesson.tasks?.writing || `Schreibe über: ${lesson.title}`;
@@ -68,9 +62,9 @@ export default function SelfLearningTabbedLessonPage({ lesson }) {
     <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))", gap: 8, padding: "10px 0", background: "#f3f4f6" }}>{tabs.map(([id, label]) => <button key={id} type="button" style={tab === id ? styles.primaryButton : styles.secondaryButton} onClick={() => setTab(id)}>{label}</button>)}</div>
 
     {tab === "learn" ? <>
-      <Box title="Daily mission"><Note><strong>No tutor submission for {lesson.level}.</strong> Learn, practise with AI, improve, and self-mark honestly.</Note><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}><PracticeBox title="Sprechen topic"><p style={{ margin: 0 }}>{speakingTopic}</p></PracticeBox><PracticeBox title="Writing topic"><span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span><p style={{ margin: 0 }}>{writingTopic}</p></PracticeBox></div></Box>
+      <Box title="Daily mission"><Note><strong>No tutor submission for {lesson.level}.</strong> Learn, practise with AI, improve, and mark the day complete when you finish.</Note><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 10 }}><PracticeBox title="Sprechen topic"><p style={{ margin: 0 }}>{speakingTopic}</p></PracticeBox><PracticeBox title="Writing topic"><span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span><p style={{ margin: 0 }}>{writingTopic}</p></PracticeBox></div></Box>
       <Box title="Ziele und Thema">{renderList(lesson.objectives || [])}{(lesson.explanation || []).map((p) => <p key={p} style={{ margin: 0, lineHeight: 1.7 }}>{p}</p>)}{lesson.topicQuestions?.length ? <PracticeBox title="Think before you answer">{renderList(lesson.topicQuestions)}</PracticeBox> : null}</Box>
-      <Box title="Grammatik, Sprache und Redemittel">{lesson.grammarFocus ? <Note><strong>Fokus:</strong> {lesson.grammarFocus}</Note> : null}{lesson.grammarLesson?.rules?.length ? <PracticeBox title="Rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}{lesson.grammarLesson?.examples?.length ? <PracticeBox title="Examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}{lesson.grammarLesson?.miniExercise ? <PracticeBox title="Mini exercise"><p style={{ margin: 0 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}{lesson.phrases?.length ? <PracticeBox title="Useful phrases">{renderList(lesson.phrases)}</PracticeBox> : null}<label style={{ display: "flex", gap: 8 }}><input type="checkbox" checked={progress.understood} onChange={(e) => setP({ understood: e.target.checked })} /><span style={styles.label}>I understand the topic and prepared my ideas.</span></label></Box>
+      <Box title="Grammatik, Sprache und Redemittel">{lesson.grammarFocus ? <Note><strong>Fokus:</strong> {lesson.grammarFocus}</Note> : null}{lesson.grammarLesson?.rules?.length ? <PracticeBox title="Rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}{lesson.grammarLesson?.examples?.length ? <PracticeBox title="Examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}{lesson.grammarLesson?.miniExercise ? <PracticeBox title="Mini exercise"><p style={{ margin: 0 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}{lesson.phrases?.length ? <PracticeBox title="Useful phrases">{renderList(lesson.phrases)}</PracticeBox> : null}<label style={{ display: "flex", gap: 8 }}><input type="checkbox" checked={Boolean(progress.understood)} onChange={(e) => setP({ understood: e.target.checked })} /><span style={styles.label}>I understand the topic and prepared my ideas.</span></label></Box>
     </> : null}
 
     {tab === "speak" ? <Box title="Speaking builder"><PracticeBox title="Sprechen topic"><p style={{ margin: 0 }}>{speakingTopic}</p></PracticeBox>{lesson.speakingBuilder?.plan?.length ? <PracticeBox title="Speaking plan">{renderList(lesson.speakingBuilder.plan)}</PracticeBox> : null}{lesson.speakingBuilder?.starters?.length ? <PracticeBox title="Sentence starters">{renderList(lesson.speakingBuilder.starters)}</PracticeBox> : null}<EmbeddedPracticeNote>Use the embedded speaking coach below so you do not leave the lesson.</EmbeddedPracticeNote><EmbeddedSpeechPracticePanel /></Box> : null}
@@ -79,8 +73,7 @@ export default function SelfLearningTabbedLessonPage({ lesson }) {
 
     {tab === "finish" ? <>
       <Box title="Lesen, Hören und Wortschatz"><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: 10 }}><ExternalCard title="Recommended reading" resource={lesson.readingResource} /><ExternalCard title="Recommended listening" resource={lesson.listeningResource} /></div><strong>Vocabulary builder</strong><div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>{(lesson.vocabulary || []).map((w) => <span key={w} style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{w}</span>)}</div></Box>
-      <Box title="AI practice checklist"><label style={{ display: "flex", gap: 8 }}><input type="checkbox" checked={progress.practisedWithAi} onChange={(e) => setP({ practisedWithAi: e.target.checked })} /><span style={styles.label}>I practised at least two parts with Falowen AI.</span></label></Box>
-      <Box title="Self-marking"><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))", gap: 10 }}>{scoreFields.map(([key, label]) => <label key={key} style={{ ...styles.field, margin: 0 }}><span style={styles.label}>{label} score</span><input type="number" min="0" max="100" value={progress[key]} onChange={(e) => setP({ [key]: e.target.value })} style={styles.input} placeholder="0-100" /></label>)}</div><label style={{ display: "flex", gap: 8 }}><input type="checkbox" checked={progress.improvedAfterFeedback} onChange={(e) => setP({ improvedAfterFeedback: e.target.checked })} /><span style={styles.label}>I read the AI feedback and improved at least one answer.</span></label><Note good={canComplete}><strong>Average score:</strong> {average === null ? "No score yet" : `${average}/100`}<br />{canComplete ? "Ready to mark complete." : "Complete the checklist above before marking this day complete."}</Note><button type="button" style={canComplete ? styles.primaryButton : styles.secondaryButton} disabled={!canComplete} onClick={() => setP({ completed: true })}>Mark this day complete</button></Box>
+      <Box title="Complete this day"><Note good={progress.completed}>{progress.completed ? "This day is marked as complete." : "When you finish learning, speaking, writing, reading and listening practice, mark this day as complete."}</Note><button type="button" style={styles.primaryButton} onClick={() => setP({ completed: true })}>{progress.completed ? "Completed" : "Mark as complete"}</button></Box>
     </> : null}
   </div>;
 }
