@@ -6,11 +6,11 @@ import { InfoBox } from "./ui";
 import ExamReadinessBadge from "./ExamReadinessBadge";
 import { useToast } from "../context/ToastContext";
 import { useAuth } from "../context/AuthContext";
-import { ALLOWED_LEVELS } from "../context/ExamContext";
 import { courseSchedules } from "../data/courseSchedule";
 import { getCurriculumEntriesForLevel } from "../data/germanAssignmentCatalog";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { mergeAssignmentProgress } from "../utils/assignmentProgress";
+import { getAccessibleLevels, normalizeCourseLevel } from "../utils/levelAccess";
 import { fetchAnswerKeyRegistry, resolveAnswerKeySource } from "../services/answerKeyRegistryService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import {
@@ -259,7 +259,14 @@ const doesEntryMatchSelectedAssignment = ({
   selectedChapterKey,
   assignmentTitle,
   buildChapterKey,
+  selectedLevel,
 }) => {
+  const normalizedEntryLevel = normalizeLevel(entry?.level);
+  const normalizedSelectedLevel = normalizeLevel(selectedLevel);
+  if (normalizedEntryLevel !== "GENERAL" && normalizedSelectedLevel !== "GENERAL" && normalizedEntryLevel !== normalizedSelectedLevel) {
+    return false;
+  }
+
   const normalizedSelectedKeys = [selectedCanonicalAssignmentKey, selectedAssignmentId]
     .map((value) => normalizeAssignmentIdentity(value))
     .filter(Boolean);
@@ -299,10 +306,7 @@ const toDateValue = (timestamp) => {
 
 const getBaseMaxByLevel = (level) => BASE_MAX_BY_LEVEL[level] || 4200;
 
-const normalizeLevel = (level) => {
-  const normalized = String(level || "").toUpperCase();
-  return ALLOWED_LEVELS.includes(normalized) ? normalized : "GENERAL";
-};
+const normalizeLevel = (level) => normalizeCourseLevel(level) || "GENERAL";
 
 const levelMatches = (entryLevel, selectedLevel) => {
   const normalizedEntryLevel = normalizeLevel(entryLevel);
@@ -359,11 +363,7 @@ const toNumericScore = (value) => {
   return null;
 };
 
-const normalizePreferredLevel = (rawLevel) => {
-  const token = String(rawLevel || "").toUpperCase();
-  const directMatch = token.match(/\b(A1|A2|B1|B2|C1|C2)\b/);
-  return directMatch ? directMatch[1] : "A1";
-};
+const normalizePreferredLevel = (rawLevel) => normalizeCourseLevel(rawLevel) || "A1";
 
 const AssignmentSubmissionPage = () => {
   const { t, i18n } = useTranslation();
@@ -374,9 +374,20 @@ const AssignmentSubmissionPage = () => {
   const [openedFeedbackId, setOpenedFeedbackId] = useState(null);
 
   const preferredLevel = useMemo(
-    () => normalizePreferredLevel(studentProfile?.level),
-    [studentProfile?.level]
+    () => normalizePreferredLevel(studentProfile?.level || studentProfile?.className),
+    [studentProfile?.className, studentProfile?.level]
   );
+  const requestedSubmitLevel = useMemo(
+    () => normalizeCourseLevel(location?.state?.level || new URLSearchParams(location?.search || "").get("level")),
+    [location?.search, location?.state?.level]
+  );
+  const accessibleSubmitLevels = useMemo(
+    () => getAccessibleLevels(preferredLevel, Object.keys(courseSchedules)),
+    [preferredLevel]
+  );
+  const [selectedSubmitLevel, setSelectedSubmitLevel] = useState(() => preferredLevel);
+  const [hasManualSubmitLevelSelection, setHasManualSubmitLevelSelection] = useState(false);
+  const appliedRequestedLevelRef = useRef("");
 
   const studentCode = useMemo(
     () => studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || "",
@@ -402,9 +413,31 @@ const AssignmentSubmissionPage = () => {
     [studentCode, user?.email, user?.uid]
   );
 
+  useEffect(() => {
+    const requestedKey = requestedSubmitLevel || "none";
+    if (appliedRequestedLevelRef.current !== requestedKey) {
+      appliedRequestedLevelRef.current = requestedKey;
+      if (requestedSubmitLevel && accessibleSubmitLevels.includes(requestedSubmitLevel)) {
+        setSelectedSubmitLevel(requestedSubmitLevel);
+        return;
+      }
+    }
+
+    if (!requestedSubmitLevel && !hasManualSubmitLevelSelection && accessibleSubmitLevels.includes(preferredLevel) && selectedSubmitLevel !== preferredLevel) {
+      setSelectedSubmitLevel(preferredLevel);
+      return;
+    }
+
+    if (!accessibleSubmitLevels.includes(selectedSubmitLevel)) {
+      const fallbackLevel = accessibleSubmitLevels.includes(preferredLevel) ? preferredLevel : accessibleSubmitLevels[0] || "A1";
+      setSelectedSubmitLevel(fallbackLevel);
+      setHasManualSubmitLevelSelection(false);
+    }
+  }, [accessibleSubmitLevels, hasManualSubmitLevelSelection, preferredLevel, requestedSubmitLevel, selectedSubmitLevel]);
+
   const assignmentDictionary = useMemo(
     () =>
-      [preferredLevel].flatMap((dictionaryLevel) => {
+      [selectedSubmitLevel].flatMap((dictionaryLevel) => {
         const levelSchedule = courseSchedules[dictionaryLevel] || [];
         const curriculumEntries = getCurriculumEntriesForLevel(dictionaryLevel);
         const entriesByDay = curriculumEntries.reduce((acc, entry) => {
@@ -484,12 +517,12 @@ const AssignmentSubmissionPage = () => {
 
         return dictionaryEntries;
       }),
-    [preferredLevel]
+    [selectedSubmitLevel]
   );
 
   const assignmentRequiredDaysLabel = useMemo(() => {
     const assignmentDays = assignmentDictionary
-      .filter((entry) => entry.assignment && isDayWithinSubmissionWindow(entry.level || preferredLevel, entry.day))
+      .filter((entry) => entry.assignment && isDayWithinSubmissionWindow(entry.level || selectedSubmitLevel, entry.day))
       .map((entry) => entry.day)
       .filter((day, index, arr) => arr.indexOf(day) === index)
       .sort((a, b) => Number(a) - Number(b));
@@ -497,7 +530,7 @@ const AssignmentSubmissionPage = () => {
     if (!assignmentDays.length) return "";
 
     return assignmentDays.map((day) => `Day ${day}`).join(", ");
-  }, [assignmentDictionary, preferredLevel]);
+  }, [assignmentDictionary, selectedSubmitLevel]);
 
   const deriveAssignmentDay = useCallback(
     (title) => {
@@ -523,7 +556,7 @@ const AssignmentSubmissionPage = () => {
     const courseFallbackNames = assignmentDictionary
       .filter(
         ({ assignment, progressionEligible, day, level }) =>
-          assignment && progressionEligible && isDayWithinSubmissionWindow(level || preferredLevel, day)
+          assignment && progressionEligible && isDayWithinSubmissionWindow(level || selectedSubmitLevel, day)
       )
       .map(({ label }) => label);
     const tutorMarkedLabels = new Set(
@@ -539,7 +572,7 @@ const AssignmentSubmissionPage = () => {
       }
 
       const dayNumber = deriveAssignmentDay(label);
-      const maxDayForLevel = getMaxAssignmentDayForLevel(preferredLevel);
+      const maxDayForLevel = getMaxAssignmentDayForLevel(selectedSubmitLevel);
       const blockedByDayZero = dayNumber === 0;
       const blockedByAssignmentWindow = Number.isFinite(dayNumber) && dayNumber > maxDayForLevel;
       includeDiagnostics.push({
@@ -557,7 +590,7 @@ const AssignmentSubmissionPage = () => {
     assignmentDictionary
       .filter(
         ({ assignment, progressionEligible, day, level }) =>
-          assignment && progressionEligible && isDayWithinSubmissionWindow(level || preferredLevel, day)
+          assignment && progressionEligible && isDayWithinSubmissionWindow(level || selectedSubmitLevel, day)
       )
       .forEach(({ label }) => addIfTutorMarked(label, "courseSchedule"));
 
@@ -573,6 +606,7 @@ const AssignmentSubmissionPage = () => {
     if (includeDiagnostics.length) {
       console.debug("[AssignmentSubmissionPage][Diagnostic][FilteredNonTutorOptions]", {
         preferredLevel,
+        selectedSubmitLevel,
         blockedSources: includeDiagnostics,
       });
     }
@@ -583,7 +617,7 @@ const AssignmentSubmissionPage = () => {
   }, [
     assignmentDictionary,
     deriveAssignmentDay,
-    preferredLevel,
+    selectedSubmitLevel,
     studentProfile?.assignmentTitle,
     studentProfile?.assignmentTitles,
     studentProfile?.assignments,
@@ -689,7 +723,7 @@ const AssignmentSubmissionPage = () => {
       if (!title) return null;
 
       const entry = assignmentDictionary.find((item) => item.label === title);
-      const normalizedLevel = normalizeIdPart(entry?.level || preferredLevel || "general");
+      const normalizedLevel = normalizeIdPart(entry?.level || selectedSubmitLevel || "general");
 
       if (entry?.canonicalAssignmentId) return entry.canonicalAssignmentId;
       if (entry?.assignmentId) return `${normalizedLevel}-${normalizeIdPart(entry.assignmentId)}`;
@@ -703,7 +737,7 @@ const AssignmentSubmissionPage = () => {
 
       return `${normalizedLevel}-${normalizeIdPart(title)}`;
     },
-    [assignmentDictionary, buildChapterKey, preferredLevel]
+    [assignmentDictionary, buildChapterKey, selectedSubmitLevel]
   );
 
   const requestedAssignmentKey = useMemo(
@@ -749,9 +783,8 @@ const AssignmentSubmissionPage = () => {
   );
 
   const selectedAssignmentLevel = useMemo(() => {
-    const rawLevel = selectedAssignmentEntry?.level || preferredLevel;
-    return ALLOWED_LEVELS.includes(rawLevel) ? rawLevel : "GENERAL";
-  }, [preferredLevel, selectedAssignmentEntry?.level]);
+    return normalizeLevel(selectedAssignmentEntry?.level || selectedSubmitLevel);
+  }, [selectedAssignmentEntry?.level, selectedSubmitLevel]);
 
   const selectedCanonicalAssignmentKey = useMemo(
     () =>
@@ -768,19 +801,19 @@ const AssignmentSubmissionPage = () => {
   const getLockDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
-      const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || preferredLevel;
+      const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || selectedSubmitLevel;
       return `${studentScopeKey}__${normalizeIdPart(assignmentLevel)}__${normalizeIdPart(chapterKey)}`;
     },
-    [assignmentDictionary, buildChapterKey, preferredLevel, studentScopeKey]
+    [assignmentDictionary, buildChapterKey, selectedSubmitLevel, studentScopeKey]
   );
 
   const getDraftDocId = useCallback(
     (assignmentTitle) => {
       const chapterKey = buildChapterKey(assignmentTitle) || "unknown";
-      const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || preferredLevel;
+      const assignmentLevel = assignmentDictionary.find((item) => item.label === assignmentTitle)?.level || selectedSubmitLevel;
       return `${studentScopeKey}__${normalizeIdPart(assignmentLevel)}__${normalizeIdPart(chapterKey)}`;
     },
-    [assignmentDictionary, buildChapterKey, preferredLevel, studentScopeKey]
+    [assignmentDictionary, buildChapterKey, selectedSubmitLevel, studentScopeKey]
   );
 
   const buildSubmissionPayload = useCallback(
@@ -1017,7 +1050,7 @@ const AssignmentSubmissionPage = () => {
               data.assignmentKey ||
               data.canonicalAssignmentKey ||
               resolveAssignmentCanonicalKey({
-                level: data.level || preferredLevel,
+                level: data.level || selectedSubmitLevel,
                 assignmentId: data.assignmentId,
                 assignmentTitle: data.assignmentTitle || data.title,
               });
@@ -1033,7 +1066,10 @@ const AssignmentSubmissionPage = () => {
               canonicalAssignmentKey: computedAssignmentKey,
             };
           })
-          .filter((entry) => levelMatches(entry.level, preferredLevel));
+          .filter((entry) => {
+            const entryLevel = normalizeLevel(entry.level || selectedSubmitLevel);
+            return entryLevel === "GENERAL" || accessibleSubmitLevels.includes(entryLevel);
+          });
         setRecentSubmissions(entries);
 
         // Locks
@@ -1045,7 +1081,7 @@ const AssignmentSubmissionPage = () => {
 
         lockSnapshot.docs.forEach((docSnap) => {
           const data = docSnap.data();
-          if (!levelMatches(data.level, preferredLevel)) return;
+          if (!levelMatches(data.level, selectedSubmitLevel)) return;
 
           const chapterKey =
             data.chapterKey ||
@@ -1077,11 +1113,11 @@ const AssignmentSubmissionPage = () => {
             data.assignmentKey ||
             data.canonicalAssignmentKey ||
             resolveAssignmentCanonicalKey({
-              level: data.level || preferredLevel,
+              level: data.level || selectedSubmitLevel,
               assignmentId: data.assignmentId,
               assignmentTitle: data.assignmentTitle || data.title,
             });
-          if (!levelMatches(data.level, preferredLevel)) return;
+          if (!levelMatches(data.level, selectedSubmitLevel)) return;
 
           if (!data.assignmentKey && computedAssignmentKey) {
             setDoc(doc(db, DRAFT_COLLECTION, docSnap.id), { assignmentKey: computedAssignmentKey }, { merge: true }).catch(() => {});
@@ -1107,7 +1143,7 @@ const AssignmentSubmissionPage = () => {
     };
 
     loadDraftsAndSubmissions();
-  }, [assignmentOptions, buildChapterKey, preferredLevel, user?.uid]);
+  }, [accessibleSubmitLevels, assignmentOptions, buildChapterKey, selectedSubmitLevel, user?.uid]);
 
   // When assignment changes, pull draft text (if any) into editor.
   useEffect(() => {
@@ -1166,8 +1202,9 @@ const AssignmentSubmissionPage = () => {
         selectedChapterKey,
         assignmentTitle: form.assignmentTitle,
         buildChapterKey,
+        selectedLevel: selectedAssignmentLevel,
       }),
-    [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedCanonicalAssignmentKey, selectedChapterKey]
+    [buildChapterKey, form.assignmentTitle, selectedAssignmentId, selectedAssignmentLevel, selectedCanonicalAssignmentKey, selectedChapterKey]
   );
 
   const selectedResubmissionCount = useMemo(() => {
@@ -1259,7 +1296,7 @@ const AssignmentSubmissionPage = () => {
 
   const mergedProgressByTitle = useMemo(() => {
     const curriculumEntries = assignmentOptions.map((label) => ({
-      level: preferredLevel,
+      level: selectedSubmitLevel,
       assignmentId: buildAssignmentId(label),
       title: label,
       assignmentDay: deriveAssignmentDay(label),
@@ -1268,14 +1305,14 @@ const AssignmentSubmissionPage = () => {
 
     const firestoreDrafts = Object.entries(draftsByAssignment || {}).map(([title, draft]) => ({
       ...(draft || {}),
-      level: preferredLevel,
+      level: draft?.level || selectedSubmitLevel,
       assignmentTitle: title,
       assignmentId: buildAssignmentId(title),
     }));
 
     const firestoreSubmissions = (recentSubmissions || []).map((entry) => ({
       ...entry,
-      level: entry.level || preferredLevel,
+      level: entry.level || selectedSubmitLevel,
       assignmentId: entry.assignmentId || entry.assignment_id || entry.assignmentKey || buildAssignmentId(entry.assignmentTitle || entry.title),
     }));
 
@@ -1292,16 +1329,16 @@ const AssignmentSubmissionPage = () => {
       if (title) acc[title] = entry;
       return acc;
     }, {});
-  }, [assignmentOptions, buildAssignmentId, deriveAssignmentDay, draftsByAssignment, preferredLevel, recentSubmissions, studentCode]);
+  }, [assignmentOptions, buildAssignmentId, deriveAssignmentDay, draftsByAssignment, recentSubmissions, selectedSubmitLevel, studentCode]);
 
   const maxUnlockedDay = useMemo(() => {
     const availableDays = recentSubmissions
-      .filter((entry) => entry?.assignment)
+      .filter((entry) => entry?.assignment && levelMatches(entry?.level, selectedSubmitLevel))
       .map((entry) => Number(entry?.chapter))
       .filter((value) => Number.isFinite(value) && value >= 0);
     if (!availableDays.length) return Number.POSITIVE_INFINITY;
     return Math.max(1, ...availableDays) + 1;
-  }, [recentSubmissions]);
+  }, [recentSubmissions, selectedSubmitLevel]);
 
   const decoratedAssignmentOptions = useMemo(() => {
     return assignmentOptions.map((opt) => {
@@ -1387,12 +1424,12 @@ const AssignmentSubmissionPage = () => {
 
 
   const dynamicMaxSubmissionCharacters = useMemo(() => {
-    const baseLimit = getBaseMaxByLevel(preferredLevel);
+    const baseLimit = getBaseMaxByLevel(selectedAssignmentLevel);
     const previousLength = (selectedPreview?.submissionText || "").trim().length;
     const expectedLimit = previousLength > 0 ? Math.ceil(previousLength * 1.6) : baseLimit;
     const bounded = Math.min(ABSOLUTE_MAX_SUBMISSION_CHARACTERS, Math.max(baseLimit, expectedLimit));
     return Math.max(MIN_SUBMISSION_CHARACTERS + 200, bounded);
-  }, [preferredLevel, selectedPreview?.submissionText]);
+  }, [selectedAssignmentLevel, selectedPreview?.submissionText]);
 
   const selectedDraft = useMemo(() => draftsByAssignment[form.assignmentTitle], [draftsByAssignment, form.assignmentTitle]);
   const hasDraftForSelection = Boolean(selectedDraft?.submissionText);
@@ -1425,6 +1462,26 @@ const AssignmentSubmissionPage = () => {
     const secondsRemaining = totalSecondsRemaining % 60;
     return minutesRemaining > 0 ? `${minutesRemaining}m ${secondsRemaining}s` : `${secondsRemaining}s`;
   }, [submissionCooldownRemainingMs]);
+
+  const handleSubmitLevelChange = (event) => {
+    const nextLevel = normalizeCourseLevel(event.target.value);
+    if (!accessibleSubmitLevels.includes(nextLevel)) return;
+
+    setSelectedSubmitLevel(nextLevel);
+    setHasManualSubmitLevelSelection(true);
+    setAssignmentSelectionUnlocked(true);
+    setForm((prev) => ({
+      ...prev,
+      assignmentTitle: "",
+      submissionText: "",
+      confirmed: false,
+    }));
+    setStatus((prev) => ({ ...prev, error: "", success: "" }));
+    setCopyStatus("");
+    setConfirmationLocked(false);
+    setPreview(null);
+    lastAssignmentRef.current = "";
+  };
 
   const handleChange = (field) => (event) => {
     const value = field === "confirmed" ? event.target.checked : event.target.value;
@@ -1490,7 +1547,7 @@ const AssignmentSubmissionPage = () => {
         reason: isGerman ? "Bitte Aufgabe auswählen" : "Select an assignment first",
       };
     }
-    if (!isDayWithinSubmissionWindow(preferredLevel, selectedDayNumber)) {
+    if (!isDayWithinSubmissionWindow(selectedAssignmentLevel, selectedDayNumber)) {
       return {
         submittable: false,
         reason: isGerman ? "Außerhalb des Aufgabenzeitraums" : "Outside assignment window",
@@ -1515,7 +1572,7 @@ const AssignmentSubmissionPage = () => {
       };
     }
     return { submittable: true, reason: isGerman ? "Bereit" : "Ready to submit" };
-  }, [hasSelectedAssignment, isGerman, isSelectedLocked, preferredLevel, selectedDayNumber, selectedOptionMeta]);
+  }, [hasSelectedAssignment, isGerman, isSelectedLocked, selectedAssignmentLevel, selectedDayNumber, selectedOptionMeta]);
   const assignmentInfo = useMemo(() => {
     const parts = [form.assignmentTitle || "Assignment"];
     if (selectedDayNumber || selectedDayNumber === 0) parts.push(`Day ${selectedDayNumber}`);
@@ -1534,6 +1591,8 @@ const AssignmentSubmissionPage = () => {
       });
 
       return recentSubmissions.some((entry) => {
+        if (!levelMatches(entry?.level, selectedAssignmentLevel)) return false;
+
         const statusLabel = safeLower(entry?.status);
         if (statusLabel !== "submitted" && (!includeResubmitted || statusLabel !== "resubmitted")) return false;
 
@@ -1547,7 +1606,7 @@ const AssignmentSubmissionPage = () => {
         return entryFingerprint === fingerprint;
       });
     },
-    [buildChapterKey, form.assignmentTitle, recentSubmissions]
+    [buildChapterKey, form.assignmentTitle, recentSubmissions, selectedAssignmentLevel]
   );
 
   const handleSubmit = async (event) => {
@@ -1653,7 +1712,14 @@ const AssignmentSubmissionPage = () => {
         const snapshot = await getDocs(
           query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
         );
-        setRecentSubmissions(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+        setRecentSubmissions(
+          snapshot.docs
+            .map((entry) => ({ id: entry.id, ...entry.data() }))
+            .filter((entry) => {
+              const entryLevel = normalizeLevel(entry.level || selectedSubmitLevel);
+              return entryLevel === "GENERAL" || accessibleSubmitLevels.includes(entryLevel);
+            })
+        );
       }
     } catch (error) {
       console.error("Failed to save submission", error);
@@ -1957,7 +2023,14 @@ const AssignmentSubmissionPage = () => {
       const snapshot = await getDocs(
         query(submissionsRef, where("studentId", "==", user.uid), orderBy("createdAt", "desc"), limit(25))
       );
-      setRecentSubmissions(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+      setRecentSubmissions(
+        snapshot.docs
+          .map((entry) => ({ id: entry.id, ...entry.data() }))
+          .filter((entry) => {
+            const entryLevel = normalizeLevel(entry.level || selectedSubmitLevel);
+            return entryLevel === "GENERAL" || accessibleSubmitLevels.includes(entryLevel);
+          })
+      );
     } catch (error) {
       console.error("Failed to save resubmission", error);
       setResubmissionStatus({ loading: false, error: "Could not save your resubmission.", success: "" });
@@ -1992,6 +2065,20 @@ const AssignmentSubmissionPage = () => {
               gap: 10,
             }}
           >
+            <div style={{ ...styles.field, margin: 0 }}>
+              <span style={styles.label}>Submit level</span>
+              <select value={selectedSubmitLevel} onChange={handleSubmitLevelChange} style={styles.select}>
+                {accessibleSubmitLevels.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
+              <span style={styles.helperText}>
+                Choose the level you want to submit for. You can submit for your current level and previous levels only.
+              </span>
+            </div>
+
             <div style={{ ...styles.field, margin: 0 }}>
               <span style={styles.label}>Assignment</span>
               <select
@@ -2059,7 +2146,7 @@ const AssignmentSubmissionPage = () => {
               <div style={{ ...styles.metaRow, padding: "10px 12px", border: "1px solid #e5e7eb", borderRadius: 10 }}>
                 <div>
                   <div style={{ fontWeight: 700 }}>{user?.email || "–"}</div>
-                  <div style={styles.helperText}>Email • Level {preferredLevel}</div>
+                  <div style={styles.helperText}>Email • Enrolled level {preferredLevel}</div>
                 </div>
                 <span style={styles.badge}>{studentCode || "No code"}</span>
               </div>
@@ -2163,7 +2250,7 @@ const AssignmentSubmissionPage = () => {
             <div style={styles.helperText}>Chapter: {selectedAssignmentChapter || "–"}</div>
             <div style={styles.helperText}>Canonical ID: {selectedCanonicalAssignmentKey || selectedAssignmentId || "–"}</div>
             <div style={styles.helperText}>Class: {studentProfile?.className || "–"}</div>
-            <div style={styles.helperText}>Level: {preferredLevel}</div>
+            <div style={styles.helperText}>Submission level: {selectedAssignmentLevel}</div>
             <div style={styles.helperText}>Student code: {studentCode || "–"}</div>
           </div>
 
@@ -2372,7 +2459,7 @@ const AssignmentSubmissionPage = () => {
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                 <strong>{entry.assignmentTitle || entry.title || "Submission"}</strong>
-                <span style={styles.levelPill}>{entry.level || preferredLevel}</span>
+                <span style={styles.levelPill}>{entry.level || selectedSubmitLevel}</span>
               </div>
               <div style={{ ...styles.helperText, margin: 0 }}>Class: {entry.className || "–"}</div>
               <div style={{ ...styles.helperText, margin: 0 }}>Saved: {formatDate(entry.createdAt)}</div>
