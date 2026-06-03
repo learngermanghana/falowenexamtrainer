@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -246,13 +247,11 @@ const A2Day5FreizeitWorkbookPage = () => {
           </div>
           <p style={{ margin: 0 }}><strong>Frage:</strong> Was machst du gern in deiner Freizeit?</p>
           <p style={{ margin: 0 }}><strong>Stichwörter:</strong> Freunde · Hobby · Wochenende · Sport</p>
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Speaking self-practice confidence check</strong>
-            <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
-            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
-              Open speaking self-practice
-            </a>
-          </div>
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
           <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
@@ -270,6 +269,11 @@ const A2Day5FreizeitWorkbookPage = () => {
             <li>Fragen Sie, ob er einen Vorschlag für eine Aktivität hat.</li>
           </ol>
           <p style={{ margin: 0 }}>Optional: Schreiben Sie 5 Sätze über Ihre Freizeit mit Ideen aus Ihrer Brain Map.</p>
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
