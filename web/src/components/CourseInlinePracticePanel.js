@@ -8,9 +8,9 @@ const practiceConfig = {
     defaultTitle: "Practice Teil 1 speaking here",
     defaultDescription:
       "Teil 1 is for practice and class discussion only. You do not submit it as an assignment. Use this AI speaking coach to prepare your answer before class.",
-    label: "Exam speaking coach",
-    closedButtonLabel: "Practice with AI",
-    render: () => <SpeakingPage />,
+    label: "Custom speaking chat",
+    closedButtonLabel: "Open custom speaking chat",
+    render: () => <SpeakingPage mode="course" />,
   },
   writing: {
     defaultTitle: "Practise your writing here",
@@ -18,7 +18,7 @@ const practiceConfig = {
       "Use this writing coach to plan, write, mark and improve your answer. When your final answer is ready, go to the Submission tab and submit it there.",
     label: "Writing practice",
     closedButtonLabel: "Open writing practice",
-    render: () => <WritingPage />,
+    render: () => <WritingPage mode="course" initialTab="mark" />,
   },
 };
 

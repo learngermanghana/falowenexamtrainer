@@ -359,6 +359,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || user?.uid || "";
   const isExamMode = mode === "exam";
+  const isCourseMode = mode === "course";
   const tutorReviewCloudEnabled = isTutorReviewCloudEnabled();
 
   const examWritingLetters = useMemo(
@@ -542,7 +543,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const isLevelLocked = ALLOWED_LEVELS.includes(profileLevel);
   const isA1Student = isLevelLocked && profileLevel === "A1";
   const canUseIdeasGenerator = !isA1Student;
-  const canUsePracticeLetters = isExamMode ? true : !isA1Student;
+  const canUsePracticeLetters = isExamMode;
   const canUseFormsPractice = isExamMode && level === "A1";
   const canUseTutorFeedback = isExamMode;
   const isTutorOnlyView = initialTab === "tutor" && canUseTutorFeedback;
@@ -1547,12 +1548,19 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <p style={{ ...styles.helperText, margin: 0 }}>
             {isTutorOnlyView
               ? "Tutor updates only."
-              : (
-                <>
-                  Start in <strong>Mark my letter</strong> for your main workflow. Use the other tabs only when you need
-                  extra practice or idea support.
-                </>
-              )}
+              : isCourseMode
+                ? (
+                  <>
+                    Course-book mode keeps only <strong>Mark my letter</strong>, references, and ideas. For full exam prompts,
+                    open the <a href="/exams/writing">Writing exam room</a>.
+                  </>
+                )
+                : (
+                  <>
+                    Start in <strong>Mark my letter</strong> for your main workflow. Use the other tabs only when you need
+                    extra practice or idea support.
+                  </>
+                )}
           </p>
         </div>
         <div style={styles.tabList} className="tab-list" role="tablist" aria-label="Writing workflow tabs">
