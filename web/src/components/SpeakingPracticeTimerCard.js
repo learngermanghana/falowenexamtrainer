@@ -64,7 +64,7 @@ const SpeakingPracticeTimerCard = () => {
     <div style={{ border: "1px solid #e5e7eb", borderRadius: 10, padding: 12, background: "#f0f9ff", display: "grid", gap: 10 }}>
       <strong>Teil 1 confidence timer (keep this page open)</strong>
       <p style={{ margin: 0, lineHeight: 1.6 }}>
-        Start this timer, then open the speaking self-practice link in a new tab to continue your timed practice.
+        Click “Practice here” above to open the speaking coach on this page, then start this timer for focused practice.
       </p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
         {timerOptions.map((option) => (
