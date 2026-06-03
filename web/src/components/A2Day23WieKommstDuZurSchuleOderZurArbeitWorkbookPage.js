@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "teil1", label: "Teil 1 · Group Practice" },
@@ -206,6 +207,11 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
               Wie kommst du zur Schule oder zur Arbeit? (z. B. zu Fuß, mit dem Bus, mit dem Auto, mit dem Fahrrad)
             </p>
           </div>
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
         </div>
       )}
 
@@ -226,6 +232,11 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
               Bitten Sie um seine/ihre Meinung zu Ihrer Idee (z. B. welches Modell er/sie empfehlen würde).
             </li>
           </ol>
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
         </div>
       )}
 

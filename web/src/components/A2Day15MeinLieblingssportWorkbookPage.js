@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -285,17 +286,15 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
               „Heute spreche ich über meinen Lieblingssport. Mein Lieblingssport ist Fußball, weil ich gern im Team spiele. Fußball macht Spaß und ist gut für die Gesundheit. Außerdem treffe ich Freunde, deshalb bin ich motiviert. Zum Beispiel spiele ich am Samstag im Park oder schaue ein Spiel im Fernsehen. Zum Schluss finde ich: Sport ist wichtig, weil man fit bleibt und weniger Stress hat.“
             </p>
           </div>
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Speaking self-practice confidence check</strong>
-            <p style={{ margin: 0 }}>Watch the timer guidance, then practice your own speaking output before class.</p>
-            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
-              Open speaking self-practice
-            </a>
-          </div>
           <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -326,15 +325,16 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
               <li>Use short A2-level sentences and connect ideas with weil, und, aber.</li>
               <li>End with a polite closing sentence and your name.</li>
             </ul>
-            <p style={{ margin: 0 }}>
-              Practice your draft here: <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">Open Writing Practice</a>.
-              You can use the Ideas Generator to organize your email before final submission.
-            </p>
           </div>
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (not on this workbook page).
           </p>
 
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}

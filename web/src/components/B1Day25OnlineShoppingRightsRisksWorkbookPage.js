@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -178,6 +179,11 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
               Was macht ihr, wenn etwas nicht stimmt? (z. B. Rückgabe, Reklamation, Kundenservice kontaktieren)
             </li>
           </ul>
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
         </div>
       )}
 
@@ -204,6 +210,11 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
             <li>Wann Sie das Handy zurückgeschickt haben</li>
             <li>Was Sie jetzt erwarten</li>
           </ul>
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
         </div>
       )}
 

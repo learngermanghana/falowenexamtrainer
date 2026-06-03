@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -403,24 +404,16 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             <li>Sehenswürdigkeiten</li>
           </ul>
 
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Speaking self-practice confidence check</strong>
-            <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
-            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
-              Open speaking self-practice
-            </a>
-          </div>
-
           <div style={{ ...questionCardStyle, background: "#f0f9ff", gap: 10 }}>
             <strong>Teil 1 confidence timer (keep this page open)</strong>
             <p style={{ margin: 0, lineHeight: 1.6 }}>
-              Start this timer, then open the speaking self-practice link in a new tab to continue your timed practice.
+              Start this timer, then open the speaking coach below on this page to continue your timed practice.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
               {speakingTimerOptions.map((option) => (
                 <button
                   key={option.seconds}
-                  type="button"
+        type="button"
                   style={{
                     ...styles.secondaryButton,
                     background: timerDurationSeconds === option.seconds ? "#dbeafe" : "#fff",
@@ -463,6 +456,11 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -493,15 +491,13 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
               Draft your letter first and submit your final answer in the assignment submission area below the lesson,
               not directly on this page.
             </p>
-            <p style={{ margin: 0 }}>
-              Practice before submitting on the writing page:{" "}
-              <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
-                Open Writing Practice
-              </a>{" "}
-              (learners can use the Ideas Generator there for support).
-            </p>
           </div>
 
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}

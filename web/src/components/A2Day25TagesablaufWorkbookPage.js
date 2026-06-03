@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -164,9 +165,13 @@ export default function A2Day25TagesablaufWorkbookPage() {
           „Heute spreche ich über meinen Tagesablauf. Zuerst stehe ich um sieben Uhr auf und frühstücke. Dann gehe ich zur Arbeit oder zum Deutschkurs, weil ich lernen und arbeiten muss. Am Nachmittag mache ich Hausaufgaben und kaufe ein. Am Abend koche ich, sehe eine Serie oder telefoniere mit meiner Familie. Zum Schluss finde ich: Ein klarer Tagesablauf hilft mir, weil ich weniger Stress habe.“
         </p>
       </div>
-      <div style={calloutStyle}><strong>Speaking self-practice confidence check</strong><p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p><a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">Open speaking self-practice</a></div>
       <SpeakingPracticeTimerCard />
       <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
+            <CourseInlinePracticePanel
+        type="speaking"
+        title="Practice speaking on this page"
+        description="Open the speaking coach here after reading the task. No new tab is needed."
+      />
       <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
     </div>}
 
@@ -174,7 +179,12 @@ export default function A2Day25TagesablaufWorkbookPage() {
       <h2 style={sectionTitle}>Teil 2 · Schreiben</h2>
       <p style={{ margin: 0 }}>Schreibe eine E-Mail an deine Freundin oder deinen Freund über deinen Tagesablauf.</p>
       <ol style={listSpacing}><li>Beschreibe deinen Morgen und deinen Arbeits- oder Schultag.</li><li>Erzähle, was du am Abend machst.</li><li>Frage nach dem Tagesablauf deiner Freundin oder deines Freundes.</li></ol>
-      <div style={calloutStyle}><strong>Writing practice guidance</strong><p style={{ margin: 0 }}>Write a first draft, improve structure and connectors, and submit your final answer in the assignment submission area — not directly on this page.</p><p style={{ margin: 0 }}>Practice before submitting on the writing page: <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">Open Writing Practice</a> (learners can use the Ideas Generator there for support).</p></div>
+      <div style={calloutStyle}><strong>Writing practice guidance</strong><p style={{ margin: 0 }}>Write a first draft, improve structure and connectors, and submit your final answer in the assignment submission area — not directly on this page.</p></div>
+            <CourseInlinePracticePanel
+        type="writing"
+        title="Practice writing on this page"
+        description="Write and mark your answer here after studying the task. No new tab is needed."
+      />
       <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
     </div>}
 
