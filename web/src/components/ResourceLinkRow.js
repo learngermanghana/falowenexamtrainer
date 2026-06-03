@@ -72,7 +72,7 @@ const ResourceLinkRow = ({ label, url }) => {
     triggerInteractionFeedback({
       sound: "open",
       notificationTitle: "Course resource opened",
-      notificationBody: `Now opening ${label}.",
+      notificationBody: `Now opening ${label}.`,
       notificationTag: "course-resource-open",
       vibratePattern: [40],
     });
