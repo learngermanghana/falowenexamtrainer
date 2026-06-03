@@ -372,11 +372,12 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
           <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
             <strong>Writing practice before submission</strong>
 
-          <CourseInlinePracticePanel
-            type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
-          />
+            <CourseInlinePracticePanel
+              type="writing"
+              title="Practice writing on this page"
+              description="Write and mark your answer here after studying the task. No new tab is needed."
+            />
+          </div>
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
