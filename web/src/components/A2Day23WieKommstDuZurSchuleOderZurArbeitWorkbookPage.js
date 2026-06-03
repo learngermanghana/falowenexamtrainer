@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "teil1", label: "Teil 1 · Group Practice" },
@@ -93,6 +94,9 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
           ))}
         </div>
       </div>
+
+      <A2B1WorkbookGuidance />
+
 
       {activeTab === "teil1" && (
         <div style={cardStyle}>
@@ -209,8 +213,6 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
           </div>
           <CourseInlinePracticePanel
             type="speaking"
-            title="Practice speaking on this page"
-            description="Open the speaking coach here after reading the task. No new tab is needed."
           />
         </div>
       )}
@@ -234,9 +236,8 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
           </ol>
           <CourseInlinePracticePanel
             type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
           />
+        <WorkbookSubmissionReminder />
         </div>
       )}
 
@@ -264,6 +265,7 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
               </div>
             ))}
           </div>
+        <WorkbookSubmissionReminder />
         </div>
       )}
 
@@ -295,6 +297,7 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
         <a href="https://www.falowen.app/campus/submit" target="_blank" rel="noreferrer">
           Go to submission area
         </a>
+      <WorkbookSubmissionReminder />
       </div>
     </div>
   );

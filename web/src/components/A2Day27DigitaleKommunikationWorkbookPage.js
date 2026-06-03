@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -70,6 +71,9 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p>
       </div>
 
+      <A2B1WorkbookGuidance />
+
+
       {activeTab === "sprechen" && <div style={card}>
         <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1600&q=80" alt="People using smartphones and laptops for digital communication" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
         <h2 style={sectionTitle}>Teil 1 · Sprechen (Group Practice)</h2>
@@ -126,8 +130,6 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
       <CourseInlinePracticePanel
           type="speaking"
-          title="Practice speaking on this page"
-          description="Open the speaking coach here after reading the task. No new tab is needed."
         />
         <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
       </div>}
@@ -141,9 +143,8 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <p style={{ margin: 0, color: "#4b5563" }}>Submit your final writing in the assignment submission area (not directly on this page).</p>
       <CourseInlinePracticePanel
           type="writing"
-          title="Practice writing on this page"
-          description="Write and mark your answer here after studying the task. No new tab is needed."
         />
+        <WorkbookSubmissionReminder />
         <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
       </div>}
 
@@ -158,6 +159,7 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <p style={{ margin: 0, lineHeight: 1.7 }}>Kostenloses Internet gibt es oft über öffentliche WLAN-Netze in Cafés, Bibliotheken oder anderen öffentlichen Gebäuden.</p>
         <h3 style={sectionTitle}>Fragen zum Text</h3>
         {lesenQuestions.map((question, index) => <div key={question.stem} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{question.options.map((option) => <span key={option}>{option}</span>)}</div>)}
+        <WorkbookSubmissionReminder />
         <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
       </div>}
 
@@ -170,6 +172,7 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         {hoerenQuestions.map((question, index) => <div key={question.stem} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{question.options.map((option) => <span key={option}>{option}</span>)}</div>)}
         <p style={{ margin: 0 }}>Recommended video: <a href="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5" target="_blank" rel="noreferrer">Digitale Kommunikation (A2)</a></p>
         <iframe style={videoPreviewStyle} src="https://www.youtube.com/embed/JEJZypJfrD8" title="Digitale Kommunikation (A2)" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+        <WorkbookSubmissionReminder />
         <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
       </div>}
     </div>

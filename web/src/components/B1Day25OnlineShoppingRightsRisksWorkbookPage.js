@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -77,6 +78,8 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
           Tab {activeIndex + 1} of {tabs.length}
         </p>
       </div>
+
+      <A2B1WorkbookGuidance />
 
       {activeTab === "sprechen" && (
         <div style={card}>
@@ -181,8 +184,6 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
           </ul>
           <CourseInlinePracticePanel
             type="speaking"
-            title="Practice speaking on this page"
-            description="Open the speaking coach here after reading the task. No new tab is needed."
           />
         </div>
       )}
@@ -212,9 +213,8 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
           </ul>
           <CourseInlinePracticePanel
             type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
           />
+        <WorkbookSubmissionReminder />
         </div>
       )}
 
@@ -323,6 +323,7 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
               </ul>
             </li>
           </ol>
+        <WorkbookSubmissionReminder />
         </div>
       )}
 
@@ -348,6 +349,7 @@ const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
               https://youtu.be/iyydRu3oY4I?list=PLg78ckjpHfZy1W9NOddmHPfv0temfRI9X
             </a>
           </p>
+        <WorkbookSubmissionReminder />
         </div>
       )}
     </div>

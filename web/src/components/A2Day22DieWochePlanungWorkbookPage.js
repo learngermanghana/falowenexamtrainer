@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -139,6 +140,8 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
           Tab {activeIndex + 1} of {tabs.length}
         </p>
       </div>
+
+      <A2B1WorkbookGuidance />
 
       {activeTab === "sprechen" && (
         <section style={sectionStyle}>
@@ -280,8 +283,6 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
           </p>
           <CourseInlinePracticePanel
             type="speaking"
-            title="Practice speaking on this page"
-            description="Open the speaking coach here after reading the task. No new tab is needed."
           />
         </section>
       )}
@@ -301,9 +302,8 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
           </ol>
           <CourseInlinePracticePanel
             type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
           />
+          <WorkbookSubmissionReminder />
         </section>
       )}
 
@@ -354,6 +354,7 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
               {question.options.map((option) => (
                 <span key={option}>{option}</span>
               ))}
+            <WorkbookSubmissionReminder />
             </div>
           ))}
         </section>
@@ -379,6 +380,7 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
             <a href="https://youtu.be/wK9JOG5lhdc?list=PLtjMpIkGWMzD1BkOt9Jx9RhUk2e439CNZ" target="_blank" rel="noreferrer">
               Click the link to begin the listening exercise
             </a>
+          <WorkbookSubmissionReminder />
           </div>
         </section>
       )}
