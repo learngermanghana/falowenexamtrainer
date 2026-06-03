@@ -46,6 +46,22 @@ const b2FallbackLessons = [
   [10, "2.5", "Konsum und Geld", "Kaufentscheidungen, Budget und Werbung"],
   [11, "3.1", "Gesellschaft und Integration", "Sprache, Teilhabe und Zusammenleben"],
   [12, "3.2", "Kultur und Freizeit", "Hobbys, kulturelle Angebote und persönliche Interessen"],
+  [13, "3.3", "Familie und Generationen", "Familienmodelle, Generationenkonflikte und Verantwortung beschreiben"],
+  [14, "3.4", "Freundschaft und soziale Beziehungen", "Beziehungen, Vertrauen und soziale Erwartungen erklären"],
+  [15, "3.5", "Ernährung und Konsumverhalten", "Essgewohnheiten, gesunde Ernährung und Konsumentscheidungen diskutieren"],
+  [16, "4.1", "Digitalisierung im Alltag", "Digitale Werkzeuge, Chancen und Abhängigkeiten bewerten"],
+  [17, "4.2", "Mobilität und Stadtleben", "Verkehr, Stadtplanung und Lebensqualität vergleichen"],
+  [18, "4.3", "Natur, Klima und Verantwortung", "Klimaschutz, Natur und persönliche Verantwortung erklären"],
+  [19, "4.4", "Freiwilligenarbeit und Engagement", "Ehrenamt, gesellschaftliche Hilfe und persönliche Motivation diskutieren"],
+  [20, "4.5", "Technologie und Arbeit der Zukunft", "Automatisierung, neue Berufe und berufliche Kompetenzen beschreiben"],
+  [21, "5.1", "Migration und neue Lebenswege", "Umzug, Integration und persönliche Chancen erklären"],
+  [22, "5.2", "Demokratie und Mitbestimmung", "Beteiligung, Rechte und gesellschaftliche Verantwortung diskutieren"],
+  [23, "5.3", "Work-Life-Balance", "Arbeit, Freizeit, Erholung und Grenzen im Alltag erklären"],
+  [24, "5.4", "Wissenschaft und Forschung im Alltag", "Forschung, Medizin, Technik und Nutzen für die Gesellschaft beschreiben"],
+  [25, "5.5", "Nachhaltiger Konsum", "Kaufverhalten, Ressourcen und Verantwortung kritisch bewerten"],
+  [26, "6.1", "Behörden, Termine und formelle Kommunikation", "Formelle Anliegen, Termine und schriftliche Kommunikation trainieren"],
+  [27, "6.2", "Prüfungstraining: Argumentieren und Reagieren", "Mündliche und schriftliche B2-Prüfungsstrategien anwenden"],
+  [28, "6.3", "Review und persönlicher Fortschritt", "B2-Themen wiederholen, Schwächen erkennen und nächsten Lernplan erstellen"],
 ].map(([day, chapter, title, topic]) => buildDefaultLesson({ level: "B2", day, chapter, title, topic }));
 
 export const SELF_LEARNING_LESSONS = {
