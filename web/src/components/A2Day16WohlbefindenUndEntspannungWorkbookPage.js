@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -321,17 +322,15 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
               „Heute spreche ich über Wohlbefinden und Entspannung. Für mich ist Ruhe wichtig, weil ich nach der Arbeit oft müde bin. Ich gehe spazieren, höre Musik oder trinke Tee. Außerdem schlafe ich genug, deshalb fühle ich mich besser. Zum Beispiel mache ich am Abend mein Handy aus und lese zehn Minuten. Zum Schluss finde ich: Kleine Pausen sind wichtig für Körper und Kopf.“
             </p>
           </div>
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Speaking self-practice confidence check</strong>
-            <p style={{ margin: 0 }}>Watch the timer guidance, then practice your own speaking output before class.</p>
-            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
-              Open speaking self-practice
-            </a>
-          </div>
           <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -362,19 +361,17 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
               <li>Beantworten Sie alle drei Aufgabenpunkte mit klaren, kurzen A2-Sätzen.</li>
               <li>Schließen Sie die Nachricht höflich ab und unterschreiben Sie mit Ihrem Namen.</li>
             </ul>
-            <p style={{ margin: 0 }}>
-              Practice your draft here:{" "}
-              <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
-                Open Writing Practice
-              </a>
-              . You can use the Ideas Generator before final submission.
-            </p>
           </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (not on this workbook page).
           </p>
 
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}

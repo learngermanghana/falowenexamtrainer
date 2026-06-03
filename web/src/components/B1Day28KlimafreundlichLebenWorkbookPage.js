@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -221,18 +222,15 @@ const B1Day28KlimafreundlichLebenWorkbookPage = () => {
             Frage: „Wie kann man in deinem Land klimafreundlich leben? Sprich über Vorteile und Nachteile und beschreibe die Situation in deinem Land.“
           </p>
 
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Speaking self-practice confidence check</strong>
-            <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
-            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
-              Open speaking self-practice
-            </a>
-          </div>
-
           <p style={{ margin: 0, color: "#4b5563" }}>
             Teil 1 is only for group discussion and has no assignment submission. Assignments start from Teil 2, Teil 3, and Teil 4.
           </p>
 
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -259,14 +257,12 @@ const B1Day28KlimafreundlichLebenWorkbookPage = () => {
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
           </p>
-          <p style={{ margin: 0 }}>
-            Practice your draft before submission on the writing page: {" "}
-            <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
-              Open Writing Practice
-            </a>{" "}
-            (you can use the Ideas Generator there for support).
-          </p>
 
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}

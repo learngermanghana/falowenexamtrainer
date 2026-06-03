@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -277,6 +278,11 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
             <strong>Wie planst du deine Woche?</strong> Erzähle davon! Montag bis Sonntag: Arbeit/Schule, Freizeit,
             Einkaufen.
           </p>
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
         </section>
       )}
 
@@ -293,6 +299,11 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
             <li>Nennen Sie Datum, Uhrzeit und Ort des Treffens.</li>
             <li>Erklären Sie, was die Person mitbringen sollte oder was sie erwarten kann.</li>
           </ol>
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
         </section>
       )}
 

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -342,18 +343,15 @@ const A2Day9UrlaubWorkbookPage = () => {
             <strong>Wohin reist du gern und warum?</strong>
           </p>
           <p style={{ margin: 0 }}>Use these guiding ideas in your discussion: Urlaub · Reiseziel · Verkehrsmittel · Erlebnis</p>
-
-          <div style={calloutStyle}>
-            <strong>Speaking self-practice confidence check</strong>
-            <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
-            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
-              Open speaking self-practice
-            </a>
-          </div>
           <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -385,15 +383,13 @@ const A2Day9UrlaubWorkbookPage = () => {
               Draft your message first, check that your request is polite and complete, and then submit your final answer
               in the assignment submission area below the lesson — not directly on this page.
             </p>
-            <p style={{ margin: 0 }}>
-              Practice before submitting on the writing page: {" "}
-              <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
-                Open Writing Practice
-              </a>{" "}
-              (learners can use the Ideas Generator there for support).
-            </p>
           </div>
 
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}

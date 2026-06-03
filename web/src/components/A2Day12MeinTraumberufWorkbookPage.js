@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -321,17 +322,15 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
               „Heute spreche ich über meinen Traumberuf. Ich möchte gern im Büro arbeiten, weil ich gern organisiere und mit Menschen spreche. Der Beruf soll interessant sein und gute Arbeitszeiten haben. Außerdem möchte ich Deutsch im Beruf benutzen, deshalb übe ich jeden Tag. Zum Beispiel kann ich später E-Mails schreiben und Kunden helfen. Zum Schluss finde ich: Ein guter Beruf passt zu meinen Stärken und macht mir Freude.“
             </p>
           </div>
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>Speaking self-practice confidence check</strong>
-            <p style={{ margin: 0 }}>Use this speaking self-practice tool to build confidence before class:</p>
-            <a href="https://www.falowen.app/campus/speech" target="_blank" rel="noreferrer">
-              Open speaking self-practice
-            </a>
-          </div>
           <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -361,13 +360,11 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this
             page.
           </p>
-          <p style={{ margin: 0 }}>
-            Practice your draft before submission on the writing page:{" "}
-            <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
-              Open Writing Practice
-            </a>{" "}
-            (you can use the Ideas Generator there for support).
-          </p>
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}

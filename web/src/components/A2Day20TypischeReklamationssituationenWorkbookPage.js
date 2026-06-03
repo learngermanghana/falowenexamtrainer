@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -366,6 +367,11 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
               <strong>Keywords:</strong> Produkt, Problem, Umtausch, Kundendienst.
             </p>
           </div>
+          <CourseInlinePracticePanel
+            type="speaking"
+            title="Practice speaking on this page"
+            description="Open the speaking coach here after reading the task. No new tab is needed."
+          />
         </section>
       )}
 
@@ -384,6 +390,11 @@ const A2Day20TypischeReklamationssituationenWorkbookPage = () => {
               <li>Welche Lösung erwarten Sie: Umtausch, Reparatur oder Geld zurück?</li>
             </ol>
           </div>
+          <CourseInlinePracticePanel
+            type="writing"
+            title="Practice writing on this page"
+            description="Write and mark your answer here after studying the task. No new tab is needed."
+          />
         </section>
       )}
 
