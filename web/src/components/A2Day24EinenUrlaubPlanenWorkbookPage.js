@@ -162,53 +162,53 @@ const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
             <li>
               <strong>Reiseziel und Zeitraum (Destination &amp; Timeframe)</strong>
               <ul style={listSpacing}>
-                <li>Land oder Stadt: Spanien, Italien, Hamburg, Wien</li>
-                <li>Art des Reiseziels: Strand, Berge, Stadturlaub</li>
-                <li>Dauer: ein Wochenende, eine Woche, zwei Wochen</li>
-                <li>Beste Reisezeit: Sommer, Winter, Ferien, Feiertage</li>
+                <li>Land oder Stadt: Spanien, Italien, Hamburg, Wien (country or city: Spain, Italy, Hamburg, Vienna)</li>
+                <li>Art des Reiseziels: Strand, Berge, Stadturlaub (type of destination: beach, mountains, city trip)</li>
+                <li>Dauer: ein Wochenende, eine Woche, zwei Wochen (duration: a weekend, one week, two weeks)</li>
+                <li>Beste Reisezeit: Sommer, Winter, Ferien, Feiertage (best travel time: summer, winter, holidays, public holidays)</li>
               </ul>
             </li>
             <li>
-              <strong>Budget</strong>
+              <strong>Budget (Budget)</strong>
               <ul style={listSpacing}>
-                <li>Gesamtkosten planen: 500 €, 1000 € usw.</li>
-                <li>Transportkosten: Flugtickets, Zugtickets, Benzin</li>
-                <li>Unterkunftskosten: Hotel pro Nacht, Airbnb, Hostel</li>
-                <li>Essen und Aktivitäten: Restaurantbesuche, Eintrittskarten</li>
+                <li>Gesamtkosten planen: 500 €, 1000 € usw. (plan total costs: €500, €1000, etc.)</li>
+                <li>Transportkosten: Flugtickets, Zugtickets, Benzin (transport costs: flight tickets, train tickets, petrol/gas)</li>
+                <li>Unterkunftskosten: Hotel pro Nacht, Airbnb, Hostel (accommodation costs: hotel per night, Airbnb, hostel)</li>
+                <li>Essen und Aktivitäten: Restaurantbesuche, Eintrittskarten (food and activities: restaurant visits, entrance tickets)</li>
               </ul>
             </li>
             <li>
               <strong>Transportmittel (Means of Transport)</strong>
               <ul style={listSpacing}>
-                <li>Flugzeug, Zug, Bus, Auto</li>
-                <li>Fahrrad – für kurze Strecken oder Ausflüge vor Ort</li>
+                <li>Flugzeug, Zug, Bus, Auto (plane, train, bus, car)</li>
+                <li>Fahrrad – für kurze Strecken oder Ausflüge vor Ort (bicycle — for short distances or local trips)</li>
               </ul>
             </li>
             <li>
               <strong>Unterkunft (Accommodation)</strong>
               <ul style={listSpacing}>
-                <li>Hotel (mit Frühstück?), Hostel oder Jugendherberge</li>
-                <li>Campingplatz, Ferienwohnung, Pension</li>
+                <li>Hotel (mit Frühstück?), Hostel oder Jugendherberge (hotel with breakfast?, hostel or youth hostel)</li>
+                <li>Campingplatz, Ferienwohnung, Pension (campsite, vacation apartment, guesthouse)</li>
               </ul>
             </li>
             <li>
               <strong>Aktivitäten (Activities)</strong>
               <ul style={listSpacing}>
-                <li>Sightseeing: Museen, historische Gebäude, Stadttouren</li>
-                <li>Sport und Freizeit: Wandern, Schwimmen, Radfahren</li>
-                <li>Entspannung: Am Strand liegen, Wellness, Spa</li>
-                <li>Kultur erleben: Konzerte, Theater, lokale Feste</li>
-                <li>Lokale Spezialitäten probieren: Restaurants, Märkte</li>
+                <li>Sightseeing: Museen, historische Gebäude, Stadttouren (sightseeing: museums, historic buildings, city tours)</li>
+                <li>Sport und Freizeit: Wandern, Schwimmen, Radfahren (sports and free time: hiking, swimming, cycling)</li>
+                <li>Entspannung: Am Strand liegen, Wellness, Spa (relaxation: lying on the beach, wellness, spa)</li>
+                <li>Kultur erleben: Konzerte, Theater, lokale Feste (experiencing culture: concerts, theater, local festivals)</li>
+                <li>Lokale Spezialitäten probieren: Restaurants, Märkte (trying local specialties: restaurants, markets)</li>
               </ul>
             </li>
             <li>
               <strong>Gepäck &amp; Vorbereitung (Luggage &amp; Preparation)</strong>
               <ul style={listSpacing}>
-                <li>Dokumente: Reisepass/Personalausweis, Tickets, Versicherung</li>
-                <li>Kleidung: Wetter prüfen, passende Outfits</li>
-                <li>Geld wechseln / Kreditkarte vorbereiten</li>
-                <li>Reiseapotheke: Medikamente, Pflaster</li>
-                <li>Reiseversicherung abschließen</li>
+                <li>Dokumente: Reisepass/Personalausweis, Tickets, Versicherung (documents: passport/ID card, tickets, insurance)</li>
+                <li>Kleidung: Wetter prüfen, passende Outfits (clothing: check the weather, suitable outfits)</li>
+                <li>Geld wechseln / Kreditkarte vorbereiten (exchange money / prepare a credit card)</li>
+                <li>Reiseapotheke: Medikamente, Pflaster (travel first-aid kit: medicine, plasters/bandages)</li>
+                <li>Reiseversicherung abschließen (take out travel insurance)</li>
               </ul>
             </li>
           </ol>

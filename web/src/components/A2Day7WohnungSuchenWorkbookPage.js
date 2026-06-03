@@ -209,47 +209,47 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
           <h3 style={sectionTitle}>Main Branches and Ideas</h3>
           <ol style={listSpacing}>
             <li>
-              <strong>Wichtige Fragen beim Wohnungssuchen</strong>
+              <strong>Wichtige Fragen beim Wohnungssuchen (Important apartment-search questions)</strong>
               <ul style={listSpacing}>
-                <li>Wie viele Zimmer hat die Wohnung?</li>
-                <li>Ist die Wohnung möbliert oder unmöbliert?</li>
-                <li>Wann kann ich die Wohnung besichtigen?</li>
-                <li>Ist die Wohnung in einem ruhigen oder lauten Gebiet?</li>
-                <li>Wie hoch ist die Miete?</li>
+                <li>Wie viele Zimmer hat die Wohnung? (How many rooms does the apartment have?)</li>
+                <li>Ist die Wohnung möbliert oder unmöbliert? (Is the apartment furnished or unfurnished?)</li>
+                <li>Wann kann ich die Wohnung besichtigen? (When can I view the apartment?)</li>
+                <li>Ist die Wohnung in einem ruhigen oder lauten Gebiet? (Is the apartment in a quiet or noisy area?)</li>
+                <li>Wie hoch ist die Miete? (How much is the rent?)</li>
               </ul>
             </li>
             <li>
-              <strong>Wohnungstypen und Merkmale</strong>
+              <strong>Wohnungstypen und Merkmale (Apartment types and features)</strong>
               <ul style={listSpacing}>
-                <li>Einzimmerwohnung, Zweizimmerwohnung, Dachgeschosswohnung, Erdgeschosswohnung</li>
-                <li>Altbau, Neubau</li>
-                <li>Balkon/Terrasse, Küche, Bad mit Dusche oder Badewanne</li>
+                <li>Einzimmerwohnung, Zweizimmerwohnung, Dachgeschosswohnung, Erdgeschosswohnung (studio apartment, two-room apartment, attic apartment, ground-floor apartment)</li>
+                <li>Altbau, Neubau (old building, new building)</li>
+                <li>Balkon/Terrasse, Küche, Bad mit Dusche oder Badewanne (balcony/terrace, kitchen, bathroom with shower or bathtub)</li>
               </ul>
             </li>
             <li>
-              <strong>Preise und Budget</strong>
+              <strong>Preise und Budget (Prices and budget)</strong>
               <ul style={listSpacing}>
-                <li>Wie hoch ist die Kaltmiete?</li>
-                <li>Nebenkosten, Gesamtmiete, Kaution</li>
-                <li>Ich habe ein Budget von ... Euro.</li>
+                <li>Wie hoch ist die Kaltmiete? (How much is the basic rent before utilities?)</li>
+                <li>Nebenkosten, Gesamtmiete, Kaution (utilities/service charges, total rent, deposit)</li>
+                <li>Ich habe ein Budget von ... Euro. (I have a budget of ... euros.)</li>
               </ul>
             </li>
             <li>
-              <strong>Standort und Umgebung</strong>
+              <strong>Standort und Umgebung (Location and surroundings)</strong>
               <ul style={listSpacing}>
-                <li>Wie weit ist es von der Arbeit entfernt?</li>
-                <li>Gibt es öffentliche Verkehrsmittel in der Nähe?</li>
-                <li>Ist die Nachbarschaft sicher?</li>
-                <li>Gibt es Geschäfte, Schulen oder Freizeitmöglichkeiten in der Nähe?</li>
-                <li>Lärmbelästigung in der Umgebung?</li>
+                <li>Wie weit ist es von der Arbeit entfernt? (How far is it from work?)</li>
+                <li>Gibt es öffentliche Verkehrsmittel in der Nähe? (Is there public transport nearby?)</li>
+                <li>Ist die Nachbarschaft sicher? (Is the neighborhood safe?)</li>
+                <li>Gibt es Geschäfte, Schulen oder Freizeitmöglichkeiten in der Nähe? (Are there shops, schools, or leisure options nearby?)</li>
+                <li>Lärmbelästigung in der Umgebung? (Noise pollution in the area?)</li>
               </ul>
             </li>
             <li>
-              <strong>Mietvertrag und Bedingungen</strong>
+              <strong>Mietvertrag und Bedingungen (Rental contract and conditions)</strong>
               <ul style={listSpacing}>
-                <li>Dauer des Mietvertrags, Kündigungsfrist, Hausordnung</li>
-                <li>Erlaubnis für Haustiere</li>
-                <li>Möbel/Renovierung</li>
+                <li>Dauer des Mietvertrags, Kündigungsfrist, Hausordnung (contract length, notice period, house rules)</li>
+                <li>Erlaubnis für Haustiere (permission for pets)</li>
+                <li>Möbel/Renovierung (furniture/renovation)</li>
               </ul>
             </li>
           </ol>

@@ -205,12 +205,12 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             <li>
               <strong>Zutaten (Ingredients)</strong>
               <ul style={listSpacing}>
-                <li>Obst: Äpfel, Bananen, Orangen</li>
-                <li>Gemüse: Karotten, Tomaten, Kartoffeln</li>
-                <li>Gewürze: Salz, Pfeffer, Paprika</li>
-                <li>Milchprodukte: Milch, Käse, Butter</li>
-                <li>Fleisch und Fisch: Hähnchen, Rindfleisch, Lachs</li>
-                <li>Kohlenhydrate: Reis, Nudeln, Brot</li>
+                <li>Obst: Äpfel, Bananen, Orangen (fruit: apples, bananas, oranges)</li>
+                <li>Gemüse: Karotten, Tomaten, Kartoffeln (vegetables: carrots, tomatoes, potatoes)</li>
+                <li>Gewürze: Salz, Pfeffer, Paprika (spices/seasoning: salt, pepper, paprika)</li>
+                <li>Milchprodukte: Milch, Käse, Butter (dairy products: milk, cheese, butter)</li>
+                <li>Fleisch und Fisch: Hähnchen, Rindfleisch, Lachs (meat and fish: chicken, beef, salmon)</li>
+                <li>Kohlenhydrate: Reis, Nudeln, Brot (carbohydrates: rice, noodles/pasta, bread)</li>
               </ul>
             </li>
             <li>
@@ -238,19 +238,19 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             <li>
               <strong>Mahlzeiten (Meals)</strong>
               <ul style={listSpacing}>
-                <li>Frühstück: Brot, Marmelade, Kaffee</li>
-                <li>Mittagessen: Suppe, Hauptgericht, Dessert</li>
-                <li>Abendessen: Salat, Sandwiches, Tee</li>
-                <li>Zwischenmahlzeit: Obst, Joghurt, Kekse</li>
+                <li>Frühstück: Brot, Marmelade, Kaffee (breakfast: bread, jam, coffee)</li>
+                <li>Mittagessen: Suppe, Hauptgericht, Dessert (lunch: soup, main course, dessert)</li>
+                <li>Abendessen: Salat, Sandwiches, Tee (dinner: salad, sandwiches, tea)</li>
+                <li>Zwischenmahlzeit: Obst, Joghurt, Kekse (snack: fruit, yogurt, cookies)</li>
               </ul>
             </li>
             <li>
               <strong>Typische Gerichte (Typical Dishes)</strong>
               <ul style={listSpacing}>
-                <li>Deutschland: Bratwurst, Sauerkraut, Brezel</li>
-                <li>Italien: Pizza, Pasta</li>
-                <li>Frankreich: Quiche, Croissant</li>
-                <li>Internationale Küche: Sushi, Curry, Tacos</li>
+                <li>Deutschland: Bratwurst, Sauerkraut, Brezel (Germany: sausage, sauerkraut, pretzel)</li>
+                <li>Italien: Pizza, Pasta (Italy: pizza, pasta)</li>
+                <li>Frankreich: Quiche, Croissant (France: quiche, croissant)</li>
+                <li>Internationale Küche: Sushi, Curry, Tacos (international cuisine: sushi, curry, tacos)</li>
               </ul>
             </li>
           </ol>

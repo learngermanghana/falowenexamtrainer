@@ -201,24 +201,26 @@ const A2Day18DieBankAnrufenWorkbookPage = () => {
           <h3 style={sectionTitle}>Example Brain Map</h3>
           <ul style={listSpacing}>
             <li>
-              <strong>Grund des Anrufs:</strong> Kontostand abfragen, Karte sperren, Überweisung tätigen, Fragen zu Gebühren,
-              Termin vereinbaren.
+              <strong>Grund des Anrufs (Reason for the call):</strong> Kontostand abfragen (ask for account balance), Karte sperren (block a card),
+              Überweisung tätigen (make a bank transfer), Fragen zu Gebühren (questions about fees), Termin vereinbaren (make an appointment).
             </li>
             <li>
-              <strong>Wichtige Daten:</strong> Kontonummer/IBAN, Name und Adresse, Geburtsdatum, Kundennummer,
-              Sicherheitsfragen/Passwort.
+              <strong>Wichtige Daten (Important information):</strong> Kontonummer/IBAN (account number/IBAN), Name und Adresse (name and address),
+              Geburtsdatum (date of birth), Kundennummer (customer number), Sicherheitsfragen/Passwort (security questions/password).
             </li>
             <li>
-              <strong>Wichtige Fragen:</strong> Wie ist mein Kontostand? Wie kann ich meine Karte sperren? Welche Gebühren
-              fallen an? Kann ich ein neues Konto eröffnen? Wie funktioniert das Online-Banking?
+              <strong>Wichtige Fragen (Key questions):</strong> Wie ist mein Kontostand? (What is my account balance?) Wie kann ich meine Karte sperren?
+              (How can I block my card?) Welche Gebühren fallen an? (What fees apply?) Kann ich ein neues Konto eröffnen?
+              (Can I open a new account?) Wie funktioniert das Online-Banking? (How does online banking work?)
             </li>
             <li>
-              <strong>Nützliche Redemittel:</strong> Guten Tag, hier spricht ... / Ich rufe an, weil ... / Könnten Sie mir
-              bitte helfen? / Vielen Dank für Ihre Hilfe. / Auf Wiederhören!
+              <strong>Nützliche Redemittel (Useful phrases):</strong> Guten Tag, hier spricht ... (Hello, ... speaking) / Ich rufe an, weil ...
+              (I am calling because ...) / Könnten Sie mir bitte helfen? (Could you please help me?) / Vielen Dank für Ihre Hilfe.
+              (Thank you for your help.) / Auf Wiederhören! (Goodbye on the phone!)
             </li>
             <li>
-              <strong>Weitere Schritte:</strong> Unterlagen schicken, Termin in der Filiale vereinbaren, Online-Banking
-              aktivieren, neue Karte beantragen, Kontoauszug prüfen.
+              <strong>Weitere Schritte (Next steps):</strong> Unterlagen schicken (send documents), Termin in der Filiale vereinbaren (make an appointment at the branch),
+              Online-Banking aktivieren (activate online banking), neue Karte beantragen (apply for a new card), Kontoauszug prüfen (check the bank statement).
             </li>
           </ul>
 
@@ -230,14 +232,14 @@ const A2Day18DieBankAnrufenWorkbookPage = () => {
 
           <h3 style={sectionTitle}>Ideas and Vocabulary</h3>
           <ul style={listSpacing}>
-            <li>Sich vorstellen</li>
-            <li>Grund des Anrufs</li>
-            <li>Konto eröffnen</li>
-            <li>Benötigte Dokumente</li>
-            <li>Termin vereinbaren</li>
-            <li>Bankfiliale</li>
-            <li>Öffnungszeiten</li>
-            <li>Beratungsgespräch</li>
+            <li>Sich vorstellen (introducing yourself)</li>
+            <li>Grund des Anrufs (reason for the call)</li>
+            <li>Konto eröffnen (open an account)</li>
+            <li>Benötigte Dokumente (required documents)</li>
+            <li>Termin vereinbaren (make an appointment)</li>
+            <li>Bankfiliale (bank branch)</li>
+            <li>Öffnungszeiten (opening hours)</li>
+            <li>Beratungsgespräch (consultation/advisory conversation)</li>
           </ul>
 
           <h3 style={sectionTitle}>Steps for Speaking</h3>

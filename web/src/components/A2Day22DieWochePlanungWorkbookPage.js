@@ -173,51 +173,51 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
           <div style={questionBoxStyle}>
             <strong>1. Wochentage (Days of the Week)</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Montag: Unterricht / Arbeit beginnt</li>
-              <li>Dienstag: Sportkurs, Einkäufe erledigen</li>
-              <li>Mittwoch: Zeit für Hobbys, Freunde treffen</li>
-              <li>Donnerstag: Termine (Arzt, Bank)</li>
-              <li>Freitag: letzte Arbeitstage, Pläne für Wochenende machen</li>
+              <li>Montag: Unterricht / Arbeit beginnt (Monday: class/work begins)</li>
+              <li>Dienstag: Sportkurs, Einkäufe erledigen (Tuesday: sports class, do shopping)</li>
+              <li>Mittwoch: Zeit für Hobbys, Freunde treffen (Wednesday: time for hobbies, meet friends)</li>
+              <li>Donnerstag: Termine (Arzt, Bank) (Thursday: appointments, for example doctor or bank)</li>
+              <li>Freitag: letzte Arbeitstage, Pläne für Wochenende machen (Friday: last workdays, make weekend plans)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>2. Arbeits- und Schulzeiten (Work and School Times)</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Bürozeiten: 9-17 Uhr</li>
-              <li>Pausenzeiten: Mittagspause, Kaffeepause</li>
-              <li>Schulstunden: 8-13 Uhr, Hausaufgaben am Nachmittag</li>
-              <li>Überstunden / Nachhilfe</li>
+              <li>Bürozeiten: 9-17 Uhr (office hours: 9 a.m.–5 p.m.)</li>
+              <li>Pausenzeiten: Mittagspause, Kaffeepause (break times: lunch break, coffee break)</li>
+              <li>Schulstunden: 8-13 Uhr, Hausaufgaben am Nachmittag (school lessons: 8 a.m.–1 p.m., homework in the afternoon)</li>
+              <li>Überstunden / Nachhilfe (overtime / tutoring)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>3. Freizeitaktivitäten (Leisure Activities)</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Sport: Joggen, Schwimmen, Fitnessstudio</li>
-              <li>Unterhaltung: Serien schauen, Videospiele, Lesen</li>
-              <li>Treffen mit Freunden: Café, Kino, Spieleabend</li>
-              <li>Vereine / Kurse: Sprachkurs, Tanzkurs, Musikprobe</li>
+              <li>Sport: Joggen, Schwimmen, Fitnessstudio (sports: jogging, swimming, gym)</li>
+              <li>Unterhaltung: Serien schauen, Videospiele, Lesen (entertainment: watching series, video games, reading)</li>
+              <li>Treffen mit Freunden: Café, Kino, Spieleabend (meeting friends: café, cinema, game night)</li>
+              <li>Vereine / Kurse: Sprachkurs, Tanzkurs, Musikprobe (clubs/courses: language course, dance course, music rehearsal)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>4. Hausarbeiten (Household Chores)</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Putzen: Staubsaugen, Staub wischen, Bad putzen</li>
-              <li>Wäsche waschen: Waschmaschine, Wäsche aufhängen</li>
-              <li>Kochen: Essensplanung, Rezepte, Einkaufsliste</li>
-              <li>Gartenarbeit: Rasen mähen, Blumen gießen</li>
+              <li>Putzen: Staubsaugen, Staub wischen, Bad putzen (cleaning: vacuuming, dusting, cleaning the bathroom)</li>
+              <li>Wäsche waschen: Waschmaschine, Wäsche aufhängen (doing laundry: washing machine, hanging laundry)</li>
+              <li>Kochen: Essensplanung, Rezepte, Einkaufsliste (cooking: meal planning, recipes, shopping list)</li>
+              <li>Gartenarbeit: Rasen mähen, Blumen gießen (gardening: mowing the lawn, watering flowers)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>5. Termine und Erledigungen (Appointments and Errands)</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Arzttermine: Zahnarzt, Hausarzt</li>
-              <li>Behörden: Ausweis verlängern, Formulare ausfüllen</li>
-              <li>Bank / Post: Überweisungen, Pakete abholen</li>
-              <li>Einkäufe: Lebensmittel, Kleidung, Drogerie</li>
+              <li>Arzttermine: Zahnarzt, Hausarzt (doctor appointments: dentist, family doctor/GP)</li>
+              <li>Behörden: Ausweis verlängern, Formulare ausfüllen (authorities/offices: renew ID, fill out forms)</li>
+              <li>Bank / Post: Überweisungen, Pakete abholen (bank/post office: transfers, pick up parcels)</li>
+              <li>Einkäufe: Lebensmittel, Kleidung, Drogerie (shopping/errands: groceries, clothes, drugstore)</li>
             </ul>
           </div>
 
