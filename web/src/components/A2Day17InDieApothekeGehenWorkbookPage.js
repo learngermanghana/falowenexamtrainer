@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -167,6 +168,8 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
         </p>
       </div>
 
+      <A2B1WorkbookGuidance />
+
       {activeTab === "sprechen" && (
         <div style={card}>
           <img
@@ -290,8 +293,6 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
 
           <CourseInlinePracticePanel
             type="speaking"
-            title="Practice speaking on this page"
-            description="Open the speaking coach here after reading the task. No new tab is needed."
           />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
@@ -332,9 +333,8 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
           </p>
           <CourseInlinePracticePanel
             type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
           />
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
@@ -388,6 +388,7 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             </div>
           ))}
 
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
       )}
@@ -432,6 +433,7 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
             allowFullScreen
           />
 
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}

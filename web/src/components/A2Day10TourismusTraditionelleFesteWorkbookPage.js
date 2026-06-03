@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -253,6 +254,8 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
         </p>
       </div>
 
+      <A2B1WorkbookGuidance />
+
       {activeTab === "sprechen" && (
         <div style={card}>
           <img
@@ -458,8 +461,6 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
 
           <CourseInlinePracticePanel
             type="speaking"
-            title="Practice speaking on this page"
-            description="Open the speaking coach here after reading the task. No new tab is needed."
           />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
@@ -495,9 +496,8 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
 
           <CourseInlinePracticePanel
             type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
           />
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
@@ -576,6 +576,7 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             </div>
           ))}
 
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
       )}
@@ -623,6 +624,7 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
             style={videoPreviewStyle}
           />
 
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}

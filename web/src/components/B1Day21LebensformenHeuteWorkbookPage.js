@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -208,6 +209,8 @@ const B1Day21LebensformenHeuteWorkbookPage = () => {
         </p>
       </div>
 
+      <A2B1WorkbookGuidance />
+
       {activeTab === "sprechen" && (
         <div style={card}>
           <img
@@ -265,8 +268,6 @@ const B1Day21LebensformenHeuteWorkbookPage = () => {
 
           <CourseInlinePracticePanel
             type="speaking"
-            title="Practice speaking on this page"
-            description="Open the speaking coach here after reading the task. No new tab is needed."
           />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
@@ -308,9 +309,8 @@ const B1Day21LebensformenHeuteWorkbookPage = () => {
 
           <CourseInlinePracticePanel
             type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
           />
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
@@ -361,6 +361,7 @@ const B1Day21LebensformenHeuteWorkbookPage = () => {
             </div>
           ))}
 
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
       )}
@@ -389,6 +390,7 @@ const B1Day21LebensformenHeuteWorkbookPage = () => {
             allowFullScreen
           />
 
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}

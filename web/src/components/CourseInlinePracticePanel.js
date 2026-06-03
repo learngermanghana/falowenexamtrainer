@@ -5,15 +5,19 @@ import WritingPage from "./WritingPage";
 
 const practiceConfig = {
   speaking: {
-    defaultTitle: "Practice speaking on this page",
-    defaultDescription: "Use the exam speaking coach here after reading the task. No new tab is needed.",
+    defaultTitle: "Practice Teil 1 speaking here",
+    defaultDescription:
+      "Teil 1 is for practice and class discussion only. You do not submit it as an assignment. Use this AI speaking coach to prepare your answer before class.",
     label: "Exam speaking coach",
+    closedButtonLabel: "Practice with AI",
     render: () => <SpeakingPage />,
   },
   writing: {
-    defaultTitle: "Practice writing on this page",
-    defaultDescription: "Write and mark your answer here after studying the task. No new tab is needed.",
+    defaultTitle: "Practise your writing here",
+    defaultDescription:
+      "Use this writing coach to plan, write, mark and improve your answer. When your final answer is ready, go to the Submission tab and submit it there.",
     label: "Writing practice",
+    closedButtonLabel: "Open writing practice",
     render: () => <WritingPage />,
   },
 };
@@ -45,7 +49,7 @@ const CourseInlinePracticePanel = ({ type, title, description, defaultOpen = tru
         aria-expanded={isOpen}
         aria-controls={panelId}
       >
-        {isOpen ? "Hide practice" : "Practice here"}
+        {isOpen ? "Hide practice" : config.closedButtonLabel}
       </button>
       {isOpen ? (
         <div

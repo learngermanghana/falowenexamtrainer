@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen (Group Practice No assignment)" },
@@ -66,6 +67,9 @@ export default function A2Day25TagesablaufWorkbookPage() {
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{tabs.map((tab) => <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>{tab.label}</TabButton>)}</div>
       <p style={{ margin: 0, color: "#4b5563" }}>Tab {activeIndex + 1} of {tabs.length}</p>
     </div>
+
+    <A2B1WorkbookGuidance />
+
 
     {activeTab === "sprechen" && <div style={card}><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80" alt="Students discussing their day in class" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
       <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>
@@ -169,8 +173,6 @@ export default function A2Day25TagesablaufWorkbookPage() {
       <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
             <CourseInlinePracticePanel
         type="speaking"
-        title="Practice speaking on this page"
-        description="Open the speaking coach here after reading the task. No new tab is needed."
       />
       <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
     </div>}
@@ -182,9 +184,8 @@ export default function A2Day25TagesablaufWorkbookPage() {
       <div style={calloutStyle}><strong>Writing practice guidance</strong><p style={{ margin: 0 }}>Write a first draft, improve structure and connectors, and submit your final answer in the assignment submission area — not directly on this page.</p></div>
             <CourseInlinePracticePanel
         type="writing"
-        title="Practice writing on this page"
-        description="Write and mark your answer here after studying the task. No new tab is needed."
       />
+      <WorkbookSubmissionReminder />
       <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
     </div>}
 
@@ -194,6 +195,7 @@ export default function A2Day25TagesablaufWorkbookPage() {
       <p style={{ margin: 0, lineHeight: 1.7 }}>Das Frühstück lasse ich nie aus, weil ich am Morgen Hunger habe. Meistens esse ich Müsli oder Toast mit Marmelade. Dazu trinke ich Tee oder Kaffee. Bevor ich in die Schule gehe, muss ich noch mein Bett machen. Das dauert aber selten länger als eine oder zwei Minuten. Dann renne ich schon los, um meinen Schulbus zu erreichen.</p>
       <p style={{ margin: 0, lineHeight: 1.7 }}>Nach der Schule esse ich zu Mittag und komme am Nachmittag nach Hause. Dann muss ich meistens noch Hausaufgaben machen. Vor dem Abendessen habe ich noch Zeit, um zu spielen oder Freunde zu treffen. Dann essen wir gemeinsam zu Abend. Bevor ich ins Bett gehe, schaue ich ein bisschen fern. Danach gehe ich schlafen und schlafe von 22 Uhr bis morgens um 7.</p>
       {lesenQuestions.map((q, i) => <div key={q.stem} style={questionCardStyle}><strong>{i + 1}. {q.stem}</strong>{q.options.map((opt) => <span key={opt}>{opt}</span>)}</div>)}
+      <WorkbookSubmissionReminder />
       <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
     </div>}
 
@@ -205,6 +207,7 @@ export default function A2Day25TagesablaufWorkbookPage() {
       <p style={{ margin: 0, lineHeight: 1.7 }}>Eine Woche später steigen Herr und Frau Meyer an einem kleinen Bahnhof in der Schweiz aus dem Zug. Ein Taxi wartet bereits und bringt das Ehepaar zum Berghotel. An der Rezeption werden ihnen die Zimmerschlüssel überreicht. Ein Bediensteter zeigt dem Ehepaar Meyer ihr Zimmer. Darin befindet sich ein Doppelbett und ein Schrank.</p>
       <p style={{ margin: 0, lineHeight: 1.7 }}>Herr Meyer ist unzufrieden mit dem Hotelzimmer. Es ist viel zu klein. &quot;Wir haben ein großes Zimmer gebucht. Dieser Raum gefällt uns nicht. Wir möchten ein anderes Zimmer haben.&quot; Durch seine Beschwerde erhält das Ehepaar sofort ein anderes Zimmer. Herr und Frau Meyer freuen sich. Sie haben ein großes Zimmer mit einem schönen Ausblick auf die schneebedeckten Berge.</p>
       {teil4Questions.map((q, i) => <div key={q.stem} style={questionCardStyle}><strong>{i + 1}. {q.stem}</strong>{q.options.map((opt) => <span key={opt}>{opt}</span>)}</div>)}
+      <WorkbookSubmissionReminder />
       <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
     </div>}
   </div>;

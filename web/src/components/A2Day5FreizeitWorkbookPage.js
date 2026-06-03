@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
@@ -171,6 +172,8 @@ const A2Day5FreizeitWorkbookPage = () => {
         </p>
       </div>
 
+      <A2B1WorkbookGuidance />
+
       {activeTab === "sprechen" && (
         <div style={card}>
           <h2 style={sectionTitle}>Teil 1 (Group Practice)</h2>
@@ -249,8 +252,6 @@ const A2Day5FreizeitWorkbookPage = () => {
           <p style={{ margin: 0 }}><strong>Stichwörter:</strong> Freunde · Hobby · Wochenende · Sport</p>
           <CourseInlinePracticePanel
             type="speaking"
-            title="Practice speaking on this page"
-            description="Open the speaking coach here after reading the task. No new tab is needed."
           />
           <SpeakingPracticeTimerCard />
 
@@ -271,9 +272,8 @@ const A2Day5FreizeitWorkbookPage = () => {
           <p style={{ margin: 0 }}>Optional: Schreiben Sie 5 Sätze über Ihre Freizeit mit Ideen aus Ihrer Brain Map.</p>
           <CourseInlinePracticePanel
             type="writing"
-            title="Practice writing on this page"
-            description="Write and mark your answer here after studying the task. No new tab is needed."
           />
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
       )}
@@ -304,6 +304,7 @@ const A2Day5FreizeitWorkbookPage = () => {
               {question.options.map((option) => <span key={option}>{option}</span>)}
             </div>
           ))}
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.lesen} onChange={setPreparedFor("lesen")} />
         </div>
       )}
@@ -321,6 +322,7 @@ const A2Day5FreizeitWorkbookPage = () => {
               {question.options.map((option) => <span key={option}>{option}</span>)}
             </div>
           ))}
+          <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
       )}
