@@ -8,6 +8,22 @@ const MAX_ZOOM = 2.5;
 const ZOOM_STEP = 0.2;
 const ZOOM_STORAGE_PREFIX = "course-resource-viewer-zoom";
 
+const LEGACY_SELF_LEARNING_RESOURCE_ROUTES = [
+  {
+    match: "1D1eb-iwfl_WA2sXPOSPD_66NCiTB4o2w",
+    route: "/campus/course/lesson/B2/1",
+  },
+  {
+    match: "17pVc0VfLm32z4zmkaaa_cdshKJEQQxYa",
+    route: "/campus/course/lesson/B2/1",
+  },
+];
+
+const getLegacySelfLearningRoute = (resourceUrl = "") => {
+  const found = LEGACY_SELF_LEARNING_RESOURCE_ROUTES.find(({ match }) => String(resourceUrl || "").includes(match));
+  return found?.route || "";
+};
+
 const toEmbeddableUrl = (resourceUrl) => {
   if (!resourceUrl) return "";
 
@@ -60,6 +76,7 @@ const CourseResourceViewerPage = () => {
   const query = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const resourceUrl = query.get("url") || "";
   const label = query.get("label") || "Course resource";
+  const legacySelfLearningRoute = useMemo(() => getLegacySelfLearningRoute(resourceUrl), [resourceUrl]);
   const inferredAssignmentKey = useMemo(() => inferAssignmentKeyFromWorkbookUrl(resourceUrl), [resourceUrl]);
   const embedUrl = useMemo(() => toEmbeddableUrl(resourceUrl), [resourceUrl]);
   const zoomStorageKey = `${ZOOM_STORAGE_PREFIX}:${resourceUrl || "default"}`;
@@ -74,6 +91,12 @@ const CourseResourceViewerPage = () => {
     { key: "discussion", label: "Discussion", path: "/campus/discussion" },
     { key: "account", label: "Account", path: "/campus/account" },
   ];
+
+  useEffect(() => {
+    if (legacySelfLearningRoute) {
+      navigate(legacySelfLearningRoute, { replace: true });
+    }
+  }, [legacySelfLearningRoute, navigate]);
 
   useEffect(() => {
     const stored = window.sessionStorage.getItem(zoomStorageKey);
@@ -131,6 +154,20 @@ const CourseResourceViewerPage = () => {
     const scale = currentDistance / initialDistance;
     updateZoom(touchStateRef.current.startZoom * scale);
   };
+
+  if (legacySelfLearningRoute) {
+    return (
+      <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+        <div style={styles.card}>
+          <h1 style={{ marginTop: 0 }}>Opening updated self-learning lesson…</h1>
+          <p style={{ marginBottom: 12 }}>This old workbook link has been replaced by the new guided B2 Day 1 lesson.</p>
+          <button type="button" style={styles.primaryButton} onClick={() => navigate(legacySelfLearningRoute, { replace: true })}>
+            Open B2 Day 1 lesson
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
