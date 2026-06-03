@@ -1,5 +1,5 @@
 import React from "react";
-import SelfLearningTabbedLessonPage from "./selfLearning/SelfLearningTabbedLessonPage";
+import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
 import c1Day1ZieleUndLernweg from "../data/selfLearningLessons/c1/day1ZieleUndLernweg";
 import b2Day1PersoenlicheIdentitaet from "../data/selfLearningLessons/b2/day1PersoenlicheIdentitaet";
@@ -57,7 +57,7 @@ const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number
 
 const componentRegistry = Object.fromEntries(
   Object.entries(SELF_LEARNING_LESSONS).flatMap(([level, lessons]) =>
-    lessons.map((lesson) => [lessonKey(level, lesson.day), () => <SelfLearningTabbedLessonPage lesson={lesson} />])
+    lessons.map((lesson) => [lessonKey(level, lesson.day), () => <SelfLearningEditableLessonPageV2 lesson={lesson} />])
   )
 );
 
