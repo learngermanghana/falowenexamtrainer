@@ -4,7 +4,7 @@ import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
-import { requestSpeakingTextAnalysis } from "../services/presentationCoachService";
+import { requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
@@ -74,6 +74,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
 
+  const [activeSpeakingTab, setActiveSpeakingTab] = useState("exam");
   const [selectedLevel, setSelectedLevel] = useState((examLevel || "A1").toUpperCase());
   const [selectedTeil, setSelectedTeil] = useState("all");
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
@@ -89,6 +90,18 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [draftMessage, setDraftMessage] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
   const [chatError, setChatError] = useState("");
+  const [customChatMessages, setCustomChatMessages] = useState([
+    {
+      id: "custom-welcome-1",
+      role: "coach",
+      type: "text",
+      text: "Hallo! This is your custom Sprechen chat. Talk about anything you like, and I will answer, correct gently, and ask you one follow-up question.",
+      createdAt: new Date().toISOString(),
+    },
+  ]);
+  const [customDraftMessage, setCustomDraftMessage] = useState("");
+  const [customChatLoading, setCustomChatLoading] = useState(false);
+  const [customChatError, setCustomChatError] = useState("");
   const [lastRubric, setLastRubric] = useState(null);
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
@@ -105,6 +118,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const recordingSecondsRef = useRef(0);
   const audioRefs = useRef({});
   const messagesEndRef = useRef(null);
+  const customMessagesEndRef = useRef(null);
 
   useEffect(() => {
     if (isExamMode && examLevel) {
@@ -169,6 +183,16 @@ const SpeakingPage = ({ mode = "exam" }) => {
     return [...new Set([...(selectedQuestion ? [selectedQuestion.topicPrompt] : []), ...fromSheet])].slice(0, 4);
   }, [filteredQuestions, selectedQuestion]);
 
+  const customQuickStarters = useMemo(
+    () => [
+      "Lass uns über meinen Alltag sprechen.",
+      "Frag mich über meine Hobbys.",
+      "Ich möchte Smalltalk im Café üben.",
+      "Hilf mir, flüssiger über Arbeit oder Schule zu sprechen.",
+    ],
+    []
+  );
+
   useEffect(() => {
     let cancelled = false;
 
@@ -213,8 +237,14 @@ const SpeakingPage = ({ mode = "exam" }) => {
   }, [completedQuestionIds, mode, progressLoaded, selectedLevel, selectedQuestionId, selectedTeil, studentCode, userId]);
 
   useEffect(() => {
+    if (activeSpeakingTab !== "exam") return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [chatMessages, chatLoading]);
+  }, [activeSpeakingTab, chatMessages, chatLoading]);
+
+  useEffect(() => {
+    if (activeSpeakingTab !== "custom") return;
+    customMessagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [activeSpeakingTab, customChatLoading, customChatMessages]);
 
   useEffect(() => {
     const audioElements = audioRefs.current;
@@ -317,6 +347,76 @@ const SpeakingPage = ({ mode = "exam" }) => {
       });
     } finally {
       setChatLoading(false);
+    }
+  };
+
+  const appendCustomCoachText = (text) => {
+    setCustomChatMessages((current) => [
+      ...current,
+      {
+        id: `custom-coach-${Date.now()}`,
+        role: "coach",
+        type: "text",
+        text,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+  };
+
+  const sendCustomChatMessage = async () => {
+    const trimmed = customDraftMessage.trim();
+    if (!trimmed || customChatLoading) return;
+
+    const studentMessage = {
+      id: `custom-student-${Date.now()}`,
+      role: "student",
+      type: "text",
+      text: trimmed,
+      createdAt: new Date().toISOString(),
+    };
+    const history = customChatMessages
+      .filter((message) => message.type === "text")
+      .map((message) => ({
+        role: message.role === "student" ? "user" : "assistant",
+        content: message.text,
+      }));
+
+    setCustomChatMessages((current) => [...current, studentMessage]);
+    setCustomDraftMessage("");
+    setCustomChatLoading(true);
+    setCustomChatError("");
+
+    try {
+      const response = await requestCustomSpeakingChatReply({
+        message: trimmed,
+        level: selectedLevel,
+        history,
+        idToken,
+      });
+      const replyText = String(response?.reply || "").trim() || "Ich konnte gerade nicht antworten. Bitte versuche es noch einmal.";
+      appendCustomCoachText(replyText);
+      triggerInteractionFeedback({
+        sound: "success",
+        toastMessage: "Custom Sprechen chat replied.",
+        toastVariant: "success",
+        showToast,
+        notificationTitle: "Custom Sprechen chat",
+        notificationBody: "Your speaking partner replied.",
+        notificationTag: "custom-speaking-chat-reply",
+        vibratePattern: [45],
+      });
+    } catch (error) {
+      setCustomChatError(error?.message || "Could not reach the custom Sprechen chat.");
+      appendCustomCoachText("Der freie Sprechen-Chat ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.");
+      triggerInteractionFeedback({
+        sound: "error",
+        toastMessage: "Custom Sprechen chat is unavailable right now.",
+        toastVariant: "error",
+        showToast,
+        vibratePattern: [120],
+      });
+    } finally {
+      setCustomChatLoading(false);
     }
   };
 
@@ -469,6 +569,21 @@ const SpeakingPage = ({ mode = "exam" }) => {
   };
 
   const clearConversation = () => {
+    if (activeSpeakingTab === "custom") {
+      setCustomChatMessages([
+        {
+          id: `custom-welcome-${Date.now()}`,
+          role: "coach",
+          type: "text",
+          text: "Custom Sprechen chat cleared. Start any German conversation topic when you are ready.",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+      setCustomChatError("");
+      setCustomDraftMessage("");
+      return;
+    }
+
     setChatMessages([
       {
         id: `welcome-${Date.now()}`,
@@ -525,7 +640,150 @@ const SpeakingPage = ({ mode = "exam" }) => {
           </button>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
+        <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap" }}>
+          {[
+            { key: "exam", label: "Exam prompts" },
+            { key: "custom", label: "Custom chat" },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              style={{
+                ...(activeSpeakingTab === tab.key ? styles.navButtonActive : styles.navButton),
+                borderRadius: 999,
+                padding: "8px 14px",
+              }}
+              onClick={() => setActiveSpeakingTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {activeSpeakingTab === "custom" ? (
+          <div style={{ display: "grid", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
+            <aside
+              style={{
+                borderRight: isCompactViewport ? "none" : "1px solid #E5E7EB",
+                borderBottom: isCompactViewport ? "1px solid #E5E7EB" : "none",
+                background: "#F8FAFC",
+                padding: isCompactViewport ? 12 : 16,
+                display: "grid",
+                alignContent: "start",
+                gap: 14,
+              }}
+            >
+              <span style={styles.badge}>Free Sprechen practice • {selectedLevel}</span>
+
+              <div style={{ ...styles.card, margin: 0, padding: 12, background: "#ECFDF5", border: "1px solid #A7F3D0" }}>
+                <p style={{ margin: 0, fontWeight: 700, fontSize: 13 }}>How custom chat works</p>
+                <p style={{ ...styles.helperText, margin: "8px 0 0" }}>
+                  Talk freely about school, work, travel, family, daily life, or any topic. The AI keeps the conversation at your level, corrects gently, and asks a new German question.
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gap: 6 }}>
+                <label style={styles.label}>Quick starters</label>
+                {customQuickStarters.map((starter) => (
+                  <button
+                    key={starter}
+                    type="button"
+                    style={{ ...styles.secondaryButton, justifyContent: "flex-start", textAlign: "left" }}
+                    onClick={() => setCustomDraftMessage(starter)}
+                  >
+                    {starter}
+                  </button>
+                ))}
+              </div>
+            </aside>
+
+            <section style={{ background: "#E5E7EB", minHeight: isCompactViewport ? 480 : 580, display: "grid", gridTemplateRows: "1fr auto" }}>
+              <div style={{ padding: 16, overflowY: "auto", display: "grid", gap: 12 }}>
+                {customChatMessages.map((message) => {
+                  const isStudent = message.role === "student";
+                  return (
+                    <div
+                      key={message.id}
+                      style={{
+                        display: "flex",
+                        justifyContent: isStudent ? "flex-end" : "flex-start",
+                        alignItems: "flex-start",
+                        gap: 10,
+                      }}
+                    >
+                      {!isStudent ? (
+                        <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#BBF7D0", display: "grid", placeItems: "center" }}>
+                          💬
+                        </div>
+                      ) : null}
+                      <div
+                        style={{
+                          maxWidth: "78%",
+                          borderRadius: 18,
+                          padding: "10px 14px",
+                          boxShadow: "0 2px 8px rgba(15, 23, 42, 0.08)",
+                          background: isStudent ? "linear-gradient(120deg, #059669, #0f766e)" : "#ffffff",
+                          color: isStudent ? "#ffffff" : "#1f2937",
+                        }}
+                      >
+                        <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{message.text}</p>
+                        <p style={{ margin: "6px 0 0", opacity: 0.75, fontSize: 11 }}>{formatClock(message.createdAt)}</p>
+                      </div>
+                      {isStudent ? (
+                        <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#D1FAE5", display: "grid", placeItems: "center" }}>
+                          👤
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
+
+                {customChatLoading ? (
+                  <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#BBF7D0", display: "grid", placeItems: "center" }}>
+                      💬
+                    </div>
+                    <div style={{ background: "#ffffff", borderRadius: 16, padding: "10px 14px", color: "#4B5563", fontSize: 13 }}>
+                      Custom Sprechen chat is typing…
+                    </div>
+                  </div>
+                ) : null}
+                <div ref={customMessagesEndRef} />
+              </div>
+
+              <div style={{ borderTop: "1px solid #D1D5DB", padding: 14, background: "#F9FAFB", display: "grid", gap: 10 }}>
+                <p style={{ margin: 0, fontSize: 12, color: "#047857" }}>
+                  Free chat mode: write in German when you can. You may use English if you are stuck.
+                </p>
+                {customChatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 12 }}>{customChatError}</p> : null}
+                <div style={{ display: "flex", gap: 8, flexDirection: isCompactViewport ? "column" : "row" }}>
+                  <textarea
+                    style={{ ...styles.input, minHeight: 56, maxHeight: 120, resize: "vertical" }}
+                    placeholder="Start a free German conversation..."
+                    value={customDraftMessage}
+                    onChange={(event) => setCustomDraftMessage(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        sendCustomChatMessage();
+                      }
+                    }}
+                    disabled={customChatLoading}
+                  />
+                  <button
+                    style={{ ...styles.primaryButton, borderRadius: 12, minWidth: isCompactViewport ? "100%" : 88, background: "#059669" }}
+                    onClick={sendCustomChatMessage}
+                    disabled={customChatLoading}
+                  >
+                    Send
+                  </button>
+                </div>
+              </div>
+            </section>
+          </div>
+        ) : null}
+
+        <div style={{ display: activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
           <aside
             style={{
               borderRight: isCompactViewport ? "none" : "1px solid #E5E7EB",

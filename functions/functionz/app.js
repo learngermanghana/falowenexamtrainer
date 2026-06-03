@@ -879,6 +879,19 @@ const chatBuddyPrompt = ({ level }) =>
     "Always ask one follow-up question in English to keep the conversation going.",
   ].join(" ");
 
+
+const customSpeakingChatPrompt = ({ level }) =>
+  [
+    "You are Falowen Custom Speaking Chat, a warm German speaking partner for free conversation practice.",
+    `Match CEFR level ${level || "A1"}; keep German natural but reachable for that level.`,
+    "The student can talk about any safe everyday topic. Do not force exam tasks or presentations.",
+    "Main goal: improve Sprechen confidence through back-and-forth communication.",
+    "Reply mostly in simple German, with short English support only when it prevents confusion.",
+    "Correct only the 1-2 most important mistakes each turn, using: Besser: ...",
+    "Always ask exactly one friendly German follow-up question to keep the student speaking.",
+    "Keep the reply concise: maximum 6 short lines.",
+  ].join(" ");
+
 const PRESENTATION_TURN_LIMIT = 6;
 
 const PRESENTATION_PROMPT_BY_LEVEL = {
@@ -2619,6 +2632,66 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
     console.error("/chatbuddy/respond error", err);
     auditAIRequest({ route: "/chatbuddy/respond", uid: authedUser?.uid, email: authedUser?.email, success: false });
     return res.status(500).json({ error: err.message || "Failed to chat with buddy" });
+  }
+});
+
+
+app.post("/speaking/custom-chat", async (req, res) => {
+  let authedUser;
+  try {
+    authedUser = await requireAuthenticatedUser(req, res);
+    if (!authedUser) return;
+
+    const { message, level = "A1", history = [] } = req.body || {};
+    const trimmedMessage = String(message || "").trim();
+    const requestedLevel = normalizeCefrLevel(level, "A1");
+
+    const validationError =
+      validateString(trimmedMessage, { required: true, maxLength: 800, label: "message" }) ||
+      validateString(level, { maxLength: 10, label: "level" });
+
+    if (validationError) return res.status(400).json({ error: validationError });
+    if (!ensureOpenAIConfigured(res)) return;
+
+    const effectiveLevel = await resolveStudentLevelForUser({ uid: authedUser.uid, fallbackLevel: requestedLevel });
+
+    const quota = await enforceUserQuota({ uid: authedUser.uid, category: "chatbuddy", limit: DAILY_LIMITS.chatbuddy });
+    if (!quota.allowed) {
+      log.warn("quota.blocked", { route: "/speaking/custom-chat", uid: authedUser.uid, category: "chatbuddy" });
+      return res.status(429).json({ error: "Daily custom speaking chat limit reached" });
+    }
+
+    const safeHistory = sanitizePresentationHistory(history);
+    const chatMessages = [
+      { role: "system", content: customSpeakingChatPrompt({ level: effectiveLevel }) },
+      ...safeHistory,
+      { role: "user", content: trimmedMessage },
+    ];
+
+    let fallbackUsed = false;
+    let reply;
+
+    try {
+      reply = await createChatCompletion(chatMessages, { temperature: 0.6, max_tokens: 360 });
+    } catch (err) {
+      log.error("speaking.custom_chat.failed", { errorMessage: err?.message || "unknown", uid: authedUser.uid });
+      fallbackUsed = true;
+      reply = "Entschuldigung, der freie Sprechen-Chat ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.";
+    }
+
+    auditAIRequest({
+      route: "/speaking/custom-chat",
+      uid: authedUser.uid,
+      email: authedUser.email,
+      metadata: { level: effectiveLevel, requestedLevel, quotaRemaining: quota.remaining },
+      success: !fallbackUsed,
+    });
+
+    return res.json({ reply, quotaRemaining: quota.remaining, degraded: fallbackUsed });
+  } catch (err) {
+    console.error("/speaking/custom-chat error", err);
+    auditAIRequest({ route: "/speaking/custom-chat", uid: authedUser?.uid, email: authedUser?.email, success: false });
+    return res.status(500).json({ error: err.message || "Failed to run custom speaking chat" });
   }
 });
 
