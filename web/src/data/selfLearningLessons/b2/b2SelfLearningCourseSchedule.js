@@ -1,0 +1,105 @@
+const makeB2ScheduleEntry = ({ day, chapter, topic, goal, grammar_topic }) => ({
+  day,
+  topic,
+  chapter,
+  goal,
+  instruction: "This is a B2 self-learning lesson. Open the guided lesson, learn the topic, practise with Falowen AI, improve from feedback and self-mark your progress.",
+  grammar_topic,
+  assignment: false,
+  lesen_hören: {
+    video: null,
+    youtube_link: null,
+    grammarbook_link: null,
+    workbook_link: `/campus/course/lesson/B2/${day}`,
+    assignment: false,
+  },
+});
+
+export const B2_SELF_LEARNING_COURSE_SCHEDULE = [
+  makeB2ScheduleEntry({
+    day: 1,
+    chapter: "1.1",
+    topic: "Persönliche Identität und Selbstverständnis",
+    goal: "Über sich selbst, Werte und persönliche Entwicklung sprechen.",
+    grammar_topic: "Adjektivdeklination, klare Begründungen und strukturierte Selbstdarstellung",
+  }),
+  makeB2ScheduleEntry({
+    day: 2,
+    chapter: "1.2",
+    topic: "Alltag und Zeitmanagement",
+    goal: "Routinen, Prioritäten und Produktivität beschreiben.",
+    grammar_topic: "Temporale Konnektoren, Nebensätze und klare Reihenfolge im Tagesablauf",
+  }),
+  makeB2ScheduleEntry({
+    day: 3,
+    chapter: "1.3",
+    topic: "Arbeit und Beruf",
+    goal: "Berufliche Erfahrungen, Erwartungen und Zusammenarbeit beschreiben.",
+    grammar_topic: "Konjunktiv II für höfliche Vorschläge, berufliche Wünsche und realistische Empfehlungen",
+  }),
+  makeB2ScheduleEntry({
+    day: 4,
+    chapter: "1.4",
+    topic: "Bildung und Lernen",
+    goal: "Lernstrategien, Prüfungen und Weiterbildung diskutieren.",
+    grammar_topic: "Finalsätze mit damit / um ... zu",
+  }),
+  makeB2ScheduleEntry({
+    day: 5,
+    chapter: "1.5",
+    topic: "Gesundheit und Wohlbefinden",
+    goal: "Stress, Balance und gesunde Gewohnheiten beschreiben.",
+    grammar_topic: "Kausale Verbindungen mit weil, da, deshalb und daher",
+  }),
+  makeB2ScheduleEntry({
+    day: 6,
+    chapter: "2.1",
+    topic: "Medien und digitale Kommunikation",
+    goal: "Soziale Medien, Datenschutz und Online-Verhalten diskutieren.",
+    grammar_topic: "Indirekte Fragen und Meinungsformeln",
+  }),
+  makeB2ScheduleEntry({
+    day: 7,
+    chapter: "2.2",
+    topic: "Umwelt und Nachhaltigkeit",
+    goal: "Klimaschutz, Konsum und Alltagshandeln bewerten.",
+    grammar_topic: "Passiv und sachliche Beschreibung",
+  }),
+  makeB2ScheduleEntry({
+    day: 8,
+    chapter: "2.3",
+    topic: "Reisen und Mobilität",
+    goal: "Transport, Urlaub und nachhaltige Entscheidungen vergleichen.",
+    grammar_topic: "Vergleichsformen und abwägende Argumentation",
+  }),
+  makeB2ScheduleEntry({
+    day: 9,
+    chapter: "2.4",
+    topic: "Wohnen und Nachbarschaft",
+    goal: "Wohnformen, Mietprobleme und Zusammenleben beschreiben.",
+    grammar_topic: "Relativsätze und genaue Beschreibungen",
+  }),
+  makeB2ScheduleEntry({
+    day: 10,
+    chapter: "2.5",
+    topic: "Konsum und Geld",
+    goal: "Kaufentscheidungen, Budget und Werbung diskutieren.",
+    grammar_topic: "Konzessive Verbindungen mit obwohl und trotzdem",
+  }),
+  makeB2ScheduleEntry({
+    day: 11,
+    chapter: "3.1",
+    topic: "Gesellschaft und Integration",
+    goal: "Sprache, Teilhabe und Zusammenleben erklären.",
+    grammar_topic: "Argumentationsstruktur mit einerseits / andererseits",
+  }),
+  makeB2ScheduleEntry({
+    day: 12,
+    chapter: "3.2",
+    topic: "Kultur und Freizeit",
+    goal: "Hobbys, kulturelle Angebote und persönliche Interessen bewerten.",
+    grammar_topic: "Adjektive, Präpositionen und Bewertungen",
+  }),
+];
+
+export default B2_SELF_LEARNING_COURSE_SCHEDULE;
