@@ -10,6 +10,8 @@ import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5
 import b2Day6MedienUndDigitaleKommunikation from "../data/selfLearningLessons/b2/day6MedienUndDigitaleKommunikation";
 import b2Day7UmweltUndNachhaltigkeit from "../data/selfLearningLessons/b2/day7UmweltUndNachhaltigkeit";
 import b2Day8ReisenUndMobilitaet from "../data/selfLearningLessons/b2/day8ReisenUndMobilitaet";
+import b2Day9WohnenUndNachbarschaft from "../data/selfLearningLessons/b2/day9WohnenUndNachbarschaft";
+import b2Day10KonsumUndGeld from "../data/selfLearningLessons/b2/day10KonsumUndGeld";
 
 const c1FallbackLessons = [
   [2, "1.2", "Kultur und Identität", "Kulturelle Prägung, Zugehörigkeit und Selbstverständnis"],
@@ -42,8 +44,6 @@ const c1FallbackLessons = [
 ].map(([day, chapter, title, topic]) => buildDefaultLesson({ level: "C1", day, chapter, title, topic }));
 
 const b2FallbackLessons = [
-  [9, "2.4", "Wohnen und Nachbarschaft", "Wohnformen, Mietprobleme und Zusammenleben"],
-  [10, "2.5", "Konsum und Geld", "Kaufentscheidungen, Budget und Werbung"],
   [11, "3.1", "Gesellschaft und Integration", "Sprache, Teilhabe und Zusammenleben"],
   [12, "3.2", "Kultur und Freizeit", "Hobbys, kulturelle Angebote und persönliche Interessen"],
   [13, "3.3", "Familie und Generationen", "Familienmodelle, Generationenkonflikte und Verantwortung beschreiben"],
@@ -74,6 +74,8 @@ export const SELF_LEARNING_LESSONS = {
     b2Day6MedienUndDigitaleKommunikation,
     b2Day7UmweltUndNachhaltigkeit,
     b2Day8ReisenUndMobilitaet,
+    b2Day9WohnenUndNachbarschaft,
+    b2Day10KonsumUndGeld,
     ...b2FallbackLessons,
   ],
   C1: [c1Day1ZieleUndLernweg, ...c1FallbackLessons],
