@@ -1,4 +1,5 @@
 import React from "react";
+import "../data/selfLearningLessons/applySelfLearningCourseOverrides";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 
 export const RESOURCE_ACTION_LABELS = {
