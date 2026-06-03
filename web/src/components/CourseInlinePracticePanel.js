@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { styles } from "../styles";
-import SpeechTrainerPage from "./SpeechTrainerPage";
+import SpeakingPage from "./SpeakingPage";
 import WritingPage from "./WritingPage";
 
 const practiceConfig = {
   speaking: {
     defaultTitle: "Practice speaking on this page",
-    defaultDescription: "Open the speaking coach here after reading the task. No new tab is needed.",
-    label: "Speaking coach",
-    render: () => <SpeechTrainerPage />,
+    defaultDescription: "Use the exam speaking coach here after reading the task. No new tab is needed.",
+    label: "Exam speaking coach",
+    render: () => <SpeakingPage />,
   },
   writing: {
     defaultTitle: "Practice writing on this page",
@@ -18,8 +18,8 @@ const practiceConfig = {
   },
 };
 
-const CourseInlinePracticePanel = ({ type, title, description }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const CourseInlinePracticePanel = ({ type, title, description, defaultOpen = true }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
   const config = practiceConfig[type] || practiceConfig.speaking;
   const panelId = `course-inline-practice-${type || "speaking"}`;
 
@@ -45,7 +45,7 @@ const CourseInlinePracticePanel = ({ type, title, description }) => {
         aria-expanded={isOpen}
         aria-controls={panelId}
       >
-        {isOpen ? "Close practice" : "Practice here"}
+        {isOpen ? "Hide practice" : "Practice here"}
       </button>
       {isOpen ? (
         <div
