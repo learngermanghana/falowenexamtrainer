@@ -145,52 +145,52 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
           <div style={questionBoxStyle}>
             <strong>Hauptzweig 1: Freizeitaktivitäten</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Sport treiben: joggen, schwimmen, Fußball spielen</li>
-              <li>Kreativ sein: malen, basteln, ein Instrument spielen</li>
-              <li>Entspannen: ein Buch lesen, Musik hören, Netflix schauen</li>
-              <li>Computer- oder Videospiele spielen</li>
+              <li>Sport treiben: joggen, schwimmen, Fußball spielen (doing sports: jogging, swimming, playing football/soccer)</li>
+              <li>Kreativ sein: malen, basteln, ein Instrument spielen (being creative: painting, crafting, playing an instrument)</li>
+              <li>Entspannen: ein Buch lesen, Musik hören, Netflix schauen (relaxing: reading a book, listening to music, watching Netflix)</li>
+              <li>Computer- oder Videospiele spielen (playing computer or video games)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>Hauptzweig 2: Reise oder Ausflug</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Tagesausflug: in die Berge, an den See, in den Freizeitpark</li>
-              <li>Städtetrip: nach Berlin, Köln oder in eine andere Stadt</li>
-              <li>Wandern oder Radfahren: im Wald, am Fluss</li>
-              <li>Kulturelle Unternehmungen: Museum, Theater, Konzert</li>
+              <li>Tagesausflug: in die Berge, an den See, in den Freizeitpark (day trip: to the mountains, to the lake, to an amusement park)</li>
+              <li>Städtetrip: nach Berlin, Köln oder in eine andere Stadt (city trip: to Berlin, Cologne, or another city)</li>
+              <li>Wandern oder Radfahren: im Wald, am Fluss (hiking or cycling: in the forest, by the river)</li>
+              <li>Kulturelle Unternehmungen: Museum, Theater, Konzert (cultural activities: museum, theater, concert)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>Hauptzweig 3: Haushalt und Erledigungen</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Hausputz: Staubsaugen, Bad putzen, Wäsche waschen</li>
-              <li>Einkaufen: Lebensmittel einkaufen, Kleidung shoppen</li>
-              <li>Reparaturen: etwas im Haus oder Garten reparieren</li>
-              <li>Post und Bank: Briefe abschicken, Bankgeschäfte erledigen</li>
+              <li>Hausputz: Staubsaugen, Bad putzen, Wäsche waschen (house cleaning: vacuuming, cleaning the bathroom, doing laundry)</li>
+              <li>Einkaufen: Lebensmittel einkaufen, Kleidung shoppen (shopping: buying groceries, shopping for clothes)</li>
+              <li>Reparaturen: etwas im Haus oder Garten reparieren (repairs: fixing something in the house or garden)</li>
+              <li>Post und Bank: Briefe abschicken, Bankgeschäfte erledigen (post and bank: sending letters, doing banking tasks)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>Hauptzweig 4: Freunde und Familie</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Treffen mit Freunden: gemeinsam kochen, ins Kino gehen, Spieleabend</li>
-              <li>Familienzeit: Eltern oder Großeltern besuchen, Familienessen</li>
-              <li>Gemeinsame Aktivitäten: Grillen, Picknick, Ausflüge</li>
-              <li>Feiern: Geburtstag, Jubiläum, andere Feste</li>
+              <li>Treffen mit Freunden: gemeinsam kochen, ins Kino gehen, Spieleabend (meeting friends: cooking together, going to the cinema, game night)</li>
+              <li>Familienzeit: Eltern oder Großeltern besuchen, Familienessen (family time: visiting parents or grandparents, family meal)</li>
+              <li>Gemeinsame Aktivitäten: Grillen, Picknick, Ausflüge (shared activities: barbecuing, picnic, outings)</li>
+              <li>Feiern: Geburtstag, Jubiläum, andere Feste (celebrations: birthday, anniversary, other parties/festivals)</li>
             </ul>
           </div>
 
           <div style={questionBoxStyle}>
             <strong>Hauptzweig 5: Ausdrücke und Fragen</strong>
             <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
-              <li>Was machst du am Wochenende?</li>
-              <li>Hast du schon Pläne?</li>
-              <li>Ich freue mich auf ...</li>
-              <li>Ich habe leider keine Zeit.</li>
-              <li>Ich möchte mich erholen.</li>
-              <li>Wollen wir etwas zusammen unternehmen?</li>
+              <li>Was machst du am Wochenende? (What are you doing at the weekend?)</li>
+              <li>Hast du schon Pläne? (Do you already have plans?)</li>
+              <li>Ich freue mich auf ... (I am looking forward to ...)</li>
+              <li>Ich habe leider keine Zeit. (Unfortunately, I do not have time.)</li>
+              <li>Ich möchte mich erholen. (I want to rest/recover.)</li>
+              <li>Wollen wir etwas zusammen unternehmen? (Shall we do something together?)</li>
             </ul>
           </div>
 

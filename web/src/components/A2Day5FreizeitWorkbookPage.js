@@ -187,19 +187,19 @@ const A2Day5FreizeitWorkbookPage = () => {
           </p>
           <h3 style={sectionTitle}>Hauptäste</h3>
           <ol style={listSpacing}>
-            <li>Sport und Bewegung</li>
-            <li>Kreative Hobbys</li>
-            <li>Digitale Freizeit</li>
-            <li>Gesellschaft und Freunde</li>
-            <li>Entspannung und Ruhe</li>
+            <li>Sport und Bewegung (Sports and movement)</li>
+            <li>Kreative Hobbys (Creative hobbies)</li>
+            <li>Digitale Freizeit (Digital free time)</li>
+            <li>Gesellschaft und Freunde (Social life and friends)</li>
+            <li>Entspannung und Ruhe (Relaxation and quiet time)</li>
           </ol>
           <h3 style={sectionTitle}>Unteräste</h3>
           <ul style={listSpacing}>
-            <li><strong>Sport und Bewegung:</strong> Joggen, Schwimmen, Fahrrad fahren, Fußball spielen, Tanzen, Wandern</li>
-            <li><strong>Kreative Hobbys:</strong> Malen, Musik machen, Fotografieren, Basteln, Schreiben</li>
-            <li><strong>Digitale Freizeit:</strong> Filme/Serien schauen, Videospiele spielen, Soziale Medien nutzen, Online lernen</li>
-            <li><strong>Gesellschaft und Freunde:</strong> Freunde treffen, mit der Familie Zeit verbringen, Grillen, Ausgehen</li>
-            <li><strong>Entspannung und Ruhe:</strong> Lesen, Musik hören, Spazieren gehen, Schlafen/Nickerchen, Yoga/Meditation</li>
+            <li><strong>Sport und Bewegung (Sports and movement):</strong> Joggen (jogging), Schwimmen (swimming), Fahrrad fahren (cycling), Fußball spielen (playing football/soccer), Tanzen (dancing), Wandern (hiking)</li>
+            <li><strong>Kreative Hobbys (Creative hobbies):</strong> Malen (painting), Musik machen (making music), Fotografieren (photography), Basteln (crafting), Schreiben (writing)</li>
+            <li><strong>Digitale Freizeit (Digital free time):</strong> Filme/Serien schauen (watching films/series), Videospiele spielen (playing video games), Soziale Medien nutzen (using social media), Online lernen (learning online)</li>
+            <li><strong>Gesellschaft und Freunde (Social life and friends):</strong> Freunde treffen (meeting friends), mit der Familie Zeit verbringen (spending time with family), Grillen (barbecuing), Ausgehen (going out)</li>
+            <li><strong>Entspannung und Ruhe (Relaxation and quiet time):</strong> Lesen (reading), Musik hören (listening to music), Spazieren gehen (going for a walk), Schlafen/Nickerchen (sleeping/napping), Yoga/Meditation (yoga/meditation)</li>
           </ul>
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>

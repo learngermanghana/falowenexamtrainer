@@ -129,23 +129,24 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
           <h3 style={sectionTitle}>Example Brain Map</h3>
           <ol style={listStyle}>
             <li>
-              <strong>Verschiedene Transportmittel</strong>: Auto, Fahrrad, Bus, Zug, Motorrad, Flugzeug, Schiff
+              <strong>Verschiedene Transportmittel (Different means of transport)</strong>: Auto (car), Fahrrad (bicycle), Bus (bus), Zug (train), Motorrad (motorcycle), Flugzeug (airplane), Schiff (ship)
             </li>
             <li>
-              <strong>Autotypen und Marken</strong>: Kleinwagen, Limousine, Kombi, SUV, Elektroauto; Marken: VW, BMW,
-              Mercedes, Toyota, Ford
+              <strong>Autotypen und Marken (Car types and brands)</strong>: Kleinwagen (small car), Limousine (sedan), Kombi (station wagon), SUV, Elektroauto (electric car);
+              Marken (brands): VW, BMW, Mercedes, Toyota, Ford
             </li>
             <li>
-              <strong>Wichtige Autoteile und Zubehör</strong>: Reifen, Motor, Lenkrad, Bremse, Scheinwerfer,
-              Sicherheitsgurt, Navigationssystem
+              <strong>Wichtige Autoteile und Zubehör (Important car parts and accessories)</strong>: Reifen (tires), Motor (engine), Lenkrad (steering wheel),
+              Bremse (brake), Scheinwerfer (headlights), Sicherheitsgurt (seat belt), Navigationssystem (navigation system)
             </li>
             <li>
-              <strong>Verkehrsregeln und Sicherheit</strong>: Geschwindigkeitsbegrenzung, Führerschein, Anschnallen,
-              Rote Ampel, Fahrradhelm tragen, Rechts vor links
+              <strong>Verkehrsregeln und Sicherheit (Traffic rules and safety)</strong>: Geschwindigkeitsbegrenzung (speed limit), Führerschein (driver's license),
+              Anschnallen (buckling up), Rote Ampel (red traffic light), Fahrradhelm tragen (wearing a bicycle helmet), Rechts vor links (right before left)
             </li>
             <li>
-              <strong>Alltag und Reisen</strong>: Zur Arbeit fahren, Einkaufen, Urlaubsreise mit dem Auto,
-              Öffentliche Verkehrsmittel benutzen, Carsharing oder Mitfahrgelegenheit
+              <strong>Alltag und Reisen (Everyday life and travel)</strong>: Zur Arbeit fahren (commuting to work), Einkaufen (shopping),
+              Urlaubsreise mit dem Auto (vacation trip by car), Öffentliche Verkehrsmittel benutzen (using public transport),
+              Carsharing oder Mitfahrgelegenheit (car sharing or ride sharing)
             </li>
           </ol>
 

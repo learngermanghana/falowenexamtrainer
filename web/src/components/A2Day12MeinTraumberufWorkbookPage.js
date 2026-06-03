@@ -208,31 +208,31 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
             <li>
               <strong>Was ist dein Traumberuf?</strong>
               <ul style={listSpacing}>
-                <li>Interessen und Hobbys – Was macht dir Spaß?</li>
-                <li>Gehalt – Ist der Beruf gut bezahlt?</li>
-                <li>Möglichkeiten – Gibt es viele Jobs?</li>
+                <li>Interessen und Hobbys – Was macht dir Spaß? (interests and hobbies — what is fun for you?)</li>
+                <li>Gehalt – Ist der Beruf gut bezahlt? (salary — is the job well paid?)</li>
+                <li>Möglichkeiten – Gibt es viele Jobs? (opportunities — are there many jobs?)</li>
                 <li>
-                  Beispiele für Traumberufe: Arzt, Lehrer, Musiker, Ingenieur, Koch, Designer, Pilot, Polizist.
+                  Beispiele für Traumberufe: Arzt, Lehrer, Musiker, Ingenieur, Koch, Designer, Pilot, Polizist (example dream jobs: doctor, teacher, musician, engineer, cook/chef, designer, pilot, police officer).
                 </li>
               </ul>
             </li>
             <li>
               <strong>Wo möchtest du arbeiten?</strong>
               <ul style={listSpacing}>
-                <li>Im Büro – Computerarbeit, Meetings</li>
-                <li>Zu Hause – Flexibel, kein Arbeitsweg</li>
-                <li>Draußen – Viel Bewegung, frische Luft</li>
-                <li>Reisen – Neue Länder sehen, viele Menschen treffen</li>
+                <li>Im Büro – Computerarbeit, Meetings (in an office — computer work, meetings)</li>
+                <li>Zu Hause – Flexibel, kein Arbeitsweg (at home — flexible, no commute)</li>
+                <li>Draußen – Viel Bewegung, frische Luft (outside — lots of movement, fresh air)</li>
+                <li>Reisen – Neue Länder sehen, viele Menschen treffen (traveling — seeing new countries, meeting many people)</li>
               </ul>
             </li>
             <li>
               <strong>Arbeitest du lieber allein oder im Team?</strong>
               <ul style={listSpacing}>
-                <li>Allein arbeiten – Mehr Konzentration, eigene Entscheidungen</li>
-                <li>Im Team arbeiten – Zusammenarbeit, Ideen teilen, Unterstützung</li>
+                <li>Allein arbeiten – Mehr Konzentration, eigene Entscheidungen (working alone — more concentration, own decisions)</li>
+                <li>Im Team arbeiten – Zusammenarbeit, Ideen teilen, Unterstützung (working in a team — cooperation, sharing ideas, support)</li>
                 <li>
                   Beispiele für Berufe: Allein (Schriftsteller, Fotograf, Künstler) · Im Team (Arzt, Lehrer,
-                  Bauarbeiter, Verkäufer)
+                  Bauarbeiter, Verkäufer) (examples of jobs: alone — writer, photographer, artist; in a team — doctor, teacher, construction worker, salesperson)
                 </li>
               </ul>
             </li>
@@ -240,17 +240,17 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
               <strong>Welche Fähigkeiten braucht man?</strong>
               <ul style={listSpacing}>
                 <li>
-                  Soft Skills: Kommunikation, Teamarbeit, Kreativität, Zeitmanagement, Geduld und Ausdauer.
+                  Soft Skills: Kommunikation, Teamarbeit, Kreativität, Zeitmanagement, Geduld und Ausdauer (soft skills: communication, teamwork, creativity, time management, patience, and perseverance).
                 </li>
-                <li>Hard Skills: Computerkenntnisse, Mathematik, handwerkliches Geschick, Sprachen.</li>
+                <li>Hard Skills: Computerkenntnisse, Mathematik, handwerkliches Geschick, Sprachen (hard skills: computer skills, mathematics, practical/craft skills, languages).</li>
               </ul>
             </li>
             <li>
               <strong>Warum interessiert dich dieser Beruf?</strong>
               <ul style={listSpacing}>
-                <li>Leidenschaft – „Ich liebe Musik, deshalb möchte ich Musiker werden.“</li>
-                <li>Zukunftspläne – „Ich möchte Menschen helfen, deshalb werde ich Arzt.“</li>
-                <li>Neue Erfahrungen – „Ich möchte reisen und neue Kulturen kennenlernen.“</li>
+                <li>Leidenschaft – „Ich liebe Musik, deshalb möchte ich Musiker werden.“ (passion — “I love music, so I want to become a musician.”)</li>
+                <li>Zukunftspläne – „Ich möchte Menschen helfen, deshalb werde ich Arzt.“ (future plans — “I want to help people, so I will become a doctor.”)</li>
+                <li>Neue Erfahrungen – „Ich möchte reisen und neue Kulturen kennenlernen.“ (new experiences — “I want to travel and get to know new cultures.”)</li>
               </ul>
             </li>
           </ol>

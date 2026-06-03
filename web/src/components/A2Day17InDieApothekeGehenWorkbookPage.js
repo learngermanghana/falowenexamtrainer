@@ -206,25 +206,27 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
           <h3 style={sectionTitle}>Beispiel für die Brain Map-Struktur</h3>
           <ul style={listSpacing}>
             <li>
-              <strong>A. Berufe in der Apotheke</strong>: Apotheker/in, PKA, PTA; Ausbildung/Aufgaben wie Beratung, Rezeptprüfung,
-              Lager, Bestellungen, Salbenherstellung.
+              <strong>A. Berufe in der Apotheke (Pharmacy jobs)</strong>: Apotheker/in (pharmacist), PKA, PTA;
+              Ausbildung/Aufgaben (training/tasks) like Beratung (advice), Rezeptprüfung (checking prescriptions),
+              Lager (stockroom), Bestellungen (orders), Salbenherstellung (making ointments).
             </li>
             <li>
-              <strong>B. Wortschatz (Symptome &amp; Medikamente)</strong>: Kopfschmerzen, Halsschmerzen, Fieber, Husten,
-              Medikamentenformen (Tabletten, Kapseln, Tropfen, Salbe, Spray) und Begriffe wie rezeptfrei/rezeptpflichtig,
-              Packungsbeilage, Dosierung.
+              <strong>B. Wortschatz (Symptoms &amp; medicine vocabulary)</strong>: Kopfschmerzen (headache), Halsschmerzen (sore throat), Fieber (fever), Husten (cough),
+              Medikamentenformen (medicine forms: tablets, capsules, drops, ointment, spray) and terms like rezeptfrei/rezeptpflichtig
+              (over-the-counter/prescription-only), Packungsbeilage (package leaflet), Dosierung (dosage).
             </li>
             <li>
-              <strong>C. Dialog in der Apotheke</strong>: Kund*in und Apotheker*in mit höflichen Redemitteln (z. B. „Darf ich Sie
-              kurz beraten?“ / „Gute Besserung!").
+              <strong>C. Dialog in der Apotheke (Dialogue in the pharmacy)</strong>: Kund*in und Apotheker*in (customer and pharmacist) with polite phrases
+              (for example, „Darf ich Sie kurz beraten?“ = “May I advise you briefly?” / „Gute Besserung!“ = “Get well soon!”).
             </li>
             <li>
-              <strong>D. Rezepte und Regeln</strong>: Wann braucht man ein Rezept, Kassenrezept vs. Privatrezept, Öffnungszeiten,
-              Altersbeschränkungen, keine Selbstbedienung.
+              <strong>D. Rezepte und Regeln (Prescriptions and rules)</strong>: Wann braucht man ein Rezept? (When do you need a prescription?),
+              Kassenrezept vs. Privatrezept (public-insurance prescription vs. private prescription), Öffnungszeiten (opening hours),
+              Altersbeschränkungen (age restrictions), keine Selbstbedienung (no self-service).
             </li>
             <li>
-              <strong>E. Tipps &amp; Kultur</strong>: Strenge Vorschriften in Deutschland, Apotheken-Notdienst,
-              Länderunterschiede und Höflichkeitsform „Sie“.
+              <strong>E. Tipps &amp; Kultur (Tips &amp; culture)</strong>: Strenge Vorschriften in Deutschland (strict rules in Germany),
+              Apotheken-Notdienst (emergency pharmacy service), Länderunterschiede (country differences) and the polite form „Sie“ (“you,” formal).
             </li>
           </ul>
 

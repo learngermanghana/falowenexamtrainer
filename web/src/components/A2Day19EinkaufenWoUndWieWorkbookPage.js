@@ -251,49 +251,49 @@ const A2Day19EinkaufenWoUndWieWorkbookPage = () => {
             <li>
               <strong>Einkaufsmöglichkeiten (Shopping Options)</strong>
               <ul style={listSpacing}>
-                <li>Supermärkte: Lidl, Aldi, Edeka</li>
-                <li>Einkaufszentren: Mall of Berlin, Skyline Plaza</li>
-                <li>Online-Shopping: Amazon, Zalando</li>
-                <li>Wochenmärkte: Gemüse, Obst, Brot</li>
-                <li>Second-Hand-Läden: Kleidung, Bücher</li>
+                <li>Supermärkte: Lidl, Aldi, Edeka (supermarkets)</li>
+                <li>Einkaufszentren: Mall of Berlin, Skyline Plaza (shopping centers)</li>
+                <li>Online-Shopping: Amazon, Zalando (online shopping)</li>
+                <li>Wochenmärkte: Gemüse, Obst, Brot (weekly markets: vegetables, fruit, bread)</li>
+                <li>Second-Hand-Läden: Kleidung, Bücher (second-hand shops: clothes, books)</li>
               </ul>
             </li>
             <li>
               <strong>Einkaufsgewohnheiten (Shopping Habits)</strong>
               <ul style={listSpacing}>
-                <li>Geplantes Einkaufen: Einkaufszettel</li>
-                <li>Spontane Käufe</li>
-                <li>Großeinkauf: Einmal pro Woche</li>
-                <li>Tagesbedarf kaufen: Brot, Milch</li>
+                <li>Geplantes Einkaufen: Einkaufszettel (planned shopping: shopping list)</li>
+                <li>Spontane Käufe (spontaneous purchases)</li>
+                <li>Großeinkauf: Einmal pro Woche (big weekly shop: once per week)</li>
+                <li>Tagesbedarf kaufen: Brot, Milch (buying daily needs: bread, milk)</li>
               </ul>
             </li>
             <li>
               <strong>Nachhaltigkeit und Konsum (Sustainability and Consumption)</strong>
               <ul style={listSpacing}>
-                <li>Wiederverwendbare Taschen</li>
-                <li>Plastik vermeiden</li>
-                <li>Regionale Produkte kaufen</li>
-                <li>Weniger kaufen, mehr reparieren</li>
-                <li>Fair Trade-Produkte</li>
+                <li>Wiederverwendbare Taschen (reusable bags)</li>
+                <li>Plastik vermeiden (avoid plastic)</li>
+                <li>Regionale Produkte kaufen (buy regional products)</li>
+                <li>Weniger kaufen, mehr reparieren (buy less, repair more)</li>
+                <li>Fair Trade-Produkte (fair-trade products)</li>
               </ul>
             </li>
             <li>
               <strong>Bezahlen und Rabatte (Payments and Discounts)</strong>
               <ul style={listSpacing}>
-                <li>Bar bezahlen</li>
-                <li>Mit Karte bezahlen</li>
-                <li>Online-Bezahlung</li>
-                <li>Rabattaktionen: Black Friday, Sommerschlussverkauf</li>
-                <li>Kundenkarten</li>
+                <li>Bar bezahlen (pay in cash)</li>
+                <li>Mit Karte bezahlen (pay by card)</li>
+                <li>Online-Bezahlung (online payment)</li>
+                <li>Rabattaktionen: Black Friday, Sommerschlussverkauf (discount campaigns: Black Friday, summer sale)</li>
+                <li>Kundenkarten (customer loyalty cards)</li>
               </ul>
             </li>
             <li>
               <strong>Produkte und Dienstleistungen (Products and Services)</strong>
               <ul style={listSpacing}>
-                <li>Lebensmittel: Brot, Milch, Gemüse</li>
-                <li>Kleidung: Hosen, T-Shirts, Jacken</li>
-                <li>Elektronik: Smartphones, Fernseher</li>
-                <li>Dienstleistungen: Friseur, Autoreparatur</li>
+                <li>Lebensmittel: Brot, Milch, Gemüse (groceries: bread, milk, vegetables)</li>
+                <li>Kleidung: Hosen, T-Shirts, Jacken (clothing: trousers/pants, T-shirts, jackets)</li>
+                <li>Elektronik: Smartphones, Fernseher (electronics: smartphones, televisions)</li>
+                <li>Dienstleistungen: Friseur, Autoreparatur (services: hairdresser, car repair)</li>
               </ul>
             </li>
           </ol>
