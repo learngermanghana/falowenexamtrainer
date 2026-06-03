@@ -70,11 +70,12 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const { idToken, user, studentProfile } = useAuth();
   const { showToast } = useToast();
   const isExamMode = mode === "exam";
+  const isCourseMode = mode === "course";
   const userId = user?.uid || "";
   const studentCode =
     studentProfile?.studentCode || studentProfile?.studentcode || studentProfile?.id || user?.uid || "";
 
-  const [activeSpeakingTab, setActiveSpeakingTab] = useState("exam");
+  const [activeSpeakingTab, setActiveSpeakingTab] = useState(isCourseMode ? "custom" : "exam");
   const [selectedLevel, setSelectedLevel] = useState((examLevel || "A1").toUpperCase());
   const [selectedTeil, setSelectedTeil] = useState("all");
   const [selectedQuestionId, setSelectedQuestionId] = useState("");
@@ -106,6 +107,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [recordingMode, setRecordingMode] = useState("");
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [recordingError, setRecordingError] = useState("");
   const [playingMessageId, setPlayingMessageId] = useState("");
@@ -119,6 +121,20 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const audioRefs = useRef({});
   const messagesEndRef = useRef(null);
   const customMessagesEndRef = useRef(null);
+
+  const visibleSpeakingTabs = useMemo(
+    () => (isCourseMode ? [{ key: "custom", label: "Custom chat" }] : [
+      { key: "exam", label: "Exam prompts" },
+      { key: "custom", label: "Custom chat" },
+    ]),
+    [isCourseMode]
+  );
+
+  useEffect(() => {
+    if (!visibleSpeakingTabs.some((tab) => tab.key === activeSpeakingTab)) {
+      setActiveSpeakingTab(visibleSpeakingTabs[0]?.key || "custom");
+    }
+  }, [activeSpeakingTab, visibleSpeakingTabs]);
 
   useEffect(() => {
     if (isExamMode && examLevel) {
@@ -363,6 +379,46 @@ const SpeakingPage = ({ mode = "exam" }) => {
     ]);
   };
 
+  const requestCustomChatReply = async (messageText, historyMessages = customChatMessages) => {
+    const history = historyMessages
+      .map((message) => ({
+        role: message.role === "student" ? "user" : "assistant",
+        content: message.type === "audio" ? message.transcript : message.text,
+      }))
+      .filter((message) => String(message.content || "").trim());
+
+    const response = await requestCustomSpeakingChatReply({
+      message: messageText,
+      level: selectedLevel,
+      history,
+      idToken,
+    });
+    return String(response?.reply || "").trim() || "Ich konnte gerade nicht antworten. Bitte versuche es noch einmal.";
+  };
+
+  const notifyCustomChatSuccess = () => {
+    triggerInteractionFeedback({
+      sound: "success",
+      toastMessage: "Custom Sprechen chat replied.",
+      toastVariant: "success",
+      showToast,
+      notificationTitle: "Custom Sprechen chat",
+      notificationBody: "Your speaking partner replied.",
+      notificationTag: "custom-speaking-chat-reply",
+      vibratePattern: [45],
+    });
+  };
+
+  const notifyCustomChatError = () => {
+    triggerInteractionFeedback({
+      sound: "error",
+      toastMessage: "Custom Sprechen chat is unavailable right now.",
+      toastVariant: "error",
+      showToast,
+      vibratePattern: [120],
+    });
+  };
+
   const sendCustomChatMessage = async () => {
     const trimmed = customDraftMessage.trim();
     if (!trimmed || customChatLoading) return;
@@ -374,12 +430,6 @@ const SpeakingPage = ({ mode = "exam" }) => {
       text: trimmed,
       createdAt: new Date().toISOString(),
     };
-    const history = customChatMessages
-      .filter((message) => message.type === "text")
-      .map((message) => ({
-        role: message.role === "student" ? "user" : "assistant",
-        content: message.text,
-      }));
 
     setCustomChatMessages((current) => [...current, studentMessage]);
     setCustomDraftMessage("");
@@ -387,42 +437,22 @@ const SpeakingPage = ({ mode = "exam" }) => {
     setCustomChatError("");
 
     try {
-      const response = await requestCustomSpeakingChatReply({
-        message: trimmed,
-        level: selectedLevel,
-        history,
-        idToken,
-      });
-      const replyText = String(response?.reply || "").trim() || "Ich konnte gerade nicht antworten. Bitte versuche es noch einmal.";
+      const replyText = await requestCustomChatReply(trimmed);
       appendCustomCoachText(replyText);
-      triggerInteractionFeedback({
-        sound: "success",
-        toastMessage: "Custom Sprechen chat replied.",
-        toastVariant: "success",
-        showToast,
-        notificationTitle: "Custom Sprechen chat",
-        notificationBody: "Your speaking partner replied.",
-        notificationTag: "custom-speaking-chat-reply",
-        vibratePattern: [45],
-      });
+      notifyCustomChatSuccess();
     } catch (error) {
       setCustomChatError(error?.message || "Could not reach the custom Sprechen chat.");
       appendCustomCoachText("Der freie Sprechen-Chat ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.");
-      triggerInteractionFeedback({
-        sound: "error",
-        toastMessage: "Custom Sprechen chat is unavailable right now.",
-        toastVariant: "error",
-        showToast,
-        vibratePattern: [120],
-      });
+      notifyCustomChatError();
     } finally {
       setCustomChatLoading(false);
     }
   };
 
-  const startRecording = async () => {
-    if (isRecording || !selectedQuestion) return;
+  const startRecording = async (targetMode = activeSpeakingTab) => {
+    if (isRecording || (targetMode === "exam" && !selectedQuestion)) return;
     setRecordingError("");
+    const recordingTargetMode = targetMode === "custom" ? "custom" : "exam";
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -458,64 +488,105 @@ const SpeakingPage = ({ mode = "exam" }) => {
         const url = URL.createObjectURL(blob);
         const duration = elapsedRecordingSeconds;
 
-        setChatMessages((current) => [
-          ...current,
-          {
-            id: `voice-${Date.now()}`,
-            role: "student",
-            type: "audio",
-            audioUrl: url,
-            duration,
-            createdAt: new Date().toISOString(),
-          },
-        ]);
-        setRecordingSeconds(0);
-        recordingSecondsRef.current = 0;
-        setIsRecording(false);
-        markPromptCompleted();
-        setChatLoading(true);
-        setChatError("");
+        const voiceMessage = {
+          id: `voice-${Date.now()}`,
+          role: "student",
+          type: "audio",
+          audioUrl: url,
+          duration,
+          createdAt: new Date().toISOString(),
+        };
 
-        try {
-          const response = await analyzeAudio({
-            audioBlob: blob,
-            teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
-            level: selectedLevel,
-            question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
-            userId,
-            idToken,
-          });
+        if (recordingTargetMode === "custom") {
+          setCustomChatMessages((current) => [...current, voiceMessage]);
+          setRecordingSeconds(0);
+          recordingSecondsRef.current = 0;
+          setIsRecording(false);
+          setRecordingMode("");
+          setCustomChatLoading(true);
+          setCustomChatError("");
 
-          const transcript = String(response?.transcript || "").trim();
-          const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
+          try {
+            const response = await analyzeAudio({
+              audioBlob: blob,
+              teil: "Custom chat",
+              level: selectedLevel,
+              question: "Free custom speaking conversation",
+              userId,
+              idToken,
+            });
 
-          if (transcript) {
-            appendCoachText(`Transcript I heard: ${transcript}`);
+            const transcript = String(response?.transcript || "").trim();
+            if (!transcript) {
+              appendCustomCoachText("I could not hear a clear sentence. Please try recording again or type your message.");
+              return;
+            }
+
+            setCustomChatMessages((current) => current.map((message) => (
+              message.id === voiceMessage.id ? { ...message, transcript } : message
+            )));
+            appendCustomCoachText(`Transcript I heard: ${transcript}`);
+            const replyText = await requestCustomChatReply(transcript);
+            appendCustomCoachText(replyText);
+            notifyCustomChatSuccess();
+          } catch (error) {
+            setCustomChatError(error?.message || "Could not reach the custom Sprechen chat.");
+            appendCustomCoachText("Der freie Sprechen-Chat ist gerade nicht verfügbar. Bitte versuche es gleich noch einmal.");
+            notifyCustomChatError();
+          } finally {
+            setCustomChatLoading(false);
           }
-          setLastRubric(parseRubric(replyText));
-          appendCoachText(replyText);
-          triggerInteractionFeedback({
-            sound: "success",
-            toastMessage: "Voice feedback received.",
-            toastVariant: "success",
-            showToast,
-            notificationTitle: "Speaking voice review ready",
-            notificationBody: "Your recording has been analyzed.",
-            notificationTag: "speaking-audio-reply",
-            vibratePattern: [45],
-          });
-        } catch (error) {
-          setChatError(error?.message || "Could not reach the AI coach.");
-          appendCoachText("I couldn't analyze your recording right now. Please try again in a moment.");
-          triggerInteractionFeedback({
-            sound: "error",
-            toastMessage: "Could not analyze your recording right now.",
-            toastVariant: "error",
-            showToast,
-            vibratePattern: [120],
-          });
-        } finally {
-          setChatLoading(false);
+        } else {
+          setChatMessages((current) => [...current, voiceMessage]);
+          setRecordingSeconds(0);
+          recordingSecondsRef.current = 0;
+          setIsRecording(false);
+          setRecordingMode("");
+          markPromptCompleted();
+          setChatLoading(true);
+          setChatError("");
+
+          try {
+            const response = await analyzeAudio({
+              audioBlob: blob,
+              teil: selectedQuestion.teilLabel || selectedQuestion.teilId || "",
+              level: selectedLevel,
+              question: selectedQuestion.text || selectedQuestion.topicPrompt || "",
+              userId,
+              idToken,
+            });
+
+            const transcript = String(response?.transcript || "").trim();
+            const replyText = String(response?.feedback || "").trim() || "I could not analyze that answer. Please try again.";
+
+            if (transcript) {
+              appendCoachText(`Transcript I heard: ${transcript}`);
+            }
+            setLastRubric(parseRubric(replyText));
+            appendCoachText(replyText);
+            triggerInteractionFeedback({
+              sound: "success",
+              toastMessage: "Voice feedback received.",
+              toastVariant: "success",
+              showToast,
+              notificationTitle: "Speaking voice review ready",
+              notificationBody: "Your recording has been analyzed.",
+              notificationTag: "speaking-audio-reply",
+              vibratePattern: [45],
+            });
+          } catch (error) {
+            setChatError(error?.message || "Could not reach the AI coach.");
+            appendCoachText("I couldn't analyze your recording right now. Please try again in a moment.");
+            triggerInteractionFeedback({
+              sound: "error",
+              toastMessage: "Could not analyze your recording right now.",
+              toastVariant: "error",
+              showToast,
+              vibratePattern: [120],
+            });
+          } finally {
+            setChatLoading(false);
+          }
         }
 
         if (streamRef.current) {
@@ -529,6 +600,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
       setRecordingSeconds(0);
       recordingSecondsRef.current = 0;
       setIsRecording(true);
+      setRecordingMode(recordingTargetMode);
       recordingIntervalRef.current = window.setInterval(() => {
         setRecordingSeconds((value) => {
           const nextValue = value + 1;
@@ -581,6 +653,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
       ]);
       setCustomChatError("");
       setCustomDraftMessage("");
+      setRecordingMode("");
       return;
     }
 
@@ -597,6 +670,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
     setChatError("");
     setDraftMessage("");
     setPlayingMessageId("");
+    setRecordingMode("");
   };
 
   const completedCount = useMemo(
@@ -640,11 +714,8 @@ const SpeakingPage = ({ mode = "exam" }) => {
           </button>
         </div>
 
-        <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap" }}>
-          {[
-            { key: "exam", label: "Exam prompts" },
-            { key: "custom", label: "Custom chat" },
-          ].map((tab) => (
+        <div style={{ display: "flex", gap: 8, padding: "12px 16px", background: "#F8FAFC", borderBottom: "1px solid #E5E7EB", flexWrap: "wrap", alignItems: "center" }}>
+          {visibleSpeakingTabs.map((tab) => (
             <button
               key={tab.key}
               type="button"
@@ -658,6 +729,11 @@ const SpeakingPage = ({ mode = "exam" }) => {
               {tab.label}
             </button>
           ))}
+          {isCourseMode ? (
+            <a href="/exams/speaking" style={{ ...styles.secondaryButton, textDecoration: "none", borderRadius: 999, padding: "8px 14px" }}>
+              Full speaking exam room
+            </a>
+          ) : null}
         </div>
 
         {activeSpeakingTab === "custom" ? (
@@ -726,7 +802,52 @@ const SpeakingPage = ({ mode = "exam" }) => {
                           color: isStudent ? "#ffffff" : "#1f2937",
                         }}
                       >
-                        <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{message.text}</p>
+                        {message.type === "audio" ? (
+                          <div style={{ display: "grid", gap: 8 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                              <button
+                                style={{
+                                  border: "none",
+                                  borderRadius: "50%",
+                                  width: 34,
+                                  height: 34,
+                                  cursor: "pointer",
+                                  background: isStudent ? "rgba(255,255,255,0.25)" : "#D1FAE5",
+                                  color: isStudent ? "#fff" : "#047857",
+                                }}
+                                onClick={() => toggleAudioPlayback(message.id)}
+                              >
+                                {playingMessageId === message.id ? "⏸" : "▶"}
+                              </button>
+                              <div style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                                {waveHeights.map((height, index) => (
+                                  <span
+                                    key={`${message.id}-custom-wave-${index}`}
+                                    style={{
+                                      display: "inline-block",
+                                      width: 3,
+                                      height,
+                                      borderRadius: 999,
+                                      background: isStudent ? "rgba(255,255,255,0.55)" : "#86EFAC",
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                              <span style={{ fontSize: 12, opacity: 0.95 }}>{formatTime(message.duration || 0)}</span>
+                            </div>
+                            <audio
+                              ref={(node) => {
+                                if (node) {
+                                  audioRefs.current[message.id] = node;
+                                  node.onended = () => setPlayingMessageId("");
+                                }
+                              }}
+                              src={message.audioUrl}
+                            />
+                          </div>
+                        ) : (
+                          <p style={{ margin: 0, whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{message.text}</p>
+                        )}
                         <p style={{ margin: "6px 0 0", opacity: 0.75, fontSize: 11 }}>{formatClock(message.createdAt)}</p>
                       </div>
                       {isStudent ? (
@@ -756,6 +877,17 @@ const SpeakingPage = ({ mode = "exam" }) => {
                   Free chat mode: write in German when you can. You may use English if you are stuck.
                 </p>
                 {customChatError ? <p style={{ margin: 0, color: "#B91C1C", fontSize: 12 }}>{customChatError}</p> : null}
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <button
+                    type="button"
+                    style={{ ...styles.primaryButton, width: "fit-content", background: "#059669" }}
+                    onClick={isRecording && recordingMode === "custom" ? stopRecording : () => startRecording("custom")}
+                    disabled={customChatLoading || (isRecording && recordingMode !== "custom")}
+                  >
+                    {isRecording && recordingMode === "custom" ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Record voice"}
+                  </button>
+                  {recordingError && recordingMode === "custom" ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
+                </div>
                 <div style={{ display: "flex", gap: 8, flexDirection: isCompactViewport ? "column" : "row" }}>
                   <textarea
                     style={{ ...styles.input, minHeight: 56, maxHeight: 120, resize: "vertical" }}
@@ -783,7 +915,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
           </div>
         ) : null}
 
-        <div style={{ display: activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
+        <div style={{ display: !isCourseMode && activeSpeakingTab === "exam" ? "grid" : "none", gridTemplateColumns: isCompactViewport ? "1fr" : "minmax(240px, 320px) 1fr", gap: 0 }}>
           <aside
             style={{
               borderRight: isCompactViewport ? "none" : "1px solid #E5E7EB",
@@ -841,10 +973,14 @@ const SpeakingPage = ({ mode = "exam" }) => {
               </select>
             </div>
 
-            <button style={styles.primaryButton} onClick={isRecording ? stopRecording : startRecording} disabled={!selectedQuestion}>
-              {isRecording ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
+            <button
+              style={styles.primaryButton}
+              onClick={isRecording && recordingMode === "exam" ? stopRecording : () => startRecording("exam")}
+              disabled={!selectedQuestion || (isRecording && recordingMode !== "exam")}
+            >
+              {isRecording && recordingMode === "exam" ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Start voice recording"}
             </button>
-            {recordingError ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
+            {recordingError && recordingMode === "exam" ? <p style={{ ...styles.helperText, margin: 0, color: "#B91C1C" }}>{recordingError}</p> : null}
             <p style={{ ...styles.helperText, margin: 0 }}>
               Listening tip: use a headset, reduce background noise, and speak for at least {MIN_RECORDING_SECONDS} seconds.
             </p>
