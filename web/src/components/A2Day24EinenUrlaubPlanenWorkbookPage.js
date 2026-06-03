@@ -50,14 +50,6 @@ const videoPreviewStyle = {
   borderRadius: 10,
 };
 
-const lesenAnswers = {
-  1: "f",
-  2: "c",
-  3: "x",
-  4: "b",
-  5: "a",
-};
-
 const lesenQuestions = [
   {
     stem: "Aufgabe 1: Sarah heiratet bald und möchte mit vielen Gästen in einem Lokal feiern.",
@@ -367,11 +359,6 @@ const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
               ))}
             </div>
           ))}
-
-          <div style={calloutStyle}>
-            <strong>Teacher quick-check key</strong>
-            <p style={{ margin: 0 }}>1 → {lesenAnswers[1]}, 2 → {lesenAnswers[2]}, 3 → {lesenAnswers[3]}, 4 → {lesenAnswers[4]}, 5 → {lesenAnswers[5]}</p>
-          </div>
 
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your selected letters in the submission area (not on this page).
