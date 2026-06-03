@@ -49,6 +49,17 @@ export const loadPresentationSessions = async ({ idToken, limit = 10, startAfter
     idToken,
   });
 
+export const requestCustomSpeakingChatReply = async ({ message, level, history, idToken }) =>
+  callAI({
+    path: "/speaking/custom-chat",
+    payload: {
+      message,
+      level,
+      history,
+    },
+    idToken,
+  });
+
 export const requestSpeakingTextAnalysis = async ({ text, teil, level, question, idToken }) =>
   callAI({
     path: "/speaking/analyze-text",
