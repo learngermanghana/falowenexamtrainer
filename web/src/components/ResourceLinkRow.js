@@ -12,6 +12,30 @@ export const RESOURCE_ACTION_LABELS = {
 const buildViewerHref = (label, url) =>
   `/campus/course/resource-viewer?label=${encodeURIComponent(label)}&url=${encodeURIComponent(url)}`;
 
+const normalizeCoursePath = (url = "") => {
+  if (!url) return "";
+  if (url.startsWith("/")) return url;
+
+  try {
+    const parsed = new URL(url);
+    const isFalowenHost = parsed.hostname === "www.falowen.app" || parsed.hostname === "falowen.app";
+    return isFalowenHost ? `${parsed.pathname}${parsed.search}${parsed.hash}` : "";
+  } catch (error) {
+    return "";
+  }
+};
+
+const isLegacySelfLearningCourseLink = (url = "") => {
+  const path = normalizeCoursePath(url);
+  if (!path) return false;
+  if (path.startsWith("/campus/course/lesson/B2/") || path.startsWith("/campus/course/lesson/C1/")) return false;
+  return (
+    path.startsWith("/campus/course/b2-") ||
+    path.startsWith("/campus/course/c1-") ||
+    path.startsWith("/campus/course/c1-self-learning")
+  );
+};
+
 const isInternalCourseRoute = (url) => {
   if (!url) return false;
 
@@ -42,13 +66,13 @@ const resolveHref = (label, url) => {
 };
 
 const ResourceLinkRow = ({ label, url }) => {
-  if (!url) return null;
+  if (!url || isLegacySelfLearningCourseLink(url)) return null;
 
   const handleResourceOpen = () => {
     triggerInteractionFeedback({
       sound: "open",
       notificationTitle: "Course resource opened",
-      notificationBody: `Now opening ${label}.`,
+      notificationBody: `Now opening ${label}.",
       notificationTag: "course-resource-open",
       vibratePattern: [40],
     });
