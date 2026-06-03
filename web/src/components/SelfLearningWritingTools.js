@@ -13,22 +13,19 @@ const toolCardStyle = {
 const writingTools = [
   {
     title: "Mark my letter",
-    description: "Paste your finished draft and get a score, corrections, feedback and a better version.",
-    path: "/campus/writing?tab=mark",
+    description: "Paste your finished draft in the writing panel below and get a score, corrections, feedback and a better version.",
   },
   {
     title: "Ref / Redemittel",
-    description: "Save useful phrases, structure lines and reference notes before you write.",
-    path: "/campus/writing?tab=references",
+    description: "Use the writing panel below to save useful phrases, structure lines and reference notes before you write.",
   },
   {
     title: "Ideas generator",
-    description: "Build ideas, examples and a simple writing plan before drafting.",
-    path: "/campus/writing?tab=ideas",
+    description: "Use the writing panel below to build ideas, examples and a simple writing plan before drafting.",
   },
 ];
 
-const SelfLearningWritingTools = ({ navigate, writingType, structure = [], usefulLines = [], showGuides = true }) => (
+const SelfLearningWritingTools = ({ writingType, structure = [], usefulLines = [], showGuides = true }) => (
   <div style={{ display: "grid", gap: 12 }}>
     <div
       style={{
@@ -39,14 +36,14 @@ const SelfLearningWritingTools = ({ navigate, writingType, structure = [], usefu
         lineHeight: 1.7,
       }}
     >
-      <strong>Writing prompts are not shown inside the course.</strong> Use these tools for support. Full practice prompts are in the Exam Room.
+      <strong>Writing prompts are not shown inside the course.</strong> Use the embedded writing panel below for marking, Redemittel and ideas. Full exam prompts are in the Exam Room.
     </div>
 
     <div style={toolCardStyle}>
       <strong>Writing type for this topic</strong>
       <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
       <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-        Use the type as a guide, then write your own answer and mark it with AI.
+        Use the type as a guide, then write your own answer and mark it with AI inside this lesson.
       </p>
     </div>
 
@@ -73,9 +70,6 @@ const SelfLearningWritingTools = ({ navigate, writingType, structure = [], usefu
         <div key={tool.title} style={toolCardStyle}>
           <strong>{tool.title}</strong>
           <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{tool.description}</p>
-          <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate(tool.path)}>
-            Open {tool.title}
-          </button>
         </div>
       ))}
     </div>
