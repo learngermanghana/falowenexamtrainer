@@ -1,0 +1,130 @@
+import { makeLesson } from "../buildSelfLearningLesson";
+
+const b2Day9WohnenUndNachbarschaft = makeLesson({
+  level: "B2",
+  day: 9,
+  chapter: "2.4",
+  title: "Wohnen und Nachbarschaft",
+  topic: "Wohnformen, Mietprobleme und Zusammenleben",
+  heroImage: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1600&q=80",
+  grammarFocus: "Relativsätze und genaue Beschreibungen von Wohnsituationen",
+  objectives: [
+    "Ich kann verschiedene Wohnformen beschreiben und vergleichen.",
+    "Ich kann über Nachbarschaft, Zusammenleben und Mietprobleme sprechen.",
+    "Ich kann Relativsätze nutzen, um Wohnungen, Personen und Situationen genauer zu beschreiben.",
+    "Ich kann höflich über ein Wohnproblem schreiben und eine Lösung vorschlagen.",
+  ],
+  explanation: [
+    "Wohnen ist ein wichtiges Alltagsthema. Es geht um Wohnungssuche, Miete, Nachbarschaft, Wohnqualität und das Zusammenleben mit anderen Menschen.",
+    "Auf B2-Niveau solltest du nicht nur beschreiben, wo du wohnst. Du solltest erklären können, welche Wohnform Vorteile und Nachteile hat, welche Probleme entstehen können und wie man höflich Lösungen findet.",
+    "Heute übst du Relativsätze, weil sie dir helfen, genauer und flüssiger zu beschreiben. Danach trainierst du Sprechen, nutzt die Schreibtools und arbeitest mit Lesen/Hören.",
+  ],
+  topicQuestions: [
+    "Welche Wohnform findest du ideal: alleine, mit Familie, in einer WG oder im Wohnheim? Warum?",
+    "Welche Probleme können mit Nachbarn entstehen?",
+    "Was macht eine gute Wohnung oder Nachbarschaft aus?",
+    "Wie sollte man reagieren, wenn es ein Problem mit Lärm, Miete oder Reparaturen gibt?",
+  ],
+  grammarLesson: {
+    rules: [
+      "Relativsätze geben zusätzliche Informationen über ein Nomen: Die Wohnung, die ich besichtigt habe, war sehr hell.",
+      "Der Relativsatz steht meistens direkt nach dem Nomen, das er beschreibt.",
+      "Das konjugierte Verb steht im Relativsatz am Ende: Der Nachbar, der neben mir wohnt, ist sehr freundlich.",
+      "Mit Präpositionen klingt der Satz genauer: Das Haus, in dem ich wohne, liegt in einer ruhigen Straße.",
+    ],
+    examples: [
+      "Ich suche eine Wohnung, die bezahlbar und gut gelegen ist.",
+      "Die Nachbarn, mit denen ich spreche, sind sehr hilfsbereit.",
+      "Das Zimmer, in dem ich arbeite, ist leider sehr laut.",
+      "Eine Hausverwaltung, die schnell reagiert, kann viele Konflikte vermeiden.",
+    ],
+    miniExercise: "Schreibe sechs Relativsätze zum Thema Wohnen. Beschreibe eine Wohnung, einen Nachbarn, ein Zimmer, ein Problem, eine Lösung und eine ideale Wohnsituation.",
+  },
+  speakingTaskType: "Housing problem and solution talk",
+  speakingTopic: "Sprechen: Beschreibe deine ideale Wohnsituation, nenne ein mögliches Problem in der Nachbarschaft und erkläre eine höfliche Lösung.",
+  speakingBuilder: {
+    plan: [
+      "Einleitung: Beschreibe, wie du gerne wohnen würdest.",
+      "Hauptteil 1: Nenne Vorteile und Nachteile einer Wohnform.",
+      "Hauptteil 2: Beschreibe ein typisches Problem, zum Beispiel Lärm oder Reparaturen.",
+      "Hauptteil 3: Erkläre, wie man das Problem höflich lösen kann.",
+      "Schluss: Sage, was für gutes Zusammenleben besonders wichtig ist.",
+    ],
+    starters: [
+      "Eine Wohnform, die ich interessant finde, ist ...",
+      "Besonders wichtig wäre mir eine Wohnung, die ...",
+      "Ein Problem, das häufig vorkommt, ist ...",
+      "Ich würde zuerst versuchen, mit ... zu sprechen.",
+      "Für ein gutes Zusammenleben ist wichtig, dass ...",
+    ],
+  },
+  writingTaskType: "Formal letter / E-Mail",
+  writingTopic: "Schreiben: Verfasse eine formelle E-Mail an die Hausverwaltung wegen eines Wohnproblems. Beschreibe die Situation, erkläre die Folgen und bitte höflich um eine Lösung.",
+  writingBuilder: {
+    structure: [
+      "Betreff: Kurzer Grund der E-Mail.",
+      "Anrede: Sehr geehrte Damen und Herren / Sehr geehrte Frau ...",
+      "Einleitung: Warum du schreibst.",
+      "Hauptteil: Beschreibe das Problem genau mit Datum, Ort oder Situation.",
+      "Folge: Erkläre, warum das Problem gelöst werden muss.",
+      "Bitte: Formuliere höflich deine gewünschte Lösung.",
+      "Schluss: Bitte um Rückmeldung und höfliche Grußformel.",
+    ],
+    usefulLines: [
+      "ich wende mich an Sie, weil es seit einiger Zeit ein Problem mit ... gibt.",
+      "Das Problem betrifft vor allem ..., was den Alltag deutlich erschwert.",
+      "Ich wäre Ihnen dankbar, wenn Sie sich zeitnah darum kümmern könnten.",
+      "Über eine kurze Rückmeldung würde ich mich sehr freuen.",
+      "Mit freundlichen Grüßen",
+    ],
+  },
+  phrases: [
+    "die Wohnung, die ...",
+    "der Nachbar, der ...",
+    "das Haus, in dem ...",
+    "eine bezahlbare Wohnung",
+    "die Hausverwaltung kontaktieren",
+    "Lärm vermeiden",
+    "eine Lösung finden",
+  ],
+  tasks: {
+    speaking: "Sprich 2–3 Minuten über Wohnen und Nachbarschaft. Nutze mindestens vier Relativsätze und beschreibe eine Lösung für ein Wohnproblem.",
+    writing: "Schreibe eine formelle E-Mail mit 180–220 Wörtern an die Hausverwaltung wegen eines Wohnproblems.",
+    reading: "Lies einen Artikel über Wohnen, Miete oder Nachbarschaft. Notiere Hauptaussage, 5 Wörter und deine Meinung.",
+    listening: "Höre einen kurzen Beitrag über Wohnen oder Stadtleben. Fasse ihn in 4 Sätzen zusammen.",
+  },
+  readingResource: {
+    title: "Welt.de Suche: Wohnen, Miete, Nachbarschaft",
+    description: "Open the search and choose one article about housing, rent or neighbourhood life. Focus on problems, solutions and useful vocabulary.",
+    url: "https://www.welt.de/suche?q=Wohnen%20Miete%20Nachbarschaft",
+    tasks: [
+      "Write the title of the article you chose.",
+      "Write the main idea in one German sentence.",
+      "Find 5 useful expressions connected to housing or rent.",
+      "Write 4–5 sentences: Which housing problem is mentioned and what solution would you suggest?",
+    ],
+  },
+  listeningResource: {
+    title: "DW Deutsch lernen search: Wohnen und Nachbarschaft",
+    description: "Choose one short DW audio/video connected to housing, rent or neighbourhood. Listen twice and write the key points.",
+    url: "https://www.dw.com/de/suche/s-100853?searchNavigationId=9097&item=Wohnen%20Nachbarschaft",
+    tasks: [
+      "Listen once and write the topic.",
+      "Listen again and write 3 important points.",
+      "Write 3 useful housing-related expressions you heard.",
+      "Record yourself summarising the audio in 60 seconds.",
+    ],
+  },
+  vocabulary: [
+    "Wohnung",
+    "Nachbarschaft",
+    "Miete",
+    "Hausverwaltung",
+    "Reparatur",
+    "Lärm",
+    "Zusammenleben",
+    "bezahlbar",
+  ],
+});
+
+export default b2Day9WohnenUndNachbarschaft;

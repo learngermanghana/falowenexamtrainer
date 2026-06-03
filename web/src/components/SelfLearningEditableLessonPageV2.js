@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import SelfLearningWritingTools from "./SelfLearningWritingTools";
+import { EmbeddedPracticeNote, EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 
 const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80";
 
@@ -62,17 +63,6 @@ const renderList = (items = []) => {
   if (!items.length) return null;
   return <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>{items.map((item) => <li key={item}>{item}</li>)}</ul>;
 };
-
-const SkillCard = ({ title, task, route, navigate, badge, hideTask = false }) => (
-  <PracticeBox title={title}>
-    {badge ? <span style={{ ...styles.badge, justifySelf: "start" }}>{badge}</span> : null}
-    {!hideTask && task ? <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{task}</p> : null}
-    {hideTask ? <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>Use the writing tools. Full writing prompts are in the Exam Room.</p> : null}
-    <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate(route)}>
-      Open {title}
-    </button>
-  </PracticeBox>
-);
 
 const ExternalResourceCard = ({ title, resource }) => {
   if (!resource) return null;
@@ -178,7 +168,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
               <PracticeBox title="Sprechen topic"><p style={{ margin: 0, lineHeight: 1.6 }}>{speakingTopic}</p></PracticeBox>
               <PracticeBox title="Schreiben support">
                 <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
-                <p style={{ margin: 0, lineHeight: 1.6 }}>Writing prompts are hidden in the course. Use Mark my letter, Ref/Redemittel and Ideas generator. Full prompts are in the Exam Room.</p>
+                <p style={{ margin: 0, lineHeight: 1.6 }}>Writing prompts are hidden in the course. Use the embedded writing panel for marking, Redemittel and ideas. Full exam prompts are in the Exam Room.</p>
               </PracticeBox>
             </div>
           </Section>
@@ -208,18 +198,20 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           <PracticeBox title="Sprechen topic"><p style={{ margin: 0, lineHeight: 1.6 }}>{speakingTopic}</p></PracticeBox>
           {lesson.speakingBuilder?.plan?.length ? <PracticeBox title="Speaking plan">{renderList(lesson.speakingBuilder.plan)}</PracticeBox> : null}
           {lesson.speakingBuilder?.starters?.length ? <PracticeBox title="Sentence starters">{renderList(lesson.speakingBuilder.starters)}</PracticeBox> : null}
-          <SkillCard title="Speech" task={lesson.tasks?.speaking} route="/campus/speech" navigate={navigate} badge={lesson.speakingTaskType || "Guided talk"} />
+          <EmbeddedPracticeNote>Record, submit, receive feedback and improve without leaving the course lesson.</EmbeddedPracticeNote>
+          <EmbeddedSpeechPracticePanel />
         </Section>
       ) : null}
 
       {activeTab === "write" ? (
         <Section title="Writing support">
           <SelfLearningWritingTools
-            navigate={navigate}
             writingType={writingType}
             structure={lesson.writingBuilder?.structure || []}
             usefulLines={lesson.writingBuilder?.usefulLines || []}
           />
+          <EmbeddedPracticeNote>Write, mark your answer, collect Redemittel and generate ideas without leaving the course lesson.</EmbeddedPracticeNote>
+          <EmbeddedWritingPracticePanel />
         </Section>
       ) : null}
 
@@ -241,10 +233,10 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
           <Section title="AI practice checklist">
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-              <SkillCard title="Speech" task={lesson.tasks?.speaking} route="/campus/speech" navigate={navigate} />
-              <SkillCard title="Writing tools" route="/campus/writing?tab=mark" navigate={navigate} hideTask />
-              <SkillCard title="Reading" task={lesson.tasks?.reading} route="/exams/lesen" navigate={navigate} />
-              <SkillCard title="Listening" task={lesson.tasks?.listening} route="/exams/horen" navigate={navigate} />
+              <PracticeBox title="Speech"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>Practise in the Speak tab inside this lesson.</p></PracticeBox>
+              <PracticeBox title="Writing"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>Practise in the Write tab inside this lesson.</p></PracticeBox>
+              <PracticeBox title="Reading"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{lesson.tasks?.reading}</p></PracticeBox>
+              <PracticeBox title="Listening"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{lesson.tasks?.listening}</p></PracticeBox>
             </div>
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input type="checkbox" checked={progress.practisedWithAi} onChange={(event) => updateProgress({ practisedWithAi: event.target.checked })} />
