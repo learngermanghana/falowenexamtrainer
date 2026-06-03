@@ -6,6 +6,7 @@ import b2Day1PersoenlicheIdentitaet from "../data/selfLearningLessons/b2/day1Per
 import b2Day2AlltagUndZeitmanagement from "../data/selfLearningLessons/b2/day2AlltagUndZeitmanagement";
 import b2Day3ArbeitUndBeruf from "../data/selfLearningLessons/b2/day3ArbeitUndBeruf";
 import b2Day4BildungUndLernen from "../data/selfLearningLessons/b2/day4BildungUndLernen";
+import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
 
 const c1FallbackLessons = [
   [2, "1.2", "Kultur und Identität", "Kulturelle Prägung, Zugehörigkeit und Selbstverständnis"],
@@ -38,7 +39,6 @@ const c1FallbackLessons = [
 ].map(([day, chapter, title, topic]) => buildDefaultLesson({ level: "C1", day, chapter, title, topic }));
 
 const b2FallbackLessons = [
-  [5, "1.5", "Gesundheit und Wohlbefinden", "Stress, Balance und gesunde Gewohnheiten"],
   [6, "2.1", "Medien und digitale Kommunikation", "Soziale Medien, Datenschutz und Online-Verhalten"],
   [7, "2.2", "Umwelt und Nachhaltigkeit", "Klimaschutz, Konsum und Alltagshandeln"],
   [8, "2.3", "Reisen und Mobilität", "Transport, Urlaub und nachhaltige Entscheidungen"],
@@ -49,7 +49,14 @@ const b2FallbackLessons = [
 ].map(([day, chapter, title, topic]) => buildDefaultLesson({ level: "B2", day, chapter, title, topic }));
 
 export const SELF_LEARNING_LESSONS = {
-  B2: [b2Day1PersoenlicheIdentitaet, b2Day2AlltagUndZeitmanagement, b2Day3ArbeitUndBeruf, b2Day4BildungUndLernen, ...b2FallbackLessons],
+  B2: [
+    b2Day1PersoenlicheIdentitaet,
+    b2Day2AlltagUndZeitmanagement,
+    b2Day3ArbeitUndBeruf,
+    b2Day4BildungUndLernen,
+    b2Day5GesundheitUndWohlbefinden,
+    ...b2FallbackLessons,
+  ],
   C1: [c1Day1ZieleUndLernweg, ...c1FallbackLessons],
 };
 
