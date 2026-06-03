@@ -140,7 +140,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day11UnterwegsVerkehrsmittelWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -247,7 +246,6 @@ const A2Day11UnterwegsVerkehrsmittelWorkbookPage = () => {
           <h3 style={sectionTitle}>Group Discussion Questions</h3>
           <p style={{ margin: 0 }}>Welches Verkehrsmittel benutzt du am liebsten und warum?</p>
           <p style={{ margin: 0, color: "#4b5563" }}>Stichwörter: Auto · Bolt · Trotro · Fahrrad</p>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -419,22 +417,6 @@ const A2Day11UnterwegsVerkehrsmittelWorkbookPage = () => {
               Open Teil 4 audio
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Thomas möchte in die Berge fahren und wählt bei der Autovermietung ein mittelgroßes Auto. Das Auto kostet
-                50 Euro pro Tag. Er zeigt dem Mitarbeiter seinen Führerschein und seinen Personalausweis. Bevor er losfährt,
-                überprüft Thomas das Auto auf mögliche Schäden.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

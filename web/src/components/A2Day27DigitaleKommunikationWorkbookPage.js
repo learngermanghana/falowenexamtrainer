@@ -55,7 +55,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 export default function A2Day27DigitaleKommunikationWorkbookPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
   const setPreparedFor = (tabKey) => (event) => setPrepared((prev) => ({ ...prev, [tabKey]: event.target.checked }));
@@ -157,8 +156,7 @@ export default function A2Day27DigitaleKommunikationWorkbookPage() {
         <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=1600&q=80" alt="Listening practice with headphones and digital devices" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
         <h2 style={sectionTitle}>Teil 4 · Hören</h2>
         <p style={{ margin: 0 }}>Listen, then submit answers in the assignment area (not on this page).</p>
-        <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}><input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />Teacher mode (show transcript)</label>
-        {teacherMode && <div style={{ ...questionCardStyle, background: "#fefce8" }}><strong>Transcript (teacher support)</strong><p style={{ margin: 0, lineHeight: 1.6 }}>Miriam hat ihr Handy verloren und möchte ein neues auf www.jumiagh.com bestellen. Sie schreibt dem Kundenservice und bittet um Empfehlungen für ein Modell mit guter Kamera und langer Akkulaufzeit. Außerdem fragt sie nach dem Bestellablauf und der Lieferzeit nach Hause.</p></div>}
+
         <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
         {hoerenQuestions.map((question, index) => <div key={question.stem} style={questionCardStyle}><strong>{index + 1}. {question.stem}</strong>{question.options.map((option) => <span key={option}>{option}</span>)}</div>)}
         <p style={{ margin: 0 }}>Recommended video: <a href="https://youtu.be/JEJZypJfrD8?list=PLZ6nUCSTx9pKcy_IKo10vFQIlAhwFpEr5" target="_blank" rel="noreferrer">Digitale Kommunikation (A2)</a></p>

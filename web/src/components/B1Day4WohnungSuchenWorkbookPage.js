@@ -148,7 +148,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day4WohnungSuchenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -433,21 +432,6 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
               </div>
             ))}
           </div>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Transcript support (Teacher mode)</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Transcript hint: The dialogue is a rental inquiry covering monthly rent, utility costs, furnishing status,
-                pet policy, and nearby transport options.
-              </p>
-            </div>
-          )}
 
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your listening answers in the assignment submission area, not directly on this page.

@@ -150,7 +150,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day12MeinTraumberufWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -266,7 +265,6 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
             Was möchtest du machen, wo möchtest du arbeiten, und arbeitest du lieber allein oder im Team?
           </p>
           <p style={{ margin: 0, color: "#4b5563" }}>Stichwörter: Traumberuf · Arbeitsplatz · Teamarbeit · Interesse</p>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -457,22 +455,6 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
               Open Teil 4 audio
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Dr. Müller beginnt seinen Arbeitstag früh und startet mit der Vorbereitung auf die Visite. Danach folgt
-                die Arbeit auf der Station und später die Sprechstunde mit Patientinnen und Patienten. In der
-                Mittagspause führt er oft wichtige Telefonate. Sein Arbeitstag endet nur selten vor dem frühen Abend.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

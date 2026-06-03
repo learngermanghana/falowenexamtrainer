@@ -117,7 +117,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -266,7 +265,6 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
               ich Kräutertee und schlafe viel.“
             </p>
           </div>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -458,23 +456,6 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
             Audio: <a href="https://drive.google.com/file/d/1xexwu1sM-Prp_2iyhBbY7UP-91gJ1S5G/view?usp=sharing" target="_blank" rel="noreferrer">Open Teil 4 audio</a>
           </p>
           <p style={{ margin: 0 }}>Listen carefully, then submit your final answers in the assignment submission area.</p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Im Hörtext geht es um gesunde Gewohnheiten im Alltag. Als einfacher Einstieg wird empfohlen, mehr Obst und
-                Gemüse zu essen. Außerdem soll man sich täglich mindestens 30 Minuten bewegen. Um motiviert zu bleiben,
-                kann ein Fitnessstudio helfen. Regelmäßige Arztbesuche sind wichtig, weil Krankheiten so früh erkannt werden
-                können. Als motivierende Sportarten werden Schwimmen und Laufen genannt.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

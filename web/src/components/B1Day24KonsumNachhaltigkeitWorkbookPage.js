@@ -85,7 +85,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day24KonsumNachhaltigkeitWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -350,21 +349,6 @@ const B1Day24KonsumNachhaltigkeitWorkbookPage = () => {
               https://youtu.be/zzPpGxzvJCY
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                No additional transcript is provided on this page. Please use the YouTube video directly for complete
-                listening content and answer checking.
-              </p>
-            </div>
-          )}
 
           <p style={{ margin: 0 }}>
             Recommended video: <a href="https://youtu.be/zzPpGxzvJCY" target="_blank" rel="noreferrer">https://youtu.be/zzPpGxzvJCY</a>

@@ -134,7 +134,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day3ComparisonsWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -452,22 +451,6 @@ const A2Day3ComparisonsWorkbookPage = () => {
           <p style={{ margin: 0 }}>
             Submit your answers in the assignment area (do not answer directly on this page).
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Julia ist 26 Jahre alt und arbeitet als Architektin. Tobias lebt in Hamburg und spricht über seine Zukunft:
-                Er möchte eine Weltreise machen. Am Wochenende verbringen Julia und Tobias gerne Zeit mit ihrer Freundin
-                Sophie, und sie kochen oft zusammen.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

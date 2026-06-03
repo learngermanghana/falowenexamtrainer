@@ -50,14 +50,6 @@ const videoPreviewStyle = {
   borderRadius: 10,
 };
 
-const lesenAnswers = {
-  1: "f",
-  2: "c",
-  3: "x",
-  4: "b",
-  5: "a",
-};
-
 const lesenQuestions = [
   {
     stem: "Aufgabe 1: Sarah heiratet bald und möchte mit vielen Gästen in einem Lokal feiern.",
@@ -107,7 +99,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -225,7 +216,6 @@ const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
             </p>
             <p style={{ margin: 0 }}>Keywords: Reiseziel · Transportmittel · Unterkunft · Aktivitäten</p>
           </div>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -368,11 +358,6 @@ const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
             </div>
           ))}
 
-          <div style={calloutStyle}>
-            <strong>Teacher quick-check key</strong>
-            <p style={{ margin: 0 }}>1 → {lesenAnswers[1]}, 2 → {lesenAnswers[2]}, 3 → {lesenAnswers[3]}, 4 → {lesenAnswers[4]}, 5 → {lesenAnswers[5]}</p>
-          </div>
-
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your selected letters in the submission area (not on this page).
           </p>
@@ -410,22 +395,6 @@ const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
           <a href="https://youtu.be/iPScKV6JWaA" target="_blank" rel="noreferrer">
             Open Teil 4 Hören video in YouTube
           </a>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={calloutStyle}>
-              <strong>Transcript reveal (Teacher Mode)</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Use the transcript/answer reveal provided in the linked video to verify learners&apos; listening
-                responses. Students should self-mark this section and only submit Lesen and Schreiben for official
-                evaluation.
-              </p>
-            </div>
-          )}
 
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>

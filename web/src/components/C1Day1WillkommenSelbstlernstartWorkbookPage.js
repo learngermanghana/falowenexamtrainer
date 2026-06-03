@@ -147,7 +147,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const C1Day1WillkommenSelbstlernstartWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -268,21 +267,7 @@ const C1Day1WillkommenSelbstlernstartWorkbookPage = () => {
           <h2 style={sectionTitle}>Teil 4 (Hören)</h2>
           <p style={{ margin: 0 }}>Listen to the audio/video input and answer the C1-level listening questions below.</p>
 
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
           <iframe src="https://www.youtube.com/embed/8xH7lFj6xRw" title="C1 listening practice" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen style={videoPreviewStyle} />
-
-          {teacherMode ? (
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Transcript (teacher mode)</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Willkommen zum C1-Selbstlernstart. Für nachhaltigen Fortschritt setzen wir auf klare Wochenziele, aktive Anwendung und reflektiertes Feedback. Entscheidend ist nicht nur, wie viel man lernt, sondern wie präzise man Strukturen in realen Situationen einsetzt. Wer regelmäßig kurze, anspruchsvolle Aufgaben bearbeitet und Fortschritte dokumentiert, entwickelt Sicherheit im Ausdruck und argumentiert überzeugender.
-              </p>
-            </div>
-          ) : null}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

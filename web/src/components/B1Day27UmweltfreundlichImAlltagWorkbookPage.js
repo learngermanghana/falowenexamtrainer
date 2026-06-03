@@ -154,7 +154,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day27UmweltfreundlichImAlltagWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -408,21 +407,6 @@ const B1Day27UmweltfreundlichImAlltagWorkbookPage = () => {
               ))}
             </div>
           ))}
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#f9fafb" }}>
-              <strong>Optional transcript support (Teacher Mode)</strong>
-              <p style={{ margin: 0 }}>
-                This section is intentionally concise. Teachers can guide learners to focus on key points: everyday eco-actions, sustainable mobility,
-                conscious shopping, and the idea that small actions from many people create a big impact.
-              </p>
-            </div>
-          )}
 
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
