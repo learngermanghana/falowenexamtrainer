@@ -100,7 +100,6 @@ const lesenQuestions = [
   },
 ];
 
-
 const speakingTimerOptions = [5, 10, 15].map((minutes) => ({
   label: `${minutes} min`,
   seconds: minutes * 60,
@@ -167,7 +166,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -613,22 +611,6 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
               ))}
             </div>
           ))}
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Transcript (Teacher Mode)</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Das Oktoberfest findet in München statt und dauert ungefähr zwei Wochen. Viele Besucher genießen traditionelle
-                Speisen wie Brezeln, Bratwurst und Schweinebraten. Typische Kleidung sind Lederhosen und Dirndl. Neben Essen und
-                Trinken gibt es auf dem Fest auch Fahrgeschäfte und Spiele für Familien und Freunde.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Recommended Video</h3>
           <p style={{ margin: 0 }}>

@@ -164,7 +164,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day6MoebelRaeumeWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -507,21 +506,6 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
             title="Teil 4 Audio Preview"
             allow="autoplay"
           />
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Teacher note</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                No transcript has been added yet for this listening exercise. You can add the transcript here later if
-                you want teachers to review it in class.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen zum Hörtext</h3>
           {hoerenQuestions.map((question, index) => (

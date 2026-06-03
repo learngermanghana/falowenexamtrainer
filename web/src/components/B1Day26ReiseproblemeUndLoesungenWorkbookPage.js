@@ -141,7 +141,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day26ReiseproblemeUndLoesungenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -362,20 +361,6 @@ const B1Day26ReiseproblemeUndLoesungenWorkbookPage = () => {
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final answers in the assignment submission area, not directly on this page.
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                This lesson uses a Goethe-standard listening task. The video includes the listening content and answer key for self-checking. In class, teachers can guide learners through the structure, pause strategically, and support answer validation.
-              </p>
-            </div>
-          )}
 
           <p style={{ margin: 0 }}>
             Recommended video: <a href="https://youtu.be/0sZVT9XAEBc" target="_blank" rel="noreferrer">Goethe Hörverstehen – Reiseprobleme und Lösungen</a>

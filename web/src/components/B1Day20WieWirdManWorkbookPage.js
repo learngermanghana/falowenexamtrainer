@@ -102,7 +102,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const B1Day20WieWirdManWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -341,20 +340,6 @@ const B1Day20WieWirdManWorkbookPage = () => {
               Open Teil 4 video
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript note (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Use the provided YouTube video transcript/captions directly for support in teacher mode.
-              </p>
-            </div>
-          )}
 
           <iframe
             style={videoPreviewStyle}

@@ -137,7 +137,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day9UrlaubWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -498,23 +497,6 @@ const A2Day9UrlaubWorkbookPage = () => {
               ))}
             </div>
           ))}
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={calloutStyle}>
-              <strong>Transcript (Teacher Mode)</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Anna erzählt von ihrem letzten Sommerurlaub. Sie ist mit ihren Freunden nach Griechenland gereist und
-                hat zwei Wochen auf Kreta verbracht. Besonders gut hat ihr der Strand von Elafonissi gefallen, weil das
-                Wasser so klar war und die Landschaft wunderschön aussah. Am letzten Tag haben Anna und ihre Freunde
-                noch eine Bootstour gemacht. Zum Schluss sagt Anna, dass sie hofft, bald wieder nach Kreta zu reisen.
-              </p>
-            </div>
-          )}
 
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>

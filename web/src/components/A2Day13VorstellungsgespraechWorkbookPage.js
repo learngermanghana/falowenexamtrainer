@@ -145,7 +145,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day13VorstellungsgespraechWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -261,7 +260,6 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
             Schlüsselwörter: Name · Ausbildung · Berufserfahrung · Fähigkeiten · Motivation · Qualifikationen · Interessen ·
             Berufsziel
           </p>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -438,24 +436,6 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
               Open Teil 4 audio
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                In einem Vorstellungsgespräch ist gute Vorbereitung sehr wichtig. Man sollte sich über das Unternehmen
-                informieren, um Interesse zu zeigen. Pünktlichkeit ist ein Zeichen von Professionalität und Respekt. Während
-                des Gesprächs spricht man klar und deutlich und beantwortet Fragen ruhig. Es ist auch sinnvoll, dem
-                Arbeitgeber eigene Fragen zu stellen, zum Beispiel zu Aufgaben oder zum Team. Nach dem Gespräch kann man
-                eine kurze Dankes-E-Mail schreiben.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

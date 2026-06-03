@@ -127,7 +127,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day18DieBankAnrufenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -259,7 +258,6 @@ const A2Day18DieBankAnrufenWorkbookPage = () => {
               <strong>Abschluss:</strong> „Vielen Dank für Ihre Hilfe.“ / „Auf Wiederhören.“
             </li>
           </ol>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -454,22 +452,6 @@ const A2Day18DieBankAnrufenWorkbookPage = () => {
               Open Teil 4 audio
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Für die Kontoeröffnung brauchen Sie einen Reisepass, eine Meldebescheinigung und einen
-                Einkommensnachweis. Das Beratungsgespräch dauert etwa eine Stunde. Die Bank bietet drei Kontomodelle an.
-                Das Basiskonto ist kostenlos. Um Zeit zu sparen, können Sie die Formulare vor dem Termin online ausfüllen.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

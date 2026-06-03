@@ -175,7 +175,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day19EinkaufenWoUndWieWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -300,7 +299,6 @@ const A2Day19EinkaufenWoUndWieWorkbookPage = () => {
             Wie kaufst du ein und worauf achtest du beim Einkaufen? Nutze diese Wörter in deinem Beitrag: <strong>Einkaufen</strong>,{" "}
             <strong>Geld</strong>, <strong>Supermarkt</strong>, <strong>Angebot</strong>.
           </p>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -488,24 +486,6 @@ const A2Day19EinkaufenWoUndWieWorkbookPage = () => {
               Open Teil 4 audio
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Online-Shopping bietet Verbrauchern eine bequeme Möglichkeit, Produkte nach Hause zu bestellen. Ein Nachteil ist
-                jedoch die hohe Anzahl von Rücksendungen, die die Umwelt belasten. Beim Online-Kauf sollten Verbraucher auf
-                vertrauenswürdige Websites achten und ihre persönlichen Daten schützen. Außerdem sollten Produkte aus nachhaltigen
-                Quellen und fairen Bedingungen stammen. Das Internet hat den Konsum insgesamt revolutioniert und viele neue
-                Möglichkeiten geschaffen.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

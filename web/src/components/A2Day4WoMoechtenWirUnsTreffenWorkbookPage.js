@@ -136,7 +136,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day4WoMoechtenWirUnsTreffenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -451,23 +450,6 @@ const A2Day4WoMoechtenWirUnsTreffenWorkbookPage = () => {
             url="https://drive.google.com/file/d/11Q9qE9gGyIKgYIqfeVzGyVyw32VfE36P/view?usp=sharing"
             linkLabel="Open Teil 4 audio"
           />
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Anna, Ben und Claudia planen ihr Wochenende gemeinsam. Sie treffen sich am Samstagvormittag und Claudia
-                bringt einen Rucksack mit Snacks und Getränken mit. Ben und Anna möchten im Wald eine Wanderung machen.
-                Für den Samstagabend planen sie, in einem Restaurant zu essen und danach einen Film zu schauen. Am Sonntag
-                möchten sie im Park spielen und spazieren gehen.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen mit möglichen Antworten</h3>
           {hoerenQuestions.map((question, index) => (

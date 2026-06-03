@@ -134,7 +134,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day2SmallTalkWorkbookEnhancedPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -402,22 +401,6 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
               Open Teil 4 audio
             </a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Lena spricht über ihren Samstag: Sie möchte mit ihrer Freundin ins Kino gehen und freut sich auf einen
-                Actionfilm. Danach erzählt sie, dass sie regelmäßig Tennis spielt. Letztes Wochenende war das Wetter sonnig und
-                warm. Für das nächste Treffen schlägt sie einen Spaziergang im Park vor.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

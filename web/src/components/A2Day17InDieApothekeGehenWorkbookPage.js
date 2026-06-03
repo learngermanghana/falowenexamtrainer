@@ -130,7 +130,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day17InDieApothekeGehenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -228,7 +227,6 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Sprecht außerdem über diese Leitfrage: <strong>Was kaufst du in der Apotheke und wann gehst du dorthin?</strong>
           </p>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -412,21 +410,6 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
           <p style={{ margin: 0 }}>
             Audio: <a href="https://drive.google.com/file/d/1glr45HegifSYLrz0XpKCFFiAPfUW8RsB/view?usp=sharing" target="_blank" rel="noreferrer">Open Teil 4 audio</a>
           </p>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Anna geht wegen Kopfschmerzen in die Apotheke. Die Apothekerin empfiehlt Ibuprofen. Anna erwähnt außerdem
-                Schnupfen. Nach der Beratung wirkt Anna erleichtert und bekommt zusätzlich Proben von Produkten.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Fragen und mögliche Antworten</h3>
           {hoerenQuestions.map((question, index) => (

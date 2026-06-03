@@ -156,7 +156,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day2PersonenBeschreibenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -478,22 +477,6 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
             url="https://drive.google.com/file/d/1SIFA08DquWp-dU86pi7pHC6eElF_39I9/view?usp=sharing"
             linkLabel="Open Teil 4 audio"
           />
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#fefce8" }}>
-              <strong>Transcript (teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.6 }}>
-                Der Sprecher erklärt, dass er Deutsch lernt, weil er in Deutschland arbeiten möchte. Er nutzt mehrere Methoden:
-                Sprachkurse, Online-Apps und das Üben mit Freunden. Außerdem sagt er, dass er jeden Tag eine Stunde Deutsch
-                übt.
-              </p>
-            </div>
-          )}
 
           <h3 style={sectionTitle}>Hörverstehen Fragen</h3>
           {hoerenQuestions.map((question, index) => (

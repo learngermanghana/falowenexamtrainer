@@ -140,7 +140,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 const A2Day7WohnungSuchenWorkbookPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
-  const [teacherMode, setTeacherMode] = useState(false);
   const [prepared, setPrepared] = useState({
     sprechen: false,
     schreiben: false,
@@ -476,21 +475,6 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
               </div>
             ))}
           </div>
-
-          <label style={{ display: "inline-flex", alignItems: "center", gap: 8, fontWeight: 600 }}>
-            <input type="checkbox" checked={teacherMode} onChange={(event) => setTeacherMode(event.target.checked)} />
-            Teacher mode (show transcript)
-          </label>
-
-          {teacherMode && (
-            <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-              <strong>Transcript (Teacher support)</strong>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>
-                Die Wohnung liegt im zweiten Stock und ist 75 Quadratmeter groß. Sie hat drei Zimmer und einen Balkon.
-                Die Nebenkosten betragen 150 Euro pro Monat.
-              </p>
-            </div>
-          )}
 
           <div style={questionCardStyle}>
             <strong>Vocabulary List: Wohnung suchen</strong>
