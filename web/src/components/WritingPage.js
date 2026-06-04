@@ -393,6 +393,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [markRubric, setMarkRubric] = useState(null);
   const [markCorrections, setMarkCorrections] = useState([]);
   const [markSimpleFeedback, setMarkSimpleFeedback] = useState(null);
+  const [markStructuredFeedback, setMarkStructuredFeedback] = useState(null);
   const [feedbackTrend, setFeedbackTrend] = useState(null);
   const [firstDraftSnapshot, setFirstDraftSnapshot] = useState("");
   const [reflectionText, setReflectionText] = useState("");
@@ -402,6 +403,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [improvedRubric, setImprovedRubric] = useState(null);
   const [improvedCorrections, setImprovedCorrections] = useState([]);
   const [improvedSimpleFeedback, setImprovedSimpleFeedback] = useState(null);
+  const [improvedStructuredFeedback, setImprovedStructuredFeedback] = useState(null);
   const [improvedLoading, setImprovedLoading] = useState(false);
   const [tutorSaveState, setTutorSaveState] = useState({ loading: false, success: "", error: "" });
   const [tutorReviews, setTutorReviews] = useState([]);
@@ -479,6 +481,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setMarkRubric(null);
     setMarkCorrections([]);
     setMarkSimpleFeedback(null);
+    setMarkStructuredFeedback(null);
     setFeedbackTrend(null);
     setFirstDraftSnapshot("");
     setReflectionText("");
@@ -488,6 +491,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setImprovedRubric(null);
     setImprovedCorrections([]);
     setImprovedSimpleFeedback(null);
+    setImprovedStructuredFeedback(null);
     setImprovedLoading(false);
     setIdeaInput("");
     setChatMessages([IDEA_COACH_INTRO]);
@@ -698,6 +702,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
 
         if (typeof saved.typedAnswer === "string") setTypedAnswer(saved.typedAnswer);
         if (typeof saved.markFeedback === "string") setMarkFeedback(saved.markFeedback);
+        if (saved.markStructuredFeedback && typeof saved.markStructuredFeedback === "object") setMarkStructuredFeedback(saved.markStructuredFeedback);
         if (typeof saved.firstDraftSnapshot === "string") setFirstDraftSnapshot(saved.firstDraftSnapshot);
         if (typeof saved.reflectionText === "string") setReflectionText(saved.reflectionText);
         if (typeof saved.revisedDraftText === "string") setRevisedDraftText(saved.revisedDraftText);
@@ -778,6 +783,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         data: {
           typedAnswer,
           markFeedback,
+          markStructuredFeedback,
           firstDraftSnapshot,
           reflectionText,
           revisedDraftText,
@@ -826,6 +832,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     firstDraftSnapshot,
     ideaInput,
     markFeedback,
+    markStructuredFeedback,
     reflectionText,
     revisedDraftText,
     progressLoaded,
@@ -1067,6 +1074,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setMarkRubric(null);
     setMarkCorrections([]);
     setMarkSimpleFeedback(null);
+    setMarkStructuredFeedback(null);
     setFeedbackTrend(null);
 
     try {
@@ -1104,11 +1112,13 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       setImprovedRubric(null);
       setImprovedCorrections([]);
       setImprovedSimpleFeedback(null);
+      setImprovedStructuredFeedback(null);
       setRubricBreakdown(breakdown);
       setErrorBank(extractErrorBank(data.feedback));
       setMarkRubric(data?.rubric || null);
       setMarkCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
       setMarkSimpleFeedback(data?.simplifiedFeedback || null);
+      setMarkStructuredFeedback(data?.structuredFeedback || data || null);
       setFeedbackTrend(data?.trend || null);
       setDraftHistory((prev) => [
         ...prev,
@@ -1260,6 +1270,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       setImprovedRubric(data?.rubric || null);
       setImprovedCorrections(Array.isArray(data?.corrections) ? data.corrections : []);
       setImprovedSimpleFeedback(data?.simplifiedFeedback || null);
+      setImprovedStructuredFeedback(data?.structuredFeedback || data || null);
       setFeedbackTrend(data?.trend || null);
     } catch (err) {
       const msg =
@@ -1417,6 +1428,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setMarkRubric(null);
     setMarkCorrections([]);
     setMarkSimpleFeedback(null);
+    setMarkStructuredFeedback(null);
     setFeedbackTrend(null);
     setIdeaSuccess("Your workspace draft is now pasted into the “Mark my letter” tab.");
     setIdeaError("");
@@ -1852,6 +1864,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 rubric={markRubric}
                 corrections={markCorrections}
                 simplifiedFeedback={markSimpleFeedback}
+                structuredFeedback={markStructuredFeedback}
                 trend={feedbackTrend}
               />
             </section>
@@ -1867,6 +1880,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 rubric={improvedRubric}
                 corrections={improvedCorrections}
                 simplifiedFeedback={improvedSimpleFeedback}
+                structuredFeedback={improvedStructuredFeedback}
                 trend={feedbackTrend}
               />
               <details style={{ marginTop: 10 }}>
@@ -1878,6 +1892,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                   rubric={markRubric}
                   corrections={markCorrections}
                   simplifiedFeedback={markSimpleFeedback}
+                  structuredFeedback={markStructuredFeedback}
                   trend={feedbackTrend}
                 />
               </details>

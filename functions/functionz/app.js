@@ -1650,64 +1650,137 @@ const getDominanceAlert = ({ distribution = {}, total = 0, level = "A1", promptT
   };
 };
 
-const buildFallbackWritingInsights = ({ feedback = "", estimatedScore = 0 }) => ({
-  rubric: {
-    task: 0,
-    coherence: 0,
-    grammar: 0,
-    lexis: 0,
-    overall: Number(estimatedScore || 0),
+const clampNumber = (value, min, max) => {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return min;
+  return Math.min(max, Math.max(min, numeric));
+};
+
+const extractWritingScoreFromText = (raw = "") => {
+  const text = String(raw || "");
+  const patterns = [
+    /score\s*:\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/i,
+    /score\s*:\s*(\d+(?:\.\d+)?)\s*\//i,
+    /(\d+(?:\.\d+)?)\s*out\s+of\s+(\d+(?:\.\d+)?)/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (!match) continue;
+    const score = Number(match[1]);
+    const max = match[2] ? Number(match[2]) : 25;
+    if (Number.isFinite(score) && Number.isFinite(max) && max > 0) {
+      return Math.round(clampNumber((score / max) * 25, 0, 25));
+    }
+  }
+
+  return null;
+};
+
+const normalizeShortStringArray = (value = [], limit = 5) =>
+  (Array.isArray(value) ? value : [])
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+    .slice(0, limit);
+
+const sanitizeWritingCorrections = (value = []) => {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  return value
+    .map((item) => {
+      const wrong = String(item?.wrong || "").trim();
+      const correct = String(item?.correct || "").trim();
+      const category = String(item?.category || "").trim();
+      const reason = String(item?.reason || "").trim();
+      return { wrong, correct, category, reason };
+    })
+    .filter((item) => item.wrong && item.correct)
+    .filter((item) => item.wrong.toLocaleLowerCase() !== item.correct.toLocaleLowerCase())
+    .filter((item) => {
+      const key = `${item.wrong.toLocaleLowerCase()}->${item.correct.toLocaleLowerCase()}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .filter((item) => {
+      const wrong = item.wrong.replace(/[.!?]+$/g, "").trim().toLocaleLowerCase();
+      const correct = item.correct.replace(/[.!?]+$/g, "").trim().toLocaleLowerCase();
+      if (wrong === correct) return false;
+      if (wrong === "ich sehe fern" && correct === "ich sehe fern") return false;
+      return true;
+    })
+    .slice(0, 5);
+};
+
+const rubricCriterionFromScore = (score) => clampNumber(Math.round(Number(score || 0) / 5), 0, 5);
+
+const normalizeWritingInsights = ({ parsed = {}, feedback = "", promptType = "unknown", source = "backend" }) => {
+  const extractedScore = extractWritingScoreFromText(feedback);
+  const parsedScore = Number.isFinite(Number(parsed?.score)) ? Number(parsed.score) : null;
+  const rubricScore = Number.isFinite(Number(parsed?.rubric?.overall)) ? Number(parsed.rubric.overall) : null;
+  const scoreCandidate = parsedScore > 0 ? parsedScore : (rubricScore > 0 ? rubricScore : (extractedScore ?? parsedScore ?? rubricScore ?? 0));
+  const score = Math.round(clampNumber(scoreCandidate, 0, 25));
+  const fallbackCriterion = rubricCriterionFromScore(score);
+  const rubric = {
+    task: Math.round(clampNumber(parsed?.rubric?.task ?? fallbackCriterion, 0, 5)),
+    coherence: Math.round(clampNumber(parsed?.rubric?.coherence ?? fallbackCriterion, 0, 5)),
+    grammar: Math.round(clampNumber(parsed?.rubric?.grammar ?? fallbackCriterion, 0, 5)),
+    lexis: Math.round(clampNumber(parsed?.rubric?.lexis ?? fallbackCriterion, 0, 5)),
+    overall: score,
     maxScore: 25,
+    source,
+  };
+  const strengths = normalizeShortStringArray(parsed?.strengths, 5);
+  const mainIssues = normalizeShortStringArray(parsed?.mainIssues, 5);
+  const nextTask = String(parsed?.nextTask || parsed?.simplifiedFeedback?.nextAction || "Fix the top mistakes and submit one improved draft.").trim();
+  const corrections = sanitizeWritingCorrections(parsed?.corrections);
+
+  return {
+    score,
+    maxScore: 25,
+    rubric,
+    summary: String(parsed?.summary || "").trim(),
+    strengths,
+    mainIssues,
+    corrections,
+    improvedVersion: String(parsed?.improvedVersion || "").trim(),
+    nextTask,
+    simplifiedFeedback: {
+      topFixes: corrections.map((item) => `${item.wrong} → ${item.correct}${item.reason ? ` — ${item.reason}` : ""}`),
+      strengths,
+      nextAction: nextTask,
+    },
+    trend: parsed?.trend || null,
+    promptType: parsed?.promptType || promptType,
+    feedbackBody: String(feedback || ""),
+  };
+};
+
+const buildFallbackWritingInsights = ({ feedback = "", estimatedScore = null, promptType = "unknown" }) => {
+  const score = estimatedScore ?? extractWritingScoreFromText(feedback) ?? 0;
+  return normalizeWritingInsights({
+    parsed: {
+      score,
+      summary: score > 0 ? `Score extracted from feedback: ${score}/25.` : "Feedback could not be parsed safely.",
+      strengths: [],
+      mainIssues: [],
+      corrections: [],
+      nextTask: "Fix the top mistakes and submit one improved draft.",
+    },
+    feedback,
+    promptType,
     source: "heuristic",
-  },
-  corrections: [],
-  simplifiedFeedback: {
-    topFixes: [],
-    strengths: [],
-    nextAction: "Fix the top mistakes and submit one improved draft.",
-  },
-  feedbackBody: String(feedback || ""),
-});
+  });
+};
 
-const deriveWritingInsights = async ({ feedback, draftText, level, firstDraft = "", promptType = "unknown" }) => {
-  const fallback = buildFallbackWritingInsights({ feedback, estimatedScore: 0 });
+const deriveWritingInsights = async ({ feedback, promptType = "unknown" }) => {
+  const fallback = buildFallbackWritingInsights({ feedback, promptType });
   try {
-    const extractionPrompt = [
-      "You are a strict JSON formatter for writing feedback.",
-      "Return valid JSON only. No markdown, no commentary.",
-      "Schema:",
-      "{ rubric: { task:number, coherence:number, grammar:number, lexis:number, overall:number, maxScore:number }, corrections:[{wrong, correct, reason, category}], simplifiedFeedback:{topFixes:string[], strengths:string[], nextAction:string}, trend:{firstDraft:{task,coherence,grammar,lexis,overall}, improvedDraft:{task,coherence,grammar,lexis,overall}, changes:string[]}, promptType:string }",
-      "Categories must be one of: Grammar, Word order, Spelling, Register.",
-      "Use level-aware expectations.",
-      "If first draft is missing, set trend to null.",
-    ].join("\n");
-
-    const userPrompt = JSON.stringify({
-      level,
-      promptType,
-      firstDraft,
-      improvedDraft: draftText,
-      feedback,
-    });
-
-    const raw = await createChatCompletion(
-      [
-        { role: "system", content: extractionPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      { temperature: 0.1, max_tokens: 500 }
-    );
-
-    const parsed = parseJSONResponse(raw, fallback);
-    return {
-      ...fallback,
-      ...parsed,
-      rubric: { ...fallback.rubric, ...(parsed?.rubric || {}), source: "backend" },
-      corrections: Array.isArray(parsed?.corrections) ? parsed.corrections : [],
-      simplifiedFeedback: { ...fallback.simplifiedFeedback, ...(parsed?.simplifiedFeedback || {}) },
-      trend: parsed?.trend || null,
-      promptType: parsed?.promptType || promptType,
-    };
+    const parsed = parseJSONResponse(feedback, null);
+    if (!parsed || typeof parsed !== "object") {
+      return fallback;
+    }
+    return normalizeWritingInsights({ parsed, feedback, promptType, source: "backend" });
   } catch (error) {
     console.warn("Failed to derive writing insights", error?.message || error);
     return fallback;
@@ -1822,7 +1895,7 @@ app.post("/writing/mark", async (req, res) => {
       { role: "user", content: userContent },
     ];
 
-    const feedback = await createChatCompletion(messages, { max_tokens: 750 });
+    const feedback = await createChatCompletion(messages, { temperature: 0.1, max_tokens: 1200 });
     const writingInsights = await deriveWritingInsights({
       feedback,
       draftText: trimmedText,
@@ -1846,8 +1919,11 @@ app.post("/writing/mark", async (req, res) => {
         promptType: promptType || "letter",
         text: trimmedText,
         feedback,
+        score: writingInsights?.score ?? writingInsights?.rubric?.overall ?? 0,
+        maxScore: 25,
         rubric: writingInsights?.rubric || null,
         corrections: writingInsights?.corrections || [],
+        structuredFeedback: writingInsights || null,
         source: "mark-tab",
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
@@ -1905,8 +1981,16 @@ app.post("/writing/mark", async (req, res) => {
 
     res.json({
       feedback,
+      score: writingInsights?.score ?? writingInsights?.rubric?.overall ?? 0,
+      maxScore: 25,
       rubric: writingInsights?.rubric || null,
+      summary: writingInsights?.summary || "",
+      strengths: writingInsights?.strengths || [],
+      mainIssues: writingInsights?.mainIssues || [],
       corrections: writingInsights?.corrections || [],
+      improvedVersion: writingInsights?.improvedVersion || "",
+      nextTask: writingInsights?.nextTask || "",
+      structuredFeedback: writingInsights || null,
       simplifiedFeedback: writingInsights?.simplifiedFeedback || null,
       trend: writingInsights?.trend || null,
       submissionSaved,
