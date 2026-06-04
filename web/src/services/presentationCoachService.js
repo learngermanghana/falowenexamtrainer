@@ -1,5 +1,7 @@
 import { callAI } from "./aiClient";
 
+export const CUSTOM_SPEAKING_CHAT_SESSION_SECONDS = 10 * 60;
+
 export const requestPresentationCoachReply = async ({ message, level, history, idToken }) =>
   callAI({
     path: "/speaking/presentation-chat",

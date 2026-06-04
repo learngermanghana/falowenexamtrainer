@@ -4,8 +4,8 @@ import { useExam } from "../context/ExamContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
-import { requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
-import { CHAT_SESSION_SECONDS, logStudentActivity } from "../services/studyBuddyService";
+import { CUSTOM_SPEAKING_CHAT_SESSION_SECONDS, requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
+import { logStudentActivity } from "../services/studyBuddyService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
@@ -106,7 +106,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [customChatLoading, setCustomChatLoading] = useState(false);
   const [customChatError, setCustomChatError] = useState("");
   const [customSessionState, setCustomSessionState] = useState("idle");
-  const [customSessionSecondsLeft, setCustomSessionSecondsLeft] = useState(CHAT_SESSION_SECONDS);
+  const [customSessionSecondsLeft, setCustomSessionSecondsLeft] = useState(CUSTOM_SPEAKING_CHAT_SESSION_SECONDS);
   const [lastRubric, setLastRubric] = useState(null);
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
@@ -152,10 +152,10 @@ const SpeakingPage = ({ mode = "exam" }) => {
 
   const startCustomSession = (source = "manual") => {
     setCustomSessionState("running");
-    setCustomSessionSecondsLeft(CHAT_SESSION_SECONDS);
+    setCustomSessionSecondsLeft(CUSTOM_SPEAKING_CHAT_SESSION_SECONDS);
     setCustomChatError("");
     customSessionTimeoutLoggedRef.current = false;
-    logSpeakingChatEvent("chat_session_start", { source, durationSeconds: CHAT_SESSION_SECONDS });
+    logSpeakingChatEvent("chat_session_start", { source, durationSeconds: CUSTOM_SPEAKING_CHAT_SESSION_SECONDS });
   };
 
   const endCustomSession = (source = "manual") => {
@@ -205,7 +205,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
     appendCustomCoachText(
       `Session complete 🎉\nYou practised for 10 minutes.\nStart a new session when you are ready.\n\nQuick summary:\n• 2 mistakes to fix: choose your top grammar pattern and pronunciation habit from today.\n• 2 useful phrases: reuse one connector and one topic phrase from the chat.\n• Next speaking task: give a 45-second opinion and one reason.`
     );
-    logSpeakingChatEvent("chat_session_timeout", { durationSeconds: CHAT_SESSION_SECONDS });
+    logSpeakingChatEvent("chat_session_timeout", { durationSeconds: CUSTOM_SPEAKING_CHAT_SESSION_SECONDS });
   }, [customSessionSecondsLeft, customSessionState]);
 
   useEffect(() => {

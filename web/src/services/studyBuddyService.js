@@ -2,7 +2,6 @@ import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from ".
 import { callAI } from "./aiClient";
 
 const STUDY_BUDDY_MODE_STORAGE_KEY = "studyBuddyCourseMode";
-export const CHAT_SESSION_SECONDS = 10 * 60;
 const studyBuddyModes = [
   { key: "lesson", label: "Lesson", helper: "Explain the current course topic step by step." },
   { key: "speaking", label: "Speaking", helper: "Help the student build a spoken answer for this lesson." },
@@ -143,15 +142,13 @@ const getBrowserLessonContext = () => {
   };
 };
 
-const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContext }) => {
+const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
   const selectedMode = mode || getStoredStudyBuddyMode();
   const browserContext = getBrowserLessonContext();
   const context = {
     ...browserContext,
     ...(lessonContext && typeof lessonContext === "object" ? lessonContext : {}),
   };
-  const session = sessionContext && typeof sessionContext === "object" ? sessionContext : {};
-  const minutesLeft = Number.isFinite(Number(session.minutesLeft)) ? Number(session.minutesLeft).toFixed(1) : "unknown";
   const contextLines = [
     `Level: ${context.level || "Use the student profile level or the level visible on the page"}`,
     `Current page: ${context.pageTitle || "Course page"}`,
@@ -160,8 +157,6 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContex
     `Topic/headings: ${context.topic || context.visibleHeadings || "Use the current lesson topic if visible"}`,
     `Visible badges/tabs: ${context.visibleBadges || ""}`,
     `Mode: ${getModeLabel(selectedMode)}`,
-    `Session state: ${session.state || "not_started"}`,
-    `Approximate minutes left: ${minutesLeft}`,
   ];
 
   const modeRules = {
@@ -179,7 +174,6 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContex
     "Level rules: A1/A2 = simple English explanation + simple German examples. B1 = correct and help build longer connected sentences. B2 = improve argumentation, connectors and natural expression. C1 = upgrade to advanced, natural, precise German.",
     "For C1 useful replies, include exactly this compact pattern: a short natural response; 'Besser / C1-Version:' with one upgraded sentence; 'Nützlicher Ausdruck:' with one strong C1 phrase and English meaning; one deeper follow-up question. Do not only correct; upgrade.",
     "Current-info safety: if the student asks about current politics, current office holders, current government, current prices, latest news, or anything that may change, do not answer with certainty unless live/current data is provided. Say: 'Bei aktuellen Informationen kann ich mich irren. Bitte prüfe eine aktuelle Quelle.' Then continue language practice with a safe sentence frame.",
-    "If session state is running and only about 1 minute remains, guide toward a short conclusion. If session state is ended, do not continue a long conversation; suggest starting a new session.",
     modeRules[selectedMode] || modeRules.lesson,
     "",
     "CURRENT LESSON CONTEXT:",
@@ -192,15 +186,14 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContex
     .join("\n");
 };
 
-export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext, sessionContext }) =>
+export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext }) =>
   callAI({
     path: "/chatbuddy/respond",
     payload: {
-      message: buildCourseFocusedMessage({ message, mode, lessonContext, sessionContext }),
+      message: buildCourseFocusedMessage({ message, mode, lessonContext }),
       level,
       mode: mode || getStoredStudyBuddyMode(),
       lessonContext: lessonContext || null,
-      sessionContext: sessionContext || null,
     },
     idToken,
   });
@@ -218,9 +211,6 @@ const EVENT_LABELS = {
   high_contrast_toggle: "Changed Study Buddy contrast",
   weekly_plan_expand: "Expanded weekly plan",
   weekly_plan_collapse: "Collapsed weekly plan",
-  chat_session_start: "Started chat practice session",
-  chat_session_end: "Ended chat practice session",
-  chat_session_timeout: "Chat practice session timed out",
   umlaut_insert: "Inserted German special character",
   chat_mode_change: "Changed Study Buddy chat mode",
 };
