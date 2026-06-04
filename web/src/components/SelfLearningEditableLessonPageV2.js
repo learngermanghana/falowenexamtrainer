@@ -127,6 +127,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
   const writingType = inferWritingType(lesson);
   const speakingTopic = lesson.speakingTopic || lesson.tasks?.speaking || `Sprich über: ${lesson.topic}`;
+  const writingTask = lesson.writingTopic || lesson.tasks?.writing || `Schreibe einen ${lesson.level}-Text zum Thema: ${lesson.topic}. Begründe deine Meinung und nutze passende Redemittel.`;
   const canComplete = progress.understood && progress.practisedWithAi && progress.improvedAfterFeedback && scoreSummary.count >= 2;
 
   return (
@@ -148,7 +149,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
             <StatCard label="Speaking task" value={lesson.speakingTaskType || "Guided talk"} />
-            <StatCard label="Writing support" value="Mark · Ref · Ideas" />
+            <StatCard label="Writing support" value="Task · Mark · Ref · Ideas" />
             <StatCard label="Progress" value={progress.completed ? "Completed" : "In progress"} />
           </div>
         </div>
@@ -166,9 +167,9 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
             <NoteBox><strong>No tutor submission for {lesson.level}.</strong> Learn the topic, practise with Falowen AI, read feedback, improve your answer and self-mark honestly.</NoteBox>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
               <PracticeBox title="Sprechen topic"><p style={{ margin: 0, lineHeight: 1.6 }}>{speakingTopic}</p></PracticeBox>
-              <PracticeBox title="Schreiben support">
+              <PracticeBox title="Schreiben task">
                 <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
-                <p style={{ margin: 0, lineHeight: 1.6 }}>Writing prompts are hidden in the course. Use the embedded writing panel for marking, Redemittel and ideas. Full exam prompts are in the Exam Room.</p>
+                <p style={{ margin: 0, lineHeight: 1.6 }}>{writingTask}</p>
               </PracticeBox>
             </div>
           </Section>
@@ -205,12 +206,16 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
       {activeTab === "write" ? (
         <Section title="Writing support">
+          <PracticeBox title="Writing task">
+            <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>{writingTask}</p>
+          </PracticeBox>
           <SelfLearningWritingTools
             writingType={writingType}
             structure={lesson.writingBuilder?.structure || []}
             usefulLines={lesson.writingBuilder?.usefulLines || []}
           />
-          <EmbeddedPracticeNote>Write, mark your answer, collect Redemittel and generate ideas without leaving the course lesson.</EmbeddedPracticeNote>
+          <EmbeddedPracticeNote>Write your answer to the task above, mark it, collect Redemittel and improve without leaving the course lesson.</EmbeddedPracticeNote>
           <EmbeddedWritingPracticePanel />
         </Section>
       ) : null}
@@ -234,7 +239,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           <Section title="AI practice checklist">
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
               <PracticeBox title="Speech"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>Practise in the Speak tab inside this lesson.</p></PracticeBox>
-              <PracticeBox title="Writing"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>Practise in the Write tab inside this lesson.</p></PracticeBox>
+              <PracticeBox title="Writing"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{writingTask}</p></PracticeBox>
               <PracticeBox title="Reading"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{lesson.tasks?.reading}</p></PracticeBox>
               <PracticeBox title="Listening"><p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{lesson.tasks?.listening}</p></PracticeBox>
             </div>
