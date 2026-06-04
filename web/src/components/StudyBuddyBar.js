@@ -530,15 +530,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
         },
       },
       {
-        key: "study",
-        label: t("studyBuddy.shortcuts.study"),
-        action: () => {
-          playOpenFeedback();
-          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "study", shortcutLabel: t("studyBuddy.shortcuts.study"), destination: "/exams/study" });
-          navigate("/exams/study");
-        },
-      },
-      {
         key: "exams",
         label: t("studyBuddy.shortcuts.exams"),
         action: () => {
@@ -550,14 +541,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
     ],
     [focusQuickQuestion, navigate, playOpenFeedback, t, trackStudyBuddyEvent]
   );
-
-  useEffect(() => {
-    const handleModeChange = (event) => {
-      trackStudyBuddyEvent("chat_mode_change", event?.detail || {});
-    };
-    window.addEventListener("studyBuddyModeChange", handleModeChange);
-    return () => window.removeEventListener("studyBuddyModeChange", handleModeChange);
-  }, [trackStudyBuddyEvent]);
 
   useEffect(() => {
     try {

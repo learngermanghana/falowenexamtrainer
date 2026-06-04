@@ -1,122 +1,16 @@
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 
-const STUDY_BUDDY_MODE_STORAGE_KEY = "studyBuddyCourseMode";
-const studyBuddyModes = [
-  { key: "lesson", label: "Lesson", helper: "Explain the current course topic step by step." },
-  { key: "speaking", label: "Speaking", helper: "Help the student build a spoken answer for this lesson." },
-  { key: "writing", label: "Writing", helper: "Help the student plan and improve writing for this lesson." },
-];
-
-const getStoredStudyBuddyMode = () => {
-  if (typeof window === "undefined") return "lesson";
-  try {
-    const stored = localStorage.getItem(STUDY_BUDDY_MODE_STORAGE_KEY);
-    return studyBuddyModes.some((mode) => mode.key === stored) ? stored : "lesson";
-  } catch (error) {
-    return "lesson";
-  }
+const DEFAULT_STUDY_BUDDY_MODE = "lesson";
+const STUDY_BUDDY_MODE_LABELS = {
+  lesson: "Lesson",
+  speaking: "Speaking",
+  writing: "Writing",
 };
 
-const setStoredStudyBuddyMode = (modeKey) => {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STUDY_BUDDY_MODE_STORAGE_KEY, modeKey);
-  } catch (error) {
-    // Ignore storage errors.
-  }
-};
+const getStoredStudyBuddyMode = () => DEFAULT_STUDY_BUDDY_MODE;
 
-const getModeLabel = (modeKey) => studyBuddyModes.find((mode) => mode.key === modeKey)?.label || "Lesson";
-const getModeHelper = (modeKey) => studyBuddyModes.find((mode) => mode.key === modeKey)?.helper || studyBuddyModes[0].helper;
-
-const applyModeButtonState = (container, selectedMode) => {
-  if (!container) return;
-  container.querySelectorAll("button[data-study-buddy-mode]").forEach((button) => {
-    const isActive = button.getAttribute("data-study-buddy-mode") === selectedMode;
-    button.setAttribute("aria-pressed", String(isActive));
-    button.style.background = isActive ? "#1d4ed8" : "#fff";
-    button.style.color = isActive ? "#fff" : "#1f2937";
-    button.style.borderColor = isActive ? "#1d4ed8" : "#cbd5e1";
-  });
-  const helper = container.querySelector("[data-study-buddy-mode-helper]");
-  if (helper) helper.textContent = getModeHelper(selectedMode);
-};
-
-const ensureStudyBuddyModeSelector = () => {
-  if (typeof document === "undefined") return;
-  const qaBlock = document.querySelector(".study-buddy-qa-priority");
-  const form = qaBlock?.querySelector(".study-buddy-qa-form");
-  if (!qaBlock || !form || qaBlock.querySelector("[data-study-buddy-mode-selector]")) return;
-
-  const selector = document.createElement("div");
-  selector.setAttribute("data-study-buddy-mode-selector", "true");
-  selector.setAttribute("aria-label", "Choose AI help mode");
-  selector.style.display = "grid";
-  selector.style.gap = "6px";
-  selector.style.margin = "8px 0 10px";
-
-  const buttonRow = document.createElement("div");
-  buttonRow.style.display = "grid";
-  buttonRow.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))";
-  buttonRow.style.gap = "6px";
-
-  studyBuddyModes.forEach((mode) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = mode.label;
-    button.setAttribute("data-study-buddy-mode", mode.key);
-    button.style.border = "1px solid #cbd5e1";
-    button.style.borderRadius = "999px";
-    button.style.padding = "7px 8px";
-    button.style.fontSize = "0.82rem";
-    button.style.fontWeight = "700";
-    button.style.cursor = "pointer";
-    button.style.whiteSpace = "nowrap";
-    button.addEventListener("click", () => {
-      const previousMode = getStoredStudyBuddyMode();
-      setStoredStudyBuddyMode(mode.key);
-      applyModeButtonState(selector, mode.key);
-      if (typeof window !== "undefined" && previousMode !== mode.key) {
-        window.dispatchEvent(
-          new CustomEvent("studyBuddyModeChange", {
-            detail: { previousMode, mode: mode.key, modeLabel: mode.label },
-          })
-        );
-      }
-    });
-    buttonRow.appendChild(button);
-  });
-
-  const helper = document.createElement("p");
-  helper.setAttribute("data-study-buddy-mode-helper", "true");
-  helper.style.margin = "0";
-  helper.style.color = "#64748b";
-  helper.style.fontSize = "0.78rem";
-  helper.style.lineHeight = "1.4";
-
-  selector.appendChild(buttonRow);
-  selector.appendChild(helper);
-  qaBlock.insertBefore(selector, form);
-  applyModeButtonState(selector, getStoredStudyBuddyMode());
-};
-
-const startStudyBuddyModeSelectorObserver = () => {
-  if (typeof document === "undefined" || typeof window === "undefined") return;
-  const start = () => {
-    ensureStudyBuddyModeSelector();
-    const observer = new MutationObserver(ensureStudyBuddyModeSelector);
-    observer.observe(document.body, { childList: true, subtree: true });
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
-  } else {
-    start();
-  }
-};
-
-startStudyBuddyModeSelectorObserver();
+const getModeLabel = (modeKey) => STUDY_BUDDY_MODE_LABELS[modeKey] || STUDY_BUDDY_MODE_LABELS[DEFAULT_STUDY_BUDDY_MODE];
 
 const getBrowserLessonContext = () => {
   if (typeof window === "undefined" || typeof document === "undefined") return {};
@@ -212,7 +106,6 @@ const EVENT_LABELS = {
   weekly_plan_expand: "Expanded weekly plan",
   weekly_plan_collapse: "Collapsed weekly plan",
   umlaut_insert: "Inserted German special character",
-  chat_mode_change: "Changed Study Buddy chat mode",
 };
 
 const sanitizeMetadata = (metadata = {}) => {
