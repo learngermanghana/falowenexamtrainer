@@ -157,10 +157,8 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [quickReply, setQuickReply] = useState("");
   const [quickReplyError, setQuickReplyError] = useState("");
   const [isReplyLoading, setIsReplyLoading] = useState(false);
-  const maxQuestionLength = 160;
   const trimmedQuestion = questionInput.trim();
-  const isQuestionTooLong = questionInput.length > maxQuestionLength;
-  const isSendDisabled = !trimmedQuestion || isReplyLoading || isQuestionTooLong;
+  const isSendDisabled = !trimmedQuestion || isReplyLoading;
   const playOpenFeedback = useCallback(() => {
     triggerInteractionFeedback({ sound: "open" });
   }, []);
@@ -659,7 +657,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
                 className="study-buddy-qa-input"
                 type="text"
                 value={questionInput}
-                maxLength={maxQuestionLength}
                 placeholder={t("studyBuddy.qa.placeholder")}
                 onChange={(event) => setQuestionInput(event.target.value)}
                 disabled={isReplyLoading}
@@ -678,12 +675,6 @@ const StudyBuddyBar = ({ studentProfile }) => {
             </div>
             <div className="study-buddy-qa-meta">
               <p className="study-buddy-qa-helper">{t("studyBuddy.qa.helper")}</p>
-              <p className={`study-buddy-qa-count${isQuestionTooLong ? " is-warning" : ""}`}>
-                {t("studyBuddy.qa.charCount", {
-                  count: questionInput.length,
-                  max: maxQuestionLength,
-                })}
-              </p>
             </div>
             {isReplyLoading ? (
               <p className="study-buddy-qa-response" aria-live="polite">

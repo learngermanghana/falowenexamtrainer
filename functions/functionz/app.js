@@ -2685,7 +2685,6 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
     }
 
     const validationError =
-      validateString(message, { maxLength: 800, label: "message" }) ||
       validateString(level, { maxLength: 10, label: "level" }) ||
       validateString(mode, { maxLength: 30, label: "mode" });
 
