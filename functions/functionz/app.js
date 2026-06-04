@@ -870,27 +870,47 @@ const speakingPrompt = ({ teil, level, contextType, question, interactionMode })
     .join("\n\n");
 };
 
-const chatBuddyPrompt = ({ level }) =>
+const levelAwareChatRules = ({ level }) => [
+  `Target CEFR level: ${level || "B1"}.`,
+  "Level rules: A1/A2 = simple English explanation + simple German examples. B1 = correct and help build longer connected sentences. B2 = improve argumentation, connectors and natural expression. C1 = upgrade to advanced, natural, precise German.",
+  "Correct only the 1-2 most important mistakes per turn. Keep replies short and phone-friendly.",
+  "For C1 useful replies, use this compact pattern: short natural response; 'Besser / C1-Version:' with one upgraded sentence; 'Nützlicher Ausdruck:' with one strong C1 phrase and English meaning; one deeper follow-up question. Do not only correct; upgrade.",
+  "Current-info safety: if asked about current politics, current office holders, current government, current prices, latest news, or anything that may change, do not answer with certainty unless live/current data is provided. Say: 'Bei aktuellen Informationen kann ich mich irren. Bitte prüfe eine aktuelle Quelle.' Then continue language practice with a safe sentence frame.",
+  "Keep the conversation on the current lesson/topic when provided. If the student goes off topic, gently connect it back to the lesson.",
+].join(" ");
+
+const formatSessionPrompt = ({ mode, lessonContext, sessionContext }) => {
+  const lesson = lessonContext && typeof lessonContext === "object" ? lessonContext : {};
+  const session = sessionContext && typeof sessionContext === "object" ? sessionContext : {};
+  return [
+    `Selected chat mode: ${mode || "Lesson"}`,
+    `Lesson title/topic: ${lesson.lessonTitle || lesson.topic || "Not provided"}`,
+    `Session state: ${session.state || "not_started"}`,
+    `Approximate minutes left: ${Number.isFinite(Number(session.minutesLeft)) ? Number(session.minutesLeft).toFixed(1) : "unknown"}`,
+    "If the session is almost over, guide toward a conclusion. If the session ended, do not continue a long conversation; suggest starting a new session.",
+  ].join("\n");
+};
+
+const chatBuddyPrompt = ({ level, mode, lessonContext, sessionContext }) =>
   [
     "You are Falowen Chat Buddy, a friendly study partner helping a student practise.",
-    `Match the CEFR level ${level || "B1"} and keep answers short (max 4 sentences).`,
-    "Respond in clear English so the student is never confused.",
-    "If you need to show a correction, include one short German example and explain it in English.",
-    "Always ask one follow-up question in English to keep the conversation going.",
-  ].join(" ");
+    levelAwareChatRules({ level }),
+    "Respond in clear English so the student is never confused, except German examples/phrases.",
+    "Always ask one follow-up question unless the session has ended.",
+    formatSessionPrompt({ mode, lessonContext, sessionContext }),
+  ].join("\n");
 
-
-const customSpeakingChatPrompt = ({ level }) =>
+const customSpeakingChatPrompt = ({ level, mode, lessonContext, sessionContext }) =>
   [
     "You are Falowen Custom Speaking Chat, a warm German speaking partner for free conversation practice.",
-    `Match CEFR level ${level || "A1"}; keep German natural but reachable for that level.`,
-    "The student can talk about any safe everyday topic. Do not force exam tasks or presentations.",
+    levelAwareChatRules({ level }),
+    "The student can talk about any safe everyday topic, but if a course lesson/topic is provided, connect the conversation back to it gently. Do not force exam tasks or presentations.",
     "Main goal: improve Sprechen confidence through back-and-forth communication.",
-    "Reply mostly in simple German, with short English support only when it prevents confusion.",
-    "Correct only the 1-2 most important mistakes each turn, using: Besser: ...",
-    "Always ask exactly one friendly German follow-up question to keep the student speaking.",
-    "Keep the reply concise: maximum 6 short lines.",
-  ].join(" ");
+    "Reply mostly in German, with short English support only when it prevents confusion.",
+    "Always ask exactly one friendly German follow-up question to keep the speaking flow active unless the session has ended.",
+    "Keep concise: maximum 6 short lines.",
+    formatSessionPrompt({ mode: mode || "Speaking", lessonContext, sessionContext }),
+  ].join("\n");
 
 const PRESENTATION_TURN_LIMIT = 6;
 
@@ -2657,7 +2677,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const { message, level = "B1" } = req.body || {};
+    const { message, level = "B1", mode = "Lesson", lessonContext = null, sessionContext = null } = req.body || {};
     const requestedLevel = normalizeCefrLevel(level, "B1");
 
     if (!req.file && (!message || !String(message).trim())) {
@@ -2666,7 +2686,8 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
 
     const validationError =
       validateString(message, { maxLength: 800, label: "message" }) ||
-      validateString(level, { maxLength: 10, label: "level" });
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(mode, { maxLength: 30, label: "mode" });
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
@@ -2688,7 +2709,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
       .join("\n\n");
 
     const chatMessages = [
-      { role: "system", content: chatBuddyPrompt({ level: effectiveLevel }) },
+      { role: "system", content: chatBuddyPrompt({ level: effectiveLevel, mode, lessonContext, sessionContext }) },
       { role: "user", content: combinedMessage || transcript || "Student sent an empty message." },
     ];
 
@@ -2707,7 +2728,7 @@ app.post("/chatbuddy/respond", upload.single("audio"), async (req, res) => {
       route: "/chatbuddy/respond",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level: effectiveLevel, requestedLevel, quotaRemaining: quota.remaining },
+      metadata: { level: effectiveLevel, requestedLevel, mode, sessionState: sessionContext?.state || null, quotaRemaining: quota.remaining },
       success: !fallbackUsed,
     });
 
@@ -2726,13 +2747,14 @@ app.post("/speaking/custom-chat", async (req, res) => {
     authedUser = await requireAuthenticatedUser(req, res);
     if (!authedUser) return;
 
-    const { message, level = "A1", history = [] } = req.body || {};
+    const { message, level = "A1", history = [], mode = "Speaking", lessonContext = null, sessionContext = null } = req.body || {};
     const trimmedMessage = String(message || "").trim();
     const requestedLevel = normalizeCefrLevel(level, "A1");
 
     const validationError =
       validateString(trimmedMessage, { required: true, maxLength: 800, label: "message" }) ||
-      validateString(level, { maxLength: 10, label: "level" });
+      validateString(level, { maxLength: 10, label: "level" }) ||
+      validateString(mode, { maxLength: 30, label: "mode" });
 
     if (validationError) return res.status(400).json({ error: validationError });
     if (!ensureOpenAIConfigured(res)) return;
@@ -2747,7 +2769,7 @@ app.post("/speaking/custom-chat", async (req, res) => {
 
     const safeHistory = sanitizePresentationHistory(history);
     const chatMessages = [
-      { role: "system", content: customSpeakingChatPrompt({ level: effectiveLevel }) },
+      { role: "system", content: customSpeakingChatPrompt({ level: effectiveLevel, mode, lessonContext, sessionContext }) },
       ...safeHistory,
       { role: "user", content: trimmedMessage },
     ];
@@ -2767,7 +2789,7 @@ app.post("/speaking/custom-chat", async (req, res) => {
       route: "/speaking/custom-chat",
       uid: authedUser.uid,
       email: authedUser.email,
-      metadata: { level: effectiveLevel, requestedLevel, quotaRemaining: quota.remaining },
+      metadata: { level: effectiveLevel, requestedLevel, mode, sessionState: sessionContext?.state || null, quotaRemaining: quota.remaining },
       success: !fallbackUsed,
     });
 
