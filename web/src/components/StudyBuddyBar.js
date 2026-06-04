@@ -48,6 +48,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDismissed, setIsDismissed] = useState(true);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
+  const [isProgressDetailsExpanded, setIsProgressDetailsExpanded] = useState(false);
   const [isHighContrast, setIsHighContrast] = useState(() => {
     try {
       return localStorage.getItem("studyBuddyHighContrast") === "true";
@@ -56,6 +57,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
     }
   });
   const contentId = "study-buddy-content";
+  const progressDetailsId = "study-buddy-progress-details";
   const studentCode =
     studentProfile?.studentcode || studentProfile?.studentCode || studentProfile?.id || "";
   const studentEmail = studentProfile?.email || "";
@@ -528,6 +530,15 @@ const StudyBuddyBar = ({ studentProfile }) => {
         },
       },
       {
+        key: "calendar",
+        label: t("studyBuddy.shortcuts.calendar"),
+        action: () => {
+          playOpenFeedback();
+          trackStudyBuddyEvent("shortcut_click", { shortcutKey: "calendar", shortcutLabel: t("studyBuddy.shortcuts.calendar"), destination: "/exams/study" });
+          navigate("/exams/study");
+        },
+      },
+      {
         key: "exams",
         label: t("studyBuddy.shortcuts.exams"),
         action: () => {
@@ -621,28 +632,13 @@ const StudyBuddyBar = ({ studentProfile }) => {
 
         <div className="study-buddy-shortcuts" aria-label={t("studyBuddy.shortcuts.ariaLabel")}>
           {quickLinks.map((link) => (
-            <button key={link.key} className="study-buddy-shortcut" type="button" onClick={link.action}>
+            <button key={link.key} className={`study-buddy-shortcut study-buddy-shortcut--${link.key}`} type="button" onClick={link.action}>
               {link.label}
             </button>
           ))}
         </div>
 
         <div id={contentId} className="study-buddy-details" hidden={isCollapsed}>
-          <div className="study-buddy-insights">
-            <div className="study-buddy-insight">
-              <p className="study-buddy-label">{t("studyBuddy.insights.nextUp")}</p>
-              <div className="study-buddy-value">{primarySuggestion}</div>
-            </div>
-            <div className="study-buddy-insight">
-              <p className="study-buddy-label">{t("studyBuddy.insights.results")}</p>
-              <div className="study-buddy-value">{resultsLabel}</div>
-            </div>
-            <div className="study-buddy-insight">
-              <p className="study-buddy-label">{t("studyBuddy.insights.attendance")}</p>
-              <div className="study-buddy-value">{attendanceLabel}</div>
-            </div>
-          </div>
-
           <div className="study-buddy-qa study-buddy-qa-priority">
             <p className="study-buddy-qa-title">{t("studyBuddy.qa.title")}</p>
             <form
@@ -691,67 +687,108 @@ const StudyBuddyBar = ({ studentProfile }) => {
             ) : null}
           </div>
 
-          <div className="study-buddy-plan">
-            <div className="study-buddy-plan-header">
-              <div>
-                <p className="study-buddy-qa-title">{t("studyBuddy.weeklyPlan.title")}</p>
-                <p className="study-buddy-plan-progress">{t("studyBuddy.weeklyPlan.description")}</p>
-              </div>
-              <p className="study-buddy-plan-progress">
-                {t("studyBuddy.weeklyPlan.progress", {
-                  done: numberFormatter.format(completedPlanCount),
-                  total: numberFormatter.format(weeklyPlanItems.length),
-                })}
-              </p>
+          <div className="study-buddy-insight study-buddy-next-up">
+            <p className="study-buddy-label">{t("studyBuddy.insights.nextUp")}</p>
+            <div className="study-buddy-value">{primarySuggestion}</div>
+          </div>
+
+          <button
+            type="button"
+            className="study-buddy-progress-toggle"
+            aria-expanded={isProgressDetailsExpanded}
+            aria-controls={progressDetailsId}
+            onClick={() => {
+              const nextExpanded = !isProgressDetailsExpanded;
+              setIsProgressDetailsExpanded(nextExpanded);
+              trackStudyBuddyEvent(nextExpanded ? "progress_details_expand" : "progress_details_collapse");
+              triggerInteractionFeedback({ sound: nextExpanded ? "open" : "close" });
+            }}
+          >
+            {isProgressDetailsExpanded
+              ? t("studyBuddy.actions.hideProgressDetails")
+              : t("studyBuddy.actions.showProgressDetails")}
+          </button>
+
+          <div
+            id={progressDetailsId}
+            className={`study-buddy-progress-details${isProgressDetailsExpanded ? " is-expanded" : ""}`}
+          >
+            <div className="study-buddy-progress-heading">
+              <p className="study-buddy-qa-title">{t("studyBuddy.insights.progressDetails")}</p>
             </div>
-            <ul className="study-buddy-plan-list">
-              {visibleWeeklyPlanItems.map((item) => {
-                const isComplete = Boolean(completedPlanItems[item.id]);
-                return (
-                  <li key={item.id} className="study-buddy-plan-item">
-                    <button
-                      type="button"
-                      className={`study-buddy-plan-check${isComplete ? " is-complete" : ""}`}
-                      aria-pressed={isComplete}
-                      onClick={() => togglePlanItem(item.id)}
-                    >
-                      {isComplete ? "✓" : "+"}
-                    </button>
-                    <div>
-                      <p className="study-buddy-plan-item-title">{item.title}</p>
-                      <p className="study-buddy-plan-item-helper">{item.helper}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-            {hiddenPlanCount > 0 ? (
-              <button
-                type="button"
-                className="study-buddy-plan-more"
-                onClick={() => {
-                  setIsPlanExpanded(true);
-                  trackStudyBuddyEvent("weekly_plan_expand", { hiddenPlanCount });
-                }}
-              >
-                {t("studyBuddy.weeklyPlan.showAll", {
-                  count: numberFormatter.format(hiddenPlanCount),
-                  defaultValue: `View ${numberFormatter.format(hiddenPlanCount)} more tasks`,
+            <div className="study-buddy-insights study-buddy-progress-insights">
+              <div className="study-buddy-insight">
+                <p className="study-buddy-label">{t("studyBuddy.insights.results")}</p>
+                <div className="study-buddy-value">{resultsLabel}</div>
+              </div>
+              <div className="study-buddy-insight">
+                <p className="study-buddy-label">{t("studyBuddy.insights.attendance")}</p>
+                <div className="study-buddy-value">{attendanceLabel}</div>
+              </div>
+            </div>
+
+            <div className="study-buddy-plan">
+              <div className="study-buddy-plan-header">
+                <div>
+                  <p className="study-buddy-qa-title">{t("studyBuddy.weeklyPlan.title")}</p>
+                  <p className="study-buddy-plan-progress">{t("studyBuddy.weeklyPlan.description")}</p>
+                </div>
+                <p className="study-buddy-plan-progress">
+                  {t("studyBuddy.weeklyPlan.progress", {
+                    done: numberFormatter.format(completedPlanCount),
+                    total: numberFormatter.format(weeklyPlanItems.length),
+                  })}
+                </p>
+              </div>
+              <ul className="study-buddy-plan-list">
+                {visibleWeeklyPlanItems.map((item) => {
+                  const isComplete = Boolean(completedPlanItems[item.id]);
+                  return (
+                    <li key={item.id} className="study-buddy-plan-item">
+                      <button
+                        type="button"
+                        className={`study-buddy-plan-check${isComplete ? " is-complete" : ""}`}
+                        aria-pressed={isComplete}
+                        onClick={() => togglePlanItem(item.id)}
+                      >
+                        {isComplete ? "✓" : "+"}
+                      </button>
+                      <div>
+                        <p className="study-buddy-plan-item-title">{item.title}</p>
+                        <p className="study-buddy-plan-item-helper">{item.helper}</p>
+                      </div>
+                    </li>
+                  );
                 })}
-              </button>
-            ) : isPlanExpanded && weeklyPlanItems.length > COLLAPSED_PLAN_LIMIT ? (
-              <button
-                type="button"
-                className="study-buddy-plan-more"
-                onClick={() => {
-                  setIsPlanExpanded(false);
-                  trackStudyBuddyEvent("weekly_plan_collapse");
-                }}
-              >
-                {t("studyBuddy.weeklyPlan.showLess", { defaultValue: "Show fewer tasks" })}
-              </button>
-            ) : null}
-            <p className="study-buddy-plan-nudge">{planNudge}</p>
+              </ul>
+              {hiddenPlanCount > 0 ? (
+                <button
+                  type="button"
+                  className="study-buddy-plan-more"
+                  onClick={() => {
+                    setIsPlanExpanded(true);
+                    trackStudyBuddyEvent("weekly_plan_expand", { hiddenPlanCount });
+                  }}
+                >
+                  {t("studyBuddy.weeklyPlan.showAll", {
+                    count: numberFormatter.format(hiddenPlanCount),
+                    defaultValue: `View ${numberFormatter.format(hiddenPlanCount)} more tasks`,
+                  })}
+                </button>
+              ) : isPlanExpanded && weeklyPlanItems.length > COLLAPSED_PLAN_LIMIT ? (
+                <button
+                  type="button"
+                  className="study-buddy-plan-more"
+                  onClick={() => {
+                    setIsPlanExpanded(false);
+                    trackStudyBuddyEvent("weekly_plan_collapse");
+                  }}
+                >
+                  {t("studyBuddy.weeklyPlan.showLess", { defaultValue: "Show fewer tasks" })}
+                </button>
+              ) : null}
+              <p className="study-buddy-plan-nudge">{planNudge}</p>
+            </div>
           </div>
         </div>
         {!isCollapsed ? (

@@ -90,6 +90,7 @@
       "course": "Cours",
       "submit": "Envoyer un devoir",
       "ai": "Falowen A.I",
+      "calendar": "Calendrier d’étude",
       "exams": "Salle d’examens"
     },
     "actions": {
@@ -99,12 +100,15 @@
       "reopen": "Study Buddy",
       "reopenAria": "Rouvrir la barre Study Buddy",
       "contrastOn": "Contraste élevé",
-      "contrastOff": "Contraste standard"
+      "contrastOff": "Contraste standard",
+      "showProgressDetails": "Afficher les détails de progression",
+      "hideProgressDetails": "Masquer les détails de progression"
     },
     "insights": {
       "nextUp": "Prochaine étape",
       "results": "Dernier résultat",
-      "attendance": "Présence"
+      "attendance": "Présence",
+      "progressDetails": "Détails de progression"
     },
     "data": {
       "title": "Sources de données",
@@ -129,6 +133,7 @@
       "default": "Dis-moi ton objectif actuel et je prépare un mini plan de semaine."
     },
     "qa": {
+      "jumpButton": "Demander à l’IA",
       "title": "Poser une question rapide",
       "placeholder": "Ex. Que dois-je réviser pour le prochain cours ?",
       "helper": "Fais court et précis pour un conseil rapide.",
