@@ -1,123 +1,16 @@
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 
-const STUDY_BUDDY_MODE_STORAGE_KEY = "studyBuddyCourseMode";
-export const CHAT_SESSION_SECONDS = 10 * 60;
-const studyBuddyModes = [
-  { key: "lesson", label: "Lesson", helper: "Explain the current course topic step by step." },
-  { key: "speaking", label: "Speaking", helper: "Help the student build a spoken answer for this lesson." },
-  { key: "writing", label: "Writing", helper: "Help the student plan and improve writing for this lesson." },
-];
-
-const getStoredStudyBuddyMode = () => {
-  if (typeof window === "undefined") return "lesson";
-  try {
-    const stored = localStorage.getItem(STUDY_BUDDY_MODE_STORAGE_KEY);
-    return studyBuddyModes.some((mode) => mode.key === stored) ? stored : "lesson";
-  } catch (error) {
-    return "lesson";
-  }
+const DEFAULT_STUDY_BUDDY_MODE = "lesson";
+const STUDY_BUDDY_MODE_LABELS = {
+  lesson: "Lesson",
+  speaking: "Speaking",
+  writing: "Writing",
 };
 
-const setStoredStudyBuddyMode = (modeKey) => {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(STUDY_BUDDY_MODE_STORAGE_KEY, modeKey);
-  } catch (error) {
-    // Ignore storage errors.
-  }
-};
+const getStoredStudyBuddyMode = () => DEFAULT_STUDY_BUDDY_MODE;
 
-const getModeLabel = (modeKey) => studyBuddyModes.find((mode) => mode.key === modeKey)?.label || "Lesson";
-const getModeHelper = (modeKey) => studyBuddyModes.find((mode) => mode.key === modeKey)?.helper || studyBuddyModes[0].helper;
-
-const applyModeButtonState = (container, selectedMode) => {
-  if (!container) return;
-  container.querySelectorAll("button[data-study-buddy-mode]").forEach((button) => {
-    const isActive = button.getAttribute("data-study-buddy-mode") === selectedMode;
-    button.setAttribute("aria-pressed", String(isActive));
-    button.style.background = isActive ? "#1d4ed8" : "#fff";
-    button.style.color = isActive ? "#fff" : "#1f2937";
-    button.style.borderColor = isActive ? "#1d4ed8" : "#cbd5e1";
-  });
-  const helper = container.querySelector("[data-study-buddy-mode-helper]");
-  if (helper) helper.textContent = getModeHelper(selectedMode);
-};
-
-const ensureStudyBuddyModeSelector = () => {
-  if (typeof document === "undefined") return;
-  const qaBlock = document.querySelector(".study-buddy-qa-priority");
-  const form = qaBlock?.querySelector(".study-buddy-qa-form");
-  if (!qaBlock || !form || qaBlock.querySelector("[data-study-buddy-mode-selector]")) return;
-
-  const selector = document.createElement("div");
-  selector.setAttribute("data-study-buddy-mode-selector", "true");
-  selector.setAttribute("aria-label", "Choose AI help mode");
-  selector.style.display = "grid";
-  selector.style.gap = "6px";
-  selector.style.margin = "8px 0 10px";
-
-  const buttonRow = document.createElement("div");
-  buttonRow.style.display = "grid";
-  buttonRow.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))";
-  buttonRow.style.gap = "6px";
-
-  studyBuddyModes.forEach((mode) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.textContent = mode.label;
-    button.setAttribute("data-study-buddy-mode", mode.key);
-    button.style.border = "1px solid #cbd5e1";
-    button.style.borderRadius = "999px";
-    button.style.padding = "7px 8px";
-    button.style.fontSize = "0.82rem";
-    button.style.fontWeight = "700";
-    button.style.cursor = "pointer";
-    button.style.whiteSpace = "nowrap";
-    button.addEventListener("click", () => {
-      const previousMode = getStoredStudyBuddyMode();
-      setStoredStudyBuddyMode(mode.key);
-      applyModeButtonState(selector, mode.key);
-      if (typeof window !== "undefined" && previousMode !== mode.key) {
-        window.dispatchEvent(
-          new CustomEvent("studyBuddyModeChange", {
-            detail: { previousMode, mode: mode.key, modeLabel: mode.label },
-          })
-        );
-      }
-    });
-    buttonRow.appendChild(button);
-  });
-
-  const helper = document.createElement("p");
-  helper.setAttribute("data-study-buddy-mode-helper", "true");
-  helper.style.margin = "0";
-  helper.style.color = "#64748b";
-  helper.style.fontSize = "0.78rem";
-  helper.style.lineHeight = "1.4";
-
-  selector.appendChild(buttonRow);
-  selector.appendChild(helper);
-  qaBlock.insertBefore(selector, form);
-  applyModeButtonState(selector, getStoredStudyBuddyMode());
-};
-
-const startStudyBuddyModeSelectorObserver = () => {
-  if (typeof document === "undefined" || typeof window === "undefined") return;
-  const start = () => {
-    ensureStudyBuddyModeSelector();
-    const observer = new MutationObserver(ensureStudyBuddyModeSelector);
-    observer.observe(document.body, { childList: true, subtree: true });
-  };
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start, { once: true });
-  } else {
-    start();
-  }
-};
-
-startStudyBuddyModeSelectorObserver();
+const getModeLabel = (modeKey) => STUDY_BUDDY_MODE_LABELS[modeKey] || STUDY_BUDDY_MODE_LABELS[DEFAULT_STUDY_BUDDY_MODE];
 
 const getBrowserLessonContext = () => {
   if (typeof window === "undefined" || typeof document === "undefined") return {};
@@ -143,15 +36,13 @@ const getBrowserLessonContext = () => {
   };
 };
 
-const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContext }) => {
+const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
   const selectedMode = mode || getStoredStudyBuddyMode();
   const browserContext = getBrowserLessonContext();
   const context = {
     ...browserContext,
     ...(lessonContext && typeof lessonContext === "object" ? lessonContext : {}),
   };
-  const session = sessionContext && typeof sessionContext === "object" ? sessionContext : {};
-  const minutesLeft = Number.isFinite(Number(session.minutesLeft)) ? Number(session.minutesLeft).toFixed(1) : "unknown";
   const contextLines = [
     `Level: ${context.level || "Use the student profile level or the level visible on the page"}`,
     `Current page: ${context.pageTitle || "Course page"}`,
@@ -160,8 +51,6 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContex
     `Topic/headings: ${context.topic || context.visibleHeadings || "Use the current lesson topic if visible"}`,
     `Visible badges/tabs: ${context.visibleBadges || ""}`,
     `Mode: ${getModeLabel(selectedMode)}`,
-    `Session state: ${session.state || "not_started"}`,
-    `Approximate minutes left: ${minutesLeft}`,
   ];
 
   const modeRules = {
@@ -179,7 +68,6 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContex
     "Level rules: A1/A2 = simple English explanation + simple German examples. B1 = correct and help build longer connected sentences. B2 = improve argumentation, connectors and natural expression. C1 = upgrade to advanced, natural, precise German.",
     "For C1 useful replies, include exactly this compact pattern: a short natural response; 'Besser / C1-Version:' with one upgraded sentence; 'Nützlicher Ausdruck:' with one strong C1 phrase and English meaning; one deeper follow-up question. Do not only correct; upgrade.",
     "Current-info safety: if the student asks about current politics, current office holders, current government, current prices, latest news, or anything that may change, do not answer with certainty unless live/current data is provided. Say: 'Bei aktuellen Informationen kann ich mich irren. Bitte prüfe eine aktuelle Quelle.' Then continue language practice with a safe sentence frame.",
-    "If session state is running and only about 1 minute remains, guide toward a short conclusion. If session state is ended, do not continue a long conversation; suggest starting a new session.",
     modeRules[selectedMode] || modeRules.lesson,
     "",
     "CURRENT LESSON CONTEXT:",
@@ -192,15 +80,14 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext, sessionContex
     .join("\n");
 };
 
-export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext, sessionContext }) =>
+export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext }) =>
   callAI({
     path: "/chatbuddy/respond",
     payload: {
-      message: buildCourseFocusedMessage({ message, mode, lessonContext, sessionContext }),
+      message: buildCourseFocusedMessage({ message, mode, lessonContext }),
       level,
       mode: mode || getStoredStudyBuddyMode(),
       lessonContext: lessonContext || null,
-      sessionContext: sessionContext || null,
     },
     idToken,
   });
@@ -218,11 +105,7 @@ const EVENT_LABELS = {
   high_contrast_toggle: "Changed Study Buddy contrast",
   weekly_plan_expand: "Expanded weekly plan",
   weekly_plan_collapse: "Collapsed weekly plan",
-  chat_session_start: "Started chat practice session",
-  chat_session_end: "Ended chat practice session",
-  chat_session_timeout: "Chat practice session timed out",
   umlaut_insert: "Inserted German special character",
-  chat_mode_change: "Changed Study Buddy chat mode",
 };
 
 const sanitizeMetadata = (metadata = {}) => {
