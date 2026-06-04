@@ -7,7 +7,7 @@ import { toDateMs } from "../lib/dateUtils";
 import { fetchAttendanceSummary } from "../services/attendanceService";
 import { fetchResults } from "../services/resultsService";
 import { fetchScoreSummary } from "../services/scoreSummaryService";
-import { logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
+import { CHAT_SESSION_SECONDS, logStudyBuddyUsage, requestStudyBuddyReply } from "../services/studyBuddyService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import "./StudyBuddyBar.css";
 
@@ -15,6 +15,7 @@ const PASS_MARK = 60;
 const ATTENDANCE_TARGET = 80;
 const EXAM_SIMULATION_WINDOW_DAYS = 45;
 const COLLAPSED_PLAN_LIMIT = 2;
+const GERMAN_KEYS = ["ä", "ö", "ü", "ß"];
 
 const toNumber = (value) => {
   const parsed = Number(value);
@@ -44,6 +45,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const { idToken, user } = useAuth();
   const locale = i18n.language;
   const quickQuestionInputRef = useRef(null);
+  const sessionTimeoutLoggedRef = useRef(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isDismissed, setIsDismissed] = useState(true);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
@@ -156,13 +158,61 @@ const StudyBuddyBar = ({ studentProfile }) => {
   const [quickReply, setQuickReply] = useState("");
   const [quickReplyError, setQuickReplyError] = useState("");
   const [isReplyLoading, setIsReplyLoading] = useState(false);
+  const [chatSessionState, setChatSessionState] = useState("idle");
+  const [chatSessionSecondsLeft, setChatSessionSecondsLeft] = useState(CHAT_SESSION_SECONDS);
   const maxQuestionLength = 160;
   const trimmedQuestion = questionInput.trim();
   const isQuestionTooLong = questionInput.length > maxQuestionLength;
-  const isSendDisabled = !trimmedQuestion || isReplyLoading || isQuestionTooLong;
+  const isChatSessionEnded = chatSessionState === "ended";
+  const isSendDisabled = !trimmedQuestion || isReplyLoading || isQuestionTooLong || isChatSessionEnded;
+  const chatSessionLabel = `${String(Math.floor(chatSessionSecondsLeft / 60)).padStart(2, "0")}:${String(chatSessionSecondsLeft % 60).padStart(2, "0")}`;
   const playOpenFeedback = useCallback(() => {
     triggerInteractionFeedback({ sound: "open" });
   }, []);
+  const startChatSession = useCallback(
+    (source = "manual") => {
+      setChatSessionState("running");
+      setChatSessionSecondsLeft(CHAT_SESSION_SECONDS);
+      setQuickReply("");
+      setQuickReplyError("");
+      sessionTimeoutLoggedRef.current = false;
+      trackStudyBuddyEvent("chat_session_start", { source, durationSeconds: CHAT_SESSION_SECONDS });
+    },
+    [trackStudyBuddyEvent]
+  );
+
+  const endChatSession = useCallback(
+    (source = "manual") => {
+      setChatSessionState("ended");
+      setQuickReply(`Session complete 🎉\nYou practised in a focused session.\nStart a new session when you are ready.`);
+      trackStudyBuddyEvent("chat_session_end", { source, secondsLeft: chatSessionSecondsLeft });
+    },
+    [chatSessionSecondsLeft, trackStudyBuddyEvent]
+  );
+
+  const insertGermanKey = useCallback(
+    (character) => {
+      const input = quickQuestionInputRef.current;
+      setQuestionInput((current) => {
+        const start = typeof input?.selectionStart === "number" ? input.selectionStart : current.length;
+        const end = typeof input?.selectionEnd === "number" ? input.selectionEnd : current.length;
+        window.setTimeout(() => {
+          if (!input) return;
+          try {
+            input.focus({ preventScroll: true });
+            const position = start + character.length;
+            input.setSelectionRange(position, position);
+          } catch (error) {
+            input.focus();
+          }
+        }, 0);
+        return `${current.slice(0, start)}${character}${current.slice(end)}`;
+      });
+      trackStudyBuddyEvent("umlaut_insert", { character, input: "course_book_chat" });
+    },
+    [trackStudyBuddyEvent]
+  );
+
 
   const examDaysLeft = useMemo(() => {
     const examDateMs = toDateMs(
@@ -416,6 +466,8 @@ const StudyBuddyBar = ({ studentProfile }) => {
     async (question) => {
       const trimmed = question.trim();
       if (!trimmed) return;
+      if (chatSessionState === "ended") return;
+      if (chatSessionState !== "running") startChatSession("first_message");
       setQuestionInput("");
       setIsReplyLoading(true);
       setQuickReply("");
@@ -435,6 +487,10 @@ const StudyBuddyBar = ({ studentProfile }) => {
           message: trimmed,
           level: resolvedLevel || "B1",
           idToken,
+          sessionContext: {
+            state: chatSessionState === "running" ? "running" : "starting",
+            minutesLeft: chatSessionSecondsLeft / 60,
+          },
         });
         setQuickReply(response?.reply || "");
         if (response?.reply) {
@@ -452,7 +508,7 @@ const StudyBuddyBar = ({ studentProfile }) => {
         setIsReplyLoading(false);
       }
     },
-    [className, idToken, resolvedLevel, studentCode, studentEmail, studentName, t, trackStudyBuddyEvent, user?.uid]
+    [chatSessionSecondsLeft, chatSessionState, className, idToken, resolvedLevel, startChatSession, studentCode, studentEmail, studentName, t, trackStudyBuddyEvent, user?.uid]
   );
 
   const focusQuickQuestion = useCallback(() => {
@@ -526,6 +582,32 @@ const StudyBuddyBar = ({ studentProfile }) => {
     ],
     [focusQuickQuestion, navigate, playOpenFeedback, t, trackStudyBuddyEvent]
   );
+
+  useEffect(() => {
+    if (chatSessionState !== "running") return undefined;
+    const timerId = window.setInterval(() => {
+      setChatSessionSecondsLeft((current) => Math.max(current - 1, 0));
+    }, 1000);
+    return () => window.clearInterval(timerId);
+  }, [chatSessionState]);
+
+  useEffect(() => {
+    if (chatSessionState !== "running" || chatSessionSecondsLeft > 0 || sessionTimeoutLoggedRef.current) return;
+    sessionTimeoutLoggedRef.current = true;
+    setChatSessionState("ended");
+    setQuickReply(
+      `Session complete 🎉\nYou practised for 10 minutes.\nStart a new session when you are ready.\n\nQuick review:\n• Fix 1–2 key grammar points from today.\n• Reuse 2 useful phrases from the lesson.\n• Next task: give a 30-second answer on this topic.`
+    );
+    trackStudyBuddyEvent("chat_session_timeout", { durationSeconds: CHAT_SESSION_SECONDS });
+  }, [chatSessionSecondsLeft, chatSessionState, trackStudyBuddyEvent]);
+
+  useEffect(() => {
+    const handleModeChange = (event) => {
+      trackStudyBuddyEvent("chat_mode_change", event?.detail || {});
+    };
+    window.addEventListener("studyBuddyModeChange", handleModeChange);
+    return () => window.removeEventListener("studyBuddyModeChange", handleModeChange);
+  }, [trackStudyBuddyEvent]);
 
   useEffect(() => {
     try {
@@ -632,6 +714,19 @@ const StudyBuddyBar = ({ studentProfile }) => {
 
           <div className="study-buddy-qa study-buddy-qa-priority">
             <p className="study-buddy-qa-title">{t("studyBuddy.qa.title")}</p>
+            <div className="study-buddy-session-row" aria-live="polite">
+              {chatSessionState === "running" ? (
+                <button type="button" className="study-buddy-session-button" onClick={() => endChatSession("manual")}>End</button>
+              ) : (
+                <button type="button" className="study-buddy-session-button" onClick={() => startChatSession(chatSessionState === "ended" ? "new_session" : "manual")}>
+                  {chatSessionState === "ended" ? "Start new session" : "Start session"}
+                </button>
+              )}
+              <span className="study-buddy-session-timer">Session: {chatSessionLabel}</span>
+            </div>
+            {chatSessionState === "ended" ? (
+              <p className="study-buddy-session-complete">Session complete 🎉 Start a new session when you are ready.</p>
+            ) : null}
             <form
               className="study-buddy-qa-form"
               onSubmit={(event) => {
@@ -647,12 +742,20 @@ const StudyBuddyBar = ({ studentProfile }) => {
                 maxLength={maxQuestionLength}
                 placeholder={t("studyBuddy.qa.placeholder")}
                 onChange={(event) => setQuestionInput(event.target.value)}
-                disabled={isReplyLoading}
+                disabled={isReplyLoading || isChatSessionEnded}
               />
               <button className="study-buddy-qa-button" type="submit" disabled={isSendDisabled}>
                 {t("studyBuddy.qa.send")}
               </button>
             </form>
+            <div className="study-buddy-german-keys" aria-label="German keys">
+              <span>German keys:</span>
+              {GERMAN_KEYS.map((character) => (
+                <button key={character} type="button" onClick={() => insertGermanKey(character)} disabled={isReplyLoading || isChatSessionEnded}>
+                  {character}
+                </button>
+              ))}
+            </div>
             <div className="study-buddy-qa-meta">
               <p className="study-buddy-qa-helper">{t("studyBuddy.qa.helper")}</p>
               <p className={`study-buddy-qa-count${isQuestionTooLong ? " is-warning" : ""}`}>

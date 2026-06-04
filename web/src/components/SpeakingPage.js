@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
 import { requestCustomSpeakingChatReply, requestSpeakingTextAnalysis } from "../services/presentationCoachService";
+import { CHAT_SESSION_SECONDS, logStudentActivity } from "../services/studyBuddyService";
 import { analyzeAudio } from "../services/coachService";
 import { loadSpeakingProgress, saveSpeakingProgress } from "../services/speakingProgressService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
@@ -58,6 +59,7 @@ const formatClock = (date) =>
 
 const waveHeights = [8, 16, 24, 18, 26, 14, 20, 30, 22, 28, 16, 24, 14, 20, 12];
 const MIN_RECORDING_SECONDS = 3;
+const GERMAN_KEYS = ["ä", "ö", "ü", "ß"];
 const audioCaptureConstraints = {
   echoCancellation: true,
   noiseSuppression: true,
@@ -103,6 +105,8 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [customDraftMessage, setCustomDraftMessage] = useState("");
   const [customChatLoading, setCustomChatLoading] = useState(false);
   const [customChatError, setCustomChatError] = useState("");
+  const [customSessionState, setCustomSessionState] = useState("idle");
+  const [customSessionSecondsLeft, setCustomSessionSecondsLeft] = useState(CHAT_SESSION_SECONDS);
   const [lastRubric, setLastRubric] = useState(null);
   const [completedQuestionIds, setCompletedQuestionIds] = useState({});
   const [progressLoaded, setProgressLoaded] = useState(false);
@@ -113,6 +117,8 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const [playingMessageId, setPlayingMessageId] = useState("");
   const [isCompactViewport, setIsCompactViewport] = useState(false);
 
+  const customSessionTimeoutLoggedRef = useRef(false);
+  const customDraftRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const streamRef = useRef(null);
@@ -122,6 +128,9 @@ const SpeakingPage = ({ mode = "exam" }) => {
   const messagesEndRef = useRef(null);
   const customMessagesEndRef = useRef(null);
 
+  const customSessionLabel = `${String(Math.floor(customSessionSecondsLeft / 60)).padStart(2, "0")}:${String(customSessionSecondsLeft % 60).padStart(2, "0")}`;
+  const isCustomSessionEnded = customSessionState === "ended";
+
   const visibleSpeakingTabs = useMemo(
     () => (isCourseMode ? [{ key: "custom", label: "Custom chat" }] : [
       { key: "exam", label: "Exam prompts" },
@@ -130,11 +139,74 @@ const SpeakingPage = ({ mode = "exam" }) => {
     [isCourseMode]
   );
 
+  const logSpeakingChatEvent = (event, metadata = {}) => {
+    logStudentActivity({
+      event,
+      feature: "custom_speaking_chat",
+      studentCode,
+      userId,
+      level: selectedLevel,
+      metadata,
+    }).catch(() => {});
+  };
+
+  const startCustomSession = (source = "manual") => {
+    setCustomSessionState("running");
+    setCustomSessionSecondsLeft(CHAT_SESSION_SECONDS);
+    setCustomChatError("");
+    customSessionTimeoutLoggedRef.current = false;
+    logSpeakingChatEvent("chat_session_start", { source, durationSeconds: CHAT_SESSION_SECONDS });
+  };
+
+  const endCustomSession = (source = "manual") => {
+    setCustomSessionState("ended");
+    appendCustomCoachText(`Session complete 🎉\nYou practised in a focused session.\nStart a new session when you are ready.`);
+    logSpeakingChatEvent("chat_session_end", { source, secondsLeft: customSessionSecondsLeft });
+  };
+
+  const insertCharacterAtCursor = (setter, inputRef, character, inputName) => {
+    const input = inputRef.current;
+    setter((current) => {
+      const start = typeof input?.selectionStart === "number" ? input.selectionStart : current.length;
+      const end = typeof input?.selectionEnd === "number" ? input.selectionEnd : current.length;
+      window.setTimeout(() => {
+        if (!input) return;
+        try {
+          input.focus({ preventScroll: true });
+          const position = start + character.length;
+          input.setSelectionRange(position, position);
+        } catch (error) {
+          input.focus();
+        }
+      }, 0);
+      return `${current.slice(0, start)}${character}${current.slice(end)}`;
+    });
+    logSpeakingChatEvent("umlaut_insert", { character, input: inputName });
+  };
+
   useEffect(() => {
     if (!visibleSpeakingTabs.some((tab) => tab.key === activeSpeakingTab)) {
       setActiveSpeakingTab(visibleSpeakingTabs[0]?.key || "custom");
     }
   }, [activeSpeakingTab, visibleSpeakingTabs]);
+
+  useEffect(() => {
+    if (customSessionState !== "running") return undefined;
+    const timerId = window.setInterval(() => {
+      setCustomSessionSecondsLeft((current) => Math.max(current - 1, 0));
+    }, 1000);
+    return () => window.clearInterval(timerId);
+  }, [customSessionState]);
+
+  useEffect(() => {
+    if (customSessionState !== "running" || customSessionSecondsLeft > 0 || customSessionTimeoutLoggedRef.current) return;
+    customSessionTimeoutLoggedRef.current = true;
+    setCustomSessionState("ended");
+    appendCustomCoachText(
+      `Session complete 🎉\nYou practised for 10 minutes.\nStart a new session when you are ready.\n\nQuick summary:\n• 2 mistakes to fix: choose your top grammar pattern and pronunciation habit from today.\n• 2 useful phrases: reuse one connector and one topic phrase from the chat.\n• Next speaking task: give a 45-second opinion and one reason.`
+    );
+    logSpeakingChatEvent("chat_session_timeout", { durationSeconds: CHAT_SESSION_SECONDS });
+  }, [customSessionSecondsLeft, customSessionState]);
 
   useEffect(() => {
     if (isExamMode && examLevel) {
@@ -392,6 +464,12 @@ const SpeakingPage = ({ mode = "exam" }) => {
       level: selectedLevel,
       history,
       idToken,
+      mode: "Speaking",
+      lessonContext: { lessonTitle: isCourseMode ? "Course Book custom speaking chat" : "Free custom speaking practice" },
+      sessionContext: {
+        state: customSessionState === "running" ? "running" : customSessionState === "ended" ? "ended" : "starting",
+        minutesLeft: customSessionSecondsLeft / 60,
+      },
     });
     return String(response?.reply || "").trim() || "Ich konnte gerade nicht antworten. Bitte versuche es noch einmal.";
   };
@@ -421,7 +499,8 @@ const SpeakingPage = ({ mode = "exam" }) => {
 
   const sendCustomChatMessage = async () => {
     const trimmed = customDraftMessage.trim();
-    if (!trimmed || customChatLoading) return;
+    if (!trimmed || customChatLoading || isCustomSessionEnded) return;
+    if (customSessionState !== "running") startCustomSession("first_message");
 
     const studentMessage = {
       id: `custom-student-${Date.now()}`,
@@ -450,7 +529,8 @@ const SpeakingPage = ({ mode = "exam" }) => {
   };
 
   const startRecording = async (targetMode = activeSpeakingTab) => {
-    if (isRecording || (targetMode === "exam" && !selectedQuestion)) return;
+    if (isRecording || (targetMode === "exam" && !selectedQuestion) || (targetMode === "custom" && isCustomSessionEnded)) return;
+    if (targetMode === "custom" && customSessionState !== "running") startCustomSession("first_voice_message");
     setRecordingError("");
     const recordingTargetMode = targetMode === "custom" ? "custom" : "exam";
 
@@ -724,7 +804,10 @@ const SpeakingPage = ({ mode = "exam" }) => {
                 borderRadius: 999,
                 padding: "8px 14px",
               }}
-              onClick={() => setActiveSpeakingTab(tab.key)}
+              onClick={() => {
+                setActiveSpeakingTab(tab.key);
+                logSpeakingChatEvent("chat_mode_change", { mode: tab.key, modeLabel: tab.label });
+              }}
             >
               {tab.label}
             </button>
@@ -873,6 +956,15 @@ const SpeakingPage = ({ mode = "exam" }) => {
               </div>
 
               <div style={{ borderTop: "1px solid #D1D5DB", padding: 14, background: "#F9FAFB", display: "grid", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }} aria-live="polite">
+                  {customSessionState === "running" ? (
+                    <button type="button" style={{ ...styles.secondaryButton, borderRadius: 999, padding: "5px 10px", fontSize: 12 }} onClick={() => endCustomSession("manual")}>End</button>
+                  ) : (
+                    <button type="button" style={{ ...styles.secondaryButton, borderRadius: 999, padding: "5px 10px", fontSize: 12 }} onClick={() => startCustomSession(customSessionState === "ended" ? "new_session" : "manual")}>{customSessionState === "ended" ? "Start new session" : "Start session"}</button>
+                  )}
+                  <span style={{ fontSize: 12, fontWeight: 800, color: "#047857" }}>Session: {customSessionLabel}</span>
+                </div>
+                {customSessionState === "ended" ? <p style={{ margin: 0, fontSize: 12, color: "#047857" }}>Session complete 🎉 Start a new session when you are ready.</p> : null}
                 <p style={{ margin: 0, fontSize: 12, color: "#047857" }}>
                   Free chat mode: write in German when you can. You may use English if you are stuck.
                 </p>
@@ -882,7 +974,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
                     type="button"
                     style={{ ...styles.primaryButton, width: "fit-content", background: "#059669" }}
                     onClick={isRecording && recordingMode === "custom" ? stopRecording : () => startRecording("custom")}
-                    disabled={customChatLoading || (isRecording && recordingMode !== "custom")}
+                    disabled={customChatLoading || isCustomSessionEnded || (isRecording && recordingMode !== "custom")}
                   >
                     {isRecording && recordingMode === "custom" ? `Stop & Send (${formatTime(recordingSeconds)})` : "🎙️ Record voice"}
                   </button>
@@ -890,6 +982,7 @@ const SpeakingPage = ({ mode = "exam" }) => {
                 </div>
                 <div style={{ display: "flex", gap: 8, flexDirection: isCompactViewport ? "column" : "row" }}>
                   <textarea
+                    ref={customDraftRef}
                     style={{ ...styles.input, minHeight: 56, maxHeight: 120, resize: "vertical" }}
                     placeholder="Start a free German conversation..."
                     value={customDraftMessage}
@@ -900,15 +993,21 @@ const SpeakingPage = ({ mode = "exam" }) => {
                         sendCustomChatMessage();
                       }
                     }}
-                    disabled={customChatLoading}
+                    disabled={customChatLoading || isCustomSessionEnded}
                   />
                   <button
                     style={{ ...styles.primaryButton, borderRadius: 12, minWidth: isCompactViewport ? "100%" : 88, background: "#059669" }}
                     onClick={sendCustomChatMessage}
-                    disabled={customChatLoading}
+                    disabled={customChatLoading || isCustomSessionEnded}
                   >
                     Send
                   </button>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", fontSize: 12, color: "#047857", fontWeight: 800 }} aria-label="German keys">
+                  <span>German keys:</span>
+                  {GERMAN_KEYS.map((character) => (
+                    <button key={character} type="button" style={{ border: "1px solid #A7F3D0", background: "#ECFDF5", borderRadius: 999, minWidth: 28, minHeight: 28, fontWeight: 800, cursor: "pointer" }} onClick={() => insertCharacterAtCursor(setCustomDraftMessage, customDraftRef, character, "custom_speaking_chat")} disabled={customChatLoading || isCustomSessionEnded}>{character}</button>
+                  ))}
                 </div>
               </div>
             </section>
