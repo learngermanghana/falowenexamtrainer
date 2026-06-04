@@ -1,14 +1,43 @@
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 
+const getBrowserLessonContext = () => {
+  if (typeof window === "undefined" || typeof document === "undefined") return {};
+
+  const route = `${window.location.pathname || ""}${window.location.search || ""}`;
+  const pageTitle = document.title || "Falowen course page";
+  const headings = Array.from(document.querySelectorAll("h1, h2, h3"))
+    .map((node) => String(node.textContent || "").trim())
+    .filter(Boolean)
+    .slice(0, 6);
+  const visibleBadges = Array.from(document.querySelectorAll("span, button"))
+    .map((node) => String(node.textContent || "").trim())
+    .filter((text) => /^(A1|A2|B1|B2|C1|Day\s+\d+|Teil\s+\d+|Learn|Speak|Write|Finish)$/i.test(text))
+    .slice(0, 8);
+
+  return {
+    route,
+    pageTitle,
+    lessonTitle: headings[0] || pageTitle,
+    topic: headings.slice(1, 4).join(" · "),
+    visibleHeadings: headings.join(" | "),
+    visibleBadges: visibleBadges.join(" | "),
+  };
+};
+
 const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
-  const context = lessonContext && typeof lessonContext === "object" ? lessonContext : {};
+  const browserContext = getBrowserLessonContext();
+  const context = {
+    ...browserContext,
+    ...(lessonContext && typeof lessonContext === "object" ? lessonContext : {}),
+  };
   const contextLines = [
-    `Level: ${context.level || "Not provided"}`,
+    `Level: ${context.level || "Use the student profile level or the level visible on the page"}`,
     `Current page: ${context.pageTitle || "Course page"}`,
     `Route: ${context.route || ""}`,
     `Lesson title: ${context.lessonTitle || "Not provided"}`,
-    `Topic: ${context.topic || "Use the current lesson topic if visible"}`,
+    `Topic/headings: ${context.topic || context.visibleHeadings || "Use the current lesson topic if visible"}`,
+    `Visible badges/tabs: ${context.visibleBadges || ""}`,
     `Mode: ${mode || "Lesson help"}`,
   ];
 
@@ -18,6 +47,7 @@ const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
     "If the student asks something unrelated, briefly redirect them back to this lesson and give one useful lesson-based example.",
     "Do not give a full final assignment answer. Guide the student step by step and ask them to try.",
     "Keep the answer short and phone-friendly. Use simple English support and short German examples.",
+    "For A1/A2, explain like a beginner. For B1-C1, give stronger Redemittel and structure.",
     "",
     "CURRENT LESSON CONTEXT:",
     ...contextLines,
