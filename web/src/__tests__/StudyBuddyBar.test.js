@@ -34,4 +34,21 @@ describe("StudyBuddyBar", () => {
     expect(screen.getAllByRole("button", { name: /^hide details$/i })).toHaveLength(2);
   });
 
+  it("toggles the progress details disclosure", async () => {
+    const user = userEvent.setup();
+    render(<StudyBuddyBar studentProfile={{ latestScore: 72, attendanceRate: 85 }} />);
+
+    await user.click(screen.getByRole("button", { name: /show details/i }));
+
+    const progressToggle = screen.getByRole("button", { name: /show progress details/i });
+    expect(progressToggle).toHaveAttribute("aria-expanded", "false");
+
+    await user.click(progressToggle);
+
+    expect(screen.getByRole("button", { name: /hide progress details/i })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText(/latest result/i)).toBeInTheDocument();
+    expect(screen.getByText(/attendance/i)).toBeInTheDocument();
+    expect(screen.getByText(/weekly plan/i)).toBeInTheDocument();
+  });
+
 });

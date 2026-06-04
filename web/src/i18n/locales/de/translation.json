@@ -90,6 +90,7 @@
       "course": "Kursbuch",
       "submit": "Aufgabe senden",
       "ai": "Falowen A.I",
+      "calendar": "Lernkalender",
       "exams": "Prüfungsraum"
     },
     "actions": {
@@ -99,12 +100,15 @@
       "reopen": "Study Buddy",
       "reopenAria": "Study Buddy-Leiste wieder öffnen",
       "contrastOn": "Hoher Kontrast",
-      "contrastOff": "Standardkontrast"
+      "contrastOff": "Standardkontrast",
+      "showProgressDetails": "Fortschrittsdetails anzeigen",
+      "hideProgressDetails": "Fortschrittsdetails ausblenden"
     },
     "insights": {
       "nextUp": "Als Nächstes",
       "results": "Letztes Ergebnis",
-      "attendance": "Anwesenheit"
+      "attendance": "Anwesenheit",
+      "progressDetails": "Fortschrittsdetails"
     },
     "data": {
       "title": "Datenquellen",
@@ -129,6 +133,8 @@
       "default": "Sag mir dein aktuelles Ziel, dann erstelle ich einen kurzen Wochenplan."
     },
     "qa": {
+      "jumpButton": "KI fragen",
+      "helper": "Kurz und konkret formulieren, damit der Tipp schneller kommt.",
       "title": "Kurze Frage stellen",
       "placeholder": "z. B. Was soll ich für die nächste Stunde wiederholen?",
       "send": "Senden",

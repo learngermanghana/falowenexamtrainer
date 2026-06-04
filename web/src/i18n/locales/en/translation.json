@@ -90,6 +90,7 @@
       "course": "Course book",
       "submit": "Submit work",
       "ai": "Falowen A.I",
+      "calendar": "Study calendar",
       "exams": "Exams room"
     },
     "actions": {
@@ -99,12 +100,15 @@
       "reopen": "Study Buddy",
       "reopenAria": "Reopen Study Buddy bar",
       "contrastOn": "High contrast",
-      "contrastOff": "Standard contrast"
+      "contrastOff": "Standard contrast",
+      "showProgressDetails": "Show progress details",
+      "hideProgressDetails": "Hide progress details"
     },
     "insights": {
       "nextUp": "Next up",
       "results": "Latest result",
-      "attendance": "Attendance"
+      "attendance": "Attendance",
+      "progressDetails": "Progress details"
     },
     "metrics": {
       "latestResult": "Latest result",
@@ -125,6 +129,7 @@
       "default": "Share your current goal, and I'll build a quick weekly plan for you."
     },
     "qa": {
+      "jumpButton": "Ask AI",
       "title": "Ask a quick question",
       "placeholder": "e.g. What should I revise for the next class?",
       "helper": "Keep it short and focused for a faster tip.",
