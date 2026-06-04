@@ -31,12 +31,13 @@ const SelfLearningWritingTools = ({ writingType, structure = [], usefulLines = [
       style={{
         padding: 12,
         borderRadius: 12,
-        border: "1px solid #fde68a",
-        background: "#fffbeb",
+        border: "1px solid #bfdbfe",
+        background: "#eff6ff",
         lineHeight: 1.7,
       }}
     >
-      <strong>Writing prompts are not shown inside the course.</strong> Use the embedded writing panel below for marking, Redemittel and ideas. Full exam prompts are in the Exam Room.
+      <strong>Use the writing task above.</strong> First understand the topic, then use the writing panel below to plan,
+      write, mark and improve your answer. Full extra exam prompts are still in the Exam Room.
     </div>
 
     <div style={toolCardStyle}>
