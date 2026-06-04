@@ -54,10 +54,16 @@ const parseCorrectionsFromText = (feedback = "") => {
 
 const extractScoreFromFeedback = (feedback = "", maxScore = 25) => {
   const text = String(feedback || "");
-  const slashMatch = text.match(/score\s*:\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/i);
-  if (slashMatch) {
-    const score = Number(slashMatch[1]);
-    const max = Number(slashMatch[2]);
+  const patterns = [
+    /score\s*:\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/i,
+    /score\s*:\s*(\d+(?:\.\d+)?)\s*\//i,
+    /(\d+(?:\.\d+)?)\s*out\s+of\s+(\d+(?:\.\d+)?)/i,
+  ];
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (!match) continue;
+    const score = Number(match[1]);
+    const max = match[2] ? Number(match[2]) : maxScore;
     if (Number.isFinite(score) && Number.isFinite(max) && max > 0) {
       return clamp(Math.round((score / max) * maxScore), 0, maxScore);
     }
@@ -109,30 +115,53 @@ const WritingFeedbackCard = ({
   rubric = null,
   corrections = null,
   simplifiedFeedback = null,
+  structuredFeedback = null,
 }) => {
   const [copyState, setCopyState] = useState("");
+  const structured = structuredFeedback && typeof structuredFeedback === "object" ? structuredFeedback : null;
+  const structuredCorrections = Array.isArray(structured?.corrections) ? structured.corrections : corrections;
+
   const mappedCorrections = useMemo(() => {
-    if (Array.isArray(corrections) && corrections.length) {
-      return corrections
+    if (Array.isArray(structuredCorrections) && structuredCorrections.length) {
+      return structuredCorrections
         .map((item) => ({
           wrong: cleanTags(item?.wrong || ""),
           correct: cleanTags(item?.correct || ""),
           reason: cleanTags(item?.reason || "") || "Use the corrected form for accuracy.",
         }))
-        .filter((item) => item.wrong && item.correct)
+        .filter((item) => item.wrong && item.correct && item.wrong.trim().toLowerCase() !== item.correct.trim().toLowerCase())
         .filter((item) => countWords(item.wrong) <= 18 && countWords(item.correct) <= 18 && countWords(item.reason) <= 20)
-        .slice(0, 4);
+        .slice(0, 5);
     }
-    return parseCorrectionsFromText(feedback).slice(0, 4);
-  }, [corrections, feedback]);
+    return parseCorrectionsFromText(feedback).filter((item) => item.wrong.trim().toLowerCase() !== item.correct.trim().toLowerCase()).slice(0, 5);
+  }, [structuredCorrections, feedback]);
 
   const overall = useMemo(() => {
+    const fromStructuredScore = Number(structured?.score ?? 0);
+    const fromStructuredRubric = Number(structured?.rubric?.overall ?? 0);
+    const fromStructured = fromStructuredScore > 0 ? fromStructuredScore : fromStructuredRubric;
+    if (fromStructured > 0) return fromStructured;
     const fromRubric = Number(rubric?.overall || 0);
     if (fromRubric > 0) return fromRubric;
     return extractScoreFromFeedback(feedback, 25) ?? 0;
-  }, [rubric, feedback]);
+  }, [structured, rubric, feedback]);
 
-  const simple = useMemo(() => toSimpleFeedback(feedback, mappedCorrections, simplifiedFeedback), [feedback, mappedCorrections, simplifiedFeedback]);
+  const activeRubric = structured?.rubric || rubric;
+  const summary = stripMarkdownSections(structured?.summary || "");
+  const strengths = Array.isArray(structured?.strengths) ? structured.strengths.map(stripMarkdownSections).filter(Boolean) : [];
+  const mainIssues = Array.isArray(structured?.mainIssues) ? structured.mainIssues.map(stripMarkdownSections).filter(Boolean) : [];
+  const improvedVersion = stripMarkdownSections(structured?.improvedVersion || "");
+  const nextTask = stripMarkdownSections(structured?.nextTask || "");
+  const simple = useMemo(() => {
+    if (structured) {
+      return {
+        strengths: strengths.length ? strengths : [summary || "You answered the task and your message is understandable."],
+        corrections: mappedCorrections,
+        nextAction: nextTask || simplifiedFeedback?.nextAction || "Rewrite 2 sentences using the corrections above.",
+      };
+    }
+    return toSimpleFeedback(feedback, mappedCorrections, simplifiedFeedback);
+  }, [feedback, mappedCorrections, simplifiedFeedback, structured, strengths, summary, nextTask]);
 
   const handleCopy = async () => {
     const text = [
@@ -140,7 +169,10 @@ const WritingFeedbackCard = ({
       `Score: ${overall}/25`,
       "",
       "What you did well",
-      ...simple.strengths.slice(0, 2).map((s) => `- ${s}`),
+      ...simple.strengths.slice(0, 3).map((s) => `- ${s}`),
+      "",
+      "Main issues",
+      ...(mainIssues.length ? mainIssues.slice(0, 3).map((s) => `- ${s}`) : ["- None listed."]),
       "",
       "Fix these mistakes",
       ...simple.corrections.slice(0, 4).flatMap((c) => [`- ❌ Needs fix: ${c.wrong}`, `  ✅ Better: ${c.correct}`, `  Why: ${c.reason}`]),
@@ -169,29 +201,52 @@ const WritingFeedbackCard = ({
         <div style={{ marginTop: 4, fontWeight: 700 }}>Score: {overall}/25</div>
       </div>
 
+      {summary ? (
+        <div style={styles.card}>
+          <strong>Short summary</strong>
+          <div style={{ marginTop: 6 }}>{summary}</div>
+        </div>
+      ) : null}
+
       <div style={styles.card}>
-        <strong>What you did well</strong>
+        <strong>Strengths</strong>
         <ul style={{ margin: "8px 0 0 18px" }}>
-          {simple.strengths.slice(0, 2).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
+          {simple.strengths.slice(0, 3).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
         </ul>
       </div>
 
+      {mainIssues.length ? (
+        <div style={styles.card}>
+          <strong>Main issues</strong>
+          <ul style={{ margin: "8px 0 0 18px" }}>
+            {mainIssues.slice(0, 4).map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}
+          </ul>
+        </div>
+      ) : null}
+
       <div style={styles.card}>
-        <strong>Fix these mistakes</strong>
+        <strong>Corrections</strong>
         <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
-          {simple.corrections.slice(0, 4).map((item, index) => (
+          {simple.corrections.length ? simple.corrections.slice(0, 5).map((item, index) => (
             <div key={`${item.wrong}-${index}`} style={styles.correctionCard}>
               <div style={styles.wrong}><strong>❌ Needs fix:</strong> {item.wrong}</div>
               <div style={{ height: 6 }} />
               <div style={styles.correct}><strong>✅ Better:</strong> {item.correct}</div>
               <div style={{ marginTop: 6, fontSize: 14 }}><strong>Why:</strong> {item.reason}</div>
             </div>
-          ))}
+          )) : <div>No correction needed.</div>}
         </div>
       </div>
 
+      {improvedVersion ? (
+        <div style={styles.card}>
+          <strong>Improved version</strong>
+          <div style={{ marginTop: 6, whiteSpace: "pre-wrap" }}>{improvedVersion}</div>
+        </div>
+      ) : null}
+
       <div style={styles.card}>
-        <strong>Next action</strong>
+        <strong>Next task</strong>
         <div style={{ marginTop: 6 }}>- {simple.nextAction}</div>
       </div>
 
@@ -205,7 +260,7 @@ const WritingFeedbackCard = ({
           {Object.entries(RUBRIC_LABELS).map(([key, label]) => (
             <div key={key} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 8, padding: "6px 8px" }}>
               <div>{label}</div>
-              <strong>{Number(rubric?.[key] || 0)}</strong>
+              <strong>{Number(activeRubric?.[key] || 0)}</strong>
             </div>
           ))}
         </div>
