@@ -1,11 +1,39 @@
 import { addDoc, collection, db, isFirebaseConfigured, serverTimestamp } from "../firebase";
 import { callAI } from "./aiClient";
 
-export const requestStudyBuddyReply = async ({ message, level, idToken }) =>
+const buildCourseFocusedMessage = ({ message, mode, lessonContext }) => {
+  const context = lessonContext && typeof lessonContext === "object" ? lessonContext : {};
+  const contextLines = [
+    `Level: ${context.level || "Not provided"}`,
+    `Current page: ${context.pageTitle || "Course page"}`,
+    `Route: ${context.route || ""}`,
+    `Lesson title: ${context.lessonTitle || "Not provided"}`,
+    `Topic: ${context.topic || "Use the current lesson topic if visible"}`,
+    `Mode: ${mode || "Lesson help"}`,
+  ];
+
+  return [
+    "You are Falowen Course Assistant inside the Course Book.",
+    "Stay focused on the current lesson, level and task below.",
+    "If the student asks something unrelated, briefly redirect them back to this lesson and give one useful lesson-based example.",
+    "Do not give a full final assignment answer. Guide the student step by step and ask them to try.",
+    "Keep the answer short and phone-friendly. Use simple English support and short German examples.",
+    "",
+    "CURRENT LESSON CONTEXT:",
+    ...contextLines,
+    "",
+    "STUDENT MESSAGE:",
+    message,
+  ]
+    .filter((line) => line !== null && typeof line !== "undefined")
+    .join("\n");
+};
+
+export const requestStudyBuddyReply = async ({ message, level, idToken, mode, lessonContext }) =>
   callAI({
     path: "/chatbuddy/respond",
     payload: {
-      message,
+      message: buildCourseFocusedMessage({ message, mode, lessonContext }),
       level,
     },
     idToken,
