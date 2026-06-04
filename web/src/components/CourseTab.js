@@ -13,7 +13,6 @@ import {
 } from "../data/germanAssignmentCatalog";
 import { FRENCH_A1_SCHEDULE } from "../data/frenchCourseSchedule";
 import ClassMembersTab from "./ClassMembersTab";
-import ResourceLinkRow, { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
 import { resolveAssignmentCanonicalKey } from "../utils/assignmentIdentity";
 import { getAccessibleLevels, LEVEL_ORDER, normalizeCourseLevel } from "../utils/levelAccess";
@@ -218,73 +217,6 @@ const { schedules: mergedCourseSchedules, derivedLevels } = buildLevelSchedules(
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
 const getPracticeEntryKey = (entry) => `day-${entry?.day || "x"}-occ-${entry?.occurrence || 1}`;
-
-const getLessonKey = (lesson) =>
-  [
-    lesson.chapter || lesson.title || "",
-    lesson.video || "",
-    lesson.youtube_link || "",
-    lesson.assignmentId || "",
-    lesson.grammarbook_link || "",
-    lesson.workbook_link || "",
-    Boolean(lesson.assignment),
-  ].join("::");
-
-const LessonList = ({ title, lessons, t }) => {
-  const uniqueLessons = useMemo(() => {
-    const seen = new Set();
-    return lessons.filter((lesson) => {
-      const key = getLessonKey(lesson);
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-  }, [lessons]);
-
-  if (!uniqueLessons.length) return null;
-
-  return (
-    <div style={{ display: "grid", gap: 8 }}>
-      <h4 style={{ margin: 0 }}>{title}</h4>
-      <div style={{ display: "grid", gap: 8 }}>
-        {uniqueLessons.map((lesson, index) => (
-          <div
-            key={`${lesson.chapter || title}-${index}`}
-            style={{
-              padding: 10,
-              borderRadius: 10,
-              border: "1px solid #e5e7eb",
-              background: "#f9fafb",
-              display: "grid",
-              gap: 6,
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-              <div style={{ fontWeight: 700 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : "Resource"}</div>
-              {lesson.assignment ? <span style={styles.badge}>{t("courseTab.assignment")}</span> : null}
-            </div>
-
-            <details>
-              <summary style={{ cursor: "pointer", fontWeight: 700 }}>{t("courseTab.resources")}</summary>
-              <ul style={{ ...styles.checklist, margin: "6px 0 0 0" }}>
-                {lesson.video || lesson.youtube_link ? (
-                  <li>
-                    <a href={lesson.video || lesson.youtube_link} target="_blank" rel="noreferrer">
-                      {RESOURCE_ACTION_LABELS.video}
-                    </a>
-                  </li>
-                ) : null}
-                <ResourceLinkRow label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
-                <ResourceLinkRow label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
-              </ul>
-            </details>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 
 export const getEntryAssignmentKey = (entry, level, occurrence = 1) =>
   resolveAssignmentCanonicalKey({
@@ -1460,30 +1392,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                             >
                               Open Lesson
                             </button>
-                            {isTutorMarked ? (
-                              <button
-                                type="button"
-                                style={styles.secondaryButton}
-                                onClick={() =>
-                                  navigate(
-                                    `/campus/submit?assignmentKey=${encodeURIComponent(entryAssignmentKey)}&assignmentId=${encodeURIComponent(entryAssignmentKey)}`,
-                                    {
-                                    state: {
-                                      assignmentKey: entryAssignmentKey,
-                                      assignmentId: entryAssignmentKey || entry.assignmentId || null,
-                                      canonicalAssignmentId: entryAssignmentKey || entry.assignmentId || null,
-                                      day: entry.day,
-                                      occurrence: entry.occurrence,
-                                      level: selectedCourseLevel,
-                                      assignmentDiagnostics: statusInfo.diagnostics || null,
-                                    },
-                                    }
-                                  )
-                                }
-                              >
-                                Submit this assignment
-                              </button>
-                            ) : null}
                             {isPracticeOnlyEntry ? (
                               <label style={{ display: "grid", gap: 6, justifyItems: "flex-end" }}>
                                 <span style={styles.helperText}>Self-mark completion</span>
@@ -1522,15 +1430,6 @@ const CourseTab = ({ defaultLevel, defaultClassName, program }) => {
                           ) : null}
                         </div>
 
-                        {(lesenHorenList.length || schreibenSprechenList.length) ? (
-                          <details>
-                            <summary style={{ cursor: "pointer", fontWeight: 700 }}>Preview lesson resources</summary>
-                            <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
-                              <LessonList title="Lesen & Hören" lessons={lesenHorenList} t={t} />
-                              <LessonList title="Schreiben & Sprechen" lessons={schreibenSprechenList} t={t} />
-                            </div>
-                          </details>
-                        ) : null}
                       </div>
                     );
                   })}
