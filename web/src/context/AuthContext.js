@@ -28,6 +28,7 @@ import {
   addDoc,
   GoogleAuthProvider,
 } from "../firebase";
+import { getBackendUrl } from "../services/backendUrl";
 
 const AuthContext = createContext();
 
@@ -107,6 +108,100 @@ const normalizeMessagingTokensForState = (tokens = []) =>
       platform: entry.platform || "web",
       lastSeen: toIsoString(entry.lastSeen),
     }));
+
+
+const toMillis = (value) => {
+  if (!value) return NaN;
+  if (value instanceof Timestamp) return value.toDate().getTime();
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const parsed = new Date(value).getTime();
+    return Number.isFinite(parsed) ? parsed : NaN;
+  }
+  if (typeof value === "object" && typeof value.toDate === "function") {
+    return value.toDate().getTime();
+  }
+  return NaN;
+};
+
+const formatDateForLoginError = (value) => {
+  const millis = toMillis(value);
+  if (!Number.isFinite(millis)) return "the recorded end date";
+  return new Intl.DateTimeFormat("en", { year: "numeric", month: "long", day: "numeric" }).format(new Date(millis));
+};
+
+const normalizePaymentStatus = (value) => String(value || "").trim().toLowerCase();
+
+
+const getStudentAccessBlockReason = (profile) => {
+  if (!profile) return "No student profile was found for this login. Please contact support.";
+
+  const status = String(profile.status || "").trim().toLowerCase();
+  if (status && !["active", "paid", "partial", "pending"].includes(status)) {
+    return `Your student account status is ${profile.status}. Please contact support to reactivate it.`;
+  }
+
+  const contractEndMs = toMillis(profile.contractEnd);
+  if (Number.isFinite(contractEndMs) && contractEndMs <= Date.now()) {
+    return `Your student contract ended on ${formatDateForLoginError(profile.contractEnd)}. Please renew your contract or contact support.`;
+  }
+
+  const paymentStatus = normalizePaymentStatus(profile.paymentStatus);
+  if (["failed", "overdue", "rejected", "cancelled", "canceled"].includes(paymentStatus)) {
+    return `Your payment status is ${profile.paymentStatus}. Please complete your payment or contact support.`;
+  }
+
+  return "";
+};
+
+class LoginDiagnosticError extends Error {
+  constructor(message, diagnostic = {}) {
+    super(message);
+    this.name = "LoginDiagnosticError";
+    this.code = diagnostic.code || "auth/login-diagnostic";
+    this.diagnostic = diagnostic;
+  }
+}
+
+const fetchLoginDiagnostic = async (identifier) => {
+  const baseUrl = getBackendUrl();
+  if (!baseUrl || !identifier?.trim()) return null;
+
+  const response = await fetch(`${baseUrl}/auth/login-diagnostics`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier }),
+  });
+
+  const json = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(json?.error || "Could not check this login account.");
+  }
+  return json;
+};
+
+const throwIfDiagnosticBlocksLogin = (diagnostic) => {
+  if (!diagnostic) return;
+  if (diagnostic.reason === "contract_ended") {
+    throw new LoginDiagnosticError(
+      `Your student contract ended on ${diagnostic.contractEndLabel || "the recorded end date"}. Please renew your contract or contact support.`,
+      { ...diagnostic, code: "auth/contract-ended" }
+    );
+  }
+  if (diagnostic.reason === "inactive_status") {
+    throw new LoginDiagnosticError(
+      `Your student account status is ${diagnostic.status || "not active"}. Please contact support to reactivate it.`,
+      { ...diagnostic, code: "auth/account-inactive" }
+    );
+  }
+};
+
+const buildCredentialMismatchError = (identifier) =>
+  new LoginDiagnosticError(
+    `Password mismatch. The password you entered does not match the account for ${identifier}. Please try again or reset your password.`,
+    { code: "auth/password-mismatch" }
+  );
 
 const fetchStudentProfileByEmail = async (email) => {
   if (!email) return null;
@@ -515,8 +610,32 @@ export const AuthProvider = ({ children }) => {
       let normalizedEmail = isEmailLogin ? cleanedIdentifier.toLowerCase() : "";
       let profileFromCode = null;
 
+      let loginDiagnostic = null;
+
+      try {
+        loginDiagnostic = await fetchLoginDiagnostic(cleanedIdentifier);
+        throwIfDiagnosticBlocksLogin(loginDiagnostic);
+      } catch (error) {
+        if (error instanceof LoginDiagnosticError) {
+          throw error;
+        }
+        console.warn("Login diagnostic check failed", error);
+      }
+
       if (!isEmailLogin) {
-        profileFromCode = await fetchStudentProfileByStudentCode(cleanedIdentifier);
+        profileFromCode = loginDiagnostic?.profile || null;
+        if (!profileFromCode) {
+          try {
+            profileFromCode = await fetchStudentProfileByStudentCode(cleanedIdentifier);
+          } catch (error) {
+            if (error?.code === "permission-denied" || error?.code === "auth/permission-denied") {
+              throw new Error(
+                "We could not verify that student code before login because Firestore denied the lookup. Please log in with your email address or contact support."
+              );
+            }
+            throw error;
+          }
+        }
         if (!profileFromCode) {
           throw new Error("Student code not found. Please check and try again.");
         }
@@ -531,6 +650,13 @@ export const AuthProvider = ({ children }) => {
         setIdToken(token);
         const profile =
           profileOverride || (await fetchStudentProfileByEmail(normalizedEmail));
+        const accessBlockReason = getStudentAccessBlockReason(profile);
+        if (accessBlockReason) {
+          await signOut(auth).catch((error) => console.warn("Failed to sign out blocked login", error));
+          setStudentProfile(null);
+          setMessagingToken(null);
+          throw new LoginDiagnosticError(accessBlockReason, { code: "auth/student-access-blocked" });
+        }
         setStudentProfile(profile);
         setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
         const studentId = profile?.id || credential.user.uid;
@@ -561,8 +687,14 @@ export const AuthProvider = ({ children }) => {
       } catch (error) {
         const canAttemptLegacyMigration = ["auth/user-not-found", "auth/invalid-credential"].includes(error?.code);
         if (canAttemptLegacyMigration) {
-          const existingProfile =
-            profileFromCode || (await fetchStudentProfileByEmail(normalizedEmail));
+          let existingProfile = profileFromCode || loginDiagnostic?.profile || null;
+          if (!existingProfile) {
+            try {
+              existingProfile = await fetchStudentProfileByEmail(normalizedEmail);
+            } catch (profileLookupError) {
+              console.warn("Login profile lookup failed after credential error", profileLookupError);
+            }
+          }
 
           const hasLinkedUid = Boolean(existingProfile?.uid);
           if (existingProfile && !hasLinkedUid) {
@@ -606,6 +738,26 @@ export const AuthProvider = ({ children }) => {
           }
         }
 
+        if (["auth/invalid-credential", "auth/wrong-password"].includes(error?.code)) {
+          if (loginDiagnostic?.exists) {
+            throwIfDiagnosticBlocksLogin(loginDiagnostic);
+            throw buildCredentialMismatchError(cleanedIdentifier);
+          }
+
+          try {
+            const diagnostic = await fetchLoginDiagnostic(cleanedIdentifier);
+            if (diagnostic?.exists) {
+              throwIfDiagnosticBlocksLogin(diagnostic);
+              throw buildCredentialMismatchError(cleanedIdentifier);
+            }
+          } catch (diagnosticError) {
+            if (diagnosticError instanceof LoginDiagnosticError) {
+              throw diagnosticError;
+            }
+            console.warn("Login diagnostic check failed after credential error", diagnosticError);
+          }
+        }
+
         throw error;
       }
     },
@@ -638,6 +790,12 @@ export const AuthProvider = ({ children }) => {
     if (existingProfile.role && `${existingProfile.role}`.toLowerCase() !== "student") {
       await signOut(auth);
       throw new Error("Google sign-in is limited to student accounts. Please contact support for access.");
+    }
+
+    const accessBlockReason = getStudentAccessBlockReason(existingProfile);
+    if (accessBlockReason) {
+      await signOut(auth);
+      throw new LoginDiagnosticError(accessBlockReason, { code: "auth/student-access-blocked" });
     }
 
     const studentRef = doc(db, "students", existingProfile.id);

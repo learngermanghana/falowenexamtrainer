@@ -419,6 +419,91 @@ const audioUpload = (req, res, next) => {
   });
 };
 
+
+const formatDateForLoginDiagnostic = (value) => {
+  const date = parseContractEnd(value);
+  if (!date) return "the recorded end date";
+  return new Intl.DateTimeFormat("en", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(date);
+};
+
+const normalizeLoginIdentifier = (value) => String(value || "").trim();
+
+const findStudentForLoginIdentifier = async (db, identifier) => {
+  const cleaned = normalizeLoginIdentifier(identifier);
+  if (!cleaned) return null;
+
+  const studentsRef = db.collection("students");
+  const isEmail = cleaned.includes("@");
+
+  if (isEmail) {
+    const lowerEmail = cleaned.toLowerCase();
+    const candidates = Array.from(new Set([lowerEmail, cleaned]));
+    for (const email of candidates) {
+      const snapshot = await studentsRef.where("email", "==", email).limit(1).get();
+      if (!snapshot.empty) return snapshot.docs[0];
+    }
+    return null;
+  }
+
+  const directDoc = await studentsRef.doc(cleaned).get();
+  if (directDoc.exists) return directDoc;
+
+  const candidates = Array.from(new Set([cleaned, cleaned.toUpperCase(), cleaned.toLowerCase()]));
+  for (const code of candidates) {
+    const studentCodeSnapshot = await studentsRef.where("studentCode", "==", code).limit(1).get();
+    if (!studentCodeSnapshot.empty) return studentCodeSnapshot.docs[0];
+
+    const legacyCodeSnapshot = await studentsRef.where("studentcode", "==", code).limit(1).get();
+    if (!legacyCodeSnapshot.empty) return legacyCodeSnapshot.docs[0];
+  }
+
+  return null;
+};
+
+const buildLoginDiagnosticProfile = (docSnap) => {
+  if (!docSnap?.exists) return null;
+  const data = docSnap.data() || {};
+  return {
+    id: docSnap.id,
+    uid: data.uid || "",
+    email: data.email || "",
+    role: data.role || "student",
+    status: data.status || "",
+    studentCode: data.studentCode || data.studentcode || docSnap.id,
+    studentcode: data.studentcode || data.studentCode || docSnap.id,
+    level: data.level || "",
+    contractEnd: data.contractEnd || "",
+    paymentStatus: data.paymentStatus || "",
+  };
+};
+
+const buildLoginDiagnostic = (profile) => {
+  if (!profile) return { exists: false, reason: "not_found" };
+
+  const status = String(profile.status || "").trim().toLowerCase();
+  if (status && !["active", "paid", "partial", "pending"].includes(status)) {
+    return {
+      exists: true,
+      reason: "inactive_status",
+      status: profile.status,
+      profile,
+    };
+  }
+
+  const contractEnd = parseContractEnd(profile.contractEnd);
+  if (contractEnd && contractEnd.getTime() <= Date.now()) {
+    return {
+      exists: true,
+      reason: "contract_ended",
+      contractEnd: contractEnd.toISOString(),
+      contractEndLabel: formatDateForLoginDiagnostic(profile.contractEnd),
+      profile,
+    };
+  }
+
+  return { exists: true, reason: "active", profile };
+};
+
 const app = express();
 
 app.use(cors({ origin: true }));
@@ -446,6 +531,25 @@ app.get("/metrics", (_req, res) => {
     metrics: snapshot,
     memory: process.memoryUsage(),
   });
+});
+
+app.post("/auth/login-diagnostics", async (req, res) => {
+  try {
+    const identifier = normalizeLoginIdentifier(req.body?.identifier);
+    if (!identifier) {
+      return res.status(400).json({ error: "Email or student code is required" });
+    }
+
+    const db = getFirestoreSafe();
+    if (!db) return res.status(503).json({ error: "Firestore not available" });
+
+    const docSnap = await findStudentForLoginIdentifier(db, identifier);
+    const profile = buildLoginDiagnosticProfile(docSnap);
+    return res.json(buildLoginDiagnostic(profile));
+  } catch (err) {
+    log.error("auth.login_diagnostics_failed", { error: err?.message || err });
+    return res.status(500).json({ error: err?.message || "Could not check login account" });
+  }
 });
 
 app.post("/webhooks/zoom", async (req, res) => {

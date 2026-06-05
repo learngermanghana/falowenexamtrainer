@@ -31,8 +31,18 @@ const formatAuthErrorMessage = (error, mode = "login") => {
         return "We could not find an account with these details. Please check your email/student code or create an account.";
       case "auth/too-many-requests":
         return "Too many login attempts were made. Please wait a few minutes and try again, or reset your password.";
+      case "auth/password-mismatch":
+        return error?.message || "Password mismatch. The password you entered does not match this student account.";
+      case "auth/contract-ended":
+      case "auth/account-inactive":
+      case "auth/student-access-blocked":
+      case "auth/login-diagnostic":
+        return error?.message || "This student account cannot log in right now. Please contact support.";
       case "auth/user-disabled":
         return "This account is currently disabled. Please contact support for help.";
+      case "auth/permission-denied":
+      case "permission-denied":
+        return error?.message || "Firestore denied access while checking this login. Please contact support.";
       case "auth/network-request-failed":
         return "We could not connect to the internet. Please check your connection and try again.";
       default:
