@@ -121,6 +121,78 @@ const renderList = (items = []) => {
   return <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>{items.map((item) => <li key={item}>{item}</li>)}</ul>;
 };
 
+const splitIntoSentences = (text = "") => {
+  const matches = String(text || "").match(/[^.!?]+[.!?]?/g) || [];
+  return matches.map((sentence) => sentence.trim()).filter(Boolean);
+};
+
+const parseWritingTask = (taskText = "", builderStructure = []) => {
+  const cleaned = String(taskText || "").replace(/^Schreiben:\s*/i, "").trim();
+  const marker = cleaned.match(/bearbeiten Sie alle Punkte:\s*/i);
+
+  if (marker) {
+    const before = cleaned.slice(0, marker.index).trim();
+    const after = cleaned.slice(marker.index + marker[0].length).trim();
+    const beforeSentences = splitIntoSentences(before);
+    const points = splitIntoSentences(after);
+    return {
+      context: beforeSentences.slice(0, -1).join(" ") || "Schreibaufgabe",
+      prompt: beforeSentences.slice(-1)[0] || before || "Schreibaufgabe",
+      points,
+    };
+  }
+
+  const sentences = splitIntoSentences(cleaned);
+  const directiveIndex = sentences.findIndex((sentence, index) => index > 0 && /^(Äußern|Nennen|Beschreiben|Machen|Zeigen|Bitten|Erklären|Argumentieren|Erläutern|Fragen|Schildern) Sie\b/i.test(sentence));
+
+  if (directiveIndex > 0) {
+    const beforeSentences = sentences.slice(0, directiveIndex);
+    return {
+      context: beforeSentences.slice(0, -1).join(" ") || "Schreibaufgabe",
+      prompt: beforeSentences.slice(-1)[0] || beforeSentences.join(" "),
+      points: sentences.slice(directiveIndex),
+    };
+  }
+
+  const structurePoints = (builderStructure || [])
+    .filter((item) => /^(Erklären|Argumentieren|Nennen|Erläutern|Äußern|Beschreiben|Machen|Zeigen|Bitten) Sie/i.test(item))
+    .map((item) => item.replace(/^[^:]+:\s*/, ""));
+
+  return {
+    context: "Schreibaufgabe",
+    prompt: cleaned,
+    points: structurePoints,
+  };
+};
+
+const WritingTaskCard = ({ writingType, writingTask, structure }) => {
+  const formattedTask = parseWritingTask(writingTask, structure);
+
+  return (
+    <div style={{ border: "1px solid #d1d5db", borderRadius: 16, background: "#fff", overflow: "hidden", display: "grid" }}>
+      <div style={{ padding: "14px 16px", borderBottom: "1px solid #e5e7eb", background: "#f8fafc", display: "flex", gap: 10, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}>
+        <strong>Schreiben Aufgabe</strong>
+        <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{writingType}</span>
+      </div>
+
+      <div style={{ padding: "18px 18px 12px", display: "grid", gap: 14 }}>
+        {formattedTask.context ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>{formattedTask.context}</p> : null}
+        <div style={{ border: "1px solid #111827", padding: "18px 20px", borderRadius: 4, background: "#ffffff", fontSize: "1.05rem", lineHeight: 1.65 }}>
+          {formattedTask.prompt}
+        </div>
+        {formattedTask.points?.length ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            <strong>Bearbeiten Sie diese Punkte:</strong>
+            <ul style={{ margin: 0, paddingLeft: 24, lineHeight: 1.8 }}>
+              {formattedTask.points.map((point) => <li key={point}>{point}</li>)}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+};
+
 const ExternalResourceCard = ({ title, resource }) => {
   if (!resource) return null;
   return (
@@ -247,10 +319,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           </Section>
 
           <Section title="Writing focus for this level">
-            <PracticeBox title="Writing task">
-              <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
-              <p style={{ margin: 0, lineHeight: 1.7 }}>{writingTask}</p>
-            </PracticeBox>
+            <WritingTaskCard writingType={writingType} writingTask={writingTask} structure={lesson.writingBuilder?.structure} />
             {lesson.writingBuilder?.structure?.length ? <PracticeBox title="Structure">{renderList(lesson.writingBuilder.structure)}</PracticeBox> : null}
             {lesson.writingBuilder?.usefulLines?.length ? <PracticeBox title="Useful lines">{renderList(lesson.writingBuilder.usefulLines)}</PracticeBox> : null}
             {lesson.grammarLesson?.miniExercise ? <PracticeBox title="Mini exercise"><p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}
@@ -291,10 +360,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
                 <NoteBox><strong>No tutor submission for {lesson.level}.</strong> Learn the topic, practise with Falowen AI, read feedback, improve your answer and self-mark honestly.</NoteBox>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
                   <PracticeBox title="Sprechen topic"><p style={{ margin: 0, lineHeight: 1.6 }}>{speakingTopic}</p></PracticeBox>
-                  <PracticeBox title="Schreiben task">
-                    <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
-                    <p style={{ margin: 0, lineHeight: 1.6 }}>{writingTask}</p>
-                  </PracticeBox>
+                  <WritingTaskCard writingType={writingType} writingTask={writingTask} structure={lesson.writingBuilder?.structure} />
                 </div>
               </Section>
 
@@ -329,10 +395,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
           {activeTab === "write" ? (
             <Section title="Writing support">
-              <PracticeBox title="Writing task">
-                <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
-                <p style={{ margin: 0, lineHeight: 1.7 }}>{writingTask}</p>
-              </PracticeBox>
+              <WritingTaskCard writingType={writingType} writingTask={writingTask} structure={lesson.writingBuilder?.structure} />
               <EmbeddedWritingPracticePanel />
             </Section>
           ) : null}
