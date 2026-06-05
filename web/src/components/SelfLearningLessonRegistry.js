@@ -1,7 +1,9 @@
 import React from "react";
 import SelfLearningEditableLessonPageV2 from "./SelfLearningEditableLessonPageV2";
 import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearningLesson";
+import c1Day0Orientation from "../data/selfLearningLessons/c1/day0Orientation";
 import c1Day1ZieleUndLernweg from "../data/selfLearningLessons/c1/day1ZieleUndLernweg";
+import b2Day0Orientation from "../data/selfLearningLessons/b2/day0Orientation";
 import b2Day1PersoenlicheIdentitaet from "../data/selfLearningLessons/b2/day1PersoenlicheIdentitaet";
 import b2Day2AlltagUndZeitmanagement from "../data/selfLearningLessons/b2/day2AlltagUndZeitmanagement";
 import b2Day3ArbeitUndBeruf from "../data/selfLearningLessons/b2/day3ArbeitUndBeruf";
@@ -66,6 +68,7 @@ const b2FallbackLessons = [
 
 export const SELF_LEARNING_LESSONS = {
   B2: [
+    b2Day0Orientation,
     b2Day1PersoenlicheIdentitaet,
     b2Day2AlltagUndZeitmanagement,
     b2Day3ArbeitUndBeruf,
@@ -73,7 +76,7 @@ export const SELF_LEARNING_LESSONS = {
     b2Day5GesundheitUndWohlbefinden,
     ...b2FallbackLessons,
   ],
-  C1: [c1Day1ZieleUndLernweg, ...c1FallbackLessons],
+  C1: [c1Day0Orientation, c1Day1ZieleUndLernweg, ...c1FallbackLessons],
 };
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;

@@ -10,12 +10,19 @@ const makeB2ScheduleEntry = ({ day, chapter, topic, goal, grammar_topic }) => ({
     video: null,
     youtube_link: null,
     grammarbook_link: null,
-    workbook_link: `/campus/course/lesson/B2/${day}`,
+    workbook_link: day === 0 ? "/campus/course/b2-day-0-self-learning-orientation-workbook" : `/campus/course/lesson/B2/${day}`,
     assignment: false,
   },
 });
 
 export const B2_SELF_LEARNING_COURSE_SCHEDULE = [
+  makeB2ScheduleEntry({
+    day: 0,
+    chapter: "0",
+    topic: "Day 0 Orientation",
+    goal: "Start here to learn the B2 self-learning workflow before Day 1.",
+    grammar_topic: "Course orientation, writing workflow and honest self-marking",
+  }),
   makeB2ScheduleEntry({
     day: 1,
     chapter: "1.1",

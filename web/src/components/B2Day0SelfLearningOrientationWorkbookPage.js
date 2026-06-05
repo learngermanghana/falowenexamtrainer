@@ -5,6 +5,40 @@ import { styles } from "../styles";
 const day0HeroImage =
   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80";
 
+
+const b2WritingOrientation = {
+  taskType: "Reflective opinion essay / Persönlicher Beitrag",
+  task: "Schreiben: Wer bin ich online – wer bin ich offline? Beschreibe Unterschiede, nenne Beispiele und erkläre deine Meinung.",
+  structure: [
+    "Einleitung: Stelle das Thema Online-Identität und echte Identität vor.",
+    "Hauptteil 1: Beschreibe, wie du dich im echten Leben siehst.",
+    "Hauptteil 2: Erkläre, ob du online anders wirkst und warum.",
+    "Hauptteil 3: Nenne ein Beispiel aus Alltag, Schule, Arbeit oder sozialen Medien.",
+    "Schluss: Formuliere deine Meinung: Sollte man online authentisch sein?",
+  ],
+  redemittel: [
+    "In der heutigen Zeit spielt die Online-Identität eine immer größere Rolle.",
+    "Im echten Leben würde ich mich eher als ... beschreiben.",
+    "In sozialen Medien zeigen Menschen oft nur eine bestimmte Seite von sich.",
+    "Meiner Meinung nach sollte man online nicht perfekt wirken wollen, sondern authentisch bleiben.",
+    "Zusammenfassend lässt sich sagen, dass Identität aus vielen Erfahrungen und Entscheidungen besteht.",
+  ],
+  tools: [
+    {
+      title: "Mark my letter",
+      description: "Paste your finished draft in the writing panel and get a score, corrections, feedback and a better version.",
+    },
+    {
+      title: "Ref / Redemittel",
+      description: "Use the writing panel to save useful phrases, structure lines and reference notes before you write.",
+    },
+    {
+      title: "Ideas generator",
+      description: "Use the writing panel to build ideas, examples and a simple writing plan before drafting.",
+    },
+  ],
+};
+
 const SectionCard = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 10 }}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -353,6 +387,46 @@ const B2Day0ProgressionWorkbookPage = () => {
           <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
             Open Writing Practice
           </a>
+        </p>
+      </SectionCard>
+
+      <SectionCard title="B2 Day 0 writing support moved here">
+        <p style={{ margin: 0 }}>
+          The lesson Writing tab is now kept short and focused. Use the writing task below to understand the topic,
+          then use the writing panel in the lesson to plan, write, mark and improve your answer.
+        </p>
+
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+          <strong>Writing task</strong>
+          <span style={{ ...styles.badge, justifySelf: "start" }}>{b2WritingOrientation.taskType}</span>
+          <p style={{ margin: 0 }}>{b2WritingOrientation.task}</p>
+        </div>
+
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+          <strong>Structure guide</strong>
+          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+            {b2WritingOrientation.structure.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+          <strong>Redemittel preview</strong>
+          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+            {b2WritingOrientation.redemittel.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+          {b2WritingOrientation.tools.map((tool) => (
+            <div key={tool.title} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 6 }}>
+              <strong>{tool.title}</strong>
+              <p style={{ margin: 0 }}>{tool.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ margin: 0 }}>
+          Practise inside the lesson: write your answer, mark it, collect Redemittel and improve without leaving the course lesson.
         </p>
       </SectionCard>
 
