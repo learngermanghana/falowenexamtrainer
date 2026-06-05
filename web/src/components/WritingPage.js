@@ -1580,6 +1580,17 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     return extractErrorBank(latest.feedback).slice(0, 3);
   }, [draftHistory]);
 
+  const toggleFormAnswers = (taskId) => {
+    setRevealedFormAnswers((prev) => ({
+      ...prev,
+      [taskId]: !prev[taskId],
+    }));
+  };
+
+  const resetFormAnswers = () => {
+    setRevealedFormAnswers({});
+  };
+
   const handleAskCoach = async () => {
     const trimmed = ideaInput.trim();
     if (!trimmed || ideasLoading) return;
@@ -1838,6 +1849,92 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                 })}
               </div>
             )}
+          </section>
+        </>
+      )}
+
+      {activeTab === "forms" && canUseFormsPractice && (
+        <>
+          <section style={styles.card}>
+            <h3 style={styles.sectionTitle}>A1 form practice – Teil 1</h3>
+            <p style={styles.helperText}>
+              Practise reading a short situation and completing a simple German form. Try the blanks first, then reveal the model answers.
+            </p>
+            <div style={{ marginTop: 12 }}>
+              <button
+                type="button"
+                style={styles.secondaryButton}
+                onClick={resetFormAnswers}
+                disabled={Object.keys(revealedFormAnswers).length === 0}
+              >
+                Hide all answers
+              </button>
+            </div>
+          </section>
+
+          <section style={styles.card}>
+            <div style={styles.gridTwo}>
+              {A1_FORM_PRACTICE_TASKS.map((task) => {
+                const answersVisible = Boolean(revealedFormAnswers[task.id]);
+
+                return (
+                  <article key={task.id} style={styles.helperCard}>
+                    <div style={styles.metaRow}>
+                      <h4 style={{ ...styles.resultHeading, margin: 0 }}>{task.title}</h4>
+                      <span style={styles.levelPill}>A1 Teil 1</span>
+                    </div>
+                    <p style={styles.helperText}>{task.context}</p>
+                    <p style={{ margin: "8px 0", fontWeight: 700 }}>{task.prompt}</p>
+
+                    <div
+                      style={{
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 12,
+                        overflow: "hidden",
+                        background: "#ffffff",
+                      }}
+                    >
+                      {task.formFields.map((field) => (
+                        <div
+                          key={`${task.id}-${field.label}`}
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "minmax(120px, 0.9fr) minmax(140px, 1.1fr)",
+                            gap: 8,
+                            padding: "8px 10px",
+                            borderBottom: "1px solid #f3f4f6",
+                          }}
+                        >
+                          <strong>{field.label}</strong>
+                          <span>{field.value}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      style={{ ...styles.primaryButton, marginTop: 12 }}
+                      onClick={() => toggleFormAnswers(task.id)}
+                    >
+                      {answersVisible ? "Hide answers" : "Reveal answers"}
+                    </button>
+
+                    {answersVisible && (
+                      <div style={{ ...styles.successBox, marginTop: 12 }}>
+                        <strong>Model answers</strong>
+                        <ol style={{ margin: "8px 0 0 18px", padding: 0 }}>
+                          {task.answers.map((item) => (
+                            <li key={`${task.id}-${item.blank}`} style={{ marginBottom: 6 }}>
+                              <strong>{item.blank} {item.answer}</strong> – {item.explanation}
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
           </section>
         </>
       )}
