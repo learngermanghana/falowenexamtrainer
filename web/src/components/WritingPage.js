@@ -28,8 +28,7 @@ const DEFAULT_EXAM_TIMINGS = {
 const IDEA_COACH_INTRO = {
   id: "intro",
   role: "assistant",
-  content:
-    "This is a chat between you and the ideas generator. Paste your exam question or draft idea, and I'll guide you step by step with Herr Felix's coaching prompts.",
+  content: "Paste your task or draft. Herr Felix will guide you step by step until your letter is ready.",
 };
 
 const WORD_TARGETS = {
@@ -49,9 +48,9 @@ const WORD_TARGET_RANGES = {
 };
 
 const IDEAS_COACHING_PROMPTS = [
-  "Start with the task and ask: What is unclear to me?",
-  "Request a short explanation and one example sentence.",
-  "End by summarizing the idea in your own words.",
+  "Paste the task or your draft.",
+  "Ask what is unclear, then request one short explanation and one example sentence.",
+  "Summarize the idea in your own words before sending your draft to Mark my letter.",
 ];
 const GERMAN_SPECIAL_CHARACTERS = ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"];
 
@@ -386,6 +385,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [ideaDraftWorkspace, setIdeaDraftWorkspace] = useState("");
   const [referenceInput, setReferenceInput] = useState("");
   const [referenceNotes, setReferenceNotes] = useState([]);
+  const [editingReferenceNote, setEditingReferenceNote] = useState(null);
+  const [referenceEditInput, setReferenceEditInput] = useState("");
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
@@ -505,6 +506,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setIdeaDraftWorkspace("");
     setReferenceInput("");
     setReferenceNotes([]);
+    setEditingReferenceNote(null);
+    setReferenceEditInput("");
     setIdeaError("");
     setIdeaSuccess("");
     setTutorSaveState({ loading: false, success: "", error: "" });
@@ -865,8 +868,50 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setIdeaSuccess("Reference note saved.");
   };
 
+  const startEditingReferenceNote = (note) => {
+    setEditingReferenceNote(note);
+    setReferenceEditInput(note);
+    setIdeaError("");
+    setIdeaSuccess("");
+  };
+
+  const cancelEditingReferenceNote = () => {
+    setEditingReferenceNote(null);
+    setReferenceEditInput("");
+    setIdeaError("");
+  };
+
+  const saveEditedReferenceNote = (originalNote) => {
+    const normalized = referenceEditInput.trim().replace(/\s+/g, " ");
+
+    if (!normalized) {
+      setIdeaError("Reference notes cannot be empty.");
+      setIdeaSuccess("");
+      return;
+    }
+
+    const alreadyExists = referenceNotes.some(
+      (note) => note !== originalNote && note.toLowerCase() === normalized.toLowerCase()
+    );
+
+    if (alreadyExists) {
+      setIdeaError("That note is already saved in your references.");
+      setIdeaSuccess("");
+      return;
+    }
+
+    setReferenceNotes((prev) => prev.map((note) => (note === originalNote ? normalized : note)));
+    setEditingReferenceNote(null);
+    setReferenceEditInput("");
+    setIdeaSuccess("Reference note updated.");
+    setIdeaError("");
+  };
+
   const removeReferenceNote = (noteToRemove) => {
     setReferenceNotes((prev) => prev.filter((note) => note !== noteToRemove));
+    if (editingReferenceNote === noteToRemove) {
+      cancelEditingReferenceNote();
+    }
   };
 
   const handleExportDraft = () => {
@@ -1941,13 +1986,10 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         <section style={styles.card} className="idea-generator-card">
           <h3 style={styles.sectionTitle}>Idea generator</h3>
           <p style={styles.helperText}>
-            Paste your task and chat in a single field. Herr Felix replies step by step with the updated coaching prompt.
-          </p>
-          <p style={styles.helperText}>
-            Your first pasted question stays pinned here so you can reference it while writing. Keep checking the task bullet points too.
+            Paste your task or draft, then ask Herr Felix for one clear next step.
           </p>
           <div style={styles.infoBox}>
-            <strong>Use the coach to learn from your ideas:</strong>
+            <strong>How to use the ideas coach:</strong>
             <ul style={styles.promptList}>
               {IDEAS_COACHING_PROMPTS.map((prompt) => (
                 <li key={prompt}>{prompt}</li>
@@ -2109,14 +2151,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           <div style={{ marginTop: 16 }}>
             <h4 style={styles.resultHeading}>Preview & quick copy</h4>
             <p style={styles.helperText}>
-              Keep one running draft box so students can keep building and refining what they type.
+              Build one draft here, then send it to Mark my letter.
             </p>
             <div
               style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
               className="idea-generator-panel"
             >
               <div>
-                <label style={styles.label}>Single draft workspace</label>
+                <label style={styles.label}>Draft workspace</label>
                 <textarea
                   ref={ideasWorkspaceRef}
                   style={styles.textareaSmall}
@@ -2126,7 +2168,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                     setIdeaError("");
                     setIdeaSuccess("");
                   }}
-                  placeholder="Your best evolving draft stays here. Keep refining it before sending to Mark my letter."
+                  placeholder="Write your best draft here before sending it to Mark my letter."
                 />
                 <SpecialCharacterRow
                   label="Quick umlaut keys for this draft"
@@ -2154,7 +2196,7 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         <section style={styles.card}>
           <h3 style={styles.sectionTitle}>References (notes)</h3>
           <p style={styles.helperText}>
-            Save important words and phrases here, then quickly reuse them while writing.
+            Save useful sentence starters and corrections, then reuse or edit them when needed.
           </p>
           <div style={{ ...styles.infoBox, marginBottom: 12 }}>
             <strong>Tip:</strong> Keep short sentence starters, formal phrases, and connector words you want to remember.
@@ -2208,23 +2250,52 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
                       alignItems: "flex-start",
                     }}
                   >
-                    <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{note}</div>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        style={styles.secondaryButton}
-                        onClick={() => setTypedAnswer((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
-                      >
-                        Add to letter
-                      </button>
-                      <button
-                        type="button"
-                        style={styles.dangerButton}
-                        onClick={() => removeReferenceNote(note)}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                    {editingReferenceNote === note ? (
+                      <div style={{ flex: 1, display: "grid", gap: 8 }}>
+                        <label style={styles.label}>Edit reference note</label>
+                        <textarea
+                          style={styles.textareaSmall}
+                          rows={3}
+                          value={referenceEditInput}
+                          onChange={(event) => {
+                            setReferenceEditInput(event.target.value);
+                            setIdeaError("");
+                            setIdeaSuccess("");
+                          }}
+                        />
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <button type="button" style={styles.primaryButton} onClick={() => saveEditedReferenceNote(note)}>
+                            Save edit
+                          </button>
+                          <button type="button" style={styles.secondaryButton} onClick={cancelEditingReferenceNote}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5, flex: 1 }}>{note}</div>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <button
+                            type="button"
+                            style={styles.secondaryButton}
+                            onClick={() => setTypedAnswer((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
+                          >
+                            Add to letter
+                          </button>
+                          <button type="button" style={styles.secondaryButton} onClick={() => startEditingReferenceNote(note)}>
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            style={styles.dangerButton}
+                            onClick={() => removeReferenceNote(note)}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
