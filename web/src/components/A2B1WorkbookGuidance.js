@@ -27,7 +27,7 @@ export const A2B1WorkbookGuidance = ({ showClassNotes = true, compactNotes = tru
               style={{ ...styles.secondaryButton, background: showNotes ? "#1d4ed8" : "#ffffff", color: showNotes ? "#ffffff" : "#1d4ed8", borderColor: "#93c5fd" }}
               onClick={() => setShowNotes((current) => !current)}
             >
-              {showNotes ? "Hide Class Notes" : "Open Class Notes"}
+              {showNotes ? "Hide Class Notes" : "Teil 5 · Class Notes"}
             </button>
           ) : null}
         </div>
@@ -42,7 +42,7 @@ export const A2B1WorkbookGuidance = ({ showClassNotes = true, compactNotes = tru
           </p>
           {showClassNotes ? (
             <p style={{ margin: 0 }}>
-              <strong>Class Notes</strong> saves Zoom vocabulary, corrections, reminders and student questions for this exact lesson and class.
+              <strong>Teil 5 · Class Notes</strong> saves vocabulary, Zoom notes, short tutor suggestions and student questions for this exact lesson and class.
             </p>
           ) : null}
         </div>
