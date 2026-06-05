@@ -283,13 +283,15 @@ const A2Day17InDieApothekeGehenWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über einen Besuch in der Apotheke. Zuerst erkläre ich mein Problem, zum Beispiel: Ich habe Kopfschmerzen oder Husten. Dann frage ich nach einem Medikament, weil ich schnell Hilfe brauche. Außerdem sage ich, ob ich Allergien habe oder andere Medikamente nehme. Zum Beispiel frage ich: Wie oft soll ich die Tabletten nehmen? Zum Schluss bedanke ich mich und lese die Packungsbeilage zu Hause.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

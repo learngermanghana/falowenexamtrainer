@@ -163,13 +163,15 @@ export default function A2Day25TagesablaufWorkbookPage() {
           </ul>
         </div>
       </div>
+
+      <SpeakingPracticeTimerCard />
+
       <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
         <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
         <p style={{ margin: 0, lineHeight: 1.7 }}>
           „Heute spreche ich über meinen Tagesablauf. Zuerst stehe ich um sieben Uhr auf und frühstücke. Dann gehe ich zur Arbeit oder zum Deutschkurs, weil ich lernen und arbeiten muss. Am Nachmittag mache ich Hausaufgaben und kaufe ein. Am Abend koche ich, sehe eine Serie oder telefoniere mit meiner Familie. Zum Schluss finde ich: Ein klarer Tagesablauf hilft mir, weil ich weniger Stress habe.“
         </p>
       </div>
-      <SpeakingPracticeTimerCard />
       <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
             <CourseInlinePracticePanel
         type="speaking"

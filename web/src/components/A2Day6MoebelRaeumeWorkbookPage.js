@@ -372,6 +372,8 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
             </div>
           </div>
 
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Kurzes Modell (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -381,7 +383,6 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
               kann ich sagen: Mein Wohnzimmer ist praktisch und modern.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

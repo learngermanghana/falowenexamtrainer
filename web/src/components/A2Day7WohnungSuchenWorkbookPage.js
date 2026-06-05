@@ -329,6 +329,8 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
             </div>
           </div>
 
+          <SpeakingPracticeTimerCard />
+
           <div style={questionCardStyle}>
             <strong>Kurzes Modell (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -338,7 +340,6 @@ const A2Day7WohnungSuchenWorkbookPage = () => {
               Zusammenfassend sind für mich Preis, Lage und eine gute Verbindung mit Bus oder Bahn am wichtigsten.
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

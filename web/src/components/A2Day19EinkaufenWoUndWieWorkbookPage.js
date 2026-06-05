@@ -353,13 +353,15 @@ const A2Day19EinkaufenWoUndWieWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über Einkaufen. Ich kaufe oft im Supermarkt ein, weil es dort viele Produkte gibt. Manchmal kaufe ich auch online, deshalb spare ich Zeit. Aber im Geschäft kann ich die Ware sehen und Fragen stellen. Zum Beispiel kaufe ich Lebensmittel im Supermarkt und Kleidung manchmal online. Zum Schluss finde ich: Beide Möglichkeiten sind gut, aber es kommt auf die Situation an.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

@@ -271,6 +271,18 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
               </ul>
             </div>
           </div>
+
+          <h3 style={sectionTitle}>Diskussionsfragen (A2)</h3>
+          <p style={{ margin: 0 }}>Kannst du dich vorstellen? Erzähl uns etwas über dich:</p>
+          <ul style={listSpacing}>
+            <li>Familie</li>
+            <li>Sprachen</li>
+            <li>Beruf/Studium</li>
+            <li>Hobbys</li>
+          </ul>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -281,16 +293,6 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
               einfach, freundlich und sehr nützlich.“
             </p>
           </div>
-
-          <h3 style={sectionTitle}>Diskussionsfragen (A2)</h3>
-          <p style={{ margin: 0 }}>Kannst du dich vorstellen? Erzähl uns etwas über dich:</p>
-          <ul style={listSpacing}>
-            <li>Familie</li>
-            <li>Sprachen</li>
-            <li>Beruf/Studium</li>
-            <li>Hobbys</li>
-          </ul>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

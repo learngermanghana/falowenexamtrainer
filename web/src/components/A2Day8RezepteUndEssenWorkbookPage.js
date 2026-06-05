@@ -316,6 +316,8 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
             </div>
           </div>
 
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Beispiel (30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -325,7 +327,6 @@ const A2Day8RezepteUndEssenWorkbookPage = () => {
               es regelmäßig. <strong>Zum Schluss</strong> kann ich sagen: Einfaches Essen kann sehr gut sein.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

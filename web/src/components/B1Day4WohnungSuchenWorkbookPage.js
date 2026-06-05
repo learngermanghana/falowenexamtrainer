@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
+import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
 
 const tabs = [
@@ -263,6 +264,7 @@ const B1Day4WohnungSuchenWorkbookPage = () => {
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             <strong>Frage des Tages:</strong> Was sind die wichtigsten Punkte, wenn man eine Wohnung sucht?
           </p>
+          <SpeakingPracticeTimerCard storageKey="b1-day4-sprechen-group-practice" />
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             <strong>Aufgabenstellung:</strong> Schreibe einen kurzen Text oder bereite eine mündliche Antwort vor. Nutze diese
             Struktur: 1) Einleitung, 2) Vorteile, 3) Nachteile, 4) Deine Meinung.

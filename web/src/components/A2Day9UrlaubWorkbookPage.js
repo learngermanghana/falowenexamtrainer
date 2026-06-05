@@ -243,6 +243,8 @@ const A2Day9UrlaubWorkbookPage = () => {
             </div>
           </div>
 
+          <SpeakingPracticeTimerCard />
+
           <div style={calloutStyle}>
             <strong>Kurzes Modell (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -346,7 +348,6 @@ const A2Day9UrlaubWorkbookPage = () => {
             <strong>Wohin reist du gern und warum?</strong>
           </p>
           <p style={{ margin: 0 }}>Use these guiding ideas in your discussion: Urlaub · Reiseziel · Verkehrsmittel · Erlebnis</p>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

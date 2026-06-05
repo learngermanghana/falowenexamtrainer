@@ -283,13 +283,15 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über meinen Lieblingssport. Mein Lieblingssport ist Fußball, weil ich gern im Team spiele. Fußball macht Spaß und ist gut für die Gesundheit. Außerdem treffe ich Freunde, deshalb bin ich motiviert. Zum Beispiel spiele ich am Samstag im Park oder schaue ein Spiel im Fernsehen. Zum Schluss finde ich: Sport ist wichtig, weil man fit bleibt und weniger Stress hat.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

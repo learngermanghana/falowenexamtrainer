@@ -300,13 +300,15 @@ const A2Day11UnterwegsVerkehrsmittelWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Ich vergleiche heute Bus, Fahrrad und Auto. Ich fahre oft mit dem Bus, weil der Bus günstig ist. Das Fahrrad ist auch gut, weil es gesund ist und kein Benzin braucht. Das Auto ist bequem, aber es ist teuer und es gibt oft Stau. Zum Beispiel nehme ich für die Arbeit den Bus, aber am Wochenende fahre ich manchmal mit dem Auto. Zum Schluss finde ich: Für kurze Wege ist das Fahrrad am besten, und für lange Wege ist der Bus oder der Zug praktisch.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

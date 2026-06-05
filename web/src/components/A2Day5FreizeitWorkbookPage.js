@@ -239,6 +239,9 @@ const A2Day5FreizeitWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Beispiel (30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -253,7 +256,6 @@ const A2Day5FreizeitWorkbookPage = () => {
           <CourseInlinePracticePanel
             type="speaking"
           />
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
