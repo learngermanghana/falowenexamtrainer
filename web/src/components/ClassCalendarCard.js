@@ -8,6 +8,7 @@ import {
   buildGhanaDateTime,
   GHANA_TIMEZONE,
   findTodayClassSession,
+  findArchivedTodayClassSession,
   findNextClassSession,
   formatScheduleSummary,
 } from "../services/classCalendar";
@@ -56,6 +57,10 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
   );
   const todayClass = useMemo(
     () => findTodayClassSession(selectedClass, now),
+    [now, selectedClass]
+  );
+  const archivedTodayClass = useMemo(
+    () => findArchivedTodayClassSession(selectedClass, now),
     [now, selectedClass]
   );
   const timeline = useMemo(() => {
@@ -137,6 +142,19 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
 
     return { ghanaRange, localRange };
   }, [locale, nextClass?.date, nextClass?.endTime, nextClass?.startTime]);
+  const archivedTodayTimes = useMemo(() => {
+    if (!archivedTodayClass?.date || !archivedTodayClass?.startTime) return null;
+    const start = buildGhanaDateTime(archivedTodayClass.date, archivedTodayClass.startTime);
+    const end = archivedTodayClass.endTime ? buildGhanaDateTime(archivedTodayClass.date, archivedTodayClass.endTime) : null;
+    if (!start) return null;
+
+    const formatter = new Intl.DateTimeFormat("en-GB", {
+      timeZone: GHANA_TIMEZONE,
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return `${formatter.format(start)}${end ? `–${formatter.format(end)}` : ""}`;
+  }, [archivedTodayClass?.date, archivedTodayClass?.endTime, archivedTodayClass?.startTime]);
   const isNextClassToday = Boolean(todayClass && nextClass && todayClass.date === nextClass.date);
   const shouldShowNextClass = Boolean(nextClass && !isNextClassToday);
 
@@ -297,6 +315,21 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
         </div>
       ) : null}
 
+      {archivedTodayClass ? (
+        <div style={{ ...styles.card, background: "#f1f5f9", border: "1px solid #cbd5e1", margin: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+            <h3 style={{ ...styles.sectionTitle, margin: 0 }}>Ended today</h3>
+            <span style={{ ...styles.badge, background: "#e2e8f0", color: "#334155" }}>Archived</span>
+          </div>
+          <p style={{ ...styles.helperText, margin: "6px 0" }}>
+            {archivedTodayClass.weekday}, {formatDateLabel(archivedTodayClass.date)} · {archivedTodayTimes || `${archivedTodayClass.startTime}–${archivedTodayClass.endTime}`} GMT
+          </p>
+          <p style={{ ...styles.helperText, margin: 0 }}>
+            {archivedTodayClass.titles?.join("; ") || "Today’s live class has ended. The next upcoming class will show below when available."}
+          </p>
+        </div>
+      ) : null}
+
       {shouldShowNextClass ? (
         <div style={{ ...styles.card, background: "#f9fafb", margin: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
@@ -305,7 +338,7 @@ const ClassCalendarCard = ({ id, initialClassName, program }) => {
           </div>
           <p style={{ ...styles.helperText, margin: "6px 0" }}>
             {nextClass.weekday}, {formatDateLabel(nextClass.date)} ·{" "}
-            {nextClassTimes?.ghanaRange || `${nextClass.startTime}–${nextClass.endTime}`}{" "}
+            {nextClassTimes?.ghanaRange || `${nextClass.startTime}–${nextClass.endTime}`} {" "}
             {t("classCalendar.next.timezone")}
           </p>
           {nextClassTimes?.localRange ? (
