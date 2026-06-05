@@ -27,6 +27,58 @@ const scoreFields = [
   { key: "listeningScore", label: "Hören" },
 ];
 
+const heroShellStyle = {
+  borderRadius: 28,
+  overflow: "hidden",
+  border: "1px solid rgba(148, 163, 184, 0.28)",
+  boxShadow: "0 28px 70px rgba(15, 23, 42, 0.22)",
+  background: "#0f172a",
+};
+
+const heroContentStyle = (imageUrl) => ({
+  minHeight: 420,
+  backgroundImage: `linear-gradient(135deg, rgba(2, 6, 23, 0.94) 0%, rgba(15, 23, 42, 0.82) 42%, rgba(30, 64, 175, 0.34) 100%), url(${imageUrl})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  color: "#fff",
+  padding: "clamp(22px, 4vw, 48px)",
+  display: "grid",
+  alignContent: "space-between",
+  gap: 28,
+  position: "relative",
+});
+
+const heroBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+  padding: "8px 13px",
+  borderRadius: 999,
+  border: "1px solid rgba(255, 255, 255, 0.28)",
+  background: "rgba(255, 255, 255, 0.14)",
+  color: "#ffffff",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: "0.01em",
+  backdropFilter: "blur(12px)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18)",
+};
+
+const tabBarStyle = {
+  position: "sticky",
+  top: 0,
+  zIndex: 5,
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
+  gap: 8,
+  padding: "10px",
+  border: "1px solid rgba(226, 232, 240, 0.9)",
+  borderRadius: 18,
+  background: "rgba(248, 250, 252, 0.92)",
+  backdropFilter: "blur(12px)",
+  boxShadow: "0 10px 26px rgba(15, 23, 42, 0.06)",
+};
+
 const Section = ({ title, children }) => (
   <section style={cardStyle}>
     <h2 style={{ margin: 0, fontSize: "1.15rem" }}>{title}</h2>
@@ -52,9 +104,22 @@ const NoteBox = ({ children, tone = "blue" }) => {
 };
 
 const StatCard = ({ label, value }) => (
-  <div style={{ border: "1px solid rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.88)", borderRadius: 14, padding: 12, display: "grid", gap: 4, minHeight: 72 }}>
-    <span style={{ fontSize: 12, color: "#4b5563", fontWeight: 700 }}>{label}</span>
-    <strong style={{ fontSize: 16 }}>{value}</strong>
+  <div
+    style={{
+      border: "1px solid rgba(255,255,255,0.18)",
+      background: "rgba(255,255,255,0.94)",
+      borderRadius: 18,
+      padding: "16px 18px",
+      display: "grid",
+      gap: 8,
+      minHeight: 92,
+      color: "#0f172a",
+      boxShadow: "0 18px 34px rgba(2, 6, 23, 0.18)",
+      backdropFilter: "blur(16px)",
+    }}
+  >
+    <span style={{ fontSize: 12, color: "#475569", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.04em" }}>{label}</span>
+    <strong style={{ fontSize: 17, color: "#0f172a", lineHeight: 1.35 }}>{value}</strong>
   </div>
 );
 
@@ -128,35 +193,71 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
   const speakingTopic = lesson.speakingTopic || lesson.tasks?.speaking || `Sprich über: ${lesson.topic}`;
   const writingTask = lesson.writingTopic || lesson.tasks?.writing || `Schreibe einen ${lesson.level}-Text zum Thema: ${lesson.topic}. Begründe deine Meinung und nutze passende Redemittel.`;
   const canComplete = progress.understood && progress.practisedWithAi && progress.improvedAfterFeedback && scoreSummary.count >= 2;
+  const heroImage = lesson.heroImage || DEFAULT_HERO_IMAGE;
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>← Course Book</button>
+    <div style={{ ...styles.container, display: "grid", gap: 18 }}>
+      <button
+        type="button"
+        style={{ ...styles.secondaryButton, justifySelf: "start", borderRadius: 999, padding: "10px 18px", boxShadow: "0 6px 18px rgba(15, 23, 42, 0.06)" }}
+        onClick={() => navigate("/campus/course")}
+      >
+        ← Course Book
+      </button>
 
-      <header style={{ borderRadius: 20, overflow: "hidden", border: "1px solid #e5e7eb", boxShadow: "0 18px 40px rgba(15, 23, 42, 0.12)", background: "#fff" }}>
-        <div style={{ minHeight: 250, backgroundImage: `linear-gradient(90deg, rgba(15,23,42,0.88), rgba(15,23,42,0.42)), url(${lesson.heroImage || DEFAULT_HERO_IMAGE})`, backgroundSize: "cover", backgroundPosition: "center", color: "#fff", padding: "28px clamp(18px, 4vw, 36px)", display: "grid", alignContent: "end", gap: 16 }}>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ ...styles.levelPill, background: "rgba(255,255,255,0.92)", color: "#1d4ed8" }}>{lesson.level}</span>
-            <span style={{ ...styles.levelPill, background: "rgba(255,255,255,0.92)", color: "#1d4ed8" }}>Day {lesson.day}</span>
-            {lesson.chapter ? <span style={{ ...styles.levelPill, background: "rgba(255,255,255,0.92)", color: "#1d4ed8" }}>Chapter {lesson.chapter}</span> : null}
-            <span style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>AI self-learning</span>
-            {progress.completed ? <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Self-marked complete</span> : null}
+      <header style={heroShellStyle}>
+        <div style={heroContentStyle(heroImage)}>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <span style={heroBadgeStyle}>{lesson.level}</span>
+            <span style={heroBadgeStyle}>Day {lesson.day}</span>
+            {lesson.chapter ? <span style={heroBadgeStyle}>Chapter {lesson.chapter}</span> : null}
+            <span style={{ ...heroBadgeStyle, background: "rgba(37, 99, 235, 0.88)", borderColor: "rgba(147, 197, 253, 0.5)" }}>AI self-learning</span>
+            {progress.completed ? <span style={{ ...heroBadgeStyle, background: "rgba(22, 163, 74, 0.88)", borderColor: "rgba(187, 247, 208, 0.55)" }}>Self-marked complete</span> : null}
           </div>
-          <div style={{ display: "grid", gap: 8, maxWidth: 860 }}>
-            <h1 style={{ margin: 0, fontSize: "clamp(2rem, 5vw, 3.4rem)", lineHeight: 1.05 }}>{lesson.title}</h1>
-            <p style={{ margin: 0, fontSize: "1.05rem", lineHeight: 1.6, color: "#e5e7eb" }}>{lesson.topic}</p>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 10 }}>
-            <StatCard label="Speaking task" value={lesson.speakingTaskType || "Guided talk"} />
-            <StatCard label="Writing support" value="Task · Mark · Ref · Ideas" />
-            <StatCard label="Progress" value={progress.completed ? "Completed" : "In progress"} />
+
+          <div style={{ display: "grid", gap: 20 }}>
+            <div style={{ display: "grid", gap: 12, maxWidth: 940 }}>
+              <h1
+                style={{
+                  margin: 0,
+                  fontSize: "clamp(2.15rem, 5.8vw, 4.7rem)",
+                  lineHeight: 0.98,
+                  letterSpacing: "-0.055em",
+                  textWrap: "balance",
+                  textShadow: "0 10px 28px rgba(0,0,0,0.32)",
+                }}
+              >
+                {lesson.title}
+              </h1>
+              <p style={{ margin: 0, maxWidth: 980, fontSize: "clamp(1rem, 1.6vw, 1.22rem)", lineHeight: 1.65, color: "#e2e8f0", textShadow: "0 6px 18px rgba(0,0,0,0.26)" }}>
+                {lesson.topic}
+              </p>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
+              <StatCard label="Speaking task" value={lesson.speakingTaskType || "Guided talk"} />
+              <StatCard label="Writing support" value="Task · Mark · Ref · Ideas" />
+              <StatCard label="Progress" value={progress.completed ? "Completed" : "In progress"} />
+            </div>
           </div>
         </div>
       </header>
 
-      <div style={{ position: "sticky", top: 0, zIndex: 5, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 8, padding: "10px 0", background: "#f3f4f6" }}>
+      <div style={tabBarStyle}>
         {tabs.map((tab) => (
-          <button key={tab.id} type="button" style={activeTab === tab.id ? styles.primaryButton : styles.secondaryButton} onClick={() => setActiveTab(tab.id)}>{tab.label}</button>
+          <button
+            key={tab.id}
+            type="button"
+            style={{
+              ...(activeTab === tab.id ? styles.primaryButton : styles.secondaryButton),
+              borderRadius: 999,
+              minHeight: 44,
+              boxShadow: activeTab === tab.id ? "0 10px 24px rgba(37, 99, 235, 0.22)" : "none",
+            }}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
         ))}
       </div>
 
