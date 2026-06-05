@@ -62,12 +62,12 @@ const findFirstSessionDate = (startDate, targetDay) => {
   return date;
 };
 
-const escapeText = (value) =>
-  value
-    .replace(/\n/g, "\n")
-    .replace(/,/g, "\,")
-    .replace(/;/g, "\;")
-    .replace(/\/g, "\\");
+const escapeText = (value = "") =>
+  String(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, "\\n")
+    .replace(/,/g, "\\,")
+    .replace(/;/g, "\\;");
 
 const buildEvents = ({ className, startDate, endDate, schedule, description }) => {
   const events = [];
