@@ -18,10 +18,9 @@ import { parseImportantPhraseLine } from "../lib/writingCoachFormatting";
 import WritingFeedbackCard from "./WritingFeedbackCard";
 
 const IDEAS_COACHING_PROMPTS = [
-  "Start with the task and ask: What is unclear to me?",
-  "Request a short explanation and one example sentence.",
-  "Keep requests simple, e.g. 'Könnten wir einen anderen Termin vereinbaren?'.",
-  "End by summarizing the idea in your own words.",
+  "Paste the task or your draft.",
+  "Ask what is unclear, then request one short explanation and one example sentence.",
+  "Summarize the idea in your own words before sending your draft to Mark my letter.",
 ];
 const IMPORTANT_PHRASE_COLORS = ["#1d4ed8", "#7c3aed", "#be123c", "#0f766e", "#b45309"];
 const IDEAS_SESSION_TURN_LIMIT = 12;
@@ -52,7 +51,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     () => ({
       id: "intro",
       role: "assistant",
-      content: `This is a chat between you and the ideas generator. Paste your exam prompt or describe the situation, and I'll guide you step by step with ${coachDisplayName}'s coaching prompts until your letter is ready.`,
+      content: `Paste your task or draft. ${coachDisplayName} will guide you step by step until your letter is ready.`,
     }),
     [coachDisplayName]
   );
@@ -88,6 +87,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [ideaDraftWorkspace, setIdeaDraftWorkspace] = useState("");
   const [referenceInput, setReferenceInput] = useState("");
   const [referenceNotes, setReferenceNotes] = useState([]);
+  const [editingReferenceNote, setEditingReferenceNote] = useState(null);
+  const [referenceEditInput, setReferenceEditInput] = useState("");
   const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
   const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -630,8 +631,50 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     setIdeaError("");
   };
 
+  const startEditingReferenceNote = (note) => {
+    setEditingReferenceNote(note);
+    setReferenceEditInput(note);
+    setIdeaError("");
+    setIdeaSuccess("");
+  };
+
+  const cancelEditingReferenceNote = () => {
+    setEditingReferenceNote(null);
+    setReferenceEditInput("");
+    setIdeaError("");
+  };
+
+  const saveEditedReferenceNote = (originalNote) => {
+    const normalized = referenceEditInput.trim().replace(/\s+/g, " ");
+
+    if (!normalized) {
+      setIdeaError("Reference notes cannot be empty.");
+      setIdeaSuccess("");
+      return;
+    }
+
+    const alreadyExists = referenceNotes.some(
+      (note) => note !== originalNote && note.toLowerCase() === normalized.toLowerCase()
+    );
+
+    if (alreadyExists) {
+      setIdeaError("That note is already in your reference list.");
+      setIdeaSuccess("");
+      return;
+    }
+
+    setReferenceNotes((prev) => prev.map((note) => (note === originalNote ? normalized : note)));
+    setEditingReferenceNote(null);
+    setReferenceEditInput("");
+    setIdeaSuccess("Reference updated.");
+    setIdeaError("");
+  };
+
   const removeReferenceNote = (noteToRemove) => {
     setReferenceNotes((prev) => prev.filter((note) => note !== noteToRemove));
+    if (editingReferenceNote === noteToRemove) {
+      cancelEditingReferenceNote();
+    }
   };
 
   const startIdeasSession = () => {
@@ -851,8 +894,8 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                   </>
                 ) : (
                   isFrenchProgram
-                    ? "Timed practice lives in the Exams Room. Here you can paste French drafts for marking and use the ideas generator to build your letter."
-                    : "Timed practice lives in the Exams Room. Here you can paste drafts for marking and use the ideas generator to build your letter."
+                    ? "Paste your French draft for marking, or use the ideas generator to plan it first."
+                    : "Paste your draft for marking, or use the ideas generator to plan it first."
                 )
               ) : (
                 "A1 students use Mark my letter only."
@@ -1198,7 +1241,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
         <section style={styles.card}>
           <h3 style={{ ...styles.sectionTitle, marginTop: 0 }}>Reference</h3>
           <p style={styles.helperText}>
-            Keep useful sentence starters and corrections here, then add them directly to your draft.
+            Save useful sentence starters and corrections, then reuse or edit them when needed.
           </p>
           <div style={{ ...styles.infoBox, marginBottom: 12 }}>
             <strong>Tip:</strong> Save short formal phrases you want to reuse in future letters.
@@ -1244,19 +1287,48 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                       alignItems: "flex-start",
                     }}
                   >
-                    <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{note}</div>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        style={styles.secondaryButton}
-                        onClick={() => setLetterText((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
-                      >
-                        Add to letter
-                      </button>
-                      <button type="button" style={styles.dangerButton} onClick={() => removeReferenceNote(note)}>
-                        Delete
-                      </button>
-                    </div>
+                    {editingReferenceNote === note ? (
+                      <div style={{ flex: 1, display: "grid", gap: 8 }}>
+                        <label style={styles.label}>Edit reference note</label>
+                        <textarea
+                          style={styles.textareaSmall}
+                          rows={3}
+                          value={referenceEditInput}
+                          onChange={(event) => {
+                            setReferenceEditInput(event.target.value);
+                            setIdeaError("");
+                            setIdeaSuccess("");
+                          }}
+                        />
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <button type="button" style={styles.primaryButton} onClick={() => saveEditedReferenceNote(note)}>
+                            Save edit
+                          </button>
+                          <button type="button" style={styles.secondaryButton} onClick={cancelEditingReferenceNote}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5, flex: 1 }}>{note}</div>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                          <button
+                            type="button"
+                            style={styles.secondaryButton}
+                            onClick={() => setLetterText((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
+                          >
+                            Add to letter
+                          </button>
+                          <button type="button" style={styles.secondaryButton} onClick={() => startEditingReferenceNote(note)}>
+                            Edit
+                          </button>
+                          <button type="button" style={styles.dangerButton} onClick={() => removeReferenceNote(note)}>
+                            Delete
+                          </button>
+                        </div>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -1287,10 +1359,10 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                 ))}
               </select>
             </div>
-            <span style={styles.levelPill}>Prompt bank in /functions/functionz/prompts.js</span>
+            <span style={styles.levelPill}>Step-by-step writing help</span>
           </div>
           <div style={styles.infoBox}>
-            <strong>Use the coach to learn from your ideas:</strong>
+            <strong>How to use the ideas coach:</strong>
             <ul style={styles.promptList}>
               {IDEAS_COACHING_PROMPTS.map((prompt) => (
                 <li key={prompt}>{prompt}</li>
@@ -1367,14 +1439,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           <div style={{ marginTop: 16 }}>
             <h4 style={styles.resultHeading}>Preview & quick copy</h4>
             <p style={styles.helperText}>
-              Keep one running draft box so students can keep building and refining what they type.
+              Build one draft here, then send it to Mark my letter.
             </p>
             <div
               style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12 }}
               className="idea-generator-panel"
             >
               <div>
-                <label style={styles.label}>Single draft workspace</label>
+                <label style={styles.label}>Draft workspace</label>
                 <textarea
                   style={styles.textareaSmall}
                   value={ideaDraftWorkspace}
@@ -1383,7 +1455,7 @@ const LetterPracticePage = ({ mode = "exams" }) => {
                     setIdeaError("");
                     setIdeaSuccess("");
                   }}
-                  placeholder="Your best evolving draft stays here. Keep refining it before sending to Mark my letter."
+                  placeholder="Write your best draft here before sending it to Mark my letter."
                 />
                 <div style={{ ...styles.helperText, marginTop: 4, marginBottom: 0 }}>{countWords(ideaDraftWorkspace)} words</div>
               </div>
