@@ -260,6 +260,7 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
               <strong>Vier Schlüsselwörter:</strong> Sport · Schlaf · gesunde Ernährung · Freizeit
             </p>
           </div>
+          <SpeakingPracticeTimerCard />
 
           <div style={questionCardStyle}>
             <strong>📝 Beispielantwort</strong>
@@ -325,7 +326,6 @@ const A2Day16WohlbefindenUndEntspannungWorkbookPage = () => {
               „Heute spreche ich über Wohlbefinden und Entspannung. Für mich ist Ruhe wichtig, weil ich nach der Arbeit oft müde bin. Ich gehe spazieren, höre Musik oder trinke Tee. Außerdem schlafe ich genug, deshalb fühle ich mich besser. Zum Beispiel mache ich am Abend mein Handy aus und lese zehn Minuten. Zum Schluss finde ich: Kleine Pausen sind wichtig für Körper und Kopf.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

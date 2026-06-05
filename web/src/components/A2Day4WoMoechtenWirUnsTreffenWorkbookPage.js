@@ -325,6 +325,8 @@ const A2Day4WoMoechtenWirUnsTreffenWorkbookPage = () => {
             </div>
           </div>
 
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#fefce8" }}>
             <strong>Kurzmodell (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -335,7 +337,6 @@ const A2Day4WoMoechtenWirUnsTreffenWorkbookPage = () => {
               Aktivität mit Freunden ist noch wichtiger.
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

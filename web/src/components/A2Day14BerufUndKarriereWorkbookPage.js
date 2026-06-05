@@ -261,13 +261,15 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über Beruf und Karriere. Für mich ist ein guter Arbeitsplatz wichtig, weil ich dort viel Zeit verbringe. Ich möchte nette Kollegen und klare Aufgaben haben. Außerdem möchte ich weiterlernen, deshalb besuche ich Deutschkurse und übe neue Wörter. Zum Beispiel kann ich später eine Weiterbildung machen oder eine bessere Stelle suchen. Zum Schluss finde ich: Karriere braucht Geduld, Motivation und gute Kommunikation.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
           <CourseInlinePracticePanel

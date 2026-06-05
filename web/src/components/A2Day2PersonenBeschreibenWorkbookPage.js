@@ -331,6 +331,19 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
             </div>
           </div>
 
+          <h3 style={sectionTitle}>Diskussionsfrage</h3>
+          <p style={{ margin: 0, lineHeight: 1.7 }}>
+            Kannst du eine Person beschreiben? Wie sieht sie aus und was für ein Mensch ist sie?
+          </p>
+          <ul style={listSpacing}>
+            <li>Aussehen (groß, klein, Haare, Augenfarbe)</li>
+            <li>Charakter (freundlich, lustig, ruhig)</li>
+            <li>Kleidung</li>
+            <li>Besondere Merkmale (Brille, Bart, Schmuck)</li>
+          </ul>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
@@ -342,18 +355,6 @@ const A2Day2PersonenBeschreibenWorkbookPage = () => {
               wichtige Person in meinem Leben.“
             </p>
           </div>
-
-          <h3 style={sectionTitle}>Diskussionsfrage</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Kannst du eine Person beschreiben? Wie sieht sie aus und was für ein Mensch ist sie?
-          </p>
-          <ul style={listSpacing}>
-            <li>Aussehen (groß, klein, Haare, Augenfarbe)</li>
-            <li>Charakter (freundlich, lustig, ruhig)</li>
-            <li>Kleidung</li>
-            <li>Besondere Merkmale (Brille, Bart, Schmuck)</li>
-          </ul>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

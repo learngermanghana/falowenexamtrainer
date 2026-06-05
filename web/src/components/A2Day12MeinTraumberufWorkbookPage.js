@@ -319,13 +319,15 @@ const A2Day12MeinTraumberufWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über meinen Traumberuf. Ich möchte gern im Büro arbeiten, weil ich gern organisiere und mit Menschen spreche. Der Beruf soll interessant sein und gute Arbeitszeiten haben. Außerdem möchte ich Deutsch im Beruf benutzen, deshalb übe ich jeden Tag. Zum Beispiel kann ich später E-Mails schreiben und Kunden helfen. Zum Schluss finde ich: Ein guter Beruf passt zu meinen Stärken und macht mir Freude.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

@@ -270,13 +270,15 @@ const A2Day24EinenUrlaubPlanenWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über einen Urlaub. Ich möchte ans Meer fahren, weil ich Sonne und Ruhe mag. Zuerst buche ich ein Hotel und dann kaufe ich ein Ticket. Außerdem plane ich Ausflüge, deshalb ist der Urlaub nicht stressig. Zum Beispiel möchte ich am Strand spazieren gehen und lokale Spezialitäten essen. Zum Schluss finde ich: Gute Planung ist wichtig, aber man braucht auch freie Zeit.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
           <CourseInlinePracticePanel

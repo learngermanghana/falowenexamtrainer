@@ -314,13 +314,15 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über ein Vorstellungsgespräch. Zuerst begrüße ich die Person freundlich und stelle mich kurz vor. Dann erkläre ich meine Erfahrung, weil das für die Stelle wichtig ist. Außerdem sage ich, warum ich in der Firma arbeiten möchte. Zum Beispiel kann ich sagen: Ich bin zuverlässig und arbeite gern im Team. Zum Schluss bedanke ich mich für das Gespräch und frage nach dem nächsten Schritt.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

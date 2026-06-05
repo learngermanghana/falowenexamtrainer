@@ -314,13 +314,15 @@ const A2Day18DieBankAnrufenWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard />
+
           <div style={{ ...questionCardStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich darüber, wie man bei der Bank anruft. Zuerst begrüße ich die Person und nenne meinen Namen. Dann erkläre ich mein Problem, weil die Bank klare Informationen braucht. Außerdem frage ich nach einem Termin oder nach Hilfe. Zum Beispiel kann ich sagen: Ich habe eine Frage zu meiner Karte. Zum Schluss wiederhole ich den Termin und bedanke mich freundlich.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard />
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 

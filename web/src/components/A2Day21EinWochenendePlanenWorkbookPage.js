@@ -249,13 +249,15 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
               </ul>
             </div>
           </div>
+
+          <SpeakingPracticeTimerCard storageKey="a2-day21-sprechen-group-practice" />
+
           <div style={{ ...questionBoxStyle, background: "#ecfeff" }}>
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über meine Wochenendplanung. Am Samstag möchte ich ausschlafen und einkaufen gehen, weil ich unter der Woche wenig Zeit habe. Dann treffe ich Freunde oder mache Sport. Am Sonntag bleibe ich gern zu Hause und lerne Deutsch. Zum Beispiel wiederhole ich neue Wörter und schreibe eine kurze E-Mail. Zum Schluss finde ich: Ein gutes Wochenende hat Ruhe, Freunde und ein bisschen Vorbereitung für Montag.“
             </p>
           </div>
-          <SpeakingPracticeTimerCard storageKey="a2-day21-sprechen-group-practice" />
           <CourseInlinePracticePanel
             type="speaking"
           />
