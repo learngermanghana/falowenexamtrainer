@@ -4,12 +4,14 @@ import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
+import LessonClassNotesPanel from "./LessonClassNotesPanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
+  { key: "classNotes", label: "Teil 5 · Class Notes" },
 ];
 
 const card = {
@@ -156,7 +158,7 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 2 Workbook · Small Talk</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook: group speaking, writing, reading and listening practice.
+          4-part workbook plus Class Notes for vocabulary, Zoom notes and short tutor suggestions.
         </p>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -172,7 +174,7 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
         </p>
       </div>
 
-      <A2B1WorkbookGuidance />
+      <A2B1WorkbookGuidance showClassNotes={false} />
 
       {activeTab === "sprechen" && (
         <div style={card}>
@@ -223,13 +225,10 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Nutze diese Struktur für starke Sprechpunkte:{" "}
-            <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
+            Nutze diese Struktur für starke Sprechpunkte: <strong>Einleitung → Hauptteil mit Verbindungswörtern → Beispiel → Schluss</strong>.
           </p>
           <p style={{ margin: 0, lineHeight: 1.7, color: "#374151" }}>
-            <strong>Wichtig für Day 2:</strong> Heute bleiben wir bewusst bei einfachen Verbindungswörtern. Nutze zuerst{" "}
-            <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>. Das reicht für eine starke
-            A2-Leistung.
+            <strong>Wichtig für Day 2:</strong> Heute bleiben wir bewusst bei einfachen Verbindungswörtern. Nutze zuerst <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>. Das reicht für eine starke A2-Leistung.
           </p>
           <div style={phraseGridStyle}>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
@@ -243,15 +242,9 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
               <strong>2) Verbindungswörter / Connectors</strong>
               <ul style={listSpacing}>
-                <li>
-                  <strong>Zuerst</strong>, <strong>dann</strong>, <strong>danach</strong>, <strong>am Ende</strong>
-                </li>
-                <li>
-                  <strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong>
-                </li>
-                <li>
-                  <strong>aber</strong>, <strong>zum Beispiel</strong>
-                </li>
+                <li><strong>Zuerst</strong>, <strong>dann</strong>, <strong>danach</strong>, <strong>am Ende</strong></li>
+                <li><strong>und</strong>, <strong>oder</strong>, <strong>weil</strong>, <strong>deshalb</strong></li>
+                <li><strong>aber</strong>, <strong>zum Beispiel</strong></li>
               </ul>
             </div>
             <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
@@ -287,8 +280,7 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
             <strong>Modellantwort (ca. 30–45 Sekunden)</strong>
             <p style={{ margin: 0, lineHeight: 1.7 }}>
               „Heute spreche ich über Small Talk im Alltag. <strong>Zuerst</strong> begrüße ich die Person und frage: ‚Wie geht es
-              dir?‘ <strong>Dann</strong> spreche ich über einfache Themen wie Arbeit, Hobbys oder das Wetter.{" "}
-              <strong>Zum Beispiel</strong> sage ich: ‚Ich spiele gern Fußball, <strong>und</strong> du?‘ <strong>Ich finde</strong> Small
+              dir?‘ <strong>Dann</strong> spreche ich über einfache Themen wie Arbeit, Hobbys oder das Wetter. <strong>Zum Beispiel</strong> sage ich: ‚Ich spiele gern Fußball, <strong>und</strong> du?‘ <strong>Ich finde</strong> Small
               Talk wichtig, <strong>weil</strong> man neue Leute besser kennenlernen kann. <strong>Deshalb</strong> ist Small Talk
               einfach, freundlich und sehr nützlich.“
             </p>
@@ -296,9 +288,7 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
 
           <p style={{ margin: 0, color: "#4b5563" }}>Teil 1 is for group practice only and has no assignment submission.</p>
 
-          <CourseInlinePracticePanel
-            type="speaking"
-          />
+          <CourseInlinePracticePanel type="speaking" />
           <PreparedCheckbox checked={prepared.sprechen} onChange={setPreparedFor("sprechen")} />
         </div>
       )}
@@ -325,9 +315,7 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
           <p style={{ margin: 0, color: "#4b5563" }}>
             Submit your final writing in the assignment submission area (same workflow as usual), not directly on this page.
           </p>
-          <CourseInlinePracticePanel
-            type="writing"
-          />
+          <CourseInlinePracticePanel type="writing" />
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.schreiben} onChange={setPreparedFor("schreiben")} />
         </div>
@@ -424,6 +412,10 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
+      )}
+
+      {activeTab === "classNotes" && (
+        <LessonClassNotesPanel lessonId="a2-day-2-small-talk" lessonTitle="A2 Day 2 · Small Talk" />
       )}
     </div>
   );
