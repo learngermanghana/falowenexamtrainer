@@ -4,6 +4,7 @@ import { useHealthStatus } from "../hooks/useHealthStatus";
 import { useOfflineStatus } from "../hooks/useOfflineStatus";
 import { styles } from "../styles";
 import Day0StudentWorkflowAutoMount from "./Day0StudentWorkflowAutoMount";
+import A1CoursePracticeAutoMount from "./A1CoursePracticeAutoMount";
 
 const statusCopy = {
   ok: "API online",
@@ -32,6 +33,7 @@ function HealthIndicator() {
   return (
     <>
       <Day0StudentWorkflowAutoMount />
+      <A1CoursePracticeAutoMount />
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }} aria-live="polite">
         <span
           aria-label={label}
