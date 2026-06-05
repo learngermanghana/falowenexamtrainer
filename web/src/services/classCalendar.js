@@ -43,6 +43,17 @@ export const buildGhanaDateTime = (dateString, timeString) => {
   return new Date(Date.UTC(year, month - 1, day, hours, minutes, 0));
 };
 
+const getGhanaDateString = (date = new Date()) => {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: GHANA_TIMEZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
 const findFirstSessionDate = (startDate, targetDay) => {
   const date = new Date(startDate);
   while (date.getDay() !== targetDay) {
@@ -53,10 +64,10 @@ const findFirstSessionDate = (startDate, targetDay) => {
 
 const escapeText = (value) =>
   value
-    .replace(/\\n/g, "\\n")
-    .replace(/,/g, "\\,")
-    .replace(/;/g, "\\;")
-    .replace(/\\/g, "\\\\");
+    .replace(/\n/g, "\n")
+    .replace(/,/g, "\,")
+    .replace(/;/g, "\;")
+    .replace(/\/g, "\\");
 
 const buildEvents = ({ className, startDate, endDate, schedule, description }) => {
   const events = [];
@@ -107,7 +118,7 @@ export const generateClassCalendar = (className) => {
     details.docUrl ? `Docs: ${details.docUrl}` : null,
   ]
     .filter(Boolean)
-    .join("\\n");
+    .join("\n");
 
   const eventsBlock = buildEvents({
     className,
@@ -135,7 +146,7 @@ export const downloadClassCalendar = (className) => {
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${className.replace(/\\s+/g, "-")}-schedule.ics`;
+  link.download = `${className.replace(/\s+/g, "-")}-schedule.ics`;
   link.click();
   window.URL.revokeObjectURL(url);
 };
@@ -150,13 +161,6 @@ const findTimeSlot = (className, weekday) => {
   return schedule.find((entry) => entry.day === weekday);
 };
 
-const toLocalDateString = (date) => {
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  return `${year}-${month}-${day}`;
-};
-
 const buildSessionTitles = (sessions = []) =>
   sessions.map((session) => {
     const primaryLabel = session.title || session.chapter || session.assignmentId;
@@ -165,25 +169,51 @@ const buildSessionTitles = (sessions = []) =>
     return session.note ? `${base} (${session.note})` : base;
   });
 
-export const findTodayClassSession = (className, referenceDate = new Date()) => {
-  const courseSchedule = courseSchedulesByName[className];
-  const sessionDays = courseSchedule?.days;
-  if (!sessionDays || sessionDays.length === 0) return null;
-
-  const today = toLocalDateString(referenceDate);
-  const day = sessionDays.find((entry) => entry.date === today);
-  if (!day) return null;
-
+const buildClassSession = (className, day) => {
   const timeSlot = findTimeSlot(className, day.weekday);
   const startTime = timeSlot?.startTime || "00:00";
   const endTime = timeSlot?.endTime || "00:00";
+  const startDateTime = buildGhanaDateTime(day.date, startTime);
+  const endDateTime = endTime ? buildGhanaDateTime(day.date, endTime) : null;
 
   return {
     ...day,
     startTime,
     endTime,
+    startDateTime,
+    endDateTime,
     titles: buildSessionTitles(day.sessions || []),
   };
+};
+
+export const findTodayClassSession = (className, referenceDate = new Date()) => {
+  const courseSchedule = courseSchedulesByName[className];
+  const sessionDays = courseSchedule?.days;
+  if (!sessionDays || sessionDays.length === 0) return null;
+
+  const today = getGhanaDateString(referenceDate);
+  const day = sessionDays.find((entry) => entry.date === today);
+  if (!day) return null;
+
+  const session = buildClassSession(className, day);
+  if (session.endDateTime && session.endDateTime < referenceDate) return null;
+
+  return session;
+};
+
+export const findArchivedTodayClassSession = (className, referenceDate = new Date()) => {
+  const courseSchedule = courseSchedulesByName[className];
+  const sessionDays = courseSchedule?.days;
+  if (!sessionDays || sessionDays.length === 0) return null;
+
+  const today = getGhanaDateString(referenceDate);
+  const day = sessionDays.find((entry) => entry.date === today);
+  if (!day) return null;
+
+  const session = buildClassSession(className, day);
+  if (!session.endDateTime || session.endDateTime >= referenceDate) return null;
+
+  return session;
 };
 
 export const findNextClassSession = (className, referenceDate = new Date()) => {
@@ -194,22 +224,9 @@ export const findNextClassSession = (className, referenceDate = new Date()) => {
   const sortedDays = [...sessionDays].sort((a, b) => new Date(a.date) - new Date(b.date));
 
   for (const day of sortedDays) {
-    const timeSlot = findTimeSlot(className, day.weekday);
-    const startTime = timeSlot?.startTime || "00:00";
-    const endTime = timeSlot?.endTime || "00:00";
-
-    const startDateTime = buildGhanaDateTime(day.date, startTime);
-    const endDateTime = endTime ? buildGhanaDateTime(day.date, endTime) : null;
-
-    if (startDateTime && startDateTime >= referenceDate) {
-      return {
-        ...day,
-        startTime,
-        endTime,
-        startDateTime,
-        endDateTime,
-        titles: buildSessionTitles(day.sessions || []),
-      };
+    const session = buildClassSession(className, day);
+    if (session.startDateTime && session.startDateTime >= referenceDate) {
+      return session;
     }
   }
 
