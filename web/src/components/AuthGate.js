@@ -19,53 +19,99 @@ const isFullName = (value) => {
   return parts.length >= 2 && parts.every((part) => part.length >= 2);
 };
 
+const getDiagnosticValue = (error, key) => {
+  const diagnostic = error?.diagnostic || {};
+  const profile = diagnostic.profile || {};
+  return diagnostic[key] || profile[key] || "";
+};
+
+const formatSupportValue = (value) => {
+  if (value === null || value === undefined || value === "") return "Not provided";
+  return String(value);
+};
+
+const appendSupportDetails = (message, error) => {
+  const details = [
+    "",
+    "Support details:",
+    `Error code: ${formatSupportValue(error?.code)}`,
+    `Reason: ${formatSupportValue(getDiagnosticValue(error, "reason"))}`,
+    `Student code: ${formatSupportValue(getDiagnosticValue(error, "studentCode") || getDiagnosticValue(error, "studentcode"))}`,
+    `Email: ${formatSupportValue(getDiagnosticValue(error, "email"))}`,
+    `Account status: ${formatSupportValue(getDiagnosticValue(error, "status"))}`,
+    `Contract end: ${formatSupportValue(getDiagnosticValue(error, "contractEndLabel") || getDiagnosticValue(error, "contractEnd"))}`,
+    `Payment status: ${formatSupportValue(getDiagnosticValue(error, "paymentStatus"))}`,
+  ];
+
+  if (error?.message && error.message !== message) {
+    details.push(`Backend/Firebase message: ${error.message}`);
+  }
+
+  return `${message}\n${details.join("\n")}`;
+};
+
 const formatAuthErrorMessage = (error, mode = "login") => {
   const code = error?.code;
+  let message = "";
 
   if (mode === "login") {
     switch (code) {
       case "auth/invalid-credential":
       case "auth/wrong-password":
-        return "Your email (or student code) and password do not match. Please check and try again.";
+        message = "Password mismatch. The password entered does not match this account.";
+        break;
       case "auth/user-not-found":
-        return "We could not find an account with these details. Please check your email/student code or create an account.";
+        message = "We could not find an account with these details. Please check your email/student code or create an account.";
+        break;
       case "auth/too-many-requests":
-        return "Too many login attempts were made. Please wait a few minutes and try again, or reset your password.";
+        message = "Too many login attempts were made. Please wait a few minutes and try again, or reset your password.";
+        break;
       case "auth/password-mismatch":
-        return error?.message || "Password mismatch. The password you entered does not match this student account.";
+        message = error?.message || "Password mismatch. The password entered does not match this account.";
+        break;
       case "auth/contract-ended":
       case "auth/account-inactive":
+      case "auth/payment-status-blocked":
       case "auth/student-access-blocked":
       case "auth/login-diagnostic":
-        return error?.message || "This student account cannot log in right now. Please contact support.";
+        message = error?.message || "This student account cannot log in right now. Please contact support.";
+        break;
       case "auth/user-disabled":
-        return "This account is currently disabled. Please contact support for help.";
+        message = "This account is currently disabled. Please contact support for help.";
+        break;
       case "auth/permission-denied":
       case "permission-denied":
-        return error?.message || "Firestore denied access while checking this login. Please contact support.";
+        message = error?.message || "Firestore denied access while checking this login. Please contact support.";
+        break;
       case "auth/network-request-failed":
-        return "We could not connect to the internet. Please check your connection and try again.";
+        message = "We could not connect to the internet. Please check your connection and try again.";
+        break;
       default:
         break;
     }
   }
 
-  if (mode === "signup") {
+  if (!message && mode === "signup") {
     switch (code) {
       case "auth/email-already-in-use":
-        return "This email is already registered. Please log in or reset your password.";
+        message = "This email is already registered. Please log in or reset your password.";
+        break;
       case "auth/weak-password":
-        return "Your password is too weak. Please use at least 8 characters, including letters and numbers.";
+        message = "Your password is too weak. Please use at least 8 characters, including letters and numbers.";
+        break;
       case "auth/invalid-email":
-        return "This email address looks invalid. Please check and try again.";
+        message = "This email address looks invalid. Please check and try again.";
+        break;
       case "auth/network-request-failed":
-        return "We could not connect to the internet. Please check your connection and try again.";
+        message = "We could not connect to the internet. Please check your connection and try again.";
+        break;
       default:
         break;
     }
   }
 
-  return error?.message || "Something went wrong. Please try again.";
+  message = message || error?.message || "Something went wrong. Please try again.";
+  return mode === "login" ? appendSupportDetails(message, error) : message;
 };
 
 const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
@@ -472,7 +518,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
           </div>
         )}
 
-        {authError && <div style={styles.errorBox}>{authError}</div>}
+        {authError && <div style={{ ...styles.errorBox, whiteSpace: "pre-line" }}>{authError}</div>}
 
         {message && (
           <div
