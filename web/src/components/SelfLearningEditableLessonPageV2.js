@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-import { EmbeddedPracticeNote, EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
+import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 
 const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80";
 
@@ -299,7 +299,6 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           <PracticeBox title="Sprechen topic"><p style={{ margin: 0, lineHeight: 1.6 }}>{speakingTopic}</p></PracticeBox>
           {lesson.speakingBuilder?.plan?.length ? <PracticeBox title="Speaking plan">{renderList(lesson.speakingBuilder.plan)}</PracticeBox> : null}
           {lesson.speakingBuilder?.starters?.length ? <PracticeBox title="Sentence starters">{renderList(lesson.speakingBuilder.starters)}</PracticeBox> : null}
-          <EmbeddedPracticeNote>Record, submit, receive feedback and improve without leaving the course lesson.</EmbeddedPracticeNote>
           <EmbeddedSpeechPracticePanel />
         </Section>
       ) : null}
@@ -310,11 +309,6 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
             <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
             <p style={{ margin: 0, lineHeight: 1.7 }}>{writingTask}</p>
           </PracticeBox>
-          <NoteBox>
-            <strong>Focused writing space.</strong> Plan, write, mark and improve in the panel below. The long writing workflow, structure guide,
-            Redemittel preview and tool explanations are now in <strong>Day 0 Orientation</strong>, so this tab stays clear for practice.
-          </NoteBox>
-          <EmbeddedPracticeNote>Write your answer, mark it, collect Redemittel and improve without leaving the course lesson.</EmbeddedPracticeNote>
           <EmbeddedWritingPracticePanel />
         </Section>
       ) : null}
