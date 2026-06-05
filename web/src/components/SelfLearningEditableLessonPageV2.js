@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
-import SelfLearningWritingTools from "./SelfLearningWritingTools";
 import { EmbeddedPracticeNote, EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 
 const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80";
@@ -210,12 +209,11 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
             <span style={{ ...styles.badge, justifySelf: "start" }}>{writingType}</span>
             <p style={{ margin: 0, lineHeight: 1.7 }}>{writingTask}</p>
           </PracticeBox>
-          <SelfLearningWritingTools
-            writingType={writingType}
-            structure={lesson.writingBuilder?.structure || []}
-            usefulLines={lesson.writingBuilder?.usefulLines || []}
-          />
-          <EmbeddedPracticeNote>Write your answer to the task above, mark it, collect Redemittel and improve without leaving the course lesson.</EmbeddedPracticeNote>
+          <NoteBox>
+            <strong>Focused writing space.</strong> Plan, write, mark and improve in the panel below. The long writing workflow, structure guide,
+            Redemittel preview and tool explanations are now in <strong>Day 0 Orientation</strong>, so this tab stays clear for practice.
+          </NoteBox>
+          <EmbeddedPracticeNote>Write your answer, mark it, collect Redemittel and improve without leaving the course lesson.</EmbeddedPracticeNote>
           <EmbeddedWritingPracticePanel />
         </Section>
       ) : null}

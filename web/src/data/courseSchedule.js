@@ -470,6 +470,14 @@ const B2_COURSE_DICTIONARY = getCurriculumEntriesForLevel("B2").map((entry) => (
 
 const c1Schedule = [
   {
+    day: 0,
+    topic: "Day 0 Orientation",
+    chapter: "0",
+    goal: "Start here to learn the C1 self-learning workflow before Day 1.",
+    instruction: "Open the Day 0 orientation first. Use it to understand the C1 writing workflow, self-marking and course progression.",
+    assignment: false,
+  },
+  {
     day: 1,
     topic: "Ziele und Lernweg",
     chapter: "1.1",
@@ -696,11 +704,16 @@ const c1Schedule = [
 ];
 
 const resolveC1LessonLinks = (assignmentDay) =>
-  assignmentDay === 1
+  assignmentDay === 0
     ? {
-        grammarbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-grammar-notes",
+        grammarbook_link: null,
         workbook_link: "/campus/course/c1-day-0-progression-workbook",
       }
+    : assignmentDay === 1
+      ? {
+          grammarbook_link: "/campus/course/c1-day-1-ziele-und-lernweg-grammar-notes",
+          workbook_link: "/campus/course/lesson/C1/1",
+        }
     : assignmentDay === 10
       ? {
           grammarbook_link: "/campus/course/c1-day-10-integration-und-gesellschaft-grammar-notes",

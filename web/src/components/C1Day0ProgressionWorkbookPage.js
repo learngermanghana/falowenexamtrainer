@@ -5,6 +5,38 @@ import { styles } from "../styles";
 const day0HeroImage =
   "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1600&q=80";
 
+
+const c1WritingOrientation = {
+  taskType: "Reflective opinion essay / Lernplan",
+  task: "Schreiben: Mein C1-Lernweg. Beschreibe deinen Ausgangspunkt, deine Motivation, deine größte Schwierigkeit und deinen konkreten 4-Wochen-Plan.",
+  structure: [
+    "Einleitung: Warum C1 für dich wichtig ist.",
+    "Hauptteil 1: Deine aktuelle Ausgangssituation und größte Schwierigkeit.",
+    "Hauptteil 2: Dein konkreter Lernplan mit Falowen AI und Selbstmarkierung.",
+    "Schluss: Dein realistisches Ziel für die nächsten 4 Wochen.",
+  ],
+  redemittel: [
+    "Mein Ziel besteht darin, meine Deutschkenntnisse nicht nur zu erweitern, sondern gezielt anzuwenden.",
+    "Besonders wichtig ist für mich, dass ich Feedback nicht als Kritik, sondern als Lernhilfe verstehe.",
+    "Durch regelmäßige Selbstreflexion kann ich besser erkennen, welche Bereiche ich wiederholen muss.",
+    "Langfristig möchte ich sicherer, präziser und strukturierter kommunizieren.",
+  ],
+  tools: [
+    {
+      title: "Mark my letter",
+      description: "Paste your finished draft in the writing panel and get a score, corrections, feedback and a better version.",
+    },
+    {
+      title: "Ref / Redemittel",
+      description: "Use the writing panel to save useful phrases, structure lines and reference notes before you write.",
+    },
+    {
+      title: "Ideas generator",
+      description: "Use the writing panel to build ideas, examples and a simple writing plan before drafting.",
+    },
+  ],
+};
+
 const SectionCard = ({ title, children }) => (
   <section style={{ ...styles.card, display: "grid", gap: 10 }}>
     <h2 style={{ margin: 0 }}>{title}</h2>
@@ -353,6 +385,46 @@ const C1Day0ProgressionWorkbookPage = () => {
           <a href="https://www.falowen.app/campus/writing" target="_blank" rel="noreferrer">
             Open Writing Practice
           </a>
+        </p>
+      </SectionCard>
+
+      <SectionCard title="C1 Day 0 writing support moved here">
+        <p style={{ margin: 0 }}>
+          The lesson Writing tab is now kept short and focused. Use the writing task below to understand the topic,
+          then use the writing panel in the lesson to plan, write, mark and improve your answer.
+        </p>
+
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+          <strong>Writing task</strong>
+          <span style={{ ...styles.badge, justifySelf: "start" }}>{c1WritingOrientation.taskType}</span>
+          <p style={{ margin: 0 }}>{c1WritingOrientation.task}</p>
+        </div>
+
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+          <strong>Structure guide</strong>
+          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+            {c1WritingOrientation.structure.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 8 }}>
+          <strong>Redemittel preview</strong>
+          <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
+            {c1WritingOrientation.redemittel.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+          {c1WritingOrientation.tools.map((tool) => (
+            <div key={tool.title} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, display: "grid", gap: 6 }}>
+              <strong>{tool.title}</strong>
+              <p style={{ margin: 0 }}>{tool.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <p style={{ margin: 0 }}>
+          Practise inside the lesson: write your answer, mark it, collect Redemittel and improve without leaving the course lesson.
         </p>
       </SectionCard>
 
