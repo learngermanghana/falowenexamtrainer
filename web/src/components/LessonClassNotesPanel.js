@@ -28,6 +28,11 @@ const getLessonIdFromLocation = () => {
   return normalizeKey(window.location.pathname || "lesson");
 };
 
+const getCurrentRoute = () => {
+  if (typeof window === "undefined") return "/campus/course";
+  return `${window.location.pathname || "/campus/course"}${window.location.search || ""}${window.location.hash || ""}`;
+};
+
 const getLessonTitleFromDocument = () => {
   if (typeof document === "undefined") return "Current lesson";
   return document.querySelector("h1")?.textContent || document.title || "Current lesson";
@@ -102,6 +107,7 @@ const LessonClassNotesPanel = ({ lessonId, lessonTitle, compact = false }) => {
         className,
         lessonId: resolvedLessonId,
         lessonTitle: resolvedLessonTitle,
+        route: getCurrentRoute(),
         title: draft.title.trim() || (isTutor ? "Class vocabulary / suggestion" : "Student question"),
         body: draft.body.trim(),
         createdAt: serverTimestamp(),
