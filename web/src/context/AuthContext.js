@@ -133,23 +133,49 @@ const formatDateForLoginError = (value) => {
 
 const normalizePaymentStatus = (value) => String(value || "").trim().toLowerCase();
 
+const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
+const BLOCKED_PAYMENT_STATUSES = ["failed", "overdue", "rejected", "cancelled", "canceled"];
+
+const getStudentSupportReason = (profile, fallbackReason = "student_access_blocked") => {
+  if (!profile) return "profile_not_found";
+  const status = String(profile.status || "").trim().toLowerCase();
+  if (status && !ACTIVE_STUDENT_STATUSES.includes(status)) return "inactive_status";
+
+  const contractEndMs = toMillis(profile.contractEnd);
+  if (Number.isFinite(contractEndMs) && contractEndMs <= Date.now()) return "contract_ended";
+
+  const paymentStatus = normalizePaymentStatus(profile.paymentStatus);
+  if (BLOCKED_PAYMENT_STATUSES.includes(paymentStatus)) return "payment_status";
+
+  return fallbackReason;
+};
+
+const buildStudentSupportDiagnostic = (profile, reason = "student_access_blocked") => ({
+  reason: getStudentSupportReason(profile, reason),
+  status: profile?.status || "",
+  studentCode: profile?.studentCode || profile?.studentcode || profile?.id || "",
+  email: profile?.email || "",
+  contractEnd: profile?.contractEnd ? formatDateForLoginError(profile.contractEnd) : "",
+  paymentStatus: profile?.paymentStatus || "",
+  profile,
+});
 
 const getStudentAccessBlockReason = (profile) => {
   if (!profile) return "No student profile was found for this login. Please contact support.";
 
   const status = String(profile.status || "").trim().toLowerCase();
-  if (status && !["active", "paid", "partial", "pending"].includes(status)) {
-    return `Your student account status is ${profile.status}. Please contact support to reactivate it.`;
+  if (status && !ACTIVE_STUDENT_STATUSES.includes(status)) {
+    return `Login blocked because this student record is marked ${profile.status}.`;
   }
 
   const contractEndMs = toMillis(profile.contractEnd);
   if (Number.isFinite(contractEndMs) && contractEndMs <= Date.now()) {
-    return `Your student contract ended on ${formatDateForLoginError(profile.contractEnd)}. Please renew your contract or contact support.`;
+    return `Your contract ended on ${formatDateForLoginError(profile.contractEnd)}. Please renew your contract or contact support.`;
   }
 
   const paymentStatus = normalizePaymentStatus(profile.paymentStatus);
-  if (["failed", "overdue", "rejected", "cancelled", "canceled"].includes(paymentStatus)) {
-    return `Your payment status is ${profile.paymentStatus}. Please complete your payment or contact support.`;
+  if (BLOCKED_PAYMENT_STATUSES.includes(paymentStatus)) {
+    return `Login blocked because this student payment status is ${profile.paymentStatus}. Please complete your payment or contact support.`;
   }
 
   return "";
@@ -185,14 +211,22 @@ const throwIfDiagnosticBlocksLogin = (diagnostic) => {
   if (!diagnostic) return;
   if (diagnostic.reason === "contract_ended") {
     throw new LoginDiagnosticError(
-      `Your student contract ended on ${diagnostic.contractEndLabel || "the recorded end date"}. Please renew your contract or contact support.`,
+      `Your contract ended on ${diagnostic.contractEndLabel || "the recorded end date"}. Please renew your contract or contact support.`,
       { ...diagnostic, code: "auth/contract-ended" }
     );
   }
   if (diagnostic.reason === "inactive_status") {
+    const status = String(diagnostic.status || diagnostic.profile?.status || "").trim();
+    if (ACTIVE_STUDENT_STATUSES.includes(status.toLowerCase())) return;
     throw new LoginDiagnosticError(
-      `Your student account status is ${diagnostic.status || "not active"}. Please contact support to reactivate it.`,
-      { ...diagnostic, code: "auth/account-inactive" }
+      `Login blocked because this student record is marked ${status || "not active"}.`,
+      { ...diagnostic, status, code: "auth/account-inactive" }
+    );
+  }
+  if (diagnostic.reason === "payment_status") {
+    throw new LoginDiagnosticError(
+      `Login blocked because this student payment status is ${diagnostic.paymentStatus || diagnostic.profile?.paymentStatus || "not accepted"}. Please complete your payment or contact support.`,
+      { ...diagnostic, code: "auth/payment-status-blocked" }
     );
   }
 };
@@ -655,7 +689,10 @@ export const AuthProvider = ({ children }) => {
           await signOut(auth).catch((error) => console.warn("Failed to sign out blocked login", error));
           setStudentProfile(null);
           setMessagingToken(null);
-          throw new LoginDiagnosticError(accessBlockReason, { code: "auth/student-access-blocked" });
+          throw new LoginDiagnosticError(accessBlockReason, {
+            ...buildStudentSupportDiagnostic(profile, "student_access_blocked"),
+            code: "auth/student-access-blocked",
+          });
         }
         setStudentProfile(profile);
         setMessagingToken(getMessagingTokenFromProfile(profile, deviceId));
@@ -795,7 +832,10 @@ export const AuthProvider = ({ children }) => {
     const accessBlockReason = getStudentAccessBlockReason(existingProfile);
     if (accessBlockReason) {
       await signOut(auth);
-      throw new LoginDiagnosticError(accessBlockReason, { code: "auth/student-access-blocked" });
+      throw new LoginDiagnosticError(accessBlockReason, {
+        ...buildStudentSupportDiagnostic(existingProfile, "student_access_blocked"),
+        code: "auth/student-access-blocked",
+      });
     }
 
     const studentRef = doc(db, "students", existingProfile.id);

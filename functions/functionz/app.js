@@ -477,11 +477,14 @@ const buildLoginDiagnosticProfile = (docSnap) => {
   };
 };
 
+const ACTIVE_STUDENT_STATUSES = ["active", "paid", "partial", "pending", "enrolled", "registered", "ongoing", "current"];
+const BLOCKED_PAYMENT_STATUSES = ["failed", "overdue", "rejected", "cancelled", "canceled"];
+
 const buildLoginDiagnostic = (profile) => {
   if (!profile) return { exists: false, reason: "not_found" };
 
   const status = String(profile.status || "").trim().toLowerCase();
-  if (status && !["active", "paid", "partial", "pending"].includes(status)) {
+  if (status && !ACTIVE_STUDENT_STATUSES.includes(status)) {
     return {
       exists: true,
       reason: "inactive_status",
@@ -497,6 +500,16 @@ const buildLoginDiagnostic = (profile) => {
       reason: "contract_ended",
       contractEnd: contractEnd.toISOString(),
       contractEndLabel: formatDateForLoginDiagnostic(profile.contractEnd),
+      profile,
+    };
+  }
+
+  const paymentStatus = String(profile.paymentStatus || "").trim().toLowerCase();
+  if (BLOCKED_PAYMENT_STATUSES.includes(paymentStatus)) {
+    return {
+      exists: true,
+      reason: "payment_status",
+      paymentStatus: profile.paymentStatus,
       profile,
     };
   }
