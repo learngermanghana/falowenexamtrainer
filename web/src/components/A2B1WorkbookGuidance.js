@@ -86,16 +86,17 @@ export const A2B1WorkbookGuidance = ({ showClassNotes = true, compactNotes = tru
 
       <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
         <p style={{ margin: 0 }}>
-          <strong>Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Use the AI
-          speaking coach on this page to practise before class.
+          Each A2/B1 workbook now has <strong>five parts</strong>: Sprechen, Schreiben, Lesen, Hören and Class Notes.
         </p>
         <p style={{ margin: 0 }}>
-          <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören</strong> are assignment parts. You can use the AI tools on
-          this page to practise and improve, but when you are finished, submit your final answers in the Submission tab.
+          <strong>Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Prepare it before class and use the AI speaking coach on this page to practise.
+        </p>
+        <p style={{ margin: 0 }}>
+          <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören</strong> are the assignment parts. You can practise with the AI tools on this page, but your final answers must be submitted in the <strong>Submission</strong> tab.
         </p>
         {showClassNotes ? (
           <p style={{ margin: 0 }}>
-            <strong>Teil 5 · Class Notes</strong> is where your tutor saves vocabulary, Zoom notes, short suggestions and answers to class questions.
+            <strong>Teil 5 · Class Notes</strong> is not an assignment. It is where your tutor saves vocabulary from Zoom, short suggestions, corrections, reminders and answers to class questions for this exact lesson.
           </p>
         ) : null}
       </div>
@@ -118,6 +119,6 @@ export const WorkbookSubmissionReminder = () => (
       lineHeight: 1.5,
     }}
   >
-    Reminder: This page is for learning and practice. Submit your final work in the Submission tab.
+    Reminder: This page is for learning and practice. Submit only your final assignment work in the Submission tab.
   </div>
 );
