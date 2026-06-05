@@ -1,4 +1,5 @@
 export const defaultReadingTasks = [
+  "Choose one suitable article from a German platform such as WELT, Tagesschau, Deutschlandfunk or DW.",
   "Read once for the general idea, not for every unknown word.",
   "Write the main idea in one sentence.",
   "Find 5 useful words or expressions and write your own example sentence.",
@@ -6,6 +7,7 @@ export const defaultReadingTasks = [
 ];
 
 export const defaultListeningTasks = [
+  "Choose one suitable audio/video from DW Deutsch lernen, Deutschlandfunk or ARD Audiothek.",
   "Listen once for the general topic.",
   "Listen again and write 3 key points.",
   "Write 2 useful expressions you heard.",
@@ -78,14 +80,14 @@ export const chooseWritingType = (title = "", topic = "") => {
   return "Opinion essay / Erörterung";
 };
 
-const buildC1OpinionWriting = (title, topic) => ({
-  taskType: "Goethe C1 opinion essay / Stellungnahme",
-  topic: `Schreiben: ${title}. Verfassen Sie eine C1-Stellungnahme und bearbeiten Sie alle Punkte: Erklären Sie, welche Bedeutung „${title}“ heute hat. Argumentieren Sie anhand eines konkreten Beispiels aus Alltag, Arbeit, Bildung oder Gesellschaft. Nennen Sie Gründe, die gegen diese Entwicklung oder Position sprechen könnten. Erläutern Sie eine Alternative oder einen ausgewogenen Lösungsweg.`,
+const buildC1OpinionWriting = (title, topicContext) => ({
+  taskType: "C1 opinion essay / Stellungnahme",
+  topic: `Schreiben: ${title}. Verfassen Sie eine C1-Stellungnahme und bearbeiten Sie alle Punkte: Erklären Sie, warum dieses Thema im Zusammenhang mit ${topicContext} wichtig ist. Argumentieren Sie anhand eines konkreten Beispiels aus Alltag, Arbeit, Bildung oder Gesellschaft. Nennen Sie mögliche Einwände oder Nachteile. Erläutern Sie eine sinnvolle Alternative oder einen ausgewogenen Lösungsweg.`,
   structure: [
     `Einleitung: Stellen Sie das Thema „${title}“ vor und zeigen Sie, warum es aktuell oder gesellschaftlich relevant ist.`,
-    `Erklären Sie: Welche Bedeutung hat „${title}“ im Zusammenhang mit ${topic}?`,
+    `Erklären Sie: Welche Bedeutung hat „${title}“ im Zusammenhang mit ${topicContext}?`,
     "Argumentieren Sie anhand eines Beispiels: Zeigen Sie konkret, wie sich das Thema im Alltag, in der Schule, im Beruf oder in der Gesellschaft zeigt.",
-    "Nennen Sie Gründe dagegen: Welche Probleme, Risiken oder Grenzen können entstehen?",
+    "Nennen Sie mögliche Einwände: Welche Probleme, Risiken oder Grenzen können entstehen?",
     "Erläutern Sie eine Alternative: Beschreiben Sie einen ausgewogenen Lösungsweg oder eine andere Möglichkeit.",
     "Schluss: Formulieren Sie ein differenziertes Fazit mit Ihrer eigenen Position.",
   ],
@@ -93,13 +95,13 @@ const buildC1OpinionWriting = (title, topic) => ({
     `Das Thema „${title}“ lässt sich aus verschiedenen Perspektiven betrachten.`,
     "Eine zentrale Bedeutung besteht darin, dass ...",
     "Ein anschauliches Beispiel hierfür ist ...",
-    "Gegen diese Entwicklung spricht jedoch, dass ...",
+    "Kritisch zu betrachten ist jedoch, dass ...",
     "Eine sinnvolle Alternative wäre, ...",
     "Zusammenfassend lässt sich festhalten, dass ...",
   ],
 });
 
-const buildB2OpinionWriting = (title, topic) => ({
+const buildB2OpinionWriting = (title) => ({
   taskType: "B2 opinion essay / Meinungsbeitrag",
   topic: `Schreiben: ${title}. Äußern Sie Ihre Meinung zu diesem Thema. Nennen Sie Gründe, warum „${title}“ im Alltag oder in der Gesellschaft wichtig bzw. verbreitet ist. Nennen Sie andere Möglichkeiten oder Alternativen. Nennen Sie Vorteile dieser Alternativen.`,
   structure: [
@@ -163,7 +165,7 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
     ? buildFormalWriting(level, title)
     : level === "C1"
       ? buildC1OpinionWriting(title, topic)
-      : buildB2OpinionWriting(title, topic);
+      : buildB2OpinionWriting(title);
 
   return makeLesson({
     level,
@@ -175,14 +177,14 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
     grammarFocus: formalTask
       ? "Formelle Sprache, klare Struktur und höfliche Begründungen"
       : level === "C1"
-        ? "Goethe-C1-Stellungnahme: erklären, Beispiel geben, Gegenargumente nennen und Alternative erläutern"
+        ? "C1-Prüfungsstruktur: erklären, Beispiel geben, Einwände nennen und Alternative erläutern"
         : "B2-Meinungsbeitrag: Meinung äußern, Gründe nennen, Alternativen erklären und Vorteile darstellen",
     objectives: [
       "Ich kann das Thema klar erklären.",
       formalTask
         ? "Ich kann eine formelle E-Mail mit Anlass, Begründung und Bitte schreiben."
         : level === "C1"
-          ? "Ich kann eine C1-Stellungnahme mit Beispiel, Gegenargument und Alternative schreiben."
+          ? "Ich kann eine C1-Stellungnahme mit Beispiel, Einwand und Alternative schreiben."
           : "Ich kann einen B2-Meinungsbeitrag mit Gründen, Alternativen und Vorteilen schreiben.",
       "Ich kann mit Falowen AI üben und meine Antwort verbessern.",
     ],
@@ -191,7 +193,7 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
       formalTask
         ? "Die Schreibaufgabe ist als formelle E-Mail aufgebaut, weil das Thema ein konkretes Anliegen oder eine offizielle Situation verlangt."
         : level === "C1"
-          ? "Die Schreibaufgabe folgt der C1-Struktur: erklären, anhand eines Beispiels argumentieren, Gegenargumente nennen und eine Alternative erläutern."
+          ? "Die Schreibaufgabe folgt einer C1-Prüfungsstruktur: erklären, anhand eines Beispiels argumentieren, Einwände nennen und eine Alternative erläutern."
           : "Die Schreibaufgabe folgt der B2-Struktur: Meinung äußern, Gründe nennen, andere Möglichkeiten erklären und Vorteile dieser Alternativen nennen.",
     ],
     topicQuestions: [
@@ -210,7 +212,7 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
           ? [
               "Beantworte jeden Aufgabenpunkt sichtbar.",
               "Erkläre zuerst die Bedeutung des Themas, bevor du argumentierst.",
-              "Nutze ein konkretes Beispiel, ein Gegenargument und eine Alternative.",
+              "Nutze ein konkretes Beispiel, einen Einwand und eine Alternative.",
             ]
           : [
               "Äußere deine Meinung klar.",
@@ -227,7 +229,7 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
       miniExercise: formalTask
         ? `Formuliere drei Sätze zum Thema „${title}": Anlass, Begründung und Bitte.`
         : level === "C1"
-          ? `Formuliere vier Stichpunkte zum Thema „${title}": Erklärung, Beispiel, Gegenargument und Alternative.`
+          ? `Formuliere vier Stichpunkte zum Thema „${title}": Erklärung, Beispiel, Einwand und Alternative.`
           : `Formuliere vier Stichpunkte zum Thema „${title}": Meinung, Gründe, Alternativen und Vorteile.`,
     },
     speakingTaskType: formalTask ? "Formal situation talk" : "Guided opinion talk",
@@ -244,7 +246,7 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
         : [
             "Einleitung: Nenne das Thema und deine Grundposition.",
             "Hauptteil: Erkläre Gründe mit Beispielen.",
-            level === "C1" ? "Gegenposition: Nenne ein Gegenargument und eine Alternative." : "Alternative: Nenne andere Möglichkeiten und Vorteile.",
+            level === "C1" ? "Gegenposition: Nenne einen Einwand und eine Alternative." : "Alternative: Nenne andere Möglichkeiten und Vorteile.",
             "Schluss: Sage, was du persönlich daraus lernst oder empfiehlst.",
           ],
       starters: formalTask
@@ -265,22 +267,33 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
       writing: formalTask
         ? `Schreibe eine formelle E-Mail mit 180–220 Wörtern über: ${title}.`
         : level === "C1"
-          ? `Schreibe 180–220 Wörter als C1-Stellungnahme über: ${title}. Beantworte Erklärung, Beispiel, Gegenargument und Alternative.`
+          ? `Schreibe 180–220 Wörter als C1-Stellungnahme über: ${title}. Beantworte Erklärung, Beispiel, Einwand und Alternative.`
           : `Schreibe 180–220 Wörter als B2-Meinungsbeitrag über: ${title}. Beantworte Meinung, Gründe, Alternativen und Vorteile.`,
-      reading: `Lies einen passenden Text zum Thema ${title} und notiere die wichtigsten Punkte.`,
-      listening: `Höre einen Beitrag zum Thema ${title} und fasse ihn zusammen.`,
+      reading: `Wähle einen passenden Artikel auf einer empfohlenen deutschen Plattform und notiere die wichtigsten Punkte zum Thema ${title}.`,
+      listening: `Wähle ein passendes Audio oder Video auf einer empfohlenen deutschen Plattform und fasse es zusammen.`,
     },
     readingResource: {
-      title: `WELT article search: ${title}`,
-      description: "Open this stable site search and choose one current WELT article connected to today’s topic.",
-      url: buildWeltReadingSearchUrl(title),
-      tasks: defaultReadingTasks,
+      title: "Recommended German reading platforms",
+      description: "Use stable German platforms instead of broken search links. Choose one article connected to today’s topic.",
+      url: "https://www.welt.de",
+      tasks: [
+        "WELT: https://www.welt.de",
+        "Tagesschau: https://www.tagesschau.de",
+        "Deutschlandfunk: https://www.deutschlandfunk.de",
+        "DW News: https://www.dw.com/de/themen/s-9077",
+        ...defaultReadingTasks,
+      ],
     },
     listeningResource: {
-      title: `DW Deutsch lernen / Top-Thema search: ${title}`,
-      description: "Choose a short German audio/video connected to today’s topic. DW is usually easier than newspaper audio for B2/C1 practice.",
-      url: `https://www.dw.com/de/suche/s-100853?searchNavigationId=9097&item=${encodeURIComponent(title)}`,
-      tasks: defaultListeningTasks,
+      title: "Recommended German listening platforms",
+      description: "Use stable platform pages. Choose one audio or video connected to today’s topic.",
+      url: "https://www.dw.com/de/deutsch-lernen/s-2055",
+      tasks: [
+        "DW Deutsch lernen: https://www.dw.com/de/deutsch-lernen/s-2055",
+        "Deutschlandfunk: https://www.deutschlandfunk.de",
+        "ARD Audiothek: https://www.ardaudiothek.de",
+        ...defaultListeningTasks,
+      ],
     },
     vocabulary: title.split(/\s+|und|\/|-/).filter((word) => word.length > 3).slice(0, 8),
   });
