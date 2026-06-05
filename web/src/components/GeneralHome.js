@@ -24,7 +24,7 @@ const day0WorkbookByLevel = {
   C1: "/campus/course/c1-day-0-progression-workbook",
 };
 
-const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning }) => {
+const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning, onOpenAccount }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
@@ -60,6 +60,14 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
         <button
           type="button"
           style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
+          onClick={onOpenAccount}
+        >
+          Account
+        </button>
+
+        <button
+          type="button"
+          style={{ ...styles.primaryButton, background: "#f8fafc", color: "#111827", borderColor: "#e5e7eb" }}
           onClick={onJoinZoom}
         >
           {t("generalHome.welcome.joinZoom")}
@@ -75,7 +83,7 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
   );
 };
 
-const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoinZoom, onOpenExamFile }) => {
+const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoinZoom, onOpenExamFile, onOpenAccount }) => {
   const levelKey = detectLevelKey(studentProfile);
   const className = studentProfile?.className || "your class";
   const hasDay0 = Boolean(day0WorkbookByLevel[levelKey]);
@@ -124,6 +132,16 @@ const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoin
           </p>
           <button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>
             {hasDay0 ? "Open Day 0" : "Open account"}
+          </button>
+        </div>
+
+        <div style={{ border: "1px solid #fde68a", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+          <strong>👤 Account & notifications</strong>
+          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
+            Open your account to enable push notifications, check payment status, and review your profile.
+          </p>
+          <button type="button" style={styles.secondaryButton} onClick={onOpenAccount}>
+            Open account
           </button>
         </div>
 
@@ -232,6 +250,11 @@ const GeneralHome = ({
   const openExamFile = useCallback(() => {
     playOpenFeedback();
     navigate("/campus/examFile");
+  }, [navigate, playOpenFeedback]);
+
+  const openAccount = useCallback(() => {
+    playOpenFeedback();
+    navigate("/campus/account");
   }, [navigate, playOpenFeedback]);
 
   const joinZoom = useCallback(() => {
@@ -366,6 +389,7 @@ const GeneralHome = ({
         onOpenExamFile={openExamFile}
         onJoinZoom={joinZoom}
         onContinueLearning={openCampus}
+        onOpenAccount={openAccount}
       />
 
       {paymentAlert ? (
@@ -405,6 +429,7 @@ const GeneralHome = ({
         }}
         onJoinZoom={joinZoom}
         onOpenExamFile={openExamFile}
+        onOpenAccount={openAccount}
       />
 
       <HomeMetrics studentProfile={studentProfile} />
