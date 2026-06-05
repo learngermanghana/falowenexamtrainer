@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 import TuitionStatusCard from "./TuitionStatusCard";
+import NotificationSettingsCard from "./NotificationSettingsCard";
 import { isPaymentsEnabled } from "../lib/featureFlags";
 import { toDate, toDateMs } from "../lib/dateUtils";
 import { hasClearedBalance, normalizePaymentStatus } from "../lib/paymentStatus";
@@ -280,6 +281,7 @@ const AccountSettings = () => {
       <div style={styles.tabList}>
         {[
           { key: "studentData", label: t("accountSettings.tabs.studentData") },
+          { key: "notifications", label: "Notifications" },
           { key: "billing", label: t("accountSettings.tabs.billing") },
           { key: "upgrade", label: t("accountSettings.tabs.upgrade") },
         ].map((tab) => (
@@ -321,6 +323,8 @@ const AccountSettings = () => {
         </p>
       </section>
       ) : null}
+
+      {activeTab === "notifications" ? <NotificationSettingsCard /> : null}
 
       {activeTab === "billing" ? (
       <section style={styles.card}>
