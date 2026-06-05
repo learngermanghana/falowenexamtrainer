@@ -17,7 +17,7 @@ const writingTools = [
   },
   {
     title: "Ref / Redemittel",
-    description: "Use the writing panel below to save useful phrases, structure lines and reference notes before you write.",
+    description: "Use the writing panel below on A2, B1, B2 and C1 lessons to save a clear topic, paste the full body, search it later and open it as its own study page.",
   },
   {
     title: "Ideas generator",
@@ -37,7 +37,7 @@ const SelfLearningWritingTools = ({ writingType, structure = [], usefulLines = [
       }}
     >
       <strong>Use the writing task above.</strong> First understand the topic, then use the writing panel below to plan,
-      write, mark and improve your answer. Full extra exam prompts are still in the Exam Room.
+      write, mark and improve your answer. The Ref tab below uses the same topic/body library for A2, B1, B2 and C1 lessons. Full extra exam prompts are still in the Exam Room.
     </div>
 
     <div style={toolCardStyle}>

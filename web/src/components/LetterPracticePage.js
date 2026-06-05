@@ -16,6 +16,8 @@ import {
 } from "../services/tutorReviewService";
 import { parseImportantPhraseLine } from "../lib/writingCoachFormatting";
 import WritingFeedbackCard from "./WritingFeedbackCard";
+import WritingReferenceLibrary from "./WritingReferenceLibrary";
+import { makeReferenceId, normalizeReferenceNotes } from "../lib/writingReferenceLibrary";
 
 const IDEAS_COACHING_PROMPTS = [
   "Paste the task or your draft.",
@@ -85,10 +87,14 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   const [editableDraftById, setEditableDraftById] = useState({});
   const [hiddenDraftIds, setHiddenDraftIds] = useState([]);
   const [ideaDraftWorkspace, setIdeaDraftWorkspace] = useState("");
-  const [referenceInput, setReferenceInput] = useState("");
+  const [referenceTopicInput, setReferenceTopicInput] = useState("");
+  const [referenceBodyInput, setReferenceBodyInput] = useState("");
   const [referenceNotes, setReferenceNotes] = useState([]);
-  const [editingReferenceNote, setEditingReferenceNote] = useState(null);
-  const [referenceEditInput, setReferenceEditInput] = useState("");
+  const [editingReferenceNoteId, setEditingReferenceNoteId] = useState(null);
+  const [referenceEditTopicInput, setReferenceEditTopicInput] = useState("");
+  const [referenceEditBodyInput, setReferenceEditBodyInput] = useState("");
+  const [selectedReferenceNoteId, setSelectedReferenceNoteId] = useState("");
+  const [referenceSearch, setReferenceSearch] = useState("");
   const [selectedLetterId, setSelectedLetterId] = useState(writingLetters[0]?.id || "");
   const [timerSeconds, setTimerSeconds] = useState(writingLetters[0]?.durationMinutes * 60 || 0);
   const [timerRunning, setTimerRunning] = useState(false);
@@ -224,6 +230,24 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     [filteredPracticeLetters, selectedLetterId]
   );
 
+  const normalizedReferenceSearch = referenceSearch.trim().toLowerCase();
+  const filteredReferenceNotes = useMemo(
+    () =>
+      referenceNotes.filter((note) => {
+        if (!normalizedReferenceSearch) return true;
+        return `${note.topic} ${note.body}`.toLowerCase().includes(normalizedReferenceSearch);
+      }),
+    [normalizedReferenceSearch, referenceNotes]
+  );
+  const selectedReferenceNote = useMemo(
+    () =>
+      referenceNotes.find((note) => note.id === selectedReferenceNoteId) ||
+      filteredReferenceNotes[0] ||
+      referenceNotes[0] ||
+      null,
+    [filteredReferenceNotes, referenceNotes, selectedReferenceNoteId]
+  );
+
   useEffect(() => {
     let mounted = true;
 
@@ -237,6 +261,11 @@ const LetterPracticePage = ({ mode = "exams" }) => {
             setEditableDraftById({});
             setHiddenDraftIds([]);
             setIdeaDraftWorkspace("");
+            setReferenceTopicInput("");
+            setReferenceBodyInput("");
+            setReferenceNotes([]);
+            setSelectedReferenceNoteId("");
+            setReferenceSearch("");
             setIdeaSessionActive(false);
             setIdeaTurnCount(0);
           }
@@ -259,6 +288,11 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           setEditableDraftById({});
           setHiddenDraftIds([]);
           setIdeaDraftWorkspace("");
+          setReferenceTopicInput("");
+          setReferenceBodyInput("");
+          setReferenceNotes([]);
+          setSelectedReferenceNoteId("");
+          setReferenceSearch("");
           setIdeaSessionActive(false);
           setIdeaTurnCount(0);
           setIdeasProgressLoaded(true);
@@ -283,12 +317,22 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           setHiddenDraftIds([]);
         }
         if (typeof saved.ideaDraftWorkspace === "string") setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
-        if (typeof saved.referenceInput === "string") setReferenceInput(saved.referenceInput);
-        if (Array.isArray(saved.referenceNotes)) {
-          setReferenceNotes(saved.referenceNotes.filter((item) => typeof item === "string"));
-        } else {
-          setReferenceNotes([]);
+        if (typeof saved.referenceInput === "string") {
+          setReferenceBodyInput(saved.referenceInput);
         }
+        if (typeof saved.referenceTopicInput === "string") setReferenceTopicInput(saved.referenceTopicInput);
+        if (typeof saved.referenceBodyInput === "string") setReferenceBodyInput(saved.referenceBodyInput);
+        const normalizedReferences = normalizeReferenceNotes(saved.referenceNotes);
+        setReferenceNotes(normalizedReferences);
+        if (
+          typeof saved.selectedReferenceNoteId === "string" &&
+          normalizedReferences.some((item) => item.id === saved.selectedReferenceNoteId)
+        ) {
+          setSelectedReferenceNoteId(saved.selectedReferenceNoteId);
+        } else {
+          setSelectedReferenceNoteId(normalizedReferences[0]?.id || "");
+        }
+        if (typeof saved.referenceSearch === "string") setReferenceSearch(saved.referenceSearch);
         if (typeof saved.ideaSessionActive === "boolean") setIdeaSessionActive(saved.ideaSessionActive);
         if (typeof saved.ideaTurnCount === "number") setIdeaTurnCount(saved.ideaTurnCount);
       } catch (error) {
@@ -320,8 +364,11 @@ const LetterPracticePage = ({ mode = "exams" }) => {
           editableDraftById,
           hiddenDraftIds,
           ideaDraftWorkspace,
-          referenceInput,
+          referenceTopicInput,
+          referenceBodyInput,
           referenceNotes,
+          selectedReferenceNoteId,
+          referenceSearch,
           ideaSessionActive,
           ideaTurnCount,
         },
@@ -339,8 +386,11 @@ const LetterPracticePage = ({ mode = "exams" }) => {
     editableDraftById,
     hiddenDraftIds,
     ideaDraftWorkspace,
-    referenceInput,
+    referenceTopicInput,
+    referenceBodyInput,
     referenceNotes,
+    selectedReferenceNoteId,
+    referenceSearch,
     ideasProgressLoaded,
     ideasProgressMode,
     selectedDraftIds,
@@ -615,66 +665,109 @@ const LetterPracticePage = ({ mode = "exams" }) => {
   };
 
   const addReferenceNote = () => {
-    const normalized = referenceInput.trim().replace(/\s+/g, " ");
-    if (!normalized) return;
+    const topic = referenceTopicInput.trim().replace(/\s+/g, " ");
+    const body = referenceBodyInput.trim();
 
-    const alreadyExists = referenceNotes.some((note) => note.toLowerCase() === normalized.toLowerCase());
+    if (!topic || !body) {
+      setIdeaError("Add both a topic and body before saving your reference.");
+      setIdeaSuccess("");
+      return;
+    }
+
+    const alreadyExists = referenceNotes.some((note) => note.topic.toLowerCase() === topic.toLowerCase());
     if (alreadyExists) {
-      setIdeaSuccess("That note is already in your reference list.");
+      setIdeaSuccess("That topic is already in your reference list.");
       setIdeaError("");
       return;
     }
 
-    setReferenceNotes((prev) => [normalized, ...prev]);
-    setReferenceInput("");
-    setIdeaSuccess("Reference saved.");
+    const newReference = {
+      id: makeReferenceId(),
+      topic,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+
+    setReferenceNotes((prev) => [newReference, ...prev]);
+    setSelectedReferenceNoteId(newReference.id);
+    setReferenceTopicInput("");
+    setReferenceBodyInput("");
+    setIdeaSuccess("Reference saved. Open the topic to study the body on its own page.");
     setIdeaError("");
   };
 
   const startEditingReferenceNote = (note) => {
-    setEditingReferenceNote(note);
-    setReferenceEditInput(note);
+    setEditingReferenceNoteId(note.id);
+    setReferenceEditTopicInput(note.topic);
+    setReferenceEditBodyInput(note.body);
     setIdeaError("");
     setIdeaSuccess("");
   };
 
   const cancelEditingReferenceNote = () => {
-    setEditingReferenceNote(null);
-    setReferenceEditInput("");
+    setEditingReferenceNoteId(null);
+    setReferenceEditTopicInput("");
+    setReferenceEditBodyInput("");
     setIdeaError("");
   };
 
   const saveEditedReferenceNote = (originalNote) => {
-    const normalized = referenceEditInput.trim().replace(/\s+/g, " ");
+    const topic = referenceEditTopicInput.trim().replace(/\s+/g, " ");
+    const body = referenceEditBodyInput.trim();
 
-    if (!normalized) {
-      setIdeaError("Reference notes cannot be empty.");
+    if (!topic || !body) {
+      setIdeaError("Reference topics and bodies cannot be empty.");
       setIdeaSuccess("");
       return;
     }
 
     const alreadyExists = referenceNotes.some(
-      (note) => note !== originalNote && note.toLowerCase() === normalized.toLowerCase()
+      (note) => note.id !== originalNote.id && note.topic.toLowerCase() === topic.toLowerCase()
     );
 
     if (alreadyExists) {
-      setIdeaError("That note is already in your reference list.");
+      setIdeaError("That topic is already in your reference list.");
       setIdeaSuccess("");
       return;
     }
 
-    setReferenceNotes((prev) => prev.map((note) => (note === originalNote ? normalized : note)));
-    setEditingReferenceNote(null);
-    setReferenceEditInput("");
+    setReferenceNotes((prev) =>
+      prev.map((note) =>
+        note.id === originalNote.id
+          ? {
+              ...note,
+              topic,
+              body,
+              updatedAt: new Date().toISOString(),
+            }
+          : note
+      )
+    );
+    setSelectedReferenceNoteId(originalNote.id);
+    setEditingReferenceNoteId(null);
+    setReferenceEditTopicInput("");
+    setReferenceEditBodyInput("");
     setIdeaSuccess("Reference updated.");
     setIdeaError("");
   };
 
   const removeReferenceNote = (noteToRemove) => {
-    setReferenceNotes((prev) => prev.filter((note) => note !== noteToRemove));
-    if (editingReferenceNote === noteToRemove) {
+    setReferenceNotes((prev) => {
+      const remaining = prev.filter((note) => note.id !== noteToRemove.id);
+      if (selectedReferenceNoteId === noteToRemove.id) {
+        setSelectedReferenceNoteId(remaining[0]?.id || "");
+      }
+      return remaining;
+    });
+    if (editingReferenceNoteId === noteToRemove.id) {
       cancelEditingReferenceNote();
     }
+  };
+
+  const addReferenceToLetter = (note) => {
+    setLetterText((prev) => `${prev}${prev ? "\n" : ""}${note.body}`);
+    setIdeaSuccess(`Added “${note.topic}” to your letter draft.`);
+    setIdeaError("");
   };
 
   const startIdeasSession = () => {
@@ -1238,103 +1331,40 @@ const LetterPracticePage = ({ mode = "exams" }) => {
       )}
 
       {activeTab === "references" && (
-        <section style={styles.card}>
-          <h3 style={{ ...styles.sectionTitle, marginTop: 0 }}>Reference</h3>
-          <p style={styles.helperText}>
-            Save useful sentence starters and corrections, then reuse or edit them when needed.
-          </p>
-          <div style={{ ...styles.infoBox, marginBottom: 12 }}>
-            <strong>Tip:</strong> Save short formal phrases you want to reuse in future letters.
-          </div>
-          <div style={{ display: "grid", gap: 6 }}>
-            <label style={styles.label}>New reference note</label>
-            <textarea
-              style={styles.textArea}
-              rows={4}
-              value={referenceInput}
-              placeholder="e.g., Ich möchte mich für die Verspätung entschuldigen."
-              onChange={(event) => {
-                setReferenceInput(event.target.value);
-                setIdeaError("");
-                setIdeaSuccess("");
-              }}
-            />
-          </div>
-          <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={styles.primaryButton} onClick={addReferenceNote}>
-              Save note
-            </button>
-          </div>
-          {ideaSuccess ? <div style={{ ...styles.successBox, marginTop: 8 }}>{ideaSuccess}</div> : null}
-
-          <div style={{ marginTop: 14 }}>
-            <h4 style={styles.resultHeading}>Saved references ({referenceNotes.length})</h4>
-            {referenceNotes.length === 0 ? (
-              <p style={styles.helperText}>No saved references yet.</p>
-            ) : (
-              <div style={{ display: "grid", gap: 10 }}>
-                {referenceNotes.map((note) => (
-                  <div
-                    key={note}
-                    style={{
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: 10,
-                      background: "#fff",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: 10,
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    {editingReferenceNote === note ? (
-                      <div style={{ flex: 1, display: "grid", gap: 8 }}>
-                        <label style={styles.label}>Edit reference note</label>
-                        <textarea
-                          style={styles.textareaSmall}
-                          rows={3}
-                          value={referenceEditInput}
-                          onChange={(event) => {
-                            setReferenceEditInput(event.target.value);
-                            setIdeaError("");
-                            setIdeaSuccess("");
-                          }}
-                        />
-                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                          <button type="button" style={styles.primaryButton} onClick={() => saveEditedReferenceNote(note)}>
-                            Save edit
-                          </button>
-                          <button type="button" style={styles.secondaryButton} onClick={cancelEditingReferenceNote}>
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <>
-                        <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5, flex: 1 }}>{note}</div>
-                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                          <button
-                            type="button"
-                            style={styles.secondaryButton}
-                            onClick={() => setLetterText((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
-                          >
-                            Add to letter
-                          </button>
-                          <button type="button" style={styles.secondaryButton} onClick={() => startEditingReferenceNote(note)}>
-                            Edit
-                          </button>
-                          <button type="button" style={styles.dangerButton} onClick={() => removeReferenceNote(note)}>
-                            Delete
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+        <WritingReferenceLibrary
+          description="Save each pasted reference with a clear topic and body. The library now shows topics first, so long notes open on their own study page instead of appearing as one long list."
+          tip="Use short topics like “Apology letter”, “Complaint phrases”, or “B1 connectors”, then paste the full explanation, example sentences, or corrections in the body."
+          emptyText="No saved references yet."
+          idPrefix="reference"
+          topicPlaceholder="e.g., Apology letter phrases"
+          referenceTopicInput={referenceTopicInput}
+          setReferenceTopicInput={setReferenceTopicInput}
+          referenceBodyInput={referenceBodyInput}
+          setReferenceBodyInput={setReferenceBodyInput}
+          referenceNotes={referenceNotes}
+          filteredReferenceNotes={filteredReferenceNotes}
+          selectedReferenceNote={selectedReferenceNote}
+          setSelectedReferenceNoteId={setSelectedReferenceNoteId}
+          editingReferenceNoteId={editingReferenceNoteId}
+          referenceEditTopicInput={referenceEditTopicInput}
+          setReferenceEditTopicInput={setReferenceEditTopicInput}
+          referenceEditBodyInput={referenceEditBodyInput}
+          setReferenceEditBodyInput={setReferenceEditBodyInput}
+          referenceSearch={referenceSearch}
+          setReferenceSearch={setReferenceSearch}
+          ideaError={ideaError}
+          ideaSuccess={ideaSuccess}
+          setIdeaError={setIdeaError}
+          setIdeaSuccess={setIdeaSuccess}
+          addReferenceNote={addReferenceNote}
+          startEditingReferenceNote={startEditingReferenceNote}
+          cancelEditingReferenceNote={cancelEditingReferenceNote}
+          saveEditedReferenceNote={saveEditedReferenceNote}
+          removeReferenceNote={removeReferenceNote}
+          addReferenceToLetter={addReferenceToLetter}
+          bodyInputStyle={styles.textArea}
+          bodyRows={7}
+        />
       )}
 
       {activeTab === "ideas" && canUseIdeasGenerator && (

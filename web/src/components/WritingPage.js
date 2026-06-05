@@ -16,6 +16,8 @@ import {
 } from "../services/tutorReviewService";
 import { triggerInteractionFeedback } from "../services/interactionFeedback";
 import WritingFeedbackCard from "./WritingFeedbackCard";
+import WritingReferenceLibrary from "./WritingReferenceLibrary";
+import { makeReferenceId, normalizeReferenceNotes } from "../lib/writingReferenceLibrary";
 
 const DEFAULT_EXAM_TIMINGS = {
   A1: 15,
@@ -384,8 +386,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   const [hiddenDraftIds, setHiddenDraftIds] = useState([]);
   const [editableDraftById, setEditableDraftById] = useState({});
   const [ideaDraftWorkspace, setIdeaDraftWorkspace] = useState("");
-  const [referenceInput, setReferenceInput] = useState("");
+  const [referenceTopicInput, setReferenceTopicInput] = useState("");
+  const [referenceBodyInput, setReferenceBodyInput] = useState("");
   const [referenceNotes, setReferenceNotes] = useState([]);
+  const [editingReferenceNoteId, setEditingReferenceNoteId] = useState(null);
+  const [referenceEditTopicInput, setReferenceEditTopicInput] = useState("");
+  const [referenceEditBodyInput, setReferenceEditBodyInput] = useState("");
+  const [selectedReferenceNoteId, setSelectedReferenceNoteId] = useState("");
+  const [referenceSearch, setReferenceSearch] = useState("");
   const [ideasLoading, setIdeasLoading] = useState(false);
   const [ideaError, setIdeaError] = useState("");
   const [ideaSuccess, setIdeaSuccess] = useState("");
@@ -442,6 +450,24 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     const firstUserMessage = chatMessages.find((message) => message.role === "user");
     return firstUserMessage?.content || "";
   }, [chatMessages]);
+
+  const normalizedReferenceSearch = referenceSearch.trim().toLowerCase();
+  const filteredReferenceNotes = useMemo(
+    () =>
+      referenceNotes.filter((note) => {
+        if (!normalizedReferenceSearch) return true;
+        return `${note.topic} ${note.body}`.toLowerCase().includes(normalizedReferenceSearch);
+      }),
+    [normalizedReferenceSearch, referenceNotes]
+  );
+  const selectedReferenceNote = useMemo(
+    () =>
+      referenceNotes.find((note) => note.id === selectedReferenceNoteId) ||
+      filteredReferenceNotes[0] ||
+      referenceNotes[0] ||
+      null,
+    [filteredReferenceNotes, referenceNotes, selectedReferenceNoteId]
+  );
   const [remainingSeconds, setRemainingSeconds] = useState(
     (selectedLetter?.durationMinutes || 0) * 60
   );
@@ -503,8 +529,14 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     setHiddenDraftIds([]);
     setEditableDraftById({});
     setIdeaDraftWorkspace("");
-    setReferenceInput("");
+    setReferenceTopicInput("");
+    setReferenceBodyInput("");
     setReferenceNotes([]);
+    setEditingReferenceNoteId(null);
+    setReferenceEditTopicInput("");
+    setReferenceEditBodyInput("");
+    setSelectedReferenceNoteId("");
+    setReferenceSearch("");
     setIdeaError("");
     setIdeaSuccess("");
     setTutorSaveState({ loading: false, success: "", error: "" });
@@ -729,17 +761,25 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           setEditableDraftById({});
         }
         if (typeof saved.ideaDraftWorkspace === "string") setIdeaDraftWorkspace(saved.ideaDraftWorkspace);
-        const currentModeNotes = Array.isArray(saved.referenceNotes)
-          ? saved.referenceNotes.filter((item) => typeof item === "string")
-          : [];
-        const alternateModeNotes = Array.isArray(alternateSaved?.referenceNotes)
-          ? alternateSaved.referenceNotes.filter((item) => typeof item === "string")
-          : [];
+        if (typeof saved.referenceTopicInput === "string") setReferenceTopicInput(saved.referenceTopicInput);
+        if (typeof saved.referenceBodyInput === "string") setReferenceBodyInput(saved.referenceBodyInput);
+        if (typeof saved.referenceInput === "string") setReferenceBodyInput(saved.referenceInput);
+        const currentModeNotes = normalizeReferenceNotes(saved.referenceNotes);
+        const alternateModeNotes = normalizeReferenceNotes(alternateSaved?.referenceNotes);
         const mergedReferenceNotes = [...currentModeNotes, ...alternateModeNotes].filter(
           (note, index, list) =>
-            list.findIndex((candidate) => candidate.toLowerCase() === note.toLowerCase()) === index
+            list.findIndex((candidate) => candidate.topic.toLowerCase() === note.topic.toLowerCase()) === index
         );
         setReferenceNotes(mergedReferenceNotes);
+        if (
+          typeof saved.selectedReferenceNoteId === "string" &&
+          mergedReferenceNotes.some((item) => item.id === saved.selectedReferenceNoteId)
+        ) {
+          setSelectedReferenceNoteId(saved.selectedReferenceNoteId);
+        } else {
+          setSelectedReferenceNoteId(mergedReferenceNotes[0]?.id || "");
+        }
+        if (typeof saved.referenceSearch === "string") setReferenceSearch(saved.referenceSearch);
         if (typeof saved.remainingSeconds === "number") {
           setRemainingSeconds(saved.remainingSeconds);
         }
@@ -794,7 +834,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
           hiddenDraftIds,
           editableDraftById,
           ideaDraftWorkspace,
+          referenceTopicInput,
+          referenceBodyInput,
           referenceNotes,
+          selectedReferenceNoteId,
+          referenceSearch,
           remainingSeconds,
           timerRunning,
           rubricBreakdown,
@@ -814,6 +858,8 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
         mode: alternateProgressMode,
         data: {
           referenceNotes,
+          selectedReferenceNoteId,
+          referenceSearch,
         },
       }).catch((err) => {
         console.error("Failed to sync reference notes across writing modes", err);
@@ -828,7 +874,11 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
     errorBank,
     editableDraftById,
     ideaDraftWorkspace,
+    referenceTopicInput,
+    referenceBodyInput,
     referenceNotes,
+    selectedReferenceNoteId,
+    referenceSearch,
     firstDraftSnapshot,
     ideaInput,
     markFeedback,
@@ -850,23 +900,109 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
   ]);
 
   const addReferenceNote = () => {
-    const normalized = referenceInput.trim().replace(/\s+/g, " ");
-    if (!normalized) return;
-    const alreadyExists = referenceNotes.some(
-      (note) => note.toLowerCase() === normalized.toLowerCase()
-    );
-    if (alreadyExists) {
-      setIdeaSuccess("That note is already saved in your references.");
+    const topic = referenceTopicInput.trim().replace(/\s+/g, " ");
+    const body = referenceBodyInput.trim();
+
+    if (!topic || !body) {
+      setIdeaError("Add both a topic and body before saving your reference.");
+      setIdeaSuccess("");
       return;
     }
-    setReferenceNotes((prev) => [normalized, ...prev]);
-    setReferenceInput("");
+
+    const alreadyExists = referenceNotes.some((note) => note.topic.toLowerCase() === topic.toLowerCase());
+    if (alreadyExists) {
+      setIdeaSuccess("That topic is already saved in your references.");
+      setIdeaError("");
+      return;
+    }
+
+    const newReference = {
+      id: makeReferenceId(),
+      topic,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+
+    setReferenceNotes((prev) => [newReference, ...prev]);
+    setSelectedReferenceNoteId(newReference.id);
+    setReferenceTopicInput("");
+    setReferenceBodyInput("");
     setIdeaError("");
-    setIdeaSuccess("Reference note saved.");
+    setIdeaSuccess("Reference saved. Open the topic to study the body on its own page.");
+  };
+
+  const startEditingReferenceNote = (note) => {
+    setEditingReferenceNoteId(note.id);
+    setReferenceEditTopicInput(note.topic);
+    setReferenceEditBodyInput(note.body);
+    setIdeaError("");
+    setIdeaSuccess("");
+  };
+
+  const cancelEditingReferenceNote = () => {
+    setEditingReferenceNoteId(null);
+    setReferenceEditTopicInput("");
+    setReferenceEditBodyInput("");
+    setIdeaError("");
+  };
+
+  const saveEditedReferenceNote = (originalNote) => {
+    const topic = referenceEditTopicInput.trim().replace(/\s+/g, " ");
+    const body = referenceEditBodyInput.trim();
+
+    if (!topic || !body) {
+      setIdeaError("Reference topics and bodies cannot be empty.");
+      setIdeaSuccess("");
+      return;
+    }
+
+    const alreadyExists = referenceNotes.some(
+      (note) => note.id !== originalNote.id && note.topic.toLowerCase() === topic.toLowerCase()
+    );
+
+    if (alreadyExists) {
+      setIdeaError("That topic is already saved in your references.");
+      setIdeaSuccess("");
+      return;
+    }
+
+    setReferenceNotes((prev) =>
+      prev.map((note) =>
+        note.id === originalNote.id
+          ? {
+              ...note,
+              topic,
+              body,
+              updatedAt: new Date().toISOString(),
+            }
+          : note
+      )
+    );
+    setSelectedReferenceNoteId(originalNote.id);
+    setEditingReferenceNoteId(null);
+    setReferenceEditTopicInput("");
+    setReferenceEditBodyInput("");
+    setIdeaSuccess("Reference updated.");
+    setIdeaError("");
   };
 
   const removeReferenceNote = (noteToRemove) => {
-    setReferenceNotes((prev) => prev.filter((note) => note !== noteToRemove));
+    setReferenceNotes((prev) => {
+      const remaining = prev.filter((note) => note.id !== noteToRemove.id);
+      if (selectedReferenceNoteId === noteToRemove.id) {
+        setSelectedReferenceNoteId(remaining[0]?.id || "");
+      }
+      return remaining;
+    });
+    if (editingReferenceNoteId === noteToRemove.id) {
+      cancelEditingReferenceNote();
+    }
+  };
+
+  const addReferenceToLetter = (note) => {
+    setTypedAnswer((prev) => `${prev}${prev ? "\n" : ""}${note.body}`);
+    setIdeaSuccess(`Added “${note.topic}” to your letter draft.`);
+    setIdeaError("");
   };
 
   const handleExportDraft = () => {
@@ -2151,154 +2287,47 @@ const WritingPage = ({ mode = "course", initialTab = "mark" }) => {
       )}
 
       {activeTab === "references" && (
-        <section style={styles.card}>
-          <h3 style={styles.sectionTitle}>References (notes)</h3>
-          <p style={styles.helperText}>
-            Save important words and phrases here, then quickly reuse them while writing.
-          </p>
-          <div style={{ ...styles.infoBox, marginBottom: 12 }}>
-            <strong>Tip:</strong> Keep short sentence starters, formal phrases, and connector words you want to remember.
-          </div>
-          <label style={styles.label}>Add a note or phrase</label>
-          <textarea
-            ref={referencesRef}
-            style={styles.textareaSmall}
-            value={referenceInput}
-            rows={3}
-            placeholder="e.g., Ich möchte mich für die Verspätung entschuldigen."
-            onChange={(event) => {
-              setReferenceInput(event.target.value);
-              setIdeaError("");
-              setIdeaSuccess("");
-            }}
-          />
-          <SpecialCharacterRow
-            label="Quick umlaut keys for references"
-            onInsert={(character) =>
-              insertSpecialCharacter(setReferenceInput, referencesRef, character)
-            }
-          />
-          <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={styles.primaryButton} onClick={addReferenceNote}>
-              Save note
-            </button>
-          </div>
-          {ideaSuccess ? (
-            <div style={{ ...styles.successBox, marginTop: 8 }}>{ideaSuccess}</div>
-          ) : null}
-          <div style={{ marginTop: 14 }}>
-            <h4 style={styles.resultHeading}>Saved references ({referenceNotes.length})</h4>
-            {referenceNotes.length === 0 ? (
-              <p style={styles.helperText}>
-                No notes saved yet. Add your first phrase above — it will be saved to Firebase with your writing workspace.
-              </p>
-            ) : (
-              <div style={{ display: "grid", gap: 10 }}>
-                {referenceNotes.map((note) => (
-                  <div
-                    key={note}
-                    style={{
-                      border: "1px solid #e5e7eb",
-                      borderRadius: 10,
-                      padding: 10,
-                      background: "#fff",
-                      display: "flex",
-                      justifyContent: "space-between",
-                      gap: 10,
-                      alignItems: "flex-start",
-                    }}
-                  >
-                    <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{note}</div>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        style={styles.secondaryButton}
-                        onClick={() => setTypedAnswer((prev) => `${prev}${prev ? "\n" : ""}${note}`)}
-                      >
-                        Add to letter
-                      </button>
-                      <button
-                        type="button"
-                        style={styles.dangerButton}
-                        onClick={() => removeReferenceNote(note)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {activeTab === "forms" && canUseFormsPractice && (
-        <section style={styles.card}>
-          <h3 style={styles.sectionTitle}>A1 Forms Practice (Teil 1)</h3>
-          <p style={styles.helperText}>
-            Train form completion before moving to Teil 2 letters. These examples are original practice tasks inspired by exam format,
-            so you can learn the pattern without copyright issues. Click to reveal model answers and compare your choices.
-          </p>
-          <div style={{ display: "grid", gap: 14 }}>
-            {A1_FORM_PRACTICE_TASKS.map((task) => {
-              const isOpen = Boolean(revealedFormAnswers[task.id]);
-              return (
-                <article
-                  key={task.id}
-                  style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 14, background: "#fff" }}
-                >
-                  <div style={styles.metaRow}>
-                    <h4 style={{ margin: 0 }}>{task.title}</h4>
-                    <span style={styles.badge}>Sample practice</span>
-                  </div>
-                  <p style={{ ...styles.helperText, marginTop: 8 }}>{task.context}</p>
-                  <p style={{ margin: "8px 0", fontWeight: 600 }}>{task.prompt}</p>
-                  <div style={{ border: "1px dashed #d1d5db", borderRadius: 10, padding: 12, background: "#f8fafc" }}>
-                    {task.formFields.map((field) => (
-                      <p key={field.label} style={{ margin: "8px 0", fontSize: 16, lineHeight: 1.5 }}>
-                        <strong>{field.label}:</strong> {field.value}
-                      </p>
-                    ))}
-                  </div>
-                  <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <button
-                      type="button"
-                      style={styles.primaryButton}
-                      onClick={() =>
-                        setRevealedFormAnswers((prev) => ({
-                          ...prev,
-                          [task.id]: !prev[task.id],
-                        }))
-                      }
-                    >
-                      {isOpen ? "Hide answers" : "Show answers"}
-                    </button>
-                  </div>
-                  {isOpen && (
-                    <div style={{ ...styles.successBox, marginTop: 10 }}>
-                      <div style={{ fontWeight: 800, marginBottom: 6 }}>Model answers + why</div>
-                      <ul style={{ margin: 0, paddingLeft: 18 }}>
-                        {task.answers.map((item) => (
-                          <li key={item.blank} style={{ marginBottom: 6 }}>
-                            <strong>{item.blank}</strong> → {item.answer}. {item.explanation}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-          <div style={{ ...styles.helperCard, marginTop: 14 }}>
-            <strong>After Forms (Teil 1):</strong>
-            <p style={{ ...styles.helperText, margin: "6px 0 0 0" }}>
-              Your main submitted assignment should still focus on Teil 2: one formal and one informal letter.
-              Use “Mark my letter” to send those drafts for grading and tutor review.
-            </p>
-          </div>
-        </section>
+        <WritingReferenceLibrary
+          emptyText="No references saved yet. Add your first topic above — it will be saved to Firebase with your writing workspace."
+          idPrefix="writing-reference"
+          topicPlaceholder="e.g., Complaint letter phrases"
+          referenceTopicInput={referenceTopicInput}
+          setReferenceTopicInput={setReferenceTopicInput}
+          referenceBodyInput={referenceBodyInput}
+          setReferenceBodyInput={setReferenceBodyInput}
+          referenceNotes={referenceNotes}
+          filteredReferenceNotes={filteredReferenceNotes}
+          selectedReferenceNote={selectedReferenceNote}
+          setSelectedReferenceNoteId={setSelectedReferenceNoteId}
+          editingReferenceNoteId={editingReferenceNoteId}
+          referenceEditTopicInput={referenceEditTopicInput}
+          setReferenceEditTopicInput={setReferenceEditTopicInput}
+          referenceEditBodyInput={referenceEditBodyInput}
+          setReferenceEditBodyInput={setReferenceEditBodyInput}
+          referenceSearch={referenceSearch}
+          setReferenceSearch={setReferenceSearch}
+          ideaError={ideaError}
+          ideaSuccess={ideaSuccess}
+          setIdeaError={setIdeaError}
+          setIdeaSuccess={setIdeaSuccess}
+          addReferenceNote={addReferenceNote}
+          startEditingReferenceNote={startEditingReferenceNote}
+          cancelEditingReferenceNote={cancelEditingReferenceNote}
+          saveEditedReferenceNote={saveEditedReferenceNote}
+          removeReferenceNote={removeReferenceNote}
+          addReferenceToLetter={addReferenceToLetter}
+          bodyInputRef={referencesRef}
+          bodyInputStyle={styles.textareaSmall}
+          bodyRows={7}
+          renderBodyTools={() => (
+            <SpecialCharacterRow
+              label="Quick umlaut keys for reference body"
+              onInsert={(character) =>
+                insertSpecialCharacter(setReferenceBodyInput, referencesRef, character)
+              }
+            />
+          )}
+        />
       )}
 
       {activeTab === "tutor" && canUseTutorFeedback && (
