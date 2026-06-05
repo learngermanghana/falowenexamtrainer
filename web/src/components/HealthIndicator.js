@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useHealthStatus } from "../hooks/useHealthStatus";
 import { useOfflineStatus } from "../hooks/useOfflineStatus";
 import { styles } from "../styles";
+import Day0StudentWorkflowAutoMount from "./Day0StudentWorkflowAutoMount";
 
 const statusCopy = {
   ok: "API online",
@@ -29,37 +30,40 @@ function HealthIndicator() {
   const showDay0Return = isDay0CoursePath(location.pathname);
 
   return (
-    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }} aria-live="polite">
-      <span
-        aria-label={label}
-        title={label}
-        style={{
-          width: 12,
-          height: 12,
-          borderRadius: "50%",
-          backgroundColor: color,
-          display: "inline-block",
-          boxShadow: "0 0 0 3px rgba(0,0,0,0.05)",
-        }}
-      />
-      <span style={{ ...styles.helperText, margin: 0, color: "#111827" }}>{label}</span>
-      {showDay0Return ? (
-        <button
-          type="button"
-          onClick={() => navigate("/")}
+    <>
+      <Day0StudentWorkflowAutoMount />
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }} aria-live="polite">
+        <span
+          aria-label={label}
+          title={label}
           style={{
-            ...styles.primaryButton,
-            padding: "6px 10px",
-            fontSize: 12,
-            background: "#dcfce7",
-            color: "#166534",
-            borderColor: "#86efac",
+            width: 12,
+            height: 12,
+            borderRadius: "50%",
+            backgroundColor: color,
+            display: "inline-block",
+            boxShadow: "0 0 0 3px rgba(0,0,0,0.05)",
           }}
-        >
-          I finished Day 0 — continue setup
-        </button>
-      ) : null}
-    </div>
+        />
+        <span style={{ ...styles.helperText, margin: 0, color: "#111827" }}>{label}</span>
+        {showDay0Return ? (
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            style={{
+              ...styles.primaryButton,
+              padding: "6px 10px",
+              fontSize: 12,
+              background: "#dcfce7",
+              color: "#166534",
+              borderColor: "#86efac",
+            }}
+          >
+            I finished Day 0 — continue setup
+          </button>
+        ) : null}
+      </div>
+    </>
   );
 }
 
