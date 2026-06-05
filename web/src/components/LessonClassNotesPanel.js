@@ -11,8 +11,7 @@ const normalizeKey = (value = "") =>
     .replace(/^-+|-+$/g, "") || "lesson";
 
 const formatDateTime = (value) => {
-  if (!value) return "";
-  const ms = typeof value === "number" ? value : value?.toMillis ? value.toMillis() : Date.parse(value);
+  const ms = typeof value === "number" ? value : value?.toMillis ? value.toMillis() : Date.parse(value || "");
   if (!ms || Number.isNaN(ms)) return "";
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
@@ -31,8 +30,7 @@ const getLessonIdFromLocation = () => {
 
 const getLessonTitleFromDocument = () => {
   if (typeof document === "undefined") return "Current lesson";
-  const heading = document.querySelector("h1")?.textContent;
-  return heading || document.title || "Current lesson";
+  return document.querySelector("h1")?.textContent || document.title || "Current lesson";
 };
 
 const notesCollectionRef = (level, className, lessonId) =>
@@ -44,8 +42,7 @@ const LessonClassNotesPanel = ({ lessonId, lessonTitle, compact = false }) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const [draft, setDraft] = useState({ title: "", body: "", type: "question" });
+  const [draft, setDraft] = useState({ title: "", body: "" });
 
   const level = String(studentProfile?.level || "").toUpperCase();
   const className = String(studentProfile?.className || studentProfile?.class || "").trim();
@@ -72,18 +69,15 @@ const LessonClassNotesPanel = ({ lessonId, lessonTitle, compact = false }) => {
       return undefined;
     }
 
-    setIsLoading(true);
-    setError("");
-
     const notesQuery = query(notesCollectionRef(level, className, resolvedLessonId), orderBy("createdAtMs", "desc"));
     const unsubscribe = onSnapshot(
       notesQuery,
       (snapshot) => {
         setNotes(snapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+        setError("");
         setIsLoading(false);
       },
-      (err) => {
-        console.error("Failed to load class lesson notes", err);
+      () => {
         setError("Class notes could not be loaded. Please try again later.");
         setIsLoading(false);
       }
@@ -93,14 +87,12 @@ const LessonClassNotesPanel = ({ lessonId, lessonTitle, compact = false }) => {
   }, [className, level, resolvedLessonId]);
 
   const displayName = studentProfile?.name || user?.displayName || user?.email || "Student";
-  const filteredNotes = notes.filter((note) => activeFilter === "all" || note.type === activeFilter);
 
   const handleSave = async (event) => {
     event.preventDefault();
     if (!draft.title.trim() && !draft.body.trim()) return;
     if (!db || !level || !className) return;
 
-    const now = Date.now();
     setIsSaving(true);
     setError("");
 
@@ -110,17 +102,16 @@ const LessonClassNotesPanel = ({ lessonId, lessonTitle, compact = false }) => {
         className,
         lessonId: resolvedLessonId,
         lessonTitle: resolvedLessonTitle,
-        type: isTutor ? draft.type : "question",
-        title: draft.title.trim() || (isTutor && draft.type === "note" ? "Class note" : "Student question"),
+        title: draft.title.trim() || (isTutor ? "Class vocabulary / suggestion" : "Student question"),
         body: draft.body.trim(),
         createdAt: serverTimestamp(),
-        createdAtMs: now,
+        createdAtMs: Date.now(),
         createdBy: displayName,
         createdByUid: user?.uid || null,
+        createdByRole: isTutor ? "tutor" : "student",
       });
-      setDraft({ title: "", body: "", type: isTutor ? draft.type : "question" });
+      setDraft({ title: "", body: "" });
     } catch (err) {
-      console.error("Failed to save class note", err);
       setError("Class note could not be saved. Please try again.");
     } finally {
       setIsSaving(false);
@@ -131,14 +122,10 @@ const LessonClassNotesPanel = ({ lessonId, lessonTitle, compact = false }) => {
 
   const handleDelete = async (note) => {
     if (!note?.id || !db || !canDelete(note)) return;
-    const confirmed = window.confirm("Delete this class note?");
-    if (!confirmed) return;
-
     try {
       await deleteDoc(doc(notesCollectionRef(level, className, resolvedLessonId), note.id));
     } catch (err) {
-      console.error("Failed to delete class note", err);
-      setError("Class note could not be deleted. Please try again.");
+      setError("Class note could not be removed. Please try again.");
     }
   };
 
@@ -156,81 +143,63 @@ const LessonClassNotesPanel = ({ lessonId, lessonTitle, compact = false }) => {
     >
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "flex-start" }}>
         <div>
-          <p style={{ ...styles.helperText, margin: 0, color: "#4f46e5", fontWeight: 700 }}>Class board</p>
+          <p style={{ ...styles.helperText, margin: 0, color: "#4f46e5", fontWeight: 700 }}>Class update</p>
           <h2 style={{ margin: "4px 0", fontSize: compact ? "1.05rem" : "1.25rem" }}>Class Notes</h2>
           <p style={{ ...styles.helperText, margin: 0 }}>
-            Saved notes for this lesson and this class only. Use it for Zoom vocabulary, corrections, reminders and follow-up questions.
+            Use this for vocabulary, short suggestions, Zoom notes and quick lesson reminders.
           </p>
         </div>
         <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{level || "Level"} · {className || "Class"}</span>
       </div>
 
-      <form onSubmit={handleSave} style={{ display: "grid", gap: 10 }}>
-        {isTutor ? (
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={draft.type === "note" ? styles.primaryButton : styles.secondaryButton} onClick={() => setDraft((prev) => ({ ...prev, type: "note" }))}>
-              Tutor note
-            </button>
-            <button type="button" style={draft.type === "question" ? styles.primaryButton : styles.secondaryButton} onClick={() => setDraft((prev) => ({ ...prev, type: "question" }))}>
-              Question / answer
-            </button>
-          </div>
-        ) : null}
+      {notes.length > 0 ? (
+        <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#eff6ff", color: "#1e40af", fontWeight: 700 }}>
+          {notes.length} saved class update{notes.length === 1 ? "" : "s"} for this lesson.
+        </div>
+      ) : null}
 
+      <form onSubmit={handleSave} style={{ display: "grid", gap: 10 }}>
         <input
           style={styles.input}
           value={draft.title}
-          placeholder={isTutor && draft.type === "note" ? "Title e.g. Vocabulary from today" : "Question title e.g. Beruf vs Arbeit"}
+          placeholder={isTutor ? "Title e.g. Vocabulary from today" : "Question title e.g. Beruf vs Arbeit"}
           onChange={(event) => setDraft((prev) => ({ ...prev, title: event.target.value }))}
         />
         <textarea
           style={styles.textareaSmall}
           rows={compact ? 4 : 6}
           value={draft.body}
-          placeholder={isTutor ? "Paste Zoom notes, vocabulary, corrections, homework reminders or class explanation here." : "Ask your question about today’s lesson. Your class and tutor can see it."}
+          placeholder={isTutor ? "Paste vocabulary, short suggestions, corrections or reminders here." : "Ask a short question about today’s lesson."}
           onChange={(event) => setDraft((prev) => ({ ...prev, body: event.target.value }))}
         />
         <button type="submit" style={styles.primaryButton} disabled={isSaving || (!draft.title.trim() && !draft.body.trim())}>
-          {isSaving ? "Saving..." : isTutor ? "Save to class notes" : "Ask question"}
+          {isSaving ? "Saving..." : isTutor ? "Save class note" : "Ask question"}
         </button>
       </form>
-
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {["all", "note", "question"].map((filter) => (
-          <button
-            key={filter}
-            type="button"
-            style={activeFilter === filter ? styles.primaryButton : styles.secondaryButton}
-            onClick={() => setActiveFilter(filter)}
-          >
-            {filter === "all" ? "All" : filter === "note" ? "Tutor notes" : "Questions"}
-          </button>
-        ))}
-      </div>
 
       {error ? <div style={styles.errorBox}>{error}</div> : null}
       {isLoading ? <p style={styles.helperText}>Loading class notes...</p> : null}
 
-      {!isLoading && filteredNotes.length === 0 ? (
+      {!isLoading && notes.length === 0 ? (
         <div style={{ border: "1px dashed #c7d2fe", borderRadius: 12, padding: 14, background: "#f8fafc", color: "#475569" }}>
-          No class notes yet. After class, the tutor can paste Zoom vocabulary and corrections here.
+          No class notes yet. After class, the tutor can paste vocabulary and short suggestions here.
         </div>
       ) : null}
 
       <div style={{ display: "grid", gap: 10 }}>
-        {filteredNotes.map((note) => (
+        {notes.map((note) => (
           <article key={note.id} style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 14, background: "#fff", display: "grid", gap: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
               <div style={{ display: "grid", gap: 4 }}>
-                <span style={{ ...styles.badge, justifySelf: "start", background: note.type === "note" ? "#dcfce7" : "#fef3c7", color: note.type === "note" ? "#166534" : "#92400e" }}>
-                  {note.type === "note" ? "Tutor note" : "Question"}
+                <span style={{ ...styles.badge, justifySelf: "start", background: note.createdByRole === "tutor" ? "#dcfce7" : "#fef3c7", color: note.createdByRole === "tutor" ? "#166534" : "#92400e" }}>
+                  {note.createdByRole === "tutor" ? "Tutor" : "Student"}
                 </span>
                 <strong>{note.title}</strong>
                 <span style={styles.helperText}>By {note.createdBy || "Student"} · {formatDateTime(note.createdAtMs || note.createdAt)}</span>
               </div>
               {canDelete(note) ? (
                 <button type="button" style={styles.dangerButton} onClick={() => handleDelete(note)}>
-                  Delete
+                  Remove
                 </button>
               ) : null}
             </div>
