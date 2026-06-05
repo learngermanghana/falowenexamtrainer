@@ -14,8 +14,19 @@ export function EmbeddedWritingPracticePanel() {
   return (
     <div className="embedded-writing-compact" style={{ border: "1px solid #e5e7eb", borderRadius: 16, overflow: "hidden", background: "#fff" }}>
       <style>{`
-        .embedded-writing-compact > section:first-of-type {
+        .embedded-writing-compact > section:first-of-type > h2,
+        .embedded-writing-compact > section:first-of-type > p,
+        .embedded-writing-compact > section:first-of-type > div:first-of-type,
+        .embedded-writing-compact > section:first-of-type > div:nth-of-type(3) {
           display: none;
+        }
+
+        .embedded-writing-compact > section:first-of-type {
+          padding-bottom: 12px;
+        }
+
+        .embedded-writing-compact > section:first-of-type > div:nth-of-type(2) {
+          margin-top: 0;
         }
 
         .embedded-writing-compact > section:nth-of-type(2) > p:first-of-type,
@@ -28,18 +39,9 @@ export function EmbeddedWritingPracticePanel() {
   );
 }
 
-export function EmbeddedPracticeNote({ children }) {
-  return (
-    <div style={{ padding: 12, borderRadius: 12, border: "1px solid #bbf7d0", background: "#f0fdf4", lineHeight: 1.7 }}>
-      <strong>Practise inside this lesson.</strong> {children}
-    </div>
-  );
-}
-
 const EmbeddedPracticePanels = {
   EmbeddedSpeechPracticePanel,
   EmbeddedWritingPracticePanel,
-  EmbeddedPracticeNote,
 };
 
 export default EmbeddedPracticePanels;
