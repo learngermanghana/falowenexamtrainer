@@ -83,10 +83,54 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
   );
 };
 
-const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoinZoom, onOpenExamFile, onOpenAccount }) => {
+const formatContractStatus = (studentProfile = {}) => {
+  const contractEndMs = toDateMs(studentProfile.contractEnd);
+  if (!Number.isFinite(contractEndMs)) return "Not set";
+
+  const dayMs = 1000 * 60 * 60 * 24;
+  const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
+  const contractDate = new Date(contractEndMs).toLocaleDateString(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+
+  if (daysLeft < 0) return `Expired · ended ${contractDate}`;
+  if (daysLeft === 0) return "Active · ends today";
+  return `Active · ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`;
+};
+
+const shouldShowDay0Prompt = (studentProfile = {}, levelKey = "") => {
+  if (!levelKey || !day0WorkbookByLevel[levelKey]) return false;
+
+  const explicitCompleted = [
+    studentProfile.day0Completed,
+    studentProfile.day0OrientationCompleted,
+    studentProfile.orientationCompleted,
+    studentProfile.knowledgeTestCompleted,
+  ];
+
+  if (explicitCompleted.some((value) => value === true || String(value).toLowerCase() === "true")) return false;
+  if (explicitCompleted.some((value) => value === false || String(value).toLowerCase() === "false")) return true;
+
+  const joinedAtMs = toDateMs(studentProfile.joined_at || studentProfile.createdAt || studentProfile.enrollDate || studentProfile.enrolledAt);
+  if (!Number.isFinite(joinedAtMs)) return false;
+
+  const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  return Date.now() - joinedAtMs <= sevenDaysMs;
+};
+
+const StatusTile = ({ label, value }) => (
+  <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
+    <p style={{ ...styles.helperText, margin: "0 0 4px", fontSize: 12 }}>{label}</p>
+    <strong style={{ color: "#0f172a" }}>{value}</strong>
+  </div>
+);
+
+const NextActionCard = ({ studentProfile, onOpenDay0 }) => {
   const levelKey = detectLevelKey(studentProfile);
   const className = studentProfile?.className || "your class";
-  const hasDay0 = Boolean(day0WorkbookByLevel[levelKey]);
+  const showDay0Prompt = shouldShowDay0Prompt(studentProfile, levelKey);
 
   return (
     <section
@@ -95,7 +139,7 @@ const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoin
         display: "grid",
         gap: 12,
         border: "1px solid #bfdbfe",
-        background: "linear-gradient(135deg, #eff6ff, #ffffff 62%, #f0fdf4)",
+        background: "linear-gradient(135deg, #eff6ff, #ffffff 62%, #f8fafc)",
       }}
     >
       <SectionHeader
@@ -103,7 +147,7 @@ const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoin
         title={levelKey ? `Continue ${levelKey} learning` : "Continue your learning setup"}
         subtitle={
           levelKey
-            ? `You are in ${className}. Start with the next learning action, then check class links or your exam file when needed.`
+            ? `You are in ${className}. Use the top buttons to continue learning, open your account, join Zoom, or check your exam file.`
             : "Set your level and class so Falowen can guide your lessons, scores, class links, and exam preparation."
         }
         actions={
@@ -115,51 +159,36 @@ const NextActionCard = ({ studentProfile, onContinueLearning, onOpenDay0, onJoin
       />
 
       <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-        <div style={{ border: "1px solid #dbeafe", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-          <strong>📘 Course work</strong>
-          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
-            Open your Course Book, assignments, grammar help, and scores.
-          </p>
-          <button type="button" style={styles.primaryButton} onClick={onContinueLearning}>
-            Continue learning
-          </button>
-        </div>
-
-        <div style={{ border: "1px solid #bbf7d0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-          <strong>🧭 New here?</strong>
-          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
-            {hasDay0 ? "Open Day 0 first to understand how Falowen works." : "Check your account setup before continuing."}
-          </p>
-          <button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>
-            {hasDay0 ? "Open Day 0" : "Open account"}
-          </button>
-        </div>
-
-        <div style={{ border: "1px solid #fde68a", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-          <strong>👤 Account & notifications</strong>
-          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
-            Open your account to enable push notifications, check payment status, and review your profile.
-          </p>
-          <button type="button" style={styles.secondaryButton} onClick={onOpenAccount}>
-            Open account
-          </button>
-        </div>
-
-        <div style={{ border: "1px solid #fde68a", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-          <strong>🎯 Exam direction</strong>
-          <p style={{ ...styles.helperText, margin: "6px 0 10px" }}>
-            Use Exam File when you want readiness, certificate progress, and exam preparation tasks.
-          </p>
-          <PrimaryActionBar align="start" wrap>
-            <button type="button" style={styles.secondaryButton} onClick={onOpenExamFile}>
-              Exam File
-            </button>
-            <button type="button" style={styles.secondaryButton} onClick={onJoinZoom}>
-              Join Zoom
-            </button>
-          </PrimaryActionBar>
-        </div>
+        <StatusTile label="Next action" value="Open Course Book and continue today’s lesson" />
+        <StatusTile label="Contract status" value={formatContractStatus(studentProfile)} />
+        <StatusTile label="Account" value="Use Account for notifications, profile, and payment status" />
       </div>
+
+      {showDay0Prompt ? (
+        <div
+          style={{
+            border: "1px solid #bbf7d0",
+            borderRadius: 14,
+            padding: 12,
+            background: "#f0fdf4",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 10,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <strong>New here? Start with Day 0 orientation</strong>
+            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
+              Day 0 explains how Falowen works before you begin the main lessons.
+            </p>
+          </div>
+          <button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>
+            Open Day 0
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 };
@@ -422,14 +451,10 @@ const GeneralHome = ({
 
       <NextActionCard
         studentProfile={studentProfile}
-        onContinueLearning={openCampus}
         onOpenDay0={() => {
           playOpenFeedback();
           navigate(day0WorkbookLink);
         }}
-        onJoinZoom={joinZoom}
-        onOpenExamFile={openExamFile}
-        onOpenAccount={openAccount}
       />
 
       <HomeMetrics studentProfile={studentProfile} />
