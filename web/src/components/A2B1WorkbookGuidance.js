@@ -1,36 +1,57 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { styles } from "../styles";
 import LessonClassNotesPanel from "./LessonClassNotesPanel";
 
 export const A2B1WorkbookGuidance = ({ showClassNotes = true, compactNotes = true }) => {
-  const [showNotes, setShowNotes] = useState(false);
+  const [activePart, setActivePart] = useState("guide");
+  const [hasOpenedNotes, setHasOpenedNotes] = useState(false);
+
+  useEffect(() => {
+    if (activePart === "notes") {
+      setHasOpenedNotes(true);
+    }
+  }, [activePart]);
 
   return (
-    <>
-      <section
-        aria-label="How this workbook works"
-        style={{
-          ...styles.card,
-          margin: 0,
-          display: "grid",
-          gap: 10,
-          border: "1px solid #bfdbfe",
-          background: "#eff6ff",
-          color: "#1e3a8a",
-        }}
-      >
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-          <h2 style={{ margin: 0, fontSize: "1.05rem" }}>How this workbook works</h2>
-          {showClassNotes ? (
-            <button
-              type="button"
-              style={{ ...styles.secondaryButton, background: showNotes ? "#1d4ed8" : "#ffffff", color: showNotes ? "#ffffff" : "#1d4ed8", borderColor: "#93c5fd" }}
-              onClick={() => setShowNotes((current) => !current)}
-            >
-              {showNotes ? "Hide Class Notes" : "Teil 5 · Class Notes"}
-            </button>
-          ) : null}
+    <section
+      aria-label="Workbook guide and class notes"
+      style={{
+        ...styles.card,
+        margin: 0,
+        display: "grid",
+        gap: 12,
+        border: "1px solid #bfdbfe",
+        background: "#eff6ff",
+        color: "#1e3a8a",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <h2 style={{ margin: 0, fontSize: "1.05rem" }}>How this workbook works</h2>
+        {showClassNotes && !hasOpenedNotes ? (
+          <span style={{ ...styles.badge, background: "#dbeafe", color: "#1d4ed8" }}>Class notes available</span>
+        ) : null}
+      </div>
+
+      {showClassNotes ? (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button
+            type="button"
+            style={{ ...(activePart === "guide" ? styles.primaryButton : styles.secondaryButton), borderRadius: 999 }}
+            onClick={() => setActivePart("guide")}
+          >
+            Workbook Guide
+          </button>
+          <button
+            type="button"
+            style={{ ...(activePart === "notes" ? styles.primaryButton : styles.secondaryButton), borderRadius: 999 }}
+            onClick={() => setActivePart("notes")}
+          >
+            Teil 5 · Class Notes{!hasOpenedNotes ? " •" : ""}
+          </button>
         </div>
+      ) : null}
+
+      {activePart === "guide" ? (
         <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
             <strong>Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Use the AI
@@ -42,14 +63,14 @@ export const A2B1WorkbookGuidance = ({ showClassNotes = true, compactNotes = tru
           </p>
           {showClassNotes ? (
             <p style={{ margin: 0 }}>
-              <strong>Teil 5 · Class Notes</strong> saves vocabulary, Zoom notes, short tutor suggestions and student questions for this exact lesson and class.
+              <strong>Teil 5 · Class Notes</strong> is where your tutor saves vocabulary, Zoom notes, short suggestions and answers to class questions.
             </p>
           ) : null}
         </div>
-      </section>
+      ) : null}
 
-      {showClassNotes && showNotes ? <LessonClassNotesPanel compact={compactNotes} /> : null}
-    </>
+      {showClassNotes && activePart === "notes" ? <LessonClassNotesPanel compact={compactNotes} /> : null}
+    </section>
   );
 };
 
