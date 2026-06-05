@@ -211,19 +211,83 @@ const normalizeTutorReviewStatus = (value) => {
   if (["needs_improvement", "needs-improvement", "improve", "revision"].includes(normalized)) {
     return "needs_improvement";
   }
+  if (["redo_required", "redo-required", "redo", "resubmit", "resubmission"].includes(normalized)) {
+    return "redo_required";
+  }
   if (["pending", "queued", "new"].includes(normalized)) return "pending";
   return normalized || "pending";
+};
+
+const isQuestionOfDayReview = (data = {}) =>
+  data.source === "exam-warm-up" || String(data.promptId || "").startsWith("exam-warmup");
+
+const getLatestTutorFeedback = (data = {}) => {
+  const latestTutorResponse = Array.isArray(data.tutorResponses)
+    ? data.tutorResponses[data.tutorResponses.length - 1]
+    : null;
+
+  return String(
+    latestTutorResponse?.tutorFeedback ||
+      latestTutorResponse?.message ||
+      latestTutorResponse?.text ||
+      data.tutorFeedback ||
+      data.reviewComment ||
+      ""
+  ).trim();
+};
+
+const hasReviewPhraseMistakes = (data = {}) => {
+  const { phraseMistakes } = data;
+  if (Array.isArray(phraseMistakes)) return phraseMistakes.length > 0;
+  if (phraseMistakes && typeof phraseMistakes === "object") return Object.keys(phraseMistakes).length > 0;
+  return Boolean(String(phraseMistakes || "").trim());
+};
+
+const notifyQuestionOfDaySubmissionCreated = async ({ reviewId, afterData = {} }) => {
+  if (!isQuestionOfDayReview(afterData)) return null;
+
+  const studentCode = afterData.studentCode || afterData.studentcode || afterData.ownerKey || "";
+  const tokenInfo = await fetchStudentMessagingToken(studentCode);
+  if (!tokenInfo?.tokens?.length) {
+    console.log(`notifyQuestionOfDaySubmissionCreated: no messaging token for ${studentCode}`);
+    return null;
+  }
+
+  const route = "/campus/question-of-day?tab=feedback";
+  const tokenOwners = tokenInfo.docId
+    ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
+    : new Map();
+
+  await sendNotifications({
+    tokens: tokenInfo.tokens,
+    notification: {
+      title: "Question of the Day submitted",
+      body: "Your answer was sent to your tutor. Feedback will appear in Teacher Feedback.",
+    },
+    data: {
+      type: "question_of_day_submitted",
+      reviewId: reviewId || "",
+      studentCode: String(studentCode || ""),
+      level: afterData.level || "",
+      route,
+    },
+    tokenOwners,
+  });
+
+  return null;
 };
 
 const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterData = {} }) => {
   const beforeStatus = normalizeTutorReviewStatus(beforeData.reviewStatus || beforeData.status);
   const afterStatus = normalizeTutorReviewStatus(afterData.reviewStatus || afterData.status);
-  const feedbackBefore = String(beforeData.tutorFeedback || beforeData.reviewComment || "").trim();
-  const feedbackAfter = String(afterData.tutorFeedback || afterData.reviewComment || "").trim();
-  const feedbackChanged = feedbackAfter && feedbackAfter !== feedbackBefore;
-  const statusChangedFromPending = afterStatus && afterStatus !== "pending" && afterStatus !== beforeStatus;
+  const feedbackBefore = getLatestTutorFeedback(beforeData);
+  const feedbackAfter = getLatestTutorFeedback(afterData);
+  const feedbackAdded = !feedbackBefore && Boolean(feedbackAfter);
+  const statusChangedFromPending =
+    beforeStatus === "pending" && ["approved", "needs_improvement", "redo_required"].includes(afterStatus);
+  const phraseMistakesAdded = !hasReviewPhraseMistakes(beforeData) && hasReviewPhraseMistakes(afterData);
 
-  if (!statusChangedFromPending && !feedbackChanged) {
+  if (!statusChangedFromPending && !feedbackAdded && !phraseMistakesAdded) {
     return null;
   }
 
@@ -236,35 +300,55 @@ const notifyTutorReviewStatusUpdate = async ({ reviewId, beforeData = {}, afterD
     return null;
   }
 
+  const questionOfDay = isQuestionOfDayReview(afterData);
+  const route = questionOfDay
+    ? "/campus/question-of-day?tab=feedback"
+    : afterData.source === "campus-writing"
+      ? "/campus/writing?tab=tutor"
+      : "/exams/writing?tab=tutor";
   const reviewLabel = afterData.promptTitle || afterData.assignmentTitle || "your exam letter";
-  const tutorFeedback = afterData.tutorFeedback || afterData.reviewComment || "";
-  const replyMessage = String(latestReply?.message || latestReply?.text || "").trim();
-  const notification = {
-    title:
-      afterStatus === "approved"
-        ? "Tutor approved your exam letter"
-        : afterStatus === "needs_improvement"
-          ? "Tutor requested improvements"
-          : "New tutor feedback is available",
-    body: safeTruncate(
-      replyLooksTutorAuthored
-        ? (replyMessage || `${reviewLabel} has a new tutor reply.`)
-        : tutorFeedback ||
-          (afterStatus === "approved"
-            ? `${reviewLabel} is approved. Great work!`
-            : `${reviewLabel} has tutor feedback. Please review and revise.`),
-      140
-    ),
-  };
+  const notification = questionOfDay
+    ? {
+        title:
+          afterStatus === "approved"
+            ? "Tutor approved your Question of the Day"
+            : ["needs_improvement", "redo_required"].includes(afterStatus)
+              ? "Tutor requested corrections"
+              : "Tutor feedback is ready",
+        body: "Your Question of the Day has been marked. Open Teacher Feedback to read it.",
+      }
+    : {
+        title:
+          afterStatus === "approved"
+            ? "Tutor approved your exam letter"
+            : ["needs_improvement", "redo_required"].includes(afterStatus)
+              ? "Tutor requested improvements"
+              : "New tutor feedback is available",
+        body: safeTruncate(
+          feedbackAfter ||
+            (afterStatus === "approved"
+              ? `${reviewLabel} is approved. Great work!`
+              : `${reviewLabel} has tutor feedback. Please review and revise.`),
+          140
+        ),
+      };
 
-  const data = {
-    type: "exam_tutor_review",
-    reviewId: reviewId || "",
-    reviewStatus: afterStatus,
-    studentCode: String(studentCode || ""),
-    level: afterData.level || "",
-    route: afterData.source === "campus-writing" ? "/campus/writing?tab=tutor" : "/exams/writing?tab=tutor",
-  };
+  const data = questionOfDay
+    ? {
+        type: "question_of_day_feedback",
+        reviewId: reviewId || "",
+        studentCode: String(studentCode || ""),
+        level: afterData.level || "",
+        route,
+      }
+    : {
+        type: "exam_tutor_review",
+        reviewId: reviewId || "",
+        reviewStatus: afterStatus,
+        studentCode: String(studentCode || ""),
+        level: afterData.level || "",
+        route,
+      };
 
   const tokenOwners = tokenInfo.docId
     ? new Map(tokenInfo.tokens.map((token) => [token, tokenInfo.docId]))
@@ -1268,6 +1352,21 @@ exports.onAttendanceCheckinWritten = onDocumentWritten(
   }
 );
 
+
+exports.onExamTutorReviewCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "examTutorReviewQueue/{reviewId}",
+  },
+  async (event) => {
+    const afterData = event.data?.data() || {};
+    await notifyQuestionOfDaySubmissionCreated({
+      reviewId: event.params.reviewId,
+      afterData,
+    });
+    return null;
+  }
+);
 
 exports.onExamTutorReviewUpdated = onDocumentUpdated(
   {
