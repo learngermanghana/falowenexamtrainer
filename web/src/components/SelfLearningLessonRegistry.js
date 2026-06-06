@@ -4,6 +4,7 @@ import { buildDefaultLesson } from "../data/selfLearningLessons/buildSelfLearnin
 import c1Day0Orientation from "../data/selfLearningLessons/c1/day0Orientation";
 import c1Day1ZieleUndLernweg from "../data/selfLearningLessons/c1/day1ZieleUndLernweg";
 import c1Day2KulturUndIdentitaet from "../data/selfLearningLessons/c1/day2KulturUndIdentitaet";
+import c1Day3MedienUndInformationskompetenz from "../data/selfLearningLessons/c1/day3MedienUndInformationskompetenz";
 import b2Day0Orientation from "../data/selfLearningLessons/b2/day0Orientation";
 import b2Day1PersoenlicheIdentitaet from "../data/selfLearningLessons/b2/day1PersoenlicheIdentitaet";
 import b2Day2AlltagUndZeitmanagement from "../data/selfLearningLessons/b2/day2AlltagUndZeitmanagement";
@@ -12,7 +13,6 @@ import b2Day4BildungUndLernen from "../data/selfLearningLessons/b2/day4BildungUn
 import b2Day5GesundheitUndWohlbefinden from "../data/selfLearningLessons/b2/day5GesundheitUndWohlbefinden";
 
 const c1FallbackLessons = [
-  [3, "1.3", "Medien und Informationskompetenz", "Nachrichten, Quellenkritik und digitale Verantwortung"],
   [4, "1.4", "Beziehungen und Teamarbeit", "Kommunikation, Konflikte und Zusammenarbeit"],
   [5, "1.5", "Berufliche Entwicklung", "Karriere, Weiterbildung und berufliche Ziele"],
   [6, "2.1", "Gesundheit und Lebensstil", "Balance, Prävention und gesellschaftliche Gesundheit"],
@@ -76,7 +76,13 @@ export const SELF_LEARNING_LESSONS = {
     b2Day5GesundheitUndWohlbefinden,
     ...b2FallbackLessons,
   ],
-  C1: [c1Day0Orientation, c1Day1ZieleUndLernweg, c1Day2KulturUndIdentitaet, ...c1FallbackLessons],
+  C1: [
+    c1Day0Orientation,
+    c1Day1ZieleUndLernweg,
+    c1Day2KulturUndIdentitaet,
+    c1Day3MedienUndInformationskompetenz,
+    ...c1FallbackLessons,
+  ],
 };
 
 const lessonKey = (level, day) => `${String(level || "").toUpperCase()}-${Number(day || 0)}`;
