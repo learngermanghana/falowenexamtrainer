@@ -9,6 +9,7 @@ const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value]
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 const isInternalLink = (url = "") => String(url || "").startsWith("/");
 const SELF_LEARNING_LEVELS = new Set(["B2", "C1"]);
+const WORKSPACE_LEVELS = new Set(["A2", "B1"]);
 
 const ResourceAnchor = ({ label, url }) => {
   if (!url) return null;
@@ -18,6 +19,27 @@ const ResourceAnchor = ({ label, url }) => {
       <a href={url} {...externalProps}>{label}</a>
     </li>
   );
+};
+
+const pickPrimaryResource = (entry = {}) => {
+  const rows = [...toLessonArray(entry.lesen_hören), ...toLessonArray(entry.schreiben_sprechen), entry].filter(Boolean);
+  return rows.find((row) => row.workbook_link) || rows[0] || entry;
+};
+
+const buildSourceLesson = (entry = {}, level = "") => {
+  const primary = pickPrimaryResource(entry);
+  return {
+    level,
+    day: entry.day,
+    chapter: primary.chapter || entry.chapter,
+    topic: entry.topic || primary.title,
+    goal: entry.goal,
+    instruction: entry.instruction,
+    grammarTopic: entry.grammar_topic,
+    video: primary.video || primary.youtube_link || entry.video || entry.youtube_link,
+    grammarLink: primary.grammarbook_link || entry.grammarbook_link,
+    workbookLink: primary.workbook_link || entry.workbook_link,
+  };
 };
 
 const LessonResourceList = ({ title, lessons, isSelfLearning, onSubmit }) => {
@@ -91,6 +113,9 @@ const CourseLessonPage = () => {
   }
 
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
+  const isWorkbookWorkspaceLevel = WORKSPACE_LEVELS.has(level);
+  const sourceLesson = useMemo(() => buildSourceLesson(entry || {}, level), [entry, level]);
+  const workbookLink = sourceLesson.workbookLink;
   const assignmentKey = location.state?.assignmentKey || entry?.assignmentId || entry?.assignment_id || `${level}-DAY-${day}`;
   const status = location.state?.status || entry?.completion?.nonActionableStatus || "notStarted";
   const scoreText = location.state?.scoreText || "";
@@ -109,6 +134,15 @@ const CourseLessonPage = () => {
     });
   };
 
+  const openWorkbook = () => {
+    if (!workbookLink) return;
+    if (isInternalLink(workbookLink)) {
+      navigate(workbookLink, { state: { sourceLesson } });
+      return;
+    }
+    window.open(workbookLink, "_blank", "noopener,noreferrer");
+  };
+
   if (!entry) {
     return (
       <div style={{ ...styles.container, display: "grid", gap: 16 }}>
@@ -119,6 +153,62 @@ const CourseLessonPage = () => {
           <h1 style={{ marginTop: 0 }}>Lesson not found</h1>
           <p style={{ marginBottom: 0 }}>We could not find Day {day} for {level || "this level"}.</p>
         </div>
+      </div>
+    );
+  }
+
+  if (isWorkbookWorkspaceLevel) {
+    return (
+      <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>
+          ← Course Book
+        </button>
+
+        <article style={{ ...styles.card, display: "grid", gap: 18 }}>
+          <header style={{ display: "grid", gap: 10 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+              <span style={styles.levelPill}>{level}</span>
+              <span style={styles.levelPill}>Day {entry.day ?? day}</span>
+              {entry.chapter ? <span style={styles.levelPill}>Chapter {entry.chapter}</span> : null}
+              <span style={styles.badge}>Status: {status}</span>
+              {scoreText ? <span style={styles.badge}>{scoreText}</span> : null}
+            </div>
+            <h1 style={{ margin: 0 }}>{entry.topic || `Day ${entry.day ?? day}`}</h1>
+            {entry.goal ? <p style={{ margin: 0 }}>{entry.goal}</p> : null}
+          </header>
+
+          <section
+            style={{
+              border: "1px solid #bfdbfe",
+              borderRadius: 16,
+              padding: 16,
+              background: "#eff6ff",
+              display: "grid",
+              gap: 12,
+            }}
+          >
+            <h2 style={{ margin: 0, fontSize: 20 }}>Open your lesson workbook</h2>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>
+              Video, Grammar, Sprechen, Schreiben, Lesen, Hören and Class Notes are now inside one workbook workspace. Open the workbook and follow the tabs from left to right.
+            </p>
+            {entry.grammar_topic ? <p style={{ margin: 0 }}><strong>Grammar focus:</strong> {entry.grammar_topic}</p> : null}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button type="button" style={styles.primaryButton} onClick={openWorkbook} disabled={!workbookLink}>
+                Open lesson workbook
+              </button>
+              {entry.assignment ? (
+                <button type="button" style={styles.secondaryButton} onClick={handleSubmitAssignment}>
+                  Submit final answers
+                </button>
+              ) : null}
+            </div>
+            {entry.assignment ? (
+              <p style={{ ...styles.helperText, margin: 0 }}>
+                Submit only final answers for Teil 2, Teil 3 and Teil 4 in the Submission tab. Teil 1 is for class preparation.
+              </p>
+            ) : null}
+          </section>
+        </article>
       </div>
     );
   }
