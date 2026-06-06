@@ -1,12 +1,25 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { styles } from "../styles";
 import LessonClassNotesPanel from "./LessonClassNotesPanel";
 import WorkbookReadAloudInjector from "./WorkbookReadAloudInjector";
 
-export const A2B1WorkbookGuidance = ({ showClassNotes = true, compactNotes = true }) => {
+const resolveWorkbookLevel = (level) => {
+  const explicit = String(level || "").trim().toUpperCase();
+  if (["A2", "B1"].includes(explicit)) return explicit;
+
+  if (typeof window === "undefined") return "";
+  const path = `${window.location.pathname || ""} ${window.location.href || ""}`.toUpperCase();
+  if (/\bB1\b|B1DAY|\/B1\//.test(path)) return "B1";
+  if (/\bA2\b|A2DAY|\/A2\//.test(path)) return "A2";
+  return "";
+};
+
+export const A2B1WorkbookGuidance = ({ level = "", showClassNotes = true, compactNotes = true }) => {
   const [activePart, setActivePart] = useState("guide");
   const [hasOpenedNotes, setHasOpenedNotes] = useState(false);
   const sectionRef = useRef(null);
+  const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
+  const workbookLabel = workbookLevel ? `${workbookLevel} workbook` : "workbook";
 
   useEffect(() => {
     if (activePart === "notes") {
@@ -89,7 +102,7 @@ export const A2B1WorkbookGuidance = ({ showClassNotes = true, compactNotes = tru
 
         <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
           <p style={{ margin: 0 }}>
-            Each A2/B1 workbook now has <strong>five parts</strong>: Sprechen, Schreiben, Lesen, Hören and Class Notes.
+            This {workbookLabel} has <strong>five parts</strong>: Sprechen, Schreiben, Lesen, Hören and Class Notes.
           </p>
           <p style={{ margin: 0 }}>
             <strong>Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Prepare it before class and use the AI speaking coach on this page to practise.
