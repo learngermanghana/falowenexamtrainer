@@ -8,13 +8,13 @@ import { loadPreferredClass } from "../services/classSelectionStorage";
 import { normalizeNotificationStatus } from "../utils/notificationStatus";
 import { getDay0WorkbookLinkForLevel, normalizeLevel } from "../lib/day0Workbook";
 
-const STORAGE_KEY = "falowen_onboarding_v4";
+const STORAGE_KEY = "falowen_onboarding_v5";
 const LIVE_CLASS_ACCESS_KEY = "live-class-access";
 
 const loadState = () => {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("falowen_onboarding_v4");
     return raw ? JSON.parse(raw) : {};
   } catch (error) {
     console.warn("Could not load onboarding state", error);
@@ -38,55 +38,52 @@ const statusBadgeStyle = (complete, active = false) => ({
   border: `1px solid ${complete ? "#86efac" : active ? "#93c5fd" : "#e5e7eb"}`,
 });
 
-const StepGuide = ({ activeStep }) => {
+const StepGuide = ({ day0Complete }) => {
   const steps = [
-    "Open Day 0 Orientation",
-    "Read it and tap the green button to come back",
-    "Open live class access",
-    "Save and open dashboard",
+    { label: "Complete Day 0 Orientation", done: day0Complete, active: !day0Complete },
+    { label: "Open your dashboard", done: false, active: day0Complete },
   ];
 
   return (
     <section style={{ ...styles.card, background: "#ffffff", display: "grid", gap: 10 }}>
       <h3 style={{ margin: 0, fontSize: 18 }}>What you should do now</h3>
       <div style={{ display: "grid", gap: 8 }}>
-        {steps.map((step, index) => {
-          const current = index + 1 === activeStep;
-          const done = index + 1 < activeStep;
-          return (
-            <div
-              key={step}
+        {steps.map((step, index) => (
+          <div
+            key={step.label}
+            style={{
+              display: "flex",
+              gap: 10,
+              alignItems: "center",
+              padding: 10,
+              borderRadius: 12,
+              border: `1px solid ${step.active ? "#2563eb" : step.done ? "#86efac" : "#e5e7eb"}`,
+              background: step.active ? "#eff6ff" : step.done ? "#f0fdf4" : "#f9fafb",
+            }}
+          >
+            <span
               style={{
-                display: "flex",
-                gap: 10,
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                display: "inline-flex",
                 alignItems: "center",
-                padding: 10,
-                borderRadius: 12,
-                border: `1px solid ${current ? "#2563eb" : done ? "#86efac" : "#e5e7eb"}`,
-                background: current ? "#eff6ff" : done ? "#f0fdf4" : "#f9fafb",
+                justifyContent: "center",
+                fontWeight: 900,
+                background: step.done ? "#16a34a" : step.active ? "#2563eb" : "#e5e7eb",
+                color: step.done || step.active ? "#ffffff" : "#374151",
+                flex: "0 0 auto",
               }}
             >
-              <span
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: "50%",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontWeight: 900,
-                  background: done ? "#16a34a" : current ? "#2563eb" : "#e5e7eb",
-                  color: done || current ? "#ffffff" : "#374151",
-                  flex: "0 0 auto",
-                }}
-              >
-                {done ? "✓" : index + 1}
-              </span>
-              <strong>{step}</strong>
-            </div>
-          );
-        })}
+              {step.done ? "✓" : index + 1}
+            </span>
+            <strong>{step.label}</strong>
+          </div>
+        ))}
       </div>
+      <p style={{ ...styles.helperText, margin: 0 }}>
+        Live class access and notifications are helpful, but they will not block your dashboard.
+      </p>
     </section>
   );
 };
@@ -117,9 +114,10 @@ const OnboardingActionCard = ({
       <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
         <span
           style={{
-            width: 30,
+            minWidth: 30,
             height: 30,
-            borderRadius: "50%",
+            padding: number === "Optional" ? "0 8px" : 0,
+            borderRadius: number === "Optional" ? 999 : "50%",
             background: complete ? "#16a34a" : active ? "#2563eb" : "#e5e7eb",
             color: complete || active ? "#fff" : "#374151",
             display: "inline-flex",
@@ -127,6 +125,7 @@ const OnboardingActionCard = ({
             justifyContent: "center",
             fontWeight: 900,
             flex: "0 0 auto",
+            fontSize: number === "Optional" ? 12 : 14,
           }}
         >
           {complete ? "✓" : number}
@@ -137,7 +136,7 @@ const OnboardingActionCard = ({
           {helper ? <p style={{ ...styles.helperText, margin: "6px 0 0", color: "#0f172a" }}>{helper}</p> : null}
         </div>
       </div>
-      <span style={statusBadgeStyle(complete, active)}>{complete ? "Done" : active ? "Do now" : "Next"}</span>
+      <span style={statusBadgeStyle(complete, active)}>{complete ? "Done" : active ? "Do now" : "Optional"}</span>
     </div>
 
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -169,14 +168,14 @@ const SetupCompleteCelebration = ({ onOpenDashboard, saving, error }) => (
       🎉
     </div>
     <p style={{ ...styles.badge, width: "fit-content", background: "#dcfce7", color: "#166534", margin: 0 }}>
-      Setup complete
+      Day 0 complete
     </p>
-    <h2 style={{ ...styles.sectionTitle, margin: 0 }}>You are ready to start learning</h2>
+    <h2 style={{ ...styles.sectionTitle, margin: 0 }}>You can now open your dashboard</h2>
     <p style={{ ...styles.helperText, maxWidth: 620, margin: 0, lineHeight: 1.6 }}>
-      Your Day 0 and live class access are done. Notifications are optional on phone, so you can enable them later from your dashboard.
+      Your dashboard is unlocked. You can check Zoom/class access and enable notifications later from the dashboard.
     </p>
     <button type="button" style={styles.primaryButton} onClick={onOpenDashboard} disabled={saving}>
-      {saving ? "Saving..." : "Save and open my dashboard"}
+      {saving ? "Saving..." : "Open my dashboard"}
     </button>
     {error ? <span style={{ ...styles.helperText, color: "#b91c1c" }}>{error}</span> : null}
   </section>
@@ -248,19 +247,11 @@ const OnboardingChecklist = ({
   const notificationsUnknown = normalizedNotificationStatus === "idle";
 
   const day0Opened = Boolean(effectiveLevel && state.day0OpenedByLevel?.[effectiveLevel]);
-  const day0Complete = Boolean(effectiveLevel && (state.day0FinishedByLevel?.[effectiveLevel] || state.day0OpenedByLevel?.[effectiveLevel]));
+  const day0Complete = Boolean(effectiveLevel && state.day0FinishedByLevel?.[effectiveLevel]);
   const liveClassAccessChecked = Boolean(state.scheduleCheckedByClass?.[scheduleKey]);
   const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted) || state.completedLocally;
-  const progressDone = [day0Complete, liveClassAccessChecked].filter(Boolean).length;
-  const allFinished = day0Complete && liveClassAccessChecked;
+  const progressDone = day0Complete ? 1 : 0;
 
-  const nextStepKey = useMemo(() => {
-    if (!day0Complete) return "day0";
-    if (!liveClassAccessChecked) return "schedule";
-    return "save";
-  }, [day0Complete, liveClassAccessChecked]);
-
-  const guideStep = nextStepKey === "day0" ? 1 : nextStepKey === "schedule" ? 3 : 4;
   const updateState = (updater) => setState((prev) => ({ ...prev, ...updater(prev) }));
 
   const markDay0Opened = () => {
@@ -275,7 +266,7 @@ const OnboardingChecklist = ({
         [effectiveLevel]: true,
       },
     }));
-    showToast("Day 0 opened. When you finish, tap the green continue setup button on the Day 0 page.", "success");
+    showToast("Day 0 opened. When you finish reading it, come back and tap I finished Day 0.", "success");
     if (day0WorkbookLink) navigate(day0WorkbookLink);
   };
 
@@ -295,7 +286,8 @@ const OnboardingChecklist = ({
         [effectiveLevel]: true,
       },
     }));
-    showToast("Day 0 marked as completed. Continue to live class access.", "success");
+    showToast("Day 0 completed. You can now open your dashboard.", "success");
+    setShowCompletionCelebration(true);
   };
 
   const markLiveClassAccessChecked = () => {
@@ -348,12 +340,15 @@ const OnboardingChecklist = ({
   };
 
   const handleSaveOnboarding = async () => {
-    if (!allFinished) return;
+    if (!day0Complete) {
+      showToast("Please complete Day 0 first. Then your dashboard will open.", "info");
+      return;
+    }
     setSaveError("");
     setSavingOnboarding(true);
     try {
       if (onSaveOnboarding) await onSaveOnboarding();
-      showToast("Setup saved. Opening your dashboard.", "success");
+      showToast("Opening your dashboard.", "success");
       setState((prev) => ({ ...prev, completedLocally: true }));
       navigate("/");
     } catch (error) {
@@ -365,9 +360,8 @@ const OnboardingChecklist = ({
   };
 
   const handlePrimaryContinue = () => {
-    if (nextStepKey === "day0") return markDay0Opened();
-    if (nextStepKey === "schedule") return markLiveClassAccessChecked();
-    setShowCompletionCelebration(true);
+    if (!day0Complete) return markDay0Opened();
+    return handleSaveOnboarding();
   };
 
   if (onboardingCompleted) return null;
@@ -376,12 +370,7 @@ const OnboardingChecklist = ({
     return <SetupCompleteCelebration onOpenDashboard={handleSaveOnboarding} saving={savingOnboarding} error={saveError} />;
   }
 
-  const primaryCTA =
-    nextStepKey === "day0"
-      ? "1. Open Day 0 Orientation"
-      : nextStepKey === "schedule"
-      ? "2. Open live class access"
-      : "3. Save and open dashboard";
+  const primaryCTA = !day0Complete ? "1. Open Day 0 Orientation" : "Open my dashboard";
 
   return (
     <section
@@ -398,21 +387,21 @@ const OnboardingChecklist = ({
           <div>
             <p style={{ ...styles.badge, background: "#dbeafe", color: "#1e40af" }}>Start here after signup</p>
             <h2 style={{ ...styles.sectionTitle, marginTop: 6, marginBottom: 4 }}>
-              Do these 2 things, then open your dashboard
+              Complete Day 0, then open your dashboard
             </h2>
             <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.6 }}>
-              First open Day 0. When you finish, come back and open your live class access. Notifications are optional on phone and will not block you.
+              Day 0 explains how Falowen works. After Day 0, your dashboard will unlock. Zoom/class access and notifications are optional and can be checked later.
             </p>
           </div>
 
           <div style={{ display: "grid", justifyItems: "end", gap: 8 }}>
-            <span style={{ ...styles.helperText, fontWeight: 900 }}>Progress: {progressDone}/2</span>
+            <span style={{ ...styles.helperText, fontWeight: 900 }}>Progress: {progressDone}/1</span>
             <div style={{ width: 220, height: 12, borderRadius: 999, background: "#dbeafe", overflow: "hidden" }}>
               <div
                 style={{
                   height: "100%",
-                  width: `${Math.round((progressDone / 2) * 100)}%`,
-                  background: allFinished ? "#16a34a" : "#2563eb",
+                  width: `${progressDone * 100}%`,
+                  background: day0Complete ? "#16a34a" : "#2563eb",
                 }}
               />
             </div>
@@ -423,23 +412,23 @@ const OnboardingChecklist = ({
           </div>
         </div>
 
-        <StepGuide activeStep={guideStep} />
+        <StepGuide day0Complete={day0Complete} />
 
-        {day0Opened && !state.day0FinishedByLevel?.[effectiveLevel] ? (
+        {day0Opened && !day0Complete ? (
           <div style={{ ...styles.card, background: "#fffbeb", border: "1px solid #f59e0b", display: "grid", gap: 8 }}>
             <strong>Already finished Day 0?</strong>
             <p style={{ ...styles.helperText, margin: 0 }}>
-              Tap this after you have read Day 0. This helps students on phone continue without getting stuck.
+              Tap this after you have read Day 0. This will unlock your dashboard.
             </p>
             <button type="button" style={styles.primaryButton} onClick={markDay0FinishedManually}>
-              I finished Day 0 — continue setup
+              I finished Day 0 — open dashboard
             </button>
           </div>
         ) : null}
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <span style={statusBadgeStyle(day0Complete)}>Day 0: {day0Complete ? "done" : "not done"}</span>
-          <span style={statusBadgeStyle(liveClassAccessChecked)}>Live class access: {liveClassAccessChecked ? "checked" : "not checked"}</span>
+          <span style={statusBadgeStyle(liveClassAccessChecked)}>Live class access: {liveClassAccessChecked ? "checked" : "optional"}</span>
           <span style={statusBadgeStyle(notificationsGranted || state.notificationsSkipped)}>
             Notifications: {notificationsGranted ? "on" : state.notificationsSkipped ? "skipped" : "optional"}
           </span>
@@ -452,20 +441,20 @@ const OnboardingChecklist = ({
           title={`Day 0 Orientation${effectiveLevel ? ` (${effectiveLevel})` : ""}`}
           description="Open Day 0 first. It explains how Falowen works, assignments, attendance, tutor feedback, and what to do before Day 1."
           complete={day0Complete}
-          active={nextStepKey === "day0"}
+          active={!day0Complete}
           actionLabel="Open Day 0 Orientation"
           onAction={markDay0Opened}
-          secondaryLabel={day0Opened && !state.day0FinishedByLevel?.[effectiveLevel] ? "I finished Day 0" : null}
-          onSecondary={day0Opened && !state.day0FinishedByLevel?.[effectiveLevel] ? markDay0FinishedManually : null}
-          helper="After reading Day 0, tap the green continue setup button on Day 0 or come back and tap I finished Day 0."
+          secondaryLabel={day0Opened && !day0Complete ? "I finished Day 0" : null}
+          onSecondary={day0Opened && !day0Complete ? markDay0FinishedManually : null}
+          helper="After reading Day 0, come back and tap I finished Day 0 to unlock your dashboard."
         />
 
         <OnboardingActionCard
-          number="2"
-          title="Open live class access"
-          description="Open this to see where your Zoom link, class days, and calendar are located."
+          number="Optional"
+          title="Live class access"
+          description="Open this to see where your Zoom link, class days, and calendar are located. This does not block your dashboard."
           complete={liveClassAccessChecked}
-          active={nextStepKey === "schedule"}
+          active={false}
           actionLabel="Open live class access"
           onAction={markLiveClassAccessChecked}
           secondaryLabel={currentClass ? "Download calendar" : null}
@@ -494,11 +483,11 @@ const OnboardingChecklist = ({
       </div>
 
       <div style={{ borderTop: "1px solid #bfdbfe", paddingTop: 10, display: "grid", gap: 6 }}>
-        <strong>{allFinished ? "You are ready to open the dashboard." : "Start with Step 1: Day 0 Orientation."}</strong>
+        <strong>{day0Complete ? "You can open your dashboard now." : "Start with Day 0 Orientation."}</strong>
         <p style={{ ...styles.helperText, margin: 0 }}>
-          {allFinished
-            ? "Click Save and open dashboard."
-            : "The page now has only two required steps so students on phone will not get blocked."}
+          {day0Complete
+            ? "Click Open my dashboard. You can check Zoom and notifications later."
+            : "Only Day 0 is required. Live class access and notifications are optional helper steps."}
         </p>
       </div>
     </section>
