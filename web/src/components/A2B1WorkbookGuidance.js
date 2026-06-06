@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
@@ -66,90 +66,27 @@ const findLessonMetaForWorkbook = ({ level, pathname, stateLesson }) => {
   return null;
 };
 
-const youtubeEmbedUrl = (url = "") => {
-  const raw = String(url || "").trim();
-  if (!raw) return "";
-  try {
-    const parsed = new URL(raw);
-    let videoId = "";
-    if (parsed.hostname.includes("youtu.be")) videoId = parsed.pathname.replace("/", "");
-    if (parsed.hostname.includes("youtube.com")) videoId = parsed.searchParams.get("v") || parsed.pathname.split("/").pop();
-    if (!videoId) return "";
-    return `https://www.youtube.com/embed/${videoId}`;
-  } catch {
-    return "";
-  }
-};
-
-const tabButtonStyle = (active) => ({
-  ...styles.secondaryButton,
-  borderColor: active ? "#2563eb" : "#d1d5db",
-  background: active ? "#eff6ff" : "#ffffff",
-  color: active ? "#1d4ed8" : "#111827",
-  fontWeight: 800,
-});
-
-const WorkspaceTabButton = ({ active, onClick, children }) => (
-  <button type="button" style={tabButtonStyle(active)} onClick={onClick}>
-    {children}
-  </button>
-);
-
 const renderExternalLinkProps = (url = "") => (isInternalLink(url) ? {} : { target: "_blank", rel: "noreferrer" });
 
-const LessonVideoPanel = ({ lessonMeta }) => {
-  const embedUrl = youtubeEmbedUrl(lessonMeta?.video);
+const actionLinkStyle = {
+  ...styles.secondaryButton,
+  textDecoration: "none",
+  width: "fit-content",
+};
+
+const PrepLink = ({ href, children }) => {
+  if (!href) return null;
   return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <h3 style={{ margin: 0 }}>Video</h3>
-      <p style={{ margin: 0, lineHeight: 1.6 }}>
-        Watch the lesson video first, then continue to Grammar and the workbook parts.
-      </p>
-      {embedUrl ? (
-        <iframe
-          title={`${lessonMeta?.topic || "Lesson"} video`}
-          src={embedUrl}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          style={{ width: "100%", minHeight: 315, border: 0, borderRadius: 12, background: "#000" }}
-        />
-      ) : lessonMeta?.video ? (
-        <a href={lessonMeta.video} {...renderExternalLinkProps(lessonMeta.video)} style={styles.linkButton}>
-          Open lesson video
-        </a>
-      ) : (
-        <p style={{ margin: 0, color: "#64748b" }}>No video has been added for this workbook yet.</p>
-      )}
-    </div>
+    <a href={href} {...renderExternalLinkProps(href)} style={actionLinkStyle}>
+      {children}
+    </a>
   );
 };
 
-const LessonGrammarPanel = ({ lessonMeta }) => (
-  <div style={{ display: "grid", gap: 12 }}>
-    <h3 style={{ margin: 0 }}>Grammar</h3>
-    {lessonMeta?.grammarTopic ? (
-      <div style={{ border: "1px solid #c7d2fe", borderRadius: 12, padding: 12, background: "#ffffff" }}>
-        <strong>Grammar focus</strong>
-        <p style={{ margin: "6px 0 0", lineHeight: 1.6 }}>{lessonMeta.grammarTopic}</p>
-      </div>
-    ) : null}
-    <p style={{ margin: 0, lineHeight: 1.6 }}>
-      Review the grammar before you answer the workbook parts. Grammar is part of the same lesson workspace, not a separate assignment.
-    </p>
-    {lessonMeta?.grammarLink ? (
-      <a href={lessonMeta.grammarLink} {...renderExternalLinkProps(lessonMeta.grammarLink)} style={styles.linkButton}>
-        Open grammar notes
-      </a>
-    ) : (
-      <p style={{ margin: 0, color: "#64748b" }}>No separate grammar notes have been added for this workbook yet.</p>
-    )}
-  </div>
-);
-
-const StartPanel = ({ workbookLabel, lessonMeta, showClassNotes }) => (
+const StartPanel = ({ workbookLabel, lessonMeta }) => (
   <div style={{ display: "grid", gap: 8, lineHeight: 1.6 }}>
     <p style={{ margin: 0 }}>
-      This {workbookLabel} is your full lesson workspace. Use the tabs in this order: <strong>Start → Video → Grammar → Sprechen → Schreiben → Lesen → Hören</strong>{showClassNotes ? <strong> → Class Notes</strong> : null}.
+      This {workbookLabel} is your lesson workspace. Use the workbook tabs above for <strong>Teil 1 · Sprechen</strong>, <strong>Teil 2 · Schreiben</strong>, <strong>Teil 3 · Lesen</strong> and <strong>Teil 4 · Hören</strong>.
     </p>
     {lessonMeta?.topic ? (
       <div style={{ border: "1px solid #bfdbfe", borderRadius: 12, padding: 12, background: "#ffffff" }}>
@@ -159,27 +96,20 @@ const StartPanel = ({ workbookLabel, lessonMeta, showClassNotes }) => (
       </div>
     ) : null}
     <p style={{ margin: 0 }}>
-      <strong>Teil 1 · Sprechen</strong> is practical class preparation. You do not submit Teil 1 as an assignment. Prepare it before class and use the AI speaking coach on this page to practise.
+      First, watch the video and review the grammar. Then continue with the workbook parts.
     </p>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      <PrepLink href={lessonMeta?.video}>Video lecture</PrepLink>
+      <PrepLink href={lessonMeta?.grammarLink}>Grammar notes</PrepLink>
+    </div>
     <p style={{ margin: 0 }}>
-      <strong>Teil 2 · Schreiben, Teil 3 · Lesen and Teil 4 · Hören</strong> are the assignment parts. You can practise with the AI tools on this page, but your final answers must be submitted in the <strong>Submission</strong> tab.
-    </p>
-    {showClassNotes ? (
-      <p style={{ margin: 0 }}>
-        <strong>Class Notes</strong> is not an assignment. It is where your tutor saves vocabulary from Zoom, short suggestions, corrections, reminders and answers to class questions for this lesson.
-      </p>
-    ) : null}
-    <p style={{ margin: 0 }}>
-      <strong>Read aloud:</strong> In Teil 3 · Lesen, use the free German voice controls to listen to the text, pause, continue, stop and change speed.
+      Submit only your final answers for <strong>Teil 2, Teil 3 and Teil 4</strong> in the Submission tab. Teil 1 is class preparation.
     </p>
   </div>
 );
 
 export const A2B1WorkbookGuidance = ({ level = "", showClassNotes = true, compactNotes = true }) => {
   const location = useLocation();
-  const [activePart, setActivePart] = useState("start");
-  const [hasOpenedNotes, setHasOpenedNotes] = useState(false);
-  const sectionRef = useRef(null);
   const workbookLevel = useMemo(() => resolveWorkbookLevel(level), [level]);
   const lessonMeta = useMemo(
     () => findLessonMetaForWorkbook({ level: workbookLevel, pathname: location.pathname, stateLesson: location.state?.sourceLesson }),
@@ -187,76 +117,10 @@ export const A2B1WorkbookGuidance = ({ level = "", showClassNotes = true, compac
   );
   const workbookLabel = workbookLevel ? `${workbookLevel} workbook` : "workbook";
 
-  useEffect(() => {
-    if (activePart === "notes") setHasOpenedNotes(true);
-  }, [activePart]);
-
-  useEffect(() => {
-    if (!sectionRef.current || typeof document === "undefined") return undefined;
-
-    const section = sectionRef.current;
-    const headerCard = section.previousElementSibling;
-    if (!headerCard || headerCard.querySelector('[data-workspace-tab="start"]')) return undefined;
-
-    const tabRows = Array.from(headerCard.querySelectorAll("div"));
-    const tabRow = tabRows.find((row) => {
-      const buttons = Array.from(row.querySelectorAll("button"));
-      const buttonText = buttons.map((button) => button.textContent || "").join(" ");
-      return buttons.length >= 4 && buttonText.includes("Teil 1") && buttonText.includes("Teil 4");
-    });
-
-    if (!tabRow) return undefined;
-
-    const makeButton = ({ key, label, before = false }) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.dataset.workspaceTab = key;
-      button.textContent = label;
-      Object.assign(button.style, {
-        border: "1px solid #d1d5db",
-        background: "#ffffff",
-        color: "#111827",
-        borderRadius: "999px",
-        padding: "9px 16px",
-        fontWeight: "700",
-        cursor: "pointer",
-        fontFamily: "inherit",
-        fontSize: "inherit",
-      });
-      const activate = () => {
-        setActivePart(key);
-        if (key === "notes") setHasOpenedNotes(true);
-        window.setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-      };
-      button.addEventListener("click", activate);
-      if (before) tabRow.insertBefore(button, tabRow.firstChild);
-      else tabRow.appendChild(button);
-      return { button, activate };
-    };
-
-    const inserted = [
-      makeButton({ key: "start", label: "Start", before: true }),
-      makeButton({ key: "video", label: "Video", before: false }),
-      makeButton({ key: "grammar", label: "Grammar", before: false }),
-    ];
-
-    if (showClassNotes && !headerCard.querySelector('[data-workspace-tab="notes"]')) {
-      inserted.push(makeButton({ key: "notes", label: "Class Notes", before: false }));
-    }
-
-    return () => {
-      inserted.forEach(({ button, activate }) => {
-        button.removeEventListener("click", activate);
-        button.remove();
-      });
-    };
-  }, [showClassNotes]);
-
   return (
     <>
       <WorkbookReadAloudInjector />
       <section
-        ref={sectionRef}
         aria-label="Lesson workspace guide"
         style={{
           ...styles.card,
@@ -269,23 +133,20 @@ export const A2B1WorkbookGuidance = ({ level = "", showClassNotes = true, compac
         }}
       >
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-          <h2 style={{ margin: 0, fontSize: "1.05rem" }}>Lesson workspace</h2>
-          {showClassNotes && !hasOpenedNotes ? (
-            <span style={{ ...styles.badge, background: "#dbeafe", color: "#1d4ed8" }}>Class notes available</span>
-          ) : null}
+          <h2 style={{ margin: 0, fontSize: "1.05rem" }}>Before you start</h2>
+          {showClassNotes ? <span style={{ ...styles.badge, background: "#dbeafe", color: "#1d4ed8" }}>Class notes available</span> : null}
         </div>
 
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <WorkspaceTabButton active={activePart === "start"} onClick={() => setActivePart("start")}>Start</WorkspaceTabButton>
-          <WorkspaceTabButton active={activePart === "video"} onClick={() => setActivePart("video")}>Video</WorkspaceTabButton>
-          <WorkspaceTabButton active={activePart === "grammar"} onClick={() => setActivePart("grammar")}>Grammar</WorkspaceTabButton>
-          {showClassNotes ? <WorkspaceTabButton active={activePart === "notes"} onClick={() => setActivePart("notes")}>Class Notes</WorkspaceTabButton> : null}
-        </div>
+        <StartPanel workbookLabel={workbookLabel} lessonMeta={lessonMeta} />
 
-        {activePart === "start" ? <StartPanel workbookLabel={workbookLabel} lessonMeta={lessonMeta} showClassNotes={showClassNotes} /> : null}
-        {activePart === "video" ? <LessonVideoPanel lessonMeta={lessonMeta} /> : null}
-        {activePart === "grammar" ? <LessonGrammarPanel lessonMeta={lessonMeta} /> : null}
-        {showClassNotes && activePart === "notes" ? <LessonClassNotesPanel compact={compactNotes} /> : null}
+        {showClassNotes ? (
+          <details style={{ borderTop: "1px solid #bfdbfe", paddingTop: 10 }}>
+            <summary style={{ cursor: "pointer", fontWeight: 800 }}>Open Class Notes</summary>
+            <div style={{ marginTop: 10 }}>
+              <LessonClassNotesPanel compact={compactNotes} />
+            </div>
+          </details>
+        ) : null}
       </section>
     </>
   );
