@@ -356,29 +356,24 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
           {activeTab === "learn" ? (
             <>
-              <Section title="Daily mission">
-                <NoteBox><strong>No tutor submission for {lesson.level}.</strong> Learn the topic, practise with Falowen AI, read feedback, improve your answer and self-mark honestly.</NoteBox>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-                  <PracticeBox title="Sprechen topic"><p style={{ margin: 0, lineHeight: 1.6 }}>{speakingTopic}</p></PracticeBox>
-                  <WritingTaskCard writingType={writingType} writingTask={writingTask} structure={lesson.writingBuilder?.structure} />
-                </div>
-              </Section>
-
-              <Section title="Ziele und Thema">
+              <Section title="Lesson overview">
+                <NoteBox>
+                  <strong>Learn first.</strong> This tab is only for the topic overview, lesson goals and thinking questions. Use the Speak tab for Sprechen practice and the Write tab for the writing task.
+                </NoteBox>
                 {renderList(lesson.objectives || [])}
                 {(lesson.explanation || []).map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
-                {lesson.topicQuestions?.length ? <PracticeBox title="Think before you answer">{renderList(lesson.topicQuestions)}</PracticeBox> : null}
+                {lesson.topicQuestions?.length ? <PracticeBox title="Think before you practise">{renderList(lesson.topicQuestions)}</PracticeBox> : null}
               </Section>
 
-              <Section title="Grammatik, Sprache und Redemittel">
-                {lesson.grammarFocus ? <NoteBox><strong>Fokus:</strong> {lesson.grammarFocus}</NoteBox> : null}
+              <Section title="Grammar and useful language">
+                {lesson.grammarFocus ? <NoteBox><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox> : null}
                 {lesson.grammarLesson?.rules?.length ? <PracticeBox title="Rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}
                 {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
                 {lesson.grammarLesson?.miniExercise ? <PracticeBox title="Mini exercise"><p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}
                 {lesson.phrases?.length ? <PracticeBox title="Useful phrases">{renderList(lesson.phrases)}</PracticeBox> : null}
                 <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input type="checkbox" checked={Boolean(progress.understood)} onChange={(event) => updateProgress({ understood: event.target.checked })} />
-                  <span style={styles.label}>I understand the topic and prepared my ideas.</span>
+                  <span style={styles.label}>I understand the overview and grammar focus.</span>
                 </label>
               </Section>
             </>
