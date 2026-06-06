@@ -86,6 +86,70 @@ const PracticeBox = ({ title, children }) => (
   </div>
 );
 
+const KnowledgeTest = ({ items = [], answers = {}, onAnswer }) => {
+  if (!items.length) return null;
+  const answered = items.filter((_, index) => answers[index]).length;
+  const correct = items.filter((item, index) => answers[index] && answers[index] === item.answer).length;
+
+  return (
+    <div style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, background: "#f8fafc", display: "grid", gap: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <strong>Knowledge test</strong>
+        <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{correct}/{items.length} correct</span>
+      </div>
+      <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+        Click the best answer. You will see immediately whether it is correct.
+      </p>
+      {items.map((item, index) => {
+        const selected = answers[index] || "";
+        const isAnswered = Boolean(selected);
+        const isCorrect = selected === item.answer;
+        return (
+          <div key={item.question} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff", display: "grid", gap: 10 }}>
+            <strong>{index + 1}. {item.question}</strong>
+            <div style={{ display: "grid", gap: 8 }}>
+              {(item.options || []).map((option) => {
+                const isSelected = selected === option;
+                const isRightOption = item.answer === option;
+                const background = isSelected ? (isCorrect ? "#dcfce7" : "#fee2e2") : isAnswered && isRightOption ? "#f0fdf4" : "#ffffff";
+                const borderColor = isSelected ? (isCorrect ? "#22c55e" : "#ef4444") : isAnswered && isRightOption ? "#86efac" : "#e5e7eb";
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => onAnswer(index, option)}
+                    style={{
+                      textAlign: "left",
+                      padding: "10px 12px",
+                      borderRadius: 12,
+                      border: `1px solid ${borderColor}`,
+                      background,
+                      cursor: "pointer",
+                      fontWeight: isSelected ? 800 : 600,
+                    }}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+            {isAnswered ? (
+              <div style={{ border: `1px solid ${isCorrect ? "#86efac" : "#fecaca"}`, borderRadius: 12, padding: 10, background: isCorrect ? "#f0fdf4" : "#fef2f2", lineHeight: 1.6 }}>
+                <strong>{isCorrect ? "Correct." : "Not correct yet."}</strong> {item.explanation}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+      {answered === items.length ? (
+        <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, padding: 10, background: "#f0fdf4" }}>
+          Finished: {correct}/{items.length}. Review any red answers before you continue.
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = {
     blue: { border: "#bfdbfe", bg: "#eff6ff" },
@@ -119,6 +183,11 @@ const StatCard = ({ label, value }) => (
 const renderList = (items = []) => {
   if (!items.length) return null;
   return <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>{items.map((item) => <li key={item}>{item}</li>)}</ul>;
+};
+
+const renderParagraphs = (items = []) => {
+  if (!items.length) return null;
+  return items.map((item) => <p key={item} style={{ margin: 0, lineHeight: 1.7 }}>{item}</p>);
 };
 
 const splitIntoSentences = (text = "") => {
@@ -217,6 +286,7 @@ const inferWritingType = (lesson) => {
 const buildInitialProgress = () => ({
   understood: false,
   completed: false,
+  grammarQuizAnswers: {},
 });
 
 export default function SelfLearningEditableLessonPageV2({ lesson }) {
@@ -236,6 +306,14 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
   }, [progress, storageKey]);
 
   const updateProgress = (updates) => setProgress((previous) => ({ ...previous, ...updates }));
+  const updateGrammarQuizAnswer = (questionIndex, option) => {
+    updateProgress({
+      grammarQuizAnswers: {
+        ...(progress.grammarQuizAnswers || {}),
+        [questionIndex]: option,
+      },
+    });
+  };
 
   const isOrientationDay = Number(lesson.day) === 0;
   const writingType = inferWritingType(lesson);
@@ -367,9 +445,16 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
               <Section title="Grammar and useful language">
                 {lesson.grammarFocus ? <NoteBox><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox> : null}
+                {lesson.grammarLesson?.title ? <PracticeBox title="Grammar topic"><strong>{lesson.grammarLesson.title}</strong></PracticeBox> : null}
+                {lesson.grammarLesson?.explanation?.length ? <PracticeBox title="How to use it">{renderParagraphs(lesson.grammarLesson.explanation)}</PracticeBox> : null}
                 {lesson.grammarLesson?.rules?.length ? <PracticeBox title="Rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}
                 {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
                 {lesson.grammarLesson?.miniExercise ? <PracticeBox title="Mini exercise"><p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}
+                <KnowledgeTest
+                  items={lesson.grammarLesson?.knowledgeTest || []}
+                  answers={progress.grammarQuizAnswers || {}}
+                  onAnswer={updateGrammarQuizAnswer}
+                />
                 {lesson.phrases?.length ? <PracticeBox title="Useful phrases">{renderList(lesson.phrases)}</PracticeBox> : null}
                 <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input type="checkbox" checked={Boolean(progress.understood)} onChange={(event) => updateProgress({ understood: event.target.checked })} />
