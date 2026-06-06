@@ -164,7 +164,10 @@ const A1WorkspacePanel = ({ activeTab, entry, level, navigate, sourceLesson }) =
             const embedUrl = youtubeEmbedUrl(videoUrl);
             if (!videoUrl) return null;
             return (
-              <article key={`${getResourceLabel(row)}-video-${index}`} style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 14, display: "grid", gap: 10, background: "#fff" }}>
+              <article
+                key={`${getResourceLabel(row)}-video-${index}`}
+                style={{ border: "1px solid #e5e7eb", borderRadius: 14, padding: 14, display: "grid", gap: 10, background: "#fff" }}
+              >
                 <strong>{getResourceLabel(row, `Video ${index + 1}`)}</strong>
                 {embedUrl ? (
                   <iframe
@@ -250,16 +253,12 @@ const CourseLessonPage = () => {
     if (location.state?.entry) return location.state.entry;
     return (courseSchedules[level] || []).find((lesson) => String(lesson.day) === String(day)) || null;
   }, [day, level, location.state]);
-
+  const sourceLesson = useMemo(() => buildSourceLesson(entry || {}, level), [entry, level]);
   const SelfLearningComponent = getSelfLearningLessonComponent(level, day);
-  if (SelfLearningComponent) {
-    return <SelfLearningComponent />;
-  }
 
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
   const isWorkbookWorkspaceLevel = WORKSPACE_LEVELS.has(level);
   const isA1WorkspaceLevel = level === "A1" && Number(day) !== 0;
-  const sourceLesson = useMemo(() => buildSourceLesson(entry || {}, level), [entry, level]);
   const workbookLink = sourceLesson.workbookLink;
   const assignmentKey = location.state?.assignmentKey || entry?.assignmentId || entry?.assignment_id || `${level}-DAY-${day}`;
   const status = location.state?.status || entry?.completion?.nonActionableStatus || "notStarted";
@@ -287,6 +286,10 @@ const CourseLessonPage = () => {
     }
     window.open(workbookLink, "_blank", "noopener,noreferrer");
   };
+
+  if (SelfLearningComponent) {
+    return <SelfLearningComponent />;
+  }
 
   if (!entry) {
     return (
