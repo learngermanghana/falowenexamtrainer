@@ -324,7 +324,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
   const orientationCards = isOrientationDay
     ? [
         { label: "Page type", value: "Orientation only" },
-        { label: "Writing focus", value: writingType },
+        { label: "Course design", value: "Learn · Speak · Write · Finish" },
         { label: "Progress", value: progress.completed ? "Completed" : "Read first" },
       ]
     : [
@@ -383,29 +383,38 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
         <>
           <Section title="Day 0 Orientation">
             <NoteBox>
-              <strong>Start here.</strong> Day 0 is only for orientation. There are no Learn, Speak, Write or Finish tabs on this page.
+              <strong>Start here.</strong> Day 0 is only for orientation. There is no writing task on this page.
             </NoteBox>
             {renderList(lesson.objectives || [])}
             {(lesson.explanation || []).map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
           </Section>
 
-          <Section title="How this course works">
+          <Section title="What you must understand today">
             {lesson.grammarFocus ? <NoteBox><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox> : null}
-            {lesson.topicQuestions?.length ? <PracticeBox title="Questions to understand before Day 1">{renderList(lesson.topicQuestions)}</PracticeBox> : null}
-            {lesson.grammarLesson?.rules?.length ? <PracticeBox title="Orientation rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}
-            {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Model language">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
+            {lesson.topicQuestions?.length ? <PracticeBox title="Questions before Day 1">{renderList(lesson.topicQuestions)}</PracticeBox> : null}
+            {lesson.grammarLesson?.explanation?.length ? <PracticeBox title="How Falowen works">{renderParagraphs(lesson.grammarLesson.explanation)}</PracticeBox> : null}
+            {lesson.grammarLesson?.rules?.length ? <PracticeBox title="Course rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}
+            {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Daily flow examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
+            {lesson.grammarLesson?.miniExercise ? <PracticeBox title="Quick orientation check"><p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}
           </Section>
 
-          <Section title="Writing focus for this level">
-            <WritingTaskCard writingType={writingType} writingTask={writingTask} structure={lesson.writingBuilder?.structure} />
-            {lesson.writingBuilder?.structure?.length ? <PracticeBox title="Structure">{renderList(lesson.writingBuilder.structure)}</PracticeBox> : null}
-            {lesson.writingBuilder?.usefulLines?.length ? <PracticeBox title="Useful lines">{renderList(lesson.writingBuilder.usefulLines)}</PracticeBox> : null}
-            {lesson.grammarLesson?.miniExercise ? <PracticeBox title="Mini exercise"><p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}
+          <Section title="Day 0 Knowledge Test">
+            <KnowledgeTest
+              items={lesson.grammarLesson?.knowledgeTest || []}
+              answers={progress.grammarQuizAnswers || {}}
+              onAnswer={updateGrammarQuizAnswer}
+            />
           </Section>
+
+          {lesson.phrases?.length ? (
+            <Section title="Key things to remember">
+              {renderList(lesson.phrases)}
+            </Section>
+          ) : null}
 
           <Section title="Next step">
             <p style={{ margin: 0, lineHeight: 1.7 }}>
-              After reading this orientation, go back to the Course Book and start Day 1. Use the normal lesson tabs from Day 1 onward.
+              After reading this orientation, go back to the Course Book and start Day 1. The normal Learn, Speak, Write and Finish tabs begin from Day 1.
             </p>
             <button type="button" style={styles.primaryButton} onClick={() => updateProgress({ completed: true })}>
               Mark orientation complete
