@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchStudentNotifications } from "../services/notificationService";
+import { getLocalNotificationEvents } from "../services/interactionFeedback";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
 import {
@@ -230,16 +231,28 @@ const NotificationBell = ({ notificationStatus, onEnablePush }) => {
 
   const sortItems = (list) => [...(list || [])].sort((a, b) => (b?.timestamp || 0) - (a?.timestamp || 0));
 
+  const mergeNotifications = (remote = [], local = []) => {
+    const map = new Map();
+    [...(remote || []), ...(local || [])].forEach((item) => {
+      if (!item) return;
+      const key = item.id || `${item.type}-${item.title}-${item.timestamp}`;
+      if (!map.has(key)) map.set(key, item);
+    });
+    return [...map.values()].sort((a, b) => (b?.timestamp || 0) - (a?.timestamp || 0));
+  };
+
   const loadNotifications = useCallback(async () => {
     if (!studentProfile) return;
     setLoading(true);
     setError("");
     try {
       const results = await fetchStudentNotifications(studentProfile);
-      setItems(sortItems(results || []));
+      const localEvents = getLocalNotificationEvents();
+      setItems(mergeNotifications(results || [], localEvents || []));
     } catch (err) {
       console.error("Failed to load notifications", err);
       setError("Could not load notifications.");
+      setItems(sortItems(getLocalNotificationEvents()));
     } finally {
       setLoading(false);
     }
