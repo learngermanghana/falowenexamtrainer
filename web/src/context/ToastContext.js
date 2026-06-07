@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { playFeedbackSound } from "../services/interactionFeedback";
 
 const ToastContext = createContext(null);
 
@@ -21,6 +22,16 @@ const TOAST_VARIANTS = {
   },
 };
 
+const DEFAULT_SOUND_VARIANTS = new Set(["success", "error"]);
+
+const resolveToastSound = (variant = "info", options = {}) => {
+  if (options?.playSound === false || options?.sound === false) return "";
+  if (typeof options?.playSound === "string") return options.playSound;
+  if (typeof options?.sound === "string") return options.sound;
+  if (options?.playSound === true || options?.sound === true) return variant;
+  return DEFAULT_SOUND_VARIANTS.has(variant) ? variant : "";
+};
+
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   const counterRef = useRef(0);
@@ -29,11 +40,16 @@ export const ToastProvider = ({ children }) => {
     setToasts((current) => current.filter((toast) => toast.id !== id));
   }, []);
 
-  const showToast = useCallback((message, variant = "info") => {
+  const showToast = useCallback((message, variant = "info", options = {}) => {
     if (!message) return;
     const id = `${Date.now()}-${counterRef.current++}`;
     setToasts((current) => [...current, { id, message, variant }]);
     setTimeout(() => dismissToast(id), 5200);
+
+    const sound = resolveToastSound(variant, options);
+    if (sound) {
+      playFeedbackSound(sound).catch(() => {});
+    }
   }, [dismissToast]);
 
   const value = useMemo(() => ({ showToast }), [showToast]);
