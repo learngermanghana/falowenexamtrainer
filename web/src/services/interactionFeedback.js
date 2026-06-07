@@ -93,7 +93,7 @@ export const triggerInteractionFeedback = async ({
   vibratePattern,
 } = {}) => {
   if (typeof showToast === "function" && toastMessage) {
-    showToast(toastMessage, toastVariant);
+    showToast(toastMessage, toastVariant, { playSound: false });
   }
 
   if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function" && Array.isArray(vibratePattern)) {
