@@ -87,6 +87,22 @@ const getStoredNotificationData = (record = {}) => ({
   route: record?.data?.route || record?.route || "",
 });
 
+const normalizeNotificationEvent = (event = {}) => {
+  const timestamp = parseTimestamp(event.timestamp || event.sentAt || event.createdAt) || Date.now();
+  const type = event.type || event.category || event.kind || "Update";
+  return {
+    id: event.id || `event-${type}-${timestamp}`,
+    type,
+    title: event.title || "Falowen update",
+    body: event.body || event.message || "",
+    timestamp,
+    source: event.source || "event",
+    route: event.route || event.url || event.link || event.data?.route || "",
+    url: event.url || event.link || "",
+    data: event.data || {},
+  };
+};
+
 // -------------------------------------------
 // Student code resolver
 // -------------------------------------------
@@ -142,6 +158,7 @@ const buildScoreNotification = (resultsPayload) => {
     title: `${headline} marked`,
     body: detail,
     timestamp,
+    route: "/campus/results",
   };
 };
 
@@ -183,6 +200,7 @@ const buildAttendanceNotification = (attendancePayload, options = {}) => {
     title: isPresent ? "Marked present ✅" : "Marked absent ❌",
     body: isPresent ? `${label} • Present` : `${label} • Absent`,
     timestamp,
+    route: "/campus/attendance",
   };
 };
 
@@ -223,6 +241,7 @@ const fetchClassBoardAnnouncements = async ({ level, className } = {}) => {
           data.instructions ||
           "Your tutor posted a new discussion.",
         timestamp,
+        route: "/campus/discussion",
       };
     })
   );
@@ -240,7 +259,7 @@ export const fetchStudentNotifications = async (profile) => {
   const fetchStoredNotifications = async () => {
     if (!profile?.id) return [];
     const ref = collection(db, "students", profile.id, "notifications");
-    const snapshot = await getDocs(query(ref, orderBy("timestamp", "desc"), limit(12)));
+    const snapshot = await getDocs(query(ref, orderBy("timestamp", "desc"), limit(20)));
     return snapshot.docs.map((docSnapshot) => {
       const data = docSnapshot.data() || {};
       const timestamp = parseTimestamp(data.timestamp || data.sentAt || data.createdAt) || Date.now();
@@ -251,6 +270,8 @@ export const fetchStudentNotifications = async (profile) => {
         body: data.body || "",
         timestamp,
         source: data.source || "push",
+        route: data.route || data.data?.route || "",
+        url: data.url || data.data?.url || "",
         data: data.data || {},
       };
     });
@@ -296,7 +317,7 @@ export const fetchStudentNotifications = async (profile) => {
 
   return deduped.items
     .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-    .slice(0, 12);
+    .slice(0, 20);
 };
 
 export const buildPushNotification = (payload = {}) => {
@@ -309,6 +330,8 @@ export const buildPushNotification = (payload = {}) => {
     body: resolvePushBody(payload),
     timestamp,
     source: "push",
+    route: payload?.data?.route || payload?.data?.url || "",
+    url: payload?.data?.url || "",
     data: payload?.data || {},
   };
 };
@@ -335,6 +358,34 @@ export const persistPushNotification = async ({ studentId, payload, notification
 
   const collectionRef = collection(db, "students", studentId, "notifications");
   const docRef = await addDoc(collectionRef, payloadToWrite);
+  return docRef.id;
+};
+
+export const createStudentNotificationEvent = async (profile, event = {}) => {
+  if (!profile?.id || !event?.title || !isFirebaseConfigured || !db) return null;
+  const normalized = normalizeNotificationEvent(event);
+  const { id, ...payloadToWrite } = {
+    ...normalized,
+    data: {
+      ...(normalized.data || {}),
+      route: normalized.route || normalized.data?.route || "",
+      url: normalized.url || normalized.data?.url || "",
+    },
+    createdAt: serverTimestamp(),
+  };
+
+  const collectionRef = collection(db, "students", profile.id, "notifications");
+  const docRef = await addDoc(collectionRef, payloadToWrite);
+  const notification = { ...normalized, id: docRef.id };
+
+  try {
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("falowen:push-notification", { detail: { notification } }));
+    }
+  } catch (error) {
+    console.error("Failed to dispatch notification event", error);
+  }
+
   return docRef.id;
 };
 
