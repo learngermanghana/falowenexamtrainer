@@ -364,7 +364,7 @@ export const persistPushNotification = async ({ studentId, payload, notification
 export const createStudentNotificationEvent = async (profile, event = {}) => {
   if (!profile?.id || !event?.title || !isFirebaseConfigured || !db) return null;
   const normalized = normalizeNotificationEvent(event);
-  const { id, ...payloadToWrite } = {
+  const payloadToWrite = {
     ...normalized,
     data: {
       ...(normalized.data || {}),
@@ -373,6 +373,7 @@ export const createStudentNotificationEvent = async (profile, event = {}) => {
     },
     createdAt: serverTimestamp(),
   };
+  delete payloadToWrite.id;
 
   const collectionRef = collection(db, "students", profile.id, "notifications");
   const docRef = await addDoc(collectionRef, payloadToWrite);
