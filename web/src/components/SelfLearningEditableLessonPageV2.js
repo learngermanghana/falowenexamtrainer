@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
+import { useToast } from "../context/ToastContext";
 import { EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./selfLearning/EmbeddedPracticePanels";
 
 const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1600&q=80";
@@ -72,6 +73,16 @@ const tabBarStyle = {
   boxShadow: "0 10px 26px rgba(15, 23, 42, 0.06)",
 };
 
+const completionBannerStyle = {
+  border: "1px solid #86efac",
+  borderRadius: 16,
+  padding: 14,
+  background: "linear-gradient(135deg, #f0fdf4, #ffffff)",
+  color: "#14532d",
+  display: "grid",
+  gap: 6,
+};
+
 const Section = ({ title, children }) => (
   <section style={cardStyle}>
     <h2 style={{ margin: 0, fontSize: "1.15rem" }}>{title}</h2>
@@ -85,70 +96,6 @@ const PracticeBox = ({ title, children }) => (
     {children}
   </div>
 );
-
-const KnowledgeTest = ({ items = [], answers = {}, onAnswer }) => {
-  if (!items.length) return null;
-  const answered = items.filter((_, index) => answers[index]).length;
-  const correct = items.filter((item, index) => answers[index] && answers[index] === item.answer).length;
-
-  return (
-    <div style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, background: "#f8fafc", display: "grid", gap: 12 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-        <strong>Knowledge test</strong>
-        <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{correct}/{items.length} correct</span>
-      </div>
-      <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-        Click the best answer. You will see immediately whether it is correct.
-      </p>
-      {items.map((item, index) => {
-        const selected = answers[index] || "";
-        const isAnswered = Boolean(selected);
-        const isCorrect = selected === item.answer;
-        return (
-          <div key={item.question} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff", display: "grid", gap: 10 }}>
-            <strong>{index + 1}. {item.question}</strong>
-            <div style={{ display: "grid", gap: 8 }}>
-              {(item.options || []).map((option) => {
-                const isSelected = selected === option;
-                const isRightOption = item.answer === option;
-                const background = isSelected ? (isCorrect ? "#dcfce7" : "#fee2e2") : isAnswered && isRightOption ? "#f0fdf4" : "#ffffff";
-                const borderColor = isSelected ? (isCorrect ? "#22c55e" : "#ef4444") : isAnswered && isRightOption ? "#86efac" : "#e5e7eb";
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => onAnswer(index, option)}
-                    style={{
-                      textAlign: "left",
-                      padding: "10px 12px",
-                      borderRadius: 12,
-                      border: `1px solid ${borderColor}`,
-                      background,
-                      cursor: "pointer",
-                      fontWeight: isSelected ? 800 : 600,
-                    }}
-                  >
-                    {option}
-                  </button>
-                );
-              })}
-            </div>
-            {isAnswered ? (
-              <div style={{ border: `1px solid ${isCorrect ? "#86efac" : "#fecaca"}`, borderRadius: 12, padding: 10, background: isCorrect ? "#f0fdf4" : "#fef2f2", lineHeight: 1.6 }}>
-                <strong>{isCorrect ? "Correct." : "Not correct yet."}</strong> {item.explanation}
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
-      {answered === items.length ? (
-        <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, padding: 10, background: "#f0fdf4" }}>
-          Finished: {correct}/{items.length}. Review any red answers before you continue.
-        </div>
-      ) : null}
-    </div>
-  );
-};
 
 const NoteBox = ({ children, tone = "blue" }) => {
   const tones = {
@@ -190,6 +137,56 @@ const renderParagraphs = (items = []) => {
   return items.map((item) => <p key={item} style={{ margin: 0, lineHeight: 1.7 }}>{item}</p>);
 };
 
+const KnowledgeTest = ({ items = [], answers = {}, onAnswer }) => {
+  if (!items.length) return null;
+  const answered = items.filter((_, index) => answers[index]).length;
+  const correct = items.filter((item, index) => answers[index] && answers[index] === item.answer).length;
+
+  return (
+    <div style={{ border: "1px solid #c7d2fe", borderRadius: 16, padding: 14, background: "#f8fafc", display: "grid", gap: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <strong>Knowledge test</strong>
+        <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{correct}/{items.length} correct</span>
+      </div>
+      <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>Click the best answer. You will see immediately whether it is correct.</p>
+      {items.map((item, index) => {
+        const selected = answers[index] || "";
+        const isAnswered = Boolean(selected);
+        const isCorrect = selected === item.answer;
+        return (
+          <div key={item.question} style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff", display: "grid", gap: 10 }}>
+            <strong>{index + 1}. {item.question}</strong>
+            <div style={{ display: "grid", gap: 8 }}>
+              {(item.options || []).map((option) => {
+                const isSelected = selected === option;
+                const isRightOption = item.answer === option;
+                const background = isSelected ? (isCorrect ? "#dcfce7" : "#fee2e2") : isAnswered && isRightOption ? "#f0fdf4" : "#ffffff";
+                const borderColor = isSelected ? (isCorrect ? "#22c55e" : "#ef4444") : isAnswered && isRightOption ? "#86efac" : "#e5e7eb";
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => onAnswer(index, option)}
+                    style={{ textAlign: "left", padding: "10px 12px", borderRadius: 12, border: `1px solid ${borderColor}`, background, cursor: "pointer", fontWeight: isSelected ? 800 : 600 }}
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+            {isAnswered ? (
+              <div style={{ border: `1px solid ${isCorrect ? "#86efac" : "#fecaca"}`, borderRadius: 12, padding: 10, background: isCorrect ? "#f0fdf4" : "#fef2f2", lineHeight: 1.6 }}>
+                <strong>{isCorrect ? "Correct." : "Not correct yet."}</strong> {item.explanation}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+      {answered === items.length ? <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, padding: 10, background: "#f0fdf4" }}>Finished: {correct}/{items.length}. Review any red answers before you continue.</div> : null}
+    </div>
+  );
+};
+
 const splitIntoSentences = (text = "") => {
   const matches = String(text || "").match(/[^.!?]+[.!?]?/g) || [];
   return matches.map((sentence) => sentence.trim()).filter(Boolean);
@@ -213,7 +210,6 @@ const parseWritingTask = (taskText = "", builderStructure = []) => {
 
   const sentences = splitIntoSentences(cleaned);
   const directiveIndex = sentences.findIndex((sentence, index) => index > 0 && /^(Äußern|Nennen|Beschreiben|Machen|Zeigen|Bitten|Erklären|Argumentieren|Erläutern|Fragen|Schildern) Sie\b/i.test(sentence));
-
   if (directiveIndex > 0) {
     const beforeSentences = sentences.slice(0, directiveIndex);
     return {
@@ -227,34 +223,24 @@ const parseWritingTask = (taskText = "", builderStructure = []) => {
     .filter((item) => /^(Erklären|Argumentieren|Nennen|Erläutern|Äußern|Beschreiben|Machen|Zeigen|Bitten) Sie/i.test(item))
     .map((item) => item.replace(/^[^:]+:\s*/, ""));
 
-  return {
-    context: "Schreibaufgabe",
-    prompt: cleaned,
-    points: structurePoints,
-  };
+  return { context: "Schreibaufgabe", prompt: cleaned, points: structurePoints };
 };
 
 const WritingTaskCard = ({ writingType, writingTask, structure }) => {
   const formattedTask = parseWritingTask(writingTask, structure);
-
   return (
     <div style={{ border: "1px solid #d1d5db", borderRadius: 16, background: "#fff", overflow: "hidden", display: "grid" }}>
       <div style={{ padding: "14px 16px", borderBottom: "1px solid #e5e7eb", background: "#f8fafc", display: "flex", gap: 10, justifyContent: "space-between", flexWrap: "wrap", alignItems: "center" }}>
         <strong>Schreiben Aufgabe</strong>
         <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>{writingType}</span>
       </div>
-
       <div style={{ padding: "18px 18px 12px", display: "grid", gap: 14 }}>
         {formattedTask.context ? <p style={{ margin: 0, color: "#475569", lineHeight: 1.7 }}>{formattedTask.context}</p> : null}
-        <div style={{ border: "1px solid #111827", padding: "18px 20px", borderRadius: 4, background: "#ffffff", fontSize: "1.05rem", lineHeight: 1.65 }}>
-          {formattedTask.prompt}
-        </div>
+        <div style={{ border: "1px solid #111827", padding: "18px 20px", borderRadius: 4, background: "#ffffff", fontSize: "1.05rem", lineHeight: 1.65 }}>{formattedTask.prompt}</div>
         {formattedTask.points?.length ? (
           <div style={{ display: "grid", gap: 10 }}>
             <strong>Bearbeiten Sie diese Punkte:</strong>
-            <ul style={{ margin: 0, paddingLeft: 24, lineHeight: 1.8 }}>
-              {formattedTask.points.map((point) => <li key={point}>{point}</li>)}
-            </ul>
+            <ul style={{ margin: 0, paddingLeft: 24, lineHeight: 1.8 }}>{formattedTask.points.map((point) => <li key={point}>{point}</li>)}</ul>
           </div>
         ) : null}
       </div>
@@ -271,6 +257,19 @@ const ExternalResourceCard = ({ title, resource }) => {
       {resource.url ? <a href={resource.url} target="_blank" rel="noreferrer" style={{ ...styles.linkButton, justifySelf: "start" }}>Open resource</a> : null}
       {renderList(resource.tasks || [])}
     </PracticeBox>
+  );
+};
+
+const CompletionBanner = ({ message, onBackToCourse }) => {
+  if (!message) return null;
+  return (
+    <div style={completionBannerStyle} role="status" aria-live="polite">
+      <strong>✅ {message.title}</strong>
+      <p style={{ margin: 0, lineHeight: 1.6 }}>{message.body}</p>
+      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={onBackToCourse}>
+        Back to Course Book
+      </button>
+    </div>
   );
 };
 
@@ -291,7 +290,9 @@ const buildInitialProgress = () => ({
 
 export default function SelfLearningEditableLessonPageV2({ lesson }) {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState("learn");
+  const [completionMessage, setCompletionMessage] = useState(null);
   const storageKey = `falowen:self-learning:lesson:${lesson.level}:${lesson.day}`;
   const [progress, setProgress] = useState(() => {
     try {
@@ -307,12 +308,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
   const updateProgress = (updates) => setProgress((previous) => ({ ...previous, ...updates }));
   const updateGrammarQuizAnswer = (questionIndex, option) => {
-    updateProgress({
-      grammarQuizAnswers: {
-        ...(progress.grammarQuizAnswers || {}),
-        [questionIndex]: option,
-      },
-    });
+    updateProgress({ grammarQuizAnswers: { ...(progress.grammarQuizAnswers || {}), [questionIndex]: option } });
   };
 
   const isOrientationDay = Number(lesson.day) === 0;
@@ -320,6 +316,17 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
   const speakingTopic = lesson.speakingTopic || lesson.tasks?.speaking || `Sprich über: ${lesson.topic}`;
   const writingTask = lesson.writingTopic || lesson.tasks?.writing || `Schreibe einen ${lesson.level}-Text zum Thema: ${lesson.topic}. Begründe deine Meinung und nutze passende Redemittel.`;
   const heroImage = lesson.heroImage || DEFAULT_HERO_IMAGE;
+
+  const markComplete = (type = "lesson") => {
+    updateProgress({ completed: true, completedAt: new Date().toISOString() });
+    const title = type === "orientation" ? "Day 0 orientation completed" : `Day ${lesson.day} marked complete`;
+    const body = type === "orientation"
+      ? "Great. You can now return to the Course Book and start Day 1."
+      : "Great work. Your progress has been saved on this device. Return to the Course Book and continue with the next day.";
+    setCompletionMessage({ title, body });
+    showToast(`${title}. Progress saved.`, "success");
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 120);
+  };
 
   const orientationCards = isOrientationDay
     ? [
@@ -335,13 +342,11 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 18 }}>
-      <button
-        type="button"
-        style={{ ...styles.secondaryButton, justifySelf: "start", borderRadius: 999, padding: "10px 18px", boxShadow: "0 6px 18px rgba(15, 23, 42, 0.06)" }}
-        onClick={() => navigate("/campus/course")}
-      >
+      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start", borderRadius: 999, padding: "10px 18px", boxShadow: "0 6px 18px rgba(15, 23, 42, 0.06)" }} onClick={() => navigate("/campus/course")}>
         ← Course Book
       </button>
+
+      <CompletionBanner message={completionMessage} onBackToCourse={() => navigate("/campus/course")} />
 
       <header style={heroShellStyle}>
         <div style={heroContentStyle(heroImage)}>
@@ -352,26 +357,11 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
             <span style={{ ...heroBadgeStyle, background: "rgba(37, 99, 235, 0.88)", borderColor: "rgba(147, 197, 253, 0.5)" }}>AI self-learning</span>
             {progress.completed ? <span style={{ ...heroBadgeStyle, background: "rgba(22, 163, 74, 0.88)", borderColor: "rgba(187, 247, 208, 0.55)" }}>Complete</span> : null}
           </div>
-
           <div style={{ display: "grid", gap: 18 }}>
             <div style={{ display: "grid", gap: 10, maxWidth: 980 }}>
-              <h1
-                style={{
-                  margin: 0,
-                  fontSize: "clamp(1.95rem, 4.8vw, 3.9rem)",
-                  lineHeight: 1.02,
-                  letterSpacing: "-0.05em",
-                  textWrap: "balance",
-                  textShadow: "0 10px 28px rgba(0,0,0,0.32)",
-                }}
-              >
-                {lesson.title}
-              </h1>
-              <p style={{ margin: 0, maxWidth: 980, fontSize: "clamp(0.98rem, 1.45vw, 1.16rem)", lineHeight: 1.6, color: "#e2e8f0", textShadow: "0 6px 18px rgba(0,0,0,0.26)" }}>
-                {lesson.topic}
-              </p>
+              <h1 style={{ margin: 0, fontSize: "clamp(1.95rem, 4.8vw, 3.9rem)", lineHeight: 1.02, letterSpacing: "-0.05em", textWrap: "balance", textShadow: "0 10px 28px rgba(0,0,0,0.32)" }}>{lesson.title}</h1>
+              <p style={{ margin: 0, maxWidth: 980, fontSize: "clamp(0.98rem, 1.45vw, 1.16rem)", lineHeight: 1.6, color: "#e2e8f0", textShadow: "0 6px 18px rgba(0,0,0,0.26)" }}>{lesson.topic}</p>
             </div>
-
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 12 }}>
               {orientationCards.map((item) => <StatCard key={item.label} label={item.label} value={item.value} />)}
             </div>
@@ -382,13 +372,10 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
       {isOrientationDay ? (
         <>
           <Section title="Day 0 Orientation">
-            <NoteBox>
-              <strong>Start here.</strong> Day 0 is only for orientation. There is no writing task on this page.
-            </NoteBox>
+            <NoteBox><strong>Start here.</strong> Day 0 is only for orientation. There is no writing task on this page.</NoteBox>
             {renderList(lesson.objectives || [])}
-            {(lesson.explanation || []).map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
+            {renderParagraphs(lesson.explanation || [])}
           </Section>
-
           <Section title="What you must understand today">
             {lesson.grammarFocus ? <NoteBox><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox> : null}
             {lesson.topicQuestions?.length ? <PracticeBox title="Questions before Day 1">{renderList(lesson.topicQuestions)}</PracticeBox> : null}
@@ -397,27 +384,15 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
             {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Daily flow examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
             {lesson.grammarLesson?.miniExercise ? <PracticeBox title="Quick orientation check"><p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}
           </Section>
-
           <Section title="Day 0 Knowledge Test">
-            <KnowledgeTest
-              items={lesson.grammarLesson?.knowledgeTest || []}
-              answers={progress.grammarQuizAnswers || {}}
-              onAnswer={updateGrammarQuizAnswer}
-            />
+            <KnowledgeTest items={lesson.grammarLesson?.knowledgeTest || []} answers={progress.grammarQuizAnswers || {}} onAnswer={updateGrammarQuizAnswer} />
           </Section>
-
-          {lesson.phrases?.length ? (
-            <Section title="Key things to remember">
-              {renderList(lesson.phrases)}
-            </Section>
-          ) : null}
-
+          {lesson.phrases?.length ? <Section title="Key things to remember">{renderList(lesson.phrases)}</Section> : null}
           <Section title="Next step">
-            <p style={{ margin: 0, lineHeight: 1.7 }}>
-              After reading this orientation, go back to the Course Book and start Day 1. The normal Learn, Speak, Write and Finish tabs begin from Day 1.
-            </p>
-            <button type="button" style={styles.primaryButton} onClick={() => updateProgress({ completed: true })}>
-              Mark orientation complete
+            <p style={{ margin: 0, lineHeight: 1.7 }}>After reading this orientation, go back to the Course Book and start Day 1. The normal Learn, Speak, Write and Finish tabs begin from Day 1.</p>
+            {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This orientation is already marked complete.</NoteBox> : null}
+            <button type="button" style={styles.primaryButton} onClick={() => markComplete("orientation")}>
+              {progress.completed ? "Mark orientation complete again" : "Mark orientation complete"}
             </button>
           </Section>
         </>
@@ -428,12 +403,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
               <button
                 key={tab.id}
                 type="button"
-                style={{
-                  ...(activeTab === tab.id ? styles.primaryButton : styles.secondaryButton),
-                  borderRadius: 999,
-                  minHeight: 44,
-                  boxShadow: activeTab === tab.id ? "0 10px 24px rgba(37, 99, 235, 0.22)" : "none",
-                }}
+                style={{ ...(activeTab === tab.id ? styles.primaryButton : styles.secondaryButton), borderRadius: 999, minHeight: 44, boxShadow: activeTab === tab.id ? "0 10px 24px rgba(37, 99, 235, 0.22)" : "none" }}
                 onClick={() => setActiveTab(tab.id)}
               >
                 {tab.label}
@@ -444,14 +414,11 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           {activeTab === "learn" ? (
             <>
               <Section title="Lesson overview">
-                <NoteBox>
-                  <strong>Learn first.</strong> This tab is only for the topic overview, lesson goals and thinking questions. Use the Speak tab for Sprechen practice and the Write tab for the writing task.
-                </NoteBox>
+                <NoteBox><strong>Learn first.</strong> This tab is only for the topic overview, lesson goals and thinking questions. Use the Speak tab for Sprechen practice and the Write tab for the writing task.</NoteBox>
                 {renderList(lesson.objectives || [])}
-                {(lesson.explanation || []).map((paragraph) => <p key={paragraph} style={{ margin: 0, lineHeight: 1.7 }}>{paragraph}</p>)}
+                {renderParagraphs(lesson.explanation || [])}
                 {lesson.topicQuestions?.length ? <PracticeBox title="Think before you practise">{renderList(lesson.topicQuestions)}</PracticeBox> : null}
               </Section>
-
               <Section title="Grammar and useful language">
                 {lesson.grammarFocus ? <NoteBox><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox> : null}
                 {lesson.grammarLesson?.title ? <PracticeBox title="Grammar topic"><strong>{lesson.grammarLesson.title}</strong></PracticeBox> : null}
@@ -459,11 +426,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
                 {lesson.grammarLesson?.rules?.length ? <PracticeBox title="Rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}
                 {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
                 {lesson.grammarLesson?.miniExercise ? <PracticeBox title="Mini exercise"><p style={{ margin: 0, lineHeight: 1.7 }}>{lesson.grammarLesson.miniExercise}</p></PracticeBox> : null}
-                <KnowledgeTest
-                  items={lesson.grammarLesson?.knowledgeTest || []}
-                  answers={progress.grammarQuizAnswers || {}}
-                  onAnswer={updateGrammarQuizAnswer}
-                />
+                <KnowledgeTest items={lesson.grammarLesson?.knowledgeTest || []} answers={progress.grammarQuizAnswers || {}} onAnswer={updateGrammarQuizAnswer} />
                 {lesson.phrases?.length ? <PracticeBox title="Useful phrases">{renderList(lesson.phrases)}</PracticeBox> : null}
                 <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <input type="checkbox" checked={Boolean(progress.understood)} onChange={(event) => updateProgress({ understood: event.target.checked })} />
@@ -504,13 +467,11 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
                   <p style={{ margin: 0, color: "#4b5563" }}>Make one strong sentence with each word, then ask Falowen AI to improve the sentences to {lesson.level} level.</p>
                 </div>
               </Section>
-
               <Section title="Complete lesson">
-                <p style={{ margin: 0, lineHeight: 1.7 }}>
-                  When you finish the practice, mark the lesson complete and continue with the next day from the Course Book.
-                </p>
-                <button type="button" style={styles.primaryButton} onClick={() => updateProgress({ completed: true })}>
-                  Mark lesson complete
+                <p style={{ margin: 0, lineHeight: 1.7 }}>When you finish the practice, mark the lesson complete and continue with the next day from the Course Book.</p>
+                {progress.completed ? <NoteBox tone="green"><strong>Completed.</strong> This lesson is already marked complete.</NoteBox> : null}
+                <button type="button" style={styles.primaryButton} onClick={() => markComplete("lesson")}>
+                  {progress.completed ? "Mark lesson complete again" : "Mark lesson complete"}
                 </button>
               </Section>
             </>
