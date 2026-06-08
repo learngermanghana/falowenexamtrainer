@@ -57,6 +57,10 @@
   flex: 0 0 auto;
 }
 
+.study-buddy-bar.is-collapsed .study-buddy-header > div:first-child {
+  display: none;
+}
+
 .study-buddy-title {
   font-size: 16px;
   line-height: 1.15;
@@ -113,6 +117,18 @@
 .study-buddy-toggle:focus-visible {
   background: rgba(51, 65, 85, 0.82);
   outline: none;
+}
+
+.study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child {
+  background: rgba(37, 99, 235, 0.7);
+  font-size: 0;
+  padding-inline: 13px;
+}
+
+.study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child::before {
+  content: "Study Buddy";
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .study-buddy-shortcuts {
@@ -490,7 +506,7 @@
   }
 
   .study-buddy-bar:not(.is-collapsed) .study-buddy-inner {
-    max-height: calc(100dvh - 18px);
+    max-height: min(82dvh, 560px);
     overflow-y: auto;
     overscroll-behavior-y: contain;
     -webkit-overflow-scrolling: touch;
@@ -506,9 +522,30 @@
     padding: 9px 10px;
   }
 
+  .study-buddy-bar.is-collapsed .study-buddy-shortcuts {
+    display: none;
+  }
+
   .study-buddy-header {
     gap: 8px;
     align-items: center;
+  }
+
+  .study-buddy-bar:not(.is-collapsed) .study-buddy-header {
+    align-items: flex-start;
+  }
+
+  .study-buddy-bar:not(.is-collapsed) .study-buddy-buttons {
+    flex: 0 0 auto;
+    display: grid;
+    gap: 6px;
+    width: 106px;
+  }
+
+  .study-buddy-bar:not(.is-collapsed) .study-buddy-buttons .study-buddy-toggle {
+    width: 100%;
+    padding: 6px 8px;
+    text-align: center;
   }
 
   .study-buddy-title {
@@ -547,6 +584,10 @@
     flex: 0 0 auto;
     padding: 7px 9px;
     font-size: 11px;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child::before {
+    font-size: 13px;
   }
 
   .study-buddy-shortcut--ai,
