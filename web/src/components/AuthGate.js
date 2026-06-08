@@ -39,6 +39,8 @@ const appendSupportDetails = (message, error) => {
     `Student code: ${formatSupportValue(getDiagnosticValue(error, "studentCode") || getDiagnosticValue(error, "studentcode"))}`,
     `Email: ${formatSupportValue(getDiagnosticValue(error, "email"))}`,
     `Account status: ${formatSupportValue(getDiagnosticValue(error, "status"))}`,
+    `Level: ${formatSupportValue(getDiagnosticValue(error, "level"))}`,
+    `Class: ${formatSupportValue(getDiagnosticValue(error, "className") || getDiagnosticValue(error, "class"))}`,
     `Contract end: ${formatSupportValue(getDiagnosticValue(error, "contractEndLabel") || getDiagnosticValue(error, "contractEnd"))}`,
     `Payment status: ${formatSupportValue(getDiagnosticValue(error, "paymentStatus"))}`,
   ];
@@ -206,14 +208,15 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       } else {
         const loginResult = await login(email, password);
         const credential = loginResult?.credential || loginResult;
+        const profile = loginResult?.profile || credential?.user?.profile || {};
 
-        const studentCode = credential?.user?.profile?.studentCode;
-        const level = credential?.user?.profile?.level;
+        const studentCode = profile?.studentCode || profile?.studentcode;
+        const level = profile?.level;
 
-        if (studentCode) rememberStudentCodeForEmail(email, studentCode);
+        if (studentCode) rememberStudentCodeForEmail(profile?.email || email, studentCode);
         if (level) savePreferredLevel(level);
 
-        const loginMessage = credential?.migratedFromLegacy
+        const loginMessage = loginResult?.migratedFromLegacy || credential?.migratedFromLegacy
           ? "We found your old account. Your new password is now saved."
           : "Welcome back!";
 
@@ -305,7 +308,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
       });
     } catch (error) {
       console.error(error);
-      const errorMessage = error?.message || "Google sign-in failed. Please try again.";
+      const errorMessage = formatAuthErrorMessage(error, "login");
       setAuthError(errorMessage);
       showToast(errorMessage, "error");
       triggerInteractionFeedback({
