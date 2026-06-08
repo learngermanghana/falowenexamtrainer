@@ -2,7 +2,14 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 const LANDING_LANGUAGE_KEY = "falowen:landing-interface-language";
+const LANGUAGE_SWITCHER_ID = "falowen-public-language-switcher";
 const SUPPORTED_LANGUAGES = new Set(["en", "de", "fr"]);
+
+const LANGUAGE_OPTIONS = [
+  { value: "en", label: "English" },
+  { value: "de", label: "Deutsch" },
+  { value: "fr", label: "Français" },
+];
 
 const normalizeLanguage = (value) => {
   const normalized = String(value || "").trim().toLowerCase().slice(0, 2);
@@ -111,11 +118,33 @@ const STATIC_TEXT = {
   },
 };
 
+const isPublicLandingPage = () => {
+  if (typeof document === "undefined") return false;
+  const bodyText = String(document.body?.textContent || "");
+  if (bodyText.includes("Signed in as") || bodyText.includes("Abgemeldet") || bodyText.includes("Déconnecter")) return false;
+  return (
+    bodyText.includes("Today in Falowen") ||
+    bodyText.includes("Heute in Falowen") ||
+    bodyText.includes("Aujourd’hui sur Falowen") ||
+    bodyText.includes("Join the next Falowen") ||
+    bodyText.includes("Kommende Kurse") ||
+    bodyText.includes("Prochains cours")
+  );
+};
+
+const getLandingRoot = () => {
+  const bodyText = String(document.body?.textContent || "");
+  if (!isPublicLandingPage()) return null;
+  if (!bodyText) return null;
+  return document.querySelector("main") || document.body;
+};
+
 const translateStaticTextNodes = (language) => {
   const dictionary = STATIC_TEXT[language];
-  if (!dictionary || typeof document === "undefined") return;
+  const root = getLandingRoot();
+  if (!dictionary || !root || typeof document === "undefined") return;
 
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const walker = document.createTreeWalker(root, window.NodeFilter ? window.NodeFilter.SHOW_TEXT : 4);
   const nodes = [];
   while (walker.nextNode()) nodes.push(walker.currentNode);
 
@@ -126,39 +155,112 @@ const translateStaticTextNodes = (language) => {
   });
 };
 
+const injectLanguageSwitcher = (language, onSelect) => {
+  const root = getLandingRoot();
+  if (!root) return;
+
+  let switcher = document.getElementById(LANGUAGE_SWITCHER_ID);
+  if (!switcher) {
+    switcher = document.createElement("div");
+    switcher.id = LANGUAGE_SWITCHER_ID;
+    switcher.setAttribute("aria-label", "Landing page language");
+    switcher.style.display = "flex";
+    switcher.style.gap = "6px";
+    switcher.style.flexWrap = "wrap";
+    switcher.style.alignItems = "center";
+    switcher.style.justifyContent = "flex-end";
+    switcher.style.margin = "0 0 8px";
+    switcher.style.position = "relative";
+    switcher.style.zIndex = "2";
+    root.insertBefore(switcher, root.firstChild);
+  }
+
+  switcher.innerHTML = "";
+  const label = document.createElement("span");
+  label.textContent = "Language:";
+  label.style.fontSize = "12px";
+  label.style.fontWeight = "800";
+  label.style.color = "#334155";
+  switcher.appendChild(label);
+
+  LANGUAGE_OPTIONS.forEach((option) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = option.label;
+    button.style.border = `1px solid ${language === option.value ? "#2563eb" : "#d1d5db"}`;
+    button.style.background = language === option.value ? "#eff6ff" : "#ffffff";
+    button.style.color = language === option.value ? "#1d4ed8" : "#111827";
+    button.style.borderRadius = "999px";
+    button.style.padding = "7px 10px";
+    button.style.fontWeight = "800";
+    button.style.fontSize = "12px";
+    button.style.cursor = "pointer";
+    button.addEventListener("click", () => onSelect(option.value));
+    switcher.appendChild(button);
+  });
+};
+
+const removeLanguageSwitcher = () => {
+  document.getElementById(LANGUAGE_SWITCHER_ID)?.remove();
+};
+
 const LandingPublicLanguageGuard = () => {
   const { i18n } = useTranslation();
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
-    const savedLandingLanguage = readLandingLanguage();
-    const targetLanguage = savedLandingLanguage || "en";
-    if (normalizeLanguage(i18n.resolvedLanguage || i18n.language) !== targetLanguage) {
-      i18n.changeLanguage(targetLanguage);
-    }
+    let currentLandingLanguage = readLandingLanguage() || "en";
+    let initializedForLanding = false;
+
+    const applyLandingLanguage = () => {
+      if (!isPublicLandingPage()) {
+        removeLanguageSwitcher();
+        return;
+      }
+
+      initializedForLanding = true;
+      const currentI18nLanguage = normalizeLanguage(i18n.resolvedLanguage || i18n.language);
+      if (currentI18nLanguage !== currentLandingLanguage) {
+        i18n.changeLanguage(currentLandingLanguage);
+      }
+      translateStaticTextNodes(currentLandingLanguage);
+      injectLanguageSwitcher(currentLandingLanguage, (nextLanguage) => {
+        currentLandingLanguage = normalizeLanguage(nextLanguage) || "en";
+        writeLandingLanguage(currentLandingLanguage);
+        i18n.changeLanguage(currentLandingLanguage);
+        window.setTimeout(() => applyLandingLanguage(), 80);
+      });
+    };
 
     const handleClick = (event) => {
       const button = event.target?.closest?.("button");
-      if (!button) return;
+      if (!button || !isPublicLandingPage()) return;
       const selectedLanguage = detectLanguageButton(button.textContent || button.getAttribute("aria-label") || "");
-      if (selectedLanguage) writeLandingLanguage(selectedLanguage);
+      if (selectedLanguage) {
+        currentLandingLanguage = selectedLanguage;
+        writeLandingLanguage(selectedLanguage);
+        window.setTimeout(() => applyLandingLanguage(), 80);
+      }
     };
 
     const handleLanguageChanged = (language) => {
-      window.setTimeout(() => translateStaticTextNodes(normalizeLanguage(language)), 80);
+      if (!initializedForLanding && !isPublicLandingPage()) return;
+      currentLandingLanguage = normalizeLanguage(readLandingLanguage() || language) || "en";
+      window.setTimeout(() => applyLandingLanguage(), 80);
     };
 
-    const observer = new MutationObserver(() => translateStaticTextNodes(normalizeLanguage(i18n.resolvedLanguage || i18n.language)));
+    const observer = new MutationObserver(() => window.setTimeout(applyLandingLanguage, 60));
     document.addEventListener("click", handleClick, true);
     i18n.on("languageChanged", handleLanguageChanged);
     observer.observe(document.body, { childList: true, subtree: true });
-    window.setTimeout(() => translateStaticTextNodes(targetLanguage), 100);
+    window.setTimeout(applyLandingLanguage, 120);
 
     return () => {
       document.removeEventListener("click", handleClick, true);
       i18n.off("languageChanged", handleLanguageChanged);
       observer.disconnect();
+      removeLanguageSwitcher();
     };
   }, [i18n]);
 
