@@ -7,31 +7,39 @@ import en from "./locales/en/translation.json";
 const interfaceLanguageKey = "falowen:interface-language";
 const legacyLanguageKey = "falowen:language";
 
-const getDefaultInterfaceLanguage = () => {
-  if (typeof navigator === "undefined") return null;
-  const locale = (navigator.language || "").toLowerCase();
-  if (locale.includes("-gh") || locale.includes("-ng")) {
-    return "en";
-  }
-  try {
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    if (timeZone === "Africa/Accra" || timeZone === "Africa/Lagos") {
-      return "en";
-    }
-  } catch {
-    // ignore time zone errors
-  }
-  return null;
+const SUPPORTED_INTERFACE_LANGUAGES = new Set(["en", "de", "fr"]);
+
+const normalizeStoredLanguage = (value) => {
+  const normalized = String(value || "").trim().toLowerCase().slice(0, 2);
+  return SUPPORTED_INTERFACE_LANGUAGES.has(normalized) ? normalized : "";
 };
 
-const storedLanguage =
-  typeof window !== "undefined"
-    ? window.localStorage.getItem(interfaceLanguageKey) || window.localStorage.getItem(legacyLanguageKey)
-    : null;
+const getStoredInterfaceLanguage = () => {
+  if (typeof window === "undefined") return "";
+  try {
+    return normalizeStoredLanguage(window.localStorage.getItem(interfaceLanguageKey));
+  } catch {
+    return "";
+  }
+};
 
-const fallbackLanguage = "de";
+const getLegacyInterfaceLanguage = () => {
+  if (typeof window === "undefined") return "";
+  try {
+    const legacy = normalizeStoredLanguage(window.localStorage.getItem(legacyLanguageKey));
+    // Older Falowen builds could store German as the default just because the course was German.
+    // Do not keep that old value as the public interface default; students should start in English.
+    return legacy === "de" ? "" : legacy;
+  } catch {
+    return "";
+  }
+};
 
-const resolvedLanguage = storedLanguage || getDefaultInterfaceLanguage() || fallbackLanguage;
+const getDefaultInterfaceLanguage = () => "en";
+
+const fallbackLanguage = "en";
+
+const resolvedLanguage = getStoredInterfaceLanguage() || getLegacyInterfaceLanguage() || getDefaultInterfaceLanguage() || fallbackLanguage;
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -49,7 +57,8 @@ i18n.use(initReactI18next).init({
 export const persistInterfaceLanguage = (language) => {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(interfaceLanguageKey, language);
+    const normalized = normalizeStoredLanguage(language) || "en";
+    window.localStorage.setItem(interfaceLanguageKey, normalized);
   } catch {
     // ignore storage errors
   }
