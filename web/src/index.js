@@ -5,6 +5,8 @@ import './index.css';
 import './i18n';
 import App from './App';
 import SubmitPageLevelGuidanceInjector from './components/SubmitPageLevelGuidanceInjector';
+import SubmitSuccessScreenInjector from './components/SubmitSuccessScreenInjector';
+import MobileHeaderMenuInjector from './components/MobileHeaderMenuInjector';
 import LandingPublicLanguageGuard from './components/LandingPublicLanguageGuard';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
@@ -18,7 +20,9 @@ root.render(
       <AuthProvider>
         <ToastProvider>
           <LandingPublicLanguageGuard />
+          <MobileHeaderMenuInjector />
           <SubmitPageLevelGuidanceInjector />
+          <SubmitSuccessScreenInjector />
           <App />
         </ToastProvider>
       </AuthProvider>
