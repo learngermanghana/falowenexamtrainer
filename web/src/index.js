@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import './index.css';
 import './i18n';
 import App from './App';
+import SubmitPageLevelGuidanceInjector from './components/SubmitPageLevelGuidanceInjector';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
@@ -15,6 +16,7 @@ root.render(
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
+          <SubmitPageLevelGuidanceInjector />
           <App />
         </ToastProvider>
       </AuthProvider>
