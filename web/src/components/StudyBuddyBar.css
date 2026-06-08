@@ -483,6 +483,64 @@
   color: #fef3c7;
 }
 
+@media (min-width: 641px) {
+  .study-buddy-bar.is-collapsed {
+    width: min(620px, calc(100vw - 28px));
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-inner {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: none;
+    padding: 12px;
+    border-radius: 20px;
+    overflow: visible;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-header > div:first-child {
+    display: block;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child {
+    font-size: 12px;
+    padding-inline: 11px;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child::before {
+    content: none;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-shortcuts {
+    display: none;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-details[hidden] {
+    display: grid !important;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-details {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-details > *:not(.study-buddy-qa-priority) {
+    display: none;
+  }
+
+  .study-buddy-bar.is-collapsed .study-buddy-qa-meta,
+  .study-buddy-bar.is-collapsed .study-buddy-german-keys {
+    display: none;
+  }
+}
+
 @media (max-width: 900px) {
   .study-buddy-bar {
     width: min(720px, calc(100vw - 20px));
