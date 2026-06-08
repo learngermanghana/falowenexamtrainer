@@ -135,9 +135,22 @@
     return `${course.title} · Starts ${formatDate(course.startDate)} · ${times}`;
   }
 
+  function getDerivedClassFields(course, index) {
+    const level = String(course?.level || "").trim();
+    const city = String(course?.city || "").trim();
+    const title = course?.title || [level, city, "Klasse"].filter(Boolean).join(" ") || `Class ${index + 1}`;
+    const slug = course?.slug || slugify(title);
+    const id = course?.id || slug || `class-${index + 1}`;
+    return { ...course, title, slug, id };
+  }
+
+  function getNormalizedClasses(data) {
+    return (data.classes || []).map((course, index) => getDerivedClassFields(course, index));
+  }
+
   function currentCourseFromData(data) {
     const requestedSlug = getRequestedSlug();
-    const classes = data.classes || [];
+    const classes = getNormalizedClasses(data);
     return (
       classes.find((course) => slugify(course.slug || course.title) === requestedSlug) ||
       classes.find((course) => course.availability !== "always") ||
@@ -151,7 +164,7 @@
     const hero = document.querySelector(".hero");
     if (!hero) return;
 
-    const classes = data.classes || [];
+    const classes = getNormalizedClasses(data);
     const selected = currentCourseFromData(data);
     const lastLead = getLastLead();
 
