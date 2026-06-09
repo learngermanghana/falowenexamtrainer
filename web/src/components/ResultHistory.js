@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { fetchResultsFromPublishedSheet } from "../services/resultsSheetService";
@@ -26,7 +27,167 @@ const toNumericScore = (value) => {
   return null;
 };
 
-const getAssignmentKey = (entry) => safeLower(entry.assignmentId || entry.assignment_id);
+const getAssignmentKey = (entry) => safeLower(entry.assignmentId || entry.assignment_id || entry.assignmentKey);
+
+const asPercent = (value) => {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return "—";
+  return `${Math.round(numeric)}%`;
+};
+
+const normalizeArray = (value) => {
+  if (Array.isArray(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+const normalizeObject = (value) => {
+  if (value && typeof value === "object" && !Array.isArray(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  return {};
+};
+
+const splitSentences = (text = "") =>
+  String(text || "")
+    .replace(/\s+/g, " ")
+    .split(/(?<=[.!?])\s+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const getMaxWritingScore = (item = {}) => {
+  const max = Number(item.maxWritingScore || item.writingMaxScore || item.writingMaxPoints || 0);
+  if (Number.isFinite(max) && max > 0) return max;
+  const writing = Number(item.writingScore);
+  if (Number.isFinite(writing) && writing > 0 && writing <= 50) return 50;
+  return 100;
+};
+
+const writingScoreToPercent = (writingScore, maxWritingScore = 100) => {
+  const score = Number(writingScore);
+  const max = Number(maxWritingScore);
+  if (!Number.isFinite(score)) return null;
+  if (!Number.isFinite(max) || max <= 0) return Math.round(score);
+  return Math.max(0, Math.min(100, Math.round((score / max) * 100)));
+};
+
+const formatWritingScore = (item = {}) => {
+  if (item.writingScore === null || item.writingScore === undefined || item.writingScore === "") return "—";
+  const max = getMaxWritingScore(item);
+  const percent = writingScoreToPercent(item.writingScore, max);
+  if (max && max !== 100) return `${item.writingScore}/${max} → ${percent}%`;
+  return `${percent}%`;
+};
+
+const getScoreBreakdownRows = (item = {}) => {
+  const rows = [];
+  const objectiveTotal = Number(item.objectiveTotal || 0);
+  if (objectiveTotal > 0) {
+    rows.push({
+      label: "Objective / MCQ",
+      score: `${item.objectiveCorrect || 0}/${objectiveTotal}`,
+      detail: `${asPercent(item.objectiveScore)} from reading/listening or multiple-choice answers`,
+    });
+  }
+
+  if (item.writingScore !== null && item.writingScore !== undefined && item.writingScore !== "") {
+    rows.push({
+      label: "Writing",
+      score: formatWritingScore(item),
+      detail: "Task completion, grammar, vocabulary, structure, tone and clarity",
+    });
+  }
+
+  const explicitBreakdown = normalizeArray(item.scoreBreakdown);
+  explicitBreakdown.forEach((row) => {
+    if (!row?.label) return;
+    rows.push({
+      label: row.label,
+      score: row.score ?? row.value ?? "—",
+      detail: row.reason || row.detail || "",
+    });
+  });
+
+  if (!rows.length) {
+    rows.push({
+      label: "Overall score",
+      score: `${item.numericScore ?? item.score ?? "—"}/100`,
+      detail: item.numericScore >= PASS_MARK ? "Passed this task" : "Needs improvement before this task is secure",
+    });
+  }
+
+  return rows;
+};
+
+const getWrongObjectiveRows = (item = {}) => {
+  const wrongAnswers = normalizeArray(item.wrongAnswers);
+  if (wrongAnswers.length) {
+    return wrongAnswers.map((row, index) => ({
+      question: row.question || row.label || index + 1,
+      student: row.student || row.submitted || row.answer || "blank",
+      expected: row.expected || row.correctAnswer || row.correct || "—",
+      partId: row.partId || row.part || "",
+    }));
+  }
+
+  const details = normalizeObject(item.objectiveDetails);
+  return Object.entries(details)
+    .map(([question, detail]) => ({ question, ...detail }))
+    .filter((row) => row && row.correct === false)
+    .map((row) => ({
+      question: row.question,
+      student: row.student || row.submitted || "blank",
+      expected: row.expected || row.rawExpected || "—",
+      partId: row.partId || "",
+    }));
+};
+
+const getCorrectionPoints = (item = {}) => {
+  const corrections = normalizeArray(item.corrections)
+    .map((row) => {
+      if (typeof row === "string") return row;
+      const from = row.from || row.original || row.student || row.error || "";
+      const to = row.to || row.corrected || row.improved || row.correction || "";
+      const reason = row.reason || row.note || row.explanation || "";
+      if (from && to) return `${from} → ${to}${reason ? ` (${reason})` : ""}`;
+      return reason || to || from;
+    })
+    .filter(Boolean);
+
+  if (corrections.length) return corrections.slice(0, 4);
+
+  const sentences = splitSentences(item.comments);
+  const useful = sentences.filter((sentence) => /grammar|verb|word order|article|structure|spelling|correct|improve|missing|task|vocabulary|tone|formal|informal|wrong|revise/i.test(sentence));
+  return useful.slice(0, 4);
+};
+
+const getWhyThisScore = (item = {}) => {
+  if (item.markingReason) return String(item.markingReason).trim();
+  if (item.improvementSummary) return String(item.improvementSummary).trim();
+  const sentences = splitSentences(item.comments);
+  if (sentences.length <= 2) return item.comments || "Your tutor has marked this work. Review the feedback and improve the weak points.";
+  return sentences.slice(0, 2).join(" ");
+};
+
+const getNextStep = (item = {}) => {
+  if (item.numericScore < PASS_MARK) {
+    return "Revise the correction points, practise the weak area, then submit an improved version.";
+  }
+  return "You passed this task. Still revise the feedback so the same mistakes do not appear in your next work.";
+};
 
 const TextBlock = ({ title, text, maxChars = 650 }) => {
   const { t } = useTranslation();
@@ -50,6 +211,123 @@ const TextBlock = ({ title, text, maxChars = 650 }) => {
           {expanded ? t("resultHistory.showLess") : t("resultHistory.showMore")}
         </button>
       ) : null}
+    </div>
+  );
+};
+
+const FeedbackDetailCard = ({ item, statusVariant }) => {
+  const navigate = useNavigate();
+  const breakdownRows = getScoreBreakdownRows(item);
+  const wrongObjectiveRows = getWrongObjectiveRows(item);
+  const correctionPoints = getCorrectionPoints(item);
+  const resubmitTarget = ["B2", "C1"].includes(item.level) ? "/campus/writing" : "/campus/submit";
+  const passed = item.numericScore >= PASS_MARK;
+
+  return (
+    <div style={{ display: "grid", gap: 12, marginTop: 12 }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+          gap: 10,
+        }}
+      >
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Your score</p>
+          <strong style={{ fontSize: 24, color: statusVariant === "fail" ? "#b91c1c" : "#065f46" }}>
+            {item.numericScore ?? item.score ?? "—"}/100
+          </strong>
+        </div>
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Status</p>
+          <strong>{passed ? "Passed" : "Needs improvement"}</strong>
+        </div>
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Date marked</p>
+          <strong>{item.createdLabel || "Not recorded"}</strong>
+        </div>
+        <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 12, background: "#ffffff" }}>
+          <p style={{ ...styles.helperText, margin: 0 }}>Assignment ID</p>
+          <strong>{item.assignmentId || item.assignmentKey || "—"}</strong>
+        </div>
+      </div>
+
+      <div style={{ border: "1px solid #dbeafe", borderRadius: 12, background: "#eff6ff", padding: 12, display: "grid", gap: 8 }}>
+        <h4 style={{ ...styles.resultHeading, margin: 0 }}>Why you got this score</h4>
+        <p style={{ ...styles.resultText, margin: 0 }}>{getWhyThisScore(item)}</p>
+      </div>
+
+      <div style={{ border: "1px solid #e5e7eb", borderRadius: 12, background: "#ffffff", overflow: "hidden" }}>
+        <div style={{ padding: 10, background: "#f8fafc", fontWeight: 800 }}>Score breakdown</div>
+        {breakdownRows.map((row, index) => (
+          <div
+            key={`${row.label}-${index}`}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(130px, 1fr) minmax(80px, auto) 2fr",
+              gap: 8,
+              padding: 10,
+              borderTop: "1px solid #e5e7eb",
+              fontSize: 13,
+            }}
+          >
+            <strong>{row.label}</strong>
+            <span>{row.score}</span>
+            <span style={{ color: "#4b5563" }}>{row.detail}</span>
+          </div>
+        ))}
+      </div>
+
+      {correctionPoints.length ? (
+        <div style={{ border: "1px solid #fde68a", borderRadius: 12, background: "#fffbeb", padding: 12 }}>
+          <h4 style={{ ...styles.resultHeading, marginTop: 0 }}>Correction points</h4>
+          <ul style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 6 }}>
+            {correctionPoints.map((point, index) => (
+              <li key={`${point}-${index}`}>{point}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {wrongObjectiveRows.length ? (
+        <div style={{ border: "1px solid #fecaca", borderRadius: 12, background: "#fff7ed", overflow: "hidden" }}>
+          <div style={{ padding: 10, fontWeight: 800, color: "#7f1d1d" }}>Wrong objective answers</div>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
+              <thead>
+                <tr>
+                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Question</th>
+                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Your answer</th>
+                  <th style={{ textAlign: "left", padding: 8, borderTop: "1px solid #fed7aa", borderBottom: "1px solid #fed7aa" }}>Correct answer</th>
+                </tr>
+              </thead>
+              <tbody>
+                {wrongObjectiveRows.slice(0, 8).map((row, index) => (
+                  <tr key={`${row.partId}-${row.question}-${index}`}>
+                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.partId ? `${row.partId} ` : ""}{row.question}</td>
+                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.student}</td>
+                    <td style={{ padding: 8, borderBottom: "1px solid #ffedd5" }}>{row.expected}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+
+      <div style={{ border: "1px solid #bbf7d0", borderRadius: 12, background: "#f0fdf4", padding: 12, display: "grid", gap: 8 }}>
+        <h4 style={{ ...styles.resultHeading, margin: 0 }}>Next step</h4>
+        <p style={{ ...styles.resultText, margin: 0 }}>{getNextStep(item)}</p>
+        {!passed ? (
+          <button
+            type="button"
+            style={{ ...styles.primaryButton, width: "fit-content" }}
+            onClick={() => navigate(resubmitTarget)}
+          >
+            Improve and resubmit
+          </button>
+        ) : null}
+      </div>
     </div>
   );
 };
@@ -100,7 +378,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     const list = (Array.isArray(activeResults) ? activeResults : []).map((entry, idx) => {
       const dateRaw = entry.date || entry.createdAt || entry.created_at || entry.dateIso || "";
       const createdMs = dateRaw ? Date.parse(dateRaw) : NaN;
-      const numericScore = toNumericScore(entry.score);
+      const numericScore = toNumericScore(entry.score ?? entry.finalScore);
       const key =
         entry.id ||
         `${entry.studentcode || t("resultHistory.studentFallback")}-${entry.assignment || t("resultHistory.assignmentKeyFallback")}-${dateRaw || idx}`;
@@ -108,18 +386,31 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
       return {
         key,
         assignment: entry.assignment || t("resultHistory.assignmentFallback"),
-        assignmentId: entry.assignmentId || entry.assignment_id || "",
+        assignmentId: entry.assignmentId || entry.assignment_id || entry.assignmentKey || "",
+        assignmentKey: entry.assignmentKey || entry.canonicalAssignmentKey || "",
         level: (entry.level || "").toUpperCase(),
-        name: entry.name || "",
-        studentcode: entry.studentcode || "",
-        score: entry.score,
+        name: entry.name || entry.studentName || "",
+        studentcode: entry.studentcode || entry.studentCode || "",
+        score: entry.score ?? entry.finalScore,
         numericScore,
-        comments: entry.comments || "",
+        comments: entry.comments || entry.feedback || entry.aiFeedback || "",
         link: entry.link || "",
         dateRaw,
         createdLabel: formatDate(dateRaw),
         createdMs: Number.isNaN(createdMs) ? 0 : createdMs,
         position: idx,
+        objectiveScore: entry.objectiveScore ?? null,
+        objectiveCorrect: entry.objectiveCorrect ?? null,
+        objectiveTotal: entry.objectiveTotal ?? null,
+        objectiveDetails: entry.objectiveDetails ?? null,
+        wrongAnswers: entry.wrongAnswers ?? [],
+        writingScore: entry.writingScore ?? null,
+        writingScorePercent: entry.writingScorePercent ?? null,
+        maxWritingScore: entry.maxWritingScore ?? null,
+        scoreBreakdown: entry.scoreBreakdown ?? [],
+        corrections: entry.corrections ?? [],
+        improvementSummary: entry.improvementSummary || "",
+        markingReason: entry.markingReason || entry.rawAiReason || entry.aiReason || "",
       };
     });
 
@@ -215,7 +506,6 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     setMinScore("");
   };
 
-  // Loading/error states for sheet source
   if (sheetCsvUrl && sheetLoading) {
     return (
       <section style={{ ...styles.card, marginTop: 16 }}>
@@ -246,7 +536,7 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
     <section style={{ ...styles.card, marginTop: 16 }}>
       <SectionHeader
         title={t("resultHistory.title")}
-        subtitle={t("resultHistory.subtitle")}
+        subtitle="Review your marks, understand why you received the score, then improve the weak points before moving on."
       />
 
       {hasCompletedRetake ? (
@@ -255,7 +545,6 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         </InfoBox>
       ) : null}
 
-      {/* Filters */}
       <div
         style={{
           ...styles.card,
@@ -326,7 +615,6 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
         </div>
       </div>
 
-      {/* Results */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {filtered.map((item) => {
           const meta = [item.level, item.createdLabel].filter(Boolean).join(" · ");
@@ -366,12 +654,6 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
             typeof item.bestScore === "number"
               ? item.bestScore
               : item.score || item.numericScore || "–";
-
-          console.log({
-            assignmentId: item.assignmentId || item.assignment_id || null,
-            bestScore: item.bestScore,
-            attempts: item.totalAttempts,
-          });
 
           return (
             <article key={item.key} style={{ ...styles.resultCard, marginTop: 0 }}>
@@ -430,6 +712,8 @@ const ResultHistory = ({ results = [], sheetCsvUrl = "" }) => {
                   </a>
                 </div>
               ) : null}
+
+              <FeedbackDetailCard item={item} statusVariant={statusVariant} />
 
               <div style={{ marginTop: 12 }}>
                 <TextBlock title={t("resultHistory.feedbackTitle")} text={item.comments} />
