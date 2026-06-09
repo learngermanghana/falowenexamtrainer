@@ -126,7 +126,7 @@
 }
 
 .study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child::before {
-  content: "Study Buddy";
+  content: "Open Study Buddy";
   font-size: 13px;
   font-weight: 900;
 }
@@ -483,6 +483,40 @@
   color: #fef3c7;
 }
 
+/* Clearer labels: students know these buttons open/expand something. */
+.study-buddy-reopen,
+.study-buddy-mobile-close,
+.study-buddy-progress-toggle,
+.study-buddy-bar:not(.is-collapsed) .study-buddy-buttons .study-buddy-toggle:first-child {
+  font-size: 0;
+}
+
+.study-buddy-reopen::after,
+.study-buddy-mobile-close::after,
+.study-buddy-progress-toggle::after,
+.study-buddy-bar:not(.is-collapsed) .study-buddy-buttons .study-buddy-toggle:first-child::after {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.study-buddy-reopen::after {
+  content: "Open Study Buddy";
+  font-size: 13px;
+}
+
+.study-buddy-bar:not(.is-collapsed) .study-buddy-buttons .study-buddy-toggle:first-child::after,
+.study-buddy-mobile-close::after {
+  content: "Close Study Buddy";
+}
+
+.study-buddy-progress-toggle[aria-expanded="false"]::after {
+  content: "Expand progress details";
+}
+
+.study-buddy-progress-toggle[aria-expanded="true"]::after {
+  content: "Close progress details";
+}
+
 @media (min-width: 641px) {
   .study-buddy-bar.is-collapsed {
     width: min(620px, calc(100vw - 28px));
@@ -509,12 +543,14 @@
   }
 
   .study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child {
-    font-size: 12px;
+    font-size: 0;
     padding-inline: 11px;
   }
 
   .study-buddy-bar.is-collapsed .study-buddy-buttons .study-buddy-toggle:first-child::before {
-    content: none;
+    content: "Open Study Buddy";
+    font-size: 12px;
+    font-weight: 900;
   }
 
   .study-buddy-bar.is-collapsed .study-buddy-shortcuts {
