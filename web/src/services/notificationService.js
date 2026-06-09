@@ -87,8 +87,6 @@ const normalizeNotificationEvent = (event = {}) => {
 
 const studentCodeFromProfile = (profile = {}) => profile.studentCode || profile.studentcode || profile.id || "";
 
-const normalizeStudentCode = (value = "") => String(value || "").trim().toLowerCase();
-
 const uniqueStudentCodes = (profile = {}) => {
   const raw = [profile.studentCode, profile.studentcode, profile.id]
     .map((value) => String(value || "").trim())
