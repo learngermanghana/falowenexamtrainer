@@ -139,6 +139,103 @@ const sendPush = async ({ tokens, notification, data, tokenOwners }) => {
   await cleanupInvalidTokens(tokenOwners, Array.from(invalidTokens));
 };
 
+const studentCodeVariants = (value = "") => {
+  const trimmed = String(value || "").trim();
+  return Array.from(new Set([trimmed, trimmed.toLowerCase(), trimmed.toUpperCase()].filter(Boolean)));
+};
+
+const findStudentTargetsByCode = async (studentCode = "") => {
+  const variants = studentCodeVariants(studentCode);
+  if (!variants.length) return [];
+
+  const targets = new Map();
+  await Promise.all(
+    variants.map(async (variant) => {
+      const direct = await db().collection("students").doc(variant).get();
+      if (direct.exists) {
+        const data = direct.data() || {};
+        targets.set(direct.id, { docId: direct.id, data, tokens: tokensFromStudent(data) });
+      }
+    })
+  );
+
+  const snapshots = await Promise.all([
+    ...variants.map((variant) => db().collection("students").where("studentCode", "==", variant).get()),
+    ...variants.map((variant) => db().collection("students").where("studentcode", "==", variant).get()),
+  ]);
+
+  snapshots.forEach((snapshot) => {
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data() || {};
+      targets.set(docSnap.id, { docId: docSnap.id, data, tokens: tokensFromStudent(data) });
+    });
+  });
+
+  return Array.from(targets.values());
+};
+
+const buildMarkedAssignmentPushPayload = (notificationDoc = {}) => {
+  const score = Number(notificationDoc.score);
+  const scoreLabel = Number.isFinite(score) ? `${score}/100` : "marked";
+  const passed = Number.isFinite(score) ? score >= 60 : notificationDoc.status === "passed";
+  const title = notificationDoc.title || "Your assignment has been marked";
+  const body = notificationDoc.body || notificationDoc.message || (passed
+    ? `Score: ${scoreLabel} · Passed. Open Results to read your feedback.`
+    : `Score: ${scoreLabel} · Needs improvement. Open Results and resubmit.`);
+  const data = toFcmData({
+    ...(notificationDoc.data || {}),
+    type: "marked_assignment",
+    category: "feedback",
+    route: notificationDoc.route || notificationDoc.data?.route || "/campus/results",
+    studentCode: notificationDoc.studentCode || notificationDoc.studentCodeOriginal || "",
+    assignment: notificationDoc.assignment || "",
+    assignmentId: notificationDoc.assignmentId || "",
+    level: notificationDoc.level || "",
+    score: Number.isFinite(score) ? score : notificationDoc.score || "",
+    status: notificationDoc.status || (passed ? "passed" : "needs_improvement"),
+    title,
+    body,
+  });
+  return { notification: { title, body }, data };
+};
+
+const notifyMarkedAssignmentCreated = async ({ notificationId, notificationDoc = {} }) => {
+  const studentCode = notificationDoc.studentCode || notificationDoc.studentCodeOriginal || notificationDoc.data?.studentCode || "";
+  const targets = await findStudentTargetsByCode(studentCode);
+  if (!targets.length) {
+    console.log("No push target found for marked assignment", { notificationId, studentCode });
+    return null;
+  }
+
+  const { notification, data } = buildMarkedAssignmentPushPayload(notificationDoc);
+
+  await Promise.all(targets.map((target) => persistInAppNotification({
+    studentDocId: target.docId,
+    notificationId,
+    notification,
+    data,
+    type: "Scores",
+  })));
+
+  const tokens = new Set();
+  const tokenOwners = new Map();
+  targets.forEach((target) => {
+    target.tokens.forEach((token) => {
+      tokens.add(token);
+      tokenOwners.set(token, target.docId);
+    });
+  });
+
+  if (!tokens.size) {
+    console.log("Marked assignment notification saved without push tokens", { notificationId, studentCode, targets: targets.length });
+    return null;
+  }
+
+  await sendPush({ tokens: Array.from(tokens), notification, data, tokenOwners });
+  console.log("Marked assignment push sent", { notificationId, studentCode, tokens: tokens.size });
+  return null;
+};
+
 const notifyClassNoteCreated = async ({ level, className, lessonId, noteId, note = {} }) => {
   const targets = await findClassTargets({ level, className, excludeUid: note.createdByUid || "" });
   if (!targets.length) return null;
@@ -263,6 +360,26 @@ const runPaymentReminderScan = async () => {
 
   console.log("sendPaymentReminders completed", { candidates: candidates.length, runDateKey });
 };
+
+exportedFunctions.onMarkedAssignmentNotificationCreated = onDocumentCreated(
+  {
+    region: "europe-west1",
+    document: "studentNotifications/{notificationId}",
+  },
+  async (event) => {
+    const data = event.data?.data() || {};
+    const category = normalize(data.category || data.type || data.data?.type || "");
+    const route = normalize(data.route || data.data?.route || "");
+    if (!category.includes("feedback") && !category.includes("scores") && !category.includes("marked_assignment") && !route.includes("results")) {
+      return null;
+    }
+    await notifyMarkedAssignmentCreated({
+      notificationId: event.params.notificationId,
+      notificationDoc: data,
+    });
+    return null;
+  }
+);
 
 exportedFunctions.onClassLessonNoteCreated = onDocumentCreated(
   {
