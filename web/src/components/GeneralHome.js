@@ -20,15 +20,18 @@ const day0WorkbookByLevel = {
   A1: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
   A2: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
   B1: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook",
-  B2: "/campus/course/b2-day-0-self-learning-orientation-workbook",
-  C1: "/campus/course/c1-day-0-progression-workbook",
+  B2: "/campus/course/lesson/B2/0",
+  C1: "/campus/course/lesson/C1/0",
 };
+
+const selfLearningLevels = new Set(["B2", "C1"]);
 
 const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLearning, onOpenAccount }) => {
   const { t } = useTranslation();
   const studentName =
     studentProfile?.name || studentProfile?.displayName || t("generalHome.welcome.studentFallback");
-  const className = studentProfile?.className || t("generalHome.welcome.classFallback");
+  const levelKey = detectLevelKey(studentProfile);
+  const courseLabel = levelKey ? `${levelKey} course` : "your course";
 
   return (
     <section
@@ -45,7 +48,7 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
         {t("generalHome.welcome.title", { studentName })}
       </h2>
       <p style={{ ...styles.helperText, color: "#e0e7ff", marginBottom: 12 }}>
-        {t("generalHome.welcome.subtitle", { className })}
+        Your {courseLabel} is ready. Start from the Course Book, follow the daily lesson, and use Study Buddy when you need help.
       </p>
 
       <PrimaryActionBar align="start">
@@ -54,7 +57,7 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
           style={{ ...styles.primaryButton, background: "#dcfce7", color: "#14532d", borderColor: "#bbf7d0" }}
           onClick={onContinueLearning}
         >
-          Continue learning
+          Open Course Book
         </button>
 
         <button
@@ -83,21 +86,25 @@ const WelcomeHero = ({ studentProfile, onOpenExamFile, onJoinZoom, onContinueLea
   );
 };
 
-const formatContractStatus = (studentProfile = {}) => {
-  const contractEndMs = toDateMs(studentProfile.contractEnd);
-  if (!Number.isFinite(contractEndMs)) return "Not set";
-
-  const dayMs = 1000 * 60 * 60 * 24;
-  const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
-  const contractDate = new Date(contractEndMs).toLocaleDateString(undefined, {
+const formatDate = (value) =>
+  new Date(value).toLocaleDateString(undefined, {
     day: "2-digit",
     month: "short",
     year: "numeric",
   });
 
-  if (daysLeft < 0) return `Expired · ended ${contractDate}`;
-  if (daysLeft === 0) return "Active · ends today";
-  return `Active · ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`;
+const formatContractStatus = (studentProfile = {}) => {
+  const contractEndMs = toDateMs(studentProfile.contractEnd);
+  if (!Number.isFinite(contractEndMs)) return "Access active";
+
+  const dayMs = 1000 * 60 * 60 * 24;
+  const daysLeft = Math.ceil((contractEndMs - Date.now()) / dayMs);
+  const contractDate = formatDate(contractEndMs);
+
+  if (daysLeft < 0) return `Access expired · ended ${contractDate}`;
+  if (daysLeft === 0) return "Access active · ends today";
+  if (daysLeft <= 45) return `Access active · ${daysLeft} day${daysLeft === 1 ? "" : "s"} left`;
+  return `Access active until ${contractDate}`;
 };
 
 const shouldShowDay0Prompt = (studentProfile = {}, levelKey = "") => {
@@ -110,8 +117,12 @@ const shouldShowDay0Prompt = (studentProfile = {}, levelKey = "") => {
     studentProfile.knowledgeTestCompleted,
   ];
 
-  if (explicitCompleted.some((value) => value === true || String(value).toLowerCase() === "true")) return false;
+  if (explicitCompleted.some((value) => value === true || String(value).toLowerCase() === "true")) {
+    return selfLearningLevels.has(levelKey);
+  }
   if (explicitCompleted.some((value) => value === false || String(value).toLowerCase() === "false")) return true;
+
+  if (selfLearningLevels.has(levelKey)) return true;
 
   const joinedAtMs = toDateMs(studentProfile.joined_at || studentProfile.createdAt || studentProfile.enrollDate || studentProfile.enrolledAt);
   if (!Number.isFinite(joinedAtMs)) return false;
@@ -120,78 +131,117 @@ const shouldShowDay0Prompt = (studentProfile = {}, levelKey = "") => {
   return Date.now() - joinedAtMs <= sevenDaysMs;
 };
 
-const StatusTile = ({ label, value }) => (
-  <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff" }}>
-    <p style={{ ...styles.helperText, margin: "0 0 4px", fontSize: 12 }}>{label}</p>
+const StatusTile = ({ label, value, helper }) => (
+  <div style={{ border: "1px solid #e2e8f0", borderRadius: 14, padding: 12, background: "#ffffff", display: "grid", gap: 4 }}>
+    <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>{label}</p>
     <strong style={{ color: "#0f172a" }}>{value}</strong>
+    {helper ? <p style={{ ...styles.helperText, margin: 0, fontSize: 12 }}>{helper}</p> : null}
   </div>
 );
 
-const NextActionCard = ({ studentProfile, onOpenDay0 }) => {
+const StartHereStep = ({ number, title, body, action }) => (
+  <div style={{ border: "1px solid #dbeafe", borderRadius: 16, padding: 14, background: "#ffffff", display: "grid", gap: 8 }}>
+    <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+      <span style={{ ...styles.badge, background: "#dbeafe", color: "#1d4ed8", minWidth: 30, justifyContent: "center" }}>{number}</span>
+      <div style={{ display: "grid", gap: 4 }}>
+        <strong style={{ color: "#0f172a" }}>{title}</strong>
+        <p style={{ ...styles.helperText, margin: 0 }}>{body}</p>
+      </div>
+    </div>
+    {action ? <div>{action}</div> : null}
+  </div>
+);
+
+const NextActionCard = ({ studentProfile, onOpenDay0, onOpenCourseBook, onOpenExamsRoom }) => {
   const levelKey = detectLevelKey(studentProfile);
-  const className = studentProfile?.className || "your class";
+  const className = studentProfile?.className || "Not assigned yet";
   const showDay0Prompt = shouldShowDay0Prompt(studentProfile, levelKey);
+  const courseName = levelKey ? `${levelKey} ${selfLearningLevels.has(levelKey) ? "Self-learning" : "Course"}` : "Course not selected";
 
   return (
     <section
       style={{
         ...styles.card,
         display: "grid",
-        gap: 12,
+        gap: 14,
         border: "1px solid #bfdbfe",
         background: "linear-gradient(135deg, #eff6ff, #ffffff 62%, #f8fafc)",
       }}
     >
       <SectionHeader
-        eyebrow="Your next step"
-        title={levelKey ? `Continue ${levelKey} learning` : "Continue your learning setup"}
+        eyebrow="Start here"
+        title={levelKey ? `Your current course: ${courseName}` : "Set up your learning path"}
         subtitle={
           levelKey
-            ? `You are in ${className}. Use the top buttons to continue learning, open your account, join Zoom, or check your exam file.`
-            : "Set your level and class so Falowen can guide your lessons, scores, class links, and exam preparation."
+            ? "Follow the steps below. Falowen works best when you start from the Course Book and complete one small task at a time."
+            : "Set your level and class so Falowen can guide your lessons, scores, class links and exam preparation."
         }
         actions={
           <PrimaryActionBar align="flex-end" wrap>
-            {levelKey ? <PillBadge tone="info">Level {levelKey}</PillBadge> : null}
-            {studentProfile?.className ? <PillBadge>{studentProfile.className}</PillBadge> : null}
+            {levelKey ? <PillBadge tone="info">Course: {levelKey}</PillBadge> : null}
+            {studentProfile?.className ? <PillBadge>Assigned class: {studentProfile.className}</PillBadge> : null}
           </PrimaryActionBar>
         }
       />
 
-      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-        <StatusTile label="Next action" value="Open Course Book and continue today’s lesson" />
-        <StatusTile label="Contract status" value={formatContractStatus(studentProfile)} />
-        <StatusTile label="Account" value="Use Account for notifications, profile, and payment status" />
+      <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))" }}>
+        <StatusTile label="Course" value={courseName} helper="This is the level Falowen will guide you through." />
+        <StatusTile label="Assigned class" value={className} helper="Used for Zoom, calendar, announcements and school records." />
+        <StatusTile label="Access" value={formatContractStatus(studentProfile)} helper="Open Account for payment and profile details." />
       </div>
 
-      {showDay0Prompt ? (
-        <div
-          style={{
-            border: "1px solid #bbf7d0",
-            borderRadius: 14,
-            padding: 12,
-            background: "#f0fdf4",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 10,
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            <strong>New here? Start with Day 0 orientation</strong>
-            <p style={{ ...styles.helperText, margin: "4px 0 0" }}>
-              Day 0 explains how Falowen works before you begin the main lessons.
-            </p>
-          </div>
-          <button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>
-            Open Day 0
-          </button>
-        </div>
-      ) : null}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+        <StartHereStep
+          number="1"
+          title={showDay0Prompt ? "Open Day 0 Orientation" : "Review the course guide"}
+          body="Day 0 explains how to use the course, Study Buddy, Falowen AI, writing practice and exam tools."
+          action={<button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>Open Day 0 Orientation</button>}
+        />
+        <StartHereStep
+          number="2"
+          title="Continue today’s lesson"
+          body="Use Learn, Speak, Write and Finish in order. Do not jump randomly between pages."
+          action={<button type="button" style={styles.primaryButton} onClick={onOpenCourseBook}>Open Course Book</button>}
+        />
+        <StartHereStep
+          number="3"
+          title="Practise with Study Buddy"
+          body="Use the floating Study Buddy at the bottom when you need quick help, AI support, calendar or exam shortcuts."
+        />
+        <StartHereStep
+          number="4"
+          title="Check Exam Room"
+          body="Use Exam Room for speaking, writing and exam-style readiness practice."
+          action={<button type="button" style={styles.secondaryButton} onClick={onOpenExamsRoom}>Open Exams Room</button>}
+        />
+      </div>
     </section>
   );
 };
+
+const B2C1GuidanceCard = ({ levelKey, onOpenDay0, onOpenCourseBook, onOpenExamsRoom }) => (
+  <section style={{ ...styles.card, display: "grid", gap: 12, border: "1px solid #c7d2fe", background: "#f8fafc" }}>
+    <SectionHeader
+      eyebrow="B2/C1 self-learning guide"
+      title="Start with Day 0, then continue one lesson at a time"
+      subtitle="For B2 and C1, the dashboard focuses on guidance instead of A1-B1 class metrics. Use the buttons below to stay on the correct path."
+      actions={
+        <PrimaryActionBar align="flex-end" wrap>
+          <PillBadge tone="info">{levelKey}</PillBadge>
+          <PillBadge>Self-learning</PillBadge>
+        </PrimaryActionBar>
+      }
+    />
+    <p style={{ ...styles.helperText, margin: 0 }}>
+      Daily routine: Course Book → Learn → Speak → Write → Finish. Use Study Buddy when you feel lost. Use Falowen AI for feedback and improvement, not blind copying.
+    </p>
+    <PrimaryActionBar align="start" wrap>
+      <button type="button" style={styles.secondaryButton} onClick={onOpenDay0}>Open Day 0 Orientation</button>
+      <button type="button" style={styles.primaryButton} onClick={onOpenCourseBook}>Continue Course Book</button>
+      <button type="button" style={styles.secondaryButton} onClick={onOpenExamsRoom}>Open Exams Room</button>
+    </PrimaryActionBar>
+  </section>
+);
 
 const AnnouncementSection = ({ announcements, announcementStatus, announcementIndex, t }) => (
   <section style={{ ...styles.card, display: "grid", gap: 12 }}>
@@ -270,6 +320,7 @@ const GeneralHome = ({
   const levelKey = detectLevelKey(studentProfile);
   const day0WorkbookLink = day0WorkbookByLevel[levelKey] || "/campus/account";
   const onboardingCompleted = Boolean(studentProfile?.onboardingCompleted);
+  const useSelfLearningGuide = selfLearningLevels.has(levelKey);
 
   const openCampus = useCallback(() => {
     playOpenFeedback();
@@ -285,6 +336,16 @@ const GeneralHome = ({
     playOpenFeedback();
     navigate("/campus/account");
   }, [navigate, playOpenFeedback]);
+
+  const openExamsRoom = useCallback(() => {
+    playOpenFeedback();
+    onSelectArea("exams");
+  }, [onSelectArea, playOpenFeedback]);
+
+  const openDay0 = useCallback(() => {
+    playOpenFeedback();
+    navigate(day0WorkbookLink);
+  }, [day0WorkbookLink, navigate, playOpenFeedback]);
 
   const joinZoom = useCallback(() => {
     playOpenFeedback();
@@ -436,13 +497,7 @@ const GeneralHome = ({
           </span>
           <strong style={{ fontSize: 16 }}>{paymentAlert.message}</strong>
           <PrimaryActionBar align="start">
-            <button
-              style={styles.primaryButton}
-              onClick={() => {
-                playOpenFeedback();
-                navigate("/campus/account");
-              }}
-            >
+            <button style={styles.primaryButton} onClick={openAccount}>
               {t("generalHome.paymentAlert.cta")}
             </button>
           </PrimaryActionBar>
@@ -451,13 +506,21 @@ const GeneralHome = ({
 
       <NextActionCard
         studentProfile={studentProfile}
-        onOpenDay0={() => {
-          playOpenFeedback();
-          navigate(day0WorkbookLink);
-        }}
+        onOpenDay0={openDay0}
+        onOpenCourseBook={openCampus}
+        onOpenExamsRoom={openExamsRoom}
       />
 
-      <HomeMetrics studentProfile={studentProfile} />
+      {useSelfLearningGuide ? (
+        <B2C1GuidanceCard
+          levelKey={levelKey}
+          onOpenDay0={openDay0}
+          onOpenCourseBook={openCampus}
+          onOpenExamsRoom={openExamsRoom}
+        />
+      ) : (
+        <HomeMetrics studentProfile={studentProfile} />
+      )}
 
       <NavigationGuide />
 
@@ -519,13 +582,7 @@ const GeneralHome = ({
             <li>{t("generalHome.exams.points.2")}</li>
           </ul>
           <PrimaryActionBar align="start">
-            <button
-              style={styles.secondaryButton}
-              onClick={() => {
-                playOpenFeedback();
-                onSelectArea("exams");
-              }}
-            >
+            <button style={styles.secondaryButton} onClick={openExamsRoom}>
               Open Exams Room
             </button>
           </PrimaryActionBar>
