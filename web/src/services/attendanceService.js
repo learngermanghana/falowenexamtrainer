@@ -2,6 +2,8 @@ import { collection, db, doc, getDoc, getDocs, isFirebaseConfigured } from "../f
 
 const normalizeValue = (value = "") => String(value || "").trim();
 
+const ATTENDANCE_TARGET = 80;
+
 const isFirebaseReady = () => {
   const configured =
     typeof isFirebaseConfigured === "function"
@@ -374,7 +376,76 @@ export const fetchAttendanceRecords = async ({ className, studentCode, studentUi
   }
 };
 
+const recordTime = (record = {}) => {
+  const parsed = new Date(record.markedAt || record.date || record.id || 0);
+  return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+};
+
+export const buildAttendanceSummary = (records = [], hours = 0) => {
+  const markedRecords = records.filter((record) => record.marked && record.present !== null);
+  const presentRecords = markedRecords.filter((record) => record.present === true);
+  const absentRecords = markedRecords.filter((record) => record.present === false);
+  const pendingRecords = records.filter((record) => !record.marked || record.present === null);
+  const totalSessions = markedRecords.length;
+  const presentSessions = presentRecords.length;
+  const absentSessions = absentRecords.length;
+  const attendanceRate = totalSessions ? Math.round((presentSessions / totalSessions) * 100) : null;
+  const classesNeededFor80 =
+    attendanceRate === null || attendanceRate >= ATTENDANCE_TARGET
+      ? 0
+      : Math.ceil(Math.max(0, ((ATTENDANCE_TARGET / 100) * totalSessions - presentSessions) / (1 - ATTENDANCE_TARGET / 100)));
+  const lastAttendance = markedRecords.slice().sort((a, b) => recordTime(b) - recordTime(a))[0] || null;
+  const recentMarked = markedRecords.slice().sort((a, b) => recordTime(b) - recordTime(a));
+  let consecutiveAbsences = 0;
+  for (const record of recentMarked) {
+    if (record.present === false) consecutiveAbsences += 1;
+    else break;
+  }
+
+  let statusLevel = "empty";
+  let statusLabel = "No attendance yet";
+  let message = "Attendance will appear here after your teacher marks class.";
+  if (attendanceRate !== null) {
+    if (attendanceRate >= ATTENDANCE_TARGET) {
+      statusLevel = "good";
+      statusLabel = "Good attendance";
+      message = "Great. Keep attending so your progress stays strong.";
+    } else if (attendanceRate >= 70) {
+      statusLevel = "warning";
+      statusLabel = "Improve consistency";
+      message = `Attend the next ${classesNeededFor80} class${classesNeededFor80 === 1 ? "" : "es"} to reach ${ATTENDANCE_TARGET}%.`;
+    } else if (attendanceRate >= 50) {
+      statusLevel = "low";
+      statusLabel = "Attendance warning";
+      message = `Your attendance is low. Attend the next ${classesNeededFor80} class${classesNeededFor80 === 1 ? "" : "es"} to reach ${ATTENDANCE_TARGET}%.`;
+    } else {
+      statusLevel = "critical";
+      statusLabel = "Critical attendance";
+      message = "You are missing too many classes. Contact support and attend the next class.";
+    }
+  }
+
+  return {
+    records,
+    markedRecords,
+    totalSessions,
+    presentSessions,
+    absentSessions,
+    pendingSessions: pendingRecords.length,
+    sessions: presentSessions,
+    hours,
+    attendanceRate,
+    classesNeededFor80,
+    lastAttendance,
+    consecutiveAbsences,
+    statusLevel,
+    statusLabel,
+    message,
+    target: ATTENDANCE_TARGET,
+  };
+};
+
 export const fetchAttendanceSummary = async ({ className, studentCode, studentUid, level } = {}) => {
-  const { sessions, hours } = await fetchAttendanceRecords({ className, studentCode, studentUid, level });
-  return { sessions, hours };
+  const { records, sessions, hours } = await fetchAttendanceRecords({ className, studentCode, studentUid, level });
+  return { ...buildAttendanceSummary(records, hours), sessions, hours };
 };
