@@ -100,6 +100,16 @@ const findIndexByHeader = (headers, candidates) => {
   return normalizedHeaders.findIndex((value) => normalizedCandidates.includes(value));
 };
 
+const getOptionalJsonValue = (value) => {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+  try {
+    return JSON.parse(trimmed);
+  } catch {
+    return trimmed;
+  }
+};
+
 const fetchCsv = async (url) => {
   const withBust = url.includes("?") ? `${url}&t=${Date.now()}` : `${url}?t=${Date.now()}`;
   const response = await fetch(withBust);
@@ -114,6 +124,9 @@ const fetchCsv = async (url) => {
 /**
  * Fetches a published Google Sheet (CSV) containing results.
  * The sheet should include columns like: studentcode, name, assignment, score, comments, date, level, link, assignment_id.
+ * Optional richer AI marking columns are also supported: objective_score, objective_correct, objective_total,
+ * wrong_answers, objective_details, writing_score, max_writing_score, score_breakdown, corrections,
+ * improvement_summary, marking_reason, ai_reason.
  */
 export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
   const normalizedUrl = normalizeSheetCsvUrl(sheetCsvUrl);
@@ -129,8 +142,8 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     level: findIndexByHeader(headerRow, ["level", "cefr", "lvl"]),
     name: findIndexByHeader(headerRow, ["name", "student", "student name"]),
     studentcode: findIndexByHeader(headerRow, ["studentcode", "student code", "code"]),
-    score: findIndexByHeader(headerRow, ["score", "mark", "marks"]),
-    comments: findIndexByHeader(headerRow, ["comments", "feedback", "comment"]),
+    score: findIndexByHeader(headerRow, ["score", "mark", "marks", "final score", "final_score", "finalscore"]),
+    comments: findIndexByHeader(headerRow, ["comments", "feedback", "comment", "ai feedback", "aifeedback"]),
     link: findIndexByHeader(headerRow, ["link", "url"]),
     date: findIndexByHeader(headerRow, ["date", "createdat", "created_at", "timestamp", "time"]),
     assignmentId: findIndexByHeader(headerRow, [
@@ -141,6 +154,18 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
       "canonicalassignmentkey",
       "canonical_assignment_key",
     ]),
+    objectiveScore: findIndexByHeader(headerRow, ["objective_score", "objectivescore", "mcq_score", "mcqscore"]),
+    objectiveCorrect: findIndexByHeader(headerRow, ["objective_correct", "objectivecorrect", "mcq_correct", "mcqcorrect"]),
+    objectiveTotal: findIndexByHeader(headerRow, ["objective_total", "objectivetotal", "mcq_total", "mcqtotal"]),
+    objectiveDetails: findIndexByHeader(headerRow, ["objective_details", "objectivedetails", "mcq_details", "mcqdetails"]),
+    wrongAnswers: findIndexByHeader(headerRow, ["wrong_answers", "wronganswers", "wrong objective answers", "wrongobjectiveanswers"]),
+    writingScore: findIndexByHeader(headerRow, ["writing_score", "writingscore", "writing mark", "writingmark"]),
+    writingScorePercent: findIndexByHeader(headerRow, ["writing_score_percent", "writingscorepercent", "writing percent", "writingpercent"]),
+    maxWritingScore: findIndexByHeader(headerRow, ["max_writing_score", "maxwritingscore", "writing max", "writingmax"]),
+    scoreBreakdown: findIndexByHeader(headerRow, ["score_breakdown", "scorebreakdown", "breakdown"]),
+    corrections: findIndexByHeader(headerRow, ["corrections", "correction_points", "correctionpoints", "mistakes"]),
+    improvementSummary: findIndexByHeader(headerRow, ["improvement_summary", "improvementsummary", "next step", "nextstep"]),
+    markingReason: findIndexByHeader(headerRow, ["marking_reason", "markingreason", "ai_reason", "aireason", "raw_ai_reason", "rawaireason"]),
   };
 
   const getValue = (row, idx) => (idx >= 0 && idx < row.length ? String(row[idx] || "").trim() : "");
@@ -157,5 +182,18 @@ export const fetchResultsFromPublishedSheet = async (sheetCsvUrl) => {
     date: getValue(row, indices.date),
     assignment_id: getValue(row, indices.assignmentId),
     assignmentId: getValue(row, indices.assignmentId),
+    assignmentKey: getValue(row, indices.assignmentId),
+    objectiveScore: getValue(row, indices.objectiveScore),
+    objectiveCorrect: getValue(row, indices.objectiveCorrect),
+    objectiveTotal: getValue(row, indices.objectiveTotal),
+    objectiveDetails: getOptionalJsonValue(getValue(row, indices.objectiveDetails)),
+    wrongAnswers: getOptionalJsonValue(getValue(row, indices.wrongAnswers)),
+    writingScore: getValue(row, indices.writingScore),
+    writingScorePercent: getValue(row, indices.writingScorePercent),
+    maxWritingScore: getValue(row, indices.maxWritingScore),
+    scoreBreakdown: getOptionalJsonValue(getValue(row, indices.scoreBreakdown)),
+    corrections: getOptionalJsonValue(getValue(row, indices.corrections)),
+    improvementSummary: getValue(row, indices.improvementSummary),
+    markingReason: getValue(row, indices.markingReason),
   }));
 };
