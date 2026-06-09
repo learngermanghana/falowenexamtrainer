@@ -10,13 +10,11 @@ import {
   setDoc,
   addDoc,
   serverTimestamp,
+  where,
 } from "../firebase";
 import { fetchAttendanceRecords } from "./attendanceService";
 import { fetchResults } from "./resultsService";
 
-// -------------------------------------------
-// Utility: timestamp parser
-// -------------------------------------------
 const parseTimestamp = (value) => {
   if (!value) return null;
   if (typeof value === "number") return value;
@@ -45,39 +43,23 @@ const resolvePushType = (payload = {}) => {
   const normalized = String(raw || "").toLowerCase();
   if (normalized.includes("score") || normalized.includes("assignment")) return "Scores";
   if (normalized.includes("attendance")) return "Attendance";
-  if (normalized.includes("class") || normalized.includes("discussion") || normalized.includes("board")) {
-    return "Class board";
-  }
-  if (normalized.includes("announcement") || normalized.includes("notice") || normalized.includes("bulletin")) {
-    return "Announcement";
-  }
+  if (normalized.includes("class") || normalized.includes("discussion") || normalized.includes("board")) return "Class board";
+  if (normalized.includes("announcement") || normalized.includes("notice") || normalized.includes("bulletin")) return "Announcement";
   return "Update";
 };
 
 const resolvePushTitle = (payload = {}) =>
-  payload?.notification?.title ||
-  payload?.data?.title ||
-  payload?.data?.subject ||
-  payload?.data?.headline ||
-  "New update";
+  payload?.notification?.title || payload?.data?.title || payload?.data?.subject || payload?.data?.headline || "New update";
 
 const resolvePushBody = (payload = {}) =>
-  payload?.notification?.body ||
-  payload?.data?.body ||
-  payload?.data?.message ||
-  payload?.data?.detail ||
-  "";
+  payload?.notification?.body || payload?.data?.body || payload?.data?.message || payload?.data?.detail || "";
 
 const resolvePushTimestamp = (payload = {}) =>
   parseTimestamp(
-    payload?.data?.timestamp ||
-      payload?.data?.sentAt ||
-      payload?.data?.createdAt ||
-      payload?.notification?.timestamp
+    payload?.data?.timestamp || payload?.data?.sentAt || payload?.data?.createdAt || payload?.notification?.timestamp
   ) || payload?.sentTime || Date.now();
 
-const resolvePushId = (payload = {}) =>
-  payload?.messageId || payload?.data?.notificationId || payload?.data?.id || null;
+const resolvePushId = (payload = {}) => payload?.messageId || payload?.data?.notificationId || payload?.data?.id || null;
 
 const getStoredNotificationData = (record = {}) => ({
   ...(record?.data || {}),
@@ -103,11 +85,16 @@ const normalizeNotificationEvent = (event = {}) => {
   };
 };
 
-// -------------------------------------------
-// Student code resolver
-// -------------------------------------------
-const studentCodeFromProfile = (profile = {}) =>
-  profile.studentCode || profile.studentcode || profile.id || "";
+const studentCodeFromProfile = (profile = {}) => profile.studentCode || profile.studentcode || profile.id || "";
+
+const normalizeStudentCode = (value = "") => String(value || "").trim().toLowerCase();
+
+const uniqueStudentCodes = (profile = {}) => {
+  const raw = [profile.studentCode, profile.studentcode, profile.id]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  return Array.from(new Set(raw.flatMap((value) => [value, value.toLowerCase(), value.toUpperCase()])));
+};
 
 const normalizeLevelTokens = (level) =>
   Array.from(
@@ -119,39 +106,26 @@ const normalizeLevelTokens = (level) =>
     )
   );
 
-// -------------------------------------------
-// Helper: Normalize attendance status
-// -------------------------------------------
 const normalizeAttendanceStatus = (record = {}) => {
-  if (record.marked === false) return ""; // not recorded yet
+  if (record.marked === false) return "";
   if (record.present === true) return "present";
   if (record.present === false) return "absent";
-
   if (record.attended === true) return "present";
   if (record.attended === false) return "absent";
-
-  const raw =
-    (record.status || record.attendance || record.state || "").toString().toLowerCase();
+  const raw = (record.status || record.attendance || record.state || "").toString().toLowerCase();
   if (raw.includes("present") || raw.includes("attended") || raw.includes("late")) return "present";
   if (raw.includes("absent")) return "absent";
   return "";
 };
 
-// -------------------------------------------
-// Scores notification
-// -------------------------------------------
 const buildScoreNotification = (resultsPayload) => {
   const latestScore = resultsPayload?.results?.[0];
   if (!latestScore) return null;
-
   const timestamp = parseTimestamp(latestScore.date) || Date.now();
   const headline = latestScore.assignment || "Assignment";
   const scoreValue = parseScoreValue(latestScore.score);
   const scoreText = scoreValue !== null ? `${scoreValue}/100` : "Awaiting score";
-  const detail = latestScore.comments
-    ? `${scoreText} · ${latestScore.comments}`
-    : scoreText;
-
+  const detail = latestScore.comments ? `${scoreText} · ${latestScore.comments}` : scoreText;
   return {
     id: `score-${latestScore.assignment}-${timestamp}`,
     type: "Scores",
@@ -162,38 +136,20 @@ const buildScoreNotification = (resultsPayload) => {
   };
 };
 
-// -------------------------------------------
-// Attendance notification (fixed)
-// -------------------------------------------
 const buildAttendanceNotification = (attendancePayload, options = {}) => {
   const records = attendancePayload?.records || [];
   if (!records.length) return null;
-
-  // Only include records where the student was explicitly marked
   const markedRecords = records.filter((r) => r && r.marked);
   if (!markedRecords.length) return null;
-
-  const resolveAttendanceSortTimestamp = (record = {}) =>
-    parseTimestamp(record?.markedAt) || parseTimestamp(record?.date) || 0;
-
+  const resolveAttendanceSortTimestamp = (record = {}) => parseTimestamp(record?.markedAt) || parseTimestamp(record?.date) || 0;
   const targetSessionId = String(options.sessionId || "").trim();
-  const matchedSessionRecord =
-    targetSessionId && markedRecords.find((record) => String(record?.id || "").trim() === targetSessionId);
-
-  const latest =
-    matchedSessionRecord ||
-    markedRecords
-      .slice()
-      .sort((a, b) => resolveAttendanceSortTimestamp(b) - resolveAttendanceSortTimestamp(a))[0];
-
-  const timestamp =
-    parseTimestamp(latest.markedAt) || parseTimestamp(latest.date) || Date.now();
+  const matchedSessionRecord = targetSessionId && markedRecords.find((record) => String(record?.id || "").trim() === targetSessionId);
+  const latest = matchedSessionRecord || markedRecords.slice().sort((a, b) => resolveAttendanceSortTimestamp(b) - resolveAttendanceSortTimestamp(a))[0];
+  const timestamp = parseTimestamp(latest.markedAt) || parseTimestamp(latest.date) || Date.now();
   const status = normalizeAttendanceStatus(latest);
   if (!status) return null;
   const label = latest.title || "Class session";
-
   const isPresent = status === "present";
-
   return {
     id: `attendance-${latest.id || label}-${timestamp}`,
     type: "Attendance",
@@ -204,26 +160,15 @@ const buildAttendanceNotification = (attendancePayload, options = {}) => {
   };
 };
 
-// -------------------------------------------
-// Class board announcements
-// -------------------------------------------
 const fetchClassBoardAnnouncements = async ({ level, className } = {}) => {
   if (!level || !className || !isFirebaseConfigured || !db) return [];
-
   const levels = normalizeLevelTokens(level);
   const targetLevels = levels.length ? levels : [level];
   const snapshots = await Promise.all(
     targetLevels.map((levelToken) =>
-      getDocs(
-        query(
-          collection(db, "class_board", levelToken, "classes", className, "posts"),
-          orderBy("createdAt", "desc"),
-          limit(5)
-        )
-      )
+      getDocs(query(collection(db, "class_board", levelToken, "classes", className, "posts"), orderBy("createdAt", "desc"), limit(5)))
     )
   );
-
   return snapshots.flatMap((snapshot) =>
     snapshot.docs.map((docSnapshot) => {
       const data = docSnapshot.data() || {};
@@ -231,15 +176,8 @@ const fetchClassBoardAnnouncements = async ({ level, className } = {}) => {
       return {
         id: docSnapshot.id,
         type: "Class board",
-        title:
-          data.topic ||
-          data.questionTitle ||
-          data.lessonLabel ||
-          "New class post",
-        body:
-          data.question ||
-          data.instructions ||
-          "Your tutor posted a new discussion.",
+        title: data.topic || data.questionTitle || data.lessonLabel || "New class post",
+        body: data.question || data.instructions || "Your tutor posted a new discussion.",
         timestamp,
         route: "/campus/discussion",
       };
@@ -247,12 +185,24 @@ const fetchClassBoardAnnouncements = async ({ level, className } = {}) => {
   );
 };
 
-// -------------------------------------------
-// Main function: Fetch all notifications
-// -------------------------------------------
+const normalizeStoredNotification = (docSnapshot) => {
+  const data = docSnapshot.data() || {};
+  const timestamp = parseTimestamp(data.timestamp || data.sentAt || data.createdAt) || Date.now();
+  return {
+    id: docSnapshot.id,
+    type: data.type || "Update",
+    title: data.title || "New update",
+    body: data.body || data.message || "",
+    timestamp,
+    source: data.source || "push",
+    route: data.route || data.data?.route || "",
+    url: data.url || data.data?.url || "",
+    data: data.data || {},
+  };
+};
+
 export const fetchStudentNotifications = async (profile) => {
   if (!profile || !isFirebaseConfigured || !db) return [];
-
   const studentCode = studentCodeFromProfile(profile);
   const studentUid = profile.uid || profile.id || "";
 
@@ -260,29 +210,27 @@ export const fetchStudentNotifications = async (profile) => {
     if (!profile?.id) return [];
     const ref = collection(db, "students", profile.id, "notifications");
     const snapshot = await getDocs(query(ref, orderBy("timestamp", "desc"), limit(20)));
-    return snapshot.docs.map((docSnapshot) => {
-      const data = docSnapshot.data() || {};
-      const timestamp = parseTimestamp(data.timestamp || data.sentAt || data.createdAt) || Date.now();
-      return {
-        id: docSnapshot.id,
-        type: data.type || "Update",
-        title: data.title || "New update",
-        body: data.body || "",
-        timestamp,
-        source: data.source || "push",
-        route: data.route || data.data?.route || "",
-        url: data.url || data.data?.url || "",
-        data: data.data || {},
-      };
-    });
+    return snapshot.docs.map(normalizeStoredNotification);
+  };
+
+  const fetchTopLevelStudentNotifications = async () => {
+    const codes = uniqueStudentCodes(profile);
+    if (!codes.length) return [];
+    const chunks = [];
+    for (let i = 0; i < codes.length; i += 10) chunks.push(codes.slice(i, i + 10));
+    const snapshots = await Promise.all(
+      chunks.map((chunk) => getDocs(query(collection(db, "studentNotifications"), where("studentCode", "in", chunk), limit(20))))
+    );
+    return snapshots.flatMap((snapshot) => snapshot.docs.map(normalizeStoredNotification));
   };
 
   const levelTokens = normalizeLevelTokens(profile.level);
-  const [resultsPayload, attendancePayload, classBoard, storedNotifications] = await Promise.all([
+  const [resultsPayload, attendancePayload, classBoard, storedNotifications, topLevelNotifications] = await Promise.all([
     fetchResults({ level: levelTokens.length ? levelTokens : profile.level, studentCode, email: profile.email }),
     fetchAttendanceRecords({ className: profile.className, studentCode, studentUid }),
     fetchClassBoardAnnouncements({ level: profile.level, className: profile.className }),
     fetchStoredNotifications(),
+    fetchTopLevelStudentNotifications(),
   ]);
 
   const latestAttendancePush = (storedNotifications || []).find((entry) => {
@@ -292,14 +240,12 @@ export const fetchStudentNotifications = async (profile) => {
     const dataType = String(data?.type || "").toLowerCase();
     return source === "push" && (type.includes("attendance") || dataType.includes("attendance"));
   });
-
   const attendancePushData = getStoredNotificationData(latestAttendancePush);
-  const attendanceContext = {
-    sessionId: attendancePushData?.sessionId || "",
-  };
+  const attendanceContext = { sessionId: attendancePushData?.sessionId || "" };
 
   const candidates = [
     ...(storedNotifications || []),
+    ...(topLevelNotifications || []),
     buildScoreNotification(resultsPayload),
     buildAttendanceNotification(attendancePayload, attendanceContext),
     ...classBoard,
@@ -315,9 +261,7 @@ export const fetchStudentNotifications = async (profile) => {
     return acc;
   }, { items: [], map: new Map() });
 
-  return deduped.items
-    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-    .slice(0, 20);
+  return deduped.items.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)).slice(0, 20);
 };
 
 export const buildPushNotification = (payload = {}) => {
@@ -340,22 +284,15 @@ export const persistPushNotification = async ({ studentId, payload, notification
   if (!studentId || !payload || !isFirebaseConfigured || !db) return null;
   const normalized = notification || buildPushNotification(payload);
   if (!normalized) return null;
-
   const { data, ...rest } = normalized;
   delete rest.id;
-  const payloadToWrite = {
-    ...rest,
-    data: data || payload?.data || {},
-    createdAt: serverTimestamp(),
-  };
-
+  const payloadToWrite = { ...rest, data: data || payload?.data || {}, createdAt: serverTimestamp() };
   const targetId = resolvePushId(payload);
   if (targetId) {
     const docRef = doc(db, "students", studentId, "notifications", targetId);
     await setDoc(docRef, payloadToWrite, { merge: true });
     return targetId;
   }
-
   const collectionRef = collection(db, "students", studentId, "notifications");
   const docRef = await addDoc(collectionRef, payloadToWrite);
   return docRef.id;
@@ -374,11 +311,9 @@ export const createStudentNotificationEvent = async (profile, event = {}) => {
     createdAt: serverTimestamp(),
   };
   delete payloadToWrite.id;
-
   const collectionRef = collection(db, "students", profile.id, "notifications");
   const docRef = await addDoc(collectionRef, payloadToWrite);
   const notification = { ...normalized, id: docRef.id };
-
   try {
     if (typeof window !== "undefined") {
       window.dispatchEvent(new CustomEvent("falowen:push-notification", { detail: { notification } }));
@@ -386,8 +321,5 @@ export const createStudentNotificationEvent = async (profile, event = {}) => {
   } catch (error) {
     console.error("Failed to dispatch notification event", error);
   }
-
   return docRef.id;
 };
-
-export { fetchClassBoardAnnouncements, buildAttendanceNotification };
