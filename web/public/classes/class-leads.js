@@ -52,6 +52,19 @@
     return `${hour}:${String(minute).padStart(2, "0")} ${suffix}`;
   }
 
+  function getCourseTitle(course) {
+    if (course?.title) return course.title;
+    const level = String(course?.level || "German").trim();
+    const city = String(course?.city || "").trim();
+    if (course?.availability === "always" && level) return `${level} Self-learning`;
+    if (level && city) return `${level} ${city} Klasse`;
+    return level || city || "German class";
+  }
+
+  function getCourseSlug(course) {
+    return slugify(course?.slug || course?.id || getCourseTitle(course));
+  }
+
   function getLeadEndpoint(data) {
     return (
       window.FALOWEN_CLASS_LEAD_ENDPOINT ||
@@ -120,6 +133,7 @@
       .lead-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 12px; color: #334155; line-height: 1.45; }
       .lead-consent input { margin-top: 2px; }
       .lead-consent a { color: #1455f5; }
+      .lead-open-link { display: inline-flex; width: fit-content; color: #1455f5; font-weight: 850; text-decoration: none; }
       @media (min-width: 760px) {
         .lead-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .lead-field.full { grid-column: 1 / -1; }
@@ -132,14 +146,14 @@
     const times = Array.isArray(course.meetingDays)
       ? course.meetingDays.map((slot) => `${slot.day} ${formatTime(slot.startTime)}-${formatTime(slot.endTime)}`).join(", ")
       : "Self-learning";
-    return `${course.title} · Starts ${formatDate(course.startDate)} · ${times}`;
+    return `${getCourseTitle(course)} · Starts ${formatDate(course.startDate)} · ${times}`;
   }
 
   function currentCourseFromData(data) {
     const requestedSlug = getRequestedSlug();
     const classes = data.classes || [];
     return (
-      classes.find((course) => slugify(course.slug || course.title) === requestedSlug) ||
+      classes.find((course) => getCourseSlug(course) === requestedSlug) ||
       classes.find((course) => course.availability !== "always") ||
       classes[0]
     );
@@ -152,6 +166,12 @@
     status.setAttribute("role", isError ? "alert" : "status");
     status.setAttribute("aria-live", "polite");
     if (message) status.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function openClassPage(course) {
+    const slug = getCourseSlug(course) || getRequestedSlug();
+    if (!slug) return;
+    window.location.assign(`/classes/${encodeURIComponent(slug)}/`);
   }
 
   function renderLeadCard(data) {
@@ -192,18 +212,23 @@
           <div class="lead-field">
             <label for="leadClass">Class / level you want</label>
             <select id="leadClass" name="classSlug" required>
-              ${classes.map((course) => `<option value="${course.slug}" ${course.id === selected?.id ? "selected" : ""}>${getClassSummary(course)}</option>`).join("")}
+              ${classes.map((course) => {
+                const slug = getCourseSlug(course);
+                const isSelected = slug === getCourseSlug(selected);
+                return `<option value="${slug}" ${isSelected ? "selected" : ""}>${getClassSummary(course)}</option>`;
+              }).join("")}
             </select>
             <div class="lead-inline-error" id="leadClassError"></div>
           </div>
         </div>
         <label class="lead-consent" for="leadConsent">
-          <input id="leadConsent" name="consent" type="checkbox" required />
+          <input id="leadConsent" name="consent" type="checkbox" />
           <span>I agree to be contacted by Falowen via WhatsApp, phone, or email about this class enquiry. Read our <a href="/privacy" target="_blank" rel="noreferrer">privacy policy</a>.</span>
         </label>
         <div class="lead-inline-error" id="leadConsentError"></div>
         <p class="lead-help">Your details sync to the Falowen lead sheet. After saving, we will open the class page you selected.</p>
         <button class="button primary lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
+        <a class="lead-open-link" id="leadOpenClassLink" href="/classes/${getCourseSlug(selected)}/">Open selected class information without saving</a>
         <div class="lead-status" id="leadStatus"></div>
       </form>
     `;
@@ -227,6 +252,20 @@
     const classError = card.querySelector("#leadClassError");
     const consentError = card.querySelector("#leadConsentError");
     const submitButton = card.querySelector("#leadSubmitButton");
+    const openLink = card.querySelector("#leadOpenClassLink");
+
+    function selectedCourse() {
+      return classes.find((item) => getCourseSlug(item) === select.value) || selected || classes[0];
+    }
+
+    function syncOpenLink() {
+      const course = selectedCourse();
+      const slug = getCourseSlug(course);
+      if (openLink && slug) openLink.href = `/classes/${encodeURIComponent(slug)}/`;
+    }
+
+    syncOpenLink();
+    select.addEventListener("change", syncOpenLink);
 
     function normalizePhone(value) {
       return String(value || "").replace(/\s+/g, "").replace(/[()\-]/g, "");
@@ -238,18 +277,6 @@
       });
     }
 
-    function focusFirstInvalid() {
-      const pairs = [
-        [nameInput, nameError],
-        [phoneInput, phoneError],
-        [emailInput, emailError],
-        [select, classError],
-        [consentInput, consentError],
-      ];
-      const firstInvalid = pairs.find(([, errorNode]) => errorNode?.textContent);
-      firstInvalid?.[0]?.focus?.();
-    }
-
     function validateLeadForm() {
       let valid = true;
       const name = nameInput.value.trim();
@@ -259,9 +286,6 @@
 
       if (!name) {
         nameError.textContent = "Enter your full name before continuing.";
-        valid = false;
-      } else if (name.split(/\s+/).filter(Boolean).length < 2) {
-        nameError.textContent = "Enter your first name and surname.";
         valid = false;
       }
 
@@ -287,8 +311,7 @@
       }
 
       if (!consentInput.checked) {
-        consentError.textContent = "Tick the agreement box so we can contact you about this class.";
-        valid = false;
+        consentError.textContent = "You can continue, but tick this box if you want us to contact you about the class.";
       }
 
       phoneInput.value = phone;
@@ -297,30 +320,31 @@
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      form.dataset.leadReady = "false";
+      form.dataset.leadReady = "true";
       const status = card.querySelector("#leadStatus");
       setStatus(status, "", false);
 
-      if (!validateLeadForm()) {
-        setStatus(status, "Please correct the highlighted fields before continuing.", true);
-        focusFirstInvalid();
-        return;
-      }
-
-      const course = classes.find((item) => item.slug === select.value) || selected || classes[0];
+      const course = selectedCourse();
       if (!course) {
-        setStatus(status, "Could not find the selected class. Please choose another class and try again.", true);
-        select.focus();
+        setStatus(status, "Could not find the selected class. Please choose another class or use the open-class link below.", true);
         return;
       }
 
-      form.dataset.leadReady = "true";
+      const isValid = validateLeadForm();
       submitButton.disabled = true;
-      submitButton.textContent = "Saving...";
+      submitButton.textContent = isValid ? "Saving..." : "Opening class...";
+
       const lead = buildLead(card, course);
       saveStoredLead(lead);
       updateSignupLinksWithLead(lead);
-      submitLead(data, lead);
+
+      if (!isValid) {
+        setStatus(status, "Some contact details need correction, but opening the class information now.", true);
+        window.setTimeout(() => openClassPage(course), 700);
+        return;
+      }
+
+      submitLead(data, lead, course);
     });
   }
 
@@ -334,9 +358,9 @@
       phone: card.querySelector("#leadPhone").value.trim(),
       email: card.querySelector("#leadEmail").value.trim(),
       consentToContact: !!card.querySelector("#leadConsent")?.checked,
-      classId: course.id || "",
-      classSlug: course.slug || slugify(course.title),
-      className: course.title || "",
+      classId: course.id || getCourseSlug(course),
+      classSlug: getCourseSlug(course),
+      className: getCourseTitle(course),
       level: course.level || "",
       startDate: course.startDate || "",
       endDate: course.endDate || "",
@@ -358,21 +382,21 @@
     });
   }
 
-  function submitLead(data, lead) {
+  function submitLead(data, lead, course) {
     const status = document.getElementById("leadStatus");
     const endpoint = getLeadEndpoint(data);
-    const classUrl = `/classes/${encodeURIComponent(lead.classSlug)}/`;
+    const targetCourse = course || { slug: lead.classSlug, title: lead.className };
     let opened = false;
     const openClass = () => {
       if (opened) return;
       opened = true;
-      window.location.assign(classUrl);
+      openClassPage(targetCourse);
     };
 
     if (status) setStatus(status, "Saving enquiry and opening class information...", false);
 
     if (!endpoint) {
-      window.setTimeout(openClass, 350);
+      window.setTimeout(openClass, 250);
       return;
     }
 
@@ -385,8 +409,8 @@
 
     Promise.race([
       submission,
-      new Promise((resolve) => window.setTimeout(resolve, 1600)),
-    ]).finally(() => window.setTimeout(openClass, 200));
+      new Promise((resolve) => window.setTimeout(resolve, 900)),
+    ]).finally(() => window.setTimeout(openClass, 100));
   }
 
   function init() {
