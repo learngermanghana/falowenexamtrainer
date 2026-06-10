@@ -63,12 +63,12 @@
     document.addEventListener("submit", function (event) {
       var form = event.target;
       if (!form || form.id !== "leadCaptureForm" || !isFormPage()) return;
-      if (form.dataset.leadReady !== "true") return;
       var select = form.querySelector("#leadClass");
       var slug = select && select.value ? select.value : selectedSlug();
+      if (!slug) return;
       var status = document.getElementById("leadStatus");
-      if (status) status.textContent = "Saved. Opening selected class information...";
-      window.setTimeout(function () { window.location.assign(detailsUrl(slug)); }, 900);
+      if (status && !status.classList.contains("error")) status.textContent = "Opening selected class information...";
+      window.setTimeout(function () { window.location.assign(detailsUrl(slug)); }, 1500);
     }, true);
   }
 
