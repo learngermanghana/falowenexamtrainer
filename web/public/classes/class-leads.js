@@ -14,6 +14,10 @@
       .replace(/^-|-$/g, "");
   }
 
+  function currentUrl() {
+    return new URL(window.location.href);
+  }
+
   function isLeadLandingPage() {
     const path = window.location.pathname.replace(/\/+$/, "") || "/";
     return path === "/classes" || path === "/classes/index.html";
@@ -21,6 +25,16 @@
 
   function isExactClassPage() {
     return /^\/classes\/[^/]+\/?$/.test(window.location.pathname);
+  }
+
+  function isOpenMode() {
+    const params = currentUrl().searchParams;
+    return params.get("open") === "1" || params.get("view") === "details" || params.get("details") === "1";
+  }
+
+  function isDebugMode() {
+    const params = currentUrl().searchParams;
+    return params.get("debug") === "1" || localStorage.getItem("falowen:class-lead-debug") === "1";
   }
 
   function safeJsonParse(value, fallback) {
@@ -32,7 +46,7 @@
   }
 
   function getRequestedSlug() {
-    const url = new URL(window.location.href);
+    const url = currentUrl();
     const querySlug = url.searchParams.get("class") || url.searchParams.get("slug") || url.searchParams.get("level");
     if (querySlug) return slugify(querySlug);
     const match = window.location.pathname.match(/^\/classes\/([^/]+)\/?$/);
@@ -46,7 +60,8 @@
 
   function formatTime(time) {
     if (!time) return "";
-    const [hourRaw, minute] = time.split(":").map(Number);
+    const [hourRaw, minute] = String(time || "").split(":").map(Number);
+    if (!Number.isFinite(hourRaw) || !Number.isFinite(minute)) return String(time || "");
     const suffix = hourRaw >= 12 ? "pm" : "am";
     const hour = hourRaw % 12 || 12;
     return `${hour}:${String(minute).padStart(2, "0")} ${suffix}`;
@@ -63,6 +78,16 @@
 
   function getCourseSlug(course) {
     return slugify(course?.slug || course?.id || getCourseTitle(course));
+  }
+
+  function buildClassUrl(courseOrSlug, extraParams) {
+    const slug = typeof courseOrSlug === "string" ? slugify(courseOrSlug) : getCourseSlug(courseOrSlug);
+    const params = new URLSearchParams({ class: slug, open: "1" });
+    if (isDebugMode()) params.set("debug", "1");
+    Object.entries(extraParams || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") params.set(key, String(value));
+    });
+    return `/classes/?${params.toString()}`;
   }
 
   function getLeadEndpoint(data) {
@@ -103,7 +128,16 @@
 
   function shouldGate() {
     if (isExactClassPage()) return false;
+    if (isOpenMode()) return false;
     return isLeadLandingPage();
+  }
+
+  function writeDebug(payload) {
+    const output = document.getElementById("leadDebugOutput");
+    if (!output) return;
+    const previous = safeJsonParse(output.textContent || "[]", []);
+    previous.unshift({ at: new Date().toISOString(), ...payload });
+    output.textContent = JSON.stringify(previous.slice(0, 8), null, 2);
   }
 
   function injectStyles() {
@@ -134,6 +168,9 @@
       .lead-consent input { margin-top: 2px; }
       .lead-consent a { color: #1455f5; }
       .lead-open-link { display: inline-flex; width: fit-content; color: #1455f5; font-weight: 850; text-decoration: none; }
+      .lead-debug { display: none; border: 1px dashed #93c5fd; border-radius: 12px; padding: 8px 10px; background: #eff6ff; color: #1e3a8a; font-size: 12px; }
+      .lead-debug.active { display: block; }
+      .lead-debug pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; }
       @media (min-width: 760px) {
         .lead-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .lead-field.full { grid-column: 1 / -1; }
@@ -168,14 +205,15 @@
     if (message) status.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  function openClassPage(course) {
-    const slug = getCourseSlug(course) || getRequestedSlug();
-    if (!slug) return;
-    window.location.assign(`/classes/${encodeURIComponent(slug)}/`);
+  function openClassPage(course, reason) {
+    const url = buildClassUrl(course, reason ? { reason } : null);
+    writeDebug({ step: "openClassPage", url, reason, slug: typeof course === "string" ? course : getCourseSlug(course) });
+    if (!url.includes("class=")) return;
+    window.location.href = url;
   }
 
   function renderLeadCard(data) {
-    if (!isLeadLandingPage()) return;
+    if (!isLeadLandingPage() || isOpenMode()) return;
     if (document.getElementById("leadCaptureCard")) return;
     const hero = document.querySelector(".hero");
     if (!hero) return;
@@ -183,6 +221,7 @@
     const classes = data.classes || [];
     const selected = currentCourseFromData(data);
     const lastLead = getLastLead();
+    const selectedSlug = getCourseSlug(selected);
 
     const card = document.createElement("section");
     card.id = "leadCaptureCard";
@@ -214,7 +253,7 @@
             <select id="leadClass" name="classSlug" required>
               ${classes.map((course) => {
                 const slug = getCourseSlug(course);
-                const isSelected = slug === getCourseSlug(selected);
+                const isSelected = slug === selectedSlug;
                 return `<option value="${slug}" ${isSelected ? "selected" : ""}>${getClassSummary(course)}</option>`;
               }).join("")}
             </select>
@@ -228,8 +267,12 @@
         <div class="lead-inline-error" id="leadConsentError"></div>
         <p class="lead-help">Your details sync to the Falowen lead sheet. After saving, we will open the class page you selected.</p>
         <button class="button primary lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
-        <a class="lead-open-link" id="leadOpenClassLink" href="/classes/${getCourseSlug(selected)}/">Open selected class information without saving</a>
+        <a class="lead-open-link" id="leadOpenClassLink" href="${buildClassUrl(selected)}">Open selected class information without saving</a>
         <div class="lead-status" id="leadStatus"></div>
+        <details class="lead-debug ${isDebugMode() ? "active" : ""}" id="leadDebugBox" ${isDebugMode() ? "open" : ""}>
+          <summary>Class form debug</summary>
+          <pre id="leadDebugOutput">[]</pre>
+        </details>
       </form>
     `;
     hero.insertAdjacentElement("afterend", card);
@@ -253,6 +296,7 @@
     const consentError = card.querySelector("#leadConsentError");
     const submitButton = card.querySelector("#leadSubmitButton");
     const openLink = card.querySelector("#leadOpenClassLink");
+    const debugBox = card.querySelector("#leadDebugBox");
 
     function selectedCourse() {
       return classes.find((item) => getCourseSlug(item) === select.value) || selected || classes[0];
@@ -260,12 +304,17 @@
 
     function syncOpenLink() {
       const course = selectedCourse();
-      const slug = getCourseSlug(course);
-      if (openLink && slug) openLink.href = `/classes/${encodeURIComponent(slug)}/`;
+      const url = buildClassUrl(course);
+      if (openLink && url) openLink.href = url;
+      writeDebug({ step: "syncOpenLink", selectedValue: select.value, url, classCount: classes.length });
     }
 
     syncOpenLink();
     select.addEventListener("change", syncOpenLink);
+    openLink.addEventListener("click", function () {
+      if (debugBox) debugBox.classList.add("active");
+      writeDebug({ step: "manualOpenLinkClick", href: openLink.href });
+    });
 
     function normalizePhone(value) {
       return String(value || "").replace(/\s+/g, "").replace(/[()\-]/g, "");
@@ -320,13 +369,17 @@
 
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-      form.dataset.leadReady = "true";
       const status = card.querySelector("#leadStatus");
       setStatus(status, "", false);
+      if (debugBox) debugBox.classList.add("active");
 
       const course = selectedCourse();
-      if (!course) {
-        setStatus(status, "Could not find the selected class. Please choose another class or use the open-class link below.", true);
+      const targetUrl = buildClassUrl(course);
+      writeDebug({ step: "submit", selectedValue: select.value, targetUrl, courseTitle: getCourseTitle(course), courseSlug: getCourseSlug(course) });
+
+      if (!course || !getCourseSlug(course)) {
+        setStatus(status, "Could not find the selected class. Use the debug box below and send a screenshot.", true);
+        writeDebug({ step: "blocked", reason: "missing_course_or_slug", classes: classes.map((item) => ({ title: getCourseTitle(item), slug: getCourseSlug(item) })) });
         return;
       }
 
@@ -335,12 +388,16 @@
       submitButton.textContent = isValid ? "Saving..." : "Opening class...";
 
       const lead = buildLead(card, course);
-      saveStoredLead(lead);
-      updateSignupLinksWithLead(lead);
+      try {
+        saveStoredLead(lead);
+        updateSignupLinksWithLead(lead);
+      } catch (error) {
+        writeDebug({ step: "localSaveError", message: error?.message || String(error) });
+      }
 
       if (!isValid) {
-        setStatus(status, "Some contact details need correction, but opening the class information now.", true);
-        window.setTimeout(() => openClassPage(course), 700);
+        setStatus(status, "Opening the class information. Some contact details were not saved correctly.", true);
+        window.setTimeout(() => openClassPage(course, "validation_fallback"), 500);
         return;
       }
 
@@ -387,16 +444,17 @@
     const endpoint = getLeadEndpoint(data);
     const targetCourse = course || { slug: lead.classSlug, title: lead.className };
     let opened = false;
-    const openClass = () => {
+    const openClass = (reason) => {
       if (opened) return;
       opened = true;
-      openClassPage(targetCourse);
+      openClassPage(targetCourse, reason || "lead_saved_or_timeout");
     };
 
     if (status) setStatus(status, "Saving enquiry and opening class information...", false);
+    writeDebug({ step: "submitLead", endpoint: endpoint ? "configured" : "missing", target: buildClassUrl(targetCourse) });
 
     if (!endpoint) {
-      window.setTimeout(openClass, 250);
+      window.setTimeout(() => openClass("no_endpoint"), 250);
       return;
     }
 
@@ -405,30 +463,44 @@
       mode: "no-cors",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify({ action: "saveLead", lead }),
-    }).catch(() => {});
+    }).catch((error) => {
+      writeDebug({ step: "leadFetchError", message: error?.message || String(error) });
+    });
 
     Promise.race([
       submission,
       new Promise((resolve) => window.setTimeout(resolve, 900)),
-    ]).finally(() => window.setTimeout(openClass, 100));
+    ]).finally(() => window.setTimeout(() => openClass("fetch_complete_or_timeout"), 100));
   }
 
   function init() {
     injectStyles();
     if (shouldGate()) document.body.classList.add("lead-gate-active");
+    else document.body.classList.remove("lead-gate-active");
     if (isExactClassPage()) document.body.classList.remove("lead-gate-active");
 
     fetch("/classes/classes-data.json")
       .then((response) => response.json())
       .then((data) => {
+        writeDebug({ step: "dataLoaded", classCount: data?.classes?.length || 0, requestedSlug: getRequestedSlug(), openMode: isOpenMode() });
         renderLeadCard(data);
         const lead = getLastLead();
         if (lead) updateSignupLinksWithLead(lead);
       })
-      .catch(() => {
+      .catch((error) => {
         document.body.classList.remove("lead-gate-active");
+        writeDebug({ step: "dataLoadError", message: error?.message || String(error) });
       });
   }
+
+  window.FalowenClassLeadDebug = {
+    slugify,
+    getCourseTitle,
+    getCourseSlug,
+    buildClassUrl,
+    shouldGate,
+    isOpenMode,
+  };
 
   window.addEventListener("load", init);
   setTimeout(init, 350);
