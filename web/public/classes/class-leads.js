@@ -145,6 +145,15 @@
     );
   }
 
+  function setStatus(status, message, isError) {
+    if (!status) return;
+    status.textContent = message || "";
+    status.classList.toggle("error", Boolean(isError));
+    status.setAttribute("role", isError ? "alert" : "status");
+    status.setAttribute("aria-live", "polite");
+    if (message) status.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
   function renderLeadCard(data) {
     if (!isLeadLandingPage()) return;
     if (document.getElementById("leadCaptureCard")) return;
@@ -163,11 +172,12 @@
         <h2>Fill the form to continue</h2>
         <p>No payment question here. We only collect your contact details and selected class for follow-up.</p>
       </div>
-      <form class="lead-capture-form" id="leadCaptureForm">
+      <form class="lead-capture-form" id="leadCaptureForm" novalidate>
         <div class="lead-form-grid">
           <div class="lead-field">
             <label for="leadName">Full name</label>
             <input id="leadName" name="name" autocomplete="name" required placeholder="Enter your full name" />
+            <div class="lead-inline-error" id="leadNameError"></div>
           </div>
           <div class="lead-field">
             <label for="leadPhone">Phone / WhatsApp</label>
@@ -184,12 +194,14 @@
             <select id="leadClass" name="classSlug" required>
               ${classes.map((course) => `<option value="${course.slug}" ${course.id === selected?.id ? "selected" : ""}>${getClassSummary(course)}</option>`).join("")}
             </select>
+            <div class="lead-inline-error" id="leadClassError"></div>
           </div>
         </div>
         <label class="lead-consent" for="leadConsent">
           <input id="leadConsent" name="consent" type="checkbox" required />
           <span>I agree to be contacted by Falowen via WhatsApp, phone, or email about this class enquiry. Read our <a href="/privacy" target="_blank" rel="noreferrer">privacy policy</a>.</span>
         </label>
+        <div class="lead-inline-error" id="leadConsentError"></div>
         <p class="lead-help">Your details sync to the Falowen lead sheet. After saving, we will open the class page you selected.</p>
         <button class="button primary lead-submit" id="leadSubmitButton" type="submit">${getLeadCtaCopy()}</button>
         <div class="lead-status" id="leadStatus"></div>
@@ -203,30 +215,79 @@
       card.querySelector("#leadEmail").value = lastLead.email || "";
     }
 
+    const form = card.querySelector("#leadCaptureForm");
     const select = card.querySelector("#leadClass");
+    const nameInput = card.querySelector("#leadName");
     const emailInput = card.querySelector("#leadEmail");
     const phoneInput = card.querySelector("#leadPhone");
+    const consentInput = card.querySelector("#leadConsent");
+    const nameError = card.querySelector("#leadNameError");
     const emailError = card.querySelector("#leadEmailError");
     const phoneError = card.querySelector("#leadPhoneError");
+    const classError = card.querySelector("#leadClassError");
+    const consentError = card.querySelector("#leadConsentError");
+    const submitButton = card.querySelector("#leadSubmitButton");
 
     function normalizePhone(value) {
       return String(value || "").replace(/\s+/g, "").replace(/[()\-]/g, "");
     }
 
+    function clearErrors() {
+      [nameError, emailError, phoneError, classError, consentError].forEach((node) => {
+        if (node) node.textContent = "";
+      });
+    }
+
+    function focusFirstInvalid() {
+      const pairs = [
+        [nameInput, nameError],
+        [phoneInput, phoneError],
+        [emailInput, emailError],
+        [select, classError],
+        [consentInput, consentError],
+      ];
+      const firstInvalid = pairs.find(([, errorNode]) => errorNode?.textContent);
+      firstInvalid?.[0]?.focus?.();
+    }
+
     function validateLeadForm() {
       let valid = true;
+      const name = nameInput.value.trim();
       const email = emailInput.value.trim();
       const phone = normalizePhone(phoneInput.value);
-      emailError.textContent = "";
-      phoneError.textContent = "";
+      clearErrors();
 
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      if (!name) {
+        nameError.textContent = "Enter your full name before continuing.";
+        valid = false;
+      } else if (name.split(/\s+/).filter(Boolean).length < 2) {
+        nameError.textContent = "Enter your first name and surname.";
+        valid = false;
+      }
+
+      if (!phone) {
+        phoneError.textContent = "Enter your phone or WhatsApp number.";
+        valid = false;
+      } else if (!/^\+?[0-9]{8,15}$/.test(phone)) {
+        phoneError.textContent = "Enter a valid phone number with 8 to 15 digits.";
+        valid = false;
+      }
+
+      if (!email) {
+        emailError.textContent = "Enter your email address.";
+        valid = false;
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         emailError.textContent = "Enter a valid email address (example: name@email.com).";
         valid = false;
       }
 
-      if (!/^\+?[0-9]{8,15}$/.test(phone)) {
-        phoneError.textContent = "Enter a valid phone number with 8 to 15 digits.";
+      if (!select.value) {
+        classError.textContent = "Select the class or level you want.";
+        valid = false;
+      }
+
+      if (!consentInput.checked) {
+        consentError.textContent = "Tick the agreement box so we can contact you about this class.";
         valid = false;
       }
 
@@ -234,17 +295,28 @@
       return valid;
     }
 
-    card.querySelector("#leadCaptureForm").addEventListener("submit", (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
+      form.dataset.leadReady = "false";
       const status = card.querySelector("#leadStatus");
-      status.textContent = "";
-      status.classList.remove("error");
+      setStatus(status, "", false);
+
       if (!validateLeadForm()) {
-        status.textContent = "Please correct highlighted fields before continuing.";
-        status.classList.add("error");
+        setStatus(status, "Please correct the highlighted fields before continuing.", true);
+        focusFirstInvalid();
         return;
       }
+
       const course = classes.find((item) => item.slug === select.value) || selected || classes[0];
+      if (!course) {
+        setStatus(status, "Could not find the selected class. Please choose another class and try again.", true);
+        select.focus();
+        return;
+      }
+
+      form.dataset.leadReady = "true";
+      submitButton.disabled = true;
+      submitButton.textContent = "Saving...";
       const lead = buildLead(card, course);
       saveStoredLead(lead);
       updateSignupLinksWithLead(lead);
@@ -297,7 +369,7 @@
       window.location.assign(classUrl);
     };
 
-    if (status) status.textContent = "Saving enquiry and opening class information...";
+    if (status) setStatus(status, "Saving enquiry and opening class information...", false);
 
     if (!endpoint) {
       window.setTimeout(openClass, 350);
