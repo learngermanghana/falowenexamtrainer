@@ -255,11 +255,18 @@ const A2Day13VorstellungsgespraechWorkbookPage = () => {
           </div>
 
           <h3 style={sectionTitle}>Hauptfrage</h3>
-          <p style={{ margin: 0, lineHeight: 1.7 }}>
-            Sie befinden sich in einem Vorstellungsgespräch bei Amazon. Bitte stellen Sie sich vor. Beschreiben Sie, wer
-            Sie sind, welche Ausbildung und Berufserfahrung Sie mitbringen, welche Fähigkeiten Sie besitzen und warum Sie
-            sich für diese Position bei Amazon interessieren.
-          </p>
+          <div style={{ ...questionCardStyle, background: "#eff6ff" }}>
+            <strong>Sie befinden sich in einem Vorstellungsgespräch bei Amazon. Bitte stellen Sie sich vor.</strong>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>Gehen Sie in Ihrer Antwort auf diese Punkte ein:</p>
+            <ul style={listSpacing}>
+              <li><strong>Wer sind Sie?</strong> Nennen Sie zum Beispiel Ihren Namen, Ihren Wohnort und Ihre Interessen.</li>
+              <li><strong>Welche Ausbildung bringen Sie mit?</strong></li>
+              <li><strong>Welche Berufserfahrung haben Sie?</strong></li>
+              <li><strong>Welche Fähigkeiten und Qualifikationen besitzen Sie?</strong></li>
+              <li><strong>Warum interessieren Sie sich für diese Position bei Amazon?</strong></li>
+            </ul>
+            <p style={{ margin: 0, lineHeight: 1.7 }}>Sprechen Sie in vollständigen Sätzen.</p>
+          </div>
           <p style={{ margin: 0, color: "#4b5563" }}>
             Schlüsselwörter: Name · Ausbildung · Berufserfahrung · Fähigkeiten · Motivation · Qualifikationen · Interessen ·
             Berufsziel
