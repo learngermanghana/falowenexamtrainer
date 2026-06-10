@@ -14,6 +14,11 @@
     return /^\/classes\/[^/]+\/?$/.test(window.location.pathname);
   }
 
+  function isOpenMode() {
+    var url = new URL(window.location.href);
+    return url.searchParams.get("open") === "1" || url.searchParams.get("view") === "details" || url.searchParams.get("details") === "1";
+  }
+
   function isClassArea() {
     return isFormPage() || isDetailPage();
   }
@@ -41,7 +46,7 @@
     var originalPushState = history.pushState.bind(history);
 
     function shouldBlockUrl(url) {
-      return isFormPage() && typeof url === "string" && /^\/classes\/[^/]+\/?$/.test(url);
+      return !isOpenMode() && isFormPage() && typeof url === "string" && /^\/classes\/[^/]+\/?$/.test(url);
     }
 
     history.replaceState = function (state, title, url) {
@@ -91,7 +96,10 @@
   }
 
   function updateHeroForForm() {
-    if (!isFormPage()) return;
+    if (!isFormPage() || isOpenMode()) {
+      document.body.classList.remove("simple-classes-form", "lead-gate-active");
+      return;
+    }
     document.body.classList.add("simple-classes-form");
     document.body.classList.remove("lead-gate-active");
     var eyebrow = document.querySelector(".hero .eyebrow");
@@ -103,7 +111,7 @@
   }
 
   function improveLeadFormText() {
-    if (!isFormPage()) return;
+    if (!isFormPage() || isOpenMode()) return;
     var h2 = document.querySelector("#leadCaptureCard h2");
     var p = document.querySelector("#leadCaptureCard p");
     var button = document.querySelector("#leadCaptureForm button[type='submit']");
@@ -127,13 +135,13 @@
       var status = document.getElementById("leadStatus");
       if (status) status.textContent = "Saved. Opening selected class information...";
       window.setTimeout(function () {
-        window.location.assign(detailsUrl(slug));
+        window.location.assign("/classes/?class=" + encodeURIComponent(slug) + "&open=1");
       }, 500);
     }, true);
   }
 
   function updateDetailButtons() {
-    if (!isDetailPage()) return;
+    if (!isDetailPage() && !isOpenMode()) return;
     document.body.classList.remove("lead-gate-active", "simple-classes-form");
     var leadCard = document.getElementById("leadCaptureCard");
     if (leadCard) leadCard.remove();
@@ -152,7 +160,7 @@
   }
 
   function renderOtherClasses(data) {
-    if (!isDetailPage() || document.getElementById("otherAvailableClasses")) return;
+    if ((!isDetailPage() && !isOpenMode()) || document.getElementById("otherAvailableClasses")) return;
     var currentSlug = selectedSlug();
     var courses = (data.classes || [])
       .filter(isOpenClass)
@@ -188,7 +196,7 @@
   }
 
   function syncFeesForCurrentClass(data) {
-    if (!isDetailPage()) return;
+    if (!isDetailPage() && !isOpenMode()) return;
     var source = data || cachedClassData;
     var course = getCurrentCourse(source);
     if (!course || !course.tuitionGhs) return;
@@ -221,7 +229,7 @@
   }
 
   function loadOtherClasses() {
-    if (!isDetailPage()) return;
+    if (!isDetailPage() && !isOpenMode()) return;
     fetch("/classes/classes-data.json")
       .then(function (response) { return response.json(); })
       .then(function (data) {
@@ -233,7 +241,7 @@
   }
 
   function watchClassSwitches() {
-    if (!isDetailPage() || window.__falowenWatchingClassSwitches) return;
+    if ((!isDetailPage() && !isOpenMode()) || window.__falowenWatchingClassSwitches) return;
     window.__falowenWatchingClassSwitches = true;
     var lastTitle = "";
     window.setInterval(function () {
