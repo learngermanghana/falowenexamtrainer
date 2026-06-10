@@ -63,6 +63,7 @@
     document.addEventListener("submit", function (event) {
       var form = event.target;
       if (!form || form.id !== "leadCaptureForm" || !isFormPage()) return;
+      if (form.dataset.leadReady !== "true") return;
       var select = form.querySelector("#leadClass");
       var slug = select && select.value ? select.value : selectedSlug();
       var status = document.getElementById("leadStatus");
