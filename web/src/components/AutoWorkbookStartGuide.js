@@ -1,0 +1,59 @@
+import React, { useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import { courseSchedules } from "../data/courseSchedule";
+import { styles } from "../styles";
+import WorkbookStartGuide from "./WorkbookStartGuide";
+
+const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
+
+export const normalizeInAppPath = (link = "") => {
+  const value = String(link || "").trim();
+  if (!value) return "";
+
+  try {
+    const url = new URL(value, "https://www.falowen.app");
+    if (!["falowen.app", "www.falowen.app"].includes(url.hostname)) return "";
+    return url.pathname.replace(/\/+$/, "") || "/";
+  } catch {
+    return "";
+  }
+};
+
+const getWorkbookResources = (entry = {}) => [
+  entry,
+  ...toArray(entry.lesen_hören),
+  ...toArray(entry.schreiben_sprechen),
+];
+
+export const buildWorkbookRouteIndex = (schedules = courseSchedules) => {
+  const index = new Map();
+
+  Object.entries(schedules).forEach(([level, entries]) => {
+    toArray(entries).forEach((entry) => {
+      getWorkbookResources(entry).forEach((resource) => {
+        const pathname = normalizeInAppPath(resource?.workbook_link);
+        if (!pathname || index.has(pathname)) return;
+        index.set(pathname, { level, day: entry?.day, entry });
+      });
+    });
+  });
+
+  return index;
+};
+
+const workbookRouteIndex = buildWorkbookRouteIndex();
+
+const AutoWorkbookStartGuide = () => {
+  const { pathname } = useLocation();
+  const match = useMemo(() => workbookRouteIndex.get(normalizeInAppPath(pathname)), [pathname]);
+
+  if (!match) return null;
+
+  return (
+    <div style={{ ...styles.container, display: "grid", marginBottom: 16 }}>
+      <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
+    </div>
+  );
+};
+
+export default AutoWorkbookStartGuide;
