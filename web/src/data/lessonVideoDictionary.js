@@ -5,6 +5,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     1: {
       ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
     },
+    20: {
+      ai_grammar_video: "https://youtu.be/mTwDMOAEMTU",
+    },
   },
   A2: {
     15: {
