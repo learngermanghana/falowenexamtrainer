@@ -29,6 +29,7 @@ export const makeLesson = ({
   title,
   topic,
   heroImage,
+  videoResource,
   grammarFocus,
   objectives,
   explanation,
@@ -52,6 +53,7 @@ export const makeLesson = ({
   title,
   topic,
   heroImage,
+  videoResource,
   grammarFocus,
   objectives,
   explanation,
@@ -283,39 +285,24 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
     phrases: writingPlan.usefulLines,
     tasks: {
       speaking: formalTask
-        ? `Sprich 2 Minuten über eine formelle Situation zum Thema ${title}.`
-        : `Sprich 2 Minuten über: ${topic}.`,
-      writing: formalTask
-        ? `Schreibe eine formelle E-Mail mit 180–220 Wörtern über: ${title}.`
-        : level === "C1"
-          ? `Schreibe 180–220 Wörter als C1-Stellungnahme über: ${title}. Beantworte Erklärung, Beispiel, Einwand und Alternative.`
-          : `Schreibe 180–220 Wörter als B2-Meinungsbeitrag über: ${title}. Beantworte Meinung, Gründe, Alternativen und Vorteile.`,
-      reading: `Wähle einen passenden Artikel auf einer empfohlenen deutschen Plattform und notiere die wichtigsten Punkte zum Thema ${title}.`,
-      listening: `Wähle ein passendes Audio oder Video auf einer empfohlenen deutschen Plattform und fasse es zusammen.`,
+        ? `Sprich 2 Minuten über eine formelle Situation zum Thema „${title}". Nenne Problem, Bitte und Kompromiss.`
+        : `Sprich 2 Minuten über das Thema „${title}". Nenne deine Meinung, Beispiele und eine Alternative.`,
+      writing: writingPlan.topic,
+      reading: defaultReadingTasks.join(" "),
+      listening: defaultListeningTasks.join(" "),
     },
     readingResource: {
       title: "Recommended German reading platforms",
-      description: "Use stable German platforms instead of broken search links. Choose one article connected to today’s topic.",
-      url: "https://www.welt.de",
-      tasks: [
-        "WELT: https://www.welt.de",
-        "Tagesschau: https://www.tagesschau.de",
-        "Deutschlandfunk: https://www.deutschlandfunk.de",
-        "DW News: https://www.dw.com/de/themen/s-9077",
-        ...defaultReadingTasks,
-      ],
+      description: "Use stable German platforms instead of broken search links. Choose one article connected to the lesson topic.",
+      url: "https://www.dw.com/de/deutsch-lernen/s-2055",
+      tasks: defaultReadingTasks,
     },
     listeningResource: {
       title: "Recommended German listening platforms",
-      description: "Use stable platform pages. Choose one audio or video connected to today’s topic.",
+      description: "Use stable platform pages. Choose one audio or video connected to the lesson topic.",
       url: "https://www.dw.com/de/deutsch-lernen/s-2055",
-      tasks: [
-        "DW Deutsch lernen: https://www.dw.com/de/deutsch-lernen/s-2055",
-        "Deutschlandfunk: https://www.deutschlandfunk.de",
-        "ARD Audiothek: https://www.ardaudiothek.de",
-        ...defaultListeningTasks,
-      ],
+      tasks: defaultListeningTasks,
     },
-    vocabulary: title.split(/\s+|und|\/|-/).filter((word) => word.length > 3).slice(0, 8),
+    vocabulary: [title, "Begründung", "Beispiel", "Alternative", "Vorteil", "Nachteil", "Fazit"].filter(Boolean),
   });
 };
