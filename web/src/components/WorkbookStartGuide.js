@@ -11,10 +11,10 @@ const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : [])
 const guideStyle = {
   border: "1px solid #bfdbfe",
   background: "#eff6ff",
-  borderRadius: 16,
-  padding: 16,
+  borderRadius: 12,
+  padding: 10,
   display: "grid",
-  gap: 14,
+  gap: 8,
 };
 
 const actionButtonStyle = {
@@ -24,15 +24,17 @@ const actionButtonStyle = {
   alignItems: "center",
   justifyContent: "center",
   textDecoration: "none",
+  padding: "7px 10px",
+  fontSize: 12,
 };
 
 const stepStyle = {
   border: "1px solid #dbeafe",
   background: "#ffffff",
-  borderRadius: 12,
-  padding: 12,
+  borderRadius: 10,
+  padding: 9,
   display: "grid",
-  gap: 8,
+  gap: 6,
 };
 
 const findEntry = (level, day) => {
@@ -56,8 +58,8 @@ const findResourceUrl = (entry = {}, key) => {
 
 const getVideoLabel = (resource = {}) => {
   const title = String(resource.title || "").toLowerCase();
-  if (title.includes("teacher")) return "Watch teacher explanation";
-  if (title.includes("ai")) return "Watch AI grammar video";
+  if (title.includes("teacher")) return "Teacher video";
+  if (title.includes("ai")) return "AI grammar video";
   return "Watch video";
 };
 
@@ -70,18 +72,18 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) =>
 
   return (
     <section style={guideStyle}>
-      <div style={{ display: "grid", gap: 4 }}>
-        <h2 style={{ margin: 0, fontSize: 22 }}>Before you start</h2>
-        <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-          Follow these steps before you complete this workbook{chapterText}. Watch, review the grammar, then answer the workbook tasks.
+      <div style={{ display: "grid", gap: 3 }}>
+        <h2 style={{ margin: 0, fontSize: 18 }}>Before you start</h2>
+        <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.45, fontSize: 12 }}>
+          Watch, review the grammar, then complete this workbook{chapterText}.
         </p>
       </div>
 
-      <div style={{ display: "grid", gap: 10 }}>
+      <div style={{ display: "grid", gap: 6 }}>
         <article style={stepStyle}>
-          <strong>Step 1: Watch the lesson videos</strong>
+          <strong style={{ fontSize: 12 }}>Step 1: Watch the lesson videos</strong>
           {videos.length ? (
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
               {videos.map((resource) => (
                 <a key={resource.key || resource.url} href={resource.url} {...getExternalProps(resource.url)} style={actionButtonStyle}>
                   🎬 {getVideoLabel(resource)}
@@ -89,25 +91,25 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) =>
               ))}
             </div>
           ) : (
-            <p style={{ margin: 0, color: "#6b7280" }}>No lesson video has been added yet.</p>
+            <p style={{ margin: 0, color: "#6b7280", fontSize: 12 }}>No lesson video has been added yet.</p>
           )}
         </article>
 
         <article style={stepStyle}>
-          <strong>Step 2: Review the grammar notes</strong>
+          <strong style={{ fontSize: 12 }}>Step 2: Review the grammar notes</strong>
           {derivedGrammarUrl ? (
             <a href={derivedGrammarUrl} {...getExternalProps(derivedGrammarUrl)} style={actionButtonStyle}>
               📘 Open grammar notes
             </a>
           ) : (
-            <p style={{ margin: 0, color: "#6b7280" }}>Grammar notes will appear here when they are added.</p>
+            <p style={{ margin: 0, color: "#6b7280", fontSize: 12 }}>Grammar notes will appear here when they are added.</p>
           )}
         </article>
 
         <article style={stepStyle}>
-          <strong>Step 3: Complete this workbook</strong>
-          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-            Work through the tasks on this page. Submit your final answers in the submission area when you finish.
+          <strong style={{ fontSize: 12 }}>Step 3: Complete this workbook</strong>
+          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.45, fontSize: 12 }}>
+            Answer the tasks, then submit your final answers in the submission area.
           </p>
         </article>
       </div>
