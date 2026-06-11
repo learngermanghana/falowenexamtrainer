@@ -7,6 +7,11 @@ const c1Day1ZieleUndLernweg = makeLesson({
   title: "Ziele und Lernweg",
   topic: "Realistische Lernziele setzen, den eigenen Lernweg planen und Alternativen bewerten",
   heroImage: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "Video explanation: Relativsätze mit Präpositionen",
+    description: "Schau dir dieses Video zuerst an. Danach kannst du die Regeln, Beispiele, Sprechaufgabe und Schreibaufgabe gezielter bearbeiten.",
+    url: "https://www.youtube.com/watch?v=u41XmMwb5PU",
+  },
   grammarFocus: "Relativsätze mit Präpositionen: worauf, wodurch, mit dem, für die, an dem",
   objectives: [
     "Ich kann erklären, welche Kriterien bei der Planung eines Lernwegs wichtig sind.",
@@ -161,7 +166,7 @@ const c1Day1ZieleUndLernweg = makeLesson({
       "Record yourself summarising the audio in 60–90 seconds.",
     ],
   },
-  vocabulary: ["Lernweg", "Lernziel", "Kriterien", "Motivation", "Selbstorganisation", "Zeitplan", "Tutorfeedback", "Wochenziel"],
+  vocabulary: ["Lernweg", "Lernziel", "Kriterien", "Motivation", "Selforganisation", "Zeitplan", "Tutorfeedback", "Wochenziel"].map((word) => word === "Selforganisation" ? "Selbstorganisation" : word),
 });
 
 export default c1Day1ZieleUndLernweg;
