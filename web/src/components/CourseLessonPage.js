@@ -74,7 +74,7 @@ const LessonVideoResources = ({ videos }) => {
   );
 };
 
-const LessonResourceList = ({ title, lessons, level, day, isSelfLearning, onSubmit }) => {
+const LessonResourceList = ({ title, lessons, isSelfLearning, onSubmit, hideVideoLink = false }) => {
   const rows = toLessonArray(lessons).filter(Boolean);
   if (!rows.length) return null;
 
@@ -82,42 +82,37 @@ const LessonResourceList = ({ title, lessons, level, day, isSelfLearning, onSubm
     <section style={{ display: "grid", gap: 10 }}>
       <h2 style={{ margin: 0, fontSize: 20 }}>{title}</h2>
       <div style={{ display: "grid", gap: 10 }}>
-        {rows.map((lesson, index) => {
-          const videoResources = getLessonVideoResources(level, day, lesson);
-
-          return (
-            <article
-              key={`${title}-${lesson.chapter || lesson.title || index}`}
-              style={{
-                padding: 14,
-                border: "1px solid #e5e7eb",
-                borderRadius: 12,
-                background: "#f9fafb",
-                display: "grid",
-                gap: 8,
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                <strong>{lesson.chapter ? `Kapitel ${lesson.chapter}` : lesson.title || "Resource"}</strong>
-                {lesson.assignment && !isSelfLearning ? <span style={styles.badge}>Assignment</span> : null}
-                {isSelfLearning ? <span style={styles.badge}>AI practice</span> : null}
-              </div>
-              {lesson.title && lesson.chapter ? <p style={{ ...styles.helperText, margin: 0 }}>{lesson.title}</p> : null}
-              {lesson.note ? <p style={{ margin: 0 }}>{lesson.note}</p> : null}
-              {videoResources.length ? <LessonVideoResources videos={videoResources} /> : null}
-              <ul style={{ ...styles.checklist, margin: 0 }}>
-                {!videoResources.length ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={lesson.video || lesson.youtube_link} /> : null}
-                <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
-                <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
-              </ul>
-              {lesson.assignment && !isSelfLearning ? (
-                <button type="button" style={{ ...styles.primaryButton, justifySelf: "start" }} onClick={onSubmit}>
-                  Submit {lesson.chapter ? `Kapitel ${lesson.chapter}` : "this"} assignment
-                </button>
-              ) : null}
-            </article>
-          );
-        })}
+        {rows.map((lesson, index) => (
+          <article
+            key={`${title}-${lesson.chapter || lesson.title || index}`}
+            style={{
+              padding: 14,
+              border: "1px solid #e5e7eb",
+              borderRadius: 12,
+              background: "#f9fafb",
+              display: "grid",
+              gap: 8,
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+              <strong>{lesson.chapter ? `Kapitel ${lesson.chapter}` : lesson.title || "Resource"}</strong>
+              {lesson.assignment && !isSelfLearning ? <span style={styles.badge}>Assignment</span> : null}
+              {isSelfLearning ? <span style={styles.badge}>AI practice</span> : null}
+            </div>
+            {lesson.title && lesson.chapter ? <p style={{ ...styles.helperText, margin: 0 }}>{lesson.title}</p> : null}
+            {lesson.note ? <p style={{ margin: 0 }}>{lesson.note}</p> : null}
+            <ul style={{ ...styles.checklist, margin: 0 }}>
+              {!hideVideoLink ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={lesson.video || lesson.youtube_link} /> : null}
+              <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
+              <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
+            </ul>
+            {lesson.assignment && !isSelfLearning ? (
+              <button type="button" style={{ ...styles.primaryButton, justifySelf: "start" }} onClick={onSubmit}>
+                Submit {lesson.chapter ? `Kapitel ${lesson.chapter}` : "this"} assignment
+              </button>
+            ) : null}
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -236,8 +231,8 @@ const CourseLessonPage = () => {
 
         <LessonVideoResources videos={videoResources} />
 
-        <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} level={level} day={day} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
-        <LessonResourceList title="Schreiben & Sprechen" lessons={entry.schreiben_sprechen} level={level} day={day} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
+        <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} hideVideoLink={Boolean(videoResources.length)} />
+        <LessonResourceList title="Schreiben & Sprechen" lessons={entry.schreiben_sprechen} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} hideVideoLink={Boolean(videoResources.length)} />
 
         <ul style={{ ...styles.checklist, margin: 0 }}>
           {!videoResources.length ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={entry.video || entry.youtube_link || entry.tutorial_video_url} /> : null}
