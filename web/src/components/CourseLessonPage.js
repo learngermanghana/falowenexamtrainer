@@ -5,6 +5,7 @@ import { courseSchedules } from "../data/courseSchedule";
 import { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
+import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
@@ -87,6 +88,10 @@ const CourseLessonPage = () => {
   }, [day, level, location.state]);
 
   if (level === "B1" && String(day) === "1") {
+    const query = new URLSearchParams(location.search);
+    if (query.get("view") === "grammar") {
+      return <B1Day1TraumweltGrammarNotesPage />;
+    }
     return <B1Day1TraumweltWorkbookPage />;
   }
 
