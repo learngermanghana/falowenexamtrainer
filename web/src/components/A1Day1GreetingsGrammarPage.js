@@ -280,6 +280,21 @@ const A1Day1GreetingsGrammarPage = () => {
         </div>
 
         <div style={infoCardStyle}>
+          <h3 style={{ margin: "0 0 8px 0" }}>What does Frau mean?</h3>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            <li>
+              <strong>die Frau</strong> means <strong>the woman</strong>.
+            </li>
+            <li>
+              <strong>meine Frau</strong> means <strong>my wife</strong>. You can also say <strong>die Ehefrau</strong> to mean wife explicitly.
+            </li>
+            <li>
+              <strong>Frau + last name</strong> is the polite title <strong>Ms./Mrs.</strong>, for example <strong>Frau Schmidt</strong>. It does not tell you whether the woman is married.
+            </li>
+          </ul>
+        </div>
+
+        <div style={infoCardStyle}>
           <h3 style={{ margin: "0 0 8px 0" }}>When you don’t know the last name</h3>
           <ul style={{ margin: 0, paddingLeft: 20 }}>
             <li>
