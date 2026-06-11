@@ -3,9 +3,9 @@ import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 
 const day0PathConfig = [
-  { match: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", level: "A1", hasClassNotes: false },
-  { match: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook", level: "A2", hasClassNotes: true },
-  { match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", level: "B1", hasClassNotes: true },
+  { match: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", level: "A1" },
+  { match: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook", level: "A2" },
+  { match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", level: "B1" },
 ];
 
 const List = ({ children }) => (
@@ -51,7 +51,6 @@ const Day0StudentWorkflowUpgrade = () => {
           <li><strong>Teil 2 · Schreiben</strong> is writing practice and assignment work.</li>
           <li><strong>Teil 3 · Lesen</strong> is reading practice and assignment work.</li>
           <li><strong>Teil 4 · Hören</strong> is listening practice and assignment work.</li>
-          {config.hasClassNotes ? <li><strong>Teil 5 · Class Notes</strong> is where class vocabulary, Zoom notes, corrections, reminders and questions are saved.</li> : null}
         </List>
       </Box>
 
@@ -65,7 +64,7 @@ const Day0StudentWorkflowUpgrade = () => {
           </p>
         ) : (
           <p style={{ margin: 0, lineHeight: 1.65 }}>
-            In {config.level}, submit <strong>Teil 2 · Schreiben</strong>, <strong>Teil 3 · Lesen</strong> and <strong>Teil 4 · Hören</strong>. Teil 1 is for class speaking preparation, and Teil 5 is not an assignment.
+            In {config.level}, submit <strong>Teil 2 · Schreiben</strong>, <strong>Teil 3 · Lesen</strong> and <strong>Teil 4 · Hören</strong>. Teil 1 is for class speaking preparation.
           </p>
         )}
       </Box>
@@ -90,20 +89,9 @@ const Day0StudentWorkflowUpgrade = () => {
         </List>
       </Box>
 
-      {config.hasClassNotes ? (
-        <Box title="5. How to use Class Notes">
-          <List>
-            <li>Open <strong>Teil 5 · Class Notes</strong> inside the lesson.</li>
-            <li>Your tutor can save vocabulary from Zoom, corrections, reminders and short explanations there.</li>
-            <li>Students can also ask short questions inside Class Notes.</li>
-            <li>When someone posts in Class Notes, students with notifications enabled can receive a notification.</li>
-          </List>
-        </Box>
-      ) : null}
-
-      <Box title={config.hasClassNotes ? "6. Enable notifications" : "5. Enable notifications"}>
+      <Box title="5. Enable notifications">
         <p style={{ margin: 0, lineHeight: 1.65 }}>
-          Open <strong>Account → Notifications</strong> and enable notifications on your device. This helps you receive score updates, class notes, payment reminders and important announcements.
+          Open <strong>Account → Notifications</strong> and enable notifications on your device. This helps you receive score updates, payment reminders and important announcements.
         </p>
         <p style={{ margin: 0, lineHeight: 1.65 }}>
           On iPhone, add Falowen to your Home Screen first, open it from the Home Screen icon, then enable notifications.

@@ -4,14 +4,12 @@ import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
-import LessonClassNotesPanel from "./LessonClassNotesPanel";
 
 const tabs = [
   { key: "sprechen", label: "Teil 1 · Sprechen" },
   { key: "schreiben", label: "Teil 2 · Schreiben" },
   { key: "lesen", label: "Teil 3 · Lesen" },
   { key: "hoeren", label: "Teil 4 · Hören" },
-  { key: "classNotes", label: "Teil 5 · Class Notes" },
 ];
 
 const card = {
@@ -158,7 +156,7 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 2 Workbook · Small Talk</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
-          4-part workbook plus Class Notes for vocabulary, Zoom notes and short tutor suggestions.
+          Four-part workbook for speaking, writing, reading and listening practice.
         </p>
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -174,7 +172,7 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
         </p>
       </div>
 
-      <A2B1WorkbookGuidance showClassNotes={false} />
+      <A2B1WorkbookGuidance />
 
       {activeTab === "sprechen" && (
         <div style={card}>
@@ -412,10 +410,6 @@ const A2Day2SmallTalkWorkbookEnhancedPage = () => {
           <WorkbookSubmissionReminder />
           <PreparedCheckbox checked={prepared.hoeren} onChange={setPreparedFor("hoeren")} />
         </div>
-      )}
-
-      {activeTab === "classNotes" && (
-        <LessonClassNotesPanel lessonId="a2-day-2-small-talk" lessonTitle="A2 Day 2 · Small Talk" />
       )}
     </div>
   );
