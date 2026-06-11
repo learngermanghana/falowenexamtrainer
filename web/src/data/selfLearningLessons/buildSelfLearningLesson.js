@@ -103,24 +103,59 @@ const buildC1OpinionWriting = (title, topicContext) => ({
   ],
 });
 
-const buildB2OpinionWriting = (title) => ({
+const buildB2OpinionWriting = (title, topicContext) => ({
   taskType: "B2 opinion essay / Meinungsbeitrag",
-  topic: `Schreiben: ${title}. Äußern Sie Ihre Meinung zu diesem Thema. Nennen Sie Gründe, warum „${title}“ im Alltag oder in der Gesellschaft wichtig bzw. verbreitet ist. Nennen Sie andere Möglichkeiten oder Alternativen. Nennen Sie Vorteile dieser Alternativen.`,
+  topic: `Schreiben: ${title}. Verfassen Sie einen B2-Meinungsbeitrag zu diesem Thema: Welche Bedeutung hat „${title}“ für ${topicContext}? Bearbeiten Sie alle Punkte: Äußern Sie Ihre Meinung zu „${title}“. Nennen Sie Gründe, warum dieses Thema wichtig, verbreitet oder aktuell ist. Nennen Sie andere Möglichkeiten, Alternativen oder Lösungen im Umgang mit diesem Thema. Nennen Sie Vorteile dieser anderen Möglichkeiten, Alternativen oder Lösungen.`,
   structure: [
-    `Einleitung: Stellen Sie das Thema „${title}“ kurz vor und sagen Sie, warum es wichtig ist.`,
-    "Meinung: Äußern Sie Ihre persönliche Meinung klar und verständlich.",
-    `Gründe: Nennen Sie Gründe, warum „${title}“ im Alltag oder in der Gesellschaft wichtig, beliebt oder verbreitet ist.`,
-    "Andere Möglichkeiten: Nennen Sie realistische Alternativen oder andere Lösungen.",
-    "Vorteile: Beschreiben Sie Vorteile dieser Alternativen.",
+    `Einleitung: Stellen Sie das Thema „${title}“ kurz vor.`,
+    `Meinung: Äußern Sie Ihre Meinung zu „${title}“ klar.`,
+    `Gründe: Erklären Sie, warum „${title}“ wichtig, verbreitet oder aktuell ist.`,
+    "Andere Möglichkeiten / Alternativen: Nennen Sie realistische andere Möglichkeiten, Alternativen oder Lösungen.",
+    "Vorteile: Erklären Sie die Vorteile dieser anderen Möglichkeiten, Alternativen oder Lösungen.",
     "Schluss: Fassen Sie Ihre Meinung kurz zusammen.",
   ],
   usefulLines: [
-    `Meiner Meinung nach spielt „${title}“ eine wichtige Rolle, weil ...`,
-    "Ein Grund dafür ist, dass ...",
-    "Außerdem ist zu beachten, dass ...",
-    "Eine andere Möglichkeit wäre, ...",
+    `In der heutigen Zeit spielt „${title}“ für ${topicContext} eine wichtige Rolle.`,
+    `Meiner Meinung nach sollte man beim Thema „${title}“ besonders beachten, dass ...`,
+    `Ein Grund für die aktuelle Bedeutung von „${title}“ ist, dass ...`,
+    `Außerdem sollte man bei „${title}“ beachten, dass ...`,
+    `Eine andere Möglichkeit im Umgang mit „${title}“ wäre, ...`,
     "Ein Vorteil dieser Alternative besteht darin, dass ...",
-    "Zusammenfassend bin ich der Ansicht, dass ...",
+    `Zusammenfassend lässt sich sagen, dass „${title}“ bewusst gestaltet werden sollte.`,
+  ],
+});
+
+const buildB2GrammarLesson = (title, topicContext, writingPlan) => ({
+  title: `B2-Argumentation und Satzverbindungen zum Thema „${title}“`,
+  explanation: [
+    `In dieser Grammatiklektion lernst du, wie du Gedanken zum Thema „${title}“ klar miteinander verbindest. Eine gute B2-Antwort besteht nicht aus einzelnen kurzen Aussagen, sondern zeigt Beziehungen zwischen Meinung, Grund, Alternative und Vorteil.`,
+    `Für B2-Schreiben und -Sprechen brauchst du Konnektoren wie weil, deshalb, obwohl, während und damit. Sie zeigen, ob du einen Grund, eine Folge, einen Gegensatz, einen Vergleich oder ein Ziel ausdrückst. So kann dein Leser oder Gesprächspartner deiner Argumentation leichter folgen.`,
+    `Beim Thema „${title}“ kannst du zuerst deine Position nennen und sie dann mit einem Nebensatz begründen. Im Nebensatz steht das konjugierte Verb am Ende: Ich halte das Thema für wichtig, weil es ${topicContext} betrifft. Nach deshalb steht das Verb dagegen auf Position zwei.`,
+    "Ein häufiger Fehler ist, nach weil die Hauptsatzstellung zu verwenden oder mehrere Gedanken ohne passende Verbindung aneinanderzureihen. Kontrolliere deshalb beim Schreiben jeden Konnektor und ergänze zu allgemeinen Aussagen ein konkretes Beispiel.",
+  ],
+  rules: [
+    "Nenne zuerst eine klare Meinung und begründe sie anschließend mit weil oder da.",
+    "Im Nebensatz mit weil, da, obwohl, während oder damit steht das konjugierte Verb am Ende.",
+    "Nach deshalb, daher und trotzdem steht das konjugierte Verb auf Position zwei.",
+    "Nutze während oder einerseits ... andererseits, um Möglichkeiten differenziert zu vergleichen.",
+    "Formuliere Alternativen mit man könnte, eine andere Möglichkeit wäre oder es wäre sinnvoll.",
+    "Erkläre nach jeder Alternative mindestens einen konkreten Vorteil.",
+  ],
+  examples: [
+    `Meiner Meinung nach ist „${title}“ wichtig, weil das Thema ${topicContext} direkt betrifft.`,
+    `Viele Menschen beschäftigen sich mit „${title}“; deshalb ist eine offene Diskussion sinnvoll.`,
+    `Obwohl es unterschiedliche Meinungen zu „${title}“ gibt, sollte man nach gemeinsamen Lösungen suchen.`,
+    `Während eine Möglichkeit bequem ist, kann eine andere Lösung langfristig mehr Vorteile bieten.`,
+    `Eine andere Möglichkeit wäre, beim Thema „${title}“ bewusster zu handeln.`,
+    "Ein Vorteil dieser Alternative besteht darin, dass sie sich realistisch in den Alltag integrieren lässt.",
+    ...writingPlan.usefulLines.slice(0, 2),
+  ],
+  miniExercise: `Schreibe sechs zusammenhängende Sätze zum Thema „${title}“. Formuliere eine Meinung, zwei Gründe, eine Alternative und einen Vorteil. Nutze mindestens einen Nebensatz mit weil oder obwohl und einen Hauptsatz mit deshalb oder trotzdem.`,
+  knowledgeTest: [
+    { question: "Welche Wortstellung ist nach weil richtig?", options: ["weil das Thema ist wichtig", "weil das Thema wichtig ist", "weil ist das Thema wichtig"], answer: "weil das Thema wichtig ist", explanation: "Weil leitet einen Nebensatz ein; das konjugierte Verb steht am Ende." },
+    { question: "Welche Formulierung leitet eine Alternative ein?", options: ["Eine andere Möglichkeit wäre, ...", "Ein Grund dafür ist, dass ...", "Zusammenfassend lässt sich sagen, dass ..."], answer: "Eine andere Möglichkeit wäre, ...", explanation: "Diese Formulierung kündigt sichtbar eine andere Möglichkeit oder Lösung an." },
+    { question: "Welche Wortstellung ist nach deshalb richtig?", options: ["deshalb man sollte handeln", "deshalb sollte man handeln", "deshalb handeln man sollte"], answer: "deshalb sollte man handeln", explanation: "Deshalb steht im Hauptsatz auf Position eins; das konjugierte Verb folgt auf Position zwei." },
+    { question: "Was macht einen B2-Vorteil überzeugend?", options: ["Nur das Wort Vorteil", "Eine konkrete Erklärung der positiven Wirkung", "Eine Wiederholung des Themas"], answer: "Eine konkrete Erklärung der positiven Wirkung", explanation: "Ein überzeugender Vorteil erklärt, welche positive Wirkung eine Alternative hat." },
   ],
 });
 
@@ -168,13 +203,13 @@ const buildFormalWriting = (level, title) => ({
 });
 
 export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
-  const writingTaskType = chooseWritingType(title, topic);
+  const writingTaskType = level === "B2" ? "B2 opinion essay / Meinungsbeitrag" : chooseWritingType(title, topic);
   const formalTask = writingTaskType === "Formal letter / E-Mail";
   const writingPlan = formalTask
     ? buildFormalWriting(level, title)
     : level === "C1"
       ? buildC1OpinionWriting(title, topic)
-      : buildB2OpinionWriting(title);
+      : buildB2OpinionWriting(title, topic);
 
   return makeLesson({
     level,
@@ -216,39 +251,30 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
       "Welche Beispiele aus Alltag, Arbeit, Schule oder Gesellschaft passen dazu?",
       formalTask ? "Welche konkrete Bitte oder welcher Kompromiss sollte am Ende stehen?" : "Welche eigene Meinung kannst du begründen?",
     ],
-    grammarLesson: {
-      rules: formalTask
-        ? level === "C1"
-          ? [
-              "Beginne höflich und zeige Verständnis, bevor du dein Anliegen erklärst.",
-              "Beschreibe die Situation sachlich und nenne konkrete Auswirkungen auf deine Arbeit oder Aufgaben.",
-              "Formuliere akzeptable Bedingungen und einen Kompromissvorschlag.",
-            ]
-          : [
-              "Bitte höflich um Verständnis für deine Situation.",
-              "Beschreibe konkret, womit du beschäftigt bist.",
-              "Mache einen realistischen Vorschlag und zeige Verständnis für die andere Seite.",
-            ]
-        : level === "C1"
-          ? [
-              "Beantworte jeden Aufgabenpunkt sichtbar.",
-              "Erkläre zuerst die Bedeutung des Themas, bevor du argumentierst.",
-              "Nutze ein konkretes Beispiel, einen Einwand und eine Alternative.",
-            ]
-          : [
-              "Äußere deine Meinung klar.",
-              "Nenne Gründe, warum das Thema wichtig oder verbreitet ist.",
-              "Nenne Alternativen und erkläre ihre Vorteile.",
-            ],
-      examples: writingPlan.usefulLines.slice(0, 4),
-      miniExercise: formalTask
-        ? level === "C1"
-          ? `Formuliere vier Stichpunkte zum Thema „${title}": Verständnis, erschwerte Tätigkeit, akzeptable Bedingung und Kompromiss.`
-          : `Formuliere vier Stichpunkte zum Thema „${title}": Verständnis, Beschäftigung, Vorschlag und Rücksicht.`
-        : level === "C1"
-          ? `Formuliere vier Stichpunkte zum Thema „${title}": Erklärung, Beispiel, Einwand und Alternative.`
-          : `Formuliere vier Stichpunkte zum Thema „${title}": Meinung, Gründe, Alternativen und Vorteile.`,
-    },
+    grammarLesson: level === "B2"
+      ? buildB2GrammarLesson(title, topic, writingPlan)
+      : {
+          title: formalTask ? "C1-formelle Ausdrucksweise" : "C1-Argumentationsstruktur",
+          explanation: [
+            `Diese Grammatik- und Strukturhinweise helfen dir, das Thema „${title}“ auf C1-Niveau differenziert darzustellen.`,
+            "Verbinde deine Aussagen logisch, erläutere konkrete Beispiele und berücksichtige auch Einwände oder organisatorische Bedingungen.",
+          ],
+          rules: formalTask
+            ? [
+                "Beginne höflich und zeige Verständnis, bevor du dein Anliegen erklärst.",
+                "Beschreibe die Situation sachlich und nenne konkrete Auswirkungen auf deine Arbeit oder Aufgaben.",
+                "Formuliere akzeptable Bedingungen und einen Kompromissvorschlag.",
+              ]
+            : [
+                "Beantworte jeden Aufgabenpunkt sichtbar.",
+                "Erkläre zuerst die Bedeutung des Themas, bevor du argumentierst.",
+                "Nutze ein konkretes Beispiel, einen Einwand und eine Alternative.",
+              ],
+          examples: writingPlan.usefulLines.slice(0, 4),
+          miniExercise: formalTask
+            ? `Formuliere vier Stichpunkte zum Thema „${title}": Verständnis, erschwerte Tätigkeit, akzeptable Bedingung und Kompromiss.`
+            : `Formuliere vier Stichpunkte zum Thema „${title}": Erklärung, Beispiel, Einwand und Alternative.`,
+        },
     speakingTaskType: formalTask ? "Formal situation talk" : "Guided opinion talk",
     speakingTopic: formalTask
       ? `Sprechen: Erkläre die formelle Situation zum Thema „${title}“ und formuliere eine höfliche Lösung.`
@@ -287,7 +313,9 @@ export const buildDefaultLesson = ({ level, day, chapter, title, topic }) => {
       speaking: formalTask
         ? `Sprich 2 Minuten über eine formelle Situation zum Thema „${title}". Nenne Problem, Bitte und Kompromiss.`
         : `Sprich 2 Minuten über das Thema „${title}". Nenne deine Meinung, Beispiele und eine Alternative.`,
-      writing: writingPlan.topic,
+      writing: level === "B2"
+        ? "Schreibe 180–220 Wörter als B2-Meinungsbeitrag. Bearbeite Meinung, Gründe, andere Möglichkeiten/Alternativen und Vorteile."
+        : writingPlan.topic,
       reading: defaultReadingTasks.join(" "),
       listening: defaultListeningTasks.join(" "),
     },
