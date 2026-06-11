@@ -1,14 +1,51 @@
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 
 export const LESSON_VIDEO_DICTIONARY = {
-  A1: {},
-  A2: {},
-  B1: {},
+  A1: {
+    1: {
+      ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
+    },
+  },
+  A2: {
+    15: {
+      ai_grammar_video: "https://youtu.be/uf3OJwalh6U",
+    },
+  },
+  B1: {
+    1: {
+      ai_grammar_video: "https://youtu.be/_mmAtSzWbNo",
+    },
+  },
   B2: {},
   C1: {},
 };
 
 const pickFirst = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || "";
+
+const uniqueVideoResources = (...groups) => {
+  const seen = new Set();
+  return groups
+    .flat()
+    .filter(Boolean)
+    .filter((resource) => {
+      const key = resource.url;
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+};
+
+const legacyTeacherVideoResource = (source = {}) => {
+  const url = pickFirst(source.video, source.youtube_link, source.tutorial_video_url);
+  if (!url) return null;
+
+  return {
+    key: "teacher-explanation",
+    title: "Teacher explanation",
+    description: "Recorded class explanation from the teacher.",
+    url,
+  };
+};
 
 export const normalizeVideoResources = (source = {}) => {
   if (!source || typeof source !== "object") return [];
@@ -84,8 +121,10 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   const fromEntry = normalizeVideoResources(entry);
   const fromNestedLesenHoeren = normalizeVideoResources(entry?.lesen_hören);
   const fromDictionary = normalizeVideoResources(dictionaryEntry);
+  const additionalResources = uniqueVideoResources(fromEntry, fromNestedLesenHoeren, fromDictionary);
 
-  if (fromEntry.length) return fromEntry;
-  if (fromNestedLesenHoeren.length) return fromNestedLesenHoeren;
-  return fromDictionary;
+  if (!additionalResources.length) return [];
+
+  const legacyTeacherVideo = legacyTeacherVideoResource(entry) || legacyTeacherVideoResource(entry?.lesen_hören);
+  return uniqueVideoResources([legacyTeacherVideo], additionalResources);
 };
