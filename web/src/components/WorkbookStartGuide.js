@@ -17,7 +17,7 @@ const guideStyle = {
   gap: 8,
 };
 
-const actionButtonStyle = {
+const resourceButtonStyle = {
   ...styles.secondaryButton,
   display: "inline-flex",
   width: "fit-content",
@@ -26,15 +26,18 @@ const actionButtonStyle = {
   textDecoration: "none",
   padding: "7px 10px",
   fontSize: 12,
+  fontWeight: 800,
 };
 
-const stepStyle = {
+const resourceCardStyle = {
   border: "1px solid #dbeafe",
   background: "#ffffff",
   borderRadius: 10,
   padding: 9,
   display: "grid",
-  gap: 6,
+  gridTemplateColumns: "28px minmax(0, 1fr)",
+  gap: 8,
+  alignItems: "start",
 };
 
 const findEntry = (level, day) => {
@@ -56,62 +59,65 @@ const findResourceUrl = (entry = {}, key) => {
   return nested?.[key] || "";
 };
 
-const getVideoLabel = (resource = {}) => {
-  const title = String(resource.title || "").toLowerCase();
-  if (title.includes("teacher")) return "Teacher video";
-  if (title.includes("ai")) return "AI grammar video";
-  return "Watch video";
+const findVideo = (videos = [], keyword) => videos.find((resource) => String(resource.title || "").toLowerCase().includes(keyword));
+
+const LessonResourceItem = ({ number, icon, title, actionLabel, url }) => {
+  if (!url) return null;
+
+  return (
+    <article style={resourceCardStyle}>
+      <span
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: "50%",
+          background: "#eff6ff",
+          color: "#1d4ed8",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 900,
+          fontSize: 12,
+        }}
+      >
+        {number}
+      </span>
+      <div style={{ display: "grid", gap: 6, minWidth: 0 }}>
+        <strong style={{ fontSize: 13, lineHeight: 1.25 }}>
+          {icon} {title}
+        </strong>
+        <a href={url} {...getExternalProps(url)} style={resourceButtonStyle}>
+          {actionLabel}
+        </a>
+      </div>
+    </article>
+  );
 };
 
 const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) => {
   const entry = useMemo(() => suppliedEntry || findEntry(level, day), [day, level, suppliedEntry]);
   const videos = useMemo(() => getLessonVideoResources(level, day, entry || {}), [day, entry, level]);
+  const teacherVideo = findVideo(videos, "teacher") || videos[0];
+  const aiVideo = findVideo(videos, "ai") || videos.find((resource) => resource?.url !== teacherVideo?.url);
   const derivedGrammarUrl = grammarUrl || findResourceUrl(entry, "grammarbook_link");
+  const workbookUrl = findResourceUrl(entry, "workbook_link");
   const primaryResource = firstResource(entry);
   const chapterText = primaryResource?.chapter ? ` Kapitel ${primaryResource.chapter}` : "";
 
   return (
     <section style={guideStyle}>
       <div style={{ display: "grid", gap: 3 }}>
-        <h2 style={{ margin: 0, fontSize: 18 }}>Before you start</h2>
+        <h2 style={{ margin: 0, fontSize: 18 }}>Lesson resources</h2>
         <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.45, fontSize: 12 }}>
-          Watch, review the grammar, then complete this workbook{chapterText}.
+          Choose what you want to use first for this workbook{chapterText}.
         </p>
       </div>
 
       <div style={{ display: "grid", gap: 6 }}>
-        <article style={stepStyle}>
-          <strong style={{ fontSize: 12 }}>Step 1: Watch the lesson videos</strong>
-          {videos.length ? (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {videos.map((resource) => (
-                <a key={resource.key || resource.url} href={resource.url} {...getExternalProps(resource.url)} style={actionButtonStyle}>
-                  🎬 {getVideoLabel(resource)}
-                </a>
-              ))}
-            </div>
-          ) : (
-            <p style={{ margin: 0, color: "#6b7280", fontSize: 12 }}>No lesson video has been added yet.</p>
-          )}
-        </article>
-
-        <article style={stepStyle}>
-          <strong style={{ fontSize: 12 }}>Step 2: Review the grammar notes</strong>
-          {derivedGrammarUrl ? (
-            <a href={derivedGrammarUrl} {...getExternalProps(derivedGrammarUrl)} style={actionButtonStyle}>
-              📘 Open grammar notes
-            </a>
-          ) : (
-            <p style={{ margin: 0, color: "#6b7280", fontSize: 12 }}>Grammar notes will appear here when they are added.</p>
-          )}
-        </article>
-
-        <article style={stepStyle}>
-          <strong style={{ fontSize: 12 }}>Step 3: Complete this workbook</strong>
-          <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.45, fontSize: 12 }}>
-            Answer the tasks, then submit your final answers in the submission area.
-          </p>
-        </article>
+        <LessonResourceItem number="1" icon="🎬" title="Teacher lecture video" actionLabel="Watch teacher video" url={teacherVideo?.url} />
+        <LessonResourceItem number="2" icon="🤖" title="AI lecture / grammar video" actionLabel="Watch AI video" url={aiVideo?.url} />
+        <LessonResourceItem number="3" icon="📘" title="Grammar book" actionLabel="Open grammar book" url={derivedGrammarUrl} />
+        <LessonResourceItem number="4" icon="📝" title="Workbook" actionLabel="Open workbook" url={workbookUrl} />
       </div>
     </section>
   );
