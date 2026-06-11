@@ -269,8 +269,8 @@ const A2_SCHEDULE = [
     instruction:
       "Watch the recommended listening/video material, review grammar notes, and complete all four workbook parts in-app. Submit your final answers in the assignment area.",
     grammar_topic: "seit + Dativ + Präsens",
-    video: "https://drive.google.com/file/d/14LiB4PoqdHlzzmJyJQHJ7n--v6iVddVh/view?usp=sharing",
-    youtube_link: "https://drive.google.com/file/d/14LiB4PoqdHlzzmJyJQHJ7n--v6iVddVh/view?usp=sharing",
+    video: "https://youtu.be/uf3OJwalh6U",
+    youtube_link: "https://youtu.be/uf3OJwalh6U",
     grammarbook_link: "/campus/course/mein-lieblingssport-6-15-seit-dativ-praesens-grammar-notes",
     workbook_link: "/campus/course/a2-day-15-mein-lieblingssport-workbook",
   },
