@@ -137,6 +137,50 @@ const renderParagraphs = (items = []) => {
   return items.map((item) => <p key={item} style={{ margin: 0, lineHeight: 1.7 }}>{item}</p>);
 };
 
+const getYouTubeEmbedUrl = (url = "") => {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    let videoId = "";
+
+    if (host === "youtu.be") {
+      videoId = parsed.pathname.replace(/^\//, "");
+    } else if (host.includes("youtube.com")) {
+      videoId = parsed.searchParams.get("v") || parsed.pathname.split("/").filter(Boolean).pop();
+    }
+
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : "";
+  } catch (error) {
+    return "";
+  }
+};
+
+const VideoResourceCard = ({ resource }) => {
+  if (!resource?.url) return null;
+  const embedUrl = getYouTubeEmbedUrl(resource.url);
+
+  return (
+    <PracticeBox title="Video explanation">
+      <div style={{ display: "grid", gap: 10 }}>
+        <strong>{resource.title || "Watch the lesson video"}</strong>
+        {resource.description ? <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{resource.description}</p> : null}
+        {embedUrl ? (
+          <div style={{ position: "relative", width: "100%", paddingTop: "56.25%", borderRadius: 16, overflow: "hidden", border: "1px solid #e5e7eb", background: "#0f172a" }}>
+            <iframe
+              title={resource.title || "Lesson video"}
+              src={embedUrl}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+            />
+          </div>
+        ) : null}
+        <a href={resource.url} target="_blank" rel="noreferrer" style={{ ...styles.linkButton, justifySelf: "start" }}>Open video on YouTube</a>
+      </div>
+    </PracticeBox>
+  );
+};
+
 const KnowledgeTest = ({ items = [], answers = {}, onAnswer }) => {
   if (!items.length) return null;
   const answered = items.filter((_, index) => answers[index]).length;
@@ -379,6 +423,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           <Section title="What you must understand today">
             {lesson.grammarFocus ? <NoteBox><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox> : null}
             {lesson.topicQuestions?.length ? <PracticeBox title="Questions before Day 1">{renderList(lesson.topicQuestions)}</PracticeBox> : null}
+            {lesson.videoResource ? <VideoResourceCard resource={lesson.videoResource} /> : null}
             {lesson.grammarLesson?.explanation?.length ? <PracticeBox title="How Falowen works">{renderParagraphs(lesson.grammarLesson.explanation)}</PracticeBox> : null}
             {lesson.grammarLesson?.rules?.length ? <PracticeBox title="Course rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}
             {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Daily flow examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
@@ -422,6 +467,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
               <Section title="Grammar and useful language">
                 {lesson.grammarFocus ? <NoteBox><strong>Focus:</strong> {lesson.grammarFocus}</NoteBox> : null}
                 {lesson.grammarLesson?.title ? <PracticeBox title="Grammar topic"><strong>{lesson.grammarLesson.title}</strong></PracticeBox> : null}
+                {lesson.videoResource ? <VideoResourceCard resource={lesson.videoResource} /> : null}
                 {lesson.grammarLesson?.explanation?.length ? <PracticeBox title="How to use it">{renderParagraphs(lesson.grammarLesson.explanation)}</PracticeBox> : null}
                 {lesson.grammarLesson?.rules?.length ? <PracticeBox title="Rules">{renderList(lesson.grammarLesson.rules)}</PracticeBox> : null}
                 {lesson.grammarLesson?.examples?.length ? <PracticeBox title="Examples">{renderList(lesson.grammarLesson.examples)}</PracticeBox> : null}
