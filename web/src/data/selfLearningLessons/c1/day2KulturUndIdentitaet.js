@@ -7,6 +7,11 @@ const c1Day2KulturUndIdentitaet = makeLesson({
   title: "Kultur und Identität",
   topic: "Kulturelle Prägung, Zugehörigkeit und Selbstverständnis differenziert erklären",
   heroImage: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "Video explanation: Partizip I und Partizip II als Adjektiv",
+    description: "Schau dir dieses Video zuerst an. Danach kannst du die Partizipialattribute in der Sprechaufgabe und C1-Stellungnahme sicherer verwenden.",
+    url: "https://youtu.be/MF0SDU0Gsp4",
+  },
   grammarFocus: "Partizip I und Partizip II als Adjektiv: prägende Kultur, geprägte Identität, sich verändernde Gesellschaft, häufig diskutierte Fragen",
   objectives: [
     "Ich kann erklären, wie Kultur die persönliche Identität prägt.",
