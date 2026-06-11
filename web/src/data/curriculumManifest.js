@@ -91,7 +91,12 @@ const B1_ENTRIES = [
           grammar_link: "/campus/course/lesson/B1/1?view=grammar",
           workbook_link: "/campus/course/lesson/B1/1",
         }
-      : { grammar_link: null, workbook_link: null },
+      : index === 1
+        ? {
+            grammar_link: "/campus/course/lesson/B1/2?view=grammar",
+            workbook_link: "/campus/course/lesson/B1/2",
+          }
+        : { grammar_link: null, workbook_link: null },
 }));
 
 const B2_ENTRIES = [
