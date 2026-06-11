@@ -23,20 +23,53 @@ const B1_WORKBOOK_PAGES = {
   1: B1Day1TraumweltWorkbookPage,
 };
 
+const actionButtonStyle = {
+  ...styles.primaryButton,
+  display: "inline-flex",
+  width: "fit-content",
+  alignItems: "center",
+  justifyContent: "center",
+  textDecoration: "none",
+};
+
+const secondaryActionButtonStyle = {
+  ...styles.secondaryButton,
+  display: "inline-flex",
+  width: "fit-content",
+  alignItems: "center",
+  justifyContent: "center",
+  textDecoration: "none",
+};
+
+const getExternalProps = (url = "") => (isInternalLink(url) ? {} : { target: "_blank", rel: "noreferrer" });
+
 const ResourceAnchor = ({ label, url }) => {
   if (!url) return null;
-  const externalProps = isInternalLink(url) ? {} : { target: "_blank", rel: "noreferrer" };
   return (
     <li>
-      <a href={url} {...externalProps}>{label}</a>
+      <a href={url} {...getExternalProps(url)}>{label}</a>
     </li>
   );
 };
 
+const ActionLink = ({ href, children, primary = false }) => {
+  if (!href) return null;
+  return (
+    <a href={href} {...getExternalProps(href)} style={primary ? actionButtonStyle : secondaryActionButtonStyle}>
+      {children}
+    </a>
+  );
+};
+
+const getVideoActionLabel = (resource = {}) => {
+  const title = String(resource.title || "").toLowerCase();
+  if (title.includes("teacher")) return "🎬 Watch teacher explanation";
+  if (title.includes("ai")) return "🎬 Watch AI grammar video";
+  return "🎬 Watch video";
+};
+
 const VideoResourceCard = ({ resource }) => {
   if (!resource?.url) return null;
-
-  const externalProps = isInternalLink(resource.url) ? {} : { target: "_blank", rel: "noreferrer" };
 
   return (
     <article
@@ -51,30 +84,91 @@ const VideoResourceCard = ({ resource }) => {
     >
       <strong>{resource.title}</strong>
       {resource.description ? <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>{resource.description}</p> : null}
-      <a href={resource.url} {...externalProps} style={{ fontWeight: 700 }}>
-        🎬 Watch video
-      </a>
+      <ActionLink href={resource.url}>{getVideoActionLabel(resource)}</ActionLink>
     </article>
   );
 };
 
-const LessonVideoResources = ({ videos }) => {
-  if (!videos?.length) return null;
+const firstLessonResource = (entry = {}) => {
+  const lesenHoeren = toLessonArray(entry.lesen_hören).filter(Boolean);
+  const schreibenSprechen = toLessonArray(entry.schreiben_sprechen).filter(Boolean);
+  return lesenHoeren[0] || schreibenSprechen[0] || {};
+};
+
+const lessonResourceUrl = (entry = {}, key) => {
+  const primaryResource = firstLessonResource(entry);
+  const nestedSchreiben = toLessonArray(entry.schreiben_sprechen).find((resource) => resource?.[key]);
+  const nestedLesen = toLessonArray(entry.lesen_hören).find((resource) => resource?.[key]);
+  return entry[key] || primaryResource[key] || nestedSchreiben?.[key] || nestedLesen?.[key] || "";
+};
+
+const LessonStartGuide = ({ entry, videoResources, isSelfLearning, onSubmit }) => {
+  const grammarUrl = lessonResourceUrl(entry, "grammarbook_link");
+  const workbookUrl = lessonResourceUrl(entry, "workbook_link");
+  const primaryResource = firstLessonResource(entry);
+  const submitLabel = primaryResource.chapter ? `Submit Kapitel ${primaryResource.chapter} assignment` : "Submit assignment";
+  const canSubmit = Boolean(entry?.assignment && !isSelfLearning);
 
   return (
-    <section style={{ display: "grid", gap: 10 }}>
-      <h2 style={{ margin: 0, fontSize: 20 }}>Lesson videos</h2>
-      <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
-        Watch the teacher explanation and the AI grammar video before you open the grammar notes and workbook.
-      </p>
-      <div style={{ display: "grid", gap: 10 }}>
-        {videos.map((resource) => <VideoResourceCard key={resource.key || resource.url} resource={resource} />)}
+    <section
+      style={{
+        border: "1px solid #bfdbfe",
+        background: "#eff6ff",
+        borderRadius: 16,
+        padding: 16,
+        display: "grid",
+        gap: 14,
+      }}
+    >
+      <div style={{ display: "grid", gap: 4 }}>
+        <h2 style={{ margin: 0, fontSize: 22 }}>Start here</h2>
+        <p style={{ margin: 0, color: "#4b5563", lineHeight: 1.6 }}>
+          Follow these steps in order. Watch, review, practise, then submit your work.
+        </p>
       </div>
+
+      <div style={{ display: "grid", gap: 12 }}>
+        <article style={{ display: "grid", gap: 10 }}>
+          <strong>Step 1: Watch the lesson videos</strong>
+          {videoResources?.length ? (
+            <div style={{ display: "grid", gap: 10 }}>
+              {videoResources.map((resource) => <VideoResourceCard key={resource.key || resource.url} resource={resource} />)}
+            </div>
+          ) : (
+            <ActionLink href={entry.video || entry.youtube_link || entry.tutorial_video_url}>🎬 Watch video</ActionLink>
+          )}
+        </article>
+
+        <article style={{ display: "grid", gap: 8 }}>
+          <strong>Step 2: Review the grammar</strong>
+          <ActionLink href={grammarUrl}>📘 Open grammar notes</ActionLink>
+        </article>
+
+        <article style={{ display: "grid", gap: 8 }}>
+          <strong>Step 3: Complete the workbook</strong>
+          <ActionLink href={workbookUrl}>📝 Open workbook</ActionLink>
+        </article>
+
+        {canSubmit ? (
+          <article style={{ display: "grid", gap: 8 }}>
+            <strong>Step 4: Submit your assignment</strong>
+            <button type="button" style={actionButtonStyle} onClick={onSubmit}>
+              {submitLabel}
+            </button>
+          </article>
+        ) : null}
+      </div>
+
+      {canSubmit ? (
+        <div style={{ border: "1px solid #dbeafe", background: "#ffffff", borderRadius: 12, padding: 12, lineHeight: 1.6 }}>
+          <strong>What should I submit?</strong> Complete the workbook task first, then submit your final answers in the submission area.
+        </div>
+      ) : null}
     </section>
   );
 };
 
-const LessonResourceList = ({ title, lessons, isSelfLearning, onSubmit, hideVideoLink = false }) => {
+const LessonResourceList = ({ title, lessons, isSelfLearning, hideVideoLink = false }) => {
   const rows = toLessonArray(lessons).filter(Boolean);
   if (!rows.length) return null;
 
@@ -106,11 +200,6 @@ const LessonResourceList = ({ title, lessons, isSelfLearning, onSubmit, hideVide
               <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
               <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
             </ul>
-            {lesson.assignment && !isSelfLearning ? (
-              <button type="button" style={{ ...styles.primaryButton, justifySelf: "start" }} onClick={onSubmit}>
-                Submit {lesson.chapter ? `Kapitel ${lesson.chapter}` : "this"} assignment
-              </button>
-            ) : null}
           </article>
         ))}
       </div>
@@ -215,10 +304,6 @@ const CourseLessonPage = () => {
             <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 14, padding: 14 }}>
               <strong>No tutor submission.</strong> This level is self-learning. Practise with Falowen AI, use the feedback, enter your score and self-mark your progress.
             </div>
-          ) : entry.assignment ? (
-            <button type="button" style={{ ...styles.primaryButton, justifySelf: "start" }} onClick={handleSubmitAssignment}>
-              Submit this assignment
-            </button>
           ) : null}
         </header>
 
@@ -229,10 +314,10 @@ const CourseLessonPage = () => {
           </section>
         ) : null}
 
-        <LessonVideoResources videos={videoResources} />
+        <LessonStartGuide entry={entry} videoResources={videoResources} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
 
-        <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} hideVideoLink={Boolean(videoResources.length)} />
-        <LessonResourceList title="Schreiben & Sprechen" lessons={entry.schreiben_sprechen} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} hideVideoLink={Boolean(videoResources.length)} />
+        <LessonResourceList title="Lesson resources" lessons={entry.lesen_hören} isSelfLearning={isSelfLearning} hideVideoLink={Boolean(videoResources.length)} />
+        <LessonResourceList title="Extra practice" lessons={entry.schreiben_sprechen} isSelfLearning={isSelfLearning} hideVideoLink={Boolean(videoResources.length)} />
 
         <ul style={{ ...styles.checklist, margin: 0 }}>
           {!videoResources.length ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={entry.video || entry.youtube_link || entry.tutorial_video_url} /> : null}
