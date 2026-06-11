@@ -4,6 +4,7 @@ import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
+import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
@@ -84,6 +85,10 @@ const CourseLessonPage = () => {
     if (location.state?.entry) return location.state.entry;
     return (courseSchedules[level] || []).find((lesson) => String(lesson.day) === String(day)) || null;
   }, [day, level, location.state]);
+
+  if (level === "B1" && String(day) === "1") {
+    return <B1Day1TraumweltWorkbookPage />;
+  }
 
   const SelfLearningComponent = getSelfLearningLessonComponent(level, day);
   const isSelfLearning = SELF_LEARNING_LEVELS.has(level);
