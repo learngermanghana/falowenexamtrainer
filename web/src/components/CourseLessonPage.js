@@ -74,7 +74,7 @@ const LessonVideoResources = ({ videos }) => {
   );
 };
 
-const LessonResourceList = ({ title, lessons, isSelfLearning, onSubmit }) => {
+const LessonResourceList = ({ title, lessons, level, day, isSelfLearning, onSubmit }) => {
   const rows = toLessonArray(lessons).filter(Boolean);
   if (!rows.length) return null;
 
@@ -83,7 +83,7 @@ const LessonResourceList = ({ title, lessons, isSelfLearning, onSubmit }) => {
       <h2 style={{ margin: 0, fontSize: 20 }}>{title}</h2>
       <div style={{ display: "grid", gap: 10 }}>
         {rows.map((lesson, index) => {
-          const videoResources = getLessonVideoResources("", "", lesson);
+          const videoResources = getLessonVideoResources(level, day, lesson);
 
           return (
             <article
@@ -236,8 +236,8 @@ const CourseLessonPage = () => {
 
         <LessonVideoResources videos={videoResources} />
 
-        <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
-        <LessonResourceList title="Schreiben & Sprechen" lessons={entry.schreiben_sprechen} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
+        <LessonResourceList title="Lesen & Hören" lessons={entry.lesen_hören} level={level} day={day} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
+        <LessonResourceList title="Schreiben & Sprechen" lessons={entry.schreiben_sprechen} level={level} day={day} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
 
         <ul style={{ ...styles.checklist, margin: 0 }}>
           {!videoResources.length ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={entry.video || entry.youtube_link || entry.tutorial_video_url} /> : null}
