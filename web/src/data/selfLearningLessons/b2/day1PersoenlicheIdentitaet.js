@@ -104,16 +104,17 @@ const b2Day1PersoenlicheIdentitaet = makeLesson({
   writingBuilder: {
     structure: [
       "Einleitung: Stellen Sie das Thema Online-Identität und echte Identität kurz vor.",
-      "Äußern Sie Ihre Meinung: Sollten Menschen online genauso sein wie im echten Leben?",
-      "Nennen Sie Gründe: Warum wirken viele Menschen online anders als offline?",
-      "Nennen Sie andere Möglichkeiten: Wie kann man sich online ehrlich und authentisch zeigen?",
-      "Nennen Sie Vorteile: Welche Vorteile hat eine authentische Online-Identität?",
+      "Meinung: Äußern Sie klar Ihre Meinung dazu, ob Menschen online genauso sein sollten wie im echten Leben.",
+      "Gründe: Erklären Sie, warum viele Menschen online anders wirken als offline.",
+      "Andere Möglichkeiten / Alternativen: Beschreiben Sie, wie man sich online ehrlich und authentisch zeigen kann.",
+      "Vorteile: Erklären Sie die Vorteile einer authentischen Online-Identität.",
       "Schluss: Fassen Sie Ihre Meinung kurz zusammen.",
     ],
     usefulLines: [
       "In der heutigen Zeit spielt die Online-Identität eine immer größere Rolle.",
       "Meiner Meinung nach sollte man online nicht perfekt wirken wollen, sondern authentisch bleiben.",
       "Ein Grund dafür, dass viele Menschen online anders wirken, ist der Wunsch nach Anerkennung.",
+      "Außerdem sollte man beachten, dass soziale Medien oft nur ausgewählte Seiten einer Person zeigen.",
       "Eine andere Möglichkeit wäre, auch persönliche Interessen, echte Erfahrungen und Schwächen zu zeigen.",
       "Ein Vorteil einer authentischen Online-Identität besteht darin, dass andere Menschen ein ehrlicheres Bild bekommen.",
       "Zusammenfassend lässt sich sagen, dass Identität aus vielen Erfahrungen und Entscheidungen besteht.",
@@ -133,7 +134,7 @@ const b2Day1PersoenlicheIdentitaet = makeLesson({
   ],
   tasks: {
     speaking: "Sprich 2–3 Minuten über deine persönliche Identität. Nutze mindestens 5 Adjektiv-Nomen-Verbindungen und nenne ein Beispiel aus deinem Leben.",
-    writing: "Schreibe 180–220 Wörter als B2-Meinungsbeitrag über Online-Identität und echte Identität. Bearbeite Meinung, Gründe, andere Möglichkeiten und Vorteile.",
+    writing: "Schreibe 180–220 Wörter als B2-Meinungsbeitrag über Online-Identität und echte Identität. Bearbeite Meinung, Gründe, andere Möglichkeiten/Alternativen und Vorteile.",
     reading: "Lies einen Artikel über Identität, soziale Medien oder Selbstbild. Notiere Hauptaussage, 5 Wörter und deine Meinung.",
     listening: "Höre einen kurzen Beitrag über Identität, Persönlichkeit oder soziale Medien. Fasse ihn in 4 Sätzen zusammen.",
   },
