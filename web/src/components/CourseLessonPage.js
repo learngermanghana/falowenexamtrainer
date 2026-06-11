@@ -1,9 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
 import { getLessonVideoResources } from "../data/lessonVideoDictionary";
-import { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
@@ -32,43 +31,7 @@ const palette = {
   amber: "#d97706",
   amberSoft: "#fed7aa",
   navy: "#262b5f",
-  blueSoft: "#eef3ff",
   border: "#eadfd0",
-  success: "#059669",
-};
-
-const actionButtonStyle = {
-  ...styles.primaryButton,
-  background: palette.navy,
-  borderColor: palette.navy,
-  color: "#fff",
-  display: "inline-flex",
-  width: "fit-content",
-  alignItems: "center",
-  justifyContent: "center",
-  textDecoration: "none",
-  gap: 6,
-  borderRadius: 14,
-  padding: "8px 12px",
-  fontSize: 13,
-  lineHeight: 1.15,
-};
-
-const secondaryActionButtonStyle = {
-  ...styles.secondaryButton,
-  background: "#fff",
-  borderColor: "#d8d1f2",
-  color: palette.navy,
-  display: "inline-flex",
-  width: "fit-content",
-  alignItems: "center",
-  justifyContent: "center",
-  textDecoration: "none",
-  gap: 6,
-  borderRadius: 14,
-  padding: "8px 12px",
-  fontSize: 13,
-  lineHeight: 1.15,
 };
 
 const pillStyle = {
@@ -84,22 +47,20 @@ const pillStyle = {
   fontSize: 12,
 };
 
-const ActionLink = ({ href, children, primary = false, onClick }) => {
-  if (!href) return null;
-  return (
-    <a href={href} {...getExternalProps(href)} onClick={onClick} style={primary ? actionButtonStyle : secondaryActionButtonStyle}>
-      {children}
-    </a>
-  );
-};
-
-const ResourceAnchor = ({ label, url }) => {
-  if (!url) return null;
-  return (
-    <a href={url} {...getExternalProps(url)} style={secondaryActionButtonStyle}>
-      {label}
-    </a>
-  );
+const resourceButtonStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  alignItems: "center",
+  justifyContent: "center",
+  textDecoration: "none",
+  border: `1px solid ${palette.navy}`,
+  background: palette.navy,
+  color: "#fff",
+  borderRadius: 999,
+  padding: "8px 12px",
+  fontSize: 13,
+  fontWeight: 800,
+  lineHeight: 1.15,
 };
 
 const firstLessonResource = (entry = {}) => {
@@ -115,65 +76,22 @@ const lessonResourceUrl = (entry = {}, key) => {
   return entry[key] || primaryResource[key] || nestedSchreiben?.[key] || nestedLesen?.[key] || "";
 };
 
-const getVideoActionLabel = (resource = {}) => {
-  const title = String(resource.title || "").toLowerCase();
-  if (title.includes("teacher")) return "Watch teacher video";
-  if (title.includes("ai")) return "Watch AI video";
-  return "Watch video";
-};
+const findVideo = (videos = [], keyword) => videos.find((resource) => String(resource.title || "").toLowerCase().includes(keyword));
 
-const VideoResourceCard = ({ resource, onOpen }) => {
-  if (!resource?.url) return null;
+const LessonResourceCard = ({ number, icon, title, description, actionLabel, url }) => {
+  if (!url) return null;
 
   return (
     <article
       style={{
-        border: "1px solid #c7d2fe",
-        background: palette.blueSoft,
+        border: `1px solid ${palette.border}`,
         borderRadius: 14,
-        padding: 10,
+        background: "#fffaf3",
+        padding: 12,
         display: "grid",
-        gap: 8,
-      }}
-    >
-      <div style={{ display: "grid", gridTemplateColumns: "28px minmax(0, 1fr)", gap: 9, alignItems: "start" }}>
-        <span style={{ fontSize: 22, lineHeight: 1 }}>🎬</span>
-        <div style={{ display: "grid", gap: 6, minWidth: 0 }}>
-          <strong style={{ color: palette.ink, fontSize: 14, lineHeight: 1.25 }}>{resource.title}</strong>
-          {resource.description ? <span style={{ color: palette.muted, lineHeight: 1.4, fontSize: 13 }}>{resource.description}</span> : null}
-          <ActionLink href={resource.url} primary onClick={onOpen}>
-            {getVideoActionLabel(resource)} ›
-          </ActionLink>
-        </div>
-      </div>
-    </article>
-  );
-};
-
-const LessonStepCard = ({ number, title, children, active, complete, locked, onToggle }) => (
-  <article
-    style={{
-      border: active ? `1px solid ${palette.amberSoft}` : `1px solid ${palette.border}`,
-      borderRadius: 14,
-      background: active ? "#fffdf8" : "rgba(255,255,255,0.65)",
-      boxShadow: active ? "0 8px 18px rgba(146, 64, 14, 0.06)" : "none",
-      overflow: "hidden",
-    }}
-  >
-    <button
-      type="button"
-      onClick={onToggle}
-      style={{
-        width: "100%",
-        border: 0,
-        background: "transparent",
-        padding: "11px 12px",
-        display: "grid",
-        gridTemplateColumns: "34px minmax(0, 1fr) auto",
-        gap: 9,
-        alignItems: "center",
-        textAlign: "left",
-        cursor: "pointer",
+        gridTemplateColumns: "34px minmax(0, 1fr)",
+        gap: 10,
+        alignItems: "start",
       }}
     >
       <span
@@ -184,40 +102,33 @@ const LessonStepCard = ({ number, title, children, active, complete, locked, onT
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
-          background: active ? palette.amber : complete ? palette.success : "#eee7dc",
-          color: active || complete ? "#fff" : palette.muted,
-          fontWeight: 800,
-          fontSize: 15,
+          background: "#fff7ed",
+          border: `1px solid ${palette.amberSoft}`,
+          fontWeight: 900,
+          color: palette.amber,
+          fontSize: 13,
         }}
       >
-        {complete ? "✓" : number}
+        {number}
       </span>
-      <strong style={{ color: active ? palette.ink : palette.muted, fontSize: 15, lineHeight: 1.15 }}>{title}</strong>
-      <span style={{ color: palette.muted, fontSize: 13 }}>{locked ? "🔒" : active ? "⌃" : "⌄"}</span>
-    </button>
-    {active ? <div style={{ padding: "0 12px 12px 12px", display: "grid", gap: 9 }}>{children}</div> : null}
-  </article>
-);
+      <div style={{ display: "grid", gap: 6, minWidth: 0 }}>
+        <strong style={{ color: palette.ink, fontSize: 15, lineHeight: 1.25 }}>
+          {icon} {title}
+        </strong>
+        <p style={{ margin: 0, color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>{description}</p>
+        <a href={url} {...getExternalProps(url)} style={resourceButtonStyle}>
+          {actionLabel} ›
+        </a>
+      </div>
+    </article>
+  );
+};
 
-const LessonStartGuide = ({ entry, videoResources, isSelfLearning, onSubmit }) => {
+const LessonResourcesHub = ({ entry, videoResources }) => {
+  const teacherVideo = findVideo(videoResources, "teacher") || videoResources?.[0];
+  const aiVideo = findVideo(videoResources, "ai") || videoResources?.find((resource) => resource?.url !== teacherVideo?.url);
   const grammarUrl = lessonResourceUrl(entry, "grammarbook_link");
   const workbookUrl = lessonResourceUrl(entry, "workbook_link");
-  const primaryResource = firstLessonResource(entry);
-  const submitLabel = primaryResource.chapter ? `Submit Kapitel ${primaryResource.chapter} assignment` : "Submit assignment";
-  const canSubmit = Boolean(entry?.assignment && !isSelfLearning);
-  const [openStep, setOpenStep] = useState(1);
-  const [completedSteps, setCompletedSteps] = useState(() => new Set());
-
-  const markComplete = (step, nextStep) => {
-    setCompletedSteps((previous) => {
-      const next = new Set(previous);
-      next.add(step);
-      return next;
-    });
-    if (nextStep) setOpenStep(nextStep);
-  };
-
-  const isComplete = (step) => completedSteps.has(step);
 
   return (
     <section
@@ -232,115 +143,69 @@ const LessonStartGuide = ({ entry, videoResources, isSelfLearning, onSubmit }) =
       }}
     >
       <div style={{ display: "grid", gap: 4 }}>
-        <span style={{ color: palette.amber, letterSpacing: 1.6, textTransform: "uppercase", fontWeight: 800, fontSize: 10 }}>Start here</span>
-        <h2 style={{ margin: 0, color: palette.ink, fontSize: 19, lineHeight: 1.15 }}>Follow the steps.</h2>
-        <p style={{ margin: 0, color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>Watch, review, complete the workbook, then submit.</p>
+        <h2 style={{ margin: 0, color: palette.ink, fontSize: 20, lineHeight: 1.15 }}>Lesson resources</h2>
+        <p style={{ margin: 0, color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>
+          Choose what you want to use first: watch a lecture, study the grammar, or open the workbook.
+        </p>
       </div>
 
-      <div style={{ display: "grid", gap: 9 }}>
-        <LessonStepCard
-          number={1}
-          title="Step 1: Watch videos"
-          active={openStep === 1}
-          complete={isComplete(1)}
-          onToggle={() => setOpenStep(openStep === 1 ? 0 : 1)}
-        >
-          {videoResources?.length ? (
-            videoResources.map((resource) => (
-              <VideoResourceCard key={resource.key || resource.url} resource={resource} onOpen={() => markComplete(1, 2)} />
-            ))
-          ) : (
-            <ActionLink href={entry.video || entry.youtube_link || entry.tutorial_video_url} primary onClick={() => markComplete(1, 2)}>
-              🎬 Watch video ›
-            </ActionLink>
-          )}
-        </LessonStepCard>
-
-        <LessonStepCard
-          number={2}
-          title="Step 2: Review grammar"
-          active={openStep === 2}
-          complete={isComplete(2)}
-          locked={!isComplete(1)}
-          onToggle={() => setOpenStep(openStep === 2 ? 0 : 2)}
-        >
-          <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>Read the grammar before doing the workbook.</p>
-          <ActionLink href={grammarUrl} primary onClick={() => markComplete(2, 3)}>
-            📘 Open grammar ›
-          </ActionLink>
-        </LessonStepCard>
-
-        <LessonStepCard
-          number={3}
-          title="Step 3: Complete workbook"
-          active={openStep === 3}
-          complete={isComplete(3)}
-          locked={!isComplete(2)}
-          onToggle={() => setOpenStep(openStep === 3 ? 0 : 3)}
-        >
-          <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>Open the workbook and prepare your final answers.</p>
-          <ActionLink href={workbookUrl} primary onClick={() => markComplete(3, 4)}>
-            📝 Open workbook ›
-          </ActionLink>
-        </LessonStepCard>
-
-        {canSubmit ? (
-          <LessonStepCard
-            number={4}
-            title="Step 4: Submit"
-            active={openStep === 4}
-            complete={false}
-            locked={!isComplete(3)}
-            onToggle={() => setOpenStep(openStep === 4 ? 0 : 4)}
-          >
-            <div style={{ display: "grid", gap: 8 }}>
-              <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>Submit after you complete the workbook.</p>
-              <button type="button" style={actionButtonStyle} onClick={onSubmit}>
-                {submitLabel} ›
-              </button>
-            </div>
-          </LessonStepCard>
-        ) : null}
+      <div style={{ display: "grid", gap: 8 }}>
+        <LessonResourceCard
+          number="1"
+          icon="🎬"
+          title="Teacher lecture video"
+          description={teacherVideo?.description || "Recorded class explanation from the teacher."}
+          actionLabel="Watch teacher video"
+          url={teacherVideo?.url}
+        />
+        <LessonResourceCard
+          number="2"
+          icon="🤖"
+          title="AI lecture / grammar video"
+          description={aiVideo?.description || "AI explanation for revision and self-study."}
+          actionLabel="Watch AI video"
+          url={aiVideo?.url}
+        />
+        <LessonResourceCard
+          number="3"
+          icon="📘"
+          title="Grammar book"
+          description="Read the grammar notes and examples before or after watching the videos."
+          actionLabel="Open grammar book"
+          url={grammarUrl}
+        />
+        <LessonResourceCard
+          number="4"
+          icon="📝"
+          title="Workbook"
+          description="Open the workbook, answer the tasks, and prepare your final answers."
+          actionLabel="Open workbook"
+          url={workbookUrl}
+        />
       </div>
     </section>
   );
 };
 
-const LessonResourceList = ({ title, lessons, isSelfLearning, hideVideoLink = false }) => {
-  const rows = toLessonArray(lessons).filter(Boolean);
-  if (!rows.length) return null;
+const SubmitAssignmentCard = ({ canSubmit, submitLabel, onSubmit }) => {
+  if (!canSubmit) return null;
 
   return (
-    <section style={{ display: "grid", gap: 8 }}>
-      <h2 style={{ margin: 0, color: palette.ink, fontSize: 18 }}>📄 {title}</h2>
-      <div style={{ display: "grid", gap: 8 }}>
-        {rows.map((lesson, index) => (
-          <article
-            key={`${title}-${lesson.chapter || lesson.title || index}`}
-            style={{
-              border: `1px solid ${palette.border}`,
-              borderRadius: 14,
-              background: "#fffaf3",
-              overflow: "hidden",
-            }}
-          >
-            <div style={{ padding: 12, display: "grid", gap: 6 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                <strong style={{ color: palette.ink, fontSize: 15 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : lesson.title || "Resource"}</strong>
-                {lesson.assignment && !isSelfLearning ? <span style={styles.badge}>Assignment</span> : null}
-                {isSelfLearning ? <span style={styles.badge}>AI practice</span> : null}
-              </div>
-              {lesson.title && lesson.chapter ? <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.4 }}>{lesson.title}</p> : null}
-              {lesson.note ? <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>{lesson.note}</p> : null}
-            </div>
-            <div style={{ borderTop: `1px solid ${palette.border}`, padding: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
-              {!hideVideoLink ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={lesson.video || lesson.youtube_link} /> : null}
-              <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
-              <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
-            </div>
-          </article>
-        ))}
-      </div>
+    <section
+      style={{
+        background: "#eff6ff",
+        border: "1px solid #bfdbfe",
+        borderRadius: 14,
+        padding: 12,
+        display: "grid",
+        gap: 8,
+      }}
+    >
+      <strong style={{ color: "#1e3a8a", fontSize: 14 }}>Finished the workbook?</strong>
+      <p style={{ margin: 0, color: "#334155", fontSize: 13, lineHeight: 1.45 }}>Submit your final answers when you are ready.</p>
+      <button type="button" style={{ ...resourceButtonStyle, borderColor: "#2563eb", background: "#2563eb" }} onClick={onSubmit}>
+        {submitLabel} ›
+      </button>
     </section>
   );
 };
@@ -387,6 +252,9 @@ const CourseLessonPage = () => {
   const status = location.state?.status || entry?.completion?.nonActionableStatus || "notStarted";
   const scoreText = location.state?.scoreText || "";
   const videoResources = getLessonVideoResources(level, day, entry || {});
+  const primaryResource = firstLessonResource(entry || {});
+  const submitLabel = primaryResource.chapter ? `Submit Kapitel ${primaryResource.chapter} assignment` : "Submit assignment";
+  const canSubmit = Boolean(entry?.assignment && !isSelfLearning);
 
   const handleSubmitAssignment = () => {
     if (!assignmentKey || isSelfLearning) return;
@@ -474,16 +342,8 @@ const CourseLessonPage = () => {
           </section>
         ) : null}
 
-        <LessonStartGuide entry={entry} videoResources={videoResources} isSelfLearning={isSelfLearning} onSubmit={handleSubmitAssignment} />
-
-        <LessonResourceList title="Lesson resources" lessons={entry.lesen_hören} isSelfLearning={isSelfLearning} hideVideoLink={Boolean(videoResources.length)} />
-        <LessonResourceList title="Extra practice" lessons={entry.schreiben_sprechen} isSelfLearning={isSelfLearning} hideVideoLink={Boolean(videoResources.length)} />
-
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {!videoResources.length ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={entry.video || entry.youtube_link || entry.tutorial_video_url} /> : null}
-          <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={entry.grammarbook_link} />
-          <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={entry.workbook_link} />
-        </div>
+        <LessonResourcesHub entry={entry} videoResources={videoResources} />
+        <SubmitAssignmentCard canSubmit={canSubmit} submitLabel={submitLabel} onSubmit={handleSubmitAssignment} />
 
         <TextBlock title="Schreiben">{entry.schreiben}</TextBlock>
         <TextBlock title="Sprechen">{entry.sprechen}</TextBlock>
