@@ -92,7 +92,9 @@ const CourseLessonPage = () => {
     if (query.get("view") === "grammar") {
       return <B1Day1TraumweltGrammarNotesPage />;
     }
-    return <B1Day1TraumweltWorkbookPage />;
+    if (query.get("view") === "workbook") {
+      return <B1Day1TraumweltWorkbookPage />;
+    }
   }
 
   const SelfLearningComponent = getSelfLearningLessonComponent(level, day);
