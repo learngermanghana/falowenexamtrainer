@@ -76,7 +76,22 @@ const A2_ENTRIES = [
 
 const B1_ENTRIES = [
   ["2.5", "Der Besichtigungstermin"],["2.6", "Leben in der Stadt oder auf dem Land"],["3.7", "Fast Food vs Hausmannskost"],["3.8", "Alles für die Gesundheit"],["3.9", "Work-Life-Balance im modernen Arbeitsumfeld"],["4.10", "Digitale Auszeit und Selbstfürsorge"],["4.11", "Teamspiele und kooperative Aktivitäten"],["4.12", "Abenteuer in der Natur"],["4.13", "Eine Filmkritik schreiben"],["5.14", "Traditionelles vs digitales Lernen"],["5.15", "Medien und Arbeiten im Homeoffice"],["5.16", "Prüfungsangst und Stressbewältigung"],["5.17", "Wie lernt man am besten?"],["6.18", "Wege zum Wunschberuf"],["6.19", "Das Vorstellungsgespräch"],["6.20", "Wie wird man …? (Ausbildung und Qualifikation)"],["7.21", "Lebensformen heute – Familie und Wohngemeinschaft"],["7.22", "Was ist dir in einer Beziehung wichtig?"],["7.23", "Erstes Date – typische Situationen"],["8.24", "Konsum und Nachhaltigkeit"],["8.25", "Online einkaufen – Rechte und Risiken"],["9.26", "Reiseprobleme und Lösungen"],["10.27", "Umweltfreundlich im Alltag"],["10.28", "Klimafreundlich leben"],
-].map(([chapter, de], index) => ({ level: "B1", assignmentDay: index + 1, chapter, mode: "Lesen & Hören", assignment: true, de, topic: de }));
+].map(([chapter, de], index) => ({
+  level: "B1",
+  assignmentDay: index + 1,
+  chapter,
+  mode: "Lesen & Hören",
+  assignment: true,
+  de,
+  topic: de,
+  schreiben_sprechen:
+    index === 1
+      ? {
+          grammar_link: "/campus/course/lesson/B1/2?view=grammar",
+          workbook_link: "/campus/course/lesson/B1/2",
+        }
+      : { grammar_link: null, workbook_link: null },
+}));
 
 
 

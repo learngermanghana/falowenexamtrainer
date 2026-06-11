@@ -6,11 +6,21 @@ import { RESOURCE_ACTION_LABELS } from "./ResourceLinkRow";
 import { getSelfLearningLessonComponent } from "./SelfLearningLessonRegistry";
 import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
+import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 
 const toLessonArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
 const isInternalLink = (url = "") => String(url || "").startsWith("/");
 const SELF_LEARNING_LEVELS = new Set(["B2", "C1"]);
+
+const B1_GRAMMAR_PAGES = {
+  1: B1Day1TraumweltGrammarNotesPage,
+  2: B1Day2FreundeFuersLebenGrammarNotesPage,
+};
+
+const B1_WORKBOOK_PAGES = {
+  1: B1Day1TraumweltWorkbookPage,
+};
 
 const ResourceAnchor = ({ label, url }) => {
   if (!url) return null;
@@ -87,13 +97,18 @@ const CourseLessonPage = () => {
     return (courseSchedules[level] || []).find((lesson) => String(lesson.day) === String(day)) || null;
   }, [day, level, location.state]);
 
-  if (level === "B1" && String(day) === "1") {
+  if (level === "B1") {
     const query = new URLSearchParams(location.search);
-    if (query.get("view") === "grammar") {
-      return <B1Day1TraumweltGrammarNotesPage />;
+    const dayNumber = Number(day);
+
+    if (query.get("view") === "grammar" && B1_GRAMMAR_PAGES[dayNumber]) {
+      const GrammarPage = B1_GRAMMAR_PAGES[dayNumber];
+      return <GrammarPage />;
     }
-    if (query.get("view") === "workbook") {
-      return <B1Day1TraumweltWorkbookPage />;
+
+    if (B1_WORKBOOK_PAGES[dayNumber]) {
+      const WorkbookPage = B1_WORKBOOK_PAGES[dayNumber];
+      return <WorkbookPage />;
     }
   }
 
