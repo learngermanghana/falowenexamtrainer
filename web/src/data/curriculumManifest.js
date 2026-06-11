@@ -75,10 +75,24 @@ const A2_ENTRIES = [
 ].map(([chapter, de], index) => ({ level: "A2", assignmentDay: index + 1, chapter, mode: "Lesen & Hören", assignment: true, de, topic: de }));
 
 const B1_ENTRIES = [
-  ["2.5", "Der Besichtigungstermin"],["2.6", "Leben in der Stadt oder auf dem Land"],["3.7", "Fast Food vs Hausmannskost"],["3.8", "Alles für die Gesundheit"],["3.9", "Work-Life-Balance im modernen Arbeitsumfeld"],["4.10", "Digitale Auszeit und Selbstfürsorge"],["4.11", "Teamspiele und kooperative Aktivitäten"],["4.12", "Abenteuer in der Natur"],["4.13", "Eine Filmkritik schreiben"],["5.14", "Traditionelles vs digitales Lernen"],["5.15", "Medien und Arbeiten im Homeoffice"],["5.16", "Prüfungsangst und Stressbewältigung"],["5.17", "Wie lernt man am besten?"],["6.18", "Wege zum Wunschberuf"],["6.19", "Das Vorstellungsgespräch"],["6.20", "Wie wird man …? (Ausbildung und Qualifikation)"],["7.21", "Lebensformen heute – Familie und Wohngemeinschaft"],["7.22", "Was ist dir in einer Beziehung wichtig?"],["7.23", "Erstes Date – typische Situationen"],["8.24", "Konsum und Nachhaltigkeit"],["8.25", "Online einkaufen – Rechte und Risiken"],["9.26", "Reiseprobleme und Lösungen"],["10.27", "Umweltfreundlich im Alltag"],["10.28", "Klimafreundlich leben"],
-].map(([chapter, de], index) => ({ level: "B1", assignmentDay: index + 1, chapter, mode: "Lesen & Hören", assignment: true, de, topic: de }));
-
-
+  ["2.5", "Traumwelt"],["2.6", "Leben in der Stadt oder auf dem Land"],["3.7", "Fast Food vs Hausmannskost"],["3.8", "Alles für die Gesundheit"],["3.9", "Work-Life-Balance im modernen Arbeitsumfeld"],["4.10", "Digitale Auszeit und Selbstfürsorge"],["4.11", "Teamspiele und kooperative Aktivitäten"],["4.12", "Abenteuer in der Natur"],["4.13", "Eine Filmkritik schreiben"],["5.14", "Traditionelles vs digitales Lernen"],["5.15", "Medien und Arbeiten im Homeoffice"],["5.16", "Prüfungsangst und Stressbewältigung"],["5.17", "Wie lernt man am besten?"],["6.18", "Wege zum Wunschberuf"],["6.19", "Das Vorstellungsgespräch"],["6.20", "Wie wird man …? (Ausbildung und Qualifikation)"],["7.21", "Lebensformen heute – Familie und Wohngemeinschaft"],["7.22", "Was ist dir in einer Beziehung wichtig?"],["7.23", "Erstes Date – typische Situationen"],["8.24", "Konsum und Nachhaltigkeit"],["8.25", "Online einkaufen – Rechte und Risiken"],["9.26", "Reiseprobleme und Lösungen"],["10.27", "Umweltfreundlich im Alltag"],["10.28", "Klimafreundlich leben"],
+].map(([chapter, de], index) => ({
+  level: "B1",
+  assignmentDay: index + 1,
+  chapter,
+  mode: "Lesen & Hören",
+  assignment: true,
+  de,
+  topic: de,
+  grammar_topic: index === 0 ? "Präsens und Perfekt" : null,
+  schreiben_sprechen:
+    index === 0
+      ? {
+          grammar_link: "/campus/course/lesson/B1/1?view=grammar",
+          workbook_link: "/campus/course/lesson/B1/1",
+        }
+      : { grammar_link: null, workbook_link: null },
+}));
 
 const B2_ENTRIES = [
   ["1.1", "Persönliche Identität und Selbstverständnis", "Adjektivdeklination"],
@@ -136,7 +150,7 @@ const C1_ENTRIES = [
   ["2.1", "Gesundheit und Lebensstil", "Modalpartikeln im argumentativen Stil"],
   ["2.2", "Reisen und Nachhaltigkeit", "Kausale und konsekutive Verknüpfungen"],
   ["2.3", "Wohnen und Stadtentwicklung", "Nominalisierung und Präpositionalstil"],
-  ["2.4", "Konsum und Werbung", "Konzessive Strukturen"],
+  ["2.4", "Konsum und Werbung", "Argumentative Redemittel"],
   ["2.5", "Integration und Gesellschaft", "Konjunktiv I in Bericht und Kommentar"],
   ["3.1", "Engagement und Ehrenamt", "Textverknüpfung mit Konnektoren"],
   ["3.2", "Freizeit und Kultur", "Erweiterte Vergleichsformen"],
