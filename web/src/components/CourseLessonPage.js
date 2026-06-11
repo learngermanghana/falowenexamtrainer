@@ -48,6 +48,10 @@ const actionButtonStyle = {
   justifyContent: "center",
   textDecoration: "none",
   gap: 6,
+  borderRadius: 14,
+  padding: "8px 12px",
+  fontSize: 13,
+  lineHeight: 1.15,
 };
 
 const secondaryActionButtonStyle = {
@@ -61,19 +65,23 @@ const secondaryActionButtonStyle = {
   justifyContent: "center",
   textDecoration: "none",
   gap: 6,
+  borderRadius: 14,
+  padding: "8px 12px",
+  fontSize: 13,
+  lineHeight: 1.15,
 };
 
 const pillStyle = {
   display: "inline-flex",
   alignItems: "center",
-  gap: 6,
+  gap: 5,
   border: `1px solid ${palette.border}`,
   borderRadius: 999,
-  padding: "6px 10px",
+  padding: "5px 8px",
   color: palette.muted,
   background: "rgba(255,255,255,0.72)",
   fontWeight: 700,
-  fontSize: 13,
+  fontSize: 12,
 };
 
 const ActionLink = ({ href, children, primary = false, onClick }) => {
@@ -109,8 +117,8 @@ const lessonResourceUrl = (entry = {}, key) => {
 
 const getVideoActionLabel = (resource = {}) => {
   const title = String(resource.title || "").toLowerCase();
-  if (title.includes("teacher")) return "Watch teacher explanation";
-  if (title.includes("ai")) return "Watch AI grammar video";
+  if (title.includes("teacher")) return "Watch teacher video";
+  if (title.includes("ai")) return "Watch AI video";
   return "Watch video";
 };
 
@@ -122,21 +130,21 @@ const VideoResourceCard = ({ resource, onOpen }) => {
       style={{
         border: "1px solid #c7d2fe",
         background: palette.blueSoft,
-        borderRadius: 16,
-        padding: 16,
+        borderRadius: 14,
+        padding: 10,
         display: "grid",
-        gap: 12,
+        gap: 8,
       }}
     >
-      <div style={{ display: "grid", gridTemplateColumns: "36px 1fr auto", gap: 12, alignItems: "center" }}>
-        <span style={{ fontSize: 26 }}>🎬</span>
-        <div style={{ display: "grid", gap: 4 }}>
-          <strong style={{ color: palette.ink, fontSize: 16 }}>{resource.title}</strong>
-          {resource.description ? <span style={{ color: palette.muted, lineHeight: 1.5 }}>{resource.description}</span> : null}
+      <div style={{ display: "grid", gridTemplateColumns: "28px minmax(0, 1fr)", gap: 9, alignItems: "start" }}>
+        <span style={{ fontSize: 22, lineHeight: 1 }}>🎬</span>
+        <div style={{ display: "grid", gap: 6, minWidth: 0 }}>
+          <strong style={{ color: palette.ink, fontSize: 14, lineHeight: 1.25 }}>{resource.title}</strong>
+          {resource.description ? <span style={{ color: palette.muted, lineHeight: 1.4, fontSize: 13 }}>{resource.description}</span> : null}
+          <ActionLink href={resource.url} primary onClick={onOpen}>
+            {getVideoActionLabel(resource)} ›
+          </ActionLink>
         </div>
-        <ActionLink href={resource.url} primary onClick={onOpen}>
-          {getVideoActionLabel(resource)} ›
-        </ActionLink>
       </div>
     </article>
   );
@@ -146,9 +154,9 @@ const LessonStepCard = ({ number, title, children, active, complete, locked, onT
   <article
     style={{
       border: active ? `1px solid ${palette.amberSoft}` : `1px solid ${palette.border}`,
-      borderRadius: 18,
+      borderRadius: 14,
       background: active ? "#fffdf8" : "rgba(255,255,255,0.65)",
-      boxShadow: active ? "0 14px 28px rgba(146, 64, 14, 0.08)" : "none",
+      boxShadow: active ? "0 8px 18px rgba(146, 64, 14, 0.06)" : "none",
       overflow: "hidden",
     }}
   >
@@ -159,10 +167,10 @@ const LessonStepCard = ({ number, title, children, active, complete, locked, onT
         width: "100%",
         border: 0,
         background: "transparent",
-        padding: 18,
+        padding: "11px 12px",
         display: "grid",
-        gridTemplateColumns: "42px 1fr auto",
-        gap: 14,
+        gridTemplateColumns: "34px minmax(0, 1fr) auto",
+        gap: 9,
         alignItems: "center",
         textAlign: "left",
         cursor: "pointer",
@@ -170,8 +178,8 @@ const LessonStepCard = ({ number, title, children, active, complete, locked, onT
     >
       <span
         style={{
-          width: 42,
-          height: 42,
+          width: 34,
+          height: 34,
           borderRadius: "50%",
           display: "inline-flex",
           alignItems: "center",
@@ -179,14 +187,15 @@ const LessonStepCard = ({ number, title, children, active, complete, locked, onT
           background: active ? palette.amber : complete ? palette.success : "#eee7dc",
           color: active || complete ? "#fff" : palette.muted,
           fontWeight: 800,
+          fontSize: 15,
         }}
       >
         {complete ? "✓" : number}
       </span>
-      <strong style={{ color: active ? palette.ink : palette.muted, fontSize: 18 }}>{title}</strong>
-      <span style={{ color: palette.muted }}>{locked ? "🔒" : active ? "⌃" : "⌄"}</span>
+      <strong style={{ color: active ? palette.ink : palette.muted, fontSize: 15, lineHeight: 1.15 }}>{title}</strong>
+      <span style={{ color: palette.muted, fontSize: 13 }}>{locked ? "🔒" : active ? "⌃" : "⌄"}</span>
     </button>
-    {active ? <div style={{ padding: "0 22px 22px 22px", display: "grid", gap: 12 }}>{children}</div> : null}
+    {active ? <div style={{ padding: "0 12px 12px 12px", display: "grid", gap: 9 }}>{children}</div> : null}
   </article>
 );
 
@@ -215,25 +224,23 @@ const LessonStartGuide = ({ entry, videoResources, isSelfLearning, onSubmit }) =
       style={{
         background: palette.card,
         border: `1px solid ${palette.amberSoft}`,
-        borderRadius: 22,
-        padding: 24,
+        borderRadius: 16,
+        padding: 12,
         display: "grid",
-        gap: 18,
-        boxShadow: "0 18px 40px rgba(120, 53, 15, 0.08)",
+        gap: 10,
+        boxShadow: "0 8px 20px rgba(120, 53, 15, 0.06)",
       }}
     >
-      <div style={{ display: "grid", gap: 8 }}>
-        <span style={{ color: palette.amber, letterSpacing: 3, textTransform: "uppercase", fontWeight: 800, fontSize: 12 }}>Start here</span>
-        <h2 style={{ margin: 0, color: palette.ink, fontSize: 32, lineHeight: 1.15 }}>Follow these steps in order.</h2>
-        <p style={{ margin: 0, color: palette.muted, fontSize: 17, lineHeight: 1.6 }}>
-          Watch, review, practise, then submit your work. Use this as your lesson checklist.
-        </p>
+      <div style={{ display: "grid", gap: 4 }}>
+        <span style={{ color: palette.amber, letterSpacing: 1.6, textTransform: "uppercase", fontWeight: 800, fontSize: 10 }}>Start here</span>
+        <h2 style={{ margin: 0, color: palette.ink, fontSize: 19, lineHeight: 1.15 }}>Follow the steps.</h2>
+        <p style={{ margin: 0, color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>Watch, review, complete the workbook, then submit.</p>
       </div>
 
-      <div style={{ display: "grid", gap: 14 }}>
+      <div style={{ display: "grid", gap: 9 }}>
         <LessonStepCard
           number={1}
-          title="Step 1: Watch the lesson videos"
+          title="Step 1: Watch videos"
           active={openStep === 1}
           complete={isComplete(1)}
           onToggle={() => setOpenStep(openStep === 1 ? 0 : 1)}
@@ -251,27 +258,27 @@ const LessonStartGuide = ({ entry, videoResources, isSelfLearning, onSubmit }) =
 
         <LessonStepCard
           number={2}
-          title="Step 2: Review the grammar"
+          title="Step 2: Review grammar"
           active={openStep === 2}
           complete={isComplete(2)}
           locked={!isComplete(1)}
           onToggle={() => setOpenStep(openStep === 2 ? 0 : 2)}
         >
-          <p style={{ margin: 0, color: palette.muted, lineHeight: 1.6 }}>Read the grammar explanation before doing the workbook tasks.</p>
+          <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>Read the grammar before doing the workbook.</p>
           <ActionLink href={grammarUrl} primary onClick={() => markComplete(2, 3)}>
-            📘 Open grammar notes ›
+            📘 Open grammar ›
           </ActionLink>
         </LessonStepCard>
 
         <LessonStepCard
           number={3}
-          title="Step 3: Complete the workbook"
+          title="Step 3: Complete workbook"
           active={openStep === 3}
           complete={isComplete(3)}
           locked={!isComplete(2)}
           onToggle={() => setOpenStep(openStep === 3 ? 0 : 3)}
         >
-          <p style={{ margin: 0, color: palette.muted, lineHeight: 1.6 }}>Open the workbook, answer the tasks, and prepare your final answers.</p>
+          <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>Open the workbook and prepare your final answers.</p>
           <ActionLink href={workbookUrl} primary onClick={() => markComplete(3, 4)}>
             📝 Open workbook ›
           </ActionLink>
@@ -280,16 +287,14 @@ const LessonStartGuide = ({ entry, videoResources, isSelfLearning, onSubmit }) =
         {canSubmit ? (
           <LessonStepCard
             number={4}
-            title="Step 4: Submit your assignment"
+            title="Step 4: Submit"
             active={openStep === 4}
             complete={false}
             locked={!isComplete(3)}
             onToggle={() => setOpenStep(openStep === 4 ? 0 : 4)}
           >
-            <div style={{ display: "grid", gap: 10 }}>
-              <p style={{ margin: 0, color: palette.muted, lineHeight: 1.6 }}>
-                Submit after you have completed the workbook. You can still submit if your teacher told you to do it now.
-              </p>
+            <div style={{ display: "grid", gap: 8 }}>
+              <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>Submit after you complete the workbook.</p>
               <button type="button" style={actionButtonStyle} onClick={onSubmit}>
                 {submitLabel} ›
               </button>
@@ -306,29 +311,29 @@ const LessonResourceList = ({ title, lessons, isSelfLearning, hideVideoLink = fa
   if (!rows.length) return null;
 
   return (
-    <section style={{ display: "grid", gap: 12 }}>
-      <h2 style={{ margin: 0, color: palette.ink, fontSize: 20 }}>📄 {title}</h2>
-      <div style={{ display: "grid", gap: 12 }}>
+    <section style={{ display: "grid", gap: 8 }}>
+      <h2 style={{ margin: 0, color: palette.ink, fontSize: 18 }}>📄 {title}</h2>
+      <div style={{ display: "grid", gap: 8 }}>
         {rows.map((lesson, index) => (
           <article
             key={`${title}-${lesson.chapter || lesson.title || index}`}
             style={{
               border: `1px solid ${palette.border}`,
-              borderRadius: 16,
+              borderRadius: 14,
               background: "#fffaf3",
               overflow: "hidden",
             }}
           >
-            <div style={{ padding: 18, display: "grid", gap: 8 }}>
+            <div style={{ padding: 12, display: "grid", gap: 6 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
-                <strong style={{ color: palette.ink, fontSize: 17 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : lesson.title || "Resource"}</strong>
+                <strong style={{ color: palette.ink, fontSize: 15 }}>{lesson.chapter ? `Kapitel ${lesson.chapter}` : lesson.title || "Resource"}</strong>
                 {lesson.assignment && !isSelfLearning ? <span style={styles.badge}>Assignment</span> : null}
                 {isSelfLearning ? <span style={styles.badge}>AI practice</span> : null}
               </div>
-              {lesson.title && lesson.chapter ? <p style={{ ...styles.helperText, margin: 0 }}>{lesson.title}</p> : null}
-              {lesson.note ? <p style={{ margin: 0, color: palette.muted, lineHeight: 1.6 }}>{lesson.note}</p> : null}
+              {lesson.title && lesson.chapter ? <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.4 }}>{lesson.title}</p> : null}
+              {lesson.note ? <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 13 }}>{lesson.note}</p> : null}
             </div>
-            <div style={{ borderTop: `1px solid ${palette.border}`, padding: 18, display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ borderTop: `1px solid ${palette.border}`, padding: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
               {!hideVideoLink ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={lesson.video || lesson.youtube_link} /> : null}
               <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={lesson.grammarbook_link} />
               <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={lesson.workbook_link} />
@@ -343,9 +348,9 @@ const LessonResourceList = ({ title, lessons, isSelfLearning, hideVideoLink = fa
 const TextBlock = ({ title, children }) => {
   if (!children) return null;
   return (
-    <section style={{ display: "grid", gap: 8 }}>
-      <h2 style={{ margin: 0, fontSize: 20 }}>{title}</h2>
-      <p style={{ margin: 0, lineHeight: 1.7 }}>{children}</p>
+    <section style={{ display: "grid", gap: 6 }}>
+      <h2 style={{ margin: 0, fontSize: 18 }}>{title}</h2>
+      <p style={{ margin: 0, lineHeight: 1.55, fontSize: 14 }}>{children}</p>
     </section>
   );
 };
@@ -403,7 +408,7 @@ const CourseLessonPage = () => {
 
   if (!entry) {
     return (
-      <div style={{ ...styles.container, display: "grid", gap: 16 }}>
+      <div style={{ ...styles.container, display: "grid", gap: 12 }}>
         <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>
           ← Course Book
         </button>
@@ -416,49 +421,56 @@ const CourseLessonPage = () => {
   }
 
   return (
-    <div style={{ ...styles.container, display: "grid", gap: 18, background: palette.page, borderRadius: 24, paddingTop: 16 }}>
-      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>
+    <div
+      style={{
+        ...styles.container,
+        display: "grid",
+        gap: 12,
+        background: palette.page,
+        borderRadius: 16,
+        padding: "12px 10px 30px",
+        maxWidth: 900,
+      }}
+    >
+      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start", padding: "6px 10px", fontSize: 12 }} onClick={() => navigate("/campus/course")}>
         ← Course Book
       </button>
 
-      <article style={{ display: "grid", gap: 28 }}>
+      <article style={{ display: "grid", gap: 14 }}>
         <header
           style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 2,
+            position: "static",
             background: "rgba(255, 250, 243, 0.96)",
             border: `1px solid ${palette.border}`,
-            borderRadius: 18,
-            padding: 18,
-            backdropFilter: "blur(10px)",
+            borderRadius: 14,
+            padding: 12,
             display: "grid",
-            gap: 12,
+            gap: 9,
           }}
         >
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 7, flexWrap: "wrap", alignItems: "center" }}>
             <span style={pillStyle}>{level}</span>
             <span style={pillStyle}>Day {entry.day ?? day}</span>
             {entry.chapter ? <span style={pillStyle}>Kapitel {entry.chapter}</span> : null}
             {isSelfLearning ? <span style={styles.badge}>AI self-learning</span> : <span style={styles.badge}>Status: {status}</span>}
             {scoreText ? <span style={styles.badge}>{scoreText}</span> : null}
           </div>
-          <div style={{ display: "grid", gap: 6 }}>
-            <h1 style={{ margin: 0, color: palette.ink, fontSize: 30 }}>{entry.topic || `Day ${entry.day ?? day}`}</h1>
-            {entry.grammar_topic ? <p style={{ ...styles.helperText, margin: 0 }}>Grammar topic: {entry.grammar_topic}</p> : null}
-            {entry.goal ? <p style={{ margin: 0, color: palette.muted, lineHeight: 1.6 }}>{entry.goal}</p> : null}
+          <div style={{ display: "grid", gap: 5 }}>
+            <h1 style={{ margin: 0, color: palette.ink, fontSize: 24, lineHeight: 1.12 }}>{entry.topic || `Day ${entry.day ?? day}`}</h1>
+            {entry.grammar_topic ? <p style={{ ...styles.helperText, margin: 0, lineHeight: 1.4 }}>Grammar topic: {entry.grammar_topic}</p> : null}
+            {entry.goal ? <p style={{ margin: 0, color: palette.muted, lineHeight: 1.45, fontSize: 14 }}>{entry.goal}</p> : null}
           </div>
           {isSelfLearning ? (
-            <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 14, padding: 14 }}>
+            <div style={{ border: "1px solid #bfdbfe", background: "#eff6ff", borderRadius: 12, padding: 10, fontSize: 13, lineHeight: 1.45 }}>
               <strong>No tutor submission.</strong> This level is self-learning. Practise with Falowen AI, use the feedback, enter your score and self-mark your progress.
             </div>
           ) : null}
         </header>
 
         {entry.instruction ? (
-          <section style={{ ...styles.card, background: "#fffaf3", border: `1px solid ${palette.border}`, display: "grid", gap: 8 }}>
-            <h2 style={{ margin: 0, fontSize: 20, color: palette.ink }}>Lesson instructions</h2>
-            <p style={{ margin: 0, lineHeight: 1.7, whiteSpace: "pre-line", color: palette.muted }}>{entry.instruction}</p>
+          <section style={{ ...styles.card, background: "#fffaf3", border: `1px solid ${palette.border}`, display: "grid", gap: 6, padding: 12, marginBottom: 0 }}>
+            <h2 style={{ margin: 0, fontSize: 18, color: palette.ink }}>Lesson instructions</h2>
+            <p style={{ margin: 0, lineHeight: 1.55, whiteSpace: "pre-line", color: palette.muted, fontSize: 14 }}>{entry.instruction}</p>
           </section>
         ) : null}
 
@@ -467,7 +479,7 @@ const CourseLessonPage = () => {
         <LessonResourceList title="Lesson resources" lessons={entry.lesen_hören} isSelfLearning={isSelfLearning} hideVideoLink={Boolean(videoResources.length)} />
         <LessonResourceList title="Extra practice" lessons={entry.schreiben_sprechen} isSelfLearning={isSelfLearning} hideVideoLink={Boolean(videoResources.length)} />
 
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {!videoResources.length ? <ResourceAnchor label={RESOURCE_ACTION_LABELS.video} url={entry.video || entry.youtube_link || entry.tutorial_video_url} /> : null}
           <ResourceAnchor label={RESOURCE_ACTION_LABELS.grammarbook} url={entry.grammarbook_link} />
           <ResourceAnchor label={RESOURCE_ACTION_LABELS.workbook} url={entry.workbook_link} />
