@@ -8,6 +8,18 @@ export const LESSON_VIDEO_DICTIONARY = {
     1: {
       ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
     },
+    2: {
+      videoResources: [
+        {
+          key: "ai-grammar-video",
+          chapter: "0.2",
+          title: "Kapitel 0.2 AI grammar video",
+          description:
+            "AI video lesson for German alphabet revision and self-study.",
+          url: "https://youtu.be/pCQVdJGsvtk",
+        },
+      ],
+    },
     20: {
       ai_grammar_video: "https://youtu.be/mTwDMOAEMTU",
     },
@@ -56,6 +68,7 @@ const legacyTeacherVideoResource = (source = {}) => {
 
   return {
     key: "teacher-explanation",
+    chapter: source.chapter || null,
     title: "Teacher explanation",
     description: "Recorded class explanation from the teacher.",
     url,
@@ -73,6 +86,7 @@ export const normalizeVideoResources = (source = {}) => {
         if (typeof resource === "string") {
           return {
             key: `video-${index + 1}`,
+            chapter: source.chapter || null,
             title: index === 0 ? "Teacher explanation" : "AI grammar video",
             description:
               "Watch this video before you continue with the grammar and workbook.",
@@ -90,6 +104,7 @@ export const normalizeVideoResources = (source = {}) => {
 
         return {
           key: resource?.key || `video-${index + 1}`,
+          chapter: resource?.chapter || source.chapter || null,
           title:
             resource?.title ||
             (index === 0 ? "Teacher explanation" : "AI grammar video"),
@@ -123,6 +138,7 @@ export const normalizeVideoResources = (source = {}) => {
     teacherUrl
       ? {
           key: "teacher-explanation",
+          chapter: source.chapter || null,
           title: "Teacher explanation",
           description: "Recorded class explanation from the teacher.",
           url: teacherUrl,
@@ -131,6 +147,7 @@ export const normalizeVideoResources = (source = {}) => {
     aiGrammarUrl
       ? {
           key: "ai-grammar-video",
+          chapter: source.chapter || null,
           title: "AI grammar video",
           description:
             "Step-by-step grammar explanation for revision and self-study.",
@@ -145,14 +162,41 @@ const isTeacherVideoResource = (resource = {}) => {
   return label.includes("teacher");
 };
 
-const lessonResourceEntries = (entry = {}) => [
-  entry,
-  ...toResourceArray(entry?.schreiben_sprechen),
-  ...toResourceArray(entry?.lesen_hören),
-];
-
 const toResourceArray = (value) =>
   Array.isArray(value) ? value : value ? [value] : [];
+
+const lessonResourceEntries = (entry = {}) => {
+  const nestedResources = [
+    ...toResourceArray(entry?.schreiben_sprechen),
+    ...toResourceArray(entry?.lesen_hören),
+  ].filter(Boolean);
+
+  if (!nestedResources.length) return [entry];
+
+  return nestedResources.map((resource) => ({
+    ...resource,
+    chapter: resource?.chapter || entry?.chapter || null,
+  }));
+};
+
+const sortVideoResourcesByLessonOrder = (resources = [], entries = []) => {
+  const chapterOrder = new Map();
+  entries.forEach((entry, index) => {
+    const chapter = String(entry?.chapter || "").trim();
+    if (chapter && !chapterOrder.has(chapter)) chapterOrder.set(chapter, index);
+  });
+
+  const typeRank = (resource = {}) => (isTeacherVideoResource(resource) ? 0 : 1);
+  const chapterRank = (resource = {}) => {
+    const chapter = String(resource.chapter || "").trim();
+    return chapterOrder.has(chapter) ? chapterOrder.get(chapter) : 999;
+  };
+
+  return [...resources].sort(
+    (a, b) =>
+      chapterRank(a) - chapterRank(b) || typeRank(a) - typeRank(b),
+  );
+};
 
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
@@ -174,8 +218,9 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
     explicitResources,
     dictionaryResources,
   );
+  const visibleResources = showTeacherVideos
+    ? allResources
+    : allResources.filter((resource) => !isTeacherVideoResource(resource));
 
-  if (showTeacherVideos) return allResources;
-
-  return allResources.filter((resource) => !isTeacherVideoResource(resource));
+  return sortVideoResourcesByLessonOrder(visibleResources, entries);
 };
