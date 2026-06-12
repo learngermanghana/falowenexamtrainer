@@ -180,13 +180,6 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
           </p>
 
           <h3 style={sectionTitle}>Zentrales Thema: „Mein Lieblingssport“</h3>
-          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
-            <strong>💬 Frage zur Diskussion</strong>
-            <p style={{ margin: 0, lineHeight: 1.6 }}>Was ist Ihr Lieblingssport und warum?</p>
-            <p style={{ margin: 0 }}>
-              <strong>Vier Schlüsselwörter:</strong> Fußball · Fitness · gesund · Freunde
-            </p>
-          </div>
           <ol style={listSpacing}>
             <li>
               <strong>Sportart (Type of Sport) 🏅</strong>
@@ -223,6 +216,14 @@ const A2Day15MeinLieblingssportWorkbookPage = () => {
               </ul>
             </li>
           </ol>
+
+          <div style={{ ...questionCardStyle, background: "#f8fafc" }}>
+            <strong>💬 Frage zur Diskussion</strong>
+            <p style={{ margin: 0, lineHeight: 1.6 }}>Was ist Ihr Lieblingssport und warum?</p>
+            <p style={{ margin: 0 }}>
+              <strong>Vier Schlüsselwörter:</strong> Fußball · Fitness · gesund · Freunde
+            </p>
+          </div>
 
           <div style={questionCardStyle}>
             <strong>📝 Beispielantwort</strong>
