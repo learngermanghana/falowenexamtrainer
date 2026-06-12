@@ -465,7 +465,7 @@ function StatementContributionSection() {
         Your answer box
         <textarea
           style={textareaStyle}
-          placeholder="Example: Ich habe zwei Bücher. Es ist halb acht. Ich bin am dritten Juli geboren. Die Tasche kostet zehn Euro. Am Montag gehe ich zur Schule."
+          placeholder="Write 5 German statements here. Use your own numbers, time, birthday/year, price, day and activity."
           value={draft}
           onChange={(event) => {
             setDraft(event.target.value);
