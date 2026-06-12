@@ -327,7 +327,7 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
             lineHeight: 1.45,
           }}
         >
-          Use the available AI videos, then study the grammar or open the workbook.
+          Use the available videos, then study the grammar or open the workbook.
         </p>
       </div>
 
@@ -489,9 +489,7 @@ const CourseLessonPage = () => {
   const scoreText = location.state?.scoreText || "";
   const videoResources = getLessonVideoResources(level, day, entry || {});
   const isOrientationLesson = isA1Day0Orientation(level, day);
-  const resourceHubVideoResources = isOrientationLesson
-    ? []
-    : videoResources.filter((video) => !isTeacherVideo(video));
+  const resourceHubVideoResources = isOrientationLesson ? [] : videoResources;
   const primaryResource = firstLessonResource(entry || {});
   const submitLabel = primaryResource.chapter
     ? `Submit Kapitel ${primaryResource.chapter} assignment`
