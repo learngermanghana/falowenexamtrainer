@@ -273,6 +273,51 @@ Teil :4
     expect(payload.assignmentId).toBe("A1-1.1");
     expect(payload.assignmentKey).toBe("A1-1.1");
     expect(payload.canonicalAssignmentKey).toBe("A1-1.1");
+    expect(payload.assignment_id).toBe("A1-1.1");
+    expect(payload.reviewStatus).toBe("pending_review");
+    expect(payload.isResubmission).toBe(false);
+    expect(payload.attempt).toBe(1);
+    expect(payload.attemptNumber).toBe(1);
+    expect(payload.submittedAt).toEqual({ seconds: 1 });
+    expect(payload.answer).toBe(payload.submissionText);
+    expect(payload.workContent).toBe(payload.submissionText);
+  });
+
+  it("builds queue-compatible metadata for a failed assignment resubmission", () => {
+    const timestamp = { seconds: 2 };
+    const metadata = __TESTING__.buildAttemptMetadata({
+      attempt: 2,
+      isResubmission: true,
+      previousScore: 42,
+      timestamp,
+    });
+
+    expect(metadata).toEqual({
+      attempt: 2,
+      attemptNumber: 2,
+      isResubmission: true,
+      reviewStatus: "pending_review",
+      submittedAt: timestamp,
+      resubmittedAt: timestamp,
+      previousScore: 42,
+    });
+  });
+
+  it("uses the latest marked score when deciding whether resubmission is allowed", () => {
+    const latestScore = __TESTING__.getLatestSubmissionScore([
+      { assignmentId: "A1-1.1", score: 75, markedAt: "2026-01-01T00:00:00.000Z" },
+      { assignmentId: "A1-1.1", score: "42%", scoredAt: "2026-02-01T00:00:00.000Z" },
+      { assignmentId: "A1-2.1", score: 90, markedAt: "2026-03-01T00:00:00.000Z" },
+    ], (entry) => entry.assignmentId === "A1-1.1");
+
+    expect(latestScore).toBe(42);
+    expect(latestScore).toBeLessThan(60);
+  });
+
+  it("normalizes previous scores for resubmission eligibility and metadata", () => {
+    expect(__TESTING__.getSubmissionScore({ score: "59%" })).toBe(59);
+    expect(__TESTING__.getSubmissionScore({ previousScore: 45 })).toBe(45);
+    expect(__TESTING__.getSubmissionScore({ score: "not marked" })).toBeNull();
   });
 
   it("falls back to auth display name when student profile name is missing", () => {

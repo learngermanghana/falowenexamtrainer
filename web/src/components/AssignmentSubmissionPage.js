@@ -363,6 +363,33 @@ const toNumericScore = (value) => {
   return null;
 };
 
+const getSubmissionScore = (entry) =>
+  toNumericScore(entry?.score ?? entry?.finalScore ?? entry?.mark ?? entry?.grade ?? entry?.previousScore);
+
+const getLatestSubmissionScore = (entries, matchesAssignment = () => true) => {
+  const scoredEntries = (entries || []).filter(
+    (entry) => matchesAssignment(entry) && typeof getSubmissionScore(entry) === "number"
+  );
+
+  scoredEntries.sort((left, right) => {
+    const leftDate = toDateValue(left?.markedAt || left?.scoredAt || left?.updatedAt || left?.createdAt);
+    const rightDate = toDateValue(right?.markedAt || right?.scoredAt || right?.updatedAt || right?.createdAt);
+    return (rightDate?.getTime() || 0) - (leftDate?.getTime() || 0);
+  });
+
+  return scoredEntries.length ? getSubmissionScore(scoredEntries[0]) : null;
+};
+
+const buildAttemptMetadata = ({ attempt = 1, isResubmission = false, previousScore = null, timestamp }) => ({
+  attempt,
+  attemptNumber: attempt,
+  isResubmission,
+  reviewStatus: "pending_review",
+  submittedAt: timestamp,
+  ...(isResubmission ? { resubmittedAt: timestamp } : {}),
+  ...(typeof previousScore === "number" ? { previousScore } : {}),
+});
+
 const normalizePreferredLevel = (rawLevel) => normalizeCourseLevel(rawLevel) || "A1";
 
 const AssignmentSubmissionPage = () => {
@@ -827,6 +854,7 @@ const AssignmentSubmissionPage = () => {
       day: selectedAssignmentDay,
       chapter: selectedAssignmentChapter || "",
       assignmentId: selectedAssignmentId,
+      assignment_id: selectedAssignmentId,
       assignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
       canonicalAssignmentKey: selectedCanonicalAssignmentKey || selectedAssignmentId,
       answerKeySource: answerKeySource
@@ -840,6 +868,8 @@ const AssignmentSubmissionPage = () => {
       chapterKey: buildChapterKey(form.assignmentTitle),
       submissionLink: null,
       submissionText: form.submissionText.trim(),
+      answer: form.submissionText.trim(),
+      workContent: form.submissionText.trim(),
       studentEmail: user?.email || "",
       studentId: user?.uid || "",
       studentCode,
@@ -852,6 +882,7 @@ const AssignmentSubmissionPage = () => {
       studentName,
       className: studentProfile?.className || "",
       status: statusLabel,
+      ...(statusLabel === "draft" ? {} : buildAttemptMetadata({ attempt: 1, timestamp: serverTimestamp() })),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };
@@ -1215,17 +1246,24 @@ const AssignmentSubmissionPage = () => {
     }, 0);
   }, [isSameSelectedAssignment, recentSubmissions]);
 
+  const latestSelectedAssignmentScore = useMemo(
+    () => getLatestSubmissionScore(recentSubmissions, isSameSelectedAssignment),
+    [isSameSelectedAssignment, recentSubmissions]
+  );
+
   const selectedAssignmentPassedFromSubmission = useMemo(() => {
-    return recentSubmissions.some((entry) => {
+    if (typeof latestSelectedAssignmentScore === "number") {
+      return latestSelectedAssignmentScore >= PASS_THRESHOLD_SCORE;
+    }
+
+    const latestReviewedEntry = recentSubmissions.find((entry) => {
       if (!isSameSelectedAssignment(entry)) return false;
-
-      const normalizedStatus = safeLower(entry?.reviewStatus || entry?.status || entry?.result);
-      if (["approved", "pass", "passed", "complete", "completed"].includes(normalizedStatus)) return true;
-
-      const score = toNumericScore(entry?.score ?? entry?.finalScore ?? entry?.mark ?? entry?.grade);
-      return typeof score === "number" && score >= PASS_THRESHOLD_SCORE;
+      const normalizedStatus = safeLower(entry?.reviewStatus || entry?.result);
+      return ["approved", "pass", "passed", "complete", "completed", "failed", "redo_required"].includes(normalizedStatus);
     });
-  }, [isSameSelectedAssignment, recentSubmissions]);
+    const normalizedStatus = safeLower(latestReviewedEntry?.reviewStatus || latestReviewedEntry?.result);
+    return ["approved", "pass", "passed", "complete", "completed"].includes(normalizedStatus);
+  }, [isSameSelectedAssignment, latestSelectedAssignmentScore, recentSubmissions]);
 
   const remainingResubmissions = Math.max(0, MAX_RESUBMISSION_TRIES - selectedResubmissionCount);
   const resubmissionLimitReached = remainingResubmissions === 0;
@@ -1408,7 +1446,10 @@ const AssignmentSubmissionPage = () => {
     return typeof score === "number" && score >= PASS_THRESHOLD_SCORE;
   }, [form.assignmentTitle, mergedProgressByTitle]);
 
-  const selectedAssignmentPassed = selectedAssignmentPassedFromSubmission || selectedAssignmentPassedFromProgress;
+  const selectedAssignmentPassed =
+    typeof latestSelectedAssignmentScore === "number"
+      ? latestSelectedAssignmentScore >= PASS_THRESHOLD_SCORE
+      : selectedAssignmentPassedFromSubmission || selectedAssignmentPassedFromProgress;
 
   const assignmentProgressSnapshot = useMemo(() => {
     const total = decoratedAssignmentOptions.length;
@@ -1784,6 +1825,7 @@ const AssignmentSubmissionPage = () => {
         day: selectedAssignmentDay,
         chapter: selectedAssignmentChapter || "",
         assignmentId: selectedAssignmentId,
+        assignment_id: selectedAssignmentId,
         chapterKey: selectedChapterKey,
         studentId: user.uid,
         studentEmail: user?.email || "",
@@ -1978,6 +2020,7 @@ const AssignmentSubmissionPage = () => {
         day: selectedAssignmentDay,
         chapter: selectedAssignmentChapter || "",
         assignmentId: selectedAssignmentId,
+        assignment_id: selectedAssignmentId,
         chapterKey: selectedChapterKey,
         studentId: user.uid,
         studentEmail: user?.email || "",
@@ -1991,10 +2034,18 @@ const AssignmentSubmissionPage = () => {
           submissionText: trimmedResubmission,
         }),
         submissionText: trimmedResubmission,
+        answer: trimmedResubmission,
+        workContent: trimmedResubmission,
         improvementSummary: trimmedImprovement,
         previousSubmissionText: selectedPreview?.submissionText || "",
         originalSubmittedAt: selectedLockInfo?.lockedAt || selectedPreview?.createdAt || null,
         status: "resubmitted",
+        ...buildAttemptMetadata({
+          attempt: selectedResubmissionCount + 2,
+          isResubmission: true,
+          previousScore: latestSelectedAssignmentScore,
+          timestamp: serverTimestamp(),
+        }),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
@@ -2499,6 +2550,9 @@ export const __TESTING__ = {
   countNewWordOccurrences,
   parseObjectiveAnswers,
   resolvePreferredStudentName,
+  buildAttemptMetadata,
+  getSubmissionScore,
+  getLatestSubmissionScore,
 };
 
 export default AssignmentSubmissionPage;
