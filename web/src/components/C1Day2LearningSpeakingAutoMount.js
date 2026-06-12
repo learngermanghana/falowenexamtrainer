@@ -302,11 +302,17 @@ function C1Day2LearningSpeakingAutoMount() {
   useEffect(() => {
     if (!enabled) return undefined;
 
+    let learnMount = null;
+    let speakingMount = null;
     let learnCleanup = null;
     let speakingCleanup = null;
 
     const mountLearn = () => {
-      if (learnTarget) return;
+      if (learnMount?.isConnected) return;
+      learnCleanup?.();
+      learnCleanup = null;
+      learnMount = null;
+
       const overviewSection = findSectionByTitle("Lesson overview");
       const grammarSection = findSectionByTitle("Grammar and useful language");
       if (!overviewSection || !grammarSection) return;
@@ -318,6 +324,7 @@ function C1Day2LearningSpeakingAutoMount() {
       const mount = document.createElement("div");
       mount.setAttribute("data-c1-day2-learn-upgrade", "true");
       overviewSection.appendChild(mount);
+      learnMount = mount;
 
       const hiddenOverviewChildren = Array.from(overviewSection.children).filter(
         (child) => child !== overviewHeading && child !== mount
@@ -342,16 +349,19 @@ function C1Day2LearningSpeakingAutoMount() {
         hiddenOverviewChildren.forEach((child, index) => {
           child.style.display = previousOverviewDisplays[index] || "";
         });
-        if (overviewHeading) overviewHeading.textContent = oldOverviewTitle;
-        if (grammarHeading) grammarHeading.textContent = oldGrammarTitle;
+        if (overviewHeading?.isConnected) overviewHeading.textContent = oldOverviewTitle;
+        if (grammarHeading?.isConnected) grammarHeading.textContent = oldGrammarTitle;
         if (videoBox) videoBox.style.display = previousVideoDisplay;
-        mount.remove();
-        setLearnTarget(null);
+        if (mount.isConnected) mount.remove();
       };
     };
 
     const mountSpeaking = () => {
-      if (speakingTarget) return;
+      if (speakingMount?.isConnected) return;
+      speakingCleanup?.();
+      speakingCleanup = null;
+      speakingMount = null;
+
       const speakingSection = findSectionByTitle("Speaking builder");
       if (!speakingSection) return;
 
@@ -360,11 +370,11 @@ function C1Day2LearningSpeakingAutoMount() {
       const mount = document.createElement("div");
       mount.setAttribute("data-c1-day2-speaking-map", "true");
       speakingSection.insertBefore(mount, firstContent || null);
+      speakingMount = mount;
       setSpeakingTarget(mount);
 
       speakingCleanup = () => {
-        mount.remove();
-        setSpeakingTarget(null);
+        if (mount.isConnected) mount.remove();
       };
     };
 
@@ -382,14 +392,14 @@ function C1Day2LearningSpeakingAutoMount() {
       learnCleanup?.();
       speakingCleanup?.();
     };
-  }, [enabled, learnTarget, speakingTarget]);
+  }, [enabled, location.pathname]);
 
   if (!enabled) return null;
 
   return (
     <>
-      {learnTarget ? createPortal(<LearnUpgrade />, learnTarget) : null}
-      {speakingTarget ? createPortal(<SpeakingIdeaMap />, speakingTarget) : null}
+      {learnTarget?.isConnected ? createPortal(<LearnUpgrade />, learnTarget) : null}
+      {speakingTarget?.isConnected ? createPortal(<SpeakingIdeaMap />, speakingTarget) : null}
     </>
   );
 }
