@@ -79,8 +79,12 @@ jest.mock("../firebase", () => ({
   setDoc: jest.fn(() => Promise.resolve()),
 }));
 
-import { addDoc } from "../firebase";
+import { addDoc, getDoc, getDocs } from "../firebase";
 import AssignmentSubmissionPage, { __TESTING__ } from "./AssignmentSubmissionPage";
+
+const words = (count, prefix = "word") => Array.from({ length: count }, (_, index) => `${prefix}${index + 1}`).join(" ");
+
+const makeDoc = (id, data) => ({ id, data: () => data });
 
 const renderPage = (initialEntries = ["/"]) =>
   render(
@@ -106,7 +110,7 @@ describe("AssignmentSubmissionPage", () => {
     expect(options.some((text) => /Day 0 · Orientation/i.test(text || ""))).toBe(false);
     expect(options.some((text) => /Tutor Assignment/i.test(text || ""))).toBe(true);
     expect(screen.getByText("Canonical ID: –")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /submit assignment/i })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /submit assignment/i })).toBeEnabled();
   });
 
   it("locks the exact assignment when opened from a course/workbook assignment link", async () => {
@@ -258,8 +262,7 @@ Teil :4
 
     fireEvent.change(screen.getByPlaceholderText(/type your answer here or paste it in/i), {
       target: {
-        value:
-          "This is a long enough practice submission for the chapter routing test. It includes enough detail to pass the minimum character requirement.",
+        value: words(80, "routing"),
       },
     });
     fireEvent.click(screen.getByRole("checkbox"));
@@ -304,4 +307,80 @@ Teil :4
 
     expect(name).toBe("Ada Lovelace");
   });
+
+  it("shows a clear error when submitting without an assignment", async () => {
+    renderPage();
+    fireEvent.click(await screen.findByRole("button", { name: /submit assignment/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Please select the assignment you want to submit.");
+  });
+
+  it("shows a clear error when submitting empty text", async () => {
+    renderPage();
+    fireEvent.change(await screen.findByRole("combobox"), { target: { value: TUTOR_ASSIGNMENT_LABEL } });
+    fireEvent.click(screen.getByRole("button", { name: /submit assignment/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Please type your answer before submitting.");
+  });
+
+  it("shows the exact word-count error for a first submission under 80 words", async () => {
+    renderPage();
+    fireEvent.change(await screen.findByRole("combobox"), { target: { value: TUTOR_ASSIGNMENT_LABEL } });
+    fireEvent.change(screen.getByPlaceholderText(/type your answer here or paste it in/i), { target: { value: words(45) } });
+    expect(screen.getByText(/45 \/ 80 words/)).toBeInTheDocument();
+    expect(screen.getByText(/Need 35 more words to submit/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /submit assignment/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Please write at least 80 words before submitting. You have written 45 words.");
+  });
+
+  it("allows 80 words to pass minimum-word validation", async () => {
+    renderPage();
+    fireEvent.change(await screen.findByRole("combobox"), { target: { value: TUTOR_ASSIGNMENT_LABEL } });
+    fireEvent.change(screen.getByPlaceholderText(/type your answer here or paste it in/i), { target: { value: words(80) } });
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /submit assignment/i }));
+    await waitFor(() => expect(addDoc).toHaveBeenCalled());
+  });
+
+  it("shows a clear duplicate-submission error", async () => {
+    const duplicateText = words(80, "duplicate");
+    getDocs
+      .mockResolvedValueOnce({ docs: [makeDoc("submission-1", { assignmentTitle: TUTOR_ASSIGNMENT_LABEL, level: "A1", status: "submitted", submissionText: duplicateText })] })
+      .mockResolvedValueOnce({ docs: [] })
+      .mockResolvedValueOnce({ docs: [] });
+    renderPage();
+    await screen.findByText(/Preview: duplicate1/);
+    fireEvent.change(await screen.findByRole("combobox"), { target: { value: TUTOR_ASSIGNMENT_LABEL } });
+    fireEvent.change(screen.getByPlaceholderText(/type your answer here or paste it in/i), { target: { value: duplicateText } });
+    fireEvent.click(screen.getByRole("button", { name: /submit assignment/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("This looks like the same text you already submitted for this assignment. Please edit your work before submitting again.");
+  });
+
+  it("shows corrected-text word count for a resubmission under 80 words", async () => {
+    const previousText = words(80, "previous");
+    getDocs
+      .mockResolvedValueOnce({ docs: [makeDoc("submission-1", { assignmentTitle: TUTOR_ASSIGNMENT_LABEL, assignmentKey: "A1-1.1", level: "A1", status: "submitted", submissionText: previousText })] })
+      .mockResolvedValueOnce({ docs: [makeDoc("lock-1", { assignmentTitle: TUTOR_ASSIGNMENT_LABEL, chapterKey: "chapter-1.1", level: "A1" })] })
+      .mockResolvedValueOnce({ docs: [] });
+    renderPage();
+    fireEvent.change(await screen.findByRole("combobox"), { target: { value: TUTOR_ASSIGNMENT_LABEL } });
+    fireEvent.change(await screen.findByPlaceholderText(/paste your corrected letter\/text here/i), { target: { value: words(20, "corrected") } });
+    fireEvent.change(screen.getByPlaceholderText(/Example: I fixed verb placement/i), { target: { value: "I fixed every tutor comment and improved the grammar throughout the answer." } });
+    fireEvent.click(screen.getByRole("button", { name: /submit resubmission/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Please write at least 80 words in your corrected text. You have written 20 words.");
+  });
+
+  it("maps Firebase permission and network errors to friendly messages", () => {
+    expect(__TESTING__.getStudentFriendlySubmitError({ code: "permission-denied" })).toBe("Your account does not have permission to submit this assignment. Please contact support.");
+    expect(__TESTING__.getStudentFriendlySubmitError({ code: "unavailable", message: "network offline" })).toBe("Network problem. Please check your internet connection and try again.");
+  });
+
+  it("shows the friendly Firebase permission error when submission saving fails", async () => {
+    getDoc.mockRejectedValueOnce({ code: "permission-denied" });
+    renderPage();
+    fireEvent.change(await screen.findByRole("combobox"), { target: { value: TUTOR_ASSIGNMENT_LABEL } });
+    fireEvent.change(screen.getByPlaceholderText(/type your answer here or paste it in/i), { target: { value: words(80, "permission") } });
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /submit assignment/i }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Your account does not have permission to submit this assignment. Please contact support.");
+  });
+
 });

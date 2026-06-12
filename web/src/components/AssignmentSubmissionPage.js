@@ -31,7 +31,7 @@ import {
 const SUBMISSION_COLLECTION = "submissions";
 const DRAFT_COLLECTION = "submissionDrafts";
 const LOCK_COLLECTION = "submissionLocks";
-const MIN_SUBMISSION_CHARACTERS = 80;
+const MIN_SUBMISSION_WORDS = 80;
 const MIN_RESUBMISSION_IMPROVEMENT_CHARACTERS = 25;
 const MIN_RESUBMISSION_CHANGED_CHARACTERS = 40;
 const MIN_RESUBMISSION_NEW_WORDS = 8;
@@ -86,6 +86,22 @@ const tokenizeSubmission = (value) =>
     .split(" ")
     .map((token) => token.trim())
     .filter(Boolean);
+
+const getStudentFriendlySubmitError = (error) => {
+  const code = String(error?.code || "").toLowerCase();
+  const message = String(error?.message || "").toLowerCase();
+
+  if (code.includes("permission-denied") || message.includes("permission")) {
+    return "Your account does not have permission to submit this assignment. Please contact support.";
+  }
+  if (code.includes("unavailable") || message.includes("network") || message.includes("offline")) {
+    return "Network problem. Please check your internet connection and try again.";
+  }
+  if (code.includes("deadline-exceeded") || message.includes("timeout")) {
+    return "The request took too long. Please try again.";
+  }
+  return "Could not save your submission. Please try again. If this continues, contact support.";
+};
 
 const countNewWordOccurrences = (previousText, currentText) => {
   const previousWordCounts = tokenizeSubmission(previousText).reduce((counts, word) => {
@@ -645,6 +661,12 @@ const AssignmentSubmissionPage = () => {
   const [resubmissionText, setResubmissionText] = useState("");
   const [resubmissionImprovement, setResubmissionImprovement] = useState("");
   const [resubmissionStatus, setResubmissionStatus] = useState({ loading: false, error: "", success: "" });
+  const lastAssignmentRef = useRef("");
+  const autosaveTimerRef = useRef(null);
+  const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
+  const submissionTextRef = useRef(null);
+  const submitErrorRef = useRef(null);
+  const resubmissionErrorRef = useRef(null);
 
   useEffect(() => {
     if (status.error) {
@@ -657,6 +679,18 @@ const AssignmentSubmissionPage = () => {
       triggerInteractionFeedback({ sound: "error" });
     }
   }, [resubmissionStatus.error]);
+  useEffect(() => {
+    if (!status.error) return;
+    submitErrorRef.current?.focus();
+    submitErrorRef.current?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+  }, [status.error]);
+
+  useEffect(() => {
+    if (!resubmissionStatus.error) return;
+    resubmissionErrorRef.current?.focus();
+    resubmissionErrorRef.current?.scrollIntoView?.({ behavior: "smooth", block: "center" });
+  }, [resubmissionStatus.error]);
+
   const [answerKeyRegistry, setAnswerKeyRegistry] = useState(new Map());
 
   const isGerman = String(i18n?.resolvedLanguage || i18n?.language || "en").toLowerCase().startsWith("de");
@@ -688,10 +722,6 @@ const AssignmentSubmissionPage = () => {
     [isGerman]
   );
 
-  const lastAssignmentRef = useRef("");
-  const autosaveTimerRef = useRef(null);
-  const lastAutosavedRef = useRef({ assignmentTitle: "", submissionText: "" });
-  const submissionTextRef = useRef(null);
 
   const buildChapterKey = useCallback(
     (title) => {
@@ -878,7 +908,10 @@ const AssignmentSubmissionPage = () => {
   const persistSubmission = useCallback(
     async ({ statusLabel = "submitted" } = {}) => {
       const trimmedText = form.submissionText.trim();
-      if (!form.assignmentTitle || !trimmedText || !db || !user?.uid) return { ok: false, reason: "missing" };
+      if (!form.assignmentTitle) return { ok: false, reason: "missing_assignment" };
+      if (!trimmedText) return { ok: false, reason: "missing_text" };
+      if (!user?.uid) return { ok: false, reason: "missing_user" };
+      if (!db) return { ok: false, reason: "missing_database" };
 
       const submissionPayload = buildSubmissionPayload(statusLabel);
 
@@ -1428,7 +1461,7 @@ const AssignmentSubmissionPage = () => {
     const previousLength = (selectedPreview?.submissionText || "").trim().length;
     const expectedLimit = previousLength > 0 ? Math.ceil(previousLength * 1.6) : baseLimit;
     const bounded = Math.min(ABSOLUTE_MAX_SUBMISSION_CHARACTERS, Math.max(baseLimit, expectedLimit));
-    return Math.max(MIN_SUBMISSION_CHARACTERS + 200, bounded);
+    return Math.max(280, bounded);
   }, [selectedAssignmentLevel, selectedPreview?.submissionText]);
 
   const selectedDraft = useMemo(() => draftsByAssignment[form.assignmentTitle], [draftsByAssignment, form.assignmentTitle]);
@@ -1609,19 +1642,36 @@ const AssignmentSubmissionPage = () => {
     [buildChapterKey, form.assignmentTitle, recentSubmissions, selectedAssignmentLevel]
   );
 
+  const submissionWordCount = useMemo(() => tokenizeSubmission(form.submissionText).length, [form.submissionText]);
+  const resubmissionWordCount = useMemo(() => tokenizeSubmission(resubmissionText).length, [resubmissionText]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ loading: true, error: "", success: "" });
 
-    if (!form.assignmentTitle || !form.submissionText.trim()) {
-      setStatus({ loading: false, error: "Please select an assignment and enter your text.", success: "" });
+    if (!form.assignmentTitle) {
+      setStatus({ loading: false, error: "Please select the assignment you want to submit.", success: "" });
       return;
     }
 
-    if (form.submissionText.trim().length < MIN_SUBMISSION_CHARACTERS) {
+    if (isSelectedLocked && !form.submissionText.trim()) {
       setStatus({
         loading: false,
-        error: `Please add a fuller response (${MIN_SUBMISSION_CHARACTERS}+ characters) before submitting.`,
+        error: "This assignment has already been submitted and is now locked. To send corrections, use the Resubmission section for this same assignment.",
+        success: "",
+      });
+      return;
+    }
+
+    if (!form.submissionText.trim()) {
+      setStatus({ loading: false, error: "Please type your answer before submitting.", success: "" });
+      return;
+    }
+
+    if (submissionWordCount < MIN_SUBMISSION_WORDS) {
+      setStatus({
+        loading: false,
+        error: `Please write at least ${MIN_SUBMISSION_WORDS} words before submitting. You have written ${submissionWordCount} words.`,
         success: "",
       });
       return;
@@ -1639,7 +1689,16 @@ const AssignmentSubmissionPage = () => {
     if (hasMatchingRecentSubmission(form.submissionText, { includeResubmitted: true })) {
       setStatus({
         loading: false,
-        error: "Duplicate submission detected for this assignment. Please edit your text before submitting again.",
+        error: "This looks like the same text you already submitted for this assignment. Please edit your work before submitting again.",
+        success: "",
+      });
+      return;
+    }
+
+    if (isSelectedLocked) {
+      setStatus({
+        loading: false,
+        error: "This assignment has already been submitted and is now locked. To send corrections, use the Resubmission section for this same assignment.",
         success: "",
       });
       return;
@@ -1655,14 +1714,14 @@ const AssignmentSubmissionPage = () => {
     }
 
     if (!form.confirmed) {
-      setStatus({ loading: false, error: "Please confirm that you are submitting the correct task.", success: "" });
+      setStatus({ loading: false, error: "Please tick the confirmation box before submitting.", success: "" });
       return;
     }
 
     if (submissionCooldownRemainingMs > 0) {
       setStatus({
         loading: false,
-        error: `Please wait ${submissionCooldownLabel} before sending another submission.`,
+        error: `Please wait ${submissionCooldownLabel} before sending another submission. This prevents accidental duplicate submissions.`,
         success: "",
       });
       return;
@@ -1674,14 +1733,20 @@ const AssignmentSubmissionPage = () => {
       if (!saved.ok && saved.reason === "locked") {
         setStatus({
           loading: false,
-          error: "This assignment is already submitted (locked). If you need changes, use the resubmission request for THIS assignment.",
+          error: "This assignment has already been submitted and is now locked. To send corrections, use the Resubmission section for this same assignment.",
           success: "",
         });
         return;
       }
 
       if (!saved.ok) {
-        setStatus({ loading: false, error: "Could not submit. Please try again.", success: "" });
+        const reasonMessages = {
+          missing_assignment: "Please select the assignment you want to submit.",
+          missing_text: "Please type your answer before submitting.",
+          missing_user: "Please sign in again before submitting your assignment.",
+          missing_database: "The submission service is unavailable right now. Please try again shortly.",
+        };
+        setStatus({ loading: false, error: reasonMessages[saved.reason] || getStudentFriendlySubmitError(), success: "" });
         return;
       }
 
@@ -1723,7 +1788,7 @@ const AssignmentSubmissionPage = () => {
       }
     } catch (error) {
       console.error("Failed to save submission", error);
-      setStatus({ loading: false, error: "Could not save your submission.", success: "" });
+      setStatus({ loading: false, error: getStudentFriendlySubmitError(error), success: "" });
     }
   };
 
@@ -1733,7 +1798,13 @@ const AssignmentSubmissionPage = () => {
     try {
       const saved = await persistSubmission({ statusLabel: "draft" });
       if (!saved.ok) {
-        setStatus({ loading: false, error: "Add your text before saving a draft.", success: "" });
+        const reasonMessages = {
+          missing_assignment: "Please select an assignment before saving a draft.",
+          missing_text: "Please type something before saving a draft.",
+          missing_user: "Please sign in again before saving a draft.",
+          missing_database: "The draft service is unavailable right now. Please try again shortly.",
+        };
+        setStatus({ loading: false, error: reasonMessages[saved.reason] || getStudentFriendlySubmitError(), success: "" });
         return;
       }
       setStatus({ loading: false, error: "", success: "Draft saved. You can keep editing before submitting." });
@@ -1745,7 +1816,7 @@ const AssignmentSubmissionPage = () => {
       });
     } catch (error) {
       console.error("Failed to save draft", error);
-      setStatus({ loading: false, error: "Could not save your draft.", success: "" });
+      setStatus({ loading: false, error: getStudentFriendlySubmitError(error), success: "" });
     }
   };
 
@@ -1755,8 +1826,16 @@ const AssignmentSubmissionPage = () => {
     const trimmedResubmission = resubmissionText.trim();
     const trimmedImprovement = resubmissionImprovement.trim();
 
-    if (!db || !user?.uid || !form.assignmentTitle) {
-      setResubmissionStatus({ loading: false, error: "Could not save your resubmission draft.", success: "" });
+    if (!form.assignmentTitle) {
+      setResubmissionStatus({ loading: false, error: "Please select an assignment before saving a resubmission draft.", success: "" });
+      return;
+    }
+    if (!user?.uid) {
+      setResubmissionStatus({ loading: false, error: "Please sign in again before saving a resubmission draft.", success: "" });
+      return;
+    }
+    if (!db) {
+      setResubmissionStatus({ loading: false, error: "The draft service is unavailable right now. Please try again shortly.", success: "" });
       return;
     }
 
@@ -1812,7 +1891,7 @@ const AssignmentSubmissionPage = () => {
       setResubmissionStatus({ loading: false, error: "", success: "Resubmission draft saved." });
     } catch (error) {
       console.error("Failed to save resubmission draft", error);
-      setResubmissionStatus({ loading: false, error: "Could not save your resubmission draft.", success: "" });
+      setResubmissionStatus({ loading: false, error: getStudentFriendlySubmitError(error), success: "" });
     }
   };
 
@@ -1850,23 +1929,23 @@ const AssignmentSubmissionPage = () => {
     const trimmedImprovement = resubmissionImprovement.trim();
 
     if (!trimmedResubmission) {
-      setResubmissionStatus({ loading: false, error: "Please add your improved text before resubmitting.", success: "" });
+      setResubmissionStatus({ loading: false, error: "Please add your corrected text before resubmitting.", success: "" });
       return;
     }
 
     if (!trimmedImprovement) {
       setResubmissionStatus({
         loading: false,
-        error: "Please explain what you improved in this submission.",
+        error: "Please explain what you improved before resubmitting.",
         success: "",
       });
       return;
     }
 
-    if (trimmedResubmission.length < MIN_SUBMISSION_CHARACTERS) {
+    if (resubmissionWordCount < MIN_SUBMISSION_WORDS) {
       setResubmissionStatus({
         loading: false,
-        error: `Please add a fuller corrected text (${MIN_SUBMISSION_CHARACTERS}+ characters).`,
+        error: `Please write at least ${MIN_SUBMISSION_WORDS} words in your corrected text. You have written ${resubmissionWordCount} words.`,
         success: "",
       });
       return;
@@ -1917,7 +1996,7 @@ const AssignmentSubmissionPage = () => {
     ) {
       setResubmissionStatus({
         loading: false,
-        error: `Please make stronger edits before resubmitting (at least ${MIN_RESUBMISSION_CHANGED_CHARACTERS} changed characters and ${MIN_RESUBMISSION_NEW_WORDS} new words compared with your last attempt).`,
+        error: "Please make stronger changes before resubmitting. Add at least 8 new words and clearly fix the tutor comments.",
         success: "",
       });
       return;
@@ -1944,7 +2023,7 @@ const AssignmentSubmissionPage = () => {
     if (selectedAssignmentPassed) {
       setResubmissionStatus({
         loading: false,
-        error: "This assignment is already passed, so resubmission is disabled.",
+        error: "This assignment has already been passed, so resubmission is disabled.",
         success: "",
       });
       return;
@@ -1953,7 +2032,7 @@ const AssignmentSubmissionPage = () => {
     if (resubmissionLimitReached) {
       setResubmissionStatus({
         loading: false,
-        error: `You have used all ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. This work has already been submitted 3 times in total, so a late mark of ${PASS_THRESHOLD_SCORE} is applied.`,
+        error: `You have reached the limit of ${MAX_RESUBMISSION_TRIES} resubmissions for this assignment. A late mark of ${PASS_THRESHOLD_SCORE} is now applied.`,
         success: "",
       });
       return;
@@ -1962,7 +2041,7 @@ const AssignmentSubmissionPage = () => {
     if (submissionCooldownRemainingMs > 0) {
       setResubmissionStatus({
         loading: false,
-        error: `Please wait ${submissionCooldownLabel} before sending another submission.`,
+        error: `Please wait ${submissionCooldownLabel} before sending another submission. This prevents accidental duplicate submissions.`,
         success: "",
       });
       return;
@@ -2033,7 +2112,7 @@ const AssignmentSubmissionPage = () => {
       );
     } catch (error) {
       console.error("Failed to save resubmission", error);
-      setResubmissionStatus({ loading: false, error: "Could not save your resubmission.", success: "" });
+      setResubmissionStatus({ loading: false, error: getStudentFriendlySubmitError(error), success: "" });
     }
   };
 
@@ -2054,7 +2133,11 @@ const AssignmentSubmissionPage = () => {
           </p>
         </div>
 
-        {status.error ? <InfoBox tone="error">{status.error}</InfoBox> : null}
+        {status.error ? (
+          <div ref={submitErrorRef} role="alert" tabIndex={-1}>
+            <InfoBox tone="error">{status.error}</InfoBox>
+          </div>
+        ) : null}
         {status.success ? <InfoBox tone="success">{status.success}</InfoBox> : null}
 
         <form style={{ display: "grid", gap: 12 }} onSubmit={handleSubmit}>
@@ -2194,6 +2277,7 @@ const AssignmentSubmissionPage = () => {
                     : "Type your answer here or paste it in."
                 }
                 disabled={isSelectedLocked || !hasSelectedAssignment}
+                aria-invalid={status.error === "Please type your answer before submitting."}
               />
               <span style={{ ...styles.helperText, marginTop: 6 }}>Quick umlaut keys:</span>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 6 }}>
@@ -2210,11 +2294,16 @@ const AssignmentSubmissionPage = () => {
                 ))}
               </div>
               <span style={styles.helperText}>
-                Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
+                {submissionWordCount} / {MIN_SUBMISSION_WORDS} words · {submissionWordCount < MIN_SUBMISSION_WORDS
+                  ? `Need ${MIN_SUBMISSION_WORDS - submissionWordCount} more words to submit.`
+                  : "Minimum reached."}
               </span>
-              <span style={styles.helperText}>
-                {formatCharacterCount(form.submissionText.length)} / {formatCharacterCount(dynamicMaxSubmissionCharacters)} · {form.submissionText.length < MIN_SUBMISSION_CHARACTERS ? `Need ${MIN_SUBMISSION_CHARACTERS} minimum to submit.` : "Minimum reached."}
+              <span style={{ ...styles.helperText, color: "#6b7280" }}>
+                Characters: {formatCharacterCount(form.submissionText.length)} / {formatCharacterCount(dynamicMaxSubmissionCharacters)} max
               </span>
+              {status.error === "Please type your answer before submitting." ? (
+                <span style={{ ...styles.helperText, color: "#b91c1c" }}>Type your answer in this box, then submit again.</span>
+              ) : null}
             </label>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
               <span style={styles.helperText}>
@@ -2236,6 +2325,7 @@ const AssignmentSubmissionPage = () => {
               checked={form.confirmed || confirmationLocked}
               onChange={handleChange("confirmed")}
               disabled={confirmationLocked || status.loading || isSelectedLocked || isOrientationDay || !hasSelectedAssignment}
+              aria-invalid={status.error === "Please tick the confirmation box before submitting."}
             />
             <span style={{ ...styles.label, margin: 0 }}>
               I confirm I am submitting {selectedAssignmentChapter ? `Chapter ${selectedAssignmentChapter}` : "this assignment"}
@@ -2259,7 +2349,7 @@ const AssignmentSubmissionPage = () => {
               type="button"
               style={styles.secondaryButton}
               onClick={handleSaveDraft}
-              disabled={status.loading || isSelectedLocked || !hasSelectedAssignment}
+              disabled={status.loading || isSelectedLocked}
             >
               {status.loading ? "Saving ..." : "Save draft"}
             </button>
@@ -2267,7 +2357,7 @@ const AssignmentSubmissionPage = () => {
             <button
               type="submit"
               style={styles.primaryButton}
-              disabled={status.loading || confirmationLocked || isSelectedLocked || isOrientationDay || submissionCooldownRemainingMs > 0 || !hasSelectedAssignment}
+              disabled={status.loading || isOrientationDay}
             >
               {status.loading ? "Submitting ..." : confirmationLocked || isSelectedLocked ? "Submission locked" : "Submit assignment"}
             </button>
@@ -2373,7 +2463,7 @@ const AssignmentSubmissionPage = () => {
                 placeholder="Paste your corrected letter/text here."
               />
               <span style={styles.helperText}>
-                Minimum {MIN_SUBMISSION_CHARACTERS} and dynamic maximum {formatCharacterCount(dynamicMaxSubmissionCharacters)} characters.
+                {resubmissionWordCount} / {MIN_SUBMISSION_WORDS} words · Characters: {formatCharacterCount(resubmissionText.length)} / {formatCharacterCount(dynamicMaxSubmissionCharacters)} max.
               </span>
             </label>
 
@@ -2407,7 +2497,11 @@ const AssignmentSubmissionPage = () => {
               </button>
             </div>
 
-            {resubmissionStatus.error ? <InfoBox tone="error">{resubmissionStatus.error}</InfoBox> : null}
+            {resubmissionStatus.error ? (
+              <div ref={resubmissionErrorRef} role="alert" tabIndex={-1}>
+                <InfoBox tone="error">{resubmissionStatus.error}</InfoBox>
+              </div>
+            ) : null}
             {resubmissionStatus.success ? <InfoBox tone="success">{resubmissionStatus.success}</InfoBox> : null}
 
             <p style={{ ...styles.helperText, margin: 0 }}>
@@ -2425,7 +2519,7 @@ const AssignmentSubmissionPage = () => {
         ) : (
           <p style={{ ...styles.helperText, margin: 0 }}>
             {selectedAssignmentPassed
-              ? "Great news: this assignment is already passed, so no resubmission is needed."
+              ? "This assignment has already been passed, so resubmission is disabled."
               : <>
                   Resubmission is only available after you submit <strong>this selected assignment</strong>.  
                   If you haven’t submitted it yet, submit first — then the resubmission button will appear here.
@@ -2497,7 +2591,9 @@ const AssignmentSubmissionPage = () => {
 export const __TESTING__ = {
   buildResubmissionDiff,
   countNewWordOccurrences,
+  getStudentFriendlySubmitError,
   parseObjectiveAnswers,
+  tokenizeSubmission,
   resolvePreferredStudentName,
 };
 
