@@ -79,9 +79,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
   const [address, setAddress] = useState("");
   const [learningMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [initialPaymentAmount, setInitialPaymentAmount] = useState(
-    `${MIN_INITIAL_PAYMENT}`
-  );
+  const [paymentOption, setPaymentOption] = useState("full");
   const [selectedClass, setSelectedClass] = useState(loadPreferredClass() || "");
   const [hasConsented, setHasConsented] = useState(false);
   const [showConsentDetails, setShowConsentDetails] = useState(false);
@@ -180,29 +178,7 @@ const SignUpPage = ({ onLogin, onBack }) => {
     };
   };
 
-  const handleInitialPaymentChange = (event) => {
-    clearFieldError("initialPaymentAmount");
-    setAuthError("");
-    const numericOnlyValue = event.target.value.replace(/[^0-9]/g, "");
-    if (numericOnlyValue === "") {
-      setInitialPaymentAmount("");
-      return;
-    }
-
-    const sanitizedValue = Math.max(Number(numericOnlyValue), 0);
-    const cappedValue = Math.min(sanitizedValue, tuitionFeeForLevel || sanitizedValue);
-    setInitialPaymentAmount(`${cappedValue}`);
-  };
-
-  useEffect(() => {
-    const numericAmount = Number(initialPaymentAmount);
-    if (initialPaymentAmount === "" || Number.isNaN(numericAmount)) return;
-
-    const cappedAmount = Math.min(Math.max(numericAmount, 0), tuitionFeeForLevel || numericAmount);
-    if (`${cappedAmount}` !== `${initialPaymentAmount}`) {
-      setInitialPaymentAmount(`${cappedAmount}`);
-    }
-  }, [initialPaymentAmount, tuitionFeeForLevel]);
+  const initialPaymentAmount = paymentOption === "part" ? MIN_INITIAL_PAYMENT : tuitionFeeForLevel;
 
   const tuitionSummary = computeTuitionStatus({
     level: selectedLevel,
@@ -623,30 +599,28 @@ const SignUpPage = ({ onLogin, onBack }) => {
             <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
           ) : null}
 
-          <label style={styles.label} htmlFor="initial-payment-amount">{t("signupPage.fields.initialPayment")}</label>
-          <input
+          <label style={styles.label} htmlFor="initial-payment-amount">Payment option</label>
+          <select
             id="initial-payment-amount"
-            type="number"
-            min={MIN_INITIAL_PAYMENT}
-            max={tuitionFeeForLevel}
-            step="100"
-            pattern="[0-9]*"
-            inputMode="numeric"
             ref={(element) => {
               fieldRefs.current.initialPaymentAmount = element;
             }}
-            value={initialPaymentAmount}
-            onChange={handleInitialPaymentChange}
-            style={inputStyle}
-            placeholder={`At least ${formatMoney(MIN_INITIAL_PAYMENT)}`}
-          />
+            value={paymentOption}
+            onChange={(event) => {
+              setPaymentOption(event.target.value);
+              clearFieldError("initialPaymentAmount");
+              setAuthError("");
+            }}
+            style={styles.select}
+          >
+            <option value="full">Full fee — {formatMoney(tuitionFeeForLevel)} (recommended)</option>
+            <option value="part">Part payment — {formatMoney(MIN_INITIAL_PAYMENT)}</option>
+          </select>
           {fieldErrors.initialPaymentAmount ? (
             <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
           ) : null}
           <p style={{ ...styles.helperText, marginTop: -2 }}>
-            Enter between {formatMoney(MIN_INITIAL_PAYMENT)} and {formatMoney(tuitionFeeForLevel)} for {selectedLevel}. A1: {formatMoney(2800)} ·
-            A2: {formatMoney(3000)} · B1: {formatMoney(3000)} · B2: {formatMoney(3000)} · C1: {formatMoney(3000)}. You must pay at least{" "}
-            {formatMoney(MIN_INITIAL_PAYMENT)} to start your account. We confirm Paystack payments before marking you as paid.
+            Full payment is selected by default and unlocks 6 months of access. Part payment unlocks 1 month of access, with the remaining balance due afterward. We confirm Paystack payments before marking you as paid.
           </p>
 
           <TuitionStatusCard

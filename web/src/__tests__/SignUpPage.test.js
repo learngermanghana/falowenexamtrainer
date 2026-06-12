@@ -63,7 +63,17 @@ describe("SignUpPage", () => {
     jest.clearAllMocks();
   });
 
-  it("does not redirect to checkout when payments are disabled", async () => {
+  it("defaults to the full fee and lists part payment second", () => {
+    render(<SignUpPage onLogin={jest.fn()} />);
+
+    const paymentOption = screen.getByLabelText(/Payment option/i);
+    expect(paymentOption).toHaveValue("full");
+    expect(Array.from(paymentOption.options).map((option) => option.value)).toEqual(["full", "part"]);
+    expect(paymentOption.options[0]).toHaveTextContent(/Full fee/i);
+    expect(paymentOption.options[1]).toHaveTextContent(/Part payment/i);
+  });
+
+  it("saves the full fee as the default payment intent when payments are disabled", async () => {
     render(<SignUpPage onLogin={jest.fn()} />);
 
     await userEvent.type(screen.getByPlaceholderText("Abigail Mensah"), "Test User");
@@ -78,8 +88,6 @@ describe("SignUpPage", () => {
     await userEvent.type(screen.getByPlaceholderText("Berlin"), "Berlin");
     await userEvent.selectOptions(screen.getByLabelText(/Preferred learning mode/i), "Online");
     await userEvent.type(screen.getByPlaceholderText("0176 98765432"), "0987654321");
-    await userEvent.clear(screen.getByLabelText(/Initial payment amount/i));
-    await userEvent.type(screen.getByLabelText(/Initial payment amount/i), "1500");
     await userEvent.selectOptions(screen.getByLabelText(/Which live class are you joining/i), "Evening A1");
     await userEvent.click(screen.getByRole("checkbox"));
     await userEvent.click(screen.getByRole("button", { name: /sign up now/i }));
@@ -88,6 +96,7 @@ describe("SignUpPage", () => {
 
     const signupPayload = mockSignup.mock.calls[0][2];
     expect(signupPayload.contractTermMonths).toBe(0);
+    expect(signupPayload.paymentIntentAmount).toBe(2800);
     expect(window.open).not.toHaveBeenCalled();
   });
 });
