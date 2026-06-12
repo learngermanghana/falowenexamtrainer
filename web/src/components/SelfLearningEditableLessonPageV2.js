@@ -84,6 +84,68 @@ const completionBannerStyle = {
   gap: 6,
 };
 
+const textAreaStyle = {
+  minHeight: 96,
+  width: "100%",
+  border: "1px solid #d1d5db",
+  borderRadius: 12,
+  padding: 12,
+  resize: "vertical",
+  font: "inherit",
+  lineHeight: 1.55,
+  boxSizing: "border-box",
+};
+
+const writingSteps = [
+  { id: "understand", label: "1. Understand" },
+  { id: "ideas", label: "2. Ideas" },
+  { id: "plan", label: "3. Plan" },
+  { id: "paragraphs", label: "4. Paragraphs" },
+  { id: "final", label: "5. Final essay" },
+];
+
+const defaultParagraphTasks = [
+  {
+    id: "introduction",
+    title: "Introduction",
+    instruction: "Write only the introduction. Introduce the topic and explain why it is relevant.",
+  },
+  {
+    id: "explanation",
+    title: "Explanation / first argument",
+    instruction: "Explain the main idea clearly. Do not try to finish the whole essay yet.",
+  },
+  {
+    id: "example",
+    title: "Concrete example",
+    instruction: "Give one concrete example from society, school, work, family or everyday life.",
+  },
+  {
+    id: "counterargument",
+    title: "Counterargument",
+    instruction: "Show another side of the topic and explain why it matters.",
+  },
+  {
+    id: "alternative",
+    title: "Alternative / solution",
+    instruction: "Present a balanced alternative, solution or more flexible way of thinking.",
+  },
+  {
+    id: "conclusion",
+    title: "Conclusion",
+    instruction: "Write a short differentiated conclusion with your final position.",
+  },
+];
+
+const defaultChecklist = [
+  "I answered all bullet points in the task.",
+  "My introduction does not simply copy the task.",
+  "I gave at least one concrete example.",
+  "I included a counterargument or limitation.",
+  "I used linking words and C1/B2 useful phrases.",
+  "My conclusion gives a clear final position.",
+];
+
 const Section = ({ title, children }) => (
   <section style={cardStyle}>
     <h2 style={{ margin: 0, fontSize: "1.15rem" }}>{title}</h2>
@@ -293,6 +355,179 @@ const WritingTaskCard = ({ writingType, writingTask, structure }) => {
   );
 };
 
+const Field = ({ label, hint, value, onChange, minHeight = 96 }) => (
+  <label style={{ display: "grid", gap: 6 }}>
+    <span style={{ fontWeight: 800 }}>{label}</span>
+    {hint ? <span style={{ color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>{hint}</span> : null}
+    <textarea
+      value={value || ""}
+      onChange={(event) => onChange(event.target.value)}
+      placeholder="Write short notes first. You can improve them later."
+      style={{ ...textAreaStyle, minHeight }}
+    />
+  </label>
+);
+
+const getWordCount = (text = "") => String(text || "").trim().split(/\s+/).filter(Boolean).length;
+
+const WritingBuilder = ({ lesson, writingType, writingTask, builder = {}, progress = {}, onProgressUpdate }) => {
+  const formattedTask = parseWritingTask(writingTask, builder?.structure);
+  const draft = progress.writingBuilderDraft || {};
+  const activeStep = progress.writingBuilderStep || "understand";
+  const activeStepIndex = writingSteps.findIndex((step) => step.id === activeStep);
+  const safeStepIndex = activeStepIndex >= 0 ? activeStepIndex : 0;
+  const currentStep = writingSteps[safeStepIndex];
+  const paragraphTasks = builder?.paragraphTasks?.length ? builder.paragraphTasks : defaultParagraphTasks;
+  const checklist = builder?.checklist?.length ? builder.checklist : defaultChecklist;
+  const thinkingQuestions = builder?.thinkingQuestions?.length
+    ? builder.thinkingQuestions
+    : formattedTask.points?.length
+      ? formattedTask.points
+      : ["What is the topic about?", "What is your position?", "What example can you use?"];
+  const ideaPrompts = builder?.ideaPrompts?.length
+    ? builder.ideaPrompts
+    : ["Two strong arguments", "One concrete example", "One counterargument", "One alternative or solution"];
+  const usefulLines = builder?.usefulLines || [];
+  const wordTarget = builder?.wordTarget || (lesson.level === "C1" ? "180–220 words" : "150–200 words");
+  const finalWordCount = getWordCount(draft.finalEssay);
+
+  const updateDraft = (key, value) => {
+    onProgressUpdate({
+      writingBuilderDraft: {
+        ...(progress.writingBuilderDraft || {}),
+        [key]: value,
+      },
+    });
+  };
+
+  const setStep = (stepId) => onProgressUpdate({ writingBuilderStep: stepId });
+  const goNext = () => setStep(writingSteps[Math.min(safeStepIndex + 1, writingSteps.length - 1)].id);
+  const goBack = () => setStep(writingSteps[Math.max(safeStepIndex - 1, 0)].id);
+
+  return (
+    <div style={{ border: "1px solid #c7d2fe", borderRadius: 18, background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)", overflow: "hidden", display: "grid" }}>
+      <div style={{ padding: 16, display: "grid", gap: 10, borderBottom: "1px solid #e5e7eb" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <div style={{ display: "grid", gap: 4 }}>
+            <span style={{ ...styles.badge, width: "fit-content", background: "#eef2ff", color: "#3730a3" }}>Writing Builder</span>
+            <h3 style={{ margin: 0 }}>Build the essay step by step</h3>
+          </div>
+          <span style={{ ...styles.badge, background: "#dcfce7", color: "#166534" }}>Target: {wordTarget}</span>
+        </div>
+        <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+          Do not write the long essay immediately. First understand the topic, collect ideas, plan, write small paragraphs, then combine everything into the final answer.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 8 }}>
+          {writingSteps.map((step) => (
+            <button
+              key={step.id}
+              type="button"
+              onClick={() => setStep(step.id)}
+              style={{
+                ...(currentStep.id === step.id ? styles.primaryButton : styles.secondaryButton),
+                borderRadius: 999,
+                minHeight: 40,
+                padding: "8px 10px",
+                fontSize: 13,
+              }}
+            >
+              {step.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1.6fr) minmax(240px, 0.9fr)", gap: 14, padding: 16 }}>
+        <div style={{ display: "grid", gap: 14, minWidth: 0 }}>
+          {currentStep.id === "understand" ? (
+            <PracticeBox title="Step 1: Understand the task">
+              <NoteBox tone="amber"><strong>Write notes only.</strong> The aim is to remove the blank-page fear.</NoteBox>
+              {thinkingQuestions.length ? renderList(thinkingQuestions) : null}
+              <Field label="Topic in my own words" value={draft.topicInMyWords} onChange={(value) => updateDraft("topicInMyWords", value)} />
+              <Field label="Main problem or discussion" value={draft.mainProblem} onChange={(value) => updateDraft("mainProblem", value)} />
+              <Field label="My first position" hint="Agree, disagree, or partly agree?" value={draft.position} onChange={(value) => updateDraft("position", value)} />
+            </PracticeBox>
+          ) : null}
+
+          {currentStep.id === "ideas" ? (
+            <PracticeBox title="Step 2: Idea bank">
+              <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>Collect short points. Do not worry about perfect grammar yet.</p>
+              {renderList(ideaPrompts)}
+              <Field label="Arguments / reasons" value={draft.arguments} onChange={(value) => updateDraft("arguments", value)} />
+              <Field label="Concrete example" value={draft.example} onChange={(value) => updateDraft("example", value)} />
+              <Field label="Counterargument or limitation" value={draft.counterargument} onChange={(value) => updateDraft("counterargument", value)} />
+              <Field label="Alternative / balanced view" value={draft.alternative} onChange={(value) => updateDraft("alternative", value)} />
+            </PracticeBox>
+          ) : null}
+
+          {currentStep.id === "plan" ? (
+            <PracticeBox title="Step 3: Essay plan">
+              <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>Use the structure below, then adjust it with your own notes.</p>
+              {builder?.structure?.length ? renderList(builder.structure) : renderList(defaultParagraphTasks.map((item) => `${item.title}: ${item.instruction}`))}
+              <Field label="My essay plan" hint="Write the order of your paragraphs in simple bullet points." value={draft.myPlan} onChange={(value) => updateDraft("myPlan", value)} minHeight={140} />
+            </PracticeBox>
+          ) : null}
+
+          {currentStep.id === "paragraphs" ? (
+            <PracticeBox title="Step 4: Paragraph builder">
+              <NoteBox><strong>Write one paragraph at a time.</strong> This is easier than writing the full essay at once.</NoteBox>
+              {paragraphTasks.map((task, index) => (
+                <Field
+                  key={task.id || task.title}
+                  label={`${index + 1}. ${task.title}`}
+                  hint={task.instruction}
+                  value={draft[`paragraph_${task.id || index}`]}
+                  onChange={(value) => updateDraft(`paragraph_${task.id || index}`, value)}
+                  minHeight={110}
+                />
+              ))}
+            </PracticeBox>
+          ) : null}
+
+          {currentStep.id === "final" ? (
+            <PracticeBox title="Step 5: Final essay">
+              <NoteBox tone="green"><strong>Now combine your work.</strong> Use your notes and paragraphs to write the final version.</NoteBox>
+              <Field label="Final essay" value={draft.finalEssay} onChange={(value) => updateDraft("finalEssay", value)} minHeight={260} />
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>Words: {finalWordCount}</span>
+                <span style={{ ...styles.badge, background: "#fef3c7", color: "#92400e" }}>Goal: {wordTarget}</span>
+              </div>
+              <PracticeBox title="Final checklist">{renderList(checklist)}</PracticeBox>
+            </PracticeBox>
+          ) : null}
+
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+            <button type="button" style={styles.secondaryButton} onClick={goBack} disabled={safeStepIndex === 0}>Back step</button>
+            <button type="button" style={styles.primaryButton} onClick={goNext} disabled={safeStepIndex === writingSteps.length - 1}>Continue</button>
+          </div>
+        </div>
+
+        <aside style={{ display: "grid", gap: 12, alignContent: "start" }}>
+          <PracticeBox title="Useful phrases">
+            {usefulLines.length ? renderList(usefulLines) : renderList([
+              "Heutzutage wird ... häufig diskutiert.",
+              "Ein wichtiger Aspekt ist ...",
+              "Kritisch zu betrachten ist jedoch, dass ...",
+              "Zusammenfassend lässt sich sagen, dass ...",
+            ])}
+          </PracticeBox>
+          <PracticeBox title="AI coach prompts">
+            {renderList([
+              "Help me understand this topic in simple German.",
+              "Give me 3 possible arguments for this topic.",
+              "Improve this paragraph to C1 level without changing my idea.",
+              "Check whether I answered all bullet points.",
+            ])}
+          </PracticeBox>
+          <PracticeBox title="Exam mode reminder">
+            <p style={{ margin: 0, lineHeight: 1.6 }}>After guided practice, try the same task again with only the task card and a timer. That is exam mode.</p>
+          </PracticeBox>
+        </aside>
+      </div>
+    </div>
+  );
+};
+
 const ExternalResourceCard = ({ title, resource }) => {
   if (!resource) return null;
   return (
@@ -329,6 +564,8 @@ const buildInitialProgress = () => ({
   understood: false,
   completed: false,
   grammarQuizAnswers: {},
+  writingBuilderStep: "understand",
+  writingBuilderDraft: {},
 });
 
 export default function SelfLearningEditableLessonPageV2({ lesson }) {
@@ -379,7 +616,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
       ]
     : [
         { label: "Speaking task", value: lesson.speakingTaskType || "Guided talk" },
-        { label: "Writing support", value: "Task · Mark · Ref · Ideas" },
+        { label: "Writing support", value: "Builder · AI coach · Exam mode" },
         { label: "Progress", value: progress.completed ? "Completed" : "In progress" },
       ];
 
@@ -491,7 +728,18 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
           {activeTab === "write" ? (
             <Section title="Writing support">
               <WritingTaskCard writingType={writingType} writingTask={writingTask} structure={lesson.writingBuilder?.structure} />
-              <EmbeddedWritingPracticePanel />
+              <WritingBuilder
+                lesson={lesson}
+                writingType={writingType}
+                writingTask={writingTask}
+                builder={lesson.writingBuilder}
+                progress={progress}
+                onProgressUpdate={updateProgress}
+              />
+              <PracticeBox title="AI writing coach and marking">
+                <p style={{ margin: 0, lineHeight: 1.7 }}>After building your essay, paste one paragraph or the final essay below. Ask Falowen AI to improve structure, grammar, vocabulary and argument strength.</p>
+                <EmbeddedWritingPracticePanel />
+              </PracticeBox>
             </Section>
           ) : null}
 
