@@ -14,6 +14,7 @@ const normalizeLevel = (level = "") =>
   String(level || "")
     .trim()
     .toUpperCase();
+const normalizeChapter = (chapter = "") => String(chapter || "").trim();
 const isInternalLink = (url = "") => String(url || "").startsWith("/");
 const getExternalProps = (url = "") =>
   isInternalLink(url) ? {} : { target: "_blank", rel: "noreferrer" };
@@ -88,7 +89,11 @@ const lessonResourceEntries = (entry = {}, level = "", day = "") => {
       Number(day || entry.day)
     ] || {};
 
-  return resources.map((resource) => ({ ...resource, ...internalRoutes }));
+  return resources.map((resource) => ({
+    ...resource,
+    chapter: resource?.chapter || entry?.chapter || null,
+    ...internalRoutes,
+  }));
 };
 
 const firstLessonResource = (entry = {}) =>
@@ -160,13 +165,61 @@ const LessonResourceCard = ({
   );
 };
 
+const LessonVideoCard = ({ video, number, chapterLabel }) => {
+  const teacherVideo = isTeacherVideo(video);
+  const fallbackTitle = teacherVideo
+    ? "Teacher lecture video"
+    : "AI lecture / grammar video";
+  const title = video.title || fallbackTitle;
+  const displayTitle = chapterLabel && !title.includes(chapterLabel)
+    ? `${chapterLabel} ${teacherVideo ? "teacher lecture video" : "AI grammar video"}`
+    : title;
+
+  return (
+    <LessonResourceCard
+      key={video.url}
+      number={number}
+      icon={teacherVideo ? "🎬" : "🤖"}
+      title={displayTitle}
+      description={
+        video.description ||
+        (teacherVideo
+          ? "Recorded class explanation from the teacher."
+          : "AI explanation for revision and self-study.")
+      }
+      actionLabel={teacherVideo ? "Watch teacher video" : "Watch AI video"}
+      url={video.url}
+    />
+  );
+};
+
 const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
   const showTeacherLecture = normalizeLevel(level) === "A1";
   const lessonResources = lessonResourceEntries(entry, level, day).filter(
     (resource) => resource.grammarbook_link || resource.workbook_link,
   );
+  const groupedVideoUrls = new Set();
   let resourceNumber = 0;
   const nextNumber = () => String(++resourceNumber);
+
+  const videosForResource = (resource) => {
+    const resourceChapter = normalizeChapter(resource.chapter);
+    return videoResources.filter((video) => {
+      const videoChapter = normalizeChapter(video.chapter);
+      if (videoChapter && resourceChapter && videoChapter === resourceChapter) {
+        groupedVideoUrls.add(video.url);
+        return true;
+      }
+      if (!videoChapter && lessonResources.length === 1) {
+        groupedVideoUrls.add(video.url);
+        return true;
+      }
+      return false;
+    });
+  };
+
+  const remainingVideos = () =>
+    videoResources.filter((video) => !groupedVideoUrls.has(video.url));
 
   return (
     <section
@@ -200,44 +253,20 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
           }}
         >
           {showTeacherLecture
-            ? "Use every available teacher and AI video, then study each lesson's grammar and workbook."
+            ? "Open the grammar and workbook for each chapter, then watch the teacher and AI videos in the same chapter group."
             : "Use the available AI videos, then study the grammar or open the workbook."}
         </p>
       </div>
 
       <div style={{ display: "grid", gap: 8 }}>
-        {videoResources.map((video) => {
-          const teacherVideo = isTeacherVideo(video);
-          return (
-            <LessonResourceCard
-              key={video.url}
-              number={nextNumber()}
-              icon={teacherVideo ? "🎬" : "🤖"}
-              title={
-                teacherVideo
-                  ? "Teacher lecture video"
-                  : video.title || "AI lecture / grammar video"
-              }
-              description={
-                video.description ||
-                (teacherVideo
-                  ? "Recorded class explanation from the teacher."
-                  : "AI explanation for revision and self-study.")
-              }
-              actionLabel={
-                teacherVideo ? "Watch teacher video" : "Watch AI video"
-              }
-              url={video.url}
-            />
-          );
-        })}
-
         {lessonResources.map((resource, index) => {
           const chapterLabel = resource.chapter
             ? `Kapitel ${resource.chapter}`
             : lessonResources.length > 1
               ? `Lesson ${index + 1}`
               : "";
+          const relatedVideos = videosForResource(resource);
+
           return (
             <React.Fragment
               key={`${resource.chapter || index}-${resource.grammarbook_link || ""}-${resource.workbook_link || ""}`}
@@ -271,9 +300,26 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
                   url={resource.workbook_link}
                 />
               ) : null}
+              {relatedVideos.map((video) => (
+                <LessonVideoCard
+                  key={video.url}
+                  video={video}
+                  number={nextNumber()}
+                  chapterLabel={chapterLabel}
+                />
+              ))}
             </React.Fragment>
           );
         })}
+
+        {remainingVideos().map((video) => (
+          <LessonVideoCard
+            key={video.url}
+            video={video}
+            number={nextNumber()}
+            chapterLabel=""
+          />
+        ))}
       </div>
     </section>
   );
