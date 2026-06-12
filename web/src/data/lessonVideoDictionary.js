@@ -10,6 +10,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
   },
   A2: {
+    1: {
+      ai_grammar_video: "https://youtu.be/HMEs3mEKdrk?si=VYK4VjV9Da2_AzU0",
+    },
     15: {
       ai_grammar_video: "https://youtu.be/uf3OJwalh6U",
     },
@@ -129,5 +132,12 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   if (!additionalResources.length) return [];
 
   const legacyTeacherVideo = legacyTeacherVideoResource(entry) || legacyTeacherVideoResource(entry?.lesen_hören);
-  return uniqueVideoResources([legacyTeacherVideo], additionalResources);
+  const dictionaryMarksLegacyAsAi = Boolean(
+    legacyTeacherVideo?.url &&
+      fromDictionary.some(
+        (resource) => resource?.url === legacyTeacherVideo.url && String(resource?.title || "").toLowerCase().includes("ai")
+      )
+  );
+
+  return uniqueVideoResources([dictionaryMarksLegacyAsAi ? null : legacyTeacherVideo], additionalResources);
 };
