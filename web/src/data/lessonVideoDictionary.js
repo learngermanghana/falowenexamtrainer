@@ -3,18 +3,18 @@ const normalizeLevel = (level = "") =>
     .trim()
     .toUpperCase();
 
+const DAY0_ORIENTATION_VIDEO_RESOURCE = {
+  key: "day0-orientation-video",
+  title: "Day 0 orientation video",
+  description:
+    "Watch this orientation video first, then continue with the Day 0 guide and workbook.",
+  url: "https://youtu.be/mY0ArOMOV9Y",
+};
+
 export const LESSON_VIDEO_DICTIONARY = {
   A1: {
     0: {
-      videoResources: [
-        {
-          key: "ai-orientation-video",
-          title: "A1 Orientation AI video",
-          description:
-            "Watch this AI orientation video first, then scroll down to read the Day 0 guide.",
-          url: "https://youtu.be/qPwxBYlu3CE",
-        },
-      ],
+      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
     },
     1: {
       ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
@@ -39,6 +39,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
   },
   A2: {
+    0: {
+      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
+    },
     1: {
       ai_grammar_video: "https://youtu.be/HMEs3mEKdrk?si=VYK4VjV9Da2_AzU0",
     },
@@ -59,12 +62,23 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
   },
   B1: {
+    0: {
+      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
+    },
     1: {
       ai_grammar_video: "https://youtu.be/_mmAtSzWbNo",
     },
   },
-  B2: {},
-  C1: {},
+  B2: {
+    0: {
+      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
+    },
+  },
+  C1: {
+    0: {
+      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
+    },
+  },
 };
 
 const pickFirst = (...values) =>
@@ -198,7 +212,6 @@ const lessonResourceEntries = (entry = {}) => {
   ].filter(Boolean);
 
   if (!nestedResources.length) return [entry];
-
   return nestedResources.map((resource) => ({
     ...resource,
     chapter: resource?.chapter || entry?.chapter || null,
