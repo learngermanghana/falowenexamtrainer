@@ -8,6 +8,14 @@ import B1Day1TraumweltWorkbookPage from "./B1Day1TraumweltWorkbookPage";
 import B1Day1TraumweltGrammarNotesPage from "./B1Day1TraumweltGrammarNotesPage";
 import B1Day2FreundeFuersLebenGrammarNotesPage from "./B1Day2FreundeFuersLebenGrammarNotesPage";
 
+const DAY0_AI_ORIENTATION_VIDEO = {
+  id: "qPwxBYlu3CE",
+  url: "https://youtu.be/qPwxBYlu3CE",
+  title: "A1 Orientation AI video",
+  description:
+    "Watch this AI orientation first, then scroll down to read the guide and open the workbook.",
+};
+
 const toLessonArray = (value) =>
   Array.isArray(value) ? value : value ? [value] : [];
 const normalizeLevel = (level = "") =>
@@ -19,6 +27,12 @@ const isInternalLink = (url = "") => String(url || "").startsWith("/");
 const getExternalProps = (url = "") =>
   isInternalLink(url) ? {} : { target: "_blank", rel: "noreferrer" };
 const SELF_LEARNING_LEVELS = new Set(["B2", "C1"]);
+
+const isA1Day0Orientation = (level = "", day = "") =>
+  normalizeLevel(level) === "A1" && String(Number(day || 0)) === "0";
+
+const getYouTubeEmbedUrl = (videoId = "") =>
+  `https://www.youtube-nocookie.com/embed/${videoId}`;
 
 const B1_GRAMMAR_PAGES = {
   1: B1Day1TraumweltGrammarNotesPage,
@@ -98,6 +112,7 @@ const lessonResourceEntries = (entry = {}, level = "", day = "") => {
 
 const firstLessonResource = (entry = {}) =>
   lessonResourceEntries(entry)[0] || {};
+
 const isTeacherVideo = (resource = {}) =>
   `${resource.key || ""} ${resource.title || ""}`
     .toLowerCase()
@@ -193,8 +208,68 @@ const LessonVideoCard = ({ video, number, chapterLabel }) => {
   );
 };
 
+const OrientationAiVideoHero = () => (
+  <section
+    style={{
+      ...styles.card,
+      background: "#111827",
+      border: "1px solid #f59e0b",
+      color: "#fff",
+      display: "grid",
+      gap: 10,
+      padding: 12,
+      marginBottom: 0,
+    }}
+  >
+    <div style={{ display: "grid", gap: 4 }}>
+      <span
+        style={{
+          ...pillStyle,
+          width: "fit-content",
+          color: "#fef3c7",
+          background: "rgba(255,255,255,0.12)",
+          borderColor: "rgba(254, 243, 199, 0.4)",
+        }}
+      >
+        🤖 AI orientation video
+      </span>
+      <h2 style={{ margin: 0, fontSize: 20, color: "#fff" }}>
+        {DAY0_AI_ORIENTATION_VIDEO.title}
+      </h2>
+      <p style={{ margin: 0, color: "#fde68a", fontSize: 13, lineHeight: 1.45 }}>
+        {DAY0_AI_ORIENTATION_VIDEO.description}
+      </p>
+    </div>
+
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        paddingTop: "56.25%",
+        borderRadius: 14,
+        overflow: "hidden",
+        background: "#000",
+        boxShadow: "0 14px 30px rgba(0,0,0,0.18)",
+      }}
+    >
+      <iframe
+        title={DAY0_AI_ORIENTATION_VIDEO.title}
+        src={getYouTubeEmbedUrl(DAY0_AI_ORIENTATION_VIDEO.id)}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          border: 0,
+        }}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+      />
+    </div>
+  </section>
+);
+
 const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
-  const showTeacherLecture = normalizeLevel(level) === "A1";
   const lessonResources = lessonResourceEntries(entry, level, day).filter(
     (resource) => resource.grammarbook_link || resource.workbook_link,
   );
@@ -252,9 +327,7 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
             lineHeight: 1.45,
           }}
         >
-          {showTeacherLecture
-            ? "Open the grammar and workbook for each chapter, then watch the teacher and AI videos in the same chapter group."
-            : "Use the available AI videos, then study the grammar or open the workbook."}
+          Use the available AI videos, then study the grammar or open the workbook.
         </p>
       </div>
 
@@ -415,6 +488,10 @@ const CourseLessonPage = () => {
     "notStarted";
   const scoreText = location.state?.scoreText || "";
   const videoResources = getLessonVideoResources(level, day, entry || {});
+  const isOrientationLesson = isA1Day0Orientation(level, day);
+  const resourceHubVideoResources = isOrientationLesson
+    ? []
+    : videoResources.filter((video) => !isTeacherVideo(video));
   const primaryResource = firstLessonResource(entry || {});
   const submitLabel = primaryResource.chapter
     ? `Submit Kapitel ${primaryResource.chapter} assignment`
@@ -566,6 +643,8 @@ const CourseLessonPage = () => {
           ) : null}
         </header>
 
+        {isOrientationLesson ? <OrientationAiVideoHero /> : null}
+
         {entry.instruction ? (
           <section
             style={{
@@ -597,7 +676,7 @@ const CourseLessonPage = () => {
 
         <LessonResourcesHub
           entry={entry}
-          videoResources={videoResources}
+          videoResources={resourceHubVideoResources}
           level={level}
           day={day}
         />
