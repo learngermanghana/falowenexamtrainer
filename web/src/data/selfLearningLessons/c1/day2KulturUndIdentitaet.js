@@ -115,6 +115,20 @@ const c1Day2KulturUndIdentitaet = makeLesson({
   writingTaskType: "C1 opinion essay / Stellungnahme",
   writingTopic: "Schreiben: Kultur und Identität. Verfassen Sie eine C1-Stellungnahme zu diesem Thema: Wie stark prägt Kultur die persönliche Identität? Bearbeiten Sie alle Punkte: Erklären Sie, welche Rolle Kultur für das Selbstverständnis eines Menschen spielt. Argumentieren Sie anhand eines konkreten Beispiels. Nennen Sie mögliche Einwände gegen eine zu starre kulturelle Zuordnung. Erläutern Sie eine Alternative, die Identität als flexibel und vielschichtig versteht.",
   writingBuilder: {
+    wordTarget: "180–220 Wörter",
+    thinkingQuestions: [
+      "Worum geht es in dieser Aufgabe genau: Herkunft, Sprache, Werte, Zugehörigkeit oder Selbstbild?",
+      "Welche Rolle spielt Kultur für das Selbstverständnis eines Menschen?",
+      "Welche konkrete Person oder Situation kann als Beispiel dienen?",
+      "Was ist problematisch an einer zu starren kulturellen Zuordnung?",
+      "Wie kann man Identität flexibler und vielschichtiger verstehen?",
+    ],
+    ideaPrompts: [
+      "Nenne zwei Faktoren, die Identität prägen: z. B. Sprache, Familie, Religion, Schule, Medien, Migration oder Alltag.",
+      "Notiere ein konkretes Beispiel: eine Person, die in mehreren kulturellen Kontexten lebt.",
+      "Notiere einen Einwand: Menschen dürfen nicht nur auf Herkunft reduziert werden.",
+      "Notiere eine Alternative: Identität als Entwicklung, Mehrfachzugehörigkeit oder flexible Selbstbeschreibung.",
+    ],
     structure: [
       "Einleitung: Stellen Sie das Thema Kultur und Identität vor und zeigen Sie, warum es aktuell ist.",
       "Erklären Sie: Welche Rolle spielt Kultur für das Selbstverständnis eines Menschen?",
@@ -123,6 +137,38 @@ const c1Day2KulturUndIdentitaet = makeLesson({
       "Erläutern Sie eine Alternative: Beschreiben Sie ein flexibles, mehrschichtiges Verständnis von Identität.",
       "Schluss: Formulieren Sie ein differenziertes Fazit mit Ihrer eigenen Position.",
     ],
+    paragraphTasks: [
+      {
+        id: "introduction",
+        title: "Einleitung",
+        instruction: "Schreibe nur die Einleitung. Stelle das Thema vor und erkläre, warum Kultur und Identität heute diskutiert werden.",
+      },
+      {
+        id: "role",
+        title: "Rolle der Kultur",
+        instruction: "Erkläre, wie Sprache, Familie, Alltag, Religion, Medien oder Migration das Selbstverständnis prägen können.",
+      },
+      {
+        id: "example",
+        title: "Konkretes Beispiel",
+        instruction: "Beschreibe eine konkrete Person oder Situation, zum Beispiel Menschen, die in zwei Kulturen aufgewachsen sind.",
+      },
+      {
+        id: "counterargument",
+        title: "Einwand",
+        instruction: "Zeige, warum eine starre kulturelle Zuordnung problematisch sein kann.",
+      },
+      {
+        id: "alternative",
+        title: "Alternative",
+        instruction: "Erläutere ein flexibles und vielschichtiges Verständnis von Identität.",
+      },
+      {
+        id: "conclusion",
+        title: "Schluss",
+        instruction: "Formuliere ein differenziertes Fazit: Kultur prägt Identität, bestimmt sie aber nicht vollständig.",
+      },
+    ],
     usefulLines: [
       "Kultur und Identität stehen in einem engen, aber nicht einfachen Zusammenhang.",
       "Eine kulturell geprägte Identität entsteht durch Sprache, Familie, Alltag und persönliche Erfahrungen.",
@@ -130,6 +176,14 @@ const c1Day2KulturUndIdentitaet = makeLesson({
       "Kritisch zu betrachten ist jedoch, dass eine starre Zuordnung Menschen auf ihre Herkunft reduzieren kann.",
       "Eine sinnvolle Alternative wäre ein Identitätsverständnis, das Mehrfachzugehörigkeit anerkennt.",
       "Zusammenfassend lässt sich festhalten, dass Kultur Identität prägt, sie aber nicht vollständig bestimmt.",
+    ],
+    checklist: [
+      "Ich habe erklärt, welche Rolle Kultur für das Selbstverständnis spielt.",
+      "Ich habe ein konkretes Beispiel verwendet.",
+      "Ich habe einen Einwand gegen starre kulturelle Zuordnung genannt.",
+      "Ich habe eine flexible Alternative erläutert.",
+      "Ich habe mindestens zwei C1-Formulierungen oder Partizipialattribute benutzt.",
+      "Mein Fazit ist differenziert und nicht zu absolut.",
     ],
   },
   phrases: [
