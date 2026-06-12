@@ -43,7 +43,7 @@ const listStyle = {
 
 function VideoCard({ resource }) {
   const embedUrl = getYouTubeEmbedUrl(resource.url);
-  const available = Boolean(resource.url);
+  if (!embedUrl) return null;
 
   return (
     <article style={{ ...card, alignContent: "start" }}>
@@ -62,69 +62,31 @@ function VideoCard({ resource }) {
       </span>
       <strong style={{ fontSize: "1rem" }}>{resource.title}</strong>
       <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>{resource.description}</p>
-
-      {embedUrl ? (
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            paddingTop: "56.25%",
-            borderRadius: 14,
-            overflow: "hidden",
-            background: "#0f172a",
-          }}
-        >
-          <iframe
-            title={resource.title}
-            src={embedUrl}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
-          />
-        </div>
-      ) : (
-        <div
-          style={{
-            minHeight: 120,
-            borderRadius: 14,
-            border: "1px dashed #cbd5e1",
-            background: "#f8fafc",
-            display: "grid",
-            placeItems: "center",
-            padding: 16,
-            color: "#64748b",
-            textAlign: "center",
-            lineHeight: 1.6,
-          }}
-        >
-          AI video slot ready. Add the C1 Day 2 AI video URL to activate it.
-        </div>
-      )}
-
-      {available ? (
-        <a
-          href={resource.url}
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            width: "fit-content",
-            padding: "9px 12px",
-            borderRadius: 10,
-            background: "#2563eb",
-            color: "#fff",
-            fontWeight: 800,
-            textDecoration: "none",
-          }}
-        >
-          Open video
-        </a>
-      ) : null}
+      <div
+        style={{
+          position: "relative",
+          width: "100%",
+          paddingTop: "56.25%",
+          borderRadius: 14,
+          overflow: "hidden",
+          background: "#0f172a",
+        }}
+      >
+        <iframe
+          title={resource.title}
+          src={embedUrl}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: 0 }}
+        />
+      </div>
     </article>
   );
 }
 
 function LearnUpgrade() {
   const { learn } = c1Day2LearningSpeakingGuide;
+  const availableVideos = learn.videos.filter((resource) => getYouTubeEmbedUrl(resource.url));
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -164,15 +126,17 @@ function LearnUpgrade() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gap: 10 }}>
-        <h3 style={{ margin: 0 }}>Watch before the grammar notes</h3>
-        <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
-          Start with the grammar video, then use the AI video for a second explanation and revision. The complete grammar notes are directly below.
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
-          {learn.videos.map((resource) => <VideoCard key={resource.key} resource={resource} />)}
+      {availableVideos.length ? (
+        <div style={{ display: "grid", gap: 10 }}>
+          <h3 style={{ margin: 0 }}>Watch before the grammar notes</h3>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.6 }}>
+            Watch the grammar explanation, then continue with the complete grammar notes below.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 12 }}>
+            {availableVideos.map((resource) => <VideoCard key={resource.key} resource={resource} />)}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
