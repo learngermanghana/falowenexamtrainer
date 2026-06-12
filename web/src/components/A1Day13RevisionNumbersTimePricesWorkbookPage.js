@@ -1,5 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import {
+  collection,
+  db,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+} from "../firebase";
 import { styles } from "../styles";
 
 const card = { ...styles.card, display: "grid", gap: 12 };
@@ -35,11 +46,13 @@ const tipBox = {
   gap: 6,
 };
 
-const answerBox = {
-  border: "1px solid #d1d5db",
-  borderRadius: 10,
-  padding: 10,
-  background: "#ecfdf5",
+const contributionBox = {
+  border: "1px solid #bbf7d0",
+  background: "#f0fdf4",
+  borderRadius: 14,
+  padding: 12,
+  display: "grid",
+  gap: 10,
 };
 
 const inputStyle = {
@@ -47,6 +60,13 @@ const inputStyle = {
   padding: "10px 12px",
   borderRadius: 10,
   border: "1px solid #d1d5db",
+};
+
+const textareaStyle = {
+  ...inputStyle,
+  minHeight: 130,
+  resize: "vertical",
+  lineHeight: 1.55,
 };
 
 const lightBtn = {
@@ -74,6 +94,10 @@ const heroCard = {
 
 const heroImage =
   "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1400&q=80";
+
+const LESSON_LEVEL = "A1";
+const LESSON_ID = "a1-day-13-revision-numbers-time-prices-statements";
+const LESSON_TITLE = "A1 Day 13 — Numbers, Time, Prices and Statements";
 
 const numbersItems = [
   ["56", "sechsundfünfzig"],
@@ -136,26 +160,11 @@ const birthdayMcqItems = [
 ];
 
 const pricesQaItems = [
-  {
-    question: "Wie viel kostet das Buch?",
-    answer: "Es kostet zehn Euro.",
-  },
-  {
-    question: "Wie viel kostet der Apfel?",
-    answer: "Er kostet zwei Euro.",
-  },
-  {
-    question: "Wie viel kostet die Banane?",
-    answer: "Sie kostet einen Euro.",
-  },
-  {
-    question: "Wie viel kostet die Zeitung?",
-    answer: "Sie kostet zwei Euro fünfzig.",
-  },
-  {
-    question: "Wie viel kostet die Tasse?",
-    answer: "Sie kostet drei Euro.",
-  },
+  { question: "Wie viel kostet das Buch?", object: "das Buch", price: "10 Euro" },
+  { question: "Wie viel kostet der Apfel?", object: "der Apfel", price: "2 Euro" },
+  { question: "Wie viel kostet die Banane?", object: "die Banane", price: "1 Euro" },
+  { question: "Wie viel kostet die Zeitung?", object: "die Zeitung", price: "2,50 Euro" },
+  { question: "Wie viel kostet die Tasse?", object: "die Tasse", price: "3 Euro" },
 ];
 
 const kostetKostenMcqItems = [
@@ -179,69 +188,67 @@ const kostetKostenMcqItems = [
   },
 ];
 
-const wordOrderBuildItems = [
-  {
-    prompt: "Ich / gehe / am Montag / zur Schule",
-    answer: "Ich gehe am Montag zur Schule.",
-  },
-  {
-    prompt: "Am Dienstag / treibe / ich / Sport",
-    answer: "Am Dienstag treibe ich Sport.",
-  },
-  {
-    prompt: "Ich / koche / am Mittwoch",
-    answer: "Ich koche am Mittwoch.",
-  },
-  {
-    prompt: "Am Donnerstag / mache / ich / Hausaufgaben",
-    answer: "Am Donnerstag mache ich Hausaufgaben.",
-  },
-  {
-    prompt: "Ich / lese / am Freitag",
-    answer: "Ich lese am Freitag.",
-  },
-  {
-    prompt: "Am Samstag / treffe / ich / Freunde",
-    answer: "Am Samstag treffe ich Freunde.",
-  },
-  {
-    prompt: "Ich / gehe / am Sonntag / im Park spazieren",
-    answer: "Ich gehe am Sonntag im Park spazieren.",
-  },
+const statementChecklist = [
+  "one sentence with a number",
+  "one sentence with a time",
+  "one sentence with a year or birthday",
+  "one sentence with a price",
+  "one sentence with a day and activity",
 ];
 
-const wordOrderMcqItems = [
-  {
-    prompt: "Choose the correct sentence.",
-    correct: 0,
-    options: [
-      "Ich gehe am Montag zur Schule.",
-      "Ich am Montag gehe zur Schule.",
-      "Am Montag ich gehe zur Schule.",
-    ],
-  },
-  {
-    prompt: "Choose the correct sentence.",
-    correct: 1,
-    options: [
-      "Am Dienstag ich treibe Sport.",
-      "Am Dienstag treibe ich Sport.",
-      "Am Dienstag Sport treibe ich.",
-    ],
-  },
-  {
-    prompt: "Choose the correct sentence.",
-    correct: 2,
-    options: [
-      "Am Freitag ich lese.",
-      "Ich am Freitag lese.",
-      "Ich lese am Freitag.",
-    ],
-  },
-];
+const safeDocKey = (value = "") =>
+  String(value || "")
+    .trim()
+    .replace(/[\\/]+/g, "-")
+    .replace(/\s+/g, "-")
+    .toLowerCase() || "unknown-class";
 
-function RevealPractice({ title, subtitle, items, placeholder = "Type your answer..." }) {
-  const [show, setShow] = useState({});
+const normalizeTimestamp = (value) => {
+  if (!value) return null;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value?.seconds === "number") return value.seconds * 1000;
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "number") return value < 1e12 ? value * 1000 : value;
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? null : parsed;
+};
+
+const formatDateTime = (value) => {
+  const ms = normalizeTimestamp(value);
+  if (!ms) return "Just now";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Africa/Accra",
+  }).format(new Date(ms));
+};
+
+const getClassName = (studentProfile = {}) =>
+  studentProfile?.className ||
+  studentProfile?.class_name ||
+  studentProfile?.class ||
+  studentProfile?.cohort ||
+  "";
+
+const getStudentCode = (studentProfile = {}, user = {}) =>
+  studentProfile?.studentcode ||
+  studentProfile?.studentCode ||
+  studentProfile?.student_id ||
+  studentProfile?.id ||
+  user?.uid ||
+  "unknown";
+
+const getDisplayName = (studentProfile = {}, user = {}) =>
+  studentProfile?.name || user?.displayName || user?.email || "Student";
+
+const contributionsCollectionRef = (classKey) =>
+  collection(db, "group_discussion", LESSON_LEVEL, "classes", classKey, "lessons", LESSON_ID, "contributions");
+
+function PracticeInputSection({ title, subtitle, items, placeholder = "Type your answer..." }) {
   const [inputs, setInputs] = useState({});
 
   return (
@@ -251,57 +258,23 @@ function RevealPractice({ title, subtitle, items, placeholder = "Type your answe
         {subtitle ? <p style={{ margin: 0 }}>{subtitle}</p> : null}
       </div>
 
-      {items.map(([q, a], i) => (
-        <div key={`${q}-${i}`} style={card}>
-          <strong>{q}</strong>
+      {items.map((item, i) => {
+        const prompt = Array.isArray(item) ? item[0] : item.question;
+        const helper = Array.isArray(item) ? null : `${item.object} · ${item.price}`;
 
-          <input
-            style={inputStyle}
-            placeholder={placeholder}
-            value={inputs[i] || ""}
-            onChange={(e) => setInputs((prev) => ({ ...prev, [i]: e.target.value }))}
-          />
-
-          <button
-            type="button"
-            style={lightBtn}
-            onClick={() => setShow((prev) => ({ ...prev, [i]: !prev[i] }))}
-          >
-            {show[i] ? "Hide answer" : "Show answer"}
-          </button>
-
-          {show[i] ? <div style={answerBox}>{a}</div> : null}
-        </div>
-      ))}
-    </section>
-  );
-}
-
-function QaRevealSection({ title, subtitle, items }) {
-  const [show, setShow] = useState({});
-
-  return (
-    <section style={section}>
-      <div style={{ display: "grid", gap: 6 }}>
-        <h2 style={{ margin: 0 }}>{title}</h2>
-        {subtitle ? <p style={{ margin: 0 }}>{subtitle}</p> : null}
-      </div>
-
-      {items.map((item, i) => (
-        <div key={i} style={card}>
-          <strong>{item.question}</strong>
-
-          <button
-            type="button"
-            style={lightBtn}
-            onClick={() => setShow((prev) => ({ ...prev, [i]: !prev[i] }))}
-          >
-            {show[i] ? "Hide answer" : "Show answer"}
-          </button>
-
-          {show[i] ? <div style={answerBox}>{item.answer}</div> : null}
-        </div>
-      ))}
+        return (
+          <div key={`${prompt}-${i}`} style={card}>
+            <strong>{prompt}</strong>
+            {helper ? <span style={{ color: "#6b7280", fontSize: 13 }}>Use: {helper}</span> : null}
+            <input
+              style={inputStyle}
+              placeholder={placeholder}
+              value={inputs[i] || ""}
+              onChange={(e) => setInputs((prev) => ({ ...prev, [i]: e.target.value }))}
+            />
+          </div>
+        );
+      })}
     </section>
   );
 }
@@ -354,39 +327,180 @@ function McqSection({ title, subtitle, items }) {
   );
 }
 
-function BuildSentenceSection({ title, subtitle, items }) {
-  const [show, setShow] = useState({});
-  const [inputs, setInputs] = useState({});
+function StatementContributionSection() {
+  const { user, studentProfile } = useAuth();
+  const className = getClassName(studentProfile);
+  const classKey = useMemo(() => safeDocKey(className), [className]);
+  const studentCode = getStudentCode(studentProfile, user);
+  const studentDocId = safeDocKey(user?.uid || studentCode);
+  const [draft, setDraft] = useState("");
+  const [hasEditedDraft, setHasEditedDraft] = useState(false);
+  const [contributions, setContributions] = useState([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [savedMessage, setSavedMessage] = useState("");
+
+  useEffect(() => {
+    if (!db || !className) return undefined;
+
+    const contributionsQuery = query(contributionsCollectionRef(classKey), orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(
+      contributionsQuery,
+      (snapshot) => {
+        const nextContributions = snapshot.docs.map((docSnapshot) => {
+          const data = docSnapshot.data();
+          return {
+            id: docSnapshot.id,
+            authorName: data.authorName || "Student",
+            studentCode: data.studentCode || "",
+            text: data.text || "",
+            createdAt: data.createdAt || data.createdAtMs || null,
+            updatedAt: data.updatedAt || null,
+          };
+        });
+
+        setContributions(nextContributions);
+        setError("");
+
+        const mine = nextContributions.find(
+          (item) => item.id === studentDocId || String(item.studentCode || "").toLowerCase() === String(studentCode || "").toLowerCase()
+        );
+
+        if (mine?.text && !hasEditedDraft) {
+          setDraft(mine.text);
+        }
+      },
+      (err) => {
+        console.error("Failed to load class contributions", err);
+        setError("Class contributions could not be loaded. Please try again later.");
+      }
+    );
+
+    return () => unsubscribe();
+  }, [classKey, className, hasEditedDraft, studentCode, studentDocId]);
+
+  const handleSave = async () => {
+    if (!db) {
+      setError("Firebase is not configured. Please try again later.");
+      return;
+    }
+
+    if (!className) {
+      setError("Your class name is missing. Please update your account profile before saving.");
+      return;
+    }
+
+    const text = draft.trim();
+    if (!text) {
+      setError("Write your contribution before saving.");
+      return;
+    }
+
+    setIsSaving(true);
+    setError("");
+    setSavedMessage("");
+
+    try {
+      await setDoc(
+        doc(contributionsCollectionRef(classKey), studentDocId),
+        {
+          level: LESSON_LEVEL,
+          className,
+          classKey,
+          lessonId: LESSON_ID,
+          lessonTitle: LESSON_TITLE,
+          contributionType: "statement-practice",
+          authorName: getDisplayName(studentProfile, user),
+          studentCode,
+          studentUid: user?.uid || null,
+          text,
+          updatedAt: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          createdAtMs: Date.now(),
+        },
+        { merge: true }
+      );
+
+      setHasEditedDraft(false);
+      setSavedMessage("Saved. Your class can now read your contribution below.");
+    } catch (err) {
+      console.error("Failed to save class contribution", err);
+      setError("Your contribution could not be saved. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
-    <section style={section}>
+    <section style={{ ...section, borderColor: "#86efac", background: "#f7fee7" }}>
       <div style={{ display: "grid", gap: 6 }}>
-        <h2 style={{ margin: 0 }}>{title}</h2>
-        {subtitle ? <p style={{ margin: 0 }}>{subtitle}</p> : null}
+        <p style={{ margin: 0, color: "#166534", fontWeight: 800 }}>Practical class discussion</p>
+        <h2 style={{ margin: 0 }}>Final task: Form your own German statements</h2>
+        <p style={{ margin: 0 }}>
+          This is not a tutor assignment. Write your contribution and save it for your class discussion.
+          Everyone in your class can view the contributions here.
+        </p>
       </div>
 
-      {items.map((item, i) => (
-        <div key={i} style={card}>
-          <strong>{item.prompt}</strong>
+      <div style={tipBox}>
+        <strong>Your contribution should include:</strong>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+          {statementChecklist.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
 
-          <input
-            style={inputStyle}
-            placeholder="Write the correct sentence..."
-            value={inputs[i] || ""}
-            onChange={(e) => setInputs((prev) => ({ ...prev, [i]: e.target.value }))}
-          />
+      <div style={infoBox}>
+        <strong>Sentence frames you can use — complete them with your own information:</strong>
+        <div>Ich habe ______ Bücher.</div>
+        <div>Es ist ______ Uhr.</div>
+        <div>Ich bin am ______ geboren.</div>
+        <div>Das/Der/Die ______ kostet ______ Euro.</div>
+        <div>Am ______ gehe/mache/lese/treffe ich ______.</div>
+      </div>
 
-          <button
-            type="button"
-            style={lightBtn}
-            onClick={() => setShow((prev) => ({ ...prev, [i]: !prev[i] }))}
-          >
-            {show[i] ? "Hide answer" : "Show answer"}
-          </button>
+      <label style={{ display: "grid", gap: 6, fontWeight: 700 }}>
+        Your answer box
+        <textarea
+          style={textareaStyle}
+          placeholder="Example: Ich habe zwei Bücher. Es ist halb acht. Ich bin am dritten Juli geboren. Die Tasche kostet zehn Euro. Am Montag gehe ich zur Schule."
+          value={draft}
+          onChange={(event) => {
+            setDraft(event.target.value);
+            setHasEditedDraft(true);
+            setSavedMessage("");
+          }}
+        />
+      </label>
 
-          {show[i] ? <div style={answerBox}>{item.answer}</div> : null}
-        </div>
-      ))}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+        <button type="button" style={darkBtn} onClick={handleSave} disabled={isSaving || !draft.trim()}>
+          {isSaving ? "Saving..." : "Save to class discussion"}
+        </button>
+        {className ? <span style={{ color: "#166534", fontSize: 13 }}>Class: {className}</span> : null}
+      </div>
+
+      {savedMessage ? <div style={{ ...contributionBox, color: "#166534" }}>{savedMessage}</div> : null}
+      {error ? <div style={{ ...styles.errorBox, margin: 0 }}>{error}</div> : null}
+
+      <div style={{ display: "grid", gap: 10 }}>
+        <h3 style={{ margin: 0 }}>Class contributions</h3>
+        {contributions.length === 0 ? (
+          <div style={contributionBox}>No contribution yet. Be the first student in your class to share one.</div>
+        ) : (
+          contributions.map((item) => (
+            <article key={item.id} style={contributionBox}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                <strong>{item.authorName}</strong>
+                <span style={{ color: "#4b5563", fontSize: 12 }}>{formatDateTime(item.updatedAt || item.createdAt)}</span>
+              </div>
+              <p style={{ margin: 0, whiteSpace: "pre-line", lineHeight: 1.55 }}>{item.text}</p>
+            </article>
+          ))
+        )}
+      </div>
     </section>
   );
 }
@@ -406,7 +520,7 @@ export default function A1RevisionOriginalContentPage() {
           <div style={{ padding: 18, display: "grid", gap: 8 }}>
             <h1 style={{ margin: 0 }}>A1 Revision — Numbers, Time, Years, Birthdays, Prices, and Word Order</h1>
             <p style={{ margin: 0 }}>
-              This revision page helps you practice practical German for everyday situations.
+              This revision page helps you practise practical German for everyday situations.
             </p>
             <button type="button" style={lightBtn} onClick={() => navigate(-1)}>
               ← Back
@@ -417,17 +531,14 @@ export default function A1RevisionOriginalContentPage() {
         <section style={section}>
           <h2 style={{ margin: 0 }}>Introduction to the Numbers Practice</h2>
           <p style={{ margin: 0 }}>
-            Hello, dear students! Today, we will practice our number skills in German.
-            We will read different numbers out loud in German to ensure we understand
-            and can use them correctly. Numbers are an important part of the language
-            and help us in many situations, such as shopping, describing age, or
-            dealing with money.
+            Today, you will revise numbers, time, years, birthdays, prices, and basic word order.
+            Type your own answers first. The final task at the bottom is where you share your own German statements with your class.
           </p>
         </section>
 
-        <RevealPractice
+        <PracticeInputSection
           title="Practice: Numbers from 1 to 10,000"
-          subtitle="Read the numbers out loud in German. You can type first, then reveal the answer."
+          subtitle="Read the numbers out loud in German and type what you think. The model answer is not shown here, so you practise actively."
           items={numbersItems}
           placeholder="Type the number in German..."
         />
@@ -442,25 +553,17 @@ export default function A1RevisionOriginalContentPage() {
           </div>
 
           <div style={tipBox}>
-            <div><strong>💬 Example Answers:</strong></div>
-            <div>Es ist ein Uhr.</div>
-            <div>Es ist drei Uhr.</div>
-            <div>Es ist halb vier.</div>
-            <div>Es ist Viertel nach zwei.</div>
-            <div>Es ist Viertel vor sechs.</div>
-          </div>
-
-          <div style={infoBox}>
-            <div><strong>🕰️ Tips:</strong></div>
-            <div>In German, the 12-hour clock and the 24-hour clock are both used.</div>
-            <div>For informal speech, the 12-hour clock is common.</div>
-            <div>"Uhr" is always used after the hour number when telling time.</div>
+            <div><strong>Useful patterns:</strong></div>
+            <div>Es ist ______ Uhr.</div>
+            <div>Es ist halb ______.</div>
+            <div>Es ist Viertel nach ______.</div>
+            <div>Es ist Viertel vor ______.</div>
           </div>
         </section>
 
-        <RevealPractice
+        <PracticeInputSection
           title="Time Practice"
-          subtitle="Say the time in German."
+          subtitle="Say the time in German. Use the patterns above to help you."
           items={timePracticeItems}
           placeholder="Type the full answer..."
         />
@@ -468,28 +571,14 @@ export default function A1RevisionOriginalContentPage() {
         <section style={section}>
           <h2 style={{ margin: 0 }}>Explanation of Years in German</h2>
           <p style={{ margin: 0 }}>
-            In German, the years from 1000 to 1999 are typically spoken with
-            <strong> hundert</strong>, while years from 2000 onwards are spoken differently.
+            In German, the years from 1000 to 1999 are often spoken with
+            <strong> hundert</strong>, while years from 2000 onwards are spoken directly.
           </p>
 
           <div style={infoBox}>
             <div>1100: <span style={{ color: yearPartColor.thousandPart }}>elf</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span></div>
-            <div>1234: <span style={{ color: yearPartColor.thousandPart }}>zwölf</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierunddreißig</span></div>
-            <div>1356: <span style={{ color: yearPartColor.thousandPart }}>dreizehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>sechsundfünfzig</span></div>
-            <div>1365: <span style={{ color: yearPartColor.thousandPart }}>dreizehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>fünfundsechzig</span></div>
             <div>1453: <span style={{ color: yearPartColor.thousandPart }}>vierzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>dreiundfünfzig</span></div>
-            <div>1544: <span style={{ color: yearPartColor.thousandPart }}>fünfzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
-            <div>1644: <span style={{ color: yearPartColor.thousandPart }}>sechzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
-            <div>1744: <span style={{ color: yearPartColor.thousandPart }}>siebzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
-            <div>1844: <span style={{ color: yearPartColor.thousandPart }}>achtzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
             <div>1944: <span style={{ color: yearPartColor.thousandPart }}>neunzehn</span><span style={{ color: yearPartColor.hundertPart }}>hundert</span><span style={{ color: yearPartColor.restPart }}>vierundvierzig</span></div>
-          </div>
-
-          <div style={tipBox}>
-            <div>
-              For example, the year <strong>1999</strong> is said as{" "}
-              <strong>neunzehnhundertneunundneunzig</strong>.
-            </div>
           </div>
 
           <div style={infoBox}>
@@ -497,11 +586,10 @@ export default function A1RevisionOriginalContentPage() {
             <div>2000: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span></div>
             <div>2010: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>zehn</span></div>
             <div>2025: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>fünfundzwanzig</span></div>
-            <div>2030: <span style={{ color: yearPartColor.post2000Part }}>zweitausend</span><span style={{ color: yearPartColor.restPart }}>dreißig</span></div>
           </div>
         </section>
 
-        <RevealPractice
+        <PracticeInputSection
           title="Year Practice"
           subtitle="Say the year in German."
           items={yearPracticeItems}
@@ -517,37 +605,16 @@ export default function A1RevisionOriginalContentPage() {
 
           <div style={infoBox}>
             <div><strong>1️⃣ Understanding the Grammar</strong></div>
-            <div>"Ich bin" = "I am" (part of the present perfect tense, used for past events).</div>
-            <div>"am" = "on the" (short for "an dem", which triggers the dative case).</div>
-            <div>[Date] = The date in its ordinal form.</div>
-            <div>"geboren" = "born" (past participle, always at the end of the sentence).</div>
+            <div>"Ich bin" = I am.</div>
+            <div>"am" = on the, and the date takes the ending -ten or -sten.</div>
+            <div>"geboren" = born, usually at the end of the sentence.</div>
           </div>
 
           <div style={tipBox}>
-            <div><strong>2️⃣ Forming Dates in German</strong></div>
-            <div>1–19 → Add "-te"</div>
-            <div>20 and above → Add "-ste"</div>
-            <div>After "am", the ordinal number takes a dative ending:</div>
-            <div>✔ "-te" changes to "-ten"</div>
-            <div>✔ "-ste" changes to "-sten"</div>
-          </div>
-
-          <div style={infoBox}>
-            <div><strong>3️⃣ Examples of Saying Your Birthday</strong></div>
-            <div>
-              12.05.1995 → Ich bin am zwölften Mai neunzehnhundertfünfundneunzig geboren.
-            </div>
-            <div>
-              03.07.1980 → Ich bin am dritten Juli neunzehnhundertachtzig geboren.
-            </div>
-          </div>
-
-          <div style={tipBox}>
-            <div><strong>4️⃣ Common Mistakes to Avoid</strong></div>
-            <div>❌ Ich bin am drei Juli geboren.</div>
-            <div>✔ Ich bin am dritten Juli geboren.</div>
-            <div>❌ Ich bin geboren am ersten Januar.</div>
-            <div>✔ Ich bin am ersten Januar geboren.</div>
+            <div><strong>Forming Dates in German</strong></div>
+            <div>1–19 → Add "-te" → after "am" it becomes "-ten".</div>
+            <div>20 and above → Add "-ste" → after "am" it becomes "-sten".</div>
+            <div>Example frame: Ich bin am ______ Mai ______ geboren.</div>
           </div>
         </section>
 
@@ -562,12 +629,7 @@ export default function A1RevisionOriginalContentPage() {
 
           <div style={infoBox}>
             <div><strong>Step 1: Practice with Objects</strong></div>
-            <div>das Buch</div>
-            <div>der Apfel</div>
-            <div>der Kaffee</div>
-            <div>die Banane</div>
-            <div>die Zeitung</div>
-            <div>die Tasse</div>
+            <div>das Buch · der Apfel · der Kaffee · die Banane · die Zeitung · die Tasse</div>
           </div>
 
           <div style={tipBox}>
@@ -575,19 +637,13 @@ export default function A1RevisionOriginalContentPage() {
             <div>A: Wie viel kostet [object]?</div>
             <div>B: [Pronoun] kostet [price] Euro.</div>
           </div>
-
-          <div style={infoBox}>
-            <div><strong>Examples:</strong></div>
-            <div>Wie viel kostet das Buch? → Es kostet zehn Euro.</div>
-            <div>Wie viel kostet der Apfel? → Er kostet zwei Euro.</div>
-            <div>Wie viel kostet die Banane? → Sie kostet einen Euro.</div>
-          </div>
         </section>
 
-        <QaRevealSection
+        <PracticeInputSection
           title="Price Question and Answer Practice"
-          subtitle="Read the question. Then reveal the model answer."
+          subtitle="Read the question and write your own full answer."
           items={pricesQaItems}
+          placeholder="Write the full answer..."
         />
 
         <section style={section}>
@@ -616,69 +672,24 @@ export default function A1RevisionOriginalContentPage() {
           <h2 style={{ margin: 0 }}>Sentence Building with Days and Activities</h2>
 
           <div style={infoBox}>
-            <div><strong>Instructions:</strong></div>
-            <div>1. Use either sentence structure 1 or 2.</div>
-            <div>2. Arrange the sentences based on the chosen rule.</div>
-            <div>3. Use only the given activities and add the pronoun and day.</div>
-            <div>4. Do not add any extra words.</div>
+            <div><strong>Sentence Structures:</strong></div>
+            <div>1. Subject + Verb + Time + Other Elements</div>
+            <div>2. Time + Verb + Subject + Other Elements</div>
           </div>
 
           <div style={tipBox}>
-            <div><strong>Sentence Structures:</strong></div>
-            <div>1⃣ Subject + Verb + Time + Other Elements</div>
-            <div>2⃣ Time + Verb + Subject + Other Elements</div>
-          </div>
-
-          <div style={infoBox}>
             <div><strong>Days of the Week in German</strong></div>
             <div>Montag · Dienstag · Mittwoch · Donnerstag · Freitag · Samstag · Sonntag</div>
           </div>
 
           <div style={infoBox}>
-            <div><strong>Pronouns to Pick From</strong></div>
-            <div>ich · du · er · sie · es · wir · ihr · sie/Sie</div>
-          </div>
-
-          <div style={tipBox}>
             <div><strong>Activities to Use in Sentences</strong></div>
-            <div>kochen</div>
-            <div>Freunde treffen</div>
-            <div>Hausaufgaben machen</div>
-            <div>fernsehen</div>
-            <div>lesen</div>
-            <div>im Park spazieren gehen</div>
-            <div>zur Schule gehen</div>
-            <div>arbeiten</div>
-            <div>Sport treiben</div>
-            <div>einkaufen gehen</div>
-          </div>
-
-          <div style={infoBox}>
-            <div><strong>Examples for Practice</strong></div>
-            <div>Ich gehe am Montag zur Schule.</div>
-            <div>Am Dienstag treibe ich Sport.</div>
-          </div>
-
-          <div style={tipBox}>
-            <div>
-              <strong>Your Turn:</strong> Remember to pay attention to the word order.
-              In German, when you start a sentence with a time expression like
-              “Am Montag”, the verb must come immediately after.
-            </div>
+            <div>kochen · Freunde treffen · Hausaufgaben machen · fernsehen · lesen</div>
+            <div>im Park spazieren gehen · zur Schule gehen · arbeiten · Sport treiben · einkaufen gehen</div>
           </div>
         </section>
 
-        <BuildSentenceSection
-          title="Arrange the Sentence"
-          subtitle="Put the words in the correct order."
-          items={wordOrderBuildItems}
-        />
-
-        <McqSection
-          title="Word Order Practice"
-          subtitle="Choose the correct sentence."
-          items={wordOrderMcqItems}
-        />
+        <StatementContributionSection />
       </div>
     </div>
   );
