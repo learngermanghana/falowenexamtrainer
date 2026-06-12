@@ -14,6 +14,8 @@ const day0PathConfig = [
   { match: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", level: "A1" },
   { match: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook", level: "A2" },
   { match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", level: "B1" },
+  { match: "/campus/course/b2-day-0-self-learning-orientation-workbook", level: "B2" },
+  { match: "/campus/course/c1-day-0-progression-workbook", level: "C1" },
 ];
 
 const getYouTubeEmbedUrl = (videoId = "") =>
