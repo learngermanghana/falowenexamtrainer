@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import AppBackButton from "./navigation/AppBackButton";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
@@ -86,7 +86,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
   const [address, setAddress] = useState("");
   const [learningMode, setLearningMode] = useState("");
   const [emergencyContactPhone, setEmergencyContactPhone] = useState("");
-  const [initialPaymentAmount, setInitialPaymentAmount] = useState(`${MIN_INITIAL_PAYMENT}`);
+  const [paymentOption, setPaymentOption] = useState("full");
 
   const scheduleHighlights = useMemo(() => FRENCH_A1_SCHEDULE.slice(0, 6), []);
   const tuitionSummary = useMemo(
@@ -112,34 +112,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
     });
   };
 
-  const handleInitialPaymentChange = (event) => {
-    const rawValue = event.target.value;
-    setInitialPaymentAmount(rawValue);
-    clearFieldError("initialPaymentAmount");
-
-    const numericOnlyValue = rawValue.replace(/[^\d.]/g, "");
-    if (!numericOnlyValue) return;
-
-    const numericValue = Number(numericOnlyValue);
-    if (Number.isNaN(numericValue)) return;
-
-    const sanitizedValue = Math.max(numericValue, 0);
-    const cappedValue = Math.min(sanitizedValue, tuitionSummary.tuitionFee || sanitizedValue);
-    setInitialPaymentAmount(`${cappedValue}`);
-  };
-
-  useEffect(() => {
-    const numericAmount = Number(initialPaymentAmount);
-    if (initialPaymentAmount === "" || Number.isNaN(numericAmount)) return;
-
-    const cappedAmount = Math.min(
-      Math.max(numericAmount, 0),
-      tuitionSummary.tuitionFee || numericAmount
-    );
-    if (`${cappedAmount}` !== `${initialPaymentAmount}`) {
-      setInitialPaymentAmount(`${cappedAmount}`);
-    }
-  }, [initialPaymentAmount, tuitionSummary.tuitionFee]);
+  const initialPaymentAmount = paymentOption === "part" ? MIN_INITIAL_PAYMENT : tuitionSummary.tuitionFee;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -508,28 +481,26 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
               <p style={styles.fieldError}>{fieldErrors.emergencyContactPhone}</p>
             ) : null}
 
-            <label style={styles.label} htmlFor="initial-payment-amount">Initial payment amount (GHS)</label>
-            <input
+            <label style={styles.label} htmlFor="initial-payment-amount">Payment option</label>
+            <select
               id="initial-payment-amount"
-              type="number"
-              min={MIN_INITIAL_PAYMENT}
-              max={tuitionSummary.tuitionFee}
-              step="100"
-              pattern="[0-9]*"
-              inputMode="numeric"
-              value={initialPaymentAmount}
-              onChange={handleInitialPaymentChange}
-              style={inputStyle}
-              placeholder={`At least ${formatMoney(MIN_INITIAL_PAYMENT)}`}
+              value={paymentOption}
+              onChange={(event) => {
+                setPaymentOption(event.target.value);
+                clearFieldError("initialPaymentAmount");
+                setAuthError("");
+              }}
+              style={styles.select}
               required
-            />
+            >
+              <option value="full">Full fee — {formatMoney(tuitionSummary.tuitionFee)} (recommended)</option>
+              <option value="part">Part payment — {formatMoney(MIN_INITIAL_PAYMENT)}</option>
+            </select>
             {fieldErrors.initialPaymentAmount ? (
               <p style={styles.fieldError}>{fieldErrors.initialPaymentAmount}</p>
             ) : null}
             <p style={{ ...styles.helperText, marginTop: -2 }}>
-              Enter between {formatMoney(MIN_INITIAL_PAYMENT)} and {formatMoney(tuitionSummary.tuitionFee)} for {selectedLevel}. A1: {formatMoney(2800)}
-              · A2: {formatMoney(3000)} · B1: {formatMoney(3000)} · B2: {formatMoney(3000)} · C1: {formatMoney(3000)}. You must pay at least{" "}
-              {formatMoney(MIN_INITIAL_PAYMENT)} to start your account. We confirm Paystack payments before marking you as paid.
+              Full payment is selected by default and unlocks 6 months of access. Part payment unlocks 1 month of access, with the remaining balance due afterward. We confirm Paystack payments before marking you as paid.
             </p>
 
             <TuitionStatusCard
