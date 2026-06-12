@@ -44,7 +44,7 @@
         "warn",
         {
           "varsIgnorePattern": "^StudyCalendarPage$",
-          "argsIgnorePattern": "^(defaultLevel|idToken)$"
+          "argsIgnorePattern": "^(defaultLevel|idToken|writingType)$"
         }
       ]
     }
