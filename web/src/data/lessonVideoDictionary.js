@@ -5,6 +5,17 @@ const normalizeLevel = (level = "") =>
 
 export const LESSON_VIDEO_DICTIONARY = {
   A1: {
+    0: {
+      videoResources: [
+        {
+          key: "ai-orientation-video",
+          title: "A1 Orientation AI video",
+          description:
+            "Watch this AI orientation video first, then scroll down to read the Day 0 guide.",
+          url: "https://youtu.be/qPwxBYlu3CE",
+        },
+      ],
+    },
     1: {
       ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
     },
@@ -212,8 +223,8 @@ const sortVideoResourcesByLessonOrder = (resources = [], entries = []) => {
 
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
-  const showTeacherVideos = normalizedLevel === "A1";
   const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
+  const showTeacherVideos = normalizedLevel === "A1" && dayKey !== "0";
   const dictionaryEntry =
     LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
   const entries = lessonResourceEntries(entry);
