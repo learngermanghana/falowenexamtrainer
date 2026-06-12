@@ -370,7 +370,7 @@ const Field = ({ label, hint, value, onChange, minHeight = 96 }) => (
 
 const getWordCount = (text = "") => String(text || "").trim().split(/\s+/).filter(Boolean).length;
 
-const WritingBuilder = ({ lesson, writingType, writingTask, builder = {}, progress = {}, onProgressUpdate }) => {
+const WritingBuilder = ({ lesson, writingTask, builder = {}, progress = {}, onProgressUpdate }) => {
   const formattedTask = parseWritingTask(writingTask, builder?.structure);
   const draft = progress.writingBuilderDraft || {};
   const activeStep = progress.writingBuilderStep || "understand";
@@ -390,6 +390,11 @@ const WritingBuilder = ({ lesson, writingType, writingTask, builder = {}, progre
   const usefulLines = builder?.usefulLines || [];
   const wordTarget = builder?.wordTarget || (lesson.level === "C1" ? "180–220 words" : "150–200 words");
   const finalWordCount = getWordCount(draft.finalEssay);
+  const getParagraphDraftKey = (task, index) => `paragraph_${task.id || index}`;
+  const paragraphDrafts = paragraphTasks
+    .map((task, index) => String(draft[getParagraphDraftKey(task, index)] || "").trim())
+    .filter(Boolean);
+  const hasParagraphDraft = paragraphDrafts.length > 0;
 
   const updateDraft = (key, value) => {
     onProgressUpdate({
@@ -401,6 +406,16 @@ const WritingBuilder = ({ lesson, writingType, writingTask, builder = {}, progre
   };
 
   const setStep = (stepId) => onProgressUpdate({ writingBuilderStep: stepId });
+  const combineParagraphs = () => {
+    if (!hasParagraphDraft) return;
+    onProgressUpdate({
+      writingBuilderDraft: {
+        ...(progress.writingBuilderDraft || {}),
+        finalEssay: paragraphDrafts.join("\n\n"),
+      },
+      writingBuilderStep: "final",
+    });
+  };
   const goNext = () => setStep(writingSteps[Math.min(safeStepIndex + 1, writingSteps.length - 1)].id);
   const goBack = () => setStep(writingSteps[Math.max(safeStepIndex - 1, 0)].id);
 
@@ -476,17 +491,23 @@ const WritingBuilder = ({ lesson, writingType, writingTask, builder = {}, progre
                   key={task.id || task.title}
                   label={`${index + 1}. ${task.title}`}
                   hint={task.instruction}
-                  value={draft[`paragraph_${task.id || index}`]}
-                  onChange={(value) => updateDraft(`paragraph_${task.id || index}`, value)}
+                  value={draft[getParagraphDraftKey(task, index)]}
+                  onChange={(value) => updateDraft(getParagraphDraftKey(task, index), value)}
                   minHeight={110}
                 />
               ))}
+              <button type="button" style={styles.primaryButton} onClick={combineParagraphs} disabled={!hasParagraphDraft}>
+                Combine my paragraphs
+              </button>
             </PracticeBox>
           ) : null}
 
           {currentStep.id === "final" ? (
             <PracticeBox title="Step 5: Final essay">
               <NoteBox tone="green"><strong>Now combine your work.</strong> Use your notes and paragraphs to write the final version.</NoteBox>
+              <button type="button" style={styles.secondaryButton} onClick={combineParagraphs} disabled={!hasParagraphDraft}>
+                Refresh final essay from paragraphs
+              </button>
               <Field label="Final essay" value={draft.finalEssay} onChange={(value) => updateDraft("finalEssay", value)} minHeight={260} />
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                 <span style={{ ...styles.badge, background: "#eef2ff", color: "#3730a3" }}>Words: {finalWordCount}</span>
@@ -730,7 +751,6 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
               <WritingTaskCard writingType={writingType} writingTask={writingTask} structure={lesson.writingBuilder?.structure} />
               <WritingBuilder
                 lesson={lesson}
-                writingType={writingType}
                 writingTask={writingTask}
                 builder={lesson.writingBuilder}
                 progress={progress}
