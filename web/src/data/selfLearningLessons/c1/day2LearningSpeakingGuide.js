@@ -33,14 +33,6 @@ const c1Day2LearningSpeakingGuide = {
           "Schau dir zuerst die Grammatikerklärung an. Achte besonders auf Partizipialattribute und Adjektivendungen.",
         url: "https://youtu.be/MF0SDU0Gsp4",
       },
-      {
-        key: "ai-topic-video",
-        type: "AI video",
-        title: "Kultur und Identität",
-        description:
-          "Nutze das AI-Video als zweite Erklärung und zur Wiederholung des Kapitels.",
-        url: "",
-      },
     ],
   },
   speaking: {
