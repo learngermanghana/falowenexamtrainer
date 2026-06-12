@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import c1Day2LearningSpeakingGuide from "../data/selfLearningLessons/c1/day2LearningSpeakingGuide";
@@ -33,6 +33,12 @@ const card = {
   background: "#ffffff",
   display: "grid",
   gap: 10,
+};
+
+const listStyle = {
+  margin: 0,
+  paddingLeft: 22,
+  lineHeight: 1.75,
 };
 
 function VideoCard({ resource }) {
@@ -171,116 +177,49 @@ function LearnUpgrade() {
   );
 }
 
-function SpeakingIdeaMap() {
+function SpeakingIdeaList() {
   const { speaking } = c1Day2LearningSpeakingGuide;
-  const [selected, setSelected] = useState([]);
-
-  const selectedSet = useMemo(() => new Set(selected), [selected]);
-  const toggleBranch = (id) => {
-    setSelected((previous) =>
-      previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id]
-    );
-  };
 
   return (
     <div style={{ display: "grid", gap: 14 }}>
       <div
         style={{
           border: "1px solid #c7d2fe",
-          borderRadius: 16,
+          borderRadius: 14,
           padding: 14,
           background: "linear-gradient(135deg, #eef2ff, #ffffff)",
           display: "grid",
           gap: 8,
         }}
       >
-        <span style={{ color: "#4338ca", fontWeight: 800, fontSize: 12 }}>IDEA MAP BEFORE SPEAKING</span>
         <h3 style={{ margin: 0 }}>{speaking.title}</h3>
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>{speaking.instruction}</p>
-        <div
-          style={{
-            justifySelf: "start",
-            padding: "10px 16px",
-            borderRadius: 999,
-            background: "#312e81",
-            color: "#fff",
-            fontWeight: 900,
-          }}
-        >
-          {speaking.center}
-        </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 12 }}>
-        {speaking.branches.map((branch) => {
-          const active = selectedSet.has(branch.id);
-          return (
-            <button
-              key={branch.id}
-              type="button"
-              onClick={() => toggleBranch(branch.id)}
-              style={{
-                ...card,
-                textAlign: "left",
-                cursor: "pointer",
-                borderColor: active ? "#6366f1" : "#e2e8f0",
-                background: active ? "#eef2ff" : "#ffffff",
-                font: "inherit",
-              }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-                <strong>{branch.title}</strong>
-                <span
-                  style={{
-                    padding: "4px 8px",
-                    borderRadius: 999,
-                    background: active ? "#4f46e5" : "#f1f5f9",
-                    color: active ? "#fff" : "#475569",
-                    fontSize: 12,
-                    fontWeight: 800,
-                  }}
-                >
-                  {active ? "Selected ✓" : "Select"}
-                </span>
-              </div>
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                {branch.keywords.map((word) => (
-                  <span
-                    key={word}
-                    style={{
-                      padding: "4px 8px",
-                      borderRadius: 999,
-                      background: "#f8fafc",
-                      border: "1px solid #e2e8f0",
-                      color: "#334155",
-                      fontSize: 12,
-                      fontWeight: 700,
-                    }}
-                  >
-                    {word}
-                  </span>
-                ))}
-              </div>
-              <p style={{ margin: 0, color: "#475569", lineHeight: 1.55 }}><strong>Think:</strong> {branch.prompt}</p>
-              <p style={{ margin: 0, color: "#334155", lineHeight: 1.55 }}><strong>Example:</strong> {branch.example}</p>
-            </button>
-          );
-        })}
-      </div>
+      <ol style={{ ...listStyle, display: "grid", gap: 16 }}>
+        {speaking.branches.map((branch) => (
+          <li key={branch.id} style={{ paddingLeft: 4 }}>
+            <strong>{branch.title}</strong>
+            <ul style={{ ...listStyle, marginTop: 6 }}>
+              <li><strong>Ideen:</strong> {branch.keywords.join(" · ")}</li>
+              <li><strong>Frage:</strong> {branch.prompt}</li>
+              <li><strong>Beispielsatz:</strong> {branch.example}</li>
+            </ul>
+          </li>
+        ))}
+      </ol>
 
       <div
         style={{
-          border: `1px solid ${selected.length >= 3 ? "#86efac" : "#fde68a"}`,
+          border: "1px solid #bae6fd",
           borderRadius: 12,
           padding: 12,
-          background: selected.length >= 3 ? "#f0fdf4" : "#fffbeb",
-          color: selected.length >= 3 ? "#166534" : "#92400e",
-          fontWeight: 800,
+          background: "#ecfeff",
+          color: "#155e75",
+          lineHeight: 1.65,
         }}
       >
-        {selected.length >= 3
-          ? `${selected.length} branches selected. You are ready to answer the speaking question below.`
-          : `Select at least 3 branches. Selected: ${selected.length}/3.`}
+        <strong>So bereitest du deine Antwort vor:</strong> Wähle aus der Liste drei oder vier passende Bereiche aus, notiere ein Beispiel und beantworte danach die eigentliche Sprechfrage darunter.
       </div>
     </div>
   );
@@ -368,7 +307,7 @@ function C1Day2LearningSpeakingAutoMount() {
       const heading = speakingSection.querySelector(":scope > h2");
       const firstContent = Array.from(speakingSection.children).find((child) => child !== heading);
       const mount = document.createElement("div");
-      mount.setAttribute("data-c1-day2-speaking-map", "true");
+      mount.setAttribute("data-c1-day2-speaking-ideas", "true");
       speakingSection.insertBefore(mount, firstContent || null);
       speakingMount = mount;
       setSpeakingTarget(mount);
@@ -399,7 +338,7 @@ function C1Day2LearningSpeakingAutoMount() {
   return (
     <>
       {learnTarget?.isConnected ? createPortal(<LearnUpgrade />, learnTarget) : null}
-      {speakingTarget?.isConnected ? createPortal(<SpeakingIdeaMap />, speakingTarget) : null}
+      {speakingTarget?.isConnected ? createPortal(<SpeakingIdeaList />, speakingTarget) : null}
     </>
   );
 }
