@@ -23,6 +23,15 @@ const B1_WORKBOOK_PAGES = {
   1: B1Day1TraumweltWorkbookPage,
 };
 
+const INTERNAL_RESOURCE_ROUTES = {
+  B1: {
+    1: {
+      grammarbook_link: "/campus/course/lesson/B1/1?view=grammar",
+      workbook_link: "/campus/course/lesson/B1/1?view=workbook",
+    },
+  },
+};
+
 const palette = {
   page: "#f6f1e9",
   card: "#fffaf3",
@@ -69,7 +78,10 @@ const firstLessonResource = (entry = {}) => {
   return lesenHoeren[0] || schreibenSprechen[0] || {};
 };
 
-const lessonResourceUrl = (entry = {}, key) => {
+const lessonResourceUrl = (entry = {}, key, level = "", day = "") => {
+  const internalUrl = INTERNAL_RESOURCE_ROUTES[normalizeLevel(level)]?.[Number(day || entry.day)]?.[key];
+  if (internalUrl) return internalUrl;
+
   const primaryResource = firstLessonResource(entry);
   const nestedSchreiben = toLessonArray(entry.schreiben_sprechen).find((resource) => resource?.[key]);
   const nestedLesen = toLessonArray(entry.lesen_hören).find((resource) => resource?.[key]);
@@ -124,11 +136,11 @@ const LessonResourceCard = ({ number, icon, title, description, actionLabel, url
   );
 };
 
-const LessonResourcesHub = ({ entry, videoResources }) => {
+const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
   const teacherVideo = findVideo(videoResources, "teacher") || videoResources?.[0];
   const aiVideo = findVideo(videoResources, "ai") || videoResources?.find((resource) => resource?.url !== teacherVideo?.url);
-  const grammarUrl = lessonResourceUrl(entry, "grammarbook_link");
-  const workbookUrl = lessonResourceUrl(entry, "workbook_link");
+  const grammarUrl = lessonResourceUrl(entry, "grammarbook_link", level, day);
+  const workbookUrl = lessonResourceUrl(entry, "workbook_link", level, day);
 
   return (
     <section
@@ -277,9 +289,7 @@ const CourseLessonPage = () => {
   if (!entry) {
     return (
       <div style={{ ...styles.container, display: "grid", gap: 12 }}>
-        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>
-          ← Course Book
-        </button>
+        <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>← Course Book</button>
         <div style={styles.card}>
           <h1 style={{ marginTop: 0 }}>Lesson not found</h1>
           <p style={{ marginBottom: 0 }}>We could not find Day {day} for {level || "this level"}.</p>
@@ -300,22 +310,10 @@ const CourseLessonPage = () => {
         maxWidth: 900,
       }}
     >
-      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start", padding: "6px 10px", fontSize: 12 }} onClick={() => navigate("/campus/course")}>
-        ← Course Book
-      </button>
+      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start", padding: "6px 10px", fontSize: 12 }} onClick={() => navigate("/campus/course")}>← Course Book</button>
 
       <article style={{ display: "grid", gap: 14 }}>
-        <header
-          style={{
-            position: "static",
-            background: "rgba(255, 250, 243, 0.96)",
-            border: `1px solid ${palette.border}`,
-            borderRadius: 14,
-            padding: 12,
-            display: "grid",
-            gap: 9,
-          }}
-        >
+        <header style={{ position: "static", background: "rgba(255, 250, 243, 0.96)", border: `1px solid ${palette.border}`, borderRadius: 14, padding: 12, display: "grid", gap: 9 }}>
           <div style={{ display: "flex", gap: 7, flexWrap: "wrap", alignItems: "center" }}>
             <span style={pillStyle}>{level}</span>
             <span style={pillStyle}>Day {entry.day ?? day}</span>
@@ -342,7 +340,7 @@ const CourseLessonPage = () => {
           </section>
         ) : null}
 
-        <LessonResourcesHub entry={entry} videoResources={videoResources} />
+        <LessonResourcesHub entry={entry} videoResources={videoResources} level={level} day={day} />
         <SubmitAssignmentCard canSubmit={canSubmit} submitLabel={submitLabel} onSubmit={handleSubmitAssignment} />
 
         <TextBlock title="Schreiben">{entry.schreiben}</TextBlock>
