@@ -1,4 +1,7 @@
-const normalizeLevel = (level = "") => String(level || "").trim().toUpperCase();
+const normalizeLevel = (level = "") =>
+  String(level || "")
+    .trim()
+    .toUpperCase();
 
 export const LESSON_VIDEO_DICTIONARY = {
   A1: {
@@ -26,7 +29,9 @@ export const LESSON_VIDEO_DICTIONARY = {
   C1: {},
 };
 
-const pickFirst = (...values) => values.find((value) => typeof value === "string" && value.trim())?.trim() || "";
+const pickFirst = (...values) =>
+  values.find((value) => typeof value === "string" && value.trim())?.trim() ||
+  "";
 
 const uniqueVideoResources = (...groups) => {
   const seen = new Set();
@@ -42,7 +47,11 @@ const uniqueVideoResources = (...groups) => {
 };
 
 const legacyTeacherVideoResource = (source = {}) => {
-  const url = pickFirst(source.video, source.youtube_link, source.tutorial_video_url);
+  const url = pickFirst(
+    source.video,
+    source.youtube_link,
+    source.tutorial_video_url,
+  );
   if (!url) return null;
 
   return {
@@ -53,27 +62,11 @@ const legacyTeacherVideoResource = (source = {}) => {
   };
 };
 
-const asAiVideoResource = (resource = {}) => {
-  if (!resource?.url) return null;
-
-  const existingTitle = String(resource.title || "").trim();
-  const titleLooksLikeTeacher = existingTitle.toLowerCase().includes("teacher");
-
-  return {
-    ...resource,
-    key: resource.key === "teacher-explanation" ? "ai-grammar-video" : resource.key || "ai-grammar-video",
-    title: titleLooksLikeTeacher || !existingTitle ? "AI grammar video" : existingTitle,
-    description:
-      titleLooksLikeTeacher || !resource.description
-        ? "AI video lesson for revision and self-study."
-        : resource.description,
-  };
-};
-
 export const normalizeVideoResources = (source = {}) => {
   if (!source || typeof source !== "object") return [];
 
-  const explicitResources = source.videoResources || source.video_resources || source.videos;
+  const explicitResources =
+    source.videoResources || source.video_resources || source.videos;
   if (Array.isArray(explicitResources)) {
     return explicitResources
       .map((resource, index) => {
@@ -81,18 +74,28 @@ export const normalizeVideoResources = (source = {}) => {
           return {
             key: `video-${index + 1}`,
             title: index === 0 ? "Teacher explanation" : "AI grammar video",
-            description: "Watch this video before you continue with the grammar and workbook.",
+            description:
+              "Watch this video before you continue with the grammar and workbook.",
             url: resource,
           };
         }
 
-        const url = pickFirst(resource?.url, resource?.href, resource?.youtube_link, resource?.video);
+        const url = pickFirst(
+          resource?.url,
+          resource?.href,
+          resource?.youtube_link,
+          resource?.video,
+        );
         if (!url) return null;
 
         return {
           key: resource?.key || `video-${index + 1}`,
-          title: resource?.title || (index === 0 ? "Teacher explanation" : "AI grammar video"),
-          description: resource?.description || "Watch this video before you continue with the grammar and workbook.",
+          title:
+            resource?.title ||
+            (index === 0 ? "Teacher explanation" : "AI grammar video"),
+          description:
+            resource?.description ||
+            "Watch this video before you continue with the grammar and workbook.",
           url,
         };
       })
@@ -105,7 +108,7 @@ export const normalizeVideoResources = (source = {}) => {
     source.teacher_lecture_url,
     source.teacherLectureUrl,
     source.teacher_explanation_url,
-    source.teacherExplanationUrl
+    source.teacherExplanationUrl,
   );
   const aiGrammarUrl = pickFirst(
     source.ai_grammar_video,
@@ -113,7 +116,7 @@ export const normalizeVideoResources = (source = {}) => {
     source.ai_grammar_video_url,
     source.aiGrammarVideoUrl,
     source.ai_video,
-    source.aiVideo
+    source.aiVideo,
   );
 
   return [
@@ -129,40 +132,50 @@ export const normalizeVideoResources = (source = {}) => {
       ? {
           key: "ai-grammar-video",
           title: "AI grammar video",
-          description: "Step-by-step grammar explanation for revision and self-study.",
+          description:
+            "Step-by-step grammar explanation for revision and self-study.",
           url: aiGrammarUrl,
         }
       : null,
   ].filter(Boolean);
 };
 
+const isTeacherVideoResource = (resource = {}) => {
+  const label = `${resource.key || ""} ${resource.title || ""}`.toLowerCase();
+  return label.includes("teacher");
+};
+
+const lessonResourceEntries = (entry = {}) => [
+  entry,
+  ...toResourceArray(entry?.schreiben_sprechen),
+  ...toResourceArray(entry?.lesen_hören),
+];
+
+const toResourceArray = (value) =>
+  Array.isArray(value) ? value : value ? [value] : [];
+
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
-  const useTeacherLecture = normalizedLevel === "A1";
+  const showTeacherVideos = normalizedLevel === "A1";
   const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
-  const dictionaryEntry = LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
+  const dictionaryEntry =
+    LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
+  const entries = lessonResourceEntries(entry);
 
-  const fromEntry = normalizeVideoResources(entry);
-  const fromNestedLesenHoeren = normalizeVideoResources(entry?.lesen_hören);
-  const fromDictionary = normalizeVideoResources(dictionaryEntry);
-  const additionalResources = uniqueVideoResources(fromEntry, fromNestedLesenHoeren, fromDictionary);
-  const legacyTeacherVideo = legacyTeacherVideoResource(entry) || legacyTeacherVideoResource(entry?.lesen_hören);
-
-  if (!useTeacherLecture) {
-    return uniqueVideoResources(
-      additionalResources.map(asAiVideoResource),
-      [fromDictionary.length ? null : asAiVideoResource(legacyTeacherVideo)]
-    );
-  }
-
-  if (!additionalResources.length) return [];
-
-  const dictionaryMarksLegacyAsAi = Boolean(
-    legacyTeacherVideo?.url &&
-      fromDictionary.some(
-        (resource) => resource?.url === legacyTeacherVideo.url && String(resource?.title || "").toLowerCase().includes("ai")
-      )
+  const explicitResources = entries.flatMap((resource) =>
+    normalizeVideoResources(resource),
+  );
+  const legacyTeacherVideos = entries
+    .map(legacyTeacherVideoResource)
+    .filter(Boolean);
+  const dictionaryResources = normalizeVideoResources(dictionaryEntry);
+  const allResources = uniqueVideoResources(
+    legacyTeacherVideos,
+    explicitResources,
+    dictionaryResources,
   );
 
-  return uniqueVideoResources([dictionaryMarksLegacyAsAi ? null : legacyTeacherVideo], additionalResources);
+  if (showTeacherVideos) return allResources;
+
+  return allResources.filter((resource) => !isTeacherVideoResource(resource));
 };
