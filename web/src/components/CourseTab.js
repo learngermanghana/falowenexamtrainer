@@ -24,7 +24,6 @@ const ASSIGNMENT_STATUSES = {
   milestoneComplete: { key: "Complete", color: "#0f766e" },
 };
 
-const CANONICAL_ASSIGNMENT_ID_PATTERN = /^(A1|A2|B1|B2|C1|C2)-\d+(?:\.\d+)?$/i;
 const SELF_LEARNING_ONLY_LEVELS = new Set(["B2", "C1"]);
 const LEVEL_FALLBACK_RESOURCES = {
   A2: {
@@ -36,7 +35,6 @@ const LEVEL_FALLBACK_RESOURCES = {
 };
 
 const sortByDay = (entries) => [...entries].sort((a, b) => Number(a.day || 0) - Number(b.day || 0));
-const isCanonicalAssignmentId = (value = "") => CANONICAL_ASSIGNMENT_ID_PATTERN.test(String(value || "").trim());
 const isMilestoneEntry = (entry) => Boolean(entry?.completion || /course completed/i.test(String(entry?.topic || "")));
 
 const hasTutorMarkedWork = (entry) => {
