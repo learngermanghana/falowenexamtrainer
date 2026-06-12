@@ -42,6 +42,17 @@ export const LESSON_VIDEO_DICTIONARY = {
     14: {
       ai_grammar_video: "https://youtu.be/Wkj1-TnNUxY",
     },
+    16: {
+      videoResources: [
+        {
+          key: "teacher-video-lecture",
+          chapter: "9_10",
+          title: "Teacher video lecture",
+          description: "Recorded A1 video lecture for this lesson.",
+          url: "https://youtu.be/1iW2E4Pw6-M",
+        },
+      ],
+    },
     20: {
       ai_grammar_video: "https://youtu.be/mTwDMOAEMTU",
     },
