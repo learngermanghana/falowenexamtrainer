@@ -1,0 +1,66 @@
+const c1Day2QuestionWritingBuilder = {
+  level: "C1",
+  day: 2,
+  title: "Kultur und Identität",
+  targetWords: 230,
+  questions: [
+    {
+      id: "introduction",
+      section: "Einleitung",
+      question: "Warum ist das Thema „Kultur und Identität“ heute relevant?",
+      help: "Führe in das Thema ein und erkläre, warum es gesellschaftlich aktuell ist.",
+      starter: "Das Thema Kultur und Identität wird heute zunehmend diskutiert, weil ...",
+      minimumWords: 30,
+    },
+    {
+      id: "role",
+      section: "Rolle der Kultur",
+      question: "Welche Rolle spielt Kultur für das Selbstverständnis eines Menschen?",
+      help: "Denke an Sprache, Familie, Werte, Religion, Schule, Medien, Migration und Alltag.",
+      starter: "Kultur beeinflusst das Selbstverständnis eines Menschen, indem ...",
+      minimumWords: 40,
+    },
+    {
+      id: "example",
+      section: "Konkretes Beispiel",
+      question: "Welches konkrete Beispiel zeigt, wie Kultur die Identität prägen kann?",
+      help: "Beschreibe eine Person oder Situation, zum Beispiel jemanden, der in zwei Kulturen aufgewachsen ist.",
+      starter: "Ein anschauliches Beispiel hierfür ist ...",
+      minimumWords: 45,
+    },
+    {
+      id: "objection",
+      section: "Einwand",
+      question: "Welche Probleme entstehen, wenn Menschen starr einer einzigen Kultur zugeordnet werden?",
+      help: "Zeige, warum Herkunft allein eine Person nicht vollständig beschreibt.",
+      starter: "Kritisch zu betrachten ist jedoch, dass ...",
+      minimumWords: 40,
+    },
+    {
+      id: "alternative",
+      section: "Alternative",
+      question: "Wie kann Identität stattdessen flexibel und vielschichtig verstanden werden?",
+      help: "Erkläre Mehrfachzugehörigkeit, persönliche Entwicklung und wandelbare Identität.",
+      starter: "Eine sinnvollere Alternative wäre ein Identitätsverständnis, das ...",
+      minimumWords: 45,
+    },
+    {
+      id: "conclusion",
+      section: "Schluss",
+      question: "Zu welchem differenzierten Fazit kommen Sie?",
+      help: "Fasse deine Position zusammen, ohne zu absolut zu formulieren.",
+      starter: "Zusammenfassend lässt sich festhalten, dass ...",
+      minimumWords: 30,
+    },
+  ],
+  checklist: [
+    "Die Einleitung führt verständlich in das Thema ein.",
+    "Die Rolle der Kultur für das Selbstverständnis wird erklärt.",
+    "Ein konkretes Beispiel wird ausführlich dargestellt.",
+    "Ein Einwand gegen starre kulturelle Zuordnung wird genannt.",
+    "Eine flexible und vielschichtige Alternative wird erläutert.",
+    "Der Schluss enthält eine differenzierte eigene Position.",
+  ],
+};
+
+export default c1Day2QuestionWritingBuilder;
