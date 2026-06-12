@@ -8,6 +8,15 @@ const isInternalLink = (url = "") => String(url || "").startsWith("/");
 const getExternalProps = (url = "") => (isInternalLink(url) ? {} : { target: "_blank", rel: "noreferrer" });
 const toArray = (value) => (Array.isArray(value) ? value : value ? [value] : []);
 
+const INTERNAL_RESOURCE_ROUTES = {
+  B1: {
+    1: {
+      grammarbook_link: "/campus/course/lesson/B1/1?view=grammar",
+      workbook_link: "/campus/course/lesson/B1/1?view=workbook",
+    },
+  },
+};
+
 const guideStyle = {
   border: "1px solid #bfdbfe",
   background: "#eff6ff",
@@ -51,7 +60,10 @@ const firstResource = (entry = {}) => {
   return lesenHoeren[0] || schreibenSprechen[0] || {};
 };
 
-const findResourceUrl = (entry = {}, key) => {
+const findResourceUrl = (entry = {}, key, level = "", day = "") => {
+  const internalUrl = INTERNAL_RESOURCE_ROUTES[normalizeLevel(level)]?.[Number(day || entry?.day)]?.[key];
+  if (internalUrl) return internalUrl;
+
   const direct = entry?.[key];
   if (direct) return direct;
 
@@ -99,7 +111,7 @@ const WorkbookStartGuide = ({ level, day, grammarUrl, entry: suppliedEntry }) =>
   const videos = useMemo(() => getLessonVideoResources(level, day, entry || {}), [day, entry, level]);
   const teacherVideo = findVideo(videos, "teacher") || videos[0];
   const aiVideo = findVideo(videos, "ai") || videos.find((resource) => resource?.url !== teacherVideo?.url);
-  const derivedGrammarUrl = grammarUrl || findResourceUrl(entry, "grammarbook_link");
+  const derivedGrammarUrl = grammarUrl || findResourceUrl(entry, "grammarbook_link", level, day);
   const primaryResource = firstResource(entry);
   const chapterText = primaryResource?.chapter ? ` Kapitel ${primaryResource.chapter}` : "";
 
