@@ -97,7 +97,7 @@ const heroImage =
 
 const LESSON_LEVEL = "A1";
 const LESSON_ID = "a1-day-13-revision-numbers-time-prices-statements";
-const LESSON_TITLE = "A1 Day 13 — Numbers, Time, Prices and Statements";
+const LESSON_TITLE = "A1 Day 13 — Sentence Building with Days and Activities";
 
 const numbersItems = [
   ["56", "sechsundfünfzig"],
@@ -188,12 +188,12 @@ const kostetKostenMcqItems = [
   },
 ];
 
-const statementChecklist = [
-  "one sentence with a number",
-  "one sentence with a time",
-  "one sentence with a year or birthday",
-  "one sentence with a price",
-  "one sentence with a day and activity",
+const groupTaskChecklist = [
+  "Write five simple sentences about days and activities.",
+  "Use at least two sentences that start with Ich.",
+  "Use at least two sentences that start with a day, for example Am Montag.",
+  "Use the verb in position 2.",
+  "Use different days and different activities where possible.",
 ];
 
 const safeDocKey = (value = "") =>
@@ -410,7 +410,7 @@ function StatementContributionSection() {
           classKey,
           lessonId: LESSON_ID,
           lessonTitle: LESSON_TITLE,
-          contributionType: "statement-practice",
+          contributionType: "sentence-building-days-activities",
           authorName: getDisplayName(studentProfile, user),
           studentCode,
           studentUid: user?.uid || null,
@@ -435,37 +435,59 @@ function StatementContributionSection() {
   return (
     <section style={{ ...section, borderColor: "#86efac", background: "#f7fee7" }}>
       <div style={{ display: "grid", gap: 6 }}>
-        <p style={{ margin: 0, color: "#166534", fontWeight: 800 }}>Practical class discussion</p>
-        <h2 style={{ margin: 0 }}>Final task: Form your own German statements</h2>
+        <p style={{ margin: 0, color: "#166534", fontWeight: 800 }}>Practical group assignment</p>
+        <h2 style={{ margin: 0 }}>Build your own sentences with days and activities</h2>
         <p style={{ margin: 0 }}>
-          This is not a tutor assignment. Write your contribution and save it for your class discussion.
-          Everyone in your class can view the contributions here.
+          This is not a tutor assignment. First learn the sentence patterns below. Then write your own sentences and save them for your class discussion.
         </p>
       </div>
 
+      <div style={infoBox}>
+        <strong>Step 1: Learn the two sentence structures</strong>
+        <div><strong>Structure 1:</strong> Subject + Verb + Time + Activity</div>
+        <div>Ich gehe am Montag zur Schule.</div>
+        <div>Ich lese am Freitag.</div>
+        <div style={{ marginTop: 6 }}><strong>Structure 2:</strong> Time + Verb + Subject + Activity</div>
+        <div>Am Montag gehe ich zur Schule.</div>
+        <div>Am Dienstag treibe ich Sport.</div>
+        <div style={{ color: "#1e40af", marginTop: 6 }}>
+          Important: If the sentence starts with a day, the verb comes directly after the day.
+        </div>
+      </div>
+
       <div style={tipBox}>
-        <strong>Your contribution should include:</strong>
-        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
-          {statementChecklist.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
+        <strong>Step 2: Choose your day and activity</strong>
+        <div><strong>Days:</strong> Montag · Dienstag · Mittwoch · Donnerstag · Freitag · Samstag · Sonntag</div>
+        <div><strong>Activities:</strong> kochen · Freunde treffen · Hausaufgaben machen · fernsehen · lesen</div>
+        <div>im Park spazieren gehen · zur Schule gehen · arbeiten · Sport treiben · einkaufen gehen</div>
       </div>
 
       <div style={infoBox}>
-        <strong>Sentence frames you can use — complete them with your own information:</strong>
-        <div>Ich habe ______ Bücher.</div>
-        <div>Es ist ______ Uhr.</div>
-        <div>Ich bin am ______ geboren.</div>
-        <div>Das/Der/Die ______ kostet ______ Euro.</div>
-        <div>Am ______ gehe/mache/lese/treffe ich ______.</div>
+        <strong>Step 3: Use the correct verb form for ich</strong>
+        <div>gehen → ich gehe</div>
+        <div>machen → ich mache</div>
+        <div>lesen → ich lese</div>
+        <div>treffen → ich treffe</div>
+        <div>arbeiten → ich arbeite</div>
+        <div>fernsehen → ich sehe fern</div>
+        <div>Sport treiben → ich treibe Sport</div>
+        <div>einkaufen gehen → ich gehe einkaufen</div>
+      </div>
+
+      <div style={tipBox}>
+        <strong>Your group assignment:</strong>
+        <ul style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 4 }}>
+          {groupTaskChecklist.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
       </div>
 
       <label style={{ display: "grid", gap: 6, fontWeight: 700 }}>
         Your answer box
         <textarea
           style={textareaStyle}
-          placeholder="Write 5 German statements here. Use your own numbers, time, birthday/year, price, day and activity."
+          placeholder="Write your 5 sentences here. Example pattern only: Ich ... am Montag ... / Am Dienstag ... ich ..."
           value={draft}
           onChange={(event) => {
             setDraft(event.target.value);
@@ -532,7 +554,7 @@ export default function A1RevisionOriginalContentPage() {
           <h2 style={{ margin: 0 }}>Introduction to the Numbers Practice</h2>
           <p style={{ margin: 0 }}>
             Today, you will revise numbers, time, years, birthdays, prices, and basic word order.
-            Type your own answers first. The final task at the bottom is where you share your own German statements with your class.
+            Type your own answers first. The final task at the bottom is where you share your own German sentences with your class.
           </p>
         </section>
 
