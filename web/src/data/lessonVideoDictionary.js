@@ -3,18 +3,26 @@ const normalizeLevel = (level = "") =>
     .trim()
     .toUpperCase();
 
-const DAY0_ORIENTATION_VIDEO_RESOURCE = {
-  key: "day0-orientation-video",
-  title: "Day 0 orientation video",
+const A1_DAY0_ORIENTATION_VIDEO_RESOURCE = {
+  key: "a1-day0-orientation-video",
+  title: "A1 Orientation AI video",
   description:
-    "Watch this orientation video first, then continue with the Day 0 guide and workbook.",
+    "Watch this A1 orientation video first, then continue with the Day 0 guide and workbook.",
+  url: "https://youtu.be/qPwxBYlu3CE",
+};
+
+const A2_DAY0_ORIENTATION_VIDEO_RESOURCE = {
+  key: "a2-day0-orientation-video",
+  title: "A2 Day 0 orientation video",
+  description:
+    "Watch this A2 orientation video first, then continue with the Day 0 guide and workbook.",
   url: "https://youtu.be/mY0ArOMOV9Y",
 };
 
 export const LESSON_VIDEO_DICTIONARY = {
   A1: {
     0: {
-      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
+      videoResources: [A1_DAY0_ORIENTATION_VIDEO_RESOURCE],
     },
     1: {
       ai_grammar_video: "https://youtu.be/5WIMkENgdGE",
@@ -40,7 +48,7 @@ export const LESSON_VIDEO_DICTIONARY = {
   },
   A2: {
     0: {
-      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
+      videoResources: [A2_DAY0_ORIENTATION_VIDEO_RESOURCE],
     },
     1: {
       ai_grammar_video: "https://youtu.be/HMEs3mEKdrk?si=VYK4VjV9Da2_AzU0",
@@ -62,23 +70,12 @@ export const LESSON_VIDEO_DICTIONARY = {
     },
   },
   B1: {
-    0: {
-      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
-    },
     1: {
       ai_grammar_video: "https://youtu.be/_mmAtSzWbNo",
     },
   },
-  B2: {
-    0: {
-      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
-    },
-  },
-  C1: {
-    0: {
-      videoResources: [DAY0_ORIENTATION_VIDEO_RESOURCE],
-    },
-  },
+  B2: {},
+  C1: {},
 };
 
 const pickFirst = (...values) =>
