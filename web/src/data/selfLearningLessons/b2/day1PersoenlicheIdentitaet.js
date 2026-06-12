@@ -7,6 +7,11 @@ const b2Day1PersoenlicheIdentitaet = makeLesson({
   title: "Persönliche Identität und Selbstverständnis",
   topic: "Über sich selbst, Werte und persönliche Entwicklung sprechen",
   heroImage: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80",
+  videoResource: {
+    title: "B2 AI lesson video: Persönliche Identität",
+    description: "Watch this AI lesson first, then continue with the grammar focus, speaking task and writing support.",
+    url: "https://youtu.be/HhUUkc8zgEc",
+  },
   grammarFocus: "Adjektivdeklination, klare Begründungen und strukturierte Selbstdarstellung",
   objectives: [
     "Ich kann mich auf B2-Niveau differenzierter vorstellen.",
