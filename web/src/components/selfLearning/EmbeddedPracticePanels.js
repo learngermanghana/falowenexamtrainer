@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import SpeakingPage from "../SpeakingPage";
 import WritingPage from "../WritingPage";
+import { useAuth } from "../../context/AuthContext";
+import { loadWritingProgress, saveWritingProgress } from "../../services/writingProgressService";
 import c1Day2QuestionWritingBuilder from "../../data/writingQuestionBuilders/c1Day2KulturUndIdentitaet";
 
 const countWords = (text = "") => String(text || "").trim().split(/\s+/).filter(Boolean).length;
@@ -12,26 +14,99 @@ const isC1Day2Route = () => {
   return /\/campus\/course\/lesson\/c1\/2(?:\/|$)/.test(path) || path.includes("c1-day-2");
 };
 
+const makeEmptyQuestionState = () => ({
+  answers: {},
+  finalEssay: "",
+  view: "questions",
+  updatedAt: "",
+});
+
 function C1Day2QuestionEssayBuilder() {
   const config = c1Day2QuestionWritingBuilder;
   const storageKey = "falowen:c1:day2:question-writing-builder";
+  const { user, studentProfile } = useAuth();
+  const userId = user?.uid || "";
+  const studentCode = studentProfile?.studentCode || studentProfile?.studentcode || userId;
+  const hasCloudOwner = Boolean(studentCode || userId);
   const [state, setState] = useState(() => {
     try {
       return {
-        answers: {},
-        finalEssay: "",
-        view: "questions",
+        ...makeEmptyQuestionState(),
         ...JSON.parse(localStorage.getItem(storageKey) || "{}"),
       };
     } catch (error) {
-      return { answers: {}, finalEssay: "", view: "questions" };
+      return makeEmptyQuestionState();
     }
   });
   const [copyMessage, setCopyMessage] = useState("");
+  const [cloudLoaded, setCloudLoaded] = useState(false);
+  const [cloudSaveStatus, setCloudSaveStatus] = useState("idle");
 
   useEffect(() => {
     localStorage.setItem(storageKey, JSON.stringify(state));
   }, [state]);
+
+  useEffect(() => {
+    let active = true;
+
+    if (!hasCloudOwner) {
+      setCloudLoaded(true);
+      setCloudSaveStatus("device");
+      return undefined;
+    }
+
+    setCloudLoaded(false);
+    setCloudSaveStatus("loading");
+
+    loadWritingProgress({ userId, studentCode, mode: "course" })
+      .then((saved) => {
+        if (!active) return;
+        const cloudDraft = saved?.c1Day2GuidedWriting;
+        if (cloudDraft && typeof cloudDraft === "object") {
+          setState((current) => {
+            const cloudTime = Date.parse(cloudDraft.updatedAt || "") || 0;
+            const localTime = Date.parse(current.updatedAt || "") || 0;
+            if (localTime > cloudTime) return current;
+            return {
+              ...makeEmptyQuestionState(),
+              ...cloudDraft,
+              answers: cloudDraft.answers && typeof cloudDraft.answers === "object" ? cloudDraft.answers : {},
+            };
+          });
+        }
+        setCloudSaveStatus("saved");
+      })
+      .catch((error) => {
+        console.error("Failed to load C1 Day 2 guided writing", error);
+        if (active) setCloudSaveStatus("error");
+      })
+      .finally(() => {
+        if (active) setCloudLoaded(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [hasCloudOwner, studentCode, userId]);
+
+  useEffect(() => {
+    if (!cloudLoaded || !hasCloudOwner) return undefined;
+
+    setCloudSaveStatus("saving");
+    const timeout = window.setTimeout(async () => {
+      const saved = await saveWritingProgress({
+        userId,
+        studentCode,
+        mode: "course",
+        data: {
+          c1Day2GuidedWriting: state,
+        },
+      });
+      setCloudSaveStatus(saved ? "saved" : "error");
+    }, 800);
+
+    return () => window.clearTimeout(timeout);
+  }, [cloudLoaded, hasCloudOwner, state, studentCode, userId]);
 
   const questionStats = useMemo(
     () => config.questions.map((item) => {
@@ -50,8 +125,15 @@ function C1Day2QuestionEssayBuilder() {
     .filter(Boolean)
     .join("\n\n");
 
+  const updateState = (updater) => {
+    setState((previous) => {
+      const next = typeof updater === "function" ? updater(previous) : { ...previous, ...updater };
+      return { ...next, updatedAt: new Date().toISOString() };
+    });
+  };
+
   const updateAnswer = (id, value) => {
-    setState((previous) => ({
+    updateState((previous) => ({
       ...previous,
       answers: { ...(previous.answers || {}), [id]: value },
     }));
@@ -59,7 +141,7 @@ function C1Day2QuestionEssayBuilder() {
 
   const combineAnswers = () => {
     if (!allComplete) return;
-    setState((previous) => ({
+    updateState((previous) => ({
       ...previous,
       finalEssay: combinedAnswers,
       view: "final",
@@ -74,6 +156,16 @@ function C1Day2QuestionEssayBuilder() {
       setCopyMessage("Copy failed. Select the text manually.");
     }
   };
+
+  const saveLabel = !hasCloudOwner
+    ? "Saved on this device"
+    : cloudSaveStatus === "loading"
+      ? "Loading saved work..."
+      : cloudSaveStatus === "saving"
+        ? "Saving to your Falowen writing progress..."
+        : cloudSaveStatus === "error"
+          ? "Cloud save failed — your device copy is still safe"
+          : "Saved to your Falowen writing progress";
 
   const primaryButton = {
     border: 0,
@@ -114,6 +206,9 @@ function C1Day2QuestionEssayBuilder() {
         <p style={{ margin: 0, color: "#475569", lineHeight: 1.65 }}>
           Answer one focused question at a time. Each answer has a minimum word requirement. When all six are complete, Falowen will combine them into your essay draft.
         </p>
+        <small style={{ color: cloudSaveStatus === "error" ? "#b91c1c" : "#166534", fontWeight: 800 }}>
+          {saveLabel}
+        </small>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 }}>
@@ -191,7 +286,7 @@ function C1Day2QuestionEssayBuilder() {
           </div>
           <textarea
             value={state.finalEssay || ""}
-            onChange={(event) => setState((previous) => ({ ...previous, finalEssay: event.target.value }))}
+            onChange={(event) => updateState((previous) => ({ ...previous, finalEssay: event.target.value }))}
             style={{ minHeight: 340, width: "100%", boxSizing: "border-box", border: "1px solid #94a3b8", borderRadius: 12, padding: 14, resize: "vertical", font: "inherit", lineHeight: 1.7 }}
           />
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
@@ -209,7 +304,7 @@ function C1Day2QuestionEssayBuilder() {
             </ul>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button type="button" style={secondaryButton} onClick={() => setState((previous) => ({ ...previous, view: "questions" }))}>
+            <button type="button" style={secondaryButton} onClick={() => updateState((previous) => ({ ...previous, view: "questions" }))}>
               Back to questions
             </button>
             <button type="button" style={secondaryButton} onClick={combineAnswers}>
