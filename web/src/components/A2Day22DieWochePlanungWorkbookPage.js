@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
@@ -110,16 +111,13 @@ function TabButton({ active, onClick, children }) {
 }
 
 const A2Day22DieWochePlanungWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, margin: 0 }}>A2 · Day 22 Workbook · Die Woche Planung</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 8.22</p>
@@ -220,7 +218,6 @@ const A2Day22DieWochePlanungWorkbookPage = () => {
               <li>Einkäufe: Lebensmittel, Kleidung, Drogerie (shopping/errands: groceries, clothes, drugstore)</li>
             </ul>
           </div>
-
 
           <h3 style={{ margin: 0 }}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const DEFAULT_HERO_IMAGE_URL =
@@ -328,19 +329,12 @@ const PracticeSectionBlock = ({ title, explanation, exercises }) => (
 );
 
 const ConjunctionNotesPage = () => {
-  const navigate = useNavigate();
   const [heroImageUrl, setHeroImageUrl] = useState(DEFAULT_HERO_IMAGE_URL);
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         {/* Hero image */}
         <div style={{ display: "grid", gap: 6 }}>

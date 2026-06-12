@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -166,7 +167,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -225,9 +225,7 @@ const A2Day10TourismusTraditionelleFesteWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 10 Workbook · Tourismus und Traditionelle Feste 4.10</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>

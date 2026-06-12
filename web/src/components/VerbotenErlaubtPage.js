@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import { speakingQuestionDictionary } from "../data/speakingDictionary";
 
@@ -427,7 +428,6 @@ const SpeakingAppCTA = ({ title, description, onOpen }) => (
 );
 
 const GoetheA1SpeakingConfidenceLabPage = () => {
-  const navigate = useNavigate();
   const bellPlayed = useRef(false);
 
   const [duration, setDuration] = useState(60);
@@ -542,19 +542,7 @@ const GoetheA1SpeakingConfidenceLabPage = () => {
 
           <div style={heroContent}>
             <div style={{ ...row, justifyContent: "space-between", alignItems: "center" }}>
-              <button
-                type="button"
-                style={{
-                  ...styles.secondaryButton,
-                  width: "fit-content",
-                  background: "rgba(255,255,255,0.14)",
-                  color: "#ffffff",
-                  border: "1px solid rgba(255,255,255,0.24)",
-                }}
-                onClick={() => navigate("/campus/course")}
-              >
-                Back to Course
-              </button>
+              <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
               <span style={heroBadge}>Day 19 • Chapter 5.9</span>
             </div>

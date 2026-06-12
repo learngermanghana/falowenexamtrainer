@@ -1,5 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const pageStyle = {
@@ -97,14 +98,11 @@ const questions = [
 ];
 
 const A1Day1GreetingsWorkbookPage = () => {
-  const navigate = useNavigate();
 
   return (
     <div style={pageStyle}>
       <div style={cardStyle}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content", padding: "6px 10px", fontSize: 12 }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, margin: 0, fontSize: 22, lineHeight: 1.15 }}>A1 · Day 1 Workbook · Greetings</h1>
         <p style={{ ...styles.subtitle, margin: 0, fontSize: 12 }}>Chapter 0.1 · Complete Teil 1 and submit only Teil 2.</p>
       </div>

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 /* =========================================================
@@ -290,15 +291,9 @@ const MiniRecap = ({ items }) => (
   </Callout>
 );
 
-const QuickBack = ({ navigate, to = "/campus/course" }) => (
+const QuickBack = ({ to = "/campus/course" }) => (
   <div style={card}>
-    <button
-      style={{ ...styles.secondaryButton, width: "fit-content" }}
-      onClick={() => navigate(to)}
-      type="button"
-    >
-      Back to Course
-    </button>
+    <AppBackButton label="Back to Course Book" fallbackPath={to} />
   </div>
 );
 
@@ -613,7 +608,6 @@ const EmbeddedPracticeBlock = ({
 ========================= */
 
 export const WeekTimeSeparableGrammarBook = () => {
-  const navigate = useNavigate();
 
   const [, setSectionScores] = useState({
     days: {},
@@ -775,7 +769,7 @@ export const WeekTimeSeparableGrammarBook = () => {
 
   return (
     <main style={pageWrap}>
-      <QuickBack navigate={navigate} />
+      <QuickBack />
 
       <Hero
         title="A1 Grammar Book: Meine Woche, die Uhrzeit und trennbare Verben"
@@ -1273,7 +1267,6 @@ export const WeekTimeSeparableGrammarBook = () => {
 ========================= */
 
 export const WeekTimeSeparablePracticeBook = () => {
-  const navigate = useNavigate();
 
   const questions = useMemo(
     () => [
@@ -1387,7 +1380,7 @@ export const WeekTimeSeparablePracticeBook = () => {
 
   return (
     <main style={pageWrap}>
-      <QuickBack navigate={navigate} />
+      <QuickBack />
 
       <Hero
         title="A1 Practice Check: Meine Woche, Uhrzeit und trennbare Verben"

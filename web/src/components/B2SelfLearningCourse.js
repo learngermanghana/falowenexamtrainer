@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -223,7 +224,7 @@ export default function B2SelfLearningCourse() {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button type="button" style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>Back to Course</button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <span style={styles.levelPill}>B2 Self-learning</span>
         <h1 style={{ ...styles.title, marginBottom: 0 }}>B2 Selbstlernkurs · AI Practice & Self-marking</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>

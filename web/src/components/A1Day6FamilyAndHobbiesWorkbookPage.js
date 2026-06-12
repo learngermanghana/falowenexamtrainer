@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -470,13 +471,7 @@ const A1FamilyLanguagesQuestionsWorkbookPage = () => {
   return (
     <div style={pageStyle}>
       <div style={cardStyle}>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <img
           src={heroImageUrl}

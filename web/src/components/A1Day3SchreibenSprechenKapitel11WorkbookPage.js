@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = {
@@ -299,7 +300,6 @@ const VocabularyCard = ({ title, items }) => (
 );
 
 const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
-  const navigate = useNavigate();
   const [showScenarioAnswers, setShowScenarioAnswers] = useState(false);
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [checkedAnswers, setCheckedAnswers] = useState(false);
@@ -329,12 +329,7 @@ const A1Day3SchreibenSprechenKapitel11WorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           A1 · Day 3 Practice Book · Greetings, Spelling, Vocabulary &amp; W-Words

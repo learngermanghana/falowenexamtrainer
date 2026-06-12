@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { useAuth } from "../context/AuthContext";
 import { styles } from "../styles";
 
 const PaymentComplete = () => {
-  const navigate = useNavigate();
   const { refreshUser, user } = useAuth();
   const [message, setMessage] = useState("Refreshing your payment status...");
 
@@ -40,13 +40,7 @@ const PaymentComplete = () => {
       <div style={{ ...styles.card, maxWidth: 520, width: "100%" }}>
         <h2 style={{ ...styles.sectionTitle, marginBottom: 8 }}>Payment received</h2>
         <p style={{ ...styles.helperText, marginBottom: 16 }}>{message}</p>
-        <button
-          type="button"
-          style={styles.primaryButton}
-          onClick={() => navigate("/")}
-        >
-          Back to dashboard
-        </button>
+        <AppBackButton label="Back to dashboard" fallbackPath="/" />
       </div>
     </div>
   );

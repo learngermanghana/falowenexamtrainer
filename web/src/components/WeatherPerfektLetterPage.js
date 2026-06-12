@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = {
@@ -266,7 +267,6 @@ const quizData = [
 ];
 
 const WeatherPerfektLetterPage = () => {
-  const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
 
@@ -335,9 +335,7 @@ const WeatherPerfektLetterPage = () => {
         }
       `}</style>
 
-      <button style={styles.secondaryButton} onClick={() => navigate(-1)}>
-        ← Back
-      </button>
+      <AppBackButton label="Back" fallbackPath="/campus/course" />
 
       <section style={cardStyle} className="falowen-section hoverCard">
         <h1 style={{ margin: 0 }}>

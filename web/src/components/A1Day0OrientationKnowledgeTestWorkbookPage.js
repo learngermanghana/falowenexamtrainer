@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const day0HeroImage =
@@ -180,7 +181,6 @@ const QuestionCard = ({ item, index, selected, onSelect }) => {
 };
 
 const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
-  const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
 
   const handleSelect = (questionIndex, letter) => {
@@ -201,12 +201,7 @@ const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           A1 Day 0 Workbook: Orientation + Knowledge Test
@@ -350,7 +345,6 @@ const A1Day0OrientationKnowledgeTestWorkbookPage = () => {
             Submit your assignment
           </a>
         </p>
-
 
         <p style={{ margin: 0 }}>
           <strong>Pass mark rule:</strong> Every assignment requires at least <strong>60%</strong> to pass.

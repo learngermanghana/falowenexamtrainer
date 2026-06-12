@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 /* ----------------------------- UI helpers ----------------------------- */
@@ -238,7 +239,6 @@ const separableWithModal = [
 /* ------------------------------ Page component ------------------------------ */
 
 const A1Day14ModalVerbsWorkbookPage = () => {
-  const navigate = useNavigate();
 
   // Stable Unsplash CDN image URL (no login/API key required for simple embedding).
   const heroImg =
@@ -307,12 +307,7 @@ const A1Day14ModalVerbsWorkbookPage = () => {
 
         <div style={{ padding: 16, display: "grid", gap: 12 }}>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-            <button
-              style={{ ...secondaryBtn, width: "fit-content" }}
-              onClick={() => navigate("/campus/course")}
-            >
-              Back to Course
-            </button>
+            <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
             <button
               style={{ ...secondaryBtn, width: "fit-content" }}
@@ -475,7 +470,6 @@ const A1Day14ModalVerbsWorkbookPage = () => {
             Often also: <strong>Gleis</strong> (platform), <strong>Umst.</strong> (transfers)
           </div>
         </div>
-
 
         <div
           style={{

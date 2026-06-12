@@ -1,15 +1,14 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
 
 const card = { background: "#fff", borderRadius: 16, padding: 20, boxShadow: "0 8px 24px rgba(15,23,42,0.08)", marginBottom: 16 };
 
 export default function B2Day1PersoenlicheIdentitaetGrammarNotesPage() {
-  const navigate = useNavigate();
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
       <div style={card}>
-        <button onClick={() => navigate("/campus/course")}>Back to Course</button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1>B2 · Day 1.1 Grammar Notes · Persönliche Identität und Selbstverständnis</h1>
         <p><strong>Grammatikfokus:</strong> Adjektivdeklination</p>
       </div>

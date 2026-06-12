@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const sectionStyle = { ...styles.card, display: "grid", gap: 12 };
@@ -413,19 +414,12 @@ const ObjectsInteractive = () => {
 };
 
 const ObjectsAndColorsPage = () => {
-  const navigate = useNavigate();
   const pageSubtitle = useMemo(() => "Chapter 6 • Possessive Determiners with Nouns", []);
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }} aria-label="Objects and Colors Chapter">
       <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-          aria-label="Back to course overview"
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Objects and Colors</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>{pageSubtitle}</p>
       </header>

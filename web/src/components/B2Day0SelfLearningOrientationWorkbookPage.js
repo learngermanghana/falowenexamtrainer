@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const day0HeroImage =
   "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80";
-
 
 const b2WritingOrientation = {
   taskType: "Reflective opinion essay / Persönlicher Beitrag",
@@ -233,7 +233,6 @@ const QuestionCard = ({ item, index, selected, onSelect }) => {
 };
 
 const B2Day0ProgressionWorkbookPage = () => {
-  const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
 
   const handleSelect = (questionIndex, letter) => {
@@ -254,12 +253,7 @@ const B2Day0ProgressionWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           B2 Day 0 Workbook: B1 to B2 Progression

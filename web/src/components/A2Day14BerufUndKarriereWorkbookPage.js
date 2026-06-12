@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -114,7 +115,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const A2Day14BerufUndKarriereWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -129,9 +129,7 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 14 Workbook · Beruf und Karriere</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
@@ -210,7 +208,6 @@ const A2Day14BerufUndKarriereWorkbookPage = () => {
           <p style={{ margin: 0, lineHeight: 1.7 }}>
             Was ist dein Beruf, wie bist du zu diesem Job gekommen und was möchtest du in Zukunft machen?
           </p>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>

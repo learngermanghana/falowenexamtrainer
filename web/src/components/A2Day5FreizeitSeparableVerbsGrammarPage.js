@@ -1,5 +1,6 @@
 import React, { memo } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = { ...styles.card, display: "grid", gap: 10 };
@@ -26,7 +27,6 @@ const InlineCode = ({ children }) => (
 );
 
 const A2Day5FreizeitSeparableVerbsGrammarPage = () => {
-  const navigate = useNavigate();
   const splashImageUrl =
     "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=1800&q=80";
 
@@ -65,9 +65,7 @@ const A2Day5FreizeitSeparableVerbsGrammarPage = () => {
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
-        <button type="button" onClick={() => navigate(-1)} style={styles.backBtn}>
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <header style={{ marginBottom: 18 }}>
           <h1 style={{ margin: "0 0 8px" }}>A2 • 2.5 Was machst du in deiner Freizeit?</h1>

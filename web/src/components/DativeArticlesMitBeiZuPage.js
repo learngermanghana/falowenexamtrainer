@@ -1,5 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const heroImageUrl =
@@ -63,14 +64,11 @@ const practice = [
 ];
 
 const DativeArticlesMitBeiZuPage = () => {
-  const navigate = useNavigate();
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 Chapter 12.2: Dative Articles with mit, bei, and zu</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
           There are several dative prepositions in German, but today we focus only on <strong>mit</strong>, <strong>bei</strong>,

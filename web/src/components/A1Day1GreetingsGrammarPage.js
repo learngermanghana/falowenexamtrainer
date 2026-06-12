@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = {
@@ -144,7 +145,6 @@ const knowledgeQuestions = [
 ];
 
 const A1Day1GreetingsGrammarPage = () => {
-  const navigate = useNavigate();
   const [knowledgeAnswers, setKnowledgeAnswers] = useState({});
   const isMobile =
     typeof window !== "undefined" ? window.innerWidth < 640 : false;
@@ -161,12 +161,7 @@ const A1Day1GreetingsGrammarPage = () => {
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={cardStyle}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <div style={{ borderRadius: 14, overflow: "hidden" }}>
           <img

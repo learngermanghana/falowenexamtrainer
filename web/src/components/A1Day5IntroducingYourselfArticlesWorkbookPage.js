@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const pageWrap = {
@@ -258,7 +259,6 @@ const MobileSectionLabel = ({ children }) => (
 );
 
 const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
-  const navigate = useNavigate();
 
   const [articlePractice, setArticlePractice] = useState("");
 
@@ -316,13 +316,7 @@ const A1Day5IntroducingYourselfArticlesWorkbookPage = () => {
         />
 
         <div style={{ padding: 16, display: "grid", gap: 12 }}>
-          <button
-            type="button"
-            style={{ ...primaryActionStyle, width: "fit-content", minWidth: 140 }}
-            onClick={() => navigate("/campus/course")}
-          >
-            Back to Course
-          </button>
+          <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
           <MobileSectionLabel>A1 · Day 5</MobileSectionLabel>
 

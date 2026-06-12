@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const Section = ({ title, children }) => (
@@ -163,7 +164,6 @@ const FullSentenceExamples = ({ examples }) => (
 );
 
 const DativeAdjectiveDeclensionPage = () => {
-  const navigate = useNavigate();
   const [showAnswers, setShowAnswers] = useState(false);
   const [showAdjectiveAnswers, setShowAdjectiveAnswers] = useState(false);
   const [selectedAdjectiveAnswers, setSelectedAdjectiveAnswers] = useState({});
@@ -362,9 +362,7 @@ const DativeAdjectiveDeclensionPage = () => {
           loading="lazy"
           style={{ width: "100%", height: 220, objectFit: "cover", borderRadius: 12 }}
         />
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>Day 23: Dative and Accusative Verbs</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Chapter 14.2: Learn how verbs decide whether the next noun/pronoun is accusative or dative.

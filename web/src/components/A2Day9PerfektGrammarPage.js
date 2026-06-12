@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = { ...styles.card, display: "grid", gap: 12 };
@@ -163,7 +164,6 @@ const InlineCode = ({ children }) => (
 );
 
 const A2Day9PerfektGrammarPage = () => {
-  const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
 
@@ -180,14 +180,7 @@ const A2Day9PerfektGrammarPage = () => {
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          style={styles.backBtn}
-          aria-label="Go back"
-        >
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 18 }}>
           <h1 style={{ margin: 0 }}>A2 • 4.9 Urlaub</h1>
@@ -370,7 +363,7 @@ const A2Day9PerfektGrammarPage = () => {
               After this chapter, continue to the next lesson to compare Perfekt with Präteritum in more detail.
             </p>
             <p style={{ margin: 0 }}>
-              <Link to="/campus/course">Back to the course overview</Link>
+              <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
             </p>
           </SectionCard>
 

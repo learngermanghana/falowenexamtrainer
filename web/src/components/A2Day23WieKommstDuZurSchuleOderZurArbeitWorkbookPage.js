@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
@@ -70,15 +71,12 @@ const lesenQuestions = [
 ];
 
 const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("teil1");
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 23 Workbook · Wie kommst du zur Schule / zur Arbeit?</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 9.23</p>
@@ -96,7 +94,6 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
       </div>
 
       <A2B1WorkbookGuidance />
-
 
       {activeTab === "teil1" && (
         <div style={cardStyle}>
@@ -149,7 +146,6 @@ const A2Day23WieKommstDuZurSchuleOderZurArbeitWorkbookPage = () => {
               Carsharing oder Mitfahrgelegenheit (car sharing or ride sharing)
             </li>
           </ol>
-
 
           <h3 style={sectionTitle}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>

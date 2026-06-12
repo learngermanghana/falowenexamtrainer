@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 /* =========================
@@ -218,7 +219,6 @@ const TimeTimeline = () => {
 ========================= */
 
 const A1TimeAndDatesGrammarPage = () => {
-  const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const [showResults, setShowResults] = useState(false);
 
@@ -251,9 +251,7 @@ const A1TimeAndDatesGrammarPage = () => {
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
-        <button type="button" onClick={() => navigate(-1)}>
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <h1 style={{ marginBottom: 6 }}>German Time and Dates</h1>
         <HeaderImage

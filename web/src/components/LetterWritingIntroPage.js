@@ -1,4 +1,5 @@
 import React, { memo, useMemo } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -658,12 +659,7 @@ const A1LetterWritingQuestionBookPage = () => {
       <header style={heroCardStyle}>
         <div style={heroLayoutStyle}>
           <div style={heroContentStyle}>
-            <button
-              style={{ ...styles.secondaryButton, width: "fit-content" }}
-              onClick={() => navigate("/campus/course")}
-            >
-              Back to Course
-            </button>
+            <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
             <span style={heroEyebrowStyle}>A1 Schreiben • Day 12.3</span>
 

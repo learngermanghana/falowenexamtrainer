@@ -1,5 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
 
@@ -60,14 +61,11 @@ const questions = [
 ];
 
 const A1Day2Kapitel11WorkbookPage = () => {
-  const navigate = useNavigate();
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A1 · Day 2 Workbook · Kapitel 1.1</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 1.1</p>
         <p style={{ ...styles.subtitle, margin: 0 }}>

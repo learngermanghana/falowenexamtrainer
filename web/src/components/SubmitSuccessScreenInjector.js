@@ -38,7 +38,7 @@ const insertSuccessScreen = () => {
       <h2>Assignment submitted successfully</h2>
       <p>Your tutor can now review your work. You will receive a notification when feedback is ready.</p>
       <div class="submit-success-screen__actions">
-        <a href="/campus/course">Back to Course Book</a>
+        <a class="app-back-button" href="/campus/course"><span class="app-back-button__icon" aria-hidden="true">←</span><span>Back to Course Book</span></a>
         <a href="/campus/results">View Results</a>
       </div>
     </div>

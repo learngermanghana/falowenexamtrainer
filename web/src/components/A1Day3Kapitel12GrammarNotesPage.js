@@ -1,5 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const sectionStyle = { ...styles.card, display: "grid", gap: 12 };
@@ -30,18 +31,11 @@ const pronounRows = [
 ];
 
 const A1Day3Kapitel12GrammarNotesPage = () => {
-  const navigate = useNavigate();
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 10 }}>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           A1 · Day 3 · Kapitel 1.2 · Personal Pronouns + Introducing Yourself · Grammar Notes

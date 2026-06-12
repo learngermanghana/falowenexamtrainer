@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 /** =========================
@@ -302,7 +303,6 @@ const tdStyle = {
 };
 
 const TwoCasePrepositionsPage = () => {
-  const navigate = useNavigate();
 
   const [choices, setChoices] = useState(() => visualGame.map(() => ""));
   const [checked, setChecked] = useState(false);
@@ -389,14 +389,7 @@ const TwoCasePrepositionsPage = () => {
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-          aria-label="Back to course overview"
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           Day 18: Wechselpräpositionen (Two-Case Prepositions)

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = {
@@ -473,7 +474,6 @@ const knowledgeQuestions = [
 ];
 
 const A1Day9NominativeAccusativeGrammarPage = () => {
-  const navigate = useNavigate();
   const [knowledgeAnswers, setKnowledgeAnswers] = useState({});
 
   const handleKnowledgeAnswerSelect = (questionId, answer) => {
@@ -533,9 +533,7 @@ const A1Day9NominativeAccusativeGrammarPage = () => {
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={cardStyle}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <img
           src={heroImage}
           alt="Students studying German grammar together"

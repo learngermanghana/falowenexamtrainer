@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
 import { useAuth } from "../context/AuthContext";
@@ -307,9 +308,7 @@ const FrenchSignUpPage = ({ onLogin, onBack }) => {
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-            <button type="button" onClick={onBack} style={styles.secondaryButton}>
-              ← Back to landing
-            </button>
+            <AppBackButton label="Back to landing" fallbackPath="/" onBack={onBack} />
             <button type="button" onClick={onLogin} style={styles.secondaryButton}>
               Log in
             </button>
