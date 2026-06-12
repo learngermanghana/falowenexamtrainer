@@ -53,6 +53,23 @@ const legacyTeacherVideoResource = (source = {}) => {
   };
 };
 
+const asAiVideoResource = (resource = {}) => {
+  if (!resource?.url) return null;
+
+  const existingTitle = String(resource.title || "").trim();
+  const titleLooksLikeTeacher = existingTitle.toLowerCase().includes("teacher");
+
+  return {
+    ...resource,
+    key: resource.key === "teacher-explanation" ? "ai-grammar-video" : resource.key || "ai-grammar-video",
+    title: titleLooksLikeTeacher || !existingTitle ? "AI grammar video" : existingTitle,
+    description:
+      titleLooksLikeTeacher || !resource.description
+        ? "AI video lesson for revision and self-study."
+        : resource.description,
+  };
+};
+
 export const normalizeVideoResources = (source = {}) => {
   if (!source || typeof source !== "object") return [];
 
@@ -121,6 +138,7 @@ export const normalizeVideoResources = (source = {}) => {
 
 export const getLessonVideoResources = (level, day, entry = {}) => {
   const normalizedLevel = normalizeLevel(level);
+  const useTeacherLecture = normalizedLevel === "A1";
   const dayKey = String(Number(day || entry?.day || entry?.assignmentDay || 0));
   const dictionaryEntry = LESSON_VIDEO_DICTIONARY[normalizedLevel]?.[dayKey] || {};
 
@@ -128,10 +146,17 @@ export const getLessonVideoResources = (level, day, entry = {}) => {
   const fromNestedLesenHoeren = normalizeVideoResources(entry?.lesen_hören);
   const fromDictionary = normalizeVideoResources(dictionaryEntry);
   const additionalResources = uniqueVideoResources(fromEntry, fromNestedLesenHoeren, fromDictionary);
+  const legacyTeacherVideo = legacyTeacherVideoResource(entry) || legacyTeacherVideoResource(entry?.lesen_hören);
+
+  if (!useTeacherLecture) {
+    return uniqueVideoResources(
+      additionalResources.map(asAiVideoResource),
+      [fromDictionary.length ? null : asAiVideoResource(legacyTeacherVideo)]
+    );
+  }
 
   if (!additionalResources.length) return [];
 
-  const legacyTeacherVideo = legacyTeacherVideoResource(entry) || legacyTeacherVideoResource(entry?.lesen_hören);
   const dictionaryMarksLegacyAsAi = Boolean(
     legacyTeacherVideo?.url &&
       fromDictionary.some(
