@@ -50,7 +50,17 @@ const AutoWorkbookStartGuide = () => {
   if (!match) return null;
 
   return (
-    <div style={{ ...styles.container, display: "grid", marginBottom: 16 }}>
+    <div
+      style={{
+        ...styles.container,
+        display: "grid",
+        width: "100%",
+        minHeight: 0,
+        padding: "0 16px",
+        marginBottom: 12,
+        boxSizing: "border-box",
+      }}
+    >
       <WorkbookStartGuide level={match.level} day={match.day} entry={match.entry} />
     </div>
   );
