@@ -20,6 +20,9 @@ export const LESSON_VIDEO_DICTIONARY = {
         },
       ],
     },
+    14: {
+      ai_grammar_video: "https://youtu.be/Wkj1-TnNUxY",
+    },
     20: {
       ai_grammar_video: "https://youtu.be/mTwDMOAEMTU",
     },
