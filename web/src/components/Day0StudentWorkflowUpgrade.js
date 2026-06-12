@@ -2,20 +2,30 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import { styles } from "../styles";
 
-const DAY0_ORIENTATION_VIDEO = {
-  id: "mY0ArOMOV9Y",
-  url: "https://youtu.be/mY0ArOMOV9Y",
-  title: "Day 0 orientation video",
-  description:
-    "Watch this orientation video first so you understand how to use the workbook, submit assignments, check attendance, and prepare before Day 1.",
-};
-
 const day0PathConfig = [
-  { match: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook", level: "A1" },
-  { match: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook", level: "A2" },
+  {
+    match: "/campus/course/a1-day-0-orientation-and-knowledge-test-workbook",
+    level: "A1",
+    video: {
+      id: "qPwxBYlu3CE",
+      url: "https://youtu.be/qPwxBYlu3CE",
+      title: "A1 Orientation AI video",
+      description:
+        "Watch this A1 orientation video first, then continue with the Day 0 guide and workbook.",
+    },
+  },
+  {
+    match: "/campus/course/a2-day-0-orientation-and-knowledge-test-workbook",
+    level: "A2",
+    video: {
+      id: "mY0ArOMOV9Y",
+      url: "https://youtu.be/mY0ArOMOV9Y",
+      title: "A2 Day 0 orientation video",
+      description:
+        "Watch this A2 orientation video first so you understand how to use the workbook, submit assignments, check attendance, and prepare before Day 1.",
+    },
+  },
   { match: "/campus/course/b1-day-0-orientation-and-knowledge-test-workbook", level: "B1" },
-  { match: "/campus/course/b2-day-0-self-learning-orientation-workbook", level: "B2" },
-  { match: "/campus/course/c1-day-0-progression-workbook", level: "C1" },
 ];
 
 const getYouTubeEmbedUrl = (videoId = "") =>
@@ -40,47 +50,51 @@ const Box = ({ title, children, tone = "blue" }) => {
   );
 };
 
-const OrientationVideoBox = () => (
-  <Box title="Start here: Watch the Day 0 orientation video" tone="green">
-    <p style={{ margin: 0, lineHeight: 1.65 }}>
-      {DAY0_ORIENTATION_VIDEO.description}
-    </p>
+const OrientationVideoBox = ({ video }) => {
+  if (!video?.id) return null;
 
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        paddingTop: "56.25%",
-        borderRadius: 14,
-        overflow: "hidden",
-        background: "#000",
-        boxShadow: "0 14px 30px rgba(0,0,0,0.18)",
-      }}
-    >
-      <iframe
-        title={DAY0_ORIENTATION_VIDEO.title}
-        src={getYouTubeEmbedUrl(DAY0_ORIENTATION_VIDEO.id)}
+  return (
+    <Box title="Start here: Watch the Day 0 orientation video" tone="green">
+      <p style={{ margin: 0, lineHeight: 1.65 }}>
+        {video.description}
+      </p>
+
+      <div
         style={{
-          position: "absolute",
-          inset: 0,
+          position: "relative",
           width: "100%",
-          height: "100%",
-          border: 0,
+          paddingTop: "56.25%",
+          borderRadius: 14,
+          overflow: "hidden",
+          background: "#000",
+          boxShadow: "0 14px 30px rgba(0,0,0,0.18)",
         }}
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        allowFullScreen
-      />
-    </div>
+      >
+        <iframe
+          title={video.title}
+          src={getYouTubeEmbedUrl(video.id)}
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            border: 0,
+          }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowFullScreen
+        />
+      </div>
 
-    <p style={{ margin: 0, lineHeight: 1.65 }}>
-      If the video does not load, open it here: {" "}
-      <a href={DAY0_ORIENTATION_VIDEO.url} target="_blank" rel="noreferrer">
-        watch on YouTube
-      </a>
-      .
-    </p>
-  </Box>
-);
+      <p style={{ margin: 0, lineHeight: 1.65 }}>
+        If the video does not load, open it here: {" "}
+        <a href={video.url} target="_blank" rel="noreferrer">
+          watch on YouTube
+        </a>
+        .
+      </p>
+    </Box>
+  );
+};
 
 const Day0StudentWorkflowUpgrade = () => {
   const location = useLocation();
@@ -97,7 +111,7 @@ const Day0StudentWorkflowUpgrade = () => {
         <span style={{ ...styles.badge, background: "#dbeafe", color: "#1d4ed8" }}>Read before Day 1</span>
       </div>
 
-      <OrientationVideoBox />
+      <OrientationVideoBox video={config.video} />
 
       <Box title="1. How the course works">
         <p style={{ margin: 0, lineHeight: 1.65 }}>
