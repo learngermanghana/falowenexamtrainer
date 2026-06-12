@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 
@@ -14,14 +15,13 @@ const card = { ...styles.card, display: "grid", gap: 12 };
 const listSpacing = { margin: 0, paddingLeft: 20, lineHeight: 1.7 };
 
 const C1Day13MehrsprachigkeitWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <section style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>Back to Course</button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, margin: 0 }}>C1 · Day 13 Workbook · Mehrsprachigkeit</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter: 3.3 · Fokus: Indirekte Rede und Distanzierung</p>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>

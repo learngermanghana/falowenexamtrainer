@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const heroImage =
@@ -75,7 +76,6 @@ const arrowStyle = {
   color: "#6b7280",
   alignSelf: "center",
 };
-
 
 const placeValueGrid = {
   display: "grid",
@@ -201,7 +201,6 @@ const numbersZeroToTwenty = [
 ];
 
 const GermanNumbersGrammarPage = () => {
-  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -238,17 +237,7 @@ const GermanNumbersGrammarPage = () => {
           }}
         >
           <div style={{ padding: 20, color: "#fff", width: "100%" }}>
-            <button
-              style={{
-                ...styles.secondaryButton,
-                width: "fit-content",
-                marginBottom: 14,
-                background: "rgba(255,255,255,0.9)",
-              }}
-              onClick={() => navigate("/campus/course")}
-            >
-              Back to Course
-            </button>
+            <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
             <h1 style={{ ...styles.title, marginBottom: 6, color: "#fff" }}>
               German Numbers 0–10,000 and Address Expressions

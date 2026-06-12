@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -89,7 +90,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const A2Day21EinWochenendePlanenWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -104,9 +104,7 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 21 Workbook · Ein Wochenende planen</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: group speaking, writing, reading and listening practice.</p>
@@ -198,7 +196,6 @@ const A2Day21EinWochenendePlanenWorkbookPage = () => {
             <strong>Zusatz:</strong> Nutzt die Stichwörter <em>Freizeit</em>, <em>Treffen</em>, <em>Samstag</em> und <em>Sonntag</em>.
             Erzählt danach von eurem Wochenendprogramm.
           </p>
-
 
           <h3 style={{ margin: 0 }}>Sprechen wie bei einer Mini-Präsentation</h3>
           <p style={{ margin: 0, lineHeight: 1.7 }}>

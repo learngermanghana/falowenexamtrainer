@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { courseSchedules } from "../data/courseSchedule";
@@ -520,13 +521,7 @@ const CourseLessonPage = () => {
   if (!entry) {
     return (
       <div style={{ ...styles.container, display: "grid", gap: 12 }}>
-        <button
-          type="button"
-          style={{ ...styles.secondaryButton, justifySelf: "start" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          ← Course Book
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <div style={styles.card}>
           <h1 style={{ marginTop: 0 }}>Lesson not found</h1>
           <p style={{ marginBottom: 0 }}>
@@ -549,18 +544,7 @@ const CourseLessonPage = () => {
         maxWidth: 900,
       }}
     >
-      <button
-        type="button"
-        style={{
-          ...styles.secondaryButton,
-          justifySelf: "start",
-          padding: "6px 10px",
-          fontSize: 12,
-        }}
-        onClick={() => navigate("/campus/course")}
-      >
-        ← Course Book
-      </button>
+      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
       <article style={{ display: "grid", gap: 14 }}>
         <header

@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import AppPageShell from "./layout/AppPageShell";
 import { styles } from "../styles";
 
 const Section = ({ title, children }) => (
@@ -33,21 +33,15 @@ const Callout = ({ children }) => (
   </div>
 );
 
-const CourseStructurePage = () => {
-  const navigate = useNavigate();
-
-  return (
-    <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-      <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
-        <h1 style={{ ...styles.title, marginBottom: 0 }}>Course book structure & what to expect</h1>
-        <p style={{ ...styles.subtitle, margin: 0 }}>
-          A quick guide to how each study day is organised so you can plan your learning time.
-        </p>
-      </div>
-
+const CourseStructurePage = () => (
+  <AppPageShell
+    title="Course book structure & what to expect"
+    subtitle="A quick guide to how each study day is organised so you can plan your learning time."
+    backLabel="Back to Course Book"
+    backTo="/campus/course"
+    className="course-structure-page"
+  >
+    <div style={{ display: "grid", gap: 16 }}>
       <Section title="How the course book is structured">
         <BulletList
           items={[
@@ -82,7 +76,7 @@ const CourseStructurePage = () => {
         />
       </Section>
     </div>
-  );
-};
+  </AppPageShell>
+);
 
 export default CourseStructurePage;

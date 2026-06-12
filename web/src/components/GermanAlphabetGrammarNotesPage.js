@@ -1,5 +1,6 @@
 import React, { memo } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const sectionStyle = { ...styles.card, display: "grid", gap: 10 };
@@ -75,17 +76,11 @@ const pronunciationRows = [
 ];
 
 const GermanAlphabetGrammarNotesPage = () => {
-  const navigate = useNavigate();
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>German Alphabet Grammar Notes</h1>
 

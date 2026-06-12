@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { updatePageMeta } from "../lib/pageMeta";
 import { styles } from "../styles";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
@@ -108,7 +109,6 @@ const listeningBoxStyle = {
 };
 
 const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
-  const navigate = useNavigate();
 
   useEffect(() => {
     updatePageMeta({
@@ -120,12 +120,7 @@ const A1Day3GermanAlphabetReviewingWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={cardStyle}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           A1 · Day 2 Workbook · German Alphabet + Reviewing

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = { ...styles.card, display: "grid", gap: 12 };
@@ -24,15 +25,12 @@ const connectorCardStyle = {
 };
 
 const A2Day28UeberDieZukunftSprechenGrammarPage = () => {
-  const navigate = useNavigate();
   const [showAnswers, setShowAnswers] = useState(false);
 
   return (
     <main style={styles.pageWrap}>
       <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-        <button type="button" onClick={() => navigate(-1)} style={styles.backBtn} aria-label="Go back">
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <header style={cardStyle}>
           <h1 style={{ margin: 0 }}>A2 · Day 28 Grammar Notes · Über die Zukunft sprechen (10.28)</h1>

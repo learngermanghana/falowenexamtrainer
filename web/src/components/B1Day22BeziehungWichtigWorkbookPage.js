@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
@@ -108,7 +109,6 @@ const lesenQuestions = [
   },
 ];
 
-
 const teil4LesenQuestions = [
   {
     stem: "Wo findet man Stellenanzeigen nicht?",
@@ -141,8 +141,6 @@ const teil4LesenQuestions = [
     ],
   },
 ];
-
-
 
 const card = {
   ...styles.card,
@@ -201,7 +199,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const B1Day22BeziehungWichtigWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -216,9 +213,7 @@ const B1Day22BeziehungWichtigWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 · Day 22 Workbook · Was ist dir in einer Beziehung wichtig?</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>

@@ -1,5 +1,6 @@
 import React, { memo } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = { ...styles.card, display: "grid", gap: 10 };
@@ -245,17 +246,11 @@ const splashImageUrl =
   "https://images.unsplash.com/photo-1488900128323-21503983a07e?auto=format&fit=crop&w=1800&q=80";
 
 const WoTreffenUnsGrammarPage = () => {
-  const navigate = useNavigate();
 
   return (
     <main style={{ ...styles.container, display: "grid", gap: 16 }}>
       <header style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <button
-          style={{ ...styles.secondaryButton, width: "fit-content" }}
-          onClick={() => navigate("/campus/course")}
-        >
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           Wo möchten wir uns treffen? (2.4)

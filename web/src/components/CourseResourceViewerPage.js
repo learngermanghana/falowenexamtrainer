@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useLocation, useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import YouTubeSubscribeButton from "./YouTubeSubscribeButton";
@@ -183,9 +184,7 @@ const CourseResourceViewerPage = () => {
             </button>
           ))}
         </div>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <YouTubeSubscribeButton />
         <h1 style={{ ...styles.title, margin: 0 }}>{label}: zoom viewer</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>

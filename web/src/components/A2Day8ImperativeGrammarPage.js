@@ -1,5 +1,6 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = { ...styles.card, display: "grid", gap: 10 };
@@ -64,19 +65,11 @@ const SelfCheckItem = ({ number, question, answer }) => (
 );
 
 const A2Day8ImperativeGrammarPage = () => {
-  const navigate = useNavigate();
 
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          style={styles.backBtn}
-          aria-label="Go back"
-        >
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <header style={{ marginBottom: 18 }}>
           <h1 style={{ margin: "0 0 8px" }}>A2 • 3.8 Rezepte und Essen</h1>

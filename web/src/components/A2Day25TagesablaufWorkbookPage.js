@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
@@ -52,7 +53,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 export default function A2Day25TagesablaufWorkbookPage() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
 
@@ -61,7 +61,7 @@ export default function A2Day25TagesablaufWorkbookPage() {
 
   return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
     <div style={card}>
-      <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>Back to Course</button>
+      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
       <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 25 Workbook · Tagesablauf 9.25</h1>
       <p style={{ ...styles.subtitle, margin: 0 }}>4-part workbook: speaking, writing, reading, and listening practice about daily routines.</p>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>{tabs.map((tab) => <TabButton key={tab.key} active={tab.key === activeTab} onClick={() => setActiveTab(tab.key)}>{tab.label}</TabButton>)}</div>
@@ -69,7 +69,6 @@ export default function A2Day25TagesablaufWorkbookPage() {
     </div>
 
     <A2B1WorkbookGuidance />
-
 
     {activeTab === "sprechen" && <div style={card}><img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1600&q=80" alt="Students discussing their day in class" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
       <h2 style={sectionTitle}>Teil 1 (Sprechen) · Group Practice</h2>

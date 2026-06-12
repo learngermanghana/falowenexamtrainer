@@ -1,5 +1,6 @@
 import React, { memo, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = {
@@ -379,7 +380,6 @@ const TransformPractice = ({ item }) => {
 };
 
 const A2Day7RelativeClausesWohnungGrammarPage = () => {
-  const navigate = useNavigate();
 
   const [quizSelections, setQuizSelections] = useState({});
   const [quizChecked, setQuizChecked] = useState({});
@@ -420,9 +420,7 @@ const A2Day7RelativeClausesWohnungGrammarPage = () => {
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
-        <button type="button" onClick={() => navigate(-1)} style={styles.backBtn}>
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <div style={{ display: "grid", gap: 14 }}>
           <section style={heroStyle}>

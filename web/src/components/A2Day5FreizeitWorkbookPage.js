@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
@@ -120,7 +121,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const A2Day5FreizeitWorkbookPage = () => {
-  const navigate = useNavigate();
   const splashImageUrl =
     "https://images.unsplash.com/photo-1511988617509-a57c8a288659?auto=format&fit=crop&w=1800&q=80";
   const [activeTab, setActiveTab] = useState("sprechen");
@@ -132,9 +132,7 @@ const A2Day5FreizeitWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>A2 · Day 5 Workbook · Was machst du in deiner Freizeit?</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter 2.5 · Dative Preposition · Talk about free time activities.</p>

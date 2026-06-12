@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import CourseInlinePracticePanel from "./CourseInlinePracticePanel";
 import { A2B1WorkbookGuidance, WorkbookSubmissionReminder } from "./A2B1WorkbookGuidance";
@@ -52,16 +53,13 @@ function TabButton({ active, onClick, children }) {
 }
 
 const B1Day25OnlineShoppingRightsRisksWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const activeIndex = useMemo(() => tabs.findIndex((tab) => tab.key === activeTab), [activeTab]);
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>B1 · Chapter 8.25 Workbook · Online einkaufen – Rechte und Risiken</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Rechte und Risiken beim Online-Shopping besprechen.</p>

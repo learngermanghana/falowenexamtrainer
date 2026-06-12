@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "../navigation/AppBackButton";
+
 import { styles } from "../../styles";
 import { EmbeddedPracticeNote, EmbeddedSpeechPracticePanel, EmbeddedWritingPracticePanel } from "./EmbeddedPracticePanels";
 
@@ -32,7 +33,6 @@ function ExternalCard({ title, resource }) {
 }
 
 export default function SelfLearningTabbedLessonPage({ lesson }) {
-  const navigate = useNavigate();
   const [tab, setTab] = useState("learn");
   const storageKey = `falowen:self-learning:lesson:${lesson.level}:${lesson.day}`;
   const [progress, setProgress] = useState(() => {
@@ -46,7 +46,7 @@ export default function SelfLearningTabbedLessonPage({ lesson }) {
   const writingTopic = lesson.writingTopic || lesson.tasks?.writing || `Schreibe über: ${lesson.title}`;
 
   return <div style={{ ...styles.container, display: "grid", gap: 16 }}>
-    <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={() => navigate("/campus/course")}>← Course Book</button>
+    <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
     <header style={{ borderRadius: 20, overflow: "hidden", border: "1px solid #e5e7eb", boxShadow: "0 18px 40px rgba(15,23,42,.12)", background: "#fff" }}>
       <div style={{ minHeight: 250, backgroundImage: `linear-gradient(90deg, rgba(15,23,42,.88), rgba(15,23,42,.42)), url(${lesson.heroImage || DEFAULT_HERO})`, backgroundSize: "cover", backgroundPosition: "center", color: "#fff", padding: "28px clamp(18px,4vw,36px)", display: "grid", alignContent: "end", gap: 16 }}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

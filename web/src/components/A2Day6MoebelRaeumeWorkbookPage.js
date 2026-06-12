@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 import CoursebookAudioPlayer from "./CoursebookAudioPlayer";
@@ -164,7 +165,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const A2Day6MoebelRaeumeWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({
     sprechen: false,
@@ -182,9 +182,7 @@ const A2Day6MoebelRaeumeWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <h1 style={{ ...styles.title, marginBottom: 0 }}>
           A2 · Day 6 Workbook · Möbel und Räume kennenlernen (3.6)

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 
@@ -36,9 +37,7 @@ const C1Day1WillkommenSelbstlernstartPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>C1 · Tag 1 · Willkommen + Selbstlernstart</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>
           Thema: Stell dich vor und erkläre, warum du Deutsch auf C1 lernst.

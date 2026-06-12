@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import AppBackButton from "./navigation/AppBackButton";
 import { useNavigate } from "react-router-dom";
 import { styles } from "../styles";
 import { useToast } from "../context/ToastContext";
@@ -310,9 +311,7 @@ const CompletionBanner = ({ message, onBackToCourse }) => {
     <div style={completionBannerStyle} role="status" aria-live="polite">
       <strong>✅ {message.title}</strong>
       <p style={{ margin: 0, lineHeight: 1.6 }}>{message.body}</p>
-      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start" }} onClick={onBackToCourse}>
-        Back to Course Book
-      </button>
+      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" onBack={onBackToCourse} />
     </div>
   );
 };
@@ -386,9 +385,7 @@ export default function SelfLearningEditableLessonPageV2({ lesson }) {
 
   return (
     <div style={{ ...styles.container, display: "grid", gap: 18 }}>
-      <button type="button" style={{ ...styles.secondaryButton, justifySelf: "start", borderRadius: 999, padding: "10px 18px", boxShadow: "0 6px 18px rgba(15, 23, 42, 0.06)" }} onClick={() => navigate("/campus/course")}>
-        ← Course Book
-      </button>
+      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
       <CompletionBanner message={completionMessage} onBackToCourse={() => navigate("/campus/course")} />
 

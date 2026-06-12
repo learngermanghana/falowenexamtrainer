@@ -1,5 +1,6 @@
 import React, { memo } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = { ...styles.card, display: "grid", gap: 10 };
@@ -26,14 +27,11 @@ const InlineCode = ({ children }) => (
 );
 
 const A2Day6TwoCasePrepositionsGrammarPage = () => {
-  const navigate = useNavigate();
 
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
-        <button type="button" onClick={() => navigate(-1)} style={styles.backBtn}>
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <header style={{ marginBottom: 18 }}>
           <h1 style={{ margin: "0 0 8px" }}>A2 • 3.6 Möbel und Räume kennenlernen</h1>

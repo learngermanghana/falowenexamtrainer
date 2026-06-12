@@ -1,4 +1,5 @@
 // AuthGate.js
+import AppBackButton from "./navigation/AppBackButton";
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { styles } from "../styles";
@@ -355,9 +356,7 @@ const AuthGate = ({ onBack, onSwitchToSignup, initialMode = "login" }) => {
               </select>
             </label>
             {onBack && (
-              <button style={{ ...styles.secondaryButton, padding: "6px 12px" }} onClick={onBack}>
-                Back to overview
-              </button>
+              <AppBackButton label="Back to overview" fallbackPath="/" onBack={onBack} />
             )}
           </div>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const heroSrc =
@@ -337,17 +338,7 @@ const HealthBodyPartsPage = () => {
   return (
     <main style={{ ...styles.container, display: "grid", gap: 18 }}>
       <header style={{ ...styles.card, display: "grid", gap: 12 }}>
-        <Link
-          to="/campus/course"
-          style={{
-            ...styles.secondaryButton,
-            width: "fit-content",
-            display: "inline-block",
-            textDecoration: "none",
-          }}
-        >
-          Back to Course
-        </Link>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
         <div style={{ display: "grid", gap: 8 }}>
           <TopicLabel>Health Vocabulary</TopicLabel>

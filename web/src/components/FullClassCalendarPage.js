@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+import { useParams } from "react-router-dom";
 import { styles } from "../styles";
 import { classCatalog } from "../data/classCatalog";
 import { courseSchedulesByName } from "../data/courseSchedules";
@@ -18,7 +19,6 @@ const formatDate = (value) => {
 };
 
 const FullClassCalendarPage = () => {
-  const navigate = useNavigate();
   const { className: encodedClassName = "" } = useParams();
   const className = useMemo(() => {
     try {
@@ -34,7 +34,7 @@ const FullClassCalendarPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>Back to Course</button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <h1 style={{ ...styles.title, margin: 0 }}>Full class calendar</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>{className || "Class not found"}</p>
       </div>

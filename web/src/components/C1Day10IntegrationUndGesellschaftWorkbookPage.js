@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 import SpeakingPracticeTimerCard from "./SpeakingPracticeTimerCard";
 
@@ -32,7 +33,6 @@ const PreparedCheckbox = ({ checked, onChange }) => (
 );
 
 const C1Day10IntegrationUndGesellschaftWorkbookPage = () => {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("sprechen");
   const [prepared, setPrepared] = useState({ sprechen: false, schreiben: false, lesen: false, hoeren: false });
 
@@ -42,7 +42,7 @@ const C1Day10IntegrationUndGesellschaftWorkbookPage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={card}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>Back to Course</button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <img src={HERO_IMAGE} alt="People from different backgrounds meeting in an urban public space" loading="lazy" style={{ width: "100%", borderRadius: 10, maxHeight: 260, objectFit: "cover" }} />
         <h1 style={{ ...styles.title, marginBottom: 0 }}>C1 · Day 10 Workbook · Integration und Gesellschaft</h1>
         <p style={{ ...styles.subtitle, margin: 0 }}>Chapter: 2.5</p>

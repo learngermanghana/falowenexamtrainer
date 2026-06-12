@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { useAuth } from "../context/AuthContext";
 import {
   collection,
@@ -528,7 +529,6 @@ function StatementContributionSection() {
 }
 
 export default function A1RevisionOriginalContentPage() {
-  const navigate = useNavigate();
 
   return (
     <div style={styles.pageWrap}>
@@ -544,9 +544,7 @@ export default function A1RevisionOriginalContentPage() {
             <p style={{ margin: 0 }}>
               This revision page helps you practise practical German for everyday situations.
             </p>
-            <button type="button" style={lightBtn} onClick={() => navigate(-1)}>
-              ← Back
-            </button>
+            <AppBackButton label="Back" fallbackPath="/campus/course" />
           </div>
         </section>
 

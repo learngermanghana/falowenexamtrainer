@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = {
@@ -268,7 +269,6 @@ const starterSentences = [
 ];
 
 const A1Day16FoodAndNegationGrammarPage = () => {
-  const navigate = useNavigate();
 
   const [showAnswers, setShowAnswers] = useState(false);
   const [flashIndex, setFlashIndex] = useState(0);
@@ -385,12 +385,7 @@ const A1Day16FoodAndNegationGrammarPage = () => {
               color: "#fff",
             }}
           >
-            <button
-              style={{ ...styles.secondaryButton, width: "fit-content" }}
-              onClick={() => navigate("/campus/course")}
-            >
-              Back to Course
-            </button>
+            <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
 
             <div
               style={{

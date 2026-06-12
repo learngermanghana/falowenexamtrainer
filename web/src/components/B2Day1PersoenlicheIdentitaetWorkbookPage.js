@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
 
 const tabs = [
   { key: "sprechen", label: "Sprechen" },
@@ -9,13 +9,12 @@ const tabs = [
 ];
 
 export default function B2Day1PersoenlicheIdentitaetWorkbookPage() {
-  const navigate = useNavigate();
   const [active, setActive] = useState("sprechen");
   const activeLabel = useMemo(() => tabs.find((t) => t.key === active)?.label, [active]);
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: 16 }}>
-      <button onClick={() => navigate("/campus/course")}>Back to Course</button>
+      <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
       <h1>B2 · Day 1.1 Workbook · Persönliche Identität und Selbstverständnis</h1>
       <p>4-part workbook: Sprechen, Schreiben, Lesen, Hören.</p>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const cardStyle = { ...styles.card, display: "grid", gap: 12 };
@@ -46,15 +47,12 @@ const SectionCard = ({ title, children }) => (
 );
 
 const A2Day11ComparativeFormsGrammarPage = () => {
-  const navigate = useNavigate();
   const [showQuizAnswers, setShowQuizAnswers] = useState(false);
 
   return (
     <div style={styles.pageWrap}>
       <div style={styles.container}>
-        <button type="button" onClick={() => navigate(-1)} style={styles.backBtn} aria-label="Go back">
-          ← Back
-        </button>
+        <AppBackButton label="Back" fallbackPath="/campus/course" />
 
         <header style={{ ...styles.card, display: "grid", gap: 10, marginBottom: 18 }}>
           <h1 style={{ margin: 0 }}>A2 • 4.11 Unterwegs: Verkehrsmittel vergleichen</h1>

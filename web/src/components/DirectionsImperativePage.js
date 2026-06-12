@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import AppBackButton from "./navigation/AppBackButton";
+
 import { styles } from "../styles";
 
 const Section = ({ title, children }) => (
@@ -128,7 +129,6 @@ const speakingCards = [
 ];
 
 const DirectionsImperativePage = () => {
-  const navigate = useNavigate();
   const [quizAnswers, setQuizAnswers] = useState({});
   const [mapProgress, setMapProgress] = useState(0);
   const [mapChoice, setMapChoice] = useState("");
@@ -174,9 +174,7 @@ const DirectionsImperativePage = () => {
   return (
     <div style={{ ...styles.container, display: "grid", gap: 16 }}>
       <div style={{ ...styles.card, display: "grid", gap: 8 }}>
-        <button style={{ ...styles.secondaryButton, width: "fit-content" }} onClick={() => navigate("/campus/course")}>
-          Back to Course
-        </button>
+        <AppBackButton label="Back to Course Book" fallbackPath="/campus/course" />
         <img
           src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1600&q=80"
           alt="City intersection with roads and buildings for practicing German directions"
