@@ -44,10 +44,9 @@ const c1Day2LearningSpeakingGuide = {
     ],
   },
   speaking: {
-    title: "C1-Ideenmap: Kultur und Identität",
+    title: "Ideen für das Thema Kultur und Identität",
     instruction:
-      "Wähle mindestens drei Bereiche aus. Sammle zu jedem Bereich ein Beispiel oder eine persönliche Beobachtung. Danach beantwortest du die Sprechfrage unter der Ideenmap.",
-    center: "Kultur & Identität",
+      "Lies die Themenbereiche und Beispiele. Nutze daraus passende Ideen für deine Antwort auf die Sprechfrage darunter.",
     branches: [
       {
         id: "sprache",
@@ -65,21 +64,21 @@ const c1Day2LearningSpeakingGuide = {
       },
       {
         id: "familie",
-        title: "Familie & Erziehung",
+        title: "Familie und Erziehung",
         keywords: ["Eltern", "Generationen", "Religion", "Regeln", "Erwartungen", "Vorbild"],
         prompt: "Welche Werte und Verhaltensweisen werden in der Familie vermittelt?",
         example: "Von der Familie vermittelte Werte beeinflussen häufig spätere Entscheidungen.",
       },
       {
         id: "migration",
-        title: "Migration & Lebensräume",
+        title: "Migration und Lebensräume",
         keywords: ["Herkunft", "neues Land", "Integration", "Anpassung", "Heimat", "Mehrfachzugehörigkeit"],
         prompt: "Wie verändert das Leben zwischen mehreren Ländern oder Kulturen die Identität?",
         example: "In zwei Ländern lebende Menschen entwickeln oft ein vielschichtiges Zugehörigkeitsgefühl.",
       },
       {
         id: "gesellschaft",
-        title: "Medien & Gesellschaft",
+        title: "Medien und Gesellschaft",
         keywords: ["Schule", "Freundeskreis", "soziale Medien", "Rollenbilder", "Normen", "Öffentlichkeit"],
         prompt: "Wie beeinflussen Gesellschaft und Medien das Selbstbild?",
         example: "In sozialen Medien verbreitete Rollenbilder können das eigene Selbstverständnis beeinflussen.",
