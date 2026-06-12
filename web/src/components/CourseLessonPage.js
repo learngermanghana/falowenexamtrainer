@@ -137,10 +137,17 @@ const LessonResourceCard = ({ number, icon, title, description, actionLabel, url
 };
 
 const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
-  const teacherVideo = findVideo(videoResources, "teacher") || videoResources?.[0];
-  const aiVideo = findVideo(videoResources, "ai") || videoResources?.find((resource) => resource?.url !== teacherVideo?.url);
+  const normalizedLevel = normalizeLevel(level);
+  const showTeacherLecture = normalizedLevel === "A1";
+  const teacherVideo = showTeacherLecture ? findVideo(videoResources, "teacher") || videoResources?.[0] : null;
+  const aiVideo =
+    findVideo(videoResources, "ai") ||
+    (showTeacherLecture ? videoResources?.find((resource) => resource?.url !== teacherVideo?.url) : videoResources?.[0]);
   const grammarUrl = lessonResourceUrl(entry, "grammarbook_link", level, day);
   const workbookUrl = lessonResourceUrl(entry, "workbook_link", level, day);
+  const aiVideoNumber = showTeacherLecture ? "2" : "1";
+  const grammarNumber = showTeacherLecture ? "3" : "2";
+  const workbookNumber = showTeacherLecture ? "4" : "3";
 
   return (
     <section
@@ -157,21 +164,25 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
       <div style={{ display: "grid", gap: 4 }}>
         <h2 style={{ margin: 0, color: palette.ink, fontSize: 20, lineHeight: 1.15 }}>Lesson resources</h2>
         <p style={{ margin: 0, color: palette.muted, fontSize: 13, lineHeight: 1.45 }}>
-          Choose what you want to use first: watch a lecture, study the grammar, or open the workbook.
+          {showTeacherLecture
+            ? "Choose what you want to use first: watch a lecture, study the grammar, or open the workbook."
+            : "Use the AI lecture first, then study the grammar or open the workbook."}
         </p>
       </div>
 
       <div style={{ display: "grid", gap: 8 }}>
+        {showTeacherLecture ? (
+          <LessonResourceCard
+            number="1"
+            icon="🎬"
+            title="Teacher lecture video"
+            description={teacherVideo?.description || "Recorded class explanation from the teacher."}
+            actionLabel="Watch teacher video"
+            url={teacherVideo?.url}
+          />
+        ) : null}
         <LessonResourceCard
-          number="1"
-          icon="🎬"
-          title="Teacher lecture video"
-          description={teacherVideo?.description || "Recorded class explanation from the teacher."}
-          actionLabel="Watch teacher video"
-          url={teacherVideo?.url}
-        />
-        <LessonResourceCard
-          number="2"
+          number={aiVideoNumber}
           icon="🤖"
           title="AI lecture / grammar video"
           description={aiVideo?.description || "AI explanation for revision and self-study."}
@@ -179,7 +190,7 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
           url={aiVideo?.url}
         />
         <LessonResourceCard
-          number="3"
+          number={grammarNumber}
           icon="📘"
           title="Grammar book"
           description="Read the grammar notes and examples before or after watching the videos."
@@ -187,7 +198,7 @@ const LessonResourcesHub = ({ entry, videoResources, level, day }) => {
           url={grammarUrl}
         />
         <LessonResourceCard
-          number="4"
+          number={workbookNumber}
           icon="📝"
           title="Workbook"
           description="Open the workbook, answer the tasks, and prepare your final answers."
