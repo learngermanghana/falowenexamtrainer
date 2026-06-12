@@ -140,6 +140,7 @@ import { styles } from "./styles";
 import "./App.css";
 import StudentResultsPage from "./components/StudentResultsPage";
 import GeneralHome from "./components/GeneralHome";
+import OnboardingChecklist from "./components/OnboardingChecklist";
 import SpeakingPage from "./components/SpeakingPage";
 import ExamResources from "./components/ExamResources";
 import HorenPage from "./components/HorenPage";
@@ -469,6 +470,12 @@ const AppShell = ({
   const { showToast } = useToast();
   const { i18n, t } = useTranslation();
   const resolvedInterfaceLanguage = i18n.resolvedLanguage || i18n.language;
+  const isOnboarding = location.pathname === "/onboarding";
+  const onboardingRole = String(studentProfile?.role || "student").toLowerCase();
+  const requiresOnboarding =
+    !["admin", "tutor"].includes(onboardingRole) &&
+    !Boolean(studentProfile?.isTutor) &&
+    !Boolean(studentProfile?.onboardingCompleted);
   const interfaceLanguageOptions = useMemo(
     () => [
       { value: "en", label: t("interfaceLanguages.en") },
@@ -551,9 +558,21 @@ const AppShell = ({
     };
   }, [showToast, studentProfile, user]);
 
+  if (requiresOnboarding && !isOnboarding) {
+    return <Navigate to="/onboarding" replace />;
+  }
+
+  if (!requiresOnboarding && isOnboarding) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
-    <div className="app-shell" style={styles.container}>
-      <header
+    <div
+      className={isOnboarding ? "onboarding-shell" : "app-shell"}
+      style={isOnboarding ? undefined : styles.container}
+    >
+      {!isOnboarding ? (
+        <header
         className="app-header"
         style={{
           ...styles.header,
@@ -598,8 +617,9 @@ const AppShell = ({
             </button>
           </div>
         </div>
-      </header>
-      <OfflineBanner />
+        </header>
+      ) : null}
+      {!isOnboarding ? <OfflineBanner /> : null}
 
       {location.pathname.startsWith("/campus/course/") ? (
         <CampusQuickNavigation
@@ -610,8 +630,17 @@ const AppShell = ({
       ) : null}
 
       <main className="layout-main" style={{ minWidth: 0 }}>
-        <AutoWorkbookStartGuide />
+        {!isOnboarding ? <AutoWorkbookStartGuide /> : null}
         <Routes>
+          <Route
+            path="/onboarding"
+            element={
+              <OnboardingChecklist
+                studentProfile={studentProfile}
+                onSaveOnboarding={() => saveStudentProfile({ onboardingCompleted: true })}
+              />
+            }
+          />
           <Route
             path="/"
             element={
@@ -975,7 +1004,7 @@ const AppShell = ({
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
-      <StudyBuddyBar studentProfile={studentProfile} />
+      {!isOnboarding ? <StudyBuddyBar studentProfile={studentProfile} /> : null}
     </div>
   );
 };
