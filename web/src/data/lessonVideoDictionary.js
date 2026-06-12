@@ -54,6 +54,9 @@ export const LESSON_VIDEO_DICTIONARY = {
     15: {
       ai_grammar_video: "https://youtu.be/uf3OJwalh6U",
     },
+    27: {
+      ai_grammar_video: "https://youtu.be/5vmLAg1aWq8",
+    },
   },
   B1: {
     1: {
